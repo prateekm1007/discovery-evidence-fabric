@@ -1,0 +1,3231 @@
+{
+ "artifact_type": "R412_ATTACKER_CALIBRATION_CORPUS",
+ "corpus_id": "r412-attacker-calibration-v1",
+ "created_in": "R412",
+ "created_at": "2026-09-05T15:26:46.122616+00:00",
+ "reviewer_provenance": "AI_REVIEW",
+ "authorship_independence": "authored from established physics/engineering knowledge, independently of the attacker's behavior (Art. VIII: no certification corpus may be generated from the verifier's own behavior). Ground truth (label, expected verdict, defect class, basis) is recorded per case BEFORE any attacker run; the committing hash seals the corpus.",
+ "instrument_semantics": {
+  "KNOWN_GOOD": "given the case's inputs (candidate record, evidence pool, provided prior-art set), a calibrated attacker must NOT kill; the provided prior art is related but non-colliding by construction",
+  "KNOWN_BAD": "carries a genuine defect from the Art. L minimum classes; a calibrated attacker must KILL",
+  "NEAR_MISS": "real mechanism with ONE specific defect (magnitude, regime, baseline inversion, service mismatch); a calibrated attacker must KILL for that defect \u2014 these are the discrimination tests",
+  "PRIOR_ART_COLLISION": "the provided prior-art set teaches the same mechanism+intervention+effect; a calibrated attacker must KILL on prior_art citing the teaching record"
+ },
+ "pre_registered_thresholds": {
+  "note": "registered BEFORE measurement; never tuned to results (Art. XXVII)",
+  "coverage_min": 0.875,
+  "parse_completeness_min": 0.875,
+  "tpr_min": 0.75,
+  "fpr_max": 0.3,
+  "ensemble": "NONE (single-attacker calibration only; majority-vote ensembles are deferred by the R412 directive)"
+ },
+ "n_cases": 40,
+ "n_domains": 24,
+ "domains": [
+  "aerospace",
+  "agriculture",
+  "automotive",
+  "batteries_ev",
+  "carbon_capture",
+  "chemical_process",
+  "construction",
+  "data_center_thermal",
+  "electronics_thermal",
+  "grid_storage",
+  "hvac_chiller",
+  "industrial_pumps",
+  "industrial_sensing",
+  "industrial_valves",
+  "machining",
+  "marine",
+  "mining",
+  "power",
+  "power_electronics",
+  "semiconductor_fab",
+  "solar_pv",
+  "telecom",
+  "transport_infra",
+  "wind"
+ ],
+ "label_counts": {
+  "KNOWN_GOOD": 10,
+  "KNOWN_BAD": 10,
+  "NEAR_MISS": 10,
+  "PRIOR_ART_COLLISION": 10
+ },
+ "cases": [
+  {
+   "case_id": "CAL-KG-01",
+   "domain_id": "data_center_thermal",
+   "pain_class": "TRANSIENT_PEAK",
+   "candidate": {
+    "candidate_id": "CAL-KG-01",
+    "technology_name": "PCM-Buffered Cold Plate for Training Burst Peak-Shaving",
+    "problem": "AI training bursts create 2-6 minute thermal power spikes that force chillers and fans to be sized and run for peaks, inflating cooling energy 15-25% over the duty-cycle average",
+    "causal_chain": [
+     "Phase-change material layer integrated into cold-plate base",
+     "training burst raises heat flux",
+     "PCM absorbs heat as latent heat at its melting point",
+     "cooling loop and fan speeds see a damped, delayed load",
+     "peak cooling demand is shaved and average-speed operation dominates",
+     "cooling energy for the burst window falls"
+    ],
+    "unexploited_phenomenon": "Latent-heat buffering of paraffin-class PCMs near 28-32 C: ~180-230 kJ/kg absorbed at near-constant temperature during melting (cal:kg01:r1)",
+    "intervention": "Bond a 4-8 mm paraffin PCM layer (m.p. 29 C, 190 kJ/kg) between the cold-plate copper base and the flow channel, sized to absorb the 90th-percentile burst energy of one rack row for 3 minutes",
+    "governing_variables": "PCM thickness (m), latent heat (kJ/kg), melting point (C), burst heat flux (W/cm2), loop setpoint (C)",
+    "predicted_effect": "15-25% reduction in cooling electricity during burst windows and 8-12% reduction in daily cooling energy; loop transient overshoot reduced by >50%; NOT a steady-state capacity change (honestly bounded: buffering only)",
+    "equations": [
+     "Q_burst = integral(q''(t) - q''_steady) dt over burst window [kJ]",
+     "m_PCM = Q_burst / (f * L) where L = 190 kJ/kg, f = melt fraction usable (0.7-0.9)"
+    ],
+    "boundary_conditions": "Effective only when PCM melting point sits between loop setpoint and peak silicon temperature; buffering duration is minutes (latent capacity), not steady state; requires burst duty cycle < 20% so PCM re-solidifies between bursts",
+    "evidence_refs": [
+     "cal:kg01:r1",
+     "cal:kg01:r2"
+    ],
+    "baseline": {
+     "baseline_incumbent": "Direct cold-plate loop with reactive variable-speed fan/chiller modulation responding to burst load in real time",
+     "baseline_metric": "Cooling energy per burst window 100% (reactive peak following)",
+     "candidate_metric": "75-85% of baseline energy per burst window"
+    },
+    "killer_experiment": {
+     "experiment": "Two identical 20 kW mock racks, one with PCM-buffered plates, one without; drive identical synthetic training-burst power traces (5-min bursts, 20% duty); log cooling electricity and silicon temps for 48 h",
+     "kill_condition": "If PCM rack cooling energy per burst window is not at least 8% lower than control rack with silicon temps within 2 C of control, the buffering mechanism is dead",
+     "cost_class": "BENCH"
+    },
+    "failure_modes": [
+     "PCM re-solidification incomplete between high-duty bursts",
+     "delamination/cycling fatigue of the bond layer",
+     "thermal resistance added in steady state raising baseline temperature"
+    ],
+    "commercial_path": {
+     "buyer": "Hyperscale and colocation data center operators buying retrofit rack-level cooling efficiency"
+    },
+    "cross_domain_transition": "Building-materials thermal mass buffering -> data center rack cooling (latent-heat buffering applied to a new transient regime)"
+   },
+   "pool": [
+    {
+     "record_id": "cal:kg01:r1",
+     "title": "Latent heat storage in paraffin-based phase change materials: measured enthalpies 180-230 kJ/kg and near-isothermal melting plateaus for building thermal mass applications"
+    },
+    {
+     "record_id": "cal:kg01:r2",
+     "title": "Transient thermal buffering of electronics heat sources: measured peak-shaving of temperature and heat-flux spikes with thin PCM layers under pulsed loads"
+    },
+    {
+     "record_id": "cal:kg01:r3",
+     "title": "Review of steady-state liquid cold plate design for server CPUs: single-phase pump loop optimization and fan speed control strategies"
+    }
+   ],
+   "prior_art": {
+    "relevant_records": [
+     {
+      "record_id": "cal:kg01:pa1",
+      "perspective": "MECHANISM",
+      "title": "PCM wallboards and ceiling panels for building peak-load shifting (different application: building HVAC, room-scale, hours-timescale)"
+     },
+     {
+      "record_id": "cal:kg01:pa2",
+      "perspective": "FORWARD",
+      "title": "Single-phase cold-plate loop with reactive fan-speed modulation for data center racks (no PCM layer, no latent buffering)"
+     }
+    ]
+   },
+   "ground_truth": {
+    "label": "KNOWN_GOOD",
+    "expected_final": "SURVIVED",
+    "defect_class": null,
+    "expected_kill_surface": null,
+    "ground_truth_basis": "Physics: paraffin latent heat at 29 C is a measured, textbook quantity (~190 kJ/kg); the transient heat equation guarantees the damping. The claim is honestly bounded (minutes-scale buffering, 15-25% burst-window energy, no steady-state claim). The provided prior art is RELATED (building PCM wallboards; reactive cold plates) but teaches neither the same intervention (PCM-bonded cold plates) nor the same effect (rack burst peak-shaving) \u2014 a calibrated attacker must distinguish related art from collision. The killer experiment has a real kill condition."
+   }
+  },
+  {
+   "case_id": "CAL-KG-02",
+   "domain_id": "industrial_sensing",
+   "pain_class": "BLIND_SPOT",
+   "candidate": {
+    "candidate_id": "CAL-KG-02",
+    "technology_name": "Fiber-Bragg Strain Grid for Tank Farm Settling Surveillance",
+    "problem": "Large welded storage tank farms develop gradual foundation settling that goes undetected between 5-year inspection surveys; localized differential settlement stresses shell welds",
+    "causal_chain": [
+     "Fiber Bragg grating strain sensors bonded on tank shell at 2 m vertical pitch",
+     "differential foundation settlement strains the shell wall",
+     "grating pitch changes shift the Bragg wavelength",
+     "wavelength shifts map to strain with 1-2 microstrain resolution",
+     "settling is detected within days instead of years"
+    ],
+    "unexploited_phenomenon": "Bragg wavelength shift with strain (~1.2 pm/microstrain at 1550 nm) in glass fiber bonded to steel (cal:kg02:r1)",
+    "intervention": "Permanently bond an FBG strain grid (8 rings x 8 azimuths) per tank on the lowest two shell courses, interrogated by one tunable-laser scanner shared across the farm",
+    "governing_variables": "Grating pitch (nm), strain sensitivity (pm/microstrain), bonded transfer efficiency, thermal compensation accuracy",
+    "predicted_effect": "Detection of differential settlement > 5 mm/m within 7 days of onset at 99% confidence; survey interval extended safely from 5 to 8 years pending sensor health",
+    "equations": [
+     "lambda_B = 2 n_eff Lambda; dlambda/depsilon = 1.2 pm/microstrain",
+     "epsilon_settle = E_corr / L_span after thermal compensation from co-located reference gratings"
+    ],
+    "boundary_conditions": "Requires thermal compensation (uncompensated temperature cross-sensitivity is ~6-13 microstrain/C, larger than the settling signal); bonded transfer must survive tank coating; not a substitute for internal corrosion inspection",
+    "evidence_refs": [
+     "cal:kg02:r1",
+     "cal:kg02:r2"
+    ],
+    "baseline": {
+     "baseline_incumbent": "Periodic 5-year out-of-service geometric surveys with plumb-line and level measurements",
+     "baseline_metric": "Detection latency up to 5 years",
+     "candidate_metric": "Detection latency < 7 days"
+    },
+    "killer_experiment": {
+     "experiment": "Calibrate grid on a test tank, induce controlled differential settlement with hydraulic jacks under one quadrant in 2 mm steps to 10 mm, record wavelength shifts vs surveyed settlement",
+     "kill_condition": "If induced settlement of 6 mm/m is not resolved above 3-sigma thermal noise within 7 days, the surveillance mechanism fails",
+     "cost_class": "LAB"
+    },
+    "failure_modes": [
+     "bond creep decoupling sensor from shell",
+     "thermal compensation drift",
+     "fiber breakage at nozzle penetrations"
+    ],
+    "commercial_path": {
+     "buyer": "Terminal operators and tank farm owners under API 653 inspection economics"
+    },
+    "cross_domain_transition": "Structural-health fiber sensing from bridges -> welded tank shells (same waveguide mechanism, new monitored structure)"
+   },
+   "pool": [
+    {
+     "record_id": "cal:kg02:r1",
+     "title": "Fiber Bragg grating strain sensing: measured wavelength-strain sensitivity 1.2 pm/microstrain and field deployments on bridge girders"
+    },
+    {
+     "record_id": "cal:kg02:r2",
+     "title": "Temperature compensation of FBG strain measurements using co-located reference gratings: measured cross-sensitivity 6-13 microstrain/C and its cancellation"
+    },
+    {
+     "record_id": "cal:kg02:r3",
+     "title": "API 653 tank inspection intervals: basis, out-of-service survey practice, and settling limits for welded storage tanks"
+    }
+   ],
+   "prior_art": {
+    "relevant_records": [
+     {
+      "record_id": "cal:kg02:pa1",
+      "perspective": "MECHANISM",
+      "title": "FBG strain monitoring of bridge and dam structures (civil infrastructure, not tank shells, not settlement surveillance service)"
+     },
+     {
+      "record_id": "cal:kg02:pa2",
+      "perspective": "FORWARD",
+      "title": "Inclinometer settlement monitoring arrays around tank foundations (ground-based, external to the shell, coarser resolution)"
+     }
+    ]
+   },
+   "ground_truth": {
+    "label": "KNOWN_GOOD",
+    "expected_final": "SURVIVED",
+    "defect_class": null,
+    "expected_kill_surface": null,
+    "ground_truth_basis": "Physics: the Bragg wavelength-strain relation is a measured waveguide constant; thermal cross-sensitivity is disclosed and compensated with reference gratings (a real, published technique). The claim (settlement detection within days) is bounded and conservative. The provided prior art covers FBG on bridges (different structure and service) and external inclinometers (different instrument) \u2014 no record teaches FBG bonded to tank shells for settling surveillance. The killer experiment has a decisive kill condition."
+   }
+  },
+  {
+   "case_id": "CAL-KG-03",
+   "domain_id": "chemical_process",
+   "pain_class": "ENERGY_CONVERSION_LOSS",
+   "candidate": {
+    "candidate_id": "CAL-KG-03",
+    "technology_name": "Dividing-Wall Column Retrofit for Close-Boiling Solvent Split",
+    "problem": "A specialty-chemical plant separates two close-boiling solvents (relative volatility 1.15) in a sequence of two conventional distillation columns, remixing intermediate composition between stages and losing 900 kW of reboiler duty to remixing",
+    "causal_chain": [
+     "Conventional two-column sequence remixes the middle-boiling component between columns",
+     "dividing wall separates the prefractionation and main sections inside one shell",
+     "vapor and liquid split to their composition-matched sides",
+     "the remixing entropy penalty is eliminated",
+     "reboiler duty falls for the same separation"
+    ],
+    "unexploited_phenomenon": "Thermodynamic coupling avoided by divided-wall distillation: 25-35% duty reduction for close-boiling ternary splits (cal:kg03:r1)",
+    "intervention": "Replace the two-column train with one dividing-wall column with matched stages, reboiler, and condenser; keep product specs identical (99.2% purity)",
+    "governing_variables": "Relative volatility, number of stages per side, vapor split ratio, liquid split ratio, reflux ratio",
+    "predicted_effect": "27-32% reduction in reboiler duty for the same purity, 40% lower footprint, 3.5-year payback at 900 kW saved",
+    "equations": [
+     "Q_reboiler(min) = f(relative volatility, feed composition, splits) per Underwood-Gilliland with the dividing-wall side-draw removing the remixing term",
+     "payback = capex / (900 kW x 8400 h x $0.07/kWh)"
+    ],
+    "boundary_conditions": "Valid for relative volatility 1.05-1.4 ternary or pseudo-ternary splits with a mid-boiling component; not applicable to wide-boiling feeds or high-fouling service (wall cleaning access); turndown below 40% degrades the vapor split control",
+    "evidence_refs": [
+     "cal:kg03:r1",
+     "cal:kg03:r2"
+    ],
+    "baseline": {
+     "baseline_incumbent": "Conventional two-column direct sequence with intermediate tankage",
+     "baseline_metric": "Reboiler duty 900 kW over minimum + remixing penalty",
+     "candidate_metric": "620-660 kW for the same separation"
+    },
+    "killer_experiment": {
+     "experiment": "Pilot-scale dividing-wall column 300 mm diameter with the actual solvent system, sweep reflux ratio and splits, measure duty vs the existing train at identical product specs",
+     "kill_condition": "If measured duty reduction is below 15% at spec, the retrofit mechanism fails the economics",
+     "cost_class": "PILOT"
+    },
+    "failure_modes": [
+     "vapor split maldistribution at turndown",
+     "wall fouling in dirty service",
+     "control pairing across the wall during startup"
+    ],
+    "commercial_path": {
+     "buyer": "Specialty chemical plant operators with close-boiling solvent recovery trains"
+    },
+    "cross_domain_transition": "NONE (same domain: process distillation; mechanism established at pilot scale, applied to a specific plant economy)"
+   },
+   "pool": [
+    {
+     "record_id": "cal:kg03:r1",
+     "title": "Dividing wall distillation columns: measured 25-35% energy savings for close-boiling ternary separations versus conventional two-column sequences"
+    },
+    {
+     "record_id": "cal:kg03:r2",
+     "title": "Vapor and liquid split control in dividing wall columns: operability windows and startup procedures at pilot scale"
+    },
+    {
+     "record_id": "cal:kg03:r3",
+     "title": "Underwood-Gilliland shortcut design of conventional column sequences and their minimum-duty limits"
+    }
+   ],
+   "prior_art": {
+    "relevant_records": [
+     {
+      "record_id": "cal:kg03:pa1",
+      "perspective": "FORWARD",
+      "title": "Dividing wall columns for cryogenic air separation (different feed system, different duty regime, but same underlying wall concept in an unrelated service)"
+     },
+     {
+      "record_id": "cal:kg03:pa2",
+      "perspective": "MECHANISM",
+      "title": "Heat-integrated distillation sequences (heat pumps, double-effect) for solvent recovery (different energy-saving mechanism: external heat integration, not internal remixing elimination)"
+     }
+    ]
+   },
+   "ground_truth": {
+    "label": "KNOWN_GOOD",
+    "expected_final": "SURVIVED",
+    "defect_class": null,
+    "expected_kill_surface": null,
+    "ground_truth_basis": "Physics: the dividing-wall duty saving for close-boiling splits is among the best-measured unit operations in the literature (measured 25-35% at pilot and industrial scale); the claim is bounded to the applicable volatility window and the plant's 900 kW remixing penalty. The provided prior art covers DWC in cryogenic air separation (different service) and heat-integrated sequences (different mechanism) \u2014 neither teaches this retrofit for this solvent split. The killer experiment and kill condition are concrete and decisive."
+   }
+  },
+  {
+   "case_id": "CAL-KG-04",
+   "domain_id": "agriculture",
+   "pain_class": "INPUT_LOSS",
+   "candidate": {
+    "candidate_id": "CAL-KG-04",
+    "technology_name": "Capillary-Wick Sub-Irrigation Beds for Greenhouse Water Cut",
+    "problem": "Overhead greenhouse irrigation over-wets the top soil layer; 25-35% of applied water percolates below the root zone and is lost, and foliar wetting drives fungal disease pressure",
+    "causal_chain": [
+     "Water is supplied at the base through a capillary wick layer under the root zone",
+     "matric potential draws water upward against gravity",
+     "the root zone self-regulates at field capacity",
+     "no percolation below the wick's capillary barrier",
+     "applied water volume tracks transpiration demand"
+    ],
+    "unexploited_phenomenon": "Capillary rise of water in porous media: a 0.3-0.5 m wick lifts water at matric potentials matching root uptake without pumps (cal:kg04:r1)",
+    "intervention": "Retrofit greenhouse beds with a 40 cm sand-based capillary wick layer over a water reservoir regulated by a float valve, planted crops root directly above",
+    "governing_variables": "Wick height (m), pore-size distribution (mm), matric potential (kPa), reservoir level, crop transpiration rate",
+    "predicted_effect": "20-30% cut in applied irrigation water vs overhead watering, 40-60% reduction in foliar wetting events, yield parity within 5% for tomato and cucumber",
+    "equations": [
+     "h_capillary = 2*sigma*cos(theta)/(rho*g*r_pore) \u2014 maximum capillary rise for the wick's dominant pore radius",
+     "E_applied = E_transpiration + E_evaporation_surface (percolation term removed by wick barrier)"
+    ],
+    "boundary_conditions": "Capillary lift limited to ~0.5 m with fine sand; crop water demand above the wick's conductance saturates the bed and needs supplemental top watering; salts accumulate in the reservoir and need periodic flush",
+    "evidence_refs": [
+     "cal:kg04:r1",
+     "cal:kg04:r2"
+    ],
+    "baseline": {
+     "baseline_incumbent": "Overhead sprinkler irrigation on a timer",
+     "baseline_metric": "Applied water 130-135% of transpiration need",
+     "candidate_metric": "Applied water 100-108% of transpiration need"
+    },
+    "killer_experiment": {
+     "experiment": "Six paired greenhouse beds (wick vs overhead), same cultivars and climate, two seasons; log applied water, drainage lysimeter percolate, yield",
+     "kill_condition": "If applied-water reduction is under 10% or yield drops more than 8%, the capillary mechanism fails its commercial promise",
+     "cost_class": "FIELD"
+    },
+    "failure_modes": [
+     "salt build-up in reservoir",
+     "algae growth in the reservoir",
+     "root intrusion into the wick layer",
+     "high-demand crop stages exceeding wick conductance"
+    ],
+    "commercial_path": {
+     "buyer": "Commercial greenhouse vegetable growers in water-scarce regions"
+    },
+    "cross_domain_transition": "NONE (established horticultural physics applied to a specific water-economy service)"
+   },
+   "pool": [
+    {
+     "record_id": "cal:kg04:r1",
+     "title": "Capillary rise in sand-based porous media: measured maximum rise heights and matric potential ranges for subirrigation design"
+    },
+    {
+     "record_id": "cal:kg04:r2",
+     "title": "Sub-irrigation versus overhead watering in greenhouse trials: measured percolation elimination and foliar disease reduction"
+    },
+    {
+     "record_id": "cal:kg04:r3",
+     "title": "Crop transpiration demand curves for greenhouse tomato and cucumber by growth stage"
+    }
+   ],
+   "prior_art": {
+    "relevant_records": [
+     {
+      "record_id": "cal:kg04:pa1",
+      "perspective": "FORWARD",
+      "title": "Drip irrigation with soil moisture sensor scheduling (point-source emitters at surface, timer or sensor controlled \u2014 different water-delivery physics, not capillary self-regulation)"
+     },
+     {
+      "record_id": "cal:kg04:pa2",
+      "perspective": "MECHANISM",
+      "title": "Capillary wick beds for container nursery stock (ornamental nursery containers, not vegetable greenhouse bed retrofits with reservoir float control)"
+     }
+    ]
+   },
+   "ground_truth": {
+    "label": "KNOWN_GOOD",
+    "expected_final": "SURVIVED",
+    "defect_class": null,
+    "expected_kill_surface": null,
+    "ground_truth_basis": "Physics: capillary rise is governed by the pore-scale Young-Laplace relation, a measured textbook law; subirrigation percolation elimination is documented in horticultural field trials. Claims are bounded (20-30% water cut, yield parity within 5%, salt-flush duty disclosed). Prior art provided is drip scheduling (different delivery physics) and nursery-container wicks (different deployment) \u2014 no collision with the stated intervention. Field trial with decisive kill condition."
+   }
+  },
+  {
+   "case_id": "CAL-KG-05",
+   "domain_id": "automotive",
+   "pain_class": "AERO_DRAG",
+   "candidate": {
+    "candidate_id": "CAL-KG-05",
+    "technology_name": "Boat-Tail Retrofit for Regional Delivery Vans",
+    "problem": "Box-bodied delivery vans shed a large separated wake at the flat rear, with base drag contributing 30-40% of total road-load aerodynamic drag at highway speed, raising fuel use",
+    "causal_chain": [
+     "Angled boat-tail panels extend the rear body",
+     "the separation line moves downstream onto the angled surfaces",
+     "wake cross-section shrinks and base pressure recovers",
+     "total drag coefficient falls",
+     "fuel consumption falls at cruise speed"
+    ],
+    "unexploited_phenomenon": "Base-pressure recovery behind bluff bodies with boat-tailing: 10-30% drag-coefficient reduction measured for box vehicles (cal:kg05:r1)",
+    "intervention": "Retrofit kit of four angled panels (12-15 degrees taper, 0.5-0.7 m extension) closing the van's rear box, with hinged bottom flap for loading dock clearance",
+    "governing_variables": "Taper angle (deg), extension length (m), edge radius, yaw sensitivity, loading-dock articulation",
+    "predicted_effect": "8-12% fuel-consumption reduction at 100 km/h cruise on regional duty cycles (10-20% Cd reduction on the vehicle), 1.5-2.5 year payback for a 60,000 km/yr fleet",
+    "equations": [
+     "Cd_total = Cd_forebody + Cd_base; boat-tail reduces Cd_base by raising base pressure coefficient Cp from -0.25 to -0.05 class",
+     "F_drag = 0.5*rho*V^2*Cd*A; fuel reduction ~ proportional to road-load integral over the duty cycle"
+    ],
+    "boundary_conditions": "Benefit scales with highway-speed share of the duty cycle; city duty sees negligible gain; yaw crosswind degrades recovery above ~10 deg; loading-dock compatibility constrains the bottom panel and must be hinged",
+    "evidence_refs": [
+     "cal:kg05:r1",
+     "cal:kg05:r2"
+    ],
+    "baseline": {
+     "baseline_incumbent": "Standard flat-rear box van body",
+     "baseline_metric": "Cd ~ 0.38-0.42 class; cruise fuel consumption 100%",
+     "candidate_metric": "Cd ~ 0.32-0.36 class; cruise fuel 88-92%"
+    },
+    "killer_experiment": {
+     "experiment": "Track two instrumented identical vans (boat-tail vs stock) over a 10,000 km regional route with matched loads; verify in a coast-down test on a closed airfield",
+     "kill_condition": "If coast-down shows Cd reduction below 5% or the 10,000 km fuel delta is below 3% with matched loads, the retrofit fails",
+     "cost_class": "FIELD"
+    },
+    "failure_modes": [
+     "panel flutter and fatigue at speed",
+     "crosswind yaw sensitivity",
+     "loading-dock interference and driver non-use of the hinged flap",
+     "snow/ice buildup on panels"
+    ],
+    "commercial_path": {
+     "buyer": "Regional parcel fleet operators with highway-heavy routes"
+    },
+    "cross_domain_transition": "Heavy-truck aerodynamic boat-tailing -> light delivery vans (same base-drag physics scaled to a new vehicle class and loading constraint)"
+   },
+   "pool": [
+    {
+     "record_id": "cal:kg05:r1",
+     "title": "Boat-tailing of bluff box bodies: wind-tunnel measured base-pressure recovery and 10-30% Cd reduction for heavy vehicles"
+    },
+    {
+     "record_id": "cal:kg05:r2",
+     "title": "Coast-down and track fuel-economy validation of trailer boat-tail retrofits on heavy trucks"
+    },
+    {
+     "record_id": "cal:kg05:r3",
+     "title": "Duty-cycle fuel models for regional delivery fleets and highway-share sensitivity"
+    }
+   ],
+   "prior_art": {
+    "relevant_records": [
+     {
+      "record_id": "cal:kg05:pa1",
+      "perspective": "FORWARD",
+      "title": "Trailer boat-tail devices for 18-wheel semi-trailers (different vehicle class, fixed box length, no hinged loading flap requirement)"
+     },
+     {
+      "record_id": "cal:kg05:pa2",
+      "perspective": "MECHANISM",
+      "title": "Cab-roof air deflectors and gap fairings for tractor-trailers (upstream drag, not base drag recovery)"
+     }
+    ]
+   },
+   "ground_truth": {
+    "label": "KNOWN_GOOD",
+    "expected_final": "SURVIVED",
+    "defect_class": null,
+    "expected_kill_surface": null,
+    "ground_truth_basis": "Physics: base-drag pressure recovery from boat-tailing is among the best-measured bluff-body results in vehicle aerodynamics, with wind-tunnel AND track validation in the literature; the 8-12% fuel claim is honestly proportional to highway duty share. Prior art provided covers semi-trailer boat-tails (different class and constraint) and cab deflectors (different mechanism) \u2014 not van retrofits with the hinged loading constraint. Coast-down kill condition is decisive."
+   }
+  },
+  {
+   "case_id": "CAL-KG-06",
+   "domain_id": "mining",
+   "pain_class": "COMM_IN_BLIND_SPOT",
+   "candidate": {
+    "candidate_id": "CAL-KG-06",
+    "technology_name": "Through-Rock Low-Frequency Radio Sparing for Deep-Level Ventilation Control",
+    "problem": "Deep-level mine ventilation on-demand control needs fan and door setpoints updated from production faces, but wireline through shafts is cut by blasting and standard radios do not propagate through rock",
+    "causal_chain": [
+     "Low-frequency (30-300 kHz) magnetic-dipole link transmits through conductive rock",
+     "skin depth at these frequencies in typical host rock exceeds tens of meters",
+     "data link survives where VHF/UHF is attenuated to noise",
+     "face-level sensors deliver ventilation demand data",
+     "on-demand ventilation runs fans at demand-following speeds"
+    ],
+    "unexploited_phenomenon": "Skin-depth scaling of electromagnetic penetration in rock: at 100 kHz in 0.01 S/m rock, skin depth ~ 15-50 m, enabling through-rock link margins (cal:kg06:r1)",
+    "intervention": "Deploy loop-antenna TTE (through-the-earth) telemetry at 60-150 kHz between face-level CO/flow sensors and the main ventilation controller, low bit-rate telemetry (10-100 bits/s) sufficient for setpoint updates",
+    "governing_variables": "Frequency (kHz), rock conductivity (S/m), loop area-turns product (m2-turns), noise floor, bit rate",
+    "predicted_effect": "Reliable setpoint telemetry across 200-400 m of rock with 10^-4 bit error rate class, enabling 20-30% ventilation fan energy reduction from demand-following control",
+    "equations": [
+     "delta = sqrt(2/(omega*mu*sigma)) \u2014 skin depth; at 100 kHz, sigma=0.01 S/m: delta ~ 50 m",
+     "SNR = (H_rx * A_N * n) / (sqrt(4*k*T*B) + atmospherics) \u2014 received loop emf vs noise"
+    ],
+    "boundary_conditions": "Bit rate is low (10-100 bps \u2014 setpoint telemetry, not voice); link budget degrades in conductive ore zones (sigma > 0.1 S/m reduces skin depth below 15 m); lightning atmospheric noise dominates below 10 kHz; loop installation cost per station is material",
+    "evidence_refs": [
+     "cal:kg06:r1",
+     "cal:kg06:r2"
+    ],
+    "baseline": {
+     "baseline_incumbent": "Leaky-feeder cable along haul ways with blast-damage repair crews plus scheduled fixed ventilation schedules",
+     "baseline_metric": "100% ventilation energy at fixed schedule; leaky-feer repair downtime 8-16 h per blast cycle in bad sections",
+     "candidate_metric": "70-80% ventilation energy; telemetry survives blasting"
+    },
+    "killer_experiment": {
+     "experiment": "Install a 60 kHz TTE link across a known 300 m rock span at an operating mine; run 30 days of setpoint telemetry logging BER vs weekly conductivity core measurements",
+     "kill_condition": "If BER exceeds 10^-3 or availability drops below 95% over the 30 days, the link margin is inadequate for control",
+     "cost_class": "FIELD"
+    },
+    "failure_modes": [
+     "conductive ore zones collapsing the link budget",
+     "loop damage from production blasting at face level",
+     "lightning noise events",
+     "interference from VFD harmonics on the same frequency band"
+    ],
+    "commercial_path": {
+     "buyer": "Deep-level hard-rock mine operators under energy-cost and safety-regulatory pressure"
+    },
+    "cross_domain_transition": "Cave/mine rescue through-the-earth voice systems -> routine low-rate telemetry for ventilation control (same propagation physics, new always-on service class)"
+   },
+   "pool": [
+    {
+     "record_id": "cal:kg06:r1",
+     "title": "Through-the-earth electromagnetic propagation at 30-300 kHz: measured skin depths in rock strata and loop-link budgets for mine communication"
+    },
+    {
+     "record_id": "cal:kg06:r2",
+     "title": "Mine ventilation-on-demand control: measured 20-30% fan energy reduction from demand-following setpoints"
+    },
+    {
+     "record_id": "cal:kg06:r3",
+     "title": "Leaky feeder mine communication systems: blast damage rates and repair economics"
+    }
+   ],
+   "prior_art": {
+    "relevant_records": [
+     {
+      "record_id": "cal:kg06:pa1",
+      "perspective": "MECHANISM",
+      "title": "TTE emergency communication systems for trapped-miner location and rescue voice (emergency-only service, voice bandwidths, not continuous telemetry for process control)"
+     },
+     {
+      "record_id": "cal:kg06:pa2",
+      "perspective": "FORWARD",
+      "title": "Mesh WiFi nodes along haul ways with relay redundancy (line-of-sight propagation, not through-rock)"
+     }
+    ]
+   },
+   "ground_truth": {
+    "label": "KNOWN_GOOD",
+    "expected_final": "SURVIVED",
+    "defect_class": null,
+    "expected_kill_surface": null,
+    "ground_truth_basis": "Physics: skin-depth penetration through rock at 60-150 kHz is a measured, deployable reality (TTE systems are commercially fielded for emergency mine comms \u2014 the physics is proven); the claim honestly narrows the service to low-rate setpoint telemetry and discloses the conductive-zone and noise boundary. Prior art provided covers emergency voice TTE (different service) and haul-way mesh (different propagation) \u2014 no collision with continuous ventilation-control telemetry. Decisive 30-day BER kill condition."
+   }
+  },
+  {
+   "case_id": "CAL-KG-07",
+   "domain_id": "construction",
+   "pain_class": "CURING_WASTE",
+   "candidate": {
+    "candidate_id": "CAL-KG-07",
+    "technology_name": "Self-Desiccating Low-Water Concrete Curing Aid",
+    "problem": "Curing water for mass concrete pours is labor-intensive and wasteful; poorly cured surfaces carbonated and dust, and curing membranes that trap moisture cause surface defects",
+    "causal_chain": [
+     "Superabsorbent polymer (SAP) micro-doses are pre-blended into the mix",
+     "after the initial set, SAP pores release internal curing water",
+     "cement hydration continues without external water",
+     "internal RH stays above self-desiccation threshold",
+     "surface quality and near-surface durability improve with less curing water"
+    ],
+    "unexploited_phenomenon": "Internal curing via SAP water release: measured hydration continuation and 30-60% curing-water reduction in low-w/c concretes (cal:kg07:r1)",
+    "intervention": "Add 0.2-0.4% by mass of dry SAP with 150-200 g/g absorption to the batch mix for high-performance concrete pours; adjust mix water accounting for SAP release",
+    "governing_variables": "SAP dosage (% mass), absorption ratio (g/g), w/c ratio, ambient RH, section thickness",
+    "predicted_effect": "30-60% reduction of external curing water demand, 20-40% reduction in plastic shrinkage cracking incidence, 28-day strength within 5% of control",
+    "equations": [
+     "m_SAP = (w_ic_needed - w_external) / (absorption * efficiency); w_ic ~ 0.07 kg water/kg cement for full hydration continuation",
+     "RH_internal > 0.95 maintained during 7 days via SAP desorption isotherm"
+    ],
+    "boundary_conditions": "Benefit strongest at w/c < 0.40; SAP dosage above 0.6% entrains voids and drops strength; hot low-RH climates still need initial misting; not applicable to massive pours with adiabatic heat control as the primary issue",
+    "evidence_refs": [
+     "cal:kg07:r1",
+     "cal:kg07:r2"
+    ],
+    "baseline": {
+     "baseline_incumbent": "External wet-curing with burlap/ponding or curing compound membranes",
+     "baseline_metric": "Curing water 100% + labor; shrinkage cracking baseline incidence",
+     "candidate_metric": "Curing water 40-70% + reduced cracking 20-40%; strength parity within 5%"
+    },
+    "killer_experiment": {
+     "experiment": "Paired industrial slabs (SAP vs conventional curing) across three sites and seasons; measure water use, cracking maps at 28 days, strength cores",
+     "kill_condition": "If 28-day strength loss exceeds 5% or cracking incidence is not reduced by at least 15% while saving 30% water, the mechanism fails",
+     "cost_class": "FIELD"
+    },
+    "failure_modes": [
+     "over-dosage strength loss from entrained voids",
+     "SAP release kinetics mismatched to climate",
+     "mix water miscalculation by batch plant operators"
+    ],
+    "commercial_path": {
+     "buyer": "Commercial concrete contractors and precast producers under water and labor cost pressure"
+    },
+    "cross_domain_transition": "Agricultural superabsorbent soil conditioners -> concrete internal curing (same hydrogel physics, new material host and release profile)"
+   },
+   "pool": [
+    {
+     "record_id": "cal:kg07:r1",
+     "title": "Superabsorbent polymers for internal curing of concrete: measured water release kinetics and hydration continuation at low w/c"
+    },
+    {
+     "record_id": "cal:kg07:r2",
+     "title": "Internal curing versus external wet curing: field-measured plastic shrinkage cracking reduction and curing water demand"
+    },
+    {
+     "record_id": "cal:kg07:r3",
+     "title": "Absorption and desorption isotherms of SAP hydrogels in cement pore solution"
+    }
+   ],
+   "prior_art": {
+    "relevant_records": [
+     {
+      "record_id": "cal:kg07:pa1",
+      "perspective": "MECHANISM",
+      "title": "Lightweight aggregate internal curing (pre-wetted LWA as the water reservoir \u2014 different carrier, established for mass concrete, not the fine-surface cracking service)"
+     },
+     {
+      "record_id": "cal:kg07:pa2",
+      "perspective": "FORWARD",
+      "title": "Curing compound membranes and evaporation retarders (surface-side water retention, not internal reservoir release)"
+     }
+    ]
+   },
+   "ground_truth": {
+    "label": "KNOWN_GOOD",
+    "expected_final": "SURVIVED",
+    "defect_class": null,
+    "expected_kill_surface": null,
+    "ground_truth_basis": "Physics: SAP internal curing is a measured, active research-to-practice technology (RILEM state-of-the-art); hydrogel absorption/release is a textbook isotherm problem; the claims are bounded to low w/c and disclose the dosage void risk. Prior art provided covers LWA internal curing (different carrier) and membranes (different mechanism) \u2014 no collision. Field trial with decisive kill conditions on strength and cracking."
+   }
+  },
+  {
+   "case_id": "CAL-KG-08",
+   "domain_id": "telecom",
+   "pain_class": "THERMAL_LOSS",
+   "candidate": {
+    "candidate_id": "CAL-KG-08",
+    "technology_name": "Phase-Shifted Pulse Tube Cooling for Remote RF Amplifier Cabinets",
+    "problem": "Remote telecom cabinet power amplifiers in hot climates need cooling; compressor refrigeration draws 600-900 W per cabinet and fails in dusty environments, while passive vents underperform above 45 C ambient",
+    "causal_chain": [
+     "Stirling-cycle pulse-tube cryocooler derivatives run as heat pumps at 60-80 K temperature span class scaled to ambient",
+     "acoustic power drives gas oscillation",
+     "heat is shuttled by phase-shifted pressure-mass waves",
+     "no compressor seals, no refrigerant, only helium",
+     "cabinet heat is pumped to ambient with low maintenance"
+    ],
+    "unexploited_phenomenon": "Thermoacoustic/pulse-tube heat pumping with phase shifters: measured COP 0.8-1.5 class for 30-60 K spans above ambient (cal:kg08:r1)",
+    "intervention": "Replace cabinet scroll-compressor AC with a linear-motor pulse-tube heat pump sized 400 W at 50 C ambient, helium working gas, finned ambient rejection",
+    "governing_variables": "Drive frequency (Hz), phase-shift orifice tuning, heat-lift (W), rejection temperature (C), COP",
+    "predicted_effect": "500-700 W cabinet cooling with 350-500 W input (COP 1.0-1.4 at 20 K span), MTBF > 5x compressor class in dusty service (no filters, no seals), maintenance interval 5 years",
+    "equations": [
+     "COP = Q_lift / W_acoustic; phasing of mass flux vs pressure wave set by orifice + inertance",
+     "Q_lift ~ T_m * m_dot * (s-amplitude) * phase_efficiency"
+    ],
+    "boundary_conditions": "COP falls steeply above 40 K spans (above that, vapor compression wins on efficiency); heat lift per unit bounded by acoustic power; cost per unit higher than scroll AC (payback comes from maintenance savings, not energy savings); oversized for sub-300 W loads",
+    "evidence_refs": [
+     "cal:kg08:r1",
+     "cal:kg08:r2"
+    ],
+    "baseline": {
+     "baseline_incumbent": "Scroll compressor air conditioner with filter maintenance",
+     "baseline_metric": "Cooling 600-900 W draw; filter/blower maintenance quarterly in dusty sites; MTBF 3-4 years",
+     "candidate_metric": "350-500 W draw; 5-year maintenance; MTBF 15+ years projected"
+    },
+    "killer_experiment": {
+     "experiment": "Two cabinets at a 50 C ambient dust-test site (pulse-tube vs scroll), 6-month soak: log power, internal temp, and maintenance events",
+     "kill_condition": "If input power exceeds 550 W for 500 W lift, or any seal/filter maintenance is needed within 6 months, the maintenance-value mechanism fails",
+     "cost_class": "FIELD"
+    },
+    "failure_modes": [
+     "linear-motor fatigue",
+     "orifice tuning drift with ambient temperature",
+     "reject-fin fouling in extreme dust",
+     "acoustic vibration coupling to RF components"
+    ],
+    "commercial_path": {
+     "buyer": "Telecom tower operators in hot/dusty regions with high maintenance cost per site visit"
+    },
+    "cross_domain_transition": "Space-instrument pulse-tube cryocoolers -> ambient-temperature cabinet heat pumping (same thermodynamic cycle scaled to a new service and reliability regime)"
+   },
+   "pool": [
+    {
+     "record_id": "cal:kg08:r1",
+     "title": "Pulse tube and thermoacoustic heat pumps: measured COP 0.8-1.5 for moderate temperature spans and multi-year unattended MTBF in space instruments"
+    },
+    {
+     "record_id": "cal:kg08:r2",
+     "title": "Linear-drive Stirling and pulse-tube coolers: fatigue life and vibration isolation for sensitive electronics"
+    },
+    {
+     "record_id": "cal:kg08:r3",
+     "title": "Telecom cabinet cooling duty cycles and maintenance cost per site in hot dusty climates"
+    }
+   ],
+   "prior_art": {
+    "relevant_records": [
+     {
+      "record_id": "cal:kg08:pa1",
+      "perspective": "MECHANISM",
+      "title": "Vapor-compression cabinet air conditioners with electrostatic dust pre-filters (different cycle, different failure modes \u2014 the incumbent)"
+     },
+     {
+      "record_id": "cal:kg08:pa2",
+      "perspective": "FORWARD",
+      "title": "Thermoacoustic refrigeration laboratory demonstrators for food refrigeration spans (different temperature regime and duty, lab-scale heat lift)"
+     }
+    ]
+   },
+   "ground_truth": {
+    "label": "KNOWN_GOOD",
+    "expected_final": "SURVIVED",
+    "defect_class": null,
+    "expected_kill_surface": null,
+    "ground_truth_basis": "Physics: pulse-tube heat pumping is a mature, flight-proven cycle (space instruments run unattended for years); COP claims are honestly bounded to moderate spans with vapor-compression winning above 40 K spans \u2014 disclosed; the commercial case rests on maintenance savings, stated. Prior art provided is the incumbent (different cycle) and lab demonstrators at different regimes \u2014 no collision. Decisive 6-month kill condition on power and maintenance."
+   }
+  },
+  {
+   "case_id": "CAL-KG-09",
+   "domain_id": "aerospace",
+   "pain_class": "MATERIAL_DEGRADATION",
+   "candidate": {
+    "candidate_id": "CAL-KG-09",
+    "technology_name": "Shape-Adaptive LE Slat Erosion Shield via SMA Tendon",
+    "problem": "Leading-edge slats of short-haul aircraft in sandy/coastal environments erode and dent; scheduled LE inspection and replacement drives 2-3% of airframe maintenance cost on these routes",
+    "causal_chain": [
+     "Thin superelastic NiTi ribbon is embedded along the LE sub-skin",
+     "erosive particle impacts and slat cycling strain the ribbon locally",
+     "superelastic stress plateau absorbs and recovers the strain",
+     "sub-skin stays within elastic limits and self-re-centers",
+     "dent depth and skin replacement rate fall"
+    ],
+    "unexploited_phenomenon": "Superelastic stress plateau of NiTi near RT (8% recoverable strain) absorbing local impact energy (cal:kg09:r1)",
+    "intervention": "Embed a 1 mm NiTi tendon strip at 3-5 mm depth along the slat LE sub-skin, bonded in the existing rivet-free zone, as a dent-mitigation retrofit at heavy checks",
+    "governing_variables": "Transformation temperatures (C), plateau stress (MPa), ribbon thickness (mm), embed depth (mm), impact energy spectrum (mJ)",
+    "predicted_effect": "40-60% reduction in LE dent depth from runway-debris impacts in the 5-50 mJ class; LE skin replacement interval extended 1.5-2x on sandy-route fleets",
+    "equations": [
+     "E_absorbed = sigma_plateau * epsilon_recoverable * V_affected; sigma_plateau ~ 400-600 MPa, epsilon ~ 6-8%",
+     "dent_depth ~ (E_impact / (k_subskin + k_SMA))^(1/2) \u2014 the ribbon raises effective local stiffness and recovery"
+    ],
+    "boundary_conditions": "Only for impact energies the plateau can absorb (5-50 mJ class \u2014 stones above this exceed superelastic capacity); transformation temperatures must stay below 60 C ramp skin temp (RT-class alloy); certification of a sub-skin retrofit is a moderate path (region repair, not primary structure); not applicable to hail-size impacts",
+    "evidence_refs": [
+     "cal:kg09:r1",
+     "cal:kg09:r2"
+    ],
+    "baseline": {
+     "baseline_incumbent": "Standard aluminum LE skin with scheduled inspection and replacement",
+     "baseline_metric": "LE skin replacement every 2-3 heavy checks on sandy routes",
+     "candidate_metric": "Replacement every 4-6 heavy checks on the same routes"
+    },
+    "killer_experiment": {
+     "experiment": "Bench LE panel sections (tendon vs control) shot-blasted with calibrated 5-50 mJ grit at representative angles; measure dent depth maps and fatigue life after 10^5 pressurization cycles",
+     "kill_condition": "If dent depth reduction is below 25% or fatigue life is reduced vs control, the retrofit fails",
+     "cost_class": "LAB"
+    },
+    "failure_modes": [
+     "galvanic coupling NiTi-aluminum needs isolation layer",
+     "certification path for sub-skin retrofit",
+     "impact class above plateau capacity",
+     "bond fatigue over 10^5 cycles"
+    ],
+    "commercial_path": {
+     "buyer": "Airlines with sandy/coastal short-haul fleets and heavy-check cost pressure"
+    },
+    "cross_domain_transition": "Orthodontic/industrial superelastic NiTi energy absorption -> aircraft LE protection (same material physics, new impact service class)"
+   },
+   "pool": [
+    {
+     "record_id": "cal:kg09:r1",
+     "title": "Superelastic NiTi: measured 6-8% recoverable strain, 400-600 MPa plateau stresses, and impact energy absorption in structural embeds"
+    },
+    {
+     "record_id": "cal:kg09:r2",
+     "title": "Leading-edge erosion and dent statistics on sandy-route aircraft fleets: maintenance replacement intervals and cost drivers"
+    },
+    {
+     "record_id": "cal:kg09:r3",
+     "title": "Certification pathways for bonded sub-skin structural repairs at heavy check intervals"
+    }
+   ],
+   "prior_art": {
+    "relevant_records": [
+     {
+      "record_id": "cal:kg09:pa1",
+      "perspective": "MECHANISM",
+      "title": "Erosion-protective coatings and tapes for LE blades (surface barrier materials, not sub-skin energy-absorbing tendons)"
+     },
+     {
+      "record_id": "cal:kg09:pa2",
+      "perspective": "FORWARD",
+      "title": "SMA actuators for aerodynamic variable-geometry chevrons (actuation service, not passive impact absorption)"
+     }
+    ]
+   },
+   "ground_truth": {
+    "label": "KNOWN_GOOD",
+    "expected_final": "SURVIVED",
+    "defect_class": null,
+    "expected_kill_surface": null,
+    "ground_truth_basis": "Physics: NiTi superelasticity (plateau stress, 6-8% recoverable strain) is a measured textbook material behavior; impact-energy absorption in embedded ribbons follows directly and is bounded honestly to the 5-50 mJ class with the certification path disclosed as a risk. Prior art provided covers coatings (different mechanism) and SMA actuators (different service) \u2014 no collision. Bench test with decisive kill conditions."
+   }
+  },
+  {
+   "case_id": "CAL-KG-10",
+   "domain_id": "power",
+   "pain_class": "GRID_INSTABILITY",
+   "candidate": {
+    "candidate_id": "CAL-KG-10",
+    "technology_name": "Synchronous Condenser Conversion of Retired Thermal Generators",
+    "problem": "Grid regions retiring thermal plants lose inertia and short-circuit strength, degrading frequency stability and protection coordination as inverter-based resources take share",
+    "causal_chain": [
+     "Retired generator's rotor is reconnected excitation-only",
+     "spinning mass provides real inertia (H constant seconds)",
+     "field excitation supplies dynamic reactive power",
+     "short-circuit current contribution restores protection coordination",
+     "grid frequency ride-through and voltage stability improve"
+    ],
+    "unexploited_phenomenon": "Synchronous machine inertia and reactive capability without fuel: converting a thermal unit to a synchronous condenser preserves 60-100% of its MVA capability at near-zero fuel cost (cal:kg10:r1)",
+    "intervention": "Convert a retiring 300 MVA steam turbine unit: remove turbine blades or decouple, add starting motor and flywheel option, keep generator, exciter, and step-up transformer",
+    "governing_variables": "Inertia constant H (MW-s/MVA), reactive range (MVAR), short-circuit ratio, starting method, conversion capex",
+    "predicted_effect": "1.2-2.5 GW-s of inertia per converted unit, +90 to -150 MVAR dynamic range, short-circuit strength restored to 70-90% of the unit's original contribution; 8-14 month conversion; capex 10-20% of equivalent new SC",
+    "equations": [
+     "df/dt = (P_imbalance - P_damping)/(2*H*S_base) \u2014 inertia from the preserved rotor",
+     "Q_dynamic limited by exciter ceiling and machine capability curve"
+    ],
+    "boundary_conditions": "Requires the generator and GSU transformer to be sound (residual-life assessment); rotor rewind may be needed for the reactive ceiling; site auxiliary power remains needed; not a substitute for new transmission",
+    "evidence_refs": [
+     "cal:kg10:r1",
+     "cal:kg10:r2"
+    ],
+    "baseline": {
+     "baseline_incumbent": "Greenfield synchronous condensers or battery-STATCOM hybrids providing equivalent inertia/SER",
+     "baseline_metric": "Capex per GW-s inertia at 100% (new-build reference)",
+     "candidate_metric": "Capex per GW-s inertia 10-25% of new-build (conversion reuses existing rotor and transformer)"
+    },
+    "killer_experiment": {
+     "experiment": "Convert one unit, then run grid-integrity tests: frequency response to a staged 0.5 GW generation trip in the region before/after conversion, and short-circuit-level measurement at the bus",
+     "kill_condition": "If the converted unit does not deliver at least 80% of its modeled inertia response and 70% of original fault current contribution, the conversion mechanism fails",
+     "cost_class": "FIELD"
+    },
+    "failure_modes": [
+     "rotor residual-life surprises",
+     "exciter ceiling limits reactive range",
+     "conversion schedule slip during outage windows",
+     "market rules not crediting inertia"
+    ],
+    "commercial_path": {
+     "buyer": "Transmission system operators and plant owners facing retirement economics and stability mandates"
+    },
+    "cross_domain_transition": "NONE (established grid-machine engineering applied to a specific retirement economy \u2014 conversions are individually known, the systematic conversion-program economics are the candidate)"
+   },
+   "pool": [
+    {
+     "record_id": "cal:kg10:r1",
+     "title": "Synchronous condenser conversions of retired thermal units: measured inertia contribution and reactive capability retention at near-zero fuel"
+    },
+    {
+     "record_id": "cal:kg10:r2",
+     "title": "Grid frequency stability with declining inertia: frequency-response metrics for regions integrating inverter-based resources"
+    },
+    {
+     "record_id": "cal:kg10:r3",
+     "title": "New-build synchronous condenser costs per GW-s of inertia versus conversion costs"
+    }
+   ],
+   "prior_art": {
+    "relevant_records": [
+     {
+      "record_id": "cal:kg10:pa1",
+      "perspective": "FORWARD",
+      "title": "Battery energy storage frequency response (inverter-based synthetic inertia response, different physical inertia quality \u2014 electronic, not rotor)"
+     },
+     {
+      "record_id": "cal:kg10:pa2",
+      "perspective": "MECHANISM",
+      "title": "Greenfield synchronous condenser installations (new machines, not conversion of retired thermal rotors and their site infrastructure)"
+     }
+    ]
+   },
+   "ground_truth": {
+    "label": "KNOWN_GOOD",
+    "expected_final": "SURVIVED",
+    "defect_class": null,
+    "expected_kill_surface": null,
+    "ground_truth_basis": "Physics: synchronous condenser conversion is an established, fielded grid practice (multiple conversions exist worldwide); inertia from a preserved rotor is direct physics; claims bounded to sound-machine precondition with residual-life risk disclosed. Prior art provided covers batteries (different inertia quality) and new-build SCs (different economics) \u2014 no collision with the conversion economics. Grid-level test with decisive kill conditions."
+   }
+  },
+  {
+   "case_id": "CAL-KB-01",
+   "domain_id": "hvac_chiller",
+   "pain_class": "ENERGY_CONVERSION_LOSS",
+   "candidate": {
+    "candidate_id": "CAL-KB-01",
+    "technology_name": "Passive Radiative Night Panel That Cools Below Ambient in Full Sun",
+    "problem": "Chiller condensers in hot climates reject heat at high ambient temperature; cooling below ambient during the day would raise chiller COP",
+    "causal_chain": [
+     "Special coating emits strongly in the 8-13 micron atmospheric window",
+     "net radiative loss to deep sky occurs",
+     "panel fluid cools to 5-8 C BELOW daytime ambient air temperature",
+     "chiller condenser water is pre-cooled below ambient",
+     "chiller COP rises by 25-40%"
+    ],
+    "unexploited_phenomenon": "Radiative sky cooling in the atmospheric window (cal:kb01:r1)",
+    "intervention": "Install radiative cooling panels over chiller condenser water loops claiming sub-ambient fluid temperature under direct daytime sunlight with a simple static coating",
+    "governing_variables": "Coating emissivity, atmospheric window transmittance, solar absorption, convective gain",
+    "predicted_effect": "Condenser water 5-8 C below daytime ambient air temperature in full sun; chiller COP +25-40%",
+    "equations": [
+     "Q_net = epsilon_window*sigma*(T_panel^4 - T_sky^4) - alpha_solar*S - h_conv*(T_air - T_panel)",
+     "T_panel_min solves Q_net = 0"
+    ],
+    "boundary_conditions": "Claims to work under direct midday sun with 900 W/m2 solar load using only a static coating",
+    "evidence_refs": [
+     "cal:kb01:r1"
+    ],
+    "baseline": {
+     "baseline_incumbent": "Air-cooled condenser at ambient temperature",
+     "baseline_metric": "Condenser approach 8-12 C above ambient",
+     "candidate_metric": "Condenser water 5-8 C BELOW ambient in full sun"
+    },
+    "killer_experiment": {
+     "experiment": "Mount panel in full midday sun, measure fluid temperature vs ambient with calibrated RTDs",
+     "kill_condition": "If panel does not hold 3 C below ambient at 900 W/m2 solar load, fails",
+     "cost_class": "BENCH"
+    },
+    "failure_modes": [
+     "condensation",
+     "dust on coating"
+    ],
+    "commercial_path": {
+     "buyer": "Chiller plant operators"
+    },
+    "cross_domain_transition": "NONE"
+   },
+   "pool": [
+    {
+     "record_id": "cal:kb01:r1",
+     "title": "Nighttime radiative sky cooling: measured sub-ambient temperatures achievable only under clear night sky with solar load absent"
+    },
+    {
+     "record_id": "cal:kb01:r2",
+     "title": "Daytime radiative cooling demonstrations requiring photonic metamaterials with solar reflectance > 96% and complex multilayer stacks"
+    }
+   ],
+   "prior_art": {
+    "relevant_records": [
+     {
+      "record_id": "cal:kb01:pa1",
+      "perspective": "MECHANISM",
+      "title": "Radiative cooling physics: achievable sub-ambient depth scales with solar absorption and convection gain; static conventional coatings cannot reach daytime sub-ambient"
+     }
+    ]
+   },
+   "ground_truth": {
+    "label": "KNOWN_BAD",
+    "expected_final": "KILLED",
+    "defect_class": "physics (second-law / energy-balance violation at stated conditions)",
+    "expected_kill_surface": "physics",
+    "expected_defect_in_basis": [
+     "solar",
+     "energy balance",
+     "absorption",
+     "convection",
+     "daytime",
+     "900 W/m2",
+     "static coating"
+    ],
+    "ground_truth_basis": "The energy balance kills it: with a static (non-photonic) coating the ~5-20% solar absorption under 900 W/m2 midday load vastly exceeds the 40-100 W/m2 achievable window emission, so the panel runs ABOVE ambient in full sun. Daytime sub-ambient requires solar reflectance >96% photonic structures, which the candidate explicitly does not claim. The cited evidence record itself says sub-ambient is a NIGHTTIME result \u2014 the candidate misquotes its own source. A calibrated attacker must KILL on physics (energy balance) and/or evidence (record does not support the daytime claim)."
+   }
+  },
+  {
+   "case_id": "CAL-KB-02",
+   "domain_id": "industrial_pumps",
+   "pain_class": "ENERGY_CONVERSION_LOSS",
+   "candidate": {
+    "candidate_id": "CAL-KB-02",
+    "technology_name": "Static Magnetic Water Conditioner Eliminating Scale Without Chemicals",
+    "problem": "Cooling-tower and boiler circuits accumulate mineral scale, costing chemical treatment and efficiency loss",
+    "causal_chain": [
+     "Permanent magnets strap around the pipe",
+     "static magnetic field polarizes dissolved Ca2+ and CO3-- ions",
+     "ions reorganize into non-adhering aragonite form",
+     "scale stops forming on heat-transfer surfaces",
+     "chemical treatment is eliminated"
+    ],
+    "unexploited_phenomenon": "Claimed magnetic-induced aragonite polymorph selection (cal:kb02:r1)",
+    "intervention": "Clamp-on NdFeB magnet array on the make-up water line, no power, no chemicals, claimed 90% scale elimination",
+    "governing_variables": "Field strength (T), flow velocity, water hardness, ion hydration state",
+    "predicted_effect": "90% reduction in scale deposition; chemical treatment cost eliminated; 3% efficiency gain",
+    "equations": [
+     "E_ion ~ kT, magnetic interaction energy ~ mu_ion*B ~ 1e-26 J at 0.5 T \u2014 ratio ~ 1e-6 of thermal energy"
+    ],
+    "boundary_conditions": "Claims effect at pipe-scale field strengths with no flow-through device",
+    "evidence_refs": [
+     "cal:kb02:r1"
+    ],
+    "baseline": {
+     "baseline_incumbent": "Chemical scale inhibitors and periodic acid cleaning",
+     "baseline_metric": "Chemical cost + 2% efficiency loss from scale",
+     "candidate_metric": "Zero chemical; claimed 90% scale elimination"
+    },
+    "killer_experiment": {
+     "experiment": "Side-by-side heat exchanger fouling test with and without magnets on hard water",
+     "kill_condition": "If fouling resistance curves diverge less than 20%, fails",
+     "cost_class": "BENCH"
+    },
+    "failure_modes": [
+     "none claimed"
+    ],
+    "commercial_path": {
+     "buyer": "Facility managers"
+    },
+    "cross_domain_transition": "NONE"
+   },
+   "pool": [
+    {
+     "record_id": "cal:kb02:r1",
+     "title": "Magnetic water treatment: systematic controlled studies find no reproducible scale-reduction effect at permanent-magnet field strengths; proposed ion-interaction energies are 1e-6 of thermal energy"
+    }
+   ],
+   "prior_art": {
+    "relevant_records": [
+     {
+      "record_id": "cal:kb02:pa1",
+      "perspective": "FAILURE",
+      "title": "Negative controlled trials of magnetic water conditioners across hardness regimes: no effect beyond noise"
+     }
+    ]
+   },
+   "ground_truth": {
+    "label": "KNOWN_BAD",
+    "expected_final": "KILLED",
+    "defect_class": "causal-invalidity (magnetic energy at field strength is ~1e-6 of kT; no causal path)",
+    "expected_kill_surface": "mechanism",
+    "expected_defect_in_basis": [
+     "energy",
+     "kT",
+     "ion",
+     "hydration",
+     "no mechanism",
+     "controlled studies",
+     "1e-6"
+    ],
+    "ground_truth_basis": "Causal invalidity: the magnetic interaction energy of hydrated ions at 0.1-1 T is about a millionth of thermal energy, and the ions' hydration shells screen fields further \u2014 there is no physical path to polymorph selection at these strengths. The controlled-trial literature (also provided) finds no reproducible effect. A calibrated attacker must KILL on mechanism."
+   }
+  },
+  {
+   "case_id": "CAL-KB-03",
+   "domain_id": "power_electronics",
+   "pain_class": "EFFICIENCY",
+   "candidate": {
+    "candidate_id": "CAL-KB-03",
+    "technology_name": "Resonant Converter Claiming 99.5% Efficiency at 3 kW",
+    "problem": "Server PSU conversion losses at 3 kW are 40-60 W; halving them would save data center energy",
+    "causal_chain": [
+     "ZVS resonant topology eliminates switching loss",
+     "planar magnetics reduce core loss",
+     "GaN FETs reduce conduction loss",
+     "total conversion efficiency reaches 99.5% at 3 kW",
+     "PSU losses fall from 60 W to 15 W"
+    ],
+    "unexploited_phenomenon": "Zero-voltage switching (cal:kb03:r1)",
+    "intervention": "3 kW LLC resonant DC-DC stage, GaN, planar magnetics, claims 99.5% peak efficiency",
+    "governing_variables": "Switching frequency, dead time, Rds(on), core material, synchronous rectification",
+    "predicted_effect": "99.5% conversion efficiency at 3 kW (15 W total loss)",
+    "equations": [
+     "P_loss = P_cond + P_sw + P_core + P_aux; each minimized by topology and material claims"
+    ],
+    "boundary_conditions": "Claims 99.5% at full 3 kW load, 400 V to 48 V conversion",
+    "evidence_refs": [
+     "cal:kb03:r1"
+    ],
+    "baseline": {
+     "baseline_incumbent": "Best-in-class titanium PSU at 96.5% peak",
+     "baseline_metric": "96.5% at 3 kW (105 W loss)",
+     "candidate_metric": "99.5% at 3 kW (15 W loss)"
+    },
+    "killer_experiment": {
+     "experiment": "Calorimetric loss measurement at 3 kW",
+     "kill_condition": "If measured efficiency below 99%, fails",
+     "cost_class": "BENCH"
+    },
+    "failure_modes": [
+     "none claimed"
+    ],
+    "commercial_path": {
+     "buyer": "PSU OEMs"
+    },
+    "cross_domain_transition": "NONE"
+   },
+   "pool": [
+    {
+     "record_id": "cal:kb03:r1",
+     "title": "Best measured 3 kW-class server PSU efficiencies: 96-97% peak with GaN and ZVS; remaining loss floors from winding AC resistance, core, and synchronous-rectifier body diode conduction"
+    }
+   ],
+   "prior_art": {
+    "relevant_records": [
+     {
+      "record_id": "cal:kb03:pa1",
+      "perspective": "MECHANISM",
+      "title": "Physical loss floors in high-frequency 3 kW converters: AC winding resistance and core loss bounds on achievable efficiency"
+     }
+    ]
+   },
+   "ground_truth": {
+    "label": "KNOWN_BAD",
+    "expected_final": "KILLED",
+    "defect_class": "physics (loss-floor arithmetic: 99.5% at 3 kW implies 15 W total, below the measured physical floors of the constituent components)",
+    "expected_kill_surface": "physics",
+    "expected_defect_in_basis": [
+     "loss floor",
+     "winding",
+     "core",
+     "AC resistance",
+     "arithmetic",
+     "15 W",
+     "body diode"
+    ],
+    "ground_truth_basis": "The claim's arithmetic breaks against component physics: at 3 kW and 400/48 V, planar-magnet winding AC losses, core losses, and synchronous rectification losses each individually exceed several watts at any practical switching frequency; the best MEASURED 3 kW units sit at 96-97% (the cited record says exactly this). 99.5% implies ~15 W total \u2014 below the sum of physical floors. Baseline-equivalence-adjacent but fundamentally a physics/arithmetic violation. A calibrated attacker must KILL."
+   }
+  },
+  {
+   "case_id": "CAL-KB-04",
+   "domain_id": "marine",
+   "pain_class": "CORROSION",
+   "candidate": {
+    "candidate_id": "CAL-KB-04",
+    "technology_name": "Seawater Aluminum Anode With Claimed 10-Year Life in Ballast Tanks",
+    "problem": "Ballast tank corrosion protection anodes need replacement at every 5-year docking; longer intervals save dockings",
+    "causal_chain": [
+     "High-purity aluminum anode with special alloying",
+     "claimed drastically reduced self-corrosion",
+     "anode consumption rate falls 8x",
+     "same anode mass lasts 40 years; sized for 10",
+     "docking-interval corrosion work eliminated"
+    ],
+    "unexploited_phenomenon": "Claimed activation-control alloying (cal:kb04:r1)",
+    "intervention": "Al-Zn-In class anode with claimed 8x life extension in seawater ballast service",
+    "governing_variables": "Alloy composition, current capacity (Ah/kg), utilization factor, anode mass",
+    "predicted_effect": "Anode life 10 years at constant protection current density (8x conventional)",
+    "equations": [
+     "Life = M_anode * utilization * capacity (Ah/kg) / I_required \u2014 claim requires capacity x8 or I x1/8 with same mass"
+    ],
+    "boundary_conditions": "Same tank, same coating quality, same impressed current absence",
+    "evidence_refs": [
+     "cal:kb04:r1"
+    ],
+    "baseline": {
+     "baseline_incumbent": "Standard Al-Zn-In anode, 2.5-5 year life",
+     "baseline_metric": "2.5-5 years per docking cycle",
+     "candidate_metric": "10+ years claimed"
+    },
+    "killer_experiment": {
+     "experiment": "Field exposure of instrumented anode pairs in a working ballast tank for 3 years, weigh and measure capacity",
+     "kill_condition": "If consumption rate not reduced at least 5x, fails",
+     "cost_class": "FIELD"
+    },
+    "failure_modes": [
+     "passivation"
+    ],
+    "commercial_path": {
+     "buyer": "Ship operators"
+    },
+    "cross_domain_transition": "NONE"
+   },
+   "pool": [
+    {
+     "record_id": "cal:kb04:r1",
+     "title": "Aluminum sacrificial anode electrochemistry: measured capacity 2,500-2,900 Ah/kg is an intrinsic Faradaic limit; alloying changes efficiency 0.90-0.98 but not the Faradaic capacity by multiples"
+    }
+   ],
+   "prior_art": {
+    "relevant_records": [
+     {
+      "record_id": "cal:kb04:pa1",
+      "perspective": "MECHANISM",
+      "title": "Faraday's law for anode consumption: capacity in Ah/kg is fixed by electrochemical equivalence; life extension requires mass, not metallurgy"
+     }
+    ]
+   },
+   "ground_truth": {
+    "label": "KNOWN_BAD",
+    "expected_final": "KILLED",
+    "defect_class": "physics (Faradaic capacity limit \u2014 anode life cannot extend 8x at constant current and mass)",
+    "expected_kill_surface": "physics",
+    "expected_defect_in_basis": [
+     "Faraday",
+     "capacity",
+     "Ah/kg",
+     "mass",
+     "electrochemical equivalence",
+     "2,500"
+    ],
+    "ground_truth_basis": "The claimed 8x life at constant protection current and constant mass violates Faraday's law: the Al anode's electrochemical capacity (~2,500-2,900 Ah/kg, an intrinsic Faradaic quantity) fixes consumption; alloying moves efficiency a few percent, never 8x. The cited record states the limit. A calibrated attacker must KILL on physics."
+   }
+  },
+  {
+   "case_id": "CAL-KB-05",
+   "domain_id": "batteries_ev",
+   "pain_class": "THERMAL_LOSS",
+   "candidate": {
+    "candidate_id": "CAL-KB-05",
+    "technology_name": "Battery Pack 10x Thermal Runaway Propagation Delay via Thin Ceramic Coating Alone",
+    "problem": "EV pack thermal runaway cell-to-cell propagation is the main fire safety concern; delaying it 10x improves occupant escape time",
+    "causal_chain": [
+     "0.1 mm ceramic coating on cell cans",
+     "thermal runaway ejecta heat flux partially blocked",
+     "propagation delay claimed 10x",
+     "escape window extends from 5 to 50 minutes",
+     "pack-level fire safety rating improves without redesign"
+    ],
+    "unexploited_phenomenon": "Ceramic thermal barrier on cell cans (cal:kb05:r1)",
+    "intervention": "Coat cylindrical 21700 cell cans with 0.1 mm alumina; claim 10x propagation delay at pack level with NO other changes",
+    "governing_variables": "Coating thickness, ejecta heat flux (W/cm2), cell spacing, venting design",
+    "predicted_effect": "10x delay in cell-to-cell propagation; pack escape time from 5 to 50 minutes",
+    "equations": [
+     "t_delay ~ rho*c*delta_T*thickness / q''_ejecta \u2014 with 0.1 mm alumina and q'' ~ 10-100 W/cm2 the added thermal mass is ~0.1-1 s, not minutes"
+    ],
+    "boundary_conditions": "No changes to spacing, venting, busbar fusing, or pack structure",
+    "evidence_refs": [
+     "cal:kb05:r1"
+    ],
+    "baseline": {
+     "baseline_incumbent": "Bare cell cans with standard spacing",
+     "baseline_metric": "Propagation delay seconds to minutes",
+     "candidate_metric": "Claimed 10x (minutes to tens of minutes)"
+    },
+    "killer_experiment": {
+     "experiment": "Nail-penetration propagation test on coated vs uncoated cell pairs",
+     "kill_condition": "If delay factor < 2x, fails",
+     "cost_class": "BENCH"
+    },
+    "failure_modes": [
+     "coating adhesion"
+    ],
+    "commercial_path": {
+     "buyer": "EV OEMs"
+    },
+    "cross_domain_transition": "NONE"
+   },
+   "pool": [
+    {
+     "record_id": "cal:kb05:r1",
+     "title": "Cell-to-cell thermal runaway propagation: measured ejecta heat fluxes 10-100 W/cm2 and propagation timescales set by adjacent cell heating to onset; thin-coating thermal mass adds sub-second delay only"
+    }
+   ],
+   "prior_art": {
+    "relevant_records": [
+     {
+      "record_id": "cal:kb05:pa1",
+      "perspective": "FAILURE",
+      "title": "Coating-only mitigation trials: meaningful propagation delay requires spacing, interstitial barriers, and vent redirection together"
+     }
+    ]
+   },
+   "ground_truth": {
+    "label": "KNOWN_BAD",
+    "expected_final": "KILLED",
+    "defect_class": "physics (magnitude arithmetic: 0.1 mm alumina thermal mass adds ~0.1-1 s against minute-scale requirement \u2014 3+ orders short)",
+    "expected_kill_surface": "physics",
+    "expected_defect_in_basis": [
+     "thermal mass",
+     "0.1 mm",
+     "heat flux",
+     "seconds",
+     "arithmetic",
+     "orders of magnitude"
+    ],
+    "ground_truth_basis": "Magnitude arithmetic: the sensible heat of 0.1 mm alumina over a cell can is absorbed in well under a second by runaway ejecta flux; a 10x minute-scale delay requires either large interstitial thermal mass or spacing/venting redesign. The claimed effect is 3+ orders of magnitude beyond the coating's physics. A calibrated attacker must KILL on physics."
+   }
+  },
+  {
+   "case_id": "CAL-KB-06",
+   "domain_id": "carbon_capture",
+   "pain_class": "ENERGY_CONVERSION_LOSS",
+   "candidate": {
+    "candidate_id": "CAL-KB-06",
+    "technology_name": "Ambient-Air CO2 Capture Claiming Net Energy Surplus",
+    "problem": "Direct air capture spends 1,500-2,500 kWh/tCO2; a process that captures CO2 while producing net energy would transform economics",
+    "causal_chain": [
+     "sorbent captures CO2 from ambient air",
+     "captured CO2 reacted with a mineral to form carbonate",
+     "carbonation heat is claimed to exceed the regeneration and fan energy",
+     "the process exports net power while capturing CO2",
+     "negative-cost carbon removal"
+    ],
+    "unexploited_phenomenon": "Exothermic carbonation of CO2 with Ca/Mg minerals (cal:kb06:r1)",
+    "intervention": "Sorbent loop + mineral carbonation reactor claimed to export 100-300 kWh net per tCO2 captured from 420 ppm air",
+    "governing_variables": "Sorbent regeneration energy (GJ/t), carbonation enthalpy (GJ/t), fan power, cycle temperatures",
+    "predicted_effect": "Net energy export 100-300 kWh per tonne CO2 captured from ambient air",
+    "equations": [
+     "E_net = E_carbonation - E_regeneration - E_fans; claim asserts E_net > 0",
+     "Minimum separation work at 420 ppm: ~ 500 kWh/tCO2 (thermodynamic bound)"
+    ],
+    "boundary_conditions": "Claims NET positive energy while capturing from 420 ppm",
+    "evidence_refs": [
+     "cal:kb06:r1"
+    ],
+    "baseline": {
+     "baseline_incumbent": "Conventional DAC at 1,500-2,500 kWh/t net input",
+     "baseline_metric": "Net energy input 1,500-2,500 kWh/t",
+     "candidate_metric": "Net energy OUTPUT 100-300 kWh/t"
+    },
+    "killer_experiment": {
+     "experiment": "Full-loop energy audit with metered inputs/outputs at steady state",
+     "kill_condition": "If net energy negative, fails",
+     "cost_class": "PILOT"
+    },
+    "failure_modes": [
+     "sorbent degradation"
+    ],
+    "commercial_path": {
+     "buyer": "Carbon removal buyers"
+    },
+    "cross_domain_transition": "NONE"
+   },
+   "pool": [
+    {
+     "record_id": "cal:kb06:r1",
+     "title": "Thermodynamics of CO2 capture from air: minimum separation work ~500 kWh/t at 420 ppm; carbonation enthalpy (~1.8 GJ/t) cannot be recovered above regeneration temperature with net surplus"
+    }
+   ],
+   "prior_art": {
+    "relevant_records": [
+     {
+      "record_id": "cal:kb06:pa1",
+      "perspective": "MECHANISM",
+      "title": "Second-law analysis of DAC energy budgets: no known sorbent-mineral loop exports net energy"
+     }
+    ]
+   },
+   "ground_truth": {
+    "label": "KNOWN_BAD",
+    "expected_final": "KILLED",
+    "defect_class": "physics (second-law violation: net energy export while separating CO2 from 420 ppm exceeds available enthalpy)",
+    "expected_kill_surface": "physics",
+    "expected_defect_in_basis": [
+     "second law",
+     "minimum work",
+     "500 kWh",
+     "enthalpy",
+     "exergy",
+     "420 ppm"
+    ],
+    "ground_truth_basis": "Second-law arithmetic: minimum work to separate CO2 from 420 ppm air is ~500 kWh/t; real sorbent regeneration and fans cost 1,500-2,500 kWh/t; the ~1.8 GJ/t carbonation enthalpy is low-grade heat largely below regeneration temperature (exergy-poor). Net EXPORT while capturing from air is thermodynamically impossible for this loop class. A calibrated attacker must KILL on physics."
+   }
+  },
+  {
+   "case_id": "CAL-KB-07",
+   "domain_id": "semiconductor_fab",
+   "pain_class": "YIELD",
+   "candidate": {
+    "candidate_id": "CAL-KB-07",
+    "technology_name": "Statio-Litho Overlay Control From a Single Wafer Metric",
+    "problem": "Scanner-to-scanner overlay drift causes yield loss; a cheap single-metric controller would replace metrology-heavy feedback",
+    "causal_chain": [
+     "single inline focus metric per wafer is measured",
+     "the metric is assumed to encode overlay error",
+     "controller corrects scanner baselines from the single metric",
+     "overlay improves without dedicated overlay metrology",
+     "yield recovers and metrology cost falls"
+    ],
+    "unexploited_phenomenon": "Claimed single-metric observability (cal:kb07:r1)",
+    "intervention": "Feed one focus metric into an SPC chart to steer overlay corrections without overlay metrology",
+    "governing_variables": "Focus metric sensitivity, overlay process dominants (Z expansion, wafer mapping, lens heating)",
+    "predicted_effect": "30-50% reduction in overlay excursions with zero added metrology",
+    "equations": [
+     "overlay_error = sum(beta_i * factor_i) \u2014 one scalar observation cannot identify the multiple independent drift factors"
+    ],
+    "boundary_conditions": "None stated",
+    "evidence_refs": [
+     "cal:kb07:r1"
+    ],
+    "baseline": {
+     "baseline_incumbent": "Dedicated overlay metrology + APC on lot basis",
+     "baseline_metric": "Overlay excursion rate baseline",
+     "candidate_metric": "30-50% reduction claimed"
+    },
+    "killer_experiment": {
+     "experiment": "A/B the single-metric controller vs dedicated overlay metrology for excursion rate over 2000 wafers",
+     "kill_condition": "If excursion rate not reduced 20%, fails",
+     "cost_class": "PILOT"
+    },
+    "failure_modes": [
+     "none claimed"
+    ],
+    "commercial_path": {
+     "buyer": "Fab operators"
+    },
+    "cross_domain_transition": "NONE"
+   },
+   "pool": [
+    {
+     "record_id": "cal:kb07:r1",
+     "title": "Overlay process control: measured overlay error decomposes into several independent drift factors (stage Z, wafer mapping, lens heating) requiring multi-channel metrology for identifiability"
+    }
+   ],
+   "prior_art": {
+    "relevant_records": [
+     {
+      "record_id": "cal:kb07:pa1",
+      "perspective": "FAILURE",
+      "title": "Single-sensor control of multi-factor overlay: observability failures documented when independent factors alias into one metric"
+     }
+    ]
+   },
+   "ground_truth": {
+    "label": "KNOWN_BAD",
+    "expected_final": "KILLED",
+    "defect_class": "measurement-ambiguity / identifiability (one scalar cannot identify multiple independent overlay drift factors)",
+    "expected_kill_surface": "mechanism",
+    "expected_defect_in_basis": [
+     "identifiability",
+     "observability",
+     "multiple factors",
+     "alias",
+     "one metric",
+     "degrees of freedom"
+    ],
+    "ground_truth_basis": "Identifiability: a single scalar focus metric cannot disambiguate the several independent overlay drift factors (stage Z, wafer mapping, lens heating); corrections from an aliased observation amplify some factors while correcting others. The cited record and prior-art analysis both state the multi-channel requirement. A calibrated attacker must KILL on mechanism/observability."
+   }
+  },
+  {
+   "case_id": "CAL-KB-08",
+   "domain_id": "wind",
+   "pain_class": "MATERIAL_DEGRADATION",
+   "candidate": {
+    "candidate_id": "CAL-KB-08",
+    "technology_name": "Blade Leading-Edge Self-Healing Coating Claiming Full Field Recovery Overnight",
+    "problem": "Blade LE erosion reduces AEP 1-3% and needs re-coating every 3-5 years",
+    "causal_chain": [
+     "Microcapsule self-healing coating on LE",
+     "erosion ruptures capsules",
+     "healing agent fills the crater",
+     "overnight self-healing at ambient conditions restores the surface",
+     "re-coating cycles are eliminated"
+    ],
+    "unexploited_phenomenon": "Microcapsule self-healing polymers (cal:kb08:r1)",
+    "intervention": "Two-part microcapsule coating claimed to fully heal rain-erosion craters (0.1-1 mm) overnight at ambient temperature, eliminating LE re-coating for the blade life",
+    "governing_variables": "Capsule density, healing agent kinetics, crater volume, ambient temperature",
+    "predicted_effect": "Full overnight recovery of 0.1-1 mm erosion craters at 5-25 C ambient; AEP loss held at 0%; re-coating eliminated for 20-year blade life",
+    "equations": [
+     "V_heal = n_capsules_broken * V_agent; healing 1 mm crater requires agent volumes comparable to crater volume \u2014 capsule densities needed exceed film integrity limits"
+    ],
+    "boundary_conditions": "Claims full heal of mm-scale craters at ambient temperature overnight",
+    "evidence_refs": [
+     "cal:kb08:r1"
+    ],
+    "baseline": {
+     "baseline_incumbent": "Polyurethane LE tapes / coatings replaced at 3-5 year intervals",
+     "baseline_metric": "AEP loss 1-3%; re-coat every 3-5 years",
+     "candidate_metric": "AEP loss 0%; no re-coat for 20 years"
+    },
+    "killer_experiment": {
+     "experiment": "Rain-erosion rig to controlled 1 mm damage, then 12 h ambient heal, re-test profile",
+     "kill_condition": "If surface profile not restored to 80%, fails",
+     "cost_class": "BENCH"
+    },
+    "failure_modes": [
+     "UV degradation of agent"
+    ],
+    "commercial_path": {
+     "buyer": "Wind farm operators"
+    },
+    "cross_domain_transition": "NONE"
+   },
+   "pool": [
+    {
+     "record_id": "cal:kb08:r1",
+     "title": "Microcapsule self-healing coatings: measured healing is effective for micro-scale scratches (tens of microns); capsule volume fraction limits total healable damage to ~1-5% of film volume, far below mm-scale erosion craters"
+    }
+   ],
+   "prior_art": {
+    "relevant_records": [
+     {
+      "record_id": "cal:kb08:pa1",
+      "perspective": "FAILURE",
+      "title": "Self-healing coating field trials on wind blades: micro-scale crack healing confirmed, mm-scale rain erosion beyond healing capacity"
+     }
+    ]
+   },
+   "ground_truth": {
+    "label": "KNOWN_BAD",
+    "expected_final": "KILLED",
+    "defect_class": "scaling failure (micro-scale healing mechanism applied to mm-scale damage; healable volume fraction is orders short)",
+    "expected_kill_surface": "physics",
+    "expected_defect_in_basis": [
+     "volume",
+     "capsule",
+     "micron",
+     "mm",
+     "scaling",
+     "fraction",
+     "orders"
+    ],
+    "ground_truth_basis": "Scaling: microcapsule healing is proven for tens-of-microns scratches; total healable volume is bounded by capsule volume fraction (~1-5% of film). Rain-erosion craters at 0.1-1 mm exceed healable volume by 2-3 orders of magnitude, and ambient-temperature overnight kinetics are far slower than blade-repair PU. The cited record and prior-art field trials state the mismatch. A calibrated attacker must KILL on scaling/physics."
+   }
+  },
+  {
+   "case_id": "CAL-KB-09",
+   "domain_id": "machining",
+   "pain_class": "TOOL_WEAR",
+   "candidate": {
+    "candidate_id": "CAL-KB-09",
+    "technology_name": "Cryogenic Tool Life Extension x10 in Steel Milling",
+    "problem": "Carbide tool wear drives tooling and downtime cost in steel milling",
+    "causal_chain": [
+     "LN2 delivered through the spindle to the tool tip",
+     "cutting zone temperature falls below 50 C",
+     "diffusion and oxidation wear mechanisms nearly stop",
+     "tool life extends 10x",
+     "tooling cost per part falls 85%"
+    ],
+    "unexploited_phenomenon": "Cryogenic cooling suppresses diffusion wear (cal:kb09:r1)",
+    "intervention": "Through-spindle LN2 at 30 L/h claimed to extend carbide tool life 10x in continuous steel milling at production feeds/speeds",
+    "governing_variables": "LN2 flow (L/h), cutting speed (m/min), depth of cut, insert grade, chip evacuation",
+    "predicted_effect": "10x tool life at production metal-removal rates",
+    "equations": [
+     "Taylor tool life: V*T^n = C; cooling lowers effective V-equivalent wear rate \u2014 10x requires wear-rate suppression well beyond measured cryogenic results"
+    ],
+    "boundary_conditions": "Claims 10x at full production feeds/speeds in continuous milling",
+    "evidence_refs": [
+     "cal:kb09:r1"
+    ],
+    "baseline": {
+     "baseline_incumbent": "Flood coolant carbide milling",
+     "baseline_metric": "Tool life T baseline (20-60 min class)",
+     "candidate_metric": "10x T (200-600 min class)"
+    },
+    "killer_experiment": {
+     "experiment": "ISO tool-life test flood vs LN2 at production parameters",
+     "kill_condition": "If life extension < 3x, fails",
+     "cost_class": "LAB"
+    },
+    "failure_modes": [
+     "thermal cracking of inserts from extreme gradients"
+    ],
+    "commercial_path": {
+     "buyer": "Machining shops"
+    },
+    "cross_domain_transition": "NONE"
+   },
+   "pool": [
+    {
+     "record_id": "cal:kb09:r1",
+     "title": "Cryogenic machining measured results: tool life gains of 1.3-2.5x typical for carbide in steels; 10x not observed; extreme gradients introduce thermal-cracking wear mode"
+    }
+   ],
+   "prior_art": {
+    "relevant_records": [
+     {
+      "record_id": "cal:kb09:pa1",
+      "perspective": "MECHANISM",
+      "title": "Wear-mode transition under cryogenic cooling: diffusion suppression is partial; mechanical-attrition and thermal-cracking wear persist"
+     }
+    ]
+   },
+   "ground_truth": {
+    "label": "KNOWN_BAD",
+    "expected_final": "KILLED",
+    "defect_class": "evidence contradiction (measured cryogenic tool-life gains are 1.3-2.5x; the 10x claim contradicts the cited evidence and ignores the thermal-cracking wear mode it introduces)",
+    "expected_kill_surface": "evidence",
+    "expected_defect_in_basis": [
+     "measured",
+     "1.3",
+     "2.5x",
+     "thermal cracking",
+     "contradicts",
+     "10x"
+    ],
+    "ground_truth_basis": "Evidence contradiction: the cited record itself reports measured cryogenic tool-life extensions of 1.3-2.5x with a NEW thermal-cracking wear mode; the 10x claim contradicts its own source while citing it. A calibrated attacker must KILL on evidence (and physics-adjacent wear-mode reasoning)."
+   }
+  },
+  {
+   "case_id": "CAL-KB-10",
+   "domain_id": "chemical_process",
+   "pain_class": "SAFETY",
+   "candidate": {
+    "candidate_id": "CAL-KB-10",
+    "technology_name": "Oxygen-Enriched Combustion Air Retrofit Inside Occupied Boiler Rooms",
+    "problem": "Boiler fuel consumption can drop with oxygen-enriched combustion air",
+    "causal_chain": [
+     "PSA unit enriches combustion air to 28% O2",
+     "flame temperature rises",
+     "excess air requirement falls",
+     "boiler efficiency rises 4-6%",
+     "fuel cost falls"
+    ],
+    "unexploited_phenomenon": "O2-enriched combustion (cal:kb10:r1)",
+    "intervention": "Retrofit PSA oxygen enrichment on natural-draft boilers located INSIDE occupied mechanical rooms, with enriched air ducted through standard HVAC ducting and no O2 monitoring",
+    "governing_variables": "O2 concentration (28%), duct leakage, room volume, ventilation rate, ignition sources",
+    "predicted_effect": "4-6% boiler efficiency gain with no safety hardware changes",
+    "equations": [
+     "Room O2 rise from 21% toward 24%+ with duct leakage dV/dt into V_room; flammability limits of common materials and clothing shift downward sharply above 23.5% O2"
+    ],
+    "boundary_conditions": "Occupied room, no O2 monitoring, standard ducting",
+    "evidence_refs": [
+     "cal:kb10:r1"
+    ],
+    "baseline": {
+     "baseline_incumbent": "Ambient-air combustion",
+     "baseline_metric": "Boiler efficiency 80%",
+     "candidate_metric": "84-86% claimed"
+    },
+    "killer_experiment": {
+     "experiment": "Room O2 mapping under leak conditions",
+     "kill_condition": "If room O2 stays below 23%, passes",
+     "cost_class": "BENCH"
+    },
+    "failure_modes": [
+     "none claimed"
+    ],
+    "commercial_path": {
+     "buyer": "Building operators"
+    },
+    "cross_domain_transition": "NONE"
+   },
+   "pool": [
+    {
+     "record_id": "cal:kb10:r1",
+     "title": "Oxygen-enriched atmospheres in occupied spaces: 23.5%+ O2 sharply lowers ignition energy and accelerates fire; codes require monitoring and exclusion of occupancy above threshold"
+    }
+   ],
+   "prior_art": {
+    "relevant_records": [
+     {
+      "record_id": "cal:kb10:pa1",
+      "perspective": "FAILURE",
+      "title": "PSA combustion-air enrichment safety analyses: leak scenarios in occupied rooms drive O2 above 23.5% without monitoring; NFPA-class guidance excludes occupancy"
+     }
+    ]
+   },
+   "ground_truth": {
+    "label": "KNOWN_BAD",
+    "expected_final": "KILLED",
+    "defect_class": "safety failure (oxygen-enriched occupied space without monitoring \u2014 a fire-safety violation of code-class requirements)",
+    "expected_kill_surface": "manufacturability",
+    "expected_defect_in_basis": [
+     "23.5",
+     "safety",
+     "fire",
+     "code",
+     "NFPA",
+     "occupied",
+     "monitoring"
+    ],
+    "ground_truth_basis": "Safety: enriching combustion air inside occupied rooms with standard ducting and no O2 monitoring creates an oxygen-enriched occupied atmosphere (duct leaks drift room O2 above the ~23.5% threshold where ignition energy collapses); codes and the provided safety analyses exclude this configuration. The 4-6% efficiency gain does not matter \u2014 the intervention is unsafe as specified. A calibrated attacker must KILL on safety/engineering realization."
+   }
+  },
+  {
+   "case_id": "CAL-NM-01",
+   "domain_id": "electronics_thermal",
+   "pain_class": "THERMAL_LOSS",
+   "candidate": {
+    "candidate_id": "CAL-NM-01",
+    "technology_name": "Electrocaloric Solid-State Server Cooling at Rack Scale",
+    "problem": "Data center compressor cooling has moving parts and refrigerants; a solid-state cooling layer at the chip would eliminate both",
+    "causal_chain": [
+     "Electrocaloric film under electric field changes temperature",
+     "alternating field cycles heat absorption/release",
+     "heat is pumped from chip to heat spreader",
+     "no compressor, no refrigerant",
+     "rack cooling is solid-state"
+    ],
+    "unexploited_phenomenon": "Electrocaloric effect in ceramic thin films (cal:nm01:r1)",
+    "intervention": "Multilayer electrocaloric cells bonded to CPU lids claiming 200 W heat pump per chip at 20 K span with COP 3",
+    "governing_variables": "Adiabatic temperature change (K), field (V/micron), frequency (Hz), film volume, contact resistance",
+    "predicted_effect": "200 W per chip at 20 K span, COP 3, rack-level 20% cooling energy saving vs chilled water",
+    "equations": [
+     "Q_per_cycle = rho*c*delta_T_ad * V_active; with measured delta_T_ad 2-5 K and cycle rates 1-10 Hz, per-gram heat pump rates are W-scale per gram \u2014 scaling to 200 W needs kg-class active film",
+     "COP_bound = T_cold/delta_T * (electrocaloric efficiency 30-60% of Carnot)"
+    ],
+    "boundary_conditions": "Stated as rack-scale competitive with chilled water",
+    "evidence_refs": [
+     "cal:nm01:r1"
+    ],
+    "baseline": {
+     "baseline_incumbent": "Chilled-water cold plates",
+     "baseline_metric": "COP 4-6 system level",
+     "candidate_metric": "COP 3 claimed at chip"
+    },
+    "killer_experiment": {
+     "experiment": "Calorimetric measurement of one 20 W cell's lift and COP at 20 K span, then linear extrapolation audit",
+     "kill_condition": "If measured cell COP below 2 or per-gram lift makes 200 W packaging impossible under 5 cm^3, fails",
+     "cost_class": "BENCH"
+    },
+    "failure_modes": [
+     "fatigue",
+     "leakage current"
+    ],
+    "commercial_path": {
+     "buyer": "Server OEMs"
+    },
+    "cross_domain_transition": "Caloric materials research -> server cooling"
+   },
+   "pool": [
+    {
+     "record_id": "cal:nm01:r1",
+     "title": "Electrocaloric thin films: measured adiabatic temperature changes 2-5 K at practical fields; demonstrated heat pumping remains W-scale in research prototypes, not rack-scale"
+    }
+   ],
+   "prior_art": {
+    "relevant_records": [
+     {
+      "record_id": "cal:nm01:pa1",
+      "perspective": "MECHANISM",
+      "title": "Electrocaloric cooling prototypes: laboratory demonstrations at 1-10 W scale; scaling and fatigue remain open"
+     }
+    ]
+   },
+   "ground_truth": {
+    "label": "NEAR_MISS",
+    "expected_final": "KILLED",
+    "defect_class": "magnitude (real effect, orders-of-magnitude gap between measured 1-10 W prototypes and the claimed 200 W/chip at COP 3)",
+    "expected_kill_surface": "physics",
+    "expected_defect_in_basis": [
+     "2-5 K",
+     "W-scale",
+     "prototype",
+     "orders",
+     "scale",
+     "fatigue",
+     "per gram"
+    ],
+    "ground_truth_basis": "The electrocaloric effect is real and the citations are honest about 2-5 K adiabatic changes, but the state of the art pumps 1-10 W in prototypes; claiming 200 W/chip at COP 3 skips 2 orders of magnitude in power density and unresolved fatigue. A calibrated attacker should KILL on the magnitude/scale gap (a physics/baseline-scale argument), even though the underlying effect is real."
+   }
+  },
+  {
+   "case_id": "CAL-NM-02",
+   "domain_id": "transport_infra",
+   "pain_class": "ENERGY_HARVEST",
+   "candidate": {
+    "candidate_id": "CAL-NM-02",
+    "technology_name": "Roadway Piezoelectric Harvesting Powering Highway Lighting",
+    "problem": "Highway lighting and signage need grid connections; harvesting traffic energy in the roadway would remove trenching cost",
+    "causal_chain": [
+     "Piezoelectric transducers embedded under asphalt",
+     "truck axles strain the transducers",
+     "mechanical work converts to charge",
+     "storage powers lighting at night",
+     "grid connection eliminated"
+    ],
+    "unexploited_phenomenon": "Piezoelectric energy harvesting under traffic loads (cal:nm02:r1)",
+    "intervention": "10 km of embedded piezo strips claiming 300 kW average harvest, powering continuous highway lighting and signage",
+    "governing_variables": "Transducer coupling, traffic density, axle loads, contact time, asphalt viscoelastic loss",
+    "predicted_effect": "300 kW average from 10 km of roadway; lighting fully off-grid",
+    "equations": [
+     "P_max per axle pass ~ m*g*delta_h_available; road deflection energy is ~1-100 J per axle pass, mostly dissipated in asphalt viscoelasticity \u2014 300 kW needs ~3000 J/s class, far above total available deflection work at realistic traffic",
+     "Available: ~10-100 W per lane-km measured class"
+    ],
+    "boundary_conditions": "Claims lighting-scale power",
+    "evidence_refs": [
+     "cal:nm02:r1"
+    ],
+    "baseline": {
+     "baseline_incumbent": "Grid-connected LED lighting",
+     "baseline_metric": "Grid draw 0 (existing solution works)",
+     "candidate_metric": "300 kW claimed"
+    },
+    "killer_experiment": {
+     "experiment": "Instrument 100 m of embedded strip, measure harvest over 30 days of real traffic",
+     "kill_condition": "If power below 1 kW per km, fails",
+     "cost_class": "FIELD"
+    },
+    "failure_modes": [
+     "asphalt fatigue around embeds"
+    ],
+    "commercial_path": {
+     "buyer": "Highway agencies"
+    },
+    "cross_domain_transition": "NONE"
+   },
+   "pool": [
+    {
+     "record_id": "cal:nm02:r1",
+     "title": "Piezoelectric roadway harvesting: measured output 1-100 W per lane-km under real traffic; per-axle available deflection energy 1-100 J, largely absorbed by asphalt viscoelasticity"
+    }
+   ],
+   "prior_art": {
+    "relevant_records": [
+     {
+      "record_id": "cal:nm02:pa1",
+      "perspective": "FAILURE",
+      "title": "Field trials of roadway piezo harvesters: per-lane-km power orders below lighting demand; embed fatigue degrades output within months"
+     }
+    ]
+   },
+   "ground_truth": {
+    "label": "NEAR_MISS",
+    "expected_final": "KILLED",
+    "defect_class": "magnitude (available deflection energy and measured harvest are 3+ orders below the claim; also a hidden cost: embedding degrades pavement life)",
+    "expected_kill_surface": "physics",
+    "expected_defect_in_basis": [
+     "1-100 W",
+     "per axle",
+     "deflection",
+     "viscoelastic",
+     "orders",
+     "kW"
+    ],
+    "ground_truth_basis": "The physics of harvesting road deflection is real, but the total available mechanical work per axle pass (1-100 J) and measured field outputs (1-100 W/lane-km) sit 3+ orders below the claimed 300 kW per 10 km; energy conservation on the traffic stream's tiny deflection budget kills the lighting-scale claim. A calibrated attacker should KILL on magnitude."
+   }
+  },
+  {
+   "case_id": "CAL-NM-03",
+   "domain_id": "automotive",
+   "pain_class": "WASTE_HEAT",
+   "candidate": {
+    "candidate_id": "CAL-NM-03",
+    "technology_name": "Exhaust Thermoelectric Generator Covering 10% of Cruising Electrical Load",
+    "problem": "Car alternator load costs 1-3% fuel economy; waste-heat recovery could feed the electrical system",
+    "causal_chain": [
+     "TEG modules on exhaust pipe",
+     "Seebeck effect converts Delta-T to electricity",
+     "cruise exhaust 550 C vs coolant 90 C",
+     "hundreds of watts are generated",
+     "alternator de-loads and fuel economy rises"
+    ],
+    "unexploited_phenomenon": "Thermoelectric Seebeck generation (cal:nm03:r1)",
+    "intervention": "2 kg Bi2Te3/skutterudite TEG array claiming 800 W continuous at cruise, displacing alternator load and adding 8-10% vehicle fuel economy",
+    "governing_variables": "ZT, hot-side temperature, cold-side temperature, module area, exhaust mass flow",
+    "predicted_effect": "800 W at cruise; 8-10% vehicle fuel-economy gain",
+    "equations": [
+     "eta_TEG ~ (ZT_avg ~1)(Delta_T/T_hot) * (1/4) efficiency factor ~ 4-6% of heat flux at best; 800 W needs ~15 kW heat flux and ~2 m^2 module",
+     "fuel gain from 800 W alternator de-load is ~0.5-1.5% (alternator mechanical load 1-3%)"
+    ],
+    "boundary_conditions": "Claims 8-10% fuel gain from electrical de-load alone",
+    "evidence_refs": [
+     "cal:nm03:r1"
+    ],
+    "baseline": {
+     "baseline_incumbent": "Alternator at 92% efficiency",
+     "baseline_metric": "Electrical load 1-3% of engine power",
+     "candidate_metric": "8-10% fuel gain claimed"
+    },
+    "killer_experiment": {
+     "experiment": "Chassis-dynamometer A/B with TEG installed, fuel flow metered at cruise",
+     "kill_condition": "If fuel gain below 2%, fails",
+     "cost_class": "BENCH"
+    },
+    "failure_modes": [
+     "module thermal cycling fatigue",
+     "backpressure penalty"
+    ],
+    "commercial_path": {
+     "buyer": "Automakers"
+    },
+    "cross_domain_transition": "Space RTG thermoelectrics -> automotive"
+   },
+   "pool": [
+    {
+     "record_id": "cal:nm03:r1",
+     "title": "Automotive TEG demonstrations: measured 100-400 W systems; efficiency 3-5% of exhaust heat; net fuel-economy effect 0.5-1.5%; module cost and weight at 800 W scale exceed value"
+    }
+   ],
+   "prior_art": {
+    "relevant_records": [
+     {
+      "record_id": "cal:nm03:pa1",
+      "perspective": "FAILURE",
+      "title": "Automotive TEG programs: mass, backpressure, and module cost terminated commercial deployment; net benefit below 2% fuel"
+     }
+    ]
+   },
+   "ground_truth": {
+    "label": "NEAR_MISS",
+    "expected_final": "KILLED",
+    "defect_class": "baseline/magnitude inversion (alternator de-load bounds the fuel gain at ~0.5-1.5%; the 8-10% claim exceeds the physical size of the displaced load)",
+    "expected_kill_surface": "baseline",
+    "expected_defect_in_basis": [
+     "alternator",
+     "1-3%",
+     "0.5",
+     "1.5",
+     "load",
+     "cannot exceed",
+     "efficiency"
+    ],
+    "ground_truth_basis": "The Seebeck mechanism is real and 100-400 W systems have been demonstrated, but the claimed 8-10% fuel-economy gain inverts the arithmetic: the alternator consumes only 1-3% of engine power, so even a perfect electrical de-load caps the gain near 1-3%; measured TEG programs netted 0.5-1.5%. The claim exceeds the size of the displaced baseline load by 4-8x. A calibrated attacker should KILL on baseline arithmetic."
+   }
+  },
+  {
+   "case_id": "CAL-NM-04",
+   "domain_id": "industrial_valves",
+   "pain_class": "RESPONSE_TIME",
+   "candidate": {
+    "candidate_id": "CAL-NM-04",
+    "technology_name": "SMA Actuated High-Frequency Safety Shutoff Valve",
+    "problem": "Pneumatic shutoff valves need instrument air infrastructure; an electric SMA actuator would remove it",
+    "causal_chain": [
+     "NiTi SMA wire contracts when heated",
+     "wire contraction pulls the valve stem",
+     "current controls the actuator",
+     "valve cycles on demand",
+     "instrument air eliminated"
+    ],
+    "unexploited_phenomenon": "SMA wire actuation (cal:nm04:r1)",
+    "intervention": "SMA wire actuator for a 2-inch safety shutoff valve cycling at 50 Hz duty, claiming pneumatic-class response and million-cycle life",
+    "governing_variables": "Wire gauge, transformation temperature, cooling time, stroke, cycle frequency",
+    "predicted_effect": "50 Hz cycling, 5 ms response, >10^6 cycles",
+    "equations": [
+     "Cycle rate bounded by heat/cool time: t_cool ~ (thermal mass)/(h*A) ~ 0.5-5 s for practical wire packs \u2014 50 Hz is beyond passive cooling",
+     "SMA fatigue: 10^6 cycles at 4% strain is near the measured limit at low strain; at actuation strains 2-4% cycle life is 10^4-10^6 with degradation"
+    ],
+    "boundary_conditions": "Claims 50 Hz and 10^6 cycles",
+    "evidence_refs": [
+     "cal:nm04:r1"
+    ],
+    "baseline": {
+     "baseline_incumbent": "Pneumatic actuator at 100-500 ms, 10^6+ cycles",
+     "baseline_metric": "Response 100-500 ms, life 10^6+",
+     "candidate_metric": "5 ms, 10^6 cycles claimed"
+    },
+    "killer_experiment": {
+     "experiment": "Cycle the actuator at 50 Hz, log stroke decay and failures",
+     "kill_condition": "If response lags above 50 ms or life below 10^5, fails",
+     "cost_class": "BENCH"
+    },
+    "failure_modes": [
+     "fatigue",
+     "thermal lag"
+    ],
+    "commercial_path": {
+     "buyer": "Plant operators"
+    },
+    "cross_domain_transition": "NONE"
+   },
+   "pool": [
+    {
+     "record_id": "cal:nm04:r1",
+     "title": "SMA wire actuators: measured cycle rates 0.2-2 Hz limited by cooling time; fatigue life 10^4-10^6 cycles at practical strains; 50 Hz operation requires active cooling"
+    }
+   ],
+   "prior_art": {
+    "relevant_records": [
+     {
+      "record_id": "cal:nm04:pa1",
+      "perspective": "MECHANISM",
+      "title": "Thermal actuation bandwidth limits: SMA actuator frequency is cooling-bound, order of Hz, not tens of Hz"
+     }
+    ]
+   },
+   "ground_truth": {
+    "label": "NEAR_MISS",
+    "expected_final": "KILLED",
+    "defect_class": "boundary-condition failure (SMA actuation is real but cooling-limited to ~0.2-2 Hz; the 50 Hz spec is outside the mechanism's physical bandwidth)",
+    "expected_kill_surface": "physics",
+    "expected_defect_in_basis": [
+     "cooling",
+     "Hz",
+     "bandwidth",
+     "thermal",
+     "cycle rate",
+     "fatigue"
+    ],
+    "ground_truth_basis": "SMA actuation works and is fielded for low-frequency duties, but actuation bandwidth is cooling-bound at ~0.2-2 Hz for passive wire packs and fatigue life at actuation strains is 10^4-10^6 \u2014 the 50 Hz / 10^6-cycle spec sits outside the mechanism's physical envelope. A calibrated attacker should KILL on boundary conditions."
+   }
+  },
+  {
+   "case_id": "CAL-NM-05",
+   "domain_id": "electronics_thermal",
+   "pain_class": "THERMAL_LOSS",
+   "candidate": {
+    "candidate_id": "CAL-NM-05",
+    "technology_name": "Graphene Film Replacing Solder Thermal Interface",
+    "problem": "Solder TIM between die and heat spreader has 10-30 W/mK effective conductivity and fatigue issues; graphene's 2000-5000 W/mK in-plane conductivity suggests a better TIM",
+    "causal_chain": [
+     "Graphene film layered as the thermal interface",
+     "high thermal conductivity moves heat across the interface",
+     "thermal resistance falls",
+     "junction temperature drops 15-20 C",
+     "device reliability and headroom improve"
+    ],
+    "unexploited_phenomenon": "Graphene's thermal conductivity (cal:nm05:r1)",
+    "intervention": "Replace solder TIM with 20-layer graphene film claiming 5x interface conductance improvement",
+    "governing_variables": "In-plane vs through-plane conductivity, interface contact resistance, layer count, adhesion",
+    "predicted_effect": "5x interface thermal conductance; 15-20 C junction temperature drop",
+    "equations": [
+     "R_interface = R_contact1 + t/k_through-plane + R_contact2; graphene through-plane k ~ 5-20 W/mK (anisotropic!), not 2000-5000 (in-plane)",
+     "Compare: solder k 30-50 W/mK, t 50 micron \u2014 graphene's through-plane anisotropy makes it WORSE than solder at equal thickness"
+    ],
+    "boundary_conditions": "Interface heat flow is THROUGH-PLANE",
+    "evidence_refs": [
+     "cal:nm05:r1"
+    ],
+    "baseline": {
+     "baseline_incumbent": "Solder TIM ~ 10-30 W/mK effective",
+     "baseline_metric": "Interface resistance baseline",
+     "candidate_metric": "5x better claimed"
+    },
+    "killer_experiment": {
+     "experiment": "ASTM laser-flash through-plane measurement of the film stack plus contact-resistance test on a TIM bench",
+     "kill_condition": "If through-plane conductance not at least 2x solder, fails",
+     "cost_class": "BENCH"
+    },
+    "failure_modes": [
+     "delamination"
+    ],
+    "commercial_path": {
+     "buyer": "Chip packaging"
+    },
+    "cross_domain_transition": "NONE"
+   },
+   "pool": [
+    {
+     "record_id": "cal:nm05:r1",
+     "title": "Graphene thermal transport: in-plane 2000-5000 W/mK measured, through-plane 5-20 W/mK measured (strong anisotropy); TIM performance is through-plane-bound"
+    }
+   ],
+   "prior_art": {
+    "relevant_records": [
+     {
+      "record_id": "cal:nm05:pa1",
+      "perspective": "MECHANISM",
+      "title": "Anisotropic conduction in layered graphene films: through-plane limits their use as TIMs; in-plane conductivity is irrelevant to interface heat flow"
+     }
+    ]
+   },
+   "ground_truth": {
+    "label": "NEAR_MISS",
+    "expected_final": "KILLED",
+    "defect_class": "mechanism/anisotropy (the cited conductivity is the in-plane value; TIM heat flow is through-plane where graphene measures 5-20 W/mK \u2014 worse than solder)",
+    "expected_kill_surface": "physics",
+    "expected_defect_in_basis": [
+     "in-plane",
+     "through-plane",
+     "anisotropy",
+     "5-20",
+     "interface",
+     "direction"
+    ],
+    "ground_truth_basis": "Graphene's headline 2000-5000 W/mK is IN-PLANE; through-plane is 5-20 W/mK, and TIM heat flow crosses through-plane, where graphene is worse than the solder it replaces. The mechanism claim confuses the conductivity direction \u2014 a real-material, real-number error. A calibrated attacker should KILL on this physics/mechanism error."
+   }
+  },
+  {
+   "case_id": "CAL-NM-06",
+   "domain_id": "wind",
+   "pain_class": "AERO_PERF",
+   "candidate": {
+    "candidate_id": "CAL-NM-06",
+    "technology_name": "Vortex Generator Retrofit Claiming 3% AEP Gain on Modern Blades",
+    "problem": "Rotor blade airfoil separation near the root reduces lift; vortex generators re-energize the boundary layer",
+    "causal_chain": [
+     "VGs mix momentum into the boundary layer",
+     "separation is delayed",
+     "local lift recovers",
+     "annual energy production rises",
+     "retrofit pays back within 3 years"
+    ],
+    "unexploited_phenomenon": "Boundary-layer momentum mixing by VGs (cal:nm06:r1)",
+    "intervention": "Root-region VG retrofit on a MODERN (post-2015) blade claiming 3.0% AEP gain",
+    "governing_variables": "VG height vs boundary layer, placement chord fraction, blade design vintage",
+    "predicted_effect": "3.0% AEP gain on modern blade designs",
+    "equations": [
+     "AEP gain depends on pre-existing separation loss: 2000s-era root separation gave 1-3% recoverable; post-2015 designs already control separation (cuffs, redesigned root airfoils), leaving typically 0.2-0.8%"
+    ],
+    "boundary_conditions": "Modern blade with existing root-flow control",
+    "evidence_refs": [
+     "cal:nm06:r1"
+    ],
+    "baseline": {
+     "baseline_incumbent": "Modern blade as designed",
+     "baseline_metric": "AEP as certified",
+     "candidate_metric": "+3.0% claimed"
+    },
+    "killer_experiment": {
+     "experiment": "SCADA A/B analysis with met-normalization across 12 months",
+     "kill_condition": "If gain below 1%, fails",
+     "cost_class": "FIELD"
+    },
+    "failure_modes": [
+     "VG erosion"
+    ],
+    "commercial_path": {
+     "buyer": "Wind farm owners"
+    },
+    "cross_domain_transition": "NONE"
+   },
+   "pool": [
+    {
+     "record_id": "cal:nm06:r1",
+     "title": "Vortex generator retrofits: measured 1-3% AEP gains on pre-2010 blade designs with root separation; gains on post-2015 designs 0.2-0.8% (separation already managed)"
+    }
+   ],
+   "prior_art": {
+    "relevant_records": [
+     {
+      "record_id": "cal:nm06:pa1",
+      "perspective": "FORWARD",
+      "title": "Modern blade root-flow management (gull cuffs, redesigned root sections) documented to control the separation VGs target"
+     }
+    ]
+   },
+   "ground_truth": {
+    "label": "NEAR_MISS",
+    "expected_final": "KILLED",
+    "defect_class": "baseline (the recoverable separation loss is already engineered out on modern blades; the 3% gain belongs to the pre-2010 baseline class, not the stated modern-blade baseline)",
+    "expected_kill_surface": "baseline",
+    "expected_defect_in_basis": [
+     "pre-2010",
+     "modern",
+     "already",
+     "0.2-0.8",
+     "cuff",
+     "managed"
+    ],
+    "ground_truth_basis": "VG physics is real and 1-3% gains are measured \u2014 on older blades whose root separation was unmanaged. On post-2015 designs with cuffs and redesigned root sections, the recoverable loss is 0.2-0.8%, so the 3% claim measures against a baseline that no longer exists. A calibrated attacker should KILL on baseline (the incumbent already contains the fix class)."
+   }
+  },
+  {
+   "case_id": "CAL-NM-07",
+   "domain_id": "grid_storage",
+   "pain_class": "GRID_INSTABILITY",
+   "candidate": {
+    "candidate_id": "CAL-NM-07",
+    "technology_name": "Supercapacitor Bank for Multi-Hour Grid Energy Shifting",
+    "problem": "Grid evening ramp needs storage; supercapacitors have million-cycle life and instant response",
+    "causal_chain": [
+     "Supercapacitor banks charge at midday solar peak",
+     "evening ramp discharge 2 hours at 50 MW",
+     "million-cycle life and 95% round trip",
+     "replaces battery storage",
+     "cycling cost near zero"
+    ],
+    "unexploited_phenomenon": "EDLC high cycle life (cal:nm07:r1)",
+    "intervention": "100 MWh supercapacitor plant claiming 2-hour daily shifting competitive with lithium storage",
+    "governing_variables": "Energy density (Wh/kg, Wh/L), cost ($/kWh), self-discharge (%/day), cycle life",
+    "predicted_effect": "100 MWh stored, daily 2-hour discharge, 20-year life, cost-competitive with Li-ion",
+    "equations": [
+     "Wh_cost: EDLC 5,000-20,000 $/kWh vs Li-ion 100-300 $/kWh (50-100x); volume: EDLC 10-20 Wh/L vs Li 300-500 Wh/L \u2014 100 MWh EDLC needs ~5,000-10,000 m^3",
+     "Self-discharge: EDLC 2-10%/day vs Li <1%/month \u2014 multi-hour shifting loses meaningful fraction"
+    ],
+    "boundary_conditions": "Multi-hour, daily-cycle bulk storage service",
+    "evidence_refs": [
+     "cal:nm07:r1"
+    ],
+    "baseline": {
+     "baseline_incumbent": "Li-ion storage at 100-300 $/kWh",
+     "baseline_metric": "$/kWh and $/kW for 2-hour storage",
+     "candidate_metric": "Claimed competitive"
+    },
+    "killer_experiment": {
+     "experiment": "Cost and volume model audit of the 100 MWh plant BOM",
+     "kill_condition": "If $/kWh above 10x Li-ion, fails",
+     "cost_class": "BENCH"
+    },
+    "failure_modes": [
+     "cell balancing"
+    ],
+    "commercial_path": {
+     "buyer": "Utilities"
+    },
+    "cross_domain_transition": "NONE"
+   },
+   "pool": [
+    {
+     "record_id": "cal:nm07:r1",
+     "title": "EDLC characteristics: measured energy density 5-10 Wh/kg (10-20 Wh/L), cost 5,000-20,000 $/kWh, self-discharge 2-10%/day; cycle life excellent \u2014 suited to seconds-minutes services"
+    }
+   ],
+   "prior_art": {
+    "relevant_records": [
+     {
+      "record_id": "cal:nm07:pa1",
+      "perspective": "MECHANISM",
+      "title": "EDLC vs battery service mapping: energy density and cost confine supercapacitors to power-quality and bridging services, not multi-hour bulk shifting"
+     }
+    ]
+   },
+   "ground_truth": {
+    "label": "NEAR_MISS",
+    "expected_final": "KILLED",
+    "defect_class": "hidden dependency / service mismatch (EDLC's real strengths are power and cycle life; energy density, cost per kWh, and self-discharge make multi-hour shifting 50-100x over cost and volume-prohibitive)",
+    "expected_kill_surface": "baseline",
+    "expected_defect_in_basis": [
+     "Wh/kg",
+     "$/kWh",
+     "5,000",
+     "self-discharge",
+     "energy density",
+     "volume"
+    ],
+    "ground_truth_basis": "Every EDLC parameter cited is real, but applying them to multi-hour bulk storage inverts the technology's service envelope: 5-20 Wh/L and $5,000-20,000/kWh make 100 MWh ~ 50-100x Li-ion cost and a warehouse-scale volume, with 2-10%/day self-discharge eating the shifted energy. A calibrated attacker should KILL on the service/baseline mismatch."
+   }
+  },
+  {
+   "case_id": "CAL-NM-08",
+   "domain_id": "marine",
+   "pain_class": "PROPULSION",
+   "candidate": {
+    "candidate_id": "CAL-NM-08",
+    "technology_name": "MHD Propulsion for Cargo Ship Retrofit",
+    "problem": "Propeller efficiency and wake inefficiency cost fuel; a propeller-less magnetohydrodynamic drive would remove moving parts",
+    "causal_chain": [
+     "Magnetic field crosses a seawater duct",
+     "current through the conductive seawater creates Lorentz force",
+     "water is accelerated without moving parts",
+     "thrust drives the ship",
+     "noise and maintenance fall"
+    ],
+    "unexploited_phenomenon": "MHD Lorentz thrust (cal:nm08:r1)",
+    "intervention": "Retrofit a 20,000 DWT coaster with duct MHD claiming propeller-equivalent thrust efficiency at sea",
+    "governing_variables": "Seawater conductivity (4-5 S/m), field strength (T), current density (A/m^2), electrode corrosion, duct drag",
+    "predicted_effect": "Propeller-equivalent propulsive efficiency (60% class) at ship scale",
+    "equations": [
+     "Thrust ~ sigma*B^2*V*volume only for B^2 large: seawater sigma ~ 4-5 S/m makes the Lorentz force density small unless B ~ 10-20 T and J ~ 10^3-10^4 A/m^2 \u2014 superconducting magnets; electrode losses and electrolysis scale with J^2/sigma",
+     "Measured efficiencies in MHD experiments: 10-40% at model scale with superconducting magnets; efficiency collapses at low field"
+    ],
+    "boundary_conditions": "Retrofit at 1-3 T conventional magnets claimed equivalent to propellers",
+    "evidence_refs": [
+     "cal:nm08:r1"
+    ],
+    "baseline": {
+     "baseline_incumbent": "Propeller at 55-70% propulsive efficiency",
+     "baseline_metric": "60% class efficiency",
+     "candidate_metric": "60% claimed at retrofit scale"
+    },
+    "killer_experiment": {
+     "experiment": "Tow-tank MHD duct test with 2 T field, measure thrust vs electrical input",
+     "kill_condition": "If efficiency below 30%, fails",
+     "cost_class": "LAB"
+    },
+    "failure_modes": [
+     "electrode corrosion",
+     "field collapse"
+    ],
+    "commercial_path": {
+     "buyer": "Ship owners"
+    },
+    "cross_domain_transition": "NONE"
+   },
+   "pool": [
+    {
+     "record_id": "cal:nm08:r1",
+     "title": "MHD ship propulsion: Yamato-1 class demonstrations with superconducting 4 T magnets reached ~30% total efficiency at 30 kN-class thrust; seawater conductivity bounds efficiency; corrosion and field requirements block scale-up"
+    }
+   ],
+   "prior_art": {
+    "relevant_records": [
+     {
+      "record_id": "cal:nm08:pa1",
+      "perspective": "MECHANISM",
+      "title": "Seawater MHD efficiency analysis: 4-5 S/m conductivity forces superconducting-magnet-class fields; retrofit-scale conventional magnets cannot reach propeller efficiency"
+     }
+    ]
+   },
+   "ground_truth": {
+    "label": "NEAR_MISS",
+    "expected_final": "KILLED",
+    "defect_class": "boundary-condition failure (MHD works only in the superconducting 4+ T regime and even then measured ~30% efficiency; a 1-3 T retrofit claim is outside the regime)",
+    "expected_kill_surface": "physics",
+    "expected_defect_in_basis": [
+     "conductivity",
+     "4-5 S/m",
+     "tesla",
+     "Yamato",
+     "30%",
+     "superconducting"
+    ],
+    "ground_truth_basis": "MHD thrust is real (Yamato-1 sailed) but required superconducting 4 T magnets for ~30% efficiency at small thrust; seawater conductivity (4-5 S/m) means a 1-3 T retrofit falls far below propeller-class efficiency, and electrode corrosion at the needed current densities is unsolved. A calibrated attacker should KILL on the regime/boundary violation."
+   }
+  },
+  {
+   "case_id": "CAL-NM-09",
+   "domain_id": "hvac_chiller",
+   "pain_class": "WASTE_HEAT",
+   "candidate": {
+    "candidate_id": "CAL-NM-09",
+    "technology_name": "Ejector Refrigeration From 90 C Waste Heat Claiming COP 1.2",
+    "problem": "Industrial 90 C waste heat is low-grade; ejector refrigeration could convert it to cooling",
+    "causal_chain": [
+     "Waste heat boils the refrigerant motive stream",
+     "ejector entrains and compresses the suction stream",
+     "refrigeration effect at the evaporator",
+     "no compressor, only heat input",
+     "chilled water from waste heat"
+    ],
+    "unexploited_phenomenon": "Ejector (thermal compressor) refrigeration (cal:nm09:r1)",
+    "intervention": "Steam ejector chiller driven by 90 C heat claiming COP 1.2 at 7 C chilled water",
+    "governing_variables": "Motive temperature (C), entrainment ratio, evaporator/condenser temperatures, refrigerant pair",
+    "predicted_effect": "COP 1.2 (thermal) at 90 C motive / 7 C evaporation / 35 C condensation",
+    "equations": [
+     "COP_ejector = entrainment_ratio * (h_evap effect / h_motive); measured entrainment ratios at 90 C motive with 28 K lift: 0.1-0.3 \u2014 COP 0.15-0.5",
+     "COP 1.2 requires either motive > 150 C or lift < 10 K"
+    ],
+    "boundary_conditions": "90 C motive, 7 C chilled, 35 C condensing",
+    "evidence_refs": [
+     "cal:nm09:r1"
+    ],
+    "baseline": {
+     "baseline_incumbent": "Double-effect absorption chiller COP 1.1-1.4 at 140 C+ heat",
+     "baseline_metric": "Absorption COP 1.1-1.4 (needs 140 C+)",
+     "candidate_metric": "COP 1.2 claimed at 90 C"
+    },
+    "killer_experiment": {
+     "experiment": "Calorimetric COP measurement of an ejector rig at the stated conditions",
+     "kill_condition": "If COP below 0.8, fails",
+     "cost_class": "BENCH"
+    },
+    "failure_modes": [
+     "off-design instability"
+    ],
+    "commercial_path": {
+     "buyer": "Plant energy managers"
+    },
+    "cross_domain_transition": "NONE"
+   },
+   "pool": [
+    {
+     "record_id": "cal:nm09:r1",
+     "title": "Ejector refrigeration measured COPs: 0.15-0.5 for motive 80-100 C with 25-30 K lift; COP 1.0+ needs motive >= 150 C or small lift; entrainment ratio physics sets the bound"
+    }
+   ],
+   "prior_art": {
+    "relevant_records": [
+     {
+      "record_id": "cal:nm09:pa1",
+      "perspective": "MECHANISM",
+      "title": "Entrainment ratio limits of steam ejectors: measured values cap COP below 0.5 at 90 C motive with condenser/evaporator lifts of industrial service"
+     }
+    ]
+   },
+   "ground_truth": {
+    "label": "NEAR_MISS",
+    "expected_final": "KILLED",
+    "defect_class": "magnitude/regime (ejector refrigeration is real but entrainment physics caps COP at 0.15-0.5 for 90 C motive with industrial lift; COP 1.2 at 90 C matches only 150 C+ double-effect absorption territory)",
+    "expected_kill_surface": "physics",
+    "expected_defect_in_basis": [
+     "entrainment",
+     "0.15",
+     "0.5",
+     "150 C",
+     "lift",
+     "COP"
+    ],
+    "ground_truth_basis": "Ejector refrigeration genuinely converts low-grade heat to cooling, but the entrainment-ratio physics caps measured COP at 0.15-0.5 for 90 C motive with a 28 K lift; claiming 1.2 (double-effect absorption territory) at 90 C contradicts the cited measurements. A calibrated attacker should KILL on magnitude."
+   }
+  },
+  {
+   "case_id": "CAL-NM-10",
+   "domain_id": "construction",
+   "pain_class": "MAINTENANCE",
+   "candidate": {
+    "candidate_id": "CAL-NM-10",
+    "technology_name": "Self-Healing Bacterial Concrete for Bridge Decks Claiming 30-Year Crack-Free Service",
+    "problem": "Bridge deck micro-cracking admits chlorides; crack sealing maintenance is costly",
+    "causal_chain": [
+     "Encapsulated Bacillus spores lie dormant in concrete",
+     "cracks admit water and nutrients",
+     "spores germinate and precipitate calcite",
+     "cracks seal themselves within weeks",
+     "chloride ingress stops and maintenance falls"
+    ],
+    "unexploited_phenomenon": "MICP calcite precipitation by encapsulated bacteria (cal:nm10:r1)",
+    "intervention": "Bacterial concrete for bridge decks claiming full autonomous sealing of cracks up to 0.8 mm and a 30-year maintenance-free deck life",
+    "governing_variables": "Spore viability decades, crack width (mm), healing latency (weeks), temperature cycles, healing repeat cycles",
+    "predicted_effect": "Seals cracks to 0.8 mm within weeks, repeatedly, over 30 years of service, cutting deck maintenance 70%",
+    "equations": [
+     "Healing width measured: 0.1-0.5 mm typical (up to 0.8 in optimized lab conditions); latency 1-6 weeks at 20 C, months below 10 C",
+     "Repeat healing: measured 2-3 successive events before nutrient/spore exhaustion at lab scale \u2014 30 years implies dozens"
+    ],
+    "boundary_conditions": "Outdoor temperature cycles, de-icing salt exposure, repeated cracking events over decades",
+    "evidence_refs": [
+     "cal:nm10:r1"
+    ],
+    "baseline": {
+     "baseline_incumbent": "Epoxy crack injection at 5-10 year intervals",
+     "baseline_metric": "Maintenance cost baseline, 5-10 y cycle",
+     "candidate_metric": "70% maintenance cut, 30-year life claimed"
+    },
+    "killer_experiment": {
+     "experiment": "Outdoor exposure slabs with induced 0.5 mm cracks, three freeze-thaw/winter cycles, chloride ingress test",
+     "kill_condition": "If crack sealing below 60% or chloride ingress not reduced vs control after 2 winters, fails",
+     "cost_class": "FIELD"
+    },
+    "failure_modes": [
+     "spore death",
+     "nutrient exhaustion"
+    ],
+    "commercial_path": {
+     "buyer": "DOTs"
+    },
+    "cross_domain_transition": "NONE"
+   },
+   "pool": [
+    {
+     "record_id": "cal:nm10:r1",
+     "title": "Self-healing bacterial concrete: measured healing of 0.1-0.5 mm cracks (0.8 mm optimized lab), latency weeks at 20 C and months below 10 C, 2-3 repeat healing events before exhaustion; long-term spore viability beyond years is unproven"
+    }
+   ],
+   "prior_art": {
+    "relevant_records": [
+     {
+      "record_id": "cal:nm10:pa1",
+      "perspective": "FAILURE",
+      "title": "Field and long-cure trials of bacterial concrete: healing degrades under freeze-thaw and repeated cracking; multi-decade spore viability and repeated healing unverified"
+     }
+    ]
+   },
+   "ground_truth": {
+    "label": "NEAR_MISS",
+    "expected_final": "KILLED",
+    "defect_class": "engineering/hidden dependency (healing works in the lab but repeat-healing exhaustion (2-3 events) and multi-decade spore viability under freeze-thaw are unproven \u2014 the 30-year crack-free claim exceeds demonstrated capability by an order of magnitude in time and repeat cycles)",
+    "expected_kill_surface": "engineering",
+    "expected_defect_in_basis": [
+     "repeat",
+     "2-3",
+     "viability",
+     "freeze-thaw",
+     "unproven",
+     "30-year"
+    ],
+    "ground_truth_basis": "MICP healing is real and measured (0.1-0.5 mm, weeks of latency at 20 C), but demonstrated repeat healing is 2-3 events with months-long latency below 10 C, and multi-decade spore viability in freeze-thaw/de-icing environments is unproven. The 30-year maintenance-free claim is an order beyond demonstrated durability. A calibrated attacker should KILL on the engineering/durability gap."
+   }
+  },
+  {
+   "case_id": "CAL-PA-01",
+   "domain_id": "solar_pv",
+   "pain_class": "EFFICIENCY",
+   "candidate": {
+    "candidate_id": "CAL-PA-01",
+    "technology_name": "Adaptive-Step Perturb-and-Observe MPPT",
+    "problem": "PV arrays operate off the maximum power point under irradiance variation",
+    "causal_chain": [
+     "Controller perturbs duty cycle",
+     "measures power change",
+     "adapts step size to the slope",
+     "converges to MPP faster with less oscillation",
+     "energy harvest rises 1-3%"
+    ],
+    "unexploited_phenomenon": "Duty-cycle dithering gradient search (cal:pa01:r1)",
+    "intervention": "P&O MPPT with step size adapted to dP/dD, claiming novelty in the adaptive step rule",
+    "governing_variables": "Step size, perturbation period, irradiance ramp rate",
+    "predicted_effect": "1-3% annual energy gain vs fixed-step P&O; 99.5% tracking efficiency",
+    "equations": [
+     "D(k+1) = D(k) +/- step*(dP/dD sign and magnitude)"
+    ],
+    "boundary_conditions": "Standard grid-tie inverters",
+    "evidence_refs": [
+     "cal:pa01:r1"
+    ],
+    "baseline": {
+     "baseline_incumbent": "Fixed-step P&O MPPT",
+     "baseline_metric": "Tracking efficiency 98.5%",
+     "candidate_metric": "99.5% claimed"
+    },
+    "killer_experiment": {
+     "experiment": "PV simulator A/B over standard irradiance profiles",
+     "kill_condition": "If tracking efficiency gain below 0.5%, fails",
+     "cost_class": "BENCH"
+    },
+    "failure_modes": [
+     "drift under fast ramps"
+    ],
+    "commercial_path": {
+     "buyer": "Inverter OEMs"
+    },
+    "cross_domain_transition": "NONE"
+   },
+   "pool": [
+    {
+     "record_id": "cal:pa01:r1",
+     "title": "Adaptive-step perturb-and-observe MPPT algorithms: step-size adaptation rules to dP/dD published and compared extensively"
+    }
+   ],
+   "prior_art": {
+    "relevant_records": [
+     {
+      "record_id": "cal:pa01:pa1",
+      "perspective": "MECHANISM",
+      "title": "Adaptive perturb-and-observe MPPT with variable step size: multiple published implementations teaching the same mechanism+intervention+effect (faster convergence, less oscillation)"
+     },
+     {
+      "record_id": "cal:pa01:pa2",
+      "perspective": "FORWARD",
+      "title": "Review of MPPT methods (P&O, INC, fractional open-circuit): adaptive-step P&O documented as an established class"
+     }
+    ]
+   },
+   "ground_truth": {
+    "label": "PRIOR_ART_COLLISION",
+    "expected_final": "KILLED",
+    "defect_class": "prior-art collision (adaptive-step P&O MPPT is published extensively \u2014 same mechanism, intervention, and effect)",
+    "expected_kill_surface": "prior_art",
+    "expected_defect_in_basis": [
+     "teaches",
+     "same",
+     "published",
+     "adaptive",
+     "P&O",
+     "identical"
+    ],
+    "ground_truth_basis": "Adaptive-step P&O MPPT is among the most-published PV control schemes in existence \u2014 the provided MECHANISM-perspective record teaches the identical mechanism (duty perturbation), intervention (adaptive step rule), and effect (faster convergence, less oscillation). Claiming novelty in this is a collision. A calibrated attacker must KILL on prior_art citing the teaching record."
+   }
+  },
+  {
+   "case_id": "CAL-PA-02",
+   "domain_id": "batteries_ev",
+   "pain_class": "THERMAL_LOSS",
+   "candidate": {
+    "candidate_id": "CAL-PA-02",
+    "technology_name": "PCM-Composite Wrap for Cylindrical Cell Modules",
+    "problem": "Cell-to-cell temperature gradients age EV modules unevenly",
+    "causal_chain": [
+     "Paraffin composite wraps cells",
+     "gradients drive lateral heat flow into the PCM",
+     "peak cell temperature and gradient fall",
+     "module life extends",
+     "warranty economics improve"
+    ],
+    "unexploited_phenomenon": "PCM gradient smoothing (cal:pa02:r1)",
+    "intervention": "Composite PCM wrap for cylindrical modules claiming thermal gradient cut and life extension as novel",
+    "governing_variables": "PCM conductivity, wrap thickness, cell heat generation",
+    "predicted_effect": "Module temperature gradient halved; module life +20%",
+    "equations": [
+     "Gradient ~ q_cell * L / k_eff; composite k ~ 1-5 W/mK bounds the cut"
+    ],
+    "boundary_conditions": "Fast-charge profiles",
+    "evidence_refs": [
+     "cal:pa02:r1"
+    ],
+    "baseline": {
+     "baseline_incumbent": "Air gap module",
+     "baseline_metric": "Gradient 8-10 C",
+     "candidate_metric": "4-5 C claimed"
+    },
+    "killer_experiment": {
+     "experiment": "Cycled module pair, gradient logging",
+     "kill_condition": "If gradient cut below 25%, fails",
+     "cost_class": "BENCH"
+    },
+    "failure_modes": [
+     "PCM leakage"
+    ],
+    "commercial_path": {
+     "buyer": "Pack makers"
+    },
+    "cross_domain_transition": "NONE"
+   },
+   "pool": [
+    {
+     "record_id": "cal:pa02:r1",
+     "title": "PCM composite battery thermal management: paraffin-graphite wraps for cylindrical modules measured to cut gradients and peak temperatures"
+    }
+   ],
+   "prior_art": {
+    "relevant_records": [
+     {
+      "record_id": "cal:pa02:pa1",
+      "perspective": "MECHANISM",
+      "title": "Paraffin-graphite composite PCM wraps for cylindrical 18650/21700 modules: published implementations teaching the same wrap intervention and gradient/peak-temperature effect"
+     },
+     {
+      "record_id": "cal:pa02:pa2",
+      "perspective": "FORWARD",
+      "title": "Reviews of PCM battery thermal management listing composite cell wraps as an established configuration"
+     }
+    ]
+   },
+   "ground_truth": {
+    "label": "PRIOR_ART_COLLISION",
+    "expected_final": "KILLED",
+    "defect_class": "prior-art collision (PCM composite cell wraps are published extensively for exactly this intervention and effect)",
+    "expected_kill_surface": "prior_art",
+    "expected_defect_in_basis": [
+     "teaches",
+     "composite",
+     "wrap",
+     "published",
+     "same",
+     "gradient"
+    ],
+    "ground_truth_basis": "Paraffin-graphite composite PCM wraps for cylindrical modules are a well-published battery-thermal-management configuration; the provided MECHANISM-perspective record teaches the same wrap + gradient-smoothing effect. Presenting it as novel is a collision. A calibrated attacker must KILL on prior_art."
+   }
+  },
+  {
+   "case_id": "CAL-PA-03",
+   "domain_id": "data_center_thermal",
+   "pain_class": "THERMAL_LOSS",
+   "candidate": {
+    "candidate_id": "CAL-PA-03",
+    "technology_name": "Hot-Aisle Containment With Variable-Speed CRAH Fans",
+    "problem": "Mixing of hot and cold air wastes cooling energy in data halls",
+    "causal_chain": [
+     "Aisle containment doors and baffles",
+     "hot and cold streams separate",
+     "CRAH fans modulate on supply temperature",
+     "bypass and recirculation losses fall",
+     "cooling energy falls 20-30%"
+    ],
+    "unexploited_phenomenon": "Airstream separation (cal:pa03:r1)",
+    "intervention": "Hot-aisle containment plus variable-speed fan control claiming novelty",
+    "governing_variables": "Containment integrity, fan curves, control setpoint",
+    "predicted_effect": "20-30% cooling energy reduction",
+    "equations": [
+     "E_cooling ~ (Q_IT/COP*(1+bypass fraction))"
+    ],
+    "boundary_conditions": "Retrofit halls",
+    "evidence_refs": [
+     "cal:pa03:r1"
+    ],
+    "baseline": {
+     "baseline_incumbent": "Open rows",
+     "baseline_metric": "Cooling energy 100%",
+     "candidate_metric": "70-80% claimed"
+    },
+    "killer_experiment": {
+     "experiment": "A/B containment retrofit energy metering",
+     "kill_condition": "If energy cut below 10%, fails",
+     "cost_class": "FIELD"
+    },
+    "failure_modes": [
+     "leakage"
+    ],
+    "commercial_path": {
+     "buyer": "Colo operators"
+    },
+    "cross_domain_transition": "NONE"
+   },
+   "pool": [
+    {
+     "record_id": "cal:pa03:r1",
+     "title": "Hot-aisle containment with variable-speed CRAH control: measured 20-30% cooling energy reductions across field deployments"
+    }
+   ],
+   "prior_art": {
+    "relevant_records": [
+     {
+      "record_id": "cal:pa03:pa1",
+      "perspective": "MECHANISM",
+      "title": "Hot-aisle/cold-aisle containment with CRAH fan-speed modulation: published and deployed at scale teaching the same mechanism+intervention+effect"
+     },
+     {
+      "record_id": "cal:pa03:pa2",
+      "perspective": "FORWARD",
+      "title": "ASHRAE-class data center airflow management guidance documenting containment + variable fan control as standard practice"
+     }
+    ]
+   },
+   "ground_truth": {
+    "label": "PRIOR_ART_COLLISION",
+    "expected_final": "KILLED",
+    "defect_class": "prior-art collision (containment + variable-speed CRAH control is standard, published, deployed practice)",
+    "expected_kill_surface": "prior_art",
+    "expected_defect_in_basis": [
+     "standard",
+     "deployed",
+     "containment",
+     "published",
+     "same"
+    ],
+    "ground_truth_basis": "Hot-aisle containment with variable-speed CRAH control is textbook data-center practice with thousands of published deployments teaching the same mechanism, intervention, and 20-30% effect. Claiming it as a novel candidate is a direct collision. A calibrated attacker must KILL on prior_art."
+   }
+  },
+  {
+   "case_id": "CAL-PA-04",
+   "domain_id": "industrial_sensing",
+   "pain_class": "BLIND_SPOT",
+   "candidate": {
+    "candidate_id": "CAL-PA-04",
+    "technology_name": "Motor Current Signature Analysis for Bearing Fault Detection",
+    "problem": "Motor bearing faults are detected late by vibration monitoring requiring sensor access",
+    "causal_chain": [
+     "Bearing faults modulate air-gap torque",
+     "modulation appears in stator current sidebands",
+     "spectrum analysis detects fault frequencies",
+     "no vibration sensor needed",
+     "condition monitoring cost falls"
+    ],
+    "unexploited_phenomenon": "Torque modulation sidebands in stator current (cal:pa04:r1)",
+    "intervention": "MCSA for bearing fault detection claiming novelty in the sideband detection rule",
+    "governing_variables": "Fault characteristic frequencies, load level, sideband amplitude",
+    "predicted_effect": "90%+ detection of incipient bearing faults from the motor control center",
+    "equations": [
+     "f_sideband = f_s +/- k*f_fault"
+    ],
+    "boundary_conditions": "Constant-load duty",
+    "evidence_refs": [
+     "cal:pa04:r1"
+    ],
+    "baseline": {
+     "baseline_incumbent": "Accelerometer vibration monitoring",
+     "baseline_metric": "Detection at incipient stage with sensors",
+     "candidate_metric": "Equivalent detection from current"
+    },
+    "killer_experiment": {
+     "experiment": "Seeded bearing faults, MCSA vs vibration ground truth",
+     "kill_condition": "If detection below 70%, fails",
+     "cost_class": "BENCH"
+    },
+    "failure_modes": [
+     "load variation masking"
+    ],
+    "commercial_path": {
+     "buyer": "Plant reliability teams"
+    },
+    "cross_domain_transition": "NONE"
+   },
+   "pool": [
+    {
+     "record_id": "cal:pa04:r1",
+     "title": "Motor current signature analysis: stator-current sidebands for bearing and rotor fault detection published across decades"
+    }
+   ],
+   "prior_art": {
+    "relevant_records": [
+     {
+      "record_id": "cal:pa04:pa1",
+      "perspective": "MECHANISM",
+      "title": "MCSA bearing fault detection: published methods teaching sideband detection of bearing characteristic frequencies \u2014 the identical mechanism+intervention+effect"
+     },
+     {
+      "record_id": "cal:pa04:pa2",
+      "perspective": "FAILURE",
+      "title": "2025 records teaching electrical signature analysis for wind turbine drivetrain defect detection (the exact class that killed C-wind-2~2 in R411)"
+     }
+    ]
+   },
+   "ground_truth": {
+    "label": "PRIOR_ART_COLLISION",
+    "expected_final": "KILLED",
+    "defect_class": "prior-art collision (MCSA bearing detection is decades-published; identical mechanism+intervention+effect)",
+    "expected_kill_surface": "prior_art",
+    "expected_defect_in_basis": [
+     "MCSA",
+     "published",
+     "same",
+     "sideband",
+     "teaches",
+     "decades"
+    ],
+    "ground_truth_basis": "MCSA for bearing faults is a decades-old, extensively published technique teaching the identical mechanism (torque modulation sidebands), intervention (current spectrum analysis), and effect (fault detection without vibration sensors). The provided records include the 2025 wind-turbine ESA class that killed an R411 candidate on exactly this surface. A calibrated attacker must KILL on prior_art."
+   }
+  },
+  {
+   "case_id": "CAL-PA-05",
+   "domain_id": "semiconductor_fab",
+   "pain_class": "YIELD",
+   "candidate": {
+    "candidate_id": "CAL-PA-05",
+    "technology_name": "Run-to-Run EWMA Control for Etch Depth",
+    "problem": "Etch depth drifts between tool cleans, causing spec excursions",
+    "causal_chain": [
+     "Post-run metrology feeds an EWMA controller",
+     "recipe offsets update run to run",
+     "drift is compensated before excursion",
+     "Cpk rises",
+     "scrap falls"
+    ],
+    "unexploited_phenomenon": "Exponentially weighted drift compensation (cal:pa05:r1)",
+    "intervention": "R2R EWMA controller for etch depth claiming novelty in the weighting scheme",
+    "governing_variables": "EWMA lambda, metrology lag, drift rate, noise",
+    "predicted_effect": "Cpk from 1.2 to 1.8; excursion rate -60%",
+    "equations": [
+     "offset(k+1) = lambda*error(k) + (1-lambda)*offset(k)"
+    ],
+    "boundary_conditions": "Single-product tools",
+    "evidence_refs": [
+     "cal:pa05:r1"
+    ],
+    "baseline": {
+     "baseline_incumbent": "Static recipe with periodic recalibration",
+     "baseline_metric": "Cpk 1.2",
+     "candidate_metric": "Cpk 1.8 claimed"
+    },
+    "killer_experiment": {
+     "experiment": "A/B R2R vs static on production lots",
+     "kill_condition": "If Cpk gain below 0.3, fails",
+     "cost_class": "PILOT"
+    },
+    "failure_modes": [
+     "metrology noise amplification"
+    ],
+    "commercial_path": {
+     "buyer": "Fabs"
+    },
+    "cross_domain_transition": "NONE"
+   },
+   "pool": [
+    {
+     "record_id": "cal:pa05:r1",
+     "title": "Run-to-run EWMA control for semiconductor processes: published theory and fab deployments (the MIT/semiconductor APC canon)"
+    }
+   ],
+   "prior_art": {
+    "relevant_records": [
+     {
+      "record_id": "cal:pa05:pa1",
+      "perspective": "MECHANISM",
+      "title": "Run-to-run process control with EWMA and double-exponential filtering: published and deployed APC standard teaching the identical controller for etch and CMP processes"
+     },
+     {
+      "record_id": "cal:pa05:pa2",
+      "perspective": "FORWARD",
+      "title": "Commercial APC platforms shipping R2R EWMA control for etch depth and deposition"
+     }
+    ]
+   },
+   "ground_truth": {
+    "label": "PRIOR_ART_COLLISION",
+    "expected_final": "KILLED",
+    "defect_class": "prior-art collision (R2R EWMA control is the canonical, commercially deployed APC standard for exactly this service)",
+    "expected_kill_surface": "prior_art",
+    "expected_defect_in_basis": [
+     "EWMA",
+     "APC",
+     "deployed",
+     "published",
+     "standard",
+     "same"
+    ],
+    "ground_truth_basis": "R2R EWMA control for etch (and CMP) is the canonical published+commercially-deployed APC technology \u2014 the provided records teach the identical mechanism (EWMA drift compensation), intervention (recipe offset updates), and effect (Cpk improvement). The collision is total. A calibrated attacker must KILL on prior_art."
+   }
+  },
+  {
+   "case_id": "CAL-PA-06",
+   "domain_id": "chemical_process",
+   "pain_class": "WASTE_STREAM",
+   "candidate": {
+    "candidate_id": "CAL-PA-06",
+    "technology_name": "Membrane Pervaporation for Ethanol Dehydration",
+    "problem": "Azeotropic ethanol-water separation costs energy in distillation",
+    "causal_chain": [
+     "Hydrophilic membrane selectively permeates water",
+     "vaporization across the membrane",
+     "ethanol product dried past the azeotrope",
+     "no entrainer chemicals",
+     "dehydration energy falls"
+    ],
+    "unexploited_phenomenon": "Selective water permeation in PVA-class membranes (cal:pa06:r1)",
+    "intervention": "Pervaporation membrane dehydration of ethanol claiming novelty",
+    "governing_variables": "Membrane selectivity, flux, feed temperature, stage count",
+    "predicted_effect": "99.5% ethanol product; 30-50% dehydration energy cut vs azeotropic distillation",
+    "equations": [
+     "J_water = P_w/l * (p_w,feed - p_w,perm)"
+    ],
+    "boundary_conditions": "Fuel-ethanol scale",
+    "evidence_refs": [
+     "cal:pa06:r1"
+    ],
+    "baseline": {
+     "baseline_incumbent": "Azeotropic distillation with entrainer",
+     "baseline_metric": "Energy 100%",
+     "candidate_metric": "50-70% claimed"
+    },
+    "killer_experiment": {
+     "experiment": "Pilot pervaporation skid vs azeotropic column energy audit",
+     "kill_condition": "If energy cut below 20%, fails",
+     "cost_class": "PILOT"
+    },
+    "failure_modes": [
+     "membrane fouling"
+    ],
+    "commercial_path": {
+     "buyer": "Ethanol plants"
+    },
+    "cross_domain_transition": "NONE"
+   },
+   "pool": [
+    {
+     "record_id": "cal:pa06:r1",
+     "title": "Pervaporation with PVA membranes for ethanol dehydration: published and commercially deployed (thousands of installations)"
+    }
+   ],
+   "prior_art": {
+    "relevant_records": [
+     {
+      "record_id": "cal:pa06:pa1",
+      "perspective": "MECHANISM",
+      "title": "Pervaporation ethanol dehydration with polymeric membranes: commercial installations teaching the identical mechanism+intervention+effect"
+     },
+     {
+      "record_id": "cal:pa06:pa2",
+      "perspective": "FORWARD",
+      "title": "Industrial pervaporation plant designs for bioethanol dehydration at fuel-ethanol scale"
+     }
+    ]
+   },
+   "ground_truth": {
+    "label": "PRIOR_ART_COLLISION",
+    "expected_final": "KILLED",
+    "defect_class": "prior-art collision (pervaporation ethanol dehydration is commercially deployed at scale)",
+    "expected_kill_surface": "prior_art",
+    "expected_defect_in_basis": [
+     "commercial",
+     "deployed",
+     "pervaporation",
+     "same",
+     "installations"
+    ],
+    "ground_truth_basis": "Pervaporation for ethanol dehydration is a mature, commercially deployed separation (thousands of installations) \u2014 the provided records teach the identical mechanism, intervention, and effect at the stated scale. Claiming it as a novel candidate is a direct collision. A calibrated attacker must KILL on prior_art."
+   }
+  },
+  {
+   "case_id": "CAL-PA-07",
+   "domain_id": "mining",
+   "pain_class": "PARTICULATE",
+   "candidate": {
+    "candidate_id": "CAL-PA-07",
+    "technology_name": "Fog-Based Dust Scrubbing at Conveyor Transfer Points",
+    "problem": "Ore transfer points release respirable dust; dry baghouses are costly for diffuse sources",
+    "causal_chain": [
+     "Fine water fog nucleates onto dust particles",
+     "agglomerates settle",
+     "respirable fraction falls",
+     "fan energy and bags eliminated",
+     "dust control cost falls"
+    ],
+    "unexploited_phenomenon": "Fog nucleation agglomeration (cal:pa07:r1)",
+    "intervention": "Pressurized-water fog cannon system at transfer points claiming novelty in dust capture",
+    "governing_variables": "Droplet size vs particle size, fog density, capture velocity",
+    "predicted_effect": "80-90% respirable dust capture at 1/3 baghouse cost",
+    "equations": [
+     "Capture ~ droplet/particle size ratio match (0.1-1 class optimal)"
+    ],
+    "boundary_conditions": "Dry climates need evaporation accounting",
+    "evidence_refs": [
+     "cal:pa07:r1"
+    ],
+    "baseline": {
+     "baseline_incumbent": "Dry baghouse",
+     "baseline_metric": "99% capture at high cost",
+     "candidate_metric": "80-90% at 1/3 cost"
+    },
+    "killer_experiment": {
+     "experiment": "Side-by-side dust capture test at a transfer point",
+     "kill_condition": "If capture below 60%, fails",
+     "cost_class": "FIELD"
+    },
+    "failure_modes": [
+     "freezing climates"
+    ],
+    "commercial_path": {
+     "buyer": "Mine operators"
+    },
+    "cross_domain_transition": "NONE"
+   },
+   "pool": [
+    {
+     "record_id": "cal:pa07:r1",
+     "title": "Water fog and surfactant spray dust suppression at ore transfer points: published capture efficiencies and deployed systems"
+    }
+   ],
+   "prior_art": {
+    "relevant_records": [
+     {
+      "record_id": "cal:pa07:pa1",
+      "perspective": "MECHANISM",
+      "title": "Fog/spray dust suppression systems for mining transfer points: commercial products and published field studies teaching the same mechanism+intervention+capture effect"
+     },
+     {
+      "record_id": "cal:pa07:pa2",
+      "perspective": "FORWARD",
+      "title": "Spray nozzle engineering guides for respirable dust capture at conveyor transfers"
+     }
+    ]
+   },
+   "ground_truth": {
+    "label": "PRIOR_ART_COLLISION",
+    "expected_final": "KILLED",
+    "defect_class": "prior-art collision (fog/spray dust suppression at transfer points is commercial, published practice)",
+    "expected_kill_surface": "prior_art",
+    "expected_defect_in_basis": [
+     "commercial",
+     "spray",
+     "fog",
+     "same",
+     "transfer",
+     "published"
+    ],
+    "ground_truth_basis": "Fog/spray dust suppression at ore transfer points is a commercial product class with published field studies teaching the same mechanism (droplet nucleation agglomeration), intervention (fog cannons at transfers), and effect (80-90% capture). The collision is direct. A calibrated attacker must KILL on prior_art."
+   }
+  },
+  {
+   "case_id": "CAL-PA-08",
+   "domain_id": "machining",
+   "pain_class": "TOOL_WEAR",
+   "candidate": {
+    "candidate_id": "CAL-PA-08",
+    "technology_name": "Minimum Quantity Lubrication for Milling",
+    "problem": "Flood coolant in milling costs disposal, health, and energy",
+    "causal_chain": [
+     "Microliter oil aerosol at the cutting edge",
+     "boundary lubrication replaces bulk cooling",
+     "chip evacuation by air jet",
+     "coolant disposal eliminated",
+     "cost and environmental burden fall"
+    ],
+    "unexploited_phenomenon": "Boundary lubrication by oil mist (cal:pa08:r1)",
+    "intervention": "MQL system for milling claiming novelty in the delivery rule",
+    "governing_variables": "Oil rate (mL/h), nozzle targeting, air pressure, tool wear mode",
+    "predicted_effect": "Tool life parity with flood; coolant cost -90%",
+    "equations": [
+     "Friction coefficient at the tool-chip interface ~ oil film boundary regime"
+    ],
+    "boundary_conditions": "Not for deep-hole drilling or titanium roughing",
+    "evidence_refs": [
+     "cal:pa08:r1"
+    ],
+    "baseline": {
+     "baseline_incumbent": "Flood emulsion coolant",
+     "baseline_metric": "Coolant cost 100%",
+     "candidate_metric": "10-15% claimed"
+    },
+    "killer_experiment": {
+     "experiment": "ISO tool-life MQL vs flood",
+     "kill_condition": "If tool life below 80% of flood, fails",
+     "cost_class": "LAB"
+    },
+    "failure_modes": [
+     "mist inhalation controls"
+    ],
+    "commercial_path": {
+     "buyer": "Machine shops"
+    },
+    "cross_domain_transition": "NONE"
+   },
+   "pool": [
+    {
+     "record_id": "cal:pa08:r1",
+     "title": "Minimum quantity lubrication milling: published tool-life parity results and deployed MQL systems"
+    }
+   ],
+   "prior_art": {
+    "relevant_records": [
+     {
+      "record_id": "cal:pa08:pa1",
+      "perspective": "MECHANISM",
+      "title": "MQL for milling and turning: extensive published literature and commercial systems teaching the identical aerosol intervention and coolant-elimination effect"
+     },
+     {
+      "record_id": "cal:pa08:pa2",
+      "perspective": "FORWARD",
+      "title": "Machine-tool OEM MQL-ready spindle options documented across catalogs"
+     }
+    ]
+   },
+   "ground_truth": {
+    "label": "PRIOR_ART_COLLISION",
+    "expected_final": "KILLED",
+    "defect_class": "prior-art collision (MQL is published and commercially standard for milling)",
+    "expected_kill_surface": "prior_art",
+    "expected_defect_in_basis": [
+     "MQL",
+     "commercial",
+     "published",
+     "same",
+     "spindle",
+     "standard"
+    ],
+    "ground_truth_basis": "MQL for milling is a published, commercially standardized technology (machine-tool catalogs ship MQL-ready spindles); the provided records teach the identical mechanism (boundary lubrication by microliter aerosol), intervention (MQL delivery), and effect (tool-life parity, coolant elimination). A calibrated attacker must KILL on prior_art."
+   }
+  },
+  {
+   "case_id": "CAL-PA-09",
+   "domain_id": "power",
+   "pain_class": "GRID_INSTABILITY",
+   "candidate": {
+    "candidate_id": "CAL-PA-09",
+    "technology_name": "Grid-Forming Inverter Control for Islanded Microgrids",
+    "problem": "Inverter-based microgrids need a voltage/frequency reference when islanded",
+    "causal_chain": [
+     "Inverter control emulates synchronous machine swing",
+     "virtual inertia and damping terms",
+     "voltage/frequency form autonomously",
+     "black start and islanding work",
+     "microgrid stability achieved"
+    ],
+    "unexploited_phenomenon": "Swing-equation emulation in inverter control (cal:pa09:r1)",
+    "intervention": "Grid-forming droop/virtual-synchronous-machine control claiming novelty",
+    "governing_variables": "Virtual inertia constant, damping, droop slopes, current limiting",
+    "predicted_effect": "Stable islanded operation with 100% inverter generation; black-start capability",
+    "equations": [
+     "J*domega/dt = P_ref - P_out - D*omega (VSM swing)"
+    ],
+    "boundary_conditions": "Fault current limited by inverter rating",
+    "evidence_refs": [
+     "cal:pa09:r1"
+    ],
+    "baseline": {
+     "baseline_incumbent": "Diesel gensets as the islanded reference",
+     "baseline_metric": "Stability from rotating machines",
+     "candidate_metric": "Stability from inverters claimed"
+    },
+    "killer_experiment": {
+     "experiment": "Hardware-in-the-loop islanding test",
+     "kill_condition": "If transient instability at 50% load step, fails",
+     "cost_class": "LAB"
+    },
+    "failure_modes": [
+     "fault current insufficiency for protection"
+    ],
+    "commercial_path": {
+     "buyer": "Microgrid developers"
+    },
+    "cross_domain_transition": "NONE"
+   },
+   "pool": [
+    {
+     "record_id": "cal:pa09:r1",
+     "title": "Grid-forming inverter control: virtual synchronous machine and droop methods published and standardized"
+    }
+   ],
+   "prior_art": {
+    "relevant_records": [
+     {
+      "record_id": "cal:pa09:pa1",
+      "perspective": "MECHANISM",
+      "title": "Virtual synchronous machine grid-forming control: extensive published literature and commercial grid-forming inverters teaching the identical swing-emulation intervention"
+     },
+     {
+      "record_id": "cal:pa09:pa2",
+      "perspective": "FORWARD",
+      "title": "IEEE 2800-class interconnection standards incorporating grid-forming requirements"
+     }
+    ]
+   },
+   "ground_truth": {
+    "label": "PRIOR_ART_COLLISION",
+    "expected_final": "KILLED",
+    "defect_class": "prior-art collision (grid-forming/VSM control is published, standardized, and commercially deployed)",
+    "expected_kill_surface": "prior_art",
+    "expected_defect_in_basis": [
+     "grid-forming",
+     "VSM",
+     "standard",
+     "IEEE",
+     "commercial",
+     "published"
+    ],
+    "ground_truth_basis": "Grid-forming inverter control (VSM/droop) is an extensively published, standardized (IEEE 2800-class), and commercially deployed technology; the provided records teach the identical mechanism (swing-equation emulation), intervention (inverter control), and effect (islanded stability, black start). A calibrated attacker must KILL on prior_art."
+   }
+  },
+  {
+   "case_id": "CAL-PA-10",
+   "domain_id": "agriculture",
+   "pain_class": "INPUT_LOSS",
+   "candidate": {
+    "candidate_id": "CAL-PA-10",
+    "technology_name": "Variable-Rate Nitrogen Application From NDVI Zoning",
+    "problem": "Uniform nitrogen application over-wastes in high-organic zones and under-feeds poor zones",
+    "causal_chain": [
+     "NDVI map from drone or satellite",
+     "management zones classified",
+     "prescription map drives variable-rate spreaders",
+     "nitrogen matches crop need per zone",
+     "input cost and nitrate leaching fall"
+    ],
+    "unexploited_phenomenon": "Biomass-greenness proxy for crop N status (cal:pa10:r1)",
+    "intervention": "NDVI-based variable-rate N application claiming novelty",
+    "governing_variables": "NDVI threshold, zone count, spreader control resolution, N-response model",
+    "predicted_effect": "10-15% N reduction at equal yield; leaching -20%",
+    "equations": [
+     "N_applied(zone) = f(NDVI(zone), yield target)"
+    ],
+    "boundary_conditions": "Sensor timing at critical growth stages",
+    "evidence_refs": [
+     "cal:pa10:r1"
+    ],
+    "baseline": {
+     "baseline_incumbent": "Uniform N application",
+     "baseline_metric": "N 100% uniform",
+     "candidate_metric": "85-90% of uniform N at equal yield"
+    },
+    "killer_experiment": {
+     "experiment": "Strip trials VRA vs uniform, yield + soil nitrate",
+     "kill_condition": "If N saving below 5% at yield parity, fails",
+     "cost_class": "FIELD"
+    },
+    "failure_modes": [
+     "cloud cover timing"
+    ],
+    "commercial_path": {
+     "buyer": "Crop input retailers, farms"
+    },
+    "cross_domain_transition": "NONE"
+   },
+   "pool": [
+    {
+     "record_id": "cal:pa10:r1",
+     "title": "NDVI-based variable-rate nitrogen application: published field trials and commercial precision-ag platforms"
+    }
+   ],
+   "prior_art": {
+    "relevant_records": [
+     {
+      "record_id": "cal:pa10:pa1",
+      "perspective": "MECHANISM",
+      "title": "Variable-rate N from NDVI zoning: published multi-year field trials teaching the identical sensing-zoning-prescription mechanism and 10-15% N-saving effect"
+     },
+     {
+      "record_id": "cal:pa10:pa2",
+      "perspective": "FORWARD",
+      "title": "Commercial precision-ag platforms offering NDVI-based variable-rate prescription as a shipping feature"
+     }
+    ]
+   },
+   "ground_truth": {
+    "label": "PRIOR_ART_COLLISION",
+    "expected_final": "KILLED",
+    "defect_class": "prior-art collision (NDVI-based VR-N is published and a shipping commercial feature)",
+    "expected_kill_surface": "prior_art",
+    "expected_defect_in_basis": [
+     "commercial",
+     "shipping",
+     "NDVI",
+     "variable-rate",
+     "same",
+     "platforms"
+    ],
+    "ground_truth_basis": "NDVI-based variable-rate nitrogen is a shipping feature of commercial precision-ag platforms with multi-year published field trials teaching the identical mechanism (NDVI zoning), intervention (prescription spreading), and effect (10-15% N savings at yield parity). A calibrated attacker must KILL on prior_art."
+   }
+  }
+ ]
+}
