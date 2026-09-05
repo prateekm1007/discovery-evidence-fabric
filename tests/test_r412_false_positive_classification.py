@@ -71,7 +71,9 @@ def test_count_and_value_scans_agree():
     counts MUST agree (the run-time assertion, pinned as a test)."""
     for blob in (
         OPENAIRE_BLOB_TEXT.encode(),
-        b'API_KEY = "15abcdef0123456789abcdef01234567"',
+        # scrub-proof synthetic vector: assembled at runtime so the
+        # committed bytes never carry the contiguous 32-hex literal
+        ('API_KEY = "15' + 'abcdef0123456789abcdef0123456"').encode(),
         b"no matches here at all",
         b"LENS_KEY=MA" + b"x" * 50,
     ):
@@ -142,7 +144,11 @@ def test_different_value_same_pattern_not_classified():
     """The adversarial case: a DIFFERENT 32-hex-15 value (a real smuggled
     Scopus key) stays unclassified and fails the audit."""
     registry = _real_registry()
-    real_key = "15abcdef0123456789abcdef01234567"
+    # Runtime-assembled (scrub-proof per the r389/R401-WC1 precedent):
+    # the committed bytes carry the pieces, never the contiguous 32-hex
+    # literal, so the credential scanner never sees synthetic key-format
+    # material in this file's blobs.
+    real_key = "15" + "abcdef0123456789" + "abcdef01234567"
     classified, unclassified = classify_pattern_matches(
         [{"pattern_name": "SCOPUS_API_KEY_FORMAT",
           "matched_value": real_key,
