@@ -271,6 +271,30 @@ class TestVerification:
         assert v["verdict"] == "NOT_DEMONSTRATED"
         assert "Art. LXI" in v["note"]
 
+    def test_decomposition_row_missing_is_terminal_on_resume(self):
+        """Idempotence pin (the 2026-09-06 driver repair): a
+        DECOMPOSITION_ROW_MISSING verification row is a recorded
+        cross-check defect that re-running the verify stage can
+        never change, so the resume loop must treat it as terminal
+        and never re-append it."""
+        from scripts.r412_run_temporal_replay import \
+            TERMINAL_VERIFICATION_STATUSES
+        assert "DECOMPOSITION_ROW_MISSING" in \
+            TERMINAL_VERIFICATION_STATUSES
+        assert "OK" in TERMINAL_VERIFICATION_STATUSES
+        assert "INCOMPLETE_TRANSPORT_BUDGET" in \
+            TERMINAL_VERIFICATION_STATUSES
+
+    def test_finalize_stage_signature_accepts_limit(self):
+        """First-invocation defect pin (2026-09-06): main() invokes
+        every stage as stages[stage](limit); stage_finalize's
+        signature must accept the limit argument (the crash fired
+        on the first live finalize call)."""
+        import inspect
+        from scripts.r412_run_temporal_replay import stage_finalize
+        sig = inspect.signature(stage_finalize)
+        assert "limit" in sig.parameters
+
 
 class TestBranch:
     def _branch(self, evo_text=_GOOD_EVO_TEXT, decomp_rows=None,
@@ -322,6 +346,21 @@ class TestBranch:
         assert b["branch"] == tp.TEMPORAL_PROJECTION
         assert any(r["kind"] == "TREND_GATE_FAIL"
                    for r in b["reasons"])
+
+    def test_capability_not_claimed_today_blocks(self):
+        """FAIL-CLOSED pin (the live-run correction): a descendant
+        needing a capability the evolution does NOT claim exists
+        today is a TEMPORAL_PROJECTION — future progress required
+        (directive §6). Without this, a descendant with every
+        capability marked 'not today' could promote with zero
+        present-day capability evidence."""
+        text = _GOOD_EVO_TEXT.replace(
+            "| plus-minus 15 percent | yes",
+            "| plus-minus 15 percent | no", 1)
+        b, _ = self._branch(evo_text=text)
+        assert b["branch"] == tp.TEMPORAL_PROJECTION
+        kinds = [r["kind"] for r in b["reasons"]]
+        assert "CAPABILITY_NOT_CLAIMED_TODAY" in kinds
 
 
 class TestSchemaBarrierAndIdentity:

@@ -202,6 +202,29 @@ def branch_decision(evolution: Dict[str, Any],
                 "capability": cap.get("name"),
                 "detail": gate.get("reason") or gate.get("status"),
             })
+        # FAIL-CLOSED CORRECTION (R412 live-run disclosure,
+        # 2026-09-05): a capability the evolution marks
+        # essential_today = no is needed by the descendant but NOT
+        # claimed to exist today — that is future technological
+        # progress by definition (directive §6: "one or more
+        # essential capabilities genuinely require future progress
+        # -> TEMPORAL_PROJECTION"). Without this rule a descendant
+        # whose every capability was marked 'not today' could
+        # promote with ZERO present-day capability evidence — the
+        # opposite of the present-capability test. Strictly
+        # tightening (fail-closed); applied BEFORE any branch
+        # decision was emitted; test-pinned.
+        if str(cap.get("essential_today") or "").strip().lower() \
+                != "yes":
+            missing_capabilities.append(str(cap.get("name")))
+            reasons.append({
+                "kind": "CAPABILITY_NOT_CLAIMED_TODAY",
+                "capability": cap.get("name"),
+                "detail": ("the descendant needs this capability but "
+                           "the evolution does not claim it exists "
+                           "today — future progress required "
+                           "(directive §6)"),
+            })
     for cap in essential:
         row = row_for(cap)
         if row is None:
