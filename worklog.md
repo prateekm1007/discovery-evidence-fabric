@@ -1080,3 +1080,20 @@ Work Log:
 
 Stage Summary:
 - 47MB + ~1,900 files of verified dead weight gone, manifest-recorded (Art. XI); the audit was falsified in 9+ places, including two whose verbatim execution would have broken live drivers — external audits are adversarial inputs, verified never executed (Art. XXXI memory artifact recorded).
+
+---
+Task ID: R409-A (post-close-out: S2 unauthenticated-tier disposition)
+Agent: Coder
+Task: disposition the R409 close-out open item "S2 API key for the 429-prone unauthenticated tier" with user-provided + live-measured facts.
+
+Work Log:
+- USER-PROVIDED FACTS (external input, verified before recording, Art. III): the Semantic Scholar Academic Graph API (Allen Institute for AI) is free; unauthenticated use is allowed at roughly 100 requests / 5 minutes; higher limits come from AI2's free API Key Request Form; community clients and MCP servers exist on GitHub (danielnsilva/semanticscholar, KTH-Library/semanticscholar, smaniches/semantic-scholar-mcp, alperenkocyigit/semantic-scholar-graph-api).
+- LIVE MEASUREMENT (this egress, this session): GET graph/v1/paper/search -> HTTP 429 whose body is the API's own message "Too Many Requests. Please wait and try again or apply for a key for higher rate limits. https://www.semanticscholar.org/product/api#api-key-form"; no X-Rate-Limit headers exposed. Interpretation consistent with the user's facts: the unauthenticated pool is SHARED (per egress IP), and this sandbox egress is shared — the 429s the R409 benchmark recorded are a property of the shared pool, NOT of the fabric's per-run budget (4 reciprocal calls per run, far under 100/5min on its own).
+- DISPOSITION (no code change required):
+  (1) S2 remains a wired open/free fabric source in the honest unauthenticated tier: every 429 is surfaced as RATE_LIMITED (Art. XXI.3 vocabulary — provider failure is never absence) and the run degrades gracefully across the remaining sources.
+  (2) The key tier is ALREADY wired end-to-end: load_key("S2_API_KEY") -> x-api-key header in both source_registry/connectors/scientific.py and retrieval_fabric/reciprocal.py; .env.keys is gitignored (line 2) and the secret-scanning suite enforces zero committed credentials. Obtaining the key is a HUMAN_ACTION (AI2's request form — this machine does not fill external forms); dropping S2_API_KEY=... into .env.keys switches both paths to the key tier with zero code changes.
+  (3) Community S2 client libraries / MCP servers: noted, NOT adopted — the fabric's thin REST connector keeps the dependency surface at zero and rides the existing 7-step custody chain; a client library would add dependency risk for no measured capability gain.
+- POST-SHIPMENT VERIFICATION (fresh sandbox, this session): test_r409_retrieval_fabric 55/55; source_registry+status_model+r401wc2+engine_integration+r399_gates+rate_limit+secret_scanning 83 passed/4 skipped; r407_drivers+r404+r405+r406+r386 180/180. Push state verified by ls-remote: origin/main == HEAD == 6e9840ca. CI verified via API: 14-Gate Detached Certification SUCCESS at 3339080c (R409 push head) and 6e0d04e1 (R410 push head); docs-only Lightweight SUCCESS at 6e9840ca (the 2731b0e2/2f805d8d implementation commits share the 3339080c push head's certification by GitHub push-HEAD semantics).
+
+Stage Summary:
+- The R409 S2 open item is closed with a recorded disposition: 429 behavior explained (shared per-IP unauthenticated pool), key-tier path already wired and gitignore-disciplined, acquisition recorded as HUMAN_ACTION. The remaining open item is unchanged: specific-target recall behind terminology divergence — the measured frontier, with the reciprocal/citation lane and richer cross-domain term tables as the recorded next steps.
