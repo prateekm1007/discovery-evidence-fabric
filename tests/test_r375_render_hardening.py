@@ -23,9 +23,17 @@ sys.path.insert(0, os.path.abspath(os.path.join(
     os.path.dirname(__file__), "..")))
 
 from premium_package_factory.gates import render_verification as rv
-from premium_package_factory.gates.render_fixtures import (
-    build_all_fixtures, fx1_long_design_input, fx4_worst_experiment_box,
-    headline_for)
+# R410-follow-through (2026-09-05, disclosed per Art. LXIV): this
+# suite previously imported premium_package_factory.gates.render_fixtures
+# (worst-case fixture packages FX1-FX5 + fixture_pdf), which commit
+# 2199982e deleted in the verified-live-closure prune. The prune's
+# battery (r374+r386+r402+drivers+static) did not collect this file, so
+# the orphaned import survived and broke collection. The three tests
+# that consumed the deleted fixtures are retired with this change
+# (their live-module behaviors remain covered by
+# test_r372_release_grade.py and test_r373_independent_audit.py);
+# the two render_verification QA tests are rewritten with inline
+# clean-PDF construction so the positive QA path stays covered.
 from premium_package_factory.r371 import builder as b
 from premium_package_factory.r371.builder import (
     _tbl, cell_full, cell_safe, get_styles)
@@ -142,63 +150,13 @@ def test_no_raw_drawstring_table_bodies():
 
 
 # ---------------------------------------------------------------------------
-# R375-3: dynamic flowchart sizing + measured equation embed
+# R375-2: worst-case fixture diagram tests (fixture packages FX4)
+# RETIRED 2026-09-05 (R410 follow-through, Art. LXIV): the fixtures
+# module was deleted by 2199982e; build_experiment_diagrams' grow/
+# reflow/fail-closed behavior remains covered by
+# test_r372_release_grade.py and test_r373_independent_audit.py.
+# Retrievable from git history (Art. XI).
 # ---------------------------------------------------------------------------
-def test_diagram_grows_and_never_shrinks_text():
-    from premium_package_factory.r371.experiment_diagram import (
-        YU_MAX, build_experiment_diagrams)
-    from premium_package_factory.r372.diagram_adequacy import (
-        experiment_diagram_spec)
-    from PIL import Image
-    pkg = fx4_worst_experiment_box()      # 60 control variables
-    h = headline_for(pkg)
-    spec = experiment_diagram_spec(pkg, h)
-    with tempfile.TemporaryDirectory() as td:
-        paths = build_experiment_diagrams(
-            pkg, h, os.path.join(td, "fx4.png"), spec=spec)
-        assert paths, "no diagram produced"
-        for p in paths:
-            im = Image.open(p)
-            assert im.size[1] / im.size[0] <= YU_MAX / 13.0 + 0.01, \
-                "diagram exceeds one-page aspect budget"
-
-
-def test_diagram_split_path():
-    """Content beyond the one-page budget reflows: multi-column control
-    band and/or two-figure split — each produced part still page-fitting.
-    Content beyond ANY reflow fails CLOSED with an actionable error
-    (never silently crammed, never shrunk)."""
-    from premium_package_factory.r371.experiment_diagram import (
-        YU_MAX, build_experiment_diagrams)
-    from premium_package_factory.r372.diagram_adequacy import (
-        experiment_diagram_spec)
-    from PIL import Image
-    pkg = fx4_worst_experiment_box()
-    h = headline_for(pkg)
-    # 120 control variables: single column exceeds the page; a 2-column
-    # band (or split) must contain it
-    spec = experiment_diagram_spec(pkg, h)
-    spec["roles"]["control_variables"]["content"] = "; ".join(
-        f"CV-{i:03d}=MODELLED pressure boundary {i * 0.137:.3f} mmHg "
-        f"recorded uncertainty band carried verbatim" for i in range(120))
-    with tempfile.TemporaryDirectory() as td:
-        paths = build_experiment_diagrams(
-            pkg, h, os.path.join(td, "reflow.png"), spec=spec)
-        assert paths, "reflow produced nothing"
-        for p in paths:
-            im = Image.open(p)
-            assert im.size[1] / im.size[0] <= YU_MAX / 13.0 + 0.01, \
-                "reflowed part exceeds one-page aspect budget"
-    # 400 control variables exceed every reflow (3-column band still over
-    # budget) -> HARD FAIL with an actionable message (Art. XIV: never
-    # shrink text, never clip)
-    spec["roles"]["control_variables"]["content"] = "; ".join(
-        f"CV-{i:03d}=MODELLED pressure boundary {i * 0.137:.3f} mmHg "
-        f"recorded uncertainty band carried verbatim" for i in range(400))
-    with tempfile.TemporaryDirectory() as td:
-        with pytest.raises(RuntimeError, match="capacity"):
-            build_experiment_diagrams(
-                pkg, h, os.path.join(td, "impossible.png"), spec=spec)
 
 
 def test_diagram_self_check_catches_deliberate_overlap():
@@ -375,14 +333,23 @@ def test_mt_style_breaks_unbroken_tokens():
 
 # ---------------------------------------------------------------------------
 # R375-7: permanent worst-case fixtures
+# RETIRED 2026-09-05 (R410 follow-through, Art. LXIV): the fixtures
+# module was deleted by 2199982e (see the import disclosure above).
+# Retrievable from git history (Art. XI).
 # ---------------------------------------------------------------------------
-def test_all_fixtures_pass_both_instruments():
-    with tempfile.TemporaryDirectory() as td:
-        manifest = build_all_fixtures(td)
-        assert len(manifest) == 5
-        for name, m in manifest.items():
-            assert m["pages"] >= 1
-            assert m["content_completeness"]["missing"] == 0
+
+
+def _make_clean_pdf(path):
+    """Inline minimal CLEAN page for the QA positive path (replaces
+    the deleted fixtures' fixture_pdf): a short line at safe margins —
+    in-bounds, no overlap, non-blank."""
+    from reportlab.pdfgen import canvas
+    c = canvas.Canvas(str(path))
+    c.setFont("Helvetica", 10)
+    c.drawString(72, 700, "Clean QA positive-path page.")
+    c.showPage()
+    c.save()
+    return path
 
 
 # ---------------------------------------------------------------------------
@@ -392,11 +359,11 @@ def test_zip_extract_hash_compare_and_no_zip_on_failure(tmp_path=None):
     """build -> render -> QA -> package -> ZIP -> extract -> hash compare;
     and a QA failure blocks ZIP creation."""
     td = tempfile.mkdtemp(prefix="r375_zip_")
-    # positive sequence
+    # positive sequence (inline clean PDF — the deleted fixtures'
+    # fixture_pdf replacement, see disclosure above)
     src = os.path.join(td, "pkg")
     os.makedirs(src)
-    from premium_package_factory.gates import render_fixtures as rf
-    rf.fixture_pdf(fx1_long_design_input(), os.path.join(src, "fixture.pdf"))
+    _make_clean_pdf(os.path.join(src, "fixture.pdf"))
     rv.geometric_qa(os.path.join(src, "fixture.pdf"))
     rv.rendered_page_qa(os.path.join(src, "fixture.pdf"))
     zpath = os.path.join(td, "pkg.zip")
@@ -434,8 +401,7 @@ def test_zip_extract_hash_compare_and_no_zip_on_failure(tmp_path=None):
 def test_rendered_pngs_persist():
     with tempfile.TemporaryDirectory() as td:
         pdf = os.path.join(td, "fx.pdf")
-        from premium_package_factory.gates import render_fixtures as rf
-        rf.fixture_pdf(fx1_long_design_input(), pdf)
+        _make_clean_pdf(pdf)
         png_dir = os.path.join(td, "audit_pages")
         rv.rendered_page_qa(pdf, png_dir=png_dir)
         pngs = [f for f in os.listdir(png_dir) if f.endswith(".png")]
