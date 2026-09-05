@@ -1,3 +1,0 @@
-# Claim Draft
-
-A system for monitoring patency of an endovascular CSF shunt between subarachnoid space and dural venous sinus, comprising: (a) first pressure sensor in subarachnoid space; (b) second pressure sensor in dural venous sinus; (c) processor calculating CSF-venous pressure differential; (d) wireless transmitter; (e) occlusion-predictive algorithm analyzing temporal variations in differential to predict partial occlusion.
