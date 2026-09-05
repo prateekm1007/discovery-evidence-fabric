@@ -76,7 +76,18 @@ def run_detached_certification() -> int:
                                # (avoids infinite recursion through detached runner)
             ],
             cwd=str(worktree_dir),
-            capture_output=True, text=True, timeout=300,
+            capture_output=True, text=True, timeout=900,
+            # TRANSPORT BUDGET REPAIR (R412, 2026-09-05, disclosed):
+            # the 300 s cap was calibrated when the certification
+            # battery was smaller; the R412 phases added ~100 gate-
+            # relevant tests and the in-place 14-gate run at ebbe3a3e
+            # measured 359 s — the cap was cutting off a HEALTHY
+            # certification mid-run (TimeoutExpired, Art. LXI class).
+            # 900 s = 2.5x the measured healthy runtime; the GATES,
+            # their thresholds, and their verdicts are byte-identical
+            # (same class as the R411 attack token-cap correction: a
+            # bounded transport budget sized to the measured workload,
+            # never an epistemic change).
         )
 
         # Print output
