@@ -361,10 +361,13 @@ class TestRealArtifactAnchors:
 class TestExclusionListGuard:
     def test_self_exclusions_are_exactly_the_disclosed_set(self):
         """SCANNER_SELF_EXCLUSIONS must contain exactly: the three
-        scanner modules + the two disclosed test fixtures (R387 corpus,
-        R401-WC1 r389 historical blob). Any additional entry is a silent
-        detection hole; any missing entry re-reds the certification on
-        intentional fixtures."""
+        scanner modules + the three disclosed test fixtures (R387
+        corpus, R401-WC1 r389 historical blob, R412 classification
+        suite's synthetic vectors — the r389/R412 entries disposition
+        reachable HISTORICAL blobs of intentional security-test
+        fixtures, per the R387 precedent). Any additional entry is a
+        silent detection hole; any missing entry re-reds the
+        certification on intentional fixtures."""
         from epistemic_integrity.credential_audit_split import (
             SCANNER_SELF_EXCLUSIONS)
         assert SCANNER_SELF_EXCLUSIONS == {
@@ -373,6 +376,7 @@ class TestExclusionListGuard:
             "epistemic_integrity/historical_artifact_audit.py",
             "tests/test_r387_ci_red_state_fixes.py",
             "tests/test_r389_reality_provider.py",
+            "tests/test_r412_false_positive_classification.py",
         }
 
 

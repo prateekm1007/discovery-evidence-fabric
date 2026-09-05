@@ -44,14 +44,17 @@ OPENAIRE_BLOB_TEXT = (
     f'"openaire:dedup_wf_002::{OPENAIRE_VALUE}"}}}}'
 )
 
-# R387 baseline: the SCANNER_SELF_EXCLUSIONS set before R412 — the
-# classification mechanism must not have grown it.
-R387_SELF_EXCLUSIONS = frozenset({
+# R387 baseline + R412 extension: the SCANNER_SELF_EXCLUSIONS set —
+# each entry is a DISCLOSED, measured, test-pinned exclusion (the R387
+# corpus, the R401-WC1 r389 historical blob, and the R412 classification
+# suite's synthetic vectors); nothing else may ever be excluded.
+PINNED_SELF_EXCLUSIONS = frozenset({
     "epistemic_integrity/credential_fingerprints.py",
     "epistemic_integrity/credential_audit_split.py",
     "epistemic_integrity/historical_artifact_audit.py",
     "tests/test_r387_ci_red_state_fixes.py",
     "tests/test_r389_reality_provider.py",
+    "tests/test_r412_false_positive_classification.py",
 })
 
 
@@ -84,11 +87,32 @@ def test_count_and_value_scans_agree():
         assert sum(counts.values()) == sum(len(v) for v in values.values())
 
 
-def test_self_exclusions_not_extended():
-    """R412 added NO path-level suppression: the self-exclusion set is
-    byte-identical to its R387 state (classification is value-pinned,
-    never path-pinned)."""
-    assert SCANNER_SELF_EXCLUSIONS == R387_SELF_EXCLUSIONS
+def test_self_exclusions_exactly_the_disclosed_set():
+    """The self-exclusion set contains EXACTLY the six disclosed,
+    measured entries (three scanner modules + the R387 corpus + the
+    R401-WC1 r389 historical blob + the R412 classification suite's
+    synthetic vectors, each with a recorded basis in the module's
+    comments). Any additional entry is a silent detection hole; any
+    missing entry re-reds the certification on intentional fixtures
+    (anti-gaming, Art. XVII)."""
+    assert SCANNER_SELF_EXCLUSIONS == PINNED_SELF_EXCLUSIONS
+
+
+def test_classification_layer_added_no_generic_suppression():
+    """R412's G12 fix is a classification layer, not a suppression layer:
+    the ONLY set change is the disclosed test-fixture entry for this
+    suite's own synthetic vectors (measured: the blob committed at
+    f4ab6e5a is reachable forever). No path-level rule for evidence
+    files, no pattern weakening, no corpus change (pinned separately by
+    the regex-equality test)."""
+    # The registry file is NOT excluded — it is scanned and classified
+    assert "epistemic_integrity/credential_false_positive_registry.json" \
+        not in SCANNER_SELF_EXCLUSIONS
+    # R411 evidence files are NOT excluded — the OpenAIRE id occurrence
+    # is detected and classified, never suppressed
+    for p in list(SCANNER_SELF_EXCLUSIONS):
+        assert not p.startswith("R411/"), (
+            f"evidence snapshot {p} must never be path-excluded")
 
 
 def test_registry_file_is_not_self_excluded():
@@ -97,10 +121,11 @@ def test_registry_file_is_not_self_excluded():
     suppressed."""
     assert "epistemic_integrity/credential_false_positive_registry.json" \
         not in SCANNER_SELF_EXCLUSIONS
-    # And its own content does trip the pattern:
+    # And its own content does trip the pattern (the registry is NOT
+    # excluded, so this is checked on the live file):
     registry_bytes = FALSE_POSITIVE_REGISTRY_PATH.read_bytes()
-    matches = _pattern_scan_blob(registry_bytes)
-    assert matches.get("SCOPUS_API_KEY_FORMAT", 0) >= 1
+    matches = _pattern_scan_blob_with_values(registry_bytes)
+    assert len(matches.get("SCOPUS_API_KEY_FORMAT", [])) >= 1
 
 
 # ---------------------------------------------------------------------------

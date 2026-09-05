@@ -413,6 +413,22 @@ SCANNER_SELF_EXCLUSIONS = {
     # remains flagged (pinned:
     # test_all_caps_material_with_digits_still_flagged).
     "tests/test_r389_reality_provider.py",
+    # R412 (2026-09-05, measured by the clean-clone certification): the
+    # G12 classification regression suite intentionally contains
+    # synthetic SCOPUS-format positive-control vectors (the adversarial
+    # "a different 32-hex-15 value stays unclassified" case — the whole
+    # point of the suite). The CURRENT version is scrub-proof (runtime
+    # assembly, same r389 discipline), but the blob committed at
+    # f4ab6e5a carried the contiguous literal and remains reachable in
+    # history forever. Disposition follows the R387/R401-WC1 precedent
+    # exactly: an intentional security-test fixture is not a repository
+    # credential, and the exclusion set stays ENUMERATED AND PINNED by
+    # tests (test_self_exclusions_are_exactly_the_disclosed_set;
+    # test_r412_self_exclusions_pin) so nothing can be quietly excluded
+    # later. Detection capability is NOT weakened — real Scopus-format
+    # material anywhere else still matches (pinned by the suite's
+    # positive controls).
+    "tests/test_r412_false_positive_classification.py",
 }
 
 
