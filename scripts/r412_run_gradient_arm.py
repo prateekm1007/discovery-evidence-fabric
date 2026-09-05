@@ -384,7 +384,7 @@ def stage_tvm_build(limit=None) -> int:
         query = (f"{rung} performance trend improvement measured "
                  f"benchmark")
         try:
-            items, _report = _retrieve(query)
+            items, report = _retrieve(query)
         except Exception as e:
             tvm["construction_log"].append(
                 {"rung": rung, "status": "INCOMPLETE_TRANSPORT",
@@ -406,6 +406,20 @@ def stage_tvm_build(limit=None) -> int:
         tvm["entries"].extend(gate["admitted"])
         tvm["construction_log"].append({
             "rung": rung, "n_retrieved": len(records),
+            # Phase B provenance custody (directive 2026-09-06:
+            # every entry retains retrieved_at — carried at the rung-
+            # construction level; each entry maps to exactly one
+            # rung construction, so entry -> rung -> this timestamp
+            # is the deterministic retrieved_at chain): the
+            # retrieval fabric's own start timestamp + version
+            "retrieved_at": (report or {}).get("retrieved_at"),
+            "retrieval_fabric_version": (report or {}).get(
+                "fabric_version"),
+            "retrieval_lanes": [
+                {"lane": s.get("lane"), "source_id":
+                 s.get("source_id"), "status": s.get("status")}
+                for s in (report or {}).get("lane_states", [])
+            ][:14],
             "n_proposed": len(entries),
             "n_admitted": len(gate["admitted"]),
             "n_rejected": len(gate["rejected"]),

@@ -1088,8 +1088,13 @@ class TestAllocationEnforcement:
             "\n".join(json.dumps(r) for r in ga1b))
         records = [{"record_id": "r-1", "title": "t",
                     "abstract": "a measured 5 unit trend"}]
+        report = {"retrieved_at": "2026-09-06T00:00:00Z",
+                  "fabric_version": "TEST-FABRIC",
+                  "lane_states": [{"lane": "SCHOLARLY",
+                                   "source_id": "crossref",
+                                   "status": "OK"}]}
         monkeypatch.setattr(
-            mod, "_retrieve", lambda q: (records, {}))
+            mod, "_retrieve", lambda q: (records, report))
         monkeypatch.setattr(
             mod, "_llm",
             lambda *a, **k: {"ok": True, "content": "", "model":
@@ -1101,18 +1106,28 @@ class TestAllocationEnforcement:
         assert rc == 0
         tvm = json.loads(mod.TVM_CONSTRUCTED.read_text())
         log = tvm["construction_log"]
-        attempted = [str(e["rung"]) for e in log
+        attempted = [e for e in log
                      if e.get("n_retrieved") is not None]
+        attempted_names = [str(e["rung"]) for e in attempted]
         allocation_rungs = {f"rung-{cid}"
                             for cid in self.priority}
         shortfall = [e for e in log if e.get("status") ==
                      "INCOMPLETE_BUDGET_SHORTFALL"]
         assert len(attempted) == 12
         # every allocation rung was attempted
-        assert allocation_rungs <= set(attempted)
+        assert allocation_rungs <= set(attempted_names)
         # the starved rung is NOT an allocation rung
         assert len(shortfall) == 1
         assert str(shortfall[0]["rung"]) not in allocation_rungs
+        # Phase B provenance custody: every completed rung
+        # construction carries the retrieval timestamp + fabric
+        # version + lane states (the entry -> rung -> retrieved_at
+        # chain)
+        for e in attempted:
+            assert e["retrieved_at"] == \
+                "2026-09-06T00:00:00Z"
+            assert e["retrieval_fabric_version"] == "TEST-FABRIC"
+            assert e["retrieval_lanes"][0]["lane"] == "SCHOLARLY"
 
     def test_tvm_build_never_reattempts_a_completed_rung(
             self, monkeypatch, tmp_path):
