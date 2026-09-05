@@ -428,6 +428,14 @@ def stage_tvm_build(limit=None) -> int:
             "model": meta.get("model"),
         })
         built += 1
+        # per-rung checkpoint (incident 2026-09-05T20:17Z: an
+        # end-of-stage-only write orphaned 5 completed rung attempts
+        # to a session timeout; writing after EVERY attempt makes
+        # an interruption resumable via attempted_done — content
+        # byte-identical to the end-of-stage write, durability only)
+        tvm["n_entries"] = len(tvm["entries"])
+        TVM_CONSTRUCTED.parent.mkdir(parents=True, exist_ok=True)
+        TVM_CONSTRUCTED.write_text(json.dumps(tvm, indent=1) + "\n")
         print(f"  rung '{rung}': {len(gate['admitted'])} admitted / "
               f"{len(gate['rejected'])} rejected")
     for rung in shortfall:
