@@ -31,7 +31,7 @@ from discovery_fabric.source_registry.query_relevance import (
     adjudicate_record, terms,
 )
 
-REPO_ROOT = Path(__file__).resolve().parents[4]
+REPO_ROOT = Path(__file__).resolve().parents[3]
 
 
 def utc_now() -> str:
@@ -79,16 +79,20 @@ def _noise_rate(primary: str, items: List[Dict[str, Any]]) -> Dict[str, Any]:
         return {"noise_count": 0, "pool_size": 0, "fp_rate": 0.0,
                 "instrument": "adjudicate_record (frozen)"}
     noise = 0
+    relevant_items: List[str] = []
     for it in items:
         adj = adjudicate_record(
             {"title": it.get("title", ""),
              "normalized": {"abstract": it.get("abstract", "")},
              "query": primary},
             primary)
-        if not adj.get("relevant"):
+        if adj.get("relevance") != "RELEVANT":
             noise += 1
+        else:
+            relevant_items.append(it.get("title", "")[:80])
     return {"noise_count": noise, "pool_size": len(items),
             "fp_rate": round(noise / len(items), 4),
+            "relevant_titles": relevant_items,
             "instrument": ("adjudicate_record: >=2 content-term overlap "
                            "with the primary query (the discovery "
                            "pipeline's own per-record adjudicator)")}
@@ -159,6 +163,13 @@ def run_benchmark(out_path: Optional[str] = None) -> Dict[str, Any]:
                             "match": m_full})
         v1_noise = _noise_rate(primary, v1["items"])
         v2_noise = _noise_rate(primary, v2["items"])
+        # V2-unique RELEVANT items: relevant V2 pool records whose
+        # normalized title is not in V1's pool (the quantitative form of
+        # 'V2 retrieves relevant records absent from V1')
+        v1_title_keys = {_norm_title(t) for t in
+                         (i.get("title", "") for i in v1["items"]) if t}
+        v2_unique_relevant = [t for t in v2_noise.get("relevant_titles", [])
+                              if _norm_title(t) not in v1_title_keys]
         div = (v2.get("report") or {}).get("retrieval_diversity", {})
         stats = (v2.get("report") or {}).get("retrieval_stats", {})
         problem_out = {
@@ -172,6 +183,8 @@ def run_benchmark(out_path: Optional[str] = None) -> Dict[str, Any]:
                              if isinstance(v, dict)}},
             "v2": {"status": v2["status"],
                    "pool_size": len(v2["items"]),
+                   "pool_titles": [it.get("title", "")[:80]
+                                   for it in v2["items"][:20]],
                    "canonical_pool_size": len(v2_canonical),
                    "sources_attempted": stats.get("sources_attempted"),
                    "sources_succeeded": stats.get("sources_succeeded"),
@@ -189,7 +202,11 @@ def run_benchmark(out_path: Optional[str] = None) -> Dict[str, Any]:
                    "retrieval_blind_spots": (v2.get("report") or {}).get(
                        "retrieval_blind_spots")},
             "targets": {"v1_hits": v1_hits, "v2_hits": v2_hits},
-            "noise": {"v1": v1_noise, "v2": v2_noise},
+            "noise": {"v1": {k: v for k, v in v1_noise.items()
+                            if k != "relevant_titles"},
+                      "v2": {k: v for k, v in v2_noise.items()
+                            if k != "relevant_titles"}},
+            "v2_unique_relevant_items": v2_unique_relevant,
         }
         problems_out.append(problem_out)
         n_v1 = sum(1 for h in v1_hits if h["found"])
@@ -230,6 +247,9 @@ def run_benchmark(out_path: Optional[str] = None) -> Dict[str, Any]:
                                  for g in p["targets"]["v1_hits"] if g["found"])]
     fp_v1 = [p["noise"]["v1"]["fp_rate"] for p in problems_out]
     fp_v2 = [p["noise"]["v2"]["fp_rate"] for p in problems_out]
+    v2_unique_relevant_total = sum(
+        len(p.get("v2_unique_relevant_items", []))
+        for p in problems_out)
     failures = sorted({s for p in problems_out
                        for s in (p["v2"].get("sources_failed") or [])})
     rate_limited = sorted({s for p in problems_out
@@ -250,6 +270,10 @@ def run_benchmark(out_path: Optional[str] = None) -> Dict[str, Any]:
             "v2_unique_target_discoveries": len(v2_unique_discoveries),
             "v2_unique_discovery_target_ids": [
                 h["target_id"] for h in v2_unique_discoveries],
+            "v2_unique_relevant_item_count": v2_unique_relevant_total,
+            "v2_unique_relevant_item_examples": [
+                t for p in problems_out
+                for t in p.get("v2_unique_relevant_items", [])[:5]][:12],
             "false_positive_rate_v1": fp_v1,
             "false_positive_rate_v2": fp_v2,
             "retrieval_failures": failures,

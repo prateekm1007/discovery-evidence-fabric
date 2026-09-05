@@ -215,7 +215,7 @@ def retrieve_fabric(problem: Dict[str, Any],
             state = LaneRunState(lane=lane, source_id=source_id,
                                  queries=[v["query"] for v in chosen])
             total_records = 0
-            last_status = "OK"
+            variant_statuses: List[str] = []
             errors: List[str] = []
             for v in chosen:
                 q = v["query"]
@@ -228,18 +228,25 @@ def retrieve_fabric(problem: Dict[str, Any],
                     # it (the custody log entry is still written by the
                     # wrapper's own _finish path)
                     result = conn.search(q)
-                last_status = result.status
+                variant_statuses.append(result.status)
                 total_records += len(result.records)
                 if result.error:
-                    errors.append(str(result.error)[:160])
+                    errors.append(f"[{result.status}] {str(result.error)[:120]}")
                 for rec in result.records:
                     _ingest_record(canonicalizer, source_id, rec, q,
                                    v["derivation_class"], lane_states, lane,
                                    scoped)
-            state.status = last_status
+            # multi-variant honesty: the source is AVAILABLE when ANY
+            # variant was answered (OK/EMPTY); a variant-level failure is
+            # recorded in the error string, never masked as total failure
+            any_answered = any(s in ("OK", "EMPTY") for s in variant_statuses)
+            if any_answered:
+                state.status = "OK" if total_records else "EMPTY"
+            else:
+                state.status = variant_statuses[-1] if variant_statuses else "SEARCH_FAILED"
             state.record_count = total_records
             state.error = "; ".join(errors)[:300] or None
-            state.fabric_health = fabric_health_of(last_status)
+            state.fabric_health = fabric_health_of(state.status)
             lane_states.append(state)
 
     # ---- PATENT lane: claim-level fetch for top hits ------------------
