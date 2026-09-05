@@ -1,0 +1,78 @@
+{
+  "ruleset_id": "TVM_V2_NORMALIZATION_RULES",
+  "version": "1.0.0",
+  "frozen": "2026-09-06",
+  "specification_status": "SPECIFIED_BEFORE_PARSER_IMPLEMENTATION (Constitution Article VIII: the ruleset and the calibration corpus ground truths were authored before the parser was written and run; disagreements found later are parser defects, never corpus/rules edits)",
+  "principles": [
+    "DETERMINISM: parse(span, context) is a pure function of its inputs; no LLM, no locale, no clock, no randomness.",
+    "LOSSLESSNESS: every normalized value retains the exact raw source span; the raw span is never normalized, trimmed, or canonicalized in place.",
+    "NEVER_MANUFACTURE_PRECISION: approximations (~50) stay approximate points with the approximator retained as a flag — they are never widened into ranges; inequalities keep their open bound open; significant digits are never extended; unit conversions are never performed by the parser (conversion is a separate, explicitly-recorded operation if ever needed).",
+    "EXACT_DECIMAL_ARITHMETIC: uncertainty-to-range uses decimal.Decimal (0.42 ± 0.03 -> [0.39, 0.45] exactly, never 0.39000000000000001).",
+    "FAIL_CLOSED: unparseable numeric-looking spans are MALFORMED with an explicit reason, never coerced, never laundered into NOT_NUMERIC (a serialization defect is distinct from missing evidence).",
+    "CONTEXT_TYPING: VALUE and YEAR are separate parse contexts supplied explicitly by the caller; the parser never guesses."
+  ],
+  "canonical_representations": ["POINT", "RANGE", "INEQUALITY", "ORDINAL_QUALITATIVE", "NOT_NUMERIC", "MALFORMED"],
+  "canonical_value_fields": [
+    "raw_source_span",
+    "normalized_value",
+    "normalized_min",
+    "normalized_max",
+    "unit",
+    "unit_raw",
+    "year",
+    "year_min",
+    "year_max",
+    "normalization_method",
+    "approximation_marker",
+    "open_bound",
+    "qualitative_term",
+    "malformed_reason",
+    "parse_context"
+  ],
+  "value_context_rule_cascade": [
+    {"rule_id": "R-EMPTY", "method": "MALFORMED_REJECTED", "reason": "MALFORMED_EMPTY", "pattern": "whitespace-only span"},
+    {"rule_id": "R-QUALITATIVE", "method": "STATED_QUALITATIVE_TERM", "semantics": "whole-span case-insensitive match to the frozen qualitative vocabulary; canonical term recorded; raw span retained"},
+    {"rule_id": "R-NO-DIGITS", "method": "NO_NUMERIC_CONTENT", "semantics": "no digits and no numeric marker -> NOT_NUMERIC; a numeric marker without a value (inequality symbol/word, approximator, bare ±) -> MALFORMED_NO_BOUND_VALUE / MALFORMED_NO_VALUE / MALFORMED_NO_CENTER_VALUE (serialization defect, not missing evidence)"},
+    {"rule_id": "R-SCI-E", "method": "SCIENTIFIC_NOTATION_E", "pattern": "NUM [eE] exponent", "semantics": "exact decimal value = mantissa * 10^exponent"},
+    {"rule_id": "R-SCI-MULT", "method": "SCIENTIFIC_NOTATION_MULTIPLIER", "pattern": "NUM [×x] 10 ^? digits", "semantics": "exact decimal value = mantissa * 10^exponent"},
+    {"rule_id": "R-DOUBLE-SEPARATOR", "method": "MALFORMED_REJECTED", "reason": "MALFORMED_SEPARATOR", "semantics": "two adjacent range separators (e.g. 0.1--10) are malformed, never silently collapsed"},
+    {"rule_id": "R-UNCERTAINTY", "method": "UNCERTAINTY_TO_RANGE", "pattern": "NUM ± NUM [unit]", "semantics": "lossless: the stated ± bound IS the interval; [center-unc, center+unc] by exact decimal arithmetic"},
+    {"rule_id": "R-INEQ-WORD", "method": "STATED_INEQUALITY_WORD_FORM", "pattern": "inequality-word NUM [unit]", "semantics": "at least/no less than/greater than/over/above -> lower bound; at most/no more than/less than/under/below -> upper bound; bound stays open"},
+    {"rule_id": "R-INEQ-SYMBOL", "method": "STATED_INEQUALITY", "pattern": "(>|<|≥|≤|>=|<=) NUM [unit]", "semantics": "lower/upper bound by symbol direction; open_bound records the canonical symbol; the opposite bound is NEVER set"},
+    {"rule_id": "R-INEQ-SUFFIX", "method": "STATED_INEQUALITY_WORD_FORM", "pattern": "NUM or more", "semantics": "lower bound, open"},
+    {"rule_id": "R-APPROX", "method": "APPROXIMATION_RETAINED", "pattern": "(~|≈|approx.|approximately|ca.|circa|about) NUM [unit]", "semantics": "POINT at the stated number with approximation_marker=true; NO range is manufactured; the approximator is preserved in the raw span"},
+    {"rule_id": "R-BETWEEN", "method": "STATED_RANGE_WORD_FORM", "pattern": "between NUM and NUM [unit]"},
+    {"rule_id": "R-INCOMPLETE-RANGE", "method": "MALFORMED_REJECTED", "reason": "MALFORMED_INCOMPLETE_RANGE", "pattern": "NUM (to|through) with no second endpoint", "semantics": "a dangling connector is never mistaken for a unit"},
+    {"rule_id": "R-RANGE-WORD", "method": "STATED_RANGE_WORD_FORM", "pattern": "NUM [unit] (to|through) NUM [unit]", "semantics": "both-endpoint units must agree; inverted endpoints (20 to 10) -> MALFORMED_INVERTED_RANGE, never silently swapped"},
+    {"rule_id": "R-RANGE-DASH", "method": "STATED_RANGE", "pattern": "NUM [en/em dash or hyphen] NUM [unit]", "semantics": "e.g. 0.1-10, 0.05-0.3 mW/cm², 10-100×; inverted -> MALFORMED_INVERTED_RANGE"},
+    {"rule_id": "R-NEG-POINT", "method": "EXACT_NUMERIC_LITERAL", "pattern": "signed single number (-5)"},
+    {"rule_id": "R-POINT", "method": "EXACT_NUMERIC_LITERAL", "pattern": "NUM [unit]", "semantics": "trailing non-numeric token is the unit (verbatim + canonical alias); trailing numeric junk -> MALFORMED_NOT_A_NUMBER"},
+    {"rule_id": "R-FALLBACK", "method": "MALFORMED_REJECTED", "reason": "MALFORMED_NOT_A_NUMBER", "semantics": "anything else that contains digits but matches no rule"}
+  ],
+  "year_context_rule_cascade": [
+    {"rule_id": "R-YEAR-EMPTY", "method": "MALFORMED_REJECTED", "reason": "MALFORMED_EMPTY"},
+    {"rule_id": "R-YEAR-NO-4-DIGITS", "method": "NO_NUMERIC_CONTENT", "semantics": "no 4-digit number and no digits -> NOT_NUMERIC; digits but no 4-digit year -> MALFORMED_NOT_A_YEAR"},
+    {"rule_id": "R-YEAR-RANGE-FROM", "method": "STATED_YEAR_RANGE", "pattern": "from YYYY to YYYY", "semantics": "inverted -> MALFORMED_INVERTED_YEAR_RANGE"},
+    {"rule_id": "R-YEAR-RANGE", "method": "STATED_YEAR_RANGE", "pattern": "YYYY [dash/hyphen] YYYY", "semantics": "inverted -> MALFORMED_INVERTED_YEAR_RANGE"},
+    {"rule_id": "R-YEAR-QUALIFIER", "method": "YEAR_WITH_QUALIFIER", "pattern": "YYYY (qualifier) | YYYY [qualifier]"},
+    {"rule_id": "R-YEAR-PREPOSITION", "method": "YEAR_WITH_PREPOSITION", "pattern": "(in|since|by|before|after|from) YYYY"},
+    {"rule_id": "R-YEAR-LITERAL", "method": "YEAR_LITERAL", "pattern": "bare YYYY in [1000, 3000]"},
+    {"rule_id": "R-YEAR-FALLBACK", "method": "MALFORMED_REJECTED", "reason": "MALFORMED_NOT_A_YEAR"}
+  ],
+  "explicit_non_goals": [
+    "No unit conversion: the parser never converts units; conversion is a separately-recorded operation so the raw span remains the single truth.",
+    "No fuzzy span matching at the binding stage: byte-exact occurrence counting only.",
+    "No thousands separators (1,000): the comma is a list separator in the TVM serialization contract; accepting it would create list/value ambiguity.",
+    "No leading-dot decimals (.5 must be written 0.5): keeps the grammar unambiguous.",
+    "No LLM anywhere in parsing, normalization, or verification."
+  ],
+  "method_registry_must_equal": [
+    "EXACT_NUMERIC_LITERAL", "UNCERTAINTY_TO_RANGE", "STATED_RANGE",
+    "STATED_RANGE_WORD_FORM", "STATED_INEQUALITY",
+    "STATED_INEQUALITY_WORD_FORM", "APPROXIMATION_RETAINED",
+    "SCIENTIFIC_NOTATION_E", "SCIENTIFIC_NOTATION_MULTIPLIER",
+    "STATED_QUALITATIVE_TERM", "NO_NUMERIC_CONTENT", "YEAR_LITERAL",
+    "YEAR_WITH_QUALIFIER", "YEAR_WITH_PREPOSITION",
+    "STATED_YEAR_RANGE", "MALFORMED_REJECTED"
+  ]
+}

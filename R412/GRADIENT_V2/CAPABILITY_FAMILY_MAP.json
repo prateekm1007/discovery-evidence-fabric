@@ -1,0 +1,54 @@
+{
+  "map_id": "TVM_V2_CAPABILITY_FAMILY_MAP",
+  "version": "1.0.0",
+  "frozen": "2026-09-06",
+  "purpose": "Operator directive Step 5: the TVM must search for a technological frontier using the underlying CAPABILITY, not merely the terminology appearing in the death record. This typed layer maps an exact recorded capability to a capability family, measurement dimension, required regime, target constraints, and a deterministic closed search vocabulary.",
+  "population_note": "The experiment's family entries must ultimately be derived from the recorded technical-death records of the R411/R412 population (limiting capability -> family). THAT POPULATION IS NOT PRESENT IN THIS WORKSPACE (see R412_GRADIENT_V1_INSTRUMENT_FINDING.json). Exactly ONE entry is seeded here, taken verbatim from the operator directive's own example, with derivation_status EXPLORATORY_HYPOTHESIS and provenance OPERATOR_DIRECTIVE_EXAMPLE. No other families are invented: inventing them would embed an unproven solution class into the search (Constitution Article XLIII). Additional entries require the recovered population or explicit operator authorization, added as a NEW frozen version of this map.",
+  "family_schema": {
+    "required_fields": ["family_id", "exact_capability", "capability_family", "measurement_dimension", "required_regime", "target_constraints", "search_vocabulary", "derivation_status", "provenance"],
+    "derivation_status_enum": ["DERIVED_FROM_EVIDENCE", "EXPLORATORY_HYPOTHESIS"],
+    "lookup_semantics": "exact key match on exact_capability or an alias only; NO fuzzy matching; a miss returns an EMPTY list (recorded, never guessed)"
+  },
+  "families": [
+    {
+      "family_id": "ACTUATION_CONTROL_PRECISION",
+      "exact_capability": "10-100x misalignment vs deflection",
+      "aliases": [
+        "misalignment vs deflection",
+        "steering misalignment control",
+        "sub-micron misalignment control"
+      ],
+      "capability_family": "actuation/control precision",
+      "measurement_dimension": "positioning error, disturbance rejection, closed-loop bandwidth",
+      "required_regime": {
+        "closed_loop": true,
+        "dynamic": true,
+        "micro_scale": true,
+        "disturbance_rejection": true
+      },
+      "target_constraints": [
+        "biocompatibility",
+        "catheter-scale form factor",
+        "long-term drift stability"
+      ],
+      "search_vocabulary": [
+        "dynamic positioning",
+        "closed-loop disturbance rejection",
+        "servo precision",
+        "fast tool servo",
+        "fast steering mirror control",
+        "galvanometer scanner control",
+        "piezoelectric nanopositioning",
+        "voice coil actuator control",
+        "atomic force microscopy position control",
+        "optical tracking and beam steering"
+      ],
+      "derivation_status": "EXPLORATORY_HYPOTHESIS",
+      "provenance": {
+        "source": "OPERATOR_DIRECTIVE_EXAMPLE",
+        "quote": "Example: '10-100x misalignment vs deflection' -> actuation/control precision -> dynamic positioning -> closed-loop disturbance rejection",
+        "note": "The exact transformation from the recorded limiting capability to a measured frontier still requires evidence; this vocabulary only widens the SEARCH, it establishes nothing by itself."
+      }
+    }
+  ]
+}
