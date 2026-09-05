@@ -1,0 +1,60 @@
+{
+ "artifact_type": "R412_TVM_V0_SNAPSHOT",
+ "tvm_version": "R412-TVM-V1",
+ "created_in": "R412",
+ "reviewer_provenance": "AI_REVIEW",
+ "entries": [],
+ "n_entries": 0,
+ "schema": {
+  "entry": {
+   "capability_rung": "str",
+   "domain": "str (application domain of the record)",
+   "metric": "str",
+   "value": "number",
+   "unit": "str",
+   "year": "int (year of the measured value)",
+   "source": {
+    "record_id": "str",
+    "citation": "str (title, <=200 chars)"
+   },
+   "provenance": {
+    "span": "str (verbatim quote)",
+    "verified_verbatim": "true (gate-admitted only)"
+   },
+   "confidence": "SPAN_VERIFIED"
+  },
+  "hard_rule": "NO LLM-asserted numbers: every value enters only through a span-verified proposal against a retrieved record (the R411 F4a instrument pattern); rejected spans count as nothing"
+ },
+ "construction_protocol": [
+  "rungs are named by verified GA-1b extractions (and the frozen seed expectations below); the map grows per campaign as death records name new rungs \u2014 no fixed industry list (Art. XLIII/LXIX)",
+  "per rung: one fabric retrieval for performance-trend records (pre-registered lane caps)",
+  "an untrusted LLM (SEPARATE_CONTEXT_ONLY, never labelled independent) proposes entries with EXACT QUOTED SPANS",
+  "the deterministic verbatim-containment gate verifies each span against the retrieved pool; rejected entries are recorded, never repaired",
+  "measured slopes require >= 2 admitted entries from the SAME domain with the SAME metric+unit at different years \u2014 movement must be measured, not asserted",
+  "frontier ranking is per rung from measured slopes only (steepest first: a SEARCH-ORDER policy, never a hard-coded belief about industries)",
+  "after construction: the map is SNAPSHOTTED + HASHED + COMMITTED before the first GA-4 backcast call; no after-the-fact entry edits (Art. XLIV)"
+ ],
+ "seed_rung_expectations": [
+  {
+   "expected_rung_for": "C-batteries_ev-1~3",
+   "deficit_class": "measurement",
+   "named_deficit": "differential measurement separating acoustic-streaming-driven convection from geometric/ballast thermal uniformity in a packed battery module"
+  },
+  {
+   "expected_rung_for": "C-chemical_process-1~3",
+   "deficit_class": "control_computation",
+   "named_deficit": "control-oriented dynamic modeling of the process loop (controller dynamics coupled to the reaction/transport model so the claimed reduction becomes falsifiable)"
+  },
+  {
+   "expected_rung_for": "C-power_electronics-1",
+   "deficit_class": "device_technology_parameter",
+   "named_deficit": "device switching energy (Esw) at light load \u2014 a device-technology parameter whose enabling trajectory (SiC/GaN wide-bandgap switching-energy trend) is concrete and measured in the literature"
+  },
+  {
+   "expected_rung_for": "C-wind-2",
+   "deficit_class": "actuation_control",
+   "named_deficit": "maintaining micron-scale alignment under mm-scale operational deflection loads (active alignment actuation/control at the required bandwidth)"
+  }
+ ],
+ "freeze_rule": "this v0 snapshot (schema + protocol + empty entries) is hashed and committed BEFORE the first gradient model call; the CONSTRUCTED map gets its own snapshot + sha256 + commit before its first use (GA-4)"
+}
