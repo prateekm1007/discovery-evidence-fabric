@@ -1137,3 +1137,15 @@ Work Log:
 Stage Summary:
 - The R412 temporal channel measurement is CLOSED: 0/13. The single-engine 30Y process, under the sealed promotion chain, rediscovered zero present-capability descendants from the R411 rejection corpus — the evolutions either require future capabilities (9/13) or claim present capabilities the evidence cannot demonstrate (4/13).
 - Open items: (a) benchmark phase-4 suite root-cause (pre-existing, disclosed); (b) R412 Phase 1-9 worklog backfill (commit messages are the authoritative per-phase records meanwhile); (c) the owner's three-engine directive (frontier-to-laggard transfer + capability backcasting + technology-velocity map + LIRY) — to be preregistered as a SEPARATELY SEALED gradient arm against the same corpus (Art. LIX: the sealed 30Y artifact is never retro-edited; its 0/13 stands as the temporal control arm).
+
+---
+Task ID: R412-GRADIENT-ARM-DESIGN (2026-09-06, same session)
+Agent: Coder (main agent)
+Task: commit the owner's three-engine gradient-arm design directive (pre-seal design document).
+
+Work Log:
+- Wrote R412/R412_GRADIENT_ARM_THREE_ENGINE_DESIGN_DIRECTIVE.md: the constraint-driven gradient pipeline (GA-1..GA-9, cheapest-kill-first), gradient eligibility drafted on the capability-deficit axis, the evidence-native TVM (span-verified entries; no LLM-asserted numbers; v0 scoped to the corpus's actual capability rungs), the phantom-arbitrage guard (absence must be evidenced), LIRY with dual denominators + per-channel reporting, and the sequencing prerequisites (separate seal before the first gradient model call).
+- Explicitly marked PRE-SEAL DESIGN (not a preregistration; no gradient model call is authorized by this document alone).
+
+Stage Summary:
+- The three-engine upgrade has its durable in-repo design record; the next session builds the machinery + tests + sealed preregistration from it.
