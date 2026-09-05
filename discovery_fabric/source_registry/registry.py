@@ -436,6 +436,136 @@ _register(_src(
     auth_requires=[],
 ))
 
+# ---------------------------------------------------------------------------
+# OPEN DISCOVERY / OA / REPOSITORIES / THESES  (R409 retrieval-fabric round:
+# measured live 2026-09-05 from this egress — see connectors/open_discovery.py)
+# ---------------------------------------------------------------------------
+
+_register(_src(
+    source_id="doaj",
+    name="Directory of Open Access Journals (DOAJ article search)",
+    authority_role=["SCIENTIFIC"],
+    coverage="Open-access journal articles from journals admitted to DOAJ "
+             "(peer-reviewed OA, no-APC condition at admission); journal and "
+             "article metadata with full-text links; OAI-PMH available.",
+    access_method="REST JSON, no key; GET https://doaj.org/api/v2/search/"
+                  "articles/{query}; OAI-PMH at https://doaj.org/oai.article",
+    update_frequency="Continuous (journal/article applications)",
+    rate_limits="Polite use; no published hard limit measured",
+    licensing="Open metadata (CC-BY-SA for DOAJ metadata; article metadata "
+              "as submitted)",
+    primary_or_secondary="PRIMARY",
+    freshness="Continuous",
+    known_gaps="Only DOAJ-admitted journals — absence is not absence of the "
+               "science (Art. XXV); article metadata as journal-declared.",
+    provenance_method="Query + DOAJ article id + raw payload sha256 into "
+                      "retrieval log",
+    connector="discovery_fabric.source_registry.connectors.open_discovery:DoajConnector",
+    auth_requires=[],
+))
+
+_register(_src(
+    source_id="unpaywall",
+    name="Unpaywall (OA full-text location resolution per DOI)",
+    authority_role=["SCIENTIFIC"],
+    coverage="For a known DOI: legally-open full-text locations (repository, "
+             "publisher page, hybrid), OA status and license. A RESOLUTION "
+             "service, not a discovery index.",
+    access_method="REST JSON, no key (contact email required); GET "
+                  "https://api.unpaywall.org/v2/{doi}?email=",
+    update_frequency="Continuous",
+    rate_limits="Polite; 100k calls/day documented for contact-email users",
+    licensing="Open data (Unpaywall/OurResearch terms; underlying links from "
+              "Crossref + repository + publisher pages)",
+    primary_or_secondary="SECONDARY",
+    freshness="Continuous",
+    known_gaps="Metadata upstream derives from Crossref; a DOI absent from "
+               "Unpaywall means Unpaywall has no OA-location record for it "
+               "(404 -> EMPTY), never that the work does not exist.",
+    provenance_method="Queried DOI + best_oa_location + raw payload sha256 "
+                      "into retrieval log",
+    connector="discovery_fabric.source_registry.connectors.open_discovery:UnpaywallConnector",
+    auth_requires=["UNPAYWALL_EMAIL (placeholder used when not provisioned)"],
+))
+
+_register(_src(
+    source_id="datacite",
+    name="DataCite DOI registry (repositories, datasets, theses)",
+    authority_role=["SCIENTIFIC"],
+    coverage="DOIs registered by data centres and institutional/subject "
+             "repositories: Zenodo, institutional repositories, datasets, "
+             "and dissertations (resourceTypeGeneral=Dissertation). "
+             "Materially different registrant population from Crossref's "
+             "publisher DOIs.",
+    access_method="REST JSON, no key; GET https://api.datacite.org/dois",
+    update_frequency="Continuous (registrant deposits)",
+    rate_limits="Polite use; no published hard limit measured",
+    licensing="Open metadata (DataCite terms; CC0 for many records)",
+    primary_or_secondary="PRIMARY",
+    freshness="Continuous",
+    known_gaps="Only DataCite-registered DOIs — publisher-registered "
+               "literature is Crossref's space; repository-declared types "
+               "are unverified (Art. XXV).",
+    provenance_method="Query + DOI + resourceTypeGeneral + raw payload "
+                      "sha256 into retrieval log",
+    connector="discovery_fabric.source_registry.connectors.open_discovery:DataciteConnector",
+    auth_requires=[],
+))
+
+_register(_src(
+    source_id="openaire",
+    name="OpenAIRE (research repository aggregator)",
+    authority_role=["SCIENTIFIC"],
+    coverage="Aggregated institutional/subject repository records across "
+             "Europe and beyond: publications, theses (instance-level "
+             "instancetype), preprints, with hosting datasource and "
+             "refereed status per instance.",
+    access_method="REST JSON, no key; GET "
+                  "https://api.openaire.eu/search/publications?keywords=",
+    update_frequency="Continuous (aggregation cycles)",
+    rate_limits="Polite use; 2 req/s documented for the search API",
+    licensing="Open metadata (OpenAIRE terms; per-repository licenses vary)",
+    primary_or_secondary="SECONDARY",
+    freshness="Continuous",
+    known_gaps="Aggregated metadata quality varies by repository; API "
+               "exposes NO server-side type filter (measured 2026-09-05: "
+               "publicationtype/documenttype/instance.type -> HTTP 400), so "
+               "document types are labeled post-hoc from instancetype.",
+    provenance_method="Query + objIdentifier + instancetype + raw payload "
+                      "sha256 into retrieval log",
+    connector="discovery_fabric.source_registry.connectors.open_discovery:OpenaireConnector",
+    auth_requires=[],
+))
+
+_register(_src(
+    source_id="core",
+    name="CORE (repository aggregator, independent harvest)",
+    authority_role=["SCIENTIFIC"],
+    coverage="Open-access research outputs harvested directly from "
+             "repositories and journals: metadata, abstracts, full-text "
+             "links; independent harvest from OpenAIRE's aggregation.",
+    access_method="REST JSON, anonymous access measured working; GET "
+                  "https://api.core.ac.uk/v3/search/works (CORE_API_KEY "
+                  "header upgrades the tier when provisioned)",
+    update_frequency="Continuous (harvest cycles)",
+    rate_limits="Anonymous tier measured live 2026-09-05; per-query quotas "
+                "may rate-limit without notice — every 429 is recorded "
+                "honestly as RATE_LIMITED (Art. XXI.3)",
+    licensing="Open metadata (CORE terms; content licenses vary by "
+              "repository)",
+    primary_or_secondary="SECONDARY",
+    freshness="Continuous",
+    known_gaps="Relevance ranking for long natural-language queries is weak "
+               "(measured: a 7-word mechanism query matched 9.7M works) — "
+               "the fabric sends SHORT keyword-form queries only; "
+               "document_type is repository-declared and unverified.",
+    provenance_method="Query + CORE work id + raw payload sha256 into "
+                      "retrieval log",
+    connector="discovery_fabric.source_registry.connectors.open_discovery:CoreConnector",
+    auth_requires=["CORE_API_KEY (optional; anonymous tier measured working)"],
+))
+
+
 _register(_src(
     source_id="elsevier_scopus",
     name="Elsevier Scopus (Scopus Search API)",
@@ -1622,3 +1752,52 @@ def validate_registry() -> List[str]:
         if rec["health_status"] == "LIVE" and not rec["connector"]:
             violations.append(f"{sid}: LIVE without connector")
     return violations
+
+# R409 retrieval-fabric round: investigated sources measured BLOCKED from
+# this egress (2026-09-05). Recorded honestly with NO_CONNECTOR (Art.
+# XXV/Art. XXI.3): a blocked source is a recorded gap, never silent
+# omission, and never counted as integrated.
+
+_register(_src(
+    source_id="zenodo",
+    name="Zenodo (open research repository, CERN)",
+    authority_role=["SCIENTIFIC"],
+    coverage="Open repository for research data, reports, preprints and "
+             "EU outputs; records also discoverable via DataCite DOIs.",
+    access_method="REST JSON, no key; GET https://zenodo.org/api/records",
+    update_frequency="Continuous",
+    rate_limits="n/a",
+    licensing="Open repository (per-record licenses)",
+    primary_or_secondary="PRIMARY",
+    freshness="Continuous",
+    known_gaps="MEASURED 2026-09-05 from this egress: HTTP 403 network-side "
+               "block (3 attempts, all 403) — the fabric records this state "
+               "honestly; Zenodo-deposited DOIs remain discoverable through "
+               "the datacite registrant lane.",
+    provenance_method="Query + record id + raw payload sha256 into retrieval "
+                      "log (when a connector is ever wired)",
+    connector=NO_CONNECTOR,
+    auth_requires=[],
+))
+
+_register(_src(
+    source_id="ndltd",
+    name="NDLTD Global ETD Search (theses/dissertations)",
+    authority_role=["SCIENTIFIC"],
+    coverage="Global electronic theses and dissertations aggregation.",
+    access_method="REST; http://search.ndltd.org/api/search",
+    update_frequency="Unknown",
+    rate_limits="Unknown",
+    licensing="Per-institution",
+    primary_or_secondary="SECONDARY",
+    freshness="Unknown",
+    known_gaps="MEASURED 2026-09-05 from this egress: HTTP 503 service "
+               "unavailable (2 attempts) — recorded honestly; thesis "
+               "coverage is served by the datacite/openaire/core/crossref "
+               "lanes in the retrieval fabric.",
+    provenance_method="Query + record id + raw payload sha256 into retrieval "
+                      "log (when a connector is ever wired)",
+    connector=NO_CONNECTOR,
+    auth_requires=[],
+))
+

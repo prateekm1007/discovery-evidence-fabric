@@ -1,0 +1,80 @@
+{
+  "benchmark_id": "RETRIEVAL_FABRIC_BENCHMARK_V1",
+  "frozen_at": "2026-09-05",
+  "frozen_rule": "Art. LIX discipline: this corpus is frozen BEFORE any V1-vs-V2 comparison run. Queries are MECHANISM-level strings derived from problem facts (device + failure mode) — never title fragments, author names, DOIs or patent numbers of the targets. Ground-truth targets are documents the repository ALREADY knows are relevant from RECORDED history (R406 P13 novelty search: LEAD_PORTFOLIO_4/P13/NOVELTY_SEARCH_R406; P04/P11 claim maps). No target identifier appears in any query. No tuning against this corpus is permitted after freeze.",
+  "v1_definition": "RETRIEVAL_FABRIC_V1 = discovery_fabric/a2/retrieve.py::retrieve (Europe PMC primary + OpenAlex lane, cross-source dedup, top-5 evidence pool with abstract>=200 filter on the OpenAlex lane) — the exact legacy code path, byte-unchanged.",
+  "v2_definition": "RETRIEVAL_FABRIC_V2 = discovery_fabric/retrieval_fabric::retrieve (multi-source open/free fabric: Europe PMC + OpenAlex as two nodes among scholarly graphs, DOI registrants, OA journal registry, repository aggregators, thesis lane, preprints, patents; canonical dedup with preserved provenance; lineage attribution; publication-status labeling; per-lane ranking).",
+  "problems": [
+    {
+      "problem_id": "BENCH-P13-DUAL-DIE-DRIFT",
+      "problem": {
+        "device": "implantable dual matched pressure sensor",
+        "failure_mode": "SENSOR_DRIFT",
+        "constraint": "long-term in vivo accuracy without recalibration"
+      },
+      "why": "The P13 lesson: the decisive prior art was a 2018 DISSERTATION (Seaver, dual matched-die, common-mode drift subtraction) plus 1982-2023 PATENTS (dummy-element bridge). The V1 pipeline (Europe PMC + OpenAlex, journal-abstract evidence pool) structurally cannot surface either document class.",
+      "targets": [
+        {"target_id": "T1-SEAVER-DISSERTATION", "kind": "THESIS", "match_doi": "10.13140/rg.2.2.32705.61282", "match_title_contains": ["implantable low pressure", "dual biopressure sensor"], "expected_document_class": "THESIS", "provenance": "R406 PA-1: Seaver 2018, University of Tennessee, trace.tennessee.edu"},
+        {"target_id": "T2-US4320664", "kind": "PATENT", "match_patent_number_prefix": "US4320664", "expected_document_class": "PATENT", "provenance": "R406 PA-2: thermally compensated silicon pressure sensor (dummy-element bridge, 1982)"},
+        {"target_id": "T3-WO2014076620", "kind": "PATENT", "match_patent_number_prefix": "WO2014076620", "expected_document_class": "PATENT", "provenance": "R406 PA-3: drift compensation for implanted capacitance-based pressure sensors"},
+        {"target_id": "T4-US11701504", "kind": "PATENT", "match_patent_number_prefix": "US11701504", "expected_document_class": "PATENT", "provenance": "R406 PA-4: shunt-mounted ICP sensing"},
+        {"target_id": "T5-US11422051", "kind": "PATENT", "match_patent_number_prefix": "US11422051", "expected_document_class": "PATENT", "provenance": "R406 PA-5: sealed-cavity reference"}
+      ],
+      "adversarial_properties": ["dissertation_exists", "patent_exists", "patent_claim_relevant_title_irrelevant (T2 title is 'Thermally compensated silicon pressure sensor' — the query never says 'thermally compensated')", "terminology_differs_radically (query says 'dual matched sensor'; the art says 'dummy element', 'matched dies', 'biopressure')"]
+    },
+    {
+      "problem_id": "BENCH-P04-ENZYME-COATING",
+      "problem": {
+        "device": "enzyme coated catheter",
+        "failure_mode": "BIOFILM_FORMATION",
+        "constraint": "catalytic clearance of biofilm on indwelling surfaces"
+      },
+      "why": "Biomedical-domain control: V1 (Europe PMC + OpenAlex) SHOULD be strong here. Measures false-positive/noise expansion — if V2 adds noise without adding recall in a domain where V1 is strong, that is the honest cost of the fabric, reported not hidden.",
+      "targets": [],
+      "adversarial_properties": ["v1_strong_domain (noise-expansion measurement)"]
+    },
+    {
+      "problem_id": "BENCH-P08-TRANSCUTANEOUS-POWER",
+      "problem": {
+        "device": "ultrasonic transcutaneous energy receiver",
+        "failure_mode": "INSUFFICIENT_POWER",
+        "constraint": "sub-milliwatt delivered power for an implantable shunt sensor"
+      },
+      "why": "Engineering-domain case: Europe PMC coverage is thin for ultrasonic power transfer engineering; cross-domain sources (patents, repositories, DOAJ engineering journals) materially change the search space. Measures cross-domain coverage expansion.",
+      "targets": [],
+      "adversarial_properties": ["engineering_domain_where_v1_is_weak"]
+    },
+    {
+      "problem_id": "BENCH-P11-PRESSURE-VALVE",
+      "problem": {
+        "device": "implantable pressure regulated valve",
+        "failure_mode": "OBSTRUCTION",
+        "constraint": "proportional flow modulation under upstream pressure"
+      },
+      "why": "Mixed biomedical + patent-dense domain: both document classes matter for prior-art collision. The R405-recorded P11 claim map (US20250242099A1, vascular servovalve) is a known-relevant patent family.",
+      "targets": [
+        {"target_id": "T6-US20250242099", "kind": "PATENT", "match_patent_number_prefix": "US20250242099", "expected_document_class": "PATENT", "provenance": "R405 P11 claim map: US20250242099A1 (servovalve-class art for implantable pressure-regulated flow)"}
+      ],
+      "adversarial_properties": ["patent_exists", "mixed_biomedical_patent_domain"]
+    }
+  ],
+  "noise_measurement": {
+    "instrument": "discovery_fabric.source_registry.query_relevance.adjudicate_record (the discovery pipeline's own per-record relevance adjudicator; >= 2 content-term overlap with the primary query)",
+    "rule": "A record in an evidence pool is NOISE when it fails adjudication against the problem's primary query. FP rate = noise / pool size, per fabric version. Both recall expansion AND FP-rate change are reported (acceptance criterion 13).",
+    "class": "ENGINEERING threshold per the query_relevance instrument's declared bands (Art. XXVII: declared, not invented)"
+  },
+  "acceptance_criteria": {
+    "six_families": ">= 6 materially different open/free source families queried successfully on the benchmark",
+    "document_classes": "Literature, patents, preprints, theses represented as distinct document classes",
+    "failures_surfaced": "Source failures and rate limits explicitly surfaced per run",
+    "canonicalization": "Duplicate records canonicalized without destroying source provenance",
+    "lineage": "Source lineage distinguishes genuine diversity from multiple indexes of the same record",
+    "v2_unique": "V2 retrieves relevant records absent from the V1 pipeline's evidence pool",
+    "non_journal": "At least one benchmark demonstrates discovery of a relevant non-journal source the old pipeline misses (the thesis + patent targets)",
+    "genuine_expansion": "Query expansion produces genuinely different retrieval terms (pinned by hermetic test)",
+    "replayable": "Retrieval replayable from a clean checkout (script + committed corpus + committed registry)",
+    "no_rewrite": "No existing evidence, historical record, or frozen artifact rewritten",
+    "fp_reported": "Both recall expansion and false-positive/noise expansion reported",
+    "auditor_provenance": "Machine-readable provenance sufficient for an independent auditor to reconstruct the discovery event"
+  }
+}

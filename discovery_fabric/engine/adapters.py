@@ -198,22 +198,85 @@ class BaseAdapter:
 
 
 class A2RetrievalAdapter(BaseAdapter):
-    """Canonical: discovery_fabric/a2/retrieve.py::retrieve (ACTIVE)."""
+    """Canonical: discovery_fabric/a2/retrieve.py::retrieve (V1) /
+    discovery_fabric/retrieval_fabric (V2 — R409 fabric, DEFAULT).
+
+    R409 retrieval-fabric directive: the engine's retrieval universe was
+    Europe PMC + OpenAlex (V1, preserved byte-unchanged for historical
+    reproduction; its recorded corpus immutable). V2 is the multi-source
+    open/free fabric: Europe PMC and OpenAlex become two nodes among
+    materially different source families (scholarly graphs, DOI
+    registrants, OA journal registry, repository aggregators, theses,
+    preprints, patents), with canonical dedup, lineage attribution,
+    publication-status labeling, per-run health states and diversity
+    measurement. Dispatch is controlled by ENGINE_RETRIEVAL_FABRIC
+    (default V2; 'V1' reproduces the legacy two-source pipeline).
+
+    Output contract is UNCHANGED for downstream stages: evidence items
+    carry the a2 schema; V2 items add fabric fields (publication_status,
+    evidence_lane, canonical_id, ...) additively.
+    """
     capability_id = "A2_RETRIEVAL"
-    module_path = "discovery_fabric/a2/retrieve.py"
-    canonical_fn = "retrieve(problem)"
+    module_path = "discovery_fabric/retrieval_fabric/pipeline.py"
+    canonical_fn = "retrieve_fabric(problem) [V2] / retrieve(problem) [V1]"
     needs_network = True
 
     input_contract = {"problem": "problem dict (device/failure/constraint/...)"}
     output_contract = "envelope.evidence = list of evidence dicts (content_hashed)"
 
     def execute(self, env, run_ctx):
-        mod = _import_with_env("discovery_fabric.a2.retrieve")
-        items = mod.retrieve(env.problem) or []
+        import os as _os
+        fabric_version = (_os.environ.get("ENGINE_RETRIEVAL_FABRIC",
+                                          "V2").strip().upper() or "V2")
+        if fabric_version == "V1":
+            mod = _import_with_env("discovery_fabric.a2.retrieve")
+            items = mod.retrieve(env.problem) or []
+            lanes = getattr(mod, "RETRIEVAL_LANES", {}) or {}
+            return _engine_result(
+                {"evidence": items,
+                 "evidence_ids": [i.get("id", "") for i in items],
+                 "provenance": {**env.provenance,
+                                "retrieval_fabric": {
+                                    "version": "V1",
+                                    "sources": ["europepmc", "openalex"],
+                                    "lane_states": lanes}}},
+                retrieved_count=len(items),
+                retrieval_fabric_version="V1")
+        # V2 (default): the multi-source fabric
+        fabric = _import_with_env("discovery_fabric.retrieval_fabric")
+        items, report = fabric.retrieve(env.problem)
+        stats = report.get("retrieval_stats", {})
+        diversity = report.get("retrieval_diversity", {})
         return _engine_result(
             {"evidence": items,
-             "evidence_ids": [i.get("id", "") for i in items]},
-            retrieved_count=len(items))
+             "evidence_ids": [i.get("id", "") for i in items],
+             "provenance": {**env.provenance,
+                            "retrieval_fabric": {
+                                "version": report.get("fabric_version"),
+                                "primary_query": report.get("primary_query"),
+                                "query_variant_count": len(
+                                    report.get("query_variants", [])),
+                                "sources_attempted": stats.get(
+                                    "sources_attempted", []),
+                                "sources_succeeded": stats.get(
+                                    "sources_succeeded", []),
+                                "sources_failed": stats.get(
+                                    "sources_failed", []),
+                                "sources_rate_limited": stats.get(
+                                    "sources_rate_limited", []),
+                                "unique_source_families": diversity.get(
+                                    "unique_source_families", []),
+                                "independent_source_families": diversity.get(
+                                    "independent_source_families"),
+                                "source_independence_score": diversity.get(
+                                    "source_independence_score"),
+                                "retrieval_blind_spots": report.get(
+                                    "retrieval_blind_spots", []),
+                                "canonical_record_count": report.get(
+                                    "canonical_record_count"),
+                            }}},
+            retrieved_count=len(items),
+            retrieval_fabric_version="V2")
 
 
 class EvidenceFreezeAdapter(BaseAdapter):

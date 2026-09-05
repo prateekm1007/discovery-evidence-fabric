@@ -1,0 +1,629 @@
+{
+  "fabric_version": "2",
+  "fabric_name": "RETRIEVAL_FABRIC_V2",
+  "version_note": "Multi-source open/free retrieval fabric (R409). V1 = Europe PMC + OpenAlex (a2/retrieve.py, byte-unchanged, historical corpus immutable). V2 treats Europe PMC + OpenAlex as two nodes among materially different open source families. The 13 CEO-directive provider-policy fields live in discovery_fabric/source_registry/registry.py (the single authority for provider policy, Art. X); this file is the authority for FABRIC fields (families, lanes, lineage, coverage classes) and is validated by tests to cross-reference registered source_ids.",
+  "independence_model": {
+    "rule": "A family is an independence cluster. Two families are CORRELATED for a run when (a) they declare a shared metadata upstream in derives_from AND (b) the run measured actual canonical-record overlap between them. Correlated families merge into one independent cluster (union-find). Independence is measured, never assumed (Art. XXI.7).",
+    "families": {
+      "biomedical_pubmed_line": "PubMed/PMC-centered biomedical literature (Europe PMC's own fulltext+metadata universe)",
+      "scholarly_index_openalex": "OpenAlex scholarly index (own citation graph; metadata harvested from Crossref/PubMed/MAG)",
+      "scholarly_graph_s2": "Semantic Scholar academic graph (own citation graph + recommendations; metadata harvested from Crossref/PubMed/arXiv/MAG)",
+      "doi_registrant_crossref": "Crossref DOI registration agency (publisher-deposited records - ORIGIN for a large share of scholarly metadata)",
+      "doi_registrant_datacite": "DataCite DOI registration agency (repository/datacentre-deposited records - theses, datasets, Zenodo, institutional repositories)",
+      "oa_journal_registry": "DOAJ (journal/article applications submitted directly by journals - own admission pipeline)",
+      "oa_location_service": "Unpaywall (own measurement of legally-open full-text locations for known DOIs)",
+      "repository_aggregator_openaire": "OpenAIRE aggregation of institutional/subject repositories",
+      "repository_aggregator_core": "CORE aggregation (independent harvest of repositories)",
+      "preprint_origin": "arXiv preprint server (origin server for preprints)",
+      "patent_index_google": "Google Patents index (patent universe: EPO/USPTO/WIPO bulk data - disjoint from the scholarly bibliographic universe)",
+      "patent_office_epo": "EPO Open Patent Services (origin patent office)"
+    },
+    "note": "The same underlying record discovered via Crossref, OpenAlex and Semantic Scholar counts as ONE record with THREE indexing sources - never three independent discoveries (Art. XXI.7: 'independent universes' means different primary sources, not different queries to overlapping databases)."
+  },
+  "evidence_lanes": [
+    "SCHOLARLY",
+    "PREPRINT",
+    "THESIS",
+    "TECHNICAL_REPORT",
+    "PATENT",
+    "DATASET",
+    "REPOSITORY",
+    "OA_LOCATION"
+  ],
+  "publication_status_vocabulary": [
+    "PEER_REVIEWED",
+    "PREPRINT",
+    "THESIS",
+    "CONFERENCE",
+    "REPORT",
+    "DATASET",
+    "UNKNOWN"
+  ],
+  "sources": [
+    {
+      "source_id": "europepmc",
+      "source_name": "Europe PMC",
+      "source_type": "DISCOVERY_INDEX",
+      "source_family": "biomedical_pubmed_line",
+      "evidence_lanes": [
+        "SCHOLARLY",
+        "PREPRINT"
+      ],
+      "fabric_versions": [
+        "V1",
+        "V2"
+      ],
+      "access_method": "REST",
+      "api_endpoint": "https://www.ebi.ac.uk/europepmc/webservices/rest/search",
+      "authentication_required": false,
+      "free_access": true,
+      "open_metadata": true,
+      "full_text_available": true,
+      "patent_coverage": false,
+      "preprint_coverage": true,
+      "thesis_dissertation_coverage": false,
+      "conference_coverage": false,
+      "technical_report_coverage": false,
+      "citation_graph": true,
+      "date_coverage": "1900-present (biomedical)",
+      "discipline_coverage": "biomedical/life sciences",
+      "rate_limit": "polite use",
+      "license": "CC-BY (most metadata)",
+      "provenance_requirements": "query + record id + raw payload sha256 in retrieval log",
+      "health_status": "NOT_MEASURED",
+      "last_successful_query": null,
+      "derives_from": [
+        "pubmed",
+        "pmc",
+        "preprint_servers"
+      ],
+      "query_grammar": "KEYWORD_FORM",
+      "role": "DISCOVERY",
+      "labeling_hints": {
+        "publication_status": "PEER_REVIEWED default; PREPRINT when pubType contains preprint"
+      }
+    },
+    {
+      "source_id": "openalex",
+      "source_name": "OpenAlex",
+      "source_type": "DISCOVERY_INDEX",
+      "source_family": "scholarly_index_openalex",
+      "evidence_lanes": [
+        "SCHOLARLY",
+        "THESIS",
+        "PREPRINT",
+        "DATASET",
+        "TECHNICAL_REPORT"
+      ],
+      "fabric_versions": [
+        "V1",
+        "V2"
+      ],
+      "access_method": "REST",
+      "api_endpoint": "https://api.openalex.org/works",
+      "authentication_required": false,
+      "free_access": true,
+      "open_metadata": true,
+      "full_text_available": false,
+      "patent_coverage": false,
+      "preprint_coverage": true,
+      "thesis_dissertation_coverage": true,
+      "conference_coverage": true,
+      "technical_report_coverage": true,
+      "citation_graph": true,
+      "date_coverage": "1900-present",
+      "discipline_coverage": "all scholarly domains (MAG descendant)",
+      "rate_limit": "credit budget model (429 measured when budget exhausted)",
+      "license": "CC0",
+      "provenance_requirements": "query + work id + raw payload sha256 in retrieval log",
+      "health_status": "NOT_MEASURED",
+      "last_successful_query": null,
+      "derives_from": [
+        "crossref",
+        "pubmed",
+        "mag_historical"
+      ],
+      "query_grammar": "KEYWORD_FORM",
+      "role": "DISCOVERY",
+      "labeling_hints": {
+        "publication_status": "by work type: dissertation->THESIS, preprint->PREPRINT, dataset->DATASET, report->TECHNICAL_REPORT"
+      }
+    },
+    {
+      "source_id": "semantic_scholar",
+      "source_name": "Semantic Scholar",
+      "source_type": "DISCOVERY_INDEX",
+      "source_family": "scholarly_graph_s2",
+      "evidence_lanes": [
+        "SCHOLARLY",
+        "PREPRINT"
+      ],
+      "fabric_versions": [
+        "V2"
+      ],
+      "access_method": "REST",
+      "api_endpoint": "https://api.semanticscholar.org/graph/v1/paper/search",
+      "authentication_required": false,
+      "free_access": true,
+      "open_metadata": true,
+      "full_text_available": false,
+      "patent_coverage": false,
+      "preprint_coverage": true,
+      "thesis_dissertation_coverage": false,
+      "conference_coverage": true,
+      "technical_report_coverage": false,
+      "citation_graph": true,
+      "date_coverage": "1900-present",
+      "discipline_coverage": "CS-heavy scholarly graph with biomedical coverage",
+      "rate_limit": "unauthenticated shared pool (429 measured live 2026-09-05)",
+      "license": "S2 terms (open metadata)",
+      "provenance_requirements": "query + paper id + raw payload sha256 in retrieval log",
+      "health_status": "NOT_MEASURED",
+      "last_successful_query": null,
+      "derives_from": [
+        "crossref",
+        "pubmed",
+        "arxiv",
+        "mag_historical"
+      ],
+      "query_grammar": "KEYWORD_FORM",
+      "role": "DISCOVERY_AND_RECIPROCAL",
+      "reciprocal_endpoints": [
+        "citations",
+        "references",
+        "recommendations",
+        "author_search"
+      ],
+      "labeling_hints": {
+        "publication_status": "by publicationTypes: Review/JournalArticle->PEER_REVIEWED, Conference->CONFERENCE, arXiv id->PREPRINT"
+      }
+    },
+    {
+      "source_id": "crossref",
+      "source_name": "Crossref",
+      "source_type": "REGISTRY",
+      "source_family": "doi_registrant_crossref",
+      "evidence_lanes": [
+        "SCHOLARLY",
+        "THESIS",
+        "PREPRINT",
+        "DATASET",
+        "TECHNICAL_REPORT"
+      ],
+      "fabric_versions": [
+        "V2"
+      ],
+      "access_method": "REST",
+      "api_endpoint": "https://api.crossref.org/works",
+      "authentication_required": false,
+      "free_access": true,
+      "open_metadata": true,
+      "full_text_available": false,
+      "patent_coverage": false,
+      "preprint_coverage": true,
+      "thesis_dissertation_coverage": true,
+      "conference_coverage": true,
+      "technical_report_coverage": true,
+      "citation_graph": true,
+      "date_coverage": "1900-present (publisher deposits)",
+      "discipline_coverage": "all domains with publisher DOI deposit",
+      "rate_limit": "polite pool with mailto",
+      "license": "Crossref open metadata terms",
+      "provenance_requirements": "query + DOI + raw payload sha256 in retrieval log",
+      "health_status": "NOT_MEASURED",
+      "last_successful_query": null,
+      "derives_from": [],
+      "query_grammar": "KEYWORD_FORM",
+      "role": "DISCOVERY_AND_RECONCILIATION",
+      "labeling_hints": {
+        "publication_status": "by type: journal-article->PEER_REVIEWED, dissertation->THESIS, posted-content->PREPRINT, proceedings-article->CONFERENCE, dataset->DATASET, report*->REPORT"
+      },
+      "scoping": "thesis-lane queries add filter=type:dissertation (measured live: server-side type filter works)"
+    },
+    {
+      "source_id": "doaj",
+      "source_name": "Directory of Open Access Journals",
+      "source_type": "DISCOVERY_INDEX",
+      "source_family": "oa_journal_registry",
+      "evidence_lanes": [
+        "SCHOLARLY"
+      ],
+      "fabric_versions": [
+        "V2"
+      ],
+      "access_method": "REST + OAI-PMH",
+      "api_endpoint": "https://doaj.org/api/v2/search/articles/{query}",
+      "authentication_required": false,
+      "free_access": true,
+      "open_metadata": true,
+      "full_text_available": true,
+      "patent_coverage": false,
+      "preprint_coverage": false,
+      "thesis_dissertation_coverage": false,
+      "conference_coverage": false,
+      "technical_report_coverage": false,
+      "citation_graph": false,
+      "date_coverage": "journal-applications to present",
+      "discipline_coverage": "all disciplines with admitted OA journals",
+      "rate_limit": "polite use (no key; OAI-PMH without login)",
+      "license": "CC-BY-SA metadata",
+      "provenance_requirements": "query + DOAJ article id + raw payload sha256 in retrieval log",
+      "health_status": "NOT_MEASURED",
+      "last_successful_query": null,
+      "derives_from": [],
+      "query_grammar": "KEYWORD_FORM",
+      "role": "DISCOVERY",
+      "labeling_hints": {
+        "publication_status": "PEER_REVIEWED (DOAJ admission requires peer review)"
+      }
+    },
+    {
+      "source_id": "unpaywall",
+      "source_name": "Unpaywall",
+      "source_type": "RESOLUTION",
+      "source_family": "oa_location_service",
+      "evidence_lanes": [
+        "OA_LOCATION"
+      ],
+      "fabric_versions": [
+        "V2"
+      ],
+      "access_method": "REST",
+      "api_endpoint": "https://api.unpaywall.org/v2/{doi}",
+      "authentication_required": false,
+      "free_access": true,
+      "open_metadata": true,
+      "full_text_available": true,
+      "patent_coverage": false,
+      "preprint_coverage": false,
+      "thesis_dissertation_coverage": false,
+      "conference_coverage": false,
+      "technical_report_coverage": false,
+      "citation_graph": false,
+      "date_coverage": "n/a (per-DOI resolution)",
+      "discipline_coverage": "all Crossref-registered DOIs",
+      "rate_limit": "100k/day with contact email",
+      "license": "Unpaywall open data terms",
+      "provenance_requirements": "queried DOI + best_oa_location + raw payload sha256 in retrieval log",
+      "health_status": "NOT_MEASURED",
+      "last_successful_query": null,
+      "derives_from": [
+        "crossref"
+      ],
+      "query_grammar": "DOI_ONLY",
+      "role": "FULLTEXT_RESOLUTION",
+      "labeling_hints": {
+        "note": "resolves DOIs discovered by ANY lane to legally-open full text; never a discovery index"
+      }
+    },
+    {
+      "source_id": "datacite",
+      "source_name": "DataCite",
+      "source_type": "REGISTRY",
+      "source_family": "doi_registrant_datacite",
+      "evidence_lanes": [
+        "REPOSITORY",
+        "THESIS",
+        "DATASET",
+        "TECHNICAL_REPORT"
+      ],
+      "fabric_versions": [
+        "V2"
+      ],
+      "access_method": "REST",
+      "api_endpoint": "https://api.datacite.org/dois",
+      "authentication_required": false,
+      "free_access": true,
+      "open_metadata": true,
+      "full_text_available": true,
+      "patent_coverage": false,
+      "preprint_coverage": true,
+      "thesis_dissertation_coverage": true,
+      "conference_coverage": false,
+      "technical_report_coverage": true,
+      "citation_graph": false,
+      "date_coverage": "registrant deposits to present",
+      "discipline_coverage": "repositories, datasets, theses, grey literature (Zenodo, institutional repositories)",
+      "rate_limit": "polite use",
+      "license": "CC0 (many records)",
+      "provenance_requirements": "query + DOI + resourceTypeGeneral + raw payload sha256 in retrieval log",
+      "health_status": "NOT_MEASURED",
+      "last_successful_query": null,
+      "derives_from": [],
+      "query_grammar": "KEYWORD_FORM",
+      "role": "DISCOVERY",
+      "labeling_hints": {
+        "publication_status": "by resourceTypeGeneral: Dissertation->THESIS, Dataset->DATASET, Report->REPORT, Text->UNKNOWN, Event->CONFERENCE"
+      },
+      "scoping": "thesis-lane queries add types.resourceTypeGeneral=Dissertation (measured live: server-side filter works)"
+    },
+    {
+      "source_id": "openaire",
+      "source_name": "OpenAIRE",
+      "source_type": "AGGREGATOR",
+      "source_family": "repository_aggregator_openaire",
+      "evidence_lanes": [
+        "REPOSITORY",
+        "THESIS",
+        "PREPRINT",
+        "SCHOLARLY"
+      ],
+      "fabric_versions": [
+        "V2"
+      ],
+      "access_method": "REST",
+      "api_endpoint": "https://api.openaire.eu/search/publications",
+      "authentication_required": false,
+      "free_access": true,
+      "open_metadata": true,
+      "full_text_available": false,
+      "patent_coverage": false,
+      "preprint_coverage": true,
+      "thesis_dissertation_coverage": true,
+      "conference_coverage": true,
+      "technical_report_coverage": false,
+      "citation_graph": false,
+      "date_coverage": "repository deposits to present",
+      "discipline_coverage": "European+ repository outputs, all disciplines",
+      "rate_limit": "2 req/s documented",
+      "license": "OpenAIRE open metadata terms",
+      "provenance_requirements": "query + objIdentifier + instancetype + raw payload sha256 in retrieval log",
+      "health_status": "NOT_MEASURED",
+      "last_successful_query": null,
+      "derives_from": [
+        "datacite",
+        "crossref",
+        "repositories"
+      ],
+      "query_grammar": "KEYWORD_FORM",
+      "role": "DISCOVERY",
+      "labeling_hints": {
+        "publication_status": "post-hoc by instance instancetype: Thesis->THESIS, Preprint->PREPRINT, Article->SCHOLARLY; refereed=nonPeerReviewed downgrades PEER_REVIEWED to UNKNOWN when article"
+      },
+      "scoping": "no server-side type filter (measured 2026-09-05) - labels read post-hoc"
+    },
+    {
+      "source_id": "core",
+      "source_name": "CORE",
+      "source_type": "AGGREGATOR",
+      "source_family": "repository_aggregator_core",
+      "evidence_lanes": [
+        "REPOSITORY",
+        "THESIS",
+        "PREPRINT",
+        "SCHOLARLY",
+        "TECHNICAL_REPORT"
+      ],
+      "fabric_versions": [
+        "V2"
+      ],
+      "access_method": "REST",
+      "api_endpoint": "https://api.core.ac.uk/v3/search/works",
+      "authentication_required": false,
+      "free_access": true,
+      "open_metadata": true,
+      "full_text_available": true,
+      "patent_coverage": false,
+      "preprint_coverage": true,
+      "thesis_dissertation_coverage": true,
+      "conference_coverage": false,
+      "technical_report_coverage": true,
+      "citation_graph": false,
+      "date_coverage": "repository harvests to present",
+      "discipline_coverage": "global repository outputs, all disciplines",
+      "rate_limit": "anonymous tier (measured working 2026-09-05; quotas may apply)",
+      "license": "CORE open metadata terms",
+      "provenance_requirements": "query + CORE work id + raw payload sha256 in retrieval log",
+      "health_status": "NOT_MEASURED",
+      "last_successful_query": null,
+      "derives_from": [
+        "repositories"
+      ],
+      "query_grammar": "KEYWORD_FORM",
+      "role": "DISCOVERY",
+      "labeling_hints": {
+        "publication_status": "by repository-declared document_type: thesis->THESIS; unverified"
+      },
+      "scoping": "SHORT keyword-form queries only (measured: long natural-language queries match millions - relevance ranking is weak)"
+    },
+    {
+      "source_id": "arxiv",
+      "source_name": "arXiv",
+      "source_type": "DISCOVERY_INDEX",
+      "source_family": "preprint_origin",
+      "evidence_lanes": [
+        "PREPRINT"
+      ],
+      "fabric_versions": [
+        "V2"
+      ],
+      "access_method": "REST (Atom)",
+      "api_endpoint": "https://export.arxiv.org/api/query",
+      "authentication_required": false,
+      "free_access": true,
+      "open_metadata": true,
+      "full_text_available": true,
+      "patent_coverage": false,
+      "preprint_coverage": true,
+      "thesis_dissertation_coverage": false,
+      "conference_coverage": false,
+      "technical_report_coverage": false,
+      "citation_graph": false,
+      "date_coverage": "1991-present",
+      "discipline_coverage": "physics/math/CS/quant-bio/econ",
+      "rate_limit": "courtesy interval ~3s (measured 429 'Rate exceeded' then read timeouts from this egress 2026-09-05 - preprint coverage survives via OpenAIRE/CORE/DataCite which index arXiv content)",
+      "license": "arXiv terms (per-record licenses vary)",
+      "provenance_requirements": "query + arxiv id + raw payload sha256 in retrieval log",
+      "health_status": "NOT_MEASURED",
+      "last_successful_query": null,
+      "derives_from": [],
+      "query_grammar": "KEYWORD_FORM",
+      "role": "DISCOVERY",
+      "labeling_hints": {
+        "publication_status": "PREPRINT always (never peer-reviewed)"
+      }
+    },
+    {
+      "source_id": "google_patents",
+      "source_name": "Google Patents",
+      "source_type": "DISCOVERY_INDEX",
+      "source_family": "patent_index_google",
+      "evidence_lanes": [
+        "PATENT"
+      ],
+      "fabric_versions": [
+        "V2"
+      ],
+      "access_method": "REST (public xhr/query) + patent-page fetch",
+      "api_endpoint": "https://patents.google.com/xhr/query",
+      "authentication_required": false,
+      "free_access": true,
+      "open_metadata": true,
+      "full_text_available": true,
+      "patent_coverage": true,
+      "preprint_coverage": false,
+      "thesis_dissertation_coverage": false,
+      "conference_coverage": false,
+      "technical_report_coverage": false,
+      "citation_graph": true,
+      "date_coverage": "patent offices' full published history",
+      "discipline_coverage": "all technology classes (EPO/USPTO/WIPO bulk data)",
+      "rate_limit": "unofficial public endpoint; burst-safe usage enforced client-side",
+      "license": "Google Patents public data (per-office terms)",
+      "provenance_requirements": "query + publication number + claim text availability + raw payload sha256 in retrieval log",
+      "health_status": "NOT_MEASURED",
+      "last_successful_query": null,
+      "derives_from": [
+        "epo_bulk",
+        "uspto_bulk",
+        "wipo_bulk"
+      ],
+      "query_grammar": "KEYWORD_FORM",
+      "role": "DISCOVERY",
+      "labeling_hints": {
+        "document_type": "PATENT (never mixed into scholarly ranking); claim-level retrieval via patent-page fetch (search matches full text, not only titles)"
+      }
+    },
+    {
+      "source_id": "epo_ops",
+      "source_name": "EPO Open Patent Services",
+      "source_type": "REGISTRY",
+      "source_family": "patent_office_epo",
+      "evidence_lanes": [
+        "PATENT"
+      ],
+      "fabric_versions": [
+        "V2"
+      ],
+      "access_method": "REST",
+      "api_endpoint": "https://ops.epo.org/3.2/rest-services/published-data/search",
+      "authentication_required": false,
+      "free_access": true,
+      "open_metadata": true,
+      "full_text_available": true,
+      "patent_coverage": true,
+      "preprint_coverage": false,
+      "thesis_dissertation_coverage": false,
+      "conference_coverage": false,
+      "technical_report_coverage": false,
+      "citation_graph": true,
+      "date_coverage": "EPO + member-state patent collections",
+      "discipline_coverage": "all patent classifications",
+      "rate_limit": "anonymous fair-use quota (measured 403 'Fair Use policy' from this egress 2026-09-05 - recorded honestly, never silently dropped)",
+      "license": "EPO open patent data terms",
+      "provenance_requirements": "query + publication number + raw payload sha256 in retrieval log",
+      "health_status": "NOT_MEASURED",
+      "last_successful_query": null,
+      "derives_from": [],
+      "query_grammar": "CQL",
+      "role": "DISCOVERY",
+      "labeling_hints": {
+        "document_type": "PATENT"
+      }
+    },
+    {
+      "source_id": "zenodo",
+      "source_name": "Zenodo",
+      "source_type": "AGGREGATOR",
+      "source_family": "doi_registrant_datacite",
+      "evidence_lanes": [
+        "REPOSITORY",
+        "DATASET",
+        "TECHNICAL_REPORT"
+      ],
+      "fabric_versions": [
+        "V2"
+      ],
+      "access_method": "REST",
+      "api_endpoint": "https://zenodo.org/api/records",
+      "authentication_required": false,
+      "free_access": true,
+      "open_metadata": true,
+      "full_text_available": true,
+      "patent_coverage": false,
+      "preprint_coverage": true,
+      "thesis_dissertation_coverage": false,
+      "conference_coverage": true,
+      "technical_report_coverage": true,
+      "citation_graph": false,
+      "date_coverage": "2013-present",
+      "discipline_coverage": "all disciplines (research data, reports, EU outputs)",
+      "rate_limit": "n/a",
+      "license": "open repository (per-record licenses)",
+      "provenance_requirements": "query + record id + raw payload sha256 in retrieval log",
+      "health_status": "NOT_MEASURED",
+      "last_successful_query": null,
+      "derives_from": [
+        "datacite"
+      ],
+      "query_grammar": "KEYWORD_FORM",
+      "role": "DISCOVERY",
+      "labeling_hints": {
+        "publication_status": "per-record resource type"
+      },
+      "measured_state": "HTTP 403 network-side block from this egress 2026-09-05 (measured 3x); Zenodo DOIs remain discoverable via the datacite lane - recorded honestly, never silently dropped (Art. XXI.3)",
+      "connector_state": "NO_CONNECTOR (measured HTTP 403 network-side block from this egress 2026-09-05; Zenodo DOIs remain discoverable via the datacite lane)"
+    },
+    {
+      "source_id": "ndltd",
+      "source_name": "NDLTD Global ETD Search",
+      "source_type": "DISCOVERY_INDEX",
+      "source_family": "repository_aggregator_openaire",
+      "evidence_lanes": [
+        "THESIS"
+      ],
+      "fabric_versions": [
+        "V2"
+      ],
+      "access_method": "REST",
+      "api_endpoint": "http://search.ndltd.org/api/search",
+      "authentication_required": false,
+      "free_access": true,
+      "open_metadata": true,
+      "full_text_available": false,
+      "patent_coverage": false,
+      "preprint_coverage": false,
+      "thesis_dissertation_coverage": true,
+      "conference_coverage": false,
+      "technical_report_coverage": false,
+      "citation_graph": false,
+      "date_coverage": "global ETD collections",
+      "discipline_coverage": "all disciplines (theses/dissertations)",
+      "rate_limit": "unknown",
+      "license": "per-institution",
+      "provenance_requirements": "query + record id + raw payload sha256 in retrieval log",
+      "health_status": "NOT_MEASURED",
+      "last_successful_query": null,
+      "derives_from": [
+        "repositories"
+      ],
+      "query_grammar": "KEYWORD_FORM",
+      "role": "DISCOVERY",
+      "labeling_hints": {
+        "publication_status": "THESIS"
+      },
+      "measured_state": "HTTP 503 measured 2026-09-05 (2x, service unavailable) - recorded honestly, never silently dropped (Art. XXI.3)",
+      "connector_state": "NO_CONNECTOR (service measured unavailable; thesis coverage served by datacite/openaire/core/crossref lanes)"
+    }
+  ]
+}
