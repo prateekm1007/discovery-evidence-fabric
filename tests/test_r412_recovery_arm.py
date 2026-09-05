@@ -969,3 +969,175 @@ class TestCrossArtifactConsistency:
         assert len(art["technical_death_subset"][
             "candidate_ids"]) == 13
         assert art["headline_denominators"]["unique_scored"] == 400
+
+
+# ---------------------------------------------------------------------------
+# ALLOCATION-ORDER REPAIR tests (pre-first-model-call, 2026-09-06):
+# the sealed 10-seed priority allocation IS the attempted set. These
+# tests are the falsifiers for the repair: an ineligible seed that
+# reaches GA-3/GA-4, or a backcast spent outside the allocation,
+# or an allocation rung starved by non-allocation rungs under the
+# sealed construction cap, all FAIL here. Art. XVII: the attempted
+# bypass IS the test.
+# ---------------------------------------------------------------------------
+
+def _load_runner_module(monkeypatch, tmp_path):
+    import importlib.util
+    spec = importlib.util.spec_from_file_location(
+        "r412_run_gradient_arm_alloc_test",
+        REPO / "scripts" / "r412_run_gradient_arm.py")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    # Art. IX: a test never mutates production state. The path
+    # globals are module constants computed at import time, so each
+    # is patched explicitly (patching OUT_DIR alone is not enough).
+    run = tmp_path / "run"
+    run.mkdir(parents=True, exist_ok=True)
+    monkeypatch.setattr(mod, "OUT_DIR", run)
+    monkeypatch.setattr(mod, "TVM_FROZEN", run / "TVM_FROZEN.json")
+    monkeypatch.setattr(mod, "TVM_CONSTRUCTED",
+                        run / "TVM_CONSTRUCTED.json")
+    return mod
+
+
+class TestAllocationEnforcement:
+    PREREG_PRIORITY = None  # loaded lazily from the real artifact
+
+    @property
+    def priority(self):
+        if self.PREREG_PRIORITY is None:
+            self.PREREG_PRIORITY = _load(PREREG)[
+                "resource_allocation"]["priority_order"]
+        return self.PREREG_PRIORITY
+
+    def test_ga3_queries_exactly_the_sealed_allocation_in_order(
+            self, monkeypatch, tmp_path):
+        """13 GA-1b-OK seeds (10 allocation + 3 ineligible) -> GA-3
+        records exist ONLY for the 10 allocation seeds, in the sealed
+        priority order. The ineligible regime/consistency deaths
+        never enter the gradient machinery."""
+        mod = _load_runner_module(monkeypatch, tmp_path)
+        ga1b = []
+        for cid in _load(ACCOUNTING)["technical_death_subset"][
+                "candidate_ids"]:
+            ga1b.append({
+                "candidate_id": cid, "status": "OK",
+                "gate": {"capability_rung": f"rung-{cid}"}})
+        (mod.OUT_DIR / "ga1b.jsonl").write_text(
+            "\n".join(json.dumps(r) for r in ga1b))
+        # a TVM with a measured mover on every rung
+        entries = []
+        for cid in _load(ACCOUNTING)["technical_death_subset"][
+                "candidate_ids"]:
+            for year, val in ((2020, 10.0), (2024, 50.0)):
+                entries.append({
+                    "capability_rung": f"rung-{cid}",
+                    "domain": "d", "metric": "m", "value": val,
+                    "unit": "u", "year": year})
+        tvm_frozen = {"entries": entries}
+        mod.TVM_FROZEN.write_text(json.dumps(tvm_frozen))
+        rc = mod.stage_ga3()
+        assert rc == 0
+        lines = [json.loads(x) for x in
+                 (mod.OUT_DIR / "ga3.jsonl").read_text().
+                 splitlines() if x.strip()]
+        recorded = [l["candidate_id"] for l in lines]
+        assert recorded == self.priority
+        assert len(recorded) == 10
+
+    def test_ga4_refuses_backcast_outside_the_allocation(
+            self, monkeypatch, tmp_path):
+        """A forged GA-3 FAST_MOVERS_RANKED record for a
+        non-allocation seed cannot buy a backcast: no LLM call, no
+        GA-4 record (the budget is never re-allocated to
+        non-eligible candidates)."""
+        mod = _load_runner_module(monkeypatch, tmp_path)
+        mod.TVM_FROZEN.write_text(json.dumps({"entries": []}))
+        ineligible = "C-heat_exchanger-1~4"  # regime violation death
+        assert ineligible not in self.priority
+        ga3_rec = {"candidate_id": ineligible,
+                   "verdict": "FAST_MOVERS_RANKED", "rung": "r"}
+        (mod.OUT_DIR / "ga3.jsonl").write_text(
+            json.dumps(ga3_rec))
+        called = []
+
+        def _no_llm(*a, **k):
+            called.append(a)
+            raise AssertionError(
+                "backcast spent outside the sealed allocation")
+
+        monkeypatch.setattr(mod, "_llm", _no_llm)
+        rc = mod.stage_ga4()
+        assert rc == 0
+        assert not called
+        assert not (mod.OUT_DIR / "ga4.jsonl").exists()
+
+    def test_tvm_build_constructs_allocation_rungs_first(
+            self, monkeypatch, tmp_path):
+        """Under the sealed construction cap, the 10 allocation
+        rungs are built BEFORE any non-allocation rung; the
+        rung left unbuilt by the cap is recorded
+        INCOMPLETE_BUDGET_SHORTFALL — never silently dropped."""
+        mod = _load_runner_module(monkeypatch, tmp_path)
+        all_seeds = _load(ACCOUNTING)["technical_death_subset"][
+            "candidate_ids"]
+        ga1b = [{"candidate_id": cid, "status": "OK",
+                 "gate": {"capability_rung": f"rung-{cid}"}}
+                for cid in all_seeds]
+        (mod.OUT_DIR / "ga1b.jsonl").write_text(
+            "\n".join(json.dumps(r) for r in ga1b))
+        records = [{"record_id": "r-1", "title": "t",
+                    "abstract": "a measured 5 unit trend"}]
+        monkeypatch.setattr(
+            mod, "_retrieve", lambda q: (records, {}))
+        monkeypatch.setattr(
+            mod, "_llm",
+            lambda *a, **k: {"ok": True, "content": "", "model":
+                             "test", "prompt_hash": "h",
+                             "output_hash": "h"})
+        # 13 distinct rungs, cap 12: the 13th must be a
+        # NON-allocation rung
+        rc = mod.stage_tvm_build(12)
+        assert rc == 0
+        tvm = json.loads(mod.TVM_CONSTRUCTED.read_text())
+        log = tvm["construction_log"]
+        attempted = [str(e["rung"]) for e in log
+                     if e.get("n_retrieved") is not None]
+        allocation_rungs = {f"rung-{cid}"
+                            for cid in self.priority}
+        shortfall = [e for e in log if e.get("status") ==
+                     "INCOMPLETE_BUDGET_SHORTFALL"]
+        assert len(attempted) == 12
+        # every allocation rung was attempted
+        assert allocation_rungs <= set(attempted)
+        # the starved rung is NOT an allocation rung
+        assert len(shortfall) == 1
+        assert str(shortfall[0]["rung"]) not in allocation_rungs
+
+    def test_tvm_build_never_reattempts_a_completed_rung(
+            self, monkeypatch, tmp_path):
+        """A rung with a completed attempt (even zero admitted
+        entries) is terminal for construction: re-invocation cannot
+        fish for better entries (rejected entries are recorded,
+        never repaired)."""
+        mod = _load_runner_module(monkeypatch, tmp_path)
+        ga1b = [{"candidate_id": self.priority[0], "status": "OK",
+                 "gate": {"capability_rung": "rung-a"}}]
+        (mod.OUT_DIR / "ga1b.jsonl").write_text(
+            json.dumps(ga1b[0]))
+        records = [{"record_id": "r-1", "title": "t",
+                    "abstract": "a"}]
+        monkeypatch.setattr(
+            mod, "_retrieve", lambda q: (records, {}))
+        monkeypatch.setattr(
+            mod, "_llm",
+            lambda *a, **k: {"ok": True, "content": "", "model":
+                             "test", "prompt_hash": "h",
+                             "output_hash": "h"})
+        assert mod.stage_tvm_build() == 0
+        calls = []
+        monkeypatch.setattr(
+            mod, "_retrieve",
+            lambda q: (calls.append(q), records, {})[1:])
+        assert mod.stage_tvm_build() == 0
+        assert calls == []  # no re-attempt of the completed rung

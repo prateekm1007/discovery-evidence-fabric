@@ -309,17 +309,43 @@ def stage_tvm_build(limit=None) -> int:
     """TVM construction: per distinct verified rung, one fabric
     retrieval + span-gated LLM proposals. The rungs are named by the
     GA-1b verified extractions (plus the frozen v0 seed
-    expectations); NO LLM-asserted numbers enter the map."""
+    expectations); NO LLM-asserted numbers enter the map.
+
+    ALLOCATION-ORDER REPAIR (pre-first-model-call, 2026-09-06, zero
+    gradient calls run): rungs are constructed in the SEALED
+    priority order — the 10 allocation seeds' rungs FIRST — so the
+    sealed 12-call construction cap can never starve an allocation
+    seed's rung; a rung left unbuilt by the cap is recorded as
+    INCOMPLETE_BUDGET_SHORTFALL (recorded, never silently dropped —
+    the sealed budget_shortfall_rule). A rung with a COMPLETED
+    attempt (even zero admitted entries) is never re-attempted
+    (rejected entries are recorded, never repaired); a
+    transport-failed rung gets one bounded retry. No sealed
+    threshold, prompt, rule, population, or map changed."""
     from discovery_fabric.r412.gradient import (
         build_tvm_proposal_prompt, parse_tvm_entries,
         verify_tvm_entries, TVM_VERSION)
+    priority, _prereg = _priority()
     ga1b = [l for l in _read_lines(OUT_DIR / "ga1b.jsonl")
             if l.get("status") == "OK"]
+    rung_by_cid: dict = {}
     rungs: dict = {}
     for l in ga1b:
         rung = (l.get("gate") or {}).get("capability_rung")
         if rung:
+            rung_by_cid[l["candidate_id"]] = rung
             rungs.setdefault(rung.casefold(), rung)
+    # sealed priority order first: allocation seeds' rungs before any
+    # other corpus rung (the map is shared infrastructure, but the
+    # allocation can never be starved by non-allocation coverage)
+    ordered_keys: list = []
+    for cid in priority:
+        rung = rung_by_cid.get(cid)
+        if rung and rung.casefold() not in ordered_keys:
+            ordered_keys.append(rung.casefold())
+    for key in rungs:
+        if key not in ordered_keys:
+            ordered_keys.append(key)
     if TVM_CONSTRUCTED.exists():
         tvm = _load(TVM_CONSTRUCTED)
         have = {str(e.get("capability_rung")).casefold()
@@ -328,12 +354,33 @@ def stage_tvm_build(limit=None) -> int:
         tvm = {"tvm_version": TVM_VERSION, "entries": [],
                "construction_log": []}
         have = set()
+    log = tvm.get("construction_log") or []
+    # completed attempts are never re-attempted (an honest zero-entry
+    # attempt is terminal for construction; only transport failures
+    # get the sealed one bounded retry)
+    attempted_done = {
+        str(e.get("rung")).casefold() for e in log
+        if e.get("n_retrieved") is not None}
+    shortfall_recorded = {
+        str(e.get("rung")).casefold() for e in log
+        if e.get("status") == "INCOMPLETE_BUDGET_SHORTFALL"}
+    transport_fails: dict = {}
+    for e in log:
+        if e.get("status") == "INCOMPLETE_TRANSPORT":
+            k = str(e.get("rung")).casefold()
+            transport_fails[k] = transport_fails.get(k, 0) + 1
     built = 0
-    for key, rung in rungs.items():
-        if key in have:
+    shortfall = []
+    for key in ordered_keys:
+        rung = rungs[key]
+        if key in have or key in attempted_done or \
+                key in shortfall_recorded:
             continue
+        if transport_fails.get(key, 0) >= 2:
+            continue  # bounded retry exhausted; stays INCOMPLETE
         if limit is not None and built >= limit:
-            break
+            shortfall.append(rung)
+            continue
         query = (f"{rung} performance trend improvement measured "
                  f"benchmark")
         try:
@@ -369,6 +416,17 @@ def stage_tvm_build(limit=None) -> int:
         built += 1
         print(f"  rung '{rung}': {len(gate['admitted'])} admitted / "
               f"{len(gate['rejected'])} rejected")
+    for rung in shortfall:
+        tvm["construction_log"].append({
+            "rung": rung,
+            "status": "INCOMPLETE_BUDGET_SHORTFALL",
+            "note": ("the sealed 12-call TVM construction cap was "
+                     "reached before this rung; recorded, never "
+                     "silently dropped (sealed budget_shortfall_"
+                     "rule — no re-allocation)"),
+        })
+        print(f"  rung '{rung}': INCOMPLETE_BUDGET_SHORTFALL "
+              f"(sealed construction cap reached)")
     tvm["n_entries"] = len(tvm["entries"])
     TVM_CONSTRUCTED.parent.mkdir(parents=True, exist_ok=True)
     TVM_CONSTRUCTED.write_text(json.dumps(tvm, indent=1) + "\n")
@@ -396,19 +454,39 @@ def stage_tvm_freeze(limit=None) -> int:
 def stage_ga3(limit=None) -> int:
     """GA-3: the deterministic TVM query per seed. No measured
     fast-mover -> DEAD_AT_TVM_QUERY (the cheapest kill: no mechanism
-    writing). NO LLM."""
+    writing). NO LLM.
+
+    ALLOCATION-ORDER REPAIR (pre-first-model-call, 2026-09-06,
+    zero gradient calls run): the queries cover EXACTLY the sealed
+    10-seed resource allocation in priority order — GA-2-ineligible
+    seeds (regime/consistency deaths, recorded at GA-2) never
+    enter the gradient machinery ("INELIGIBLE -> recorded, no
+    model call spent" — design directive §2), and gradient_
+    attempted can never exceed the sealed allocation (finalize's
+    attempted count IS this set). No sealed threshold, prompt,
+    rule, population, or map changed."""
     from discovery_fabric.r412.gradient import query_tvm
     if not TVM_FROZEN.exists():
         print("REFUSED: the TVM must be frozen before any gradient "
               "query (Art. XLIV)")
         return 1
     tvm = _load(TVM_FROZEN)
+    priority, _prereg = _priority()
     ga1b = [l for l in _read_lines(OUT_DIR / "ga1b.jsonl")
             if l.get("status") == "OK"]
+    ga1b_by_cid = {l["candidate_id"]: l for l in ga1b}
+    # the sealed allocation set, in priority order; a seed whose
+    # extraction is not OK never entered the machinery (recorded at
+    # GA-1b as INCOMPLETE/EXTRACTION_FAILED — a recorded shortfall,
+    # never re-allocated)
+    ordered = [ga1b_by_cid[cid] for cid in priority
+               if cid in ga1b_by_cid]
+    skipped = sorted(l["candidate_id"] for l in ga1b
+                     if l["candidate_id"] not in priority)
     path = OUT_DIR / "ga3.jsonl"
     lines = _read_lines(path)
     done = 0
-    for l in ga1b:
+    for l in ordered:
         cid = l["candidate_id"]
         if _latest(lines, "candidate_id", cid):
             continue
@@ -419,6 +497,10 @@ def stage_ga3(limit=None) -> int:
         lines.append(rec)
         done += 1
         print(f"  {cid}: {q['verdict']} (rung={rung})")
+    if skipped:
+        print(f"ga3: {len(skipped)} non-allocation seed(s) not "
+              f"queried (GA-2 ineligible, recorded at GA-2, never "
+              f"attempted): {', '.join(skipped)}")
     n_dead = sum(1 for l in lines
                  if l.get("verdict") == "DEAD_AT_TVM_QUERY")
     print(f"ga3: {len(lines)} queries, {n_dead} cheapest-kills")
@@ -437,6 +519,8 @@ def stage_ga4(limit=None) -> int:
         print("REFUSED: the TVM must be frozen before GA-4")
         return 1
     tvm = _load(TVM_FROZEN)
+    priority, _prereg = _priority()
+    allocation = set(priority)
     ga3 = _read_lines(OUT_DIR / "ga3.jsonl")
     path = OUT_DIR / "ga4.jsonl"
     lines = _read_lines(path)
@@ -444,6 +528,15 @@ def stage_ga4(limit=None) -> int:
     for q in ga3:
         cid = q["candidate_id"]
         if q.get("verdict") != "FAST_MOVERS_RANKED":
+            continue
+        # ALLOCATION-ORDER REPAIR (defense in depth): a backcast can
+        # never be spent outside the sealed allocation — the sealed
+        # budget_shortfall_rule forbids re-allocation to
+        # non-eligible candidates
+        if cid not in allocation:
+            print(f"  {cid}: REFUSED backcast outside the sealed "
+                  f"allocation (defense-in-depth; never re-allocated "
+                  f"to non-eligible candidates)")
             continue
         last = _latest(lines, "candidate_id", cid)
         if last and last.get("status") in TERMINAL_STATUSES:
