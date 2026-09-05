@@ -1175,3 +1175,19 @@ Work Log:
 Stage Summary:
 - The R412 gradient/recovery arm is SEALED before its first model call: the experimental population is honestly the ENTIRE frozen R411 population (550 raw / 400 unique / 13 technical deaths / 4 eligible + 6 special route), every denominator present and guarded, the death-cause recovery is evidence-only, and the next session's first action is `python3 scripts/r412_run_gradient_arm.py seal` then the GA stages under the pre-registered budgets.
 - The sealed temporal control arm (0/13) is preserved byte-identical and machine-guarded.
+
+---
+Task ID: R412-gradient-arm-1
+Agent: coder (main session)
+Task: R412 recovery arm — Phase A seal verification + pre-run repairs before the first gradient model call
+
+Work Log:
+- Read EPISTEMIC_CONSTITUTION.md v2.1.0 in full (2020 lines) before any work.
+- Phase A verified: HEAD == origin/main == 5084673f (ls-remote network-verified); working tree clean; seal stage PASS; population hash 750647b8, TVM v0 49bdf36f, temporal control arm e7c4ecd5, accounting cfc71c8b — all recomputed and matched; 5 prompt hashes recomputed from committed machinery MATCH; model pins present in runner + prereg; budgets 15 fields; stopping rules 10; frozen 10-seed priority order identical.
+- Zero pre-seal gradient calls proven: GRADIENT_RUN/ did not exist before the seal check; all gateway ledgers predate the seal commit with zero r412/gradient mentions.
+- Defect found + repaired (commit be265c14, BEFORE any gradient call): runner did not enforce the sealed 10-seed priority allocation (ga3 iterated all 13; ga4/tvm-build unfiltered, waterfall order). Repair: ga3 = exactly the allocation in priority order; ga4 allocation membership (defense in depth); tvm-build allocation rungs first + INCOMPLETE_BUDGET_SHORTFALL recording + no re-attempt of completed rungs. 4 adversarial tests added; r412+R411 batteries 325/325.
+- Phase B provenance custody (commit 5dee0972): TVM construction log now carries retrieved_at + fabric version + lane states per rung construction (entry->rung->retrieved_at chain); sealed ENTRY schema unchanged.
+- Pre-existing battery defects disclosed: benchmark b10 (external coder2_blind path absent) + legacy suite order-dependent errors — reproduce identically on clean sealed HEAD (stash comparison).
+
+Stage Summary:
+- Repository at 5dee0972; seals intact (re-verified after every change); zero gradient model calls to this point; ready for GA-1b.
