@@ -1,0 +1,26 @@
+{
+  "artifact": "R412_TRANSPORT_PROBE",
+  "probe_time_utc": "2026-09-06T00:27:37Z",
+  "probe_class": "LLM_TRANSPORT_LIVENESS (R401-WC2 discipline: tiny pinned call per provider; dead/absent = recorded absent; this is an infrastructure probe, NOT a gradient/discovery model call)",
+  "gateway_script": "scripts/zai_gateway.mjs",
+  "gateway_script_sha256": "b02e57a820e53e37aecafe2dba3c5b19527243facfd05552e607833cfecd2d60",
+  "endpoint": "127.0.0.1:8790 (probe instance)",
+  "healthz": {
+    "status": "ok"
+  },
+  "probe_call": {
+    "model": "glm-4-plus",
+    "messages": 1,
+    "max_tokens": 10,
+    "completion": "TRANSPORT_ALIVE",
+    "usage": {
+      "prompt_tokens": 17,
+      "completion_tokens": 5,
+      "total_tokens": 22
+    }
+  },
+  "verdict": "LIVE",
+  "gradient_model_calls_made": 0,
+  "discovery_model_calls_made": 0,
+  "note": "The gateway is process-scoped (the sandbox reaps detached processes); a real run must start the gateway for the duration of the run per scripts/zai_gw_run.sh. The engine's other providers have no credentials in this session (.env.keys absent)."
+}

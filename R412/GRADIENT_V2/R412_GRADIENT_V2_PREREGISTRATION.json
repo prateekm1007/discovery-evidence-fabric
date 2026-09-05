@@ -1,0 +1,220 @@
+{
+  "artifact": "R412_GRADIENT_V2_PREREGISTRATION",
+  "preregistration_version": "1.0.0",
+  "sealed": "2026-09-05T22:45:23+00:00Z",
+  "directive": "CODER directive (operator), R412 gradient v2, Step 7: seal v2 BEFORE any v2 discovery calls",
+  "v1_provenance": {
+    "claimed_v1_seal_commit": "5084673f",
+    "verification_state": "NOT_VERIFIABLE_IN_THIS_WORKSPACE",
+    "v1_figures_provenance": "OPERATOR_DIRECTIVE_REPORTED",
+    "v1_figures": {
+      "seeds": 10,
+      "frontier_entries": 0,
+      "proposals": 34,
+      "value_or_year_not_numeric_failures": 31
+    },
+    "v1_result_modified": false,
+    "v1_preregistration_modified": false,
+    "temporal_control_arm_modified": false,
+    "v1_instrument_finding": {
+      "path": "R412/R412_GRADIENT_V1_INSTRUMENT_FINDING.json",
+      "sha256": "e39a9ed7a9a4f40ea5c7f36e5b54e8140315ae11b6f8a55d864328866a981352"
+    },
+    "full_evidence": "See R412/R412_GRADIENT_V1_INSTRUMENT_FINDING.json v1_provenance_verification: exhaustive filesystem/git/reflog/fsck searches found no R411/R412 artifacts; the claimed seal commits are not valid objects; the remote is unreachable without credentials (private repo)."
+  },
+  "v2_parser_specification": {
+    "module": "R412/GRADIENT_V2/tvm_v2/value_parser.py",
+    "sha256": "9fd773341439bc5435272bcb0394e81ac2309b08153bdab04074f084dcc5ef3a",
+    "canonical_representations": [
+      "POINT",
+      "RANGE",
+      "INEQUALITY",
+      "ORDINAL_QUALITATIVE",
+      "NOT_NUMERIC",
+      "MALFORMED"
+    ],
+    "canonical_value_fields": [
+      "raw_source_span",
+      "normalized_value",
+      "normalized_min",
+      "normalized_max",
+      "unit",
+      "unit_raw",
+      "year",
+      "year_min",
+      "year_max",
+      "normalization_method",
+      "approximation_marker",
+      "open_bound",
+      "qualitative_term",
+      "malformed_reason",
+      "parse_context"
+    ],
+    "method_registry": [
+      "EXACT_NUMERIC_LITERAL",
+      "UNCERTAINTY_TO_RANGE",
+      "STATED_RANGE",
+      "STATED_RANGE_WORD_FORM",
+      "STATED_INEQUALITY",
+      "STATED_INEQUALITY_WORD_FORM",
+      "APPROXIMATION_RETAINED",
+      "SCIENTIFIC_NOTATION_E",
+      "SCIENTIFIC_NOTATION_MULTIPLIER",
+      "STATED_QUALITATIVE_TERM",
+      "NO_NUMERIC_CONTENT",
+      "YEAR_LITERAL",
+      "YEAR_WITH_QUALIFIER",
+      "YEAR_WITH_PREPOSITION",
+      "STATED_YEAR_RANGE",
+      "MALFORMED_REJECTED"
+    ],
+    "invariants": [
+      "deterministic pure function",
+      "exact decimal arithmetic",
+      "never manufactures precision",
+      "raw span retained byte-exactly",
+      "fail-closed with explicit malformed reasons"
+    ]
+  },
+  "parser_calibration_corpus": {
+    "path": "R412/GRADIENT_V2/TVM_V2_PARSER_CALIBRATION_CORPUS.json",
+    "sha256": "dd2a40906bf3f8a3fe730b4947e250ec47b65ac51831b1e387ad36fe5d0d419c",
+    "total_cases": 40,
+    "verification_fixtures": 6,
+    "all_passed": true,
+    "llm_judge_used": false,
+    "ground_truth_authority": "operator directive exemplars + pre-specified ruleset (authored before the parser; Constitution Article VIII)"
+  },
+  "normalization_rules": {
+    "path": "R412/GRADIENT_V2/NORMALIZATION_RULES.json",
+    "sha256": "14cd7b96568e41f5254366dfc59c6bb9fe9fbe51d5e43031baab7d3a030adfee",
+    "core_rules": [
+      "uncertainty to range is lossless (± bound IS the interval)",
+      "approximation is retained, never widened to a range",
+      "inequalities keep their open bound open",
+      "no unit conversion, no rounding, no digit extension",
+      "double separators / inverted ranges / dangling connectors are MALFORMED"
+    ]
+  },
+  "capability_family_layer": {
+    "path": "R412/GRADIENT_V2/CAPABILITY_FAMILY_MAP.json",
+    "sha256": "e5f7faf1a21736a11c1082ec86b08cfdc56612840906148b3f5b890cb50435bd",
+    "module": "R412/GRADIENT_V2/tvm_v2/capability_family.py",
+    "module_sha256": "a5edff352168701f393866daff0bd35d9fe1e706ad903032bc00d60d490549aa",
+    "families_seeded": 1,
+    "seed_source": "OPERATOR_DIRECTIVE_EXAMPLE only; no families invented (Constitution Article XLIII)"
+  },
+  "signal_policy": {
+    "module": "R412/GRADIENT_V2/tvm_v2/signal_policy.py",
+    "module_sha256": "5ac9ca50949099ecd1be297fc7275fa7f58e7dc323561e424b20dae2af208d4b",
+    "primary_technical": [
+      "performance",
+      "cost",
+      "efficiency",
+      "reliability",
+      "manufacturing",
+      "deployment"
+    ],
+    "explanatory_only": [
+      "investment",
+      "talent",
+      "experimental_concentration"
+    ],
+    "rule": "An explanatory-class signal can NEVER appear as a TVM entry's capability evidence; the validator rejects it deterministically."
+  },
+  "evidence_contract": {
+    "module": "R412/GRADIENT_V2/tvm_v2/evidence_contract.py",
+    "module_sha256": "f2cf25c948027fe751487a5aa65c8283b41ef8124cef6109b486b2ef57b1d706",
+    "span_binding": "byte-exact substring occurrence; case-insensitive fallback is FORBIDDEN for numerical spans (stricter than the a2 mechanism-span check, per Constitution Article II)",
+    "ambiguity": "recorded as SPAN_AMBIGUOUS_REQUIRES_INDEX, never silently first-matched",
+    "tvm_entry_schema": "v1 13-field contract (unchanged) + canonical_value + signal_class + trajectory_dimension + capability_family_ref + occurrence_index"
+  },
+  "prompt_hashes": {
+    "provenance": "NEW_V2_PROMPTS; the v1 prompt files are NOT recoverable in this workspace (recorded, not fabricated)",
+    "files": {
+      "TVM_V2_CAUSAL_ARCHITECTURE_DELTA": "3dbda9bccfdbda1b3b8cc816467900df0a1806e98c7acea813b616766d934ed8",
+      "TVM_V2_FRONTIER_ENTRY_PROPOSAL": "15c4381be7f464301a1bca71ff856911e567facbc8cd3b8d9c5880748b616685",
+      "TVM_V2_MECHANISM_BACKCAST": "687bd0b129fd8465f5cda0917612f521bc3f1d16688627d6ecd640b9cf474b85"
+    }
+  },
+  "v1_output_reparse_measurement": {
+    "path": "R412/GRADIENT_V2/V1_OUTPUT_REPARSE_MEASUREMENT.json",
+    "sha256": "65851a9da682b3a4756f0487c8e5cfd3b17ff730e81a3916a9134b395c7c429b",
+    "mandated_measurement_state": "NOT_MEASURABLE_V1_OUTPUTS_NOT_PRESENT"
+  },
+  "transport_probe": {
+    "path": "R412/GRADIENT_V2/TRANSPORT_PROBE.json",
+    "sha256": "6ea9f9d76a831d49d89907573060d4b433f9ffb7a8f84e695aee44a3e1aaccdf",
+    "verdict": "LIVE (measured; 1 liveness probe call, 0 gradient calls)"
+  },
+  "generator": {
+    "script": "scripts/r412_generate_artifacts.py",
+    "sha256": "f483d3373d49ad47f1ba55b5d31c47e7f3a31232c4b7bb721e647cd16ab3a1a0"
+  },
+  "population_hash": {
+    "state": "NOT_VERIFIABLE",
+    "reason": "The R411/R412 population artifacts (RAW_R411_ACCEPTED 550 -> UNIQUE_SCORED_CANDIDATES 400 -> 13 technical deaths, as reported in the recovery-arm directive) are NOT present in this workspace. No population may be invented (Constitution Articles VI, XLIII): the population defines which failure records the experiment recovers from."
+  },
+  "seed_allocation": {
+    "state": "NOT_VERIFIABLE",
+    "reason": "The v1 frozen 10-seed allocation is NOT present in this workspace. The directive requires rerunning the SAME seeds for a clean instrument comparison; with no recorded seeds, any seeds chosen now would be a design change. A fresh allocation requires explicit operator authorization recorded as a new directive."
+  },
+  "tvm_snapshot_hash": {
+    "state": "NOT_BUILDABLE_YET",
+    "reason": "A TVM snapshot requires (a) the population's limiting capabilities, (b) capability-family expansion, and (c) live retrieval with span-verified entries. (a) is absent; therefore no TVM snapshot may be frozen now. The v2 instrument (parser/verifier/policies) is frozen by this preregistration instead."
+  },
+  "model_pin": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "transport": "sandbox-local OpenAI-compatible gateway (scripts/zai_gateway.mjs)",
+    "gateway_script_sha256": "b02e57a820e53e37aecafe2dba3c5b19527243facfd05552e607833cfecd2d60",
+    "substitution": "FORBIDDEN (max_preference_fallback=0 discipline; any provider change requires a new preregistration)",
+    "transport_probe": "R412/GRADIENT_V2/TRANSPORT_PROBE.json (verdict LIVE, measured; sha256 recorded above)"
+  },
+  "cost_budget": {
+    "gradient_calls_spent_before_seal": 0,
+    "liveness_probe_calls": 1,
+    "max_gradient_calls_per_seed": 40,
+    "max_total_gradient_calls": 400,
+    "max_usd_equivalent": 0.0,
+    "note": "Zero gradient/discovery model calls have been made. The only model call in this session is the single 22-token transport liveness probe."
+  },
+  "stopping_rules": [
+    "STOP on 3 consecutive transport failures (recorded as TRANSPORT_BLOCKED, never as a scientific result)",
+    "STOP when the cost budget is exhausted (recorded as BUDGET_EXHAUSTED)",
+    "STOP if the seal verification fails at any checkpoint (Constitution Article XIV: red = stop)",
+    "STOP if any TVM entry fails span verification twice with the same span (serialization defect class; instrument review, not evidence reinterpretation)",
+    "NO quota on successes or survivors (operator directive: no quota; Article LVI: optimize information gain, not counts)"
+  ],
+  "success_criterion": {
+    "chain": "REAL MEASURED FRONTIER -> CAUSAL MECHANISM BACKCAST -> TRANSFERABLE TO TARGET -> CAPABILITIES AVAILABLE TODAY -> NEW CAUSAL ARCHITECTURE",
+    "explicitly_not_success": [
+      "more descendants",
+      "more TVM domains found",
+      "candidates that look technologically sophisticated",
+      "'use technology X in industry Y'",
+      "better sensor/material/processor substitution",
+      "did the model generate something clever"
+    ],
+    "central_report_question": "Did an existing technology from a faster-moving domain create a genuinely new architecture/application in the target field?"
+  },
+  "run_gate": {
+    "state": "BLOCKED_PENDING_OPERATOR_INPUT",
+    "blocking_fields": [
+      "population_hash",
+      "seed_allocation",
+      "tvm_snapshot_hash"
+    ],
+    "fail_closed_rule": "No gradient/discovery model call may be made while any blocking field is unresolved (Constitution Article XIV; the operator's pre-seal constraint).",
+    "unblock_paths": [
+      "PATH_A: provide the GitHub PAT so the remote can be fetched and checked for the R407-R412 commits (the private remote may carry the sealed v1 artifacts from the workspace that produced them).",
+      "PATH_B: restore/point this session at the workspace or repository state that contains the sealed R412 v1 artifacts (population, TVM-v0, prompts, model pins, 10-seed allocation, and the 34 v1 proposals).",
+      "PATH_C: explicit operator authorization to constitute a NEW population and a NEW 10-seed allocation, recorded as a new directive and a new preregistration (this abandons the same-seeds instrument comparison by operator decision, not silently)."
+    ]
+  },
+  "seal_verification": {
+    "script": "scripts/r412_seal_verify.py",
+    "command": "python3 scripts/r412_seal_verify.py",
+    "expected_output": "SEAL_VERIFIED with RUN_GATE=BLOCKED_PENDING_OPERATOR_INPUT"
+  }
+}

@@ -1,0 +1,748 @@
+{
+  "corpus_id": "TVM_V2_PARSER_CALIBRATION_CORPUS",
+  "version": "1.0.0",
+  "frozen": "2026-09-06",
+  "purpose": "Deterministic calibration corpus for the TVM v2 value parser. Stage contract: raw span -> parsed canonical representation -> evidence verification. No LLM is used as a judge at any stage (operator directive Step 3).",
+  "ground_truth_authority": "The expected classifications for the DIRECTIVE_EXEMPLAR cases are derived from the operator directive's own exemplar list and category taxonomy (POINT / RANGE / INEQUALITY / ORDINAL_QUALITATIVE / NOT_NUMERIC). The EXTENDED and MALFORMED cases are authored from the pre-specified ruleset (NORMALIZATION_RULES.json), which was specified BEFORE the parser implementation was written. Ground truths are NOT derived from the parser's own behavior (Constitution Article VIII).",
+  "corpus_immutability_rule": "Disagreement between the parser and this corpus is a parser defect, never a corpus defect. This corpus may not be edited after the parser runs against it; its sha256 is pinned in tests/test_r412_tvm_v2.py and in R412_GRADIENT_V2_PREREGISTRATION.json. Any corpus change requires a new corpus version and a new preregistration.",
+  "field_context_note": "VALUE and YEAR are distinct parse contexts, resolved by the caller's explicit field declaration (never by heuristic guessing and never by an LLM). Case C031 demonstrates: the same span '2023' is a POINT value in VALUE context and a YEAR in YEAR context.",
+  "cases": [
+    {
+      "id": "C001",
+      "category": "DIRECTIVE_EXEMPLAR",
+      "raw_span": "0.42",
+      "field_context": "VALUE",
+      "expected": {
+        "representation": "POINT",
+        "normalized_value": 0.42,
+        "normalized_min": null,
+        "normalized_max": null,
+        "unit": null,
+        "year": null,
+        "year_min": null,
+        "year_max": null,
+        "normalization_method": "EXACT_NUMERIC_LITERAL",
+        "approximation_marker": false,
+        "open_bound": null
+      }
+    },
+    {
+      "id": "C002",
+      "category": "DIRECTIVE_EXEMPLAR",
+      "raw_span": "0.42 ± 0.03",
+      "field_context": "VALUE",
+      "expected": {
+        "representation": "RANGE",
+        "normalized_value": null,
+        "normalized_min": 0.39,
+        "normalized_max": 0.45,
+        "unit": null,
+        "year": null,
+        "year_min": null,
+        "year_max": null,
+        "normalization_method": "UNCERTAINTY_TO_RANGE",
+        "approximation_marker": false,
+        "open_bound": null
+      }
+    },
+    {
+      "id": "C003",
+      "category": "DIRECTIVE_EXEMPLAR",
+      "raw_span": "0.1–10",
+      "field_context": "VALUE",
+      "expected": {
+        "representation": "RANGE",
+        "normalized_value": null,
+        "normalized_min": 0.1,
+        "normalized_max": 10.0,
+        "unit": null,
+        "year": null,
+        "year_min": null,
+        "year_max": null,
+        "normalization_method": "STATED_RANGE",
+        "approximation_marker": false,
+        "open_bound": null
+      }
+    },
+    {
+      "id": "C004",
+      "category": "DIRECTIVE_EXEMPLAR",
+      "raw_span": "10 to 20",
+      "field_context": "VALUE",
+      "expected": {
+        "representation": "RANGE",
+        "normalized_value": null,
+        "normalized_min": 10.0,
+        "normalized_max": 20.0,
+        "unit": null,
+        "year": null,
+        "year_min": null,
+        "year_max": null,
+        "normalization_method": "STATED_RANGE_WORD_FORM",
+        "approximation_marker": false,
+        "open_bound": null
+      }
+    },
+    {
+      "id": "C005",
+      "category": "DIRECTIVE_EXEMPLAR",
+      "raw_span": "~50",
+      "field_context": "VALUE",
+      "expected": {
+        "representation": "POINT",
+        "normalized_value": 50.0,
+        "normalized_min": null,
+        "normalized_max": null,
+        "unit": null,
+        "year": null,
+        "year_min": null,
+        "year_max": null,
+        "normalization_method": "APPROXIMATION_RETAINED",
+        "approximation_marker": true,
+        "open_bound": null
+      }
+    },
+    {
+      "id": "C006",
+      "category": "DIRECTIVE_EXEMPLAR",
+      "raw_span": ">100",
+      "field_context": "VALUE",
+      "expected": {
+        "representation": "INEQUALITY",
+        "normalized_value": null,
+        "normalized_min": 100.0,
+        "normalized_max": null,
+        "unit": null,
+        "year": null,
+        "year_min": null,
+        "year_max": null,
+        "normalization_method": "STATED_INEQUALITY",
+        "approximation_marker": false,
+        "open_bound": ">"
+      }
+    },
+    {
+      "id": "C007",
+      "category": "DIRECTIVE_EXEMPLAR",
+      "raw_span": "2023",
+      "field_context": "YEAR",
+      "expected": {
+        "representation": "POINT",
+        "normalized_value": null,
+        "normalized_min": null,
+        "normalized_max": null,
+        "unit": null,
+        "year": 2023,
+        "year_min": null,
+        "year_max": null,
+        "normalization_method": "YEAR_LITERAL",
+        "approximation_marker": false,
+        "open_bound": null
+      }
+    },
+    {
+      "id": "C008",
+      "category": "DIRECTIVE_EXEMPLAR",
+      "raw_span": "2023 (study)",
+      "field_context": "YEAR",
+      "expected": {
+        "representation": "POINT",
+        "normalized_value": null,
+        "normalized_min": null,
+        "normalized_max": null,
+        "unit": null,
+        "year": 2023,
+        "year_min": null,
+        "year_max": null,
+        "normalization_method": "YEAR_WITH_QUALIFIER",
+        "approximation_marker": false,
+        "open_bound": null
+      }
+    },
+    {
+      "id": "C009",
+      "category": "DIRECTIVE_EXEMPLAR",
+      "raw_span": "2018–2024",
+      "field_context": "YEAR",
+      "expected": {
+        "representation": "RANGE",
+        "normalized_value": null,
+        "normalized_min": null,
+        "normalized_max": null,
+        "unit": null,
+        "year": null,
+        "year_min": 2018,
+        "year_max": 2024,
+        "normalization_method": "STATED_YEAR_RANGE",
+        "approximation_marker": false,
+        "open_bound": null
+      }
+    },
+    {
+      "id": "C010",
+      "category": "EXTENDED",
+      "raw_span": "0.42 mW/cm²",
+      "field_context": "VALUE",
+      "expected": {
+        "representation": "POINT",
+        "normalized_value": 0.42,
+        "normalized_min": null,
+        "normalized_max": null,
+        "unit": "mW/cm²",
+        "year": null,
+        "year_min": null,
+        "year_max": null,
+        "normalization_method": "EXACT_NUMERIC_LITERAL",
+        "approximation_marker": false,
+        "open_bound": null
+      }
+    },
+    {
+      "id": "C011",
+      "category": "EXTENDED",
+      "raw_span": "≤ 3.5",
+      "field_context": "VALUE",
+      "expected": {
+        "representation": "INEQUALITY",
+        "normalized_value": null,
+        "normalized_min": null,
+        "normalized_max": 3.5,
+        "unit": null,
+        "year": null,
+        "year_min": null,
+        "year_max": null,
+        "normalization_method": "STATED_INEQUALITY",
+        "approximation_marker": false,
+        "open_bound": "≤"
+      }
+    },
+    {
+      "id": "C012",
+      "category": "EXTENDED",
+      "raw_span": "≥ 0.9",
+      "field_context": "VALUE",
+      "expected": {
+        "representation": "INEQUALITY",
+        "normalized_value": null,
+        "normalized_min": 0.9,
+        "normalized_max": null,
+        "unit": null,
+        "year": null,
+        "year_min": null,
+        "year_max": null,
+        "normalization_method": "STATED_INEQUALITY",
+        "approximation_marker": false,
+        "open_bound": "≥"
+      }
+    },
+    {
+      "id": "C013",
+      "category": "EXTENDED",
+      "raw_span": "<0.05",
+      "field_context": "VALUE",
+      "expected": {
+        "representation": "INEQUALITY",
+        "normalized_value": null,
+        "normalized_min": null,
+        "normalized_max": 0.05,
+        "unit": null,
+        "year": null,
+        "year_min": null,
+        "year_max": null,
+        "normalization_method": "STATED_INEQUALITY",
+        "approximation_marker": false,
+        "open_bound": "<"
+      }
+    },
+    {
+      "id": "C014",
+      "category": "EXTENDED",
+      "raw_span": "at least 12",
+      "field_context": "VALUE",
+      "expected": {
+        "representation": "INEQUALITY",
+        "normalized_value": null,
+        "normalized_min": 12.0,
+        "normalized_max": null,
+        "unit": null,
+        "year": null,
+        "year_min": null,
+        "year_max": null,
+        "normalization_method": "STATED_INEQUALITY_WORD_FORM",
+        "approximation_marker": false,
+        "open_bound": "≥"
+      }
+    },
+    {
+      "id": "C015",
+      "category": "EXTENDED",
+      "raw_span": "between 10 and 20",
+      "field_context": "VALUE",
+      "expected": {
+        "representation": "RANGE",
+        "normalized_value": null,
+        "normalized_min": 10.0,
+        "normalized_max": 20.0,
+        "unit": null,
+        "year": null,
+        "year_min": null,
+        "year_max": null,
+        "normalization_method": "STATED_RANGE_WORD_FORM",
+        "approximation_marker": false,
+        "open_bound": null
+      }
+    },
+    {
+      "id": "C016",
+      "category": "EXTENDED",
+      "raw_span": "50 ± 5 %",
+      "field_context": "VALUE",
+      "expected": {
+        "representation": "RANGE",
+        "normalized_value": null,
+        "normalized_min": 45.0,
+        "normalized_max": 55.0,
+        "unit": "%",
+        "year": null,
+        "year_min": null,
+        "year_max": null,
+        "normalization_method": "UNCERTAINTY_TO_RANGE",
+        "approximation_marker": false,
+        "open_bound": null
+      }
+    },
+    {
+      "id": "C017",
+      "category": "EXTENDED",
+      "raw_span": "10 nm to 20 nm",
+      "field_context": "VALUE",
+      "expected": {
+        "representation": "RANGE",
+        "normalized_value": null,
+        "normalized_min": 10.0,
+        "normalized_max": 20.0,
+        "unit": "nm",
+        "year": null,
+        "year_min": null,
+        "year_max": null,
+        "normalization_method": "STATED_RANGE_WORD_FORM",
+        "approximation_marker": false,
+        "open_bound": null
+      }
+    },
+    {
+      "id": "C018",
+      "category": "EXTENDED",
+      "raw_span": "0.05–0.3 mW/cm²",
+      "field_context": "VALUE",
+      "expected": {
+        "representation": "RANGE",
+        "normalized_value": null,
+        "normalized_min": 0.05,
+        "normalized_max": 0.3,
+        "unit": "mW/cm²",
+        "year": null,
+        "year_min": null,
+        "year_max": null,
+        "normalization_method": "STATED_RANGE",
+        "approximation_marker": false,
+        "open_bound": null
+      }
+    },
+    {
+      "id": "C019",
+      "category": "EXTENDED",
+      "raw_span": "10–100×",
+      "field_context": "VALUE",
+      "expected": {
+        "representation": "RANGE",
+        "normalized_value": null,
+        "normalized_min": 10.0,
+        "normalized_max": 100.0,
+        "unit": "×",
+        "year": null,
+        "year_min": null,
+        "year_max": null,
+        "normalization_method": "STATED_RANGE",
+        "approximation_marker": false,
+        "open_bound": null
+      }
+    },
+    {
+      "id": "C020",
+      "category": "EXTENDED",
+      "raw_span": "1.2 × 10^3",
+      "field_context": "VALUE",
+      "expected": {
+        "representation": "POINT",
+        "normalized_value": 1200.0,
+        "normalized_min": null,
+        "normalized_max": null,
+        "unit": null,
+        "year": null,
+        "year_min": null,
+        "year_max": null,
+        "normalization_method": "SCIENTIFIC_NOTATION_MULTIPLIER",
+        "approximation_marker": false,
+        "open_bound": null
+      }
+    },
+    {
+      "id": "C021",
+      "category": "EXTENDED",
+      "raw_span": "3.2e-2",
+      "field_context": "VALUE",
+      "expected": {
+        "representation": "POINT",
+        "normalized_value": 0.032,
+        "normalized_min": null,
+        "normalized_max": null,
+        "unit": null,
+        "year": null,
+        "year_min": null,
+        "year_max": null,
+        "normalization_method": "SCIENTIFIC_NOTATION_E",
+        "approximation_marker": false,
+        "open_bound": null
+      }
+    },
+    {
+      "id": "C022",
+      "category": "EXTENDED",
+      "raw_span": "approximately 50",
+      "field_context": "VALUE",
+      "expected": {
+        "representation": "POINT",
+        "normalized_value": 50.0,
+        "normalized_min": null,
+        "normalized_max": null,
+        "unit": null,
+        "year": null,
+        "year_min": null,
+        "year_max": null,
+        "normalization_method": "APPROXIMATION_RETAINED",
+        "approximation_marker": true,
+        "open_bound": null
+      }
+    },
+    {
+      "id": "C023",
+      "category": "EXTENDED",
+      "raw_span": "-5",
+      "field_context": "VALUE",
+      "expected": {
+        "representation": "POINT",
+        "normalized_value": -5.0,
+        "normalized_min": null,
+        "normalized_max": null,
+        "unit": null,
+        "year": null,
+        "year_min": null,
+        "year_max": null,
+        "normalization_method": "EXACT_NUMERIC_LITERAL",
+        "approximation_marker": false,
+        "open_bound": null
+      }
+    },
+    {
+      "id": "C024",
+      "category": "EXTENDED",
+      "raw_span": "from 2019 to 2023",
+      "field_context": "YEAR",
+      "expected": {
+        "representation": "RANGE",
+        "normalized_value": null,
+        "normalized_min": null,
+        "normalized_max": null,
+        "unit": null,
+        "year": null,
+        "year_min": 2019,
+        "year_max": 2023,
+        "normalization_method": "STATED_YEAR_RANGE",
+        "approximation_marker": false,
+        "open_bound": null
+      }
+    },
+    {
+      "id": "C025",
+      "category": "EXTENDED",
+      "raw_span": "2023-2024",
+      "field_context": "YEAR",
+      "expected": {
+        "representation": "RANGE",
+        "normalized_value": null,
+        "normalized_min": null,
+        "normalized_max": null,
+        "unit": null,
+        "year": null,
+        "year_min": 2023,
+        "year_max": 2024,
+        "normalization_method": "STATED_YEAR_RANGE",
+        "approximation_marker": false,
+        "open_bound": null
+      }
+    },
+    {
+      "id": "C026",
+      "category": "EXTENDED",
+      "raw_span": "in 2021",
+      "field_context": "YEAR",
+      "expected": {
+        "representation": "POINT",
+        "normalized_value": null,
+        "normalized_min": null,
+        "normalized_max": null,
+        "unit": null,
+        "year": 2021,
+        "year_min": null,
+        "year_max": null,
+        "normalization_method": "YEAR_WITH_PREPOSITION",
+        "approximation_marker": false,
+        "open_bound": null
+      }
+    },
+    {
+      "id": "C027",
+      "category": "EXTENDED",
+      "raw_span": "state-of-the-art",
+      "field_context": "VALUE",
+      "expected": {
+        "representation": "ORDINAL_QUALITATIVE",
+        "normalized_value": null,
+        "normalized_min": null,
+        "normalized_max": null,
+        "unit": null,
+        "year": null,
+        "year_min": null,
+        "year_max": null,
+        "normalization_method": "STATED_QUALITATIVE_TERM",
+        "approximation_marker": false,
+        "open_bound": null,
+        "qualitative_term": "STATE_OF_THE_ART"
+      }
+    },
+    {
+      "id": "C028",
+      "category": "EXTENDED",
+      "raw_span": "order-of-magnitude improvement",
+      "field_context": "VALUE",
+      "expected": {
+        "representation": "ORDINAL_QUALITATIVE",
+        "normalized_value": null,
+        "normalized_min": null,
+        "normalized_max": null,
+        "unit": null,
+        "year": null,
+        "year_min": null,
+        "year_max": null,
+        "normalization_method": "STATED_QUALITATIVE_TERM",
+        "approximation_marker": false,
+        "open_bound": null,
+        "qualitative_term": "ORDER_OF_MAGNITUDE_IMPROVEMENT"
+      }
+    },
+    {
+      "id": "C029",
+      "category": "EXTENDED",
+      "raw_span": "varies",
+      "field_context": "VALUE",
+      "expected": {
+        "representation": "NOT_NUMERIC",
+        "normalized_value": null,
+        "normalized_min": null,
+        "normalized_max": null,
+        "unit": null,
+        "year": null,
+        "year_min": null,
+        "year_max": null,
+        "normalization_method": "NO_NUMERIC_CONTENT",
+        "approximation_marker": false,
+        "open_bound": null
+      }
+    },
+    {
+      "id": "C030",
+      "category": "EXTENDED",
+      "raw_span": "not reported",
+      "field_context": "VALUE",
+      "expected": {
+        "representation": "NOT_NUMERIC",
+        "normalized_value": null,
+        "normalized_min": null,
+        "normalized_max": null,
+        "unit": null,
+        "year": null,
+        "year_min": null,
+        "year_max": null,
+        "normalization_method": "NO_NUMERIC_CONTENT",
+        "approximation_marker": false,
+        "open_bound": null
+      }
+    },
+    {
+      "id": "C031",
+      "category": "CONTEXT_DISAMBIGUATION",
+      "raw_span": "2023",
+      "field_context": "VALUE",
+      "expected": {
+        "representation": "POINT",
+        "normalized_value": 2023.0,
+        "normalized_min": null,
+        "normalized_max": null,
+        "unit": null,
+        "year": null,
+        "year_min": null,
+        "year_max": null,
+        "normalization_method": "EXACT_NUMERIC_LITERAL",
+        "approximation_marker": false,
+        "open_bound": null
+      }
+    },
+    {
+      "id": "C032",
+      "category": "MALFORMED",
+      "raw_span": "",
+      "field_context": "VALUE",
+      "expected": {
+        "representation": "MALFORMED",
+        "malformed_reason": "MALFORMED_EMPTY"
+      }
+    },
+    {
+      "id": "C033",
+      "category": "MALFORMED",
+      "raw_span": "±0.03",
+      "field_context": "VALUE",
+      "expected": {
+        "representation": "MALFORMED",
+        "malformed_reason": "MALFORMED_NO_CENTER_VALUE"
+      }
+    },
+    {
+      "id": "C034",
+      "category": "MALFORMED",
+      "raw_span": "0.4.2",
+      "field_context": "VALUE",
+      "expected": {
+        "representation": "MALFORMED",
+        "malformed_reason": "MALFORMED_NOT_A_NUMBER"
+      }
+    },
+    {
+      "id": "C035",
+      "category": "MALFORMED",
+      "raw_span": "10 to",
+      "field_context": "VALUE",
+      "expected": {
+        "representation": "MALFORMED",
+        "malformed_reason": "MALFORMED_INCOMPLETE_RANGE"
+      }
+    },
+    {
+      "id": "C036",
+      "category": "MALFORMED",
+      "raw_span": "20 to 10",
+      "field_context": "VALUE",
+      "expected": {
+        "representation": "MALFORMED",
+        "malformed_reason": "MALFORMED_INVERTED_RANGE"
+      }
+    },
+    {
+      "id": "C037",
+      "category": "MALFORMED",
+      "raw_span": "2024–2018",
+      "field_context": "YEAR",
+      "expected": {
+        "representation": "MALFORMED",
+        "malformed_reason": "MALFORMED_INVERTED_YEAR_RANGE"
+      }
+    },
+    {
+      "id": "C038",
+      "category": "MALFORMED",
+      "raw_span": "0.1--10",
+      "field_context": "VALUE",
+      "expected": {
+        "representation": "MALFORMED",
+        "malformed_reason": "MALFORMED_SEPARATOR"
+      }
+    },
+    {
+      "id": "C039",
+      "category": "MALFORMED",
+      "raw_span": ">",
+      "field_context": "VALUE",
+      "expected": {
+        "representation": "MALFORMED",
+        "malformed_reason": "MALFORMED_NO_BOUND_VALUE"
+      }
+    },
+    {
+      "id": "C040",
+      "category": "MALFORMED",
+      "raw_span": "approx",
+      "field_context": "VALUE",
+      "expected": {
+        "representation": "MALFORMED",
+        "malformed_reason": "MALFORMED_NO_VALUE"
+      }
+    }
+  ],
+  "verification_fixtures": [
+    {
+      "id": "VF1",
+      "description": "Exact byte-identical span found once in source text.",
+      "source_text": "The measured conversion efficiency was 0.42 ± 0.03 under standard test conditions, with the facility reporting values since 2019.",
+      "span": "0.42 ± 0.03",
+      "occurrence_index": 0,
+      "expected_verdict": "SPAN_VERIFIED",
+      "expected_occurrences": 1
+    },
+    {
+      "id": "VF2",
+      "description": "Span absent from source text must yield SPAN_NOT_FOUND, never a fuzzy or case-insensitive match (Constitution Article II).",
+      "source_text": "The measured conversion efficiency was 0.42 ± 0.03 under standard test conditions.",
+      "span": "0.55 ± 0.02",
+      "occurrence_index": 0,
+      "expected_verdict": "SPAN_NOT_FOUND",
+      "expected_occurrences": 0
+    },
+    {
+      "id": "VF3",
+      "description": "Byte-exact matching only: a whitespace-mutated span must NOT match (no fuzzy matching, no normalization drift at the binding stage).",
+      "source_text": "The measured conversion efficiency was 0.42 ± 0.03 under standard test conditions.",
+      "span": "0.42  ±  0.03",
+      "occurrence_index": 0,
+      "expected_verdict": "SPAN_NOT_FOUND",
+      "expected_occurrences": 0
+    },
+    {
+      "id": "VF4",
+      "description": "Span occurring twice: explicit index resolves; out-of-range index is recorded as such; missing index with multiple occurrences is ambiguous and must be recorded, never silently first-matched.",
+      "source_text": "Yield improved to 0.42 in the first run and stabilized at 0.42 in the second run.",
+      "span": "0.42",
+      "occurrence_index": 1,
+      "expected_verdict": "SPAN_VERIFIED",
+      "expected_occurrences": 2
+    },
+    {
+      "id": "VF5",
+      "description": "Out-of-range index with known occurrences.",
+      "source_text": "Yield improved to 0.42 in the first run and stabilized at 0.42 in the second run.",
+      "span": "0.42",
+      "occurrence_index": 5,
+      "expected_verdict": "SPAN_INDEX_OUT_OF_RANGE",
+      "expected_occurrences": 2
+    },
+    {
+      "id": "VF6",
+      "description": "Multiple occurrences with no index chosen: ambiguity is recorded, never silently resolved.",
+      "source_text": "Yield improved to 0.42 in the first run and stabilized at 0.42 in the second run.",
+      "span": "0.42",
+      "occurrence_index": null,
+      "expected_verdict": "SPAN_AMBIGUOUS_REQUIRES_INDEX",
+      "expected_occurrences": 2
+    }
+  ]
+}
