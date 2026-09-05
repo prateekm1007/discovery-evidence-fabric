@@ -1051,3 +1051,32 @@ Work Log:
 Stage Summary:
 - The R407/DRIVERS outputs now carry the TRUE final measurement state (ce36ce72 + the D2/P13/P11 tree), the portfolio residue is dispositioned rather than silently dropped, and the worklog carries an entry for every unpushed commit.
 - The R408 audit-response cycle is closed: 7/7 instructions executed, all scores MEASURED or honestly 0, the one below-bar finding (MACHINERY 8) disclosed rather than cosmetically repaired, and the honest headline unchanged — the machine waits on the first real physical observation.
+
+---
+Task ID: R409 (engine-side entry)
+Agent: Coder
+Task: CODER DIRECTIVE — MULTI-SOURCE OPEN RETRIEVAL FABRIC (search-space neutrality).
+
+Work Log:
+- Commits 2731b0e2 + 2f805d8d (implementation, 20 files) + 3339080c (benchmark report). RETRIEVAL_FABRIC_V2: FABRIC_SOURCES.json (14 wired open/free sources, 12 independence families, 8 evidence lanes, declared lineage); 5 new ConnectorBase adapters (DOAJ/Unpaywall/DataCite/OpenAIRE/CORE — live-measured payload shapes, Art. XXI.3 discipline); query expansion with derivation classes + LLM no-fabrication gate; canonical dedup preserving multi-source provenance; lineage-based source_independence_score (declared upstream AND measured overlap, union-find); publication_status labeling from source-declared types; directive patent schema with claim-fetch custody; S2 reciprocal expansion (budgeted); per-run health honesty; blind-spot analysis; frozen benchmark corpus (Art. L59) with ground truth from RECORDED R406/R405 history.
+- V1 (a2/retrieve.py) BYTE-UNCHANGED (sha256-pinned by test); ENGINE_RETRIEVAL_FABRIC=V1 reproduces the legacy path; A2RetrievalAdapter defaults to V2 with additive evidence fields.
+- Hermetic suite 55/55; batteries 151/4 + 112/112. BENCHMARK (clean clone, live): V2 = 6-9 families (5-9 independent, score 0.71-1.0), all lanes populated, 58 V2-unique RELEVANT items, FP rate DOWN on every problem (0.7/0.3/0.4/0.44 -> 0.21/0.0/0.11/0.0); HONEST: 0/6 frozen targets found by BOTH pipelines — terminology lock-in remains the measured open problem. Full detail: R409/RETRIEVAL_BENCH/fabric_benchmark_report.json + the main worklog.
+- CI on 3339080c: Epistemic Certification COMPLETED SUCCESS.
+
+Stage Summary:
+- The engine's search space is no longer defined by Europe PMC + OpenAlex; Europe PMC + OpenAlex are two nodes in a measured-independence fabric. Open items: specific-target recall (terminology divergence), S2 API key for the 429-prone unauthenticated tier.
+
+---
+Task ID: R410 (engine-side entry)
+Agent: Coder
+Task: respond to the external efficiency audit (91MB claimed dead; Gen-1 reality loop; premium_package_factory prune; scripts cleanup) — verify every claim, execute the verified set with before/after batteries.
+
+Work Log:
+- Commits f365d959 + cd6f0fc8 + 2199982e + 23399cb2 + 6e0d04e1 (pushed; certification in_progress at log time, Lightweight SUCCESS). Verification matrix + disputes + manifest: R410/EFFICIENCY_AUDIT_RESPONSE.json.
+- DELETED: 10 ack scripts; Gen-1 reality loop (reality_loop/reality_provider/learning_loop + tests + gates + conftest fixture + 3 E13 tests; _conductance_ml_per_min_mmhg relocated VERBATIM to physics_core, pins re-pointed); ~105 dead premium_package_factory paths (pruned to the VERIFIED 42-file live closure — the audit's keep-list would have broken the live drivers + 5 suites: r371/ r372/r381/r382/r394-live-gates missed); 42 zero-ref scripts archived to scripts/archive/; 89 dead top-level paths (R400, 44 CEREVASC_*, R332/R334/R341/R346/R399/R370_completion/R370J-P, inventions/, external_evidence/, non-constitution R309/R339).
+- KEPT against the audit's zero-ref claims (disputed with evidence): NOVELTY_EVIDENCE, EXTERNAL_CONSULTANT_EVIDENCE, tournament_v3, replay_candidates, autonomous_calibration_v3*, R394, R396, R370Q, R370, constitution subdirs.
+- RED GATE EVENT: the post-deletion battery caught 2 mis-classified deletions (P11-manifest-cited R339/g2_p24_buyer_package; R406-record-cited R400 files verified by the FIDELITY stale-path census) — citation-restoration pass restored 25 cited files; pins re-verified green; pre-existing dangling citations disclosed.
+- FINAL vs BASELINE (identical commands): group A 234/1 BOTH; group B 326->323 (= exactly the 3 intentionally-removed E13 tests); ppf battery 187/1; import closure green. Tree 144MB -> 97MB. Secret scan 0 matches.
+
+Stage Summary:
+- 47MB + ~1,900 files of verified dead weight gone, manifest-recorded (Art. XI); the audit was falsified in 9+ places, including two whose verbatim execution would have broken live drivers — external audits are adversarial inputs, verified never executed (Art. XXXI memory artifact recorded).
