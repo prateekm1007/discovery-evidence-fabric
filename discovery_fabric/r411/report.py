@@ -27,6 +27,66 @@ def _read(c, *rel) -> Any:
     return json.load(open(p)) if os.path.exists(p) else None
 
 
+def _assert_funnel_arithmetic(collision: Dict[str, Any],
+                              extraction_gate_rejected: int,
+                              engineering_done: List[str]) -> None:
+    """R412: the funnel-arithmetic guard (CEO R412 Phase 2 directive:
+    'a test that makes the report impossible to emit with inconsistent
+    funnel arithmetic' — this is the emission-side guard; the test-side
+    pin lives in tests/test_r412_death_waterfall.py).
+
+    The canonical identity, from the frozen stage semantics:
+
+        raw_accepted_from_extraction
+          - medical_excluded_count            (denominator: raw)
+          - collision_rejected_count          (denominator: raw - medical)
+          - len(dedup.merge_events)           (denominator: post-collision)
+          == survivor_count
+
+    dedup_indeterminate_pairs and extraction_gate_rejected are NOT
+    subtraction terms (pair-level and attempt-level counts
+    respectively) — mis-presenting them as candidate-level subtractions
+    is exactly the R411 denominator ambiguity this guard closes.
+
+    Raises ValueError on any inconsistency — the record is NOT emitted.
+    """
+    raw = collision.get("raw_accepted_from_extraction")
+    med = collision.get("medical_excluded_count")
+    col = collision.get("collision_rejected_count")
+    merged = len((collision.get("dedup") or {}).get("merge_events") or [])
+    surv = collision.get("survivor_count")
+    for name, v in (("raw_accepted_from_extraction", raw),
+                    ("medical_excluded_count", med),
+                    ("collision_rejected_count", col),
+                    ("survivor_count", surv)):
+        if not isinstance(v, int) or v < 0:
+            raise ValueError(
+                f"funnel arithmetic guard: {name} is not a non-negative "
+                f"integer: {v!r} — refusing to emit the run record")
+    if raw - med - col - merged != surv:
+        raise ValueError(
+            "funnel arithmetic guard: raw_accepted_from_extraction "
+            f"({raw}) - medical_excluded ({med}) - collision_rejected "
+            f"({col}) - dedup_merged ({merged}) != survivor_count "
+            f"({surv}) — the funnel does not reconcile; refusing to "
+            "emit the run record with inconsistent arithmetic")
+    # engineering denominators: n_gated reports UNIQUE candidate ids;
+    # the resumable state machine appends at two sites (F6 pre-selection
+    # pass and run_selection's re-gate), so the raw list may carry each
+    # id twice — the RECORD reports unique ids plus the append-site
+    # disclosure, never the double count (the R411 'engineering-gated =
+    # 28' class of unexplained denominator).
+    if len(set(engineering_done)) * 2 < len(engineering_done):
+        raise ValueError(
+            "funnel arithmetic guard: engineering_done contains ids "
+            f"appended more than 2x ({len(engineering_done)} entries, "
+            f"{len(set(engineering_done))} unique) — the state machine "
+            "appended more than its two known sites; refusing to emit")
+    if extraction_gate_rejected < 0:
+        raise ValueError("funnel arithmetic guard: negative "
+                         "extraction_gate_rejected")
+
+
 def build_run_record(c) -> Dict[str, Any]:
     state = c.state
     matrix = _read(c, "domain_matrix.json") or {}
@@ -35,6 +95,17 @@ def build_run_record(c) -> Dict[str, Any]:
     shortlist = _read(c, "shortlist.json") or []
     selection = _read(c, "selection.json") or {}
     cal = _read(c, "attack_calibration.json") or {}
+
+    # R412: the funnel-arithmetic guard runs BEFORE any emission —
+    # inconsistent arithmetic makes the run record impossible to emit
+    # (a raised ValueError, never a silently inconsistent JSON).
+    _assert_funnel_arithmetic(
+        collision,
+        sum(len((_read(c, "candidates", f"{d}.json") or
+                 {}).get("rejected") or [])
+            for d in state.get("extraction_done", [])),
+        state.get("engineering_done", []),
+    )
 
     # aggregate retrieval stats across the domain snapshots
     sources_attempted: List[str] = []
@@ -179,16 +250,35 @@ def build_run_record(c) -> Dict[str, Any]:
         },
         "candidate_count": collision.get("raw_accepted_from_extraction"),
         "candidate_rejections": {
+            # R412: every category now carries its true denominator and
+            # semantics — the R411 presentation let a naive reader
+            # subtract attempt-level and pair-level counts from the
+            # candidate-level pool (the 550-8-142-0-267-32 != 400
+            # ambiguity class). The reconciliation field states the
+            # exact identity the guard enforces.
             "medical_excluded": collision.get("medical_excluded_count"),
             "collision_rejected": collision.get("collision_rejected_count"),
             "dedup_merged": len((collision.get("dedup") or {}).get(
                 "merge_events") or []),
-            "dedup_indeterminate": len((collision.get("dedup") or {}).get(
-                "indeterminate_pairs") or []),
+            "dedup_indeterminate_pairs": len(
+                (collision.get("dedup") or {}).get(
+                    "indeterminate_pairs") or []),
             "extraction_gate_rejected": sum(
                 len((_read(c, "candidates", f"{d}.json") or
                      {}).get("rejected") or [])
                 for d in state.get("extraction_done", [])),
+            "extraction_gate_denominator": (
+                "extraction ATTEMPTS (accepted + rejected); NOT a "
+                "candidate-level subtraction term"),
+            "dedup_indeterminate_semantics": (
+                "PAIR-level referrals to collision adjudication; removes "
+                "ZERO candidates; NOT a subtraction term"),
+            "funnel_reconciliation": (
+                f"survivors = raw({collision.get('raw_accepted_from_extraction')}) "
+                f"- medical_excluded({collision.get('medical_excluded_count')}) "
+                f"- collision_rejected({collision.get('collision_rejected_count')}) "
+                f"- dedup_merged({len((collision.get('dedup') or {}).get('merge_events') or [])}) "
+                f"= {collision.get('survivor_count')}"),
         },
         "candidate_survivors": collision.get("survivor_count"),
         "attacker_results": {
@@ -242,7 +332,19 @@ def build_run_record(c) -> Dict[str, Any]:
             },
         },
         "engineering_results": {
-            "n_gated": len(state.get("engineering_done", [])),
+            # R412: n_gated counts UNIQUE candidate ids. The resumable
+            # state machine appends each id at TWO sites (the F6
+            # pre-selection pass and run_selection's re-gate), so the
+            # raw state list may hold 2x entries — the RECORD never
+            # reports the double count (the R411 'engineering-gated =
+            # 28 vs 14 shortlisted' unexplained denominator, closed).
+            "n_gated": len(set(state.get("engineering_done", []))),
+            "n_gated_append_sites": 2,
+            "n_gated_note": (
+                "unique candidate ids gated by the structural engineering "
+                "gate; the resumable state appends at the F6 pre-selection "
+                "pass and run_selection's re-gate — ids, not appends, "
+                "are the denominator"),
             "verdicts": {
                 cid: (_read(c, "engineering", f"{cid}.json") or
                       {}).get("passed")
