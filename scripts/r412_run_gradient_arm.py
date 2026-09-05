@@ -64,6 +64,10 @@ TERMINAL_STATUSES = ("OK", "EXTRACTION_FAILED", "INSUFFICIENT_FRONTIER",
 FABRIC_LANE_CAPS = {"SCHOLARLY": 4, "PREPRINT": 2, "PATENT": 3,
                     "THESIS": 2, "DATASET": 1, "REGISTER": 2,
                     "CLINICAL": 0}
+# the sealed budget: tvm_construction_fabric_calls_max = 12 total
+# completed rung constructions (transport retries are the sealed
+# bounded headroom on top)
+TVM_CONSTRUCTION_CAP = 12
 
 
 def _utc() -> str:
@@ -371,6 +375,12 @@ def stage_tvm_build(limit=None) -> int:
             transport_fails[k] = transport_fails.get(k, 0) + 1
     built = 0
     shortfall = []
+    # the sealed budget is a TOTAL cap over completed rung attempts
+    # (tvm_construction_fabric_calls_max = 12); the invocation limit
+    # only bounds THIS invocation's work — later rungs stay PENDING
+    # (resumable), and only a rung the TOTAL cap can never cover is
+    # recorded INCOMPLETE_BUDGET_SHORTFALL
+    total_attempts = len(attempted_done)
     for key in ordered_keys:
         rung = rungs[key]
         if key in have or key in attempted_done or \
@@ -378,9 +388,13 @@ def stage_tvm_build(limit=None) -> int:
             continue
         if transport_fails.get(key, 0) >= 2:
             continue  # bounded retry exhausted; stays INCOMPLETE
-        if limit is not None and built >= limit:
+        if total_attempts + built >= TVM_CONSTRUCTION_CAP:
             shortfall.append(rung)
             continue
+        if limit is not None and built >= limit:
+            break  # per-invocation limit: remaining rungs stay
+            # PENDING for the next resumable invocation (NOT
+            # shortfall — the total cap has not been reached)
         query = (f"{rung} performance trend improvement measured "
                  f"benchmark")
         try:

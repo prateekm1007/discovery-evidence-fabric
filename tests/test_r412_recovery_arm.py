@@ -1156,3 +1156,63 @@ class TestAllocationEnforcement:
             lambda q: (calls.append(q), records, {})[1:])
         assert mod.stage_tvm_build() == 0
         assert calls == []  # no re-attempt of the completed rung
+
+    def test_tvm_build_incremental_invocations_do_not_fake_shortfall(
+            self, monkeypatch, tmp_path):
+        """limit=N bounds THIS invocation only: after building N
+        rungs the remaining rungs stay PENDING (resumable), NOT
+        INCOMPLETE_BUDGET_SHORTFALL — the sealed 12-call cap is a
+        TOTAL cap, and only a rung the total cap can never cover is
+        recorded as shortfall."""
+        mod = _load_runner_module(monkeypatch, tmp_path)
+        all_seeds = _load(ACCOUNTING)["technical_death_subset"][
+            "candidate_ids"]
+        ga1b = [{"candidate_id": cid, "status": "OK",
+                 "gate": {"capability_rung": f"rung-{cid}"}}
+                for cid in all_seeds]
+        (mod.OUT_DIR / "ga1b.jsonl").write_text(
+            "\n".join(json.dumps(r) for r in ga1b))
+        records = [{"record_id": "r-1", "title": "t",
+                    "abstract": "a"}]
+        report = {"retrieved_at": "2026-09-06T00:00:00Z"}
+        monkeypatch.setattr(
+            mod, "_retrieve", lambda q: (records, report))
+        monkeypatch.setattr(
+            mod, "_llm",
+            lambda *a, **k: {"ok": True, "content": "", "model":
+                             "test", "prompt_hash": "h",
+                             "output_hash": "h"})
+        # invocation 1: build 1 rung only
+        assert mod.stage_tvm_build(1) == 0
+        tvm = json.loads(mod.TVM_CONSTRUCTED.read_text())
+        done1 = [e for e in tvm["construction_log"]
+                 if e.get("n_retrieved") is not None]
+        shortfall1 = [e for e in tvm["construction_log"]
+                      if e.get("status") ==
+                      "INCOMPLETE_BUDGET_SHORTFALL"]
+        assert len(done1) == 1
+        assert shortfall1 == []  # PENDING, not shortfall
+        # invocations 2..11: one rung each, no fake shortfall
+        for _ in range(10):
+            assert mod.stage_tvm_build(1) == 0
+        tvm = json.loads(mod.TVM_CONSTRUCTED.read_text())
+        done = [e for e in tvm["construction_log"]
+                if e.get("n_retrieved") is not None]
+        shortfall = [e for e in tvm["construction_log"]
+                     if e.get("status") ==
+                     "INCOMPLETE_BUDGET_SHORTFALL"]
+        assert len(done) == 11
+        assert shortfall == []
+        # invocation 12: the 12th rung; the 13th (non-allocation)
+        # is now beyond the TOTAL cap -> genuine shortfall
+        assert mod.stage_tvm_build(1) == 0
+        tvm = json.loads(mod.TVM_CONSTRUCTED.read_text())
+        done = [e for e in tvm["construction_log"]
+                if e.get("n_retrieved") is not None]
+        shortfall = [e for e in tvm["construction_log"]
+                     if e.get("status") ==
+                     "INCOMPLETE_BUDGET_SHORTFALL"]
+        assert len(done) == 12
+        assert len(shortfall) == 1
+        allocation_rungs = {f"rung-{cid}" for cid in self.priority}
+        assert str(shortfall[0]["rung"]) not in allocation_rungs
