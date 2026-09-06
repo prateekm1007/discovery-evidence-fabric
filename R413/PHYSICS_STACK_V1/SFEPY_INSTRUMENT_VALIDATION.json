@@ -1,0 +1,101 @@
+{
+ "artifact_type": "R413_SFEPY_INSTRUMENT_VALIDATION",
+ "solver": "sfepy",
+ "solver_version": "sfepy/2026.2",
+ "validated_phenomenon": "linear_elastic_deformation",
+ "validated_regime": {
+  "constitutive": "plane-stress linear elasticity, homogeneous isotropic",
+  "loading": "uniform uniaxial traction (no stress concentration, no body force)",
+  "mesh": "structured bilinear quads, 8..64 elements",
+  "fields": "displacement (exact-representable linear fields)"
+ },
+ "method": "closed-form reference replay: uniform-traction plane-stress problems whose exact displacement fields lie inside the element space \u2014 the FE solution must reproduce them to floating-point agreement",
+ "threshold": {
+  "name": "REFERENCE_REL_TOL",
+  "value": 1e-09,
+  "epistemic_class": "ENGINEERING",
+  "justification": "the closed-form solution is exactly representable in the bilinear element space; the threshold detects assembly, BC, or unit defects while allowing roundoff (the R394 V0 discipline applied to FEM)"
+ },
+ "cases": [
+  {
+   "case": "uniaxial-tension-A",
+   "geometry": {
+    "L": 1.0,
+    "H": 0.5,
+    "n_elements": 8,
+    "element": "bilinear quad (2_4)"
+   },
+   "load": {
+    "sigma": 1000000.0,
+    "E": 200000000000.0,
+    "nu": 0.3
+   },
+   "closed_form": {
+    "ux": "sigma*x/E",
+    "uy": "-nu*sigma*y/E",
+    "sigma_xx": "sigma (uniform)"
+   },
+   "max_abs_err_ux": 1.5246593050577406e-20,
+   "max_abs_err_uy": 3.6422416731934915e-20,
+   "max_rel_error": 7.284483346386983e-15,
+   "threshold": 1e-09,
+   "pass": true
+  },
+  {
+   "case": "uniaxial-tension-B",
+   "geometry": {
+    "L": 2.0,
+    "H": 1.0,
+    "n_elements": 32,
+    "element": "bilinear quad (2_4)"
+   },
+   "load": {
+    "sigma": -2500000.0,
+    "E": 70000000000.0,
+    "nu": 0.33
+   },
+   "closed_form": {
+    "ux": "sigma*x/E",
+    "uy": "-nu*sigma*y/E",
+    "sigma_xx": "sigma (uniform)"
+   },
+   "max_abs_err_ux": 5.55653613398821e-19,
+   "max_abs_err_uy": 7.5258877363544585e-19,
+   "max_rel_error": 1.053624283089624e-14,
+   "threshold": 1e-09,
+   "pass": true
+  },
+  {
+   "case": "uniaxial-tension-C",
+   "geometry": {
+    "L": 0.5,
+    "H": 2.0,
+    "n_elements": 32,
+    "element": "bilinear quad (2_4)"
+   },
+   "load": {
+    "sigma": 750000.0,
+    "E": 3000000000.0,
+    "nu": 0.4
+   },
+   "closed_form": {
+    "ux": "sigma*x/E",
+    "uy": "-nu*sigma*y/E",
+    "sigma_xx": "sigma (uniform)"
+   },
+   "max_abs_err_ux": 4.87890977618477e-19,
+   "max_abs_err_uy": 3.821812658011403e-18,
+   "max_rel_error": 1.9109063290057016e-14,
+   "threshold": 1e-09,
+   "pass": true
+  }
+ ],
+ "all_cases_pass": true,
+ "determinism_replay": {
+  "case_rerun": "uniaxial-tension-A",
+  "byte_identical": true
+ },
+ "notes": "this replay validates the instrument for the DECLARED REGIME ONLY (uniform traction, plane stress, exactly-representable fields). Stress concentrations, singularities, nonlinear materials, and 3D remain OUTSIDE the validated regime \u2014 the claim contract enforces this scoping (coverage.evaluate_physics_claim).",
+ "measured_at": "2026-09-06",
+ "reviewer_provenance": "AI_REVIEW"
+}

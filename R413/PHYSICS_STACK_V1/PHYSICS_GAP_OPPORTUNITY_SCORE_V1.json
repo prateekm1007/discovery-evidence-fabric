@@ -1,0 +1,924 @@
+{
+ "artifact_type": "R413_PHYSICS_GAP_OPPORTUNITY_SCORE_V1",
+ "version": "1.0.0",
+ "directive": "operator directive V2 Phase 5 + the Physics Gap Opportunity Score (the operator's improvement beyond the auditor): physics expansion as a MEASURED discovery investment decision",
+ "input_matrix": {
+  "path": "R413/PHYSICS_STACK_V1/PHYSICS_COVERAGE_MATRIX_V1.json",
+  "sha256": "03d8aef1fef90005b28f364403619b77682364974156a73ea3f2fc97b7cf3080"
+ },
+ "factor_tables_pre_registered": [
+  {
+   "solver_id": "elmer",
+   "implementation_cost": {
+    "value": 7,
+    "components": {
+     "install_mechanism": 3,
+     "automation_interface": 2,
+     "verification_setup": 2
+    },
+    "justification": {
+     "install_mechanism": "system package; no binary on PATH (MEASURED)",
+     "automation_interface": "sif case files + ElmerSolver CLI",
+     "verification_setup": "ships verification cases requiring sif setup"
+    },
+    "class": "MODEL_DERIVED over MEASURED components (availability probes, pip dry-run, official interface documentation)",
+    "scale": "lower = cheaper (3..9)"
+   },
+   "validation_maturity": {
+    "value": 2,
+    "class": "MODEL_DERIVED / DOC_DECLARED — shipped verification material replayable headless",
+    "scale": "1..3, higher = more mature"
+   },
+   "automation_feasibility": {
+    "value": 2,
+    "class": "MODEL_DERIVED / DOC_DECLARED — official headless interface",
+    "scale": "1..3, higher = better"
+   }
+  },
+  {
+   "solver_id": "fenicsx",
+   "implementation_cost": {
+    "value": 5,
+    "components": {
+     "install_mechanism": 2,
+     "automation_interface": 1,
+     "verification_setup": 2
+    },
+    "justification": {
+     "install_mechanism": "dolfinx wheels/packages with native PETSc stack",
+     "automation_interface": "native Python API",
+     "verification_setup": "MMS conventions documented; verification problems require authoring"
+    },
+    "class": "MODEL_DERIVED over MEASURED components (availability probes, pip dry-run, official interface documentation)",
+    "scale": "lower = cheaper (3..9)"
+   },
+   "validation_maturity": {
+    "value": 2,
+    "class": "MODEL_DERIVED / DOC_DECLARED — shipped verification material replayable headless",
+    "scale": "1..3, higher = more mature"
+   },
+   "automation_feasibility": {
+    "value": 3,
+    "class": "MODEL_DERIVED / DOC_DECLARED — official headless interface",
+    "scale": "1..3, higher = better"
+   }
+  },
+  {
+   "solver_id": "mujoco",
+   "implementation_cost": {
+    "value": 4,
+    "components": {
+     "install_mechanism": 2,
+     "automation_interface": 1,
+     "verification_setup": 1
+    },
+    "justification": {
+     "install_mechanism": "pip wheel shipping native binaries (deepmind mujoco wheels)",
+     "automation_interface": "native Python API (mujoco bindings)",
+     "verification_setup": "ships analytical/pendulum-style regression tests"
+    },
+    "class": "MODEL_DERIVED over MEASURED components (availability probes, pip dry-run, official interface documentation)",
+    "scale": "lower = cheaper (3..9)"
+   },
+   "validation_maturity": {
+    "value": 3,
+    "class": "MODEL_DERIVED / DOC_DECLARED — shipped verification material replayable headless",
+    "scale": "1..3, higher = more mature"
+   },
+   "automation_feasibility": {
+    "value": 3,
+    "class": "MODEL_DERIVED / DOC_DECLARED — official headless interface",
+    "scale": "1..3, higher = better"
+   }
+  },
+  {
+   "solver_id": "openems",
+   "implementation_cost": {
+    "value": 8,
+    "components": {
+     "install_mechanism": 3,
+     "automation_interface": 3,
+     "verification_setup": 2
+    },
+    "justification": {
+     "install_mechanism": "system package + (typically) Octave/MATLAB driver; no binary on PATH (MEASURED)",
+     "automation_interface": "CSX XML + typically Octave/MATLAB driver — GUI-adjacent workflow",
+     "verification_setup": "ships validation examples (antennas/waveguides) requiring setup"
+    },
+    "class": "MODEL_DERIVED over MEASURED components (availability probes, pip dry-run, official interface documentation)",
+    "scale": "lower = cheaper (3..9)"
+   },
+   "validation_maturity": {
+    "value": 2,
+    "class": "MODEL_DERIVED / DOC_DECLARED — shipped verification material replayable headless",
+    "scale": "1..3, higher = more mature"
+   },
+   "automation_feasibility": {
+    "value": 1,
+    "class": "MODEL_DERIVED / DOC_DECLARED — official headless interface",
+    "scale": "1..3, higher = better"
+   }
+  },
+  {
+   "solver_id": "openfoam",
+   "implementation_cost": {
+    "value": 7,
+    "components": {
+     "install_mechanism": 3,
+     "automation_interface": 2,
+     "verification_setup": 2
+    },
+    "justification": {
+     "install_mechanism": "system package (apt/spack); no binary on PATH (MEASURED by the availability probe)",
+     "automation_interface": "case-directory CLI (blockMesh/simpleFoam processes; file-bound orchestration)",
+     "verification_setup": "tutorial validation cases require per-case setup (meshing, fields, schemes)"
+    },
+    "class": "MODEL_DERIVED over MEASURED components (availability probes, pip dry-run, official interface documentation)",
+    "scale": "lower = cheaper (3..9)"
+   },
+   "validation_maturity": {
+    "value": 2,
+    "class": "MODEL_DERIVED / DOC_DECLARED — shipped verification material replayable headless",
+    "scale": "1..3, higher = more mature"
+   },
+   "automation_feasibility": {
+    "value": 2,
+    "class": "MODEL_DERIVED / DOC_DECLARED — official headless interface",
+    "scale": "1..3, higher = better"
+   }
+  },
+  {
+   "solver_id": "openmdao",
+   "implementation_cost": {
+    "value": 3,
+    "components": {
+     "install_mechanism": 1,
+     "automation_interface": 1,
+     "verification_setup": 1
+    },
+    "justification": {
+     "install_mechanism": "pure-Python pip package",
+     "automation_interface": "native Python API",
+     "verification_setup": "ships its own test suite; but an optimization layer produces no physics evidence (not a solver choice, kept for completeness)"
+    },
+    "class": "MODEL_DERIVED over MEASURED components (availability probes, pip dry-run, official interface documentation)",
+    "scale": "lower = cheaper (3..9)"
+   },
+   "validation_maturity": {
+    "value": 2,
+    "class": "MODEL_DERIVED / DOC_DECLARED — shipped verification material replayable headless",
+    "scale": "1..3, higher = more mature"
+   },
+   "automation_feasibility": {
+    "value": 3,
+    "class": "MODEL_DERIVED / DOC_DECLARED — official headless interface",
+    "scale": "1..3, higher = better"
+   }
+  },
+  {
+   "solver_id": "project_chrono",
+   "implementation_cost": {
+    "value": 5,
+    "components": {
+     "install_mechanism": 2,
+     "automation_interface": 1,
+     "verification_setup": 2
+    },
+    "justification": {
+     "install_mechanism": "pip wheel shipping native binaries (pychrono)",
+     "automation_interface": "pychrono Python API",
+     "verification_setup": "ships unit/regression tests and demos (C++/Python)"
+    },
+    "class": "MODEL_DERIVED over MEASURED components (availability probes, pip dry-run, official interface documentation)",
+    "scale": "lower = cheaper (3..9)"
+   },
+   "validation_maturity": {
+    "value": 2,
+    "class": "MODEL_DERIVED / DOC_DECLARED — shipped verification material replayable headless",
+    "scale": "1..3, higher = more mature"
+   },
+   "automation_feasibility": {
+    "value": 3,
+    "class": "MODEL_DERIVED / DOC_DECLARED — official headless interface",
+    "scale": "1..3, higher = better"
+   }
+  },
+  {
+   "solver_id": "sfepy",
+   "implementation_cost": {
+    "value": 3,
+    "components": {
+     "install_mechanism": 1,
+     "automation_interface": 1,
+     "verification_setup": 1
+    },
+    "justification": {
+     "install_mechanism": "pure-Python pip package (numpy/scipy-based; measured resolvable by pip --dry-run in this environment)",
+     "automation_interface": "native Python API + problem files; fully scriptable headless",
+     "verification_setup": "ships a testsuite + examples with analytical solutions (linear elasticity, Laplace/heat verification problems) — replayable headless"
+    },
+    "class": "MODEL_DERIVED over MEASURED components (availability probes, pip dry-run, official interface documentation)",
+    "scale": "lower = cheaper (3..9)"
+   },
+   "validation_maturity": {
+    "value": 3,
+    "class": "MODEL_DERIVED / DOC_DECLARED — shipped verification material replayable headless",
+    "scale": "1..3, higher = more mature"
+   },
+   "automation_feasibility": {
+    "value": 3,
+    "class": "MODEL_DERIVED / DOC_DECLARED — official headless interface",
+    "scale": "1..3, higher = better"
+   }
+  },
+  {
+   "solver_id": "sofa",
+   "implementation_cost": {
+    "value": 7,
+    "components": {
+     "install_mechanism": 3,
+     "automation_interface": 2,
+     "verification_setup": 2
+    },
+    "justification": {
+     "install_mechanism": "system package / custom build; runSofa absent (MEASURED)",
+     "automation_interface": "runSofa CLI + scene files (Python plugin optional)",
+     "verification_setup": "scene-level regression tests requiring scene setup"
+    },
+    "class": "MODEL_DERIVED over MEASURED components (availability probes, pip dry-run, official interface documentation)",
+    "scale": "lower = cheaper (3..9)"
+   },
+   "validation_maturity": {
+    "value": 2,
+    "class": "MODEL_DERIVED / DOC_DECLARED — shipped verification material replayable headless",
+    "scale": "1..3, higher = more mature"
+   },
+   "automation_feasibility": {
+    "value": 2,
+    "class": "MODEL_DERIVED / DOC_DECLARED — official headless interface",
+    "scale": "1..3, higher = better"
+   }
+  }
+ ],
+ "scores": [
+  {
+   "solver_id": "sfepy",
+   "registered_phenomena": [
+    "linear_elastic_deformation",
+    "structural_stress_strain",
+    "thermal_structural_multiphysics"
+   ],
+   "dead_candidates_unlocked": {
+    "weighted_all_dead": 97.0,
+    "full_unlock_all_dead": 69,
+    "weighted_adjudicated_physics_relevant": 2.17,
+    "full_unlock_adjudicated": 0,
+    "basis": "weighted = fraction of each mechanism's evidenced phenomena covered by this solver's registered phenomena (partial credit: multiphysics mechanisms need combinations); full = 100% coverage"
+   },
+   "mechanism_diversity": {
+    "distinct_pain_classes": 43,
+    "distinct_industry_domains": 26,
+    "class": "MODEL_DERIVED — Art. XLVIII discipline: families (pain classes), not candidate counts"
+   },
+   "expected_information_gain": {
+    "value": 1.67,
+    "basis": "adjudicated physics-relevant deaths only (the only population with recorded kill surfaces): simulation-DECIDABLE surfaces (equations, boundary_conditions, predicted_effect) x coverage weight; mechanisms without kill-surface records contribute 0 — unknown stays unknown (Art. XXV)",
+    "detail": [
+     {
+      "candidate_id": "C-batteries_ev-1~3",
+      "decidable_surfaces": [
+       "predicted_effect"
+      ],
+      "coverage_weight": 0.4
+     },
+     {
+      "candidate_id": "C-heat_exchanger-1~4",
+      "decidable_surfaces": [
+       "equations"
+      ],
+      "coverage_weight": 0.2
+     },
+     {
+      "candidate_id": "C-machining-1~4",
+      "decidable_surfaces": [
+       "boundary_conditions"
+      ],
+      "coverage_weight": 0.4
+     },
+     {
+      "candidate_id": "C-power_electronics-1",
+      "decidable_surfaces": [
+       "boundary_conditions"
+      ],
+      "coverage_weight": 0.6667
+     }
+    ]
+   },
+   "implementation_cost": {
+    "value": 3,
+    "components": {
+     "install_mechanism": 1,
+     "automation_interface": 1,
+     "verification_setup": 1
+    },
+    "justification": {
+     "install_mechanism": "pure-Python pip package (numpy/scipy-based; measured resolvable by pip --dry-run in this environment)",
+     "automation_interface": "native Python API + problem files; fully scriptable headless",
+     "verification_setup": "ships a testsuite + examples with analytical solutions (linear elasticity, Laplace/heat verification problems) — replayable headless"
+    },
+    "class": "MODEL_DERIVED over MEASURED components (availability probes, pip dry-run, official interface documentation)",
+    "scale": "lower = cheaper (3..9)"
+   },
+   "validation_maturity": {
+    "value": 3,
+    "class": "MODEL_DERIVED / DOC_DECLARED — shipped verification material replayable headless",
+    "scale": "1..3, higher = more mature"
+   },
+   "automation_feasibility": {
+    "value": 3,
+    "class": "MODEL_DERIVED / DOC_DECLARED — official headless interface",
+    "scale": "1..3, higher = better"
+   },
+   "score": 20855.0,
+   "operator_simple_score_UxG_div_C": 53.89
+  },
+  {
+   "solver_id": "elmer",
+   "registered_phenomena": [
+    "electromagnetic_fields_lowfreq",
+    "heat_transfer",
+    "linear_elastic_deformation",
+    "structural_stress_strain",
+    "thermal_structural_multiphysics"
+   ],
+   "dead_candidates_unlocked": {
+    "weighted_all_dead": 148.92,
+    "full_unlock_all_dead": 115,
+    "weighted_adjudicated_physics_relevant": 3.35,
+    "full_unlock_adjudicated": 1,
+    "basis": "weighted = fraction of each mechanism's evidenced phenomena covered by this solver's registered phenomena (partial credit: multiphysics mechanisms need combinations); full = 100% coverage"
+   },
+   "mechanism_diversity": {
+    "distinct_pain_classes": 57,
+    "distinct_industry_domains": 26,
+    "class": "MODEL_DERIVED — Art. XLVIII discipline: families (pain classes), not candidate counts"
+   },
+   "expected_information_gain": {
+    "value": 3.35,
+    "basis": "adjudicated physics-relevant deaths only (the only population with recorded kill surfaces): simulation-DECIDABLE surfaces (equations, boundary_conditions, predicted_effect) x coverage weight; mechanisms without kill-surface records contribute 0 — unknown stays unknown (Art. XXV)",
+    "detail": [
+     {
+      "candidate_id": "C-batteries_ev-1",
+      "decidable_surfaces": [
+       "boundary_conditions",
+       "equations",
+       "predicted_effect"
+      ],
+      "coverage_weight": 0.25
+     },
+     {
+      "candidate_id": "C-batteries_ev-1~3",
+      "decidable_surfaces": [
+       "predicted_effect"
+      ],
+      "coverage_weight": 0.6
+     },
+     {
+      "candidate_id": "C-heat_exchanger-1~4",
+      "decidable_surfaces": [
+       "equations"
+      ],
+      "coverage_weight": 0.4
+     },
+     {
+      "candidate_id": "C-machining-1~4",
+      "decidable_surfaces": [
+       "boundary_conditions"
+      ],
+      "coverage_weight": 0.6
+     },
+     {
+      "candidate_id": "C-power_electronics-1",
+      "decidable_surfaces": [
+       "boundary_conditions"
+      ],
+      "coverage_weight": 1.0
+     }
+    ]
+   },
+   "implementation_cost": {
+    "value": 7,
+    "components": {
+     "install_mechanism": 3,
+     "automation_interface": 2,
+     "verification_setup": 2
+    },
+    "justification": {
+     "install_mechanism": "system package; no binary on PATH (MEASURED)",
+     "automation_interface": "sif case files + ElmerSolver CLI",
+     "verification_setup": "ships verification cases requiring sif setup"
+    },
+    "class": "MODEL_DERIVED over MEASURED components (availability probes, pip dry-run, official interface documentation)",
+    "scale": "lower = cheaper (3..9)"
+   },
+   "validation_maturity": {
+    "value": 2,
+    "class": "MODEL_DERIVED / DOC_DECLARED — shipped verification material replayable headless",
+    "scale": "1..3, higher = more mature"
+   },
+   "automation_feasibility": {
+    "value": 2,
+    "class": "MODEL_DERIVED / DOC_DECLARED — official headless interface",
+    "scale": "1..3, higher = better"
+   },
+   "score": 16248.94,
+   "operator_simple_score_UxG_div_C": 71.27
+  },
+  {
+   "solver_id": "fenicsx",
+   "registered_phenomena": [
+    "linear_elastic_deformation",
+    "structural_stress_strain",
+    "thermal_structural_multiphysics"
+   ],
+   "dead_candidates_unlocked": {
+    "weighted_all_dead": 97.0,
+    "full_unlock_all_dead": 69,
+    "weighted_adjudicated_physics_relevant": 2.17,
+    "full_unlock_adjudicated": 0,
+    "basis": "weighted = fraction of each mechanism's evidenced phenomena covered by this solver's registered phenomena (partial credit: multiphysics mechanisms need combinations); full = 100% coverage"
+   },
+   "mechanism_diversity": {
+    "distinct_pain_classes": 43,
+    "distinct_industry_domains": 26,
+    "class": "MODEL_DERIVED — Art. XLVIII discipline: families (pain classes), not candidate counts"
+   },
+   "expected_information_gain": {
+    "value": 1.67,
+    "basis": "adjudicated physics-relevant deaths only (the only population with recorded kill surfaces): simulation-DECIDABLE surfaces (equations, boundary_conditions, predicted_effect) x coverage weight; mechanisms without kill-surface records contribute 0 — unknown stays unknown (Art. XXV)",
+    "detail": [
+     {
+      "candidate_id": "C-batteries_ev-1~3",
+      "decidable_surfaces": [
+       "predicted_effect"
+      ],
+      "coverage_weight": 0.4
+     },
+     {
+      "candidate_id": "C-heat_exchanger-1~4",
+      "decidable_surfaces": [
+       "equations"
+      ],
+      "coverage_weight": 0.2
+     },
+     {
+      "candidate_id": "C-machining-1~4",
+      "decidable_surfaces": [
+       "boundary_conditions"
+      ],
+      "coverage_weight": 0.4
+     },
+     {
+      "candidate_id": "C-power_electronics-1",
+      "decidable_surfaces": [
+       "boundary_conditions"
+      ],
+      "coverage_weight": 0.6667
+     }
+    ]
+   },
+   "implementation_cost": {
+    "value": 5,
+    "components": {
+     "install_mechanism": 2,
+     "automation_interface": 1,
+     "verification_setup": 2
+    },
+    "justification": {
+     "install_mechanism": "dolfinx wheels/packages with native PETSc stack",
+     "automation_interface": "native Python API",
+     "verification_setup": "MMS conventions documented; verification problems require authoring"
+    },
+    "class": "MODEL_DERIVED over MEASURED components (availability probes, pip dry-run, official interface documentation)",
+    "scale": "lower = cheaper (3..9)"
+   },
+   "validation_maturity": {
+    "value": 2,
+    "class": "MODEL_DERIVED / DOC_DECLARED — shipped verification material replayable headless",
+    "scale": "1..3, higher = more mature"
+   },
+   "automation_feasibility": {
+    "value": 3,
+    "class": "MODEL_DERIVED / DOC_DECLARED — official headless interface",
+    "scale": "1..3, higher = better"
+   },
+   "score": 8342.0,
+   "operator_simple_score_UxG_div_C": 32.33
+  },
+  {
+   "solver_id": "openfoam",
+   "registered_phenomena": [
+    "convective_heat_transfer",
+    "incompressible_viscous_flow",
+    "porous_media_flow",
+    "turbulent_flow"
+   ],
+   "dead_candidates_unlocked": {
+    "weighted_all_dead": 42.28,
+    "full_unlock_all_dead": 28,
+    "weighted_adjudicated_physics_relevant": 2.05,
+    "full_unlock_adjudicated": 1,
+    "basis": "weighted = fraction of each mechanism's evidenced phenomena covered by this solver's registered phenomena (partial credit: multiphysics mechanisms need combinations); full = 100% coverage"
+   },
+   "mechanism_diversity": {
+    "distinct_pain_classes": 20,
+    "distinct_industry_domains": 17,
+    "class": "MODEL_DERIVED — Art. XLVIII discipline: families (pain classes), not candidate counts"
+   },
+   "expected_information_gain": {
+    "value": 4.55,
+    "basis": "adjudicated physics-relevant deaths only (the only population with recorded kill surfaces): simulation-DECIDABLE surfaces (equations, boundary_conditions, predicted_effect) x coverage weight; mechanisms without kill-surface records contribute 0 — unknown stays unknown (Art. XXV)",
+    "detail": [
+     {
+      "candidate_id": "C-batteries_ev-1",
+      "decidable_surfaces": [
+       "boundary_conditions",
+       "equations",
+       "predicted_effect"
+      ],
+      "coverage_weight": 0.25
+     },
+     {
+      "candidate_id": "C-chemical_process-1~3",
+      "decidable_surfaces": [
+       "equations",
+       "boundary_conditions",
+       "predicted_effect"
+      ],
+      "coverage_weight": 1.0
+     },
+     {
+      "candidate_id": "C-heat_exchanger-1~4",
+      "decidable_surfaces": [
+       "equations"
+      ],
+      "coverage_weight": 0.6
+     },
+     {
+      "candidate_id": "C-machining-1~4",
+      "decidable_surfaces": [
+       "boundary_conditions"
+      ],
+      "coverage_weight": 0.2
+     }
+    ]
+   },
+   "implementation_cost": {
+    "value": 7,
+    "components": {
+     "install_mechanism": 3,
+     "automation_interface": 2,
+     "verification_setup": 2
+    },
+    "justification": {
+     "install_mechanism": "system package (apt/spack); no binary on PATH (MEASURED by the availability probe)",
+     "automation_interface": "case-directory CLI (blockMesh/simpleFoam processes; file-bound orchestration)",
+     "verification_setup": "tutorial validation cases require per-case setup (meshing, fields, schemes)"
+    },
+    "class": "MODEL_DERIVED over MEASURED components (availability probes, pip dry-run, official interface documentation)",
+    "scale": "lower = cheaper (3..9)"
+   },
+   "validation_maturity": {
+    "value": 2,
+    "class": "MODEL_DERIVED / DOC_DECLARED — shipped verification material replayable headless",
+    "scale": "1..3, higher = more mature"
+   },
+   "automation_feasibility": {
+    "value": 2,
+    "class": "MODEL_DERIVED / DOC_DECLARED — official headless interface",
+    "scale": "1..3, higher = better"
+   },
+   "score": 2198.73,
+   "operator_simple_score_UxG_div_C": 27.48
+  },
+  {
+   "solver_id": "project_chrono",
+   "registered_phenomena": [
+    "contact_friction_mechanics",
+    "multibody_mechanisms",
+    "vehicle_dynamics"
+   ],
+   "dead_candidates_unlocked": {
+    "weighted_all_dead": 52.68,
+    "full_unlock_all_dead": 33,
+    "weighted_adjudicated_physics_relevant": 1.15,
+    "full_unlock_adjudicated": 0,
+    "basis": "weighted = fraction of each mechanism's evidenced phenomena covered by this solver's registered phenomena (partial credit: multiphysics mechanisms need combinations); full = 100% coverage"
+   },
+   "mechanism_diversity": {
+    "distinct_pain_classes": 28,
+    "distinct_industry_domains": 22,
+    "class": "MODEL_DERIVED — Art. XLVIII discipline: families (pain classes), not candidate counts"
+   },
+   "expected_information_gain": {
+    "value": 1.15,
+    "basis": "adjudicated physics-relevant deaths only (the only population with recorded kill surfaces): simulation-DECIDABLE surfaces (equations, boundary_conditions, predicted_effect) x coverage weight; mechanisms without kill-surface records contribute 0 — unknown stays unknown (Art. XXV)",
+    "detail": [
+     {
+      "candidate_id": "C-batteries_ev-1",
+      "decidable_surfaces": [
+       "boundary_conditions",
+       "equations",
+       "predicted_effect"
+      ],
+      "coverage_weight": 0.25
+     },
+     {
+      "candidate_id": "C-batteries_ev-1~3",
+      "decidable_surfaces": [
+       "predicted_effect"
+      ],
+      "coverage_weight": 0.2
+     },
+     {
+      "candidate_id": "C-machining-1~4",
+      "decidable_surfaces": [
+       "boundary_conditions"
+      ],
+      "coverage_weight": 0.2
+     }
+    ]
+   },
+   "implementation_cost": {
+    "value": 5,
+    "components": {
+     "install_mechanism": 2,
+     "automation_interface": 1,
+     "verification_setup": 2
+    },
+    "justification": {
+     "install_mechanism": "pip wheel shipping native binaries (pychrono)",
+     "automation_interface": "pychrono Python API",
+     "verification_setup": "ships unit/regression tests and demos (C++/Python)"
+    },
+    "class": "MODEL_DERIVED over MEASURED components (availability probes, pip dry-run, official interface documentation)",
+    "scale": "lower = cheaper (3..9)"
+   },
+   "validation_maturity": {
+    "value": 2,
+    "class": "MODEL_DERIVED / DOC_DECLARED — shipped verification material replayable headless",
+    "scale": "1..3, higher = more mature"
+   },
+   "automation_feasibility": {
+    "value": 3,
+    "class": "MODEL_DERIVED / DOC_DECLARED — official headless interface",
+    "scale": "1..3, higher = better"
+   },
+   "score": 2035.68,
+   "operator_simple_score_UxG_div_C": 12.12
+  },
+  {
+   "solver_id": "mujoco",
+   "registered_phenomena": [
+    "actuated_multibody_control",
+    "rigid_body_contact_dynamics"
+   ],
+   "dead_candidates_unlocked": {
+    "weighted_all_dead": 8.28,
+    "full_unlock_all_dead": 5,
+    "weighted_adjudicated_physics_relevant": 0.45,
+    "full_unlock_adjudicated": 0,
+    "basis": "weighted = fraction of each mechanism's evidenced phenomena covered by this solver's registered phenomena (partial credit: multiphysics mechanisms need combinations); full = 100% coverage"
+   },
+   "mechanism_diversity": {
+    "distinct_pain_classes": 11,
+    "distinct_industry_domains": 6,
+    "class": "MODEL_DERIVED — Art. XLVIII discipline: families (pain classes), not candidate counts"
+   },
+   "expected_information_gain": {
+    "value": 0.95,
+    "basis": "adjudicated physics-relevant deaths only (the only population with recorded kill surfaces): simulation-DECIDABLE surfaces (equations, boundary_conditions, predicted_effect) x coverage weight; mechanisms without kill-surface records contribute 0 — unknown stays unknown (Art. XXV)",
+    "detail": [
+     {
+      "candidate_id": "C-batteries_ev-1",
+      "decidable_surfaces": [
+       "boundary_conditions",
+       "equations",
+       "predicted_effect"
+      ],
+      "coverage_weight": 0.25
+     },
+     {
+      "candidate_id": "C-batteries_ev-1~3",
+      "decidable_surfaces": [
+       "predicted_effect"
+      ],
+      "coverage_weight": 0.2
+     }
+    ]
+   },
+   "implementation_cost": {
+    "value": 4,
+    "components": {
+     "install_mechanism": 2,
+     "automation_interface": 1,
+     "verification_setup": 1
+    },
+    "justification": {
+     "install_mechanism": "pip wheel shipping native binaries (deepmind mujoco wheels)",
+     "automation_interface": "native Python API (mujoco bindings)",
+     "verification_setup": "ships analytical/pendulum-style regression tests"
+    },
+    "class": "MODEL_DERIVED over MEASURED components (availability probes, pip dry-run, official interface documentation)",
+    "scale": "lower = cheaper (3..9)"
+   },
+   "validation_maturity": {
+    "value": 3,
+    "class": "MODEL_DERIVED / DOC_DECLARED — shipped verification material replayable headless",
+    "scale": "1..3, higher = more mature"
+   },
+   "automation_feasibility": {
+    "value": 3,
+    "class": "MODEL_DERIVED / DOC_DECLARED — official headless interface",
+    "scale": "1..3, higher = better"
+   },
+   "score": 194.76,
+   "operator_simple_score_UxG_div_C": 1.97
+  },
+  {
+   "solver_id": "openems",
+   "registered_phenomena": [
+    "electromagnetic_fields_highfreq"
+   ],
+   "dead_candidates_unlocked": {
+    "weighted_all_dead": 6.33,
+    "full_unlock_all_dead": 5,
+    "weighted_adjudicated_physics_relevant": 0.0,
+    "full_unlock_adjudicated": 0,
+    "basis": "weighted = fraction of each mechanism's evidenced phenomena covered by this solver's registered phenomena (partial credit: multiphysics mechanisms need combinations); full = 100% coverage"
+   },
+   "mechanism_diversity": {
+    "distinct_pain_classes": 7,
+    "distinct_industry_domains": 5,
+    "class": "MODEL_DERIVED — Art. XLVIII discipline: families (pain classes), not candidate counts"
+   },
+   "expected_information_gain": {
+    "value": 0.0,
+    "basis": "adjudicated physics-relevant deaths only (the only population with recorded kill surfaces): simulation-DECIDABLE surfaces (equations, boundary_conditions, predicted_effect) x coverage weight; mechanisms without kill-surface records contribute 0 — unknown stays unknown (Art. XXV)",
+    "detail": []
+   },
+   "implementation_cost": {
+    "value": 8,
+    "components": {
+     "install_mechanism": 3,
+     "automation_interface": 3,
+     "verification_setup": 2
+    },
+    "justification": {
+     "install_mechanism": "system package + (typically) Octave/MATLAB driver; no binary on PATH (MEASURED)",
+     "automation_interface": "CSX XML + typically Octave/MATLAB driver — GUI-adjacent workflow",
+     "verification_setup": "ships validation examples (antennas/waveguides) requiring setup"
+    },
+    "class": "MODEL_DERIVED over MEASURED components (availability probes, pip dry-run, official interface documentation)",
+    "scale": "lower = cheaper (3..9)"
+   },
+   "validation_maturity": {
+    "value": 2,
+    "class": "MODEL_DERIVED / DOC_DECLARED — shipped verification material replayable headless",
+    "scale": "1..3, higher = more mature"
+   },
+   "automation_feasibility": {
+    "value": 1,
+    "class": "MODEL_DERIVED / DOC_DECLARED — official headless interface",
+    "scale": "1..3, higher = better"
+   },
+   "score": 0.0,
+   "operator_simple_score_UxG_div_C": 0.0
+  },
+  {
+   "solver_id": "sofa",
+   "registered_phenomena": [
+    "deformable_biomechanics",
+    "soft_body_continuum_mechanics"
+   ],
+   "dead_candidates_unlocked": {
+    "weighted_all_dead": 0.0,
+    "full_unlock_all_dead": 0,
+    "weighted_adjudicated_physics_relevant": 0.0,
+    "full_unlock_adjudicated": 0,
+    "basis": "weighted = fraction of each mechanism's evidenced phenomena covered by this solver's registered phenomena (partial credit: multiphysics mechanisms need combinations); full = 100% coverage"
+   },
+   "mechanism_diversity": {
+    "distinct_pain_classes": 0,
+    "distinct_industry_domains": 0,
+    "class": "MODEL_DERIVED — Art. XLVIII discipline: families (pain classes), not candidate counts"
+   },
+   "expected_information_gain": {
+    "value": 0.0,
+    "basis": "adjudicated physics-relevant deaths only (the only population with recorded kill surfaces): simulation-DECIDABLE surfaces (equations, boundary_conditions, predicted_effect) x coverage weight; mechanisms without kill-surface records contribute 0 — unknown stays unknown (Art. XXV)",
+    "detail": []
+   },
+   "implementation_cost": {
+    "value": 7,
+    "components": {
+     "install_mechanism": 3,
+     "automation_interface": 2,
+     "verification_setup": 2
+    },
+    "justification": {
+     "install_mechanism": "system package / custom build; runSofa absent (MEASURED)",
+     "automation_interface": "runSofa CLI + scene files (Python plugin optional)",
+     "verification_setup": "scene-level regression tests requiring scene setup"
+    },
+    "class": "MODEL_DERIVED over MEASURED components (availability probes, pip dry-run, official interface documentation)",
+    "scale": "lower = cheaper (3..9)"
+   },
+   "validation_maturity": {
+    "value": 2,
+    "class": "MODEL_DERIVED / DOC_DECLARED — shipped verification material replayable headless",
+    "scale": "1..3, higher = more mature"
+   },
+   "automation_feasibility": {
+    "value": 2,
+    "class": "MODEL_DERIVED / DOC_DECLARED — official headless interface",
+    "scale": "1..3, higher = better"
+   },
+   "score": 0.0,
+   "operator_simple_score_UxG_div_C": 0.0
+  }
+ ],
+ "selection": {
+  "solver_id": "sfepy",
+  "score": 20855.0,
+  "selection_rule": "top score under the pre-registered formula (U x G x D x V x A) / C; the operator's directive V2 pre-authorized installing and wiring exactly ONE solver chosen this way (Phase 6 target)",
+  "runner_up": {
+   "solver_id": "elmer",
+   "score": 16248.94
+  }
+ },
+ "formula": {
+  "score": "(U x G x D x V x A) / C",
+  "operator_simple": "(U x G) / C  (the directive's own shape: candidate unlock x expected information gain / integration cost)",
+  "factors": {
+   "U": "weighted dead candidates unlocked (all-dead population; adjudicated subset reported alongside)",
+   "G": "expected information gain (adjudicated physics-relevant, simulation-decidable kill surfaces x coverage)",
+   "D": "mechanism diversity (distinct pain classes)",
+   "V": "validation maturity (1..3)",
+   "A": "automation feasibility (1..3)",
+   "C": "implementation cost (3..9, lower = cheaper)"
+  }
+ },
+ "pre_registration_note": "factor tables (cost/maturity/automation) are environment- and documentation-derived, declared in opportunity.py BEFORE the matrix numbers were read; the formula is the operator's directive shape; no factor was revised after any score was computed (Art. XXVII/LIX)",
+ "decision_time_state": {
+  "installed_solvers_at_decision": [
+   "hydraulic_network_1d"
+  ],
+  "note": "the decision is computed over the decision-time missing-solver set (sfepy was THEN the missing top scorer); the LIVE forward query ('which solver is missing next') now excludes the wired sfepy — the machine's question moves on, the frozen decision does not (Art. XI)"
+ },
+ "FORMULA_SENSITIVITY_DISCLOSURE": {
+  "six_factor_ranking_top3": [
+   {
+    "solver_id": "sfepy",
+    "score": 20855.0
+   },
+   {
+    "solver_id": "elmer",
+    "score": 16248.94
+   },
+   {
+    "solver_id": "fenicsx",
+    "score": 8342.0
+   }
+  ],
+  "operator_simple_ranking_top3": [
+   {
+    "solver_id": "elmer",
+    "score": 71.27
+   },
+   {
+    "solver_id": "sfepy",
+    "score": 53.89
+   },
+   {
+    "solver_id": "fenicsx",
+    "score": 32.33
+   }
+  ],
+  "finding": "the two formulas disagree on the leader: the full six-factor formula selects sfepy (20855.0) while the operator's simple three-factor shape (U x G / C) leads with elmer (71.3)",
+  "decisive_factors": [
+   "elmer's raw phenomenon coverage is larger (5 registered phenomena vs sfepy's 3: elmer adds heat_transfer and electromagnetic_fields_lowfreq) — it wins on U under the simple formula",
+   "sfepy's integration cost is 3 vs elmer's 7 (MEASURED: sfepy is a pure-Python pip package resolvable in THIS environment by pip dry-run; elmer requires a system binary that is absent per the availability probe)",
+   "sfepy's validation maturity is 3 vs elmer's 2 (sfepy ships a testsuite + analytical-solution examples replayable headless)",
+   "sfepy's automation feasibility is 3 vs elmer's 2 (native Python API vs sif-case CLI)"
+  ],
+  "practical_decisive_fact": "the operator's Phase 6 standard is 'at least one real candidate must traverse the complete path' — only sfepy is installable in THIS environment (measured), so elmer cannot meet the Phase 6 standard here regardless of ranking",
+  "classification": "the disagreement is disclosed, not resolved by preference (Art. XV); the selection rule was pre-registered as the six-factor score (all six factors are the operator's own list), and the simple-formula disagreement is carried on this artifact"
+ },
+ "provenance": {
+  "builder": "scripts/r413_build_opportunity_score.py",
+  "build_date": "2026-09-06",
+  "determinism": "byte-identical on re-run from the frozen matrix (Art. LXII)",
+  "llm_calls": 0
+ },
+ "reviewer_provenance": "AI_REVIEW"
+}

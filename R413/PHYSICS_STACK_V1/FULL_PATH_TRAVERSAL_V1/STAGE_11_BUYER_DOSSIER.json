@@ -1,0 +1,104 @@
+{
+ "model_reference": {
+  "geometry_identity": "C-wind-2/bearing-section-v1",
+  "geometry_hash": "b2a147c45b91810fd5018c275d09a62d42622fca060b8d017b407b7ef4ae4ab2",
+  "step_export": "C-wind-2_bearing_section.step"
+ },
+ "assumptions": [
+  "plane-stress linear elasticity (thickness 10 mm; in-plane loading only)",
+  "the representative geometry is a bearing-section plate with a central stress concentrator (an IDEALIZATION of the rolling-element contact zone declared in the geometry stage — not a bearing contact simulation)",
+  "the mechanism's declared load models are applied as uniform edge tractions (projection AND tilt readings simulated separately)",
+  "E-independent verification targets (K_t, ratios); displacement magnitudes carry the steel-modulus assumption"
+ ],
+ "boundary_conditions": {
+  "load_model": "uniform edge traction (engineering convention) on x=+a; both the projection and tilt misalignment readings",
+  "constraints": "u_x=0 on x=-a (left edge); u_y anchored at one node (rigid-body removal)",
+  "free_surfaces": "top/bottom edges and the hole (stress-concentrator) boundary"
+ },
+ "simulation_outputs": {
+  "artifact": "STAGE_05_SIMULATION_EXECUTION.json",
+  "output_hash": "848b4c5f522c4a765f6fb2f08085a47cf56b2f630b8e8443cd44a2dabfa4e48d",
+  "headline_quantities": [
+   {
+    "quantity": "sigma_max_hole_aligned_pa",
+    "value": 27914688.010742716,
+    "unit": "Pa",
+    "evidence_class": "COMPUTATIONAL_RESULT"
+   },
+   {
+    "quantity": "K_t_gross_fine_mesh",
+    "value": 3.0304697462151764,
+    "unit": "dimensionless",
+    "evidence_class": "COMPUTATIONAL_RESULT",
+    "note": "stress concentration factor, far-field-gross convention; infinite-plate Kirsch limit = 3.0"
+   },
+   {
+    "quantity": "reduction_under_projection_model",
+    "value": 0.060307379214103674,
+    "unit": "fraction",
+    "evidence_class": "COMPUTATIONAL_RESULT"
+   },
+   {
+    "quantity": "reduction_under_tilt_model",
+    "value": -0.0046357471335758405,
+    "unit": "fraction",
+    "evidence_class": "COMPUTATIONAL_RESULT",
+    "note": "THE FALSIFICATION-RELEVANT NUMBER: under the service-deflection (tilt) reading the peak stress does NOT reduce"
+   },
+   {
+    "quantity": "far_field_sigma_xx_check_pa",
+    "value": 9986074.723068306,
+    "unit": "Pa",
+    "note": "sanity anchor ~ 10 MPa"
+   }
+  ],
+  "evidence_class": "COMPUTATIONAL_RESULT (layer 4)"
+ },
+ "uncertainty": {
+  "numerical": {
+   "measured_rel_diff": 0.07886597298633267,
+   "threshold": 0.02,
+   "class": "ENGINEERING",
+   "justification": "bilinear FEM convergence on a smooth (non-singular) stress field: K_t must stabilize under refinement"
+  },
+  "model_form": "plane-stress idealization + representative stress-concentrator geometry (declared, not quantified — Art. XXVII: the claim contract blocks validated-claim status outside the instrument regime)"
+ },
+ "failure_modes": [
+  {
+   "failure_mode": "Over-misalignment",
+   "detectability": "detectable via vibration monitoring",
+   "mitigation": "mitigation: precise installation calibration"
+  },
+  {
+   "failure_mode": "Inconsistent load distribution",
+   "detectability": "detectable via temperature monitoring",
+   "mitigation": "mitigation: real-time load adjustment system"
+  }
+ ],
+ "physics_claims": [
+  {
+   "statement": "Validated: linear_elastic_deformation, plane-stress uniform-traction regime, specified geometry and boundary conditions; computational result, not physical observation.",
+   "phenomenon": "linear_elastic_deformation",
+   "regime": {
+    "constitutive": "plane-stress linear elasticity, homogeneous isotropic",
+    "loading": "uniform uniaxial traction (no stress concentration, no body force)",
+    "mesh": "structured bilinear quads, 8..64 elements",
+    "fields": "displacement (exact-representable linear fields)"
+   },
+   "geometry_binding": "structured bilinear quad meshes over rectangles (the instrument-validation geometries)",
+   "boundary_conditions": "uniform edge traction + essential BCs (the validation replay set)",
+   "solver_version": "sfepy/2026.2",
+   "uncertainty": "max rel error 1.9e-14 vs closed form across 3 reference cases at threshold 1e-9 (ENGINEERING)"
+  }
+ ],
+ "claims_contract_results": {
+  "regime_claim_verdict": "ADMITTED_REGIME_SCOPED",
+  "k_t_claim_attempt": {
+   "statement": "the K_t and stress-reduction numbers are carried as COMPUTATIONAL_RESULT evidence, NOT as validated claims — the claim contract REJECTS them (stress concentration is outside the validated regime) and the dossier complies",
+   "expected_rejection": "REJECTED_REGIME_UNVALIDATED"
+  }
+ },
+ "provenance": {
+  "reviewer_provenance": "AI_REVIEW"
+ }
+}

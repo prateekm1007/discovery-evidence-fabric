@@ -1,0 +1,118 @@
+{
+ "solver_id": "sfepy",
+ "solver_version": "sfepy/2026.2",
+ "phenomenon": "structural_stress_strain",
+ "geometry_hash": "b2a147c45b91810fd5018c275d09a62d42622fca060b8d017b407b7ef4ae4ab2",
+ "input_hash": "4cb970a97726fa4e98445311f90de77c39288dc1020c1499ff80795b81495c31",
+ "output_hash": "848b4c5f522c4a765f6fb2f08085a47cf56b2f630b8e8443cd44a2dabfa4e48d",
+ "assumptions": [
+  "plane-stress linear elasticity (thickness 10 mm; in-plane loading only)",
+  "the representative geometry is a bearing-section plate with a central stress concentrator (an IDEALIZATION of the rolling-element contact zone declared in the geometry stage — not a bearing contact simulation)",
+  "the mechanism's declared load models are applied as uniform edge tractions (projection AND tilt readings simulated separately)",
+  "E-independent verification targets (K_t, ratios); displacement magnitudes carry the steel-modulus assumption"
+ ],
+ "limitations": [
+  "NOT a bearing contact simulation: no Hertzian contact, no raceway geometry, no rolling kinematics (the contact/friction phenomenon is registered to project_chrono, measured NOT_INSTALLED)",
+  "stress AT the concentrator is mesh-resolution-bound (element-center recovery); the convergence check quantifies this",
+  "the validated instrument regime (uniform traction, exactly-representable fields) does NOT cover stress concentration — the claim contract will (correctly) REFUSE a validated-claim status for these results"
+ ],
+ "convergence": {
+  "measured_rel_diff": 0.07886597298633267,
+  "threshold": 0.02,
+  "class": "ENGINEERING",
+  "justification": "bilinear FEM convergence on a smooth (non-singular) stress field: K_t must stabilize under refinement"
+ },
+ "runs": {
+  "RUN-1": {
+   "n_nodes": 676,
+   "n_elements": 624,
+   "n_ring_elements_excluded_quality": 4,
+   "sigma_max_hole_pa": 27914688.010742716,
+   "theta_of_max_deg": 86.25,
+   "far_field_sigma_xx_pa": 9986074.723068306,
+   "dofs_sha256": "6cf4f5e6bb1b60c3891ff47279beb510b20beb64a7ed5512548db32a7b377210"
+  },
+  "RUN-2": {
+   "n_nodes": 2500,
+   "n_elements": 2400,
+   "n_ring_elements_excluded_quality": 4,
+   "sigma_max_hole_pa": 30304697.462151766,
+   "theta_of_max_deg": 268.125,
+   "far_field_sigma_xx_pa": 9985478.017086755,
+   "dofs_sha256": "51995b5bb480a2cee8f07a991fec6902040a41ed2e86b9b56131bbeb53961134"
+  },
+  "RUN-3": {
+   "n_nodes": 676,
+   "n_elements": 624,
+   "n_ring_elements_excluded_quality": 4,
+   "sigma_max_hole_pa": 26231226.33523546,
+   "theta_of_max_deg": 93.75,
+   "far_field_sigma_xx_pa": 9383840.727883983,
+   "dofs_sha256": "68a4af3d7bd72cb4d70b749508b121f636eb3fb42b377b6405098706597a4a41"
+  },
+  "RUN-4": {
+   "n_nodes": 676,
+   "n_elements": 624,
+   "n_ring_elements_excluded_quality": 4,
+   "sigma_max_hole_pa": 28044093.445673183,
+   "theta_of_max_deg": 108.74999999999999,
+   "far_field_sigma_xx_pa": 8819928.606463348,
+   "dofs_sha256": "074590501eb5829545ddd68d9fe0a8f84d1b10098dfb4dcd78ac2377cb6bc088"
+  }
+ },
+ "kt_gross": {
+  "RUN-1": 2.791468801074272,
+  "RUN-2": 3.0304697462151764,
+  "RUN-3": 2.791468801074236,
+  "RUN-4": 2.8044093445673184
+ },
+ "verification": {
+  "linearity_projection": {
+   "measured": 0.9396926207858963,
+   "expected": 0.9396926207859084,
+   "threshold": 1e-09,
+   "class": "ENGINEERING",
+   "justification": "the system is linear: scaling the load by cos(20deg) must scale sigma_max identically (exact instrument check)"
+  },
+  "mesh_convergence": {
+   "measured_rel_diff": 0.07886597298633267,
+   "threshold": 0.02,
+   "class": "ENGINEERING",
+   "justification": "bilinear FEM convergence on a smooth (non-singular) stress field: K_t must stabilize under refinement"
+  },
+  "kt_anchor": {
+   "measured": {
+    "RUN-1": 2.791468801074272,
+    "RUN-2": 3.0304697462151764
+   },
+   "kirsch_at_sampling_center": {
+    "RUN-1": 2.8073349855763343,
+    "RUN-2": 2.9945323608620864
+   },
+   "tolerance": 0.02,
+   "class": "ENGINEERING",
+   "justification": "the anchor is the EXACT Kirsch infinite-plate solution evaluated at the ring-element-center sampling radius of each mesh (element-center recovery of a smooth field; the coarse-mesh agreement calibrates the 2% tolerance); mesh-B also approaches the boundary limit K_t=3 from below as the sampling radius collapses to the hole"
+  },
+  "tilt_angle_invariance": {
+   "measured_ratio": 1.0046357471335758,
+   "expected_band": [
+    0.95,
+    1.05
+   ],
+   "class": "ENGINEERING",
+   "justification": "Kirsch far-field structure: the hole's peak stress is approximately invariant to the LOAD DIRECTION (only magnitude matters) — the falsification-relevant anchor"
+  }
+ },
+ "verification_checks_pass": {
+  "linearity": true,
+  "convergence": false,
+  "kt_anchor": true,
+  "tilt": true,
+  "far_field": true
+ },
+ "provenance": {
+  "instrument_validation": "R413/PHYSICS_STACK_V1/SFEPY_INSTRUMENT_VALIDATION.json",
+  "reviewer_provenance": "AI_REVIEW"
+ },
+ "failure_state": "COMPUTATIONAL_RESULT_MODEL_INVALIDITY"
+}

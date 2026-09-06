@@ -1,0 +1,1943 @@
+{
+ "artifact_type": "R413_PHYSICS_COVERAGE_REGISTRY_V1",
+ "version": "1.0.0",
+ "directive": "operator directive V2 (OPERATOR_DIRECTIVE_V2.json) Phase 1: the registry is a DECISION SYSTEM — machine-readable, 15-field schema verbatim, feeding the coverage matrix, the deterministic router, and the Physics Gap Opportunity Score",
+ "schema_fields_verbatim": [
+  "phenomenon",
+  "governing_equations",
+  "solver",
+  "solver_version",
+  "geometry_requirements",
+  "boundary_conditions",
+  "material_requirements",
+  "operating_regime",
+  "validated_regime",
+  "known_limitations",
+  "uncertainty",
+  "verification_method",
+  "epistemic_class",
+  "input_schema",
+  "output_schema"
+ ],
+ "decision_system_contract": {
+  "coverage_matrix_consumes": "solver availability + validated_regime state per phenomenon (what is simulatable NOW, measured)",
+  "router_consumes": "phenomenon + operating_regime + requirements (deterministic lookup, fail-closed)",
+  "opportunity_score_consumes": "uncovered phenomena + their unvalidated state (the price of each gap)",
+  "llm_role": "the LLM may PROPOSE classifications; the registry and rules VERIFY (Art. XVIII — the LLM is never the sole selector)"
+ },
+ "availability_context": {
+  "probe_artifact": "R413/PHYSICS_STACK_V1/SOLVER_AVAILABILITY_PROBES.json",
+  "measured_state": "1 of 18 phenomena execution-capable + reference-validated (hydraulic V0); 17 declared-contract-only (solvers measured NOT_INSTALLED in this environment)",
+  "note": "availability is MEASURED (Art. VI) and re-read from the probe artifact by the solver registry at import time; this registry carries the same measured states"
+ },
+ "entries": [
+  {
+   "phenomenon": "laminar_incompressible_network_flow",
+   "governing_equations": [
+    {
+     "equation": "poiseuille_laminar",
+     "form": "Q = dP * pi * d^4 / (128 * mu * L)",
+     "epistemic_class": "MODEL_FORM_DECLARED",
+     "note": "circular-segment volumetric flow under a pressure gradient"
+    },
+    {
+     "equation": "mass_conservation",
+     "form": "sum of flows at each internal node = 0",
+     "epistemic_class": "MODEL_FORM_DECLARED",
+     "note": "incompressible steady state"
+    },
+    {
+     "equation": "uniform_stenosis_reduction",
+     "form": "d_eff = d * sqrt(1 - obstruction_pct/100)",
+     "epistemic_class": "MODEL_FORM_DECLARED",
+     "note": "disclosed model choice: obstruction modeled as uniform diameter reduction (R394)"
+    }
+   ],
+   "solver": "hydraulic_network_1d",
+   "solver_version": "hydraulic_network_1d/1.0.0",
+   "geometry_requirements": {
+    "requirement": "geometry",
+    "description": "1D segment network: connectivity graph over named nodes; each segment is a circular tube (diameter, length); a primary segment representing the mechanism's failure site must exist for failure-mode simulation",
+    "fields": [
+     {
+      "field": "geometry_identity",
+      "type": "str",
+      "unit": null,
+      "meaning": "CAD model_id / parametric id"
+     },
+     {
+      "field": "geometry_hash",
+      "type": "str (sha256)",
+      "unit": null,
+      "meaning": "canonical geometry pin"
+     },
+     {
+      "field": "segments[].segment_id",
+      "type": "str",
+      "unit": null,
+      "meaning": "segment identity"
+     },
+     {
+      "field": "segments[].node_a / node_b",
+      "type": "str",
+      "unit": null,
+      "meaning": "connectivity graph edges"
+     },
+     {
+      "field": "segments[].diameter_mm",
+      "type": "float",
+      "unit": "mm",
+      "bound": "> 0 (d=0 allowed only as the fully-obstructed state)"
+     },
+     {
+      "field": "segments[].length_mm",
+      "type": "float",
+      "unit": "mm",
+      "bound": "> 0"
+     },
+     {
+      "field": "segments[].obstruction_pct",
+      "type": "float",
+      "unit": "percent",
+      "bound": "0..100"
+     }
+    ],
+    "epistemic_class": "MODEL_FORM_DECLARED"
+   },
+   "boundary_conditions": {
+    "requirement": "boundary",
+    "description": "fixed-pressure nodes: inlet and outlet pressures (mmHg); node assignment is TOPOLOGICAL (first segment node_a = inlet, last segment node_b = outlet) unless explicitly overridden — never alphabetical guessing",
+    "fields": [
+     {
+      "field": "boundary.inlet_mmHg",
+      "type": "float",
+      "unit": "mmHg"
+     },
+     {
+      "field": "boundary.outlet_mmHg",
+      "type": "float",
+      "unit": "mmHg"
+     },
+     {
+      "field": "boundary.inlet_node / outlet_node",
+      "type": "str (optional override)"
+     }
+    ],
+    "epistemic_class": "MODEL_FORM_DECLARED"
+   },
+   "material_requirements": {
+    "requirement": "material",
+    "description": "single Newtonian fluid; per-field source class required (Art. XXVII)",
+    "fields": [
+     {
+      "field": "fluid.viscosity_mPa_s",
+      "type": "float",
+      "unit": "mPa.s",
+      "bound": "> 0"
+     },
+     {
+      "field": "fluid.density_kg_m3",
+      "type": "float",
+      "unit": "kg/m3",
+      "default": 993.0
+     },
+     {
+      "field": "fluid.temperature_K",
+      "type": "float",
+      "unit": "K",
+      "role": "carried to the record (operating condition basis)"
+     }
+    ],
+    "epistemic_class": "MODEL_FORM_DECLARED"
+   },
+   "operating_regime": {
+    "laminar": {
+     "criterion": "Re < 2300 (LAMINAR_RE_LIMIT)",
+     "epistemic_class": "ENGINEERING",
+     "justification": "standard laminar-turbulent transition bound (R394 V0 threshold declaration, unchanged)"
+    },
+    "incompressible": true,
+    "steady_state": true,
+    "rigid_walls": true,
+    "no_pump": "the solver models no pump — a passive network cannot amplify pressure (enforced as a plausibility bound)",
+    "reduction": "1D (entrance effects neglected)"
+   },
+   "validated_regime": [
+    {
+     "regime": {
+      "flow_regime": "laminar",
+      "network": "trivial topologies (single tube, series, parallel)",
+      "fluid": "newtonian, viscosity 1.0 mPa.s, density 998 kg/m3",
+      "reduction": "1D"
+     },
+     "method": "closed-form reference replay: single-tube Poiseuille, series resistances add, parallel conductances add",
+     "computation_log_sha256": "2c86867ee957496162da16ca5ceb70dc6adc647105f45d86865895a6f6eb40a5",
+     "computation_log_location": "R413/PHYSICS_STACK_V1/SOLVER_AVAILABILITY_PROBES.json probe hydraulic_network_1d (the recorded live replay: 3/3 cases pass, max rel error 0.0)",
+     "solver_version": "hydraulic_network_1d/1.0.0",
+     "uncertainty": "numerical: max rel error 0.0 vs closed form across 3 reference cases, threshold 1e-12 (ENGINEERING); model-form uncertainty: NOT quantified beyond the Re<2300 laminar criterion — claims outside the laminar regime are not covered",
+     "validated_at": "2026-09-06",
+     "determinism": "linear solve; identical inputs -> identical outputs (R394 V0 contract)"
+    }
+   ],
+   "known_limitations": [
+    "laminar regime only — turbulent flows are NOT covered",
+    "1D network reduction: no cross-section-resolved flow fields",
+    "uniform-stenosis obstruction model, not discrete geometry",
+    "single fluid, rigid walls, steady state, isothermal",
+    "the solver validates FLOW quantities only — no heat, no stress, no electromagnetics (a mechanism needing those is MECHANISM_NOT_SIMULATABLE under this entry, never a forced analogy)"
+   ],
+   "uncertainty": {
+    "state": "QUANTIFIED_FOR_VALIDATED_REGIME",
+    "numerical": "max rel error 0.0 vs closed form across 3 reference cases at threshold 1e-12 (ENGINEERING)",
+    "model_form": "NOT quantified beyond the Re<2300 laminar criterion — claims outside the laminar regime are not covered"
+   },
+   "verification_method": {
+    "method": "closed-form reference replay (deterministic): single-tube Poiseuille, series resistances add, parallel conductances add",
+    "threshold": {
+     "name": "REFERENCE_REL_TOL",
+     "value": 1e-12,
+     "epistemic_class": "ENGINEERING",
+     "justification": "a linear-network solver must reproduce Poiseuille closed forms to floating-point agreement (R394 V0)"
+    },
+    "computation_log_sha256": "2c86867ee957496162da16ca5ceb70dc6adc647105f45d86865895a6f6eb40a5",
+    "live_reverification_at_build": {
+     "replayed_at_build": true,
+     "result": "3/3 reference cases pass, max rel error 0.0 (re-run live 2026-09-06 by this builder, fail-closed)"
+    }
+   },
+   "epistemic_class": "COMPUTATIONAL_RESULT",
+   "epistemic_class_note": "results produced under this entry are COMPUTATIONAL_RESULT (Reality Boundary layer 4); simulation -> physics requires measurement (Art. LIII); a covered phenomenon is a model-form declaration, never evidence the form applies to any specific device (Art. XXVIII)",
+   "input_schema": {
+    "epistemic_class": "VERIFIED_FROM_CODE",
+    "fields": {
+     "geometry_identity": "str",
+     "geometry_hash": "str (sha256)",
+     "fluid": {
+      "viscosity_mPa_s": "float",
+      "density_kg_m3": "float (default 993.0)",
+      "temperature_K": "float"
+     },
+     "boundary": {
+      "inlet_mmHg": "float",
+      "outlet_mmHg": "float",
+      "inlet_node": "str (optional)",
+      "outlet_node": "str (optional)"
+     },
+     "segments": [
+      "{segment_id, node_a, node_b, diameter_mm, length_mm, obstruction_pct}"
+     ],
+     "operating_conditions": "dict (optional, carried to record)"
+    },
+    "source": "discovery_fabric/engine/physics_core.py solve_network (section 8 contract), verified live by the builder's reference replay"
+   },
+   "output_schema": {
+    "epistemic_class": "VERIFIED_FROM_CODE",
+    "fields": {
+     "solver_version": "str",
+     "model_version": "str",
+     "status": "SOLVED | PLAUSIBILITY_BOUND_VIOLATED | MECHANISM_NOT_SIMULATABLE",
+     "input_hash": "str (sha256 of canonical spec)",
+     "output_hash": "str (sha256 of canonical output)",
+     "node_pressures_mmHg": "{node: float}",
+     "segment_results": [
+      "{segment_id, flow_ml_min, ...}"
+     ],
+     "predicted_quantities": "{metric: value} (e.g. total_flow_ml_min)"
+    },
+    "failure_states": "PLAUSIBILITY_BOUND_VIOLATED carries the violation list (physical bounds checked BEFORE the solve); no computational result is emitted in that state"
+   },
+   "solver_availability": {
+    "state": "INSTALLED",
+    "probe": "IMPORT_AND_REPLAY",
+    "measured_at": "2026-09-06T12:08:43Z",
+    "detail": "the R394 V0, in-repo, reference-validated by live closed-form replay"
+   },
+   "notes": "the ONE execution-capable, reference-validated solver in this environment (measured); the registry's first member — the stack generalizes the V0 pattern (Art. LXIV: member, not superseded)"
+  },
+  {
+   "phenomenon": "incompressible_viscous_flow",
+   "governing_equations": [
+    {
+     "equation": "navier_stokes_incompressible",
+     "form": "rho*(du/dt + u.grad u) = -grad p + mu * lap u + f",
+     "epistemic_class": "MODEL_FORM_DECLARED",
+     "note": ""
+    },
+    {
+     "equation": "continuity",
+     "form": "div u = 0",
+     "epistemic_class": "MODEL_FORM_DECLARED",
+     "note": ""
+    }
+   ],
+   "solver": "openfoam",
+   "solver_version": "DECLARED_AT_INSTALL",
+   "geometry_requirements": {
+    "requirement": "geometry",
+    "description": "3D fluid domain mesh (polyhedral/hex-dominant), inlet/outlet/wall patches named",
+    "fields": [
+     {
+      "field": "fluid_domain_mesh",
+      "type": "mesh"
+     },
+     {
+      "field": "patches",
+      "type": "inlet|outlet|wall|symmetry"
+     }
+    ],
+    "epistemic_class": "MODEL_FORM_DECLARED"
+   },
+   "boundary_conditions": {
+    "requirement": "boundary",
+    "description": "velocity or pressure at inlets/outlets; no-slip walls; turbulence model inlet conditions where RANS is used",
+    "fields": [
+     {
+      "field": "inlet",
+      "type": "fixedValue | pressureInlet"
+     },
+     {
+      "field": "walls",
+      "type": "no-slip (U=0)"
+     },
+     {
+      "field": "outlet",
+      "type": "zeroGradient | fixedValue"
+     }
+    ],
+    "epistemic_class": "MODEL_FORM_DECLARED"
+   },
+   "material_requirements": {
+    "requirement": "material",
+    "description": "Newtonian fluid: density + dynamic viscosity (constant or temperature-dependent as declared)",
+    "fields": [
+     {
+      "field": "nu",
+      "type": "kinematic viscosity",
+      "unit": "m2/s"
+     },
+     {
+      "field": "rho",
+      "type": "density",
+      "unit": "kg/m3"
+     }
+    ],
+    "epistemic_class": "MODEL_FORM_DECLARED"
+   },
+   "operating_regime": {
+    "regime": "laminar or RANS-modeled turbulent; steady or transient",
+    "incompressible": true
+   },
+   "validated_regime": [],
+   "known_limitations": [
+    "turbulence model fidelity is the dominant uncertainty for RANS cases (validation regime must state the model)",
+    "mesh-resolution dependence: results unvalidated without a mesh-convergence check",
+    "no compressibility, no cavitation, no free surfaces (OpenFOAM can do these; THIS entry declares the incompressible scope only)"
+   ],
+   "uncertainty": {
+    "state": "UNQUANTIFIED_UNTIL_VALIDATED",
+    "note": "no validation has been executed and recorded in this environment; UNQUANTIFIED uncertainty BLOCKS validated claims (Art. XXVII) — an empty validated_regime is the honest state, never evidence against the solver"
+   },
+   "verification_method": {
+    "method": "shipped tutorial/validation cases replayed headlessly in THIS environment + a mesh-convergence demonstration, recorded with computation-log hashes before any validated_regime is non-empty",
+    "note": "NOT executed yet — Art. XXV: the honest empty state"
+   },
+   "epistemic_class": "COMPUTATIONAL_RESULT",
+   "epistemic_class_note": "results produced under this entry are COMPUTATIONAL_RESULT (Reality Boundary layer 4); simulation -> physics requires measurement (Art. LIII); a covered phenomenon is a model-form declaration, never evidence the form applies to any specific device (Art. XXVIII)",
+   "input_schema": {
+    "epistemic_class": "DECLARED_INTERFACE_NOT_YET_EXECUTED",
+    "declaration": {
+     "solver": "OpenFOAM case directory: mesh (blockMesh/polyMesh), fields, BCs, fvSchemes, fvSolution"
+    },
+    "note": "the interface contract this entry will honor once the solver is installed and replayed in this environment; until then no run record may exist (Art. VI/LXI)"
+   },
+   "output_schema": {
+    "epistemic_class": "DECLARED_INTERFACE_NOT_YET_EXECUTED",
+    "declaration": {
+     "fields": "velocity (U), pressure (p), derived wall shear / flow rates; residual + continuity convergence record"
+    },
+    "note": "the interface contract this entry will honor once the solver is installed and replayed in this environment; until then no run record may exist (Art. VI/LXI)"
+   },
+   "solver_availability": {
+    "state": "PROBED_NOT_INSTALLED",
+    "probe": "WHICH",
+    "measured_at": "2026-09-06T12:08:42Z",
+    "detail": "shutil.which('blockMesh') -> None (MEASURED)"
+   }
+  },
+  {
+   "phenomenon": "turbulent_flow",
+   "governing_equations": [
+    {
+     "equation": "rans_reynolds_averaging",
+     "form": "RANS + turbulence closure (k-epsilon / k-omega SST families)",
+     "epistemic_class": "MODEL_FORM_DECLARED",
+     "note": ""
+    },
+    {
+     "equation": "navier_stokes_incompressible",
+     "form": "rho*(du/dt + u.grad u) = -grad p + mu_eff * lap u + f",
+     "epistemic_class": "MODEL_FORM_DECLARED",
+     "note": ""
+    }
+   ],
+   "solver": "openfoam",
+   "solver_version": "DECLARED_AT_INSTALL",
+   "geometry_requirements": {
+    "requirement": "geometry",
+    "description": "3D fluid domain mesh with wall-resolving or wall-function-declared near-wall treatment (y+ declaration required)",
+    "fields": [
+     {
+      "field": "fluid_domain_mesh",
+      "type": "mesh"
+     },
+     {
+      "field": "y_plus_declaration",
+      "type": "float or range",
+      "unit": null
+     }
+    ],
+    "epistemic_class": "MODEL_FORM_DECLARED"
+   },
+   "boundary_conditions": {
+    "requirement": "boundary",
+    "description": "turbulence quantities at inlets (k, epsilon/omega); wall functions or low-Re wall treatment as declared",
+    "fields": [
+     {
+      "field": "k_inlet",
+      "type": "turbulent kinetic energy"
+     },
+     {
+      "field": "omega_inlet",
+      "type": "specific dissipation"
+     }
+    ],
+    "epistemic_class": "MODEL_FORM_DECLARED"
+   },
+   "material_requirements": {
+    "requirement": "material",
+    "description": "Newtonian fluid + turbulence model constants",
+    "fields": [
+     {
+      "field": "turbulence_model",
+      "type": "kEpsilon | kOmegaSST"
+     }
+    ],
+    "epistemic_class": "MODEL_FORM_DECLARED"
+   },
+   "operating_regime": {
+    "regime": "fully turbulent (Re >> 2300); RANS closure declared per case; steady or transient"
+   },
+   "validated_regime": [],
+   "known_limitations": [
+    "RANS closures are MODEL FORMS with known regime-dependent fidelity (k-epsilon poor in adverse pressure gradients; k-omega SST better) — the validated regime must name the closure",
+    "no LES/DDES in this entry (declared scope: RANS)",
+    "laminar-to-turbulent transition is NOT modeled"
+   ],
+   "uncertainty": {
+    "state": "UNQUANTIFIED_UNTIL_VALIDATED",
+    "note": "no validation has been executed and recorded in this environment; UNQUANTIFIED uncertainty BLOCKS validated claims (Art. XXVII) — an empty validated_regime is the honest state, never evidence against the solver"
+   },
+   "verification_method": {
+    "method": "shipped validation cases (backward-facing step, channel flow) replayed headlessly + closure-named regime records",
+    "note": "NOT executed yet"
+   },
+   "epistemic_class": "COMPUTATIONAL_RESULT",
+   "epistemic_class_note": "results produced under this entry are COMPUTATIONAL_RESULT (Reality Boundary layer 4); simulation -> physics requires measurement (Art. LIII); a covered phenomenon is a model-form declaration, never evidence the form applies to any specific device (Art. XXVIII)",
+   "input_schema": {
+    "epistemic_class": "DECLARED_INTERFACE_NOT_YET_EXECUTED",
+    "declaration": {
+     "solver": "OpenFOAM case directory with turbulence model declaration"
+    },
+    "note": "the interface contract this entry will honor once the solver is installed and replayed in this environment; until then no run record may exist (Art. VI/LXI)"
+   },
+   "output_schema": {
+    "epistemic_class": "DECLARED_INTERFACE_NOT_YET_EXECUTED",
+    "declaration": {
+     "fields": "U, p, k, epsilon/omega; wall shear, pressure drop"
+    },
+    "note": "the interface contract this entry will honor once the solver is installed and replayed in this environment; until then no run record may exist (Art. VI/LXI)"
+   },
+   "solver_availability": {
+    "state": "PROBED_NOT_INSTALLED",
+    "probe": "WHICH",
+    "measured_at": "2026-09-06T12:08:42Z",
+    "detail": "shutil.which('blockMesh') -> None (MEASURED)"
+   }
+  },
+  {
+   "phenomenon": "convective_heat_transfer",
+   "governing_equations": [
+    {
+     "equation": "energy_advection_diffusion",
+     "form": "rho*cp*(dT/dt + u.grad T) = div(k grad T) + S",
+     "epistemic_class": "MODEL_FORM_DECLARED",
+     "note": ""
+    },
+    {
+     "equation": "convective_correlation_family",
+     "form": "Nu = f(Re, Pr) — correlation-based (R394 discipline: dimensional validity must be verified, the C-batteries_ev-1 death was a dimensionally invalid Nu correlation)",
+     "epistemic_class": "MODEL_FORM_DECLARED",
+     "note": ""
+    }
+   ],
+   "solver": "openfoam",
+   "solver_version": "DECLARED_AT_INSTALL",
+   "geometry_requirements": {
+    "requirement": "geometry",
+    "description": "3D conjugate or fluid-side domain with thermal wall coupling declared",
+    "fields": [
+     {
+      "field": "domain",
+      "type": "fluid | conjugate (fluid+solid)"
+     },
+     {
+      "field": "thermal_interfaces",
+      "type": "named coupled boundaries"
+     }
+    ],
+    "epistemic_class": "MODEL_FORM_DECLARED"
+   },
+   "boundary_conditions": {
+    "requirement": "boundary",
+    "description": "fixed or profiled temperatures/heat fluxes at thermal boundaries; inlet fluid temperature",
+    "fields": [
+     {
+      "field": "T_inlet",
+      "type": "fixedValue",
+      "unit": "K"
+     },
+     {
+      "field": "q_wall or T_wall",
+      "type": "fixedValue | zeroGradient",
+      "unit": "W/m2 | K"
+     }
+    ],
+    "epistemic_class": "MODEL_FORM_DECLARED"
+   },
+   "material_requirements": {
+    "requirement": "material",
+    "description": "fluid (rho, cp, k, mu) and solid (k, optionally rho*cp) properties per region",
+    "fields": [
+     {
+      "field": "k",
+      "type": "thermal conductivity",
+      "unit": "W/m/K"
+     },
+     {
+      "field": "cp",
+      "type": "specific heat",
+      "unit": "J/kg/K"
+     }
+    ],
+    "epistemic_class": "MODEL_FORM_DECLARED"
+   },
+   "operating_regime": {
+    "regime": "forced and/or natural convection as declared; steady or transient"
+   },
+   "validated_regime": [],
+   "known_limitations": [
+    "correlation-based predictions (Nu=f(Re,Pr)) carry the regime-validity burden the R411 battery-cooling death demonstrated (dimensional + regime mismatch)",
+    "radiation NOT in this entry unless declared",
+    "turbulent convection inherits the RANS fidelity limits"
+   ],
+   "uncertainty": {
+    "state": "UNQUANTIFIED_UNTIL_VALIDATED",
+    "note": "no validation has been executed and recorded in this environment; UNQUANTIFIED uncertainty BLOCKS validated claims (Art. XXVII) — an empty validated_regime is the honest state, never evidence against the solver"
+   },
+   "verification_method": {
+    "method": "shipped validation cases (e.g. heated channel / buoyant cavity) replayed headlessly with closure-named regimes",
+    "note": "NOT executed yet"
+   },
+   "epistemic_class": "COMPUTATIONAL_RESULT",
+   "epistemic_class_note": "results produced under this entry are COMPUTATIONAL_RESULT (Reality Boundary layer 4); simulation -> physics requires measurement (Art. LIII); a covered phenomenon is a model-form declaration, never evidence the form applies to any specific device (Art. XXVIII)",
+   "input_schema": {
+    "epistemic_class": "DECLARED_INTERFACE_NOT_YET_EXECUTED",
+    "declaration": {
+     "solver": "OpenFOAM case: mesh + T field + thermophysical properties"
+    },
+    "note": "the interface contract this entry will honor once the solver is installed and replayed in this environment; until then no run record may exist (Art. VI/LXI)"
+   },
+   "output_schema": {
+    "epistemic_class": "DECLARED_INTERFACE_NOT_YET_EXECUTED",
+    "declaration": {
+     "fields": "T field, wall heat fluxes, h (derived), Nu (derived)"
+    },
+    "note": "the interface contract this entry will honor once the solver is installed and replayed in this environment; until then no run record may exist (Art. VI/LXI)"
+   },
+   "solver_availability": {
+    "state": "PROBED_NOT_INSTALLED",
+    "probe": "WHICH",
+    "measured_at": "2026-09-06T12:08:42Z",
+    "detail": "shutil.which('blockMesh') -> None (MEASURED)"
+   }
+  },
+  {
+   "phenomenon": "porous_media_flow",
+   "governing_equations": [
+    {
+     "equation": "darcy_law",
+     "form": "u = -(K/mu) * grad p",
+     "epistemic_class": "MODEL_FORM_DECLARED",
+     "note": ""
+    },
+    {
+     "equation": "forchheimer_extension",
+     "form": "grad p = -(mu/K) u - (rho C_F / sqrt K) |u| u",
+     "epistemic_class": "MODEL_FORM_DECLARED",
+     "note": ""
+    }
+   ],
+   "solver": "openfoam",
+   "solver_version": "DECLARED_AT_INSTALL",
+   "geometry_requirements": {
+    "requirement": "geometry",
+    "description": "porous region designation over the domain mesh (porosity and permeability zones)",
+    "fields": [
+     {
+      "field": "porous_zones",
+      "type": "cell zones with permeability tensor"
+     },
+     {
+      "field": "porosity",
+      "type": "void fraction",
+      "unit": "dimensionless"
+     }
+    ],
+    "epistemic_class": "MODEL_FORM_DECLARED"
+   },
+   "boundary_conditions": {
+    "requirement": "boundary",
+    "description": "as incompressible_viscous_flow plus porous-zone interface treatment",
+    "fields": [
+     {
+      "field": "K",
+      "type": "permeability tensor",
+      "unit": "m2"
+     }
+    ],
+    "epistemic_class": "MODEL_FORM_DECLARED"
+   },
+   "material_requirements": {
+    "requirement": "material",
+    "description": "fluid properties + porous medium (K, porosity, Forchheimer coefficient)",
+    "fields": [
+     {
+      "field": "K",
+      "type": "intrinsic permeability",
+      "unit": "m2"
+     },
+     {
+      "field": "C_F",
+      "type": "Forchheimer coefficient"
+     }
+    ],
+    "epistemic_class": "MODEL_FORM_DECLARED"
+   },
+   "operating_regime": {
+    "regime": "Darcy (Re_p << 1) up to Forchheimer as declared"
+   },
+   "validated_regime": [],
+   "known_limitations": [
+    "Darcy-Forchheimer is an averaged homogenized model — pore-scale geometry is NOT resolved (the R411 porous-media death's 'enhanced turbulence' causal chain was an homogenization-level claim)",
+    "anisotropic K must be declared per axis"
+   ],
+   "uncertainty": {
+    "state": "UNQUANTIFIED_UNTIL_VALIDATED",
+    "note": "no validation has been executed and recorded in this environment; UNQUANTIFIED uncertainty BLOCKS validated claims (Art. XXVII) — an empty validated_regime is the honest state, never evidence against the solver"
+   },
+   "verification_method": {
+    "method": "shipped porous media validation cases replayed headlessly",
+    "note": "NOT executed yet"
+   },
+   "epistemic_class": "COMPUTATIONAL_RESULT",
+   "epistemic_class_note": "results produced under this entry are COMPUTATIONAL_RESULT (Reality Boundary layer 4); simulation -> physics requires measurement (Art. LIII); a covered phenomenon is a model-form declaration, never evidence the form applies to any specific device (Art. XXVIII)",
+   "input_schema": {
+    "epistemic_class": "DECLARED_INTERFACE_NOT_YET_EXECUTED",
+    "declaration": {
+     "solver": "OpenFOAM case with porousZones / DarcyForchheimer declaration"
+    },
+    "note": "the interface contract this entry will honor once the solver is installed and replayed in this environment; until then no run record may exist (Art. VI/LXI)"
+   },
+   "output_schema": {
+    "epistemic_class": "DECLARED_INTERFACE_NOT_YET_EXECUTED",
+    "declaration": {
+     "fields": "U, p; pressure-drop vs flow-rate curves"
+    },
+    "note": "the interface contract this entry will honor once the solver is installed and replayed in this environment; until then no run record may exist (Art. VI/LXI)"
+   },
+   "solver_availability": {
+    "state": "PROBED_NOT_INSTALLED",
+    "probe": "WHICH",
+    "measured_at": "2026-09-06T12:08:42Z",
+    "detail": "shutil.which('blockMesh') -> None (MEASURED)"
+   }
+  },
+  {
+   "phenomenon": "structural_stress_strain",
+   "governing_equations": [
+    {
+     "equation": "linear_elasticity_equilibrium",
+     "form": "div sigma + b = 0; sigma = C : epsilon(u)",
+     "epistemic_class": "MODEL_FORM_DECLARED",
+     "note": ""
+    }
+   ],
+   "solver": "fenicsx",
+   "solver_version": "DECLARED_AT_INSTALL",
+   "geometry_requirements": {
+    "requirement": "geometry",
+    "description": "3D (or 2D-axisymmetric where declared) solid/fluid domain mesh with named boundaries; mesh must resolve the field gradients the declared equations require (a mesh-quality declaration, not a guarantee)",
+    "fields": [
+     {
+      "field": "mesh",
+      "type": "mesh file / programmatic mesh",
+      "unit": null
+     },
+     {
+      "field": "named_boundaries",
+      "type": "list of boundary names",
+      "unit": null
+     },
+     {
+      "field": "geometry_hash",
+      "type": "str (sha256)",
+      "unit": null,
+      "meaning": "canonical geometry pin"
+     }
+    ],
+    "epistemic_class": "MODEL_FORM_DECLARED"
+   },
+   "boundary_conditions": {
+    "requirement": "boundary",
+    "description": "displacement constraints and tractions on named boundaries (Dirichlet/Neumann)",
+    "fields": [
+     {
+      "field": "fixed_boundaries",
+      "type": "u = 0 or prescribed"
+     },
+     {
+      "field": "loads",
+      "type": "traction | pressure",
+      "unit": "Pa"
+     }
+    ],
+    "epistemic_class": "MODEL_FORM_DECLARED"
+   },
+   "material_requirements": {
+    "requirement": "material",
+    "description": "linear elastic isotropic (E, nu) or orthotropic as declared",
+    "fields": [
+     {
+      "field": "E",
+      "type": "Young's modulus",
+      "unit": "Pa"
+     },
+     {
+      "field": "nu",
+      "type": "Poisson ratio",
+      "unit": "dimensionless"
+     }
+    ],
+    "epistemic_class": "MODEL_FORM_DECLARED"
+   },
+   "operating_regime": {
+    "regime": "small strain, small displacement, static (linear elasticity)"
+   },
+   "validated_regime": [],
+   "known_limitations": [
+    "small-strain linear elasticity only — no plasticity, contact, or geometric nonlinearity in this entry",
+    "stress singularities at re-entrant corners require mesh-refinement honesty (values AT singularities are not reportable)",
+    "no fatigue or fracture propagation"
+   ],
+   "uncertainty": {
+    "state": "UNQUANTIFIED_UNTIL_VALIDATED",
+    "note": "no validation has been executed and recorded in this environment; UNQUANTIFIED uncertainty BLOCKS validated claims (Art. XXVII) — an empty validated_regime is the honest state, never evidence against the solver"
+   },
+   "verification_method": {
+    "method": "method of manufactured solutions (MMS) or shipped convergence tests replayed headlessly; mesh-convergence recorded",
+    "note": "NOT executed yet"
+   },
+   "epistemic_class": "COMPUTATIONAL_RESULT",
+   "epistemic_class_note": "results produced under this entry are COMPUTATIONAL_RESULT (Reality Boundary layer 4); simulation -> physics requires measurement (Art. LIII); a covered phenomenon is a model-form declaration, never evidence the form applies to any specific device (Art. XXVIII)",
+   "input_schema": {
+    "epistemic_class": "DECLARED_INTERFACE_NOT_YET_EXECUTED",
+    "declaration": {
+     "solver": "FEM: mesh (meshio-compatible), fields, Dirichlet/Neumann BCs, material law"
+    },
+    "note": "the interface contract this entry will honor once the solver is installed and replayed in this environment; until then no run record may exist (Art. VI/LXI)"
+   },
+   "output_schema": {
+    "epistemic_class": "DECLARED_INTERFACE_NOT_YET_EXECUTED",
+    "declaration": {
+     "fields": "displacement u, stress sigma (von Mises derived), strain epsilon; reaction forces"
+    },
+    "note": "the interface contract this entry will honor once the solver is installed and replayed in this environment; until then no run record may exist (Art. VI/LXI)"
+   },
+   "solver_availability": {
+    "state": "PROBED_NOT_INSTALLED",
+    "probe": "IMPORT",
+    "measured_at": "2026-09-06T12:08:42Z",
+    "detail": "import dolfinx failed in a clean subprocess (MEASURED)"
+   }
+  },
+  {
+   "phenomenon": "linear_elastic_deformation",
+   "governing_equations": [
+    {
+     "equation": "linear_elasticity_equilibrium",
+     "form": "div sigma + b = 0; sigma = C : epsilon(u)",
+     "epistemic_class": "MODEL_FORM_DECLARED",
+     "note": ""
+    }
+   ],
+   "solver": "sfepy",
+   "solver_version": "sfepy/2026.2",
+   "geometry_requirements": {
+    "requirement": "geometry",
+    "description": "2D (plane-stress declared) or 3D solid domain mesh with named regions and boundaries; the validation regime uses structured bilinear quad meshes over rectangles",
+    "fields": [
+     {
+      "field": "mesh",
+      "type": "quad/tetra mesh (Mesh.from_data / meshio)"
+     },
+     {
+      "field": "regions",
+      "type": "Omega + named facet boundaries (GammaL/GammaR...)"
+     },
+     {
+      "field": "geometry_hash",
+      "type": "str (sha256)",
+      "unit": null,
+      "meaning": "canonical geometry pin"
+     }
+    ],
+    "epistemic_class": "MODEL_FORM_DECLARED"
+   },
+   "boundary_conditions": {
+    "requirement": "boundary",
+    "description": "prescribed displacements (EssentialBC per dof, e.g. u.0=0 on a facet) and surface tractions (dw_surface_ltr; SIGN CONVENTION: the term's val enters the residual minus the engineering tension convention — measured and pinned by the validation replay)",
+    "fields": [
+     {
+      "field": "ebcs",
+      "type": "EssentialBC(name, region, {dof: value})"
+     },
+     {
+      "field": "tractions",
+      "type": "Material val shape (dim, 1)"
+     }
+    ],
+    "epistemic_class": "MODEL_FORM_DECLARED"
+   },
+   "material_requirements": {
+    "requirement": "material",
+    "description": "linear elastic plane-stress stiffness D = E/(1-nu^2) * [[1,nu,0],[nu,1,0],[0,0,(1-nu)/2]] (isotropic declared first; E, nu with source class)",
+    "fields": [
+     {
+      "field": "E",
+      "type": "Young's modulus",
+      "unit": "Pa"
+     },
+     {
+      "field": "nu",
+      "type": "Poisson ratio",
+      "unit": "dimensionless"
+     }
+    ],
+    "epistemic_class": "MODEL_FORM_DECLARED"
+   },
+   "operating_regime": {
+    "constitutive": "plane-stress linear elasticity, homogeneous isotropic",
+    "loading": "static, uniform surface traction, no body force",
+    "mesh": "bilinear quads, displacement fields exactly representable in the element space",
+    "validated_scope_note": "stress concentrations, singularities, nonlinear materials, dynamics and 3D are OUTSIDE the validated regime"
+   },
+   "validated_regime": [
+    {
+     "regime": {
+      "constitutive": "plane-stress linear elasticity, homogeneous isotropic",
+      "loading": "uniform uniaxial traction (no stress concentration, no body force)",
+      "mesh": "structured bilinear quads, 8..64 elements",
+      "fields": "displacement (exact-representable linear fields)"
+     },
+     "method": "closed-form reference replay: uniform-traction plane-stress problems whose exact displacement fields lie inside the element space — the FE solution must reproduce them to floating-point agreement",
+     "computation_log_sha256": "d8d35184f624139dfeb22a4e3277ca5148290e9c0a176a2f8e79c5235fa2b768",
+     "computation_log_location": "R413/PHYSICS_STACK_V1/SFEPY_INSTRUMENT_VALIDATION.json",
+     "solver_version": "sfepy/2026.2",
+     "uncertainty": "numerical: max rel error 1.91e-14 across 3 reference cases, threshold 1e-9 (ENGINEERING); model-form: not quantified beyond the declared regime",
+     "validated_at": "2026-09-06",
+     "determinism": "linear solve; byte-identical re-run"
+    }
+   ],
+   "known_limitations": [
+    "small-strain linear elasticity only — no plasticity, contact, or geometric nonlinearity",
+    "the VALIDATED regime is plane-stress uniform-traction problems with exactly-representable displacement fields; anything else computes numbers the claim contract will NOT admit as validated claims (regime scoping is enforced by coverage.evaluate_physics_claim)",
+    "stress AT re-entrant corners/singularities is not reportable without mesh-refinement honesty",
+    "pure-Python FEM: mesh scale limited by memory/time — large 3D assemblies may be impractical (priced in the opportunity score)"
+   ],
+   "uncertainty": {
+    "state": "QUANTIFIED_FOR_VALIDATED_REGIME",
+    "numerical": "max rel error 1.91e-14 vs closed form across 3 reference cases at threshold 1e-9 (ENGINEERING)",
+    "model_form": "NOT quantified beyond the declared plane-stress/uniform-traction regime — claims outside it are not covered"
+   },
+   "verification_method": {
+    "method": "closed-form reference replay: uniform-traction plane-stress problems whose exact displacement fields lie inside the element space (ux=sigma*x/E, uy=-nu*sigma*y/E) — 3 cases, 2 geometries, 3 materials, tension+compression",
+    "threshold": {
+     "name": "REFERENCE_REL_TOL",
+     "value": 1e-09,
+     "epistemic_class": "ENGINEERING",
+     "justification": "the closed-form solution is exactly representable in the bilinear element space; the threshold detects assembly/BC/unit defects (the R394 V0 discipline applied to FEM)"
+    },
+    "computation_log_sha256": "d8d35184f624139dfeb22a4e3277ca5148290e9c0a176a2f8e79c5235fa2b768",
+    "computation_log_location": "R413/PHYSICS_STACK_V1/SFEPY_INSTRUMENT_VALIDATION.json",
+    "determinism": "linear solve; byte-identical re-run (replay case A re-executed and byte-compared)",
+    "sign_convention_incident": "the first fail-closed run measured FE = -1x closed form (dw_surface_ltr sign convention); fixed with the documented sign and the replay re-run — the instrument caught its own defect (Art. XVI: tests are evidence of enforcement)"
+   },
+   "epistemic_class": "COMPUTATIONAL_RESULT",
+   "epistemic_class_note": "results produced under this entry are COMPUTATIONAL_RESULT (Reality Boundary layer 4); simulation -> physics requires measurement (Art. LIII); a covered phenomenon is a model-form declaration, never evidence the form applies to any specific device (Art. XXVIII)",
+   "input_schema": {
+    "epistemic_class": "VERIFIED_FROM_CODE",
+    "fields": {
+     "mesh": "Mesh.from_data(name, coors, ngroups, [conns], [mat_ids], ['2_4'])",
+     "regions": "domain.create_region(name, selector, 'facet'|'vertex'|'cell')",
+     "field": "Field.from_args(name, dtype, 'vector'|'scalar', region, approx_order=1)",
+     "variables": "FieldVariable unknown + test pair",
+     "materials": "Material D (stiffness, shape (3,3) plane-stress), traction val shape (dim,1)",
+     "terms": "dw_lin_elastic(m.D, v, u) + dw_surface_ltr(m_tr.val, v)",
+     "bcs": "EssentialBC(name, region, {dof: value})",
+     "solvers": "Newton({}, lin_solver=ScipyDirect({}))"
+    },
+    "source": "scripts/r413_sfepy_instrument_validation.py — the exact interface driven by the passing closed-form replay"
+   },
+   "output_schema": {
+    "epistemic_class": "VERIFIED_FROM_CODE",
+    "fields": {
+     "state": "solution state; state.vec = DOF vector (vertex-ordered for P1 fields)",
+     "displacements": "u at mesh vertices (reshape(-1, dim))",
+     "derived": "strain/stress recoverable from the displacement gradient (postprocessing)"
+    }
+   },
+   "solver_availability": {
+    "state": "INSTALLED",
+    "probe": "CLEAN_SUBPROCESS_IMPORT_AND_MINI_FEM_SOLVE",
+    "measured_at": "2026-09-06T13:40:00Z",
+    "detail": "sfepy 2026.2 installed by the operator-authorized Phase 5/6 decision; mini-solve Laplace err 1.1e-16 (measured)"
+   },
+   "notes": "the SECOND execution-capable, reference-validated solver — earned by the Phase 5 decision machine (score 20855, formula-sensitivity disclosed on the opportunity artifact) and validated by closed-form replay BEFORE any discovery use"
+  },
+  {
+   "phenomenon": "thermal_structural_multiphysics",
+   "governing_equations": [
+    {
+     "equation": "heat_equation",
+     "form": "rho*cp*dT/dt = div(k grad T) + Q",
+     "epistemic_class": "MODEL_FORM_DECLARED",
+     "note": ""
+    },
+    {
+     "equation": "thermoelastic_coupling",
+     "form": "sigma = C:(epsilon(u) - alpha*dT*1)",
+     "epistemic_class": "MODEL_FORM_DECLARED",
+     "note": ""
+    }
+   ],
+   "solver": "elmer",
+   "solver_version": "DECLARED_AT_INSTALL",
+   "geometry_requirements": {
+    "requirement": "geometry",
+    "description": "3D (or 2D-axisymmetric where declared) solid/fluid domain mesh with named boundaries; mesh must resolve the field gradients the declared equations require (a mesh-quality declaration, not a guarantee)",
+    "fields": [
+     {
+      "field": "mesh",
+      "type": "mesh file / programmatic mesh",
+      "unit": null
+     },
+     {
+      "field": "named_boundaries",
+      "type": "list of boundary names",
+      "unit": null
+     },
+     {
+      "field": "geometry_hash",
+      "type": "str (sha256)",
+      "unit": null,
+      "meaning": "canonical geometry pin"
+     }
+    ],
+    "epistemic_class": "MODEL_FORM_DECLARED"
+   },
+   "boundary_conditions": {
+    "requirement": "boundary",
+    "description": "thermal BCs (fixed T / flux / convection) + structural BCs, coupled on shared boundaries",
+    "fields": [
+     {
+      "field": "thermal_bc",
+      "type": "T | q | h+T_inf"
+     },
+     {
+      "field": "structural_bc",
+      "type": "u | traction"
+     }
+    ],
+    "epistemic_class": "MODEL_FORM_DECLARED"
+   },
+   "material_requirements": {
+    "requirement": "material",
+    "description": "solid: k, rho, cp, E, nu, alpha (CTE) per region",
+    "fields": [
+     {
+      "field": "alpha",
+      "type": "coeff. thermal expansion",
+      "unit": "1/K"
+     }
+    ],
+    "epistemic_class": "MODEL_FORM_DECLARED"
+   },
+   "operating_regime": {
+    "regime": "small strain, linear thermoelastic coupling, steady or transient"
+   },
+   "validated_regime": [],
+   "known_limitations": [
+    "coupled linear regime only; nonlinear materials (plasticity, temperature-dependent k/E) outside declared scope",
+    "two-way coupling fidelity depends on both sub-models' validations"
+   ],
+   "uncertainty": {
+    "state": "UNQUANTIFIED_UNTIL_VALIDATED",
+    "note": "no validation has been executed and recorded in this environment; UNQUANTIFIED uncertainty BLOCKS validated claims (Art. XXVII) — an empty validated_regime is the honest state, never evidence against the solver"
+   },
+   "verification_method": {
+    "method": "Elmer shipped verification cases replayed headlessly (ElmerSolver CLI)",
+    "note": "NOT executed yet"
+   },
+   "epistemic_class": "COMPUTATIONAL_RESULT",
+   "epistemic_class_note": "results produced under this entry are COMPUTATIONAL_RESULT (Reality Boundary layer 4); simulation -> physics requires measurement (Art. LIII); a covered phenomenon is a model-form declaration, never evidence the form applies to any specific device (Art. XXVIII)",
+   "input_schema": {
+    "epistemic_class": "DECLARED_INTERFACE_NOT_YET_EXECUTED",
+    "declaration": {
+     "solver": "Elmer sif case: mesh (ElmerGrid input), coupled heat + elasticity solvers"
+    },
+    "note": "the interface contract this entry will honor once the solver is installed and replayed in this environment; until then no run record may exist (Art. VI/LXI)"
+   },
+   "output_schema": {
+    "epistemic_class": "DECLARED_INTERFACE_NOT_YET_EXECUTED",
+    "declaration": {
+     "fields": "T field, displacement, thermal stress"
+    },
+    "note": "the interface contract this entry will honor once the solver is installed and replayed in this environment; until then no run record may exist (Art. VI/LXI)"
+   },
+   "solver_availability": {
+    "state": "PROBED_NOT_INSTALLED",
+    "probe": "WHICH",
+    "measured_at": "2026-09-06T12:08:42Z",
+    "detail": "shutil.which('ElmerSolver') -> None (MEASURED)"
+   }
+  },
+  {
+   "phenomenon": "heat_transfer",
+   "governing_equations": [
+    {
+     "equation": "heat_equation",
+     "form": "rho*cp*dT/dt = div(k grad T) + Q",
+     "epistemic_class": "MODEL_FORM_DECLARED",
+     "note": ""
+    }
+   ],
+   "solver": "elmer",
+   "solver_version": "DECLARED_AT_INSTALL",
+   "geometry_requirements": {
+    "requirement": "geometry",
+    "description": "3D (or 2D-axisymmetric where declared) solid/fluid domain mesh with named boundaries; mesh must resolve the field gradients the declared equations require (a mesh-quality declaration, not a guarantee)",
+    "fields": [
+     {
+      "field": "mesh",
+      "type": "mesh file / programmatic mesh",
+      "unit": null
+     },
+     {
+      "field": "named_boundaries",
+      "type": "list of boundary names",
+      "unit": null
+     },
+     {
+      "field": "geometry_hash",
+      "type": "str (sha256)",
+      "unit": null,
+      "meaning": "canonical geometry pin"
+     }
+    ],
+    "epistemic_class": "MODEL_FORM_DECLARED"
+   },
+   "boundary_conditions": {
+    "requirement": "boundary",
+    "description": "fixed temperature, heat flux, or convective (h, T_inf) boundary conditions",
+    "fields": [
+     {
+      "field": "T_bc",
+      "type": "fixedValue",
+      "unit": "K"
+     },
+     {
+      "field": "q_bc",
+      "type": "flux",
+      "unit": "W/m2"
+     }
+    ],
+    "epistemic_class": "MODEL_FORM_DECLARED"
+   },
+   "material_requirements": {
+    "requirement": "material",
+    "description": "solid conduction properties: k (+ rho, cp for transient)",
+    "fields": [
+     {
+      "field": "k",
+      "type": "thermal conductivity",
+      "unit": "W/m/K"
+     }
+    ],
+    "epistemic_class": "MODEL_FORM_DECLARED"
+   },
+   "operating_regime": {
+    "regime": "conduction-dominated solid heat transfer; steady or transient"
+   },
+   "validated_regime": [],
+   "known_limitations": [
+    "conduction-only declared scope (convection lives in convective_heat_transfer; radiation undeclared)",
+    "temperature-dependent k would move this out of linear scope"
+   ],
+   "uncertainty": {
+    "state": "UNQUANTIFIED_UNTIL_VALIDATED",
+    "note": "no validation has been executed and recorded in this environment; UNQUANTIFIED uncertainty BLOCKS validated claims (Art. XXVII) — an empty validated_regime is the honest state, never evidence against the solver"
+   },
+   "verification_method": {
+    "method": "Elmer shipped heat-equation verification cases replayed headlessly",
+    "note": "NOT executed yet"
+   },
+   "epistemic_class": "COMPUTATIONAL_RESULT",
+   "epistemic_class_note": "results produced under this entry are COMPUTATIONAL_RESULT (Reality Boundary layer 4); simulation -> physics requires measurement (Art. LIII); a covered phenomenon is a model-form declaration, never evidence the form applies to any specific device (Art. XXVIII)",
+   "input_schema": {
+    "epistemic_class": "DECLARED_INTERFACE_NOT_YET_EXECUTED",
+    "declaration": {
+     "solver": "Elmer sif case: heat solver"
+    },
+    "note": "the interface contract this entry will honor once the solver is installed and replayed in this environment; until then no run record may exist (Art. VI/LXI)"
+   },
+   "output_schema": {
+    "epistemic_class": "DECLARED_INTERFACE_NOT_YET_EXECUTED",
+    "declaration": {
+     "fields": "T field, heat fluxes, temperature gradients"
+    },
+    "note": "the interface contract this entry will honor once the solver is installed and replayed in this environment; until then no run record may exist (Art. VI/LXI)"
+   },
+   "solver_availability": {
+    "state": "PROBED_NOT_INSTALLED",
+    "probe": "WHICH",
+    "measured_at": "2026-09-06T12:08:42Z",
+    "detail": "shutil.which('ElmerSolver') -> None (MEASURED)"
+   }
+  },
+  {
+   "phenomenon": "soft_body_continuum_mechanics",
+   "governing_equations": [
+    {
+     "equation": "finite_strain_equilibrium",
+     "form": "div P + b = 0; P = F*S (neo-Hookean / Mooney-Rivlin declared per case)",
+     "epistemic_class": "MODEL_FORM_DECLARED",
+     "note": ""
+    }
+   ],
+   "solver": "sofa",
+   "solver_version": "DECLARED_AT_INSTALL",
+   "geometry_requirements": {
+    "requirement": "geometry",
+    "description": "3D volumetric mesh of the deformable body (SOFA mechanical object topology)",
+    "fields": [
+     {
+      "field": "deformable_body_mesh",
+      "type": "tetra/hexa mesh"
+     },
+     {
+      "field": "collision_models",
+      "type": "declared collision primitives"
+     }
+    ],
+    "epistemic_class": "MODEL_FORM_DECLARED"
+   },
+   "boundary_conditions": {
+    "requirement": "boundary",
+    "description": "prescribed displacements, forces, or contact constraints",
+    "fields": [
+     {
+      "field": "prescribed_dofs",
+      "type": "fixed | imposed"
+     },
+     {
+      "field": "contact",
+      "type": "collision pairs"
+     }
+    ],
+    "epistemic_class": "MODEL_FORM_DECLARED"
+   },
+   "material_requirements": {
+    "requirement": "material",
+    "description": "hyperelastic or corotated-linear parameters per body",
+    "fields": [
+     {
+      "field": "constitutive_model",
+      "type": "neoHookean | corotated"
+     }
+    ],
+    "epistemic_class": "MODEL_FORM_DECLARED"
+   },
+   "operating_regime": {
+    "regime": "large deformation, quasi-static or explicit dynamic"
+   },
+   "validated_regime": [],
+   "known_limitations": [
+    "SOFA's corotated-linear default is a FASTER but coarser model form than full hyperelasticity — the regime record must name the constitutive model",
+    "contact fidelity depends on collision model resolution"
+   ],
+   "uncertainty": {
+    "state": "UNQUANTIFIED_UNTIL_VALIDATED",
+    "note": "no validation has been executed and recorded in this environment; UNQUANTIFIED uncertainty BLOCKS validated claims (Art. XXVII) — an empty validated_regime is the honest state, never evidence against the solver"
+   },
+   "verification_method": {
+    "method": "SOFA scene regression tests replayed headlessly via runSofa -n",
+    "note": "NOT executed yet"
+   },
+   "epistemic_class": "COMPUTATIONAL_RESULT",
+   "epistemic_class_note": "results produced under this entry are COMPUTATIONAL_RESULT (Reality Boundary layer 4); simulation -> physics requires measurement (Art. LIII); a covered phenomenon is a model-form declaration, never evidence the form applies to any specific device (Art. XXVIII)",
+   "input_schema": {
+    "epistemic_class": "DECLARED_INTERFACE_NOT_YET_EXECUTED",
+    "declaration": {
+     "solver": "SOFA scene (.scn / Python scene): mechanical objects, force fields, mass, collision models"
+    },
+    "note": "the interface contract this entry will honor once the solver is installed and replayed in this environment; until then no run record may exist (Art. VI/LXI)"
+   },
+   "output_schema": {
+    "epistemic_class": "DECLARED_INTERFACE_NOT_YET_EXECUTED",
+    "declaration": {
+     "fields": "positions, velocities, von Mises (derived), contact forces"
+    },
+    "note": "the interface contract this entry will honor once the solver is installed and replayed in this environment; until then no run record may exist (Art. VI/LXI)"
+   },
+   "solver_availability": {
+    "state": "PROBED_NOT_INSTALLED",
+    "probe": "WHICH",
+    "measured_at": "2026-09-06T12:08:42Z",
+    "detail": "shutil.which('runSofa') -> None (MEASURED)"
+   }
+  },
+  {
+   "phenomenon": "deformable_biomechanics",
+   "governing_equations": [
+    {
+     "equation": "finite_strain_equilibrium",
+     "form": "div P + b = 0 (tissue-constitutive models: hyperelastic / viscoelastic declared per case)",
+     "epistemic_class": "MODEL_FORM_DECLARED",
+     "note": ""
+    }
+   ],
+   "solver": "sofa",
+   "solver_version": "DECLARED_AT_INSTALL",
+   "geometry_requirements": {
+    "requirement": "geometry",
+    "description": "anatomical-region volumetric meshes with interaction surfaces",
+    "fields": [
+     {
+      "field": "anatomy_mesh",
+      "type": "patient or canonical geometry"
+     }
+    ],
+    "epistemic_class": "MODEL_FORM_DECLARED"
+   },
+   "boundary_conditions": {
+    "requirement": "boundary",
+    "description": "physiological loads/motions; contact with devices or adjacent anatomy",
+    "fields": [
+     {
+      "field": "physiological_load",
+      "type": "declared per case"
+     }
+    ],
+    "epistemic_class": "MODEL_FORM_DECLARED"
+   },
+   "material_requirements": {
+    "requirement": "material",
+    "description": "tissue parameters — REGIME-CRITICAL (soft tissue properties vary orders of magnitude across sources; each parameter carries a source class, Art. XXVII)",
+    "fields": [
+     {
+      "field": "tissue_model",
+      "type": "constitutive + parameters + source"
+     }
+    ],
+    "epistemic_class": "MODEL_FORM_DECLARED"
+   },
+   "operating_regime": {
+    "regime": "physiological-strain-rate deformation"
+   },
+   "validated_regime": [],
+   "known_limitations": [
+    "tissue parameter uncertainty dominates: results are parameter-sensitivity-bound, and the validated regime must carry the parameter source",
+    "patient-specific geometry changes conclusions (the R411 lesson generalized)"
+   ],
+   "uncertainty": {
+    "state": "UNQUANTIFIED_UNTIL_VALIDATED",
+    "note": "no validation has been executed and recorded in this environment; UNQUANTIFIED uncertainty BLOCKS validated claims (Art. XXVII) — an empty validated_regime is the honest state, never evidence against the solver"
+   },
+   "verification_method": {
+    "method": "SOFA biomechanics scene regression + parameter-sensitivity demonstration",
+    "note": "NOT executed yet"
+   },
+   "epistemic_class": "COMPUTATIONAL_RESULT",
+   "epistemic_class_note": "results produced under this entry are COMPUTATIONAL_RESULT (Reality Boundary layer 4); simulation -> physics requires measurement (Art. LIII); a covered phenomenon is a model-form declaration, never evidence the form applies to any specific device (Art. XXVIII)",
+   "input_schema": {
+    "epistemic_class": "DECLARED_INTERFACE_NOT_YET_EXECUTED",
+    "declaration": {
+     "solver": "SOFA scene with tissue constitutive models"
+    },
+    "note": "the interface contract this entry will honor once the solver is installed and replayed in this environment; until then no run record may exist (Art. VI/LXI)"
+   },
+   "output_schema": {
+    "epistemic_class": "DECLARED_INTERFACE_NOT_YET_EXECUTED",
+    "declaration": {
+     "fields": "deformation, stress, contact pressure"
+    },
+    "note": "the interface contract this entry will honor once the solver is installed and replayed in this environment; until then no run record may exist (Art. VI/LXI)"
+   },
+   "solver_availability": {
+    "state": "PROBED_NOT_INSTALLED",
+    "probe": "WHICH",
+    "measured_at": "2026-09-06T12:08:42Z",
+    "detail": "shutil.which('runSofa') -> None (MEASURED)"
+   }
+  },
+  {
+   "phenomenon": "rigid_body_contact_dynamics",
+   "governing_equations": [
+    {
+     "equation": "rigid_body_dynamics",
+     "form": "M(q) q_ddot + C(q, qdot) qdot + g(q) = tau + contact forces",
+     "epistemic_class": "MODEL_FORM_DECLARED",
+     "note": ""
+    },
+    {
+     "equation": "contact_complementarity",
+     "form": "contact forces solve a complementarity problem (impulse-based or constraint-based as declared)",
+     "epistemic_class": "MODEL_FORM_DECLARED",
+     "note": ""
+    }
+   ],
+   "solver": "mujoco",
+   "solver_version": "DECLARED_AT_INSTALL",
+   "geometry_requirements": {
+    "requirement": "geometry",
+    "description": "rigid-body model: bodies, joints, collision shapes (MuJoCo MJCF model)",
+    "fields": [
+     {
+      "field": "mjcf_model",
+      "type": "body/joint/geom tree"
+     }
+    ],
+    "epistemic_class": "MODEL_FORM_DECLARED"
+   },
+   "boundary_conditions": {
+    "requirement": "boundary",
+    "description": "initial states, actuation signals, contact friction parameters",
+    "fields": [
+     {
+      "field": "friction",
+      "type": "per-pair coefficients"
+     },
+     {
+      "field": "actuation",
+      "type": "control inputs"
+     }
+    ],
+    "epistemic_class": "MODEL_FORM_DECLARED"
+   },
+   "material_requirements": {
+    "requirement": "material",
+    "description": "mass/inertia per body + contact friction/restitution pairs",
+    "fields": [
+     {
+      "field": "inertia",
+      "type": "mass + inertia tensor"
+     }
+    ],
+    "epistemic_class": "MODEL_FORM_DECLARED"
+   },
+   "operating_regime": {
+    "regime": "rigid-body (non-deformable) multibody dynamics; impulse/constraint contact"
+   },
+   "validated_regime": [],
+   "known_limitations": [
+    "rigid bodies by construction — no structural deformation (deformation lives in soft_body/structural entries)",
+    "friction coefficients are tunable model parameters whose validated regime must carry their source",
+    "contact-rich dynamics may be chaotic — determinism guarantees only per identical inputs + integrator declaration"
+   ],
+   "uncertainty": {
+    "state": "UNQUANTIFIED_UNTIL_VALIDATED",
+    "note": "no validation has been executed and recorded in this environment; UNQUANTIFIED uncertainty BLOCKS validated claims (Art. XXVII) — an empty validated_regime is the honest state, never evidence against the solver"
+   },
+   "verification_method": {
+    "method": "MuJoCo shipped analytical/pendulum-style tests replayed headlessly via its Python API",
+    "note": "NOT executed yet"
+   },
+   "epistemic_class": "COMPUTATIONAL_RESULT",
+   "epistemic_class_note": "results produced under this entry are COMPUTATIONAL_RESULT (Reality Boundary layer 4); simulation -> physics requires measurement (Art. LIII); a covered phenomenon is a model-form declaration, never evidence the form applies to any specific device (Art. XXVIII)",
+   "input_schema": {
+    "epistemic_class": "DECLARED_INTERFACE_NOT_YET_EXECUTED",
+    "declaration": {
+     "solver": "MJCF model + initial state + controls"
+    },
+    "note": "the interface contract this entry will honor once the solver is installed and replayed in this environment; until then no run record may exist (Art. VI/LXI)"
+   },
+   "output_schema": {
+    "epistemic_class": "DECLARED_INTERFACE_NOT_YET_EXECUTED",
+    "declaration": {
+     "fields": "positions, velocities, contact forces, energies"
+    },
+    "note": "the interface contract this entry will honor once the solver is installed and replayed in this environment; until then no run record may exist (Art. VI/LXI)"
+   },
+   "solver_availability": {
+    "state": "PROBED_NOT_INSTALLED",
+    "probe": "IMPORT",
+    "measured_at": "2026-09-06T12:08:42Z",
+    "detail": "import mujoco failed in a clean subprocess (MEASURED)"
+   }
+  },
+  {
+   "phenomenon": "actuated_multibody_control",
+   "governing_equations": [
+    {
+     "equation": "controlled_multibody",
+     "form": "M(q) q_ddot + ... = tau + contact; tau = K(x) with declared control law",
+     "epistemic_class": "MODEL_FORM_DECLARED",
+     "note": ""
+    }
+   ],
+   "solver": "mujoco",
+   "solver_version": "DECLARED_AT_INSTALL",
+   "geometry_requirements": {
+    "requirement": "geometry",
+    "description": "MJCF model with actuators declared",
+    "fields": [
+     {
+      "field": "actuators",
+      "type": "motor/piston/..."
+     }
+    ],
+    "epistemic_class": "MODEL_FORM_DECLARED"
+   },
+   "boundary_conditions": {
+    "requirement": "boundary",
+    "description": "control law parameters + reference signals",
+    "fields": [
+     {
+      "field": "control_law",
+      "type": "declared gain schedule"
+     }
+    ],
+    "epistemic_class": "MODEL_FORM_DECLARED"
+   },
+   "material_requirements": {
+    "requirement": "material",
+    "description": "actuator models (force/torque limits, bandwidth)",
+    "fields": [
+     {
+      "field": "actuator_limits",
+      "type": "declared"
+     }
+    ],
+    "epistemic_class": "MODEL_FORM_DECLARED"
+   },
+   "operating_regime": {
+    "regime": "closed-loop dynamics within actuator bandwidth limits"
+   },
+   "validated_regime": [],
+   "known_limitations": [
+    "control-loop conclusions are only as good as the actuator model (bandwidth, saturation)",
+    "no electrical drive modeling (EM entry) — co-simulation undeclared"
+   ],
+   "uncertainty": {
+    "state": "UNQUANTIFIED_UNTIL_VALIDATED",
+    "note": "no validation has been executed and recorded in this environment; UNQUANTIFIED uncertainty BLOCKS validated claims (Art. XXVII) — an empty validated_regime is the honest state, never evidence against the solver"
+   },
+   "verification_method": {
+    "method": "MuJoCo shipped control-relevant tests replayed headlessly",
+    "note": "NOT executed yet"
+   },
+   "epistemic_class": "COMPUTATIONAL_RESULT",
+   "epistemic_class_note": "results produced under this entry are COMPUTATIONAL_RESULT (Reality Boundary layer 4); simulation -> physics requires measurement (Art. LIII); a covered phenomenon is a model-form declaration, never evidence the form applies to any specific device (Art. XXVIII)",
+   "input_schema": {
+    "epistemic_class": "DECLARED_INTERFACE_NOT_YET_EXECUTED",
+    "declaration": {
+     "solver": "MJCF + control law + reference trajectory"
+    },
+    "note": "the interface contract this entry will honor once the solver is installed and replayed in this environment; until then no run record may exist (Art. VI/LXI)"
+   },
+   "output_schema": {
+    "epistemic_class": "DECLARED_INTERFACE_NOT_YET_EXECUTED",
+    "declaration": {
+     "fields": "tracking errors, forces, stability margins (derived)"
+    },
+    "note": "the interface contract this entry will honor once the solver is installed and replayed in this environment; until then no run record may exist (Art. VI/LXI)"
+   },
+   "solver_availability": {
+    "state": "PROBED_NOT_INSTALLED",
+    "probe": "IMPORT",
+    "measured_at": "2026-09-06T12:08:42Z",
+    "detail": "import mujoco failed in a clean subprocess (MEASURED)"
+   }
+  },
+  {
+   "phenomenon": "multibody_mechanisms",
+   "governing_equations": [
+    {
+     "equation": "multibody_dynamics",
+     "form": "M(q) q_ddot + C qdot + g = Q (joints, constraints, contact/friction)",
+     "epistemic_class": "MODEL_FORM_DECLARED",
+     "note": ""
+    }
+   ],
+   "solver": "project_chrono",
+   "solver_version": "DECLARED_AT_INSTALL",
+   "geometry_requirements": {
+    "requirement": "geometry",
+    "description": "mechanism bodies, joints (revolute/prismatic/spherical), collision shapes",
+    "fields": [
+     {
+      "field": "mechanism_model",
+      "type": "body/joint graph"
+     }
+    ],
+    "epistemic_class": "MODEL_FORM_DECLARED"
+   },
+   "boundary_conditions": {
+    "requirement": "boundary",
+    "description": "drivers (motions/forces), initial assembly, friction pairs",
+    "fields": [
+     {
+      "field": "joint_drivers",
+      "type": "motor laws"
+     }
+    ],
+    "epistemic_class": "MODEL_FORM_DECLARED"
+   },
+   "material_requirements": {
+    "requirement": "material",
+    "description": "mass/inertia, joint friction, contact material pairs",
+    "fields": [
+     {
+      "field": "inertia",
+      "type": "per body"
+     }
+    ],
+    "epistemic_class": "MODEL_FORM_DECLARED"
+   },
+   "operating_regime": {
+    "regime": "large-displacement mechanism kinematics/dynamics"
+   },
+   "validated_regime": [],
+   "known_limitations": [
+    "friction models are tunable — regime records must carry their source",
+    "joint clearance/backlash not modeled unless declared"
+   ],
+   "uncertainty": {
+    "state": "UNQUANTIFIED_UNTIL_VALIDATED",
+    "note": "no validation has been executed and recorded in this environment; UNQUANTIFIED uncertainty BLOCKS validated claims (Art. XXVII) — an empty validated_regime is the honest state, never evidence against the solver"
+   },
+   "verification_method": {
+    "method": "Chrono shipped unit/regression tests replayed headlessly (pychrono or C++ demos)",
+    "note": "NOT executed yet"
+   },
+   "epistemic_class": "COMPUTATIONAL_RESULT",
+   "epistemic_class_note": "results produced under this entry are COMPUTATIONAL_RESULT (Reality Boundary layer 4); simulation -> physics requires measurement (Art. LIII); a covered phenomenon is a model-form declaration, never evidence the form applies to any specific device (Art. XXVIII)",
+   "input_schema": {
+    "epistemic_class": "DECLARED_INTERFACE_NOT_YET_EXECUTED",
+    "declaration": {
+     "solver": "Chrono system: bodies, links, motors, contact"
+    },
+    "note": "the interface contract this entry will honor once the solver is installed and replayed in this environment; until then no run record may exist (Art. VI/LXI)"
+   },
+   "output_schema": {
+    "epistemic_class": "DECLARED_INTERFACE_NOT_YET_EXECUTED",
+    "declaration": {
+     "fields": "positions, velocities, joint reactions, contact forces"
+    },
+    "note": "the interface contract this entry will honor once the solver is installed and replayed in this environment; until then no run record may exist (Art. VI/LXI)"
+   },
+   "solver_availability": {
+    "state": "PROBED_NOT_INSTALLED",
+    "probe": "IMPORT",
+    "measured_at": "2026-09-06T12:08:42Z",
+    "detail": "import pychrono failed in a clean subprocess (MEASURED)"
+   }
+  },
+  {
+   "phenomenon": "vehicle_dynamics",
+   "governing_equations": [
+    {
+     "equation": "multibody_dynamics",
+     "form": "full-vehicle multibody (chassis, suspension, tires) + tire-force models (declared: e.g. Pacejka-style magic formula)",
+     "epistemic_class": "MODEL_FORM_DECLARED",
+     "note": ""
+    }
+   ],
+   "solver": "project_chrono",
+   "solver_version": "DECLARED_AT_INSTALL",
+   "geometry_requirements": {
+    "requirement": "geometry",
+    "description": "vehicle multibody model (chassis + suspension + wheels + tires)",
+    "fields": [
+     {
+      "field": "vehicle_model",
+      "type": "assembly"
+     }
+    ],
+    "epistemic_class": "MODEL_FORM_DECLARED"
+   },
+   "boundary_conditions": {
+    "requirement": "boundary",
+    "description": "road profile / terrain, speeds, maneuvers",
+    "fields": [
+     {
+      "field": "road",
+      "type": "height profile"
+     },
+     {
+      "field": "maneuver",
+      "type": "steering/throttle law"
+     }
+    ],
+    "epistemic_class": "MODEL_FORM_DECLARED"
+   },
+   "material_requirements": {
+    "requirement": "material",
+    "description": "masses, inertias, tire model parameters (regime-critical",
+    "fields": " parameter sources required)",
+    "epistemic_class": "MODEL_FORM_DECLARED"
+   },
+   "operating_regime": {
+    "regime": "ground-vehicle speeds within tire-model validity"
+   },
+   "validated_regime": [],
+   "known_limitations": [
+    "tire force models carry the dominant model-form uncertainty (outside their fitted regime they extrapolate badly)",
+    "validated regimes must name the tire model + road class"
+   ],
+   "uncertainty": {
+    "state": "UNQUANTIFIED_UNTIL_VALIDATED",
+    "note": "no validation has been executed and recorded in this environment; UNQUANTIFIED uncertainty BLOCKS validated claims (Art. XXVII) — an empty validated_regime is the honest state, never evidence against the solver"
+   },
+   "verification_method": {
+    "method": "Chrono vehicle demos (the DoD/NSF-funded vehicle simulation use case) replayed headlessly",
+    "note": "NOT executed yet"
+   },
+   "epistemic_class": "COMPUTATIONAL_RESULT",
+   "epistemic_class_note": "results produced under this entry are COMPUTATIONAL_RESULT (Reality Boundary layer 4); simulation -> physics requires measurement (Art. LIII); a covered phenomenon is a model-form declaration, never evidence the form applies to any specific device (Art. XXVIII)",
+   "input_schema": {
+    "epistemic_class": "DECLARED_INTERFACE_NOT_YET_EXECUTED",
+    "declaration": {
+     "solver": "Chrono vehicle system + terrain + maneuver"
+    },
+    "note": "the interface contract this entry will honor once the solver is installed and replayed in this environment; until then no run record may exist (Art. VI/LXI)"
+   },
+   "output_schema": {
+    "epistemic_class": "DECLARED_INTERFACE_NOT_YET_EXECUTED",
+    "declaration": {
+     "fields": "trajectories, loads, accelerations, tire forces"
+    },
+    "note": "the interface contract this entry will honor once the solver is installed and replayed in this environment; until then no run record may exist (Art. VI/LXI)"
+   },
+   "solver_availability": {
+    "state": "PROBED_NOT_INSTALLED",
+    "probe": "IMPORT",
+    "measured_at": "2026-09-06T12:08:42Z",
+    "detail": "import pychrono failed in a clean subprocess (MEASURED)"
+   }
+  },
+  {
+   "phenomenon": "contact_friction_mechanics",
+   "governing_equations": [
+    {
+     "equation": "friction_cone_constraints",
+     "form": "|t_t| <= mu * t_n (Coulomb cone); complementarity contact",
+     "epistemic_class": "MODEL_FORM_DECLARED",
+     "note": ""
+    }
+   ],
+   "solver": "project_chrono",
+   "solver_version": "DECLARED_AT_INSTALL",
+   "geometry_requirements": {
+    "requirement": "geometry",
+    "description": "3D (or 2D-axisymmetric where declared) solid/fluid domain mesh with named boundaries; mesh must resolve the field gradients the declared equations require (a mesh-quality declaration, not a guarantee)",
+    "fields": [
+     {
+      "field": "mesh",
+      "type": "mesh file / programmatic mesh",
+      "unit": null
+     },
+     {
+      "field": "named_boundaries",
+      "type": "list of boundary names",
+      "unit": null
+     },
+     {
+      "field": "geometry_hash",
+      "type": "str (sha256)",
+      "unit": null,
+      "meaning": "canonical geometry pin"
+     }
+    ],
+    "epistemic_class": "MODEL_FORM_DECLARED"
+   },
+   "boundary_conditions": {
+    "requirement": "boundary",
+    "description": "normal approach velocities, applied loads",
+    "fields": [
+     {
+      "field": "approach",
+      "type": "initial conditions"
+     }
+    ],
+    "epistemic_class": "MODEL_FORM_DECLARED"
+   },
+   "material_requirements": {
+    "requirement": "material",
+    "description": "contact pair friction coefficients (source class required)",
+    "fields": [
+     {
+      "field": "mu",
+      "type": "friction coefficient"
+     }
+    ],
+    "epistemic_class": "MODEL_FORM_DECLARED"
+   },
+   "operating_regime": {
+    "regime": "dry Coulomb friction within declared coefficient validity"
+   },
+   "validated_regime": [],
+   "known_limitations": [
+    "Coulomb friction is a model form — stick-slip transitions are sensitive to mu and solver settings",
+    "lubricated contacts are NOT covered (regime boundary)"
+   ],
+   "uncertainty": {
+    "state": "UNQUANTIFIED_UNTIL_VALIDATED",
+    "note": "no validation has been executed and recorded in this environment; UNQUANTIFIED uncertainty BLOCKS validated claims (Art. XXVII) — an empty validated_regime is the honest state, never evidence against the solver"
+   },
+   "verification_method": {
+    "method": "Chrono contact benchmarks replayed headlessly",
+    "note": "NOT executed yet"
+   },
+   "epistemic_class": "COMPUTATIONAL_RESULT",
+   "epistemic_class_note": "results produced under this entry are COMPUTATIONAL_RESULT (Reality Boundary layer 4); simulation -> physics requires measurement (Art. LIII); a covered phenomenon is a model-form declaration, never evidence the form applies to any specific device (Art. XXVIII)",
+   "input_schema": {
+    "epistemic_class": "DECLARED_INTERFACE_NOT_YET_EXECUTED",
+    "declaration": {
+     "solver": "Chrono bodies + contact material pairs"
+    },
+    "note": "the interface contract this entry will honor once the solver is installed and replayed in this environment; until then no run record may exist (Art. VI/LXI)"
+   },
+   "output_schema": {
+    "epistemic_class": "DECLARED_INTERFACE_NOT_YET_EXECUTED",
+    "declaration": {
+     "fields": "contact forces, slip velocities, wear proxies (derived, NOT wear prediction)"
+    },
+    "note": "the interface contract this entry will honor once the solver is installed and replayed in this environment; until then no run record may exist (Art. VI/LXI)"
+   },
+   "solver_availability": {
+    "state": "PROBED_NOT_INSTALLED",
+    "probe": "IMPORT",
+    "measured_at": "2026-09-06T12:08:42Z",
+    "detail": "import pychrono failed in a clean subprocess (MEASURED)"
+   }
+  },
+  {
+   "phenomenon": "electromagnetic_fields_lowfreq",
+   "governing_equations": [
+    {
+     "equation": "magnetostatic_quasistatic",
+     "form": "curl H = J; B = mu H (magnetoquasistatic approximation)",
+     "epistemic_class": "MODEL_FORM_DECLARED",
+     "note": ""
+    },
+    {
+     "equation": "eddy_current_induction",
+     "form": "curl E = -dB/dt (MQS induction)",
+     "epistemic_class": "MODEL_FORM_DECLARED",
+     "note": ""
+    }
+   ],
+   "solver": "elmer",
+   "solver_version": "DECLARED_AT_INSTALL",
+   "geometry_requirements": {
+    "requirement": "geometry",
+    "description": "2D-axisymmetric or 3D mesh with conductors, coils, magnetic regions",
+    "fields": [
+     {
+      "field": "em_regions",
+      "type": "coils | cores | conductors"
+     }
+    ],
+    "epistemic_class": "MODEL_FORM_DECLARED"
+   },
+   "boundary_conditions": {
+    "requirement": "boundary",
+    "description": "coil currents / magnetization, magnetic insulation (n x A = 0) or far-field approximations",
+    "fields": [
+     {
+      "field": "currents",
+      "type": "ampere-turns"
+     }
+    ],
+    "epistemic_class": "MODEL_FORM_DECLARED"
+   },
+   "material_requirements": {
+    "requirement": "material",
+    "description": "permeability, conductivity per region (nonlinear B-H curves outside linear declared scope)",
+    "fields": [
+     {
+      "field": "mu_r",
+      "type": "relative permeability"
+     },
+     {
+      "field": "sigma",
+      "type": "conductivity",
+      "unit": "S/m"
+     }
+    ],
+    "epistemic_class": "MODEL_FORM_DECLARED"
+   },
+   "operating_regime": {
+    "regime": "low-frequency (magnetoquasistatic): dimensions << wavelength"
+   },
+   "validated_regime": [],
+   "known_limitations": [
+    "quasistatic approximation invalid when device size approaches wavelength (high-frequency entry then required)",
+    "linear materials only in declared scope (saturation needs B-H curves, out of scope)"
+   ],
+   "uncertainty": {
+    "state": "UNQUANTIFIED_UNTIL_VALIDATED",
+    "note": "no validation has been executed and recorded in this environment; UNQUANTIFIED uncertainty BLOCKS validated claims (Art. XXVII) — an empty validated_regime is the honest state, never evidence against the solver"
+   },
+   "verification_method": {
+    "method": "Elmer EM verification cases replayed headlessly",
+    "note": "NOT executed yet"
+   },
+   "epistemic_class": "COMPUTATIONAL_RESULT",
+   "epistemic_class_note": "results produced under this entry are COMPUTATIONAL_RESULT (Reality Boundary layer 4); simulation -> physics requires measurement (Art. LIII); a covered phenomenon is a model-form declaration, never evidence the form applies to any specific device (Art. XXVIII)",
+   "input_schema": {
+    "epistemic_class": "DECLARED_INTERFACE_NOT_YET_EXECUTED",
+    "declaration": {
+     "solver": "Elmer sif: magnetodynamics solver, AV formulation"
+    },
+    "note": "the interface contract this entry will honor once the solver is installed and replayed in this environment; until then no run record may exist (Art. VI/LXI)"
+   },
+   "output_schema": {
+    "epistemic_class": "DECLARED_INTERFACE_NOT_YET_EXECUTED",
+    "declaration": {
+     "fields": "B, H, E fields, induced currents, losses"
+    },
+    "note": "the interface contract this entry will honor once the solver is installed and replayed in this environment; until then no run record may exist (Art. VI/LXI)"
+   },
+   "solver_availability": {
+    "state": "PROBED_NOT_INSTALLED",
+    "probe": "WHICH",
+    "measured_at": "2026-09-06T12:08:42Z",
+    "detail": "shutil.which('ElmerSolver') -> None (MEASURED)"
+   }
+  },
+  {
+   "phenomenon": "electromagnetic_fields_highfreq",
+   "governing_equations": [
+    {
+     "equation": "maxwell_fdtd",
+     "form": "curl E = -dB/dt; curl H = J + dD/dt solved on a FDTD grid (Yee scheme)",
+     "epistemic_class": "MODEL_FORM_DECLARED",
+     "note": ""
+    }
+   ],
+   "solver": "openems",
+   "solver_version": "DECLARED_AT_INSTALL",
+   "geometry_requirements": {
+    "requirement": "geometry",
+    "description": "FDTD grid with conformal or staircased metal/substrate geometry",
+    "fields": [
+     {
+      "field": "fdtd_geometry",
+      "type": "primitives + mesh"
+     }
+    ],
+    "epistemic_class": "MODEL_FORM_DECLARED"
+   },
+   "boundary_conditions": {
+    "requirement": "boundary",
+    "description": "ports/excitation (waveguide/antenna feeds), absorbing boundaries (PML/MUR)",
+    "fields": [
+     {
+      "field": "excitation",
+      "type": "port modes/gaussian pulses"
+     }
+    ],
+    "epistemic_class": "MODEL_FORM_DECLARED"
+   },
+   "material_requirements": {
+    "requirement": "material",
+    "description": "permittivity, conductivity, permeability per region; dispersive models as declared",
+    "fields": [
+     {
+      "field": "eps_r",
+      "type": "relative permittivity"
+     }
+    ],
+    "epistemic_class": "MODEL_FORM_DECLARED"
+   },
+   "operating_regime": {
+    "regime": "full-wave: device dimensions comparable to wavelength"
+   },
+   "validated_regime": [],
+   "known_limitations": [
+    "staircasing error on curved metal edges (conformal schemes mitigate; regime must declare which)",
+    "cell-size vs wavelength constraints drive cost",
+    "dispersive material models need measured parameters"
+   ],
+   "uncertainty": {
+    "state": "UNQUANTIFIED_UNTIL_VALIDATED",
+    "note": "no validation has been executed and recorded in this environment; UNQUANTIFIED uncertainty BLOCKS validated claims (Art. XXVII) — an empty validated_regime is the honest state, never evidence against the solver"
+   },
+   "verification_method": {
+    "method": "openEMS shipped validation examples (antennas, waveguides with analytical/S-parameter comparisons) replayed headlessly",
+    "note": "NOT executed yet"
+   },
+   "epistemic_class": "COMPUTATIONAL_RESULT",
+   "epistemic_class_note": "results produced under this entry are COMPUTATIONAL_RESULT (Reality Boundary layer 4); simulation -> physics requires measurement (Art. LIII); a covered phenomenon is a model-form declaration, never evidence the form applies to any specific device (Art. XXVIII)",
+   "input_schema": {
+    "epistemic_class": "DECLARED_INTERFACE_NOT_YET_EXECUTED",
+    "declaration": {
+     "solver": "openEMS XML/CSX geometry + simulation settings"
+    },
+    "note": "the interface contract this entry will honor once the solver is installed and replayed in this environment; until then no run record may exist (Art. VI/LXI)"
+   },
+   "output_schema": {
+    "epistemic_class": "DECLARED_INTERFACE_NOT_YET_EXECUTED",
+    "declaration": {
+     "fields": "S-parameters, fields, radiation patterns"
+    },
+    "note": "the interface contract this entry will honor once the solver is installed and replayed in this environment; until then no run record may exist (Art. VI/LXI)"
+   },
+   "solver_availability": {
+    "state": "PROBED_NOT_INSTALLED",
+    "probe": "WHICH",
+    "measured_at": "2026-09-06T12:08:42Z",
+    "detail": "shutil.which('openEMS') -> None (MEASURED)"
+   }
+  }
+ ],
+ "build": {
+  "builder": "scripts/r413_build_physics_coverage_registry_v1.py",
+  "build_date": "2026-09-06",
+  "determinism": "byte-identical on re-run (fixed date, canonical JSON, sorted structure)",
+  "live_reverification": "the V0 closed-form replay re-run at build time; build fails closed if it does not pass"
+ },
+ "reviewer_provenance": "AI_REVIEW"
+}

@@ -1,0 +1,44 @@
+{
+ "artifact_type": "R413_GEOMETRY_AUTHORITY_PROBES",
+ "directive": "operator directive V2 Phase 4: CadQuery is the engineering geometry authority; Blender is downstream visualization only and cannot originate or independently validate engineering geometry",
+ "measured_at": "2026-09-06",
+ "probes": {
+  "cadquery": {
+   "probe": "CLEAN_SUBPROCESS_IMPORT_AND_PARAMETRIC_BUILD",
+   "result": "OPERATIONAL",
+   "cadquery_version": "2.6.1",
+   "detail": "",
+   "parametric_build_verification": {
+    "result": "OPERATIONAL",
+    "cadquery_version": "2.6.1",
+    "build": {
+     "box_mm": [
+      40.0,
+      20.0,
+      10.0
+     ],
+     "hole_radius_mm": 3.0
+    },
+    "volume_mm3": 7717.256661176918,
+    "closed_form_volume_mm3": 7717.256661176919,
+    "rel_error": 1.1785207382674064e-16,
+    "bbox_exact": true,
+    "n_faces": 7
+   },
+   "interpretation": "OPERATIONAL = the engineering geometry authority imports and executes parametric builds in this environment, with closed-form volume verification (the authority does real geometry here, measured)"
+  },
+  "blender": {
+   "probe": "WHICH",
+   "result": "NOT_INSTALLED",
+   "measured_at": "2026-09-06T12:08:42Z",
+   "detail": "shutil.which('blender') -> None — the binary is not on PATH in this environment",
+   "interpretation": "the visualization layer is NOT installed in this environment (measured) — and by the operator's boundary it could never originate or validate engineering geometry anyway, installed or not"
+  }
+ },
+ "boundary_test_vector": {
+  "legitimate": "GEOMETRY_SPEC with geometry_authority=cadquery, geometry_hash, parameters",
+  "forbidden": "GEOMETRY_SPEC with geometry_authority=blender (or any renderer-originated geometry) — REJECTED_GEOMETRY_AUTHORITY",
+  "forbidden_2": "a geometry VALIDATION record citing blender as the validator — renders cannot validate engineering geometry"
+ },
+ "reviewer_provenance": "AI_REVIEW"
+}
