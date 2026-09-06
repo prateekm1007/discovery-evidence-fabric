@@ -32,7 +32,7 @@ from .run_state import (OUTCOME_LABELS, OUTCOME_NO_DEFENSIBLE,
 
 # Machine -> user translation (CEO directive 2). The machine taxonomy
 # stays intact internally; this is the product-surface projection.
-_TRANSPORT_ERRORS = ("ERROR_TRANSPORT",)
+_TRANSPORT_ERRORS = ("ERROR_TRANSPORT", "RUN_BLOCKED_TRANSPORT")
 _ENGINE_ERRORS = ("ERROR_BUILD", "ERROR_RUN", "ERROR_STUCK")
 
 _USER_STATE_LABELS = {
@@ -43,6 +43,7 @@ _USER_STATE_LABELS = {
     "COMPLETED_FALSE_PREMISE": "Completed — false premise",
     "COMPLETED_UNKNOWN": "Completed — outcome unknown",
     "INTERRUPTED": "Interrupted — recoverable",
+    "BLOCKED_TRANSPORT": "Blocked by infrastructure — saved and resumable",
     "FAILED_TRANSPORT": "Failed — transport",
     "FAILED_ENGINE": "Failed — engine",
 }
@@ -79,6 +80,13 @@ _USER_STATE_EXPLANATIONS = {
     "INTERRUPTED": ("The worker died before reaching a verdict (restart "
                     "or crash). The run is recoverable through the same "
                     "worker path — retry from the run page."),
+    "BLOCKED_TRANSPORT": ("Discovery temporarily blocked by "
+                          "infrastructure. Your problem is saved and "
+                          "ready to resume. No conclusion was reached — "
+                          "this is not a rejection. Toscanini exhausted "
+                          "every available model route (each failure is "
+                          "recorded with its provider and failure class) "
+                          "and will attempt the run again on retry."),
     "FAILED_TRANSPORT": ("The run could not reach the language-model "
                          "transport — no evidence synthesis was possible. "
                          "Retryable once the transport responds."),
@@ -107,6 +115,9 @@ def user_state(session: Dict[str, Any]) -> str:
         return "COMPLETED_UNKNOWN"
     if status == "INTERRUPTED":
         return "INTERRUPTED"
+    if status == "RUN_BLOCKED_TRANSPORT":
+        return "BLOCKED_TRANSPORT"   # R415 (directive §8): infrastructure
+        # blocked ≠ discovery failure — distinct projection, never a kill
     if status in _TRANSPORT_ERRORS:
         return "FAILED_TRANSPORT"
     if status in _ENGINE_ERRORS or status.startswith("ERROR"):
@@ -136,7 +147,7 @@ def user_state_view(session: Dict[str, Any]) -> Dict[str, Any]:
     final = (session.get("final_status") or "") or ""
     pkg = session.get("package") or {}
     finished = key.startswith("COMPLETED") or key.startswith("FAILED") \
-        or key == "INTERRUPTED"
+        or key in ("INTERRUPTED", "BLOCKED_TRANSPORT")
     found = key in ("COMPLETED_PACKAGE", "COMPLETED_CANDIDATE")
     rejected = key == "COMPLETED_REJECTED"
 
@@ -155,12 +166,16 @@ def user_state_view(session: Dict[str, Any]) -> Dict[str, Any]:
         decision = "investigating"
     elif key == "INTERRUPTED":
         decision = "interrupted before a verdict"
+    elif key == "BLOCKED_TRANSPORT":
+        decision = "discovery temporarily blocked by infrastructure — "\
+                   "your problem is saved and ready to resume"
     elif key == "FAILED_TRANSPORT":
         decision = "could not reach the model transport"
     else:
         decision = "engine failure"
     error = session.get("error")
-    if error and (key.startswith("FAILED") or key == "INTERRUPTED"):
+    if error and (key.startswith("FAILED") or key in ("INTERRUPTED",
+                                                    "BLOCKED_TRANSPORT")):
         decision = f"{decision} ({str(error)[:140]})"
 
     return {

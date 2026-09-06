@@ -354,11 +354,13 @@ def _post_json(url: str, payload: dict, headers: Dict[str, str],
 
 
 def _call_openai_flavor(spec: ProviderSpec, messages: List[dict],
-                        timeout: int, max_tokens: int) -> str:
+                        timeout: int, max_tokens: int,
+                        model_override: Optional[str] = None) -> str:
     key = os.environ.get(spec.env_var, "").strip()
+    model = model_override or spec.model_for_call()
     data = _post_json(
         spec.url_for_call(),
-        {"model": spec.model_for_call(), "messages": messages,
+        {"model": model, "messages": messages,
          "temperature": 0.0,
          # bounded generation: the structured FIELD-line outputs are short;
          # an unbounded cap lets reasoning models generate for many minutes
@@ -392,8 +394,10 @@ class EmptyContentWithFinish(RuntimeError):
 
 
 def _call_anthropic_flavor(spec: ProviderSpec, messages: List[dict],
-                           timeout: int, max_tokens: int) -> str:
+                           timeout: int, max_tokens: int,
+                           model_override: Optional[str] = None) -> str:
     key = os.environ.get(spec.env_var, "").strip()
+    model = model_override or spec.model_for_call()
     system = ""
     msgs = []
     for m in messages:
@@ -403,7 +407,7 @@ def _call_anthropic_flavor(spec: ProviderSpec, messages: List[dict],
             msgs.append(m)
     data = _post_json(
         spec.url_for_call(),
-        {"model": spec.model_for_call(), "max_tokens": max_tokens,
+        {"model": model, "max_tokens": max_tokens,
          "messages": msgs, **({"system": system} if system else {})},
         {"x-api-key": key, "anthropic-version": "2023-06-01"}, timeout)
     content = "".join(b.get("text", "") for b in data.get("content", []))
@@ -440,7 +444,8 @@ def generate(prompt: str, system: str = "",
              max_tokens: int = 512,
              max_provider_fallbacks: int = 2,
              role: Optional[str] = None,
-             avoid_provider: Optional[str] = None) -> LLMCallResult:
+             avoid_provider: Optional[str] = None,
+             run_id: Optional[str] = None) -> LLMCallResult:
     """CEO E1 single entry point:
     generate(prompt, evidence, schema) -> structured candidate.
     `evidence` items (already-custodied evidence dicts) are appended to the
@@ -451,20 +456,25 @@ def generate(prompt: str, system: str = "",
     improving output quality (measured 2026-08-27).
 
     R414 (provider-resilience directive §8): MODEL A -> failure ->
-    MODEL B -> failure -> MODEL C. The cascade tries up to
-    1 + max_provider_fallbacks providers from the policy order. Every
-    hop is classified onto the eight-value failure taxonomy and recorded
-    (provider_attempted, failure_type, timestamp, fallback_provider,
-    fallback_model, retry_count) — both on the result's `route` and in
-    the provider health book. A SUCCESS after failover carries the route
-    so the failover is inspectable, never silent; a total failure keeps
-    status CALL_FAILED with the typed failures of every hop (Art. XXI.3:
-    a provider failure is never absence, never a verdict).
+    MODEL B -> failure -> MODEL C — every hop classified onto the failure
+    taxonomy and recorded. R415 (P0 directive §§3-7): the cascade walks
+    (provider, MODEL) rungs built by the routing registry — a provider's
+    pinned model answering 410 GONE no longer kills the provider's other
+    models: the rung list comes from model_routing.build_ladder (live
+    catalog ∩ pinned family allowlist, availability-scored, cooldown-
+    demoted-never-removed), each attempt is recorded in the
+    MODEL_ROUTING_LEDGER, and a 410 marks that MODEL gone (known-dead from
+    the provider's own response) while the provider stays eligible
+    (Art. V). Bounded: at most 1 + max_provider_fallbacks + 2 model hops.
+    A SUCCESS after failover carries the route (never silent); a total
+    failure keeps status CALL_FAILED with the typed failures of every hop
+    (Art. XXI.3: a provider failure is never absence, never a verdict).
     Cooldown demotion: providers the health book holds in rate-limit
     cooldown are demoted to the END of the cascade, never removed — the
     engine never refuses to run on a heuristic (Art. V)."""
     from .provider_health import (ROLE_SYNTHESIS, HEALTH, classify_failure,
                                   order_for_role, role_for_purpose)
+    from . import model_routing as mr
 
     matrix = availability_matrix()
     avail_ids = [m["provider_id"] for m in matrix if m["available"]]
@@ -488,10 +498,6 @@ def generate(prompt: str, system: str = "",
         cooled = [p for p in chain if HEALTH.in_cooldown(p)]
         if cooled:
             chain = [p for p in chain if p not in cooled] + cooled
-    # bounded cascade: at most 1 + max_provider_fallbacks providers per
-    # call (the directive's MODEL A -> B -> C shape; unbounded walks
-    # through every dead provider would multiply wall time)
-    chain = chain[:1 + max(0, max_provider_fallbacks)]
     if not chain:
         # preferred_providers exhausted with no available provider: keep
         # the historical honest semantics (no silent widening beyond the
@@ -503,7 +509,31 @@ def generate(prompt: str, system: str = "",
             prompt_hash=_sha(prompt),
             selection_ledger=ledger)
 
-    wanted_head = chain[0]
+    # -- R415: the (provider, model) rung list from the routing registry --
+    eff_role = role or (role_for_purpose(
+        policy.purpose if policy else "") if policy else None) \
+        or ROLE_SYNTHESIS
+    task = mr.task_class_for_role(eff_role)
+    purpose_tag = (policy.purpose if policy else "") or eff_role
+    ladder = mr.build_ladder(
+        task, role=eff_role, avoid_provider=avoid_provider,
+        preferred_providers=list(chain),
+        available_providers=avail_ids)
+    rungs = [(r["provider"], r["model"], r) for r in ladder["rungs"]]
+    # the ladder may add last-resort providers beyond the policy chain
+    # (the directive's LAST-RESORT rung); bound the walk:
+    # 1 + max_provider_fallbacks + 2 model hops
+    rungs = rungs[:max(3, 1 + max(0, max_provider_fallbacks) + 2)]
+    if not rungs:
+        return LLMCallResult(
+            status=ST_PROVIDER_UNAVAILABLE,
+            error="no routing rung available for this task "
+                  "(see selection_ledger)",
+            prompt_hash=_sha(prompt),
+            selection_ledger={"chain": list(chain),
+                              "ladder": ladder})
+
+    wanted_head = rungs[0][0]
 
     messages: List[dict] = []
     # Constitutional transport contract: engine LLM output is ENGLISH ONLY
@@ -528,37 +558,49 @@ def generate(prompt: str, system: str = "",
     last_err = None
     last_failure_type = None
 
-    for hop_idx, provider_id in enumerate(chain):
+    for hop_idx, (provider_id, model_id, rung_meta) in enumerate(rungs):
         spec = _SPEC_BY_ID.get(provider_id)
         if spec is None:
             continue
-        next_provider = chain[hop_idx + 1] if hop_idx + 1 < len(chain) \
+        next_rung = rungs[hop_idx + 1] if hop_idx + 1 < len(rungs) \
             else None
+        next_provider = next_rung[0] if next_rung else None
+        next_model = next_rung[1] if next_rung else None
+        # a rung whose model is recorded GONE is skipped (known-dead from
+        # the provider's own 410 — a recorded fact, not a heuristic)
+        if mr.is_model_gone(provider_id, model_id):
+            continue
         attempt_budget = max_tokens
         retry_notes: List[str] = []
         hop_t0 = time.time()
+        attempt = 0
         for attempt in range(max_retries + 1):
             t0 = time.time()
             try:
                 if spec.flavor == "anthropic":
-                    content = _call_anthropic_flavor(spec, messages,
-                                                     timeout,
-                                                     attempt_budget)
+                    content = _call_anthropic_flavor(
+                        spec, messages, timeout, attempt_budget,
+                        model_override=model_id)
                 else:
-                    content = _call_openai_flavor(spec, messages, timeout,
-                                                  attempt_budget)
+                    content = _call_openai_flavor(
+                        spec, messages, timeout, attempt_budget,
+                        model_override=model_id)
                 latency_ms = int((time.time() - t0) * 1000)
                 HEALTH.record_success(
                     spec.provider_id, latency_ms,
-                    purpose=(policy.purpose if policy else "") or "general",
-                    model=spec.model_for_call())
+                    purpose=purpose_tag,
+                    model=model_id)
+                mr.record_call_outcome(
+                    provider_id, model_id, ok=True,
+                    latency_ms=latency_ms, task=task, stage=purpose_tag,
+                    run_id=run_id, attempt=attempt + 1)
                 # success after a failed hop is OK ONLY with the route
                 # disclosing every failure that preceded it (never a
                 # silent failover — directive §8)
                 return LLMCallResult(
                     status=ST_OK, content=content,
                     provider_id=spec.provider_id,
-                    model=spec.model_for_call(),
+                    model=model_id,
                     prompt_hash=_sha(body), output_hash=_sha(content),
                     latency_ms=latency_ms,
                     substituted_from=(
@@ -567,6 +609,7 @@ def generate(prompt: str, system: str = "",
                     selection_ledger={
                         "chain": list(chain),
                         "chain_source": chain_source,
+                        "ladder": ladder,
                         "availability": matrix,
                     },
                     retry_notes=retry_notes,
@@ -590,18 +633,32 @@ def generate(prompt: str, system: str = "",
             except Exception as exc:  # noqa: BLE001 — recorded, retried
                 last_err = f"{type(exc).__name__}: {exc}"
                 ftype = classify_failure(exc)
-                if attempt < max_retries:
+                # GONE (410): the model was retired upstream — retrying the
+                # SAME dead model wastes the budget. Skip the same-model
+                # retry (fall straight through to the hop RECORDING and the
+                # next rung); the hop must still be recorded — a GONE that
+                # is silently skipped would be exactly the unrecorded-
+                # failover the directive forbids.
+                if ftype != "GONE" and attempt < max_retries:
                     time.sleep(2 * (attempt + 1))
                     continue
-            # this attempt exhausted the same-provider budget -> record
-            # the hop honestly and move to the next provider
+            # this attempt exhausted the same-model budget -> record
+            # the hop honestly and move to the next rung
             HEALTH.record_failure(
                 spec.provider_id, ftype,
-                purpose=(policy.purpose if policy else "") or "general",
-                model=spec.model_for_call(), error=str(last_err))
+                purpose=purpose_tag,
+                model=model_id, error=str(last_err))
+            mr.record_call_outcome(
+                provider_id, model_id, ok=False,
+                latency_ms=int((time.time() - hop_t0) * 1000),
+                failure_type=ftype, task=task, stage=purpose_tag,
+                run_id=run_id, attempt=attempt + 1,
+                fallback_from=(provider_id if next_provider else None),
+                fallback_to=next_provider,
+                error=str(last_err))
             route.append({
                 "provider_attempted": spec.provider_id,
-                "model": spec.model_for_call(),
+                "model": model_id,
                 "failure_type": ftype,
                 "timestamp": utc_now(),
                 "retry_count": attempt,
@@ -609,25 +666,24 @@ def generate(prompt: str, system: str = "",
                 "latency_ms": int((time.time() - hop_t0) * 1000),
                 "error": str(last_err)[:300],
                 "fallback_provider": next_provider,
-                "fallback_model": (
-                    _SPEC_BY_ID[next_provider].model_for_call()
-                    if next_provider and next_provider in _SPEC_BY_ID
-                    else None),
+                "fallback_model": next_model,
+                "rung_band": rung_meta.get("band"),
+                "task": task,
             })
             last_failure_type = ftype
             break
 
-    # every provider in the chain failed: CALL_FAILED with the full typed
-    # route (a provider outage is infrastructure, never a verdict — the
-    # CALLER decides meaning; Art. XXI.3 / LXI)
+    # every rung failed: CALL_FAILED with the full typed route (a
+    # provider outage is infrastructure, never a verdict — the CALLER
+    # decides meaning; Art. XXI.3 / LXI)
     return LLMCallResult(
         status=ST_CALL_FAILED, error=last_err,
-        provider_id=chain[-1] if chain else None,
-        model=(_SPEC_BY_ID.get(chain[-1]).model_for_call()
-               if chain and chain[-1] in _SPEC_BY_ID else None),
+        provider_id=(rungs[-1][0] if rungs else None),
+        model=(rungs[-1][1] if rungs else None),
         prompt_hash=_sha(body),
         selection_ledger={"chain": list(chain),
                           "chain_source": chain_source,
+                          "ladder": ladder,
                           "availability": matrix},
         retry_notes=[],
         route=route or None,

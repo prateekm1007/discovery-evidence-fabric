@@ -179,7 +179,7 @@ export function OutcomeBanner({
         {isNo
           ? "No defensible invention survived this run."
           : isBlocked
-            ? "This run was blocked before a scientific conclusion — infrastructure, not a verdict."
+            ? "Discovery temporarily blocked by infrastructure. Your problem is saved and ready to resume."
             : label}
       </div>
       {isNo && (
@@ -202,8 +202,8 @@ export function OutcomeBanner({
       )}
       {isBlocked && (
         <div className="outcome-detail faint">
-          {runState?.failure_state?.error ??
-            "retry from the run page — the failure is recorded in the run's own artifacts"}{" "}
+          {runState?.failure_state?.error ?
+            "retry from the run page — every provider failure was recorded with its provider, model, and failure class" : "retry from the run page — the failure is recorded in the run's own artifacts"}{" "}
           (Art. LXI: infrastructure failure is never a scientific rejection)
         </div>
       )}
@@ -222,7 +222,9 @@ export function isTerminal(status: string): boolean {
   return (
     status === "COMPLETE" ||
     status === "INTERRUPTED" ||
-    status.startsWith("ERROR")
+    status.startsWith("ERROR") ||
+    status.startsWith("RUN_BLOCKED")  // R415: RUN_BLOCKED_TRANSPORT —
+    // infrastructure-blocked terminal, distinct from every verdict
   );
 }
 

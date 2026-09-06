@@ -23,6 +23,20 @@ Constitutional contract (Art. XVIII, XXI.3, XXV, LXI):
     the engine never refuses to run just because the book thinks a
     quota window is open (Art. V: fail closed on evidence, but do not
     become a universal rejector).
+
+R415 amendment (P0 directive section 1 — the 410 root cause):
+  - HTTP 410 GONE becomes a DISTINCT failure class and provider-health
+    state. Before this amendment a 410 fell into INVALID_RESPONSE —
+    converting a knowable fact (the provider retired this model/
+    endpoint: the registry's own policy note records NVIDIA returning
+    410 for retired models, verified 2026-08-27) into a vaguer class.
+    That is the machine-level root cause of the production
+    ERROR_TRANSPORT surface: a retired pinned model answered 410 on
+    every call and the registry had no model-level fallback. GONE is
+    recorded per (provider, model) by the R415 routing registry and the
+    model is demoted from the eligible ladder (a retired model is
+    KNOWN-DEAD from the provider's own response — not a heuristic);
+    the PROVIDER stays eligible with its other models (Art. V).
 """
 from __future__ import annotations
 
@@ -39,7 +53,10 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 HEALTH_DIR = REPO_ROOT / "ENGINE_RUNS" / "provider_health"
 
 # ---------------------------------------------------------------------------
-# The failure taxonomy (operator directive section 8 — exact vocabulary)
+# The failure taxonomy (operator directive section 8 — exact vocabulary;
+# R415: + GONE per the P0 directive section 1 — "410 GONE must become a
+# distinct provider-health state". This EXTENDS the vocabulary; it never
+# reclassifies an existing member)
 # ---------------------------------------------------------------------------
 RATE_LIMITED = "RATE_LIMITED"
 TIMEOUT = "TIMEOUT"
@@ -48,10 +65,12 @@ NETWORK_FAILURE = "NETWORK_FAILURE"
 INVALID_RESPONSE = "INVALID_RESPONSE"
 MODEL_FAILURE = "MODEL_FAILURE"
 PARSER_FAILURE = "PARSER_FAILURE"
+GONE = "GONE"                   # R415: HTTP 410 — resource retired
 UNKNOWN = "UNKNOWN"
 
 FAILURE_TYPES = (RATE_LIMITED, TIMEOUT, AUTH_FAILURE, NETWORK_FAILURE,
-                 INVALID_RESPONSE, MODEL_FAILURE, PARSER_FAILURE, UNKNOWN)
+                 INVALID_RESPONSE, MODEL_FAILURE, PARSER_FAILURE, GONE,
+                 UNKNOWN)
 
 # Cooldown ladder for rate limits (seconds). A rate-limited provider is
 # demoted (not removed) for this long; repeated consecutive rate limits
@@ -93,6 +112,8 @@ def classify_failure(exc: BaseException, http_status: Optional[int] = None,
         return RATE_LIMITED
     if status in (401, 403):
         return AUTH_FAILURE
+    if status == 410:
+        return GONE                  # R415: retired model/endpoint
     if _hints(_RATE_HINTS):
         return RATE_LIMITED
     if status in (400, 422):
@@ -112,6 +133,8 @@ def classify_failure(exc: BaseException, http_status: Optional[int] = None,
             return RATE_LIMITED
         if code in (401, 403):
             return AUTH_FAILURE
+        if code == 410:
+            return GONE              # R415: retired model/endpoint
         if code and code >= 500:
             return MODEL_FAILURE      # model service failed server-side
         if code is not None:
@@ -322,12 +345,23 @@ class ProviderHealthBook:
                 status = "NEVER_CALLED"         # configured, unproven
             elif cooling:
                 status = "RATE_LIMITED"
+            elif e.get("last_failure_type") == GONE and \
+                    e.get("last_failure_at") and \
+                    (e.get("last_success_at") or 0) < \
+                    (e.get("last_failure_at") or 0):
+                # R415 (directive section 1/6): 410 GONE is its own
+                # provider-health state — the last call hit a retired
+                # resource. The PROVIDER is not dead (other models may
+                # serve); this state says exactly what was measured.
+                status = "GONE"
             elif e.get("last_failure_at") and \
                     (e.get("last_success_at") or 0) < \
                     (e.get("last_failure_at") or 0):
                 status = "DEGRADED"
             else:
-                status = "OK"
+                status = "OK"   # R414 vocabulary (UI + tests pin it); the
+                # directive section-6 HEALTHY/... vocabulary lives in the
+                # R415 routing registry's provider summary
             out.append({
                 "provider": pid,
                 "status": status,

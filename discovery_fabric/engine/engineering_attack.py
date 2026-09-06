@@ -722,7 +722,17 @@ def select_survivors(candidates: List[Dict[str, Any]]
         quality = c.get("quality") or {}
         verdict_rank = {"PASS": 0, "CONDITIONAL": 1, "FAIL": 2,
                         None: 3}.get(quality.get("verdict"), 3)
-        killed = attack.get("overall") == "KILLED" \
+        # R415 fix (caught LIVE by the scale-fouling acceptance run):
+        # the entry's OWN killed flag is authoritative — every kill path
+        # sets it (engineering-attack KILL, R401 Phase-6 INDEPENDENT
+        # attack KILL, R397 physics kill, resumed persisted kills).
+        # Deriving killed ONLY from attack.overall == "KILLED" let an
+        # independent-attack-killed candidate rank as alive, get
+        # SELECTED, and crash the chosen lookup with StopIteration
+        # (evaluated marks it killed=True). The kill must be honored
+        # here exactly as the caller recorded it.
+        killed = bool(c.get("killed")) \
+            or attack.get("overall") == "KILLED" \
             or bool(c.get("physics_kill"))
         underived = bool(c.get("span_underived"))
         physics_lifecycle = c.get("physics_lifecycle") \

@@ -174,10 +174,13 @@ export default function RunArtifact({
   const pillClass = usv
     ? usv.user_state.startsWith("COMPLETED")
       ? "COMPLETE"
-      : usv.user_state.startsWith("FAILED") || usv.user_state === "INTERRUPTED"
+      : usv.user_state.startsWith("FAILED") ||
+          usv.user_state === "INTERRUPTED" ||
+          usv.user_state === "BLOCKED_TRANSPORT"
         ? "ERROR"
         : "RUNNING"
-    : detail.status.startsWith("ERROR")
+    : detail.status.startsWith("ERROR") ||
+        detail.status.startsWith("RUN_BLOCKED")
       ? "ERROR"
       : detail.status;
 
@@ -246,16 +249,22 @@ export default function RunArtifact({
           )}
 
           {(detail.status.startsWith("ERROR") ||
+            detail.status.startsWith("RUN_BLOCKED") ||
             detail.status === "INTERRUPTED") && (
             <div className="errbox" style={{ marginTop: 12 }}>
-              <b>{detail.status}</b> — {detail.error ?? "unknown error"}
+              <b>{detail.status.startsWith("RUN_BLOCKED")
+                ? "Blocked by infrastructure — not a verdict"
+                : detail.status}</b>{" "}
+              — {detail.error ?? "unknown error"}
               <div style={{ marginTop: 10 }}>
                 <button
                   className="btn ghost small"
                   onClick={() => onRetry(detail.session_id)}
                   type="button"
                 >
-                  Retry through the same worker path
+                  {detail.status.startsWith("RUN_BLOCKED")
+                    ? "Resume the run — problem saved"
+                    : "Retry through the same worker path"}
                 </button>
               </div>
             </div>

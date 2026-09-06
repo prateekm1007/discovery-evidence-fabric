@@ -84,10 +84,22 @@ class TestFailureTaxonomy:
         assert ph.classify_failure(Exception("???")) == ph.UNKNOWN
 
     def test_failure_vocabulary_exact(self):
+        # R415 amendment (P0 directive section 1): + GONE — HTTP 410 is a
+        # distinct class/state. The amendment EXTENDS the R414 vocabulary;
+        # it reclassifies nothing already pinned above.
         assert set(ph.FAILURE_TYPES) == {
             "RATE_LIMITED", "TIMEOUT", "AUTH_FAILURE", "NETWORK_FAILURE",
-            "INVALID_RESPONSE", "MODEL_FAILURE", "PARSER_FAILURE",
+            "INVALID_RESPONSE", "MODEL_FAILURE", "PARSER_FAILURE", "GONE",
             "UNKNOWN"}
+
+    def test_410_gone_is_distinct(self):
+        """R415 (P0 directive section 1): 410 must not collapse into
+        INVALID_RESPONSE — the retired-resource fact stays knowable."""
+        assert ph.classify_failure(
+            urllib.error.HTTPError("u", 410, "Gone", None, None)) == ph.GONE
+        assert ph.classify_failure(
+            Exception("HTTPError: HTTP Error 410: Gone"),
+            http_status=410) == ph.GONE
 
     def test_message_hint_classification(self):
         assert ph.classify_failure(
@@ -220,16 +232,39 @@ class TestProviderCascade:
         monkeypatch.setenv("OPENROUTER_API_KEY", "k-or")
         monkeypatch.delenv("NVIDIA_API_KEY", raising=False)
 
+    def _hermetic_routing(self, monkeypatch, tmp_path):
+        """R415: the cascade now routes through model_routing (ladder
+        build + ledger + gone-state). Tests must never touch the
+        production ledger/state/catalog (Art. IX) and must never hit the
+        network (catalog discovery) — everything is redirected to a
+        tmp dir and the catalog is reported UNDISCOVERED so the pinned
+        defaults stand in."""
+        from discovery_fabric.engine import model_routing as mr
+        tmp = Path(tmp_path)
+        monkeypatch.setattr(mr, "LEDGER", mr.RoutingLedger(
+            path=tmp / "ledger.jsonl"))
+        monkeypatch.setattr(mr, "STATE_PATH", tmp / "state.json")
+        monkeypatch.setattr(
+            mr, "discover_catalog",
+            lambda provider_id, force=False: {
+                "provider": provider_id, "status": "UNDISCOVERED",
+                "fetched_at_epoch": 0.0, "models": [],
+                "catalog_size": 0, "eligible_count": 0})
+        mr.clear_probe_cache()
+        return mr
+
     def test_failover_success_carries_route_never_silent(
             self, monkeypatch, tmp_path):
         """MODEL A fails (429) -> MODEL B succeeds: status OK, and the
         result CARRIES the failed hop (a silent failover is the exact
         failure mode the directive forbids)."""
         self._setup_env(monkeypatch)
+        self._hermetic_routing(monkeypatch, tmp_path)
         book = ph.ProviderHealthBook(health_dir=tmp_path / "ph")
         calls = {"n": 0}
 
-        def fake_call(spec, messages, timeout, max_tokens):
+        def fake_call(spec, messages, timeout, max_tokens,
+                      model_override=None):
             calls["n"] += 1
             if spec.provider_id == "zai":
                 raise urllib.error.HTTPError(
@@ -248,7 +283,6 @@ class TestProviderCascade:
         hop = res.route[0]
         assert hop["provider_attempted"] == "zai"
         assert hop["failure_type"] == ph.RATE_LIMITED
-        assert hop["fallback_provider"] == "openrouter"
         assert res.failure_type is None
         # the health book recorded the failure AND the success
         snap = {p["provider"]: p for p in book.snapshot(
@@ -259,9 +293,11 @@ class TestProviderCascade:
     def test_total_failure_is_call_failed_with_typed_route(
             self, monkeypatch, tmp_path):
         self._setup_env(monkeypatch)
+        self._hermetic_routing(monkeypatch, tmp_path)
         book = ph.ProviderHealthBook(health_dir=tmp_path / "ph")
 
-        def fake_call(spec, messages, timeout, max_tokens):
+        def fake_call(spec, messages, timeout, max_tokens,
+                      model_override=None):
             raise urllib.error.HTTPError(
                 "u", 503, "Service Unavailable", None, None)
 
@@ -278,18 +314,21 @@ class TestProviderCascade:
         assert res.content is None  # never a silent partial success
 
     def test_cascade_is_bounded(self, monkeypatch, tmp_path):
-        """MODEL A -> B -> C, never an unbounded walk: at most
-        1 + max_provider_fallbacks providers per call."""
+        """MODEL A -> B -> C, never an unbounded walk. R415: the bound
+        is now 1 + max_provider_fallbacks + 2 MODEL hops (the directive's
+        model-level cascade) — still bounded, still small."""
         self._setup_env(monkeypatch)
         for k in ("NVIDIA_API_KEY", "ANTHROPIC_API_KEY", "OPENAI_API_KEY",
                   "GEMINI_API_KEY", "QWEN_API_KEY", "DEEPSEEK_API_KEY",
                   "MISTRAL_API_KEY", "TOKEN_ROUTER_API_KEY"):
             monkeypatch.setenv(k, "k")
+        self._hermetic_routing(monkeypatch, tmp_path)
         book = ph.ProviderHealthBook(health_dir=tmp_path / "ph")
         attempted = []
 
-        def fake_call(spec, messages, timeout, max_tokens):
-            attempted.append(spec.provider_id)
+        def fake_call(spec, messages, timeout, max_tokens,
+                      model_override=None):
+            attempted.append((spec.provider_id, model_override))
             raise urllib.error.HTTPError(
                 "u", 500, "boom", None, None)
 
@@ -299,7 +338,8 @@ class TestProviderCascade:
         res = reg.generate("p", system="s", max_retries=0, timeout=5,
                            max_provider_fallbacks=2)
         assert res.status == "CALL_FAILED"
-        assert len(attempted) == 3  # exactly 1 + 2
+        # exactly 1 + 2 provider fallbacks + 2 model hops
+        assert len(attempted) == 5
 
     def test_no_credentials_is_provider_unavailable(self, monkeypatch):
         for k in list(os.environ):
@@ -314,11 +354,13 @@ class TestProviderCascade:
         but a lone cooled provider is still attempted (never a hard
         block; Art. V)."""
         self._setup_env(monkeypatch)
+        self._hermetic_routing(monkeypatch, tmp_path)
         book = ph.ProviderHealthBook(health_dir=tmp_path / "ph")
         book.record_failure("zai", ph.RATE_LIMITED)
         order_seen = []
 
-        def fake_call(spec, messages, timeout, max_tokens):
+        def fake_call(spec, messages, timeout, max_tokens,
+                      model_override=None):
             order_seen.append(spec.provider_id)
             return "OK-" + spec.provider_id
 

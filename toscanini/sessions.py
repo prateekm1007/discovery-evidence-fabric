@@ -153,7 +153,9 @@ ERROR_STATUSES = ("ERROR_TRANSPORT", "ERROR_BUILD", "ERROR_RUN",
 # it is RECOVERABLE through the same retry path, never silently reported
 # as successful or still-running (Art. XXV).
 ACTIVE_STATUSES = ("PENDING", "BUILDING_PROBLEM", "RUNNING")
-RETRYABLE_STATUSES = ERROR_STATUSES + ("INTERRUPTED",)
+RETRYABLE_STATUSES = ERROR_STATUSES + (
+    "INTERRUPTED", "RUN_BLOCKED_TRANSPORT")   # R415: a blocked run
+#   re-enters the same worker path (the problem is saved, never lost)
 
 
 def _proc_stat_starttime(pid: int) -> Optional[str]:

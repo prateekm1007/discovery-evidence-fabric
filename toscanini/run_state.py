@@ -53,7 +53,10 @@ OUTCOME_LABELS = {
 
 _RUNNING_STATUSES = ("PENDING", "BUILDING_PROBLEM", "RUNNING", "")
 _BLOCKED_STATUSES = ("INTERRUPTED", "ERROR_TRANSPORT", "ERROR_BUILD",
-                     "ERROR_RUN", "ERROR_STUCK")
+                     "ERROR_RUN", "ERROR_STUCK",
+                     "RUN_BLOCKED_TRANSPORT")   # R415: the directive §8
+#                    infrastructure-blocked state, distinct from every
+#                    discovery verdict (Art. LXI)
 
 # Engine stage -> product phase (directive §5: each UI state must
 # correspond to a real backend stage). The canonical engine STAGE_ORDER
@@ -479,7 +482,10 @@ def terminal_outcome(session: Dict, run_dir: Optional[Path] = None) -> Dict:
                 "basis": ("terminal without a recorded verdict "
                           "(final_status empty/UNKNOWN) — a scientific "
                           "conclusion was not reached")}
-    # INTERRUPTED / ERROR_* : infrastructure-class terminations
+    # INTERRUPTED / ERROR_* / RUN_BLOCKED_TRANSPORT : infrastructure-class
+    # terminations (R415: RUN_BLOCKED_TRANSPORT is the P0 directive's §8
+    # state — the machine genuinely exhausted its routes; the problem is
+    # saved and resumable, NEVER a scientific rejection)
     return {"outcome": OUTCOME_RUN_BLOCKED,
             "basis": f"machine status {status} — infrastructure, "
                      f"never a scientific rejection (Art. LXI)"}

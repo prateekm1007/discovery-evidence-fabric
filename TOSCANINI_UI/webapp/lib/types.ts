@@ -116,6 +116,18 @@ export interface HealthSummary {
   llm_transport_ready?: boolean;
   portfolio_ready?: boolean;
   engine_commit?: string;
+  // R415 (P0 directive §13): the operational top-level block — the UI's
+  // status wording is generated from these, never hand-written.
+  showcase_ready?: boolean;
+  discovery_ready?: boolean;
+  retrieval_ready?: boolean;
+  physics_ready?: boolean;
+  reality_loop_ready?: boolean;
+  product_status?: string;
+  providers?: Record<
+    string,
+    { status?: string; available_models?: number }
+  >;
   durable?: { last_snapshot?: { at?: string; pushed?: boolean } };
   readiness?: {
     discovery_ready?: boolean;

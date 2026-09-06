@@ -586,22 +586,34 @@ class TestWorkerFailureMatrix:
         return wk
 
     def test_no_credentials_error_transport(self, hermetic, store):
-        """Scenario 1: no LLM credentials -> honest ERROR_TRANSPORT with
-        the provider-unavailable reason — never a research verdict."""
+        """Scenario 1: no LLM credentials -> honest blocked-transport
+        terminal with the provider-unavailable reason — never a research
+        verdict. R415 amendment (P0 directive §8): the machine status is
+        RUN_BLOCKED_TRANSPORT (distinct from every discovery verdict);
+        the legacy ERROR_TRANSPORT label is history."""
         s = store.create_session("t", "a sufficiently long problem text")
         hermetic.run(s["session_id"])
         row = store.get_session(s["session_id"])
-        assert row["status"] == "ERROR_TRANSPORT"
+        assert row["status"] == "RUN_BLOCKED_TRANSPORT"
         # honest reason: no credential in the environment (Art. XXV —
-        # absence of transport is stated, never a research verdict)
-        assert "NO_TRANSPORT" in row["error"]
-        assert "no LLM provider credential" in row["error"]
+        # absence of transport is stated, never a research verdict).
+        # Gateway-state independent: with no local gateway the probe is
+        # skipped (NO_TRANSPORT); with one up (an environmental fact of
+        # this machine) the real probe runs and returns the typed
+        # PROVIDER_UNAVAILABLE — both are the honest no-credential shape
+        assert ("NO_TRANSPORT" in row["error"]
+                or "PROVIDER_UNAVAILABLE" in row["error"])
+        assert "no provider credential" in row["error"]
+        assert "Discovery temporarily blocked by infrastructure" in \
+            row["error"]
+        assert "Your problem is saved and ready to resume" in row["error"]
 
     def test_dead_endpoint_error_transport(self, hermetic, store,
                                            monkeypatch):
         """Scenario 2+3: provider endpoint unreachable (connection
         refused — the fast form of timeout/HTTP failure) -> honest
-        ERROR_TRANSPORT naming the CALL_FAILED probe."""
+        blocked-transport terminal naming the CALL_FAILED probe (R415:
+        RUN_BLOCKED_TRANSPORT, the §8 infrastructure state)."""
         # 0.0.0.0 is non-loopback for the external check and refuses
         # connections instantly (measured 4 ms) — a fast deterministic
         # stand-in for provider outage / timeout / HTTP failure.
@@ -611,12 +623,12 @@ class TestWorkerFailureMatrix:
         s = store.create_session("t", "a sufficiently long problem text")
         hermetic.run(s["session_id"])
         row = store.get_session(s["session_id"])
-        assert row["status"] == "ERROR_TRANSPORT"
+        assert row["status"] == "RUN_BLOCKED_TRANSPORT"
         assert "EXTERNAL" in row["error"]
         assert "CALL_FAILED" in row["error"]
 
     def test_error_transport_is_retryable(self, hermetic, store, monkeypatch):
-        """Scenario 7 (retry): a transport-failed session re-enters the
+        """Scenario 7 (retry): a blocked-transport session re-enters the
         queue and can succeed when the transport recovers."""
         monkeypatch.setenv("ZAI_API_KEY", "dummy-dead-endpoint-key")
         monkeypatch.setenv("ZAI_BASE_URL",
@@ -624,7 +636,7 @@ class TestWorkerFailureMatrix:
         s = store.create_session("t", "a sufficiently long problem text")
         hermetic.run(s["session_id"])
         assert store.get_session(s["session_id"])["status"] == \
-            "ERROR_TRANSPORT"
+            "RUN_BLOCKED_TRANSPORT"
         r = store.retry_session(s["session_id"])
         assert r["status"] == "PENDING"
         assert store.get_session(s["session_id"])["retry_attempts"] == 1

@@ -67,7 +67,8 @@ function TransportDot({ health }: { health: HealthSummary | null }) {
   const degraded = providers.filter(
     (p) => p.available && p.status !== "OK" && p.status !== "NEVER_CALLED"
   );
-  const ready = r?.discovery_ready ?? health?.llm_transport_ready === true;
+  const ready = r?.discovery_ready ?? health?.discovery_ready ??
+    health?.llm_transport_ready === true;
   return (
     <span
       className={`transport-dot ${ready ? "ok" : "down"}`}
@@ -85,19 +86,42 @@ function TransportDot({ health }: { health: HealthSummary | null }) {
 }
 
 function EngineStatusText({ health }: { health: HealthSummary | null }) {
+  // R415 (P0 directive §12): the status wording is GENERATED from
+  // /api/health — "Discovery ready" / "Discovery ready · 1 provider
+  // degraded" / "Showcase ready · Discovery temporarily unavailable".
+  // "engine starting…" is BANNED as a persistent state: while health is
+  // still loading (a transient client-side fact, at most one poll
+  // cycle), the chip is quiet rather than fake.
   const r = health?.readiness;
   const providers = r?.providers ?? [];
   const degraded = providers.filter(
     (p) => p.available && p.status !== "OK" && p.status !== "NEVER_CALLED"
   );
-  const ready = r?.discovery_ready ?? health?.llm_transport_ready === true;
+  const ready = r?.discovery_ready ?? health?.discovery_ready ??
+    health?.llm_transport_ready === true;
   if (ready) {
     return degraded.length > 0
-      ? `Discovery available · one provider degraded`
+      ? `Discovery ready · ${degraded.length === 1 ? "1 provider" : `${degraded.length} providers`} degraded`
       : "Discovery ready";
   }
-  return "Engine starting…";
+  if (health === null) {
+    return ""; // first poll in flight — never a fake persistent state
+  }
+  const showcase = health?.showcase_ready ?? r?.showcase_ready ??
+    health?.portfolio_ready;
+  return showcase
+    ? "Showcase ready · Discovery temporarily unavailable"
+    : "Discovery temporarily unavailable";
 }
+
+const STORY_STEPS = [
+  "DISCOVER",
+  "INVENT",
+  "INSPECT",
+  "CHALLENGE",
+  "REBUILD",
+  "EXPERIMENT",
+];
 
 function NewProblemPane({
   onStarted,
@@ -132,17 +156,20 @@ function NewProblemPane({
 
   return (
     <section className="hero workspace-hero">
-      <h1>
-        What problem should Toscanini investigate?
-      </h1>
-      <p className="lede">
-        A real discovery engine runs underneath: evidence first, adversarial
-        attacks included. Watch it investigate, see the engineering
-        argument, then inspect the invention.
+      {/* R415 (P0 directive §10/§11/§21): the main brand statement and
+          the landing hierarchy — the problem input is the dominant
+          element until an invention exists, then the 3D artifact takes
+          over. No "AI platform" language. */}
+      <h1 className="brand-statement">DISCOVER. INVENT. ANYTHING.</h1>
+      <p className="brand-subline">
+        Give Toscanini a real problem. It will investigate the evidence,
+        challenge its own ideas, and develop the strongest invention it
+        can defend.
       </p>
+      <h2 className="ask-title">What problem should Toscanini investigate?</h2>
       <div className="ask">
         <textarea
-          placeholder="e.g. Why do hemodialysis grafts clot at the venous anastomosis despite anticoagulation?"
+          placeholder="Describe a real technical problem…"
           value={text}
           onChange={(e) => setText(e.target.value)}
           onKeyDown={(e) => {
@@ -154,7 +181,7 @@ function NewProblemPane({
             ⌘↵ to start · runs take minutes; you can leave and come back
           </span>
           <button className="btn" onClick={submit} type="button">
-            {submitting ? "Starting…" : "Start discovery"}
+            {submitting ? "Starting…" : "Discover"}
           </button>
         </div>
       </div>
@@ -163,6 +190,16 @@ function NewProblemPane({
           {error}
         </div>
       )}
+      <div className="story-strip" aria-label="how it works">
+        {STORY_STEPS.map((step, i) => (
+          <span className="story-step" key={step}>
+            <span className="story-word">{step}</span>
+            {i < STORY_STEPS.length - 1 && (
+              <span className="story-arrow" aria-hidden="true">↓</span>
+            )}
+          </span>
+        ))}
+      </div>
       <div className="examples">
         {EXAMPLES.map((ex) => (
           <button

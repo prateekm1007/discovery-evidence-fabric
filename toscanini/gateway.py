@@ -205,7 +205,13 @@ def preflight_probe() -> dict:
     R392: the result is cached for the health endpoint (directive 2) —
     LLM_TRANSPORT_READY is only ever TRUE when this real completion
     succeeded. A missing credential, timeout, or HTTP failure stays
-    exactly what it is (Art. XXV)."""
+    exactly what it is (Art. XXV).
+
+    R415: the probe is a REAL completion through the routing ladder —
+    generate() cascades across (provider, model) rungs, so the probe
+    fails only when every rung failed, and the typed route (provider /
+    model / attempt / failure_class per hop) travels with the result so
+    the worker's blocked-transport record carries it (directive §1)."""
     from discovery_fabric.engine.adapters import load_credentials
     load_credentials()
     from discovery_fabric.engine import llm_registry as reg
@@ -216,7 +222,14 @@ def preflight_probe() -> dict:
         out = {"status": res.status, "provider": res.provider_id,
                "model": res.model,
                "latency_ms": res.latency_ms,
-               "error": (res.error or "")[:160]}
+               "error": (res.error or "")[:160],
+               "route": [
+                   {"provider_attempted": h.get("provider_attempted"),
+                    "model": h.get("model"),
+                    "attempts": h.get("attempts"),
+                    "failure_type": h.get("failure_type"),
+                    "timestamp": h.get("timestamp")}
+                   for h in (res.route or [])]}
     except Exception as exc:  # noqa: BLE001
         out = {"status": "CALL_FAILED",
                "error": f"{type(exc).__name__}: {exc}"[:200]}

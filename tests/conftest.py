@@ -191,3 +191,32 @@ def _hermetic_source_health_retrieval_log(tmp_path, monkeypatch):
     monkeypatch.setattr(_rl, "LOG_PATH", sandbox)
     monkeypatch.setattr(_mat, "RETRIEVAL_LOG_PATH", sandbox)
     yield
+
+
+@pytest.fixture(autouse=True)
+def _hermetic_model_routing_state(monkeypatch, tmp_path):
+    """R415 guard (Art. IX): the routing ledger / gone-state / catalog
+    cache under ENGINE_RUNS/model_routing/ are PRODUCTION runtime
+    telemetry (the evidence base for routing decisions, directive §17).
+    A test that walks llm_registry.generate() must never append to them.
+
+    FOUND LIVE 2026-09-06 (R415, during this round's iteration): the
+    first post-cascade-edit test run recorded its fake_call TypeError
+    hops through the production singleton before the cascade tests were
+    made hermetic — quarantined as ledger.test-pollution.quarantine.jsonl
+    and disclosed in the R415 worklog. This guard makes the isolation
+    structural: every test gets a tmp ledger/state/catalog by default.
+    ENGINE_LIVE=1 opts out.
+    """
+    if os.environ.get("ENGINE_LIVE"):
+        yield
+        return
+    from discovery_fabric.engine import model_routing as _mr
+    monkeypatch.setattr(_mr, "LEDGER", _mr.RoutingLedger(
+        path=tmp_path / "model_routing_ledger.jsonl"))
+    monkeypatch.setattr(_mr, "STATE_PATH",
+                        tmp_path / "model_routing_state.json")
+    monkeypatch.setattr(_mr, "CATALOG_DIR", tmp_path / "model_catalog")
+    _mr.clear_probe_cache()
+    yield
+    _mr.clear_probe_cache()

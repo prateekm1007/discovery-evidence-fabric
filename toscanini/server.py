@@ -238,8 +238,42 @@ def _health_payload() -> dict:
     except Exception:  # noqa: BLE001 — absent stays absent
         _connectors_ok = False
 
+    # ---- R415 (P0 directive §13): the operational health block, top-
+    # level and directive-shaped: showcase_ready / discovery_ready /
+    # providers{<id>: {status, available_models}} / retrieval_ready /
+    # physics_ready / reality_loop_ready. No keys, no endpoints, no
+    # sensitive infrastructure details — the model-routing registry's
+    # own summary (recorded facts + live catalog counts only).
+    from discovery_fabric.engine import model_routing as _mr
+    try:
+        _routing_providers = _mr.provider_summary()
+    except Exception as exc:  # noqa: BLE001 — disclosed, never silent
+        _routing_providers = {"_error": {
+            "status": "UNKNOWN",
+            "available_models": 0,
+            "note": f"summary failed: {type(exc).__name__}"}}
+    _flat_providers = {
+        k: {"status": v.get("status"),
+            "available_models": v.get("available_models", 0)}
+        for k, v in _routing_providers.items()
+        if isinstance(v, dict) and k != "_error"}
+
     return {
         "ok": True, "status": "ok", "service": "toscanini",
+        # ---- R415 (directive §13) — the operational summary block ----
+        "showcase_ready": portfolio_ready,
+        "discovery_ready": bool(engine_ready and transport_configured
+                                 and probe_ok),
+        "providers": _flat_providers,
+        "retrieval_ready": bool(_connectors_ok and _src_report == "measured"),
+        "physics_ready": bool(_physics_registry.exists() and _sfepy_ok),
+        "reality_loop_ready": _reality_ok,
+        "product_status": (
+            "Discovery ready" if (
+                engine_ready and transport_configured and probe_ok)
+            else "Showcase ready · Discovery temporarily unavailable"
+            if portfolio_ready
+            else "Discovery temporarily unavailable"),
         # legacy keys (R391 contract) kept for the Render healthcheck;
         # the reported commit is the FRESH artifact read (per-request),
         # so in-container tampering is reflected immediately
@@ -313,6 +347,12 @@ def _health_payload() -> dict:
             "showcase_ready": portfolio_ready,
         },
         "durable": _durable_state(),
+        # R415: the routing registry's richer provider detail (directive
+        # sections 3/6/13 — per-model counts, catalog state, probe cache)
+        "model_routing": {
+            "providers": _routing_providers,
+            "ledger": _mr.LEDGER.diagnostics(),
+        },
     }
 
 
@@ -617,6 +657,22 @@ class Handler(BaseHTTPRequestHandler):
             payload = self._share_payload(parts[2])
             return self._json(200, payload) if payload else self._json(404, {"error": "not found"})
 
+        # ---- R415 (P0 directive §9): GET /api/discovery/{run_id} — the
+        # live run state for the directive's canonical API. ALIAS of
+        # /api/run/{id}/state (one canonical projection, never a second)
+        if (len(parts) == 3 and parts[0] == "api"
+                and parts[1] == "discovery"):
+            rid = parts[2]
+            if self._access(rid) == "DENY":
+                return self._denied()
+            s = store.get_session(rid)
+            if not s:
+                return self._json(404, {"error": "not found"})
+            from toscanini import run_state as _rs
+            state = _rs.canonical_run_state(s)
+            state.pop("provenance", None)  # no run_dir paths here
+            return self._json(200, state)
+
         # R391: same-origin static webapp (Render deployment shape).
         # API paths never fall through here — /api 404s stay honest JSON.
         if not p.path.startswith("/api"):
@@ -635,7 +691,10 @@ class Handler(BaseHTTPRequestHandler):
 
         # R389 Phase 7: /api/run is the CEO's canonical job API name for
         # the SAME discovery start path (one production loop, one worker).
-        if p.path == "/api/discoveries" or p.path == "/api/run":
+        # R415 (P0 directive §9): POST /api/discovery is the directive's
+        # exact contract — 202 + run_id. Same canonical path (ONE worker,
+        # ONE session store; never a second run pipeline).
+        if p.path in ("/api/discoveries", "/api/run", "/api/discovery"):
             body = self._body_json()
             text = (body.get("text") or "").strip()
             if len(text) < 15:
@@ -654,7 +713,16 @@ class Handler(BaseHTTPRequestHandler):
             # R394 s15: the response carries the customer projection —
             # never the owner_key, worker identity, or filesystem paths
             from toscanini.user_state import public_session_view
-            return self._json(200, public_session_view(session))
+            view = public_session_view(session)
+            if p.path == "/api/discovery":
+                # directive §9: 202 Accepted + run_id (async run started)
+                return self._json(202, {
+                    "run_id": session["session_id"],
+                    "session_id": session["session_id"],
+                    "status": "RUN_STARTED",
+                    "state": "DISCOVERY_RUN_STARTED",
+                    "detail": view})
+            return self._json(200, view)
 
         # R395: conversational Q&A over a run's / invention's own
         # artifacts — honest refusals are 200-body states (the client
@@ -1027,7 +1095,8 @@ class Handler(BaseHTTPRequestHandler):
                                "error": cur.get("error")})
                 if last_status in ("COMPLETE", "ERROR_TRANSPORT",
                                    "ERROR_BUILD", "ERROR_RUN",
-                                   "ERROR_STUCK", "INTERRUPTED"):
+                                   "ERROR_STUCK", "INTERRUPTED",
+                                   "RUN_BLOCKED_TRANSPORT"):
                     detail = store.session_detail(sid)
                     if detail:
                         from toscanini.user_state import user_state_view
@@ -1124,6 +1193,18 @@ def main():
             except Exception:  # noqa: BLE001
                 pass
     threading.Thread(target=_startup_probe, daemon=True).start()
+    # R415 (P0 directive section 2): startup key validation. Reports ONLY
+    # "NVIDIA: CONFIGURED" / "OPENROUTER: CONFIGURED" (or NOT_CONFIGURED)
+    # — never the secret, never a key fragment, never the env var's
+    # value. Render injects the real values server-side; this line is the
+    # operator's deployment checklist made machine-visible.
+    try:
+        from discovery_fabric.engine import model_routing as _mr
+        for line in _mr.startup_validation():
+            print(f"startup-key-check {line}", flush=True)
+    except Exception as exc:  # noqa: BLE001 — disclosed, never fatal
+        print(f"startup-key-check FAILED: {type(exc).__name__}: {exc}"
+              [:200], flush=True)
     srv = ThreadingHTTPServer((HOST, PORT), Handler)
     print(f"toscanini service on {HOST}:{PORT} "
           f"(engine {ENGINE_COMMIT[:8] or 'UNRESOLVED'} via "

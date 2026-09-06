@@ -75,17 +75,48 @@ def _s2_get(url: str, timeout: int = 25) -> Dict[str, Any]:
                   else STATUS_SEARCH_FAILED)
     latency = int((time.time() - t0) * 1000)
     raw_sha = sha256_bytes(body) if body is not None else None
+    # R415 (Art. XXI.3, caught LIVE by the acceptance run): Semantic
+    # Scholar's rate-limited/throttled responses can carry HTTP 200 with
+    # a JSON body whose "data" is explicitly null (measured 2026-09-06 on
+    # the live anastomotic-leakage run). len(None) crashed the whole
+    # RETRIEVE stage — a provider failure masquerading as an engine
+    # crash. A null data array is now counted as 0 with the throttled
+    # shape DISCLOSED in the custody entry, never a TypeError.
+    parsed_count: int = 0
+    null_data_shape = False
+    if status == STATUS_OK and body:
+        try:
+            parsed = json.loads(body)
+            d = parsed.get("data") if isinstance(parsed, dict) else None
+            if d is None:
+                null_data_shape = True   # 200 + {"data": null} = throttled
+                parsed_count = 0
+            else:
+                parsed_count = len(d)
+        except Exception:  # noqa: BLE001 — count stays 0; status flips below
+            parsed_count = 0
     append_entry(source_id="semantic_scholar", query=url.split("?")[0][-80:],
                  url=url, status=status, http_status=http_status,
                  latency_ms=latency,
-                 record_count=(len(json.loads(body).get("data", []))
-                               if status == STATUS_OK and body else 0),
-                 raw_payload_sha256=raw_sha, error=error,
+                 record_count=parsed_count,
+                 raw_payload_sha256=raw_sha,
+                 error=(f"{error}; " if error else "") +
+                       ("S2_200_NULL_DATA (throttled shape)" if
+                        null_data_shape else ""),
                  retrieval_role="RECIPROCAL")
     data = None
     if status == STATUS_OK and body is not None:
         try:
             data = json.loads(body)
+            if null_data_shape:
+                # normalize the throttled shape: classified
+                # RATE_LIMITED (a 200 + {"data": null} is a provider
+                # throttle, NOT a clean empty — Art. XXI.3 forbids a
+                # provider failure masquerading as absence), never a
+                # crash, never evidence of absence (Art. XXV)
+                if isinstance(data, dict):
+                    data = dict(data, data=[])
+                status = STATUS_RATE_LIMITED
         except Exception:  # noqa: BLE001
             status = "PARSE_FAILED"
     return {"status": status, "data": data, "http_status": http_status,

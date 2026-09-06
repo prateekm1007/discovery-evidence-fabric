@@ -17,6 +17,16 @@ Phases (all real, all persisted — the UI streams them from artifacts):
 
 Art. XXV: transport/infrastructure failure -> status ERROR_* with reason;
 NEVER a research kill.
+
+R415 (P0 directive §§1, 8, 9):
+  - The preflight is LADDER-AWARE: the probe is a real completion through
+    the routing registry's fallback ladder (model A -> B -> C across
+    providers), so a single retired model (410 GONE) no longer kills the
+    run — the cascade moves to the next rung and every hop is recorded.
+  - A genuinely exhausted transport (every rung failed) terminates as
+    RUN_BLOCKED_TRANSPORT — a distinct infrastructure state that is
+    NEVER a discovery verdict (Art. LXI), keeps the user's problem
+    saved, and stays resumable through the retry path.
 """
 from __future__ import annotations
 
@@ -69,6 +79,26 @@ def _snapshot(session_id: str, reason: str) -> None:
               f"{type(exc).__name__}: {exc}", file=sys.stderr)
 
 
+def _route_detail(probe: dict) -> str:
+    """R415 (directive §1): the typed failure record for the blocked-
+    transport terminal state — provider, HTTP status, model, attempt,
+    timestamp, failure_class — taken from the probe's own recorded route
+    (the cascade records every hop; this projects the last ones). Never
+    a bare "failed"; never a key."""
+    route = probe.get("route") or []
+    if not route:
+        return ""
+    parts = []
+    for hop in route[-3:]:
+        parts.append(
+            f"provider={hop.get('provider_attempted')} "
+            f"model={hop.get('model')} "
+            f"attempt={hop.get('attempts')} "
+            f"failure_class={hop.get('failure_type')} "
+            f"timestamp={hop.get('timestamp')}")
+    return " | ".join(parts)
+
+
 def run(session_id: str) -> None:
     s = store.get_session(session_id)
     if not s:
@@ -82,12 +112,15 @@ def run(session_id: str) -> None:
     _lock_handle = _serialize_run()
 
     # --- phase 1: transport -------------------------------------------------
-    # R395: the public transport (registry-resolved NVIDIA) measurably
-    # oscillates (R392 record: 35 s..>240 s; historical public failures
-    # gateway=ALREADY_UP probe=CALL_FAILED Timeout). One REAL retry with
-    # backoff before declaring ERROR_TRANSPORT — the retry is itself a
-    # genuine live completion (never a skipped probe), and a second
-    # failure stays exactly what it is (Art. XXV).
+    # R415 (P0 directive §§1, 6-9): the probe is a REAL completion through
+    # the routing registry's fallback LADDER — llm_registry.generate()
+    # now cascades across (provider, model) rungs, so one retired model
+    # (HTTP 410 GONE) demotes that model and the next rung serves the run.
+    # The probe failing means EVERY rung failed — but we still give it one
+    # real retry with backoff (cooldowns expire, gateways restart) before
+    # declaring the routes genuinely exhausted. A second failure is
+    # RUN_BLOCKED_TRANSPORT: infrastructure, never a verdict (Art. LXI),
+    # the problem stays saved, resumable via retry.
     g = gw.ensure_gateway()
     probeable = g["status"] in ("UP", "ALREADY_UP", "EXTERNAL")
     probe = gw.preflight_probe() if probeable else {
@@ -98,12 +131,18 @@ def run(session_id: str) -> None:
         time.sleep(10)
         probe = gw.preflight_probe()
     if probe.get("status") != "OK":
+        # directive §1: the failure record carries provider / endpoint /
+        # HTTP status / model / attempt / timestamp / failure_class from
+        # the probe's own typed route (never a bare "failed")
+        route_detail = _route_detail(probe)
         store.update_session(
-            session_id, status="ERROR_TRANSPORT",
-            error=(f"LLM transport unavailable: gateway={g.get('status')} "
-                   f"probe={probe.get('status')} {probe.get('error', '')}"
-                   )[:400])
-        _snapshot(session_id, f"terminal:ERROR_TRANSPORT:{session_id}")
+            session_id, status="RUN_BLOCKED_TRANSPORT",
+            error=(f"Discovery temporarily blocked by infrastructure. "
+                   f"Your problem is saved and ready to resume. "
+                   f"[transport exhausted: gateway={g.get('status')} "
+                   f"probe={probe.get('status')} {route_detail} "
+                   f"{probe.get('error', '')}")[:400])
+        _snapshot(session_id, f"terminal:RUN_BLOCKED_TRANSPORT:{session_id}")
         return
 
     # --- phase 2: evidence-bound problem ------------------------------------

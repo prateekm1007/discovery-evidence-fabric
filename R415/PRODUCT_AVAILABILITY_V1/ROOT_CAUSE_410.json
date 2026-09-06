@@ -1,0 +1,30 @@
+{
+  "artifact": "R415_ROOT_CAUSE_410_RECORD",
+  "directive_section": "P0 section 1 — fix the 410 root cause first; do not solve it by hiding the error",
+  "reviewer_provenance": "AI_REVIEW",
+  "observed_production_error": "ERROR_TRANSPORT — LLM transport unavailable: gateway=EXTERNAL probe=CALL_FAILED HTTPError: HTTP Error 410: Gone",
+  "error_path_traced": "browser -> toscanini/server.py (POST /api/run spawns worker) -> toscanini/worker.py phase 1 (gw.ensure_gateway -> EXTERNAL via registry_external_transport or ZAI_BASE_URL; gw.preflight_probe -> llm_registry.generate) -> discovery_fabric/engine/llm_registry.py (_call_openai_flavor -> the provider endpoint) -> HTTP 410 Gone",
+  "root_cause": {
+    "machine_level": "the R414 registry pinned EXACTLY ONE model per provider (ProviderSpec.default_model). The deployed transport's selected provider answered 410 on its pinned model — the registry's own policy note documents this exact provider behavior: 'legacy default meta/llama-3.1-8b-instruct was retired from the NVIDIA catalog (HTTP 410, verified 2026-08-27)'. NVIDIA retires models from the hosted catalog; a retired model answers 410 Gone on the chat-completions call. With one model per provider and no model-level fallback, EVERY call failed, the preflight probe failed, and the worker surfaced ERROR_TRANSPORT.",
+    "classification_defect": "classify_failure mapped HTTP 410 into INVALID_RESPONSE (a vague class), so the retirement fact was not even knowable from the recorded failure — converting a knowable fact into a vaguer one (the converse of Art. XXV).",
+    "product_level": "the machine treated one provider's one dead model as total transport death: no ladder, no model-level failover, no distinct blocked state. The user saw a raw internal error instead of an attempted discovery."
+  },
+  "the_fix": {
+    "not_by_hiding": "the error is still surfaced — better: every failed hop is RECORDED (typed route + ledger), the terminal state is a distinct RUN_BLOCKED_TRANSPORT with the failure record attached, and the run stays resumable",
+    "routing": "model_routing.py — many models per provider (live catalog ∩ pinned family allowlist), round-robin (provider, model) rungs, availability-scored; llm_registry.generate() walks the rungs",
+    "classification": "HTTP 410 -> the distinct GONE failure class and provider-health state; a GONE model is demoted (known-dead from the provider's own response), the provider's OTHER models remain eligible (Art. V)",
+    "no_same_model_retry": "a 410 fails over immediately to the next rung (measured in the cascade tests: every remaining rung attempted exactly once)",
+    "ladder_aware_probe": "the worker preflight is a real completion through the cascade, so a single retired model can no longer kill the run — only genuinely exhausted routes terminate as RUN_BLOCKED_TRANSPORT"
+  },
+  "failure_record_shape": {
+    "directive_fields": ["provider", "endpoint", "http_status", "model", "attempt", "timestamp", "failure_class"],
+    "where_recorded": "the run's session error field (typed route projected by worker._route_detail) + MODEL_ROUTING_LEDGER.jsonl (every attempt) + provider health book + the probe cache invalidation",
+    "410_state": "GONE — a distinct provider-health state (P0 section 1 requirement), reported in /api/health providers[]"
+  },
+  "honest_limits": [
+    "the deployed Render instance was NOT directly reachable from this sandbox (no credentials, no deployment URL in session) — the 410 was root-caused from the error signature, the traced code path, and the registry's own recorded 410 precedent (2026-08-27 verification note), not from a live reproduction against the production key",
+    "NVIDIA_API_KEY and OPENROUTER_API_KEY are NOT configured in this sandbox (checked, values never read) — the multi-provider ladder is verified by deterministic transport-level tests (the directive section 19 scenarios) and by the catalog discovery mechanism live-verified against OpenRouter's public models endpoint (430 models, 135 allowlist-eligible)",
+    "the operator must inject both keys through Render environment/secrets; startup validation then reports 'NVIDIA: CONFIGURED' / 'OPENROUTER: CONFIGURED' (never the secret)"
+  ],
+  "sealed_artifacts_untouched": "git-verified (R411/R412/R413 + the portfolio)"
+}

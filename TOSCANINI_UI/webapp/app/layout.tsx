@@ -9,7 +9,7 @@ import "./globals.css";
 export const metadata = {
   title: "Toscanini",
   description:
-    "Describe an engineering or scientific problem. Toscanini runs a real discovery-and-invention engine and returns a credible technology package with an inspectable 3D design.",
+    "Give Toscanini a real problem. It will investigate the evidence, challenge its own ideas, and develop the strongest invention it can defend — a technology package with an inspectable 3D design.",
 };
 
 export default function RootLayout({
