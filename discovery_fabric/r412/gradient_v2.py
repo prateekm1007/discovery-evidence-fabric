@@ -223,7 +223,9 @@ def verify_v2_proposals(proposals: List[Dict[str, Any]],
                              "reason": "MALFORMED_PROPOSAL",
                              "raw_proposal": p})
             continue
-        rid = str(p.get("record_id") or p.get("source_record") or "")
+        rid = str(p.get("source_record_id")
+                  or p.get("record_id")
+                  or p.get("source_record") or "")
         r = pool.get(rid)
         if r is None:
             rejected.append({"slot": slot,
@@ -467,6 +469,12 @@ def construction_log_entry(rung: str, records, parsed, gate,
     return {
         "rung": rung,
         "n_retrieved": len(records or []),
+        "retrieved_records": [
+            {"record_id": r.get("record_id") or r.get("id"),
+             "title": str(r.get("title") or "")[:300],
+             "abstract": str(r.get("abstract") or
+                             r.get("snippet") or "")[:600]}
+            for r in records or []],
         "retrieved_at": retrieved_at,
         "retrieval_fabric_version": fabric_version,
         "query": query,

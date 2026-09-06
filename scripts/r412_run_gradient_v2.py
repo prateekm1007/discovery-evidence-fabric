@@ -287,18 +287,53 @@ def stage_tvm_build(limit=None) -> int:
         tvm = {"tvm_version": TVM_V2_VERSION, "entries": [],
                "construction_log": []}
     log = tvm.get("construction_log") or []
-    attempted_done = {str(e.get("rung")).casefold() for e in log
-                      if e.get("n_retrieved") is not None}
+    # a completed attempt = a real LLM completion was produced
+    # (raw output non-empty); transport failures are INCOMPLETE,
+    # re-attemptable within the bounded retry, and disclosed as
+    # incident overhead (the v1 orphan-calls precedent) — they do
+    # NOT count against the sealed 12-call budget
+    attempted_done = {
+        str(e.get("rung")).casefold() for e in log
+        if e.get("n_retrieved") is not None
+        and (e.get("raw_llm_output") or "").strip()
+        and e.get("status") != "INCOMPLETE_GATE_FIELD_DEFECT"}
+    # a gate-field-defect attempt is INCOMPLETE infrastructure, not
+    # a scientific rejection (Art. LXI): ONE bounded re-attempt is
+    # authorized, recorded as a replay event (the defective entry's
+    # bytes are preserved in the incident artifact)
+    gate_defect_replayed = {str(e.get("rung")).casefold() for e in log
+                            if e.get("gate_defect_replayed")}
+    transport_fails: dict = {}
+    for e in log:
+        if e.get("status") == "INCOMPLETE_TRANSPORT":
+            # incident-attributed failures (the 2026-09-06 gateway-
+            # ownership 401 defect, root-caused and fixed) do NOT
+            # consume the bounded retry — the bound guards an
+            # unreachable upstream, not a fixed local defect
+            if e.get("incident_attributed"):
+                continue
+            k = str(e.get("rung")).casefold()
+            transport_fails[k] = transport_fails.get(k, 0) + 1
     shortfall_recorded = {str(e.get("rung")).casefold() for e in log
                           if e.get("status") ==
                           "INCOMPLETE_BUDGET_SHORTFALL"}
     built = 0
     shortfall = []
-    total_attempts = len(attempted_done)
+    # HONEST cap accounting: only attempts that produced a real LLM
+    # completion count against the sealed 12-call budget; transport
+    # failures are disclosed incident overhead (v1 precedent)
+    total_attempts = sum(
+        1 for e in log
+        if e.get("n_retrieved") is not None
+        and (e.get("raw_llm_output") or "").strip())
     for key in ordered:
         rung = rungs[key]
         if key in attempted_done or key in shortfall_recorded:
             continue
+        if key in gate_defect_replayed:
+            continue  # the one bounded gate-defect replay is spent
+        if transport_fails.get(key, 0) >= 2:
+            continue  # bounded retry exhausted; stays INCOMPLETE
         if total_attempts + built >= cap:
             shortfall.append(rung)
             continue
@@ -350,6 +385,30 @@ def stage_tvm_build(limit=None) -> int:
             system="You bind measured evidence verbatim. Never "
                    "assert numbers.",
             purpose="r412_gradient_v2_tvm_proposal"))
+        # Art. LXI: a failed/empty LLM call is INCOMPLETE_TRANSPORT,
+        # never a parse failure and never a completed attempt — the
+        # rung gets the bounded retry; the failed call is disclosed
+        # incident overhead (v1 orphan-calls precedent)
+        if not meta.get("ok") or not \
+                str(meta.get("content") or "").strip():
+            tvm["construction_log"].append({
+                "rung": rung, "n_retrieved": len(records),
+                "status": "INCOMPLETE_TRANSPORT",
+                "llm_status": meta.get("status"),
+                "error": str(meta.get("error") or
+                             "empty content")[:200],
+                "prompt_hash": meta.get("prompt_hash"),
+                "retrieved_records": [
+                    {"record_id": r.get("record_id") or r.get("id"),
+                     "title": str(r.get("title") or "")[:300],
+                     "abstract": str(r.get("abstract") or
+                                     r.get("snippet") or "")[:600]}
+                    for r in records],
+                "query": q})
+            _write_tvm(tvm)
+            print(f"  rung '{rung}': INCOMPLETE_TRANSPORT "
+                  f"({meta.get('status')})")
+            continue
         parsed = parse_v2_proposals(meta.get("content") or "")
         gate = verify_v2_proposals(
             parsed.get("proposals") or [], records, rung,
@@ -1094,7 +1153,12 @@ def main() -> int:
                     help="manage the zai gateway for this "
                          "invocation (required for LLM stages)")
     args = ap.parse_args()
-    if args.gateway and not _gateway_alive():
+    if args.gateway:
+        # ALWAYS establish a runner-owned gateway: an already-alive
+        # gateway carries an unknown key (a previous invocation's),
+        # and this fresh process has no matching credential — reuse
+        # would 401 (measured 2026-09-06). _start_gateway pkills any
+        # existing instance, starts ours, and exports the key.
         if not _start_gateway():
             print("REFUSED: the zai gateway failed to start — "
                   "no LLM stage may run (fail-closed)")

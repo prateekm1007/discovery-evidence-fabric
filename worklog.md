@@ -1210,3 +1210,79 @@ Work Log:
 
 Stage Summary:
 - The sealed gradient arm executed end-to-end for the first time; 0 rediscoveries with an instrument-attributed cause; allocation discipline held in production; the temporal control arm preserved and re-verified at every stage.
+
+---
+Task ID: R412-GRADIENT-V2-SESSION
+Agent: main session (operator directive 2026-09-06, Phases A-L)
+Task: Reconcile the histories, verify the v1 substrate, measure the
+v1-vs-v2 instrument, build + seal the gradient-v2 machinery, and run
+the exact original 10 seeds.
+
+Work Log:
+- Phase A: branch r412/gradient-v2 from current main 42a17514;
+  cherry-picked the v2 instrument (08a8f142, from 52103610); chain
+  verified (R411 corpus, temporal arm, gradient v1, seal commits all
+  ancestors); 150/150 instrument tests green on the new base; the
+  v1 seal stage re-verified live (population/TVM-v0/accounting/
+  temporal all match). One correction: my seal-stage invocation
+  appended a 28th entry to the sealed seal.jsonl — REVERTED to the
+  committed 27-entry state; the live verification lives in the new
+  reconciliation artifact instead.
+- Phase B: V1_PROVENANCE_RECONCILIATION.json — 4/4 pinned artifacts
+  match, population hash live-recomputed and matching both pin
+  holders, TVM frozen-map self hash reproduced, 12/12 structural
+  cross-checks (550/400/13/387/34-31-2-1/12+1 rungs/13 GA-1b/ga3 ==
+  the 10-seed allocation in order). Adversarial battery 6/6; the
+  first run caught my verdict logic ignoring ABSENT pins — fixed
+  the logic, not the test.
+- Phase C: V1_V2_PARSER_COMPARISON.json — the 34 v1 proposals' RAW
+  texts were NEVER persisted by the v1 instrument (recorded search
+  evidence), so the full reparse is NOT_MEASURABLE_FROM_COMMITTED_
+  EVIDENCE and fabricating 34 strings was refused. Measured instead:
+  v1 recorded outcome (0/34; 31/2/1), the corpus-level comparison
+  with dual predicates (v1 3/33 vs v2 21/33 measured-numeric /
+  23/33 lossless; reproduces the superseded artifact exactly), and
+  the two byte-exact fragments the v1 report quotes (both fail v1,
+  both parse under v2).
+- Phases D-K: CAPABILITY_FAMILY_MAP_V2.json (13 families derived
+  deterministically from the 13 verified deaths; 6 distinct; 4
+  allocation targets; LLM abstractions preserved as recorded inputs,
+  never re-promoted); gradient_v2.py (the field-line instrument:
+  signal-policy-first admission gate, byte-exact span binding,
+  canonical re-derivation, two-truths checks, slope basis labels,
+  RAW persistence incl. retrieved records); the v2.1 preregistration
+  (every v2.0 blocking field resolved with verified values; budgets
+  byte-copied; model confound disclosed; RUN_ALLOWED after live pin
+  verification); the runner (seal re-verified per stage, 12-call cap,
+  allocation-first, per-rung checkpointing, downstream v1 machinery
+  imported unchanged). 21/21 + 177/177 + 74/74 batteries.
+- Phase L (the sealed run): 11 in-cap construction attempts + 13th
+  rung INCOMPLETE_BUDGET_SHORTFALL; the empty map frozen (Art.
+  XLIV); GA-3: exactly the 10 sealed seeds, ALL DEAD_AT_TVM_QUERY;
+  GA-4..GA-9 zero calls; finalize with the operator's comparison
+  table (v1 column from committed evidence, v2 measured). HONEST
+  RESULT 0/10 with a measured three-cause decomposition: (1)
+  RETRIEVAL — the family-expanded queries returned pools where only
+  6-7 of ~120 records contain any numeric value (v2 persists the
+  pools; measured from committed bytes); (2) PROPOSER — 54
+  proposals, ZERO numeric-bearing (the glm-4-plus proposer quoted
+  titles and wrote "not reported"); (3) INSTRUMENT — the v2 gate
+  rejected 54/54 correctly (every rejection is a rejection of
+  non-evidence; the parser is exonerated — unlike v1's 31/34
+  serialization failures on real numerics). Three incidents
+  disclosed + quarantined (gate field defect reclassified per Art.
+  LXI; transport misclassification fixed; gateway-ownership 401
+  root-caused + fixed) — all original bytes preserved, no mid-run
+  prompt/threshold change, the v1 artifacts untouched.
+
+Stage Summary:
+- The histories are reconciled; the stale NOT_VERIFIABLE statement
+  is superseded by real verification; the v2 instrument ran the same
+  10 seeds end-to-end and returned an honest zero with a measured
+  cause decomposition.
+- The bottleneck ordering for the next arm: RETRIEVAL first (plain
+  v1 query form measured better on pool numeric density), proposer
+  discipline second, parser exonerated.
+- RAW persistence paid for itself immediately: every incident
+  diagnosis and the three-cause decomposition replayed committed
+  bytes, not prose.

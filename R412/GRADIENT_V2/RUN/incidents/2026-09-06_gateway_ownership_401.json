@@ -1,0 +1,89 @@
+{
+ "incident_id": "2026-09-06-gateway-ownership-401",
+ "class": "LOCAL_TRANSPORT_AUTH_DEFECT (Art. LXI: infrastructure failure; INCOMPLETE, never scientific)",
+ "root_cause": "the runner reused an already-alive gateway whose key belonged to a previous invocation; the fresh process had no ZAI_API_KEY -> 401 -> PROVIDER_UNAVAILABLE on every call (upstream verified healthy by direct probe throughout)",
+ "fix": "scripts/r412_run_gradient_v2.py --gateway now ALWAYS establishes a runner-owned gateway (pkill + fresh key + env export); verified by the post-fix invocation returning real completions",
+ "affected_transport_entries": [
+  {
+   "rung": "device switching energy",
+   "llm_status": "recorded_empty_content",
+   "error": null
+  },
+  {
+   "rung": "control oriented dynamic modeling",
+   "llm_status": "recorded_empty_content",
+   "error": null
+  },
+  {
+   "rung": "differential measurement instrumentation",
+   "llm_status": "recorded_empty_content",
+   "error": null
+  },
+  {
+   "rung": "device switching energy",
+   "llm_status": "PROVIDER_UNAVAILABLE",
+   "error": "no provider credential available (see selection_ledger)"
+  },
+  {
+   "rung": "control oriented dynamic modeling",
+   "llm_status": "PROVIDER_UNAVAILABLE",
+   "error": "no provider credential available (see selection_ledger)"
+  },
+  {
+   "rung": "differential measurement instrumentation",
+   "llm_status": "PROVIDER_UNAVAILABLE",
+   "error": "no provider credential available (see selection_ledger)"
+  },
+  {
+   "rung": "amine substitution novelty margin",
+   "llm_status": "PROVIDER_UNAVAILABLE",
+   "error": "no provider credential available (see selection_ledger)"
+  },
+  {
+   "rung": "primary evidence quantified prediction",
+   "llm_status": "PROVIDER_UNAVAILABLE",
+   "error": "no provider credential available (see selection_ledger)"
+  },
+  {
+   "rung": "predictive novelty differentiation",
+   "llm_status": "PROVIDER_UNAVAILABLE",
+   "error": "no provider credential available (see selection_ledger)"
+  },
+  {
+   "rung": "maximum power point tracking efficiency",
+   "llm_status": "PROVIDER_UNAVAILABLE",
+   "error": "no provider credential available (see selection_ledger)"
+  },
+  {
+   "rung": "control oriented modeling",
+   "llm_status": "PROVIDER_UNAVAILABLE",
+   "error": "no provider credential available (see selection_ledger)"
+  },
+  {
+   "rung": "novelty of defect detection method",
+   "llm_status": "PROVIDER_UNAVAILABLE",
+   "error": "no provider credential available (see selection_ledger)"
+  },
+  {
+   "rung": "turbulent regime porous insert tradeoff",
+   "llm_status": "PROVIDER_UNAVAILABLE",
+   "error": "no provider credential available (see selection_ledger)"
+  },
+  {
+   "rung": "material-property-consistent effectiveness prediction",
+   "llm_status": "PROVIDER_UNAVAILABLE",
+   "error": "no provider credential available (see selection_ledger)"
+  },
+  {
+   "rung": "dimensional regime consistency validation",
+   "llm_status": "PROVIDER_UNAVAILABLE",
+   "error": "no provider credential available (see selection_ledger)"
+  }
+ ],
+ "n_failed_calls": 15,
+ "treatment": "incident-attributed failures do not count toward the 2-failure bounded retry (the bound guards an unreachable upstream, not a fixed local defect); affected entries carry incident_ref",
+ "defect_replay_closure": "the device-switching-energy gate-defect re-attempt is CONSUMED (its replay transport-failed under this incident; further attempts flow through the normal transport path)",
+ "no_prompt_change": true,
+ "no_threshold_change": true,
+ "reviewer_provenance": "AI_REVIEW"
+}
