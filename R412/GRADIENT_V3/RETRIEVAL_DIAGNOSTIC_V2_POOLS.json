@@ -1,0 +1,214 @@
+{
+ "artifact_type": "R412_GRADIENT_V3_RETRIEVAL_DIAGNOSTIC",
+ "directive_item": 2,
+ "created_at": null,
+ "feal_version": "R412-FEAL-1.0.0",
+ "input_bytes": {
+  "tvm_v2_constructed": {
+   "path": "R412/GRADIENT_V2/RUN/TVM_V2_CONSTRUCTED.json",
+   "sha256": "c335e85fbe52bc4a5f2e61bb5c7cd9470e2374be07348971a8fe8e658185e22c"
+  },
+  "retrieval_ledger": {
+   "path": "artifacts/source_health/retrieval_log.jsonl",
+   "window": [
+    "2026-09-06T04:12:44.340549+00:00",
+    "2026-09-06T04:50:14.106785+00:00"
+   ],
+   "window_rule": "min/max retrieved_at of the v2 construction log (committed bytes)",
+   "rows_in_window": 482
+  }
+ },
+ "pool_universe": {
+  "n_pool_instances": 267,
+  "n_unique_records": 152,
+  "n_construction_log_entries": 28,
+  "n_rungs_with_pools": 13
+ },
+ "required_statistics": {
+  "numeric_bearing_record_rate": {
+   "tier1_any_digit": {
+    "count": 38,
+    "rate": 0.25
+   },
+   "tier2_numeric_token_non_year": {
+    "count": 33,
+    "rate": 0.2171
+   },
+   "tier3_measured_numeric_with_unit": {
+    "count": 4,
+    "rate": 0.0263
+   },
+   "method": "deterministic FEAL extraction over the persisted title+abstract bytes (the exact text the v2 proposer saw)"
+  },
+  "measurement_bearing_record_rate": {
+   "count": 23,
+   "rate": 0.1513,
+   "method": "closed MEASUREMENT_VERBS vocabulary (frozen list)"
+  },
+  "signal_family_rate": {
+   "counts": {
+    "efficiency": 10,
+    "reliability": 1,
+    "performance": 13,
+    "manufacturing": 4
+   },
+   "rates": {
+    "efficiency": 0.0658,
+    "reliability": 0.0066,
+    "performance": 0.0855,
+    "manufacturing": 0.0263
+   },
+   "method": "closed surface-form tables for the six primary signal families (signal_policy)"
+  },
+  "source_domain_diversity": {
+   "identity_basis_counts": {
+    "SCHOLARLY_DOI": 97,
+    "PATENT_NUMBER": 37,
+    "TITLE_FINGERPRINT": 18
+   },
+   "identity_basis_classes": 3,
+   "domain_classes": [
+    "aerospace_propulsion",
+    "chemical_process",
+    "control_systems",
+    "metrology_sensing",
+    "other_unclassified",
+    "patent_unclassified",
+    "power_electronics",
+    "renewables_pv",
+    "thermal_management",
+    "wind_energy"
+   ],
+   "domain_diversity": 10,
+   "method": "identity basis from persisted record_id prefixes; domain classes from the closed keyword table (DERIVED_HEURISTIC \u2014 the v2 runner did not persist origin_source, so source attribution is bounded by identity basis; DISCLOSED persistence gap)"
+  },
+  "duplicate_rate": {
+   "instance_duplicate_rate": 0.4307,
+   "near_duplicate_title_pairs": 3,
+   "method": "unique record_id + title fingerprint"
+  },
+  "year_distribution": {
+   "text_embedded_years": {
+    "2003": 1,
+    "2011": 2,
+    "2012": 1,
+    "2013": 1,
+    "2014": 2,
+    "2017": 1,
+    "2019": 4,
+    "2020": 1,
+    "2025": 3,
+    "2026": 1
+   },
+   "records_with_text_year": 17,
+   "method": "years appearing in persisted title/abstract text ONLY \u2014 the v2 runner did not persist publication_year (DISCLOSED persistence gap; fixed forward by the FEAL pool records)"
+  },
+  "abstract_length_distribution": {
+   "n_empty_abstract": 118,
+   "empty_abstract_rate": 0.7763,
+   "median_abstract_len": 0,
+   "max_abstract_len": 600,
+   "method": "len() over persisted abstract bytes"
+  },
+  "quantitative_evidence_only_in_abstract": {
+   "count": 4,
+   "rate": 0.0263,
+   "title_only_numeric_count": 0,
+   "title_only_numeric_rate": 0.0,
+   "method": "FEAL extraction in_abstract flag"
+  },
+  "query_to_record_relevance": {
+   "per_rung_mean_overlap": {
+    "amine substitution novelty margin": 0.1319,
+    "control oriented dynamic modeling": 0.1825,
+    "control oriented modeling": 0.0917,
+    "device switching energy": 0.1978,
+    "differential measurement instrumentation": 0.0915,
+    "dimensional regime consistency validation": 0.2,
+    "material-property-consistent effectiveness prediction": 0.037,
+    "maximum power point tracking efficiency": 0.1818,
+    "novelty of defect detection method": 0.3222,
+    "predictive novelty differentiation": 0.0764,
+    "primary evidence quantified prediction": 0.2,
+    "turbulent regime porous insert tradeoff": 0.2597
+   },
+   "pooled_mean_overlap": 0.1521,
+   "method": "deterministic token overlap (stopword-filtered) between the logged v2 query and the record's title+abstract"
+  }
+ },
+ "mechanical_root_cause": {
+  "pool_composition": {
+   "note": "every abstract-bearing scholarly source except europepmc contributed ZERO records",
+   "audited_commit": "e7e130b1fb5352dfa4dea07c8e2b23d5c41fb56d",
+   "arxiv_ledger_ok_records_in_window": 130,
+   "arxiv_records_in_v2_pools": 0,
+   "title_normalization_defect_connectors": [
+    "ArxivConnector",
+    "OpenAlexConnector",
+    "SemanticScholarConnector"
+   ],
+   "defect_repaired_at_head": [
+    "ArxivConnector",
+    "OpenAlexConnector",
+    "SemanticScholarConnector"
+   ],
+   "defect_mechanism": "the arxiv/openalex/semantic_scholar connectors set SourceRecord.title but NOT normalized.title; the fabric's Canonicalizer reads the title from normalized \u2014 so those records become BLANK-TITLE canonical records, all blank titles share one title-fingerprint (a constant), they dedup-collapse into one record, and the pipeline's blank-title filter then EXCLUDES that survivor from the engine evidence pool. Result: 100% of arXiv/OpenAlex/S2 retrieval effort was silently discarded in every fabric invocation the v1/v2 gradient arms ever made.",
+   "defect_status": "REPAIRED pre-seal in the v3 arm (title added to normalized for the three connectors + blank-title guard in the canonicalizer); regression batteries green; the sealed v2 artifacts are untouched committed bytes"
+  },
+  "ledger_window_census": {
+   "window": [
+    "2026-09-06T04:12:44.340549+00:00",
+    "2026-09-06T04:50:14.106785+00:00"
+   ],
+   "status_counts": {
+    "datacite:EMPTY": 96,
+    "crossref:OK": 50,
+    "openaire:EMPTY": 49,
+    "core:OK": 44,
+    "core:RATE_LIMITED": 34,
+    "doaj:EMPTY": 26,
+    "arxiv:OK": 26,
+    "semantic_scholar:RATE_LIMITED": 24,
+    "google_patents:SEARCH_FAILED": 24,
+    "datacite:OK": 20,
+    "openalex:OK": 17,
+    "europepmc:EMPTY": 15,
+    "google_patents:UNAVAILABLE": 14,
+    "google_patents:OK": 13,
+    "europepmc:OK": 12,
+    "openalex:RATE_LIMITED": 6,
+    "openalex:EMPTY": 3,
+    "openaire:TIMEOUT": 3,
+    "crossref:EMPTY": 2,
+    "google_patents:EMPTY": 2,
+    "semantic_scholar:UNAVAILABLE": 1,
+    "semantic_scholar:PARSE_FAILED": 1
+   },
+   "record_counts_by_source": {
+    "crossref": 248,
+    "core": 220,
+    "arxiv": 130,
+    "google_patents": 130,
+    "europepmc": 85,
+    "datacite": 84,
+    "openalex": 81,
+    "semantic_scholar": 0,
+    "doaj": 0,
+    "openaire": 0
+   },
+   "reading": "crossref (metadata-only, no abstracts) was the dominant OK scholarly source; semantic_scholar was fully rate-limited (zero OK); openalex partially; europepmc OK but EMPTY-heavy on engineering queries; arxiv OK but its records were destroyed by the title-normalization defect above"
+  },
+  "proposer_side_scan": {
+   "n_proposals": 54,
+   "n_numeric_bearing_proposals": 4,
+   "n_unit_bearing_numeric_proposals": 0,
+   "note": "the digit scan's 4 hits are incidental digits in quoted TITLES (e.g. 'Chandrayaan-1', 'CMP') \u2014 the strict unit-bearing tier CONFIRMS the v2 final report's zero-numeric finding",
+   "method": "deterministic digit scan + FEAL unit-bearing extraction over the persisted raw proposals (span+value)"
+  }
+ },
+ "diagnostic_conclusion": "The v2 retrieval bottleneck is MECHANICAL, not lexical: (1) the three abstract-bearing scholarly connectors' records never entered any pool (title-normalization defect \u2014 repaired pre-seal); (2) the only consistently-OK scholarly source was crossref, which is metadata-only; (3) S2/OpenAlex were rate-limited; (4) the persisted pools carried no publication_year and no source attribution (persistence gaps fixed forward by the FEAL pool records). The v1-vs-v2 query-wording comparison measured by the v2 arm was therefore a comparison of two query forms on top of a broken acquisition layer.",
+ "regenerable_from_committed_bytes": true,
+ "network_calls": 0,
+ "llm_calls": 0,
+ "reviewer_provenance": "AI_REVIEW"
+}

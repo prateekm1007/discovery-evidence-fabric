@@ -1286,3 +1286,100 @@ Stage Summary:
 - RAW persistence paid for itself immediately: every incident
   diagnosis and the three-cause decomposition replayed committed
   bytes, not prose.
+
+---
+Task ID: R412-GRADIENT-V3-SESSION
+Agent: main session (operator directive 2026-09-06 audit, 14-item directive)
+Task: Build the retrieval-first Gradient V3 arm (the Frontier Evidence
+Acquisition Layer) on a new branch off r412/gradient-v2, run it under
+the sealed preregistration, and stop honestly wherever the evidence
+says stop.
+
+Work Log:
+- Constitution v2.1.0 read in FULL at session start AND re-read in FULL
+  (all 2020 lines) immediately before the final commit (the operator's
+  double-read mandate).
+- Resumed the prior session's un-committed V3 work: the preregistration
+  was already rebuilt post the lane-C UNKNOWN-domain incident (all pins
+  verified MATCH from live bytes: module, runner, evaluator, diagnostic,
+  family map, corpus, lane plan, 2 prompts); 28/39 lane queries complete;
+  sealed v2 artifacts verified untouched (zero tracked changes under
+  R412/GRADIENT_V2/; HEAD = e7e130b1).
+- Completed the lane run: 39/39 queries OK (content-keyed resumption,
+  byte-identical plumbing to the v1/v2 _retrieve; ~100-150s per query).
+- First benchmark evaluation crashed on an evaluator accounting defect
+  (int() on the persisted sources_attempted LIST). Quarantined as
+  incident R412-GRADIENT-V3-EVAL-SOURCE-CALL-COUNT: the crash preceded
+  every threshold evaluation (no verdict influenced), the fix counts
+  len() for lists, the prereg was rebuilt BEFORE the evaluation ran.
+  The cost denominator only; no gate threshold consumes it.
+- THE GATE VERDICT: FAIL (6 of 9 pre-registered thresholds failed:
+  recall_numeric 0.1429<0.25, recall_measurement 0.1481<0.25,
+  numeric_bearing 0.1491<0.15, abstract_bearing 0.4865<0.6,
+  year_recovery 0.3313<0.5, baseline_recovery 0.0559<0.1; passed:
+  measurement_bearing 0.4037, source_identity 1.0, domain_diversity 13).
+  Union pool: 483 deduplicated records, 72 numeric-bearing, 390 source
+  calls. The arm STOPPED at the gate exactly as pre-registered: ZERO
+  proposer/LLM calls (the 26-call construction budget registered and
+  never spent).
+- Adversarial instrument verification BEFORE accepting the verdict (Art.
+  XVI/XVII): the missing 12 reference records verified genuinely absent
+  from all pool bytes (no DOI hit, no title hit); the recall computation
+  verified sound. The FAIL is real.
+- The mandated decomposition (GATE_FAIL_DECOMPOSITION.json, deterministic
+  over committed bytes): CAUSE 1 GENUINE (dominant): the sealed lane
+  query forms do not retrieve the reference records — the 12 missing are
+  europepmc(9)/core(3) papers; europepmc was queried on every invocation
+  (OK or honest EMPTY) and did not return them; the corpus's distinct
+  "{capability} experimental comparison" form outperformed all three
+  sealed lane forms on reference recall. CAUSE 2 INSTRUMENT: the
+  normalization layer dropped metadata-only sources' fields — crossref
+  issued_year (212/483 records lost year), google_patents
+  publication_date+snippet (176/483 lost year AND their only text;
+  best_record only ever assigned to longer-abstract records) — deflating
+  the four RATE metrics. CAUSE 3 INFRASTRUCTURE INCOMPLETE (Art. XXI.3):
+  OpenAlex HTTP 429 on 39/39 invocations ($0 remaining budget, resets
+  midnight UTC, verbatim message recorded); SemanticScholar throttled
+  28/39 + 9 throttle-shaped parse failures; CORE throttled 19/117 and
+  its 0/109 year recovery stays UNRESOLVED (live probe 429-blocked;
+  Art. XXV).
+- Quarantined + repaired the normalization defects (incident
+  R412-GRADIENT-V3-NORM-METADATA-FIELDS, post-verdict diagnosis, the v2
+  gate-field-defect precedent): canonical.py now reads issued_year +
+  publication_date for publication_year; best_record is seeded by the
+  record's first appearance (never emptier than any appearance; a
+  strictly-richer abstract still replaces it); pipeline.py's abstract
+  chain falls back to snippet (the patent adapters' only text). Pinned by
+  6 new tests (tests/test_r412_v3_norm_fields.py). The repairs CANNOT
+  resurrect this arm's verdict (stopping rule 2) and NO counterfactual
+  rate is asserted (the dropped fields were never persisted — Art. XXV);
+  they exist so the NEXT arm's instrument measures what it claims.
+- Batteries: retrieval 103/103 (97 legacy + 6 new pinning); r412 core
+  251/251; r412/r411 remaining 252/252. Retrieval log hash chain valid
+  (6199 entries).
+- The deterministic trajectory layer (directive items 5-6) run over the
+  committed pools for the decomposition: 65 trajectories (21 multi-point,
+  2 with capability velocity), corroboration 19 SINGLE_SOURCE_SIGNAL /
+  2 REPLICATED_TRAJECTORY / 44 UNKNOWN; 163/488 records FES-positive;
+  18.46 numeric-bearing records per 100 source calls; v2-vs-v3 pool
+  numeric density 2.6% -> 14.9% (5.7x, measured from committed bytes).
+- Final report written (R412_GRADIENT_V3_FINAL_REPORT.md): the arm's
+  terminal state is BENCHMARK_GATE_FAIL with the three-incident ledger,
+  budget honesty (0 LLM calls), learning recorded (Art. LI: the query
+  form is the dominant retrieval variable AGAIN; comparison-targeted
+  forms beat all three sealed lane forms; OpenAlex is a metered budget
+  not an open source; measure the acquisition layer BEFORE attributing
+  anything to the proposer), and the v1/v2/temporal seals re-verified
+  untouched.
+
+Stage Summary:
+- The V3 arm executed its pre-registered design end-to-end to the gate
+  and stopped honestly at the gate: the retrieval-first design (lanes
+  A/B/C as sealed) does not yet expose quantitative frontier evidence at
+  the pre-registered bar, and the machine refused to spend discovery
+  budget on a starved evidence layer. The gate worked in production.
+- The failure decomposes into a GENUINE query-form limit (dominant, the
+  scientific finding), instrument normalization defects (repaired,
+  pinned, forward-feeding), and provider budget exhaustion (disclosed,
+  never counted as absence).
+- reviewer_provenance=AI_REVIEW on every artifact (Art. LXVII).

@@ -531,7 +531,7 @@ def _to_engine_item(rec: CanonicalRecord, rank: int,
     """CanonicalRecord -> engine evidence item (a2 schema + fabric fields)."""
     best = rec.best_record
     abstract = (best.get("abstract") or best.get("claims_excerpt")
-                or best.get("summary") or "")
+                or best.get("summary") or best.get("snippet") or "")
     core = {
         "canonical_id": rec.canonical_id,
         "title": rec.title,

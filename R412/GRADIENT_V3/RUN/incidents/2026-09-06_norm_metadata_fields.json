@@ -1,0 +1,26 @@
+{
+ "incident_id": "R412-GRADIENT-V3-NORM-METADATA-FIELDS",
+ "detected_at": "2026-09-06T10:05:00Z",
+ "detected_by": "the gate-fail decomposition analysis over the committed v3 lane pool bytes (post-verdict diagnosis; the decomposition script is deterministic and committed)",
+ "class": "INFRASTRUCTURE (retrieval-fabric normalization layer)",
+ "severity": "quarantined + repaired + pinned by tests (the R412 v2 gate-field-defect precedent: root cause from committed bytes, fix disclosed, original evidence preserved)",
+ "description": "The retrieval fabric's canonicalization dropped every field that a metadata-only source uniquely carried. Three coupled mechanisms, all measured from the committed v3 pool bytes: (1) canonical.py read rec.publication_year only from normalized.publication_year or normalized.year — crossref persists the year as issued_year (212/483 union records lost their year) and the patent adapters as publication_date (176/483 lost their year); (2) best_record was only assigned when a source's normalized record had a LONGER abstract than the incumbent — metadata-only sources (crossref, google_patents) never won that comparison, so best_record stayed EMPTY for any record with no abstract-bearing appearance, and every field only those sources carried (issued_year, publication_date, snippet) was dropped for the whole canonical record; (3) the engine-item abstract fallback chain (abstract/claims_excerpt/summary) never read snippet — the patent adapters' ONLY text field — so 176 google_patents records entered the pools as zero-text records (no numeric evidence extractable from them at all).",
+ "measured_effect_on_gate_metrics": {
+  "year_recovery_rate": "0.3313 measured vs 0.5 threshold — 388/483 records lost their year to causes (1)+(2); crossref and google_patents jointly are 80% of the pool",
+  "abstract_bearing_rate": "0.4865 vs 0.6 — the 176 patent records contributed zero text (cause 3); crossref is metadata-only by provider design (disclosed limitation, not a defect)",
+  "numeric_bearing_rate": "0.1491 vs 0.15 (fails by 0.0009) — numeric extraction runs over title+abstract; zero-text records cannot yield numeric evidence",
+  "baseline_recovery_rate": "0.0559 vs 0.1 — same text-less deflation",
+  "recall_metrics": "NOT affected — recall is identity-based (DOI/title fingerprint), the identities were persisted correctly"
+ },
+ "verdict_influence": "The gate FAIL stands. This incident DEFLATED four rate metrics (infrastructure-manufactured failure components, Art. LXI) but the recall failures are genuine (cause 1 in GATE_FAIL_DECOMPOSITION.json: the sealed lane query forms do not retrieve the reference records — europepmc/core papers that a comparison-targeted query form surfaces). The arm is stopped by the pre-registered rule either way; these repairs cannot and do not resurrect the verdict (stopping rule 2: a failed gate is never retried with revised thresholds). The repairs exist so the NEXT arm's instrument measures what it claims to measure.",
+ "counterfactual_honesty": "What the repaired pipeline would have measured on this run's retrievals is NOT_MEASURABLE_FROM_COMMITTED_BYTES: the dropped fields were never persisted, so no counterfactual rate is asserted (Art. XXV). The repair effect will be measured on the next arm's fresh retrievals.",
+ "fix": [
+  "canonical.py: rec.publication_year now reads publication_year, year, issued_year, publication_date (verbatim provider strings; a record with no year-bearing field still stays None — Art. XXV)",
+  "canonical.py: best_record is seeded by the record's FIRST appearance (a record's representative is never emptier than any of its appearances); a strictly-richer abstract still replaces it — the original richest-representative precedence is unchanged",
+  "pipeline.py: the engine-item abstract fallback chain now falls back to snippet (after abstract/claims_excerpt/summary) so patent snippets are no longer discarded"
+ ],
+ "fix_pinned_by": "tests/test_r412_v3_norm_fields.py (6 tests: crossref issued_year survives; patent date+snippet survive; full pool-record year chain; metadata-only seeds then richer wins; no year is ever fabricated; patent-snippet numeric evidence extractable). Battery: 97 legacy retrieval tests + 6 new = 103/103 green.",
+ "llm_calls_at_incident_time": 0,
+ "constitution_articles": ["XI (evidence preserved — the defective pools stay committed as the honest first attempt)", "XXV (unknown stays unknown — no counterfactual rates)", "XXVII (the repairs read fields, they never invent values)", "LXI (infrastructure failure is never scientific rejection — the four deflated rate metrics are infrastructure-manufactured failure components)", "LIX (thresholds untouched; queries untouched; the FAIL verdict is recorded, never retried)", "XVII/XVI (the repairs are pinned by adversarial tests)"],
+ "reviewer_provenance": "AI_REVIEW"
+}

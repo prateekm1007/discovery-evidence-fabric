@@ -1,0 +1,16 @@
+{
+ "incident_id": "R412-GRADIENT-V3-EVAL-SOURCE-CALL-COUNT",
+ "detected_at": "2026-09-06T09:30:00Z",
+ "class": "INFRASTRUCTURE (deterministic evaluator accounting)",
+ "severity": "quarantined + repaired mid-session (the R412 v2 gate-field-defect precedent: original error preserved, fix disclosed, no verdict was influenced)",
+ "description": "r412_v3_benchmark_eval.py coerced the lane pools' persisted retrieval_stats.sources_attempted with int(). The lane runner persists the fabric report's field as a LIST of source ids (e.g. ['arxiv','core','crossref',...]), so the evaluator crashed with TypeError at the cost-metric accumulation, BEFORE any threshold was evaluated and before the report file was written (no partial/incorrect evaluation artifact exists).",
+ "original_error": "TypeError: int() argument must be a string, a bytes-like object or a real number, not 'list' — at scripts/r412_v3_benchmark_eval.py line 220 (total_source_calls += int(st.get('sources_attempted') or 0))",
+ "affected_stage": "retrieval benchmark evaluation (directive item 7) — the gate stage BEFORE any proposer call",
+ "llm_calls_at_incident_time": 0,
+ "verdict_influence": "NONE POSSIBLE — the crashed line feeds ONLY the reported retrieval_cost_metric denominator (a reported number, not a gate threshold). No threshold check consumes total_source_calls; the threshold evaluation block was never reached. The gate thresholds themselves are pre-registered and untouched (Art. LIX).",
+ "fix": "count len() when the field is a list, int() otherwise; fix is inline-commented with this incident id",
+ "fix_location": "scripts/r412_v3_benchmark_eval.py::main (cost-metric accumulation loop)",
+ "reseal": "the evaluator sha256 changes; the v3 preregistration is REBUILT via scripts/r412_v3_build_preregistration.py (all other pins re-verified from live bytes, thresholds byte-identical) BEFORE the evaluation re-runs; the lane pools, corpus, prompts, module, and lane plan pins are unchanged",
+ "constitution_articles": ["XI (original error preserved verbatim)", "LXI (infrastructure failure is never scientific rejection)", "LIX (thresholds untouched — the defect was in reporting plumbing, not the gate)", "XLIV (changed instrument file = re-verified seal before use)"],
+ "reviewer_provenance": "AI_REVIEW"
+}

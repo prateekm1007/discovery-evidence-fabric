@@ -1,0 +1,1183 @@
+{
+ "artifact_type": "R412_GRADIENT_V3_GATE_FAIL_DECOMPOSITION",
+ "preregistration_rule": "stopping rule 1: the benchmark gate must PASS before any proposer call; a FAIL is an honest stop with decomposition; no threshold may be revised after results are seen (Art. LIX)",
+ "gate_verdict": "FAIL",
+ "failed_thresholds": {
+  "recall_numeric_bearing": {
+   "measured": 0.1429,
+   "threshold": 0.25,
+   "pass": false
+  },
+  "recall_measurement_bearing": {
+   "measured": 0.1481,
+   "threshold": 0.25,
+   "pass": false
+  },
+  "numeric_bearing_rate": {
+   "measured": 0.1491,
+   "threshold": 0.15,
+   "pass": false
+  },
+  "abstract_bearing_rate": {
+   "measured": 0.4865,
+   "threshold": 0.6,
+   "pass": false
+  },
+  "year_recovery_rate": {
+   "measured": 0.3313,
+   "threshold": 0.5,
+   "pass": false
+  },
+  "baseline_recovery_rate": {
+   "measured": 0.0559,
+   "threshold": 0.1,
+   "pass": false
+  }
+ },
+ "passed_thresholds": {
+  "measurement_bearing_rate": {
+   "measured": 0.4037,
+   "threshold": 0.3,
+   "pass": true
+  },
+  "source_identity_recovery_rate": {
+   "measured": 1.0,
+   "threshold": 1.0,
+   "pass": true
+  },
+  "domain_diversity": {
+   "measured": 13,
+   "threshold": 5,
+   "pass": true
+  }
+ },
+ "cause_1_genuine_query_form_limit": {
+  "finding": "reference-set recall failed for reasons ATTRIBUTABLE TO THE SEALED LANE QUERY FORMS, not to infrastructure: the 12 unmatched numeric-bearing reference records are europepmc (9) and core (3) papers \u2014 europepmc was queried on every invocation (OK or honest EMPTY, never a provider failure in this window) and did not return them for the lane query strings; the corpus was acquired with the distinct form '{capability} experimental comparison', which outperformed all three sealed lane forms on reference recall. The lane query form is the dominant retrieval variable \u2014 consistent with the v2 arm's own finding that plain v1 form > family-expanded form on pool numeric density.",
+  "recall_numeric_bearing": {
+   "measured": 0.1429,
+   "threshold": 0.25,
+   "matched": [
+    "BENCH-014",
+    "BENCH-030"
+   ],
+   "missing_by_corpus_source": {
+    "europepmc": 9,
+    "core": 3
+   }
+  },
+  "recall_measurement_bearing": {
+   "measured": 0.1481,
+   "threshold": 0.25
+  },
+  "infrastructure_attribution": "NONE DOMINANT: the reference records are europepmc/core-indexed; OpenAlex unavailability cannot explain their absence (it never indexed them into these pools to begin with); SemanticScholar throttling removed a possible additional retrieval path but the corpus records were not S2-acquired either"
+ },
+ "cause_2_instrument_normalization_defects": {
+  "incident_id": "R412-GRADIENT-V3-NORM-METADATA-FIELDS",
+  "finding": "the fabric's canonicalization dropped every field a metadata-only source uniquely carried: crossref's issued_year (212/483 union records lost their year), google_patents' publication_date AND snippet (176/483 records lost their year AND their only text, leaving them zero-text pool ballast). best_record was only assigned when a source's record had a LONGER abstract than the incumbent, so metadata-only sources never contributed a representative at all. These defects deflated the RATE metrics the gate measured: year_recovery 0.3313 (threshold 0.5), abstract_bearing 0.4865 (0.6), numeric_bearing 0.1491 (0.15 \u2014 fails by 0.0009, one record's worth), baseline_recovery 0.0559 (0.1).",
+  "counterfactual_honesty": "what the repaired pipeline WOULD have measured is NOT_MEASURABLE_FROM_COMMITTED_BYTES: the dropped fields (issued_year, publication_date, snippet) were never persisted in the pool files, so no counterfactual rate may be asserted (Art. XXV). The repairs are pinned by 6 new tests; the NEXT arm measures their effect on fresh retrieval.",
+  "repair_scope": "canonical.py: publication_year now reads issued_year and publication_date; best_record is seeded by the first appearance (a record's representative is never emptier than any of its appearances; a strictly-richer abstract still replaces it). pipeline.py: the engine item abstract chain now falls back to snippet (the patent adapters' only text field). 97 legacy retrieval tests + 6 new pinning tests: 103/103 green.",
+  "verdict_influence": "NONE on this arm's verdict: the FAIL stands; the repairs exist for the next arm and cannot resurrect this gate (stopping rule 2: never retried with revised thresholds). The genuine recall failure (cause 1) is unaffected by these repairs."
+ },
+ "cause_3_infrastructure_incomplete": {
+  "openalex": {
+   "state": "RATE_LIMITED on all 39/39 invocations",
+   "provider_message_verbatim": "HTTP 429: {\"error\":\"Rate limit exceeded\",\"message\":\"Insufficient budget. This request costs $0.001 but you only have $0 remaining. Resets at midnight UTC. Need more? Add funds at https://openalex.org/pricing\",\" | Retry-After: 52599",
+   "class": "provider budget exhaustion ($0 remaining, resets midnight UTC) \u2014 Art. XXI.3: a provider failure, never evidence of absence; the OpenAlex lane contributed zero records by provider state, not by corpus coverage"
+  },
+  "semantic_scholar": {
+   "state": "RATE_LIMITED 28/39, PARSE_FAILED 9/39 (payload-missing-data under throttle), OK 2/39 \u2014 transient throttling with backoff recovery observed in the log"
+  },
+  "core": {
+   "state": "RATE_LIMITED 19/117 lane-state attempts; OK 98; contributed 109 records. CORE year recovery measured 0/109 \u2014 UNRESOLVED (connector maps publication_year correctly; a live payload probe is currently 429-blocked; whether the anonymous tier omits year_published stays UNKNOWN, Art. XXV)"
+  },
+  "other": "doaj TIMEOUT 3 + UNAVAILABLE 2; datacite EMPTY 100 (honest empties); openaire EMPTY 71",
+  "source_health_matrix": {
+   "arxiv": {
+    "OK": 39
+   },
+   "core": {
+    "OK": 98,
+    "RATE_LIMITED": 19
+   },
+   "crossref": {
+    "OK": 78
+   },
+   "datacite": {
+    "EMPTY": 100,
+    "OK": 56
+   },
+   "doaj": {
+    "EMPTY": 34,
+    "TIMEOUT": 3,
+    "UNAVAILABLE": 2
+   },
+   "europepmc": {
+    "OK": 26,
+    "EMPTY": 13
+   },
+   "google_patents": {
+    "OK": 36,
+    "EMPTY": 3
+   },
+   "openaire": {
+    "EMPTY": 71,
+    "OK": 7
+   },
+   "openalex": {
+    "RATE_LIMITED": 39
+   },
+   "semantic_scholar": {
+    "RATE_LIMITED": 28,
+    "PARSE_FAILED": 9,
+    "OK": 2
+   }
+  }
+ },
+ "what_the_engine_would_have_seen": {
+  "note": "the deterministic FEAL trajectory/corroboration layer (directive items 5-6) run over the COMMITTED pool bytes \u2014 quantifying the evidence starvation the gate correctly stopped the arm over. LLM-free, no proposer call was ever made.",
+  "n_trajectories": 65,
+  "n_multi_point": 21,
+  "n_with_velocity": 2,
+  "corroboration_distribution": {
+   "SINGLE_SOURCE_SIGNAL": 19,
+   "UNKNOWN": 44,
+   "REPLICATED_TRAJECTORY": 2
+  },
+  "n_fes_positive_records": 163,
+  "n_union_records": 488,
+  "per_rung": {
+   "active alignment actuation control bandwidth": {
+    "n_records": 61,
+    "n_trajectories": 6,
+    "top_trajectory": {
+     "capability_rung": "active alignment actuation control bandwidth",
+     "metric": "accuracy",
+     "unit": "%",
+     "n_points": 5,
+     "points": [
+      {
+       "record_id": "doi:10.3390/mi17050592",
+       "title": "Comparative Evaluation of Optical Alignment Algorithms for Integrated Probe Cards in Photonic Wafer Testing.",
+       "year": 2026,
+       "value": 100.0,
+       "value_basis": "POINT_VALUE",
+       "span": "100%",
+       "source": "europepmc",
+       "source_family": "biomedical_pubmed_line",
+       "domain": "semiconductor_fab",
+       "baseline_comparator": [
+        "baseline"
+       ],
+       "improvement_direction": [],
+       "sentence": "Experimental validation across eight die positions confirms 100% success rate for both Local Bayesian (98.24% accuracy in 99.87 arbitrary units (a.u.)) and Fixed Gradient (99.18% accuracy in 154.01 a.u.) baseline algorithms.",
+       "record_fes": 78
+      },
+      {
+       "record_id": "doi:10.3390/mi17050592",
+       "title": "Comparative Evaluation of Optical Alignment Algorithms for Integrated Probe Cards in Photonic Wafer Testing.",
+       "year": 2026,
+       "value": 98.24,
+       "value_basis": "POINT_VALUE",
+       "span": "98.24%",
+       "source": "europepmc",
+       "source_family": "biomedical_pubmed_line",
+       "domain": "semiconductor_fab",
+       "baseline_comparator": [
+        "baseline"
+       ],
+       "improvement_direction": [],
+       "sentence": "Experimental validation across eight die positions confirms 100% success rate for both Local Bayesian (98.24% accuracy in 99.87 arbitrary units (a.u.)) and Fixed Gradient (99.18% accuracy in 154.01 a.u.) baseline algorithms.",
+       "record_fes": 78
+      },
+      {
+       "record_id": "doi:10.3390/mi17050592",
+       "title": "Comparative Evaluation of Optical Alignment Algorithms for Integrated Probe Cards in Photonic Wafer Testing.",
+       "year": 2026,
+       "value": 99.18,
+       "value_basis": "POINT_VALUE",
+       "span": "99.18%",
+       "source": "europepmc",
+       "source_family": "biomedical_pubmed_line",
+       "domain": "semiconductor_fab",
+       "baseline_comparator": [
+        "baseline"
+       ],
+       "improvement_direction": [],
+       "sentence": "Experimental validation across eight die positions confirms 100% success rate for both Local Bayesian (98.24% accuracy in 99.87 arbitrary units (a.u.)) and Fixed Gradient (99.18% accuracy in 154.01 a.u.) baseline algorithms.",
+       "record_fes": 78
+      },
+      {
+       "record_id": "doi:10.3390/mi17050592",
+       "title": "Comparative Evaluation of Optical Alignment Algorithms for Integrated Probe Cards in Photonic Wafer Testing.",
+       "year": 2026,
+       "value": 95.8,
+       "value_basis": "POINT_VALUE",
+       "span": "95.8%",
+       "source": "europepmc",
+       "source_family": "biomedical_pubmed_line",
+       "domain": "semiconductor_fab",
+       "baseline_comparator": [],
+       "improvement_direction": [
+        "achieves"
+       ],
+       "sentence": "Fixed Gradient achieves the highest reliability (95.8%) with 99.4% average accuracy across all operating conditions.",
+       "record_fes": 78
+      },
+      {
+       "record_id": "doi:10.3390/mi17050592",
+       "title": "Comparative Evaluation of Optical Alignment Algorithms for Integrated Probe Cards in Photonic Wafer Testing.",
+       "year": 2026,
+       "value": 99.4,
+       "value_basis": "POINT_VALUE",
+       "span": "99.4%",
+       "source": "europepmc",
+       "source_family": "biomedical_pubmed_line",
+       "domain": "semiconductor_fab",
+       "baseline_comparator": [],
+       "improvement_direction": [
+        "achieves"
+       ],
+       "sentence": "Fixed Gradient achieves the highest reliability (95.8%) with 99.4% average accuracy across all operating conditions.",
+       "record_fes": 78
+      }
+     ],
+     "years": [
+      2026,
+      2026,
+      2026,
+      2026,
+      2026
+     ],
+     "year_span": 0,
+     "sources": [
+      "europepmc"
+     ],
+     "source_families": [
+      "biomedical_pubmed_line"
+     ],
+     "domains": [
+      "semiconductor_fab"
+     ],
+     "capability_velocity": null,
+     "velocity_direction": null,
+     "corroboration": "SINGLE_SOURCE_SIGNAL",
+     "trajectory_score": 10,
+     "trajectory_score_components": {
+      "three_or_more_points": 10
+     },
+     "unpointed_evidence_count": 0
+    },
+    "corroboration_counts": {
+     "SINGLE_SOURCE_SIGNAL": 3,
+     "UNKNOWN": 3
+    }
+   },
+   "amine substitution novelty margin": {
+    "n_records": 44,
+    "n_trajectories": 5,
+    "top_trajectory": {
+     "capability_rung": "amine substitution novelty margin",
+     "metric": "sensitivity",
+     "unit": "Hz",
+     "n_points": 1,
+     "points": [
+      {
+       "record_id": "doi:10.48550/arxiv.2308.03822",
+       "title": "Search for Eccentric Black Hole Coalescences during the Third Observing Run of LIGO and Virgo",
+       "year": 2023,
+       "value": 15.0,
+       "value_basis": "POINT_VALUE",
+       "span": "15 Hz",
+       "source": "arxiv",
+       "source_family": "preprint_origin",
+       "domain": "other_unclassified",
+       "baseline_comparator": [],
+       "improvement_direction": [],
+       "sentence": "We determine the sensitivity of our search to high-mass (total mass $M>70$ $M_\\odot$) binaries covering eccentricities up to 0.3 at 15 Hz orbital frequency, and use this to compare model predictions to search results.",
+       "record_fes": 43
+      }
+     ],
+     "years": [
+      2023
+     ],
+     "year_span": 0,
+     "sources": [
+      "arxiv"
+     ],
+     "source_families": [
+      "preprint_origin"
+     ],
+     "domains": [
+      "other_unclassified"
+     ],
+     "capability_velocity": null,
+     "velocity_direction": null,
+     "corroboration": "UNKNOWN",
+     "trajectory_score": 0,
+     "trajectory_score_components": {},
+     "unpointed_evidence_count": 0
+    },
+    "corroboration_counts": {
+     "UNKNOWN": 5
+    }
+   },
+   "control oriented dynamic modeling": {
+    "n_records": 57,
+    "n_trajectories": 2,
+    "top_trajectory": {
+     "capability_rung": "control oriented dynamic modeling",
+     "metric": "accuracy",
+     "unit": "%",
+     "n_points": 2,
+     "points": [
+      {
+       "record_id": "doi:10.1115/1.4066268",
+       "title": "Control-Oriented modeling of a solid oxide fuel cell affected by Redox cycling using a novel deep learning approach",
+       "year": 2024,
+       "value": 31.0,
+       "value_basis": "POINT_VALUE",
+       "span": "31%",
+       "source": "semantic_scholar",
+       "source_family": "scholarly_graph_s2",
+       "domain": "thermal_management",
+       "baseline_comparator": [
+        "compared",
+        "benchmark"
+       ],
+       "improvement_direction": [
+        "improve",
+        "improvement",
+        "enhancement"
+       ],
+       "sentence": "The results indicate 31% accuracy improvement and 27% computation speed enhancement compared to the benchmarks.",
+       "record_fes": 78
+      },
+      {
+       "record_id": "doi:10.1115/1.4066268",
+       "title": "Control-Oriented modeling of a solid oxide fuel cell affected by Redox cycling using a novel deep learning approach",
+       "year": 2024,
+       "value": 27.0,
+       "value_basis": "POINT_VALUE",
+       "span": "27%",
+       "source": "semantic_scholar",
+       "source_family": "scholarly_graph_s2",
+       "domain": "thermal_management",
+       "baseline_comparator": [
+        "compared",
+        "benchmark"
+       ],
+       "improvement_direction": [
+        "improve",
+        "improvement",
+        "enhancement"
+       ],
+       "sentence": "The results indicate 31% accuracy improvement and 27% computation speed enhancement compared to the benchmarks.",
+       "record_fes": 78
+      }
+     ],
+     "years": [
+      2024,
+      2024
+     ],
+     "year_span": 0,
+     "sources": [
+      "semantic_scholar"
+     ],
+     "source_families": [
+      "scholarly_graph_s2"
+     ],
+     "domains": [
+      "thermal_management"
+     ],
+     "capability_velocity": null,
+     "velocity_direction": null,
+     "corroboration": "SINGLE_SOURCE_SIGNAL",
+     "trajectory_score": 0,
+     "trajectory_score_components": {},
+     "unpointed_evidence_count": 0
+    },
+    "corroboration_counts": {
+     "SINGLE_SOURCE_SIGNAL": 2
+    }
+   },
+   "control oriented modeling": {
+    "n_records": 54,
+    "n_trajectories": 4,
+    "top_trajectory": {
+     "capability_rung": "control oriented modeling",
+     "metric": "loss",
+     "unit": "dB",
+     "n_points": 0,
+     "points": [],
+     "years": [],
+     "year_span": 0,
+     "sources": [],
+     "source_families": [],
+     "domains": [],
+     "capability_velocity": null,
+     "velocity_direction": null,
+     "corroboration": "UNKNOWN",
+     "trajectory_score": 0,
+     "trajectory_score_components": {},
+     "unpointed_evidence_count": 2
+    },
+    "corroboration_counts": {
+     "UNKNOWN": 4
+    }
+   },
+   "device switching energy": {
+    "n_records": 38,
+    "n_trajectories": 9,
+    "top_trajectory": {
+     "capability_rung": "device switching energy",
+     "metric": "loss",
+     "unit": "GHz",
+     "n_points": 2,
+     "points": [
+      {
+       "record_id": "doi:10.1038/s41467-026-74534-7",
+       "title": "Sub-femtosecond figure-of-merit millimeter-wave switches via solution-processed MoS&lt;sub&gt;2&lt;/sub&gt; for 6G radio-frequency front-ends.",
+       "year": 2026,
+       "value": 100.0,
+       "value_basis": "POINT_VALUE",
+       "span": "100 GHz",
+       "source": "europepmc",
+       "source_family": "biomedical_pubmed_line",
+       "domain": "other_unclassified",
+       "baseline_comparator": [],
+       "improvement_direction": [],
+       "sentence": "Next-generation 6G communication requires radio-frequency components capable of operating above 100 GHz with low loss, high isolation, and zero static power-requirements that challenge complementary metal-oxide-semiconductor (CMOS) and microelectromechanical systems (MEMS) technologies.",
+       "record_fes": 78
+      },
+      {
+       "record_id": "doi:10.1038/s41467-026-74534-7",
+       "title": "Sub-femtosecond figure-of-merit millimeter-wave switches via solution-processed MoS&lt;sub&gt;2&lt;/sub&gt; for 6G radio-frequency front-ends.",
+       "year": 2026,
+       "value": 67.0,
+       "value_basis": "POINT_VALUE",
+       "span": "67 GHz",
+       "source": "europepmc",
+       "source_family": "biomedical_pubmed_line",
+       "domain": "other_unclassified",
+       "baseline_comparator": [],
+       "improvement_direction": [],
+       "sentence": "The resulting switches achieve an low insertion loss ( 35 dB) at 67 GHz.",
+       "record_fes": 78
+      }
+     ],
+     "years": [
+      2026,
+      2026
+     ],
+     "year_span": 0,
+     "sources": [
+      "europepmc"
+     ],
+     "source_families": [
+      "biomedical_pubmed_line"
+     ],
+     "domains": [
+      "other_unclassified"
+     ],
+     "capability_velocity": null,
+     "velocity_direction": null,
+     "corroboration": "SINGLE_SOURCE_SIGNAL",
+     "trajectory_score": 0,
+     "trajectory_score_components": {},
+     "unpointed_evidence_count": 0
+    },
+    "corroboration_counts": {
+     "SINGLE_SOURCE_SIGNAL": 3,
+     "UNKNOWN": 6
+    }
+   },
+   "differential measurement instrumentation": {
+    "n_records": 38,
+    "n_trajectories": 1,
+    "top_trajectory": {
+     "capability_rung": "differential measurement instrumentation",
+     "metric": "resolution",
+     "unit": "GHz",
+     "n_points": 1,
+     "points": [
+      {
+       "record_id": "doi:10.48550/arxiv.1106.2173",
+       "title": "Design and performance of the Spider instrument",
+       "year": 2011,
+       "value": 280.0,
+       "value_basis": "POINT_VALUE",
+       "span": "280 GHz",
+       "source": "arxiv",
+       "source_family": "preprint_origin",
+       "domain": "other_unclassified",
+       "baseline_comparator": [],
+       "improvement_direction": [],
+       "sentence": "Spider is a balloon-borne cosmic microwave background polarization imager that will map part of the sky at 90, 145, and 280 GHz with sub-degree resolution and high sensitivity.",
+       "record_fes": 37
+      }
+     ],
+     "years": [
+      2011
+     ],
+     "year_span": 0,
+     "sources": [
+      "arxiv"
+     ],
+     "source_families": [
+      "preprint_origin"
+     ],
+     "domains": [
+      "other_unclassified"
+     ],
+     "capability_velocity": null,
+     "velocity_direction": null,
+     "corroboration": "UNKNOWN",
+     "trajectory_score": 0,
+     "trajectory_score_components": {},
+     "unpointed_evidence_count": 0
+    },
+    "corroboration_counts": {
+     "UNKNOWN": 1
+    }
+   },
+   "dimensional regime consistency validation": {
+    "n_records": 53,
+    "n_trajectories": 9,
+    "top_trajectory": {
+     "capability_rung": "dimensional regime consistency validation",
+     "metric": "accuracy",
+     "unit": "%",
+     "n_points": 2,
+     "points": [
+      {
+       "record_id": "doi:10.3390/s26082538",
+       "title": "TC-KAN: Time-Conditioned Kolmogorov-Arnold Networks with Time-Dependent Activations for Long-Term Time Series Forecasting.",
+       "year": 2026,
+       "value": 40.0,
+       "value_basis": "POINT_VALUE",
+       "span": "40%",
+       "source": "europepmc",
+       "source_family": "biomedical_pubmed_line",
+       "domain": "other_unclassified",
+       "baseline_comparator": [],
+       "improvement_direction": [
+        "achieves"
+       ],
+       "sentence": "TC-KAN achieves superior or competitive accuracy in most configurations while requiring merely 51K parameters-approximately 40% of DLinear and \u223c100\u00d7 fewer than iTransformer.",
+       "record_fes": 78
+      },
+      {
+       "record_id": "doi:10.3390/s26134192",
+       "title": "Adapting a Foundation Monocular Depth Model for Soccer Video: From Synthetic Supervision to Match-Level Reliability.",
+       "year": 2026,
+       "value": 5.9,
+       "value_basis": "POINT_VALUE",
+       "span": "5.9%",
+       "source": "europepmc",
+       "source_family": "biomedical_pubmed_line",
+       "domain": "other_unclassified",
+       "baseline_comparator": [],
+       "improvement_direction": [
+        "improve",
+        "improved",
+        "higher"
+       ],
+       "sentence": "The higher-resolution configuration improved the validation AbsRel by 5.9%, while the default retained a better accuracy-cost balance.",
+       "record_fes": 68
+      }
+     ],
+     "years": [
+      2026,
+      2026
+     ],
+     "year_span": 0,
+     "sources": [
+      "europepmc"
+     ],
+     "source_families": [
+      "biomedical_pubmed_line"
+     ],
+     "domains": [
+      "other_unclassified"
+     ],
+     "capability_velocity": null,
+     "velocity_direction": null,
+     "corroboration": "SINGLE_SOURCE_SIGNAL",
+     "trajectory_score": 0,
+     "trajectory_score_components": {},
+     "unpointed_evidence_count": 0
+    },
+    "corroboration_counts": {
+     "SINGLE_SOURCE_SIGNAL": 1,
+     "UNKNOWN": 8
+    }
+   },
+   "material-property-consistent effectiveness prediction": {
+    "n_records": 43,
+    "n_trajectories": 4,
+    "top_trajectory": {
+     "capability_rung": "material-property-consistent effectiveness prediction",
+     "metric": "accuracy",
+     "unit": "%",
+     "n_points": 4,
+     "points": [
+      {
+       "record_id": "doi:10.48550/arxiv.2310.02812",
+       "title": "Time-Series Classification in Smart Manufacturing Systems: An Experimental Evaluation of State-of-the-Art Machine Learning Algorithms",
+       "year": 2023,
+       "value": 96.6,
+       "value_basis": "POINT_VALUE",
+       "span": "96.6%",
+       "source": "arxiv",
+       "source_family": "preprint_origin",
+       "domain": "metrology_sensing",
+       "baseline_comparator": [],
+       "improvement_direction": [],
+       "sentence": "Based on the results, ResNet, DrCIF, InceptionTime, and ARSENAL are the top-performing algorithms, boasting an average accuracy of over 96.6% across all 22 manufacturing TSC datasets.",
+       "record_fes": 68
+      },
+      {
+       "record_id": "doi:10.1007/s10856-026-07070-x",
+       "title": "Nanostructured electrode materials and flexible-substrate engineering for wearable multi-analyte biosensors in diabetes monitoring and personalized care: a comp",
+       "year": 2026,
+       "value": 94.0,
+       "value_basis": "POINT_VALUE",
+       "span": "94%",
+       "source": "europepmc",
+       "source_family": "biomedical_pubmed_line",
+       "domain": "batteries_storage",
+       "baseline_comparator": [],
+       "improvement_direction": [],
+       "sentence": "AI-based predictive algorithms can forecast glucose excursions 30-60 min in advance, exhibiting an accuracy exceeding 94%.",
+       "record_fes": 63
+      },
+      {
+       "record_id": "doi:10.1039/d6ra05362a",
+       "title": "A catalyst-aware explainable machine learning framework for biodiesel yield prediction over metal-doped biochar and activated carbon catalysts.",
+       "year": 2026,
+       "value": 3.27,
+       "value_basis": "POINT_VALUE",
+       "span": "3.27%",
+       "source": "europepmc",
+       "source_family": "biomedical_pubmed_line",
+       "domain": "chemical_process",
+       "baseline_comparator": [],
+       "improvement_direction": [
+        "achieved"
+       ],
+       "sentence": "The neural network model achieved the highest predictive accuracy on unseen data, with RMSE of 3.27%, MAE of 1.64%, and R 2 of 0.95, whereas linear regression showed the weakest performance, highlighting the nonlinear behavior of the catalytic system.",
+       "record_fes": 78
+      },
+      {
+       "record_id": "doi:10.1039/d6ra05362a",
+       "title": "A catalyst-aware explainable machine learning framework for biodiesel yield prediction over metal-doped biochar and activated carbon catalysts.",
+       "year": 2026,
+       "value": 1.64,
+       "value_basis": "POINT_VALUE",
+       "span": "1.64%",
+       "source": "europepmc",
+       "source_family": "biomedical_pubmed_line",
+       "domain": "chemical_process",
+       "baseline_comparator": [],
+       "improvement_direction": [
+        "achieved"
+       ],
+       "sentence": "The neural network model achieved the highest predictive accuracy on unseen data, with RMSE of 3.27%, MAE of 1.64%, and R 2 of 0.95, whereas linear regression showed the weakest performance, highlighting the nonlinear behavior of the catalytic system.",
+       "record_fes": 78
+      }
+     ],
+     "years": [
+      2023,
+      2026,
+      2026,
+      2026
+     ],
+     "year_span": 3,
+     "sources": [
+      "arxiv",
+      "europepmc"
+     ],
+     "source_families": [
+      "biomedical_pubmed_line",
+      "preprint_origin"
+     ],
+     "domains": [
+      "batteries_storage",
+      "chemical_process",
+      "metrology_sensing"
+     ],
+     "capability_velocity": -31.653333,
+     "velocity_direction": "decrease",
+     "corroboration": "REPLICATED_TRAJECTORY",
+     "trajectory_score": 50,
+     "trajectory_score_components": {
+      "replicated_trajectory": 25,
+      "three_or_more_points": 10,
+      "domain_diversity_two_plus": 10,
+      "year_span_three_plus": 5
+     },
+     "unpointed_evidence_count": 0
+    },
+    "corroboration_counts": {
+     "REPLICATED_TRAJECTORY": 1,
+     "SINGLE_SOURCE_SIGNAL": 2,
+     "UNKNOWN": 1
+    }
+   },
+   "maximum power point tracking efficiency": {
+    "n_records": 45,
+    "n_trajectories": 7,
+    "top_trajectory": {
+     "capability_rung": "maximum power point tracking efficiency",
+     "metric": "energy",
+     "unit": "%",
+     "n_points": 4,
+     "points": [
+      {
+       "record_id": "doi:10.1038/s41598-026-48744-4",
+       "title": "Chaotic L\u00e9vy flight Grey wolf optimizer for optimal design and techno-economic assessment of grid-connected solar photovoltaic power plant in Assam.",
+       "year": 2026,
+       "value": 14.2,
+       "value_basis": "POINT_VALUE",
+       "span": "14.2%",
+       "source": "europepmc",
+       "source_family": "biomedical_pubmed_line",
+       "domain": "renewables_pv",
+       "baseline_comparator": [
+        "compared",
+        "conventional"
+       ],
+       "improvement_direction": [
+        "improve",
+        "improvement",
+        "achieves"
+       ],
+       "sentence": "The optimized 1 MWp solar plant achieves annual energy yield of 1,542 MWh, performance ratio of 79.8%, capacity utilization factor of 17.6%, and levelized cost of energy of \u20b9 3.89/kWh, representing improvements of 14.2%, 11.8%, 28.5%, and 23.7%, respectively, compared to the conventional design.",
+       "record_fes": 78
+      },
+      {
+       "record_id": "doi:10.1038/s41598-026-48744-4",
+       "title": "Chaotic L\u00e9vy flight Grey wolf optimizer for optimal design and techno-economic assessment of grid-connected solar photovoltaic power plant in Assam.",
+       "year": 2026,
+       "value": 11.8,
+       "value_basis": "POINT_VALUE",
+       "span": "11.8%",
+       "source": "europepmc",
+       "source_family": "biomedical_pubmed_line",
+       "domain": "renewables_pv",
+       "baseline_comparator": [
+        "compared",
+        "conventional"
+       ],
+       "improvement_direction": [
+        "improve",
+        "improvement",
+        "achieves"
+       ],
+       "sentence": "The optimized 1 MWp solar plant achieves annual energy yield of 1,542 MWh, performance ratio of 79.8%, capacity utilization factor of 17.6%, and levelized cost of energy of \u20b9 3.89/kWh, representing improvements of 14.2%, 11.8%, 28.5%, and 23.7%, respectively, compared to the conventional design.",
+       "record_fes": 78
+      },
+      {
+       "record_id": "doi:10.1038/s41598-026-48744-4",
+       "title": "Chaotic L\u00e9vy flight Grey wolf optimizer for optimal design and techno-economic assessment of grid-connected solar photovoltaic power plant in Assam.",
+       "year": 2026,
+       "value": 28.5,
+       "value_basis": "POINT_VALUE",
+       "span": "28.5%",
+       "source": "europepmc",
+       "source_family": "biomedical_pubmed_line",
+       "domain": "renewables_pv",
+       "baseline_comparator": [
+        "compared",
+        "conventional"
+       ],
+       "improvement_direction": [
+        "improve",
+        "improvement",
+        "achieves"
+       ],
+       "sentence": "The optimized 1 MWp solar plant achieves annual energy yield of 1,542 MWh, performance ratio of 79.8%, capacity utilization factor of 17.6%, and levelized cost of energy of \u20b9 3.89/kWh, representing improvements of 14.2%, 11.8%, 28.5%, and 23.7%, respectively, compared to the conventional design.",
+       "record_fes": 78
+      },
+      {
+       "record_id": "doi:10.1038/s41598-026-48744-4",
+       "title": "Chaotic L\u00e9vy flight Grey wolf optimizer for optimal design and techno-economic assessment of grid-connected solar photovoltaic power plant in Assam.",
+       "year": 2026,
+       "value": 23.7,
+       "value_basis": "POINT_VALUE",
+       "span": "23.7%",
+       "source": "europepmc",
+       "source_family": "biomedical_pubmed_line",
+       "domain": "renewables_pv",
+       "baseline_comparator": [
+        "compared",
+        "conventional"
+       ],
+       "improvement_direction": [
+        "improve",
+        "improvement",
+        "achieves"
+       ],
+       "sentence": "The optimized 1 MWp solar plant achieves annual energy yield of 1,542 MWh, performance ratio of 79.8%, capacity utilization factor of 17.6%, and levelized cost of energy of \u20b9 3.89/kWh, representing improvements of 14.2%, 11.8%, 28.5%, and 23.7%, respectively, compared to the conventional design.",
+       "record_fes": 78
+      }
+     ],
+     "years": [
+      2026,
+      2026,
+      2026,
+      2026
+     ],
+     "year_span": 0,
+     "sources": [
+      "europepmc"
+     ],
+     "source_families": [
+      "biomedical_pubmed_line"
+     ],
+     "domains": [
+      "renewables_pv"
+     ],
+     "capability_velocity": null,
+     "velocity_direction": null,
+     "corroboration": "SINGLE_SOURCE_SIGNAL",
+     "trajectory_score": 10,
+     "trajectory_score_components": {
+      "three_or_more_points": 10
+     },
+     "unpointed_evidence_count": 0
+    },
+    "corroboration_counts": {
+     "SINGLE_SOURCE_SIGNAL": 4,
+     "UNKNOWN": 3
+    }
+   },
+   "novelty of defect detection method": {
+    "n_records": 63,
+    "n_trajectories": 3,
+    "top_trajectory": {
+     "capability_rung": "novelty of defect detection method",
+     "metric": "accuracy",
+     "unit": "%",
+     "n_points": 2,
+     "points": [
+      {
+       "record_id": "doi:10.48550/arxiv.2302.13317",
+       "title": "TransferD2: Automated Defect Detection Approach in Smart Manufacturing using Transfer Learning Techniques",
+       "year": 2023,
+       "value": 95.72,
+       "value_basis": "POINT_VALUE",
+       "span": "95.72%",
+       "source": "arxiv",
+       "source_family": "preprint_origin",
+       "domain": "metrology_sensing",
+       "baseline_comparator": [],
+       "improvement_direction": [],
+       "sentence": "Our results show that ResNet101V2 performs best on the source data with an accuracy of 95.72%.",
+       "record_fes": 53
+      },
+      {
+       "record_id": "doi:10.48550/arxiv.2302.13317",
+       "title": "TransferD2: Automated Defect Detection Approach in Smart Manufacturing using Transfer Learning Techniques",
+       "year": 2023,
+       "value": 91.0,
+       "value_basis": "POINT_VALUE",
+       "span": "91.00%",
+       "source": "arxiv",
+       "source_family": "preprint_origin",
+       "domain": "metrology_sensing",
+       "baseline_comparator": [],
+       "improvement_direction": [],
+       "sentence": "Xception performs best on the target data with an accuracy of 91.00% and also provides a more accurate prediction of the defects on the target images.",
+       "record_fes": 53
+      }
+     ],
+     "years": [
+      2023,
+      2023
+     ],
+     "year_span": 0,
+     "sources": [
+      "arxiv"
+     ],
+     "source_families": [
+      "preprint_origin"
+     ],
+     "domains": [
+      "metrology_sensing"
+     ],
+     "capability_velocity": null,
+     "velocity_direction": null,
+     "corroboration": "SINGLE_SOURCE_SIGNAL",
+     "trajectory_score": 0,
+     "trajectory_score_components": {},
+     "unpointed_evidence_count": 0
+    },
+    "corroboration_counts": {
+     "SINGLE_SOURCE_SIGNAL": 2,
+     "UNKNOWN": 1
+    }
+   },
+   "predictive novelty differentiation": {
+    "n_records": 50,
+    "n_trajectories": 11,
+    "top_trajectory": {
+     "capability_rung": "predictive novelty differentiation",
+     "metric": "efficiency",
+     "unit": "%",
+     "n_points": 7,
+     "points": [
+      {
+       "record_id": "doi:10.48550/arxiv.2511.14590",
+       "title": "Initial performance results of the JUNO detector",
+       "year": 2025,
+       "value": 99.9,
+       "value_basis": "POINT_VALUE",
+       "span": "99.9%",
+       "source": "arxiv",
+       "source_family": "preprint_origin",
+       "domain": "other_unclassified",
+       "baseline_comparator": [],
+       "improvement_direction": [
+        "achieves"
+       ],
+       "sentence": "The water Cherenkov detector achieves a muon detection efficiency better than 99.9% for muons traversing the liquid scintillator volume.",
+       "record_fes": 63
+      },
+      {
+       "record_id": "doi:10.3390/biomimetics11070478",
+       "title": "Bio-Inspired Explainable Evolutionary Rule Mining for Thermodynamic Performance Assessment of a Solar Greenhouse Dryer.",
+       "year": 2026,
+       "value": 17.7,
+       "value_basis": "POINT_VALUE",
+       "span": "17.7%",
+       "source": "europepmc",
+       "source_family": "biomedical_pubmed_line",
+       "domain": "other_unclassified",
+       "baseline_comparator": [],
+       "improvement_direction": [],
+       "sentence": "The experimental results indicated that energy efficiency ranged from 17.7% to 29.2%, drying efficiency from 1.0% to 9.7%, and exergy efficiency from 5.6% to 8.4%.",
+       "record_fes": 68
+      },
+      {
+       "record_id": "doi:10.3390/biomimetics11070478",
+       "title": "Bio-Inspired Explainable Evolutionary Rule Mining for Thermodynamic Performance Assessment of a Solar Greenhouse Dryer.",
+       "year": 2026,
+       "value": 29.2,
+       "value_basis": "POINT_VALUE",
+       "span": "29.2%",
+       "source": "europepmc",
+       "source_family": "biomedical_pubmed_line",
+       "domain": "other_unclassified",
+       "baseline_comparator": [],
+       "improvement_direction": [],
+       "sentence": "The experimental results indicated that energy efficiency ranged from 17.7% to 29.2%, drying efficiency from 1.0% to 9.7%, and exergy efficiency from 5.6% to 8.4%.",
+       "record_fes": 68
+      },
+      {
+       "record_id": "doi:10.3390/biomimetics11070478",
+       "title": "Bio-Inspired Explainable Evolutionary Rule Mining for Thermodynamic Performance Assessment of a Solar Greenhouse Dryer.",
+       "year": 2026,
+       "value": 1.0,
+       "value_basis": "POINT_VALUE",
+       "span": "1.0%",
+       "source": "europepmc",
+       "source_family": "biomedical_pubmed_line",
+       "domain": "other_unclassified",
+       "baseline_comparator": [],
+       "improvement_direction": [],
+       "sentence": "The experimental results indicated that energy efficiency ranged from 17.7% to 29.2%, drying efficiency from 1.0% to 9.7%, and exergy efficiency from 5.6% to 8.4%.",
+       "record_fes": 68
+      },
+      {
+       "record_id": "doi:10.3390/biomimetics11070478",
+       "title": "Bio-Inspired Explainable Evolutionary Rule Mining for Thermodynamic Performance Assessment of a Solar Greenhouse Dryer.",
+       "year": 2026,
+       "value": 9.7,
+       "value_basis": "POINT_VALUE",
+       "span": "9.7%",
+       "source": "europepmc",
+       "source_family": "biomedical_pubmed_line",
+       "domain": "other_unclassified",
+       "baseline_comparator": [],
+       "improvement_direction": [],
+       "sentence": "The experimental results indicated that energy efficiency ranged from 17.7% to 29.2%, drying efficiency from 1.0% to 9.7%, and exergy efficiency from 5.6% to 8.4%.",
+       "record_fes": 68
+      },
+      {
+       "record_id": "doi:10.3390/biomimetics11070478",
+       "title": "Bio-Inspired Explainable Evolutionary Rule Mining for Thermodynamic Performance Assessment of a Solar Greenhouse Dryer.",
+       "year": 2026,
+       "value": 5.6,
+       "value_basis": "POINT_VALUE",
+       "span": "5.6%",
+       "source": "europepmc",
+       "source_family": "biomedical_pubmed_line",
+       "domain": "other_unclassified",
+       "baseline_comparator": [],
+       "improvement_direction": [],
+       "sentence": "The experimental results indicated that energy efficiency ranged from 17.7% to 29.2%, drying efficiency from 1.0% to 9.7%, and exergy efficiency from 5.6% to 8.4%.",
+       "record_fes": 68
+      },
+      {
+       "record_id": "doi:10.3390/biomimetics11070478",
+       "title": "Bio-Inspired Explainable Evolutionary Rule Mining for Thermodynamic Performance Assessment of a Solar Greenhouse Dryer.",
+       "year": 2026,
+       "value": 8.4,
+       "value_basis": "POINT_VALUE",
+       "span": "8.4%",
+       "source": "europepmc",
+       "source_family": "biomedical_pubmed_line",
+       "domain": "other_unclassified",
+       "baseline_comparator": [],
+       "improvement_direction": [],
+       "sentence": "The experimental results indicated that energy efficiency ranged from 17.7% to 29.2%, drying efficiency from 1.0% to 9.7%, and exergy efficiency from 5.6% to 8.4%.",
+       "record_fes": 68
+      }
+     ],
+     "years": [
+      2025,
+      2026,
+      2026,
+      2026,
+      2026,
+      2026,
+      2026
+     ],
+     "year_span": 1,
+     "sources": [
+      "arxiv",
+      "europepmc"
+     ],
+     "source_families": [
+      "biomedical_pubmed_line",
+      "preprint_origin"
+     ],
+     "domains": [
+      "other_unclassified"
+     ],
+     "capability_velocity": -91.5,
+     "velocity_direction": "decrease",
+     "corroboration": "REPLICATED_TRAJECTORY",
+     "trajectory_score": 35,
+     "trajectory_score_components": {
+      "replicated_trajectory": 25,
+      "three_or_more_points": 10
+     },
+     "unpointed_evidence_count": 0
+    },
+    "corroboration_counts": {
+     "REPLICATED_TRAJECTORY": 1,
+     "SINGLE_SOURCE_SIGNAL": 2,
+     "UNKNOWN": 8
+    }
+   },
+   "primary evidence quantified prediction": {
+    "n_records": 36,
+    "n_trajectories": 2,
+    "top_trajectory": {
+     "capability_rung": "primary evidence quantified prediction",
+     "metric": "accuracy",
+     "unit": "cycles",
+     "n_points": 1,
+     "points": [
+      {
+       "record_id": "doi:10.3390/s26072230",
+       "title": "A Metric-Driven Evaluation Framework for Remaining Useful Life Prognosis with Quantified Uncertainty.",
+       "year": 2026,
+       "value": 8.1829,
+       "value_basis": "POINT_VALUE",
+       "span": "8.1829 cycles",
+       "source": "europepmc",
+       "source_family": "biomedical_pubmed_line",
+       "domain": "other_unclassified",
+       "baseline_comparator": [],
+       "improvement_direction": [],
+       "sentence": "Experimental validation on the IMS bearing dataset demonstrates superior RUL prediction accuracy, evidenced by the lowest Root Mean Square Error (RMSE) of 8.1829 cycles, and a PICP of 0.59416.",
+       "record_fes": 68
+      }
+     ],
+     "years": [
+      2026
+     ],
+     "year_span": 0,
+     "sources": [
+      "europepmc"
+     ],
+     "source_families": [
+      "biomedical_pubmed_line"
+     ],
+     "domains": [
+      "other_unclassified"
+     ],
+     "capability_velocity": null,
+     "velocity_direction": null,
+     "corroboration": "UNKNOWN",
+     "trajectory_score": 0,
+     "trajectory_score_components": {},
+     "unpointed_evidence_count": 0
+    },
+    "corroboration_counts": {
+     "UNKNOWN": 2
+    }
+   },
+   "turbulent regime porous insert tradeoff": {
+    "n_records": 66,
+    "n_trajectories": 2,
+    "top_trajectory": {
+     "capability_rung": "turbulent regime porous insert tradeoff",
+     "metric": "accuracy",
+     "unit": "%",
+     "n_points": 1,
+     "points": [
+      {
+       "record_id": "doi:10.48550/arxiv.2310.02812",
+       "title": "Time-Series Classification in Smart Manufacturing Systems: An Experimental Evaluation of State-of-the-Art Machine Learning Algorithms",
+       "year": 2023,
+       "value": 96.6,
+       "value_basis": "POINT_VALUE",
+       "span": "96.6%",
+       "source": "arxiv",
+       "source_family": "preprint_origin",
+       "domain": "metrology_sensing",
+       "baseline_comparator": [],
+       "improvement_direction": [],
+       "sentence": "Based on the results, ResNet, DrCIF, InceptionTime, and ARSENAL are the top-performing algorithms, boasting an average accuracy of over 96.6% across all 22 manufacturing TSC datasets.",
+       "record_fes": 68
+      }
+     ],
+     "years": [
+      2023
+     ],
+     "year_span": 0,
+     "sources": [
+      "arxiv"
+     ],
+     "source_families": [
+      "preprint_origin"
+     ],
+     "domains": [
+      "metrology_sensing"
+     ],
+     "capability_velocity": null,
+     "velocity_direction": null,
+     "corroboration": "UNKNOWN",
+     "trajectory_score": 0,
+     "trajectory_score_components": {},
+     "unpointed_evidence_count": 0
+    },
+    "corroboration_counts": {
+     "UNKNOWN": 2
+    }
+   }
+  },
+  "dedup_note": "this diagnostic dedups by normalized-DOI-else-record_id (488 records); the benchmark evaluator dedups by normalized-DOI-else-title-fingerprint (483 records) \u2014 both rules are stated, deterministic, and committed; the 5-record difference is title-fingerprint collisions the stricter evaluator merges"
+ },
+ "budget_honesty": {
+  "llm_calls": 0,
+  "retrieval_fabric_invocations": 39,
+  "proposer_configurations_executed": 0,
+  "note": "the gate stopped the arm BEFORE any proposer call \u2014 the pre-registered order held in production"
+ },
+ "reviewer_provenance": "AI_REVIEW"
+}

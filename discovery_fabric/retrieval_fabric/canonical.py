@@ -138,22 +138,32 @@ class Canonicalizer:
         if rec is None:
             # a DOI-keyed record may also match an earlier
             # TITLE_FINGERPRINT record of the same paper: unify via the
-            # title index (title key -> canonical key)
-            tkey = title_fingerprint(normalized.get("title"),
-                                     normalized.get("publication_year")
-                                     or normalized.get("year"))
-            existing_canonical = self._by_title.get(tkey)
-            if existing_canonical:
-                rec = self._by_key[existing_canonical]
-                self.merge_events.append({
-                    "merged": key, "into": existing_canonical,
-                    "basis": "TITLE_FINGERPRINT_TO_EXISTING",
-                })
-            else:
+            # title index (title key -> canonical key).
+            # BLANK-TITLE GUARD (R412 gradient-v3 pre-seal repair,
+            # 2026-09-06): title_fingerprint of a blank title is a
+            # CONSTANT — without this guard every blank-title record
+            # from every source aliases to one dedup key and collapses
+            # into a single canonical record (measured: arXiv 5 records
+            # -> 1 blank-title survivor, excluded from the engine pool).
+            # A blank title is NOT identity evidence (Art. II): it must
+            # never merge or index.
+            _title_text = (normalized.get("title") or "").strip()
+            if _title_text:
+                tkey = title_fingerprint(_title_text,
+                                         normalized.get("publication_year")
+                                         or normalized.get("year"))
+                existing_canonical = self._by_title.get(tkey)
+                if existing_canonical:
+                    rec = self._by_key[existing_canonical]
+                    self.merge_events.append({
+                        "merged": key, "into": existing_canonical,
+                        "basis": "TITLE_FINGERPRINT_TO_EXISTING",
+                    })
+            if rec is None:
                 rec = CanonicalRecord(canonical_id=key, identity_basis=basis,
                                       title=(normalized.get("title") or ""))
                 self._by_key[key] = rec
-                if tkey and basis != "TITLE_FINGERPRINT":
+                if _title_text and tkey and basis != "TITLE_FINGERPRINT":
                     self._by_title[tkey] = key
         # attribute this appearance
         if source_id not in rec.indexing_sources:
@@ -168,13 +178,37 @@ class Canonicalizer:
         if (len(_pick_abstract(normalized)) >
                 len(_pick_abstract(rec.best_record))):
             rec.best_record = normalized
+        elif not rec.best_record:
+            # R412 gradient-v3 gate-fail decomposition repair
+            # (2026-09-06, incident
+            # R412-GRADIENT-V3-NORM-METADATA-FIELDS): a metadata-only
+            # source (crossref, google_patents) never won the
+            # longest-abstract comparison, so best_record stayed EMPTY
+            # and every field only that source carried (issued_year,
+            # publication_date, snippet) was silently dropped for the
+            # whole canonical record. A record's representative must
+            # never be emptier than any of its appearances: the FIRST
+            # appearance seeds best_record; a strictly-richer abstract
+            # still replaces it (precedence unchanged).
+            rec.best_record = normalized
         if not rec.doi and doi:
             rec.doi = doi
         if not rec.patent_number and patent:
             rec.patent_number = patent
         if not rec.publication_year:
-            rec.publication_year = (normalized.get("publication_year")
-                                    or normalized.get("year"))
+            # R412 gradient-v3 gate-fail decomposition repair
+            # (2026-09-06, incident R412-GRADIENT-V3-NORM-METADATA-
+            # FIELDS): crossref persists the year as `issued_year` and
+            # the patent adapters as `publication_date` — neither key
+            # was read here, so 388/483 v3 pool records lost their
+            # year (measured from committed pool bytes). Read every
+            # field form the connectors actually emit; the value
+            # stays a verbatim provider string, never a guess.
+            rec.publication_year = (
+                normalized.get("publication_year")
+                or normalized.get("year")
+                or normalized.get("issued_year")
+                or normalized.get("publication_date"))
         if not rec.title:
             rec.title = normalized.get("title") or ""
         if not rec.fulltext_url and fulltext_url:

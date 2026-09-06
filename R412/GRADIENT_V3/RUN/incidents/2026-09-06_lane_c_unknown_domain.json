@@ -1,0 +1,29 @@
+{
+ "incident_id": "R412-GRADIENT-V3-LANE-C-UNKNOWN-DOMAIN",
+ "detected_at": "2026-09-06T08:30:00Z",
+ "class": "INFRASTRUCTURE (query construction)",
+ "severity": "quarantined + repaired mid-run (the R412 v2 gate-field-defect precedent: original bytes preserved, fix disclosed, bounded re-attempt)",
+ "description": "lane_c_queries() split the ga1b gate.frontier_domains string by comma WITHOUT filtering epistemic-state markers. 7 of the 13 ga1b rungs record frontier_domains as the literal string 'UNKNOWN' — an explicit NOT-DETERMINED state (Art. XXV), never a search domain. The lane C construction used 'UNKNOWN' as a literal search term, producing queries like 'UNKNOWN device switching energy measured performance improvement' — noise injected into provider queries.",
+ "affected_executed_query": {
+  "pool_file": "R412/GRADIENT_V3/RUN/LANE_POOLS/006__device-switching-energy__C.json",
+  "n_items": 21,
+  "n_pool_records": 21,
+  "query": "UNKNOWN device switching energy measured performance improvement",
+  "record_ids": ["doi:10.1002/advs.75476", "doi:10.3390/ma19122601", "doi:10.1088/1742-6596/2161/1/012040", "doi:10.3390/ma19132823", "doi:10.1038/s41467-026-74342-z"],
+  "disposition": "QUARANTINED — the pool file is deleted from the run in the same change that ships the fix; the full original bytes remain recoverable in git history (this incident artifact records the query, the record ids, and the disposition; no downstream stage consumed the file — the benchmark evaluator had not yet run)"
+ },
+ "affected_not_executed": [
+  "predictive novelty differentiation",
+  "material-property-consistent effectiveness prediction",
+  "dimensional regime consistency validation",
+  "differential measurement instrumentation",
+  "amine substitution novelty margin",
+  "primary evidence quantified prediction"
+ ],
+ "root_cause": "the ga1b extraction recorded frontier_domains='UNKNOWN' for rungs where the proposer could not name a domain (an honest epistemic state); lane_c_queries treated the field as always-domain-bearing without a validity filter",
+ "fix": "lane_c_queries() now filters domain tokens against a closed invalid-token set (unknown, not stated, n/a, none, unspecified, empty) — a rung with no VALID recorded frontier domain emits ZERO lane C queries and the miss is RECORDED (LANE_C_NO_VALID_FRONTIER_DOMAIN — Art. XXV: unknown stays unknown, never fabricated into a search term)",
+ "fix_location": "discovery_fabric/r412/frontier_evidence.py::lane_c_queries",
+ "reseal": "the lane plan sha256 changes; the v3 preregistration is REBUILT (all other pins unchanged) BEFORE the lane run resumes; no LLM call has been made at any point in this incident window (the lane stage is fabric retrieval only); completed UNPOLLUTED lane queries keep their committed bytes (their query strings are unchanged in the new plan and are skipped by content-keyed resumption)",
+ "constitution_articles": ["XXV (unknown is not a domain)", "XI (original bytes preserved)", "LXI (infrastructure failure is never scientific rejection)", "XLIV (changed plan = re-verified seal before use)"],
+ "reviewer_provenance": "AI_REVIEW"
+}

@@ -338,6 +338,7 @@ class OpenAlexConnector(ConnectorBase):
                 normalized={
                     "openalex_id": oid,
                     "doi": item.get("source_specific", {}).get("doi"),
+                    "title": item.get("title") or "",
                     "publication_year": item.get("publication_year") or (item.get("source_specific") or {}).get("publication_year"),
                     "cited_by_count": (item.get("source_specific") or {}).get("cited_by_count"),
                     "abstract": (item.get("abstract") or "")[:4000] or None,
@@ -403,6 +404,7 @@ class SemanticScholarConnector(ConnectorBase):
                     "paper_id": sid,
                     "doi": ext.get("DOI"),
                     "pmid": ext.get("PubMed"),
+                    "title": r.get("title"),
                     "year": r.get("year"),
                     "citation_count": r.get("citationCount"),
                     "abstract": (r.get("abstract") or "")[:4000] or None,
@@ -509,6 +511,7 @@ class ArxivConnector(ConnectorBase):
                 normalized={
                     "arxiv_id": aid,
                     "doi": f"10.48550/arxiv.{aid.split('v')[0]}" if aid else None,
+                    "title": r.get("title"),
                     "published": r.get("published"),
                     "updated": r.get("updated"),
                     "authors": (r.get("authors") or [])[:20],
