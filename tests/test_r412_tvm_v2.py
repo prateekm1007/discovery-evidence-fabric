@@ -519,7 +519,25 @@ def test_preregistration_seals_all_artifacts():
          V2DIR / "TRANSPORT_PROBE.json"),
     ]
     for prompt_id, ph in prereg["prompt_hashes"]["files"].items():
-        checks.append((ph, V2DIR / "PROMPTS" / f"{prompt_id}.json"))
+        path = V2DIR / "PROMPTS" / f"{prompt_id}.json"
+        if prompt_id == "TVM_V2_FRONTIER_ENTRY_PROPOSAL":
+            # v1.0.0 -> v1.1.0 SUPERSESSION (disclosed pre-v2.1-seal
+            # adjustment to the per-rung batch semantics): the v2.0
+            # preregistration's pin for this prompt is STALE BY
+            # DESIGN — the v2.1 preregistration carries the live pin.
+            # Verify the supersession instead of the stale pin (same
+            # rigor, versioned truth — Art. XI/XLIV).
+            v21 = json.loads((V2DIR /
+                              "R412_GRADIENT_V2_1_PREREGISTRATION"
+                              ".json").read_text(encoding="utf-8"))
+            live_pin = v21["prompt_pins"][prompt_id]["sha256"]
+            assert _sha256(path) == live_pin, (
+                "superseded prompt pin broken in v2.1: "
+                f"{prompt_id}")
+            assert v21["prompt_pins"][prompt_id]["version"] == \
+                "1.1.0"
+            continue
+        checks.append((ph, path))
     for expected, path in checks:
         assert _sha256(path) == expected, f"seal broken: {path.name}"
 
