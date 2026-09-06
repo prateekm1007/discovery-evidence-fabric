@@ -527,6 +527,12 @@ def session_detail(session_id: str) -> Optional[Dict[str, Any]]:
     ep = _read_json(ep_path)
     if ep:
         detail["evidence_pack"] = ep
+    # R414 (directive §4): the canonical DiscoveryRun state, derived
+    # backend-side from this record + the run dir's own artifacts. The
+    # frontend READS this; it never re-derives states client-side and
+    # never infers an invention exists because a GLB exists.
+    from . import run_state as _rs
+    detail["run_state"] = _rs.canonical_run_state(detail)
     return detail
 
 

@@ -58,17 +58,45 @@ const EXAMPLES = [
 ];
 
 function TransportDot({ health }: { health: HealthSummary | null }) {
-  const ready = health?.llm_transport_ready === true;
+  // R414 (directive §10): the CALM product surface — "Discovery ready"
+  // or "Discovery available · one provider degraded". The technical
+  // per-provider truth lives in the health payload; the UI reduces it
+  // and never exposes panic.
+  const r = health?.readiness;
+  const providers = r?.providers ?? [];
+  const degraded = providers.filter(
+    (p) => p.available && p.status !== "OK" && p.status !== "NEVER_CALLED"
+  );
+  const ready = r?.discovery_ready ?? health?.llm_transport_ready === true;
   return (
     <span
       className={`transport-dot ${ready ? "ok" : "down"}`}
       title={
         ready
-          ? "engine live — LLM transport responding (real probe)"
+          ? degraded.length > 0
+            ? `discovery available · ${degraded.length} provider degraded (${degraded
+                .map((d) => d.provider)
+                .join(", ")}) — failover active, runs continue`
+            : "discovery ready — engine live, LLM transport verified by a real probe"
           : "LLM transport not responding right now — runs will say so honestly"
       }
     />
   );
+}
+
+function EngineStatusText({ health }: { health: HealthSummary | null }) {
+  const r = health?.readiness;
+  const providers = r?.providers ?? [];
+  const degraded = providers.filter(
+    (p) => p.available && p.status !== "OK" && p.status !== "NEVER_CALLED"
+  );
+  const ready = r?.discovery_ready ?? health?.llm_transport_ready === true;
+  if (ready) {
+    return degraded.length > 0
+      ? `Discovery available · one provider degraded`
+      : "Discovery ready";
+  }
+  return "Engine starting…";
 }
 
 function NewProblemPane({
@@ -333,9 +361,7 @@ function WorkspaceInner() {
         <span className="ws-status">
           <TransportDot health={health} />
           <span className="ws-status-text">
-            {health?.llm_transport_ready === true
-              ? "engine live"
-              : "engine starting…"}
+            <EngineStatusText health={health} />
           </span>
         </span>
         <span className="ws-spacer" />

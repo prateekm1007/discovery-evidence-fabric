@@ -372,6 +372,13 @@ class EngineRun:
         objects (never forced to consensus).
         E15-F: every candidate is attacked on the ten engineering targets;
         KILL verdicts remove the candidate BEFORE any document is made.
+
+        (R414 fix: this method reads ENGINE_CAD_PROVIDER / ENGINE_CAD_LLM
+        from the environment, but `import os as _os` existed only in the
+        OTHER env-reading methods — the CAD pass raised
+        NameError: name '_os' and the run proceeded WITHOUT its 3D
+        section. Caught live by the R414 acceptance run's honest
+        degradation ledger; the fix is the import, nothing else.)
         E15-G: REPAIR verdicts mutate the engineering artifact itself
         (V2 + ledger); cosmetic changes do not pass.
         E15-H: only the strongest survivor reaches full dossier
@@ -383,6 +390,7 @@ class EngineRun:
         Rehearsal flag is False here: this runs only on a real loop
         envelope. Any failure records an explicit FAILED state in the run
         directory; it never fabricates a package."""
+        import os as _os
         from .dossier_quality import (evaluate_dossier_quality,
                                       assert_quality_gate)
         from .engineering_attack import (attack_engineering,

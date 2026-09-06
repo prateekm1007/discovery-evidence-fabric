@@ -190,6 +190,54 @@ def _health_payload() -> dict:
     ext_mode = transport.get("status") == "EXTERNAL"
     gateway_up_value = None if ext_mode else gw.gateway_up()
 
+    # R414 (directive §10): the extended readiness split. Each field is
+    # a MEASURED fact or an honest measured-absence — never a configured
+    # assumption (Art. XXV):
+    #   llm_ready        transport configured AND a real probe succeeded
+    #   providers[]      per-provider health from the health book +
+    #                    the registry's availability matrix (credential
+    #                    presence + REAL call outcomes; NEVER_CALLED is
+    #                    reported, never "healthy")
+    #   retrieval_ready  source connectors importable + the last
+    #                    MEASURED source-health report (stale timestamp
+    #                    disclosed)
+    #   physics_ready    the physics decision system's registry exists
+    #                    and the wired solver imports (local facts)
+    #   reality_loop_ready  the reality-loop interface modules exist
+    #   showcase_ready   the portfolio (buyer surface) is present
+    from discovery_fabric.engine import llm_registry as _reg
+    from discovery_fabric.engine import provider_health as _ph
+    providers = _ph.HEALTH.snapshot(
+        provider_specs=_reg.availability_matrix())
+    _src_report = "absent"
+    _src_report_at = None
+    try:
+        _shp = REPO_ROOT / "artifacts" / "source_health" / \
+            "SOURCE_HEALTH_REPORT.json"
+        if _shp.exists():
+            _sh = json.loads(_shp.read_text())
+            _src_report = "measured"
+            _src_report_at = _sh.get("run_timestamp")
+    except Exception:  # noqa: BLE001 — absent stays absent
+        pass
+    _physics_registry = REPO_ROOT / "discovery_fabric" / "physics_stack" \
+        / "PHYSICS_COVERAGE_REGISTRY_V1.json"
+    _sfepy_ok = False
+    try:
+        import sfepy  # noqa: F401 — presence probe only
+        _sfepy_ok = True
+    except Exception:  # noqa: BLE001
+        _sfepy_ok = False
+    _reality_ok = all(
+        (REPO_ROOT / "discovery_fabric" / "engine" / f).exists()
+        for f in ("loop_chain.py", "reality_ingestion.py"))
+    _connectors_ok = False
+    try:
+        from discovery_fabric.source_registry import connectors  # noqa
+        _connectors_ok = True
+    except Exception:  # noqa: BLE001 — absent stays absent
+        _connectors_ok = False
+
     return {
         "ok": True, "status": "ok", "service": "toscanini",
         # legacy keys (R391 contract) kept for the Render healthcheck;
@@ -237,6 +285,32 @@ def _health_payload() -> dict:
             # portfolio (showcase) is reported separately above
             "discovery_ready": bool(engine_ready and transport_configured
                                      and probe_ok),
+            # ---- R414 (directive §10): the extended readiness fields --
+            # calm product surface: "Discovery ready" or "Discovery
+            # available - one provider degraded" (the UI reduces; this
+            # payload carries the per-provider truth)
+            "llm_ready": bool(transport_configured and probe_ok),
+            "providers": providers,
+            "provider_count": len([p for p in providers
+                                   if p.get("available")]),
+            "retrieval_ready": {
+                "connectors_importable": _connectors_ok,
+                "last_source_health_report": _src_report,
+                "last_source_health_report_at": _src_report_at,
+                "note": "retrieval outcomes are recorded per-run; the "
+                        "source-health report is the last measurement "
+                        "(stale is disclosed, never refreshed silently)",
+            },
+            "physics_ready": bool(_physics_registry.exists()
+                                  and _sfepy_ok),
+            "physics_state": {
+                "registry_present": _physics_registry.exists(),
+                "wired_solver_importable": _sfepy_ok,
+                "note": "the R413 physics decision system (registry + "
+                        "deterministic router + one wired solver)",
+            },
+            "reality_loop_ready": _reality_ok,
+            "showcase_ready": portfolio_ready,
         },
         "durable": _durable_state(),
     }
@@ -396,6 +470,89 @@ class Handler(BaseHTTPRequestHandler):
                     from toscanini.user_state import public_session_view
                     return self._json(200, public_session_view(detail))
                 return self._json(404, {"error": "not found"})
+            # ---- R414 product-integration endpoints ------------------
+            # GET /api/run/{id}/state — the canonical DiscoveryRun state
+            # (directive §4/§5): light live-polling payload; the UI's
+            # phase progression and four terminal outcomes come from
+            # HERE, never client-side inference.
+            if len(parts) == 4 and parts[3] == "state":
+                if self._access(rid) == "DENY":
+                    return self._denied()
+                s = store.get_session(rid)
+                if not s:
+                    return self._json(404, {"error": "not found"})
+                from toscanini import run_state as _rs
+                state = _rs.canonical_run_state(s)
+                state.pop("provenance", None)  # no run_dir paths here
+                return self._json(200, state)
+            # GET /api/run/{id}/cio — the Canonical Invention Object
+            # (directive §12): the ONE object the browser renders; it
+            # never assembles an invention from separate calls.
+            if len(parts) == 4 and parts[3] == "cio":
+                if self._access(rid) == "DENY":
+                    return self._denied()
+                s = store.get_session(rid)
+                if not s:
+                    return self._json(404, {"error": "not found"})
+                from toscanini import cio as _cio
+                obj = _cio.build_cio(s)
+                if not obj:
+                    return self._json(200, {
+                        "kind": "CANONICAL_INVENTION_OBJECT",
+                        "present": False,
+                        "note": ("no invention-side artifacts on this "
+                                 "run yet — the run state is the truth; "
+                                 "no object is fabricated (Art. XXV)")})
+                obj["present"] = True
+                prov = obj.get("provenance") or {}
+                prov.pop("run_dir", None)
+                return self._json(200, obj)
+            # GET /api/run/{id}/model — the run's GLB (only when the run
+            # actually produced one; 404 honest otherwise — the UI never
+            # treats a GLB's existence as invention existence anyway)
+            if len(parts) == 4 and parts[3] == "model":
+                if self._access(rid) == "DENY":
+                    return self._denied()
+                s = store.get_session(rid)
+                glb = self._run_glb(s)
+                return self._serve_file(glb, "model/gltf-binary")
+            # GET /api/run/{id}/geometry/{name} — restricted geometry
+            # downloads (STEP/STL/SVG whitelist; never envelopes)
+            if len(parts) == 5 and parts[3] == "geometry":
+                if self._access(rid) == "DENY":
+                    return self._denied()
+                s = store.get_session(rid)
+                f = self._run_geometry_file(s, parts[4])
+                mime = {
+                    ".step": "application/step",
+                    ".stp": "application/step",
+                    ".stl": "model/stl",
+                    ".svg": "image/svg+xml",
+                    ".glb": "model/gltf-binary",
+                }.get(f.suffix.lower() if f else "", "application/"
+                                                         "octet-stream")
+                return self._serve_file(f, mime, download_name=(
+                    f.name if f else None))
+            # GET /api/run/{id}/counsel-package — the technical evidence
+            # export for IP counsel (directive §20): derived entirely
+            # from run artifacts; never asserts patentability.
+            if len(parts) == 4 and parts[3] == "counsel-package":
+                if self._access(rid) == "DENY":
+                    return self._denied()
+                s = store.get_session(rid)
+                if not s:
+                    return self._json(404, {"error": "not found"})
+                from toscanini import counsel as _counsel
+                path = _counsel.build_counsel_package(s)
+                if not path:
+                    return self._json(404, {
+                        "error": "no run artifacts to export yet",
+                        "note": "the counsel package exports the run's "
+                                "own technical evidence — nothing is "
+                                "fabricated"})
+                return self._serve_file(
+                    path, "application/zip",
+                    download_name=f"counsel_package_{rid}.zip")
             if len(parts) == 4 and parts[3] == "package":
                 if self._access(rid) == "DENY":
                     return self._denied()
@@ -647,6 +804,40 @@ class Handler(BaseHTTPRequestHandler):
                              f'attachment; filename="{download_name}"')
         self.end_headers()
         self.wfile.write(data)
+
+    # R414: run-scoped geometry file resolution (restricted to
+    # engineering-geometry extensions — a request for envelope_*.json
+    # or session stores through this route is a 404 by construction).
+    _GEOMETRY_EXTS = (".glb", ".step", ".stp", ".stl", ".svg")
+
+    def _run_glb(self, session) -> Optional[Path]:
+        if not session or not session.get("run_dir"):
+            return None
+        run_dir = Path(session["run_dir"])
+        if not run_dir.exists():
+            return None
+        model_dir = run_dir / "MODEL"
+        glbs = sorted(model_dir.glob("*.glb")) if model_dir.exists() \
+            else sorted(run_dir.glob("*.glb"))
+        return glbs[0] if glbs else None
+
+    def _run_geometry_file(self, session, name: str) -> Optional[Path]:
+        if not session or not session.get("run_dir"):
+            return None
+        run_dir = Path(session["run_dir"])
+        if not run_dir.exists():
+            return None
+        clean = Path(name).name  # no traversal, ever
+        if clean.suffix.lower() not in self._GEOMETRY_EXTS:
+            return None
+        if clean.startswith("envelope_") or clean.endswith(
+                (".json", ".jsonl", ".log")):
+            return None
+        for base in (run_dir / "MODEL", run_dir):
+            cand = base / clean
+            if cand.exists() and cand.is_file():
+                return cand
+        return None
 
     # ------------------------------------------------------------- package
     def _package(self, sid: str):

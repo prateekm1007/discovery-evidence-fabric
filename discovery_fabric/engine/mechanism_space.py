@@ -104,9 +104,16 @@ def llm_generate(prompt: str, system: str = "", timeout: int = 240,
     """Generate through the provider registry. exclude_providers removes
     providers from eligibility (used by the independent-attack separation
     and by operator instantiation to avoid the primary synthesis context
-    where possible). Returns the LLMCallResult-shaped meta dict."""
+    where possible). Returns the LLMCallResult-shaped meta dict.
+
+    R414: the eligibility order is now ROLE-ROUTED (directive §7) —
+    evidence-extraction purposes prefer fast/cheap providers, attack
+    purposes keep provider separation, synthesis keeps quality-first —
+    and the registry cascades across providers on failure with every hop
+    typed and recorded (the result meta carries provider_route)."""
     from .llm_registry import (SelectionPolicy, availability_matrix,
                                generate)
+    from .provider_health import order_for_role, role_for_purpose
     matrix = availability_matrix()
     available = [m["provider_id"] for m in matrix if m["available"]]
     if exclude_providers:
@@ -115,6 +122,23 @@ def llm_generate(prompt: str, system: str = "", timeout: int = 240,
         preferred = remaining or available  # honest fallback, recorded
     else:
         preferred = available
+    # R414 role routing: order the eligible providers for the purpose's
+    # role (deterministic; cooldown-aware inside order_for_role). The
+    # operator pin below can still promote one provider to the head.
+    role = role_for_purpose(purpose)
+    if preferred:
+        preferred = order_for_role(matrix, role,
+                                   avoid_provider=(
+                                       set(exclude_providers or []).pop()
+                                       if exclude_providers else None))
+        if exclude_providers:
+            # re-apply the exclusion on the role-ordered list (the
+            # honest fallback when NOTHING remains is preserved above)
+            remaining = [p for p in preferred
+                         if p not in set(exclude_providers)]
+            preferred = remaining or preferred
+        elif available:
+            preferred = [p for p in preferred if p in set(available)]
     # ENGINE_LLM_PROVIDER operator pin (R391 operator-override class):
     # the operator may pin one provider at the head of the eligibility
     # order. A pinned provider without a credential is RECORDED and
@@ -134,7 +158,8 @@ def llm_generate(prompt: str, system: str = "", timeout: int = 240,
                                            "qwen", "deepseek", "mistral"],
         purpose=purpose)
     res = generate(prompt, system=system, timeout=timeout,
-                   max_retries=2, policy=policy, max_tokens=max_tokens)
+                   max_retries=2, policy=policy, max_tokens=max_tokens,
+                   max_provider_fallbacks=2)
     return {
         "ok": res.ok, "status": res.status, "content": res.content,
         "provider": res.provider_id, "model": res.model,
@@ -145,6 +170,13 @@ def llm_generate(prompt: str, system: str = "", timeout: int = 240,
         "fallback_to_excluded": bool(
             exclude_providers and not remaining) if exclude_providers
         else False,
+        "provider_route": [
+            {"provider": h.get("provider_attempted"),
+             "failure_type": h.get("failure_type"),
+             "fallback_provider": h.get("fallback_provider")}
+            for h in (res.route or [])],
+        "failure_type": res.failure_type,
+        "role": role,
     }
 
 

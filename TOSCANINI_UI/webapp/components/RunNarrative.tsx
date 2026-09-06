@@ -4,7 +4,8 @@
 // narrative states over the 13-stage pipeline; the machine is never
 // shown. Ported from run/page.tsx into the workspace (R395).
 
-import type { SessionDetail, StageDigest } from "@/lib/types";
+import type { RunPhase, RunStateObject, SessionDetail, StageDigest } from "@/lib/types";
+import type { RunOutcome } from "@/lib/types";
 
 export const NARRATIVE_GROUPS: { heading: string; stages: string[] }[] = [
   { heading: "Understanding the problem", stages: [] },
@@ -100,6 +101,123 @@ export const PHASE_LABELS: Record<string, string> = {
   RUNNING: "Thinking…",
 };
 
+
+// ---------------------------------------------------------------------------
+// R414 (directive §5 + §18): the canonical phase progression and the
+// four terminal outcomes — both READ from the backend's run_state
+// (toscanini/run_state.py). The frontend never re-derives states and
+// never infers an invention exists because a GLB exists.
+// ---------------------------------------------------------------------------
+const PHASE_MARK: Record<string, string> = {
+  NOT_STARTED: "·",
+  IN_PROGRESS: "…",
+  DONE: "✓",
+  FAILED: "✕",
+};
+
+export function PhaseProgression({
+  phases,
+}: {
+  phases: RunPhase[] | undefined;
+}) {
+  if (!phases || phases.length === 0) return null;
+  return (
+    <div className="phasebar" aria-label="discovery progress">
+      {phases.map((ph) => (
+        <div
+          key={ph.phase}
+          className={`phase phase-${ph.state.toLowerCase()}`}
+          title={Object.entries(ph.stages ?? {})
+            .map(([k, v]) => `${k}: ${v}`)
+            .join(" · ")}
+        >
+          <span className="phase-mark">{PHASE_MARK[ph.state] ?? "·"}</span>
+          <span className="phase-label">{ph.label}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+const OUTCOME_CLASS: Record<RunOutcome, string> = {
+  PENDING: "RUNNING",
+  INVENTION_SURVIVED: "COMPLETE",
+  INVENTION_REQUIRES_EXPERIMENT: "COMPLETE",
+  NO_DEFENSIBLE_INVENTION: "REJECTED",
+  RUN_BLOCKED: "ERROR",
+};
+
+export function OutcomeBanner({
+  runState,
+  detail,
+}: {
+  runState: RunStateObject | undefined;
+  detail: SessionDetail;
+}) {
+  const outcome = runState?.outcome ?? detail.user_state_view?.outcome;
+  if (!outcome || outcome === "PENDING") return null;
+  const label =
+    runState?.outcome_label ??
+    detail.user_state_view?.outcome_label ??
+    outcome;
+  // directive §2: the honest no-invention shape — never "nothing found,
+  // try again". Most promising mechanism, missing evidence, best next
+  // step are read from the run state's own fields.
+  const mechanism = runState?.mechanism_state?.mechanism;
+  const nextAction = (() => {
+    const stage = (detail.stages ?? []).find(
+      (s) => s.stage === "NEXT_BEST_ACTION"
+    );
+    const a = stage?.action as Record<string, unknown> | undefined;
+    return (a?.action as string | undefined) ?? (a?.summary as string | undefined);
+  })();
+  const isNo = outcome === "NO_DEFENSIBLE_INVENTION";
+  const isBlocked = outcome === "RUN_BLOCKED";
+  return (
+    <div className={`outcome-banner ob-${OUTCOME_CLASS[outcome]}`}>
+      <div className="outcome-line">
+        {isNo
+          ? "No defensible invention survived this run."
+          : isBlocked
+            ? "This run was blocked before a scientific conclusion — infrastructure, not a verdict."
+            : label}
+      </div>
+      {isNo && (
+        <div className="outcome-detail">
+          {mechanism ? (
+            <div>
+              <b>Most promising mechanism explored:</b> {mechanism}
+            </div>
+          ) : null}
+          <div className="faint">
+            kills are recorded to the mechanism cemetery and improve
+            future runs — a real discovery result, not a failure
+          </div>
+          {nextAction ? (
+            <div>
+              <b>Best next step:</b> {nextAction}
+            </div>
+          ) : null}
+        </div>
+      )}
+      {isBlocked && (
+        <div className="outcome-detail faint">
+          {runState?.failure_state?.error ??
+            "retry from the run page — the failure is recorded in the run's own artifacts"}{" "}
+          (Art. LXI: infrastructure failure is never a scientific rejection)
+        </div>
+      )}
+      {outcome === "INVENTION_REQUIRES_EXPERIMENT" && (
+        <div className="outcome-detail faint">
+          the candidate is strong enough conceptually; the decisive
+          physical experiment is specified but not executed — that is
+          the recorded reason no package was reached
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function isTerminal(status: string): boolean {
   return (
     status === "COMPLETE" ||
@@ -115,9 +233,12 @@ export default function RunNarrative({
 }) {
   const stages = detail.stages ?? [];
   const done = isTerminal(detail.status);
+  const runState = detail.run_state as RunStateObject | undefined;
 
   return (
     <div className="narrative" aria-live="polite">
+      <PhaseProgression phases={runState?.phase_progression} />
+      {done && <OutcomeBanner runState={runState} detail={detail} />}
       {(() => {
         const byStage = new Map(stages.map((s) => [s.stage, s]));
         const seen = new Set<string>();

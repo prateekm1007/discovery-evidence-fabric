@@ -236,6 +236,12 @@ class LLMCallResult:
     substituted_from: Optional[str] = None   # provider the policy wanted first
     selection_ledger: Dict[str, Any] = field(default_factory=dict)
     retry_notes: Optional[List[str]] = None  # recorded same-provider retries
+    # R414 (provider resilience directive §8): the failover route and
+    # the typed failure of the last hop. A provider failure is NEVER
+    # silently treated as success — a successful result after failover
+    # carries the full route disclosing every hop that failed first.
+    route: Optional[List[Dict[str, Any]]] = None
+    failure_type: Optional[str] = None
 
     @property
     def ok(self) -> bool:
@@ -252,6 +258,13 @@ class LLMCallResult:
             "substituted_from": self.substituted_from,
             "status": self.status,
             "retry_notes": list(self.retry_notes or []),
+            "provider_route": [
+                {"provider": h.get("provider_attempted"),
+                 "failure_type": h.get("failure_type"),
+                 "fallback_provider": h.get("fallback_provider")}
+                for h in (self.route or [])
+            ] if self.route else [],
+            "failure_type": self.failure_type,
         }
 
 
@@ -424,7 +437,10 @@ def generate(prompt: str, system: str = "",
              evidence: Optional[List[Dict[str, Any]]] = None,
              policy: Optional[SelectionPolicy] = None,
              timeout: int = 240, max_retries: int = 2,
-             max_tokens: int = 512) -> LLMCallResult:
+             max_tokens: int = 512,
+             max_provider_fallbacks: int = 2,
+             role: Optional[str] = None,
+             avoid_provider: Optional[str] = None) -> LLMCallResult:
     """CEO E1 single entry point:
     generate(prompt, evidence, schema) -> structured candidate.
     `evidence` items (already-custodied evidence dicts) are appended to the
@@ -432,14 +448,62 @@ def generate(prompt: str, system: str = "",
     output as evidence (Art. XVIII).
     max_tokens=512 default: the FIELD-line output protocol needs ~150-250
     tokens; a larger cap multiplies wall time on reasoning endpoints without
-    improving output quality (measured 2026-08-27)."""
-    spec, ledger = select_provider(policy)
-    if spec is None:
+    improving output quality (measured 2026-08-27).
+
+    R414 (provider-resilience directive §8): MODEL A -> failure ->
+    MODEL B -> failure -> MODEL C. The cascade tries up to
+    1 + max_provider_fallbacks providers from the policy order. Every
+    hop is classified onto the eight-value failure taxonomy and recorded
+    (provider_attempted, failure_type, timestamp, fallback_provider,
+    fallback_model, retry_count) — both on the result's `route` and in
+    the provider health book. A SUCCESS after failover carries the route
+    so the failover is inspectable, never silent; a total failure keeps
+    status CALL_FAILED with the typed failures of every hop (Art. XXI.3:
+    a provider failure is never absence, never a verdict).
+    Cooldown demotion: providers the health book holds in rate-limit
+    cooldown are demoted to the END of the cascade, never removed — the
+    engine never refuses to run on a heuristic (Art. V)."""
+    from .provider_health import (ROLE_SYNTHESIS, HEALTH, classify_failure,
+                                  order_for_role, role_for_purpose)
+
+    matrix = availability_matrix()
+    avail_ids = [m["provider_id"] for m in matrix if m["available"]]
+
+    # -- the provider chain (policy order, then role ordering) -------------
+    if policy and policy.preferred_providers:
+        chain = [pid for pid in policy.preferred_providers
+                 if pid in avail_ids]
+        chain_source = "policy.preferred_providers"
+    else:
+        eff_role = role or (role_for_purpose(
+            policy.purpose if policy else "") if policy else None) \
+            or ROLE_SYNTHESIS
+        chain = order_for_role(matrix, eff_role,
+                               avoid_provider=avoid_provider)
+        chain_source = f"role_order:{eff_role}"
+    # cooldown demotion applies to BOTH chain sources: a rate-limited
+    # provider slides to the end (never removed — a lone cooled provider
+    # is still tried; Art. V)
+    if len(chain) > 1:
+        cooled = [p for p in chain if HEALTH.in_cooldown(p)]
+        if cooled:
+            chain = [p for p in chain if p not in cooled] + cooled
+    # bounded cascade: at most 1 + max_provider_fallbacks providers per
+    # call (the directive's MODEL A -> B -> C shape; unbounded walks
+    # through every dead provider would multiply wall time)
+    chain = chain[:1 + max(0, max_provider_fallbacks)]
+    if not chain:
+        # preferred_providers exhausted with no available provider: keep
+        # the historical honest semantics (no silent widening beyond the
+        # operator's list — Art. IV)
+        _, ledger = select_provider(policy)
         return LLMCallResult(
             status=ST_PROVIDER_UNAVAILABLE,
             error="no provider credential available (see selection_ledger)",
             prompt_hash=_sha(prompt),
             selection_ledger=ledger)
+
+    wanted_head = chain[0]
 
     messages: List[dict] = []
     # Constitutional transport contract: engine LLM output is ENGLISH ONLY
@@ -460,48 +524,114 @@ def generate(prompt: str, system: str = "",
         body = f"{prompt}\n\n=== RETRIEVED EVIDENCE (custodied) ===\n{ev_block}"
     messages.append({"role": "user", "content": body})
 
+    route: List[Dict[str, Any]] = []
     last_err = None
-    attempt_budget = max_tokens
-    retry_notes: List[str] = []
-    for attempt in range(max_retries + 1):
-        t0 = time.time()
-        try:
-            if spec.flavor == "anthropic":
-                content = _call_anthropic_flavor(spec, messages, timeout,
-                                                 attempt_budget)
-            else:
-                content = _call_openai_flavor(spec, messages, timeout,
-                                              attempt_budget)
-            return LLMCallResult(
-                status=ST_OK, content=content,
-                provider_id=spec.provider_id, model=spec.model_for_call(),
-                prompt_hash=_sha(body), output_hash=_sha(content),
-                latency_ms=int((time.time() - t0) * 1000),
-                substituted_from=ledger.get("substituted_from"),
-                selection_ledger=ledger,
-                retry_notes=retry_notes)
-        except EmptyContentWithFinish as exc:
-            last_err = f"{type(exc).__name__}: {exc}"
-            # reasoning-token exhaustion: SAME provider/model, larger cap
-            # (recorded in retry_notes — never a silent change)
-            if attempt_budget < 2048:
-                attempt_budget = min(2048, attempt_budget * 4)
-                retry_notes.append(
-                    f"attempt {attempt + 1}: empty content "
-                    f"(finish_reason={exc.finish_reason}); same "
-                    f"provider/model retried with max_tokens="
-                    f"{attempt_budget}")
-            if attempt < max_retries:
-                time.sleep(2 * (attempt + 1))
-        except Exception as exc:  # noqa: BLE001 — recorded, retried, explicit
-            last_err = f"{type(exc).__name__}: {exc}"
-            if attempt < max_retries:
-                time.sleep(2 * (attempt + 1))
+    last_failure_type = None
+
+    for hop_idx, provider_id in enumerate(chain):
+        spec = _SPEC_BY_ID.get(provider_id)
+        if spec is None:
+            continue
+        next_provider = chain[hop_idx + 1] if hop_idx + 1 < len(chain) \
+            else None
+        attempt_budget = max_tokens
+        retry_notes: List[str] = []
+        hop_t0 = time.time()
+        for attempt in range(max_retries + 1):
+            t0 = time.time()
+            try:
+                if spec.flavor == "anthropic":
+                    content = _call_anthropic_flavor(spec, messages,
+                                                     timeout,
+                                                     attempt_budget)
+                else:
+                    content = _call_openai_flavor(spec, messages, timeout,
+                                                  attempt_budget)
+                latency_ms = int((time.time() - t0) * 1000)
+                HEALTH.record_success(
+                    spec.provider_id, latency_ms,
+                    purpose=(policy.purpose if policy else "") or "general",
+                    model=spec.model_for_call())
+                # success after a failed hop is OK ONLY with the route
+                # disclosing every failure that preceded it (never a
+                # silent failover — directive §8)
+                return LLMCallResult(
+                    status=ST_OK, content=content,
+                    provider_id=spec.provider_id,
+                    model=spec.model_for_call(),
+                    prompt_hash=_sha(body), output_hash=_sha(content),
+                    latency_ms=latency_ms,
+                    substituted_from=(
+                        wanted_head if wanted_head != spec.provider_id
+                        else None),
+                    selection_ledger={
+                        "chain": list(chain),
+                        "chain_source": chain_source,
+                        "availability": matrix,
+                    },
+                    retry_notes=retry_notes,
+                    route=route or None,
+                    failure_type=None)
+            except EmptyContentWithFinish as exc:
+                last_err = f"{type(exc).__name__}: {exc}"
+                ftype = classify_failure(exc)
+                # reasoning-token exhaustion: SAME provider/model, larger
+                # cap (recorded in retry_notes — never a silent change)
+                if attempt_budget < 2048:
+                    attempt_budget = min(2048, attempt_budget * 4)
+                    retry_notes.append(
+                        f"attempt {attempt + 1}: empty content "
+                        f"(finish_reason={exc.finish_reason}); same "
+                        f"provider/model retried with max_tokens="
+                        f"{attempt_budget}")
+                if attempt < max_retries:
+                    time.sleep(2 * (attempt + 1))
+                    continue
+            except Exception as exc:  # noqa: BLE001 — recorded, retried
+                last_err = f"{type(exc).__name__}: {exc}"
+                ftype = classify_failure(exc)
+                if attempt < max_retries:
+                    time.sleep(2 * (attempt + 1))
+                    continue
+            # this attempt exhausted the same-provider budget -> record
+            # the hop honestly and move to the next provider
+            HEALTH.record_failure(
+                spec.provider_id, ftype,
+                purpose=(policy.purpose if policy else "") or "general",
+                model=spec.model_for_call(), error=str(last_err))
+            route.append({
+                "provider_attempted": spec.provider_id,
+                "model": spec.model_for_call(),
+                "failure_type": ftype,
+                "timestamp": utc_now(),
+                "retry_count": attempt,
+                "attempts": attempt + 1,
+                "latency_ms": int((time.time() - hop_t0) * 1000),
+                "error": str(last_err)[:300],
+                "fallback_provider": next_provider,
+                "fallback_model": (
+                    _SPEC_BY_ID[next_provider].model_for_call()
+                    if next_provider and next_provider in _SPEC_BY_ID
+                    else None),
+            })
+            last_failure_type = ftype
+            break
+
+    # every provider in the chain failed: CALL_FAILED with the full typed
+    # route (a provider outage is infrastructure, never a verdict — the
+    # CALLER decides meaning; Art. XXI.3 / LXI)
     return LLMCallResult(
         status=ST_CALL_FAILED, error=last_err,
-        provider_id=spec.provider_id, model=spec.model_for_call(),
-        prompt_hash=_sha(body), selection_ledger=ledger,
-        retry_notes=retry_notes)
+        provider_id=chain[-1] if chain else None,
+        model=(_SPEC_BY_ID.get(chain[-1]).model_for_call()
+               if chain and chain[-1] in _SPEC_BY_ID else None),
+        prompt_hash=_sha(body),
+        selection_ledger={"chain": list(chain),
+                          "chain_source": chain_source,
+                          "availability": matrix},
+        retry_notes=[],
+        route=route or None,
+        failure_type=last_failure_type)
 
 
 def availability_statement() -> Dict[str, Any]:

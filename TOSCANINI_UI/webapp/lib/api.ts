@@ -10,10 +10,12 @@
 
 import type {
   AskResponse,
+  CIO,
   EvalResult,
   HealthSummary,
   RealityLoopRecord,
   Refusal,
+  RunStateObject,
   SessionDetail,
   SessionRow,
   ShowcaseDetail,
@@ -132,4 +134,18 @@ export async function getRealityLoop(
   });
   if (!res.ok) return null;
   return (await res.json()) as RealityLoopRecord;
+}
+
+// R414: the canonical run state (directive §4) — light live payload for
+// phase progression and the four terminal outcomes.
+export async function getRunState(id: string): Promise<RunStateObject> {
+  return json<RunStateObject>(
+    await fetch(`/api/run/${id}/state`, { cache: "no-store" })
+  );
+}
+
+// R414: the Canonical Invention Object (directive §12) — the ONE object
+// the browser renders for a run's invention surface.
+export async function getCIO(id: string): Promise<CIO> {
+  return json<CIO>(await fetch(`/api/run/${id}/cio`, { cache: "no-store" }));
 }

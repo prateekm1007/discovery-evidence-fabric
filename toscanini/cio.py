@@ -1,0 +1,390 @@
+"""toscanini/cio.py — R414: the Canonical Invention Object (CIO).
+
+Operator directive (product integration, sections 12-14, 16):
+  The browser NEVER assembles an invention from separate API calls —
+  it receives ONE object and renders it. One source of truth:
+
+      Discovery Engine -> Canonical Invention Object
+                      -> Website / PDF / 3D / ZIP / STEP / STL
+
+  The reality status beside every invention (DESIGNED / SIMULATED /
+  EVIDENCE-SUPPORTED / EXPERIMENTALLY VERIFIED) is NOT a frontend
+  badge: these are FIELDS of the CIO, derived from what the run's own
+  artifacts actually establish (Art. XXXVIII Reality Boundary, Art.
+  LIII promotion ladder — no state may skip a level).
+
+  Toscanini is not a patent court: the CIO carries the legal position
+  copy and the builder REJECTS patentability language (§3 — the words
+  "patentable", "legally novel", "patent guaranteed", "patent
+  cleared", "FTO confirmed" may never appear unless explicitly
+  counsel-derived, which this machine never claims).
+
+Constitutional contract: every field is PROJECted from a persisted
+run artifact (INVENTION_SPECIFICATION, PARAMETRIC_MODEL, MODEL/,
+PHYSICS envelope, evidence pack, package manifests). Absent artifact
+-> honest false/None (Art. VI, XXV). Nothing here grants epistemic
+authority to LLM output (Art. XVIII).
+"""
+from __future__ import annotations
+
+import hashlib
+import json
+from pathlib import Path
+from typing import Any, Dict, List, Optional
+
+# ---------------------------------------------------------------------------
+# Language guard (directive §3 — not a patent court)
+# ---------------------------------------------------------------------------
+BANNED_PHRASES = (
+    "patentable", "legally novel", "patent guaranteed",
+    "patent cleared", "fto confirmed", "patent valid",
+    "legally protect", "patent approved", "guaranteed patent",
+)
+LEGAL_POSITION = (
+    "Toscanini performs technology discovery — technical prior-art "
+    "search, mechanism analysis, and evidence-grounded invention "
+    "hypotheses. It does NOT determine legal patentability or freedom "
+    "to operate. Patent counsel should conduct formal patentability "
+    "and FTO analysis."
+)
+PREFERRED_NOVELTY_LANGUAGE = (
+    "No materially similar mechanism identified in the searched "
+    "evidence. Potential IP territory — formal legal review required."
+)
+
+
+def language_guard(text: str) -> Dict[str, Any]:
+    """Scan generated copy for banned patentability words (directive
+    §3). Returns {clean, violations} — the caller must refuse to ship
+    text with violations rather than silently editing it."""
+    t = (text or "").lower()
+    violations = [p for p in BANNED_PHRASES if p in t]
+    return {"clean": not violations, "violations": violations}
+
+
+def _read_json(p: Path) -> Optional[Dict[str, Any]]:
+    try:
+        if p.exists():
+            data = json.loads(p.read_text())
+            return data if isinstance(data, dict) else None
+    except Exception:  # noqa: BLE001
+        return None
+    return None
+
+
+def _unwrap(field: Any) -> Any:
+    """The invention spec wraps narrative fields as {value: X,
+    epistemic_class, ...} — unwrap to the value (the wrapper's own
+    epistemic_class is preserved separately where it matters)."""
+    if isinstance(field, dict) and "value" in field and set(
+            field.keys()) <= {"value", "epistemic_class", "origin_stage",
+                              "evidence_ids", "note", "source_span",
+                              "provenance"}:
+        return field.get("value")
+    return field
+
+
+def _package_info(run_dir: Path) -> Dict[str, Any]:
+    """Package presence from the run's own PACKAGE_REPORT + DOWNLOAD
+    dir (the same derivation the session store uses — never from the
+    session index, which may lag the worker)."""
+    report = _read_json(run_dir / "PACKAGE_REPORT.json") or {}
+    zips = sorted((run_dir / "DOWNLOAD").glob("*.zip")) \
+        if (run_dir / "DOWNLOAD").exists() else []
+    complete = bool(report.get("complete") and zips)
+    return {"complete": complete, "maturity": report.get("maturity"),
+            "zip_name": zips[0].name if zips else None}
+
+
+def _sha_file(p: Path) -> Optional[str]:
+    try:
+        if p.exists() and p.is_file():
+            h = hashlib.sha256()
+            with open(p, "rb") as fh:
+                for chunk in iter(lambda: fh.read(65536), b""):
+                    h.update(chunk)
+            return h.hexdigest()
+    except Exception:  # noqa: BLE001
+        return None
+    return None
+
+
+def _geometry_file_route(session_id: str, f: Path) -> str:
+    """The API route the UI uses to fetch one GEOMETRY file. The server
+    restricts this route to engineering-geometry extensions (glb/step/
+    stl/svg) — never envelopes or internal records."""
+    return f"/api/run/{session_id}/geometry/{f.name}"
+
+
+# ---------------------------------------------------------------------------
+# The CIO builder
+# ---------------------------------------------------------------------------
+def build_cio(session: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    """Build the Canonical Invention Object for one session. Returns
+    None when the run has no invention-side artifacts yet (honest: no
+    invention -> no CIO; the UI shows the run-state, never a fabricated
+    invention object)."""
+    run_dir = Path(session["run_dir"]) if session.get("run_dir") else None
+    if not run_dir or not run_dir.exists():
+        return None
+
+    inv = _read_json(run_dir / "INVENTION_SPECIFICATION.json")
+    eng = _read_json(run_dir / "ENGINEERING_SPECIFICATION.json")
+    pm = _read_json(run_dir / "PARAMETRIC_MODEL.json")
+    cad_ledger = _read_json(run_dir / "CAD_PIPELINE_LEDGER.json")
+    dex = _read_json(run_dir / "DECISIVE_EXPERIMENT.json")
+    final_state = _read_json(run_dir / "final_state.json")
+    phys_env = _read_json(run_dir / "envelope_PHYSICS.json")
+    physics = (phys_env or {}).get("physics") or {}
+
+    # no invention-side artifacts anywhere -> no CIO (directive §12: the
+    # frontend renders the CIO; an empty object would still LOOK like an
+    # invention surface — honest absence instead, Art. XXV)
+    if not any((inv, eng, pm, cad_ledger, dex, final_state)):
+        return None
+
+    # geometry: MODEL/ dir (package path) or STEP/STL in the run dir
+    model_dir = run_dir / "MODEL"
+    glb = sorted(model_dir.glob("*.glb")) if model_dir.exists() else []
+    step = sorted(run_dir.glob("*.step")) + \
+        sorted(model_dir.glob("*.step")) if model_dir.exists() \
+        else sorted(run_dir.glob("*.step"))
+    stl = sorted(run_dir.glob("*.stl")) + \
+        sorted(model_dir.glob("*.stl")) if model_dir.exists() \
+        else sorted(run_dir.glob("*.stl"))
+    svg_views = sorted(model_dir.glob("*.svg")) if model_dir.exists() \
+        else []
+
+    has_geometry = bool(glb or step or pm)
+    final = (session.get("final_status") or "").upper()
+    survivor = final == "AUTOMATED_INVENTION_CANDIDATE" or bool(inv)
+
+    # evidence classes (from the invention spec's own evidence index,
+    # unwrapped from its {value: [...]} envelope)
+    evidence = _unwrap((inv or {}).get("evidence")) or []
+    if isinstance(evidence, dict):
+        evidence = evidence.get("records") or []
+    ev_classes: List[str] = []
+    for e in evidence:
+        if isinstance(e, dict):
+            c = e.get("evidence_class") or e.get("epistemic_class")
+            if isinstance(c, str):
+                ev_classes.append(c)
+    survivor_gate = (inv or {}).get("_survivor_gate") \
+        if isinstance((inv or {}).get("_survivor_gate"), dict) else {}
+    evidence_supported = bool(
+        (ev_classes and any(c in ("SOURCE_FACT", "EXTERNAL_PRECEDENT",
+                                  "VERIFIED_EVIDENCE")
+                            for c in ev_classes))
+        or survivor_gate.get("evidence_verified")
+        or evidence)
+
+    # physics/simulation (COMPUTATIONAL_RESULT only — Art. LIII).
+    # MECHANISM_NOT_SIMULATABLE is the R413 decision machine's honest
+    # refusal (the mechanism's physics domain is not covered by a
+    # validated solver) — that is NOT a simulation result, and must
+    # never be counted as one.
+    _NOT_SIM = (None, "NOT_APPLICABLE", "MECHANISM_NOT_SIMULATABLE")
+    _verdict = physics.get("lifecycle_verdict")
+    simulated = _verdict not in _NOT_SIM and bool(_verdict)
+
+    # reality loop (physical observation requires REAL events — never
+    # simulated into existence; in fresh runs this is honestly false)
+    reality_loop_state = "NONE"
+    rl = _read_json(run_dir / "REALITY_LOOP.json")
+    if rl:
+        reality_loop_state = rl.get("loop_verification_state") or \
+            rl.get("state") or "NONE"
+
+    package = _package_info(run_dir)
+
+    cio: Dict[str, Any] = {
+        "schema_version": "1.0.0",
+        "kind": "CANONICAL_INVENTION_OBJECT",
+        "run_id": session.get("session_id"),
+        "legal_position": LEGAL_POSITION,
+        "novelty_language": PREFERRED_NOVELTY_LANGUAGE,
+        "identity": {
+            "invention_id": _unwrap((inv or {}).get("invention_id"))
+            if isinstance((inv or {}).get("invention_id"), dict)
+            else (inv or {}).get("invention_id"),
+            "problem": _unwrap((inv or {}).get("problem")) or
+            session.get("user_text"),
+            "mechanism": _unwrap((inv or {}).get("mechanism")),
+            "novelty_hypothesis": _unwrap((inv or {}).get(
+                "novelty_hypothesis")),
+            "distinguishing_features": _unwrap((inv or {}).get(
+                "distinguishing_features")),
+            "survivor": survivor,
+            "final_status": session.get("final_status"),
+        },
+        "maturity": {
+            # the directive §14 reality states — CIO FIELDS, not
+            # frontend badges. Each is true ONLY when a run artifact
+            # establishes it (Art. XXXVIII; no promotion without
+            # evidence — Art. XXVIII).
+            "design": has_geometry,
+            "simulation": simulated,
+            "evidence_supported": bool(evidence_supported and survivor),
+            "experimentally_verified": reality_loop_state in (
+                "REAL_LOOP_VERIFIED", "REPEATED_REALITY_VERIFIED"),
+            "maturity_ladder": [
+                "DESIGNED" if has_geometry else None,
+                "SIMULATED" if simulated else None,
+                "EVIDENCE_SUPPORTED" if (evidence_supported and survivor)
+                else None,
+                "EXPERIMENTALLY_VERIFIED"
+                if reality_loop_state in ("REAL_LOOP_VERIFIED",
+                                          "REPEATED_REALITY_VERIFIED")
+                else None],
+            "reality_loop_state": reality_loop_state,
+            "maturity_basis": {
+                "design": ("parametric model / STEP / GLB present in "
+                           "the run artifacts"
+                           if has_geometry else
+                           "no engineering geometry produced on this "
+                           "run (honest absence)"),
+                "simulation": ("PHYSICS stage executed with a "
+                               "computational result (class "
+                               "COMPUTATIONAL_RESULT)" if simulated else
+                               "no simulation result recorded"),
+                "evidence_supported": ("verified evidence records "
+                                       "bound to the mechanism"
+                                       if evidence_supported and survivor
+                                       else "insufficient verified "
+                                       "evidence"),
+                "experimentally_verified": (
+                    "a REAL external observation updated this "
+                    "invention through the reality loop"
+                    if reality_loop_state in ("REAL_LOOP_VERIFIED",
+                                              "REPEATED_REALITY_VERIFIED")
+                    else "no physical observation of this invention "
+                         "exists (Art. LIII — reality cannot be "
+                         "simulated into existence)"),
+            },
+        },
+        "evidence": {
+            "records": [
+                {"id": e.get("id") or e.get("record_id"),
+                 "title": (e.get("title") or "")[:160],
+                 "source": e.get("source") or e.get("source_uri"),
+                 "evidence_class": e.get("evidence_class")
+                 or e.get("epistemic_class"),
+                 "span": (e.get("span") or e.get("quote") or "")[:200]}
+                for e in (evidence if isinstance(evidence, list) else [])
+                [:20] if isinstance(e, dict)],
+            "record_count": len(evidence) if isinstance(evidence, list)
+            else 0,
+            "prior_art": {
+                "searched": bool((inv or {}).get("prior_art")),
+                "note": "novelty SIGNAL from searched evidence — "
+                        "never a legal novelty determination",
+            },
+        },
+        "engineering": {
+            "specification_present": bool(eng),
+            "parameters": [
+                {"param_id": p.get("param_id") or p.get("id"),
+                 "value": p.get("value"),
+                 "unit": p.get("unit"),
+                 "category": p.get("category"),
+                 "value_class": p.get("value_class"),
+                 "envelope": (p.get("range_min"), p.get("range_max"))
+                 if p.get("range_min") is not None else None}
+                for p in (_unwrap((pm or {}).get("parameters"))
+                          or _unwrap((eng or {}).get("parameters"))
+                          or [])[:24]
+                if isinstance(p, dict)],
+            "assumptions": _unwrap((inv or {}).get("assumptions")),
+            "failure_modes": _unwrap((inv or {}).get("failure_modes")),
+            "constraints": _unwrap((inv or {}).get("constraints")),
+            "causal_chain": _unwrap((inv or {}).get("causal_chain")),
+        },
+        "geometry": {
+            "present": has_geometry,
+            "glb": (f"/api/run/{session.get('session_id')}/model"
+                    if glb else None),
+            "glb_sha256": _sha_file(glb[0]) if glb else None,
+            "step": [_geometry_file_route(session.get("session_id"), f)
+                      for f in step[:4]],
+            "stl": [_geometry_file_route(session.get("session_id"), f)
+                    for f in stl[:4]],
+            "svg_views": [_geometry_file_route(session.get("session_id"),
+                                                f)
+                          for f in svg_views[:6]],
+            "parametric_model_present": bool(pm),
+            "cad_pipeline_status": (cad_ledger or {}).get("status"),
+            "authority": ("CadQuery/OCCT parametric build is the "
+                          "engineering geometry authority; meshes and "
+                          "renders are derived artifacts (R413 geometry "
+                          "authority boundary — a render can never "
+                          "originate or validate geometry)"),
+        },
+        "simulation": {
+            "executed": simulated,
+            "lifecycle_verdict": physics.get("lifecycle_verdict"),
+            "baseline_outcome": (physics.get("baseline_comparison")
+                                 or {}).get("outcome"),
+            "epistemic_class": "COMPUTATIONAL_RESULT" if simulated
+            else None,
+            "assumption": "simulation results are computational "
+                          "evidence, never physical observations",
+        },
+        "reality_loop": {
+            "state": reality_loop_state,
+            "record": rl,
+        },
+        "downloads": {
+            "package_zip": (
+                f"/api/sessions/{session.get('session_id')}/package"
+                if package.get("complete") else None),
+            "package_maturity": package.get("maturity"),
+            "counsel_package": (
+                f"/api/run/{session.get('session_id')}/counsel-package"),
+            "note": "counsel package = technical evidence export for "
+                    "IP counsel review — not a legal document",
+        },
+        "experiment": {
+            "decisive_experiment": dex or _unwrap((inv or {}).get(
+                "killer_experiment")),
+            "status": "SPECIFIED_NOT_EXECUTED",
+        },
+        "provenance": {
+            "run_dir": str(run_dir),
+            "run_id": session.get("session_id"),
+            "origin": session.get("origin"),
+            "invention_spec_sha256": _sha_file(
+                run_dir / "INVENTION_SPECIFICATION.json"),
+            "parametric_model_sha256": _sha_file(
+                run_dir / "PARAMETRIC_MODEL.json"),
+            "final_state_sha256": _sha_file(
+                run_dir / "final_state.json"),
+            "provider_route_note": "see run_state.model_route — "
+                                   "aggregated from persisted call "
+                                   "records",
+            "reviewer_provenance": "AI_REVIEW",
+        },
+    }
+
+    # the language guard runs over the copy THIS object ships (the
+    # invention spec's own text fields could carry banned words from a
+    # model output — Art. XVIII: LLM output is content, never
+    # authority; the product surface must not assert patentability)
+    shipped_text = json.dumps({
+        "mechanism": _unwrap((inv or {}).get("mechanism")),
+        "novelty_hypothesis": _unwrap((inv or {}).get(
+            "novelty_hypothesis")),
+        "distinguishing_features": _unwrap((inv or {}).get(
+            "distinguishing_features")),
+    })
+    guard = language_guard(shipped_text)
+    cio["language_guard"] = guard
+    if not guard["clean"]:
+        # the object still ships (the run record is the authority) but
+        # the violation is DISCLOSED on the object — never silently
+        # edited (Art. XV); the UI hides the offending narrative fields
+        cio["language_guard"]["action"] = (
+            "banned patentability language detected in model-generated "
+            "narrative fields; the narrative is quarantined from the "
+            "product surface (deterministic copy is unaffected)")
+    return cio

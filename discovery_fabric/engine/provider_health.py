@@ -1,0 +1,465 @@
+"""discovery_fabric/engine/provider_health.py — R414 provider resilience.
+
+Operator directive (product integration, sections 6-10):
+  - NVIDIA and OpenRouter (and every other provider) are server-side
+    secrets; a provider failure must not make the product appear dead.
+  - Automatic failover MODEL A -> MODEL B -> MODEL C, but a provider
+    failure is NEVER silently treated as successful model output.
+  - Failures are classified: RATE_LIMITED / TIMEOUT / AUTH_FAILURE /
+    NETWORK_FAILURE / INVALID_RESPONSE / MODEL_FAILURE / PARSER_FAILURE /
+    UNKNOWN — rate limits are distinguished from empty results.
+  - Per-provider health (status, last_success, latency, rate_limit_state,
+    model_count) is exposed through /api/health.
+
+Constitutional contract (Art. XVIII, XXI.3, XXV, LXI):
+  - A provider outage is an infrastructure fact, never a scientific
+    verdict; the caller keeps deciding what a failed call MEANS.
+  - Health state is only ever built from REAL call outcomes recorded at
+    call time — never from configuration optimism (a configured key is
+    UNAVAILABLE-OR-OK until a call proves which; we report NEVER_CALLED
+    honestly rather than pretending "healthy").
+  - The rate-limit cooldown is an ORDERING hint, never a hard block: a
+    cooled provider is demoted in the failover chain, not removed, so
+    the engine never refuses to run just because the book thinks a
+    quota window is open (Art. V: fail closed on evidence, but do not
+    become a universal rejector).
+"""
+from __future__ import annotations
+
+import json
+import os
+import threading
+import time
+import urllib.error
+import urllib.request
+from pathlib import Path
+from typing import Any, Dict, List, Optional
+
+REPO_ROOT = Path(__file__).resolve().parents[2]
+HEALTH_DIR = REPO_ROOT / "ENGINE_RUNS" / "provider_health"
+
+# ---------------------------------------------------------------------------
+# The failure taxonomy (operator directive section 8 — exact vocabulary)
+# ---------------------------------------------------------------------------
+RATE_LIMITED = "RATE_LIMITED"
+TIMEOUT = "TIMEOUT"
+AUTH_FAILURE = "AUTH_FAILURE"
+NETWORK_FAILURE = "NETWORK_FAILURE"
+INVALID_RESPONSE = "INVALID_RESPONSE"
+MODEL_FAILURE = "MODEL_FAILURE"
+PARSER_FAILURE = "PARSER_FAILURE"
+UNKNOWN = "UNKNOWN"
+
+FAILURE_TYPES = (RATE_LIMITED, TIMEOUT, AUTH_FAILURE, NETWORK_FAILURE,
+                 INVALID_RESPONSE, MODEL_FAILURE, PARSER_FAILURE, UNKNOWN)
+
+# Cooldown ladder for rate limits (seconds). A rate-limited provider is
+# demoted (not removed) for this long; repeated consecutive rate limits
+# walk up the ladder. Deterministic policy input (Art. XXVII): the values
+# encode "wait out the measured ~60 s quota window, then back off harder
+# if it keeps happening" from the 2026-08-30 gateway measurements.
+_COOLDOWN_LADDER_S = (60, 120, 240, 600)
+
+_RATE_HINTS = ("429", "too many requests", "rate limit", "rate_limit",
+               "quota", "exceeded your current quota",
+               "requests per minute", "rpm limit")
+_AUTH_HINTS = ("401", "403", "unauthorized", "unauthorised",
+               "invalid api key", "invalid_api_key", "authentication",
+               "permission denied", "insufficient_user_quota")
+_TIMEOUT_HINTS = ("timed out", "timeout", "timeouterror",
+                  "socket timeout", "deadline exceeded", "sigkilled")
+_NETWORK_HINTS = ("connection refused", "connection reset",
+                  "connection aborted", "name or service not known",
+                  "temporary failure in name resolution",
+                  "no route to host", "network", "ssl", "certificate",
+                  "urlopen error", "broken pipe")
+
+
+def classify_failure(exc: BaseException, http_status: Optional[int] = None,
+                     body_snippet: str = "") -> str:
+    """Map one exception (plus whatever HTTP context the caller captured)
+    onto the eight-value taxonomy. Deterministic string classification:
+    HTTP status first, then the exception type, then message hints. An
+    unmapped failure stays UNKNOWN — never forced into a confident class
+    (Art. XXV)."""
+    msg = f"{type(exc).__name__}: {exc}".lower()
+    status = http_status
+
+    def _hints(hit: tuple) -> bool:
+        text = " ".join([msg, str(body_snippet or "").lower()])
+        return any(h in text for h in hit)
+
+    if status == 429:
+        return RATE_LIMITED
+    if status in (401, 403):
+        return AUTH_FAILURE
+    if _hints(_RATE_HINTS):
+        return RATE_LIMITED
+    if status in (400, 422):
+        # provider received the request and rejected the payload shape
+        return INVALID_RESPONSE
+    if _hints(_AUTH_HINTS):
+        return AUTH_FAILURE
+    if isinstance(exc, TimeoutError) or _hints(_TIMEOUT_HINTS):
+        return TIMEOUT
+    if isinstance(exc, (ConnectionError,)):
+        return NETWORK_FAILURE
+    if isinstance(exc, urllib.error.HTTPError):
+        # HTTPError is a URLError subclass — check it FIRST so the
+        # provider's own status code wins over generic transport hints.
+        code = getattr(exc, "code", None)
+        if code == 429:
+            return RATE_LIMITED
+        if code in (401, 403):
+            return AUTH_FAILURE
+        if code and code >= 500:
+            return MODEL_FAILURE      # model service failed server-side
+        if code is not None:
+            return INVALID_RESPONSE
+        return UNKNOWN
+    if isinstance(exc, urllib.error.URLError):
+        # URLError without an HTTP code is transport-level (DNS, TCP,
+        # TLS); with a reason that mentions timeouts it is TIMEOUT.
+        if _hints(_TIMEOUT_HINTS):
+            return TIMEOUT
+        return NETWORK_FAILURE
+    if isinstance(exc, json.JSONDecodeError):
+        return INVALID_RESPONSE
+    if _hints(_NETWORK_HINTS):
+        return NETWORK_FAILURE
+    if isinstance(exc, RuntimeError) and "empty content" in msg:
+        # the completion arrived but carried no usable content
+        return MODEL_FAILURE
+    if isinstance(exc, ValueError):
+        return INVALID_RESPONSE
+    return UNKNOWN
+
+
+# ---------------------------------------------------------------------------
+# The health book — per-provider state, persisted, thread-safe
+# ---------------------------------------------------------------------------
+class ProviderHealthBook:
+    """Per-provider health state. RECORDED FROM REAL CALLS ONLY.
+
+    state.json (atomic rewrite) carries the live snapshot;
+    events.jsonl (append-only) carries every call outcome so any health
+    claim is replayable from committed bytes (Art. XII, LXII). Both are
+    best-effort: a persistence failure is disclosed in last_error and
+    never crashes a discovery run (the book degrades to memory-only).
+    """
+
+    def __init__(self, health_dir: Optional[Path] = None):
+        self._dir = Path(health_dir) if health_dir else HEALTH_DIR
+        self._lock = threading.Lock()
+        self._state: Dict[str, Dict[str, Any]] = {}
+        self._last_error: Optional[str] = None
+        self._load()
+
+    # -- persistence -------------------------------------------------------
+    def _load(self) -> None:
+        try:
+            p = self._dir / "state.json"
+            if p.exists():
+                data = json.loads(p.read_text())
+                if isinstance(data.get("providers"), dict):
+                    self._state = data["providers"]
+        except Exception as exc:  # noqa: BLE001 — disclosed, non-fatal
+            self._last_error = f"state load failed: {exc}"
+
+    def _persist(self) -> None:
+        try:
+            self._dir.mkdir(parents=True, exist_ok=True)
+            tmp = self._dir / "state.json.tmp"
+            tmp.write_text(json.dumps(
+                {"providers": self._state,
+                 "updated_at": time.strftime("%Y-%m-%dT%H:%M:%SZ",
+                                             time.gmtime())},
+                indent=1, sort_keys=True))
+            tmp.replace(self._dir / "state.json")
+            self._last_error = None
+        except Exception as exc:  # noqa: BLE001
+            self._last_error = f"state persist failed: {exc}"
+
+    def _append_event(self, event: Dict[str, Any]) -> None:
+        try:
+            self._dir.mkdir(parents=True, exist_ok=True)
+            with open(self._dir / "events.jsonl", "a") as fh:
+                fh.write(json.dumps(event, sort_keys=True) + "\n")
+        except Exception as exc:  # noqa: BLE001
+            self._last_error = f"event append failed: {exc}"
+
+    # -- recording ---------------------------------------------------------
+    def _entry(self, provider_id: str) -> Dict[str, Any]:
+        return self._state.setdefault(provider_id, {
+            "call_count": 0,
+            "success_count": 0,
+            "failure_count": 0,
+            "consecutive_failures": 0,
+            "consecutive_rate_limits": 0,
+            "last_call_at": None,
+            "last_success_at": None,
+            "last_failure_at": None,
+            "last_failure_type": None,
+            "last_latency_ms": None,
+            "latency_ema_ms": None,
+            "cooldown_until_epoch": 0.0,
+        })
+
+    def record_success(self, provider_id: str, latency_ms: int,
+                       purpose: str = "", model: str = "") -> None:
+        with self._lock:
+            e = self._entry(provider_id)
+            e["call_count"] += 1
+            e["success_count"] += 1
+            e["consecutive_failures"] = 0
+            e["consecutive_rate_limits"] = 0
+            e["cooldown_until_epoch"] = 0.0
+            e["last_call_at"] = time.time()
+            e["last_success_at"] = time.time()
+            e["last_latency_ms"] = int(latency_ms)
+            ema = e.get("latency_ema_ms")
+            if ema is None:
+                e["latency_ema_ms"] = float(latency_ms)
+            else:
+                e["latency_ema_ms"] = round(
+                    0.7 * float(ema) + 0.3 * float(latency_ms), 1)
+            event = {"provider": provider_id, "ok": True,
+                     "latency_ms": int(latency_ms), "purpose": purpose,
+                     "model": model,
+                     "at": time.strftime("%Y-%m-%dT%H:%M:%SZ",
+                                         time.gmtime())}
+        self._append_event(event)
+        self._persist()
+
+    def record_failure(self, provider_id: str, failure_type: str,
+                       purpose: str = "", model: str = "",
+                       error: str = "") -> None:
+        if failure_type not in FAILURE_TYPES:
+            failure_type = UNKNOWN
+        cooldown_s = 0.0
+        with self._lock:
+            e = self._entry(provider_id)
+            e["call_count"] += 1
+            e["failure_count"] += 1
+            e["consecutive_failures"] += 1
+            e["last_call_at"] = time.time()
+            e["last_failure_at"] = time.time()
+            e["last_failure_type"] = failure_type
+            if failure_type == RATE_LIMITED:
+                e["consecutive_rate_limits"] += 1
+                idx = min(e["consecutive_rate_limits"],
+                          len(_COOLDOWN_LADDER_S)) - 1
+                cooldown_s = float(_COOLDOWN_LADDER_S[max(0, idx)])
+                e["cooldown_until_epoch"] = time.time() + cooldown_s
+            else:
+                e["consecutive_rate_limits"] = 0
+            event = {"provider": provider_id, "ok": False,
+                     "failure_type": failure_type, "purpose": purpose,
+                     "model": model, "error": error[:300],
+                     "cooldown_s": cooldown_s,
+                     "at": time.strftime("%Y-%m-%dT%H:%M:%SZ",
+                                         time.gmtime())}
+        self._append_event(event)
+        self._persist()
+
+    # -- queries -----------------------------------------------------------
+    def in_cooldown(self, provider_id: str) -> bool:
+        with self._lock:
+            e = self._state.get(provider_id)
+            if not e:
+                return False
+            return float(e.get("cooldown_until_epoch") or 0) > time.time()
+
+    def cooldown_remaining_s(self, provider_id: str) -> float:
+        with self._lock:
+            e = self._state.get(provider_id)
+            if not e:
+                return 0.0
+            return max(0.0, float(e.get("cooldown_until_epoch") or 0)
+                       - time.time())
+
+    def last_failure_type(self, provider_id: str) -> Optional[str]:
+        with self._lock:
+            e = self._state.get(provider_id)
+            return (e or {}).get("last_failure_type")
+
+    def recent_failure_rate(self, provider_id: str,
+                            window: int = 10) -> Optional[float]:
+        """Failures / calls over the last `window` calls, or None when
+        fewer than 2 calls were ever made (insufficient evidence is not
+        a 0.0 rate — Art. XXV)."""
+        with self._lock:
+            e = self._state.get(provider_id)
+            if not e:
+                return None
+            n = min(int(e.get("call_count") or 0), window)
+            if n < 2:
+                return None
+            fails = min(int(e.get("failure_count") or 0), n)
+            return round(fails / n, 3)
+
+    def snapshot(self, provider_specs: Optional[List[Dict]] = None,
+                 available_ids: Optional[List[str]] = None) -> List[Dict]:
+        """The /api/health providers[] array. provider_specs comes from
+        llm_registry.availability_matrix() so model/tier info is the
+        registry's own recorded policy input, not a second truth."""
+        out: List[Dict] = []
+        specs = provider_specs or []
+        avail = set(available_ids or
+                    [s.get("provider_id") for s in specs
+                     if s.get("available")])
+        with self._lock:
+            state = {k: dict(v) for k, v in self._state.items()}
+        for spec in specs:
+            pid = spec.get("provider_id")
+            e = state.get(pid, {})
+            has_key = bool(spec.get("available"))
+            called = int(e.get("call_count") or 0)
+            cooling = self.in_cooldown(pid)
+            if not has_key:
+                status = "UNAVAILABLE"          # no credential (env truth)
+            elif called == 0:
+                status = "NEVER_CALLED"         # configured, unproven
+            elif cooling:
+                status = "RATE_LIMITED"
+            elif e.get("last_failure_at") and \
+                    (e.get("last_success_at") or 0) < \
+                    (e.get("last_failure_at") or 0):
+                status = "DEGRADED"
+            else:
+                status = "OK"
+            out.append({
+                "provider": pid,
+                "status": status,
+                "available": has_key,
+                "model": spec.get("model"),
+                "model_count": 1,  # the engine's configured model per
+                # provider; router-style providers still expose exactly
+                # the one model this engine is pinned to (honest count)
+                "quality_tier": spec.get("quality_tier"),
+                "cost_tier": spec.get("cost_tier"),
+                "latency_tier": spec.get("latency_tier"),
+                "context_window": spec.get("context_capacity_tokens"),
+                "last_success": (
+                    time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(
+                        float(e.get("last_success_at") or 0)))
+                    if e.get("last_success_at") else None),
+                "last_failure": (
+                    time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(
+                        float(e.get("last_failure_at") or 0)))
+                    if e.get("last_failure_at") else None),
+                "last_failure_type": e.get("last_failure_type"),
+                "latency_ms": e.get("last_latency_ms"),
+                "latency_ema_ms": e.get("latency_ema_ms"),
+                "call_count": called,
+                "failure_count": e.get("failure_count"),
+                "recent_failure_rate": self.recent_failure_rate(pid),
+                "rate_limit_state": (
+                    f"COOLDOWN_{int(self.cooldown_remaining_s(pid))}S"
+                    if cooling else "CLEAR"),
+            })
+        self._last_error and out.append({
+            "provider": "_book", "status": "PERSISTENCE_DEGRADED",
+            "note": self._last_error[:200],
+        })
+        return out
+
+    def diagnostics(self) -> Dict[str, Any]:
+        with self._lock:
+            return {"providers_tracked": len(self._state),
+                    "last_persistence_error": self._last_error,
+                    "health_dir": str(self._dir)}
+
+
+# Module-level singleton — one book per process, shared by the registry,
+# the health endpoint and the worker. Tests construct their own instance
+# with a temp dir (Art. IX: certification must not touch production
+# state; the singleton is never written by tests).
+HEALTH = ProviderHealthBook()
+
+
+# ---------------------------------------------------------------------------
+# The deterministic role router (operator directive section 7)
+# ---------------------------------------------------------------------------
+ROLE_SYNTHESIS = "synthesis"        # complex mechanism reasoning
+ROLE_EXTRACTION = "extraction"      # fast evidence extraction
+ROLE_ATTACK = "attack"              # adversarial review
+ROLE_TRANSFORM = "transform"        # simple JSON shaping (prefer no LLM)
+
+_PURPOSE_ROLE_HINTS = {
+    # purposes in use across the engine (grep-verified) -> roles
+    "structured_evidence_extraction": ROLE_EXTRACTION,
+    "structured_evidence_extraction_retry": ROLE_EXTRACTION,
+    "independent_attack": ROLE_ATTACK,
+    "ensemble_invention": ROLE_SYNTHESIS,
+    "mechanism_space": ROLE_SYNTHESIS,
+    "improvement_mutation_proposal": ROLE_SYNTHESIS,
+    "technical_mutation_proposal": ROLE_SYNTHESIS,
+    "technical_state_extraction": ROLE_EXTRACTION,
+    "cad_build_program_proposal": ROLE_SYNTHESIS,
+    "diversity_exploration": ROLE_SYNTHESIS,
+}
+
+
+def role_for_purpose(purpose: str) -> str:
+    p = (purpose or "").lower()
+    for hint, role in _PURPOSE_ROLE_HINTS.items():
+        if hint in p:
+            return role
+    if "attack" in p or "adversar" in p:
+        return ROLE_ATTACK
+    if "extract" in p:
+        return ROLE_EXTRACTION
+    return ROLE_SYNTHESIS
+
+
+def order_for_role(matrix: List[Dict[str, Any]], role: str,
+                   avoid_provider: Optional[str] = None,
+                   book: Optional[ProviderHealthBook] = None) -> List[str]:
+    """Deterministic provider ORDER for one role. Inputs: the registry's
+    own availability matrix (availability, tiers, context capacity) and
+    the health book (cooldown, recent failure rate). Ordering rules:
+
+      attack     : providers != avoid_provider first (Art. XLV
+                   SEPARATE_PROVIDER when the chain actually lands on
+                   one), then quality, then latency.
+      extraction : latency tier, then cost, then quality (fast/cheap
+                   first — the operator's routing table).
+      transform  : cost tier, then latency.
+      synthesis  : quality tier, then cost, then latency (the registry
+                   default).
+
+    Cooldown demotion (never removal) applies to every role: a
+    rate-limited provider slides to the end so the cascade tries the
+    healthy path first without ever refusing to run (Art. V).
+    """
+    b = book or HEALTH
+    avail = [m for m in matrix if m.get("available")]
+
+    def _rank(m: Dict[str, Any]) -> tuple:
+        if role == ROLE_ATTACK:
+            first = 0 if m["provider_id"] != avoid_provider else 1
+            return (first, m["quality_tier"], m["latency_tier"],
+                    m["cost_tier"])
+        if role == ROLE_EXTRACTION:
+            return (m["latency_tier"], m["cost_tier"], m["quality_tier"])
+        if role == ROLE_TRANSFORM:
+            return (m["cost_tier"], m["latency_tier"], m["quality_tier"])
+        return (m["quality_tier"], m["cost_tier"], m["latency_tier"])
+
+    ranked = sorted(avail, key=_rank)
+    order = [m["provider_id"] for m in ranked]
+    cooled = [p for p in order if b.in_cooldown(p)]
+    if cooled and len(order) > 1:
+        order = [p for p in order if p not in cooled] + cooled
+    return order
+
+
+def independence_degree(generator_provider: Optional[str],
+                        attacker_provider: Optional[str]) -> str:
+    """Art. XLV vocabulary for the generator/attacker separation."""
+    if not generator_provider or not attacker_provider:
+        return "NOT_INDEPENDENT"
+    if generator_provider != attacker_provider:
+        return "SEPARATE_PROVIDER"
+    return "SEPARATE_CONTEXT_ONLY"

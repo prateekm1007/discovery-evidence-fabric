@@ -26,6 +26,10 @@ from __future__ import annotations
 
 from typing import Any, Dict, Optional
 
+from .run_state import (OUTCOME_LABELS, OUTCOME_NO_DEFENSIBLE,
+                        OUTCOME_REQUIRES_EXPERIMENT, OUTCOME_RUN_BLOCKED,
+                        OUTCOME_SURVIVED, terminal_outcome)
+
 # Machine -> user translation (CEO directive 2). The machine taxonomy
 # stays intact internally; this is the product-surface projection.
 _TRANSPORT_ERRORS = ("ERROR_TRANSPORT",)
@@ -110,10 +114,24 @@ def user_state(session: Dict[str, Any]) -> str:
     return "RUNNING" if status in ("", None) else "COMPLETED_UNKNOWN"
 
 
+def _run_dir(session: Dict[str, Any]):
+    """Resolve the session's run dir for artifact-derived projections
+    (the outcome consults the run's own package report when the session
+    index lags the worker — Art. X: the run dir is the authority)."""
+    from pathlib import Path
+    rd = session.get("run_dir")
+    try:
+        p = Path(rd) if rd else None
+        return p if p and p.exists() else None
+    except Exception:  # noqa: BLE001 — absent stays absent
+        return None
+
+
 def user_state_view(session: Dict[str, Any]) -> Dict[str, Any]:
     """The full user-state projection for one session (label, meaning,
     decision line, finish flags) — derived from the session record's own
-    fields, never hand-written per-run copy."""
+    fields (plus its run dir's package report when present — the run
+    dir is the authority, Art. X), never hand-written per-run copy."""
     key = user_state(session)
     final = (session.get("final_status") or "") or ""
     pkg = session.get("package") or {}
@@ -155,6 +173,15 @@ def user_state_view(session: Dict[str, Any]) -> Dict[str, Any]:
         "rejected": rejected,
         "package_available": bool(pkg.get("complete")),
         "machine_status": session.get("status"),  # never shown as the state
+        # R414 (directive §18): the four terminal outcome states. The
+        # granular user_state above stays the sub-detail; the outcome is
+        # the product-level terminal truth, derived by run_state from
+        # recorded fields only.
+        "outcome": terminal_outcome(session, _run_dir(session)).get(
+            "outcome"),
+        "outcome_label": OUTCOME_LABELS.get(
+            terminal_outcome(session, _run_dir(session)).get("outcome"),
+            "Investigating"),
     }
 
 
@@ -190,8 +217,18 @@ def strip_operational_fields(session: Dict[str, Any]) -> Dict[str, Any]:
 def public_session_view(session: Dict[str, Any]) -> Dict[str, Any]:
     """The FULL customer-facing projection: user state + stripped
     internals. Every API response that carries a session record goes
-    through this (R394 s15/s16)."""
-    return with_user_state(strip_operational_fields(session))
+    through this (R394 s15/s16).
+
+    R414: the user-state projection (including the four-outcome
+    terminal state) is derived FIRST — while the run_dir is still
+    present so the outcome can consult the run's own package report —
+    and the operational fields are stripped AFTER. Stripping first
+    made the outcome fall back to the (lagging) session index, which
+    disagreed with the detail view (Art. X: one authority, not two
+    projections of it)."""
+    projected = with_user_state(session)
+    stripped = strip_operational_fields(projected)
+    return stripped
 
 
 # raw final_status -> readable language (CEO directive 16: "raw labels
