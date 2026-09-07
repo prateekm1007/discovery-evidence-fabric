@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Create a repeatable control loop between the external AI auditor and the project coder so that neither party relies on memory, stale handoffs, or the other party's confidence. The objective is continual improvement of the discovery and invention machine while preserving the Constitution, experimental integrity, provenance, and product mission.
+Create a repeatable control loop between the external AI auditor and the project coder so that neither party relies on stale handoffs, unverified confidence, or loss of continuity. The objective is continual improvement of the discovery and invention machine while preserving the Constitution, experimental integrity, provenance, and product mission.
 
 ## Authority order
 
@@ -39,7 +39,8 @@ The auditor and coder must establish the same baseline:
 - current auditor governance versions and hashes;
 - current active branches and pull requests;
 - known unresolved standing notes;
-- current product acceptance target.
+- current product acceptance target;
+- **current remembered project state/direction checkpoint, refreshed against the authoritative baseline.**
 
 Do not rely on a stale handoff to establish these facts.
 
@@ -53,7 +54,21 @@ The auditor reads:
 4. the most recent relevant worklog/directive;
 5. the current deployed UI/API where applicable.
 
+The auditor reconstructs and records internally a continuity checkpoint containing at least:
+
+- project mission;
+- two-repository roles;
+- current authoritative commits and deployment identity;
+- settled architectural decisions that should not be casually reopened;
+- standing blockers and owner-gated decisions;
+- latest accepted coder directive;
+- last verified end-to-end behavior;
+- what remains unproven;
+- relevant recently rejected approaches and why they were rejected.
+
 The auditor states the claims to be tested and identifies at least one plausible falsifier for each major claim.
+
+**Continuity is not evidence.** The checkpoint exists to prevent entropy and must be refreshed against live state before it is used to prescribe work.
 
 ## Phase 2 — Coder preparation
 
@@ -67,6 +82,8 @@ The coder identifies:
 - tests expected to cover the change;
 - production acceptance path;
 - deployment/release requirements.
+
+The coder explicitly confirms the latest accepted directive before starting so that completed or rejected work is not inadvertently repeated.
 
 ## Phase 3 — Independent audit first
 
@@ -83,7 +100,7 @@ Required observation channels when relevant:
 - buyer package;
 - provenance records.
 
-The auditor must distinguish observed facts from coder claims.
+The auditor must distinguish observed facts from coder claims and must not substitute remembered state for current observation.
 
 ## Phase 4 — Coder response
 
@@ -147,6 +164,7 @@ Examples:
 - "No 3D" → coder asks "did the auditor inspect the geometry bridge or only the UI?"
 - "Provider unavailable" → auditor asks "was alternate provider routing exercised?"
 - "No evidence" → coder asks "were sources actually reachable?"
+- **"This is what we decided last time" → either party asks "what is the current authoritative evidence that the decision remains settled?"**
 
 Neither side wins by rhetoric; the decisive test is a reproducible observation.
 
@@ -178,6 +196,7 @@ A release is complete only when:
 - known blind spots checked;
 - repository state verified;
 - deployment identity verified;
+- continuity checkpoint refreshed and reconciled against live state;
 - no frozen artifact modified improperly;
 - relevant tests pass;
 - fresh user path exercised;
@@ -191,6 +210,8 @@ A release is complete only when:
 
 ```text
 AUDITOR GOVERNANCE READ
+        ↓
+RECONSTRUCT + REFRESH PROJECT STATE/DIRECTION
         ↓
 AUDIT CURRENT STATE
         ↓
@@ -222,4 +243,6 @@ NEXT LOOP
 
 Do not allow the audit process itself to become a checklist ritual. Each round must ask a fresh question: **what could still be false even if everything reported so far is true?**
 
-That question is mandatory whenever a release is called complete.
+The auditor must also ask: **what might I have forgotten about the project's settled direction that would make my new recommendation create entropy?**
+
+Those questions are mandatory whenever a release is called complete or a new coding directive is issued.
