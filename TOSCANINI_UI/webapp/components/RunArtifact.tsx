@@ -107,11 +107,20 @@ function CioPanel({ cio, detail }: { cio: CIO; detail: SessionDetail }) {
               itself — disclosed with their recorded reason, never the
               old blanket "No 3D on this run." */}
           <b>Visual artifact unavailable.</b>{" "}
-          {geo?.bridge_outcome === "BRIDGE_GEOMETRY_FAILED"
-            ? "The automatic 3D bridge attempted generation, failed after diagnosis and repair, and recorded every attempt — an engine defect, not an honest absence. The failure record is in the run directory."
-            : geo?.parametric_model_present
-              ? "A parametric model was produced but no exported mesh — design is DESIGNED, the 3D export was not reached."
-              : "No visual artifact was produced for this invention — the bridge gate recorded its reason (an implementation failure by the product contract, disclosed honestly)."}
+          {geo?.bridge_why ? (
+            <span>
+              {geo.bridge_outcome === "BRIDGE_GEOMETRY_FAILED"
+                ? "The automatic 3D bridge attempted generation, failed after diagnosis and repair, and recorded every attempt — an engine defect, not an honest absence. "
+                : ""}
+              Recorded reason: {geo.bridge_why}
+            </span>
+          ) : geo?.bridge_outcome === "BRIDGE_GEOMETRY_FAILED" ? (
+            "The automatic 3D bridge attempted generation, failed after diagnosis and repair, and recorded every attempt — the failure record is in the run directory."
+          ) : geo?.parametric_model_present ? (
+            "A parametric model was produced but no exported mesh — design is DESIGNED, the 3D export was not reached."
+          ) : (
+            "No visual artifact was produced for this invention — the bridge gate recorded its reason (an implementation failure by the product contract, disclosed honestly)."
+          )}
         </div>
       )}
 

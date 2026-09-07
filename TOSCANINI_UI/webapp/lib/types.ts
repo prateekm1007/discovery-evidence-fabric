@@ -550,6 +550,7 @@ export interface CIO {
     parametric_model_present?: boolean;
     cad_pipeline_status?: string;
     bridge_outcome?: string | null;
+    bridge_why?: string | null;
     authority?: string;
   };
   simulation?: {

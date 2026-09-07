@@ -135,6 +135,31 @@ def _bridge_package_info(run_dir: Path) -> Optional[Dict[str, Any]]:
     }
 
 
+def _bridge_why(bridge_report: Dict[str, Any]) -> Optional[str]:
+    """R418 (operator §4): when the artifact pane shows an unavailable
+    state, the backend must answer WHY — the recorded reason from the
+    bridge's own report (never a blanket sentence, never invented)."""
+    outcome = bridge_report.get("outcome")
+    if not outcome or outcome in ("COMPLETED", "ALREADY_COMPLETE",
+                                  "PACKAGE_ADDED_TO_EXISTING_GEOMETRY",
+                                  "CONCEPTUAL_FALLBACK"):
+        return None
+    if outcome == "NO_INVENTION":
+        return ("no invention-side artifacts were recorded on this run — "
+                "the bridge generates nothing (honest absence)")
+    report = bridge_report.get("report") or {}
+    steps = report.get("steps") or []
+    geom = next((s for s in steps if s.get("step") == "GEOMETRY"), {})
+    attempts = (geom.get("detail") or {}).get("attempts") or []
+    why = "; ".join(
+        f"{a.get('failure_class') or 'ATTEMPT'}: "
+        f"{str(a.get('diagnosis') or a.get('error') or 'no detail')[:160]}"
+        for a in attempts if a.get("status") != "OK") or \
+        str(bridge_report.get("error") or
+            bridge_report.get("note") or "no recorded attempt detail")
+    return f"bridge outcome {outcome}: {why}"[:600]
+
+
 def _sha_file(p: Path) -> Optional[str]:
     try:
         if p.exists() and p.is_file():
@@ -382,6 +407,7 @@ def build_cio(session: Dict[str, Any]) -> Optional[Dict[str, Any]]:
             "parametric_model_present": bool(pm),
             "cad_pipeline_status": (cad_ledger or {}).get("status"),
             "bridge_outcome": bridge_report.get("outcome"),
+            "bridge_why": _bridge_why(bridge_report),
             "authority": (
                 "CONCEPTUAL architecture visualization (CadQuery/OCCT "
                 "topology-only build, R418 invention bridge): this is "

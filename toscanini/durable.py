@@ -173,11 +173,22 @@ def _run_dir_files(run_dir: Path) -> List[Path]:
         "RELEASE_GATE_EVALUATION.json", "RELEASE_PROOF.json",
         "DISCOVERY_RELEASE.json", "DOSSIER_QUALITY_EVALUATION.json",
         "ENSEMBLE_DISAGREEMENT.json", "EXPLORATION_GRID.json",
+        # R418: the automatic artifact contract's product state — the
+        # bridge report (the WHY of any artifact failure), the evolution
+        # lineage (resume-safety per R416) and the per-generation records
+        "BRIDGE_REPORT.json", "INVENTION_LINEAGE.json",
     }
     out: List[Path] = []
     for f in sorted(run_dir.glob("*.json")):
-        if f.name in keep_json or f.name.startswith("envelope_"):
+        if f.name in keep_json or f.name.startswith("envelope_") \
+                or f.name.startswith("EVOLUTION_GEN_"):
             out.append(f)
+    # R418: the bridge's visual artifacts (MODEL/model-00N.glb) and the
+    # generation models — the product surface's 3D layer; the per-file
+    # size cap below filters anything oversized
+    model_dir = run_dir / "MODEL"
+    if model_dir.is_dir():
+        out.extend(sorted(model_dir.glob("*.glb")))
     dl = run_dir / "DOWNLOAD"
     if dl.is_dir():
         out.extend(sorted(p for p in dl.rglob("*") if p.is_file()))
