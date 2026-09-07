@@ -407,8 +407,41 @@ def test_expansion_produces_genuinely_different_terms():
         assert toks != ptoks, f"cosmetic rewrite: {v['query']}"
         assert v["derivation_class"] in (
             "FUNCTION_EQUIV", "CROSS_DOMAIN_TERM", "ADJACENT_INDUSTRY",
-            "DOMAIN_NARROW", "EXPLORATORY_HYPOTHESIS", "LLM_PROPOSED")
+            "DOMAIN_NARROW", "COMPARISON_TARGETED",
+            "EXPLORATORY_HYPOTHESIS", "LLM_PROPOSED")
         assert v["derivation_basis"]
+
+
+def test_comparison_targeted_variant_is_the_measured_form():
+    """R417 (Art. LI): the V3 query-form learning is adopted as a
+    variant class — the '{capability} experimental comparison' form
+    with the measured derivation basis, routed ADDITIVELY to the two
+    sources the V3 decomposition named (europepmc, core)."""
+    primary = mechanism_query(PROBLEM)
+    variants = expand_query(primary, PROBLEM)
+    comp = [v for v in variants
+            if v["derivation_class"] == "COMPARISON_TARGETED"]
+    assert comp, "the measured comparison-targeted form is missing"
+    v = comp[0]
+    assert v["query"].endswith("experimental comparison")
+    # the selector only adds the document-class tail — no mechanism term
+    base_tokens = set(re.findall(r"[a-z0-9]+", primary.lower()))
+    v_tokens = set(re.findall(r"[a-z0-9]+", v["query"].lower()))
+    assert v_tokens - base_tokens == {"experimental", "comparison"}
+    assert "GATE_FAIL_DECOMPOSITION" in v["derivation_basis"]
+
+    # policy routing: additive on the measured sources
+    from discovery_fabric.retrieval_fabric.pipeline import (
+        SOURCE_VARIANT_POLICY, _select_variants)
+    assert SOURCE_VARIANT_POLICY["europepmc"] == "PRIMARY_AND_COMPARISON"
+    assert SOURCE_VARIANT_POLICY["core"] == "NARROW_AND_COMPARISON"
+    by_class = {v2["derivation_class"]: v2 for v2 in variants}
+    sel = _select_variants(variants, "PRIMARY_AND_COMPARISON")
+    classes = [x["derivation_class"] for x in sel]
+    assert classes == ["PRIMARY", "COMPARISON_TARGETED"], classes
+    sel_core = _select_variants(variants, "NARROW_AND_COMPARISON")
+    classes_core = [x["derivation_class"] for x in sel_core]
+    assert "COMPARISON_TARGETED" in classes_core, classes_core
 
 
 def test_expansion_terminology_lock_in_escape():

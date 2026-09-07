@@ -658,6 +658,11 @@ def generations_projection(session: Dict,
                 "physics_lifecycle": ch.get("physics_lifecycle"),
                 "survived": ch.get("survived"),
                 "evidence_verified": ch.get("evidence_verified"),
+                # R417 attacker-calibration gate: the measured-
+                # unselective independent attacker's KILL is escalated
+                # (objection preserved verbatim, never executed) — the
+                # product surface shows exactly what happened
+                "escalated_objection": ch.get("escalated_objection"),
             },
             "diagnosis": {
                 "cause": (g.get("diagnosis") or {}).get("cause"),

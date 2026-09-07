@@ -1091,6 +1091,18 @@ class EngineRun:
                             self._persist(
                                 f"INDEPENDENT_ATTACK_{key}.json",
                                 indep_attack)
+                # R417 attacker-calibration gate (Art. L): the
+                # instrument is measured NOT_CALIBRATED (FPR 1.0 on
+                # the sealed KNOWN_GOOD cohort) — its KILL is
+                # reclassified at consumption to ESCALATED_OBJECTION
+                # (objection + basis preserved verbatim; the
+                # deterministic gates are unchanged). The RAW record
+                # is persisted unmodified above; the gate runs on the
+                # in-memory copy the gauntlet consumes.
+                if indep_attack:
+                    from .attacker_calibration import \
+                        apply_at_consumption
+                    indep_attack = apply_at_consumption(indep_attack)
                 if indep_attack and indep_attack.get("overall") == "KILLED":
                     self._persist(f"PACKAGE_FAILED_{key}.json", {
                         "stage": "INDEPENDENT_ATTACK",
@@ -1104,8 +1116,23 @@ class EngineRun:
                     evaluated.append({
                         "candidate_id": c["candidate_id"],
                         "key": key, "attack": attack1,
-                        "independent_attack": indep_attack, "killed": True})
+                        "independent_attack": indep_attack,
+                        "killed": True})
                     continue
+                if indep_attack and indep_attack.get("attack_outcome") \
+                        == "ESCALATED_OBJECTION":
+                    # the measured-unselective attacker's kill: the
+                    # candidate is NOT killed by this attack alone; the
+                    # preserved objections travel on the record for
+                    # every downstream consumer (quality evaluation,
+                    # selection, the product surface)
+                    self._persist(
+                        f"INDEPENDENT_ATTACK_ESCALATED_{key}.json",
+                        {"stage": "INDEPENDENT_ATTACK",
+                         "candidate_id": c["candidate_id"],
+                         "escalation": indep_attack.get("escalation"),
+                         "preserved_objections":
+                             indep_attack.get("preserved_objections")})
                 eng_final, repaired = eng1, False
                 if attack1["counts"].get("REPAIR", 0) > 0:
                     eng2 = repair_engineering(s, eng1, attack1)
@@ -2306,6 +2333,16 @@ class EngineRun:
                      "error": f"{type(exc).__name__}: {exc}"[:300]}
         gen["challenge"]["independent_attack"] = (
             indep or {}).get("overall")
+        # R417 attacker-calibration gate (Art. L): same rule as the
+        # standard gauntlet — the measured-unselective instrument's
+        # KILL cannot terminate a generation; it becomes an
+        # ESCALATED_OBJECTION (objection + basis preserved verbatim,
+        # measured state carried). The RAW record is persisted above
+        # unmodified; the gate reclassifies the consumed copy.
+        if indep:
+            from .attacker_calibration import apply_at_consumption
+            indep = apply_at_consumption(indep)
+            gen["challenge"]["independent_attack"] = indep.get("overall")
         if (indep or {}).get("overall") == "KILLED":
             gen["challenge"].update({
                 "killed": True, "kill_stage": "INDEPENDENT_ATTACK",
@@ -2320,6 +2357,30 @@ class EngineRun:
                 "independence_mode": (indep or {}).get(
                     "independence_mode")})
             return gen
+        if (indep or {}).get("attack_outcome") == "ESCALATED_OBJECTION":
+            # the generation survives the challenge WITH the preserved
+            # objection attached — surfaced in the lineage record, the
+            # narrative, and the product surface (never hidden, never
+            # executed as a death)
+            gen["challenge"]["escalated_objection"] = {
+                "preserved_objections":
+                    indep.get("preserved_objections"),
+                "calibration_state":
+                    (indep.get("escalation") or {}).get(
+                        "calibration_state"),
+                "measured": (indep.get("escalation") or {}).get(
+                    "measured"),
+                "note": ("the independent attack KILLED this "
+                         "architecture, but the instrument is measured "
+                         "NOT_CALIBRATED (FPR 1.0 on sealed known-good "
+                         "mechanisms): the objection is preserved and "
+                         "escalated, not executed (Art. L)")}
+            self._persist(
+                f"INDEPENDENT_ATTACK_ESCALATED_gen-{gen_n}.json",
+                {"generation": gen_n, "invention_id": invention_id,
+                 "escalation": indep.get("escalation"),
+                 "preserved_objections":
+                     indep.get("preserved_objections")})
 
         # survived the re-evaluation gauntlet
         evidence_verified = bool(

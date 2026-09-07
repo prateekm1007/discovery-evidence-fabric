@@ -226,6 +226,21 @@ export function GenerationsTimeline({
                   : ""}
               </div>
             )}
+            {ch.escalated_objection && (
+              <div className="gen-escalated">
+                <b>Independent-attack objection preserved (not executed).</b>{" "}
+                The attacker instrument is measured not calibrated — it kills
+                {" "}
+                {ch.escalated_objection.measured?.fpr_known_good != null
+                  ? `${Math.round((ch.escalated_objection.measured.fpr_known_good ?? 0) * 100)}% of`
+                  : ""}{" "}
+                sealed known-good mechanisms too — so its objection is
+                escalated for adjudication, never treated as a verdict.
+                {ch.escalated_objection.preserved_objections?.[0]?.basis
+                  ? ` Strongest objection: ${String(ch.escalated_objection.preserved_objections[0].basis).slice(0, 220)}`
+                  : ""}
+              </div>
+            )}
             {ch.survived && (
               <div className="gen-survive">
                 Survived the challenge gauntlet

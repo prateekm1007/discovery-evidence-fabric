@@ -82,7 +82,12 @@ LANE_SOURCE_MAP = {
 #: weak-ranking repository sources get DOMAIN_NARROW; keyword sources
 #: get PRIMARY/keyword-form; thesis lane gets alternative terminology.
 SOURCE_VARIANT_POLICY = {
-    "europepmc": "PRIMARY",
+    # R417 (Art. LI adoption of the R412-V3 query-form learning): the
+    # two sources the V3 decomposition measured for the numeric-
+    # bearing reference gap (europepmc 9 / core 3 of the 12 unmatched
+    # records) additionally receive the COMPARISON_TARGETED variant —
+    # ADDITIVE to their existing selection, never replacing it.
+    "europepmc": "PRIMARY_AND_COMPARISON",
     "openalex": "KEYWORD_FORM",
     "semantic_scholar": "PRIMARY",
     "crossref": "PRIMARY",
@@ -90,7 +95,7 @@ SOURCE_VARIANT_POLICY = {
     "arxiv": "PRIMARY",
     "datacite": "NARROW_OR_PRIMARY",
     "openaire": "PRIMARY",
-    "core": "DOMAIN_NARROW",
+    "core": "NARROW_AND_COMPARISON",
     "google_patents": "PRIMARY_AND_CROSS_DOMAIN",
 }
 
@@ -133,6 +138,22 @@ def _select_variants(variants: List[Dict[str, Any]],
         cd = by_class.get("CROSS_DOMAIN_TERM")
         if cd:
             out.append(cd)
+        return out
+    # R417: additive comparison-targeted routing for the sources the
+    # V3 measurement named (the numeric-bearing reference records were
+    # europepmc/core-indexed; the comparison form retrieved them)
+    if policy == "PRIMARY_AND_COMPARISON":
+        out = [primary] if primary else []
+        comp = by_class.get("COMPARISON_TARGETED")
+        if comp:
+            out.append(comp)
+        return out
+    if policy == "NARROW_AND_COMPARISON":
+        v = by_class.get("DOMAIN_NARROW") or kw
+        out = [v]
+        comp = by_class.get("COMPARISON_TARGETED")
+        if comp:
+            out.append(comp)
         return out
     return [primary] if primary else []
 

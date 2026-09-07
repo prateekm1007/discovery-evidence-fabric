@@ -113,6 +113,11 @@ def expand_query(primary: str,
       ADJACENT_INDUSTRY     — cross-domain industry transfer
       DOMAIN_NARROW         — top mechanism keywords only (for
                               weak-ranking sources like CORE)
+      COMPARISON_TARGETED   — the measured query-form learning (R412-V3
+                              decomposition cause 1): the '{capability}
+                              experimental comparison' form retrieves the
+                              numeric-bearing comparative-experimental
+                              document class; adopted per Art. LI
       EXPLORATORY_HYPOTHESIS — solution-class term NOT derived from
                               evidence; marked exploratory, never
                               counted as evidence-derived
@@ -177,6 +182,29 @@ def expand_query(primary: str,
     for ind in industries[:3]:
         _add(f"{mechanism_core} {ind}", "ADJACENT_INDUSTRY",
              f"cross-domain transfer to '{ind}' (adjacent-industry map)")
+
+    # COMPARISON_TARGETED: the R412-V3 measured learning, adopted
+    # forward (Art. LI: negative knowledge must change future search).
+    # The V3 gate-fail decomposition (R412/GRADIENT_V3/RUN/
+    # GATE_FAIL_DECOMPOSITION.json, cause 1) measured that the query
+    # FORM is the dominant retrieval variable for numeric-bearing
+    # evidence: the comparison-targeted form ('{capability}
+    # experimental comparison') outperformed all three sealed lane
+    # forms on reference recall (the 12 unmatched numeric-bearing
+    # records were europepmc/core-indexed). Mechanism: the form
+    # selects for comparative-experimental literature — the document
+    # class that carries measured values. This is a DERIVED-from-
+    # measurement query variant, not a solution-class injection (Art.
+    # XLIII: it adds no mechanism/technology term — only the
+    # document-class selector).
+    base = " ".join(primary.lower().split()[:6])
+    if len(base.split()) >= 2:
+        _add(f"{base} experimental comparison",
+             "COMPARISON_TARGETED",
+             "measured query-form learning (R412/GRADIENT_V3/RUN/"
+             "GATE_FAIL_DECOMPOSITION.json cause 1: the comparison-"
+             "targeted form retrieves the numeric-bearing comparative-"
+             "experimental document class; adopted per Art. LI)")
 
     # DOMAIN_NARROW: short keyword form for weak-ranking sources
     # (measured: CORE's long-query behavior matched 9.7M works)

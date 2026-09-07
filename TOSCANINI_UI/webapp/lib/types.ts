@@ -446,6 +446,16 @@ export interface GenerationRecord {
     physics_lifecycle?: string | null;
     survived?: boolean;
     evidence_verified?: boolean;
+    escalated_objection?: {
+      preserved_objections?: { attack_class?: string | null; basis?: string | null }[];
+      calibration_state?: string | null;
+      measured?: {
+        tpr_scoped?: number | null;
+        fpr_known_good?: number | null;
+        n_cases_attacked?: number | null;
+      } | null;
+      note?: string | null;
+    } | null;
   };
   diagnosis?: { cause?: string | null; basis?: string[] } | null;
   fresh_evidence?: {
