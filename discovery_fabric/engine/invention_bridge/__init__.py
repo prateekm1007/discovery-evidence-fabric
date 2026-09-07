@@ -18,22 +18,25 @@ Contract (operator P0 product correction, 2026-09-07):
     MODEL/model-00N.glb (+ STEP/STL when engineering)
         |
         v  package (essay PDFs, engineering definition, evidence
-           summary, decisive experiment, manifest sha256, provenance)
-    TECHNOLOGY_PACKAGE/ + zip
+           summary, decisive experiment, MODEL/, manifest, provenance)
         |
-        v  CIO update (epistemic guards intact)
+        v  CIO update (geometry.present, downloads, maturity basis)
 
-Epistemic law (Constitution v2.1.0):
-- CONCEPTUAL_3D / SYSTEM_3D / PROCESS_3D never claim ENGINEERING_3D
-  (Art. XXVIII — no silent semantic promotion).
-- Conceptual artifacts carry NO engineering dimensions; topology only.
-- Modelled parameters are labeled ENGINE-DECLARED MODELLED proposals
-  (Art. XXVII).
-- EXPERIMENTALLY_VERIFIED is never set by this bridge (Art. LIII).
-- The buyer-package quality gate and release gate are untouched — the
-  bridge package is a distinct honest artifact class (technology
-  package for early technical evaluation), never a weakened buyer
-  release (Art. IV/VII).
-- reviewer_provenance=AI_REVIEW on every artifact (Art. LXVII).
+This package __init__ is deliberately LIGHT (R420b): importing the
+bridge pulls cadquery/OCP (~500 MB RSS — measured locally 2026-09-08,
+497 MB), which OOM-killed the 512 MB production container when the
+async artifact workers spawned at boot (deploy dep-dafjealg1s2s73eqnog0
+update_failed; the container never reached its boot snapshot). Every
+submodule is importable on its own:
+
+    from discovery_fabric.engine.invention_bridge import render      # stdlib-only
+    from discovery_fabric.engine.invention_bridge import bridge      # heavy (OCP)
+    from discovery_fabric.engine.invention_bridge import classifier   # heavy
+    ...
+
+Importers that need the HEAVY modules (the run worker's bridge gate,
+tests) import them explicitly; light consumers (the async render job,
+the server's render routes) import only what they need. The render
+orchestrator itself (render.py) is stdlib-only by design so the
+detached artifact worker stays small next to Blender's own footprint.
 """
-from .bridge import bridge, BRIDGE_VERSION  # noqa: F401

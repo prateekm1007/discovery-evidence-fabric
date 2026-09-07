@@ -1523,3 +1523,20 @@ Stage Summary:
 - The render path is now autonomous by construction: typed in-worker skip/failure -> worker auto-enqueue -> async ladder -> persisted renders + job authority -> durable snapshot -> CIO/website display; restart -> deterministic observable recovery; pinned-build provenance fail-closed; every threshold carries its Article XXVII record; the production Dockerfile carries no external callbacks.
 - The deploy acceptance (live fresh run end to end + the boot healing of ts_c0f41af92195) is the remaining gate for this task; reported separately with OBSERVED/VERIFIED labels per operator §8.
 - reviewer_provenance=AI_REVIEW (Art. LXVII).
+
+---
+Task ID: R420b
+Agent: Coder (main session — deploy-failure root cause + fix)
+Task: The R420 deploy (dep-dafjealg1s2s73eqnog0, commit f6f7f751) built OK but update_failed after ~20 min with the container never going healthy. Diagnose from evidence (no Render logs available — the R419d-documented API gap), fix, redeploy.
+
+Work Log:
+- EVIDENCE: the new container never pushed a boot snapshot to runtime-state (its last snapshot would have carried engine_commit f6f7f751; none exists — the boot died BEFORE the snapshot line, i.e. in/before the new boot render sweeps, which run before the boot snapshot). Render rolled back to the R419f container (live again at 22:35, its boot snapshot present). The build phase SUCCEEDED (build_in_progress -> update_in_progress), so the image was fine; the STARTUP failed.
+- ROOT CAUSE (measured, not guessed): `from discovery_fabric.engine.invention_bridge import render` executed the package __init__, which did `from .bridge import bridge` -> the full cadquery/OCP closure. Measured locally in a clean interpreter: 497 MB RSS for ONE import. The boot render-recovery sweep spawned an artifact worker per qualifying session; each worker = ~500 MB python on a 512 MB instance -> OOM kill of the booting server -> crash-loop through the 20-minute update window -> update_failed. (Also: the sweeps ran INLINE before serve_forever, delaying the health check even without the OOM.)
+- FIX 1 (the load-bearing one): the package __init__ is now LIGHT — docs only, no bridge re-export. render.py is stdlib-only by design (verified: clean-interpreter import now 22 MB; the heavy bridge import is unchanged at ~499 MB when the RUN WORKER pulls it explicitly). All import sites updated to the explicit module path (`from discovery_fabric.engine.invention_bridge.bridge import bridge as run_bridge`): bridge_gate + the r419/r418 test files (the `from package import bridge` form now resolves to the MODULE, not the function — caught by the batteries immediately).
+- FIX 2: the boot sweeps moved into a DEFERRED DAEMON THREAD (45 s delay) started at the end of main() — the health check binds the port first, the deployment goes live, and the render work starts only after the boot settles.
+- FIX 3 (hygiene): _spawn_job mkdirs ENGINE_RUNS before opening the job log (a fresh container whose ENGINE_RUNS has not been restored must not crash the enqueue path).
+- NEW REGRESSION GUARD (Art. XXXI memory artifact): test_artifact_worker_import_chain_is_light — a fresh interpreter imports toscanini.artifact_worker + the render module, asserts ZERO cadquery/OCP/trimesh/numpy/scipy modules loaded and VmRSS < 120 MB. Measurement note learned the honest way: ru_maxrss is FORK-CONTAMINATED (the child inherits the parent's peak — a 570 MB pytest parent made the child "report" 569 MB while actually loading nothing heavy); the test reads VmRSS (current) + module census instead.
+
+Stage Summary:
+- Tests after R420b: combined r420+r418+r419 product/scipy/english/recovery batteries 100 passed + 7 skipped; with the pinned local build r420 + r419 render pipeline = 52 passed + 2 skipped (419 s, real renders). The import-cost guard runs in every future battery.
+- reviewer_provenance=AI_REVIEW.

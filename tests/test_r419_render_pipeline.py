@@ -34,7 +34,7 @@ import zipfile
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from discovery_fabric.engine.invention_bridge import bridge as run_bridge  # noqa: E402
+from discovery_fabric.engine.invention_bridge.bridge import bridge as run_bridge  # noqa: E402
 from discovery_fabric.engine.invention_bridge import render as render_stage  # noqa: E402
 
 REAL_RUN = os.path.join(os.path.dirname(os.path.abspath(__file__)),

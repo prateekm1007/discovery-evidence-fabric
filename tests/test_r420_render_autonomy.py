@@ -148,6 +148,45 @@ class TestDockerfileHygiene(unittest.TestCase):
                 continue
             self.assertNotIn("webhook.site", line)
 
+    def test_artifact_worker_import_chain_is_light(self):
+        """R420b — the deploy-failure root cause, guarded forever: the
+        async render job runs as a DETACHED subprocess next to the
+        server and Blender on a 512 MB instance. Its import chain must
+        stay LIGHT — importing the render orchestrator pulled the
+        cadquery/OCP closure through the package __init__ (measured
+        497 MB RSS in a clean interpreter; the first R420 deploy
+        update_failed with the container never reaching its boot
+        snapshot). Measured via CURRENT VmRSS in a fresh interpreter —
+        ru_maxrss is fork-contaminated (the child inherits the pytest
+        parent's peak) and VmRSS is the honest number."""
+        import subprocess as sp
+        code = (
+            "import sys\n"
+            "sys.path.insert(0, %r)\n"
+            "from toscanini import artifact_worker\n"
+            "from discovery_fabric.engine.invention_bridge import render\n"
+            "heavy = [m for m in sys.modules if m.split('.')[0] in\n"
+            "         ('cadquery', 'OCP', 'trimesh', 'numpy', 'scipy')]\n"
+            "vmrss = 0\n"
+            "for line in open('/proc/self/status'):\n"
+            "    if line.startswith('VmRSS:'):\n"
+            "        vmrss = int(line.split()[1]) // 1024\n"
+            "print('HEAVYCOUNT', len(heavy), 'VMRSS', vmrss)\n"
+            % str(REPO_ROOT))
+        out = sp.run([sys.executable, "-c", code], capture_output=True,
+                     text=True, timeout=120)
+        self.assertEqual(out.returncode, 0, out.stderr[-400:])
+        tag, heavy, tag2, vmrss = out.stdout.strip().split()
+        self.assertEqual((tag, tag2), ("HEAVYCOUNT", "VMRSS"))
+        self.assertEqual(int(heavy), 0,
+                         "the render job's import chain pulled the heavy "
+                         "geometry closure — it OOM-kills the 512 MB "
+                         "production container (R420b root cause)")
+        self.assertLess(int(vmrss), 120,
+                        f"artifact worker import chain grew to {vmrss} MB "
+                        f"of resident memory — too heavy next to Blender "
+                        f"on the 512 MB production instance")
+
 
 # ---------------------------------------------------------------------------
 # §5 threshold provenance (Art. XXVII)

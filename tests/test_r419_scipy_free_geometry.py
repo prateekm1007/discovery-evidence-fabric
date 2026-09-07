@@ -47,7 +47,7 @@ assert "scipy" not in sys.modules
 REPO = sys.argv[1]
 sys.path.insert(0, REPO)
 
-from discovery_fabric.engine.invention_bridge import (  # noqa: E402
+from discovery_fabric.engine.invention_bridge.bridge import (  # noqa: E402
     bridge as run_bridge,
     conceptual_geometry,
     engineering_geometry,

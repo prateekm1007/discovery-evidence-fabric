@@ -288,6 +288,13 @@ def enqueue(session_id: str, enqueued_by: str = "api") -> Dict[str, Any]:
 
 
 def _spawn_job(session_id: str) -> subprocess.Popen:
+    # R420b: the log parent must exist before open() (a fresh container
+    # whose ENGINE_RUNS has not been restored yet must not crash the
+    # enqueue path — spawn hygiene is part of the autonomous contract)
+    try:
+        (REPO_ROOT / "ENGINE_RUNS").mkdir(parents=True, exist_ok=True)
+    except OSError:
+        pass
     return subprocess.Popen(
         [sys.executable, "-m", "toscanini.artifact_worker", session_id],
         cwd=str(REPO_ROOT),

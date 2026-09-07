@@ -1318,24 +1318,37 @@ def main():
     # boot — a job left RUNNING when the container died is marked
     # INTERRUPTED in its own record and re-enqueued (deterministic,
     # observable). R420 §1: completed runs whose render path never
-    # finished get their async job now (one-shot: the record the job
+    # finished get their async job (one-shot: the record the job
     # writes stops the next boot from re-enqueueing).
-    try:
-        from toscanini import artifact_worker
-        recovered = artifact_worker.recover_interrupted_jobs()
-        if recovered:
-            print(f"render-job restart recovery re-enqueued "
-                  f"{len(recovered)} job(s): "
-                  f"{[r['session_id'] for r in recovered]}",
-                  file=sys.stderr)
-        healed = artifact_worker.boot_render_recovery()
-        if healed:
-            print(f"boot render recovery enqueued {len(healed)} job(s) "
-                  f"for runs with unfinished render paths: "
-                  f"{[h['session_id'] for h in healed]}", file=sys.stderr)
-    except Exception as exc:  # noqa: BLE001 — disclosed, never fatal
-        print(f"render-recovery sweep failed: {type(exc).__name__}: {exc}",
-              file=sys.stderr)
+    #
+    # R420b: the sweeps run in a DEFERRED DAEMON THREAD, not inline —
+    # (a) the container's health check needs the port bound FIRST (the
+    # first R420 deploy ran the sweeps before serve_forever and the
+    # update phase never went healthy); (b) the spawned artifact jobs
+    # must not compete with the boot's own memory window. The delay
+    # lets the deployment go live before any render work starts.
+    def _render_recovery_sweep():
+        import time as _time
+        _time.sleep(45)  # health check + boot settle first
+        try:
+            from toscanini import artifact_worker
+            recovered = artifact_worker.recover_interrupted_jobs()
+            if recovered:
+                print(f"render-job restart recovery re-enqueued "
+                      f"{len(recovered)} job(s): "
+                      f"{[r['session_id'] for r in recovered]}",
+                      file=sys.stderr, flush=True)
+            healed = artifact_worker.boot_render_recovery()
+            if healed:
+                print(f"boot render recovery enqueued {len(healed)} job(s) "
+                      f"for runs with unfinished render paths: "
+                      f"{[h['session_id'] for h in healed]}", file=sys.stderr,
+                      flush=True)
+        except Exception as exc:  # noqa: BLE001 — disclosed, never fatal
+            print(f"render-recovery sweep failed: {type(exc).__name__}: "
+                  f"{exc}", file=sys.stderr, flush=True)
+    threading.Thread(target=_render_recovery_sweep,
+                     daemon=True).start()
     # R396 B.1/B.2: a boot snapshot immediately after restore. This is
     # the snapshot-pipeline health check on EVERY boot (a failure is
     # disclosed through /api/health durable.last_snapshot — never

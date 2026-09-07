@@ -25,7 +25,7 @@ import zipfile
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from discovery_fabric.engine.invention_bridge import bridge as run_bridge
+from discovery_fabric.engine.invention_bridge.bridge import bridge as run_bridge
 from discovery_fabric.engine.invention_bridge import classifier, epistemics  # noqa: E402
 from discovery_fabric.engine.invention_bridge import conceptual_geometry, engineering_geometry  # noqa: E402
 

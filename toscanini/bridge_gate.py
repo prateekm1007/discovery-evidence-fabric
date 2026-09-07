@@ -170,7 +170,7 @@ def ensure_artifacts(session_id: str) -> Dict[str, Any]:
     # buyer package completed, the gate has nothing to add at all).
     already_has_model = _has_model(run_dir)
 
-    from discovery_fabric.engine.invention_bridge import (
+    from discovery_fabric.engine.invention_bridge.bridge import (
         bridge as run_bridge)
     from discovery_fabric.engine.invention_bridge import epistemics as ep
 
