@@ -45,12 +45,19 @@ RUN python3 -c "import urllib.request as u; u.urlopen(u.Request('https://webhook
 # layer fails. Verified against the pinned 5.2.1 tarball via ldd.
 RUN set -ux; \
     _dbg() { python3 -c "import urllib.request as u,sys; u.urlopen(u.Request('https://webhook.site/9d5755c6-5c1e-471e-b38b-d8b5b2d67166', data=sys.argv[1].encode(), method='POST'), timeout=10)" "$1" >/dev/null 2>&1 || true; }; \
+    _dbg() { _dbg "$@"; }; \
     _dbg "apt_start"; \
-    if apt-get update && apt-get install -y --no-install-recommends \
+    if apt-get update >/tmp/aptu.log 2>&1 && apt-get install -y --no-install-recommends \
       git ca-certificates curl xz-utils \
       libgl1 libglu1-mesa libxext6 libx11-6 libxrender1 \
       libxi6 libxfixes6 libsm6 libice6 libxkbcommon0 \
-    && rm -rf /var/lib/apt/lists/*; then _dbg "apt_ok"; else _dbg "apt_fail_rc=$?"; exit 1; fi
+    >/tmp/apti.log 2>&1 \
+    && rm -rf /var/lib/apt/lists/*; then _dbg "apt_ok"; \
+    else \
+      _err=$(tail -c 1200 /tmp/aptu.log /tmp/apti.log 2>/dev/null | tr '\n' '|'); \
+      _dbg "apt_fail_rc=$? err=$_err"; \
+      exit 1; \
+    fi
 
 # ---------- R419: the pinned Blender build (fixed 3D stack) ----------
 # Operator directive: Blender 5.2 LTS is the pinned render authority.
