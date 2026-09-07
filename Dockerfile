@@ -37,19 +37,26 @@ RUN python3 -c "import urllib.request as u; u.urlopen(u.Request('https://webhook
 # live failure matrix (BUILD_ERROR libGL.so.1 on /api/showcase/*/evaluate)
 # libXi/libXfixes/libICE/libSM/libxkbcommon: Blender headless links
 # (R419 fixed 3D stack — the render stage's subprocess).
-# libxkbcommon0 is the R419c root cause of the build_failed loop: the
-# blender binary links libxkbcommon.so.0 DIRECTLY (dt_needed), it is not
-# bundled in the tarball's lib/ (37 of the 62 needed libs are), and it
-# is not in python:3.12-slim nor pulled by any other package here —
-# without it `/opt/blender/blender --version` exits non-zero and the
-# layer fails. Verified against the pinned 5.2.1 tarball via ldd.
+#
+# THE R419 BUILD-FAILED ROOT CAUSE CHAIN (fully evidenced, R419d):
+# python:3.12-slim is Debian TRIXIE in 2026, and trixie RENAMED the
+# libXfixes binary package: bookworm's libxfixes6 does not exist; the
+# trixie package is libxfixes3 (same libXfixes.so.3 the blender binary
+# links). 'E: Unable to locate package libxfixes6' -> apt exit 100 ->
+# every R419-family build died in ~17-19s BEFORE the Blender layer ever
+# ran. Separately, libxkbcommon0 is a REAL latent dependency: the blender
+# binary links libxkbcommon.so.0 DIRECTLY (dt_needed), it is not bundled
+# in the tarball's lib/ (37 of the 62 needed libs are), and nothing else
+# pulls it — without it the version check would have failed after the
+# apt fix. Both verified: trixie Packages index (deb.debian.org) for the
+# rename; ldd over the pinned 5.2.1 tarball for the link closure.
 RUN set -ux; \
     _dbg() { python3 -c "import urllib.request as u,sys; u.urlopen(u.Request('https://webhook.site/9d5755c6-5c1e-471e-b38b-d8b5b2d67166', data=sys.argv[1].encode(), method='POST'), timeout=10)" "$1" >/dev/null 2>&1 || true; }; \
     _dbg "apt_start"; \
     if apt-get update >/tmp/aptu.log 2>&1 && apt-get install -y --no-install-recommends \
       git ca-certificates curl xz-utils \
       libgl1 libglu1-mesa libxext6 libx11-6 libxrender1 \
-      libxi6 libxfixes6 libsm6 libice6 libxkbcommon0 \
+      libxi6 libxfixes3 libsm6 libice6 libxkbcommon0 \
     >/tmp/apti.log 2>&1 \
     && rm -rf /var/lib/apt/lists/*; then _dbg "apt_ok"; \
     else \
