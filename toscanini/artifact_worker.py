@@ -73,6 +73,34 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 
 _JOB_LOCK = "RENDER_JOB.json"
 
+
+def _run_lock_path() -> Path:
+    """The SAME exclusive lock file the discovery run worker holds for
+    its whole lifetime (worker._serialize_run: store.STORE_DIR /
+    'run.lock' — the EXISTING production path, unchanged). The async
+    render job acquires it around each Blender attempt — on the 512 MB
+    instance there must be EXACTLY ONE heavy process at a time (an
+    engine run OR a render); without this mutual exclusion the
+    background recovery renders OOM-killed live run workers (observed
+    live 2026-09-07: the fresh run ts_a5a7eee35361's worker died and
+    the container restarted at 23:04 while the boot-recovery Blender
+    held memory)."""
+    p = store.STORE_DIR / "run.lock"
+    p.parent.mkdir(parents=True, exist_ok=True)
+    return p
+
+
+def _try_run_lock_nonblocking():
+    """(handle, acquired) — used by tests and diagnostics; the job
+    itself uses the blocking acquire."""
+    f = open(_run_lock_path(), "w")
+    try:
+        fcntl.flock(f, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        return f, True
+    except OSError:
+        f.close()
+        return None, False
+
 # R420 quality ladder — bounded, typed, provenance in
 # render_threshold_provenance.json (Art. XXVII). Each rung:
 # (samples, [width, height], budget_seconds)
@@ -487,6 +515,18 @@ def _acquire_render_lock():
     return f
 
 
+def _acquire_run_lock_blocking():
+    """R420c: block until no discovery run worker is active, then hold
+    the run lock for ONE render attempt (bounded by the attempt's
+    budget). A fresh user run therefore waits at most one attempt
+    (<= 900 s) before its worker proceeds — the calm, correct price
+    of a 512 MB instance. The run worker holds this same lock for its
+    whole lifetime, so an engine run and a Blender never overlap."""
+    f = open(_run_lock_path(), "w")
+    fcntl.flock(f, fcntl.LOCK_EX)  # blocking — jobs are patient
+    return f
+
+
 def run(session_id: str) -> Dict[str, Any]:
     """The job body: run the render stage over the authoritative GLB,
     through the bounded quality ladder, under the render lock.
@@ -552,16 +592,26 @@ def run(session_id: str) -> Dict[str, Any]:
         rec: Dict[str, Any] = {}
         for idx, (samples, resolution, budget_s) in enumerate(
                 QUALITY_LADDER, start=1):
+            # R420c: mutual exclusion with the discovery runs — hold
+            # the run lock for exactly one attempt (an engine run and
+            # a Blender must never share the 512 MB instance)
+            run_lock = _acquire_run_lock_blocking()
             try:
-                rec = render.render_invention(
-                    str(run_dir), {"generation_models": None},
-                    is_conceptual=vis_class != "ENGINEERING_3D",
-                    memory_mode="async",
-                    samples=samples, resolution=resolution,
-                    timeout_s=budget_s)
-            except Exception as exc:  # noqa: BLE001 — typed, never silent
-                rec = {"stage": "RENDER", "status": "RENDER_FAILED",
-                       "error": f"{type(exc).__name__}: {exc}"}
+                try:
+                    rec = render.render_invention(
+                        str(run_dir), {"generation_models": None},
+                        is_conceptual=vis_class != "ENGINEERING_3D",
+                        memory_mode="async",
+                        samples=samples, resolution=resolution,
+                        timeout_s=budget_s)
+                except Exception as exc:  # noqa: BLE001 — typed, never silent
+                    rec = {"stage": "RENDER", "status": "RENDER_FAILED",
+                           "error": f"{type(exc).__name__}: {exc}"}
+            finally:
+                try:
+                    run_lock.close()
+                except Exception:  # noqa: BLE001
+                    pass
             attempts.append({
                 "attempt": idx,
                 "samples": samples,

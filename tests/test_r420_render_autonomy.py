@@ -720,6 +720,34 @@ class TestLadderAndTypedTerminal(unittest.TestCase):
             self.assertLessEqual(budget, 900)
             self.assertGreaterEqual(budget, 60)
 
+    def test_render_job_mutually_excludes_with_run_workers(self):
+        """R420c — the crash-loop root cause, guarded: an async render
+        attempt holds the SAME run.lock the discovery worker holds for
+        its whole lifetime, so an engine run and a Blender never share
+        the 512 MB instance (observed live: the recovery Blender +
+        fresh-run worker OOM-crashed the container at 23:04)."""
+        src = inspect.getsource(artifact_worker.run)
+        self.assertIn("_acquire_run_lock_blocking()", src)
+        self.assertIn("run_lock", src)
+        # CRITICAL: the render job and the run worker must share the
+        # SAME lock FILE (the worker's existing production path) —
+        # different paths would silently provide no mutual exclusion
+        worker_src = inspect.getsource(worker_mod)
+        self.assertIn('store.STORE_DIR / "run.lock"', worker_src)
+        self.assertEqual(str(artifact_worker._run_lock_path()),
+                         str(__import__(
+                             "toscanini.sessions", fromlist=["x"])
+                             .STORE_DIR / "run.lock"))
+        # functional: the non-blocking probe honors a held lock
+        handle, acquired = artifact_worker._try_run_lock_nonblocking()
+        self.assertTrue(acquired)
+        try:
+            handle2, acquired2 = artifact_worker._try_run_lock_nonblocking()
+            self.assertFalse(acquired2)  # one holder at a time
+            self.assertIsNone(handle2)
+        finally:
+            handle.close()
+
 
 # ---------------------------------------------------------------------------
 # §2 epistemic boundary + CIO projection

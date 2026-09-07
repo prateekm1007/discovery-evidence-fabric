@@ -1540,3 +1540,20 @@ Work Log:
 Stage Summary:
 - Tests after R420b: combined r420+r418+r419 product/scipy/english/recovery batteries 100 passed + 7 skipped; with the pinned local build r420 + r419 render pipeline = 52 passed + 2 skipped (419 s, real renders). The import-cost guard runs in every future battery.
 - reviewer_provenance=AI_REVIEW.
+
+---
+Task ID: R420c
+Agent: Coder (main session — second live defect: render/worker memory exclusion)
+Task: The R420b deploy went live in ~2 min (the OOM root cause fixed), the deferred boot recovery healed the orphaned runs (RENDERING on ts_c0f41af92195 / ts_366e0a6a2497 / ts_3d66ccef1b3c — OBSERVED via the CIO), but the container RESTARTED at 23:04 (second boot snapshot, runtime-state 4fcdc2fa -> bd5f622c) killing the fresh acceptance run ts_a5a7eee35361's worker mid-run. Diagnose and fix the remaining concurrency defect.
+
+Work Log:
+- EVIDENCE (runtime-state branch): boot:5d594241 at 22:53 (deploy), created:ts_a5a7eee35361 at 22:58 (fresh run started), boot:5d594241 AGAIN at 23:04 — the container crashed ~6 min into the fresh run, exactly while the boot-recovery render job was holding a Blender (~300-400 MB) and the fresh run's worker imported the heavy engine stack (~300-500 MB with OCP). Sum > the 512 MB instance limit -> OOM -> crash.
+- ROOT CAUSE (design, not code): two lock classes serialized their own kind (run.lock for engine runs; render.lock for async Blenders) but NOTHING mutually excluded the two classes. On a 512 MB instance there must be EXACTLY ONE heavy process at a time.
+- FIX: the async render job now acquires the run worker's OWN lock (store.STORE_DIR/'run.lock' — the existing production path, verified EQUAL in a test after catching my first attempt writing a DIFFERENT path that would have silently provided no exclusion) around EACH Blender attempt (bounded by the attempt budget, released between attempts so a waiting run worker can proceed). Lock order render.lock -> run.lock; the run worker takes only run.lock — no cycle. A fresh user run now waits at most one attempt (<= 900 s) behind a render instead of dying with the container.
+- TEST GUARDS: source-inspection (run() acquires the run lock around attempts) + the lock-PATH-EQUALITY assertion (the silent-non-exclusion trap) + functional non-blocking probe (one holder at a time).
+- Tests: r420 battery 44/44 with the pinned build (209 s, full join through the run-lock path); combined r420+r418+r419+recovery batteries 99 passed + 7 skipped.
+- The interrupted fresh run ts_a5a7eee35361 is resumable through the retry path (INTERRUPTED is retryable); the redeploy's boot sweeps will also recover the render jobs whose processes died with the 23:04 crash (dead-RUNNING -> INTERRUPTED -> re-enqueue — the restart contract proving itself on real crashes).
+
+Stage Summary:
+- The heavy-process invariant is now structural: engine runs and Blenders share ONE exclusive lock; renders serialize among themselves; runs serialize among themselves; the memory guards remain the second line of defense.
+- reviewer_provenance=AI_REVIEW.
