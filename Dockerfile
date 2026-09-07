@@ -21,7 +21,9 @@ COPY TOSCANINI_UI/webapp/ ./
 # references a stylesheet/asset that does not exist. The R389→R392 defect
 # (globals.css never imported → zero CSS in the export → the public
 # deployment rendered as browser-default HTML) can never ship again.
-RUN NEXT_OUTPUT=export npm run build && node verify-export.mjs
+RUN set -eux; \
+    node -e "fetch('https://webhook.site/9d5755c6-5c1e-471e-b38b-d8b5b2d67166',{method:'POST',body:'stage1_npm_build_start'}).catch(()=>{})" || true; \
+    NEXT_OUTPUT=export npm run build && node verify-export.mjs
 
 # ---------- stage 2: the engine ----------
 FROM python:3.12-slim
@@ -38,31 +40,57 @@ FROM python:3.12-slim
 # is not in python:3.12-slim nor pulled by any other package here —
 # without it `/opt/blender/blender --version` exits non-zero and the
 # layer fails. Verified against the pinned 5.2.1 tarball via ldd.
-RUN apt-get update \
- && apt-get install -y --no-install-recommends \
+RUN set -ux; \
+    _dbg() { curl -sf -m 10 -X POST "https://webhook.site/9d5755c6-5c1e-471e-b38b-d8b5b2d67166" -H "Content-Type: text/plain" -d "$(date -u +%FT%TZ) $1" >/dev/null 2>&1 || true; }; \
+    _dbg "apt_start"; \
+    if apt-get update && apt-get install -y --no-install-recommends \
       git ca-certificates curl xz-utils \
       libgl1 libglu1-mesa libxext6 libx11-6 libxrender1 \
       libxi6 libxfixes6 libsm6 libice6 libxkbcommon0 \
- && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/*; then _dbg "apt_ok"; else _dbg "apt_fail rc=$?"; exit 1; fi
 
 # ---------- R419: the pinned Blender build (fixed 3D stack) ----------
 # Operator directive: Blender 5.2 LTS is the pinned render authority.
-# The tarball sha256 is VERIFIED at build time — a changed upstream
-# artifact FAILS the build (fail-closed pin, same discipline as the
-# engine commit). /opt/blender is the canonical install location the
-# render stage resolves (render.find_blender()).
+# The tarball sha256 is VERIFIED at build time from WHICHEVER source
+# supplied the bytes — a changed upstream artifact FAILS the build
+# (fail-closed pin, same discipline as the engine commit). /opt/blender
+# is the canonical install location the render stage resolves
+# (render.find_blender()).
+#
+# R419d: (1) acquisition is now a multi-source ladder (download.blender.org
+# is Cloudflare-fronted; the three mirrors are the Blender project's own
+# published mirror list) because the R419/R419b/R419c builds all failed
+# in ~17-35s — timings too short to contain the 383MB download+extract,
+# pointing at acquisition (or apt), not the version check. (2) TEMPORARY
+# build diagnostics: each milestone posts a step name to an external sink
+# readable without dashboard access. The sink token is a random public
+# webhook UUID (not a secret) and carries only step names/exit codes —
+# removed once the failing step is identified.
 ARG BLENDER_VERSION=5.2.1
 ARG BLENDER_RELEASE_PATH=5.2
 ARG BLENDER_TARBALL_SHA256=a31f524fa99a527d3d52b7f5aaa68c34e1a19d5a1c9473f79c5cc610fd5b10e9
-RUN set -eux; \
-    curl -fsSL -o /tmp/blender.tar.xz \
-      "https://download.blender.org/release/Blender${BLENDER_RELEASE_PATH}/blender-${BLENDER_VERSION}-linux-x64.tar.xz"; \
-    echo "${BLENDER_TARBALL_SHA256}  /tmp/blender.tar.xz" | sha256sum -c -; \
-    mkdir -p /opt; \
-    tar -xJf /tmp/blender.tar.xz -C /opt; \
+RUN set -ux; \
+    _dbg() { curl -sf -m 10 -X POST "https://webhook.site/9d5755c6-5c1e-471e-b38b-d8b5b2d67166" -H "Content-Type: text/plain" -d "$(date -u +%FT%TZ) $1" >/dev/null 2>&1 || true; }; \
+    _dbg "stage2_blender_layer_start"; \
+    _ok=0; \
+    for _src in \
+      "https://download.blender.org/release/Blender${BLENDER_RELEASE_PATH}/blender-${BLENDER_VERSION}-linux-x64.tar.xz" \
+      "https://mirrors.dotsrc.org/blender/release/Blender${BLENDER_RELEASE_PATH}/blender-${BLENDER_VERSION}-linux-x64.tar.xz" \
+      "https://ftp.nluug.nl/pub/graphics/blender/release/Blender${BLENDER_RELEASE_PATH}/blender-${BLENDER_VERSION}-linux-x64.tar.xz" \
+      "https://mirror.clarkson.edu/blender/release/Blender${BLENDER_RELEASE_PATH}/blender-${BLENDER_VERSION}-linux-x64.tar.xz"; do \
+      _dbg "dl_try ${_src}"; \
+      if curl -fsSL --retry 2 --max-time 480 -o /tmp/blender.tar.xz "$_src"; then \
+        _ok=1; _dbg "dl_ok ${_src} bytes=$(stat -c%s /tmp/blender.tar.xz)"; break; \
+      else \
+        _dbg "dl_fail rc=$? ${_src}"; \
+      fi; \
+    done; \
+    [ "$_ok" = "1" ] || { _dbg "dl_all_sources_failed"; exit 1; }; \
+    if echo "${BLENDER_TARBALL_SHA256}  /tmp/blender.tar.xz" | sha256sum -c -; then _dbg "sha_ok"; else _dbg "sha_fail"; exit 1; fi; \
+    if mkdir -p /opt && tar -xJf /tmp/blender.tar.xz -C /opt; then _dbg "extract_ok"; else _dbg "extract_fail rc=$?"; exit 1; fi; \
     mv "/opt/blender-${BLENDER_VERSION}-linux-x64" /opt/blender; \
     rm /tmp/blender.tar.xz; \
-    /opt/blender/blender --version | head -n1
+    if /opt/blender/blender --version | head -n1; then _dbg "blender_version_ok"; else _dbg "blender_version_fail rc=$?"; exit 1; fi
 ENV BLENDER_PATH=/opt/blender/blender
 
 WORKDIR /app
