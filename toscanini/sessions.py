@@ -239,6 +239,38 @@ def mark_stuck_sessions(max_age_hours: float = STUCK_AFTER_HOURS) -> List[str]:
     return stuck
 
 
+def mark_boot_pending_interrupted() -> List[str]:
+    """R419c: BOOT-ONLY sweep — PENDING/BUILDING_PROBLEM sessions at boot
+    had their worker die with the previous container and can never resume
+    on their own (retry accepts ERROR_*/INTERRUPTED, not PENDING).
+
+    Safe ONLY at boot: mark_interrupted_sessions() also runs inside the
+    /api/sessions handler, where a just-created PENDING session's worker
+    is mid-spawn with no pid yet — sweeping no-pid PENDING there would
+    kill live jobs. This sweep runs exclusively from server main() BEFORE
+    serve_forever(), when no worker process can exist by construction.
+
+    Observed on the production deploy (R419c acceptance): sessions created
+    minutes before a container crash stayed PENDING forever — 3+ hours
+    from any recovery path, contradicting the R392 directive-7 contract
+    ("recoverable, never spinning").
+    """
+    interrupted: List[str] = []
+    for s in list_sessions():
+        if s.get("status") not in ("PENDING", "BUILDING_PROBLEM"):
+            continue
+        alive = worker_alive(s)
+        if alive is True:
+            # impossible at boot; defensive — never interrupt a live job
+            continue
+        update_session(
+            s["session_id"], status="INTERRUPTED",
+            error=("worker died before the run registered (service "
+                   "restarted during spawn/early phase); retry to resume"))
+        interrupted.append(s["session_id"])
+    return interrupted
+
+
 def retry_session(session_id: str) -> Optional[Dict[str, Any]]:
     """Re-enqueue an errored session through the SAME worker path.
 

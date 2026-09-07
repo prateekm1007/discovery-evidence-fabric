@@ -106,12 +106,66 @@ def authoritative_glb(work_dir: str,
     return str(roots[0]) if roots else None
 
 
+def _mem_available_mb() -> Optional[int]:
+    """MemAvailable in MB from /proc/meminfo, or None (non-Linux /
+    unreadable — never a guess, Art. XXV)."""
+    try:
+        with open("/proc/meminfo") as f:
+            for line in f:
+                if line.startswith("MemAvailable:"):
+                    return int(line.split()[1]) // 1024
+    except OSError:
+        pass
+    return None
+
+
+def _memory_guard(context: str,
+                  mode: str = "in_worker") -> Optional[Dict[str, Any]]:
+    """R419c: typed skip when the pinned Blender build cannot fit in
+    available memory. Measured: blender --background baseline is
+    ~269 MB RSS (trivial scene), plus scene geometry and render buffers.
+
+    in_worker mode (the bridge RENDER step inside the discovery run):
+    the gauntlet worker still holds its own memory, so a Blender launch
+    there can OOM-kill the RUN ITSELF on small instances — the guard
+    threshold is high and the skip is typed, never a run failure (Art.
+    LXI: infrastructure capacity is never a scientific verdict).
+
+    async mode (the detached artifact-build job, after the worker
+    exits): more headroom exists; the threshold is lower.
+
+    Returns the typed skip record, or None when rendering may proceed.
+    """
+    thresholds = {"in_worker": 650, "async": 400}
+    need_mb = thresholds.get(mode, 650)
+    avail = _mem_available_mb()
+    if avail is None or avail >= need_mb:
+        return None
+    return {
+        "stage": "RENDER",
+        "render_pipeline": "BLENDER_HEADLESS",
+        "pinned_blender": PINNED_BLENDER_VERSION,
+        "status": "RENDER_SKIPPED_LOW_MEMORY",
+        "context": context,
+        "mem_available_mb": avail,
+        "required_mb": need_mb,
+        "note": (
+            "the pinned Blender build (baseline ~269 MB RSS) does not "
+            "fit in available memory alongside the run worker — typed "
+            "skip, the interactive GLB is served unchanged; the async "
+            "artifact-build job renders when memory allows, or the "
+            "operator raises the instance plan (owner-gated decision, "
+            "Art. LXV)"),
+    }
+
+
 def render_invention(work_dir: str,
                      geometry_out: Optional[Dict[str, Any]],
                      is_conceptual: bool,
                      renders: Optional[List[str]] = None,
                      resolution: Optional[List[int]] = None,
-                     samples: Optional[int] = None) -> Dict[str, Any]:
+                     samples: Optional[int] = None,
+                     memory_mode: str = "in_worker") -> Dict[str, Any]:
     """Run the pinned Blender build over the authoritative GLB.
 
     Returns a typed render record — always honest, never raising into
@@ -135,6 +189,13 @@ def render_invention(work_dir: str,
             "no Blender build found (set BLENDER_PATH or install the "
             "pinned 5.2.1 LTS build) — the interactive GLB is served "
             "unchanged; PNG renders are enhancements, not the contract")
+        return record
+
+    # R419c memory guard — typed skip before the subprocess is launched
+    # (a Blender OOM on a small instance can kill the run worker itself)
+    guard = _memory_guard("bridge_render", mode=memory_mode)
+    if guard:
+        record.update({k: v for k, v in guard.items() if k != "stage"})
         return record
 
     source = authoritative_glb(

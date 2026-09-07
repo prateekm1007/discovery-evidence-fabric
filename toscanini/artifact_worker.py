@@ -150,7 +150,8 @@ def run(session_id: str) -> Dict[str, Any]:
     try:
         rec = render.render_invention(
             str(run_dir), {"generation_models": None},
-            is_conceptual=vis_class != "ENGINEERING_3D")
+            is_conceptual=vis_class != "ENGINEERING_3D",
+            memory_mode="async")  # R419c: detached job — worker memory freed
     except Exception as exc:  # noqa: BLE001 — typed, never silent
         rec = {"stage": "RENDER", "status": "RENDER_FAILED",
                "error": f"{type(exc).__name__}: {exc}"}

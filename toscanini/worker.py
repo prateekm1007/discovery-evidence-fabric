@@ -100,6 +100,14 @@ def _route_detail(probe: dict) -> str:
 
 
 def run(session_id: str) -> None:
+    # R419c heartbeat: the FIRST line in the worker log for every run —
+    # the operator-scoped /api/ops/worker-log route serves this file's
+    # tail, so a worker that dies before phase 0 is VISIBLE, not silent
+    # (observed live: sessions stuck PENDING with an empty log tail gave
+    # no evidence of even attempting the import chain)
+    print(f"[worker] start sid={session_id} pid={os.getpid()} "
+          f"blender={os.environ.get('BLENDER_PATH', '') or 'unset'}",
+          file=sys.stderr, flush=True)
     s = store.get_session(session_id)
     if not s:
         print(f"session {session_id} not found", file=sys.stderr)

@@ -462,6 +462,32 @@ class Handler(BaseHTTPRequestHandler):
                                == "EXTERNAL" else gw.gateway_up()),
                 "runs_root": str(store.ENGINE_RUNS),
             })
+        # R419c: operator-scoped worker-log tail — the operator-visibility
+        # capability (R394 s15 pattern) applied to the run worker's own
+        # stderr. Owner-scoped sessions never leak through it: the route
+        # requires the ENGINE_OPERATOR_KEY (header match), 404 otherwise
+        # (enumeration-safe). Serves the LAST N lines only; the file is
+        # operational diagnostics, never user content.
+        if p.path == "/api/ops/worker-log":
+            hdr = self.headers.get("X-Operator-Key") or ""
+            if not (OPERATOR_KEY and hdr and hdr == OPERATOR_KEY):
+                return self._denied()
+            try:
+                n = min(int(self.headers.get("X-Tail-Lines") or 60), 400)
+            except ValueError:
+                n = 60
+            log_path = store.ENGINE_RUNS / "toscanini_worker.log"
+            try:
+                text = log_path.read_text(errors="replace")
+                tail = "\n".join(text.splitlines()[-n:])
+            except FileNotFoundError:
+                tail = "(no worker log yet)"
+            except OSError as exc:
+                tail = f"(worker log unreadable: {exc})"
+            return self._json(200, {
+                "path": "ENGINE_RUNS/toscanini_worker.log",
+                "lines_served": len(tail.splitlines()),
+                "tail": tail})
         if p.path == "/api/sessions":
             # failure recovery (CEO #8 + R392 directive 7): honest dead-
             # worker detection runs on every history read — interrupted/
@@ -1253,6 +1279,15 @@ def main():
                   f"{interrupted}", file=sys.stderr)
     except Exception as exc:  # noqa: BLE001
         print(f"interrupted-sweep failed: {exc}", file=sys.stderr)
+    # R419c: boot-only sweep of PENDING sessions orphaned by a restart
+    # (their worker died before registering; retry is the recovery path)
+    try:
+        orphaned = store.mark_boot_pending_interrupted()
+        if orphaned:
+            print(f"marked {len(orphaned)} boot-orphaned PENDING job(s) "
+                  f"INTERRUPTED: {orphaned}", file=sys.stderr)
+    except Exception as exc:  # noqa: BLE001
+        print(f"boot-pending-sweep failed: {exc}", file=sys.stderr)
     # R396 B.1/B.2: a boot snapshot immediately after restore. This is
     # the snapshot-pipeline health check on EVERY boot (a failure is
     # disclosed through /api/health durable.last_snapshot — never
