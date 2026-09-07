@@ -30,13 +30,19 @@ FROM python:3.12-slim
 # libGL/libGLU/X11: cadquery/OCP native geometry (the interactive 3D
 # rebuild path) — python:3.12-slim lacks them; discovered by the R392
 # live failure matrix (BUILD_ERROR libGL.so.1 on /api/showcase/*/evaluate)
-# libXi/libXfixes/libICE/libSM: Blender headless links (R419 fixed 3D
-# stack — the render stage's subprocess)
+# libXi/libXfixes/libICE/libSM/libxkbcommon: Blender headless links
+# (R419 fixed 3D stack — the render stage's subprocess).
+# libxkbcommon0 is the R419c root cause of the build_failed loop: the
+# blender binary links libxkbcommon.so.0 DIRECTLY (dt_needed), it is not
+# bundled in the tarball's lib/ (37 of the 62 needed libs are), and it
+# is not in python:3.12-slim nor pulled by any other package here —
+# without it `/opt/blender/blender --version` exits non-zero and the
+# layer fails. Verified against the pinned 5.2.1 tarball via ldd.
 RUN apt-get update \
  && apt-get install -y --no-install-recommends \
       git ca-certificates curl xz-utils \
       libgl1 libglu1-mesa libxext6 libx11-6 libxrender1 \
-      libxi6 libxfixes6 libsm6 libice6 \
+      libxi6 libxfixes6 libsm6 libice6 libxkbcommon0 \
  && rm -rf /var/lib/apt/lists/*
 
 # ---------- R419: the pinned Blender build (fixed 3D stack) ----------

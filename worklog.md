@@ -1474,3 +1474,20 @@ Stage Summary:
 - The product surface is the calm three-column workspace: runs left, conversation + engineering argument + the 8-section essay center, THE INVENTION + interactive 3D + render gallery + component inspection + downloads right; provider failover invisible; vocabulary clean; async artifact builds 202-typed.
 - Remaining honest gaps (disclosed): the render layer needs the Docker image build to prove /opt/blender on Render (the deploy acceptance); the fresh solar-run E2E acceptance still needs a working LLM transport (the R418 blocker — operator action: OpenRouter credits or the NVIDIA key); generation-side objective enforcement (synthesis filtering by OBJECTIVE) is the deeper engine follow-up; the r399 zenodo routing_state defect is a standing pre-existing item.
 - reviewer_provenance=AI_REVIEW on every artifact (Art. LXVII).
+
+---
+Task ID: R419c
+Agent: Coder (main session — R419 continuation; the deploy acceptance)
+Task: Diagnose and fix the R419/R419b Render build_failed loop; prove the pinned Blender layer on the production image.
+
+Work Log:
+- Failing state observed: R419 (16a32ba3) and R419b (c4724a61) deploys all build_failed in ~17-19s (three attempts); last live deploy remains R418c (214ff6d5).
+- Root cause NOT the R419b diagnosis. `${VAR%.*}` inside a shell-form RUN is expanded by the SHELL, not rejected by BuildKit — R419b's refactor was harmless but inert. The real cause: the blender 5.2.1 binary links libxkbcommon.so.0 DIRECTLY (dt_needed, full loader closure = 62 libs); the tarball bundles 37 in lib/ (RPATH $ORIGIN), python:3.12-slim + the apt list supplied every other system lib (X11 stack, libGL, libuuid via base), but NOTHING supplies libxkbcommon.so.0 — `/opt/blender/blender --version` exits non-zero -> RUN fails -> build_failed at the end of the Blender layer (~17s on Render's fast build box: apt + 383MB download + sha + extract). Verified by downloading the pinned tarball locally, sha256 a31f524f... OK (matches download.blender.org's official .sha256), extracting, running ldd.
+- Dockerfile fix: libxkbcommon0 added to the apt layer (with the root-cause comment). Everything else untouched: pin, sha verification, install path, ENV BLENDER_PATH.
+- Local acceptance re-proven WITH the pinned build installed (BLENDER_PATH=/home/z/blender-5.2.1/blender, same sha): r419 render pipeline 9 passed + 2 skipped (215s — real hero/section/exploded renders through Blender 5.2.1); scipy-free 6/6; product surface 10/10; english-only 4/4; r418 bridge regression 29/29.
+- Test-hermeticity defect found and fixed (test_r419_product_surface.py::TestArtifactWorker::test_run_writes_typed_record_without_blender): the "without blender" contract depended on MACHINE state — it false-fails wherever a blender is resolvable (local /usr/local/bin symlink during this session; also the Docker image itself, where /opt/blender exists). The test now pins render.find_blender -> None; passes 10/10 with a blender visible on PATH. Machine-state independence restored (Art. IX discipline: the certification must mean the same thing everywhere).
+- Observed during diagnosis: this sandbox had NO /opt/blender and no blender on PATH at session start — the prior session's local render tests used a build that no longer exists here; the batteries were re-run against the freshly downloaded pinned 5.2.1 (same sha) so the R419 numbers in this entry are re-proven, not inherited.
+
+Stage Summary:
+- The one-line root cause (libxkbcommon0) is fixed with evidence (ldd closure analysis on the pinned tarball); the R419b BuildKit theory is corrected in the record; the product-surface battery is machine-independent.
+- Next: commit + push + Render deploy of R419c; then the live acceptance (async artifact-build on the real solar run; render endpoints; fresh-run attempt with the LLM transport state disclosed per Art. LXI).

@@ -100,15 +100,25 @@ class TestArtifactWorker(unittest.TestCase):
     def test_run_writes_typed_record_without_blender(self):
         with tempfile.TemporaryDirectory() as td:
             from toscanini import sessions as store
+            from discovery_fabric.engine.invention_bridge import render
             orig = store.get_session
             store.get_session = lambda sid: {
                 "session_id": sid, "run_dir": td}
+            # Hermeticity: pin find_blender to None so the test means the
+            # same thing on every machine — including the Docker image,
+            # where /opt/blender EXISTS (the deployed render authority).
+            # Without this, the "without blender" contract only holds on
+            # blender-less machines and false-fails wherever the pinned
+            # build is installed (observed: R419c local rerun with a
+            # /usr/local/bin/blender symlink on PATH).
+            orig_find = render.find_blender
+            render.find_blender = lambda: None
             try:
                 model = Path(td) / "MODEL"
                 model.mkdir()
                 (model / "model-001.glb").write_bytes(b"glb")
                 out = artifact_worker.run("ts_x")
-                # no Blender on this machine -> typed honest skip,
+                # no Blender resolvable -> typed honest skip,
                 # never a crash and never a fabricated artifact
                 self.assertIn(out["status"],
                               ("RENDER_SKIPPED_NO_BLENDER", "FAILED"))
@@ -117,6 +127,7 @@ class TestArtifactWorker(unittest.TestCase):
                     .read_text())
                 self.assertEqual(job["artifact"], "RENDER_JOB")
             finally:
+                render.find_blender = orig_find
                 store.get_session = orig
 
 
