@@ -163,12 +163,18 @@ def test_false_premise_is_not_rejected():
     assert v["rejected"] is False  # NOT a candidate rejection
 
 
-def test_rejected_means_candidate_failed():
+def test_rejected_projects_to_under_development_not_a_dead_end():
+    # R416 honest-causes fix: a REJECTED run presents the invention as
+    # IN DEVELOPMENT (the generation record carries the diagnosed
+    # cause) — never "the engine REJECTED the candidate — the
+    # adversarial chain found the idea not defensible enough"
     s = {"status": "COMPLETE", "final_status": "REJECTED", "package": None}
     v = us.user_state_view(s)
-    assert v["user_state"] == "COMPLETED_REJECTED"
-    assert "engine REJECTED the candidate" in v["meaning"]
-    assert v["rejected"] is True
+    assert v["user_state"] == "COMPLETED_UNDER_DEVELOPMENT"
+    assert "architecture" in v["meaning"].lower()
+    assert v["rejected"] is False  # the product surface never renders a
+    # bare reject dead-end; challenge losses live on the generation
+    # records
 
 
 def test_transport_failure_is_not_a_research_verdict():
@@ -190,7 +196,12 @@ def test_engine_failure_is_not_a_research_verdict():
 
 @pytest.mark.parametrize("final_status,readable", [
     ("AUTOMATED_INVENTION_CANDIDATE", "Invention candidate (automated)"),
-    ("REJECTED", "Rejected — not defensible enough to package"),
+    ("REJECTED", "Challenged and killed — the generation record shows "
+                 "the diagnosed cause"),
+    ("EVOLVED_INVENTION_CANDIDATE", "Evolved invention candidate"),
+    ("INVENTION_UNDER_DEVELOPMENT", "Invention in development"),
+    ("MECHANISM_GENERATION_FAILED", "Mechanism generation failed (a "
+                                    "generation gap — not a rejection)"),
     ("MALFORMED_OR_FALSE_PREMISE",
      "False premise — the problem as stated cannot physically occur"),
 ])

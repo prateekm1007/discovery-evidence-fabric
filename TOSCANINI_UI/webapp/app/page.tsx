@@ -181,7 +181,7 @@ function NewProblemPane({
             ⌘↵ to start · runs take minutes; you can leave and come back
           </span>
           <button className="btn" onClick={submit} type="button">
-            {submitting ? "Starting…" : "Discover"}
+            {submitting ? "Starting…" : "Start discovery"}
           </button>
         </div>
       </div>
@@ -232,9 +232,7 @@ function RunConversation({ detail }: { detail: SessionDetail }) {
         <div className="msg-role">
           Toscanini
           {usv && done && (
-            <span className={`pill ${usv.rejected ? "REJECTED" : "COMPLETE"}`}>
-              {usv.label}
-            </span>
+            <span className="pill COMPLETE">{usv.label}</span>
           )}
         </div>
         <div className="msg-body">

@@ -13,9 +13,15 @@
 // VERIFIED), never frontend inventions; the counsel button exports the
 // technical evidence package for IP counsel review — it never says
 // "patent this" (Toscanini is not a patent court).
+//
+// R416 (Phase H): each invention GENERATION gets its own geometry
+// artifact (model-001.glb, model-002.glb, …) — the user moves through
+// GEN 1 / GEN 2 / GEN 3 / CURRENT with the "What changed?" panel. The
+// models are served per generation by /api/run/{id}/model?gen=N; the
+// UI never infers an invention exists because a GLB exists.
 
 import { useEffect, useState } from "react";
-import type { CIO, SessionDetail } from "@/lib/types";
+import type { CIO, GenerationRecord, SessionDetail } from "@/lib/types";
 import { getCIO } from "@/lib/api";
 import { isTerminal } from "./RunNarrative";
 import ModelViewer from "./ModelViewer";
@@ -105,9 +111,9 @@ function CioPanel({ cio, detail }: { cio: CIO; detail: SessionDetail }) {
         </a>
       ) : (
         <div className="artifact-note">
-          <b>Candidate, no package.</b> A package is produced only when a
-          candidate survives the full adversarial chain — candidates are
-          recorded, packages are earned.
+          <b>Invention, no package yet.</b> A package is produced only
+          when an architecture survives the full challenge chain —
+          architectures are recorded, packages are earned.
         </div>
       )}
 
@@ -144,6 +150,106 @@ function CioPanel({ cio, detail }: { cio: CIO; detail: SessionDetail }) {
   );
 }
 
+// ---------------------------------------------------------------------------
+// R416 (Phase H): the generation navigator — GEN 1 / GEN 2 / GEN 3 /
+// CURRENT. Each generation loads its own GLB (model-00N.glb) and shows
+// "What changed?" — the causal delta from the lineage record, never
+// client-side inference.
+// ---------------------------------------------------------------------------
+function GenerationNavigator({
+  detail,
+  generations,
+  currentGen,
+}: {
+  detail: SessionDetail;
+  generations: GenerationRecord[];
+  currentGen?: number | null;
+}) {
+  const withModels = generations.filter((g) => g.model_available);
+  const [selected, setSelected] = useState<number>(
+    currentGen ?? withModels[withModels.length - 1]?.gen ?? generations[0]?.gen ?? 1
+  );
+  const gen = generations.find((g) => g.gen === selected) ?? generations[0];
+  const hasModel = withModels.some((g) => g.gen === selected);
+  const modelUrl = `/api/run/${detail.session_id}/model?gen=${selected}`;
+
+  return (
+    <div className="gen-nav">
+      <div className="gen-nav-tabs" role="tablist" aria-label="invention generations">
+        {generations.map((g) => {
+          const isCurrent = currentGen != null && g.gen === currentGen;
+          return (
+            <button
+              key={g.gen}
+              type="button"
+              role="tab"
+              aria-selected={g.gen === selected}
+              className={`gen-tab ${g.gen === selected ? "sel" : ""} ${
+                g.challenge?.killed ? "dead" : g.challenge?.survived ? "ok" : ""
+              }`}
+              onClick={() => setSelected(g.gen)}
+            >
+              GEN {g.gen}
+              {isCurrent ? " · CURRENT" : ""}
+            </button>
+          );
+        })}
+      </div>
+
+      <div className="gen-view">
+        {hasModel ? (
+          <ModelViewer
+            url={modelUrl}
+            height={280}
+            compact
+            label={`architecture ${selected} geometry`}
+            note={`model-${String(selected).padStart(3, "0")}.glb — this generation's own geometry artifact (CadQuery/OCCT authority; a render is a derived artifact, never physical truth)`}
+          />
+        ) : (
+          <div className="artifact-note">
+            <b>GEN {selected} has no 3D model.</b>{" "}
+            {gen?.challenge?.killed
+              ? "This architecture was challenged before its engineering realization — no geometry was built (honest absence, never a placeholder)."
+              : "No engineering geometry was produced for this generation — honest absence, never a placeholder object."}
+          </div>
+        )}
+
+        {gen?.what_changed && (
+          <div className="gen-what-changed">
+            <div className="rail-h">What changed?</div>
+            <div>{gen.what_changed}</div>
+            {gen.causal_delta?.new_capability && (
+              <div className="faint" style={{ fontSize: 12, marginTop: 4 }}>
+                New capability: {gen.causal_delta.new_capability}
+              </div>
+            )}
+            {gen.causal_delta?.new_interaction && (
+              <div className="faint" style={{ fontSize: 12, marginTop: 2 }}>
+                New interaction: {gen.causal_delta.new_interaction}
+              </div>
+            )}
+            {gen.causal_delta?.new_operating_regime && (
+              <div className="faint" style={{ fontSize: 12, marginTop: 2 }}>
+                New operating regime: {gen.causal_delta.new_operating_regime}
+              </div>
+            )}
+            {gen.causal_delta?.frontier_capability && (
+              <div className="faint" style={{ fontSize: 12, marginTop: 2 }}>
+                Frontier transfer: {gen.causal_delta.frontier_capability}
+              </div>
+            )}
+            {gen.reason_for_change && (
+              <div className="faint" style={{ fontSize: 12, marginTop: 4 }}>
+                Why: {gen.reason_for_change}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function RunArtifact({
   detail,
   onRetry,
@@ -156,6 +262,9 @@ export default function RunArtifact({
   const stages = detail.stages ?? [];
   const pkg = detail.package ?? null;
   const [cio, setCio] = useState<CIO | null>(null);
+  const runState = detail.run_state;
+  const generations = runState?.generations?.generations ?? [];
+  const currentGen = runState?.generations?.current_invention?.gen;
 
   // R414: fetch the CIO once the run is terminal (the invention object
   // exists only when the run produced invention-side artifacts — an
@@ -213,6 +322,14 @@ export default function RunArtifact({
           <div className="artifact-decision">{usv.decision}</div>
           <div className="artifact-meaning faint">{usv.meaning}</div>
 
+          {generations.length > 0 && (
+            <GenerationNavigator
+              detail={detail}
+              generations={generations}
+              currentGen={currentGen}
+            />
+          )}
+
           {cio?.present ? (
             <CioPanel cio={cio} detail={detail} />
           ) : pkg?.zip_name ? (
@@ -224,18 +341,18 @@ export default function RunArtifact({
             </a>
           ) : usv.found_something ? (
             <div className="artifact-note">
-              <b>Candidate, no package.</b> This run recorded an invention
-              candidate, but no buyer package was produced — the release
-              gate was not reached. An honest result: candidates are
-              recorded, packages are earned.
+              <b>Invention, no package yet.</b> This run recorded an
+              invention candidate, but no buyer package was produced — the
+              release gate was not reached. An honest result: architectures
+              are recorded, packages are earned.
             </div>
           ) : (
             <div className="artifact-note">
-              <b>No buyer package.</b> A package is produced only when a
-              candidate survives the full adversarial chain — no survivor
-              reached the release gate on this run. That is an honest
-              result, not a failure of the product: kills are recorded to
-              the mechanism cemetery and improve the next run.
+              <b>No buyer package yet.</b> A package is produced only when
+              an architecture survives the full challenge chain. The
+              generations above carry the current invention with its
+              honest maturity — and every diagnosed cause is kept on
+              record so the next generation builds on it.
             </div>
           )}
 

@@ -321,11 +321,19 @@ class TestUserStateIntegration(unittest.TestCase):
         from toscanini.user_state import user_state, user_state_view
         s = {"status": "COMPLETE", "final_status": "REJECTED",
              "package": {"complete": False}}
-        self.assertEqual(user_state(s), "COMPLETED_REJECTED")
+        # R416: the invention is presented as IN DEVELOPMENT (the
+        # generation record carries the diagnosed cause) — completed,
+        # not failed, and never the banned dead-end sentence
+        self.assertEqual(user_state(s), "COMPLETED_UNDER_DEVELOPMENT")
         v = user_state_view(s)
         self.assertTrue(v["finished"])
-        self.assertTrue(v["rejected"])
-        self.assertIn("real discovery result", v["meaning"])
+        # R416: the product surface never renders a bare reject
+        # dead-end; challenge losses live on the generation records
+        self.assertFalse(v["rejected"])
+        # R416: the meaning presents the architecture generations and
+        # the honest maturity (never "the adversarial chain found the
+        # idea not defensible enough")
+        self.assertIn("architecture generations", v["meaning"])
 
     def test_transport_failure_is_failed_transport(self):
         from toscanini.user_state import user_state

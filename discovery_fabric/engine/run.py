@@ -274,6 +274,10 @@ class EngineRun:
 
         final = self._final_state()
         self._persist("final_state.json", final)
+        # the PRE-evolution final state is preserved for the cemetery
+        # decision (Art. X: GEN-1's own verdict is the negative-knowledge
+        # event; the evolution outcome below is the product-level state)
+        final_pre_evolution = dict(final)
 
         # ------------- Directive 1: AUTOMATIC post-RANK pipeline ----------
         # Only a SURVIVOR is promotable; every failure is explicit and the
@@ -283,6 +287,48 @@ class EngineRun:
         if self.with_package and "SYNTHESIZE" not in self.failed_stages \
                 and "PREMISE_GATE" not in self.failed_stages:
             self._post_rank_pipeline(run_ctx={"run_id": self.run_id})
+
+        # ------------- R416: the causal evolution pipeline -----------------
+        # Product contract (honest-causes-evolution-v1): every valid
+        # query ends with at least one invention architecture. Entered
+        # ONLY when the standard path produced no package (SYNTHESIZE
+        # failed, or the gauntlet/adjudication rejected everything)
+        # AND the premise is coherent. A premise-incoherent problem has
+        # nothing to invent (honest MALFORMED_OR_FALSE_PREMISE stands).
+        # GEN-1's rejection is still recorded as negative knowledge
+        # below (the cemetery decision uses final_pre_evolution).
+        if "PREMISE_GATE" not in self.failed_stages:
+            from . import evolution as _ev
+            standard_path_packaged = bool(
+                self.package_report and self.package_report.get("complete"))
+            if not standard_path_packaged and _ev.evolution_enabled():
+                try:
+                    evolution_summary = self._evolution_pipeline(
+                        {"run_id": self.run_id}, final)
+                    if evolution_summary and \
+                            evolution_summary.get("final_state"):
+                        final = dict(evolution_summary["final_state"])
+                        self._persist("final_state.json", final)
+                except Exception as exc:  # noqa: BLE001 — recorded honest
+                    self._persist("INVENTION_LINEAGE.json", {
+                        "schema": "INVENTION_LINEAGE/1.0.0",
+                        "run_id": self.run_id,
+                        "status": "EVOLUTION_PIPELINE_ERROR",
+                        "error": f"{type(exc).__name__}: {exc}"[:400],
+                        "consequence": ("the run's epistemic record stands "
+                                        "as completed by the standard "
+                                        "path; the evolution layer failed "
+                                        "and is disclosed, never hidden "
+                                        "(Art. XV)"),
+                    })
+            elif not _ev.evolution_enabled():
+                self._persist("INVENTION_LINEAGE.json", {
+                    "schema": "INVENTION_LINEAGE/1.0.0",
+                    "run_id": self.run_id,
+                    "status": "DISABLED_BY_OPERATOR",
+                    "reason": "ENGINE_EVOLUTION=0 (explicit operator "
+                              "override; recorded, never silent)",
+                })
 
         # ------------- Directive 2: canonical DISCOVERY_RELEASE -----------
         # ALWAYS written — a run that never reached a survivor still gets an
@@ -320,12 +366,16 @@ class EngineRun:
         # R394 s6: a premise reject is not negative knowledge EITHER — the
         # premise was malformed before any mechanism existed to kill; it
         # teaches nothing about a mechanism class.
+        # R416: the decision uses the PRE-evolution final state — GEN-1's
+        # own adjudicated rejection is the negative-knowledge event; the
+        # evolution outcome (EVOLVED_INVENTION_CANDIDATE etc.) is the
+        # product-level state, not a retraction of the kill.
         research_reject = (
-            final.get("final_status") == "REJECTED"
+            final_pre_evolution.get("final_status") == "REJECTED"
             and "SYNTHESIZE" not in self.failed_stages
             and "PREMISE_GATE" not in self.failed_stages)
         if research_reject:
-            self._cemetery_update(final)
+            self._cemetery_update(final_pre_evolution)
         else:
             self._persist("cemetery_update.json",
                           {"appended": False,
@@ -1723,8 +1773,22 @@ class EngineRun:
             reason = ("the problem's premise is physically/scientifically "
                       f"incoherent: {self.failed_stages.get('PREMISE_GATE', '')[:300]}")
         elif not synthesis_ok:
-            status = "REJECTED"
-            reason = f"synthesis failed: {self.failed_stages.get('SYNTHESIZE','')[:300]}"
+            # R416 honest-cause fix: a SYNTHESIZE stage failure means the
+            # mechanism GENERATION failed BEFORE any candidate existed.
+            # The old code stamped this REJECTED, and the product surface
+            # then told the user "the adversarial chain found the idea not
+            # defensible enough" — a chain that never ran against a
+            # candidate that never existed (Art. LXI: a generation
+            # failure is not a scientific rejection). The typed status
+            # says exactly what happened; the downstream evolution
+            # pipeline (R416 Phase C) then produces the mandatory
+            # baseline architecture for this run.
+            status = "MECHANISM_GENERATION_FAILED"
+            reason = ("the evidence-bound mechanism synthesis failed "
+                      "before any candidate existed — no adversarial "
+                      "challenge ran and nothing was rejected; the "
+                      "actual stage failure: "
+                      f"{self.failed_stages.get('SYNTHESIZE','')[:300]}")
         elif status:
             reason = eps.get("reason", "")
         else:
@@ -1760,6 +1824,742 @@ class EngineRun:
             "code_commit": _git_head(),
             "timestamp": utc_now(),
         }
+
+    # ------------------------------------------------------------------
+    # R416: THE CAUSAL EVOLUTION PIPELINE (operator directive
+    # honest-causes-evolution-v1, Phases C-G)
+    # ------------------------------------------------------------------
+    def _evolution_pipeline(self, run_ctx: Dict[str, Any],
+                            final: Dict[str, Any]) -> Dict[str, Any]:
+        """Every valid query ends with at least one invention
+        architecture; killed generations are diagnosed honestly and
+        evolved through an explicit causal delta (30-year engine +
+        frontier-to-laggard transfer); a surviving generation is
+        packaged through the REAL package tail.
+
+        Entry contract: called from run() ONLY when the standard path
+        produced no package (SYNTHESIZE failed, or the gauntlet /
+        adjudication rejected everything) and the premise is coherent.
+        The GEN-1 record is derived from this run's own artifacts; the
+        loop's re-evaluation uses the SAME gauntlet instruments the
+        engine uses for grid/mechanism-space candidates (there is no
+        second, weaker evaluator — Art. IV).
+
+        Honesty contract (Constitution v2.1.0):
+        - maturity is DERIVED from verification events (Art. LX)
+        - generated content is AI_PROPOSED, never evidence (Art. VI)
+        - infrastructure failure is typed, never a verdict (Art. LXI)
+        - the current invention is presented with its true maturity,
+          never softened into a survivor (Art. LXVIII)
+        - fresh evidence per generation is a NEW versioned snapshot,
+          never silently merged (Art. XLIV)
+        - the information-gain stop rule: a generation whose diagnosis
+          repeats the previous generation's cause stops the loop and
+          says so (the evolution step did not resolve the diagnosed
+          cause; a harder underlying constraint may exist)
+        """
+        from . import evolution as ev
+
+        lineage_path = self.out / "INVENTION_LINEAGE.json"
+        if lineage_path.exists():
+            try:
+                prior = json.loads(lineage_path.read_text())
+                if prior.get("stop_reason") in (
+                        "SURVIVOR_REACHED", "TRANSPORT_BLOCKED",
+                        "INFORMATION_GAIN_ZERO", "BUDGET_EXHAUSTED",
+                        "FALLBACK_GENERATION_FAILED"):
+                    # resume-safe: a completed lineage is never re-run
+                    # (Art. X: the persisted record is the authority);
+                    # the resumed flag is persisted so the record on
+                    # disk says the same thing as the return value
+                    prior["resumed"] = True
+                    prior["resumed_at"] = utc_now()
+                    self._persist("INVENTION_LINEAGE.json", prior)
+                    return prior
+            except Exception:  # noqa: BLE001 — corrupt record -> redo
+                pass
+
+        budget = {
+            "max_evolution_generations": ev.max_evolution_generations(),
+            "engine_evolution_env": os.environ.get("ENGINE_EVOLUTION", "1"),
+        }
+        generations: List[Dict[str, Any]] = []
+        stop_reason = None
+
+        # ---------- GEN 1: from this run's own record -------------------
+        gen1_path = self.out / "EVOLUTION_GEN_1.json"
+        if gen1_path.exists():
+            try:
+                gen1 = json.loads(gen1_path.read_text())
+            except Exception:  # noqa: BLE001
+                gen1 = None
+        else:
+            gen1 = None
+        if gen1 is None:
+            gen1 = self._evolution_gen1(final)
+            if gen1 is not None:
+                self._persist("EVOLUTION_GEN_1.json", gen1)
+        if gen1 is None:
+            # Phase C hard floor: even the fallback generation failed
+            # (transport-class). Infrastructure, never a verdict.
+            stop_reason = "FALLBACK_GENERATION_FAILED"
+            summary = ev.lineage_summary(
+                generations, stop_reason, self.run_id, budget)
+            summary["final_state"] = dict(
+                final, final_status="MECHANISM_GENERATION_FAILED",
+                reason=("the mandatory baseline architecture could not "
+                        "be generated (transport-class failure — Art. "
+                        "LXI: infrastructure, never a scientific "
+                        "rejection); the problem stays saved and "
+                        "resumable"))
+            self._persist("INVENTION_LINEAGE.json", summary)
+            return summary
+        generations.append(gen1)
+
+        # ---------- the fallback baseline faces the gauntlet --------------
+        # (Phase C/D sequence: the mandatory architecture is CREATED and
+        # then CHALLENGED with the same instruments — baseline ->
+        # challenge -> diagnosis -> evolution. Only the synthesis-path
+        # GEN 1 carries its verdict from the run's own standard stages.)
+        if gen1.get("origin") == "BASELINE_FALLBACK_GENERATION":
+            gen1 = self._evolution_challenge_generation(
+                gen1, self.env.evidence or [])
+            self._persist("EVOLUTION_GEN_1.json", gen1)
+
+        # ---------- the evolution loop (GEN 2..N) ------------------------
+        survivor = gen1 if gen1.get("state") in (
+            ev.INVENTION_SURVIVED, ev.INVENTION_REQUIRES_EXPERIMENT
+        ) else None
+        prev_cause: Optional[str] = (gen1.get("diagnosis") or {}).get("cause")
+        gen_n = 1
+        while (survivor is None and stop_reason is None
+               and gen_n < budget["max_evolution_generations"] + 1):
+            parent = generations[-1]
+            diagnosis = ev.diagnose_parent(
+                parent, self.out, self.failed_stages, final)
+            cause = diagnosis.get("cause")
+            if cause in (ev.CAUSE_PREMISE_INCOHERENT,):
+                stop_reason = "PREMISE_INCOHERENT"
+                parent["diagnosis"] = diagnosis
+                break
+            if cause == prev_cause:
+                # information-gain stop rule: the previous evolution
+                # step did NOT resolve the diagnosed cause. Honest
+                # stop — burning more generations against the same
+                # constraint is compute, not discovery (Art. LVI).
+                parent["diagnosis"] = diagnosis
+                stop_reason = "INFORMATION_GAIN_ZERO"
+                parent["stop_note"] = (
+                    "the evolution step did not resolve the diagnosed "
+                    f"cause ({cause}); a harder underlying constraint "
+                    "may exist — reported honestly, budget not burned")
+                break
+            parent["diagnosis"] = diagnosis
+            prev_cause = cause
+
+            gen_n += 1
+            gen_path = self.out / f"EVOLUTION_GEN_{gen_n}.json"
+            if gen_path.exists():
+                try:
+                    child = json.loads(gen_path.read_text())
+                except Exception:  # noqa: BLE001
+                    child = None
+            else:
+                child = None
+            if child is None:
+                child = self._evolution_generate_next(
+                    parent, diagnosis, gen_n)
+                if child is not None:
+                    self._persist(f"EVOLUTION_GEN_{gen_n}.json", child)
+            if child is None:
+                stop_reason = "TRANSPORT_BLOCKED"
+                parent["state"] = ev.INVENTION_EVOLVED
+                break
+            parent["state"] = ev.INVENTION_EVOLVED
+            generations.append(child)
+            if child.get("state") in (ev.INVENTION_SURVIVED,
+                                      ev.INVENTION_REQUIRES_EXPERIMENT):
+                survivor = child
+                stop_reason = "SURVIVOR_REACHED"
+                break
+
+        if stop_reason is None:
+            stop_reason = ("SURVIVOR_REACHED" if survivor
+                           else "BUDGET_EXHAUSTED")
+
+        # ---------- survivor -> the REAL package tail -------------------
+        if survivor is not None and self.with_package:
+            self._evolution_package_survivor(survivor, run_ctx)
+
+        for g in generations:
+            g["maturity"] = ev.maturity_for(g)
+        summary = ev.lineage_summary(generations, stop_reason,
+                                     self.run_id, budget)
+        summary["resumed"] = False
+
+        # the honest final_state for the whole run
+        fs_status, fs_reason = self._evolution_final_status(
+            summary, survivor)
+        summary["final_state"] = dict(
+            final, final_status=fs_status, reason=fs_reason,
+            evolution={
+                "n_generations": summary["n_generations"],
+                "stop_reason": stop_reason,
+                "current_invention": summary["current_invention"],
+                "survivor_reached": summary["survivor_reached"],
+            })
+        self._persist("INVENTION_LINEAGE.json", summary)
+        return summary
+
+    # ------------------------------------------------------------------
+    def _evolution_gen1(self, final: Dict[str, Any]) -> Optional[Dict]:
+        """The GEN-1 record from this run's own artifacts: the
+        evidence-bound synthesis candidate when it exists (challenge
+        verdict = whatever the run recorded), else the mandatory
+        fallback architecture (Phase C — GENERATED maturity)."""
+        from . import evolution as ev
+        mm = self.env.mechanism_map or {}
+        run_id = self.run_id
+
+        def _record(arch: Dict[str, Any], origin: str) -> Dict[str, Any]:
+            gen: Dict[str, Any] = {
+                "gen": 1,
+                "invention_id": ev.new_invention_id(run_id, 1),
+                "parent_id": None,
+                "lineage": [ev.new_invention_id(run_id, 1)],
+                "origin": origin,
+                "architecture": {
+                    "mechanism": arch.get("mechanism", ""),
+                    "intervention": arch.get("intervention", ""),
+                    "expected_effect": arch.get("expected_effect", ""),
+                    "falsification_test":
+                        arch.get("falsification_test", ""),
+                },
+                "state": ev.INVENTION_GENERATED,
+                "maturity": ev.MATURITY_GENERATED,
+                "challenge": {},
+                "causal_delta": None,
+                "change_delta": None,
+                "reason_for_change": None,
+                "fresh_evidence": None,
+                "model": None,
+                "artifacts": {},
+            }
+            return gen
+
+        if mm.get("intervention"):
+            gen = _record(mm, "BASELINE_SYNTHESIS")
+            # challenge verdict from the run's own final state
+            final_status = (final.get("final_status") or "").upper()
+            adversarial = (self.env.attack_results or {}).get("overall")
+            evidence_verified = bool(
+                (self.env.adjudication or {})
+                .get("evidence_verification", {}).get("verified", False))
+            ph = (self.env.physics or {})
+            physics_lifecycle = ph.get("lifecycle_verdict")
+            killed = final_status in ("REJECTED",)
+            gen["challenge"] = {
+                "physics_lifecycle": physics_lifecycle,
+                "attack_overall": adversarial,
+                "evidence_verified": evidence_verified,
+                "killed": killed,
+                "kill_reason": (final.get("reason") or "")[:400],
+                "final_status": final_status,
+            }
+            gen["evidence_verified"] = evidence_verified
+            gen["state"] = (
+                ev.INVENTION_SURVIVED if not killed and evidence_verified
+                else ev.INVENTION_REJECTED if killed
+                else ev.INVENTION_CHALLENGED)
+            return gen
+
+        # Phase C: the mandatory baseline architecture (honest fallback)
+        synthesis_failure = self.failed_stages.get("SYNTHESIZE", "")
+        arch = ev.generate_baseline_architecture(
+            self.problem, self.env.evidence or [],
+            synthesis_failure=synthesis_failure)
+        if arch is None:
+            return None
+        gen = _record(arch, "BASELINE_FALLBACK_GENERATION")
+        gen["generated_by"] = arch.get("generated_by")
+        gen["challenge"] = {
+            "killed": False,
+            "not_yet_challenged": True,
+            "note": ("the fallback architecture has not faced the "
+                     "challenge gauntlet yet — the evolution loop "
+                     "challenges it in generation 2's evaluation path"),
+        }
+        gen["state"] = ev.INVENTION_GENERATED
+        return gen
+
+    # ------------------------------------------------------------------
+    def _evolution_generate_next(self, parent: Dict[str, Any],
+                                 diagnosis: Dict[str, Any],
+                                 gen_n: int) -> Optional[Dict[str, Any]]:
+        """One evolution step: FRESH EVIDENCE retrieval (a NEW versioned
+        snapshot — Art. XLIV) -> the causal-delta generation (30-year
+        engine + frontier transfer) -> the REAL re-evaluation gauntlet
+        (collision, spec, engineering spec, CAD per-generation geometry,
+        physics gate, engineering attack, independent attack). A
+        brand-new invention identity; the full lineage preserved."""
+        from . import evolution as ev
+        # ---- fresh evidence (new snapshot, versioned) ------------------
+        fresh = ev.retrieve_fresh_evidence(
+            self.problem, parent.get("architecture") or {},
+            snapshot_version=gen_n)
+        fresh_items = fresh.get("items") or []
+
+        # ---- the causal-delta generation --------------------------------
+        arch = ev.generate_evolved_architecture(
+            self.problem, parent, diagnosis, fresh_items, gen_n)
+        if arch is None:
+            return None
+
+        invention_id = ev.new_invention_id(self.run_id, gen_n)
+        lineage = list(parent.get("lineage") or []) + [invention_id]
+        gen: Dict[str, Any] = {
+            "gen": gen_n,
+            "invention_id": invention_id,
+            "parent_id": parent.get("invention_id"),
+            "lineage": lineage,
+            "origin": "EVOLUTION_CAUSAL_DELTA",
+            "architecture": {
+                "mechanism": arch.get("mechanism", ""),
+                "intervention": arch.get("intervention", ""),
+                "expected_effect": arch.get("expected_effect", ""),
+                "falsification_test":
+                    arch.get("falsification_test", ""),
+            },
+            "state": ev.INVENTION_GENERATED,
+            "maturity": ev.MATURITY_GENERATED,
+            "causal_delta": arch.get("causal_delta"),
+            "change_delta": (arch.get("causal_delta") or {}).get(
+                "causal_change", ""),
+            "reason_for_change": (
+                f"diagnosed cause {diagnosis.get('cause')}; "
+                + ((arch.get("causal_delta") or {}).get(
+                    "frontier_capability", "") or "frontier transfer"))[:200],
+            "fresh_evidence": {
+                "snapshot_version": fresh.get("snapshot_version"),
+                "query": fresh.get("query"),
+                "n_items": fresh.get("n_items"),
+                "status": fresh.get("status"),
+                "snapshot_hash": fresh.get("snapshot_hash"),
+                "boundary": fresh.get("boundary"),
+                "retrieved_at": fresh.get("retrieved_at"),
+            },
+            "generated_by": arch.get("generated_by"),
+            "challenge": {},
+            "model": None,
+            "artifacts": {},
+        }
+        return self._evolution_challenge_generation(gen, fresh_items,
+                                                     parent)
+
+    # ------------------------------------------------------------------
+    def _evolution_challenge_generation(self, gen: Dict[str, Any],
+                                        fresh_items: List[Dict[str, Any]],
+                                        parent: Optional[Dict] = None
+                                        ) -> Dict[str, Any]:
+        """The REAL re-evaluation gauntlet for ONE generation (the same
+        instruments the engine uses for grid/mechanism-space candidates
+        — no weaker path, Art. IV): env view + fresh collision ->
+        invention spec -> engineering spec -> per-generation CAD ->
+        physics gate -> engineering attack -> independent attack. Sets
+        the generation's state/challenge/artifacts in place and returns
+        it. Used by BOTH the fallback baseline (GEN 1, Phase C) and
+        every evolved generation (GEN 2+)."""
+        from . import evolution as ev
+        from .engineering_attack import attack_engineering
+        from .engineering_spec import build_engineering_spec
+        from .invention_spec import build_invention_spec
+        # (the same instruments the engine uses for grid/mechanism-space
+        # candidates — no weaker path, Art. IV)
+        gen_n = gen.get("gen") or 1
+        invention_id = gen.get("invention_id")
+        try:
+            env_view = self._evolution_env_view(gen, fresh_items)
+        except Exception as exc:  # noqa: BLE001 — recorded, not a kill
+            gen["challenge"] = {
+                "killed": False, "evaluation_error":
+                    f"env view build failed: {type(exc).__name__}: {exc}"}
+            gen["state"] = ev.INVENTION_CHALLENGED
+            return gen
+        run_ctx = {"run_id": self.run_id}
+        from .engineering_attack import attack_engineering
+        from .engineering_spec import build_engineering_spec
+        from .invention_spec import build_invention_spec
+        try:
+            spec = build_invention_spec(env_view, run_ctx)
+            spec = dict(spec, _evolution_candidate={
+                "marker": "EVOLUTION_CAUSAL_DELTA_CANDIDATE",
+                "generation": gen_n,
+                "parent_invention_id": (parent or {}).get(
+                    "invention_id"),
+                "causal_delta_present": bool(gen.get("causal_delta")),
+                "discovery_verification": (
+                    "RE-EVALUATED through the standard gauntlet "
+                    "(collision/spec/physics/attack) for this "
+                    "generation; nothing inherited from the parent"),
+            })
+            self._persist(f"INVENTION_SPECIFICATION_gen-{gen_n}.json",
+                          spec)
+            eng1 = build_engineering_spec(spec, env_view, run_ctx)
+            self._persist(f"ENGINEERING_SPECIFICATION_gen-{gen_n}.json",
+                          eng1)
+        except Exception as exc:  # noqa: BLE001 — honest error record
+            gen["challenge"] = {
+                "killed": False,
+                "evaluation_error": (f"spec build failed: "
+                                     f"{type(exc).__name__}: {exc}")[:300]}
+            gen["state"] = ev.INVENTION_CHALLENGED
+            return gen
+
+        # per-generation geometry artifact (Phase H): CAD pass for THIS
+        # generation, GLB lands at MODEL/model-00N.glb (honest
+        # NOT_APPLICABLE when the invention is non-geometric — never
+        # forced, never fake)
+        try:
+            self._evolution_geometry(gen_n, spec)
+        except Exception as exc:  # noqa: BLE001 — recorded, never fatal
+            gen["artifacts"]["geometry_error"] = \
+                f"{type(exc).__name__}: {exc}"[:200]
+
+        # physics gate (same instrument as the gauntlet)
+        physics_lifecycle = None
+        try:
+            from .physics_gate import evaluate_candidate_physics
+            eng1["physics_evaluation"] = evaluate_candidate_physics(
+                spec, eng1, run_ctx)
+            self._persist(f"ENGINEERING_SPECIFICATION_gen-{gen_n}.json",
+                          eng1)
+        except Exception as exc:  # noqa: BLE001 — disclosed, not a kill
+            eng1["physics_evaluation"] = {
+                "gate_version": "physics_gate/1.0.0",
+                "error": f"{type(exc).__name__}: {exc}"[:300]}
+        physics_lifecycle = _physics_lifecycle(
+            eng1.get("physics_evaluation") or {})
+        gen["challenge"]["physics_lifecycle"] = physics_lifecycle
+        if physics_lifecycle == "PLAUSIBILITY_BOUND_VIOLATED":
+            gen["challenge"].update({
+                "killed": True, "kill_stage": "PHYSICS",
+                "kill_reason": ("physics gate: the evolved architecture "
+                                "violates a deterministic physical "
+                                "bound")})
+            gen["state"] = ev.INVENTION_REJECTED
+            self._persist(f"PACKAGE_FAILED_gen-{gen_n}.json", {
+                "stage": "PHYSICS", "generation": gen_n,
+                "invention_id": invention_id,
+                "reason": gen["challenge"]["kill_reason"]})
+            return gen
+
+        # engineering attack (same instrument as the gauntlet)
+        attack1 = None
+        try:
+            attack1 = attack_engineering(spec, eng1, env_view)
+            self._persist(f"ENGINEERING_ATTACK_gen-{gen_n}.json", attack1)
+        except Exception as exc:  # noqa: BLE001 — honest error record
+            gen["challenge"]["attack_error"] = \
+                f"{type(exc).__name__}: {exc}"[:300]
+        gen["challenge"]["attack_overall"] = (
+            attack1 or {}).get("overall")
+        if (attack1 or {}).get("overall") == "KILLED":
+            gen["challenge"].update({
+                "killed": True, "kill_stage": "ENGINEERING_ATTACK",
+                "kill_reason": ("engineering attack KILLED the evolved "
+                                "architecture"),
+                "kill_basis": [i["basis"] for i in attack1["items"]
+                               if i["verdict"] == "KILL"][:5]})
+            gen["state"] = ev.INVENTION_REJECTED
+            self._persist(f"PACKAGE_FAILED_gen-{gen_n}.json", {
+                "stage": "ENGINEERING_ATTACK", "generation": gen_n,
+                "invention_id": invention_id,
+                "reason": gen["challenge"]["kill_reason"],
+                "kill_basis": gen["challenge"]["kill_basis"]})
+            return gen
+
+        # independent adversarial attack (separate context/provider —
+        # the same R401 Phase-6 instrument, ATTACK_INCOMPLETE never
+        # kills — Art. XXIX)
+        indep = None
+        try:
+            from .independent_attack import independent_attack
+            generator_provider = ((gen.get("generated_by") or {})
+                                   .get("provider"))
+            indep = independent_attack(
+                {"candidate_id": invention_id,
+                 "mechanism": gen["architecture"]["mechanism"],
+                 "intervention": gen["architecture"]["intervention"],
+                 "predicted_effect":
+                     gen["architecture"]["expected_effect"],
+                 "testable_prediction":
+                     gen["architecture"]["falsification_test"],
+                 "novel_design_variable": (gen.get("causal_delta") or {})
+                     .get("causal_change", ""),
+                 "known_failure_modes": [], "constraint_set": {}},
+                self.problem, fresh_items or (self.env.evidence or []),
+                generator_provider)
+            self._persist(f"INDEPENDENT_ATTACK_gen-{gen_n}.json", indep)
+        except Exception as exc:  # noqa: BLE001 — recorded
+            indep = {"state": "ATTACK_INCOMPLETE",
+                     "overall": "ATTACK_INCOMPLETE",
+                     "error": f"{type(exc).__name__}: {exc}"[:300]}
+        gen["challenge"]["independent_attack"] = (
+            indep or {}).get("overall")
+        if (indep or {}).get("overall") == "KILLED":
+            gen["challenge"].update({
+                "killed": True, "kill_stage": "INDEPENDENT_ATTACK",
+                "kill_reason": ("the independent attacker produced a "
+                                "validated KILL on the evolved "
+                                "architecture")})
+            gen["state"] = ev.INVENTION_REJECTED
+            self._persist(f"PACKAGE_FAILED_gen-{gen_n}.json", {
+                "stage": "INDEPENDENT_ATTACK", "generation": gen_n,
+                "invention_id": invention_id,
+                "reason": gen["challenge"]["kill_reason"],
+                "independence_mode": (indep or {}).get(
+                    "independence_mode")})
+            return gen
+
+        # survived the re-evaluation gauntlet
+        evidence_verified = bool(
+            (self.env.adjudication or {})
+            .get("evidence_verification", {}).get("verified", False))
+        gen["evidence_verified"] = evidence_verified and \
+            bool(fresh_items)
+        gen["challenge"]["killed"] = False
+        gen["challenge"]["survived"] = True
+        gen["state"] = ev.INVENTION_REQUIRES_EXPERIMENT
+        gen["artifacts"]["invention_spec"] = \
+            f"INVENTION_SPECIFICATION_gen-{gen_n}.json"
+        gen["artifacts"]["engineering_spec"] = \
+            f"ENGINEERING_SPECIFICATION_gen-{gen_n}.json"
+        # carry the survivor artifacts for the package tail
+        gen["_survivor_spec"] = spec
+        gen["_survivor_eng"] = eng1
+        gen["_survivor_env"] = env_view
+        return gen
+
+    # ------------------------------------------------------------------
+    def _evolution_env_view(self, gen: Dict[str, Any],
+                            fresh_items: List[Dict[str, Any]]):
+        """A Candidate env view for one evolution generation — the SAME
+        construction the gauntlet uses for grid candidates (mechanism
+        map swap + a FRESH per-candidate collision run; inherited art
+        is never silently reused — R376 rule) with the fresh-evidence
+        snapshot attached as the generation's own evidence context."""
+        from .candidate import Candidate
+        d = self.env.to_dict()
+        arch = gen.get("architecture") or {}
+        mm = dict(d.get("mechanism_map") or {})
+        mm.update({
+            "mechanism": arch.get("mechanism", ""),
+            "intervention": arch.get("intervention", ""),
+            "expected_effect": arch.get("expected_effect", ""),
+            "falsification_test": arch.get("falsification_test", ""),
+            "raw_candidate": {
+                "candidate_id": gen.get("invention_id"),
+                "mechanism": arch.get("mechanism", ""),
+                "intervention": arch.get("intervention", ""),
+                "expected_effect": arch.get("expected_effect", ""),
+                "falsification_test": arch.get("falsification_test", ""),
+                "evolution_generation": gen.get("gen"),
+            },
+        })
+        d["mechanism_map"] = mm
+        # fresh collision for THIS mechanism (R376: never inherit the
+        # parent's collision results)
+        collision, coll_err = None, None
+        try:
+            from .prior_art_v2_bridge import candidate_collision
+            collision = candidate_collision(mm, self.problem)
+        except Exception as exc:  # noqa: BLE001 — honest record
+            coll_err = f"{type(exc).__name__}: {exc}"
+        if collision is not None:
+            d["collision_results"] = collision["collision"]
+            d["prior_art"] = collision["prior_art"]
+        else:
+            d["collision_results"] = {
+                "strategy": "mechanism-centered multi-query (R376)",
+                "collision_rerun_error": coll_err,
+                "novelty_risk": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+                "differentiation_resolution": {
+                    "state": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+                    "epistemic_class": "SEARCH_RESULT",
+                    "reason": f"per-generation collision re-run failed: "
+                              f"{coll_err}",
+                    "constitutional_limitation":
+                        "unknown stays unknown (Art. XXV)"},
+                "nearest_prior_art": [],
+            }
+            d["prior_art"] = {
+                "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+                "differentiation_resolution":
+                    d["collision_results"]["differentiation_resolution"],
+                "state_vocabulary": "collision_resolution R376"}
+        if fresh_items:
+            d["evidence"] = fresh_items
+        return Candidate.from_dict(d)
+
+    # ------------------------------------------------------------------
+    def _evolution_geometry(self, gen_n: int, spec: Dict[str, Any]) -> None:
+        """Phase H: the per-generation geometry artifact. The CAD pass
+        runs for THIS generation into three_d/gen-N; the GLB derivative
+        is copied to MODEL/model-00N.glb (the directive's naming).
+        NOT_APPLICABLE for non-geometric inventions is honest — never
+        forced, never fake. A build failure records the failure and
+        proceeds (the candidate never dies here — R380 rule)."""
+        import shutil
+        from .cad_pipeline import run_cad_pass
+        out_dir = str(self.out / "three_d" / f"gen-{gen_n:03d}")
+        try:
+            _, ledger = run_cad_pass(
+                dict(spec), out_dir=out_dir,
+                provider=os.environ.get("ENGINE_CAD_PROVIDER") or None,
+                allow_llm=os.environ.get("ENGINE_CAD_LLM", "1") != "0")
+            self._persist(f"CAD_PIPELINE_LEDGER_gen-{gen_n}.json", ledger)
+        except Exception as exc:  # noqa: BLE001 — honest degradation
+            self._persist(f"CAD_PIPELINE_LEDGER_gen-{gen_n}.json", {
+                "stage": "CAD_PIPELINE_PASS", "status": "ERROR",
+                "error": f"{type(exc).__name__}: {exc}"[:300]})
+            return
+        model_dir = self.out / "MODEL"
+        model_dir.mkdir(parents=True, exist_ok=True)
+        dst = model_dir / f"model-{gen_n:03d}.glb"
+        glbs = sorted(Path(out_dir).glob("*.glb")) if \
+            Path(out_dir).exists() else []
+        if glbs and not dst.exists():
+            shutil.copyfile(str(glbs[0]), str(dst))
+
+    # ------------------------------------------------------------------
+    def _evolution_package_survivor(self, survivor: Dict[str, Any],
+                                    run_ctx: Dict[str, Any]) -> None:
+        """The REAL package tail for an evolution survivor: registry
+        allocation -> buyer package -> quality gate -> release gate.
+        The R378/R379 improvement passes are NOT re-run here (the
+        evolution loop IS the mutation engine on this path — diagnose ->
+        causal change -> re-evaluate; the deviation is recorded, never
+        silent)."""
+        import os as _os
+        from .dossier_quality import (evaluate_dossier_quality,
+                                      assert_quality_gate)
+        from .package_factory import generate_buyer_package
+        spec = survivor.pop("_survivor_spec", None)
+        eng = survivor.pop("_survivor_eng", None)
+        env_view = survivor.pop("_survivor_env", None)
+        if not (spec and eng and env_view is not None):
+            self._persist("EVOLUTION_PACKAGE_SKIPPED.json", {
+                "reason": ("survivor artifacts unavailable (resumed run "
+                           "without in-memory spec/eng); the run's "
+                           "epistemic record is complete; re-run the "
+                           "session for a fresh package path"),
+                "generation": survivor.get("gen")})
+            return
+        gen_n = survivor.get("gen")
+        try:
+            # per-generation geometry already built in the gauntlet;
+            # ensure the survivor's own MODEL entry exists
+            self._evolution_geometry(gen_n, spec)
+            invention_id = (spec.get("invention_id") or {}).get("value")
+            if self.package_number is None:
+                from .package_registry import allocate
+                row = allocate(
+                    invention_id, self.run_id,
+                    parent_invention_id=survivor.get("parent_id"),
+                    registry_path=self.package_registry_path)
+                pkg_number = row["portfolio_number"]
+                run_ctx = dict(run_ctx, package_registry_row=row)
+            else:
+                pkg_number = self.package_number
+            eng = dict(eng, engineering_attack_summary={
+                "attack": "ENGINEERING_ATTACK (evolution re-evaluation)",
+                "overall": (survivor.get("challenge") or {}).get(
+                    "attack_overall"),
+                "attack_record": f"ENGINEERING_ATTACK_gen-{gen_n}.json",
+                "independent_attack_record":
+                    f"INDEPENDENT_ATTACK_gen-{gen_n}.json",
+                "evolution_generation": gen_n,
+                "improvement_passes": (
+                    "NOT_RE_RUN_FOR_EVOLUTION_SURVIVORS — the evolution "
+                    "loop (diagnose -> causal change -> re-evaluate) is "
+                    "the mutation engine on this path (R416); disclosed, "
+                    "never silent"),
+            })
+            self._spec, self._eng = spec, eng
+            self._chosen_env = env_view
+            self._persist("INVENTION_SPECIFICATION.json", spec)
+            self._persist("ENGINEERING_SPECIFICATION.json", eng)
+            from .experiment_selector import select_decisive_experiment
+            self._persist("DECISIVE_EXPERIMENT.json",
+                          select_decisive_experiment(env_view))
+            self.package_report = generate_buyer_package(
+                str(self.out), spec, eng, env_view,
+                {"run_id": self.run_id, "package_number": pkg_number},
+                rehearsal=self.rehearsal)
+            self._persist("PACKAGE_REPORT.json",
+                          {k: v for k, v in self.package_report.items()
+                           if k != "rendered"} | {"rendered":
+                                                  self.package_report.get(
+                                                      "rendered", [])})
+            if not self.package_report.get("complete"):
+                self.package_failure = (
+                    "evolution package incomplete: "
+                    f"missing={self.package_report.get('missing_links')} "
+                    f"failed={self.package_report.get('failed')}")
+                return
+            quality_final = evaluate_dossier_quality(
+                spec, eng, self.package_report)
+            self._persist("DOSSIER_QUALITY_EVALUATION.json", quality_final)
+            assert_quality_gate(quality_final)
+            from .release_gate import (HELD_FOR_HUMAN_REVIEW, RELEASED,
+                                       evaluate_release_gate)
+            gate = evaluate_release_gate(spec, eng, self.package_report)
+            self._persist("RELEASE_GATE_EVALUATION.json", gate)
+            self.release_gate = gate
+            self._terminal_status = (RELEASED
+                                     if gate["decision"] == RELEASED
+                                     else HELD_FOR_HUMAN_REVIEW)
+            if self.package_number is None:
+                from .package_registry import mark_released
+                mark_released(invention_id,
+                              status=getattr(self, "_terminal_status",
+                                             "RELEASED"),
+                              registry_path=self.package_registry_path)
+        except Exception as exc:  # noqa: BLE001 — explicit, never fabricated
+            self.package_failure = (
+                f"evolution package tail: {type(exc).__name__}: {exc}")
+            self._persist("PACKAGE_FAILED.json", {
+                "stage": "EVOLUTION_PACKAGE_TAIL",
+                "generation": survivor.get("gen"),
+                "error": self.package_failure,
+                "timestamp": utc_now()})
+
+    # ------------------------------------------------------------------
+    def _evolution_final_status(self, summary: Dict[str, Any],
+                                survivor: Optional[Dict[str, Any]]
+                                ) -> tuple:
+        """The honest run-level final_status after evolution."""
+        if survivor is not None and self.package_report is not None and \
+                self.package_report.get("complete"):
+            return ("EVOLVED_INVENTION_CANDIDATE",
+                    "an evolved architecture generation survived the "
+                    "re-evaluation gauntlet and a technology package "
+                    "was produced (maturity label on the package is "
+                    "derived from the generation's own verification "
+                    "events)")
+        if survivor is not None:
+            return ("EVOLVED_INVENTION_CANDIDATE",
+                    "an evolved architecture generation survived the "
+                    "re-evaluation gauntlet; the decisive physical "
+                    "experiment is specified, not executed")
+        n = summary.get("n_generations") or 0
+        current = summary.get("current_invention") or {}
+        return ("INVENTION_UNDER_DEVELOPMENT",
+                f"{n} architecture generations explored; the current "
+                f"invention (GEN {current.get('gen')}) is presented "
+                f"with maturity {current.get('maturity')} — none yet "
+                f"survived the full challenge gauntlet; stop reason: "
+                f"{summary.get('stop_reason')}")
 
     # ------------------------------------------------------------------
     def _cemetery_update(self, final: Dict[str, Any]):

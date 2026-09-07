@@ -1,0 +1,58 @@
+{
+ "record": "R416/EVOLUTION_V1/ROOT_CAUSE_MISATTRIBUTED_REJECTION.json",
+ "directive_section": "the R416 root-cause fix (the operator's screenshot)",
+ "the_defect": {
+   "where": "discovery_fabric/engine/run.py::_final_state (the pre-R416 "
+            "branch) + toscanini/user_state.py (the projection)",
+   "symptom": "a run whose SYNTHESIZE stage failed (mechanism GENERATION "
+              "failed — transport or no-coherent-mechanism) terminated "
+              "final_status=REJECTED, and the product surface then told "
+              "the user: 'The run finished and the engine REJECTED the "
+              "candidate — the adversarial chain found the idea not "
+              "defensible enough to package.'",
+   "why_it_was_a_lie": "the adversarial chain never ran and no candidate "
+                       "ever existed — the stage tracker itself showed "
+                       "Stress-testing NOT_STARTED. The user was told a "
+                       "verdict was reached when the machine had failed "
+                       "to GENERATE. This is exactly the Art. LXI "
+                       "contamination (implementation failure converted "
+                       "into a scientific rejection), laundered through "
+                       "the wording layer.",
+   "measured_reproduction": "the sealed fixture in "
+                            "tests/test_r416_evolution.py "
+                            "(TestHonestFinalStatus): a SYNTHESIZE "
+                            "transport failure now terminates "
+                            "MECHANISM_GENERATION_FAILED with a reason "
+                            "that names the generation gap — never "
+                            "REJECTED, never an adversarial claim"
+ },
+ "the_fix": {
+   "engine": "SYNTHESIZE failure -> final_status="
+             "MECHANISM_GENERATION_FAILED (typed; the reason carries the "
+             "actual stage failure). The downstream evolution pipeline "
+             "(R416 Phase C) then produces the mandatory baseline "
+             "architecture so a valid query still ends with an invention.",
+   "product_surface": "user_state/run_state translate the typed statuses "
+                      "honestly: MECHANISM_GENERATION_FAILED -> 'the "
+                      "engine could not generate an architecture "
+                      "(transport-class) — not a scientific rejection; "
+                      "retry resumable'. REJECTED (an ADJUDICATED kill) "
+                      "-> the invention is presented as IN DEVELOPMENT "
+                      "with the generation record and diagnosed cause — "
+                      "never the banned dead-end sentence.",
+   "nothing_weakened": "the adversarial chain still kills candidates the "
+                       "same way (the live acceptance run shows a real "
+                       "5-dimension KILL recorded to the cemetery); only "
+                       "the ATTRIBUTION became honest (Art. XV: the "
+                       "reporting layer was the defect, the gates were "
+                       "not)"
+ },
+ "constitutional_basis": [
+   "Art. LXI: infrastructure failure is never scientific rejection",
+   "Art. XV: the coder must never optimize the reporting layer to make "
+   "the system look healthier",
+   "Art. XXV: unknown must remain unknown — a generation gap is stated "
+   "as a generation gap"
+ ],
+ "reviewer_provenance": "AI_REVIEW (Art. LXVII)"
+}

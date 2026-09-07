@@ -25,8 +25,8 @@ Constitutional contract (Art. X, XXV, LXI, LXVIII):
     and the converse holds here too).
   - The outcome is derived from RECORDED fields only; absence of a
     field is never evidence (Art. XXV).
-  - No quota pressure: an honest NO_DEFENSIBLE_INVENTION is a real
-    result, never softened into a survivor (Art. LXVIII).
+  - No quota pressure: a weak architecture is presented with its true
+    maturity, never softened into a survivor (Art. LXVIII).
 """
 from __future__ import annotations
 
@@ -40,14 +40,21 @@ from typing import Any, Dict, List, Optional
 OUTCOME_PENDING = "PENDING"
 OUTCOME_SURVIVED = "INVENTION_SURVIVED"
 OUTCOME_REQUIRES_EXPERIMENT = "INVENTION_REQUIRES_EXPERIMENT"
-OUTCOME_NO_DEFENSIBLE = "NO_DEFENSIBLE_INVENTION"
+OUTCOME_UNDER_DEVELOPMENT = "INVENTION_UNDER_DEVELOPMENT"
+OUTCOME_FALSE_PREMISE = "FALSE_PREMISE_INCOHERENT"
+OUTCOME_NO_DEFENSIBLE = "NO_DEFENSIBLE_INVENTION"   # R416: legacy key —
+#   no longer emitted as a terminal; kept so pre-R416 session records
+#   map onto the UNDER_DEVELOPMENT projection instead of rendering the
+#   banned dead-end sentence
 OUTCOME_RUN_BLOCKED = "RUN_BLOCKED"
 
 OUTCOME_LABELS = {
     OUTCOME_PENDING: "Investigating",
     OUTCOME_SURVIVED: "Invention survived",
     OUTCOME_REQUIRES_EXPERIMENT: "Invention requires experiment",
-    OUTCOME_NO_DEFENSIBLE: "No defensible invention survived this run",
+    OUTCOME_UNDER_DEVELOPMENT: "Invention under development",
+    OUTCOME_FALSE_PREMISE: "Premise incoherent — reformulate the problem",
+    OUTCOME_NO_DEFENSIBLE: "Invention under development",
     OUTCOME_RUN_BLOCKED: "Run blocked — infrastructure, not a verdict",
 }
 
@@ -66,10 +73,10 @@ PHASES = [
      ["BUILDING_PROBLEM"]),
     ("GATHERING_EVIDENCE", "Gathering evidence",
      ["RETRIEVE", "FREEZE", "VERIFY"]),
-    ("MAPPING_MECHANISMS", "Mapping mechanisms",
+    ("MAPPING_MECHANISMS", "Inventing architecture 1",
      ["PREMISE_GATE", "SYNTHESIZE", "MECHANISM_SPACE",
       "MULTI_SOURCE_DISCOVERY", "COLLISION"]),
-    ("STRESS_TESTING", "Stress-testing",
+    ("STRESS_TESTING", "Challenging architecture 1",
      ["PHYSICS", "ATTACK", "CONTRADICTION"]),
     ("PREPARING_PACKAGE", "Preparing technology package",
      ["KILLER_EXPERIMENT", "ADJUDICATION", "CLASSIFY",
@@ -398,9 +405,13 @@ def _failure_state(session: Dict, run_dir: Optional[Path]) -> Dict:
 
 def phase_progression(session: Dict, run_dir: Optional[Path],
                       stage_status: Dict[str, str]) -> List[Dict]:
-    """The directive §5 UI phases, each mapped to REAL backend stages;
-    a phase is DONE only when its stages are done, IN_PROGRESS while any
-    runs, FAILED if any failed. Never fabricated progress."""
+    """The directive §5 UI phases (R416 Phase J wording: the machine
+    WORKS the problem — 'Inventing architecture 1' -> 'Challenging
+    architecture 1' -> ['Developing architecture 2' -> 'Testing
+    architecture 2' -> ...] -> 'Preparing technology package'), each
+    mapped to REAL backend stages or lineage records; a phase is DONE
+    only when its stages are done, IN_PROGRESS while any runs, FAILED
+    if any failed. Never fabricated progress."""
     running = session.get("status") in _RUNNING_STATUSES
     out: List[Dict] = []
     reached_any = False
@@ -436,6 +447,40 @@ def phase_progression(session: Dict, run_dir: Optional[Path],
                     "state": phase_state,
                     "stages": {s: stage_status.get(s)
                                for s in stages if s in stage_status}})
+
+    # ---- R416: the evolution generations extend the progression ------
+    # Each generation beyond the first appends 'Developing architecture
+    # N' -> 'Testing architecture N' (Phase J wording), states derived
+    # from the lineage's own records — never fabricated.
+    if run_dir and run_dir.exists():
+        lineage = _read_json(run_dir / "INVENTION_LINEAGE.json")
+        for g in (lineage or {}).get("generations") or []:
+            if not isinstance(g, dict):
+                continue
+            gen_n = g.get("gen")
+            if not gen_n or gen_n == 1:
+                continue
+            ch = g.get("challenge") or {}
+            if ch:
+                out.append({
+                    "phase": f"TESTING_{gen_n}",
+                    "label": f"Testing architecture {gen_n}",
+                    "state": ("DONE" if ch.get("survived") else
+                              "FAILED" if ch.get("killed") else
+                              "IN_PROGRESS" if running else "DONE"),
+                    "stages": {f"EVOLUTION_GEN_{gen_n}":
+                               g.get("state") or "UNKNOWN"},
+                    "generation": gen_n})
+        # a live evolution generation shows as Developing in progress
+        live = _evolution_live_phase(session, run_dir)
+        if live:
+            out.append({
+                "phase": f"DEVELOPING_{live['current_gen']}",
+                "label": live["label"],
+                "state": "IN_PROGRESS",
+                "stages": {},
+                "generation": live["current_gen"],
+                "subline": live["subline"]})
     return out
 
 
@@ -471,12 +516,66 @@ def terminal_outcome(session: Dict, run_dir: Optional[Path] = None) -> Dict:
                           "physical experiment is specified, not "
                           "executed (recorded fields: package.complete="
                           "false)")}
+    if status == "COMPLETE" and final == "EVOLVED_INVENTION_CANDIDATE":
+        # R416: an evolution generation survived the re-evaluation
+        # gauntlet. Package presence decides SURVIVED vs
+        # REQUIRES_EXPERIMENT — the maturity label rides on the
+        # generations projection, never asserted here.
+        pkg_complete = bool(pkg.get("complete"))
+        if not pkg_complete and run_dir and run_dir.exists():
+            report = _read_json(run_dir / "PACKAGE_REPORT.json") or {}
+            zips = sorted((run_dir / "DOWNLOAD").glob("*.zip")) \
+                if (run_dir / "DOWNLOAD").exists() else []
+            pkg_complete = bool(report.get("complete") and zips)
+        if pkg_complete:
+            return {"outcome": OUTCOME_SURVIVED,
+                    "basis": ("final_status="
+                              "EVOLVED_INVENTION_CANDIDATE and the "
+                              "technology package was built (recorded "
+                              "package.complete=true)")}
+        return {"outcome": OUTCOME_REQUIRES_EXPERIMENT,
+                "basis": ("final_status="
+                          "EVOLVED_INVENTION_CANDIDATE; the decisive "
+                          "physical experiment is specified, not "
+                          "executed (recorded fields: package.complete="
+                          "false)")}
+    if status == "COMPLETE" and final == "INVENTION_UNDER_DEVELOPMENT":
+        # R416: the evolution loop explored architectures and stopped
+        # honestly (budget / information-gain / transport). The CURRENT
+        # invention is presented with its true maturity — the lineage
+        # projection carries the generations, the challenge history and
+        # the stop reason. Never a dead-end sentence.
+        n = None
+        cur = None
+        if run_dir and run_dir.exists():
+            lineage = _read_json(run_dir / "INVENTION_LINEAGE.json") or {}
+            n = lineage.get("n_generations")
+            cur = lineage.get("current_invention") or {}
+        return {"outcome": OUTCOME_UNDER_DEVELOPMENT,
+                "basis": (f"final_status=INVENTION_UNDER_DEVELOPMENT — "
+                          f"{n or 'multiple'} architecture generations "
+                          f"explored; current invention GEN "
+                          f"{(cur or {}).get('gen')} at maturity "
+                          f"{(cur or {}).get('maturity')}; stop reason "
+                          f"recorded on the lineage")}
     if status == "COMPLETE" and final in ("REJECTED",
-                                          "MALFORMED_OR_FALSE_PREMISE"):
-        return {"outcome": OUTCOME_NO_DEFENSIBLE,
-                "basis": f"final_status={final} — a real discovery "
-                         f"result (the adversarial chain killed or "
-                         f"premise-gated the candidate)"}
+                                          "MECHANISM_GENERATION_FAILED"):
+        # legacy/pre-evolution records: an architecture WAS generated on
+        # R416 runs; for pre-R416 records the exploration is still
+        # presented as development state with the recorded basis — the
+        # product never renders the banned dead-end sentence
+        return {"outcome": OUTCOME_UNDER_DEVELOPMENT,
+                "basis": f"final_status={final} — the recorded "
+                         f"challenge outcome; the invention lineage "
+                         f"(when present) carries the generations and "
+                         f"their maturity"}
+    if status == "COMPLETE" and final == "MALFORMED_OR_FALSE_PREMISE":
+        return {"outcome": OUTCOME_FALSE_PREMISE,
+                "basis": ("final_status=MALFORMED_OR_FALSE_PREMISE — "
+                          "the problem as stated cannot physically "
+                          "occur; reformulating the premise is the fix "
+                          "(checked BEFORE inventing; nothing was "
+                          "synthesized)")}
     if status == "COMPLETE":
         return {"outcome": OUTCOME_RUN_BLOCKED,
                 "basis": ("terminal without a recorded verdict "
@@ -489,6 +588,138 @@ def terminal_outcome(session: Dict, run_dir: Optional[Path] = None) -> Dict:
     return {"outcome": OUTCOME_RUN_BLOCKED,
             "basis": f"machine status {status} — infrastructure, "
                      f"never a scientific rejection (Art. LXI)"}
+
+
+# ---------------------------------------------------------------------------
+# R416: the invention generations projection (INVENTION_LINEAGE.json is
+# the authority; this only PROJECTS it — Art. X)
+# ---------------------------------------------------------------------------
+
+def _gen_model_available(run_dir: Optional[Path], gen: int) -> bool:
+    if not run_dir or not gen:
+        return False
+    return (run_dir / "MODEL" / f"model-{int(gen):03d}.glb").exists()
+
+
+def generations_projection(session: Dict,
+                           run_dir: Optional[Path]) -> Optional[Dict]:
+    """The lineage generations for the UI: INVENTION 01, 02, ... with
+    state, maturity, what changed, challenge history, and per-gen
+    geometry availability. None when no lineage was recorded (standard
+    single-generation runs still show the GEN-1 phases)."""
+    if not run_dir or not run_dir.exists():
+        return None
+    lineage = _read_json(run_dir / "INVENTION_LINEAGE.json")
+    if not lineage or not lineage.get("generations"):
+        return None
+    gens = []
+    for g in lineage.get("generations") or []:
+        if not isinstance(g, dict):
+            continue
+        gen_n = g.get("gen")
+        ch = g.get("challenge") or {}
+        cd = g.get("causal_delta") or {}
+        gens.append({
+            "gen": gen_n,
+            "label": f"INVENTION {int(gen_n):02d}" if gen_n else None,
+            "invention_id": g.get("invention_id"),
+            "parent_id": g.get("parent_id"),
+            "origin": g.get("origin"),
+            "state": g.get("state"),
+            "maturity": g.get("maturity"),
+            "architecture": {
+                "mechanism": (g.get("architecture") or {}).get(
+                    "mechanism"),
+                "intervention": (g.get("architecture") or {}).get(
+                    "intervention"),
+                "expected_effect": (g.get("architecture") or {}).get(
+                    "expected_effect"),
+                "falsification_test": (g.get("architecture") or {}).get(
+                    "falsification_test"),
+            },
+            "what_changed": g.get("change_delta"),
+            "reason_for_change": g.get("reason_for_change"),
+            "causal_delta": {
+                "causal_change": cd.get("causal_change"),
+                "new_capability": cd.get("new_capability"),
+                "new_interaction": cd.get("new_interaction"),
+                "new_operating_regime": cd.get("new_operating_regime"),
+                "predicted_effect": cd.get("predicted_effect"),
+                "frontier_capability": cd.get("frontier_capability"),
+                "thirty_year_engine": cd.get("thirty_year_engine") or None,
+                "diagnosed_cause": cd.get("diagnosed_cause"),
+            } if cd else None,
+            "challenge": {
+                "killed": ch.get("killed"),
+                "kill_stage": ch.get("kill_stage"),
+                "kill_reason": ch.get("kill_reason"),
+                "attack_overall": ch.get("attack_overall"),
+                "independent_attack": ch.get("independent_attack"),
+                "physics_lifecycle": ch.get("physics_lifecycle"),
+                "survived": ch.get("survived"),
+                "evidence_verified": ch.get("evidence_verified"),
+            },
+            "diagnosis": {
+                "cause": (g.get("diagnosis") or {}).get("cause"),
+                "basis": ((g.get("diagnosis") or {}).get("basis")
+                          or [])[:2],
+            } if g.get("diagnosis") else None,
+            "fresh_evidence": {
+                "n_items": (g.get("fresh_evidence") or {}).get("n_items"),
+                "query": (g.get("fresh_evidence") or {}).get("query"),
+                "status": (g.get("fresh_evidence") or {}).get("status"),
+                "snapshot_version": (g.get("fresh_evidence") or {}).get(
+                    "snapshot_version"),
+            } if g.get("fresh_evidence") else None,
+            "model_available": _gen_model_available(run_dir, gen_n or 0),
+            "stop_note": g.get("stop_note"),
+        })
+    return {
+        "generations": gens,
+        "n_generations": lineage.get("n_generations") or len(gens),
+        "n_evolution_generations": lineage.get(
+            "n_evolution_generations"),
+        "current_invention": lineage.get("current_invention"),
+        "survivor_reached": lineage.get("survivor_reached"),
+        "survivor_gen": lineage.get("survivor_gen"),
+        "stop_reason": lineage.get("stop_reason"),
+        "status": lineage.get("status"),   # DISABLED / ERROR states
+        "honesty_contract": lineage.get("honesty_contract"),
+    }
+
+
+def _evolution_live_phase(session: Dict,
+                          run_dir: Optional[Path]) -> Optional[Dict]:
+    """The live evolution state while the run works: which generation
+    is being developed/tested right now, derived from persisted
+    per-generation records (EVOLUTION_GEN_N.json presence + the last
+    record's state). Absent when no evolution is in flight."""
+    if not run_dir or not run_dir.exists():
+        return None
+    if session.get("status") not in _RUNNING_STATUSES:
+        return None
+    # the engine persists EVOLUTION_GEN_N.json as each generation
+    # completes; the LIVE generation is one beyond the last record
+    n = 0
+    for i in range(1, 9):
+        if (run_dir / f"EVOLUTION_GEN_{i}.json").exists():
+            n = i
+        else:
+            break
+    if n == 0:
+        # no generation record yet: the run is still in the standard
+        # stages — the evolution has not started (not a fake phase)
+        return None
+    return {
+        "current_gen": n + 1,
+        "phase": "DEVELOPING",
+        "label": f"Developing architecture {n + 1}",
+        "subline": ("Generation " + str(n + 1) +
+                    " · Frontier transfer in progress"),
+        "note": ("the causal evolution is running: diagnose -> causal "
+                 "change -> re-evaluate; every step lands in the run "
+                 "directory as it happens"),
+    }
 
 
 def canonical_run_state(session: Dict) -> Dict[str, Any]:
@@ -528,5 +759,11 @@ def canonical_run_state(session: Dict) -> Dict[str, Any]:
         "outcome_basis": outcome["basis"],
         "phase_progression": phase_progression(session, run_dir,
                                                stage_status),
-        "schema_version": "1.0.0",
+        # R416: the invention generations (INVENTION 01, 02, ...) with
+        # lineage, causal deltas, maturity and per-gen geometry — the
+        # UI's generation navigation renders THIS, never client-side
+        # inference. None for runs without a lineage record.
+        "generations": generations_projection(session, run_dir),
+        "evolution_state": _evolution_live_phase(session, run_dir),
+        "schema_version": "1.1.0",
     }

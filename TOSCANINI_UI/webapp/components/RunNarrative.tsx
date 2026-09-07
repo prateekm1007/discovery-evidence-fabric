@@ -3,19 +3,28 @@
 // The live run narrative — R393 directive 6: eight human-readable
 // narrative states over the 13-stage pipeline; the machine is never
 // shown. Ported from run/page.tsx into the workspace (R395).
+//
+// R416 (honest-causes-evolution): the narrative follows the
+// architecture GENERATIONS. The user always sees forward progress
+// toward an invention: "Inventing architecture 1" -> "Challenging
+// architecture 1" -> "Developing architecture 2" -> ... -> "Preparing
+// technology package". The terminal presents the CURRENT invention
+// with its honest maturity — the banned dead-end sentences ("No
+// defensible invention survived this run", "candidate rejected") are
+// structurally impossible to render here.
 
 import type { RunPhase, RunStateObject, SessionDetail, StageDigest } from "@/lib/types";
-import type { RunOutcome } from "@/lib/types";
+import type { GenerationRecord, RunOutcome } from "@/lib/types";
 
 export const NARRATIVE_GROUPS: { heading: string; stages: string[] }[] = [
   { heading: "Understanding the problem", stages: [] },
   { heading: "Searching the evidence", stages: ["RETRIEVE", "FREEZE"] },
   {
-    heading: "Testing competing mechanisms",
+    heading: "Inventing architecture 1",
     stages: ["SYNTHESIZE", "MULTI_SOURCE_DISCOVERY", "COLLISION"],
   },
   { heading: "Building the candidate", stages: ["VERIFY", "PHYSICS"] },
-  { heading: "Attacking the candidate", stages: ["ATTACK", "CONTRADICTION"] },
+  { heading: "Challenging architecture 1", stages: ["ATTACK", "CONTRADICTION"] },
   { heading: "Improving it", stages: ["ADJUDICATION"] },
   { heading: "Designing the experiment", stages: ["KILLER_EXPERIMENT"] },
   {
@@ -35,10 +44,10 @@ export const STAGE_SENTENCE: Record<string, (s: StageDigest) => string> = {
     "Evidence custody frozen: every claim will have to bind to an exact source span.",
   SYNTHESIZE: (s) =>
     [s.mechanism, s.intervention].filter(Boolean).length > 0
-      ? `Candidate mechanism: ${[s.mechanism, s.intervention]
+      ? `Invention 01 — mechanism: ${[s.mechanism, s.intervention]
           .filter(Boolean)
           .join(" → ")}.`
-      : "Synthesizing candidate mechanisms from the evidence…",
+      : "Inventing the first architecture from the evidence…",
   VERIFY: () =>
     "Each claim verified against its exact evidence binding — no fuzzy matches admitted.",
   PHYSICS: (s) => {
@@ -59,7 +68,7 @@ export const STAGE_SENTENCE: Record<string, (s: StageDigest) => string> = {
       : "Prior-art collision check complete — nothing overlapped.",
   ATTACK: (s) =>
     s.overall
-      ? `Adversarial gate: ${s.overall}.`
+      ? `Challenging architecture 1 — adversarial gate: ${s.overall}.`
       : `${(s.challenges ?? []).length} adversarial attacks run against the candidate.`,
   CONTRADICTION: (s) =>
     s.count != null
@@ -103,8 +112,8 @@ export const PHASE_LABELS: Record<string, string> = {
 
 
 // ---------------------------------------------------------------------------
-// R414 (directive §5 + §18): the canonical phase progression and the
-// four terminal outcomes — both READ from the backend's run_state
+// R414 (directive §5 + §18) / R416: the canonical phase progression and
+// the terminal outcomes — both READ from the backend's run_state
 // (toscanini/run_state.py). The frontend never re-derives states and
 // never infers an invention exists because a GLB exists.
 // ---------------------------------------------------------------------------
@@ -143,9 +152,99 @@ const OUTCOME_CLASS: Record<RunOutcome, string> = {
   PENDING: "RUNNING",
   INVENTION_SURVIVED: "COMPLETE",
   INVENTION_REQUIRES_EXPERIMENT: "COMPLETE",
-  NO_DEFENSIBLE_INVENTION: "REJECTED",
+  INVENTION_UNDER_DEVELOPMENT: "RUNNING",
+  FALSE_PREMISE_INCOHERENT: "REJECTED",
+  NO_DEFENSIBLE_INVENTION: "RUNNING",
   RUN_BLOCKED: "ERROR",
 };
+
+// ---------------------------------------------------------------------------
+// R416: the invention generations timeline — INVENTION 01, 02, ... with
+// each generation's state, what changed, and the diagnosed cause. The
+// user sees the machine WORKING the problem across generations.
+// ---------------------------------------------------------------------------
+export function GenerationsTimeline({
+  generations,
+  currentGen,
+}: {
+  generations: GenerationRecord[] | undefined;
+  currentGen?: number | null;
+}) {
+  if (!generations || generations.length === 0) return null;
+  return (
+    <div className="generations" aria-label="invention generations">
+      {generations.map((g) => {
+        const ch = g.challenge ?? {};
+        const isCurrent = currentGen != null && g.gen === currentGen;
+        const stateLabel = g.state
+          ? String(g.state)
+              .replace("INVENTION_", "")
+              .replace(/_/g, " ")
+              .toLowerCase()
+          : "";
+        return (
+          <div
+            key={g.invention_id ?? g.gen}
+            className={`gen ${isCurrent ? "current" : ""} ${
+              ch.killed ? "killed" : ch.survived ? "survived" : ""
+            }`}
+          >
+            <div className="gen-head">
+              <span className="gen-label">{g.label ?? `INVENTION ${String(g.gen).padStart(2, "0")}`}</span>
+              {g.maturity && (
+                <span className={`pill small mat-${g.maturity.toLowerCase()}`}>
+                  {g.maturity}
+                </span>
+              )}
+              {isCurrent && <span className="gen-current">CURRENT</span>}
+            </div>
+            {g.architecture?.intervention && (
+              <div className="gen-intervention">{g.architecture.intervention}</div>
+            )}
+            {g.what_changed && (
+              <div className="gen-change">
+                <b>What changed:</b> {g.what_changed}
+              </div>
+            )}
+            {g.causal_delta?.new_operating_regime && (
+              <div className="gen-detail faint">
+                New operating regime: {g.causal_delta.new_operating_regime}
+              </div>
+            )}
+            {g.causal_delta?.frontier_capability && (
+              <div className="gen-detail faint">
+                Frontier transfer: {g.causal_delta.frontier_capability}
+              </div>
+            )}
+            {ch.killed && (
+              <div className="gen-kill">
+                Challenged and killed at {String(ch.kill_stage ?? "the gauntlet").toLowerCase()} —
+                {g.diagnosis?.cause
+                  ? ` diagnosed cause: ${String(g.diagnosis.cause)
+                      .replace(/_/g, " ")
+                      .toLowerCase()}`
+                  : ""}
+              </div>
+            )}
+            {ch.survived && (
+              <div className="gen-survive">
+                Survived the challenge gauntlet
+                {g.maturity === "SIMULATED" ? " — physics beat the baseline" : ""}
+                {ch.evidence_verified ? " — evidence-verified" : ""}
+              </div>
+            )}
+            {g.stop_note && <div className="gen-stop faint">{g.stop_note}</div>}
+            {stateLabel && !ch.killed && !ch.survived && (
+              <div className="faint" style={{ fontSize: 12 }}>
+                {stateLabel}
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
 
 export function OutcomeBanner({
   runState,
@@ -160,10 +259,14 @@ export function OutcomeBanner({
     runState?.outcome_label ??
     detail.user_state_view?.outcome_label ??
     outcome;
-  // directive §2: the honest no-invention shape — never "nothing found,
-  // try again". Most promising mechanism, missing evidence, best next
-  // step are read from the run state's own fields.
   const mechanism = runState?.mechanism_state?.mechanism;
+  const generations = runState?.generations;
+  const current = generations?.current_invention;
+  const isDev =
+    outcome === "INVENTION_UNDER_DEVELOPMENT" ||
+    outcome === "NO_DEFENSIBLE_INVENTION";
+  const isBlocked = outcome === "RUN_BLOCKED";
+  const isPremise = outcome === "FALSE_PREMISE_INCOHERENT";
   const nextAction = (() => {
     const stage = (detail.stages ?? []).find(
       (s) => s.stage === "NEXT_BEST_ACTION"
@@ -171,27 +274,34 @@ export function OutcomeBanner({
     const a = stage?.action as Record<string, unknown> | undefined;
     return (a?.action as string | undefined) ?? (a?.summary as string | undefined);
   })();
-  const isNo = outcome === "NO_DEFENSIBLE_INVENTION";
-  const isBlocked = outcome === "RUN_BLOCKED";
   return (
     <div className={`outcome-banner ob-${OUTCOME_CLASS[outcome]}`}>
       <div className="outcome-line">
-        {isNo
-          ? "No defensible invention survived this run."
-          : isBlocked
-            ? "Discovery temporarily blocked by infrastructure. Your problem is saved and ready to resume."
-            : label}
+        {isDev
+          ? `Invention ${generations?.n_generations ?? 1} generation${(generations?.n_generations ?? 1) > 1 ? "s" : ""} explored — the current architecture (GEN ${current?.gen ?? 1}) is presented with its honest maturity.`
+          : isPremise
+            ? "The problem's premise is physically incoherent — reformulate it and run again."
+            : isBlocked
+              ? "Discovery temporarily blocked by infrastructure. Your problem is saved and ready to resume."
+              : label}
       </div>
-      {isNo && (
+      {isDev && (
         <div className="outcome-detail">
+          {current?.maturity && (
+            <div>
+              <b>Current invention maturity:</b> {current.maturity} — the
+              verification gates decide maturity, never the wording.
+            </div>
+          )}
           {mechanism ? (
             <div>
               <b>Most promising mechanism explored:</b> {mechanism}
             </div>
           ) : null}
           <div className="faint">
-            kills are recorded to the mechanism cemetery and improve
-            future runs — a real discovery result, not a failure
+            the machine keeps every diagnosed cause on record — each
+            generation builds on what the last one learned, and nothing
+            is softened into a survivor
           </div>
           {nextAction ? (
             <div>
@@ -236,10 +346,23 @@ export default function RunNarrative({
   const stages = detail.stages ?? [];
   const done = isTerminal(detail.status);
   const runState = detail.run_state as RunStateObject | undefined;
+  const generations = runState?.generations?.generations;
+  const currentGen = runState?.generations?.current_invention?.gen;
+  const evolutionLive = runState?.evolution_state;
 
   return (
     <div className="narrative" aria-live="polite">
       <PhaseProgression phases={runState?.phase_progression} />
+
+      {/* R416: the live evolution line — "Developing architecture 3 ·
+          Frontier transfer in progress" while a generation is in flight */}
+      {evolutionLive && !done && (
+        <div className="nline working gen-live">
+          <span className="cursor" />
+          {evolutionLive.label} — {evolutionLive.subline}
+        </div>
+      )}
+
       {done && <OutcomeBanner runState={runState} detail={detail} />}
       {(() => {
         const byStage = new Map(stages.map((s) => [s.stage, s]));
@@ -305,6 +428,17 @@ export default function RunNarrative({
         }
         return blocks;
       })()}
+
+      {/* R416: the generations timeline — INVENTION 01 → 02 → … with
+          what changed at each step (progressive disclosure: shown as
+          soon as the first generation record exists) */}
+      {(generations?.length ?? 0) > 0 && (
+        <div className="ngroup">
+          <h3>The inventions, so far</h3>
+          <GenerationsTimeline generations={generations} currentGen={currentGen} />
+        </div>
+      )}
+
       {!done && stages.length > 0 && (
         <div className="nline working">
           <span className="cursor" />
