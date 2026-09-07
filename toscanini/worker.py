@@ -217,6 +217,39 @@ def run(session_id: str) -> None:
         final_status=(final or {}).get("final_status")
         or manifest.get("final_status", "UNKNOWN"))
 
+    # --- phase 4.5: R420 — the automatic async render handoff ----------------
+    # Operator §1: when the in-worker render was skipped or failed for a
+    # typed infrastructure reason (RENDER_SKIPPED_LOW_MEMORY /
+    # RENDER_TIMEOUT / RENDER_FAILED / ...), the production worker
+    # AUTOMATICALLY enqueues the async artifact-render job. This runs at
+    # the END of the run — the gauntlet worker's memory is freed by now,
+    # so the async guard decides honestly whether the instance can
+    # render. No operator intervention, no copied JSON, no user-side
+    # regeneration: invention -> GLB -> render decision -> async job
+    # when required -> persisted render record -> CIO -> website. A
+    # failure here is disclosed in the log, never fatal to the terminal
+    # record (the run is complete; presentation followup is typed).
+    try:
+        from toscanini import artifact_worker
+        followup = artifact_worker.auto_enqueue(
+            session_id, enqueued_by="production_worker")
+        if followup:
+            print(f"  [worker] render followup enqueued "
+                  f"({followup.get('followup_reason')}): "
+                  f"job={followup.get('status')} "
+                  f"pid={followup.get('worker_pid')}", file=sys.stderr)
+            store.update_session(
+                session_id,
+                render_followup="enqueued",
+                render_followup_reason=followup.get("followup_reason"))
+        else:
+            print("  [worker] render followup not needed "
+                  "(artifacts complete, nothing to render, or the async "
+                  "job already spoke)", file=sys.stderr)
+    except Exception as exc:  # noqa: BLE001 — disclosed, never fatal
+        print(f"  [worker] render followup enqueue failed: "
+              f"{type(exc).__name__}: {exc}", file=sys.stderr)
+
     # --- phase 5: durable epistemic record -----------------------------------
     _snapshot(session_id, f"terminal:COMPLETE:{session_id}")
 

@@ -53,6 +53,20 @@ export default function RenderGallery({
     });
   }
   if (entries.length === 0) {
+    // R420: the async render job is finishing this run's presentation
+    // artifacts automatically (enqueued by the production worker — the
+    // user never triggers anything). Calm, static text — no spinner, no
+    // animation (the product surface stays still). Typed honest
+    // absence (no pinned build / typed skip) stays silent-absent: the
+    // interactive GLB above is the contract.
+    if (renders?.status === "RENDERING") {
+      return (
+        <div className="render-pending faint">
+          studio renders are being prepared — they will appear here when
+          ready
+        </div>
+      );
+    }
     // typed honest absence: the render stage did not produce artifacts
     // (no pinned build / timeout / failure) — the interactive GLB is
     // unaffected and that stays the contract

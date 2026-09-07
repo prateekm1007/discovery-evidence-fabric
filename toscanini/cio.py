@@ -279,6 +279,45 @@ def build_cio(session: Dict[str, Any]) -> Optional[Dict[str, Any]]:
             if (render_record or {}).get("source_glb_sha256"):
                 renders["source_glb_sha256"] = \
                     render_record["source_glb_sha256"]
+            # R420 quality disclosure: the achieved render parameters are
+            # projected (a degraded-quality attempt from the async
+            # ladder is DISCLOSED, never passed off as full quality)
+            if (render_record or {}).get("samples") is not None:
+                renders["samples"] = render_record.get("samples")
+                renders["resolution"] = render_record.get("resolution")
+    # R420 §1/§3: the async render job's own state, surfaced honestly
+    # when the render artifacts are not (yet) on disk. Presentation
+    # state ONLY — this changes no maturity/class field (operator §2;
+    # a pending or skipped render is never a scientific statement).
+    if not renders:
+        job = _read_json(render_dir / "RENDER_JOB.json") \
+            if render_dir and (render_dir / "RENDER_JOB.json").exists() \
+            else None
+        if job:
+            status = job.get("status")
+            note = None
+            if status in ("RUNNING", "INTERRUPTED"):
+                surface = "RENDERING" if status == "RUNNING" else status
+                note = ("studio renders are being prepared — the async "
+                        "render job is finishing this run's presentation "
+                        "artifacts automatically")
+            else:
+                surface = status
+            renders = {
+                "status": surface,
+                "pipeline": job.get("pipeline", "BLENDER_HEADLESS"),
+                "is_conceptual": geometry_is_conceptual,
+                "missing": ["hero.png", "hero.glb", "section.png",
+                            "section.glb", "exploded.png", "exploded.glb"],
+                "presentation_rule": (
+                    "presentation renders — the authoritative geometry is "
+                    "the CadQuery/OCCT GLB; renders are enhancements, "
+                    "never the contract"),
+            }
+            if note:
+                renders["note"] = note
+            if job.get("enqueued_by"):
+                renders["enqueued_by"] = job.get("enqueued_by")
 
     final = (session.get("final_status") or "").upper()
     survivor = final == "AUTOMATED_INVENTION_CANDIDATE" or bool(inv)

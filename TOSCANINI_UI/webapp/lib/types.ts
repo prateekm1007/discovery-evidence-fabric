@@ -568,6 +568,10 @@ export interface CIO {
   };
   // R419: the render gallery contract — pointers the UI renders ONLY
   // from the CIO (the frontend never invents render availability).
+  // R420: status may be "RENDERING" while the async render job finishes
+  // the presentation artifacts automatically (calm pending state —
+  // never a maturity statement); samples/resolution disclose the
+  // achieved quality of a possibly degraded async-ladder attempt.
   visualization?: {
     renders?: {
       status?: string;
@@ -583,6 +587,9 @@ export interface CIO {
       missing?: string[];
       presentation_rule?: string;
       note?: string;
+      enqueued_by?: string;
+      samples?: number;
+      resolution?: number[];
     };
     viewer_required?: string[];
   };

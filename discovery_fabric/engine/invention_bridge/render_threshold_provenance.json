@@ -1,0 +1,111 @@
+{
+  "record": "RENDER_THRESHOLD_PROVENANCE",
+  "version": "1.0.0",
+  "ratified": "2026-09-08",
+  "round": "R420",
+  "article": "XXVII (no threshold invention — every operational threshold carries provenance, class, uncertainty, justification)",
+  "operator_directive": "R420 section 5: record memory-threshold provenance — measurement environment, measurement date, observed baseline, safety margin rationale, threshold, intended execution context, uncertainty/limitations",
+
+  "measurements": [
+    {
+      "quantity": "blender --background baseline RSS",
+      "observed_value": "269 MB",
+      "measurement_date": "2026-09-07",
+      "rounds": ["R419c (guard introduced)", "R419f (guard verified live)"],
+      "measurement_environment": {
+        "host": "Render free-tier web-service container (toscanini-engine-docker, srv-dabp678jo6nc738fg2u0)",
+        "image": "python:3.12-slim (Debian trixie 2026) + pinned Blender 5.2.1 LTS x64 (tarball sha256 a31f524fa99a527d3d52b7f5aaa68c34e1a19d5a1c9473f79c5cc610fd5b10e9, verified at image build)",
+        "scene": "trivial/empty scene, --background --factory-startup, no render executed",
+        "method": "resident set size of the blender subprocess observed while authoring the R419c guard; order-of-magnitude figure, not a distribution"
+      },
+      "uncertainty": [
+        "single-point observation, not a sampled distribution; scene geometry, Cycles render buffers, and denoising add unmeasured per-scene overhead on top (bridge scenes observed adding on the order of tens to a few hundred MB)",
+        "RSS is measured at one moment; peak during tile rendering can be higher",
+        "the measurement was taken by the implementing agent inside the container (AI_REVIEW provenance, Art. LXVII) — not an independent instrumented benchmark"
+      ]
+    },
+    {
+      "quantity": "full-quality hero+section+exploded bundle wall time (pinned build, local verification host)",
+      "observed_value": "~208 s total (hero 65-67 s, section 67-68 s, exploded 74-75 s)",
+      "measurement_date": "2026-09-07",
+      "rounds": ["R419 render-pipeline test runs (two independent runs: 207.59 s and 208.51 s)"],
+      "measurement_environment": {
+        "host": "local verification container (faster CPU than the free-tier shared core)",
+        "parameters": "Cycles CPU, 48 samples, adaptive threshold 0.02, denoising on, 1152x768, three views"
+      },
+      "uncertainty": [
+        "two runs, same host — no cross-host distribution",
+        "the deployed free-tier shared CPU is materially slower: the live production run ts_c0f41af92195 exceeded the full 900 s bundle budget on 2026-09-07 (BRIDGE_REPORT.json: RENDER_TIMEOUT), which is the direct evidence the async quality ladder exists"
+      ]
+    }
+  ],
+
+  "thresholds": [
+    {
+      "name": "in_worker memory guard",
+      "value_mb": 650,
+      "class": "ENGINEERING",
+      "intended_execution_context": "the bridge RENDER step inside the discovery-run worker (the gauntlet worker process still resident)",
+      "safety_margin_rationale": "observed Blender baseline 269 MB + per-scene geometry/Cycles buffers (unmeasured, assumed up to roughly 2x baseline on bridge scenes) + the run worker's own residency on the same instance; the threshold is deliberately conservative because an OOM kill in-worker kills the RUN itself, converting a presentation skip into a user-visible run failure (Art. LXI inversion)",
+      "justification_for_not_another_number": "650 MB gives ~2.4x the measured baseline; lowering it toward the baseline risks worker deaths on the only instance class observed (512 MB free tier, MemAvailable inflated by reclaimable cache); raising it further would make the guard never fire, silently returning to the pre-R419c OOM regime",
+      "applied_by": "discovery_fabric.engine.invention_bridge.render._memory_guard(mode='in_worker')"
+    },
+    {
+      "name": "async memory guard",
+      "value_mb": 400,
+      "class": "ENGINEERING",
+      "intended_execution_context": "the detached artifact-render job (the run worker has exited; its memory is freed)",
+      "safety_margin_rationale": "Blender baseline 269 MB + scene/buffer headroom with the run worker gone; ~1.5x baseline. The job may be killed by OOM without any user-visible run damage (it is a detached presentation job with a typed record), so the margin can be tighter than in_worker",
+      "justification_for_not_another_number": "below ~1.5x baseline the job would OOM during tile rendering on scenes only marginally above the trivial baseline; above it, the free-tier instance (MemAvailable typically < 500 MB after boot) would never start the job at all, making the async path dead code on the only instance class that needs it",
+      "applied_by": "discovery_fabric.engine.invention_bridge.render._memory_guard(mode='async')"
+    },
+    {
+      "name": "in_worker render budget",
+      "value_seconds": 300,
+      "class": "ENGINEERING",
+      "intended_execution_context": "the bridge RENDER step inside the discovery-run worker; env-overridable via ENGINE_RENDER_INWORKER_TIMEOUT_S (minimum 60)",
+      "safety_margin_rationale": "local full-quality bundle is ~208 s; 300 s lets a capable instance complete full quality in-worker, while a slow instance hands off to the async job after 5 minutes instead of the pre-R420 900 s hostage situation (observed live: ts_c0f41af92195 spent the whole 900 s budget and produced nothing)",
+      "justification_for_not_another_number": "208 s local + ~45% headroom covers capable instances; anything longer re-creates the observed run-hostage defect; anything shorter hands off even on capable instances and wastes the in-worker attempt",
+      "applied_by": "discovery_fabric.engine.invention_bridge.render._in_worker_budget_s()"
+    },
+    {
+      "name": "async render budget (attempt 1, full quality)",
+      "value_seconds": 900,
+      "class": "ENGINEERING",
+      "intended_execution_context": "async artifact-render job attempt 1 (samples 48, 1152x768)",
+      "safety_margin_rationale": "the full bundle budget from R419; the async job has no user waiting on the same request, so it can afford the long attempt before the ladder degrades",
+      "justification_for_not_another_number": "the deployed instance exceeded 900 s at full quality (observed); the ladder therefore degrades quality rather than extending time indefinitely — presentation quality is the tunable, never the truth",
+      "applied_by": "toscanini.artifact_worker run() ladder attempt 1"
+    },
+    {
+      "name": "async quality ladder attempts 2-3",
+      "value": "attempt 2: 16 samples, 960x640, 420 s; attempt 3: 6 samples, 768x512, 240 s",
+      "class": "ENGINEERING",
+      "intended_execution_context": "async artifact-render job retries after a timed-out/failed higher-quality attempt",
+      "safety_margin_rationale": "render cost scales ~linearly with sample count and ~quadratically with pixel count; 48->16->6 samples with the matching resolution steps moves the deployed-instance cost from >900 s into the hundreds-of-seconds regime while keeping a presentable studio image; bounded at three attempts so the job is always terminal-honest (no infinite retry loop)",
+      "justification_for_not_another_number": "three rungs span a ~13x compute reduction; fewer rungs leave a gap between full quality and the free-tier capacity, more rungs extend wall time past the value of a slightly better PNG",
+      "applied_by": "toscanini.artifact_worker run() ladder attempts 2-3",
+      "disclosure": "the achieved samples/resolution are recorded in render_record.json and projected into the CIO renders block — a degraded-quality render is DISCLOSED, never silently passed off as full quality"
+    }
+  ],
+
+  "cross_cutting": {
+    "threshold_class_discipline": "all thresholds above are ENGINEERING (infrastructure capacity), never SCIENTIFIC — a render skip changes no epistemic state (Art. LXI); conceptual geometry is never promoted by a successful render (Art. XXVIII)",
+    "intended_execution_contexts": [
+      "Render free-tier 512 MB container (the deployed production instance)",
+      "local verification hosts (BLENDER_PATH pointing at the same pinned 5.2.1 LTS build)"
+    ],
+    "limitations": [
+      "MemAvailable (from /proc/meminfo) includes reclaimable page cache; it is a proxy for launchability, not a hard reservation",
+      "the free-tier container shares its host CPU; render wall time varies with neighbor load, which the time budgets absorb only statistically",
+      "thresholds are calibrated against ONE deployed instance class and one local host; a plan upgrade (owner-gated, Art. LXV) changes the memory calculus and this record should be revised with new measurements then",
+      "no automated CI measurement re-derives these numbers; revision requires a new dated entry appended here (never silent drift, Art. XXVII)"
+    ],
+    "reviewer_provenance": "AI_REVIEW",
+    "sources": [
+      "live BRIDGE_REPORT.json of run ts_c0f41af92195 (RENDER_TIMEOUT at 900 s, 2026-09-07, deployed R419f engine)",
+      "local pinned-build bundle timings 207.59 s / 208.51 s (R419 test artifacts)",
+      "R419c/R419f guard authoring measurements (269 MB baseline)"
+    ]
+  }
+}

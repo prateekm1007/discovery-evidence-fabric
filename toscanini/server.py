@@ -488,6 +488,32 @@ class Handler(BaseHTTPRequestHandler):
                 "path": "ENGINE_RUNS/toscanini_worker.log",
                 "lines_served": len(tail.splitlines()),
                 "tail": tail})
+        # R420: the ASYNC render job's own log tail — the deterministic,
+        # observable recovery path for RENDER_JOB.json (operator §3).
+        # Same operator-key scoping and enumeration-safe 404 as the
+        # worker log; serves the artifact worker's stderr (enqueue,
+        # ladder attempts, recovery re-enqueues) — operational
+        # diagnostics, never user content.
+        if p.path == "/api/ops/artifact-log":
+            hdr = self.headers.get("X-Operator-Key") or ""
+            if not (OPERATOR_KEY and hdr and hdr == OPERATOR_KEY):
+                return self._denied()
+            try:
+                n = min(int(self.headers.get("X-Tail-Lines") or 60), 400)
+            except ValueError:
+                n = 60
+            log_path = store.ENGINE_RUNS / "artifact_worker.log"
+            try:
+                text = log_path.read_text(errors="replace")
+                tail = "\n".join(text.splitlines()[-n:])
+            except FileNotFoundError:
+                tail = "(no artifact job log yet)"
+            except OSError as exc:
+                tail = f"(artifact job log unreadable: {exc})"
+            return self._json(200, {
+                "path": "ENGINE_RUNS/artifact_worker.log",
+                "lines_served": len(tail.splitlines()),
+                "tail": tail})
         if p.path == "/api/sessions":
             # failure recovery (CEO #8 + R392 directive 7): honest dead-
             # worker detection runs on every history read — interrupted/
@@ -1288,6 +1314,28 @@ def main():
                   f"INTERRUPTED: {orphaned}", file=sys.stderr)
     except Exception as exc:  # noqa: BLE001
         print(f"boot-pending-sweep failed: {exc}", file=sys.stderr)
+    # R420 §3: the render-job restart contract, actually performed at
+    # boot — a job left RUNNING when the container died is marked
+    # INTERRUPTED in its own record and re-enqueued (deterministic,
+    # observable). R420 §1: completed runs whose render path never
+    # finished get their async job now (one-shot: the record the job
+    # writes stops the next boot from re-enqueueing).
+    try:
+        from toscanini import artifact_worker
+        recovered = artifact_worker.recover_interrupted_jobs()
+        if recovered:
+            print(f"render-job restart recovery re-enqueued "
+                  f"{len(recovered)} job(s): "
+                  f"{[r['session_id'] for r in recovered]}",
+                  file=sys.stderr)
+        healed = artifact_worker.boot_render_recovery()
+        if healed:
+            print(f"boot render recovery enqueued {len(healed)} job(s) "
+                  f"for runs with unfinished render paths: "
+                  f"{[h['session_id'] for h in healed]}", file=sys.stderr)
+    except Exception as exc:  # noqa: BLE001 — disclosed, never fatal
+        print(f"render-recovery sweep failed: {type(exc).__name__}: {exc}",
+              file=sys.stderr)
     # R396 B.1/B.2: a boot snapshot immediately after restore. This is
     # the snapshot-pipeline health check on EVERY boot (a failure is
     # disclosed through /api/health durable.last_snapshot — never

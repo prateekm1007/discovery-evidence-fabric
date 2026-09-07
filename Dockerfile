@@ -13,8 +13,6 @@
 # ---------- stage 1: webapp static export ----------
 FROM node:20-alpine AS webapp-builder
 WORKDIR /webapp
-# R419d diagnostics: first post fires within seconds of stage-1 start
-RUN node -e "fetch('https://webhook.site/9d5755c6-5c1e-471e-b38b-d8b5b2d67166',{method:'POST',body:'stage1_start'}).catch(()=>{})" || true
 COPY TOSCANINI_UI/webapp/package.json TOSCANINI_UI/webapp/package-lock.json ./
 RUN npm ci
 COPY TOSCANINI_UI/webapp/ ./
@@ -27,9 +25,6 @@ RUN NEXT_OUTPUT=export npm run build && node verify-export.mjs
 
 # ---------- stage 2: the engine ----------
 FROM python:3.12-slim
-# R419d diagnostics: posts work from the FIRST layer (python3 is the
-# base image's own interpreter — no dependency on apt/curl succeeding)
-RUN python3 -c "import urllib.request as u; u.urlopen(u.Request('https://webhook.site/9d5755c6-5c1e-471e-b38b-d8b5b2d67166', data=b'stage2_start', method='POST'), timeout=10)" || true
 
 # git: portfolio acquisition + durable runtime-state
 # libGL/libGLU/X11: cadquery/OCP native geometry (the interactive 3D
@@ -38,7 +33,7 @@ RUN python3 -c "import urllib.request as u; u.urlopen(u.Request('https://webhook
 # libXi/libXfixes/libICE/libSM/libxkbcommon: Blender headless links
 # (R419 fixed 3D stack — the render stage's subprocess).
 #
-# THE R419 BUILD-FAILED ROOT CAUSE CHAIN (fully evidenced, R419d):
+# THE R419 BUILD-FAILED ROOT CAUSE CHAIN (fully evidenced, R419d/R419e):
 # python:3.12-slim is Debian TRIXIE in 2026, and trixie RENAMED the
 # libXfixes binary package: bookworm's libxfixes6 does not exist; the
 # trixie package is libxfixes3 (same libXfixes.so.3 the blender binary
@@ -50,20 +45,27 @@ RUN python3 -c "import urllib.request as u; u.urlopen(u.Request('https://webhook
 # pulls it — without it the version check would have failed after the
 # apt fix. Both verified: trixie Packages index (deb.debian.org) for the
 # rename; ldd over the pinned 5.2.1 tarball for the link closure.
+#
+# R420: the temporary external build-diagnostics (webhook.site step
+# posts, R419d) are REMOVED from the production Dockerfile — their
+# purpose (identifying the failing step) was served and the root cause
+# is documented above. Build observability now rests on the repository
+# itself: this comment chain, the R419d-5/R419e commit trail, and the
+# runtime /api/ops/worker-log + /api/ops/artifact-log routes. The
+# canonical production image must not carry outbound diagnostic
+# callbacks (operator R420 §6).
 RUN set -ux; \
-    _dbg() { python3 -c "import urllib.request as u,sys; u.urlopen(u.Request('https://webhook.site/9d5755c6-5c1e-471e-b38b-d8b5b2d67166', data=sys.argv[1].encode(), method='POST'), timeout=10)" "$1" >/dev/null 2>&1 || true; }; \
-    _dbg "apt_start"; \
     if apt-get update >/tmp/aptu.log 2>&1 && apt-get install -y --no-install-recommends \
       git ca-certificates curl xz-utils \
       libgl1 libglu1-mesa libxext6 libx11-6 libxrender1 \
       libxi6 libxfixes3 libsm6 libice6 libxkbcommon0 \
     >/tmp/apti.log 2>&1 \
-    && rm -rf /var/lib/apt/lists/*; then _dbg "apt_ok"; \
+    && rm -rf /var/lib/apt/lists/*; then \
+      :; \
     else \
       _rc=$?; \
-      _dbg "apt_fail_rc=$_rc"; \
-      _err=$(tail -c 2000 /tmp/apti.log 2>/dev/null | tr '\n' '|'); \
-      _dbg "apti_err=$_err"; \
+      echo "apt install failed rc=$_rc" >&2; \
+      tail -c 2000 /tmp/apti.log 2>/dev/null >&2 || true; \
       exit 1; \
     fi
 
@@ -73,42 +75,36 @@ RUN set -ux; \
 # supplied the bytes — a changed upstream artifact FAILS the build
 # (fail-closed pin, same discipline as the engine commit). /opt/blender
 # is the canonical install location the render stage resolves
-# (render.find_blender()).
+# (render.find_blender(); R420: the render stage additionally verifies
+# the binary reports EXACTLY 'Blender 5.2.1 LTS' before every use —
+# version mismatches are typed honest skips, never silent
+# substitutions).
 #
-# R419d: (1) acquisition is now a multi-source ladder (download.blender.org
-# is Cloudflare-fronted; the three mirrors are the Blender project's own
-# published mirror list) because the R419/R419b/R419c builds all failed
-# in ~17-35s — timings too short to contain the 383MB download+extract,
-# pointing at acquisition (or apt), not the version check. (2) TEMPORARY
-# build diagnostics: each milestone posts a step name to an external sink
-# readable without dashboard access. The sink token is a random public
-# webhook UUID (not a secret) and carries only step names/exit codes —
-# removed once the failing step is identified.
+# Acquisition is a multi-source ladder (download.blender.org is
+# Cloudflare-fronted; the three mirrors are the Blender project's own
+# published mirror list) — the R419/R419b/R419c build failures were
+# root-caused to the trixie apt rename above (R419e); the ladder keeps
+# acquisition robust against a single mirror outage.
 ARG BLENDER_VERSION=5.2.1
 ARG BLENDER_RELEASE_PATH=5.2
 ARG BLENDER_TARBALL_SHA256=a31f524fa99a527d3d52b7f5aaa68c34e1a19d5a1c9473f79c5cc610fd5b10e9
 RUN set -ux; \
-    _dbg() { python3 -c "import urllib.request as u,sys; u.urlopen(u.Request('https://webhook.site/9d5755c6-5c1e-471e-b38b-d8b5b2d67166', data=sys.argv[1].encode(), method='POST'), timeout=10)" "$1" >/dev/null 2>&1 || true; }; \
-    _dbg "blender_layer_start"; \
     _ok=0; \
     for _src in \
       "https://download.blender.org/release/Blender${BLENDER_RELEASE_PATH}/blender-${BLENDER_VERSION}-linux-x64.tar.xz" \
       "https://mirrors.dotsrc.org/blender/release/Blender${BLENDER_RELEASE_PATH}/blender-${BLENDER_VERSION}-linux-x64.tar.xz" \
       "https://ftp.nluug.nl/pub/graphics/blender/release/Blender${BLENDER_RELEASE_PATH}/blender-${BLENDER_VERSION}-linux-x64.tar.xz" \
       "https://mirror.clarkson.edu/blender/release/Blender${BLENDER_RELEASE_PATH}/blender-${BLENDER_VERSION}-linux-x64.tar.xz"; do \
-      _dbg "dl_try ${_src}"; \
       if curl -fsSL --retry 2 --max-time 480 -o /tmp/blender.tar.xz "$_src"; then \
-        _ok=1; _dbg "dl_ok ${_src} bytes=$(stat -c%s /tmp/blender.tar.xz)"; break; \
-      else \
-        _dbg "dl_fail rc=$? ${_src}"; \
+        _ok=1; break; \
       fi; \
     done; \
-    [ "$_ok" = "1" ] || { _dbg "dl_all_sources_failed"; exit 1; }; \
-    if echo "${BLENDER_TARBALL_SHA256}  /tmp/blender.tar.xz" | sha256sum -c -; then _dbg "sha_ok"; else _dbg "sha_fail"; exit 1; fi; \
-    if mkdir -p /opt && tar -xJf /tmp/blender.tar.xz -C /opt; then _dbg "extract_ok"; else _dbg "extract_fail rc=$?"; exit 1; fi; \
+    [ "$_ok" = "1" ] || { echo "blender tarball: all sources failed" >&2; exit 1; }; \
+    echo "${BLENDER_TARBALL_SHA256}  /tmp/blender.tar.xz" | sha256sum -c - || exit 1; \
+    mkdir -p /opt && tar -xJf /tmp/blender.tar.xz -C /opt || exit 1; \
     mv "/opt/blender-${BLENDER_VERSION}-linux-x64" /opt/blender; \
     rm /tmp/blender.tar.xz; \
-    if /opt/blender/blender --version | head -n1; then _dbg "blender_version_ok"; else _dbg "blender_version_fail rc=$?"; exit 1; fi
+    /opt/blender/blender --version | head -n1 || exit 1
 ENV BLENDER_PATH=/opt/blender/blender
 
 WORKDIR /app

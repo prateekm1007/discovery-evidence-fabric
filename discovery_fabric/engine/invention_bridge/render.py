@@ -24,7 +24,6 @@ from __future__ import annotations
 import hashlib
 import json
 import os
-import shutil
 import subprocess
 import sys
 import time
@@ -34,6 +33,14 @@ from typing import Any, Dict, List, Optional
 RENDER_SCRIPT = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                              "blender_render.py")
 
+# R420: the Article XXVII provenance record for every operational
+# threshold this module applies (memory guards, render budgets). The
+# file is the authority for WHY these numbers; the code only applies
+# them and points at the record.
+THRESHOLD_PROVENANCE_PATH = os.path.join(
+    os.path.dirname(os.path.abspath(__file__)),
+    "render_threshold_provenance.json")
+
 # Pinned build (operator directive: Blender 5.2 LTS). The tarball sha256
 # is recorded so the Docker image and every local verification run use
 # byte-identical builds.
@@ -41,33 +48,121 @@ PINNED_BLENDER_VERSION = "5.2.1 LTS"
 PINNED_TARBALL_SHA256 = (
     "a31f524fa99a527d3d52b7f5aaa68c34e1a19d5a1c9473f79c5cc610fd5b10e9")
 
-_BLENDER_TIMEOUT_S = 900  # whole hero+section+exploded bundle
+# R420: the in-worker render budget is SHORT because the async job is
+# the completion path — a slow instance must hand off quickly instead
+# of holding the run hostage (observed live: the fresh production run
+# ts_c0f41af92195 sat 900 s in a doomed full-quality render before
+# timing out with nothing produced). Env-overridable for verification
+# runs. The async ladder's budgets live in artifact_worker.py and are
+# documented in the same threshold-provenance record.
+def _in_worker_budget_s() -> int:
+    try:
+        return max(60, int(os.environ.get(
+            "ENGINE_RENDER_INWORKER_TIMEOUT_S", "300")))
+    except (TypeError, ValueError):
+        return 300
+
+
+_ASYNC_BUDGET_S = 900  # whole hero+section+exploded bundle, async job
 _ARTIFACTS = ("hero.png", "section.png", "exploded.png",
               "hero.glb", "section.glb", "exploded.glb")
 
+# R420 fail-closed provenance: the resolution result of the LAST
+# find_blender() call — every candidate considered, what it reported,
+# and why it was accepted or refused. Recorded into the render record
+# so 'which binary rendered this' is never a guess (Art. VI).
+_LAST_RESOLUTION: Dict[str, Any] = {"candidates": []}
+
+
+def _blender_version_string(path: str) -> Optional[str]:
+    """First line of `<blender> --version` (e.g. 'Blender 5.2.1 LTS'),
+    or None when the binary cannot even answer — never a guess."""
+    try:
+        proc = subprocess.run(
+            [path, "--version"], capture_output=True, text=True,
+            timeout=30)
+    except (subprocess.TimeoutExpired, OSError):
+        return None
+    if proc.returncode != 0:
+        return None
+    first = (proc.stdout or "").strip().splitlines()
+    return first[0].strip() if first else None
+
 
 def find_blender() -> Optional[str]:
-    """Locate the pinned Blender build. Resolution order:
+    """Locate the PINNED Blender build — fail-closed (R420, operator §4).
+
+    Resolution order:
 
     1. $BLENDER_PATH (explicit operator/environment override — also
        how local verification runs point at their own build)
-    2. /opt/blender — the Docker image install location (the pinned
-       tarball, sha256-verified at build time)
-    3. shutil.which("blender") — a system install (operator-managed)
+    2. /opt/blender/blender — the Docker image install location (the
+       pinned tarball, sha256-verified at build time)
 
-    No machine-specific fallbacks: a render that cannot find the pinned
-    build is a TYPED honest skip (RENDER_SKIPPED_NO_BLENDER), never a
-    guessed binary (Art. VI: no fabricated provenance).
+    EVERY candidate must report EXACTLY the pinned version string via
+    `--version` before it is used. A binary that exists but reports a
+    different version is REFUSED and the refusal is recorded. There is
+    deliberately NO shutil.which("blender") fallback: an arbitrary
+    system-installed blender is not provenance, it is a guess (Art. VI),
+    and the pinned-build contract (operator §4) forbids silent
+    substitution. When no candidate verifies, the caller records the
+    typed honest RENDER_SKIPPED_NO_BLENDER state with the resolution
+    trail attached.
+
+    The verified result is cached per (path, mtime, size) so repeated
+    renders do not re-run `--version`.
     """
     candidates = [
-        os.environ.get("BLENDER_PATH") or "",
-        "/opt/blender/blender",
-        shutil.which("blender") or "",
+        ("BLENDER_PATH", os.environ.get("BLENDER_PATH") or ""),
+        ("DOCKER_INSTALL", "/opt/blender/blender"),
     ]
-    for c in candidates:
-        if c and os.path.isfile(c) and os.access(c, os.X_OK):
+    trail: List[Dict[str, Any]] = []
+    _LAST_RESOLUTION["candidates"] = trail
+    for source, c in candidates:
+        if not c:
+            continue
+        entry: Dict[str, Any] = {"source": source, "path": c}
+        if not (os.path.isfile(c) and os.access(c, os.X_OK)):
+            entry["result"] = "ABSENT"
+            trail.append(entry)
+            continue
+        try:
+            stat = os.stat(c)
+            key = (c, stat.st_mtime_ns, stat.st_size)
+        except OSError:
+            entry["result"] = "UNSTATABLE"
+            trail.append(entry)
+            continue
+        cached = _VERSION_CACHE.get(key)
+        if cached is None:
+            cached = _blender_version_string(c)
+            _VERSION_CACHE[key] = cached
+        entry["version_reported"] = cached
+        if cached is None:
+            entry["result"] = "REFUSED_BINARY_UNRESPONSIVE"
+        elif cached != f"Blender {PINNED_BLENDER_VERSION}":
+            entry["result"] = "REFUSED_VERSION_MISMATCH"
+        else:
+            entry["result"] = "ACCEPTED"
+            _LAST_RESOLUTION["accepted"] = c
+            _LAST_RESOLUTION["verified_version"] = cached
             return c
+        trail.append(entry)
+    _LAST_RESOLUTION["accepted"] = None
+    _LAST_RESOLUTION["verified_version"] = None
     return None
+
+
+_VERSION_CACHE: Dict[Any, Optional[str]] = {}
+
+
+def last_blender_resolution() -> Dict[str, Any]:
+    """The fail-closed resolution trail for the last find_blender() call
+    (recorded into every render record — provenance, Art. VI/XII)."""
+    out = dict(_LAST_RESOLUTION)
+    out["pinned_version"] = f"Blender {PINNED_BLENDER_VERSION}"
+    out["pinned_tarball_sha256"] = PINNED_TARBALL_SHA256
+    return out
 
 
 def _sha256_file(path: str) -> str:
@@ -134,6 +229,13 @@ def _memory_guard(context: str,
     async mode (the detached artifact-build job, after the worker
     exits): more headroom exists; the threshold is lower.
 
+    R420: the thresholds themselves carry provenance — the Article
+    XXVII record (render_threshold_provenance.json: measurement
+    environment, date, observed baseline, safety-margin rationale,
+    intended execution context, uncertainty) is referenced by every
+    guard record, so no operational threshold is an unexplained magic
+    number.
+
     Returns the typed skip record, or None when rendering may proceed.
     """
     thresholds = {"in_worker": 650, "async": 400}
@@ -149,6 +251,10 @@ def _memory_guard(context: str,
         "context": context,
         "mem_available_mb": avail,
         "required_mb": need_mb,
+        "threshold_class": "ENGINEERING",
+        "threshold_provenance": (
+            "discovery_fabric/engine/invention_bridge/"
+            "render_threshold_provenance.json"),
         "note": (
             "the pinned Blender build (baseline ~269 MB RSS) does not "
             "fit in available memory alongside the run worker — typed "
@@ -165,19 +271,31 @@ def render_invention(work_dir: str,
                      renders: Optional[List[str]] = None,
                      resolution: Optional[List[int]] = None,
                      samples: Optional[int] = None,
-                     memory_mode: str = "in_worker") -> Dict[str, Any]:
+                     memory_mode: str = "in_worker",
+                     timeout_s: Optional[int] = None) -> Dict[str, Any]:
     """Run the pinned Blender build over the authoritative GLB.
 
     Returns a typed render record — always honest, never raising into
     the caller (the run's epistemic state is never altered by a
     presentation-layer failure; Art. LXI).
+
+    R420: the render budget depends on the execution context —
+    in_worker renders get a SHORT budget (the async job is the
+    completion path; a slow instance hands off instead of holding the
+    run hostage), async renders get the full bundle budget. Every
+    budget applied is recorded in the typed record.
     """
+    if timeout_s is None:
+        timeout_s = _ASYNC_BUDGET_S if memory_mode == "async" \
+            else _in_worker_budget_s()
     record: Dict[str, Any] = {
         "stage": "RENDER",
         "render_pipeline": "BLENDER_HEADLESS",
         "pinned_blender": PINNED_BLENDER_VERSION,
         "pinned_tarball_sha256": PINNED_TARBALL_SHA256,
         "is_conceptual": bool(is_conceptual),
+        "memory_mode": memory_mode,
+        "budget_seconds": timeout_s,
         "status": "OK",
     }
     t0 = time.time()
@@ -185,10 +303,15 @@ def render_invention(work_dir: str,
     blender = find_blender()
     if not blender:
         record["status"] = "RENDER_SKIPPED_NO_BLENDER"
+        # R420 fail-closed provenance: which candidates were considered
+        # and why each was refused — the skip is evidenced, not asserted
+        record["blender_resolution"] = last_blender_resolution()
         record["note"] = (
-            "no Blender build found (set BLENDER_PATH or install the "
-            "pinned 5.2.1 LTS build) — the interactive GLB is served "
-            "unchanged; PNG renders are enhancements, not the contract")
+            "no pinned Blender build verified (BLENDER_PATH or the "
+            "Docker /opt/blender install reporting exactly "
+            f"'{PINNED_BLENDER_VERSION}') — the interactive GLB is "
+            "served unchanged; PNG renders are enhancements, not the "
+            "contract")
         return record
 
     # R419c memory guard — typed skip before the subprocess is launched
@@ -206,6 +329,11 @@ def render_invention(work_dir: str,
         return record
     record["source_glb"] = source
     record["source_glb_sha256"] = _sha256_file(source)
+    # R420: the verified binary identity is part of every render record
+    # (fail-closed provenance — never a guessed binary, Art. VI)
+    record["blender_path"] = blender
+    record["blender_version_verified"] = _LAST_RESOLUTION.get(
+        "verified_version")
 
     out_dir = os.path.join(work_dir, "MODEL", "3D")
     os.makedirs(out_dir, exist_ok=True)
@@ -228,11 +356,11 @@ def render_invention(work_dir: str,
         proc = subprocess.run(
             [blender, "--background", "--factory-startup",
              "--python", RENDER_SCRIPT, "--", spec_path],
-            capture_output=True, text=True, timeout=_BLENDER_TIMEOUT_S,
+            capture_output=True, text=True, timeout=timeout_s,
             cwd=out_dir, env=env)
     except subprocess.TimeoutExpired:
         record["status"] = "RENDER_TIMEOUT"
-        record["timeout_seconds"] = _BLENDER_TIMEOUT_S
+        record["timeout_seconds"] = timeout_s
         record["note"] = (
             "Blender exceeded the render budget — typed failure; the GLB "
             "contract is unaffected (interactive 3D served from the "

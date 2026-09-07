@@ -189,6 +189,22 @@ def _run_dir_files(run_dir: Path) -> List[Path]:
     model_dir = run_dir / "MODEL"
     if model_dir.is_dir():
         out.extend(sorted(model_dir.glob("*.glb")))
+        # R420: the presentation render artifacts + their typed records
+        # (hero/section/exploded PNG+GLB, render_record.json,
+        # render_spec.json, RENDER_JOB.json). The deployed filesystem is
+        # EPHEMERAL — without this, every restart silently wiped the
+        # render surface the website was already displaying (and the
+        # RENDER_JOB.json authority the restart contract reads). Same
+        # size cap applies.
+        three_d = model_dir / "3D"
+        if three_d.is_dir():
+            out.extend(sorted(p for p in three_d.iterdir()
+                              if p.is_file()))
+    # R420: the bridge technology package ZIP — the run's downloadable
+    # deliverable (the CIO's downloads.package_zip serves THIS file; a
+    # restart without it honest-blanked the package link on runs whose
+    # packages were already delivered). Same size cap applies.
+    out.extend(sorted(run_dir.glob("TECHNOLOGY_PACKAGE_*.zip")))
     dl = run_dir / "DOWNLOAD"
     if dl.is_dir():
         out.extend(sorted(p for p in dl.rglob("*") if p.is_file()))
