@@ -20,6 +20,8 @@ This register records places where previous audits were empirically blindsided. 
 
 **Principle:** Deployment identity is a tuple, not a label: repository commit, build artifact, running commit, health-reported commit, and operator expectation must agree according to the release protocol.
 
+**Required check:** Compare all five identities before calling a release complete.
+
 ## BS-003 — Built but not wired
 
 **Observed:** A bridge could generate real 3D and packages from captured run state, but fresh production runs never invoked the engineering/CAD/package stage.
@@ -291,6 +293,16 @@ This register records places where previous audits were empirically blindsided. 
 **Failure mode:** Governance itself could become fragmented and contradictory.
 
 **Principle:** Governance artifacts need versions, hashes, authority order, and an explicit supersession rule.
+
+## BS-037 — Auditor forgetting project state and direction
+
+**Observed:** Across long-running sessions, the auditor can lose track of which architectural decisions are settled, which directives are already completed, which blockers remain open, which repository/deployment is authoritative, and what the current product objective is. This creates a specific risk of giving the coder obsolete instructions, re-opening rejected approaches, duplicating completed work, or accidentally reversing direction even when the individual facts used in the new audit are correct.
+
+**Failure mode:** The auditor behaves as though each audit starts from a blank slate, producing entropy through loss of continuity rather than through incorrect technical reasoning.
+
+**Principle:** Maintain an explicit remembered-state/direction checkpoint across audits, refresh it against authoritative live state before each substantive audit, and distinguish continuity memory from evidence. Memory is a navigation aid; it is never proof.
+
+**Required check:** Before prescribing new work, reconstruct current mission, authoritative repositories/commits, deployment identity, current production path, settled architectural decisions, standing blockers, latest accepted directive, known rejected approaches, and last verified end-to-end behavior. Do not repeat or reverse a prior decision without new evidence.
 
 ## Audit-trigger rule
 
