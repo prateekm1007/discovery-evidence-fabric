@@ -603,7 +603,8 @@ class TestWorkerFailureMatrix:
         # PROVIDER_UNAVAILABLE — both are the honest no-credential shape
         assert ("NO_TRANSPORT" in row["error"]
                 or "PROVIDER_UNAVAILABLE" in row["error"])
-        assert "no provider credential" in row["error"]
+        assert ("no provider credential" in row["error"]
+                or "no LLM provider credential available" in row["error"])
         assert "Discovery temporarily blocked by infrastructure" in \
             row["error"]
         assert "Your problem is saved and ready to resume" in row["error"]

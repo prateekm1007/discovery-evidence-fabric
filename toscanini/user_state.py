@@ -3,13 +3,21 @@
 The machine retains its richer internal taxonomy (PENDING / BUILDING_
 PROBLEM / RUNNING / COMPLETE / INTERRUPTED / ERROR_TRANSPORT / ERROR_
 BUILD / ERROR_RUN / ERROR_STUCK; final_status REJECTED /
-AUTOMATED_INVENTION_CANDIDATE / UNKNOWN). The PRODUCT surface translates
-it to exactly one coherent user state:
+AUTOMATED_INVENTION_CANDIDATE / MECHANISM_GENERATION_FAILED /
+EVOLVED_INVENTION_CANDIDATE / INVENTION_UNDER_DEVELOPMENT / UNKNOWN).
+The PRODUCT surface translates it to exactly one coherent user state
+(R416: the wording follows what ACTUALLY happened — a mechanism-
+generation failure is never described as an adversarial rejection,
+and the terminal always presents the current invention):
 
   RUNNING
   COMPLETED — PACKAGE READY          (candidate found AND package built)
   COMPLETED — CANDIDATE FOUND        (candidate, no package yet)
-  COMPLETED — CANDIDATE REJECTED     (engine rejected — a real result)
+  COMPLETED — EVOLVED INVENTION      (an evolution generation survived)
+  COMPLETED — INVENTION IN DEVELOPMENT (architectures explored; the
+                              current invention is presented with its
+                              honest maturity — never "candidate
+                              rejected" as a dead end)
   COMPLETED — OUTCOME UNKNOWN        (terminal, no recorded verdict)
   INTERRUPTED — RECOVERABLE          (worker died; retryable)
   FAILED — TRANSPORT
@@ -39,7 +47,11 @@ _USER_STATE_LABELS = {
     "RUNNING": "Running",
     "COMPLETED_PACKAGE": "Completed — package ready",
     "COMPLETED_CANDIDATE": "Completed — candidate found",
-    "COMPLETED_REJECTED": "Completed — candidate rejected",
+    "COMPLETED_EVOLVED": "Completed — evolved invention found",
+    "COMPLETED_GENERATION_FAILED":
+        "Completed — architecture generation failed",
+    "COMPLETED_UNDER_DEVELOPMENT":
+        "Completed — invention in development",
     "COMPLETED_FALSE_PREMISE": "Completed — false premise",
     "COMPLETED_UNKNOWN": "Completed — outcome unknown",
     "INTERRUPTED": "Interrupted — recoverable",
@@ -62,11 +74,25 @@ _USER_STATE_EXPLANATIONS = {
                             "invention candidate, but no buyer package was "
                             "produced on this run (the release gate was "
                             "not reached — an honest result, not a failure)."),
-    "COMPLETED_REJECTED": ("The run finished and the engine REJECTED the "
-                           "candidate — the adversarial chain found the "
-                           "idea not defensible enough to package. That is "
-                           "a real discovery result: kills are recorded to "
-                           "the mechanism cemetery and improve future runs."),
+    "COMPLETED_GENERATION_FAILED": ("The engine could not generate an "
+                          "invention architecture on this run — a "
+                          "transport-class failure, never a scientific "
+                          "rejection (the typed failure record is on "
+                          "the run page). Your problem is saved and "
+                          "resumable."),
+    "COMPLETED_EVOLVED": ("The run challenged its first architecture, "
+                          "diagnosed why it failed, and evolved the "
+                          "next architecture through an explicit causal "
+                          "change — this generation survived the "
+                          "challenge gauntlet. Its maturity label says "
+                          "exactly what is verified so far."),
+    "COMPLETED_UNDER_DEVELOPMENT": ("The engine explored multiple "
+                          "architecture generations. The current "
+                          "invention is presented with its honest "
+                          "maturity and full challenge history — "
+                          "nothing is softened, and the machine keeps "
+                          "the diagnosed causes on record so the next "
+                          "generation can build on them."),
     "COMPLETED_FALSE_PREMISE": ("The engine checked the problem's premises "
                                 "BEFORE inventing and found them "
                                 "physically/scientifically incoherent — no "
@@ -96,6 +122,28 @@ _USER_STATE_EXPLANATIONS = {
 }
 
 
+def _generation_note(session: Dict[str, Any]) -> str:
+    """R416: a one-line honest note from the run's lineage record (the
+    run dir is the authority — Art. X). Absent when no lineage exists
+    (never fabricated)."""
+    from pathlib import Path
+    import json as _json
+    rd = session.get("run_dir")
+    try:
+        p = Path(rd) / "INVENTION_LINEAGE.json" if rd else None
+        if p and p.exists():
+            lin = _json.loads(p.read_text())
+            n = lin.get("n_generations")
+            cur = lin.get("current_invention") or {}
+            if n and cur:
+                return (f"{n} architecture generations explored; "
+                        f"current invention GEN {cur.get('gen')} "
+                        f"(maturity {cur.get('maturity')})")
+    except Exception:  # noqa: BLE001 — absent stays absent
+        pass
+    return ""
+
+
 def user_state(session: Dict[str, Any]) -> str:
     """The user-facing state key for one session record."""
     status = session.get("status") or ""
@@ -104,6 +152,14 @@ def user_state(session: Dict[str, Any]) -> str:
     if status in ("PENDING", "BUILDING_PROBLEM", "RUNNING"):
         return "RUNNING"
     if status == "COMPLETE":
+        if final == "EVOLVED_INVENTION_CANDIDATE":
+            # R416: an evolution generation survived — package state
+            # decides the packaging wording; the evolution story rides
+            # on the run page's generations timeline either way.
+            return "COMPLETED_PACKAGE" if pkg.get("complete") \
+                else "COMPLETED_EVOLVED"
+        if final == "INVENTION_UNDER_DEVELOPMENT":
+            return "COMPLETED_UNDER_DEVELOPMENT"
         if pkg.get("complete"):
             return "COMPLETED_PACKAGE"
         if final == "AUTOMATED_INVENTION_CANDIDATE":
@@ -111,7 +167,16 @@ def user_state(session: Dict[str, Any]) -> str:
         if final == "MALFORMED_OR_FALSE_PREMISE":
             return "COMPLETED_FALSE_PREMISE"
         if final == "REJECTED":
-            return "COMPLETED_REJECTED"
+            # R416 honest-cause fix: this state now says the invention
+            # is IN DEVELOPMENT (the architecture was challenged and
+            # killed; the run page shows the generation record and the
+            # diagnosed cause) — never "the adversarial chain found the
+            # idea not defensible enough" as a bare dead end. When the
+            # evolution engine is enabled this path is only reached by
+            # legacy/pre-R416 session records.
+            return "COMPLETED_UNDER_DEVELOPMENT"
+        if final == "MECHANISM_GENERATION_FAILED":
+            return "COMPLETED_GENERATION_FAILED"
         return "COMPLETED_UNKNOWN"
     if status == "INTERRUPTED":
         return "INTERRUPTED"
@@ -148,18 +213,34 @@ def user_state_view(session: Dict[str, Any]) -> Dict[str, Any]:
     pkg = session.get("package") or {}
     finished = key.startswith("COMPLETED") or key.startswith("FAILED") \
         or key in ("INTERRUPTED", "BLOCKED_TRANSPORT")
-    found = key in ("COMPLETED_PACKAGE", "COMPLETED_CANDIDATE")
-    rejected = key == "COMPLETED_REJECTED"
+    found = key in ("COMPLETED_PACKAGE", "COMPLETED_CANDIDATE",
+                    "COMPLETED_EVOLVED")
+    rejected = False   # R416: the product surface never renders a bare
+    # reject dead-end; challenge losses live on the generation records
 
     # the one-line decision: what did the engine decide?
+    # R416: the decision line follows what ACTUALLY happened (honest
+    # cause attribution — a mechanism-generation failure is never
+    # described as an adversarial rejection)
+    gen_note = _generation_note(session)
     if found and pkg.get("maturity"):
-        decision = f"candidate found — package at {pkg['maturity']} maturity"
+        decision = f"invention found — package at {pkg['maturity']} maturity"
+        if gen_note:
+            decision = f"{decision}; {gen_note}"
     elif found:
-        decision = "candidate found — no package on this run"
+        decision = "invention found — no package on this run"
+        if gen_note:
+            decision = f"{decision}; {gen_note}"
     elif key == "COMPLETED_FALSE_PREMISE":
         decision = "the problem's premise is physically incoherent — nothing to invent"
-    elif rejected:
-        decision = "no defensible invention — candidate rejected"
+    elif key == "COMPLETED_GENERATION_FAILED":
+        decision = ("the engine could not generate an architecture "
+                    "(transport-class) — not a scientific rejection; "
+                    "retry resumable")
+    elif key == "COMPLETED_UNDER_DEVELOPMENT":
+        decision = (gen_note or
+                    "architecture challenged — the generation record "
+                    "shows what was diagnosed and what comes next")
     elif key == "COMPLETED_UNKNOWN":
         decision = "outcome not established"
     elif key == "RUNNING":
@@ -250,7 +331,12 @@ def public_session_view(session: Dict[str, Any]) -> Dict[str, Any]:
 # such as AUTOMATED_INVENTION_CANDIDATE should be translated")
 FINAL_STATUS_READABLE = {
     "AUTOMATED_INVENTION_CANDIDATE": "Invention candidate (automated)",
-    "REJECTED": "Rejected — not defensible enough to package",
+    "EVOLVED_INVENTION_CANDIDATE": "Evolved invention candidate",
+    "INVENTION_UNDER_DEVELOPMENT": "Invention in development",
+    "MECHANISM_GENERATION_FAILED": "Mechanism generation failed (a "
+                                  "generation gap — not a rejection)",
+    "REJECTED": "Challenged and killed — the generation record shows "
+                "the diagnosed cause",
     "MALFORMED_OR_FALSE_PREMISE": "False premise — the problem as stated "
                                   "cannot physically occur",
     "UNKNOWN": "Outcome unknown",

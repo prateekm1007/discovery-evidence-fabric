@@ -128,8 +128,12 @@ def test_retrieve_failure_cascades_to_rank(tmp_path, monkeypatch):
     run = EngineRun(problem, str(tmp_path), with_package=False)
     manifest = run.run()
     # classification never ran (skipped) -> the run is not a candidate
-    # outcome; UNKNOWN is the honest terminal state (never fabricated)
-    assert manifest["final_status"] == "UNKNOWN"
+    # outcome (never fabricated). R416: a retrieval-dead run fails the
+    # mechanism GENERATION (typed, infrastructure-class — never a
+    # rejection); the evolution layer (transport also dead in the
+    # hermetic suite) records the same typed terminal.
+    assert manifest["final_status"] in (
+        "UNKNOWN", "MECHANISM_GENERATION_FAILED")
     log = {e["stage"]: e["status"] for e in run.env.stage_log}
     assert log["RETRIEVE"] == "FAILED_EXPLICIT"
     assert log["SYNTHESIZE"] == "SKIPPED_UPSTREAM_FAILURE"
@@ -314,4 +318,11 @@ def test_rejected_run_generates_no_package_artifacts(tmp_path):
     # the release record is honest and carries the reason
     rel = json.loads((tmp_path / "DISCOVERY_RELEASE.json").read_text())
     assert rel["status"] != "RELEASED"
-    assert manifest["final_status"] == "REJECTED"
+    # R416: the GEN-1 REJECTED verdict is preserved in the epistemic
+    # record (W2.1 skip record above + cemetery + lineage); the
+    # run-level final_status is now the evolution-aware product state
+    # (the hermetic suite has no transport, so no evolved generation
+    # was produced and nothing was softened into a survivor).
+    assert manifest["final_status"] in (
+        "REJECTED", "INVENTION_UNDER_DEVELOPMENT",
+        "MECHANISM_GENERATION_FAILED")

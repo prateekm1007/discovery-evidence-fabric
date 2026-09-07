@@ -550,11 +550,18 @@ class Handler(BaseHTTPRequestHandler):
             # GET /api/run/{id}/model — the run's GLB (only when the run
             # actually produced one; 404 honest otherwise — the UI never
             # treats a GLB's existence as invention existence anyway)
+            # R416 (Phase H): ?gen=N serves the PER-GENERATION geometry
+            # (MODEL/model-00N.glb); no parameter serves the CURRENT
+            # generation's model (the highest numbered one), falling
+            # back to the run's package GLB.
             if len(parts) == 4 and parts[3] == "model":
                 if self._access(rid) == "DENY":
                     return self._denied()
                 s = store.get_session(rid)
-                glb = self._run_glb(s)
+                q = urllib.parse.parse_qs(
+                    urllib.urlsplit(p.path).query)
+                gen = (q.get("gen") or [None])[0]
+                glb = self._run_glb(s, gen=gen)
                 return self._serve_file(glb, "model/gltf-binary")
             # GET /api/run/{id}/geometry/{name} — restricted geometry
             # downloads (STEP/STL/SVG whitelist; never envelopes)
@@ -878,7 +885,7 @@ class Handler(BaseHTTPRequestHandler):
     # or session stores through this route is a 404 by construction).
     _GEOMETRY_EXTS = (".glb", ".step", ".stp", ".stl", ".svg")
 
-    def _run_glb(self, session) -> Optional[Path]:
+    def _run_glb(self, session, gen=None) -> Optional[Path]:
         if not session or not session.get("run_dir"):
             return None
         run_dir = Path(session["run_dir"])
@@ -887,7 +894,24 @@ class Handler(BaseHTTPRequestHandler):
         model_dir = run_dir / "MODEL"
         glbs = sorted(model_dir.glob("*.glb")) if model_dir.exists() \
             else sorted(run_dir.glob("*.glb"))
-        return glbs[0] if glbs else None
+        if not glbs:
+            return None
+        if gen is not None:
+            try:
+                want = f"model-{int(gen):03d}.glb"
+                for g in glbs:
+                    if g.name == want:
+                        return g
+                return None   # honest 404: that generation has no model
+            except (TypeError, ValueError):
+                return None
+        # default: the CURRENT generation's model = the highest
+        # numbered per-generation artifact (model-003.glb sorts after
+        # model-002.glb); other names (package GLBs) come last
+        named = [g for g in glbs if g.name.startswith("model-")]
+        if named:
+            return named[-1]
+        return glbs[0]
 
     def _run_geometry_file(self, session, name: str) -> Optional[Path]:
         if not session or not session.get("run_dir"):

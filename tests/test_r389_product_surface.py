@@ -146,7 +146,10 @@ def test_api_run_alias_is_the_same_handler_path():
     loop)."""
     import inspect
     src = inspect.getsource(srv.Handler.do_POST)
-    assert 'p.path == "/api/discoveries" or p.path == "/api/run"' in src
+    # R415 widened the shared dispatch to the directive's
+    # /api/discovery alias; the three names remain ONE code path
+    assert 'p.path in ("/api/discoveries", "/api/run", "/api/discovery")' \
+        in src
 
 
 def test_api_run_stream_and_result_alias_routes():

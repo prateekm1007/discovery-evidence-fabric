@@ -322,11 +322,15 @@ export interface RealityLoopRecord {
 // toscanini/cio.py — the frontend READS these; it never re-derives
 // states client-side and never infers an invention from a GLB).
 // ---------------------------------------------------------------------------
-// The four terminal outcomes (directive §18) + the live PENDING state.
+// R416: the terminal outcomes — NO_DEFENSIBLE_INVENTION is a legacy
+// key (pre-R416 records map onto UNDER_DEVELOPMENT server-side); the
+// current invention is always presented, never a dead end.
 export type RunOutcome =
   | "PENDING"
   | "INVENTION_SURVIVED"
   | "INVENTION_REQUIRES_EXPERIMENT"
+  | "INVENTION_UNDER_DEVELOPMENT"
+  | "FALSE_PREMISE_INCOHERENT"
   | "NO_DEFENSIBLE_INVENTION"
   | "RUN_BLOCKED";
 
@@ -397,7 +401,86 @@ export interface RunStateObject {
   outcome_label: string;
   outcome_basis: string;
   phase_progression?: RunPhase[];
+  // R416: the invention generations (INVENTION 01, 02, ...) with
+  // lineage, causal deltas, maturity labels and per-generation
+  // geometry availability — the UI's generation navigation renders
+  // THIS, never client-side inference.
+  generations?: GenerationsProjection | null;
+  evolution_state?: EvolutionLivePhase | null;
   schema_version?: string;
+}
+
+// R416: one architecture generation in the invention lineage.
+export interface GenerationRecord {
+  gen: number;
+  label?: string | null;
+  invention_id?: string | null;
+  parent_id?: string | null;
+  origin?: string | null;
+  state?: string | null;
+  maturity?: string | null;
+  architecture?: {
+    mechanism?: string | null;
+    intervention?: string | null;
+    expected_effect?: string | null;
+    falsification_test?: string | null;
+  };
+  what_changed?: string | null;
+  reason_for_change?: string | null;
+  causal_delta?: {
+    causal_change?: string | null;
+    new_capability?: string | null;
+    new_interaction?: string | null;
+    new_operating_regime?: string | null;
+    predicted_effect?: string | null;
+    frontier_capability?: string | null;
+    thirty_year_engine?: Record<string, string> | null;
+    diagnosed_cause?: string | null;
+  } | null;
+  challenge?: {
+    killed?: boolean;
+    kill_stage?: string | null;
+    kill_reason?: string | null;
+    attack_overall?: string | null;
+    independent_attack?: string | null;
+    physics_lifecycle?: string | null;
+    survived?: boolean;
+    evidence_verified?: boolean;
+  };
+  diagnosis?: { cause?: string | null; basis?: string[] } | null;
+  fresh_evidence?: {
+    n_items?: number | null;
+    query?: string | null;
+    status?: string | null;
+    snapshot_version?: number | null;
+  } | null;
+  model_available?: boolean;
+  stop_note?: string | null;
+}
+
+export interface GenerationsProjection {
+  generations: GenerationRecord[];
+  n_generations?: number;
+  n_evolution_generations?: number | null;
+  current_invention?: {
+    gen?: number | null;
+    invention_id?: string | null;
+    state?: string | null;
+    maturity?: string | null;
+  } | null;
+  survivor_reached?: boolean;
+  survivor_gen?: number | null;
+  stop_reason?: string | null;
+  status?: string | null;
+  honesty_contract?: string | null;
+}
+
+export interface EvolutionLivePhase {
+  current_gen: number;
+  phase: string;
+  label: string;
+  subline: string;
+  note?: string;
 }
 
 export interface CIOMaturity {
