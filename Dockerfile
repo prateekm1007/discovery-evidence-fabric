@@ -53,8 +53,10 @@ RUN set -ux; \
     >/tmp/apti.log 2>&1 \
     && rm -rf /var/lib/apt/lists/*; then _dbg "apt_ok"; \
     else \
-      _err=$(tail -c 1200 /tmp/aptu.log /tmp/apti.log 2>/dev/null | tr '\n' '|'); \
-      _dbg "apt_fail_rc=$? err=$_err"; \
+      _rc=$?; \
+      _dbg "apt_fail_rc=$_rc"; \
+      _err=$(tail -c 2000 /tmp/apti.log 2>/dev/null | tr '\n' '|'); \
+      _dbg "apti_err=$_err"; \
       exit 1; \
     fi
 
