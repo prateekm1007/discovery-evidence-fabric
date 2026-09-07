@@ -642,25 +642,65 @@ def _pinned_records(provider_id: str) -> List[ModelRecord]:
     return out
 
 
+def _operator_pinned_model(provider_id: str) -> Optional[str]:
+    """R418: the recorded operator override {PROVIDER}_MODEL (the R391
+    transport-override mechanism, applied to the ROUTING LADDER). When
+    set, the pinned model is the provider's PRIMARY rung — an explicit,
+    recorded operator decision (never silent; the ladder's provenance
+    records it). The cascade still works: if the pinned model fails,
+    the walk continues down the ladder exactly as before."""
+    val = (os.environ.get(f"{provider_id.upper()}_MODEL", "").strip())
+    return val or None
+
+
 def eligible_models(provider_id: str, task: str,
                     catalog: bool = True) -> List[ModelRecord]:
     """The provider's models eligible for a task: live-catalog records
     where discoverable (intersected with the pinned family allowlist),
     else the pinned defaults. GONE models are excluded (recorded-fact
-    exclusion, not heuristic — Art. V)."""
+    exclusion, not heuristic — Art. V).
+
+    R418 (two measured defects fixed):
+    1. `:batch` / `:extended` catalog slugs are BATCH/alternate
+       endpoints, not chat-completions endpoints — the live catalog
+       lists them and the ladder picked `z-ai/glm-5.3-flash:batch`
+       (measured HTTP 404 on the chat endpoint, the deployed
+       transport probe's last failure). They are excluded from the
+       chat ladder — a recorded-fact exclusion (the slug's own
+       semantics), same class as the GONE exclusion.
+    2. The operator's {PROVIDER}_MODEL pin is emitted FIRST when set
+       (source=OPERATOR_PINNED) so an operator who has measured a
+       working model routes the engine's very first attempt there
+       instead of burning the cascade on paid models the account
+       cannot afford."""
+    pinned = _operator_pinned_model(provider_id)
     recs = _catalog_records(provider_id) if catalog else []
     if not recs:
         recs = _pinned_records(provider_id)
+    # batch/alternate endpoint variants are not chat endpoints
+    recs = [r for r in recs if not r.model.endswith(
+        (":batch", ":extended"))]
+    if pinned and not is_model_gone(provider_id, pinned):
+        existing = next((r for r in recs if r.model == pinned), None)
+        pinned_rec = existing or ModelRecord(
+            provider=provider_id, model=pinned,
+            task_capabilities=[TASK_STRONG, TASK_FAST, TASK_CHEAP],
+            cost_class=1, latency_class=2, context_limit=128000,
+            source="OPERATOR_PINNED")
+        recs = [pinned_rec] + [r for r in recs if r.model != pinned]
     return [r for r in recs if task in r.task_capabilities] or recs
 
 
 def all_models(provider_id: str) -> List[ModelRecord]:
     """The provider's models WITHOUT the task filter (the LAST_RESORT
-    band's any-capability pool — same GONE exclusion, same sources)."""
+    band's any-capability pool — same GONE exclusion, same sources).
+    R418: batch/alternate endpoint variants are excluded here too —
+    they are not chat-completions endpoints (measured 404)."""
     recs = _catalog_records(provider_id)
     if not recs:
         recs = _pinned_records(provider_id)
-    return recs
+    return [r for r in recs if not r.model.endswith(
+        (":batch", ":extended"))]
 
 
 # ---------------------------------------------------------------------------
