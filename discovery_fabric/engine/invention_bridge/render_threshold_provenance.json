@@ -3,15 +3,17 @@
   "version": "1.0.0",
   "ratified": "2026-09-08",
   "round": "R420",
-  "article": "XXVII (no threshold invention — every operational threshold carries provenance, class, uncertainty, justification)",
-  "operator_directive": "R420 section 5: record memory-threshold provenance — measurement environment, measurement date, observed baseline, safety margin rationale, threshold, intended execution context, uncertainty/limitations",
-
+  "article": "XXVII (no threshold invention \u2014 every operational threshold carries provenance, class, uncertainty, justification)",
+  "operator_directive": "R420 section 5: record memory-threshold provenance \u2014 measurement environment, measurement date, observed baseline, safety margin rationale, threshold, intended execution context, uncertainty/limitations",
   "measurements": [
     {
       "quantity": "blender --background baseline RSS",
       "observed_value": "269 MB",
       "measurement_date": "2026-09-07",
-      "rounds": ["R419c (guard introduced)", "R419f (guard verified live)"],
+      "rounds": [
+        "R419c (guard introduced)",
+        "R419f (guard verified live)"
+      ],
       "measurement_environment": {
         "host": "Render free-tier web-service container (toscanini-engine-docker, srv-dabp678jo6nc738fg2u0)",
         "image": "python:3.12-slim (Debian trixie 2026) + pinned Blender 5.2.1 LTS x64 (tarball sha256 a31f524fa99a527d3d52b7f5aaa68c34e1a19d5a1c9473f79c5cc610fd5b10e9, verified at image build)",
@@ -21,25 +23,26 @@
       "uncertainty": [
         "single-point observation, not a sampled distribution; scene geometry, Cycles render buffers, and denoising add unmeasured per-scene overhead on top (bridge scenes observed adding on the order of tens to a few hundred MB)",
         "RSS is measured at one moment; peak during tile rendering can be higher",
-        "the measurement was taken by the implementing agent inside the container (AI_REVIEW provenance, Art. LXVII) — not an independent instrumented benchmark"
+        "the measurement was taken by the implementing agent inside the container (AI_REVIEW provenance, Art. LXVII) \u2014 not an independent instrumented benchmark"
       ]
     },
     {
       "quantity": "full-quality hero+section+exploded bundle wall time (pinned build, local verification host)",
       "observed_value": "~208 s total (hero 65-67 s, section 67-68 s, exploded 74-75 s)",
       "measurement_date": "2026-09-07",
-      "rounds": ["R419 render-pipeline test runs (two independent runs: 207.59 s and 208.51 s)"],
+      "rounds": [
+        "R419 render-pipeline test runs (two independent runs: 207.59 s and 208.51 s)"
+      ],
       "measurement_environment": {
         "host": "local verification container (faster CPU than the free-tier shared core)",
         "parameters": "Cycles CPU, 48 samples, adaptive threshold 0.02, denoising on, 1152x768, three views"
       },
       "uncertainty": [
-        "two runs, same host — no cross-host distribution",
+        "two runs, same host \u2014 no cross-host distribution",
         "the deployed free-tier shared CPU is materially slower: the live production run ts_c0f41af92195 exceeded the full 900 s bundle budget on 2026-09-07 (BRIDGE_REPORT.json: RENDER_TIMEOUT), which is the direct evidence the async quality ladder exists"
       ]
     }
   ],
-
   "thresholds": [
     {
       "name": "in_worker memory guard",
@@ -74,7 +77,7 @@
       "class": "ENGINEERING",
       "intended_execution_context": "async artifact-render job attempt 1 (samples 48, 1152x768)",
       "safety_margin_rationale": "the full bundle budget from R419; the async job has no user waiting on the same request, so it can afford the long attempt before the ladder degrades",
-      "justification_for_not_another_number": "the deployed instance exceeded 900 s at full quality (observed); the ladder therefore degrades quality rather than extending time indefinitely — presentation quality is the tunable, never the truth",
+      "justification_for_not_another_number": "the deployed instance exceeded 900 s at full quality (observed); the ladder therefore degrades quality rather than extending time indefinitely \u2014 presentation quality is the tunable, never the truth",
       "applied_by": "toscanini.artifact_worker run() ladder attempt 1"
     },
     {
@@ -85,12 +88,11 @@
       "safety_margin_rationale": "render cost scales ~linearly with sample count and ~quadratically with pixel count; 48->16->6 samples with the matching resolution steps moves the deployed-instance cost from >900 s into the hundreds-of-seconds regime while keeping a presentable studio image; bounded at three attempts so the job is always terminal-honest (no infinite retry loop)",
       "justification_for_not_another_number": "three rungs span a ~13x compute reduction; fewer rungs leave a gap between full quality and the free-tier capacity, more rungs extend wall time past the value of a slightly better PNG",
       "applied_by": "toscanini.artifact_worker run() ladder attempts 2-3",
-      "disclosure": "the achieved samples/resolution are recorded in render_record.json and projected into the CIO renders block — a degraded-quality render is DISCLOSED, never silently passed off as full quality"
+      "disclosure": "the achieved samples/resolution are recorded in render_record.json and projected into the CIO renders block \u2014 a degraded-quality render is DISCLOSED, never silently passed off as full quality"
     }
   ],
-
   "cross_cutting": {
-    "threshold_class_discipline": "all thresholds above are ENGINEERING (infrastructure capacity), never SCIENTIFIC — a render skip changes no epistemic state (Art. LXI); conceptual geometry is never promoted by a successful render (Art. XXVIII)",
+    "threshold_class_discipline": "all thresholds above are ENGINEERING (infrastructure capacity), never SCIENTIFIC \u2014 a render skip changes no epistemic state (Art. LXI); conceptual geometry is never promoted by a successful render (Art. XXVIII)",
     "intended_execution_contexts": [
       "Render free-tier 512 MB container (the deployed production instance)",
       "local verification hosts (BLENDER_PATH pointing at the same pinned 5.2.1 LTS build)"
@@ -107,5 +109,13 @@
       "local pinned-build bundle timings 207.59 s / 208.51 s (R419 test artifacts)",
       "R419c/R419f guard authoring measurements (269 MB baseline)"
     ]
-  }
+  },
+  "revision_history": [
+    {
+      "revision": "R420d",
+      "date": "2026-09-08",
+      "change": "the measurement BASIS of every memory guard changed: _mem_available_mb now reads the CONTAINER's cgroup headroom (memory.max - memory.current, cgroup v2; limit/usage_in_bytes, v1) and returns the MINIMUM of cgroup headroom and host /proc/meminfo MemAvailable. /proc/meminfo inside the container reports the HOST \u2014 on the Render Starter plan (512 MB cgroup, buildPlan verified via the Render API) the R419f-era guard read GBs of host availability, passed, and launched Blender into over-subscription; the cgroup OOM killer crashed the container (observed live 2026-09-07: boots at 23:04 and 23:40 in the runtime-state branch, each fresh-disk restart resetting run progress). The threshold VALUES are unchanged; what changed is that they are now measured against the real limit. On the 512 MB plan the honest outcome is a typed RENDER_SKIPPED_LOW_MEMORY with the owner-gated plan-upgrade note (Art. LXV) \u2014 the guard now performs the protection it always claimed.",
+      "record_basis_note": "guard records now carry mem_available_basis (CGROUP / HOST / CGROUP_AND_HOST)"
+    }
+  ]
 }

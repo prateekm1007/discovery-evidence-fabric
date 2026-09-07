@@ -1557,3 +1557,19 @@ Work Log:
 Stage Summary:
 - The heavy-process invariant is now structural: engine runs and Blenders share ONE exclusive lock; renders serialize among themselves; runs serialize among themselves; the memory guards remain the second line of defense.
 - reviewer_provenance=AI_REVIEW.
+
+---
+Task ID: R420d
+Agent: Coder (main session — the THIRD root cause: the memory guard measured the wrong machine)
+Task: The R420c deploy still crashed: the fresh run ts_758a62961654 progressed to 14 stages, then the container restarted (~23:40 — fresh boot snapshot, run progress reset to the creation snapshot). The mutual exclusion was working (the worker waited behind the render attempt, then proceeded) — but the render attempt itself should never have launched. Find why the guard let it.
+
+Work Log:
+- FACTS: the Render service buildPlan is 'starter' (Render API, serviceDetails) = 512 MB cgroup limit. /proc/meminfo INSIDE the container reports the HOST (GBs). The R419f-era _mem_available_mb read MemAvailable from /proc/meminfo — the guard measured the HOST, not the container: it passed with GBs of 'available' while the cgroup capped the process tree at 512 MB. Blender launched into over-subscription; the cgroup OOM killer killed the largest process — twice the SERVER (pid 1) — crashing the container (observed boots at 23:04 and 23:40; each crash reset run progress to the last durable snapshot).
+- This also retroactively explains the R419f production 'RENDER_TIMEOUT' (the 900 s in-worker Blender was cgroup-starved and thrashing, not merely slow) — the guard never actually protected anything; its measurement basis was wrong on every deployed run.
+- FIX: _mem_available_mb is now CGROUP-AWARE — reads memory.max - memory.current (cgroup v2) or limit/usage_in_bytes (v1) and returns the MINIMUM of cgroup headroom and host MemAvailable; guard records carry mem_available_basis (CGROUP / HOST / CGROUP_AND_HOST). Threshold VALUES unchanged (650 in-worker / 400 async) — what changed is that they are now measured against the REAL limit (revision appended to render_threshold_provenance.json per Art. XXVII — never silent drift).
+- Honest consequence on the current 512 MB Starter plan: the async guard (400 MB) fires (512 - server - os ≈ 320) -> renders are TYPED SKIPPED with the existing owner-gated plan-upgrade note (Art. LXV). No Blender ever launches on this plan; no crash loop is possible. On an upgraded plan the renders proceed automatically — no code change needed.
+- TESTS: cgroup fixture battery (v2, v1, 'max' sentinel -> None) + the decisive regression: host says 3500 MB, cgroup says 90 -> the guard REFUSES (the exact pre-R420d failure mode). Combined batteries: 102 passed + 7 skipped.
+
+Stage Summary:
+- The memory guard now measures the machine the process actually runs on. The full honest production behavior on the Starter plan: fresh run -> invention -> GLB -> interactive 3D + package on the website; renders typed-skipped with the plan-upgrade note; on a plan upgrade, the same code renders automatically.
+- reviewer_provenance=AI_REVIEW.

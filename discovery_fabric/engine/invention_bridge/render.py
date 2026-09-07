@@ -201,9 +201,40 @@ def authoritative_glb(work_dir: str,
     return str(roots[0]) if roots else None
 
 
-def _mem_available_mb() -> Optional[int]:
-    """MemAvailable in MB from /proc/meminfo, or None (non-Linux /
-    unreadable — never a guess, Art. XXV)."""
+def _cgroup_avail_mb(root: str = "/sys/fs/cgroup") -> Optional[int]:
+    """The container's OWN memory headroom in MB, or None when no
+    cgroup limit is visible. R420d: /proc/meminfo inside the container
+    reports the HOST's memory — on the Render Starter plan the cgroup
+    caps the container at 512 MB while the host reports GBs of
+    MemAvailable. The R419f-era guard trusted the host number, passed,
+    and launched Blender into over-subscription — the cgroup OOM
+    killer then crashed the container (observed live 2026-09-07 at
+    23:04 and 23:40, fresh boot snapshots in the runtime-state
+    branch). The honest availability is the cgroup headroom."""
+    # cgroup v2
+    try:
+        limit_raw = open(f"{root}/memory.max").read().strip()
+        if limit_raw and limit_raw != "max":
+            limit = int(limit_raw)
+            current = int(open(f"{root}/memory.current").read().strip())
+            if limit > 0:
+                return max(0, limit - current) // (1024 * 1024)
+    except (OSError, ValueError):
+        pass
+    # cgroup v1
+    try:
+        limit = int(open(
+            f"{root}/memory/memory.limit_in_bytes").read().strip())
+        if 0 < limit < (1 << 40):  # the 'unlimited' sentinel is huge
+            current = int(open(
+                f"{root}/memory/memory.usage_in_bytes").read().strip())
+            return max(0, limit - current) // (1024 * 1024)
+    except (OSError, ValueError):
+        pass
+    return None
+
+
+def _host_avail_mb() -> Optional[int]:
     try:
         with open("/proc/meminfo") as f:
             for line in f:
@@ -212,6 +243,17 @@ def _mem_available_mb() -> Optional[int]:
     except OSError:
         pass
     return None
+
+
+def _mem_available_mb() -> Optional[int]:
+    """The honest per-process launch budget: the MINIMUM of the cgroup
+    headroom (the container's actual limit) and the host MemAvailable.
+    None only when neither is readable (never a guess, Art. XXV)."""
+    cgroup = _cgroup_avail_mb()
+    host = _host_avail_mb()
+    if cgroup is not None and host is not None:
+        return min(cgroup, host)
+    return cgroup if cgroup is not None else host
 
 
 def _memory_guard(context: str,
@@ -243,6 +285,9 @@ def _memory_guard(context: str,
     avail = _mem_available_mb()
     if avail is None or avail >= need_mb:
         return None
+    basis = "CGROUP_AND_HOST" if (_cgroup_avail_mb() is not None
+                                  and _host_avail_mb() is not None) \
+        else ("CGROUP" if _cgroup_avail_mb() is not None else "HOST")
     return {
         "stage": "RENDER",
         "render_pipeline": "BLENDER_HEADLESS",
@@ -250,6 +295,7 @@ def _memory_guard(context: str,
         "status": "RENDER_SKIPPED_LOW_MEMORY",
         "context": context,
         "mem_available_mb": avail,
+        "mem_available_basis": basis,
         "required_mb": need_mb,
         "threshold_class": "ENGINEERING",
         "threshold_provenance": (

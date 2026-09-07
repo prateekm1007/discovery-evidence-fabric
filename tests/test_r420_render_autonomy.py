@@ -263,6 +263,49 @@ class TestThresholdProvenance(unittest.TestCase):
                             "invention_bridge" /
                             "render_threshold_provenance.json").exists())
 
+    def test_memory_measurement_is_cgroup_aware(self):
+        """R420d — the guard's crash-loop root cause, guarded forever:
+        /proc/meminfo inside a container reports the HOST. On the
+        Render Starter plan (512 MB cgroup) the old guard read GBs of
+        host availability, passed, and Blender OOM-crashed the
+        container (live boots at 23:04 / 23:40, 2026-09-07). The honest
+        availability is the MINIMUM of cgroup headroom and host."""
+        import tempfile
+        # cgroup v2 fixture: 512 MB limit, 200 MB used -> 312 MB free
+        with tempfile.TemporaryDirectory() as td:
+            Path(td, "memory.max").write_text("536870912\n")
+            Path(td, "memory.current").write_text("209715200\n")
+            self.assertEqual(
+                render_mod._cgroup_avail_mb(root=td), 312)
+            # 'max' (no cgroup limit) -> None
+            Path(td, "memory.max").write_text("max\n")
+            self.assertIsNone(render_mod._cgroup_avail_mb(root=td))
+        # v1 fixture
+        with tempfile.TemporaryDirectory() as td:
+            Path(td, "memory").mkdir()
+            Path(td, "memory", "memory.limit_in_bytes").write_text(
+                "536870912\n")
+            Path(td, "memory", "memory.usage_in_bytes").write_text(
+                "52428800\n")
+            self.assertEqual(
+                render_mod._cgroup_avail_mb(root=td), 462)
+        # the decisive regression: host says plenty, cgroup says no ->
+        # the MINIMUM decides (the launch guard must refuse)
+        orig_cgroup = render_mod._cgroup_avail_mb
+        orig_host = render_mod._host_avail_mb
+        render_mod._cgroup_avail_mb = lambda: 90
+        render_mod._host_avail_mb = lambda: 3500  # the HOST's number
+        try:
+            self.assertEqual(render_mod._mem_available_mb(), 90)
+            guard = render_mod._memory_guard("test", mode="async")
+            self.assertIsNotNone(guard)  # REFUSED despite host plenty
+            self.assertEqual(guard["mem_available_mb"], 90)
+            self.assertIn(guard["mem_available_basis"],
+                          ("CGROUP_AND_HOST", "CGROUP"))
+        finally:
+            render_mod._cgroup_avail_mb = orig_cgroup
+            render_mod._host_avail_mb = orig_host
+
 
 # ---------------------------------------------------------------------------
 # §4 Blender provenance fail-closed
