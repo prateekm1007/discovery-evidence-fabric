@@ -25,6 +25,7 @@ import type { CIO, GenerationRecord, SessionDetail } from "@/lib/types";
 import { getCIO } from "@/lib/api";
 import { isTerminal } from "./RunNarrative";
 import ModelViewer from "./ModelViewer";
+import RenderGallery from "./RenderGallery";
 
 const MATURITY_STEPS: {
   key: "design" | "simulation" | "evidence_supported" | "experimentally_verified";
@@ -69,6 +70,10 @@ function CioPanel({ cio, detail }: { cio: CIO; detail: SessionDetail }) {
   const languageQuarantined = cio.language_guard?.clean === false;
   const conceptual = geo?.conceptual ?? false;
   const geoClass = geo?.class ?? (conceptual ? "CONCEPTUAL_3D" : "ENGINEERING_3D");
+  // R419 section 12: text↔component linkage — the selected component
+  // highlights in the viewer (presentation only; the GLB is unchanged)
+  const [highlight, setHighlight] = useState<string | null>(null);
+  const components = geo?.components ?? [];
   return (
     <>
       <MaturityBadges cio={cio} />
@@ -88,17 +93,69 @@ function CioPanel({ cio, detail }: { cio: CIO; detail: SessionDetail }) {
             url={geo.glb}
             height={300}
             compact
+            highlight={highlight}
             label={conceptual ? "conceptual architecture" : "run geometry"}
             note={conceptual
               ? "the invention's system architecture as an explicitly conceptual 3D visualization — topology and named components, NOT engineering geometry; engineering CAD is earned only when parameters are sourced"
               : "the run's engineering geometry (CadQuery/OCCT authority; renders are derived artifacts — never physical truth)"}
           />
+          {components.length > 0 && (
+            <div className="component-panel">
+              <div className="rail-h">
+                Components
+                <span className="faint" style={{ marginLeft: 6, fontSize: 10.5 }}>
+                  click to isolate in the viewer
+                </span>
+              </div>
+              <div className="component-list">
+                {components.slice(0, 12).map((c, i) => {
+                  const name =
+                    typeof c === "string" ? c : (c?.name ?? `component ${i + 1}`);
+                  const role =
+                    typeof c === "string" ? null : (c?.role ?? c?.type ?? null);
+                  return (
+                    <button
+                      key={`${name}-${i}`}
+                      type="button"
+                      className={`component-chip ${
+                        highlight === name ? "sel" : ""
+                      }`}
+                      title={role ?? undefined}
+                      onClick={() =>
+                        setHighlight(highlight === name ? null : name)
+                      }
+                    >
+                      {name}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
           {conceptual && (
             <div className="faint" style={{ fontSize: 11.5, marginTop: 4 }}>
               no engineering dimensions are claimed by this artifact —
               components mirror the recorded subsystem names
             </div>
           )}
+          {/* R419 sections 5/8: the studio render gallery (hero/section/
+              exploded) — pointers from the CIO's visualization.renders
+              only; presentation variants, honestly labeled */}
+          <RenderGallery
+            renders={cio.visualization?.renders}
+            conceptual={conceptual}
+          />
+          {(() => {
+            const r = cio.visualization?.renders;
+            if (!r || !r.status || r.status === "OK" ||
+                r.status === "RENDER_PARTIAL" || r.hero_png) return null;
+            return (
+              <div className="faint" style={{ fontSize: 11.5, marginTop: 4 }}>
+                studio renders unavailable on this run ({r.status.toLowerCase().replace(/_/g, " ")})
+                — the interactive 3D above is the artifact
+              </div>
+            );
+          })()}
         </div>
       ) : (
         <div className="artifact-note">
@@ -396,7 +453,7 @@ export default function RunArtifact({
           ) : usv.found_something ? (
             <div className="artifact-note">
               <b>Invention recorded, artifacts pending.</b> This run
-              recorded an invention candidate; the automatic artifact
+              recorded an invention; the automatic artifact
               gate ({detail.status === "COMPLETE" ? "ran" : "will run"})
               on completion — if this persists, the bridge gate recorded
               its failure reason on the run record (disclosed, never a

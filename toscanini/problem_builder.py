@@ -123,17 +123,23 @@ def extract_problem_fields(text: str) -> Dict[str, Any]:
     FAILURE_MODE are still absent they are derived from FAILURE_QUERY (all
     still MODEL_DERIVED, never presented as evidence)."""
     from discovery_fabric.engine import llm_registry as reg
-    schema = ["DOMAIN", "DEVICE", "FAILURE_MODE", "CONSTRAINT",
-              "FAILURE_QUERY", "SCIENCE_QUERY", "VEHICLE"]
+    schema = ["DOMAIN", "DEVICE", "FAILURE_MODE", "OBJECTIVE",
+              "CONSTRAINT", "FAILURE_QUERY", "SCIENCE_QUERY", "VEHICLE"]
     system = (
         "You convert a user's engineering problem description into "
-        "structured discovery-engine fields. The first SIX field lines are "
+        "structured discovery-engine fields. The first SEVEN field lines are "
         "MANDATORY, each on its own line as FIELD: value. DOMAIN must be "
         "exactly one of: medical, automotive, energy, aerospace, "
         "electronics, industrial, materials, general. DEVICE is a concise "
         "noun phrase naming the technical system (never a question). "
         "FAILURE_MODE is a concise noun phrase naming the failure "
-        "mechanism. FAILURE_QUERY and SCIENCE_QUERY are KEYWORD search "
+        "mechanism. OBJECTIVE is a concise phrase naming the outcome the "
+        "USER wants — what to maximize, minimize, or achieve (e.g. for a "
+        "solar-panel problem: 'maximize photovoltaic conversion "
+        "efficiency'); when the text names one explicitly it must be "
+        "captured VERBATIM in substance — the engine optimizes THIS, not "
+        "whatever adjacent application retrieval later surfaces. "
+        "FAILURE_QUERY and SCIENCE_QUERY are KEYWORD search "
         "strings: 3-8 content nouns each, NO question words (how/why/what), "
         "NO punctuation — e.g. 'lithium battery thermal runaway', not 'Why "
         "do lithium batteries fail?'. CONSTRAINT states the engineering "
@@ -297,6 +303,14 @@ def build_problem(text: str, on_event=None) -> Dict[str, Any]:
         domain = "general"
     device = extraction.get("device") or text[:80]
     failure_mode = extraction.get("failure_mode") or "unspecified failure mode"
+    # R419 section 19: the user's stated objective — the engine optimizes
+    # THIS, never whatever adjacent application retrieval later surfaces
+    # (BS-023: the solar run drifted to heating/cooking while the user
+    # asked for maximal PV efficiency). MODEL_DERIVED, honest fallback
+    # when the text names no explicit objective.
+    objective = (extraction.get("objective") or "").strip() or (
+        "solve the stated problem within its constraint "
+        f"({failure_mode})")
     constraint = (extraction.get("constraint")
                   or "Solution must address the documented failure mode "
                      "without introducing a larger one.")
@@ -407,6 +421,7 @@ def build_problem(text: str, on_event=None) -> Dict[str, Any]:
         "problem_id": problem_id,
         "device": device,
         "failure_mode": failure_mode,
+        "objective": objective,
         "failure": failure,
         "constraint": constraint,
         "sources": {r["source"]: r["status"] for r in results},

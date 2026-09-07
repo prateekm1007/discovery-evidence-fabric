@@ -552,6 +552,12 @@ export interface CIO {
     bridge_outcome?: string | null;
     bridge_why?: string | null;
     authority?: string;
+    // R419 section 12: the named components from the bridge report —
+    // the inspection panel renders these; click = viewer highlight
+    components?: (
+      | string
+      | { name?: string; role?: string; type?: string }
+    )[];
   };
   simulation?: {
     executed?: boolean;
@@ -559,6 +565,26 @@ export interface CIO {
     baseline_outcome?: string | null;
     epistemic_class?: string | null;
     assumption?: string;
+  };
+  // R419: the render gallery contract — pointers the UI renders ONLY
+  // from the CIO (the frontend never invents render availability).
+  visualization?: {
+    renders?: {
+      status?: string;
+      pipeline?: string;
+      pinned_blender?: string;
+      is_conceptual?: boolean;
+      hero_png?: string | null;
+      hero_glb?: string | null;
+      section_png?: string | null;
+      section_glb?: string | null;
+      exploded_png?: string | null;
+      exploded_glb?: string | null;
+      missing?: string[];
+      presentation_rule?: string;
+      note?: string;
+    };
+    viewer_required?: string[];
   };
   reality_loop?: { state?: string };
   downloads?: {
@@ -572,4 +598,12 @@ export interface CIO {
   experiment?: { decisive_experiment?: unknown; status?: string };
   language_guard?: { clean?: boolean; violations?: string[] };
   note?: string;
+}
+
+// R419 section 11: the 8-section technical essay (the package PDF's
+// narrative, served as structured JSON from the same canonical state).
+export interface EssayBody {
+  section_order: string[];
+  sections: Record<string, string>;
+  structure?: string;
 }

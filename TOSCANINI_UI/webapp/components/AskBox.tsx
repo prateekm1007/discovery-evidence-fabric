@@ -18,9 +18,6 @@ function AnswerView({ a }: { a: AskResponse }) {
         {a.answer}
         <div className="qa-meta faint">
           AI_INTERPRETATION · {a.basis}
-          {a.transport?.provider
-            ? ` · ${a.transport.provider}${a.transport.model ? ` (${a.transport.model})` : ""}`
-            : ""}
         </div>
       </div>
     );

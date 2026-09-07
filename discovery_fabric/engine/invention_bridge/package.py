@@ -262,6 +262,45 @@ def assemble(
             with open(os.path.join(model_dir, "GEOMETRY_VALIDATION_REPORT.json"), "w") as f:
                 json.dump(validation, f, indent=2)
 
+    # ---- render artifacts (R419 sections 5-6: every invention gets
+    # hero/section/exploded PNG + GLB when the pinned Blender build ran) ----
+    # Copied from the run's MODEL/3D/ directory (the render stage's
+    # output) into the package — the website and the download ZIP carry
+    # the SAME canonical files (operator section 17: one canonical
+    # object, no divergence). Presentation artifacts, honestly labeled:
+    # the render record + conceptual disclaimers ride along.
+    renders = geometry_out.get("renders") or {}
+    render_dir = os.path.join(model_dir, "3D")
+    render_artifacts: list = []
+    if renders.get("status") in ("OK", "RENDER_PARTIAL"):
+        src_dir = renders.get("out_dir") or ""
+        if src_dir and os.path.isdir(src_dir):
+            os.makedirs(render_dir, exist_ok=True)
+            for name in ("hero.png", "hero.glb", "section.png", "section.glb",
+                         "exploded.png", "exploded.glb", "render_record.json"):
+                src = os.path.join(src_dir, name)
+                if os.path.isfile(src) and os.path.getsize(src) > 0:
+                    with open(src, "rb") as s, \
+                            open(os.path.join(render_dir, name), "wb") as d:
+                        d.write(s.read())
+                    render_artifacts.append(f"MODEL/3D/{name}")
+            # every copied artifact carries its presentation boundary
+            presentation_note = {
+                "artifact": "RENDER_ARTIFACT_DISCLOSURE",
+                "rule": ("hero/section/exploded are PRESENTATION renders "
+                         "(Blender 5.2 LTS headless). The authoritative "
+                         "geometry is the CadQuery/OCCT GLB; section.glb/"
+                         "exploded.glb are disclosed presentation variants "
+                         "(cut / exploded offsets), never engineering "
+                         "geometry (operator R419 section 7)"),
+                "source_glb_sha256": renders.get("source_glb_sha256"),
+                "pinned_blender": renders.get("pinned_blender"),
+            }
+            with open(os.path.join(render_dir,
+                                   "RENDER_DISCLOSURE.json"), "w") as f:
+                json.dump(presentation_note, f, indent=2)
+            render_artifacts.append("MODEL/3D/RENDER_DISCLOSURE.json")
+
     # ---- top-level files -----------------------------------------------------
     with open(os.path.join(out_dir, "02_ENGINEERING_DEFINITION.json"), "w") as f:
         json.dump(engineering_definition, f, indent=2)
@@ -283,6 +322,10 @@ def assemble(
         "final_envelope_hash": fs.get("final_envelope_hash"),
         "invention_spec_hash": (run_result.get("invention_specification") or {}).get("_spec_hash"),
         "glb_sha256": geometry_out.get("glb_sha256"),
+        "render_pipeline": (geometry_out.get("renders") or {}).get("render_pipeline"),
+        "render_status": (geometry_out.get("renders") or {}).get("status"),
+        "render_pinned_blender": (geometry_out.get("renders") or {}).get("pinned_blender"),
+        "render_source_glb_sha256": (geometry_out.get("renders") or {}).get("source_glb_sha256"),
         "essay_from": "one canonical source: run state + CIO",
         "package_maturity": package_maturity,
         "counsel_boundary": ep.COUNSEL_LANGUAGE,
@@ -338,6 +381,8 @@ def assemble(
         "visualizability_class": vis_class,
         "essay": essay,
         "glb_sha256": geometry_out.get("glb_sha256"),
+        "render_artifacts": render_artifacts,
+        "render_status": renders.get("status"),
         "zip_sha256": _sha256_file(zip_path),
         "zip_bytes": os.path.getsize(zip_path),
         "invention_label": invention_label,

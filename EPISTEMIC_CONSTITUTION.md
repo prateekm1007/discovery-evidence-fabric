@@ -1,6 +1,6 @@
 # Epistemic Constitution — Research & Coding
 
-**Version:** 2.1.0
+**Version:** 2.2.0
 **Ratified:** 2026-08-19
 **Amended:** 2026-08-20 (Articles XXIII–XXXIV — Anti-Gaming, Anti-Entropy, Anti-Hallucination Principles; Article XXXV — Closed-Loop Epistemic Control as the Completion Standard)
 **Amended:** 2026-08-25 (Article XXXVI — TECHNOLOGY_TRANSFER_READY as the Manufactured-Asset Completion Standard; see R309/constitution/ARTICLE_XXXVI_TECHNOLOGY_TRANSFER_READY.md)
@@ -9,6 +9,7 @@
 **Amended:** 2026-09-01 (Article XXXIX — The Buyer-Distribution Repository Is the Final Authority; enforced by `scripts/r386_release_chain.py` + `ENGINE_RELEASE_REGISTRY.json` + `CANONICAL_RELEASE_MANIFEST.json`)
 **Amended:** 2026-09-04 (THE DISCOVERY IMPERATIVE + Articles XL–LXIII — the Discovery & Invention Constitution, per the CEO R402 directive after the R401-WC external audit: the Constitution's center of gravity moves from "do not lie about knowledge" to "do not mistake plausible generation for knowledge creation"; see `CODER_DIRECTIVE_R402.md`)
 **Amended:** 2026-09-05 (Articles LXIV–LXIX — per external audit findings across six rounds of live review: superseded implementations left coexisting for months, an owner-gated decision left idle for four rounds without escalation, commercial figures drifting toward unsourced assertion in buyer dossiers, every review to date being AI-on-AI with no tracked independence field, and the standing risk — surfaced ahead of the R411 autonomous cross-domain discovery mission — that a fixed portfolio quota could pressure the bar down on a final candidate, or that broad discovery could quietly collapse back into the domain the system already knows best. These six articles are audit-derived, not aspirational: each responds to a specific, verified, repeated failure mode, not a hypothetical one.)
+**Amended:** 2026-09-07 (Article LXX — the Operational Language Rule (English Only), per the operator's CODER NEXT DIRECTIVE section 1; see `R419/constitution/ARTICLE_LXX_OPERATIONAL_LANGUAGE_RULE.md`)
 **Authority:** Constitutional — supersedes all coding directives, gate results, and research priorities
 **Scope:** Governs both research output AND modifications to the epistemic machinery itself, AND — from v2.0.0 — what the machine may call a discovery or an invention
 
@@ -1960,6 +1961,46 @@ This makes explicit what Article LVII already implies for mechanism-operator div
 > **A discovery campaign that returns candidates disproportionately concentrated in the domain the system already has the deepest existing infrastructure for has not demonstrated broad discovery — it has demonstrated efficient retrieval of what was already easy to find.**
 
 This extends Article XLIII (search-space neutral) from the query-construction stage to the portfolio-composition stage. Search-space neutrality prevents seeding a query with an unproven solution class before the evidence earns it; this article additionally requires that when a campaign is explicitly scoped across multiple domains, the resulting portfolio's domain distribution must be reported and checked against that scope — not silently accepted because five plausible-looking dossiers were produced. A campaign that was asked to explore twenty domains and returned five candidates from one adjacent, already-instrumented domain has under-delivered on the directive even if every individual dossier is individually rigorous. Domain concentration is not, by itself, proof of bias — some domains genuinely contain more discoverable opportunity than others — but the concentration must be an observed, reported result of the search, never an unexamined default.
+
+---
+
+## Article LXX — Operational Language Rule (English Only)
+
+**Ratified:** 2026-09-07 (Round R419)
+**Amends:** Constitution v2.1.0 → v2.2.0
+**Full text:** `R419/constitution/ARTICLE_LXX_OPERATIONAL_LANGUAGE_RULE.md`
+**Sponsor:** Operator directive (CODER NEXT DIRECTIVE, section 1)
+
+> **Operational Language Rule — English Only.** All project-authored code, comments, logs, tests, test names, error messages, worklogs, commit messages, reports, READMEs, governance additions, documentation, API-facing descriptive text, user-facing product copy, and generated technology-package prose shall be written in English unless the operator explicitly requests a translation for a separate user-facing purpose. This rule governs operational consistency and does not alter the epistemic authority of sources in other languages.
+
+### What the rule governs
+
+Every artifact the project AUTHORS: code and comments, tests and test names, logs and error messages, worklogs, commit messages, reports, READMEs, documentation, governance artifacts, API-facing descriptive text, user-facing product copy, and generated technology-package prose. Enforcement is honest-first with a test guard (`tests/test_r419_english_only.py`) scanning newly authored artifacts for non-Latin authorship script with an explicit allowlist for retrieved evidence spans, quoted operator text, and proper nouns.
+
+### What the rule does NOT touch
+
+1. **Retrieved evidence.** A source in any language is admissible exactly as it
+   was retrieved; Article II (exact evidence beats semantic plausibility)
+   forbids mutating the evidentiary span, including by translation. The
+   epistemic authority of non-English sources is UNCHANGED by this article.
+2. **User input.** Users may state problems in any language; the engine's
+   MODEL_DERIVED extraction handles it as it already does.
+3. **Quoted operator text.** Operator directives quoted verbatim in records
+   are sources, not project authorship.
+4. **Historical artifacts.** Pre-R419 artifacts in other languages are
+   historical records (Art. XI) — superseded going forward, never
+   retroactively rewritten (a history rewrite is an epistemic event).
+
+### Constitutional basis
+
+Extends Article X (one canonical authority — one operational language prevents
+semantic drift between two parallel wordings of the same rule) and Article
+XXIV (never let a summary outrank the underlying artifact — mixed-language
+artifacts create translation ambiguity no single reader can resolve).
+
+See the full text at `R419/constitution/ARTICLE_LXX_OPERATIONAL_LANGUAGE_RULE.md`
+for the scope table, enforcement mechanics, and the verification trail
+(old/new hashes, amendment process, certification chain).
 
 ---
 

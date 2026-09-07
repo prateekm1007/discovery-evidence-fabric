@@ -260,6 +260,17 @@ def build_essay(run_result: Dict[str, Any], cio: Optional[Dict[str, Any]] = None
         f"and, after {max(2, len(gens))} architecture generations of challenge-and-evolution, "
         f"its current invention is generation {current['generation']}. "
     )
+    # R419 section 19: the user's stated objective rides in the essay's
+    # FIRST section — objective fidelity is visible on every package
+    # (BS-023: the solar drift is exactly what this surfaces).
+    objective = None
+    _problem = run_result.get("problem")
+    if not isinstance(_problem, dict):
+        _problem = (run_result.get("run_state") or {}).get("problem")
+    if isinstance(_problem, dict):
+        objective = _problem.get("objective")
+    if objective:
+        invented += f"The user's stated objective is \u201c{_sentence_case(objective)}\u201d; the invention is held to that objective. "
     if current["intervention"]:
         invented += f"The intervention is {_sentence_case(current['intervention'])}. "
     if current["mechanism"]:

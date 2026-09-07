@@ -38,6 +38,59 @@ function FittedModel({ url }: { url: string }) {
   return <primitive object={cloned} />;
 }
 
+// R419 section 12: component highlighting — when the user picks a
+// component (from the artifact pane or the essay), the named node
+// stays full-opacity and every other mesh dims. Pure presentation:
+// nothing about the geometry changes (the authority stays the GLB).
+function ComponentHighlight({
+  url,
+  highlight,
+}: {
+  url: string;
+  highlight: string | null;
+}) {
+  const { scene } = useGLTF(url);
+  useEffect(() => {
+    scene.traverse((obj) => {
+      const mesh = obj as unknown as {
+        material?: unknown;
+        name?: string;
+      };
+      if (!mesh || !mesh.material) return;
+      const mats = Array.isArray(mesh.material)
+        ? (mesh.material as unknown[])
+        : [mesh.material];
+      const name = (mesh.name ?? "").toLowerCase();
+      const hit =
+        highlight != null &&
+        (name.includes(highlight.toLowerCase()) ||
+         highlight.toLowerCase().includes(name));
+      mats.forEach((m) => {
+        const mat = m as {
+          opacity?: number;
+          transparent?: boolean;
+          emissiveIntensity?: number;
+        };
+        if (!mat) return;
+        if (highlight == null) {
+          mat.opacity = 1;
+          mat.transparent = false;
+          mat.emissiveIntensity = 0;
+        } else if (hit) {
+          mat.opacity = 1;
+          mat.transparent = false;
+          mat.emissiveIntensity = 0.35;
+        } else {
+          mat.opacity = 0.12;
+          mat.transparent = true;
+          mat.emissiveIntensity = 0;
+        }
+      });
+    });
+  }, [scene, highlight]);
+  return null;
+}
+
 function WireToggle({
   url,
   wire,
@@ -81,6 +134,7 @@ export default function ModelViewer({
   note,
   height = 460,
   compact = false,
+  highlight = null,
 }: {
   url: string;
   label: string;
@@ -88,6 +142,7 @@ export default function ModelViewer({
   note?: string;
   height?: number;
   compact?: boolean;
+  highlight?: string | null;
 }) {
   const [wire, setWire] = useState(false);
   const [clip, setClip] = useState(false);
@@ -127,6 +182,7 @@ export default function ModelViewer({
               <FittedModel url={url} />
             </Center>
             <WireToggle url={url} wire={wire} clip={clip} />
+            <ComponentHighlight url={url} highlight={highlight} />
           </Suspense>
           <OrbitControls
             makeDefault
@@ -136,7 +192,6 @@ export default function ModelViewer({
             minDistance={2}
             maxDistance={40}
           />
-          <gridHelper args={[24, 24, "#3a3835", "#26241f"]} />
         </Canvas>
         <div className="canvas-hud">
           <button type="button" onClick={resetView} title="reset view">

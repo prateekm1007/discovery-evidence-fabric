@@ -125,9 +125,9 @@ export function EngineeringArgument({
   const challenges = (attackStage?.challenges ?? []).slice(0, 3);
 
   const decision = usv?.found_something
-    ? "KEEP — a candidate survived the adversarial chain"
+    ? "KEEP — the invention survived the adversarial chain"
     : usv?.rejected
-      ? "KILL — the candidate was not defensible enough to package; recorded to the mechanism cemetery"
+      ? "KILL — the architecture was not defensible enough to develop further; recorded to the mechanism cemetery"
       : str(fs.final_status, 200) || "outcome not established";
 
   const Step = ({

@@ -30,11 +30,33 @@ FROM python:3.12-slim
 # libGL/libGLU/X11: cadquery/OCP native geometry (the interactive 3D
 # rebuild path) — python:3.12-slim lacks them; discovered by the R392
 # live failure matrix (BUILD_ERROR libGL.so.1 on /api/showcase/*/evaluate)
+# libXi/libXfixes/libICE/libSM: Blender headless links (R419 fixed 3D
+# stack — the render stage's subprocess)
 RUN apt-get update \
  && apt-get install -y --no-install-recommends \
-      git ca-certificates \
+      git ca-certificates curl xz-utils \
       libgl1 libglu1-mesa libxext6 libx11-6 libxrender1 \
+      libxi6 libxfixes6 libsm6 libice6 \
  && rm -rf /var/lib/apt/lists/*
+
+# ---------- R419: the pinned Blender build (fixed 3D stack) ----------
+# Operator directive: Blender 5.2 LTS is the pinned render authority.
+# The tarball sha256 is VERIFIED at build time — a changed upstream
+# artifact FAILS the build (fail-closed pin, same discipline as the
+# engine commit). /opt/blender is the canonical install location the
+# render stage resolves (render.find_blender()).
+ARG BLENDER_VERSION=5.2.1
+ARG BLENDER_TARBALL_SHA256=a31f524fa99a527d3d52b7f5aaa68c34e1a19d5a1c9473f79c5cc610fd5b10e9
+RUN set -eux; \
+    curl -fsSL -o /tmp/blender.tar.xz \
+      "https://download.blender.org/release/Blender${BLENDER_VERSION%.*}/blender-${BLENDER_VERSION}-linux-x64.tar.xz"; \
+    echo "${BLENDER_TARBALL_SHA256}  /tmp/blender.tar.xz" | sha256sum -c -; \
+    mkdir -p /opt; \
+    tar -xJf /tmp/blender.tar.xz -C /opt; \
+    mv "/opt/blender-${BLENDER_VERSION}-linux-x64" /opt/blender; \
+    rm /tmp/blender.tar.xz; \
+    /opt/blender/blender --version | head -n1
+ENV BLENDER_PATH=/opt/blender/blender
 
 WORKDIR /app
 

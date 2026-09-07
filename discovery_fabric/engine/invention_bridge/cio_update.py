@@ -100,7 +100,9 @@ def update_cio(cio: Dict[str, Any], geometry_out: Dict[str, Any],
     updated["maturity"] = maturity
 
     # --- visualization section (viewer hints, frontend renders only these) -------
-    updated["visualization"] = {
+    renders = geometry_out.get("renders") or {}
+    render_status = renders.get("status")
+    visualization = {
         "viewer_required": ["orbit", "zoom", "pan", "reset", "wireframe", "clip"],
         "component_inspection": [
             {"from": "component name", "explain": ["function", "mechanism",
@@ -109,6 +111,40 @@ def update_cio(cio: Dict[str, Any], geometry_out: Dict[str, Any],
         "generation_models": geometry_out.get("generation_models") or [],
         "disclaimer": ep.conceptual_disclaimer(vis_class) if not is_engineering else None,
     }
+    # R419 sections 5-6/16-17: the six presentation artifacts (hero/
+    # section/exploded PNG+GLB) when the pinned Blender build ran. The
+    # frontend gallery and the ZIP carry the SAME files — the CIO points
+    # at them; it never fabricates one (absent = honestly absent).
+    if render_status in ("OK", "RENDER_PARTIAL"):
+        artifacts = renders.get("artifacts") or {}
+        visualization["renders"] = {
+            "status": render_status,
+            "pipeline": renders.get("render_pipeline"),
+            "pinned_blender": renders.get("pinned_blender"),
+            "is_conceptual": renders.get("is_conceptual", not is_engineering),
+            "hero_png": "/renders/hero.png" if "hero.png" in artifacts else None,
+            "hero_glb": "/renders/hero.glb" if "hero.glb" in artifacts else None,
+            "section_png": "/renders/section.png" if "section.png" in artifacts else None,
+            "section_glb": "/renders/section.glb" if "section.glb" in artifacts else None,
+            "exploded_png": "/renders/exploded.png" if "exploded.png" in artifacts else None,
+            "exploded_glb": "/renders/exploded.glb" if "exploded.glb" in artifacts else None,
+            "missing": renders.get("missing_artifacts") or [],
+            "presentation_rule": (
+                "presentation renders — the authoritative geometry is the "
+                "CadQuery/OCCT GLB; section/exploded are disclosed variants"),
+        }
+    elif render_status:
+        # typed honest absence (no Blender / timeout / failure) — the
+        # interactive GLB contract is unaffected
+        visualization["renders"] = {
+            "status": render_status,
+            "note": renders.get("note"),
+            "presentation_rule": (
+                "presentation renders unavailable on this run — the "
+                "interactive 3D artifact is served from the authoritative "
+                "geometry regardless"),
+        }
+    updated["visualization"] = visualization
 
     # --- provenance extension ------------------------------------------------------
     provenance = dict(updated.get("provenance") or {})

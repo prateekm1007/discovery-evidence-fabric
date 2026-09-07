@@ -23,7 +23,7 @@ export const NARRATIVE_GROUPS: { heading: string; stages: string[] }[] = [
     heading: "Inventing architecture 1",
     stages: ["SYNTHESIZE", "MULTI_SOURCE_DISCOVERY", "COLLISION"],
   },
-  { heading: "Building the candidate", stages: ["VERIFY", "PHYSICS"] },
+  { heading: "Developing the invention", stages: ["VERIFY", "PHYSICS"] },
   { heading: "Challenging architecture 1", stages: ["ATTACK", "CONTRADICTION"] },
   { heading: "Improving it", stages: ["ADJUDICATION"] },
   { heading: "Designing the experiment", stages: ["KILLER_EXPERIMENT"] },
@@ -54,11 +54,11 @@ export const STAGE_SENTENCE: Record<string, (s: StageDigest) => string> = {
     const verdict = s.lifecycle_verdict ?? s.baseline_outcome;
     return verdict
       ? `Physics gate: ${String(verdict).replace(/_/g, " ").toLowerCase()} against the un-invented baseline.`
-      : "Solving the candidate's physics against its baseline — plausibility bounds, failure modes, and the baseline comparison.";
+      : "Solving the invention's physics against its baseline — plausibility bounds, failure modes, and the baseline comparison.";
   },
   MULTI_SOURCE_DISCOVERY: (s) =>
     s.prior_art_count != null
-      ? `Scanned ${s.prior_art_count} prior-art candidates across independent sources.`
+      ? `Scanned ${s.prior_art_count} prior-art references across independent sources.`
       : "Scanning prior art across independent sources…",
   COLLISION: (s) =>
     (s.collisions ?? []).length > 0
@@ -69,7 +69,7 @@ export const STAGE_SENTENCE: Record<string, (s: StageDigest) => string> = {
   ATTACK: (s) =>
     s.overall
       ? `Challenging architecture 1 — adversarial gate: ${s.overall}.`
-      : `${(s.challenges ?? []).length} adversarial attacks run against the candidate.`,
+      : `${(s.challenges ?? []).length} adversarial challenges run against this architecture.`,
   CONTRADICTION: (s) =>
     s.count != null
       ? `${s.count} contradictions found and resolved against the evidence.`
@@ -79,12 +79,12 @@ export const STAGE_SENTENCE: Record<string, (s: StageDigest) => string> = {
     const name = String(ke?.name ?? ke?.description ?? "");
     return name
       ? `Decisive experiment designed: ${name}.`
-      : "Designing the experiment that could kill the candidate…";
+      : "Designing the experiment that could kill this invention…";
   },
   ADJUDICATION: (s) =>
     s.verdict
       ? `Adjudicated: ${s.verdict}.`
-      : (s.reason ?? "Adjudicating the surviving candidate…"),
+      : (s.reason ?? "Adjudicating the surviving architecture…"),
   CLASSIFY: (s) => {
     const es = s.epistemic_state as Record<string, unknown> | undefined;
     const state = String(es?.epistemic_state ?? es?.final_status ?? "");
@@ -328,13 +328,13 @@ export function OutcomeBanner({
       {isBlocked && (
         <div className="outcome-detail faint">
           {runState?.failure_state?.error ?
-            "retry from the run page — every provider failure was recorded with its provider, model, and failure class" : "retry from the run page — the failure is recorded in the run's own artifacts"}{" "}
+            "retry from the run page — every transport failure was recorded with its full route detail" : "retry from the run page — the failure is recorded in the run's own artifacts"}{" "}
           (Art. LXI: infrastructure failure is never a scientific rejection)
         </div>
       )}
       {outcome === "INVENTION_REQUIRES_EXPERIMENT" && (
         <div className="outcome-detail faint">
-          the candidate is strong enough conceptually; the decisive
+          the invention is strong enough conceptually; the decisive
           physical experiment is specified but not executed — that is
           the recorded reason no package was reached
         </div>

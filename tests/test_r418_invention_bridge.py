@@ -236,7 +236,8 @@ class TestBridgeEndToEnd(unittest.TestCase):
         cls.result = run_bridge(
             _solar_run(), _solar_cio(), cls.work,
             glb_endpoint="/api/run/x/model",
-            package_endpoint="/api/run/x/package")
+            package_endpoint="/api/run/x/package",
+            build_renders=False)
 
     def test_all_steps_ok(self):
         steps = {s["step"]: s["status"] for s in self.result["report"]["steps"]}
@@ -320,7 +321,8 @@ class TestBridgeEngineeringPath(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.work = tempfile.mkdtemp(prefix="bridge_eng_")
-        cls.result = run_bridge(_engineering_run(), None, cls.work)
+        cls.result = run_bridge(_engineering_run(), None, cls.work,
+                                build_renders=False)
 
     def test_engineering_class(self):
         self.assertEqual(self.result["report"]["visualizability_class"],
@@ -363,7 +365,7 @@ class TestBridgeFailureRecovery(unittest.TestCase):
              "envelope": [80, 120], "value_class": "MODELLED"},
         ]
         work = tempfile.mkdtemp(prefix="bridge_fail_")
-        result = run_bridge(run, None, work)
+        result = run_bridge(run, None, work, build_renders=False)
         # never silent: completed-as-conceptual with recorded demotion
         self.assertEqual(result["report"]["outcome"], "COMPLETED")
         self.assertEqual(result["report"]["visualizability_class"],

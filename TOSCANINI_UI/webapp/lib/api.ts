@@ -11,6 +11,7 @@
 import type {
   AskResponse,
   CIO,
+  EssayBody,
   EvalResult,
   HealthSummary,
   RealityLoopRecord,
@@ -148,4 +149,18 @@ export async function getRunState(id: string): Promise<RunStateObject> {
 // the browser renders for a run's invention surface.
 export async function getCIO(id: string): Promise<CIO> {
   return json<CIO>(await fetch(`/api/run/${id}/cio`, { cache: "no-store" }));
+}
+
+// R419 section 11: the technical essay — the same 8 sections the
+// package PDF renders, as structured JSON from the canonical state.
+export async function getEssay(
+  id: string
+): Promise<EssayBody | null> {
+  try {
+    return json<EssayBody>(
+      await fetch(`/api/run/${id}/essay`, { cache: "no-store" })
+    );
+  } catch {
+    return null; // honest absence — the argument panel still renders
+  }
 }

@@ -25,6 +25,7 @@ from typing import Any, Dict, List, Optional, Tuple
 import cadquery as cq
 import trimesh
 
+from .coloring import apply_gltf_yup, set_uniform_color
 from .epistemics import VALUE_CLASS_MODELLED, VALUE_CLASS_SOURCE_FACT
 
 MM_UNITS = {"mm", "millimeter", "millimetre", "mm."}
@@ -262,14 +263,20 @@ def export(solid: cq.Workplane, name: str, out_dir: str,
                 vertices=[(v.x, v.y, v.z) for v in verts],
                 faces=[list(t) for t in tris], process=False)
             color = (component_colors or {}).get(cname, (168, 98, 66, 255))
-            mesh.visual.face_colors = color
+            # R419: vertex colors — the face-color path requires scipy at use
+            # time (production defect "No module named 'scipy'"); see
+            # coloring.py for the measured matrix.
+            set_uniform_color(mesh, color)
+            # R419: canonical glTF Y-up orientation (see coloring.py).
+            apply_gltf_yup(mesh)
             scene.add_geometry(mesh, node_name=cname, geom_name=cname)
     else:
         verts, tris = solid.val().tessellate(0.05)
         mesh = trimesh.Trimesh(
             vertices=[(v.x, v.y, v.z) for v in verts],
             faces=[list(t) for t in tris], process=False)
-        mesh.visual.face_colors = (168, 98, 66, 255)
+        set_uniform_color(mesh, (168, 98, 66, 255))
+        apply_gltf_yup(mesh)
         scene.add_geometry(mesh, node_name=name, geom_name=name)
 
     glb_path = os.path.join(out_dir, f"{name}.glb")

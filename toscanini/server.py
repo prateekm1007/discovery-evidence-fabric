@@ -604,6 +604,54 @@ class Handler(BaseHTTPRequestHandler):
                 if self._access(rid) == "DENY":
                     return self._denied()
                 return self._package(rid)
+            # R419 section 11: the technical essay as structured JSON —
+            # the SAME 8 sections the package PDF renders, built from
+            # the SAME canonical state (run record + CIO), deterministic
+            # per request; raw JSON never leaks into the prose (the
+            # essay builder's own section-27 guard raises on violation).
+            if len(parts) == 4 and parts[3] == "essay":
+                if self._access(rid) == "DENY":
+                    return self._denied()
+                s = store.get_session(rid)
+                if not s:
+                    return self._json(404, {"error": "not found"})
+                detail = store.session_detail(rid) or {}
+                cio_obj = None
+                try:
+                    from toscanini import cio as _cio
+                    cio_obj = _cio.build_cio(s)
+                except Exception:  # noqa: BLE001 — essay stands alone
+                    cio_obj = None
+                try:
+                    from discovery_fabric.engine.invention_bridge import (
+                        essay as _essay,)
+                    body = _essay.build_essay(detail, cio_obj)
+                except Exception as exc:  # noqa: BLE001 — typed, honest
+                    return self._json(404, {
+                        "error": "essay unavailable for this run",
+                        "note": f"{type(exc).__name__}: {exc}"[:300]})
+                return self._json(200, body)
+            # R419 sections 5-6: the six presentation artifacts from
+            # MODEL/3D/ — hero/section/exploded PNG (gallery) + GLB
+            # (presentation variants). Same canonical files the
+            # technology package carries (section 17: one object).
+            # Name whitelist; 404 honest when the render stage did not
+            # or could not run (its typed record is in BRIDGE_REPORT).
+            if len(parts) == 5 and parts[3] == "render":
+                if self._access(rid) == "DENY":
+                    return self._denied()
+                s = store.get_session(rid)
+                if not s or not s.get("run_dir"):
+                    return self._json(404, {"error": "not found"})
+                name = Path(parts[4]).name
+                if name not in (
+                        "hero.png", "hero.glb", "section.png", "section.glb",
+                        "exploded.png", "exploded.glb"):
+                    return self._json(404, {"error": "unknown render name"})
+                f = Path(s["run_dir"]) / "MODEL" / "3D" / name
+                mime = "image/png" if name.endswith(".png") \
+                    else "model/gltf-binary"
+                return self._serve_file(f, mime)
 
         if len(parts) >= 3 and parts[0] == "api" and parts[1] == "showcase":
             slot = parts[2]
@@ -829,6 +877,32 @@ class Handler(BaseHTTPRequestHandler):
             self._spawn_worker(sid)
             from toscanini.user_state import public_session_view
             return self._json(200, public_session_view(result))
+
+        # R419 section 21: async artifact build — POST
+        # /api/run/{id}/artifact-build (aliases /api/sessions/{id}/
+        # artifact-build). 202 + a detached render job; the WEB REQUEST
+        # NEVER WAITS FOR BLENDER. The job is idempotent (renders that
+        # already exist are not re-run) and its typed record is written
+        # to MODEL/3D/RENDER_JOB.json (poll via the render routes).
+        if len(parts) == 4 and parts[3] == "artifact-build" \
+                and parts[0] == "api" and parts[1] in ("run", "sessions"):
+            sid = parts[2]
+            if self._access(sid) == "DENY":
+                return self._denied()
+            s = store.get_session(sid)
+            if not s:
+                return self._json(404, {"error": "session not found"})
+            if not s.get("run_dir") or not Path(s["run_dir"]).exists():
+                return self._json(409, {"error": "no run directory yet"})
+            from toscanini import artifact_worker
+            if not artifact_worker.renderables_present(s):
+                return self._json(409, {
+                    "error": "no authoritative GLB to render",
+                    "note": ("the artifact-build job renders the run's "
+                             "existing geometry; a run with no model "
+                             "needs the discovery path, not this job")})
+            job = artifact_worker.enqueue(sid)
+            return self._json(202, {"job": job, "session_id": sid})
 
         return self._json(404, {"error": "no such endpoint"})
 

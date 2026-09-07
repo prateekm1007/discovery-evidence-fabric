@@ -35,8 +35,9 @@ from typing import Any, Dict, List, Optional
 
 from . import epistemics as ep
 from . import classifier, conceptual_geometry, engineering_geometry, package, cio_update
+from . import render as render_stage
 
-BRIDGE_VERSION = "1.0.0"
+BRIDGE_VERSION = "1.1.0"
 MAX_GEOMETRY_ATTEMPTS = 3
 
 
@@ -54,10 +55,14 @@ def bridge(run_result: Dict[str, Any], cio: Optional[Dict[str, Any]],
            work_dir: str,
            glb_endpoint: Optional[str] = None,
            package_endpoint: Optional[str] = None,
-           build_generation_models: bool = True) -> Dict[str, Any]:
+           build_generation_models: bool = True,
+           build_renders: bool = True) -> Dict[str, Any]:
     """Run the full invention-to-3D-to-package path for one completed run.
 
     Returns {visualizability, geometry_out, package_out, cio_updated, report}.
+
+    build_renders=False skips the Blender stage (used by hermetic tests and
+    by paths that only need the interactive GLB contract).
     """
     steps: List[Dict[str, Any]] = []
     cio = cio or {}
@@ -202,6 +207,34 @@ def bridge(run_result: Dict[str, Any], cio: Optional[Dict[str, Any]],
         except Exception as exc:  # noqa: BLE001
             _pipeline_step(steps, "GENERATION_MODELS", "SKIPPED",
                            {"reason": str(exc)})
+
+    # ------------------------------------------------- 2.5 render (R419 fixed 3D stack)
+    # Blender 5.2 LTS headless over the authoritative GLB: hero/section/
+    # exploded PNG renders + materialized presentation GLBs (operator
+    # directive R419 sections 5-6). Presentation ONLY — CadQuery/OCCT
+    # stays the engineering authority (section 7; render_record.json
+    # carries the topology comparison). A render failure is a TYPED
+    # record; the GLB contract is unaffected (Art. LXI).
+    render_record: Optional[Dict[str, Any]] = None
+    if build_renders:
+        try:
+            render_record = render_stage.render_invention(
+                work_dir, geometry_out,
+                is_conceptual=vis["visualizability_class"] != ep.ENGINEERING_3D)
+            geometry_out["renders"] = render_record
+            _pipeline_step(steps, "RENDER", render_record.get("status", "OK"), {
+                k: render_record.get(k) for k in
+                ("pinned_blender", "source_glb_sha256", "artifacts",
+                 "missing_artifacts", "seconds", "note")
+            })
+        except Exception as exc:  # noqa: BLE001 — typed, never silent
+            render_record = {
+                "stage": "RENDER", "status": "RENDER_FAILED",
+                "error": f"{type(exc).__name__}: {exc}",
+            }
+            geometry_out["renders"] = render_record
+            _pipeline_step(steps, "RENDER", "RENDER_FAILED",
+                           {"error": str(exc)})
 
     # ---------------------------------------------------------------- 3. package
     pkg_dir = os.path.join(work_dir, "TECHNOLOGY_PACKAGE")

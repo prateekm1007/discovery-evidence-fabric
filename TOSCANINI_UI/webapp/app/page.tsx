@@ -49,6 +49,7 @@ import AskBox from "@/components/AskBox";
 import RunArtifact from "@/components/RunArtifact";
 import InventionArtifact from "@/components/InventionArtifact";
 import InventionStory from "@/components/InventionStory";
+import InventionEssay from "@/components/InventionEssay";
 
 const EXAMPLES = [
   "Why do infusion pumps fail to detect downstream occlusion before patient harm?",
@@ -58,15 +59,13 @@ const EXAMPLES = [
 ];
 
 function TransportDot({ health }: { health: HealthSummary | null }) {
-  // R414 (directive §10): the CALM product surface — "Discovery ready"
-  // or "Discovery available · one provider degraded". The technical
-  // per-provider truth lives in the health payload; the UI reduces it
-  // and never exposes panic.
+  // R415 (directive §10) + R419 (§20): the CALM product surface —
+  // "Discovery ready" or "Discovery temporarily unavailable". Provider
+  // failover is INVISIBLE: the routing ladder switches models
+  // internally (MODEL A → B → C) and the user never sees provider
+  // names, degradation counts, or failover events; only a full
+  // transport exhaustion reaches the surface (and then honestly).
   const r = health?.readiness;
-  const providers = r?.providers ?? [];
-  const degraded = providers.filter(
-    (p) => p.available && p.status !== "OK" && p.status !== "NEVER_CALLED"
-  );
   const ready = r?.discovery_ready ?? health?.discovery_ready ??
     health?.llm_transport_ready === true;
   return (
@@ -74,35 +73,25 @@ function TransportDot({ health }: { health: HealthSummary | null }) {
       className={`transport-dot ${ready ? "ok" : "down"}`}
       title={
         ready
-          ? degraded.length > 0
-            ? `discovery available · ${degraded.length} provider degraded (${degraded
-                .map((d) => d.provider)
-                .join(", ")}) — failover active, runs continue`
-            : "discovery ready — engine live, LLM transport verified by a real probe"
-          : "LLM transport not responding right now — runs will say so honestly"
+          ? "discovery ready — engine live, transport verified by a real probe"
+          : "discovery temporarily unavailable — runs will say so honestly"
       }
     />
   );
 }
 
 function EngineStatusText({ health }: { health: HealthSummary | null }) {
-  // R415 (P0 directive §12): the status wording is GENERATED from
-  // /api/health — "Discovery ready" / "Discovery ready · 1 provider
-  // degraded" / "Showcase ready · Discovery temporarily unavailable".
-  // "engine starting…" is BANNED as a persistent state: while health is
-  // still loading (a transient client-side fact, at most one poll
-  // cycle), the chip is quiet rather than fake.
+  // R419 (§20): status wording GENERATED from /api/health —
+  // "Discovery ready" / "Showcase ready · Discovery temporarily
+  // unavailable". Per-provider degradation never reaches this text
+  // (failover is internal); the technical per-provider truth stays in
+  // the health payload for audits, not for the product surface.
+  // "engine starting…" is BANNED as a persistent state.
   const r = health?.readiness;
-  const providers = r?.providers ?? [];
-  const degraded = providers.filter(
-    (p) => p.available && p.status !== "OK" && p.status !== "NEVER_CALLED"
-  );
   const ready = r?.discovery_ready ?? health?.discovery_ready ??
     health?.llm_transport_ready === true;
   if (ready) {
-    return degraded.length > 0
-      ? `Discovery ready · ${degraded.length === 1 ? "1 provider" : `${degraded.length} providers`} degraded`
-      : "Discovery ready";
+    return "Discovery ready";
   }
   if (health === null) {
     return ""; // first poll in flight — never a fake persistent state
@@ -259,6 +248,9 @@ function RunConversation({ detail }: { detail: SessionDetail }) {
                 </div>
                 <EngineeringArgument detail={detail} />
               </div>
+              {/* R419 section 11: the engineer's 8-section narrative —
+                  "What Toscanini invented", from the canonical state */}
+              <InventionEssay sessionId={detail.session_id} />
               <NoveltyAndCemetery detail={detail} />
             </>
           )}

@@ -21,6 +21,8 @@ from typing import Any, Dict, List, Optional, Tuple
 import cadquery as cq
 import trimesh
 
+from .coloring import apply_gltf_yup, set_uniform_color
+
 # Palette: warm/terracotta editorial direction (matches the product chrome)
 PALETTE = {
     "substrate": (168, 98, 66, 255),      # terracotta
@@ -53,9 +55,15 @@ def _tessellate(shape: cq.Workplane) -> Dict[str, Any]:
 
 
 def _add(scene: trimesh.Scene, shape: cq.Workplane, node: str, color) -> None:
-    scene.add_geometry(trimesh.Trimesh(**_tessellate(shape)),
-                       node_name=node, geom_name=node)
-    scene.geometry[node].visual.face_colors = color
+    mesh = trimesh.Trimesh(**_tessellate(shape))
+    # R419: vertex colors, not face_colors — trimesh's face-color path
+    # uses scipy.grouping at use time and died on the production image
+    # ("No module named 'scipy'"); see coloring.py for the measured matrix.
+    set_uniform_color(mesh, color)
+    # R419: canonical glTF Y-up orientation (was: raw Z-up exported as a
+    # wall in every glTF consumer — see coloring.py).
+    apply_gltf_yup(mesh)
+    scene.add_geometry(mesh, node_name=node, geom_name=node)
 
 
 def _type_for(name: str) -> str:

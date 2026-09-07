@@ -239,6 +239,47 @@ def build_cio(session: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         geometry_class = None
     geometry_is_conceptual = geometry_class in (
         "SYSTEM_3D", "CONCEPTUAL_3D", "PROCESS_3D")
+
+    # R419 (sections 5-6/16-17): the presentation render artifacts —
+    # derived from the MODEL/3D/ directory itself (the files are the
+    # authority, Art. X; render_record.json carries the provenance).
+    # The frontend gallery and the ZIP carry the SAME files.
+    render_dir = model_dir / "3D" if model_dir.exists() else None
+    render_record = _read_json(render_dir / "render_record.json") \
+        if render_dir and (render_dir / "render_record.json").exists() \
+        else None
+    renders: Dict[str, Any] = {}
+    if render_dir and render_dir.exists():
+        sid = session.get("session_id")
+        present = {p.name for p in render_dir.iterdir()
+                   if p.is_file() and p.stat().st_size > 0}
+        names = ("hero.png", "hero.glb", "section.png", "section.glb",
+                 "exploded.png", "exploded.glb")
+        available = [n for n in names if n in present]
+        if available or render_record:
+            renders = {
+                "status": (render_record or {}).get("status",
+                                                    "OK" if available
+                                                    else "UNKNOWN"),
+                "pipeline": (render_record or {}).get("render_pipeline",
+                                                      "BLENDER_HEADLESS"),
+                "pinned_blender": (render_record or {}).get(
+                    "blender_version"),
+                "is_conceptual": geometry_is_conceptual,
+                "missing": [n for n in names if n not in present],
+                "presentation_rule": (
+                    "presentation renders — the authoritative geometry is "
+                    "the CadQuery/OCCT GLB; section/exploded are "
+                    "disclosed variants (Blender never alters the "
+                    "engineering truth)"),
+            }
+            for n in available:
+                key = n.replace(".", "_")
+                renders[key] = f"/api/run/{sid}/render/{n}"
+            if (render_record or {}).get("source_glb_sha256"):
+                renders["source_glb_sha256"] = \
+                    render_record["source_glb_sha256"]
+
     final = (session.get("final_status") or "").upper()
     survivor = final == "AUTOMATED_INVENTION_CANDIDATE" or bool(inv)
 
@@ -408,6 +449,14 @@ def build_cio(session: Dict[str, Any]) -> Optional[Dict[str, Any]]:
             "cad_pipeline_status": (cad_ledger or {}).get("status"),
             "bridge_outcome": bridge_report.get("outcome"),
             "bridge_why": _bridge_why(bridge_report),
+            # R419 section 12: the named components (from the bridge
+            # report — the geometry's own named nodes; the inspection
+            # panel and the text↔component linkage render these)
+            "components": (
+                (bridge_report.get("geometry") or {}).get("components")
+                if isinstance(
+                    (bridge_report.get("geometry") or {}).get("components"),
+                    list) else []),
             "authority": (
                 "CONCEPTUAL architecture visualization (CadQuery/OCCT "
                 "topology-only build, R418 invention bridge): this is "
@@ -430,6 +479,19 @@ def build_cio(session: Dict[str, Any]) -> Optional[Dict[str, Any]]:
             else None,
             "assumption": "simulation results are computational "
                           "evidence, never physical observations",
+        },
+        # R419: viewer hints + the render gallery contract — the
+        # frontend renders ONLY these pointers (never invents state);
+        # the renders block is derived above from MODEL/3D/ itself.
+        "visualization": {
+            "viewer_required": ["orbit", "zoom", "pan", "reset",
+                                "wireframe", "clip"],
+            "renders": renders,
+            "component_inspection": [
+                {"from": "component name",
+                 "explain": ["function", "mechanism", "evidence",
+                             "simulation", "unknowns"]},
+            ],
         },
         "reality_loop": {
             "state": reality_loop_state,

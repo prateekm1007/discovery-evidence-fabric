@@ -53,9 +53,43 @@ from typing import Any, Dict, Optional
 from . import cio as _cio
 from . import sessions as store
 
-BRIDGE_GATE_VERSION = "1.0.0"
+BRIDGE_GATE_VERSION = "1.1.0"
 
 _CONCEPTUAL_CLASSES = ("SYSTEM_3D", "CONCEPTUAL_3D", "PROCESS_3D")
+
+_RENDER_ARTIFACTS = ("hero.png", "section.png", "exploded.png")
+
+
+def _renders_present(run_dir: Path) -> bool:
+    """The R419 presentation artifacts exist (hero/section/exploded PNGs
+    under MODEL/3D/). The GLB variants are enhancements; the PNGs are
+    the observable contract (operator section 5)."""
+    d = run_dir / "MODEL" / "3D"
+    return bool(d.exists()) and all(
+        (d / n).is_file() and (d / n).stat().st_size > 0
+        for n in _RENDER_ARTIFACTS)
+
+
+def _ensure_renders(run_dir: Path,
+                     cio_obj: Optional[Dict] = None) -> Optional[Dict[str, Any]]:
+    """Run the Blender render stage over an EXISTING authoritative GLB
+    (R419 sections 5-6: every invention gets the six presentation
+    artifacts when the pinned build is available — including runs whose
+    geometry predates R419). Typed honest record; never raises."""
+    if _renders_present(run_dir):
+        return None  # already rendered — idempotent
+    # honest class label: read it from the CIO when present (never a
+    # guessed engineering label)
+    geo = (cio_obj or {}).get("geometry") or {}
+    vis_class = geo.get("visualizability_class") or geo.get("class")
+    try:
+        from discovery_fabric.engine.invention_bridge import render
+        return render.render_invention(
+            str(run_dir), {"generation_models": None},
+            is_conceptual=vis_class != "ENGINEERING_3D")
+    except Exception as exc:  # noqa: BLE001 — typed, never silent
+        return {"stage": "RENDER", "status": "RENDER_FAILED",
+                "error": f"{type(exc).__name__}: {exc}"}
 
 
 def _now() -> str:
@@ -142,17 +176,23 @@ def ensure_artifacts(session_id: str) -> Dict[str, Any]:
 
     if already_has_model:
         # Case A: geometry exists (cad_pipeline engineering models or a
-        # package GLB). If a package also exists, nothing to do.
+        # package GLB). If a package also exists, the R418 contract is
+        # satisfied — but the R419 RENDER contract still applies: run
+        # the Blender stage over the existing model when the six
+        # presentation artifacts are missing (operator sections 5-6).
         buyer_zip = list((run_dir / "DOWNLOAD").glob("*.zip")) \
             if (run_dir / "DOWNLOAD").exists() else []
         bridge_zip = list(run_dir.glob("TECHNOLOGY_PACKAGE_*.zip"))
         if buyer_zip or bridge_zip:
+            render_record = _ensure_renders(run_dir, cio_obj)
             return _record(run_dir, "ALREADY_COMPLETE", {
                 "case": "A",
                 "geometry_present": True,
                 "package_present": True,
+                "renders": render_record or {"status": "ALREADY_PRESENT"},
                 "note": ("visual artifact and package both present — "
-                         "the projections render them (Case A)"),
+                         "the projections render them (Case A); R419 "
+                         "renders ensured where missing"),
             })
         # geometry exists but no package -> build the bridge package
         # around the EXISTING geometry (classification still runs —
@@ -167,6 +207,7 @@ def ensure_artifacts(session_id: str) -> Dict[str, Any]:
             "case": "A+package",
             "visualizability": result.get("visualizability"),
             "geometry_outcome": "SKIPPED_ALREADY_PRESENT",
+            "renders": (result.get("geometry_out") or {}).get("renders"),
             "package_out": _package_summary(result.get("package_out")),
             "report": result.get("report"),
         })
@@ -200,11 +241,16 @@ def ensure_artifacts(session_id: str) -> Dict[str, Any]:
             model_dir = run_dir / "MODEL"
             model_dir.mkdir(parents=True, exist_ok=True)
             (model_dir / "model-001.glb").write_bytes(built["glb_bytes"])
+            # R419 sections 5-6: the Case C conceptual fallback gets its
+            # presentation renders too (same contract as A/B)
+            render_record = _ensure_renders(run_dir, {"geometry": {
+                "visualizability_class": "CONCEPTUAL_3D"}})
             return _record(run_dir, "CONCEPTUAL_FALLBACK", {
                 "case": "C",
                 "classification": vis,
                 "fallback_model": "MODEL/model-001.glb",
                 "fallback_class": "CONCEPTUAL_3D",
+                "renders": render_record or {"status": "ALREADY_PRESENT"},
                 "fallback_basis": (
                     "the classifier recorded NOT_VISUALIZABLE "
                     "(algorithmic invention, no physical intervention "
@@ -250,13 +296,15 @@ def ensure_artifacts(session_id: str) -> Dict[str, Any]:
                 p.name for p in (run_dir / "MODEL").glob("model-*.glb")
             ) if (run_dir / "MODEL").exists() else [],
             "glb_sha256": geometry_out.get("glb_sha256"),
-            "components": len(geometry_out.get("components") or []),
+            "components": geometry_out.get("components") or [],
+            "key_dimensions": geometry_out.get("key_dimensions") or {},
             "generation_models": [
                 {"generation": m.get("generation"),
                  "glb": f"MODEL/model-{m.get('generation'):03d}.glb",
                  "current": m.get("current")}
                 for m in geometry_out.get("generation_models") or []],
         },
+        "renders": geometry_out.get("renders"),
         "package_out": _package_summary(result.get("package_out")),
         "report": result.get("report"),
     })
