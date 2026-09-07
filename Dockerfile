@@ -46,10 +46,11 @@ RUN apt-get update \
 # engine commit). /opt/blender is the canonical install location the
 # render stage resolves (render.find_blender()).
 ARG BLENDER_VERSION=5.2.1
+ARG BLENDER_RELEASE_PATH=5.2
 ARG BLENDER_TARBALL_SHA256=a31f524fa99a527d3d52b7f5aaa68c34e1a19d5a1c9473f79c5cc610fd5b10e9
 RUN set -eux; \
     curl -fsSL -o /tmp/blender.tar.xz \
-      "https://download.blender.org/release/Blender${BLENDER_VERSION%.*}/blender-${BLENDER_VERSION}-linux-x64.tar.xz"; \
+      "https://download.blender.org/release/Blender${BLENDER_RELEASE_PATH}/blender-${BLENDER_VERSION}-linux-x64.tar.xz"; \
     echo "${BLENDER_TARBALL_SHA256}  /tmp/blender.tar.xz" | sha256sum -c -; \
     mkdir -p /opt; \
     tar -xJf /tmp/blender.tar.xz -C /opt; \
