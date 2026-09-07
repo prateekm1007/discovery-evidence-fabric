@@ -87,13 +87,52 @@ def _unwrap(field: Any) -> Any:
 def _package_info(run_dir: Path) -> Dict[str, Any]:
     """Package presence from the run's own PACKAGE_REPORT + DOWNLOAD
     dir (the same derivation the session store uses — never from the
-    session index, which may lag the worker)."""
+    session index, which may lag the worker).
+
+    R418: when the buyer package was not produced (the honest pre-bridge
+    state for evolution-survivor runs), the BRIDGE technology package
+    (TECHNOLOGY_PACKAGE_*.zip, recorded in BRIDGE_REPORT.json) is the
+    package the user receives — labeled with its own honest maturity and
+    package_kind. A bridge package NEVER claims buyer-release posture
+    (Art. IV: distinct artifact classes, never a weakened gate)."""
     report = _read_json(run_dir / "PACKAGE_REPORT.json") or {}
     zips = sorted((run_dir / "DOWNLOAD").glob("*.zip")) \
         if (run_dir / "DOWNLOAD").exists() else []
     complete = bool(report.get("complete") and zips)
-    return {"complete": complete, "maturity": report.get("maturity"),
-            "zip_name": zips[0].name if zips else None}
+    if complete:
+        return {"complete": True, "maturity": report.get("maturity"),
+                "zip_name": zips[0].name if zips else None,
+                "package_kind": "BUYER_PACKAGE",
+                "zip_path": str(zips[0]) if zips else None}
+    # bridge fallback (R418)
+    bridge = _bridge_package_info(run_dir)
+    if bridge:
+        return bridge
+    return {"complete": False, "maturity": None, "zip_name": None,
+            "package_kind": None, "zip_path": None}
+
+
+def _bridge_package_info(run_dir: Path) -> Optional[Dict[str, Any]]:
+    """The bridge technology package, derived from BRIDGE_REPORT.json +
+    the TECHNOLOGY_PACKAGE_*.zip on disk (the report is the record; the
+    file is the artifact — both must agree)."""
+    br = _read_json(run_dir / "BRIDGE_REPORT.json") or {}
+    pkg = br.get("package_out") or {}
+    zip_name = pkg.get("zip_name")
+    if not zip_name:
+        return None
+    zp = run_dir / zip_name
+    if not zp.exists():
+        return None
+    return {
+        "complete": True,
+        "maturity": pkg.get("package_maturity"),
+        "zip_name": zip_name,
+        "package_kind": "TECHNOLOGY_PACKAGE_BRIDGE",
+        "zip_path": str(zp),
+        "visualizability_class": pkg.get("visualizability_class"),
+        "zip_sha256": pkg.get("zip_sha256"),
+    }
 
 
 def _sha_file(p: Path) -> Optional[str]:
@@ -156,6 +195,25 @@ def build_cio(session: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         else []
 
     has_geometry = bool(glb or step or pm)
+
+    # R418: the geometry CLASS — engineering (parametric CAD authority)
+    # vs conceptual (bridge system/conceptual architecture) — derived
+    # from the run's own records, never inferred from the GLB's
+    # existence (Art. XXVIII: a conceptual model never silently
+    # presents as engineering geometry).
+    bridge_report = _read_json(run_dir / "BRIDGE_REPORT.json") or {}
+    _br_vis = bridge_report.get("visualizability_class") or \
+        ((bridge_report.get("geometry") or {}).get("visualizability_class"))
+    if pm or (cad_ledger or {}).get("status") == "COMPLETED" and glb:
+        geometry_class = "ENGINEERING_3D"
+    elif _br_vis:
+        geometry_class = _br_vis
+    elif glb:
+        geometry_class = "ENGINEERING_3D"
+    else:
+        geometry_class = None
+    geometry_is_conceptual = geometry_class in (
+        "SYSTEM_3D", "CONCEPTUAL_3D", "PROCESS_3D")
     final = (session.get("final_status") or "").upper()
     survivor = final == "AUTOMATED_INVENTION_CANDIDATE" or bool(inv)
 
@@ -239,11 +297,18 @@ def build_cio(session: Dict[str, Any]) -> Optional[Dict[str, Any]]:
                 else None],
             "reality_loop_state": reality_loop_state,
             "maturity_basis": {
-                "design": ("parametric model / STEP / GLB present in "
-                           "the run artifacts"
-                           if has_geometry else
-                           "no engineering geometry produced on this "
-                           "run (honest absence)"),
+                "design": (
+                    f"{geometry_class} visualization produced ("
+                    + ("parametric CAD with measured geometry"
+                       if not geometry_is_conceptual else
+                       "conceptual architecture only — engineering CAD "
+                       "is not yet earned: no sourced geometry "
+                       "parameters on this run")
+                    + "); renders are derived artifacts, never "
+                      "physical truth"
+                    if has_geometry else
+                    "no engineering geometry produced on this run "
+                    "(honest absence)"),
                 "simulation": ("PHYSICS stage executed with a "
                                "computational result (class "
                                "COMPUTATIONAL_RESULT)" if simulated else
@@ -302,6 +367,8 @@ def build_cio(session: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         },
         "geometry": {
             "present": has_geometry,
+            "class": geometry_class,
+            "conceptual": geometry_is_conceptual,
             "glb": (f"/api/run/{session.get('session_id')}/model"
                     if glb else None),
             "glb_sha256": _sha_file(glb[0]) if glb else None,
@@ -314,11 +381,19 @@ def build_cio(session: Dict[str, Any]) -> Optional[Dict[str, Any]]:
                           for f in svg_views[:6]],
             "parametric_model_present": bool(pm),
             "cad_pipeline_status": (cad_ledger or {}).get("status"),
-            "authority": ("CadQuery/OCCT parametric build is the "
-                          "engineering geometry authority; meshes and "
-                          "renders are derived artifacts (R413 geometry "
-                          "authority boundary — a render can never "
-                          "originate or validate geometry)"),
+            "bridge_outcome": bridge_report.get("outcome"),
+            "authority": (
+                "CONCEPTUAL architecture visualization (CadQuery/OCCT "
+                "topology-only build, R418 invention bridge): this is "
+                "NOT engineering geometry — no engineering dimensions "
+                "are claimed; engineering CAD remains unearned until "
+                "parameters are sourced (labels on the artifact)"
+                if geometry_is_conceptual else
+                "CadQuery/OCCT parametric build is the "
+                "engineering geometry authority; meshes and renders "
+                "are derived artifacts (R413 geometry authority "
+                "boundary — a render can never originate or validate "
+                "geometry)"),
         },
         "simulation": {
             "executed": simulated,
@@ -339,6 +414,14 @@ def build_cio(session: Dict[str, Any]) -> Optional[Dict[str, Any]]:
                 f"/api/sessions/{session.get('session_id')}/package"
                 if package.get("complete") else None),
             "package_maturity": package.get("maturity"),
+            "package_kind": package.get("package_kind"),
+            "package_kind_note": (
+                "buyer package from the certified release chain"
+                if package.get("package_kind") == "BUYER_PACKAGE" else
+                "technology package (invention bridge) — the honest "
+                "early-technical-evaluation artifact: invention "
+                "existence, maturity and buyer-readiness are separate "
+                "states (the buyer release gates are untouched)"),
             "counsel_package": (
                 f"/api/run/{session.get('session_id')}/counsel-package"),
             "note": "counsel package = technical evidence export for "

@@ -361,14 +361,31 @@ def _package_state(session: Dict, run_dir: Optional[Path]) -> Dict:
     # R414 fix: package presence from the run's own PACKAGE_REPORT +
     # DOWNLOAD dir (the worker persists it there; the session INDEX may
     # lag — the run dir is the authority, Art. X)
+    #
+    # R418: the BRIDGE technology package (TECHNOLOGY_PACKAGE_*.zip,
+    # recorded in BRIDGE_REPORT.json) counts as an available package —
+    # invention existence is separate from package maturity and from
+    # buyer-readiness (operator §5). The kind is carried so the surface
+    # can label it honestly; a bridge package never claims buyer-release
+    # posture (Art. IV).
     pkg = {"complete": False, "maturity": None, "zip_name": None}
     if run_dir and run_dir.exists():
         report = _read_json(run_dir / "PACKAGE_REPORT.json") or {}
         dl = run_dir / "DOWNLOAD"
         zips = sorted(dl.glob("*.zip")) if dl.exists() else []
-        pkg = {"complete": bool(report.get("complete") and zips),
-               "maturity": report.get("maturity"),
-               "zip_name": zips[0].name if zips else None}
+        if report.get("complete") and zips:
+            pkg = {"complete": True,
+                   "maturity": report.get("maturity"),
+                   "zip_name": zips[0].name,
+                   "package_kind": "BUYER_PACKAGE"}
+        else:
+            br = _read_json(run_dir / "BRIDGE_REPORT.json") or {}
+            bp = br.get("package_out") or {}
+            if bp.get("zip_name") and (run_dir / bp["zip_name"]).exists():
+                pkg = {"complete": True,
+                       "maturity": bp.get("package_maturity"),
+                       "zip_name": bp["zip_name"],
+                       "package_kind": "TECHNOLOGY_PACKAGE_BRIDGE"}
     session_pkg = session.get("package") or {}
     complete = bool(pkg.get("complete") or session_pkg.get("complete"))
     return {
@@ -377,6 +394,7 @@ def _package_state(session: Dict, run_dir: Optional[Path]) -> Dict:
                   _RUNNING_STATUSES else "NOT_PRODUCED"),
         "maturity": pkg.get("maturity") or session_pkg.get("maturity"),
         "zip_name": pkg.get("zip_name") or session_pkg.get("zip_name"),
+        "package_kind": pkg.get("package_kind"),
         "counsel_package_available": True,  # R414: always exportable
         # (it is a technical-evidence export, not a legal document)
     }

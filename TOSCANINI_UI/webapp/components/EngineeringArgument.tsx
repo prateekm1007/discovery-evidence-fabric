@@ -9,15 +9,87 @@
 
 import type { SessionDetail, StageDigest } from "@/lib/types";
 
+// R418 (operator §11): NEVER show raw JSON as the primary explanation.
+// When a field is an object, render it as labeled prose lines
+// (Mechanism / Intervention / Expected effect / …). The underlying
+// JSON remains available through the counsel export and the run's own
+// artifacts — the primary surface renders human language.
+
+const LABELS: Record<string, string> = {
+  mechanism: "Mechanism",
+  intervention: "Intervention",
+  expected_effect: "Expected effect",
+  falsification_test: "Falsification test",
+  causal_chain: "Causal chain",
+  problem: "Problem",
+  user_need: "User need",
+  novelty_hypothesis: "Novelty hypothesis",
+  name: "Name",
+  description: "Description",
+  value: "Value",
+  reason: "Reason",
+  note: "Note",
+  treatment: "Treatment",
+  control: "Control",
+  measurement: "Measurement",
+  apparatus: "Apparatus",
+  acceptance_threshold: "Acceptance threshold",
+  falsification_threshold: "Falsification threshold",
+  hypothesis: "Hypothesis",
+  sample: "Sample",
+  cost: "Cost",
+  time: "Time",
+  safety: "Safety",
+  uncertainty: "Uncertainty",
+};
+
+function humanLabel(key: string): string {
+  return LABELS[key] ?? key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+function FieldLines({ obj, max = 8 }: { obj: Record<string, unknown>; max?: number }) {
+  const entries = Object.entries(obj)
+    .filter(([, v]) => v != null && v !== "")
+    .slice(0, max);
+  if (!entries.length) return null;
+  return (
+    <div className="field-lines">
+      {entries.map(([k, v]) => (
+        <div key={k} className="field-line">
+          <span className="field-k">{humanLabel(k)}</span>
+          <span className="field-v">{str(v, 400)}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function str(x: unknown, max = 400): string {
   if (x == null) return "";
   if (typeof x === "string") return x;
   if (typeof x === "number" || typeof x === "boolean") return String(x);
+  if (Array.isArray(x)) {
+    return x
+      .map((i) => (typeof i === "string" ? i : str(i, max)))
+      .filter(Boolean)
+      .join("; ");
+  }
   try {
     return JSON.stringify(x).slice(0, max);
   } catch {
     return String(x);
   }
+}
+
+/** The §11 renderer: strings pass through; objects render as labeled
+ * prose lines (never a raw JSON blob); arrays render as lists. */
+function Prose({ x, maxLines }: { x: unknown; maxLines?: number }) {
+  if (x == null) return null;
+  if (typeof x === "object" && !Array.isArray(x)) {
+    const obj = x as Record<string, unknown>;
+    return <FieldLines obj={obj} max={maxLines} />;
+  }
+  return <>{str(x, 500)}</>;
 }
 
 function pick(obj: Record<string, unknown> | null | undefined, key: string) {
@@ -94,12 +166,24 @@ export function EngineeringArgument({
         </div>
       </Step>
       <Step k="Hypothesis">
-        {str(invMech?.value ?? synthesizeStage?.mechanism, 500) || (
+        {invMech?.value != null ? (
+          <Prose x={invMech.value} />
+        ) : invMech != null ? (
+          <Prose x={invMech} />
+        ) : synthesizeStage?.mechanism ? (
+          <Prose x={synthesizeStage.mechanism} />
+        ) : (
           <span className="faint">not established by this run</span>
         )}
       </Step>
       <Step k="Design decision">
-        {str(invCausal?.value ?? synthesizeStage?.intervention, 500) || (
+        {invCausal?.value != null ? (
+          <Prose x={invCausal.value} />
+        ) : invCausal != null ? (
+          <Prose x={invCausal} />
+        ) : synthesizeStage?.intervention ? (
+          <Prose x={synthesizeStage.intervention} />
+        ) : (
           <span className="faint">not established by this run</span>
         )}
       </Step>
@@ -146,7 +230,11 @@ export function EngineeringArgument({
       </Step>
       <Step k="Decision">{decision}</Step>
       <Step k="Next decisive experiment">
-        {str(keSel.name ?? keSel.description, 400) || (
+        {keSel != null && (keSel.name != null || keSel.description != null) ? (
+          <Prose x={keSel} />
+        ) : keSel != null ? (
+          <Prose x={keSel} maxLines={6} />
+        ) : (
           <span className="faint">
             the decisive experiment stage will appear here
           </span>
@@ -204,7 +292,13 @@ export function NoveltyAndCemetery({
       <div className="block">
         <h4>Novelty hypothesis</h4>
         <div style={{ fontSize: 14 }}>
-          {str(invNovelty?.value, 600) || "not established"}
+          {invNovelty?.value != null ? (
+            <Prose x={invNovelty.value} />
+          ) : invNovelty != null ? (
+            <Prose x={invNovelty} />
+          ) : (
+            "not established"
+          )}
         </div>
       </div>
       <div className="block">

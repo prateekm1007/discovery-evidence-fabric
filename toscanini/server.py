@@ -938,10 +938,21 @@ class Handler(BaseHTTPRequestHandler):
             return self._json(404, {"error": "not found"})
         run_dir = Path(s["run_dir"]) if s.get("run_dir") else None
         info = store.package_info(run_dir) if run_dir and run_dir.exists() else None
-        if not info or not info.get("zip") or not Path(info["zip"]).exists():
-            return self._json(404, {"error": "no buyer package produced "
-                                    "(no survivor reached the release gate)"})
-        zp = Path(info["zip"])
+        zp = None
+        if info and info.get("zip") and Path(info["zip"]).exists():
+            zp = Path(info["zip"])
+        elif run_dir and run_dir.exists():
+            # R418: the bridge technology package — served when the
+            # buyer package was not produced, honestly labeled by its
+            # own name (TECHNOLOGY_PACKAGE_*.zip) and content. A bridge
+            # package is never presented as a buyer release (Art. IV).
+            br_zips = sorted(run_dir.glob("TECHNOLOGY_PACKAGE_*.zip"))
+            if br_zips:
+                zp = br_zips[0]
+        if zp is None:
+            return self._json(404, {"error": "no package produced on "
+                                    "this run (no buyer release and no "
+                                    "bridge technology package)"})
         data = zp.read_bytes()
         self.send_response(200)
         self.send_header("Content-Type", "application/zip")

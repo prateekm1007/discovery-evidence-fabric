@@ -67,26 +67,51 @@ function CioPanel({ cio, detail }: { cio: CIO; detail: SessionDetail }) {
   const geo = cio.geometry;
   const downloads = cio.downloads ?? {};
   const languageQuarantined = cio.language_guard?.clean === false;
+  const conceptual = geo?.conceptual ?? false;
+  const geoClass = geo?.class ?? (conceptual ? "CONCEPTUAL_3D" : "ENGINEERING_3D");
   return (
     <>
       <MaturityBadges cio={cio} />
 
       {geo?.present && geo.glb ? (
         <div className="artifact-3d">
+          {/* R418 (operator §8): the artifact pane labels WHAT the model
+              is — engineering geometry vs conceptual architecture —
+              from the CIO's own class field, never inferred. */}
+          <div className={`geo-class-chip ${conceptual ? "conceptual" : "engineering"}`}>
+            {conceptual ? "CONCEPTUAL ARCHITECTURE" : "ENGINEERING MODEL"}
+            <span className="faint" style={{ marginLeft: 8, fontSize: 10.5 }}>
+              {geoClass} · CadQuery/OCCT
+            </span>
+          </div>
           <ModelViewer
             url={geo.glb}
             height={300}
             compact
-            label="run geometry"
-            note="the run's engineering geometry (CadQuery/OCCT authority; renders are derived artifacts — never physical truth)"
+            label={conceptual ? "conceptual architecture" : "run geometry"}
+            note={conceptual
+              ? "the invention's system architecture as an explicitly conceptual 3D visualization — topology and named components, NOT engineering geometry; engineering CAD is earned only when parameters are sourced"
+              : "the run's engineering geometry (CadQuery/OCCT authority; renders are derived artifacts — never physical truth)"}
           />
+          {conceptual && (
+            <div className="faint" style={{ fontSize: 11.5, marginTop: 4 }}>
+              no engineering dimensions are claimed by this artifact —
+              components mirror the recorded subsystem names
+            </div>
+          )}
         </div>
       ) : (
         <div className="artifact-note">
-          <b>No 3D on this run.</b>{" "}
-          {geo?.parametric_model_present
-            ? "A parametric model was produced but no exported mesh — design is DESIGNED, the 3D export was not reached."
-            : "The run produced no engineering geometry (the CAD pipeline did not reach a model on this run — honest absence, never a placeholder object)."}
+          {/* R418 (operator §4): the backend must answer WHY. The only
+              remaining no-3D states are honest failures of the bridge
+              itself — disclosed with their recorded reason, never the
+              old blanket "No 3D on this run." */}
+          <b>Visual artifact unavailable.</b>{" "}
+          {geo?.bridge_outcome === "BRIDGE_GEOMETRY_FAILED"
+            ? "The automatic 3D bridge attempted generation, failed after diagnosis and repair, and recorded every attempt — an engine defect, not an honest absence. The failure record is in the run directory."
+            : geo?.parametric_model_present
+              ? "A parametric model was produced but no exported mesh — design is DESIGNED, the 3D export was not reached."
+              : "No visual artifact was produced for this invention — the bridge gate recorded its reason (an implementation failure by the product contract, disclosed honestly)."}
         </div>
       )}
 
@@ -106,14 +131,27 @@ function CioPanel({ cio, detail }: { cio: CIO; detail: SessionDetail }) {
       )}
 
       {downloads.package_zip ? (
-        <a className="btn download artifact-dl" href={downloads.package_zip}>
-          Download technology package
-        </a>
+        <>
+          <a className="btn download artifact-dl" href={downloads.package_zip}>
+            Download technology package
+          </a>
+          <div className="faint" style={{ fontSize: 11.5, marginTop: 4 }}>
+            {downloads.package_maturity
+              ? `package maturity: ${String(downloads.package_maturity).replace(/_/g, " ").toLowerCase()}`
+              : ""}
+            {downloads.package_kind === "TECHNOLOGY_PACKAGE_BRIDGE"
+              ? " · early technical evaluation — invention existence, maturity and buyer-readiness are separate states; the buyer release gates are untouched"
+              : downloads.package_kind === "BUYER_PACKAGE"
+                ? " · from the certified release chain"
+                : ""}
+          </div>
+        </>
       ) : (
         <div className="artifact-note">
-          <b>Invention, no package yet.</b> A package is produced only
-          when an architecture survives the full challenge chain —
-          architectures are recorded, packages are earned.
+          <b>Package not produced.</b> The bridge gate recorded the
+          reason on the run record — an implementation state, disclosed
+          (never “earned by survival” language again: the invention
+          exists above with its honest maturity).
         </div>
       )}
 
@@ -198,19 +236,26 @@ function GenerationNavigator({
 
       <div className="gen-view">
         {hasModel ? (
-          <ModelViewer
-            url={modelUrl}
-            height={280}
-            compact
-            label={`architecture ${selected} geometry`}
-            note={`model-${String(selected).padStart(3, "0")}.glb — this generation's own geometry artifact (CadQuery/OCCT authority; a render is a derived artifact, never physical truth)`}
-          />
+          <>
+            <ModelViewer
+              url={modelUrl}
+              height={280}
+              compact
+              label={`architecture ${selected} geometry`}
+              note={`model-${String(selected).padStart(3, "0")}.glb — this generation's own geometry artifact (CadQuery/OCCT authority; a render is a derived artifact, never physical truth)`}
+            />
+            <div className="faint" style={{ fontSize: 11, marginTop: 3 }}>
+              conceptual system architecture when no engineering
+              parameters are sourced — the class is labeled on the
+              invention object, never inferred from the mesh
+            </div>
+          </>
         ) : (
           <div className="artifact-note">
             <b>GEN {selected} has no 3D model.</b>{" "}
             {gen?.challenge?.killed
-              ? "This architecture was challenged before its engineering realization — no geometry was built (honest absence, never a placeholder)."
-              : "No engineering geometry was produced for this generation — honest absence, never a placeholder object."}
+              ? "This architecture was challenged before its engineering realization — no geometry was built (recorded, never a placeholder)."
+              : "No visual artifact was produced for this generation — the bridge gate recorded its reason on the run record (an implementation state by the product contract, disclosed)."}
           </div>
         )}
 
@@ -341,18 +386,20 @@ export default function RunArtifact({
             </a>
           ) : usv.found_something ? (
             <div className="artifact-note">
-              <b>Invention, no package yet.</b> This run recorded an
-              invention candidate, but no buyer package was produced — the
-              release gate was not reached. An honest result: architectures
-              are recorded, packages are earned.
+              <b>Invention recorded, artifacts pending.</b> This run
+              recorded an invention candidate; the automatic artifact
+              gate ({detail.status === "COMPLETE" ? "ran" : "will run"})
+              on completion — if this persists, the bridge gate recorded
+              its failure reason on the run record (disclosed, never a
+              silent gap).
             </div>
           ) : (
             <div className="artifact-note">
-              <b>No buyer package yet.</b> A package is produced only when
-              an architecture survives the full challenge chain. The
-              generations above carry the current invention with its
-              honest maturity — and every diagnosed cause is kept on
-              record so the next generation builds on it.
+              <b>No invention on this run.</b> The problem was
+              investigated honestly and nothing defensible was found —
+              the generations above carry what was tried, what killed
+              each architecture, and what was learned (negative
+              knowledge is kept).
             </div>
           )}
 

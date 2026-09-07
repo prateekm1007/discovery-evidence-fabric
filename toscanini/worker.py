@@ -173,6 +173,31 @@ def run(session_id: str) -> None:
         _snapshot(session_id, f"terminal:ERROR_RUN:{session_id}")
         return
 
+    # --- phase 3.5: the automatic artifact contract (R418) -----------------
+    # Operator P0 product correction: every completed run with an
+    # invention gets its visual artifact + technology package
+    # automatically — Case A (artifact exists -> render), Case B
+    # (invention exists, artifact missing -> generate), Case C (not
+    # visualizable -> conceptual fallback, labeled). No operator
+    # script, no copied JSON, no manual post-processing. A bridge
+    # failure is an honest typed record — it NEVER changes the run's
+    # epistemic state (Art. VI/XV/LXI) and never blocks completion.
+    try:
+        from toscanini import bridge_gate
+        gate = bridge_gate.ensure_artifacts(session_id)
+        print(f"  [worker] bridge gate: {gate.get('outcome')}",
+              file=sys.stderr)
+        store.update_session(
+            session_id,
+            bridge_outcome=gate.get("outcome"),
+            bridge_case=gate.get("case"))
+    except Exception as exc:  # noqa: BLE001 — disclosed, never fatal
+        print(f"  [worker] bridge gate failed: "
+              f"{type(exc).__name__}: {exc}", file=sys.stderr)
+        store.update_session(
+            session_id, bridge_outcome="GATE_ERROR",
+            bridge_error=f"{type(exc).__name__}: {exc}"[:400])
+
     # --- phase 4: honest terminal status -------------------------------------
     final = None
     fs_path = run_dir / "final_state.json"

@@ -540,12 +540,16 @@ export interface CIO {
   };
   geometry?: {
     present: boolean;
+    class?: string | null;
+    conceptual?: boolean;
     glb?: string | null;
+    glb_sha256?: string | null;
     step?: string[];
     stl?: string[];
     svg_views?: string[];
     parametric_model_present?: boolean;
     cad_pipeline_status?: string;
+    bridge_outcome?: string | null;
     authority?: string;
   };
   simulation?: {
@@ -559,6 +563,8 @@ export interface CIO {
   downloads?: {
     package_zip?: string | null;
     package_maturity?: string | null;
+    package_kind?: string | null;
+    package_kind_note?: string;
     counsel_package?: string;
     note?: string;
   };
