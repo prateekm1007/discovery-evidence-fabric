@@ -1,0 +1,87 @@
+{
+ "record": "R416/EVOLUTION_V1/PHASE_B_DEPLOYED_ACCEPTANCE.json",
+ "directive_section": "Phase B — prove the new UI on the real deployment",
+ "deployment": {
+   "url": "https://toscanini-engine-docker.onrender.com",
+   "engine_commit_verified_live": "d12fce54867c3ee78ae5380d7eb67bc7527b7b78",
+   "deployment_drift": "GREEN",
+   "identity_tamper": false,
+   "discovery_ready": true,
+   "note": "verified via GET /api/health before the acceptance run: "
+           "engine_commit == build_artifact_commit == render_git_commit "
+           "== d12fce54 (the exact pushed r416/honest-causes-evolution-v1 "
+           "SHA; no force-push; PR #3 open)"
+ },
+ "the_test": {
+   "method": "real browser (agent-browser/Playwright) against the PUBLIC "
+             "deployment, fresh user session, fresh problem",
+   "problem": "make a solar panel which is the most efficient in the world",
+   "run_id": "ts_4d8db3a7cc96",
+   "duration_note": "the run worked the problem live: standard chain -> "
+                    "GEN 1 challenged and killed -> GEN 2 evolved and "
+                    "re-evaluated -> honest stop"
+ },
+ "the_assertions": {
+   "banned_string_NO_DEFENSIBLE_INVENTION_SURVIVED_THIS_RUN": {
+     "found_in_rendered_page": false, "verdict": "PASS"},
+   "banned_string_COMPLETED_CANDIDATE_REJECTED": {
+     "found_in_rendered_page": false, "verdict": "PASS"},
+   "INVENTION_01_visible": {"found": true, "verdict": "PASS"},
+   "INVENTION_02_visible_with_CURRENT_marker": {
+     "found": true, "verdict": "PASS"},
+   "CHALLENGING_ARCHITECTURE_visible": {
+     "found": "Challenging architecture 1 (phase bar) + 'Challenged and "
+              "killed at the gauntlet / at independent_attack' "
+              "(generation records)",
+     "verdict": "PASS"},
+   "forward_progress_to_generation_2": {
+     "found": "Testing architecture 2 (phase bar, live during the run) + "
+              "the What changed? panel on GEN 2 with the full causal "
+              "delta (new capability, new interaction, new operating "
+              "regime, frontier transfer)",
+     "verdict": "PASS"},
+   "honest_maturity_visible": {
+     "found": "GEN 1 EVIDENCE_SUPPORTED; GEN 2 CURRENT · GENERATED; "
+              "'the verification gates decide maturity, never the "
+              "wording'",
+     "verdict": "PASS"},
+   "user_always_sees_forward_progress": {
+     "verdict": "PASS",
+     "evidence": "the terminal presents 'Invention 2 generations "
+                 "explored — the current architecture (GEN 2) is "
+                 "presented with its honest maturity' — never a dead end"}
+ },
+ "the_observed_lineage": [
+   {"gen": 1, "origin": "BASELINE_SYNTHESIS", "maturity":
+    "EVIDENCE_SUPPORTED", "fate": "killed by the standard adversarial "
+    "chain (weak_transfer, obvious_combination KILLED dimensions); "
+    "diagnosed cause: adversarial kill"},
+   {"gen": 2, "origin": "EVOLUTION_CAUSAL_DELTA", "maturity":
+    "GENERATED", "state": "CURRENT",
+    "architecture": "molecular-scale energy storage (quantum-dot "
+                    "supercapacitor) with the high-efficiency panel",
+    "causal_delta": "molecular-scale storage and conversion; frontier "
+                    "transfer from energy storage/conversion; new "
+                    "operating regime",
+    "fate": "killed by the independent adversarial attack — the same "
+            "diagnosed cause as GEN 1, so the information-gain stop "
+            "rule ended the loop honestly"}
+ ],
+ "screenshots": [
+   "/home/z/my-project/download/r416_deployed_run_page.png",
+   "/home/z/my-project/download/r416_local_run_page.png",
+   "/home/z/my-project/download/r416_local_landing.png"
+ ],
+ "honesty_note": "nothing in this run was mocked, staged, or hardcoded: "
+                 "the deployed engine really retrieved 18 evidence "
+                 "records from 8 live sources, really killed GEN 1 in "
+                 "the adversarial chain, really generated and "
+                 "re-evaluated GEN 2, and really reported the "
+                 "information-gain stop. The outcome "
+                 "(INVENTION_UNDER_DEVELOPMENT, maturity GENERATED) is "
+                 "the honest one — no generation survived the "
+                 "uncalibrated gauntlet, and nothing was softened "
+                 "(Art. LXVIII). The attacker-calibration standing note "
+                 "(Art. L) is the top priority for the next round.",
+ "reviewer_provenance": "AI_REVIEW (Art. LXVII)"
+}
