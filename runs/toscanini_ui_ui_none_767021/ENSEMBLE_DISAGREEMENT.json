@@ -1,0 +1,183 @@
+{
+ "ensemble": "MULTI_MODEL_DISAGREEMENT (E15-E)",
+ "version": "1.0.0",
+ "requested_models": 3,
+ "available_providers": [
+  "nvidia",
+  "gemini"
+ ],
+ "members": [
+  {
+   "role": "MODEL_A",
+   "provider_id": "nvidia",
+   "status": "OK",
+   "model": "meta/llama-3.2-11b-vision-instruct",
+   "prompt_hash": "83ae4f5c373f3a4571eddc38cf2052dbb4702ea227aba35534c8a9137df29709",
+   "output_hash": "4476902b92441e5e0b4709a5d8cd28ea333bb96fe0041b52a7a40cecafdc29d8",
+   "latency_ms": 11939,
+   "fields": {
+    "mechanism": "Using a high-efficiency photovoltaic (PV) panel directly connected to a heating element, such as a Positive Temperature Coefficient (PTC) heating element, to form a \"hot plate\" for cooking.",
+    "intervention": "Implement a high-efficiency solar panel directly connected to a heating element, such as a PTC heating element, to form a \"hot plate\" for cooking, and use an Arduino controller to manage the load and record system data.",
+    "expected_effect": "Achieve an average cooking efficiency of 54% or higher, dependent on the duration of cooking and the food type being cooked.",
+    "falsification_test": "Conduct cooking tests under different weather conditions, measuring the time and energy required to cook various food types, and compare the results to the expected efficiency of 54% or higher.",
+    "mechanism_source_span": "\"An Arduino controller manages the load and records system data (current, voltage, power, and temperature).\""
+   },
+   "missing_fields": [],
+   "candidate": {
+    "candidate_id": "cand:ENS:nvidia:4476902b9244",
+    "mechanism": "Using a high-efficiency photovoltaic (PV) panel directly connected to a heating element, such as a Positive Temperature Coefficient (PTC) heating element, to form a \"hot plate\" for cooking.",
+    "intervention": "Implement a high-efficiency solar panel directly connected to a heating element, such as a PTC heating element, to form a \"hot plate\" for cooking, and use an Arduino controller to manage the load and record system data.",
+    "expected_effect": "Achieve an average cooking efficiency of 54% or higher, dependent on the duration of cooking and the food type being cooked.",
+    "falsification_test": "Conduct cooking tests under different weather conditions, measuring the time and energy required to cook various food types, and compare the results to the expected efficiency of 54% or higher.",
+    "mechanism_source_span": "\"An Arduino controller manages the load and records system data (current, voltage, power, and temperature).\"",
+    "source_evidence": {
+     "source_id": "doi:10.20944/preprints202607.0751.v1",
+     "source_hash": "c4f65b479fd2b792e98681b2342c47d1a04119a260c2fc6c242b6b1747b4a0e6"
+    }
+   }
+  },
+  {
+   "role": "MODEL_B",
+   "provider_id": "gemini",
+   "status": "OK",
+   "model": "meta/llama-3.2-11b-vision-instruct",
+   "prompt_hash": "83ae4f5c373f3a4571eddc38cf2052dbb4702ea227aba35534c8a9137df29709",
+   "output_hash": "1a55222f87c0f9c30aba770a81f6b6206f9d4b707fbaf7d1a3c0531a84bfd94d",
+   "latency_ms": 9321,
+   "fields": {
+    "mechanism": "Using a high-efficiency photovoltaic (PV) panel directly connected to a heating element, such as a Positive Temperature Coefficient (PTC) heating element, to form a \"hot plate\" for cooking.",
+    "intervention": "Implement a high-efficiency solar panel with a maximum power point tracking (MPPT) system to optimize energy harvesting, and connect it directly to a high-efficiency heating element, such as a PTC heating element, to form a \"hot plate\" for cooking.",
+    "expected_effect": "Achieve an average cooking efficiency of 33.3% or higher, with a minimum solar irradiance of about 400 W/m2 per day required for effective cooking.",
+    "falsification_test": "Conduct a cooking test under controlled conditions, measuring the energy input from the solar panel and the energy output from the heating element, to verify that the system achieves an average cooking efficiency of 33.3% or higher.",
+    "mechanism_source_span": "\"An Arduino controller manages the load and records system data (current, voltage, power, and temperature).\""
+   },
+   "missing_fields": [],
+   "candidate": {
+    "candidate_id": "cand:ENS:gemini:1a55222f87c0",
+    "mechanism": "Using a high-efficiency photovoltaic (PV) panel directly connected to a heating element, such as a Positive Temperature Coefficient (PTC) heating element, to form a \"hot plate\" for cooking.",
+    "intervention": "Implement a high-efficiency solar panel with a maximum power point tracking (MPPT) system to optimize energy harvesting, and connect it directly to a high-efficiency heating element, such as a PTC heating element, to form a \"hot plate\" for cooking.",
+    "expected_effect": "Achieve an average cooking efficiency of 33.3% or higher, with a minimum solar irradiance of about 400 W/m2 per day required for effective cooking.",
+    "falsification_test": "Conduct a cooking test under controlled conditions, measuring the energy input from the solar panel and the energy output from the heating element, to verify that the system achieves an average cooking efficiency of 33.3% or higher.",
+    "mechanism_source_span": "\"An Arduino controller manages the load and records system data (current, voltage, power, and temperature).\"",
+    "source_evidence": {
+     "source_id": "doi:10.20944/preprints202607.0751.v1",
+     "source_hash": "c4f65b479fd2b792e98681b2342c47d1a04119a260c2fc6c242b6b1747b4a0e6"
+    }
+   }
+  }
+ ],
+ "common_claims": [
+  {
+   "dimension": "mechanism",
+   "supporting_roles": [
+    "MODEL_A",
+    "MODEL_B"
+   ],
+   "claim": "Using a high-efficiency photovoltaic (PV) panel directly connected to a heating element, such as a Positive Temperature Coefficient (PTC) heating element, to form a \"hot plate\" for cooking.",
+   "epistemic_class": "COMPUTED",
+   "note": "independently produced by >= 2 paths (N-ary comparison, E16-G)"
+  },
+  {
+   "dimension": "intervention",
+   "supporting_roles": [
+    "MODEL_A",
+    "MODEL_B"
+   ],
+   "claim": "Implement a high-efficiency solar panel directly connected to a heating element, such as a PTC heating element, to form a \"hot plate\" for cooking, and use an Arduino controller to manage the load and record system data.",
+   "epistemic_class": "COMPUTED",
+   "note": "independently produced by >= 2 paths (N-ary comparison, E16-G)"
+  }
+ ],
+ "disagreements": [
+  {
+   "disagreement_id": "DIS-001",
+   "dimension": "falsification_test",
+   "role_a": "MODEL_A",
+   "claim_a": "Conduct cooking tests under different weather conditions, measuring the time and energy required to cook various food types, and compare the results to the expected efficiency of 54% or higher.",
+   "role_b": "MODEL_B",
+   "claim_b": "Conduct a cooking test under controlled conditions, measuring the energy input from the solar panel and the energy output from the heating element, to verify that the system achieves an average cooking efficiency of 33.3% or higher.",
+   "similarity": 0.25,
+   "status": "UNRESOLVED (deliberate — no forced consensus)",
+   "resolution_path": "decisive experiment + buyer diligence; the disagreement travels into the dossier's uncertainty register (Art. XXV)",
+   "epistemic_class": "COMPUTED",
+   "recorded_at": "2026-09-07T07:49:33+00:00Z"
+  }
+ ],
+ "unique_mechanisms": [
+  {
+   "dimension": "expected_effect",
+   "role": "MODEL_A",
+   "claim": "Achieve an average cooking efficiency of 54% or higher, dependent on the duration of cooking and the food type being cooked.",
+   "epistemic_class": "MODELLED",
+   "note": "produced by exactly one path"
+  },
+  {
+   "dimension": "expected_effect",
+   "role": "MODEL_B",
+   "claim": "Achieve an average cooking efficiency of 33.3% or higher, with a minimum solar irradiance of about 400 W/m2 per day required for effective cooking.",
+   "epistemic_class": "MODELLED",
+   "note": "produced by exactly one path"
+  },
+  {
+   "dimension": "falsification_test",
+   "role": "MODEL_A",
+   "claim": "Conduct cooking tests under different weather conditions, measuring the time and energy required to cook various food types, and compare the results to the expected efficiency of 54% or higher.",
+   "epistemic_class": "MODELLED",
+   "note": "produced by exactly one path"
+  },
+  {
+   "dimension": "falsification_test",
+   "role": "MODEL_B",
+   "claim": "Conduct a cooking test under controlled conditions, measuring the energy input from the solar panel and the energy output from the heating element, to verify that the system achieves an average cooking efficiency of 33.3% or higher.",
+   "epistemic_class": "MODELLED",
+   "note": "produced by exactly one path"
+  }
+ ],
+ "adjudication": {
+  "adjudicator": "DETERMINISTIC (field completeness -> falsifiability -> source span)",
+  "primary_role": "MODEL_A",
+  "primary_provider": "nvidia",
+  "primary_candidate_id": "cand:ENS:nvidia:4476902b9244",
+  "ranking": [
+   {
+    "role": "MODEL_A",
+    "provider_id": "nvidia",
+    "score": [
+     5,
+     1,
+     1
+    ]
+   },
+   {
+    "role": "MODEL_B",
+    "provider_id": "gemini",
+    "score": [
+     5,
+     1,
+     1
+    ]
+   }
+  ],
+  "consensus_forced": false,
+  "note": "the primary candidate enters the pipeline; disagreement objects remain UNRESOLVED and travel with the artifact chain (E15-E: do not force consensus)",
+  "decided_at": "2026-09-07T07:49:33+00:00Z"
+ },
+ "built_at": "2026-09-07T07:49:10+00:00Z",
+ "status": "ENSEMBLE_RUN",
+ "paths": [
+  "nvidia",
+  "gemini"
+ ],
+ "comparison": {
+  "method": "pairwise significant-word Jaccard over the four invention claim dimensions (deterministic, N-ary; E16-G)",
+  "thresholds": {
+   "agreement": 0.3,
+   "disagreement": 0.25
+  },
+  "roles_compared": [
+   "MODEL_A",
+   "MODEL_B"
+  ],
+  "pairs_compared": 1
+ }
+}
