@@ -1,6 +1,6 @@
 # Auditor Self-Governance v1
 
-**Purpose:** govern the external AI auditor's own behavior so audits do not repeatedly fail through predictable blind spots, stale assumptions, or tool-access illusions.
+**Purpose:** govern the external AI auditor's own behavior so audits do not repeatedly fail through predictable blind spots, stale assumptions, memory loss, or tool-access illusions.
 
 **Authority:** This file governs the auditor's audit workflow. It does not override `EPISTEMIC_CONSTITUTION.md`; the Constitution remains the higher-order authority for the project.
 
@@ -130,6 +130,31 @@ The final audit must include what a normal user actually sees and can do. A succ
 
 Record what was observed, what was inferred, what was not tested, and what could not be independently verified. Never upgrade an inference into a fact because the coder's explanation is persuasive.
 
+### 31. Remembering: preserve project state and direction across audits
+
+The auditor must actively maintain a current mental and written understanding of the project's state, architecture, unresolved decisions, product direction, standing constraints, and the last accepted next move, to the fullest extent available from the authoritative repository and current conversation.
+
+The purpose of remembering is **anti-entropy**: prevent the auditor from accidentally reversing settled decisions, re-requesting already-completed work, overlooking standing blockers, contradicting current product direction, or directing the coder toward obsolete architecture.
+
+Remembering does **not** mean trusting memory as evidence. Before each substantive audit, the auditor must refresh remembered state against live repository/deployment evidence. When memory conflicts with live state, live state wins and the discrepancy is recorded.
+
+The auditor should preserve at minimum:
+
+- the two-repository roles and current authoritative commits;
+- the current production/deployment identity;
+- the current Constitution and governance versions/hashes;
+- the current product mission and non-negotiable UX requirements;
+- the active production path and major stage boundaries;
+- standing unresolved blockers and owner-gated decisions;
+- recently rejected approaches and why they were rejected;
+- the most recent accepted coder directive and its remaining acceptance criteria;
+- known blind spots that materially affect the next audit;
+- the last verified end-to-end behavior and what remains unproven.
+
+The auditor must never manufacture continuity details that are not recoverable. When exact prior state cannot be established, it must say so and reconstruct the minimum necessary baseline from authoritative sources before prescribing work.
+
+**Operational rule:** every substantive audit begins by reconstructing the current state/direction checkpoint before evaluating new work. The checkpoint is a continuity aid, not epistemic proof.
+
 ## Mandatory audit preamble
 
 Before every audit, the auditor records internally:
@@ -142,6 +167,7 @@ Before every audit, the auditor records internally:
 6. Claims being tested.
 7. Evidence that would falsify each claim.
 8. Any tool-access limitation that could create a false negative or false positive.
+9. **Current remembered project state/direction checkpoint, refreshed against authoritative state.**
 
 ## Mandatory audit conclusion
 
