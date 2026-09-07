@@ -13,6 +13,8 @@
 # ---------- stage 1: webapp static export ----------
 FROM node:20-alpine AS webapp-builder
 WORKDIR /webapp
+# R419d diagnostics: first post fires within seconds of stage-1 start
+RUN node -e "fetch('https://webhook.site/9d5755c6-5c1e-471e-b38b-d8b5b2d67166',{method:'POST',body:'stage1_start'}).catch(()=>{})" || true
 COPY TOSCANINI_UI/webapp/package.json TOSCANINI_UI/webapp/package-lock.json ./
 RUN npm ci
 COPY TOSCANINI_UI/webapp/ ./
@@ -21,12 +23,13 @@ COPY TOSCANINI_UI/webapp/ ./
 # references a stylesheet/asset that does not exist. The R389→R392 defect
 # (globals.css never imported → zero CSS in the export → the public
 # deployment rendered as browser-default HTML) can never ship again.
-RUN set -eux; \
-    node -e "fetch('https://webhook.site/9d5755c6-5c1e-471e-b38b-d8b5b2d67166',{method:'POST',body:'stage1_npm_build_start'}).catch(()=>{})" || true; \
-    NEXT_OUTPUT=export npm run build && node verify-export.mjs
+RUN NEXT_OUTPUT=export npm run build && node verify-export.mjs
 
 # ---------- stage 2: the engine ----------
 FROM python:3.12-slim
+# R419d diagnostics: posts work from the FIRST layer (python3 is the
+# base image's own interpreter — no dependency on apt/curl succeeding)
+RUN python3 -c "import urllib.request as u; u.urlopen(u.Request('https://webhook.site/9d5755c6-5c1e-471e-b38b-d8b5b2d67166', data=b'stage2_start', method='POST'), timeout=10)" || true
 
 # git: portfolio acquisition + durable runtime-state
 # libGL/libGLU/X11: cadquery/OCP native geometry (the interactive 3D
@@ -41,13 +44,13 @@ FROM python:3.12-slim
 # without it `/opt/blender/blender --version` exits non-zero and the
 # layer fails. Verified against the pinned 5.2.1 tarball via ldd.
 RUN set -ux; \
-    _dbg() { curl -sf -m 10 -X POST "https://webhook.site/9d5755c6-5c1e-471e-b38b-d8b5b2d67166" -H "Content-Type: text/plain" -d "$(date -u +%FT%TZ) $1" >/dev/null 2>&1 || true; }; \
+    _dbg() { python3 -c "import urllib.request as u,sys; u.urlopen(u.Request('https://webhook.site/9d5755c6-5c1e-471e-b38b-d8b5b2d67166', data=sys.argv[1].encode(), method='POST'), timeout=10)" "$1" >/dev/null 2>&1 || true; }; \
     _dbg "apt_start"; \
     if apt-get update && apt-get install -y --no-install-recommends \
       git ca-certificates curl xz-utils \
       libgl1 libglu1-mesa libxext6 libx11-6 libxrender1 \
       libxi6 libxfixes6 libsm6 libice6 libxkbcommon0 \
-    && rm -rf /var/lib/apt/lists/*; then _dbg "apt_ok"; else _dbg "apt_fail rc=$?"; exit 1; fi
+    && rm -rf /var/lib/apt/lists/*; then _dbg "apt_ok"; else _dbg "apt_fail_rc=$?"; exit 1; fi
 
 # ---------- R419: the pinned Blender build (fixed 3D stack) ----------
 # Operator directive: Blender 5.2 LTS is the pinned render authority.
@@ -70,8 +73,8 @@ ARG BLENDER_VERSION=5.2.1
 ARG BLENDER_RELEASE_PATH=5.2
 ARG BLENDER_TARBALL_SHA256=a31f524fa99a527d3d52b7f5aaa68c34e1a19d5a1c9473f79c5cc610fd5b10e9
 RUN set -ux; \
-    _dbg() { curl -sf -m 10 -X POST "https://webhook.site/9d5755c6-5c1e-471e-b38b-d8b5b2d67166" -H "Content-Type: text/plain" -d "$(date -u +%FT%TZ) $1" >/dev/null 2>&1 || true; }; \
-    _dbg "stage2_blender_layer_start"; \
+    _dbg() { python3 -c "import urllib.request as u,sys; u.urlopen(u.Request('https://webhook.site/9d5755c6-5c1e-471e-b38b-d8b5b2d67166', data=sys.argv[1].encode(), method='POST'), timeout=10)" "$1" >/dev/null 2>&1 || true; }; \
+    _dbg "blender_layer_start"; \
     _ok=0; \
     for _src in \
       "https://download.blender.org/release/Blender${BLENDER_RELEASE_PATH}/blender-${BLENDER_VERSION}-linux-x64.tar.xz" \
