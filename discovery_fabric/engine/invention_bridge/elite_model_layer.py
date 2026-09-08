@@ -45,65 +45,50 @@ def _write_json(path, data) -> None:
 
 
 # ---------------------------------------------------------------------------
-# Parametric source emission (ENGINEERING_3D only)
+# Parametric source emission (ENGINEERING_3D only) — R425 §2: ONE CAD
+# source of truth. The shipped source is EXPORTED from the canonical
+# engineering_geometry.FORM_LIBRARY builder (verbatim, via
+# inspect.getsource) — never an independently handwritten
+# reimplementation in this package layer. The R424-era handwritten
+# _FORM_SOURCE map is DELETED (Art. LXIV: superseded implementations
+# are retired, not accumulated).
 # ---------------------------------------------------------------------------
-
-_FORM_SOURCE = {
-    "layered_panel": '''def build(p):
-    length = p["length_mm"]
-    width = p["width_mm"]
-    thickness = p["thickness_mm"]
-    body = (cq.Workplane("XY")
-            .box(length, width, thickness, centered=(True, True, False)))
-    return {"layered_panel": body}
-''',
-    "dual_lumen_catheter": '''def build(p):
-    od = p["outer_diameter_mm"]
-    pd = p["primary_lumen_diameter_mm"]
-    fd = p["floor_lumen_diameter_mm"]
-    off = p["floor_offset_mm"]
-    length = p["length_mm"]
-    body = cq.Workplane("XY").circle(od * 0.5).extrude(length)
-    prim = (cq.Workplane("XY").center(pd * 0.35, 0.0)
-            .circle(pd * 0.5).extrude(length + 2))
-    floor = (cq.Workplane("XY").center(-off, 0.0)
-             .circle(fd * 0.5).extrude(length + 2))
-    return {"dual_lumen_catheter": body.cut(prim).cut(floor)}
-''',
-    "cylindrical_device": '''def build(p):
-    od = p["outer_diameter_mm"]
-    h = p["height_mm"]
-    wall = p["wall_thickness_mm"]
-    port = p["port_diameter_mm"]
-    body = cq.Workplane("XY").circle(od / 2).extrude(h)
-    cavity = (cq.Workplane("XY").workplane(offset=wall)
-              .circle(od / 2 - wall).extrude(h - 2 * wall))
-    port_cut = (cq.Workplane("XY").workplane(offset=-1)
-                .circle(port / 2).extrude(wall + 2))
-    return {"cylindrical_device": body.cut(cavity).cut(port_cut)}
-''',
-}
 
 
 def _emit_parametric_source(pkg_model_dir: Path, form: str,
                             params: Dict[str, float]) -> Optional[str]:
-    """The standalone source of truth: `def build(p)` over the shipped
-    parameter map — the SAME construction the bridge's engineering
-    geometry executes (deterministic CadQuery/OCCT)."""
-    src = _FORM_SOURCE.get(form)
-    if not src:
+    """Write MODEL/PARAMETRIC_MODEL_SOURCE.py as the EXPORT of the
+    canonical builder (the same program the bridge's engineering
+    geometry executes). Returns the file path, or None when no
+    canonical builder exists for the form (the package then ships NO
+    parametric source — never a reimplementation)."""
+    from . import engineering_geometry as eg
+    file_text, identity = eg.export_parametric_source(form, params)
+    if file_text is None:
         return None
-    header = (
-        '"""PARAMETRIC MODEL SOURCE — the source of truth for this 3D '
-        f'design (bridge form: {form}).\n'
-        'Executed with MODEL/PARAMETERS.json; STEP/STL/GLB are derived '
-        'artifacts.\n'
-        'The regeneration check (MODEL/3D_EVIDENCE/REGENERATION_CHECK'
-        '.json) re-executes this program and compares measurements.\n'
-        '"""\nimport cadquery as cq\n\n\n')
     path = pkg_model_dir / "PARAMETRIC_MODEL_SOURCE.py"
-    path.write_text(header + src)
+    path.write_text(file_text)
     return str(path)
+
+
+def _canonical_identity(form: Optional[str]) -> Optional[Dict[str, Any]]:
+    """The canonical builder identity tuple recorded in the package
+    (R425 §2: canonical builder identity + source hash). None when the
+    form is absent (conceptual class records nothing to fake)."""
+    if not form:
+        return None
+    from . import engineering_geometry as eg
+    ident = eg.canonical_source_identity(form)
+    return {k: ident.get(k) for k in (
+        "form", "builder_function", "canonical_module", "module_path",
+        "module_sha256", "builder_source_sha256", "status")}
+
+
+def _parameter_hash(params: Optional[Dict[str, Any]]) -> Optional[str]:
+    if params is None:
+        return None
+    from . import engineering_geometry as eg
+    return eg.parameter_map_hash(params)
 
 
 def build_model_layer(out_dir: str, run_result: Dict[str, Any],
@@ -169,13 +154,17 @@ def build_model_layer(out_dir: str, run_result: Dict[str, Any],
 
     # ---- parametric source + derived CAD (ENGINEERING_3D) --------------
     derived = []
+    cad_provenance = None
     if is_engineering:
         form = (geometry_out.get("parametric_source") or {}).get("form")
         src_path = _emit_parametric_source(
-            model_dir, form, {p["param_id"]: p["value"]
-                              for p in parameters})
+            model_dir, form,
+            (geometry_out.get("parametric_source") or {}).get(
+                "parameters") or {p["param_id"]: p["value"]
+                                  for p in parameters})
         if src_path:
-            _record(Path(src_path), "parametric source of truth")
+            _record(Path(src_path), "parametric source (exported from "
+                                    "the canonical builder)")
         # derived CAD artifacts: copy from the run's exported set
         for key in ("step_files", "stl_files"):
             for p in geometry_out.get(key) or []:
@@ -196,6 +185,56 @@ def build_model_layer(out_dir: str, run_result: Dict[str, Any],
                                 "sha256": _sha256_file(dest),
                                 "bytes": dest.stat().st_size,
                                 "role": "svg_view"})
+        # ---- CAD_SOURCE_PROVENANCE.json (R425 §2) ------------------------
+        # canonical builder identity + source hash + parameter hash +
+        # derived artifact hashes + the regeneration relationship — the
+        # record that makes a second geometry source detectable.
+        glb_file = model_dir / f"{package_id}.glb"
+        derived_all = derived + ([{
+            "path": f"MODEL/{glb_file.name}",
+            "sha256": _sha256_file(glb_file),
+            "bytes": glb_file.stat().st_size,
+            "role": "glb"}] if glb_file.is_file() else [])
+        cad_provenance = {
+            "artifact": "CAD_SOURCE_PROVENANCE",
+            "package_id": package_id,
+            "rule": ("one CAD source of truth (R425 §2): "
+                     "MODEL/PARAMETRIC_MODEL_SOURCE.py is EXPORTED from "
+                     "the canonical engineering geometry program — an "
+                     "independent reimplementation in the package layer "
+                     "is forbidden and detectable"),
+            "authoritative_source_path": (
+                "canonical builder (engineering_geometry.FORM_LIBRARY) "
+                "-> exported parametric source + parameters -> derived "
+                "STEP/STL/GLB"),
+            "canonical_builder": _canonical_identity(form),
+            "exported_file": "MODEL/PARAMETRIC_MODEL_SOURCE.py",
+            "exported_source_sha256": (
+                _sha256_file(model_dir / "PARAMETRIC_MODEL_SOURCE.py")
+                if (model_dir / "PARAMETRIC_MODEL_SOURCE.py").is_file()
+                else None),
+            "parameter_map": (geometry_out.get("parametric_source")
+                              or {}).get("parameters"),
+            "parameter_hash": _parameter_hash(
+                (geometry_out.get("parametric_source") or {}).get(
+                    "parameters")),
+            "derived_artifacts": derived_all,
+            "regeneration_relationship": {
+                "claim": ("executing MODEL/PARAMETRIC_MODEL_SOURCE.py "
+                          "build() over MODEL/PARAMETERS.json "
+                          "reconstructs the same geometry as the "
+                          "canonical FORM_LIBRARY builder"),
+                "verification": "MODEL/3D_EVIDENCE/REGENERATION_CHECK.json",
+                "drift_detection": (
+                    "engineering_geometry.verify_cad_source_provenance"
+                    "(model_dir) re-derives the live canonical identity "
+                    "and compares it to canonical_builder above"),
+            },
+        }
+        _write_json(model_dir / "CAD_SOURCE_PROVENANCE.json",
+                    cad_provenance)
+        _record(model_dir / "CAD_SOURCE_PROVENANCE.json",
+                "canonical CAD source provenance (R425 §2)")
 
     # ---- MODEL_MANIFEST.json --------------------------------------------
     _write_json(model_dir / "MODEL_MANIFEST.json", {
@@ -206,12 +245,16 @@ def build_model_layer(out_dir: str, run_result: Dict[str, Any],
                    + str((geometry_out.get("parametric_source") or {})
                          .get("form")) + ")") if is_engineering
         else "BRIDGE_CONCEPTUAL (system architecture visualization)",
+        "canonical_builder": (cad_provenance or {}).get(
+            "canonical_builder") if is_engineering else None,
         "objects": geometry_out.get("components") or [],
         "parameter_count": len(parameters),
         "source_of_truth": (
-            "MODEL/PARAMETRIC_MODEL_SOURCE.py + MODEL/PARAMETERS.json; "
-            "STEP/STL/GLB below are DERIVED artifacts with real sha256 "
-            "of real bytes") if is_engineering else
+            "MODEL/PARAMETRIC_MODEL_SOURCE.py (EXPORTED from the "
+            "canonical engineering_geometry.FORM_LIBRARY builder) + "
+            "MODEL/PARAMETERS.json; STEP/STL/GLB below are DERIVED "
+            "artifacts with real sha256 of real bytes; see "
+            "MODEL/CAD_SOURCE_PROVENANCE.json") if is_engineering else
             ("the conceptual GLB(s) — topology visualization only; "
              "no parametric source exists for a conceptual class"),
         "derived_artifacts": derived,
@@ -403,14 +446,23 @@ def _build_3d_evidence(ev_dir: Path, out_dir: str,
     _ev_record(ev_dir / "3D_EVIDENCE_README.json", "JSON")
 
     # --- regeneration + parameter-feature log (one rebuild) --------------
+    # R425 §2: the regeneration check EXECUTES THE SHIPPED
+    # PARAMETRIC_MODEL_SOURCE.py (not merely the canonical builder) and
+    # compares its measurements against BOTH the canonical FORM_LIBRARY
+    # builder AND the shipped KEY_DIMENSIONS — proving the shipped
+    # parameter source reconstructs the same geometry as the canonical
+    # builder. A tampered/handwritten source fails here.
     regen = {"artifact": "REGENERATION_CHECK",
-             "method": ("independent rebuild: re-execute the bridge's "
-                        "deterministic form builder with the SHIPPED "
-                        "MODEL/PARAMETERS.json, measure with the same "
-                        "OCCT measurement, and compare against the "
-                        "shipped MODEL/KEY_DIMENSIONS.json"),
+             "method": ("clean regeneration (R425 §2): execute the "
+                        "SHIPPED MODEL/PARAMETRIC_MODEL_SOURCE.py "
+                        "build() over the shipped parameters, measure "
+                        "with the same OCCT measurement, and compare "
+                        "against (a) the canonical FORM_LIBRARY builder "
+                        "rebuilt live and (b) the shipped MODEL/"
+                        "KEY_DIMENSIONS.json"),
              "tolerance_mm": 1e-3, "objects": {},
              "regeneration_status": "NOT_PERFORMED",
+             "shipped_source_executed": False,
              "evidence_class": "COMPUTATIONAL_RESULT"}
     plog = {"artifact": "PARAMETER_FEATURE_LOG",
             "method": ("parameters from MODEL/PARAMETERS.json compared "
@@ -424,33 +476,79 @@ def _build_3d_evidence(ev_dir: Path, out_dir: str,
         from . import engineering_geometry as eg
         form = (geometry_out.get("parametric_source") or {}).get("form")
         builder = eg.FORM_LIBRARY.get(form)
-        if builder and parameters:
-            pmap = {p["param_id"]: p["value"] for p in parameters}
-            solid = builder(pmap)
-            measured = eg.measure(solid)
+        # the ACTUAL build map the bridge normalized (the same map the
+        # exported source carries as its PARAMETERS literal)
+        build_map = dict((geometry_out.get("parametric_source") or {})
+                         .get("parameters") or {})
+        if not build_map and parameters:
+            # fallback: normalize the MODEL/PARAMETERS.json ids exactly
+            # the way the bridge did (strip _mm family suffixes)
+            for p in parameters:
+                k = str(p["param_id"]).replace("_mm", "").replace(
+                    "-mm", "").replace(" ", "_").lower()
+                build_map[k] = p["value"]
+        shipped_src = ev_dir.parent / "PARAMETRIC_MODEL_SOURCE.py"
+        shipped_ns = None
+        if shipped_src.is_file() and (build_map or parameters):
+            # (a) EXECUTE THE SHIPPED SOURCE — the §2 clean regeneration
+            shipped_ns = {"__name__": "shipped_parametric_source"}
+            exec(compile(shipped_src.read_text(),
+                         str(shipped_src), "exec"), shipped_ns)
+            regen["shipped_source_executed"] = True
+        if builder and build_map and shipped_ns is not None:
+            # (b) rebuild the CANONICAL builder live (the same call the
+            # bridge made)
+            canonical_solid = builder(build_map)
+            canonical_meas = eg.measure(canonical_solid)
+            # (c) rebuild from the SHIPPED exported source AS SHIPPED
+            # (its own PARAMETERS literal — no injected overrides)
+            shipped_solid = shipped_ns["build"]()
+            shipped_meas = eg.measure(shipped_solid)
+            # (d) the shipped KEY_DIMENSIONS (what the run measured)
             shipped = geometry_out.get("key_dimensions") or {}
-            v_delta = abs((measured.get("volume_mm3") or 0)
+            v_delta_sc = abs((shipped_meas.get("volume_mm3") or 0)
+                             - (canonical_meas.get("volume_mm3") or 0))
+            bbox_deltas_sc = {k: round(abs(
+                (shipped_meas.get("bbox") or {}).get(k, 0)
+                - (canonical_meas.get("bbox") or {}).get(k, 0)), 6)
+                for k in ("xlen", "ylen", "zlen")}
+            v_delta = abs((shipped_meas.get("volume_mm3") or 0)
                           - (shipped.get("volume_mm3") or 0))
             bbox_deltas = {k: round(abs(
-                (measured.get("bbox") or {}).get(k, 0)
+                (shipped_meas.get("bbox") or {}).get(k, 0)
                 - (shipped.get("bbox") or {}).get(k, 0)), 6)
                 for k in ("xlen", "ylen", "zlen")}
-            match = v_delta <= regen["tolerance_mm"] and all(
-                d <= regen["tolerance_mm"] for d in bbox_deltas.values())
+            match = (v_delta <= regen["tolerance_mm"]
+                     and all(d <= regen["tolerance_mm"]
+                             for d in bbox_deltas.values()))
+            same_as_canonical = (
+                v_delta_sc <= regen["tolerance_mm"]
+                and all(d <= regen["tolerance_mm"]
+                        for d in bbox_deltas_sc.values()))
             regen["objects"] = {form: {
                 "status": "MATCH" if match else "MISMATCH",
-                "volume_mm3_rebuilt": measured.get("volume_mm3"),
-                "volume_mm3_shipped": shipped.get("volume_mm3"),
-                "volume_delta": round(v_delta, 6),
+                "shipped_source_equals_canonical_builder": (
+                    "MATCH" if same_as_canonical else "MISMATCH"),
+                "volume_mm3_shipped_source": shipped_meas.get(
+                    "volume_mm3"),
+                "volume_mm3_canonical_builder": canonical_meas.get(
+                    "volume_mm3"),
+                "volume_mm3_record": shipped.get("volume_mm3"),
+                "volume_delta_shipped_vs_canonical": round(v_delta_sc, 6),
+                "volume_delta_shipped_vs_record": round(v_delta, 6),
                 "bbox_dim_deltas_mm": bbox_deltas}}
             regen["regeneration_status"] = (
-                "REPRODUCIBLE" if match else "NOT_REPRODUCIBLE")
+                "REPRODUCIBLE" if match and same_as_canonical
+                else "NOT_REPRODUCIBLE")
             # parameter -> measured feature matching (mechanical)
             matched = 0
-            feats = {"bbox.xlen": (measured.get("bbox") or {}).get("xlen"),
-                     "bbox.ylen": (measured.get("bbox") or {}).get("ylen"),
-                     "bbox.zlen": (measured.get("bbox") or {}).get("zlen"),
-                     "volume_mm3": measured.get("volume_mm3")}
+            feats = {"bbox.xlen": (shipped_meas.get("bbox") or {}).get(
+                "xlen"),
+                     "bbox.ylen": (shipped_meas.get("bbox") or {}).get(
+                "ylen"),
+                     "bbox.zlen": (shipped_meas.get("bbox") or {}).get(
+                "zlen"),
+                     "volume_mm3": shipped_meas.get("volume_mm3")}
             for p in parameters:
                 rows = []
                 for fname, fval in feats.items():
@@ -470,6 +568,11 @@ def _build_3d_evidence(ev_dir: Path, out_dir: str,
                     "dimension — see the parametric source)"})
             plog["parameters_with_linear_feature_match"] = min(
                 matched, len(parameters))
+        elif parameters and shipped_ns is None:
+            regen["error"] = (
+                "PARAMETRIC_MODEL_SOURCE.py absent while engineering "
+                "parameters exist — the exported source must ship with "
+                "every ENGINEERING_3D package (R425 §2)")
     except Exception as exc:  # noqa: BLE001 — typed, never silent
         regen["error"] = f"{type(exc).__name__}: {exc}"
     _write_json(ev_dir / "REGENERATION_CHECK.json", regen)

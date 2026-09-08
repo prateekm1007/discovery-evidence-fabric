@@ -19,7 +19,10 @@ diagnosis so the bridge can attempt repair (handoff section 17):
 from __future__ import annotations
 
 import hashlib
+import inspect
+import json
 import math
+from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 import cadquery as cq
@@ -147,6 +150,225 @@ def route_form(intervention_site: str, subsystems: List[str]) -> str:
         if any(sig in text for sig in signals):
             return form
     return "cylindrical_device"  # conservative default form
+
+
+# ---------------------------------------------------------------------------
+# Canonical parametric-source export (R425 §2 — ONE CAD source of truth)
+# ---------------------------------------------------------------------------
+
+def _module_sha256() -> Optional[str]:
+    """sha256 of THIS module's bytes on disk — the canonical program's own
+    identity (None only when the file is genuinely unreadable, never a
+    guess; Art. VI)."""
+    try:
+        p = Path(__file__).resolve()
+        h = hashlib.sha256()
+        with open(p, "rb") as fh:
+            for chunk in iter(lambda: fh.read(1 << 20), b""):
+                h.update(chunk)
+        return h.hexdigest()
+    except OSError:
+        return None
+
+
+def canonical_source_identity(form: str) -> Dict[str, Any]:
+    """The identity tuple of a canonical FORM_LIBRARY builder.
+
+    This is THE export authority for the package layer (R425 §2): the
+    package's MODEL/PARAMETRIC_MODEL_SOURCE.py must be derived from the
+    EXACT canonical builder this function identifies — an independently
+    handwritten reimplementation of the geometry in the package layer
+    is a second source of truth and is constitutionally forbidden
+    (Art. X: one canonical authority; Art. VI: provenance is real).
+
+    Returns the identity even for an unknown form (with
+    builder_function=None) so callers can record the refusal honestly.
+    """
+    builder = FORM_LIBRARY.get(form)
+    if builder is None:
+        return {
+            "form": form,
+            "builder_function": None,
+            "canonical_module": __name__,
+            "module_path": str(Path(__file__).resolve()),
+            "module_sha256": _module_sha256(),
+            "builder_source_sha256": None,
+            "form_library_forms": sorted(FORM_LIBRARY),
+            "status": "UNKNOWN_FORM — no canonical builder exists for "
+                      f"form '{form}'; nothing may be exported or "
+                      "reimplemented (Art. XXV)",
+        }
+    source_text = inspect.getsource(builder)
+    return {
+        "form": form,
+        "builder_function": builder.__name__,
+        "canonical_module": __name__,
+        "module_path": str(Path(__file__).resolve()),
+        "module_sha256": _module_sha256(),
+        "builder_source_sha256": hashlib.sha256(
+            source_text.encode("utf-8")).hexdigest(),
+        "form_library_forms": sorted(FORM_LIBRARY),
+        "status": "CANONICAL",
+    }
+
+
+def _exported_file_text(form: str, parameters: Dict[str, float],
+                        identity: Dict[str, Any],
+                        parameter_hash: str) -> str:
+    """The standalone parametric source, DERIVED from the canonical
+    builder — never a reimplementation.
+
+    The exported file is executable on its own: `build(p)` (or no-arg
+    `build()` over the shipped PARAMETERS literal) reconstructs the
+    geometry with deterministic CadQuery/OCCT semantics identical to
+    the canonical FORM_LIBRARY entry, because the builder body below
+    IS the canonical builder body, exported verbatim via
+    inspect.getsource (R425 §2's one authoritative source path:
+    canonical builder -> exported parametric source + parameters ->
+    derived STEP/STL/GLB).
+    """
+    builder = FORM_LIBRARY[form]
+    builder_source = inspect.getsource(builder)
+    param_literal = json.dumps(parameters, indent=4, sort_keys=True)
+    return f'''"""PARAMETRIC MODEL SOURCE — exported from the canonical
+engineering geometry program (R425: one CAD source of truth).
+
+Canonical program : {identity["canonical_module"]}
+Builder function  : {identity["builder_function"]}
+Form              : {form}
+Canonical module sha256      : {identity["module_sha256"]}
+Canonical builder source sha256: {identity["builder_source_sha256"]}
+Parameter hash (build map)    : {parameter_hash}
+
+This file is DERIVED, not authored: the builder below is the canonical
+FORM_LIBRARY builder, exported verbatim. Executing build() with
+MODEL/PARAMETERS.json (or the PARAMETERS literal below) reconstructs
+the same geometry the canonical bridge executed; MODEL/STEP/STL/GLB
+files are derived artifacts of exactly this program (see
+MODEL/CAD_SOURCE_PROVENANCE.json for the full relationship and hashes).
+
+Regeneration check:
+    python PARAMETRIC_MODEL_SOURCE.py
+rebuilds the solid, measures it (OCCT), and prints the measurements as
+JSON — compare against MODEL/KEY_DIMENSIONS.json and
+MODEL/3D_EVIDENCE/REGENERATION_CHECK.json.
+"""
+from typing import Dict, Optional
+
+import cadquery as cq
+
+
+{builder_source}
+
+
+PARAMETERS = {param_literal}
+
+
+def build(p: Optional[Dict[str, float]] = None) -> "cq.Workplane":
+    """Entry point preserving the shipped-source contract: build(p)
+    executes the canonical builder over the shipped parameter map
+    (or an explicit override map p)."""
+    return {builder.__name__}(PARAMETERS if p is None else p)
+
+
+if __name__ == "__main__":
+    import json as _json
+    import sys as _sys
+    from pathlib import Path as _Path
+    _p = _Path(__file__).resolve().parent / "PARAMETERS.json"
+    if _p.is_file():
+        _doc = _json.loads(_p.read_text())
+        _values = {{}}
+        for _e in _doc.get("parameters", []):
+            _pid = str(_e.get("param_id") or "")
+            _v = _e.get("value")
+            if isinstance(_v, (int, float)) and _pid:
+                # canonical builder keys are unit-suffix-free (the same
+                # normalization the bridge applies); the raw id is kept
+                # too so both spellings drive the build
+                _values[_pid] = _v
+                _values[_pid.replace("_mm", "").replace(
+                    "-mm", "").replace(" ", "_").lower()] = _v
+        if _values:
+            PARAMETERS.update(_values)
+    _solid = build()
+    _bb = _solid.val().BoundingBox()
+    _out = {{
+        "form": {form!r},
+        "volume_mm3": round(_solid.val().Volume(), 6),
+        "bbox": {{"xlen": round(_bb.xlen, 6), "ylen": round(_bb.ylen, 6),
+                 "zlen": round(_bb.zlen, 6)}},
+        "parameters": PARAMETERS,
+    }}
+    _sys.stdout.write(_json.dumps(_out, indent=2))
+'''
+
+
+def parameter_map_hash(parameters: Dict[str, Any]) -> str:
+    """sha256 over the canonical JSON serialization of a build parameter
+    map — the parameter identity recorded in CAD_SOURCE_PROVENANCE and
+    the exported source header (one definition, used by both)."""
+    return hashlib.sha256(json.dumps(
+        parameters, sort_keys=True, default=str).encode("utf-8")).hexdigest()
+
+
+def export_parametric_source(form: str,
+                             parameters: Dict[str, float]
+                             ) -> Tuple[Optional[str], Dict[str, Any]]:
+    """(file_text, identity) — the ONE authoritative export path from
+    the canonical geometry program to the package's parametric source.
+
+    file_text is None only when no canonical builder exists for the
+    form (the identity records the honest UNKNOWN_FORM refusal; a
+    package layer must then ship NO parametric source at all — never
+    a reimplementation, R425 §2).
+    """
+    identity = canonical_source_identity(form)
+    if identity.get("builder_function") is None:
+        return None, identity
+    param_hash = parameter_map_hash(parameters)
+    return _exported_file_text(form, parameters, identity, param_hash), identity
+
+
+def verify_cad_source_provenance(model_dir: str) -> Dict[str, Any]:
+    """Drift detector (R425 §2 regression hook): re-derive the LIVE
+    canonical builder identity and compare it against the identity a
+    shipped package recorded in MODEL/CAD_SOURCE_PROVENANCE.json.
+
+    VERDICTS:
+      CANONICAL_SOURCE_CONFIRMED — every recorded identity field still
+        matches the live canonical program;
+      DRIFT_DETECTED — the canonical builder changed after the package
+        was built (source or module hash mismatch): the package's
+        provenance statement no longer describes the live program;
+      PROVENANCE_RECORD_ABSENT / UNKNOWN_FORM — the package layer
+        failed to record (or recorded an unresolvable) canonical
+        identity — itself a defect for an ENGINEERING package.
+    """
+    record_path = Path(model_dir) / "CAD_SOURCE_PROVENANCE.json"
+    if not record_path.is_file():
+        return {"verdict": "PROVENANCE_RECORD_ABSENT",
+                "model_dir": str(model_dir)}
+    try:
+        record = json.loads(record_path.read_text())
+    except (OSError, ValueError) as exc:
+        return {"verdict": "PROVENANCE_RECORD_UNREADABLE",
+                "error": f"{type(exc).__name__}: {exc}"}
+    recorded = record.get("canonical_builder") or {}
+    form = recorded.get("form")
+    live = canonical_source_identity(form) if form else {}
+    fields = ("builder_function", "canonical_module",
+              "module_sha256", "builder_source_sha256")
+    mismatches = [f for f in fields
+                  if recorded.get(f) != live.get(f)]
+    return {
+        "verdict": ("CANONICAL_SOURCE_CONFIRMED" if not mismatches
+                    else "DRIFT_DETECTED"),
+        "form": form,
+        "mismatched_fields": mismatches,
+        "recorded_identity": recorded,
+        "live_identity": {k: live.get(k) for k in fields},
+    }
 
 
 # ---------------------------------------------------------------------------

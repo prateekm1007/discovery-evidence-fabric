@@ -1550,6 +1550,67 @@ def main():
                   f"{exc}", file=sys.stderr, flush=True)
     threading.Thread(target=_render_recovery_sweep,
                      daemon=True).start()
+    # R425 §7: the render-completion durable observer. The artifact
+    # worker now runs under a minimal, secret-free environment; its
+    # post-render durable push is DELEGATED to THIS process (the
+    # application, which legitimately holds GITHUB_TOKEN). The observer
+    # scans terminal render-job records that lack a completed durable
+    # snapshot marker, snapshots them from here, and appends the typed
+    # marker to the job record (append-only: status and verdicts are
+    # never rewritten). Bounded delay replaces the worker-held secret:
+    # the R420 persistence contract (renders survive the next restart)
+    # is preserved without ever handing the renderer pipeline a
+    # credential.
+    def _render_completion_observer():
+        import time as _time
+        _time.sleep(90)  # first pass after boot settle
+        while True:
+            try:
+                _observer_pass()
+            except Exception as exc:  # noqa: BLE001 — disclosed
+                print(f"render-completion observer pass failed: "
+                      f"{type(exc).__name__}: {exc}",
+                      file=sys.stderr, flush=True)
+            _time.sleep(60)
+
+    def _observer_pass():
+        from toscanini import durable
+        if not durable.enabled():
+            return
+        for session in store.list_sessions():
+            sid = session.get("session_id")
+            run_dir = session.get("run_dir")
+            if not (sid and run_dir):
+                continue
+            job_path = Path(run_dir) / "MODEL" / "3D" / "RENDER_JOB.json"
+            if not job_path.is_file():
+                continue
+            try:
+                record = json.loads(job_path.read_text())
+            except (OSError, ValueError):
+                continue
+            if record.get("status") not in ("OK", "PARTIAL"):
+                continue
+            snapshots = record.get("durable_snapshots") or []
+            if any(s.get("ok") for s in snapshots):
+                continue  # already persisted
+            if record.get("durable_push") == "PUSHED_BY_WORKER":
+                continue  # persisted by a token-holding worker
+            snap = durable.snapshot(f"render_complete:{sid}")
+            marker = {"at": time.strftime("%Y-%m-%dT%H:%M:%SZ",
+                                          time.gmtime()),
+                      "ok": bool(snap.get("ok")),
+                      "by": "server_render_completion_observer"}
+            if not snap.get("ok"):
+                marker["error"] = str(snap.get("error"))[:200]
+            merged = dict(record)
+            merged["durable_snapshots"] = snapshots + [marker]
+            job_path.write_text(json.dumps(merged, indent=2))
+            print(f"[observer] render durable snapshot {sid}: "
+                  f"ok={snap.get('ok')}", file=sys.stderr, flush=True)
+
+    threading.Thread(target=_render_completion_observer,
+                     daemon=True).start()
     # R396 B.1/B.2: a boot snapshot immediately after restore. This is
     # the snapshot-pipeline health check on EVERY boot (a failure is
     # disclosed through /api/health durable.last_snapshot — never

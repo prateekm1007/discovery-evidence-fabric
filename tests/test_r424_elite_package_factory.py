@@ -130,25 +130,26 @@ class TestEngineeringDefinitionIsReal:
 
 class TestDecisiveExperiment:
     def test_populated_when_earned(self, elite_pkg):
-        """The weak baseline's 04 was empty. The elite 04 carries the
-        recorded experiment OR the honest derived killer-experiment
-        contract — never a bare empty record."""
+        """The weak baseline's 04 was empty. The elite 04 (R425 §5)
+        carries the buyer-runnable contract: every field either
+        DEFINED from a named canonical record or
+        NOT_DEFINED_IN_CANONICAL_STATE with its provenance basis —
+        never a bare empty record, never generic filler."""
         dex = _read(elite_pkg["pkg"], "04_DECISIVE_EXPERIMENT.json")
-        sel = dex.get("selected")
-        derived = dex.get("derived_from_invention_record") or {}
-        assert sel or derived.get("definition") or \
-            derived.get("hypotheses") or derived.get(
-                "status") == "NOT_RECORDED", \
-            "decisive experiment layer is empty"
-        # when the loop recorded none, the derived layer discloses WHY
-        if not sel:
-            assert derived.get("status") in (
-                "DERIVED_FROM_KILLER_EXPERIMENT_RECORD", "NOT_RECORDED")
-            assert "no values are invented" in (
-                derived.get("note") or "") or derived.get("note")
-        # the falsification contract fields survive
-        assert dex.get("no_invented_values_note") is not None or \
-            derived.get("verification_requirement") is not None
+        assert dex["schema"] == "R425_DECISIVE_EXPERIMENT_CONTRACT"
+        contract = dex["contract"]
+        assert len(contract) >= 14
+        sel = dex["recorded_layer"].get("selected")
+        hyp = contract["hypothesis"]["value"]
+        assert sel or hyp, "decisive experiment layer is empty"
+        # every field carries its provenance basis
+        for name, field in contract.items():
+            assert field["provenance_basis"], name
+            assert field["status"] in (
+                "DEFINED", "NOT_DEFINED_IN_CANONICAL_STATE"), name
+        # gaps are honest, never filler prose
+        blob = json.dumps(dex).lower()
+        assert "further testing required" not in blob
 
 
 class TestEvidenceStructure:
@@ -180,9 +181,10 @@ class TestUnknownRoadmap:
         ur = _read(elite_pkg["pkg"], "UNKNOWN_ROADMAP.json")
         assert ur["unknown_count_roadmap"] >= 3
         for u in ur["unknowns"][:3]:
-            assert u["what_would_resolve_it"]
+            assert u["resolution_action"]
             assert u["expected_measurement"]
             assert u["acceptance_rule"]
+            assert u["consequence"]
             assert u["classification"] in (
                 "LITERATURE_RESOLVABLE", "BENCH_TEST_REQUIRED",
                 "ENGINEERING_DESIGN_REQUIRED",
@@ -220,12 +222,15 @@ class TestTraceability:
     def test_explicit_id_chains(self, elite_pkg):
         tr = _read(elite_pkg["pkg"], "ENGINEERING_TRACEABILITY.json")
         assert tr["summary"]["design_outputs"] >= 3
-        assert tr["chains"]
-        # exact id bindings, no semantic guessing
-        for c in tr["chains"][:3]:
-            for link in c["design_input_links"]:
-                assert link["binding"] in ("EXPLICIT", "UNKNOWN")
-                assert link["binding_basis"]
+        assert tr["links"]
+        # exact id bindings, no semantic guessing (R425 §4 graph:
+        # every link is EXPLICIT or UNKNOWN-with-basis)
+        for link in tr["links"][:5]:
+            assert link["binding"] in ("EXPLICIT", "UNKNOWN")
+            assert link["binding_basis"]
+        cov = tr["coverage"]
+        assert (cov["explicit_bindings"] + cov["unknown_bindings"]
+                == cov["total_links"])
 
 
 class TestProvenance:
@@ -239,7 +244,7 @@ class TestProvenance:
         assert prov["engine_commit_source"]
         if commit != "UNKNOWN":
             assert len(commit) >= 7  # a real sha prefix
-        assert prov["package_version"] == "R424_ELITE.1.0.0"
+        assert prov["package_version"] == "R425_ELITE.1.1.0"
         assert prov["canonical_invention_state_identity"][
             "invention_spec_hash"]
         assert prov["generated_at_utc"]

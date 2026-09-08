@@ -357,21 +357,30 @@ class TestBridgeEngineeringPath(unittest.TestCase):
 
     def test_full_record_earns_engineering_definition_maturity(self):
         """The maturity rule fires on the recorded evidence, not the 3D
-        class: a record carrying >=5 DIs, >=3 FMs, >=4 WPs earns
-        ENGINEERING_DEFINITION (the elite P-07 basis)."""
+        class: a record carrying >=5 semantically complete DIs, >=3 FMs,
+        >=4 WPs earns ENGINEERING_DEFINITION (the elite P-07 basis).
+        R425 §3: the records below now carry the semantic fields the
+        content-quality gates require (roles, evidence refs, affected
+        targets, actions) — the OLD count-only fixture is exactly the
+        low-information class the gates exist to exclude."""
         run = _engineering_run()
         eng = run["engineering_specification"]
         eng["design_inputs"] = [{"id": f"DI-{i:03d}",
                                  "input": f"input {i}",
                                  "value": f"v{i}",
-                                 "evidence_class": "MODELLED"}
+                                 "evidence_class": "MODELLED",
+                                 "evidence_refs": ["engineering_core"]}
                                 for i in range(1, 6)]
         eng["failure_analysis"] = [
-            {"graph_id": f"FM-{i}", "failure_mode": f"mode {i}"}
+            {"graph_id": f"FM-{i}", "failure_mode": f"mode {i}",
+             "severity": f"UNKNOWN (no sourced severity basis {i})",
+             "verification": f"VF-{i:03d}"}
             for i in range(1, 4)]
         eng["engineering_build_plan"] = [
             {"work_package": f"WP-{i:02d}",
-             "test_article": f"article {i}"} for i in range(1, 5)]
+             "test_article": f"article {i}",
+             "design_work": f"design work {i}",
+             "equipment": f"bench equipment {i}"} for i in range(1, 5)]
         result = run_bridge(run, None, tempfile.mkdtemp(
             prefix="bridge_eng_full_"), build_renders=False)
         self.assertEqual(result["package_out"]["package_maturity"],

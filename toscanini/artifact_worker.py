@@ -329,8 +329,60 @@ def _spawn_job(session_id: str) -> subprocess.Popen:
         stdout=open(REPO_ROOT / "ENGINE_RUNS" / "artifact_worker.log", "ab"),
         stderr=subprocess.STDOUT,
         start_new_session=True,
-        env=dict(os.environ),
+        env=_worker_subprocess_env(),
     )
+
+
+# ---------------------------------------------------------------------------
+# R425 §7 — the renderer process boundary (application -> artifact worker)
+#
+# The detached artifact worker is spawned with an EXPLICIT minimal
+# environment, never `dict(os.environ)`: the worker must NOT inherit the
+# application's secret environment (GitHub token, provider keys,
+# operator key, database URLs — and any FUTURE secret the application
+# acquires). Absent-by-construction beats scrub-by-blacklist: a secret
+# the allowlist never heard of cannot leak into a worker we did not
+# update. The stronger Blender allowlist
+# (discovery_fabric/engine/invention_bridge/render.py::
+# RENDER_ENV_ALLOWLIST) is preserved UNDERNEATH this level: the worker
+# itself has no secrets to pass down, and Blender additionally receives
+# only its own allowlisted few.
+#
+# Durable persistence after render completion is therefore DELEGATED to
+# the server's render-completion observer (toscanini/server.py), which
+# legitimately holds GITHUB_TOKEN as the application process: the worker
+# marks its terminal record `durable_push: DELEGATED_TO_SERVER_OBSERVER`
+# and the observer snapshots terminal renders within its scan interval.
+# The R420 persistence contract (renders survive the next restart) is
+# preserved with a bounded delay instead of a worker-held secret.
+# ---------------------------------------------------------------------------
+WORKER_ENV_ALLOWLIST = (
+    "PATH",                 # resolve python/blender binaries + git for
+                            # the (now absent) durable path
+    "HOME",                 # git/blender scratch configuration
+    "TMPDIR",               # render temp files
+    "LANG", "LC_ALL",       # deterministic number formatting
+    "PYTHONIOENCODING",     # worker stdout/stderr encoding
+    "PYTHONUNBUFFERED",     # log flushing discipline
+    "OMP_NUM_THREADS",      # the thread pin the renderer applies
+    "BLENDER_PATH",         # the pinned-build override (provenance)
+    "ENGINE_RENDER_INWORKER_TIMEOUT_S",   # in-worker budget override
+    "ENGINE_RENDER_ASYNC_TIMEOUT_S",      # async budget override
+    "DURABLE_STATE_ENABLED",   # the worker still KNOWS whether durable
+                                # persistence is on (it only no longer
+                                # holds the credential to push)
+    "DURABLE_STATE_BRANCH",
+)
+
+
+def _worker_subprocess_env() -> Dict[str, str]:
+    """The EXPLICIT minimal environment for the detached artifact
+    worker. Only allowlisted variables pass; everything else —
+    including every application secret and every FUTURE secret name —
+    is absent by construction (R425 §7)."""
+    env = {k: v for k, v in os.environ.items()
+           if k in WORKER_ENV_ALLOWLIST}
+    return env
 
 
 def needs_render_followup(session: Dict[str, Any]) -> Optional[str]:
@@ -656,17 +708,46 @@ def run(session_id: str) -> Dict[str, Any]:
              "error", "threshold_provenance")},
     })
 
-    # R420 persistence: completed renders ride the durable snapshot
-    # immediately — they must survive the next container restart (the
-    # filesystem is ephemeral; Art. X: the branch + files agree).
+    # R420 persistence, R425 §7 boundary: completed renders must ride
+    # the durable snapshot (the filesystem is ephemeral) — but the
+    # worker NO LONGER HOLDS GITHUB_TOKEN (the minimal worker
+    # environment is absent-by-construction for secrets), so the push
+    # is DELEGATED to the server's render-completion observer, which
+    # runs in the application process that legitimately holds the
+    # credential. The job record carries the typed delegation state
+    # (never a silent gap); the observer snapshots within its interval
+    # and marks `durable_snapshots` on the same record.
     if status in _TERMINAL_OK:
-        try:
-            from toscanini import durable
-            durable.snapshot(f"render_complete:{session_id}")
-        except Exception as exc:  # noqa: BLE001 — disclosed, never fatal
-            print(f"[artifact_worker] durable snapshot after render "
-                  f"failed ({session_id}): {type(exc).__name__}: {exc}",
+        delegated = {
+            "durable_push": "DELEGATED_TO_SERVER_OBSERVER",
+            "durable_push_note": (
+                "R425 §7: the worker environment carries no "
+                "credentials by construction; the server's "
+                "render-completion observer performs the durable "
+                "snapshot from the application process"),
+        }
+        record = _write_job(
+            session_id, (job_record(session_id) or {}) | delegated)
+        if not os.environ.get("GITHUB_TOKEN", "").strip():
+            print(f"[artifact_worker] durable push delegated to the "
+                  f"server observer ({session_id}: {status})",
                   file=sys.stderr, flush=True)
+        else:
+            # local/verification runs where the worker DOES carry the
+            # token (spawned directly by tests/operators outside the
+            # boundary): keep the immediate R420 push
+            try:
+                from toscanini import durable
+                durable.snapshot(f"render_complete:{session_id}")
+                record = _write_job(
+                    session_id,
+                    (job_record(session_id) or {})
+                    | {"durable_push": "PUSHED_BY_WORKER"})
+            except Exception as exc:  # noqa: BLE001 — disclosed, never fatal
+                print(f"[artifact_worker] durable snapshot after render "
+                      f"failed ({session_id}): {type(exc).__name__}: "
+                      f"{exc}",
+                      file=sys.stderr, flush=True)
 
     return record
 

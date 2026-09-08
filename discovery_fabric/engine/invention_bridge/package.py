@@ -42,6 +42,7 @@ import json
 import os
 import time
 import zipfile
+from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 from . import epistemics as ep
@@ -177,7 +178,8 @@ def assemble(
     proj = _elite.derive_engineering_projection(run_result, geometry_out)
     proj["decisive_selected"] = (run_result.get("decisive_experiment")
                                  or {}).get("selected")
-    package_maturity = _elite.build_maturity(proj, is_engineering)
+    package_maturity = _elite.build_maturity(proj, is_engineering,
+                                             run_result)
 
     # ---- canonical narrative (one source: run state + CIO) ----------------
     essay = build_essay(run_result, cio, visualizability)
@@ -216,9 +218,9 @@ def assemble(
     # ---- the machine-readable elite layers (R424 §2) -----------------------
     machine = {
         "ENGINEERING_TRACEABILITY.json": _elite.build_traceability(
-            proj, invention_label),
+            proj, invention_label, run_result),
         "MATURITY_BASIS.json": _elite.build_maturity_basis(
-            proj, invention_label, package_maturity),
+            proj, invention_label, package_maturity, run_result),
         "EQUATION_REGISTRY.json": _elite.build_equation_registry(
             proj, invention_label),
         "UNKNOWN_ROADMAP.json": _elite.build_unknown_roadmap(
@@ -307,12 +309,37 @@ def assemble(
     fs = run_result.get("final_state") or {}
     engine_commit, engine_commit_source = _elite.resolve_engine_commit(
         run_result, engine_identity)
+    model_dir_path = Path(out_dir) / "MODEL"
+    cad_source = {}
+    if is_engineering and (model_dir_path / "CAD_SOURCE_PROVENANCE.json"
+                           ).is_file():
+        try:
+            cad_source = {
+                "relationship": "MODEL/PARAMETRIC_MODEL_SOURCE.py is "
+                                "EXPORTED from the canonical "
+                                "engineering_geometry.FORM_LIBRARY "
+                                "builder (R425 §2: one CAD source of "
+                                "truth)",
+                "record": "MODEL/CAD_SOURCE_PROVENANCE.json",
+                "drift_detection": "engineering_geometry."
+                                   "verify_cad_source_provenance()",
+            }
+        except Exception:  # noqa: BLE001 — provenance stays honest
+            cad_source = {}
     provenance = {
         "artifact": "PACKAGE_PROVENANCE",
         "run_id": run_id,
         "engine_commit": engine_commit,
         "engine_commit_source": engine_commit_source,
-        "package_version": "R424_ELITE.1.0.0",
+        "package_version": "R425_ELITE.1.1.0",
+        "package_version_basis": (
+            "R425: one CAD source of truth (canonical export), "
+            "semantic maturity gates, complete traceability graph, "
+            "buyer-runnable decisive-experiment contract, specific "
+            "unknown roadmap, hardened renderer process boundary"),
+        "cad_source_of_truth": cad_source or (
+            "CONCEPTUAL class — no parametric CAD source exists "
+            "(nothing fabricated)"),
         "generated_at_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ",
                                           time.gmtime()),
         "final_envelope_hash": fs.get("final_envelope_hash"),
@@ -524,41 +551,266 @@ def _evidence_structure(proj: Dict, run_id: str,
 
 def _decisive_experiment_layer(proj: Dict, run_id: str,
                                run_result: Dict) -> Dict:
-    """R424 — the decisive experiment as recorded, PLUS the honest
-    derivation when the loop recorded none: the invention's own killer
-    experiment and the falsification contract fields (never invented
-    values)."""
-    recorded = dict(run_result.get("decisive_experiment") or {})
+    """R425 §5 — the decisive experiment as a BUYER-RUNNABLE contract.
+
+    Every field of the contract is derived from the canonical state
+    where the record actually carries it; a field the canonical state
+    does not define is emitted as NOT_DEFINED_IN_CANONICAL_STATE with
+    the exact provenance basis (which record was inspected and found
+    lacking) — never generic filler such as 'further testing required'
+    and never an invented value (Art. I/XXV/LII).
+    """
+    recorded = run_result.get("decisive_experiment") or {}
     ke = proj.get("killer_experiment") or {}
-    layer = {
-        "artifact": "DECISIVE_EXPERIMENT",
-        "run_id": run_id,
-        **{k: v for k, v in recorded.items() if k != "artifact"},
-    }
-    if not (recorded.get("selected") or recorded.get("shortlist")):
-        # R424: derive the honest fallback — the invention's own killer
-        # experiment record (never fabricated values)
-        layer["derived_from_invention_record"] = {
-            "selected": ke.get("selected"),
-            "definition": ke.get("definition"),
-            "eig": ke.get("eig"),
-            "hypotheses": [
-                {"name": h.get("name"),
-                 "description": h.get("description"),
-                 "prior_probability": h.get("prior_probability"),
-                 "provenance_class": ((h.get("provenance") or {}).get(
-                     "epistemic_class"))}
-                for h in (ke.get("hypotheses") or [])
-                if isinstance(h, dict)][:6],
-            "verification_requirement": _first_verification(proj),
-            "status": ("DERIVED_FROM_KILLER_EXPERIMENT_RECORD"
-                       if ke else "NOT_RECORDED"),
-            "note": ("the loop's experiment selector recorded no "
-                     "shortlist; this layer carries the invention's own "
-                     "recorded killer-experiment contract — no values "
-                     "are invented"),
+    inv = run_result.get("invention_specification") or {}
+    fs = run_result.get("final_state") or {}
+    eng = run_result.get("engineering_specification") or {}
+    wps = eng.get("engineering_build_plan") or []
+    vfs = eng.get("verification_matrix") or []
+    cps = (eng.get("engineering_core") or {}).get(
+        "critical_parameters") or []
+    selected = recorded.get("selected")
+    if isinstance(selected, str):
+        try:
+            import ast
+            selected = ast.literal_eval(selected)
+        except (ValueError, SyntaxError):
+            selected = None
+    sel = selected if isinstance(selected, dict) else {}
+
+    def _field(value, provenance_basis: str, status: str = "DEFINED"):
+        return {
+            "value": value,
+            "status": status,
+            "provenance_basis": provenance_basis,
         }
-    return layer
+
+    def _not_defined(basis: str):
+        return _field("NOT_DEFINED_IN_CANONICAL_STATE", basis,
+                      "NOT_DEFINED_IN_CANONICAL_STATE")
+
+    # ---- the 14-field contract -------------------------------------------
+    hypotheses = [
+        {"name": h.get("name"),
+         "description": h.get("description"),
+         "prior_probability": h.get("prior_probability"),
+         "provenance_class": ((h.get("provenance") or {}).get(
+             "epistemic_class"))}
+        for h in (ke.get("hypotheses") or [])
+        if isinstance(h, dict)][:8]
+
+    cc = inv.get("causal_chain")
+    cc_val = cc.get("value") if isinstance(cc, dict) else None
+    intervention_rec = (cc_val or {}).get("intervention") if isinstance(
+        cc_val, dict) else None
+    if not intervention_rec:
+        intervention_rec = (cc_val or {}).get("mechanism") if isinstance(
+            cc_val, dict) else None
+
+    first_wp = next((w for w in wps if w.get("test_article")), None) \
+        or (wps[0] if wps else None)
+    falsification_vf = next(
+        (v for v in vfs if "falsification" in str(
+            (v.get("invention_tie") or {}).get("linkage_kind")
+            or "").lower()), None)
+    decision_vf = falsification_vf or (vfs[0] if vfs else None)
+    kill_arm = next((h for h in hypotheses
+                     if h.get("name") == "H_effect_fails"), None)
+
+    experiment_id = sel.get("experiment") or ke.get("selected")
+
+    contract = {
+        "experiment_id": (
+            _field(
+                experiment_id,
+                "decisive_experiment.selected.experiment "
+                "(the loop's own selection)")
+            if experiment_id else
+            _not_defined("decisive_experiment.selected and "
+                         "invention_specification.killer_experiment "
+                         "carry no experiment selection")),
+        "hypothesis": _field(
+            hypotheses,
+            "invention_specification.killer_experiment.hypotheses "
+            "(recorded names, descriptions, priors)")
+            if hypotheses else
+            _not_defined("invention_specification.killer_experiment "
+                         "carries no hypotheses array"),
+        "intervention": _field(
+            intervention_rec,
+            "invention_specification.causal_chain."
+            + ("intervention" if (cc_val or {}).get("intervention")
+               else "mechanism")
+            + " (the recorded causal mechanism under test)")
+            if intervention_rec else
+            _not_defined("invention_specification.causal_chain "
+                         "carries no intervention/mechanism value"),
+        "baseline_control": (
+            _not_defined(
+                "verification_matrix "
+                + str((decision_vf or {}).get("id"))
+                + ".requirement mentions a baseline comparison in "
+                "prose, but the canonical record carries no structured "
+                "baseline_arm/control_arm field — the arms are the "
+                "recipient's pre-registration work, fixed from the "
+                "measured baseline per the recorded acceptance rule")
+            if decision_vf else
+            _not_defined("no verification_matrix record exists")),
+        "test_article": _field(
+            (first_wp or {}).get("test_article"),
+            "engineering_build_plan "
+            + str((first_wp or {}).get("work_package"))
+            + ".test_article (the recorded article to build)")
+            if (first_wp or {}).get("test_article") else
+            _not_defined("engineering_build_plan carries no "
+                         "test_article field"),
+        "measurable_variables": _field(
+            [{"parameter_id": p.get("parameter_id"),
+              "name": p.get("name") or p.get("parameter"),
+              "symbol": p.get("symbol"),
+              "unit": p.get("unit"),
+              "value_status": p.get("value_status"),
+              "value_class": p.get("value_class")}
+             for p in cps[:12]],
+            "engineering_core.critical_parameters (recorded symbols, "
+            "units, and value_status — UNKNOWN values stay UNKNOWN)")
+            if cps else
+            _not_defined("engineering_core.critical_parameters is "
+                         "empty"),
+        "apparatus_instrumentation": _field(
+            (first_wp or {}).get("equipment"),
+            "engineering_build_plan "
+            + str((first_wp or {}).get("work_package"))
+            + ".equipment (the recorded equipment requirement)")
+            if (first_wp or {}).get("equipment") else
+            _not_defined("engineering_build_plan carries no equipment "
+                         "field"),
+        "procedure": _field(
+            {"verification_requirement": (decision_vf or {}).get(
+                "requirement"),
+             "work_package_measurement": (first_wp or {}).get(
+                 "measurement")},
+            "verification_matrix "
+            + str((decision_vf or {}).get("id"))
+            + ".requirement + engineering_build_plan "
+            + str((first_wp or {}).get("work_package"))
+            + ".measurement (the recorded procedure texts)")
+            if (decision_vf or {}).get("requirement") else
+            _not_defined("verification_matrix carries no requirement"),
+        "acceptance_rule": _field(
+            {"rule": (decision_vf or {}).get("acceptance"),
+             "status": (decision_vf or {}).get("acceptance_status")
+             or (decision_vf or {}).get("result")},
+            "verification_matrix "
+            + str((decision_vf or {}).get("id"))
+            + ".acceptance (the recorded pre-registration rule — the "
+            "numeric margin is fixed from the measured baseline at "
+            "pre-registration, never invented here)")
+            if (decision_vf or {}).get("acceptance") else
+            _not_defined("verification_matrix carries no acceptance "
+                         "rule"),
+        "falsification_rule": _field(
+            {"kill_arm": kill_arm,
+             "rule_basis": (decision_vf or {}).get("acceptance"),
+             "kill_probability": sel.get("kill_probability")},
+            "invention_specification.killer_experiment.hypotheses "
+            "(H_effect_fails is the recorded falsification arm) + "
+            "verification_matrix "
+            + str((decision_vf or {}).get("id"))
+            + ".acceptance (the failing side of the recorded rule) + "
+            "decisive_experiment.selected.kill_probability (UNKNOWN "
+            "where no sourced base rate exists)")
+            if kill_arm else
+            _not_defined("the killer-experiment record carries no "
+                         "explicit falsification arm hypothesis"),
+        "expected_discriminating_outcomes": _field(
+            [{"outcome": h.get("name"),
+              "meaning": h.get("description"),
+              "prior_probability": h.get("prior_probability")}
+             for h in hypotheses],
+            "invention_specification.killer_experiment.hypotheses — "
+            "the recorded arms the experiment separates (Bayesian EIG "
+            "over MODEL_DERIVED priors per the recorded basis)")
+            if hypotheses else
+            _not_defined("no recorded hypothesis arms"),
+        "dependencies": _field(
+            sel.get("dependency"),
+            "decisive_experiment.selected.dependency (the recorded "
+            "precondition)")
+            if sel.get("dependency") else
+            _not_defined("decisive_experiment.selected carries no "
+                         "dependency field"),
+        "safety_operational_constraints": _field(
+            {"regulatory_pathway": (eng.get("regulatory") or {}).get(
+                "pathway"),
+             "candidate_standards": (eng.get("regulatory") or {}).get(
+                 "candidate_standards")},
+            "engineering_specification.regulatory (the recorded "
+            "regulatory determination — UNKNOWN pathway stays UNKNOWN "
+            "per the R370C correction; never inferred from device "
+            "class)")
+            if (eng.get("regulatory") or {}).get("pathway") else
+            _not_defined("engineering_specification.regulatory carries "
+                         "no pathway"),
+        "decision_mapping": _field(
+            {"next_best_action": fs.get("next_best_action"),
+             "selection_explanation": recorded.get("explanation"),
+             "decision_impact": sel.get("decision_impact"),
+             "prior_update_rule": (
+                 "the measured outcome updates the recorded priors "
+                 "(Bayesian, per decisive_experiment.selected.basis "
+                 + repr(sel.get("basis")) + ")")},
+            "final_state.next_best_action + decisive_experiment."
+            "explanation/selected (the recorded decision semantics)")
+            if (fs.get("next_best_action")
+                    or recorded.get("explanation")) else
+            _not_defined("final_state.next_best_action and "
+                         "decisive_experiment.explanation are absent"),
+        "next_technical_state_transition": _field(
+            {"current_state": ((fs.get("evolution") or {}).get(
+                "current_invention") or {}).get("state"),
+             "transition": (
+                 "the experiment's recorded arms map the transition: "
+                 "H_effect_holds graduates the recorded "
+                 "INVENTION_REQUIRES_EXPERIMENT state to a sourced "
+                 "measurement; H_effect_fails terminates the lineage "
+                 "(the recorded kill arm)")},
+            "final_state.evolution.current_invention.state (the "
+            "recorded technical state) + the recorded hypothesis arms")
+            if ((fs.get("evolution") or {}).get("current_invention")
+                    or {}).get("state") else
+            _not_defined("final_state.evolution.current_invention "
+                         "carries no state"),
+    }
+
+    # ---- the honest contract-level summary -------------------------------
+    defined = [k for k, v in contract.items()
+               if v["status"] != "NOT_DEFINED_IN_CANONICAL_STATE"]
+    return {
+        "artifact": "DECISIVE_EXPERIMENT",
+        "schema": "R425_DECISIVE_EXPERIMENT_CONTRACT",
+        "run_id": run_id,
+        "contract": contract,
+        "contract_completeness": {
+            "fields_total": len(contract),
+            "fields_defined_in_canonical_state": len(defined),
+            "fields_not_defined": len(contract) - len(defined),
+            "not_defined_fields": [
+                k for k, v in contract.items()
+                if v["status"] == "NOT_DEFINED_IN_CANONICAL_STATE"],
+            "discipline": (
+                "every field is either derived from a named canonical "
+                "record or emitted as NOT_DEFINED_IN_CANONICAL_STATE "
+                "with the exact record inspected — no generic filler, "
+                "no invented values (R425 §5)"),
+        },
+        "recorded_layer": {
+            k: v for k, v in recorded.items() if k != "artifact"},
+        "discriminating_contract": (
+            _elite.experiment_contract_assessment(proj, run_result)
+            if hasattr(_elite, "experiment_contract_assessment")
+            else None),
+    }
 
 
 def _first_verification(proj: Dict) -> Optional[Dict]:

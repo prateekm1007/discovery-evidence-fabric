@@ -163,98 +163,327 @@ def _evclass(v: Any) -> str:
     return "UNKNOWN"
 
 
-def build_traceability(proj: Dict[str, Any], package_id: str) -> Dict:
-    """ENGINEERING_TRACEABILITY.json — the DI -> DO -> FM -> VF -> EX
-    graph with EXPLICIT ids and exact bindings (R424 §6). Unknown links
-    carry record-cited justifications (never silent gaps)."""
+def build_traceability(proj: Dict[str, Any], package_id: str,
+                       run_result: Optional[Dict[str, Any]] = None
+                       ) -> Dict:
+    """ENGINEERING_TRACEABILITY.json — the COMPLETE relationship graph
+    DI -> DO -> FM -> VF -> EXPERIMENT (R425 §4), with explicit
+    machine-readable bindings for every edge class:
+
+      DO  -> DI        (design_outputs.parent_ids -> design_inputs.id)
+      FM  -> DO        (and/or functional target)
+      VF  -> FM        (verification.invention_tie.targets -> graph_id)
+      EX  -> FM/VF/DO  (the decisive experiment's targets)
+      decision -> technical state (adjudication/evolution outcomes)
+
+    Every missing link is represented as UNKNOWN with a record-cited
+    basis (which record was inspected and what it lacked) — never a
+    silent gap. Coverage metrics close the loop: nodes, bindings,
+    orphans, unverified failure modes, failure modes without a decisive
+    verification, experiment targets with no upstream requirement.
+    """
     dis = {d.get("id"): d for d in proj["design_inputs"] if d.get("id")}
     dos = proj["design_outputs"]
     fms = {f.get("graph_id") or f.get("id"): f
            for f in proj["failure_modes"]}
     vfs = proj["verification"]
+    do_ids = {d.get("id") for d in dos if d.get("id")}
 
-    chains = []
+    links: List[Dict] = []
+
+    def _link(kind: str, src: str, dst: Optional[str], explicit: bool,
+              basis: str) -> None:
+        links.append({
+            "link_kind": kind,
+            "source_id": src,
+            "target_id": dst,
+            "binding": "EXPLICIT" if explicit else "UNKNOWN",
+            "binding_basis": basis,
+        })
+
+    # ---- DO -> DI ------------------------------------------------------
     for do in dos:
         do_id = do.get("id")
         parent_ids = do.get("parent_ids") or []
-        links = []
+        if not parent_ids:
+            _link(
+                "DO_TO_DI", do_id, None, False,
+                f"design_outputs record {do_id} carries no parent_ids "
+                "and no missing_inputs — the parent binding is not "
+                "recorded (recorded as-is, never guessed)")
         for pid in parent_ids:
             di = dis.get(pid)
-            links.append({
-                "design_input_id": pid,
-                "binding": "EXPLICIT" if di else "UNKNOWN",
-                "binding_basis": (
-                    "design_outputs.parent_ids -> design_inputs.id "
-                    "(exact id match)" if di else
-                    f"parent id {pid} not present in design_inputs "
-                    "(recorded as-is, never guessed)"),
-                "di_value": (di or {}).get("value"),
-                "di_evidence_class": _evclass(di or {}),
-            })
-        chains.append({
-            "chain_id": f"CH-{do_id}",
-            "design_output_id": do_id,
-            "design_output": {
-                "description": do.get("description"),
-                "status": do.get("status"),
-                "missing_inputs": do.get("missing_inputs") or [],
-            },
-            "design_input_links": links,
-        })
+            _link(
+                "DO_TO_DI", do_id, pid, di is not None,
+                ("design_outputs.parent_ids -> design_inputs.id "
+                 "(exact id match)") if di is not None else
+                f"parent id {pid} not present in design_inputs "
+                "(recorded as-is, never guessed)")
 
-    # FM -> VF (verification targets)
-    vf_links = []
+    # ---- FM -> DO / functional target ----------------------------------
+    for fm_id, fm in fms.items():
+        affected = fm.get("affected_outputs") or fm.get(
+            "design_outputs") or fm.get("affects") or []
+        if isinstance(affected, str):
+            affected = [affected]
+        if affected:
+            for tgt in affected:
+                _link(
+                    "FM_TO_DO", fm_id, tgt, tgt in do_ids,
+                    ("failure_modes.affected_outputs -> "
+                     "design_outputs.id (exact id match)")
+                    if tgt in do_ids else
+                    f"affected-output id {tgt} not present in "
+                    "design_outputs (recorded as-is)")
+        else:
+            control = fm.get("design_control")
+            feature = fm.get("design_feature")
+            if _informative(control) or _informative(feature):
+                _link(
+                    "FM_TO_DO", fm_id, None, False,
+                    f"failure_modes record {fm_id} carries "
+                    "design_control/design_feature but no machine-"
+                    "readable design-output id — the DO binding is "
+                    f"UNKNOWN (control={str(control or feature)[:80]!r})")
+            else:
+                _link(
+                    "FM_TO_DO", fm_id, None, False,
+                    f"failure_modes record {fm_id} carries no "
+                    "affected-output/design-output field at all — "
+                    "inspected: " + ", ".join(sorted(fm.keys())))
+
+    # ---- VF -> FM --------------------------------------------------------
     for vf in vfs:
         tie = (vf.get("invention_tie") or {})
         targets = tie.get("targets") or []
+        if not targets:
+            _link(
+                "VF_TO_FM", vf.get("id"), None, False,
+                f"verification record {vf.get('id')} carries "
+                "invention_tie with no targets — the failure-mode "
+                "binding is not recorded (inspected: "
+                + ", ".join(sorted(tie.keys())) + ")")
         for t in targets:
             fm = fms.get(t)
-            vf_links.append({
-                "verification_id": vf.get("id"),
-                "requirement": (vf.get("requirement") or "")[:300],
-                "result": vf.get("result"),
-                "failure_mode_id": t,
-                "binding": "EXPLICIT" if fm else "UNKNOWN",
-                "binding_basis": (
-                    "verification.invention_tie.targets -> failure_modes"
-                    ".graph_id (exact id match)" if fm else
-                    f"target {t} not present in failure_analysis "
-                    "(recorded as-is)"),
+            _link(
+                "VF_TO_FM", vf.get("id"), t, fm is not None,
+                ("verification.invention_tie.targets -> failure_modes"
+                 ".graph_id (exact id match)") if fm is not None else
+                f"target {t} not present in failure_analysis "
+                "(recorded as-is)")
+
+    # ---- EXPERIMENT -> FM/VF/DO ------------------------------------------
+    de = (run_result or {}).get("decisive_experiment") or {}
+    selected = de.get("selected")
+    if isinstance(selected, str):
+        try:
+            import ast
+            selected = ast.literal_eval(selected)
+        except (ValueError, SyntaxError):
+            selected = None
+    ex_id = "EXPERIMENT"
+    ex_source = "decisive_experiment"
+    if not (selected or proj.get("killer_experiment")):
+        _link(
+            "EX_TO_TARGET", ex_id, None, False,
+            "the canonical state records no decisive experiment and no "
+            "killer experiment — there is no experiment node to bind "
+            "(honest absence)")
+    else:
+        ex_kind = (selected or {}).get("experiment") if isinstance(
+            selected, dict) else None
+        if not ex_kind:
+            ex_kind = (proj.get("killer_experiment") or {}).get(
+                "selected")
+            ex_source = "invention_specification.killer_experiment"
+        # EX -> VF: a verification item that IS the falsification test.
+        # Mechanical binding: exact kind equality, or whole-string kind
+        # containment (e.g. VF linkage_kind "falsification_test" inside
+        # selected experiment "falsification_test_from_candidate") —
+        # the containment relation is disclosed in the basis, never
+        # presented as an exact id match.
+        ex_vf_bound = False
+        for vf in vfs:
+            tie = vf.get("invention_tie") or {}
+            kind = str(tie.get("linkage_kind") or "")
+            if not (ex_kind and kind):
+                continue
+            exk, vk = str(ex_kind), kind
+            if exk == vk:
+                rel = (f"exact kind match: {kind!r}")
+                explicit = True
+            elif vk in exk or exk in vk:
+                rel = (f"kind containment: {vk!r} within {exk!r} "
+                       f"(mechanical string containment, disclosed)")
+                explicit = True
+            else:
+                continue
+            _link(
+                "EX_TO_VF", ex_id, vf.get("id"), explicit,
+                f"{ex_source}.selected.experiment == "
+                f"verification {vf.get('id')}.invention_tie."
+                f"linkage_kind ({rel})")
+            ex_vf_bound = True
+            # transitive EX -> FM through that VF's targets
+            for t in tie.get("targets") or []:
+                _link(
+                    "EX_TO_FM", ex_id, t, t in fms,
+                    (f"transitive through verification "
+                     f"{vf.get('id')}.invention_tie.targets; "
+                     "exact id match in failure_analysis")
+                    if t in fms else
+                    f"transitive through verification "
+                    f"{vf.get('id')}; target {t} not present in "
+                    "failure_analysis (recorded as-is)")
+        if not ex_vf_bound:
+            _link(
+                "EX_TO_VF", ex_id, None, False,
+                f"{ex_source} is recorded but no verification item's "
+                "invention_tie.linkage_kind matches the experiment "
+                "kind — no machine-readable experiment->verification "
+                "binding exists (inspected kinds: "
+                + ", ".join(sorted({
+                    str((v.get("invention_tie") or {}).get(
+                        "linkage_kind") or "")
+                    for v in vfs
+                    if (v.get("invention_tie") or {}).get(
+                        "linkage_kind")})) + ")")
+        # EX -> DO: no canonical field binds the experiment to design
+        # outputs — represent as UNKNOWN citing the record
+        _link(
+            "EX_TO_DO", ex_id, None, False,
+            f"{ex_source} carries hypotheses/definition/EIG but no "
+            "design-output id field — the EX->DO binding is not "
+            "recorded (fields inspected: "
+            + ", ".join(sorted((selected or
+                                (proj.get("killer_experiment") or {}))
+                               .keys())) + ")")
+
+    # ---- decision outcome -> resulting technical state --------------------
+    fs = (run_result or {}).get("final_state") or {}
+    gens = proj.get("generations") or []
+    decision_outcomes = []
+    if fs.get("final_status"):
+        decision_outcomes.append({
+            "decision": "adjudication final_status",
+            "outcome": fs.get("final_status"),
+            "resulting_technical_state": {
+                "invention_state": fs.get("final_status"),
+                "spec_hash": fs.get("final_envelope_hash"),
+            },
+            "basis": "final_state.final_status (the run's own terminal "
+                     "adjudication record)",
+        })
+    for g in gens[:6]:
+        ch = g.get("challenge") or {}
+        if isinstance(ch, dict) and (ch.get("survived") is not None
+                                     or ch.get("killed") is not None):
+            decision_outcomes.append({
+                "decision": f"generation {g.get('generation')} challenge",
+                "outcome": ("KILLED" if ch.get("killed") else "SURVIVED"),
+                "resulting_technical_state": {
+                    "invention_id": g.get("invention_id"),
+                    "action": ("evolution/improvement continued" if not
+                               ch.get("killed") else
+                               "lineage terminated"),
+                },
+                "basis": "run_state.generations.challenge (the recorded "
+                         "adversarial decision)",
             })
-    orphans = {
+
+    # ---- coverage metrics ---------------------------------------------------
+    node_counts = {
+        "design_inputs": len(dis),
+        "design_outputs": len(dos),
+        "failure_modes": len(fms),
+        "verification": len(vfs),
+        "experiment": 1 if (selected or proj.get("killer_experiment"))
+        else 0,
+        "decisions": len(decision_outcomes),
+    }
+    explicit = sum(1 for l in links if l["binding"] == "EXPLICIT")
+    unknown = sum(1 for l in links if l["binding"] == "UNKNOWN")
+    verified_fm_ids = {
+        t for vf in vfs
+        for t in ((vf.get("invention_tie") or {}).get("targets") or [])
+        if t in fms}
+    unverified_fms = [k for k in fms if k not in verified_fm_ids]
+    # failure modes without a DECISIVE verification: FMs verified only
+    # by items whose linkage is not a decisive/falsification outcome
+    decisive_vf_ids = {
+        vf.get("id") for vf in vfs
+        if ("falsification" in str(
+            (vf.get("invention_tie") or {}).get("linkage_kind") or
+            "").lower()
+            or "kill" in str(
+                (vf.get("invention_tie") or {}).get("linkage_kind") or
+                "").lower())}
+    fm_decisive_ids = {
+        t for vf in vfs if vf.get("id") in decisive_vf_ids
+        for t in ((vf.get("invention_tie") or {}).get("targets") or [])}
+    fms_without_decisive = [k for k in fms if k not in fm_decisive_ids]
+    orphan_nodes = {
         "design_outputs_without_parent": [
             d.get("id") for d in dos if not d.get("parent_ids")],
-        "failure_modes_without_verification": [
-            k for k in fms
-            if k not in {t for vf in vfs
-                         for t in ((vf.get("invention_tie") or {})
-                                   .get("targets") or [])}],
+        "failure_modes_without_verification": unverified_fms,
+        "verification_without_fm_target": [
+            vf.get("id") for vf in vfs
+            if not ((vf.get("invention_tie") or {}).get("targets")
+                    or [])],
+        "design_inputs_without_child": [
+            k for k in dis
+            if k not in {pid for d in dos
+                         for pid in (d.get("parent_ids") or [])}],
     }
-    explicit = sum(1 for c in chains
-                   for l in c["design_input_links"]
-                   if l["binding"] == "EXPLICIT")
-    total = sum(len(c["design_input_links"]) for c in chains) \
-        + len(vf_links)
-    unknown = total - explicit
-    state = ("TRACEABILITY_COMPLETE" if total and unknown == 0 else
+    ex_targets_no_upstream: List[str] = []
+    if selected or proj.get("killer_experiment"):
+        # experiment targets with no upstream requirement: FMs named by
+        # the experiment that no VF requirement covers
+        ex_fm_targets = {l["target_id"] for l in links
+                         if l["link_kind"] == "EX_TO_FM"
+                         and l["target_id"]}
+        ex_targets_no_upstream = sorted(
+            t for t in ex_fm_targets if t not in verified_fm_ids)
+
+    state = ("TRACEABILITY_COMPLETE" if links and unknown == 0 else
              "TRACEABILITY_PARTIAL" if explicit else
-             "TRACEABILITY_UNKNOWN" if total else
+             "TRACEABILITY_UNKNOWN" if links else
              "TRACEABILITY_NOT_APPLICABLE")
     return {
         "artifact": "ENGINEERING_TRACEABILITY",
         "package_id": package_id,
-        "schema": "R424_TRACEABILITY_SEMANTICS",
+        "schema": "R425_TRACEABILITY_GRAPH",
         "classification_scheme": {
-            "EXPLICIT": "link recorded in canonical data (exact id match)",
-            "UNKNOWN": "no link recorded; justification cites the record",
+            "EXPLICIT": "link recorded in canonical data (exact id "
+                        "match)",
+            "UNKNOWN": "no link recorded; basis cites the record that "
+                       "was inspected",
+            "link_kinds": ["DO_TO_DI", "FM_TO_DO", "VF_TO_FM",
+                           "EX_TO_VF", "EX_TO_FM", "EX_TO_DO",
+                           "EX_TO_TARGET"],
             "chain_states": ["TRACEABILITY_COMPLETE",
                              "TRACEABILITY_PARTIAL",
                              "TRACEABILITY_UNKNOWN",
                              "TRACEABILITY_NOT_APPLICABLE"],
         },
-        "chains": chains,
-        "verification_links": vf_links,
-        "orphan_outputs_and_failure_modes": orphans,
+        "links": links,
+        "decision_outcomes": decision_outcomes,
+        "coverage": {
+            "total_nodes": node_counts,
+            "total_nodes_sum": sum(node_counts.values()),
+            "total_links": len(links),
+            "explicit_bindings": explicit,
+            "unknown_bindings": unknown,
+            "binding_accounting": (
+                "explicit_bindings + unknown_bindings == total_links "
+                "(every link is classified — no silent gaps)"),
+            "orphan_nodes": orphan_nodes,
+            "unverified_failure_modes": unverified_fms,
+            "failure_modes_without_decisive_verification":
+                fms_without_decisive,
+            "experiment_targets_with_no_upstream_requirement":
+                ex_targets_no_upstream,
+        },
         "summary": {
             "design_inputs": len(dis),
             "design_outputs": len(dos),
@@ -266,16 +495,19 @@ def build_traceability(proj: Dict[str, Any], package_id: str) -> Dict:
             "justification": (
                 "every non-EXPLICIT slot cites the canonical record "
                 "state that produced it (ids preserved verbatim, never "
-                "semantically guessed)"),
+                "semantically guessed); coverage metrics enumerate "
+                "orphans and unverified nodes by name (R425 §4)"),
         },
         "traceability_state": state,
     }
 
 
 def build_maturity_basis(proj: Dict, package_id: str,
-                         maturity: str) -> Dict:
+                         maturity: str,
+                         run_result: Optional[Dict] = None) -> Dict:
     """MATURITY_BASIS.json — the exact evidence supporting the maturity
-    level (R424 §10: only a level whose required evidence exists)."""
+    level (R424 §10: only a level whose required evidence exists;
+    R425 §3: the counts are SEMANTICALLY COMPLETE records only)."""
     counts = {
         "equations": len(proj["equations"]),
         "design_inputs": len(proj["design_inputs"]),
@@ -286,6 +518,8 @@ def build_maturity_basis(proj: Dict, package_id: str,
         "critical_parameters": len(proj["critical_parameters"]),
         "remaining_unknowns": len(proj["remaining_unknowns"]),
     }
+    semantic = semantic_completeness(proj)
+    contract = experiment_contract_assessment(proj, run_result)
     selected = proj["killer_experiment"] or {}
     experiment_selected = bool(
         selected.get("selected") or selected.get("definition")
@@ -298,6 +532,26 @@ def build_maturity_basis(proj: Dict, package_id: str,
             maturity, maturity),
         "basis": _maturity_rule(maturity, counts, experiment_selected),
         "counts": counts,
+        "semantic_gates": {
+            "rule": ("R425 §3: only records passing their category's "
+                     "deterministic content-quality gate count toward "
+                     "the maturity thresholds — low-information "
+                     "records can never upgrade the level"),
+            "categories": semantic,
+            "counts_semantically_complete": {
+                "design_inputs": semantic["design_inputs"][
+                    "records_semantically_complete"],
+                "design_outputs": semantic["design_outputs"][
+                    "records_semantically_complete"],
+                "failure_modes": semantic["failure_modes"][
+                    "records_semantically_complete"],
+                "verification": semantic["verification"][
+                    "records_semantically_complete"],
+                "build_plan": semantic["build_plan"][
+                    "records_semantically_complete"],
+            },
+        },
+        "experiment_contract": contract,
         "evidence_ids": {
             "equations": [e.get("equation_id") for e in
                           proj["equations"]],
@@ -319,11 +573,14 @@ def build_maturity_basis(proj: Dict, package_id: str,
             u.get("unknown") or str(u)[:160]
             for u in proj["remaining_unknowns"][:12]],
         "honesty": (
-            "the maturity level is derived from the counts above — a "
-            "higher level is never claimed without its required "
-            "evidence (R424 §10); ENGINEERING_VALIDATED requires "
-            "recorded validation results which do not exist for "
-            "generated packages (Art. XXXVIII: no PHYSICAL_OBSERVATION)"),
+            "the maturity level is derived from the semantically "
+            "complete records above (R425 §3) — a higher level is "
+            "never claimed without its required evidence, and "
+            "EXPERIMENT_READY additionally requires the full "
+            "discriminating experiment contract; ENGINEERING_VALIDATED "
+            "requires recorded validation results which do not exist "
+            "for generated packages (Art. XXXVIII: no "
+            "PHYSICAL_OBSERVATION)"),
     }
     return basis
 
@@ -337,9 +594,12 @@ def _maturity_rule(maturity: str, counts: Dict[str, int],
                 f"({counts['failure_modes']}) >= 3, build plan "
                 f"({counts['build_plan_steps']}) >= 4 steps")
     if maturity == "EXPERIMENT_READY":
-        return (f"Derived from: engineering definition present AND a "
-                f"decisive experiment selected with hypotheses and "
-                f"acceptance rule (experiment_selected={experiment_selected})")
+        return (f"Derived from: engineering definition present AND the "
+                f"discriminating experiment contract complete (>=2 "
+                f"hypothesis arms with priors, pre-registered decision "
+                f"rule, measurable outcome path, target resolving in "
+                f"the record — see experiment_contract; "
+                f"experiment_selected={experiment_selected})")
     return ("Derived from: invention architecture survived the recorded "
             "challenge stages; engineering quantities are proposals or "
             "UNKNOWN — nothing here is buyer-release quality")
@@ -421,6 +681,27 @@ def build_equation_registry(proj: Dict, package_id: str) -> Dict:
     }
 
 
+_RECORD_ID_RE = None  # compiled lazily to keep import time minimal
+
+
+def _source_record_ids(u: Dict) -> List[str]:
+    """Record ids cited by the unknown's own statement/reason/binding —
+    parsed mechanically, never guessed (R425 §6: source record IDs)."""
+    global _RECORD_ID_RE
+    if _RECORD_ID_RE is None:
+        import re
+        _RECORD_ID_RE = re.compile(
+            r"\b(?:FM|VF|DO|DI|UIN|CP|EQ|ENH|WP|EXT|V)-[A-Za-z0-9-]+\b")
+    found: List[str] = []
+    for field in ("unknown", "reason", "binding", "note"):
+        v = u.get(field)
+        if isinstance(v, str):
+            for m in _RECORD_ID_RE.findall(v):
+                if m not in found:
+                    found.append(m)
+    return found
+
+
 def _classify_unknown(u: Dict) -> Tuple[str, str]:
     """Mechanical classification with the rule that fired."""
     reason = str(u.get("reason") or "")
@@ -428,83 +709,198 @@ def _classify_unknown(u: Dict) -> Tuple[str, str]:
     if "no sourced value exists" in reason or \
             "value_status UNKNOWN" in reason:
         return "LITERATURE_RESOLVABLE", "RULE_NO_SOURCED_VALUE"
+    if "no sourced threshold" in reason:
+        return "BENCH_TEST_REQUIRED", "RULE_ACCEPTANCE_PRE_REGISTRATION"
     if "validation requires physical observation" in reason:
         return "BENCH_TEST_REQUIRED", "RULE_PHYSICAL_VALIDATION"
+    if "FM_WITHOUT_QUANTITY" in text:
+        return "ENGINEERING_DESIGN_REQUIRED", "RULE_FM_QUANTITY_MATCH"
     if "verification method measures" in reason or \
             "quantity family" in reason:
         return "BENCH_TEST_REQUIRED", "RULE_QUANTITY_VERIFICATION"
-    if "FM_WITHOUT_QUANTITY" in text:
-        return "ENGINEERING_DESIGN_REQUIRED", "RULE_FM_QUANTITY_MATCH"
     return "ENGINEERING_DESIGN_REQUIRED", "RULE_DEFAULT_DESIGN_WORK"
+
+
+def _subject_of(text: str) -> str:
+    """The unknown's own subject, extracted mechanically (never a
+    semantic guess): the parameter/quantity phrase from the recorded
+    statement."""
+    t = text.strip()
+    if t.lower().startswith("value of critical parameter "):
+        return t[len("value of critical parameter "):].strip()
+    if ":" in t and t.split(":", 1)[0].isupper() and "_" in \
+            t.split(":", 1)[0]:
+        return t.split(":", 1)[1].strip() or t
+    return t
+
+
+def _vf_of(u: Dict) -> Optional[str]:
+    for field in ("unknown", "reason", "binding"):
+        v = str(u.get(field) or "")
+        if "verification VF-" in v or v.startswith("VF-"):
+            import re
+            m = re.search(r"\bVF-[A-Za-z0-9-]+\b", v)
+            if m:
+                return m.group(0)
+    return None
+
+
+def _priority_of(u: Dict, cls: str) -> Tuple[str, str]:
+    """Mechanical priority with the rule that fired (R425 §6 — the
+    H/M single-letter bug is closed; priorities are full words derived
+    from the recorded consequence, never from list position)."""
+    reason = str(u.get("reason") or "")
+    text = str(u.get("unknown") or "")
+    if ("required before any numeric design decision" in reason
+            or text.lower().startswith("value of critical parameter")
+            or "acceptance criterion" in text.lower()):
+        return "HIGH", ("blocks numeric design decisions or the "
+                        "decisive experiment's acceptance threshold "
+                        "(recorded reason states the blocking)")
+    if cls in ("BENCH_TEST_REQUIRED",
+               "ENGINEERING_DESIGN_REQUIRED"):
+        return "MEDIUM", "blocks a verification item or design decision"
+    return "LOW", "contextual unknown — not recorded as blocking"
+
+
+def _roadmap_entry(i: int, u: Dict, proj: Dict) -> Dict:
+    """One unknown -> one SPECIFIC roadmap entry (R425 §6): resolution
+    action, expected measurement, acceptance rule and consequence are
+    built from THIS unknown's own subject and record ids — never the
+    generic shared text the R424 layer used for unrelated unknowns."""
+    cls, rule = _classify_unknown(u)
+    text = u.get("unknown") or str(u)
+    subject = _subject_of(str(text))
+    ids = _source_record_ids(u)
+    vf = _vf_of(u)
+    priority, priority_basis = _priority_of(u, cls)
+
+    if cls == "LITERATURE_RESOLVABLE":
+        action = (f"Retrieve and freeze an evidence span that states "
+                  f"the value of {subject} — the retrieval's custody "
+                  f"chain (query, source identity, exact span, content "
+                  f"hash) applies; the value then enters the critical-"
+                  f"parameter record as SOURCE_FACT or is bounded by "
+                  f"a declared envelope (MODELLED)")
+        expected = (f"the sourced value of {subject} with its recorded "
+                    f"unit, evidence span, and epistemic class")
+        acceptance = ("the frozen span states the value verbatim with "
+                      "a matching unit; value_status leaves UNKNOWN "
+                      "only when the retrieval itself fails (never on "
+                      "semantic plausibility — Art. II)")
+        consequence = (f"blocks numeric design decisions for "
+                       f"{subject} and the decisive experiment's "
+                       f"acceptance threshold (the recorded reason: "
+                       f"'required before any numeric design decision')")
+    elif cls == "BENCH_TEST_REQUIRED" and vf:
+        action = (f"Fix verification {vf}'s numeric margin at "
+                  f"pre-registration by measuring the baseline arm "
+                  f"under the identical setup (the recorded procedure); "
+                  f"the criterion then leaves ENGINEERING_PROPOSED")
+        expected = (f"the measured baseline value that fixes {vf}'s "
+                    f"pre-registered margin")
+        acceptance = ("the margin is pre-registered BEFORE the "
+                      "decisive test runs (no post-hoc threshold — "
+                      "Art. VIII)")
+        consequence = (f"verification {vf} cannot be evaluated until "
+                       f"its criterion is fixed")
+    elif cls == "BENCH_TEST_REQUIRED":
+        action = (f"Measure {subject} in the first physical work "
+                  f"package (see the build plan's test article and "
+                  f"equipment); pre-register the acceptance rule "
+                  f"before the test")
+        expected = (f"a measured value of {subject} from the first "
+                    f"article under the pre-registered rule")
+        acceptance = ("pre-registered pass/fail fixed BEFORE the test "
+                      "(the physical-observation boundary, Art. "
+                      "XXXVIII, is respected: no simulation may "
+                      "satisfy it)")
+        consequence = (f"{subject} stays unvalidated — physical "
+                       f"validation is the recorded blocker")
+    elif rule == "RULE_FM_QUANTITY_MATCH":
+        fm_ids = [i2 for i2 in ids if i2.startswith("FM-")]
+        fm_ref = fm_ids[0] if fm_ids else "the failure mode"
+        action = (f"Design or select a verification method whose "
+                  f"measured quantity family covers the quantity "
+                  f"{fm_ref} affects (the E21-A quantity rule); record "
+                  f"it on the verification matrix with {fm_ref} as its "
+                  f"target")
+        expected = (f"a verification-matrix row targeting {fm_ref} "
+                    f"whose method measures a quantity in the family "
+                    f"the failure affects")
+        acceptance = (f"the verification row binds {fm_ref} by exact id "
+                      f"(see the traceability graph's VF_TO_FM links)")
+        consequence = (f"{fm_ref} has no verification whose measured "
+                       f"quantity family covers it — it remains in the "
+                       f"traceability coverage report's "
+                       f"unverified_failure_modes")
+    else:
+        action = (f"Replace the unknown with a design decision for "
+                  f"{subject} carrying a recorded basis (declared "
+                  f"MODELLED inside an envelope, never as evidence)")
+        expected = (f"a selected value/range for {subject} with its "
+                    f"documented selection basis")
+        acceptance = ("the decision is recorded with basis and envelope "
+                      "(Art. XXVII); it never silently becomes "
+                      "SOURCE_FACT")
+        consequence = (f"design work on {subject} cannot proceed on a "
+                       f"recorded basis")
+
+    dependency = u.get("binding")
+    if not dependency:
+        if cls == "LITERATURE_RESOLVABLE":
+            dependency = ("retrieval of an external source (the "
+                          "evidence pipeline)")
+        elif cls == "BENCH_TEST_REQUIRED":
+            dependency = "the first physical article (see build plan)"
+        else:
+            dependency = "design-output definition"
+
+    return {
+        "unknown_id": f"U-{i:02d}",
+        "unknown_statement": text,
+        "why_unknown": (u.get("reason")
+                        or "no recorded basis in the canonical record"),
+        "consequence": consequence,
+        "classification": cls,
+        "classification_basis": rule,
+        "resolution_action": action,
+        "expected_measurement": expected,
+        "acceptance_rule": acceptance,
+        "dependency": dependency,
+        "priority": priority,
+        "priority_basis": priority_basis,
+        "source_record_ids": ids,
+    }
 
 
 def build_unknown_roadmap(proj: Dict, package_id: str) -> Dict:
     """UNKNOWN_ROADMAP.json — every material unknown as an actionable
-    roadmap entry (R424 §7: never 'further testing required')."""
-    entries = []
-    for i, u in enumerate(proj["remaining_unknowns"], start=1):
-        cls, rule = _classify_unknown(u)
-        text = u.get("unknown") or str(u)
-        res_action = {
-            "LITERATURE_RESOLVABLE": (
-                "retrieve and freeze an evidence span that states the "
-                "value (the evidence pipeline's custody chain applies); "
-                "the unknown then becomes SOURCE_FACT or is bounded by "
-                "an envelope"),
-            "BENCH_TEST_REQUIRED": (
-                "the first physical work package measures it (see the "
-                "build plan); acceptance rule pre-registered before "
-                "the test"),
-            "ENGINEERING_DESIGN_REQUIRED": (
-                "a design decision with recorded basis replaces the "
-                "unknown (declared as MODELLED inside an envelope, "
-                "never as evidence)"),
-        }[cls]
-        entries.append({
-            "unknown_id": f"U-{i:02d}",
-            "unknown_statement": text,
-            "classification": cls,
-            "classification_basis": rule,
-            "why_unknown": (u.get("reason") or
-                            "no recorded basis in the canonical record"),
-            "consequence": (
-                "blocks numeric design decisions and the decisive "
-                "experiment's acceptance threshold" if "no sourced "
-                "value" in str(u.get("reason") or "") else
-                "blocks the corresponding verification item (see the "
-                "traceability graph)"),
-            "what_would_resolve_it": res_action,
-            "expected_measurement": (
-                "the sourced value with its evidence span and class"
-                if cls == "LITERATURE_RESOLVABLE" else
-                "a measured quantity from the first article under the "
-                "pre-registered rule"),
-            "acceptance_rule": (
-                "value carries SOURCE_FACT class with a frozen span"
-                if cls == "LITERATURE_RESOLVABLE" else
-                "pre-registered pass/fail fixed BEFORE the test"),
-            "dependency": u.get("binding") or (
-                "design-output definition" if cls ==
-                "ENGINEERING_DESIGN_REQUIRED" else "none recorded"),
-            "priority": ("HIGH" if i <= 2 else "MEDIUM")[:1]  # positional honesty below
-        })
-    # priority: mechanical — unknowns bound to critical parameters first
-    for e in entries:
-        e["priority"] = "HIGH" if any(
-            "critical parameter" in str(e["unknown_statement"]).lower()
-            for _ in [0]) and "value" in str(
-            e["why_unknown"]).lower() else e["priority"]
+    roadmap entry (R424 §7: never 'further testing required'; R425 §6:
+    the action/measurement/acceptance/consequence text is built from
+    EACH unknown's own subject and cited record ids — never the
+    generic shared text the R424 layer emitted, and the priority field
+    is a real mechanical priority, not a positional H/M marker)."""
+    entries = [_roadmap_entry(i, u, proj)
+               for i, u in enumerate(proj["remaining_unknowns"],
+                                     start=1)]
     return {
         "artifact": "UNKNOWN_ROADMAP",
         "package_id": package_id,
+        "schema": "R425_UNKNOWN_ROADMAP",
         "unknown_count_source": len(proj["remaining_unknowns"]),
         "unknown_count_roadmap": len(entries),
         "discipline": (
             "unknowns preserved exactly as recorded; classification is "
-            "mechanical (each entry records the rule that fired) and "
-            "converts each unknown into a resolution action, expected "
-            "measurement and acceptance rule — an engineering roadmap, "
-            "not a reduced count"),
+            "mechanical (each entry records the rule that fired); each "
+            "entry's resolution action, expected measurement, "
+            "acceptance rule, consequence and priority are derived from "
+            "THAT unknown's own subject and cited record ids — the "
+            "roadmap answers: what exactly must a technical team do "
+            "next to remove this uncertainty? (R425 §6)"),
+        "priority_counts": {
+            k: sum(1 for e in entries if e["priority"] == k)
+            for k in ("HIGH", "MEDIUM", "LOW")},
         "classification_counts": {
             k: sum(1 for e in entries if e["classification"] == k)
             for k in ("LITERATURE_RESOLVABLE", "COMPUTATION_RESOLVABLE",
@@ -675,20 +1071,306 @@ def build_commercial_evidence(proj: Dict, package_id: str,
     }
 
 
-def build_maturity(proj: Dict, is_engineering: bool) -> str:
-    """Evidence-derived maturity (R424 §10)."""
+# ---------------------------------------------------------------------------
+# R425 §3 — deterministic semantic content-quality gates
+# ---------------------------------------------------------------------------
+
+_UNKNOWN_MARKERS = (
+    "unknown", "not established", "not performed", "not recorded",
+    "not defined", "not tested", "not applicable", "not yet",
+    "none recorded", "not selected", "unresolved", "missing",
+)
+
+
+def _is_explicit_unknown(v: Any) -> bool:
+    """A value that EXPLICITLY declares its own unknown-ness (the honest
+    placeholder the §3 contract accepts) — versus an absent field (a
+    gap, which the gate must reject)."""
+    if v is None:
+        return False
+    if isinstance(v, (list, tuple)):
+        return False
+    if isinstance(v, dict):
+        for k in ("value", "status", "result", "note", "reason"):
+            if _is_explicit_unknown(v.get(k)):
+                return True
+        return False
+    text = str(v).strip().lower()
+    return any(m in text for m in _UNKNOWN_MARKERS)
+
+
+def _informative(v: Any) -> bool:
+    """A present, information-bearing value (not blank, not merely a
+    placeholder like 'UNKNOWN')."""
+    if v is None:
+        return False
+    if isinstance(v, (list, tuple, dict)):
+        return len(v) > 0
+    text = str(v).strip()
+    if not text:
+        return False
+    return not _is_explicit_unknown(v)
+
+
+def _first_informative(record: Dict, *fields: str) -> Any:
+    for f in fields:
+        if _informative(record.get(f)):
+            return record.get(f)
+    return None
+
+
+def _gate_di(record: Dict) -> Optional[str]:
+    """Design input gate: unique id; stated role; value/status; epistemic
+    class; evidence or an explicit UNKNOWN reason."""
+    if not (record.get("id") or record.get("input_id")):
+        return "no unique id"
+    role = _informative(record.get("input")) or \
+        _informative(record.get("design_role")) or \
+        _informative(record.get("role"))
+    if not role:
+        return "no stated role"
+    value = record.get("value")
+    if value is None and not (
+            _informative(record.get("value_status"))
+            or _informative(record.get("status"))):
+        return "no value/status"
+    evclass = _evclass(record)
+    if evclass == "UNKNOWN" and not (
+            _informative(record.get("epistemic_class"))
+            or _informative(record.get("value_class"))):
+        return "no epistemic class"
+    if not (_informative(record.get("evidence_refs"))
+            or _informative(record.get("evidence_ids"))
+            or _informative(record.get("source"))
+            or _informative(record.get("origin"))
+            or _is_explicit_unknown(value)):
+        return "no evidence and no explicit UNKNOWN reason"
+    return None
+
+
+def _gate_do(record: Dict) -> Optional[str]:
+    """Design output gate: unique id; measurable meaning (what the
+    output IS); explicit parent input binding or explicit UNKNOWN."""
+    if not record.get("id"):
+        return "no unique id"
+    if not (_informative(record.get("description"))
+            or _informative(record.get("output"))):
+        return "no measurable meaning (no description of what is " \
+               "delivered)"
+    parents = record.get("parent_ids") or []
+    if not parents:
+        if not (_informative(record.get("missing_inputs"))
+                or _is_explicit_unknown(record.get("basis"))):
+            return "no parent input binding and no explicit UNKNOWN"
+    return None
+
+
+def _gate_fm(record: Dict) -> Optional[str]:
+    """Failure mode gate: unique id; failure consequence; affected
+    function/output or explicit UNKNOWN."""
+    if not (record.get("graph_id") or record.get("id")):
+        return "no unique id"
+    consequence = (_informative(record.get("severity"))
+                   or _informative(record.get("severity_basis"))
+                   or _informative(record.get("consequence"))
+                   or _informative(record.get("failure_mode")))
+    if not consequence:
+        return "no failure consequence"
+    if not (_informative(record.get("verification"))
+            or _informative(record.get("verification_test"))
+            or _informative(record.get("design_feature"))
+            or _informative(record.get("affected_output"))
+            or _informative(record.get("detectability"))):
+        return "no affected function/output and no explicit UNKNOWN"
+    return None
+
+
+def _gate_vf(record: Dict) -> Optional[str]:
+    """Verification gate: unique id; requirement; target failure/output;
+    result status; acceptance rule or explicit UNKNOWN."""
+    if not record.get("id"):
+        return "no unique id"
+    if not (_informative(record.get("requirement"))
+            or _informative(record.get("method"))):
+        return "no requirement"
+    targets = ((record.get("invention_tie") or {}).get("targets")
+               or record.get("targets"))
+    if not targets:
+        if not _is_explicit_unknown(record.get("target")):
+            return "no target failure/output"
+    if not (_informative(record.get("result"))
+            or _informative(record.get("status"))):
+        return "no result status"
+    if not (_informative(record.get("acceptance"))
+            or _informative(record.get("acceptance_criterion"))
+            or _is_explicit_unknown(record.get("acceptance_status"))):
+        return "no acceptance rule and no explicit UNKNOWN"
+    return None
+
+
+def _gate_wp(record: Dict) -> Optional[str]:
+    """Build step gate: concrete work-package identity; action;
+    dependency; required capability/tooling where recorded (present
+    when recorded — the gate checks identity/action/dependency)."""
+    if not (record.get("work_package") or record.get("id")):
+        return "no work-package identity"
+    if not (_informative(record.get("design_work"))
+            or _informative(record.get("action"))
+            or _informative(record.get("measurement"))):
+        return "no action"
+    if not (_informative(record.get("test_article"))
+            or _informative(record.get("equipment"))
+            or _informative(record.get("depends_on"))
+            or _informative(record.get("dependency"))
+            or _informative(record.get("basis"))):
+        return "no dependency"
+    return None
+
+
+_GATES = {
+    "design_inputs": _gate_di,
+    "design_outputs": _gate_do,
+    "failure_modes": _gate_fm,
+    "verification": _gate_vf,
+    "build_plan": _gate_wp,
+}
+
+
+def semantic_completeness(proj: Dict) -> Dict:
+    """R425 §3 — the deterministic content-quality gate report.
+
+    Maturity is semantic, not count-based: only records that PASS
+    their category gate count toward the maturity thresholds, so an
+    arbitrary quantity of low-information records can never upgrade
+    the level. Every failed record is listed with the FIRST gate rule
+    it violated (never a silent discount)."""
+    report = {}
+    for category, gate in _GATES.items():
+        records = proj.get(category) or []
+        seen_ids: set = set()
+        complete: List[Dict] = []
+        failed: List[Dict] = []
+        for r in records:
+            if not isinstance(r, dict):
+                failed.append({"record": str(r)[:80],
+                               "violation": "not a structured record"})
+                continue
+            rid = (r.get("id") or r.get("graph_id")
+                   or r.get("work_package"))
+            violation = gate(r)
+            if rid and rid in seen_ids:
+                violation = "duplicate id"
+            if rid:
+                seen_ids.add(rid)
+            if violation:
+                failed.append({"record": rid,
+                               "violation": violation})
+            else:
+                complete.append(r)
+        report[category] = {
+            "records_total": len(records),
+            "records_semantically_complete": len(complete),
+            "low_information_excluded": len(failed),
+            "failed_records": failed[:12],
+        }
+    return report
+
+
+def experiment_contract_assessment(proj: Dict,
+                                   run_result: Optional[Dict] = None
+                                   ) -> Dict:
+    """R425 §3 — EXPERIMENT_READY requires an actual DISCRIMINATING
+    experiment contract, never merely the presence of a hypotheses
+    array.
+
+    A discriminating contract (Art. LII) has ALL of:
+      1. >= 2 hypotheses with numeric prior probabilities (the arms
+         the experiment separates);
+      2. a pre-registered decision/acceptance rule (recorded on a
+         verification item or the killer-experiment record);
+      3. a measurable outcome path (a verification method/requirement
+         naming what gets measured);
+      4. a target that resolves in the record (an FM/VF id the
+         experiment speaks to).
+    Anything missing is listed by name — the level then stays at
+    ENGINEERING_DEFINITION (honest, never softened to pass)."""
+    ke = proj.get("killer_experiment") or {}
+    hyps = [h for h in (ke.get("hypotheses") or [])
+            if isinstance(h, dict)]
+    arms = [h for h in hyps
+            if isinstance(h.get("prior_probability"), (int, float))]
+    rule = None
+    for v in (proj.get("verification") or []):
+        if _informative(v.get("acceptance")):
+            rule = {"source": f"verification_matrix {v.get('id')}",
+                    "acceptance": str(v.get("acceptance"))[:200]}
+            break
+    if rule is None:
+        # an explicit acceptance/decision field on the killer-experiment
+        # record counts; a mere 'definition' of what the experiment IS
+        # does not (Art. LII: the rule must pre-register the decision)
+        ke_rule = ke.get("acceptance") or ke.get("decision_rule") or \
+            ke.get("acceptance_rule")
+        if _informative(ke_rule):
+            rule = {"source": "killer_experiment.acceptance",
+                    "acceptance": str(ke_rule)[:200]}
+    measurable = None
+    for v in (proj.get("verification") or []):
+        if _informative(v.get("method")) or _informative(
+                v.get("requirement")):
+            measurable = {"source": f"verification_matrix {v.get('id')}",
+                          "method": str(v.get("method")
+                                        or v.get("requirement"))[:200]}
+            break
+    targets: List[str] = []
+    for v in (proj.get("verification") or []):
+        tie = (v.get("invention_tie") or {}).get("targets") or []
+        targets.extend(t for t in tie if isinstance(t, str))
+    fm_ids = {f.get("graph_id") or f.get("id")
+              for f in (proj.get("failure_modes") or [])}
+    resolved_targets = [t for t in targets if t in fm_ids]
+    selected = (run_result or {}).get("decisive_experiment") or {}
+    requirements = {
+        "at_least_two_hypothesis_arms_with_priors": len(arms) >= 2,
+        "pre_registered_decision_rule": rule is not None,
+        "measurable_outcome_path": measurable is not None,
+        "target_resolves_in_record": bool(resolved_targets),
+        "experiment_selected_by_loop": bool(
+            selected.get("selected") or ke.get("selected")),
+    }
+    return {
+        "discriminating": all(requirements.values()),
+        "requirements": requirements,
+        "hypothesis_arms": [
+            {"name": h.get("name"),
+             "prior_probability": h.get("prior_probability")}
+            for h in arms],
+        "decision_rule": rule,
+        "measurable_outcome": measurable,
+        "targets_resolved": resolved_targets,
+        "basis": ("EXPERIMENT_READY requires the full discriminating "
+                  "contract (R425 §3); each failed requirement is "
+                  "named above — the hypotheses array alone never "
+                  "grants the tier"),
+    }
+
+
+def build_maturity(proj: Dict, is_engineering: bool,
+                   run_result: Optional[Dict] = None) -> str:
+    """Evidence-derived maturity (R424 §10), now SEMANTIC (R425 §3):
+    only semantically complete records count; EXPERIMENT_READY
+    requires the discriminating experiment contract."""
+    sem = semantic_completeness(proj)
     counts = {
         "eq": len(proj["equations"]),
-        "di": len(proj["design_inputs"]),
-        "fm": len(proj["failure_modes"]),
-        "wp": len(proj["build_plan"]),
+        "di": sem["design_inputs"]["records_semantically_complete"],
+        "fm": sem["failure_modes"]["records_semantically_complete"],
+        "wp": sem["build_plan"]["records_semantically_complete"],
     }
-    ke = proj["killer_experiment"] or {}
-    experiment_selected = bool(ke.get("selected")
-                               or ke.get("definition"))
+    contract = experiment_contract_assessment(proj, run_result)
     if is_engineering and counts["di"] >= 5 and counts["fm"] >= 3 \
             and counts["wp"] >= 4:
-        if experiment_selected and ke.get("hypotheses"):
+        if contract["discriminating"]:
             return "EXPERIMENT_READY"
         return ep.PACKAGE_MATURITY_ENGINEERING
     return ep.PACKAGE_MATURITY_EARLY
