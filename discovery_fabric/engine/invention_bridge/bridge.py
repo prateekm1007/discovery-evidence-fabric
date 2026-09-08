@@ -36,8 +36,11 @@ from typing import Any, Dict, List, Optional
 from . import epistemics as ep
 from . import classifier, conceptual_geometry, engineering_geometry, package, cio_update
 from . import render as render_stage
+from . import domain_spec, domain_geometry
+from . import geometry_quality_gate as quality_gate
+from . import artifact_identity as artifact_id
 
-BRIDGE_VERSION = "1.1.0"
+BRIDGE_VERSION = "2.0.0"
 MAX_GEOMETRY_ATTEMPTS = 3
 
 
@@ -57,13 +60,20 @@ def bridge(run_result: Dict[str, Any], cio: Optional[Dict[str, Any]],
            package_endpoint: Optional[str] = None,
            build_generation_models: bool = True,
            build_renders: bool = True,
-           engine_identity: Optional[tuple] = None) -> Dict[str, Any]:
+           engine_identity: Optional[tuple] = None,
+           run_id: Optional[str] = None) -> Dict[str, Any]:
     """Run the full invention-to-3D-to-package path for one completed run.
 
     Returns {visualizability, geometry_out, package_out, cio_updated, report}.
 
     build_renders=False skips the Blender stage (used by hermetic tests and
     by paths that only need the interactive GLB contract).
+
+    R432: the conceptual path is DOMAIN-AWARE — a deterministic family
+    selection (recorded score table) drives canonical geometry builders
+    whose node names are canonical component IDs. The generic
+    substrate+blocks diagram remains ONLY as an explicitly labeled
+    fallback (section 3/15), never a silent primary artifact (section 23).
     """
     steps: List[Dict[str, Any]] = []
     cio = cio or {}
@@ -100,7 +110,8 @@ def bridge(run_result: Dict[str, Any], cio: Optional[Dict[str, Any]],
     if vis["visualizability_class"] == ep.ENGINEERING_3D:
         for attempt in range(1, MAX_GEOMETRY_ATTEMPTS + 1):
             try:
-                built = _build_engineering(vis, run_result, work_dir, attempt)
+                built = _build_engineering(vis, run_result, work_dir, attempt,
+                                           run_id=run_id)
                 attempts.append({"attempt": attempt, "status": "OK"})
                 break
             except Exception as exc:  # noqa: BLE001 — failure taxonomy is the product
@@ -131,7 +142,8 @@ def bridge(run_result: Dict[str, Any], cio: Optional[Dict[str, Any]],
         if demoted_to_conceptual:
             # build the conceptual artifact on the demoted classification
             try:
-                built = _build_conceptual(vis, run_result)
+                built = _build_conceptual(vis, run_result, work_dir,
+                                          run_id=run_id)
                 attempts.append({"attempt": MAX_GEOMETRY_ATTEMPTS + 1,
                                  "status": "OK",
                                  "repair": "conceptual fallback after engineering failure"})
@@ -142,10 +154,16 @@ def bridge(run_result: Dict[str, Any], cio: Optional[Dict[str, Any]],
                                  "diagnosis": str(exc)})
     else:
         try:
-            built = _build_conceptual(vis, run_result)
-            attempts.append({"attempt": 1, "status": "OK"})
+            built = _build_conceptual(vis, run_result, work_dir,
+                                       run_id=run_id)
+            attempts.append({"attempt": 1, "status": "OK",
+                             "domain_family": (built or {}).get(
+                                 "domain_family")})
         except Exception as exc:  # noqa: BLE001
-            # even the conceptual build can fail: one retry with the simplest form
+            # even the conceptual build can fail: one retry with the
+            # simplest form — the GENERIC labeled fallback (R432 section 3:
+            # generic blocks are acceptable ONLY as a clearly labeled
+            # early conceptual fallback, never a silent primary artifact)
             attempts.append({"attempt": 1, "status": "FAILED",
                              "failure_class": "CONCEPTUAL_BUILD_FAILURE",
                              "diagnosis": str(exc)})
@@ -153,8 +171,14 @@ def bridge(run_result: Dict[str, Any], cio: Optional[Dict[str, Any]],
                 built = conceptual_geometry.build_system_architecture(
                     ["subsystem 1", "subsystem 2", "subsystem 3"],
                     vis.get("intervention_site", ""))
+                built["domain_family"] = "GENERIC_FALLBACK"
+                built["fallback_basis"] = (
+                    f"domain build failed ({type(exc).__name__}: {exc}) — "
+                    "explicitly labeled generic fallback; engineering "
+                    "geometry remains unearned")
                 attempts.append({"attempt": 2, "status": "OK",
-                                 "repair": "simplified three-block fallback"})
+                                 "repair": "labeled generic fallback after "
+                                           "domain build failure"})
             except Exception as exc2:  # noqa: BLE001
                 attempts.append({"attempt": 2, "status": "FAILED",
                                  "diagnosis": str(exc2)})
@@ -186,6 +210,7 @@ def bridge(run_result: Dict[str, Any], cio: Optional[Dict[str, Any]],
         "status": "COMPLETED",
         "visualizability_class": vis["visualizability_class"],
         "geometry_authority": "CadQuery/OCCT",
+        "domain_family": geometry_out.get("domain_family"),
         "measure_step": "executed" if vis["visualizability_class"] == ep.ENGINEERING_3D
                         else "topology-only (conceptual)",
     }
@@ -193,8 +218,11 @@ def bridge(run_result: Dict[str, Any], cio: Optional[Dict[str, Any]],
     geometry_out["bridge_version"] = BRIDGE_VERSION
     _pipeline_step(steps, "GEOMETRY", "OK", {
         "visualizability_class": vis["visualizability_class"],
+        "domain_family": geometry_out.get("domain_family"),
         "glb_sha256": geometry_out.get("glb_sha256"),
         "components": len(geometry_out.get("components") or []),
+        "quality_gates": (geometry_out.get("quality_gates") or {}).get(
+            "passed"),
         "attempts": attempts,
     })
 
@@ -203,8 +231,25 @@ def bridge(run_result: Dict[str, Any], cio: Optional[Dict[str, Any]],
         try:
             gen_models = _generation_models(vis, run_result, work_dir)
             geometry_out["generation_models"] = gen_models
+            # the CURRENT generation's canonical model is the primary
+            # served artifact — keep glb_path/identity pointed at it
+            for m in gen_models:
+                if m.get("current") and m.get("glb_canonical_path"):
+                    geometry_out["glb_path"] = m["glb_canonical_path"]
+                    try:
+                        doc = artifact_id.load(work_dir)
+                        if doc:
+                            doc["glb_path"] = m["glb_canonical_path"]
+                            doc["generation_id"] = f"gen-{m.get('generation')}"
+                            artifact_id.persist(work_dir, doc)
+                            geometry_out["artifact_identity"] = doc
+                    except Exception:  # noqa: BLE001 — identity stays honest
+                        pass
+                    break
             _pipeline_step(steps, "GENERATION_MODELS", "OK",
-                           {"count": len(gen_models)})
+                           {"count": len(gen_models),
+                            "domain_family": (gen_models[-1] or {}).get(
+                                "domain_family") if gen_models else None})
         except Exception as exc:  # noqa: BLE001
             _pipeline_step(steps, "GENERATION_MODELS", "SKIPPED",
                            {"reason": str(exc)})
@@ -280,21 +325,144 @@ def bridge(run_result: Dict[str, Any], cio: Optional[Dict[str, Any]],
 # Internal builders
 # ---------------------------------------------------------------------------
 
-def _build_conceptual(vis: Dict[str, Any], run_result: Dict[str, Any]) -> Dict[str, Any]:
-    if vis["visualizability_class"] in (ep.SYSTEM_3D, ep.PROCESS_3D):
-        return conceptual_geometry.build_system_architecture(
+def _persist_conceptual_artifacts(work_dir: str, built: Dict[str, Any],
+                                  spec: Optional[Dict[str, Any]],
+                                  vis: Dict[str, Any],
+                                  run_result: Dict[str, Any],
+                                  run_id: Optional[str]) -> Dict[str, Any]:
+    """Persist the domain conceptual layer: MODEL/model-001.glb (the
+    canonical GLB the run routes serve), MODEL/GEOMETRY_SPEC.json, and
+    MODEL/ARTIFACT_IDENTITY.json. Failure here is typed, never fatal
+    to the build itself."""
+    import json as _json
+    try:
+        model_dir = os.path.join(work_dir, "MODEL")
+        os.makedirs(model_dir, exist_ok=True)
+        glb_path = os.path.join(model_dir, "model-001.glb")
+        with open(glb_path, "wb") as f:
+            f.write(built["glb_bytes"])
+        built["glb_path"] = glb_path
+        if spec is not None:
+            with open(os.path.join(model_dir, "GEOMETRY_SPEC.json"),
+                      "w") as f:
+                _json.dump(spec, f, indent=2)
+        tech_id = (((run_result.get("problem") or {}).get("problem_id"))
+                   or ((run_result.get("final_state") or {}).get(
+                       "problem_id")) or "")
+        cad_source = None
+        if built.get("parametric_source"):
+            from . import engineering_geometry as _eg
+            cad_source = _eg.canonical_source_identity(
+                built["parametric_source"].get("form", ""))
+        identity = artifact_id.build_artifact_identity(
+            run_dir=work_dir,
+            technology_id=tech_id,
+            run_id=run_id or "",
+            generation_id="gen-1",
+            geometry_hash=built.get("glb_sha256") or "",
+            source_geometry_hash=(spec or {}).get("spec_sha256"),
+            glb_path=glb_path,
+            cad_source=cad_source,
+            visualizability_class=vis.get("visualizability_class"),
+            domain_family=built.get("domain_family"),
+        )
+        artifact_id.persist(work_dir, identity)
+        built["artifact_identity"] = identity
+    except OSError:
+        pass
+    return built
+
+
+def _build_conceptual(vis: Dict[str, Any], run_result: Dict[str, Any],
+                      work_dir: Optional[str] = None,
+                      run_id: Optional[str] = None) -> Dict[str, Any]:
+    """R432: the conceptual path is DOMAIN-AWARE for device-form
+    classes. PROCESS_3D keeps the flow-chain representation (a process
+    is honestly a flow, not a device). The generic architecture
+    diagram remains ONLY as the explicitly labeled fallback (section
+    3/15) — a family failure falls back LOUDLY with a recorded basis,
+    never silently (section 23)."""
+    vclass = vis["visualizability_class"]
+
+    if vclass == ep.PROCESS_3D:
+        built = conceptual_geometry.build_system_architecture(
             vis.get("subsystems") or [], vis.get("intervention_site", ""))
-    # single device form: use recorded layer/architecture names when present
-    es = run_result.get("engineering_specification") or {}
-    layers = [s.get("name", f"layer {i+1}")
-              for i, s in enumerate(es.get("system_architecture", {}).get("subsystems") or [])
-              if isinstance(s, dict)] or None
-    return conceptual_geometry.build_conceptual_device(
-        vis.get("intervention_site", ""), layers)
+        built["domain_family"] = "PROCESS_FLOW"
+        if work_dir:
+            _persist_conceptual_artifacts(work_dir, built, None, vis,
+                                          run_result, run_id)
+        return built
+
+    # --- domain family selection (deterministic, basis recorded) ---------
+    out = domain_spec.build_spec_from_state(run_result, vis)
+    selection, spec = out["selection"], out["spec"]
+    family = selection["family"]
+
+    if family == domain_spec.GENERIC_FAMILY:
+        # honest labeled generic fallback (R432 section 3: acceptable
+        # only as a clearly labeled early conceptual fallback)
+        if vclass == ep.CONCEPTUAL_3D and not (vis.get("subsystems") or []):
+            es = run_result.get("engineering_specification") or {}
+            layers = [s.get("name", f"layer {i+1}")
+                      for i, s in enumerate(
+                          es.get("system_architecture", {}).get(
+                              "subsystems") or [])
+                      if isinstance(s, dict)] or None
+            built = conceptual_geometry.build_conceptual_device(
+                vis.get("intervention_site", ""), layers)
+        else:
+            built = conceptual_geometry.build_system_architecture(
+                vis.get("subsystems") or [],
+                vis.get("intervention_site", ""))
+        built["domain_family"] = "GENERIC_ARCHITECTURE"
+        built["domain_selection"] = selection
+        built["fallback_basis"] = (
+            "no domain family earned the minimum form score — the "
+            "generic architecture diagram is shown as the clearly "
+            "labeled early conceptual fallback (R432 section 3/15)")
+        if work_dir:
+            _persist_conceptual_artifacts(work_dir, built, None, vis,
+                                          run_result, run_id)
+        return built
+
+    # --- deterministic domain build + quality gates -------------------------
+    try:
+        built = domain_geometry.build_domain_model(spec)
+    except Exception as exc:  # noqa: BLE001 — LOUD fallback, never silent
+        built = conceptual_geometry.build_system_architecture(
+            vis.get("subsystems") or [], vis.get("intervention_site", ""))
+        built["domain_family"] = "GENERIC_FALLBACK"
+        built["fallback_basis"] = (
+            f"domain family {family} was selected but its deterministic "
+            f"builder failed ({type(exc).__name__}: {exc}) — explicitly "
+            "labeled generic fallback; the failure is recorded, the "
+            "generic diagram never masquerades as the domain model "
+            "(R432 section 23)")
+        if work_dir:
+            _persist_conceptual_artifacts(work_dir, built, None, vis,
+                                          run_result, run_id)
+        return built
+
+    gates = quality_gate.run_all_gates(
+        built["glb_bytes"], spec, domain_family=family)
+    built["quality_gates"] = gates
+    built["domain_selection"] = selection
+    built["geometry_spec"] = spec
+    if not gates["passed"]:
+        # The domain build exists but failed its own quality gate: keep
+        # it ONLY with the typed failure record attached — the dossier
+        # shows the gate failures honestly. The artifact is not
+        # silently replaced (the failure is product information).
+        built["quality_gate_failed"] = True
+    if work_dir:
+        _persist_conceptual_artifacts(work_dir, built, spec, vis,
+                                      run_result, run_id)
+    return built
 
 
 def _build_engineering(vis: Dict[str, Any], run_result: Dict[str, Any],
-                       work_dir: str, attempt: int) -> Dict[str, Any]:
+                       work_dir: str, attempt: int,
+                       run_id: Optional[str] = None) -> Dict[str, Any]:
     normalized = engineering_geometry.normalize_parameters(vis["geometry_parameters"])
     params = normalized["build_params"]
     meta = normalized["parameter_meta"]
@@ -334,7 +502,11 @@ def _build_engineering(vis: Dict[str, Any], run_result: Dict[str, Any],
     if not validation["passed"]:
         raise ValueError(f"geometry validation gates failed: {validation['gates']}")
 
-    return {
+    # R432 section 16 engineering block: the provenance hash chain +
+    # the canonical artifact identity (spec-less: the engineering
+    # path's canonical source IS the FORM_LIBRARY builder — identity
+    # carries cad_source instead of a spec hash).
+    result = {
         "glb_bytes": exported["glb_bytes"],
         "glb_sha256": exported["glb_sha256"],
         "glb_path": exported["glb_path"],
@@ -349,39 +521,81 @@ def _build_engineering(vis: Dict[str, Any], run_result: Dict[str, Any],
             "parameters": params,
         },
         "validation": validation,
+        "domain_family": "ENGINEERING_PARAMETRIC",
     }
+    result["quality_gates"] = quality_gate.run_all_gates(
+        exported["glb_bytes"], None, domain_family=None,
+        engineering=True, model_dir=work_dir, geometry_out=result)
+    tech_id = (((run_result.get("problem") or {}).get("problem_id"))
+               or ((run_result.get("final_state") or {}).get(
+                   "problem_id")) or "")
+    identity = artifact_id.build_artifact_identity(
+        run_dir=work_dir, technology_id=tech_id, run_id=run_id or "",
+        generation_id="gen-1",
+        geometry_hash=exported["glb_sha256"],
+        source_geometry_hash=None,
+        glb_path=exported["glb_path"],
+        cad_source=engineering_geometry.canonical_source_identity(form),
+        visualizability_class=ep.ENGINEERING_3D,
+        domain_family="ENGINEERING_PARAMETRIC")
+    artifact_id.persist(work_dir, identity)
+    result["artifact_identity"] = identity
+    return result
 
 
 def _generation_models(vis: Dict[str, Any], run_result: Dict[str, Any],
                        work_dir: str) -> List[Dict[str, Any]]:
-    """Visual invention lineage: one conceptual GLB per generation (handoff 25).
+    """Visual invention lineage: one GLB per generation (handoff 25).
 
-    The number of models mirrors the run's recorded generation count
-    (run_state.generations.generations); each model's visual complexity grows
-    with the generation index so the geometry visibly changes per generation.
+    R432: each generation's model is the DOMAIN model of that
+    generation's architecture — the structural family form is present
+    in every generation (a vehicle generation is always vehicle-
+    shaped) and the mapped component count grows with the generation
+    index so the lineage is visible in the geometry, not just in text.
     """
     gens_dir = os.path.join(work_dir, "GENERATIONS")
     os.makedirs(gens_dir, exist_ok=True)
     rs = run_result.get("run_state") or {}
     recorded = ((rs.get("generations") or {}).get("generations")) or []
     n = max(1, len(recorded)) if isinstance(recorded, list) else 1
+    arch = (run_result.get("engineering_specification") or {}
+            .get("system_architecture") or {}).get("subsystems") or []
+    full_names = [s.get("name") if isinstance(s, dict) else str(s)
+                  for s in arch if (isinstance(s, dict) and s.get("name"))
+                  or isinstance(s, str)] or (vis.get("subsystems") or [])
+
+    # the family selection is computed ONCE from the full state (the
+    # technology class does not change per generation)
+    out = domain_spec.build_spec_from_state(run_result, vis)
+    family = out["selection"]["family"]
+
     models: List[Dict[str, Any]] = []
     for i in range(min(n, 5)):
         gen_no = i + 1
-        # visual delta: each generation adds a subsystem block — the lineage
-        # is visible in the geometry, not just in text
-        k = min(1 + gen_no, 6)
         rec = recorded[i] if i < len(recorded) and isinstance(recorded[i], dict) else {}
-        names = []
-        arch = (run_result.get("engineering_specification") or {}
-                .get("system_architecture") or {}).get("subsystems") or []
-        for j in range(k):
-            base = None
-            if j < len(arch) and isinstance(arch[j], dict):
-                base = arch[j].get("name")
-            names.append(base or f"subsystem {j+1}")
-        built = conceptual_geometry.build_system_architecture(
-            names, vis.get("intervention_site", ""))
+        # visual delta: generation N carries the first 1+gen recorded
+        # subsystems (capped at the full list); the CURRENT generation
+        # (gen_no == n) always carries the FULL architecture — the
+        # served model IS the primary artifact (R432 section 20: THIS
+        # MODEL = THIS INVENTION GENERATION; geometry_hash equality)
+        k = len(full_names) if gen_no == n else min(1 + gen_no,
+                                                    max(1, len(full_names)))
+        names = list(full_names[:k]) or [f"subsystem {j+1}" for j in range(k)]
+        try:
+            gen_spec = domain_spec.derive_geometry_spec(
+                family, names, vis.get("intervention_site", ""),
+                selection=out["selection"])
+            if gen_spec.get("technology_class") == domain_spec.GENERIC_FAMILY \
+                    or not gen_spec.get("components"):
+                built = conceptual_geometry.build_system_architecture(
+                    names, vis.get("intervention_site", ""))
+                built["domain_family"] = "GENERIC_ARCHITECTURE"
+            else:
+                built = domain_geometry.build_domain_model(gen_spec)
+        except Exception:  # noqa: BLE001 — lineage stays honest per gen
+            built = conceptual_geometry.build_system_architecture(
+                names, vis.get("intervention_site", ""))
+            built["domain_family"] = "GENERIC_FALLBACK"
         path = os.path.join(gens_dir, f"gen-{gen_no}.glb")
         with open(path, "wb") as f:
             f.write(built["glb_bytes"])
@@ -400,6 +614,7 @@ def _generation_models(vis: Dict[str, Any], run_result: Dict[str, Any],
             "invention_id": rec.get("invention_id"),
             "parent_id": rec.get("parent_id") or rec.get("parent_invention_id"),
             "what_changed": rec.get("what_changed"),
+            "domain_family": built.get("domain_family"),
             "glb_path": os.path.abspath(path),
             "glb_canonical_path": os.path.abspath(canonical),
             "glb_sha256": built["glb_sha256"],

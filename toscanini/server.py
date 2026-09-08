@@ -703,6 +703,7 @@ class Handler(BaseHTTPRequestHandler):
                     ".stl": "model/stl",
                     ".svg": "image/svg+xml",
                     ".glb": "model/gltf-binary",
+                    ".json": "application/json",
                 }.get(f.suffix.lower() if f else "", "application/"
                                                          "octet-stream")
                 return self._serve_file(f, mime, download_name=(
@@ -1272,6 +1273,14 @@ class Handler(BaseHTTPRequestHandler):
         if not run_dir.exists():
             return None
         clean = Path(name).name  # no traversal, ever
+        # R432 section 20: the canonical geometry spec + artifact identity
+        # are served by EXACT NAME from MODEL/ (auditable identity chain;
+        # every other .json stays private — envelopes, state, records)
+        if clean in ("GEOMETRY_SPEC.json", "ARTIFACT_IDENTITY.json"):
+            cand = run_dir / "MODEL" / clean
+            if cand.is_file():
+                return cand
+            return None
         if clean.suffix.lower() not in self._GEOMETRY_EXTS:
             return None
         if clean.startswith("envelope_") or clean.endswith(

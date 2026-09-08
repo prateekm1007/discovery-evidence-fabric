@@ -252,6 +252,7 @@ def ensure_artifacts(session_id: str) -> Dict[str, Any]:
             package_endpoint=f"/api/run/{session_id}/package",
             build_renders=False,
             engine_identity=engine_identity,
+            run_id=session_id,
         )
         outcome = "PACKAGE_ADDED_TO_EXISTING_GEOMETRY"
         render_record = _request_renders(session_id, run_dir, cio_obj)
@@ -275,6 +276,7 @@ def ensure_artifacts(session_id: str) -> Dict[str, Any]:
         package_endpoint=f"/api/run/{session_id}/package",
         build_renders=False,
         engine_identity=engine_identity,
+        run_id=session_id,
     )
 
     geometry_out = result.get("geometry_out")

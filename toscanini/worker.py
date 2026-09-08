@@ -196,7 +196,15 @@ def _run_inner(session_id: str, forensics) -> None:
     # --- phase 2: evidence-bound problem ------------------------------------
     forensics.event("PHASE_STARTED", stage="BUILDING_PROBLEM", phase=2)
     try:
-        built = problem_builder.build_problem(s["user_text"])
+        # R431: the live event journal — every real phase event lands
+        # persisted the moment it occurs (per-source retrieval events
+        # included; the journal is the SSE/refresh-recovery source)
+        from toscanini import event_journal as _journal
+        _phase_cb = _journal.phase_callback(str(s.get("run_dir") or ""),
+                                            session_id)
+        # run_dir is created below; the journal writer mkdirs lazily
+        built = problem_builder.build_problem(s["user_text"],
+                                              on_event=_phase_cb)
     except Exception as exc:  # noqa: BLE001
         forensics.event("TERMINAL_STATE", terminal="ERROR_BUILD",
                         stage="BUILDING_PROBLEM",
@@ -218,7 +226,12 @@ def _run_inner(session_id: str, forensics) -> None:
                     problem_id=problem["problem_id"])
     from discovery_fabric.engine.run import EngineRun
     try:
-        engine = EngineRun(problem, str(run_dir), with_package=True)
+        # R431: the engine journals each stage the moment its envelope
+        # is persisted (the event_callback contract)
+        from toscanini import event_journal as _journal
+        _engine_cb = _journal.engine_callback(str(run_dir), session_id)
+        engine = EngineRun(problem, str(run_dir), with_package=True,
+                           event_callback=_engine_cb)
         manifest = engine.run()
     except Exception as exc:  # noqa: BLE001
         forensics.event("TERMINAL_STATE", terminal="ERROR_RUN",
@@ -248,6 +261,13 @@ def _run_inner(session_id: str, forensics) -> None:
         forensics.event("BRIDGE_GATE_OUTCOME",
                         outcome=gate.get("outcome"),
                         case=gate.get("case"))
+        # R431: geometry/package events from the gate's own record
+        try:
+            from toscanini import event_journal as _journal
+            _journal.record_bridge_outcomes(
+                str(run_dir), session_id, gate)
+        except Exception:  # noqa: BLE001 — journaling is fail-open
+            pass
         store.update_session(
             session_id,
             bridge_outcome=gate.get("outcome"),
@@ -292,6 +312,13 @@ def _run_inner(session_id: str, forensics) -> None:
         session_id, status="COMPLETE",
         final_status=(final or {}).get("final_status")
         or manifest.get("final_status", "UNKNOWN"))
+    # R431: the terminal event (infra vs scientific never collapsed)
+    try:
+        from toscanini import event_journal as _journal
+        _journal.record_terminal(
+            str(run_dir), session_id, "COMPLETE", "run manifest")
+    except Exception:  # noqa: BLE001 — journaling is fail-open
+        pass
 
     # --- phase 4.5: R420 — the automatic async render handoff ----------------
     # Operator §1: when the in-worker render was skipped or failed for a

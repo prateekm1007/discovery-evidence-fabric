@@ -177,9 +177,17 @@ def design_tab(session: Dict[str, Any],
                 if isinstance(p, dict) and p.get("envelope")],
             authority=geom.get("authority"),
             renders=renders,
-            viewer_required=["rotate", "zoom", "reset"],
+            viewer_required=["rotate", "zoom", "pan", "reset",
+                              "fullscreen"],
             section_view=bool(renders.get("section_png")),
             exploded_view=bool(renders.get("exploded_png")),
+            # R432: the domain layer + the section-20 identity chain +
+            # the honest generic-fallback disclosure (sections 3/15/23)
+            domain_family=geom.get("domain_family"),
+            quality_gates=geom.get("quality_gates"),
+            artifact_identity=geom.get("artifact_identity"),
+            fallback_basis=geom.get("fallback_basis"),
+            geometry_spec=geom.get("geometry_spec"),
         )
     # honest unavailable block (directive section 6)
     reason = geom.get("bridge_why") or geom.get("bridge_outcome") \

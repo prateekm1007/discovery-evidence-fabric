@@ -198,32 +198,122 @@ function DesignTab({ tab }: { tab: DossierTab }) {
       unknown
     >;
     authority?: string;
+    domain_family?: string | null;
+    quality_gates?: {
+      passed?: boolean;
+      failures?: string[];
+      note?: string;
+    } | null;
+    artifact_identity?: {
+      technology_id?: string | null;
+      run_id?: string | null;
+      generation_id?: string | null;
+      geometry_hash?: string | null;
+      source_geometry_hash?: string | null;
+      blender_scene_hash?: string | null;
+      glb_matches_geometry_hash?: boolean | null;
+    } | null;
+    fallback_basis?: string | null;
+    geometry_spec?: string | null;
   };
   if (tab.availability !== "AVAILABLE" || !d.glb) {
     // section 6: the honest unavailable block — never a dead link that
     // looks like a live model
     return <PendingNote tab={tab} />;
   }
+  const hash = (h?: string | null) =>
+    h ? `${h.slice(0, 12)}…` : "—";
   return (
     <div className="dtab design-tab">
-      {d.conceptual && (
+      {d.fallback_basis ? (
+        // R432 section 15: the generic fallback is ALWAYS disclosed —
+        // it can never masquerade as the domain technology model
         <div className="conceptual-note">
-          Conceptual architecture visualization — not engineering CAD.
-          Engineering dimensions are not claimed.
+          TECHNOLOGY VISUALIZATION — Conceptual architecture. Engineering
+          geometry has not been established. The following visualization
+          represents the proposed system relationships only.
+          {d.fallback_basis && (
+            <div className="faint" style={{ marginTop: 4 }}>
+              {d.fallback_basis}
+            </div>
+          )}
         </div>
+      ) : (
+        d.conceptual && (
+          <div className="conceptual-note">
+            Conceptual {d.domain_family ? `${d.domain_family.toLowerCase()} ` : ""}
+            architecture visualization — not engineering CAD. Engineering
+            dimensions are not claimed.
+          </div>
+        )
       )}
       <div className="viewer-wrap">
         <ModelViewer
           url={d.glb}
           label={d.conceptual
-            ? "Conceptual architecture — not engineering CAD"
+            ? d.domain_family && !d.fallback_basis
+              ? `Conceptual ${d.domain_family.toLowerCase()} architecture — not engineering CAD`
+              : "Conceptual architecture — not engineering CAD"
             : "Engineering geometry — canonical CAD source"}
         />
       </div>
       <div className="viewer-hints faint">
-        rotate · zoom · reset — the geometry comes from the same
-        canonical CAD source the package carries
+        rotate · zoom · pan · reset · fullscreen — the geometry comes from
+        the same canonical CAD source the package carries
       </div>
+      {d.artifact_identity && (
+        // R432 section 20: THIS MODEL = THIS INVENTION GENERATION = THIS
+        // CANONICAL GEOMETRY — the identity chain the browser shows
+        <div className="ov-block">
+          <h4>Model identity</h4>
+          <table className="param-table">
+            <tbody>
+              <tr>
+                <td>technology</td>
+                <td>{d.artifact_identity.technology_id || "—"}</td>
+                <td className="faint">run {d.artifact_identity.run_id || "—"}</td>
+              </tr>
+              <tr>
+                <td>generation</td>
+                <td>{d.artifact_identity.generation_id || "—"}</td>
+                <td className="faint">
+                  {d.artifact_identity.glb_matches_geometry_hash === true
+                    ? "model = canonical geometry (hash verified)"
+                    : d.artifact_identity.glb_matches_geometry_hash === false
+                      ? "hash mismatch — see audit records"
+                      : "hash verification pending"}
+                </td>
+              </tr>
+              <tr>
+                <td>geometry hash</td>
+                <td>{hash(d.artifact_identity.geometry_hash)}</td>
+                <td className="faint">
+                  spec {hash(d.artifact_identity.source_geometry_hash)} · blender{" "}
+                  {hash(d.artifact_identity.blender_scene_hash)}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      )}
+      {d.quality_gates && (
+        <div className="ov-block">
+          <h4>Geometry quality gates</h4>
+          <p className={d.quality_gates.passed ? "" : "gate-fail"}>
+            {d.quality_gates.passed
+              ? "All machine-checkable geometry and presentation gates passed " +
+                "for this artifact."
+              : `Gate failures recorded: ${
+                  (d.quality_gates.failures || []).join(", ")
+                } — disclosed, never hidden.`}
+          </p>
+          {d.quality_gates.note && (
+            <div className="faint" style={{ fontSize: 12 }}>
+              {d.quality_gates.note}
+            </div>
+          )}
+        </div>
+      )}
       {(d.parameters?.length ?? 0) > 0 && (
         <div className="ov-block">
           <h4>Parameters</h4>

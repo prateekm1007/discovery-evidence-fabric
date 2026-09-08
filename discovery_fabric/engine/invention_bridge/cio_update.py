@@ -19,6 +19,41 @@ from typing import Any, Dict, Optional
 from . import epistemics as ep
 
 
+def _gate_summary(gates: Optional[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
+    """Compact, non-bloating projection of the R432 quality gates."""
+    if not gates:
+        return None
+    return {
+        "passed": gates.get("passed"),
+        "failures": gates.get("failures") or [],
+        "version": gates.get("version"),
+        "geometry_gate_passed": (gates.get("geometry_gate") or {}).get(
+            "passed"),
+        "visual_gate_passed": (gates.get("visual_gate") or {}).get("passed"),
+        "engineering_gate_passed": (
+            (gates.get("engineering_gate") or {}).get("passed")
+            if gates.get("engineering_gate") is not None else None),
+        "note": ("presentation gate is a structural metrics audit — never a "
+                 "scientific verdict (R432 section 17)"),
+    }
+
+
+def _identity_summary(identity: Optional[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
+    """The R432 section-20 identity chain the browser displays."""
+    if not identity:
+        return None
+    return {
+        "technology_id": identity.get("technology_id"),
+        "run_id": identity.get("run_id"),
+        "generation_id": identity.get("generation_id"),
+        "geometry_hash": identity.get("geometry_hash"),
+        "source_geometry_hash": identity.get("source_geometry_hash"),
+        "blender_scene_hash": identity.get("blender_scene_hash"),
+        "glb_matches_geometry_hash": identity.get("glb_matches_geometry_hash"),
+        "derivation": identity.get("derivation"),
+    }
+
+
 def update_cio(cio: Dict[str, Any], geometry_out: Dict[str, Any],
                package_out: Dict[str, Any],
                visualizability: Dict[str, Any]) -> Dict[str, Any]:
@@ -45,6 +80,16 @@ def update_cio(cio: Dict[str, Any], geometry_out: Dict[str, Any],
         "key_dimensions": geometry_out.get("key_dimensions") or {},
         "components": geometry_out.get("components") or [],
         "validation": geometry_out.get("validation"),
+        # R432: the domain layer — family, canonical spec, quality gates,
+        # artifact identity, and the honest fallback label when the
+        # generic diagram served instead of the domain form
+        "domain_family": geometry_out.get("domain_family"),
+        "geometry_spec": ("/api/run/{run}/geometry/GEOMETRY_SPEC.json"
+                          if geometry_out.get("geometry_spec") else None),
+        "quality_gates": _gate_summary(geometry_out.get("quality_gates")),
+        "artifact_identity": _identity_summary(
+            geometry_out.get("artifact_identity")),
+        "fallback_basis": geometry_out.get("fallback_basis"),
         "authority": (
             "CadQuery/OCCT parametric build is the engineering geometry authority; "
             "meshes and renders are derived artifacts (R413 geometry authority "

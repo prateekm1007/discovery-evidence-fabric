@@ -353,6 +353,11 @@ def render_invention(work_dir: str,
                      timeout_s: Optional[int] = None) -> Dict[str, Any]:
     """Run the pinned Blender build over the authoritative GLB.
 
+    R432: the canonical geometry spec (when the run carries one) is
+    passed to the Blender stage so materials are assigned from THE
+    SAME canonical source the model was built from — material classes
+    ride the spec, never an independent Blender-side invention.
+
     Returns a typed render record — always honest, never raising into
     the caller (the run's epistemic state is never altered by a
     presentation-layer failure; Art. LXI).
@@ -424,8 +429,24 @@ def render_invention(work_dir: str,
         "resolution": resolution or [1152, 768],
         "samples": samples or 48,
     }
-    spec_path = os.path.join(out_dir, "render_spec.json")
-    with open(spec_path, "w") as f:
+    # R432 sections 5/10: the canonical geometry spec drives Blender
+    # material assignment (one material source of truth). The spec
+    # file the bridge persisted is authoritative; a spec carried only
+    # in geometry_out is persisted here for the renderer.
+    spec_path = os.path.join(work_dir, "MODEL", "GEOMETRY_SPEC.json")
+    if os.path.isfile(spec_path):
+        spec["geometry_spec"] = spec_path
+    elif (geometry_out or {}).get("geometry_spec"):
+        try:
+            with open(spec_path, "w") as f:
+                json.dump(geometry_out["geometry_spec"], f, indent=2)
+            spec["geometry_spec"] = spec_path
+        except OSError:
+            pass
+    if (geometry_out or {}).get("domain_family"):
+        spec["domain_family"] = geometry_out["domain_family"]
+    spec_path_arg = os.path.join(out_dir, "render_spec.json")
+    with open(spec_path_arg, "w") as f:
         json.dump(spec, f, indent=2)
 
     # R423A Phase 7: explicit allowlist (see RENDER_ENV_ALLOWLIST) —
@@ -436,7 +457,7 @@ def render_invention(work_dir: str,
     try:
         proc = subprocess.run(
             [blender, "--background", "--factory-startup",
-             "--python", RENDER_SCRIPT, "--", spec_path],
+             "--python", RENDER_SCRIPT, "--", spec_path_arg],
             capture_output=True, text=True, timeout=timeout_s,
             cwd=out_dir, env=env)
     except subprocess.TimeoutExpired:
@@ -465,6 +486,17 @@ def render_invention(work_dir: str,
         record["status"] = "RENDER_FAILED"
         record["stderr_tail"] = (proc.stderr or "")[-2000:]
         return record
+
+    # R432 section 20: the render completed — the artifact identity's
+    # blender_scene_hash fills from the render record now (the identity
+    # doc is derived, never guessed; a refresh failure is typed).
+    try:
+        from . import artifact_identity as _aid
+        h = _aid.refresh_blender_hash(work_dir)
+        if h:
+            record["blender_scene_hash"] = h
+    except Exception as exc:  # noqa: BLE001 — typed, never silent
+        record["identity_refresh_error"] = f"{type(exc).__name__}: {exc}"
 
     # verify every artifact class exists (operator §4: EVERY invention
     # gets the six artifacts when the stack is available)

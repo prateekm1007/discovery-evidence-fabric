@@ -55,13 +55,13 @@ from mathutils import Vector
 START = time.time()
 
 # Studio constants — neutral, calm, no debug grid, no gimmicks.
-WORLD_COLOR = (0.043, 0.048, 0.054)  # near-black cool neutral
-WORLD_STRENGTH = 1.0
-KEY_ENERGY = 900.0
+WORLD_COLOR = (0.055, 0.060, 0.068)  # dark neutral studio
+WORLD_STRENGTH = 1.6
+KEY_ENERGY = 1300.0
 KEY_SIZE = 6.0
-FILL_ENERGY = 260.0
+FILL_ENERGY = 450.0
 FILL_SIZE = 9.0
-RIM_ENERGY = 160.0
+RIM_ENERGY = 260.0
 LENS_MM = 50.0
 SENSOR_W = 36.0
 CAM_AZIMUTH_DEG = 38.0
@@ -69,6 +69,56 @@ CAM_ELEVATION_DEG = 21.0
 FIT_MARGIN = 1.18
 ROUGHNESS = 0.62
 METALLIC = 0.0
+
+# R432 section 10: restrained scientific-industrial PBR presets per
+# material class. Driven by the canonical geometry spec (ONE material
+# source of truth — the same spec classes the deterministic builders
+# used for vertex colors). Visual target: industrial R&D / advanced
+# engineering / scientific visualization — no gaming gloss, no toy.
+PBR_PRESETS = {
+    "body_metal":      {"base": (0.72, 0.74, 0.78), "metallic": 0.85,
+                        "roughness": 0.35},
+    "glass":           {"base": (0.55, 0.70, 0.85), "metallic": 0.0,
+                        "roughness": 0.08, "alpha": 0.55,
+                        "transmission": 0.7},
+    "silicon":         {"base": (0.015, 0.03, 0.12), "metallic": 0.35,
+                        "roughness": 0.22},
+    "battery":         {"base": (0.13, 0.14, 0.16), "metallic": 0.25,
+                        "roughness": 0.48},
+    "rubber":          {"base": (0.03, 0.03, 0.035), "metallic": 0.0,
+                        "roughness": 0.9},
+    "polymer":         {"base": (0.82, 0.80, 0.76), "metallic": 0.0,
+                        "roughness": 0.55},
+    "machined_metal":  {"base": (0.55, 0.57, 0.60), "metallic": 0.9,
+                        "roughness": 0.42},
+    "circuit":         {"base": (0.10, 0.28, 0.16), "metallic": 0.05,
+                        "roughness": 0.5},
+    "ceramic":         {"base": (0.88, 0.87, 0.84), "metallic": 0.0,
+                        "roughness": 0.22},
+    "composite":       {"base": (0.38, 0.46, 0.54), "metallic": 0.05,
+                        "roughness": 0.55},
+    "conduit_power":   {"base": (0.75, 0.45, 0.25), "metallic": 0.8,
+                        "roughness": 0.4},
+    "conduit_data":    {"base": (0.30, 0.50, 0.75), "metallic": 0.4,
+                        "roughness": 0.4},
+}
+
+# fallback keyword hints when no spec entry matches the node name
+_NAME_HINTS = [
+    (("wheel", "tire"), "rubber"),
+    (("solar", "pv", "cell"), "silicon"),
+    (("battery", "pack"), "battery"),
+    (("glass", "cabin", "window"), "glass"),
+    (("motor", "shaft", "bearing", "gear", "heat_sink", "sink",
+      "bus", "antenna"), "machined_metal"),
+    (("board", "bms", "control", "sensor", "electronics",
+      "power"), "circuit"),
+    (("thermal", "loop", "coolant", "channel", "link", "flow",
+      "conduit"), "conduit_power"),
+    (("hub", "port", "connector", "housing", "enclosure",
+      "chassis", "body"), "body_metal"),
+    (("tip", "membrane", "coating", "valve", "chamber"), "polymer"),
+]
 
 
 def _log(msg: str) -> None:
@@ -98,10 +148,92 @@ def _mesh_objects() -> list:
     return [o for o in bpy.context.scene.objects if o.type == "MESH"]
 
 
-def _assign_studio_materials(meshes: list) -> None:
-    """One clean Principled BSDF per mesh, driven by the mesh's own
-    COLOR_0 vertex palette (the bridge's component colors)."""
+def _load_spec_material_map(spec_path):
+    """R432 sections 5/10: canonical spec -> {node_name: material_class}.
+    Component nodes map by component_id; interface nodes by
+    link_{from}__{to}. Returns (map, spec_sha256)."""
+    if not spec_path or not os.path.isfile(spec_path):
+        return {}, None
+    try:
+        spec = json.loads(open(spec_path).read())
+    except (OSError, ValueError):
+        return {}, None
+    mat_map = {}
+    for comp in spec.get("components") or []:
+        cid = comp.get("component_id")
+        if cid and comp.get("material_class"):
+            mat_map[cid] = comp["material_class"]
+    for iface in spec.get("interfaces") or []:
+        f, t = iface.get("from"), iface.get("to")
+        if f and t and iface.get("material_class"):
+            mat_map[f"link_{f}__{t}"] = iface["material_class"]
+    return mat_map, spec.get("spec_sha256")
+
+
+def _material_class_for(name: str, mat_map: dict) -> str | None:
+    if name in mat_map:
+        return mat_map[name]
+    low = name.lower()
+    for keywords, cls in _NAME_HINTS:
+        if any(k in low for k in keywords):
+            return cls
+    return None
+
+
+def _set_input(bsdf, names, value):
+    """Set a Principled BSDF input by candidate names (Blender renamed
+    some inputs across versions — try each, never crash)."""
+    for n in names:
+        if n in bsdf.inputs:
+            try:
+                bsdf.inputs[n].default_value = value
+                return True
+            except Exception:  # noqa: BLE001
+                pass
+    return False
+
+
+def _assign_pbr_material(obj, preset):
+    """One clean Principled BSDF from a class preset (section 10)."""
+    mesh = obj.data
+    mat = bpy.data.materials.new(name=f"pbr::{obj.name[:56]}")
+    mat.use_nodes = True
+    tree = mat.node_tree
+    for node in list(tree.nodes):
+        tree.nodes.remove(node)
+    out = tree.nodes.new("ShaderNodeOutputMaterial")
+    bsdf = tree.nodes.new("ShaderNodeBsdfPrincipled")
+    tree.links.new(bsdf.outputs["BSDF"], out.inputs["Surface"])
+    _set_input(bsdf, ["Base Color"], (*preset["base"], 1.0))
+    _set_input(bsdf, ["Metallic"], preset.get("metallic", 0.0))
+    _set_input(bsdf, ["Roughness"], preset.get("roughness", 0.5))
+    if preset.get("alpha") is not None:
+        _set_input(bsdf, ["Alpha"], preset["alpha"])
+        mat.blend_method = "BLEND" if hasattr(mat, "blend_method") \
+            else "BLEND"
+    if preset.get("transmission") is not None:
+        _set_input(bsdf, ["Transmission", "Transmission Weight"],
+                   preset["transmission"])
+    if len(obj.data.materials) > 0:
+        for i in range(len(obj.data.materials)):
+            obj.data.materials[i] = mat
+    else:
+        obj.data.materials.append(mat)
+
+
+def _assign_studio_materials(meshes: list, mat_map: dict = None) -> dict:
+    """R432 section 10: spec-driven PBR per material class; the legacy
+    COLOR_0 studio material remains ONLY as the no-spec fallback
+    (generic/process models). Returns the applied class census."""
+    applied = {}
     for obj in meshes:
+        cls = _material_class_for(obj.name, mat_map or {})
+        preset = PBR_PRESETS.get(cls) if cls else None
+        if preset is not None:
+            _assign_pbr_material(obj, preset)
+            applied[cls] = applied.get(cls, 0) + 1
+            continue
+        # legacy fallback: vertex-color driven studio material
         mesh = obj.data
         mat = bpy.data.materials.new(name=f"studio::{obj.name[:58]}")
         mat.use_nodes = True
@@ -127,6 +259,39 @@ def _assign_studio_materials(meshes: list) -> None:
                 obj.data.materials[i] = mat
         else:
             obj.data.materials.append(mat)
+        applied["studio_color_fallback"] = applied.get(
+            "studio_color_fallback", 0) + 1
+    return applied
+
+
+def _organize_scene(meshes: list) -> None:
+    """R432 section 9: the scene graph the directive specifies —
+
+        Scene
+        ├── Technology  (the imported component meshes, canonical IDs)
+        ├── Environment (floor)
+        ├── Camera_Hero / Camera_Section / Camera_Exploded
+        └── Lights
+
+    Object names already ARE canonical component IDs from the GLB
+    (battery_pack, solar_roof, ...); this adds the collection-level
+    organization without touching geometry or names."""
+    scene = bpy.context.scene
+    tech = bpy.data.collections.new("Technology")
+    scene.collection.children.link(tech)
+    for obj in meshes:
+        for coll in obj.users_collection:
+            coll.objects.unlink(obj)
+        tech.objects.link(obj)
+
+
+def _link_to_collection(obj, name: str) -> None:
+    scene = bpy.context.scene
+    coll = bpy.data.collections.new(name)
+    scene.collection.children.link(coll)
+    for c in list(obj.users_collection):
+        c.objects.unlink(obj)
+    coll.objects.link(obj)
 
 
 def _world_bbox(meshes: list):
@@ -146,86 +311,98 @@ def _world_bbox(meshes: list):
 
 
 def _add_floor(center, size) -> object:
+    """A visible neutral studio surface (grounding + contact
+    shadows). R432 visual iteration: the shadow-catcher-only floor was
+    invisible against the dark world — the model had no ground."""
     bpy.ops.mesh.primitive_plane_add(size=1, location=(center.x, center.y, 0.0))
     floor = bpy.context.active_object
     floor.name = "__floor"
     floor.scale = (max(size.x, size.y) * 3.5, max(size.x, size.y) * 3.5, 1.0)
-    floor.is_shadow_catcher = True
     mat = bpy.data.materials.new(name="__floor_mat")
     mat.use_nodes = True
+    tree = mat.node_tree
+    for node in list(tree.nodes):
+        tree.nodes.remove(node)
+    out = tree.nodes.new("ShaderNodeOutputMaterial")
+    bsdf = tree.nodes.new("ShaderNodeBsdfPrincipled")
+    tree.links.new(bsdf.outputs["BSDF"], out.inputs["Surface"])
+    bsdf.inputs["Base Color"].default_value = (0.24, 0.25, 0.27, 1.0)
+    bsdf.inputs["Roughness"].default_value = 0.55
+    bsdf.inputs["Metallic"].default_value = 0.0
     floor.data.materials.append(mat)
+    _link_to_collection(floor, "Environment")
     return floor
 
 
 def _add_lights(center, radius: float) -> list:
     lights = []
-    key = bpy.data.lights.new(name="__key", type="AREA")
-    key.energy = KEY_ENERGY
-    key.size = KEY_SIZE
-    k = bpy.data.objects.new("__key_obj", key)
-    bpy.context.collection.objects.link(k)
-    k.location = (center.x + radius * 1.6, center.y - radius * 1.9, radius * 2.6)
-    k.rotation_euler = (math.radians(52), 0, math.radians(34))
-    lights.append(k)
+    coll = bpy.data.collections.new("Lights")
+    bpy.context.scene.collection.children.link(coll)
 
-    fill = bpy.data.lights.new(name="__fill", type="AREA")
-    fill.energy = FILL_ENERGY
-    fill.size = FILL_SIZE
-    f = bpy.data.objects.new("__fill_obj", fill)
-    bpy.context.collection.objects.link(f)
-    f.location = (center.x - radius * 2.2, center.y - radius * 0.8, radius * 1.4)
-    f.rotation_euler = (math.radians(66), 0, math.radians(-48))
-    lights.append(f)
+    def _new(name, energy, size, loc, rot):
+        data = bpy.data.lights.new(name=name, type="AREA")
+        data.energy = energy
+        data.size = size
+        obj = bpy.data.objects.new(f"{name}_obj", data)
+        coll.objects.link(obj)
+        obj.location = loc
+        obj.rotation_euler = rot
+        lights.append(obj)
 
-    rim = bpy.data.lights.new(name="__rim", type="AREA")
-    rim.energy = RIM_ENERGY
-    rim.size = FILL_SIZE
-    r = bpy.data.objects.new("__rim_obj", rim)
-    bpy.context.collection.objects.link(r)
-    r.location = (center.x - radius * 0.4, center.y + radius * 2.2, radius * 1.9)
-    r.rotation_euler = (math.radians(60), 0, math.radians(196))
-    lights.append(r)
+    _new("key", KEY_ENERGY, KEY_SIZE,
+         (center.x + radius * 1.6, center.y - radius * 1.9, radius * 2.6),
+         (math.radians(52), 0, math.radians(34)))
+    _new("fill", FILL_ENERGY, FILL_SIZE,
+         (center.x - radius * 2.2, center.y - radius * 0.8, radius * 1.4),
+         (math.radians(66), 0, math.radians(-48)))
+    _new("rim", RIM_ENERGY, FILL_SIZE,
+         (center.x - radius * 0.4, center.y + radius * 2.2, radius * 1.9),
+         (math.radians(60), 0, math.radians(196)))
     return lights
 
 
-def _add_camera(center, radius: float) -> object:
-    cam_data = bpy.data.cameras.new(name="__cam")
-    cam_data.lens = LENS_MM
-    cam_data.sensor_width = SENSOR_W
-    cam = bpy.data.objects.new(name="__cam", object_data=cam_data)
-    bpy.context.collection.objects.link(cam)
-
+def _cam_location(center, radius: float, dist_scale: float = 1.0) -> Vector:
     fov_v = 2.0 * math.atan(SENSOR_W * 0.5 / LENS_MM)  # sensor fit AUTO/HORIZONTAL
-    dist = (radius / max(math.sin(fov_v / 2.0), 1e-6)) * FIT_MARGIN
+    dist = (radius / max(math.sin(fov_v / 2.0), 1e-6)) * FIT_MARGIN * dist_scale
     az = math.radians(CAM_AZIMUTH_DEG)
     el = math.radians(CAM_ELEVATION_DEG)
     direction = Vector((
         math.cos(el) * math.sin(az),
         -math.cos(el) * math.cos(az),
         math.sin(el)))
-    cam.location = center + direction * dist
+    return center + direction * dist
 
+
+def _add_cameras(center, radius: float) -> dict:
+    """R432 section 9: Camera_Hero / Camera_Section / Camera_Exploded.
+
+    Hero: the primary three-quarter perspective. Section: same
+    perspective (the cut is what changes). Exploded: pulled back to
+    frame the exploded assembly. All three share one look-at target
+    and are switched per render state; the scene camera switches —
+    geometry never moves for framing (presentation-only rule, §8)."""
+    coll = bpy.data.collections.new("Cameras")
+    bpy.context.scene.collection.children.link(coll)
     target = bpy.data.objects.new(name="__cam_target", object_data=None)
-    bpy.context.collection.objects.link(target)
+    coll.objects.link(target)
     target.location = center
-    con = cam.constraints.new(type="TRACK_TO")
-    con.target = target
-    con.track_axis = "TRACK_NEGATIVE_Z"
-    con.up_axis = "UP_Y"
-    bpy.context.scene.camera = cam
-    return cam
 
-
-def _set_cam_distance(cam, center, radius: float) -> None:
-    fov_v = 2.0 * math.atan(SENSOR_W * 0.5 / LENS_MM)
-    dist = (radius / max(math.sin(fov_v / 2.0), 1e-6)) * FIT_MARGIN
-    az = math.radians(CAM_AZIMUTH_DEG)
-    el = math.radians(CAM_ELEVATION_DEG)
-    direction = Vector((
-        math.cos(el) * math.sin(az),
-        -math.cos(el) * math.cos(az),
-        math.sin(el)))
-    cam.location = center + direction * dist
+    cams = {}
+    for name, scale in (("Camera_Hero", 1.0), ("Camera_Section", 1.0),
+                        ("Camera_Exploded", 1.35)):
+        cam_data = bpy.data.cameras.new(name=f"{name}_data")
+        cam_data.lens = LENS_MM
+        cam_data.sensor_width = SENSOR_W
+        cam = bpy.data.objects.new(name=name, object_data=cam_data)
+        coll.objects.link(cam)
+        cam.location = _cam_location(center, radius, scale)
+        con = cam.constraints.new(type="TRACK_TO")
+        con.target = target
+        con.track_axis = "TRACK_NEGATIVE_Z"
+        con.up_axis = "UP_Y"
+        cams[name] = cam
+    bpy.context.scene.camera = cams["Camera_Hero"]
+    return cams
 
 
 def _configure_render(scene, width: int, height: int, samples: int) -> None:
@@ -244,7 +421,10 @@ def _configure_render(scene, width: int, height: int, samples: int) -> None:
     scene.render.image_settings.file_format = "PNG"
     scene.render.image_settings.color_mode = "RGB"
     scene.render.film_transparent = False
-    scene.view_settings.view_transform = "Standard"
+    try:
+        scene.view_settings.view_transform = "AgX"
+    except Exception:  # noqa: BLE001 — older builds
+        scene.view_settings.view_transform = "Standard"
 
     world = bpy.data.worlds.new(name="__world")
     scene.world = world
@@ -432,13 +612,22 @@ def main() -> int:
     imported_topology = _count_topology(meshes)
     record["source_topology"] = imported_topology
 
-    _assign_studio_materials(meshes)
+    # R432 sections 5/9/10: canonical-spec material classes, PBR
+    # presets, and the organized scene graph (Technology /
+    # Environment / Cameras / Lights; canonical component IDs).
+    mat_map, spec_sha = _load_spec_material_map(spec.get("geometry_spec"))
+    record["geometry_spec_sha256"] = spec_sha
+    record["materials_from_canonical_spec"] = bool(mat_map)
+    material_census = _assign_studio_materials(meshes, mat_map)
+    record["material_census"] = material_census
+    _organize_scene(meshes)
+    record["component_names"] = [o.name for o in meshes]
     _log("meshes after import: " + ", ".join(
         f"{o.name[:24]}({len(o.data.vertices)}v)" for o in meshes[:4]) + f" ...{len(meshes)} total")
     center, size, radius = _world_bbox(meshes)
     _add_floor(center, size)
     _add_lights(center, radius)
-    cam = _add_camera(center, radius)
+    cams = _add_cameras(center, radius)
     scene = bpy.context.scene
     _configure_render(scene, width, height, samples)
 
@@ -468,6 +657,7 @@ def main() -> int:
     if "section" in renders:
         t0 = time.time()
         try:
+            scene.camera = cams["Camera_Section"]
             cutters, _ = _enter_section_state(meshes, center, size)
             _apply_section_cut(meshes)
             _log("meshes after section apply: " + ", ".join(
@@ -504,8 +694,7 @@ def main() -> int:
         t0 = time.time()
         try:
             moves = _enter_exploded_state(meshes, center)
-            _, _, radius_ex = _world_bbox(meshes)
-            _set_cam_distance(cam, center, radius_ex)
+            scene.camera = cams["Camera_Exploded"]
             exploded_png = os.path.join(out_dir, "exploded.png")
             _render_png(scene, exploded_png)
             record["renders"]["exploded.png"] = {
@@ -522,7 +711,7 @@ def main() -> int:
                         "variant": "PRESENTATION_EXPLODED",
                         "topology": _count_topology(meshes)}
             _restore_explosion(meshes, moves)
-            _set_cam_distance(cam, center, radius)
+            scene.camera = cams["Camera_Hero"]
         except Exception as exc:  # noqa: BLE001 — typed record, never silent
             record["renders"]["exploded.png"] = {
                 "status": "FAILED", "error": f"{type(exc).__name__}: {exc}"}

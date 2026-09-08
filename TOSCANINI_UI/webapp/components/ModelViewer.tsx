@@ -167,6 +167,11 @@ export default function ModelViewer({
     <div
       className="viewer"
       ref={wrap}
+      /* R432 section 14: the DOM acceptance test counts primary technology
+         model viewers with this attribute — exactly ONE per technology
+         page. Two viewers that happen to display the same GLB are still
+         a violation; the count is a machine-checked product invariant. */
+      data-model-viewer={label}
       style={compact ? { maxWidth: 480 } : undefined}
     >
       <div className="canvas-wrap" style={{ height }}>

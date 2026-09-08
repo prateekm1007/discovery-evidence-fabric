@@ -23,7 +23,7 @@ import argparse
 import json
 import os
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Callable, Dict, List, Optional
 
 from .candidate import Candidate, StageFailure, canonical_json, sha256_obj, utc_now
 from . import adapters as _adapters
@@ -71,7 +71,11 @@ class EngineRun:
                  with_package: bool = True,
                  package_number: Optional[str] = None,
                  package_registry_path: Optional[str] = None,
-                 resume: bool = False):
+                 resume: bool = False,
+                 event_callback: Optional[Callable] = None):
+        # R431: optional journal callback — called (stage, envelope)
+        # each time a stage envelope is persisted (the moment the
+        # operation occurs). No engine-side journal dependency.
         # CEO A1: there is NO default package number. Production numbers are
         # allocated ATOMICALLY from PACKAGE_ID_REGISTRY.json only after the
         # survivor gate passes. `package_number` exists solely as an explicit
@@ -116,6 +120,7 @@ class EngineRun:
         # (the audit's measured defect: OK-on-empty-input downstream
         # stages after an upstream skip)
         self._skipped_stages: set = set()
+        self.event_callback = event_callback
 
     @classmethod
     def from_run_dir(cls, run_dir: str, **overrides) -> "EngineRun":
@@ -155,6 +160,15 @@ class EngineRun:
 
     def _persist_envelope(self, stage: str):
         self._persist(f"envelope_{stage}.json", self.env.to_dict())
+        # R431: the persisted append-only scientific event journal —
+        # the event lands the moment the envelope does (the operation
+        # itself). Opt-in callback; the engine has no journal
+        # dependency (worker constructs the writer).
+        if self.event_callback:
+            try:
+                self.event_callback(stage, self.env.to_dict())
+            except Exception:  # noqa: BLE001 — journaling is fail-open
+                pass
 
     # ------------------------------------------------------------------
     def run(self) -> Dict[str, Any]:
