@@ -20,6 +20,7 @@ JSON, session record, final_state) — no fabricated progress (Art. IV/VI).
 from __future__ import annotations
 
 import json
+import hashlib
 import os
 import subprocess
 import sys
@@ -89,6 +90,62 @@ _STATIC_TYPES = {
     ".png": "image/png",
     ".woff2": "font/woff2",
 }
+
+
+def _web_build_hash() -> Tuple[Optional[str], int]:
+    """R436 Direction 1 — deterministic content hash over the SERVED web
+    export (TOSCANINI_UI/webapp-export/): sha256 over the sorted
+    (relative path, per-file sha256) pairs. Computed fresh on every call
+    — an identity endpoint must never serve a stale cache (Art. VI:
+    never manufacture provenance; a missing export stays null, never a
+    plausible hash)."""
+    if not WEBAPP_EXPORT.exists():
+        return None, 0
+    acc = hashlib.sha256()
+    count = 0
+    for f in sorted(WEBAPP_EXPORT.rglob("*")):
+        if not f.is_file():
+            continue
+        rel = f.relative_to(WEBAPP_EXPORT).as_posix()
+        fh = hashlib.sha256()
+        with open(f, "rb") as fhnd:
+            for chunk in iter(lambda: fhnd.read(65536), b""):
+                fh.update(chunk)
+        acc.update(rel.encode("utf-8"))
+        acc.update(fh.hexdigest().encode("ascii"))
+        count += 1
+    return acc.hexdigest(), count
+
+
+def _constitution_version() -> Optional[str]:
+    """Parse the **Version:** line from EPISTEMIC_CONSTITUTION.md. The
+    constitution is the controlling authority; its version is reported
+    exactly as ratified (unparseable stays None — never guessed)."""
+    try:
+        head = (REPO_ROOT / "EPISTEMIC_CONSTITUTION.md").read_text(
+            errors="replace")[:2000]
+        for line in head.splitlines():
+            if line.strip().startswith("**Version:**"):
+                return line.split("**Version:**", 1)[1].strip() or None
+    except OSError:
+        return None
+    return None
+
+
+def _version_payload() -> dict:
+    """R436 Direction 1 — the production identity endpoint payload.
+    Read-only, no secrets, no process side effects. The deployed commit
+    is verified AUTOMATICALLY against this (never a dashboard claim)."""
+    web_hash, web_files = _web_build_hash()
+    return {
+        "engine_commit": ENGINE_COMMIT,
+        "engine_commit_source": ENGINE_COMMIT_SOURCE,
+        "web_build_hash": web_hash,
+        "web_build_file_count": web_files,
+        "web_build_source": ("content hash over TOSCANINI_UI/webapp-export/"
+                             if web_hash else "export not built"),
+        "constitution_version": _constitution_version(),
+    }
 
 
 def _health_payload() -> dict:
@@ -483,6 +540,14 @@ class Handler(BaseHTTPRequestHandler):
                                == "EXTERNAL" else gw.gateway_up()),
                 "runs_root": str(store.ENGINE_RUNS),
             })
+        # R436 Direction 1 — the production identity endpoint. Read-only,
+        # no secrets, no auth (identity is public-safe: commit hashes and
+        # a content hash of the served web export). The post-deploy
+        # verification (scripts/r436_verify_production.py) checks
+        # production_commit == expected against THIS endpoint — never a
+        # dashboard screenshot claim (operator directive).
+        if p.path == "/api/version":
+            return self._json(200, _version_payload())
         # R419c: operator-scoped worker-log tail — the operator-visibility
         # capability (R394 s15 pattern) applied to the run worker's own
         # stderr. Owner-scoped sessions never leak through it: the route

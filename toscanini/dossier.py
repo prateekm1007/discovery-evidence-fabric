@@ -200,6 +200,65 @@ def evidence_ledger(session: Dict[str, Any]) -> Dict[str, Any]:
 # ---------------------------------------------------------------------------
 # Design tab (section 6) — the primary visual artifact, honestly
 # ---------------------------------------------------------------------------
+def _hero_eligibility(geom: Dict[str, Any]) -> Dict[str, Any]:
+    """R436 Direction 3 — the semantic-failure hero suppression invariant,
+    derived ONLY from the run's own records (the dossier is the canonical
+    projection; the frontend renders, never re-derives — Art. X).
+
+    A generic fallback object (R432 fallback_basis: the domain template
+    or its repair path — the "slab with boxes" class) is NOT hero
+    material: no substitute model may occupy the primary surface
+    (blind-spot register BS-006/007/024/025). A CONCEPTUAL model whose
+    recorded semantic_identity score FAILED (not_visualized components —
+    the model does not faithfully represent the architecture) is
+    likewise not hero material.
+
+    NEVER suppressed:
+      * engineering geometry (the earned engineering model — its
+        semantic score is structurally "uncheckable by this gate" with
+        no spec; that is UNKNOWN, not a failure finding — Art. XXV);
+      * a conceptual model whose semantic identity PASSED (it
+        materially communicates the architecture — state B);
+      * legacy records with no scores and no fallback_basis (absence
+        of evidence is not evidence of failure — Art. XXV).
+    """
+    fallback = bool(geom.get("fallback_basis"))
+    scores = geom.get("scores") or {}
+    semantic = scores.get("semantic_identity") or {}
+    semantic_failed = (
+        bool(geom.get("conceptual"))
+        and semantic.get("passed") is False
+    )
+    if fallback:
+        return {
+            "eligible": False,
+            "reason": (
+                "generic fallback geometry — the domain template or its "
+                "repair path stood in because a faithful model could not "
+                "be built; a substitute object is never shown as the "
+                "technology"),
+            "rule": "R436 hero suppression: fallback_basis",
+        }
+    if semantic_failed:
+        return {
+            "eligible": False,
+            "reason": (
+                "the model does not faithfully represent the recorded "
+                "architecture — components of the invention are not "
+                "visualized in the geometry"),
+            "rule": ("R436 hero suppression: semantic_identity FAIL "
+                     "on conceptual geometry"),
+            "not_visualized": semantic.get("not_visualized") or [],
+        }
+    return {
+        "eligible": True,
+        "reason": None,
+        "rule": (
+            "R436 hero suppression: no fallback_basis and semantic "
+            "identity not failed (or not applicable)"),
+    }
+
+
 def design_tab(session: Dict[str, Any],
                cio: Optional[Dict[str, Any]]) -> Dict[str, Any]:
     run_dir = Path(session["run_dir"]) if session.get("run_dir") else None
@@ -247,6 +306,13 @@ def design_tab(session: Dict[str, Any],
             # R435: evolution `why` text that is prompt scaffolding is
             # suppressed row-by-row (same guard class as the overview
             # mechanism — never render scaffolding as invention state)
+            # R436 Direction 3: the hero suppression invariant — the
+            # primary surface shows the model ONLY when the geometry
+            # earns it; the technical record (this tab) keeps every
+            # field regardless (the GLB stays inspectable/downloadable
+            # in the deep layer — the projection never hides the
+            # artifact, only the stage placement)
+            hero_eligibility=_hero_eligibility(geom),
             scores=geom.get("scores"),
             not_visualized=(geom.get("scores") or {}).get(
                 "not_visualized") or [],

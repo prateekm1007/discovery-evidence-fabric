@@ -54,6 +54,14 @@ export type DesignTabData = DossierTab & {
   glb?: string | null;
   geometry_class?: string | null;
   conceptual?: boolean;
+  // R436 Direction 3 — the hero suppression invariant, projected by
+  // the dossier (the frontend renders, never re-derives)
+  hero_eligibility?: {
+    eligible?: boolean;
+    reason?: string | null;
+    rule?: string | null;
+    not_visualized?: string[];
+  } | null;
   parameters?: {
     param_id?: string;
     value?: number | string;
@@ -305,6 +313,9 @@ export function ModelDetailsSection({
   const genLabel = (d.generation_id || "gen-1").replace("gen-", "");
   const genCount = d.generation_count || evo.length || 1;
   const hash = (h?: string | null) => (h ? `${h.slice(0, 12)}…` : "—");
+  // R436: the deep layer explains hero suppression — when the geometry
+  // did not earn the stage, the record (this section) carries the WHY
+  const heroSuppressed = d.hero_eligibility?.eligible === false;
 
   // component selector uses the CANONICAL component IDs — the same ids
   // the GLB scene graph carries (R433 section 5); chips highlight the
@@ -340,35 +351,44 @@ export function ModelDetailsSection({
       )}
 
       <div className="ov-block">
-        <h4>The model on stage</h4>
-        <p>
-          {viewingGen != null ? (
-            <>
-              Generation {viewingGen} (history) is on stage —{" "}
-              <button
-                type="button"
-                className="linklike"
-                onClick={() => onSelectGen(null)}
-              >
-                return to the current generation
-              </button>
-              .
-            </>
-          ) : (
-            <>
-              Generation {genLabel} · current
-              {genCount > 1 ? ` · ${genCount} generations recorded` : ""}
-              {d.domain_family
-                ? ` · ${d.domain_family.toLowerCase().replace(/_/g, " ")}`
-                : ""}
-              .
-            </>
-          )}
-        </p>
+        <h4>{heroSuppressed ? "The model record" : "The model on stage"}</h4>
+        {heroSuppressed ? (
+          <p>
+            The geometry on this run did not earn the technology stage —
+            no substitute model is shown on the primary surface. The
+            record below is the truth about what was produced and why
+            it was withheld.
+            <br />
+            <b>Reason: </b>
+            {d.hero_eligibility?.reason ||
+              "semantic identity below acceptance threshold"}
+          </p>
+        ) : viewingGen != null ? (
+          <p>
+            Generation {viewingGen} (history) is on stage —{" "}
+            <button
+              type="button"
+              className="linklike"
+              onClick={() => onSelectGen(null)}
+            >
+              return to the current generation
+            </button>
+            .
+          </p>
+        ) : (
+          <p>
+            Generation {genLabel} · current
+            {genCount > 1 ? ` · ${genCount} generations recorded` : ""}
+            {d.domain_family
+              ? ` · ${d.domain_family.toLowerCase().replace(/_/g, " ")}`
+              : ""}
+            .
+          </p>
+        )}
         <div className="faint" style={{ fontSize: 12 }}>
-          the interactive model lives on the stage above — rotate, zoom,
-          inspect components; it is built from the same canonical CAD
-          source the technology package carries
+          {heroSuppressed
+            ? "the geometry files remain part of this run's record — the scores, the components, and the suppression reason are all below"
+            : "the interactive model lives on the stage above — rotate, zoom, inspect components; it is built from the same canonical CAD source the technology package carries"}
         </div>
       </div>
 
@@ -383,7 +403,13 @@ export function ModelDetailsSection({
                 className={`chip${highlight === c ? " on" : ""}`}
                 data-component-id={c}
                 onClick={() => onHighlight(highlight === c ? null : c)}
-                title={highlight === c ? "clear highlight" : "highlight on stage"}
+                title={
+                  heroSuppressed
+                    ? "recorded component of the canonical architecture"
+                    : highlight === c
+                      ? "clear highlight"
+                      : "highlight on stage"
+                }
               >
                 {c}
               </button>
@@ -428,8 +454,10 @@ export function ModelDetailsSection({
             ))}
           </div>
           <div className="faint" style={{ fontSize: 12, paddingTop: 4 }}>
-            selecting a generation puts that historical model on stage;
-            the current generation is GEN {genLabel}
+            {heroSuppressed
+              ? "the generation history is part of the record; the interactive stage is withheld on this run"
+              : "selecting a generation puts that historical model on stage; the current generation is GEN " +
+                genLabel}
           </div>
         </div>
       )}

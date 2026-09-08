@@ -167,9 +167,11 @@ export function ScienceEventStream({
 export function InvestigationProgress({
   lastCompletedLabel,
   activeLabel,
+  pausedLabel,
 }: {
   lastCompletedLabel?: string | null;
   activeLabel?: string | null;
+  pausedLabel?: string | null;
 }) {
   return (
     <div className="inv-progress">
@@ -181,9 +183,16 @@ export function InvestigationProgress({
         <div className="faint">Last completed: {lastCompletedLabel}</div>
       )}
       {activeLabel && <div>Currently: {activeLabel}</div>}
+      {/* R436 (audit §5B): an infrastructure pause is its own state —
+          never presented as active investigation work */}
+      {pausedLabel && !activeLabel && (
+        <div className="inv-paused" data-inv-paused>
+          Paused — infrastructure: {pausedLabel}
+        </div>
+      )}
       <div className="faint" style={{ fontSize: 12 }}>
-        the investigation runs on the server — leave and return; nothing
-        is lost
+        the investigation is persisted on the server; you can leave and
+        return to it
       </div>
     </div>
   );

@@ -97,11 +97,13 @@ function HeroInvestigating({
   gauntlet,
   lastCompleted,
   active,
+  paused,
 }: {
   events: ScienceEvent[];
   gauntlet: GauntletCard[];
   lastCompleted: string | null;
   active: string | null;
+  paused: string | null;
 }) {
   return (
     <div className="hero-live" data-hero-live>
@@ -109,11 +111,12 @@ function HeroInvestigating({
         <InvestigationProgress
           lastCompletedLabel={lastCompleted}
           activeLabel={active}
+          pausedLabel={paused}
         />
         <div className="hero-live-line faint">
           The technology model will appear here as the design solidifies.
-          The investigation runs on the server — leave and come back;
-          nothing is lost.
+          The investigation is persisted on the server; you can leave and
+          return to it.
         </div>
       </div>
     </div>
@@ -132,6 +135,42 @@ function HeroNotEstablished({ design }: { design: DesignTabData | undefined }) {
         {design?.note ||
           "A physical-looking model was not generated for this technology — " +
           "showing one anyway would misrepresent the engineering state."}
+      </div>
+    </div>
+  );
+}
+
+// ---- R436 Direction 3: the UNEARNED hero -----------------------------------
+// A geometry exists on this run (the record keeps it — inspectable and
+// downloadable in the deep layer), but it did not EARN the primary
+// surface: a generic fallback object or a model that does not
+// faithfully represent the recorded architecture. No substitute model
+// is shown (blind-spot register BS-006/007/024/025).
+function HeroNotFaithful({ design }: { design: DesignTabData | undefined }) {
+  const he = design?.hero_eligibility;
+  const notVisualized = he?.not_visualized || [];
+  return (
+    <div className="hero-honest hero-unearned" data-hero-unearned>
+      <div className="hero-honest-h">Technology visualization</div>
+      <div className="hero-honest-body">
+        Not established yet.
+      </div>
+      <div className="hero-honest-note faint">
+        {he?.reason ||
+          "The investigation found an architecture, but the system could " +
+          "not produce a faithful visual representation of it. No " +
+          "substitute model is shown."}
+      </div>
+      {notVisualized.length > 0 && (
+        <div className="hero-honest-note faint" data-unearned-components>
+          Architecture components not represented in the geometry: {""}
+          {notVisualized.join(", ")}.
+        </div>
+      )}
+      <div className="hero-honest-note faint">
+        The full technical record — the model’s recorded scores, the
+        geometry files, and the reason visualization was not earned — is
+        preserved below.
       </div>
     </div>
   );
@@ -214,11 +253,22 @@ export default function TechStage({
   const evo = design?.evolution ?? [];
 
   // ---- hero resolution (the ONE viewer) ----
+  // R436 Direction 3: the geometry must EARN the hero. The dossier
+  // projection carries hero_eligibility (derived from the run's own
+  // records — fallback_basis / semantic_identity); the frontend only
+  // renders it (Art. X). An ineligible geometry renders the honest
+  // unearned state — never a substitute object on the primary surface,
+  // and never a second viewer to work around the first.
+  const heroEligible = design?.hero_eligibility?.eligible !== false;
   const heroGlb =
-    design && design.availability === "AVAILABLE" ? design.glb : null;
+    heroEligible && design && design.availability === "AVAILABLE"
+      ? design.glb
+      : null;
   const activeRow =
     viewingGen != null ? evo.find((r) => r.generation === viewingGen) : undefined;
-  const showingHistory = Boolean(activeRow?.glb);
+  // history swap is gated on the SAME eligibility: an unearned current
+  // generation cannot be bypassed by selecting a historical one
+  const showingHistory = heroEligible && Boolean(activeRow?.glb);
   const viewerUrl = showingHistory && activeRow?.glb ? activeRow.glb : heroGlb;
   const genLabelNum = (design?.generation_id || "gen-1").replace("gen-", "");
   const genCount = design?.generation_count || evo.length || 1;
@@ -259,10 +309,16 @@ export default function TechStage({
     return doneEvts?.summary ?? null;
   }, [events]);
   const activeLabel = useMemo(() => {
-    const act = [...events]
-      .reverse()
-      .find((e) => e.status === "ACTIVE" || e.status === "FAILED_INFRASTRUCTURE");
+    const act = [...events].reverse().find((e) => e.status === "ACTIVE");
     return act?.summary ?? null;
+  }, [events]);
+  // R436 (audit §5B): an infrastructure-failed event is NOT active work —
+  // it renders as its own paused state, never as "Currently: …".
+  const pausedLabel = useMemo(() => {
+    const paused = [...events]
+      .reverse()
+      .find((e) => e.status === "FAILED_INFRASTRUCTURE");
+    return paused?.summary ?? null;
   }, [events]);
 
   function focus(section: string) {
@@ -337,6 +393,10 @@ export default function TechStage({
               </button>
             )}
           </>
+        ) : done && design && design.availability === "AVAILABLE" ? (
+          // R436 Direction 3: geometry exists but did not earn the hero —
+          // the honest unearned state (no substitute model)
+          <HeroNotFaithful design={design} />
         ) : done ? (
           <HeroNotEstablished design={design} />
         ) : (
@@ -345,6 +405,7 @@ export default function TechStage({
             gauntlet={gauntlet}
             lastCompleted={lastCompleted}
             active={activeLabel}
+            paused={pausedLabel}
           />
         )}
       </div>
@@ -416,7 +477,7 @@ export default function TechStage({
         >
           Test this
         </button>
-        {genCount > 1 && (
+        {genCount > 1 && heroEligible && (
           <button
             type="button"
             className="btn ghost big"

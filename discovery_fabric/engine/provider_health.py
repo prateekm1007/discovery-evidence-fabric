@@ -7,7 +7,9 @@ Operator directive (product integration, sections 6-10):
     failure is NEVER silently treated as successful model output.
   - Failures are classified: RATE_LIMITED / TIMEOUT / AUTH_FAILURE /
     NETWORK_FAILURE / INVALID_RESPONSE / MODEL_FAILURE / PARSER_FAILURE /
-    UNKNOWN — rate limits are distinguished from empty results.
+    GONE / CREDIT_EXHAUSTED / UNKNOWN — rate limits are distinguished
+    from empty results; a retired model (410) and an unaffordable
+    request (402) are distinguished from a malformed response.
   - Per-provider health (status, last_success, latency, rate_limit_state,
     model_count) is exposed through /api/health.
 
@@ -66,11 +68,24 @@ INVALID_RESPONSE = "INVALID_RESPONSE"
 MODEL_FAILURE = "MODEL_FAILURE"
 PARSER_FAILURE = "PARSER_FAILURE"
 GONE = "GONE"                   # R415: HTTP 410 — resource retired
+# R436: HTTP 402 — the provider's own response says the account cannot
+# afford the request (credit/token budget exhausted). Before this
+# amendment a 402 fell into INVALID_RESPONSE via the HTTPError
+# catch-all — the same pre-R415 pattern 410 had. This EXTENDS the
+# vocabulary the same way R415 extended it for GONE; it never
+# reclassifies an existing member. The distinction is diagnostic
+# honesty (Art. XV): an operator reading failure_class=CREDIT_EXHAUSTED
+# knows retrying and waiting cannot fix it and where to look (the
+# wallet), while INVALID_RESPONSE pointed at the models — the exact
+# misdiagnosis carried by the production RUN_BLOCKED_TRANSPORT record
+# ts_bf144222321f (2026-09-08T21:53Z, root-caused R436 §1: OpenRouter
+# 402 "can only afford 0 tokens" on every rung of the ladder).
+CREDIT_EXHAUSTED = "CREDIT_EXHAUSTED"
 UNKNOWN = "UNKNOWN"
 
 FAILURE_TYPES = (RATE_LIMITED, TIMEOUT, AUTH_FAILURE, NETWORK_FAILURE,
                  INVALID_RESPONSE, MODEL_FAILURE, PARSER_FAILURE, GONE,
-                 UNKNOWN)
+                 CREDIT_EXHAUSTED, UNKNOWN)
 
 # Cooldown ladder for rate limits (seconds). A rate-limited provider is
 # demoted (not removed) for this long; repeated consecutive rate limits
@@ -114,6 +129,8 @@ def classify_failure(exc: BaseException, http_status: Optional[int] = None,
         return AUTH_FAILURE
     if status == 410:
         return GONE                  # R415: retired model/endpoint
+    if status == 402:
+        return CREDIT_EXHAUSTED      # R436: cannot afford the request
     if _hints(_RATE_HINTS):
         return RATE_LIMITED
     if status in (400, 422):
@@ -135,6 +152,8 @@ def classify_failure(exc: BaseException, http_status: Optional[int] = None,
             return AUTH_FAILURE
         if code == 410:
             return GONE              # R415: retired model/endpoint
+        if code == 402:
+            return CREDIT_EXHAUSTED  # R436: credits exhausted upstream
         if code and code >= 500:
             return MODEL_FAILURE      # model service failed server-side
         if code is not None:
