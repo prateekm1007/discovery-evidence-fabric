@@ -132,7 +132,33 @@ def _bridge_package_info(run_dir: Path) -> Optional[Dict[str, Any]]:
         "zip_path": str(zp),
         "visualizability_class": pkg.get("visualizability_class"),
         "zip_sha256": pkg.get("zip_sha256"),
+        "document_count": pkg.get("manifest_files"),
     }
+
+
+def _package_document_count(run_dir: Path,
+                            package: Dict[str, Any]) -> Optional[int]:
+    """R422 (directive 3): the honest document count for the Downloads
+    block — from the package's own records, never hardcoded. Bridge: the
+    manifest file_count recorded in BRIDGE_REPORT. Buyer: the manifest
+    inside the DOWNLOAD tree (MANIFEST.json carries file_count)."""
+    try:
+        if package.get("package_kind") == "BUYER_PACKAGE":
+            dl = run_dir / "DOWNLOAD"
+            if dl.is_dir():
+                m = _read_json(dl / "MANIFEST.json")
+                if m and isinstance(m.get("file_count"), int):
+                    return m["file_count"]
+                return sum(1 for _ in dl.rglob("*"))
+        count = package.get("document_count")
+        if isinstance(count, int):
+            return count
+        # fall back to the bridge report's own count (the record)
+        br = _read_json(run_dir / "BRIDGE_REPORT.json") or {}
+        count = (br.get("package_out") or {}).get("manifest_files")
+        return count if isinstance(count, int) else None
+    except Exception:  # noqa: BLE001 — count stays absent, never guessed
+        return None
 
 
 def _bridge_why(bridge_report: Dict[str, Any]) -> Optional[str]:
@@ -542,6 +568,12 @@ def build_cio(session: Dict[str, Any]) -> Optional[Dict[str, Any]]:
                 if package.get("complete") else None),
             "package_maturity": package.get("maturity"),
             "package_kind": package.get("package_kind"),
+            # R422 (directive 3 — package UX): the REAL document count
+            # from the package's own manifest (BRIDGE_REPORT
+            # package_out.manifest file_count, or the buyer package's
+            # DOWNLOAD tree) — never hardcoded, never guessed. The
+            # run-inspector Downloads block renders this number.
+            "document_count": _package_document_count(run_dir, package),
             "package_kind_note": (
                 "buyer package from the certified release chain"
                 if package.get("package_kind") == "BUYER_PACKAGE" else

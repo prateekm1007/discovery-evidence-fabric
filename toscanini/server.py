@@ -347,6 +347,13 @@ def _health_payload() -> dict:
             "showcase_ready": portfolio_ready,
         },
         "durable": _durable_state(),
+        # R422 (directive 2 — the a5a7 anomaly): the durable worker
+        # forensics ledger summary. Derived at READ TIME from the ledger
+        # tail (spawned / heartbeat-fresh / not-terminal) — never from a
+        # second in-memory registry that can itself die. This field is
+        # what makes "Discovery ready" GREEN while zero workers are
+        # alive impossible to repeat silently (see 00_P0_INCIDENT.md).
+        "worker_forensics": _worker_forensics_state(),
         # R415: the routing registry's richer provider detail (directive
         # sections 3/6/13 — per-model counts, catalog state, probe cache)
         "model_routing": {
@@ -360,9 +367,22 @@ def _durable_state() -> dict:
     try:
         from toscanini import durable
         return durable.state()
-    except Exception as exc:  # noqa: BLE001 — disclosed, never silent
+    except Exception as exc:  # noqa: BLE001 — disclosed, never fatal
         return {"enabled": False,
                 "error": f"{type(exc).__name__}: {exc}"[:200]}
+
+
+def _worker_forensics_state() -> dict:
+    """R422: worker-forensics summary for /api/health. Fail-open: a
+    forensics read failure is DISCLOSED here (forensics_degraded) but
+    never fails the health request itself."""
+    try:
+        from toscanini import worker_forensics as _wfx
+        return _wfx.health_summary(_wfx.durable_root())
+    except Exception as exc:  # noqa: BLE001 — disclosed, never fatal
+        return {"enabled": False,
+                "forensics_degraded": True,
+                "last_write_error": f"{type(exc).__name__}: {exc}"[:200]}
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -933,6 +953,19 @@ class Handler(BaseHTTPRequestHandler):
                 return self._json(404, {"error": "session not found"})
             if "error" in result:
                 return self._json(409, result)
+            # R422 (directive 2 — the a5a7 retry path): the RETRY_REQUESTED
+            # event is durably appended BEFORE the spawn. If the spawned
+            # retry worker dies instantly (the observed a5a7 class: pid 3256,
+            # 2026-09-08T06:33Z, cause lost with the container), the ledger
+            # still proves the retry was requested and which worker took it.
+            try:
+                from toscanini import worker_forensics as _wfx
+                _fxq = _wfx.attach_session(
+                    sid, durable_root=_wfx.durable_root())
+                _fxq.event("RETRY_REQUESTED", origin="api",
+                           retry_attempts=result.get("retry_attempts"))
+            except Exception:  # noqa: BLE001 — fail-open, never blocks
+                pass
             self._spawn_worker(sid)
             from toscanini.user_state import public_session_view
             return self._json(200, public_session_view(result))
@@ -1304,6 +1337,26 @@ def main():
         durable.restore()
     except Exception as exc:  # noqa: BLE001 — disclosed, never fatal
         print(f"durable restore failed: {type(exc).__name__}: {exc}",
+              file=sys.stderr)
+    # R422 (directive 2 — the a5a7 anomaly): boot-time forensic
+    # reconciliation, AFTER the durable restore (the ledger itself is
+    # restored with the store). Any worker with a WORKER_SPAWNED/
+    # heartbeat record and no terminal event, whose boot_id differs from
+    # THIS boot, is marked ORPHANED_AT_RESTART — as a NEW append-only
+    # ledger event (the referenced run's own record is never rewritten;
+    # the reconciliation event IS the evidence). One instrumented restart
+    # now yields a durable, pushed, diff-able answer to "which worker
+    # died with the previous container, and how far did it get".
+    try:
+        from toscanini import worker_forensics as _wfx
+        rec = _wfx.reconcile_at_boot(_wfx.durable_root())
+        if rec.get("orphan_count"):
+            print(f"forensic reconciliation: {rec['orphan_count']} "
+                  f"orphaned worker(s) marked: "
+                  f"{[o['session_id'] for o in rec['orphans']]}",
+                  file=sys.stderr)
+    except Exception as exc:  # noqa: BLE001 — disclosed, never fatal
+        print(f"forensic reconcile failed: {type(exc).__name__}: {exc}",
               file=sys.stderr)
     try:
         interrupted = store.mark_interrupted_sessions()

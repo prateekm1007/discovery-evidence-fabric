@@ -99,8 +99,10 @@ function pick(obj: Record<string, unknown> | null | undefined, key: string) {
 
 export function EngineeringArgument({
   detail,
+  packageAvailable,
 }: {
   detail: NonNullable<SessionDetail>;
+  packageAvailable?: boolean;
 }) {
   const inv = (detail.invention_specification ??
     {}) as Record<string, unknown>;
@@ -191,7 +193,11 @@ export function EngineeringArgument({
         {str(fs.final_status, 300) || detail.final_status || (
           <span className="faint">pending</span>
         )}
-        {pkg?.maturity && (
+        {/* R422 (directive 1): "package maturity: …" only renders when a
+            package actually exists — a maturity line under a no-package
+            Reality row was itself a small contradiction. The value prefers
+            the run-record package field (re-derived from the run dir). */}
+        {packageAvailable && pkg?.maturity && (
           <div className="faint">package maturity: {pkg.maturity}</div>
         )}
       </Step>
@@ -214,17 +220,23 @@ export function EngineeringArgument({
         )}
       </Step>
       <Step k="Reality">
-        {usv?.package_available ? (
+        {/* R422 (directive 1 — UI copy reconciliation): the Reality row is
+            gated on the FRESH package truth (packageAvailable), never the
+            stale completion-time user_state_view flag — and measurement
+            honesty is now stated in BOTH branches, decoupled from package
+            existence. One assertion per run, sourced from one truth. */}
+        {packageAvailable ? (
           <>
-            This run produced a computationally-validated technology
-            package. No physical observation exists anywhere in this
-            program&apos;s records — every result is
-            COMPUTATIONAL_RESULT or MODELLED, stated as such.
+            A technology package exists for this run. Every result in it
+            is COMPUTATIONAL_RESULT or MODELLED — no physical observation
+            exists anywhere in this program&apos;s records, and each
+            document states its own evidence class.
           </>
         ) : (
           <span className="faint">
-            simulated / modelled results only — nothing on this run was
-            measured in reality (the honest state, never hidden)
+            no technology package on this run, and nothing was measured
+            in reality — results are simulated or modelled, stated as
+            such (the honest state, never hidden)
           </span>
         )}
       </Step>

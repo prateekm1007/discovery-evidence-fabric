@@ -264,9 +264,11 @@ export function GenerationsTimeline({
 export function OutcomeBanner({
   runState,
   detail,
+  packageAvailable,
 }: {
   runState: RunStateObject | undefined;
   detail: SessionDetail;
+  packageAvailable: boolean;
 }) {
   const outcome = runState?.outcome ?? detail.user_state_view?.outcome;
   if (!outcome || outcome === "PENDING") return null;
@@ -332,7 +334,22 @@ export function OutcomeBanner({
           (Art. LXI: infrastructure failure is never a scientific rejection)
         </div>
       )}
-      {outcome === "INVENTION_REQUIRES_EXPERIMENT" && (
+      {/* R422 (directive 1 — UI copy reconciliation): the async artifact
+          gate can land a bridge package AFTER the run's completion
+          snapshot recorded "no package was reached". When that happened,
+          this banner renders ONE calm reconciler line instead of letting
+          the banner text and the Artifact panel's download link fight —
+          presentation-only; the run record itself is never edited. */}
+      {packageAvailable &&
+        detail.user_state_view?.package_available === false && (
+          <div className="outcome-detail">
+            The technology package was produced by the automatic artifact
+            gate after the run completed — the summary above was recorded
+            at completion. The package in the Artifact panel is the
+            current state.
+          </div>
+        )}
+      {outcome === "INVENTION_REQUIRES_EXPERIMENT" && !packageAvailable && (
         <div className="outcome-detail faint">
           the invention is strong enough conceptually; the decisive
           physical experiment is specified but not executed — that is
@@ -355,8 +372,10 @@ export function isTerminal(status: string): boolean {
 
 export default function RunNarrative({
   detail,
+  packageAvailable,
 }: {
   detail: NonNullable<SessionDetail>;
+  packageAvailable?: boolean;
 }) {
   const stages = detail.stages ?? [];
   const done = isTerminal(detail.status);
@@ -378,7 +397,13 @@ export default function RunNarrative({
         </div>
       )}
 
-      {done && <OutcomeBanner runState={runState} detail={detail} />}
+      {done && (
+        <OutcomeBanner
+          runState={runState}
+          detail={detail}
+          packageAvailable={Boolean(packageAvailable)}
+        />
+      )}
       {(() => {
         const byStage = new Map(stages.map((s) => [s.stage, s]));
         const seen = new Set<string>();

@@ -523,7 +523,24 @@ def package_info(run_dir: Path) -> Optional[Dict[str, Any]]:
         "zip": zip_path,
         "zip_name": Path(zip_path).name if zip_path else None,
         "rendered": report.get("rendered"),
+        # R422 (directive 3 — package UX): honest document count for the
+        # run-inspector Downloads block — from the DOWNLOAD tree's own
+        # manifest when present, else the tree count; never hardcoded.
+        "document_count": _download_document_count(run_dir),
     }
+
+
+def _download_document_count(run_dir: Path) -> Optional[int]:
+    try:
+        dl = run_dir / "DOWNLOAD"
+        if not dl.is_dir():
+            return None
+        m = _read_json(dl / "MANIFEST.json")
+        if m and isinstance(m.get("file_count"), int):
+            return m["file_count"]
+        return sum(1 for p in dl.rglob("*") if p.is_file())
+    except Exception:  # noqa: BLE001 — absent stays absent
+        return None
 
 
 def session_detail(session_id: str) -> Optional[Dict[str, Any]]:

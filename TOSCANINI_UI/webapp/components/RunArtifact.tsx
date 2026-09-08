@@ -20,9 +20,8 @@
 // models are served per generation by /api/run/{id}/model?gen=N; the
 // UI never infers an invention exists because a GLB exists.
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import type { CIO, GenerationRecord, SessionDetail } from "@/lib/types";
-import { getCIO } from "@/lib/api";
 import { isTerminal } from "./RunNarrative";
 import ModelViewer from "./ModelViewer";
 import RenderGallery from "./RenderGallery";
@@ -60,6 +59,76 @@ function MaturityBadges({ cio }: { cio: CIO }) {
           </span>
         );
       })}
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// R422 (directive 3 — the Technology Package Downloads block): the ZIP is
+// the actual licensable asset, so it is the FIRST, most prominent download
+// in the Artifact panel — same markup and label as the released-invention
+// page ("Technology package (ZIP)") so a buyer moving between surfaces
+// recognizes the same asset class. GLB/STEP/STL are secondary chips. The
+// document count is the package manifest's OWN count — never hardcoded.
+// The honest-tier note is always shown: rendering completeness never
+// implies buyer-readiness (invention existence, maturity, and
+// buyer-release are separate states).
+// ---------------------------------------------------------------------------
+function PackageDownloads({
+  detail,
+  zipHref,
+  packageKind,
+  docCount,
+  maturity,
+  geometry,
+}: {
+  detail: SessionDetail;
+  zipHref: string;
+  packageKind?: string | null;
+  docCount?: number | null;
+  maturity?: string | null;
+  geometry?: CIO["geometry"];
+}) {
+  const glb = geometry?.glb ?? `/api/run/${detail.session_id}/model`;
+  const step = geometry?.step?.[0];
+  const stl = geometry?.stl?.[0];
+  const isBridge = packageKind === "TECHNOLOGY_PACKAGE_BRIDGE";
+  return (
+    <div className="artifact-dls">
+      <div className="rail-h">Downloads</div>
+      <a className="btn download artifact-dl" href={zipHref}>
+        Technology package (ZIP)
+      </a>
+      <div className="dl-row">
+        <a className="dl-chip" href={glb}>
+          GLB · 3D
+        </a>
+        {step && (
+          <a className="dl-chip" href={step}>
+            STEP · CAD
+          </a>
+        )}
+        {stl && (
+          <a className="dl-chip" href={stl}>
+            STL · print
+          </a>
+        )}
+      </div>
+      {docCount ? (
+        <div className="faint" style={{ fontSize: 11.5, marginTop: 6 }}>
+          {docCount} documents inside the ZIP — {isBridge
+            ? "package README, technical essay, engineering definition, evidence summary, decisive experiment, manifest, provenance"
+            : "executive brief, dossier, decision card, evidence, manifest, traceability"}
+          {maturity ? ` · package maturity: ${String(maturity).replace(/_/g, " ").toLowerCase()}` : ""}
+        </div>
+      ) : null}
+      <div className="faint" style={{ fontSize: 11.5, marginTop: 2 }}>
+        {isBridge
+          ? "early technical evaluation — invention existence, maturity and buyer-readiness are separate states; the buyer release gates are untouched"
+          : packageKind === "BUYER_PACKAGE"
+            ? "from the certified release chain"
+            : ""}
+      </div>
     </div>
   );
 }
@@ -197,27 +266,20 @@ function CioPanel({ cio, detail }: { cio: CIO; detail: SessionDetail }) {
       )}
 
       {downloads.package_zip ? (
-        <>
-          <a className="btn download artifact-dl" href={downloads.package_zip}>
-            Download technology package
-          </a>
-          <div className="faint" style={{ fontSize: 11.5, marginTop: 4 }}>
-            {downloads.package_maturity
-              ? `package maturity: ${String(downloads.package_maturity).replace(/_/g, " ").toLowerCase()}`
-              : ""}
-            {downloads.package_kind === "TECHNOLOGY_PACKAGE_BRIDGE"
-              ? " · early technical evaluation — invention existence, maturity and buyer-readiness are separate states; the buyer release gates are untouched"
-              : downloads.package_kind === "BUYER_PACKAGE"
-                ? " · from the certified release chain"
-                : ""}
-          </div>
-        </>
+        <PackageDownloads
+          detail={detail}
+          zipHref={downloads.package_zip}
+          packageKind={downloads.package_kind}
+          docCount={downloads.document_count}
+          maturity={downloads.package_maturity}
+          geometry={geo}
+        />
       ) : (
         <div className="artifact-note">
-          <b>Package not produced.</b> The bridge gate recorded the
-          reason on the run record — an implementation state, disclosed
-          (never “earned by survival” language again: the invention
-          exists above with its honest maturity).
+          <b>Package not produced on this run.</b> The bridge gate
+          recorded the reason on the run record — an implementation
+          state, disclosed (never “earned by survival” language again:
+          the invention exists above with its honest maturity).
         </div>
       )}
 
@@ -363,33 +425,30 @@ function GenerationNavigator({
 
 export default function RunArtifact({
   detail,
+  cio,
+  cioLoading,
+  packageAvailable,
   onRetry,
 }: {
   detail: SessionDetail;
+  cio: CIO | null;
+  cioLoading: boolean;
+  packageAvailable: boolean;
   onRetry: (id: string) => void;
 }) {
   const usv = detail.user_state_view;
   const done = isTerminal(detail.status);
   const stages = detail.stages ?? [];
   const pkg = detail.package ?? null;
-  const [cio, setCio] = useState<CIO | null>(null);
   const runState = detail.run_state;
   const generations = runState?.generations?.generations ?? [];
   const currentGen = runState?.generations?.current_invention?.gen;
 
-  // R414: fetch the CIO once the run is terminal (the invention object
-  // exists only when the run produced invention-side artifacts — an
-  // honest null otherwise, never a fabricated object).
-  useEffect(() => {
-    if (!done) return;
-    let alive = true;
-    getCIO(detail.session_id)
-      .then((c) => alive && setCio(c))
-      .catch(() => alive && setCio(null));
-    return () => {
-      alive = false;
-    };
-  }, [done, detail.session_id]);
+  // R422: the CIO is fetched by the WORKSPACE (app/page.tsx) once the run
+  // is terminal, so every package-availability assertion on the page —
+  // the Reality row, the outcome banner, and this panel — derives from
+  // the SAME fresh object (one source of truth, never two that can
+  // disagree; see the UI copy reconciliation note in page.tsx).
 
   const pillClass = usv
     ? usv.user_state.startsWith("COMPLETED")
@@ -443,14 +502,21 @@ export default function RunArtifact({
 
           {cio?.present ? (
             <CioPanel cio={cio} detail={detail} />
-          ) : pkg?.zip_name ? (
-            <a
-              className="btn download artifact-dl"
-              href={`/api/run/${detail.session_id}/package`}
-            >
-              Download technology package
-            </a>
-          ) : usv.found_something ? (
+          ) : packageAvailable ? (
+            /* R422 (directive 3): the package exists (run-record truth)
+               even though the CIO view is absent — the polished Downloads
+               block, NOT a bare button. The ZIP is the first, most
+               prominent download; the count comes from the package's own
+               records. */
+            <PackageDownloads
+              detail={detail}
+              zipHref={`/api/run/${detail.session_id}/package`}
+              packageKind={pkg?.package_kind}
+              docCount={pkg?.document_count}
+              maturity={pkg?.maturity}
+            />
+          ) : cioLoading ? null /* never flash "artifacts pending" while a
+               package may still resolve — the CIO fetch decides */ : usv.found_something ? (
             <div className="artifact-note">
               <b>Invention recorded, artifacts pending.</b> This run
               recorded an invention; the automatic artifact
@@ -468,6 +534,22 @@ export default function RunArtifact({
               knowledge is kept).
             </div>
           )}
+
+          {/* R422 (directive 1 — the reconciler): the completion-time
+              snapshot above can predate the async artifact gate. When the
+              summary text said no package and one now exists, ONE calm
+              disclosure prevents the two texts from fighting — the run
+              record itself is never edited (presentation-only). */}
+          {packageAvailable &&
+            usv.package_available === false &&
+            !cio?.present && (
+              <div className="artifact-note">
+                The technology package was produced by the automatic
+                artifact gate after the run completed — the run summary
+                above was recorded at completion. The package below is
+                the current state.
+              </div>
+            )}
 
           {!cio?.present && done && (
             <a

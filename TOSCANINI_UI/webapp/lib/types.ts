@@ -154,6 +154,11 @@ export interface PackageInfo {
   maturity?: string;
   posture?: string;
   zip_name?: string | null;
+  // R422 (directive 3): the honest document count from the package's own
+  // manifest — rendered in the run-inspector Downloads block, never
+  // hardcoded.
+  document_count?: number | null;
+  package_kind?: string | null;
 }
 
 export interface ShowcaseRow {
@@ -599,6 +604,7 @@ export interface CIO {
     package_maturity?: string | null;
     package_kind?: string | null;
     package_kind_note?: string;
+    document_count?: number | null;
     counsel_package?: string;
     note?: string;
   };

@@ -22,6 +22,7 @@
 import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
+  getCIO,
   getHealth,
   getRealityLoop,
   getRunResult,
@@ -32,6 +33,7 @@ import {
   startRun,
 } from "@/lib/api";
 import type {
+  CIO,
   HealthSummary,
   RealityLoopRecord,
   SessionDetail,
@@ -205,7 +207,13 @@ function NewProblemPane({
   );
 }
 
-function RunConversation({ detail }: { detail: SessionDetail }) {
+function RunConversation({
+  detail,
+  packageAvailable,
+}: {
+  detail: SessionDetail;
+  packageAvailable: boolean;
+}) {
   const done = isTerminal(detail.status);
   const usv = detail.user_state_view;
   return (
@@ -225,7 +233,10 @@ function RunConversation({ detail }: { detail: SessionDetail }) {
           )}
         </div>
         <div className="msg-body">
-          <RunNarrative detail={detail} />
+          <RunNarrative
+            detail={detail}
+            packageAvailable={packageAvailable}
+          />
 
           {done && usv && (
             <div className="narrative-summary">
@@ -246,7 +257,10 @@ function RunConversation({ detail }: { detail: SessionDetail }) {
                   derived from the run&apos;s persisted artifacts — evidence,
                   mechanisms, decisions, and what is still unknown
                 </div>
-                <EngineeringArgument detail={detail} />
+                <EngineeringArgument
+                  detail={detail}
+                  packageAvailable={packageAvailable}
+                />
               </div>
               {/* R419 section 11: the engineer's 8-section narrative —
                   "What Toscanini invented", from the canonical state */}
@@ -278,6 +292,14 @@ function WorkspaceInner() {
   const [showcase, setShowcase] = useState<ShowcaseRow[]>([]);
   const [health, setHealth] = useState<HealthSummary | null>(null);
   const [detail, setDetail] = useState<SessionDetail | null>(null);
+  const [cio, setCio] = useState<CIO | null>(null);
+  const [cioLoading, setCioLoading] = useState(false);
+  // R422 (P0 triage item 6): a run id that 404s repeatedly must surface
+  // a VISIBLE state — "Loading run…" forever was the silent-404 trap that
+  // made the R421 session misdiagnose the live pipeline as dead. The
+  // counter tracks consecutive result-poll failures; 4 misses (~10 s)
+  // flips the center pane to an honest not-found / not-visible state.
+  const [runNotFound, setRunNotFound] = useState(false);
   const [invention, setInvention] = useState<ShowcaseDetail | null>(null);
   const [reality, setReality] = useState<RealityLoopRecord | null>(null);
   const [railOpen, setRailOpen] = useState(false);
@@ -302,6 +324,8 @@ function WorkspaceInner() {
   // ---- load the focused run (and poll while it works) ----
   useEffect(() => {
     setDetail(null);
+    setRunNotFound(false);
+    let misses = 0;
     if (timer.current) clearInterval(timer.current);
     const id = runId ?? "";
     if (!id) return;
@@ -310,13 +334,23 @@ function WorkspaceInner() {
       try {
         const d = await getRunResult(id);
         if (!alive) return;
+        misses = 0;
+        setRunNotFound(false);
         setDetail(d);
         if (isTerminal(d.status)) {
           if (timer.current) clearInterval(timer.current);
           listSessions().then(setSessions).catch(() => {});
         }
-      } catch {
-        /* transient — the next poll will retry */
+      } catch (e) {
+        if (!alive) return;
+        // R422: a 404 is NOT transient noise when it repeats — it means
+        // the run id does not exist or is scoped to another owner (R394
+        // s15). Four consecutive misses stop the silent spinner and show
+        // an honest state; other errors stay transient (network blips).
+        if (e instanceof Error && e.message.startsWith("404")) {
+          misses += 1;
+          if (misses >= 4) setRunNotFound(true);
+        }
       }
     }
     poll();
@@ -326,6 +360,48 @@ function WorkspaceInner() {
       if (timer.current) clearInterval(timer.current);
     };
   }, [runId]);
+
+  // ---- R422: load the CIO once the run is terminal (the ONE invention
+  // object; an honest null when the run produced no invention-side
+  // artifacts). Lifted here from RunArtifact so EVERY package-availability
+  // assertion on the page derives from the same fresh data. ----
+  useEffect(() => {
+    setCio(null);
+    setCioLoading(false);
+    if (!detail || !isTerminal(detail.status)) return;
+    let alive = true;
+    setCioLoading(true);
+    getCIO(detail.session_id)
+      .then((c) => {
+        if (!alive) return;
+        setCio(c);
+        setCioLoading(false);
+      })
+      .catch(() => {
+        if (!alive) return;
+        setCio(null);
+        setCioLoading(false);
+      });
+    return () => {
+      alive = false;
+    };
+  }, [detail?.session_id, detail?.status]);
+
+  // ---- R422 (directive 1 — UI copy reconciliation): the SINGLE source
+  // of truth for package availability, computed from the FRESHEST data:
+  // the live CIO's download endpoint (reflects the async artifact gate's
+  // package) or the run record's package field (re-derived from the run
+  // dir on every result poll — the authority, Art. X). TRUE iff a
+  // package is actually downloadable right now. The completion-time
+  // user_state_view.package_available is NEVER the only basis for copy —
+  // a run whose bridge package landed after completion can no longer
+  // say "no package" above a live download link.
+  // ----
+  const packageAvailable = Boolean(
+    cio?.downloads?.package_zip ||
+    detail?.package?.zip_name ||
+    detail?.package?.complete
+  );
 
   // ---- load the focused invention ----
   useEffect(() => {
@@ -426,7 +502,19 @@ function WorkspaceInner() {
 
           {activeMode === "run" &&
             (detail ? (
-              <RunConversation detail={detail} />
+              <RunConversation
+                detail={detail}
+                packageAvailable={packageAvailable}
+              />
+            ) : runNotFound ? (
+              <div className="errbox" style={{ marginTop: 24 }}>
+                <b>Run not found.</b> This run id does not exist, or it
+                belongs to a different visitor (runs are private to the
+                session that created them). If you just started this run,
+                use the history rail — if the rail is empty, the run did
+                not register and nothing was invented on it (an
+                infrastructure state, never a scientific result).
+              </div>
             ) : (
               <div className="loading">Loading run…</div>
             ))}
@@ -452,6 +540,9 @@ function WorkspaceInner() {
             (detail ? (
               <RunArtifact
                 detail={detail}
+                cio={cio}
+                cioLoading={cioLoading}
+                packageAvailable={packageAvailable}
                 onRetry={(id) =>
                   retryRun(id).then(() => location.reload())
                 }

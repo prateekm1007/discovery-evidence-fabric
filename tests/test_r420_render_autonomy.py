@@ -538,12 +538,19 @@ class TestAutoEnqueue(unittest.TestCase):
             self.assertEqual(spawned_count(spawn), 0)
 
     def test_worker_wires_the_handoff(self):
-        """The production path actually calls it: worker.run contains
-        the auto-enqueue phase (source-inspection precedent — the
-        wiring is the contract under test)."""
+        """The production path actually calls it: the worker's run body
+        contains the auto-enqueue phase (source-inspection precedent —
+        the wiring is the contract under test). R422: the body moved from
+        run() into _run_inner() so run() could wrap it in the durable
+        WorkerForensics ledger (directive 2) — the wiring contract now
+        covers BOTH: the forensics wrapper in run() and the handoff in
+        the body it wraps."""
         src = inspect.getsource(worker_mod.run)
-        self.assertIn("artifact_worker.auto_enqueue", src)
-        self.assertIn("render_followup", src)
+        self.assertIn("WorkerForensics", src)
+        self.assertIn("_run_inner", src)
+        body = inspect.getsource(worker_mod._run_inner)
+        self.assertIn("artifact_worker.auto_enqueue", body)
+        self.assertIn("render_followup", body)
 
 
 def spawned_count(spawn) -> int:

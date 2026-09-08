@@ -225,6 +225,19 @@ def _collect_payload() -> Dict[str, Path]:
         payload["shares.json"] = src_shares
     for ev in sorted(store.STORE_DIR.glob("evidence_*.json")):
         payload[f"evidence/{ev.name}"] = ev
+    # R422 (directive 2 — the a5a7 anomaly): the worker-forensics ledger
+    # rides the SAME durable push as the store. Every WORKER_SPAWNED /
+    # HEARTBEAT / WORKER_DEATH / ORPHANED_AT_RESTART event written since
+    # the last snapshot leaves the ephemeral container with this push —
+    # a transient worker death can no longer lose its evidence to a
+    # container recycle (the R421 P0 lesson: observability that lives
+    # only inside the container is observability that dies with it).
+    from toscanini import worker_forensics as _wfx
+    _fx_dir = store.STORE_DIR / _wfx.FORENSICS_DIRNAME
+    if _fx_dir.is_dir():
+        for f in sorted(_fx_dir.iterdir()):
+            if f.is_file() and f.suffix == ".jsonl":
+                payload[f"{_wfx.FORENSICS_DIRNAME}/{f.name}"] = f
     for s in store.list_sessions():
         rd = s.get("run_dir")
         if not rd or s.get("origin") != "toscanini_ui":
@@ -458,6 +471,48 @@ def restore() -> Dict[str, Any]:
                         dst.parent.mkdir(parents=True, exist_ok=True)
                         shutil.copy2(f, dst)
                         _LAST_RESTORE["evidence"] += 1
+            # R422: the worker-forensics ledger is restored BEFORE the
+            # boot reconciliation runs — reconcile_at_boot() in server
+            # main() must see the previous boot's tail to mark orphans.
+            # Append-preserving: the local ledger keeps its own events; a
+            # remote line never overwrites them (merge by replay, not
+            # replace — the ledger is append-only history).
+            fx_dir = repo / "worker_forensics"
+            if fx_dir.is_dir():
+                dst_dir = store.STORE_DIR / "worker_forensics"
+                dst_dir.mkdir(parents=True, exist_ok=True)
+                for f in sorted(fx_dir.glob("*.jsonl")):
+                    dst = dst_dir / f.name
+                    if not dst.exists():
+                        shutil.copy2(f, dst)
+                    else:
+                        # merge: append only remote lines this local file
+                        # does not already contain (idempotent by event_id)
+                        try:
+                            local_ids = set()
+                            for line in dst.read_text().splitlines():
+                                line = line.strip()
+                                if not line:
+                                    continue
+                                try:
+                                    local_ids.add(
+                                        json.loads(line).get("event_id"))
+                                except json.JSONDecodeError:
+                                    continue  # torn local tail line
+                            with open(dst, "a", encoding="utf-8") as out:
+                                for line in f.read_text().splitlines():
+                                    line = line.strip()
+                                    if not line:
+                                        continue
+                                    try:
+                                        ev = json.loads(line)
+                                    except json.JSONDecodeError:
+                                        continue
+                                    if ev.get("event_id") not in local_ids:
+                                        out.write(line + "\n")
+                        except Exception:  # noqa: BLE001 — ledger restore
+                            # is best-effort; the local ledger stays
+                            pass
             runs_dir = repo / "runs"
             if runs_dir.is_dir():
                 for rd in runs_dir.iterdir():

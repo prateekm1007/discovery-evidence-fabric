@@ -108,41 +108,81 @@ def run(session_id: str) -> None:
     print(f"[worker] start sid={session_id} pid={os.getpid()} "
           f"blender={os.environ.get('BLENDER_PATH', '') or 'unset'}",
           file=sys.stderr, flush=True)
+
+    # R422 (directive 2 — the a5a7 anomaly): the DURABLE forensic ledger.
+    # Every phase boundary, heartbeat, and death (exception OR SIGTERM) is
+    # appended + fsync'd to TOSCANINI_UI/worker_forensics/ledger.jsonl
+    # BEFORE the worker proceeds — so a transient worker death leaves
+    # diff-able evidence that rides the durable snapshot push out of the
+    # container instead of dying with it. Fail-open: a forensics failure
+    # NEVER blocks the run (the product gains no new failure mode).
+    from toscanini import worker_forensics as _fx
+    with _fx.WorkerForensics(session_id=session_id, kind="run",
+                             durable_root=_fx.durable_root()) as forensics:
+        with _fx.heartbeat_loop(forensics):
+            _run_inner(session_id, forensics)
+
+
+def _run_inner(session_id: str, forensics) -> None:
+    forensics.event("PHASE_STARTED", stage="SESSION_LOOKUP", phase=0)
     s = store.get_session(session_id)
     if not s:
         print(f"session {session_id} not found", file=sys.stderr)
+        forensics.event("WORKER_ABORT", reason="session not found",
+                        stage="SESSION_LOOKUP")
         sys.exit(2)
 
     # --- phase 0: job lifecycle (durable, restart-safe) ----------------------
+    forensics.event("PHASE_STARTED", stage="REGISTER_RUNNING", phase=0)
     _register_running(session_id)
 
     # Serialize engine runs (transport protection). Held for the whole run.
+    forensics.event("PHASE_STARTED", stage="ACQUIRING_RUN_LOCK", phase=0)
     _lock_handle = _serialize_run()
+    forensics.event("PHASE_STARTED", stage="TRANSPORT_PROBE", phase=1,
+                    note="lock acquired — one serialized engine run")
 
     # --- phase 1: transport -------------------------------------------------
     # R415 (P0 directive §§1, 6-9): the probe is a REAL completion through
     # the routing registry's fallback LADDER — llm_registry.generate()
     # now cascades across (provider, model) rungs, so one retired model
     # (HTTP 410 GONE) demotes that model and the next rung serves the run.
-    # The probe failing means EVERY rung failed — but we still give it one
-    # real retry with backoff (cooldowns expire, gateways restart) before
-    # declaring the routes genuinely exhausted. A second failure is
-    # RUN_BLOCKED_TRANSPORT: infrastructure, never a verdict (Art. LXI),
-    # the problem stays saved, resumable via retry.
+    # The probe failing means EVERY rung failed.
+    #
+    # R422 (LLM chokepoint directive — transport reliability): the free-tier
+    # models flap per-model (OBSERVED live 2026-09-08 06:29-06:35Z: two
+    # rungs INVALID_RESPONSE at 06:30, a fresh probe OK on rung 2 at 06:34).
+    # A single 10 s retry is too eager to declare the routes exhausted:
+    # the backoff ladder is now 3 attempts (probe / +10 s / +30 s) — still
+    # bounded, still honest, and a transport that recovers within ~40 s
+    # no longer burns a user's run into RUN_BLOCKED_TRANSPORT.
+    _PROBE_BACKOFF_S = (0, 10, 30)
     g = gw.ensure_gateway()
     probeable = g["status"] in ("UP", "ALREADY_UP", "EXTERNAL")
-    probe = gw.preflight_probe() if probeable else {
-        "status": "NO_TRANSPORT", "error": str(g)}
-    if probe.get("status") != "OK" and probeable:
-        print(f"  [worker] transport probe failed ({probe.get('status')}); "
-              f"one retry after 10 s backoff", file=sys.stderr)
-        time.sleep(10)
-        probe = gw.preflight_probe()
+    probe = None
+    if probeable:
+        for i, backoff in enumerate(_PROBE_BACKOFF_S):
+            if backoff:
+                print(f"  [worker] probe attempt {i + 1} after {backoff} s "
+                      f"backoff", file=sys.stderr)
+                time.sleep(backoff)
+            forensics.event("TRANSPORT_PROBE", attempt=i + 1,
+                            stage="TRANSPORT_PROBE")
+            probe = gw.preflight_probe()
+            if probe.get("status") == "OK":
+                break
+            print(f"  [worker] transport probe failed "
+                  f"({probe.get('status')})", file=sys.stderr)
+    else:
+        probe = {"status": "NO_TRANSPORT", "error": str(g)}
     if probe.get("status") != "OK":
         # directive §1: the failure record carries provider / endpoint /
         # HTTP status / model / attempt / timestamp / failure_class from
         # the probe's own typed route (never a bare "failed")
         route_detail = _route_detail(probe)
+        forensics.event("TERMINAL_STATE", terminal="RUN_BLOCKED_TRANSPORT",
+                        stage="TRANSPORT_PROBE",
+                        route_tail=_route_detail(probe)[:500])
         store.update_session(
             session_id, status="RUN_BLOCKED_TRANSPORT",
             error=(f"Discovery temporarily blocked by infrastructure. "
@@ -154,9 +194,13 @@ def run(session_id: str) -> None:
         return
 
     # --- phase 2: evidence-bound problem ------------------------------------
+    forensics.event("PHASE_STARTED", stage="BUILDING_PROBLEM", phase=2)
     try:
         built = problem_builder.build_problem(s["user_text"])
     except Exception as exc:  # noqa: BLE001
+        forensics.event("TERMINAL_STATE", terminal="ERROR_BUILD",
+                        stage="BUILDING_PROBLEM",
+                        error_class=type(exc).__name__)
         store.update_session(session_id, status="ERROR_BUILD",
                              error=f"{type(exc).__name__}: {exc}"[:400])
         _snapshot(session_id, f"terminal:ERROR_BUILD:{session_id}")
@@ -170,11 +214,16 @@ def run(session_id: str) -> None:
                          domain=built["domain"])
 
     # --- phase 3: the engine (unchanged) -------------------------------------
+    forensics.event("PHASE_STARTED", stage="ENGINE_RUN", phase=3,
+                    problem_id=problem["problem_id"])
     from discovery_fabric.engine.run import EngineRun
     try:
         engine = EngineRun(problem, str(run_dir), with_package=True)
         manifest = engine.run()
     except Exception as exc:  # noqa: BLE001
+        forensics.event("TERMINAL_STATE", terminal="ERROR_RUN",
+                        stage="ENGINE_RUN",
+                        error_class=type(exc).__name__)
         store.update_session(session_id, status="ERROR_RUN",
                              error=f"{type(exc).__name__}: {exc}"[:400],
                              traceback=traceback.format_exc()[-2000:])
@@ -190,16 +239,42 @@ def run(session_id: str) -> None:
     # script, no copied JSON, no manual post-processing. A bridge
     # failure is an honest typed record — it NEVER changes the run's
     # epistemic state (Art. VI/XV/LXI) and never blocks completion.
+    forensics.event("PHASE_STARTED", stage="BRIDGE_GATE", phase=3.5)
     try:
         from toscanini import bridge_gate
         gate = bridge_gate.ensure_artifacts(session_id)
         print(f"  [worker] bridge gate: {gate.get('outcome')}",
               file=sys.stderr)
+        forensics.event("BRIDGE_GATE_OUTCOME",
+                        outcome=gate.get("outcome"),
+                        case=gate.get("case"))
         store.update_session(
             session_id,
             bridge_outcome=gate.get("outcome"),
             bridge_case=gate.get("case"))
+        # R422 (UI copy reconciliation, server-side companion): when the
+        # async artifact gate lands a package on a run whose completion
+        # snapshot recorded package_available=false, the session's package
+        # field is refreshed HERE — from the run dir's own package report
+        # (the authority, Art. X) — so the stored user_state_view and the
+        # product surface can never disagree about package existence.
+        # Presentation-snapshot only: no scientific field is touched.
+        try:
+            from toscanini import cio as _cio_mod
+            refreshed = _cio_mod._package_info(run_dir)
+            if refreshed.get("complete"):
+                store.update_session(
+                    session_id,
+                    package={"zip_name": refreshed.get("zip_name"),
+                             "maturity": refreshed.get("maturity"),
+                             "package_kind": refreshed.get("package_kind"),
+                             "complete": True})
+        except Exception as exc:  # noqa: BLE001 — disclosed, never fatal
+            print(f"  [worker] package-field refresh failed: "
+                  f"{type(exc).__name__}: {exc}", file=sys.stderr)
     except Exception as exc:  # noqa: BLE001 — disclosed, never fatal
+        forensics.event("BRIDGE_GATE_ERROR",
+                        error_class=type(exc).__name__)
         print(f"  [worker] bridge gate failed: "
               f"{type(exc).__name__}: {exc}", file=sys.stderr)
         store.update_session(
@@ -207,6 +282,7 @@ def run(session_id: str) -> None:
             bridge_error=f"{type(exc).__name__}: {exc}"[:400])
 
     # --- phase 4: honest terminal status -------------------------------------
+    forensics.event("PHASE_STARTED", stage="TERMINAL_STATUS", phase=4)
     final = None
     fs_path = run_dir / "final_state.json"
     if fs_path.exists():
@@ -229,6 +305,7 @@ def run(session_id: str) -> None:
     # when required -> persisted render record -> CIO -> website. A
     # failure here is disclosed in the log, never fatal to the terminal
     # record (the run is complete; presentation followup is typed).
+    forensics.event("PHASE_STARTED", stage="RENDER_FOLLOWUP", phase=4.5)
     try:
         from toscanini import artifact_worker
         followup = artifact_worker.auto_enqueue(
@@ -251,7 +328,9 @@ def run(session_id: str) -> None:
               f"{type(exc).__name__}: {exc}", file=sys.stderr)
 
     # --- phase 5: durable epistemic record -----------------------------------
+    forensics.event("PHASE_STARTED", stage="FINAL_SNAPSHOT", phase=5)
     _snapshot(session_id, f"terminal:COMPLETE:{session_id}")
+    forensics.event("TERMINAL_STATE", terminal="COMPLETE", phase=5)
 
 
 if __name__ == "__main__":
