@@ -9,7 +9,8 @@ export type SessionStatus =
   | "ERROR_TRANSPORT"
   | "ERROR_BUILD"
   | "ERROR_RUN"
-  | "ERROR_STUCK";
+  | "ERROR_STUCK"
+  | "RUN_BLOCKED_TRANSPORT"; // R415: infrastructure-blocked, resumable — never a verdict
 
 export interface SessionRow {
   session_id: string;
@@ -619,4 +620,142 @@ export interface EssayBody {
   section_order: string[];
   sections: Record<string, string>;
   structure?: string;
+}
+
+// ---------------------------------------------------------------------------
+// R430.1 — the Scientific Technology Artifact Workspace
+// ---------------------------------------------------------------------------
+
+// Section 7: structured scientific events (closed vocabularies server-side;
+// the frontend RENDERS these and never upgrades a status or class).
+export type EventStatus =
+  | "QUEUED"
+  | "ACTIVE"
+  | "COMPLETED"
+  | "BLOCKED"
+  | "FAILED_INFRASTRUCTURE"
+  | "FAILED_SCIENTIFIC"
+  | "UNKNOWN";
+
+export type EpistemicClass =
+  | "RETRIEVED"
+  | "INFERRED"
+  | "HYPOTHESIZED"
+  | "COMPUTED"
+  | "SIMULATED"
+  | "ENGINEERING_DEFINED"
+  | "PHYSICALLY_OBSERVED"
+  | "UNKNOWN";
+
+export interface ScienceEvent {
+  event_id: string;
+  investigation_id: string;
+  seq: number;
+  stage: string;
+  kind: string;
+  status: EventStatus;
+  summary: string;
+  epistemic_class: EpistemicClass;
+  basis_ref: string;
+  timestamp?: string | null;
+  generation?: number | null;
+  [k: string]: unknown;
+}
+
+export interface GauntletCard {
+  stage: string;
+  label: string;
+  mark: string;
+  state: string;
+  summary?: string;
+  events: string[];
+}
+
+export interface EventsBody {
+  investigation_id: string;
+  status: string;
+  event_count: number;
+  events: ScienceEvent[];
+  gauntlet: GauntletCard[];
+}
+
+export type TabAvailability =
+  | "AVAILABLE"
+  | "PENDING"
+  | "UNAVAILABLE"
+  | "NOT_ESTABLISHED";
+
+export interface EvidenceLedgerItem {
+  id: string;
+  title: string;
+  source?: string | null;
+  source_uri?: string | null;
+  doi?: string | null;
+  publication_date?: string | null;
+  retrieval_timestamp?: string | null;
+  evidence_class?: string | null;
+  provenance_id?: string | null;
+  used_in_design: boolean;
+}
+
+export interface DossierTab {
+  availability: TabAvailability;
+  epistemic_class: EpistemicClass;
+  note: string;
+  [k: string]: unknown;
+  // tab-specific fields (kept loose like CIO — the backend is the
+  // authority; the frontend renders, never re-derives)
+  items?: EvidenceLedgerItem[];
+  retrieved_count?: number;
+  used_count?: number;
+  reason?: string | null;
+  glb?: string | null;
+  geometry_class?: string | null;
+  conceptual?: boolean;
+  download?: string | null;
+  primary_action?: string;
+  zip_name?: string | null;
+  package_maturity?: string | null;
+  document_count?: number | null;
+  key_unknowns?: { statement?: string; priority?: string | null }[];
+  status_line?: string;
+  problem?: string | null;
+  mechanism?: string | null;
+  strongest_evidence?: EvidenceLedgerItem | null;
+  strongest_challenge?: string | null;
+  decisive_experiment?: string | null;
+  epistemic_status?: string;
+  contract?: Record<string, { status?: string; value?: unknown }> | null;
+  recorded?: unknown;
+  execution_note?: string;
+}
+
+export interface FalsificationRecord {
+  kind: "FALSIFICATION_DOSSIER" | "VALIDATION_INCOMPLETE" | "DEVELOPMENT_RECORD";
+  cause?: string;
+  detail?: string;
+  scientific_conclusions?: string;
+  note?: string;
+  stop_reason?: string | null;
+  initial_candidate?: string | null;
+  challenge_condition?: string;
+  observed_failure?: string | null;
+  rejected_mechanism?: string | null;
+  why_it_failed?: string | null;
+  what_remains_unknown?: string | null;
+  epistemic_class?: string;
+  basis?: string;
+}
+
+export interface DossierBody {
+  kind: "TECHNOLOGY_DOSSIER";
+  schema_version: string;
+  investigation_id: string;
+  derived_from: string;
+  running: boolean;
+  tabs: Record<
+    "overview" | "design" | "evidence" | "engineering" | "experiment" | "transfer",
+    DossierTab
+  >;
+  falsification?: FalsificationRecord | null;
 }

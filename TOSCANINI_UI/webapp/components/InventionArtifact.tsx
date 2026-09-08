@@ -16,7 +16,15 @@ import type {
   ShowcaseParam,
 } from "@/lib/types";
 import { evaluateParam } from "@/lib/api";
-import ModelViewer from "./ModelViewer";
+import dynamic from "next/dynamic";
+
+// R430.1 section 19: the 3D stack (three.js) is LAZY — it loads when
+// an artifact with geometry actually renders, never in the initial
+// page payload.
+const ModelViewer = dynamic(() => import("./ModelViewer"), {
+  ssr: false,
+  loading: () => <div className="loading">Loading the 3D viewer…</div>,
+});
 
 function ParamCard({
   slot,

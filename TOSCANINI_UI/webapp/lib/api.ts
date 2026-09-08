@@ -11,7 +11,9 @@
 import type {
   AskResponse,
   CIO,
+  DossierBody,
   EssayBody,
+  EventsBody,
   EvalResult,
   HealthSummary,
   RealityLoopRecord,
@@ -162,5 +164,27 @@ export async function getEssay(
     );
   } catch {
     return null; // honest absence — the argument panel still renders
+  }
+}
+
+// R430.1 section 12: the persisted event history — the refresh-recovery
+// source (the workspace hydrates from this, then appends live SSE
+// science events).
+export async function getEvents(id: string): Promise<EventsBody> {
+  return json<EventsBody>(
+    await fetch(`/api/run/${id}/events`, { cache: "no-store" })
+  );
+}
+
+// R430.1 sections 3-6: the Technology Dossier projection — exists from
+// the first moment the investigation has a canonical state; the right
+// pane renders it and NEVER re-derives state client-side.
+export async function getDossier(id: string): Promise<DossierBody | null> {
+  try {
+    return await json<DossierBody>(
+      await fetch(`/api/run/${id}/dossier`, { cache: "no-store" })
+    );
+  } catch {
+    return null; // honest absence — the investigation pane still works
   }
 }

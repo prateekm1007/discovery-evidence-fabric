@@ -620,6 +620,52 @@ class Handler(BaseHTTPRequestHandler):
                 prov = obj.get("provenance") or {}
                 prov.pop("run_dir", None)
                 return self._json(200, obj)
+            # GET /api/run/{id}/events — R430.1 section 7/12: the
+            # structured scientific event HISTORY (persisted-state
+            # projection; the refresh-recovery source the UI replays
+            # to hydrate the workspace). Owner-scoped like every run
+            # surface; derived from persisted artifacts only.
+            if len(parts) == 4 and parts[3] == "events":
+                if self._access(rid) == "DENY":
+                    return self._denied()
+                s = store.get_session(rid)
+                if not s:
+                    return self._json(404, {"error": "not found"})
+                from toscanini import investigation as _inv
+                body = _inv.build_investigation(s)
+                return self._json(200, {
+                    "investigation_id": rid,
+                    "status": s.get("status"),
+                    "event_count": len(body["events"]),
+                    "statuses": _inv.EVENT_STATUSES,
+                    "epistemic_classes": _inv.EPISTEMIC_CLASSES,
+                    "events": body["events"],
+                    "gauntlet": body["gauntlet"],
+                })
+            # GET /api/run/{id}/dossier — R430.1 sections 3-6/15: the
+            # Technology Dossier projection. Exists as soon as the
+            # investigation has a canonical state (even PENDING) —
+            # NEVER gated on 3D or package readiness; incomplete tabs
+            # carry honest PENDING/UNAVAILABLE/NOT_ESTABLISHED states.
+            if len(parts) == 4 and parts[3] == "dossier":
+                if self._access(rid) == "DENY":
+                    return self._denied()
+                s = store.get_session(rid)
+                if not s:
+                    return self._json(404, {"error": "not found"})
+                from toscanini import dossier as _dos
+                try:
+                    d = _dos.build_dossier(s)
+                except Exception as exc:  # noqa: BLE001 — typed, honest
+                    return self._json(200, {
+                        "kind": "TECHNOLOGY_DOSSIER",
+                        "present": False,
+                        "error": f"{type(exc).__name__}: {exc}"[:300],
+                        "note": ("the dossier projection failed — the "
+                                 "run record remains the truth; no "
+                                 "partial dossier is fabricated "
+                                 "(Art. XXV)")})
+                return self._json(200, d)
             # GET /api/run/{id}/model — the run's GLB (only when the run
             # actually produced one; 404 honest otherwise — the UI never
             # treats a GLB's existence as invention existence anyway)
@@ -1424,6 +1470,12 @@ class Handler(BaseHTTPRequestHandler):
 
         send("hello", {"session_id": sid})
         seen_stages: set = set()
+        # R430.1 section 7/11: structured scientific events, streamed
+        # incrementally as NEW persisted events appear (tracked by
+        # event_id). The full history is replayable from
+        # GET /api/run/{id}/events — this live layer only appends what
+        # CHANGED since the stream opened.
+        seen_events: set = set()
         last_status = None
         start = time.time()
         while time.time() - start < 3600:
@@ -1452,6 +1504,19 @@ class Handler(BaseHTTPRequestHandler):
                         })
                     send("done", {"status": last_status})
                     return
+            # structured science events first (R430.1): the workspace's
+            # live hydration layer — every event from a persisted
+            # artifact, never token-stream, never fabricated progress
+            try:
+                from toscanini import investigation as _inv
+                for evt in _inv.investigation_events(cur):
+                    if evt["event_id"] not in seen_events:
+                        seen_events.add(evt["event_id"])
+                        send("science", evt)
+            except Exception:  # noqa: BLE001 — stream never dies on the
+                # projection layer; the REST /events route stays the
+                # durable replay source
+                pass
             run_dir = cur.get("run_dir")
             if run_dir and Path(run_dir).exists():
                 for digest in store.stage_summaries(Path(run_dir)):

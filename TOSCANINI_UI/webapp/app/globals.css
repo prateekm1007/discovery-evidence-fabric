@@ -820,11 +820,14 @@ details.tech li { font-size: 13.5px; color: var(--ink-soft); margin-bottom: 6px;
 }
 .rail-toggle:hover { color: var(--ink); border-color: var(--ink-faint); }
 
-/* ---- the body grid: rail | conversation | artifact ---- */
+/* ---- R430.1: the body grid: rail | INVESTIGATION | DOSSIER ----
+   ~40/60 split between the investigation conversation and the living
+   technology dossier (fr ratio, not hard pixels — content flows and
+   the responsive tiers below re-measure the arrangement). */
 .ws-body {
   display: grid;
-  grid-template-columns: 268px minmax(0, 1fr) 460px;
-  grid-template-areas: "rail center artifact";
+  grid-template-columns: 268px minmax(0, 2fr) minmax(0, 3fr);
+  grid-template-areas: "rail investigation dossier";
   flex: 1;
   min-height: 0;
   align-items: stretch;
@@ -840,15 +843,15 @@ details.tech li { font-size: 13.5px; color: var(--ink-soft); margin-bottom: 6px;
   top: 53px;
 }
 
-.ws-center {
-  grid-area: center;
+.ws-investigation {
+  grid-area: investigation;
   min-width: 0;
   padding: 26px 34px 90px;
   max-width: 860px;
 }
 
-.ws-artifact {
-  grid-area: artifact;
+.ws-dossier {
+  grid-area: dossier;
   border-left: 1px solid var(--line);
   background: #fbfaf7;
   overflow-y: auto;
@@ -1156,12 +1159,12 @@ details.tech li { font-size: 13.5px; color: var(--ink-soft); margin-bottom: 6px;
 
 /* ---- responsive: the workspace collapses gracefully ---- */
 @media (max-width: 1440px) {
-  .ws-body { grid-template-columns: 240px minmax(0, 1fr) 400px; }
+  .ws-body { grid-template-columns: 240px minmax(0, 2fr) minmax(0, 3fr); }
 }
 @media (max-width: 1180px) {
   .ws-body {
     grid-template-columns: minmax(0, 1fr) 380px;
-    grid-template-areas: "center artifact";
+    grid-template-areas: "investigation dossier";
   }
   .ws-rail {
     position: fixed;
@@ -1187,18 +1190,26 @@ details.tech li { font-size: 13.5px; color: var(--ink-soft); margin-bottom: 6px;
   }
 }
 @media (max-width: 880px) {
+  /* R430.1 section 18: mobile is a single flow — conversation, then
+     status, then the dossier artifact (full-width panel, not a scaled
+     split pane); the composer stays reachable at the flow's end. */
   .ws-body {
     grid-template-columns: minmax(0, 1fr);
-    grid-template-areas: "center" "artifact";
+    grid-template-areas: "investigation" "dossier";
   }
-  .ws-artifact {
+  .ws-dossier {
     position: static;
     max-height: none;
     border-left: none;
     border-top: 1px solid var(--line);
     padding: 18px 16px 60px;
   }
-  .ws-center { padding: 18px 16px 60px; }
+  .ws-investigation { padding: 18px 16px 60px; }
+  /* R430.1: the investigation message header wraps instead of
+     overflowing (the event count rides below the role on narrow
+     screens) */
+  .msg-role { flex-wrap: wrap; }
+  .evt-count { flex-basis: 100%; margin-left: 0; text-align: left; }
   .msg.user { margin-left: 0; }
   .rail-toggle { display: inline-flex; }
   .canvas-wrap { height: 300px !important; }
@@ -1585,3 +1596,342 @@ details.tech li { font-size: 13.5px; color: var(--ink-soft); margin-bottom: 6px;
   color: #5c4a1e;
   font-weight: 700;
 }
+
+/* ---------------------------------------------------------------------------
+   R430.1 — the Scientific Technology Artifact Workspace
+   dossier tabs, gauntlet cards, science events, epistemic badges,
+   evidence ledger, falsification dossier
+   ------------------------------------------------------------------------- */
+
+/* ---- the dossier pane ---- */
+.dossier { display: flex; flex-direction: column; gap: 0; min-width: 0; }
+.dossier-h {
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  font-weight: 600;
+  color: var(--ink-soft);
+  text-transform: uppercase;
+  padding-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.dossier-placeholder {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 28px 6px;
+  color: var(--ink-soft);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.dossier-tabs {
+  display: flex;
+  gap: 2px;
+  border-bottom: 1px solid var(--line);
+  flex-wrap: wrap;
+  position: sticky;
+  top: 0;
+  background: #fbfaf7;
+  z-index: 5;
+}
+.dtab-btn {
+  appearance: none;
+  border: none;
+  background: none;
+  padding: 8px 12px 7px;
+  font-size: 13.5px;
+  color: var(--ink-faint);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  border-radius: 6px 6px 0 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.dtab-btn:hover { color: var(--ink); background: rgba(0,0,0,0.025); }
+.dtab-btn.active {
+  color: var(--ink);
+  border-bottom-color: var(--ink);
+  font-weight: 600;
+}
+.dtab-btn.has-content { color: var(--ink-soft); }
+.dtab-btn.has-content.active { color: var(--ink); }
+.tab-pend {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--ink-faint);
+  display: inline-block;
+}
+
+.dossier-body { padding: 14px 2px 10px; display: flex; flex-direction: column; gap: 14px; }
+.dossier-foot { font-size: 11.5px; line-height: 1.5; padding-top: 6px; border-top: 1px dashed var(--line); }
+
+/* tab availability states (section 3: an incomplete dossier is honest) */
+.tab-note {
+  border: 1px dashed var(--line);
+  border-radius: 10px;
+  padding: 14px 16px;
+  color: var(--ink-soft);
+  font-size: 13.5px;
+  line-height: 1.55;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.tn-unavailable { border-style: solid; background: #faf9f6; }
+.tn-not_established { border-style: solid; background: #faf9f6; }
+.tab-reason { font-size: 12.5px; }
+.avail {
+  align-self: flex-start;
+  font-size: 10.5px;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  border-radius: 20px;
+  padding: 2px 8px;
+  font-weight: 600;
+}
+.av-pending { background: rgba(120, 110, 95, 0.12); color: #6b6252; }
+.av-unavailable { background: rgba(120, 110, 95, 0.16); color: #6b6252; }
+.av-not_established { background: rgba(150, 60, 40, 0.10); color: #8a4429; }
+
+.dtab { display: flex; flex-direction: column; gap: 16px; }
+.ov-block h4, .ev-group, .dtab h4 {
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin: 0 0 6px;
+  font-weight: 600;
+}
+.ov-block p { margin: 0; font-size: 14px; line-height: 1.55; }
+
+.tech-status {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--ink);
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-size: 13px;
+  line-height: 1.6;
+}
+.tech-status-h {
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  font-weight: 700;
+  color: var(--ink-soft);
+  margin-bottom: 4px;
+}
+
+.unknowns { margin: 0; padding-left: 18px; font-size: 13.5px; line-height: 1.7; }
+.unknowns li { margin-bottom: 3px; }
+.mini-gauntlet { margin: 0; padding-left: 4px; list-style: none; font-size: 13px; line-height: 1.8; }
+
+.param-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+.param-table td { padding: 4px 8px 4px 0; border-bottom: 1px solid var(--paper-2); vertical-align: top; }
+.param-table td:first-child { font-weight: 500; white-space: nowrap; }
+
+.mono-block {
+  font-family: var(--mono, monospace);
+  font-size: 11.5px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px 12px;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  margin: 0;
+}
+.not-defined {
+  color: #8a4429;
+  font-size: 11.5px;
+  font-style: italic;
+}
+
+/* design tab */
+.conceptual-note {
+  background: rgba(178, 140, 0, 0.08);
+  border: 1px solid rgba(178, 140, 0, 0.25);
+  color: #7a6000;
+  border-radius: 8px;
+  padding: 9px 12px;
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+.viewer-wrap { border: 1px solid var(--line); border-radius: 10px; background: #fff; overflow: hidden; }
+.viewer-hints { font-size: 11.5px; padding: 6px 2px; }
+.render-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.render-row img { width: 120px; border-radius: 6px; border: 1px solid var(--line); }
+.component-list { margin: 0; padding-left: 18px; font-size: 13px; line-height: 1.7; }
+
+/* evidence ledger (section 10) */
+.ev-counts { display: flex; gap: 16px; font-size: 13px; color: var(--ink-soft); padding-bottom: 2px; }
+.ev-counts b { color: var(--ink); }
+.ev-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.ev-item {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px 12px;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.ev-item.used { border-left: 3px solid #3d6b4f; }
+.ev-title { font-size: 13.5px; font-weight: 550; line-height: 1.4; }
+.ev-meta { font-size: 12px; }
+.ev-rel { font-size: 12px; color: #3d6b4f; line-height: 1.45; }
+.ev-item:not(.used) .ev-rel { color: var(--ink-faint); }
+.ev-link {
+  font-size: 12px;
+  color: var(--ink-soft);
+  text-decoration: none;
+  border-bottom: 1px dotted var(--ink-faint);
+  align-self: flex-start;
+  margin-top: 2px;
+}
+.ev-link:hover { color: var(--ink); }
+
+/* transfer tab */
+.download-package { margin: 4px 0 8px; text-align: center; }
+
+/* experiment tab */
+.exp-note {
+  background: rgba(61, 107, 79, 0.06);
+  border: 1px solid rgba(61, 107, 79, 0.2);
+  color: #3d6b4f;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+
+/* falsification dossier (section 14) */
+.falsification {
+  border: 1px solid rgba(138, 68, 41, 0.3);
+  border-left: 3px solid #8a4429;
+  border-radius: 10px;
+  background: #fdf9f7;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.fal-h {
+  font-size: 11.5px;
+  letter-spacing: 0.1em;
+  font-weight: 700;
+  color: #8a4429;
+}
+.fal-chain { margin: 0; padding-left: 18px; font-size: 13px; line-height: 1.5; display: flex; flex-direction: column; gap: 8px; }
+.fal-chain b { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-faint); display: block; }
+.fal-cause { font-size: 13.5px; font-weight: 550; }
+.fal-sci { font-size: 12.5px; color: #8a4429; }
+.fi-incomplete { border-left-color: #b28c00; background: #fdfaf1; }
+.fi-incomplete .fal-h { color: #7a6000; }
+
+/* ---- the investigation pane ---- */
+.investigation { display: flex; flex-direction: column; gap: 14px; }
+.evt-count { font-size: 11.5px; margin-left: auto; font-weight: 400; }
+.inv-progress {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 13.5px;
+}
+.inv-progress-h { font-weight: 600; display: flex; align-items: center; gap: 8px; letter-spacing: 0.05em; font-size: 12px; color: var(--ink-soft); }
+
+.retry-row { display: flex; align-items: center; gap: 12px; margin-top: 10px; font-size: 12px; }
+
+/* ---- the gauntlet (section 9) ---- */
+.gauntlet { display: flex; flex-direction: column; gap: 6px; margin: 4px 0 10px; }
+.gcard {
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: #fff;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: border-color 0.12s ease;
+}
+.gcard:hover { border-color: var(--ink-faint); }
+.gcard-head { display: flex; align-items: baseline; gap: 8px; font-size: 13.5px; }
+.gmark { width: 18px; display: inline-block; text-align: center; }
+.glabel { font-weight: 600; }
+.gstate { font-size: 10.5px; letter-spacing: 0.05em; text-transform: uppercase; margin-left: auto; }
+.gs-failed_scientific { color: #8a4429; }
+.gs-failed_infrastructure { color: #7a6000; }
+.gs-active { color: #3d6b4f; }
+.gsummary { font-size: 12.5px; color: var(--ink-soft); padding-left: 26px; line-height: 1.45; margin-top: 2px; }
+.gdetail { font-size: 11.5px; padding-left: 26px; margin-top: 4px; line-height: 1.5; }
+.g-failed_scientific { border-left: 3px solid #8a4429; }
+.g-failed_infrastructure { border-left: 3px solid #b28c00; }
+.g-active { border-left: 3px solid #3d6b4f; }
+.g-completed { border-left: 3px solid #9db5a6; }
+
+/* ---- the structured science events (section 7) ---- */
+.science-events { display: flex; flex-direction: column; gap: 5px; margin: 2px 0 10px; }
+.scevt {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 5px 10px;
+  font-size: 13px;
+  cursor: pointer;
+  line-height: 1.45;
+  transition: background 0.1s ease;
+}
+.scevt:hover { background: rgba(0,0,0,0.03); }
+.scevt-head { display: flex; align-items: center; gap: 8px; }
+.scdot { width: 7px; height: 7px; border-radius: 50%; flex: none; }
+.sc-completed { background: #9db5a6; }
+.sc-active { background: #3d6b4f; animation: pulse 1.6s infinite; }
+.sc-blocked, .sc-failed_infrastructure { background: #b28c00; }
+.sc-failed_scientific { background: #8a4429; }
+.sc-queued, .sc-unknown { background: var(--ink-faint); }
+.scsummary { flex: 1; min-width: 0; }
+.scevt-detail {
+  font-size: 11.5px;
+  padding: 6px 2px 2px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  line-height: 1.5;
+}
+.scnote { font-style: italic; }
+.ev-completed .scsummary { color: var(--ink-soft); }
+.ev-active .scsummary { color: var(--ink); }
+.ev-failed_scientific .scsummary { color: #8a4429; }
+.ev-blocked .scsummary, .ev-infra .scsummary { color: #7a6000; }
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+/* ---- epistemic badges (section 8) ---- */
+.ep-badge {
+  flex: none;
+  font-size: 9.5px;
+  letter-spacing: 0.05em;
+  border-radius: 20px;
+  padding: 1.5px 7px;
+  font-weight: 600;
+  text-transform: uppercase;
+  border: 1px solid transparent;
+}
+.ep-retrieved { background: rgba(61, 107, 79, 0.10); color: #3d6b4f; border-color: rgba(61,107,79,0.25); }
+.ep-inferred { background: rgba(70, 100, 160, 0.10); color: #4664a0; border-color: rgba(70,100,160,0.25); }
+.ep-hypothesized { background: rgba(120, 100, 170, 0.10); color: #6f5aa8; border-color: rgba(120,100,170,0.25); }
+.ep-computed { background: rgba(90, 110, 130, 0.12); color: #55697e; border-color: rgba(90,110,130,0.3); }
+.ep-simulated { background: rgba(60, 130, 150, 0.10); color: #3c8296; border-color: rgba(60,130,150,0.25); }
+.ep-engineering { background: rgba(120, 90, 60, 0.10); color: #78593c; border-color: rgba(120,90,60,0.25); }
+.ep-physical { background: rgba(160, 60, 60, 0.12); color: #8a3030; border-color: rgba(160,60,60,0.3); }
+.ep-unknown { background: rgba(120, 110, 95, 0.10); color: #6b6252; border-color: rgba(120,110,95,0.2); }
+.epi-footer { font-size: 11.5px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; padding-top: 4px; }
+.epi-row { display: flex; align-items: center; gap: 6px; font-size: 12px; }
+
+/* build steps */
+.build-steps { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.7; }
