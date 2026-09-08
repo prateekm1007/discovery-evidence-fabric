@@ -68,6 +68,59 @@ def _tab(avail: str, epi: str, note: str, **content) -> Dict[str, Any]:
 
 
 # ---------------------------------------------------------------------------
+# R435 — schema-scaffolding guard (defense in depth).
+#
+# The generation prompts carry placeholder field examples ("<the causal
+# mechanism the architecture exploits>"). Older / weaker generation paths
+# can echo those placeholders into a run record (OBSERVED live on the
+# production deployment; the generator boundary now rejects echo —
+# discovery_fabric/engine/evolution.py::_is_template_echo). This
+# projection guard catches the SAME shape in records that predate the
+# generator fix or arrive through any other path, so scaffolding can
+# never be presented to a user as the finished invention.
+#
+# Four distinct honest states, never interchangeable:
+#   * missing data          -> PENDING / UNAVAILABLE (recorded reason)
+#   * generation failed     -> this guard: field suppressed +
+#                              generation_failed flag, explicit note
+#   * legitimate unknown    -> NOT_ESTABLISHED / UNKNOWN (Art. XXV)
+#   * schema fallback       -> this guard: never rendered as content
+# The projection still never MUTATES the underlying record (Art. X) —
+# the suppression is presentation-layer only and the scaffolding value
+# remains inspectable in the run artifact itself.
+# ---------------------------------------------------------------------------
+_SCAFFOLD_PHRASES = (
+    "the causal mechanism the architecture exploits",
+    "the specific engineering intervention on the device",
+    "the measurable expected effect",
+    "the cheapest concrete test that could kill it",
+    "the operating regime the architecture assumes",
+    "the new causal mechanism",
+    "the new specific engineering intervention",
+    "the new measurable expected effect",
+)
+
+
+def _scaffold_like(value: Any) -> bool:
+    """True when a field value is prompt/schema scaffolding, not content."""
+    if not isinstance(value, str) or not value.strip():
+        return False
+    v = value.strip()
+    if v.startswith("<") and v.endswith(">") and len(v) > 8:
+        return True
+    stripped = v.strip("<>").strip().rstrip(".:")
+    return stripped.lower() in _SCAFFOLD_PHRASES
+
+
+def _suppress_scaffold(value: Any) -> Optional[str]:
+    """None when the value is scaffolding (suppressed); the value when
+    it is real content."""
+    if _scaffold_like(value):
+        return None
+    return value if isinstance(value, str) else None
+
+
+# ---------------------------------------------------------------------------
 # Evidence ledger (section 10)
 # ---------------------------------------------------------------------------
 def evidence_ledger(session: Dict[str, Any]) -> Dict[str, Any]:
@@ -191,10 +244,17 @@ def design_tab(session: Dict[str, Any],
             # R433: the three separated scores (section 13) + the
             # generation evolution projection (sections 2/15) + the
             # NOT VISUALIZED disclosure (section 6)
+            # R435: evolution `why` text that is prompt scaffolding is
+            # suppressed row-by-row (same guard class as the overview
+            # mechanism — never render scaffolding as invention state)
             scores=geom.get("scores"),
             not_visualized=(geom.get("scores") or {}).get(
                 "not_visualized") or [],
-            evolution=geom.get("evolution"),
+            evolution=[
+                {**row, "why": _suppress_scaffold(row.get("why"))}
+                if isinstance(row, dict) else row
+                for row in (geom.get("evolution") or [])
+            ],
             generation_id=(geom.get("generation_id")
                            or ((geom.get("artifact_identity") or {})
                                .get("generation_id"))),
@@ -354,6 +414,28 @@ def build_dossier(session: Dict[str, Any]) -> Dict[str, Any]:
         overview_avail, overview_epi = "AVAILABLE", "COMPUTED"
         overview_note = ("derived from the run's persisted artifacts — "
                          "every field traces to a record")
+
+    # R435 scaffolding guard: mechanism / challenge / experiment text that
+    # is prompt scaffolding (generation echo) is suppressed at the
+    # projection layer and replaced by an explicit generation-incomplete
+    # state — a distinct honest state from missing data (PENDING) and
+    # from a legitimate unknown (NOT_ESTABLISHED / UNKNOWN).
+    raw_mechanism = ((cio or {}).get("identity", {}).get("mechanism")
+                     or mechanism_state.get("mechanism"))
+    mechanism = _suppress_scaffold(raw_mechanism)
+    mechanism_generation_failed = (
+        raw_mechanism is not None and mechanism is None)
+    challenges = _suppress_scaffold(challenges) if challenges else challenges
+    experiment_summary = (_suppress_scaffold(experiment_summary)
+                          if experiment_summary else experiment_summary)
+    if mechanism_generation_failed:
+        overview_note = ("the architecture generator did not produce a "
+                         "usable mechanism for the surviving generation "
+                         "(schema placeholder echo, rejected at the "
+                         "projection boundary) — the run record keeps "
+                         "the raw field; it is not presented as the "
+                         "invention")
+
     overview = _tab(
         overview_avail, overview_epi, overview_note,
         problem=session.get("user_text"),
@@ -361,8 +443,8 @@ def build_dossier(session: Dict[str, Any]) -> Dict[str, Any]:
         # INVENTION_SPECIFICATION's mechanism (the canonical invention
         # state, Art. X) — the SYNTHESIZE envelope's mechanism_map is
         # the intermediate stage record and only a fallback
-        mechanism=((cio or {}).get("identity", {}).get("mechanism")
-                  or mechanism_state.get("mechanism")),
+        mechanism=mechanism,
+        mechanism_generation_failed=mechanism_generation_failed,
         invention_state=invention_state.get("state")
         or invention_state.get("maturity")
         or (generations.get("current_invention") or {}).get("maturity"),

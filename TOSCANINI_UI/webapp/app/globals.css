@@ -820,14 +820,14 @@ details.tech li { font-size: 13.5px; color: var(--ink-soft); margin-bottom: 6px;
 }
 .rail-toggle:hover { color: var(--ink); border-color: var(--ink-faint); }
 
-/* ---- R430.1: the body grid: rail | INVESTIGATION | DOSSIER ----
-   ~40/60 split between the investigation conversation and the living
-   technology dossier (fr ratio, not hard pixels — content flows and
-   the responsive tiers below re-measure the arrangement). */
+/* ---- R435: the body grid: rail | THE TECHNOLOGY STAGE (one column).
+   No split panes — the artifact is the hero of a single calm
+   workspace; the dossier projection lives underneath it as the deep
+   layer (progressive disclosure), not as a panel beside a report. */
 .ws-body {
   display: grid;
-  grid-template-columns: 268px minmax(0, 2fr) minmax(0, 3fr);
-  grid-template-areas: "rail investigation dossier";
+  grid-template-columns: 268px minmax(0, 1fr);
+  grid-template-areas: "rail main";
   flex: 1;
   min-height: 0;
   align-items: stretch;
@@ -843,22 +843,13 @@ details.tech li { font-size: 13.5px; color: var(--ink-soft); margin-bottom: 6px;
   top: 53px;
 }
 
-.ws-investigation {
-  grid-area: investigation;
+.ws-main {
+  grid-area: main;
   min-width: 0;
-  padding: 26px 34px 90px;
-  max-width: 860px;
-}
-
-.ws-dossier {
-  grid-area: dossier;
-  border-left: 1px solid var(--line);
-  background: #fbfaf7;
-  overflow-y: auto;
-  max-height: calc(100vh - 53px);
-  position: sticky;
-  top: 53px;
-  padding: 20px 22px 70px;
+  padding: 30px 40px 100px;
+  max-width: 1160px;
+  width: 100%;
+  margin: 0 auto;
 }
 
 /* ---- the history rail ---- */
@@ -1159,13 +1150,14 @@ details.tech li { font-size: 13.5px; color: var(--ink-soft); margin-bottom: 6px;
 
 /* ---- responsive: the workspace collapses gracefully ---- */
 @media (max-width: 1440px) {
-  .ws-body { grid-template-columns: 240px minmax(0, 2fr) minmax(0, 3fr); }
+  .ws-body { grid-template-columns: 240px minmax(0, 1fr); }
 }
 @media (max-width: 1180px) {
   .ws-body {
-    grid-template-columns: minmax(0, 1fr) 380px;
-    grid-template-areas: "investigation dossier";
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "main";
   }
+  .ws-main { padding: 22px 22px 80px; }
   .ws-rail {
     position: fixed;
     left: 0;
@@ -1190,29 +1182,24 @@ details.tech li { font-size: 13.5px; color: var(--ink-soft); margin-bottom: 6px;
   }
 }
 @media (max-width: 880px) {
-  /* R430.1 section 18: mobile is a single flow — conversation, then
-     status, then the dossier artifact (full-width panel, not a scaled
-     split pane); the composer stays reachable at the flow's end. */
+  /* R435: mobile is the same single flow — stage head, hero, insights,
+     actions, deep layer; the hero keeps a meaningful height on small
+     screens and nothing ever overflows horizontally. */
   .ws-body {
     grid-template-columns: minmax(0, 1fr);
-    grid-template-areas: "investigation" "dossier";
+    grid-template-areas: "main";
   }
-  .ws-dossier {
-    position: static;
-    max-height: none;
-    border-left: none;
-    border-top: 1px solid var(--line);
-    padding: 18px 16px 60px;
-  }
-  .ws-investigation { padding: 18px 16px 60px; }
-  /* R430.1: the investigation message header wraps instead of
-     overflowing (the event count rides below the role on narrow
-     screens) */
+  .ws-main { padding: 16px 14px 70px; }
+  .stage-insights { grid-template-columns: 1fr; }
+  .stage-actions { flex-direction: column; align-items: stretch; }
+  .stage-actions .btn { width: 100%; text-align: center; }
   .msg-role { flex-wrap: wrap; }
   .evt-count { flex-basis: 100%; margin-left: 0; text-align: left; }
   .msg.user { margin-left: 0; }
   .rail-toggle { display: inline-flex; }
   .canvas-wrap { height: 300px !important; }
+  .hero-viewport { height: clamp(320px, 52vh, 460px); }
+  .viewer.hero .canvas-wrap { height: 100% !important; }
 }
 @media (min-width: 1181px) {
   .rail-toggle { display: none; }
@@ -2066,3 +2053,407 @@ details.tech li { font-size: 13.5px; color: var(--ink-soft); margin-bottom: 6px;
 
 /* build steps */
 .build-steps { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.7; }
+
+/* ---------------------------------------------------------------------------
+   R435 — THE PRODUCT EXPERIENCE RESET: the technology stage.
+   One objective, one calm workspace, the artifact as the hero.
+   ------------------------------------------------------------------------- */
+
+.tech-stage {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  min-width: 0;
+}
+
+/* ---- the stage head ---- */
+.stage-head { min-width: 0; }
+.stage-kicker {
+  font-size: 11.5px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+.stage-title {
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: clamp(21px, 2.6vw, 30px);
+  line-height: 1.16;
+  letter-spacing: 0.005em;
+  color: var(--ink);
+  margin: 0 0 10px;
+  max-width: 900px;
+  overflow-wrap: anywhere;
+}
+.stage-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+}
+.stage-outcome { font-size: 12.5px; }
+.stage-blurb {
+  margin-top: 10px;
+  color: var(--ink-soft);
+  font-size: 15.5px;
+  line-height: 1.55;
+  max-width: 760px;
+}
+.stage-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  padding: 4px 11px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: #fff;
+}
+.stage-pill .cursor {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--ink-faint);
+  animation: blink 1.6s ease infinite;
+}
+.stage-pill.sp-live { color: var(--ok); border-color: #cfdccf; background: #f4f8f3; }
+.stage-pill.sp-live .cursor { background: var(--ok); }
+.stage-pill.sp-done { color: var(--ink); background: #fff; }
+.stage-pill.sp-done .cursor { background: var(--ok); animation: none; }
+.stage-pill.sp-paused { color: var(--warn); border-color: #e6d4bb; background: #faf5ec; }
+.stage-pill.sp-paused .cursor { background: var(--warn); animation: none; }
+.stage-pill.sp-refuted { color: var(--bad); border-color: #e7c9c2; background: #faf0ee; }
+.stage-pill.sp-refuted .cursor { background: var(--bad); animation: none; }
+@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.25; } }
+
+/* ---- THE HERO: the technology artifact ---- */
+.hero-viewport {
+  position: relative;
+  width: 100%;
+  height: clamp(430px, 60vh, 780px);
+  border-radius: 18px;
+  border: 1px solid var(--line);
+  background:
+    radial-gradient(120% 90% at 50% 0%, #ffffff 0%, #f7f4ee 55%, #efe9df 100%);
+  box-shadow:
+    0 1px 2px rgba(31, 30, 28, 0.05),
+    0 18px 50px rgba(31, 30, 28, 0.09);
+  overflow: hidden;
+  min-width: 0;
+}
+.hero-viewport .viewer.hero {
+  width: 100%;
+  height: 100%;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  display: flex;
+  flex-direction: column;
+}
+.hero-viewport .viewer.hero .canvas-wrap {
+  height: 100% !important;
+  flex: 1;
+  min-height: 0;
+}
+.hero-viewport .viewer.hero .tag {
+  position: absolute;
+  left: 14px;
+  bottom: 12px;
+  z-index: 5;
+  margin: 0;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 4px 12px;
+  box-shadow: 0 1px 3px rgba(31, 30, 28, 0.08);
+}
+.hero-viewport .viewer.hero .controls {
+  position: absolute;
+  right: 14px;
+  bottom: 12px;
+  z-index: 5;
+  margin: 0;
+  gap: 6px;
+}
+.hero-viewport .viewer.hero .controls button {
+  background: rgba(255, 255, 255, 0.92);
+}
+.canvas-hud.hero-hud {
+  top: 12px;
+  bottom: auto;
+}
+.hud-live {
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  color: var(--ink-faint);
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 3px 9px;
+  margin-right: 4px;
+}
+.hero-return,
+.hero-clear {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 6;
+  appearance: none;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.94);
+  border-radius: 999px;
+  padding: 5px 12px;
+  font-size: 12px;
+  color: var(--ink);
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(31, 30, 28, 0.1);
+}
+.hero-clear { left: auto; right: 130px; }
+.hero-return:hover, .hero-clear:hover { border-color: var(--accent); color: var(--accent); }
+.hero-ab {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.hero-hint {
+  font-size: 11.5px;
+  padding: 2px 6px 0;
+  text-align: center;
+  letter-spacing: 0.03em;
+}
+
+/* the calm preparing state (non-blocking render UX) */
+.hero-preparing {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 40px;
+  text-align: center;
+}
+.hero-preparing-label {
+  font-family: var(--serif);
+  font-size: clamp(17px, 2.2vw, 22px);
+  color: var(--ink-soft);
+}
+.hero-preparing-label::after {
+  content: "";
+  display: inline-block;
+  width: 0.6em;
+  text-align: left;
+  animation: dots 1.4s steps(4) infinite;
+}
+@keyframes dots { 0% { content: ""; } 25% { content: "."; } 50% { content: ".."; } 75% { content: "..."; } 100% { content: ""; } }
+.hero-preparing-sub { font-size: 12.5px; max-width: 420px; color: var(--ink-faint); }
+
+/* the live investigating surface */
+.hero-live {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 36px;
+}
+.hero-live-inner { max-width: 560px; width: 100%; }
+.hero-live-line {
+  margin-top: 14px;
+  font-size: 12.5px;
+  line-height: 1.6;
+  text-align: center;
+}
+
+/* the honest not-established block */
+.hero-honest {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 40px;
+  text-align: center;
+}
+.hero-honest-h {
+  font-size: 11.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+.hero-honest-body {
+  font-family: var(--serif);
+  font-size: clamp(19px, 2.6vw, 26px);
+  color: var(--ink-soft);
+}
+.hero-honest-note { max-width: 520px; font-size: 12.5px; line-height: 1.6; }
+
+/* ---- the four insight cards ---- */
+.stage-insights {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 12px;
+  min-width: 0;
+}
+.insight {
+  appearance: none;
+  text-align: left;
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--accent-soft);
+  background: #fff;
+  border-radius: 14px;
+  padding: 16px 18px 14px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  min-width: 0;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+}
+.insight:not(:disabled):hover {
+  border-color: #d8cfbf;
+  border-left-color: var(--accent);
+  box-shadow: 0 6px 22px rgba(31, 30, 28, 0.09);
+  transform: translateY(-1px);
+}
+.insight:disabled { cursor: default; }
+.ic-title {
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.ic-pending .ic-title { color: var(--ink-faint); }
+.ic-body {
+  font-size: 14px;
+  line-height: 1.58;
+  color: var(--ink);
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}
+.ic-sub { font-size: 12px; }
+.ic-more { font-size: 12px; letter-spacing: 0.04em; color: var(--ink-faint); }
+
+/* ---- the actions ---- */
+.stage-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+.stage-actions .btn.big { font-size: 15px; padding: 12px 22px; }
+.stage-download { flex: 1 1 auto; min-width: 220px; text-align: center; }
+.stage-actions-note { font-size: 12.5px; margin-top: -4px; }
+
+/* ---- the live journal (while the investigation runs) ---- */
+.stage-journal {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: #fff;
+  padding: 16px 18px 18px;
+  min-width: 0;
+}
+.stage-journal-h {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-bottom: 10px;
+}
+
+/* ---- the terminal verdict ---- */
+.stage-verdict {
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--accent);
+  border-radius: 12px;
+  background: #fff;
+  padding: 14px 18px;
+  max-width: 860px;
+}
+.sv-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 4px;
+}
+.sv-decision { font-size: 14.5px; line-height: 1.55; }
+.sv-meaning { font-size: 12.5px; margin-top: 4px; }
+
+/* ---- the deep layer (progressive disclosure) ---- */
+.deep-dive {
+  margin-top: 26px;
+  border-top: 1px solid var(--line);
+  padding-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+.dd-head {
+  font-size: 11.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.dd-sec {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #fff;
+  overflow: hidden;
+}
+.dd-sec summary {
+  cursor: pointer;
+  padding: 12px 16px;
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  list-style: none;
+  user-select: none;
+}
+.dd-sec summary::-webkit-details-marker { display: none; }
+.dd-sec summary::before {
+  content: "+";
+  font-weight: 700;
+  color: var(--ink-faint);
+  width: 1em;
+  flex: none;
+}
+.dd-sec[open] summary::before { content: "–"; color: var(--accent); }
+.dd-sec summary:hover .dd-title { color: var(--accent); }
+.dd-title { font-size: 14px; font-weight: 600; }
+.dd-sub { font-size: 12px; flex-basis: 100%; margin-left: 26px; }
+.dd-body {
+  padding: 4px 18px 18px;
+  border-top: 1px solid var(--line);
+  min-width: 0;
+}
+.dd-part { margin-top: 22px; }
+.dd-part h3 { margin: 0 0 4px; font-size: 15px; }
+.dd-part .sub { font-size: 12.5px; margin-bottom: 10px; }
+.linklike {
+  appearance: none;
+  border: none;
+  background: none;
+  color: var(--accent);
+  cursor: pointer;
+  font: inherit;
+  padding: 0;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}

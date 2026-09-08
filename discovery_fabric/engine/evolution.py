@@ -129,6 +129,53 @@ def _sha(s: str) -> str:
     return hashlib.sha256(s.encode()).hexdigest()[:16]
 
 
+# ---------------------------------------------------------------------------
+# R435: template-echo rejection. The generation prompts legitimately carry
+# placeholder field examples ("MECHANISM: <the causal mechanism the
+# architecture exploits>"). A weak or failing model can echo those
+# placeholders back as if they were the answer; without this guard the
+# scaffolding flows into the invention record and is presented to the
+# user as the finished invention (OBSERVED on the production deployment
+# — the external audit quoted the placeholders verbatim from the live
+# UI). Template echo is therefore a MISSING field, never a value:
+# Art. VI (never manufacture provenance) and Art. II (exact evidence,
+# not plausible shape). Echo rejection is RECORDED in the call record so
+# the failure is inspectable (Art. XXXI memory artifact).
+# ---------------------------------------------------------------------------
+_TEMPLATE_ECHO_RE = re.compile(r"^\s*<[^<>]{3,300}>\s*[.:]?\s*$")
+
+_KNOWN_PLACEHOLDERS = (
+    "the causal mechanism the architecture exploits",
+    "the specific engineering intervention on the device",
+    "the measurable expected effect",
+    "the cheapest concrete test that could kill it",
+    "the operating regime the architecture assumes",
+    "the new causal mechanism",
+    "the new specific engineering intervention",
+    "the new measurable expected effect",
+    "the parent's operating regime today",
+    "how the field plausibly evolves by 2055",
+    "the capability the diagnosis shows is missing",
+    "the intermediate milestones between the 2055 capability and today",
+    "the fastest-advancing adjacent capability available today",
+    "how the frontier capability crosses into this problem's domain",
+)
+
+
+def _is_template_echo(value: str) -> bool:
+    """True when a parsed field value is prompt scaffolding, not content."""
+    v = (value or "").strip()
+    if not v:
+        return False
+    if _TEMPLATE_ECHO_RE.match(v):
+        return True
+    stripped = v.strip("<>").strip()
+    for phrase in _KNOWN_PLACEHOLDERS:
+        if stripped == phrase or v == phrase:
+            return True
+    return False
+
+
 def _parse_fields(content: str, schema: List[str]) -> Dict[str, str]:
     """Extract `FIELD: value` lines per schema (the engine's structured
     output protocol). Missing fields stay absent — never fabricated
@@ -163,7 +210,18 @@ def _llm_generate(prompt: str, system: str, schema: List[str],
         "prompt_hash": _sha(prompt),
     }
     if res.status == "OK" and res.content:
-        out["fields"] = _parse_fields(res.content, schema)
+        fields = _parse_fields(res.content, schema)
+        # R435: template echo is a MISSING field, never a value. The
+        # rejection list is recorded on the call so downstream readers
+        # can see the model echoed the format example instead of
+        # answering (Art. XXXI).
+        echoed = [k for k, v in fields.items()
+                  if _is_template_echo(v)]
+        for k in echoed:
+            fields.pop(k, None)
+        if echoed:
+            out["template_echo_rejected"] = echoed
+        out["fields"] = fields
         out["output_hash"] = _sha(res.content)
     else:
         out["fields"] = {}
@@ -530,6 +588,7 @@ def generate_baseline_architecture(problem: Dict[str, Any],
             "status": call.get("status"),
             "prompt_hash": call.get("prompt_hash"),
             "output_hash": call.get("output_hash"),
+            "template_echo_rejected": call.get("template_echo_rejected") or [],
             "provenance": "AI_PROPOSED",
             "maturity_at_generation": MATURITY_GENERATED,
             "honesty": ("generated architecture — no verified evidence "
@@ -609,6 +668,7 @@ def generate_evolved_architecture(problem: Dict[str, Any],
             "status": call.get("status"),
             "prompt_hash": call.get("prompt_hash"),
             "output_hash": call.get("output_hash"),
+            "template_echo_rejected": call.get("template_echo_rejected") or [],
             "provenance": "AI_PROPOSED",
             "maturity_at_generation": MATURITY_GENERATED,
         },

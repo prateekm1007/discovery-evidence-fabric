@@ -1,12 +1,13 @@
 "use client";
 
-// R395: the workspace's right pane for a RELEASED INVENTION — the
-// artifact is first-class: interactive 3D (rotate/zoom/pan/reset/
-// fullscreen/wireframe/clip), real parameter rebuilds through the
-// deterministic CAD sandbox with A/B version compare, downloadable
-// STEP/STL/GLB geometry, the buyer dossier, and re-measured key
-// dimensions. The released package bytes are never modified (Art. IX);
-// rebuilds are MODELLED previews (COMPUTATIONAL_RESULT).
+// R395 + R435: the parameter/downloads/dimensions panel for a RELEASED
+// INVENTION. The interactive 3D viewer itself now lives in the stage
+// hero (components/InventionStage.tsx) — this panel carries the live
+// parameter rebuilds through the deterministic CAD sandbox with real
+// re-measured geometry, the downloadable STEP/STL/GLB geometry, the
+// buyer dossier, and re-measured key dimensions. The released package
+// bytes are never modified (Art. IX); rebuilds are MODELLED previews
+// (COMPUTATIONAL_RESULT) that swap the single hero viewer.
 
 import { useState } from "react";
 import type {
@@ -16,26 +17,15 @@ import type {
   ShowcaseParam,
 } from "@/lib/types";
 import { evaluateParam } from "@/lib/api";
-import dynamic from "next/dynamic";
-
-// R430.1 section 19: the 3D stack (three.js) is LAZY — it loads when
-// an artifact with geometry actually renders, never in the initial
-// page payload.
-const ModelViewer = dynamic(() => import("./ModelViewer"), {
-  ssr: false,
-  loading: () => <div className="loading">Loading the 3D viewer…</div>,
-});
 
 function ParamCard({
   slot,
   param,
   onPreview,
-  activeGlb,
 }: {
   slot: string;
   param: ShowcaseParam;
-  onPreview: (r: EvalResult, activate: boolean) => void;
-  activeGlb: string;
+  onPreview: (r: EvalResult) => void;
 }) {
   const [value, setValue] = useState<number>(
     typeof param.value === "number" ? param.value : Number(param.value) || 0
@@ -58,7 +48,7 @@ function ParamCard({
     setBusy(false);
     if (out.ok) {
       setResult(out.result);
-      onPreview(out.result, true);
+      onPreview(out.result);
     } else {
       setRefusal(out.refusal);
     }
@@ -155,78 +145,38 @@ function ParamCard({
 export default function InventionArtifact({
   detail,
   slot,
+  onPreview,
 }: {
   detail: ShowcaseDetail;
   slot: string;
+  /** a preview rebuild puts its GLB on the stage hero (single viewer) */
+  onPreview: (url: string | null) => void;
 }) {
-  const [activeGlb, setActiveGlb] = useState<string>(detail.model.glb);
-  const [previewGlb, setPreviewGlb] = useState<string | null>(null);
-  const [showPreview, setShowPreview] = useState(true);
   const baseGlb = detail.model.glb;
   const downloads = detail.model.downloads ?? {};
-  const showing = previewGlb && showPreview ? previewGlb : baseGlb;
+
+  function handleResult(r: EvalResult) {
+    onPreview(r.preview_glb?.serve ?? null);
+  }
 
   return (
     <div className="artifact">
       <div className="artifact-h">
-        Artifact
+        Geometry & parameters
         <span className="faint" style={{ fontWeight: 400, fontSize: 12 }}>
           {" "}
           · {detail.package_id}
         </span>
       </div>
 
-      {/* ---------- the 3D design ---------- */}
-      {detail.model.glb && (
-        <>
-          <ModelViewer
-            url={showing}
-            height={340}
-            compact
-            label={
-              showing === baseGlb
-                ? "released geometry"
-                : "preview rebuild — your parameter change"
-            }
-            note={
-              showing === baseGlb
-                ? "the released engineering geometry — rotate, zoom, pan, reset, wireframe, clip, fullscreen"
-                : "a preview rebuild from your parameter change — deterministic CAD sandbox, COMPUTATIONAL_RESULT, the released package is untouched"
-            }
-          />
-
-          {/* ---------- A/B version compare ---------- */}
-          {previewGlb && (
-            <div className="ab-compare">
-              <span className="ab-label">compare versions</span>
-              <div className="ab-toggle">
-                <button
-                  className={showing === baseGlb ? "on" : ""}
-                  onClick={() => setShowPreview(false)}
-                  type="button"
-                >
-                  released
-                </button>
-                <button
-                  className={showing !== baseGlb ? "on" : ""}
-                  onClick={() => setShowPreview(true)}
-                  type="button"
-                >
-                  your rebuild
-                </button>
-              </div>
-              <button
-                className="ab-clear"
-                onClick={() => {
-                  setPreviewGlb(null);
-                }}
-                type="button"
-              >
-                clear preview
-              </button>
-            </div>
-          )}
-        </>
+      {/* ---------- the stage hero mirror note ---------- */}
+      {baseGlb && (
+        <div className="faint" style={{ fontSize: 12.5, marginBottom: 12 }}>
+          The interactive model lives on the stage above. A parameter
+          rebuild swaps it with the preview version — the released
+          package is untouched (deterministic CAD sandbox,
+          COMPUTATIONAL_RESULT).
+        </div>
       )}
 
       {/* ---------- downloads ---------- */}
@@ -275,15 +225,7 @@ export default function InventionArtifact({
               key={p.param_id}
               slot={slot}
               param={p}
-              activeGlb={activeGlb}
-              onPreview={(r, activate) => {
-                if (activate && r.preview_glb?.serve) {
-                  setPreviewGlb(r.preview_glb.serve);
-                  setActiveGlb(r.preview_glb.serve);
-                } else if (r.preview_glb?.serve) {
-                  setPreviewGlb(r.preview_glb.serve);
-                }
-              }}
+              onPreview={handleResult}
             />
           ))}
         </div>

@@ -575,20 +575,35 @@ class TestCanonicalFlowEndToEnd(unittest.TestCase):
                             f"{token}")
 
     def test_viewer_dom_marker_is_singular_by_construction(self):
-        """Section 1: the built DossierPane renders exactly ONE
-        <ModelViewer> in the Design tab (source-level invariant; the
-        browser-level count is asserted by the E2E journey)."""
+        """Section 1: the stage component renders exactly ONE
+        <ModelViewer> (source-level invariant; the browser-level count
+        is asserted by the E2E journey).
+
+        R435 supersession (Art. LXIV): DossierPane was retired by the
+        product-experience reset — the ONE-viewer invariant MIGRATED to
+        TechStage.tsx (the stage hero), and the deep layer renders none
+        (history/generations act on the hero). This test tracks the
+        invariant, not the retired component: it now points at the
+        component that owns the contract."""
         repo = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         src = open(os.path.join(repo, "TOSCANINI_UI", "webapp",
-                                "components", "DossierPane.tsx")).read()
+                                "components", "TechStage.tsx")).read()
         self.assertEqual(src.count("<ModelViewer"), 1)
         self.assertIn("data-model-viewer", open(os.path.join(
             repo, "TOSCANINI_UI", "webapp", "components",
             "ModelViewer.tsx")).read())
-        # the UI contract strings (sections 2/14/18)
-        for marker in ("TECHNOLOGY MODEL", "GEN ", "· CURRENT",
-                       "NOT ESTABLISHED", "NOT VISUALIZED", "Evolution"):
-            self.assertIn(marker, src)
+        # the honest-state contract (R433 sections 2/14/18, R435 wording):
+        # generation identity, the honest not-established hero, the
+        # history swap that keeps the single viewer, and the
+        # not-visualized + evolution disclosures in the deep layer
+        deep = open(os.path.join(repo, "TOSCANINI_UI", "webapp",
+                                 "components",
+                                 "DossierSections.tsx")).read()
+        self.assertIn("data-generation", deep)          # evolution rows
+        self.assertIn("not visualized", deep)           # NOT VISUALIZED
+        self.assertIn("Not established", src)           # honest hero block
+        self.assertIn("back to the current generation", src)  # history swap
+        self.assertIn("generation", src)                # GEN N identity
 
 
 if __name__ == "__main__":

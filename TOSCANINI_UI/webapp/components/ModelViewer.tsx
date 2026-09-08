@@ -1,47 +1,113 @@
 "use client";
 
-// Interactive 3D viewer — R389 Phase 5 baseline, R395 first-class upgrade.
-// Controls: rotate / zoom / pan / RESET / wireframe / render clip-plane /
-// fullscreen. Honesty badges are structural: engineering geometry is
-// COMPUTATIONAL_RESULT; provider reconstructions are RECONSTRUCTED and
-// visibly labeled (never physical truth — Art. XXXVIII).
+// Interactive 3D viewer — the R435 HERO presentation.
+//
+// Two variants:
+//   * "hero"   — the technology stage: fills the hero viewport, soft
+//                ground shadows, gentle auto-rotate until the user
+//                takes control, product-language status badge
+//                ("Engineering model · generation 2"). This is the
+//                product surface the user came for.
+//   * "inline" — the compact embedded form used in deep sections.
+//
+// Honesty is structural, unchanged: the badge wording derives from the
+// same epistemic facts the record carries — engineering geometry is a
+// deterministic CAD result; provider reconstructions are reconstructions
+// and stay labeled (never physical truth — Art. XXXVIII); conceptual
+// architectures never claim engineering dimensions. The full machine
+// vocabulary stays in the tooltip/deep layer, off the primary surface.
+//
+// Controls: rotate / zoom / pan / reset / wireframe / clip-plane /
+// fullscreen. The data-model-viewer attribute is the machine-checked
+// single-viewer contract (R432 section 14 — exactly ONE per technology
+// page).
 
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
-import { Canvas } from "@react-three/fiber";
-import { Center, OrbitControls, useGLTF } from "@react-three/drei";
+import { Canvas, useThree } from "@react-three/fiber";
+import { ContactShadows, OrbitControls, useGLTF } from "@react-three/drei";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
-import { Box3, Plane, Vector3 } from "three";
+import { Box3, Plane, Sphere, Vector3 } from "three";
 
-// The render clip-plane: normal -Z, constant 0 → hides z > 0 half of the
-// model in the VIEW. A viewing aid only — honestly labeled, never a
+// The render clip-plane: normal -Z, constant 0 → hides z > 0 half of
+// the model in the VIEW. A viewing aid only — honestly labeled, never a
 // section drawing.
 const CLIP_PLANE = new Plane(new Vector3(0, 0, -1), 0);
 
-function FittedModel({ url }: { url: string }) {
+// the measured model layout — drives the model-aware camera framing
+// and the ground-contact shadow placement (R435: the artifact must
+// COMMAND the hero and read as GROUNDED, whatever its proportions)
+export type ModelLayout = {
+  bottom: number;
+  center: [number, number, number];
+  radius: number;
+};
+
+function FittedModel({
+  url,
+  onLayout,
+}: {
+  url: string;
+  onLayout?: (b: ModelLayout) => void;
+}) {
   const { scene } = useGLTF(url);
   const cloned = useMemo(() => scene.clone(true), [scene]);
 
   useEffect(() => {
-    // scale-to-fit: normalize any model into the ~4-unit view volume
+    // scale-to-fit: normalize any model into the ~5-unit view volume
     const box = new Box3().setFromObject(cloned);
     const size = new Vector3();
     box.getSize(size);
     const maxDim = Math.max(size.x, size.y, size.z) || 1;
-    const scale = 4 / maxDim;
-    cloned.scale.setScalar(scale);
+    cloned.scale.setScalar(5 / maxDim);
     const box2 = new Box3().setFromObject(cloned);
     const center = new Vector3();
     box2.getCenter(center);
     cloned.position.sub(center);
-  }, [cloned]);
+    // measure the FINAL layout (bottom for the contact shadow, bounding
+    // sphere for the camera framing)
+    const box3 = new Box3().setFromObject(cloned);
+    const sphere = box3.getBoundingSphere(new Sphere());
+    onLayout?.({
+      bottom: box3.min.y,
+      center: [sphere.center.x, sphere.center.y, sphere.center.z],
+      radius: sphere.radius || 2.5,
+    });
+  }, [cloned, onLayout]);
 
   return <primitive object={cloned} />;
 }
 
-// R419 section 12: component highlighting — when the user picks a
-// component (from the artifact pane or the essay), the named node
-// stays full-opacity and every other mesh dims. Pure presentation:
-// nothing about the geometry changes (the authority stays the GLB).
+// model-aware camera rig: once the layout is measured, frame the
+// bounding sphere with a gentle three-quarter studio angle — the
+// artifact fills the hero frame instead of floating small inside it,
+// and the orbit target sits at the model's own center.
+function CameraRig({ layout }: { layout: ModelLayout | null }) {
+  const camera = useThree((s) => s.camera);
+  const controls = useThree(
+    (s) => s.controls
+  ) as OrbitControlsImpl | null;
+  useEffect(() => {
+    if (!layout || !controls) return;
+    const [cx, cy, cz] = layout.center;
+    controls.target.set(cx, cy, cz);
+    // fit the bounding sphere in the vertical fov with a small margin
+    const fovRad = ((camera as { fov?: number }).fov ?? 35) * (Math.PI / 180);
+    const dist = (layout.radius * 1.06) / Math.sin(fovRad / 2);
+    // gentle three-quarter studio angle, slightly above center
+    const dir = new Vector3(0.62, 0.36, 1).normalize();
+    camera.position.set(
+      cx + dir.x * dist,
+      cy + dir.y * dist,
+      cz + dir.z * dist
+    );
+    controls.update();
+  }, [layout, camera, controls]);
+  return null;
+}
+
+// Component highlighting — the named node stays full-opacity and every
+// other mesh dims. Pure presentation: nothing about the geometry
+// changes (the authority stays the GLB).
 function ComponentHighlight({
   url,
   highlight,
@@ -135,17 +201,29 @@ export default function ModelViewer({
   height = 460,
   compact = false,
   highlight = null,
+  variant = "inline",
+  modelKind,
+  genLabel,
 }: {
   url: string;
   label: string;
   reconstructed?: boolean;
   note?: string;
-  height?: number;
+  height?: number | string;
   compact?: boolean;
   highlight?: string | null;
+  variant?: "hero" | "inline";
+  /** what kind of model this is — drives the product-language badge */
+  modelKind?: "engineering" | "conceptual" | "reconstruction";
+  /** e.g. "generation 2" — the generation identity, when known */
+  genLabel?: string;
 }) {
   const [wire, setWire] = useState(false);
   const [clip, setClip] = useState(false);
+  // gentle presentation rotation until the user takes control
+  const [auto, setAuto] = useState(variant === "hero");
+  // the measured model layout (hero: drives framing + ground shadow)
+  const [layout, setLayout] = useState<ModelLayout | null>(null);
   const wrap = useRef<HTMLDivElement>(null);
   const controls = useRef<OrbitControlsImpl | null>(null);
 
@@ -163,42 +241,93 @@ export default function ModelViewer({
     }
   }
 
+  // the product-language badge: what kind of model is on stage. The
+  // full epistemic wording rides the title tooltip (deep layer), never
+  // the primary surface.
+  const kind =
+    modelKind ??
+    (reconstructed ? "reconstruction" : label.toLowerCase().includes("conceptual") ? "conceptual" : "engineering");
+  const badge =
+    kind === "reconstruction"
+      ? "Spatial reconstruction"
+      : kind === "conceptual"
+        ? "Conceptual design"
+        : "Engineering model";
+  const badgeTitle =
+    kind === "reconstruction"
+      ? "provider reconstruction — a spatial hypothesis, not a measurement"
+      : kind === "conceptual"
+        ? "conceptual architecture visualization — engineering dimensions are not claimed"
+        : "deterministic CAD build from the canonical engineering geometry — a computational result, not a physical validation";
+
+  const hero = variant === "hero";
+
   return (
     <div
-      className="viewer"
+      className={`viewer${hero ? " hero" : ""}`}
       ref={wrap}
-      /* R432 section 14: the DOM acceptance test counts primary technology
-         model viewers with this attribute — exactly ONE per technology
-         page. Two viewers that happen to display the same GLB are still
-         a violation; the count is a machine-checked product invariant. */
+      /* the DOM acceptance test counts primary technology model viewers
+         with this attribute — exactly ONE per technology page. Two
+         viewers that happen to display the same GLB are still a
+         violation; the count is a machine-checked product invariant. */
       data-model-viewer={label}
-      style={compact ? { maxWidth: 480 } : undefined}
+      style={compact && !hero ? { maxWidth: 480 } : undefined}
     >
-      <div className="canvas-wrap" style={{ height }}>
+      <div
+        className="canvas-wrap"
+        style={{ height: hero ? "100%" : height }}
+      >
         <Canvas
-          camera={{ position: [6, 4.5, 8], fov: 40 }}
-          gl={{ localClippingEnabled: true }}
+          camera={hero ? { position: [9, 6, 12], fov: 30 } : { position: [6, 4.5, 8], fov: 40 }}
+          gl={{ localClippingEnabled: true, antialias: true }}
+          dpr={[1, 2]}
         >
-          <ambientLight intensity={0.6} />
-          <directionalLight position={[6, 9, 7]} intensity={1.15} />
-          <directionalLight position={[-7, -4, -5]} intensity={0.4} />
+          {/* calm three-point studio lighting (warm key, cool fill,
+              warm rim + low bounce) — enough contrast to read as a
+              photographed object, not a flat primitive */}
+          <ambientLight intensity={hero ? 0.55 : 0.6} />
+          <directionalLight position={[7, 10, 6]} intensity={hero ? 1.6 : 1.15} />
+          <directionalLight position={[-8, 2, -6]} intensity={0.5} color="#dfe6ee" />
+          {hero && <directionalLight position={[-5, 6, -7]} intensity={0.7} color="#f5e8d8" />}
+          {hero && <directionalLight position={[0, -6, 2]} intensity={0.25} color="#f0e9df" />}
           <Suspense fallback={null}>
-            <Center>
-              <FittedModel url={url} />
-            </Center>
+            <FittedModel url={url} onLayout={hero ? setLayout : undefined} />
             <WireToggle url={url} wire={wire} clip={clip} />
             <ComponentHighlight url={url} highlight={highlight} />
           </Suspense>
+          {/* the model-aware framing + the ground-contact shadow — both
+              measured from the model's OWN bounding box, so any
+              proportions read as grounded and commanding */}
+          {hero && <CameraRig layout={layout} />}
+          {hero && layout && (
+            <ContactShadows
+              position={[layout.center[0], layout.bottom - 0.02, layout.center[2]]}
+              opacity={0.5}
+              scale={Math.max(layout.radius * 3.2, 8)}
+              blur={2.1}
+              far={layout.radius * 2}
+              resolution={1024}
+              color="#3a332b"
+            />
+          )}
           <OrbitControls
             makeDefault
             ref={controls}
             enablePan
             enableZoom
-            minDistance={2}
-            maxDistance={40}
+            minDistance={2.4}
+            maxDistance={26}
+            autoRotate={auto}
+            autoRotateSpeed={0.85}
+            onStart={() => setAuto(false)}
           />
         </Canvas>
-        <div className="canvas-hud">
+        <div className={`canvas-hud${hero ? " hero-hud" : ""}`}>
+          {auto && hero && (
+            <span className="hud-live" title="drag to take control">
+              exploring
+            </span>
+          )}
           <button type="button" onClick={resetView} title="reset view">
             reset
           </button>
@@ -207,17 +336,24 @@ export default function ModelViewer({
           </button>
         </div>
       </div>
-      <div className="tag">
+      <div className="tag" title={badgeTitle}>
         {reconstructed ? (
           <>
-            <span className="recon">RECONSTRUCTED</span> · spatial hypothesis,
+            <span className="recon">reconstruction</span> · spatial hypothesis,
             not a measurement
           </>
         ) : (
-          <>COMPUTATIONAL_RESULT · deterministic CAD</>
+          <>
+            {badge}
+            {genLabel ? ` · ${genLabel}` : ""}
+          </>
         )}
-        {" · "}
-        {label}
+        {!hero && label ? (
+          <>
+            {" · "}
+            {label}
+          </>
+        ) : null}
       </div>
       <div className="controls">
         <button onClick={() => setWire(!wire)} type="button">

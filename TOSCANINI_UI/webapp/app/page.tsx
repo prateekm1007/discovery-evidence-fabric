@@ -1,26 +1,34 @@
 "use client";
 
-// R430.1 — THE SCIENTIFIC TECHNOLOGY ARTIFACT WORKSPACE.
+// R435 — THE PRODUCT EXPERIENCE RESET.
 //
-//   ┌────────────────────────────┬─────────────────────────────────┐
-//   │ INVESTIGATION              │ TECHNOLOGY DOSSIER              │
-//   │ conversation               │ Overview / Design / Evidence    │
-//   │ scientific stages          │ Engineering / Experiment        │
-//   │ evidence events            │ Transfer                        │
-//   │ user interaction           │ (the living technology artifact)│
-//   └────────────────────────────┴─────────────────────────────────┘
+//   ┌──────────────────────────────────────────────────────────────┐
+//   │ Toscanini · Designing: <the problem> · status      + New     │
+//   ├──────────────────────────────────────────────────────────────┤
+//   │                     THE TECHNOLOGY STAGE                      │
+//   │   ┌────────────────────────────────────────────────────┐     │
+//   │   │              THE 3D ARTIFACT (HERO)                │     │
+//   │   │   large · calm · interactive · the product itself  │     │
+//   │   └────────────────────────────────────────────────────┘     │
+//   │   What changed · Why it works · What supports it · What      │
+//   │   could kill it                                              │
+//   │   Test this · Compare generations · Technology package       │
+//   │   ── deep layer (progressive disclosure) ──                  │
+//   │   journal · summary · model · evidence · engineering ·       │
+//   │   experiment · package · ask                                 │
+//   └──────────────────────────────────────────────────────────────┘
 //
-// ~40/60 on desktop, collapsing to a single flow on mobile with the
-// dossier as a full-width panel (section 18). The 13-stage pipeline,
-// the machine states, the G-gates — all of it stays underneath. The
-// dossier exists from the first canonical state (section 3) — never
-// gated on 3D or PACKAGE_READY. Honest states everywhere; the only
-// prominent customer action is DOWNLOAD TECHNOLOGY PACKAGE.
+// The reset directive: stop treating the Dossier as the primary UI.
+// The dossier stays the CANONICAL PROJECTION (Art. X) — the visible
+// experience is the technology workspace that projects it: the artifact
+// becomes the hero, complexity is progressively revealed, the result
+// becomes the product.
 //
-// Section 12 (refresh recovery): the workspace hydrates from PERSISTED
-// endpoints only — /result, /events, /dossier — then reconnects the
-// live event stream if the job is still running. No UI state depends
-// solely on transient React state.
+// Section 12 (refresh recovery, R430.1): the workspace hydrates from
+// PERSISTED endpoints only — /result, /events, /dossier — then
+// reconnects the live event stream if the job is still running. No UI
+// state depends solely on transient React state. All polling/SSE
+// plumbing below is unchanged from R430.1/R433.
 
 import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -51,11 +59,8 @@ import type {
   ShowcaseRow,
 } from "@/lib/types";
 import HistoryRail from "@/components/HistoryRail";
-import InvestigationPane from "@/components/InvestigationPane";
-import DossierPane from "@/components/DossierPane";
-import InventionArtifact from "@/components/InventionArtifact";
-import InventionStory from "@/components/InventionStory";
-import AskBox from "@/components/AskBox";
+import TechStage from "@/components/TechStage";
+import InventionStage from "@/components/InventionStage";
 import { isTerminal } from "@/components/RunNarrative";
 
 const EXAMPLES = [
@@ -145,7 +150,7 @@ function NewProblemPane({
         Give Toscanini a real problem. It will investigate the evidence,
         challenge its own ideas, and develop the strongest invention it
         can defend — while you watch the investigation unfold and the
-        technology dossier grow.
+        technology take shape on stage.
       </p>
       <h2 className="ask-title">What problem should Toscanini investigate?</h2>
       <div className="ask">
@@ -208,7 +213,6 @@ function WorkspaceInner() {
   const [health, setHealth] = useState<HealthSummary | null>(null);
   const [detail, setDetail] = useState<SessionDetail | null>(null);
   const [cio, setCio] = useState<CIO | null>(null);
-  const [cioLoading, setCioLoading] = useState(false);
   // R422: a run id that 404s repeatedly must surface a VISIBLE state.
   const [runNotFound, setRunNotFound] = useState(false);
   // R430.1: the investigation event history + the dossier projection —
@@ -216,7 +220,6 @@ function WorkspaceInner() {
   const [events, setEvents] = useState<ScienceEvent[]>([]);
   const [gauntlet, setGauntlet] = useState<GauntletCard[]>([]);
   const [dossier, setDossier] = useState<DossierBody | null>(null);
-  const [dossierLoading, setDossierLoading] = useState(false);
   const [invention, setInvention] = useState<ShowcaseDetail | null>(null);
   const [reality, setReality] = useState<RealityLoopRecord | null>(null);
   const [railOpen, setRailOpen] = useState(false);
@@ -299,12 +302,11 @@ function WorkspaceInner() {
         /* honest absence — the result poll still drives the UI */
       }
       try {
-        setDossierLoading(true);
         const d = await getDossier(id);
         if (!alive) return;
         setDossier(d);
-      } finally {
-        if (alive) setDossierLoading(false);
+      } catch {
+        /* the dossier is a projection — honest absence until it exists */
       }
     }
     refresh();
@@ -368,20 +370,16 @@ function WorkspaceInner() {
   // ---- R422: load the CIO once the run is terminal ----
   useEffect(() => {
     setCio(null);
-    setCioLoading(false);
     if (!detail || !isTerminal(detail.status)) return;
     let alive = true;
-    setCioLoading(true);
     getCIO(detail.session_id)
       .then((c) => {
         if (!alive) return;
         setCio(c);
-        setCioLoading(false);
       })
       .catch(() => {
         if (!alive) return;
         setCio(null);
-        setCioLoading(false);
       });
     return () => {
       alive = false;
@@ -485,7 +483,9 @@ function WorkspaceInner() {
           />
         )}
 
-        <main className="ws-investigation">
+        {/* R435: ONE calm workspace column — the stage and its deep
+            layer; no split panes, no dossier panel beside a report */}
+        <main className="ws-main">
           {activeMode === "fresh" &&
             (starting ? (
               <div className="loading">Starting the investigation…</div>
@@ -495,7 +495,7 @@ function WorkspaceInner() {
 
           {activeMode === "run" &&
             (detail ? (
-              <InvestigationPane
+              <TechStage
                 detail={detail}
                 events={events}
                 gauntlet={gauntlet}
@@ -520,61 +520,15 @@ function WorkspaceInner() {
 
           {activeMode === "invention" &&
             (invention ? (
-              <div className="invstory">
-                <InventionStory detail={invention} loop={reality} />
-                <AskBox
-                  mode="invention"
-                  subject={slot ?? ""}
-                  enabled={true}
-                  placeholder="Ask about this technology — answered from its own record…"
-                />
-              </div>
+              <InventionStage
+                detail={invention}
+                loop={reality}
+                slot={slot ?? ""}
+              />
             ) : (
               <div className="loading">Loading package…</div>
             ))}
         </main>
-
-        <aside className="ws-dossier">
-          {activeMode === "run" && (
-            <DossierPane
-              dossier={dossier}
-              gauntlet={gauntlet}
-              loading={
-                dossierLoading && !dossier && detail !== null
-              }
-            />
-          )}
-
-          {activeMode === "invention" &&
-            (invention ? (
-              <InventionArtifact detail={invention} slot={slot ?? ""} />
-            ) : (
-              <div className="artifact">
-                <div className="artifact-h">Artifact</div>
-                <div className="faint">loading…</div>
-              </div>
-            ))}
-
-          {activeMode === "fresh" && (
-            <aside className="dossier">
-              <div className="dossier-h">Technology Dossier</div>
-              <div className="dossier-placeholder">
-                <div className="ph-shape" aria-hidden="true" />
-                <div>
-                  Start an investigation and the dossier grows beside it:
-                  problem, evidence, mechanism, challenge, engineering,
-                  the decisive experiment — and the downloadable
-                  technology package when the invention survives.
-                </div>
-                <div className="faint" style={{ fontSize: 12 }}>
-                  the dossier exists from the first moment the
-                  investigation starts — incomplete tabs are honest
-                  pending states, never errors
-                </div>
-              </div>
-            </aside>
-          )}
-        </aside>
       </div>
     </div>
   );
