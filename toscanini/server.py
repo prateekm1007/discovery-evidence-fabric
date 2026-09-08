@@ -610,8 +610,15 @@ class Handler(BaseHTTPRequestHandler):
                 if self._access(rid) == "DENY":
                     return self._denied()
                 s = store.get_session(rid)
-                q = urllib.parse.parse_qs(
-                    urllib.urlsplit(p.path).query)
+                # R420e fix: this route crashed with AttributeError
+                # since R416 (urllib.urlsplit) — every /model request
+                # 502'd in production (caught by the R420 live
+                # acceptance). Second defect found under the first:
+                # urlsplit(p.path) can never see the query (urlparse
+                # already stripped it into p.query) — so ?gen=N was
+                # silently ignored and every generation tab served the
+                # CURRENT model. Parse the ACTUAL query string.
+                q = urllib.parse.parse_qs(p.query)
                 gen = (q.get("gen") or [None])[0]
                 glb = self._run_glb(s, gen=gen)
                 return self._serve_file(glb, "model/gltf-binary")

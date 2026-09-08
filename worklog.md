@@ -1573,3 +1573,18 @@ Work Log:
 Stage Summary:
 - The memory guard now measures the machine the process actually runs on. The full honest production behavior on the Starter plan: fresh run -> invention -> GLB -> interactive 3D + package on the website; renders typed-skipped with the plan-upgrade note; on a plan upgrade, the same code renders automatically.
 - reviewer_provenance=AI_REVIEW.
+
+---
+Task ID: R420e
+Agent: Coder (main session — a pre-existing production defect caught BY the acceptance)
+Task: The live verification of the fresh run's artifact routes: /cio, /essay, /package all 200 — but /api/run/{id}/model 502'd on EVERY run (fresh and historical). Reproduced locally with a controlled server instance and fixed.
+
+Work Log:
+- REPRODUCTION: a real server + fixture session + GLB — /model crashed with AttributeError: module 'urllib' has no attribute 'urlsplit' (server.py, the R416 ?gen= parameter line: urllib.urlsplit instead of urllib.parse.urlsplit). Every /model request crashed the handler thread and closed the connection (Render's proxy surfaces that as 502). The route has been broken in production since R416 deployed — nobody noticed because the R418 browser acceptance used the SHOWCASE model route (different code) and the fresh-run path never reached a model until R418's bridge; the R419/R420 fresh runs' models were never fetched in a browser until this acceptance.
+- SECOND defect under the first: even with the crash fixed, urlsplit(p.path) can never see the query — urlparse already stripped it into p.query — so ?gen=N was silently ignored and every generation tab served the CURRENT model (the R416 per-generation geometry feature never actually worked). Fixed: parse_qs(p.query).
+- FIX + REGRESSION TEST: tests/test_r420_render_autonomy.py::TestDurableRenderPersistence::test_model_route_serves_the_glb — the REAL ThreadingHTTPServer handler on a random port with patched store paths; asserts /model 200 with the GLB bytes, ?gen=1 200, ?gen=9 honest 404, /cio 200.
+- Verified locally: /model 200 4204B, ?gen=1 200, ?gen=9 404. Batteries: r420 39 passed + 7 skipped; combined 103 passed + 7 skipped.
+
+Stage Summary:
+- The run's interactive 3D surface now actually serves (the R420 acceptance proved the join the batteries could not: route + store + real handler).
+- reviewer_provenance=AI_REVIEW.

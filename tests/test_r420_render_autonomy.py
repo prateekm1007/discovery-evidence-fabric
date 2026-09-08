@@ -898,6 +898,74 @@ class TestCioRenderStateProjection(unittest.TestCase):
 
 class TestDurableRenderPersistence(unittest.TestCase):
 
+    def test_model_route_serves_the_glb(self):
+        """R420e — the caught-in-acceptance production defect, guarded:
+        /api/run/{id}/model 502'd in production since R416
+        (urllib.urlsplit — AttributeError crash, connection reset per
+        request). The route must serve the run's GLB over the REAL
+        handler with the REAL store paths."""
+        import shutil
+        import socket
+        import threading
+        import urllib.request as urlreq
+        from http.server import ThreadingHTTPServer
+        from toscanini import sessions as store_mod
+        from toscanini import server as srv_mod
+        tmp = tempfile.mkdtemp(prefix="r420_modelroute_")
+        self.addCleanup(shutil.rmtree, tmp, ignore_errors=True)
+        store = Path(tmp) / "TOSCANINI_UI"
+        store.mkdir()
+        rd = Path(tmp) / "ENGINE_RUNS" / "toscanini_ui_x_ts_modeltest"
+        (rd / "MODEL").mkdir(parents=True)
+        (rd / "MODEL" / "model-001.glb").write_bytes(
+            b"glTF" + b"\x00" * 4000)
+        (rd / "INVENTION_SPECIFICATION.json").write_text(json.dumps(
+            {"mechanism": {"value": "adaptive thermal regulation"}}))
+        (store / "sessions.json").write_text(json.dumps({"sessions": [{
+            "session_id": "ts_modeltest", "status": "COMPLETE",
+            "run_dir": str(rd), "origin": "toscanini_ui",
+            "final_status": "EVOLVED_INVENTION_CANDIDATE",
+            "created_at": "2026-09-08T00:00:00Z",
+            "owner_key": "testowner",
+        }]}))
+        orig = (store_mod.STORE_DIR, store_mod.SESSIONS_PATH,
+                store_mod.ENGINE_RUNS)
+        store_mod.STORE_DIR = store
+        store_mod.SESSIONS_PATH = store / "sessions.json"
+        store_mod.SHARES_PATH = store / "shares.json"
+        store_mod.ENGINE_RUNS = Path(tmp) / "ENGINE_RUNS"
+        orig_key = srv_mod.OPERATOR_KEY
+        srv_mod.OPERATOR_KEY = "testoperator"
+        with socket.socket() as s:
+            s.bind(("127.0.0.1", 0))
+            port = s.getsockname()[1]
+        httpd = ThreadingHTTPServer(
+            ("127.0.0.1", port), srv_mod.Handler)
+        thread = threading.Thread(target=httpd.serve_forever, daemon=True)
+        thread.start()
+        self.addCleanup(httpd.shutdown)
+        try:
+            for path, expect in (
+                    ("/api/run/ts_modeltest/model", 200),
+                    ("/api/run/ts_modeltest/model?gen=1", 200),
+                    ("/api/run/ts_modeltest/model?gen=9", 404),
+                    ("/api/run/ts_modeltest/cio", 200)):
+                req = urlreq.Request(
+                    f"http://127.0.0.1:{port}{path}",
+                    headers={"X-Operator-Key": "testoperator"})
+                try:
+                    with urlreq.urlopen(req, timeout=20) as r:
+                        code, body = r.status, r.read()
+                except urlreq.HTTPError as e:
+                    code, body = e.code, b""
+                self.assertEqual(code, expect, path)
+                if expect == 200 and path.endswith("model"):
+                    self.assertGreater(len(body), 1000)
+        finally:
+            srv_mod.OPERATOR_KEY = orig_key
+            (store_mod.STORE_DIR, store_mod.SESSIONS_PATH,
+             store_mod.ENGINE_RUNS) = orig
+
     def test_run_dir_files_collect_renders_and_package_zip(self):
         with tempfile.TemporaryDirectory() as td:
             run_dir = Path(td)
