@@ -56,7 +56,8 @@ def bridge(run_result: Dict[str, Any], cio: Optional[Dict[str, Any]],
            glb_endpoint: Optional[str] = None,
            package_endpoint: Optional[str] = None,
            build_generation_models: bool = True,
-           build_renders: bool = True) -> Dict[str, Any]:
+           build_renders: bool = True,
+           engine_identity: Optional[tuple] = None) -> Dict[str, Any]:
     """Run the full invention-to-3D-to-package path for one completed run.
 
     Returns {visualizability, geometry_out, package_out, cio_updated, report}.
@@ -243,6 +244,7 @@ def bridge(run_result: Dict[str, Any], cio: Optional[Dict[str, Any]],
         run_result, cio, geometry_out, pkg_dir,
         visualizability=vis,
         zip_name=None,
+        engine_identity=engine_identity,
     )
     package_out["package_endpoint"] = package_endpoint
     package_out["glb_endpoint"] = glb_endpoint

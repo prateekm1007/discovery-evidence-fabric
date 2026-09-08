@@ -274,7 +274,19 @@ class TestBridgeEndToEnd(unittest.TestCase):
         with zipfile.ZipFile(pkg["zip_path"]) as zf:
             names = zf.namelist()
         self.assertTrue(any(n.endswith("00_PACKAGE_README.pdf") for n in names))
-        self.assertTrue(any(n.endswith("01_TECHNICAL_ESSAY.pdf") for n in names))
+        # R424 elite document set
+        for elite_doc in ("01_EXECUTIVE_TECHNOLOGY_BRIEF.pdf",
+                          "02_ENGINEERING_TECHNOLOGY_TRANSFER_DOSSIER.pdf",
+                          "03_BUYER_DECISION_CARD.pdf",
+                          "04_EVIDENCE_SUMMARY.pdf",
+                          "05_TRANSFER_MANIFEST.pdf",
+                          "ENGINEERING_TRACEABILITY.json",
+                          "MATURITY_BASIS.json", "EQUATION_REGISTRY.json",
+                          "UNKNOWN_ROADMAP.json",
+                          "VALIDATION_ECONOMICS.json", "LOOP_STATE.json",
+                          "COMMERCIAL_EVIDENCE.json"):
+            self.assertTrue(any(n.endswith(elite_doc) for n in names),
+                            f"missing elite layer: {elite_doc}")
         self.assertTrue(any(n.endswith("CONCEPTUAL_3D_DISCLAIMER.json") for n in names))
         self.assertTrue(any(n.endswith("MANIFEST.json") for n in names))
         self.assertTrue(any(n.endswith("PROVENANCE.json") for n in names))
@@ -337,7 +349,32 @@ class TestBridgeEngineeringPath(unittest.TestCase):
         self.assertTrue(any(n.endswith("GEOMETRY_VALIDATION_REPORT.json") for n in names))
 
     def test_package_maturity_engineering(self):
+        # R424 §10: maturity is EVIDENCE-derived. The thin fixture has
+        # engineering geometry but NO design inputs / failure modes /
+        # build plan in its record — EARLY is the honest level.
         self.assertEqual(self.result["package_out"]["package_maturity"],
+                         epistemics.PACKAGE_MATURITY_EARLY)
+
+    def test_full_record_earns_engineering_definition_maturity(self):
+        """The maturity rule fires on the recorded evidence, not the 3D
+        class: a record carrying >=5 DIs, >=3 FMs, >=4 WPs earns
+        ENGINEERING_DEFINITION (the elite P-07 basis)."""
+        run = _engineering_run()
+        eng = run["engineering_specification"]
+        eng["design_inputs"] = [{"id": f"DI-{i:03d}",
+                                 "input": f"input {i}",
+                                 "value": f"v{i}",
+                                 "evidence_class": "MODELLED"}
+                                for i in range(1, 6)]
+        eng["failure_analysis"] = [
+            {"graph_id": f"FM-{i}", "failure_mode": f"mode {i}"}
+            for i in range(1, 4)]
+        eng["engineering_build_plan"] = [
+            {"work_package": f"WP-{i:02d}",
+             "test_article": f"article {i}"} for i in range(1, 5)]
+        result = run_bridge(run, None, tempfile.mkdtemp(
+            prefix="bridge_eng_full_"), build_renders=False)
+        self.assertEqual(result["package_out"]["package_maturity"],
                          epistemics.PACKAGE_MATURITY_ENGINEERING)
 
     def test_cio_carries_measured_dimensions(self):

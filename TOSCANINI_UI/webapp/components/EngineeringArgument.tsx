@@ -12,8 +12,8 @@ import type { SessionDetail, StageDigest } from "@/lib/types";
 // R418 (operator §11): NEVER show raw JSON as the primary explanation.
 // When a field is an object, render it as labeled prose lines
 // (Mechanism / Intervention / Expected effect / …). The underlying
-// JSON remains available through the counsel export and the run's own
-// artifacts — the primary surface renders human language.
+// JSON remains available through the technology transfer package and
+// the run's own artifacts — the primary surface renders human language.
 
 const LABELS: Record<string, string> = {
   mechanism: "Mechanism",

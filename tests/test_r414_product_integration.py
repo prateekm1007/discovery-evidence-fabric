@@ -589,10 +589,17 @@ class TestCIO:
             "novelty_language"].lower()
 
     def test_counsel_download_route(self, tmp_path):
+        # R423A Phase 3 — ONE package: the separate counsel export is no
+        # longer a customer surface. The CIO must NOT advertise a second
+        # package route, and the technical evidence it carried rides
+        # inside the single technology transfer package.
         rd = self._run_dir(tmp_path)
         cio = cio_mod.build_cio(self._session(rd))
-        assert cio["downloads"]["counsel_package"] == \
-            "/api/run/s1/counsel-package"
+        assert "counsel_package" not in cio["downloads"]
+        assert cio["downloads"]["package_kind"] == \
+            "TECHNOLOGY_TRANSFER_PACKAGE"
+        assert cio["downloads"]["package_origin"] in (
+            "INVENTION_BRIDGE", "BUYER_RELEASE_CHAIN")
 
 
 # ---------------------------------------------------------------------------

@@ -225,7 +225,7 @@ export default function InventionArtifact({
       <div className="artifact-dls">
         <div className="rail-h">Downloads</div>
         <a className="btn download artifact-dl" href={detail.dossier.download}>
-          Technology package (ZIP)
+          Download technology package
         </a>
         <div className="dl-row">
           {downloads.glb && (

@@ -90,8 +90,10 @@ class TestCaseB:
         report = json.loads((rd / "BRIDGE_REPORT.json").read_text())
         assert report["outcome"] == "COMPLETED"
         assert report["reviewer_provenance"] == "AI_REVIEW"
-        # the technology package zip exists and is recorded
-        zips = list(rd.glob("TECHNOLOGY_PACKAGE_*.zip"))
+        # R423A Phase 3: the ONE canonical package zip exists and is
+        # recorded (new runs carry the TECHNOLOGY_TRANSFER_PACKAGE name)
+        zips = list(rd.glob("TECHNOLOGY_TRANSFER_PACKAGE_*.zip")) \
+            + list(rd.glob("TECHNOLOGY_PACKAGE_*.zip"))
         assert zips, "bridge package zip missing"
         assert report["package_out"]["zip_name"] == zips[0].name
         assert report["package_out"]["zip_sha256"]
@@ -113,7 +115,8 @@ class TestCaseB:
         assert "NOT engineering geometry" in geo["authority"]
         dl = cio_obj["downloads"]
         assert dl["package_zip"], "package route missing"
-        assert dl["package_kind"] == "TECHNOLOGY_PACKAGE_BRIDGE"
+        assert dl["package_kind"] == "TECHNOLOGY_TRANSFER_PACKAGE"
+        assert dl["package_origin"] == "INVENTION_BRIDGE"
         assert dl["package_maturity"]
 
     def test_run_state_package_and_generations(self, isolated):
@@ -122,7 +125,8 @@ class TestCaseB:
         state = rs.canonical_run_state(session)
         pkg = state["package_state"]
         assert pkg["state"] == "READY"
-        assert pkg["package_kind"] == "TECHNOLOGY_PACKAGE_BRIDGE"
+        assert pkg["package_kind"] == "TECHNOLOGY_TRANSFER_PACKAGE"
+        assert pkg["package_origin"] == "INVENTION_BRIDGE"
         assert pkg["zip_name"]
         rd = isolated["run_dir"]
         assert rs._gen_model_available(rd, 1) is True
@@ -155,7 +159,9 @@ class TestCaseA:
         gate = bridge_gate.ensure_artifacts("ts_r418_test")
         assert gate["outcome"] == "PACKAGE_ADDED_TO_EXISTING_GEOMETRY"
         assert gate["case"] == "A+package"
-        assert list(rd.glob("TECHNOLOGY_PACKAGE_*.zip"))
+        assert list(rd.glob(
+            "TECHNOLOGY_TRANSFER_PACKAGE_*.zip")) \
+            or list(rd.glob("TECHNOLOGY_PACKAGE_*.zip"))
 
 
 class TestCaseC:

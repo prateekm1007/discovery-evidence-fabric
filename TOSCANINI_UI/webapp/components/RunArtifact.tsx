@@ -5,14 +5,14 @@
 // download when one was produced, the honest no-package explanation
 // when not (a real result, never a failure of the product).
 //
-// R414 (directive §12-14, §20): the terminal card renders the CANONICAL
+// R414 (directive §12-14): the terminal card renders the CANONICAL
 // INVENTION OBJECT — one object, one source of truth. The 3D viewer
 // appears only when the CIO's geometry actually exists (never inferred
 // from anything else); the reality-status badges are CIO FIELDS
 // (DESIGNED / SIMULATED / EVIDENCE-SUPPORTED / EXPERIMENTALLY
-// VERIFIED), never frontend inventions; the counsel button exports the
-// technical evidence package for IP counsel review — it never says
-// "patent this" (Toscanini is not a patent court).
+// VERIFIED), never frontend inventions. R423A Phase 3: ONE package —
+// the technology transfer package is the single customer deliverable
+// (no separate counsel export; Toscanini is not a patent court).
 //
 // R416 (Phase H): each invention GENERATION gets its own geometry
 // artifact (model-001.glb, model-002.glb, …) — the user moves through
@@ -74,6 +74,11 @@ function MaturityBadges({ cio }: { cio: CIO }) {
 // implies buyer-readiness (invention existence, maturity, and
 // buyer-release are separate states).
 // ---------------------------------------------------------------------------
+// R423A Phase 3 — ONE package: the technology transfer package is
+// the single customer deliverable. The buyer-vs-bridge product split
+// is gone from the UI (the honest maturity label stays); the separate
+// "Prepare for IP counsel" export is removed (its content rides inside
+// the one package; Toscanini is not a patent court).
 function PackageDownloads({
   detail,
   zipHref,
@@ -81,6 +86,7 @@ function PackageDownloads({
   docCount,
   maturity,
   geometry,
+  packageOrigin,
 }: {
   detail: SessionDetail;
   zipHref: string;
@@ -88,16 +94,16 @@ function PackageDownloads({
   docCount?: number | null;
   maturity?: string | null;
   geometry?: CIO["geometry"];
+  packageOrigin?: string | null;
 }) {
   const glb = geometry?.glb ?? `/api/run/${detail.session_id}/model`;
   const step = geometry?.step?.[0];
   const stl = geometry?.stl?.[0];
-  const isBridge = packageKind === "TECHNOLOGY_PACKAGE_BRIDGE";
   return (
     <div className="artifact-dls">
       <div className="rail-h">Downloads</div>
       <a className="btn download artifact-dl" href={zipHref}>
-        Technology package (ZIP)
+        Download technology package
       </a>
       <div className="dl-row">
         <a className="dl-chip" href={glb}>
@@ -116,18 +122,18 @@ function PackageDownloads({
       </div>
       {docCount ? (
         <div className="faint" style={{ fontSize: 11.5, marginTop: 6 }}>
-          {docCount} documents inside the ZIP — {isBridge
-            ? "package README, technical essay, engineering definition, evidence summary, decisive experiment, manifest, provenance"
-            : "executive brief, dossier, decision card, evidence, manifest, traceability"}
-          {maturity ? ` · package maturity: ${String(maturity).replace(/_/g, " ").toLowerCase()}` : ""}
+          {docCount} documents inside the ZIP — executive brief, engineering
+          dossier, buyer decision card, evidence summary, transfer
+          manifest, plus machine-readable layers (traceability, equation
+          registry, unknown roadmap, validation economics)
+          {maturity ? ` · maturity: ${String(maturity).replace(/_/g, " ").toLowerCase()}` : ""}
         </div>
       ) : null}
       <div className="faint" style={{ fontSize: 11.5, marginTop: 2 }}>
-        {isBridge
-          ? "early technical evaluation — invention existence, maturity and buyer-readiness are separate states; the buyer release gates are untouched"
-          : packageKind === "BUYER_PACKAGE"
-            ? "from the certified release chain"
-            : ""}
+        the single deliverable for this technology — its maturity label is the
+        honest state{packageOrigin === "BUYER_RELEASE_CHAIN"
+          ? "; this one came from the certified release chain"
+          : "; invention existence, maturity and buyer-readiness are separate states"}
       </div>
     </div>
   );
@@ -273,6 +279,7 @@ function CioPanel({ cio, detail }: { cio: CIO; detail: SessionDetail }) {
           docCount={downloads.document_count}
           maturity={downloads.package_maturity}
           geometry={geo}
+          packageOrigin={downloads.package_origin}
         />
       ) : (
         <div className="artifact-note">
@@ -282,19 +289,6 @@ function CioPanel({ cio, detail }: { cio: CIO; detail: SessionDetail }) {
           the invention exists above with its honest maturity).
         </div>
       )}
-
-      <a
-        className="btn counsel artifact-dl"
-        href={`/api/run/${detail.session_id}/counsel-package`}
-      >
-        Prepare for IP counsel
-      </a>
-      <div className="faint" style={{ fontSize: 12, marginTop: 4 }}>
-        exports the technical evidence package — invention description,
-        cited evidence, prior-art results, provenance — for your patent
-        attorney to review. Toscanini does not determine patentability:
-        <i> potential IP territory — formal legal review required.</i>
-      </div>
 
       {cio.simulation?.executed && (
         <div className="artifact-note">
@@ -514,6 +508,7 @@ export default function RunArtifact({
               packageKind={pkg?.package_kind}
               docCount={pkg?.document_count}
               maturity={pkg?.maturity}
+              packageOrigin={pkg?.package_origin}
             />
           ) : cioLoading ? null /* never flash "artifacts pending" while a
                package may still resolve — the CIO fetch decides */ : usv.found_something ? (
@@ -544,21 +539,12 @@ export default function RunArtifact({
             usv.package_available === false &&
             !cio?.present && (
               <div className="artifact-note">
-                The technology package was produced by the automatic
+                The technology transfer package was produced by the automatic
                 artifact gate after the run completed — the run summary
                 above was recorded at completion. The package below is
                 the current state.
               </div>
             )}
-
-          {!cio?.present && done && (
-            <a
-              className="btn counsel artifact-dl"
-              href={`/api/run/${detail.session_id}/counsel-package`}
-            >
-              Prepare for IP counsel
-            </a>
-          )}
 
           {(detail.status.startsWith("ERROR") ||
             detail.status.startsWith("RUN_BLOCKED") ||

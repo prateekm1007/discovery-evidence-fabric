@@ -102,33 +102,51 @@ def _package_info(run_dir: Path) -> Dict[str, Any]:
     if complete:
         return {"complete": True, "maturity": report.get("maturity"),
                 "zip_name": zips[0].name if zips else None,
-                "package_kind": "BUYER_PACKAGE",
+                "package_kind": "TECHNOLOGY_TRANSFER_PACKAGE",
+                "package_origin": "BUYER_RELEASE_CHAIN",
                 "zip_path": str(zips[0]) if zips else None}
     # bridge fallback (R418)
     bridge = _bridge_package_info(run_dir)
     if bridge:
         return bridge
     return {"complete": False, "maturity": None, "zip_name": None,
-            "package_kind": None, "zip_path": None}
+            "package_kind": None, "zip_path": None,
+            "package_origin": None}
 
 
 def _bridge_package_info(run_dir: Path) -> Optional[Dict[str, Any]]:
-    """The bridge technology package, derived from BRIDGE_REPORT.json +
-    the TECHNOLOGY_PACKAGE_*.zip on disk (the report is the record; the
-    file is the artifact — both must agree)."""
+    """The bridge technology transfer package, derived from
+    BRIDGE_REPORT.json + the package ZIP on disk (the report is the
+    record; the file is the artifact — both must agree). R423A Phase 3:
+    both the historical TECHNOLOGY_PACKAGE_*.zip name and the current
+    TECHNOLOGY_TRANSFER_PACKAGE_*.zip name resolve — historical run
+    artifacts are never rewritten, new runs use the one canonical
+    artifact name."""
     br = _read_json(run_dir / "BRIDGE_REPORT.json") or {}
     pkg = br.get("package_out") or {}
     zip_name = pkg.get("zip_name")
-    if not zip_name:
-        return None
-    zp = run_dir / zip_name
-    if not zp.exists():
+    zp = None
+    if zip_name:
+        zp = run_dir / zip_name
+        if not zp.exists():
+            zp = None
+    if zp is None:
+        # the report's name is stale or absent — resolve from disk by
+        # BOTH naming generations (historical first, current second)
+        for pattern in ("TECHNOLOGY_PACKAGE_*.zip",
+                        "TECHNOLOGY_TRANSFER_PACKAGE_*.zip"):
+            found = sorted(run_dir.glob(pattern))
+            if found:
+                zp = found[0]
+                break
+    if zp is None or not zp.exists():
         return None
     return {
         "complete": True,
         "maturity": pkg.get("package_maturity"),
-        "zip_name": zip_name,
-        "package_kind": "TECHNOLOGY_PACKAGE_BRIDGE",
+        "zip_name": zp.name,
+        "package_kind": "TECHNOLOGY_TRANSFER_PACKAGE",
+        "package_origin": "INVENTION_BRIDGE",
         "zip_path": str(zp),
         "visualizability_class": pkg.get("visualizability_class"),
         "zip_sha256": pkg.get("zip_sha256"),
@@ -143,7 +161,7 @@ def _package_document_count(run_dir: Path,
     manifest file_count recorded in BRIDGE_REPORT. Buyer: the manifest
     inside the DOWNLOAD tree (MANIFEST.json carries file_count)."""
     try:
-        if package.get("package_kind") == "BUYER_PACKAGE":
+        if package.get("package_origin") == "BUYER_RELEASE_CHAIN":
             dl = run_dir / "DOWNLOAD"
             if dl.is_dir():
                 m = _read_json(dl / "MANIFEST.json")
@@ -567,24 +585,30 @@ def build_cio(session: Dict[str, Any]) -> Optional[Dict[str, Any]]:
                 f"/api/sessions/{session.get('session_id')}/package"
                 if package.get("complete") else None),
             "package_maturity": package.get("maturity"),
-            "package_kind": package.get("package_kind"),
+            "package_kind": "TECHNOLOGY_TRANSFER_PACKAGE",
             # R422 (directive 3 — package UX): the REAL document count
             # from the package's own manifest (BRIDGE_REPORT
             # package_out.manifest file_count, or the buyer package's
             # DOWNLOAD tree) — never hardcoded, never guessed. The
             # run-inspector Downloads block renders this number.
             "document_count": _package_document_count(run_dir, package),
+            # R423A Phase 3 — ONE package: the buyer- vs bridge-package
+            # distinction is a MATURITY fact, not two customer products.
+            # The single deliverable is the technology transfer package;
+            # package_origin discloses which path produced it and the
+            # maturity field carries the honest tier. The separate
+            # counsel-package surface is REMOVED (the technical evidence
+            # rides inside the one package; Toscanini is not a patent
+            # court and no longer ships a second legal-flavored ZIP).
+            "package_origin": (
+                "BUYER_RELEASE_CHAIN" if package.get("package_kind")
+                == "BUYER_PACKAGE" else "INVENTION_BRIDGE"),
             "package_kind_note": (
-                "buyer package from the certified release chain"
-                if package.get("package_kind") == "BUYER_PACKAGE" else
-                "technology package (invention bridge) — the honest "
-                "early-technical-evaluation artifact: invention "
-                "existence, maturity and buyer-readiness are separate "
-                "states (the buyer release gates are untouched)"),
-            "counsel_package": (
-                f"/api/run/{session.get('session_id')}/counsel-package"),
-            "note": "counsel package = technical evidence export for "
-                    "IP counsel review — not a legal document",
+                "the technology transfer package for this run — one "
+                "canonical deliverable; its maturity label is the "
+                "honest state (" + str(package.get("maturity")
+                or "UNKNOWN") + "), and the buyer release gates are "
+                "untouched"),
         },
         "experiment": {
             "decisive_experiment": dex or _unwrap((inv or {}).get(

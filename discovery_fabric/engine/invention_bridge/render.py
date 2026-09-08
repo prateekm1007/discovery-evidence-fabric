@@ -55,6 +55,38 @@ PINNED_TARBALL_SHA256 = (
 # timing out with nothing produced). Env-overridable for verification
 # runs. The async ladder's budgets live in artifact_worker.py and are
 # documented in the same threshold-provenance record.
+# R423A Phase 7 (operator §7): the renderer subprocess gets an
+# EXPLICIT environment allowlist. The Blender process is UNTRUSTED
+# compute: it must receive NEITHER the GitHub token, NOR provider keys
+# (NVIDIA/ZAI/OPENROUTER), NOR operator keys, NOR anything else the
+# service carries. The allowlist is the whole contract — anything not
+# listed is absent by construction. Adversarial regression:
+# tests/test_r423_renderer_env_allowlist.py (a stub blender dumps its
+# received environment; poisoned secrets must be ABSENT, the few
+# allowlisted variables PRESENT).
+RENDER_ENV_ALLOWLIST = (
+    "PATH",            # blender resolves its own libs on PATH
+    "HOME",            # blender's --factory-startup scratch space
+    "TMPDIR",          # render temp files
+    "LANG", "LC_ALL",  # deterministic number formatting in Cycles
+    "OMP_NUM_THREADS",  # the thread pin applied below
+    "BLENDER_PATH",    # provenance: which pinned build was resolved
+    "PYTHONIOENCODING",  # blender's python stdout/stderr encoding
+)
+
+
+def _render_subprocess_env() -> Dict[str, str]:
+    """The EXPLICIT allowlisted environment for the Blender subprocess.
+    Absent-by-construction beats scrub-by-blacklist: a future secret in
+    os.environ cannot leak into a renderer we did not update (a new
+    allowlist entry must be a deliberate code change with a test).
+    """
+    env = {k: v for k, v in os.environ.items()
+           if k in RENDER_ENV_ALLOWLIST}
+    env.setdefault("OMP_NUM_THREADS", "2")
+    return env
+
+
 def _in_worker_budget_s() -> int:
     try:
         return max(60, int(os.environ.get(
@@ -396,8 +428,11 @@ def render_invention(work_dir: str,
     with open(spec_path, "w") as f:
         json.dump(spec, f, indent=2)
 
-    env = dict(os.environ)
-    env.setdefault("OMP_NUM_THREADS", "2")
+    # R423A Phase 7: explicit allowlist (see RENDER_ENV_ALLOWLIST) —
+    # the renderer NEVER sees GITHUB_TOKEN / provider keys / operator
+    # keys / any unrelated secret. Verified adversarially by
+    # tests/test_r423_renderer_env_allowlist.py.
+    env = _render_subprocess_env()
     try:
         proc = subprocess.run(
             [blender, "--background", "--factory-startup",

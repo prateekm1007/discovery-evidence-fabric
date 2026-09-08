@@ -377,15 +377,28 @@ def _package_state(session: Dict, run_dir: Optional[Path]) -> Dict:
             pkg = {"complete": True,
                    "maturity": report.get("maturity"),
                    "zip_name": zips[0].name,
-                   "package_kind": "BUYER_PACKAGE"}
+                   "package_kind": "TECHNOLOGY_TRANSFER_PACKAGE",
+                   "package_origin": "BUYER_RELEASE_CHAIN"}
         else:
             br = _read_json(run_dir / "BRIDGE_REPORT.json") or {}
             bp = br.get("package_out") or {}
-            if bp.get("zip_name") and (run_dir / bp["zip_name"]).exists():
+            zip_name = bp.get("zip_name")
+            zp = run_dir / zip_name if zip_name else None
+            if zp is None or not zp.exists():
+                # R423A Phase 3: both naming generations resolve
+                # (historical runs keep their old zip names)
+                for pattern in ("TECHNOLOGY_PACKAGE_*.zip",
+                                "TECHNOLOGY_TRANSFER_PACKAGE_*.zip"):
+                    found = sorted(run_dir.glob(pattern))
+                    if found:
+                        zp = found[0]
+                        break
+            if zp is not None and zp.exists():
                 pkg = {"complete": True,
                        "maturity": bp.get("package_maturity"),
-                       "zip_name": bp["zip_name"],
-                       "package_kind": "TECHNOLOGY_PACKAGE_BRIDGE"}
+                       "zip_name": zp.name,
+                       "package_kind": "TECHNOLOGY_TRANSFER_PACKAGE",
+                       "package_origin": "INVENTION_BRIDGE"}
     session_pkg = session.get("package") or {}
     complete = bool(pkg.get("complete") or session_pkg.get("complete"))
     return {
@@ -394,9 +407,13 @@ def _package_state(session: Dict, run_dir: Optional[Path]) -> Dict:
                   _RUNNING_STATUSES else "NOT_PRODUCED"),
         "maturity": pkg.get("maturity") or session_pkg.get("maturity"),
         "zip_name": pkg.get("zip_name") or session_pkg.get("zip_name"),
-        "package_kind": pkg.get("package_kind"),
-        "counsel_package_available": True,  # R414: always exportable
-        # (it is a technical-evidence export, not a legal document)
+        "package_kind": pkg.get("package_kind") or (
+            "TECHNOLOGY_TRANSFER_PACKAGE" if complete else None),
+        "package_origin": pkg.get("package_origin"),
+        # R423A Phase 3: ONE package — the counsel export is no longer a
+        # separate customer surface, so no counsel_package_available
+        # field is projected (the technical evidence rides inside the
+        # one technology transfer package).
     }
 
 

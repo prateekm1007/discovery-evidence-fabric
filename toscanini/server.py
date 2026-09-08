@@ -29,6 +29,7 @@ import urllib.parse
 import uuid
 from pathlib import Path
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from typing import Dict, Optional, Tuple  # noqa: E402  R423A Phase 5
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_ROOT))
@@ -641,7 +642,8 @@ class Handler(BaseHTTPRequestHandler):
                 q = urllib.parse.parse_qs(p.query)
                 gen = (q.get("gen") or [None])[0]
                 glb = self._run_glb(s, gen=gen)
-                return self._serve_file(glb, "model/gltf-binary")
+                return self._serve_file(glb, "model/gltf-binary",
+                                        immutable=True)
             # GET /api/run/{id}/geometry/{name} — restricted geometry
             # downloads (STEP/STL/SVG whitelist; never envelopes)
             if len(parts) == 5 and parts[3] == "geometry":
@@ -658,27 +660,32 @@ class Handler(BaseHTTPRequestHandler):
                 }.get(f.suffix.lower() if f else "", "application/"
                                                          "octet-stream")
                 return self._serve_file(f, mime, download_name=(
-                    f.name if f else None))
-            # GET /api/run/{id}/counsel-package — the technical evidence
-            # export for IP counsel (directive §20): derived entirely
-            # from run artifacts; never asserts patentability.
+                    f.name if f else None), immutable=True)
+            # R423A Phase 3 — the counsel-package route is REMOVED as a
+            # customer surface: ONE technology = ONE canonical technology
+            # transfer package. The technical evidence the counsel export
+            # duplicated (invention description, cited evidence, prior
+            # art, provenance) rides INSIDE the technology transfer
+            # package; a second legal-flavored ZIP is no longer a product
+            # (Toscanini is not a patent court). The module and the
+            # historical ZIPs stay intact (Art. XI) — only the separate
+            # customer surface is gone. Stale links get an honest 404
+            # that names the consolidation, never a silent break.
             if len(parts) == 4 and parts[3] == "counsel-package":
                 if self._access(rid) == "DENY":
                     return self._denied()
-                s = store.get_session(rid)
-                if not s:
-                    return self._json(404, {"error": "not found"})
-                from toscanini import counsel as _counsel
-                path = _counsel.build_counsel_package(s)
-                if not path:
-                    return self._json(404, {
-                        "error": "no run artifacts to export yet",
-                        "note": "the counsel package exports the run's "
-                                "own technical evidence — nothing is "
-                                "fabricated"})
-                return self._serve_file(
-                    path, "application/zip",
-                    download_name=f"counsel_package_{rid}.zip")
+                return self._json(404, {
+                    "error": "the separate counsel package is retired",
+                    "note": ("one technology = one package: the technical "
+                             "evidence this export carried (invention "
+                             "description, cited evidence, prior-art "
+                             "results, provenance) is inside the "
+                             "technology transfer package at "
+                             "/api/run/{id}/package. Toscanini performs "
+                             "technology discovery and never determines "
+                             "patentability."),
+                    "consolidated_into": f"/api/run/{rid}/package",
+                })
             if len(parts) == 4 and parts[3] == "package":
                 if self._access(rid) == "DENY":
                     return self._denied()
@@ -730,7 +737,9 @@ class Handler(BaseHTTPRequestHandler):
                 f = Path(s["run_dir"]) / "MODEL" / "3D" / name
                 mime = "image/png" if name.endswith(".png") \
                     else "model/gltf-binary"
-                return self._serve_file(f, mime)
+                # R423A Phase 5: render artifacts are content-stable —
+                # immutable caching + real-SHA ETag + Range (resumable)
+                return self._serve_file(f, mime, immutable=True)
 
         if len(parts) >= 3 and parts[0] == "api" and parts[1] == "showcase":
             slot = parts[2]
@@ -740,7 +749,7 @@ class Handler(BaseHTTPRequestHandler):
                     else self._json(404, {"error": "no such showcase slot"})
             if len(parts) == 4 and parts[3] == "model":
                 return self._serve_file(show.glb_path(slot),
-                                        "model/gltf-binary")
+                                        "model/gltf-binary", immutable=True)
             if len(parts) == 4 and parts[3] == "reality-loop":
                 rl = show.reality_loop_record(slot)
                 return self._json(200, rl) if rl \
@@ -755,7 +764,7 @@ class Handler(BaseHTTPRequestHandler):
             if len(parts) == 5 and parts[3] == "preview":
                 return self._serve_file(
                     show.preview_glb_path(slot, parts[4]),
-                    "model/gltf-binary")
+                    "model/gltf-binary", immutable=True)
             # R395: first-class geometry downloads — STEP/STL/GLB from
             # the artifact panel (kind whitelist; 404 honest when absent)
             if len(parts) == 5 and parts[3] == "download":
@@ -766,7 +775,8 @@ class Handler(BaseHTTPRequestHandler):
                     dpath, show.download_mime(kind),
                     download_name=(
                         f"{slot_dir.name}.{kind}" if dpath and slot_dir
-                        else None))
+                        else None),
+                    immutable=True)
 
         if len(parts) >= 3 and parts[0] == "api" and parts[1] == "sessions":
             sid = parts[2]
@@ -1032,19 +1042,149 @@ class Handler(BaseHTTPRequestHandler):
             start_new_session=True)
 
     # ------------------------------------------------------------- file
-    def _serve_file(self, path, mime: str, download_name=None):
+    # R423A Phase 5: streaming artifact delivery. The OLD handler did a
+    # whole-file read_bytes() into RAM per GET (measured: the package
+    # ZIP peak-RAM == zip bytes, 16.3 MB on the biggest local run — and
+    # every poll re-paid it). The new path streams 256 KB chunks, sends
+    # Content-Length from stat, a REAL ETag (sha256 of the bytes,
+    # computed once per file version and cached by (path,size,mtime)),
+    # honest Cache-Control (immutable for content-stable artifacts,
+    # no-cache + ETag revalidation for the refreshable package), and
+    # single-range Range support for resumable downloads. Artifact
+    # bytes are NEVER modified (read-only streams).
+    _ETAG_CACHE: Dict[str, Tuple[Tuple[int, int], str]] = {}
+
+    def _etag_for(self, path: Path) -> Optional[str]:
+        """The REAL artifact SHA (first 32 hex chars) as the ETag —
+        cached per (size, mtime_ns) so each file version is hashed
+        exactly once. A changed artifact yields a new ETag by
+        construction (never a stale validator)."""
+        try:
+            st = path.stat()
+        except OSError:
+            return None
+        key = (st.st_size, st.st_mtime_ns)
+        cached = self._ETAG_CACHE.get(str(path))
+        if cached and cached[0] == key:
+            return cached[1]
+        import hashlib
+        h = hashlib.sha256()
+        try:
+            with open(path, "rb") as fh:
+                for chunk in iter(lambda: fh.read(1 << 20), b""):
+                    h.update(chunk)
+        except OSError:
+            return None
+        tag = f'"sha256-{h.hexdigest()[:32]}"'
+        self._ETAG_CACHE[str(path)] = (key, tag)
+        return tag
+
+    _CHUNK = 1 << 18  # 256 KB stream chunks
+
+    def _serve_file(self, path, mime: str, download_name=None,
+                    immutable: bool = False):
+        """Stream one file with ETag / conditional-GET / Range support.
+
+        immutable=True  -> Cache-Control: public, max-age=31536000,
+                           immutable (render PNGs/GLBs, STEP/STL,
+                           showcase artifacts — content-stable by
+                           contract; the files are never rewritten)
+        immutable=False -> Cache-Control: no-cache (the package ZIP —
+                           revalidate with the ETag; a refresh produces
+                           a new ETag and the client gets new bytes)
+
+        Bytes on disk are read in chunks and NEVER modified.
+        """
         if not path or not Path(path).exists():
             return self._json(404, {"error": "file not available"})
         p = Path(path)
-        data = p.read_bytes()
-        self.send_response(200)
-        self.send_header("Content-Type", mime)
-        self.send_header("Content-Length", str(len(data)))
+        try:
+            size = p.stat().st_size
+        except OSError:
+            return self._json(404, {"error": "file not available"})
+        etag = self._etag_for(p)
+        cache = ("public, max-age=31536000, immutable" if immutable
+                 else "no-cache")
+        headers = [
+            ("Content-Type", mime),
+            ("Content-Length", str(size)),
+            ("Cache-Control", cache),
+            ("Accept-Ranges", "bytes"),
+        ]
+        if etag:
+            headers.append(("ETag", etag))
         if download_name:
-            self.send_header("Content-Disposition",
-                             f'attachment; filename="{download_name}"')
+            headers.append(("Content-Disposition",
+                            f'attachment; filename="{download_name}"'))
+        if etag and self.headers.get("If-None-Match"):
+            client = self.headers.get("If-None-Match", "").strip()
+            if client == etag or client == f"W/{etag}":
+                self.send_response(304)
+                for k, v in headers:
+                    if k not in ("Content-Type", "Content-Disposition"):
+                        self.send_header(k, v)
+                self.end_headers()
+                return
+
+        # --- single-range request support (resumable downloads) -------
+        range_header = self.headers.get("Range", "") if size else ""
+        start, end = 0, size - 1
+        is_range = False
+        if range_header.startswith("bytes=") and "," not in range_header:
+            spec = range_header[len("bytes="):].strip()
+            if_range = self.headers.get("If-Range", "").strip()
+            range_safe = (not if_range) or (if_range == (etag or ""))
+            if range_safe:
+                try:
+                    s_part, _, e_part = spec.partition("-")
+                    if s_part == "":
+                        # suffix-length: last N bytes
+                        n = int(e_part)
+                        start = max(0, size - n)
+                    else:
+                        start = int(s_part)
+                        end = int(e_part) if e_part else size - 1
+                    if start < 0 or start >= size or end >= size \
+                            or start > end:
+                        raise ValueError
+                    is_range = True
+                except (ValueError, TypeError):
+                    self.send_response(416)
+                    self.send_header("Content-Range",
+                                     f"bytes */{size}")
+                    self.send_header("Content-Length", "0")
+                    self.end_headers()
+                    return
+
+        code = 206 if is_range else 200
+        self.send_response(code)
+        for k, v in headers:
+            if is_range and k == "Content-Length":
+                v = str(end - start + 1)
+            self.send_header(k, v)
+        if is_range:
+            self.send_header("Content-Range",
+                             f"bytes {start}-{end}/{size}")
         self.end_headers()
-        self.wfile.write(data)
+        if self.command == "HEAD":
+            return
+        try:
+            with open(p, "rb") as fh:
+                fh.seek(start)
+                remaining = end - start + 1
+                while remaining > 0:
+                    chunk = fh.read(min(self._CHUNK, remaining))
+                    if not chunk:
+                        break
+                    self.wfile.write(chunk)
+                    remaining -= len(chunk)
+        except (BrokenPipeError, ConnectionResetError):
+            pass  # client went away mid-stream; nothing to fabricate
+
+    def do_HEAD(self):
+        """HEAD support for cacheable artifacts (metadata without the
+        body — lets clients refresh validators without re-downloading)."""
+        self.do_GET()
 
     # R414: run-scoped geometry file resolution (restricted to
     # engineering-geometry extensions — a request for envelope_*.json
@@ -1108,25 +1248,26 @@ class Handler(BaseHTTPRequestHandler):
         if info and info.get("zip") and Path(info["zip"]).exists():
             zp = Path(info["zip"])
         elif run_dir and run_dir.exists():
-            # R418: the bridge technology package — served when the
-            # buyer package was not produced, honestly labeled by its
-            # own name (TECHNOLOGY_PACKAGE_*.zip) and content. A bridge
-            # package is never presented as a buyer release (Art. IV).
-            br_zips = sorted(run_dir.glob("TECHNOLOGY_PACKAGE_*.zip"))
+            # R418: the bridge technology transfer package — served when
+            # the buyer package was not produced, honestly labeled by its
+            # own name and content. R423A Phase 3: BOTH naming generations
+            # resolve (historical TECHNOLOGY_PACKAGE_*.zip runs stay
+            # intact; new runs carry TECHNOLOGY_TRANSFER_PACKAGE_*.zip).
+            # A bridge package is never presented as a buyer release
+            # (Art. IV) — the maturity label inside the ZIP says the tier.
+            br_zips = sorted(
+                list(run_dir.glob("TECHNOLOGY_PACKAGE_*.zip"))
+                + list(run_dir.glob("TECHNOLOGY_TRANSFER_PACKAGE_*.zip")))
             if br_zips:
                 zp = br_zips[0]
         if zp is None:
             return self._json(404, {"error": "no package produced on "
                                     "this run (no buyer release and no "
-                                    "bridge technology package)"})
-        data = zp.read_bytes()
-        self.send_response(200)
-        self.send_header("Content-Type", "application/zip")
-        self.send_header("Content-Disposition",
-                         f'attachment; filename="{zp.name}"')
-        self.send_header("Content-Length", str(len(data)))
-        self.end_headers()
-        self.wfile.write(data)
+                                    "bridge technology transfer package)"})
+        # R423A Phase 5: streamed, ETag-revalidated (the ZIP may be
+        # legitimately refreshed by a later bridge pass — a fresh ETag
+        # delivers fresh bytes; an unchanged one saves the transfer).
+        return self._serve_file(zp, "application/zip")
 
     # ---------------------------------------------------------------- share
     def _share_payload(self, share_id: str):

@@ -1,25 +1,37 @@
-"""Technology package assembler — handoff sections 15, 16, 33.
+"""The ELITE technology transfer package factory — R424.
 
-Assembles the buyer-facing TECHNOLOGY PACKAGE from one canonical source (the
-run state + CIO + bridge artifacts):
+One technology -> one canonical invention state -> ONE ELITE
+TECHNOLOGY TRANSFER PACKAGE (R423A named the single artifact;
+R424 gives it the elite class). Everything is DERIVED from the
+canonical run state by THIS factory — no hand-authored enrichment,
+no operator assembly, no separate bridge/counsel packaging:
 
     TECHNOLOGY_PACKAGE/
-    ├── 00_PACKAGE_README.pdf
-    ├── 01_TECHNICAL_ESSAY.pdf
-    ├── 02_ENGINEERING_DEFINITION.json
-    ├── 03_EVIDENCE_SUMMARY.json
-    ├── 04_DECISIVE_EXPERIMENT.json
-    ├── MODEL/
-    │   ├── <invention>.glb
-    │   ├── DESIGN_STATUS_3D.json
-    │   ├── KEY_DIMENSIONS.json
-    │   ├── [STEP/STL + GEOMETRY_VALIDATION — ENGINEERING_3D only]
-    │   └── CONCEPTUAL_3D_DISCLAIMER.json [conceptual only]
-    ├── MANIFEST.json            (sha256 per file — release integrity)
-    └── PROVENANCE.json          (chain from run envelope hash to package)
+    ├── 00_PACKAGE_README.pdf                        plain orientation
+    ├── 01_EXECUTIVE_TECHNOLOGY_BRIEF.pdf             one-page executive
+    ├── 02_ENGINEERING_TECHNOLOGY_TRANSFER_DOSSIER.pdf  technical core
+    ├── 03_BUYER_DECISION_CARD.pdf                   nine questions
+    ├── 04_EVIDENCE_SUMMARY.pdf                      evidence by role
+    ├── 05_TRANSFER_MANIFEST.pdf                     what transfers
+    ├── PACKAGE_MANIFEST.json                        (sha256 per file)
+    ├── ENGINEERING_TRACEABILITY.json                DI->DO->FM->VF graph
+    ├── MATURITY_BASIS.json                          evidence-derived tier
+    ├── COMMERCIAL_EVIDENCE.json                     Art. LXVI discipline
+    ├── EQUATION_REGISTRY.json / NOT_APPLICABLE      real bindings
+    ├── UNKNOWN_ROADMAP.json                         actionable unknowns
+    ├── VALIDATION_ECONOMICS.json                    no invented dollars
+    ├── LOOP_STATE.json                              Art. XXXVII state
+    ├── PROVENANCE.json                              REAL engine commit
+    ├── 05_TECHNICAL_EVALUATION.json (machine layer)
+    ├── 02_ENGINEERING_DEFINITION.json (machine layer, REAL derivation)
+    ├── 03_EVIDENCE_STRUCTURE.json + 04_DECISIVE_EXPERIMENT.json
+    └── MODEL/  parametric source + parameters + manifest + status
+        + lineage + provenance + validation + 3D_EVIDENCE/ when earned
 
-The IP counsel export is a SEPARATE package type (already exposed by the engine
-at /api/run/{id}/counsel-package); this assembler never embeds legal judgments.
+The weak-package failure baseline (empty engineering definition,
+empty decisive experiment, unknown engine commit, thin evidence,
+no buyer architecture) is closed HERE — by the factory, never by
+hand enrichment.
 """
 
 from __future__ import annotations
@@ -28,10 +40,14 @@ import hashlib
 import io
 import json
 import os
+import time
 import zipfile
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 from . import epistemics as ep
+from . import elite_package as _elite
+from . import elite_documents as _edocs
+from . import elite_model_layer as _emodel
 from .essay import build_essay
 
 INK = (0.16, 0.13, 0.10)          # warm near-black
@@ -121,6 +137,7 @@ def _sha256_file(path: str) -> str:
 # Package assembly
 # ---------------------------------------------------------------------------
 
+
 def assemble(
     run_result: Dict[str, Any],
     cio: Optional[Dict[str, Any]],
@@ -128,11 +145,17 @@ def assemble(
     out_dir: str,
     visualizability: Optional[Dict[str, Any]] = None,
     zip_name: Optional[str] = None,
+    engine_identity: Optional[Tuple[Optional[str], str]] = None,
 ) -> Dict[str, Any]:
-    """Assemble the buyer-facing technology package ZIP from one canonical source.
+    """Assemble the ELITE technology transfer package from one canonical
+    source (run state + CIO + bridge geometry). R424: every layer is
+    derived here — the weak-package gaps are closed by this factory.
 
     geometry_out is the bridge's geometry result (glb bytes/path, class,
-    key_dimensions, components, validation...).
+    key_dimensions, components, validation, parametric_source...).
+    engine_identity: (commit, source) from the caller's artifact
+    identity resolution (the hosted engine's authority); when absent
+    the factory resolves it honestly (never "unknown" while available).
     """
     os.makedirs(out_dir, exist_ok=True)
     run_id = run_result.get("session_id") or run_result.get("run_id") or "run"
@@ -148,127 +171,107 @@ def assemble(
     visualizability = visualizability or {}
     vis_class = geometry_out.get("visualizability_class") or visualizability.get(
         "visualizability_class") or ep.CONCEPTUAL_3D
-
     is_engineering = vis_class == ep.ENGINEERING_3D
-    package_maturity = (
-        ep.PACKAGE_MATURITY_ENGINEERING if is_engineering
-        else ep.PACKAGE_MATURITY_EARLY
-    )
 
-    # ---- canonical artifacts ------------------------------------------------
+    # ---- the canonical engineering projection (R424 §4/§6) ---------------
+    proj = _elite.derive_engineering_projection(run_result, geometry_out)
+    proj["decisive_selected"] = (run_result.get("decisive_experiment")
+                                 or {}).get("selected")
+    package_maturity = _elite.build_maturity(proj, is_engineering)
+
+    # ---- canonical narrative (one source: run state + CIO) ----------------
     essay = build_essay(run_result, cio, visualizability)
 
-    title = "Technology package — Toscanini invention"
+    title = "Technology transfer package — Toscanini invention"
     problem = run_result.get("user_text") or run_result.get("title") or "the recorded problem"
     subtitle = (f"{invention_label} · run {run_id} · maturity {package_maturity} · "
                 f"3D class {vis_class}")
 
-    readme_essay = {
-        "section_order": ["what_toscanini_invented"],
-        "titles": {"what_toscanini_invented": "What is in this package"},
-        "sections": {
-            "what_toscanini_invented": (
-                f"This package lets a company evaluate a Toscanini invention against the "
-                f"recorded problem: \u201c{problem}\u201d. "
-                "01 is the technical essay (the human document). 02 is the engineering "
-                "definition (parameters, envelopes, assumptions, failure modes). 03 is the "
-                "honest evidence summary. 04 is the decisive experiment — the first thing "
-                "to fund. MODEL/ contains the inspectable 3D representation: "
-                + ("engineering parametric CAD with STEP/STL and measured geometry."
-                   if is_engineering else
-                   "a conceptual architecture visualization — topology and interaction "
-                   "only, with NO engineering dimensions (CONCEPTUAL_3D != ENGINEERING_3D).")
-                + " MANIFEST.json hashes every file; PROVENANCE.json traces the chain from "
-                "the run's sealed envelope to this package."
-            ),
-        },
+    # ---- the six elite documents (R424 §3) ---------------------------------
+    docs = {
+        "00_PACKAGE_README.pdf": _edocs.build_readme(
+            proj, run_result, invention_label, package_maturity,
+            is_engineering, vis_class),
+        "01_EXECUTIVE_TECHNOLOGY_BRIEF.pdf": _edocs.build_executive_brief(
+            proj, run_result, package_maturity),
+        "02_ENGINEERING_TECHNOLOGY_TRANSFER_DOSSIER.pdf":
+            _edocs.build_dossier(
+                proj, run_result, essay, package_maturity, geometry_out,
+                is_engineering),
+        "03_BUYER_DECISION_CARD.pdf": _edocs.build_decision_card(
+            proj, run_result, package_maturity),
+        "04_EVIDENCE_SUMMARY.pdf": _edocs.build_evidence_summary(
+            proj, run_result),
+        "05_TRANSFER_MANIFEST.pdf": _edocs.build_transfer_manifest(
+            proj, run_result, invention_label, package_maturity,
+            is_engineering, vis_class),
     }
-    readme_pdf = _pdf("Toscanini technology package", subtitle, readme_essay)
+    for fname, doc in docs.items():
+        pdf_bytes = _pdf(title if fname.startswith("02") else
+                         "Toscanini " + fname[:-4].replace("_", " ").lower(),
+                         subtitle, doc)
+        with open(os.path.join(out_dir, fname), "wb") as f:
+            f.write(pdf_bytes)
 
-    essay_pdf = _pdf(title, subtitle, essay)
-
-    engineering_definition = {
-        "artifact": "ENGINEERING_DEFINITION",
-        "run_id": run_id,
-        "engineering_specification": run_result.get("engineering_specification") or {},
-        "bridge_parameters": geometry_out.get("parameters") or [],
-        "status": "ENGINEERING_PROPOSED (parameters UNKNOWN unless marked MODELLED/SOURCE_FACT)",
+    # ---- the machine-readable elite layers (R424 §2) -----------------------
+    machine = {
+        "ENGINEERING_TRACEABILITY.json": _elite.build_traceability(
+            proj, invention_label),
+        "MATURITY_BASIS.json": _elite.build_maturity_basis(
+            proj, invention_label, package_maturity),
+        "EQUATION_REGISTRY.json": _elite.build_equation_registry(
+            proj, invention_label),
+        "UNKNOWN_ROADMAP.json": _elite.build_unknown_roadmap(
+            proj, invention_label),
+        "VALIDATION_ECONOMICS.json": _elite.build_validation_economics(
+            proj, invention_label,
+            run_result.get("decisive_experiment")),
+        "LOOP_STATE.json": _elite.build_loop_state(proj, invention_label),
+        "COMMERCIAL_EVIDENCE.json": _elite.build_commercial_evidence(
+            proj, invention_label, run_result),
     }
+    for fname, layer in machine.items():
+        with open(os.path.join(out_dir, fname), "w") as f:
+            json.dump(layer, f, indent=2, ensure_ascii=False)
 
-    evidence_summary = {
-        "artifact": "EVIDENCE_SUMMARY",
-        "run_id": run_id,
-        "evidence_pack": run_result.get("evidence_pack") or {},
-        "final_state_evidence": (run_result.get("final_state") or {}).get(
-            "evidence_classification_counts"),
-        "honesty": ("claims trace to recorded evidence spans; unknowns are recorded, "
-                    "never suppressed"),
-    }
+    # ---- 02 machine layer: the REAL engineering definition (R424 §4) ------
+    engineering_definition = _engineering_definition(
+        proj, run_id, geometry_out, is_engineering)
+    with open(os.path.join(out_dir, "02_ENGINEERING_DEFINITION.json"), "w") as f:
+        json.dump(engineering_definition, f, indent=2, ensure_ascii=False)
 
-    decisive = run_result.get("decisive_experiment") or {}
-    decisive_experiment = {
-        "artifact": "DECISIVE_EXPERIMENT",
-        "run_id": run_id,
-        **decisive,
-    }
+    # ---- 03/04 machine layers -----------------------------------------------
+    evidence_summary = _evidence_structure(proj, run_id, run_result)
+    with open(os.path.join(out_dir, "03_EVIDENCE_SUMMARY.json"), "w") as f:
+        json.dump(evidence_summary, f, indent=2, ensure_ascii=False)
+    decisive_experiment = _decisive_experiment_layer(
+        proj, run_id, run_result)
+    with open(os.path.join(out_dir, "04_DECISIVE_EXPERIMENT.json"), "w") as f:
+        json.dump(decisive_experiment, f, indent=2, ensure_ascii=False)
 
+    # ---- 05 machine layer: the technical evaluation -------------------------
+    technical_evaluation = _technical_evaluation(
+        proj, run_id, package_maturity, vis_class, geometry_out,
+        is_engineering, run_result)
+    with open(os.path.join(out_dir, "05_TECHNICAL_EVALUATION.json"), "w") as f:
+        json.dump(technical_evaluation, f, indent=2, ensure_ascii=False)
+
+    # ---- MODEL/ elite layer (R424 §9) ---------------------------------------
     model_dir = os.path.join(out_dir, "MODEL")
     os.makedirs(model_dir, exist_ok=True)
-
     glb_path = os.path.join(model_dir, f"{invention_label}.glb")
     with open(glb_path, "wb") as f:
         f.write(geometry_out["glb_bytes"])
-
-    design_status = {
-        "artifact": "3D_DESIGN_STATUS",
-        "package_id": invention_label,
-        "visualizability_class": vis_class,
-        "3d_design_status": "PRESENT_CONCEPTUAL" if not is_engineering else "PRESENT_AND_VALIDATED",
-        "status_meaning": ep.VISUALIZABILITY_MEANINGS[vis_class],
-        "classification_basis": visualizability.get("classification_basis"),
-        "cad_pipeline_status": geometry_out.get("cad_pipeline_status"),
-        "components": geometry_out.get("components") or [],
-        "key_dimensions": geometry_out.get("key_dimensions") or {},
-    }
-    ep.guard_no_engineering_dimensions(vis_class, design_status["key_dimensions"])
-
-    with open(os.path.join(model_dir, "DESIGN_STATUS_3D.json"), "w") as f:
-        json.dump(design_status, f, indent=2)
-    with open(os.path.join(model_dir, "KEY_DIMENSIONS.json"), "w") as f:
-        json.dump(geometry_out.get("key_dimensions") or {}, f, indent=2)
-
+    model_layer = _emodel.build_model_layer(
+        out_dir, run_result, geometry_out, vis_class, invention_label,
+        generation_models=geometry_out.get("generation_models"),
+        renders=geometry_out.get("renders"))
     if not is_engineering:
-        with open(os.path.join(model_dir, "CONCEPTUAL_3D_DISCLAIMER.json"), "w") as f:
+        with open(os.path.join(model_dir, "CONCEPTUAL_3D_DISCLAIMER.json"),
+                  "w") as f:
             json.dump(ep.conceptual_disclaimer(vis_class), f, indent=2)
-    else:
-        # engineering artifacts: STEP + STL (+ validation report)
-        for key in ("step_files", "stl_files"):
-            for p in geometry_out.get(key) or []:
-                if p and os.path.exists(p):
-                    dest = os.path.join(model_dir, os.path.basename(p))
-                    with open(p, "rb") as src, open(dest, "wb") as dst:
-                        dst.write(src.read())
-        for key in ("step_path", "stl_path"):  # legacy singular keys
-            p = geometry_out.get(key)
-            if p and os.path.exists(p) and not any(
-                    os.path.basename(x) == os.path.basename(p)
-                    for x in (geometry_out.get("step_files") or []) +
-                             (geometry_out.get("stl_files") or [])):
-                dest = os.path.join(model_dir, os.path.basename(p))
-                with open(p, "rb") as src, open(dest, "wb") as dst:
-                    dst.write(src.read())
-        validation = geometry_out.get("validation")
-        if validation:
-            with open(os.path.join(model_dir, "GEOMETRY_VALIDATION_REPORT.json"), "w") as f:
-                json.dump(validation, f, indent=2)
 
-    # ---- render artifacts (R419 sections 5-6: every invention gets
-    # hero/section/exploded PNG + GLB when the pinned Blender build ran) ----
-    # Copied from the run's MODEL/3D/ directory (the render stage's
-    # output) into the package — the website and the download ZIP carry
-    # the SAME canonical files (operator section 17: one canonical
-    # object, no divergence). Presentation artifacts, honestly labeled:
-    # the render record + conceptual disclaimers ride along.
+    # ---- render artifacts (R419 §5-6, presentation-only) --------------------
     renders = geometry_out.get("renders") or {}
     render_dir = os.path.join(model_dir, "3D")
     render_artifacts: list = []
@@ -284,7 +287,6 @@ def assemble(
                             open(os.path.join(render_dir, name), "wb") as d:
                         d.write(s.read())
                     render_artifacts.append(f"MODEL/3D/{name}")
-            # every copied artifact carries its presentation boundary
             presentation_note = {
                 "artifact": "RENDER_ARTIFACT_DISCLOSURE",
                 "rule": ("hero/section/exploded are PRESENTATION renders "
@@ -301,44 +303,53 @@ def assemble(
                 json.dump(presentation_note, f, indent=2)
             render_artifacts.append("MODEL/3D/RENDER_DISCLOSURE.json")
 
-    # ---- top-level files -----------------------------------------------------
-    with open(os.path.join(out_dir, "02_ENGINEERING_DEFINITION.json"), "w") as f:
-        json.dump(engineering_definition, f, indent=2)
-    with open(os.path.join(out_dir, "03_EVIDENCE_SUMMARY.json"), "w") as f:
-        json.dump(evidence_summary, f, indent=2)
-    with open(os.path.join(out_dir, "04_DECISIVE_EXPERIMENT.json"), "w") as f:
-        json.dump(decisive_experiment, f, indent=2)
-    with open(os.path.join(out_dir, "00_PACKAGE_README.pdf"), "wb") as f:
-        f.write(readme_pdf)
-    with open(os.path.join(out_dir, "01_TECHNICAL_ESSAY.pdf"), "wb") as f:
-        f.write(essay_pdf)
-
-    # ---- provenance ------------------------------------------------------------
+    # ---- provenance (R424 §11: REAL engine identity, never lazy unknown) ---
     fs = run_result.get("final_state") or {}
+    engine_commit, engine_commit_source = _elite.resolve_engine_commit(
+        run_result, engine_identity)
     provenance = {
         "artifact": "PACKAGE_PROVENANCE",
         "run_id": run_id,
-        "engine_commit": fs.get("code_commit"),
+        "engine_commit": engine_commit,
+        "engine_commit_source": engine_commit_source,
+        "package_version": "R424_ELITE.1.0.0",
+        "generated_at_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ",
+                                          time.gmtime()),
         "final_envelope_hash": fs.get("final_envelope_hash"),
         "invention_spec_hash": (run_result.get("invention_specification") or {}).get("_spec_hash"),
+        "canonical_invention_state_identity": {
+            "invention_spec_hash": (run_result.get(
+                "invention_specification") or {}).get("_spec_hash"),
+            "final_envelope_hash": fs.get("final_envelope_hash"),
+            "invention_id": invention_label,
+            "run_id": run_id,
+        },
         "glb_sha256": geometry_out.get("glb_sha256"),
+        "model_layer_files": model_layer.get("files"),
         "render_pipeline": (geometry_out.get("renders") or {}).get("render_pipeline"),
         "render_status": (geometry_out.get("renders") or {}).get("status"),
         "render_pinned_blender": (geometry_out.get("renders") or {}).get("pinned_blender"),
         "render_source_glb_sha256": (geometry_out.get("renders") or {}).get("source_glb_sha256"),
+        "derivation_relationships": (
+            "documents + machine layers derive from the canonical run "
+            "state (engineering_specification, invention_specification, "
+            "final_state, evidence_pack) and the bridge geometry_out; "
+            "MODEL/3D_EVIDENCE derives from re-executing the shipped "
+            "parametric source; every file hash is in PACKAGE_MANIFEST"),
         "essay_from": "one canonical source: run state + CIO",
         "package_maturity": package_maturity,
         "counsel_boundary": ep.COUNSEL_LANGUAGE,
-        "generated_by": "toscanini_bridge (canonical invention-to-3D-to-package path)",
+        "generated_by": ("toscanini_bridge elite package factory "
+                         "(R424; canonical invention-to-package path)"),
     }
     with open(os.path.join(out_dir, "PROVENANCE.json"), "w") as f:
-        json.dump(provenance, f, indent=2)
+        json.dump(provenance, f, indent=2, ensure_ascii=False)
 
     # ---- manifest (hash every file) --------------------------------------------
     manifest_files = []
     for root, _, files in os.walk(out_dir):
         for fn in sorted(files):
-            if fn in ("MANIFEST.json",):
+            if fn in ("PACKAGE_MANIFEST.json",):
                 continue
             path = os.path.join(root, fn)
             rel = os.path.relpath(path, out_dir)
@@ -357,13 +368,14 @@ def assemble(
         "visualizability_class": vis_class,
         "integrity_rule": "every file is sha256-hashed; verify after transfer",
     }
-    with open(os.path.join(out_dir, "MANIFEST.json"), "w") as f:
+    # R424 §2: the elite manifest name
+    with open(os.path.join(out_dir, "PACKAGE_MANIFEST.json"), "w") as f:
         json.dump(manifest, f, indent=2)
 
-    # ---- zip -------------------------------------------------------------------
+    # ---- zip (R423A: ONE canonical customer artifact) -------------------------
     zip_path = os.path.join(
         os.path.dirname(out_dir.rstrip("/")) or ".",
-        zip_name or f"TECHNOLOGY_PACKAGE_{invention_label}.zip",
+        zip_name or f"TECHNOLOGY_TRANSFER_PACKAGE_{invention_label}.zip",
     )
     with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zf:
         for root, _, files in os.walk(out_dir):
@@ -386,4 +398,226 @@ def assemble(
         "zip_sha256": _sha256_file(zip_path),
         "zip_bytes": os.path.getsize(zip_path),
         "invention_label": invention_label,
+        "engine_commit": engine_commit,
+        "package_version": provenance["package_version"],
+    }
+
+
+# ---------------------------------------------------------------------------
+# Machine-layer derivations (R424 §2/§4)
+# ---------------------------------------------------------------------------
+
+def _engineering_definition(proj: Dict, run_id: str,
+                            geometry_out: Dict,
+                            is_engineering: bool) -> Dict:
+    """R424 §4 — the REAL engineering definition: derived design inputs,
+    outputs, constraints, parameters, subsystem architecture, failure
+    modes, verification items, build steps, equations, technical
+    evaluation, experiment requirements. Every quantity keeps its
+    epistemic class; missing fields stay UNKNOWN (never plausible AI
+    text)."""
+    return {
+        "artifact": "ENGINEERING_DEFINITION",
+        "run_id": run_id,
+        "status": "ENGINEERING_PROPOSED (parameters UNKNOWN unless marked "
+                  "MODELLED/SOURCE_FACT)",
+        "design_inputs": proj["design_inputs"],
+        "design_outputs": proj["design_outputs"],
+        "constraints": proj["constraints"],
+        "parameters": proj["critical_parameters"],
+        "subsystem_architecture": proj["subsystems"],
+        "failure_modes": proj["failure_modes"],
+        "verification_items": proj["verification"],
+        "build_steps": proj["build_plan"],
+        "governing_equations": proj["equations"],
+        "experiment_requirements": _experiment_requirements(proj),
+        "technical_evaluation": "see 05_TECHNICAL_EVALUATION.json",
+        "bridge_parameters": geometry_out.get("parameters") or [],
+        "build_path": {
+            "geometry_sources": (
+                ["MODEL/" + os.path.basename(p)
+                 for p in (geometry_out.get("step_files") or [])]
+                + ["MODEL/" + os.path.basename(p)
+                   for p in (geometry_out.get("stl_files") or [])]
+                + (["MODEL/PARAMETRIC_MODEL_SOURCE.py"]
+                   if is_engineering else [])
+                or ["MODEL/ (conceptual architecture — no engineering "
+                    "geometry to build from)"]),
+            "cad_authority": "CadQuery/OCCT (STEP is the engineering "
+                             "exchange format; STL is the print format; "
+                             "GLB is the inspectable visualization)",
+            "parameters": "MODEL/PARAMETERS.json — every value carries "
+                          "its provenance class; unmarked values are "
+                          "UNKNOWN, never assumed",
+            "not_yet_defined": (
+                "manufacturing tolerances, material selection, and "
+                "process qualification are NOT established by this "
+                "package — they are the recipient's engineering work, "
+                "starting from the recorded geometry and parameters"),
+        },
+        "epistemic_discipline": (
+            "every quantity retains its recorded class (SOURCE_FACT / "
+            "MODELLED / UNKNOWN / COMPUTATIONAL_RESULT / "
+            "EXTERNAL_PRECEDENT); no field is filled with plausible "
+            "AI text (R424 §4)"),
+    }
+
+
+def _experiment_requirements(proj: Dict) -> List[Dict]:
+    reqs = []
+    for v in (proj.get("verification") or [])[:8]:
+        reqs.append({
+            "requirement_id": v.get("id"),
+            "requirement": (v.get("requirement") or "")[:300],
+            "result": v.get("result", "UNKNOWN"),
+            "acceptance": (v.get("acceptance") or
+                           "UNKNOWN — pre-register before the test"),
+        })
+    if not reqs:
+        return [{"requirement_id": None,
+                 "requirement": "UNKNOWN (no verification items recorded)",
+                 "result": "UNKNOWN",
+                 "acceptance": "UNKNOWN"}]
+    return reqs
+
+
+def _evidence_structure(proj: Dict, run_id: str,
+                        run_result: Dict) -> Dict:
+    """R424 §3 (04) — evidence by role with exact provenance."""
+    fs = run_result.get("final_state") or {}
+    counts = fs.get("evidence_classification_counts") or {}
+    retrieval = (run_result.get("evidence_pack") or {}).get(
+        "retrieval") or []
+    return {
+        "artifact": "EVIDENCE_STRUCTURE",
+        "run_id": run_id,
+        "roles": [
+            {"role": "DIRECT_SUPPORT",
+             "count": counts.get("DIRECT_SUPPORT", 0),
+             "meaning": "spans that state the claimed proposition"},
+            {"role": "PARTIAL_SUPPORT",
+             "count": counts.get("PARTIAL_SUPPORT", 0),
+             "meaning": "spans that support part of the claim"},
+            {"role": "BACKGROUND", "count": counts.get("BACKGROUND", 0),
+             "meaning": "contextual, not claim-bearing"},
+            {"role": "ANALOGY", "count": counts.get("ANALOGY", 0),
+             "meaning": "adjacent-domain transfer, weaker class"},
+            {"role": "CONTRADICTION",
+             "count": counts.get("CONTRADICTORY", 0),
+             "meaning": "spans that contradict the claim"},
+            {"role": "UNAVAILABLE_SOURCES",
+             "count": sum(1 for r in retrieval
+                          if isinstance(r, dict) and r.get("error")),
+             "meaning": "retrieval failures — absence is never evidence "
+                        "(Art. XXI.3)"},
+        ],
+        "provenance": ("counts derive from the run's own "
+                       "final_state.evidence_classification_counts; "
+                       "per-span custody chains live in the run record"),
+        "coverage_limitations": (
+            f"{sum(1 for r in retrieval if isinstance(r, dict) and r.get('error'))} "
+            "retrieval failure(s) recorded; unknown records stay "
+            "UNKNOWN (Art. XXV)"),
+        "evidence_pack": run_result.get("evidence_pack") or {},
+    }
+
+
+def _decisive_experiment_layer(proj: Dict, run_id: str,
+                               run_result: Dict) -> Dict:
+    """R424 — the decisive experiment as recorded, PLUS the honest
+    derivation when the loop recorded none: the invention's own killer
+    experiment and the falsification contract fields (never invented
+    values)."""
+    recorded = dict(run_result.get("decisive_experiment") or {})
+    ke = proj.get("killer_experiment") or {}
+    layer = {
+        "artifact": "DECISIVE_EXPERIMENT",
+        "run_id": run_id,
+        **{k: v for k, v in recorded.items() if k != "artifact"},
+    }
+    if not (recorded.get("selected") or recorded.get("shortlist")):
+        # R424: derive the honest fallback — the invention's own killer
+        # experiment record (never fabricated values)
+        layer["derived_from_invention_record"] = {
+            "selected": ke.get("selected"),
+            "definition": ke.get("definition"),
+            "eig": ke.get("eig"),
+            "hypotheses": [
+                {"name": h.get("name"),
+                 "description": h.get("description"),
+                 "prior_probability": h.get("prior_probability"),
+                 "provenance_class": ((h.get("provenance") or {}).get(
+                     "epistemic_class"))}
+                for h in (ke.get("hypotheses") or [])
+                if isinstance(h, dict)][:6],
+            "verification_requirement": _first_verification(proj),
+            "status": ("DERIVED_FROM_KILLER_EXPERIMENT_RECORD"
+                       if ke else "NOT_RECORDED"),
+            "note": ("the loop's experiment selector recorded no "
+                     "shortlist; this layer carries the invention's own "
+                     "recorded killer-experiment contract — no values "
+                     "are invented"),
+        }
+    return layer
+
+
+def _first_verification(proj: Dict) -> Optional[Dict]:
+    for v in (proj.get("verification") or [])[:1]:
+        return {"requirement": (v.get("requirement") or "")[:300],
+                "acceptance": (v.get("acceptance") or
+                               "UNKNOWN — pre-register before the test"),
+                "result": v.get("result")}
+    return None
+
+
+def _technical_evaluation(proj: Dict, run_id: str, maturity: str,
+                          vis_class: str, geometry_out: Dict,
+                          is_engineering: bool,
+                          run_result: Dict) -> Dict:
+    """R423A Phase 3 layer, now with the R424 maturity basis inline."""
+    return {
+        "artifact": "TECHNICAL_EVALUATION",
+        "run_id": run_id,
+        "package_maturity": maturity,
+        "maturity_meaning": ep.PACKAGE_MATURITY_MEANINGS.get(
+            maturity, maturity),
+        "maturity_basis": "see MATURITY_BASIS.json (evidence-derived)",
+        "visualizability_class": vis_class,
+        "visualizability_meaning": ep.VISUALIZABILITY_MEANINGS.get(
+            vis_class, vis_class),
+        "geometry_validation": geometry_out.get("validation") or {
+            "status": "NOT_APPLICABLE_CONCEPTUAL"},
+        "cad_pipeline_status": geometry_out.get("cad_pipeline_status"),
+        "render_status": (geometry_out.get("renders") or {}).get("status"),
+        "simulation": {
+            "executed": bool((run_result.get("final_state") or {}).get(
+                "simulation_executed")),
+            "class": "COMPUTATIONAL_RESULT at most — never a physical "
+                     "observation (Art. XXXVIII)",
+        },
+        "physical_validation": {
+            "status": "NOT_PERFORMED",
+            "meaning": "nothing in this package was measured in reality; "
+                       "EXPERIMENTALLY VERIFIED is not claimed anywhere",
+        },
+        "what_is_earned": [
+            "the invention architecture survived the recorded "
+            "adversarial challenge and adjudication stages",
+            "the 3D representation exists with the class recorded "
+            "above" + (" and passed deterministic geometry gates"
+                       if is_engineering else
+                       " (conceptual topology — engineering CAD is "
+                       "unearned)"),
+            "every claim in this package traces to the run's recorded "
+            "evidence spans (PROVENANCE.json + PACKAGE_MANIFEST.json)",
+        ],
+        "what_is_proposed_not_earned": [
+            "parameter values without a SOURCE_FACT/MODELLED class are "
+            "UNKNOWN",
+            "no physical experiment has been run (see the decisive "
+            "experiment section for the cheapest one)",
+            "buyer-release quality gates were not applied to this "
+            "package (the release chain is a separate authority)",
+        ],
+        "reviewer_provenance": "AI_REVIEW",
     }

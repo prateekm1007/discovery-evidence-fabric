@@ -159,6 +159,7 @@ export interface PackageInfo {
   // hardcoded.
   document_count?: number | null;
   package_kind?: string | null;
+  package_origin?: string | null;
 }
 
 export interface ShowcaseRow {
@@ -603,10 +604,9 @@ export interface CIO {
     package_zip?: string | null;
     package_maturity?: string | null;
     package_kind?: string | null;
+    package_origin?: string | null;
     package_kind_note?: string;
     document_count?: number | null;
-    counsel_package?: string;
-    note?: string;
   };
   experiment?: { decisive_experiment?: unknown; status?: string };
   language_guard?: { clean?: boolean; violations?: string[] };

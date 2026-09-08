@@ -1,5 +1,14 @@
 """toscanini/bridge_gate.py — R418: the automatic artifact contract.
 
+R423A Phase 2 (2026-09-08): the gate OWNS the render REQUEST and its
+state, and NEVER runs Blender inline. DISCOVERY COMPLETE does not mean
+PRESENTATION RENDER COMPLETE: the gate records the render request
+(RENDER_REQUESTED / ALREADY_PRESENT) and hands execution to the async
+artifact job, which waits for the run worker to exit and then renders
+under the quality ladder. The run's terminal state no longer waits for
+premium rendering (measured before: the in-worker render budget was up
+to 300 s inside phase 3.5, BEFORE terminal COMPLETE).
+
 Operator P0 product correction (2026-09-07), sections 2-5:
 
     When a run ends with an invention, the product surface must never
@@ -30,6 +39,9 @@ Invocation contract:
     automatically after every engine run — no operator script, no
     copied JSON, no post-run manual processing. Idempotent: a run
     whose BRIDGE_REPORT.json exists is never re-bridged (resume-safe).
+    The render stage is REQUESTED here and EXECUTED by the async
+    artifact job (toscanini/artifact_worker.py) — the gate never
+    blocks on a Blender subprocess.
 
 Constitutional contract:
     - The run directory's artifacts remain the AUTHORITY (Art. X);
@@ -70,26 +82,50 @@ def _renders_present(run_dir: Path) -> bool:
         for n in _RENDER_ARTIFACTS)
 
 
-def _ensure_renders(run_dir: Path,
+def _request_renders(session_id: str, run_dir: Path,
                      cio_obj: Optional[Dict] = None) -> Optional[Dict[str, Any]]:
-    """Run the Blender render stage over an EXISTING authoritative GLB
-    (R419 sections 5-6: every invention gets the six presentation
-    artifacts when the pinned build is available — including runs whose
-    geometry predates R419). Typed honest record; never raises."""
+    """R423A Phase 2 — the render REQUEST the gate owns. The Blender
+    EXECUTION belongs to the async artifact job (it waits for the run
+    worker to exit, acquires the run lock, walks the quality ladder).
+    The gate records a typed request state; it NEVER launches Blender.
+
+    Returns the typed record (RENDER_REQUESTED with the job identity,
+    ALREADY_PRESENT, or RENDER_REQUEST_FAILED — never an exception).
+    """
     if _renders_present(run_dir):
-        return None  # already rendered — idempotent
-    # honest class label: read it from the CIO when present (never a
-    # guessed engineering label)
-    geo = (cio_obj or {}).get("geometry") or {}
-    vis_class = geo.get("visualizability_class") or geo.get("class")
+        return {"stage": "RENDER", "status": "ALREADY_PRESENT",
+                "note": "presentation artifacts already on disk — "
+                        "nothing requested (idempotent)"}
+    if not _has_model(run_dir):
+        return None  # nothing renderable — no request is fabricated
     try:
-        from discovery_fabric.engine.invention_bridge import render
-        return render.render_invention(
-            str(run_dir), {"generation_models": None},
-            is_conceptual=vis_class != "ENGINEERING_3D")
+        from toscanini import artifact_worker
+        record = artifact_worker.enqueue(
+            session_id, enqueued_by="bridge_gate")
+        return {
+            "stage": "RENDER",
+            "status": "RENDER_REQUESTED",
+            "job": {
+                "status": record.get("status"),
+                "enqueued_at": record.get("enqueued_at"),
+                "worker_pid": record.get("worker_pid"),
+                "readback": record.get("readback"),
+            },
+            "execution": "async artifact job (waits for the run worker "
+                         "to exit, then renders through the quality "
+                         "ladder; poll the CIO visualization.renders)",
+            "note": ("DISCOVERY COMPLETE does not mean PRESENTATION "
+                     "RENDER COMPLETE — the render runs asynchronously "
+                     "after the run's terminal state"),
+        }
     except Exception as exc:  # noqa: BLE001 — typed, never silent
-        return {"stage": "RENDER", "status": "RENDER_FAILED",
-                "error": f"{type(exc).__name__}: {exc}"}
+        return {"stage": "RENDER", "status": "RENDER_REQUEST_FAILED",
+                "error": f"{type(exc).__name__}: {exc}",
+                "note": ("the async render job could not be requested — "
+                         "the run record and package are unaffected "
+                         "(Art. LXI: presentation failure is never a "
+                         "run failure); the boot render recovery sweep "
+                         "re-attempts at next boot")}
 
 
 def _now() -> str:
@@ -174,25 +210,38 @@ def ensure_artifacts(session_id: str) -> Dict[str, Any]:
         bridge as run_bridge)
     from discovery_fabric.engine.invention_bridge import epistemics as ep
 
+    # R424 §11: the REAL engine identity for every package this gate
+    # builds — resolved from the baked artifact identity (the hosted
+    # authority, R396 A) and threaded into the factory. A package may
+    # never carry a lazy "unknown" while the identity is available.
+    engine_identity = None
+    try:
+        from toscanini import artifact_identity as _aid
+        engine_identity = _aid.resolve_engine_commit()
+    except Exception:  # noqa: BLE001 — factory has honest fallbacks
+        engine_identity = None
+
     if already_has_model:
         # Case A: geometry exists (cad_pipeline engineering models or a
         # package GLB). If a package also exists, the R418 contract is
-        # satisfied — but the R419 RENDER contract still applies: run
-        # the Blender stage over the existing model when the six
-        # presentation artifacts are missing (operator sections 5-6).
+        # satisfied — the R419 RENDER contract is satisfied by REQUEST:
+        # missing presentation artifacts are requested from the async
+        # job (R423A Phase 2: the gate never runs Blender inline).
         buyer_zip = list((run_dir / "DOWNLOAD").glob("*.zip")) \
             if (run_dir / "DOWNLOAD").exists() else []
-        bridge_zip = list(run_dir.glob("TECHNOLOGY_PACKAGE_*.zip"))
+        bridge_zip = list(run_dir.glob("TECHNOLOGY_PACKAGE_*.zip")) + \
+            list(run_dir.glob("TECHNOLOGY_TRANSFER_PACKAGE_*.zip"))
         if buyer_zip or bridge_zip:
-            render_record = _ensure_renders(run_dir, cio_obj)
+            render_record = _request_renders(session_id, run_dir, cio_obj)
             return _record(run_dir, "ALREADY_COMPLETE", {
                 "case": "A",
                 "geometry_present": True,
                 "package_present": True,
                 "renders": render_record or {"status": "ALREADY_PRESENT"},
                 "note": ("visual artifact and package both present — "
-                         "the projections render them (Case A); R419 "
-                         "renders ensured where missing"),
+                         "the projections render them (Case A); "
+                         "missing R419 renders are requested from the "
+                         "async job"),
             })
         # geometry exists but no package -> build the bridge package
         # around the EXISTING geometry (classification still runs —
@@ -201,23 +250,31 @@ def ensure_artifacts(session_id: str) -> Dict[str, Any]:
             detail, cio_obj, str(run_dir),
             glb_endpoint=f"/api/run/{session_id}/model",
             package_endpoint=f"/api/run/{session_id}/package",
+            build_renders=False,
+            engine_identity=engine_identity,
         )
         outcome = "PACKAGE_ADDED_TO_EXISTING_GEOMETRY"
+        render_record = _request_renders(session_id, run_dir, cio_obj)
         persisted = _record(run_dir, outcome, {
             "case": "A+package",
             "visualizability": result.get("visualizability"),
             "geometry_outcome": "SKIPPED_ALREADY_PRESENT",
-            "renders": (result.get("geometry_out") or {}).get("renders"),
+            "renders": render_record or {"status": "ALREADY_PRESENT"},
             "package_out": _package_summary(result.get("package_out")),
             "report": result.get("report"),
         })
         return persisted
 
     # Case B: invention exists, no visual artifact -> generate it.
+    # R423A Phase 2: build_renders=False — the Blender stage is NOT run
+    # inline; the gate requests the async render job after the package
+    # is built (render state is owned HERE, execution is async).
     result = run_bridge(
         detail, cio_obj, str(run_dir),
         glb_endpoint=f"/api/run/{session_id}/model",
         package_endpoint=f"/api/run/{session_id}/package",
+        build_renders=False,
+        engine_identity=engine_identity,
     )
 
     geometry_out = result.get("geometry_out")
@@ -241,10 +298,12 @@ def ensure_artifacts(session_id: str) -> Dict[str, Any]:
             model_dir = run_dir / "MODEL"
             model_dir.mkdir(parents=True, exist_ok=True)
             (model_dir / "model-001.glb").write_bytes(built["glb_bytes"])
-            # R419 sections 5-6: the Case C conceptual fallback gets its
-            # presentation renders too (same contract as A/B)
-            render_record = _ensure_renders(run_dir, {"geometry": {
-                "visualizability_class": "CONCEPTUAL_3D"}})
+            # R419 sections 5-6 (R423A Phase 2 form): the Case C
+            # conceptual fallback gets its presentation renders via the
+            # SAME async request path as A/B (never inline Blender)
+            render_record = _request_renders(
+                session_id, run_dir, {"geometry": {
+                    "visualizability_class": "CONCEPTUAL_3D"}})
             return _record(run_dir, "CONCEPTUAL_FALLBACK", {
                 "case": "C",
                 "classification": vis,
@@ -286,6 +345,8 @@ def ensure_artifacts(session_id: str) -> Dict[str, Any]:
         })
 
     vis_class = geometry_out.get("visualizability_class") or vis_class
+    # R423A Phase 2: the render REQUEST (execution is the async job's)
+    render_record = _request_renders(session_id, run_dir, cio_obj)
     persisted = _record(run_dir, "COMPLETED", {
         "case": "B",
         "visualizability_class": vis_class,
@@ -304,7 +365,7 @@ def ensure_artifacts(session_id: str) -> Dict[str, Any]:
                  "current": m.get("current")}
                 for m in geometry_out.get("generation_models") or []],
         },
-        "renders": geometry_out.get("renders"),
+        "renders": render_record or geometry_out.get("renders"),
         "package_out": _package_summary(result.get("package_out")),
         "report": result.get("report"),
     })
@@ -321,7 +382,9 @@ def _package_summary(package_out: Optional[Dict[str, Any]]) -> Optional[Dict]:
         "package_maturity": package_out.get("package_maturity"),
         "visualizability_class": package_out.get("visualizability_class"),
         "manifest_files": (package_out.get("manifest") or {}).get("file_count"),
-        "package_kind": "TECHNOLOGY_PACKAGE (bridge) — honest early-"
-                        "evaluation artifact, distinct from the buyer "
-                        "release chain (Art. IV: no weakened gates)",
+        "package_kind": "TECHNOLOGY_TRANSFER_PACKAGE (bridge) — the ONE "
+                        "canonical technology-transfer artifact for "
+                        "this run, honestly maturity-labeled; distinct "
+                        "from the buyer release chain (Art. IV: no "
+                        "weakened gates)",
     }

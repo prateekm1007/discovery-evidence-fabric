@@ -70,6 +70,22 @@ VALUE_CLASS_SOURCE_FACT = "SOURCE_FACT"    # value bound to a custody-frozen evi
 PACKAGE_MATURITY_EARLY = "EARLY_TECHNICAL_EVALUATION"
 PACKAGE_MATURITY_ENGINEERING = "ENGINEERING_DEFINITION"
 
+# R423A Phase 3: the honest meaning of each maturity tier, carried by the
+# package's technical-evaluation section (one canonical deliverable, one
+# explicit maturity statement — the tier is a fact, never a product split).
+PACKAGE_MATURITY_MEANINGS = {
+    PACKAGE_MATURITY_EARLY: (
+        "the invention architecture exists and survived the recorded "
+        "challenge stages; parameters and engineering detail are "
+        "proposals or unknown — nothing here is buyer-release quality"
+    ),
+    PACKAGE_MATURITY_ENGINEERING: (
+        "a parametric engineering model exists with sourced or declared "
+        "parameters and passed deterministic geometry gates; physical "
+        "validation and buyer-release gates remain unearned"
+    ),
+}
+
 # ---------------------------------------------------------------------------
 # Language guards (handoff sections 27, 29, 34)
 # ---------------------------------------------------------------------------

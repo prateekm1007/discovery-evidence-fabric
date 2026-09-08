@@ -62,6 +62,32 @@ FILE_CAP_BYTES = 20 * 1024 * 1024
 MANIFEST_NAME = "MANIFEST.json"
 SNAPSHOT_LOG_NAME = "snapshot_log.jsonl"
 
+# R423A Phase 4: incremental payload tracking. Measured BEFORE (the
+# r423 baseline, P6): EVERY snapshot copied the FULL payload — 282
+# files / 225,167,652 bytes / 284 sha256 calls — even for a
+# `created:{sid}` snapshot whose only change was sessions.json. On the
+# deployed instance that copy plus the git fetch dominated the
+# POST /api/run latency (measured live: 13.6 s). The cache records the
+# (size, mtime_ns) of every file as last copied; unchanged files are
+# skipped (the state-repo copy IS the previous copy — copy2 preserves
+# mtimes, so a byte-identical re-copy is provably a no-op).
+_PAYLOAD_CACHE: Dict[str, Tuple[int, int]] = {}
+# R423A Phase 4: hash cache for unchanged payload files — a file whose
+# (size, mtime_ns) matches its last-copied state has the same bytes in
+# the state repo (copy2 preserves both), so its previous manifest hash
+# remains the true hash. Re-hashing 225 MB per snapshot was measured as
+# the dominant LOCAL cost (P6: 284 sha256 calls, 0.38 s on fast disk;
+# multiples of that on the deployed instance).
+_HASH_CACHE: Dict[str, Tuple[Tuple[int, int], str]] = {}
+
+
+def reset_payload_cache() -> None:
+    """Test/ops hook: forget the incremental state (next snapshot does
+    a full copy). Production never needs this — the cache is derived
+    from the state-repo's own files."""
+    _PAYLOAD_CACHE.clear()
+    _HASH_CACHE.clear()
+
 _LAST: Dict[str, Any] = {"ok": None, "at": None, "reason": None,
                          "error": None, "files": 0, "commit": None,
                          "pushed": None, "manifest_sha256": None,
@@ -204,7 +230,12 @@ def _run_dir_files(run_dir: Path) -> List[Path]:
     # deliverable (the CIO's downloads.package_zip serves THIS file; a
     # restart without it honest-blanked the package link on runs whose
     # packages were already delivered). Same size cap applies.
+    # R423A Phase 3: BOTH naming generations persist (historical runs
+    # keep TECHNOLOGY_PACKAGE_*.zip; new runs write the canonical
+    # TECHNOLOGY_TRANSFER_PACKAGE_*.zip).
     out.extend(sorted(run_dir.glob("TECHNOLOGY_PACKAGE_*.zip")))
+    out.extend(sorted(
+        run_dir.glob("TECHNOLOGY_TRANSFER_PACKAGE_*.zip")))
     dl = run_dir / "DOWNLOAD"
     if dl.is_dir():
         out.extend(sorted(p for p in dl.rglob("*") if p.is_file()))
@@ -259,9 +290,27 @@ def _ensure_state_repo() -> Path:
         STATE_REPO.mkdir(parents=True, exist_ok=True)
         _git(STATE_REPO, "init", "-b", branch())
         _git(STATE_REPO, "remote", "add", "origin", REMOTE)
-    fetch = _git(STATE_REPO, "fetch", "origin", branch(), check=False)
-    if fetch.returncode == 0:
-        _git(STATE_REPO, "reset", "--hard", "FETCH_HEAD", check=False)
+        fetch = _git(STATE_REPO, "fetch", "origin", branch(), check=False)
+        if fetch.returncode == 0:
+            _git(STATE_REPO, "reset", "--hard", "FETCH_HEAD", check=False)
+    return STATE_REPO
+
+
+def _ensure_state_repo_hot() -> Path:
+    """R423A Phase 4 — the hot-path variant: NO network fetch. The
+    single-container deployment has exactly one writer (this process,
+    under the durable lock), so the local branch is authoritative for
+    pushes and the fetch adds pure network latency to every user-visible
+    snapshot. The remote is fetched ONLY at first clone (and a fresh
+    fetch can still be forced by deleting ENGINE_RUNTIME/state-repo).
+
+    Fallback honesty (Art. XV): if the push is ever REJECTED because the
+    remote moved (multi-writer scenario), the snapshot records the
+    failure verbatim in /api/health durable.last_snapshot — never a
+    silent success — and the next boot's restore() reconciles by
+    fetching."""
+    if not (STATE_REPO / ".git").exists():
+        return _ensure_state_repo()  # first clone: network required
     return STATE_REPO
 
 
@@ -295,16 +344,44 @@ def snapshot(reason: str) -> Dict[str, Any]:
     lock = open(LOCK_PATH, "w")
     try:
         fcntl.flock(lock, fcntl.LOCK_EX)
-        repo = _ensure_state_repo()
+        # R423A Phase 4: the hot path never pays the fetch — see
+        # _ensure_state_repo_hot (single-writer deployment; honest
+        # failure disclosure if that assumption is ever violated).
+        repo = _ensure_state_repo_hot()
         payload = _collect_payload()
         copied = 0
+        skipped = 0
         file_hashes: Dict[str, str] = {}
         for dest, src in sorted(payload.items()):
             target = repo / dest
-            target.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copy2(src, target)
-            file_hashes[dest] = _file_sha256(target)
-            copied += 1
+            try:
+                src_stat = src.stat()
+                src_key = (src_stat.st_size, src_stat.st_mtime_ns)
+            except OSError:
+                continue  # vanished mid-snapshot — skipped, disclosed below
+            cached_key = _PAYLOAD_CACHE.get(dest)
+            if cached_key == src_key and target.exists():
+                # unchanged since the last snapshot AND its copy exists —
+                # the state-repo copy IS the previous copy (copy2 preserves
+                # mtime/size); re-copying would be a byte-identical no-op
+                skipped += 1
+                cached_hash = _HASH_CACHE.get(dest)
+                if cached_hash and cached_hash[0] == src_key:
+                    file_hashes[dest] = cached_hash[1]
+                else:
+                    file_hashes[dest] = _file_sha256(target)
+                    _HASH_CACHE[dest] = (src_key, file_hashes[dest])
+            else:
+                target.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(src, target)
+                _PAYLOAD_CACHE[dest] = src_key
+                copied += 1
+                file_hashes[dest] = _file_sha256(target)
+                _HASH_CACHE[dest] = (src_key, file_hashes[dest])
+        # R423A Phase 4: record the incremental outcome honestly —
+        # files counts the payload map; copied/skipped show the work.
+        _LAST["files_copied"] = copied
+        _LAST["files_skipped_unchanged"] = skipped
         # R396 B.3: integrity manifest (self-excluded by name constant)
         manifest = {
             "schema": 1,
@@ -326,7 +403,9 @@ def snapshot(reason: str) -> Dict[str, Any]:
             lf.write(json.dumps({
                 "reason": reason,
                 "at": _LAST["at"],
-                "files": copied,
+                "files": len(file_hashes),
+                "files_copied": copied,
+                "files_skipped_unchanged": skipped,
                 "engine_commit": ident_commit or None,
                 "tree_sha256": _LAST["manifest_sha256"]}) + "\n")
         _git(repo, "add", "-A")
@@ -337,7 +416,7 @@ def snapshot(reason: str) -> Dict[str, Any]:
         pushed = None
         if commit.returncode == 0:
             _LAST["commit"] = _git(repo, "rev-parse", "HEAD").stdout.strip()
-            _LAST["files"] = copied
+            _LAST["files"] = len(file_hashes)
             push = _git(repo, "push", "origin",
                         f"HEAD:refs/heads/{branch()}", check=False)
             pushed = push.returncode == 0
@@ -349,7 +428,7 @@ def snapshot(reason: str) -> Dict[str, Any]:
             push = _git(repo, "push", "origin",
                         f"HEAD:refs/heads/{branch()}", check=False)
             pushed = push.returncode == 0
-            _LAST["files"] = copied
+            _LAST["files"] = len(file_hashes)
             if not pushed and commit.stderr.strip():
                 _LAST["error"] = commit.stderr.strip()[:200]
         _LAST["ok"] = pushed is True
