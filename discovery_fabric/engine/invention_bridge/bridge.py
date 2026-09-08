@@ -250,6 +250,18 @@ def bridge(run_result: Dict[str, Any], cio: Optional[Dict[str, Any]],
                            {"count": len(gen_models),
                             "domain_family": (gen_models[-1] or {}).get(
                                 "domain_family") if gen_models else None})
+            # R433 sections 2/15: the EVOLUTION projection — history
+            # rows for the progressive-disclosure section; exactly one
+            # CURRENT row; per-gen models load only on request
+            counts = {m["generation"]: m.get("component_count")
+                      for m in gen_models}
+            geometry_out["evolution"] = _evolution_projection(
+                gen_models, run_result, run_id,
+                component_counts=counts)
+            geometry_out["generation_id"] = next(
+                (f"gen-{m['generation']}" for m in reversed(gen_models)
+                 if m.get("current")), None)
+            geometry_out["generation_count"] = len(gen_models)
         except Exception as exc:  # noqa: BLE001
             _pipeline_step(steps, "GENERATION_MODELS", "SKIPPED",
                            {"reason": str(exc)})
@@ -423,6 +435,14 @@ def _build_conceptual(vis: Dict[str, Any], run_result: Dict[str, Any],
         if work_dir:
             _persist_conceptual_artifacts(work_dir, built, None, vis,
                                           run_result, run_id)
+        # R433: the generic fallback FAILS semantic identity by record
+        # (honest score, never hidden — section 13)
+        built["scores"] = quality_gate.score_technology_model(
+            None, built["glb_bytes"], domain_family=built.get(
+                "domain_family"),
+            requested_problem=str((run_result or {}).get("user_text")
+                                   or ""),
+            identity=built.get("artifact_identity"))
         return built
 
     # --- deterministic domain build + quality gates -------------------------
@@ -441,6 +461,13 @@ def _build_conceptual(vis: Dict[str, Any], run_result: Dict[str, Any],
         if work_dir:
             _persist_conceptual_artifacts(work_dir, built, None, vis,
                                           run_result, run_id)
+        # R433: the builder-failure fallback FAILS semantic identity by
+        # record (honest score, never hidden — section 13)
+        built["scores"] = quality_gate.score_technology_model(
+            None, built["glb_bytes"], domain_family=family,
+            requested_problem=str((run_result or {}).get("user_text")
+                                   or ""),
+            identity=built.get("artifact_identity"))
         return built
 
     gates = quality_gate.run_all_gates(
@@ -457,6 +484,13 @@ def _build_conceptual(vis: Dict[str, Any], run_result: Dict[str, Any],
     if work_dir:
         _persist_conceptual_artifacts(work_dir, built, spec, vis,
                                       run_result, run_id)
+    # R433 section 13: the three SEPARATED scores (semantic identity /
+    # engineering coherence / presentation quality — never combined),
+    # bound to the persisted artifact identity when available
+    built["scores"] = quality_gate.score_technology_model(
+        spec, built["glb_bytes"], domain_family=family,
+        requested_problem=str((run_result or {}).get("user_text") or ""),
+        identity=built.get("artifact_identity"))
     return built
 
 
@@ -540,6 +574,13 @@ def _build_engineering(vis: Dict[str, Any], run_result: Dict[str, Any],
         domain_family="ENGINEERING_PARAMETRIC")
     artifact_id.persist(work_dir, identity)
     result["artifact_identity"] = identity
+    # R433 section 13: the engineering path carries the same three
+    # separated scores (the parametric form IS the semantic identity
+    # here; the canonical CAD source is the coherence authority)
+    result["scores"] = quality_gate.score_technology_model(
+        None, exported["glb_bytes"], domain_family="ENGINEERING_PARAMETRIC",
+        requested_problem=str((run_result or {}).get("user_text") or ""),
+        identity=identity)
     return result
 
 
@@ -615,9 +656,79 @@ def _generation_models(vis: Dict[str, Any], run_result: Dict[str, Any],
             "parent_id": rec.get("parent_id") or rec.get("parent_invention_id"),
             "what_changed": rec.get("what_changed"),
             "domain_family": built.get("domain_family"),
+            "component_count": len(built.get("components") or []),
             "glb_path": os.path.abspath(path),
             "glb_canonical_path": os.path.abspath(canonical),
             "glb_sha256": built["glb_sha256"],
             "current": gen_no == n,
         })
     return models
+
+
+def _evolution_projection(gen_models: List[Dict[str, Any]],
+                          run_result: Dict[str, Any],
+                          run_id: Optional[str],
+                          component_counts: Optional[Dict[int, int]] = None
+                          ) -> Optional[List[Dict[str, Any]]]:
+    """R433 sections 2/15 — generation HISTORY, not competing artifacts.
+
+    One row per generation: the UI renders exactly ONE current primary
+    model; history rows live behind progressive disclosure and may
+    TEMPORARILY swap the single viewer's model on explicit request.
+    Status vocabulary is the lineage's own (INVENTION_* states) — the
+    projection never invents a verdict (Art. X).
+    """
+    if not gen_models:
+        return None
+    rs = run_result.get("run_state") or {}
+    recorded = ((rs.get("generations") or {}).get("generations")) or []
+    n = len(gen_models)
+    rows: List[Dict[str, Any]] = []
+    for m in gen_models:
+        gen_no = m["generation"]
+        rec = recorded[gen_no - 1] if gen_no <= len(recorded) \
+            and isinstance(recorded[gen_no - 1], dict) else {}
+        # why the CURRENT generation holds the primary slot: its own
+        # recorded state (survived / requires-experiment / evolved)
+        current = bool(m.get("current"))
+        if current:
+            status = "CURRENT"
+            basis = (f"state {rec.get('state') or 'RECORDED'}"
+                     f" · maturity {rec.get('maturity') or 'RECORDED'}")
+            why = (m.get("what_changed")
+                   or "the latest recorded architecture generation")
+        else:
+            # why this generation changed: the NEXT generation's
+            # recorded what_changed (the delta that superseded it) —
+            # never a projection-invented narrative
+            nxt = recorded[gen_no] if gen_no < len(recorded) \
+                and isinstance(recorded[gen_no], dict) else {}
+            status = "CHALLENGED" if rec.get("state") == \
+                "INVENTION_CHALLENGED" else "SUPERSEDED"
+            why = (nxt.get("what_changed")
+                   or rec.get("state")
+                   or "superseded by a later recorded generation")
+            basis = f"state {rec.get('state') or 'RECORDED'}"
+        rows.append({
+            "generation": gen_no,
+            "invention_id": m.get("invention_id"),
+            "status": status,
+            "status_basis": basis,
+            "why": str(why)[:240],
+            "domain_family": m.get("domain_family"),
+            "component_count": (component_counts or {}).get(gen_no),
+            # the per-generation model route — loaded ONLY on explicit
+            # request (R433 section 16: history never preloads)
+            "glb": (f"/api/run/{run_id}/model?gen={gen_no}"
+                    if run_id else None),
+            "glb_sha256": m.get("glb_sha256"),
+            "current": current,
+        })
+    # exactly one CURRENT row (the last) — a projection invariant the
+    # tests hold: history may be long, the primary slot is singular
+    if sum(1 for r in rows if r["current"]) != 1:
+        rows[-1]["current"] = True
+        rows[-1]["status"] = "CURRENT"
+        for r in rows[:-1]:
+            r["current"] = False
+    return rows

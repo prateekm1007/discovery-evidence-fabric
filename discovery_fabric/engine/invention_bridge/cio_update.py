@@ -54,6 +54,54 @@ def _identity_summary(identity: Optional[Dict[str, Any]]) -> Optional[Dict[str, 
     }
 
 
+def _scores_summary(scores: Optional[Dict[str, Any]]
+                    ) -> Optional[Dict[str, Any]]:
+    """R433 section 13 — the three SEPARATED scores, each an independent
+    record; deliberately NO combined number."""
+    if not scores:
+        return None
+
+    def _dim(key: str) -> Dict[str, Any]:
+        d = scores.get(key) or {}
+        return {
+            "score": d.get("score"),
+            "passed": d.get("passed"),
+            "failures": d.get("failures") or [],
+        }
+
+    return {
+        "semantic_identity": _dim("semantic_identity"),
+        "engineering_coherence": _dim("engineering_coherence"),
+        "presentation_quality": _dim("presentation_quality"),
+        "not_visualized": (scores.get("semantic_identity") or {}).get(
+            "not_visualized") or [],
+        "note": ("three separated dimensions — never combined into one "
+                 "score (R433 section 13)"),
+    }
+
+
+def _evolution_summary(evolution: Optional[Any]) -> Optional[list]:
+    """R433 section 15 — the history rows (compact, request-loaded)."""
+    if not evolution:
+        return None
+    rows = []
+    for r in evolution:
+        if not isinstance(r, dict):
+            continue
+        rows.append({
+            "generation": r.get("generation"),
+            "invention_id": r.get("invention_id"),
+            "status": r.get("status"),
+            "status_basis": r.get("status_basis"),
+            "why": r.get("why"),
+            "domain_family": r.get("domain_family"),
+            "component_count": r.get("component_count"),
+            "glb": r.get("glb"),
+            "current": bool(r.get("current")),
+        })
+    return rows or None
+
+
 def update_cio(cio: Dict[str, Any], geometry_out: Dict[str, Any],
                package_out: Dict[str, Any],
                visualizability: Dict[str, Any]) -> Dict[str, Any]:
@@ -90,6 +138,12 @@ def update_cio(cio: Dict[str, Any], geometry_out: Dict[str, Any],
         "artifact_identity": _identity_summary(
             geometry_out.get("artifact_identity")),
         "fallback_basis": geometry_out.get("fallback_basis"),
+        # R433: the three separated scores + the generation evolution
+        # projection (history rows; per-gen GLBs load only on request)
+        "scores": _scores_summary(geometry_out.get("scores")),
+        "evolution": _evolution_summary(geometry_out.get("evolution")),
+        "generation_id": geometry_out.get("generation_id"),
+        "generation_count": geometry_out.get("generation_count"),
         "authority": (
             "CadQuery/OCCT parametric build is the engineering geometry authority; "
             "meshes and renders are derived artifacts (R413 geometry authority "

@@ -179,6 +179,34 @@ def _package_document_count(run_dir: Path,
         return None
 
 
+def _compact_scores(scores: Optional[Dict[str, Any]]
+                    ) -> Optional[Dict[str, Any]]:
+    """R433 section 13 — the three SEPARATED score dimensions, each an
+    independent record; deliberately NO combined number. The full check
+    tables stay in the run record (BRIDGE_REPORT.json); the browser
+    gets the dimensions, their failures, and NOT VISUALIZED."""
+    if not scores:
+        return None
+
+    def _dim(key: str) -> Dict[str, Any]:
+        d = (scores.get(key) or {}) if isinstance(scores, dict) else {}
+        return {
+            "score": d.get("score"),
+            "passed": d.get("passed"),
+            "failures": d.get("failures") or [],
+        }
+
+    return {
+        "semantic_identity": _dim("semantic_identity"),
+        "engineering_coherence": _dim("engineering_coherence"),
+        "presentation_quality": _dim("presentation_quality"),
+        "not_visualized": ((scores.get("semantic_identity") or {})
+                           .get("not_visualized") or []),
+        "note": ("three separated dimensions — never combined into one "
+                 "score (R433 section 13)"),
+    }
+
+
 def _bridge_why(bridge_report: Dict[str, Any]) -> Optional[str]:
     """R418 (operator §4): when the artifact pane shows an unavailable
     state, the backend must answer WHY — the recorded reason from the
@@ -273,6 +301,9 @@ def build_cio(session: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     bridge_report = _read_json(run_dir / "BRIDGE_REPORT.json") or {}
     _br_vis = bridge_report.get("visualizability_class") or \
         ((bridge_report.get("geometry") or {}).get("visualizability_class"))
+    # the gate-persisted geometry block (R432/R433 fields render from
+    # here verbatim — the CIO is a projection, never a re-derivation)
+    _br_geo = bridge_report.get("geometry") or {}
     if pm or (cad_ledger or {}).get("status") == "COMPLETED" and glb:
         geometry_class = "ENGINEERING_3D"
     elif _br_vis:
@@ -540,6 +571,20 @@ def build_cio(session: Dict[str, Any]) -> Optional[Dict[str, Any]]:
                 if isinstance(
                     (bridge_report.get("geometry") or {}).get("components"),
                     list) else []),
+            # R432/R433: the domain layer + the separated scores + the
+            # evolution projection — persisted by the bridge gate in
+            # BRIDGE_REPORT.json's geometry block; rendered verbatim
+            # (the CIO never re-derives them, Art. X). The scores are
+            # compacted (the full check tables live in the run record;
+            # the browser gets the three dimensions + failures).
+            "domain_family": _br_geo.get("domain_family"),
+            "quality_gates": _br_geo.get("quality_gates"),
+            "artifact_identity": _br_geo.get("artifact_identity"),
+            "fallback_basis": _br_geo.get("fallback_basis"),
+            "scores": _compact_scores(_br_geo.get("scores")),
+            "evolution": _br_geo.get("evolution"),
+            "generation_id": _br_geo.get("generation_id"),
+            "generation_count": _br_geo.get("generation_count"),
             "authority": (
                 "CONCEPTUAL architecture visualization (CadQuery/OCCT "
                 "topology-only build, R418 invention bridge): this is "

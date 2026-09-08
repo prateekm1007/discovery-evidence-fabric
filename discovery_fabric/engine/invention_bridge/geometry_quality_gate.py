@@ -460,3 +460,216 @@ def run_all_gates(glb_bytes: bytes, spec: Optional[Dict[str, Any]],
         "failures": (geo["failures"] + vis["failures"]
                      + ((eng or {}).get("failures") or [])),
     }
+
+
+# ---------------------------------------------------------------------------
+# R433 — the semantic gate + the three SEPARATED quality scores
+# ---------------------------------------------------------------------------
+# R433 sections 6/13: semantic identity, engineering coherence, and
+# presentation quality are DIFFERENT questions and are never merged into
+# one number. A beautiful but semantically wrong model FAILS; a correct
+# but ugly model reports its presentation debt honestly.
+
+# Section 8 — the solar-EV visual-semantic contract (the flagship public
+# acceptance case). It asserts the MODEL visibly encodes the requested
+# architecture; it asserts NOTHING about superiority to Tesla or BYD
+# (that remains a discovery objective, never a verified fact).
+SOLAR_EV_REQUIRED = [
+    "chassis",            # body/chassis
+    "cabin",              # vehicle enclosure
+    "wheel_fl", "wheel_fr", "wheel_rl", "wheel_rr",   # wheels x4
+    "solar_roof",         # solar collection (mapped surface)
+    "battery_pack",       # energy storage
+    "traction_motor",     # drivetrain
+    "power_electronics",  # power conversion
+]
+
+# Domain-semantic acceptance: the canonical component sets that make a
+# model READ as the requested physical class (section 7). Each entry is
+# the minimal full architecture of that domain's acceptance case.
+DOMAIN_ACCEPTANCE = {
+    "VEHICLE": SOLAR_EV_REQUIRED + ["thermal_loop"],
+    "MEDICAL_DEVICE": ["device_shaft", "distal_tip", "hub",
+                       "flow_lumen"],
+    "FLUID_DEVICE": ["device_body", "flow_channel", "inlet_port",
+                     "outlet_port", "valve_stage"],
+    "THERMAL_SYSTEM": ["assembly_base", "heat_source", "heat_sink",
+                       "coolant_loop"],
+    "MECHANICAL_COMPONENT": ["housing", "load_path"],
+    "ELECTRONIC_SYSTEM": ["enclosure", "main_board", "power_stage"],
+    "ENERGY_STORAGE": ["cell_stack", "pack_enclosure", "bus_bars"],
+}
+
+SEMANTIC_VERSION = "1.0.0"
+
+
+def semantic_identity_gate(spec: Optional[Dict[str, Any]],
+                           glb_bytes: bytes,
+                           domain_family: Optional[str] = None,
+                           requested_problem: str = "",
+                           ) -> Dict[str, Any]:
+    """R433 section 6 — the GEOMETRIC SEMANTIC GATE.
+
+    Three-way reconciliation:
+      requested technology (family selection from the problem text)
+        vs canonical spec components
+        vs GLB scene nodes
+
+    Surfaces `not_visualized` at BOTH levels — a component that exists
+    in the canonical architecture but not in the model is NOT
+    VISUALIZED, never silently omitted. This is a structural/identity
+    audit, NOT scientific validation and NOT a claim about engineering
+    merit (disclosed in the record, Art. XXVIII).
+    """
+    checks: List[Dict[str, Any]] = []
+    failures: List[str] = []
+
+    def check(name: str, ok: bool, measured: Any = None) -> None:
+        entry = {"check": name, "passed": bool(ok)}
+        if measured is not None:
+            entry["measured"] = measured
+        checks.append(entry)
+        if not ok:
+            failures.append(name)
+
+    scene = _load_scene(glb_bytes)
+    scene_nodes = set(scene.geometry.keys()) if scene else set()
+    check("model_loads", scene is not None,
+          {"node_count": len(scene_nodes)})
+
+    # --- level 1: family consistency (requested vs spec vs scene) ------
+    spec_family = (spec or {}).get("technology_class")
+    effective_family = domain_family or spec_family
+    if spec is not None:
+        check("family_selected", spec_family not in (None, "", "GENERIC"),
+              {"family": spec_family})
+        spec_ids = {c["component_id"] for c in spec.get("components")
+                    or []}
+        # spec components missing from the GLB -> NOT VISUALIZED
+        missing = sorted(spec_ids - scene_nodes)
+        check("spec_components_visualized", not missing,
+              {"spec_components": len(spec_ids),
+               "not_visualized": missing})
+    else:
+        spec_ids = set()
+        check("family_selected", False,
+              {"note": "no canonical spec — semantic identity "
+                       "uncheckable"})
+
+    # --- level 2: domain acceptance (the class reads as requested) ------
+    required = DOMAIN_ACCEPTANCE.get(effective_family) or []
+    if required:
+        missing_req = [c for c in required if c not in scene_nodes]
+        check("domain_architecture_present", not missing_req,
+              {"family": effective_family,
+               "required": len(required),
+               "not_visualized": missing_req})
+    else:
+        check("domain_architecture_present", False,
+              {"family": effective_family,
+               "note": ("no domain acceptance contract for this family — "
+                        "GENERIC models carry conceptual-architecture "
+                        "labeling instead (the honest fallback, "
+                        "R432 section 15)"),
+               "requested_problem": str(requested_problem or "")[:160]})
+
+    # --- interface representation ---------------------------------------
+    if spec is not None and spec_ids:
+        interfaces = spec.get("interfaces") or []
+        resolvable = [i for i in interfaces
+                      if i["from"] in scene_nodes and i["to"] in
+                      scene_nodes]
+        check("major_interfaces_represented",
+              len(interfaces) == 0 or len(resolvable) > 0,
+              {"interfaces": len(interfaces),
+               "resolvable_in_scene": len(resolvable),
+               "note": "conduit links may run inside the body by design"})
+
+    return {
+        "artifact": "SEMANTIC_IDENTITY_GATE",
+        "version": SEMANTIC_VERSION,
+        "domain_family": effective_family,
+        "not_visualized": sorted(
+            ({c for c in required if c not in scene_nodes}
+             | (spec_ids - scene_nodes))) if spec is not None else sorted(
+            {c for c in required if c not in scene_nodes}),
+        "checks": checks,
+        "failures": failures,
+        "passed": not failures,
+        "note": ("geometric identity audit — structural metrics and "
+                 "canonical-ID parity only; NOT scientific validation; "
+                 "asserts nothing about competitive superiority "
+                 "(R433 sections 6/8)"),
+    }
+
+
+def score_technology_model(spec: Optional[Dict[str, Any]],
+                           glb_bytes: bytes,
+                           domain_family: Optional[str] = None,
+                           requested_problem: str = "",
+                           identity: Optional[Dict[str, Any]] = None,
+                           ) -> Dict[str, Any]:
+    """R433 section 13 — THREE SEPARATED quality scores.
+
+    semantic_identity     — does the model represent the requested
+                            technology? (semantic gate above)
+    engineering_coherence — does the geometry correspond to the
+                            canonical components/interfaces? (geometry
+                            gate + interface resolution)
+    presentation_quality  — is the visualization professional?
+                            (visual gate)
+
+    Each score is an INDEPENDENT record with its own checks, pass
+    state, and measured values. There is deliberately NO combined
+    number: a beautiful but semantically wrong model fails semantic
+    identity while its presentation score can still read PASS — the
+    separation IS the product contract.
+    """
+    semantic = semantic_identity_gate(spec, glb_bytes, domain_family,
+                                      requested_problem)
+    coherence = geometry_quality_gate(glb_bytes, spec, domain_family)
+    presentation = visual_quality_gate(glb_bytes, spec, domain_family)
+
+    # engineering coherence additionally binds the identity chain when
+    # the artifact identity is available (geometry_hash == GLB file)
+    identity_ok: Optional[bool] = None
+    if identity:
+        identity_ok = bool(identity.get("glb_matches_geometry_hash"))
+        coherence["checks"].append({
+            "check": "artifact_identity_chain", "passed": identity_ok,
+            "measured": {
+                "generation_id": identity.get("generation_id"),
+                "geometry_hash": (identity.get("geometry_hash")
+                                  or "")[:16],
+            }})
+        if not identity_ok:
+            coherence["failures"].append("artifact_identity_chain")
+            coherence["passed"] = False
+
+    return {
+        "artifact": "R433_MODEL_SCORES",
+        "version": SEMANTIC_VERSION,
+        "semantic_identity": {
+            "score": "PASS" if semantic["passed"] else "FAIL",
+            "passed": semantic["passed"],
+            "failures": semantic["failures"],
+            "not_visualized": semantic["not_visualized"],
+            "checks": semantic["checks"],
+        },
+        "engineering_coherence": {
+            "score": "PASS" if coherence["passed"] else "FAIL",
+            "passed": coherence["passed"],
+            "failures": coherence["failures"],
+            "checks": coherence["checks"],
+        },
+        "presentation_quality": {
+            "score": "PASS" if presentation["passed"] else "FAIL",
+            "passed": presentation["passed"],
+            "failures": presentation["failures"],
+            "checks": presentation["checks"],
+        },
+        "note": ("three separated dimensions — never combined into one "
+                 "score (R433 section 13); presentation PASS with "
+                 "semantic FAIL is a disclosed failure, never a pass"),
+    }
+

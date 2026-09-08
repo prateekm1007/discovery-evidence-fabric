@@ -366,6 +366,19 @@ def ensure_artifacts(session_id: str) -> Dict[str, Any]:
                  "glb": f"MODEL/model-{m.get('generation'):03d}.glb",
                  "current": m.get("current")}
                 for m in geometry_out.get("generation_models") or []],
+            # R432: the domain layer (family + gates + identity + the
+            # honest fallback basis) — persisted for the CIO projection
+            "domain_family": geometry_out.get("domain_family"),
+            "quality_gates": geometry_out.get("quality_gates"),
+            "artifact_identity": geometry_out.get("artifact_identity"),
+            "fallback_basis": geometry_out.get("fallback_basis"),
+            # R433: the three SEPARATED scores (section 13) + the
+            # evolution projection (sections 2/15) + NOT VISUALIZED
+            # (section 6) — the dossier renders these verbatim
+            "scores": geometry_out.get("scores"),
+            "evolution": geometry_out.get("evolution"),
+            "generation_id": geometry_out.get("generation_id"),
+            "generation_count": geometry_out.get("generation_count"),
         },
         "renders": render_record or geometry_out.get("renders"),
         "package_out": _package_summary(result.get("package_out")),

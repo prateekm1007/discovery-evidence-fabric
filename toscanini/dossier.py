@@ -188,6 +188,17 @@ def design_tab(session: Dict[str, Any],
             artifact_identity=geom.get("artifact_identity"),
             fallback_basis=geom.get("fallback_basis"),
             geometry_spec=geom.get("geometry_spec"),
+            # R433: the three separated scores (section 13) + the
+            # generation evolution projection (sections 2/15) + the
+            # NOT VISUALIZED disclosure (section 6)
+            scores=geom.get("scores"),
+            not_visualized=(geom.get("scores") or {}).get(
+                "not_visualized") or [],
+            evolution=geom.get("evolution"),
+            generation_id=(geom.get("generation_id")
+                           or ((geom.get("artifact_identity") or {})
+                               .get("generation_id"))),
+            generation_count=geom.get("generation_count"),
         )
     # honest unavailable block (directive section 6)
     reason = geom.get("bridge_why") or geom.get("bridge_outcome") \

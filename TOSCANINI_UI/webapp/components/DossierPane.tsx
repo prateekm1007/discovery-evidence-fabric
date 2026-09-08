@@ -1,8 +1,20 @@
 "use client";
 
-// R430.1 sections 2-6, 10, 14-15: the TECHNOLOGY DOSSIER — the right
-// pane of the workspace. Six tabs (never the internal 16-step engine):
-// Overview / Design / Evidence / Engineering / Experiment / Transfer.
+// R430.1 sections 2-6, 10, 14-15 + R433: the TECHNOLOGY DOSSIER — the
+// right pane of the workspace. Six tabs (never the internal 16-step
+// engine): Overview / Design / Evidence / Engineering / Experiment /
+// Transfer.
+//
+// R433 — the Design tab is ONE CANONICAL TECHNOLOGY MODEL:
+//   * exactly ONE primary 3D viewer (data-model-viewer, machine-counted)
+//   * the header says TECHNOLOGY MODEL / GEN N · CURRENT
+//   * previous generations are HISTORY (Evolution, progressive
+//     disclosure); selecting one temporarily swaps the single viewer
+//   * components / evolution / identity / gates live BELOW or behind
+//     <details> — the first viewport is the model, not metadata
+//   * the three SEPARATED quality scores (semantic identity /
+//     engineering coherence / presentation quality — never combined)
+//   * NOT VISUALIZED components are surfaced, never silently omitted
 //
 // The dossier is a PROJECTION of the canonical run state (Art. X):
 // every field renders from the backend object; the frontend never
@@ -179,64 +191,154 @@ function OverviewTab({
   );
 }
 
-// ---- Design (section 6) ---------------------------------------------------
-function DesignTab({ tab }: { tab: DossierTab }) {
-  const d = tab as DossierTab & {
-    glb?: string | null;
-    geometry_class?: string | null;
-    conceptual?: boolean;
-    parameters?: {
-      param_id?: string;
-      value?: number | string;
-      unit?: string;
-      envelope?: [number, number] | null;
-    }[];
-    key_dimensions?: unknown;
-    components?: string[];
-    renders?: { hero_png?: string; section_png?: string; exploded_png?: string } & Record<
-      string,
-      unknown
-    >;
-    authority?: string;
+// R433 section 2: one evolution row (history, not a competing
+// artifact — the projection's own fields, rendered verbatim)
+function EvolutionRow({
+  row,
+  active,
+  onSelect,
+}: {
+  row: NonNullable<DesignTabData["evolution"]>[number];
+  active: boolean;
+  onSelect: () => void;
+}) {
+  const status = row.status === "CURRENT" ? "Current" : row.status === "CHALLENGED" ? "Challenged" : "Superseded";
+  return (
+    <button
+      type="button"
+      className={`evo-row${active ? " active" : ""}${row.current ? " current" : ""}`}
+      data-generation={row.generation}
+      onClick={onSelect}
+      aria-pressed={active}
+    >
+      <span className="evo-gen">GEN {row.generation}</span>
+      <span className={`evo-status st-${(row.status || "").toLowerCase()}`}>
+        {status}
+      </span>
+      <span className="evo-why">{row.why}</span>
+      <span className="evo-meta faint">
+        {row.domain_family ? `${row.domain_family.toLowerCase()} · ` : ""}
+        {row.component_count != null
+          ? `${row.component_count} components`
+          : ""}
+      </span>
+    </button>
+  );
+}
+
+type DesignTabData = DossierTab & {
+  glb?: string | null;
+  geometry_class?: string | null;
+  conceptual?: boolean;
+  parameters?: {
+    param_id?: string;
+    value?: number | string;
+    unit?: string;
+    envelope?: [number, number] | null;
+  }[];
+  key_dimensions?: unknown;
+  components?: (string | { name?: string; role?: string; type?: string })[];
+  renders?: { hero_png?: string; section_png?: string; exploded_png?: string } & Record<
+    string,
+    unknown
+  >;
+  authority?: string;
+  domain_family?: string | null;
+  quality_gates?: {
+    passed?: boolean;
+    failures?: string[];
+    note?: string;
+  } | null;
+  artifact_identity?: {
+    technology_id?: string | null;
+    run_id?: string | null;
+    generation_id?: string | null;
+    geometry_hash?: string | null;
+    source_geometry_hash?: string | null;
+    blender_scene_hash?: string | null;
+    glb_matches_geometry_hash?: boolean | null;
+  } | null;
+  fallback_basis?: string | null;
+  geometry_spec?: string | null;
+  scores?: {
+    semantic_identity?: ScoreDim;
+    engineering_coherence?: ScoreDim;
+    presentation_quality?: ScoreDim;
+    not_visualized?: string[];
+    note?: string;
+  } | null;
+  not_visualized?: string[];
+  evolution?: {
+    generation: number;
+    invention_id?: string | null;
+    status?: string | null;
+    status_basis?: string | null;
+    why?: string | null;
     domain_family?: string | null;
-    quality_gates?: {
-      passed?: boolean;
-      failures?: string[];
-      note?: string;
-    } | null;
-    artifact_identity?: {
-      technology_id?: string | null;
-      run_id?: string | null;
-      generation_id?: string | null;
-      geometry_hash?: string | null;
-      source_geometry_hash?: string | null;
-      blender_scene_hash?: string | null;
-      glb_matches_geometry_hash?: boolean | null;
-    } | null;
-    fallback_basis?: string | null;
-    geometry_spec?: string | null;
-  };
+    component_count?: number | null;
+    glb?: string | null;
+    current?: boolean;
+  }[] | null;
+  generation_id?: string | null;
+  generation_count?: number | null;
+};
+
+type ScoreDim = {
+  score?: string | null;
+  passed?: boolean | null;
+  failures?: string[];
+};
+
+// ---- Design (section 6; R433: the ONE canonical technology model) --------
+function DesignTab({ tab }: { tab: DossierTab }) {
+  const d = tab as DesignTabData;
   if (tab.availability !== "AVAILABLE" || !d.glb) {
-    // section 6: the honest unavailable block — never a dead link that
-    // looks like a live model
+    // section 6 / R433 section 18: the honest unavailable block — never
+    // a dead link that looks like a live model, never a misleading
+    // physical-looking stand-in
     return <PendingNote tab={tab} />;
   }
   const hash = (h?: string | null) =>
     h ? `${h.slice(0, 12)}…` : "—";
+  const genLabel = (d.generation_id || "gen-1").replace("gen-", "");
+  const genCount = d.generation_count || d.evolution?.length || 1;
+
+  // R433 sections 2/15: generation history is BEHIND disclosure; the
+  // single primary viewer shows the CURRENT model. Selecting a
+  // historical row TEMPORARILY swaps the same single viewer (the
+  // count stays ONE — never several primary models at once).
+  const [viewingGen, setViewingGen] = useState<number | null>(null);
+  const [highlight, setHighlight] = useState<string | null>(null);
+  const evo = d.evolution || [];
+  const activeRow = viewingGen != null ? evo.find((r) => r.generation === viewingGen) : undefined;
+  const showingHistory = Boolean(activeRow && activeRow.glb);
+  const viewerUrl = showingHistory && activeRow?.glb ? activeRow.glb : d.glb;
+
+  // the component selector uses the CANONICAL component IDs (the same
+  // ids the GLB scene graph carries — R433 section 5). The bridge
+  // reports components as {name, type, role} objects (canonical IDs in
+  // .name); plain strings are accepted too.
+  const componentIds = (d.components || [])
+    .map((c) => (typeof c === "string" ? c : (c as { name?: string })?.name))
+    .filter((c): c is string => Boolean(c));
+  const notVisualized = d.not_visualized || d.scores?.not_visualized || [];
+
   return (
     <div className="dtab design-tab">
+      {/* R433 section 18: the honest failure artifact — a domain-specific
+          physical model could not be generated; NEVER a silent slab+boxes */}
       {d.fallback_basis ? (
-        // R432 section 15: the generic fallback is ALWAYS disclosed —
-        // it can never masquerade as the domain technology model
-        <div className="conceptual-note">
-          TECHNOLOGY VISUALIZATION — Conceptual architecture. Engineering
-          geometry has not been established. The following visualization
-          represents the proposed system relationships only.
-          {d.fallback_basis && (
-            <div className="faint" style={{ marginTop: 4 }}>
-              {d.fallback_basis}
-            </div>
-          )}
+        <div className="conceptual-note" data-fallback-disclosure>
+          TECHNOLOGY VISUALIZATION
+          <div className="faint" style={{ marginTop: 4 }}>
+            A domain-specific physical model could not be generated from
+            the current engineering state. Conceptual architecture shown.
+            <br />
+            <b>Engineering geometry: NOT ESTABLISHED</b>
+          </div>
+          <div className="faint" style={{ marginTop: 4 }}>
+            {d.fallback_basis}
+          </div>
         </div>
       ) : (
         d.conceptual && (
@@ -247,127 +349,285 @@ function DesignTab({ tab }: { tab: DossierTab }) {
           </div>
         )
       )}
+
+      {/* R433 sections 2/14: the TECHNOLOGY MODEL header — ONE current
+          model, generation identity visible, no competing artifacts */}
+      <div className="tech-model-head">
+        <div className="tm-title">TECHNOLOGY MODEL</div>
+        <div className="tm-gen">
+          {showingHistory ? (
+            <>
+              <span className="tm-history">GEN {viewingGen} · HISTORY</span>
+              <button
+                type="button"
+                className="tm-return"
+                onClick={() => setViewingGen(null)}
+              >
+                return to current →
+              </button>
+            </>
+          ) : (
+            <span className="tm-current" data-generation-current>
+              GEN {genLabel} · CURRENT
+            </span>
+          )}
+          <span className="faint tm-family">
+            {d.domain_family
+              ? d.domain_family.toLowerCase().replace(/_/g, " ")
+              : ""}
+            {genCount > 1 ? ` · ${genCount} generations recorded` : ""}
+          </span>
+        </div>
+      </div>
+
+      {/* sections 1/14: the ONE primary viewer — large, first, alone */}
       <div className="viewer-wrap">
         <ModelViewer
-          url={d.glb}
-          label={d.conceptual
-            ? d.domain_family && !d.fallback_basis
-              ? `Conceptual ${d.domain_family.toLowerCase()} architecture — not engineering CAD`
-              : "Conceptual architecture — not engineering CAD"
-            : "Engineering geometry — canonical CAD source"}
+          url={viewerUrl}
+          height={520}
+          highlight={highlight}
+          label={showingHistory
+            ? `GEN ${viewingGen} historical architecture — the current model is GEN ${genLabel}`
+            : d.conceptual
+              ? d.domain_family && !d.fallback_basis
+                ? `Conceptual ${d.domain_family.toLowerCase()} architecture — not engineering CAD`
+                : "Conceptual architecture — not engineering CAD"
+              : "Engineering geometry — canonical CAD source"}
         />
       </div>
       <div className="viewer-hints faint">
         rotate · zoom · pan · reset · fullscreen — the geometry comes from
         the same canonical CAD source the package carries
       </div>
-      {d.artifact_identity && (
-        // R432 section 20: THIS MODEL = THIS INVENTION GENERATION = THIS
-        // CANONICAL GEOMETRY — the identity chain the browser shows
-        <div className="ov-block">
-          <h4>Model identity</h4>
-          <table className="param-table">
-            <tbody>
-              <tr>
-                <td>technology</td>
-                <td>{d.artifact_identity.technology_id || "—"}</td>
-                <td className="faint">run {d.artifact_identity.run_id || "—"}</td>
-              </tr>
-              <tr>
-                <td>generation</td>
-                <td>{d.artifact_identity.generation_id || "—"}</td>
-                <td className="faint">
-                  {d.artifact_identity.glb_matches_geometry_hash === true
-                    ? "model = canonical geometry (hash verified)"
-                    : d.artifact_identity.glb_matches_geometry_hash === false
-                      ? "hash mismatch — see audit records"
-                      : "hash verification pending"}
-                </td>
-              </tr>
-              <tr>
-                <td>geometry hash</td>
-                <td>{hash(d.artifact_identity.geometry_hash)}</td>
-                <td className="faint">
-                  spec {hash(d.artifact_identity.source_geometry_hash)} · blender{" "}
-                  {hash(d.artifact_identity.blender_scene_hash)}
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      )}
-      {d.quality_gates && (
-        <div className="ov-block">
-          <h4>Geometry quality gates</h4>
-          <p className={d.quality_gates.passed ? "" : "gate-fail"}>
-            {d.quality_gates.passed
-              ? "All machine-checkable geometry and presentation gates passed " +
-                "for this artifact."
-              : `Gate failures recorded: ${
-                  (d.quality_gates.failures || []).join(", ")
-                } — disclosed, never hidden.`}
-          </p>
-          {d.quality_gates.note && (
-            <div className="faint" style={{ fontSize: 12 }}>
-              {d.quality_gates.note}
-            </div>
+
+      {/* R433 sections 5/14: the component selector — canonical IDs, the
+          same ids the GLB scene graph carries; chips highlight the named
+          node in the single viewer. NOT VISUALIZED entries are surfaced
+          (section 6), never silently omitted. */}
+      {(componentIds.length > 0 || notVisualized.length > 0) && (
+        <div className="comp-select" data-component-selector>
+          <span className="faint cs-label">components</span>
+          {componentIds.map((c) => (
+            <button
+              key={c}
+              type="button"
+              className={`chip${highlight === c ? " on" : ""}`}
+              data-component-id={c}
+              onClick={() => setHighlight(highlight === c ? null : c)}
+              title={highlight === c ? "clear highlight" : "highlight in model"}
+            >
+              {c}
+            </button>
+          ))}
+          {notVisualized.map((c) => (
+            <span key={`nv-${c}`} className="chip nv" title="recorded in the canonical architecture but not present in the model">
+              {c} · NOT VISUALIZED
+            </span>
+          ))}
+          {highlight && (
+            <button
+              type="button"
+              className="chip clear"
+              onClick={() => setHighlight(null)}
+            >
+              clear
+            </button>
           )}
         </div>
       )}
-      {(d.parameters?.length ?? 0) > 0 && (
-        <div className="ov-block">
-          <h4>Parameters</h4>
-          <table className="param-table">
-            <tbody>
-              {d.parameters!.map((p, i) => (
-                <tr key={i}>
-                  <td>{p.param_id}</td>
-                  <td>
-                    {String(p.value)}
-                    {p.unit ? ` ${p.unit}` : ""}
-                  </td>
+
+      {/* R433 section 13: the three SEPARATED scores — semantic identity,
+          engineering coherence, presentation quality. NEVER combined. */}
+      {d.scores && (
+        <details className="ov-disclose" data-scores>
+          <summary>
+            Model quality — three separated scores
+            {d.scores.semantic_identity?.passed &&
+            d.scores.engineering_coherence?.passed &&
+            d.scores.presentation_quality?.passed
+              ? " · all three PASS"
+              : " · attention required"}
+          </summary>
+          <div className="ov-block">
+            <div className="score-row">
+              <span className="sc-name">semantic identity</span>
+              <span className={`sc-val ${d.scores.semantic_identity?.passed ? "ok" : "fail"}`}>
+                {d.scores.semantic_identity?.score || "—"}
+              </span>
+              <span className="faint sc-note">
+                does the model represent the requested technology?
+              </span>
+            </div>
+            <div className="score-row">
+              <span className="sc-name">engineering coherence</span>
+              <span className={`sc-val ${d.scores.engineering_coherence?.passed ? "ok" : "fail"}`}>
+                {d.scores.engineering_coherence?.score || "—"}
+              </span>
+              <span className="faint sc-note">
+                geometry corresponds to canonical components/interfaces
+              </span>
+            </div>
+            <div className="score-row">
+              <span className="sc-name">presentation quality</span>
+              <span className={`sc-val ${d.scores.presentation_quality?.passed ? "ok" : "fail"}`}>
+                {d.scores.presentation_quality?.score || "—"}
+              </span>
+              <span className="faint sc-note">
+                professional visualization (structural metrics, not taste)
+              </span>
+            </div>
+            {notVisualized.length > 0 && (
+              <p className="gate-fail" style={{ fontSize: 12.5 }}>
+                NOT VISUALIZED (canonical architecture, absent from the
+                model): {notVisualized.join(", ")}
+              </p>
+            )}
+            <div className="faint" style={{ fontSize: 12 }}>
+              {d.scores.note ||
+                "three separated dimensions — never combined into one score"}
+            </div>
+          </div>
+        </details>
+      )}
+
+      {/* R433 sections 2/15: EVOLUTION — generation history behind
+          progressive disclosure. Selecting a row swaps the SINGLE
+          viewer temporarily; never several primary models at once. */}
+      {evo.length > 1 && (
+        <details className="ov-disclose" data-evolution>
+          <summary>
+            Evolution — {evo.length} generations (history)
+          </summary>
+          <div className="evo-list">
+            {evo.map((row) => (
+              <EvolutionRow
+                key={row.generation}
+                row={row}
+                active={viewingGen === row.generation}
+                onSelect={() =>
+                  setViewingGen(
+                    viewingGen === row.generation ? null : row.generation,
+                  )
+                }
+              />
+            ))}
+          </div>
+          <div className="faint" style={{ fontSize: 12, paddingTop: 4 }}>
+            selecting a generation temporarily replaces the single viewer
+            above with that historical model; the current model is GEN{" "}
+            {genLabel}
+          </div>
+        </details>
+      )}
+
+      {d.artifact_identity && (
+        // R432 section 20: THIS MODEL = THIS INVENTION GENERATION = THIS
+        // CANONICAL GEOMETRY — the identity chain, behind disclosure
+        <details className="ov-disclose" data-model-identity>
+          <summary>Model identity</summary>
+          <div className="ov-block">
+            <table className="param-table">
+              <tbody>
+                <tr>
+                  <td>technology</td>
+                  <td>{d.artifact_identity.technology_id || "—"}</td>
+                  <td className="faint">run {d.artifact_identity.run_id || "—"}</td>
+                </tr>
+                <tr>
+                  <td>generation</td>
+                  <td>{d.artifact_identity.generation_id || "—"}</td>
                   <td className="faint">
-                    {p.envelope
-                      ? `envelope ${p.envelope[0]}–${p.envelope[1]}`
-                      : "recorded value"}
+                    {d.artifact_identity.glb_matches_geometry_hash === true
+                      ? "model = canonical geometry (hash verified)"
+                      : d.artifact_identity.glb_matches_geometry_hash === false
+                        ? "hash mismatch — see audit records"
+                        : "hash verification pending"}
                   </td>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-          <div className="faint" style={{ fontSize: 12 }}>
-            parameter controls appear only when the canonical state
-            declares mutable envelopes
+                <tr>
+                  <td>geometry hash</td>
+                  <td>{hash(d.artifact_identity.geometry_hash)}</td>
+                  <td className="faint">
+                    spec {hash(d.artifact_identity.source_geometry_hash)} · blender{" "}
+                    {hash(d.artifact_identity.blender_scene_hash)}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
-        </div>
+        </details>
       )}
-      {(d.components?.length ?? 0) > 0 && (
-        <div className="ov-block">
-          <h4>Components</h4>
-          <ul className="component-list">
-            {d.components!.map((c, i) => (
-              <li key={i}>{c}</li>
-            ))}
-          </ul>
-        </div>
+      {d.quality_gates && (
+        <details className="ov-disclose" data-quality-gates>
+          <summary>
+            Geometry quality gates
+            {d.quality_gates.passed ? " · passed" : " · failures recorded"}
+          </summary>
+          <div className="ov-block">
+            <p className={d.quality_gates.passed ? "" : "gate-fail"}>
+              {d.quality_gates.passed
+                ? "All machine-checkable geometry and presentation gates passed " +
+                  "for this artifact."
+                : `Gate failures recorded: ${
+                    (d.quality_gates.failures || []).join(", ")
+                  } — disclosed, never hidden.`}
+            </p>
+            {d.quality_gates.note && (
+              <div className="faint" style={{ fontSize: 12 }}>
+                {d.quality_gates.note}
+              </div>
+            )}
+          </div>
+        </details>
+      )}
+      {(d.parameters?.length ?? 0) > 0 && (
+        <details className="ov-disclose" data-parameters>
+          <summary>Parameters · {d.parameters!.length}</summary>
+          <div className="ov-block">
+            <table className="param-table">
+              <tbody>
+                {d.parameters!.map((p, i) => (
+                  <tr key={i}>
+                    <td>{p.param_id}</td>
+                    <td>
+                      {String(p.value)}
+                      {p.unit ? ` ${p.unit}` : ""}
+                    </td>
+                    <td className="faint">
+                      {p.envelope
+                        ? `envelope ${p.envelope[0]}–${p.envelope[1]}`
+                        : "recorded value"}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <div className="faint" style={{ fontSize: 12 }}>
+              parameter controls appear only when the canonical state
+              declares mutable envelopes
+            </div>
+          </div>
+        </details>
       )}
       {d.renders?.hero_png && (
-        <div className="ov-block">
-          <h4>Presentation renders</h4>
-          <div className="render-row">
-            <img src={d.renders.hero_png} alt="hero render" />
-            {d.renders.section_png && (
-              <img src={d.renders.section_png} alt="section render" />
-            )}
-            {d.renders.exploded_png && (
-              <img src={d.renders.exploded_png} alt="exploded render" />
-            )}
+        <details className="ov-disclose" data-renders>
+          <summary>Presentation renders</summary>
+          <div className="ov-block">
+            <div className="render-row">
+              <img src={d.renders.hero_png} alt="hero render" />
+              {d.renders.section_png && (
+                <img src={d.renders.section_png} alt="section render" />
+              )}
+              {d.renders.exploded_png && (
+                <img src={d.renders.exploded_png} alt="exploded render" />
+              )}
+            </div>
+            <div className="faint" style={{ fontSize: 12 }}>
+              presentation renders — the authoritative geometry is the
+              CAD-built GLB above; renders never validate physics
+            </div>
           </div>
-          <div className="faint" style={{ fontSize: 12 }}>
-            presentation renders — the authoritative geometry is the
-            CAD-built GLB above; renders never validate physics
-          </div>
-        </div>
+        </details>
       )}
     </div>
   );
