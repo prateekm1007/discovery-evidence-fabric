@@ -184,6 +184,80 @@ def _mk_session(tmp_path: Path, *, geometry: dict,
     }
 
 
+class TestMechanismObjectProjection:
+    """R436 fix: the canonical MECHANISM OBJECT (the shape
+    INVENTION_SPECIFICATION.mechanism.value carries in real runs —
+    observed on ts_387d8467cbb5 AND the fresh R436 EV run) must project
+    its mechanism SENTENCE into the overview, never be misreported as a
+    generation failure. The R435 guard treated non-strings as
+    suppressed content: a real dict-shaped mechanism rendered as
+    "the generator did not produce a usable mechanism" — the exact
+    honest-state defect the guard exists to prevent."""
+
+    def _session_with_mechanism(self, tmp_path, mechanism_value):
+        s = _mk_session(tmp_path, geometry={
+            "scores": {"semantic_identity": {"passed": True,
+                                             "score": "PASS"}}})
+        spec = {
+            "invention_id": {"value": "inv:x:1"},
+            "mechanism": {"value": mechanism_value},
+            "problem": {"value": {"device": "d"}},
+            "evidence": {"value": [], "evidence_ids": []},
+        }
+        import json as _json
+        from pathlib import Path as _Path
+        _Path(s["run_dir"], "INVENTION_SPECIFICATION.json").write_text(
+            _json.dumps(spec))
+        return s
+
+    def test_dict_shaped_mechanism_projects_sentence(self, tmp_path):
+        s = self._session_with_mechanism(tmp_path, {
+            "mechanism": "Metamaterial-integrated adaptive torsion axle "
+                         "with field-responsive elements",
+            "intervention": "embed metamaterials in the torsion axle",
+            "expected_effect": "higher torque density at lower mass"})
+        d = dos.build_dossier(s)
+        ov = d["tabs"]["overview"]
+        assert ov["mechanism"] == (
+            "Metamaterial-integrated adaptive torsion axle "
+            "with field-responsive elements")
+        assert ov["mechanism_generation_failed"] is False
+
+    def test_dict_shaped_echo_still_suppressed(self, tmp_path):
+        """The guard still catches echo INSIDE the mechanism object —
+        the sentence extraction happens before suppression, so the
+        echo check applies to the extracted sentence."""
+        s = self._session_with_mechanism(tmp_path, {
+            "mechanism": "<the causal mechanism the architecture "
+                         "exploits>",
+            "intervention": "x"})
+        d = dos.build_dossier(s)
+        ov = d["tabs"]["overview"]
+        assert ov["mechanism"] is None
+        assert ov["mechanism_generation_failed"] is True
+
+    @pytest.mark.skipif(not HEATPUMP_RUN.exists(),
+                        reason="real heat-pump run not present locally")
+    def test_real_run_mechanism_now_projects(self):
+        """The real ts_387d8467cbb5 run carries the mechanism object —
+        its overview must show the real sentence (previously
+        misreported as generation-failed)."""
+        session = {
+            "session_id": "ts_387d8467cbb5",
+            "user_text": "water heater heating capacity insufficient",
+            "status": "COMPLETE",
+            "created_at": "2026-09-08T20:37:00Z",
+            "final_status": "EVOLVED_INVENTION_CANDIDATE",
+            "run_dir": str(HEATPUMP_RUN),
+        }
+        d = dos.build_dossier(session)
+        ov = d["tabs"]["overview"]
+        assert ov["mechanism"] == (
+            "AI-driven predictive thermal management with molecular "
+            "refrigerant behavior modeling")
+        assert ov["mechanism_generation_failed"] is False
+
+
 class TestDesignTabSuppression:
     def test_design_tab_carries_ineligible_flag(self, tmp_path):
         s = _mk_session(tmp_path, geometry={

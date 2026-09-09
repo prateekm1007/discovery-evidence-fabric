@@ -248,7 +248,10 @@ def _hero_eligibility(geom: Dict[str, Any]) -> Dict[str, Any]:
                 "visualized in the geometry"),
             "rule": ("R436 hero suppression: semantic_identity FAIL "
                      "on conceptual geometry"),
-            "not_visualized": semantic.get("not_visualized") or [],
+            # the compacted CIO score carries not_visualized at the
+            # TOP level of scores (R433 compaction) — read both places
+            "not_visualized": (semantic.get("not_visualized")
+                               or scores.get("not_visualized") or []),
         }
     return {
         "eligible": True,
@@ -488,6 +491,17 @@ def build_dossier(session: Dict[str, Any]) -> Dict[str, Any]:
     # from a legitimate unknown (NOT_ESTABLISHED / UNKNOWN).
     raw_mechanism = ((cio or {}).get("identity", {}).get("mechanism")
                      or mechanism_state.get("mechanism"))
+    # R436 fix: the CIO mechanism is frequently the canonical MECHANISM
+    # OBJECT (mechanism/intervention/expected_effect — the shape
+    # INVENTION_SPECIFICATION.mechanism.value carries). Project the
+    # mechanism SENTENCE before the scaffold guard: a dict is not
+    # scaffolding, and a REAL dict-shaped mechanism misreported as a
+    # generation failure is exactly the honest-state defect the guard
+    # exists to prevent (observed live: both ts_387d8467cbb5 and the
+    # fresh R436 EV run carry real mechanisms the overview suppressed).
+    if isinstance(raw_mechanism, dict):
+        raw_mechanism = (raw_mechanism.get("mechanism")
+                         or raw_mechanism.get("value"))
     mechanism = _suppress_scaffold(raw_mechanism)
     mechanism_generation_failed = (
         raw_mechanism is not None and mechanism is None)
