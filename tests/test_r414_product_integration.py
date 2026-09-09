@@ -87,10 +87,15 @@ class TestFailureTaxonomy:
         # R415 amendment (P0 directive section 1): + GONE — HTTP 410 is a
         # distinct class/state. The amendment EXTENDS the R414 vocabulary;
         # it reclassifies nothing already pinned above.
+        # R442 reconciliation (Art. LXIV rule 2, dated investigation):
+        # R436 added CREDIT_EXHAUSTED (provider_health.py: cannot afford
+        # the request — distinct from RATE_LIMITED, observed live in the
+        # production transport route); this exact-set assertion was not
+        # updated in the same change. Reconciled to the shipped set.
         assert set(ph.FAILURE_TYPES) == {
             "RATE_LIMITED", "TIMEOUT", "AUTH_FAILURE", "NETWORK_FAILURE",
             "INVALID_RESPONSE", "MODEL_FAILURE", "PARSER_FAILURE", "GONE",
-            "UNKNOWN"}
+            "CREDIT_EXHAUSTED", "UNKNOWN"}
 
     def test_410_gone_is_distinct(self):
         """R415 (P0 directive section 1): 410 must not collapse into
@@ -403,9 +408,21 @@ class TestTerminalOutcome:
         assert o["outcome"] == rs.OUTCOME_REQUIRES_EXPERIMENT
 
     def test_no_defensible_for_rejected_and_false_premise(self):
-        for final in ("REJECTED", "MALFORMED_OR_FALSE_PREMISE"):
-            o = rs.terminal_outcome(self._session(final_status=final))
-            assert o["outcome"] == rs.OUTCOME_NO_DEFENSIBLE, final
+        # R442 reconciliation (Art. LXIV rule 2, dated investigation):
+        # R416 (honest causes + evolution V1, operator directive) remapped
+        # REJECTED/MALFORMED_OR_FALSE_PREMISE to INVENTION_UNDER_DEVELOPMENT
+        # / FALSE_PREMISE_INCOHERENT — the product never renders the banned
+        # dead-end sentence; the recorded challenge outcome rides the
+        # basis, the lineage carries the generations. The Art. LXI intent
+        # is preserved and STILL asserted: neither outcome is RUN_BLOCKED.
+        o = rs.terminal_outcome(self._session(final_status="REJECTED"))
+        assert o["outcome"] == rs.OUTCOME_UNDER_DEVELOPMENT
+        assert "REJECTED" in o["basis"]
+        assert o["outcome"] != rs.OUTCOME_RUN_BLOCKED
+        o2 = rs.terminal_outcome(
+            self._session(final_status="MALFORMED_OR_FALSE_PREMISE"))
+        assert o2["outcome"] == rs.OUTCOME_FALSE_PREMISE
+        assert o2["outcome"] != rs.OUTCOME_RUN_BLOCKED
 
     def test_run_blocked_is_infrastructure_only(self):
         """Art. LXI: infrastructure failure is never scientific
@@ -424,9 +441,14 @@ class TestTerminalOutcome:
 
     def test_no_rejection_maps_to_blocked(self):
         """A scientific REJECTED must NEVER become RUN_BLOCKED (the
-        converse of Art. LXI — an honest kill is a real result)."""
+        converse of Art. LXI — an honest kill is a real result).
+        R442 reconciliation: the R416 contract carries the rejection as
+        INVENTION_UNDER_DEVELOPMENT with the recorded basis (never the
+        banned dead-end surface), which satisfies the same invariant."""
         o = rs.terminal_outcome(self._session(final_status="REJECTED"))
-        assert o["outcome"] == rs.OUTCOME_NO_DEFENSIBLE
+        assert o["outcome"] == rs.OUTCOME_UNDER_DEVELOPMENT
+        assert o["outcome"] != rs.OUTCOME_RUN_BLOCKED
+        assert "REJECTED" in o["basis"]
 
     def test_outcome_vocabulary_exact(self):
         assert {rs.OUTCOME_PENDING, rs.OUTCOME_SURVIVED,
@@ -734,7 +756,10 @@ class TestProjections:
         v = user_state_view({"status": "COMPLETE",
                              "final_status": "REJECTED",
                              "package": {}})
-        assert v["outcome"] == "NO_DEFENSIBLE_INVENTION"
+        # R442 reconciliation: the R416 surface contract (the banned
+        # dead-end sentence is never rendered; the shipped mapping is
+        # INVENTION_UNDER_DEVELOPMENT).
+        assert v["outcome"] == "INVENTION_UNDER_DEVELOPMENT"
         v2 = user_state_view({"status": "ERROR_TRANSPORT",
                               "final_status": None, "package": {}})
         assert v2["outcome"] == "RUN_BLOCKED"
@@ -783,8 +808,9 @@ class TestAdversarial:
     def test_tampered_final_status_flips_outcome(self):
         base = {"session_id": "s", "user_text": "p", "status": "COMPLETE",
                 "final_status": "REJECTED", "package": {}}
+        # R442 reconciliation: the shipped R416 mapping for REJECTED.
         assert rs.terminal_outcome(base)["outcome"] == \
-            rs.OUTCOME_NO_DEFENSIBLE
+            rs.OUTCOME_UNDER_DEVELOPMENT
         base["final_status"] = "AUTOMATED_INVENTION_CANDIDATE"
         assert rs.terminal_outcome(base)["outcome"] == \
             rs.OUTCOME_REQUIRES_EXPERIMENT

@@ -113,3 +113,27 @@ KILLER_EXPERIMENT → ADJUDICATION → CLASSIFY → NEXT_BEST_ACTION → RANK`
    `PHYSICALLY_VALIDATED: NONE` discipline are the moat.
 5. No candidate is called an invention until evidence and novelty checks
    justify the classification (epistemic states never silently promoted).
+
+---
+
+## R442-PREP addendum (2026-09-10) — the production visual join, proven at the byte level
+
+The Visual Compiler path (R441) was exercised end to end from PRODUCTION
+at the exact deployed SHA (33e5d6d9) with two genuinely fresh inventions
+(ts_ef8a3f281c94 multi-part autosampler; ts_4c86d5642e99 helical heat
+recovery module): engineering identity (GEOMETRY_SPEC spec_sha256) ->
+canonical GLB (sha-verified served bytes) -> Visual Compiler -> gate ->
+seven views -> package. The production visual stage itself typed-skips
+(RENDER_SKIPPED_LOW_MEMORY, honest, fail-closed) on the 512 MB free
+plan; the full visual join was proven on the SAME bytes at the SAME SHA
+in the sandbox (gate PASS, all seven rules, independently re-measured).
+The failure chain was proven both by injection (FAIL -> hero suppressed
+-> release blocked) and live in production (NOT_RUN -> zero hero files
+in the package ZIP, zero images in all six PDFs, render routes 404,
+canonical GLB still 200). Coder 1 feedback filed: R442/FEEDBACK_TO_CODER_1.md
+(generic chassis dominance + overlapping/enclosed part placement — two
+different inventions rendered a byte-identical hero). The Blender
+dispatcher deletion conditions are NOT all true yet (production visual
+service blocked on the billing-gated memory upgrade) — retirement
+deferred per the directive's own condition list. Round record:
+R442/R442_ROUND_RECORD.json.
