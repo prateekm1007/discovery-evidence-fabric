@@ -272,6 +272,13 @@ export default function TechStage({
   const viewerUrl = showingHistory && activeRow?.glb ? activeRow.glb : heroGlb;
   const genLabelNum = (design?.generation_id || "gen-1").replace("gen-", "");
   const genCount = design?.generation_count || evo.length || 1;
+  // R441 Article LXXII: the hero the buyer sees is the hero the gate
+  // approved — the verdict is surfaced on the stage, never hidden
+  const renders = design?.renders;
+  const gateVerdict = (renders?.visual_gate as
+    | { verdict?: string }
+    | undefined)?.verdict;
+  const gateOk = gateVerdict === "PASS";
   const modelKind: "engineering" | "conceptual" | undefined =
     design?.fallback_basis
       ? "conceptual"
@@ -415,6 +422,24 @@ export default function TechStage({
           : done
             ? "the scientific record below is complete regardless — a model is a presentation, never a claim"
             : ""}
+        {gateVerdict && (
+          <span
+            className="gate-badge"
+            title={gateOk
+              ? "Article LXXII — this render passed the Visual Quality Gate (frame occupancy, contact shadow, semantic materials, single viewer)"
+              : "Article LXXII — Visual Quality Gate verdict: " + gateVerdict}
+            style={{
+              marginLeft: 12,
+              padding: "1px 8px",
+              borderRadius: 999,
+              fontSize: 11,
+              border: "1px solid " + (gateOk ? "#3d7a4d" : "#a05a3d"),
+              color: gateOk ? "#3d7a4d" : "#a05a3d",
+            }}
+          >
+            visual gate {gateOk ? "\u2713" : "\u2715 " + gateVerdict}
+          </span>
+        )}
       </div>
 
       {/* ---- the four insight cards ---- */}

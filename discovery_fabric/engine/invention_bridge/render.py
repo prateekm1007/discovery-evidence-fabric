@@ -1,23 +1,50 @@
-"""Engine-side render orchestrator — invokes the pinned Blender build.
+"""Engine-side render dispatcher — R441.
 
-R419 fixed 3D stack (operator directive):
+R441 VISUAL COMPILER stack (operator directive):
 
     INVENTION -> ENGINEERING SPEC -> CadQuery/OCCT -> MEASURE -> GLB
-        -> Blender 5.2 LTS (headless) -> hero/section/exploded renders
-        -> Three.js / React Three Fiber -> WEB
+        -> VISUAL COMPILER (headless Chromium + Three.js, the SAME
+           renderer family as the website — WYSIWYG, deterministic)
+        -> Hero / Turntable / Exploded / Section / Orthographic /
+           Dimension / Poster
+        -> VISUAL QUALITY GATE (Article LXXII: no gate pass, no hero,
+           no release)
+        -> WEB + PDF (the exact same approved render)
 
-This module is the engine half of that pipeline. It NEVER runs Blender
-interactively, never keeps it resident, and runs it as a subprocess of
-the run WORKER (the run is already a background job — the web request
-never waits for Blender; operator directive section 21).
+This module is the engine half of that pipeline. It NEVER runs a
+renderer interactively, never keeps one resident, and runs it as a
+subprocess of the run WORKER (the run is already a background job —
+the web request never waits; operator directive R419 section 21,
+carried forward).
+
+BACKEND DISPATCH (Article LXIV — superseded implementations are
+retired, not accumulated; the retirement of the Blender HERO path is
+explicit and stated here):
+
+  * PRIMARY (default): "visual_compiler" — the R441 deterministic
+    Three.js pipeline. Production hero renders NEVER touch Blender
+    (operator directive R441: "Never use it for normal hero renders").
+  * LEGACY: "blender" — the pinned Blender 5.2 LTS path, KEPT_BECAUSE
+    (a) it remains the only USD/DAE/FBX conversion route the stack
+    has (Blender's demoted role: format conversion only), and (b) the
+    R441 swap carries one round of production A/B before the hero
+    code is deleted outright (the LXIV two-step discipline:
+    supersede -> battery -> delete, deletion scheduled R442). Selecting
+    it requires an EXPLICIT backend choice; nothing routes to it by
+    default, and its render records carry render_pipeline
+    "BLENDER_HEADLESS_LEGACY" so a legacy render can never pass as a
+    Visual Compiler render.
+  * the legacy hero-render script blender_render.py is retired to
+    ARCHIVED_TO discovery_fabric/engine/invention_bridge/
+    r441_retired/blender_render.py in this same commit (importable
+    history, zero live references).
 
 Failure semantics: a render failure is a TYPED record
-(RENDER_FAILED / RENDER_SKIPPED_NO_BLENDER / RENDER_TIMEOUT) written to
-the bridge report. The GLB contract is unaffected — the interactive 3D
-artifact is served from the CadQuery-authored geometry regardless; the
-PNG renders and materialized GLBs are enhancements produced when the
-pinned build is available. Nothing is fabricated (Art. VI/XXV/LXI:
-infrastructure failure is never scientific rejection).
+(RENDER_FAILED / RENDER_SKIPPED_* / RENDER_TIMEOUT) written to the
+bridge report. The GLB contract is unaffected — the interactive 3D
+artifact is served from the CadQuery-authored geometry regardless.
+Nothing is fabricated (Art. VI/XXV/LXI: infrastructure failure is
+never scientific rejection).
 """
 from __future__ import annotations
 
@@ -30,8 +57,11 @@ import time
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
+# the legacy Blender hero script — RETIRED (R441, Article LXIV):
+# ARCHIVED_TO r441_retired/blender_render.py in this commit; the path
+# below is only used when the legacy backend is EXPLICITLY selected
 RENDER_SCRIPT = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                             "blender_render.py")
+                             "r441_retired", "blender_render.py")
 
 # R420: the Article XXVII provenance record for every operational
 # threshold this module applies (memory guards, render budgets). The
@@ -344,6 +374,59 @@ def _memory_guard(context: str,
 
 
 def render_invention(work_dir: str,
+                     geometry_out: Optional[Dict[str, Any]] = None,
+                     is_conceptual: bool = False,
+                     renders: Optional[List[str]] = None,
+                     resolution: Optional[List[int]] = None,
+                     samples: Optional[int] = None,
+                     memory_mode: str = "in_worker",
+                     timeout_s: Optional[int] = None,
+                     backend: Optional[str] = None,
+                     ) -> Dict[str, Any]:
+    """THE render entry point (R441): dispatch to the Visual Compiler
+    (the primary, deterministic Three.js pipeline) — the pinned Blender
+    build is only reachable through an EXPLICIT backend choice.
+
+    The signature is the R419 contract (callers unchanged); `samples`
+    is N/A for a rasterizer and is recorded as such (no Cycles in the
+    new engine). Returns a typed render record; on the primary backend
+    it carries the Visual Quality Gate verdict (visual_gate /
+    hero_suppressed / release_blocked — Article LXXII).
+    """
+    chosen = (backend or os.environ.get("TOSCANINI_RENDER_BACKEND")
+              or "visual_compiler").strip().lower()
+    if chosen == "blender":
+        rec = render_invention_blender_legacy(
+            work_dir, geometry_out, is_conceptual, renders, resolution,
+            samples, memory_mode, timeout_s)
+        rec["render_pipeline"] = "BLENDER_HEADLESS_LEGACY"
+        rec["backend_selected"] = "explicit-legacy"
+        return rec
+    # primary path — the extra legacy kwargs map honestly:
+    #   renders   -> views (subset selection, same vocabulary)
+    #   samples   -> recorded N/A (rasterizer, not a path tracer)
+    #   resolution-> the Visual Compiler's resolution
+    from discovery_fabric.engine.visual_compiler import visual_compiler
+    views = None
+    if renders:
+        views = {"hero": "hero" in renders,
+                 "section": "section" in renders,
+                 "exploded": "exploded" in renders}
+    rec = visual_compiler.compile_visuals(
+        work_dir, geometry_out=geometry_out,
+        is_conceptual=is_conceptual, resolution=resolution,
+        timeout_s=timeout_s, memory_mode=memory_mode
+        if memory_mode in ("in_worker", "async") else "async",
+        views=views)
+    if samples is not None:
+        rec["samples_na"] = (
+            "rasterization has no Cycles samples (engine change R441); "
+            f"requested {samples} recorded, not applied")
+    rec.setdefault("backend_selected", "visual_compiler")
+    return rec
+
+
+def render_invention_blender_legacy(work_dir: str,
                      geometry_out: Optional[Dict[str, Any]],
                      is_conceptual: bool,
                      renders: Optional[List[str]] = None,

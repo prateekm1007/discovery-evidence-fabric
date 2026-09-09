@@ -326,39 +326,90 @@ def build_cio(session: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     renders: Dict[str, Any] = {}
     if render_dir and render_dir.exists():
         sid = session.get("session_id")
-        present = {p.name for p in render_dir.iterdir()
+        present = {str(p.relative_to(render_dir))
+                   for p in render_dir.rglob("*")
                    if p.is_file() and p.stat().st_size > 0}
-        names = ("hero.png", "hero.glb", "section.png", "section.glb",
-                 "exploded.png", "exploded.glb")
+        # R441: the full visual set (poster / dimension / orthographic /
+        # turntable join hero / section / exploded); turntable frames are
+        # projected as a count + first-frame URL (the gallery animates
+        # client-side without twelve endpoints)
+        # the artifact set is judged by the RECORD'S OWN era: a legacy
+        # BLENDER_HEADLESS record against the legacy six, an R441
+        # Visual Compiler record against the full visual set (no
+        # silent contract drift between eras, Art. XI)
+        legacy_pipeline = ((render_record or {}).get("render_pipeline")
+                           == "BLENDER_HEADLESS")
+        names = ("hero.png", "hero.glb", "section.png",
+                 "exploded.png", "exploded.glb", "poster.png",
+                 "dimension.png") \
+            if not legacy_pipeline else \
+            ("hero.png", "hero.glb", "section.png", "section.glb",
+             "exploded.png", "exploded.glb")
         available = [n for n in names if n in present]
+        ortho = sorted(n for n in present
+                       if n.startswith("orthographic/"))
+        turntable = sorted(n for n in present
+                           if n.startswith("turntable/"))
+        gate_record = _read_json(render_dir / "visual_gate.json") \
+            if (render_dir / "visual_gate.json").exists() else None
         if available or render_record:
             renders = {
                 "status": (render_record or {}).get("status",
                                                     "OK" if available
                                                     else "UNKNOWN"),
-                "pipeline": (render_record or {}).get("render_pipeline",
-                                                      "BLENDER_HEADLESS"),
-                "pinned_blender": (render_record or {}).get(
-                    "blender_version"),
+                "pipeline": (render_record or {}).get(
+                    "render_pipeline", "VISUAL_COMPILER_HEADLESS_THREE"),
+                "renderer_stack": (render_record or {}).get(
+                    "renderer_stack"),
                 "is_conceptual": geometry_is_conceptual,
                 "missing": [n for n in names if n not in present],
                 "presentation_rule": (
                     "presentation renders — the authoritative geometry is "
-                    "the CadQuery/OCCT GLB; section/exploded are "
-                    "disclosed variants (Blender never alters the "
-                    "engineering truth)"),
+                    "the CadQuery/OCCT GLB; the visual set is the R441 "
+                    "Visual Compiler output (same renderer family as this "
+                    "website), gate-approved per Article LXXII"),
             }
             for n in available:
-                key = n.replace(".", "_")
+                key = n.replace(".", "_").replace("/", "_")
                 renders[key] = f"/api/run/{sid}/render/{n}"
+            if ortho:
+                renders["orthographic"] = {
+                    n.split("/")[1].replace(".png", ""):
+                        f"/api/run/{sid}/render/{n}" for n in ortho}
+            if turntable:
+                renders["turntable_frame_count"] = len(turntable)
+                renders["turntable_first"] = \
+                    f"/api/run/{sid}/render/{turntable[0]}"
+            # THE ARTICLE LXXII VERDICT, surfaced to the product: the
+            # hero the buyer sees is the hero the gate approved
+            if gate_record:
+                renders["visual_gate"] = {
+                    "verdict": gate_record.get("verdict"),
+                    "hero_suppressed": gate_record.get("hero_suppressed"),
+                    "failed_rules": gate_record.get("failed_rules", []),
+                }
+            if (render_record or {}).get("renderer_stack"):
+                renders["renderer_stack"] = render_record["renderer_stack"]
+            # legacy records (BLENDER_HEADLESS) carry the pinned build —
+            # the projection discloses what the RECORD claims, never a
+            # guessed engine (Art. VI)
+            if (render_record or {}).get("blender_version"):
+                renders["pinned_blender"] = \
+                    render_record["blender_version"]
             if (render_record or {}).get("source_glb_sha256"):
                 renders["source_glb_sha256"] = \
                     render_record["source_glb_sha256"]
             # R420 quality disclosure: the achieved render parameters are
             # projected (a degraded-quality attempt from the async
             # ladder is DISCLOSED, never passed off as full quality)
+            # quality disclosure: the achieved parameters the record
+            # itself carries are projected (a degraded-quality attempt
+            # from the async ladder is DISCLOSED, never passed off as
+            # full quality); samples exist only in legacy records
+            # (rasterization has no Cycles samples — R441)
             if (render_record or {}).get("samples") is not None:
                 renders["samples"] = render_record.get("samples")
+            if (render_record or {}).get("resolution") is not None:
                 renders["resolution"] = render_record.get("resolution")
     # R420 §1/§3: the async render job's own state, surfaced honestly
     # when the render artifacts are not (yet) on disk. Presentation

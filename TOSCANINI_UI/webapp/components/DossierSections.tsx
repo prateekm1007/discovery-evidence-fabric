@@ -70,10 +70,21 @@ export type DesignTabData = DossierTab & {
   }[];
   key_dimensions?: unknown;
   components?: (string | { name?: string; role?: string; type?: string })[];
-  renders?: { hero_png?: string; section_png?: string; exploded_png?: string } & Record<
-    string,
-    unknown
-  >;
+  renders?: {
+    hero_png?: string;
+    section_png?: string;
+    exploded_png?: string;
+    poster_png?: string;
+    dimension_png?: string;
+    orthographic?: Record<string, string>;
+    turntable_frame_count?: number;
+    turntable_first?: string;
+    visual_gate?: {
+      verdict?: string;
+      hero_suppressed?: boolean;
+      failed_rules?: string[];
+    };
+  } & Record<string, unknown>;
   authority?: string;
   domain_family?: string | null;
   quality_gates?: {

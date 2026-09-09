@@ -55,10 +55,59 @@ INK = (0.16, 0.13, 0.10)          # warm near-black
 ACCENT = (0.66, 0.38, 0.26)       # terracotta
 PAPER = (0.985, 0.96, 0.93)       # warm ivory
 
+from reportlab.lib.units import mm  # noqa: E402 — the cover flowable
+from reportlab.platypus import Flowable  # noqa: E402
+
 
 # ---------------------------------------------------------------------------
 # PDF rendering (essay + README) — editorial, calm, one accent
 # ---------------------------------------------------------------------------
+
+class _CoverImage(Flowable):
+    """Full-bleed cover image (object-fit: cover). The render is drawn
+    ONCE — the exact approved PNG bytes the gate measured — scaled to
+    COVER the page, center-cropped. No decoration is invented on top
+    beyond the typed title band."""
+
+    def __init__(self, path: str, page_w: float, page_h: float,
+                 band: str = ""):
+        super().__init__()
+        self.path = path
+        self.page_w = page_w
+        self.page_h = page_h
+        self.band = band
+        self.width = page_w
+        self.height = page_h
+
+    def draw(self):
+        c = self.canv
+        c.saveState()
+        p = c.beginPath()
+        p.rect(0, 0, self.page_w, self.page_h)
+        c.clipPath(p, stroke=0, fill=0)
+        try:
+            from reportlab.lib.utils import ImageReader
+            img = ImageReader(self.path)
+            iw, ih = img.getSize()
+            scale = max(self.page_w / iw, self.page_h / ih)
+            dw, dh = iw * scale, ih * scale
+            c.drawImage(img, (self.page_w - dw) / 2,
+                        (self.page_h - dh) / 2, dw, dh)
+        except Exception:  # noqa: BLE001 — a missing render degrades to
+            pass          # the paper background, never a broken PDF
+        c.restoreState()
+        if self.band:
+            c.setFillColorRGB(0.05, 0.05, 0.06)
+            bh = 16 * mm
+            c.rect(0, 0, self.page_w, bh, stroke=0, fill=1)
+            c.setFillColorRGB(0.92, 0.92, 0.94)
+            c.setFont("Helvetica-Bold", 11)
+            c.drawString(12 * mm, bh / 2 - 3 * mm, self.band[:90])
+            c.setFont("Helvetica", 7)
+            c.drawString(12 * mm, 4 * mm,
+                         "Toscanini Visual Compiler render — gate-approved "
+                         "(Article LXXII); identical render as the website")
+
 
 def _pdf(title: str, subtitle: str, essay: Dict[str, Any],
          extra_blocks: Optional[List[tuple]] = None) -> bytes:
@@ -66,10 +115,13 @@ def _pdf(title: str, subtitle: str, essay: Dict[str, Any],
     from reportlab.lib.styles import ParagraphStyle
     from reportlab.lib.units import mm
     from reportlab.lib.enums import TA_LEFT
-    from reportlab.platypus import (BaseDocTemplate, Frame, PageTemplate,
-                                    Paragraph, Spacer)
+    from reportlab.platypus import (BaseDocTemplate, Flowable, Frame,
+                                    Image, NextPageTemplate, PageBreak,
+                                    Paragraph, Spacer, Table, TableStyle,
+                                    PageTemplate)
 
     buf = io.BytesIO()
+    cover = essay.pop("__cover__", None) if isinstance(essay, dict) else None
     doc = BaseDocTemplate(buf, pagesize=A4,
                           leftMargin=22 * mm, rightMargin=22 * mm,
                           topMargin=20 * mm, bottomMargin=20 * mm,
@@ -88,7 +140,18 @@ def _pdf(title: str, subtitle: str, essay: Dict[str, Any],
                           "Toscanini — invented architecture, not invented evidence. "
                           "Generated content is labeled; nothing claims physical validation.")
 
-    doc.addPageTemplates([PageTemplate(id="page", frames=[frame], onPage=on_page)])
+    cover_frame = Frame(0, 0, A4[0], A4[1],
+                        leftPadding=0, rightPadding=0,
+                        topPadding=0, bottomPadding=0, id="coverframe")
+    # when the gate approved a cover, the FULL-BLEED template leads
+    # (page 1 IS the hero); otherwise the framed body template is the
+    # only template (text-only doc, unchanged from R424)
+    has_cover = bool(cover and cover.get("gate") == "PASS")
+    doc.addPageTemplates([
+        *([PageTemplate(id="cover", frames=[cover_frame])] if has_cover
+          else []),
+        PageTemplate(id="page", frames=[frame], onPage=on_page),
+    ])
 
     h1 = ParagraphStyle("h1", fontName="Helvetica-Bold", fontSize=19, leading=24,
                         textColor=INK, spaceAfter=2)
@@ -99,7 +162,68 @@ def _pdf(title: str, subtitle: str, essay: Dict[str, Any],
     body = ParagraphStyle("body", fontName="Helvetica", fontSize=10, leading=14.5,
                           textColor=INK, alignment=TA_LEFT, spaceAfter=7)
 
-    story = [Paragraph(title, h1), Paragraph(subtitle, sub)]
+    # ---- R441 PDF Constitution cover pages --------------------------------
+    # page 1 full-page hero; 2 exploded; 3 orthographic; 4 dimensions —
+    # the buyer reads the invention VISUALLY before the narrative. The
+    # pages exist ONLY when the Visual Quality Gate PASSED (Article
+    # LXXII: a render the gate rejected is embedded NOWHERE).
+    story: List[Any] = []
+    cover_pages = 0
+    if has_cover:
+        import os as _os
+        hero = cover.get("hero")
+        if hero and _os.path.isfile(hero):
+            story.append(_CoverImage(hero, A4[0], A4[1],
+                                     band=cover.get("label", title)))
+            story.append(PageBreak())
+            cover_pages += 1
+            exploded = cover.get("exploded")
+            if exploded and _os.path.isfile(exploded):
+                story.append(_CoverImage(exploded, A4[0], A4[1],
+                                         band="Exploded view — disclosed "
+                                              "presentation variant"))
+                story.append(PageBreak())
+                cover_pages += 1
+            ortho = [p_ for p_ in (cover.get("orthographic") or [])
+                     if _os.path.isfile(p_)]
+            if ortho:
+                cell_w = (doc.width - 8 * mm) / 2
+                cell_h = cell_w / 1.5
+                story.append(Spacer(1, 4 * mm))
+                for i in range(0, len(ortho), 2):
+                    row = ortho[i:i + 2]
+                    tbl: List[Any] = []
+                    for p_ in row:
+                        try:
+                            tbl.append(Image(p_, width=cell_w,
+                                             height=cell_h,
+                                             kind="proportional"))
+                        except Exception:  # noqa: BLE001
+                            pass
+                    if tbl:
+                        t = Table([tbl], colWidths=[cell_w + 4 * mm] * len(tbl))
+                        t.setStyle(TableStyle([
+                            ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+                            ("ALIGN", (0, 0), (-1, -1), "CENTER"),
+                            ("LEFTPADDING", (0, 0), (-1, -1), 2),
+                            ("RIGHTPADDING", (0, 0), (-1, -1), 2)]))
+                        story.append(t)
+                        story.append(Spacer(1, 4 * mm))
+                story.append(PageBreak())
+                cover_pages += 1
+            dimension = cover.get("dimension")
+            if dimension and _os.path.isfile(dimension):
+                story.append(_CoverImage(dimension, A4[0], A4[1] - 10 * mm,
+                                         band="Dimensioned view — measured "
+                                              "W/D/H in glTF units"))
+                story.append(PageBreak())
+                cover_pages += 1
+
+    if cover_pages:
+        # the body reverts to the framed page template
+        story.append(NextPageTemplate("page"))
+        story.append(PageBreak())
+    story.extend([Paragraph(title, h1), Paragraph(subtitle, sub)])
     for key in essay.get("section_order", []):
         text = (essay.get("sections") or {}).get(key, "")
         if not text:
@@ -190,16 +314,43 @@ def assemble(
                 f"3D class {vis_class}")
 
     # ---- the six elite documents (R424 §3) ---------------------------------
+    # R441 PDF Constitution: the DOSSIER opens VISUALLY — page 1
+    # full-page hero, 2 exploded, 3 orthographic, 4 dimensions, then the
+    # narrative and the decisive experiment. The cover exists ONLY when
+    # the Visual Quality Gate PASSED (Article LXXII: NO HERO on a gate
+    # failure — the buyer never sees a rejected render, in any medium).
+    dossier_doc = _edocs.build_dossier(
+        proj, run_result, essay, package_maturity, geometry_out,
+        is_engineering)
+    renders = geometry_out.get("renders") or {}
+    gate = renders.get("visual_gate") or {}
+    if renders.get("status") in ("OK", "PARTIAL") \
+            and gate.get("verdict") == "PASS":
+        src3d = renders.get("out_dir") or ""
+        if src3d:
+            def _v(rel):
+                p_ = os.path.join(src3d, rel)
+                return p_ if os.path.isfile(p_) else None
+            dossier_doc["__cover__"] = {
+                "gate": "PASS",
+                "label": f"{invention_label} · {vis_class}",
+                "hero": _v("hero.png"),
+                "exploded": _v("exploded.png"),
+                "dimension": _v("dimension.png"),
+                "orthographic": [
+                    _v("orthographic/front.png"),
+                    _v("orthographic/side.png"),
+                    _v("orthographic/top.png"),
+                    _v("orthographic/iso.png"),
+                ],
+            }
     docs = {
         "00_PACKAGE_README.pdf": _edocs.build_readme(
             proj, run_result, invention_label, package_maturity,
             is_engineering, vis_class),
         "01_EXECUTIVE_TECHNOLOGY_BRIEF.pdf": _edocs.build_executive_brief(
             proj, run_result, package_maturity),
-        "02_ENGINEERING_TECHNOLOGY_TRANSFER_DOSSIER.pdf":
-            _edocs.build_dossier(
-                proj, run_result, essay, package_maturity, geometry_out,
-                is_engineering),
+        "02_ENGINEERING_TECHNOLOGY_TRANSFER_DOSSIER.pdf": dossier_doc,
         "03_BUYER_DECISION_CARD.pdf": _edocs.build_decision_card(
             proj, run_result, package_maturity),
         "04_EVIDENCE_SUMMARY.pdf": _edocs.build_evidence_summary(
@@ -281,29 +432,115 @@ def assemble(
         src_dir = renders.get("out_dir") or ""
         if src_dir and os.path.isdir(src_dir):
             os.makedirs(render_dir, exist_ok=True)
-            for name in ("hero.png", "hero.glb", "section.png", "section.glb",
-                         "exploded.png", "exploded.glb", "render_record.json"):
+            visual_set = [
+                "hero.png", "hero.glb", "poster.png", "dimension.png",
+                "section.png", "exploded.png", "exploded.glb",
+                "orthographic/front.png", "orthographic/side.png",
+                "orthographic/top.png", "orthographic/iso.png",
+                "scene_spec.json", "visual_gate.json",
+                "render_record.json",
+            ]
+            for frame in sorted(
+                    Path(src_dir, "turntable").glob("frame-*.png")) \
+                    if os.path.isdir(os.path.join(src_dir, "turntable")) \
+                    else []:
+                visual_set.append(f"turntable/{frame.name}")
+            for name in visual_set:
                 src = os.path.join(src_dir, name)
                 if os.path.isfile(src) and os.path.getsize(src) > 0:
-                    with open(src, "rb") as s, \
-                            open(os.path.join(render_dir, name), "wb") as d:
+                    dst = os.path.join(render_dir, name)
+                    os.makedirs(os.path.dirname(dst), exist_ok=True)
+                    with open(src, "rb") as s, open(dst, "wb") as d:
                         d.write(s.read())
                     render_artifacts.append(f"MODEL/3D/{name}")
             presentation_note = {
                 "artifact": "RENDER_ARTIFACT_DISCLOSURE",
-                "rule": ("hero/section/exploded are PRESENTATION renders "
-                         "(Blender 5.2 LTS headless). The authoritative "
-                         "geometry is the CadQuery/OCCT GLB; section.glb/"
-                         "exploded.glb are disclosed presentation variants "
-                         "(cut / exploded offsets), never engineering "
-                         "geometry (operator R419 section 7)"),
+                "rule": ("the visual set (hero/turntable/exploded/section/"
+                         "orthographic/dimension/poster) is a "
+                         "PRESENTATION render (R441 Visual Compiler: "
+                         "headless Chromium + Three.js, the same renderer "
+                         "family as the website). The authoritative "
+                         "geometry is the CadQuery/OCCT GLB; exploded.glb "
+                         "is a disclosed presentation variant (offsets "
+                         "recorded), never engineering geometry (operator "
+                         "R419 section 7, carried)"),
                 "source_glb_sha256": renders.get("source_glb_sha256"),
-                "pinned_blender": renders.get("pinned_blender"),
+                "scene_spec_sha256": renders.get("scene_spec_sha256"),
+                "renderer_stack": renders.get("renderer_stack"),
             }
             with open(os.path.join(render_dir,
                                    "RENDER_DISCLOSURE.json"), "w") as f:
                 json.dump(presentation_note, f, indent=2)
             render_artifacts.append("MODEL/3D/RENDER_DISCLOSURE.json")
+
+            # ---- Article LXXII — no 3D artifact ships without passing
+            # the Visual Compiler. A gate FAIL suppresses the hero in
+            # this package (the buyer never sees a render the gate
+            # rejected) and blocks the release; NOT_RUN (renderer
+            # skipped/failed) fails closed the same way.
+            gate = renders.get("visual_gate") or {}
+            gate_path = os.path.join(render_dir, "visual_gate.json")
+            if os.path.isfile(gate_path):
+                try:
+                    gate = json.loads(Path(gate_path).read_text())
+                except Exception:  # noqa: BLE001 — unreadable gate = fail closed
+                    gate = {"verdict": "NOT_RUN",
+                            "reasons": ["visual_gate.json unreadable"]}
+            gate_verdict = gate.get("verdict") or (
+                "NOT_RUN" if renders.get("status") not in
+                ("OK", "RENDER_PARTIAL") else "PASS")
+            hero_suppressed = gate_verdict != "PASS"
+            with open(os.path.join(render_dir,
+                                   "HERO_RELEASE_STATE.json"), "w") as f:
+                json.dump({
+                    "artifact": "HERO_RELEASE_STATE",
+                    "article": "LXXII",
+                    "gate_verdict": gate_verdict,
+                    "hero_suppressed": hero_suppressed,
+                    "release_blocked": hero_suppressed,
+                    "failed_rules": gate.get("failed_rules", []),
+                    "reasons": gate.get("reasons", []),
+                }, f, indent=2)
+            render_artifacts.append("MODEL/3D/HERO_RELEASE_STATE.json")
+            if hero_suppressed:
+                for suppressed in ("hero.png", "poster.png"):
+                    sp = os.path.join(render_dir, suppressed)
+                    if os.path.isfile(sp):
+                        os.remove(sp)
+                        render_artifacts.remove(f"MODEL/3D/{suppressed}")
+                render_artifacts.append("MODEL/3D/HERO_SUPPRESSED.txt")
+                with open(os.path.join(render_dir,
+                                       "HERO_SUPPRESSED.txt"), "w") as f:
+                    f.write("NO HERO — the Visual Quality Gate did not "
+                            "pass; the hero is suppressed and the "
+                            "package is blocked from release "
+                            "(Article LXXII).\n\nFailed rules: "
+                            + ", ".join(gate.get("failed_rules", []))
+                            + "\n\nReasons:\n"
+                            + "\n".join(f"- {r}" for r in
+                                         gate.get("reasons", []))
+                            + "\n")
+    else:
+        # fail closed (Art. V): a render that never ran CANNOT pass the
+        # gate — the hero is suppressed and the release is blocked, with
+        # the typed renderer status as the reason (Art. XXV: unknown
+        # stays unknown)
+        os.makedirs(render_dir, exist_ok=True)
+        with open(os.path.join(render_dir, "HERO_RELEASE_STATE.json"),
+                  "w") as f:
+            json.dump({
+                "artifact": "HERO_RELEASE_STATE",
+                "article": "LXXII",
+                "gate_verdict": "NOT_RUN",
+                "hero_suppressed": True,
+                "release_blocked": True,
+                "failed_rules": [],
+                "reasons": [f"renderer status: "
+                            f"{renders.get('status', 'ABSENT')} — the "
+                            "gate refuses to pass what it cannot "
+                            "measure"],
+            }, f, indent=2)
+        render_artifacts.append("MODEL/3D/HERO_RELEASE_STATE.json")
 
     # ---- provenance (R424 §11: REAL engine identity, never lazy unknown) ---
     fs = run_result.get("final_state") or {}

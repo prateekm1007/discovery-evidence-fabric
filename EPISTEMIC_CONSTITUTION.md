@@ -1,6 +1,6 @@
 # Epistemic Constitution — Research & Coding
 
-**Version:** 2.2.0
+**Version:** 2.3.0
 **Ratified:** 2026-08-19
 **Amended:** 2026-08-20 (Articles XXIII–XXXIV — Anti-Gaming, Anti-Entropy, Anti-Hallucination Principles; Article XXXV — Closed-Loop Epistemic Control as the Completion Standard)
 **Amended:** 2026-08-25 (Article XXXVI — TECHNOLOGY_TRANSFER_READY as the Manufactured-Asset Completion Standard; see R309/constitution/ARTICLE_XXXVI_TECHNOLOGY_TRANSFER_READY.md)
@@ -10,6 +10,7 @@
 **Amended:** 2026-09-04 (THE DISCOVERY IMPERATIVE + Articles XL–LXIII — the Discovery & Invention Constitution, per the CEO R402 directive after the R401-WC external audit: the Constitution's center of gravity moves from "do not lie about knowledge" to "do not mistake plausible generation for knowledge creation"; see `CODER_DIRECTIVE_R402.md`)
 **Amended:** 2026-09-05 (Articles LXIV–LXIX — per external audit findings across six rounds of live review: superseded implementations left coexisting for months, an owner-gated decision left idle for four rounds without escalation, commercial figures drifting toward unsourced assertion in buyer dossiers, every review to date being AI-on-AI with no tracked independence field, and the standing risk — surfaced ahead of the R411 autonomous cross-domain discovery mission — that a fixed portfolio quota could pressure the bar down on a final candidate, or that broad discovery could quietly collapse back into the domain the system already knows best. These six articles are audit-derived, not aspirational: each responds to a specific, verified, repeated failure mode, not a hypothetical one.)
 **Amended:** 2026-09-07 (Article LXX — the Operational Language Rule (English Only), per the operator's CODER NEXT DIRECTIVE section 1; see `R419/constitution/ARTICLE_LXX_OPERATIONAL_LANGUAGE_RULE.md`)
+**Amended:** 2026-09-10 (Article LXXI is RESERVED; Article LXXII — No 3D Artifact Ships Without Passing the Visual Compiler, per the operator's R441 World-Class 3D Pipeline Constitution directive: the pipeline, not prompts, guarantees presentation quality; see `R441/constitution/ARTICLE_LXXII_VISUAL_COMPILER.md`)
 **Authority:** Constitutional — supersedes all coding directives, gate results, and research priorities
 **Scope:** Governs both research output AND modifications to the epistemic machinery itself, AND — from v2.0.0 — what the machine may call a discovery or an invention
 
@@ -2004,6 +2005,26 @@ for the scope table, enforcement mechanics, and the verification trail
 
 ---
 
+## Article LXXII — No 3D Artifact Ships Without Passing the Visual Compiler
+
+**Ratified:** 2026-09-10 (R441). Full text: `R441/constitution/ARTICLE_LXXII_VISUAL_COMPILER.md`.
+
+> A 3D artifact is not complete because geometry exists. It is complete only
+> after the canonical geometry has been transformed by the Visual Compiler
+> into a deterministic presentation set (Hero, Turntable, Exploded, Section,
+> Orthographic, Dimension, Poster), passed the Visual Quality Gate, and the
+> exact same approved render has been embedded in both the website and the
+> technology package PDF. If any visual gate fails, the Hero is suppressed
+> and the package is blocked from release.
+
+The gate is a verifier in the full constitutional sense: it re-measures the
+saved pixels with its own tools (Art. III), its thresholds carry directive
+provenance (Art. XXVII), it fails closed (a gate that cannot run suppresses
+the hero exactly like a failure — Art. V/XXV), and it never promotes the
+geometry's engineering status (a beautiful conceptual render is still
+conceptual — Art. XXVIII). CadQuery/OCCT remains the engineering geometry
+authority; the Visual Compiler is presentation-only (Art. LXI).
+
 # THE FOUR CONSTITUTIONAL LAYERS
 
 ```text
@@ -2047,6 +2068,7 @@ One immutable constitutional gate. It cannot become GREEN merely because code co
 ✓ learning from failure                      (Article LI)
 ✓ physical validation                        (Articles XXXVII, XXXVIII, LIII)
 ✓ technology-transfer package quality        (Articles XXXVI, LXIII, LXVI)
+✓ 3D visual quality gate                     (Article LXXII)
 ✓ infrastructure hygiene                     (Article LXIV)
 ✓ owner-decision closure, not just deferral  (Article LXV)
 ✓ tracked review independence                (Article LXVII)

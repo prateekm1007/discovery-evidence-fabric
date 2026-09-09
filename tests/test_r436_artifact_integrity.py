@@ -393,7 +393,7 @@ class TestVersionEndpoint:
             "web_build_file_count", "web_build_source",
             "constitution_version"}
         # the constitution version is parsed from the ratified file
-        assert payload["constitution_version"] == "2.2.0"
+        assert payload["constitution_version"] == "2.3.0"  # R441 amendment
         # engine commit resolves (local checkout: git source)
         assert payload["engine_commit_source"] in ("git", "build_artifact")
         assert len(payload["engine_commit"] or "") in (0, 40)

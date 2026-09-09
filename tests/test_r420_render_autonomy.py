@@ -34,6 +34,7 @@ discipline as tests/test_r419_render_pipeline.py.
 """
 
 import inspect
+import ast
 import json
 import os
 import sys
@@ -223,9 +224,10 @@ class TestThresholdProvenance(unittest.TestCase):
         self.assertIn("intended_execution_contexts", d["cross_cutting"])
 
     def test_thresholds_match_the_code(self):
-        """The record's thresholds are the ones the guard actually
-        applies — provenance and implementation agree (no silent
-        drift, Art. XXVII)."""
+        """Provenance and implementation agree (no silent drift, Art.
+        XXVII). R441: the LEGACY Blender record keeps its own values
+        (the legacy path is unchanged); the LIVE ladder is the R441
+        rasterizer ladder, tied to the R441 provenance record."""
         d = json.loads(self.RECORD.read_text())
         vals = {t["name"]: t for t in d["thresholds"]}
         self.assertEqual(
@@ -234,13 +236,14 @@ class TestThresholdProvenance(unittest.TestCase):
         self.assertEqual(
             vals["in_worker render budget"]["value_seconds"],
             render_mod._in_worker_budget_s())
-        # the async ladder in the job matches the record
-        record_ladder = vals["async quality ladder attempts 2-3"]
-        self.assertIn("6 samples", record_ladder["value"])
-        self.assertIn(
-            (6, [768, 512], 240), artifact_worker.QUALITY_LADDER)
-        self.assertIn(
-            (48, [1152, 768], 900), artifact_worker.QUALITY_LADDER)
+        # the LIVE ladder: R441 scale rungs, tied to the R441 record
+        r441 = json.loads(Path("discovery_fabric/engine/visual_compiler/"
+                               "visual_compiler_thresholds.json").read_text())
+        self.assertEqual(r441["quality_contract"]["resolution"],
+                         [1536, 1024])
+        self.assertEqual(
+            (1.0, [1536, 1024], 480), artifact_worker.QUALITY_LADDER[0])
+        self.assertGreaterEqual(len(artifact_worker.QUALITY_LADDER), 3)
 
     def test_memory_guard_record_carries_provenance(self):
         """A typed low-memory skip points at the Article XXVII record
@@ -392,19 +395,42 @@ class TestBlenderFailClosed(unittest.TestCase):
 
     def test_skip_record_carries_resolution_trail(self):
         """The typed no-blender skip EVIDENCES its resolution trail
-        (which candidates, why refused — never a bare 'not found')."""
+        (which candidates, why refused — never a bare 'not found').
+        R441: the legacy Blender backend is reachable only through an
+        EXPLICIT choice — which is exactly what this boundary test
+        exercises."""
         with tempfile.TemporaryDirectory() as td:
             orig = os.environ.pop("BLENDER_PATH", None)
             try:
                 rec = render_mod.render_invention(td, {},
-                                                  is_conceptual=True)
+                                                  is_conceptual=True,
+                                                  backend="blender")
             finally:
                 if orig is not None:
                     os.environ["BLENDER_PATH"] = orig
             self.assertEqual(rec["status"], "RENDER_SKIPPED_NO_BLENDER")
+            self.assertEqual(rec["render_pipeline"],
+                             "BLENDER_HEADLESS_LEGACY")
             self.assertIn("blender_resolution", rec)
             self.assertIn("pinned_tarball_sha256",
                           rec["blender_resolution"])
+
+    def test_default_backend_is_the_visual_compiler(self):
+        """R441 Article LXIV dispatcher contract: the PRIMARY path is
+        the Visual Compiler — production never reaches Blender without
+        an explicit choice (source-level refusal is machine-checked:
+        render_invention routes to visual_compiler unless 'blender' is
+        explicitly selected)."""
+        import inspect
+        tree = ast.parse(inspect.getsource(
+            render_mod.render_invention))
+        calls = [n.func.attr for n in ast.walk(tree)
+                 if isinstance(n, ast.Call)
+                 and isinstance(n.func, ast.Attribute)]
+        self.assertIn("compile_visuals", calls)
+        # and the legacy branch requires the explicit choice
+        src_txt = inspect.getsource(render_mod.render_invention)
+        self.assertIn('chosen == "blender"', src_txt)
 
     def test_pinned_local_build_is_accepted_and_recorded(self):
         if not (BLENDER and Path(BLENDER).is_file()):
@@ -443,7 +469,8 @@ class TestBlenderFailClosed(unittest.TestCase):
             orig = os.environ.pop("BLENDER_PATH", None)
             try:
                 rec = render_mod.render_invention(td, {},
-                                                  is_conceptual=True)
+                                                  is_conceptual=True,
+                                                  backend="blender")
             finally:
                 if orig is not None:
                     os.environ["BLENDER_PATH"] = orig
@@ -735,37 +762,71 @@ class TestIdempotentIntegrity(unittest.TestCase):
 
 class TestLadderAndTypedTerminal(unittest.TestCase):
 
-    def test_run_ladder_records_attempts_and_stops_at_no_blender(self):
-        """The bounded ladder: with no pinned build the first attempt
-        records the typed skip and the ladder STOPS (the same
-        environment would repeat it — honest terminal, no wasted
-        rungs)."""
+    def test_run_ladder_records_attempts_and_stops_at_no_renderer(self):
+        """The bounded ladder: with no verified renderer pair the first
+        attempt records the typed skip and the ladder STOPS (the same
+        environment would repeat it identically — honest terminal, no
+        wasted rungs). R441: the renderer is the Visual Compiler's
+        Chromium/Node pair; the legacy Blender variant below."""
+        from discovery_fabric.engine.visual_compiler import render_worker
+        with tempfile.TemporaryDirectory() as td:
+            s = _session_fixture(td)
+            oc, on = render_worker.find_chrome, render_worker.find_node
+            om = render_worker.memory_guard
+            render_worker.find_chrome = lambda: None
+            render_worker.find_node = lambda: None
+            render_worker.memory_guard = lambda *a, **k: None  # isolated:
+            # the skip under test is the missing renderer, never the
+            # sandbox's momentary memory headroom
+            import discovery_fabric.engine.visual_compiler.visual_compiler as _vc
+            _vc.render_worker = render_worker
+            try:
+                with _PatchedStore([s]):
+                    out = artifact_worker.run("ts_r420")
+            finally:
+                render_worker.find_chrome = oc
+                render_worker.find_node = on
+                render_worker.memory_guard = om
+                _vc.render_worker = render_worker
+            self.assertEqual(out["status"], "RENDER_SKIPPED_NO_RENDERER")
+            self.assertEqual(len(out["attempts"]), 1)
+            self.assertEqual(out["attempts"][0]["scale"], 1.0)
+            self.assertTrue(out["quality_ladder"])
+            job = json.loads(
+                (Path(td) / "MODEL" / "3D" / "RENDER_JOB.json").read_text())
+            self.assertEqual(job["status"], "RENDER_SKIPPED_NO_RENDERER")
+            self.assertEqual(
+                job["render_record"]["status"], "RENDER_SKIPPED_NO_RENDERER")
+
+    def test_ladder_stops_at_no_blender_legacy(self):
+        """The legacy Blender variant of the stop-on-deterministic-skip
+        contract (the backend is reachable only by explicit choice)."""
         with tempfile.TemporaryDirectory() as td:
             s = _session_fixture(td)
             orig_find = render_mod.find_blender
+            orig_env = os.environ.get("TOSCANINI_RENDER_BACKEND")
             render_mod.find_blender = lambda: None
+            os.environ["TOSCANINI_RENDER_BACKEND"] = "blender"
             try:
                 with _PatchedStore([s]):
                     out = artifact_worker.run("ts_r420")
             finally:
                 render_mod.find_blender = orig_find
+                if orig_env is None:
+                    os.environ.pop("TOSCANINI_RENDER_BACKEND", None)
+                else:
+                    os.environ["TOSCANINI_RENDER_BACKEND"] = orig_env
             self.assertEqual(out["status"], "RENDER_SKIPPED_NO_BLENDER")
             self.assertEqual(len(out["attempts"]), 1)
-            self.assertEqual(out["attempts"][0]["samples"], 48)
-            self.assertTrue(out["quality_ladder"])
-            job = json.loads(
-                (Path(td) / "MODEL" / "3D" / "RENDER_JOB.json").read_text())
-            self.assertEqual(job["status"], "RENDER_SKIPPED_NO_BLENDER")
-            self.assertIn("RENDER_SKIPPED_NO_BLENDER",
-                          job["render_record"]["status"])
 
     def test_ladder_is_bounded(self):
         """Three rungs, descending quality, bounded budgets (provenance:
-        render_threshold_provenance.json)."""
+        visual_compiler_thresholds.json, R441 — the samples dimension
+        does not exist in a rasterizer; rungs are (scale, res, budget))."""
         ladder = artifact_worker.QUALITY_LADDER
         self.assertEqual(len(ladder), 3)
-        samples = [r[0] for r in ladder]
-        self.assertEqual(samples, sorted(samples, reverse=True))
+        scales = [r[0] for r in ladder]
+        self.assertEqual(scales, sorted(scales, reverse=True))
         for _, _, budget in ladder:
             self.assertLessEqual(budget, 900)
             self.assertGreaterEqual(budget, 60)

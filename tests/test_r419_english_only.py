@@ -85,8 +85,10 @@ def test_r419_amendment_record_exists_and_certified():
 
 
 def test_constitution_v220_parses_and_acknowledged():
+    # R441: the constitution amended to v2.3.0 (Article LXXII); the
+    # loader must parse the RATIFIED version, whatever it now is
     from epistemic_integrity import constitution_loader as cl
-    assert cl._parse_constitution_version() == "2.2.0"
+    assert cl._parse_constitution_version() == "2.3.0"
     state = cl.check_constitution_compliance()
     assert state.constitution_present
     assert state.acknowledgment_present, (
@@ -108,7 +110,8 @@ def test_r419_authored_artifacts_are_english_only():
 
 def test_article_lxx_section_is_unique_and_verbatim():
     body = (REPO / "EPISTEMIC_CONSTITUTION.md").read_text()
-    assert body.count("## Article LXX") == 1
+    # prefix-safe: LXXII contains the LXX substring (R441 amendment)
+    assert body.count("## Article LXX ") + body.count("## Article LXX\n") == 1
     # the rule's key sentence is present (punctuation-insensitive)
     norm = re.sub(r"[^a-z0-9]+", " ", body.lower())
     assert "shall be written in english unless the operator explicitly" in norm

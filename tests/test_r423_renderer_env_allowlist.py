@@ -87,6 +87,18 @@ def poisoned_env(tmp_path, monkeypatch):
         monkeypatch.setenv(k, v)
     stub = _stub_blender(tmp_path)
     monkeypatch.setenv("BLENDER_PATH", str(stub))
+    # R441: these tests exercise the LEGACY Blender subprocess boundary
+    # (kept for format conversion + one round of production A/B). The
+    # legacy backend is reachable ONLY through an explicit choice —
+    # which is precisely the boundary under adversarial test here. The
+    # ACTIVE boundary (Chromium/Node) carries the same allowlist
+    # contract, adversarially covered in tests/test_r441_visual_compiler.py.
+    monkeypatch.setenv("TOSCANINI_RENDER_BACKEND", "blender")
+    # isolate the MEMORY dimension: the boundary under adversarial test
+    # is the env allowlist — a momentary dip in sandbox headroom must
+    # not convert the scenario into a low-memory skip
+    import discovery_fabric.engine.invention_bridge.render as _r
+    monkeypatch.setattr(_r, "_mem_available_mb", lambda: 4096)
     return {"stub": stub, "tmp": tmp_path}
 
 

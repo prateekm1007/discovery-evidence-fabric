@@ -1,9 +1,12 @@
-"""toscanini/artifact_worker.py — R419 §21 + R420: the async render job.
+"""toscanini/artifact_worker.py — R419 §21 + R420 + R441: the async
+render job.
 
-The render job (Blender 5.2 LTS headless over the run's authoritative
-GLB) is a DETACHED subprocess — the web request that enqueues it never
-waits for Blender (operator directive section 21: POST artifact-build
--> job -> worker -> Blender -> artifacts -> persisted).
+The render job (the R441 VISUAL COMPILER — headless Chromium + Three.js
+over the run's authoritative GLB; the pinned Blender build is a legacy
+backend reachable only by explicit choice) is a DETACHED subprocess —
+the web request that enqueues it never waits for the renderer (operator
+directive R419 section 21, carried: POST artifact-build -> job ->
+worker -> Visual Compiler -> artifacts -> persisted).
 
 R420 (operator directive, sections 1/3/7) — the render path is
 AUTONOMOUS and RESTART-SAFE:
@@ -53,8 +56,8 @@ Job contract:
       untouched by this module.
 
 This module is a thin enqueue/job-record layer; the render itself is
-discovery_fabric.engine.invention_bridge.render (the pinned-build
-orchestrator) and blender_render.py (the Blender-side script).
+discovery_fabric.engine.invention_bridge.render (the R441 dispatcher:
+Visual Compiler primary) over discovery_fabric.engine.visual_compiler.
 """
 from __future__ import annotations
 
@@ -101,13 +104,14 @@ def _try_run_lock_nonblocking():
         f.close()
         return None, False
 
-# R420 quality ladder — bounded, typed, provenance in
-# render_threshold_provenance.json (Art. XXVII). Each rung:
-# (samples, [width, height], budget_seconds)
+# R420 quality ladder, re-expressed for the R441 rasterizer (Art.
+# XXVII provenance: visual_compiler_thresholds.json — Cycles "samples"
+# no longer exists; each rung is (scale, [width, height], budget_s)).
+# Measured full-set wall times: 6.9-17.1 s — budgets are generous.
 QUALITY_LADDER = (
-    (48, [1152, 768], 900),
-    (16, [960, 640], 420),
-    (6, [768, 512], 240),
+    (1.0, [1536, 1024], 480),
+    (0.75, [1152, 768], 300),
+    (0.5, [768, 512], 180),
 )
 
 _TERMINAL_OK = ("OK", "PARTIAL")
@@ -307,10 +311,10 @@ def enqueue(session_id: str, enqueued_by: str = "api") -> Dict[str, Any]:
         "enqueued_by": enqueued_by,
         "worker_pid": proc.pid,
         "worker_starttime": starttime,
-        "pipeline": "BLENDER_HEADLESS",
+        "pipeline": "VISUAL_COMPILER_HEADLESS_THREE",
         "note": ("async artifact build — the web request never waits "
-                 "for Blender; poll the render routes or the CIO's "
-                 "visualization.renders"),
+                 "for the renderer; poll the render routes or the "
+                 "CIO's visualization.renders"),
     } | trail
     return _write_job(session_id, record)
 
@@ -628,7 +632,7 @@ def run(session_id: str) -> Dict[str, Any]:
         "status": "RUNNING",
         "worker_pid": os.getpid(),
         "worker_starttime": store._proc_stat_starttime(os.getpid()),
-        "pipeline": "BLENDER_HEADLESS",
+        "pipeline": "VISUAL_COMPILER_HEADLESS_THREE",
         "note": "async artifact build — detached render job running"})
 
     # R420: the worker enqueues this job at the END of the run but the
@@ -642,7 +646,7 @@ def run(session_id: str) -> Dict[str, Any]:
     try:
         attempts: List[Dict[str, Any]] = []
         rec: Dict[str, Any] = {}
-        for idx, (samples, resolution, budget_s) in enumerate(
+        for idx, (scale, resolution, budget_s) in enumerate(
                 QUALITY_LADDER, start=1):
             # R420c: mutual exclusion with the discovery runs — hold
             # the run lock for exactly one attempt (an engine run and
@@ -654,8 +658,7 @@ def run(session_id: str) -> Dict[str, Any]:
                         str(run_dir), {"generation_models": None},
                         is_conceptual=vis_class != "ENGINEERING_3D",
                         memory_mode="async",
-                        samples=samples, resolution=resolution,
-                        timeout_s=budget_s)
+                        resolution=resolution, timeout_s=budget_s)
                 except Exception as exc:  # noqa: BLE001 — typed, never silent
                     rec = {"stage": "RENDER", "status": "RENDER_FAILED",
                            "error": f"{type(exc).__name__}: {exc}"}
@@ -666,20 +669,25 @@ def run(session_id: str) -> Dict[str, Any]:
                     pass
             attempts.append({
                 "attempt": idx,
-                "samples": samples,
+                "scale": scale,
+                "samples": "N/A (rasterizer, R441 engine change)",
                 "resolution": resolution,
                 "budget_seconds": budget_s,
                 "status": rec.get("status", "UNKNOWN"),
             })
             print(f"[artifact_worker] {session_id} attempt {idx} "
-                  f"(samples={samples}, {resolution[0]}x{resolution[1]}): "
+                  f"(scale={scale}, {resolution[0]}x{resolution[1]}): "
                   f"{rec.get('status')}", file=sys.stderr, flush=True)
             if rec.get("status") in ("OK", "PARTIAL"):
                 break
             # a skip that the same environment will repeat identically
-            # (no pinned build at all) ends the ladder now — honest
-            # terminal state, no wasted rungs
-            if rec.get("status") == "RENDER_SKIPPED_NO_BLENDER":
+            # (no verified renderer pair, dependency contract unmet)
+            # ends the ladder now — honest terminal state, no wasted
+            # rungs
+            if str(rec.get("status", "")).startswith(
+                    "RENDER_SKIPPED_NO") or str(
+                        rec.get("status", "")).startswith(
+                        "RENDER_SKIPPED_THREE"):
                 break
     finally:
         try:
@@ -697,15 +705,16 @@ def run(session_id: str) -> Dict[str, Any]:
         "status": status,
         "at": _now(),
         "quality_ladder": [
-            {"samples": s_, "resolution": r, "budget_seconds": b}
+            {"scale": s_, "resolution": r, "budget_seconds": b}
             for s_, r, b in QUALITY_LADDER],
         "attempts": attempts,
         "render_record": {
             k: rec.get(k) for k in
-            ("status", "render_pipeline", "pinned_blender",
-             "blender_version_verified", "source_glb_sha256",
+            ("status", "render_pipeline", "renderer_stack",
+             "source_glb_sha256", "scene_spec_sha256",
              "artifacts", "missing_artifacts", "seconds", "note",
-             "error", "threshold_provenance")},
+             "error", "threshold_provenance", "hero_suppressed",
+             "release_blocked")},
     })
 
     # R420 persistence, R425 §7 boundary: completed renders must ride

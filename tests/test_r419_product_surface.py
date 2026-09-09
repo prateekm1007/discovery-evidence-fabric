@@ -53,10 +53,16 @@ class TestRouteWiring(unittest.TestCase):
 
     def test_render_route_whitelists_names(self):
         # the whitelist is IN the handler source (no traversal, no
-        # arbitrary file serving through the render route)
+        # arbitrary file serving through the render route). R441: the
+        # visual set adds poster/dimension/turntable/orthographic and
+        # ONE sub-path segment, still through the Path(...).name sanitizer
         src = inspect.getsource(srv.Handler.do_GET)
-        self.assertIn('Path(parts[4]).name', src)
+        self.assertIn('Path(tail).name', src)
+        self.assertIn('Path(name).name', src)
         self.assertIn("unknown render name", src)
+        # no raw parts[4] ever reaches a file path unsanitized
+        render_block = src.split('parts[3] == "render"')[1]
+        self.assertIn('/ "MODEL" / "3D" / rel', render_block)
 
 
 class TestArtifactWorker(unittest.TestCase):
@@ -118,10 +124,14 @@ class TestArtifactWorker(unittest.TestCase):
                 model.mkdir()
                 (model / "model-001.glb").write_bytes(b"glb")
                 out = artifact_worker.run("ts_x")
-                # no Blender resolvable -> typed honest skip,
-                # never a crash and never a fabricated artifact
+                # no renderer resolvable -> typed honest skip or a
+                # typed failure, never a crash and never a fabricated
+                # artifact (R441: the renderer is the Visual Compiler;
+                # the legacy Blender variant keeps its own status)
                 self.assertIn(out["status"],
-                              ("RENDER_SKIPPED_NO_BLENDER", "FAILED"))
+                              ("RENDER_SKIPPED_NO_BLENDER",
+                               "RENDER_SKIPPED_NO_RENDERER",
+                               "RENDER_FAILED"))
                 job = json.loads(
                     (Path(td) / "MODEL" / "3D" / "RENDER_JOB.json")
                     .read_text())

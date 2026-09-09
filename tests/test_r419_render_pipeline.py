@@ -65,10 +65,15 @@ class TestRenderPipelineHermetic(unittest.TestCase):
             self.skipTest("BLENDER_PATH set — the skip path needs it unset")
         work = tempfile.mkdtemp(prefix="r419_skip_")
         rec = render_stage.render_invention(work, {}, is_conceptual=True)
-        self.assertEqual(rec["status"], "RENDER_SKIPPED_NO_BLENDER")
+        # R441: the renderer is the Visual Compiler; the typed skip
+        # FAMILY is the contract (which specific skip fires — no
+        # renderer / no source / low memory — depends on the
+        # environment), never a crash, never a fabricated artifact
+        self.assertTrue(str(rec.get("status", "")).startswith(
+            "RENDER_SKIPPED_"), rec)
         self.assertIn("note", rec)
         # the GLB contract statement is part of the record
-        self.assertIn("interactive GLB", rec["note"])
+        self.assertIn("interactive GLB", rec.get("note", ""))
 
     def test_bridge_with_no_blender_still_completes(self):
         if BLENDER and os.path.isfile(BLENDER):
@@ -80,14 +85,31 @@ class TestRenderPipelineHermetic(unittest.TestCase):
                  for s in result["report"]["steps"]}
         self.assertEqual(steps["CLASSIFY"], "OK")
         self.assertEqual(steps["GEOMETRY"], "OK")
-        self.assertEqual(steps["RENDER"], "RENDER_SKIPPED_NO_BLENDER")
+        # R441: with a verified renderer the bridge now renders FOR
+        # REAL (better than the old typed skip); on a renderer-less
+        # environment the typed-skip family holds. Both are honest.
+        self.assertTrue(steps["RENDER"] == "OK" or
+                        str(steps["RENDER"]).startswith("RENDER_SKIPPED_"),
+                        steps["RENDER"])
         self.assertEqual(steps["PACKAGE"], "OK")
         # the interactive GLB contract is unaffected by the render skip
         self.assertTrue(result["geometry_out"]["glb_sha256"])
         # CIO: renders is a typed honest absence, not a fabricated state
         renders = result["cio_updated"]["visualization"]["renders"]
-        self.assertEqual(renders["status"], "RENDER_SKIPPED_NO_BLENDER")
-        self.assertIsNone(renders.get("hero_png"))
+        # R441: a verified renderer renders FOR REAL (status OK, the
+        # visual set attached); a renderer-less environment carries the
+        # typed skip family. Both are honest completions of the bridge.
+        self.assertTrue(
+            renders["status"] == "OK"
+            or str(renders["status"]).startswith("RENDER_SKIPPED_"),
+            renders["status"])
+        if renders["status"] != "OK":
+            # the typed-skip honest absence: no hero pointer is
+            # fabricated when nothing was rendered (Art. VI/XXV)
+            self.assertIsNone(renders.get("hero_png"))
+        else:
+            # the R441 real render: the hero pointer IS the artifact
+            self.assertTrue(renders["hero_png"].endswith("hero.png"))
 
 
 @unittest.skipUnless(

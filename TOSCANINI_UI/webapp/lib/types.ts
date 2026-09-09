@@ -584,6 +584,7 @@ export interface CIO {
       status?: string;
       pipeline?: string;
       pinned_blender?: string;
+      renderer_stack?: Record<string, unknown>;
       is_conceptual?: boolean;
       hero_png?: string | null;
       hero_glb?: string | null;
@@ -591,6 +592,16 @@ export interface CIO {
       section_glb?: string | null;
       exploded_png?: string | null;
       exploded_glb?: string | null;
+      poster_png?: string | null;
+      dimension_png?: string | null;
+      orthographic?: Record<string, string>;
+      turntable_frame_count?: number;
+      turntable_first?: string | null;
+      visual_gate?: {
+        verdict?: string;
+        hero_suppressed?: boolean;
+        failed_rules?: string[];
+      };
       missing?: string[];
       presentation_rule?: string;
       note?: string;

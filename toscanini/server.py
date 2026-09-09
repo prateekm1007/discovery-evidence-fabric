@@ -841,14 +841,32 @@ class Handler(BaseHTTPRequestHandler):
                 s = store.get_session(rid)
                 if not s or not s.get("run_dir"):
                     return self._json(404, {"error": "not found"})
-                name = Path(parts[4]).name
-                if name not in (
-                        "hero.png", "hero.glb", "section.png", "section.glb",
-                        "exploded.png", "exploded.glb"):
-                    return self._json(404, {"error": "unknown render name"})
-                f = Path(s["run_dir"]) / "MODEL" / "3D" / name
-                mime = "image/png" if name.endswith(".png") \
-                    else "model/gltf-binary"
+                name = parts[4]
+                # R441 visual set (poster/dimension/turntable/ortho join
+                # hero/section/exploded); the name may carry ONE path
+                # segment (orthographic/front.png, turntable/frame-01.png)
+                if "/" in name:
+                    head, _, tail = name.partition("/")
+                    if (head not in ("orthographic", "turntable")
+                            or not tail.replace(".", "").replace("-", "")
+                            .replace("_", "").isalnum()):
+                        return self._json(404,
+                                          {"error": "unknown render name"})
+                    rel = f"{head}/{Path(tail).name}"
+                else:
+                    name = Path(name).name
+                    if name not in (
+                            "hero.png", "hero.glb", "section.png",
+                            "exploded.png", "exploded.glb", "poster.png",
+                            "dimension.png", "scene_spec.json",
+                            "visual_gate.json", "render_record.json"):
+                        return self._json(404,
+                                          {"error": "unknown render name"})
+                    rel = name
+                f = Path(s["run_dir"]) / "MODEL" / "3D" / rel
+                mime = ("image/png" if rel.endswith(".png")
+                        else "application/json" if rel.endswith(".json")
+                        else "model/gltf-binary")
                 # R423A Phase 5: render artifacts are content-stable —
                 # immutable caching + real-SHA ETag + Range (resumable)
                 return self._serve_file(f, mime, immutable=True)

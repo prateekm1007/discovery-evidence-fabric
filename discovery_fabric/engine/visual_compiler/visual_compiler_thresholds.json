@@ -1,0 +1,50 @@
+{
+  "artifact_type": "VISUAL_COMPILER_THRESHOLD_PROVENANCE",
+  "constitutional_basis": "Article XXVII (no threshold invention) — every operational threshold applied by the R441 Visual Compiler carries its measurement basis, context and uncertainty. Revised values are APPENDED to the revision history, never overwritten.",
+  "created": "2026-09-10",
+  "round": "R441",
+  "memory_guard_mb": {
+    "in_worker": 800,
+    "async": 650,
+    "basis": "MEASURED (2026-09-10, sandbox verification host, R441 acceptance): headless Chromium + SwiftShader renderer tree peak PSS 542-643 MB across 8 processes (chrome-gpu SwiftShader ~393 MB dominant, node ~98 MB, chrome mains ~152 MB; measured per-process from /proc/<pid>/smaps_rollup during live R441 acceptance runs over two CAD GLBs at 1536x1024 with the full seven-view set). The guard values (800 in-worker / 650 async) sit ABOVE the measured tree peak with a modest margin. CONSEQUENCE (same honest production behavior as the Blender path): on the 512 MB Starter cgroup the visual compiler TYPED-SKIPS (RENDER_SKIPPED_LOW_MEMORY, Art. LXI) with the plan-upgrade note; on a >=1 GB plan it renders automatically. The Blender comparison baseline (~269 MB RSS trivial scene) is NOT directly comparable — Cycles path tracing vs SwiftShader rasterization with persistent GPU-process surfaces.",
+    "threshold_class": "ENGINEERING",
+    "uncertainty": "PSS sum double-counts nothing (proportional), but varies with model complexity, resolution and view count by roughly +/-15%; the largest single process (SwiftShader GPU) dominates. Re-measure on the production plan before lowering."
+  },
+  "chrome_baseline_measurement": {
+    "status": "MEASURED",
+    "date": "2026-09-10",
+    "environment": "sandbox verification host (R441 acceptance), chrome-headless-shell 152.0.7977.54 via puppeteer-core 25.9.0, three 0.175.0, Node v24",
+    "tree_peak_pss_mb": [542, 643],
+    "per_process_peak_pss_mb": {
+      "chrome_gpu_swiftshader": 292,
+      "node_driver": 98,
+      "chrome_main_processes": "18-82 each"
+    },
+    "timing_full_visual_set_seconds": [6.9, 17.1],
+    "notes": "antialias disabled for the deterministic raster path (SwiftShader MSAA buffers ~4x surface memory; the interactive website viewer keeps its own AA). Turntable rendered at half resolution (768x512) — gallery asset, not the hero."
+  },
+  "render_budget_seconds": {
+    "async": 480,
+    "basis": "the full seven-view visual set (hero + 12-frame turntable + exploded + section + 4 orthographic + dimension + poster + 2 GLB exports) through SwiftShader CPU rasterization measured at 6.9-17.1 s live — the 480 s budget is >25x the measured worst case, generous by construction. Env-overridable via ENGINE_VC_TIMEOUT_S.",
+    "threshold_class": "ENGINEERING"
+  },
+  "quality_contract": {
+    "resolution": [1536, 1024],
+    "turntable_resolution": [768, 512],
+    "note": "rasterization (Three.js) has no Cycles 'samples' — the R420 quality ladder's samples dimension is N/A by engine change and recorded as such in the typed record; the ladder's resolution/budget dimensions carry over."
+  },
+  "revision_history": [
+    {
+      "rev": 1,
+      "date": "2026-09-10",
+      "round": "R441",
+      "change": "initial record — thresholds carried over from the Blender provenance file where engine-independent, fresh where engine-specific; chrome baseline marked TO_BE_MEASURED"
+    },
+    {
+      "rev": 2,
+      "date": "2026-09-10",
+      "round": "R441",
+      "change": "chrome baseline MEASURED on live acceptance runs (542-643 MB tree PSS, breakdown recorded); memory guards set to 800 in-worker / 650 async per the measurement (was 650/400 carried from Blender); antialias disabled on the renderer path with rationale; turntable pinned at half resolution; budgets confirmed against measured 6.9-17.1 s wall times"
+    }
+  ]
+}
