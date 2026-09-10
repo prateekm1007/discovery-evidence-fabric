@@ -246,11 +246,119 @@ def main() -> int:
         "state_integrity_tests": _state_integrity_summary(),
         "fresh_production_run_ids": _production_summary(),
         "package_hashes": _package_hashes(),
+        "known_failures": _known_failures(),
+        "known_gaps": _known_gaps(),
     }
 
     OUT.write_text(json.dumps(record, indent=1, default=str))
     print(f"round record -> {OUT}")
     return 0
+
+
+def _known_failures() -> Dict[str, Any]:
+    """The round's honestly-recorded failures (Art. XV — disclosed,
+    never hidden)."""
+    return {
+        "f1_package_gate_blocks_every_fresh_package": (
+            "REPRODUCED + ROOT-CAUSED (R444/F1_REPRODUCTION.json): "
+            "A-INTERNAL-DIVERGENT — the package identity declares "
+            "domain_family in the ENGINE vocabulary (thermal, "
+            "energy_harvesting...) while the GEOMETRY_SPEC declares it "
+            "in the BRIDGE family vocabulary (GENERIC_ARCHITECTURE, "
+            "THERMAL_SYSTEM...); the R440 quality gate correctly "
+            "blocks. Introduced by R443's defect-5 fix (the GEOMETRY_SPEC "
+            "began declaring family). Consequence: ZERO packages emitted "
+            "from the fresh benchmark (13 PACKAGE_DEFERRED + blocked "
+            "compiles; package_hashes.n_packages = 0). DEFERRED to the "
+            "next round per the operator's R444 do-not-touch list "
+            "('domain architecture' — the vocabulary unification IS "
+            "domain architecture). Coder 2's finding confirmed."),
+        "f2_r424_battery_red": (
+            "CONFIRMED: 17 failures at HEAD vs 20 passed at pristine "
+            "790abb99 — root cause is F1 (blocked packages carry no "
+            "zip_path -> KeyError) plus the W-applicability gate "
+            "correctly firing on the stale solar fixture's medical "
+            "contamination. DISCLOSURE (Art. XV): the R443 round "
+            "record's claim that the regression failure set was "
+            "'IDENTICAL to the clean tree' was INACCURATE for this "
+            "battery — Coder 2's pristine verification is correct."),
+        "f3_visual_stage_record_regression": (
+            "FILED BY CODER 2, not re-verified this round (production "
+            "window spent on the benchmark runs): fresh production runs "
+            "may leave NO visual-stage record; needs production-log "
+            "diagnosis. The R443-C2 typed-record schema is in place."),
+        "f4_glb_template_reuse": (
+            "FILED BY CODER 2 (the R442 generic-chassis defect 1 still "
+            "reproduces: a structurally different problem produced a "
+            "byte-identical GLB to R442 Case B). Domain-architecture "
+            "adjacent; deferred with F1."),
+        "dedicated_evolution_cases_transport_blocked": (
+            "the 3 dedicated R444-C cases (intentionally imperfect "
+            "candidates) ran into the z-ai quota exhaustion "
+            "(429 Too many requests, >1h window after the battery + "
+            "calibration burned the shared upstream quota): "
+            "evol-x01 INVENTION_UNDER_DEVELOPMENT/TRANSPORT_BLOCKED, "
+            "evol-x02 + evol-x03 MECHANISM_GENERATION_FAILED "
+            "(FALLBACK_GENERATION_FAILED) — honest Art. LXI states, "
+            "resumable when the quota resets; the battery's 10 full "
+            "causal chains are the round's evolution evidence"),
+        "production_transport_degradation": (
+            "R444-F fresh production runs at the deployed SHA "
+            "3f8229be: ts_fe2fbf3c1d3e completed "
+            "MECHANISM_GENERATION_FAILED (transport/CALL_FAILED — the "
+            "same degradation R443-C2's four runs measured); "
+            "ts_b68a033d87b3 still running past the 30-minute poll "
+            "window (cio=200 — the run is alive and progressing). "
+            "NVIDIA completions hang (240s timeouts re-measured this "
+            "round); openrouter DEGRADED (50 models)."),
+    }
+
+
+def _known_gaps() -> Dict[str, Any]:
+    """The round's honestly-recorded gaps (what remains unproven)."""
+    return {
+        "no_packages_emitted": (
+            "the killer-experiment contract is proven at the RUN level "
+            "(every DECISIVE_EXPERIMENT carries the Article LII "
+            "contract; the final-status gate enforces the kill answer) "
+            "but NOT at the PACKAGE level — F1 blocks every package "
+            "compile; the package-level contract presentation (the "
+            "12 fields in the buyer documents) awaits the vocabulary "
+            "unification"),
+        "attacker_not_calibrated": (
+            "two independent corpora now measure the engine's "
+            "independent attacker as a universal killer (R412 40-case: "
+            "TPR 1.0/FPR 1.0; R401-WC2 16-case this round: TPR 12/12, "
+            "false-kill 4/4, TNR 0) — the verdict NOT_CALIBRATED "
+            "stands; the R417 abstain/escalate gate remains the "
+            "production mitigation; a selectively-calibrated attacker "
+            "remains an open engineering problem (the objection CONTENT "
+            "is substantive on both defect and clean cases)"),
+        "evolution_diagnosis_coverage": (
+            "the battery's 10 evolved chains carry the full "
+            "gen-N -> diagnosis -> causal-delta -> gen-N+1 record, but "
+            "the diagnosed causes cluster on evidence-verification "
+            "failure (UNDETERMINED class) — the diagnosis taxonomy's "
+            "coverage of physics/attack-driven causes was not "
+            "exercised by these particular runs (the 3 dedicated "
+            "adversarial cases that would exercise them were "
+            "transport-blocked)"),
+        "benchmark_single_arm": (
+            "the battery ran the r401 arm only (the current HEAD "
+            "engine) — the original W11 protocol's baseline-vs-r401 "
+            "two-arm comparison was for the R401-era measurement; the "
+            "R444 directive asked for the machinery to RUN against "
+            "the current engine, which it did at commit 6ff0da3a"),
+        "production_visual_stage": (
+            "no production visual success is claimed this round (the "
+            "512MB free plan type-skips render; the owner-gated "
+            "capacity upgrade remains the standing blocker, Art. LXV "
+            "escalation count 4 per Coder 2's R444-C2 record)"),
+        "reviewer_independence": (
+            "every review in this chain is AI-on-AI (Art. LXVII): the "
+            "coder and the auditor are both AI agents; no human or "
+            "external-organization review has occurred"),
+    }
 
 
 def _battery_summary() -> Dict[str, Any]:

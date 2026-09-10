@@ -1,0 +1,528 @@
+{
+ "report_version": "r444-production-verify/1.0.0",
+ "base_url": "https://toscanini-engine-docker.onrender.com",
+ "version_check": {
+  "http_status": 200,
+  "set_cookie": "tosca_owner=ca6ba1d9514d43738e3d73b07042e03e; HttpOnly; SameSite=Lax; Path=/; Max-Age=31536000",
+  "body": {
+   "engine_commit": "3f8229be2b31211ccdcdf49101f0e1576ab861a5",
+   "engine_commit_source": "build_artifact",
+   "web_build_hash": "c403e279fe4dcb93214621509094549cd724d0bf5f1a62fec34b6c468aac6ea1",
+   "web_build_file_count": 30,
+   "web_build_source": "content hash over TOSCANINI_UI/webapp-export/",
+   "constitution_version": "2.3.0"
+  }
+ },
+ "health_check": {
+  "http_status": 200,
+  "set_cookie": "tosca_owner=54cd0286b77643378ebed42d9fc06a89; HttpOnly; SameSite=Lax; Path=/; Max-Age=31536000",
+  "body": {
+   "ok": true,
+   "status": "ok",
+   "service": "toscanini",
+   "showcase_ready": true,
+   "discovery_ready": true,
+   "providers": {
+    "tokenrouter": {
+     "status": "UNAVAILABLE",
+     "available_models": 0
+    },
+    "zai": {
+     "status": "UNAVAILABLE",
+     "available_models": 0
+    },
+    "openrouter": {
+     "status": "DEGRADED",
+     "available_models": 50
+    },
+    "nvidia": {
+     "status": "HEALTHY",
+     "available_models": 19
+    },
+    "anthropic": {
+     "status": "UNAVAILABLE",
+     "available_models": 0
+    },
+    "gemini": {
+     "status": "UNAVAILABLE",
+     "available_models": 0
+    },
+    "openai": {
+     "status": "UNAVAILABLE",
+     "available_models": 0
+    },
+    "qwen": {
+     "status": "UNAVAILABLE",
+     "available_models": 0
+    },
+    "deepseek": {
+     "status": "UNAVAILABLE",
+     "available_models": 0
+    },
+    "mistral": {
+     "status": "UNAVAILABLE",
+     "available_models": 0
+    }
+   },
+   "retrieval_ready": true,
+   "physics_ready": false,
+   "reality_loop_ready": true,
+   "product_status": "Discovery ready",
+   "engine_commit": "3f8229be2b31211ccdcdf49101f0e1576ab861a5",
+   "transport": "https://integrate.api.nvidia.com/v1/chat/completions",
+   "portfolio_ready": true,
+   "gateway_up": null,
+   "gateway_up_note": "not applicable: EXTERNAL transport mode (no local gateway by design); transport readiness = llm_transport_ready",
+   "operator_key_configured": true,
+   "deployment_identity": {
+    "build_artifact_commit": "3f8229be2b31211ccdcdf49101f0e1576ab861a5",
+    "build_artifact_source": "render_git_commit",
+    "build_artifact_sha256": "73b606f954e0d3d3b724acd9ffca3538e410b0b8f38ac6277253ad0d6ae872ec",
+    "render_git_commit": "3f8229be2b31211ccdcdf49101f0e1576ab861a5",
+    "build_context_git_head": null,
+    "baked_at_utc": "2026-09-10T20:19:53Z",
+    "running_artifact_sha256": "73b606f954e0d3d3b724acd9ffca3538e410b0b8f38ac6277253ad0d6ae872ec",
+    "identity_tamper": false,
+    "health_reported_commit": "3f8229be2b31211ccdcdf49101f0e1576ab861a5",
+    "health_reported_commit_source": "build_artifact",
+    "operator_declared_commit": "f177fcf5e14626ea1bee4a9a25b24b0ac80e7ee2",
+    "live_git_head": null,
+    "boot_time_utc": "2026-09-10T20:21:05Z",
+    "is_restart_not_deployment": true,
+    "portfolio_commit_pinned": "b978e32c6a484fa14d7b42e60f407333612a50d9",
+    "portfolio_commit_running": "b978e32c6a484fa14d7b42e60f407333612a50d9",
+    "deployment_drift": "RED",
+    "drift_reasons": [
+     "operator_declared=f177fcf5e146 != artifact=3f8229be2b31"
+    ],
+    "rule": "identity = build artifact only (env vars pin expectations, never identity); BUILD_ARTIFACT_SHA == RUNNING_ARTIFACT_SHA == HEALTH_REPORTED_SHA with identity_tamper=false; drift is RED => the release is NOT healthy regardless of other readiness fields (R394 s1, R396 A.6)"
+   },
+   "readiness": {
+    "engine_ready": true,
+    "engine_commit": "3f8229be2b31211ccdcdf49101f0e1576ab861a5",
+    "engine_commit_source": "build_artifact",
+    "deployment_drift": "RED",
+    "portfolio_ready": true,
+    "portfolio_commit": "b978e32c6a484fa14d7b42e60f407333612a50d9",
+    "portfolio_commit_pinned": "b978e32c6a484fa14d7b42e60f407333612a50d9",
+    "portfolio_pin_match": true,
+    "llm_transport_ready": true,
+    "llm_transport": {
+     "mode": "EXTERNAL",
+     "provider": "nvidia",
+     "model": "deepseek-ai/deepseek-v4-flash-0731",
+     "base_url": "https://integrate.api.nvidia.com/v1/chat/completions",
+     "selection": "registry default policy (availability->quality->cost->latency)",
+     "last_probe": {
+      "status": "OK",
+      "provider": "nvidia",
+      "model": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
+      "latency_ms": 555,
+      "error": "",
+      "route": [
+       {
+        "provider_attempted": "nvidia",
+        "model": "deepseek-ai/deepseek-v4-flash-0731",
+        "attempts": 1,
+        "failure_type": "TIMEOUT",
+        "timestamp": "2026-09-10T20:23:27+00:00Z"
+       },
+       {
+        "provider_attempted": "openrouter",
+        "model": "deepseek/deepseek-v4-flash-0731",
+        "attempts": 1,
+        "failure_type": "CREDIT_EXHAUSTED",
+        "timestamp": "2026-09-10T20:23:27+00:00Z"
+       }
+      ],
+      "at": "2026-09-10T20:23:28Z",
+      "source": "preflight"
+     }
+    },
+    "discovery_ready": true,
+    "llm_ready": true,
+    "providers": [
+     {
+      "provider": "tokenrouter",
+      "status": "UNAVAILABLE",
+      "available": false,
+      "model": "z-ai/glm-5.3-free",
+      "model_count": 1,
+      "quality_tier": 2,
+      "cost_tier": 1,
+      "latency_tier": 2,
+      "context_window": 128000,
+      "last_success": null,
+      "last_failure": null,
+      "last_failure_type": null,
+      "latency_ms": null,
+      "latency_ema_ms": null,
+      "call_count": 0,
+      "failure_count": null,
+      "recent_failure_rate": null,
+      "rate_limit_state": "CLEAR"
+     },
+     {
+      "provider": "zai",
+      "status": "UNAVAILABLE",
+      "available": false,
+      "model": "glm-4-plus",
+      "model_count": 1,
+      "quality_tier": 2,
+      "cost_tier": 1,
+      "latency_tier": 1,
+      "context_window": 128000,
+      "last_success": null,
+      "last_failure": null,
+      "last_failure_type": null,
+      "latency_ms": null,
+      "latency_ema_ms": null,
+      "call_count": 0,
+      "failure_count": null,
+      "recent_failure_rate": null,
+      "rate_limit_state": "CLEAR"
+     },
+     {
+      "provider": "openrouter",
+      "status": "DEGRADED",
+      "available": true,
+      "model": "nvidia/nemotron-3.5-lightning:free",
+      "model_count": 1,
+      "quality_tier": 2,
+      "cost_tier": 2,
+      "latency_tier": 2,
+      "context_window": 128000,
+      "last_success": null,
+      "last_failure": "2026-09-10T20:23:27Z",
+      "last_failure_type": "CREDIT_EXHAUSTED",
+      "latency_ms": null,
+      "latency_ema_ms": null,
+      "call_count": 1,
+      "failure_count": 1,
+      "recent_failure_rate": null,
+      "rate_limit_state": "CLEAR"
+     },
+     {
+      "provider": "nvidia",
+      "status": "OK",
+      "available": true,
+      "model": "deepseek-ai/deepseek-v4-flash-0731",
+      "model_count": 1,
+      "quality_tier": 2,
+      "cost_tier": 1,
+      "latency_tier": 1,
+      "context_window": 128000,
+      "last_success": "2026-09-10T20:23:28Z",
+      "last_failure": "2026-09-10T20:23:27Z",
+      "last_failure_type": "TIMEOUT",
+      "latency_ms": 555,
+      "latency_ema_ms": 555.0,
+      "call_count": 2,
+      "failure_count": 1,
+      "recent_failure_rate": 0.5,
+      "rate_limit_state": "CLEAR"
+     },
+     {
+      "provider": "anthropic",
+      "status": "UNAVAILABLE",
+      "available": false,
+      "model": "claude-sonnet-4-20250514",
+      "model_count": 1,
+      "quality_tier": 1,
+      "cost_tier": 3,
+      "latency_tier": 3,
+      "context_window": 200000,
+      "last_success": null,
+      "last_failure": null,
+      "last_failure_type": null,
+      "latency_ms": null,
+      "latency_ema_ms": null,
+      "call_count": 0,
+      "failure_count": null,
+      "recent_failure_rate": null,
+      "rate_limit_state": "CLEAR"
+     },
+     {
+      "provider": "gemini",
+      "status": "UNAVAILABLE",
+      "available": false,
+      "model": "gemini-2.0-flash",
+      "model_count": 1,
+      "quality_tier": 2,
+      "cost_tier": 1,
+      "latency_tier": 2,
+      "context_window": 1000000,
+      "last_success": null,
+      "last_failure": null,
+      "last_failure_type": null,
+      "latency_ms": null,
+      "latency_ema_ms": null,
+      "call_count": 0,
+      "failure_count": null,
+      "recent_failure_rate": null,
+      "rate_limit_state": "CLEAR"
+     },
+     {
+      "provider": "openai",
+      "status": "UNAVAILABLE",
+      "available": false,
+      "model": "gpt-4o",
+      "model_count": 1,
+      "quality_tier": 1,
+      "cost_tier": 3,
+      "latency_tier": 2,
+      "context_window": 128000,
+      "last_success": null,
+      "last_failure": null,
+      "last_failure_type": null,
+      "latency_ms": null,
+      "latency_ema_ms": null,
+      "call_count": 0,
+      "failure_count": null,
+      "recent_failure_rate": null,
+      "rate_limit_state": "CLEAR"
+     },
+     {
+      "provider": "qwen",
+      "status": "UNAVAILABLE",
+      "available": false,
+      "model": "qwen-max",
+      "model_count": 1,
+      "quality_tier": 2,
+      "cost_tier": 2,
+      "latency_tier": 2,
+      "context_window": 128000,
+      "last_success": null,
+      "last_failure": null,
+      "last_failure_type": null,
+      "latency_ms": null,
+      "latency_ema_ms": null,
+      "call_count": 0,
+      "failure_count": null,
+      "recent_failure_rate": null,
+      "rate_limit_state": "CLEAR"
+     },
+     {
+      "provider": "deepseek",
+      "status": "UNAVAILABLE",
+      "available": false,
+      "model": "deepseek-chat",
+      "model_count": 1,
+      "quality_tier": 2,
+      "cost_tier": 1,
+      "latency_tier": 2,
+      "context_window": 128000,
+      "last_success": null,
+      "last_failure": null,
+      "last_failure_type": null,
+      "latency_ms": null,
+      "latency_ema_ms": null,
+      "call_count": 0,
+      "failure_count": null,
+      "recent_failure_rate": null,
+      "rate_limit_state": "CLEAR"
+     },
+     {
+      "provider": "mistral",
+      "status": "UNAVAILABLE",
+      "available": false,
+      "model": "mistral-small-latest",
+      "model_count": 1,
+      "quality_tier": 3,
+      "cost_tier": 1,
+      "latency_tier": 1,
+      "context_window": 128000,
+      "last_success": null,
+      "last_failure": null,
+      "last_failure_type": null,
+      "latency_ms": null,
+      "latency_ema_ms": null,
+      "call_count": 0,
+      "failure_count": null,
+      "recent_failure_rate": null,
+      "rate_limit_state": "CLEAR"
+     }
+    ],
+    "provider_count": 2,
+    "retrieval_ready": {
+     "connectors_importable": true,
+     "last_source_health_report": "measured",
+     "last_source_health_report_at": "2026-08-30T21:16:04.277717+00:00",
+     "note": "retrieval outcomes are recorded per-run; the source-health report is the last measurement (stale is disclosed, never refreshed silently)"
+    },
+    "physics_ready": false,
+    "physics_state": {
+     "registry_present": true,
+     "wired_solver_importable": false,
+     "note": "the R413 physics decision system (registry + deterministic router + one wired solver)"
+    },
+    "reality_loop_ready": true,
+    "showcase_ready": true
+   },
+   "durable": {
+    "enabled": true,
+    "branch": "runtime-state",
+    "last_snapshot": {
+     "ok": true,
+     "at": "2026-09-10T20:36:14Z",
+     "reason": "created:ts_304d539a8fe8",
+     "error": null,
+     "files": 3132,
+     "commit": "21910b6f2af5c832a154b571f4af19a4833a83fe",
+     "pushed": true,
+     "manifest_sha256": "5181588ed287967ef91f848795a884c2b60aa0d093cb21a830aa1bd495aa11dc",
+     "engine_commit": "3f8229be2b31211ccdcdf49101f0e1576ab861a5",
+     "files_copied": 34,
+     "files_skipped_unchanged": 3098
+    },
+    "last_restore": {
+     "at": "2026-09-10T20:21:05Z",
+     "sessions": 188,
+     "runs": 93,
+     "evidence": 93,
+     "interrupted": 0,
+     "error": null,
+     "branch_sessions": 211,
+     "integrity_mismatches": null,
+     "integrity_verified": true,
+     "manifest_sha256": "ad7f212d23a447492d53b6781dfb5051fe1e376f44c2d1d5105617ec07f07eb3",
+     "snapshot_of_record": {
+      "at": "2026-09-10T20:09:09Z",
+      "reason": "boot:b3792c973abd:after_restore",
+      "engine_commit": "b3792c973abdcb9dbf9544ad2b70f3097a99d0b2",
+      "files": 3100
+     }
+    },
+    "store": "private engine repo runtime-state branch (git)"
+   },
+   "worker_forensics": {
+    "enabled": true,
+    "ledger": "/app/TOSCANINI_UI/worker_forensics/ledger.jsonl",
+    "boot_id": "boot-1789071635",
+    "active_workers": [
+     {
+      "session_id": "ts_304d539a8fe8",
+      "kind": "run",
+      "stage": "ENGINE_RUN",
+      "last_heartbeat_utc": "2026-09-10T20:38:19.661Z",
+      "age_s": 16.5
+     }
+    ],
+    "orphans_reconciled_this_boot": 0,
+    "forensics_degraded": false,
+    "last_write_error": null
+   },
+   "model_routing": {
+    "providers": {
+     "tokenrouter": {
+      "status": "UNAVAILABLE",
+      "available_models": 0,
+      "credential": "NOT_CONFIGURED"
+     },
+     "zai": {
+      "status": "UNAVAILABLE",
+      "available_models": 0,
+      "credential": "NOT_CONFIGURED"
+     },
+     "openrouter": {
+      "status": "DEGRADED",
+      "available_models": 50,
+      "credential": "CONFIGURED"
+     },
+     "nvidia": {
+      "status": "HEALTHY",
+      "available_models": 19,
+      "credential": "CONFIGURED"
+     },
+     "anthropic": {
+      "status": "UNAVAILABLE",
+      "available_models": 0,
+      "credential": "NOT_CONFIGURED"
+     },
+     "gemini": {
+      "status": "UNAVAILABLE",
+      "available_models": 0,
+      "credential": "NOT_CONFIGURED"
+     },
+     "openai": {
+      "status": "UNAVAILABLE",
+      "available_models": 0,
+      "credential": "NOT_CONFIGURED"
+     },
+     "qwen": {
+      "status": "UNAVAILABLE",
+      "available_models": 0,
+      "credential": "NOT_CONFIGURED"
+     },
+     "deepseek": {
+      "status": "UNAVAILABLE",
+      "available_models": 0,
+      "credential": "NOT_CONFIGURED"
+     },
+     "mistral": {
+      "status": "UNAVAILABLE",
+      "available_models": 0,
+      "credential": "NOT_CONFIGURED"
+     }
+    },
+    "ledger": {
+     "ledger_path": "/app/ENGINE_RUNS/model_routing/ledger.jsonl",
+     "last_error": null,
+     "entries_in_tail": 15
+    }
+   }
+  }
+ },
+ "runs": [
+  {
+   "problem_id": "bench-p03-phe-biofouling",
+   "domain": "thermal-fluid-process",
+   "run_id": "ts_b68a033d87b3",
+   "submitted_text": "stainless steel plate heat exchanger in a district cooling loop: biofilm and scale accumulation on plate channels reduces overall heat transfer coefficient and raises pressure drop between cleanings. Hard constraint: sustain heat transfer coefficient above 2500 W/m2K for 12 months between mechanical cleanings without chlorination above 0.5 ppm residual.",
+   "submit_http": 200,
+   "poll_http": "TIMEOUT",
+   "user_visible_state": {
+    "status": null,
+    "final_status": null,
+    "stage": null
+   },
+   "cio_http": 200,
+   "cio_summary": {
+    "present": true,
+    "mechanism": "",
+    "technology_class": null,
+    "n_components": 0,
+    "experiment_contract_present": false
+   },
+   "glb_http": 404,
+   "glb_bytes": null,
+   "outcome": "TIMEOUT"
+  },
+  {
+   "problem_id": "bench-x01-rl-reward-hacking",
+   "domain": "software-ml-reinforcement-learning",
+   "run_id": "ts_fe2fbf3c1d3e",
+   "submitted_text": "PPO-trained robotic pick-and-place policy running on a warehouse manipulation cell: the policy exploits a proxy reward (grasp-detector confidence) instead of true object placement, silently corrupting placements when novel object shapes shift the detector's calibration. Hard constraint: hold true placement success above 98 percent across a quarterly rotation of 200 novel SKUs without per-SKU reward recalibration or human labeling.",
+   "submit_http": 200,
+   "poll_http": 200,
+   "user_visible_state": {
+    "status": "COMPLETE",
+    "final_status": "MECHANISM_GENERATION_FAILED",
+    "stage": null
+   },
+   "cio_http": 200,
+   "cio_summary": {
+    "present": true,
+    "mechanism": "",
+    "technology_class": null,
+    "n_components": 0,
+    "experiment_contract_present": false
+   },
+   "glb_http": null,
+   "glb_bytes": null,
+   "outcome": "RUN_COMPLETED"
+  }
+ ],
+ "n_runs": 2,
+ "n_completed": 1
+}

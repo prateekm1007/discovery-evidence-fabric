@@ -41,16 +41,26 @@ def _log(msg: str) -> None:
 
 
 def _req(path: str, body: Optional[Dict] = None, timeout: int = 120,
-         method: Optional[str] = None) -> Dict[str, Any]:
+         method: Optional[str] = None,
+         cookie: Optional[str] = None) -> Dict[str, Any]:
+    """One HTTP request. The cookie carries the session owner key the
+    SAME way a real user's browser does (the POST /api/run response
+    sets it; subsequent GETs present it — the user path, not an
+    operator backdoor)."""
     url = BASE + path
     data = json.dumps(body).encode() if body is not None else None
+    headers = {"Content-Type": "application/json"}
+    if cookie:
+        headers["Cookie"] = cookie
     req = urllib.request.Request(
-        url, data=data,
-        headers={"Content-Type": "application/json"},
+        url, data=data, headers=headers,
         method=method or ("POST" if data else "GET"))
+    set_cookie = None
     try:
         with urllib.request.urlopen(req, timeout=timeout) as r:
+            set_cookie = r.headers.get("Set-Cookie")
             return {"http_status": r.status,
+                    "set_cookie": set_cookie,
                     "body": json.loads(r.read() or b"{}")}
     except urllib.error.HTTPError as e:
         try:
@@ -72,12 +82,14 @@ def _problem_text(problem: Dict[str, Any]) -> str:
         f"Hard constraint: {problem['constraint']}.")
 
 
-def _poll_run(session_id: str) -> Dict[str, Any]:
+def _poll_run(session_id: str,
+              cookie: Optional[str] = None) -> Dict[str, Any]:
     """Poll the result endpoint until a terminal state or timeout."""
     t0 = time.time()
     last: Dict[str, Any] = {}
     while time.time() - t0 < MAX_WAIT_S:
-        r = _req(f"/api/run/{session_id}/result", timeout=60)
+        r = _req(f"/api/run/{session_id}/result", timeout=60,
+                 cookie=cookie)
         last = r
         if r.get("http_status") == 200:
             body = r.get("body") or {}
@@ -102,11 +114,15 @@ def _verify_run(problem: Dict[str, Any]) -> Dict[str, Any]:
     if not session_id:
         return {"problem_id": problem["problem_id"],
                 "submit": create, "outcome": "NO_SESSION_ID"}
-    _log(f"{problem['problem_id']}: session {session_id} — polling")
-    result = _poll_run(session_id)
-    # the artifact chain
-    cio = _req(f"/api/run/{session_id}/cio", timeout=60)
-    model = _req(f"/api/run/{session_id}/model", timeout=120)
+    # the owner cookie the POST set — exactly what a real browser holds
+    cookie = create.get("set_cookie")
+    _log(f"{problem['problem_id']}: session {session_id} — polling "
+         f"(cookie {'set' if cookie else 'ABSENT'})")
+    result = _poll_run(session_id, cookie)
+    # the artifact chain (same cookie — the user path)
+    cio = _req(f"/api/run/{session_id}/cio", timeout=60, cookie=cookie)
+    model = _req(f"/api/run/{session_id}/model", timeout=120,
+                 cookie=cookie)
     final_body = (result.get("body") or {}) \
         if result.get("http_status") == 200 else {}
     rec = {
@@ -171,15 +187,27 @@ def main() -> int:
                          "battery results' strongest cases)")
     args = ap.parse_args()
 
+    # the FULL problem records (the battery projection carries only
+    # problem_id/device/failure_mode/domain; the user-path text needs
+    # device/failure/constraint from the frozen definitions — Art. XXIV:
+    # the underlying artifact is the authority)
+    frozen = json.loads(
+        (REPO_ROOT / "R401-WC2" / "BENCHMARK" /
+         "FROZEN_BENCHMARK.json").read_text())
+    extension = json.loads(
+        (REPO_ROOT / "R444" / "BENCHMARK_EXTENSION" /
+         "FROZEN_EXTENSION.json").read_text())
+    full_problems = {p["problem_id"]: p
+                     for p in frozen["problems"] + extension["problems"]}
+
     battery_path = REPO_ROOT / "R444" / "BENCHMARK_RESULTS.json"
     battery = json.loads(battery_path.read_text()) \
         if battery_path.exists() else {}
     problems: List[Dict[str, Any]] = []
     if args.problems:
         for pid in args.problems:
-            rec = (battery.get("problems") or {}).get(pid)
-            if rec:
-                problems.append(rec["problem"])
+            if pid in full_problems:
+                problems.append(full_problems[pid])
     else:
         # the strongest cases: EVOLVED (or INVENTION_REQUIRES_EXPERIMENT)
         # with engineering realization + experiment records
@@ -191,7 +219,9 @@ def main() -> int:
                 else 0,
                 1 if (r.get("engineering_realization") or {}).get(
                     "engineering_specification_present") else 0))
-        problems = [r["problem"] for r in ranked[:2]]
+        problems = [full_problems[r["problem"]["problem_id"]]
+                    for r in ranked[:2]
+                    if r["problem"]["problem_id"] in full_problems]
 
     if not problems:
         _log("no problems selected (battery results missing?)")
