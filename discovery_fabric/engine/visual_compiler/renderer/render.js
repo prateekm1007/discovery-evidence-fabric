@@ -700,6 +700,96 @@ record.lights = { environment: "three RoomEnvironment (procedural HDR/PMREM)",
   rim: "directional 0xf5e8d8 int 1.25", ambient: 0.22,
   contact_shadow: "ShadowMaterial ground plane opacity 0.42 (PCFSoft)" };
 record.tone_mapping = "ACESFilmic exposure 1.05, sRGB output";
+
+// ---- material probe (R443: measurable semantic material separation) --------
+// One sphere per DISTINCT semantic class, rendered under the SAME light
+// rig directions/intensities and the same tone mapping as the hero. The
+// gate measures the saved pixels (CIEDE2000 between class pairs) — a
+// label is not a visual validation. The probe is gate instrumentation:
+// it is NOT part of the release ladder and never enters a package.
+if (VIEWS.material_probe !== false) {
+  const classSet = {};
+  for (const name of Object.keys(matMap)) {
+    const c = matMap[name]?.class;
+    if (c) classSet[c] = matMap[name];
+  }
+  const classes = Object.keys(classSet).sort();
+  if (classes.length) {
+    const probeScene = new THREE.Scene();
+    probeScene.environment = world.environment;
+    probeScene.environmentIntensity = world.environmentIntensity;
+    // same light CHARACTER as the hero scene: identical directions and
+    // intensities (directional lights are direction-only), shadows off
+    // — the probe isolates MATERIAL appearance, not shadow geometry
+    const pKey = new THREE.DirectionalLight(0xfff1e0, 2.4);
+    pKey.position.set(-0.5, 1.0, 0.45).normalize();
+    probeScene.add(pKey);
+    const pFill = new THREE.DirectionalLight(0xdfe6ee, 0.85);
+    pFill.position.set(-3, 1.2, 2.4).normalize();
+    probeScene.add(pFill);
+    const pRim = new THREE.DirectionalLight(0xf5e8d8, 1.25);
+    pRim.position.set(-2.2, 2.6, -3.4).normalize();
+    probeScene.add(pRim);
+    probeScene.add(new THREE.AmbientLight(0xffffff, 0.22));
+
+    const R = 1, GAP = 1.4;              // spacing center-to-center 2R+GAP
+    const n = classes.length;
+    const step = 2 * R + GAP;
+    const rects = {};
+    let vertexColorsPresent = false;
+    for (const { obj } of parts) {
+      obj.traverse((m) => {
+        if (m.isMesh && m.geometry.attributes.color) vertexColorsPresent = true;
+      });
+    }
+    const pcam2 = new THREE.OrthographicCamera(
+      -1, 1, 1, -1, 0.1, 100);
+    const halfW = (n * step) / 2 + R + 0.2;
+    const cx = ((n - 1) * step) / 2;
+    pcam2.position.set(cx, 0, 10);
+    pcam2.left = -halfW; pcam2.right = halfW;
+    pcam2.top = halfW * RES[1] / RES[0];
+    pcam2.bottom = -halfW * RES[1] / RES[0];
+    pcam2.updateProjectionMatrix();
+    pcam2.updateMatrixWorld(true);
+    classes.forEach((cls, i) => {
+      const def = classSet[cls];
+      const mat = new THREE.MeshPhysicalMaterial({
+        color: new THREE.Color(...def.color),
+        metalness: def.metallic ?? 0.1,
+        roughness: def.roughness ?? 0.5,
+      });
+      if (def.alpha != null && def.alpha < 1) {
+        mat.transparent = true; mat.opacity = def.alpha;
+      }
+      if (def.transmission) mat.transmission = def.transmission;
+      const sphere = new THREE.Mesh(
+        new THREE.SphereGeometry(R, 48, 32), mat);
+      sphere.position.set(i * step, 0, 0);
+      probeScene.add(sphere);
+      // record the rect (PNG orientation) the gate crops + measures
+      const c = new THREE.Vector3(i * step, 0, 0).project(pcam2);
+      const e = new THREE.Vector3(i * step + R, 0, 0).project(pcam2);
+      const cpx = (c.x + 1) / 2 * RES[0];
+      const cpy = (1 - c.y) / 2 * RES[1];
+      const rpx = Math.max(2, (e.x - c.x) / 2 * RES[0]);
+      rects[cls] = [Math.round(cpx - rpx), Math.round(cpy - rpx),
+        Math.round(2 * rpx), Math.round(2 * rpx)];
+    });
+    sizeCanvas(RES[0], RES[1]);
+    renderer.render(probeScene, pcam2);
+    const pBlob = await canvasToBlob(canvas);
+    record.views["material_probe.png"] =
+      await put("material_probe.png", await pBlob.arrayBuffer());
+    record.material_probe = {
+      classes, rects, resolution: RES,
+      vertex_colors_present: vertexColorsPresent,
+      note: ("one sphere per distinct semantic class under the hero "
+             + "light rig; the gate measures CIEDE2000 between class "
+             + "pairs on the saved pixels"),
+    };
+  }
+}
 // a view is produced (sha256) or TYPED-skipped (disclosed) — a view
 // that is neither is the only path to RENDER_PARTIAL
 record.status = Object.values(record.views).every((v) => v.sha256 || v.skipped)

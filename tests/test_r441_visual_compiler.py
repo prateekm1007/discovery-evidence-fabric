@@ -388,13 +388,18 @@ class TestPackageEnforcement:
                "package.py").read_text()
         assert "HERO_RELEASE_STATE" in src
         assert "hero_suppressed" in src
-        assert 'gate_verdict != "PASS"' in src or \
+        # R443 reconciliation: the release rule is now the typed helper
+        # _visual_release_ok (COMPLETE_PASS is the only release-passing
+        # verdict; the R441 '!= "PASS"' string no longer exists)
+        assert "_visual_release_ok(gate)" in src or \
             gate_check_present(src)
 
     def test_pdf_cover_exists_only_on_gate_pass(self):
         src = (REPO / "discovery_fabric/engine/invention_bridge/"
                "package.py").read_text()
-        assert 'gate.get("verdict") == "PASS"' in src
+        # R443 reconciliation: the cover exists ONLY through the same
+        # typed release check (COMPLETE_PASS vocabulary)
+        assert "_visual_release_ok(gate)" in src
 
     def test_pdf_constitution_page_order(self, tmp_path):
         """The PDF Constitution: p1 hero, p2 exploded, p3 ortho,
@@ -478,7 +483,8 @@ class TestEndToEnd:
         rec = vc.compile_visuals(str(tmp_path), memory_mode="async")
         assert rec["status"] in ("OK", "PARTIAL"), rec
         gate = rec["visual_gate"]
-        assert gate["verdict"] == "PASS", gate["reasons"]
+        # R443: the gate vocabulary is COMPLETE_PASS/PARTIAL/NOT_RUN/FAIL
+        assert gate["verdict"] == "COMPLETE_PASS", gate["reasons"]
         out = Path(rec["out_dir"])
         for name in ("hero.png", "poster.png", "dimension.png",
                      "section.png", "exploded.png", "exploded.glb",

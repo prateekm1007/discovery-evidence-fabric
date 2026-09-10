@@ -33,6 +33,20 @@
     "turntable_resolution": [768, 512],
     "note": "rasterization (Three.js) has no Cycles 'samples' — the R420 quality ladder's samples dimension is N/A by engine change and recorded as such in the typed record; the ladder's resolution/budget dimensions carry over."
   },
+  "material_distinction_min_de00": {
+    "value": 10.0,
+    "threshold_class": "PRESENTATION",
+    "round": "R443",
+    "basis": "CIEDE2000 color difference between pairs of DISTINCT semantic material classes, measured on the rendered material probe (one sphere per class under the hero light rig; visual_gate.measure_material_distinction). Anchor: the CIE just-noticeable difference for CIEDE2000 is dE00 ~= 2.3 (CIE 142:2001; Sharma, Wu & Dalal 2005 implementation notes). The bar is set at ~4x JND = 10.0 — the 'clearly distinguishable' band — because semantic classes must survive ACES tone-mapping compression, PBR highlight variance and SwiftShader dithering, not just a side-by-side lab comparison. NOT tuned to the existing fixtures: the R442 palette measured 15/78 pairs below 10 (body_metal vs machined_metal at 1.01, below JND) and was re-derived in R443 to satisfy the bar (scripts/r443_palette_measure.py, measured 2026-09-10); the two metallic-involved pairs below 10 at spec level separate in the RENDER through metallic-reflection contrast (verified live in R443 acceptance).",
+    "uncertainty": "rendered dE00 varies ~+/-1.5 across the probe rig (tone-mapping + dither); the 4x-JND margin absorbs it. Re-measure if the renderer's tone mapping or light rig changes.",
+    "measurement": "gate-side PIL/numpy on material_probe.png rects recorded by the renderer; mean sRGB of the central 60% of each sphere rect -> Lab (D65) -> CIEDE2000"
+  },
+  "visual_set_ladder": {
+    "round": "R443",
+    "required": "hero.png + hero.glb + poster.png + dimension.png + section.png + orthographic/{front,side,top,iso}.png + turntable/frame-01..12.png (+ exploded.png + exploded.glb when the architecture is multi-part; single-part exploded is a TYPED waiver, disclosed in the gate record)",
+    "verdicts": "COMPLETE_PASS / PARTIAL / NOT_RUN / FAIL — anything but COMPLETE_PASS suppresses the hero and blocks release (Article LXXII; directive R443-C2 Workstream 2)",
+    "threshold_class": "OPERATOR_DIRECTIVE"
+  },
   "revision_history": [
     {
       "rev": 1,
@@ -45,6 +59,12 @@
       "date": "2026-09-10",
       "round": "R441",
       "change": "chrome baseline MEASURED on live acceptance runs (542-643 MB tree PSS, breakdown recorded); memory guards set to 800 in-worker / 650 async per the measurement (was 650/400 carried from Blender); antialias disabled on the renderer path with rationale; turntable pinned at half resolution; budgets confirmed against measured 6.9-17.1 s wall times"
+    },
+    {
+      "rev": 3,
+      "date": "2026-09-10",
+      "round": "R443",
+      "change": "R443 Visual Integrity Hardening: material_distinction_min_de00 = 10.0 added (CIEDE2000 rendered probe separation, ~4x JND, provenance + uncertainty recorded) and the R443 visual-set ladder + four-verdict gate vocabulary recorded. The R441 semantic palette was re-derived the same day (15/78 pairs measured below the new bar; body_metal/machined_metal at 1.01 = below JND) — no existing threshold was lowered; one was added."
     }
   ]
 }

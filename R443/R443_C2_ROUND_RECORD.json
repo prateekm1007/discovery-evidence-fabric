@@ -1,0 +1,188 @@
+{
+  "artifact_type": "R443_C2_ROUND_RECORD",
+  "round": "R443-C2",
+  "created_at": "2026-09-10",
+  "directive": "R443-C2 / VISUAL INTEGRITY HARDENING: strengthen the visual integrity boundary without altering engineering truth. Five workstreams (raw-document node identity; visual-set completeness with four verdicts; measurable material semantics; total typed render records; Coder 1 boundary preserved) + a fresh adversarial battery of five attacks",
+  "reviewer_provenance": "AI_REVIEW (Art. LXVII)",
+  "constitution_version": "2.3.0",
+
+  "mandatory_reads_completed": "EPISTEMIC_CONSTITUTION.md v2.3.0 read IN FULL at round start (all 2084 lines) and RE-READ before the final commit (Preamble, Discovery Imperative, Articles I-LXXII, Four Constitutional Layers, WORLD_CLASS_DISCOVERY_GATE); GOVERNANCE/README.md, AUDITOR_SELF_GOVERNANCE_v1.md, AUDITOR_BLINDSPOT_REGISTER.md, AUDIT_LOOP_PROTOCOL_v1.md, AUDITOR_REMEMBERED_STATE.md, ACTIVE_PATH.md (through the R442-PREP addendum), R442/R442_ROUND_RECORD.json, R442/FEEDBACK_TO_CODER_1.md",
+
+  "source_sha": "0b58f106985ff1f9907b42a4b854fa43001bdebb",
+  "origin_main_sha_at_round_start": "0b58f106985ff1f9907b42a4b854fa43001bdebb",
+  "deployed_sha": "see production_deployment below (recorded after deploy)",
+  "constitution_version_recorded": "2.3.0",
+
+  "git_baseline_art22_xxiii": {
+    "head": "0b58f106985ff1f9907b42a4b854fa43001bdebb",
+    "origin_main_local_ref": "0b58f106985ff1f9907b42a4b854fa43001bdebb",
+    "ls_remote_actual": "0b58f106985ff1f9907b42a4b854fa43001bdebb",
+    "working_tree": "clean at round start",
+    "verdict": "HEAD == origin/main == ls-remote (Art. XXII/XXIII verified)"
+  },
+
+  "workstream_1_node_identity": {
+    "rule_change": "canonical node identity is now PROVEN FROM THE RAW glTF DOCUMENT (gltf_doc.read_gltf_json + raw_part_identity — stdlib struct/json, no loader); the rule checks (a) every mesh-bearing node named in the raw document or an unnamed primitive slice inheriting a named mesh ancestor, and (b) the raw named-identity set EQUALS the scene spec's canonical node set 1:1",
+    "superseded_check_disposition_art_lxiv": "the trimesh-based check_node_naming is DELETED in the same change (verifiable: visual_gate.py carries no 'def check_node_naming' and no 'import trimesh'); asserted by tests/test_r443_visual_integrity.py::test_trimesh_naming_rule_is_retired",
+    "why": "trimesh (any loader) SYNTHESIZES names for unnamed glTF nodes — the R442 round record disclosed the blind spot: 'the node-naming gate rule is resilient to name-stripping at gate time'. A gate reading through a loader cannot distinguish canonical names from synthesized ones",
+    "acceptance_positive": "canonical GLB with valid canonical IDs passes (test_gate_identity_check_passes_a_canonical_glb + live COMPLETE_PASS runs)",
+    "acceptance_negative": "Attack 1: node names stripped from the raw JSON chunk of hero.glb (geometry/accessors untouched) -> verdict FAIL, failed_rules contains node_identity, the reason names the raw-document absence specifically",
+    "loader_rescue_proof": "test_loader_synthesized_names_are_not_evidence: the SAME stripped GLB yields 3 synthesized loader names via trimesh and 0 raw names via the document walk — the gate is written against the raw document"
+  },
+
+  "workstream_2_visual_set_completeness": {
+    "ladder": "REQUIRED = hero.png + hero.glb + poster.png + dimension.png + section.png + orthographic/{front,side,top,iso}.png + turntable/frame-01..12.png (= 23) + exploded.png + exploded.glb when the architecture is multi-part (typed waiver with reason when single-part)",
+    "module": "visual_compiler/visual_set.py — ONE definition shared by the compiler (inventory) and the gate (disk re-verification, Art. III)",
+    "verdict_vocabulary": "COMPLETE_PASS / PARTIAL / NOT_RUN / FAIL — COMPLETE_PASS is the ONLY release-passing verdict; PARTIAL = quality rules passed but ladder incomplete (NOT_COMPLETE -> hero_suppressed=true, release_blocked=true); FAIL = measured quality-rule failure (takes precedence when both); NOT_RUN = the gate refuses to pass what it cannot measure",
+    "before": "the R441 gate verdicts were PASS/FAIL/NOT_RUN with NO completeness dimension — 'three artifacts exist' could ride a hero/poster-only pass; turntable frames were not inventoried by compile_visuals at all",
+    "consumer_wiring": "package.py::_visual_release_ok is the single release-decision helper (verdict COMPLETE_PASS, or legacy PASS only while no completeness block is declared, and the declared block must be complete); HERO_RELEASE_STATE.json carries the verdict verbatim; PDF cover only through the same helper",
+    "acceptance": "Attack 2: section.png + turntable/frame-07.png deleted from a complete live render set -> verdict PARTIAL, visual_set.complete=false, hero_suppressed=true, release_blocked=true, NOT_COMPLETE reason; package._visual_release_ok(gate)=False"
+  },
+
+  "workstream_3_material_semantics_measurable": {
+    "principle": "a material is not visually validated merely because it has a label; semantic_material_mapping (coverage) and minimum observable contrast (rendered pixels) are SEPARATE gate checks",
+    "instrument": "the renderer shoots a material probe (one sphere per distinct semantic class, same light-rig directions/intensities + tone mapping as the hero, shadows off) and records the pixel rect per class; the gate crops the central 60% of each rect from the saved PNG, converts mean sRGB -> Lab (D65) and measures CIEDE2000 for every pair of distinct classes",
+    "threshold": "material_distinction_min_de00 = 10.0 (~4x the CIE just-noticeable difference of 2.3, CIE 142:2001; Sharma/Wu/Dalal 2005 implementation notes) — provenance, class (PRESENTATION), uncertainty (+/-1.5) and measurement recorded in visual_compiler_thresholds.json rev 3 (Art. XXVII)",
+    "no_threshold_rescue": "the threshold was NOT tuned to the fixtures: the R442 palette measured 15/78 pairs below the bar (body_metal vs machined_metal at 1.01 — BELOW JND) and the palette was RE-DERIVED (12 iterations, measured each time) until every pair of distinct classes separates in the RENDER; scripts/r443_palette_measure.py + r443_iter_palette.py (session scripts) hold the measurement trail",
+    "palette_disposition": "SEMANTIC_MATERIALS re-derived; semantic characters preserved (steel dark gunmetal, aluminum mirror-chrome, copper copper); 'default' is deliberately a flagging magenta — an UNCLASSIFIED part must be noticeable (Art. XXV: unclassified is a state to surface, not to hide); the four pairs whose spec-level base separation sits below 10 separate in the RENDER through metallic/roughness contrast (measured live: ceramic/machined 12.59-12.74, glass/machined 10.68-10.72, battery/rubber 11.31-14.08, conduit_power/polymer 11.28-11.85)",
+    "acceptance": "Attack 3: two semantic classes given one visual material (identical probe regions) -> material_distinction FAIL with the pair named; live: the 13-class probe measures all 78 pairs >= 10.68"
+  },
+
+  "workstream_4_typed_render_records": {
+    "module": "visual_compiler/render_record_schema.py (RECORD_SCHEMA_VERSION R443-1): STATUS_CLASS maps every concrete status to a canonical class (RENDER_SUCCEEDED / RENDER_FAILED / RENDER_SKIPPED_LOW_MEMORY / RENDER_SKIPPED_INFRA_UNAVAILABLE / RENDER_NOT_RUN — the directive's four states plus the honest infrastructure split, Art. LXI); finalize_render_record fills the total shape deterministically; validate_render_record raises RenderRecordValidationError BEFORE consumer logic",
+    "total_shape": "every record carries stage/render_pipeline/status/status_class/out_dir (null when none)/visual_gate (NOT_RUN + suppressed + blocked when unmeasured)/hero_suppressed/release_blocked/note; skips and failures additionally require a non-empty reason; skips/fails CANNOT carry a measured gate verdict (coerced to NOT_RUN, fail closed)",
+    "closes_r442_defect": "the R442 record disclosed 'the visual-compiler memory-guard record merge path lacks out_dir/visual_gate keys (consumers that read those fields on a skip record must check status first)' — the memory-guard exit now finalizes through the same schema (test_compile_memory_guard_path_returns_valid_record), and package.py runs validate_render_record BEFORE reading consumer fields (Attack 4)",
+    "wiring": "compile_visuals exits EVERY return path through _finish (finalize + validate; a schema violation is converted to a fail-closed RENDER_FAILED record rather than emitted); render.py's Blender LEGACY dispatcher exits finalize too",
+    "acceptance": "Attack 4: a RENDER_SKIPPED_LOW_MEMORY record with incomplete fields raises at validation ('missing required field out_dir') before any consumer branch"
+  },
+
+  "workstream_5_coder1_boundary": {
+    "files_touched": "discovery_fabric/engine/visual_compiler/* (gate, compiler, gltf_doc walker addition, material palette, renderer probe, thresholds provenance, NEW visual_set.py + render_record_schema.py), invention_bridge/package.py (release-decision helper + schema validation), invention_bridge/render.py (legacy dispatcher finalize), tests",
+    "untouched": "zero changes to CadQuery/OCCT geometry, cad_pipeline, GEOMETRY_SPEC generation, domain_geometry, load paths, engineering validation, discovery/evidence/package logic beyond the Article LXXII release decision reading",
+    "thresholds": "no existing threshold weakened or lowered; ONE threshold ADDED (material_distinction_min_de00) with full Art. XXVII provenance; the R441 RULES values are byte-identical",
+    "engineering_defects_found_this_round": "NONE new — the R442 feedback (R442/FEEDBACK_TO_CODER_1.md) remains the open engineering-side item; this round's defects were all presentation-layer and fixed presentation-side"
+  },
+
+  "adversarial_battery": {
+    "attack_1_stripped_identity": {
+      "method": "full live compile -> node names removed from hero.glb's RAW JSON chunk (geometry/accessors preserved; geometry node count re-verified via trimesh = 3) -> gate re-evaluates the saved artifacts",
+      "expected": "FAIL",
+      "observed": "verdict=FAIL, node_identity in failed_rules, reason 'canonical node identity ABSENT from the raw glTF document (3 mesh node(s) carry no name...)', hero_suppressed=true, release_blocked=true",
+      "test": "TestLiveAdversarialBattery::test_attack_1_stripped_identity_fails_closed"
+    },
+    "attack_2_missing_view": {
+      "method": "section.png + turntable/frame-07.png deleted from a COMPLETE live render set",
+      "expected": "PARTIAL / NOT_COMPLETE, hero_suppressed=true, release_blocked=true",
+      "observed": "verdict=PARTIAL, visual_set.complete=false with both files in missing, hero_suppressed=true, release_blocked=true, NOT_COMPLETE reason present; package._visual_release_ok(gate)=False",
+      "test": "TestLiveAdversarialBattery::test_attack_2_missing_view_is_not_complete (+ test_package_rejects_partial_gate)"
+    },
+    "attack_3_material_spoof": {
+      "method": "two semantic classes bound to the SAME visual material (probe regions forced identical), evaluated against the live render set",
+      "expected": "FAIL when those classes are required to be visually distinct",
+      "observed": "verdict=FAIL, material_distinction in failed_rules, failed_pairs names the spoofed pair at dE00 0.00, release_blocked=true",
+      "test": "TestLiveAdversarialBattery::test_attack_3_material_spoof_fails (+ the synthetic-unit identical-rects case)"
+    },
+    "attack_4_malformed_skip": {
+      "method": "a RENDER_SKIPPED_LOW_MEMORY record with incomplete fields (no out_dir, no visual_gate, no reason) fed to the validator; package.py source-scan asserts the validator wiring runs BEFORE consumer field reads",
+      "expected": "schema validation failure before consumer code sees it",
+      "observed": "RenderRecordValidationError: \"render record for status 'RENDER_SKIPPED_LOW_MEMORY' is malformed: missing required field 'out_dir'\"; the compile-level integration test proves the real guard path returns a record that validates",
+      "test": "TestTypedRenderRecords::test_malformed_skip_is_caught_before_consumers + test_compile_memory_guard_path_returns_valid_record + TestLiveAdversarialBattery::test_attack_4_..."
+    },
+    "attack_5_wrong_source": {
+      "method": "the live render set of geometry X evaluated against the scene spec of geometry Y (a valid-LOOKING render that is not the supplied canonical GLB); plus the unit-level bounds witness on a trimesh-built grounded export",
+      "expected": "FAIL",
+      "observed": "verdict=FAIL with BOTH source_agreement (world-bounds deviation >> tolerance) and node_identity (identity-set mismatch) failed; release_blocked=true",
+      "test": "TestLiveAdversarialBattery::test_attack_5_wrong_source_fails (+ TestWrongSourceWitness unit pair)"
+    },
+    "not_derived_from_happy_path": "the attacks mutate the RAW glTF container bytes, delete ladder files, spoof probe regions and cross-evaluate two independently compiled geometries — none reuse the implementation's own fixture builders as their oracle"
+  },
+
+  "before_after_gate_schema": {
+    "before": {
+      "gate_version": "R441-1",
+      "verdicts": ["PASS", "FAIL", "NOT_RUN"],
+      "rules": ["hero_occupancy", "contact_shadow", "semantic_materials",
+                "node_naming (loader-synthesized names accepted)",
+                "geometry_identity", "poster_parity", "single_viewer"],
+      "completeness": "NONE — artifacts inventoried without turntable; a missing view was silence unless the compiler happened to record it; 'PASS' meant 'the seven rules passed on whatever files existed'",
+      "records": "skip/fail records could lack out_dir/visual_gate; consumers branched on status before reading fields",
+      "materials": "mapping COVERAGE only — '6/6 semantic mappings' passed with two classes visually identical (dE00 1.01)"
+    },
+    "after": {
+      "gate_version": "R443-1",
+      "verdicts": ["COMPLETE_PASS", "PARTIAL", "NOT_RUN", "FAIL"],
+      "rules": ["hero_occupancy", "contact_shadow", "semantic_materials",
+                "node_identity (RAW document)", "source_agreement (bounds)",
+                "geometry_identity", "poster_parity", "single_viewer",
+                "material_distinction (rendered CIEDE2000 >= 10)",
+                "visual_set_completeness (23-artifact ladder)"],
+      "completeness": "re-verified FROM DISK at gate time; REQUIRED=23 (multi-part) with typed single-part waivers; anything but COMPLETE_PASS blocks release",
+      "records": "every record finalized + validated for its status; malformed records die at validation, before consumers",
+      "materials": "coverage AND rendered separation, measured with the gate's own PIL/numpy on the probe the renderer recorded"
+    }
+  },
+
+  "clean_state_replay": {
+    "inputs": "the EXACT canonical GLB bytes production served in R442 (case A sha 5a1815ee6bd0023a..., case B sha 22de99c085caada7...), compiler exits wiped, full compile from clean state at the R443 working tree",
+    "results": {
+      "case_A_benchtop_autosampler": {"status": "OK", "verdict": "COMPLETE_PASS", "ladder": "23/23", "node_identity": true, "source_agreement_dev": 0.0, "elapsed_s": 7.9},
+      "case_B_heat_recovery": {"status": "OK", "verdict": "COMPLETE_PASS", "ladder": "23/23", "node_identity": true, "source_agreement_dev": 0.0, "elapsed_s": 8.7, "note": "the R442 defect pair body_metal/machined_metal measures 15.92 rendered dE00 on the SAME bytes where R442 measured it visually indistinguishable"}
+    }
+  },
+
+  "regression_batteries": {
+    "r443_battery": "34 passed (tests/test_r443_visual_integrity.py — NEW: raw-document identity units, ladder, distinction, schema, five attacks incl. live)",
+    "r441_battery": "33 passed (tests/test_r441_visual_compiler.py — dated reconciliation: the release-rule source-scan and the e2e verdict assertion moved to the R443 vocabulary; Art. LXIV rule-2 discipline, no production semantics relaxed)",
+    "render_artifact": "131 passed, 11 skipped, 24 subtests (r441 + r420 + r423 + r436 + r432)",
+    "package_product": "99 passed, 14 skipped (r424 + r435 + r419 + r414 + r389)",
+    "r436": "32 passed, 3 skipped (after building TOSCANINI_UI/webapp-export in the sandbox — the fresh clone lacked it; environment fix, not code)",
+    "full_suite_segments": "seg1 656 passed/9 pre-existing, seg2a 224 passed/15 pre-existing, seg3 885 passed/7 pre-existing, seg4 544 passed/0 failed, seg5 610 passed/1 pre-existing — every failure REPRODUCED on the pristine 0b58f106 tree via git stash (pre-existing, not R443)",
+    "not_completed_disclosed": "test_r371_portfolio_v5 + test_r372 (slow CAD battery exceeds the sandbox 9.5-min tool budget) and the patsnap/prior-art network batteries (hang on sandbox network) were not completed this session; NEITHER imports the R443-changed surface (verified by import scan: only r420/r423/r432/r441/r443 reference visual_compiler/render_record_schema/invention_bridge package+render); test_r373/test_r382 remain the R441-disclosed environmental failures, untouched",
+    "pre_existing_failures_all_pristine_verified": true
+  },
+
+  "production_deployment": {
+    "owner_gated_decision_art_lxv": {
+      "decision": "production memory upgrade (512 MB free plan cannot fit the measured renderer tree 542-643 MB; guards 800/650 MB)",
+      "opened_at": "R441",
+      "escalation_count": 3,
+      "attempted_this_round": "Render API service PATCH to plan 'standard' re-attempted (HTTP 200) — the API accepts the call but the EFFECTIVE plan remains 'free' (billing-gated; identical outcome to R442's explicit rejections)",
+      "cost_of_inaction": "every fresh production run still type-skips the visual set (RENDER_SKIPPED_LOW_MEMORY): production serves the interactive GLB but NO hero/poster/ladder/probe, and NO production package can claim a visual release until the owner adds a payment method in the Render dashboard and the service moves to >= 1 GB (standard 2 GB recommended)",
+      "what_unblocks": "owner adds payment info -> coder re-runs the plan PATCH -> redeploy -> fresh production Case A + Case B through the production Visual Compiler -> the remaining Blender retirement condition closes"
+    },
+    "deployed_this_round": "R443 commit (see git_push below) via Render API pinned commitId deploy",
+    "verified_health": "see production_verify below"
+  },
+
+  "production_verify": "RECORDED AFTER DEPLOY below",
+
+  "blender_disposition": {
+    "decision": "NOT deleted in R443 (per directive: retirement requires >=1 GB production + fresh production A/B + production compiler success + complete visual set + negative attack pass + website/PDF parity + no legacy conversion route)",
+    "conditions_checklist": {
+      "production_gb": "NOT MET (plan still free/512 MB; PATCH accepted-but-billing-gated)",
+      "fresh_production_AB_through_production_compiler": "NOT MET (visual stage type-skips in production)",
+      "visual_compiler_succeeds_in_production": "NOT MET (same blocker)",
+      "visual_set_complete": "MET locally (23/23 both cases, clean-state replay)",
+      "negative_visual_attack_passes": "MET (five attacks, all fail-closed)",
+      "website_pdf_parity": "MET locally (poster parity rule + PDF constitution battery)",
+      "no_required_legacy_conversion_route": "UNVERIFIED this round (Blender demoted to format conversion only since R441; no production invocation observed)"
+    },
+    "summary": "2 of 7 conditions met; retirement stays deferred — the dispatcher's LEGACY labeling and the R441 archive remain exactly as R442 left them (zero changes to the Blender path this round)"
+  },
+
+  "coder2_boundary_compliance": "CODER_2_BOUNDARY_VIOLATIONS = 0 — no engineering part moved/enlarged/hidden; no chassis/GEOMETRY_SPEC change; no fake openings; no canonical GLB topology change; no threshold weakened (one ADDED with provenance); the R442 engineering feedback was NOT 'fixed' visually; the material palette change is presentation-layer (material_mapper is the R441 Coder 2 module) and was forced by a measured, literature-anchored check, not tuned to rescue fixtures",
+
+  "limitations_recorded": [
+    "production visual stage still type-skips on the 512 MB free plan (billing-blocked; Art. LXV escalation 3 recorded) — production visual success is NOT claimed",
+    "the material probe measures the semantic material SYSTEM (per-class spheres under the hero light rig); per-INSTANCE rendered distinction inside the hero scene (part-specific lighting/shading) is not separately measured — the probe is the class-level instrument; a vertex-colored model is disclosed (material_probe.vertex_colors_present) since vertex colors bypass the mapping colors in the renderer",
+    "the wrong-source witness compares grounded world bounds (tolerance 0.02 normalized units); two DIFFERENT geometries with identical bounding boxes AND identical node names would evade it — the vertex-count topology rule and the raw-identity set remain the residual witnesses (recorded as a known measurement boundary, not a gate bypass observed)",
+    "the source-agreement unit test simulates the grounded export by applying the spec transform in trimesh; the live e2e attack uses the REAL renderer export (dev=0.0 measured)",
+    "full-suite completion is bounded by the sandbox (slow CAD battery + network-hanging patsnap tests + detached processes killed by the session manager) — the affected-surface batteries and 4.7 of 5 suite segments completed; all failures pristine-verified pre-existing",
+    "test_r392 WebappSecretScan fails on the PRISTINE tree in this sandbox (flags a deliberately-poisoned fixture key in test_r425 and/or build artifacts) — pre-existing, disclosed; same class: test_secret_scanning flags the test_r425 poisoning fixture ('nvapi-poisoned-worker-level')",
+    "Render per-key env-var PATCH does not exist (405) — carried from R442; the service-level PATCH accepts silently while billing gates the plan change (new observation this round)"
+  ],
+
+  "next_decisive_verification": "owner adds Render payment method -> plan PATCH to standard -> redeploy -> ONE fresh production run passes through the production Visual Compiler + gate end-to-end (Case A + Case B) -> production visual success becomes claimable -> Blender retirement checklist closes",
+
+  "honest_summary": "The four R442-disclosed gate blind spots are closed with measured evidence: identity now reads the RAW glTF document (the stripped-GLB attack fails for the exact right reason), the 23-artifact ladder is re-verified from disk with a four-verdict fail-closed vocabulary, material semantics carry a rendered CIEDE2000 >= 10 bar that the OLD palette measurably fails and the re-derived palette passes live (13 classes, 78 pairs), and every render record is typed, finalized and validated before consumers. The five fresh attacks all fail closed for the specific reasons the boundaries exist; both R442 production cases replay COMPLETE_PASS from clean state at the same bytes. Production itself still cannot render (512 MB free plan; billing-gated upgrade re-escalated, count 3) — no production visual success is claimed."
+}

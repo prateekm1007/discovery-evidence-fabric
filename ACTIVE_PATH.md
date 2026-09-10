@@ -137,3 +137,29 @@ dispatcher deletion conditions are NOT all true yet (production visual
 service blocked on the billing-gated memory upgrade) — retirement
 deferred per the directive's own condition list. Round record:
 R442/R442_ROUND_RECORD.json.
+
+## R443-C2 addendum (2026-09-10) — the gate hardened against itself
+
+Operator directive R443-C2 (Visual Integrity Hardening) closed the four
+R442-disclosed gate blind spots WITHOUT altering engineering truth.
+The stage map's VISUAL QUALITY GATE row now reads:
+
+| Rule / boundary | Module | Notes |
+|---|---|---|
+| Raw-document node identity | `visual_compiler/visual_gate.py` + `gltf_doc.raw_part_identity` | canonical identity is proven from the RAW glTF JSON chunk (no loader — loaders synthesize names for unnamed nodes and a stripped GLB used to pass); the named-identity set must equal the scene spec's canonical nodes 1:1; the trimesh naming rule is DELETED (Art. LXIV disposition in the R443 record) |
+| Wrong-source witness | `visual_gate.check_source_scene_agreement` | the exported hero GLB's re-derived grounded world bounds must reproduce the spec's grounding (tolerance 0.02 normalized units) — a valid-looking render of another geometry fails |
+| Visual-set completeness | `visual_compiler/visual_set.py` | the required R441 ladder (hero, poster, dimension, section, exploded-when-multi-part, orthographic x4, turntable x12 = 23) re-verified FROM DISK at gate time; verdicts COMPLETE_PASS / PARTIAL / NOT_RUN / FAIL; anything but COMPLETE_PASS suppresses the hero and blocks release (Art. LXXII) |
+| Material distinction | `render.js` material probe + `visual_gate.measure_material_distinction` | one sphere per distinct semantic class under the hero light rig; the gate measures CIEDE2000 >= 10.0 between every class pair on the saved pixels (threshold provenance: visual_compiler_thresholds.json rev 3, ~4x CIE JND); the R441 palette measured 15/78 pairs below the bar (body_metal/machined_metal at 1.01 = BELOW JND) and was re-derived to pass the RENDERED measurement (13 classes, min pair 10.68 live) |
+| Typed render records | `visual_compiler/render_record_schema.py` | every status (SUCCEEDED / FAILED / SKIPPED_LOW_MEMORY / SKIPPED_INFRA_UNAVAILABLE / NOT_RUN) has a total typed record; finalize + validate on every compiler exit; package.py validates BEFORE reading consumer fields; skips/fails cannot carry a measured verdict |
+| Release decision | `package.py::_visual_release_ok` | the single release-passing state: verdict COMPLETE_PASS (legacy PASS only while no completeness block is declared); HERO_RELEASE_STATE.json carries the verdict verbatim |
+
+The five adversarial attacks (stripped identity, missing view, material
+spoof, malformed skip, wrong source) all fail closed for the specific
+reason each boundary exists (tests/test_r443_visual_integrity.py, 34
+tests). Both R442 production cases replay COMPLETE_PASS from clean
+state on the SAME bytes (Case B's body_metal/machined_metal now
+measures 15.92 dE00 rendered where R442 measured it visually
+indistinguishable). Production still type-skips the visual stage on the
+512 MB free plan (billing-gated upgrade re-escalated, Art. LXV count 3)
+— production visual success is NOT claimed. Round record:
+R443/R443_C2_ROUND_RECORD.json.

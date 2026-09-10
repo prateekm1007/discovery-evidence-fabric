@@ -401,7 +401,11 @@ def render_invention(work_dir: str,
             samples, memory_mode, timeout_s)
         rec["render_pipeline"] = "BLENDER_HEADLESS_LEGACY"
         rec["backend_selected"] = "explicit-legacy"
-        return rec
+        # R443: the legacy path exits through the same typed-record
+        # contract — every record is structurally valid for its status
+        from discovery_fabric.engine.visual_compiler \
+            import render_record_schema as _rrs
+        return _rrs.finalize_render_record(rec)
     # primary path — the extra legacy kwargs map honestly:
     #   renders   -> views (subset selection, same vocabulary)
     #   samples   -> recorded N/A (rasterizer, not a path tracer)

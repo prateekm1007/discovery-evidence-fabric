@@ -146,7 +146,8 @@ def _pdf(title: str, subtitle: str, essay: Dict[str, Any],
     # when the gate approved a cover, the FULL-BLEED template leads
     # (page 1 IS the hero); otherwise the framed body template is the
     # only template (text-only doc, unchanged from R424)
-    has_cover = bool(cover and cover.get("gate") == "PASS")
+    has_cover = bool(cover and cover.get("gate") in ("PASS",
+                                                     "COMPLETE_PASS"))
     doc.addPageTemplates([
         *([PageTemplate(id="cover", frames=[cover_frame])] if has_cover
           else []),
@@ -246,6 +247,24 @@ def _pdf(title: str, subtitle: str, essay: Dict[str, Any],
     return buf.getvalue()
 
 
+def _visual_release_ok(gate: Dict) -> bool:
+    """R443: the ONLY gate state that releases visuals to a buyer
+    surface. COMPLETE_PASS is the R443 vocabulary (every quality rule
+    passed AND the full required visual ladder present); legacy
+    "PASS" from a pre-R443 record stays accepted only while the
+    record declares no completeness block. A declared visual_set
+    that is NOT complete blocks — "three artifacts exist" is never
+    silently reinterpreted as "visual set passed"."""
+    if not isinstance(gate, dict):
+        return False
+    if gate.get("verdict") not in ("PASS", "COMPLETE_PASS"):
+        return False
+    vs = gate.get("visual_set")
+    if isinstance(vs, dict) and not vs.get("complete", True):
+        return False
+    return True
+
+
 def _sha256_bytes(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
 
@@ -325,7 +344,7 @@ def assemble(
     renders = geometry_out.get("renders") or {}
     gate = renders.get("visual_gate") or {}
     if renders.get("status") in ("OK", "PARTIAL") \
-            and gate.get("verdict") == "PASS":
+            and _visual_release_ok(gate):
         src3d = renders.get("out_dir") or ""
         if src3d:
             def _v(rel):
@@ -477,7 +496,14 @@ def assemble(
             # the Visual Compiler. A gate FAIL suppresses the hero in
             # this package (the buyer never sees a render the gate
             # rejected) and blocks the release; NOT_RUN (renderer
-            # skipped/failed) fails closed the same way.
+            # skipped/failed) fails closed the same way; R443 adds
+            # PARTIAL (visual set NOT_COMPLETE) — a full-ladder
+            # release requires verdict COMPLETE_PASS, never "some
+            # artifacts exist".
+            # R443 Workstream 4: the render record is validated
+            # BEFORE any consumer field is read — a malformed record
+            # never reaches this logic (it fails closed as NOT_RUN
+            # with the schema violation as the reason).
             gate = renders.get("visual_gate") or {}
             gate_path = os.path.join(render_dir, "visual_gate.json")
             if os.path.isfile(gate_path):
@@ -486,10 +512,31 @@ def assemble(
                 except Exception:  # noqa: BLE001 — unreadable gate = fail closed
                     gate = {"verdict": "NOT_RUN",
                             "reasons": ["visual_gate.json unreadable"]}
+            try:
+                from discovery_fabric.engine.visual_compiler\
+                    import render_record_schema as _rrs
+                _rrs.validate_render_record(renders)
+                _record_schema_error = None
+            except Exception as exc:  # noqa: BLE001 — malformed = fail closed
+                _record_schema_error = str(exc)
+                gate = {"verdict": "NOT_RUN",
+                        "reasons": [f"render record schema violation: "
+                                    f"{exc}"]}
             gate_verdict = gate.get("verdict") or (
                 "NOT_RUN" if renders.get("status") not in
                 ("OK", "RENDER_PARTIAL") else "PASS")
-            hero_suppressed = gate_verdict != "PASS"
+            # COMPLETE_PASS is the ONLY release-passing verdict (R443
+            # vocabulary); legacy "PASS" from a pre-R443 record stays
+            # accepted ONLY while the record carries no visual_set
+            # completeness block (fail closed once completeness is
+            # declared and false).
+            _vs = gate.get("visual_set")
+            _complete_ok = (True if not isinstance(_vs, dict)
+                            else bool(_vs.get("complete", True)))
+            hero_suppressed = (
+                gate_verdict not in ("PASS", "COMPLETE_PASS")
+                or not _complete_ok
+                or _record_schema_error is not None)
             with open(os.path.join(render_dir,
                                    "HERO_RELEASE_STATE.json"), "w") as f:
                 json.dump({

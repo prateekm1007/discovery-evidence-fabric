@@ -152,3 +152,76 @@ def walk_scene(glb_path: str) -> Dict[str, Any]:
         "min": all_min, "max": all_max, "center": center,
         "raw_size": all_max - all_min, "min_y": float(all_min[1]),
     }
+
+
+def raw_part_identity(glb_path: str) -> Dict[str, Any]:
+    """R443: RAW-document part identity — the gate's witness for
+    canonical node identity (Workstream 1).
+
+    WHY: any loader (trimesh, three.js) SYNTHESIZES names for unnamed
+    glTF nodes, so a check that reads names through a loader cannot
+    distinguish a canonically named GLB from one whose names were
+    stripped after compilation (the R442 recorded blind spot). This
+    function reads the glTF JSON chunk DIRECTLY — no loader, no
+    synthesis — and reports, per mesh-bearing node:
+
+      * name          the RAW `node.name` (None when absent/empty);
+      * ancestor_name the nearest NAMED mesh-bearing ancestor's raw
+                      name (None when none);
+      * is_primitive_slice
+                      True when the node itself is unnamed but its
+                      PARENT is a named mesh-bearing node — the
+                      multi-primitive export pattern (one named part
+                      node whose primitive meshes the GLTFExporter
+                      emits as unnamed child nodes). A slice carries
+                      its parent's identity; it is NOT a missing
+                      identity.
+
+    The gate FAILS a GLB whose mesh-bearing nodes are neither named
+    nor primitive slices of a named part — and that failure is
+    specifically "canonical identity absent from the raw document".
+    """
+    doc = read_gltf_json(glb_path)
+    scene_idx = doc.get("scene", 0)
+    scene = (doc.get("scenes") or [{}])[scene_idx]
+    nodes = doc.get("nodes") or []
+
+    found: List[Dict[str, Any]] = []
+
+    def visit(idx: int, anc_name: Optional[str], seen: set) -> None:
+        """anc_name = nearest NAMED mesh-bearing ancestor's raw name
+        (None when none) — the identity a slice inherits."""
+        if idx in seen or idx >= len(nodes):
+            return
+        seen.add(idx)
+        node = nodes[idx]
+        name = str(node.get("name") or "").strip() or None
+        has_mesh = "mesh" in node
+        if has_mesh:
+            found.append({
+                "name": name,
+                "ancestor_name": anc_name,
+                "is_primitive_slice": bool(name is None and anc_name),
+            })
+        child_anc = name if (name and has_mesh) else \
+            (anc_name if (name is None and has_mesh and anc_name) else None)
+        # a NAMED mesh node re-anchors identity; an UNNAMED slice keeps
+        # its ancestor; a non-mesh node does not pass identity down
+        # (a named group without meshes is NOT a part identity)
+        for child in node.get("children", []):
+            visit(child, child_anc, seen)
+
+    for root in scene.get("nodes", []):
+        visit(root, None, set())
+
+    named = [f["name"] for f in found if f["name"]]
+    unnamed = [f for f in found if f["name"] is None
+               and not f["is_primitive_slice"]]
+    return {
+        "mesh_nodes": len(found),
+        "named": named,
+        "unnamed_unattributed": [{"ancestor_name": f["ancestor_name"]}
+                                 for f in unnamed],
+        "primitive_slices": sum(1 for f in found
+                                if f["is_primitive_slice"]),
+    }

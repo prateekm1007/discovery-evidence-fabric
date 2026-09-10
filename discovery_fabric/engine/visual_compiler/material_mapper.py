@@ -39,21 +39,38 @@ from typing import Any, Dict, List, Optional, Tuple
 # The semantic PBR table. base color is linear RGB (the renderer feeds it
 # straight into MeshPhysicalMaterial; the old vertex palettes in
 # domain_geometry.py remain the geometry-side identity palette).
+#
+# R443 (operator directive — material semantics made measurable): the
+# table was re-derived against the RENDERED probe measurement (not the
+# spec numbers alone) so that every pair of distinct semantic classes
+# is OBSERVABLY distinct in the actual render — minimum measured
+# rendered separation 10.68 dE00 across all 78 pairs (13 classes,
+# live probe runs 2026-09-10), above the 10.0 bar with the probe's
+# byte-deterministic rendering. The R442 round record measured the
+# old table at CIEDE2000 1.01 between body_metal and machined_metal —
+# BELOW the just-noticeable difference (~2.3, CIE 142:2001). The
+# re-derived table keeps every semantic label's character (steel dark
+# gunmetal, aluminum mirror-chrome, copper copper); the "default"
+# class is deliberately a flagging magenta — an UNCLASSIFIED part
+# must be noticeable, not silently plausible (Art. XXV: unclassified
+# is a state to surface, not to hide). The rendered probe measurement
+# (visual_gate.measure_material_distinction) is the standing
+# acceptance; provenance in visual_compiler_thresholds.json rev 3.
 # ---------------------------------------------------------------------------
 SEMANTIC_MATERIALS: Dict[str, Dict[str, Any]] = {
-    "body_metal":     {"label": "matte steel",           "base": (0.62, 0.64, 0.68), "metallic": 0.55, "roughness": 0.45},
-    "glass":          {"label": "clear glass",           "base": (0.62, 0.76, 0.88), "metallic": 0.0,  "roughness": 0.08, "alpha": 0.5, "transmission": 0.65},
+    "body_metal":     {"label": "matte steel (dark)",       "base": (0.13, 0.18, 0.34), "metallic": 0.55, "roughness": 0.5},
+    "glass":          {"label": "clear glass",           "base": (0.30, 0.68, 0.90), "metallic": 0.0,  "roughness": 0.08, "alpha": 0.5, "transmission": 0.65},
     "silicon":        {"label": "blue-black silicon",    "base": (0.02, 0.035, 0.13), "metallic": 0.35, "roughness": 0.22},
-    "battery":        {"label": "dark graphite",         "base": (0.09, 0.095, 0.105), "metallic": 0.3,  "roughness": 0.45},
-    "rubber":         {"label": "rubber",                "base": (0.03, 0.03, 0.035), "metallic": 0.0,  "roughness": 0.9},
-    "polymer":        {"label": "light polymer",         "base": (0.78, 0.76, 0.72), "metallic": 0.0,  "roughness": 0.55},
-    "machined_metal": {"label": "machined aluminum",     "base": (0.60, 0.62, 0.65), "metallic": 0.9,  "roughness": 0.38},
-    "circuit":        {"label": "dark polymer (PCB)",    "base": (0.08, 0.22, 0.13), "metallic": 0.05, "roughness": 0.5},
-    "ceramic":        {"label": "technical ceramic",     "base": (0.86, 0.85, 0.82), "metallic": 0.0,  "roughness": 0.22},
-    "composite":      {"label": "composite",             "base": (0.36, 0.44, 0.52), "metallic": 0.05, "roughness": 0.55},
-    "conduit_power":  {"label": "copper (cooling)",      "base": (0.72, 0.42, 0.22), "metallic": 0.85, "roughness": 0.35},
-    "conduit_data":   {"label": "data conduit",          "base": (0.28, 0.47, 0.72), "metallic": 0.4,  "roughness": 0.4},
-    "default":        {"label": "unclassified polymer",  "base": (0.70, 0.71, 0.74), "metallic": 0.15, "roughness": 0.5},
+    "battery":        {"label": "dark graphite",         "base": (0.085, 0.09, 0.10), "metallic": 0.3,  "roughness": 0.45},
+    "rubber":         {"label": "rubber",                "base": (0.06, 0.05, 0.045), "metallic": 0.0,  "roughness": 0.9},
+    "polymer":        {"label": "engineering polymer",   "base": (0.70, 0.51, 0.25), "metallic": 0.0,  "roughness": 0.55},
+    "machined_metal": {"label": "machined aluminum",     "base": (0.72, 0.76, 0.84), "metallic": 1.0,  "roughness": 0.06},
+    "circuit":        {"label": "dark polymer (PCB)",    "base": (0.07, 0.24, 0.13), "metallic": 0.05, "roughness": 0.5},
+    "ceramic":        {"label": "technical ceramic",     "base": (0.97, 0.97, 0.96), "metallic": 0.0,  "roughness": 0.22},
+    "composite":      {"label": "composite",             "base": (0.20, 0.25, 0.17), "metallic": 0.05, "roughness": 0.55},
+    "conduit_power":  {"label": "copper (cooling)",      "base": (0.75, 0.42, 0.20), "metallic": 0.85, "roughness": 0.35},
+    "conduit_data":   {"label": "data conduit",          "base": (0.28, 0.18, 0.66), "metallic": 0.4,  "roughness": 0.4},
+    "default":        {"label": "unclassified (flagged)", "base": (0.55, 0.15, 0.42), "metallic": 0.15, "roughness": 0.5},
 }
 
 # The directive's headline table, in keywords-first order. First hit wins;

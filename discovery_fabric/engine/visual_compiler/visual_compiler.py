@@ -1,14 +1,26 @@
-"""visual_compiler.py — R441 the Visual Compiler orchestrator.
+"""visual_compiler.py — R441 the Visual Compiler orchestrator; R443
+integrity hardening.
 
 One entry point, one typed record — the same honest contract the
 Blender path had (status / artifacts / source provenance / budget),
 now over the deterministic Three.js pipeline, with two NEW hard
 outputs the old pipeline never produced:
 
-  * visual_gate.json  — the Visual Quality Gate verdict; a FAIL
-    suppresses the hero and blocks package release (Article LXXII);
+  * visual_gate.json  — the Visual Quality Gate verdict (R443
+    vocabulary: COMPLETE_PASS / PARTIAL / NOT_RUN / FAIL); anything
+    but COMPLETE_PASS suppresses the hero and blocks package release
+    (Article LXXII);
   * scene_spec.json   — the deterministic scene the renderer executed
     (hash-recorded; the website and the PDF render from the SAME spec).
+
+R443 (operator directive — Visual Integrity Hardening): EVERY return
+record is finalized through render_record_schema — a skipped/failed
+render carries the same typed shape as a successful one (out_dir null
+when nothing was produced, visual_gate NOT_RUN, release blocked, a
+non-empty reason) — and the artifact inventory is the FULL R443
+required ladder (hero, poster, dimension, section, exploded when
+multi-part, orthographic x4, turntable x12), so a missing view is a
+typed PARTIAL, never silence.
 
 Pipeline (operator directive R441):
 
@@ -30,25 +42,14 @@ from typing import Any, Dict, List, Optional
 
 from . import camera_solver, material_mapper, render_worker, scene_builder
 from . import visual_gate
+from . import visual_set
+from . import render_record_schema
 from . import RENDER_PIPELINE
 
-# the mandatory visual set (R441: every package must generate these
-# AUTOMATICALLY — a missing class is a typed PARTIAL, never silence).
-# The exploded pair is conditional: a single-part architecture has
-# nothing to separate — its typed skip is disclosed in the render
-# record, never faked (Art. XXV).
-BASE_ARTIFACTS = (
-    "hero.png", "hero.glb",
-    "poster.png", "dimension.png",
-    "section.png",
-    "orthographic/front.png", "orthographic/side.png",
-    "orthographic/top.png", "orthographic/iso.png",
-)
-EXPLODED_ARTIFACTS = ("exploded.png", "exploded.glb")
 _META_ARTIFACTS = ("render_record.json", "scene_spec.json",
                    "visual_gate.json")
 DEFAULT_RESOLUTION = [1536, 1024]
-DEFAULT_TURNTABLE_FRAMES = 12
+DEFAULT_TURNTABLE_FRAMES = visual_set.DEFAULT_TURNTABLE_FRAMES
 
 
 def _sha256_file(path: str) -> str:
@@ -57,6 +58,33 @@ def _sha256_file(path: str) -> str:
         for chunk in iter(lambda: f.read(1 << 20), b""):
             h.update(chunk)
     return h.hexdigest()
+
+
+def _finish(record: Dict[str, Any]) -> Dict[str, Any]:
+    """The ONE exit: finalize the record to its status's total typed
+    shape, then validate. A validation failure is converted to a
+    fail-closed RENDER_FAILED record (and re-validated) — a malformed
+    record must never reach a consumer (R443 Workstream 4, Attack 4)."""
+    render_record_schema.finalize_render_record(record)
+    try:
+        render_record_schema.validate_render_record(record)
+    except render_record_schema.RenderRecordValidationError as exc:
+        broken = dict(record)
+        record.clear()
+        record.update({
+            "stage": "RENDER",
+            "render_pipeline": RENDER_PIPELINE,
+            "status": "RENDER_FAILED",
+            "error": f"render record schema violation: {exc}",
+            "reason": f"render record schema violation: {exc}",
+            "note": ("the compiler refused to emit a record that is "
+                     "not structurally valid for its status — fail "
+                     "closed before any consumer sees it"),
+            "broken_record_snapshot_keys": sorted(broken),
+        })
+        render_record_schema.finalize_render_record(record)
+        render_record_schema.validate_render_record(record)
+    return record
 
 
 def authoritative_glb(work_dir: str,
@@ -120,11 +148,14 @@ def compile_visuals(work_dir: str,
         "status": "OK",
     }
 
-    # memory guard BEFORE any subprocess (the R420d discipline)
+    # memory guard BEFORE any subprocess (the R420d discipline). The
+    # guard record is merged and then finalized like every other exit:
+    # the R442-disclosed defect (skip records without out_dir /
+    # visual_gate) is structurally impossible after _finish.
     guard = render_worker.memory_guard(context, mode=memory_mode)
     if guard:
-        return {**record, **{k: v for k, v in guard.items()
-                             if k != "stage"}}
+        return _finish({**record,
+                        **{k: v for k, v in guard.items() if k != "stage"}})
 
     # the renderer availability check is the CHEAPEST typed skip — run
     # it before any scene work (a renderer-less environment fails in
@@ -136,13 +167,13 @@ def compile_visuals(work_dir: str,
         record["note"] = ("no verified Chromium/Node pair in this "
                           "environment — typed skip; the interactive "
                           "GLB is served unchanged")
-        return record
+        return _finish(record)
     deps = _rw.renderer_deps_present()
     if deps:
         record["status"] = deps
         record["note"] = (f"the renderer dependency contract is not met "
                           f"({deps}) — typed skip")
-        return record
+        return _finish(record)
 
     source = authoritative_glb(
         work_dir, (geometry_out or {}).get("generation_models"))
@@ -151,7 +182,7 @@ def compile_visuals(work_dir: str,
         record["note"] = ("no authoritative GLB found in the run "
                           "directory — typed skip; the interactive GLB "
                           "is served unchanged")
-        return record
+        return _finish(record)
     record["source_glb"] = source
     record["source_glb_sha256"] = _sha256_file(source)
 
@@ -184,7 +215,8 @@ def compile_visuals(work_dir: str,
             "reasons": [record["error"]], "checks": {}}
         record["hero_suppressed"] = True
         record["release_blocked"] = True
-        return record
+        record["out_dir"] = out_dir
+        return _finish(record)
     spec["solve"] = camera_solver.solve(spec)
     spec["domain_family"] = (geometry_out or {}).get("domain_family")
     spec_bytes = scene_builder.scene_spec_bytes(spec)
@@ -245,13 +277,14 @@ def compile_visuals(work_dir: str,
         rec["hero_suppressed"] = True
         rec["release_blocked"] = True
         rec["out_dir"] = out_dir
-        return rec
+        return _finish(rec)
     record.update({k: v for k, v in rec.items() if k != "stage"})
 
     # ---- verify artifacts on disk (the record's hashes re-computed) ----
-    mandatory = list(BASE_ARTIFACTS)
-    if spec["model"]["node_count"] >= 2:
-        mandatory += list(EXPLODED_ARTIFACTS)
+    # the FULL R443 required ladder — a missing view is a typed PARTIAL,
+    # never silence (the gate re-derives the same classification)
+    mandatory = visual_set.required_artifacts(
+        int(spec["model"]["node_count"]), turntable_frames)["required"]
     produced: Dict[str, Any] = {}
     missing: List[str] = []
     for name in mandatory:
@@ -267,7 +300,7 @@ def compile_visuals(work_dir: str,
         record["status"] = "PARTIAL"
         record["note"] = (
             f"the visual set completed with {len(missing)} artifact(s) "
-            f"missing: {missing} — disclosed, never silent")
+            f"missing: {missing[:8]} — disclosed, never silent")
 
     # ---- the Visual Quality Gate (Article LXXII) ----------------------------
     gate = visual_gate.evaluate(out_dir, spec, record, record["status"])
@@ -277,7 +310,7 @@ def compile_visuals(work_dir: str,
     record["hero_suppressed"] = gate.get("hero_suppressed", True)
     record["release_blocked"] = gate.get("release_blocked", True)
     record["out_dir"] = out_dir
-    return record
+    return _finish(record)
 
 
 def _with_chrome(rspec_path: str) -> str:
