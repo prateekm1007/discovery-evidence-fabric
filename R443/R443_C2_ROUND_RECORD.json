@@ -10,7 +10,8 @@
 
   "source_sha": "0b58f106985ff1f9907b42a4b854fa43001bdebb",
   "origin_main_sha_at_round_start": "0b58f106985ff1f9907b42a4b854fa43001bdebb",
-  "deployed_sha": "see production_deployment below (recorded after deploy)",
+  "origin_main_sha_after_push": "6f64ffa34e761a2ef992eec1df86a8e8c6435db0 (verified via ls-remote after push; deployed and /api/version-verified)",
+  "deployed_sha": "6f64ffa34e761a2ef992eec1df86a8e8c6435db0",
   "constitution_version_recorded": "2.3.0",
 
   "git_baseline_art22_xxiii": {
@@ -150,11 +151,29 @@
       "cost_of_inaction": "every fresh production run still type-skips the visual set (RENDER_SKIPPED_LOW_MEMORY): production serves the interactive GLB but NO hero/poster/ladder/probe, and NO production package can claim a visual release until the owner adds a payment method in the Render dashboard and the service moves to >= 1 GB (standard 2 GB recommended)",
       "what_unblocks": "owner adds payment info -> coder re-runs the plan PATCH -> redeploy -> fresh production Case A + Case B through the production Visual Compiler -> the remaining Blender retirement condition closes"
     },
-    "deployed_this_round": "R443 commit (see git_push below) via Render API pinned commitId deploy",
-    "verified_health": "see production_verify below"
+    "deployed_this_round": "6f64ffa34e761a2ef992eec1df86a8e8c6435db0 via Render API pinned commitId (deploy dep-dah32h142hec73eiosj0, status live 2026-09-10T04:28Z)",
+    "verified_health": {
+      "api_version_engine_commit": "6f64ffa34e761a2ef992eec1df86a8e8c6435db0",
+      "engine_commit_source": "build_artifact",
+      "build_running_health": "agree (BUILD == RUNNING == HEALTH)",
+      "constitution_version": "2.3.0",
+      "web_build_hash": "7cb2174df5ee1aafb95ff38654cc4afe25ff7f13ef6f70a3ed9cc34a8e56ddcd"
+    },
+    "production_verify": {
+      "method": "FOUR genuinely fresh production runs submitted through the ACTUAL production pipeline at the deployed SHA (POST /api/run, owner-cookie scoped polling)",
+      "runs": [
+        {"run_id": "ts_e0b4f66febbf", "outcome": "orphaned by access control discovery — the run was accepted but polls without the owner cookie correctly 404 (a denied caller learns nothing); the owner cookie was not captured on submission; NOT a defect, a verification-procedure lesson", "run_state": "UNKNOWN (unobservable without the owner key)"},
+        {"run_id": "ts_204caafe4402", "problem": "benchtop sonicator bath for sealed microfluidic cassettes", "final_status": "MALFORMED_OR_FALSE_PREMISE", "premise_gate": "[PG-03] vacuum-vs-sonic contradiction — the gate read 'sealed cassettes' against 'sonic' as a vacuum premise; the machine REFUSED to proceed on what it judged an incoherent premise (honest fail-closed premise behavior; the phrasing was the submitter's imprecision)", "reached_visual_stage": false},
+        {"run_id": "ts_43240815db3f", "final_status": "MECHANISM_GENERATION_FAILED", "failed_stage": "SYNTHESIZE RuntimeError: transport/CALL_FAILED (openrouter + nvidia) — honest typed infrastructure state (Art. LXI)", "reached_visual_stage": false},
+        {"run_id": "ts_0ea447aee908", "final_status": "MECHANISM_GENERATION_FAILED", "failed_stage": "same transport/CALL_FAILED", "reached_visual_stage": false},
+        {"run_id": "ts_d86f86ef640d", "final_status": "MECHANISM_GENERATION_FAILED", "failed_stage": "same transport/CALL_FAILED (providers DEGRADED in this window despite the health probe reporting nvidia HEALTHY moments before)", "reached_visual_stage": false}
+      ],
+      "conclusion": "the production identity is verified (exact SHA deployed and health-reported); the production VISUAL stage could NOT be reached in this verification window — the LLM transport layer degraded for the entire window and four runs honestly typed their infrastructure state instead of pretending success. The production typed-skip record under the R443 schema is covered by the compile-level integration test running the SAME production code path (render.py -> compile_visuals memory guard), and the R442 live production proof of the skip chain (NOT_RUN -> zero hero files -> zero PDF images -> 404 render routes -> GLB 200) remains valid for the unchanged fail-closed package chain",
+      "production_visual_success_claimed": false
+    }
   },
 
-  "production_verify": "RECORDED AFTER DEPLOY below",
+  "production_verify": "RECORDED ABOVE (production_deployment.production_verify): four fresh production runs, all honestly typed; visual stage unreachable in-window due to LLM transport degradation; identity chain verified at the exact deployed SHA",
 
   "blender_disposition": {
     "decision": "NOT deleted in R443 (per directive: retirement requires >=1 GB production + fresh production A/B + production compiler success + complete visual set + negative attack pass + website/PDF parity + no legacy conversion route)",
