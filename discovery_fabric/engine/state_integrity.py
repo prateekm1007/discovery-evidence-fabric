@@ -1,5 +1,6 @@
 """discovery_fabric/engine/state_integrity.py — R443 / TSC-008: narrow
-earned-state validators.
+earned-state validators. R444 extends the same discipline to the
+experiment contract (Art. LII) and to system-level claims.
 
 THE MEASURED DEFECT (external audit, latest production run):
     SYNTHESIZE = FAILED_EXPLICIT, VERIFY/PHYSICS/ATTACK/
@@ -22,6 +23,22 @@ THE REPAIR — narrow state tests, NOT a rewrite:
     - unbound evidence references    -> cannot grant evidence-supported
                                         status
 
+R444 additions (operator directive R444-E — the impossible states):
+    - null falsification threshold   -> cannot claim a COMPLETE
+                                        experiment (Art. LII: there
+                                        must exist an experimental
+                                        outcome that kills the
+                                        mechanism)
+    - benchmark not run              -> cannot claim WORLD_CLASS_
+                                        DISCOVERY_GREEN (Art. XLIX/
+                                        LIX: the multi-domain
+                                        benchmark is a precondition)
+    - attacker calibration not run   -> cannot claim a certified
+                                        attacker (Art. L: the attacker
+                                        is an instrument; an
+                                        uncalibrated instrument is
+                                        not certified)
+
 THE FALLBACK HYPOTHESIS IS PRESERVED (the mission-critical distinction):
 a synthesis-path failure that falls back to the mandatory baseline
 generation, survives the gauntlet, and requires an experiment is NOT
@@ -36,7 +53,9 @@ promotion requires new evidence), Art. XIV (red = stop; the status word
 may not outrun the gate), Art. XV (the coder discloses inconvenient
 results — the audit finding itself), Art. LXI (infrastructure failure is
 never scientific rejection — the fallback state is an infrastructure-
-origin presentation, not a scientific verdict).
+origin presentation, not a scientific verdict), Art. LII (the killer
+experiment is a falsification contract), Art. L/LIX (calibration and
+the frozen benchmark are preconditions for world-class claims).
 """
 from __future__ import annotations
 
@@ -186,3 +205,142 @@ def honest_fallback_status(survivor: Optional[Dict[str, Any]],
            "; the decisive physical experiment is specified, not "
            "executed"))
     return ("EVOLVED_INVENTION_CANDIDATE", reason)
+
+
+# ---------------------------------------------------------------------------
+# R444-D — the Article LII falsification-contract validators
+# ---------------------------------------------------------------------------
+#: the twelve Article LII fields, in constitutional order
+ARTICLE_LII_FIELDS = (
+    "HYPOTHESIS",
+    "TREATMENT",
+    "CONTROL",
+    "MEASUREMENT",
+    "APPARATUS",
+    "SAMPLE",
+    "ACCEPTANCE_THRESHOLD",
+    "FALSIFICATION_THRESHOLD",
+    "UNCERTAINTY",
+    "COST",
+    "TIME",
+    "SAFETY",
+)
+
+
+def falsification_contract_status(contract: Optional[Dict[str, Any]]
+                                  ) -> Dict[str, Any]:
+    """Narrow test: an experiment contract is COMPLETE only when it
+    answers what experimental outcome kills the mechanism.
+
+    Art. LII: 'There must exist an experimental outcome that kills the
+    mechanism.' A contract whose FALSIFICATION_THRESHOLD is null/
+    UNKNOWN answers no kill outcome — the honest presentation is
+    INVENTION_REQUIRES_EXPERIMENT (the package-level status), never a
+    'complete experiment' claim. UNKNOWN fields are legitimate states
+    (Art. XXV) and are listed with their blockers; only the
+    falsification answer is completeness-affecting (the R444-E
+    impossible state: null falsification threshold -> complete
+    experiment).
+    """
+    c = contract or {}
+    answered: List[str] = []
+    unknown: Dict[str, str] = {}
+    for f in ARTICLE_LII_FIELDS:
+        v = c.get(f)
+        if v in (None, "", [], {}):
+            unknown[f] = str(c.get(f + "_BLOCKER")
+                             or "no record exists for this field")
+        elif isinstance(v, str) and v.strip().upper().startswith("UNKNOWN"):
+            unknown[f] = v
+        else:
+            answered.append(f)
+    falsification_answered = "FALSIFICATION_THRESHOLD" in answered
+    return {
+        "answered_fields": answered,
+        "unknown_fields": unknown,
+        "falsification_threshold_answered": falsification_answered,
+        "contract_complete": falsification_answered,
+        "basis": (
+            "Art. LII: the contract is complete only when an "
+            "experimental outcome that kills the mechanism is stated; "
+            "UNKNOWN fields are honest states (Art. XXV) and are "
+            "listed with their blockers — they limit maturity, not "
+            "existence"),
+    }
+
+
+def experiment_claim_violations_r444(
+        claims_complete_experiment: bool,
+        contract: Optional[Dict[str, Any]]) -> List[Dict[str, str]]:
+    """Narrow test: a 'complete experiment' claim requires the
+    falsification answer (R444-E impossible state #4)."""
+    v: List[Dict[str, str]] = []
+    if claims_complete_experiment:
+        status = falsification_contract_status(contract)
+        if not status["falsification_threshold_answered"]:
+            v.append({
+                "code": "R444-FALSIFICATION-THRESHOLD-ABSENT",
+                "detail": (
+                    "a complete experiment is claimed but the "
+                    "FALSIFICATION_THRESHOLD is null/UNKNOWN — no "
+                    "experimental outcome that kills the mechanism is "
+                    "stated (Art. LII); the honest presentation is "
+                    "INVENTION_REQUIRES_EXPERIMENT"),
+            })
+    return v
+
+
+# ---------------------------------------------------------------------------
+# R444-E — system-level claim validators
+# ---------------------------------------------------------------------------
+#: system-level claims that require measured run evidence
+_SYSTEM_CLAIMS = {
+    "world_class_discovery_green": {
+        "requires": "benchmark_run",
+        "code": "R444-WORLD-CLASS-WITHOUT-BENCHMARK",
+        "detail": (
+            "WORLD_CLASS_DISCOVERY_GREEN is claimed but the "
+            "multi-domain discovery benchmark has not been run (Art. "
+            "XLIX/LIX: the frozen benchmark is a precondition; a "
+            "green gate without the measured run is a self-scored "
+            "claim — Art. LVIII)"),
+    },
+    "certified_attacker": {
+        "requires": "attacker_calibration_run",
+        "code": "R444-CERTIFIED-ATTACKER-WITHOUT-CALIBRATION",
+        "detail": (
+            "a certified attacker is claimed but the attacker "
+            "calibration corpus has not been run (Art. L: the "
+            "attacker is an instrument; certification requires the "
+            "measured confusion matrix, not a verdict count)"),
+    },
+}
+
+
+def system_claim_violations(
+        claims: Optional[Dict[str, Any]],
+        benchmark_run_evidence: Optional[Any],
+        attacker_calibration_evidence: Optional[Any]) -> List[Dict[str, str]]:
+    """Narrow test: system-level claims require their measured runs.
+
+    R444-E impossible states #5/#6:
+        benchmark not run            -> WORLD_CLASS_DISCOVERY_GREEN
+        attacker calibration not run -> certified attacker
+
+    Evidence is any non-empty measured artifact (the battery/calibration
+    results record). An empty/None evidence state with a True claim is
+    the violation. Evidence PRESENCE is necessary, never sufficient:
+    the claim must also carry the run's identity (hashes/SHAs travel in
+    the claiming record itself; this validator refuses the claim when
+    the run does not exist at all).
+    """
+    v: List[Dict[str, str]] = []
+    for claim_key, spec in _SYSTEM_CLAIMS.items():
+        if not (claims or {}).get(claim_key):
+            continue
+        ev = (benchmark_run_evidence
+              if spec["requires"] == "benchmark_run"
+              else attacker_calibration_evidence)
+        if ev in (None, {}, [], ""):
+            v.append({"code": spec["code"], "detail": spec["detail"]})
+    return v

@@ -1,0 +1,49 @@
+{
+  "benchmark_version": "r444-extension/1.0.0",
+  "frozen_at": "2026-09-10",
+  "frozen_by": "CODER (R444 session), operator R444-A directive: 'Run the existing W11 machinery against at least 10 problems across at least 6 domains. The exact domain mix should intentionally prevent engineering-domain overfitting. Use materially different classes such as: mechanical, thermal/energy, fluid, materials, biological/medical, software/ML with multiple problems per some domains.'",
+  "freeze_semantics": {
+    "held_out": "NONE of these problems appear in the R401-WC2 frozen benchmark (12 physical-engineering problems), the R401-WC2 attacker-calibration corpus (compressed-air moisture separation), the R412 40-case calibration corpus, the 18-case production battery, or any engine test fixture. Authored fresh 2026-09-10 from software/ML domain-failure knowledge BEFORE any engine run against this set.",
+    "freeze_first": "This file is committed BEFORE any measurement run. Engine optimization against any problem in this set is FORBIDDEN until the R444 measurement is recorded. The R401-WC2 frozen benchmark is NOT modified by this extension (its sha256 is separately recorded and verified by the battery); this file adds the software/ML domain class the frozen set lacks, per the R444 directive's explicit domain-mix instruction.",
+    "why_extension_not_new_framework": "The R444 directive says 'Do not build another benchmark framework unless the current one is actually broken.' The current W11 machinery is intact (verified: scripts/r401wc2_benchmark_run.py imports cleanly against HEAD; a smoke problem executed end-to-end at HEAD). This extension reuses the SAME problem shape, the SAME engine entry path, and the SAME measurement instrument (_measure / MD-EST contract) on the SAME r401 arm. Only the problem list is new.",
+    "problem_shape": ["problem_id", "device", "failure", "failure_mode", "constraint", "domain"]
+  },
+  "domain_class_mapping_note": "Together with the frozen 12 problems, the R444 run covers: mechanical (microsystems, precision-engineering), thermal/energy (electrochemical-energy, electrochemical-materials, thermal-fluid-process, energy-photovoltaic), fluid (fluid-machinery), materials (materials-food, civil-infrastructure), biological/medical (biomedical-sensing, environmental-engineering), software/ML (this extension, 4 problems). Multiple problems per domain family: thermal/energy x4, materials x2, bio/medical x2, software/ML x4.",
+  "problems": [
+    {
+      "problem_id": "bench-x01-rl-reward-hacking",
+      "device": "PPO-trained robotic pick-and-place policy running on a warehouse manipulation cell",
+      "failure": "the policy exploits a proxy reward (grasp-detector confidence) instead of true object placement, silently corrupting placements when novel object shapes shift the detector's calibration",
+      "failure_mode": "reward_hacking",
+      "constraint": "hold true placement success above 98 percent across a quarterly rotation of 200 novel SKUs without per-SKU reward recalibration or human labeling",
+      "domain": "software-ml-reinforcement-learning"
+    },
+    {
+      "problem_id": "bench-x02-recommender-feedback-loop",
+      "device": "collaborative-filtering video recommender serving a subscription platform",
+      "failure": "the recommender trains on its own past outputs, collapsing recommendation diversity and gradually eroding long-term engagement for mid-tail users even as short-term click-through rises",
+      "failure_mode": "feedback_loop_degradation",
+      "constraint": "sustain 90-day retention for mid-tail users within 2 percent of cold-start cohort performance without reducing request throughput below 10 million recommendations per hour",
+      "domain": "software-ml-recommender-systems"
+    },
+    {
+      "problem_id": "bench-x03-llm-kvcache-fragmentation",
+      "device": "LLM inference serving cluster with paged KV-cache on shared GPU nodes",
+      "failure": "mixed-length bursty requests fragment the paged KV-cache blocks, forcing live-token evictions and re-computation that blow tail latency budgets during traffic peaks",
+      "failure_mode": "memory_fragmentation",
+      "constraint": "hold p99 first-token latency below 800 ms at 3x baseline burst load without dropping requests or adding GPU nodes beyond the current fleet",
+      "domain": "software-ml-inference-infrastructure"
+    },
+    {
+      "problem_id": "bench-x04-demand-forecast-drift",
+      "device": "gradient-boosted demand forecast model inside a retail supply-chain planning system",
+      "failure": "silent feature drift (store-assortment changes, pricing experiments, seasonality shift) degrades forecast accuracy for weeks before anyone notices, accumulating stockouts and overstock",
+      "failure_mode": "feature_drift",
+      "constraint": "detect forecast degradation within 7 days of onset at or above 15 percent WAPE inflation, holding planner alert false-positive rate below 5 percent without retraining more than monthly",
+      "domain": "software-ml-forecasting"
+    }
+  ],
+  "metrics": {
+    "inheritance": "The per-problem metric contract and the MD-EST headline are INHERITED VERBATIM from R401-WC2/BENCHMARK/FROZEN_BENCHMARK.json (the same instrument code computes them). No new metric, no new threshold, no new scoring rule is introduced by this extension (Art. LIX)."
+  }
+}

@@ -115,6 +115,12 @@ class EngineRun:
         self.package_report: Optional[Dict[str, Any]] = None
         self.release: Optional[Dict[str, Any]] = None
         self.package_failure: Optional[str] = None
+        # R444-D: the Article LII experiment contract + its status,
+        # attached to the run's final state by
+        # _evolution_final_status when the presentation status is
+        # decided (persisted in the lineage record — the contract is a
+        # record, never an assertion)
+        self._experiment_contract: Optional[Dict[str, Any]] = None
         # R399 W2.5: stages skipped by the blocker cascade — a skipped
         # stage blocks its own downstream set exactly like a failed one
         # (the audit's measured defect: OK-on-empty-input downstream
@@ -2043,6 +2049,12 @@ class EngineRun:
                 "current_invention": summary["current_invention"],
                 "survivor_reached": summary["survivor_reached"],
             })
+        # R444-D: the Article LII falsification contract travels with
+        # the final state whenever it was assessed (a record, never an
+        # assertion — Art. XV)
+        if self._experiment_contract is not None:
+            summary["final_state"]["experiment_contract"] = \
+                self._experiment_contract
         self._persist("INVENTION_LINEAGE.json", summary)
         return summary
 
@@ -2600,23 +2612,60 @@ class EngineRun:
         useful idea is preserved, never rejected, and never dressed as
         EVOLVED. Only a genuine evolved lineage (a generation beyond
         the baseline with a recorded causal delta) earns
-        EVOLVED_INVENTION_CANDIDATE."""
-        from .state_integrity import honest_fallback_status
+        EVOLVED_INVENTION_CANDIDATE.
+
+        R444-D: an evolved lineage whose experiment contract does not
+        state a FALSIFICATION_THRESHOLD (the experimental outcome that
+        kills the mechanism — Art. LII) ALSO presents as
+        INVENTION_REQUIRES_EXPERIMENT. The evolution record stays in
+        the lineage (the evolution axis is honest); the package-level
+        status is the experiment axis, and a package that cannot answer
+        'what would kill this mechanism' is not presented as a fully
+        defensible technical opportunity."""
+        from .state_integrity import (
+            FALLBACK_PRESENTATION_STATUS, falsification_contract_status,
+            honest_fallback_status)
         package_complete = bool(
             self.package_report is not None
             and self.package_report.get("complete"))
         status, reason = honest_fallback_status(
             survivor, summary, package_complete=package_complete)
-        if status is not None:
-            return (status, reason)
-        n = summary.get("n_generations") or 0
-        current = summary.get("current_invention") or {}
-        return ("INVENTION_UNDER_DEVELOPMENT",
-                f"{n} architecture generations explored; the current "
-                f"invention (GEN {current.get('gen')}) is presented "
-                f"with maturity {current.get('maturity')} — none yet "
-                f"survived the full challenge gauntlet; stop reason: "
-                f"{summary.get('stop_reason')}")
+        if status is None:
+            n = summary.get("n_generations") or 0
+            current = summary.get("current_invention") or {}
+            return ("INVENTION_UNDER_DEVELOPMENT",
+                    f"{n} architecture generations explored; the current "
+                    f"invention (GEN {current.get('gen')}) is presented "
+                    f"with maturity {current.get('maturity')} — none yet "
+                    f"survived the full challenge gauntlet; stop reason: "
+                    f"{summary.get('stop_reason')}")
+        # R444-D — the falsification-contract gate on the package-level
+        # presentation: a status that presents the invention as a
+        # defensible technical opportunity requires the kill answer.
+        if status == "EVOLVED_INVENTION_CANDIDATE":
+            from .experiment_selector import article_lii_contract
+            contract = article_lii_contract(
+                self.env,
+                survivor_architecture=(survivor or {}).get(
+                    "architecture") or {})
+            cstat = falsification_contract_status(contract)
+            self._experiment_contract = {
+                "contract": contract,
+                "status": cstat,
+            }
+            if not cstat["falsification_threshold_answered"]:
+                status = FALLBACK_PRESENTATION_STATUS
+                reason = (
+                    reason
+                    + "; R444-D: the experiment contract does not state "
+                    "an experimental outcome that kills the mechanism "
+                    "(FALSIFICATION_THRESHOLD null/UNKNOWN — Art. LII), "
+                    "so the package presents as requiring its decisive "
+                    "experiment, never as a fully defensible technical "
+                    "opportunity; unknown contract fields: "
+                    + ", ".join(sorted(
+                        cstat["unknown_fields"].keys())))
+        return (status, reason)
 
     # ------------------------------------------------------------------
     def _cemetery_update(self, final: Dict[str, Any]):

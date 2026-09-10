@@ -68,7 +68,6 @@ def select_decisive_experiment(env: Candidate) -> Dict[str, Any]:
     nba = env.next_best_action or {}
     shortlist: List[Dict[str, Any]] = []
     excluded_administrative: List[Dict[str, Any]] = []
-
     for opt in ke.get("options_ranked", []):
         name = opt.get("name", "")
         selected = (ke.get("selected") or {})
@@ -153,5 +152,188 @@ def select_decisive_experiment(env: Candidate) -> Dict[str, Any]:
         "no_invented_values_note": ("cost/time/kill_probability remain "
                                     "UNKNOWN where no stage recorded them "
                                     "(Art. XXV)"),
+        "falsification_contract": article_lii_contract(env),
         "timestamp": utc_now(),
     }
+
+
+# ---------------------------------------------------------------------------
+# R444-D — the Article LII falsification-contract projection
+# ---------------------------------------------------------------------------
+_KILL_DIRECTION_RE = re.compile(
+    r"\b(if|when|unless|exceeds|above|below|outside|beyond|fails?|"
+    r"not\s+observed|does\s+not|drops?|rises?)\b", re.IGNORECASE)
+_NUMBER_RE = re.compile(r"\d+(?:\.\d+)?")
+
+
+def article_lii_contract(env, survivor_architecture: Optional[Dict] = None
+                         ) -> Dict[str, Any]:
+    """Project the run's OWN records onto the twelve Article LII
+    falsification-contract fields.
+
+    NOTHING IS INVENTED (Art. XXVII: no threshold invention). Every
+    field is answered from a recorded artifact or carries UNKNOWN with
+    its blocker. The decisive field is FALSIFICATION_THRESHOLD — 'what
+    experimental outcome would kill this mechanism?' — which is
+    answered ONLY when the records state both a falsification
+    procedure (the candidate's own falsification test) and the effect
+    it must show (the recorded expected effect); the kill outcome is
+    then the test failing to show that effect, stated as a
+    derived-from-records composite, never a fabricated number. A
+    contract without the falsification answer is INCOMPLETE and the
+    package presenting it must read INVENTION_REQUIRES_EXPERIMENT
+    (state_integrity.falsification_contract_status enforces this).
+
+    Sources (all from the run's own envelope):
+      HYPOTHESIS            <- killer_experiment.hypotheses (H_effect_holds)
+      TREATMENT             <- mechanism_map.intervention (or the evolution
+                               survivor's architecture when provided)
+      CONTROL               <- physics BASELINE_COMPARISON execution
+      MEASUREMENT           <- mechanism_map.falsification_test
+      APPARATUS             <- UNKNOWN unless the falsification test names
+                               instrumentation explicitly (kept honest:
+                               the split is not invented)
+      SAMPLE                <- UNKNOWN (no sample-size stage exists)
+      ACCEPTANCE_THRESHOLD  <- mechanism_map.expected_effect (the recorded
+                               predicted effect with its quantities)
+      FALSIFICATION_THRESHOLD <- falsification_test + expected_effect
+                               composite (see above)
+      UNCERTAINTY           <- the killer experiment's recorded epistemic
+                               note (priors MODEL_DERIVED, provenance)
+      COST / TIME           <- the selector's own honest UNKNOWN records
+      SAFETY                <- UNKNOWN (no safety stage output exists)
+    """
+    mm = getattr(env, "mechanism_map", None) or {}
+    arch = survivor_architecture or {}
+    treatment = (arch.get("intervention")
+                 or mm.get("intervention") or "").strip()
+    expected_effect = (arch.get("expected_effect")
+                       or mm.get("expected_effect") or "").strip()
+    falsification_test = (arch.get("falsification_test")
+                          or mm.get("falsification_test") or "").strip()
+    ke = getattr(env, "killer_experiment", None) or {}
+    hypotheses = ke.get("hypotheses") or []
+    h_hold = next((h for h in hypotheses
+                   if str(h.get("name") or "").startswith("H_effect_holds")),
+                  None)
+    h_fail = next((h for h in hypotheses
+                   if str(h.get("name") or "").startswith("H_effect_fails")),
+                  None)
+    ph = getattr(env, "physics", None) or {}
+
+    contract: Dict[str, Any] = {}
+
+    # HYPOTHESIS — the recorded testable hypothesis with its prior
+    if h_hold and h_hold.get("description"):
+        hyp = str(h_hold["description"])
+        prior = h_hold.get("prior_probability")
+        if prior is not None:
+            hyp += (f" (recorded prior {prior}, epistemic class "
+                    "MODEL_DERIVED per the killer-experiment provenance)")
+        contract["HYPOTHESIS"] = hyp
+    else:
+        contract["HYPOTHESIS_BLOCKER"] = (
+            "no killer-experiment hypothesis record exists (the "
+            "KILLER_EXPERIMENT stage did not record H_effect_holds)")
+
+    # TREATMENT — what is experimentally applied
+    if treatment:
+        contract["TREATMENT"] = treatment
+    else:
+        contract["TREATMENT_BLOCKER"] = (
+            "no intervention recorded in the mechanism map or the "
+            "evolution survivor architecture")
+
+    # CONTROL — the baseline comparison arm
+    chain = ph.get("chain_executed") or []
+    if "BASELINE_COMPARISON" in chain:
+        contract["CONTROL"] = (
+            "the physics stage's executed BASELINE_COMPARISON arm "
+            f"(lifecycle verdict {ph.get('lifecycle_verdict')}) — the "
+            "baseline the candidate was measured against in the same "
+            "evaluation")
+    else:
+        contract["CONTROL_BLOCKER"] = (
+            f"no executed baseline comparison on record (physics chain "
+            f"executed: {chain or 'none'}; lifecycle "
+            f"{ph.get('lifecycle_verdict')}) — the control arm is not "
+            "invented from the problem statement")
+
+    # MEASUREMENT — the recorded measurement procedure
+    if falsification_test:
+        contract["MEASUREMENT"] = falsification_test
+    else:
+        contract["MEASUREMENT_BLOCKER"] = (
+            "no falsification test recorded by the candidate")
+
+    # APPARATUS — only when the records name instrumentation explicitly
+    if falsification_test and _NUMBER_RE.search(falsification_test) \
+            and _KILL_DIRECTION_RE.search(falsification_test):
+        # the recorded procedure itself carries instrument + quantities;
+        # no separate apparatus field is split out of it (Art. XXV)
+        contract["APPARATUS"] = (
+            "the falsification test's own recorded instrumentation "
+            "(stated within MEASUREMENT; not split out — no separate "
+            "apparatus record exists)")
+    else:
+        contract["APPARATUS_BLOCKER"] = (
+            "no separate apparatus record exists; the falsification "
+            "test does not state a quantified instrumented procedure")
+
+    # SAMPLE — no sample-size stage exists in the engine
+    contract["SAMPLE_BLOCKER"] = (
+        "no sample-size / n= record exists in any engine stage "
+        "(honest UNKNOWN — Art. XXV)")
+
+    # ACCEPTANCE_THRESHOLD — the recorded predicted effect
+    if expected_effect and _NUMBER_RE.search(expected_effect):
+        contract["ACCEPTANCE_THRESHOLD"] = expected_effect
+    elif expected_effect:
+        contract["ACCEPTANCE_THRESHOLD"] = expected_effect
+        contract["ACCEPTANCE_THRESHOLD_NOTE"] = (
+            "the recorded expected effect carries no explicit numeric "
+            "band — stated verbatim, never quantified by inference")
+    else:
+        contract["ACCEPTANCE_THRESHOLD_BLOCKER"] = (
+            "no expected effect recorded by the candidate")
+
+    # FALSIFICATION_THRESHOLD — THE KILL OUTCOME (the decisive field)
+    if falsification_test and expected_effect:
+        kill_outcome = (
+            f"the recorded falsification test ('{falsification_test[:200]}') "
+            f"fails to show the recorded expected effect "
+            f"('{expected_effect[:200]}') — the mechanism is killed by "
+            "its own test's negative outcome"
+            + (f"; the recorded failing hypothesis is '{h_fail['description']}'"
+               if h_fail and h_fail.get("description") else ""))
+        contract["FALSIFICATION_THRESHOLD"] = kill_outcome
+    else:
+        contract["FALSIFICATION_THRESHOLD_BLOCKER"] = (
+            "the kill outcome cannot be stated from records: "
+            + ("no falsification test recorded; "
+               if not falsification_test else "")
+            + ("no expected effect recorded"
+               if not expected_effect else "")
+            + " — a threshold would have to be invented (Art. XXVII)")
+
+    # UNCERTAINTY — the recorded epistemic note
+    note = ke.get("epistemic_note")
+    if note:
+        contract["UNCERTAINTY"] = str(note)
+    else:
+        contract["UNCERTAINTY_BLOCKER"] = (
+            "no killer-experiment epistemic note recorded")
+
+    # COST / TIME — the selector's own honest UNKNOWN records
+    contract["COST"] = ("UNKNOWN absolute cost (options ranked on a "
+                        "relative-1.0 scale per bayesian_eig; no sourced "
+                        "dollar/time estimate exists — Art. XXV)")
+    contract["TIME"] = "UNKNOWN (no stage recorded a time estimate)"
+
+    # SAFETY — no safety stage output exists
+    contract["SAFETY_BLOCKER"] = (
+        "no safety-analysis stage output exists in the engine "
+        "(honest UNKNOWN — Art. XXV; the engineering failure_modes "
+        "record is a failure-mode list, not a safety case)")
+
+    return contract
