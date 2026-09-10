@@ -1,0 +1,61 @@
+{
+  "cases_version": "r444-evolution-cases/1.0.0",
+  "frozen_at": "2026-09-10",
+  "frozen_by": "CODER (R444 session), operator R444-C directive: 'Use at least three fresh cases where the initial candidate is intentionally imperfect. For every claimed evolution, the record must show: generation N, diagnosed failure cause, causal delta, new mechanism, predicted effect, re-evaluation, generation N+1. A result with generation_count = 0, causal_delta = null must never be classified as evolved.'",
+  "design_note": "Each case is authored from engineering-failure knowledge so that the OBVIOUS first candidate is intentionally imperfect: the naive mechanism class either violates the problem's own hard constraint, is baseline-equivalent on the problem quantity, or rests on a premise the constraint falsifies. The engine's gen-1 is expected to exhibit the imperfection; the evolution pipeline's diagnosis -> causal delta -> gen-2 chain is then the object under test. NO evolution is also an honest outcome (recorded as such). None of these problems appear in any frozen instrument.",
+  "cases": [
+    {
+      "case_id": "evol-x01-desalination-scaling-no-additives",
+      "problem": {
+        "problem_id": "evol-x01-desalination-scaling",
+        "device": "brackish-water reverse-osmosis desalination skid",
+        "failure": "calcium carbonate and sulfate scaling on the membrane tail elements collapses permeate flux within weeks, forcing chemical cleanings that shorten membrane life",
+        "failure_mode": "scaling",
+        "constraint": "hold normalized permeate flux above 85 percent of start-of-life for 12 months with NO chemical antiscalant dosing, NO acid injection, and recovery fixed at 75 percent",
+        "domain": "water-treatment"
+      },
+      "intentional_imperfection": {
+        "naive_mechanism_class": "antiscalant / acid dosing or scale-inhibitor chemistry",
+        "why_imperfect": "the constraint explicitly forbids chemical dosing and acid injection — the textbook first answer is inadmissible by the problem's own terms, so a chemistry-dosing gen-1 must be diagnosed (constraint/quality violation) and evolved toward a physical or operational mechanism (flow redistribution, induced nucleation, hydraulic staging)",
+        "expected_diagnosis_class": "QUALITY_REJECTION or ADVERSARIAL_KILL on constraint violation"
+      }
+    },
+    {
+      "case_id": "evol-x02-bus-fastcharge-rate-locked",
+      "problem": {
+        "problem_id": "evol-x02-bus-fastcharge-lithium-plating",
+        "device": "electric-bus depot lithium-titanate-free fast-charging battery pack",
+        "failure": "lithium plating on the graphite anode during 350 kW depot fast charges consumes cyclable lithium and accelerates capacity fade past the warranty threshold within two years",
+        "failure_mode": "lithium_plating",
+        "constraint": "hold capacity fade below 8 percent over 3000 fast-charge cycles while PRESERVING the 350 kW charge rate and 15-minute depot turnaround (reducing the charge rate is not an admissible fix)",
+        "domain": "electrochemical-energy"
+      },
+      "intentional_imperfection": {
+        "naive_mechanism_class": "reduce the charge current / derate the charger",
+        "why_imperfect": "the constraint locks the charge rate — the obvious mitigation (lower current) is inadmissible, so a derating gen-1 must be diagnosed and evolved toward a mechanism that removes the plating driver at constant current (thermal management of the anode, electrode design, pulse protocols)",
+        "expected_diagnosis_class": "BASELINE_EQUIVALENCE or constraint-violation rejection"
+      }
+    },
+    {
+      "case_id": "evol-x03-centrifuge-mass-capped-damping",
+      "problem": {
+        "problem_id": "evol-x03-centrifuge-vibration-mass-cap",
+        "device": "benchtop high-speed laboratory centrifuge rotor assembly",
+        "failure": "rotor imbalance vibration at 15000 rpm damages bearings and produces sample-layer disturbance that ruins separations above 4000 g",
+        "failure_mode": "vibration",
+        "constraint": "hold residual vibration displacement below 20 micrometers at 15000 rpm with the TOTAL moving assembly mass capped at the current design value (adding a massive damping block or a second counterweight stage is not admissible)",
+        "domain": "mechanical-machinery"
+      },
+      "intentional_imperfection": {
+        "naive_mechanism_class": "add mass / heavier damping block / additional counterweights",
+        "why_imperfect": "the constraint caps total moving mass — the textbook vibration fix (more damping mass) is inadmissible, so a mass-adding gen-1 must be diagnosed and evolved toward a mass-neutral mechanism (active electromagnetic balancing, tuned absorbers within the cap, stiffness redistribution)",
+        "expected_diagnosis_class": "ADVERSARIAL_KILL or QUALITY_REJECTION on the mass cap"
+      }
+    }
+  ],
+  "record_contract": {
+    "per_case": ["generation N", "diagnosed failure cause", "causal delta", "new mechanism", "predicted effect", "re-evaluation outcome", "generation N+1"],
+    "impossible": "generation_count = 0 AND causal_delta = null classified as evolved — the R443/R444 state-integrity validators prevent this mechanically (tests/test_r444_state_integrity.py)",
+    "honest_no_evolution": "a case where gen-1 survives (or evolution stops with INFORMATION_GAIN_ZERO / TRANSPORT_BLOCKED) is recorded as NO_EVOLUTION — never claimed as evolved"
+  }
+}
