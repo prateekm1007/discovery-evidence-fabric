@@ -1634,3 +1634,29 @@ Work Log:
 Stage Summary:
 - The join is PROVEN at the byte level at the exact deployed SHA: engineering identity -> canonical GLB -> compiler -> gate -> seven views -> poster/PDF parity, for two structurally different fresh inventions, with the failure chain demonstrated both by injection and live in production. The single remaining blocker for IN-PRODUCTION visuals is the owner-side Render payment method; the moment it lands: plan PATCH -> redeploy -> one fresh production rerun closes the last condition and unblocks the explicit Blender retirement commit.
 - reviewer_provenance=AI_REVIEW.
+
+---
+R444-C2 (2026-09-11) — Coder 2, Production Visual Closure (full record:
+R444/R444_C2_ROUND_RECORD.json). Constitution v2.3.0 read IN FULL at
+round start and re-read (hash-verified unchanged) before the final
+commit. Baseline: HEAD == origin/main == ls-remote == f177fcf5;
+production /api/version == f177fcf5; Render plan measured 'free' (512 MB)
+— the owner-side capacity decision has NOT happened (Art. LXV
+escalation 4 recorded). Implementations (Coder 2 boundary only):
+visual_compiler/lineage.py (read-only buyer-surface lineage verifier:
+GEOMETRY_SPEC -> GLB -> render source -> view hashes -> PDF embedded
+page-1 pixels) + the finalized R443-schema render record now PERSISTED
+to MODEL/3D/render_record.json (supersedes the node-side side-record in
+place; the shipped bytes now carry the validated record). Batteries:
+r444 lineage 12/12 (incl. live full-chain + wrong-cover + suppression
+bypass + wrong-source negatives), r443 34/34, r441 33/33, r440+r443
+Coder-1 batteries 75/75. Pristine-attributed pre-existing failures:
+tests/test_r424_elite_package_factory.py 17 FAIL at f177fcf5 vs 20 PASS
+at 790abb99 (R440 assemble() zip_path contract change; Coder 1 surface,
+filed, not fixed by Coder 2). CLEAN-STATE REPLAY: R442 production bytes
+A+B -> COMPLETE_PASS 23/23 both (dev 0.0; B pair 15.92 dE00); persisted
+record validates + matches return; lineage INCOMPLETE only on the PDF
+leg (bare replay trees carry no PDFs — the released-package lineage is
+proven in the battery). Production visual closure NOT achieved (no
+capacity decision); fresh production A/B + negative tests recorded in
+the round record.

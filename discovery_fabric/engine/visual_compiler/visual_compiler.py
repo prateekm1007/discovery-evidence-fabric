@@ -310,7 +310,20 @@ def compile_visuals(work_dir: str,
     record["hero_suppressed"] = gate.get("hero_suppressed", True)
     record["release_blocked"] = gate.get("release_blocked", True)
     record["out_dir"] = out_dir
-    return _finish(record)
+    record = _finish(record)
+    # R444-C2: the BUYER SURFACE carries the finalized typed record.
+    # The node-side side-record written by render.js is the renderer's
+    # contemporaneous claim; its full content was merged into this
+    # record, which is then finalized + validated for its status (R443
+    # Workstream 4). Persisting the validated record in place means the
+    # shipped bytes satisfy the same schema the in-memory record does —
+    # a package copy of render_record.json can therefore be schema-
+    # checked and lineage-checked AS SHIPPED, not merely as returned.
+    # (Art. LXIV disposition: the side-record shape is superseded by
+    # this merge-and-persist; no second record shape survives on disk.)
+    (Path(out_dir) / "render_record.json").write_text(
+        json.dumps(record, indent=2))
+    return record
 
 
 def _with_chrome(rspec_path: str) -> str:

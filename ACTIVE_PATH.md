@@ -163,3 +163,22 @@ indistinguishable). Production still type-skips the visual stage on the
 512 MB free plan (billing-gated upgrade re-escalated, Art. LXV count 3)
 — production visual success is NOT claimed. Round record:
 R443/R443_C2_ROUND_RECORD.json.
+
+## R444-C2 addendum (2026-09-11) — the buyer surface's lineage is re-measured
+
+Operator directive R444-C2 (Production Visual Closure): the visual gate
+remains the presentation authority (never the renderer's own claims).
+Two additions, both inside the Coder 2 presentation boundary:
+
+| Component | Module | Notes |
+|---|---|---|
+| Buyer-surface lineage verifier | `visual_compiler/lineage.py` | read-only re-measurement of the chain GEOMETRY_SPEC hash -> GLB hash -> render source hash -> hero/poster/view hashes -> PDF embedded page-1 image (pixel-exact, container-agnostic); verdicts VERIFIED / INCOMPLETE / FAIL, fail-closed (missing evidence is never a pass, Art. XXV); suppression contract verified too (hero absent, no cover image) |
+| Persisted typed record | `visual_compiler/visual_compiler.py` | the finalized R443-schema record is persisted to `MODEL/3D/render_record.json`, superseding the renderer's contemporaneous side-record in place (Art. LXIV merge-and-replace) — the buyer surface now carries the SAME validated record consumers use |
+
+Battery: `tests/test_r444_lineage.py` (12 tests: live full-chain
+positive incl. the real `_pdf` cover contract, read-only proof, swapped
+hero bytes, wrong PDF cover, suppression bypass, consistent suppressed
+package, missing/legacy records, tampered engineering identity, wrong
+source GLB). Production visual closure remains BLOCKED on the owner-side
+capacity decision (Render plan measured 'free' at round start; Art. LXV
+escalation 4) — production visual success is NOT claimed this round.
