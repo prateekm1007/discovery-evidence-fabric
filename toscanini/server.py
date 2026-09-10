@@ -443,6 +443,57 @@ def _worker_forensics_state() -> dict:
                 "last_write_error": f"{type(exc).__name__}: {exc}"[:200]}
 
 
+def package_release_decision(release_state, request_path,
+                              available: bool = True) -> Dict[str, Any]:
+    """R443 — the Article-LXXII release decision for the package
+    consumer (PURE FUNCTION, testable without a socket).
+
+    VISUAL_GATE = NOT_RUN or FAIL -> NO VISUAL RELEASE -> the buyer
+    package is NOT served as a normal download: the default request
+    gets the TYPED state (409 payload) and the engineering-draft ZIP
+    is served only under an explicit draft request
+    (?release=engineering_draft) — eliminating the ambiguous state
+    (render skipped + package complete + plain download button). Not a
+    universal rejection policy: the early-evaluation package stays
+    available, explicitly typed.
+    """
+    if not release_state or not release_state.get("release_blocked"):
+        return {"action": "SERVE_RELEASE"}
+    from urllib.parse import parse_qs
+    qs = parse_qs(request_path.split("?", 1)[-1]
+                  if "?" in request_path else "")
+    explicit = any(v == "engineering_draft" for v in qs.get("release", []))
+    if not explicit:
+        return {
+            "action": "TYPED_STATE",
+            "payload": {
+                "error": "package release blocked",
+                "package_state": "VISUAL_RELEASE_BLOCKED",
+                "article": "LXXII",
+                "gate_verdict": release_state.get("gate_verdict"),
+                "hero_suppressed": release_state.get("hero_suppressed"),
+                "release_blocked": True,
+                "reasons": release_state.get("reasons") or [],
+                "engineering_draft_available": bool(available),
+                "note": ("the Visual Quality Gate did not pass (or "
+                         "did not run) on this run — the buyer "
+                         "package is blocked from release; the "
+                         "ENGINEERING EVALUATION DRAFT (text-only "
+                         "package, zero visual artifacts by design) "
+                         "is available via ?release=engineering_draft"),
+            },
+        }
+    return {
+        "action": "SERVE_DRAFT",
+        "headers": [
+            ("X-Package-State",
+             "ENGINEERING_DRAFT_VISUAL_RELEASE_PENDING"),
+            ("X-Visual-Gate-Verdict",
+             str(release_state.get("gate_verdict") or "NOT_RUN")),
+        ],
+    }
+
+
 class Handler(BaseHTTPRequestHandler):
     protocol_version = "HTTP/1.1"
 
@@ -1212,7 +1263,8 @@ class Handler(BaseHTTPRequestHandler):
     _CHUNK = 1 << 18  # 256 KB stream chunks
 
     def _serve_file(self, path, mime: str, download_name=None,
-                    immutable: bool = False):
+                    immutable: bool = False,
+                    extra_headers=None):
         """Stream one file with ETag / conditional-GET / Range support.
 
         immutable=True  -> Cache-Control: public, max-age=31536000,
@@ -1240,7 +1292,7 @@ class Handler(BaseHTTPRequestHandler):
             ("Content-Length", str(size)),
             ("Cache-Control", cache),
             ("Accept-Ranges", "bytes"),
-        ]
+        ] + list(extra_headers or [])
         if etag:
             headers.append(("ETag", etag))
         if download_name:
@@ -1402,10 +1454,45 @@ class Handler(BaseHTTPRequestHandler):
             return self._json(404, {"error": "no package produced on "
                                     "this run (no buyer release and no "
                                     "bridge technology transfer package)"})
+        # R443 package-release authority (Article LXXII, enforced at the
+        # ACTUAL package consumer): the endpoint consults the run's
+        # visual release state before serving. VISUAL_GATE = NOT_RUN or
+        # FAIL => NO VISUAL RELEASE => the package is NOT served as a
+        # normal download: the default request returns the TYPED state
+        # (409) and the engineering-draft ZIP is served only under an
+        # explicit draft request (?release=engineering_draft) — the
+        # ambiguous state (render skipped + package complete + plain
+        # download button) is eliminated. This is NOT a new universal
+        # rejection policy: the early-evaluation package remains
+        # available, explicitly typed as an engineering draft whose
+        # visual release is pending.
+        release = self._visual_release_state(run_dir)
+        decision = package_release_decision(
+            release, self.path, available=True)
+        if decision["action"] == "TYPED_STATE":
+            return self._json(409, decision["payload"])
+        if decision["action"] == "SERVE_DRAFT":
+            return self._serve_file(
+                zp, "application/zip", extra_headers=decision["headers"])
         # R423A Phase 5: streamed, ETag-revalidated (the ZIP may be
         # legitimately refreshed by a later bridge pass — a fresh ETag
         # delivers fresh bytes; an unchanged one saves the transfer).
         return self._serve_file(zp, "application/zip")
+
+    def _visual_release_state(self, run_dir):
+        """The run's Article-LXXII visual release state (R443). Read
+        from MODEL/3D/HERO_RELEASE_STATE.json — the record the package
+        layer writes at build time; unreadable/absent returns None (the
+        endpoint then behaves as before — the record is written by every
+        R441+ package build)."""
+        if not run_dir or not Path(run_dir).exists():
+            return None
+        p = Path(run_dir) / "MODEL" / "3D" / "HERO_RELEASE_STATE.json"
+        try:
+            import json as _json
+            return _json.loads(p.read_text())
+        except Exception:  # noqa: BLE001 — absent/unreadable = unknown
+            return None
 
     # ---------------------------------------------------------------- share
     def _share_payload(self, share_id: str):

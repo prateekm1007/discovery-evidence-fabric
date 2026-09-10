@@ -288,12 +288,18 @@ class TestBuyerDecisionArchitecture:
         tm = _ed.build_transfer_manifest(
             proj, _solar(), "x", ep.PACKAGE_MATURITY_EARLY, False,
             "SYSTEM_3D")
-        assert len(tm["section_order"]) == 9
+        # R443: the manifest gained the canonical-applicability section
+        # (buyer/regulatory requirements projected from the problem's
+        # OWN context — the domain-contamination repair); the section
+        # count is pinned to the new contract
+        assert len(tm["section_order"]) == 11
         blob = " ".join(tm["section_order"]).lower()
         for fragment in ("transferable", "inventory", "maturity",
                          "capability", "tooling", "dependencies",
                          "confidentiality", "reproduction",
-                         "open technical work"):
+                         "open technical work",
+                         # the R443 canonical applicability projection
+                         "canonical applicability"):
             assert fragment in blob
 
 

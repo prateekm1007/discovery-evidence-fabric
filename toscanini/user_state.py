@@ -152,6 +152,12 @@ def user_state(session: Dict[str, Any]) -> str:
     if status in ("PENDING", "BUILDING_PROBLEM", "RUNNING"):
         return "RUNNING"
     if status == "COMPLETE":
+        if final == "INVENTION_REQUIRES_EXPERIMENT":
+            # R443 / TSC-008: the surviving baseline fallback — the
+            # idea is alive and requires its experiment (never EVOLVED,
+            # never rejected)
+            return "COMPLETED_PACKAGE" if pkg.get("complete") \
+                else "COMPLETED_CANDIDATE"
         if final == "EVOLVED_INVENTION_CANDIDATE":
             # R416: an evolution generation survived — package state
             # decides the packaging wording; the evolution story rides

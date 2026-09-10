@@ -401,9 +401,14 @@ def _build_fluid_device(spec: Dict[str, Any]) -> Dict[str, Any]:
         comps.append(("actuator_stage", [abox], "circuit"))
         anchors["actuator_stage"] = (0.8, 1.35, 2.9)
     mods = [c for c in spec["components"] if c["form"] == "module"]
+    # R443: distinct placement per module (the audit defect: every
+    # module at one position -> duplicate geometry + invisible stack).
+    # Grid on the rear deck, column stride 1.3 (> box width 1.1) with
+    # row wrap every 3 columns — every module gets its own cell.
     for i, m in enumerate(mods):
-        mx = 2.2 - 1.35 * (i % 2)
-        my = -1.35 - 0.0 * i
+        col, row = i % 3, i // 3
+        mx = 2.2 - 1.35 * col
+        my = -1.35 - 1.05 * row
         box = _box(1.1, 0.9, 0.8, mx, my, 2.4)
         comps.append((m["component_id"], [box], "polymer"))
         anchors[m["component_id"]] = (mx, my, 2.9)
@@ -452,9 +457,14 @@ def _build_thermal_system(spec: Dict[str, Any]) -> Dict[str, Any]:
         comps.append(("control_module", [ctl], "circuit"))
         anchors["control_module"] = (0.2, -1.95, 1.35)
     mods = [c for c in spec["components"] if c["form"] == "module"]
+    # R443: distinct placement per module (the audit defect: all modules
+    # at one position -> no_duplicate_model FAIL "module_01==module_02").
+    # Grid along the rear-left deck margin: column stride 1.3 (> box
+    # width 1.1), row stride 1.05 (> box depth 0.9) — non-overlapping.
     for i, m in enumerate(mods):
-        mx = -3.1 + 0.0 * i
-        my = 1.85 - 0.0 * i
+        col, row = i % 3, i // 3
+        mx = -3.1 + 1.3 * col
+        my = 1.85 - 1.05 * row
         box = _box(1.1, 0.9, 0.8, mx, my, 0.45)
         comps.append((m["component_id"], [box], "polymer"))
         anchors[m["component_id"]] = (mx, my, 1.25)
@@ -503,9 +513,12 @@ def _build_mechanical_component(spec: Dict[str, Any]) -> Dict[str, Any]:
         comps.append(("sensor_module", [smod], "circuit"))
         anchors["sensor_module"] = (2.05, 1.15, 4.1)
     mods = [c for c in spec["components"] if c["form"] == "module"]
+    # R443: distinct placement per module (grid, column stride 1.1 >
+    # box width 0.95, row wrap every 3) — no stacked duplicates.
     for i, m in enumerate(mods):
-        mx = -2.35 + 0.0 * i
-        my = -1.15 + 0.0 * i
+        col, row = i % 3, i // 3
+        mx = -2.35 + 1.1 * col
+        my = -1.15 - 0.95 * row
         box = _box(0.95, 0.85, 0.75, mx, my, 3.75)
         comps.append((m["component_id"], [box], "polymer"))
         anchors[m["component_id"]] = (mx, my, 4.1)
@@ -606,9 +619,12 @@ def _build_energy_storage(spec: Dict[str, Any]) -> Dict[str, Any]:
         comps.append(("bms_board", [bms], "circuit"))
         anchors["bms_board"] = (0.0, 0.0, 2.4)
     mods = [c for c in spec["components"] if c["form"] == "module"]
+    # R443: distinct placement per module (grid, column stride 1.05 >
+    # box width 0.9, row wrap every 3) — no stacked duplicates.
     for i, m in enumerate(mods):
-        mx = 3.15 - 0.0 * i
-        my = 1.85 - 0.0 * i
+        col, row = i % 3, i // 3
+        mx = 3.15 - 1.05 * col
+        my = 1.85 - 0.95 * row
         box = _box(0.9, 0.8, 0.7, mx, my, 2.5)
         comps.append((m["component_id"], [box], "polymer"))
         anchors[m["component_id"]] = (mx, my, 3.2)

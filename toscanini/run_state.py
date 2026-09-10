@@ -132,17 +132,79 @@ def _envelope(run_dir: Optional[Path], stage: str) -> Optional[Dict]:
     return _read_json(run_dir / f"envelope_{stage}.json")
 
 
+# R443: provider records found under these keys are EVIDENCE-SOURCE
+# provenance (retrieval providers: unpaywall, EuropePMC, arxiv...), not
+# model execution. The fresh-production audit measured the defect: the
+# walk attributed "provider: unpaywall" to 16 stage ROLES because every
+# envelope embeds evidence records whose provenance.provider is a
+# retrieval source — model_route must never report an evidence source
+# as the provider that executed a stage's model work.
+_EVIDENCE_CONTEXT_KEYS = {
+    "evidence", "records", "retrieval", "sources", "provider_outcomes",
+    "prior_art", "sample_titles", "collisions", "contradictions",
+    "related_records", "cited_by",
+}
+# retrieval-provenance shape markers (a provider dict carrying these is
+# describing a RETRIEVAL, not a model call)
+_RETRIEVAL_PROVENANCE_KEYS = {
+    "retrieved_at", "query_or_method", "api_version", "source_uri",
+    "source_id",
+}
+_LLM_TRANSPORT_MARKERS = {
+    "model", "prompt_hash", "output_hash", "transport_status",
+    "failure_type", "latency_ms", "status", "retry_notes",
+}
+
+
+def _known_evidence_source(pid: str) -> bool:
+    """A registered retrieval source id (or its normalized form) is
+    never an LLM execution provider (one authority: the registry)."""
+    low = str(pid).strip().lower()
+    try:
+        from discovery_fabric.source_registry.registry import (
+            SOURCE_REGISTRY,
+        )
+        if low in SOURCE_REGISTRY:
+            return True
+    except Exception:  # noqa: BLE001 — registry absent: fall through
+        pass
+    norm = "".join(ch for ch in low if ch.isalnum())
+    return norm in {
+        "unpaywall", "europepmc", "arxiv", "crossref", "openalex",
+        "pubmed", "semanticscholar", "core", "zenodo", "doaj",
+        "openaire", "datacite", "cordis",
+    }
+
+
+def _is_model_call_record(obj: Dict[str, Any]) -> bool:
+    """A provider record counts as MODEL EXECUTION only when it carries
+    an LLM-transport marker AND is not retrieval provenance AND its
+    provider is not a registered evidence source."""
+    pid = obj.get("provider") or obj.get("provider_id")
+    if not isinstance(pid, str) or not pid:
+        return False
+    if _known_evidence_source(pid):
+        return False
+    if (set(obj.keys()) & _RETRIEVAL_PROVENANCE_KEYS) and not (
+            set(obj.keys()) & _LLM_TRANSPORT_MARKERS):
+        return False
+    return True
+
+
 def _walk_providers(obj: Any, found: List[Dict[str, Any]],
-                    depth: int = 0) -> None:
-    """Bounded recursive scan for persisted provider/model records
+                    depth: int = 0, parent_key: str = "") -> None:
+    """Bounded recursive scan for persisted MODEL-CALL records
     (model_route is aggregated from what the run ACTUALLY recorded —
-    never from configuration). Depth-limited to keep the scan cheap on
-    large envelopes."""
+    never from configuration; R443: evidence-source provenance is
+    excluded — a retrieval provider never executed a stage's model
+    work). Depth-limited to keep the scan cheap on large envelopes."""
     if depth > 4:
         return
     if isinstance(obj, dict):
         pid = obj.get("provider") or obj.get("provider_id")
-        if isinstance(pid, str) and pid and not str(pid).startswith("$"):
+        if isinstance(pid, str) and pid and not str(pid).startswith("$") \
+                and parent_key not in _EVIDENCE_CONTEXT_KEYS \
+                and _is_model_call_record(obj):
             rec = {"provider": pid}
             for k_src, k_dst in (("model", "model"), ("status", "status"),
                                  ("latency_ms", "latency_ms"),
@@ -153,11 +215,13 @@ def _walk_providers(obj: Any, found: List[Dict[str, Any]],
                     rec[k_dst] = v
             if rec not in found:
                 found.append(rec)
-        for v in obj.values():
-            _walk_providers(v, found, depth + 1)
+        for k, v in obj.items():
+            if k in _EVIDENCE_CONTEXT_KEYS and not isinstance(v, dict):
+                continue
+            _walk_providers(v, found, depth + 1, str(k))
     elif isinstance(obj, list):
         for v in obj[:60]:
-            _walk_providers(v, found, depth + 1)
+            _walk_providers(v, found, depth + 1, parent_key)
 
 
 def _model_route(session: Dict[str, Any],
@@ -551,6 +615,35 @@ def terminal_outcome(session: Dict, run_dir: Optional[Path] = None) -> Dict:
                           "physical experiment is specified, not "
                           "executed (recorded fields: package.complete="
                           "false)")}
+    if status == "COMPLETE" and final == "INVENTION_REQUIRES_EXPERIMENT":
+        # R443 / TSC-008: the BASELINE FALLBACK survivor — the synthesis
+        # path failed, the mandatory baseline architecture was created,
+        # challenged, and survived. The idea is presented honestly: it
+        # requires its decisive experiment. Never rejected, never
+        # dressed as EVOLVED (Art. XXVIII).
+        pkg_complete = bool(pkg.get("complete"))
+        if not pkg_complete and run_dir and run_dir.exists():
+            report = _read_json(run_dir / "PACKAGE_REPORT.json") or {}
+            zips = sorted((run_dir / "DOWNLOAD").glob("*.zip")) \
+                if (run_dir / "DOWNLOAD").exists() else []
+            pkg_complete = bool(report.get("complete") and zips)
+        if pkg_complete:
+            return {"outcome": OUTCOME_REQUIRES_EXPERIMENT,
+                    "basis": ("final_status="
+                              "INVENTION_REQUIRES_EXPERIMENT — the "
+                              "baseline fallback generation survived "
+                              "the challenge gauntlet and a technology "
+                              "package was built (0 evolution "
+                              "generations; no evolution claimed — the "
+                              "honest fallback presentation, TSC-008)")}
+        return {"outcome": OUTCOME_REQUIRES_EXPERIMENT,
+                "basis": ("final_status="
+                          "INVENTION_REQUIRES_EXPERIMENT — the baseline "
+                          "fallback generation survived the challenge "
+                          "gauntlet; the decisive physical experiment "
+                          "is specified, not executed (0 evolution "
+                          "generations; no evolution claimed — the "
+                          "honest fallback presentation, TSC-008)")}
     if status == "COMPLETE" and final == "EVOLVED_INVENTION_CANDIDATE":
         # R416: an evolution generation survived the re-evaluation
         # gauntlet. Package presence decides SURVIVED vs

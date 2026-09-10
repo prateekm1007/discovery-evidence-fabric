@@ -607,11 +607,37 @@ def build_dossier(session: Dict[str, Any]) -> Dict[str, Any]:
     pkg = _cio_mod._package_info(run_dir) if run_dir \
         and run_dir.exists() else None
     pkg_complete = bool((pkg or {}).get("complete"))
+    # R443: the Article-LXXII typed release state — the download link
+    # carries it so the button is never a silent "complete package"
+    # while the visual release is blocked (render skipped + package
+    # complete + plain download = the ambiguous state, eliminated)
+    release_state = None
+    if run_dir and Path(run_dir).exists():
+        _hr = Path(run_dir) / "MODEL" / "3D" / "HERO_RELEASE_STATE.json"
+        try:
+            import json as _json
+            release_state = _json.loads(_hr.read_text())
+        except Exception:  # noqa: BLE001 — honest absent
+            release_state = None
+    release_blocked = bool((release_state or {}).get("release_blocked"))
     if pkg_complete:
         transfer = _tab(
-            "AVAILABLE", "ENGINEERING_DEFINED",
-            "the technology transfer package for this investigation",
-            download=f"/api/sessions/{sid}/package",
+            "AVAILABLE",
+            "ENGINEERING_DEFINED",
+            ("the technology transfer package for this investigation"
+             if not release_blocked else
+             "the engineering evaluation draft for this investigation — "
+             "the Visual Quality Gate did not pass/run (Article LXXII): "
+             "the package contains zero visual artifacts by design and "
+             "the buyer release is blocked until the visual gate passes"),
+            download=(f"/api/sessions/{sid}/package"
+                      if not release_blocked else
+                      f"/api/sessions/{sid}/package"
+                      "?release=engineering_draft"),
+            package_state=("RELEASED" if not release_blocked else
+                           "ENGINEERING_DRAFT_VISUAL_RELEASE_PENDING"),
+            visual_gate_verdict=((release_state or {}).get(
+                "gate_verdict") if release_blocked else None),
             package_maturity=(pkg or {}).get("maturity"),
             package_kind=(pkg or {}).get("package_kind"),
             zip_name=(pkg or {}).get("zip_name"),

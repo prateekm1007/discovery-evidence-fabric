@@ -292,6 +292,16 @@ def apply_copy_mechanism(source_run: Path, target_run: Path,
 
 
 def _find_package_file(run: Path, name: str) -> Optional[Path]:
+    # R440 canonical compiler layout FIRST (the package tree at
+    # run/TECHNOLOGY_PACKAGE/), then the legacy factory layout
+    # (run/DOWNLOAD/<sub>/) — the attack must reach the REAL package
+    # tree whichever compiler produced it
+    r404 = run / "TECHNOLOGY_PACKAGE" / name
+    if r404.is_file():
+        return r404
+    legacy = run / name
+    if legacy.is_file():
+        return legacy
     for candidate in (run / "DOWNLOAD", ):
         if candidate.is_dir():
             for sub in candidate.iterdir():

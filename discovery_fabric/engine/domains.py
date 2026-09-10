@@ -50,29 +50,60 @@ DOMAIN_TEMPLATES: Dict[str, Dict[str, Any]] = {
             "flow path / lumen architecture",
             "pressure regulation element",
             "sensing / feedback element (if closed-loop)",
+            "termination interfaces (application-context-specific: "
+            "source and sink boundaries)"],
+        # R443 context de-conflation: medical-context architecture
+        # lives in the parallel list and participates ONLY when the
+        # canonical applicability is medical (applicability.py filter).
+        "architecture_blocks_medical": [
             "termination interfaces (patient / reservoir)"],
         "materials_candidates": [
             {"material": "medical-grade silicone elastomer",
              "precedent": "standard CSF shunt catheter material",
-             "verify_applicability": True},
+             "verify_applicability": True,
+             "applicability_context": "MEDICAL"},
             {"material": "polycarbonate / PSU rigid components",
              "precedent": "standard shunt valve housings",
-             "verify_applicability": True}],
+             "verify_applicability": True,
+             "applicability_context": "MEDICAL"},
+            {"material": "engineering polymers / elastomers (PPS, PEEK, "
+                          "EPDM) per fluid compatibility",
+             "precedent": "general industrial fluid-handling practice",
+             "verify_applicability": True,
+             "applicability_context": "GENERAL"},
+            {"material": "stainless steel / copper alloys for wetted "
+                          "paths per fluid compatibility",
+             "precedent": "general industrial fluid-handling practice",
+             "verify_applicability": True,
+             "applicability_context": "GENERAL"}],
         "manufacturing_candidates": [
             {"process": "medical extrusion (catheter body)",
-             "status": "ENGINEERING_PROPOSED"},
+             "status": "ENGINEERING_PROPOSED",
+             "applicability_context": "MEDICAL"},
             {"process": "injection molding (housings, precision features)",
-             "status": "ENGINEERING_PROPOSED"}],
+             "status": "ENGINEERING_PROPOSED"},
+            {"process": "general extrusion / machining / welding of "
+                        "fluid-handling components",
+             "status": "ENGINEERING_PROPOSED",
+             "applicability_context": "GENERAL"}],
         "verification_methods": [
             "bench flow-loop characterization across operating range",
             "pressure-drop mapping vs flow (identify regime transitions)",
             "accelerated occlusion / fouling challenge testing"],
         "standards_candidates": [
-            {"standard": "ISO 13485 (QMS)", "verify_applicability": True},
-            {"standard": "ISO 14971 (risk management)",
-             "verify_applicability": True},
+            {"standard": "ISO 13485 (medical QMS)",
+             "verify_applicability": True,
+             "applicability_context": "MEDICAL"},
+            {"standard": "ISO 14971 (medical risk management)",
+             "verify_applicability": True,
+             "applicability_context": "MEDICAL"},
             {"standard": "ASTM F2394 (silicone elastomers for medical use)",
-             "verify_applicability": True}],
+             "verify_applicability": True,
+             "applicability_context": "MEDICAL"},
+            {"standard": "ASME B31 / EN 13445 (pressure piping and "
+                          "vessels, per installation jurisdiction)",
+             "verify_applicability": True,
+             "applicability_context": "GENERAL"}],
     },
     "optical_photonic": {
         "label": "Optical transport / photonic power",
@@ -92,7 +123,13 @@ DOMAIN_TEMPLATES: Dict[str, Dict[str, Any]] = {
              "verify_applicability": True},
             {"material": "biocompatible optical window (sapphire / PDMS)",
              "precedent": "implant optical interfaces",
-             "verify_applicability": True}],
+             "verify_applicability": True,
+             "applicability_context": "MEDICAL"},
+            {"material": "fused silica / borosilicate optical windows "
+                          "and standard fiber assemblies",
+             "precedent": "general optical practice",
+             "verify_applicability": True,
+             "applicability_context": "GENERAL"}],
         "manufacturing_candidates": [
             {"process": "die bonding + wire bonding on carrier",
              "status": "ENGINEERING_PROPOSED"},
@@ -106,7 +143,13 @@ DOMAIN_TEMPLATES: Dict[str, Dict[str, Any]] = {
             {"standard": "IEC 60825 (laser product safety)",
              "verify_applicability": True},
             {"standard": "ISO 10993 (biocompatibility)",
-             "verify_applicability": True}],
+             "verify_applicability": True,
+             "applicability_context": "MEDICAL"},
+            {"standard": "IEC 62471 (photobiological safety) / product "
+                          "applicable optical standards (jurisdiction-"
+                          "dependent)",
+             "verify_applicability": True,
+             "applicability_context": "GENERAL"}],
     },
     "ml_data": {
         "label": "Data architecture / machine learning",
@@ -149,7 +192,12 @@ DOMAIN_TEMPLATES: Dict[str, Dict[str, Any]] = {
         "materials_candidates": [
             {"material": "biocompatible antenna dielectric",
              "precedent": "implant telemetry practice",
-             "verify_applicability": True}],
+             "verify_applicability": True,
+             "applicability_context": "MEDICAL"},
+            {"material": "standard RF laminates / dielectric substrates",
+             "precedent": "general RF practice",
+             "verify_applicability": True,
+             "applicability_context": "GENERAL"}],
         "manufacturing_candidates": [
             {"process": "PCB + chip-scale RF front end",
              "status": "ENGINEERING_PROPOSED"}],
@@ -203,7 +251,7 @@ DOMAIN_TEMPLATES: Dict[str, Dict[str, Any]] = {
         "materials_candidates": [
             {"material": "non-ferromagnetic structural materials (MR-conditional)",
              "precedent": "MR-conditional implant practice",
-             "verify_applicability": True}],
+             "verify_applicability": True, "applicability_context": "MEDICAL"}],
         "manufacturing_candidates": [
             {"process": "precision micro-coil winding",
              "status": "ENGINEERING_PROPOSED"}],
@@ -242,7 +290,7 @@ DOMAIN_TEMPLATES: Dict[str, Dict[str, Any]] = {
             "leaching / immunogenic byproduct assays"],
         "standards_candidates": [
             {"standard": "ISO 10993 (biocompatibility + degradation)",
-             "verify_applicability": True}],
+             "verify_applicability": True, "applicability_context": "MEDICAL"}],
     },
     "phage_microbio": {
         "label": "Microbiology / phage anti-biofilm",
@@ -309,20 +357,40 @@ DOMAIN_TEMPLATES: Dict[str, Dict[str, Any]] = {
             "conduction path / spreader",
             "reject interface",
             "safety limit interlock"],
+        # R443 context de-conflation (see fluidics_hydraulic note)
+        "architecture_blocks_medical": [],
         "materials_candidates": [
             {"material": "biocompatible thermal spreader (graphite/AlN)",
              "precedent": "implant electronics thermal practice",
-             "verify_applicability": True}],
+             "verify_applicability": True,
+             "applicability_context": "MEDICAL"},
+            {"material": "copper / aluminum alloys and graphite "
+                          "thermal spreaders",
+             "precedent": "general heat-transfer practice",
+             "verify_applicability": True,
+             "applicability_context": "GENERAL"},
+            {"material": "stainless steel / titanium wetted-path "
+                          "components per fluid compatibility",
+             "precedent": "general industrial heat-exchanger practice",
+             "verify_applicability": True,
+             "applicability_context": "GENERAL"}],
         "manufacturing_candidates": [
             {"process": "bonded spreader + encapsulation",
-             "status": "ENGINEERING_PROPOSED"}],
+             "status": "ENGINEERING_PROPOSED",
+             "applicability_context": "MEDICAL"},
+            {"process": "brazed / welded / plate-fabricated heat "
+                        "exchanger core and shell",
+             "status": "ENGINEERING_PROPOSED",
+             "applicability_context": "GENERAL"}],
         "verification_methods": [
             "temperature-rise mapping at max duty",
             "interface resistance characterization",
             "worst-case ambient soak test"],
         "standards_candidates": [
-            {"standard": "IEC 60601-1 (general electrical safety, thermal)",
-             "verify_applicability": True}],
+            {"standard": "IEC 60601-1 (medical electrical equipment "
+                          "safety, thermal)",
+             "verify_applicability": True,
+             "applicability_context": "MEDICAL"}],
     },
     "energy_harvesting": {
         "label": "Energy harvesting / power conversion",
@@ -341,7 +409,7 @@ DOMAIN_TEMPLATES: Dict[str, Dict[str, Any]] = {
         "materials_candidates": [
             {"material": "PZT / AlN piezoelectric stack",
              "precedent": "implantable energy harvester practice",
-             "verify_applicability": True},
+             "verify_applicability": True, "applicability_context": "MEDICAL"},
             {"material": "BiTe thermoelectric couple",
              "precedent": "body-heat harvesting practice",
              "verify_applicability": True}],
@@ -358,7 +426,13 @@ DOMAIN_TEMPLATES: Dict[str, Dict[str, Any]] = {
             {"standard": "IEC 60601-1 (electrical safety)",
              "verify_applicability": True},
             {"standard": "ISO 10993 (biocompatibility)",
-             "verify_applicability": True}],
+             "verify_applicability": True,
+             "applicability_context": "MEDICAL"},
+            {"standard": "IEC 62471 (photobiological safety) / product "
+                          "applicable optical standards (jurisdiction-"
+                          "dependent)",
+             "verify_applicability": True,
+             "applicability_context": "GENERAL"}],
     },
 }
 
@@ -1802,6 +1876,13 @@ def get_domain_module(domain_id: str) -> Dict[str, Any]:
         or [p.get("process") for p in
             base.get("manufacturing_candidates", [])],
         "architecture_blocks": list(base.get("architecture_blocks", [])),
+        # R443: medical-context architecture participates only when the
+        # canonical applicability is medical (applicability.py filter)
+        "architecture_blocks_medical": list(
+            base.get("architecture_blocks_medical", [])),
+        "manufacturing_candidates": [dict(m) for m in
+                                     base.get("manufacturing_candidates",
+                                              [])],
         "materials_candidates": [dict(m) for m in
                                  base.get("materials_candidates", [])],
         "standards_candidates": [dict(s) for s in

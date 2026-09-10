@@ -378,6 +378,33 @@ def build_problem(text: str, on_event=None) -> Dict[str, Any]:
                          "make|model|year (routing decision, not absence)",
             })
             continue
+        # R443 grammar-aware routing for DATE-WINDOW sources (the audit's
+        # fra_rail_accidents finding): cpsc_recalls / usgs_earthquakes /
+        # fra_rail_accidents answer YYYY-MM-DD date-floor questions only.
+        # Sending the free-text failure/science query is the engine
+        # routing error the fresh-production audit measured
+        # (GRAMMAR_MISMATCH — "engine routing error, not a provider
+        # failure"). The router now refuses BEFORE the request: the
+        # source is honestly recorded as NOT_QUERIED_GRAMMAR — an
+        # engine routing decision, never absence (Art. XXV). The
+        # connector's own grammar gate stays as defense in depth.
+        _grammar = getattr(cls, "QUERY_GRAMMAR", "") or ""
+        if "YYYY-MM-DD" in _grammar:
+            _planned = fail_q if role == "failure" else sci_q
+            if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", str(_planned or "")):
+                routing_notes.append(
+                    f"{name}: not queried — the {role} query is free "
+                    f"text and this source answers date-floor questions "
+                    f"only (grammar: {_grammar})")
+                results.append({
+                    "source": name, "role": role,
+                    "status": "NOT_QUERIED_GRAMMAR", "count": 0,
+                    "records": [], "relevant": 0,
+                    "error": ("planned query is free text; source grammar "
+                              "is a YYYY-MM-DD date floor (R443 routing "
+                              "decision, not absence)"),
+                })
+                continue
         # NHTSA-style sources WITH a vehicle: the vehicle IS the query —
         # the failure query is free-text and would be a grammar mismatch.
         query = vehicle if getattr(cls, "QUERY_GRAMMAR", "") and "make|model|year" \

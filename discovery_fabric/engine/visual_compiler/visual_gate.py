@@ -51,7 +51,7 @@ from PIL import Image
 from . import gltf_doc
 from . import visual_set
 
-GATE_VERSION = "R443-1"
+GATE_VERSION = "R443-2"
 
 # directive thresholds (Art. XXVII provenance: operator directive R441,
 # Visual Quality Gate table — R443 adds the material-distinction bar
@@ -327,6 +327,139 @@ def check_source_scene_agreement(glb_path: Optional[Path],
 
 
 # ---------------------------------------------------------------------------
+# R443-MERGED — the independent byte-level geometry identity (the
+# substitution attack the trust-based check could not catch)
+# ---------------------------------------------------------------------------
+def _sha256_file(path: Path) -> str:
+    import hashlib
+    h = hashlib.sha256()
+    with open(path, "rb") as f:
+        for chunk in iter(lambda: f.read(1 << 20), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+
+def _world_signature(glb_path: Path) -> Optional[Dict[str, Any]]:
+    """A scale/translation-invariant per-part SHAPE signature built from
+    the RAW glTF document (gltf_doc's stdlib walk — no loader: the same
+    discipline as the naming check; trimesh stays retired for this
+    gate, Art. LXIV). For each named part, the axis extents normalized
+    by that part's largest extent (uniform grounding scale and
+    translation cancel; shape — including non-uniform substitution like
+    1,1,1 -> 100,1,1 — does not). Vertex/triangle counts come from the
+    document's accessors (POSITION / indices)."""
+    try:
+        from . import gltf_doc
+        w = gltf_doc.walk_scene(str(glb_path))
+        doc = gltf_doc.read_gltf_json(str(glb_path))
+        verts = 0
+        tris = 0
+        meshes = 0
+        accessors = doc.get("accessors") or []
+        for node in doc.get("nodes") or []:
+            if node.get("mesh") is None:
+                continue
+            meshes += 1
+            mesh = (doc.get("meshes") or [{}])[node["mesh"]] \
+                if isinstance(node.get("mesh"), int) \
+                and node["mesh"] < len(doc.get("meshes") or []) else {}
+            for prim in mesh.get("primitives") or []:
+                pos = prim.get("attributes", {}).get("POSITION")
+                if isinstance(pos, int) and pos < len(accessors):
+                    verts += int(accessors[pos].get("count") or 0)
+                idx = prim.get("indices")
+                if isinstance(idx, int) and idx < len(accessors):
+                    tris += int(accessors[idx].get("count") or 0) // 3
+                elif isinstance(pos, int) and pos < len(accessors):
+                    tris += int(accessors[pos].get("count") or 0) // 3
+        sig: Dict[str, List[float]] = {}
+        for part in w.get("parts") or []:
+            ext = np.asarray(part["max"], dtype=float) - \
+                np.asarray(part["min"], dtype=float)
+            m = float(ext.max())
+            sig[str(part["name"])] = [round(float(e) / m, 5)
+                                      for e in ext] if m > 0 \
+                else [0.0, 0.0, 0.0]
+        return {"counts": {"meshes": meshes, "verts": verts,
+                           "tris": tris},
+                "shape": sig}
+    except Exception:  # noqa: BLE001 — typed failure at the caller
+        return None
+
+
+def independent_geometry_identity(
+        source_glb: Optional[str],
+        exported_glb: Path) -> Dict[str, Any]:
+    """R443-MERGED — geometry identity RE-MEASURED by the gate itself.
+
+    The independent audit's geometry_attack demonstrated that a
+    substituted exported GLB passed while the renderer RECORD stayed
+    unchanged — any check whose pass basis is the claimant's own record
+    cannot catch substitution (Art. III). The gate now: (1) re-parses
+    BOTH the canonical source GLB and the exported hero GLB with its
+    own tools, (2) compares mesh/vert/tri counts AND a scale-invariant
+    per-part shape signature (non-uniform substitution changes the
+    signature), (3) the caller re-verifies the source GLB's recorded
+    sha256 against the bytes on disk (source substitution catch)."""
+    if exported_glb is None or not Path(exported_glb).is_file():
+        return {"pass": False,
+                "reason": "exported hero GLB missing on disk"}
+    out_sig = _world_signature(Path(exported_glb))
+    if out_sig is None:
+        return {"pass": False,
+                "reason": "exported hero GLB unparseable"}
+    if not source_glb or not Path(source_glb).is_file():
+        return {"pass": False,
+                "reason": "canonical source GLB unavailable — identity "
+                          "cannot be verified (never assumed)",
+                "exported_counts": out_sig["counts"]}
+    src_sig = _world_signature(Path(source_glb))
+    if src_sig is None:
+        return {"pass": False,
+                "reason": "canonical source GLB unparseable"}
+    counts_match = (src_sig["counts"] == out_sig["counts"])
+    shape_match = (src_sig["shape"] == out_sig["shape"])
+    identical = counts_match and shape_match
+    diff_parts = sorted(set(src_sig["shape"]) ^ set(out_sig["shape"]))
+    changed_parts = sorted(
+        k for k in set(src_sig["shape"]) & set(out_sig["shape"])
+        if src_sig["shape"][k] != out_sig["shape"][k])
+    return {
+        "pass": bool(identical),
+        "identical": bool(identical),
+        "source": "independent re-measure (R443 merged) — gate parses "
+                  "both GLBs; the renderer record is corroboration only",
+        "source_glb": str(source_glb),
+        "counts": {"source": src_sig["counts"],
+                   "exported": out_sig["counts"]},
+        "parts_differing": diff_parts[:8],
+        "shape_changed_parts": changed_parts[:8],
+    }
+
+
+def _verify_view_hashes(out: Path, render_record: Dict[str, Any],
+                        completeness: Dict[str, Any]) -> List[str]:
+    """R443-MERGED — every PRESENT ladder artifact whose sha256 the
+    render record carries must hash to exactly those bytes: a view
+    file swapped after the render is a substituted artifact, not a
+    missing one (the audit's post-render substitution class)."""
+    views_recorded = render_record.get("views") or {}
+    mismatched: List[str] = []
+    for name in completeness.get("present") or []:
+        rec = views_recorded.get(name) or {}
+        rec_sha = rec.get("sha256")
+        if not rec_sha:
+            continue
+        p = out / name
+        try:
+            if p.is_file() and _sha256_file(p) != rec_sha:
+                mismatched.append(name)
+        except Exception:  # noqa: BLE001 — unreadable = mismatch
+            mismatched.append(name)
+    return mismatched
+
+
+# ---------------------------------------------------------------------------
 # R443 Workstream 3 — material semantics, measured in the render
 # ---------------------------------------------------------------------------
 def _srgb255_to_lab(px: np.ndarray) -> np.ndarray:
@@ -583,17 +716,35 @@ def evaluate(out_dir: str,
             "spec grounding — the render does not correspond to the "
             "supplied canonical GLB")
 
-    # 5. topology: the renderer's own comparison re-checked (the hero
-    #    GLB must re-export the SAME vertices — presentation never
-    #    edits geometry)
+    # 5. topology: R443-MERGED — INDEPENDENTLY re-measured (the audit's
+    #    geometry_attack: a substituted exported hero GLB passed while
+    #    the renderer record stayed unchanged — a trust-based check
+    #    cannot catch substitution). The gate parses the canonical
+    #    source GLB and the exported hero GLB itself and compares
+    #    counts + a scale/translation-invariant per-part shape
+    #    signature; the renderer's topology_comparison is recorded as
+    #    corroboration, never the pass basis (Art. III). The
+    #    source_agreement witness above stays as the complementary
+    #    spec-side bound check.
+    source_glb = render_record.get("source_glb")
+    gi = independent_geometry_identity(source_glb, hero_glb)
+    src_sha_expected = render_record.get("source_glb_sha256")
+    if src_sha_expected and source_glb and Path(source_glb).is_file():
+        actual_src = _sha256_file(Path(source_glb))
+        gi["source_glb_sha256_match"] = bool(
+            actual_src == src_sha_expected)
+        if not gi["source_glb_sha256_match"]:
+            gi["pass"] = False
+            gi["identical"] = False
     topo = render_record.get("topology_comparison") or {}
-    checks["geometry_identity"] = {
-        "pass": bool(topo.get("identical")),
-        **topo}
-    if not topo.get("identical"):
-        reasons.append("exported hero GLB vertex/face counts differ "
-                       "from the canonical import — presentation "
-                       "edited geometry")
+    gi["renderer_assertion"] = topo
+    gi["renderer_assertion_role"] = ("corroboration only (never the "
+                                     "pass basis, R443 merged)")
+    checks["geometry_identity"] = gi
+    if not gi.get("pass"):
+        reasons.append("exported hero GLB is NOT the canonical geometry "
+                       "(independent re-measure failed — presentation "
+                       "edited or substituted geometry)")
 
     # 6. poster parity
     poster_png = out / "poster.png"
@@ -645,6 +796,20 @@ def evaluate(out_dir: str,
     frames = int(render_record.get("turntable_frames")
                  or visual_set.DEFAULT_TURNTABLE_FRAMES)
     completeness = visual_set.classify(str(out), node_count, frames)
+    # R443-MERGED: present artifacts must ALSO hash to the bytes the
+    # render record claims — a swapped-after-render view is a
+    # SUBSTITUTED artifact: a quality/integrity rejection (FAIL),
+    # never merely an incomplete ladder (PARTIAL)
+    hash_mismatched = _verify_view_hashes(out, render_record,
+                                          completeness)
+    checks["view_hash_integrity"] = {
+        "pass": not hash_mismatched,
+        "sha256_mismatched": hash_mismatched}
+    if hash_mismatched:
+        reasons.append(
+            "view artifact bytes do not match the render record "
+            f"(substituted after render): {hash_mismatched[:6]} — "
+            "presentation or an attacker swapped a produced view")
     checks["visual_set_completeness"] = {
         "pass": bool(completeness["complete"]),
         "required_count": completeness["required_count"],

@@ -287,13 +287,31 @@ def _regulatory_summary(proj: Dict) -> str:
     listed as candidates with applicability verification owed)."""
     reg = (proj.get("regulatory") or {})
     standards = reg.get("candidate_standards") or []
+    # R443: the applicability state heads the regulatory posture — the
+    # context decision (medical / industrial / unknown) is the canonical
+    # basis for WHAT regulatory regimes are in scope
+    app = proj.get("applicability") or {}
+    reqs = app.get("requirements") or {}
+    ctx = app.get("context_class") or "UNKNOWN"
+    header = (f"problem context (canonical applicability): {ctx}. ")
+    reg_req = reqs.get("regulatory") or {}
+    if reg_req:
+        appl = reg_req.get("applicability") or "UNKNOWN"
+        header += (f"Context requirement [{appl}]: "
+                   f"{_txt(reg_req.get('statement'), 200)}. ")
+        mna = reg_req.get("medical_not_applicable")
+        if mna:
+            header += (f"Medical-device regulation: "
+                       f"{mna.get('applicability')} — "
+                       f"{_txt(mna.get('basis'), 140)}. ")
     if not standards:
-        return ("regulatory pathway: NOT ESTABLISHED (no determination "
-                "exists for this invention; the pathway is never "
-                "inferred from device class alone — the buyer's first "
-                "regulatory action is the determination itself)")
+        return (header + "regulatory pathway: NOT ESTABLISHED (no "
+                "determination exists for this invention; the pathway "
+                "is never inferred from device class alone — the "
+                "buyer's first regulatory action is the determination "
+                "itself)")
     lines = [
-        f"regulatory pathway: {_txt(reg.get('pathway'), 160)}",
+        header + f"regulatory pathway: {_txt(reg.get('pathway'), 160)}",
         f"{len(standards)} candidate standard"
         + ("s" if len(standards) != 1 else "")
         + " recorded (candidates, NOT compliance claims):",
@@ -506,6 +524,8 @@ def build_decision_card(proj: Dict, run_result: Dict,
               or _u(inv.get("distinguishing_features")), 300)),
         ("What would we build?",
          _build_plan_table(proj)),
+        ("What must the buyer bring?",
+         _buyer_requirements(proj)),
         ("What is the cheapest decisive next experiment?",
          _txt(ke.get("definition") or "not selected — see the unknown "
               "roadmap for the blockers", 300)),
@@ -514,6 +534,61 @@ def build_decision_card(proj: Dict, run_result: Dict,
     ]
     sections = [_sec(t, b) for t, b in q]
     return _essayish(sections)
+
+
+def _must_verify(proj: Dict) -> str:
+    """R443 (R440 completion): the verification duty transferred to the
+    buyer — from the engineering specification's transfer boundary
+    (buyer_must_verify), itself derived from the verification matrix.
+    The boundary transfers ALL three duties: receive / develop /
+    verify."""
+    tb = proj.get("transfer_boundary") or {}
+    duties = tb.get("buyer_must_verify") or []
+    if not duties:
+        duties = ["NOT ESTABLISHED — no verification duty is derivable; "
+                  "defining one is the buyer's first verification action"]
+    return ("the buyer carries the verification duty for every "
+            "transferred claim (nothing arrives pre-verified):\n"
+            + "\n".join(f"  - {_txt(d, 200)}" for d in duties[:12]))
+
+
+def _buyer_requirements(proj: Dict) -> str:
+    """R443: buyer/manufacturing/regulatory/market requirements derived
+    from the CANONICAL applicability state — never from a reusable
+    medical template, never keyword-guessed. Every line traces to the
+    applicability record; honest states UNKNOWN / NOT_APPLICABLE /
+    UNSUPPORTED (no silent defaults)."""
+    app = proj.get("applicability") or {}
+    reqs = app.get("requirements") or {}
+    ctx = app.get("context_class") or "UNKNOWN"
+    if not reqs:
+        return ("buyer requirements: UNKNOWN — no canonical "
+                "applicability record exists for this technology; the "
+                "requirement derivation is NOT invented (Art. XXVII)")
+    out = [f"canonical problem context: {ctx}"]
+    bt = reqs.get("buyer_type") or {}
+    out.append(f"buyer type: {_txt(bt.get('statement'), 200)} "
+               f"[{bt.get('applicability') or 'UNKNOWN'}]")
+    for cap in (reqs.get("engineering_capability") or []):
+        out.append(f"engineering capability: "
+                   f"{_txt(cap.get('statement'), 160)} "
+                   f"[{cap.get('applicability') or 'UNKNOWN'}]")
+    for cap in (reqs.get("manufacturing_capability") or []):
+        out.append(f"manufacturing capability: "
+                   f"{_txt(cap.get('statement'), 160)} "
+                   f"[{cap.get('applicability') or 'UNKNOWN'}]")
+    reg = reqs.get("regulatory") or {}
+    out.append(f"regulatory: {_txt(reg.get('statement'), 240)} "
+               f"[{reg.get('applicability') or 'UNKNOWN'}]")
+    mna = reg.get("medical_not_applicable")
+    if mna:
+        out.append(f"medical regulatory: "
+                   f"{_txt(mna.get('statement'), 160)} "
+                   f"[{mna.get('applicability')}]")
+    for ch in (reqs.get("market_channels") or []):
+        out.append(f"market channels: {_txt(ch.get('statement'), 160)} "
+                   f"[{ch.get('applicability') or 'UNKNOWN'}]")
+    return "\n".join(out)
 
 
 def build_evidence_summary(proj: Dict, run_result: Dict) -> Dict:
@@ -597,7 +672,14 @@ def build_transfer_manifest(proj: Dict, run_result: Dict,
              "an engineering team able to take ENGINEERING_PROPOSED "
              "state to manufacturable definition (the design work "
              "named in the unknown roadmap) and to run the "
-             "pre-registered decisive experiment"),
+             "pre-registered decisive experiment — the context-"
+             "specific buyer capabilities are recorded in the buyer "
+             "decision card (What must the buyer bring?), derived "
+             "from the canonical applicability state"),
+        _sec("You must verify",
+             _must_verify(proj)),
+        _sec("Buyer and regulatory requirements (canonical applicability)",
+             _buyer_requirements(proj)),
         _sec("Required tooling",
              "CAD (STEP readers; CadQuery/OCCT for parametric "
              "rebuilds — see MODEL/PARAMETRIC_MODEL_SOURCE.py), "

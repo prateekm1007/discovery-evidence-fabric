@@ -289,6 +289,49 @@ def build_technology_package_model(
                 "candidate_processes") or [],
             "source_refs": ["engineering_specification.*"],
         },
+        # R443: the requirements dimension — buyer / manufacturing /
+        # regulatory / market requirements derived from the CANONICAL
+        # applicability state (engineering_specification.applicability,
+        # the one context authority). The independent gate re-verifies
+        # that every requirement statement in the built package traces
+        # HERE (contamination check); a reusable medical template can
+        # never again supply requirements to an industrial problem.
+        "requirements": {
+            "context_class": (eng.get("applicability") or {}).get(
+                "context_class") or "UNKNOWN",
+            "buyer_type": ((eng.get("applicability") or {}).get(
+                "requirements") or {}).get("buyer_type") or {},
+            "engineering_capability": ((eng.get("applicability") or {})
+                                       .get("requirements") or {}).get(
+                "engineering_capability") or [],
+            "manufacturing_capability": ((eng.get("applicability") or {})
+                                         .get("requirements") or {}).get(
+                "manufacturing_capability") or [],
+            "regulatory": ((eng.get("applicability") or {}).get(
+                "requirements") or {}).get("regulatory") or {},
+            "market_channels": ((eng.get("applicability") or {}).get(
+                "requirements") or {}).get("market_channels") or [],
+            "domain_content_exclusions": (eng.get("applicability") or
+                                         {}).get(
+                "domain_content_exclusions") or [],
+            # the decision's OWN recorded basis (score table + matched
+            # signals) rides the model so the independent gate can
+            # verify the context claim is internally coherent (Art. III
+            # — a fabricated context claim has zero signal support)
+            "score_table": (eng.get("applicability") or {}).get(
+                "score_table") or [],
+            "matched_signals": (eng.get("applicability") or {}).get(
+                "matched_signals") or [],
+            "source_refs": [
+                "engineering_specification.applicability (the canonical "
+                "problem-context decision + requirements projection)"],
+            # the gate's binding key (view.BINDING_KEYS): this section
+            # IS a canonical projection — the vocabulary it carries
+            # (including an honest NOT_APPLICABLE medical statement) is
+            # bound to the applicability record, never free-floating
+            "canonical_source_refs": [
+                "engineering_specification.applicability"],
+        },
         "equations": {
             "registry_source": "EQUATION_REGISTRY.json",
             "governing_models": ((eng.get("engineering_core") or {}).get(
@@ -367,6 +410,12 @@ def build_technology_package_model(
                 "invention_specification": fi_hash,
                 "final_state": fs.get("final_envelope_hash"),
             },
+            # binding key: this section is the FROZEN SOURCE copy — its
+            # vocabulary is the sources' own, bound by hash
+            "canonical_source_refs": [
+                "INVENTION_SPECIFICATION.json",
+                "ENGINEERING_SPECIFICATION.json",
+                "final_state.json", "DECISIVE_EXPERIMENT.json"],
         },
     }
     return model
@@ -1087,6 +1136,13 @@ def _canonical_for_gate(model: Dict[str, Any]) -> Dict[str, Any]:
         "technology_name": ident.get("technology_name"),
         "domain_family": ident.get("domain_family"),
         "problem_domain_family": ident.get("problem_domain_family"),
+        # R443: the canonical problem-context applicability (ONE
+        # authority — the engineering specification's decision; the
+        # gate CONSUMES it as source so a medical-context package
+        # routed to a non-medical ENGINEERING domain is not misread as
+        # foreign-domain contamination)
+        "applicability_context": (model.get("requirements") or {}).get(
+            "context_class"),
         "final_invention_hash": ident.get("final_invention_hash"),
         "problem": (model["problem"].get("user_problem")
                     or model["problem"].get("failure_mode")),

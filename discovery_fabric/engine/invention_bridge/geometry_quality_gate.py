@@ -113,6 +113,104 @@ def _finite(a: Any) -> bool:
         return False
 
 
+def _world_parts(scene: "trimesh.Scene") -> Dict[str, "trimesh.Trimesh"]:
+    """Named part meshes in WORLD space (transforms applied; link_
+    presentation conduits excluded — they are interface topology, not
+    parts)."""
+    parts: Dict[str, trimesh.Trimesh] = {}
+    try:
+        for node in scene.graph.nodes_geometry:
+            if str(node).startswith("link_"):
+                continue
+            T, g_name = scene.graph[node]
+            g = scene.geometry.get(g_name)
+            if not isinstance(g, trimesh.Trimesh) or len(g.vertices) == 0:
+                continue
+            wc = g.copy()
+            wc.apply_transform(T)
+            parts[str(node)] = wc
+    except Exception:  # noqa: BLE001 — typed honest failure
+        return {}
+    return parts
+
+
+def component_interference_witness(
+        scene: "trimesh.Scene",
+        spec: Optional[Dict[str, Any]],
+        mutual_min: float = 0.9,
+        mutual_max: float = 0.6,
+        ) -> Tuple[bool, Dict[str, Any]]:
+    """R443 / R442-FEEDBACK — the engineering-side non-interference
+    witness (deterministic; no renderer involved).
+
+    Independent named parts may not occupy the SAME cell: a pair whose
+    world AABBs mutually co-locate (intersection / smaller-bbox > 0.9
+    AND intersection / larger-bbox > 0.6) is an engineering-realization
+    failure — the stacked-module defect class — UNLESS the canonical
+    spec records the pair as an intentional mating (interfaces[]).
+
+    Nested pairs (a small part inside a body: boards in enclosures,
+    springs around shafts) are the conceptual layer's honest pattern:
+    they are DISCLOSED here with their mating state (the engineering
+    realization boundary must open access or declare mating when
+    engineering geometry is earned) but do not fail the conceptual
+    gate (Art. XXVIII — presentation geometry is labeled conceptual;
+    engineering claims are earned elsewhere).
+    """
+    parts = _world_parts(scene)
+    if len(parts) < 2:
+        return True, {"pairs_checked": len(parts)}
+    mated = set()
+    for i in (spec or {}).get("interfaces") or []:
+        a, b = i.get("from"), i.get("to")
+        if a and b:
+            mated.add((a, b))
+            mated.add((b, a))
+    names = sorted(parts)
+    same_cell: List[Dict[str, Any]] = []
+    nested: List[Dict[str, Any]] = []
+    for i in range(len(names)):
+        for j in range(i + 1, len(names)):
+            a, b = parts[names[i]], parts[names[j]]
+            ab, bb = np.asarray(a.bounds), np.asarray(b.bounds)
+            lo = np.maximum(ab[0], bb[0])
+            hi = np.minimum(ab[1], bb[1])
+            if not np.all(hi > lo):
+                continue
+            inter = float(np.prod(hi - lo))
+            va = float(np.prod(ab[1] - ab[0]))
+            vb = float(np.prod(bb[1] - bb[0]))
+            if min(va, vb) <= 0:
+                continue
+            frac_min = inter / min(va, vb)
+            frac_max = inter / max(va, vb)
+            is_mated = (names[i], names[j]) in mated
+            rec = {"pair": f"{names[i]}=={names[j]}",
+                   "overlap_fraction_min_part": round(frac_min, 3),
+                   "overlap_fraction_max_part": round(frac_max, 3),
+                   "mating_declared": is_mated}
+            if frac_min > mutual_min and frac_max > mutual_max:
+                if not is_mated:
+                    same_cell.append(rec)
+                else:
+                    nested.append({**rec, "relation": "mated co-location"})
+            elif frac_min > 0.5:
+                nested.append({**rec, "relation": (
+                    "nested (conceptual containment — engineering "
+                    "realization must open access or declare mating)")})
+    measured = {
+        "pairs_checked": len(names) * (len(names) - 1) // 2,
+        "same_cell_unmated": same_cell,
+        "nested_disclosed": nested[:12],
+        "rule": ("two distinct parts at the same cell (mutual overlap "
+                 "> 0.9 of the smaller and > 0.6 of the larger bbox) "
+                 "without a declared mating interface is an "
+                 "engineering-realization failure; nested parts are "
+                 "disclosed for the engineering boundary"),
+    }
+    return (not same_cell), measured
+
+
 def geometry_quality_gate(glb_bytes: bytes,
                           spec: Optional[Dict[str, Any]],
                           domain_family: Optional[str] = None,
@@ -220,6 +318,21 @@ def geometry_quality_gate(glb_bytes: bytes,
            else round(min_ext, 6)})
     check("no_duplicate_model", not duplicates, {"duplicates": duplicates})
     check("normals_valid", not bad_normals)
+
+    # --- R443: per-pair interference witness (R442 FEEDBACK defects 2/3) ---
+    # Deterministic world-space AABB comparison over NAMED parts (link_
+    # conduits are presentation topology and are excluded). The
+    # conceptual layer legitimately nests content inside bodies (boards
+    # in enclosures, springs around shafts): those pairs are DISCLOSED
+    # with their mating state so the engineering realization boundary
+    # must resolve them (bore/access features or declared mating) once
+    # engineering geometry is earned. The FAILURE class is mutual
+    # co-location: two distinct parts occupying the SAME cell
+    # (frac_min > 0.9 and frac_max > 0.6) — the stacked-module defect
+    # the fresh-production audit measured (module_01==module_02 at one
+    # position, and the R442 Case-A four-module same-cell stack).
+    check("component_interference",
+          *component_interference_witness(scene, spec))
 
     # --- no enormous disconnected geometry ----------------------------------
     # A component spanning the whole scene is LEGITIMATE (a thermal

@@ -255,6 +255,44 @@ def _geometry_file_route(session_id: str, f: Path) -> str:
 # ---------------------------------------------------------------------------
 # The CIO builder
 # ---------------------------------------------------------------------------
+def _domain_summary(eng: Optional[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
+    """R443: the canonical domain identity, consumed from the
+    engineering specification (one authority — never re-derived here)."""
+    if not eng:
+        return None
+    wd = eng.get("why_this_domain") or {}
+    app = eng.get("applicability") or {}
+    return {
+        "domain": wd.get("domain") or eng.get("technology_domain"),
+        "label": wd.get("label"),
+        "basis": wd.get("basis"),
+        "selection_basis": wd.get("selection_basis"),
+        "source_refs": ["engineering_specification.why_this_domain"],
+    }
+
+
+def _applicability_summary(
+        eng: Optional[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
+    """R443: the canonical problem-context applicability state, consumed
+    from the engineering specification (one authority). The CIO, the
+    website and the package documents speak THIS decision."""
+    if not eng:
+        return None
+    app = eng.get("applicability") or {}
+    if not app:
+        return None
+    return {
+        "context_class": app.get("context_class"),
+        "basis": app.get("basis"),
+        "score": app.get("score"),
+        "buyer_type": ((app.get("requirements") or {}).get(
+            "buyer_type") or {}).get("statement"),
+        "regulatory": ((app.get("requirements") or {}).get(
+            "regulatory") or {}).get("statement"),
+        "source_refs": ["engineering_specification.applicability"],
+    }
+
+
 def build_cio(session: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     """Build the Canonical Invention Object for one session. Returns
     None when the run has no invention-side artifacts yet (honest: no
@@ -461,12 +499,26 @@ def build_cio(session: Dict[str, Any]) -> Optional[Dict[str, Any]]:
                 ev_classes.append(c)
     survivor_gate = (inv or {}).get("_survivor_gate") \
         if isinstance((inv or {}).get("_survivor_gate"), dict) else {}
-    evidence_supported = bool(
+    # R443 / TSC-008: evidence-supported status requires BOUND evidence
+    # references — classification counts alone are not evidence (Art.
+    # XXI.1); unbound/unresolvable references make the honest state NOT
+    # evidence-supported (never silently granted).
+    from discovery_fabric.engine.state_integrity import \
+        evidence_supported_honest
+    _bound_refs = [
+        e for e in evidence
+        if isinstance(e, dict) and (e.get("evidence_id")
+                                    or e.get("id")
+                                    or e.get("source"))]
+    _es_raw = bool(
         (ev_classes and any(c in ("SOURCE_FACT", "EXTERNAL_PRECEDENT",
                                   "VERIFIED_EVIDENCE")
                             for c in ev_classes))
         or survivor_gate.get("evidence_verified")
         or evidence)
+    _es = evidence_supported_honest(_es_raw, _bound_refs)
+    evidence_supported = _es["evidence_supported"]
+    evidence_supported_basis = _es
 
     # physics/simulation (COMPUTATIONAL_RESULT only — Art. LIII).
     # MECHANISM_NOT_SIMULATABLE is the R413 decision machine's honest
@@ -506,6 +558,12 @@ def build_cio(session: Dict[str, Any]) -> Optional[Dict[str, Any]]:
                 "distinguishing_features")),
             "survivor": survivor,
             "final_status": session.get("final_status"),
+            # R443: the canonical domain + problem-context applicability
+            # consumed VERBATIM from the engineering specification (one
+            # authority: engineering_specification.why_this_domain +
+            # .applicability — the CIO never re-guesses either)
+            "domain": _domain_summary(eng),
+            "applicability": _applicability_summary(eng),
         },
         "maturity": {
             # the directive §14 reality states — CIO FIELDS, not
@@ -515,6 +573,14 @@ def build_cio(session: Dict[str, Any]) -> Optional[Dict[str, Any]]:
             "design": has_geometry,
             "simulation": simulated,
             "evidence_supported": bool(evidence_supported and survivor),
+            "evidence_supported_basis": (
+                evidence_supported_basis if (evidence_supported
+                                             and survivor) else
+                {"evidence_supported": False,
+                 "references_bound": False,
+                 "basis": ("no bound evidence references resolve on "
+                           "this run — the honest state is NOT "
+                           "evidence-supported (TSC-008/Art. XXI.1)")}),
             "experimentally_verified": reality_loop_state in (
                 "REAL_LOOP_VERIFIED", "REPEATED_REALITY_VERIFIED"),
             "maturity_ladder": [

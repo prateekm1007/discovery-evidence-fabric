@@ -2590,20 +2590,25 @@ class EngineRun:
     def _evolution_final_status(self, summary: Dict[str, Any],
                                 survivor: Optional[Dict[str, Any]]
                                 ) -> tuple:
-        """The honest run-level final_status after evolution."""
-        if survivor is not None and self.package_report is not None and \
-                self.package_report.get("complete"):
-            return ("EVOLVED_INVENTION_CANDIDATE",
-                    "an evolved architecture generation survived the "
-                    "re-evaluation gauntlet and a technology package "
-                    "was produced (maturity label on the package is "
-                    "derived from the generation's own verification "
-                    "events)")
-        if survivor is not None:
-            return ("EVOLVED_INVENTION_CANDIDATE",
-                    "an evolved architecture generation survived the "
-                    "re-evaluation gauntlet; the decisive physical "
-                    "experiment is specified, not executed")
+        """The honest run-level final_status after evolution.
+
+        R443 / TSC-008: the status word may not outrun the run's own
+        records (Art. XXVIII). A surviving BASELINE FALLBACK generation
+        (the synthesis path failed; the mandatory baseline was created,
+        challenged, and survived; 0 evolution generations; no causal
+        delta) is presented as INVENTION_REQUIRES_EXPERIMENT — the
+        useful idea is preserved, never rejected, and never dressed as
+        EVOLVED. Only a genuine evolved lineage (a generation beyond
+        the baseline with a recorded causal delta) earns
+        EVOLVED_INVENTION_CANDIDATE."""
+        from .state_integrity import honest_fallback_status
+        package_complete = bool(
+            self.package_report is not None
+            and self.package_report.get("complete"))
+        status, reason = honest_fallback_status(
+            survivor, summary, package_complete=package_complete)
+        if status is not None:
+            return (status, reason)
         n = summary.get("n_generations") or 0
         current = summary.get("current_invention") or {}
         return ("INVENTION_UNDER_DEVELOPMENT",

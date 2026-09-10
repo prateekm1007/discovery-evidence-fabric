@@ -374,6 +374,12 @@ _STRUCTURAL: Dict[str, List[Dict[str, Any]]] = {
          "material_class": "polymer", "form": "hub",
          "role": "proximal hub interface (structural presentation "
                  "element)"},
+        # R443 family-definitional (domain acceptance contract)
+        {"component_id": "flow_lumen", "label": "primary flow lumen",
+         "material_class": "conduit_power", "form": "lumen",
+         "role": "primary flow lumen (family-definitional presentation "
+                 "element of the medical-device acceptance case; mapped "
+                 "subsystem recorded as alias)"},
     ],
     "FLUID_DEVICE": [
         {"component_id": "device_body", "label": "device body",
@@ -382,11 +388,51 @@ _STRUCTURAL: Dict[str, List[Dict[str, Any]]] = {
         {"component_id": "flow_channel", "label": "main flow channel",
          "material_class": "conduit_power", "form": "channel",
          "role": "main flow path (structural presentation element)"},
+        # R443 family-definitional (domain acceptance contract): a
+        # fluid device reads as a fluid device only with its ports and
+        # flow-control stage; mapped subsystems carry provenance
+        # aliases.
+        {"component_id": "inlet_port", "label": "inlet port",
+         "material_class": "polymer", "form": "port",
+         "role": "inlet port (family-definitional presentation element "
+                 "of the fluid-device acceptance case; mapped subsystem "
+                 "recorded as alias)"},
+        {"component_id": "outlet_port", "label": "outlet port",
+         "material_class": "polymer", "form": "port",
+         "role": "outlet port (family-definitional presentation element "
+                 "of the fluid-device acceptance case; mapped subsystem "
+                 "recorded as alias)"},
+        {"component_id": "valve_stage", "label": "flow-control valve stage",
+         "material_class": "machined_metal", "form": "valve",
+         "role": "flow-control stage (family-definitional presentation "
+                 "element of the fluid-device acceptance case; mapped "
+                 "subsystem recorded as alias)"},
     ],
     "THERMAL_SYSTEM": [
         {"component_id": "assembly_base", "label": "assembly base",
          "material_class": "body_metal", "form": "base",
          "role": "assembly baseplate (structural presentation element)"},
+        # R443 family-definitional (domain acceptance contract — the
+        # audit defect: a thermal system whose spec never carries a
+        # heat source/sink failed family_feature + domain_architecture).
+        # A thermal system reads as one only with its source, sink and
+        # transport loop; recorded subsystems that map here carry the
+        # provenance alias (never invented content).
+        {"component_id": "heat_source", "label": "heat source block",
+         "material_class": "battery", "form": "source",
+         "role": "heat source side (family-definitional presentation "
+                 "element of the thermal acceptance case; mapped "
+                 "subsystem recorded as alias)"},
+        {"component_id": "heat_sink", "label": "heat sink fin stack",
+         "material_class": "machined_metal", "form": "sink",
+         "role": "heat rejection side (family-definitional presentation "
+                 "element of the thermal acceptance case; mapped "
+                 "subsystem recorded as alias)"},
+        {"component_id": "coolant_loop", "label": "coolant loop",
+         "material_class": "conduit_power", "form": "loop",
+         "role": "coolant transport circuit (family-definitional "
+                 "presentation element of the thermal acceptance case; "
+                 "mapped subsystem recorded as alias)"},
     ],
     "MECHANICAL_COMPONENT": [
         {"component_id": "housing", "label": "component housing",
@@ -403,6 +449,12 @@ _STRUCTURAL: Dict[str, List[Dict[str, Any]]] = {
         {"component_id": "main_board", "label": "main circuit board",
          "material_class": "circuit", "form": "board",
          "role": "main board (structural presentation element)"},
+        # R443 family-definitional (domain acceptance contract)
+        {"component_id": "power_stage", "label": "power stage",
+         "material_class": "machined_metal", "form": "stage",
+         "role": "power conversion stage (family-definitional "
+                 "presentation element of the electronic acceptance "
+                 "case; mapped subsystem recorded as alias)"},
     ],
     "ENERGY_STORAGE": [
         {"component_id": "cell_stack", "label": "cell stack",
@@ -411,6 +463,12 @@ _STRUCTURAL: Dict[str, List[Dict[str, Any]]] = {
         {"component_id": "pack_enclosure", "label": "pack enclosure",
          "material_class": "body_metal", "form": "enclosure",
          "role": "pack enclosure (structural presentation element)"},
+        # R443 family-definitional (domain acceptance contract)
+        {"component_id": "bus_bars", "label": "bus bars",
+         "material_class": "machined_metal", "form": "bus",
+         "role": "series interconnect bus bars (family-definitional "
+                 "presentation element of the energy-storage "
+                 "acceptance case; mapped subsystem recorded as alias)"},
     ],
 }
 
@@ -572,12 +630,21 @@ def derive_geometry_spec(family: str, subsystems: Sequence[str],
             cid, label, "slot", material, str(name), False,
             f"recorded subsystem '{name}' mapped onto the {label} slot"))
     # dedupe mapped slots by component_id (first recorded name wins —
-    # deterministic; later duplicates are recorded as aliases)
+    # deterministic; later duplicates are recorded as aliases). R443:
+    # a slot that is family-definitional STRUCTURAL may also receive a
+    # recorded subsystem — the mapping is recorded as mapped_from +
+    # alias on that component so the provenance is never lost (Art. X:
+    # one canonical spec, every recorded subsystem's destination
+    # auditable).
     aliases: List[Dict[str, Any]] = []
+    by_id = {c["component_id"]: c for c in components}
     for comp in mapped:
         if comp["component_id"] in seen:
             aliases.append({"component_id": comp["component_id"],
                             "recorded_subsystem": comp["mapped_from"]})
+            target = by_id.get(comp["component_id"])
+            if target is not None and not target.get("mapped_from"):
+                target["mapped_from"] = comp["mapped_from"]
             continue
         add(comp)
     if aliases:

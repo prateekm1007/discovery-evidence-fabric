@@ -97,6 +97,16 @@ def derive_engineering_projection(run_result: Dict[str, Any],
         "materials": eng.get("materials") or [],
         "regulatory": (run_result.get("engineering_specification")
                        or {}).get("regulatory") or {},
+        # R443: the canonical applicability state rides the projection —
+        # the package layer is a CONSUMER (one authority: the
+        # engineering specification's applicability record; never
+        # re-guessed here, never inferred from keywords or templates)
+        "applicability": (run_result.get("engineering_specification")
+                          or {}).get("applicability") or {},
+        # R443 (R440 completion): the full transfer boundary (incl. the
+        # buyer's verification duty) — consumed by the transfer manifest
+        "transfer_boundary": (run_result.get("engineering_specification")
+                              or {}).get("transfer_boundary") or {},
         "manufacturing": eng.get("manufacturing") or {},
         "constraints": _unwrap(inv.get("constraints")) or [],
         "assumptions": _unwrap(inv.get("assumptions")) or [],
@@ -163,6 +173,70 @@ def _evclass(v: Any) -> str:
             if isinstance(v.get(k), str):
                 return v[k]
     return "UNKNOWN"
+
+
+def _replayable_chains(proj: Dict[str, Any],
+                       run_result: Optional[Dict[str, Any]] = None
+                       ) -> List[Dict]:
+    """The hash-bound replayable chain rows for the Coder-2 audit.
+
+    Each row: {node_id, chain_type, source, hash, evidence_ids,
+    linked}. The hash is the sha256 of the canonical JSON of the
+    EXACT engineering-specification object (the row as shipped in
+    ENGINEERING_SPECIFICATION.json) — recomputable by the verifier.
+    """
+    import hashlib as _hl
+    eng = ((run_result or {}).get("engineering_specification")) or {}
+    pools = (
+        ("DESIGN_INPUT", eng.get("design_inputs") or [],
+         "engineering_specification.design_inputs"),
+        ("DESIGN_OUTPUT", eng.get("design_outputs") or [],
+         "engineering_specification.design_outputs"),
+        ("FAILURE_MODE", eng.get("failure_analysis") or
+         (eng.get("engineering_core") or {}).get("failure_modes") or [],
+         "engineering_specification.failure_analysis"),
+        ("VERIFICATION", eng.get("verification_matrix") or [],
+         "engineering_specification.verification_matrix"),
+    )
+    inv_id = None
+    inv_field = ((run_result or {}).get("invention_specification")
+                 or {}).get("invention_id")
+    if isinstance(inv_field, dict):
+        inv_id = inv_field.get("value")
+    elif inv_field is not None:
+        inv_id = inv_field
+    chains: List[Dict] = []
+    for chain_type, rows, source in pools:
+        for row in rows:
+            if not isinstance(row, dict):
+                continue
+            node_id = (row.get("id") or row.get("graph_id")
+                       or row.get("chain_id"))
+            if not node_id:
+                continue
+            ev_ids = [str(e) for e in (row.get("evidence_refs") or [])
+                      if e]
+            chains.append({
+                "invention_id": str(inv_id) if inv_id else None,
+                "candidate_id": str(
+                    ((run_result or {}).get("session_id")
+                     or (run_result or {}).get("run_id")
+                     or "unknown")),
+                "node_id": str(node_id),
+                "design_input_id": str(node_id),
+                "chain_type": chain_type,
+                "source": source,
+                "hash": _hl.sha256(json.dumps(
+                    row, sort_keys=True, ensure_ascii=False,
+                    default=str).encode("utf-8")).hexdigest(),
+                "evidence_ids": ev_ids,
+                "linked": bool(ev_ids),
+                "binding_rule": (
+                    "hash = sha256(canonical JSON of the shipped "
+                    "engineering_specification object with this id; "
+                    "the independent replay recomputes it"),
+            })
+    return chains
 
 
 def build_traceability(proj: Dict[str, Any], package_id: str,
@@ -469,6 +543,15 @@ def build_traceability(proj: Dict[str, Any], package_id: str,
                              "TRACEABILITY_NOT_APPLICABLE"],
         },
         "links": links,
+        # R443 (R440 completion): the REPLAYABLE chain view — one row
+        # per shipped engineering node (DI/DO/FM/VF), hash-bound to the
+        # ENGINEERING_SPECIFICATION object (sha256 of the canonical
+        # JSON), evidence ids from the row's own evidence_refs. The
+        # Coder-2 independent replay consumes THIS view: a mutated
+        # engineering object or forged traceability row breaks the
+        # hash binding (the replay recomputes it from the shipped
+        # spec). The legacy corpus contract preserved verbatim.
+        "traceability_chains": _replayable_chains(proj, run_result),
         "decision_outcomes": decision_outcomes,
         "coverage": {
             "total_nodes": node_counts,

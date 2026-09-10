@@ -26,6 +26,7 @@ import tempfile
 from pathlib import Path
 from typing import Optional
 
+from .view import Finding, GateResult, PackageView  # noqa: E402
 from .view import (
     CANONICAL_ID_PATTERNS, DOMAIN_VOCAB, GateResult, PackageView,
     domain_term_hits, distinctive_tokens, sha256_file,
@@ -228,6 +229,15 @@ def gate_C_domain_integrity(pv: PackageView, canonical: Optional[dict]) -> GateR
         problem_dom = infer_domain(str(canonical["problem"]))
     if problem_dom:
         home_domains.add(str(problem_dom))
+    # R443: the canonical problem-context applicability — a MEDICAL-
+    # context package legitimately speaks medical vocabulary (its
+    # requirements are medical BY the one canonical authority), even
+    # when the ENGINEERING routing domain is non-medical (e.g. a
+    # steering catheter routed to mechanical_structural engineering).
+    # Consumed from the canonical state, never re-guessed here.
+    _app_ctx = str((canonical or {}).get("applicability_context") or "")
+    if _app_ctx in ("MEDICAL_IN_VIVO", "MEDICAL_EX_VIVO"):
+        home_domains.add("medical")
     dom_l = str(dom).strip().lower()
     # when the declared domain is outside the gate's known vocabulary the
     # contradiction detector cannot adjudicate foreign terms (Art. XXV:
@@ -1273,6 +1283,12 @@ def gate_U_semantic_audit(pv: PackageView, canonical: Optional[dict],
         pd = infer_domain(str(canonical["problem"]))
     if pd:
         home_domains.add(str(pd))
+    # R443: the same canonical applicability consumption as Gate C — a
+    # MEDICAL-context package's buyer documents legitimately discuss
+    # medical requirements (the one authority decided the context)
+    _app_ctx_u = str((canonical or {}).get("applicability_context") or "")
+    if _app_ctx_u in ("MEDICAL_IN_VIVO", "MEDICAL_EX_VIVO"):
+        home_domains.add("medical")
     tech_name = str(pv.manifest.get("technology_name") or "")
     inv_tokens = set(distinctive_tokens(tech_name, limit=20))
     if canonical and canonical.get("invention"):
@@ -1386,6 +1402,257 @@ def gate_V_buyer_language(pv: PackageView, canonical: Optional[dict]) -> GateRes
     return g
 
 
+
+# ---------------------------------------------------------------------------
+# R443 — Gate W: APPLICABILITY INTEGRITY (domain-to-package semantic
+# boundary). The audit's fresh wastewater case acquired patient/
+# catheter/FDA/neurosurgery requirements from a reusable medical
+# template. This gate re-derives the problem's medical context
+# INDEPENDENTLY (Art. III — its own minimal signal set, not the
+# compiler's applicability module) and verifies that the buyer-facing
+# requirement statements match that context. It is NOT a forbidden-word
+# filter: medical requirements in a genuinely medical problem PASS
+# (Test B); medical requirements in a non-medical problem BLOCK (Test
+# A/E); a missing applicability record BLOCKS (the compiler must carry
+# the canonical state).
+# ---------------------------------------------------------------------------
+
+#: requirement-side contamination markers — the audit's exact list
+#: (these words in buyer REQUIREMENT text of a non-medical problem are
+#: contamination; in a medical problem they are legitimate)
+_MEDICAL_REQUIREMENT_MARKERS = (
+    "patient", "catheter", "neurosurgery", "neurosurgical",
+    "clinical validation", "fda 510(k)", "fda 510k", "510(k)",
+    "fda pma", "pma submission", "medical tubing",
+    "medical-grade silicone", "medical extrusion",
+    "neuroshunt", "hospital purchasing", "iso 10993",
+    "iso 13485", "cleanroom assembly", "biocompatib",
+)
+
+#: problem-side medical-context signals (independent set — deliberately
+#: different from applicability.py; it must cover the clinical/anatomical
+#: vocabulary real medical problems use, so a genuinely medical problem
+#: is never misread as non-medical by the verifier)
+_MEDICAL_CONTEXT_SIGNALS = (
+    "patient", "in vivo", "in-vivo", "implant", "implantable",
+    "clinical", "neurosurgery", "physician", "hospital", "therapy",
+    "cerebrospinal", "hydrocephalus", "shunt", "surgical",
+    "diagnostic", "assay", "biocompatib", "steriliz", "medical",
+    "catheter", "choroid", "plexus", "csf", "ventricul",
+    "peritoneal", "intravascular", "arterial", "venous", "lumen",
+    "tissue", "anatom", "physiological", "infection", "biofilm",
+    "enzyme", "phage", "antibod",
+    "vascular", "occlusion", "retinal", "biopsy", "blood", "sepsis",
+    "icu", "guidewire", "pacemaker", "drain", "detox", "thromb",
+    "embol", "stenosis", "neurovascular", "ocular", "renal",
+    "cardiac", "oncolog", "tumor", "wound", "skin", "mucosal",
+)
+
+
+def _problem_is_medical(problem_text: str) -> Optional[bool]:
+    """Independent medical-context determination over the problem's OWN
+    words. Returns True/False, or None when the text is too thin to
+    decide (the gate then degrades to WARN — Art. XXV: unknown never
+    blocks)."""
+    t = f" {str(problem_text or '').lower()} "
+    hits = sum(1 for s in _MEDICAL_CONTEXT_SIGNALS if s in t)
+    # word-boundary match for the industrial short token ('plant' must
+    # not match inside 'implant' — the Art. XXI substring-noise rule)
+    import re as _re
+    industrial = any(
+        (_re.search(rf"\b{_re.escape(s)}\b", t) if len(s) < 12
+         else s in t)
+        for s in ("wastewater", "industrial", "plant", "municipal",
+                  "effluent", "utility", "refinery", "hvac",
+                  "process stream", "factory", "district heating",
+                  "water treatment", "pipeline"))
+    if hits >= 2 and not industrial:
+        return True
+    if hits >= 4:
+        return True
+    if industrial and hits == 0:
+        return False
+    if hits == 0 and len(t.strip()) > 40:
+        return False
+    if hits <= 1 and industrial:
+        return False
+    return None
+
+
+def _marker_context_exempt(text_lower: str, idx: int,
+                            marker: str) -> bool:
+    """A marker inside an explicit NOT_APPLICABLE / not-applicable
+    statement is the HONEST negation (the R443 regulatory record names
+    the medical regime it is exempting) — never contamination."""
+    window = text_lower[max(0, idx - 220):idx + len(marker) + 220]
+    return ("not applicable" in window
+            or "not_applicable" in window
+            or "never applicable" in window
+            or "no patient-contact" in window
+            or "outside this problem" in window)
+
+
+def gate_W_applicability_integrity(pv: PackageView,
+                                   canonical: Optional[dict]) -> GateResult:
+    g = GateResult("W", "Applicability integrity: buyer/manufacturing/"
+                        "regulatory/market requirements must match the "
+                        "problem's canonical context (the R443 "
+                        "domain-to-package semantic boundary; medical "
+                        "requirements in a non-medical problem are "
+                        "contamination, in a medical problem they are "
+                        "legitimate).")
+    model = pv.json("TECHNOLOGY_PACKAGE_MODEL.json") or {}
+    problem_text = " ".join(str(x) for x in (
+        (model.get("problem") or {}).get("user_problem"),
+        (model.get("problem") or {}).get("failure_mode")) if x)
+    if not problem_text and canonical and canonical.get("problem"):
+        problem_text = str(canonical["problem"])
+    if not problem_text:
+        g.warn("W-PROBLEM-TEXT-ABSENT", "no canonical problem text "
+               "available to the gate — the applicability check cannot "
+               "run independently (Art. XXV: unknown never blocks)")
+        return g
+    # the gate's problem view is enriched with the invention's own
+    # intervention site + mechanism (the fuller canonical problem view
+    # the applicability decision itself used — Art. III: source, not
+    # claimant content)
+    invention = model.get("invention") or {}
+    problem_text = " ".join(filter(None, [
+        problem_text,
+        str(invention.get("intervention_site") or ""),
+        str((invention.get("mechanism") or {}).get("mechanism")
+            if isinstance(invention.get("mechanism"), dict)
+            else invention.get("mechanism") or "")[:600],
+    ]))
+    medical = _problem_is_medical(problem_text)
+
+    # 1. the model MUST carry the canonical applicability dimension
+    reqs = model.get("requirements") or {}
+    if not reqs:
+        g.fail("W-NO-APPLICABILITY", "the package model carries no "
+               "requirements/applicability dimension — the canonical "
+               "problem-context state (R443) is missing: requirements "
+               "cannot be traced, and a reusable template may have "
+               "supplied them")
+        return g
+
+    # 1b. the record must be INTERNALLY COHERENT (Art. III
+    # independence): a context_class claim of MEDICAL must be supported
+    # by the record's OWN score table — a fabricated context (the
+    # injected-template failure mode) has zero medical signals in its
+    # own recorded basis. This catches the old-template injection even
+    # when the injected record claims a medical context.
+    claimed_ctx = str(reqs.get("context_class") or "UNKNOWN")
+    _MEDICAL_CTX = {"MEDICAL_IN_VIVO", "MEDICAL_EX_VIVO"}
+    app_record = model.get("applicability") or {}
+    score_table = (app_record.get("score_table")
+                   or reqs.get("score_table") or [])
+    medical_table_hits = 0
+    for row in score_table:
+        if str(row.get("context_class")) in _MEDICAL_CTX:
+            medical_table_hits += int(row.get("score") or 0)
+    if claimed_ctx in _MEDICAL_CTX and medical_table_hits <= 0 \
+            and not (app_record.get("matched_signals")):
+        g.fail("W-CONTEXT-FABRICATED", f"the applicability record "
+               f"claims context {claimed_ctx} but its own score table "
+               f"carries zero medical-context signal support — the "
+               f"context claim is fabricated (the injected-template "
+               f"failure mode)")
+
+    # 2. contamination: medical markers in buyer requirement text of a
+    # non-medical problem (requirement statements whose applicability
+    # is NOT_APPLICABLE are exempt — they are the honest negation)
+    if medical is False:
+        # 2a. structured requirement statements (the model dimension)
+        def _iter_requirement_statements(node, path="requirements"):
+            if isinstance(node, dict):
+                appl = str(node.get("applicability") or "")
+                stmt = node.get("statement")
+                if isinstance(stmt, str) and appl != "NOT_APPLICABLE":
+                    yield path, stmt
+                for k, v in node.items():
+                    if k in ("statement",):
+                        continue
+                    yield from _iter_requirement_statements(
+                        v, f"{path}.{k}")
+            elif isinstance(node, list):
+                for i, v in enumerate(node):
+                    yield from _iter_requirement_statements(
+                        v, f"{path}[{i}]")
+        bad = []
+        for path, stmt in _iter_requirement_statements(reqs):
+            low = stmt.lower()
+            for m in _MEDICAL_REQUIREMENT_MARKERS:
+                idx = low.find(m)
+                if idx >= 0 and not _marker_context_exempt(low, idx, m):
+                    bad.append({"where": path, "marker": m,
+                                "statement": stmt[:140]})
+                    break
+        # 2b. buyer-facing PDF requirement text (the decision card /
+        # transfer manifest sections render the same statements)
+        pdf_bad = []
+        for name, pages in pv.pdfs.items():
+            text = "\n".join(pages).lower()
+            for m in _MEDICAL_REQUIREMENT_MARKERS:
+                start = 0
+                while True:
+                    idx = text.find(m, start)
+                    if idx < 0:
+                        break
+                    if not _marker_context_exempt(text, idx, m):
+                        pdf_bad.append({"pdf": name, "marker": m})
+                        break
+                    start = idx + len(m)
+        if bad or pdf_bad:
+            g.fail("W-APPLICABILITY-CONTAMINATION",
+                   "a non-medical problem's buyer requirements carry "
+                   "medical-context content (the R443 audit defect: "
+                   "requirements from the wrong domain; the canonical "
+                   "applicability state must gate every requirement)",
+                   {"model_findings": bad[:6],
+                    "pdf_findings": pdf_bad[:8]})
+        else:
+            g.findings.append(Finding(
+                "W-CLEAN", "non-medical problem: zero medical-context "
+                "markers in the buyer requirement statements (the "
+                "canonical applicability boundary holds)",
+                "PASS", {"context_check": "independent re-derivation"}))
+    elif medical is True:
+        g.findings.append(Finding(
+            "W-MEDICAL-LEGITIMATE", "medical problem: medical-context "
+            "requirements are legitimately applicable (the paired "
+            "positive control — a global deletion strategy would "
+            "falsely fail here)", "PASS",
+            {"independent_determination": "medical"}))
+    else:
+        # the gate could not determine the context from its own view.
+        # If the record claims MEDICAL with a COHERENT score table, the
+        # disagreement is view loss (the package's problem text is a
+        # lossy projection of the canonical problem) — surfaced for
+        # review, never auto-blocked (Art. XXV). A non-medical/UNKNOWN
+        # record with an undeterminable view also stays WARN.
+        if claimed_ctx in _MEDICAL_CTX and medical_table_hits > 0:
+            g.warn("W-MEDICAL-VIEW-LOSS", "the applicability record "
+                   f"claims {claimed_ctx} with coherent signal support "
+                   f"(score {medical_table_hits}) but the package's own "
+                   "problem text is too thin for independent "
+                   "confirmation — surfaced for review, not blocked")
+        else:
+            g.warn("W-CONTEXT-UNDETERMINED", "the problem's medical "
+                   "context could not be independently determined from "
+                   "its own text — requirement-context verification "
+                   "degrades to review (Art. XXV)")
+
+    # 3. the context class must be one of the closed vocabulary
+    ctx = str(reqs.get("context_class") or "UNKNOWN")
+    if ctx not in ("MEDICAL_IN_VIVO", "MEDICAL_EX_VIVO",
+                   "INDUSTRIAL_PROCESS", "LABORATORY_BENCH", "CONSUMER",
+                   "UNKNOWN"):
+        g.fail("W-CONTEXT-VOCAB", f"context_class {ctx!r} is outside the "
+               "closed applicability vocabulary")
+    return g
+
+
 ALL_GATES = [
     ("A", gate_A_identity_coherence),
     ("B", gate_B_problem_fidelity),
@@ -1408,4 +1675,5 @@ ALL_GATES = [
     ("T", gate_T_security),
     ("U", gate_U_semantic_audit),
     ("V", gate_V_buyer_language),
+    ("W", gate_W_applicability_integrity),
 ]

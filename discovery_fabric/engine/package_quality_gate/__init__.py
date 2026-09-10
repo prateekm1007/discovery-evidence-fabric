@@ -55,6 +55,7 @@ DIMENSION_MAP = {
     "T": "SECURITY",
     "U": "SEMANTIC_AUDIT",
     "V": "BUYER_LANGUAGE",
+    "W": "APPLICABILITY_INTEGRITY",
 }
 
 

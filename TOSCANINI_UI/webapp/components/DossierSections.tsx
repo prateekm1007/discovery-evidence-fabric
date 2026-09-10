@@ -863,6 +863,8 @@ export function PackageSection({ tab }: { tab: DossierTab }) {
     package_kind?: string | null;
     document_count?: number | null;
     package_origin?: string | null;
+    package_state?: string | null;
+    visual_gate_verdict?: string | null;
     evidence_coverage?: { used_in_design?: number; retrieved?: number } | null;
     validation_state?: unknown;
     decisive_experiment?: string | null;
@@ -876,8 +878,18 @@ export function PackageSection({ tab }: { tab: DossierTab }) {
     <div className="dtab transfer-tab">
       {t.download && (
         <a className="btn primary big download-package" href={t.download}>
-          {t.primary_action ?? "Download the technology package"}
+          {t.package_state === "ENGINEERING_DRAFT_VISUAL_RELEASE_PENDING"
+            ? "Download engineering draft (visual release pending)"
+            : (t.primary_action ?? "Download the technology package")}
         </a>
+      )}
+      {t.package_state === "ENGINEERING_DRAFT_VISUAL_RELEASE_PENDING" && (
+        <p className="faint" style={{ fontSize: 12, marginTop: 6 }}>
+          Visual gate {t.visual_gate_verdict ?? "NOT_RUN"} — this
+          engineering evaluation draft contains zero visual artifacts by
+          design (Article LXXII); the buyer release stays blocked until
+          the visual gate passes.
+        </p>
       )}
       <div className="ov-block">
         <h4>Package</h4>

@@ -57,6 +57,7 @@ import re
 from typing import Any, Dict, List, Optional, Tuple
 
 from .domain_reasoning import detect_domain_reasoned  # E21-D
+from . import applicability as _applicability  # R443: context authority
 from .candidate import Candidate, sha256_obj, utc_now
 from .design_outputs import compile_design_outputs
 from .domains import domain_label, get_domain_module
@@ -720,6 +721,38 @@ def build_engineering_spec(spec: Dict[str, Any], env: Optional[Candidate],
     detection = detect_domain_reasoned(mech_text, wrapper_text)
     domain = detection["domain"]
     module = get_domain_module(domain)
+
+    # R443: the ONE canonical problem-context applicability decision.
+    # The problem's OWN words (user problem + recorded problem
+    # statement + invention mechanism/intervention) decide the context
+    # class; the domain module's context-carrying candidates are then
+    # filtered BY that decision (exclusions recorded, never stripped,
+    # never re-guessed downstream: Art. X one authority — the CIO,
+    # the website and the package compiler consume this record).
+    user_problem = ""
+    if env is not None and isinstance(getattr(env, "problem", None), dict):
+        ep = env.problem
+        user_problem = " ".join(str(ep.get(k) or "") for k in
+                                ("user_text", "failure_mode", "device",
+                                 "objective"))
+    problem_text = " ".join(
+        str(x or "") for x in (
+            user_problem,
+            " ".join(str(problem.get(k, "")) for k in
+                     ("device", "failure", "constraint")),
+            mech_text))
+    applicability = _applicability.detect_applicability(problem_text)
+    context_class = applicability["context_class"]
+    filtered = _applicability.filter_domain_module_content(
+        module, context_class)
+    # the module VIEW the rest of this builder consumes is the
+    # context-filtered view (physics keys unchanged — governing models,
+    # equations, critical parameters are context-free)
+    module = dict(module)
+    module["architecture_blocks"] = filtered["architecture_blocks"]
+    module["materials_candidates"] = filtered["materials_candidates"]
+    module["manufacturing_candidates"] = filtered["manufacturing_candidates"]
+    module["standards_candidates"] = filtered["standards_candidates"]
 
     graph = build_design_graph(spec, env)
     equations = select_equations(spec, domain)
@@ -1400,6 +1433,26 @@ def build_engineering_spec(spec: Dict[str, Any], env: Optional[Candidate],
             "assumptions": detection.get("assumptions"),
             "limitations": detection.get("limitations")},
         "why_this_domain": why_this_domain,
+        # R443: the canonical problem-context applicability state — ONE
+        # authority (this record); the CIO, the website, the package
+        # compiler and the buyer documents are CONSUMERS. The context
+        # requirements projection and the domain-content exclusions ride
+        # with it so every downstream requirement traces HERE.
+        "applicability": {
+            **applicability,
+            "requirements": _applicability.context_requirements(
+                context_class),
+            "domain_content_exclusions": filtered[
+                "excluded_context_mismatch"],
+            "filter_basis": filtered["filter_basis"],
+            "canonical_domain": {
+                "domain": domain,
+                "label": domain_label(domain),
+                "selection": "engineering_specification.why_this_domain "
+                             "(the E21-D phenomena-layer domain decision "
+                             "— physics authority, unchanged by R443)",
+            },
+        },
         "engineering_disciplines": module["disciplines"],
         "system_architecture": {
             "description": (
@@ -1522,6 +1575,15 @@ def build_engineering_spec(spec: Dict[str, Any], env: Optional[Candidate],
                 "unresolved-uncertainty register",
                 "domain equation set (symbolic; sources and applicability "
                 "judgments identified)"],
+            # R443 (R440 completion): the buyer's VERIFICATION duty is
+            # transferred explicitly (the R370 portfolio boundary
+            # carried 'YOU MUST VERIFY'; the R440 rewrite dropped it —
+            # restored from the verification matrix + validation rows)
+            "buyer_must_verify": [
+                f"{v['id']}: {v['method']}"
+                for v in graph["verifications"]] or
+                ["NOT ESTABLISHED (no verification duty derivable — the "
+                 "buyer's first verification action is defining one)"],
             "buyer_must_create": [
                 "actual geometry and detailed design",
                 "sourced engineering parameters and acceptance thresholds",

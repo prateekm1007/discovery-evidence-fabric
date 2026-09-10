@@ -1,0 +1,90 @@
+{
+  "artifact_type": "R443_ROUND_RECORD",
+  "round": "R443",
+  "created_at": "2026-09-10",
+  "directive": "R443 / fix all the issues the auditor pointed (independent audit of deployed SHA 0b58f106; evidence: upload/toscanini-technology-audit.zip \u2014 fresh-package-audit.json, independent-gate-tests.json, production-observations.json)",
+  "reviewer_provenance": "AI_REVIEW (Art. LXVII)",
+  "mandatory_reads_completed": "EPISTEMIC_CONSTITUTION.md v2.3.0 re-read before the final commit (Preamble, Discovery Imperative, Articles I-LXXII incl. Art. III verifier-never-trusts-claimant, Art. XXVIII no silent semantic promotion, Art. LXXII visual gate blocks release); GOVERNANCE/* read at round start",
+  "audit_findings_fixed": {
+    "1_status_integrity": {
+      "finding": "run ts_cbf63298bfc1: SYNTHESIZE FAILED_EXPLICIT (transport/CALL_FAILED), 11 stages SKIPPED_UPSTREAM_FAILURE, yet status COMPLETE + final_status EVOLVED_INVENTION_CANDIDATE (status words outran the run's own records)",
+      "fix": "state_integrity.py (new module: evolution_status_violations, experiment_claim_violations, evidence_supported_honest, honest_fallback_status) + run.py _evolution_final_status + run_state.py terminal_outcome + user_state.py \u2014 a surviving BASELINE_FALLBACK generation (0 evolution generations, no causal delta) presents as INVENTION_REQUIRES_EXPERIMENT, never EVOLVED; evidence-supported requires BOUND references (Art. XXI.1)",
+      "tests": "tests/test_r443_state_integrity.py"
+    },
+    "2_domain_applicability": {
+      "finding": "the industrial wastewater heat-exchanger package carried MEDICAL buyer requirements (patient/reservoir interfaces, medical tubing, FDA 510(k)/PMA, neurosurgery channels) + fluidics-medical architecture blocks on a thermal system",
+      "fix": "applicability.py (new canonical problem-context authority: detect_applicability/context_requirements/filter_domain_module_content) + domains.py context de-conflation (architecture_blocks_medical + applicability_context tags) + engineering_spec.py + elite_documents/elite_package + Gate W (applicability integrity) in package_quality_gate/gates.py",
+      "tests": "tests/test_r443_domain_applicability.py (industrial negative control, medical positive control, adversarial contamination blocks release)"
+    },
+    "3_release_authority": {
+      "finding": "geometry/visual gates FAILED (no_duplicate_model, family_feature, semantic_identity) and the render stage was RENDER_SKIPPED_LOW_MEMORY (gate NOT_RUN, release_blocked) \u2014 yet the package ZIP served with download_http 200",
+      "fix": "server.py package_release_decision (Art. LXXII typed release state: VISUAL_GATE NOT_RUN/FAIL -> 409 TYPED_STATE by default, engineering-draft ZIP only under ?release=engineering_draft) + dossier.py typed transfer tab + run_state/user_state typed labels + DossierSections.tsx",
+      "tests": "tests/test_r443_release_authority.py"
+    },
+    "4_duplicate_geometry": {
+      "finding": "geometry gate FAILED no_duplicate_model: module_01==module_02 (identical vertex hashes) \u2014 every unmapped module was placed at the SAME coordinates with the SAME box in 4 of 7 family builders (thermal/mechanical/energy_storage fully, fluid partially)",
+      "fix": "domain_geometry.py: distinct grid placement per module in all four builders (column stride > box width, row wrap); the R442-FEEDBACK DEFECT 2 class closed at the geometry source",
+      "tests": "tests/test_r443_audit_fixes.py::TestFamilyArchetypes::test_four_modules_no_duplicates_no_interference"
+    },
+    "5_missing_family_features": {
+      "finding": "visual gate FAILED family_feature_any_heat_heat_source_heat_sink; semantic gate FAILED domain_architecture_present (not_visualized: heat_sink, heat_source) \u2014 the THERMAL_SYSTEM spec never carried heat_source/heat_sink because no recorded subsystem mapped to them",
+      "fix": "domain_spec.py: family-definitional structural components for the DEFINITIONAL families (THERMAL_SYSTEM: heat_source/heat_sink/coolant_loop; FLUID_DEVICE: inlet_port/outlet_port/valve_stage; MEDICAL_DEVICE: flow_lumen; ELECTRONIC_SYSTEM: power_stage; ENERGY_STORAGE: bus_bars) with honest roles and provenance aliases (mapped_from + recorded_aliases preserved). VEHICLE deliberately NOT included: its acceptance contract is the mapping-derived SOLAR-EV case \u2014 a battery-EV must not get an invented solar roof (the R442 causal-geometry boundary; the semantic gate surfaces unmapped acceptance components as not_visualized instead of inventing them)",
+      "tests": "tests/test_r443_audit_fixes.py::TestFamilyArchetypes (audit thermal case passes every gate; acceptance satisfied; the R433 not-invented contract re-verified)"
+    },
+    "6_visual_gate_bypass_geometry_identity": {
+      "finding": "independent-gate-tests geometry_attack: substituted exported hero GLB (extents 1,1,1 -> 100,1,1, different sha256) with renderer_record_unchanged \u2014 BOTH baseline and changed gates PASSED; geometry_identity source was 'untrusted renderer assertion'",
+      "fix": "visual_gate.py independent_geometry_identity: the gate itself parses BOTH the canonical source GLB and the exported hero GLB (own tools), compares mesh/vert/tri counts AND a scale/translation-invariant per-part shape signature (normalized axis extents \u2014 catches non-uniform substitution); re-verifies the source GLB's sha256 against the render record (source substitution catch); the renderer's topology_comparison demoted to recorded corroboration, never the pass basis (Art. III)",
+      "tests": "tests/test_r443_audit_fixes.py::TestGeometrySubstitutionAttack (substitution, full-gate block, source substitution, identical-bytes positive control)"
+    },
+    "7_visual_gate_bypass_node_names": {
+      "finding": "stripped_node_names: node names stripped from the raw GLB (raw_named_nodes=0) \u2014 the gate still passed because trimesh's scene graph synthesizes fallback names",
+      "fix": "visual_gate.py check_node_naming now parses the RAW glTF JSON chunk (byte-level GLB parse): a mesh node without a non-empty name in the glTF JSON is UNNAMED, whatever any loader claims; trimesh kept as corroborating count only",
+      "tests": "tests/test_r443_audit_fixes.py::TestStrippedNodeNamesAttack (byte-level strip attack + named positive control)"
+    },
+    "8_visual_gate_missing_views": {
+      "finding": "files_present was only hero.glb/hero.png/poster.png/unnamed.glb; missing_required_views: turntable, exploded, section, orthographic, dimension \u2014 the gate passed a hero+poster-only render",
+      "fix": "visual_gate.py required_views_check: every required view (BASE set + exploded when multi-part + turntable frame 1) must be on disk with bytes hashing to the render record's sha256, or typed-skipped with a reason \u2014 and a typed skip is accepted ONLY for the exploded pair (single-part architecture); operator-disabled views (render payload config) are recorded as config-disabled, never silently missing; a view whose bytes no longer match the record = substituted artifact",
+      "tests": "tests/test_r443_audit_fixes.py::TestMissingRequiredViews (missing, typed-skip-refused, single-part exploded accepted, swapped bytes, operator-disabled, full-set positive control)"
+    },
+    "9_model_route_provenance": {
+      "finding": "model_route attributed provider 'unpaywall' to ALL 16 stage roles (ADJUDICATION, RANK, FREEZE...) \u2014 evidence-source provenance (retrieval providers embedded in every envelope's evidence records) was mis-reported as model execution; unpaywall is a retrieval source and 14 of those stages never ran",
+      "fix": "run_state.py _walk_providers: model-call records only \u2014 evidence-context subtrees (evidence/records/retrieval/sources/provider_outcomes/prior_art/...) excluded, retrieval-provenance shapes (retrieved_at/query_or_method/api_version) excluded, registered evidence-source providers (SOURCE_REGISTRY ids + normalized scholarly names) never attributed as model execution; genuine LLM transport records (incl. the typed CALL_FAILED synthesize attempt) keep their roles",
+      "tests": "tests/test_r443_audit_fixes.py::TestModelRouteProvenance (the audit replica: 16 envelopes + unpaywall evidence -> zero unpaywall attributions; skipped stages contribute nothing; the honest route shows evidence_extraction + the failed SYNTHESIZE transport)"
+    },
+    "10_retrieval_routing_grammar": {
+      "finding": "production-observations early projection: fra_rail_accidents status GRAMMAR_MISMATCH \u2014 the free-text failure query was sent to a date-floor source ('YYYY-MM-DD date floor ($where date >= X) \u2014 engine routing error, not a provider failure')",
+      "fix": "problem_builder.py: date-grammar routing guard \u2014 when a source's QUERY_GRAMMAR is a YYYY-MM-DD date window and the planned query is free text, the router refuses BEFORE any request and records NOT_QUERIED_GRAMMAR with the honest routing note (the connector grammar gate stays as defense in depth)",
+      "tests": "tests/test_r443_audit_fixes.py::TestDateGrammarRouting (no request sent to the date source; doe_osti's R399 SUSPENDED_RELEVANCE row unchanged; routing note rides the problem statement)"
+    },
+    "11_interference_witness": {
+      "finding": "R442 FEEDBACK_TO_CODER_1 DEFECT 2 (four modules in one cell) + DEFECT 3 (enclosed sub-parts with no declared mating) \u2014 the suggested engineering-side non-interference witness was never built",
+      "fix": "geometry_quality_gate.py component_interference_witness (deterministic, world-space AABB, link conduits excluded): two distinct parts mutually co-locating (overlap > 0.9 of the smaller AND > 0.6 of the larger bbox) without a declared mating interface = component_interference FAILURE; nested pairs (conceptual containment) are DISCLOSED with their mating state for the engineering realization boundary to resolve (bore/access features when engineering geometry is earned)",
+      "tests": "tests/test_r443_audit_fixes.py::TestFamilyArchetypes (stacked-duplicate attack fails; mated co-location disclosed not failed; all 7 archetypes pass)"
+    }
+  },
+  "boundary_compliance": {
+    "visual_compiler_untouched": "visual_compiler.py, render_worker.py, renderer/render.js, scene_builder.py, camera_solver.py, material_mapper.py NOT modified \u2014 only visual_gate.py, the independent VERIFIER, was hardened (R441's own principle: 'the verifier never trusts the claimant'; the R442 do-not-modify-Visual-Compiler constraint respected in letter and spirit)",
+    "art_llxiv_disposition": "no files retired this round",
+    "epistemics": "no gate weakened; every fix adds measurement or honest typed states; no synthetic pass introduced anywhere"
+  },
+  "git_baseline_art22": {
+    "local_head_at_start": "628dac47 (R440) with the R443 in-progress working tree",
+    "deployed_production_at_start": "0b58f106 (the audit's engine_snapshot and health identity)",
+    "clean_state_replay": "fresh clone + full working-tree patch applied: tests/test_r443_* + test_r441_visual_compiler + test_r440_canonical_package_compiler + test_r432_domain_geometry + test_r433_one_canonical_model = 159 passed, 2 skipped, 36 subtests passed",
+    "final_head": null
+  },
+  "verification": {
+    "adversarial_tests": "tests/test_r443_audit_fixes.py \u2014 20 tests replicating the auditor's exact attacks (A1-A5 gate bypasses, B1-B5 geometry archetypes, C model_route, D routing); all pass",
+    "regression": "full tests/ suite compared file-by-file against the clean tree: the failure set is IDENTICAL (pre-existing environment-dependent failures: missing benchmark artifacts, missing coder2_blind fixture, no local webapp build); the single test updated is test_r424_elite_package_factory.py::test_transfer_manifest_sections (9 -> 11 sections: the R443 canonical-applicability projection added by the applicability repair)",
+    "known_standing_blockers": [
+      "production memory: 512 MB free plan still types RENDER_SKIPPED_LOW_MEMORY on every fresh production run (owner-gated payment info; escalated R441/R442) \u2014 the R443 release authority makes the blocked state explicit at the package consumer instead of shipping an ambiguous download",
+      "physics_ready false under provider degradation (transport/CALL_FAILED typed honestly; state integrity now presents such runs as INVENTION_REQUIRES_EXPERIMENT)"
+    ]
+  },
+  "reconciliation_with_r443_c2": {
+    "situation": "origin/main had advanced with R443-C2 (Coder 2's response to the same audit: Visual Integrity Hardening at 6f64ffa3 + 3 records commits, deployed and health-verified) while this round's R440 + R443 work sat locally. The two rounds converged on HERO_RELEASE_STATE.json with compatible schemas and both hardened the gate \u2014 complementary strengths, overlapping files.",
+    "resolution": "rebased R440 + R443 onto 790abb99; visual_gate.py merged: the R443-C2 implementation is the base (raw glTF document node identity via gltf_doc, the 23-artifact visual_set ladder with COMPLETE_PASS/PARTIAL/NOT_RUN/FAIL verdicts, measured material distinction, typed render records, wrong-source witness) with THIS round's additions integrated: (1) independent_geometry_identity \u2014 the gate re-measures BOTH the canonical source GLB and the exported hero GLB from the raw documents (counts from accessors + a scale/translation-invariant per-part shape signature from walk_scene bounds; NO trimesh \u2014 the C2 naming-retirement discipline preserved); the renderer's topology_comparison demoted to recorded corroboration; the source GLB's recorded sha256 re-verified against disk; (2) view_hash_integrity \u2014 every present ladder artifact must hash to the render record's bytes (a swapped-after-render view is a FAIL, never silently a PARTIAL). The trust-based topology check (the audit's geometry_attack hole) is REPLACED by the independent re-measure.",
+    "tests_reconciled": "tests/test_r443_audit_fixes.py rewritten against the merged API (check_canonical_node_identity, visual_set ladder, view_hash_integrity, independent_geometry_identity); test_r443_release_authority.py updated to the COMPLETE_PASS vocabulary (_visual_release_ok); R443-C2's test_trimesh_naming_rule_is_retired now PASSES (this round's signature is loader-free by design); combined suites 128 passed / 9 skipped",
+    "boundary": "both rounds' boundary discipline held: the render pipeline itself (renderer/render.js was C2's operator-sanctioned change; this round touched only the verifier) \u2014 zero double-modification of engineering truth"
+  }
+}
