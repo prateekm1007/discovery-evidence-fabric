@@ -1,0 +1,440 @@
+{
+ "diversity": "CANDIDATE_DIVERSITY (E16-E)",
+ "version": "1.1.0",
+ "min_candidates": 10,
+ "available_providers": [
+  "openrouter",
+  "nvidia"
+ ],
+ "operator_override": null,
+ "angles": [
+  "cross_industry_transfer",
+  "mechanism_inversion",
+  "simplification",
+  "multi_physics_hybrid",
+  "constraint_first"
+ ],
+ "candidates": [
+  {
+   "angle": "cross_industry_transfer",
+   "provider_id": "openrouter",
+   "status": "OK",
+   "model": "meta/llama-3.2-11b-vision-instruct",
+   "prompt_hash": "6901e8b738fc90db25ab7090c3ba8c681b6d7df71e085a3cf1eb2d9589cd8762",
+   "output_hash": "963a2799102cde11061e92bf21ccc80cbed15f16f0e0c51732d703a908740c71",
+   "fields": {
+    "mechanism": "The use of ultrasonic cleaning can reduce biofilm development on surfaces.",
+    "intervention": "Implement an ultrasonic cleaning system to clean the stainless steel plate heat exchanger channels at regular intervals, thereby reducing biofilm development and fouling.",
+    "expected_effect": "This intervention is expected to reduce biofilm development and fouling, thereby maintaining a heat transfer coefficient above 2500 W/m2K for 12 months.",
+    "falsification_test": "Measure the heat transfer coefficient and biofilm development on the ultrasonically cleaned surface after 12 months of operation in the district cooling loop.",
+    "mechanism_source_span": "\"The use of ultrasonic cleaning can reduce biofilm development on surfaces.\"",
+    "span_derivation": {
+     "n_shared": 8,
+     "shared_terms": [
+      "biofilm",
+      "can",
+      "cleaning",
+      "development",
+      "reduce",
+      "surface",
+      "ultrasonic",
+      "use"
+     ],
+     "span_terms_n": 8,
+     "ratio": 1.0,
+     "underived": false,
+     "state": "MEASURED",
+     "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+    }
+   },
+   "span_underived": false,
+   "candidate_id": "cand:DIV:cross_industry_transfer:openrouter:963a2799102c"
+  },
+  {
+   "angle": "cross_industry_transfer",
+   "provider_id": "nvidia",
+   "status": "OK",
+   "model": "meta/llama-3.2-11b-vision-instruct",
+   "prompt_hash": "6901e8b738fc90db25ab7090c3ba8c681b6d7df71e085a3cf1eb2d9589cd8762",
+   "output_hash": "6edd381070d3cfc13a23ff76e85590857466535d890470fe8b920e2594725030",
+   "fields": {
+    "mechanism": "The formation of a biofilm on the surface of the plate heat exchanger is reduced by the use of a modified surface, which alters the surface energy and hydrophobicity, thereby inhibiting the adhesion of microorganisms.",
+    "intervention": "Install ultrasonic transducers in the plate heat exchanger channels to periodically remove biofilm and scale deposits using ultrasonic cleaning.",
+    "expected_effect": "The ultrasonic cleaning is expected to remove biofilm and scale deposits, thereby maintaining a heat transfer coefficient above 2500 W/m2K for 12 months.",
+    "falsification_test": "Measure the heat transfer coefficient and biofilm formation after ultrasonic cleaning and compare to the baseline values.",
+    "mechanism_source_span": "\"The ultrasonic cleaning was effective in removing biofilm and scale deposits from the surface of the plate heat exchanger.\"",
+    "span_derivation": {
+     "n_shared": 9,
+     "shared_terms": [
+      "biofilm",
+      "cleaning",
+      "deposit",
+      "exchanger",
+      "heat",
+      "plate",
+      "scale",
+      "surface",
+      "ultrasonic"
+     ],
+     "span_terms_n": 11,
+     "ratio": 0.818,
+     "underived": false,
+     "state": "MEASURED",
+     "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+    }
+   },
+   "span_underived": false,
+   "candidate_id": "cand:DIV:cross_industry_transfer:nvidia:6edd381070d3"
+  },
+  {
+   "angle": "mechanism_inversion",
+   "provider_id": "openrouter",
+   "status": "OK",
+   "model": "meta/llama-3.2-11b-vision-instruct",
+   "prompt_hash": "e81b5c3447cf3a32ff8606f0164c1ca815229305b6509e47f399e45b67e5804f",
+   "output_hash": "24016b2907813d7c4be7a72438ee085fa846ecf01be878eb0b42d6e9de1aaf01",
+   "fields": {
+    "mechanism": "Biofilm development on stainless steel surfaces can be promoted by creating a surface roughness that increases the adhesion of microorganisms.",
+    "intervention": "Intentionally create surface roughness on the stainless steel plate heat exchanger channels to increase biofilm adhesion and accumulation.",
+    "expected_effect": "The increased surface roughness should promote biofilm development, thereby reducing the heat transfer coefficient and increasing pressure drop between cleanings.",
+    "falsification_test": "Measure the heat transfer coefficient and pressure drop of the modified-surface plate heat exchanger after 12 months of operation in the district cooling loop, comparing it to the baseline stainless steel plate heat exchanger.",
+    "mechanism_source_span": "(Note: This inverted mechanism is not supported by the retrieved paper, but it is an exploration angle to consider alternative solutions.)",
+    "span_derivation": {
+     "n_shared": 0,
+     "shared_terms": [],
+     "span_terms_n": 14,
+     "ratio": 0.0,
+     "underived": true,
+     "state": "MEASURED",
+     "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+    }
+   },
+   "span_underived": true,
+   "candidate_id": "cand:DIV:mechanism_inversion:openrouter:24016b290781"
+  },
+  {
+   "angle": "mechanism_inversion",
+   "provider_id": "nvidia",
+   "status": "OK",
+   "model": "meta/llama-3.2-11b-vision-instruct",
+   "prompt_hash": "e81b5c3447cf3a32ff8606f0164c1ca815229305b6509e47f399e45b67e5804f",
+   "output_hash": "9895ffc1d2c008cbb21891820c3084e135d0e5744d447ecda67dbc2309e6dbad",
+   "fields": {
+    "mechanism": "Biofilm development on stainless steel surfaces can be promoted by creating a surface roughness that increases the adhesion of microorganisms.",
+    "intervention": "Intentionally create surface roughness on the stainless steel plate heat exchanger channels to increase biofilm adhesion and accumulation.",
+    "expected_effect": "The increased surface roughness should promote biofilm development, thereby reducing the heat transfer coefficient and increasing pressure drop between cleanings.",
+    "falsification_test": "Measure the heat transfer coefficient and pressure drop of the modified-surface plate heat exchanger after 12 months of operation in the district cooling loop, comparing it to the baseline stainless steel plate heat exchanger.",
+    "mechanism_source_span": "(Note: This inverted mechanism is not supported by the retrieved paper, and the MECHANISM_SOURCE_SPAN is left blank.)",
+    "span_derivation": {
+     "n_shared": 0,
+     "shared_terms": [],
+     "span_terms_n": 12,
+     "ratio": 0.0,
+     "underived": true,
+     "state": "MEASURED",
+     "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+    }
+   },
+   "span_underived": true,
+   "candidate_id": "cand:DIV:mechanism_inversion:nvidia:9895ffc1d2c0"
+  },
+  {
+   "angle": "simplification",
+   "provider_id": "openrouter",
+   "status": "OK",
+   "model": "meta/llama-3.2-11b-vision-instruct",
+   "prompt_hash": "7446193d69eb57b61452fdc4f58c5b64d0d9aacdd1e1671ac1818e04c2644aa6",
+   "output_hash": "4a5b24c871656c564156639490a169d5687cbf0c01ad3068b859caba731dd456",
+   "fields": {
+    "mechanism": "Biofilm development on stainless steel surfaces can be reduced by modifying the surface properties to decrease the adhesion of microorganisms.",
+    "intervention": "Apply a modified-surface coating to the stainless steel plate heat exchanger channels to reduce biofilm adhesion and accumulation.",
+    "expected_effect": "The modified surface coating should reduce biofilm and scale accumulation, thereby maintaining a heat transfer coefficient above 2500 W/m2K for 12 months.",
+    "falsification_test": "Measure the heat transfer coefficient and biofilm accumulation on the modified-surface plate heat exchanger after 12 months of operation in the district cooling loop.",
+    "mechanism_source_span": "\"A comparison of biofilm development on stainless steel and modified-surface plate heat exchangers during a 17-h milk pasteurization run.\"",
+    "span_derivation": {
+     "n_shared": 9,
+     "shared_terms": [
+      "biofilm",
+      "development",
+      "exchanger",
+      "heat",
+      "modified",
+      "plate",
+      "stainless",
+      "steel",
+      "surface"
+     ],
+     "span_terms_n": 14,
+     "ratio": 0.643,
+     "underived": false,
+     "state": "MEASURED",
+     "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+    }
+   },
+   "span_underived": false,
+   "candidate_id": "cand:DIV:simplification:openrouter:4a5b24c87165"
+  },
+  {
+   "angle": "simplification",
+   "provider_id": "nvidia",
+   "status": "OK",
+   "model": "meta/llama-3.2-11b-vision-instruct",
+   "prompt_hash": "7446193d69eb57b61452fdc4f58c5b64d0d9aacdd1e1671ac1818e04c2644aa6",
+   "output_hash": "4a5b24c871656c564156639490a169d5687cbf0c01ad3068b859caba731dd456",
+   "fields": {
+    "mechanism": "Biofilm development on stainless steel surfaces can be reduced by modifying the surface properties to decrease the adhesion of microorganisms.",
+    "intervention": "Apply a modified-surface coating to the stainless steel plate heat exchanger channels to reduce biofilm adhesion and accumulation.",
+    "expected_effect": "The modified surface coating should reduce biofilm and scale accumulation, thereby maintaining a heat transfer coefficient above 2500 W/m2K for 12 months.",
+    "falsification_test": "Measure the heat transfer coefficient and biofilm accumulation on the modified-surface plate heat exchanger after 12 months of operation in the district cooling loop.",
+    "mechanism_source_span": "\"A comparison of biofilm development on stainless steel and modified-surface plate heat exchangers during a 17-h milk pasteurization run.\"",
+    "span_derivation": {
+     "n_shared": 9,
+     "shared_terms": [
+      "biofilm",
+      "development",
+      "exchanger",
+      "heat",
+      "modified",
+      "plate",
+      "stainless",
+      "steel",
+      "surface"
+     ],
+     "span_terms_n": 14,
+     "ratio": 0.643,
+     "underived": false,
+     "state": "MEASURED",
+     "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+    }
+   },
+   "span_underived": false,
+   "candidate_id": "cand:DIV:simplification:nvidia:4a5b24c87165"
+  },
+  {
+   "angle": "multi_physics_hybrid",
+   "provider_id": "openrouter",
+   "status": "OK",
+   "model": "meta/llama-3.2-11b-vision-instruct",
+   "prompt_hash": "c88e2bccc4b5cfe72ec06174a4c09a4fd8a578d3814d7ad6b55cf161b97b6f89",
+   "output_hash": "e7e7036b5b85ae29ded8ff670a627063f42935befffabb822c4514e1d77b8407",
+   "fields": {
+    "mechanism": "The combination of thermal and acoustic properties of a surface can influence the development of biofilm on plate heat exchangers.",
+    "intervention": "Integrate ultrasonic cleaning technology into the plate heat exchanger design to create a surface that disrupts biofilm formation through acoustic waves, while also maintaining a high heat transfer coefficient.",
+    "expected_effect": "The ultrasonic cleaning technology will create a surface that is less conducive to biofilm formation, reducing the pressure drop and maintaining a heat transfer coefficient above 2500 W/m2K for 12 months.",
+    "falsification_test": "Measure the heat transfer coefficient and pressure drop of the ultrasonic plate heat exchanger after 12 months of operation in the district cooling loop, and compare it to the unmodified plate heat exchanger.",
+    "mechanism_source_span": "\"The modified-surface plate heat exchangers showed a significant reduction in biofilm development, which can be attributed to the increased hydrophobicity and reduced surface energy of the surface.\"",
+    "span_derivation": {
+     "n_shared": 7,
+     "shared_terms": [
+      "biofilm",
+      "can",
+      "development",
+      "exchanger",
+      "heat",
+      "plate",
+      "surface"
+     ],
+     "span_terms_n": 17,
+     "ratio": 0.412,
+     "underived": false,
+     "state": "MEASURED",
+     "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+    }
+   },
+   "span_underived": false,
+   "candidate_id": "cand:DIV:multi_physics_hybrid:openrouter:e7e7036b5b85"
+  },
+  {
+   "angle": "multi_physics_hybrid",
+   "provider_id": "nvidia",
+   "status": "OK",
+   "model": "meta/llama-3.2-11b-vision-instruct",
+   "prompt_hash": "c88e2bccc4b5cfe72ec06174a4c09a4fd8a578d3814d7ad6b55cf161b97b6f89",
+   "output_hash": "e7e7036b5b85ae29ded8ff670a627063f42935befffabb822c4514e1d77b8407",
+   "fields": {
+    "mechanism": "The combination of thermal and acoustic properties of a surface can influence the development of biofilm on plate heat exchangers.",
+    "intervention": "Integrate ultrasonic cleaning technology into the plate heat exchanger design to create a surface that disrupts biofilm formation through acoustic waves, while also maintaining a high heat transfer coefficient.",
+    "expected_effect": "The ultrasonic cleaning technology will create a surface that is less conducive to biofilm formation, reducing the pressure drop and maintaining a heat transfer coefficient above 2500 W/m2K for 12 months.",
+    "falsification_test": "Measure the heat transfer coefficient and pressure drop of the ultrasonic plate heat exchanger after 12 months of operation in the district cooling loop, and compare it to the unmodified plate heat exchanger.",
+    "mechanism_source_span": "\"The modified-surface plate heat exchangers showed a significant reduction in biofilm development, which can be attributed to the increased hydrophobicity and reduced surface energy of the surface.\"",
+    "span_derivation": {
+     "n_shared": 7,
+     "shared_terms": [
+      "biofilm",
+      "can",
+      "development",
+      "exchanger",
+      "heat",
+      "plate",
+      "surface"
+     ],
+     "span_terms_n": 17,
+     "ratio": 0.412,
+     "underived": false,
+     "state": "MEASURED",
+     "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+    }
+   },
+   "span_underived": false,
+   "candidate_id": "cand:DIV:multi_physics_hybrid:nvidia:e7e7036b5b85"
+  },
+  {
+   "angle": "constraint_first",
+   "provider_id": "openrouter",
+   "status": "OK",
+   "model": "meta/llama-3.2-11b-vision-instruct",
+   "prompt_hash": "4bc087db154e8fd3b7344eae14e761c1800d58e20a3f639004227b76a89ce7d2",
+   "output_hash": "c6cd13ea28bed84b2c56b7eed687f34345c170a80b5714a7b3995ac79ee8a94a",
+   "fields": {
+    "mechanism": "Biofilm development on stainless steel surfaces is reduced by modifying the surface to increase the hydrophobicity and roughness.",
+    "intervention": "Apply a hydrophobic and rough surface coating to the stainless steel plate channels in the heat exchanger to reduce biofilm accumulation.",
+    "expected_effect": "The modified surface coating should reduce biofilm development, thereby maintaining a higher heat transfer coefficient and reducing pressure drop between cleanings.",
+    "falsification_test": "Measure the heat transfer coefficient and pressure drop of the modified heat exchanger after 12 months of operation and compare it to the baseline heat exchanger.",
+    "mechanism_source_span": "\"Biofilm development on stainless steel surfaces is reduced by modifying the surface to increase the hydrophobicity and roughness.\"",
+    "span_derivation": {
+     "n_shared": 10,
+     "shared_terms": [
+      "biofilm",
+      "development",
+      "hydrophobicity",
+      "increase",
+      "modifying",
+      "reduced",
+      "roughness",
+      "stainless",
+      "steel",
+      "surface"
+     ],
+     "span_terms_n": 10,
+     "ratio": 1.0,
+     "underived": false,
+     "state": "MEASURED",
+     "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+    }
+   },
+   "span_underived": false,
+   "candidate_id": "cand:DIV:constraint_first:openrouter:c6cd13ea28be"
+  },
+  {
+   "angle": "constraint_first",
+   "provider_id": "nvidia",
+   "status": "OK",
+   "model": "meta/llama-3.2-11b-vision-instruct",
+   "prompt_hash": "4bc087db154e8fd3b7344eae14e761c1800d58e20a3f639004227b76a89ce7d2",
+   "output_hash": "c6cd13ea28bed84b2c56b7eed687f34345c170a80b5714a7b3995ac79ee8a94a",
+   "fields": {
+    "mechanism": "Biofilm development on stainless steel surfaces is reduced by modifying the surface to increase the hydrophobicity and roughness.",
+    "intervention": "Apply a hydrophobic and rough surface coating to the stainless steel plate channels in the heat exchanger to reduce biofilm accumulation.",
+    "expected_effect": "The modified surface coating should reduce biofilm development, thereby maintaining a higher heat transfer coefficient and reducing pressure drop between cleanings.",
+    "falsification_test": "Measure the heat transfer coefficient and pressure drop of the modified heat exchanger after 12 months of operation and compare it to the baseline heat exchanger.",
+    "mechanism_source_span": "\"Biofilm development on stainless steel surfaces is reduced by modifying the surface to increase the hydrophobicity and roughness.\"",
+    "span_derivation": {
+     "n_shared": 10,
+     "shared_terms": [
+      "biofilm",
+      "development",
+      "hydrophobicity",
+      "increase",
+      "modifying",
+      "reduced",
+      "roughness",
+      "stainless",
+      "steel",
+      "surface"
+     ],
+     "span_terms_n": 10,
+     "ratio": 1.0,
+     "underived": false,
+     "state": "MEASURED",
+     "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+    }
+   },
+   "span_underived": false,
+   "candidate_id": "cand:DIV:constraint_first:nvidia:c6cd13ea28be"
+  }
+ ],
+ "built_at": "2026-09-10T20:45:59+00:00Z",
+ "usable_candidates": 10,
+ "status": "GRID_RUN",
+ "diversity_metrics": {
+  "candidates_measured": 10,
+  "mean_pairwise_token_distance": 0.638,
+  "distinct_mechanism_clusters": 5,
+  "cluster_sizes": [
+   4,
+   2,
+   2,
+   1,
+   1
+  ],
+  "rewrite_pairs_jaccard_ge_0_8": [
+   {
+    "a": "cand:DIV:mechanism_inversion:openrouter:24016b290781",
+    "b": "cand:DIV:mechanism_inversion:nvidia:9895ffc1d2c0",
+    "jaccard": 1.0
+   },
+   {
+    "a": "cand:DIV:simplification:openrouter:4a5b24c87165",
+    "b": "cand:DIV:simplification:nvidia:4a5b24c87165",
+    "jaccard": 1.0
+   },
+   {
+    "a": "cand:DIV:multi_physics_hybrid:openrouter:e7e7036b5b85",
+    "b": "cand:DIV:multi_physics_hybrid:nvidia:e7e7036b5b85",
+    "jaccard": 1.0
+   },
+   {
+    "a": "cand:DIV:constraint_first:openrouter:c6cd13ea28be",
+    "b": "cand:DIV:constraint_first:nvidia:c6cd13ea28be",
+    "jaccard": 1.0
+   }
+  ],
+  "architecture_term_count": 51,
+  "architecture_terms_sample": [
+   "accumulation",
+   "acoustic",
+   "adhesion",
+   "also",
+   "apply",
+   "biofilm",
+   "channels",
+   "clean",
+   "cleaning",
+   "coating",
+   "coefficient",
+   "create",
+   "deposits",
+   "design",
+   "development",
+   "disrupts",
+   "exchanger",
+   "formation",
+   "fouling",
+   "heat",
+   "high",
+   "hydrophobic",
+   "implement",
+   "increase"
+  ],
+  "failure_mode_signal_count": 1,
+  "failure_modes_invoked_sample": [
+   "crosstalk between elements corrupting detection"
+  ],
+  "prior_art_query_set_count": 6,
+  "detected_domain": "acoustic"
+ },
+ "entry": {
+  "entry_helper_version": "stage_entry/1.0.0",
+  "stage": "EXPLORATION_GRID",
+  "entry_status": "ALLOWED",
+  "prerequisite": "VERIFIED_EVIDENCE",
+  "prerequisite_evidence": {
+   "n_verified_evidence_items": 15,
+   "n_direct_support": 6,
+   "n_partial_support": 9,
+   "n_items_total": 17,
+   "span_binding_verified": false,
+   "basis": ">=1 evidence item classified DIRECT_SUPPORT/PARTIAL_SUPPORT, or the candidate's span binding verified (R394 s5 classification + a2/verify)"
+  }
+ }
+}
