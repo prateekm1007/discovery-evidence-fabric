@@ -1,0 +1,67 @@
+{
+ "attack_version": "independent_attack/1.0.0",
+ "candidate_id": "cal:humidity-rising-efficiency",
+ "generator_provider": null,
+ "attacker_provider": "zai",
+ "attacker_model": "glm-4-plus",
+ "independence_mode": "SEPARATE_CONTEXT",
+ "independence_note": "the attacker ran in an independent reasoning context (fresh adversarial conversation, generator reasoning never shown; no alternative provider credentialed \u2014 disclosed, never claimed as provider separation)",
+ "prompt_hash": "43cf48f2cb50fa9f4ab532114c09fcba42cf94d3b29ed8f9676b827792bffa58",
+ "output_hash": "5bb6475ebdcd03ddbafe68427519dd4f37a350ea0d8011b2f873168325e966b4",
+ "llm_status": "OK",
+ "attacked_at": "2026-09-10T17:31:44+00:00Z",
+ "items": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "verdict": "KILL",
+   "basis": "The mechanism claims fiber swelling tightens pore structure to improve capture efficiency, but evidence [ev:swell-99] shows swelling-induced pore CLOSURE degrades capture, directly contradicting the core operating principle"
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "verdict": "RISK",
+   "basis": "At 8 bar operating pressure, the claimed fiber swelling ratio of 1.0-1.6 is unrealistic as pressure would compress fibers unpredictably, altering the swelling behavior beyond the tested range"
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "verdict": "KILL",
+   "basis": "Evidence [ev:swell-99] explicitly states swelling-induced pore closure degrades performance, while the candidate claims the opposite effect without addressing this contradiction"
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "verdict": "RISK",
+   "basis": "The candidate claims dew point improvement to 3\u00b0C equivalent at 85% RH, but provides no comparative data against baseline separators under identical conditions"
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "verdict": "KILL",
+   "basis": "The cartridge compaction failure mode over 2000 hours makes long-term operation impossible without frequent maintenance, violating the requirement for reliable inline operation"
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "verdict": "RISK",
+   "basis": "The prediction of linear dew point improvement from 12\u00b0C to 3\u00b0C equivalent lacks specific measurement methodology for quantifying \"equivalent\" dew point under cycling conditions"
+  }
+ ],
+ "state": "ATTACK_RUN",
+ "overall": "KILLED",
+ "kill_basis": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "basis": "The mechanism claims fiber swelling tightens pore structure to improve capture efficiency, but evidence [ev:swell-99] shows swelling-induced pore CLOSURE degrades capture, directly contradicting the core operating principle"
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "basis": "Evidence [ev:swell-99] explicitly states swelling-induced pore closure degrades performance, while the candidate claims the opposite effect without addressing this contradiction"
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "basis": "The cartridge compaction failure mode over 2000 hours makes long-term operation impossible without frequent maintenance, violating the requirement for reliable inline operation"
+  }
+ ],
+ "counts": {
+  "KILL": 3,
+  "RISK": 3,
+  "SURVIVE": 0,
+  "INVALID": 0
+ }
+}

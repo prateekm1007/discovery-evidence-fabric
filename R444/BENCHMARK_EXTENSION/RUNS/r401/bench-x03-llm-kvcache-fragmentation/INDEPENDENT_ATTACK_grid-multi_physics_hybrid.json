@@ -1,0 +1,79 @@
+{
+ "attack_version": "independent_attack/1.0.0",
+ "candidate_id": "cand:DIV:multi_physics_hybrid:zai:8e61283b480a",
+ "generator_provider": null,
+ "attacker_provider": "zai",
+ "attacker_model": "glm-4-plus",
+ "independence_mode": "SEPARATE_CONTEXT",
+ "independence_note": "the attacker ran in an independent reasoning context (fresh adversarial conversation, generator reasoning never shown; no alternative provider credentialed — disclosed, never claimed as provider separation)",
+ "prompt_hash": "136b5ba85bf18540d4fd57bae1cddbdf60e09cd8a76b0517589e30acf4af21a3",
+ "output_hash": "1f3f7b5281433d51d8c0576f2825e834e2fe9835ec94fd16f3ce97da68de224f",
+ "llm_status": "OK",
+ "attacked_at": "2026-09-10T17:09:36+00:00Z",
+ "items": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "verdict": "KILL",
+   "basis": "The candidate incorrectly assumes thermal-induced bit-flips are the primary cause of KV-cache fragmentation issues, when the actual problem is architectural fragmentation from mixed-length requests, not thermal memory corruption as evidenced by the baseline problem description."
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "verdict": "KILL",
+   "basis": "No boundary conditions are specified, making the proposal undefined for critical factors like thermal thresholds, cooling response times, or how the system behaves when cooling capacity is exceeded."
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "verdict": "KILL",
+   "basis": "The cited evidence [doi:10.1109/icassp55912.2026.11461518] shows KV-cache offloading frameworks solve fragmentation issues without thermal intervention, directly contradicting the thermal mitigation approach."
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "verdict": "KILL",
+   "basis": "The proposed thermal monitoring adds significant overhead to the baseline system without addressing the core fragmentation issue, making it worse than the baseline during normal operation due to added cooling costs and complexity."
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "verdict": "KILL",
+   "basis": "The proposal requires per-KV-cache block thermal monitoring which is architecturally impossible in current GPU memory systems that only provide aggregate memory temperature readings at the GPU level."
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "verdict": "KILL",
+   "basis": "The testable prediction fails to isolate thermal effects from other variables, as bit-flip rates could be caused by numerous factors beyond temperature, making it impossible to validate the claimed causal relationship."
+  }
+ ],
+ "state": "ATTACK_RUN",
+ "overall": "KILLED",
+ "kill_basis": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "basis": "The candidate incorrectly assumes thermal-induced bit-flips are the primary cause of KV-cache fragmentation issues, when the actual problem is architectural fragmentation from mixed-length requests, not thermal memory corruption as evidenced by the baseline problem description."
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "basis": "No boundary conditions are specified, making the proposal undefined for critical factors like thermal thresholds, cooling response times, or how the system behaves when cooling capacity is exceeded."
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "basis": "The cited evidence [doi:10.1109/icassp55912.2026.11461518] shows KV-cache offloading frameworks solve fragmentation issues without thermal intervention, directly contradicting the thermal mitigation approach."
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "basis": "The proposed thermal monitoring adds significant overhead to the baseline system without addressing the core fragmentation issue, making it worse than the baseline during normal operation due to added cooling costs and complexity."
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "basis": "The proposal requires per-KV-cache block thermal monitoring which is architecturally impossible in current GPU memory systems that only provide aggregate memory temperature readings at the GPU level."
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "basis": "The testable prediction fails to isolate thermal effects from other variables, as bit-flip rates could be caused by numerous factors beyond temperature, making it impossible to validate the claimed causal relationship."
+  }
+ ],
+ "counts": {
+  "KILL": 6,
+  "RISK": 0,
+  "SURVIVE": 0,
+  "INVALID": 0
+ }
+}

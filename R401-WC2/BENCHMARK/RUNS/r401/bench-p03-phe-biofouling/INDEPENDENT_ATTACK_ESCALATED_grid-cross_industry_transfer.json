@@ -1,0 +1,52 @@
+{
+ "stage": "INDEPENDENT_ATTACK",
+ "candidate_id": "cand:DIV:cross_industry_transfer:zai:fdc25b4fd2c8",
+ "escalation": {
+  "gate_version": "attacker_calibration/1.0.0",
+  "instrument": "independent_attack/1.0.0",
+  "calibration_state": "NOT_CALIBRATED",
+  "terminal_kill_admissible": false,
+  "measured": {
+   "coverage": 1.0,
+   "parse_completeness": 1.0,
+   "tpr_scoped": 1.0,
+   "fpr_known_good": 1.0,
+   "n_cases_attacked": 40
+  },
+  "sealed_thresholds": {
+   "note": "registered BEFORE measurement; never tuned to results (Art. XXVII)",
+   "coverage_min": 0.875,
+   "parse_completeness_min": 0.875,
+   "tpr_min": 0.75,
+   "fpr_max": 0.3,
+   "ensemble": "NONE (single-attacker calibration only; majority-vote ensembles are deferred by the R412 directive)"
+  },
+  "measurement_path": "R412/CALIBRATION/engine_independent_attack_measurement.json",
+  "measurement_sha256": "4e1718e7088564333b5e1ef9be47ca452133d051001628cd6eed91f44e60ef5f",
+  "reason": "measured FPR 1.0 > sealed bar 0.3 (Art. L: the attacker is measured non-selective; its KILL is inadmissible as a terminal verdict and is escalated with the objection preserved)",
+  "rule": "the instrument's KILL is measured non-selective (FPR above the sealed bar); the objection is preserved verbatim and ESCALATED for adjudication — the candidate is NOT killed by this attack alone (Art. L); the deterministic gates are unchanged",
+  "reviewer_provenance": "AI_REVIEW (Art. LXVII)"
+ },
+ "preserved_objections": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "basis": "The proposed mechanism directly contradicts the evidence provided, as [doi:10.3323/jcorr1974.29.7_354] demonstrates that stress corrosion cracking in stainless steel heat exchangers by cooling water is a destructive failure mode, not a beneficial one. Inducing micro-cracking would accelerate corrosion, leading to catastrophic failure rather than preventing biofilm adhesion."
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "basis": "No boundary conditions are specified for the cooling water chemistry, temperature, or flow rates, which are critical parameters that determine stress corrosion cracking susceptibility. Without these defined parameters, the claimed \"controlled mechanical stress\" cannot be properly calibrated, making the intervention unpredictable and potentially dangerous."
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "basis": "The evidence bundle contains no studies supporting the claimed beneficial effect of micro-cracking on biofilm prevention. Instead, the provided references address unrelated topics like heat transfer correlations, biogas combustion, and phase change materials, none of which support the core mechanism of this invention."
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "basis": "There is no method described for precisely controlling the mechanical stress to induce only \"beneficial\" micro-cracking without causing larger cracks that would compromise the heat exchanger. The process would require uniform stress application across all plates, which is technically unfeasible in a plate heat exchanger design with varying flow dynamics and pressure differentials."
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "basis": "The testable prediction fails to define what constitutes \"beneficial micro-cracking\" versus destructive cracking, making it impossible to objectively measure success. Additionally, no metrics are provided for quantifying the \"reduced biofilm accumulation,\" leaving the validation criteria vague and subjective."
+  }
+ ]
+}

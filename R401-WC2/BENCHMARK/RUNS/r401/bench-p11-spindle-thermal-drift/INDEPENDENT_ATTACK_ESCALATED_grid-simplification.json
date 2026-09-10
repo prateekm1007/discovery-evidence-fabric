@@ -1,0 +1,56 @@
+{
+ "stage": "INDEPENDENT_ATTACK",
+ "candidate_id": "cand:DIV:simplification:zai:ecf988bbb88d",
+ "escalation": {
+  "gate_version": "attacker_calibration/1.0.0",
+  "instrument": "independent_attack/1.0.0",
+  "calibration_state": "NOT_CALIBRATED",
+  "terminal_kill_admissible": false,
+  "measured": {
+   "coverage": 1.0,
+   "parse_completeness": 1.0,
+   "tpr_scoped": 1.0,
+   "fpr_known_good": 1.0,
+   "n_cases_attacked": 40
+  },
+  "sealed_thresholds": {
+   "note": "registered BEFORE measurement; never tuned to results (Art. XXVII)",
+   "coverage_min": 0.875,
+   "parse_completeness_min": 0.875,
+   "tpr_min": 0.75,
+   "fpr_max": 0.3,
+   "ensemble": "NONE (single-attacker calibration only; majority-vote ensembles are deferred by the R412 directive)"
+  },
+  "measurement_path": "R412/CALIBRATION/engine_independent_attack_measurement.json",
+  "measurement_sha256": "4e1718e7088564333b5e1ef9be47ca452133d051001628cd6eed91f44e60ef5f",
+  "reason": "measured FPR 1.0 > sealed bar 0.3 (Art. L: the attacker is measured non-selective; its KILL is inadmissible as a terminal verdict and is escalated with the objection preserved)",
+  "rule": "the instrument's KILL is measured non-selective (FPR above the sealed bar); the objection is preserved verbatim and ESCALATED for adjudication — the candidate is NOT killed by this attack alone (Art. L); the deterministic gates are unchanged",
+  "reviewer_provenance": "AI_REVIEW (Art. LXVII)"
+ },
+ "preserved_objections": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "basis": "The CNN-BiLSTM hybrid network with SCSSA optimization has never been demonstrated for real-time thermal error prediction in machining spindles, and the thermal dynamics of spindles involve complex non-linear relationships that CNN-BiLSTM may not adequately capture according to the evidence on thermal analysis of machining centers."
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "basis": "The proposal fails to specify critical boundary conditions including spindle speed ranges, material being machined, ambient temperature fluctuations, and cooling system performance, all of which significantly impact thermal behavior and would likely cause the system to fail in real-world conditions."
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "basis": "The evidence provided includes studies on thermal analysis of machining centers that show thermal errors are highly dependent on specific machine designs and operating conditions, yet the candidate proposes a generic solution without accounting for these variables."
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "basis": "The predicted effect of maintaining tool center point displacement below 10 micrometers is not substantiated by any evidence in the candidate's own bundle, which contains no data on actual thermal error compensation performance."
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "basis": "Implementing real-time thermal error compensation requires extremely high-speed data acquisition and processing that would likely exceed the capabilities of current control systems, as evidenced by the complexity of thermal modeling in the provided studies."
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "basis": "The testable prediction fails to specify measurement methodology, sampling rate, or environmental controls necessary to accurately determine whether the compensation system is actually reducing thermal errors below 10 micrometers."
+  }
+ ]
+}

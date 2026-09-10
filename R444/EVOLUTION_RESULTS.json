@@ -1,0 +1,136 @@
+{
+ "results_version": "r444-evolution-results/1.0.0",
+ "measured_at_head": "4748b12a20624245daed61d556baa8aeb828f461",
+ "cases_file_sha256": "7c4c2654ee9146202bd92f636769122a03eb52c32f6957c84be086c9b2fc449b",
+ "per_case": {
+  "evol-x01-desalination-scaling-no-additives": {
+   "case": {
+    "problem_id": "evol-x01-desalination-scaling",
+    "device": "brackish-water reverse-osmosis desalination skid",
+    "failure_mode": "scaling",
+    "domain": "water-treatment"
+   },
+   "intentional_imperfection": {
+    "naive_mechanism_class": "antiscalant / acid dosing or scale-inhibitor chemistry",
+    "why_imperfect": "the constraint explicitly forbids chemical dosing and acid injection \u2014 the textbook first answer is inadmissible by the problem's own terms, so a chemistry-dosing gen-1 must be diagnosed (constraint/quality violation) and evolved toward a physical or operational mechanism (flow redistribution, induced nucleation, hydraulic staging)",
+    "expected_diagnosis_class": "QUALITY_REJECTION or ADVERSARIAL_KILL on constraint violation"
+   },
+   "run_dir": "R444/EVOLUTION_CASES/RUNS/evol-x01-desalination-scaling",
+   "elapsed_s": 3658.1,
+   "chain": {
+    "n_generations": 1,
+    "stop_reason": "TRANSPORT_BLOCKED",
+    "survivor_reached": false,
+    "generations": [
+     {
+      "generation": 1,
+      "origin": "BASELINE_SYNTHESIS",
+      "invention_id": "inv:c03bdb10a9:gen1",
+      "parent_id": null,
+      "state": "INVENTION_EVOLVED",
+      "maturity": "GENERATED",
+      "diagnosed_failure_cause": "UNDETERMINED",
+      "diagnosed_failure_basis": [
+       "generation challenge.kill_stage=UNKNOWN"
+      ],
+      "causal_delta": null,
+      "mechanism": "Skid mounted mobile brackish water reverse osmosis plants at different sites in Kuwait",
+      "intervention": "Implement a mobile skid-mounted design that allows for easy relocation and operation across different sites in Kuwait",
+      "predicted_effect": "By utilizing a mobile skid-mounted system, the device can be deployed in areas with varying water quality characteristics, potentially avoiding prolonged exposure to highly scaling-prone water sources and reducing the concentration of scaling ions on membrane surfaces",
+      "challenge": {
+       "physics_lifecycle": "MECHANISM_NOT_SIMULATABLE",
+       "attack_overall": "NOT_RUN",
+       "evidence_verified": false,
+       "killed": true,
+       "kill_reason": "evidence verification failed: missing_source_span; mechanism_span_not_verbatim",
+       "final_status": "REJECTED"
+      },
+      "fresh_evidence": null
+     }
+    ],
+    "final_status": "INVENTION_UNDER_DEVELOPMENT",
+    "final_reason": "1 architecture generations explored; the current invention (GEN 1) is presented with maturity GENERATED \u2014 none yet survived the full challenge gauntlet; stop reason: TRANSPORT_BLOCKED",
+    "experiment_contract": null,
+    "evolution_summary": {
+     "n_generations": 1,
+     "stop_reason": "TRANSPORT_BLOCKED",
+     "current_invention": {
+      "gen": 1,
+      "invention_id": "inv:c03bdb10a9:gen1",
+      "state": "INVENTION_EVOLVED",
+      "maturity": "GENERATED"
+     },
+     "survivor_reached": false
+    }
+   },
+   "classification": {
+    "classification": "NO_EVOLUTION",
+    "evidence": "n_generations=1, causal_delta_present=False, stop_reason=TRANSPORT_BLOCKED \u2014 recorded honestly; never classified as evolved (the R443/R444 state-integrity validators make the misclassification mechanically impossible)"
+   }
+  },
+  "evol-x02-bus-fastcharge-rate-locked": {
+   "case": {
+    "problem_id": "evol-x02-bus-fastcharge-lithium-plating",
+    "device": "electric-bus depot lithium-titanate-free fast-charging battery pack",
+    "failure_mode": "lithium_plating",
+    "domain": "electrochemical-energy"
+   },
+   "intentional_imperfection": {
+    "naive_mechanism_class": "reduce the charge current / derate the charger",
+    "why_imperfect": "the constraint locks the charge rate \u2014 the obvious mitigation (lower current) is inadmissible, so a derating gen-1 must be diagnosed and evolved toward a mechanism that removes the plating driver at constant current (thermal management of the anode, electrode design, pulse protocols)",
+    "expected_diagnosis_class": "BASELINE_EQUIVALENCE or constraint-violation rejection"
+   },
+   "run_dir": "R444/EVOLUTION_CASES/RUNS/evol-x02-bus-fastcharge-lithium-plating",
+   "elapsed_s": 2350.0,
+   "chain": {
+    "n_generations": 0,
+    "stop_reason": "FALLBACK_GENERATION_FAILED",
+    "survivor_reached": false,
+    "generations": [],
+    "final_status": "MECHANISM_GENERATION_FAILED",
+    "final_reason": "the mandatory baseline architecture could not be generated (transport-class failure \u2014 Art. LXI: infrastructure, never a scientific rejection); the problem stays saved and resumable",
+    "experiment_contract": null,
+    "evolution_summary": {}
+   },
+   "classification": {
+    "classification": "NO_EVOLUTION",
+    "evidence": "n_generations=0, causal_delta_present=False, stop_reason=FALLBACK_GENERATION_FAILED \u2014 recorded honestly; never classified as evolved (the R443/R444 state-integrity validators make the misclassification mechanically impossible)"
+   }
+  },
+  "evol-x03-centrifuge-mass-capped-damping": {
+   "case": {
+    "problem_id": "evol-x03-centrifuge-vibration-mass-cap",
+    "device": "benchtop high-speed laboratory centrifuge rotor assembly",
+    "failure_mode": "vibration",
+    "domain": "mechanical-machinery"
+   },
+   "intentional_imperfection": {
+    "naive_mechanism_class": "add mass / heavier damping block / additional counterweights",
+    "why_imperfect": "the constraint caps total moving mass \u2014 the textbook vibration fix (more damping mass) is inadmissible, so a mass-adding gen-1 must be diagnosed and evolved toward a mass-neutral mechanism (active electromagnetic balancing, tuned absorbers within the cap, stiffness redistribution)",
+    "expected_diagnosis_class": "ADVERSARIAL_KILL or QUALITY_REJECTION on the mass cap"
+   },
+   "run_dir": "R444/EVOLUTION_CASES/RUNS/evol-x03-centrifuge-vibration-mass-cap",
+   "elapsed_s": 2329.0,
+   "chain": {
+    "n_generations": 0,
+    "stop_reason": "FALLBACK_GENERATION_FAILED",
+    "survivor_reached": false,
+    "generations": [],
+    "final_status": "MECHANISM_GENERATION_FAILED",
+    "final_reason": "the mandatory baseline architecture could not be generated (transport-class failure \u2014 Art. LXI: infrastructure, never a scientific rejection); the problem stays saved and resumable",
+    "experiment_contract": null,
+    "evolution_summary": {}
+   },
+   "classification": {
+    "classification": "NO_EVOLUTION",
+    "evidence": "n_generations=0, causal_delta_present=False, stop_reason=FALLBACK_GENERATION_FAILED \u2014 recorded honestly; never classified as evolved (the R443/R444 state-integrity validators make the misclassification mechanically impossible)"
+   }
+  }
+ },
+ "summary": {
+  "n_cases": 3,
+  "n_causal_evolution_demonstrated": 0,
+  "n_no_evolution": 3,
+  "note": "NO_EVOLUTION is an honest outcome; the directive's impossible state (0 generations + null delta classified as evolved) is mechanically prevented (tests/test_r444_state_integrity.py)"
+ }
+}

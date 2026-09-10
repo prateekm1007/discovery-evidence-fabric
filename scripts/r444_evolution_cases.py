@@ -130,6 +130,16 @@ def main() -> int:
         "cases_file_sha256": _sha256(CASES_PATH),
         "per_case": {},
     }
+    # the same provider pins the W11 battery uses (the documented zai
+    # transport path; recorded in every run's provenance — never silent)
+    for var in ("ENGINE_SYNTHESIS_PROVIDER", "ENGINE_ATTACK_PROVIDER",
+                "ENGINE_CAD_PROVIDER", "ENGINE_IMPROVEMENT_PROVIDER",
+                "ENGINE_TECHNICAL_PROVIDER", "ENGINE_LLM_PROVIDER"):
+        import os
+        os.environ.setdefault(var, "zai")
+    import os
+    os.environ.setdefault("ENGINE_GRID_PROVIDERS", "zai")
+    os.environ.setdefault("ENGINE_ENSEMBLE_PROVIDERS", "zai")
     from discovery_fabric.engine.run import EngineRun
     for case in cases["cases"]:
         cid = case["case_id"]

@@ -1,0 +1,56 @@
+{
+ "generation": 2,
+ "invention_id": "inv:08ff8cf9dd:gen2",
+ "escalation": {
+  "gate_version": "attacker_calibration/1.0.0",
+  "instrument": "independent_attack/1.0.0",
+  "calibration_state": "NOT_CALIBRATED",
+  "terminal_kill_admissible": false,
+  "measured": {
+   "coverage": 1.0,
+   "parse_completeness": 1.0,
+   "tpr_scoped": 1.0,
+   "fpr_known_good": 1.0,
+   "n_cases_attacked": 40
+  },
+  "sealed_thresholds": {
+   "note": "registered BEFORE measurement; never tuned to results (Art. XXVII)",
+   "coverage_min": 0.875,
+   "parse_completeness_min": 0.875,
+   "tpr_min": 0.75,
+   "fpr_max": 0.3,
+   "ensemble": "NONE (single-attacker calibration only; majority-vote ensembles are deferred by the R412 directive)"
+  },
+  "measurement_path": "R412/CALIBRATION/engine_independent_attack_measurement.json",
+  "measurement_sha256": "4e1718e7088564333b5e1ef9be47ca452133d051001628cd6eed91f44e60ef5f",
+  "reason": "measured FPR 1.0 > sealed bar 0.3 (Art. L: the attacker is measured non-selective; its KILL is inadmissible as a terminal verdict and is escalated with the objection preserved)",
+  "rule": "the instrument's KILL is measured non-selective (FPR above the sealed bar); the objection is preserved verbatim and ESCALATED for adjudication — the candidate is NOT killed by this attack alone (Art. L); the deterministic gates are unchanged",
+  "reviewer_provenance": "AI_REVIEW (Art. LXVII)"
+ },
+ "preserved_objections": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "basis": "The proposed mechanism relies on microfluidic channels with thermoresponsive nanoparticles and phase change materials, but in a fanless compact gaming laptop chassis, there is no active fluid circulation system to redistribute heat as claimed. The metamaterial thermal interface cannot actively redistribute heat without external energy input, violating the fundamental principle of thermodynamics in a sealed system."
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "basis": "The boundary condition is a \"fanless compact gaming laptop chassis,\" yet the proposed mechanism requires active thermal redistribution which inherently necessitates either fans or pumps to move fluid, directly contradicting the fanless constraint and making the solution inapplicable to the stated problem."
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "basis": "The provided evidence includes patents on social network indexing systems (US20200265070A1) and portable computing systems (CN102007478B) that do not support the thermal management claims. The heat pump modeling paper (1051/matecconf/201824005012) discusses air heat pumps, not metamaterial interfaces, and the form language analysis (10.47294/ksbda.26.2.53) is irrelevant to thermal engineering, providing no concrete evidence for the proposed mechanism."
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "basis": "The predicted effect claims a 15-20°C reduction in CPU package temperature while maintaining external skin temperature below 40°C, but without active fluid circulation (fans or pumps), the metamaterial interface cannot achieve this performance difference from the baseline passive heat spreader, resulting in thermal equivalence with the current failing system."
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "basis": "Implementing microfluidic channels with thermoresponsive nanoparticles in a thin laptop chassis is physically impossible due to the required thickness of fluid channels, nanoparticle suspension systems, and phase change materials, which would exceed the form factor constraints of a compact laptop."
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "basis": "The testable prediction only mentions \"comparative testing against traditional TIMs\" but fails to specify metrics for workload analysis, thermal mapping resolution, or response time measurement, making it impossible to validate the claimed faster response to thermal spikes or the dynamic redistribution capability."
+  }
+ ]
+}

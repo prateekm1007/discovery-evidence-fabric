@@ -1,0 +1,209 @@
+{
+ "problem": {
+  "problem_id": "bench-x01-rl-reward-hacking",
+  "device": "PPO-trained robotic pick-and-place policy running on a warehouse manipulation cell",
+  "failure_mode": "reward_hacking",
+  "domain": "software-ml-reinforcement-learning"
+ },
+ "problem_existence_result": "PREMISE_COHERENT",
+ "evidence": {
+  "retrieved_count": 13,
+  "custody_records": 13,
+  "classification_counts": {
+   "DIRECT_SUPPORT": 3,
+   "PARTIAL_SUPPORT": 3,
+   "BACKGROUND": 4,
+   "ANALOGY": 3,
+   "CONTRADICTORY": 0,
+   "IRRELEVANT": 0
+  },
+  "support_rate": 0.462,
+  "contradiction_rate": 0.0
+ },
+ "mechanism_generated": {
+  "synthesis_intervention": "Incorporate force feedback during the demonstration phase of policy training, providing haptic feedback to human operators when manipulating objects to capture more physically consistent manipulation strategies",
+  "synthesis_mechanism": "Immersive demonstrations with force feedback lead to more consistent and efficient trajectories that agents can successfully imitate",
+  "mechanism_space_candidates": 0,
+  "n_candidates_generated": 0
+ },
+ "distinctness_result": {
+  "n_materially_distinct": 0,
+  "material_distinctness_rate": null
+ },
+ "attack_result": {
+  "adversarial_overall": "KILLED",
+  "attack_survival": 6
+ },
+ "evolution_result": {
+  "n_generations": 2,
+  "stop_reason": "SURVIVOR_REACHED",
+  "survivor_reached": true,
+  "generations": [
+   {
+    "gen": 1,
+    "origin": "BASELINE_SYNTHESIS",
+    "state": "INVENTION_EVOLVED",
+    "maturity": "EVIDENCE_SUPPORTED",
+    "challenge": {
+     "physics_lifecycle": "MECHANISM_NOT_SIMULATABLE",
+     "attack_overall": "KILLED",
+     "evidence_verified": true,
+     "killed": true,
+     "kill_reason": "adversarial challenge failed: engineering_infeasibility: KILLED; killed dimensions: engineering_infeasibility: KILLED",
+     "final_status": "REJECTED"
+    },
+    "diagnosed_failure_cause": "ADVERSARIAL_KILL",
+    "diagnosed_failure_basis": [
+     "generation challenge.attack_overall=KILLED",
+     "adversarial challenge failed: engineering_infeasibility: KILLED; killed dimensions: engineering_infeasibility: KILLED"
+    ],
+    "causal_delta": null,
+    "mechanism": "Immersive demonstrations with force feedback lead to more consistent and efficient trajectories that agents can successfully imitate",
+    "intervention": "Incorporate force feedback during the demonstration phase of policy training, providing haptic feedback to human operators when manipulating objects to capture more physically consistent manipulation strategies",
+    "predicted_effect": "The trained policy will develop more robust manipulation strategies less dependent on visual proxies, maintaining >98% placement success across novel SKUs without recalibration"
+   },
+   {
+    "gen": 2,
+    "origin": "EVOLUTION_CAUSAL_DELTA",
+    "state": "INVENTION_REQUIRES_EXPERIMENT",
+    "maturity": "EVIDENCE_SUPPORTED",
+    "challenge": {
+     "physics_lifecycle": "MECHANISM_NOT_SIMULATABLE",
+     "attack_overall": "SURVIVED_WITH_UNCERTAINTIES",
+     "independent_attack": "ESCALATED_OBJECTION",
+     "escalated_objection": {
+      "preserved_objections": [
+       {
+        "attack_class": "MECHANISM_FAILURE",
+        "basis": "The candidate claims to replace physical force feedback with simulated physical interactions from a foundation model's world model, but this fundamentally misunderstands the nature of physical interactions in robotics. Force feedback provides critical real-time physical information that cannot be accurately simulated, especially for novel objects with unknown physical properties. The evidence from [europepmc:37050822] specifically notes that \"real-world physical interactions remain challenging to simulate accurately\" and that \"force feedback is crucial for robust robotic manipulation.\""
+       },
+       {
+        "attack_class": "BOUNDARY_CONDITION_FAILURE",
+        "basis": "The candidate claims >95% placement success across novel SKUs without requiring force feedback demonstrations or recalibration, but this violates the fundamental boundary condition that real-world robotic manipulation requires adaptation to new physical properties. The evidence from [europepmc:37050822] explicitly states that \"robotic manipulation systems typically require recalibration when encountering objects with significantly different physical properties\" and that \"generalization to novel objects remains a significant challenge in the field.\""
+       },
+       {
+        "attack_class": "EVIDENCE_CONTRADICTION",
+        "basis": "The candidate's own evidence bundle contradicts the proposed mechanism. [europepmc:37050822] states that \"knowledge distillation from foundation models to specialized policies has shown limited success in manipulation tasks\" and that \"visual demonstrations alone without force feedback often result in policies that fail to generalize to novel object shapes and properties.\" This directly contradicts the candidate's claim that a policy trained only on visual demonstrations can achieve >95% success on novel SKUs."
+       },
+       {
+        "attack_class": "BASELINE_EQUIVALENCE",
+        "basis": "The candidate fails to demonstrate any improvement over the baseline PPO-trained policy. In fact, the evidence shows that the baseline (standard PPO with force feedback) outperforms the proposed approach. [europepmc:37050822] notes that \"PPO policies trained with force feedback consistently outperform those trained with visual demonstrations alone by 15-25% on novel object manipulation tasks.\" The candidate's approach doesn't just fail to improve upon the baseline\u2014it actively performs worse."
+       },
+       {
+        "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+        "basis": "The candidate proposes to train a foundation model on \"massive datasets of manipulation tasks\" without specifying how this dataset would be acquired. The evidence from [europepmc:37050822] indicates that \"collecting sufficient manipulation task data with proper force feedback annotations remains prohibitively expensive and time-consuming, often requiring thousands of hours of robotic operation.\" The candidate provides no feasible path to acquiring such a dataset, making the proposed implementation impossible with current technology."
+       },
+       {
+        "attack_class": "MEASUREMENT_AMBIGUITY",
+        "basis": "The candidate's testable prediction to \"compare performance on objects with significantly different physical properties than those in the training set\" is fundamentally ambiguous. [europepmc:37050822] explicitly states that \"defining 'significantly different physical properties' remains a challenge in robotic manipulation research\" and that \"standardized metrics for evaluating generalization across novel objects do not exist.\" Without clear, measurable criteria for what constitutes \"significantly different,\" the prediction cannot be properly tested."
+       }
+      ],
+      "calibration_state": "NOT_CALIBRATED",
+      "measured": {
+       "coverage": 1.0,
+       "parse_completeness": 1.0,
+       "tpr_scoped": 1.0,
+       "fpr_known_good": 1.0,
+       "n_cases_attacked": 40
+      },
+      "note": "the independent attack KILLED this architecture, but the instrument is measured NOT_CALIBRATED (FPR 1.0 on sealed known-good mechanisms): the objection is preserved and escalated, not executed (Art. L)"
+     },
+     "killed": false,
+     "survived": true
+    },
+    "diagnosed_failure_cause": null,
+    "diagnosed_failure_basis": null,
+    "causal_delta": {
+     "failure_or_challenge": "adversarial challenge failed: engineering_infeasibility: KILLED; killed dimensions: engineering_infeasibility: KILLED",
+     "diagnosed_cause": "ADVERSARIAL_KILL",
+     "causal_change": "Replaced physical force feedback demonstrations with simulated physical interactions from a foundation model's world model",
+     "new_capability": "Simulation-to-reality transfer without physical force feedback",
+     "new_interaction": "Knowledge distillation from world models trained on diverse manipulation datasets",
+     "new_operating_regime": "Training policies entirely in simulation using foundation model knowledge",
+     "predicted_effect": "Reduces dependency on physical demonstrations while maintaining high success rates across novel objects",
+     "frontier_capability": "Foundation models with world modeling capabilities from natural language processing and computer vision",
+     "thirty_year_engine": {
+      "current": "Immersive demonstrations with force feedback for policy training",
+      "evolution_2055": "Fully autonomous robotic manipulation systems with embodied intelligence that can generalize across object domains",
+      "required_capability": "Simulation-to-reality transfer without requiring physical demonstrations",
+      "capability_backcast": "2040: Advanced digital twins with physics-based simulation; 2030: Self-supervised learning from unlabeled physical interactions; 2025: Digital twin calibration from sparse physical data",
+      "todays_frontier": "Foundation models with world models that can simulate physical interactions without direct physical experience",
+      "transfer": "Incorporate foundation models with world modeling capabilities to simulate physical interactions without requiring force feedback demonstrations"
+     },
+     "provenance": "AI_PROPOSED (the 30-year walk and the frontier transfer are generated reasoning, not retrieved evidence \u2014 they must survive the re-evaluation gauntlet like every other generated claim)"
+    },
+    "mechanism": "Knowledge distillation from foundation models with world modeling capabilities",
+    "intervention": "Train a foundation model on massive datasets of manipulation tasks, then distill this knowledge into a specialized policy using only visual demonstrations without force feedback",
+    "predicted_effect": "The trained policy will achieve >95% placement success across novel SKUs without requiring force feedback demonstrations or recalibration"
+   }
+  ]
+ },
+ "engineering_realization": {
+  "engineering_specification_present": true,
+  "technology_class": null,
+  "subsystems_present": false,
+  "cad_ledgers": [
+   "CAD_PIPELINE_LEDGER_gen-2.json"
+  ],
+  "canonical_glbs": []
+ },
+ "experiment_state": {
+  "decisive_experiment_selected": true,
+  "selected_experiment": "falsification_test_from_candidate",
+  "killer_experiment_options": 0,
+  "falsification_test_present": true
+ },
+ "final_epistemic_state": {
+  "final_status": "EVOLVED_INVENTION_CANDIDATE",
+  "epistemic_state": "CANDIDATE_CONNECTION",
+  "reason": "an evolved architecture generation survived the re-evaluation gauntlet (2 generations, causal delta recorded); the decisive physical experiment is specified, not executed",
+  "evidence_verified": true,
+  "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+  "adjudication_verdict": "CONTESTED"
+ },
+ "failure_class": null,
+ "time": {
+  "runtime_s": 608.9
+ },
+ "cost": {
+  "gateway_calls_delta": 0,
+  "note": "call count from the gateway JSONL log; token counts are recorded where the upstream transport returns them (zai gateway logs usage when available)"
+ },
+ "frozen_metric_sheet": {
+  "n_candidates_generated": 0,
+  "n_materially_distinct": 0,
+  "material_distinctness_rate": null,
+  "n_testable_predictions": 0,
+  "testable_prediction_rate": null,
+  "evidence_counts": {
+   "DIRECT_SUPPORT": 3,
+   "PARTIAL_SUPPORT": 3,
+   "BACKGROUND": 4,
+   "ANALOGY": 3,
+   "CONTRADICTORY": 0,
+   "IRRELEVANT": 0
+  },
+  "evidence_n_items": 13,
+  "evidence_support_rate": 0.462,
+  "contradiction_rate": 0.0,
+  "run_level_evidence_supported": true,
+  "md_est_count": 0,
+  "md_est_threshold_pass": false,
+  "cad_rate": null,
+  "physics_beats_baseline": 0,
+  "attack_survival": 6,
+  "final_status": "EVOLVED_INVENTION_CANDIDATE",
+  "final_reason": "an evolved architecture generation survived the re-evaluation gauntlet (2 generations, causal delta recorded); the decisive physical experiment is specified, not executed",
+  "runtime_s": 608.9,
+  "dedup_kept_ids": [],
+  "mechanism_level_support": {},
+  "problem": {
+   "problem_id": "bench-x01-rl-reward-hacking",
+   "device": "PPO-trained robotic pick-and-place policy running on a warehouse manipulation cell",
+   "failure_mode": "reward_hacking",
+   "domain": "software-ml-reinforcement-learning"
+  },
+  "returncode": 0,
+  "resumed": false
+ }
+}

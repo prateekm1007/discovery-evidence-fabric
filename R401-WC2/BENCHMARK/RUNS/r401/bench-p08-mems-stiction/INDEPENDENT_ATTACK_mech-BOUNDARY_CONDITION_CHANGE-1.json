@@ -1,0 +1,79 @@
+{
+ "attack_version": "independent_attack/1.0.0",
+ "candidate_id": "cand:MS:BOUNDARY_CONDITION_CHANGE:2a2a8bc4ce92",
+ "generator_provider": "zai",
+ "attacker_provider": "zai",
+ "attacker_model": "glm-4-plus",
+ "independence_mode": "SEPARATE_CONTEXT",
+ "independence_note": "the attacker ran in an independent reasoning context (fresh adversarial conversation, generator reasoning never shown; no alternative provider credentialed — disclosed, never claimed as provider separation)",
+ "prompt_hash": "01ee2a6b7a0e5b5419264bf555539ccba95b59c2e8a85fc78a65d62553e360cc",
+ "output_hash": "ad2d492d82262461d610bc94b0c640d0f1d3433a2f5b9968246f13ab5ddac8fb",
+ "llm_status": "OK",
+ "attacked_at": "2026-09-10T15:41:58+00:00Z",
+ "items": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "verdict": "KILL",
+   "basis": "The proposed intervention addresses dielectric charging degradation but fails to address the actual failure mechanism: shock-induced contact between comb fingers causing stiction and permanent shorting of electrodes. The candidate completely misdiagnoses the root cause of failure."
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "verdict": "KILL",
+   "basis": "The boundary condition of 10000 g mechanical shock in all axes will inevitably cause comb finger contact regardless of resonance monitoring, as the shock energy exceeds the structural limits of MEMS comb fingers, making the proposed intervention irrelevant to this boundary condition."
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "verdict": "KILL",
+   "basis": "The provided evidence bundle ([doi:10.3390/mi17060732], [doi:10.3390/mi9110602], [doi:10.23919/ursi.2018.8406772], [doi:10.1109/iic.2015.7150884], [doi:10.1109/incet54531.2022.9824806]) all focus on normal operation design and sensitivity analysis, with no evidence supporting the efficacy of resonance monitoring for shock-induced stiction prevention."
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "verdict": "KILL",
+   "basis": "The predicted 70% reduction in capacitance shift after shock is unsubstantiated and likely optimistic given that shock-induced physical contact between comb fingers would cause immediate and complete failure regardless of any monitoring system, making the performance equivalent to baseline in actual shock conditions."
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "verdict": "KILL",
+   "basis": "Implementing a resonance monitoring system in a MEMS accelerometer that must survive 10000 g shocks is impossible as the monitoring electronics would be destroyed by such extreme acceleration, violating the boundary condition of surviving mechanical shock."
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "verdict": "KILL",
+   "basis": "The testable prediction fails to define what constitutes \"70% less capacitance shift\" when the baseline device experiences complete electrode shorting (infinite capacitance change), making the metric undefined and unmeasurable."
+  }
+ ],
+ "state": "ATTACK_RUN",
+ "overall": "KILLED",
+ "kill_basis": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "basis": "The proposed intervention addresses dielectric charging degradation but fails to address the actual failure mechanism: shock-induced contact between comb fingers causing stiction and permanent shorting of electrodes. The candidate completely misdiagnoses the root cause of failure."
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "basis": "The boundary condition of 10000 g mechanical shock in all axes will inevitably cause comb finger contact regardless of resonance monitoring, as the shock energy exceeds the structural limits of MEMS comb fingers, making the proposed intervention irrelevant to this boundary condition."
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "basis": "The provided evidence bundle ([doi:10.3390/mi17060732], [doi:10.3390/mi9110602], [doi:10.23919/ursi.2018.8406772], [doi:10.1109/iic.2015.7150884], [doi:10.1109/incet54531.2022.9824806]) all focus on normal operation design and sensitivity analysis, with no evidence supporting the efficacy of resonance monitoring for shock-induced stiction prevention."
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "basis": "The predicted 70% reduction in capacitance shift after shock is unsubstantiated and likely optimistic given that shock-induced physical contact between comb fingers would cause immediate and complete failure regardless of any monitoring system, making the performance equivalent to baseline in actual shock conditions."
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "basis": "Implementing a resonance monitoring system in a MEMS accelerometer that must survive 10000 g shocks is impossible as the monitoring electronics would be destroyed by such extreme acceleration, violating the boundary condition of surviving mechanical shock."
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "basis": "The testable prediction fails to define what constitutes \"70% less capacitance shift\" when the baseline device experiences complete electrode shorting (infinite capacitance change), making the metric undefined and unmeasurable."
+  }
+ ],
+ "counts": {
+  "KILL": 6,
+  "RISK": 0,
+  "SURVIVE": 0,
+  "INVALID": 0
+ }
+}

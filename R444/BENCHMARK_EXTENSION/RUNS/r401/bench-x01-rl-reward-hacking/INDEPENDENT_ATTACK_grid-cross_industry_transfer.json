@@ -1,0 +1,79 @@
+{
+ "attack_version": "independent_attack/1.0.0",
+ "candidate_id": "cand:DIV:cross_industry_transfer:zai:2ca90fb354ec",
+ "generator_provider": null,
+ "attacker_provider": "zai",
+ "attacker_model": "glm-4-plus",
+ "independence_mode": "SEPARATE_CONTEXT",
+ "independence_note": "the attacker ran in an independent reasoning context (fresh adversarial conversation, generator reasoning never shown; no alternative provider credentialed — disclosed, never claimed as provider separation)",
+ "prompt_hash": "184853d1a2f5d5ffdffd5e200c69f7207c9da2844a91fba9ffe956f4123d38e8",
+ "output_hash": "10a68785b2c3eb5ef1f7990a8de45f9fd04f958cf7a2ec06e212c33bce7ee8f7",
+ "llm_status": "OK",
+ "attacked_at": "2026-09-10T16:51:39+00:00Z",
+ "items": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "verdict": "KILL",
+   "basis": "The proposed mechanism fails to address the core issue of proxy reward exploitation. Force feedback during demonstrations may improve trajectory execution but does nothing to prevent the policy from still relying on grasp-detector confidence as a proxy for successful placement, as demonstrated in the failure case."
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "verdict": "KILL",
+   "basis": "The candidate fails to define boundary conditions for when force feedback becomes irrelevant or insufficient, particularly when dealing with extremely novel object shapes that weren't represented in the demonstration set."
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "verdict": "KILL",
+   "basis": "The evidence bundle [doi:10.1109/icra48891.2023.10160560] shows that immersive demonstrations improve trajectory learning but does not demonstrate improved placement success on novel objects, contradicting the candidate's primary claim."
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "verdict": "KILL",
+   "basis": "The candidate provides no evidence that force feedback demonstrations would outperform the baseline in terms of placement success rates on novel SKUs, making it equivalent to the status quo it claims to improve."
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "verdict": "KILL",
+   "basis": "The candidate fails to address how force feedback would be integrated with existing grasp-detector confidence metrics, creating conflicting signals that would confuse the learning process."
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "verdict": "KILL",
+   "basis": "The testable prediction comparing placement success rates fails to define what constitutes a \"successful placement\" in the context of novel objects, making the measurement ambiguous and subjective."
+  }
+ ],
+ "state": "ATTACK_RUN",
+ "overall": "KILLED",
+ "kill_basis": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "basis": "The proposed mechanism fails to address the core issue of proxy reward exploitation. Force feedback during demonstrations may improve trajectory execution but does nothing to prevent the policy from still relying on grasp-detector confidence as a proxy for successful placement, as demonstrated in the failure case."
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "basis": "The candidate fails to define boundary conditions for when force feedback becomes irrelevant or insufficient, particularly when dealing with extremely novel object shapes that weren't represented in the demonstration set."
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "basis": "The evidence bundle [doi:10.1109/icra48891.2023.10160560] shows that immersive demonstrations improve trajectory learning but does not demonstrate improved placement success on novel objects, contradicting the candidate's primary claim."
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "basis": "The candidate provides no evidence that force feedback demonstrations would outperform the baseline in terms of placement success rates on novel SKUs, making it equivalent to the status quo it claims to improve."
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "basis": "The candidate fails to address how force feedback would be integrated with existing grasp-detector confidence metrics, creating conflicting signals that would confuse the learning process."
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "basis": "The testable prediction comparing placement success rates fails to define what constitutes a \"successful placement\" in the context of novel objects, making the measurement ambiguous and subjective."
+  }
+ ],
+ "counts": {
+  "KILL": 6,
+  "RISK": 0,
+  "SURVIVE": 0,
+  "INVALID": 0
+ }
+}

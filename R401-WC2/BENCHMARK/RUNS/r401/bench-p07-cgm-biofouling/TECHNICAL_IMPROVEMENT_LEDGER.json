@@ -1,0 +1,500 @@
+{
+ "ledger": "TECHNICAL_IMPROVEMENT_LEDGER (R379 V2 + R383 ANALYTICAL EQUATION LAYER)",
+ "version": "3.0.0",
+ "loop": "CANDIDATE -> TECHNICAL DIAGNOSIS (limiting variable + direction + R383 QUANTITATIVE margins/sensitivities) -> DETERMINISTIC SOLVE-OR-LLM MUTATION (actual design variable) -> CAD REBUILD -> INDEPENDENT TECHNICAL EVALUATION (monotone + quantitative on the child's OWN measured geometry) -> EVIDENCE/PRIOR-ART RECHECK -> KEEP/KILL (K1-K8) -> SECOND IMPROVEMENT",
+ "collision_mode": "REPLAY_CACHE",
+ "live_sources": null,
+ "thresholds": {
+  "MAX_ITERATIONS_DEFAULT": {
+   "value": 2,
+   "epistemic_class": "ENGINEERING",
+   "justification": "the CEO milestone is DIAGNOSE -> TECHNICAL MUTATION -> RE-EVALUATE -> SECOND IMPROVEMENT; two iterations demonstrate repeatability at bounded cost"
+  },
+  "MAX_PROPOSALS_PER_ITERATION": {
+   "value": 3,
+   "epistemic_class": "ENGINEERING",
+   "justification": "bounded proposal budget, identical to the R378 epistemic loop: three attempts, then the honest no-defensible-mutation verdict"
+  },
+  "VALUE_CLASS_STRICTNESS": {
+   "value": "HARD",
+   "epistemic_class": "ENGINEERING",
+   "justification": "EXTRACTED claims are span-verified or rejected (Art. II/VI); MODELLED values are admitted only when declared; an unbounded parameter is immutable (ADR_R379 anti-gaming)"
+  }
+ },
+ "mutation_kinds_live": [
+  "PARAMETER_CHANGE",
+  "GEOMETRY_CHANGE",
+  "MATERIAL_CHANGE",
+  "OPERATING_CONDITION_CHANGE",
+  "MECHANISM_CHANGE"
+ ],
+ "mutation_kinds_reserved": {
+  "ARCHITECTURE_CHANGE": "needs a structural/control search space at a higher fidelity tier (ADR_R379)",
+  "CONTROL_POLICY_CHANGE": "needs a structural/control search space at a higher fidelity tier (ADR_R379)"
+ },
+ "keep_criterion": "the child's OWN independent technical evaluation must confirm the objective improves in the mutation direction with constraints preserved — a score increase is NEVER sufficient (CEO R379 item 4/8)",
+ "started_at": "2026-09-10T15:31:07+00:00Z",
+ "iterations": [],
+ "outcome": "TECHNICAL_UNQUANTIFIED",
+ "outcome_reason": "the candidate's own custodied evidence yields no quantifiable technical objective+leverage (admitted: {\"parameters\": 10, \"parameters_with_value\": 0, \"parameters_extracted\": 0, \"parameters_modelled\": 0, \"parameters_with_envelope\": 4, \"constraints\": 0, \"objectives\": 3, \"dependencies\": 7, \"objects\": 5, \"failure_modes\": 1}); the technical layer cannot engage — an honest measured gap (the 🟡 state), not a kill and not a failure",
+ "extraction": {
+  "proposal_id": "tsp:daafc593f0ba",
+  "attempts": [
+   {
+    "attempt": 1,
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "status": "OK",
+    "prompt_hash": "59f3ace896d4f78d1948821b2baa0934fcec78bc20e2a5104cee3a7eb82ea634",
+    "output_hash": "908e0f09202c9bb7dce8f7bc3cdd29d8471d827fa53e8adc7dd27e817ee0c908",
+    "latency_ms": 31786,
+    "error": null,
+    "raw_content_sha256": "601bcc634ce64cf5c6a40b164ef8295046dfd16fd4b2733b58e1a633d4c3ba48"
+   }
+  ],
+  "provider": "zai",
+  "model": "glm-4-plus",
+  "status": "OK",
+  "prompt_hash": "59f3ace896d4f78d1948821b2baa0934fcec78bc20e2a5104cee3a7eb82ea634",
+  "output_hash": "908e0f09202c9bb7dce8f7bc3cdd29d8471d827fa53e8adc7dd27e817ee0c908",
+  "latency_ms": 31786,
+  "error": null,
+  "proposal": {
+   "objects": [
+    {
+     "object_id": "obj001",
+     "name": "plasmon-enhanced photoelectrode",
+     "role": "working electrode with light-driven redox chemistry"
+    },
+    {
+     "object_id": "obj002",
+     "name": "conductive hydrogel microneedle array",
+     "role": "interface for subcutaneous interstitial fluid access"
+    },
+    {
+     "object_id": "obj003",
+     "name": "light excitation module",
+     "role": "drives photoelectrochemical reactions without applied bias"
+    },
+    {
+     "object_id": "obj004",
+     "name": "current recording module",
+     "role": "measures electrochemical response"
+    },
+    {
+     "object_id": "obj005",
+     "name": "Bluetooth transmission module",
+     "role": "wirelessly transmits sensor data"
+    }
+   ],
+   "parameters": [
+    {
+     "param_id": "param001",
+     "name": "operating bias",
+     "category": "OPERATING_CONDITIONS",
+     "unit": "V",
+     "value": 0,
+     "value_class": "EXTRACTED",
+     "value_span": "Visible light drives oxygen-mediated redox chemistry without an applied bias",
+     "value_evidence_id": "doi:10.1038/s41467-026-75940-7",
+     "range_min": null,
+     "range_max": null,
+     "range_span": null,
+     "range_evidence_id": null,
+     "role": "electrical potential applied to the working electrode"
+    },
+    {
+     "param_id": "param002",
+     "name": "light wavelength",
+     "category": "OPERATING_CONDITIONS",
+     "unit": "nm",
+     "value": null,
+     "value_class": "UNKNOWN",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": 400,
+     "range_max": 700,
+     "range_span": null,
+     "range_evidence_id": null,
+     "role": "wavelength of light used to drive photoelectrochemical reactions"
+    },
+    {
+     "param_id": "param003",
+     "name": "microneedle length",
+     "category": "GEOMETRY",
+     "unit": "μm",
+     "value": null,
+     "value_class": "UNKNOWN",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": 200,
+     "range_max": 1000,
+     "range_span": null,
+     "range_evidence_id": null,
+     "role": "length of microneedles for interstitial fluid access"
+    },
+    {
+     "param_id": "param004",
+     "name": "hydrogel swelling tolerance",
+     "category": "MATERIALS",
+     "unit": "%",
+     "value": null,
+     "value_class": "UNKNOWN",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": 20,
+     "range_max": 80,
+     "range_span": null,
+     "range_evidence_id": null,
+     "role": "percentage volume change the hydrogel can accommodate"
+    },
+    {
+     "param_id": "param005",
+     "name": "measurement accuracy",
+     "category": "PARAMETERS",
+     "unit": "%",
+     "value": 10,
+     "value_class": "EXTRACTED",
+     "value_span": "keep mean absolute relative difference below 10 percent",
+     "value_evidence_id": "device failure constraint",
+     "range_min": null,
+     "range_max": null,
+     "range_span": null,
+     "range_evidence_id": null,
+     "role": "maximum allowable error in glucose concentration measurement"
+    },
+    {
+     "param_id": "param006",
+     "name": "wear duration",
+     "category": "OPERATING_CONDITIONS",
+     "unit": "days",
+     "value": 14,
+     "value_class": "EXTRACTED",
+     "value_span": "over a 14-day wear",
+     "value_evidence_id": "device failure constraint",
+     "range_min": null,
+     "range_max": null,
+     "range_span": null,
+     "range_evidence_id": null,
+     "role": "duration the sensor must maintain accuracy without recalibration"
+    },
+    {
+     "param_id": "param007",
+     "name": "power consumption",
+     "category": "PARAMETERS",
+     "unit": "mW",
+     "value": null,
+     "value_class": "MODELLED",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": 0.1,
+     "range_max": 1,
+     "range_span": null,
+     "range_evidence_id": null,
+     "role": "electrical power required for sensor operation"
+    },
+    {
+     "param_id": "param008",
+     "name": "signal drift rate",
+     "category": "PARAMETERS",
+     "unit": "%/day",
+     "value": null,
+     "value_class": "UNKNOWN",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": null,
+     "range_max": null,
+     "range_span": null,
+     "range_evidence_id": null,
+     "role": "rate of signal change unrelated to analyte concentration"
+    },
+    {
+     "param_id": "param009",
+     "name": "protein encapsulation thickness",
+     "category": "PARAMETERS",
+     "unit": "nm",
+     "value": null,
+     "value_class": "UNKNOWN",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": null,
+     "range_max": null,
+     "range_span": null,
+     "range_evidence_id": null,
+     "role": "thickness of protein layer forming on sensor surface"
+    },
+    {
+     "param_id": "param010",
+     "name": "interstitial fluid glucose correlation",
+     "category": "PARAMETERS",
+     "unit": "R²",
+     "value": 0.95,
+     "value_class": "EXTRACTED",
+     "value_span": "ISF glucose demonstrates a strong correlation with blood glucose (R² > 0.95)",
+     "value_evidence_id": "doi:1007/s10856-026-07070-x",
+     "range_min": null,
+     "range_max": null,
+     "range_span": null,
+     "range_evidence_id": null,
+     "role": "correlation coefficient between ISF and blood glucose levels"
+    }
+   ],
+   "constraints": [
+    {
+     "constraint_id": "const001",
+     "target": "param005",
+     "bound": "<=",
+     "limit": 10,
+     "unit": "%",
+     "limit_class": "EXTRACTED",
+     "limit_span": "keep mean absolute relative difference below 10 percent",
+     "limit_evidence_id": "device failure constraint",
+     "justification": "maximum allowable measurement error for clinical utility"
+    },
+    {
+     "constraint_id": "const002",
+     "target": "param006",
+     "bound": ">=",
+     "limit": 14,
+     "unit": "days",
+     "limit_class": "EXTRACTED",
+     "limit_span": "over a 14-day wear",
+     "limit_evidence_id": "device failure constraint",
+     "justification": "minimum required wear duration without recalibration"
+    }
+   ],
+   "objectives": [
+    {
+     "objective_id": "obj001",
+     "target": "param005",
+     "direction": "MAINTAIN_WITHIN",
+     "basis": "to address encapsulation failure mode by maintaining measurement accuracy below 10% over 14 days"
+    },
+    {
+     "objective_id": "obj002",
+     "target": "param008",
+     "direction": "MINIMIZE",
+     "basis": "to address encapsulation failure mode by minimizing signal drift during wear"
+    },
+    {
+     "objective_id": "obj003",
+     "target": "param009",
+     "direction": "MINIMIZE",
+     "basis": "to address encapsulation failure mode by reducing protein accumulation on sensor surface"
+    }
+   ],
+   "failure_modes": [
+    {
+     "mode_id": "fail001",
+     "name": "encapsulation",
+     "problem_link": "device failure mode leading to signal drift and reduced accuracy"
+    }
+   ],
+   "dependencies": [
+    {
+     "relation_id": "dep001",
+     "cause": "param001",
+     "effect": "param008",
+     "direction": "INCREASES",
+     "statement": "applied bias increases electrochemical side reactions that contribute to signal drift",
+     "relation_class": "MODELLED",
+     "span": null,
+     "evidence_id": null
+    },
+    {
+     "relation_id": "dep002",
+     "cause": "param001",
+     "effect": "param009",
+     "direction": "INCREASES",
+     "statement": "applied bias promotes protein adsorption and encapsulation on electrode surface",
+     "relation_class": "MODELLED",
+     "span": null,
+     "evidence_id": null
+    },
+    {
+     "relation_id": "dep003",
+     "cause": "param002",
+     "effect": "param005",
+     "direction": "INCREASES",
+     "statement": "optimal light wavelength enhances photoelectrochemical response, improving measurement accuracy",
+     "relation_class": "MODELLED",
+     "span": null,
+     "evidence_id": null
+    },
+    {
+     "relation_id": "dep004",
+     "cause": "param004",
+     "effect": "param009",
+     "direction": "DECREASES",
+     "statement": "higher hydrogel swelling tolerance reduces mechanical stress on tissue, minimizing inflammation and protein encapsulation",
+     "relation_class": "MODELLED",
+     "span": null,
+     "evidence_id": null
+    },
+    {
+     "relation_id": "dep005",
+     "cause": "param009",
+     "effect": "param005",
+     "direction": "INCREASES",
+     "statement": "protein encapsulation thickness increases measurement error by blocking analyte access to electrode",
+     "relation_class": "MODELLED",
+     "span": null,
+     "evidence_id": null
+    },
+    {
+     "relation_id": "dep006",
+     "cause": "param008",
+     "effect": "param005",
+     "direction": "INCREASES",
+     "statement": "signal drift rate increases measurement error over time",
+     "relation_class": "MODELLED",
+     "span": null,
+     "evidence_id": null
+    },
+    {
+     "relation_id": "dep007",
+     "cause": "param001",
+     "effect": "param007",
+     "direction": "INCREASES",
+     "statement": "applied bias increases power consumption requirements",
+     "relation_class": "MODELLED",
+     "span": null,
+     "evidence_id": null
+    }
+   ]
+  },
+  "raw_content_sha256": "601bcc634ce64cf5c6a40b164ef8295046dfd16fd4b2733b58e1a633d4c3ba48"
+ },
+ "technical_state_counts": {
+  "parameters": 10,
+  "parameters_with_value": 0,
+  "parameters_extracted": 0,
+  "parameters_modelled": 0,
+  "parameters_with_envelope": 4,
+  "constraints": 0,
+  "objectives": 3,
+  "dependencies": 7,
+  "objects": 5,
+  "failure_modes": 1
+ },
+ "baseline": {
+  "technical": {
+   "status": "UNQUANTIFIED",
+   "objective": {
+    "target": "param005",
+    "direction": "MAINTAIN_WITHIN",
+    "known": false,
+    "basis": "to address encapsulation failure mode by maintaining measurement accuracy below 10% over 14 days"
+   },
+   "limiting_variable": null,
+   "constraint_results": [],
+   "uncertainty": {
+    "unknown_value_params": [
+     "param001",
+     "param002",
+     "param003",
+     "param004",
+     "param005",
+     "param006",
+     "param007",
+     "param008",
+     "param009",
+     "param010"
+    ],
+    "modelled_relations": 7,
+    "extracted_relations": 0,
+    "unverifiable_constraints": [],
+    "objective_known": false,
+    "note": "UNKNOWN values are never treated as zeros; unverifiable constraints are never treated as satisfied (Art. XXV / Art. IV)"
+   },
+   "computation_log": {
+    "evaluator_id": "analytical_monotone_v1",
+    "fidelity_tier": "STRUCTURED_CONSTRAINT",
+    "evidence_rank": 3,
+    "input_state_sha256": "0c2954534f94a007923a5d3636404550e59d80f1b4b60fa28b2fb28c87993e5a",
+    "conventions": [
+     {
+      "name": "ORDINAL_LEVERAGE_BY_PATH_LENGTH",
+      "epistemic_class": "ENGINEERING",
+      "justification": "with MONOTONE-only relations the evaluator cannot rank leverage by magnitude; it ranks by (1) fewest constraint blocks, (2) shortest causal path from the parameter to the objective target, (3) envelope provenance class (EXTRACTED beats MODELLED). This is a declared ordinal convention, not a measurement — recorded on every evaluation that uses it.",
+      "uncertainty": "ordinal only; magnitudes are UNKNOWN at this tier"
+     },
+     {
+      "name": "DIRECTIONAL_FAIL_CLOSED",
+      "epistemic_class": "ENGINEERING",
+      "justification": "a proposed change is constraint-BLOCKED when (a) the changed parameter's own numeric constraint would be violated at the proposed value, or (b) a relation-connected constraint target is already VIOLATED or value-UNKNOWN and the predicted direction moves it TOWARD its bound. Fail-closed on directional risk: an unknown-position target moving toward a bound is a blocked move, not an accepted one (Art. IV).",
+      "uncertainty": "direction-level only at this tier"
+     }
+    ],
+    "steps": [
+     "resolved objective param005 (MAINTAIN_WITHIN)",
+     "checked 0 constraint(s) numerically where values exist",
+     "propagated signs over 7 relation(s)",
+     "ranked 0 movable improving direction(s)"
+    ],
+    "computed_at": "2026-09-10T15:31:39+00:00Z",
+    "deterministic": true
+   }
+  },
+  "quantitative": {
+   "status": "UNQUANTIFIED",
+   "objective": {
+    "target": "param005",
+    "direction": "MAINTAIN_WITHIN",
+    "computed": false,
+    "value": null,
+    "unit": null,
+    "equation_id": null,
+    "margin": null,
+    "margin_status": "UNCOMPUTED",
+    "statement": "no active computation binds the objective target"
+   },
+   "requirement_satisfied": null,
+   "limiting_variable": null,
+   "computed_equations": [],
+   "computation_log": [],
+   "evidence_rank": 4
+  },
+  "i_dimensions": {
+   "I1_MECHANISM_EVIDENCE_DERIVATION": {
+    "score": 0.562,
+    "state": "MEASURED"
+   },
+   "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_SURVIVORS"
+   },
+   "I3_RECOMBINATION_RISK": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_FAMILIES"
+   },
+   "I4_NEW_TECHNICAL_RELATIONSHIP": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+   },
+   "I5_EXPERIMENT_DISCRIMINATION": {
+    "score": 0.667,
+    "state": "MEASURED"
+   }
+  },
+  "i_flags": {
+   "underived_mechanism": false,
+   "recombination_only": false
+  },
+  "i_average": 0.615,
+  "q_average": 0.625,
+  "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE"
+ },
+ "fidelity_escalation": {
+  "current_tier": "STRUCTURED_CONSTRAINT (analytical_monotone_v1) + ANALYTICAL_EQUATION (analytical_equation_v1, R383)",
+  "deciding_question": "does a design-variable change improve the objective within constraints, and by how much?",
+  "resolved_at_current_tier": false,
+  "quantitative_tier_engaged": false,
+  "quantitative_objective_computed": false,
+  "escalation_needed": true,
+  "next_tier_available": false,
+  "note": "the R383 ANALYTICAL_EQUATION tier is LIVE (closed-form deterministic relations with computation logs); the higher tiers (NUMERICAL_SOLVER / SIMULATION / NEURAL_OPERATOR) remain contract-reserved and unregistered; escalation is recorded, never faked at the current tier"
+ },
+ "finished_at": "2026-09-10T15:31:39+00:00Z",
+ "status": "TECHNICAL_UNQUANTIFIED"
+}

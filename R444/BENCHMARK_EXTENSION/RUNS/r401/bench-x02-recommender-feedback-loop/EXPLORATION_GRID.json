@@ -1,0 +1,256 @@
+{
+ "diversity": "CANDIDATE_DIVERSITY (E16-E)",
+ "version": "1.1.0",
+ "min_candidates": 10,
+ "available_providers": [
+  "zai"
+ ],
+ "operator_override": [
+  "zai"
+ ],
+ "angles": [
+  "cross_industry_transfer",
+  "mechanism_inversion",
+  "simplification",
+  "multi_physics_hybrid",
+  "constraint_first"
+ ],
+ "candidates": [
+  {
+   "angle": "cross_industry_transfer",
+   "provider_id": "zai",
+   "status": "OK",
+   "model": "glm-4-plus",
+   "prompt_hash": "db9a90e0bed97f104431762d21cbc6c8ff4106a2ccb47351696511b702b7024b",
+   "output_hash": "f7f71a061f29f6d16a71f73f4afffbb381a279bb5e52de54ceaf2e7bf71fab15",
+   "fields": {
+    "mechanism": "feedback loop bias amplification in collaborative filtering systems",
+    "intervention": "implement a debiasing algorithm that periodically resets the training data with a small random sample of cold-start user interactions",
+    "expected_effect": "maintain recommendation diversity by preventing the system from over-optimizing on its own feedback, preserving long-term engagement for mid-tail users while maintaining high request throughput",
+    "falsification_test": "compare retention rates between users exposed to the debiased system versus the original system over a 90-day period",
+    "mechanism_source_span": "\"collaborative filtering systems can develop feedback loops where the system's own recommendations influence future training data, leading to reduced diversity and potential bias amplification\"",
+    "span_derivation": {
+     "n_shared": 9,
+     "shared_terms": [
+      "amplification",
+      "bia",
+      "collaborative",
+      "data",
+      "feedback",
+      "filtering",
+      "loop",
+      "system",
+      "training"
+     ],
+     "span_terms_n": 20,
+     "ratio": 0.45,
+     "underived": false,
+     "state": "MEASURED",
+     "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+    }
+   },
+   "span_underived": false,
+   "candidate_id": "cand:DIV:cross_industry_transfer:zai:f7f71a061f29"
+  },
+  {
+   "angle": "mechanism_inversion",
+   "provider_id": "zai",
+   "status": "OK",
+   "model": "glm-4-plus",
+   "prompt_hash": "25801e355e8590d931040df33857b3288780c8efec5f35b376b6c991fbade6af",
+   "output_hash": "b7bcf08f079a0f16431306001df8b30c8f12452416528db714e2d2a9d36c3172",
+   "fields": {
+    "mechanism": "feedback loop bias amplification in human-recommender systems",
+    "intervention": "implement a passive structural constraint that limits the influence of recent interaction data on model updates, creating a time-decay effect that prevents immediate feedback from dominating the training signal",
+    "expected_effect": "reduce the rate at which the system becomes biased toward recent popular items, maintaining diversity in recommendations while preserving throughput capacity",
+    "falsification_test": "measure the diversity metric (e.g., entropy of recommendations) over time with and without the time-decay constraint, tracking mid-tail user retention",
+    "mechanism_source_span": "\"we demonstrate how the feedback loop between human users and recommender systems can lead to bias amplification, reducing diversity and potentially harming user experience\"",
+    "span_derivation": {
+     "n_shared": 7,
+     "shared_terms": [
+      "amplification",
+      "bia",
+      "feedback",
+      "human",
+      "loop",
+      "recommender",
+      "system"
+     ],
+     "span_terms_n": 18,
+     "ratio": 0.389,
+     "underived": false,
+     "state": "MEASURED",
+     "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+    }
+   },
+   "span_underived": false,
+   "candidate_id": "cand:DIV:mechanism_inversion:zai:b7bcf08f079a"
+  },
+  {
+   "angle": "simplification",
+   "provider_id": "zai",
+   "status": "OK",
+   "model": "glm-4-plus",
+   "prompt_hash": "dfdfb7ebc28de20499c8d6e4c7bc9aea723fd5cbf65837bca8e3e52d234d0fd7",
+   "output_hash": "78485265816ca94e8a92aba3a507b23450cac2512fd08b4053594b708f004b93",
+   "fields": {
+    "mechanism": "feedback loop amplification",
+    "intervention": "implement a bias correction layer that artificially injects diversity into the training data by sampling from long-tail items with probability proportional to their inverse popularity",
+    "expected_effect": "breaks the positive feedback loop that causes over-representation of popular items, restoring recommendation diversity and improving long-term retention for mid-tail users",
+    "falsification_test": "compare retention rates of mid-tail users between control group (standard recommender) and test group (recommender with bias correction) over 90 days",
+    "mechanism_source_span": "\"we demonstrate how the human-recommender system feedback loop can amplify biases present in user interaction data, leading to increasingly homogeneous recommendations over time\"",
+    "span_derivation": {
+     "n_shared": 3,
+     "shared_terms": [
+      "data",
+      "feedback",
+      "loop"
+     ],
+     "span_terms_n": 20,
+     "ratio": 0.15,
+     "underived": true,
+     "state": "MEASURED",
+     "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+    }
+   },
+   "span_underived": true,
+   "candidate_id": "cand:DIV:simplification:zai:78485265816c"
+  },
+  {
+   "angle": "multi_physics_hybrid",
+   "provider_id": "zai",
+   "status": "OK",
+   "model": "glm-4-plus",
+   "prompt_hash": "1353640691521b14ec87958dd19662553e1a48140d5590be604e676c9c37277b",
+   "output_hash": "ebb676f4961fa0227b966ee7e1aaba004177aa916259732fd28d31438c1fed92",
+   "fields": {
+    "mechanism": "thermal diffusion of recommendation signals across user clusters",
+    "intervention": "implement a thermal-inspired diffusion mechanism that redistributes recommendation influence across user clusters to prevent localized overheating of popular content",
+    "expected_effect": "maintain temperature balance in the recommendation graph, preventing hotspots that cause diversity collapse while preserving throughput",
+    "falsification_test": "measure the temperature variance across user clusters before and after intervention, correlating with retention metrics",
+    "mechanism_source_span": "thermal diffusion processes can redistribute energy in closed systems to prevent localized overheating and maintain system equilibrium",
+    "span_derivation": {
+     "n_shared": 6,
+     "shared_terms": [
+      "diffusion",
+      "localized",
+      "overheating",
+      "prevent",
+      "redistribute",
+      "thermal"
+     ],
+     "span_terms_n": 13,
+     "ratio": 0.462,
+     "underived": false,
+     "state": "MEASURED",
+     "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+    }
+   },
+   "span_underived": false,
+   "candidate_id": "cand:DIV:multi_physics_hybrid:zai:ebb676f4961f"
+  },
+  {
+   "angle": "constraint_first",
+   "provider_id": "zai",
+   "status": "OK",
+   "model": "glm-4-plus",
+   "prompt_hash": "76e33c78eb13040648256f55cd209ee9db23d64b18380169e7516858fa4b21a5",
+   "output_hash": "407a011e2c83f70b3b94ea2f11ac066f47714d01c9c0ba122b1ca72ed017498f",
+   "fields": {
+    "mechanism": "feedback loop debiasing through explicit regularization of recommendation diversity",
+    "intervention": "implement diversity regularization in the collaborative filtering algorithm that penalizes over-reliance on past recommendation outputs",
+    "expected_effect": "maintain recommendation diversity while preserving high throughput, preventing collapse of long-term engagement for mid-tail users",
+    "falsification_test": "compare retention rates of mid-tail users between debiased and conventional models over 90 days while measuring recommendation diversity metrics",
+    "mechanism_source_span": "We introduce a debiasing technique that explicitly regularizes the recommendation algorithm to prevent over-reliance on past outputs, thereby maintaining recommendation diversity and preventing feedback loop collapse.",
+    "span_derivation": {
+     "n_shared": 11,
+     "shared_terms": [
+      "algorithm",
+      "debiasing",
+      "diversity",
+      "feedback",
+      "loop",
+      "output",
+      "over",
+      "past",
+      "recommendation",
+      "reliance",
+      "that"
+     ],
+     "span_terms_n": 20,
+     "ratio": 0.55,
+     "underived": false,
+     "state": "MEASURED",
+     "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+    }
+   },
+   "span_underived": false,
+   "candidate_id": "cand:DIV:constraint_first:zai:407a011e2c83"
+  }
+ ],
+ "built_at": "2026-09-10T16:57:37+00:00Z",
+ "usable_candidates": 5,
+ "status": "GRID_RUN",
+ "diversity_metrics": {
+  "candidates_measured": 5,
+  "mean_pairwise_token_distance": 0.882,
+  "distinct_mechanism_clusters": 5,
+  "cluster_sizes": [
+   1,
+   1,
+   1,
+   1,
+   1
+  ],
+  "rewrite_pairs_jaccard_ge_0_8": [],
+  "architecture_term_count": 68,
+  "architecture_terms_sample": [
+   "across",
+   "algorithm",
+   "artificially",
+   "bias",
+   "clusters",
+   "cold",
+   "collaborative",
+   "constraint",
+   "content",
+   "correction",
+   "creating",
+   "data",
+   "debiasing",
+   "decay",
+   "diffusion",
+   "diversity",
+   "dominating",
+   "effect",
+   "feedback",
+   "filtering",
+   "immediate",
+   "implement",
+   "influence",
+   "injects"
+  ],
+  "failure_mode_signal_count": 3,
+  "failure_modes_invoked_sample": [
+   "calibration drift invalidating decision thresholds",
+   "feedback-loop data contamination",
+   "label noise propagating to biased predictions"
+  ],
+  "prior_art_query_set_count": 5,
+  "detected_domain": "ml_data"
+ },
+ "entry": {
+  "entry_helper_version": "stage_entry/1.0.0",
+  "stage": "EXPLORATION_GRID",
+  "entry_status": "ALLOWED",
+  "prerequisite": "VERIFIED_EVIDENCE",
+  "prerequisite_evidence": {
+   "n_verified_evidence_items": 8,
+   "n_direct_support": 2,
+   "n_partial_support": 6,
+   "n_items_total": 16,
+   "span_binding_verified": false,
+   "basis": ">=1 evidence item classified DIRECT_SUPPORT/PARTIAL_SUPPORT, or the candidate's span binding verified (R394 s5 classification + a2/verify)"
+  }
+ }
+}

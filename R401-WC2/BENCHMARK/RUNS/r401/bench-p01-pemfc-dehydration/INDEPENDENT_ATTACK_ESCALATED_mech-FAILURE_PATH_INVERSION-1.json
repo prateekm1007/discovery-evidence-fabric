@@ -1,0 +1,56 @@
+{
+ "stage": "INDEPENDENT_ATTACK",
+ "candidate_id": "cand:MS:FAILURE_PATH_INVERSION:81a7e3b21cb9",
+ "escalation": {
+  "gate_version": "attacker_calibration/1.0.0",
+  "instrument": "independent_attack/1.0.0",
+  "calibration_state": "NOT_CALIBRATED",
+  "terminal_kill_admissible": false,
+  "measured": {
+   "coverage": 1.0,
+   "parse_completeness": 1.0,
+   "tpr_scoped": 1.0,
+   "fpr_known_good": 1.0,
+   "n_cases_attacked": 40
+  },
+  "sealed_thresholds": {
+   "note": "registered BEFORE measurement; never tuned to results (Art. XXVII)",
+   "coverage_min": 0.875,
+   "parse_completeness_min": 0.875,
+   "tpr_min": 0.75,
+   "fpr_max": 0.3,
+   "ensemble": "NONE (single-attacker calibration only; majority-vote ensembles are deferred by the R412 directive)"
+  },
+  "measurement_path": "R412/CALIBRATION/engine_independent_attack_measurement.json",
+  "measurement_sha256": "4e1718e7088564333b5e1ef9be47ca452133d051001628cd6eed91f44e60ef5f",
+  "reason": "measured FPR 1.0 > sealed bar 0.3 (Art. L: the attacker is measured non-selective; its KILL is inadmissible as a terminal verdict and is escalated with the objection preserved)",
+  "rule": "the instrument's KILL is measured non-selective (FPR above the sealed bar); the objection is preserved verbatim and ESCALATED for adjudication — the candidate is NOT killed by this attack alone (Art. L); the deterministic gates are unchanged",
+  "reviewer_provenance": "AI_REVIEW (Art. LXVII)"
+ },
+ "preserved_objections": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "basis": "The Enhanced Osprey Optimization Algorithm (EOOA) fails to address the fundamental mass transfer limitations in PEMFCs at high current densities (>1.5 A/cm²) where membrane dehydration occurs, as evidenced by the coupled influence study showing that water management dynamics are more complex than algorithmic optimization can solve when electro-osmotic drag exceeds back-diffusion rates."
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "basis": "The boundary condition of maintaining 1.5 A/cm² current density with cathode humidification parasitic load below 10% is physically impossible, as demonstrated by the Ballard-Mark-V investigation which shows that maintaining optimal hydration at this current density requires at least 15% parasitic load for humidification alone, violating the fundamental energy balance of the system."
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "basis": "The candidate's own evidence includes a study on a PEMFC recirculation system without an external humidifier, directly contradicting the need for the EOOA's hydration maintenance mechanism by showing that alternative system approaches can achieve performance without complex optimization algorithms."
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "basis": "The predicted 15% voltage increase at 1.5 A/cm² is not achievable based on the membrane humidifier performance study, which demonstrates that even with perfect humidification, theoretical maximum voltage improvement at this current density is capped at 8% due to fundamental thermodynamic losses that cannot be overcome by parameter optimization alone."
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "basis": "The EOOA cannot be implemented in real-time fuel cell control systems due to its computational complexity, as evidenced by the biomimetics paper itself which admits the algorithm requires \"significant computational resources\" that exceed the processing capabilities of standard PEMFC control units, making it impractical for the intended application."
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "basis": "The testable prediction of voltage increase at 1.5 A/cm² fails to account for the localized hot spot formation it claims to eliminate, as the provided evidence does not include any methodology for measuring spatial temperature distribution within the membrane, making it impossible to verify the claimed prevention of hot spots which is the core failure mode being addressed."
+  }
+ ]
+}

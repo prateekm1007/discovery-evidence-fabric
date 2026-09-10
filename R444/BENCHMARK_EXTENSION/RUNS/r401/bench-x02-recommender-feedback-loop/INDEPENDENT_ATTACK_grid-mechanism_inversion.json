@@ -1,0 +1,79 @@
+{
+ "attack_version": "independent_attack/1.0.0",
+ "candidate_id": "cand:DIV:mechanism_inversion:zai:b7bcf08f079a",
+ "generator_provider": null,
+ "attacker_provider": "zai",
+ "attacker_model": "glm-4-plus",
+ "independence_mode": "SEPARATE_CONTEXT",
+ "independence_note": "the attacker ran in an independent reasoning context (fresh adversarial conversation, generator reasoning never shown; no alternative provider credentialed — disclosed, never claimed as provider separation)",
+ "prompt_hash": "9b9d81dec75e50945d7ef2df87d138327a2fc5b88cc44b88c160468eeb533c75",
+ "output_hash": "2ad00d767c230f289355f092385de30db4ddabd0388d653a1aa7aecdbfe8ab9e",
+ "llm_status": "OK",
+ "attacked_at": "2026-09-10T17:01:33+00:00Z",
+ "items": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "verdict": "KILL",
+   "basis": "The proposed time-decay constraint fails to address the fundamental feedback loop amplification problem because it only affects the model update process, not the data collection mechanism. Recent interactions will still dominate the training signal regardless of how the model is updated, as the system continues to train on its own biased outputs."
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "verdict": "KILL",
+   "basis": "The candidate fails to specify boundary conditions for handling cold-start users or items, where time-decay would be particularly problematic as there is no historical data to establish a baseline for comparison."
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "verdict": "KILL",
+   "basis": "The candidate cites evidence about collaborative filtering and debiasing but fails to reference any studies specifically demonstrating the effectiveness of time-decay constraints in addressing feedback loop bias amplification. The cited evidence [doi:10.1145/3308560.3317303] actually suggests that more active interventions are needed beyond simple structural constraints."
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "verdict": "KILL",
+   "basis": "The time-decay constraint will not preserve throughput capacity as claimed, as limiting the influence of recent data will necessarily reduce the system's ability to respond quickly to emerging trends, directly contradicting the baseline performance requirement."
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "verdict": "KILL",
+   "basis": "The proposed intervention cannot be implemented without fundamentally rearchitecting the entire recommender system, as the time-decay constraint requires access to historical interaction data at the model update level, which is not available in standard collaborative filtering implementations without significant architectural changes."
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "verdict": "KILL",
+   "basis": "The candidate's testable prediction fails to specify how to isolate the effect of the time-decay constraint from other potential interventions, making it impossible to determine whether any observed changes in diversity metrics are due to the constraint or other factors."
+  }
+ ],
+ "state": "ATTACK_RUN",
+ "overall": "KILLED",
+ "kill_basis": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "basis": "The proposed time-decay constraint fails to address the fundamental feedback loop amplification problem because it only affects the model update process, not the data collection mechanism. Recent interactions will still dominate the training signal regardless of how the model is updated, as the system continues to train on its own biased outputs."
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "basis": "The candidate fails to specify boundary conditions for handling cold-start users or items, where time-decay would be particularly problematic as there is no historical data to establish a baseline for comparison."
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "basis": "The candidate cites evidence about collaborative filtering and debiasing but fails to reference any studies specifically demonstrating the effectiveness of time-decay constraints in addressing feedback loop bias amplification. The cited evidence [doi:10.1145/3308560.3317303] actually suggests that more active interventions are needed beyond simple structural constraints."
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "basis": "The time-decay constraint will not preserve throughput capacity as claimed, as limiting the influence of recent data will necessarily reduce the system's ability to respond quickly to emerging trends, directly contradicting the baseline performance requirement."
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "basis": "The proposed intervention cannot be implemented without fundamentally rearchitecting the entire recommender system, as the time-decay constraint requires access to historical interaction data at the model update level, which is not available in standard collaborative filtering implementations without significant architectural changes."
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "basis": "The candidate's testable prediction fails to specify how to isolate the effect of the time-decay constraint from other potential interventions, making it impossible to determine whether any observed changes in diversity metrics are due to the constraint or other factors."
+  }
+ ],
+ "counts": {
+  "KILL": 6,
+  "RISK": 0,
+  "SURVIVE": 0,
+  "INVALID": 0
+ }
+}

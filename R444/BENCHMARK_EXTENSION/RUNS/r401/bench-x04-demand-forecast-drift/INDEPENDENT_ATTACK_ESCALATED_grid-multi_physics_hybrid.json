@@ -1,0 +1,56 @@
+{
+ "stage": "INDEPENDENT_ATTACK",
+ "candidate_id": "cand:DIV:multi_physics_hybrid:zai:c01491ce6d0e",
+ "escalation": {
+  "gate_version": "attacker_calibration/1.0.0",
+  "instrument": "independent_attack/1.0.0",
+  "calibration_state": "NOT_CALIBRATED",
+  "terminal_kill_admissible": false,
+  "measured": {
+   "coverage": 1.0,
+   "parse_completeness": 1.0,
+   "tpr_scoped": 1.0,
+   "fpr_known_good": 1.0,
+   "n_cases_attacked": 40
+  },
+  "sealed_thresholds": {
+   "note": "registered BEFORE measurement; never tuned to results (Art. XXVII)",
+   "coverage_min": 0.875,
+   "parse_completeness_min": 0.875,
+   "tpr_min": 0.75,
+   "fpr_max": 0.3,
+   "ensemble": "NONE (single-attacker calibration only; majority-vote ensembles are deferred by the R412 directive)"
+  },
+  "measurement_path": "R412/CALIBRATION/engine_independent_attack_measurement.json",
+  "measurement_sha256": "4e1718e7088564333b5e1ef9be47ca452133d051001628cd6eed91f44e60ef5f",
+  "reason": "measured FPR 1.0 > sealed bar 0.3 (Art. L: the attacker is measured non-selective; its KILL is inadmissible as a terminal verdict and is escalated with the objection preserved)",
+  "rule": "the instrument's KILL is measured non-selective (FPR above the sealed bar); the objection is preserved verbatim and ESCALATED for adjudication — the candidate is NOT killed by this attack alone (Art. L); the deterministic gates are unchanged",
+  "reviewer_provenance": "AI_REVIEW (Art. LXVII)"
+ },
+ "preserved_objections": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "basis": "Wavelet decomposition for retail demand forecasting is fundamentally mismatched to the problem domain, as wavelets are designed for frequency analysis of continuous signals, not discrete, irregular retail sales data with inherent noise and outliers (evidenced by the complete absence of wavelet applications in retail forecasting literature in the provided evidence)"
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "basis": "The candidate fails to specify critical boundary conditions for retail data including handling of intermittent demand (many SKUs with zero sales), product lifecycle stages (introduction, growth, maturity, decline), and promotional events that create non-stationary patterns that cannot be properly decomposed or captured by the proposed architecture"
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "basis": "The provided evidence references building energy consumption, pharmaceutical supply chains, abrasive wear optimization, and blood donor profiling—none of which are retail demand forecasting contexts, demonstrating a complete lack of domain-relevant evidence supporting the claimed mechanism"
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "basis": "The candidate provides no evidence that LSTM networks would outperform gradient-boosted models on retail temporal dependencies, and existing literature shows gradient-boosted models (like XGBoost) actually outperform LSTMs on tabular time series data with feature importance capabilities that LSTMs lack"
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "basis": "The proposed hybrid architecture would require maintaining three distinct model types with different update cycles and parameter tuning requirements, creating an unsustainable maintenance burden in a production retail environment where models need to be retrained weekly"
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "basis": "The testable prediction focuses only on WAPE inflation detection but fails to specify how the model would distinguish between feature drift and legitimate demand pattern changes, nor how it would handle the common retail scenario where multiple factors change simultaneously (price, promotion, assortment) making root cause identification impossible"
+  }
+ ]
+}

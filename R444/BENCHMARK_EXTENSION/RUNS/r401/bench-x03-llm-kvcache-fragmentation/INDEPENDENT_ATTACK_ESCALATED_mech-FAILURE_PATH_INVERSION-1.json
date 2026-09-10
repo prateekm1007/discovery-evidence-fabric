@@ -1,0 +1,56 @@
+{
+ "stage": "INDEPENDENT_ATTACK",
+ "candidate_id": "cand:MS:FAILURE_PATH_INVERSION:e470972039a0",
+ "escalation": {
+  "gate_version": "attacker_calibration/1.0.0",
+  "instrument": "independent_attack/1.0.0",
+  "calibration_state": "NOT_CALIBRATED",
+  "terminal_kill_admissible": false,
+  "measured": {
+   "coverage": 1.0,
+   "parse_completeness": 1.0,
+   "tpr_scoped": 1.0,
+   "fpr_known_good": 1.0,
+   "n_cases_attacked": 40
+  },
+  "sealed_thresholds": {
+   "note": "registered BEFORE measurement; never tuned to results (Art. XXVII)",
+   "coverage_min": 0.875,
+   "parse_completeness_min": 0.875,
+   "tpr_min": 0.75,
+   "fpr_max": 0.3,
+   "ensemble": "NONE (single-attacker calibration only; majority-vote ensembles are deferred by the R412 directive)"
+  },
+  "measurement_path": "R412/CALIBRATION/engine_independent_attack_measurement.json",
+  "measurement_sha256": "4e1718e7088564333b5e1ef9be47ca452133d051001628cd6eed91f44e60ef5f",
+  "reason": "measured FPR 1.0 > sealed bar 0.3 (Art. L: the attacker is measured non-selective; its KILL is inadmissible as a terminal verdict and is escalated with the objection preserved)",
+  "rule": "the instrument's KILL is measured non-selective (FPR above the sealed bar); the objection is preserved verbatim and ESCALATED for adjudication — the candidate is NOT killed by this attack alone (Art. L); the deterministic gates are unchanged",
+  "reviewer_provenance": "AI_REVIEW (Art. LXVII)"
+ },
+ "preserved_objections": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "basis": "The proposed mechanism assumes request length patterns are predictable enough for proactive migration, but [doi:10.14711/thesis-hdl152583] demonstrates that in multi-tenant GPU clusters, request patterns are inherently unpredictable due to tenant behavior variations, making predictive migration fundamentally flawed."
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "basis": "The mechanism requires \"sufficient inter-GPU bandwidth\" which directly contradicts [doi:10.70675/036b4171z0acfz4a50z9d51z481b92e5f4da] which proves that shared-cache networks have fundamental bandwidth limitations that cannot be overcome, making this boundary condition impossible to meet in practice."
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "basis": "The candidate claims reduced live-token evictions by 40%, but [doi:10.1109/icassp55912.2026.11461518] shows that MIDAS, a similar approach, actually increases evictions during burst conditions by 15-20% due to the overhead of cross-GPU operations, directly contradicting this prediction."
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "basis": "The mechanism cannot outperform baseline at loads below 2x baseline according to its own boundary conditions, meaning it fails to solve the core problem of handling traffic peaks which is exactly when the failure occurs, rendering it equivalent to baseline for the most critical use case."
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "basis": "The proposed mechanism requires real-time request length pattern analysis which [doi:10.5463/thesis.308] demonstrates is impossible to implement with the required precision in latency-critical inference serving systems without violating p99 latency constraints."
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "basis": "The testable prediction compares \"predictive migration\" to \"reactive migration\" but fails to define how reactive migration is implemented or measured, and [doi:10.5220/0015138800004103] shows that KV cache measurements themselves are unreliable due to bit-flip vulnerabilities in shared blocks, making the 30% fragmentation reduction claim unverifiable."
+  }
+ ]
+}

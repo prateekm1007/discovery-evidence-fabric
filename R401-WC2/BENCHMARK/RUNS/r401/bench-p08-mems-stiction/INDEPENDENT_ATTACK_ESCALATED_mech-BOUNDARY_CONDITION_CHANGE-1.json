@@ -1,0 +1,56 @@
+{
+ "stage": "INDEPENDENT_ATTACK",
+ "candidate_id": "cand:MS:BOUNDARY_CONDITION_CHANGE:2a2a8bc4ce92",
+ "escalation": {
+  "gate_version": "attacker_calibration/1.0.0",
+  "instrument": "independent_attack/1.0.0",
+  "calibration_state": "NOT_CALIBRATED",
+  "terminal_kill_admissible": false,
+  "measured": {
+   "coverage": 1.0,
+   "parse_completeness": 1.0,
+   "tpr_scoped": 1.0,
+   "fpr_known_good": 1.0,
+   "n_cases_attacked": 40
+  },
+  "sealed_thresholds": {
+   "note": "registered BEFORE measurement; never tuned to results (Art. XXVII)",
+   "coverage_min": 0.875,
+   "parse_completeness_min": 0.875,
+   "tpr_min": 0.75,
+   "fpr_max": 0.3,
+   "ensemble": "NONE (single-attacker calibration only; majority-vote ensembles are deferred by the R412 directive)"
+  },
+  "measurement_path": "R412/CALIBRATION/engine_independent_attack_measurement.json",
+  "measurement_sha256": "4e1718e7088564333b5e1ef9be47ca452133d051001628cd6eed91f44e60ef5f",
+  "reason": "measured FPR 1.0 > sealed bar 0.3 (Art. L: the attacker is measured non-selective; its KILL is inadmissible as a terminal verdict and is escalated with the objection preserved)",
+  "rule": "the instrument's KILL is measured non-selective (FPR above the sealed bar); the objection is preserved verbatim and ESCALATED for adjudication — the candidate is NOT killed by this attack alone (Art. L); the deterministic gates are unchanged",
+  "reviewer_provenance": "AI_REVIEW (Art. LXVII)"
+ },
+ "preserved_objections": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "basis": "The proposed intervention addresses dielectric charging degradation but fails to address the actual failure mechanism: shock-induced contact between comb fingers causing stiction and permanent shorting of electrodes. The candidate completely misdiagnoses the root cause of failure."
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "basis": "The boundary condition of 10000 g mechanical shock in all axes will inevitably cause comb finger contact regardless of resonance monitoring, as the shock energy exceeds the structural limits of MEMS comb fingers, making the proposed intervention irrelevant to this boundary condition."
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "basis": "The provided evidence bundle ([doi:10.3390/mi17060732], [doi:10.3390/mi9110602], [doi:10.23919/ursi.2018.8406772], [doi:10.1109/iic.2015.7150884], [doi:10.1109/incet54531.2022.9824806]) all focus on normal operation design and sensitivity analysis, with no evidence supporting the efficacy of resonance monitoring for shock-induced stiction prevention."
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "basis": "The predicted 70% reduction in capacitance shift after shock is unsubstantiated and likely optimistic given that shock-induced physical contact between comb fingers would cause immediate and complete failure regardless of any monitoring system, making the performance equivalent to baseline in actual shock conditions."
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "basis": "Implementing a resonance monitoring system in a MEMS accelerometer that must survive 10000 g shocks is impossible as the monitoring electronics would be destroyed by such extreme acceleration, violating the boundary condition of surviving mechanical shock."
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "basis": "The testable prediction fails to define what constitutes \"70% less capacitance shift\" when the baseline device experiences complete electrode shorting (infinite capacitance change), making the metric undefined and unmeasurable."
+  }
+ ]
+}

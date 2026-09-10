@@ -1,0 +1,1435 @@
+{
+ "ledger": "TECHNICAL_IMPROVEMENT_LEDGER (R379 V2 + R383 ANALYTICAL EQUATION LAYER)",
+ "version": "3.0.0",
+ "loop": "CANDIDATE -> TECHNICAL DIAGNOSIS (limiting variable + direction + R383 QUANTITATIVE margins/sensitivities) -> DETERMINISTIC SOLVE-OR-LLM MUTATION (actual design variable) -> CAD REBUILD -> INDEPENDENT TECHNICAL EVALUATION (monotone + quantitative on the child's OWN measured geometry) -> EVIDENCE/PRIOR-ART RECHECK -> KEEP/KILL (K1-K8) -> SECOND IMPROVEMENT",
+ "collision_mode": "REPLAY_CACHE",
+ "live_sources": null,
+ "thresholds": {
+  "MAX_ITERATIONS_DEFAULT": {
+   "value": 2,
+   "epistemic_class": "ENGINEERING",
+   "justification": "the CEO milestone is DIAGNOSE -> TECHNICAL MUTATION -> RE-EVALUATE -> SECOND IMPROVEMENT; two iterations demonstrate repeatability at bounded cost"
+  },
+  "MAX_PROPOSALS_PER_ITERATION": {
+   "value": 3,
+   "epistemic_class": "ENGINEERING",
+   "justification": "bounded proposal budget, identical to the R378 epistemic loop: three attempts, then the honest no-defensible-mutation verdict"
+  },
+  "VALUE_CLASS_STRICTNESS": {
+   "value": "HARD",
+   "epistemic_class": "ENGINEERING",
+   "justification": "EXTRACTED claims are span-verified or rejected (Art. II/VI); MODELLED values are admitted only when declared; an unbounded parameter is immutable (ADR_R379 anti-gaming)"
+  }
+ },
+ "mutation_kinds_live": [
+  "PARAMETER_CHANGE",
+  "GEOMETRY_CHANGE",
+  "MATERIAL_CHANGE",
+  "OPERATING_CONDITION_CHANGE",
+  "MECHANISM_CHANGE"
+ ],
+ "mutation_kinds_reserved": {
+  "ARCHITECTURE_CHANGE": "needs a structural/control search space at a higher fidelity tier (ADR_R379)",
+  "CONTROL_POLICY_CHANGE": "needs a structural/control search space at a higher fidelity tier (ADR_R379)"
+ },
+ "keep_criterion": "the child's OWN independent technical evaluation must confirm the objective improves in the mutation direction with constraints preserved — a score increase is NEVER sufficient (CEO R379 item 4/8)",
+ "started_at": "2026-09-10T16:03:28+00:00Z",
+ "iterations": [
+  {
+   "iteration": 1,
+   "diagnosis": {
+    "status": "QUANTIFIED",
+    "limiting_variable": {
+     "param_id": "param_002",
+     "name": "coating thickness",
+     "improving_move": "INCREASE",
+     "objective_target": "param_001",
+     "objective_direction": "MINIMIZE",
+     "envelope": [
+      0.1,
+      10.0
+     ],
+     "envelope_class": "MODELLED",
+     "causal_path_length": 1,
+     "statement": "The limiting variable is coating thickness. Changing it by increase is predicted to improve objective param_001 (MINIMIZE) while preserving all declared constraints that are checkable at this tier.",
+     "convention": {
+      "name": "ORDINAL_LEVERAGE_BY_PATH_LENGTH",
+      "epistemic_class": "ENGINEERING",
+      "justification": "with MONOTONE-only relations the evaluator cannot rank leverage by magnitude; it ranks by (1) fewest constraint blocks, (2) shortest causal path from the parameter to the objective target, (3) envelope provenance class (EXTRACTED beats MODELLED). This is a declared ordinal convention, not a measurement — recorded on every evaluation that uses it.",
+      "uncertainty": "ordinal only; magnitudes are UNKNOWN at this tier"
+     }
+    },
+    "improvement_directions_summary": [
+     {
+      "param_id": "param_001",
+      "improving_move": "DECREASE",
+      "mutable": false,
+      "blocked": false
+     },
+     {
+      "param_id": "param_002",
+      "improving_move": "INCREASE",
+      "mutable": true,
+      "blocked": false
+     },
+     {
+      "param_id": "param_003",
+      "improving_move": "INCREASE",
+      "mutable": true,
+      "blocked": false
+     },
+     {
+      "param_id": "param_005",
+      "improving_move": "DECREASE",
+      "mutable": false,
+      "blocked": false
+     }
+    ],
+    "constraint_results": [],
+    "quantitative": {
+     "status": "UNQUANTIFIED",
+     "objective": {
+      "target": "param_001",
+      "direction": "MINIMIZE",
+      "computed": false,
+      "value": null,
+      "unit": null,
+      "equation_id": null,
+      "margin": null,
+      "margin_status": "UNCOMPUTED",
+      "statement": "no active computation binds the objective target"
+     },
+     "requirement_satisfied": null,
+     "limiting_variable": null,
+     "computed_equations": [],
+     "computation_log": [],
+     "evidence_rank": 4
+    }
+   },
+   "proposals": [
+    {
+     "proposal_id": "tmp:6a681cdda209",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "4ec44852b4d75c989b4e5ccc4fe92d3574455d252c94db263649a0cc9085bd54",
+     "output_hash": "4b8628427b53d2a937f9d9a2e60b9a853bbabe355f4c2634fe67efe2a647e4f0",
+     "fields": {
+      "MUTATION_KIND": "GEOMETRY_CHANGE",
+      "TARGET_PARAM": "param_002",
+      "NEW_VALUE": "6.5",
+      "DIRECTION": "INCREASE",
+      "VALUE_CLASS": "MODELLED",
+      "VALUE_SPAN": "NONE",
+      "VALUE_EVIDENCE_ID": "NONE",
+      "RATIONALE": "Increasing coating thickness creates a longer diffusion pathway for water molecules, reducing permeation while maintaining oxygen barrier properties",
+      "MECHANISM_DELTA": "The thickness of the nanocomposite coating layer is increased from its previous unknown value to 6.5 micrometers to enhance barrier performance against moisture permeation.",
+      "INTERVENTION_DELTA": "Apply a nanocomposite coating containing hydrophobic nanoparticles with a thickness of 6.5 micrometers to the ethylene-vinyl alcohol layer to further reduce moisture permeation while maintaining oxygen barrier properties."
+     },
+     "validation": {
+      "valid": true,
+      "stage": "VALIDATION",
+      "mutation_kind": "GEOMETRY_CHANGE",
+      "target_param": "param_002",
+      "checks": {
+       "mutation_kind_valid": "GEOMETRY_CHANGE",
+       "target_is_limiting_variable": "param_002",
+       "target_exists": true,
+       "target_is_design_variable": true,
+       "kind_matches_category": true,
+       "envelope_declared": [
+        0.1,
+        10.0
+       ],
+       "direction_matches_evaluator": "INCREASE",
+       "new_value_numeric": 6.5,
+       "value_inside_envelope": "[0.1, 10.0]",
+       "mutation_changes_value": true,
+       "value_class_declared": "MODELLED",
+       "spec_text_sync": "The thickness of the nanocomposite coating layer is increased from its previous  | Apply a nanocomposite coating containing hydrophobic nanoparticles with a thickn",
+       "t10_geometry_gate": "no parametric model bound to this parameter — the state-level gates are decisive"
+      },
+      "reasons": [],
+      "validated_at": "2026-09-10T16:03:47+00:00Z"
+     }
+    }
+   ],
+   "mutation_attempts_extra": [],
+   "mutation_applied": {
+    "chain": "ORIGINAL CANDIDATE -> TECHNICAL DIAGNOSIS -> TECHNICAL MUTATION -> NEW CANDIDATE",
+    "mutation_id": "tmut:f8ee3076230a",
+    "mutation_kind": "GEOMETRY_CHANGE",
+    "layer": "TECHNICAL (R379 V2) — an actual design variable was changed, not the wording",
+    "diagnostic_trigger": {
+     "evaluator": "analytical_monotone_v1 (deterministic)",
+     "limiting_variable": "param_002",
+     "improving_direction": "INCREASE",
+     "evaluation_computation_log": {
+      "evaluator_id": "analytical_monotone_v1",
+      "fidelity_tier": "STRUCTURED_CONSTRAINT",
+      "evidence_rank": 3,
+      "input_state_sha256": "dba4e862a006013fe2737e1c7feaa5cc729985308f007cc62b206353031804f2",
+      "conventions": [
+       {
+        "name": "ORDINAL_LEVERAGE_BY_PATH_LENGTH",
+        "epistemic_class": "ENGINEERING",
+        "justification": "with MONOTONE-only relations the evaluator cannot rank leverage by magnitude; it ranks by (1) fewest constraint blocks, (2) shortest causal path from the parameter to the objective target, (3) envelope provenance class (EXTRACTED beats MODELLED). This is a declared ordinal convention, not a measurement — recorded on every evaluation that uses it.",
+        "uncertainty": "ordinal only; magnitudes are UNKNOWN at this tier"
+       },
+       {
+        "name": "DIRECTIONAL_FAIL_CLOSED",
+        "epistemic_class": "ENGINEERING",
+        "justification": "a proposed change is constraint-BLOCKED when (a) the changed parameter's own numeric constraint would be violated at the proposed value, or (b) a relation-connected constraint target is already VIOLATED or value-UNKNOWN and the predicted direction moves it TOWARD its bound. Fail-closed on directional risk: an unknown-position target moving toward a bound is a blocked move, not an accepted one (Art. IV).",
+        "uncertainty": "direction-level only at this tier"
+       }
+      ],
+      "steps": [
+       "resolved objective param_001 (MINIMIZE)",
+       "checked 0 constraint(s) numerically where values exist",
+       "propagated signs over 3 relation(s)",
+       "ranked 2 movable improving direction(s)"
+      ],
+      "computed_at": "2026-09-10T16:03:47+00:00Z",
+      "deterministic": true
+     }
+    },
+    "quantitative_diagnosis": {
+     "engaged": false,
+     "status": "UNQUANTIFIED",
+     "note": "no bound equation named a limiting variable"
+    },
+    "proposal_provenance": {
+     "proposal_id": "tmp:6a681cdda209",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "4ec44852b4d75c989b4e5ccc4fe92d3574455d252c94db263649a0cc9085bd54",
+     "output_hash": "4b8628427b53d2a937f9d9a2e60b9a853bbabe355f4c2634fe67efe2a647e4f0",
+     "origin": "UNTRUSTED_LLM_PROPOSER",
+     "llm_is_untrusted_proposer": true
+    },
+    "validation": {
+     "valid": true,
+     "stage": "VALIDATION",
+     "mutation_kind": "GEOMETRY_CHANGE",
+     "target_param": "param_002",
+     "checks": {
+      "mutation_kind_valid": "GEOMETRY_CHANGE",
+      "target_is_limiting_variable": "param_002",
+      "target_exists": true,
+      "target_is_design_variable": true,
+      "kind_matches_category": true,
+      "envelope_declared": [
+       0.1,
+       10.0
+      ],
+      "direction_matches_evaluator": "INCREASE",
+      "new_value_numeric": 6.5,
+      "value_inside_envelope": "[0.1, 10.0]",
+      "mutation_changes_value": true,
+      "value_class_declared": "MODELLED",
+      "spec_text_sync": "The thickness of the nanocomposite coating layer is increased from its previous  | Apply a nanocomposite coating containing hydrophobic nanoparticles with a thickn",
+      "t10_geometry_gate": "no parametric model bound to this parameter — the state-level gates are decisive"
+     },
+     "reasons": [],
+     "validated_at": "2026-09-10T16:03:47+00:00Z"
+    },
+    "changed_variable": {
+     "param_id": "param_002",
+     "name": "coating thickness",
+     "from_value": null,
+     "to_value": 6.5,
+     "from_class": "UNKNOWN",
+     "to_class": "MODELLED",
+     "envelope": [
+      0.1,
+      10.0
+     ],
+     "envelope_class": "MODELLED"
+    },
+    "spec_text_delta": {
+     "mechanism": "The thickness of the nanocomposite coating layer is increased from its previous unknown value to 6.5 micrometers to enhance barrier performance against moisture permeation.",
+     "intervention": "Apply a nanocomposite coating containing hydrophobic nanoparticles with a thickness of 6.5 micrometers to the ethylene-vinyl alcohol layer to further reduce moisture permeation while maintaining oxygen barrier properties."
+    },
+    "cad_rebuild": null,
+    "inherited_negatives": {
+     "uncertainty_ids": [
+      "con:verify:fc690a03",
+      "multilayer polymer packaging layer food film",
+      "multilayer polymer packaging layer food film",
+      "layers physical contact filling molecular synergistic",
+      "layers physical contact filling molecular synergistic",
+      "multilayer layer barrier replace structure monolithic hydrophobic",
+      "multilayer layer barrier replace structure monolithic hydrophobic",
+      "multilayer transmission incorporating during distribution humidity",
+      "multilayer transmission incorporating during distribution humidity",
+      "transmission decrease water vapor rate 890",
+      "transmission decrease water vapor rate 890"
+     ],
+     "collision_family_ids": [],
+     "source_errors": []
+    },
+    "parent_spec_hash": "dc27c30e1c9fd332c798f7628016c3eef04e4c3dc56056276d3014013117c25b",
+    "reason": "Increasing coating thickness creates a longer diffusion pathway for water molecules, reducing permeation while maintaining oxygen barrier properties",
+    "applied_at": "2026-09-10T16:03:47+00:00Z"
+   },
+   "re_evaluation": {
+    "technical": {
+     "status": "QUANTIFIED",
+     "objective": {
+      "target": "param_001",
+      "direction": "MINIMIZE",
+      "known": true,
+      "basis": "to prevent moisture permeation failure in food packaging"
+     },
+     "limiting_variable": {
+      "param_id": "param_002",
+      "name": "coating thickness",
+      "improving_move": "INCREASE",
+      "objective_target": "param_001",
+      "objective_direction": "MINIMIZE",
+      "envelope": [
+       0.1,
+       10.0
+      ],
+      "envelope_class": "MODELLED",
+      "causal_path_length": 1,
+      "statement": "The limiting variable is coating thickness. Changing it by increase is predicted to improve objective param_001 (MINIMIZE) while preserving all declared constraints that are checkable at this tier.",
+      "convention": {
+       "name": "ORDINAL_LEVERAGE_BY_PATH_LENGTH",
+       "epistemic_class": "ENGINEERING",
+       "justification": "with MONOTONE-only relations the evaluator cannot rank leverage by magnitude; it ranks by (1) fewest constraint blocks, (2) shortest causal path from the parameter to the objective target, (3) envelope provenance class (EXTRACTED beats MODELLED). This is a declared ordinal convention, not a measurement — recorded on every evaluation that uses it.",
+       "uncertainty": "ordinal only; magnitudes are UNKNOWN at this tier"
+      }
+     },
+     "constraint_results": [],
+     "uncertainty": {
+      "unknown_value_params": [
+       "param_003",
+       "param_004",
+       "param_005",
+       "param_006",
+       "param_007"
+      ],
+      "modelled_relations": 3,
+      "extracted_relations": 0,
+      "unverifiable_constraints": [],
+      "objective_known": true,
+      "note": "UNKNOWN values are never treated as zeros; unverifiable constraints are never treated as satisfied (Art. XXV / Art. IV)"
+     },
+     "computation_log": {
+      "evaluator_id": "analytical_monotone_v1",
+      "fidelity_tier": "STRUCTURED_CONSTRAINT",
+      "evidence_rank": 3,
+      "input_state_sha256": "708f2c7b71fe2a48fd69689950d677c3b164c7a057db7c066d54057e37c38fcb",
+      "conventions": [
+       {
+        "name": "ORDINAL_LEVERAGE_BY_PATH_LENGTH",
+        "epistemic_class": "ENGINEERING",
+        "justification": "with MONOTONE-only relations the evaluator cannot rank leverage by magnitude; it ranks by (1) fewest constraint blocks, (2) shortest causal path from the parameter to the objective target, (3) envelope provenance class (EXTRACTED beats MODELLED). This is a declared ordinal convention, not a measurement — recorded on every evaluation that uses it.",
+        "uncertainty": "ordinal only; magnitudes are UNKNOWN at this tier"
+       },
+       {
+        "name": "DIRECTIONAL_FAIL_CLOSED",
+        "epistemic_class": "ENGINEERING",
+        "justification": "a proposed change is constraint-BLOCKED when (a) the changed parameter's own numeric constraint would be violated at the proposed value, or (b) a relation-connected constraint target is already VIOLATED or value-UNKNOWN and the predicted direction moves it TOWARD its bound. Fail-closed on directional risk: an unknown-position target moving toward a bound is a blocked move, not an accepted one (Art. IV).",
+        "uncertainty": "direction-level only at this tier"
+       }
+      ],
+      "steps": [
+       "resolved objective param_001 (MINIMIZE)",
+       "checked 0 constraint(s) numerically where values exist",
+       "propagated signs over 3 relation(s)",
+       "ranked 2 movable improving direction(s)"
+      ],
+      "computed_at": "2026-09-10T16:03:47+00:00Z",
+      "deterministic": true
+     }
+    },
+    "quantitative": {
+     "status": "UNQUANTIFIED",
+     "objective": {
+      "target": "param_001",
+      "direction": "MINIMIZE",
+      "computed": false,
+      "value": null,
+      "unit": null,
+      "equation_id": null,
+      "margin": null,
+      "margin_status": "UNCOMPUTED",
+      "statement": "no active computation binds the objective target"
+     },
+     "requirement_satisfied": null,
+     "limiting_variable": null,
+     "computed_equations": [],
+     "computation_log": [],
+     "evidence_rank": 4
+    },
+    "i_dimensions": {
+     "I1_MECHANISM_EVIDENCE_DERIVATION": {
+      "score": 0.341,
+      "state": "MEASURED"
+     },
+     "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_SURVIVORS"
+     },
+     "I3_RECOMBINATION_RISK": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_FAMILIES"
+     },
+     "I4_NEW_TECHNICAL_RELATIONSHIP": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+     },
+     "I5_EXPERIMENT_DISCRIMINATION": {
+      "score": 0.667,
+      "state": "MEASURED"
+     }
+    },
+    "i_flags": {
+     "underived_mechanism": false,
+     "recombination_only": false
+    },
+    "i_average": 0.504,
+    "q_average": 0.625,
+    "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE"
+   },
+   "decision": {
+    "action": "KEEP",
+    "checks": {
+     "technical_objective": "CONFIRMED on the child's independent evaluation: param_002 INCREASE improves objective param_001 (MINIMIZE) with constraints preserved",
+     "no_new_constraint_violation": true,
+     "no_constraint_laundering": true,
+     "negatives_preserved": true,
+     "no_new_structural_flags": true,
+     "i1_structural_floor": {
+      "parent": 0.455,
+      "child": 0.341,
+      "floor": 0.2,
+      "crossed_downward": false,
+      "note": "numeric I1 movement is recorded, never gated here (CEO R379 item 8); the floor crossing IS gated — a mutation may not flip a derived mechanism to underived"
+     },
+     "prior_art_position_not_degraded": true,
+     "value_class_provenance": "MODELLED design value — declared, never promoted (Art. XXVIII); the improvement attribution carries the class",
+     "geometry_valid_on_child": "no parametric model bound to the changed variable — the state-level gates are decisive",
+     "quantitative_margin": {
+      "engaged": false,
+      "parent_margin": null,
+      "child_margin": null,
+      "improvement": null,
+      "threshold": 0.005,
+      "verdict": "NOT_ENGAGED",
+      "parent_value": null,
+      "child_value": null,
+      "parent_unit": null,
+      "equation_id": null,
+      "reason": "quantitative objective not computed on both sides — the direction-level K1 criterion governs"
+     }
+    },
+    "reasons": [],
+    "decided_at": "2026-09-10T16:03:47+00:00Z"
+   },
+   "attribution": {
+    "artifact": "TECHNICAL_IMPROVEMENT_ATTRIBUTION",
+    "technical_mechanism": "param_003 --DECREASES--> param_001 (MODELLED): increasing nanoparticle concentration reduces water vapor transmission rate by creating more tortuou | param_002 --DECREASES--> param_001 (MODELLED): increasing coating thickness reduces water vapor transmission rate by providing a longer diffusion p | param_005 --INCREASES--> param_001 (MODELLED): increasing relative humidity increases water vapor transmission rate by increasing moisture gradient",
+    "changed_variable": "param_002",
+    "changed_variable_name": "coating thickness",
+    "direction": "INCREASE",
+    "from_value": null,
+    "to_value": 6.5,
+    "value_class": "MODELLED",
+    "envelope": [
+     0.1,
+     10.0
+    ],
+    "envelope_class": "MODELLED",
+    "predicted_effect": "param_002 6.5 is predicted to move objective param_001 (MINIMIZE) in the improving sense",
+    "evaluated_result": "CONFIRMED on the child's independent evaluation: param_002 INCREASE improves objective param_001 (MINIMIZE) with constraints preserved",
+    "constraints_result": [],
+    "evidence_class": "AI_INFERENCE (rank 3) — a direction-level prediction of the declared analytical model over the structured technical state. NOT a measurement, NOT a physical observation (Art. XXVIII / XXXVIII). The value class of the changed variable is recorded above; MODELLED design values are invention content, never evidence.",
+    "mutation_id": "tmut:f8ee3076230a",
+    "recorded_at": "2026-09-10T16:03:47+00:00Z"
+   }
+  },
+  {
+   "iteration": 2,
+   "diagnosis": {
+    "status": "QUANTIFIED",
+    "limiting_variable": {
+     "param_id": "param_002",
+     "name": "coating thickness",
+     "improving_move": "INCREASE",
+     "objective_target": "param_001",
+     "objective_direction": "MINIMIZE",
+     "envelope": [
+      0.1,
+      10.0
+     ],
+     "envelope_class": "MODELLED",
+     "causal_path_length": 1,
+     "statement": "The limiting variable is coating thickness. Changing it by increase is predicted to improve objective param_001 (MINIMIZE) while preserving all declared constraints that are checkable at this tier.",
+     "convention": {
+      "name": "ORDINAL_LEVERAGE_BY_PATH_LENGTH",
+      "epistemic_class": "ENGINEERING",
+      "justification": "with MONOTONE-only relations the evaluator cannot rank leverage by magnitude; it ranks by (1) fewest constraint blocks, (2) shortest causal path from the parameter to the objective target, (3) envelope provenance class (EXTRACTED beats MODELLED). This is a declared ordinal convention, not a measurement — recorded on every evaluation that uses it.",
+      "uncertainty": "ordinal only; magnitudes are UNKNOWN at this tier"
+     }
+    },
+    "improvement_directions_summary": [
+     {
+      "param_id": "param_001",
+      "improving_move": "DECREASE",
+      "mutable": false,
+      "blocked": false
+     },
+     {
+      "param_id": "param_002",
+      "improving_move": "INCREASE",
+      "mutable": true,
+      "blocked": false
+     },
+     {
+      "param_id": "param_003",
+      "improving_move": "INCREASE",
+      "mutable": true,
+      "blocked": false
+     },
+     {
+      "param_id": "param_005",
+      "improving_move": "DECREASE",
+      "mutable": false,
+      "blocked": false
+     }
+    ],
+    "constraint_results": [],
+    "quantitative": {
+     "status": "UNQUANTIFIED",
+     "objective": {
+      "target": "param_001",
+      "direction": "MINIMIZE",
+      "computed": false,
+      "value": null,
+      "unit": null,
+      "equation_id": null,
+      "margin": null,
+      "margin_status": "UNCOMPUTED",
+      "statement": "no active computation binds the objective target"
+     },
+     "requirement_satisfied": null,
+     "limiting_variable": null,
+     "computed_equations": [],
+     "computation_log": [],
+     "evidence_rank": 4
+    }
+   },
+   "proposals": [
+    {
+     "proposal_id": "tmp:8fb6ef7e163c",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "4d2aa2535c33e828020b28d8103c1c6eb66b635d4fcbedab7312d55f4dfa41cb",
+     "output_hash": "07d6eac3129d051fd05907f7eb331ff6187afa537fb7b531f81d7309d49fccae",
+     "fields": {
+      "MUTATION_KIND": "GEOMETRY_CHANGE",
+      "TARGET_PARAM": "param_002",
+      "NEW_VALUE": "8.5",
+      "DIRECTION": "INCREASE",
+      "VALUE_CLASS": "MODELLED",
+      "VALUE_SPAN": "NONE",
+      "VALUE_EVIDENCE_ID": "NONE",
+      "RATIONALE": "Increasing coating thickness enhances barrier properties by creating a more tortuous path for moisture molecules to permeate through the packaging film.",
+      "MECHANISM_DELTA": "The thickness of the nanocomposite coating layer is increased from 6.5 micrometers to 8.5 micrometers to further enhance barrier performance against moisture permeation.",
+      "INTERVENTION_DELTA": "Apply a nanocomposite coating containing hydrophobic nanoparticles with an increased thickness of 8.5 micrometers to the ethylene-vinyl alcohol layer to maximize reduction in moisture permeation while maintaining oxygen barrier properties."
+     },
+     "validation": {
+      "valid": true,
+      "stage": "VALIDATION",
+      "mutation_kind": "GEOMETRY_CHANGE",
+      "target_param": "param_002",
+      "checks": {
+       "mutation_kind_valid": "GEOMETRY_CHANGE",
+       "target_is_limiting_variable": "param_002",
+       "target_exists": true,
+       "target_is_design_variable": true,
+       "kind_matches_category": true,
+       "envelope_declared": [
+        0.1,
+        10.0
+       ],
+       "direction_matches_evaluator": "INCREASE",
+       "new_value_numeric": 8.5,
+       "value_inside_envelope": "[0.1, 10.0]",
+       "mutation_changes_value": true,
+       "value_class_declared": "MODELLED",
+       "spec_text_sync": "The thickness of the nanocomposite coating layer is increased from 6.5 micromete | Apply a nanocomposite coating containing hydrophobic nanoparticles with an incre",
+       "t10_geometry_gate": "no parametric model bound to this parameter — the state-level gates are decisive"
+      },
+      "reasons": [],
+      "validated_at": "2026-09-10T16:03:48+00:00Z"
+     }
+    }
+   ],
+   "mutation_attempts_extra": [],
+   "mutation_applied": {
+    "chain": "ORIGINAL CANDIDATE -> TECHNICAL DIAGNOSIS -> TECHNICAL MUTATION -> NEW CANDIDATE",
+    "mutation_id": "tmut:e3ef2acdf3f1",
+    "mutation_kind": "GEOMETRY_CHANGE",
+    "layer": "TECHNICAL (R379 V2) — an actual design variable was changed, not the wording",
+    "diagnostic_trigger": {
+     "evaluator": "analytical_monotone_v1 (deterministic)",
+     "limiting_variable": "param_002",
+     "improving_direction": "INCREASE",
+     "evaluation_computation_log": {
+      "evaluator_id": "analytical_monotone_v1",
+      "fidelity_tier": "STRUCTURED_CONSTRAINT",
+      "evidence_rank": 3,
+      "input_state_sha256": "708f2c7b71fe2a48fd69689950d677c3b164c7a057db7c066d54057e37c38fcb",
+      "conventions": [
+       {
+        "name": "ORDINAL_LEVERAGE_BY_PATH_LENGTH",
+        "epistemic_class": "ENGINEERING",
+        "justification": "with MONOTONE-only relations the evaluator cannot rank leverage by magnitude; it ranks by (1) fewest constraint blocks, (2) shortest causal path from the parameter to the objective target, (3) envelope provenance class (EXTRACTED beats MODELLED). This is a declared ordinal convention, not a measurement — recorded on every evaluation that uses it.",
+        "uncertainty": "ordinal only; magnitudes are UNKNOWN at this tier"
+       },
+       {
+        "name": "DIRECTIONAL_FAIL_CLOSED",
+        "epistemic_class": "ENGINEERING",
+        "justification": "a proposed change is constraint-BLOCKED when (a) the changed parameter's own numeric constraint would be violated at the proposed value, or (b) a relation-connected constraint target is already VIOLATED or value-UNKNOWN and the predicted direction moves it TOWARD its bound. Fail-closed on directional risk: an unknown-position target moving toward a bound is a blocked move, not an accepted one (Art. IV).",
+        "uncertainty": "direction-level only at this tier"
+       }
+      ],
+      "steps": [
+       "resolved objective param_001 (MINIMIZE)",
+       "checked 0 constraint(s) numerically where values exist",
+       "propagated signs over 3 relation(s)",
+       "ranked 2 movable improving direction(s)"
+      ],
+      "computed_at": "2026-09-10T16:03:48+00:00Z",
+      "deterministic": true
+     }
+    },
+    "quantitative_diagnosis": {
+     "engaged": false,
+     "status": "UNQUANTIFIED",
+     "note": "no bound equation named a limiting variable"
+    },
+    "proposal_provenance": {
+     "proposal_id": "tmp:8fb6ef7e163c",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "4d2aa2535c33e828020b28d8103c1c6eb66b635d4fcbedab7312d55f4dfa41cb",
+     "output_hash": "07d6eac3129d051fd05907f7eb331ff6187afa537fb7b531f81d7309d49fccae",
+     "origin": "UNTRUSTED_LLM_PROPOSER",
+     "llm_is_untrusted_proposer": true
+    },
+    "validation": {
+     "valid": true,
+     "stage": "VALIDATION",
+     "mutation_kind": "GEOMETRY_CHANGE",
+     "target_param": "param_002",
+     "checks": {
+      "mutation_kind_valid": "GEOMETRY_CHANGE",
+      "target_is_limiting_variable": "param_002",
+      "target_exists": true,
+      "target_is_design_variable": true,
+      "kind_matches_category": true,
+      "envelope_declared": [
+       0.1,
+       10.0
+      ],
+      "direction_matches_evaluator": "INCREASE",
+      "new_value_numeric": 8.5,
+      "value_inside_envelope": "[0.1, 10.0]",
+      "mutation_changes_value": true,
+      "value_class_declared": "MODELLED",
+      "spec_text_sync": "The thickness of the nanocomposite coating layer is increased from 6.5 micromete | Apply a nanocomposite coating containing hydrophobic nanoparticles with an incre",
+      "t10_geometry_gate": "no parametric model bound to this parameter — the state-level gates are decisive"
+     },
+     "reasons": [],
+     "validated_at": "2026-09-10T16:03:48+00:00Z"
+    },
+    "changed_variable": {
+     "param_id": "param_002",
+     "name": "coating thickness",
+     "from_value": 6.5,
+     "to_value": 8.5,
+     "from_class": "MODELLED",
+     "to_class": "MODELLED",
+     "envelope": [
+      0.1,
+      10.0
+     ],
+     "envelope_class": "MODELLED"
+    },
+    "spec_text_delta": {
+     "mechanism": "The thickness of the nanocomposite coating layer is increased from 6.5 micrometers to 8.5 micrometers to further enhance barrier performance against moisture permeation.",
+     "intervention": "Apply a nanocomposite coating containing hydrophobic nanoparticles with an increased thickness of 8.5 micrometers to the ethylene-vinyl alcohol layer to maximize reduction in moisture permeation while maintaining oxygen barrier properties."
+    },
+    "cad_rebuild": null,
+    "inherited_negatives": {
+     "uncertainty_ids": [
+      "con:verify:fc690a03",
+      "multilayer polymer packaging layer food film",
+      "multilayer polymer packaging layer food film",
+      "layers physical contact filling molecular synergistic",
+      "layers physical contact filling molecular synergistic",
+      "multilayer layer barrier replace structure monolithic hydrophobic",
+      "multilayer layer barrier replace structure monolithic hydrophobic",
+      "multilayer transmission incorporating during distribution humidity",
+      "multilayer transmission incorporating during distribution humidity",
+      "transmission decrease water vapor rate 890",
+      "transmission decrease water vapor rate 890"
+     ],
+     "collision_family_ids": [],
+     "source_errors": []
+    },
+    "parent_spec_hash": "13867d94e9ca72a58827a2b9847dd98c938c0ffbd21406d54945f5df7b3031e0",
+    "reason": "Increasing coating thickness enhances barrier properties by creating a more tortuous path for moisture molecules to permeate through the packaging film.",
+    "applied_at": "2026-09-10T16:03:48+00:00Z"
+   },
+   "re_evaluation": {
+    "technical": {
+     "status": "QUANTIFIED",
+     "objective": {
+      "target": "param_001",
+      "direction": "MINIMIZE",
+      "known": true,
+      "basis": "to prevent moisture permeation failure in food packaging"
+     },
+     "limiting_variable": {
+      "param_id": "param_002",
+      "name": "coating thickness",
+      "improving_move": "INCREASE",
+      "objective_target": "param_001",
+      "objective_direction": "MINIMIZE",
+      "envelope": [
+       0.1,
+       10.0
+      ],
+      "envelope_class": "MODELLED",
+      "causal_path_length": 1,
+      "statement": "The limiting variable is coating thickness. Changing it by increase is predicted to improve objective param_001 (MINIMIZE) while preserving all declared constraints that are checkable at this tier.",
+      "convention": {
+       "name": "ORDINAL_LEVERAGE_BY_PATH_LENGTH",
+       "epistemic_class": "ENGINEERING",
+       "justification": "with MONOTONE-only relations the evaluator cannot rank leverage by magnitude; it ranks by (1) fewest constraint blocks, (2) shortest causal path from the parameter to the objective target, (3) envelope provenance class (EXTRACTED beats MODELLED). This is a declared ordinal convention, not a measurement — recorded on every evaluation that uses it.",
+       "uncertainty": "ordinal only; magnitudes are UNKNOWN at this tier"
+      }
+     },
+     "constraint_results": [],
+     "uncertainty": {
+      "unknown_value_params": [
+       "param_003",
+       "param_004",
+       "param_005",
+       "param_006",
+       "param_007"
+      ],
+      "modelled_relations": 3,
+      "extracted_relations": 0,
+      "unverifiable_constraints": [],
+      "objective_known": true,
+      "note": "UNKNOWN values are never treated as zeros; unverifiable constraints are never treated as satisfied (Art. XXV / Art. IV)"
+     },
+     "computation_log": {
+      "evaluator_id": "analytical_monotone_v1",
+      "fidelity_tier": "STRUCTURED_CONSTRAINT",
+      "evidence_rank": 3,
+      "input_state_sha256": "312a03704cfc04bca0e2d9ed6fa6f25444972866318da3142880fe16c8304f91",
+      "conventions": [
+       {
+        "name": "ORDINAL_LEVERAGE_BY_PATH_LENGTH",
+        "epistemic_class": "ENGINEERING",
+        "justification": "with MONOTONE-only relations the evaluator cannot rank leverage by magnitude; it ranks by (1) fewest constraint blocks, (2) shortest causal path from the parameter to the objective target, (3) envelope provenance class (EXTRACTED beats MODELLED). This is a declared ordinal convention, not a measurement — recorded on every evaluation that uses it.",
+        "uncertainty": "ordinal only; magnitudes are UNKNOWN at this tier"
+       },
+       {
+        "name": "DIRECTIONAL_FAIL_CLOSED",
+        "epistemic_class": "ENGINEERING",
+        "justification": "a proposed change is constraint-BLOCKED when (a) the changed parameter's own numeric constraint would be violated at the proposed value, or (b) a relation-connected constraint target is already VIOLATED or value-UNKNOWN and the predicted direction moves it TOWARD its bound. Fail-closed on directional risk: an unknown-position target moving toward a bound is a blocked move, not an accepted one (Art. IV).",
+        "uncertainty": "direction-level only at this tier"
+       }
+      ],
+      "steps": [
+       "resolved objective param_001 (MINIMIZE)",
+       "checked 0 constraint(s) numerically where values exist",
+       "propagated signs over 3 relation(s)",
+       "ranked 2 movable improving direction(s)"
+      ],
+      "computed_at": "2026-09-10T16:03:48+00:00Z",
+      "deterministic": true
+     }
+    },
+    "quantitative": {
+     "status": "UNQUANTIFIED",
+     "objective": {
+      "target": "param_001",
+      "direction": "MINIMIZE",
+      "computed": false,
+      "value": null,
+      "unit": null,
+      "equation_id": null,
+      "margin": null,
+      "margin_status": "UNCOMPUTED",
+      "statement": "no active computation binds the objective target"
+     },
+     "requirement_satisfied": null,
+     "limiting_variable": null,
+     "computed_equations": [],
+     "computation_log": [],
+     "evidence_rank": 4
+    },
+    "i_dimensions": {
+     "I1_MECHANISM_EVIDENCE_DERIVATION": {
+      "score": 0.326,
+      "state": "MEASURED"
+     },
+     "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_SURVIVORS"
+     },
+     "I3_RECOMBINATION_RISK": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_FAMILIES"
+     },
+     "I4_NEW_TECHNICAL_RELATIONSHIP": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+     },
+     "I5_EXPERIMENT_DISCRIMINATION": {
+      "score": 0.667,
+      "state": "MEASURED"
+     }
+    },
+    "i_flags": {
+     "underived_mechanism": false,
+     "recombination_only": false
+    },
+    "i_average": 0.497,
+    "q_average": 0.625,
+    "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE"
+   },
+   "decision": {
+    "action": "KEEP",
+    "checks": {
+     "technical_objective": "CONFIRMED on the child's independent evaluation: param_002 INCREASE improves objective param_001 (MINIMIZE) with constraints preserved",
+     "no_new_constraint_violation": true,
+     "no_constraint_laundering": true,
+     "negatives_preserved": true,
+     "no_new_structural_flags": true,
+     "i1_structural_floor": {
+      "parent": 0.341,
+      "child": 0.326,
+      "floor": 0.2,
+      "crossed_downward": false,
+      "note": "numeric I1 movement is recorded, never gated here (CEO R379 item 8); the floor crossing IS gated — a mutation may not flip a derived mechanism to underived"
+     },
+     "prior_art_position_not_degraded": true,
+     "value_class_provenance": "MODELLED design value — declared, never promoted (Art. XXVIII); the improvement attribution carries the class",
+     "geometry_valid_on_child": "no parametric model bound to the changed variable — the state-level gates are decisive",
+     "quantitative_margin": {
+      "engaged": false,
+      "parent_margin": null,
+      "child_margin": null,
+      "improvement": null,
+      "threshold": 0.005,
+      "verdict": "NOT_ENGAGED",
+      "parent_value": null,
+      "child_value": null,
+      "parent_unit": null,
+      "equation_id": null,
+      "reason": "quantitative objective not computed on both sides — the direction-level K1 criterion governs"
+     }
+    },
+    "reasons": [],
+    "decided_at": "2026-09-10T16:03:48+00:00Z"
+   },
+   "attribution": {
+    "artifact": "TECHNICAL_IMPROVEMENT_ATTRIBUTION",
+    "technical_mechanism": "param_003 --DECREASES--> param_001 (MODELLED): increasing nanoparticle concentration reduces water vapor transmission rate by creating more tortuou | param_002 --DECREASES--> param_001 (MODELLED): increasing coating thickness reduces water vapor transmission rate by providing a longer diffusion p | param_005 --INCREASES--> param_001 (MODELLED): increasing relative humidity increases water vapor transmission rate by increasing moisture gradient",
+    "changed_variable": "param_002",
+    "changed_variable_name": "coating thickness",
+    "direction": "INCREASE",
+    "from_value": 6.5,
+    "to_value": 8.5,
+    "value_class": "MODELLED",
+    "envelope": [
+     0.1,
+     10.0
+    ],
+    "envelope_class": "MODELLED",
+    "predicted_effect": "param_002 8.5 is predicted to move objective param_001 (MINIMIZE) in the improving sense",
+    "evaluated_result": "CONFIRMED on the child's independent evaluation: param_002 INCREASE improves objective param_001 (MINIMIZE) with constraints preserved",
+    "constraints_result": [],
+    "evidence_class": "AI_INFERENCE (rank 3) — a direction-level prediction of the declared analytical model over the structured technical state. NOT a measurement, NOT a physical observation (Art. XXVIII / XXXVIII). The value class of the changed variable is recorded above; MODELLED design values are invention content, never evidence.",
+    "mutation_id": "tmut:e3ef2acdf3f1",
+    "recorded_at": "2026-09-10T16:03:48+00:00Z"
+   }
+  }
+ ],
+ "outcome": "TECHNICALLY_IMPROVED",
+ "outcome_reason": "2 iteration(s) ran within budget; keeps: 2 (the R379 convention: the budget, not a verdict, ended the loop)",
+ "extraction": {
+  "proposal_id": "tsp:174ea57e5952",
+  "attempts": [
+   {
+    "attempt": 1,
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "status": "OK",
+    "prompt_hash": "4c94798cdc9e9fe2c0cdd583117eb33f1ee3a0c71958b39069fb83d3ca8378ad",
+    "output_hash": "5cbc4a7467eb698312555b881c2ef97ec62d9f74b7edc08aa919ebba2b0c845f",
+    "latency_ms": 16432,
+    "error": null,
+    "raw_content_sha256": "3e42c01ddcbd73f05d39ca82fe74d89bc23114b9dbfb1bcd820711eda3604e9d"
+   }
+  ],
+  "provider": "zai",
+  "model": "glm-4-plus",
+  "status": "OK",
+  "prompt_hash": "4c94798cdc9e9fe2c0cdd583117eb33f1ee3a0c71958b39069fb83d3ca8378ad",
+  "output_hash": "5cbc4a7467eb698312555b881c2ef97ec62d9f74b7edc08aa919ebba2b0c845f",
+  "latency_ms": 16432,
+  "error": null,
+  "proposal": {
+   "objects": [
+    {
+     "object_id": "obj_001",
+     "name": "multilayer polymer food packaging film",
+     "role": "main packaging structure"
+    },
+    {
+     "object_id": "obj_002",
+     "name": "ethylene-vinyl alcohol layer",
+     "role": "barrier layer in multilayer structure"
+    },
+    {
+     "object_id": "obj_003",
+     "name": "nanocomposite coating",
+     "role": "surface coating applied to barrier layer"
+    },
+    {
+     "object_id": "obj_004",
+     "name": "hydrophobic nanoparticles",
+     "role": "filler reinforcement in nanocomposite"
+    }
+   ],
+   "parameters": [
+    {
+     "param_id": "param_001",
+     "name": "water vapor transmission rate",
+     "category": "PARAMETERS",
+     "unit": "g·m^-2·day^-1",
+     "value": 890,
+     "value_class": "EXTRACTED",
+     "value_span": "890-920 g·m -2 ·day -1",
+     "value_evidence_id": "doi:10.3390/polym18121500",
+     "range_min": null,
+     "range_max": null,
+     "range_span": null,
+     "range_evidence_id": null,
+     "role": "measures moisture permeation through packaging"
+    },
+    {
+     "param_id": "param_002",
+     "name": "coating thickness",
+     "category": "GEOMETRY",
+     "unit": "μm",
+     "value": null,
+     "value_class": "UNKNOWN",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": 0.1,
+     "range_max": 10,
+     "range_span": null,
+     "range_evidence_id": null,
+     "role": "thickness of nanocomposite coating layer"
+    },
+    {
+     "param_id": "param_003",
+     "name": "nanoparticle concentration",
+     "category": "MATERIALS",
+     "unit": "% wt/wt",
+     "value": null,
+     "value_class": "UNKNOWN",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": 0.1,
+     "range_max": 5,
+     "range_span": null,
+     "range_evidence_id": null,
+     "role": "concentration of hydrophobic nanoparticles in coating"
+    },
+    {
+     "param_id": "param_004",
+     "name": "operating temperature",
+     "category": "OPERATING_CONDITIONS",
+     "unit": "°C",
+     "value": 25,
+     "value_class": "EXTRACTED",
+     "value_span": "25 C",
+     "value_evidence_id": "DEVICE FAILURE",
+     "range_min": null,
+     "range_max": null,
+     "range_span": null,
+     "range_evidence_id": null,
+     "role": "temperature during storage and testing"
+    },
+    {
+     "param_id": "param_005",
+     "name": "relative humidity",
+     "category": "OPERATING_CONDITIONS",
+     "unit": "%",
+     "value": 65,
+     "value_class": "EXTRACTED",
+     "value_span": "65 percent relative humidity",
+     "value_evidence_id": "DEVICE FAILURE",
+     "range_min": null,
+     "range_max": null,
+     "range_span": null,
+     "range_evidence_id": null,
+     "role": "humidity conditions during storage and testing"
+    },
+    {
+     "param_id": "param_006",
+     "name": "shelf life",
+     "category": "OPERATING_CONDITIONS",
+     "unit": "months",
+     "value": 18,
+     "value_class": "EXTRACTED",
+     "value_span": "18 months of shelf life",
+     "value_evidence_id": "DEVICE FAILURE",
+     "range_min": null,
+     "range_max": null,
+     "range_span": null,
+     "range_evidence_id": null,
+     "role": "required duration of barrier performance"
+    },
+    {
+     "param_id": "param_007",
+     "name": "oxygen barrier property",
+     "category": "PARAMETERS",
+     "unit": "cm³·m⁻²·day⁻¹·atm⁻¹",
+     "value": null,
+     "value_class": "UNKNOWN",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": null,
+     "range_max": null,
+     "range_span": null,
+     "range_evidence_id": null,
+     "role": "oxygen transmission rate through packaging"
+    }
+   ],
+   "constraints": [
+    {
+     "constraint_id": "const_001",
+     "target": "param_001",
+     "bound": "<=",
+     "limit": 0.5,
+     "unit": "g·m^-2·day^-1",
+     "limit_class": "EXTRACTED",
+     "limit_span": "hold water vapor transmission rate below 0.5 g/m2/day",
+     "limit_evidence_id": "DEVICE FAILURE",
+     "justification": "required barrier performance for food preservation over shelf life"
+    }
+   ],
+   "objectives": [
+    {
+     "objective_id": "obj_001",
+     "target": "param_001",
+     "direction": "MINIMIZE",
+     "basis": "to prevent moisture permeation failure in food packaging"
+    },
+    {
+     "objective_id": "obj_002",
+     "target": "param_007",
+     "direction": "MAINTAIN_WITHIN",
+     "basis": "to preserve oxygen barrier properties while improving moisture barrier"
+    }
+   ],
+   "failure_modes": [
+    {
+     "mode_id": "fm_001",
+     "name": "permeation",
+     "problem_link": "Device: multilayer polymer food packaging film; Failure mode: permeation"
+    }
+   ],
+   "dependencies": [
+    {
+     "relation_id": "dep_001",
+     "cause": "param_003",
+     "effect": "param_001",
+     "direction": "DECREASES",
+     "statement": "increasing nanoparticle concentration reduces water vapor transmission rate by creating more tortuous diffusion pathways",
+     "relation_class": "MODELLED",
+     "span": null,
+     "evidence_id": null
+    },
+    {
+     "relation_id": "dep_002",
+     "cause": "param_002",
+     "effect": "param_001",
+     "direction": "DECREASES",
+     "statement": "increasing coating thickness reduces water vapor transmission rate by providing a longer diffusion path",
+     "relation_class": "MODELLED",
+     "span": null,
+     "evidence_id": null
+    },
+    {
+     "relation_id": "dep_003",
+     "cause": "param_004",
+     "effect": "param_001",
+     "direction": "INCREASES",
+     "statement": "increasing temperature increases water vapor transmission rate by enhancing molecular mobility",
+     "relation_class": "EXTRACTED",
+     "span": "water vapor permeability remained high and narrowly distributed for all configurations (890-920 g·m -2 ·day -1 )",
+     "evidence_id": "doi:10.3390/polym18121500"
+    },
+    {
+     "relation_id": "dep_004",
+     "cause": "param_005",
+     "effect": "param_001",
+     "direction": "INCREASES",
+     "statement": "increasing relative humidity increases water vapor transmission rate by increasing moisture gradient",
+     "relation_class": "MODELLED",
+     "span": null,
+     "evidence_id": null
+    }
+   ]
+  },
+  "raw_content_sha256": "3e42c01ddcbd73f05d39ca82fe74d89bc23114b9dbfb1bcd820711eda3604e9d"
+ },
+ "technical_state_counts": {
+  "parameters": 7,
+  "parameters_with_value": 1,
+  "parameters_extracted": 1,
+  "parameters_modelled": 0,
+  "parameters_with_envelope": 2,
+  "constraints": 0,
+  "objectives": 2,
+  "dependencies": 3,
+  "objects": 4,
+  "failure_modes": 1
+ },
+ "baseline": {
+  "technical": {
+   "status": "QUANTIFIED",
+   "objective": {
+    "target": "param_001",
+    "direction": "MINIMIZE",
+    "known": true,
+    "basis": "to prevent moisture permeation failure in food packaging"
+   },
+   "limiting_variable": {
+    "param_id": "param_002",
+    "name": "coating thickness",
+    "improving_move": "INCREASE",
+    "objective_target": "param_001",
+    "objective_direction": "MINIMIZE",
+    "envelope": [
+     0.1,
+     10.0
+    ],
+    "envelope_class": "MODELLED",
+    "causal_path_length": 1,
+    "statement": "The limiting variable is coating thickness. Changing it by increase is predicted to improve objective param_001 (MINIMIZE) while preserving all declared constraints that are checkable at this tier.",
+    "convention": {
+     "name": "ORDINAL_LEVERAGE_BY_PATH_LENGTH",
+     "epistemic_class": "ENGINEERING",
+     "justification": "with MONOTONE-only relations the evaluator cannot rank leverage by magnitude; it ranks by (1) fewest constraint blocks, (2) shortest causal path from the parameter to the objective target, (3) envelope provenance class (EXTRACTED beats MODELLED). This is a declared ordinal convention, not a measurement — recorded on every evaluation that uses it.",
+     "uncertainty": "ordinal only; magnitudes are UNKNOWN at this tier"
+    }
+   },
+   "constraint_results": [],
+   "uncertainty": {
+    "unknown_value_params": [
+     "param_002",
+     "param_003",
+     "param_004",
+     "param_005",
+     "param_006",
+     "param_007"
+    ],
+    "modelled_relations": 3,
+    "extracted_relations": 0,
+    "unverifiable_constraints": [],
+    "objective_known": true,
+    "note": "UNKNOWN values are never treated as zeros; unverifiable constraints are never treated as satisfied (Art. XXV / Art. IV)"
+   },
+   "computation_log": {
+    "evaluator_id": "analytical_monotone_v1",
+    "fidelity_tier": "STRUCTURED_CONSTRAINT",
+    "evidence_rank": 3,
+    "input_state_sha256": "dba4e862a006013fe2737e1c7feaa5cc729985308f007cc62b206353031804f2",
+    "conventions": [
+     {
+      "name": "ORDINAL_LEVERAGE_BY_PATH_LENGTH",
+      "epistemic_class": "ENGINEERING",
+      "justification": "with MONOTONE-only relations the evaluator cannot rank leverage by magnitude; it ranks by (1) fewest constraint blocks, (2) shortest causal path from the parameter to the objective target, (3) envelope provenance class (EXTRACTED beats MODELLED). This is a declared ordinal convention, not a measurement — recorded on every evaluation that uses it.",
+      "uncertainty": "ordinal only; magnitudes are UNKNOWN at this tier"
+     },
+     {
+      "name": "DIRECTIONAL_FAIL_CLOSED",
+      "epistemic_class": "ENGINEERING",
+      "justification": "a proposed change is constraint-BLOCKED when (a) the changed parameter's own numeric constraint would be violated at the proposed value, or (b) a relation-connected constraint target is already VIOLATED or value-UNKNOWN and the predicted direction moves it TOWARD its bound. Fail-closed on directional risk: an unknown-position target moving toward a bound is a blocked move, not an accepted one (Art. IV).",
+      "uncertainty": "direction-level only at this tier"
+     }
+    ],
+    "steps": [
+     "resolved objective param_001 (MINIMIZE)",
+     "checked 0 constraint(s) numerically where values exist",
+     "propagated signs over 3 relation(s)",
+     "ranked 2 movable improving direction(s)"
+    ],
+    "computed_at": "2026-09-10T16:03:45+00:00Z",
+    "deterministic": true
+   }
+  },
+  "quantitative": {
+   "status": "UNQUANTIFIED",
+   "objective": {
+    "target": "param_001",
+    "direction": "MINIMIZE",
+    "computed": false,
+    "value": null,
+    "unit": null,
+    "equation_id": null,
+    "margin": null,
+    "margin_status": "UNCOMPUTED",
+    "statement": "no active computation binds the objective target"
+   },
+   "requirement_satisfied": null,
+   "limiting_variable": null,
+   "computed_equations": [],
+   "computation_log": [],
+   "evidence_rank": 4
+  },
+  "i_dimensions": {
+   "I1_MECHANISM_EVIDENCE_DERIVATION": {
+    "score": 0.455,
+    "state": "MEASURED"
+   },
+   "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_SURVIVORS"
+   },
+   "I3_RECOMBINATION_RISK": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_FAMILIES"
+   },
+   "I4_NEW_TECHNICAL_RELATIONSHIP": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+   },
+   "I5_EXPERIMENT_DISCRIMINATION": {
+    "score": 0.667,
+    "state": "MEASURED"
+   }
+  },
+  "i_flags": {
+   "underived_mechanism": false,
+   "recombination_only": false
+  },
+  "i_average": 0.561,
+  "q_average": 0.625,
+  "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE"
+ },
+ "fidelity_escalation": {
+  "current_tier": "STRUCTURED_CONSTRAINT (analytical_monotone_v1) + ANALYTICAL_EQUATION (analytical_equation_v1, R383)",
+  "deciding_question": "does a design-variable change improve the objective within constraints, and by how much?",
+  "resolved_at_current_tier": true,
+  "quantitative_tier_engaged": false,
+  "quantitative_objective_computed": false,
+  "escalation_needed": false,
+  "next_tier_available": false,
+  "note": "the R383 ANALYTICAL_EQUATION tier is LIVE (closed-form deterministic relations with computation logs); the higher tiers (NUMERICAL_SOLVER / SIMULATION / NEURAL_OPERATOR) remain contract-reserved and unregistered; escalation is recorded, never faked at the current tier"
+ },
+ "final": {
+  "technical": {
+   "status": "QUANTIFIED",
+   "objective": {
+    "target": "param_001",
+    "direction": "MINIMIZE",
+    "known": true,
+    "basis": "to prevent moisture permeation failure in food packaging"
+   },
+   "limiting_variable": {
+    "param_id": "param_002",
+    "name": "coating thickness",
+    "improving_move": "INCREASE",
+    "objective_target": "param_001",
+    "objective_direction": "MINIMIZE",
+    "envelope": [
+     0.1,
+     10.0
+    ],
+    "envelope_class": "MODELLED",
+    "causal_path_length": 1,
+    "statement": "The limiting variable is coating thickness. Changing it by increase is predicted to improve objective param_001 (MINIMIZE) while preserving all declared constraints that are checkable at this tier.",
+    "convention": {
+     "name": "ORDINAL_LEVERAGE_BY_PATH_LENGTH",
+     "epistemic_class": "ENGINEERING",
+     "justification": "with MONOTONE-only relations the evaluator cannot rank leverage by magnitude; it ranks by (1) fewest constraint blocks, (2) shortest causal path from the parameter to the objective target, (3) envelope provenance class (EXTRACTED beats MODELLED). This is a declared ordinal convention, not a measurement — recorded on every evaluation that uses it.",
+     "uncertainty": "ordinal only; magnitudes are UNKNOWN at this tier"
+    }
+   },
+   "constraint_results": [],
+   "uncertainty": {
+    "unknown_value_params": [
+     "param_003",
+     "param_004",
+     "param_005",
+     "param_006",
+     "param_007"
+    ],
+    "modelled_relations": 3,
+    "extracted_relations": 0,
+    "unverifiable_constraints": [],
+    "objective_known": true,
+    "note": "UNKNOWN values are never treated as zeros; unverifiable constraints are never treated as satisfied (Art. XXV / Art. IV)"
+   },
+   "computation_log": {
+    "evaluator_id": "analytical_monotone_v1",
+    "fidelity_tier": "STRUCTURED_CONSTRAINT",
+    "evidence_rank": 3,
+    "input_state_sha256": "312a03704cfc04bca0e2d9ed6fa6f25444972866318da3142880fe16c8304f91",
+    "conventions": [
+     {
+      "name": "ORDINAL_LEVERAGE_BY_PATH_LENGTH",
+      "epistemic_class": "ENGINEERING",
+      "justification": "with MONOTONE-only relations the evaluator cannot rank leverage by magnitude; it ranks by (1) fewest constraint blocks, (2) shortest causal path from the parameter to the objective target, (3) envelope provenance class (EXTRACTED beats MODELLED). This is a declared ordinal convention, not a measurement — recorded on every evaluation that uses it.",
+      "uncertainty": "ordinal only; magnitudes are UNKNOWN at this tier"
+     },
+     {
+      "name": "DIRECTIONAL_FAIL_CLOSED",
+      "epistemic_class": "ENGINEERING",
+      "justification": "a proposed change is constraint-BLOCKED when (a) the changed parameter's own numeric constraint would be violated at the proposed value, or (b) a relation-connected constraint target is already VIOLATED or value-UNKNOWN and the predicted direction moves it TOWARD its bound. Fail-closed on directional risk: an unknown-position target moving toward a bound is a blocked move, not an accepted one (Art. IV).",
+      "uncertainty": "direction-level only at this tier"
+     }
+    ],
+    "steps": [
+     "resolved objective param_001 (MINIMIZE)",
+     "checked 0 constraint(s) numerically where values exist",
+     "propagated signs over 3 relation(s)",
+     "ranked 2 movable improving direction(s)"
+    ],
+    "computed_at": "2026-09-10T16:03:48+00:00Z",
+    "deterministic": true
+   }
+  },
+  "quantitative": {
+   "status": "UNQUANTIFIED",
+   "objective": {
+    "target": "param_001",
+    "direction": "MINIMIZE",
+    "computed": false,
+    "value": null,
+    "unit": null,
+    "equation_id": null,
+    "margin": null,
+    "margin_status": "UNCOMPUTED",
+    "statement": "no active computation binds the objective target"
+   },
+   "requirement_satisfied": null,
+   "limiting_variable": null,
+   "computed_equations": [],
+   "computation_log": [],
+   "evidence_rank": 4
+  },
+  "i_dimensions": {
+   "I1_MECHANISM_EVIDENCE_DERIVATION": {
+    "score": 0.326,
+    "state": "MEASURED"
+   },
+   "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_SURVIVORS"
+   },
+   "I3_RECOMBINATION_RISK": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_FAMILIES"
+   },
+   "I4_NEW_TECHNICAL_RELATIONSHIP": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+   },
+   "I5_EXPERIMENT_DISCRIMINATION": {
+    "score": 0.667,
+    "state": "MEASURED"
+   }
+  },
+  "i_flags": {
+   "underived_mechanism": false,
+   "recombination_only": false
+  },
+  "i_average": 0.497,
+  "q_average": 0.625,
+  "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE"
+ },
+ "outcome_summary": {
+  "baseline_status": "QUANTIFIED",
+  "final_status": "QUANTIFIED",
+  "baseline_quantitative": "UNQUANTIFIED",
+  "final_quantitative": "UNQUANTIFIED",
+  "final_quantitative_objective": {
+   "target": "param_001",
+   "value": null,
+   "unit": null,
+   "margin": null,
+   "margin_status": "UNCOMPUTED",
+   "equation_id": null
+  },
+  "baseline_i_average": 0.561,
+  "final_i_average": 0.497,
+  "baseline_prior_art": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+  "final_prior_art": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+  "iterations_run": 2,
+  "keeps": 2,
+  "attributions": [
+   {
+    "artifact": "TECHNICAL_IMPROVEMENT_ATTRIBUTION",
+    "technical_mechanism": "param_003 --DECREASES--> param_001 (MODELLED): increasing nanoparticle concentration reduces water vapor transmission rate by creating more tortuou | param_002 --DECREASES--> param_001 (MODELLED): increasing coating thickness reduces water vapor transmission rate by providing a longer diffusion p | param_005 --INCREASES--> param_001 (MODELLED): increasing relative humidity increases water vapor transmission rate by increasing moisture gradient",
+    "changed_variable": "param_002",
+    "changed_variable_name": "coating thickness",
+    "direction": "INCREASE",
+    "from_value": null,
+    "to_value": 6.5,
+    "value_class": "MODELLED",
+    "envelope": [
+     0.1,
+     10.0
+    ],
+    "envelope_class": "MODELLED",
+    "predicted_effect": "param_002 6.5 is predicted to move objective param_001 (MINIMIZE) in the improving sense",
+    "evaluated_result": "CONFIRMED on the child's independent evaluation: param_002 INCREASE improves objective param_001 (MINIMIZE) with constraints preserved",
+    "constraints_result": [],
+    "evidence_class": "AI_INFERENCE (rank 3) — a direction-level prediction of the declared analytical model over the structured technical state. NOT a measurement, NOT a physical observation (Art. XXVIII / XXXVIII). The value class of the changed variable is recorded above; MODELLED design values are invention content, never evidence.",
+    "mutation_id": "tmut:f8ee3076230a",
+    "recorded_at": "2026-09-10T16:03:47+00:00Z"
+   },
+   {
+    "artifact": "TECHNICAL_IMPROVEMENT_ATTRIBUTION",
+    "technical_mechanism": "param_003 --DECREASES--> param_001 (MODELLED): increasing nanoparticle concentration reduces water vapor transmission rate by creating more tortuou | param_002 --DECREASES--> param_001 (MODELLED): increasing coating thickness reduces water vapor transmission rate by providing a longer diffusion p | param_005 --INCREASES--> param_001 (MODELLED): increasing relative humidity increases water vapor transmission rate by increasing moisture gradient",
+    "changed_variable": "param_002",
+    "changed_variable_name": "coating thickness",
+    "direction": "INCREASE",
+    "from_value": 6.5,
+    "to_value": 8.5,
+    "value_class": "MODELLED",
+    "envelope": [
+     0.1,
+     10.0
+    ],
+    "envelope_class": "MODELLED",
+    "predicted_effect": "param_002 8.5 is predicted to move objective param_001 (MINIMIZE) in the improving sense",
+    "evaluated_result": "CONFIRMED on the child's independent evaluation: param_002 INCREASE improves objective param_001 (MINIMIZE) with constraints preserved",
+    "constraints_result": [],
+    "evidence_class": "AI_INFERENCE (rank 3) — a direction-level prediction of the declared analytical model over the structured technical state. NOT a measurement, NOT a physical observation (Art. XXVIII / XXXVIII). The value class of the changed variable is recorded above; MODELLED design values are invention content, never evidence.",
+    "mutation_id": "tmut:e3ef2acdf3f1",
+    "recorded_at": "2026-09-10T16:03:48+00:00Z"
+   }
+  ]
+ },
+ "finished_at": "2026-09-10T16:03:48+00:00Z",
+ "status": "TECHNICALLY_IMPROVED"
+}

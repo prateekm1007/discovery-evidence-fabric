@@ -1,0 +1,253 @@
+{
+ "diversity": "CANDIDATE_DIVERSITY (E16-E)",
+ "version": "1.1.0",
+ "min_candidates": 10,
+ "available_providers": [
+  "zai"
+ ],
+ "operator_override": [
+  "zai"
+ ],
+ "angles": [
+  "cross_industry_transfer",
+  "mechanism_inversion",
+  "simplification",
+  "multi_physics_hybrid",
+  "constraint_first"
+ ],
+ "candidates": [
+  {
+   "angle": "cross_industry_transfer",
+   "provider_id": "zai",
+   "status": "OK",
+   "model": "glm-4-plus",
+   "prompt_hash": "442c8de73daaf2604575902e8646608a33db8f87035a52fe582c8375e195f595",
+   "output_hash": "396142938de1757fea6c25e2eca568a81429471834b2b35f6b4f77567ab592bd",
+   "fields": {
+    "mechanism": "Bit-flip vulnerability of shared KV-cache blocks",
+    "intervention": "Deploy redundant KV-cache storage with parity protection across shared GPU nodes",
+    "expected_effect": "Maintain data integrity during high traffic bursts without increasing live-token evictions",
+    "falsification_test": "Measure p99 first-token latency during 3x baseline burst load with and without redundant cache parity",
+    "mechanism_source_span": "Bit-flip vulnerability of shared KV-cache blocks in LLM serving systems",
+    "span_derivation": {
+     "n_shared": 6,
+     "shared_terms": [
+      "bit",
+      "block",
+      "cache",
+      "flip",
+      "shared",
+      "vulnerability"
+     ],
+     "span_terms_n": 9,
+     "ratio": 0.667,
+     "underived": false,
+     "state": "MEASURED",
+     "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+    }
+   },
+   "span_underived": false,
+   "candidate_id": "cand:DIV:cross_industry_transfer:zai:396142938de1"
+  },
+  {
+   "angle": "mechanism_inversion",
+   "provider_id": "zai",
+   "status": "OK",
+   "model": "glm-4-plus",
+   "prompt_hash": "b78c4629091dd18edff4dc5d201d1b912086811ba6cf0067434aca39255b7f0a",
+   "output_hash": "a07c3bc51d905ae2ec98d8a25c0cee3ba3bd58c0ad530c2b0ec7e16002252e24",
+   "fields": {
+    "mechanism": "Bit-flip vulnerability of shared KV-cache blocks",
+    "intervention": "Design the KV-cache system to periodically verify cache integrity and isolate blocks showing bit-flip characteristics before they impact serving performance",
+    "expected_effect": "Prevention of cascading cache fragmentation caused by bit-flips, maintaining stable performance during traffic bursts without additional GPU resources",
+    "falsification_test": "Measure the frequency of cache block reallocations and their impact on first-token latency during simulated bit-flip events and traffic peaks",
+    "mechanism_source_span": "Bit-flip vulnerability of shared KV-cache blocks in LLM serving systems",
+    "span_derivation": {
+     "n_shared": 8,
+     "shared_terms": [
+      "bit",
+      "block",
+      "cache",
+      "flip",
+      "serving",
+      "shared",
+      "system",
+      "vulnerability"
+     ],
+     "span_terms_n": 9,
+     "ratio": 0.889,
+     "underived": false,
+     "state": "MEASURED",
+     "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+    }
+   },
+   "span_underived": false,
+   "candidate_id": "cand:DIV:mechanism_inversion:zai:a07c3bc51d90"
+  },
+  {
+   "angle": "simplification",
+   "provider_id": "zai",
+   "status": "OK",
+   "model": "glm-4-plus",
+   "prompt_hash": "955760325f9c9eea373048535142016e0cecb387250c6950068dbaf8e6cd6bb5",
+   "output_hash": "641281523b5d3133eb7f2270df916a97d85e96fe44576264629d9c5705a927d2",
+   "fields": {
+    "mechanism": "bit-flip vulnerability of shared KV-cache blocks",
+    "intervention": "implementing error correction codes on shared KV-cache blocks to detect and correct bit-flips without requiring cache invalidation",
+    "expected_effect": "reduce unnecessary cache evictions and re-computation during traffic peaks by maintaining cache integrity despite concurrent access patterns",
+    "falsification_test": "measure p99 first-token latency under 3x baseline burst load with and without error correction codes on shared KV-cache blocks",
+    "mechanism_source_span": "\"Bit-Flip Vulnerability of Shared KV-Cache Blocks in LLM Serving Systems\"",
+    "span_derivation": {
+     "n_shared": 6,
+     "shared_terms": [
+      "bit",
+      "block",
+      "cache",
+      "flip",
+      "shared",
+      "vulnerability"
+     ],
+     "span_terms_n": 9,
+     "ratio": 0.667,
+     "underived": false,
+     "state": "MEASURED",
+     "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+    }
+   },
+   "span_underived": false,
+   "candidate_id": "cand:DIV:simplification:zai:641281523b5d"
+  },
+  {
+   "angle": "multi_physics_hybrid",
+   "provider_id": "zai",
+   "status": "OK",
+   "model": "glm-4-plus",
+   "prompt_hash": "69967cf42d0f45541805d11f547219be1483bef48e176d98adfc0114aee3c2d9",
+   "output_hash": "8e61283b480a0718b99df7cdeb978b2326471f48addd1fed6b547a5714230459",
+   "fields": {
+    "mechanism": "Thermal-induced bit-flip vulnerability in shared memory blocks",
+    "intervention": "Integrate thermal monitoring and active cooling specifically for shared GPU nodes hosting KV-cache blocks during burst traffic periods",
+    "expected_effect": "Maintain stable thermal conditions to prevent bit-flips in shared KV-cache blocks during mixed-length bursty requests",
+    "falsification_test": "Compare bit-flip rates and p99 latency during burst periods with controlled temperature variations in shared GPU nodes",
+    "mechanism_source_span": "Thermal-induced bit-flip vulnerability in shared memory blocks when accessed by multiple concurrent requests",
+    "span_derivation": {
+     "n_shared": 8,
+     "shared_terms": [
+      "bit",
+      "block",
+      "flip",
+      "induced",
+      "memory",
+      "shared",
+      "thermal",
+      "vulnerability"
+     ],
+     "span_terms_n": 13,
+     "ratio": 0.615,
+     "underived": false,
+     "state": "MEASURED",
+     "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+    }
+   },
+   "span_underived": false,
+   "candidate_id": "cand:DIV:multi_physics_hybrid:zai:8e61283b480a"
+  },
+  {
+   "angle": "constraint_first",
+   "provider_id": "zai",
+   "status": "OK",
+   "model": "glm-4-plus",
+   "prompt_hash": "0c19a1726eb22634bca7199d731610f25e380b3be472356d8f72589688bbf338",
+   "output_hash": "8dbc2cfbdf82a1eb32567fc29653555b46e78920fabad6b857a2d66bb24e3973",
+   "fields": {
+    "mechanism": "Bit-Flip Vulnerability of Shared KV-Cache Blocks",
+    "intervention": "Implement bit-flip detection and correction mechanisms in the shared KV-cache blocks to prevent silent corruption during concurrent access",
+    "expected_effect": "Reduce live-token evictions and re-computation by maintaining data integrity of KV-cache blocks during mixed-length bursty requests, thus keeping p99 first-token latency below 800ms at 3x baseline burst load",
+    "falsification_test": "Compare cache eviction rates and re-computation frequency between systems with and without bit-flip protection under identical bursty workloads",
+    "mechanism_source_span": "Bit-Flip Vulnerability of Shared KV-Cache Blocks in LLM Serving Systems",
+    "span_derivation": {
+     "n_shared": 6,
+     "shared_terms": [
+      "bit",
+      "block",
+      "cache",
+      "flip",
+      "shared",
+      "vulnerability"
+     ],
+     "span_terms_n": 9,
+     "ratio": 0.667,
+     "underived": false,
+     "state": "MEASURED",
+     "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+    }
+   },
+   "span_underived": false,
+   "candidate_id": "cand:DIV:constraint_first:zai:8dbc2cfbdf82"
+  }
+ ],
+ "built_at": "2026-09-10T17:08:14+00:00Z",
+ "usable_candidates": 5,
+ "status": "GRID_RUN",
+ "diversity_metrics": {
+  "candidates_measured": 5,
+  "mean_pairwise_token_distance": 0.796,
+  "distinct_mechanism_clusters": 5,
+  "cluster_sizes": [
+   1,
+   1,
+   1,
+   1,
+   1
+  ],
+  "rewrite_pairs_jaccard_ge_0_8": [],
+  "architecture_term_count": 53,
+  "architecture_terms_sample": [
+   "access",
+   "across",
+   "active",
+   "before",
+   "blocks",
+   "burst",
+   "cache",
+   "characteristics",
+   "codes",
+   "concurrent",
+   "cooling",
+   "correct",
+   "correction",
+   "corruption",
+   "deploy",
+   "design",
+   "detect",
+   "detection",
+   "during",
+   "error",
+   "flip",
+   "flips",
+   "hosting",
+   "impact"
+  ],
+  "failure_mode_signal_count": 2,
+  "failure_modes_invoked_sample": [
+   "coolant/flow path blockage (if active)",
+   "hotspot exceeding material/safety limit"
+  ],
+  "prior_art_query_set_count": 5,
+  "detected_domain": "thermal"
+ },
+ "entry": {
+  "entry_helper_version": "stage_entry/1.0.0",
+  "stage": "EXPLORATION_GRID",
+  "entry_status": "ALLOWED",
+  "prerequisite": "VERIFIED_EVIDENCE",
+  "prerequisite_evidence": {
+   "n_verified_evidence_items": 11,
+   "n_direct_support": 10,
+   "n_partial_support": 1,
+   "n_items_total": 12,
+   "span_binding_verified": false,
+   "basis": ">=1 evidence item classified DIRECT_SUPPORT/PARTIAL_SUPPORT, or the candidate's span binding verified (R394 s5 classification + a2/verify)"
+  }
+ }
+}

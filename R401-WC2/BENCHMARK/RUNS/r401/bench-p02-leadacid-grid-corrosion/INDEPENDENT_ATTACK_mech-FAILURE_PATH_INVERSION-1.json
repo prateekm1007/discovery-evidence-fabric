@@ -1,0 +1,71 @@
+{
+ "attack_version": "independent_attack/1.0.0",
+ "candidate_id": "cand:MS:FAILURE_PATH_INVERSION:cc7635b3ee23",
+ "generator_provider": "zai",
+ "attacker_provider": "zai",
+ "attacker_model": "glm-4-plus",
+ "independence_mode": "SEPARATE_CONTEXT",
+ "independence_note": "the attacker ran in an independent reasoning context (fresh adversarial conversation, generator reasoning never shown; no alternative provider credentialed — disclosed, never claimed as provider separation)",
+ "prompt_hash": "e44bdad34502e9ffc0e47057be7f9d499d7907cb8331253a3eccfc17a1d03a50",
+ "output_hash": "e4f9fc7053db13c8bed852e5e71fa91a5f7f34b7f5efc905cdfde86598cfcae8",
+ "llm_status": "OK",
+ "attacked_at": "2026-09-10T14:34:01+00:00Z",
+ "items": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "verdict": "KILL",
+   "basis": "The claimed HER potential shift from -1.65 to -1.50 V is insufficient to meaningfully reduce positive grid corrosion, as grid corrosion occurs at more positive potentials where lead dioxide forms, not at the HER potential range. The candidate confuses hydrogen evolution kinetics with the dominant corrosion mechanism of lead grids."
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "verdict": "RISK",
+   "basis": "The specified temperature range of 20-30°C is unrealistically narrow for real-world applications where batteries often operate at higher temperatures (35-45°C), which would accelerate corrosion and potentially alter the catalytic effectiveness of the additives beyond the tested range."
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "verdict": "KILL",
+   "basis": "The evidence bundle includes [doi:10.1016/s0378-7753(98)00028-7] which demonstrates that grid corrosion is primarily driven by the thermodynamic instability of PbO2 at the positive electrode potential, not by hydrogen evolution kinetics, directly contradicting the candidate's proposed mechanism."
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "verdict": "RISK",
+   "basis": "The predicted 75% reduction in corrosion rate lacks sufficient experimental validation in the evidence bundle, making it difficult to confirm this improvement over baseline without extensive long-term testing that isn't referenced."
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "verdict": "KILL",
+   "basis": "The claimed additive ratio of 66:17:17 ppm Ni:Co:Sb is impossibly precise for industrial implementation given the challenges of homogeneous distribution in molten lead alloy and the potential for segregation during solidification, as evidenced by industry standard manufacturing tolerances."
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "verdict": "KILL",
+   "basis": "The testable prediction of measuring grid cross-section retention after 10 years is methodologically flawed as it doesn't account for localized pitting corrosion that could cause premature failure even with average cross-section retention at 95%, a critical oversight noted in [doi:10.1109/intlec.1995.498976]."
+  }
+ ],
+ "state": "ATTACK_RUN",
+ "overall": "KILLED",
+ "kill_basis": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "basis": "The claimed HER potential shift from -1.65 to -1.50 V is insufficient to meaningfully reduce positive grid corrosion, as grid corrosion occurs at more positive potentials where lead dioxide forms, not at the HER potential range. The candidate confuses hydrogen evolution kinetics with the dominant corrosion mechanism of lead grids."
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "basis": "The evidence bundle includes [doi:10.1016/s0378-7753(98)00028-7] which demonstrates that grid corrosion is primarily driven by the thermodynamic instability of PbO2 at the positive electrode potential, not by hydrogen evolution kinetics, directly contradicting the candidate's proposed mechanism."
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "basis": "The claimed additive ratio of 66:17:17 ppm Ni:Co:Sb is impossibly precise for industrial implementation given the challenges of homogeneous distribution in molten lead alloy and the potential for segregation during solidification, as evidenced by industry standard manufacturing tolerances."
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "basis": "The testable prediction of measuring grid cross-section retention after 10 years is methodologically flawed as it doesn't account for localized pitting corrosion that could cause premature failure even with average cross-section retention at 95%, a critical oversight noted in [doi:10.1109/intlec.1995.498976]."
+  }
+ ],
+ "counts": {
+  "KILL": 4,
+  "RISK": 2,
+  "SURVIVE": 0,
+  "INVALID": 0
+ }
+}

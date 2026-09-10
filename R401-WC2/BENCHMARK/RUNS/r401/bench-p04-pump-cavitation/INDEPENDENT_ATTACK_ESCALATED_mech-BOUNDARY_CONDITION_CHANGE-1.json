@@ -1,0 +1,56 @@
+{
+ "stage": "INDEPENDENT_ATTACK",
+ "candidate_id": "cand:MS:BOUNDARY_CONDITION_CHANGE:ad5872771eb0",
+ "escalation": {
+  "gate_version": "attacker_calibration/1.0.0",
+  "instrument": "independent_attack/1.0.0",
+  "calibration_state": "NOT_CALIBRATED",
+  "terminal_kill_admissible": false,
+  "measured": {
+   "coverage": 1.0,
+   "parse_completeness": 1.0,
+   "tpr_scoped": 1.0,
+   "fpr_known_good": 1.0,
+   "n_cases_attacked": 40
+  },
+  "sealed_thresholds": {
+   "note": "registered BEFORE measurement; never tuned to results (Art. XXVII)",
+   "coverage_min": 0.875,
+   "parse_completeness_min": 0.875,
+   "tpr_min": 0.75,
+   "fpr_max": 0.3,
+   "ensemble": "NONE (single-attacker calibration only; majority-vote ensembles are deferred by the R412 directive)"
+  },
+  "measurement_path": "R412/CALIBRATION/engine_independent_attack_measurement.json",
+  "measurement_sha256": "4e1718e7088564333b5e1ef9be47ca452133d051001628cd6eed91f44e60ef5f",
+  "reason": "measured FPR 1.0 > sealed bar 0.3 (Art. L: the attacker is measured non-selective; its KILL is inadmissible as a terminal verdict and is escalated with the objection preserved)",
+  "rule": "the instrument's KILL is measured non-selective (FPR above the sealed bar); the objection is preserved verbatim and ESCALATED for adjudication — the candidate is NOT killed by this attack alone (Art. L); the deterministic gates are unchanged",
+  "reviewer_provenance": "AI_REVIEW (Art. LXVII)"
+ },
+ "preserved_objections": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "basis": "The proposed mechanism fails to address the fundamental physics of cavitation bubble collapse, which occurs at microsecond timescales and generates localized pressures exceeding 1000 atmospheres. The modification only reduces bubble formation but does not address the collapse intensity, which is the primary erosion mechanism (doi:10.1016/j.engfailanal.2005.07.012)."
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "basis": "The candidate specifies operation at 85% of best-efficiency flow rate, but real-world cooling water pumps frequently operate at much lower flow rates (40-70%) during turndown conditions, where the modified vane profile with reduced curvature will experience significant flow separation, exacerbating rather than reducing cavitation damage (doi:10.22161/ijaers.136.4)."
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "basis": "The candidate's own evidence (doi:10.1016/j.engfailanal.2016.07.011) demonstrates that cavitation erosion leads to resonance of torsional vibrations, which the modification does not address. The increased vane thickness will actually increase mass imbalance and vibration susceptibility, potentially accelerating failure modes not accounted for in the prediction."
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "basis": "The claimed 5% head delivery maintenance is statistically indistinguishable from baseline measurement uncertainty in industrial pump testing (ASME PTC 8.2-1990 standard allows ±3% tolerance), rendering the claimed improvement functionally equivalent to the status quo."
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "basis": "The proposed vane modification with increased thickness and reduced curvature creates stress concentration factors exceeding 3.5 at the leading edge transition, violating the material fatigue requirement of 5-year life under cyclic loading conditions (doi:10.3390/ma14030521)."
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "basis": "The testable prediction of a 0.15 increase in cavitation index cannot be isolated from other variables, as the cavitation index is a function of velocity head, vapor pressure, and NPSH, all of which have measurement uncertainties that exceed the predicted change (±0.12 according to ISO 19400-3 standard)."
+  }
+ ]
+}

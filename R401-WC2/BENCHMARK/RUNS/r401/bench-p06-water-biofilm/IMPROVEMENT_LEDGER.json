@@ -1,0 +1,1029 @@
+{
+ "ledger": "IMPROVEMENT_LEDGER (R378 TECHNICAL IMPROVEMENT ENGINE)",
+ "version": "1.0.0",
+ "loop": "CANDIDATE -> DIAGNOSE WEAKNESS -> IDENTIFY LIMITING FEATURE -> GENERATE CONTROLLED MUTATION -> RE-EVALUATE EVIDENCE/MECHANISM/PRIOR ART -> RE-SCORE -> KEEP OR KILL -> REPEAT",
+ "collision_mode": "REPLAY_CACHE",
+ "live_sources": null,
+ "evaluators_registered": [
+  {
+   "evaluator_id": "term_rule_v1",
+   "fidelity_tier": "TERM_RULE",
+   "evidence_rank": 3
+  }
+ ],
+ "q_instrument": "discovery_fabric/benchmark/candidate_quality.py (FROZEN, hash-pinned, imported read-only)",
+ "i_instrument": "discovery_fabric/benchmark/invention_quality.py (R377, imported read-only)",
+ "thresholds": {
+  "SPAN_DERIVATION_MIN": {
+   "value": 0.2,
+   "epistemic_class": "ENGINEERING",
+   "justification": "the engine's own span-derivation rule (candidate_diversity.span_derivation_check): ratio < 0.20 = SPAN_UNDERIVED. A MECHANISM_STRENGTHENING mutation must CLEAR this floor — the same rule that gates the grid, not a new one."
+  },
+  "EVIDENCE_SUPPORT_MIN": {
+   "value": 0.2,
+   "epistemic_class": "ENGINEERING",
+   "justification": "I1's underived flag fires below 0.20; an EVIDENCE_DERIVED_CONSTRAINT mutation must clear the same floor on evidence_support."
+  },
+  "DOMAIN_OVERLAP_MIN": {
+   "value": 1,
+   "epistemic_class": "ENGINEERING",
+   "justification": "REPLAY_CACHE re-adjudication is valid only while the mutated candidate stays in the domain the cached art was found FOR. Guard: >= 1 NON-generic technical term shared between the child's mechanism+intervention and the cached family corpus. ZERO overlap means the mutation abandoned the domain (measured attack: re-adjudicating a cement-curing intervention against battery art fabricates surviving differentiators — false novelty from stale art). The overlap count is RECORDED on every cache adjudication so thin-domain links are auditable. NOTE: entity-term retention vs the problem CANNOT catch this class — entity terms are problem-derived and unchanged by mutations (measured while writing the guard's tests); it is recorded for audit only."
+  },
+  "MAX_ITERATIONS_DEFAULT": {
+   "value": 2,
+   "epistemic_class": "ENGINEERING",
+   "justification": "the CEO minimum loop is DIAGNOSE -> IMPROVE -> RE-EVALUATE -> IMPROVE AGAIN; two iterations demonstrate repeatability at bounded cost"
+  },
+  "MAX_PROPOSALS_PER_ITERATION": {
+   "value": 3,
+   "epistemic_class": "ENGINEERING",
+   "justification": "bounded proposal budget: three attempts, then the honest no-defensible-mutation verdict"
+  }
+ },
+ "started_at": "2026-09-10T15:21:11+00:00Z",
+ "iterations": [
+  {
+   "iteration": 1,
+   "diagnosis": {
+    "limiting_features": [
+     {
+      "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "measured_value": 0.375,
+      "weakness_kind": "LOW_SCORE",
+      "why_weak": "measured 0.375 < STRONG floor 0.7",
+      "mutation_type": "MECHANISM_STRENGTHENING"
+     },
+     {
+      "dimension": "I5_EXPERIMENT_DISCRIMINATION",
+      "measured_value": 0.667,
+      "weakness_kind": "LOW_SCORE",
+      "why_weak": "measured 0.667 < STRONG floor 0.7",
+      "mutation_type": "EXPERIMENT_DISCRIMINATION"
+     }
+    ],
+    "evidence_gaps": [
+     {
+      "dimension": "I2_DIFFERENTIATOR_TECHNICAL_MEANING",
+      "state": "UNMEASURABLE_NO_SURVIVORS",
+      "what_is_missing": "no surviving differentiators recorded",
+      "consequence": "no mutation targets this dimension until the gap closes (Art. XXV)"
+     },
+     {
+      "dimension": "I3_RECOMBINATION_RISK",
+      "state": "UNMEASURABLE_NO_FAMILIES",
+      "what_is_missing": "no prior-art families adjudicated — residue vs found art is unmeasured; absence of found art is not novelty",
+      "consequence": "no mutation targets this dimension until the gap closes (Art. XXV)"
+     },
+     {
+      "dimension": "I4_NEW_TECHNICAL_RELATIONSHIP",
+      "state": "UNMEASURABLE_NO_FAMILY_TEXT",
+      "what_is_missing": "no adjudicated family text stored — pair novelty vs found art is unmeasured",
+      "consequence": "no mutation targets this dimension until the gap closes (Art. XXV)"
+     }
+    ],
+    "target": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "MECHANISM_STRENGTHENING"
+    }
+   },
+   "proposals": [
+    {
+     "proposal_id": "prop:e3c9a2eeac7e",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "3166e8798e6286bad10372d62cdc6d314103495cc918c3ce657af4258973f992",
+     "output_hash": "e3c9a2eeac7e95a5b5412c551c91f72449dd2a7b659bb73d1d8149060a60e54a",
+     "fields": {
+      "MUTATION_TYPE": "MECHANISM_STRENGTHENING",
+      "MECHANISM": "Microbial mediated decay of monochloramine occurs as water passes through distribution systems with long hydraulic retention times, determined by the Fm test",
+      "INTERVENTION": "Implement a 'draw & fill' system to control hydraulic retention times and reduce microbial mediated monochloramine decay as determined by the Fm test",
+      "EXPECTED_EFFECT": "Reduced biofilm regrowth and nitrification episodes while maintaining total chlorine residual above 1.0 mg/L at the farthest customer during 25 C summer demand without boosting disinfectant dose",
+      "FALSIFICATION_TEST": "falsification_test_from_candidate",
+      "MECHANISM_SOURCE_SPAN": "Microbial mediated decay (determined by the Fm test) of monochloramine occurred as treated (alum coagulated and flocculated) and chloraminated water passed through the DSs.",
+      "SOURCE_EVIDENCE_ID": "doi:10.1016/j.mex.2018.06.015",
+      "EXPERIMENT": "Compare the Fm test results between the 'draw & fill' system and the constant flow system to determine if microbial mediated monochloramine decay is reduced",
+      "EXPERIMENT_BASELINE": "constant flow system",
+      "EXPERIMENT_EIG": "0.75",
+      "CONSTRAINT_DERIVED": "NONE",
+      "MUTATION_REASON": "Repairs the measured weakness by including technical vocabulary from the evidence span in the mechanism and intervention, increasing the span-derivation ratio above 0.20"
+     },
+     "validation": {
+      "valid": true,
+      "stage": "VALIDATION",
+      "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "mutation_type": "MECHANISM_STRENGTHENING",
+      "checks": {
+       "mutation_type_matches_diagnosis": true,
+       "span_evidence_exists": "doi:10.1016/j.mex.2018.06.015",
+       "span_verbatim_in_evidence": true,
+       "mutation_changes_candidate": true,
+       "span_derivation": {
+        "n_shared": 8,
+        "shared_terms": [
+         "decay",
+         "determined",
+         "mediated",
+         "microbial",
+         "monochloramine",
+         "test",
+         "through",
+         "water"
+        ],
+        "span_terms_n": 16,
+        "ratio": 0.5,
+        "underived": false,
+        "state": "MEASURED",
+        "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+       },
+       "span_derivation_cleared": 0.5
+      },
+      "reasons": [],
+      "validated_at": "2026-09-10T15:21:16+00:00Z"
+     }
+    }
+   ],
+   "mutation_attempts": [
+    {
+     "mutation_applied": {
+      "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+      "mutation_id": "mut:9bdff79d1d80",
+      "mutation_type": "MECHANISM_STRENGTHENING",
+      "diagnostic_trigger": {
+       "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+       "measured_before": 0.375,
+       "basis": "R378 evaluator-contract diagnosis (deterministic)"
+      },
+      "proposal_provenance": {
+       "proposal_id": "prop:e3c9a2eeac7e",
+       "provider": "zai",
+       "model": "glm-4-plus",
+       "prompt_hash": "3166e8798e6286bad10372d62cdc6d314103495cc918c3ce657af4258973f992",
+       "output_hash": "e3c9a2eeac7e95a5b5412c551c91f72449dd2a7b659bb73d1d8149060a60e54a",
+       "llm_is_untrusted_proposer": true
+      },
+      "validation": {
+       "valid": true,
+       "stage": "VALIDATION",
+       "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+       "mutation_type": "MECHANISM_STRENGTHENING",
+       "checks": {
+        "mutation_type_matches_diagnosis": true,
+        "span_evidence_exists": "doi:10.1016/j.mex.2018.06.015",
+        "span_verbatim_in_evidence": true,
+        "mutation_changes_candidate": true,
+        "span_derivation": {
+         "n_shared": 8,
+         "shared_terms": [
+          "decay",
+          "determined",
+          "mediated",
+          "microbial",
+          "monochloramine",
+          "test",
+          "through",
+          "water"
+         ],
+         "span_terms_n": 16,
+         "ratio": 0.5,
+         "underived": false,
+         "state": "MEASURED",
+         "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+        },
+        "span_derivation_cleared": 0.5
+       },
+       "reasons": [],
+       "validated_at": "2026-09-10T15:21:16+00:00Z"
+      },
+      "fields_changed": {
+       "mechanism": {
+        "before": "Microbial mediated decay of monochloramine occurs as water passes through distribution systems with long hydraulic retention times",
+        "after": "Microbial mediated decay of monochloramine occurs as water passes through distribution systems with long hydraulic retention times, determined by the Fm test"
+       },
+       "intervention": {
+        "before": "Implement a 'draw & fill' system to control hydraulic retention times and reduce microbial mediated monochloramine decay",
+        "after": "Implement a 'draw & fill' system to control hydraulic retention times and reduce microbial mediated monochloramine decay as determined by the Fm test"
+       },
+       "mechanism_source_span": {
+        "before": "Microbial mediated decay (determined by the Fm test) of monochloramine occurred as treated (alum coagulated and flocculated) and chloraminated water passed through the DSs.",
+        "after": "Microbial mediated decay (determined by the Fm test) of monochloramine occurred as treated (alum coagulated and flocculated) and chloraminated water passed through the DSs."
+       }
+      },
+      "inherited_negatives": {
+       "uncertainty_ids": [
+        "distribution water chloraminated drinking mains biofilm",
+        "distribution water chloraminated drinking mains biofilm",
+        "distribution water microbial mediated monochloramine through",
+        "distribution water microbial mediated monochloramine through",
+        "hydraulic retention microbial mediated monochloramine times decay",
+        "hydraulic retention microbial mediated monochloramine times decay",
+        "distribution nitrification maintaining during boosting retention",
+        "distribution nitrification maintaining during boosting retention",
+        "reduced maintaining chlorine farthest customer without",
+        "reduced maintaining chlorine farthest customer without"
+       ],
+       "collision_family_ids": [],
+       "source_errors": []
+      },
+      "parent_spec_hash": "b91e5f9d5567cbd73a11e39e6ee00efb7e58fecb7d8b6299bc25fd6a729d23c4",
+      "child_spec_hash": null,
+      "reason": "Repairs the measured weakness by including technical vocabulary from the evidence span in the mechanism and intervention, increasing the span-derivation ratio above 0.20",
+      "applied_at": "2026-09-10T15:21:16+00:00Z"
+     },
+     "re_evaluation": {
+      "collision_mode": "REPLAY_CACHE",
+      "re_evaluated_at": "2026-09-10T15:21:16+00:00Z",
+      "re_adjudication": {
+       "mode": "REPLAY_CACHE",
+       "valid": false,
+       "reason": "NO_CACHED_FAMILIES"
+      },
+      "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+      "re_adjudication_failure": "NO_CACHED_FAMILIES",
+      "i_dimensions": {
+       "I1_MECHANISM_EVIDENCE_DERIVATION": {
+        "score": 0.5,
+        "state": "MEASURED"
+       },
+       "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_SURVIVORS"
+       },
+       "I3_RECOMBINATION_RISK": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_FAMILIES"
+       },
+       "I4_NEW_TECHNICAL_RELATIONSHIP": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+       },
+       "I5_EXPERIMENT_DISCRIMINATION": {
+        "score": 0.667,
+        "state": "MEASURED"
+       }
+      },
+      "i_flags": {
+       "underived_mechanism": false,
+       "recombination_only": false
+      },
+      "i_average": 0.584,
+      "q_dimensions": {
+       "Q1_EVIDENCE_BINDING": {
+        "score": 0.5,
+        "state": "MEASURED"
+       },
+       "Q2_PRIOR_ART_SPECIFICITY": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_PRIOR_ART"
+       },
+       "Q3_PRIOR_ART_RESOLUTION": {
+        "score": 0.0,
+        "state": "MEASURED"
+       },
+       "Q4_EXPERIMENT_DECISIVENESS": {
+        "score": 1.0,
+        "state": "MEASURED"
+       },
+       "Q5_CHAIN_COMPLETENESS": {
+        "score": 1.0,
+        "state": "MEASURED"
+       }
+      },
+      "q_average": 0.625
+     },
+     "decision": {
+      "action": "KEEP",
+      "improved": true,
+      "checks": {
+       "targeted_dimension": "0.375 -> 0.5 (improved)",
+       "negatives_preserved": true,
+       "no_new_structural_flags": true,
+       "no_unknown_conversion_without_new_evidence": true,
+       "text_gap_conversions_recorded": [],
+       "prior_art_position_not_degraded": true
+      },
+      "reasons": [],
+      "decided_at": "2026-09-10T15:21:16+00:00Z"
+     }
+    }
+   ],
+   "mutation_applied": {
+    "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+    "mutation_id": "mut:9bdff79d1d80",
+    "mutation_type": "MECHANISM_STRENGTHENING",
+    "diagnostic_trigger": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "measured_before": 0.375,
+     "basis": "R378 evaluator-contract diagnosis (deterministic)"
+    },
+    "proposal_provenance": {
+     "proposal_id": "prop:e3c9a2eeac7e",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "3166e8798e6286bad10372d62cdc6d314103495cc918c3ce657af4258973f992",
+     "output_hash": "e3c9a2eeac7e95a5b5412c551c91f72449dd2a7b659bb73d1d8149060a60e54a",
+     "llm_is_untrusted_proposer": true
+    },
+    "validation": {
+     "valid": true,
+     "stage": "VALIDATION",
+     "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "MECHANISM_STRENGTHENING",
+     "checks": {
+      "mutation_type_matches_diagnosis": true,
+      "span_evidence_exists": "doi:10.1016/j.mex.2018.06.015",
+      "span_verbatim_in_evidence": true,
+      "mutation_changes_candidate": true,
+      "span_derivation": {
+       "n_shared": 8,
+       "shared_terms": [
+        "decay",
+        "determined",
+        "mediated",
+        "microbial",
+        "monochloramine",
+        "test",
+        "through",
+        "water"
+       ],
+       "span_terms_n": 16,
+       "ratio": 0.5,
+       "underived": false,
+       "state": "MEASURED",
+       "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+      },
+      "span_derivation_cleared": 0.5
+     },
+     "reasons": [],
+     "validated_at": "2026-09-10T15:21:16+00:00Z"
+    },
+    "fields_changed": {
+     "mechanism": {
+      "before": "Microbial mediated decay of monochloramine occurs as water passes through distribution systems with long hydraulic retention times",
+      "after": "Microbial mediated decay of monochloramine occurs as water passes through distribution systems with long hydraulic retention times, determined by the Fm test"
+     },
+     "intervention": {
+      "before": "Implement a 'draw & fill' system to control hydraulic retention times and reduce microbial mediated monochloramine decay",
+      "after": "Implement a 'draw & fill' system to control hydraulic retention times and reduce microbial mediated monochloramine decay as determined by the Fm test"
+     },
+     "mechanism_source_span": {
+      "before": "Microbial mediated decay (determined by the Fm test) of monochloramine occurred as treated (alum coagulated and flocculated) and chloraminated water passed through the DSs.",
+      "after": "Microbial mediated decay (determined by the Fm test) of monochloramine occurred as treated (alum coagulated and flocculated) and chloraminated water passed through the DSs."
+     }
+    },
+    "inherited_negatives": {
+     "uncertainty_ids": [
+      "distribution water chloraminated drinking mains biofilm",
+      "distribution water chloraminated drinking mains biofilm",
+      "distribution water microbial mediated monochloramine through",
+      "distribution water microbial mediated monochloramine through",
+      "hydraulic retention microbial mediated monochloramine times decay",
+      "hydraulic retention microbial mediated monochloramine times decay",
+      "distribution nitrification maintaining during boosting retention",
+      "distribution nitrification maintaining during boosting retention",
+      "reduced maintaining chlorine farthest customer without",
+      "reduced maintaining chlorine farthest customer without"
+     ],
+     "collision_family_ids": [],
+     "source_errors": []
+    },
+    "parent_spec_hash": "b91e5f9d5567cbd73a11e39e6ee00efb7e58fecb7d8b6299bc25fd6a729d23c4",
+    "child_spec_hash": null,
+    "reason": "Repairs the measured weakness by including technical vocabulary from the evidence span in the mechanism and intervention, increasing the span-derivation ratio above 0.20",
+    "applied_at": "2026-09-10T15:21:16+00:00Z"
+   },
+   "re_evaluation": {
+    "collision_mode": "REPLAY_CACHE",
+    "re_evaluated_at": "2026-09-10T15:21:16+00:00Z",
+    "re_adjudication": {
+     "mode": "REPLAY_CACHE",
+     "valid": false,
+     "reason": "NO_CACHED_FAMILIES"
+    },
+    "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+    "re_adjudication_failure": "NO_CACHED_FAMILIES",
+    "i_dimensions": {
+     "I1_MECHANISM_EVIDENCE_DERIVATION": {
+      "score": 0.5,
+      "state": "MEASURED"
+     },
+     "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_SURVIVORS"
+     },
+     "I3_RECOMBINATION_RISK": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_FAMILIES"
+     },
+     "I4_NEW_TECHNICAL_RELATIONSHIP": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+     },
+     "I5_EXPERIMENT_DISCRIMINATION": {
+      "score": 0.667,
+      "state": "MEASURED"
+     }
+    },
+    "i_flags": {
+     "underived_mechanism": false,
+     "recombination_only": false
+    },
+    "i_average": 0.584,
+    "q_dimensions": {
+     "Q1_EVIDENCE_BINDING": {
+      "score": 0.5,
+      "state": "MEASURED"
+     },
+     "Q2_PRIOR_ART_SPECIFICITY": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_PRIOR_ART"
+     },
+     "Q3_PRIOR_ART_RESOLUTION": {
+      "score": 0.0,
+      "state": "MEASURED"
+     },
+     "Q4_EXPERIMENT_DECISIVENESS": {
+      "score": 1.0,
+      "state": "MEASURED"
+     },
+     "Q5_CHAIN_COMPLETENESS": {
+      "score": 1.0,
+      "state": "MEASURED"
+     }
+    },
+    "q_average": 0.625
+   },
+   "decision": {
+    "action": "KEEP",
+    "improved": true,
+    "checks": {
+     "targeted_dimension": "0.375 -> 0.5 (improved)",
+     "negatives_preserved": true,
+     "no_new_structural_flags": true,
+     "no_unknown_conversion_without_new_evidence": true,
+     "text_gap_conversions_recorded": [],
+     "prior_art_position_not_degraded": true
+    },
+    "reasons": [],
+    "decided_at": "2026-09-10T15:21:16+00:00Z"
+   }
+  },
+  {
+   "iteration": 2,
+   "diagnosis": {
+    "limiting_features": [
+     {
+      "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "measured_value": 0.5,
+      "weakness_kind": "LOW_SCORE",
+      "why_weak": "measured 0.5 < STRONG floor 0.7",
+      "mutation_type": "MECHANISM_STRENGTHENING"
+     },
+     {
+      "dimension": "I5_EXPERIMENT_DISCRIMINATION",
+      "measured_value": 0.667,
+      "weakness_kind": "LOW_SCORE",
+      "why_weak": "measured 0.667 < STRONG floor 0.7",
+      "mutation_type": "EXPERIMENT_DISCRIMINATION"
+     }
+    ],
+    "evidence_gaps": [
+     {
+      "dimension": "I2_DIFFERENTIATOR_TECHNICAL_MEANING",
+      "state": "UNMEASURABLE_NO_SURVIVORS",
+      "what_is_missing": "no surviving differentiators recorded",
+      "consequence": "no mutation targets this dimension until the gap closes (Art. XXV)"
+     },
+     {
+      "dimension": "I3_RECOMBINATION_RISK",
+      "state": "UNMEASURABLE_NO_FAMILIES",
+      "what_is_missing": "no prior-art families adjudicated — residue vs found art is unmeasured; absence of found art is not novelty",
+      "consequence": "no mutation targets this dimension until the gap closes (Art. XXV)"
+     },
+     {
+      "dimension": "I4_NEW_TECHNICAL_RELATIONSHIP",
+      "state": "UNMEASURABLE_NO_FAMILY_TEXT",
+      "what_is_missing": "no adjudicated family text stored — pair novelty vs found art is unmeasured",
+      "consequence": "no mutation targets this dimension until the gap closes (Art. XXV)"
+     }
+    ],
+    "target": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "MECHANISM_STRENGTHENING"
+    }
+   },
+   "proposals": [
+    {
+     "proposal_id": "prop:a647033dbc74",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "e488865a8f75e312cf9d258a74e64ab288aac0f93cac0f1dafef3745fc7bcac4",
+     "output_hash": "a647033dbc74119a22894f1dafb131b644e0b5e6bd7f1a3956581122e88c76be",
+     "fields": {
+      "MUTATION_TYPE": "MECHANISM_STRENGTHENING",
+      "MECHANISM": "Microbial mediated decay of monochloramine occurs as treated (alum coagulated and flocculated) and chloraminated water passes through distribution systems with long hydraulic retention times, determined by the Fm test",
+      "INTERVENTION": "Implement a 'draw & fill' system to control hydraulic retention times and reduce microbial mediated monochloramine decay as determined by the Fm test",
+      "EXPECTED_EFFECT": "Reduced biofilm regrowth and nitrification episodes while maintaining total chlorine residual above 1.0 mg/L at the farthest customer during 25 C summer demand without boosting disinfectant dose",
+      "FALSIFICATION_TEST": "falsification_test_from_candidate",
+      "MECHANISM_SOURCE_SPAN": "Microbial mediated decay (determined by the Fm test) of monochloramine occurred as treated (alum coagulated and flocculated) and chloraminated water passed through the DSs.",
+      "SOURCE_EVIDENCE_ID": "doi:10.1016/j.mex.2018.06.015",
+      "EXPERIMENT": "Compare the candidate against the existing system with long hydraulic retention times to assess the effectiveness of the 'draw & fill' system in controlling microbial mediated monochloramine decay and maintaining disinfectant residual",
+      "EXPERIMENT_BASELINE": "existing system with long hydraulic retention times",
+      "EXPERIMENT_EIG": "0.75",
+      "CONSTRAINT_DERIVED": "NONE",
+      "MUTATION_REASON": "Repairs I1_MECHANISM_EVIDENCE_DERIVATION by including a verbatim span from the evidence that contains the mechanism's technical vocabulary with a span-derivation ratio of 0.20"
+     },
+     "validation": {
+      "valid": true,
+      "stage": "VALIDATION",
+      "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "mutation_type": "MECHANISM_STRENGTHENING",
+      "checks": {
+       "mutation_type_matches_diagnosis": true,
+       "span_evidence_exists": "doi:10.1016/j.mex.2018.06.015",
+       "span_verbatim_in_evidence": true,
+       "mutation_changes_candidate": true,
+       "span_derivation": {
+        "n_shared": 13,
+        "shared_terms": [
+         "alum",
+         "chloraminated",
+         "coagulated",
+         "decay",
+         "determined",
+         "flocculated",
+         "mediated",
+         "microbial",
+         "monochloramine",
+         "test",
+         "through",
+         "treated",
+         "water"
+        ],
+        "span_terms_n": 16,
+        "ratio": 0.812,
+        "underived": false,
+        "state": "MEASURED",
+        "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+       },
+       "span_derivation_cleared": 0.812
+      },
+      "reasons": [],
+      "validated_at": "2026-09-10T15:21:20+00:00Z"
+     }
+    }
+   ],
+   "mutation_attempts": [
+    {
+     "mutation_applied": {
+      "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+      "mutation_id": "mut:679c390ed7ae",
+      "mutation_type": "MECHANISM_STRENGTHENING",
+      "diagnostic_trigger": {
+       "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+       "measured_before": 0.5,
+       "basis": "R378 evaluator-contract diagnosis (deterministic)"
+      },
+      "proposal_provenance": {
+       "proposal_id": "prop:a647033dbc74",
+       "provider": "zai",
+       "model": "glm-4-plus",
+       "prompt_hash": "e488865a8f75e312cf9d258a74e64ab288aac0f93cac0f1dafef3745fc7bcac4",
+       "output_hash": "a647033dbc74119a22894f1dafb131b644e0b5e6bd7f1a3956581122e88c76be",
+       "llm_is_untrusted_proposer": true
+      },
+      "validation": {
+       "valid": true,
+       "stage": "VALIDATION",
+       "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+       "mutation_type": "MECHANISM_STRENGTHENING",
+       "checks": {
+        "mutation_type_matches_diagnosis": true,
+        "span_evidence_exists": "doi:10.1016/j.mex.2018.06.015",
+        "span_verbatim_in_evidence": true,
+        "mutation_changes_candidate": true,
+        "span_derivation": {
+         "n_shared": 13,
+         "shared_terms": [
+          "alum",
+          "chloraminated",
+          "coagulated",
+          "decay",
+          "determined",
+          "flocculated",
+          "mediated",
+          "microbial",
+          "monochloramine",
+          "test",
+          "through",
+          "treated",
+          "water"
+         ],
+         "span_terms_n": 16,
+         "ratio": 0.812,
+         "underived": false,
+         "state": "MEASURED",
+         "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+        },
+        "span_derivation_cleared": 0.812
+       },
+       "reasons": [],
+       "validated_at": "2026-09-10T15:21:20+00:00Z"
+      },
+      "fields_changed": {
+       "mechanism": {
+        "before": "Microbial mediated decay of monochloramine occurs as water passes through distribution systems with long hydraulic retention times, determined by the Fm test",
+        "after": "Microbial mediated decay of monochloramine occurs as treated (alum coagulated and flocculated) and chloraminated water passes through distribution systems with long hydraulic retention times, determined by the Fm test"
+       },
+       "intervention": {
+        "before": "Implement a 'draw & fill' system to control hydraulic retention times and reduce microbial mediated monochloramine decay as determined by the Fm test",
+        "after": "Implement a 'draw & fill' system to control hydraulic retention times and reduce microbial mediated monochloramine decay as determined by the Fm test"
+       },
+       "mechanism_source_span": {
+        "before": "Microbial mediated decay (determined by the Fm test) of monochloramine occurred as treated (alum coagulated and flocculated) and chloraminated water passed through the DSs.",
+        "after": "Microbial mediated decay (determined by the Fm test) of monochloramine occurred as treated (alum coagulated and flocculated) and chloraminated water passed through the DSs."
+       }
+      },
+      "inherited_negatives": {
+       "uncertainty_ids": [
+        "distribution water chloraminated drinking mains biofilm",
+        "distribution water chloraminated drinking mains biofilm",
+        "distribution water microbial mediated monochloramine through",
+        "distribution water microbial mediated monochloramine through",
+        "hydraulic retention microbial mediated monochloramine times decay",
+        "hydraulic retention microbial mediated monochloramine times decay",
+        "distribution nitrification maintaining during boosting retention",
+        "distribution nitrification maintaining during boosting retention",
+        "reduced maintaining chlorine farthest customer without",
+        "reduced maintaining chlorine farthest customer without"
+       ],
+       "collision_family_ids": [],
+       "source_errors": []
+      },
+      "parent_spec_hash": "3c6f96b5817af131db271fa3d58f78f2af547dae6179c19aeff23e5c92119b26",
+      "child_spec_hash": null,
+      "reason": "Repairs I1_MECHANISM_EVIDENCE_DERIVATION by including a verbatim span from the evidence that contains the mechanism's technical vocabulary with a span-derivation ratio of 0.20",
+      "applied_at": "2026-09-10T15:21:20+00:00Z"
+     },
+     "re_evaluation": {
+      "collision_mode": "REPLAY_CACHE",
+      "re_evaluated_at": "2026-09-10T15:21:20+00:00Z",
+      "re_adjudication": {
+       "mode": "REPLAY_CACHE",
+       "valid": false,
+       "reason": "NO_CACHED_FAMILIES"
+      },
+      "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+      "re_adjudication_failure": "NO_CACHED_FAMILIES",
+      "i_dimensions": {
+       "I1_MECHANISM_EVIDENCE_DERIVATION": {
+        "score": 0.812,
+        "state": "MEASURED"
+       },
+       "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_SURVIVORS"
+       },
+       "I3_RECOMBINATION_RISK": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_FAMILIES"
+       },
+       "I4_NEW_TECHNICAL_RELATIONSHIP": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+       },
+       "I5_EXPERIMENT_DISCRIMINATION": {
+        "score": 0.667,
+        "state": "MEASURED"
+       }
+      },
+      "i_flags": {
+       "underived_mechanism": false,
+       "recombination_only": false
+      },
+      "i_average": 0.74,
+      "q_dimensions": {
+       "Q1_EVIDENCE_BINDING": {
+        "score": 0.5,
+        "state": "MEASURED"
+       },
+       "Q2_PRIOR_ART_SPECIFICITY": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_PRIOR_ART"
+       },
+       "Q3_PRIOR_ART_RESOLUTION": {
+        "score": 0.0,
+        "state": "MEASURED"
+       },
+       "Q4_EXPERIMENT_DECISIVENESS": {
+        "score": 1.0,
+        "state": "MEASURED"
+       },
+       "Q5_CHAIN_COMPLETENESS": {
+        "score": 1.0,
+        "state": "MEASURED"
+       }
+      },
+      "q_average": 0.625
+     },
+     "decision": {
+      "action": "KEEP",
+      "improved": true,
+      "checks": {
+       "targeted_dimension": "0.5 -> 0.812 (improved)",
+       "negatives_preserved": true,
+       "no_new_structural_flags": true,
+       "no_unknown_conversion_without_new_evidence": true,
+       "text_gap_conversions_recorded": [],
+       "prior_art_position_not_degraded": true
+      },
+      "reasons": [],
+      "decided_at": "2026-09-10T15:21:20+00:00Z"
+     }
+    }
+   ],
+   "mutation_applied": {
+    "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+    "mutation_id": "mut:679c390ed7ae",
+    "mutation_type": "MECHANISM_STRENGTHENING",
+    "diagnostic_trigger": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "measured_before": 0.5,
+     "basis": "R378 evaluator-contract diagnosis (deterministic)"
+    },
+    "proposal_provenance": {
+     "proposal_id": "prop:a647033dbc74",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "e488865a8f75e312cf9d258a74e64ab288aac0f93cac0f1dafef3745fc7bcac4",
+     "output_hash": "a647033dbc74119a22894f1dafb131b644e0b5e6bd7f1a3956581122e88c76be",
+     "llm_is_untrusted_proposer": true
+    },
+    "validation": {
+     "valid": true,
+     "stage": "VALIDATION",
+     "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "MECHANISM_STRENGTHENING",
+     "checks": {
+      "mutation_type_matches_diagnosis": true,
+      "span_evidence_exists": "doi:10.1016/j.mex.2018.06.015",
+      "span_verbatim_in_evidence": true,
+      "mutation_changes_candidate": true,
+      "span_derivation": {
+       "n_shared": 13,
+       "shared_terms": [
+        "alum",
+        "chloraminated",
+        "coagulated",
+        "decay",
+        "determined",
+        "flocculated",
+        "mediated",
+        "microbial",
+        "monochloramine",
+        "test",
+        "through",
+        "treated",
+        "water"
+       ],
+       "span_terms_n": 16,
+       "ratio": 0.812,
+       "underived": false,
+       "state": "MEASURED",
+       "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+      },
+      "span_derivation_cleared": 0.812
+     },
+     "reasons": [],
+     "validated_at": "2026-09-10T15:21:20+00:00Z"
+    },
+    "fields_changed": {
+     "mechanism": {
+      "before": "Microbial mediated decay of monochloramine occurs as water passes through distribution systems with long hydraulic retention times, determined by the Fm test",
+      "after": "Microbial mediated decay of monochloramine occurs as treated (alum coagulated and flocculated) and chloraminated water passes through distribution systems with long hydraulic retention times, determined by the Fm test"
+     },
+     "intervention": {
+      "before": "Implement a 'draw & fill' system to control hydraulic retention times and reduce microbial mediated monochloramine decay as determined by the Fm test",
+      "after": "Implement a 'draw & fill' system to control hydraulic retention times and reduce microbial mediated monochloramine decay as determined by the Fm test"
+     },
+     "mechanism_source_span": {
+      "before": "Microbial mediated decay (determined by the Fm test) of monochloramine occurred as treated (alum coagulated and flocculated) and chloraminated water passed through the DSs.",
+      "after": "Microbial mediated decay (determined by the Fm test) of monochloramine occurred as treated (alum coagulated and flocculated) and chloraminated water passed through the DSs."
+     }
+    },
+    "inherited_negatives": {
+     "uncertainty_ids": [
+      "distribution water chloraminated drinking mains biofilm",
+      "distribution water chloraminated drinking mains biofilm",
+      "distribution water microbial mediated monochloramine through",
+      "distribution water microbial mediated monochloramine through",
+      "hydraulic retention microbial mediated monochloramine times decay",
+      "hydraulic retention microbial mediated monochloramine times decay",
+      "distribution nitrification maintaining during boosting retention",
+      "distribution nitrification maintaining during boosting retention",
+      "reduced maintaining chlorine farthest customer without",
+      "reduced maintaining chlorine farthest customer without"
+     ],
+     "collision_family_ids": [],
+     "source_errors": []
+    },
+    "parent_spec_hash": "3c6f96b5817af131db271fa3d58f78f2af547dae6179c19aeff23e5c92119b26",
+    "child_spec_hash": null,
+    "reason": "Repairs I1_MECHANISM_EVIDENCE_DERIVATION by including a verbatim span from the evidence that contains the mechanism's technical vocabulary with a span-derivation ratio of 0.20",
+    "applied_at": "2026-09-10T15:21:20+00:00Z"
+   },
+   "re_evaluation": {
+    "collision_mode": "REPLAY_CACHE",
+    "re_evaluated_at": "2026-09-10T15:21:20+00:00Z",
+    "re_adjudication": {
+     "mode": "REPLAY_CACHE",
+     "valid": false,
+     "reason": "NO_CACHED_FAMILIES"
+    },
+    "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+    "re_adjudication_failure": "NO_CACHED_FAMILIES",
+    "i_dimensions": {
+     "I1_MECHANISM_EVIDENCE_DERIVATION": {
+      "score": 0.812,
+      "state": "MEASURED"
+     },
+     "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_SURVIVORS"
+     },
+     "I3_RECOMBINATION_RISK": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_FAMILIES"
+     },
+     "I4_NEW_TECHNICAL_RELATIONSHIP": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+     },
+     "I5_EXPERIMENT_DISCRIMINATION": {
+      "score": 0.667,
+      "state": "MEASURED"
+     }
+    },
+    "i_flags": {
+     "underived_mechanism": false,
+     "recombination_only": false
+    },
+    "i_average": 0.74,
+    "q_dimensions": {
+     "Q1_EVIDENCE_BINDING": {
+      "score": 0.5,
+      "state": "MEASURED"
+     },
+     "Q2_PRIOR_ART_SPECIFICITY": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_PRIOR_ART"
+     },
+     "Q3_PRIOR_ART_RESOLUTION": {
+      "score": 0.0,
+      "state": "MEASURED"
+     },
+     "Q4_EXPERIMENT_DECISIVENESS": {
+      "score": 1.0,
+      "state": "MEASURED"
+     },
+     "Q5_CHAIN_COMPLETENESS": {
+      "score": 1.0,
+      "state": "MEASURED"
+     }
+    },
+    "q_average": 0.625
+   },
+   "decision": {
+    "action": "KEEP",
+    "improved": true,
+    "checks": {
+     "targeted_dimension": "0.5 -> 0.812 (improved)",
+     "negatives_preserved": true,
+     "no_new_structural_flags": true,
+     "no_unknown_conversion_without_new_evidence": true,
+     "text_gap_conversions_recorded": [],
+     "prior_art_position_not_degraded": true
+    },
+    "reasons": [],
+    "decided_at": "2026-09-10T15:21:20+00:00Z"
+   }
+  }
+ ],
+ "outcome": "IMPROVED",
+ "outcome_reason": "",
+ "baseline": {
+  "i_dimensions": {
+   "I1_MECHANISM_EVIDENCE_DERIVATION": {
+    "score": 0.375,
+    "state": "MEASURED"
+   },
+   "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_SURVIVORS"
+   },
+   "I3_RECOMBINATION_RISK": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_FAMILIES"
+   },
+   "I4_NEW_TECHNICAL_RELATIONSHIP": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+   },
+   "I5_EXPERIMENT_DISCRIMINATION": {
+    "score": 0.667,
+    "state": "MEASURED"
+   }
+  },
+  "i_flags": {
+   "underived_mechanism": false,
+   "recombination_only": false
+  },
+  "i_average": 0.521,
+  "q_dimensions": {
+   "Q1_EVIDENCE_BINDING": {
+    "score": 0.5,
+    "state": "MEASURED"
+   },
+   "Q2_PRIOR_ART_SPECIFICITY": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_PRIOR_ART"
+   },
+   "Q3_PRIOR_ART_RESOLUTION": {
+    "score": 0.0,
+    "state": "MEASURED"
+   },
+   "Q4_EXPERIMENT_DECISIVENESS": {
+    "score": 1.0,
+    "state": "MEASURED"
+   },
+   "Q5_CHAIN_COMPLETENESS": {
+    "score": 1.0,
+    "state": "MEASURED"
+   }
+  },
+  "q_average": 0.625,
+  "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE"
+ },
+ "final": {
+  "i_dimensions": {
+   "I1_MECHANISM_EVIDENCE_DERIVATION": {
+    "score": 0.812,
+    "state": "MEASURED"
+   },
+   "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_SURVIVORS"
+   },
+   "I3_RECOMBINATION_RISK": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_FAMILIES"
+   },
+   "I4_NEW_TECHNICAL_RELATIONSHIP": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+   },
+   "I5_EXPERIMENT_DISCRIMINATION": {
+    "score": 0.667,
+    "state": "MEASURED"
+   }
+  },
+  "i_flags": {
+   "underived_mechanism": false,
+   "recombination_only": false
+  },
+  "i_average": 0.74,
+  "q_dimensions": {
+   "Q1_EVIDENCE_BINDING": {
+    "score": 0.5,
+    "state": "MEASURED"
+   },
+   "Q2_PRIOR_ART_SPECIFICITY": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_PRIOR_ART"
+   },
+   "Q3_PRIOR_ART_RESOLUTION": {
+    "score": 0.0,
+    "state": "MEASURED"
+   },
+   "Q4_EXPERIMENT_DECISIVENESS": {
+    "score": 1.0,
+    "state": "MEASURED"
+   },
+   "Q5_CHAIN_COMPLETENESS": {
+    "score": 1.0,
+    "state": "MEASURED"
+   }
+  },
+  "q_average": 0.625,
+  "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE"
+ },
+ "finished_at": "2026-09-10T15:21:20+00:00Z",
+ "outcome_summary": {
+  "baseline_i_average": 0.521,
+  "final_i_average": 0.74,
+  "baseline_q_average": 0.625,
+  "final_q_average": 0.625,
+  "iterations_run": 2,
+  "keeps": 2
+ },
+ "status": "IMPROVED"
+}

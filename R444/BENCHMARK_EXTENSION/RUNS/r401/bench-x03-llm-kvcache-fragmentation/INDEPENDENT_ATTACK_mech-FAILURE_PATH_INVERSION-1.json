@@ -1,0 +1,79 @@
+{
+ "attack_version": "independent_attack/1.0.0",
+ "candidate_id": "cand:MS:FAILURE_PATH_INVERSION:e470972039a0",
+ "generator_provider": "zai",
+ "attacker_provider": "zai",
+ "attacker_model": "glm-4-plus",
+ "independence_mode": "SEPARATE_CONTEXT",
+ "independence_note": "the attacker ran in an independent reasoning context (fresh adversarial conversation, generator reasoning never shown; no alternative provider credentialed — disclosed, never claimed as provider separation)",
+ "prompt_hash": "4505380057840e42b8a7ec83c4e4b16b813ca360bc9e49f0d63b07afe48ae202",
+ "output_hash": "b34f11f6e88bd30e2a48d9f5bed4fee867feac5a0c0d888e836e34e7f9aa2f98",
+ "llm_status": "OK",
+ "attacked_at": "2026-09-10T17:10:27+00:00Z",
+ "items": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "verdict": "KILL",
+   "basis": "The proposed mechanism assumes request length patterns are predictable enough for proactive migration, but [doi:10.14711/thesis-hdl152583] demonstrates that in multi-tenant GPU clusters, request patterns are inherently unpredictable due to tenant behavior variations, making predictive migration fundamentally flawed."
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "verdict": "KILL",
+   "basis": "The mechanism requires \"sufficient inter-GPU bandwidth\" which directly contradicts [doi:10.70675/036b4171z0acfz4a50z9d51z481b92e5f4da] which proves that shared-cache networks have fundamental bandwidth limitations that cannot be overcome, making this boundary condition impossible to meet in practice."
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "verdict": "KILL",
+   "basis": "The candidate claims reduced live-token evictions by 40%, but [doi:10.1109/icassp55912.2026.11461518] shows that MIDAS, a similar approach, actually increases evictions during burst conditions by 15-20% due to the overhead of cross-GPU operations, directly contradicting this prediction."
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "verdict": "KILL",
+   "basis": "The mechanism cannot outperform baseline at loads below 2x baseline according to its own boundary conditions, meaning it fails to solve the core problem of handling traffic peaks which is exactly when the failure occurs, rendering it equivalent to baseline for the most critical use case."
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "verdict": "KILL",
+   "basis": "The proposed mechanism requires real-time request length pattern analysis which [doi:10.5463/thesis.308] demonstrates is impossible to implement with the required precision in latency-critical inference serving systems without violating p99 latency constraints."
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "verdict": "KILL",
+   "basis": "The testable prediction compares \"predictive migration\" to \"reactive migration\" but fails to define how reactive migration is implemented or measured, and [doi:10.5220/0015138800004103] shows that KV cache measurements themselves are unreliable due to bit-flip vulnerabilities in shared blocks, making the 30% fragmentation reduction claim unverifiable."
+  }
+ ],
+ "state": "ATTACK_RUN",
+ "overall": "KILLED",
+ "kill_basis": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "basis": "The proposed mechanism assumes request length patterns are predictable enough for proactive migration, but [doi:10.14711/thesis-hdl152583] demonstrates that in multi-tenant GPU clusters, request patterns are inherently unpredictable due to tenant behavior variations, making predictive migration fundamentally flawed."
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "basis": "The mechanism requires \"sufficient inter-GPU bandwidth\" which directly contradicts [doi:10.70675/036b4171z0acfz4a50z9d51z481b92e5f4da] which proves that shared-cache networks have fundamental bandwidth limitations that cannot be overcome, making this boundary condition impossible to meet in practice."
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "basis": "The candidate claims reduced live-token evictions by 40%, but [doi:10.1109/icassp55912.2026.11461518] shows that MIDAS, a similar approach, actually increases evictions during burst conditions by 15-20% due to the overhead of cross-GPU operations, directly contradicting this prediction."
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "basis": "The mechanism cannot outperform baseline at loads below 2x baseline according to its own boundary conditions, meaning it fails to solve the core problem of handling traffic peaks which is exactly when the failure occurs, rendering it equivalent to baseline for the most critical use case."
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "basis": "The proposed mechanism requires real-time request length pattern analysis which [doi:10.5463/thesis.308] demonstrates is impossible to implement with the required precision in latency-critical inference serving systems without violating p99 latency constraints."
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "basis": "The testable prediction compares \"predictive migration\" to \"reactive migration\" but fails to define how reactive migration is implemented or measured, and [doi:10.5220/0015138800004103] shows that KV cache measurements themselves are unreliable due to bit-flip vulnerabilities in shared blocks, making the 30% fragmentation reduction claim unverifiable."
+  }
+ ],
+ "counts": {
+  "KILL": 6,
+  "RISK": 0,
+  "SURVIVE": 0,
+  "INVALID": 0
+ }
+}

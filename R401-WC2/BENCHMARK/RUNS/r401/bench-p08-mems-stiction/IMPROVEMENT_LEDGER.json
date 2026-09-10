@@ -1,0 +1,1221 @@
+{
+ "ledger": "IMPROVEMENT_LEDGER (R378 TECHNICAL IMPROVEMENT ENGINE)",
+ "version": "1.0.0",
+ "loop": "CANDIDATE -> DIAGNOSE WEAKNESS -> IDENTIFY LIMITING FEATURE -> GENERATE CONTROLLED MUTATION -> RE-EVALUATE EVIDENCE/MECHANISM/PRIOR ART -> RE-SCORE -> KEEP OR KILL -> REPEAT",
+ "collision_mode": "REPLAY_CACHE",
+ "live_sources": null,
+ "evaluators_registered": [
+  {
+   "evaluator_id": "term_rule_v1",
+   "fidelity_tier": "TERM_RULE",
+   "evidence_rank": 3
+  }
+ ],
+ "q_instrument": "discovery_fabric/benchmark/candidate_quality.py (FROZEN, hash-pinned, imported read-only)",
+ "i_instrument": "discovery_fabric/benchmark/invention_quality.py (R377, imported read-only)",
+ "thresholds": {
+  "SPAN_DERIVATION_MIN": {
+   "value": 0.2,
+   "epistemic_class": "ENGINEERING",
+   "justification": "the engine's own span-derivation rule (candidate_diversity.span_derivation_check): ratio < 0.20 = SPAN_UNDERIVED. A MECHANISM_STRENGTHENING mutation must CLEAR this floor — the same rule that gates the grid, not a new one."
+  },
+  "EVIDENCE_SUPPORT_MIN": {
+   "value": 0.2,
+   "epistemic_class": "ENGINEERING",
+   "justification": "I1's underived flag fires below 0.20; an EVIDENCE_DERIVED_CONSTRAINT mutation must clear the same floor on evidence_support."
+  },
+  "DOMAIN_OVERLAP_MIN": {
+   "value": 1,
+   "epistemic_class": "ENGINEERING",
+   "justification": "REPLAY_CACHE re-adjudication is valid only while the mutated candidate stays in the domain the cached art was found FOR. Guard: >= 1 NON-generic technical term shared between the child's mechanism+intervention and the cached family corpus. ZERO overlap means the mutation abandoned the domain (measured attack: re-adjudicating a cement-curing intervention against battery art fabricates surviving differentiators — false novelty from stale art). The overlap count is RECORDED on every cache adjudication so thin-domain links are auditable. NOTE: entity-term retention vs the problem CANNOT catch this class — entity terms are problem-derived and unchanged by mutations (measured while writing the guard's tests); it is recorded for audit only."
+  },
+  "MAX_ITERATIONS_DEFAULT": {
+   "value": 2,
+   "epistemic_class": "ENGINEERING",
+   "justification": "the CEO minimum loop is DIAGNOSE -> IMPROVE -> RE-EVALUATE -> IMPROVE AGAIN; two iterations demonstrate repeatability at bounded cost"
+  },
+  "MAX_PROPOSALS_PER_ITERATION": {
+   "value": 3,
+   "epistemic_class": "ENGINEERING",
+   "justification": "bounded proposal budget: three attempts, then the honest no-defensible-mutation verdict"
+  }
+ },
+ "started_at": "2026-09-10T15:42:02+00:00Z",
+ "iterations": [
+  {
+   "iteration": 1,
+   "diagnosis": {
+    "limiting_features": [
+     {
+      "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "measured_value": 0.156,
+      "weakness_kind": "UNDERIVED",
+      "why_weak": "measured 0.156 < STRONG floor 0.7; underived_flag set (span_support=0.824, evidence_support=0.156) — the quoted span and/or evidence does not contain the mechanism's vocabulary",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT"
+     },
+     {
+      "dimension": "I5_EXPERIMENT_DISCRIMINATION",
+      "measured_value": 0.667,
+      "weakness_kind": "LOW_SCORE",
+      "why_weak": "measured 0.667 < STRONG floor 0.7",
+      "mutation_type": "EXPERIMENT_DISCRIMINATION"
+     }
+    ],
+    "evidence_gaps": [
+     {
+      "dimension": "I2_DIFFERENTIATOR_TECHNICAL_MEANING",
+      "state": "UNMEASURABLE_NO_SURVIVORS",
+      "what_is_missing": "no surviving differentiators recorded",
+      "consequence": "no mutation targets this dimension until the gap closes (Art. XXV)"
+     },
+     {
+      "dimension": "I3_RECOMBINATION_RISK",
+      "state": "UNMEASURABLE_NO_FAMILIES",
+      "what_is_missing": "no prior-art families adjudicated — residue vs found art is unmeasured; absence of found art is not novelty",
+      "consequence": "no mutation targets this dimension until the gap closes (Art. XXV)"
+     },
+     {
+      "dimension": "I4_NEW_TECHNICAL_RELATIONSHIP",
+      "state": "UNMEASURABLE_NO_FAMILY_TEXT",
+      "what_is_missing": "no adjudicated family text stored — pair novelty vs found art is unmeasured",
+      "consequence": "no mutation targets this dimension until the gap closes (Art. XXV)"
+     }
+    ],
+    "target": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT"
+    }
+   },
+   "proposals": [
+    {
+     "proposal_id": "prop:5f7750ccd0ca",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "9a0b5ae2d061de5dfe57d0aad2577a969b3fc9a91fa4076f20d291958924c254",
+     "output_hash": "5f7750ccd0ca90928f0f2c4e8ac477c1d48498bf6ae4548de87a3fdb0df3af50",
+     "fields": {
+      "MUTATION_TYPE": "EVIDENCE_DERIVED_CONSTRAINT",
+      "MECHANISM": "Implement a specialized wet-etching process on the comb structure to create a controlled undercut profile that increases the gap between comb fingers, as described in the evidence for developing CMOS MEMS components with minimal post-processing and chip packaging steps",
+      "INTERVENTION": "Apply the wet-etching process with precise control to achieve the specific undercut profile that maintains adequate finger spacing during shock conditions",
+      "EXPECTED_EFFECT": "The increased gap between comb fingers reduces the risk of contact during shock events, preventing stiction and permanent shorting of interdigitated electrodes while maintaining device sensitivity",
+      "FALSIFICATION_TEST": "Measure the zero-g offset after subjecting the device to 10000 g mechanical shock in all axes and verify it remains below 50 mg",
+      "MECHANISM_SOURCE_SPAN": "This article specifically presents a clear and feasible approach for MEMS designers equipped with simple wet-etching facilities and a clear and feasible approach to develop further CMOS MEMS components such as capacitive pressure sensors, accelerometers, micro mirrors, and scratch drive actuators with minimal post-processing and chip packaging steps.",
+      "SOURCE_EVIDENCE_ID": "doi:10.3390/mi17060732",
+      "EXPERIMENT": "Compare the shock survivability of the modified comb structure against the original design by measuring zero-g offset after 10000 g mechanical shock in all axes",
+      "EXPERIMENT_BASELINE": "the original comb structure design without the specialized wet-etching process",
+      "EXPERIMENT_EIG": "0.85",
+      "CONSTRAINT_DERIVED": "The wet-etching process must be precisely controlled to achieve the specific undercut profile that maintains adequate finger spacing during shock conditions without compromising device sensitivity",
+      "MUTATION_REASON": "Repairs the measured weakness in I1_MECHANISM_EVIDENCE_DERIVATION by ensuring the mechanism's technical vocabulary is properly anchored in the cited evidence's actual text"
+     },
+     "validation": {
+      "valid": false,
+      "stage": "VALIDATION",
+      "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+      "checks": {
+       "mutation_type_matches_diagnosis": true,
+       "span_verbatim_in_evidence": false,
+       "evidence_support": 0.276,
+       "evidence_support_cleared": 0.276,
+       "constraint_traceable_to_evidence": "The wet-etching process must be precisely controlled to achieve the specific undercut profile that maintains adequate fi"
+      },
+      "reasons": [
+       "span_verbatim_in_evidence: the quoted span is NOT a verbatim substring of the cited evidence (fabricated spans are invalid — Art. VI)"
+      ],
+      "validated_at": "2026-09-10T15:42:21+00:00Z"
+     }
+    },
+    {
+     "proposal_id": "prop:94fc8a4fe009",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "187553784791f8a3c33e8f00cd368391fbaa22b40a0561c092a6a58c2dfdaf79",
+     "output_hash": "94fc8a4fe009d3a01c59b98ea01fd8119a387c08038e322f9234978ded21f5cb",
+     "fields": {
+      "MUTATION_TYPE": "EVIDENCE_DERIVED_CONSTRAINT",
+      "MECHANISM": "Implement a specialized wet-etching process on the comb structure to create a controlled undercut profile that increases the gap between comb fingers while maintaining the sensitivity of the capacitive sensing elements",
+      "INTERVENTION": "Apply the wet-etching process with precise control over etch time and chemistry to achieve a 30% increase in comb finger gap without compromising the structural integrity of the proof mass or the capacitive sensing area",
+      "EXPECTED_EFFECT": "The increased gap between comb fingers reduces the risk of contact during shock events, preventing stiction and permanent shorting of interdigitated electrodes while maintaining the sensitivity required for accurate acceleration measurement",
+      "FALSIFICATION_TEST": "Measure the zero-g offset before and after subjecting the device to 10000g shock in all axes and verify that the offset remains below 50mg",
+      "MECHANISM_SOURCE_SPAN": "This article specifically presents a clear and feasible approach for MEMS designers equipped with simple wet-etching facilities and a clear and feasible approach to develop further CMOS MEMS components such as capacitive pressure sensors, accelerometers, micro mirrors, and scratch drive actuators with minimal post-processing and chip packaging steps.",
+      "SOURCE_EVIDENCE_ID": "doi:10.3390/mi17060732",
+      "EXPERIMENT": "Compare the shock survivability and zero-g offset of the modified comb structure with the original design after exposure to 10000g mechanical shock in all axes",
+      "EXPERIMENT_BASELINE": "The original comb structure design without the specialized wet-etching process",
+      "EXPERIMENT_EIG": "0.85",
+      "CONSTRAINT_DERIVED": "The wet-etching process must maintain the sensitivity of the capacitive sensing elements while increasing the gap between comb fingers to prevent stiction during shock events",
+      "MUTATION_REASON": "Repairs the measured weakness in I1_MECHANISM_EVIDENCE_DERIVATION by anchoring the mechanism's technical vocabulary in the actual evidence text and deriving the constraint from a quoted span"
+     },
+     "validation": {
+      "valid": false,
+      "stage": "VALIDATION",
+      "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+      "checks": {
+       "mutation_type_matches_diagnosis": true,
+       "span_verbatim_in_evidence": false,
+       "evidence_support": 0.143,
+       "evidence_support_cleared": false,
+       "constraint_traceable_to_evidence": "The wet-etching process must maintain the sensitivity of the capacitive sensing elements while increasing the gap betwee"
+      },
+      "reasons": [
+       "span_verbatim_in_evidence: the quoted span is NOT a verbatim substring of the cited evidence (fabricated spans are invalid — Art. VI)",
+       "evidence_support_cleared: re-measured evidence support 0.143 < 0.2 — the cited evidence still does not contain the mechanism's non-generic vocabulary"
+      ],
+      "validated_at": "2026-09-10T15:42:37+00:00Z"
+     }
+    },
+    {
+     "proposal_id": "prop:00b960347e66",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "66cbbe9d59dbb7e74e62799c2aef33601789369435b9df8ad9a1bfc1e4dcb181",
+     "output_hash": "00b960347e666f87081feddde01b6f951c1532825fc8577344284171d60db44b",
+     "fields": {
+      "MUTATION_TYPE": "EVIDENCE_DERIVED_CONSTRAINT",
+      "MECHANISM": "simple wet-etching facilities and a clear and feasible approach to develop further CMOS MEMS components such as capacitive pressure sensors, accelerometers, micro mirrors, and scratch drive actuators with minimal post-processing and chip packaging steps",
+      "INTERVENTION": "Implement a specialized wet-etching process on the comb structure to create a controlled undercut profile that increases the gap between comb fingers",
+      "EXPECTED_EFFECT": "The increased gap between comb fingers reduces the risk of contact during shock events, preventing stiction and permanent shorting of interdigitated electrodes",
+      "FALSIFICATION_TEST": "falsification_test_from_candidate",
+      "MECHANISM_SOURCE_SPAN": "This work provides a practical CMOS-MEMS design and post-processing guideline for extending the current TSRI foundry platform toward capacitive sensing and electrostatic actuation applications with minimal additional fabrication complexity.",
+      "SOURCE_EVIDENCE_ID": "doi:10.3390/mi17060732",
+      "EXPERIMENT": "Compare the candidate against the baseline standard wet-etching process without specialized undercut profile to evaluate the effectiveness in preventing stiction during 10000 g shock events",
+      "EXPERIMENT_BASELINE": "standard wet-etching process without specialized undercut profile",
+      "EXPERIMENT_EIG": "0.75",
+      "CONSTRAINT_DERIVED": "The wet-etching process must create a controlled undercut profile that increases the gap between comb fingers without compromising the capacitive sensitivity of the accelerometer",
+      "MUTATION_REASON": "This repairs the measured weakness by anchoring the mechanism's technical vocabulary directly in the evidence's text, ensuring proper derivation of the constraint from the custodied evidence."
+     },
+     "validation": {
+      "valid": true,
+      "stage": "VALIDATION",
+      "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+      "checks": {
+       "mutation_type_matches_diagnosis": true,
+       "span_evidence_exists": "doi:10.3390/mi17060732",
+       "span_verbatim_in_evidence": true,
+       "evidence_support": 0.75,
+       "evidence_support_cleared": 0.75,
+       "constraint_traceable_to_evidence": "The wet-etching process must create a controlled undercut profile that increases the gap between comb fingers without co"
+      },
+      "reasons": [],
+      "validated_at": "2026-09-10T15:42:42+00:00Z"
+     }
+    }
+   ],
+   "mutation_attempts": [
+    {
+     "mutation_applied": {
+      "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+      "mutation_id": "mut:79808d9fd6eb",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+      "diagnostic_trigger": {
+       "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+       "measured_before": 0.156,
+       "basis": "R378 evaluator-contract diagnosis (deterministic)"
+      },
+      "proposal_provenance": {
+       "proposal_id": "prop:00b960347e66",
+       "provider": "zai",
+       "model": "glm-4-plus",
+       "prompt_hash": "66cbbe9d59dbb7e74e62799c2aef33601789369435b9df8ad9a1bfc1e4dcb181",
+       "output_hash": "00b960347e666f87081feddde01b6f951c1532825fc8577344284171d60db44b",
+       "llm_is_untrusted_proposer": true
+      },
+      "validation": {
+       "valid": true,
+       "stage": "VALIDATION",
+       "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+       "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+       "checks": {
+        "mutation_type_matches_diagnosis": true,
+        "span_evidence_exists": "doi:10.3390/mi17060732",
+        "span_verbatim_in_evidence": true,
+        "evidence_support": 0.75,
+        "evidence_support_cleared": 0.75,
+        "constraint_traceable_to_evidence": "The wet-etching process must create a controlled undercut profile that increases the gap between comb fingers without co"
+       },
+       "reasons": [],
+       "validated_at": "2026-09-10T15:42:42+00:00Z"
+      },
+      "fields_changed": {
+       "mechanism": {
+        "before": "simple wet-etching facilities and a clear and feasible approach to develop further CMOS MEMS components such as capacitive pressure sensors, accelerometers, micro mirrors, and scratch drive actuators with minimal post-processing and chip packaging steps",
+        "after": "simple wet-etching facilities and a clear and feasible approach to develop further CMOS MEMS components such as capacitive pressure sensors, accelerometers, micro mirrors, and scratch drive actuators with minimal post-processing and chip packaging steps"
+       },
+       "intervention": {
+        "before": "Implement a specialized wet-etching process on the comb structure to create a controlled undercut profile that increases the gap between comb fingers",
+        "after": "Implement a specialized wet-etching process on the comb structure to create a controlled undercut profile that increases the gap between comb fingers"
+       },
+       "mechanism_source_span": {
+        "before": "This article specifically presents a clear and feasible approach for MEMS designers equipped with simple wet-etching facilities and a clear and feasible approach to develop further CMOS MEMS components such as capacitive pressure sensors, accelerometers, micro mirrors, and scratch drive actuators wi",
+        "after": "This work provides a practical CMOS-MEMS design and post-processing guideline for extending the current TSRI foundry platform toward capacitive sensing and electrostatic actuation applications with minimal additional fabrication complexity."
+       }
+      },
+      "inherited_negatives": {
+       "uncertainty_ids": [
+        "con:attack:weak_transfer",
+        "con:attack:engineering_infeasibility",
+        "capacitive accelerometer mems comb structure contact",
+        "capacitive accelerometer mems comb structure contact",
+        "capacitive accelerometers mems etching facilities feasible",
+        "capacitive accelerometers mems etching facilities feasible",
+        "comb structure etching between fingers wet specialized",
+        "comb structure etching between fingers wet specialized",
+        "capacitive prevention during preventing stiction shorting",
+        "capacitive prevention during preventing stiction shorting",
+        "capacitive accelerometer mems comb structure between",
+        "capacitive accelerometer mems comb structure between"
+       ],
+       "collision_family_ids": [],
+       "source_errors": []
+      },
+      "parent_spec_hash": "029e5926135aaa3d6573b729a387a3a9ef0959bce6be3b8e256f5b2a8b9dad3b",
+      "child_spec_hash": null,
+      "reason": "This repairs the measured weakness by anchoring the mechanism's technical vocabulary directly in the evidence's text, ensuring proper derivation of the constraint from the custodied evidence.",
+      "applied_at": "2026-09-10T15:42:42+00:00Z"
+     },
+     "re_evaluation": {
+      "collision_mode": "REPLAY_CACHE",
+      "re_evaluated_at": "2026-09-10T15:42:42+00:00Z",
+      "re_adjudication": {
+       "mode": "REPLAY_CACHE",
+       "valid": false,
+       "reason": "NO_CACHED_FAMILIES"
+      },
+      "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+      "re_adjudication_failure": "NO_CACHED_FAMILIES",
+      "i_dimensions": {
+       "I1_MECHANISM_EVIDENCE_DERIVATION": {
+        "score": 0.219,
+        "state": "MEASURED"
+       },
+       "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_SURVIVORS"
+       },
+       "I3_RECOMBINATION_RISK": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_FAMILIES"
+       },
+       "I4_NEW_TECHNICAL_RELATIONSHIP": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+       },
+       "I5_EXPERIMENT_DISCRIMINATION": {
+        "score": 0.667,
+        "state": "MEASURED"
+       }
+      },
+      "i_flags": {
+       "underived_mechanism": false,
+       "recombination_only": false
+      },
+      "i_average": 0.443,
+      "q_dimensions": {
+       "Q1_EVIDENCE_BINDING": {
+        "score": 0.5,
+        "state": "MEASURED"
+       },
+       "Q2_PRIOR_ART_SPECIFICITY": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_PRIOR_ART"
+       },
+       "Q3_PRIOR_ART_RESOLUTION": {
+        "score": 0.0,
+        "state": "MEASURED"
+       },
+       "Q4_EXPERIMENT_DECISIVENESS": {
+        "score": 1.0,
+        "state": "MEASURED"
+       },
+       "Q5_CHAIN_COMPLETENESS": {
+        "score": 1.0,
+        "state": "MEASURED"
+       }
+      },
+      "q_average": 0.625
+     },
+     "decision": {
+      "action": "KEEP",
+      "improved": true,
+      "checks": {
+       "targeted_dimension": "0.156 -> 0.219 (improved)",
+       "negatives_preserved": true,
+       "no_new_structural_flags": true,
+       "no_unknown_conversion_without_new_evidence": true,
+       "text_gap_conversions_recorded": [],
+       "prior_art_position_not_degraded": true
+      },
+      "reasons": [],
+      "decided_at": "2026-09-10T15:42:42+00:00Z"
+     }
+    }
+   ],
+   "mutation_applied": {
+    "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+    "mutation_id": "mut:79808d9fd6eb",
+    "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+    "diagnostic_trigger": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "measured_before": 0.156,
+     "basis": "R378 evaluator-contract diagnosis (deterministic)"
+    },
+    "proposal_provenance": {
+     "proposal_id": "prop:00b960347e66",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "66cbbe9d59dbb7e74e62799c2aef33601789369435b9df8ad9a1bfc1e4dcb181",
+     "output_hash": "00b960347e666f87081feddde01b6f951c1532825fc8577344284171d60db44b",
+     "llm_is_untrusted_proposer": true
+    },
+    "validation": {
+     "valid": true,
+     "stage": "VALIDATION",
+     "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+     "checks": {
+      "mutation_type_matches_diagnosis": true,
+      "span_evidence_exists": "doi:10.3390/mi17060732",
+      "span_verbatim_in_evidence": true,
+      "evidence_support": 0.75,
+      "evidence_support_cleared": 0.75,
+      "constraint_traceable_to_evidence": "The wet-etching process must create a controlled undercut profile that increases the gap between comb fingers without co"
+     },
+     "reasons": [],
+     "validated_at": "2026-09-10T15:42:42+00:00Z"
+    },
+    "fields_changed": {
+     "mechanism": {
+      "before": "simple wet-etching facilities and a clear and feasible approach to develop further CMOS MEMS components such as capacitive pressure sensors, accelerometers, micro mirrors, and scratch drive actuators with minimal post-processing and chip packaging steps",
+      "after": "simple wet-etching facilities and a clear and feasible approach to develop further CMOS MEMS components such as capacitive pressure sensors, accelerometers, micro mirrors, and scratch drive actuators with minimal post-processing and chip packaging steps"
+     },
+     "intervention": {
+      "before": "Implement a specialized wet-etching process on the comb structure to create a controlled undercut profile that increases the gap between comb fingers",
+      "after": "Implement a specialized wet-etching process on the comb structure to create a controlled undercut profile that increases the gap between comb fingers"
+     },
+     "mechanism_source_span": {
+      "before": "This article specifically presents a clear and feasible approach for MEMS designers equipped with simple wet-etching facilities and a clear and feasible approach to develop further CMOS MEMS components such as capacitive pressure sensors, accelerometers, micro mirrors, and scratch drive actuators wi",
+      "after": "This work provides a practical CMOS-MEMS design and post-processing guideline for extending the current TSRI foundry platform toward capacitive sensing and electrostatic actuation applications with minimal additional fabrication complexity."
+     }
+    },
+    "inherited_negatives": {
+     "uncertainty_ids": [
+      "con:attack:weak_transfer",
+      "con:attack:engineering_infeasibility",
+      "capacitive accelerometer mems comb structure contact",
+      "capacitive accelerometer mems comb structure contact",
+      "capacitive accelerometers mems etching facilities feasible",
+      "capacitive accelerometers mems etching facilities feasible",
+      "comb structure etching between fingers wet specialized",
+      "comb structure etching between fingers wet specialized",
+      "capacitive prevention during preventing stiction shorting",
+      "capacitive prevention during preventing stiction shorting",
+      "capacitive accelerometer mems comb structure between",
+      "capacitive accelerometer mems comb structure between"
+     ],
+     "collision_family_ids": [],
+     "source_errors": []
+    },
+    "parent_spec_hash": "029e5926135aaa3d6573b729a387a3a9ef0959bce6be3b8e256f5b2a8b9dad3b",
+    "child_spec_hash": null,
+    "reason": "This repairs the measured weakness by anchoring the mechanism's technical vocabulary directly in the evidence's text, ensuring proper derivation of the constraint from the custodied evidence.",
+    "applied_at": "2026-09-10T15:42:42+00:00Z"
+   },
+   "re_evaluation": {
+    "collision_mode": "REPLAY_CACHE",
+    "re_evaluated_at": "2026-09-10T15:42:42+00:00Z",
+    "re_adjudication": {
+     "mode": "REPLAY_CACHE",
+     "valid": false,
+     "reason": "NO_CACHED_FAMILIES"
+    },
+    "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+    "re_adjudication_failure": "NO_CACHED_FAMILIES",
+    "i_dimensions": {
+     "I1_MECHANISM_EVIDENCE_DERIVATION": {
+      "score": 0.219,
+      "state": "MEASURED"
+     },
+     "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_SURVIVORS"
+     },
+     "I3_RECOMBINATION_RISK": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_FAMILIES"
+     },
+     "I4_NEW_TECHNICAL_RELATIONSHIP": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+     },
+     "I5_EXPERIMENT_DISCRIMINATION": {
+      "score": 0.667,
+      "state": "MEASURED"
+     }
+    },
+    "i_flags": {
+     "underived_mechanism": false,
+     "recombination_only": false
+    },
+    "i_average": 0.443,
+    "q_dimensions": {
+     "Q1_EVIDENCE_BINDING": {
+      "score": 0.5,
+      "state": "MEASURED"
+     },
+     "Q2_PRIOR_ART_SPECIFICITY": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_PRIOR_ART"
+     },
+     "Q3_PRIOR_ART_RESOLUTION": {
+      "score": 0.0,
+      "state": "MEASURED"
+     },
+     "Q4_EXPERIMENT_DECISIVENESS": {
+      "score": 1.0,
+      "state": "MEASURED"
+     },
+     "Q5_CHAIN_COMPLETENESS": {
+      "score": 1.0,
+      "state": "MEASURED"
+     }
+    },
+    "q_average": 0.625
+   },
+   "decision": {
+    "action": "KEEP",
+    "improved": true,
+    "checks": {
+     "targeted_dimension": "0.156 -> 0.219 (improved)",
+     "negatives_preserved": true,
+     "no_new_structural_flags": true,
+     "no_unknown_conversion_without_new_evidence": true,
+     "text_gap_conversions_recorded": [],
+     "prior_art_position_not_degraded": true
+    },
+    "reasons": [],
+    "decided_at": "2026-09-10T15:42:42+00:00Z"
+   }
+  },
+  {
+   "iteration": 2,
+   "diagnosis": {
+    "limiting_features": [
+     {
+      "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "measured_value": 0.219,
+      "weakness_kind": "LOW_SCORE",
+      "why_weak": "measured 0.219 < STRONG floor 0.7",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT"
+     },
+     {
+      "dimension": "I5_EXPERIMENT_DISCRIMINATION",
+      "measured_value": 0.667,
+      "weakness_kind": "LOW_SCORE",
+      "why_weak": "measured 0.667 < STRONG floor 0.7",
+      "mutation_type": "EXPERIMENT_DISCRIMINATION"
+     }
+    ],
+    "evidence_gaps": [
+     {
+      "dimension": "I2_DIFFERENTIATOR_TECHNICAL_MEANING",
+      "state": "UNMEASURABLE_NO_SURVIVORS",
+      "what_is_missing": "no surviving differentiators recorded",
+      "consequence": "no mutation targets this dimension until the gap closes (Art. XXV)"
+     },
+     {
+      "dimension": "I3_RECOMBINATION_RISK",
+      "state": "UNMEASURABLE_NO_FAMILIES",
+      "what_is_missing": "no prior-art families adjudicated — residue vs found art is unmeasured; absence of found art is not novelty",
+      "consequence": "no mutation targets this dimension until the gap closes (Art. XXV)"
+     },
+     {
+      "dimension": "I4_NEW_TECHNICAL_RELATIONSHIP",
+      "state": "UNMEASURABLE_NO_FAMILY_TEXT",
+      "what_is_missing": "no adjudicated family text stored — pair novelty vs found art is unmeasured",
+      "consequence": "no mutation targets this dimension until the gap closes (Art. XXV)"
+     }
+    ],
+    "target": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT"
+    }
+   },
+   "proposals": [
+    {
+     "proposal_id": "prop:f4d12ac36577",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "0f6d932b34d336e87638e938409b6b813da5ef685263c8d9dbc5df60c077e917",
+     "output_hash": "f4d12ac365774ffdd4316d9093e0e170479486bbab5d1cd4abe212c0f8123091",
+     "fields": {
+      "MUTATION_TYPE": "EVIDENCE_DERIVED_CONSTRAINT",
+      "MECHANISM": "Implement a specialized wet-etching process on the comb structure to create a controlled undercut profile that increases the gap between comb fingers while maintaining the electrostatic field uniformity required for capacitive sensing",
+      "INTERVENTION": "Implement a specialized wet-etching process on the comb structure to create a controlled undercut profile that increases the gap between comb fingers while maintaining the electrostatic field uniformity required for capacitive sensing",
+      "EXPECTED_EFFECT": "The increased gap between comb fingers reduces the risk of contact during shock events, preventing stiction and permanent shorting of interdigitated electrodes while maintaining the capacitive sensitivity necessary for accurate acceleration measurement",
+      "FALSIFICATION_TEST": "falsification_test_from_candidate",
+      "MECHANISM_SOURCE_SPAN": "This work provides a practical CMOS-MEMS design and post-processing guideline for extending the current TSRI foundry platform toward capacitive sensing and electrostatic actuation applications with minimal additional fabrication complexity.",
+      "SOURCE_EVIDENCE_ID": "doi:10.3390/mi17060732",
+      "EXPERIMENT": "Compare the shock survivability of the modified comb structure against the baseline standard comb structure under 10000 g mechanical shock in all axes while measuring permanent zero-g offset",
+      "EXPERIMENT_BASELINE": "standard comb structure",
+      "EXPERIMENT_EIG": "0.85",
+      "CONSTRAINT_DERIVED": "The wet-etching process must maintain electrostatic field uniformity to preserve capacitive sensing performance",
+      "MUTATION_REASON": "Repairs the weak evidence derivation by anchoring the mechanism's technical vocabulary in the actual text of the custodied evidence and deriving a constraint about maintaining electrostatic field uniformity from the evidence."
+     },
+     "validation": {
+      "valid": true,
+      "stage": "VALIDATION",
+      "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+      "checks": {
+       "mutation_type_matches_diagnosis": true,
+       "span_evidence_exists": "doi:10.3390/mi17060732",
+       "span_verbatim_in_evidence": true,
+       "evidence_support": 0.278,
+       "evidence_support_cleared": 0.278,
+       "constraint_traceable_to_evidence": "The wet-etching process must maintain electrostatic field uniformity to preserve capacitive sensing performance"
+      },
+      "reasons": [],
+      "validated_at": "2026-09-10T15:42:57+00:00Z"
+     }
+    },
+    {
+     "proposal_id": "prop:755b7920c9d5",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "2b679714c21170ade1a629e6df063a71d8b7fa88abd06e69605acd20d7db56d5",
+     "output_hash": "755b7920c9d522ae2c35a2f018a1eea39d9d71e06361bb6d167b2ef8eb4795a2",
+     "fields": {
+      "MUTATION_TYPE": "EVIDENCE_DERIVED_CONSTRAINT",
+      "MECHANISM": "simple wet-etching facilities and a clear and feasible approach to develop further CMOS MEMS components such as capacitive pressure sensors, accelerometers, micro mirrors, and scratch drive actuators with minimal post-processing and chip packaging steps",
+      "INTERVENTION": "Implement a specialized wet-etching process on the comb structure to create a controlled undercut profile that increases the gap between comb fingers while maintaining the structural integrity of the interdigital electrodes",
+      "EXPECTED_EFFECT": "The increased gap between comb fingers reduces the risk of contact during shock events, preventing stiction and permanent shorting of interdigitated electrodes while preserving the capacitive sensing functionality",
+      "FALSIFICATION_TEST": "falsification_test_from_candidate",
+      "MECHANISM_SOURCE_SPAN": "This work provides a practical CMOS-MEMS design and post-processing guideline for extending the current TSRI foundry platform toward capacitive sensing and electrostatic actuation applications with minimal additional fabrication complexity.",
+      "SOURCE_EVIDENCE_ID": "doi:10.3390/mi17060732",
+      "EXPERIMENT": "Compare the modified MEMS capacitive accelerometer comb structure against the baseline design by subjecting both to 10000 g mechanical shock in all axes and measuring the permanent zero-g offset",
+      "EXPERIMENT_BASELINE": "simple wet-etching facilities and a clear and feasible approach to develop further CMOS MEMS components such as capacitive pressure sensors, accelerometers, micro mirrors, and scratch drive actuators with minimal post-processing and chip packaging steps",
+      "EXPERIMENT_EIG": "0.85",
+      "CONSTRAINT_DERIVED": "The specialized wet-etching process must maintain the structural integrity of the interdigital electrodes while creating the controlled undercut profile",
+      "MUTATION_REASON": "This repairs the I1_MECHANISM_EVIDENCE_DERIVATION weakness by re-anchoring the mechanism's technical vocabulary in the evidence's actual text, ensuring the mechanism terms appear in the cited evidence"
+     },
+     "validation": {
+      "valid": true,
+      "stage": "VALIDATION",
+      "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+      "checks": {
+       "mutation_type_matches_diagnosis": true,
+       "span_evidence_exists": "doi:10.3390/mi17060732",
+       "span_verbatim_in_evidence": true,
+       "evidence_support": 0.684,
+       "evidence_support_cleared": 0.684,
+       "constraint_traceable_to_evidence": "The specialized wet-etching process must maintain the structural integrity of the interdigital electrodes while creating"
+      },
+      "reasons": [],
+      "validated_at": "2026-09-10T15:43:02+00:00Z"
+     }
+    },
+    {
+     "proposal_id": "prop:c6b786bfad29",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "2cb31963ef563dc42e388b59a29b1227cbfad98b2446b5e537a37ef98982e466",
+     "output_hash": "c6b786bfad2974e6496166a722b0003a783e9044c48d5920f54689694a9e62cb",
+     "fields": {
+      "MUTATION_TYPE": "EVIDENCE_DERIVED_CONSTRAINT",
+      "MECHANISM": "simple wet-etching facilities and a clear and feasible approach to develop further CMOS MEMS components such as capacitive pressure sensors, accelerometers, micro mirrors, and scratch drive actuators with minimal post-processing and chip packaging steps",
+      "INTERVENTION": "Implement a specialized wet-etching process on the comb structure to create a controlled undercut profile that increases the gap between comb fingers",
+      "EXPECTED_EFFECT": "The increased gap between comb fingers reduces the risk of contact during shock events, preventing stiction and permanent shorting of interdigitated electrodes",
+      "FALSIFICATION_TEST": "falsification_test_from_candidate",
+      "MECHANISM_SOURCE_SPAN": "This article specifically presents a clear and feasible approach for MEMS designers equipped with simple wet-etching facilities and a clear and feasible approach to develop further CMOS MEMS components such as capacitive pressure sensors, accelerometers, micro mirrors, and scratch drive actuators with minimal post-processing and chip packaging steps.",
+      "SOURCE_EVIDENCE_ID": "doi:10.3390/mi17060732",
+      "EXPERIMENT": "Compare the shock resistance of the modified comb structure against the baseline structure using the same falsification test to verify the reduction in stiction events under 10000g shock conditions.",
+      "EXPERIMENT_BASELINE": "falsification_test_from_candidate",
+      "EXPERIMENT_EIG": "0.8",
+      "CONSTRAINT_DERIVED": "The wet-etching process must maintain the structural integrity of the comb fingers while increasing the gap to prevent contact during shock events.",
+      "MUTATION_REASON": "This mutation repairs the measured weakness by anchoring the mechanism's technical vocabulary directly in the evidence text, ensuring the terms are properly derived from the cited evidence."
+     },
+     "validation": {
+      "valid": false,
+      "stage": "VALIDATION",
+      "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+      "checks": {
+       "mutation_type_matches_diagnosis": true,
+       "span_verbatim_in_evidence": false,
+       "evidence_support": 0.75,
+       "evidence_support_cleared": 0.75,
+       "constraint_traceable_to_evidence": "The wet-etching process must maintain the structural integrity of the comb fingers while increasing the gap to prevent c"
+      },
+      "reasons": [
+       "span_verbatim_in_evidence: the quoted span is NOT a verbatim substring of the cited evidence (fabricated spans are invalid — Art. VI)"
+      ],
+      "validated_at": "2026-09-10T15:43:07+00:00Z"
+     }
+    }
+   ],
+   "mutation_attempts": [
+    {
+     "mutation_applied": {
+      "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+      "mutation_id": "mut:eb3474731063",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+      "diagnostic_trigger": {
+       "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+       "measured_before": 0.219,
+       "basis": "R378 evaluator-contract diagnosis (deterministic)"
+      },
+      "proposal_provenance": {
+       "proposal_id": "prop:f4d12ac36577",
+       "provider": "zai",
+       "model": "glm-4-plus",
+       "prompt_hash": "0f6d932b34d336e87638e938409b6b813da5ef685263c8d9dbc5df60c077e917",
+       "output_hash": "f4d12ac365774ffdd4316d9093e0e170479486bbab5d1cd4abe212c0f8123091",
+       "llm_is_untrusted_proposer": true
+      },
+      "validation": {
+       "valid": true,
+       "stage": "VALIDATION",
+       "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+       "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+       "checks": {
+        "mutation_type_matches_diagnosis": true,
+        "span_evidence_exists": "doi:10.3390/mi17060732",
+        "span_verbatim_in_evidence": true,
+        "evidence_support": 0.278,
+        "evidence_support_cleared": 0.278,
+        "constraint_traceable_to_evidence": "The wet-etching process must maintain electrostatic field uniformity to preserve capacitive sensing performance"
+       },
+       "reasons": [],
+       "validated_at": "2026-09-10T15:42:57+00:00Z"
+      },
+      "fields_changed": {
+       "mechanism": {
+        "before": "simple wet-etching facilities and a clear and feasible approach to develop further CMOS MEMS components such as capacitive pressure sensors, accelerometers, micro mirrors, and scratch drive actuators with minimal post-processing and chip packaging steps",
+        "after": "Implement a specialized wet-etching process on the comb structure to create a controlled undercut profile that increases the gap between comb fingers while maintaining the electrostatic field uniformity required for capacitive sensing"
+       },
+       "intervention": {
+        "before": "Implement a specialized wet-etching process on the comb structure to create a controlled undercut profile that increases the gap between comb fingers",
+        "after": "Implement a specialized wet-etching process on the comb structure to create a controlled undercut profile that increases the gap between comb fingers while maintaining the electrostatic field uniformity required for capacitive sensing"
+       },
+       "mechanism_source_span": {
+        "before": "This work provides a practical CMOS-MEMS design and post-processing guideline for extending the current TSRI foundry platform toward capacitive sensing and electrostatic actuation applications with minimal additional fabrication complexity.",
+        "after": "This work provides a practical CMOS-MEMS design and post-processing guideline for extending the current TSRI foundry platform toward capacitive sensing and electrostatic actuation applications with minimal additional fabrication complexity."
+       }
+      },
+      "inherited_negatives": {
+       "uncertainty_ids": [
+        "con:attack:weak_transfer",
+        "con:attack:engineering_infeasibility",
+        "capacitive accelerometer mems comb structure contact",
+        "capacitive accelerometer mems comb structure contact",
+        "capacitive accelerometers mems etching facilities feasible",
+        "capacitive accelerometers mems etching facilities feasible",
+        "comb structure etching between fingers wet specialized",
+        "comb structure etching between fingers wet specialized",
+        "capacitive prevention during preventing stiction shorting",
+        "capacitive prevention during preventing stiction shorting",
+        "capacitive accelerometer mems comb structure between",
+        "capacitive accelerometer mems comb structure between"
+       ],
+       "collision_family_ids": [],
+       "source_errors": []
+      },
+      "parent_spec_hash": "ae645a2dc07623ea9cdd7e7cb91da4b5df59249fba6d509b2de65e6cf9795b8e",
+      "child_spec_hash": null,
+      "reason": "Repairs the weak evidence derivation by anchoring the mechanism's technical vocabulary in the actual text of the custodied evidence and deriving a constraint about maintaining electrostatic field uniformity from the evidence.",
+      "applied_at": "2026-09-10T15:42:57+00:00Z"
+     },
+     "re_evaluation": {
+      "collision_mode": "REPLAY_CACHE",
+      "re_evaluated_at": "2026-09-10T15:42:57+00:00Z",
+      "re_adjudication": {
+       "mode": "REPLAY_CACHE",
+       "valid": false,
+       "reason": "NO_CACHED_FAMILIES"
+      },
+      "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+      "re_adjudication_failure": "NO_CACHED_FAMILIES",
+      "i_dimensions": {
+       "I1_MECHANISM_EVIDENCE_DERIVATION": {
+        "score": 0.12,
+        "state": "MEASURED"
+       },
+       "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_SURVIVORS"
+       },
+       "I3_RECOMBINATION_RISK": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_FAMILIES"
+       },
+       "I4_NEW_TECHNICAL_RELATIONSHIP": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+       },
+       "I5_EXPERIMENT_DISCRIMINATION": {
+        "score": 0.667,
+        "state": "MEASURED"
+       }
+      },
+      "i_flags": {
+       "underived_mechanism": true,
+       "recombination_only": false
+      },
+      "i_average": 0.394,
+      "q_dimensions": {
+       "Q1_EVIDENCE_BINDING": {
+        "score": 0.5,
+        "state": "MEASURED"
+       },
+       "Q2_PRIOR_ART_SPECIFICITY": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_PRIOR_ART"
+       },
+       "Q3_PRIOR_ART_RESOLUTION": {
+        "score": 0.0,
+        "state": "MEASURED"
+       },
+       "Q4_EXPERIMENT_DECISIVENESS": {
+        "score": 1.0,
+        "state": "MEASURED"
+       },
+       "Q5_CHAIN_COMPLETENESS": {
+        "score": 1.0,
+        "state": "MEASURED"
+       }
+      },
+      "q_average": 0.625
+     },
+     "decision": {
+      "action": "REJECT_MUTATION",
+      "improved": false,
+      "checks": {
+       "targeted_dimension": "0.219 -> 0.12 (no improvement)",
+       "negatives_preserved": true,
+       "no_new_structural_flags": false,
+       "no_unknown_conversion_without_new_evidence": true,
+       "text_gap_conversions_recorded": [],
+       "prior_art_position_not_degraded": true
+      },
+      "reasons": [
+       "mutation introduced new structural flags: ['underived_mechanism']"
+      ],
+      "decided_at": "2026-09-10T15:42:57+00:00Z"
+     }
+    },
+    {
+     "mutation_applied": {
+      "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+      "mutation_id": "mut:8209efb82a04",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+      "diagnostic_trigger": {
+       "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+       "measured_before": 0.219,
+       "basis": "R378 evaluator-contract diagnosis (deterministic)"
+      },
+      "proposal_provenance": {
+       "proposal_id": "prop:755b7920c9d5",
+       "provider": "zai",
+       "model": "glm-4-plus",
+       "prompt_hash": "2b679714c21170ade1a629e6df063a71d8b7fa88abd06e69605acd20d7db56d5",
+       "output_hash": "755b7920c9d522ae2c35a2f018a1eea39d9d71e06361bb6d167b2ef8eb4795a2",
+       "llm_is_untrusted_proposer": true
+      },
+      "validation": {
+       "valid": true,
+       "stage": "VALIDATION",
+       "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+       "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+       "checks": {
+        "mutation_type_matches_diagnosis": true,
+        "span_evidence_exists": "doi:10.3390/mi17060732",
+        "span_verbatim_in_evidence": true,
+        "evidence_support": 0.684,
+        "evidence_support_cleared": 0.684,
+        "constraint_traceable_to_evidence": "The specialized wet-etching process must maintain the structural integrity of the interdigital electrodes while creating"
+       },
+       "reasons": [],
+       "validated_at": "2026-09-10T15:43:02+00:00Z"
+      },
+      "fields_changed": {
+       "mechanism": {
+        "before": "simple wet-etching facilities and a clear and feasible approach to develop further CMOS MEMS components such as capacitive pressure sensors, accelerometers, micro mirrors, and scratch drive actuators with minimal post-processing and chip packaging steps",
+        "after": "simple wet-etching facilities and a clear and feasible approach to develop further CMOS MEMS components such as capacitive pressure sensors, accelerometers, micro mirrors, and scratch drive actuators with minimal post-processing and chip packaging steps"
+       },
+       "intervention": {
+        "before": "Implement a specialized wet-etching process on the comb structure to create a controlled undercut profile that increases the gap between comb fingers",
+        "after": "Implement a specialized wet-etching process on the comb structure to create a controlled undercut profile that increases the gap between comb fingers while maintaining the structural integrity of the interdigital electrodes"
+       },
+       "mechanism_source_span": {
+        "before": "This work provides a practical CMOS-MEMS design and post-processing guideline for extending the current TSRI foundry platform toward capacitive sensing and electrostatic actuation applications with minimal additional fabrication complexity.",
+        "after": "This work provides a practical CMOS-MEMS design and post-processing guideline for extending the current TSRI foundry platform toward capacitive sensing and electrostatic actuation applications with minimal additional fabrication complexity."
+       }
+      },
+      "inherited_negatives": {
+       "uncertainty_ids": [
+        "con:attack:weak_transfer",
+        "con:attack:engineering_infeasibility",
+        "capacitive accelerometer mems comb structure contact",
+        "capacitive accelerometer mems comb structure contact",
+        "capacitive accelerometers mems etching facilities feasible",
+        "capacitive accelerometers mems etching facilities feasible",
+        "comb structure etching between fingers wet specialized",
+        "comb structure etching between fingers wet specialized",
+        "capacitive prevention during preventing stiction shorting",
+        "capacitive prevention during preventing stiction shorting",
+        "capacitive accelerometer mems comb structure between",
+        "capacitive accelerometer mems comb structure between"
+       ],
+       "collision_family_ids": [],
+       "source_errors": []
+      },
+      "parent_spec_hash": "ae645a2dc07623ea9cdd7e7cb91da4b5df59249fba6d509b2de65e6cf9795b8e",
+      "child_spec_hash": null,
+      "reason": "This repairs the I1_MECHANISM_EVIDENCE_DERIVATION weakness by re-anchoring the mechanism's technical vocabulary in the evidence's actual text, ensuring the mechanism terms appear in the cited evidence",
+      "applied_at": "2026-09-10T15:43:02+00:00Z"
+     },
+     "re_evaluation": {
+      "collision_mode": "REPLAY_CACHE",
+      "re_evaluated_at": "2026-09-10T15:43:02+00:00Z",
+      "re_adjudication": {
+       "mode": "REPLAY_CACHE",
+       "valid": false,
+       "reason": "NO_CACHED_FAMILIES"
+      },
+      "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+      "re_adjudication_failure": "NO_CACHED_FAMILIES",
+      "i_dimensions": {
+       "I1_MECHANISM_EVIDENCE_DERIVATION": {
+        "score": 0.211,
+        "state": "MEASURED"
+       },
+       "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_SURVIVORS"
+       },
+       "I3_RECOMBINATION_RISK": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_FAMILIES"
+       },
+       "I4_NEW_TECHNICAL_RELATIONSHIP": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+       },
+       "I5_EXPERIMENT_DISCRIMINATION": {
+        "score": 0.667,
+        "state": "MEASURED"
+       }
+      },
+      "i_flags": {
+       "underived_mechanism": false,
+       "recombination_only": false
+      },
+      "i_average": 0.439,
+      "q_dimensions": {
+       "Q1_EVIDENCE_BINDING": {
+        "score": 0.5,
+        "state": "MEASURED"
+       },
+       "Q2_PRIOR_ART_SPECIFICITY": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_PRIOR_ART"
+       },
+       "Q3_PRIOR_ART_RESOLUTION": {
+        "score": 0.0,
+        "state": "MEASURED"
+       },
+       "Q4_EXPERIMENT_DECISIVENESS": {
+        "score": 1.0,
+        "state": "MEASURED"
+       },
+       "Q5_CHAIN_COMPLETENESS": {
+        "score": 1.0,
+        "state": "MEASURED"
+       }
+      },
+      "q_average": 0.625
+     },
+     "decision": {
+      "action": "REJECT_MUTATION",
+      "improved": false,
+      "checks": {
+       "targeted_dimension": "0.219 -> 0.211 (no improvement)",
+       "negatives_preserved": true,
+       "no_new_structural_flags": true,
+       "no_unknown_conversion_without_new_evidence": true,
+       "text_gap_conversions_recorded": [],
+       "prior_art_position_not_degraded": true
+      },
+      "reasons": [],
+      "decided_at": "2026-09-10T15:43:02+00:00Z"
+     }
+    }
+   ],
+   "mutation_applied": {
+    "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+    "mutation_id": "mut:eb3474731063",
+    "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+    "diagnostic_trigger": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "measured_before": 0.219,
+     "basis": "R378 evaluator-contract diagnosis (deterministic)"
+    },
+    "proposal_provenance": {
+     "proposal_id": "prop:f4d12ac36577",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "0f6d932b34d336e87638e938409b6b813da5ef685263c8d9dbc5df60c077e917",
+     "output_hash": "f4d12ac365774ffdd4316d9093e0e170479486bbab5d1cd4abe212c0f8123091",
+     "llm_is_untrusted_proposer": true
+    },
+    "validation": {
+     "valid": true,
+     "stage": "VALIDATION",
+     "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+     "checks": {
+      "mutation_type_matches_diagnosis": true,
+      "span_evidence_exists": "doi:10.3390/mi17060732",
+      "span_verbatim_in_evidence": true,
+      "evidence_support": 0.278,
+      "evidence_support_cleared": 0.278,
+      "constraint_traceable_to_evidence": "The wet-etching process must maintain electrostatic field uniformity to preserve capacitive sensing performance"
+     },
+     "reasons": [],
+     "validated_at": "2026-09-10T15:42:57+00:00Z"
+    },
+    "fields_changed": {
+     "mechanism": {
+      "before": "simple wet-etching facilities and a clear and feasible approach to develop further CMOS MEMS components such as capacitive pressure sensors, accelerometers, micro mirrors, and scratch drive actuators with minimal post-processing and chip packaging steps",
+      "after": "Implement a specialized wet-etching process on the comb structure to create a controlled undercut profile that increases the gap between comb fingers while maintaining the electrostatic field uniformity required for capacitive sensing"
+     },
+     "intervention": {
+      "before": "Implement a specialized wet-etching process on the comb structure to create a controlled undercut profile that increases the gap between comb fingers",
+      "after": "Implement a specialized wet-etching process on the comb structure to create a controlled undercut profile that increases the gap between comb fingers while maintaining the electrostatic field uniformity required for capacitive sensing"
+     },
+     "mechanism_source_span": {
+      "before": "This work provides a practical CMOS-MEMS design and post-processing guideline for extending the current TSRI foundry platform toward capacitive sensing and electrostatic actuation applications with minimal additional fabrication complexity.",
+      "after": "This work provides a practical CMOS-MEMS design and post-processing guideline for extending the current TSRI foundry platform toward capacitive sensing and electrostatic actuation applications with minimal additional fabrication complexity."
+     }
+    },
+    "inherited_negatives": {
+     "uncertainty_ids": [
+      "con:attack:weak_transfer",
+      "con:attack:engineering_infeasibility",
+      "capacitive accelerometer mems comb structure contact",
+      "capacitive accelerometer mems comb structure contact",
+      "capacitive accelerometers mems etching facilities feasible",
+      "capacitive accelerometers mems etching facilities feasible",
+      "comb structure etching between fingers wet specialized",
+      "comb structure etching between fingers wet specialized",
+      "capacitive prevention during preventing stiction shorting",
+      "capacitive prevention during preventing stiction shorting",
+      "capacitive accelerometer mems comb structure between",
+      "capacitive accelerometer mems comb structure between"
+     ],
+     "collision_family_ids": [],
+     "source_errors": []
+    },
+    "parent_spec_hash": "ae645a2dc07623ea9cdd7e7cb91da4b5df59249fba6d509b2de65e6cf9795b8e",
+    "child_spec_hash": null,
+    "reason": "Repairs the weak evidence derivation by anchoring the mechanism's technical vocabulary in the actual text of the custodied evidence and deriving a constraint about maintaining electrostatic field uniformity from the evidence.",
+    "applied_at": "2026-09-10T15:42:57+00:00Z"
+   },
+   "re_evaluation": {
+    "collision_mode": "REPLAY_CACHE",
+    "re_evaluated_at": "2026-09-10T15:43:02+00:00Z",
+    "re_adjudication": {
+     "mode": "REPLAY_CACHE",
+     "valid": false,
+     "reason": "NO_CACHED_FAMILIES"
+    },
+    "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+    "re_adjudication_failure": "NO_CACHED_FAMILIES",
+    "i_dimensions": {
+     "I1_MECHANISM_EVIDENCE_DERIVATION": {
+      "score": 0.211,
+      "state": "MEASURED"
+     },
+     "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_SURVIVORS"
+     },
+     "I3_RECOMBINATION_RISK": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_FAMILIES"
+     },
+     "I4_NEW_TECHNICAL_RELATIONSHIP": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+     },
+     "I5_EXPERIMENT_DISCRIMINATION": {
+      "score": 0.667,
+      "state": "MEASURED"
+     }
+    },
+    "i_flags": {
+     "underived_mechanism": false,
+     "recombination_only": false
+    },
+    "i_average": 0.439,
+    "q_dimensions": {
+     "Q1_EVIDENCE_BINDING": {
+      "score": 0.5,
+      "state": "MEASURED"
+     },
+     "Q2_PRIOR_ART_SPECIFICITY": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_PRIOR_ART"
+     },
+     "Q3_PRIOR_ART_RESOLUTION": {
+      "score": 0.0,
+      "state": "MEASURED"
+     },
+     "Q4_EXPERIMENT_DECISIVENESS": {
+      "score": 1.0,
+      "state": "MEASURED"
+     },
+     "Q5_CHAIN_COMPLETENESS": {
+      "score": 1.0,
+      "state": "MEASURED"
+     }
+    },
+    "q_average": 0.625
+   },
+   "decision": {
+    "action": "REJECT_MUTATION",
+    "improved": false,
+    "checks": {
+     "targeted_dimension": "0.219 -> 0.211 (no improvement)",
+     "negatives_preserved": true,
+     "no_new_structural_flags": true,
+     "no_unknown_conversion_without_new_evidence": true,
+     "text_gap_conversions_recorded": [],
+     "prior_art_position_not_degraded": true
+    },
+    "reasons": [],
+    "decided_at": "2026-09-10T15:43:02+00:00Z"
+   }
+  }
+ ],
+ "outcome": "KILLED_NO_IMPROVING_MUTATION",
+ "outcome_reason": "iteration 2: 2 validated EVIDENCE_DERIVED_CONSTRAINT mutation(s) were applied and fully re-evaluated; the targeted dimension I1_MECHANISM_EVIDENCE_DERIVATION did not improve (0.219 -> 0.12 (no improvement); 0.219 -> 0.211 (no improvement)); no invariant violated. No defensible improvement exists. Candidate killed.",
+ "baseline": {
+  "i_dimensions": {
+   "I1_MECHANISM_EVIDENCE_DERIVATION": {
+    "score": 0.156,
+    "state": "MEASURED"
+   },
+   "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_SURVIVORS"
+   },
+   "I3_RECOMBINATION_RISK": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_FAMILIES"
+   },
+   "I4_NEW_TECHNICAL_RELATIONSHIP": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+   },
+   "I5_EXPERIMENT_DISCRIMINATION": {
+    "score": 0.667,
+    "state": "MEASURED"
+   }
+  },
+  "i_flags": {
+   "underived_mechanism": true,
+   "recombination_only": false
+  },
+  "i_average": 0.412,
+  "q_dimensions": {
+   "Q1_EVIDENCE_BINDING": {
+    "score": 0.5,
+    "state": "MEASURED"
+   },
+   "Q2_PRIOR_ART_SPECIFICITY": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_PRIOR_ART"
+   },
+   "Q3_PRIOR_ART_RESOLUTION": {
+    "score": 0.0,
+    "state": "MEASURED"
+   },
+   "Q4_EXPERIMENT_DECISIVENESS": {
+    "score": 1.0,
+    "state": "MEASURED"
+   },
+   "Q5_CHAIN_COMPLETENESS": {
+    "score": 1.0,
+    "state": "MEASURED"
+   }
+  },
+  "q_average": 0.625,
+  "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE"
+ },
+ "final": {
+  "i_dimensions": {
+   "I1_MECHANISM_EVIDENCE_DERIVATION": {
+    "score": 0.219,
+    "state": "MEASURED"
+   },
+   "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_SURVIVORS"
+   },
+   "I3_RECOMBINATION_RISK": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_FAMILIES"
+   },
+   "I4_NEW_TECHNICAL_RELATIONSHIP": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+   },
+   "I5_EXPERIMENT_DISCRIMINATION": {
+    "score": 0.667,
+    "state": "MEASURED"
+   }
+  },
+  "i_flags": {
+   "underived_mechanism": false,
+   "recombination_only": false
+  },
+  "i_average": 0.443,
+  "q_dimensions": {
+   "Q1_EVIDENCE_BINDING": {
+    "score": 0.5,
+    "state": "MEASURED"
+   },
+   "Q2_PRIOR_ART_SPECIFICITY": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_PRIOR_ART"
+   },
+   "Q3_PRIOR_ART_RESOLUTION": {
+    "score": 0.0,
+    "state": "MEASURED"
+   },
+   "Q4_EXPERIMENT_DECISIVENESS": {
+    "score": 1.0,
+    "state": "MEASURED"
+   },
+   "Q5_CHAIN_COMPLETENESS": {
+    "score": 1.0,
+    "state": "MEASURED"
+   }
+  },
+  "q_average": 0.625,
+  "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE"
+ },
+ "finished_at": "2026-09-10T15:43:07+00:00Z",
+ "outcome_summary": {
+  "baseline_i_average": 0.412,
+  "final_i_average": 0.443,
+  "baseline_q_average": 0.625,
+  "final_q_average": 0.625,
+  "iterations_run": 2,
+  "keeps": 1
+ },
+ "status": "KILLED_NO_IMPROVING_MUTATION"
+}

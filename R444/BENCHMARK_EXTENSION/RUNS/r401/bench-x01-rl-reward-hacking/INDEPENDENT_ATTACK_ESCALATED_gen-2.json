@@ -1,0 +1,56 @@
+{
+ "generation": 2,
+ "invention_id": "inv:5e9350bdf0:gen2",
+ "escalation": {
+  "gate_version": "attacker_calibration/1.0.0",
+  "instrument": "independent_attack/1.0.0",
+  "calibration_state": "NOT_CALIBRATED",
+  "terminal_kill_admissible": false,
+  "measured": {
+   "coverage": 1.0,
+   "parse_completeness": 1.0,
+   "tpr_scoped": 1.0,
+   "fpr_known_good": 1.0,
+   "n_cases_attacked": 40
+  },
+  "sealed_thresholds": {
+   "note": "registered BEFORE measurement; never tuned to results (Art. XXVII)",
+   "coverage_min": 0.875,
+   "parse_completeness_min": 0.875,
+   "tpr_min": 0.75,
+   "fpr_max": 0.3,
+   "ensemble": "NONE (single-attacker calibration only; majority-vote ensembles are deferred by the R412 directive)"
+  },
+  "measurement_path": "R412/CALIBRATION/engine_independent_attack_measurement.json",
+  "measurement_sha256": "4e1718e7088564333b5e1ef9be47ca452133d051001628cd6eed91f44e60ef5f",
+  "reason": "measured FPR 1.0 > sealed bar 0.3 (Art. L: the attacker is measured non-selective; its KILL is inadmissible as a terminal verdict and is escalated with the objection preserved)",
+  "rule": "the instrument's KILL is measured non-selective (FPR above the sealed bar); the objection is preserved verbatim and ESCALATED for adjudication — the candidate is NOT killed by this attack alone (Art. L); the deterministic gates are unchanged",
+  "reviewer_provenance": "AI_REVIEW (Art. LXVII)"
+ },
+ "preserved_objections": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "basis": "The candidate claims to replace physical force feedback with simulated physical interactions from a foundation model's world model, but this fundamentally misunderstands the nature of physical interactions in robotics. Force feedback provides critical real-time physical information that cannot be accurately simulated, especially for novel objects with unknown physical properties. The evidence from [europepmc:37050822] specifically notes that \"real-world physical interactions remain challenging to simulate accurately\" and that \"force feedback is crucial for robust robotic manipulation.\""
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "basis": "The candidate claims >95% placement success across novel SKUs without requiring force feedback demonstrations or recalibration, but this violates the fundamental boundary condition that real-world robotic manipulation requires adaptation to new physical properties. The evidence from [europepmc:37050822] explicitly states that \"robotic manipulation systems typically require recalibration when encountering objects with significantly different physical properties\" and that \"generalization to novel objects remains a significant challenge in the field.\""
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "basis": "The candidate's own evidence bundle contradicts the proposed mechanism. [europepmc:37050822] states that \"knowledge distillation from foundation models to specialized policies has shown limited success in manipulation tasks\" and that \"visual demonstrations alone without force feedback often result in policies that fail to generalize to novel object shapes and properties.\" This directly contradicts the candidate's claim that a policy trained only on visual demonstrations can achieve >95% success on novel SKUs."
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "basis": "The candidate fails to demonstrate any improvement over the baseline PPO-trained policy. In fact, the evidence shows that the baseline (standard PPO with force feedback) outperforms the proposed approach. [europepmc:37050822] notes that \"PPO policies trained with force feedback consistently outperform those trained with visual demonstrations alone by 15-25% on novel object manipulation tasks.\" The candidate's approach doesn't just fail to improve upon the baseline—it actively performs worse."
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "basis": "The candidate proposes to train a foundation model on \"massive datasets of manipulation tasks\" without specifying how this dataset would be acquired. The evidence from [europepmc:37050822] indicates that \"collecting sufficient manipulation task data with proper force feedback annotations remains prohibitively expensive and time-consuming, often requiring thousands of hours of robotic operation.\" The candidate provides no feasible path to acquiring such a dataset, making the proposed implementation impossible with current technology."
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "basis": "The candidate's testable prediction to \"compare performance on objects with significantly different physical properties than those in the training set\" is fundamentally ambiguous. [europepmc:37050822] explicitly states that \"defining 'significantly different physical properties' remains a challenge in robotic manipulation research\" and that \"standardized metrics for evaluating generalization across novel objects do not exist.\" Without clear, measurable criteria for what constitutes \"significantly different,\" the prediction cannot be properly tested."
+  }
+ ]
+}

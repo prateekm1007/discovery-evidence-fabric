@@ -1,0 +1,8 @@
+{
+ "problem_id": "bench-x03-llm-kvcache-fragmentation",
+ "device": "LLM inference serving cluster with paged KV-cache on shared GPU nodes",
+ "failure": "mixed-length bursty requests fragment the paged KV-cache blocks, forcing live-token evictions and re-computation that blow tail latency budgets during traffic peaks",
+ "failure_mode": "memory_fragmentation",
+ "constraint": "hold p99 first-token latency below 800 ms at 3x baseline burst load without dropping requests or adding GPU nodes beyond the current fleet",
+ "domain": "software-ml-inference-infrastructure"
+}

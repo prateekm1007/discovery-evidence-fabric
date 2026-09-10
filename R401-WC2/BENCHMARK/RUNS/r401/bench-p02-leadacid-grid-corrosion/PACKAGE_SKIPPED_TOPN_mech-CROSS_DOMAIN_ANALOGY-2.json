@@ -1,0 +1,326 @@
+{
+ "stage": "TOPN",
+ "candidate_id": "cand:MS:CROSS_DOMAIN_ANALOGY:1e7ec1683326",
+ "cheap_score": 3,
+ "rank": 7,
+ "reason": "SKIPPED_TOPN: cheap-score rank beyond the top-N evaluation budget — the candidate ADVANCED the screens and is preserved in full for future evaluation windows",
+ "structured_candidate": {
+  "candidate_id": "cand:MS:CROSS_DOMAIN_ANALOGY:1e7ec1683326",
+  "candidate_hash": "1e7ec1683326e0c6586c101dd080caa655958eafd2d9b8eb10bf67f20da2d591",
+  "candidate_schema": "mechanism_candidate/1.0.0",
+  "candidate_state": "CANDIDATE",
+  "transformation_operator": "CROSS_DOMAIN_ANALOGY",
+  "mechanism": "Heat treatment increases corrosion resistance by modifying the material microstructure to reduce electrochemical activity",
+  "intervention": "Apply heat treatment to positive grid alloy after casting",
+  "mechanism_graph": {
+   "nodes": {
+    "intervention_site": {
+     "label": "INTERVENTION",
+     "terms": [
+      "after",
+      "alloy",
+      "apply",
+      "casting",
+      "grid",
+      "heat",
+      "positive",
+      "treatment"
+     ]
+    },
+    "causal_agent": {
+     "label": "MECHANISM",
+     "terms": [
+      "activity",
+      "corrosion",
+      "electrochemical",
+      "heat",
+      "increase",
+      "material",
+      "microstructure",
+      "modifying",
+      "reduce",
+      "resistance",
+      "treatment"
+     ]
+    },
+    "physical_effect": {
+     "label": "PREDICTED_EFFECT",
+     "terms": [
+      "10x",
+      "charging",
+      "corrosion",
+      "during",
+      "float",
+      "grid",
+      "rate",
+      "reduce"
+     ]
+    },
+    "observed_outcome": {
+     "label": "OBSERVED_EFFECT",
+     "terms": [
+      "10x",
+      "az31",
+      "can",
+      "corrosion",
+      "heat",
+      "increase",
+      "resistance",
+      "treating"
+     ]
+    }
+   },
+   "edges": [
+    {
+     "from": "intervention_site",
+     "to": "causal_agent",
+     "relation": "ACTIVATES"
+    },
+    {
+     "from": "causal_agent",
+     "to": "physical_effect",
+     "relation": "PRODUCES"
+    },
+    {
+     "from": "physical_effect",
+     "to": "observed_outcome",
+     "relation": "MEASURES_AGAINST"
+    }
+   ],
+   "graph_version": "mechanism_graph/1.0.0"
+  },
+  "evidence_bundle": {
+   "primary_item_id": "arxiv:1706.08663v1",
+   "primary_structured_hash": "793af26b0e5ebb442188f9e415dc5858b3b17c98ec958fdf77c8d536ca7d3ae9",
+   "primary_source": {
+    "source_id": "arxiv:1706.08663v1",
+    "source_name": "arxiv",
+    "content_hash": "8ffc2a55ee4d559dd667e029dfc3e875aa9a237cc27325a6a25eded8d2aa8b0c",
+    "title": "Influence of Heat Treatment on the Corrosion Behavior of Purified Magnesium and AZ31 Alloy",
+    "retrieval_timestamp": "2026-09-10T14:30:35.117038+00:00",
+    "source_uri": "http://arxiv.org/abs/1706.08663v1",
+    "doi": ""
+   },
+   "mechanism_source_span": "\"Results show that heat treating can increase the corrosion resistance of HP-Mg by 2x and AZ31 by 10x.\"",
+   "evidence_plane": "DISCOVERY_EXPANSION",
+   "evidence_snapshot_id": "evsnap_fed9089e9201fe5b",
+   "evidence_hash": "fed9089e9201fe5b6b3cf4af3f2d281834ce8e83270954bf5b92c5472eccf8a2",
+   "retrieval_role": "DISCOVERY_EXPANSION",
+   "retrieval_version": "multi_source_expansion/2.0.0",
+   "retrieval_sources": "arxiv",
+   "retrieval_timestamp": "2026-09-10T14:30:35.117038+00:00"
+  },
+  "constraint_set": {
+   "problem_constraint": "achieve 15-year float service life at 2.27 V per cell continuous charge without antimony content above 2 percent",
+   "boundary_conditions": "Continuous float charging at 2.27V/cell; Operating temperature between 20-40°C; Grid alloy with antimony content below 2 percent",
+   "stated_constraints": "UNEXTRACTED"
+  },
+  "predicted_effect": "Reduces grid corrosion rate by 2-10x during float charging",
+  "known_failure_modes": [
+   "Excessive heat treatment causes grain growth leading to reduced mechanical strength",
+   "Incomplete heat treatment fails to achieve optimal corrosion resistance"
+  ],
+  "novel_design_variable": "Heat treatment temperature and time profile",
+  "testable_prediction": "Heat-treated grids will show lower weight loss and hydrogen evolution rate after 1 year of float testing at 2.27V/cell compared to untreated grids",
+  "testable_prediction_check": {
+   "present": true,
+   "measurable_quantity": true,
+   "sufficiently_specific": true,
+   "testable": true
+  },
+  "derivation_trace": {
+   "operator": "CROSS_DOMAIN_ANALOGY",
+   "operator_rule_version": "CROSS_DOMAIN_ANALOGY/1.0.0",
+   "input_contract": {
+    "operator": "CROSS_DOMAIN_ANALOGY",
+    "satisfied": true,
+    "shared_system_terms": [],
+    "failure_mechanism_overlap": [
+     "corrosion",
+     "resistance"
+    ],
+    "basis": "system is foreign to the problem domain while the mechanism/failure vocabulary overlaps — analogy material, never direct support"
+   },
+   "selection_result": {
+    "selected_by": "CROSS_DOMAIN_ANALOGY",
+    "contract": {
+     "operator": "CROSS_DOMAIN_ANALOGY",
+     "satisfied": true,
+     "shared_system_terms": [],
+     "failure_mechanism_overlap": [
+      "corrosion",
+      "resistance"
+     ],
+     "basis": "system is foreign to the problem domain while the mechanism/failure vocabulary overlaps — analogy material, never direct support"
+    }
+   },
+   "llm_provider": "zai",
+   "llm_model": "glm-4-plus",
+   "prompt_hash": "ed7b4e070844e82f0f77247a56e6be009a4cc94ea071775a2e5d38dda30f2fb9",
+   "output_hash": "ec83f195db1d22af52939d7f8b458048b45d985163933c6a7f620da46a8ecc1e",
+   "source_item_id": "arxiv:1706.08663v1",
+   "derived_at": "2026-09-10T14:31:23+00:00Z"
+  },
+  "falsification_test": "Heat-treated grids will show lower weight loss and hydrogen evolution rate after 1 year of float testing at 2.27V/cell compared to untreated grids",
+  "expected_effect": "Reduces grid corrosion rate by 2-10x during float charging",
+  "mechanism_source_span": "\"Results show that heat treating can increase the corrosion resistance of HP-Mg by 2x and AZ31 by 10x.\"",
+  "span_binding": {
+   "mechanism_source_span": "\"Results show that heat treating can increase the corrosion resistance of HP-Mg by 2x and AZ31 by 10x.\"",
+   "verbatim_in_record": true,
+   "match_mode": "VERBATIM",
+   "contract": "a2/verify.py ladder: verbatim -> case-insensitive normalized; anything else is a reworded/fabricated span and is rejected"
+  },
+  "extraction_confidence": "HIGH",
+  "mechanism_support": {
+   "candidate_id": "cand:MS:CROSS_DOMAIN_ANALOGY:1e7ec1683326",
+   "mechanism_support_state": "PARTIALLY_SUPPORTED",
+   "counts": {
+    "SUPPORTS": 0,
+    "PARTIALLY_SUPPORTS": 1,
+    "CONTRADICTS": 0,
+    "IRRELEVANT": 0,
+    "NOT_ENOUGH_EVIDENCE": 5
+   },
+   "n_items": 6,
+   "verdicts": [
+    {
+     "item_id": "arxiv:2402.07804v1",
+     "relation": "NOT_ENOUGH_EVIDENCE",
+     "basis": "phenomenon/domain overlap present (1 terms) but the candidate's mechanism vocabulary is absent (overlap 1 < 2) — phenomenon support is NOT mechanism support (R401 Phase 4)",
+     "overlaps": {
+      "mechanism_terms": [
+       "corrosion"
+      ],
+      "system_match": false,
+      "phenomenon_terms": [
+       "corrosion"
+      ],
+      "domain_terms": [
+       "corrosion"
+      ]
+     },
+     "contradiction_basis": null
+    },
+    {
+     "item_id": "doi:10.1021/acsaem.4c02648",
+     "relation": "NOT_ENOUGH_EVIDENCE",
+     "basis": "phenomenon/domain overlap present (4 terms) but the candidate's mechanism vocabulary is absent (overlap 1 < 2) — phenomenon support is NOT mechanism support (R401 Phase 4)",
+     "overlaps": {
+      "mechanism_terms": [
+       "increase"
+      ],
+      "system_match": true,
+      "phenomenon_terms": [
+       "acid",
+       "battery",
+       "below",
+       "lead"
+      ],
+      "domain_terms": [
+       "acid",
+       "battery",
+       "below",
+       "lead"
+      ]
+     },
+     "contradiction_basis": null
+    },
+    {
+     "item_id": "arxiv:1706.08663v1",
+     "relation": "PARTIALLY_SUPPORTS",
+     "basis": "mechanism overlap 9 terms from a DIFFERENT system — ANALOGY: the causal structure may transfer, but analogy is never direct support (item system: Magnesium and AZ31 alloy in simulated body fluid at 37°C)",
+     "overlaps": {
+      "mechanism_terms": [
+       "10x",
+       "az31",
+       "can",
+       "corrosion",
+       "heat",
+       "increase",
+       "resistance",
+       "treating",
+       "treatment"
+      ],
+      "system_match": false,
+      "phenomenon_terms": [
+       "corrosion",
+       "resistance"
+      ],
+      "domain_terms": [
+       "corrosion",
+       "resistance"
+      ]
+     },
+     "contradiction_basis": null
+    },
+    {
+     "item_id": "doi:10.1051/e3sconf/202018501058",
+     "relation": "NOT_ENOUGH_EVIDENCE",
+     "basis": "phenomenon/domain overlap present (5 terms) but the candidate's mechanism vocabulary is absent (overlap 0 < 2) — phenomenon support is NOT mechanism support (R401 Phase 4)",
+     "overlaps": {
+      "mechanism_terms": [],
+      "system_match": true,
+      "phenomenon_terms": [
+       "acid",
+       "battery",
+       "corrosion",
+       "plate",
+       "positive"
+      ],
+      "domain_terms": [
+       "acid",
+       "battery",
+       "lead",
+       "regulated",
+       "valve"
+      ]
+     },
+     "contradiction_basis": null
+    },
+    {
+     "item_id": "arxiv:1008.4872v1",
+     "relation": "NOT_ENOUGH_EVIDENCE",
+     "basis": "phenomenon/domain overlap present (3 terms) but the candidate's mechanism vocabulary is absent (overlap 0 < 2) — phenomenon support is NOT mechanism support (R401 Phase 4)",
+     "overlaps": {
+      "mechanism_terms": [],
+      "system_match": true,
+      "phenomenon_terms": [],
+      "domain_terms": [
+       "acid",
+       "battery",
+       "lead"
+      ]
+     },
+     "contradiction_basis": null
+    },
+    {
+     "item_id": "arxiv:1902.01771v1",
+     "relation": "NOT_ENOUGH_EVIDENCE",
+     "basis": "phenomenon/domain overlap present (1 terms) but the candidate's mechanism vocabulary is absent (overlap 1 < 2) — phenomenon support is NOT mechanism support (R401 Phase 4)",
+     "overlaps": {
+      "mechanism_terms": [
+       "rate"
+      ],
+      "system_match": true,
+      "phenomenon_terms": [
+       "capacity"
+      ],
+      "domain_terms": [
+       "acid",
+       "battery",
+       "capacity",
+       "charge",
+       "during",
+       "lead"
+      ]
+     },
+     "contradiction_basis": null
+    }
+   ],
+   "contradictions_visible": [],
+   "note": "CONTESTED keeps contradictions VISIBLE alongside any support (never absorbed); cross-system items cap at PARTIALLY_SUPPORTS (analogy never becomes direct support); phenomenon-only overlap is NOT_ENOUGH_EVIDENCE (never weak support)"
+  },
+  "distinctness_verdict": "DISTINCT",
+  "distinctness_basis": "causal core materially different (aggregate graph Jaccard 0.143 < 0.45): the intervention/mechanism/effect vocabulary itself differs — different causal variables, not different wording"
+ }
+}

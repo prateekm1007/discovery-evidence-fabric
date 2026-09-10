@@ -1,0 +1,79 @@
+{
+ "attack_version": "independent_attack/1.0.0",
+ "candidate_id": "cand:DIV:mechanism_inversion:zai:98e3c1db3829",
+ "generator_provider": null,
+ "attacker_provider": "zai",
+ "attacker_model": "glm-4-plus",
+ "independence_mode": "SEPARATE_CONTEXT",
+ "independence_note": "the attacker ran in an independent reasoning context (fresh adversarial conversation, generator reasoning never shown; no alternative provider credentialed — disclosed, never claimed as provider separation)",
+ "prompt_hash": "1bed8223e5b0b8bce55c576fc3aeda160b3a4166e8d1f5f94374b6d8b948022c",
+ "output_hash": "c9b6306401b2a3f249e34da83aaddd537357114d91385943aa5baaa457fbc107",
+ "llm_status": "OK",
+ "attacked_at": "2026-09-10T17:20:47+00:00Z",
+ "items": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "verdict": "KILL",
+   "basis": "Wavelet decomposition is fundamentally a signal processing technique designed for stationary or quasi-stationary signals, while retail sales data is inherently non-stationary with multiple seasonal patterns, promotional spikes, and assortment changes that violate the stationarity assumption required for effective wavelet decomposition"
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "verdict": "KILL",
+   "basis": "The candidate fails to specify boundary conditions for handling the multi-scale nature of wavelet decomposition, where different frequency components (daily, weekly, yearly seasonality) would require different decomposition parameters, making the approach impractical for real-world retail data with varying seasonal patterns"
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "verdict": "KILL",
+   "basis": "All provided evidence references LSTM, SVR, meta-learning, and federated learning approaches, with no evidence supporting wavelet decomposition for retail sales forecasting or feature drift detection, creating a complete disconnect between the proposed mechanism and the cited evidence"
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "verdict": "KILL",
+   "basis": "The candidate provides no evidence that wavelet decomposition would detect feature drift any earlier than current methods, as the approach doesn't address the core issue of how to distinguish between random noise and actual feature drift in high-dimensional retail data"
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "verdict": "KILL",
+   "basis": "The proposed mechanism would require maintaining parallel wavelet decomposition models for each product category, store, and time granularity, making it computationally infeasible for real-time implementation in large retail systems with thousands of SKUs"
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "verdict": "KILL",
+   "basis": "The testable prediction fails to define what constitutes \"feature drift components\" in wavelet space, how to distinguish them from noise, or what threshold would trigger an alert, making the measurement fundamentally ambiguous and impossible to validate"
+  }
+ ],
+ "state": "ATTACK_RUN",
+ "overall": "KILLED",
+ "kill_basis": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "basis": "Wavelet decomposition is fundamentally a signal processing technique designed for stationary or quasi-stationary signals, while retail sales data is inherently non-stationary with multiple seasonal patterns, promotional spikes, and assortment changes that violate the stationarity assumption required for effective wavelet decomposition"
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "basis": "The candidate fails to specify boundary conditions for handling the multi-scale nature of wavelet decomposition, where different frequency components (daily, weekly, yearly seasonality) would require different decomposition parameters, making the approach impractical for real-world retail data with varying seasonal patterns"
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "basis": "All provided evidence references LSTM, SVR, meta-learning, and federated learning approaches, with no evidence supporting wavelet decomposition for retail sales forecasting or feature drift detection, creating a complete disconnect between the proposed mechanism and the cited evidence"
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "basis": "The candidate provides no evidence that wavelet decomposition would detect feature drift any earlier than current methods, as the approach doesn't address the core issue of how to distinguish between random noise and actual feature drift in high-dimensional retail data"
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "basis": "The proposed mechanism would require maintaining parallel wavelet decomposition models for each product category, store, and time granularity, making it computationally infeasible for real-time implementation in large retail systems with thousands of SKUs"
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "basis": "The testable prediction fails to define what constitutes \"feature drift components\" in wavelet space, how to distinguish them from noise, or what threshold would trigger an alert, making the measurement fundamentally ambiguous and impossible to validate"
+  }
+ ],
+ "counts": {
+  "KILL": 6,
+  "RISK": 0,
+  "SURVIVE": 0,
+  "INVALID": 0
+ }
+}

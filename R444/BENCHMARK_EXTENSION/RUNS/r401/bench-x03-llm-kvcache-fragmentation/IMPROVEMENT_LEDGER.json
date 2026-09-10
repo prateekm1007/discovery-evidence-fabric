@@ -1,0 +1,1181 @@
+{
+ "ledger": "IMPROVEMENT_LEDGER (R378 TECHNICAL IMPROVEMENT ENGINE)",
+ "version": "1.0.0",
+ "loop": "CANDIDATE -> DIAGNOSE WEAKNESS -> IDENTIFY LIMITING FEATURE -> GENERATE CONTROLLED MUTATION -> RE-EVALUATE EVIDENCE/MECHANISM/PRIOR ART -> RE-SCORE -> KEEP OR KILL -> REPEAT",
+ "collision_mode": "REPLAY_CACHE",
+ "live_sources": null,
+ "evaluators_registered": [
+  {
+   "evaluator_id": "term_rule_v1",
+   "fidelity_tier": "TERM_RULE",
+   "evidence_rank": 3
+  }
+ ],
+ "q_instrument": "discovery_fabric/benchmark/candidate_quality.py (FROZEN, hash-pinned, imported read-only)",
+ "i_instrument": "discovery_fabric/benchmark/invention_quality.py (R377, imported read-only)",
+ "thresholds": {
+  "SPAN_DERIVATION_MIN": {
+   "value": 0.2,
+   "epistemic_class": "ENGINEERING",
+   "justification": "the engine's own span-derivation rule (candidate_diversity.span_derivation_check): ratio < 0.20 = SPAN_UNDERIVED. A MECHANISM_STRENGTHENING mutation must CLEAR this floor — the same rule that gates the grid, not a new one."
+  },
+  "EVIDENCE_SUPPORT_MIN": {
+   "value": 0.2,
+   "epistemic_class": "ENGINEERING",
+   "justification": "I1's underived flag fires below 0.20; an EVIDENCE_DERIVED_CONSTRAINT mutation must clear the same floor on evidence_support."
+  },
+  "DOMAIN_OVERLAP_MIN": {
+   "value": 1,
+   "epistemic_class": "ENGINEERING",
+   "justification": "REPLAY_CACHE re-adjudication is valid only while the mutated candidate stays in the domain the cached art was found FOR. Guard: >= 1 NON-generic technical term shared between the child's mechanism+intervention and the cached family corpus. ZERO overlap means the mutation abandoned the domain (measured attack: re-adjudicating a cement-curing intervention against battery art fabricates surviving differentiators — false novelty from stale art). The overlap count is RECORDED on every cache adjudication so thin-domain links are auditable. NOTE: entity-term retention vs the problem CANNOT catch this class — entity terms are problem-derived and unchanged by mutations (measured while writing the guard's tests); it is recorded for audit only."
+  },
+  "MAX_ITERATIONS_DEFAULT": {
+   "value": 2,
+   "epistemic_class": "ENGINEERING",
+   "justification": "the CEO minimum loop is DIAGNOSE -> IMPROVE -> RE-EVALUATE -> IMPROVE AGAIN; two iterations demonstrate repeatability at bounded cost"
+  },
+  "MAX_PROPOSALS_PER_ITERATION": {
+   "value": 3,
+   "epistemic_class": "ENGINEERING",
+   "justification": "bounded proposal budget: three attempts, then the honest no-defensible-mutation verdict"
+  }
+ },
+ "started_at": "2026-09-10T17:10:33+00:00Z",
+ "iterations": [
+  {
+   "iteration": 1,
+   "diagnosis": {
+    "limiting_features": [
+     {
+      "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "measured_value": 0.5,
+      "weakness_kind": "LOW_SCORE",
+      "why_weak": "measured 0.5 < STRONG floor 0.7",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT"
+     },
+     {
+      "dimension": "I5_EXPERIMENT_DISCRIMINATION",
+      "measured_value": 0.667,
+      "weakness_kind": "LOW_SCORE",
+      "why_weak": "measured 0.667 < STRONG floor 0.7",
+      "mutation_type": "EXPERIMENT_DISCRIMINATION"
+     }
+    ],
+    "evidence_gaps": [
+     {
+      "dimension": "I2_DIFFERENTIATOR_TECHNICAL_MEANING",
+      "state": "UNMEASURABLE_NO_SURVIVORS",
+      "what_is_missing": "no surviving differentiators recorded",
+      "consequence": "no mutation targets this dimension until the gap closes (Art. XXV)"
+     },
+     {
+      "dimension": "I3_RECOMBINATION_RISK",
+      "state": "UNMEASURABLE_NO_FAMILIES",
+      "what_is_missing": "no prior-art families adjudicated — residue vs found art is unmeasured; absence of found art is not novelty",
+      "consequence": "no mutation targets this dimension until the gap closes (Art. XXV)"
+     },
+     {
+      "dimension": "I4_NEW_TECHNICAL_RELATIONSHIP",
+      "state": "UNMEASURABLE_NO_FAMILY_TEXT",
+      "what_is_missing": "no adjudicated family text stored — pair novelty vs found art is unmeasured",
+      "consequence": "no mutation targets this dimension until the gap closes (Art. XXV)"
+     }
+    ],
+    "target": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT"
+    }
+   },
+   "proposals": [
+    {
+     "proposal_id": "prop:a387b6b35b55",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "ce77b63744c5c8c2841a65e86424dd8658912fa641491c6e875b358e7b0a6d07",
+     "output_hash": "a387b6b35b55fc916cf1f53eb4807a30dfcb98639d4b24851cb8b8c01ac40899",
+     "fields": {
+      "MUTATION_TYPE": "EVIDENCE_DERIVED_CONSTRAINT",
+      "MECHANISM": "Bit-flip vulnerability of shared KV-cache blocks during cross-GPU data transfers",
+      "INTERVENTION": "Deploy redundant KV-cache storage with parity protection across shared GPU nodes",
+      "EXPECTED_EFFECT": "Maintain data integrity during high traffic bursts without increasing live-token evictions",
+      "FALSIFICATION_TEST": "falsification_test_from_candidate",
+      "MECHANISM_SOURCE_SPAN": "\"Bit-Flip Vulnerability of Shared KV-Cache Blocks in LLM Serving Systems\"",
+      "SOURCE_EVIDENCE_ID": "doi:10.5220/0015138800004103",
+      "EXPERIMENT": "Compare the candidate against the baseline of no parity protection during cross-GPU KV-cache transfers",
+      "EXPERIMENT_BASELINE": "Bit-Flip Vulnerability of Shared KV-Cache Blocks in LLM Serving Systems",
+      "EXPERIMENT_EIG": "0.8",
+      "CONSTRAINT_DERIVED": "Parity protection must be applied specifically during cross-GPU KV-cache transfers",
+      "MUTATION_REASON": "This repairs the I1_MECHANISM_EVIDENCE_DERIVATION weakness by anchoring the mechanism in the exact terminology from the cited evidence and adding a constraint derived from the evidence title."
+     },
+     "validation": {
+      "valid": false,
+      "stage": "VALIDATION",
+      "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+      "checks": {
+       "mutation_type_matches_diagnosis": true,
+       "span_verbatim_in_evidence": false,
+       "evidence_support": 0.385,
+       "evidence_support_cleared": 0.385,
+       "constraint_traceable_to_evidence": "Parity protection must be applied specifically during cross-GPU KV-cache transfers"
+      },
+      "reasons": [
+       "span_verbatim_in_evidence: the quoted span is NOT a verbatim substring of the cited evidence (fabricated spans are invalid — Art. VI)"
+      ],
+      "validated_at": "2026-09-10T17:10:35+00:00Z"
+     }
+    },
+    {
+     "proposal_id": "prop:cc18585f05fe",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "2dbeb915a9564ed73e6cd25e551094e97fa9a048d11a8cbecde8f8f6abd9f036",
+     "output_hash": "cc18585f05fe028d1b3b0e3ea6c5ab8c7dfef503fb9e6f26fb2cc571cfa87064",
+     "fields": {
+      "MUTATION_TYPE": "EVIDENCE_DERIVED_CONSTRAINT",
+      "MECHANISM": "Bit-Flip Vulnerability of Shared KV-Cache Blocks in LLM Serving Systems",
+      "INTERVENTION": "Deploy redundant KV-cache storage with parity protection across shared GPU nodes",
+      "EXPECTED_EFFECT": "Maintain data integrity during high traffic bursts without increasing live-token evictions",
+      "FALSIFICATION_TEST": "falsification_test_from_candidate",
+      "MECHANISM_SOURCE_SPAN": "Bit-Flip Vulnerability of Shared KV-Cache Blocks in LLM Serving Systems",
+      "SOURCE_EVIDENCE_ID": "doi:10.5220/0015138800004103",
+      "EXPERIMENT": "Compare the candidate against the baseline \"standard KV-cache implementation without parity protection\" to measure reduction in live-token evictions during bursty traffic",
+      "EXPERIMENT_BASELINE": "standard KV-cache implementation without parity protection",
+      "EXPERIMENT_EIG": "0.8",
+      "CONSTRAINT_DERIVED": "\"redundant KV-cache storage must implement parity protection\" (from span: \"Bit-Flip Vulnerability of Shared KV-Cache Blocks in LLM Serving Systems\")",
+      "MUTATION_REASON": "This repair fixes the I1_MECHANISM_EVIDENCE_DERIVATION weakness by using verbatim terminology from the cited evidence title and deriving a constraint directly from it."
+     },
+     "validation": {
+      "valid": true,
+      "stage": "VALIDATION",
+      "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+      "checks": {
+       "mutation_type_matches_diagnosis": true,
+       "span_evidence_exists": "doi:10.5220/0015138800004103",
+       "span_verbatim_in_evidence": true,
+       "evidence_support": 0.545,
+       "evidence_support_cleared": 0.545,
+       "constraint_traceable_to_evidence": "\"redundant KV-cache storage must implement parity protection\" (from span: \"Bit-Flip Vulnerability of Shared KV-Cache Blo"
+      },
+      "reasons": [],
+      "validated_at": "2026-09-10T17:10:39+00:00Z"
+     }
+    }
+   ],
+   "mutation_attempts": [
+    {
+     "mutation_applied": {
+      "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+      "mutation_id": "mut:bce6092a1eb5",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+      "diagnostic_trigger": {
+       "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+       "measured_before": 0.5,
+       "basis": "R378 evaluator-contract diagnosis (deterministic)"
+      },
+      "proposal_provenance": {
+       "proposal_id": "prop:cc18585f05fe",
+       "provider": "zai",
+       "model": "glm-4-plus",
+       "prompt_hash": "2dbeb915a9564ed73e6cd25e551094e97fa9a048d11a8cbecde8f8f6abd9f036",
+       "output_hash": "cc18585f05fe028d1b3b0e3ea6c5ab8c7dfef503fb9e6f26fb2cc571cfa87064",
+       "llm_is_untrusted_proposer": true
+      },
+      "validation": {
+       "valid": true,
+       "stage": "VALIDATION",
+       "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+       "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+       "checks": {
+        "mutation_type_matches_diagnosis": true,
+        "span_evidence_exists": "doi:10.5220/0015138800004103",
+        "span_verbatim_in_evidence": true,
+        "evidence_support": 0.545,
+        "evidence_support_cleared": 0.545,
+        "constraint_traceable_to_evidence": "\"redundant KV-cache storage must implement parity protection\" (from span: \"Bit-Flip Vulnerability of Shared KV-Cache Blo"
+       },
+       "reasons": [],
+       "validated_at": "2026-09-10T17:10:39+00:00Z"
+      },
+      "fields_changed": {
+       "mechanism": {
+        "before": "Bit-flip vulnerability of shared KV-cache blocks",
+        "after": "Bit-Flip Vulnerability of Shared KV-Cache Blocks in LLM Serving Systems"
+       },
+       "intervention": {
+        "before": "Deploy redundant KV-cache storage with parity protection across shared GPU nodes",
+        "after": "Deploy redundant KV-cache storage with parity protection across shared GPU nodes"
+       },
+       "mechanism_source_span": {
+        "before": "Bit-flip vulnerability of shared KV-cache blocks in LLM serving systems",
+        "after": "Bit-Flip Vulnerability of Shared KV-Cache Blocks in LLM Serving Systems"
+       }
+      },
+      "inherited_negatives": {
+       "uncertainty_ids": [
+        "con:verify:5fc42398",
+        "con:verify:fc690a03",
+        "cache shared inference serving cluster blocks",
+        "cache shared inference serving cluster blocks",
+        "shared cache blocks vulnerability bit flip",
+        "shared cache blocks vulnerability bit flip",
+        "cache shared gpu nodes redundant storage protection deploy",
+        "cache shared gpu nodes redundant storage protection deploy",
+        "cache integrity during increasing parity protection",
+        "cache integrity during increasing parity protection",
+        "maintain integrity without increasing data high",
+        "maintain integrity without increasing data high"
+       ],
+       "collision_family_ids": [],
+       "source_errors": []
+      },
+      "parent_spec_hash": "d41f0e88df3704938553a53562ae390550f7296622ce7e5b27832d3f3c80027e",
+      "child_spec_hash": null,
+      "reason": "This repair fixes the I1_MECHANISM_EVIDENCE_DERIVATION weakness by using verbatim terminology from the cited evidence title and deriving a constraint directly from it.",
+      "applied_at": "2026-09-10T17:10:39+00:00Z"
+     },
+     "re_evaluation": {
+      "collision_mode": "REPLAY_CACHE",
+      "re_evaluated_at": "2026-09-10T17:10:39+00:00Z",
+      "re_adjudication": {
+       "mode": "REPLAY_CACHE",
+       "valid": false,
+       "reason": "NO_CACHED_FAMILIES"
+      },
+      "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+      "re_adjudication_failure": "NO_CACHED_FAMILIES",
+      "i_dimensions": {
+       "I1_MECHANISM_EVIDENCE_DERIVATION": {
+        "score": 0.545,
+        "state": "MEASURED"
+       },
+       "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_SURVIVORS"
+       },
+       "I3_RECOMBINATION_RISK": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_FAMILIES"
+       },
+       "I4_NEW_TECHNICAL_RELATIONSHIP": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+       },
+       "I5_EXPERIMENT_DISCRIMINATION": {
+        "score": 0.667,
+        "state": "MEASURED"
+       }
+      },
+      "i_flags": {
+       "underived_mechanism": false,
+       "recombination_only": false
+      },
+      "i_average": 0.606,
+      "q_dimensions": {
+       "Q1_EVIDENCE_BINDING": {
+        "score": 0.5,
+        "state": "MEASURED"
+       },
+       "Q2_PRIOR_ART_SPECIFICITY": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_PRIOR_ART"
+       },
+       "Q3_PRIOR_ART_RESOLUTION": {
+        "score": 0.0,
+        "state": "MEASURED"
+       },
+       "Q4_EXPERIMENT_DECISIVENESS": {
+        "score": 1.0,
+        "state": "MEASURED"
+       },
+       "Q5_CHAIN_COMPLETENESS": {
+        "score": 1.0,
+        "state": "MEASURED"
+       }
+      },
+      "q_average": 0.625
+     },
+     "decision": {
+      "action": "KEEP",
+      "improved": true,
+      "checks": {
+       "targeted_dimension": "0.5 -> 0.545 (improved)",
+       "negatives_preserved": true,
+       "no_new_structural_flags": true,
+       "no_unknown_conversion_without_new_evidence": true,
+       "text_gap_conversions_recorded": [],
+       "prior_art_position_not_degraded": true
+      },
+      "reasons": [],
+      "decided_at": "2026-09-10T17:10:39+00:00Z"
+     }
+    }
+   ],
+   "mutation_applied": {
+    "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+    "mutation_id": "mut:bce6092a1eb5",
+    "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+    "diagnostic_trigger": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "measured_before": 0.5,
+     "basis": "R378 evaluator-contract diagnosis (deterministic)"
+    },
+    "proposal_provenance": {
+     "proposal_id": "prop:cc18585f05fe",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "2dbeb915a9564ed73e6cd25e551094e97fa9a048d11a8cbecde8f8f6abd9f036",
+     "output_hash": "cc18585f05fe028d1b3b0e3ea6c5ab8c7dfef503fb9e6f26fb2cc571cfa87064",
+     "llm_is_untrusted_proposer": true
+    },
+    "validation": {
+     "valid": true,
+     "stage": "VALIDATION",
+     "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+     "checks": {
+      "mutation_type_matches_diagnosis": true,
+      "span_evidence_exists": "doi:10.5220/0015138800004103",
+      "span_verbatim_in_evidence": true,
+      "evidence_support": 0.545,
+      "evidence_support_cleared": 0.545,
+      "constraint_traceable_to_evidence": "\"redundant KV-cache storage must implement parity protection\" (from span: \"Bit-Flip Vulnerability of Shared KV-Cache Blo"
+     },
+     "reasons": [],
+     "validated_at": "2026-09-10T17:10:39+00:00Z"
+    },
+    "fields_changed": {
+     "mechanism": {
+      "before": "Bit-flip vulnerability of shared KV-cache blocks",
+      "after": "Bit-Flip Vulnerability of Shared KV-Cache Blocks in LLM Serving Systems"
+     },
+     "intervention": {
+      "before": "Deploy redundant KV-cache storage with parity protection across shared GPU nodes",
+      "after": "Deploy redundant KV-cache storage with parity protection across shared GPU nodes"
+     },
+     "mechanism_source_span": {
+      "before": "Bit-flip vulnerability of shared KV-cache blocks in LLM serving systems",
+      "after": "Bit-Flip Vulnerability of Shared KV-Cache Blocks in LLM Serving Systems"
+     }
+    },
+    "inherited_negatives": {
+     "uncertainty_ids": [
+      "con:verify:5fc42398",
+      "con:verify:fc690a03",
+      "cache shared inference serving cluster blocks",
+      "cache shared inference serving cluster blocks",
+      "shared cache blocks vulnerability bit flip",
+      "shared cache blocks vulnerability bit flip",
+      "cache shared gpu nodes redundant storage protection deploy",
+      "cache shared gpu nodes redundant storage protection deploy",
+      "cache integrity during increasing parity protection",
+      "cache integrity during increasing parity protection",
+      "maintain integrity without increasing data high",
+      "maintain integrity without increasing data high"
+     ],
+     "collision_family_ids": [],
+     "source_errors": []
+    },
+    "parent_spec_hash": "d41f0e88df3704938553a53562ae390550f7296622ce7e5b27832d3f3c80027e",
+    "child_spec_hash": null,
+    "reason": "This repair fixes the I1_MECHANISM_EVIDENCE_DERIVATION weakness by using verbatim terminology from the cited evidence title and deriving a constraint directly from it.",
+    "applied_at": "2026-09-10T17:10:39+00:00Z"
+   },
+   "re_evaluation": {
+    "collision_mode": "REPLAY_CACHE",
+    "re_evaluated_at": "2026-09-10T17:10:39+00:00Z",
+    "re_adjudication": {
+     "mode": "REPLAY_CACHE",
+     "valid": false,
+     "reason": "NO_CACHED_FAMILIES"
+    },
+    "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+    "re_adjudication_failure": "NO_CACHED_FAMILIES",
+    "i_dimensions": {
+     "I1_MECHANISM_EVIDENCE_DERIVATION": {
+      "score": 0.545,
+      "state": "MEASURED"
+     },
+     "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_SURVIVORS"
+     },
+     "I3_RECOMBINATION_RISK": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_FAMILIES"
+     },
+     "I4_NEW_TECHNICAL_RELATIONSHIP": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+     },
+     "I5_EXPERIMENT_DISCRIMINATION": {
+      "score": 0.667,
+      "state": "MEASURED"
+     }
+    },
+    "i_flags": {
+     "underived_mechanism": false,
+     "recombination_only": false
+    },
+    "i_average": 0.606,
+    "q_dimensions": {
+     "Q1_EVIDENCE_BINDING": {
+      "score": 0.5,
+      "state": "MEASURED"
+     },
+     "Q2_PRIOR_ART_SPECIFICITY": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_PRIOR_ART"
+     },
+     "Q3_PRIOR_ART_RESOLUTION": {
+      "score": 0.0,
+      "state": "MEASURED"
+     },
+     "Q4_EXPERIMENT_DECISIVENESS": {
+      "score": 1.0,
+      "state": "MEASURED"
+     },
+     "Q5_CHAIN_COMPLETENESS": {
+      "score": 1.0,
+      "state": "MEASURED"
+     }
+    },
+    "q_average": 0.625
+   },
+   "decision": {
+    "action": "KEEP",
+    "improved": true,
+    "checks": {
+     "targeted_dimension": "0.5 -> 0.545 (improved)",
+     "negatives_preserved": true,
+     "no_new_structural_flags": true,
+     "no_unknown_conversion_without_new_evidence": true,
+     "text_gap_conversions_recorded": [],
+     "prior_art_position_not_degraded": true
+    },
+    "reasons": [],
+    "decided_at": "2026-09-10T17:10:39+00:00Z"
+   }
+  },
+  {
+   "iteration": 2,
+   "diagnosis": {
+    "limiting_features": [
+     {
+      "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "measured_value": 0.545,
+      "weakness_kind": "LOW_SCORE",
+      "why_weak": "measured 0.545 < STRONG floor 0.7",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT"
+     },
+     {
+      "dimension": "I5_EXPERIMENT_DISCRIMINATION",
+      "measured_value": 0.667,
+      "weakness_kind": "LOW_SCORE",
+      "why_weak": "measured 0.667 < STRONG floor 0.7",
+      "mutation_type": "EXPERIMENT_DISCRIMINATION"
+     }
+    ],
+    "evidence_gaps": [
+     {
+      "dimension": "I2_DIFFERENTIATOR_TECHNICAL_MEANING",
+      "state": "UNMEASURABLE_NO_SURVIVORS",
+      "what_is_missing": "no surviving differentiators recorded",
+      "consequence": "no mutation targets this dimension until the gap closes (Art. XXV)"
+     },
+     {
+      "dimension": "I3_RECOMBINATION_RISK",
+      "state": "UNMEASURABLE_NO_FAMILIES",
+      "what_is_missing": "no prior-art families adjudicated — residue vs found art is unmeasured; absence of found art is not novelty",
+      "consequence": "no mutation targets this dimension until the gap closes (Art. XXV)"
+     },
+     {
+      "dimension": "I4_NEW_TECHNICAL_RELATIONSHIP",
+      "state": "UNMEASURABLE_NO_FAMILY_TEXT",
+      "what_is_missing": "no adjudicated family text stored — pair novelty vs found art is unmeasured",
+      "consequence": "no mutation targets this dimension until the gap closes (Art. XXV)"
+     }
+    ],
+    "target": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT"
+    }
+   },
+   "proposals": [
+    {
+     "proposal_id": "prop:7fd709dea46d",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "5717cc47aad2c446124d7ad99afc6c4c96132552d939e0d01376c1ac84480a03",
+     "output_hash": "7fd709dea46d2e79ac6fc016b77ea4844c48fee5c37df9d7101ec55510f4c437",
+     "fields": {
+      "MUTATION_TYPE": "EVIDENCE_DERIVED_CONSTRAINT",
+      "MECHANISM": "Bit-Flip Vulnerability of Shared KV-Cache Blocks in LLM Serving Systems",
+      "INTERVENTION": "Deploy redundant KV-cache storage with parity protection across shared GPU nodes to prevent bit-flip induced corruption",
+      "EXPECTED_EFFECT": "Maintain data integrity during high traffic bursts without increasing live-token evictions",
+      "FALSIFICATION_TEST": "falsification_test_from_candidate",
+      "MECHANISM_SOURCE_SPAN": "Bit-Flip Vulnerability of Shared KV-Cache Blocks in LLM Serving Systems",
+      "SOURCE_EVIDENCE_ID": "doi:10.5220/0015138800004103",
+      "EXPERIMENT": "Compare bit-flip error rates between baseline system and parity-protected KV-cache implementation under bursty mixed-length request patterns",
+      "EXPERIMENT_BASELINE": "Baseline system without parity protection",
+      "EXPERIMENT_EIG": "0.8",
+      "CONSTRAINT_DERIVED": "Parity protection must be applied to all shared KV-cache blocks to prevent bit-flip induced corruption",
+      "MUTATION_REASON": "Repairs I1_MECHANISM_EVIDENCE_DERIVATION weakness by anchoring mechanism in actual evidence text and deriving constraint from verbatim span"
+     },
+     "validation": {
+      "valid": true,
+      "stage": "VALIDATION",
+      "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+      "checks": {
+       "mutation_type_matches_diagnosis": true,
+       "span_evidence_exists": "doi:10.5220/0015138800004103",
+       "span_verbatim_in_evidence": true,
+       "evidence_support": 0.429,
+       "evidence_support_cleared": 0.429,
+       "constraint_traceable_to_evidence": "Parity protection must be applied to all shared KV-cache blocks to prevent bit-flip induced corruption"
+      },
+      "reasons": [],
+      "validated_at": "2026-09-10T17:10:41+00:00Z"
+     }
+    },
+    {
+     "proposal_id": "prop:437f73658e88",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "4441e3c4952be876998d22f4aa18ab78b0fc16ef15df9adb79ea5f06ffec5e1e",
+     "output_hash": "437f73658e882987d179a157baeac8e4295870d33f6e474dd6394f14a5800e18",
+     "fields": {
+      "MUTATION_TYPE": "EVIDENCE_DERIVED_CONSTRAINT",
+      "MECHANISM": "Bit-Flip Vulnerability of Shared KV-Cache Blocks in LLM Serving Systems",
+      "INTERVENTION": "Deploy redundant KV-cache storage with parity protection across shared GPU nodes to prevent data corruption from bit-flips",
+      "EXPECTED_EFFECT": "Maintain data integrity during high traffic bursts without increasing live-token evictions",
+      "FALSIFICATION_TEST": "falsification_test_from_candidate",
+      "MECHANISM_SOURCE_SPAN": "Bit-Flip Vulnerability of Shared KV-Cache Blocks in LLM Serving Systems",
+      "SOURCE_EVIDENCE_ID": "doi:10.5220/0015138800004103",
+      "EXPERIMENT": "Compare the candidate against the baseline system without parity protection under identical bursty traffic conditions to measure reduction in bit-flip induced KV-cache corruption",
+      "EXPERIMENT_BASELINE": "the baseline system without parity protection",
+      "EXPERIMENT_EIG": "0.8",
+      "CONSTRAINT_DERIVED": "\"parity protection must be implemented across all shared GPU nodes to prevent bit-flip corruption of KV-cache blocks\"",
+      "MUTATION_REASON": "This repair addresses the I1_MECHANISM_EVIDENCE_DERIVATION defect by re-anchoring the mechanism's technical vocabulary directly in the cited evidence's title and ensuring the intervention uses the same terminology as the source evidence."
+     },
+     "validation": {
+      "valid": true,
+      "stage": "VALIDATION",
+      "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+      "checks": {
+       "mutation_type_matches_diagnosis": true,
+       "span_evidence_exists": "doi:10.5220/0015138800004103",
+       "span_verbatim_in_evidence": true,
+       "evidence_support": 0.462,
+       "evidence_support_cleared": 0.462,
+       "constraint_traceable_to_evidence": "\"parity protection must be implemented across all shared GPU nodes to prevent bit-flip corruption of KV-cache blocks\""
+      },
+      "reasons": [],
+      "validated_at": "2026-09-10T17:10:45+00:00Z"
+     }
+    },
+    {
+     "proposal_id": "prop:3c812f3cd123",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "ea14bf8fa3c9949c610b2330ea4dee987af4864d8c4ef5624695ecccb742163b",
+     "output_hash": "3c812f3cd123547b23c7c4293d4319f96ac02d540f6d4f4c5d190849762f8550",
+     "fields": {
+      "MUTATION_TYPE": "EVIDENCE_DERIVED_CONSTRAINT",
+      "MECHANISM": "Bit-Flip Vulnerability of Shared KV-Cache Blocks in LLM Serving Systems",
+      "INTERVENTION": "Deploy redundant KV-cache storage with parity protection across shared GPU nodes to prevent bit-flip induced cache corruption during high traffic bursts",
+      "EXPECTED_EFFECT": "Maintain data integrity during high traffic bursts without increasing live-token evictions",
+      "FALSIFICATION_TEST": "falsification_test_from_candidate",
+      "MECHANISM_SOURCE_SPAN": "Bit-Flip Vulnerability of Shared KV-Cache Blocks in LLM Serving Systems",
+      "SOURCE_EVIDENCE_ID": "doi:10.5220/0015138800004103",
+      "EXPERIMENT": "Compare the candidate against the baseline system to measure reduction in bit-flip induced cache corruption during high traffic bursts",
+      "EXPERIMENT_BASELINE": "The baseline system without parity protection",
+      "EXPERIMENT_EIG": "0.25",
+      "CONSTRAINT_DERIVED": "The parity protection must be implemented using error-correcting codes that can detect and correct single-bit errors without significant performance overhead",
+      "MUTATION_REASON": "This repair addresses the measured weakness in I1_MECHANISM_EVIDENCE_DERIVATION by re-anchoring the mechanism's technical vocabulary directly in the evidence title and ensuring the intervention explicitly references the bit-flip vulnerability phenomenon described in the evidence."
+     },
+     "validation": {
+      "valid": false,
+      "stage": "VALIDATION",
+      "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+      "checks": {
+       "mutation_type_matches_diagnosis": true,
+       "span_evidence_exists": "doi:10.5220/0015138800004103",
+       "span_verbatim_in_evidence": true,
+       "evidence_support": 0.333,
+       "evidence_support_cleared": 0.333,
+       "constraint_traceable_to_evidence": false
+      },
+      "reasons": [
+       "constraint_traceable_to_evidence: the derived constraint shares no non-generic term with the cited evidence"
+      ],
+      "validated_at": "2026-09-10T17:10:48+00:00Z"
+     }
+    }
+   ],
+   "mutation_attempts": [
+    {
+     "mutation_applied": {
+      "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+      "mutation_id": "mut:82cd0d3f6d38",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+      "diagnostic_trigger": {
+       "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+       "measured_before": 0.545,
+       "basis": "R378 evaluator-contract diagnosis (deterministic)"
+      },
+      "proposal_provenance": {
+       "proposal_id": "prop:7fd709dea46d",
+       "provider": "zai",
+       "model": "glm-4-plus",
+       "prompt_hash": "5717cc47aad2c446124d7ad99afc6c4c96132552d939e0d01376c1ac84480a03",
+       "output_hash": "7fd709dea46d2e79ac6fc016b77ea4844c48fee5c37df9d7101ec55510f4c437",
+       "llm_is_untrusted_proposer": true
+      },
+      "validation": {
+       "valid": true,
+       "stage": "VALIDATION",
+       "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+       "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+       "checks": {
+        "mutation_type_matches_diagnosis": true,
+        "span_evidence_exists": "doi:10.5220/0015138800004103",
+        "span_verbatim_in_evidence": true,
+        "evidence_support": 0.429,
+        "evidence_support_cleared": 0.429,
+        "constraint_traceable_to_evidence": "Parity protection must be applied to all shared KV-cache blocks to prevent bit-flip induced corruption"
+       },
+       "reasons": [],
+       "validated_at": "2026-09-10T17:10:41+00:00Z"
+      },
+      "fields_changed": {
+       "mechanism": {
+        "before": "Bit-Flip Vulnerability of Shared KV-Cache Blocks in LLM Serving Systems",
+        "after": "Bit-Flip Vulnerability of Shared KV-Cache Blocks in LLM Serving Systems"
+       },
+       "intervention": {
+        "before": "Deploy redundant KV-cache storage with parity protection across shared GPU nodes",
+        "after": "Deploy redundant KV-cache storage with parity protection across shared GPU nodes to prevent bit-flip induced corruption"
+       },
+       "mechanism_source_span": {
+        "before": "Bit-Flip Vulnerability of Shared KV-Cache Blocks in LLM Serving Systems",
+        "after": "Bit-Flip Vulnerability of Shared KV-Cache Blocks in LLM Serving Systems"
+       }
+      },
+      "inherited_negatives": {
+       "uncertainty_ids": [
+        "con:verify:5fc42398",
+        "con:verify:fc690a03",
+        "cache shared inference serving cluster blocks",
+        "cache shared inference serving cluster blocks",
+        "shared cache blocks vulnerability bit flip",
+        "shared cache blocks vulnerability bit flip",
+        "cache shared gpu nodes redundant storage protection deploy",
+        "cache shared gpu nodes redundant storage protection deploy",
+        "cache integrity during increasing parity protection",
+        "cache integrity during increasing parity protection",
+        "maintain integrity without increasing data high",
+        "maintain integrity without increasing data high"
+       ],
+       "collision_family_ids": [],
+       "source_errors": []
+      },
+      "parent_spec_hash": "605b2a7812c2aae85daac9e7d22709f0312ddd813b157402ea357ea6218c0a39",
+      "child_spec_hash": null,
+      "reason": "Repairs I1_MECHANISM_EVIDENCE_DERIVATION weakness by anchoring mechanism in actual evidence text and deriving constraint from verbatim span",
+      "applied_at": "2026-09-10T17:10:41+00:00Z"
+     },
+     "re_evaluation": {
+      "collision_mode": "REPLAY_CACHE",
+      "re_evaluated_at": "2026-09-10T17:10:41+00:00Z",
+      "re_adjudication": {
+       "mode": "REPLAY_CACHE",
+       "valid": false,
+       "reason": "NO_CACHED_FAMILIES"
+      },
+      "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+      "re_adjudication_failure": "NO_CACHED_FAMILIES",
+      "i_dimensions": {
+       "I1_MECHANISM_EVIDENCE_DERIVATION": {
+        "score": 0.429,
+        "state": "MEASURED"
+       },
+       "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_SURVIVORS"
+       },
+       "I3_RECOMBINATION_RISK": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_FAMILIES"
+       },
+       "I4_NEW_TECHNICAL_RELATIONSHIP": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+       },
+       "I5_EXPERIMENT_DISCRIMINATION": {
+        "score": 0.667,
+        "state": "MEASURED"
+       }
+      },
+      "i_flags": {
+       "underived_mechanism": false,
+       "recombination_only": false
+      },
+      "i_average": 0.548,
+      "q_dimensions": {
+       "Q1_EVIDENCE_BINDING": {
+        "score": 0.5,
+        "state": "MEASURED"
+       },
+       "Q2_PRIOR_ART_SPECIFICITY": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_PRIOR_ART"
+       },
+       "Q3_PRIOR_ART_RESOLUTION": {
+        "score": 0.0,
+        "state": "MEASURED"
+       },
+       "Q4_EXPERIMENT_DECISIVENESS": {
+        "score": 1.0,
+        "state": "MEASURED"
+       },
+       "Q5_CHAIN_COMPLETENESS": {
+        "score": 1.0,
+        "state": "MEASURED"
+       }
+      },
+      "q_average": 0.625
+     },
+     "decision": {
+      "action": "REJECT_MUTATION",
+      "improved": false,
+      "checks": {
+       "targeted_dimension": "0.545 -> 0.429 (no improvement)",
+       "negatives_preserved": true,
+       "no_new_structural_flags": true,
+       "no_unknown_conversion_without_new_evidence": true,
+       "text_gap_conversions_recorded": [],
+       "prior_art_position_not_degraded": true
+      },
+      "reasons": [],
+      "decided_at": "2026-09-10T17:10:41+00:00Z"
+     }
+    },
+    {
+     "mutation_applied": {
+      "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+      "mutation_id": "mut:dacf7f4b9d40",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+      "diagnostic_trigger": {
+       "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+       "measured_before": 0.545,
+       "basis": "R378 evaluator-contract diagnosis (deterministic)"
+      },
+      "proposal_provenance": {
+       "proposal_id": "prop:437f73658e88",
+       "provider": "zai",
+       "model": "glm-4-plus",
+       "prompt_hash": "4441e3c4952be876998d22f4aa18ab78b0fc16ef15df9adb79ea5f06ffec5e1e",
+       "output_hash": "437f73658e882987d179a157baeac8e4295870d33f6e474dd6394f14a5800e18",
+       "llm_is_untrusted_proposer": true
+      },
+      "validation": {
+       "valid": true,
+       "stage": "VALIDATION",
+       "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+       "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+       "checks": {
+        "mutation_type_matches_diagnosis": true,
+        "span_evidence_exists": "doi:10.5220/0015138800004103",
+        "span_verbatim_in_evidence": true,
+        "evidence_support": 0.462,
+        "evidence_support_cleared": 0.462,
+        "constraint_traceable_to_evidence": "\"parity protection must be implemented across all shared GPU nodes to prevent bit-flip corruption of KV-cache blocks\""
+       },
+       "reasons": [],
+       "validated_at": "2026-09-10T17:10:45+00:00Z"
+      },
+      "fields_changed": {
+       "mechanism": {
+        "before": "Bit-Flip Vulnerability of Shared KV-Cache Blocks in LLM Serving Systems",
+        "after": "Bit-Flip Vulnerability of Shared KV-Cache Blocks in LLM Serving Systems"
+       },
+       "intervention": {
+        "before": "Deploy redundant KV-cache storage with parity protection across shared GPU nodes",
+        "after": "Deploy redundant KV-cache storage with parity protection across shared GPU nodes to prevent data corruption from bit-flips"
+       },
+       "mechanism_source_span": {
+        "before": "Bit-Flip Vulnerability of Shared KV-Cache Blocks in LLM Serving Systems",
+        "after": "Bit-Flip Vulnerability of Shared KV-Cache Blocks in LLM Serving Systems"
+       }
+      },
+      "inherited_negatives": {
+       "uncertainty_ids": [
+        "con:verify:5fc42398",
+        "con:verify:fc690a03",
+        "cache shared inference serving cluster blocks",
+        "cache shared inference serving cluster blocks",
+        "shared cache blocks vulnerability bit flip",
+        "shared cache blocks vulnerability bit flip",
+        "cache shared gpu nodes redundant storage protection deploy",
+        "cache shared gpu nodes redundant storage protection deploy",
+        "cache integrity during increasing parity protection",
+        "cache integrity during increasing parity protection",
+        "maintain integrity without increasing data high",
+        "maintain integrity without increasing data high"
+       ],
+       "collision_family_ids": [],
+       "source_errors": []
+      },
+      "parent_spec_hash": "605b2a7812c2aae85daac9e7d22709f0312ddd813b157402ea357ea6218c0a39",
+      "child_spec_hash": null,
+      "reason": "This repair addresses the I1_MECHANISM_EVIDENCE_DERIVATION defect by re-anchoring the mechanism's technical vocabulary directly in the cited evidence's title and ensuring the intervention uses the same terminology as the source evidence.",
+      "applied_at": "2026-09-10T17:10:45+00:00Z"
+     },
+     "re_evaluation": {
+      "collision_mode": "REPLAY_CACHE",
+      "re_evaluated_at": "2026-09-10T17:10:45+00:00Z",
+      "re_adjudication": {
+       "mode": "REPLAY_CACHE",
+       "valid": false,
+       "reason": "NO_CACHED_FAMILIES"
+      },
+      "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+      "re_adjudication_failure": "NO_CACHED_FAMILIES",
+      "i_dimensions": {
+       "I1_MECHANISM_EVIDENCE_DERIVATION": {
+        "score": 0.462,
+        "state": "MEASURED"
+       },
+       "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_SURVIVORS"
+       },
+       "I3_RECOMBINATION_RISK": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_FAMILIES"
+       },
+       "I4_NEW_TECHNICAL_RELATIONSHIP": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+       },
+       "I5_EXPERIMENT_DISCRIMINATION": {
+        "score": 0.667,
+        "state": "MEASURED"
+       }
+      },
+      "i_flags": {
+       "underived_mechanism": false,
+       "recombination_only": false
+      },
+      "i_average": 0.565,
+      "q_dimensions": {
+       "Q1_EVIDENCE_BINDING": {
+        "score": 0.5,
+        "state": "MEASURED"
+       },
+       "Q2_PRIOR_ART_SPECIFICITY": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_PRIOR_ART"
+       },
+       "Q3_PRIOR_ART_RESOLUTION": {
+        "score": 0.0,
+        "state": "MEASURED"
+       },
+       "Q4_EXPERIMENT_DECISIVENESS": {
+        "score": 1.0,
+        "state": "MEASURED"
+       },
+       "Q5_CHAIN_COMPLETENESS": {
+        "score": 1.0,
+        "state": "MEASURED"
+       }
+      },
+      "q_average": 0.625
+     },
+     "decision": {
+      "action": "REJECT_MUTATION",
+      "improved": false,
+      "checks": {
+       "targeted_dimension": "0.545 -> 0.462 (no improvement)",
+       "negatives_preserved": true,
+       "no_new_structural_flags": true,
+       "no_unknown_conversion_without_new_evidence": true,
+       "text_gap_conversions_recorded": [],
+       "prior_art_position_not_degraded": true
+      },
+      "reasons": [],
+      "decided_at": "2026-09-10T17:10:45+00:00Z"
+     }
+    }
+   ],
+   "mutation_applied": {
+    "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+    "mutation_id": "mut:82cd0d3f6d38",
+    "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+    "diagnostic_trigger": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "measured_before": 0.545,
+     "basis": "R378 evaluator-contract diagnosis (deterministic)"
+    },
+    "proposal_provenance": {
+     "proposal_id": "prop:7fd709dea46d",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "5717cc47aad2c446124d7ad99afc6c4c96132552d939e0d01376c1ac84480a03",
+     "output_hash": "7fd709dea46d2e79ac6fc016b77ea4844c48fee5c37df9d7101ec55510f4c437",
+     "llm_is_untrusted_proposer": true
+    },
+    "validation": {
+     "valid": true,
+     "stage": "VALIDATION",
+     "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+     "checks": {
+      "mutation_type_matches_diagnosis": true,
+      "span_evidence_exists": "doi:10.5220/0015138800004103",
+      "span_verbatim_in_evidence": true,
+      "evidence_support": 0.429,
+      "evidence_support_cleared": 0.429,
+      "constraint_traceable_to_evidence": "Parity protection must be applied to all shared KV-cache blocks to prevent bit-flip induced corruption"
+     },
+     "reasons": [],
+     "validated_at": "2026-09-10T17:10:41+00:00Z"
+    },
+    "fields_changed": {
+     "mechanism": {
+      "before": "Bit-Flip Vulnerability of Shared KV-Cache Blocks in LLM Serving Systems",
+      "after": "Bit-Flip Vulnerability of Shared KV-Cache Blocks in LLM Serving Systems"
+     },
+     "intervention": {
+      "before": "Deploy redundant KV-cache storage with parity protection across shared GPU nodes",
+      "after": "Deploy redundant KV-cache storage with parity protection across shared GPU nodes to prevent bit-flip induced corruption"
+     },
+     "mechanism_source_span": {
+      "before": "Bit-Flip Vulnerability of Shared KV-Cache Blocks in LLM Serving Systems",
+      "after": "Bit-Flip Vulnerability of Shared KV-Cache Blocks in LLM Serving Systems"
+     }
+    },
+    "inherited_negatives": {
+     "uncertainty_ids": [
+      "con:verify:5fc42398",
+      "con:verify:fc690a03",
+      "cache shared inference serving cluster blocks",
+      "cache shared inference serving cluster blocks",
+      "shared cache blocks vulnerability bit flip",
+      "shared cache blocks vulnerability bit flip",
+      "cache shared gpu nodes redundant storage protection deploy",
+      "cache shared gpu nodes redundant storage protection deploy",
+      "cache integrity during increasing parity protection",
+      "cache integrity during increasing parity protection",
+      "maintain integrity without increasing data high",
+      "maintain integrity without increasing data high"
+     ],
+     "collision_family_ids": [],
+     "source_errors": []
+    },
+    "parent_spec_hash": "605b2a7812c2aae85daac9e7d22709f0312ddd813b157402ea357ea6218c0a39",
+    "child_spec_hash": null,
+    "reason": "Repairs I1_MECHANISM_EVIDENCE_DERIVATION weakness by anchoring mechanism in actual evidence text and deriving constraint from verbatim span",
+    "applied_at": "2026-09-10T17:10:41+00:00Z"
+   },
+   "re_evaluation": {
+    "collision_mode": "REPLAY_CACHE",
+    "re_evaluated_at": "2026-09-10T17:10:45+00:00Z",
+    "re_adjudication": {
+     "mode": "REPLAY_CACHE",
+     "valid": false,
+     "reason": "NO_CACHED_FAMILIES"
+    },
+    "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+    "re_adjudication_failure": "NO_CACHED_FAMILIES",
+    "i_dimensions": {
+     "I1_MECHANISM_EVIDENCE_DERIVATION": {
+      "score": 0.462,
+      "state": "MEASURED"
+     },
+     "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_SURVIVORS"
+     },
+     "I3_RECOMBINATION_RISK": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_FAMILIES"
+     },
+     "I4_NEW_TECHNICAL_RELATIONSHIP": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+     },
+     "I5_EXPERIMENT_DISCRIMINATION": {
+      "score": 0.667,
+      "state": "MEASURED"
+     }
+    },
+    "i_flags": {
+     "underived_mechanism": false,
+     "recombination_only": false
+    },
+    "i_average": 0.565,
+    "q_dimensions": {
+     "Q1_EVIDENCE_BINDING": {
+      "score": 0.5,
+      "state": "MEASURED"
+     },
+     "Q2_PRIOR_ART_SPECIFICITY": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_PRIOR_ART"
+     },
+     "Q3_PRIOR_ART_RESOLUTION": {
+      "score": 0.0,
+      "state": "MEASURED"
+     },
+     "Q4_EXPERIMENT_DECISIVENESS": {
+      "score": 1.0,
+      "state": "MEASURED"
+     },
+     "Q5_CHAIN_COMPLETENESS": {
+      "score": 1.0,
+      "state": "MEASURED"
+     }
+    },
+    "q_average": 0.625
+   },
+   "decision": {
+    "action": "REJECT_MUTATION",
+    "improved": false,
+    "checks": {
+     "targeted_dimension": "0.545 -> 0.462 (no improvement)",
+     "negatives_preserved": true,
+     "no_new_structural_flags": true,
+     "no_unknown_conversion_without_new_evidence": true,
+     "text_gap_conversions_recorded": [],
+     "prior_art_position_not_degraded": true
+    },
+    "reasons": [],
+    "decided_at": "2026-09-10T17:10:45+00:00Z"
+   }
+  }
+ ],
+ "outcome": "KILLED_NO_IMPROVING_MUTATION",
+ "outcome_reason": "iteration 2: 2 validated EVIDENCE_DERIVED_CONSTRAINT mutation(s) were applied and fully re-evaluated; the targeted dimension I1_MECHANISM_EVIDENCE_DERIVATION did not improve (0.545 -> 0.429 (no improvement); 0.545 -> 0.462 (no improvement)); no invariant violated. No defensible improvement exists. Candidate killed.",
+ "baseline": {
+  "i_dimensions": {
+   "I1_MECHANISM_EVIDENCE_DERIVATION": {
+    "score": 0.5,
+    "state": "MEASURED"
+   },
+   "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_SURVIVORS"
+   },
+   "I3_RECOMBINATION_RISK": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_FAMILIES"
+   },
+   "I4_NEW_TECHNICAL_RELATIONSHIP": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+   },
+   "I5_EXPERIMENT_DISCRIMINATION": {
+    "score": 0.667,
+    "state": "MEASURED"
+   }
+  },
+  "i_flags": {
+   "underived_mechanism": false,
+   "recombination_only": false
+  },
+  "i_average": 0.584,
+  "q_dimensions": {
+   "Q1_EVIDENCE_BINDING": {
+    "score": 0.5,
+    "state": "MEASURED"
+   },
+   "Q2_PRIOR_ART_SPECIFICITY": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_PRIOR_ART"
+   },
+   "Q3_PRIOR_ART_RESOLUTION": {
+    "score": 0.0,
+    "state": "MEASURED"
+   },
+   "Q4_EXPERIMENT_DECISIVENESS": {
+    "score": 1.0,
+    "state": "MEASURED"
+   },
+   "Q5_CHAIN_COMPLETENESS": {
+    "score": 1.0,
+    "state": "MEASURED"
+   }
+  },
+  "q_average": 0.625,
+  "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE"
+ },
+ "final": {
+  "i_dimensions": {
+   "I1_MECHANISM_EVIDENCE_DERIVATION": {
+    "score": 0.545,
+    "state": "MEASURED"
+   },
+   "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_SURVIVORS"
+   },
+   "I3_RECOMBINATION_RISK": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_FAMILIES"
+   },
+   "I4_NEW_TECHNICAL_RELATIONSHIP": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+   },
+   "I5_EXPERIMENT_DISCRIMINATION": {
+    "score": 0.667,
+    "state": "MEASURED"
+   }
+  },
+  "i_flags": {
+   "underived_mechanism": false,
+   "recombination_only": false
+  },
+  "i_average": 0.606,
+  "q_dimensions": {
+   "Q1_EVIDENCE_BINDING": {
+    "score": 0.5,
+    "state": "MEASURED"
+   },
+   "Q2_PRIOR_ART_SPECIFICITY": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_PRIOR_ART"
+   },
+   "Q3_PRIOR_ART_RESOLUTION": {
+    "score": 0.0,
+    "state": "MEASURED"
+   },
+   "Q4_EXPERIMENT_DECISIVENESS": {
+    "score": 1.0,
+    "state": "MEASURED"
+   },
+   "Q5_CHAIN_COMPLETENESS": {
+    "score": 1.0,
+    "state": "MEASURED"
+   }
+  },
+  "q_average": 0.625,
+  "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE"
+ },
+ "finished_at": "2026-09-10T17:10:48+00:00Z",
+ "outcome_summary": {
+  "baseline_i_average": 0.584,
+  "final_i_average": 0.606,
+  "baseline_q_average": 0.625,
+  "final_q_average": 0.625,
+  "iterations_run": 2,
+  "keeps": 1
+ },
+ "status": "KILLED_NO_IMPROVING_MUTATION"
+}

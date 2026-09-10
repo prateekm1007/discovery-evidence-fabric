@@ -1,0 +1,79 @@
+{
+ "attack_version": "independent_attack/1.0.0",
+ "candidate_id": "cand:DIV:mechanism_inversion:zai:8e56cf7e5b6b",
+ "generator_provider": null,
+ "attacker_provider": "zai",
+ "attacker_model": "glm-4-plus",
+ "independence_mode": "SEPARATE_CONTEXT",
+ "independence_note": "the attacker ran in an independent reasoning context (fresh adversarial conversation, generator reasoning never shown; no alternative provider credentialed — disclosed, never claimed as provider separation)",
+ "prompt_hash": "4db2fae3a6a3018acc32f376c4c69dbcd8d141ea709d7cb108734b9b79ddea24",
+ "output_hash": "11ea0afaf4ba86be64d0c897969f9887e8762a8cec9c73896329ac6b7ef01f80",
+ "llm_status": "OK",
+ "attacked_at": "2026-09-10T16:51:43+00:00Z",
+ "items": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "verdict": "KILL",
+   "basis": "The mechanism fails to address the core issue of proxy reward exploitation, as force feedback during demonstration collection doesn't prevent the policy from still relying on grasp-detector confidence during execution, evidenced by the fact that the failure occurs during deployment, not demonstration."
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "verdict": "KILL",
+   "basis": "No boundary conditions are specified, making it impossible to determine if the solution would work only for specific object types, weights, or environments, leaving critical operational parameters undefined."
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "verdict": "KILL",
+   "basis": "The evidence bundle contains studies on PPO-based reinforcement learning and warehouse implementations but lacks any specific evidence demonstrating that force feedback during teleoperation actually prevents proxy reward exploitation in novel object scenarios."
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "verdict": "KILL",
+   "basis": "The proposed intervention doesn't alter the fundamental architecture of the PPO policy or its reward structure, so the policy will continue to exploit the grasp-detector confidence proxy when faced with novel objects, maintaining equivalence with the baseline failure mode."
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "verdict": "KILL",
+   "basis": "Integrating force feedback into existing teleoperation systems would require significant hardware modifications and recalibration of the entire manipulation cell, which is not addressed in the proposal and would likely be prohibitively expensive and complex."
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "verdict": "KILL",
+   "basis": "The testable prediction compares placement success rates but fails to specify how it will distinguish between successful placements achieved through proper manipulation versus those still exploiting the proxy reward, making the measurement insufficient to validate the solution."
+  }
+ ],
+ "state": "ATTACK_RUN",
+ "overall": "KILLED",
+ "kill_basis": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "basis": "The mechanism fails to address the core issue of proxy reward exploitation, as force feedback during demonstration collection doesn't prevent the policy from still relying on grasp-detector confidence during execution, evidenced by the fact that the failure occurs during deployment, not demonstration."
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "basis": "No boundary conditions are specified, making it impossible to determine if the solution would work only for specific object types, weights, or environments, leaving critical operational parameters undefined."
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "basis": "The evidence bundle contains studies on PPO-based reinforcement learning and warehouse implementations but lacks any specific evidence demonstrating that force feedback during teleoperation actually prevents proxy reward exploitation in novel object scenarios."
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "basis": "The proposed intervention doesn't alter the fundamental architecture of the PPO policy or its reward structure, so the policy will continue to exploit the grasp-detector confidence proxy when faced with novel objects, maintaining equivalence with the baseline failure mode."
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "basis": "Integrating force feedback into existing teleoperation systems would require significant hardware modifications and recalibration of the entire manipulation cell, which is not addressed in the proposal and would likely be prohibitively expensive and complex."
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "basis": "The testable prediction compares placement success rates but fails to specify how it will distinguish between successful placements achieved through proper manipulation versus those still exploiting the proxy reward, making the measurement insufficient to validate the solution."
+  }
+ ],
+ "counts": {
+  "KILL": 6,
+  "RISK": 0,
+  "SURVIVE": 0,
+  "INVALID": 0
+ }
+}

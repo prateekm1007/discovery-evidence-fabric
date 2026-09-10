@@ -1,0 +1,218 @@
+{
+ "problem": {
+  "problem_id": "bench-x03-llm-kvcache-fragmentation",
+  "device": "LLM inference serving cluster with paged KV-cache on shared GPU nodes",
+  "failure_mode": "memory_fragmentation",
+  "domain": "software-ml-inference-infrastructure"
+ },
+ "problem_existence_result": "PREMISE_COHERENT",
+ "evidence": {
+  "retrieved_count": 12,
+  "custody_records": 12,
+  "classification_counts": {
+   "DIRECT_SUPPORT": 10,
+   "PARTIAL_SUPPORT": 1,
+   "BACKGROUND": 1,
+   "ANALOGY": 0,
+   "CONTRADICTORY": 0,
+   "IRRELEVANT": 0
+  },
+  "support_rate": 0.917,
+  "contradiction_rate": 0.0
+ },
+ "mechanism_generated": {
+  "synthesis_intervention": "Implement bit-flip detection and correction mechanisms for shared KV-cache blocks during mixed-length request processing",
+  "synthesis_mechanism": "Bit-Flip Vulnerability of Shared KV-Cache Blocks in LLM Serving Systems",
+  "mechanism_space_candidates": 4,
+  "n_candidates_generated": 4
+ },
+ "distinctness_result": {
+  "n_materially_distinct": 4,
+  "material_distinctness_rate": 1.0
+ },
+ "attack_result": {
+  "adversarial_overall": "NOT_RUN",
+  "attack_survival": 10
+ },
+ "evolution_result": {
+  "n_generations": 2,
+  "stop_reason": "SURVIVOR_REACHED",
+  "survivor_reached": true,
+  "generations": [
+   {
+    "gen": 1,
+    "origin": "BASELINE_SYNTHESIS",
+    "state": "INVENTION_EVOLVED",
+    "maturity": "GENERATED",
+    "challenge": {
+     "physics_lifecycle": "MECHANISM_NOT_SIMULATABLE",
+     "attack_overall": "NOT_RUN",
+     "evidence_verified": false,
+     "killed": true,
+     "kill_reason": "evidence verification failed: missing_source_span; mechanism_span_not_verbatim",
+     "final_status": "REJECTED"
+    },
+    "diagnosed_failure_cause": "UNDETERMINED",
+    "diagnosed_failure_basis": [
+     "generation challenge.kill_stage=UNKNOWN"
+    ],
+    "causal_delta": null,
+    "mechanism": "Bit-Flip Vulnerability of Shared KV-Cache Blocks in LLM Serving Systems",
+    "intervention": "Implement bit-flip detection and correction mechanisms for shared KV-cache blocks during mixed-length request processing",
+    "predicted_effect": "Prevent silent data corruption in KV-cache blocks that cause live-token evictions and re-computation, maintaining p99 first-token latency below 800ms during traffic peaks"
+   },
+   {
+    "gen": 2,
+    "origin": "EVOLUTION_CAUSAL_DELTA",
+    "state": "INVENTION_REQUIRES_EXPERIMENT",
+    "maturity": "GENERATED",
+    "challenge": {
+     "physics_lifecycle": "MECHANISM_NOT_SIMULATABLE",
+     "attack_overall": "SURVIVED_WITH_UNCERTAINTIES",
+     "independent_attack": "ESCALATED_OBJECTION",
+     "escalated_objection": {
+      "preserved_objections": [
+       {
+        "attack_class": "MECHANISM_FAILURE",
+        "basis": "The black-box model checking approach cannot realistically model all possible bit-flip scenarios in a paged KV-cache system with the required precision, as evidenced by [doi:10.5220/0015138800004103] which demonstrates that bit-flip vulnerabilities in shared KV-cache blocks are highly dependent on specific hardware implementations and memory access patterns that cannot be fully captured without source code access."
+       },
+       {
+        "attack_class": "BOUNDARY_CONDITION_FAILURE",
+        "basis": "The candidate fails to address boundary conditions where mixed-length bursty requests cause fragmentation in paged KV-cache blocks, which directly contradicts the problem statement and the evidence in [doi:10.1109/icassp55912.2026.11461518] showing that dynamic cross-GPU KV cache offloading is necessary to handle these scenarios."
+       },
+       {
+        "attack_class": "EVIDENCE_CONTRADICTION",
+        "basis": "The candidate's claim of 99.999% verification coverage directly contradicts the evidence in [doi:10.70675/036b4171z0acfz4a50z9d51z481b92e5f4da] which establishes fundamental limits of shared-cache networks that make perfect verification coverage mathematically impossible."
+       },
+       {
+        "attack_class": "BASELINE_EQUIVALENCE",
+        "basis": "The intervention does not address the core failure mode of live-token evictions and re-computation during traffic peaks, meaning it will not beat the baseline in tail latency performance, as confirmed by [doi:10.5463/thesis.308] which identifies latency-critical inference serving challenges that require more than just verification."
+       },
+       {
+        "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+        "basis": "Implementing a verification layer that models KV-cache behavior mathematically without source code access is impossible given the complexity of GPU memory management and the evidence in [doi:10.14711/thesis-hdl152583] showing that resource-efficient model serving in multi-tenant GPU clusters requires deep integration with the memory management system."
+       },
+       {
+        "attack_class": "MEASUREMENT_AMBIGUITY",
+        "basis": "The testable prediction of a \"verification coverage gap test\" is ambiguous because it cannot definitively identify all possible bit-flip scenarios that might occur in a real-world GPU cluster, as evidenced by the fundamental limits established in [doi:10.70675/036b4171z0acfz4a50z9d51z481b92e5f4da]."
+       }
+      ],
+      "calibration_state": "NOT_CALIBRATED",
+      "measured": {
+       "coverage": 1.0,
+       "parse_completeness": 1.0,
+       "tpr_scoped": 1.0,
+       "fpr_known_good": 1.0,
+       "n_cases_attacked": 40
+      },
+      "note": "the independent attack KILLED this architecture, but the instrument is measured NOT_CALIBRATED (FPR 1.0 on sealed known-good mechanisms): the objection is preserved and escalated, not executed (Art. L)"
+     },
+     "killed": false,
+     "survived": true
+    },
+    "diagnosed_failure_cause": null,
+    "diagnosed_failure_basis": null,
+    "causal_delta": {
+     "failure_or_challenge": "evidence verification failed: missing_source_span; mechanism_span_not_verbatim",
+     "diagnosed_cause": "UNDETERMINED",
+     "causal_change": "Replaced source-code-dependent verification with formal mathematical modeling of KV-cache behavior",
+     "new_capability": "Black-box verification of cache integrity without source code dependencies",
+     "new_interaction": "Mathematical modeling of cache behavior combined with exhaustive scenario testing",
+     "new_operating_regime": "Formal verification regime where cache integrity is mathematically proven rather than empirically tested",
+     "predicted_effect": "Verification coverage increases from undetermined to >99.999% while maintaining latency targets",
+     "frontier_capability": "Formal verification methods from aerospace and critical systems engineering",
+     "thirty_year_engine": {
+      "current": "Shared KV-cache blocks with bit-flip vulnerability during mixed-length request processing",
+      "evolution_2055": "Quantum-resistant error correction codes integrated at the hardware level with predictive failure analysis",
+      "required_capability": "Deterministic verification of error correction mechanisms without source code dependencies",
+      "capability_backcast": "2045: Hardware-level verification frameworks; 2035: Formal verification tools for error correction; 2025: Automated verification without source access",
+      "todays_frontier": "Formal verification techniques from aerospace and critical systems engineering",
+      "transfer": "Aerospace industry's formal methods that verify system properties without requiring source code access through black-box testing and model checking"
+     },
+     "provenance": "AI_PROPOSED (the 30-year walk and the frontier transfer are generated reasoning, not retrieved evidence \u2014 they must survive the re-evaluation gauntlet like every other generated claim)"
+    },
+    "mechanism": "Formal verification of KV-cache integrity using black-box model checking",
+    "intervention": "Implement a verification layer that models KV-cache behavior mathematically and tests for all possible bit-flip scenarios without requiring source code access",
+    "predicted_effect": "Achieve 99.999% verification coverage of KV-cache corruption scenarios while maintaining p99 first-token latency below 800ms during traffic peaks"
+   }
+  ]
+ },
+ "engineering_realization": {
+  "engineering_specification_present": true,
+  "technology_class": null,
+  "subsystems_present": false,
+  "cad_ledgers": [
+   "CAD_PIPELINE_LEDGER_gen-2.json"
+  ],
+  "canonical_glbs": []
+ },
+ "experiment_state": {
+  "decisive_experiment_selected": true,
+  "selected_experiment": "falsification_test_from_candidate",
+  "killer_experiment_options": 0,
+  "falsification_test_present": true
+ },
+ "final_epistemic_state": {
+  "final_status": "EVOLVED_INVENTION_CANDIDATE",
+  "epistemic_state": "OBSERVED",
+  "reason": "an evolved architecture generation survived the re-evaluation gauntlet (2 generations, causal delta recorded); the decisive physical experiment is specified, not executed",
+  "evidence_verified": false,
+  "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+  "adjudication_verdict": "CONTESTED"
+ },
+ "failure_class": null,
+ "time": {
+  "runtime_s": 539.6
+ },
+ "cost": {
+  "gateway_calls_delta": 0,
+  "note": "call count from the gateway JSONL log; token counts are recorded where the upstream transport returns them (zai gateway logs usage when available)"
+ },
+ "frozen_metric_sheet": {
+  "n_candidates_generated": 4,
+  "n_materially_distinct": 4,
+  "material_distinctness_rate": 1.0,
+  "n_testable_predictions": 4,
+  "testable_prediction_rate": 1.0,
+  "evidence_counts": {
+   "DIRECT_SUPPORT": 10,
+   "PARTIAL_SUPPORT": 1,
+   "BACKGROUND": 1,
+   "ANALOGY": 0,
+   "CONTRADICTORY": 0,
+   "IRRELEVANT": 0
+  },
+  "evidence_n_items": 12,
+  "evidence_support_rate": 0.917,
+  "contradiction_rate": 0.0,
+  "run_level_evidence_supported": true,
+  "md_est_count": 4,
+  "md_est_threshold_pass": true,
+  "cad_rate": 2.5,
+  "physics_beats_baseline": 0,
+  "attack_survival": 10,
+  "final_status": "EVOLVED_INVENTION_CANDIDATE",
+  "final_reason": "an evolved architecture generation survived the re-evaluation gauntlet (2 generations, causal delta recorded); the decisive physical experiment is specified, not executed",
+  "runtime_s": 539.6,
+  "dedup_kept_ids": [
+   "cand:MS:DIRECT_TRANSFER:9e8d46e72516",
+   "cand:MS:DIRECT_TRANSFER:3362833d8267",
+   "cand:MS:FAILURE_PATH_INVERSION:e470972039a0",
+   "cand:MS:FAILURE_PATH_INVERSION:f94d0d31f122"
+  ],
+  "mechanism_level_support": {
+   "cand:MS:DIRECT_TRANSFER:9e8d46e72516": "SUPPORTED",
+   "cand:MS:DIRECT_TRANSFER:3362833d8267": "SUPPORTED",
+   "cand:MS:FAILURE_PATH_INVERSION:e470972039a0": "SUPPORTED",
+   "cand:MS:FAILURE_PATH_INVERSION:f94d0d31f122": "SUPPORTED"
+  },
+  "problem": {
+   "problem_id": "bench-x03-llm-kvcache-fragmentation",
+   "device": "LLM inference serving cluster with paged KV-cache on shared GPU nodes",
+   "failure_mode": "memory_fragmentation",
+   "domain": "software-ml-inference-infrastructure"
+  },
+  "returncode": 0,
+  "resumed": false
+ }
+}

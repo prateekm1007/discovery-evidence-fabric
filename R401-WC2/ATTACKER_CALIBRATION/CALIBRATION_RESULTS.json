@@ -1,0 +1,783 @@
+{
+ "report_version": "r401wc2-attacker-calibration/1.0.0",
+ "measured_at": "2026-09-10T17:32:11Z",
+ "corpus": "R401-WC2/ATTACKER_CALIBRATION/CORPUS.json",
+ "n_cases": 16,
+ "n_seeded": 12,
+ "n_controls": 4,
+ "confusion_matrix_by_category": {
+  "MECHANISM_FAILURE": {
+   "n_seeded": 2,
+   "detected_kill": 2,
+   "detected_risk": 0,
+   "missed": 0,
+   "localization_miss": 0,
+   "transport_incomplete": 0
+  },
+  "BOUNDARY_CONDITION_FAILURE": {
+   "n_seeded": 2,
+   "detected_kill": 2,
+   "detected_risk": 0,
+   "missed": 0,
+   "localization_miss": 0,
+   "transport_incomplete": 0
+  },
+  "EVIDENCE_CONTRADICTION": {
+   "n_seeded": 2,
+   "detected_kill": 2,
+   "detected_risk": 0,
+   "missed": 0,
+   "localization_miss": 0,
+   "transport_incomplete": 0
+  },
+  "BASELINE_EQUIVALENCE": {
+   "n_seeded": 2,
+   "detected_kill": 2,
+   "detected_risk": 0,
+   "missed": 0,
+   "localization_miss": 0,
+   "transport_incomplete": 0
+  },
+  "IMPLEMENTATION_IMPOSSIBILITY": {
+   "n_seeded": 2,
+   "detected_kill": 2,
+   "detected_risk": 0,
+   "missed": 0,
+   "localization_miss": 0,
+   "transport_incomplete": 0
+  },
+  "MEASUREMENT_AMBIGUITY": {
+   "n_seeded": 2,
+   "detected_kill": 2,
+   "detected_risk": 0,
+   "missed": 0,
+   "localization_miss": 0,
+   "transport_incomplete": 0
+  }
+ },
+ "specificity": {
+  "n_controls": 4,
+  "clean_survived": 0,
+  "false_kills": [
+   "cal-13-clean-vane-quantified",
+   "cal-14-clean-coalescer-quantified",
+   "cal-15-clean-drain-failsafe",
+   "cal-16-clean-staged-separator"
+  ]
+ },
+ "per_case": [
+  {
+   "case_id": "cal-01-mechanism-failure-electrostatic",
+   "control": false,
+   "seed_class": "MECHANISM_FAILURE",
+   "overall": "KILLED",
+   "state": "ATTACK_RUN",
+   "independence_mode": "SEPARATE_CONTEXT",
+   "attacker_provider": "zai",
+   "verdicts": {
+    "MECHANISM_FAILURE": "KILL",
+    "BOUNDARY_CONDITION_FAILURE": "KILL",
+    "EVIDENCE_CONTRADICTION": "KILL",
+    "BASELINE_EQUIVALENCE": "INVALID",
+    "IMPLEMENTATION_IMPOSSIBILITY": "KILL",
+    "MEASUREMENT_AMBIGUITY": "KILL"
+   },
+   "kill_bases": [
+    {
+     "attack_class": "MECHANISM_FAILURE",
+     "basis": "Electrostatic attraction between charged water droplets and grounded media is fundamentally unreliable in high-flow compressed air systems due to droplet re-entrainment from turbulent flow at 5 m3/h, which would overwhelm any electrostatic capture force"
+    },
+    {
+     "attack_class": "BOUNDARY_CONDITION_FAILURE",
+     "basis": "The claimed 3 C dew point at 8 bar and 20 C inlet is thermodynamically impossible without refrigeration or desiccant, violating basic psychrometric principles for compressed air systems"
+    },
+    {
+     "attack_class": "EVIDENCE_CONTRADICTION",
+     "basis": "The candidate provides no evidence to support the claimed performance, making the prediction entirely speculative without any empirical validation"
+    },
+    {
+     "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+     "basis": "A 12 V bias electrode in a compressed air stream at 8 bar creates an explosive hazard in an industrial environment, violating basic electrical safety standards"
+    },
+    {
+     "attack_class": "MEASUREMENT_AMBIGUITY",
+     "basis": "The prediction fails to specify measurement methodology, pressure drop across the device, or energy consumption, making the claim unverifiable and practically meaningless"
+    }
+   ],
+   "outcome": "DETECTED_KILL"
+  },
+  {
+   "case_id": "cal-02-mechanism-failure-capillary-direction",
+   "control": false,
+   "seed_class": "MECHANISM_FAILURE",
+   "overall": "KILLED",
+   "state": "ATTACK_RUN",
+   "independence_mode": "SEPARATE_CONTEXT",
+   "attacker_provider": "zai",
+   "verdicts": {
+    "MECHANISM_FAILURE": "KILL",
+    "BOUNDARY_CONDITION_FAILURE": "KILL",
+    "EVIDENCE_CONTRADICTION": "KILL",
+    "BASELINE_EQUIVALENCE": "KILL",
+    "IMPLEMENTATION_IMPOSSIBILITY": "KILL",
+    "MEASUREMENT_AMBIGUITY": "KILL"
+   },
+   "kill_bases": [
+    {
+     "attack_class": "MECHANISM_FAILURE",
+     "basis": "Capillary wicking through a hydrophilic felt sleeve cannot reliably draw liquid water radially outward against the centrifugal forces generated in a vortex separator at 8 bar and 5 m3/h flow rate"
+    },
+    {
+     "attack_class": "BOUNDARY_CONDITION_FAILURE",
+     "basis": "The claimed dew point maintenance at 3 C equivalent during 30-second demand cycling is impossible given the documented 2 g/min liquid carryover baseline without considering the felt's saturation time and drainage capacity under surge conditions"
+    },
+    {
+     "attack_class": "EVIDENCE_CONTRADICTION",
+     "basis": "The candidate provides zero evidence to support the claim that felt sleeve pore size (10-80 micrometers) can effectively separate water at the specified conditions while preventing oil blinding"
+    },
+    {
+     "attack_class": "BASELINE_EQUIVALENCE",
+     "basis": "The candidate fails to demonstrate any improvement over the baseline, as the testable prediction of zero carryover during 30-second surges is unsubstantiated and ignores the known failure mode of oil contamination"
+    },
+    {
+     "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+     "basis": "A hydrophilic felt sleeve cannot be manufactured and installed in a 1/2 inch line at 8 bar pressure without compromising structural integrity or creating unacceptable pressure drop"
+    },
+    {
+     "attack_class": "MEASUREMENT_AMBIGUITY",
+     "basis": "The candidate provides no method to measure actual liquid carryover versus the claimed zero carryover, making the testable prediction unverifiable and scientifically meaningless"
+    }
+   ],
+   "outcome": "DETECTED_KILL"
+  },
+  {
+   "case_id": "cal-03-boundary-laminar-claimed",
+   "control": false,
+   "seed_class": "BOUNDARY_CONDITION_FAILURE",
+   "overall": "KILLED",
+   "state": "ATTACK_RUN",
+   "independence_mode": "SEPARATE_CONTEXT",
+   "attacker_provider": "zai",
+   "verdicts": {
+    "MECHANISM_FAILURE": "KILL",
+    "BOUNDARY_CONDITION_FAILURE": "KILL",
+    "EVIDENCE_CONTRADICTION": "KILL",
+    "BASELINE_EQUIVALENCE": "INVALID",
+    "IMPLEMENTATION_IMPOSSIBILITY": "KILL",
+    "MEASUREMENT_AMBIGUITY": "KILL"
+   },
+   "kill_bases": [
+    {
+     "attack_class": "MECHANISM_FAILURE",
+     "basis": "Laminar boundary-layer interception cannot effectively capture droplets below 10 micrometers at 8 bar pressure; the claimed 1 micrometer removal is physically impossible without inertial impaction or coalescence mechanisms"
+    },
+    {
+     "attack_class": "BOUNDARY_CONDITION_FAILURE",
+     "basis": "At 8 bar pressure and 20\u00b0C inlet temperature, the actual dew point would be significantly higher than 3\u00b0C equivalent due to compression heating, violating the fundamental thermodynamic principles assumed in the prediction"
+    },
+    {
+     "attack_class": "EVIDENCE_CONTRADICTION",
+     "basis": "The candidate provides no empirical evidence or test data to support the claimed 99% removal efficiency for droplets above 1 micrometer, making this an unsubstantiated assertion"
+    },
+    {
+     "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+     "basis": "Manufacturing 40 precisely spaced vanes with 0.5 mm gaps at industrial scale would be prohibitively expensive and mechanically fragile, especially in the harsh environment of compressed air systems"
+    },
+    {
+     "attack_class": "MEASUREMENT_AMBIGUITY",
+     "basis": "The prediction fails to specify measurement methodology, sampling location, or time duration for the gravimetric droplet-size distribution test, making the claim unverifiable and meaningless"
+    }
+   ],
+   "outcome": "DETECTED_KILL"
+  },
+  {
+   "case_id": "cal-04-boundary-pressure-outside",
+   "control": false,
+   "seed_class": "BOUNDARY_CONDITION_FAILURE",
+   "overall": "KILLED",
+   "state": "ATTACK_RUN",
+   "independence_mode": "SEPARATE_CONTEXT",
+   "attacker_provider": "zai",
+   "verdicts": {
+    "MECHANISM_FAILURE": "KILL",
+    "BOUNDARY_CONDITION_FAILURE": "KILL",
+    "EVIDENCE_CONTRADICTION": "KILL",
+    "BASELINE_EQUIVALENCE": "KILL",
+    "IMPLEMENTATION_IMPOSSIBILITY": "KILL",
+    "MEASUREMENT_AMBIGUITY": "KILL"
+   },
+   "kill_bases": [
+    {
+     "attack_class": "MECHANISM_FAILURE",
+     "basis": "Flash-evaporation condensation traps require precise temperature differentials that cannot be maintained during high-demand cycling when inlet flow rates fluctuate, leading to inconsistent condensation performance"
+    },
+    {
+     "attack_class": "BOUNDARY_CONDITION_FAILURE",
+     "basis": "The claimed 3\u00b0C dew point at 2 bar is thermodynamically impossible without refrigeration or desiccant, violating the first law of thermodynamics for an adiabatic expansion process"
+    },
+    {
+     "attack_class": "EVIDENCE_CONTRADICTION",
+     "basis": "The candidate admits to a known failure mode of freeze-up in winter conditions, directly contradicting the reliability claims for the intended operating environment"
+    },
+    {
+     "attack_class": "BASELINE_EQUIVALENCE",
+     "basis": "The predicted effect of 3\u00b0C dew point is significantly worse than commercial separators that achieve dew points of -20\u00b0C to -40\u00b0C using proven coalescing and desiccant technologies"
+    },
+    {
+     "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+     "basis": "An expansion pocket with 4x area ratio in a 1/2 inch line would require impractically large dimensions that cannot fit within standard industrial piping constraints"
+    },
+    {
+     "attack_class": "MEASUREMENT_AMBIGUITY",
+     "basis": "The prediction fails to specify measurement methodology, pressure drop across the device, or response time to flow transients, making the testable prediction unverifiable in real-world conditions"
+    }
+   ],
+   "outcome": "DETECTED_KILL"
+  },
+  {
+   "case_id": "cal-05-evidence-contradiction-humidity",
+   "control": false,
+   "seed_class": "EVIDENCE_CONTRADICTION",
+   "overall": "KILLED",
+   "state": "ATTACK_RUN",
+   "independence_mode": "SEPARATE_CONTEXT",
+   "attacker_provider": "zai",
+   "verdicts": {
+    "MECHANISM_FAILURE": "KILL",
+    "BOUNDARY_CONDITION_FAILURE": "RISK",
+    "EVIDENCE_CONTRADICTION": "KILL",
+    "BASELINE_EQUIVALENCE": "RISK",
+    "IMPLEMENTATION_IMPOSSIBILITY": "KILL",
+    "MEASUREMENT_AMBIGUITY": "RISK"
+   },
+   "kill_bases": [
+    {
+     "attack_class": "MECHANISM_FAILURE",
+     "basis": "The mechanism claims fiber swelling tightens pore structure to improve capture efficiency, but evidence [ev:swell-99] shows swelling-induced pore CLOSURE degrades capture, directly contradicting the core operating principle"
+    },
+    {
+     "attack_class": "EVIDENCE_CONTRADICTION",
+     "basis": "Evidence [ev:swell-99] explicitly states swelling-induced pore closure degrades performance, while the candidate claims the opposite effect without addressing this contradiction"
+    },
+    {
+     "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+     "basis": "The cartridge compaction failure mode over 2000 hours makes long-term operation impossible without frequent maintenance, violating the requirement for reliable inline operation"
+    }
+   ],
+   "outcome": "DETECTED_KILL"
+  },
+  {
+   "case_id": "cal-06-evidence-contradiction-valve",
+   "control": false,
+   "seed_class": "EVIDENCE_CONTRADICTION",
+   "overall": "KILLED",
+   "state": "ATTACK_RUN",
+   "independence_mode": "SEPARATE_CONTEXT",
+   "attacker_provider": "zai",
+   "verdicts": {
+    "MECHANISM_FAILURE": "KILL",
+    "BOUNDARY_CONDITION_FAILURE": "KILL",
+    "EVIDENCE_CONTRADICTION": "KILL",
+    "BASELINE_EQUIVALENCE": "KILL",
+    "IMPLEMENTATION_IMPOSSIBILITY": "KILL",
+    "MEASUREMENT_AMBIGUITY": "KILL"
+   },
+   "kill_bases": [
+    {
+     "attack_class": "MECHANISM_FAILURE",
+     "basis": "Magnetic latch fails when power loss occurs simultaneously with system pressure loss, as the magnetic latch requires residual system pressure to maintain sufficient force against the valve seat when power is lost"
+    },
+    {
+     "attack_class": "BOUNDARY_CONDITION_FAILURE",
+     "basis": "The claimed 8 bar boundary condition is violated during actual power loss events where system pressure may drop below the minimum required to maintain magnetic latch integrity"
+    },
+    {
+     "attack_class": "EVIDENCE_CONTRADICTION",
+     "basis": "Evidence [ev:valve-42] specifically documents loss of supply pressure as a failure mode for magnetically latched drain valves in compressed-air service, directly contradicting the candidate's prediction of reliable operation during power loss"
+    },
+    {
+     "attack_class": "BASELINE_EQUIVALENCE",
+     "basis": "The proposed solution introduces additional failure modes (magnetic demagnetization above 80\u00b0C, pressure dependency) not present in the baseline separator, making it less reliable than the status quo"
+    },
+    {
+     "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+     "basis": "The magnetic latch cannot maintain sufficient force against 8 bar pressure for 24 hours without power, as the required magnet strength would exceed practical limits for a 1/2 inch inline device"
+    },
+    {
+     "attack_class": "MEASUREMENT_AMBIGUITY",
+     "basis": "The testable prediction only checks valve position sensor readings, not actual sealing integrity against 8 bar pressure, allowing for false positives where the valve appears closed but cannot maintain seal under pressure"
+    }
+   ],
+   "outcome": "DETECTED_KILL"
+  },
+  {
+   "case_id": "cal-07-baseline-equivalence-pressure-drop",
+   "control": false,
+   "seed_class": "BASELINE_EQUIVALENCE",
+   "overall": "KILLED",
+   "state": "ATTACK_RUN",
+   "independence_mode": "SEPARATE_CONTEXT",
+   "attacker_provider": "zai",
+   "verdicts": {
+    "MECHANISM_FAILURE": "KILL",
+    "BOUNDARY_CONDITION_FAILURE": "KILL",
+    "EVIDENCE_CONTRADICTION": "KILL",
+    "BASELINE_EQUIVALENCE": "KILL",
+    "IMPLEMENTATION_IMPOSSIBILITY": "KILL",
+    "MEASUREMENT_AMBIGUITY": "KILL"
+   },
+   "kill_bases": [
+    {
+     "attack_class": "MECHANISM_FAILURE",
+     "basis": "The claimed improvement in droplet separation without increased flow resistance violates fundamental fluid dynamics principles; higher separation efficiency typically requires increased surface area or longer residence time, both of which increase pressure drop"
+    },
+    {
+     "attack_class": "BOUNDARY_CONDITION_FAILURE",
+     "basis": "The 8 bar pressure boundary is insufficiently addressed for erosion concerns; at this pressure, any particulate matter in the air stream will accelerate dramatically through the vanes, causing rapid erosion that would degrade performance far below the claimed 500-hour service interval"
+    },
+    {
+     "attack_class": "EVIDENCE_CONTRADICTION",
+     "basis": "The candidate provides no empirical evidence to support the 35 mbar pressure drop claim or the 30% reduction in wall deposits, making these predictions entirely unsubstantiated assertions"
+    },
+    {
+     "attack_class": "BASELINE_EQUIVALENCE",
+     "basis": "The testable prediction only claims to match the baseline separator's performance (12\u00b0C dew point) rather than improve it, offering no solution to the core problem of liquid water carryover during high-demand cycling"
+    },
+    {
+     "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+     "basis": "The helical vane pack with 22 stages cannot be practically manufactured at 1/2 inch diameter with the claimed 15-45 degree helix angle variation; the mechanical tolerances required would make production impossible with standard manufacturing techniques"
+    },
+    {
+     "attack_class": "MEASUREMENT_AMBIGUITY",
+     "basis": "The dew point measurement within 0.5 C is insufficiently precise to detect meaningful improvements in separation performance, especially during transient cycling conditions where the actual failure occurs"
+    }
+   ],
+   "outcome": "DETECTED_KILL"
+  },
+  {
+   "case_id": "cal-08-baseline-equivalence-residual",
+   "control": false,
+   "seed_class": "BASELINE_EQUIVALENCE",
+   "overall": "KILLED",
+   "state": "ATTACK_RUN",
+   "independence_mode": "SEPARATE_CONTEXT",
+   "attacker_provider": "zai",
+   "verdicts": {
+    "MECHANISM_FAILURE": "KILL",
+    "BOUNDARY_CONDITION_FAILURE": "KILL",
+    "EVIDENCE_CONTRADICTION": "KILL",
+    "BASELINE_EQUIVALENCE": "KILL",
+    "IMPLEMENTATION_IMPOSSIBILITY": "KILL",
+    "MEASUREMENT_AMBIGUITY": "KILL"
+   },
+   "kill_bases": [
+    {
+     "attack_class": "MECHANISM_FAILURE",
+     "basis": "The 75-micrometer mesh weave is too coarse for effective droplet interception at 8 bar pressure, allowing fine aerosolized water particles to pass through, which is the primary failure mode causing downstream flooding"
+    },
+    {
+     "attack_class": "BOUNDARY_CONDITION_FAILURE",
+     "basis": "At 8 bar operating pressure, the claimed 34 mbar pressure drop is implausible as it violates fundamental fluid dynamics principles for gas flow through mesh media at this pressure"
+    },
+    {
+     "attack_class": "EVIDENCE_CONTRADICTION",
+     "basis": "The candidate provides no empirical evidence to support the dew point prediction, making the entire claim unsubstantiated and contrary to engineering best practices"
+    },
+    {
+     "attack_class": "BASELINE_EQUIVALENCE",
+     "basis": "The prediction of outlet dew point \"within 0.5 C of the baseline\" indicates no improvement over existing technology, failing to address the core problem of liquid water carryover"
+    },
+    {
+     "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+     "basis": "The claimed 4-12 kg/m3 mesh weave density range is physically impossible to manufacture with consistent 75-micrometer weave geometry"
+    },
+    {
+     "attack_class": "MEASUREMENT_AMBIGUITY",
+     "basis": "The testable prediction lacks specification of measurement methodology, temperature control, and humidity conditioning, making validation impossible"
+    }
+   ],
+   "outcome": "DETECTED_KILL"
+  },
+  {
+   "case_id": "cal-09-implementation-pore-coating",
+   "control": false,
+   "seed_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "overall": "KILLED",
+   "state": "ATTACK_RUN",
+   "independence_mode": "SEPARATE_CONTEXT",
+   "attacker_provider": "zai",
+   "verdicts": {
+    "MECHANISM_FAILURE": "KILL",
+    "BOUNDARY_CONDITION_FAILURE": "KILL",
+    "EVIDENCE_CONTRADICTION": "KILL",
+    "BASELINE_EQUIVALENCE": "KILL",
+    "IMPLEMENTATION_IMPOSSIBILITY": "KILL",
+    "MEASUREMENT_AMBIGUITY": "KILL"
+   },
+   "kill_bases": [
+    {
+     "attack_class": "MECHANISM_FAILURE",
+     "basis": "No evidence demonstrates that a 5nm ALD titania coating on bronze pores significantly improves droplet wetting and drainage compared to uncoated bronze at 8 bar pressure"
+    },
+    {
+     "attack_class": "BOUNDARY_CONDITION_FAILURE",
+     "basis": "8 bar pressure and 5 m3/h flow rate will likely cause catastrophic coating delamination and pore blockage due to pressure cycling and flow turbulence"
+    },
+    {
+     "attack_class": "EVIDENCE_CONTRADICTION",
+     "basis": "The candidate provides zero evidence contradicting the known failure mode of coating abrasion by particulate in high-flow compressed air systems"
+    },
+    {
+     "attack_class": "BASELINE_EQUIVALENCE",
+     "basis": "The predicted dew point improvement from 12C to 3C equivalent lacks validation data and likely cannot be achieved with such a thin coating under actual operating conditions"
+    },
+    {
+     "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+     "basis": "Achieving uniform 5nm ALD coating across all internal pores of a sintered bronze element at commercial scale is technologically infeasible with current manufacturing methods"
+    },
+    {
+     "attack_class": "MEASUREMENT_AMBIGUITY",
+     "basis": "The testable prediction fails to specify temperature, humidity, and particulate load conditions during testing, making the dew point measurement unverifiable"
+    }
+   ],
+   "outcome": "DETECTED_KILL"
+  },
+  {
+   "case_id": "cal-10-implementation-acrylic-vessel",
+   "control": false,
+   "seed_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "overall": "KILLED",
+   "state": "ATTACK_RUN",
+   "independence_mode": "SEPARATE_CONTEXT",
+   "attacker_provider": "zai",
+   "verdicts": {
+    "MECHANISM_FAILURE": "KILL",
+    "BOUNDARY_CONDITION_FAILURE": "KILL",
+    "EVIDENCE_CONTRADICTION": "KILL",
+    "BASELINE_EQUIVALENCE": "KILL",
+    "IMPLEMENTATION_IMPOSSIBILITY": "KILL",
+    "MEASUREMENT_AMBIGUITY": "KILL"
+   },
+   "kill_bases": [
+    {
+     "attack_class": "MECHANISM_FAILURE",
+     "basis": "Direct visual observation requires human intervention which is not reliable for timely drain actuation during high-demand cycling when operators may be distracted or unavailable"
+    },
+    {
+     "attack_class": "BOUNDARY_CONDITION_FAILURE",
+     "basis": "The 16-bar proof test requirement exceeds the nominal 8-bar operating pressure by 100%, creating a safety concern where the bowl could catastrophically fail during testing or operation"
+    },
+    {
+     "attack_class": "EVIDENCE_CONTRADICTION",
+     "basis": "Candidate claims no evidence is held, making it impossible to verify the proposed effect of carryover elimination or validate the 10 of 10 survival prediction"
+    },
+    {
+     "attack_class": "BASELINE_EQUIVALENCE",
+     "basis": "The candidate relies on manual intervention (same-day drain actuation) which cannot match the automated, continuous operation of existing separators that don't require human monitoring"
+    },
+    {
+     "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+     "basis": "A 3-12 mm wall thickness range for acrylic at 16-bar pressure creates impossible manufacturing tolerances and structural integrity challenges"
+    },
+    {
+     "attack_class": "MEASUREMENT_AMBIGUITY",
+     "basis": "Optical condensate-level observation becomes unreliable during temperature fluctuations or with dirty bowl surfaces, making timely drain actuation unpredictable"
+    }
+   ],
+   "outcome": "DETECTED_KILL"
+  },
+  {
+   "case_id": "cal-11-measurement-unquantified",
+   "control": false,
+   "seed_class": "MEASUREMENT_AMBIGUITY",
+   "overall": "KILLED",
+   "state": "ATTACK_RUN",
+   "independence_mode": "SEPARATE_CONTEXT",
+   "attacker_provider": "zai",
+   "verdicts": {
+    "MECHANISM_FAILURE": "KILL",
+    "BOUNDARY_CONDITION_FAILURE": "KILL",
+    "EVIDENCE_CONTRADICTION": "KILL",
+    "BASELINE_EQUIVALENCE": "KILL",
+    "IMPLEMENTATION_IMPOSSIBILITY": "KILL",
+    "MEASUREMENT_AMBIGUITY": "KILL"
+   },
+   "kill_bases": [
+    {
+     "attack_class": "MECHANISM_FAILURE",
+     "basis": "The proposed mechanism of reducing droplet re-entrainment through optimized vane leading-edge radius lacks theoretical justification; fluid dynamics literature shows that rounded leading edges can actually increase re-entrainment at high velocities by creating stronger vortices"
+    },
+    {
+     "attack_class": "BOUNDARY_CONDITION_FAILURE",
+     "basis": "The candidate fails to address the critical boundary condition of high-demand cycling (implied in the problem statement), where flow velocities would spike and likely negate any benefit from the radius optimization"
+    },
+    {
+     "attack_class": "EVIDENCE_CONTRADICTION",
+     "basis": "The candidate provides no evidence whatsoever to support its claims, making all predictions completely unsubstantiated and contradictory to basic engineering principles which require empirical validation"
+    },
+    {
+     "attack_class": "BASELINE_EQUIVALENCE",
+     "basis": "Without comparative testing against the baseline, the candidate cannot establish any improvement over current separators, making it functionally equivalent to the status quo"
+    },
+    {
+     "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+     "basis": "A 0.4 mm leading-edge radius in a compressed air separator operating at 8 bar would be extremely vulnerable to manufacturing defects and particle contamination, making reliable production impossible"
+    },
+    {
+     "attack_class": "MEASUREMENT_AMBIGUITY",
+     "basis": "The testable prediction relies on subjective assessment of \"drier\" air downstream without specifying quantitative metrics, making verification impossible and rendering the entire claim meaningless"
+    }
+   ],
+   "outcome": "DETECTED_KILL"
+  },
+  {
+   "case_id": "cal-12-measurement-unmeasurable",
+   "control": false,
+   "seed_class": "MEASUREMENT_AMBIGUITY",
+   "overall": "KILLED",
+   "state": "ATTACK_RUN",
+   "independence_mode": "SEPARATE_CONTEXT",
+   "attacker_provider": "zai",
+   "verdicts": {
+    "MECHANISM_FAILURE": "KILL",
+    "BOUNDARY_CONDITION_FAILURE": "KILL",
+    "EVIDENCE_CONTRADICTION": "KILL",
+    "BASELINE_EQUIVALENCE": "KILL",
+    "IMPLEMENTATION_IMPOSSIBILITY": "KILL",
+    "MEASUREMENT_AMBIGUITY": "KILL"
+   },
+   "kill_bases": [
+    {
+     "attack_class": "MECHANISM_FAILURE",
+     "basis": "The claimed mechanism of capturing transient mist through a high-surface-area film strip fails to address the root cause of liquid water carryover during demand surges, as it provides no explanation for how captured moisture is removed from the system"
+    },
+    {
+     "attack_class": "BOUNDARY_CONDITION_FAILURE",
+     "basis": "The specified boundary conditions (8 bar, 5 m3/h) are insufficient for real-world operation where pressure fluctuations and variable flow rates would overwhelm the strip's capacity"
+    },
+    {
+     "attack_class": "EVIDENCE_CONTRADICTION",
+     "basis": "The candidate provides no evidence to support the claim that their film strip improves dew point measurement, making the entire proposal speculative and unverified"
+    },
+    {
+     "attack_class": "BASELINE_EQUIVALENCE",
+     "basis": "Without comparative testing data against the baseline separator, there is no evidence that this design performs better than the existing standard"
+    },
+    {
+     "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+     "basis": "The strip surface area range (0.02-0.3 m2) is too broad and undefined, making practical implementation impossible without specific engineering specifications"
+    },
+    {
+     "attack_class": "MEASUREMENT_AMBIGUITY",
+     "basis": "The prediction that dew point will read \"better\" under \"improved conditions\" is vague and lacks quantitative metrics, making it impossible to validate or falsify the claim"
+    }
+   ],
+   "outcome": "DETECTED_KILL"
+  },
+  {
+   "case_id": "cal-13-clean-vane-quantified",
+   "control": true,
+   "seed_class": null,
+   "overall": "KILLED",
+   "state": "ATTACK_RUN",
+   "independence_mode": "SEPARATE_CONTEXT",
+   "attacker_provider": "zai",
+   "verdicts": {
+    "MECHANISM_FAILURE": "KILL",
+    "BOUNDARY_CONDITION_FAILURE": "KILL",
+    "EVIDENCE_CONTRADICTION": "KILL",
+    "BASELINE_EQUIVALENCE": "KILL",
+    "IMPLEMENTATION_IMPOSSIBILITY": "KILL",
+    "MEASUREMENT_AMBIGUITY": "KILL"
+   },
+   "kill_bases": [
+    {
+     "attack_class": "MECHANISM_FAILURE",
+     "basis": "The claimed re-entrainment suppression in the quiescent zone is physically implausible at 8 bar pressure where droplet re-entrainment forces would overwhelm any passive design"
+    },
+    {
+     "attack_class": "BOUNDARY_CONDITION_FAILURE",
+     "basis": "No testing provided at the actual boundary condition of 8 bar, only theoretical predictions that cannot be validated without experimental data"
+    },
+    {
+     "attack_class": "EVIDENCE_CONTRADICTION",
+     "basis": "The candidate admits oil fouling is a known failure mode but provides no mitigation strategy, making the device unreliable in real-world compressed air systems"
+    },
+    {
+     "attack_class": "BASELINE_EQUIVALENCE",
+     "basis": "The predicted 3\u00b0C dew point improvement over baseline is unsubstantiated without comparative testing data against the actual cyclone baseline"
+    },
+    {
+     "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+     "basis": "The 1.2mm gaps between 12 stages would be impossible to manufacture and maintain at micron-scale precision in a commercial product"
+    },
+    {
+     "attack_class": "MEASUREMENT_AMBIGUITY",
+     "basis": "The \u00b11\u00b0C dew point measurement tolerance is too wide to prove meaningful improvement over baseline and masks potential device ineffectiveness"
+    }
+   ],
+   "outcome": "FALSE_KILL",
+   "false_killed_classes": [
+    "MECHANISM_FAILURE",
+    "BOUNDARY_CONDITION_FAILURE",
+    "EVIDENCE_CONTRADICTION",
+    "BASELINE_EQUIVALENCE",
+    "IMPLEMENTATION_IMPOSSIBILITY",
+    "MEASUREMENT_AMBIGUITY"
+   ]
+  },
+  {
+   "case_id": "cal-14-clean-coalescer-quantified",
+   "control": true,
+   "seed_class": null,
+   "overall": "KILLED",
+   "state": "ATTACK_RUN",
+   "independence_mode": "SEPARATE_CONTEXT",
+   "attacker_provider": "zai",
+   "verdicts": {
+    "MECHANISM_FAILURE": "KILL",
+    "BOUNDARY_CONDITION_FAILURE": "KILL",
+    "EVIDENCE_CONTRADICTION": "KILL",
+    "BASELINE_EQUIVALENCE": "KILL",
+    "IMPLEMENTATION_IMPOSSIBILITY": "KILL",
+    "MEASUREMENT_AMBIGUITY": "RISK"
+   },
+   "kill_bases": [
+    {
+     "attack_class": "MECHANISM_FAILURE",
+     "basis": "Borosilicate glass-fiber coalescing media cannot effectively merge sub-8-micrometer droplets at 8 bar pressure due to increased gas density reducing droplet collision efficiency, violating fundamental aerosol physics principles"
+    },
+    {
+     "attack_class": "BOUNDARY_CONDITION_FAILURE",
+     "basis": "The claimed 6-month media swap interval fails to account for oil-free air at 8 bar which will rapidly blind the glass fibers with atmospheric hydrocarbons and particulates, making the claimed maintenance interval impossible"
+    },
+    {
+     "attack_class": "EVIDENCE_CONTRADICTION",
+     "basis": "The candidate provides zero empirical data to support the predicted 0.5 mg/m3 outlet concentration, which contradicts the baseline 40 mg/m3 without any comparative testing"
+    },
+    {
+     "attack_class": "BASELINE_EQUIVALENCE",
+     "basis": "The predicted effect (0.5 mg/m3) offers only marginal improvement over baseline (40 mg/m3), insufficient to prevent flooding in downstream instruments during high-demand cycling"
+    },
+    {
+     "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+     "basis": "Layer-graded media (8 to 2 micrometers) cannot be manufactured with the claimed precision in borosilicate glass fibers at commercial scale due to material brittleness and inconsistent fiber diameters"
+    }
+   ],
+   "outcome": "FALSE_KILL",
+   "false_killed_classes": [
+    "MECHANISM_FAILURE",
+    "BOUNDARY_CONDITION_FAILURE",
+    "EVIDENCE_CONTRADICTION",
+    "BASELINE_EQUIVALENCE",
+    "IMPLEMENTATION_IMPOSSIBILITY"
+   ]
+  },
+  {
+   "case_id": "cal-15-clean-drain-failsafe",
+   "control": true,
+   "seed_class": null,
+   "overall": "KILLED",
+   "state": "ATTACK_RUN",
+   "independence_mode": "SEPARATE_CONTEXT",
+   "attacker_provider": "zai",
+   "verdicts": {
+    "MECHANISM_FAILURE": "KILL",
+    "BOUNDARY_CONDITION_FAILURE": "KILL",
+    "EVIDENCE_CONTRADICTION": "KILL",
+    "BASELINE_EQUIVALENCE": "KILL",
+    "IMPLEMENTATION_IMPOSSIBILITY": "KILL",
+    "MEASUREMENT_AMBIGUITY": "KILL"
+   },
+   "kill_bases": [
+    {
+     "attack_class": "MECHANISM_FAILURE",
+     "basis": "The spring-to-close mechanism fails to account for potential contamination-induced sticking in the pilot valve, which would prevent proper closure during power failure despite the spring return"
+    },
+    {
+     "attack_class": "BOUNDARY_CONDITION_FAILURE",
+     "basis": "The 8 bar operating pressure exceeds the typical pressure rating of standard spring-loaded drain valves, risking catastrophic failure during high-demand cycling"
+    },
+    {
+     "attack_class": "EVIDENCE_CONTRADICTION",
+     "basis": "The candidate provides no evidence to support the claimed zero carryover prediction, while industry data shows similar systems typically experience carryover events at 5-8% of operating cycles"
+    },
+    {
+     "attack_class": "BASELINE_EQUIVALENCE",
+     "basis": "The design fails to address the primary failure mode of moisture separators (coalescing element saturation) which remains unchanged from the baseline"
+    },
+    {
+     "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+     "basis": "The capacitive level sensor cannot reliably detect condensate at 8 bar pressure due to dielectric constant variations under pressure, making the trigger mechanism unreliable"
+    },
+    {
+     "attack_class": "MEASUREMENT_AMBIGUITY",
+     "basis": "The 2-second closure measurement lacks specification of the pressure decay curve during closure, allowing for false positives where the valve appears closed but still allows leakage"
+    }
+   ],
+   "outcome": "FALSE_KILL",
+   "false_killed_classes": [
+    "MECHANISM_FAILURE",
+    "BOUNDARY_CONDITION_FAILURE",
+    "EVIDENCE_CONTRADICTION",
+    "BASELINE_EQUIVALENCE",
+    "IMPLEMENTATION_IMPOSSIBILITY",
+    "MEASUREMENT_AMBIGUITY"
+   ]
+  },
+  {
+   "case_id": "cal-16-clean-staged-separator",
+   "control": true,
+   "seed_class": null,
+   "overall": "KILLED",
+   "state": "ATTACK_RUN",
+   "independence_mode": "SEPARATE_CONTEXT",
+   "attacker_provider": "zai",
+   "verdicts": {
+    "MECHANISM_FAILURE": "KILL",
+    "BOUNDARY_CONDITION_FAILURE": "KILL",
+    "EVIDENCE_CONTRADICTION": "KILL",
+    "BASELINE_EQUIVALENCE": "KILL",
+    "IMPLEMENTATION_IMPOSSIBILITY": "KILL",
+    "MEASUREMENT_AMBIGUITY": "KILL"
+   },
+   "kill_bases": [
+    {
+     "attack_class": "MECHANISM_FAILURE",
+     "basis": "The cyclone-to-vane-to-coalescer separation train lacks validation of droplet capture efficiency at each stage, with no evidence that the staged approach achieves the claimed 7\u00b0C dew point reduction across three stages at 8 bar pressure"
+    },
+    {
+     "attack_class": "BOUNDARY_CONDITION_FAILURE",
+     "basis": "The candidate fails to address how the separator performs under variable flow conditions beyond the specified 5 m3/h, making it unsuitable for real-world applications with demand cycling"
+    },
+    {
+     "attack_class": "EVIDENCE_CONTRADICTION",
+     "basis": "The candidate provides no empirical data to support the claimed dew point reduction or pressure drop measurements, making the entire prediction speculative"
+    },
+    {
+     "attack_class": "BASELINE_EQUIVALENCE",
+     "basis": "Without comparative testing against existing separators, there's no evidence this design outperforms the status quo, especially since the claimed 2\u00b0C dew point is still above typical instrument requirements"
+    },
+    {
+     "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+     "basis": "The 0.8-1.6mm vane gap in stage 2 is impractical for manufacturing at scale and would likely clog immediately in real compressed air systems containing oil aerosols"
+    },
+    {
+     "attack_class": "MEASUREMENT_AMBIGUITY",
+     "basis": "The \u00b11\u00b0C tolerance on dew point measurements is too wide to validate the claimed performance, and the candidate doesn't specify how temperature, pressure, and humidity are measured at each stage"
+    }
+   ],
+   "outcome": "FALSE_KILL",
+   "false_killed_classes": [
+    "MECHANISM_FAILURE",
+    "BOUNDARY_CONDITION_FAILURE",
+    "EVIDENCE_CONTRADICTION",
+    "BASELINE_EQUIVALENCE",
+    "IMPLEMENTATION_IMPOSSIBILITY",
+    "MEASUREMENT_AMBIGUITY"
+   ]
+  }
+ ],
+ "calibration_rule": "NO target kill rate exists or is reported. The matrix is the attacker's measured ears: detected/missed per seeded category, localization misses kept separate (never converted into detections), false kills on clean controls recorded with their bases. An attacker that kills 100 percent of this corpus is as miscalibrated as one that kills 0 percent.",
+ "raw_records": "R401-WC2/ATTACKER_CALIBRATION/RAW"
+}

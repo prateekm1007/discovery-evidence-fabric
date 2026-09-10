@@ -1,0 +1,56 @@
+{
+ "stage": "INDEPENDENT_ATTACK",
+ "candidate_id": "cand:DIV:cross_industry_transfer:zai:814592508dda",
+ "escalation": {
+  "gate_version": "attacker_calibration/1.0.0",
+  "instrument": "independent_attack/1.0.0",
+  "calibration_state": "NOT_CALIBRATED",
+  "terminal_kill_admissible": false,
+  "measured": {
+   "coverage": 1.0,
+   "parse_completeness": 1.0,
+   "tpr_scoped": 1.0,
+   "fpr_known_good": 1.0,
+   "n_cases_attacked": 40
+  },
+  "sealed_thresholds": {
+   "note": "registered BEFORE measurement; never tuned to results (Art. XXVII)",
+   "coverage_min": 0.875,
+   "parse_completeness_min": 0.875,
+   "tpr_min": 0.75,
+   "fpr_max": 0.3,
+   "ensemble": "NONE (single-attacker calibration only; majority-vote ensembles are deferred by the R412 directive)"
+  },
+  "measurement_path": "R412/CALIBRATION/engine_independent_attack_measurement.json",
+  "measurement_sha256": "4e1718e7088564333b5e1ef9be47ca452133d051001628cd6eed91f44e60ef5f",
+  "reason": "measured FPR 1.0 > sealed bar 0.3 (Art. L: the attacker is measured non-selective; its KILL is inadmissible as a terminal verdict and is escalated with the objection preserved)",
+  "rule": "the instrument's KILL is measured non-selective (FPR above the sealed bar); the objection is preserved verbatim and ESCALATED for adjudication — the candidate is NOT killed by this attack alone (Art. L); the deterministic gates are unchanged",
+  "reviewer_provenance": "AI_REVIEW (Art. LXVII)"
+ },
+ "preserved_objections": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "basis": "The proposed wet-etching approach to increase comb finger gaps fundamentally compromises the capacitive sensitivity of the accelerometer, as evidenced by [doi:10.1109/iic.2015.7150884] which demonstrates that sensitivity is inversely proportional to gap size, rendering the device functionally equivalent to baseline in terms of performance"
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "basis": "The candidate fails to address critical boundary conditions of temperature variation and packaging constraints, as [doi:10.23919/ursi.2018.8406772] shows that thermal expansion coefficients mismatch between materials will cause unpredictable gap variations under operational conditions"
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "basis": "The cited evidence [doi:10.3390/mi17060732] explicitly states that wet etching introduces surface roughness that increases stiction risk, directly contradicting the candidate's claim of reduced stiction"
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "basis": "The proposed solution does not address the fundamental physics of shock-induced contact, as [doi:10.1109/incet54531.2022.9824806] demonstrates that shock forces scale with proof mass size, making gap increases merely a temporary fix for larger acceleration events"
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "basis": "The claim of \"minimal post-processing\" is impossible given that [doi:10.3390/mi9110602] shows that controlled undercut profiles require precise timing control and multiple etching baths, adding significant complexity to the manufacturing process"
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "basis": "The testable prediction fails to account for hysteresis effects in shock response, as [doi:10.1109/iic.2015.7150884] demonstrates that zero-g offset measurements vary significantly based on shock history and orientation, making the 50 mg threshold unverifiable"
+  }
+ ]
+}

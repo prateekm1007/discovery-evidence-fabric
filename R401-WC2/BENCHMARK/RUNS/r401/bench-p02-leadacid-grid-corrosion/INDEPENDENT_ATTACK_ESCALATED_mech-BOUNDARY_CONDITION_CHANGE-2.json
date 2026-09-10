@@ -1,0 +1,56 @@
+{
+ "stage": "INDEPENDENT_ATTACK",
+ "candidate_id": "cand:MS:BOUNDARY_CONDITION_CHANGE:0fe8e905aef0",
+ "escalation": {
+  "gate_version": "attacker_calibration/1.0.0",
+  "instrument": "independent_attack/1.0.0",
+  "calibration_state": "NOT_CALIBRATED",
+  "terminal_kill_admissible": false,
+  "measured": {
+   "coverage": 1.0,
+   "parse_completeness": 1.0,
+   "tpr_scoped": 1.0,
+   "fpr_known_good": 1.0,
+   "n_cases_attacked": 40
+  },
+  "sealed_thresholds": {
+   "note": "registered BEFORE measurement; never tuned to results (Art. XXVII)",
+   "coverage_min": 0.875,
+   "parse_completeness_min": 0.875,
+   "tpr_min": 0.75,
+   "fpr_max": 0.3,
+   "ensemble": "NONE (single-attacker calibration only; majority-vote ensembles are deferred by the R412 directive)"
+  },
+  "measurement_path": "R412/CALIBRATION/engine_independent_attack_measurement.json",
+  "measurement_sha256": "4e1718e7088564333b5e1ef9be47ca452133d051001628cd6eed91f44e60ef5f",
+  "reason": "measured FPR 1.0 > sealed bar 0.3 (Art. L: the attacker is measured non-selective; its KILL is inadmissible as a terminal verdict and is escalated with the objection preserved)",
+  "rule": "the instrument's KILL is measured non-selective (FPR above the sealed bar); the objection is preserved verbatim and ESCALATED for adjudication — the candidate is NOT killed by this attack alone (Art. L); the deterministic gates are unchanged",
+  "reviewer_provenance": "AI_REVIEW (Art. LXVII)"
+ },
+ "preserved_objections": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "basis": "The claimed 1.7-1.8 V contribution from relativistic effects in PbO2 and PbSO4 is physically implausible; battery voltage arises from electrochemical potential differences, not relativistic effects, which are negligible at battery operating energies"
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "basis": "The 15-year boundary condition without exceeding 2% antimony is unrealistic given the evidence showing that even low-antimony grids corrode significantly at float voltages above 2.25 V/cell"
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "basis": "The candidate's evidence contradicts itself as [doi:10.1109/intlec.1995.498976] shows grid corrosion is the dominant failure mode in VRLA batteries at float voltages, yet the candidate claims to solve this with a mechanism that doesn't address the fundamental electrochemical corrosion process"
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "basis": "The proposed solution offers no improvement over baseline as calcium-tin alloys without antimony have been commercially available for decades and are known to have inferior mechanical properties compared to traditional lead-antimony alloys"
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "basis": "Reducing antimony below 2% while maintaining mechanical strength is impossible as documented in [doi:10.1016/s0378-7753(98)00028-7], which shows that low-antimony alloys require additional strengthening elements that increase hydrogen evolution"
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "basis": "The testable prediction of <5% grid cross-section reduction after 15 years fails to account for localized corrosion at grain boundaries, which would cause premature failure despite average cross-section measurements appearing acceptable"
+  }
+ ]
+}

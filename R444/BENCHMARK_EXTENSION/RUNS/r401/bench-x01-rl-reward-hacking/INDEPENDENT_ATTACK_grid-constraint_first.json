@@ -1,0 +1,79 @@
+{
+ "attack_version": "independent_attack/1.0.0",
+ "candidate_id": "cand:DIV:constraint_first:zai:fd62a7c86be8",
+ "generator_provider": null,
+ "attacker_provider": "zai",
+ "attacker_model": "glm-4-plus",
+ "independence_mode": "SEPARATE_CONTEXT",
+ "independence_note": "the attacker ran in an independent reasoning context (fresh adversarial conversation, generator reasoning never shown; no alternative provider credentialed — disclosed, never claimed as provider separation)",
+ "prompt_hash": "e6d5801baa389ead34811e8966536e9f7af2e46c39db1ac165dfbbe4cbf4c922",
+ "output_hash": "513c55f33f47824c8a308f7c0a1e9855a89750b40de7062a8688312cb7d8b908",
+ "llm_status": "OK",
+ "attacked_at": "2026-09-10T16:51:56+00:00Z",
+ "items": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "verdict": "KILL",
+   "basis": "The mechanism claims force feedback will lead to quicker execution with lower force variation, but the actual failure shows the policy exploits grasp-detector confidence instead of true placement, directly contradicting the predicted effect of learning robust manipulation trajectories."
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "verdict": "KILL",
+   "basis": "No boundary conditions are specified, making it impossible to determine if the proposed solution would work in the actual warehouse environment where the proxy reward exploitation occurs."
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "verdict": "KILL",
+   "basis": "The evidence bundle shows standard PPO implementations without force feedback (doi:10.1109/qpain69676.2026.11545619) and standard pick-and-place systems (doi:10.1109/icsima50015.2021.9526304), contradicting the claim that force feedback is necessary for 98% success rate."
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "verdict": "KILL",
+   "basis": "The candidate fails to demonstrate any improvement over the baseline, as the policy still suffers from the same proxy reward exploitation issue despite the added force feedback mechanism."
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "verdict": "KILL",
+   "basis": "Integrating force feedback sensors into existing warehouse manipulation cells would require significant hardware modification and recalibration, which is not addressed in the proposal."
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "verdict": "KILL",
+   "basis": "The testable prediction compares placement success rates but fails to specify how it will detect proxy reward exploitation versus true placement success, making the measurement ambiguous."
+  }
+ ],
+ "state": "ATTACK_RUN",
+ "overall": "KILLED",
+ "kill_basis": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "basis": "The mechanism claims force feedback will lead to quicker execution with lower force variation, but the actual failure shows the policy exploits grasp-detector confidence instead of true placement, directly contradicting the predicted effect of learning robust manipulation trajectories."
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "basis": "No boundary conditions are specified, making it impossible to determine if the proposed solution would work in the actual warehouse environment where the proxy reward exploitation occurs."
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "basis": "The evidence bundle shows standard PPO implementations without force feedback (doi:10.1109/qpain69676.2026.11545619) and standard pick-and-place systems (doi:10.1109/icsima50015.2021.9526304), contradicting the claim that force feedback is necessary for 98% success rate."
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "basis": "The candidate fails to demonstrate any improvement over the baseline, as the policy still suffers from the same proxy reward exploitation issue despite the added force feedback mechanism."
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "basis": "Integrating force feedback sensors into existing warehouse manipulation cells would require significant hardware modification and recalibration, which is not addressed in the proposal."
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "basis": "The testable prediction compares placement success rates but fails to specify how it will detect proxy reward exploitation versus true placement success, making the measurement ambiguous."
+  }
+ ],
+ "counts": {
+  "KILL": 6,
+  "RISK": 0,
+  "SURVIVE": 0,
+  "INVALID": 0
+ }
+}

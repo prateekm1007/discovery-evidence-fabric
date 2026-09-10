@@ -1,0 +1,56 @@
+{
+ "stage": "INDEPENDENT_ATTACK",
+ "candidate_id": "cand:MS:BOUNDARY_CONDITION_CHANGE:8ab2e617965c",
+ "escalation": {
+  "gate_version": "attacker_calibration/1.0.0",
+  "instrument": "independent_attack/1.0.0",
+  "calibration_state": "NOT_CALIBRATED",
+  "terminal_kill_admissible": false,
+  "measured": {
+   "coverage": 1.0,
+   "parse_completeness": 1.0,
+   "tpr_scoped": 1.0,
+   "fpr_known_good": 1.0,
+   "n_cases_attacked": 40
+  },
+  "sealed_thresholds": {
+   "note": "registered BEFORE measurement; never tuned to results (Art. XXVII)",
+   "coverage_min": 0.875,
+   "parse_completeness_min": 0.875,
+   "tpr_min": 0.75,
+   "fpr_max": 0.3,
+   "ensemble": "NONE (single-attacker calibration only; majority-vote ensembles are deferred by the R412 directive)"
+  },
+  "measurement_path": "R412/CALIBRATION/engine_independent_attack_measurement.json",
+  "measurement_sha256": "4e1718e7088564333b5e1ef9be47ca452133d051001628cd6eed91f44e60ef5f",
+  "reason": "measured FPR 1.0 > sealed bar 0.3 (Art. L: the attacker is measured non-selective; its KILL is inadmissible as a terminal verdict and is escalated with the objection preserved)",
+  "rule": "the instrument's KILL is measured non-selective (FPR above the sealed bar); the objection is preserved verbatim and ESCALATED for adjudication — the candidate is NOT killed by this attack alone (Art. L); the deterministic gates are unchanged",
+  "reviewer_provenance": "AI_REVIEW (Art. LXVII)"
+ },
+ "preserved_objections": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "basis": "TiO2 photocatalytic activity requires UV light activation, which is not present in the typical operating conditions of a district cooling loop where heat exchangers are insulated and operate in low-light environments"
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "basis": "The claim maintains heat transfer above 2500 W/m2K for 12 months, but district cooling loops experience significant temperature cycling that will cause thermal expansion mismatches between TiO2 coating and stainless steel substrate, leading to coating delamination"
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "basis": "The provided evidence includes studies on stress corrosion cracking of stainless steel heat exchangers, which demonstrates that coatings can actually exacerbate corrosion issues when microcracks form in the coating, creating crevice corrosion sites"
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "basis": "The prediction states only a 10% decrease in heat transfer coefficient over 12 months, which is essentially equivalent to the baseline performance of well-maintained stainless steel heat exchangers that already achieve this performance through regular cleaning cycles"
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "basis": "The colloidal suspension preparation using Degussa P-25 nanoparticles cannot be uniformly applied to complex heat exchanger plate geometries with the required thickness consistency needed for effective photocatalytic activity"
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "basis": "The testable prediction fails to specify how photocatalytic activity will be measured or verified independently of heat transfer performance, making it impossible to distinguish between coating effectiveness and normal heat transfer degradation"
+  }
+ ]
+}

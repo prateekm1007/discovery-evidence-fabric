@@ -1,0 +1,79 @@
+{
+ "attack_version": "independent_attack/1.0.0",
+ "candidate_id": "cand:DIV:mechanism_inversion:zai:a07c3bc51d90",
+ "generator_provider": null,
+ "attacker_provider": "zai",
+ "attacker_model": "glm-4-plus",
+ "independence_mode": "SEPARATE_CONTEXT",
+ "independence_note": "the attacker ran in an independent reasoning context (fresh adversarial conversation, generator reasoning never shown; no alternative provider credentialed — disclosed, never claimed as provider separation)",
+ "prompt_hash": "b453d56679b4bfde987348ca4efec3c03dffd29293e9e1930c729dff40aac3f1",
+ "output_hash": "a419bb2264025b2304959ec1423ef2c0312c6c881b0bd40adc9f9678363f5845",
+ "llm_status": "OK",
+ "attacked_at": "2026-09-10T17:09:27+00:00Z",
+ "items": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "verdict": "KILL",
+   "basis": "The proposed intervention addresses bit-flip vulnerabilities but fails to address the core problem of cache fragmentation from mixed-length bursty requests, which is the actual cause of the failure mode described in the problem statement."
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "verdict": "KILL",
+   "basis": "No boundary conditions are specified, making it impossible to determine when the intervention would be effective or how it would behave under different load patterns or hardware configurations."
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "verdict": "KILL",
+   "basis": "The provided evidence includes [doi:10.1109/icassp55912.2026.11461518] MIDAS which focuses on cross-GPU KV cache offloading, contradicting the proposed intra-GPU solution, and [doi:10.5463/thesis.308] which highlights latency-critical inference serving that would be severely impacted by the overhead of periodic cache integrity verification."
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "verdict": "KILL",
+   "basis": "The proposed intervention adds periodic verification overhead that would increase latency during normal operation, making it worse than the baseline which has no such overhead, thus failing to beat the status quo."
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "verdict": "KILL",
+   "basis": "Implementing periodic cache integrity verification would require significant modifications to the GPU memory management system and would likely require exclusive access to cache blocks during verification, causing service interruptions that violate the latency requirements."
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "verdict": "KILL",
+   "basis": "The testable prediction fails to account for the overhead of the verification process itself, making it impossible to determine whether the proposed solution actually improves performance over the baseline when considering the full system impact."
+  }
+ ],
+ "state": "ATTACK_RUN",
+ "overall": "KILLED",
+ "kill_basis": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "basis": "The proposed intervention addresses bit-flip vulnerabilities but fails to address the core problem of cache fragmentation from mixed-length bursty requests, which is the actual cause of the failure mode described in the problem statement."
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "basis": "No boundary conditions are specified, making it impossible to determine when the intervention would be effective or how it would behave under different load patterns or hardware configurations."
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "basis": "The provided evidence includes [doi:10.1109/icassp55912.2026.11461518] MIDAS which focuses on cross-GPU KV cache offloading, contradicting the proposed intra-GPU solution, and [doi:10.5463/thesis.308] which highlights latency-critical inference serving that would be severely impacted by the overhead of periodic cache integrity verification."
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "basis": "The proposed intervention adds periodic verification overhead that would increase latency during normal operation, making it worse than the baseline which has no such overhead, thus failing to beat the status quo."
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "basis": "Implementing periodic cache integrity verification would require significant modifications to the GPU memory management system and would likely require exclusive access to cache blocks during verification, causing service interruptions that violate the latency requirements."
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "basis": "The testable prediction fails to account for the overhead of the verification process itself, making it impossible to determine whether the proposed solution actually improves performance over the baseline when considering the full system impact."
+  }
+ ],
+ "counts": {
+  "KILL": 6,
+  "RISK": 0,
+  "SURVIVE": 0,
+  "INVALID": 0
+ }
+}

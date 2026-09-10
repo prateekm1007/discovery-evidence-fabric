@@ -1,0 +1,1147 @@
+{
+ "ledger": "IMPROVEMENT_LEDGER (R378 TECHNICAL IMPROVEMENT ENGINE)",
+ "version": "1.0.0",
+ "loop": "CANDIDATE -> DIAGNOSE WEAKNESS -> IDENTIFY LIMITING FEATURE -> GENERATE CONTROLLED MUTATION -> RE-EVALUATE EVIDENCE/MECHANISM/PRIOR ART -> RE-SCORE -> KEEP OR KILL -> REPEAT",
+ "collision_mode": "REPLAY_CACHE",
+ "live_sources": null,
+ "evaluators_registered": [
+  {
+   "evaluator_id": "term_rule_v1",
+   "fidelity_tier": "TERM_RULE",
+   "evidence_rank": 3
+  }
+ ],
+ "q_instrument": "discovery_fabric/benchmark/candidate_quality.py (FROZEN, hash-pinned, imported read-only)",
+ "i_instrument": "discovery_fabric/benchmark/invention_quality.py (R377, imported read-only)",
+ "thresholds": {
+  "SPAN_DERIVATION_MIN": {
+   "value": 0.2,
+   "epistemic_class": "ENGINEERING",
+   "justification": "the engine's own span-derivation rule (candidate_diversity.span_derivation_check): ratio < 0.20 = SPAN_UNDERIVED. A MECHANISM_STRENGTHENING mutation must CLEAR this floor — the same rule that gates the grid, not a new one."
+  },
+  "EVIDENCE_SUPPORT_MIN": {
+   "value": 0.2,
+   "epistemic_class": "ENGINEERING",
+   "justification": "I1's underived flag fires below 0.20; an EVIDENCE_DERIVED_CONSTRAINT mutation must clear the same floor on evidence_support."
+  },
+  "DOMAIN_OVERLAP_MIN": {
+   "value": 1,
+   "epistemic_class": "ENGINEERING",
+   "justification": "REPLAY_CACHE re-adjudication is valid only while the mutated candidate stays in the domain the cached art was found FOR. Guard: >= 1 NON-generic technical term shared between the child's mechanism+intervention and the cached family corpus. ZERO overlap means the mutation abandoned the domain (measured attack: re-adjudicating a cement-curing intervention against battery art fabricates surviving differentiators — false novelty from stale art). The overlap count is RECORDED on every cache adjudication so thin-domain links are auditable. NOTE: entity-term retention vs the problem CANNOT catch this class — entity terms are problem-derived and unchanged by mutations (measured while writing the guard's tests); it is recorded for audit only."
+  },
+  "MAX_ITERATIONS_DEFAULT": {
+   "value": 2,
+   "epistemic_class": "ENGINEERING",
+   "justification": "the CEO minimum loop is DIAGNOSE -> IMPROVE -> RE-EVALUATE -> IMPROVE AGAIN; two iterations demonstrate repeatability at bounded cost"
+  },
+  "MAX_PROPOSALS_PER_ITERATION": {
+   "value": 3,
+   "epistemic_class": "ENGINEERING",
+   "justification": "bounded proposal budget: three attempts, then the honest no-defensible-mutation verdict"
+  }
+ },
+ "started_at": "2026-09-10T16:03:15+00:00Z",
+ "iterations": [
+  {
+   "iteration": 1,
+   "diagnosis": {
+    "limiting_features": [
+     {
+      "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "measured_value": 0.19,
+      "weakness_kind": "UNDERIVED",
+      "why_weak": "measured 0.19 < STRONG floor 0.7; underived_flag set (span_support=0.429, evidence_support=0.19) — the quoted span and/or evidence does not contain the mechanism's vocabulary",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT"
+     },
+     {
+      "dimension": "I5_EXPERIMENT_DISCRIMINATION",
+      "measured_value": 0.667,
+      "weakness_kind": "LOW_SCORE",
+      "why_weak": "measured 0.667 < STRONG floor 0.7",
+      "mutation_type": "EXPERIMENT_DISCRIMINATION"
+     }
+    ],
+    "evidence_gaps": [
+     {
+      "dimension": "I2_DIFFERENTIATOR_TECHNICAL_MEANING",
+      "state": "UNMEASURABLE_NO_SURVIVORS",
+      "what_is_missing": "no surviving differentiators recorded",
+      "consequence": "no mutation targets this dimension until the gap closes (Art. XXV)"
+     },
+     {
+      "dimension": "I3_RECOMBINATION_RISK",
+      "state": "UNMEASURABLE_NO_FAMILIES",
+      "what_is_missing": "no prior-art families adjudicated — residue vs found art is unmeasured; absence of found art is not novelty",
+      "consequence": "no mutation targets this dimension until the gap closes (Art. XXV)"
+     },
+     {
+      "dimension": "I4_NEW_TECHNICAL_RELATIONSHIP",
+      "state": "UNMEASURABLE_NO_FAMILY_TEXT",
+      "what_is_missing": "no adjudicated family text stored — pair novelty vs found art is unmeasured",
+      "consequence": "no mutation targets this dimension until the gap closes (Art. XXV)"
+     }
+    ],
+    "target": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT"
+    }
+   },
+   "proposals": [
+    {
+     "proposal_id": "prop:a3ac615a87e9",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "9bbd24e61e81de068e16011c048d2b9c436a2f8b69a2bc78fba54b4a0927f4e1",
+     "output_hash": "a3ac615a87e93923855fb4b3ad755e36acf878b8bbe6296df906561f55f70dbb",
+     "fields": {
+      "MUTATION_TYPE": "EVIDENCE_DERIVED_CONSTRAINT",
+      "MECHANISM": "Nanocomposite technology incorporating hydrophobic nanoparticles to enhance barrier properties through molecular structure modification",
+      "INTERVENTION": "Replace the porous multilayer structure with a dense monolithic layer incorporating hydrophobic nanofillers that create a tortuous path for moisture and oxygen molecules",
+      "EXPECTED_EFFECT": "Water vapor transmission rate will decrease from 890-920 g·m^-2·day^-1 to below 0.5 g/m2/day by creating a tortuous path that impedes diffusion of gas molecules",
+      "FALSIFICATION_TEST": "Measure water vapor transmission rate after 18 months of shelf life at 25 C and 65 percent relative humidity",
+      "MECHANISM_SOURCE_SPAN": "Over the past decades, biodegradable polymer films have gained significant attention owing to their environmental friendliness and abundant raw material availability. However, the barrier properties of biodegradable polymers as packaging materials remain inferior to those of traditional petroleum-based plastic films, limiting their suitability for applications sensitive to oxygen or moisture such as food preservation, pharmaceutical packaging, and electronic device protection. In this paper, we summarize effective strategies to enhance the barrier properties of biodegradable polymer packaging films, such as surface coating, polymer blending, multilayer compounding, copolymerization and modification, nanocomposite technology, and filler reinforcement.",
+      "SOURCE_EVIDENCE_ID": "doi:10.3390/nano16150934",
+      "EXPERIMENT": "Compare water vapor transmission rate of the nanocomposite film against the conventional multilayer structure after 18 months at 25 C and 65 percent relative humidity",
+      "EXPERIMENT_BASELINE": "conventional multilayer structure",
+      "EXPERIMENT_EIG": "0.85",
+      "CONSTRAINT_DERIVED": "The nanocomposite must incorporate hydrophobic nanoparticles at optimal loading to create a tortuous path without compromising mechanical properties",
+      "MUTATION_REASON": "Repairs I1_MECHANISM_EVIDENCE_DERIVATION defect by anchoring mechanism in evidence-specific technical vocabulary (nanocomposite technology, tortuous path)"
+     },
+     "validation": {
+      "valid": true,
+      "stage": "VALIDATION",
+      "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+      "checks": {
+       "mutation_type_matches_diagnosis": true,
+       "span_evidence_exists": "doi:10.3390/nano16150934",
+       "span_verbatim_in_evidence": true,
+       "evidence_support": 0.435,
+       "evidence_support_cleared": 0.435,
+       "constraint_traceable_to_evidence": "The nanocomposite must incorporate hydrophobic nanoparticles at optimal loading to create a tortuous path without compro"
+      },
+      "reasons": [],
+      "validated_at": "2026-09-10T16:03:20+00:00Z"
+     }
+    },
+    {
+     "proposal_id": "prop:d4eb7768e77f",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "f24d7b9029fa28c743980f62c13cec096b2c59b5ced11375e1410e0cce6164a0",
+     "output_hash": "d4eb7768e77f184f626398f4c5bebd01ad77a99ca6d051f58feba33546298997",
+     "fields": {
+      "MUTATION_TYPE": "EVIDENCE_DERIVED_CONSTRAINT",
+      "MECHANISM": "Surface coating enhances barrier properties of biodegradable polymer films by forming a dense layer that impedes molecular diffusion pathways",
+      "INTERVENTION": "Apply a nanocomposite coating containing hydrophobic nanoparticles to the ethylene-vinyl alcohol layer to reduce moisture permeation while maintaining oxygen barrier properties",
+      "EXPECTED_EFFECT": "Water vapor transmission rate will decrease from 890-920 g·m^-2·day^-1 to below 0.5 g/m2/day",
+      "FALSIFICATION_TEST": "falsification_test_from_candidate",
+      "MECHANISM_SOURCE_SPAN": "surface coating, polymer blending, multilayer compounding, copolymerization and modification, nanocomposite technology, and filler reinforcement",
+      "SOURCE_EVIDENCE_ID": "doi:10.3390/nano16150934",
+      "EXPERIMENT": "Compare the water vapor transmission rate of the coated EVOH film against the uncoated baseline film over 18 months at 25 C and 65 percent relative humidity",
+      "EXPERIMENT_BASELINE": "uncoated ethylene-vinyl alcohol film",
+      "EXPERIMENT_EIG": "0.85",
+      "CONSTRAINT_DERIVED": "The coating must contain hydrophobic nanoparticles that form a tortuous path for moisture molecules",
+      "MUTATION_REASON": "Repairs I1_MECHANISM_EVIDENCE_DERIVATION defect by incorporating technical vocabulary from the evidence about surface coating and nanocomposite technology for barrier enhancement"
+     },
+     "validation": {
+      "valid": true,
+      "stage": "VALIDATION",
+      "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+      "checks": {
+       "mutation_type_matches_diagnosis": true,
+       "span_evidence_exists": "doi:10.3390/nano16150934",
+       "span_verbatim_in_evidence": true,
+       "evidence_support": 0.414,
+       "evidence_support_cleared": 0.414,
+       "constraint_traceable_to_evidence": "The coating must contain hydrophobic nanoparticles that form a tortuous path for moisture molecules"
+      },
+      "reasons": [],
+      "validated_at": "2026-09-10T16:03:24+00:00Z"
+     }
+    }
+   ],
+   "mutation_attempts": [
+    {
+     "mutation_applied": {
+      "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+      "mutation_id": "mut:41bb49858d8f",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+      "diagnostic_trigger": {
+       "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+       "measured_before": 0.19,
+       "basis": "R378 evaluator-contract diagnosis (deterministic)"
+      },
+      "proposal_provenance": {
+       "proposal_id": "prop:a3ac615a87e9",
+       "provider": "zai",
+       "model": "glm-4-plus",
+       "prompt_hash": "9bbd24e61e81de068e16011c048d2b9c436a2f8b69a2bc78fba54b4a0927f4e1",
+       "output_hash": "a3ac615a87e93923855fb4b3ad755e36acf878b8bbe6296df906561f55f70dbb",
+       "llm_is_untrusted_proposer": true
+      },
+      "validation": {
+       "valid": true,
+       "stage": "VALIDATION",
+       "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+       "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+       "checks": {
+        "mutation_type_matches_diagnosis": true,
+        "span_evidence_exists": "doi:10.3390/nano16150934",
+        "span_verbatim_in_evidence": true,
+        "evidence_support": 0.435,
+        "evidence_support_cleared": 0.435,
+        "constraint_traceable_to_evidence": "The nanocomposite must incorporate hydrophobic nanoparticles at optimal loading to create a tortuous path without compro"
+       },
+       "reasons": [],
+       "validated_at": "2026-09-10T16:03:20+00:00Z"
+      },
+      "fields_changed": {
+       "mechanism": {
+        "before": "Physical contact and void filling rather than molecular mixing, with no synergistic mechanical reinforcement between layers",
+        "after": "Nanocomposite technology incorporating hydrophobic nanoparticles to enhance barrier properties through molecular structure modification"
+       },
+       "intervention": {
+        "before": "Replace the porous multilayer structure with a dense monolithic layer incorporating a hydrophobic barrier material",
+        "after": "Replace the porous multilayer structure with a dense monolithic layer incorporating hydrophobic nanofillers that create a tortuous path for moisture and oxygen molecules"
+       },
+       "mechanism_source_span": {
+        "before": "negligible polymer interdiffusion or specific intermolecular interactions, indicating that layer integration occurs mainly through physical contact and void filling rather than molecular mixing",
+        "after": "Over the past decades, biodegradable polymer films have gained significant attention owing to their environmental friendliness and abundant raw material availability. However, the barrier properties of biodegradable polymers as packaging materials remain inferior to those of traditional petroleum-ba"
+       }
+      },
+      "inherited_negatives": {
+       "uncertainty_ids": [
+        "con:verify:fc690a03",
+        "multilayer polymer packaging layer food film",
+        "multilayer polymer packaging layer food film",
+        "layers physical contact filling molecular synergistic",
+        "layers physical contact filling molecular synergistic",
+        "multilayer layer barrier replace structure monolithic hydrophobic",
+        "multilayer layer barrier replace structure monolithic hydrophobic",
+        "multilayer transmission incorporating during distribution humidity",
+        "multilayer transmission incorporating during distribution humidity",
+        "transmission decrease water vapor rate 890",
+        "transmission decrease water vapor rate 890"
+       ],
+       "collision_family_ids": [],
+       "source_errors": []
+      },
+      "parent_spec_hash": "b5ecfcebb2e35fa1bc397db6a6e42a56eb201739c64c5cdbd143a773d88cedaa",
+      "child_spec_hash": null,
+      "reason": "Repairs I1_MECHANISM_EVIDENCE_DERIVATION defect by anchoring mechanism in evidence-specific technical vocabulary (nanocomposite technology, tortuous path)",
+      "applied_at": "2026-09-10T16:03:20+00:00Z"
+     },
+     "re_evaluation": {
+      "collision_mode": "REPLAY_CACHE",
+      "re_evaluated_at": "2026-09-10T16:03:20+00:00Z",
+      "re_adjudication": {
+       "mode": "REPLAY_CACHE",
+       "valid": false,
+       "reason": "NO_CACHED_FAMILIES"
+      },
+      "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+      "re_adjudication_failure": "NO_CACHED_FAMILIES",
+      "i_dimensions": {
+       "I1_MECHANISM_EVIDENCE_DERIVATION": {
+        "score": 0.155,
+        "state": "MEASURED"
+       },
+       "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_SURVIVORS"
+       },
+       "I3_RECOMBINATION_RISK": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_FAMILIES"
+       },
+       "I4_NEW_TECHNICAL_RELATIONSHIP": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+       },
+       "I5_EXPERIMENT_DISCRIMINATION": {
+        "score": 0.667,
+        "state": "MEASURED"
+       }
+      },
+      "i_flags": {
+       "underived_mechanism": true,
+       "recombination_only": false
+      },
+      "i_average": 0.411,
+      "q_dimensions": {
+       "Q1_EVIDENCE_BINDING": {
+        "score": 0.5,
+        "state": "MEASURED"
+       },
+       "Q2_PRIOR_ART_SPECIFICITY": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_PRIOR_ART"
+       },
+       "Q3_PRIOR_ART_RESOLUTION": {
+        "score": 0.0,
+        "state": "MEASURED"
+       },
+       "Q4_EXPERIMENT_DECISIVENESS": {
+        "score": 1.0,
+        "state": "MEASURED"
+       },
+       "Q5_CHAIN_COMPLETENESS": {
+        "score": 1.0,
+        "state": "MEASURED"
+       }
+      },
+      "q_average": 0.625
+     },
+     "decision": {
+      "action": "REJECT_MUTATION",
+      "improved": false,
+      "checks": {
+       "targeted_dimension": "0.19 -> 0.155 (no improvement)",
+       "negatives_preserved": true,
+       "no_new_structural_flags": true,
+       "no_unknown_conversion_without_new_evidence": true,
+       "text_gap_conversions_recorded": [],
+       "prior_art_position_not_degraded": true
+      },
+      "reasons": [],
+      "decided_at": "2026-09-10T16:03:20+00:00Z"
+     }
+    },
+    {
+     "mutation_applied": {
+      "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+      "mutation_id": "mut:f4cae401c2f9",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+      "diagnostic_trigger": {
+       "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+       "measured_before": 0.19,
+       "basis": "R378 evaluator-contract diagnosis (deterministic)"
+      },
+      "proposal_provenance": {
+       "proposal_id": "prop:d4eb7768e77f",
+       "provider": "zai",
+       "model": "glm-4-plus",
+       "prompt_hash": "f24d7b9029fa28c743980f62c13cec096b2c59b5ced11375e1410e0cce6164a0",
+       "output_hash": "d4eb7768e77f184f626398f4c5bebd01ad77a99ca6d051f58feba33546298997",
+       "llm_is_untrusted_proposer": true
+      },
+      "validation": {
+       "valid": true,
+       "stage": "VALIDATION",
+       "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+       "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+       "checks": {
+        "mutation_type_matches_diagnosis": true,
+        "span_evidence_exists": "doi:10.3390/nano16150934",
+        "span_verbatim_in_evidence": true,
+        "evidence_support": 0.414,
+        "evidence_support_cleared": 0.414,
+        "constraint_traceable_to_evidence": "The coating must contain hydrophobic nanoparticles that form a tortuous path for moisture molecules"
+       },
+       "reasons": [],
+       "validated_at": "2026-09-10T16:03:24+00:00Z"
+      },
+      "fields_changed": {
+       "mechanism": {
+        "before": "Physical contact and void filling rather than molecular mixing, with no synergistic mechanical reinforcement between layers",
+        "after": "Surface coating enhances barrier properties of biodegradable polymer films by forming a dense layer that impedes molecular diffusion pathways"
+       },
+       "intervention": {
+        "before": "Replace the porous multilayer structure with a dense monolithic layer incorporating a hydrophobic barrier material",
+        "after": "Apply a nanocomposite coating containing hydrophobic nanoparticles to the ethylene-vinyl alcohol layer to reduce moisture permeation while maintaining oxygen barrier properties"
+       },
+       "mechanism_source_span": {
+        "before": "negligible polymer interdiffusion or specific intermolecular interactions, indicating that layer integration occurs mainly through physical contact and void filling rather than molecular mixing",
+        "after": "surface coating, polymer blending, multilayer compounding, copolymerization and modification, nanocomposite technology, and filler reinforcement"
+       }
+      },
+      "inherited_negatives": {
+       "uncertainty_ids": [
+        "con:verify:fc690a03",
+        "multilayer polymer packaging layer food film",
+        "multilayer polymer packaging layer food film",
+        "layers physical contact filling molecular synergistic",
+        "layers physical contact filling molecular synergistic",
+        "multilayer layer barrier replace structure monolithic hydrophobic",
+        "multilayer layer barrier replace structure monolithic hydrophobic",
+        "multilayer transmission incorporating during distribution humidity",
+        "multilayer transmission incorporating during distribution humidity",
+        "transmission decrease water vapor rate 890",
+        "transmission decrease water vapor rate 890"
+       ],
+       "collision_family_ids": [],
+       "source_errors": []
+      },
+      "parent_spec_hash": "b5ecfcebb2e35fa1bc397db6a6e42a56eb201739c64c5cdbd143a773d88cedaa",
+      "child_spec_hash": null,
+      "reason": "Repairs I1_MECHANISM_EVIDENCE_DERIVATION defect by incorporating technical vocabulary from the evidence about surface coating and nanocomposite technology for barrier enhancement",
+      "applied_at": "2026-09-10T16:03:24+00:00Z"
+     },
+     "re_evaluation": {
+      "collision_mode": "REPLAY_CACHE",
+      "re_evaluated_at": "2026-09-10T16:03:24+00:00Z",
+      "re_adjudication": {
+       "mode": "REPLAY_CACHE",
+       "valid": false,
+       "reason": "NO_CACHED_FAMILIES"
+      },
+      "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+      "re_adjudication_failure": "NO_CACHED_FAMILIES",
+      "i_dimensions": {
+       "I1_MECHANISM_EVIDENCE_DERIVATION": {
+        "score": 0.333,
+        "state": "MEASURED"
+       },
+       "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_SURVIVORS"
+       },
+       "I3_RECOMBINATION_RISK": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_FAMILIES"
+       },
+       "I4_NEW_TECHNICAL_RELATIONSHIP": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+       },
+       "I5_EXPERIMENT_DISCRIMINATION": {
+        "score": 0.667,
+        "state": "MEASURED"
+       }
+      },
+      "i_flags": {
+       "underived_mechanism": false,
+       "recombination_only": false
+      },
+      "i_average": 0.5,
+      "q_dimensions": {
+       "Q1_EVIDENCE_BINDING": {
+        "score": 0.5,
+        "state": "MEASURED"
+       },
+       "Q2_PRIOR_ART_SPECIFICITY": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_PRIOR_ART"
+       },
+       "Q3_PRIOR_ART_RESOLUTION": {
+        "score": 0.0,
+        "state": "MEASURED"
+       },
+       "Q4_EXPERIMENT_DECISIVENESS": {
+        "score": 1.0,
+        "state": "MEASURED"
+       },
+       "Q5_CHAIN_COMPLETENESS": {
+        "score": 1.0,
+        "state": "MEASURED"
+       }
+      },
+      "q_average": 0.625
+     },
+     "decision": {
+      "action": "KEEP",
+      "improved": true,
+      "checks": {
+       "targeted_dimension": "0.19 -> 0.333 (improved)",
+       "negatives_preserved": true,
+       "no_new_structural_flags": true,
+       "no_unknown_conversion_without_new_evidence": true,
+       "text_gap_conversions_recorded": [],
+       "prior_art_position_not_degraded": true
+      },
+      "reasons": [],
+      "decided_at": "2026-09-10T16:03:24+00:00Z"
+     }
+    }
+   ],
+   "mutation_applied": {
+    "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+    "mutation_id": "mut:41bb49858d8f",
+    "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+    "diagnostic_trigger": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "measured_before": 0.19,
+     "basis": "R378 evaluator-contract diagnosis (deterministic)"
+    },
+    "proposal_provenance": {
+     "proposal_id": "prop:a3ac615a87e9",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "9bbd24e61e81de068e16011c048d2b9c436a2f8b69a2bc78fba54b4a0927f4e1",
+     "output_hash": "a3ac615a87e93923855fb4b3ad755e36acf878b8bbe6296df906561f55f70dbb",
+     "llm_is_untrusted_proposer": true
+    },
+    "validation": {
+     "valid": true,
+     "stage": "VALIDATION",
+     "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+     "checks": {
+      "mutation_type_matches_diagnosis": true,
+      "span_evidence_exists": "doi:10.3390/nano16150934",
+      "span_verbatim_in_evidence": true,
+      "evidence_support": 0.435,
+      "evidence_support_cleared": 0.435,
+      "constraint_traceable_to_evidence": "The nanocomposite must incorporate hydrophobic nanoparticles at optimal loading to create a tortuous path without compro"
+     },
+     "reasons": [],
+     "validated_at": "2026-09-10T16:03:20+00:00Z"
+    },
+    "fields_changed": {
+     "mechanism": {
+      "before": "Physical contact and void filling rather than molecular mixing, with no synergistic mechanical reinforcement between layers",
+      "after": "Nanocomposite technology incorporating hydrophobic nanoparticles to enhance barrier properties through molecular structure modification"
+     },
+     "intervention": {
+      "before": "Replace the porous multilayer structure with a dense monolithic layer incorporating a hydrophobic barrier material",
+      "after": "Replace the porous multilayer structure with a dense monolithic layer incorporating hydrophobic nanofillers that create a tortuous path for moisture and oxygen molecules"
+     },
+     "mechanism_source_span": {
+      "before": "negligible polymer interdiffusion or specific intermolecular interactions, indicating that layer integration occurs mainly through physical contact and void filling rather than molecular mixing",
+      "after": "Over the past decades, biodegradable polymer films have gained significant attention owing to their environmental friendliness and abundant raw material availability. However, the barrier properties of biodegradable polymers as packaging materials remain inferior to those of traditional petroleum-ba"
+     }
+    },
+    "inherited_negatives": {
+     "uncertainty_ids": [
+      "con:verify:fc690a03",
+      "multilayer polymer packaging layer food film",
+      "multilayer polymer packaging layer food film",
+      "layers physical contact filling molecular synergistic",
+      "layers physical contact filling molecular synergistic",
+      "multilayer layer barrier replace structure monolithic hydrophobic",
+      "multilayer layer barrier replace structure monolithic hydrophobic",
+      "multilayer transmission incorporating during distribution humidity",
+      "multilayer transmission incorporating during distribution humidity",
+      "transmission decrease water vapor rate 890",
+      "transmission decrease water vapor rate 890"
+     ],
+     "collision_family_ids": [],
+     "source_errors": []
+    },
+    "parent_spec_hash": "b5ecfcebb2e35fa1bc397db6a6e42a56eb201739c64c5cdbd143a773d88cedaa",
+    "child_spec_hash": null,
+    "reason": "Repairs I1_MECHANISM_EVIDENCE_DERIVATION defect by anchoring mechanism in evidence-specific technical vocabulary (nanocomposite technology, tortuous path)",
+    "applied_at": "2026-09-10T16:03:20+00:00Z"
+   },
+   "re_evaluation": {
+    "collision_mode": "REPLAY_CACHE",
+    "re_evaluated_at": "2026-09-10T16:03:24+00:00Z",
+    "re_adjudication": {
+     "mode": "REPLAY_CACHE",
+     "valid": false,
+     "reason": "NO_CACHED_FAMILIES"
+    },
+    "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+    "re_adjudication_failure": "NO_CACHED_FAMILIES",
+    "i_dimensions": {
+     "I1_MECHANISM_EVIDENCE_DERIVATION": {
+      "score": 0.333,
+      "state": "MEASURED"
+     },
+     "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_SURVIVORS"
+     },
+     "I3_RECOMBINATION_RISK": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_FAMILIES"
+     },
+     "I4_NEW_TECHNICAL_RELATIONSHIP": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+     },
+     "I5_EXPERIMENT_DISCRIMINATION": {
+      "score": 0.667,
+      "state": "MEASURED"
+     }
+    },
+    "i_flags": {
+     "underived_mechanism": false,
+     "recombination_only": false
+    },
+    "i_average": 0.5,
+    "q_dimensions": {
+     "Q1_EVIDENCE_BINDING": {
+      "score": 0.5,
+      "state": "MEASURED"
+     },
+     "Q2_PRIOR_ART_SPECIFICITY": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_PRIOR_ART"
+     },
+     "Q3_PRIOR_ART_RESOLUTION": {
+      "score": 0.0,
+      "state": "MEASURED"
+     },
+     "Q4_EXPERIMENT_DECISIVENESS": {
+      "score": 1.0,
+      "state": "MEASURED"
+     },
+     "Q5_CHAIN_COMPLETENESS": {
+      "score": 1.0,
+      "state": "MEASURED"
+     }
+    },
+    "q_average": 0.625
+   },
+   "decision": {
+    "action": "KEEP",
+    "improved": true,
+    "checks": {
+     "targeted_dimension": "0.19 -> 0.333 (improved)",
+     "negatives_preserved": true,
+     "no_new_structural_flags": true,
+     "no_unknown_conversion_without_new_evidence": true,
+     "text_gap_conversions_recorded": [],
+     "prior_art_position_not_degraded": true
+    },
+    "reasons": [],
+    "decided_at": "2026-09-10T16:03:24+00:00Z"
+   }
+  },
+  {
+   "iteration": 2,
+   "diagnosis": {
+    "limiting_features": [
+     {
+      "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "measured_value": 0.333,
+      "weakness_kind": "LOW_SCORE",
+      "why_weak": "measured 0.333 < STRONG floor 0.7",
+      "mutation_type": "MECHANISM_STRENGTHENING"
+     },
+     {
+      "dimension": "I5_EXPERIMENT_DISCRIMINATION",
+      "measured_value": 0.667,
+      "weakness_kind": "LOW_SCORE",
+      "why_weak": "measured 0.667 < STRONG floor 0.7",
+      "mutation_type": "EXPERIMENT_DISCRIMINATION"
+     }
+    ],
+    "evidence_gaps": [
+     {
+      "dimension": "I2_DIFFERENTIATOR_TECHNICAL_MEANING",
+      "state": "UNMEASURABLE_NO_SURVIVORS",
+      "what_is_missing": "no surviving differentiators recorded",
+      "consequence": "no mutation targets this dimension until the gap closes (Art. XXV)"
+     },
+     {
+      "dimension": "I3_RECOMBINATION_RISK",
+      "state": "UNMEASURABLE_NO_FAMILIES",
+      "what_is_missing": "no prior-art families adjudicated — residue vs found art is unmeasured; absence of found art is not novelty",
+      "consequence": "no mutation targets this dimension until the gap closes (Art. XXV)"
+     },
+     {
+      "dimension": "I4_NEW_TECHNICAL_RELATIONSHIP",
+      "state": "UNMEASURABLE_NO_FAMILY_TEXT",
+      "what_is_missing": "no adjudicated family text stored — pair novelty vs found art is unmeasured",
+      "consequence": "no mutation targets this dimension until the gap closes (Art. XXV)"
+     }
+    ],
+    "target": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "MECHANISM_STRENGTHENING"
+    }
+   },
+   "proposals": [
+    {
+     "proposal_id": "prop:2064f3668fc4",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "3566cec93f08487ef6031f5565683747169998548dc4e798c68a1961de7dea39",
+     "output_hash": "2064f3668fc4c72d95346406cfcc3733d1f71729620a85eb19b07eed5c85ff5f",
+     "fields": {
+      "MUTATION_TYPE": "MECHANISM_STRENGTHENING",
+      "MECHANISM": "Surface coating enhances barrier properties of biodegradable polymer films by forming a dense layer that impedes molecular diffusion pathways through nanocomposite technology with filler reinforcement",
+      "INTERVENTION": "Apply a nanocomposite coating containing hydrophobic nanoparticles to the ethylene-vinyl alcohol layer to reduce moisture permeation while maintaining oxygen barrier properties through nanocomposite technology",
+      "EXPECTED_EFFECT": "Water vapor transmission rate will decrease from 890-920 g·m^-2·day^-1 to below 0.5 g/m2/day",
+      "FALSIFICATION_TEST": "falsification_test_from_candidate",
+      "MECHANISM_SOURCE_SPAN": "surface coating, polymer blending, multilayer compounding, copolymerization and modification, nanocomposite technology, and filler reinforcement",
+      "SOURCE_EVIDENCE_ID": "doi:10.3390/nano16150934",
+      "EXPERIMENT": "Compare the water vapor transmission rate of the nanocomposite-coated EVOH film against an uncoated EVOH film over 18 months at 25°C and 65% relative humidity",
+      "EXPERIMENT_BASELINE": "uncoated ethylene-vinyl alcohol film",
+      "EXPERIMENT_EIG": "0.75",
+      "CONSTRAINT_DERIVED": "NONE",
+      "MUTATION_REASON": "Repairs I1_MECHANISM_EVIDENCE_DERIVATION weakness by incorporating technical vocabulary directly from evidence span to achieve span-derivation ratio >= 0.20"
+     },
+     "validation": {
+      "valid": true,
+      "stage": "VALIDATION",
+      "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "mutation_type": "MECHANISM_STRENGTHENING",
+      "checks": {
+       "mutation_type_matches_diagnosis": true,
+       "span_evidence_exists": "doi:10.3390/nano16150934",
+       "span_verbatim_in_evidence": true,
+       "mutation_changes_candidate": true,
+       "span_derivation": {
+        "n_shared": 7,
+        "shared_terms": [
+         "coating",
+         "filler",
+         "nanocomposite",
+         "polymer",
+         "reinforcement",
+         "surface",
+         "technology"
+        ],
+        "span_terms_n": 12,
+        "ratio": 0.583,
+        "underived": false,
+        "state": "MEASURED",
+        "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+       },
+       "span_derivation_cleared": 0.583
+      },
+      "reasons": [],
+      "validated_at": "2026-09-10T16:03:28+00:00Z"
+     }
+    }
+   ],
+   "mutation_attempts": [
+    {
+     "mutation_applied": {
+      "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+      "mutation_id": "mut:e1bd7a216617",
+      "mutation_type": "MECHANISM_STRENGTHENING",
+      "diagnostic_trigger": {
+       "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+       "measured_before": 0.333,
+       "basis": "R378 evaluator-contract diagnosis (deterministic)"
+      },
+      "proposal_provenance": {
+       "proposal_id": "prop:2064f3668fc4",
+       "provider": "zai",
+       "model": "glm-4-plus",
+       "prompt_hash": "3566cec93f08487ef6031f5565683747169998548dc4e798c68a1961de7dea39",
+       "output_hash": "2064f3668fc4c72d95346406cfcc3733d1f71729620a85eb19b07eed5c85ff5f",
+       "llm_is_untrusted_proposer": true
+      },
+      "validation": {
+       "valid": true,
+       "stage": "VALIDATION",
+       "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+       "mutation_type": "MECHANISM_STRENGTHENING",
+       "checks": {
+        "mutation_type_matches_diagnosis": true,
+        "span_evidence_exists": "doi:10.3390/nano16150934",
+        "span_verbatim_in_evidence": true,
+        "mutation_changes_candidate": true,
+        "span_derivation": {
+         "n_shared": 7,
+         "shared_terms": [
+          "coating",
+          "filler",
+          "nanocomposite",
+          "polymer",
+          "reinforcement",
+          "surface",
+          "technology"
+         ],
+         "span_terms_n": 12,
+         "ratio": 0.583,
+         "underived": false,
+         "state": "MEASURED",
+         "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+        },
+        "span_derivation_cleared": 0.583
+       },
+       "reasons": [],
+       "validated_at": "2026-09-10T16:03:28+00:00Z"
+      },
+      "fields_changed": {
+       "mechanism": {
+        "before": "Surface coating enhances barrier properties of biodegradable polymer films by forming a dense layer that impedes molecular diffusion pathways",
+        "after": "Surface coating enhances barrier properties of biodegradable polymer films by forming a dense layer that impedes molecular diffusion pathways through nanocomposite technology with filler reinforcement"
+       },
+       "intervention": {
+        "before": "Apply a nanocomposite coating containing hydrophobic nanoparticles to the ethylene-vinyl alcohol layer to reduce moisture permeation while maintaining oxygen barrier properties",
+        "after": "Apply a nanocomposite coating containing hydrophobic nanoparticles to the ethylene-vinyl alcohol layer to reduce moisture permeation while maintaining oxygen barrier properties through nanocomposite technology"
+       },
+       "mechanism_source_span": {
+        "before": "surface coating, polymer blending, multilayer compounding, copolymerization and modification, nanocomposite technology, and filler reinforcement",
+        "after": "surface coating, polymer blending, multilayer compounding, copolymerization and modification, nanocomposite technology, and filler reinforcement"
+       }
+      },
+      "inherited_negatives": {
+       "uncertainty_ids": [
+        "con:verify:fc690a03",
+        "multilayer polymer packaging layer food film",
+        "multilayer polymer packaging layer food film",
+        "layers physical contact filling molecular synergistic",
+        "layers physical contact filling molecular synergistic",
+        "multilayer layer barrier replace structure monolithic hydrophobic",
+        "multilayer layer barrier replace structure monolithic hydrophobic",
+        "multilayer transmission incorporating during distribution humidity",
+        "multilayer transmission incorporating during distribution humidity",
+        "transmission decrease water vapor rate 890",
+        "transmission decrease water vapor rate 890"
+       ],
+       "collision_family_ids": [],
+       "source_errors": []
+      },
+      "parent_spec_hash": "ca2a88b149dcf0e309f1ab545600bb4dcb56e4dae6cc6c1b09f2bb96d95ef988",
+      "child_spec_hash": null,
+      "reason": "Repairs I1_MECHANISM_EVIDENCE_DERIVATION weakness by incorporating technical vocabulary directly from evidence span to achieve span-derivation ratio >= 0.20",
+      "applied_at": "2026-09-10T16:03:28+00:00Z"
+     },
+     "re_evaluation": {
+      "collision_mode": "REPLAY_CACHE",
+      "re_evaluated_at": "2026-09-10T16:03:28+00:00Z",
+      "re_adjudication": {
+       "mode": "REPLAY_CACHE",
+       "valid": false,
+       "reason": "NO_CACHED_FAMILIES"
+      },
+      "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+      "re_adjudication_failure": "NO_CACHED_FAMILIES",
+      "i_dimensions": {
+       "I1_MECHANISM_EVIDENCE_DERIVATION": {
+        "score": 0.455,
+        "state": "MEASURED"
+       },
+       "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_SURVIVORS"
+       },
+       "I3_RECOMBINATION_RISK": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_FAMILIES"
+       },
+       "I4_NEW_TECHNICAL_RELATIONSHIP": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+       },
+       "I5_EXPERIMENT_DISCRIMINATION": {
+        "score": 0.667,
+        "state": "MEASURED"
+       }
+      },
+      "i_flags": {
+       "underived_mechanism": false,
+       "recombination_only": false
+      },
+      "i_average": 0.561,
+      "q_dimensions": {
+       "Q1_EVIDENCE_BINDING": {
+        "score": 0.5,
+        "state": "MEASURED"
+       },
+       "Q2_PRIOR_ART_SPECIFICITY": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_PRIOR_ART"
+       },
+       "Q3_PRIOR_ART_RESOLUTION": {
+        "score": 0.0,
+        "state": "MEASURED"
+       },
+       "Q4_EXPERIMENT_DECISIVENESS": {
+        "score": 1.0,
+        "state": "MEASURED"
+       },
+       "Q5_CHAIN_COMPLETENESS": {
+        "score": 1.0,
+        "state": "MEASURED"
+       }
+      },
+      "q_average": 0.625
+     },
+     "decision": {
+      "action": "KEEP",
+      "improved": true,
+      "checks": {
+       "targeted_dimension": "0.333 -> 0.455 (improved)",
+       "negatives_preserved": true,
+       "no_new_structural_flags": true,
+       "no_unknown_conversion_without_new_evidence": true,
+       "text_gap_conversions_recorded": [],
+       "prior_art_position_not_degraded": true
+      },
+      "reasons": [],
+      "decided_at": "2026-09-10T16:03:28+00:00Z"
+     }
+    }
+   ],
+   "mutation_applied": {
+    "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+    "mutation_id": "mut:e1bd7a216617",
+    "mutation_type": "MECHANISM_STRENGTHENING",
+    "diagnostic_trigger": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "measured_before": 0.333,
+     "basis": "R378 evaluator-contract diagnosis (deterministic)"
+    },
+    "proposal_provenance": {
+     "proposal_id": "prop:2064f3668fc4",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "3566cec93f08487ef6031f5565683747169998548dc4e798c68a1961de7dea39",
+     "output_hash": "2064f3668fc4c72d95346406cfcc3733d1f71729620a85eb19b07eed5c85ff5f",
+     "llm_is_untrusted_proposer": true
+    },
+    "validation": {
+     "valid": true,
+     "stage": "VALIDATION",
+     "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "MECHANISM_STRENGTHENING",
+     "checks": {
+      "mutation_type_matches_diagnosis": true,
+      "span_evidence_exists": "doi:10.3390/nano16150934",
+      "span_verbatim_in_evidence": true,
+      "mutation_changes_candidate": true,
+      "span_derivation": {
+       "n_shared": 7,
+       "shared_terms": [
+        "coating",
+        "filler",
+        "nanocomposite",
+        "polymer",
+        "reinforcement",
+        "surface",
+        "technology"
+       ],
+       "span_terms_n": 12,
+       "ratio": 0.583,
+       "underived": false,
+       "state": "MEASURED",
+       "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+      },
+      "span_derivation_cleared": 0.583
+     },
+     "reasons": [],
+     "validated_at": "2026-09-10T16:03:28+00:00Z"
+    },
+    "fields_changed": {
+     "mechanism": {
+      "before": "Surface coating enhances barrier properties of biodegradable polymer films by forming a dense layer that impedes molecular diffusion pathways",
+      "after": "Surface coating enhances barrier properties of biodegradable polymer films by forming a dense layer that impedes molecular diffusion pathways through nanocomposite technology with filler reinforcement"
+     },
+     "intervention": {
+      "before": "Apply a nanocomposite coating containing hydrophobic nanoparticles to the ethylene-vinyl alcohol layer to reduce moisture permeation while maintaining oxygen barrier properties",
+      "after": "Apply a nanocomposite coating containing hydrophobic nanoparticles to the ethylene-vinyl alcohol layer to reduce moisture permeation while maintaining oxygen barrier properties through nanocomposite technology"
+     },
+     "mechanism_source_span": {
+      "before": "surface coating, polymer blending, multilayer compounding, copolymerization and modification, nanocomposite technology, and filler reinforcement",
+      "after": "surface coating, polymer blending, multilayer compounding, copolymerization and modification, nanocomposite technology, and filler reinforcement"
+     }
+    },
+    "inherited_negatives": {
+     "uncertainty_ids": [
+      "con:verify:fc690a03",
+      "multilayer polymer packaging layer food film",
+      "multilayer polymer packaging layer food film",
+      "layers physical contact filling molecular synergistic",
+      "layers physical contact filling molecular synergistic",
+      "multilayer layer barrier replace structure monolithic hydrophobic",
+      "multilayer layer barrier replace structure monolithic hydrophobic",
+      "multilayer transmission incorporating during distribution humidity",
+      "multilayer transmission incorporating during distribution humidity",
+      "transmission decrease water vapor rate 890",
+      "transmission decrease water vapor rate 890"
+     ],
+     "collision_family_ids": [],
+     "source_errors": []
+    },
+    "parent_spec_hash": "ca2a88b149dcf0e309f1ab545600bb4dcb56e4dae6cc6c1b09f2bb96d95ef988",
+    "child_spec_hash": null,
+    "reason": "Repairs I1_MECHANISM_EVIDENCE_DERIVATION weakness by incorporating technical vocabulary directly from evidence span to achieve span-derivation ratio >= 0.20",
+    "applied_at": "2026-09-10T16:03:28+00:00Z"
+   },
+   "re_evaluation": {
+    "collision_mode": "REPLAY_CACHE",
+    "re_evaluated_at": "2026-09-10T16:03:28+00:00Z",
+    "re_adjudication": {
+     "mode": "REPLAY_CACHE",
+     "valid": false,
+     "reason": "NO_CACHED_FAMILIES"
+    },
+    "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+    "re_adjudication_failure": "NO_CACHED_FAMILIES",
+    "i_dimensions": {
+     "I1_MECHANISM_EVIDENCE_DERIVATION": {
+      "score": 0.455,
+      "state": "MEASURED"
+     },
+     "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_SURVIVORS"
+     },
+     "I3_RECOMBINATION_RISK": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_FAMILIES"
+     },
+     "I4_NEW_TECHNICAL_RELATIONSHIP": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+     },
+     "I5_EXPERIMENT_DISCRIMINATION": {
+      "score": 0.667,
+      "state": "MEASURED"
+     }
+    },
+    "i_flags": {
+     "underived_mechanism": false,
+     "recombination_only": false
+    },
+    "i_average": 0.561,
+    "q_dimensions": {
+     "Q1_EVIDENCE_BINDING": {
+      "score": 0.5,
+      "state": "MEASURED"
+     },
+     "Q2_PRIOR_ART_SPECIFICITY": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_PRIOR_ART"
+     },
+     "Q3_PRIOR_ART_RESOLUTION": {
+      "score": 0.0,
+      "state": "MEASURED"
+     },
+     "Q4_EXPERIMENT_DECISIVENESS": {
+      "score": 1.0,
+      "state": "MEASURED"
+     },
+     "Q5_CHAIN_COMPLETENESS": {
+      "score": 1.0,
+      "state": "MEASURED"
+     }
+    },
+    "q_average": 0.625
+   },
+   "decision": {
+    "action": "KEEP",
+    "improved": true,
+    "checks": {
+     "targeted_dimension": "0.333 -> 0.455 (improved)",
+     "negatives_preserved": true,
+     "no_new_structural_flags": true,
+     "no_unknown_conversion_without_new_evidence": true,
+     "text_gap_conversions_recorded": [],
+     "prior_art_position_not_degraded": true
+    },
+    "reasons": [],
+    "decided_at": "2026-09-10T16:03:28+00:00Z"
+   }
+  }
+ ],
+ "outcome": "IMPROVED",
+ "outcome_reason": "",
+ "baseline": {
+  "i_dimensions": {
+   "I1_MECHANISM_EVIDENCE_DERIVATION": {
+    "score": 0.19,
+    "state": "MEASURED"
+   },
+   "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_SURVIVORS"
+   },
+   "I3_RECOMBINATION_RISK": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_FAMILIES"
+   },
+   "I4_NEW_TECHNICAL_RELATIONSHIP": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+   },
+   "I5_EXPERIMENT_DISCRIMINATION": {
+    "score": 0.667,
+    "state": "MEASURED"
+   }
+  },
+  "i_flags": {
+   "underived_mechanism": true,
+   "recombination_only": false
+  },
+  "i_average": 0.428,
+  "q_dimensions": {
+   "Q1_EVIDENCE_BINDING": {
+    "score": 0.5,
+    "state": "MEASURED"
+   },
+   "Q2_PRIOR_ART_SPECIFICITY": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_PRIOR_ART"
+   },
+   "Q3_PRIOR_ART_RESOLUTION": {
+    "score": 0.0,
+    "state": "MEASURED"
+   },
+   "Q4_EXPERIMENT_DECISIVENESS": {
+    "score": 1.0,
+    "state": "MEASURED"
+   },
+   "Q5_CHAIN_COMPLETENESS": {
+    "score": 1.0,
+    "state": "MEASURED"
+   }
+  },
+  "q_average": 0.625,
+  "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE"
+ },
+ "final": {
+  "i_dimensions": {
+   "I1_MECHANISM_EVIDENCE_DERIVATION": {
+    "score": 0.455,
+    "state": "MEASURED"
+   },
+   "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_SURVIVORS"
+   },
+   "I3_RECOMBINATION_RISK": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_FAMILIES"
+   },
+   "I4_NEW_TECHNICAL_RELATIONSHIP": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+   },
+   "I5_EXPERIMENT_DISCRIMINATION": {
+    "score": 0.667,
+    "state": "MEASURED"
+   }
+  },
+  "i_flags": {
+   "underived_mechanism": false,
+   "recombination_only": false
+  },
+  "i_average": 0.561,
+  "q_dimensions": {
+   "Q1_EVIDENCE_BINDING": {
+    "score": 0.5,
+    "state": "MEASURED"
+   },
+   "Q2_PRIOR_ART_SPECIFICITY": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_PRIOR_ART"
+   },
+   "Q3_PRIOR_ART_RESOLUTION": {
+    "score": 0.0,
+    "state": "MEASURED"
+   },
+   "Q4_EXPERIMENT_DECISIVENESS": {
+    "score": 1.0,
+    "state": "MEASURED"
+   },
+   "Q5_CHAIN_COMPLETENESS": {
+    "score": 1.0,
+    "state": "MEASURED"
+   }
+  },
+  "q_average": 0.625,
+  "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE"
+ },
+ "finished_at": "2026-09-10T16:03:28+00:00Z",
+ "outcome_summary": {
+  "baseline_i_average": 0.428,
+  "final_i_average": 0.561,
+  "baseline_q_average": 0.625,
+  "final_q_average": 0.625,
+  "iterations_run": 2,
+  "keeps": 2
+ },
+ "status": "IMPROVED"
+}

@@ -1,0 +1,56 @@
+{
+ "stage": "INDEPENDENT_ATTACK",
+ "candidate_id": "cand:MS:DIRECT_TRANSFER:947b5f76beb9",
+ "escalation": {
+  "gate_version": "attacker_calibration/1.0.0",
+  "instrument": "independent_attack/1.0.0",
+  "calibration_state": "NOT_CALIBRATED",
+  "terminal_kill_admissible": false,
+  "measured": {
+   "coverage": 1.0,
+   "parse_completeness": 1.0,
+   "tpr_scoped": 1.0,
+   "fpr_known_good": 1.0,
+   "n_cases_attacked": 40
+  },
+  "sealed_thresholds": {
+   "note": "registered BEFORE measurement; never tuned to results (Art. XXVII)",
+   "coverage_min": 0.875,
+   "parse_completeness_min": 0.875,
+   "tpr_min": 0.75,
+   "fpr_max": 0.3,
+   "ensemble": "NONE (single-attacker calibration only; majority-vote ensembles are deferred by the R412 directive)"
+  },
+  "measurement_path": "R412/CALIBRATION/engine_independent_attack_measurement.json",
+  "measurement_sha256": "4e1718e7088564333b5e1ef9be47ca452133d051001628cd6eed91f44e60ef5f",
+  "reason": "measured FPR 1.0 > sealed bar 0.3 (Art. L: the attacker is measured non-selective; its KILL is inadmissible as a terminal verdict and is escalated with the objection preserved)",
+  "rule": "the instrument's KILL is measured non-selective (FPR above the sealed bar); the objection is preserved verbatim and ESCALATED for adjudication — the candidate is NOT killed by this attack alone (Art. L); the deterministic gates are unchanged",
+  "reviewer_provenance": "AI_REVIEW (Art. LXVII)"
+ },
+ "preserved_objections": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "basis": "The mechanism fails because maintaining higher surface temperatures to reduce biofilm and scale contradicts the fundamental principle that increased temperature accelerates scale formation, as demonstrated by the evidence on calcium carbonate scaling which shows scaling rates increase exponentially with temperature above 50°C, making the claimed effect impossible under the proposed boundary condition of 60°C inlet temperature."
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "basis": "The boundary condition of maintaining 60°C inlet temperature while preventing chlorination above 0.5 ppm residual is impossible to achieve in a district cooling loop where typical inlet temperatures range from 7-12°C for cooling applications, and the proposed temperature would transform the device from a cooling heat exchanger to a heating application, violating the fundamental operating parameters of the baseline system."
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "basis": "The candidate's own evidence [doi:10.3323/jcorr1974.29.7_354] explicitly documents stress corrosion cracking of stainless steel heat exchangers in cooling water systems, directly contradicting the claim that stainless steel will perform adequately in this application without addressing the corrosion risks that the evidence proves are inherent to this material in this context."
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "basis": "The proposed solution cannot beat the baseline because the predicted heat transfer coefficient of 2500 W/m2K after 12 months is actually lower than typical values for clean stainless steel plate heat exchangers which operate between 3000-5000 W/m2K under standard conditions, meaning the candidate's \"improved\" design performs worse than the unmodified baseline from day one."
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "basis": "Integration of a stainless steel coil heat exchanger within existing plate channels is mechanically impossible because the coil would obstruct the flow path, increase pressure drop beyond acceptable limits (contradicting the flow rate boundary condition), and create inaccessible dead zones where biofilm accumulation would actually be worse than in the baseline design."
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "basis": "The testable prediction fails to pin down critical variables, as it doesn't specify the fluid composition, flow velocity distribution across the modified channels, or the method for distinguishing between heat transfer degradation from biofilm versus the added thermal resistance of the coil itself, making the measurement of effectiveness scientifically invalid."
+  }
+ ]
+}

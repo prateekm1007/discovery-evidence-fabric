@@ -92,15 +92,17 @@ def check_run_dir(run_dir: Path) -> List[Dict[str, str]]:
     # answer. The run's own contract (R444-D) is the record; when the
     # run predates R444-D the contract is re-derived from the envelope
     # by the caller-supplied projection when available.
+    # Mirrors run.py::_evolution_final_status: only opportunity-
+    # presenting statuses (the EVOLVED class) claim the experiment
+    # axis is closed; failure/infrastructure presentations
+    # (MECHANISM_GENERATION_FAILED, REJECTED, UNDER_DEVELOPMENT,
+    # REQUIRES_EXPERIMENT) make no such claim.
     contract = source.get("experiment_contract", {}).get("contract") \
         if isinstance(source.get("experiment_contract"), dict) else None
     if contract is None and decisive:
         contract = decisive.get("falsification_contract")
-    if status not in ("INVENTION_REQUIRES_EXPERIMENT",
-                      "INVENTION_UNDER_DEVELOPMENT", None):
-        # any status that presents the invention as a defensible
-        # opportunity claims the experiment axis is closed enough that
-        # the kill answer must exist
+    if status in ("EVOLVED_INVENTION_CANDIDATE",
+                  "AUTOMATED_INVENTION_CANDIDATE"):
         v.extend(experiment_claim_violations_r444(
             claims_complete_experiment=True, contract=contract))
     return v

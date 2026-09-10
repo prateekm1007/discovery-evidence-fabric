@@ -1,0 +1,79 @@
+{
+ "attack_version": "independent_attack/1.0.0",
+ "candidate_id": "cand:MS:FAILURE_PATH_INVERSION:f94d0d31f122",
+ "generator_provider": "zai",
+ "attacker_provider": "zai",
+ "attacker_model": "glm-4-plus",
+ "independence_mode": "SEPARATE_CONTEXT",
+ "independence_note": "the attacker ran in an independent reasoning context (fresh adversarial conversation, generator reasoning never shown; no alternative provider credentialed — disclosed, never claimed as provider separation)",
+ "prompt_hash": "047336e174b8cdf642ff8512943be8d156b1ee24a411f3a826cd34a5d8ddc05a",
+ "output_hash": "b9850e04ed3c654f4e90f7dcbe11d99e298ceee057d452f48153d8f97f1bd989",
+ "llm_status": "OK",
+ "attacked_at": "2026-09-10T17:10:33+00:00Z",
+ "items": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "verdict": "KILL",
+   "basis": "The decoupling of computation from memory defragmentation through CPU-GPU heterogeneous approach introduces fundamental synchronization overhead that negates any latency benefits, as evidenced by the known failure mode of excessive CPU-GPU communication overhead and contradicted by [doi:10.70675/036b4171z0acfz4a50z9d51z481b92e5f4da] which shows fundamental limits of shared-cache networks."
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "verdict": "KILL",
+   "basis": "The solution requires \"sufficient CPU resources for management\" but fails to define how this scales with GPU nodes, violating boundary conditions in multi-GPU systems where CPU resources become the bottleneck during 3x baseline burst load, contradicting the predicted effect of maintaining request acceptance without adding GPU nodes."
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "verdict": "KILL",
+   "basis": "The candidate's evidence bundle includes [doi:10.5220/0015138800004103] which demonstrates bit-flip vulnerabilities in shared KV-cache blocks, making the proposed GPU virtual memory management approach fundamentally unsafe for production systems, directly contradicting the predicted reliability improvements."
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "verdict": "KILL",
+   "basis": "The predicted 2.12x speedup in kernel evaluation fails to account for the overhead of page management separation, making the claimed p99 latency reduction of at least 50% unrealistic compared to the baseline, especially when considering the known failure mode of increased latency in very short request scenarios."
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "verdict": "KILL",
+   "basis": "The proposed vTensor framework based on GPU virtual memory management cannot be implemented without deep hardware-specific modifications that are incompatible with existing GPU architectures, as evidenced by the known failure mode of compatibility issues with existing LLM architectures and contradicted by [doi:10.14711/thesis-hdl152583] which shows resource-efficient model serving requires holistic optimization, not just memory management."
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "verdict": "KILL",
+   "basis": "The testable prediction of 2.12x speedup in kernel evaluation fails to define specific metrics for measuring \"kernel evaluation\" separately from memory management overhead, making the measurement ambiguous and impossible to verify independently, as contradicted by [doi:10.5463/thesis.308] which emphasizes the need for holistic latency measurement in inference serving."
+  }
+ ],
+ "state": "ATTACK_RUN",
+ "overall": "KILLED",
+ "kill_basis": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "basis": "The decoupling of computation from memory defragmentation through CPU-GPU heterogeneous approach introduces fundamental synchronization overhead that negates any latency benefits, as evidenced by the known failure mode of excessive CPU-GPU communication overhead and contradicted by [doi:10.70675/036b4171z0acfz4a50z9d51z481b92e5f4da] which shows fundamental limits of shared-cache networks."
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "basis": "The solution requires \"sufficient CPU resources for management\" but fails to define how this scales with GPU nodes, violating boundary conditions in multi-GPU systems where CPU resources become the bottleneck during 3x baseline burst load, contradicting the predicted effect of maintaining request acceptance without adding GPU nodes."
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "basis": "The candidate's evidence bundle includes [doi:10.5220/0015138800004103] which demonstrates bit-flip vulnerabilities in shared KV-cache blocks, making the proposed GPU virtual memory management approach fundamentally unsafe for production systems, directly contradicting the predicted reliability improvements."
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "basis": "The predicted 2.12x speedup in kernel evaluation fails to account for the overhead of page management separation, making the claimed p99 latency reduction of at least 50% unrealistic compared to the baseline, especially when considering the known failure mode of increased latency in very short request scenarios."
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "basis": "The proposed vTensor framework based on GPU virtual memory management cannot be implemented without deep hardware-specific modifications that are incompatible with existing GPU architectures, as evidenced by the known failure mode of compatibility issues with existing LLM architectures and contradicted by [doi:10.14711/thesis-hdl152583] which shows resource-efficient model serving requires holistic optimization, not just memory management."
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "basis": "The testable prediction of 2.12x speedup in kernel evaluation fails to define specific metrics for measuring \"kernel evaluation\" separately from memory management overhead, making the measurement ambiguous and impossible to verify independently, as contradicted by [doi:10.5463/thesis.308] which emphasizes the need for holistic latency measurement in inference serving."
+  }
+ ],
+ "counts": {
+  "KILL": 6,
+  "RISK": 0,
+  "SURVIVE": 0,
+  "INVALID": 0
+ }
+}

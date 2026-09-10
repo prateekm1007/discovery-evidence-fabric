@@ -1,0 +1,56 @@
+{
+ "stage": "INDEPENDENT_ATTACK",
+ "candidate_id": "cand:DIV:multi_physics_hybrid:zai:8712b4102a3b",
+ "escalation": {
+  "gate_version": "attacker_calibration/1.0.0",
+  "instrument": "independent_attack/1.0.0",
+  "calibration_state": "NOT_CALIBRATED",
+  "terminal_kill_admissible": false,
+  "measured": {
+   "coverage": 1.0,
+   "parse_completeness": 1.0,
+   "tpr_scoped": 1.0,
+   "fpr_known_good": 1.0,
+   "n_cases_attacked": 40
+  },
+  "sealed_thresholds": {
+   "note": "registered BEFORE measurement; never tuned to results (Art. XXVII)",
+   "coverage_min": 0.875,
+   "parse_completeness_min": 0.875,
+   "tpr_min": 0.75,
+   "fpr_max": 0.3,
+   "ensemble": "NONE (single-attacker calibration only; majority-vote ensembles are deferred by the R412 directive)"
+  },
+  "measurement_path": "R412/CALIBRATION/engine_independent_attack_measurement.json",
+  "measurement_sha256": "4e1718e7088564333b5e1ef9be47ca452133d051001628cd6eed91f44e60ef5f",
+  "reason": "measured FPR 1.0 > sealed bar 0.3 (Art. L: the attacker is measured non-selective; its KILL is inadmissible as a terminal verdict and is escalated with the objection preserved)",
+  "rule": "the instrument's KILL is measured non-selective (FPR above the sealed bar); the objection is preserved verbatim and ESCALATED for adjudication — the candidate is NOT killed by this attack alone (Art. L); the deterministic gates are unchanged",
+  "reviewer_provenance": "AI_REVIEW (Art. LXVII)"
+ },
+ "preserved_objections": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "basis": "The candidate incorrectly assumes PID is solely caused by positive voltage when established literature shows PID occurs under both positive and negative polarities depending on module construction and environmental conditions (doi:10.1155/2018/3286124)"
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "basis": "The solution fails to address that PID can occur at module-level voltages as low as 5V, making reverse polarity protection impractical for high-voltage strings where individual module voltages are much lower than string voltage (doi:10.3390/en12224230)"
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "basis": "The candidate's evidence bundle includes research on silicon alloy purification (doi:10.1038/s41598-026-49258-9) which is irrelevant to PID mechanisms, showing a fundamental misunderstanding of the failure mode"
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "basis": "The solution does not improve upon the baseline as PID can still occur through thermal stress, humidity ingress, and other voltage-independent pathways not addressed by reverse polarity protection"
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "basis": "Incorporating reverse polarity protection in high-voltage strings would require additional components that increase cost, reduce efficiency, and create new failure points while being incompatible with existing module architectures"
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "basis": "The proposed test cannot distinguish between sodium ion migration caused by voltage and other degradation mechanisms, making the prediction impossible to validate conclusively (doi:10.1038/s41598-025-26765-9)"
+  }
+ ]
+}

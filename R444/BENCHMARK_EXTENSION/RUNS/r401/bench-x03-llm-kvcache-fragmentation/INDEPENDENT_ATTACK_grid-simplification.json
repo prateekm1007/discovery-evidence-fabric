@@ -1,0 +1,79 @@
+{
+ "attack_version": "independent_attack/1.0.0",
+ "candidate_id": "cand:DIV:simplification:zai:641281523b5d",
+ "generator_provider": null,
+ "attacker_provider": "zai",
+ "attacker_model": "glm-4-plus",
+ "independence_mode": "SEPARATE_CONTEXT",
+ "independence_note": "the attacker ran in an independent reasoning context (fresh adversarial conversation, generator reasoning never shown; no alternative provider credentialed — disclosed, never claimed as provider separation)",
+ "prompt_hash": "88cce9ddcee58e43059824de8f68683592e09c4251c74f09d08de5a5b145e139",
+ "output_hash": "cbc151ab1811520f9a9a54d0d8ba6c9c585f578eaae4d10b15f6b5bae2e51e36",
+ "llm_status": "OK",
+ "attacked_at": "2026-09-10T17:09:32+00:00Z",
+ "items": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "verdict": "KILL",
+   "basis": "The candidate proposes error correction codes for bit-flips in shared KV-cache blocks, but the cited evidence [doi:10.5220/0015138800004103] demonstrates that bit-flips in GPU memory are not random but correlated with specific memory locations and access patterns, making standard error correction codes ineffective against the actual failure mode."
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "verdict": "KILL",
+   "basis": "The candidate fails to define boundary conditions for when error correction becomes insufficient (e.g., when corruption exceeds correction capability), which is critical given evidence [doi:10.1109/icassp55912.2026.11461518] showing that MIDAS framework already handles cache fragmentation through dynamic offloading, making error correction only partially effective at best."
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "verdict": "KILL",
+   "basis": "The candidate's evidence [doi:10.70675/036b4171z0acfz4a50z9d51z481b92e5f4da] on fundamental limits of shared-cache networks directly contradicts the approach by demonstrating that shared memory systems inherently have higher error rates under concurrent access, which error correction cannot fully mitigate without significant performance penalties."
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "verdict": "KILL",
+   "basis": "The candidate's predicted effect of reducing unnecessary cache evictions equals the baseline because evidence [doi:10.5463/thesis.308] shows that latency-critical inference serving already implements selective cache invalidation based on access patterns, making the error correction approach redundant for the specific failure mode described."
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "verdict": "KILL",
+   "basis": "The novel design variable is undefined, making implementation impossible as the candidate fails to specify how error correction codes would be integrated with existing paged KV-cache systems without violating the memory access patterns documented in [doi:10.5220/0015138800004103]."
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "verdict": "KILL",
+   "basis": "The testable prediction fails to account for the variable impact of error correction overhead on different token lengths, as evidenced by [doi:10.14711/thesis-hdl152583], which shows that resource-efficient serving requires different strategies for short versus long sequences, making the proposed measurement insufficient to validate the approach."
+  }
+ ],
+ "state": "ATTACK_RUN",
+ "overall": "KILLED",
+ "kill_basis": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "basis": "The candidate proposes error correction codes for bit-flips in shared KV-cache blocks, but the cited evidence [doi:10.5220/0015138800004103] demonstrates that bit-flips in GPU memory are not random but correlated with specific memory locations and access patterns, making standard error correction codes ineffective against the actual failure mode."
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "basis": "The candidate fails to define boundary conditions for when error correction becomes insufficient (e.g., when corruption exceeds correction capability), which is critical given evidence [doi:10.1109/icassp55912.2026.11461518] showing that MIDAS framework already handles cache fragmentation through dynamic offloading, making error correction only partially effective at best."
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "basis": "The candidate's evidence [doi:10.70675/036b4171z0acfz4a50z9d51z481b92e5f4da] on fundamental limits of shared-cache networks directly contradicts the approach by demonstrating that shared memory systems inherently have higher error rates under concurrent access, which error correction cannot fully mitigate without significant performance penalties."
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "basis": "The candidate's predicted effect of reducing unnecessary cache evictions equals the baseline because evidence [doi:10.5463/thesis.308] shows that latency-critical inference serving already implements selective cache invalidation based on access patterns, making the error correction approach redundant for the specific failure mode described."
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "basis": "The novel design variable is undefined, making implementation impossible as the candidate fails to specify how error correction codes would be integrated with existing paged KV-cache systems without violating the memory access patterns documented in [doi:10.5220/0015138800004103]."
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "basis": "The testable prediction fails to account for the variable impact of error correction overhead on different token lengths, as evidenced by [doi:10.14711/thesis-hdl152583], which shows that resource-efficient serving requires different strategies for short versus long sequences, making the proposed measurement insufficient to validate the approach."
+  }
+ ],
+ "counts": {
+  "KILL": 6,
+  "RISK": 0,
+  "SURVIVE": 0,
+  "INVALID": 0
+ }
+}

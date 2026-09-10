@@ -1,0 +1,79 @@
+{
+ "attack_version": "independent_attack/1.0.0",
+ "candidate_id": "cand:DIV:simplification:zai:df0889443483",
+ "generator_provider": null,
+ "attacker_provider": "zai",
+ "attacker_model": "glm-4-plus",
+ "independence_mode": "SEPARATE_CONTEXT",
+ "independence_note": "the attacker ran in an independent reasoning context (fresh adversarial conversation, generator reasoning never shown; no alternative provider credentialed — disclosed, never claimed as provider separation)",
+ "prompt_hash": "7a8823802c0af8cf65227497deb74d4a05b651032f51975e177a125acafb46bf",
+ "output_hash": "93decd80fa81c64a969b0edecb469b1ab3b6b29c95cf0ec2a4119481a8195f53",
+ "llm_status": "OK",
+ "attacked_at": "2026-09-10T17:20:51+00:00Z",
+ "items": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "verdict": "KILL",
+   "basis": "Wavelet decomposition is designed for stationary signals with periodic patterns, but retail time-series data contains multiple non-stationary components (promotions, holidays, supply disruptions) that violate this fundamental assumption, making the decomposition mathematically unsound for this application."
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "verdict": "KILL",
+   "basis": "The candidate fails to specify how the method handles boundary conditions where wavelet decomposition requires padding at signal edges, which would introduce artificial features that could be misinterpreted as drift in retail data with frequent start/end-of-period anomalies."
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "verdict": "KILL",
+   "basis": "The provided evidence bundle contains no studies on wavelet decomposition for retail time-series monitoring; instead, the references focus on LSTM, SVR, meta-learning, and federated learning for completely different domains (energy, pharmaceuticals, abrasion, blood donation), showing no connection to the claimed mechanism."
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "verdict": "KILL",
+   "basis": "The candidate provides no evidence that wavelet decomposition would outperform existing statistical process control methods already used in retail forecasting systems, which are specifically designed for non-stationary time-series and have proven track records in drift detection."
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "verdict": "KILL",
+   "basis": "The proposed method would require maintaining separate wavelet decomposition models for each product category, store, and time granularity, creating an intractable computational burden that would make real-time monitoring impossible in large retail operations."
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "verdict": "KILL",
+   "basis": "The testable prediction fails to define what constitutes a \"significant\" impact on forecast accuracy or how to distinguish between true feature drift and normal volatility in retail data, making the detection metrics inherently ambiguous and subject to false positives."
+  }
+ ],
+ "state": "ATTACK_RUN",
+ "overall": "KILLED",
+ "kill_basis": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "basis": "Wavelet decomposition is designed for stationary signals with periodic patterns, but retail time-series data contains multiple non-stationary components (promotions, holidays, supply disruptions) that violate this fundamental assumption, making the decomposition mathematically unsound for this application."
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "basis": "The candidate fails to specify how the method handles boundary conditions where wavelet decomposition requires padding at signal edges, which would introduce artificial features that could be misinterpreted as drift in retail data with frequent start/end-of-period anomalies."
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "basis": "The provided evidence bundle contains no studies on wavelet decomposition for retail time-series monitoring; instead, the references focus on LSTM, SVR, meta-learning, and federated learning for completely different domains (energy, pharmaceuticals, abrasion, blood donation), showing no connection to the claimed mechanism."
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "basis": "The candidate provides no evidence that wavelet decomposition would outperform existing statistical process control methods already used in retail forecasting systems, which are specifically designed for non-stationary time-series and have proven track records in drift detection."
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "basis": "The proposed method would require maintaining separate wavelet decomposition models for each product category, store, and time granularity, creating an intractable computational burden that would make real-time monitoring impossible in large retail operations."
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "basis": "The testable prediction fails to define what constitutes a \"significant\" impact on forecast accuracy or how to distinguish between true feature drift and normal volatility in retail data, making the detection metrics inherently ambiguous and subject to false positives."
+  }
+ ],
+ "counts": {
+  "KILL": 6,
+  "RISK": 0,
+  "SURVIVE": 0,
+  "INVALID": 0
+ }
+}

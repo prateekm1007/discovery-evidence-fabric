@@ -1,0 +1,1256 @@
+{
+ "ledger": "IMPROVEMENT_LEDGER (R378 TECHNICAL IMPROVEMENT ENGINE)",
+ "version": "1.0.0",
+ "loop": "CANDIDATE -> DIAGNOSE WEAKNESS -> IDENTIFY LIMITING FEATURE -> GENERATE CONTROLLED MUTATION -> RE-EVALUATE EVIDENCE/MECHANISM/PRIOR ART -> RE-SCORE -> KEEP OR KILL -> REPEAT",
+ "collision_mode": "REPLAY_CACHE",
+ "live_sources": null,
+ "evaluators_registered": [
+  {
+   "evaluator_id": "term_rule_v1",
+   "fidelity_tier": "TERM_RULE",
+   "evidence_rank": 3
+  }
+ ],
+ "q_instrument": "discovery_fabric/benchmark/candidate_quality.py (FROZEN, hash-pinned, imported read-only)",
+ "i_instrument": "discovery_fabric/benchmark/invention_quality.py (R377, imported read-only)",
+ "thresholds": {
+  "SPAN_DERIVATION_MIN": {
+   "value": 0.2,
+   "epistemic_class": "ENGINEERING",
+   "justification": "the engine's own span-derivation rule (candidate_diversity.span_derivation_check): ratio < 0.20 = SPAN_UNDERIVED. A MECHANISM_STRENGTHENING mutation must CLEAR this floor — the same rule that gates the grid, not a new one."
+  },
+  "EVIDENCE_SUPPORT_MIN": {
+   "value": 0.2,
+   "epistemic_class": "ENGINEERING",
+   "justification": "I1's underived flag fires below 0.20; an EVIDENCE_DERIVED_CONSTRAINT mutation must clear the same floor on evidence_support."
+  },
+  "DOMAIN_OVERLAP_MIN": {
+   "value": 1,
+   "epistemic_class": "ENGINEERING",
+   "justification": "REPLAY_CACHE re-adjudication is valid only while the mutated candidate stays in the domain the cached art was found FOR. Guard: >= 1 NON-generic technical term shared between the child's mechanism+intervention and the cached family corpus. ZERO overlap means the mutation abandoned the domain (measured attack: re-adjudicating a cement-curing intervention against battery art fabricates surviving differentiators — false novelty from stale art). The overlap count is RECORDED on every cache adjudication so thin-domain links are auditable. NOTE: entity-term retention vs the problem CANNOT catch this class — entity terms are problem-derived and unchanged by mutations (measured while writing the guard's tests); it is recorded for audit only."
+  },
+  "MAX_ITERATIONS_DEFAULT": {
+   "value": 2,
+   "epistemic_class": "ENGINEERING",
+   "justification": "the CEO minimum loop is DIAGNOSE -> IMPROVE -> RE-EVALUATE -> IMPROVE AGAIN; two iterations demonstrate repeatability at bounded cost"
+  },
+  "MAX_PROPOSALS_PER_ITERATION": {
+   "value": 3,
+   "epistemic_class": "ENGINEERING",
+   "justification": "bounded proposal budget: three attempts, then the honest no-defensible-mutation verdict"
+  }
+ },
+ "started_at": "2026-09-10T15:11:35+00:00Z",
+ "iterations": [
+  {
+   "iteration": 1,
+   "diagnosis": {
+    "limiting_features": [
+     {
+      "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "measured_value": 0.263,
+      "weakness_kind": "LOW_SCORE",
+      "why_weak": "measured 0.263 < STRONG floor 0.7",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT"
+     },
+     {
+      "dimension": "I5_EXPERIMENT_DISCRIMINATION",
+      "measured_value": 0.667,
+      "weakness_kind": "LOW_SCORE",
+      "why_weak": "measured 0.667 < STRONG floor 0.7",
+      "mutation_type": "EXPERIMENT_DISCRIMINATION"
+     }
+    ],
+    "evidence_gaps": [
+     {
+      "dimension": "I2_DIFFERENTIATOR_TECHNICAL_MEANING",
+      "state": "UNMEASURABLE_NO_SURVIVORS",
+      "what_is_missing": "no surviving differentiators recorded",
+      "consequence": "no mutation targets this dimension until the gap closes (Art. XXV)"
+     },
+     {
+      "dimension": "I3_RECOMBINATION_RISK",
+      "state": "UNMEASURABLE_NO_FAMILIES",
+      "what_is_missing": "no prior-art families adjudicated — residue vs found art is unmeasured; absence of found art is not novelty",
+      "consequence": "no mutation targets this dimension until the gap closes (Art. XXV)"
+     },
+     {
+      "dimension": "I4_NEW_TECHNICAL_RELATIONSHIP",
+      "state": "UNMEASURABLE_NO_FAMILY_TEXT",
+      "what_is_missing": "no adjudicated family text stored — pair novelty vs found art is unmeasured",
+      "consequence": "no mutation targets this dimension until the gap closes (Art. XXV)"
+     }
+    ],
+    "target": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT"
+    }
+   },
+   "proposals": [
+    {
+     "proposal_id": "prop:e758a4bc24d6",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "dded6c1d609884d7d5b40a85d04fafbb4ce357d110921c0f94eb0c1093c622b1",
+     "output_hash": "e758a4bc24d6a1427a316a0d52e335b298caa417388458e475af5908b09ad60a",
+     "fields": {
+      "MUTATION_TYPE": "EVIDENCE_DERIVED_CONSTRAINT",
+      "MECHANISM": "improved rubber-filler interaction through optimized carbon black filler selection and semi efficient vulcanization system",
+      "INTERVENTION": "replace current elastomer with hydrogenated natural rubber compound using N220 carbon black and semi efficient vulcanization system",
+      "EXPECTED_EFFECT": "improved tensile properties and compression set resistance, reducing creep and ozone-induced cracking",
+      "FALSIFICATION_TEST": "falsification_test_from_candidate",
+      "MECHANISM_SOURCE_SPAN": "By adjusting semi efficient vulcanization system and used N220 as carbon filler in designing compound formula,HNR was regarded as alternative promosing base elastomer for elastomeric bridge bearing pad manufacture.",
+      "SOURCE_EVIDENCE_ID": "doi:10.5614/j.eng.technol.sci.2019.51.5.4",
+      "EXPERIMENT": "Compare the rubber-filler interaction and tensile properties of hydrogenated natural rubber with N220 carbon black against the current commercial elastomeric bearing pad material",
+      "EXPERIMENT_BASELINE": "commercial elastomeric bearing pad",
+      "EXPERIMENT_EIG": "0.75",
+      "CONSTRAINT_DERIVED": "The compound formula must use N220 carbon black with a semi efficient vulcanization system to achieve improved rubber-filler interaction",
+      "MUTATION_REASON": "Repairs I1_MECHANISM_EVIDENCE_DERIVATION weakness by re-anchoring mechanism technical vocabulary in the evidence's actual text, specifically incorporating \"semi efficient vulcanization system\" and \"N220 carbon filler\" from the evidence span."
+     },
+     "validation": {
+      "valid": true,
+      "stage": "VALIDATION",
+      "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+      "checks": {
+       "mutation_type_matches_diagnosis": true,
+       "span_evidence_exists": "doi:10.5614/j.eng.technol.sci.2019.51.5.4",
+       "span_verbatim_in_evidence": true,
+       "evidence_support": 0.722,
+       "evidence_support_cleared": 0.722,
+       "constraint_traceable_to_evidence": "The compound formula must use N220 carbon black with a semi efficient vulcanization system to achieve improved rubber-fi"
+      },
+      "reasons": [],
+      "validated_at": "2026-09-10T15:11:39+00:00Z"
+     }
+    }
+   ],
+   "mutation_attempts": [
+    {
+     "mutation_applied": {
+      "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+      "mutation_id": "mut:b8a8e7b5a64d",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+      "diagnostic_trigger": {
+       "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+       "measured_before": 0.263,
+       "basis": "R378 evaluator-contract diagnosis (deterministic)"
+      },
+      "proposal_provenance": {
+       "proposal_id": "prop:e758a4bc24d6",
+       "provider": "zai",
+       "model": "glm-4-plus",
+       "prompt_hash": "dded6c1d609884d7d5b40a85d04fafbb4ce357d110921c0f94eb0c1093c622b1",
+       "output_hash": "e758a4bc24d6a1427a316a0d52e335b298caa417388458e475af5908b09ad60a",
+       "llm_is_untrusted_proposer": true
+      },
+      "validation": {
+       "valid": true,
+       "stage": "VALIDATION",
+       "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+       "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+       "checks": {
+        "mutation_type_matches_diagnosis": true,
+        "span_evidence_exists": "doi:10.5614/j.eng.technol.sci.2019.51.5.4",
+        "span_verbatim_in_evidence": true,
+        "evidence_support": 0.722,
+        "evidence_support_cleared": 0.722,
+        "constraint_traceable_to_evidence": "The compound formula must use N220 carbon black with a semi efficient vulcanization system to achieve improved rubber-fi"
+       },
+       "reasons": [],
+       "validated_at": "2026-09-10T15:11:39+00:00Z"
+      },
+      "fields_changed": {
+       "mechanism": {
+        "before": "enhanced rubber-filler interaction through optimized carbon black filler selection",
+        "after": "improved rubber-filler interaction through optimized carbon black filler selection and semi efficient vulcanization system"
+       },
+       "intervention": {
+        "before": "replace current elastomer with hydrogenated natural rubber compound using N220 carbon black and semi efficient vulcanization system",
+        "after": "replace current elastomer with hydrogenated natural rubber compound using N220 carbon black and semi efficient vulcanization system"
+       },
+       "mechanism_source_span": {
+        "before": "The low interaction was more evident with increasing carbon filler particle size. By adjusting semi efficient vulcanization system and used N220 as carbon filler in designing compound formula,HNR was regarded as alternative promising base elastomer for elastomeric bearing pad manufacture.",
+        "after": "By adjusting semi efficient vulcanization system and used N220 as carbon filler in designing compound formula,HNR was regarded as alternative promosing base elastomer for elastomeric bridge bearing pad manufacture."
+       }
+      },
+      "inherited_negatives": {
+       "uncertainty_ids": [
+        "con:attack:weak_transfer",
+        "con:attack:contradiction",
+        "laminated elastomeric bearing bridge pad induced",
+        "laminated elastomeric bearing bridge pad induced",
+        "enhanced interaction through optimized selection rubber",
+        "enhanced interaction through optimized selection rubber",
+        "elastomer rubber carbon black replace current hydrogenated natural",
+        "elastomer rubber carbon black replace current hydrogenated natural",
+        "laminated compression resistance reducing cracking vulcanization",
+        "laminated compression resistance reducing cracking vulcanization",
+        "improved tensile properties compression resistance reducing",
+        "improved tensile properties compression resistance reducing"
+       ],
+       "collision_family_ids": [],
+       "source_errors": []
+      },
+      "parent_spec_hash": "ec94be9768209c30e7733a627fbd6463ed19900657df7bc114620afd6839b071",
+      "child_spec_hash": null,
+      "reason": "Repairs I1_MECHANISM_EVIDENCE_DERIVATION weakness by re-anchoring mechanism technical vocabulary in the evidence's actual text, specifically incorporating \"semi efficient vulcanization system\" and \"N220 carbon filler\" from the evidence span.",
+      "applied_at": "2026-09-10T15:11:39+00:00Z"
+     },
+     "re_evaluation": {
+      "collision_mode": "REPLAY_CACHE",
+      "re_evaluated_at": "2026-09-10T15:11:39+00:00Z",
+      "re_adjudication": {
+       "mode": "REPLAY_CACHE",
+       "valid": false,
+       "reason": "NO_CACHED_FAMILIES"
+      },
+      "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+      "re_adjudication_failure": "NO_CACHED_FAMILIES",
+      "i_dimensions": {
+       "I1_MECHANISM_EVIDENCE_DERIVATION": {
+        "score": 0.391,
+        "state": "MEASURED"
+       },
+       "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_SURVIVORS"
+       },
+       "I3_RECOMBINATION_RISK": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_FAMILIES"
+       },
+       "I4_NEW_TECHNICAL_RELATIONSHIP": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+       },
+       "I5_EXPERIMENT_DISCRIMINATION": {
+        "score": 0.667,
+        "state": "MEASURED"
+       }
+      },
+      "i_flags": {
+       "underived_mechanism": false,
+       "recombination_only": false
+      },
+      "i_average": 0.529,
+      "q_dimensions": {
+       "Q1_EVIDENCE_BINDING": {
+        "score": 0.5,
+        "state": "MEASURED"
+       },
+       "Q2_PRIOR_ART_SPECIFICITY": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_PRIOR_ART"
+       },
+       "Q3_PRIOR_ART_RESOLUTION": {
+        "score": 0.0,
+        "state": "MEASURED"
+       },
+       "Q4_EXPERIMENT_DECISIVENESS": {
+        "score": 1.0,
+        "state": "MEASURED"
+       },
+       "Q5_CHAIN_COMPLETENESS": {
+        "score": 1.0,
+        "state": "MEASURED"
+       }
+      },
+      "q_average": 0.625
+     },
+     "decision": {
+      "action": "KEEP",
+      "improved": true,
+      "checks": {
+       "targeted_dimension": "0.263 -> 0.391 (improved)",
+       "negatives_preserved": true,
+       "no_new_structural_flags": true,
+       "no_unknown_conversion_without_new_evidence": true,
+       "text_gap_conversions_recorded": [],
+       "prior_art_position_not_degraded": true
+      },
+      "reasons": [],
+      "decided_at": "2026-09-10T15:11:39+00:00Z"
+     }
+    }
+   ],
+   "mutation_applied": {
+    "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+    "mutation_id": "mut:b8a8e7b5a64d",
+    "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+    "diagnostic_trigger": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "measured_before": 0.263,
+     "basis": "R378 evaluator-contract diagnosis (deterministic)"
+    },
+    "proposal_provenance": {
+     "proposal_id": "prop:e758a4bc24d6",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "dded6c1d609884d7d5b40a85d04fafbb4ce357d110921c0f94eb0c1093c622b1",
+     "output_hash": "e758a4bc24d6a1427a316a0d52e335b298caa417388458e475af5908b09ad60a",
+     "llm_is_untrusted_proposer": true
+    },
+    "validation": {
+     "valid": true,
+     "stage": "VALIDATION",
+     "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+     "checks": {
+      "mutation_type_matches_diagnosis": true,
+      "span_evidence_exists": "doi:10.5614/j.eng.technol.sci.2019.51.5.4",
+      "span_verbatim_in_evidence": true,
+      "evidence_support": 0.722,
+      "evidence_support_cleared": 0.722,
+      "constraint_traceable_to_evidence": "The compound formula must use N220 carbon black with a semi efficient vulcanization system to achieve improved rubber-fi"
+     },
+     "reasons": [],
+     "validated_at": "2026-09-10T15:11:39+00:00Z"
+    },
+    "fields_changed": {
+     "mechanism": {
+      "before": "enhanced rubber-filler interaction through optimized carbon black filler selection",
+      "after": "improved rubber-filler interaction through optimized carbon black filler selection and semi efficient vulcanization system"
+     },
+     "intervention": {
+      "before": "replace current elastomer with hydrogenated natural rubber compound using N220 carbon black and semi efficient vulcanization system",
+      "after": "replace current elastomer with hydrogenated natural rubber compound using N220 carbon black and semi efficient vulcanization system"
+     },
+     "mechanism_source_span": {
+      "before": "The low interaction was more evident with increasing carbon filler particle size. By adjusting semi efficient vulcanization system and used N220 as carbon filler in designing compound formula,HNR was regarded as alternative promising base elastomer for elastomeric bearing pad manufacture.",
+      "after": "By adjusting semi efficient vulcanization system and used N220 as carbon filler in designing compound formula,HNR was regarded as alternative promosing base elastomer for elastomeric bridge bearing pad manufacture."
+     }
+    },
+    "inherited_negatives": {
+     "uncertainty_ids": [
+      "con:attack:weak_transfer",
+      "con:attack:contradiction",
+      "laminated elastomeric bearing bridge pad induced",
+      "laminated elastomeric bearing bridge pad induced",
+      "enhanced interaction through optimized selection rubber",
+      "enhanced interaction through optimized selection rubber",
+      "elastomer rubber carbon black replace current hydrogenated natural",
+      "elastomer rubber carbon black replace current hydrogenated natural",
+      "laminated compression resistance reducing cracking vulcanization",
+      "laminated compression resistance reducing cracking vulcanization",
+      "improved tensile properties compression resistance reducing",
+      "improved tensile properties compression resistance reducing"
+     ],
+     "collision_family_ids": [],
+     "source_errors": []
+    },
+    "parent_spec_hash": "ec94be9768209c30e7733a627fbd6463ed19900657df7bc114620afd6839b071",
+    "child_spec_hash": null,
+    "reason": "Repairs I1_MECHANISM_EVIDENCE_DERIVATION weakness by re-anchoring mechanism technical vocabulary in the evidence's actual text, specifically incorporating \"semi efficient vulcanization system\" and \"N220 carbon filler\" from the evidence span.",
+    "applied_at": "2026-09-10T15:11:39+00:00Z"
+   },
+   "re_evaluation": {
+    "collision_mode": "REPLAY_CACHE",
+    "re_evaluated_at": "2026-09-10T15:11:39+00:00Z",
+    "re_adjudication": {
+     "mode": "REPLAY_CACHE",
+     "valid": false,
+     "reason": "NO_CACHED_FAMILIES"
+    },
+    "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+    "re_adjudication_failure": "NO_CACHED_FAMILIES",
+    "i_dimensions": {
+     "I1_MECHANISM_EVIDENCE_DERIVATION": {
+      "score": 0.391,
+      "state": "MEASURED"
+     },
+     "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_SURVIVORS"
+     },
+     "I3_RECOMBINATION_RISK": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_FAMILIES"
+     },
+     "I4_NEW_TECHNICAL_RELATIONSHIP": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+     },
+     "I5_EXPERIMENT_DISCRIMINATION": {
+      "score": 0.667,
+      "state": "MEASURED"
+     }
+    },
+    "i_flags": {
+     "underived_mechanism": false,
+     "recombination_only": false
+    },
+    "i_average": 0.529,
+    "q_dimensions": {
+     "Q1_EVIDENCE_BINDING": {
+      "score": 0.5,
+      "state": "MEASURED"
+     },
+     "Q2_PRIOR_ART_SPECIFICITY": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_PRIOR_ART"
+     },
+     "Q3_PRIOR_ART_RESOLUTION": {
+      "score": 0.0,
+      "state": "MEASURED"
+     },
+     "Q4_EXPERIMENT_DECISIVENESS": {
+      "score": 1.0,
+      "state": "MEASURED"
+     },
+     "Q5_CHAIN_COMPLETENESS": {
+      "score": 1.0,
+      "state": "MEASURED"
+     }
+    },
+    "q_average": 0.625
+   },
+   "decision": {
+    "action": "KEEP",
+    "improved": true,
+    "checks": {
+     "targeted_dimension": "0.263 -> 0.391 (improved)",
+     "negatives_preserved": true,
+     "no_new_structural_flags": true,
+     "no_unknown_conversion_without_new_evidence": true,
+     "text_gap_conversions_recorded": [],
+     "prior_art_position_not_degraded": true
+    },
+    "reasons": [],
+    "decided_at": "2026-09-10T15:11:39+00:00Z"
+   }
+  },
+  {
+   "iteration": 2,
+   "diagnosis": {
+    "limiting_features": [
+     {
+      "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "measured_value": 0.391,
+      "weakness_kind": "LOW_SCORE",
+      "why_weak": "measured 0.391 < STRONG floor 0.7",
+      "mutation_type": "MECHANISM_STRENGTHENING"
+     },
+     {
+      "dimension": "I5_EXPERIMENT_DISCRIMINATION",
+      "measured_value": 0.667,
+      "weakness_kind": "LOW_SCORE",
+      "why_weak": "measured 0.667 < STRONG floor 0.7",
+      "mutation_type": "EXPERIMENT_DISCRIMINATION"
+     }
+    ],
+    "evidence_gaps": [
+     {
+      "dimension": "I2_DIFFERENTIATOR_TECHNICAL_MEANING",
+      "state": "UNMEASURABLE_NO_SURVIVORS",
+      "what_is_missing": "no surviving differentiators recorded",
+      "consequence": "no mutation targets this dimension until the gap closes (Art. XXV)"
+     },
+     {
+      "dimension": "I3_RECOMBINATION_RISK",
+      "state": "UNMEASURABLE_NO_FAMILIES",
+      "what_is_missing": "no prior-art families adjudicated — residue vs found art is unmeasured; absence of found art is not novelty",
+      "consequence": "no mutation targets this dimension until the gap closes (Art. XXV)"
+     },
+     {
+      "dimension": "I4_NEW_TECHNICAL_RELATIONSHIP",
+      "state": "UNMEASURABLE_NO_FAMILY_TEXT",
+      "what_is_missing": "no adjudicated family text stored — pair novelty vs found art is unmeasured",
+      "consequence": "no mutation targets this dimension until the gap closes (Art. XXV)"
+     }
+    ],
+    "target": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "MECHANISM_STRENGTHENING"
+    }
+   },
+   "proposals": [
+    {
+     "proposal_id": "prop:1bec567a819e",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "0badb79392ae1281de603b56af582a8c97b02e17ebd7ce4f3a43657d513b1382",
+     "output_hash": "1bec567a819e8c15515b7b6c398aa09b36c4364fbe95b22395dbc00b2eec1a4f",
+     "fields": {
+      "MUTATION_TYPE": "MECHANISM_STRENGTHENING",
+      "MECHANISM": "improvement of rubber-filler interaction through optimized carbon black filler selection and semi efficient vulcanization system",
+      "INTERVENTION": "replace current elastomer with hydrogenated natural rubber compound using N220 carbon black and semi efficient vulcanization system",
+      "EXPECTED_EFFECT": "improved tensile properties and compression set resistance, reducing creep and ozone-induced cracking",
+      "FALSIFICATION_TEST": "falsification_test_from_candidate",
+      "MECHANISM_SOURCE_SPAN": "By adjusting semi efficient vulcanization system and used N220 as carbon filler in designing compound formula,HNR was regarded as alternative promosing base elastomer for elastomeric bridge bearing pad manufacture",
+      "SOURCE_EVIDENCE_ID": "doi:10.5614/j.eng.technol.sci.2019.51.5.4",
+      "EXPERIMENT": "compare the tensile properties and compression set of the HNR compound with semi efficient vulcanization system and N220 carbon filler against conventional natural rubber under identical testing conditions",
+      "EXPERIMENT_BASELINE": "conventional natural rubber",
+      "EXPERIMENT_EIG": "0.25",
+      "CONSTRAINT_DERIVED": "NONE",
+      "MUTATION_REASON": "repairs I1_MECHANISM_EVIDENCE_DERIVATION weakness by ensuring the mechanism contains technical vocabulary from evidence with span-derivation ratio >= 0.20"
+     },
+     "validation": {
+      "valid": true,
+      "stage": "VALIDATION",
+      "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "mutation_type": "MECHANISM_STRENGTHENING",
+      "checks": {
+       "mutation_type_matches_diagnosis": true,
+       "span_evidence_exists": "doi:10.5614/j.eng.technol.sci.2019.51.5.4",
+       "span_verbatim_in_evidence": true,
+       "mutation_changes_candidate": true,
+       "span_derivation": {
+        "n_shared": 9,
+        "shared_terms": [
+         "carbon",
+         "compound",
+         "efficient",
+         "elastomer",
+         "filler",
+         "n220",
+         "semi",
+         "system",
+         "vulcanization"
+        ],
+        "span_terms_n": 23,
+        "ratio": 0.391,
+        "underived": false,
+        "state": "MEASURED",
+        "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+       },
+       "span_derivation_cleared": 0.391
+      },
+      "reasons": [],
+      "validated_at": "2026-09-10T15:11:43+00:00Z"
+     }
+    },
+    {
+     "proposal_id": "prop:89b93b120408",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "8a7bd6f4fbde3ab25cb0eb0f0ebeb159c4791139bbe02d3e4f228986d6ff3704",
+     "output_hash": "89b93b120408d2f53e1f1e9ae2ba9dd295aad354bd1d593cb86ed70bde49ad68",
+     "fields": {
+      "MUTATION_TYPE": "MECHANISM_STRENGTHENING",
+      "MECHANISM": "low rubber-filler interaction and rigidity of crosslink network",
+      "INTERVENTION": "replace current elastomer with hydrogenated natural rubber compound using N220 carbon black and semi efficient vulcanization system to address low rubber-filler interaction and rigidity of crosslink network",
+      "EXPECTED_EFFECT": "improved tensile properties and compression set resistance, reducing creep and ozone-induced cracking by addressing low rubber-filler interaction and rigidity of crosslink network",
+      "FALSIFICATION_TEST": "falsification_test_from_candidate",
+      "MECHANISM_SOURCE_SPAN": "The low interaction was more evident with increasing carbon filler particle size. By adjusting semi efficient vulcanization system and used N220 as carbon filler in designing compound formula,HNR was regarded as alternative promosing base elastomer for elastomeric bridge bearing pad manufacture. Nevertheless, it was necessary to improve the procedure to achieve better tesile property and compression set parameter",
+      "SOURCE_EVIDENCE_ID": "doi:10.5614/j.eng.technol.sci.2019.51.5.4",
+      "EXPERIMENT": "compare the rubber-filler interaction and crosslink network rigidity of the hydrogenated natural rubber compound using N220 carbon black and semi efficient vulcanization system against the baseline compound",
+      "EXPERIMENT_BASELINE": "current elastomer with hydrogenated natural rubber compound using N220 carbon black and semi efficient vulcanization system",
+      "EXPERIMENT_EIG": "0.25",
+      "CONSTRAINT_DERIVED": "NONE",
+      "MUTATION_REASON": "repairs I1_MECHANISM_EVIDENCE_DERIVATION defect by incorporating the exact technical vocabulary from the evidence span into the mechanism description"
+     },
+     "validation": {
+      "valid": true,
+      "stage": "VALIDATION",
+      "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "mutation_type": "MECHANISM_STRENGTHENING",
+      "checks": {
+       "mutation_type_matches_diagnosis": true,
+       "span_evidence_exists": "doi:10.5614/j.eng.technol.sci.2019.51.5.4",
+       "span_verbatim_in_evidence": true,
+       "mutation_changes_candidate": true,
+       "span_derivation": {
+        "n_shared": 11,
+        "shared_terms": [
+         "carbon",
+         "compound",
+         "efficient",
+         "elastomer",
+         "filler",
+         "interaction",
+         "low",
+         "n220",
+         "semi",
+         "system",
+         "vulcanization"
+        ],
+        "span_terms_n": 41,
+        "ratio": 0.268,
+        "underived": false,
+        "state": "MEASURED",
+        "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+       },
+       "span_derivation_cleared": 0.268
+      },
+      "reasons": [],
+      "validated_at": "2026-09-10T15:11:47+00:00Z"
+     }
+    },
+    {
+     "proposal_id": "prop:ca1ecb490b07",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "3a03578b9180b26368d6e50b573edfb40986ead99673aa37e5c36ea16c5acd64",
+     "output_hash": "ca1ecb490b07f936adedf2c45baa6ea214ff74bb9769c60ef1e947b81795f529",
+     "fields": {
+      "MUTATION_TYPE": "MECHANISM_STRENGTHENING",
+      "MECHANISM": "improving rubber-filler interaction by reducing carbon filler particle size and optimizing semi efficient vulcanization system",
+      "INTERVENTION": "replace current elastomer with hydrogenated natural rubber compound using N220 carbon black and semi efficient vulcanization system with reduced carbon filler particle size",
+      "EXPECTED_EFFECT": "improved tensile properties and compression set resistance, reducing creep and ozone-induced cracking through enhanced rubber-filler interaction",
+      "FALSIFICATION_TEST": "falsification_test_from_candidate",
+      "MECHANISM_SOURCE_SPAN": "The low interaction was more evident with increasing carbon filler particle size. By adjusting semi efficient vulcanization system and used N220 as carbon filler in designing compound formula,HNR was regarded as alternative promosing base elastomer for elastomeric bridge bearing pad manufacture.",
+      "SOURCE_EVIDENCE_ID": "doi:10.5614/j.eng.technol.sci.2019.51.5.4",
+      "EXPERIMENT": "compare the modified hydrogenated natural rubber compound with reduced carbon filler particle size against the original compound in tensile property and compression set tests",
+      "EXPERIMENT_BASELINE": "hydrogenated natural rubber vulcanizates with standard carbon filler particle size",
+      "EXPERIMENT_EIG": "0.45",
+      "CONSTRAINT_DERIVED": "reduced carbon filler particle size to improve rubber-filler interaction",
+      "MUTATION_REASON": "repairs I1_MECHANISM_EVIDENCE_DERIVATION weakness by including a verbatim span from evidence with sufficient term overlap"
+     },
+     "validation": {
+      "valid": true,
+      "stage": "VALIDATION",
+      "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "mutation_type": "MECHANISM_STRENGTHENING",
+      "checks": {
+       "mutation_type_matches_diagnosis": true,
+       "span_evidence_exists": "doi:10.5614/j.eng.technol.sci.2019.51.5.4",
+       "span_verbatim_in_evidence": true,
+       "mutation_changes_candidate": true,
+       "span_derivation": {
+        "n_shared": 12,
+        "shared_terms": [
+         "carbon",
+         "compound",
+         "efficient",
+         "elastomer",
+         "filler",
+         "interaction",
+         "n220",
+         "particle",
+         "semi",
+         "size",
+         "system",
+         "vulcanization"
+        ],
+        "span_terms_n": 30,
+        "ratio": 0.4,
+        "underived": false,
+        "state": "MEASURED",
+        "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+       },
+       "span_derivation_cleared": 0.4
+      },
+      "reasons": [],
+      "validated_at": "2026-09-10T15:11:51+00:00Z"
+     }
+    }
+   ],
+   "mutation_attempts": [
+    {
+     "mutation_applied": {
+      "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+      "mutation_id": "mut:a3463fa00063",
+      "mutation_type": "MECHANISM_STRENGTHENING",
+      "diagnostic_trigger": {
+       "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+       "measured_before": 0.391,
+       "basis": "R378 evaluator-contract diagnosis (deterministic)"
+      },
+      "proposal_provenance": {
+       "proposal_id": "prop:1bec567a819e",
+       "provider": "zai",
+       "model": "glm-4-plus",
+       "prompt_hash": "0badb79392ae1281de603b56af582a8c97b02e17ebd7ce4f3a43657d513b1382",
+       "output_hash": "1bec567a819e8c15515b7b6c398aa09b36c4364fbe95b22395dbc00b2eec1a4f",
+       "llm_is_untrusted_proposer": true
+      },
+      "validation": {
+       "valid": true,
+       "stage": "VALIDATION",
+       "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+       "mutation_type": "MECHANISM_STRENGTHENING",
+       "checks": {
+        "mutation_type_matches_diagnosis": true,
+        "span_evidence_exists": "doi:10.5614/j.eng.technol.sci.2019.51.5.4",
+        "span_verbatim_in_evidence": true,
+        "mutation_changes_candidate": true,
+        "span_derivation": {
+         "n_shared": 9,
+         "shared_terms": [
+          "carbon",
+          "compound",
+          "efficient",
+          "elastomer",
+          "filler",
+          "n220",
+          "semi",
+          "system",
+          "vulcanization"
+         ],
+         "span_terms_n": 23,
+         "ratio": 0.391,
+         "underived": false,
+         "state": "MEASURED",
+         "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+        },
+        "span_derivation_cleared": 0.391
+       },
+       "reasons": [],
+       "validated_at": "2026-09-10T15:11:43+00:00Z"
+      },
+      "fields_changed": {
+       "mechanism": {
+        "before": "improved rubber-filler interaction through optimized carbon black filler selection and semi efficient vulcanization system",
+        "after": "improvement of rubber-filler interaction through optimized carbon black filler selection and semi efficient vulcanization system"
+       },
+       "intervention": {
+        "before": "replace current elastomer with hydrogenated natural rubber compound using N220 carbon black and semi efficient vulcanization system",
+        "after": "replace current elastomer with hydrogenated natural rubber compound using N220 carbon black and semi efficient vulcanization system"
+       },
+       "mechanism_source_span": {
+        "before": "By adjusting semi efficient vulcanization system and used N220 as carbon filler in designing compound formula,HNR was regarded as alternative promosing base elastomer for elastomeric bridge bearing pad manufacture.",
+        "after": "By adjusting semi efficient vulcanization system and used N220 as carbon filler in designing compound formula,HNR was regarded as alternative promosing base elastomer for elastomeric bridge bearing pad manufacture"
+       }
+      },
+      "inherited_negatives": {
+       "uncertainty_ids": [
+        "con:attack:weak_transfer",
+        "con:attack:contradiction",
+        "laminated elastomeric bearing bridge pad induced",
+        "laminated elastomeric bearing bridge pad induced",
+        "enhanced interaction through optimized selection rubber",
+        "enhanced interaction through optimized selection rubber",
+        "elastomer rubber carbon black replace current hydrogenated natural",
+        "elastomer rubber carbon black replace current hydrogenated natural",
+        "laminated compression resistance reducing cracking vulcanization",
+        "laminated compression resistance reducing cracking vulcanization",
+        "improved tensile properties compression resistance reducing",
+        "improved tensile properties compression resistance reducing"
+       ],
+       "collision_family_ids": [],
+       "source_errors": []
+      },
+      "parent_spec_hash": "00e33551c2dc21ffa96afcc872ae3ae76477992c73398bef2d53570083dd7dae",
+      "child_spec_hash": null,
+      "reason": "repairs I1_MECHANISM_EVIDENCE_DERIVATION weakness by ensuring the mechanism contains technical vocabulary from evidence with span-derivation ratio >= 0.20",
+      "applied_at": "2026-09-10T15:11:43+00:00Z"
+     },
+     "re_evaluation": {
+      "collision_mode": "REPLAY_CACHE",
+      "re_evaluated_at": "2026-09-10T15:11:43+00:00Z",
+      "re_adjudication": {
+       "mode": "REPLAY_CACHE",
+       "valid": false,
+       "reason": "NO_CACHED_FAMILIES"
+      },
+      "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+      "re_adjudication_failure": "NO_CACHED_FAMILIES",
+      "i_dimensions": {
+       "I1_MECHANISM_EVIDENCE_DERIVATION": {
+        "score": 0.391,
+        "state": "MEASURED"
+       },
+       "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_SURVIVORS"
+       },
+       "I3_RECOMBINATION_RISK": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_FAMILIES"
+       },
+       "I4_NEW_TECHNICAL_RELATIONSHIP": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+       },
+       "I5_EXPERIMENT_DISCRIMINATION": {
+        "score": 0.667,
+        "state": "MEASURED"
+       }
+      },
+      "i_flags": {
+       "underived_mechanism": false,
+       "recombination_only": false
+      },
+      "i_average": 0.529,
+      "q_dimensions": {
+       "Q1_EVIDENCE_BINDING": {
+        "score": 0.5,
+        "state": "MEASURED"
+       },
+       "Q2_PRIOR_ART_SPECIFICITY": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_PRIOR_ART"
+       },
+       "Q3_PRIOR_ART_RESOLUTION": {
+        "score": 0.0,
+        "state": "MEASURED"
+       },
+       "Q4_EXPERIMENT_DECISIVENESS": {
+        "score": 1.0,
+        "state": "MEASURED"
+       },
+       "Q5_CHAIN_COMPLETENESS": {
+        "score": 1.0,
+        "state": "MEASURED"
+       }
+      },
+      "q_average": 0.625
+     },
+     "decision": {
+      "action": "REJECT_MUTATION",
+      "improved": false,
+      "checks": {
+       "targeted_dimension": "0.391 -> 0.391 (no improvement)",
+       "negatives_preserved": true,
+       "no_new_structural_flags": true,
+       "no_unknown_conversion_without_new_evidence": true,
+       "text_gap_conversions_recorded": [],
+       "prior_art_position_not_degraded": true
+      },
+      "reasons": [],
+      "decided_at": "2026-09-10T15:11:43+00:00Z"
+     }
+    },
+    {
+     "mutation_applied": {
+      "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+      "mutation_id": "mut:f7f0461d050c",
+      "mutation_type": "MECHANISM_STRENGTHENING",
+      "diagnostic_trigger": {
+       "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+       "measured_before": 0.391,
+       "basis": "R378 evaluator-contract diagnosis (deterministic)"
+      },
+      "proposal_provenance": {
+       "proposal_id": "prop:89b93b120408",
+       "provider": "zai",
+       "model": "glm-4-plus",
+       "prompt_hash": "8a7bd6f4fbde3ab25cb0eb0f0ebeb159c4791139bbe02d3e4f228986d6ff3704",
+       "output_hash": "89b93b120408d2f53e1f1e9ae2ba9dd295aad354bd1d593cb86ed70bde49ad68",
+       "llm_is_untrusted_proposer": true
+      },
+      "validation": {
+       "valid": true,
+       "stage": "VALIDATION",
+       "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+       "mutation_type": "MECHANISM_STRENGTHENING",
+       "checks": {
+        "mutation_type_matches_diagnosis": true,
+        "span_evidence_exists": "doi:10.5614/j.eng.technol.sci.2019.51.5.4",
+        "span_verbatim_in_evidence": true,
+        "mutation_changes_candidate": true,
+        "span_derivation": {
+         "n_shared": 11,
+         "shared_terms": [
+          "carbon",
+          "compound",
+          "efficient",
+          "elastomer",
+          "filler",
+          "interaction",
+          "low",
+          "n220",
+          "semi",
+          "system",
+          "vulcanization"
+         ],
+         "span_terms_n": 41,
+         "ratio": 0.268,
+         "underived": false,
+         "state": "MEASURED",
+         "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+        },
+        "span_derivation_cleared": 0.268
+       },
+       "reasons": [],
+       "validated_at": "2026-09-10T15:11:47+00:00Z"
+      },
+      "fields_changed": {
+       "mechanism": {
+        "before": "improved rubber-filler interaction through optimized carbon black filler selection and semi efficient vulcanization system",
+        "after": "low rubber-filler interaction and rigidity of crosslink network"
+       },
+       "intervention": {
+        "before": "replace current elastomer with hydrogenated natural rubber compound using N220 carbon black and semi efficient vulcanization system",
+        "after": "replace current elastomer with hydrogenated natural rubber compound using N220 carbon black and semi efficient vulcanization system to address low rubber-filler interaction and rigidity of crosslink network"
+       },
+       "mechanism_source_span": {
+        "before": "By adjusting semi efficient vulcanization system and used N220 as carbon filler in designing compound formula,HNR was regarded as alternative promosing base elastomer for elastomeric bridge bearing pad manufacture.",
+        "after": "The low interaction was more evident with increasing carbon filler particle size. By adjusting semi efficient vulcanization system and used N220 as carbon filler in designing compound formula,HNR was regarded as alternative promosing base elastomer for elastomeric bridge bearing pad manufacture. Nev"
+       }
+      },
+      "inherited_negatives": {
+       "uncertainty_ids": [
+        "con:attack:weak_transfer",
+        "con:attack:contradiction",
+        "laminated elastomeric bearing bridge pad induced",
+        "laminated elastomeric bearing bridge pad induced",
+        "enhanced interaction through optimized selection rubber",
+        "enhanced interaction through optimized selection rubber",
+        "elastomer rubber carbon black replace current hydrogenated natural",
+        "elastomer rubber carbon black replace current hydrogenated natural",
+        "laminated compression resistance reducing cracking vulcanization",
+        "laminated compression resistance reducing cracking vulcanization",
+        "improved tensile properties compression resistance reducing",
+        "improved tensile properties compression resistance reducing"
+       ],
+       "collision_family_ids": [],
+       "source_errors": []
+      },
+      "parent_spec_hash": "00e33551c2dc21ffa96afcc872ae3ae76477992c73398bef2d53570083dd7dae",
+      "child_spec_hash": null,
+      "reason": "repairs I1_MECHANISM_EVIDENCE_DERIVATION defect by incorporating the exact technical vocabulary from the evidence span into the mechanism description",
+      "applied_at": "2026-09-10T15:11:47+00:00Z"
+     },
+     "re_evaluation": {
+      "collision_mode": "REPLAY_CACHE",
+      "re_evaluated_at": "2026-09-10T15:11:47+00:00Z",
+      "re_adjudication": {
+       "mode": "REPLAY_CACHE",
+       "valid": false,
+       "reason": "NO_CACHED_FAMILIES"
+      },
+      "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+      "re_adjudication_failure": "NO_CACHED_FAMILIES",
+      "i_dimensions": {
+       "I1_MECHANISM_EVIDENCE_DERIVATION": {
+        "score": 0.268,
+        "state": "MEASURED"
+       },
+       "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_SURVIVORS"
+       },
+       "I3_RECOMBINATION_RISK": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_FAMILIES"
+       },
+       "I4_NEW_TECHNICAL_RELATIONSHIP": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+       },
+       "I5_EXPERIMENT_DISCRIMINATION": {
+        "score": 0.667,
+        "state": "MEASURED"
+       }
+      },
+      "i_flags": {
+       "underived_mechanism": false,
+       "recombination_only": false
+      },
+      "i_average": 0.468,
+      "q_dimensions": {
+       "Q1_EVIDENCE_BINDING": {
+        "score": 0.5,
+        "state": "MEASURED"
+       },
+       "Q2_PRIOR_ART_SPECIFICITY": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_PRIOR_ART"
+       },
+       "Q3_PRIOR_ART_RESOLUTION": {
+        "score": 0.0,
+        "state": "MEASURED"
+       },
+       "Q4_EXPERIMENT_DECISIVENESS": {
+        "score": 1.0,
+        "state": "MEASURED"
+       },
+       "Q5_CHAIN_COMPLETENESS": {
+        "score": 1.0,
+        "state": "MEASURED"
+       }
+      },
+      "q_average": 0.625
+     },
+     "decision": {
+      "action": "REJECT_MUTATION",
+      "improved": false,
+      "checks": {
+       "targeted_dimension": "0.391 -> 0.268 (no improvement)",
+       "negatives_preserved": true,
+       "no_new_structural_flags": true,
+       "no_unknown_conversion_without_new_evidence": true,
+       "text_gap_conversions_recorded": [],
+       "prior_art_position_not_degraded": true
+      },
+      "reasons": [],
+      "decided_at": "2026-09-10T15:11:47+00:00Z"
+     }
+    }
+   ],
+   "mutation_applied": {
+    "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+    "mutation_id": "mut:a3463fa00063",
+    "mutation_type": "MECHANISM_STRENGTHENING",
+    "diagnostic_trigger": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "measured_before": 0.391,
+     "basis": "R378 evaluator-contract diagnosis (deterministic)"
+    },
+    "proposal_provenance": {
+     "proposal_id": "prop:1bec567a819e",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "0badb79392ae1281de603b56af582a8c97b02e17ebd7ce4f3a43657d513b1382",
+     "output_hash": "1bec567a819e8c15515b7b6c398aa09b36c4364fbe95b22395dbc00b2eec1a4f",
+     "llm_is_untrusted_proposer": true
+    },
+    "validation": {
+     "valid": true,
+     "stage": "VALIDATION",
+     "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "MECHANISM_STRENGTHENING",
+     "checks": {
+      "mutation_type_matches_diagnosis": true,
+      "span_evidence_exists": "doi:10.5614/j.eng.technol.sci.2019.51.5.4",
+      "span_verbatim_in_evidence": true,
+      "mutation_changes_candidate": true,
+      "span_derivation": {
+       "n_shared": 9,
+       "shared_terms": [
+        "carbon",
+        "compound",
+        "efficient",
+        "elastomer",
+        "filler",
+        "n220",
+        "semi",
+        "system",
+        "vulcanization"
+       ],
+       "span_terms_n": 23,
+       "ratio": 0.391,
+       "underived": false,
+       "state": "MEASURED",
+       "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+      },
+      "span_derivation_cleared": 0.391
+     },
+     "reasons": [],
+     "validated_at": "2026-09-10T15:11:43+00:00Z"
+    },
+    "fields_changed": {
+     "mechanism": {
+      "before": "improved rubber-filler interaction through optimized carbon black filler selection and semi efficient vulcanization system",
+      "after": "improvement of rubber-filler interaction through optimized carbon black filler selection and semi efficient vulcanization system"
+     },
+     "intervention": {
+      "before": "replace current elastomer with hydrogenated natural rubber compound using N220 carbon black and semi efficient vulcanization system",
+      "after": "replace current elastomer with hydrogenated natural rubber compound using N220 carbon black and semi efficient vulcanization system"
+     },
+     "mechanism_source_span": {
+      "before": "By adjusting semi efficient vulcanization system and used N220 as carbon filler in designing compound formula,HNR was regarded as alternative promosing base elastomer for elastomeric bridge bearing pad manufacture.",
+      "after": "By adjusting semi efficient vulcanization system and used N220 as carbon filler in designing compound formula,HNR was regarded as alternative promosing base elastomer for elastomeric bridge bearing pad manufacture"
+     }
+    },
+    "inherited_negatives": {
+     "uncertainty_ids": [
+      "con:attack:weak_transfer",
+      "con:attack:contradiction",
+      "laminated elastomeric bearing bridge pad induced",
+      "laminated elastomeric bearing bridge pad induced",
+      "enhanced interaction through optimized selection rubber",
+      "enhanced interaction through optimized selection rubber",
+      "elastomer rubber carbon black replace current hydrogenated natural",
+      "elastomer rubber carbon black replace current hydrogenated natural",
+      "laminated compression resistance reducing cracking vulcanization",
+      "laminated compression resistance reducing cracking vulcanization",
+      "improved tensile properties compression resistance reducing",
+      "improved tensile properties compression resistance reducing"
+     ],
+     "collision_family_ids": [],
+     "source_errors": []
+    },
+    "parent_spec_hash": "00e33551c2dc21ffa96afcc872ae3ae76477992c73398bef2d53570083dd7dae",
+    "child_spec_hash": null,
+    "reason": "repairs I1_MECHANISM_EVIDENCE_DERIVATION weakness by ensuring the mechanism contains technical vocabulary from evidence with span-derivation ratio >= 0.20",
+    "applied_at": "2026-09-10T15:11:43+00:00Z"
+   },
+   "re_evaluation": {
+    "collision_mode": "REPLAY_CACHE",
+    "re_evaluated_at": "2026-09-10T15:11:47+00:00Z",
+    "re_adjudication": {
+     "mode": "REPLAY_CACHE",
+     "valid": false,
+     "reason": "NO_CACHED_FAMILIES"
+    },
+    "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+    "re_adjudication_failure": "NO_CACHED_FAMILIES",
+    "i_dimensions": {
+     "I1_MECHANISM_EVIDENCE_DERIVATION": {
+      "score": 0.268,
+      "state": "MEASURED"
+     },
+     "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_SURVIVORS"
+     },
+     "I3_RECOMBINATION_RISK": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_FAMILIES"
+     },
+     "I4_NEW_TECHNICAL_RELATIONSHIP": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+     },
+     "I5_EXPERIMENT_DISCRIMINATION": {
+      "score": 0.667,
+      "state": "MEASURED"
+     }
+    },
+    "i_flags": {
+     "underived_mechanism": false,
+     "recombination_only": false
+    },
+    "i_average": 0.468,
+    "q_dimensions": {
+     "Q1_EVIDENCE_BINDING": {
+      "score": 0.5,
+      "state": "MEASURED"
+     },
+     "Q2_PRIOR_ART_SPECIFICITY": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_PRIOR_ART"
+     },
+     "Q3_PRIOR_ART_RESOLUTION": {
+      "score": 0.0,
+      "state": "MEASURED"
+     },
+     "Q4_EXPERIMENT_DECISIVENESS": {
+      "score": 1.0,
+      "state": "MEASURED"
+     },
+     "Q5_CHAIN_COMPLETENESS": {
+      "score": 1.0,
+      "state": "MEASURED"
+     }
+    },
+    "q_average": 0.625
+   },
+   "decision": {
+    "action": "REJECT_MUTATION",
+    "improved": false,
+    "checks": {
+     "targeted_dimension": "0.391 -> 0.268 (no improvement)",
+     "negatives_preserved": true,
+     "no_new_structural_flags": true,
+     "no_unknown_conversion_without_new_evidence": true,
+     "text_gap_conversions_recorded": [],
+     "prior_art_position_not_degraded": true
+    },
+    "reasons": [],
+    "decided_at": "2026-09-10T15:11:47+00:00Z"
+   }
+  }
+ ],
+ "outcome": "KILLED_NO_IMPROVING_MUTATION",
+ "outcome_reason": "iteration 2: 2 validated MECHANISM_STRENGTHENING mutation(s) were applied and fully re-evaluated; the targeted dimension I1_MECHANISM_EVIDENCE_DERIVATION did not improve (0.391 -> 0.391 (no improvement); 0.391 -> 0.268 (no improvement)); no invariant violated. No defensible improvement exists. Candidate killed.",
+ "baseline": {
+  "i_dimensions": {
+   "I1_MECHANISM_EVIDENCE_DERIVATION": {
+    "score": 0.263,
+    "state": "MEASURED"
+   },
+   "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_SURVIVORS"
+   },
+   "I3_RECOMBINATION_RISK": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_FAMILIES"
+   },
+   "I4_NEW_TECHNICAL_RELATIONSHIP": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+   },
+   "I5_EXPERIMENT_DISCRIMINATION": {
+    "score": 0.667,
+    "state": "MEASURED"
+   }
+  },
+  "i_flags": {
+   "underived_mechanism": false,
+   "recombination_only": false
+  },
+  "i_average": 0.465,
+  "q_dimensions": {
+   "Q1_EVIDENCE_BINDING": {
+    "score": 0.5,
+    "state": "MEASURED"
+   },
+   "Q2_PRIOR_ART_SPECIFICITY": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_PRIOR_ART"
+   },
+   "Q3_PRIOR_ART_RESOLUTION": {
+    "score": 0.0,
+    "state": "MEASURED"
+   },
+   "Q4_EXPERIMENT_DECISIVENESS": {
+    "score": 1.0,
+    "state": "MEASURED"
+   },
+   "Q5_CHAIN_COMPLETENESS": {
+    "score": 1.0,
+    "state": "MEASURED"
+   }
+  },
+  "q_average": 0.625,
+  "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE"
+ },
+ "final": {
+  "i_dimensions": {
+   "I1_MECHANISM_EVIDENCE_DERIVATION": {
+    "score": 0.391,
+    "state": "MEASURED"
+   },
+   "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_SURVIVORS"
+   },
+   "I3_RECOMBINATION_RISK": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_FAMILIES"
+   },
+   "I4_NEW_TECHNICAL_RELATIONSHIP": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+   },
+   "I5_EXPERIMENT_DISCRIMINATION": {
+    "score": 0.667,
+    "state": "MEASURED"
+   }
+  },
+  "i_flags": {
+   "underived_mechanism": false,
+   "recombination_only": false
+  },
+  "i_average": 0.529,
+  "q_dimensions": {
+   "Q1_EVIDENCE_BINDING": {
+    "score": 0.5,
+    "state": "MEASURED"
+   },
+   "Q2_PRIOR_ART_SPECIFICITY": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_PRIOR_ART"
+   },
+   "Q3_PRIOR_ART_RESOLUTION": {
+    "score": 0.0,
+    "state": "MEASURED"
+   },
+   "Q4_EXPERIMENT_DECISIVENESS": {
+    "score": 1.0,
+    "state": "MEASURED"
+   },
+   "Q5_CHAIN_COMPLETENESS": {
+    "score": 1.0,
+    "state": "MEASURED"
+   }
+  },
+  "q_average": 0.625,
+  "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE"
+ },
+ "finished_at": "2026-09-10T15:11:51+00:00Z",
+ "outcome_summary": {
+  "baseline_i_average": 0.465,
+  "final_i_average": 0.529,
+  "baseline_q_average": 0.625,
+  "final_q_average": 0.625,
+  "iterations_run": 2,
+  "keeps": 1
+ },
+ "status": "KILLED_NO_IMPROVING_MUTATION"
+}

@@ -1,0 +1,56 @@
+{
+ "stage": "INDEPENDENT_ATTACK",
+ "candidate_id": "cand:DIV:cross_industry_transfer:zai:396142938de1",
+ "escalation": {
+  "gate_version": "attacker_calibration/1.0.0",
+  "instrument": "independent_attack/1.0.0",
+  "calibration_state": "NOT_CALIBRATED",
+  "terminal_kill_admissible": false,
+  "measured": {
+   "coverage": 1.0,
+   "parse_completeness": 1.0,
+   "tpr_scoped": 1.0,
+   "fpr_known_good": 1.0,
+   "n_cases_attacked": 40
+  },
+  "sealed_thresholds": {
+   "note": "registered BEFORE measurement; never tuned to results (Art. XXVII)",
+   "coverage_min": 0.875,
+   "parse_completeness_min": 0.875,
+   "tpr_min": 0.75,
+   "fpr_max": 0.3,
+   "ensemble": "NONE (single-attacker calibration only; majority-vote ensembles are deferred by the R412 directive)"
+  },
+  "measurement_path": "R412/CALIBRATION/engine_independent_attack_measurement.json",
+  "measurement_sha256": "4e1718e7088564333b5e1ef9be47ca452133d051001628cd6eed91f44e60ef5f",
+  "reason": "measured FPR 1.0 > sealed bar 0.3 (Art. L: the attacker is measured non-selective; its KILL is inadmissible as a terminal verdict and is escalated with the objection preserved)",
+  "rule": "the instrument's KILL is measured non-selective (FPR above the sealed bar); the objection is preserved verbatim and ESCALATED for adjudication — the candidate is NOT killed by this attack alone (Art. L); the deterministic gates are unchanged",
+  "reviewer_provenance": "AI_REVIEW (Art. LXVII)"
+ },
+ "preserved_objections": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "basis": "The candidate addresses bit-flip vulnerability but fails to address the root cause of fragmentation in paged KV-cache blocks during mixed-length bursty requests, which is the actual problem causing live-token evictions. The mechanism doesn't prevent fragmentation itself, only protects against corruption after it occurs."
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "basis": "The candidate completely fails to define boundary conditions regarding cache block sizes, request length distributions, or GPU memory partitioning, making it impossible to determine when this solution would or wouldn't work in different deployment scenarios."
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "basis": "The evidence [doi:10.1109/icassp55912.2026.11461518] demonstrates that KV cache offloading itself introduces significant latency overhead, contradicting the candidate's claim that redundant storage with parity won't impact performance. The additional parity operations would likely exacerbate the latency issue the candidate claims to solve."
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "basis": "The candidate provides no evidence that redundant parity storage can be implemented without increasing memory overhead or processing time, making it equivalent to or worse than the baseline during traffic bursts when resources are already constrained."
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "basis": "Implementing redundant parity storage across shared GPU nodes would require complex synchronization mechanisms between GPUs that don't exist in current LLM serving systems, as evidenced by [doi:10.14711/thesis-hdl152583] which highlights the fundamental challenges in multi-tenant GPU cluster resource management."
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "basis": "The testable prediction only measures first-token latency but fails to account for the additional overhead introduced by parity computation and synchronization across nodes, making it impossible to determine if the solution actually improves overall system performance."
+  }
+ ]
+}

@@ -1,0 +1,48 @@
+{
+ "stage": "INDEPENDENT_ATTACK",
+ "candidate_id": "cand:MS:DIRECT_TRANSFER:c03116d0961c",
+ "escalation": {
+  "gate_version": "attacker_calibration/1.0.0",
+  "instrument": "independent_attack/1.0.0",
+  "calibration_state": "NOT_CALIBRATED",
+  "terminal_kill_admissible": false,
+  "measured": {
+   "coverage": 1.0,
+   "parse_completeness": 1.0,
+   "tpr_scoped": 1.0,
+   "fpr_known_good": 1.0,
+   "n_cases_attacked": 40
+  },
+  "sealed_thresholds": {
+   "note": "registered BEFORE measurement; never tuned to results (Art. XXVII)",
+   "coverage_min": 0.875,
+   "parse_completeness_min": 0.875,
+   "tpr_min": 0.75,
+   "fpr_max": 0.3,
+   "ensemble": "NONE (single-attacker calibration only; majority-vote ensembles are deferred by the R412 directive)"
+  },
+  "measurement_path": "R412/CALIBRATION/engine_independent_attack_measurement.json",
+  "measurement_sha256": "4e1718e7088564333b5e1ef9be47ca452133d051001628cd6eed91f44e60ef5f",
+  "reason": "measured FPR 1.0 > sealed bar 0.3 (Art. L: the attacker is measured non-selective; its KILL is inadmissible as a terminal verdict and is escalated with the objection preserved)",
+  "rule": "the instrument's KILL is measured non-selective (FPR above the sealed bar); the objection is preserved verbatim and ESCALATED for adjudication — the candidate is NOT killed by this attack alone (Art. L); the deterministic gates are unchanged",
+  "reviewer_provenance": "AI_REVIEW (Art. LXVII)"
+ },
+ "preserved_objections": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "basis": "The proposed mechanism fails to explain why adding multiple metal additives (Ni, Co, Sb, Mn, Fe) would specifically target positive grid corrosion without affecting other critical battery processes like hydrogen evolution or sulfate formation, which are well-documented in [doi:10.1051/e3sconf/202018501058] as interconnected failure modes."
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "basis": "The candidate's own evidence bundle contradicts the claimed effectiveness, as [doi:10.1109/bcaa.2000.838406] demonstrates that improved charge algorithms have a more significant impact on reducing grid corrosion than additive modifications, suggesting the proposed intervention is a marginal improvement at best."
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "basis": "The prediction of a 75% reduction in grid cross-section reduction rate is not grounded in comparative baseline data from the cited references, particularly [doi:10.1109/intlec.1995.498976] which shows typical grid corrosion rates under float charge conditions that the candidate fails to meaningfully improve upon."
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "basis": "The measurement methodology using gas chromatography with thermal conductive detector and sulfur chemiluminescence detector measures hydrogen yield and purity, but fails to directly measure the claimed reduction in grid cross-section corrosion rate, making the central prediction untestable with the proposed methods."
+  }
+ ]
+}

@@ -1,0 +1,79 @@
+{
+ "attack_version": "independent_attack/1.0.0",
+ "candidate_id": "cal:fail-open-drain-safety",
+ "generator_provider": null,
+ "attacker_provider": "zai",
+ "attacker_model": "glm-4-plus",
+ "independence_mode": "SEPARATE_CONTEXT",
+ "independence_note": "the attacker ran in an independent reasoning context (fresh adversarial conversation, generator reasoning never shown; no alternative provider credentialed \u2014 disclosed, never claimed as provider separation)",
+ "prompt_hash": "ce612d0e2abe5d848f78970fa8218d92409f6159bb4acd06f55b18fe8fa366c4",
+ "output_hash": "1d7ea44a4f3183c5923ac4a0b46d06f8472dbf9920deed6bd8cc3bd21dfb55a1",
+ "llm_status": "OK",
+ "attacked_at": "2026-09-10T17:31:46+00:00Z",
+ "items": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "verdict": "KILL",
+   "basis": "Magnetic latch fails when power loss occurs simultaneously with system pressure loss, as the magnetic latch requires residual system pressure to maintain sufficient force against the valve seat when power is lost"
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "verdict": "KILL",
+   "basis": "The claimed 8 bar boundary condition is violated during actual power loss events where system pressure may drop below the minimum required to maintain magnetic latch integrity"
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "verdict": "KILL",
+   "basis": "Evidence [ev:valve-42] specifically documents loss of supply pressure as a failure mode for magnetically latched drain valves in compressed-air service, directly contradicting the candidate's prediction of reliable operation during power loss"
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "verdict": "KILL",
+   "basis": "The proposed solution introduces additional failure modes (magnetic demagnetization above 80\u00b0C, pressure dependency) not present in the baseline separator, making it less reliable than the status quo"
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "verdict": "KILL",
+   "basis": "The magnetic latch cannot maintain sufficient force against 8 bar pressure for 24 hours without power, as the required magnet strength would exceed practical limits for a 1/2 inch inline device"
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "verdict": "KILL",
+   "basis": "The testable prediction only checks valve position sensor readings, not actual sealing integrity against 8 bar pressure, allowing for false positives where the valve appears closed but cannot maintain seal under pressure"
+  }
+ ],
+ "state": "ATTACK_RUN",
+ "overall": "KILLED",
+ "kill_basis": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "basis": "Magnetic latch fails when power loss occurs simultaneously with system pressure loss, as the magnetic latch requires residual system pressure to maintain sufficient force against the valve seat when power is lost"
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "basis": "The claimed 8 bar boundary condition is violated during actual power loss events where system pressure may drop below the minimum required to maintain magnetic latch integrity"
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "basis": "Evidence [ev:valve-42] specifically documents loss of supply pressure as a failure mode for magnetically latched drain valves in compressed-air service, directly contradicting the candidate's prediction of reliable operation during power loss"
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "basis": "The proposed solution introduces additional failure modes (magnetic demagnetization above 80\u00b0C, pressure dependency) not present in the baseline separator, making it less reliable than the status quo"
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "basis": "The magnetic latch cannot maintain sufficient force against 8 bar pressure for 24 hours without power, as the required magnet strength would exceed practical limits for a 1/2 inch inline device"
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "basis": "The testable prediction only checks valve position sensor readings, not actual sealing integrity against 8 bar pressure, allowing for false positives where the valve appears closed but cannot maintain seal under pressure"
+  }
+ ],
+ "counts": {
+  "KILL": 6,
+  "RISK": 0,
+  "SURVIVE": 0,
+  "INVALID": 0
+ }
+}

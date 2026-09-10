@@ -1,0 +1,56 @@
+{
+ "stage": "INDEPENDENT_ATTACK",
+ "candidate_id": "cand:DIV:mechanism_inversion:zai:b3e16cdd9773",
+ "escalation": {
+  "gate_version": "attacker_calibration/1.0.0",
+  "instrument": "independent_attack/1.0.0",
+  "calibration_state": "NOT_CALIBRATED",
+  "terminal_kill_admissible": false,
+  "measured": {
+   "coverage": 1.0,
+   "parse_completeness": 1.0,
+   "tpr_scoped": 1.0,
+   "fpr_known_good": 1.0,
+   "n_cases_attacked": 40
+  },
+  "sealed_thresholds": {
+   "note": "registered BEFORE measurement; never tuned to results (Art. XXVII)",
+   "coverage_min": 0.875,
+   "parse_completeness_min": 0.875,
+   "tpr_min": 0.75,
+   "fpr_max": 0.3,
+   "ensemble": "NONE (single-attacker calibration only; majority-vote ensembles are deferred by the R412 directive)"
+  },
+  "measurement_path": "R412/CALIBRATION/engine_independent_attack_measurement.json",
+  "measurement_sha256": "4e1718e7088564333b5e1ef9be47ca452133d051001628cd6eed91f44e60ef5f",
+  "reason": "measured FPR 1.0 > sealed bar 0.3 (Art. L: the attacker is measured non-selective; its KILL is inadmissible as a terminal verdict and is escalated with the objection preserved)",
+  "rule": "the instrument's KILL is measured non-selective (FPR above the sealed bar); the objection is preserved verbatim and ESCALATED for adjudication — the candidate is NOT killed by this attack alone (Art. L); the deterministic gates are unchanged",
+  "reviewer_provenance": "AI_REVIEW (Art. LXVII)"
+ },
+ "preserved_objections": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "basis": "The proposed mechanism uses temperature-sensitive point identification with K-means clustering-grey association coupling algorithm, but thermal elongation in spindles is a distributed phenomenon with complex heat transfer paths that cannot be accurately represented by discrete point measurements. The evidence (doi:10.1016/j.aasri.2012.06.032) shows thermal errors in spindles involve complex temperature gradients and time-dependent behavior that cannot be captured by point sampling."
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "basis": "The candidate fails to address boundary conditions regarding spindle speed variations, material being machined, and cooling system performance. The evidence (doi:10.4028/www.scientific.net/amm.192.185) demonstrates that spindle thermal behavior varies significantly with operating conditions, and the proposed compensation mechanism would need recalibration for different scenarios, making it impractical for real-world applications."
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "basis": "The candidate's evidence bundle (doi:10.1038/s41598-025-23907-x and doi:10.3390/ma19091850) focuses on material machining properties and drilling processes, not thermal compensation mechanisms. The referenced thermal analysis paper (doi:10.1016/j.aasri.2012.06.032) actually demonstrates that thermal compensation requires more sophisticated approaches than simple point measurements and algorithmic adjustments."
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "basis": "The candidate provides no evidence that the proposed approach outperforms existing thermal compensation systems. The evidence (doi:10.1038/s41598-025-27599-1) shows that hybrid network approaches for thermal error modeling significantly outperform simpler methods like the one proposed here, meaning the candidate would likely perform worse than the current state-of-the-art baseline."
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "basis": "The K-means clustering-grey association coupling algorithm would require extensive computational resources for real-time implementation, making it impractical for high-speed machining operations where control loops typically operate at kHz frequencies. The evidence (doi:10.4028/www.scientific.net/amm.192.185) shows that machine tool control systems require low-latency compensation methods, which this approach cannot provide."
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "basis": "The testable prediction fails to account for the time lag between temperature measurement and actual thermal displacement, as well as hysteresis effects during cooling cycles. The evidence (doi:10.1016/j.aasri.2012.06.032) demonstrates that thermal displacement in spindles has significant time-dependent characteristics that cannot be accurately captured by simple temperature point measurements."
+  }
+ ]
+}

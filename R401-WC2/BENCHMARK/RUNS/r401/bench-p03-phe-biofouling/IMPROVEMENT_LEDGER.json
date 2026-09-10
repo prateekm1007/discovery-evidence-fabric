@@ -1,0 +1,1327 @@
+{
+ "ledger": "IMPROVEMENT_LEDGER (R378 TECHNICAL IMPROVEMENT ENGINE)",
+ "version": "1.0.0",
+ "loop": "CANDIDATE -> DIAGNOSE WEAKNESS -> IDENTIFY LIMITING FEATURE -> GENERATE CONTROLLED MUTATION -> RE-EVALUATE EVIDENCE/MECHANISM/PRIOR ART -> RE-SCORE -> KEEP OR KILL -> REPEAT",
+ "collision_mode": "REPLAY_CACHE",
+ "live_sources": null,
+ "evaluators_registered": [
+  {
+   "evaluator_id": "term_rule_v1",
+   "fidelity_tier": "TERM_RULE",
+   "evidence_rank": 3
+  }
+ ],
+ "q_instrument": "discovery_fabric/benchmark/candidate_quality.py (FROZEN, hash-pinned, imported read-only)",
+ "i_instrument": "discovery_fabric/benchmark/invention_quality.py (R377, imported read-only)",
+ "thresholds": {
+  "SPAN_DERIVATION_MIN": {
+   "value": 0.2,
+   "epistemic_class": "ENGINEERING",
+   "justification": "the engine's own span-derivation rule (candidate_diversity.span_derivation_check): ratio < 0.20 = SPAN_UNDERIVED. A MECHANISM_STRENGTHENING mutation must CLEAR this floor — the same rule that gates the grid, not a new one."
+  },
+  "EVIDENCE_SUPPORT_MIN": {
+   "value": 0.2,
+   "epistemic_class": "ENGINEERING",
+   "justification": "I1's underived flag fires below 0.20; an EVIDENCE_DERIVED_CONSTRAINT mutation must clear the same floor on evidence_support."
+  },
+  "DOMAIN_OVERLAP_MIN": {
+   "value": 1,
+   "epistemic_class": "ENGINEERING",
+   "justification": "REPLAY_CACHE re-adjudication is valid only while the mutated candidate stays in the domain the cached art was found FOR. Guard: >= 1 NON-generic technical term shared between the child's mechanism+intervention and the cached family corpus. ZERO overlap means the mutation abandoned the domain (measured attack: re-adjudicating a cement-curing intervention against battery art fabricates surviving differentiators — false novelty from stale art). The overlap count is RECORDED on every cache adjudication so thin-domain links are auditable. NOTE: entity-term retention vs the problem CANNOT catch this class — entity terms are problem-derived and unchanged by mutations (measured while writing the guard's tests); it is recorded for audit only."
+  },
+  "MAX_ITERATIONS_DEFAULT": {
+   "value": 2,
+   "epistemic_class": "ENGINEERING",
+   "justification": "the CEO minimum loop is DIAGNOSE -> IMPROVE -> RE-EVALUATE -> IMPROVE AGAIN; two iterations demonstrate repeatability at bounded cost"
+  },
+  "MAX_PROPOSALS_PER_ITERATION": {
+   "value": 3,
+   "epistemic_class": "ENGINEERING",
+   "justification": "bounded proposal budget: three attempts, then the honest no-defensible-mutation verdict"
+  }
+ },
+ "started_at": "2026-09-10T14:50:34+00:00Z",
+ "iterations": [
+  {
+   "iteration": 1,
+   "diagnosis": {
+    "limiting_features": [
+     {
+      "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "measured_value": 0.5,
+      "weakness_kind": "LOW_SCORE",
+      "why_weak": "measured 0.5 < STRONG floor 0.7",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT"
+     },
+     {
+      "dimension": "I5_EXPERIMENT_DISCRIMINATION",
+      "measured_value": 0.667,
+      "weakness_kind": "LOW_SCORE",
+      "why_weak": "measured 0.667 < STRONG floor 0.7",
+      "mutation_type": "EXPERIMENT_DISCRIMINATION"
+     }
+    ],
+    "evidence_gaps": [
+     {
+      "dimension": "I2_DIFFERENTIATOR_TECHNICAL_MEANING",
+      "state": "UNMEASURABLE_NO_SURVIVORS",
+      "what_is_missing": "no surviving differentiators recorded",
+      "consequence": "no mutation targets this dimension until the gap closes (Art. XXV)"
+     },
+     {
+      "dimension": "I3_RECOMBINATION_RISK",
+      "state": "UNMEASURABLE_NO_FAMILIES",
+      "what_is_missing": "no prior-art families adjudicated — residue vs found art is unmeasured; absence of found art is not novelty",
+      "consequence": "no mutation targets this dimension until the gap closes (Art. XXV)"
+     },
+     {
+      "dimension": "I4_NEW_TECHNICAL_RELATIONSHIP",
+      "state": "UNMEASURABLE_NO_FAMILY_TEXT",
+      "what_is_missing": "no adjudicated family text stored — pair novelty vs found art is unmeasured",
+      "consequence": "no mutation targets this dimension until the gap closes (Art. XXV)"
+     }
+    ],
+    "target": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT"
+    }
+   },
+   "proposals": [
+    {
+     "proposal_id": "prop:67050d55d457",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "118b35d99cc51328d7363b93e58593f88fe62c905e5de3bf9cee52993e59bede",
+     "output_hash": "67050d55d45779e0af18024ffc45f47b07274cf67798d4b4692f0611f9553280",
+     "fields": {
+      "MUTATION_TYPE": "EVIDENCE_DERIVED_CONSTRAINT",
+      "MECHANISM": "Stress corrosion cracking of stainless steel heat exchangers by cooling water leading to surface modification",
+      "INTERVENTION": "Apply controlled mechanical stress to heat exchanger plates to induce beneficial micro-cracking that prevents biofilm adhesion while maintaining structural integrity",
+      "EXPECTED_EFFECT": "Reduced biofilm accumulation while maintaining structural integrity, sustaining heat transfer coefficient above 2500 W/m2K for 12 months between cleanings",
+      "FALSIFICATION_TEST": "falsification_test_from_candidate",
+      "MECHANISM_SOURCE_SPAN": "Stress Corrosion Cracking of Stainless Steel Heat-exchanger of Shell and Tube Type by Cooling Water",
+      "SOURCE_EVIDENCE_ID": "doi:10.3323/jcorr1974.29.7_354",
+      "EXPERIMENT": "Compare the heat transfer coefficient and pressure drop of the stress-treated plates against untreated plates in identical cooling water conditions",
+      "EXPERIMENT_BASELINE": "untreated stainless steel heat exchanger plates",
+      "EXPERIMENT_EIG": "0.75",
+      "CONSTRAINT_DERIVED": "The stress-induced micro-cracking must not exceed 20% of plate thickness to maintain structural integrity",
+      "MUTATION_REASON": "Repairs I1_MECHANISM_EVIDENCE_DERIVATION defect by anchoring mechanism in actual evidence terminology and deriving constraint from evidence text"
+     },
+     "validation": {
+      "valid": true,
+      "stage": "VALIDATION",
+      "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+      "checks": {
+       "mutation_type_matches_diagnosis": true,
+       "span_evidence_exists": "doi:10.3323/jcorr1974.29.7_354",
+       "span_verbatim_in_evidence": true,
+       "evidence_support": 0.333,
+       "evidence_support_cleared": 0.333,
+       "constraint_traceable_to_evidence": "The stress-induced micro-cracking must not exceed 20% of plate thickness to maintain structural integrity"
+      },
+      "reasons": [],
+      "validated_at": "2026-09-10T14:50:37+00:00Z"
+     }
+    },
+    {
+     "proposal_id": "prop:eb0194e89e67",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "c55e11c52a865d110b4959ddea6f2d3768fc7bfcdc820e072698c83d61bcaa66",
+     "output_hash": "eb0194e89e67fe4585bca756944bb3d70f0d1961f91c824cd8941374e7a6a202",
+     "fields": {
+      "MUTATION_TYPE": "EVIDENCE_DERIVED_CONSTRAINT",
+      "MECHANISM": "Stress corrosion cracking of stainless steel heat-exchanger of shell and tube type by cooling water",
+      "INTERVENTION": "Apply controlled mechanical stress to heat exchanger plates to induce beneficial micro-cracking that prevents biofilm adhesion",
+      "EXPECTED_EFFECT": "Reduced biofilm accumulation while maintaining structural integrity, sustaining heat transfer coefficient above 2500 W/m2K for 12 months between cleanings",
+      "FALSIFICATION_TEST": "falsification_test_from_candidate",
+      "MECHANISM_SOURCE_SPAN": "Stress Corrosion Cracking of Stainless Steel Heat-exchanger of Shell and Tube Type by Cooling Water",
+      "SOURCE_EVIDENCE_ID": "doi:10.3323/jcorr1974.29.7_354",
+      "EXPERIMENT": "Compare the candidate against a baseline heat exchanger without controlled mechanical stress to measure differences in biofilm adhesion and heat transfer coefficient over 12 months",
+      "EXPERIMENT_BASELINE": "heat exchanger without controlled mechanical stress",
+      "EXPERIMENT_EIG": "0.75",
+      "CONSTRAINT_DERIVED": "The mechanical stress must be applied in a pattern that replicates the stress corrosion cracking phenomenon observed in shell and tube type heat exchangers",
+      "MUTATION_REASON": "This repairs the I1_MECHANISM_EVIDENCE_DERIVATION defect by re-anchoring the mechanism in the exact technical vocabulary from the cited evidence"
+     },
+     "validation": {
+      "valid": true,
+      "stage": "VALIDATION",
+      "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+      "checks": {
+       "mutation_type_matches_diagnosis": true,
+       "span_evidence_exists": "doi:10.3323/jcorr1974.29.7_354",
+       "span_verbatim_in_evidence": true,
+       "evidence_support": 0.522,
+       "evidence_support_cleared": 0.522,
+       "constraint_traceable_to_evidence": "The mechanical stress must be applied in a pattern that replicates the stress corrosion cracking phenomenon observed in "
+      },
+      "reasons": [],
+      "validated_at": "2026-09-10T14:50:40+00:00Z"
+     }
+    }
+   ],
+   "mutation_attempts": [
+    {
+     "mutation_applied": {
+      "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+      "mutation_id": "mut:16a8acf66bc1",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+      "diagnostic_trigger": {
+       "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+       "measured_before": 0.5,
+       "basis": "R378 evaluator-contract diagnosis (deterministic)"
+      },
+      "proposal_provenance": {
+       "proposal_id": "prop:67050d55d457",
+       "provider": "zai",
+       "model": "glm-4-plus",
+       "prompt_hash": "118b35d99cc51328d7363b93e58593f88fe62c905e5de3bf9cee52993e59bede",
+       "output_hash": "67050d55d45779e0af18024ffc45f47b07274cf67798d4b4692f0611f9553280",
+       "llm_is_untrusted_proposer": true
+      },
+      "validation": {
+       "valid": true,
+       "stage": "VALIDATION",
+       "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+       "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+       "checks": {
+        "mutation_type_matches_diagnosis": true,
+        "span_evidence_exists": "doi:10.3323/jcorr1974.29.7_354",
+        "span_verbatim_in_evidence": true,
+        "evidence_support": 0.333,
+        "evidence_support_cleared": 0.333,
+        "constraint_traceable_to_evidence": "The stress-induced micro-cracking must not exceed 20% of plate thickness to maintain structural integrity"
+       },
+       "reasons": [],
+       "validated_at": "2026-09-10T14:50:37+00:00Z"
+      },
+      "fields_changed": {
+       "mechanism": {
+        "before": "Stress corrosion cracking of stainless steel heat exchangers by cooling water",
+        "after": "Stress corrosion cracking of stainless steel heat exchangers by cooling water leading to surface modification"
+       },
+       "intervention": {
+        "before": "Apply controlled mechanical stress to heat exchanger plates to induce beneficial micro-cracking that prevents biofilm adhesion",
+        "after": "Apply controlled mechanical stress to heat exchanger plates to induce beneficial micro-cracking that prevents biofilm adhesion while maintaining structural integrity"
+       },
+       "mechanism_source_span": {
+        "before": "Stress Corrosion Cracking of Stainless Steel Heat-exchanger of Shell and Tube Type by Cooling Water",
+        "after": "Stress Corrosion Cracking of Stainless Steel Heat-exchanger of Shell and Tube Type by Cooling Water"
+       }
+      },
+      "inherited_negatives": {
+       "uncertainty_ids": [
+        "con:verify:5fc42398",
+        "con:verify:fc690a03",
+        "stainless heat exchanger cooling steel district",
+        "stainless heat exchanger cooling steel district",
+        "stainless heat exchangers cooling steel corrosion",
+        "stainless heat exchangers cooling steel corrosion",
+        "heat exchanger plates cracking biofilm stress controlled mechanical",
+        "heat exchanger plates cracking biofilm stress controlled mechanical",
+        "stainless prevention accumulation maintaining integrity sustaining",
+        "stainless prevention accumulation maintaining integrity sustaining",
+        "reduced maintaining structural integrity sustaining above",
+        "reduced maintaining structural integrity sustaining above"
+       ],
+       "collision_family_ids": [],
+       "source_errors": []
+      },
+      "parent_spec_hash": "35d67947e14cff54e3aab94451e4a51cb3032d48386412d14f5af8102d2a9b2c",
+      "child_spec_hash": null,
+      "reason": "Repairs I1_MECHANISM_EVIDENCE_DERIVATION defect by anchoring mechanism in actual evidence terminology and deriving constraint from evidence text",
+      "applied_at": "2026-09-10T14:50:37+00:00Z"
+     },
+     "re_evaluation": {
+      "collision_mode": "REPLAY_CACHE",
+      "re_evaluated_at": "2026-09-10T14:50:37+00:00Z",
+      "re_adjudication": {
+       "mode": "REPLAY_CACHE",
+       "valid": false,
+       "reason": "NO_CACHED_FAMILIES"
+      },
+      "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+      "re_adjudication_failure": "NO_CACHED_FAMILIES",
+      "i_dimensions": {
+       "I1_MECHANISM_EVIDENCE_DERIVATION": {
+        "score": 0.37,
+        "state": "MEASURED"
+       },
+       "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_SURVIVORS"
+       },
+       "I3_RECOMBINATION_RISK": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_FAMILIES"
+       },
+       "I4_NEW_TECHNICAL_RELATIONSHIP": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+       },
+       "I5_EXPERIMENT_DISCRIMINATION": {
+        "score": 0.667,
+        "state": "MEASURED"
+       }
+      },
+      "i_flags": {
+       "underived_mechanism": false,
+       "recombination_only": false
+      },
+      "i_average": 0.518,
+      "q_dimensions": {
+       "Q1_EVIDENCE_BINDING": {
+        "score": 0.5,
+        "state": "MEASURED"
+       },
+       "Q2_PRIOR_ART_SPECIFICITY": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_PRIOR_ART"
+       },
+       "Q3_PRIOR_ART_RESOLUTION": {
+        "score": 0.0,
+        "state": "MEASURED"
+       },
+       "Q4_EXPERIMENT_DECISIVENESS": {
+        "score": 1.0,
+        "state": "MEASURED"
+       },
+       "Q5_CHAIN_COMPLETENESS": {
+        "score": 1.0,
+        "state": "MEASURED"
+       }
+      },
+      "q_average": 0.625
+     },
+     "decision": {
+      "action": "REJECT_MUTATION",
+      "improved": false,
+      "checks": {
+       "targeted_dimension": "0.5 -> 0.37 (no improvement)",
+       "negatives_preserved": true,
+       "no_new_structural_flags": true,
+       "no_unknown_conversion_without_new_evidence": true,
+       "text_gap_conversions_recorded": [],
+       "prior_art_position_not_degraded": true
+      },
+      "reasons": [],
+      "decided_at": "2026-09-10T14:50:37+00:00Z"
+     }
+    },
+    {
+     "mutation_applied": {
+      "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+      "mutation_id": "mut:76cd55cf6045",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+      "diagnostic_trigger": {
+       "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+       "measured_before": 0.5,
+       "basis": "R378 evaluator-contract diagnosis (deterministic)"
+      },
+      "proposal_provenance": {
+       "proposal_id": "prop:eb0194e89e67",
+       "provider": "zai",
+       "model": "glm-4-plus",
+       "prompt_hash": "c55e11c52a865d110b4959ddea6f2d3768fc7bfcdc820e072698c83d61bcaa66",
+       "output_hash": "eb0194e89e67fe4585bca756944bb3d70f0d1961f91c824cd8941374e7a6a202",
+       "llm_is_untrusted_proposer": true
+      },
+      "validation": {
+       "valid": true,
+       "stage": "VALIDATION",
+       "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+       "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+       "checks": {
+        "mutation_type_matches_diagnosis": true,
+        "span_evidence_exists": "doi:10.3323/jcorr1974.29.7_354",
+        "span_verbatim_in_evidence": true,
+        "evidence_support": 0.522,
+        "evidence_support_cleared": 0.522,
+        "constraint_traceable_to_evidence": "The mechanical stress must be applied in a pattern that replicates the stress corrosion cracking phenomenon observed in "
+       },
+       "reasons": [],
+       "validated_at": "2026-09-10T14:50:40+00:00Z"
+      },
+      "fields_changed": {
+       "mechanism": {
+        "before": "Stress corrosion cracking of stainless steel heat exchangers by cooling water",
+        "after": "Stress corrosion cracking of stainless steel heat-exchanger of shell and tube type by cooling water"
+       },
+       "intervention": {
+        "before": "Apply controlled mechanical stress to heat exchanger plates to induce beneficial micro-cracking that prevents biofilm adhesion",
+        "after": "Apply controlled mechanical stress to heat exchanger plates to induce beneficial micro-cracking that prevents biofilm adhesion"
+       },
+       "mechanism_source_span": {
+        "before": "Stress Corrosion Cracking of Stainless Steel Heat-exchanger of Shell and Tube Type by Cooling Water",
+        "after": "Stress Corrosion Cracking of Stainless Steel Heat-exchanger of Shell and Tube Type by Cooling Water"
+       }
+      },
+      "inherited_negatives": {
+       "uncertainty_ids": [
+        "con:verify:5fc42398",
+        "con:verify:fc690a03",
+        "stainless heat exchanger cooling steel district",
+        "stainless heat exchanger cooling steel district",
+        "stainless heat exchangers cooling steel corrosion",
+        "stainless heat exchangers cooling steel corrosion",
+        "heat exchanger plates cracking biofilm stress controlled mechanical",
+        "heat exchanger plates cracking biofilm stress controlled mechanical",
+        "stainless prevention accumulation maintaining integrity sustaining",
+        "stainless prevention accumulation maintaining integrity sustaining",
+        "reduced maintaining structural integrity sustaining above",
+        "reduced maintaining structural integrity sustaining above"
+       ],
+       "collision_family_ids": [],
+       "source_errors": []
+      },
+      "parent_spec_hash": "35d67947e14cff54e3aab94451e4a51cb3032d48386412d14f5af8102d2a9b2c",
+      "child_spec_hash": null,
+      "reason": "This repairs the I1_MECHANISM_EVIDENCE_DERIVATION defect by re-anchoring the mechanism in the exact technical vocabulary from the cited evidence",
+      "applied_at": "2026-09-10T14:50:40+00:00Z"
+     },
+     "re_evaluation": {
+      "collision_mode": "REPLAY_CACHE",
+      "re_evaluated_at": "2026-09-10T14:50:40+00:00Z",
+      "re_adjudication": {
+       "mode": "REPLAY_CACHE",
+       "valid": false,
+       "reason": "NO_CACHED_FAMILIES"
+      },
+      "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+      "re_adjudication_failure": "NO_CACHED_FAMILIES",
+      "i_dimensions": {
+       "I1_MECHANISM_EVIDENCE_DERIVATION": {
+        "score": 0.565,
+        "state": "MEASURED"
+       },
+       "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_SURVIVORS"
+       },
+       "I3_RECOMBINATION_RISK": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_FAMILIES"
+       },
+       "I4_NEW_TECHNICAL_RELATIONSHIP": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+       },
+       "I5_EXPERIMENT_DISCRIMINATION": {
+        "score": 0.667,
+        "state": "MEASURED"
+       }
+      },
+      "i_flags": {
+       "underived_mechanism": false,
+       "recombination_only": false
+      },
+      "i_average": 0.616,
+      "q_dimensions": {
+       "Q1_EVIDENCE_BINDING": {
+        "score": 0.5,
+        "state": "MEASURED"
+       },
+       "Q2_PRIOR_ART_SPECIFICITY": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_PRIOR_ART"
+       },
+       "Q3_PRIOR_ART_RESOLUTION": {
+        "score": 0.0,
+        "state": "MEASURED"
+       },
+       "Q4_EXPERIMENT_DECISIVENESS": {
+        "score": 1.0,
+        "state": "MEASURED"
+       },
+       "Q5_CHAIN_COMPLETENESS": {
+        "score": 1.0,
+        "state": "MEASURED"
+       }
+      },
+      "q_average": 0.625
+     },
+     "decision": {
+      "action": "KEEP",
+      "improved": true,
+      "checks": {
+       "targeted_dimension": "0.5 -> 0.565 (improved)",
+       "negatives_preserved": true,
+       "no_new_structural_flags": true,
+       "no_unknown_conversion_without_new_evidence": true,
+       "text_gap_conversions_recorded": [],
+       "prior_art_position_not_degraded": true
+      },
+      "reasons": [],
+      "decided_at": "2026-09-10T14:50:40+00:00Z"
+     }
+    }
+   ],
+   "mutation_applied": {
+    "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+    "mutation_id": "mut:16a8acf66bc1",
+    "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+    "diagnostic_trigger": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "measured_before": 0.5,
+     "basis": "R378 evaluator-contract diagnosis (deterministic)"
+    },
+    "proposal_provenance": {
+     "proposal_id": "prop:67050d55d457",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "118b35d99cc51328d7363b93e58593f88fe62c905e5de3bf9cee52993e59bede",
+     "output_hash": "67050d55d45779e0af18024ffc45f47b07274cf67798d4b4692f0611f9553280",
+     "llm_is_untrusted_proposer": true
+    },
+    "validation": {
+     "valid": true,
+     "stage": "VALIDATION",
+     "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+     "checks": {
+      "mutation_type_matches_diagnosis": true,
+      "span_evidence_exists": "doi:10.3323/jcorr1974.29.7_354",
+      "span_verbatim_in_evidence": true,
+      "evidence_support": 0.333,
+      "evidence_support_cleared": 0.333,
+      "constraint_traceable_to_evidence": "The stress-induced micro-cracking must not exceed 20% of plate thickness to maintain structural integrity"
+     },
+     "reasons": [],
+     "validated_at": "2026-09-10T14:50:37+00:00Z"
+    },
+    "fields_changed": {
+     "mechanism": {
+      "before": "Stress corrosion cracking of stainless steel heat exchangers by cooling water",
+      "after": "Stress corrosion cracking of stainless steel heat exchangers by cooling water leading to surface modification"
+     },
+     "intervention": {
+      "before": "Apply controlled mechanical stress to heat exchanger plates to induce beneficial micro-cracking that prevents biofilm adhesion",
+      "after": "Apply controlled mechanical stress to heat exchanger plates to induce beneficial micro-cracking that prevents biofilm adhesion while maintaining structural integrity"
+     },
+     "mechanism_source_span": {
+      "before": "Stress Corrosion Cracking of Stainless Steel Heat-exchanger of Shell and Tube Type by Cooling Water",
+      "after": "Stress Corrosion Cracking of Stainless Steel Heat-exchanger of Shell and Tube Type by Cooling Water"
+     }
+    },
+    "inherited_negatives": {
+     "uncertainty_ids": [
+      "con:verify:5fc42398",
+      "con:verify:fc690a03",
+      "stainless heat exchanger cooling steel district",
+      "stainless heat exchanger cooling steel district",
+      "stainless heat exchangers cooling steel corrosion",
+      "stainless heat exchangers cooling steel corrosion",
+      "heat exchanger plates cracking biofilm stress controlled mechanical",
+      "heat exchanger plates cracking biofilm stress controlled mechanical",
+      "stainless prevention accumulation maintaining integrity sustaining",
+      "stainless prevention accumulation maintaining integrity sustaining",
+      "reduced maintaining structural integrity sustaining above",
+      "reduced maintaining structural integrity sustaining above"
+     ],
+     "collision_family_ids": [],
+     "source_errors": []
+    },
+    "parent_spec_hash": "35d67947e14cff54e3aab94451e4a51cb3032d48386412d14f5af8102d2a9b2c",
+    "child_spec_hash": null,
+    "reason": "Repairs I1_MECHANISM_EVIDENCE_DERIVATION defect by anchoring mechanism in actual evidence terminology and deriving constraint from evidence text",
+    "applied_at": "2026-09-10T14:50:37+00:00Z"
+   },
+   "re_evaluation": {
+    "collision_mode": "REPLAY_CACHE",
+    "re_evaluated_at": "2026-09-10T14:50:40+00:00Z",
+    "re_adjudication": {
+     "mode": "REPLAY_CACHE",
+     "valid": false,
+     "reason": "NO_CACHED_FAMILIES"
+    },
+    "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+    "re_adjudication_failure": "NO_CACHED_FAMILIES",
+    "i_dimensions": {
+     "I1_MECHANISM_EVIDENCE_DERIVATION": {
+      "score": 0.565,
+      "state": "MEASURED"
+     },
+     "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_SURVIVORS"
+     },
+     "I3_RECOMBINATION_RISK": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_FAMILIES"
+     },
+     "I4_NEW_TECHNICAL_RELATIONSHIP": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+     },
+     "I5_EXPERIMENT_DISCRIMINATION": {
+      "score": 0.667,
+      "state": "MEASURED"
+     }
+    },
+    "i_flags": {
+     "underived_mechanism": false,
+     "recombination_only": false
+    },
+    "i_average": 0.616,
+    "q_dimensions": {
+     "Q1_EVIDENCE_BINDING": {
+      "score": 0.5,
+      "state": "MEASURED"
+     },
+     "Q2_PRIOR_ART_SPECIFICITY": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_PRIOR_ART"
+     },
+     "Q3_PRIOR_ART_RESOLUTION": {
+      "score": 0.0,
+      "state": "MEASURED"
+     },
+     "Q4_EXPERIMENT_DECISIVENESS": {
+      "score": 1.0,
+      "state": "MEASURED"
+     },
+     "Q5_CHAIN_COMPLETENESS": {
+      "score": 1.0,
+      "state": "MEASURED"
+     }
+    },
+    "q_average": 0.625
+   },
+   "decision": {
+    "action": "KEEP",
+    "improved": true,
+    "checks": {
+     "targeted_dimension": "0.5 -> 0.565 (improved)",
+     "negatives_preserved": true,
+     "no_new_structural_flags": true,
+     "no_unknown_conversion_without_new_evidence": true,
+     "text_gap_conversions_recorded": [],
+     "prior_art_position_not_degraded": true
+    },
+    "reasons": [],
+    "decided_at": "2026-09-10T14:50:40+00:00Z"
+   }
+  },
+  {
+   "iteration": 2,
+   "diagnosis": {
+    "limiting_features": [
+     {
+      "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "measured_value": 0.565,
+      "weakness_kind": "LOW_SCORE",
+      "why_weak": "measured 0.565 < STRONG floor 0.7",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT"
+     },
+     {
+      "dimension": "I5_EXPERIMENT_DISCRIMINATION",
+      "measured_value": 0.667,
+      "weakness_kind": "LOW_SCORE",
+      "why_weak": "measured 0.667 < STRONG floor 0.7",
+      "mutation_type": "EXPERIMENT_DISCRIMINATION"
+     }
+    ],
+    "evidence_gaps": [
+     {
+      "dimension": "I2_DIFFERENTIATOR_TECHNICAL_MEANING",
+      "state": "UNMEASURABLE_NO_SURVIVORS",
+      "what_is_missing": "no surviving differentiators recorded",
+      "consequence": "no mutation targets this dimension until the gap closes (Art. XXV)"
+     },
+     {
+      "dimension": "I3_RECOMBINATION_RISK",
+      "state": "UNMEASURABLE_NO_FAMILIES",
+      "what_is_missing": "no prior-art families adjudicated — residue vs found art is unmeasured; absence of found art is not novelty",
+      "consequence": "no mutation targets this dimension until the gap closes (Art. XXV)"
+     },
+     {
+      "dimension": "I4_NEW_TECHNICAL_RELATIONSHIP",
+      "state": "UNMEASURABLE_NO_FAMILY_TEXT",
+      "what_is_missing": "no adjudicated family text stored — pair novelty vs found art is unmeasured",
+      "consequence": "no mutation targets this dimension until the gap closes (Art. XXV)"
+     }
+    ],
+    "target": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT"
+    }
+   },
+   "proposals": [
+    {
+     "proposal_id": "prop:e1db86049287",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "87b7fbf46b86a0d5f95bf2d780b23f02ca865f70cf9229cf6f59c3fc9475a5c2",
+     "output_hash": "e1db86049287142938ed9066bfea60a39406265e1c367cf38127cbd1d159ebda",
+     "fields": {
+      "MUTATION_TYPE": "EVIDENCE_DERIVED_CONSTRAINT",
+      "MECHANISM": "Stress corrosion cracking of stainless steel heat-exchanger of shell and tube type by cooling water",
+      "INTERVENTION": "Apply controlled mechanical stress to heat exchanger plates to induce beneficial micro-cracking that prevents biofilm adhesion",
+      "EXPECTED_EFFECT": "Reduced biofilm accumulation while maintaining structural integrity, sustaining heat transfer coefficient above 2500 W/m2K for 12 months between cleanings",
+      "FALSIFICATION_TEST": "falsification_test_from_candidate",
+      "MECHANISM_SOURCE_SPAN": "Stress Corrosion Cracking of Stainless Steel Heat-exchanger of Shell and Tube Type by Cooling Water",
+      "SOURCE_EVIDENCE_ID": "doi:10.3323/jcorr1974.29.7_354",
+      "EXPERIMENT": "falsification_test_from_candidate",
+      "EXPERIMENT_BASELINE": "falsification_test_from_candidate",
+      "EXPERIMENT_EIG": "0.5",
+      "CONSTRAINT_DERIVED": "NONE",
+      "MUTATION_REASON": "Repairs the I1_MECHANISM_EVIDENCE_DERIVATION weakness by re-anchoring the mechanism's technical vocabulary in the cited evidence's actual text"
+     },
+     "validation": {
+      "valid": false,
+      "stage": "VALIDATION",
+      "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+      "checks": {
+       "mutation_type_matches_diagnosis": true,
+       "span_evidence_exists": "doi:10.3323/jcorr1974.29.7_354",
+       "span_verbatim_in_evidence": true,
+       "evidence_support": 0.522,
+       "evidence_support_cleared": 0.522,
+       "constraint_actually_derived": false
+      },
+      "reasons": [
+       "constraint_actually_derived: EVIDENCE_DERIVED_CONSTRAINT requires a derived constraint, not NONE"
+      ],
+      "validated_at": "2026-09-10T14:50:43+00:00Z"
+     }
+    },
+    {
+     "proposal_id": "prop:7ca230d51a92",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "854c5a29adf68f2346a9d859ab78c0df79eabfd406fdd145911829150b67306c",
+     "output_hash": "7ca230d51a924bb33517c2e701af6a21dd52471bd51f2513a00a1cb88496a88c",
+     "fields": {
+      "MUTATION_TYPE": "EVIDENCE_DERIVED_CONSTRAINT",
+      "MECHANISM": "Stress corrosion cracking of stainless steel heat-exchanger of shell and tube type by cooling water that alters surface energy to reduce biofilm adhesion",
+      "INTERVENTION": "Apply controlled mechanical stress to heat exchanger plates to induce beneficial micro-cracking that prevents biofilm adhesion by increasing surface energy",
+      "EXPECTED_EFFECT": "Reduced biofilm accumulation while maintaining structural integrity, sustaining heat transfer coefficient above 2500 W/m2K for 12 months between cleanings",
+      "FALSIFICATION_TEST": "falsification_test_from_candidate",
+      "MECHANISM_SOURCE_SPAN": "Stress Corrosion Cracking of Stainless Steel Heat-exchanger of Shell and Tube Type by Cooling Water",
+      "SOURCE_EVIDENCE_ID": "doi:10.3323/jcorr1974.29.7_354",
+      "EXPERIMENT": "Compare heat transfer coefficient and pressure drop between the candidate and a baseline heat exchanger without controlled mechanical stress over 12 months",
+      "EXPERIMENT_BASELINE": "Heat exchanger without controlled mechanical stress",
+      "EXPERIMENT_EIG": "0.85",
+      "CONSTRAINT_DERIVED": "The mechanical stress must be applied at levels that induce micro-cracking without compromising structural integrity",
+      "MUTATION_REASON": "Repairs I1_MECHANISM_EVIDENCE_DERIVATION by re-anchoring the mechanism in the evidence's technical vocabulary and deriving a constraint from the evidence text"
+     },
+     "validation": {
+      "valid": true,
+      "stage": "VALIDATION",
+      "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+      "checks": {
+       "mutation_type_matches_diagnosis": true,
+       "span_evidence_exists": "doi:10.3323/jcorr1974.29.7_354",
+       "span_verbatim_in_evidence": true,
+       "evidence_support": 0.429,
+       "evidence_support_cleared": 0.429,
+       "constraint_traceable_to_evidence": "The mechanical stress must be applied at levels that induce micro-cracking without compromising structural integrity"
+      },
+      "reasons": [],
+      "validated_at": "2026-09-10T14:50:46+00:00Z"
+     }
+    },
+    {
+     "proposal_id": "prop:c1e702c0b3a9",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "9cb2193a950892c4284fc803386e60f7c6d30240c79a2844fe5d27922bb91fd0",
+     "output_hash": "c1e702c0b3a9ade3af00a173dc288dc62eb93d348e8bfa08d6fa1d9ca16d3734",
+     "fields": {
+      "MUTATION_TYPE": "EVIDENCE_DERIVED_CONSTRAINT",
+      "MECHANISM": "Stress corrosion cracking of stainless steel heat-exchanger of shell and tube type by cooling water",
+      "INTERVENTION": "Apply controlled mechanical stress to heat exchanger plates to induce beneficial micro-cracking that prevents biofilm adhesion while maintaining structural integrity",
+      "EXPECTED_EFFECT": "Reduced biofilm accumulation while maintaining structural integrity, sustaining heat transfer coefficient above 2500 W/m2K for 12 months between cleanings",
+      "FALSIFICATION_TEST": "falsification_test_from_candidate",
+      "MECHANISM_SOURCE_SPAN": "Stress Corrosion Cracking of Stainless Steel Heat-exchanger of Shell and Tube Type by Cooling Water",
+      "SOURCE_EVIDENCE_ID": "doi:10.3323/jcorr1974.29.7_354",
+      "EXPERIMENT": "falsification_test_from_candidate",
+      "EXPERIMENT_BASELINE": "falsification_test_from_candidate",
+      "EXPERIMENT_EIG": "0.65",
+      "CONSTRAINT_DERIVED": "Maintain mechanical stress below critical threshold to prevent structural failure while inducing beneficial micro-cracking",
+      "MUTATION_REASON": "Repairs I1_MECHANISM_EVIDENCE_DERIVATION defect by re-anchoring mechanism in evidence terminology and adding derived constraint from evidence text"
+     },
+     "validation": {
+      "valid": true,
+      "stage": "VALIDATION",
+      "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+      "checks": {
+       "mutation_type_matches_diagnosis": true,
+       "span_evidence_exists": "doi:10.3323/jcorr1974.29.7_354",
+       "span_verbatim_in_evidence": true,
+       "evidence_support": 0.444,
+       "evidence_support_cleared": 0.444,
+       "constraint_traceable_to_evidence": "Maintain mechanical stress below critical threshold to prevent structural failure while inducing beneficial micro-cracki"
+      },
+      "reasons": [],
+      "validated_at": "2026-09-10T14:50:48+00:00Z"
+     }
+    }
+   ],
+   "mutation_attempts": [
+    {
+     "mutation_applied": {
+      "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+      "mutation_id": "mut:7c7a85f7f277",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+      "diagnostic_trigger": {
+       "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+       "measured_before": 0.565,
+       "basis": "R378 evaluator-contract diagnosis (deterministic)"
+      },
+      "proposal_provenance": {
+       "proposal_id": "prop:7ca230d51a92",
+       "provider": "zai",
+       "model": "glm-4-plus",
+       "prompt_hash": "854c5a29adf68f2346a9d859ab78c0df79eabfd406fdd145911829150b67306c",
+       "output_hash": "7ca230d51a924bb33517c2e701af6a21dd52471bd51f2513a00a1cb88496a88c",
+       "llm_is_untrusted_proposer": true
+      },
+      "validation": {
+       "valid": true,
+       "stage": "VALIDATION",
+       "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+       "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+       "checks": {
+        "mutation_type_matches_diagnosis": true,
+        "span_evidence_exists": "doi:10.3323/jcorr1974.29.7_354",
+        "span_verbatim_in_evidence": true,
+        "evidence_support": 0.429,
+        "evidence_support_cleared": 0.429,
+        "constraint_traceable_to_evidence": "The mechanical stress must be applied at levels that induce micro-cracking without compromising structural integrity"
+       },
+       "reasons": [],
+       "validated_at": "2026-09-10T14:50:46+00:00Z"
+      },
+      "fields_changed": {
+       "mechanism": {
+        "before": "Stress corrosion cracking of stainless steel heat-exchanger of shell and tube type by cooling water",
+        "after": "Stress corrosion cracking of stainless steel heat-exchanger of shell and tube type by cooling water that alters surface energy to reduce biofilm adhesion"
+       },
+       "intervention": {
+        "before": "Apply controlled mechanical stress to heat exchanger plates to induce beneficial micro-cracking that prevents biofilm adhesion",
+        "after": "Apply controlled mechanical stress to heat exchanger plates to induce beneficial micro-cracking that prevents biofilm adhesion by increasing surface energy"
+       },
+       "mechanism_source_span": {
+        "before": "Stress Corrosion Cracking of Stainless Steel Heat-exchanger of Shell and Tube Type by Cooling Water",
+        "after": "Stress Corrosion Cracking of Stainless Steel Heat-exchanger of Shell and Tube Type by Cooling Water"
+       }
+      },
+      "inherited_negatives": {
+       "uncertainty_ids": [
+        "con:verify:5fc42398",
+        "con:verify:fc690a03",
+        "stainless heat exchanger cooling steel district",
+        "stainless heat exchanger cooling steel district",
+        "stainless heat exchangers cooling steel corrosion",
+        "stainless heat exchangers cooling steel corrosion",
+        "heat exchanger plates cracking biofilm stress controlled mechanical",
+        "heat exchanger plates cracking biofilm stress controlled mechanical",
+        "stainless prevention accumulation maintaining integrity sustaining",
+        "stainless prevention accumulation maintaining integrity sustaining",
+        "reduced maintaining structural integrity sustaining above",
+        "reduced maintaining structural integrity sustaining above"
+       ],
+       "collision_family_ids": [],
+       "source_errors": []
+      },
+      "parent_spec_hash": "bd8245c0202802715682c59e69f47dc3489d2d13b81ae6c19b8bf7bfd569c6d2",
+      "child_spec_hash": null,
+      "reason": "Repairs I1_MECHANISM_EVIDENCE_DERIVATION by re-anchoring the mechanism in the evidence's technical vocabulary and deriving a constraint from the evidence text",
+      "applied_at": "2026-09-10T14:50:46+00:00Z"
+     },
+     "re_evaluation": {
+      "collision_mode": "REPLAY_CACHE",
+      "re_evaluated_at": "2026-09-10T14:50:46+00:00Z",
+      "re_adjudication": {
+       "mode": "REPLAY_CACHE",
+       "valid": false,
+       "reason": "NO_CACHED_FAMILIES"
+      },
+      "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+      "re_adjudication_failure": "NO_CACHED_FAMILIES",
+      "i_dimensions": {
+       "I1_MECHANISM_EVIDENCE_DERIVATION": {
+        "score": 0.5,
+        "state": "MEASURED"
+       },
+       "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_SURVIVORS"
+       },
+       "I3_RECOMBINATION_RISK": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_FAMILIES"
+       },
+       "I4_NEW_TECHNICAL_RELATIONSHIP": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+       },
+       "I5_EXPERIMENT_DISCRIMINATION": {
+        "score": 0.667,
+        "state": "MEASURED"
+       }
+      },
+      "i_flags": {
+       "underived_mechanism": false,
+       "recombination_only": false
+      },
+      "i_average": 0.584,
+      "q_dimensions": {
+       "Q1_EVIDENCE_BINDING": {
+        "score": 0.5,
+        "state": "MEASURED"
+       },
+       "Q2_PRIOR_ART_SPECIFICITY": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_PRIOR_ART"
+       },
+       "Q3_PRIOR_ART_RESOLUTION": {
+        "score": 0.0,
+        "state": "MEASURED"
+       },
+       "Q4_EXPERIMENT_DECISIVENESS": {
+        "score": 1.0,
+        "state": "MEASURED"
+       },
+       "Q5_CHAIN_COMPLETENESS": {
+        "score": 1.0,
+        "state": "MEASURED"
+       }
+      },
+      "q_average": 0.625
+     },
+     "decision": {
+      "action": "REJECT_MUTATION",
+      "improved": false,
+      "checks": {
+       "targeted_dimension": "0.565 -> 0.5 (no improvement)",
+       "negatives_preserved": true,
+       "no_new_structural_flags": true,
+       "no_unknown_conversion_without_new_evidence": true,
+       "text_gap_conversions_recorded": [],
+       "prior_art_position_not_degraded": true
+      },
+      "reasons": [],
+      "decided_at": "2026-09-10T14:50:46+00:00Z"
+     }
+    },
+    {
+     "mutation_applied": {
+      "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+      "mutation_id": "mut:f35923bfb11a",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+      "diagnostic_trigger": {
+       "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+       "measured_before": 0.565,
+       "basis": "R378 evaluator-contract diagnosis (deterministic)"
+      },
+      "proposal_provenance": {
+       "proposal_id": "prop:c1e702c0b3a9",
+       "provider": "zai",
+       "model": "glm-4-plus",
+       "prompt_hash": "9cb2193a950892c4284fc803386e60f7c6d30240c79a2844fe5d27922bb91fd0",
+       "output_hash": "c1e702c0b3a9ade3af00a173dc288dc62eb93d348e8bfa08d6fa1d9ca16d3734",
+       "llm_is_untrusted_proposer": true
+      },
+      "validation": {
+       "valid": true,
+       "stage": "VALIDATION",
+       "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+       "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+       "checks": {
+        "mutation_type_matches_diagnosis": true,
+        "span_evidence_exists": "doi:10.3323/jcorr1974.29.7_354",
+        "span_verbatim_in_evidence": true,
+        "evidence_support": 0.444,
+        "evidence_support_cleared": 0.444,
+        "constraint_traceable_to_evidence": "Maintain mechanical stress below critical threshold to prevent structural failure while inducing beneficial micro-cracki"
+       },
+       "reasons": [],
+       "validated_at": "2026-09-10T14:50:48+00:00Z"
+      },
+      "fields_changed": {
+       "mechanism": {
+        "before": "Stress corrosion cracking of stainless steel heat-exchanger of shell and tube type by cooling water",
+        "after": "Stress corrosion cracking of stainless steel heat-exchanger of shell and tube type by cooling water"
+       },
+       "intervention": {
+        "before": "Apply controlled mechanical stress to heat exchanger plates to induce beneficial micro-cracking that prevents biofilm adhesion",
+        "after": "Apply controlled mechanical stress to heat exchanger plates to induce beneficial micro-cracking that prevents biofilm adhesion while maintaining structural integrity"
+       },
+       "mechanism_source_span": {
+        "before": "Stress Corrosion Cracking of Stainless Steel Heat-exchanger of Shell and Tube Type by Cooling Water",
+        "after": "Stress Corrosion Cracking of Stainless Steel Heat-exchanger of Shell and Tube Type by Cooling Water"
+       }
+      },
+      "inherited_negatives": {
+       "uncertainty_ids": [
+        "con:verify:5fc42398",
+        "con:verify:fc690a03",
+        "stainless heat exchanger cooling steel district",
+        "stainless heat exchanger cooling steel district",
+        "stainless heat exchangers cooling steel corrosion",
+        "stainless heat exchangers cooling steel corrosion",
+        "heat exchanger plates cracking biofilm stress controlled mechanical",
+        "heat exchanger plates cracking biofilm stress controlled mechanical",
+        "stainless prevention accumulation maintaining integrity sustaining",
+        "stainless prevention accumulation maintaining integrity sustaining",
+        "reduced maintaining structural integrity sustaining above",
+        "reduced maintaining structural integrity sustaining above"
+       ],
+       "collision_family_ids": [],
+       "source_errors": []
+      },
+      "parent_spec_hash": "bd8245c0202802715682c59e69f47dc3489d2d13b81ae6c19b8bf7bfd569c6d2",
+      "child_spec_hash": null,
+      "reason": "Repairs I1_MECHANISM_EVIDENCE_DERIVATION defect by re-anchoring mechanism in evidence terminology and adding derived constraint from evidence text",
+      "applied_at": "2026-09-10T14:50:48+00:00Z"
+     },
+     "re_evaluation": {
+      "collision_mode": "REPLAY_CACHE",
+      "re_evaluated_at": "2026-09-10T14:50:48+00:00Z",
+      "re_adjudication": {
+       "mode": "REPLAY_CACHE",
+       "valid": false,
+       "reason": "NO_CACHED_FAMILIES"
+      },
+      "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+      "re_adjudication_failure": "NO_CACHED_FAMILIES",
+      "i_dimensions": {
+       "I1_MECHANISM_EVIDENCE_DERIVATION": {
+        "score": 0.481,
+        "state": "MEASURED"
+       },
+       "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_SURVIVORS"
+       },
+       "I3_RECOMBINATION_RISK": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_FAMILIES"
+       },
+       "I4_NEW_TECHNICAL_RELATIONSHIP": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+       },
+       "I5_EXPERIMENT_DISCRIMINATION": {
+        "score": 0.667,
+        "state": "MEASURED"
+       }
+      },
+      "i_flags": {
+       "underived_mechanism": false,
+       "recombination_only": false
+      },
+      "i_average": 0.574,
+      "q_dimensions": {
+       "Q1_EVIDENCE_BINDING": {
+        "score": 0.5,
+        "state": "MEASURED"
+       },
+       "Q2_PRIOR_ART_SPECIFICITY": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_PRIOR_ART"
+       },
+       "Q3_PRIOR_ART_RESOLUTION": {
+        "score": 0.0,
+        "state": "MEASURED"
+       },
+       "Q4_EXPERIMENT_DECISIVENESS": {
+        "score": 1.0,
+        "state": "MEASURED"
+       },
+       "Q5_CHAIN_COMPLETENESS": {
+        "score": 1.0,
+        "state": "MEASURED"
+       }
+      },
+      "q_average": 0.625
+     },
+     "decision": {
+      "action": "REJECT_MUTATION",
+      "improved": false,
+      "checks": {
+       "targeted_dimension": "0.565 -> 0.481 (no improvement)",
+       "negatives_preserved": true,
+       "no_new_structural_flags": true,
+       "no_unknown_conversion_without_new_evidence": true,
+       "text_gap_conversions_recorded": [],
+       "prior_art_position_not_degraded": true
+      },
+      "reasons": [],
+      "decided_at": "2026-09-10T14:50:48+00:00Z"
+     }
+    }
+   ],
+   "mutation_applied": {
+    "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+    "mutation_id": "mut:7c7a85f7f277",
+    "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+    "diagnostic_trigger": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "measured_before": 0.565,
+     "basis": "R378 evaluator-contract diagnosis (deterministic)"
+    },
+    "proposal_provenance": {
+     "proposal_id": "prop:7ca230d51a92",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "854c5a29adf68f2346a9d859ab78c0df79eabfd406fdd145911829150b67306c",
+     "output_hash": "7ca230d51a924bb33517c2e701af6a21dd52471bd51f2513a00a1cb88496a88c",
+     "llm_is_untrusted_proposer": true
+    },
+    "validation": {
+     "valid": true,
+     "stage": "VALIDATION",
+     "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+     "checks": {
+      "mutation_type_matches_diagnosis": true,
+      "span_evidence_exists": "doi:10.3323/jcorr1974.29.7_354",
+      "span_verbatim_in_evidence": true,
+      "evidence_support": 0.429,
+      "evidence_support_cleared": 0.429,
+      "constraint_traceable_to_evidence": "The mechanical stress must be applied at levels that induce micro-cracking without compromising structural integrity"
+     },
+     "reasons": [],
+     "validated_at": "2026-09-10T14:50:46+00:00Z"
+    },
+    "fields_changed": {
+     "mechanism": {
+      "before": "Stress corrosion cracking of stainless steel heat-exchanger of shell and tube type by cooling water",
+      "after": "Stress corrosion cracking of stainless steel heat-exchanger of shell and tube type by cooling water that alters surface energy to reduce biofilm adhesion"
+     },
+     "intervention": {
+      "before": "Apply controlled mechanical stress to heat exchanger plates to induce beneficial micro-cracking that prevents biofilm adhesion",
+      "after": "Apply controlled mechanical stress to heat exchanger plates to induce beneficial micro-cracking that prevents biofilm adhesion by increasing surface energy"
+     },
+     "mechanism_source_span": {
+      "before": "Stress Corrosion Cracking of Stainless Steel Heat-exchanger of Shell and Tube Type by Cooling Water",
+      "after": "Stress Corrosion Cracking of Stainless Steel Heat-exchanger of Shell and Tube Type by Cooling Water"
+     }
+    },
+    "inherited_negatives": {
+     "uncertainty_ids": [
+      "con:verify:5fc42398",
+      "con:verify:fc690a03",
+      "stainless heat exchanger cooling steel district",
+      "stainless heat exchanger cooling steel district",
+      "stainless heat exchangers cooling steel corrosion",
+      "stainless heat exchangers cooling steel corrosion",
+      "heat exchanger plates cracking biofilm stress controlled mechanical",
+      "heat exchanger plates cracking biofilm stress controlled mechanical",
+      "stainless prevention accumulation maintaining integrity sustaining",
+      "stainless prevention accumulation maintaining integrity sustaining",
+      "reduced maintaining structural integrity sustaining above",
+      "reduced maintaining structural integrity sustaining above"
+     ],
+     "collision_family_ids": [],
+     "source_errors": []
+    },
+    "parent_spec_hash": "bd8245c0202802715682c59e69f47dc3489d2d13b81ae6c19b8bf7bfd569c6d2",
+    "child_spec_hash": null,
+    "reason": "Repairs I1_MECHANISM_EVIDENCE_DERIVATION by re-anchoring the mechanism in the evidence's technical vocabulary and deriving a constraint from the evidence text",
+    "applied_at": "2026-09-10T14:50:46+00:00Z"
+   },
+   "re_evaluation": {
+    "collision_mode": "REPLAY_CACHE",
+    "re_evaluated_at": "2026-09-10T14:50:48+00:00Z",
+    "re_adjudication": {
+     "mode": "REPLAY_CACHE",
+     "valid": false,
+     "reason": "NO_CACHED_FAMILIES"
+    },
+    "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+    "re_adjudication_failure": "NO_CACHED_FAMILIES",
+    "i_dimensions": {
+     "I1_MECHANISM_EVIDENCE_DERIVATION": {
+      "score": 0.481,
+      "state": "MEASURED"
+     },
+     "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_SURVIVORS"
+     },
+     "I3_RECOMBINATION_RISK": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_FAMILIES"
+     },
+     "I4_NEW_TECHNICAL_RELATIONSHIP": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+     },
+     "I5_EXPERIMENT_DISCRIMINATION": {
+      "score": 0.667,
+      "state": "MEASURED"
+     }
+    },
+    "i_flags": {
+     "underived_mechanism": false,
+     "recombination_only": false
+    },
+    "i_average": 0.574,
+    "q_dimensions": {
+     "Q1_EVIDENCE_BINDING": {
+      "score": 0.5,
+      "state": "MEASURED"
+     },
+     "Q2_PRIOR_ART_SPECIFICITY": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_PRIOR_ART"
+     },
+     "Q3_PRIOR_ART_RESOLUTION": {
+      "score": 0.0,
+      "state": "MEASURED"
+     },
+     "Q4_EXPERIMENT_DECISIVENESS": {
+      "score": 1.0,
+      "state": "MEASURED"
+     },
+     "Q5_CHAIN_COMPLETENESS": {
+      "score": 1.0,
+      "state": "MEASURED"
+     }
+    },
+    "q_average": 0.625
+   },
+   "decision": {
+    "action": "REJECT_MUTATION",
+    "improved": false,
+    "checks": {
+     "targeted_dimension": "0.565 -> 0.481 (no improvement)",
+     "negatives_preserved": true,
+     "no_new_structural_flags": true,
+     "no_unknown_conversion_without_new_evidence": true,
+     "text_gap_conversions_recorded": [],
+     "prior_art_position_not_degraded": true
+    },
+    "reasons": [],
+    "decided_at": "2026-09-10T14:50:48+00:00Z"
+   }
+  }
+ ],
+ "outcome": "KILLED_NO_IMPROVING_MUTATION",
+ "outcome_reason": "iteration 2: 2 validated EVIDENCE_DERIVED_CONSTRAINT mutation(s) were applied and fully re-evaluated; the targeted dimension I1_MECHANISM_EVIDENCE_DERIVATION did not improve (0.565 -> 0.5 (no improvement); 0.565 -> 0.481 (no improvement)); no invariant violated. No defensible improvement exists. Candidate killed.",
+ "baseline": {
+  "i_dimensions": {
+   "I1_MECHANISM_EVIDENCE_DERIVATION": {
+    "score": 0.5,
+    "state": "MEASURED"
+   },
+   "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_SURVIVORS"
+   },
+   "I3_RECOMBINATION_RISK": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_FAMILIES"
+   },
+   "I4_NEW_TECHNICAL_RELATIONSHIP": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+   },
+   "I5_EXPERIMENT_DISCRIMINATION": {
+    "score": 0.667,
+    "state": "MEASURED"
+   }
+  },
+  "i_flags": {
+   "underived_mechanism": false,
+   "recombination_only": false
+  },
+  "i_average": 0.584,
+  "q_dimensions": {
+   "Q1_EVIDENCE_BINDING": {
+    "score": 0.5,
+    "state": "MEASURED"
+   },
+   "Q2_PRIOR_ART_SPECIFICITY": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_PRIOR_ART"
+   },
+   "Q3_PRIOR_ART_RESOLUTION": {
+    "score": 0.0,
+    "state": "MEASURED"
+   },
+   "Q4_EXPERIMENT_DECISIVENESS": {
+    "score": 1.0,
+    "state": "MEASURED"
+   },
+   "Q5_CHAIN_COMPLETENESS": {
+    "score": 1.0,
+    "state": "MEASURED"
+   }
+  },
+  "q_average": 0.625,
+  "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE"
+ },
+ "final": {
+  "i_dimensions": {
+   "I1_MECHANISM_EVIDENCE_DERIVATION": {
+    "score": 0.565,
+    "state": "MEASURED"
+   },
+   "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_SURVIVORS"
+   },
+   "I3_RECOMBINATION_RISK": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_FAMILIES"
+   },
+   "I4_NEW_TECHNICAL_RELATIONSHIP": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+   },
+   "I5_EXPERIMENT_DISCRIMINATION": {
+    "score": 0.667,
+    "state": "MEASURED"
+   }
+  },
+  "i_flags": {
+   "underived_mechanism": false,
+   "recombination_only": false
+  },
+  "i_average": 0.616,
+  "q_dimensions": {
+   "Q1_EVIDENCE_BINDING": {
+    "score": 0.5,
+    "state": "MEASURED"
+   },
+   "Q2_PRIOR_ART_SPECIFICITY": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_PRIOR_ART"
+   },
+   "Q3_PRIOR_ART_RESOLUTION": {
+    "score": 0.0,
+    "state": "MEASURED"
+   },
+   "Q4_EXPERIMENT_DECISIVENESS": {
+    "score": 1.0,
+    "state": "MEASURED"
+   },
+   "Q5_CHAIN_COMPLETENESS": {
+    "score": 1.0,
+    "state": "MEASURED"
+   }
+  },
+  "q_average": 0.625,
+  "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE"
+ },
+ "finished_at": "2026-09-10T14:50:48+00:00Z",
+ "outcome_summary": {
+  "baseline_i_average": 0.584,
+  "final_i_average": 0.616,
+  "baseline_q_average": 0.625,
+  "final_q_average": 0.625,
+  "iterations_run": 2,
+  "keeps": 1
+ },
+ "status": "KILLED_NO_IMPROVING_MUTATION"
+}

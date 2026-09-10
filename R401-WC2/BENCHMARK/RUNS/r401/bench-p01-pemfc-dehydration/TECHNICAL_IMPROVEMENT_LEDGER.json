@@ -1,0 +1,774 @@
+{
+ "ledger": "TECHNICAL_IMPROVEMENT_LEDGER (R379 V2 + R383 ANALYTICAL EQUATION LAYER)",
+ "version": "3.0.0",
+ "loop": "CANDIDATE -> TECHNICAL DIAGNOSIS (limiting variable + direction + R383 QUANTITATIVE margins/sensitivities) -> DETERMINISTIC SOLVE-OR-LLM MUTATION (actual design variable) -> CAD REBUILD -> INDEPENDENT TECHNICAL EVALUATION (monotone + quantitative on the child's OWN measured geometry) -> EVIDENCE/PRIOR-ART RECHECK -> KEEP/KILL (K1-K8) -> SECOND IMPROVEMENT",
+ "collision_mode": "REPLAY_CACHE",
+ "live_sources": null,
+ "thresholds": {
+  "MAX_ITERATIONS_DEFAULT": {
+   "value": 2,
+   "epistemic_class": "ENGINEERING",
+   "justification": "the CEO milestone is DIAGNOSE -> TECHNICAL MUTATION -> RE-EVALUATE -> SECOND IMPROVEMENT; two iterations demonstrate repeatability at bounded cost"
+  },
+  "MAX_PROPOSALS_PER_ITERATION": {
+   "value": 3,
+   "epistemic_class": "ENGINEERING",
+   "justification": "bounded proposal budget, identical to the R378 epistemic loop: three attempts, then the honest no-defensible-mutation verdict"
+  },
+  "VALUE_CLASS_STRICTNESS": {
+   "value": "HARD",
+   "epistemic_class": "ENGINEERING",
+   "justification": "EXTRACTED claims are span-verified or rejected (Art. II/VI); MODELLED values are admitted only when declared; an unbounded parameter is immutable (ADR_R379 anti-gaming)"
+  }
+ },
+ "mutation_kinds_live": [
+  "PARAMETER_CHANGE",
+  "GEOMETRY_CHANGE",
+  "MATERIAL_CHANGE",
+  "OPERATING_CONDITION_CHANGE",
+  "MECHANISM_CHANGE"
+ ],
+ "mutation_kinds_reserved": {
+  "ARCHITECTURE_CHANGE": "needs a structural/control search space at a higher fidelity tier (ADR_R379)",
+  "CONTROL_POLICY_CHANGE": "needs a structural/control search space at a higher fidelity tier (ADR_R379)"
+ },
+ "keep_criterion": "the child's OWN independent technical evaluation must confirm the objective improves in the mutation direction with constraints preserved — a score increase is NEVER sufficient (CEO R379 item 4/8)",
+ "started_at": "2026-09-10T14:25:19+00:00Z",
+ "iterations": [
+  {
+   "iteration": 1,
+   "diagnosis": {
+    "status": "PARTIALLY_QUANTIFIED",
+    "limiting_variable": null,
+    "improvement_directions_summary": [
+     {
+      "param_id": "stack_temperature",
+      "improving_move": "DECREASE",
+      "mutable": false,
+      "blocked": false
+     },
+     {
+      "param_id": "membrane_hydration",
+      "improving_move": "INCREASE",
+      "mutable": false,
+      "blocked": false
+     }
+    ],
+    "constraint_results": [],
+    "quantitative": {
+     "status": "UNQUANTIFIED",
+     "objective": {
+      "target": "membrane_hydration",
+      "direction": "MAXIMIZE",
+      "computed": false,
+      "value": null,
+      "unit": null,
+      "equation_id": null,
+      "margin": null,
+      "margin_status": "UNCOMPUTED",
+      "statement": "no active computation binds the objective target"
+     },
+     "requirement_satisfied": null,
+     "limiting_variable": null,
+     "computed_equations": [],
+     "computation_log": [],
+     "evidence_rank": 4
+    }
+   },
+   "proposals": [],
+   "mutation_attempts_extra": []
+  }
+ ],
+ "outcome": "TECHNICAL_UNQUANTIFIED",
+ "outcome_reason": "improving directions exist but no movable DESIGN variable (outcomes are not set directly; unbounded parameters are immutable — ADR_R379)",
+ "extraction": {
+  "proposal_id": "tsp:58eb4ce083ca",
+  "attempts": [
+   {
+    "attempt": 1,
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "status": "OK",
+    "prompt_hash": "2369962dfd68ab1c93fe40b43b8693c1b0680ef83e74fe1902636d6b2029a50a",
+    "output_hash": "6de6071de7ef7fc3aa8f9c5a2ec9b5ddde26eaba484d491cf26a32c71d4274c2",
+    "latency_ms": 41879,
+    "error": null,
+    "raw_content_sha256": "18e8c11f84c0a435aa00c3ec7a780459ce3d4d9311e202a11f976c7087699444"
+   }
+  ],
+  "provider": "zai",
+  "model": "glm-4-plus",
+  "status": "OK",
+  "prompt_hash": "2369962dfd68ab1c93fe40b43b8693c1b0680ef83e74fe1902636d6b2029a50a",
+  "output_hash": "6de6071de7ef7fc3aa8f9c5a2ec9b5ddde26eaba484d491cf26a32c71d4274c2",
+  "latency_ms": 41879,
+  "error": null,
+  "proposal": {
+   "objects": [
+    {
+     "object_id": "fuel_cell_stack",
+     "name": "proton exchange membrane fuel cell stack",
+     "role": "the device that experiences dehydration failure"
+    },
+    {
+     "object_id": "membrane",
+     "name": "proton exchange membrane",
+     "role": "component that dehydrates and loses ionic conductivity"
+    },
+    {
+     "object_id": "anode",
+     "name": "fuel electrode",
+     "role": "hydrogen electrode where oxidation occurs"
+    },
+    {
+     "object_id": "cathode",
+     "name": "oxidant electrode",
+     "role": "oxygen electrode where reduction occurs and water is produced"
+    },
+    {
+     "object_id": "gas_diffusion_layer",
+     "name": "gas diffusion layer",
+     "role": "layer that allows gas transport and water removal"
+    }
+   ],
+   "parameters": [
+    {
+     "param_id": "current_density",
+     "name": "operating current density",
+     "category": "OPERATING_CONDITIONS",
+     "unit": "A/cm²",
+     "value": 1.5,
+     "value_class": "EXTRACTED",
+     "value_span": "maintain 1.5 A/cm2 current density",
+     "value_evidence_id": "PROBLEM_STATEMENT",
+     "range_min": null,
+     "range_max": null,
+     "range_span": null,
+     "range_evidence_id": null,
+     "role": "the target current density to be maintained during operation"
+    },
+    {
+     "param_id": "stack_temperature",
+     "name": "stack operating temperature",
+     "category": "OPERATING_CONDITIONS",
+     "unit": "°C",
+     "value": 80,
+     "value_class": "EXTRACTED",
+     "value_span": "maintain ... stack temperature at 80 C",
+     "value_evidence_id": "PROBLEM_STATEMENT",
+     "range_min": null,
+     "range_max": null,
+     "range_span": null,
+     "range_evidence_id": null,
+     "role": "the temperature at which the stack must operate"
+    },
+    {
+     "param_id": "anode_pressure",
+     "name": "anode operating pressure",
+     "category": "OPERATING_CONDITIONS",
+     "unit": "kPa",
+     "value": 170,
+     "value_class": "EXTRACTED",
+     "value_span": "limit pressure to 170/150 kPa (anode/cathode)",
+     "value_evidence_id": "INTERVENTION",
+     "range_min": 70,
+     "range_max": 170,
+     "range_span": "from 70/60kPa to 170/150kPa",
+     "range_evidence_id": "doi:10.21203/rs.3.rs-7081268/v1",
+     "role": "the pressure at which hydrogen is supplied to the anode"
+    },
+    {
+     "param_id": "cathode_pressure",
+     "name": "cathode operating pressure",
+     "category": "OPERATING_CONDITIONS",
+     "unit": "kPa",
+     "value": 150,
+     "value_class": "EXTRACTED",
+     "value_span": "limit pressure to 170/150 kPa (anode/cathode)",
+     "value_evidence_id": "INTERVENTION",
+     "range_min": 60,
+     "range_max": 150,
+     "range_span": "from 70/60kPa to 170/150kPa",
+     "range_evidence_id": "doi:10.21203/rs.3.rs-7081268/v1",
+     "role": "the pressure at which oxygen/air is supplied to the cathode"
+    },
+    {
+     "param_id": "pressure_differential",
+     "name": "anode-cathode pressure differential",
+     "category": "OPERATING_CONDITIONS",
+     "unit": "kPa",
+     "value": 20,
+     "value_class": "EXTRACTED",
+     "value_span": "pressure differential between anode and cathode maintained at 20 kPa",
+     "value_evidence_id": "INTERVENTION",
+     "range_min": null,
+     "range_max": null,
+     "range_span": null,
+     "range_evidence_id": null,
+     "role": "the pressure difference maintained between anode and cathode"
+    },
+    {
+     "param_id": "cell_voltage",
+     "name": "single cell voltage",
+     "category": "OPERATING_CONDITIONS",
+     "unit": "V",
+     "value": null,
+     "value_class": "UNKNOWN",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": null,
+     "range_max": null,
+     "range_span": null,
+     "range_evidence_id": null,
+     "role": "voltage output of a single cell in the stack"
+    },
+    {
+     "param_id": "membrane_resistance",
+     "name": "membrane ionic resistance",
+     "category": "PARAMETERS",
+     "unit": "Ω·cm²",
+     "value": null,
+     "value_class": "UNKNOWN",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": null,
+     "range_max": null,
+     "range_span": null,
+     "range_evidence_id": null,
+     "role": "resistance to proton flow through the membrane"
+    },
+    {
+     "param_id": "water_vapor_partial_pressure",
+     "name": "water vapor partial pressure",
+     "category": "PARAMETERS",
+     "unit": "kPa",
+     "value": null,
+     "value_class": "UNKNOWN",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": null,
+     "range_max": null,
+     "range_span": null,
+     "range_evidence_id": null,
+     "role": "partial pressure of water vapor in the gas streams"
+    },
+    {
+     "param_id": "humidification_parasitic_load",
+     "name": "cathode humidification parasitic load",
+     "category": "PARAMETERS",
+     "unit": "percent",
+     "value": null,
+     "value_class": "UNKNOWN",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": null,
+     "range_max": null,
+     "range_span": null,
+     "range_evidence_id": null,
+     "role": "percentage of power used for cathode humidification"
+    },
+    {
+     "param_id": "membrane_hydration",
+     "name": "membrane hydration level",
+     "category": "PARAMETERS",
+     "unit": null,
+     "value": null,
+     "value_class": "UNKNOWN",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": null,
+     "range_max": null,
+     "range_span": null,
+     "range_evidence_id": null,
+     "role": "water content in the proton exchange membrane"
+    },
+    {
+     "param_id": "hot_spot_formation",
+     "name": "hot spot formation tendency",
+     "category": "PARAMETERS",
+     "unit": null,
+     "value": null,
+     "value_class": "UNKNOWN",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": null,
+     "range_max": null,
+     "range_span": null,
+     "range_evidence_id": null,
+     "role": "tendency for localized hot spots to form in the stack"
+    }
+   ],
+   "constraints": [
+    {
+     "constraint_id": "current_density_constraint",
+     "target": "current_density",
+     "bound": "=",
+     "limit": 1.5,
+     "unit": "A/cm²",
+     "limit_class": "EXTRACTED",
+     "limit_span": "maintain 1.5 A/cm2 current density",
+     "limit_evidence_id": "PROBLEM_STATEMENT",
+     "justification": "required operating condition specified in the problem statement"
+    },
+    {
+     "constraint_id": "temperature_constraint",
+     "target": "stack_temperature",
+     "bound": "=",
+     "limit": 80,
+     "unit": "°C",
+     "limit_class": "EXTRACTED",
+     "limit_span": "maintain ... stack temperature at 80 C",
+     "limit_evidence_id": "PROBLEM_STATEMENT",
+     "justification": "required operating condition specified in the problem statement"
+    },
+    {
+     "constraint_id": "anode_pressure_constraint",
+     "target": "anode_pressure",
+     "bound": "<=",
+     "limit": 170,
+     "unit": "kPa",
+     "limit_class": "EXTRACTED",
+     "limit_span": "limit pressure to 170/150 kPa (anode/cathode)",
+     "limit_evidence_id": "INTERVENTION",
+     "justification": "maximum operating pressure for anode based on evidence showing voltage increases under these conditions"
+    },
+    {
+     "constraint_id": "cathode_pressure_constraint",
+     "target": "cathode_pressure",
+     "bound": "<=",
+     "limit": 150,
+     "unit": "kPa",
+     "limit_class": "EXTRACTED",
+     "limit_span": "limit pressure to 170/150 kPa (anode/cathode)",
+     "limit_evidence_id": "INTERVENTION",
+     "justification": "maximum operating pressure for cathode based on evidence showing voltage increases under these conditions"
+    },
+    {
+     "constraint_id": "pressure_differential_constraint",
+     "target": "pressure_differential",
+     "bound": "=",
+     "limit": 20,
+     "unit": "kPa",
+     "limit_class": "EXTRACTED",
+     "limit_span": "pressure differential between anode and cathode maintained at 20 kPa",
+     "limit_evidence_id": "INTERVENTION",
+     "justification": "required pressure differential between anode and cathode specified in the intervention"
+    },
+    {
+     "constraint_id": "humidification_load_constraint",
+     "target": "humidification_parasitic_load",
+     "bound": "<=",
+     "limit": 10,
+     "unit": "percent",
+     "limit_class": "EXTRACTED",
+     "limit_span": "without increasing cathode humidification parasitic load above 10 percent",
+     "limit_evidence_id": "PROBLEM_STATEMENT",
+     "justification": "maximum allowable parasitic load for cathode humidification specified in the problem statement"
+    }
+   ],
+   "objectives": [
+    {
+     "objective_id": "reduce_membrane_dehydration",
+     "target": "membrane_hydration",
+     "direction": "MAXIMIZE",
+     "basis": "to address the device failure mode of membrane dehydration"
+    },
+    {
+     "objective_id": "maintain_power_output",
+     "target": "cell_voltage",
+     "direction": "MAINTAIN_WITHIN",
+     "basis": "to maintain power output despite dehydration failure"
+    },
+    {
+     "objective_id": "minimize_hot_spots",
+     "target": "hot_spot_formation",
+     "direction": "MINIMIZE",
+     "basis": "to prevent localized overheating due to membrane dehydration"
+    }
+   ],
+   "failure_modes": [
+    {
+     "mode_id": "membrane_dehydration",
+     "name": "membrane dehydration",
+     "problem_link": "Device: proton exchange membrane fuel cell stack - Failure mode: dehydration"
+    },
+    {
+     "mode_id": "increased_membrane_resistance",
+     "name": "increased membrane ionic resistance",
+     "problem_link": "caused by membrane dehydration leading to higher ohmic losses"
+    },
+    {
+     "mode_id": "hot_spot_formation",
+     "name": "hot spot formation",
+     "problem_link": "caused by local dehydration leading to uneven current distribution"
+    }
+   ],
+   "dependencies": [
+    {
+     "relation_id": "pressure_voltage_dependency",
+     "cause": "anode_pressure",
+     "effect": "cell_voltage",
+     "direction": "INCREASES",
+     "statement": "increasing anode pressure improves cell performance as evidenced by voltage increase from 0.472V to 0.651V",
+     "relation_class": "EXTRACTED",
+     "span": "the voltage increases 37.9%, i.e., from 0.472 V(@70/60kPa) to 0.651 V (@170/150kPa)",
+     "evidence_id": "doi:10.21203/rs.3.rs-7081268/v1"
+    },
+    {
+     "relation_id": "pressure_cathode_dependency",
+     "cause": "cathode_pressure",
+     "effect": "cell_voltage",
+     "direction": "INCREASES",
+     "statement": "increasing cathode pressure improves cell performance as evidenced by voltage increase from 0.472V to 0.651V",
+     "relation_class": "EXTRACTED",
+     "span": "the voltage increases 37.9%, i.e., from 0.472 V(@70/60kPa) to 0.651 V (@170/150kPa)",
+     "evidence_id": "doi:10.21203/rs.3.rs-7081268/v1"
+    },
+    {
+     "relation_id": "pressure_membrane_dependency",
+     "cause": "anode_pressure",
+     "effect": "membrane_hydration",
+     "direction": "INCREASES",
+     "statement": "increasing operating pressure reduces the proportion of water vapor partial pressure in total gas pressure, mitigating membrane dehydration",
+     "relation_class": "EXTRACTED",
+     "span": "Increasing pressure not only improves cell performance but also enhances stack consistency while mitigating the impacts of temperature and humidity on membrane dehydration by reducing the proportion of water vapor partial pressure in the total gas pressure",
+     "evidence_id": "INTERVENTION"
+    },
+    {
+     "relation_id": "pressure_membrane_resistance_dependency",
+     "cause": "anode_pressure",
+     "effect": "membrane_resistance",
+     "direction": "DECREASES",
+     "statement": "increasing operating pressure reduces membrane dehydration and thus decreases ionic resistance",
+     "relation_class": "EXTRACTED",
+     "span": "Reduced membrane dehydration, lower ionic resistance, minimized hot spot formation",
+     "evidence_id": "EXPECTED_EFFECT"
+    },
+    {
+     "relation_id": "temperature_voltage_dependency",
+     "cause": "stack_temperature",
+     "effect": "cell_voltage",
+     "direction": "DECREASES",
+     "statement": "increasing temperature from 75 to 84°C causes voltage drop from 0.540V to 0.472V under low-pressure and low-humidity conditions",
+     "relation_class": "EXTRACTED",
+     "span": "under low-pressure and low-humidity conditions, the voltage drops from 0.540 V to 0.472 V (a 12.6% decrease) as temperature rises from 75 to 84℃",
+     "evidence_id": "doi:10.21203/rs.3.rs-7081268/v1"
+    },
+    {
+     "relation_id": "temperature_membrane_dependency",
+     "cause": "stack_temperature",
+     "effect": "membrane_hydration",
+     "direction": "DECREASES",
+     "statement": "increasing temperature accelerates electrochemical reactions but exacerbates membrane dehydration",
+     "relation_class": "EXTRACTED",
+     "span": "Although increasing temperature accelerates electrochemical reactions, it exacerbates membrane dehydration, increasing internal resistance and reducing performance",
+     "evidence_id": "doi:10.21203/rs.3.rs-7081268/v1"
+    },
+    {
+     "relation_id": "humidity_pressure_dependency",
+     "cause": "anode_pressure",
+     "effect": "humidification_parasitic_load",
+     "direction": "DECREASES",
+     "statement": "increasing operating pressure reduces the proportion of water vapor partial pressure, allowing reduced humidification load",
+     "relation_class": "EXTRACTED",
+     "span": "Increasing humidity notably improves performance under low-pressure conditions, but its effect diminishes under high pressure due to the reduced proportion of water vapor partial pressure in the total gas pressure",
+     "evidence_id": "doi:10.21203/rs.3.rs-7081268/v1"
+    },
+    {
+     "relation_id": "hydration_voltage_dependency",
+     "cause": "membrane_hydration",
+     "effect": "cell_voltage",
+     "direction": "INCREASES",
+     "statement": "higher membrane hydration increases ionic conductivity and thus cell voltage",
+     "relation_class": "MODELLED",
+     "span": null,
+     "evidence_id": null
+    },
+    {
+     "relation_id": "hydration_resistance_dependency",
+     "cause": "membrane_hydration",
+     "effect": "membrane_resistance",
+     "direction": "DECREASES",
+     "statement": "higher membrane hydration decreases ionic resistance",
+     "relation_class": "MODELLED",
+     "span": null,
+     "evidence_id": null
+    },
+    {
+     "relation_id": "resistance_hotspot_dependency",
+     "cause": "membrane_resistance",
+     "effect": "hot_spot_formation",
+     "direction": "INCREASES",
+     "statement": "higher membrane resistance leads to uneven current distribution and hot spot formation",
+     "relation_class": "MODELLED",
+     "span": null,
+     "evidence_id": null
+    }
+   ]
+  },
+  "raw_content_sha256": "18e8c11f84c0a435aa00c3ec7a780459ce3d4d9311e202a11f976c7087699444"
+ },
+ "technical_state_counts": {
+  "parameters": 11,
+  "parameters_with_value": 0,
+  "parameters_extracted": 0,
+  "parameters_modelled": 0,
+  "parameters_with_envelope": 0,
+  "constraints": 0,
+  "objectives": 3,
+  "dependencies": 5,
+  "objects": 5,
+  "failure_modes": 3
+ },
+ "baseline": {
+  "technical": {
+   "status": "PARTIALLY_QUANTIFIED",
+   "objective": {
+    "target": "membrane_hydration",
+    "direction": "MAXIMIZE",
+    "known": true,
+    "basis": "to address the device failure mode of membrane dehydration"
+   },
+   "limiting_variable": null,
+   "constraint_results": [],
+   "uncertainty": {
+    "unknown_value_params": [
+     "anode_pressure",
+     "cathode_pressure",
+     "cell_voltage",
+     "current_density",
+     "hot_spot_formation",
+     "humidification_parasitic_load",
+     "membrane_hydration",
+     "membrane_resistance",
+     "pressure_differential",
+     "stack_temperature",
+     "water_vapor_partial_pressure"
+    ],
+    "modelled_relations": 3,
+    "extracted_relations": 2,
+    "unverifiable_constraints": [],
+    "objective_known": true,
+    "note": "UNKNOWN values are never treated as zeros; unverifiable constraints are never treated as satisfied (Art. XXV / Art. IV)"
+   },
+   "computation_log": {
+    "evaluator_id": "analytical_monotone_v1",
+    "fidelity_tier": "STRUCTURED_CONSTRAINT",
+    "evidence_rank": 3,
+    "input_state_sha256": "4ffebfa810c283577d3d2efa812f1c8e564482bf88a760e71336b8bedeb6be1e",
+    "conventions": [
+     {
+      "name": "ORDINAL_LEVERAGE_BY_PATH_LENGTH",
+      "epistemic_class": "ENGINEERING",
+      "justification": "with MONOTONE-only relations the evaluator cannot rank leverage by magnitude; it ranks by (1) fewest constraint blocks, (2) shortest causal path from the parameter to the objective target, (3) envelope provenance class (EXTRACTED beats MODELLED). This is a declared ordinal convention, not a measurement — recorded on every evaluation that uses it.",
+      "uncertainty": "ordinal only; magnitudes are UNKNOWN at this tier"
+     },
+     {
+      "name": "DIRECTIONAL_FAIL_CLOSED",
+      "epistemic_class": "ENGINEERING",
+      "justification": "a proposed change is constraint-BLOCKED when (a) the changed parameter's own numeric constraint would be violated at the proposed value, or (b) a relation-connected constraint target is already VIOLATED or value-UNKNOWN and the predicted direction moves it TOWARD its bound. Fail-closed on directional risk: an unknown-position target moving toward a bound is a blocked move, not an accepted one (Art. IV).",
+      "uncertainty": "direction-level only at this tier"
+     }
+    ],
+    "steps": [
+     "resolved objective membrane_hydration (MAXIMIZE)",
+     "checked 0 constraint(s) numerically where values exist",
+     "propagated signs over 5 relation(s)",
+     "ranked 0 movable improving direction(s)"
+    ],
+    "computed_at": "2026-09-10T14:26:00+00:00Z",
+    "deterministic": true
+   }
+  },
+  "quantitative": {
+   "status": "UNQUANTIFIED",
+   "objective": {
+    "target": "membrane_hydration",
+    "direction": "MAXIMIZE",
+    "computed": false,
+    "value": null,
+    "unit": null,
+    "equation_id": null,
+    "margin": null,
+    "margin_status": "UNCOMPUTED",
+    "statement": "no active computation binds the objective target"
+   },
+   "requirement_satisfied": null,
+   "limiting_variable": null,
+   "computed_equations": [],
+   "computation_log": [],
+   "evidence_rank": 4
+  },
+  "i_dimensions": {
+   "I1_MECHANISM_EVIDENCE_DERIVATION": {
+    "score": 0.575,
+    "state": "MEASURED"
+   },
+   "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_SURVIVORS"
+   },
+   "I3_RECOMBINATION_RISK": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_FAMILIES"
+   },
+   "I4_NEW_TECHNICAL_RELATIONSHIP": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+   },
+   "I5_EXPERIMENT_DISCRIMINATION": {
+    "score": 0.667,
+    "state": "MEASURED"
+   }
+  },
+  "i_flags": {
+   "underived_mechanism": false,
+   "recombination_only": false
+  },
+  "i_average": 0.621,
+  "q_average": 0.625,
+  "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE"
+ },
+ "fidelity_escalation": {
+  "current_tier": "STRUCTURED_CONSTRAINT (analytical_monotone_v1) + ANALYTICAL_EQUATION (analytical_equation_v1, R383)",
+  "deciding_question": "does a design-variable change improve the objective within constraints, and by how much?",
+  "resolved_at_current_tier": false,
+  "quantitative_tier_engaged": false,
+  "quantitative_objective_computed": false,
+  "escalation_needed": true,
+  "next_tier_available": false,
+  "note": "the R383 ANALYTICAL_EQUATION tier is LIVE (closed-form deterministic relations with computation logs); the higher tiers (NUMERICAL_SOLVER / SIMULATION / NEURAL_OPERATOR) remain contract-reserved and unregistered; escalation is recorded, never faked at the current tier"
+ },
+ "final": {
+  "technical": {
+   "status": "PARTIALLY_QUANTIFIED",
+   "objective": {
+    "target": "membrane_hydration",
+    "direction": "MAXIMIZE",
+    "known": true,
+    "basis": "to address the device failure mode of membrane dehydration"
+   },
+   "limiting_variable": null,
+   "constraint_results": [],
+   "uncertainty": {
+    "unknown_value_params": [
+     "anode_pressure",
+     "cathode_pressure",
+     "cell_voltage",
+     "current_density",
+     "hot_spot_formation",
+     "humidification_parasitic_load",
+     "membrane_hydration",
+     "membrane_resistance",
+     "pressure_differential",
+     "stack_temperature",
+     "water_vapor_partial_pressure"
+    ],
+    "modelled_relations": 3,
+    "extracted_relations": 2,
+    "unverifiable_constraints": [],
+    "objective_known": true,
+    "note": "UNKNOWN values are never treated as zeros; unverifiable constraints are never treated as satisfied (Art. XXV / Art. IV)"
+   },
+   "computation_log": {
+    "evaluator_id": "analytical_monotone_v1",
+    "fidelity_tier": "STRUCTURED_CONSTRAINT",
+    "evidence_rank": 3,
+    "input_state_sha256": "4ffebfa810c283577d3d2efa812f1c8e564482bf88a760e71336b8bedeb6be1e",
+    "conventions": [
+     {
+      "name": "ORDINAL_LEVERAGE_BY_PATH_LENGTH",
+      "epistemic_class": "ENGINEERING",
+      "justification": "with MONOTONE-only relations the evaluator cannot rank leverage by magnitude; it ranks by (1) fewest constraint blocks, (2) shortest causal path from the parameter to the objective target, (3) envelope provenance class (EXTRACTED beats MODELLED). This is a declared ordinal convention, not a measurement — recorded on every evaluation that uses it.",
+      "uncertainty": "ordinal only; magnitudes are UNKNOWN at this tier"
+     },
+     {
+      "name": "DIRECTIONAL_FAIL_CLOSED",
+      "epistemic_class": "ENGINEERING",
+      "justification": "a proposed change is constraint-BLOCKED when (a) the changed parameter's own numeric constraint would be violated at the proposed value, or (b) a relation-connected constraint target is already VIOLATED or value-UNKNOWN and the predicted direction moves it TOWARD its bound. Fail-closed on directional risk: an unknown-position target moving toward a bound is a blocked move, not an accepted one (Art. IV).",
+      "uncertainty": "direction-level only at this tier"
+     }
+    ],
+    "steps": [
+     "resolved objective membrane_hydration (MAXIMIZE)",
+     "checked 0 constraint(s) numerically where values exist",
+     "propagated signs over 5 relation(s)",
+     "ranked 0 movable improving direction(s)"
+    ],
+    "computed_at": "2026-09-10T14:26:00+00:00Z",
+    "deterministic": true
+   }
+  },
+  "quantitative": {
+   "status": "UNQUANTIFIED",
+   "objective": {
+    "target": "membrane_hydration",
+    "direction": "MAXIMIZE",
+    "computed": false,
+    "value": null,
+    "unit": null,
+    "equation_id": null,
+    "margin": null,
+    "margin_status": "UNCOMPUTED",
+    "statement": "no active computation binds the objective target"
+   },
+   "requirement_satisfied": null,
+   "limiting_variable": null,
+   "computed_equations": [],
+   "computation_log": [],
+   "evidence_rank": 4
+  },
+  "i_dimensions": {
+   "I1_MECHANISM_EVIDENCE_DERIVATION": {
+    "score": 0.575,
+    "state": "MEASURED"
+   },
+   "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_SURVIVORS"
+   },
+   "I3_RECOMBINATION_RISK": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_FAMILIES"
+   },
+   "I4_NEW_TECHNICAL_RELATIONSHIP": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+   },
+   "I5_EXPERIMENT_DISCRIMINATION": {
+    "score": 0.667,
+    "state": "MEASURED"
+   }
+  },
+  "i_flags": {
+   "underived_mechanism": false,
+   "recombination_only": false
+  },
+  "i_average": 0.621,
+  "q_average": 0.625,
+  "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE"
+ },
+ "outcome_summary": {
+  "baseline_status": "PARTIALLY_QUANTIFIED",
+  "final_status": "PARTIALLY_QUANTIFIED",
+  "baseline_quantitative": "UNQUANTIFIED",
+  "final_quantitative": "UNQUANTIFIED",
+  "final_quantitative_objective": {
+   "target": "membrane_hydration",
+   "value": null,
+   "unit": null,
+   "margin": null,
+   "margin_status": "UNCOMPUTED",
+   "equation_id": null
+  },
+  "baseline_i_average": 0.621,
+  "final_i_average": 0.621,
+  "baseline_prior_art": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+  "final_prior_art": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+  "iterations_run": 1,
+  "keeps": 0,
+  "attributions": []
+ },
+ "finished_at": "2026-09-10T14:26:00+00:00Z",
+ "status": "TECHNICAL_UNQUANTIFIED"
+}

@@ -1,0 +1,326 @@
+{
+ "ledger": "IMPROVEMENT_LEDGER (R378 TECHNICAL IMPROVEMENT ENGINE)",
+ "version": "1.0.0",
+ "loop": "CANDIDATE -> DIAGNOSE WEAKNESS -> IDENTIFY LIMITING FEATURE -> GENERATE CONTROLLED MUTATION -> RE-EVALUATE EVIDENCE/MECHANISM/PRIOR ART -> RE-SCORE -> KEEP OR KILL -> REPEAT",
+ "collision_mode": "REPLAY_CACHE",
+ "live_sources": null,
+ "evaluators_registered": [
+  {
+   "evaluator_id": "term_rule_v1",
+   "fidelity_tier": "TERM_RULE",
+   "evidence_rank": 3
+  }
+ ],
+ "q_instrument": "discovery_fabric/benchmark/candidate_quality.py (FROZEN, hash-pinned, imported read-only)",
+ "i_instrument": "discovery_fabric/benchmark/invention_quality.py (R377, imported read-only)",
+ "thresholds": {
+  "SPAN_DERIVATION_MIN": {
+   "value": 0.2,
+   "epistemic_class": "ENGINEERING",
+   "justification": "the engine's own span-derivation rule (candidate_diversity.span_derivation_check): ratio < 0.20 = SPAN_UNDERIVED. A MECHANISM_STRENGTHENING mutation must CLEAR this floor — the same rule that gates the grid, not a new one."
+  },
+  "EVIDENCE_SUPPORT_MIN": {
+   "value": 0.2,
+   "epistemic_class": "ENGINEERING",
+   "justification": "I1's underived flag fires below 0.20; an EVIDENCE_DERIVED_CONSTRAINT mutation must clear the same floor on evidence_support."
+  },
+  "DOMAIN_OVERLAP_MIN": {
+   "value": 1,
+   "epistemic_class": "ENGINEERING",
+   "justification": "REPLAY_CACHE re-adjudication is valid only while the mutated candidate stays in the domain the cached art was found FOR. Guard: >= 1 NON-generic technical term shared between the child's mechanism+intervention and the cached family corpus. ZERO overlap means the mutation abandoned the domain (measured attack: re-adjudicating a cement-curing intervention against battery art fabricates surviving differentiators — false novelty from stale art). The overlap count is RECORDED on every cache adjudication so thin-domain links are auditable. NOTE: entity-term retention vs the problem CANNOT catch this class — entity terms are problem-derived and unchanged by mutations (measured while writing the guard's tests); it is recorded for audit only."
+  },
+  "MAX_ITERATIONS_DEFAULT": {
+   "value": 2,
+   "epistemic_class": "ENGINEERING",
+   "justification": "the CEO minimum loop is DIAGNOSE -> IMPROVE -> RE-EVALUATE -> IMPROVE AGAIN; two iterations demonstrate repeatability at bounded cost"
+  },
+  "MAX_PROPOSALS_PER_ITERATION": {
+   "value": 3,
+   "epistemic_class": "ENGINEERING",
+   "justification": "bounded proposal budget: three attempts, then the honest no-defensible-mutation verdict"
+  }
+ },
+ "started_at": "2026-09-10T14:34:01+00:00Z",
+ "iterations": [
+  {
+   "iteration": 1,
+   "diagnosis": {
+    "limiting_features": [
+     {
+      "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "measured_value": 0.333,
+      "weakness_kind": "LOW_SCORE",
+      "why_weak": "measured 0.333 < STRONG floor 0.7",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT"
+     },
+     {
+      "dimension": "I5_EXPERIMENT_DISCRIMINATION",
+      "measured_value": 0.667,
+      "weakness_kind": "LOW_SCORE",
+      "why_weak": "measured 0.667 < STRONG floor 0.7",
+      "mutation_type": "EXPERIMENT_DISCRIMINATION"
+     }
+    ],
+    "evidence_gaps": [
+     {
+      "dimension": "I2_DIFFERENTIATOR_TECHNICAL_MEANING",
+      "state": "UNMEASURABLE_NO_SURVIVORS",
+      "what_is_missing": "no surviving differentiators recorded",
+      "consequence": "no mutation targets this dimension until the gap closes (Art. XXV)"
+     },
+     {
+      "dimension": "I3_RECOMBINATION_RISK",
+      "state": "UNMEASURABLE_NO_FAMILIES",
+      "what_is_missing": "no prior-art families adjudicated — residue vs found art is unmeasured; absence of found art is not novelty",
+      "consequence": "no mutation targets this dimension until the gap closes (Art. XXV)"
+     },
+     {
+      "dimension": "I4_NEW_TECHNICAL_RELATIONSHIP",
+      "state": "UNMEASURABLE_NO_FAMILY_TEXT",
+      "what_is_missing": "no adjudicated family text stored — pair novelty vs found art is unmeasured",
+      "consequence": "no mutation targets this dimension until the gap closes (Art. XXV)"
+     }
+    ],
+    "target": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT"
+    }
+   },
+   "proposals": [
+    {
+     "proposal_id": "prop:b128d4ce199b",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "3da9f1661305920e9c8420834d015f928436dfba9aca39432d7b989a50aad0c7",
+     "output_hash": "b128d4ce199b78da877b97971ed22b31e85cd1a8e0fde4b179768906b8bbb812",
+     "fields": {
+      "MUTATION_TYPE": "EVIDENCE_DERIVED_CONSTRAINT",
+      "MECHANISM": "corrosion of the positive electrode plate",
+      "INTERVENTION": "implement a grid alloy with antimony content below 2 percent and corrosion-inhibiting additives",
+      "EXPECTED_EFFECT": "reduce positive grid corrosion rate during extended float charge, maintaining grid cross-section and internal resistance within acceptable limits for 15-year service life",
+      "FALSIFICATION_TEST": "falsification_test_from_candidate",
+      "MECHANISM_SOURCE_SPAN": "\"corrosion of the positive electrode plate\"",
+      "SOURCE_EVIDENCE_ID": "doi:10.1051/e3sconf/202018501058",
+      "EXPERIMENT": "Compare the candidate against the baseline by measuring positive grid corrosion rate during extended float charge",
+      "EXPERIMENT_BASELINE": "valve regulated lead acid battery",
+      "EXPERIMENT_EIG": "0.7",
+      "CONSTRAINT_DERIVED": "The mechanism must directly reference the specific failure mode \"corrosion of the positive electrode plate\" as identified in the evidence",
+      "MUTATION_REASON": "Repairs I1_MECHANISM_EVIDENCE_DERIVATION by anchoring the mechanism's technical vocabulary in the evidence's actual text"
+     },
+     "validation": {
+      "valid": false,
+      "stage": "VALIDATION",
+      "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+      "checks": {
+       "mutation_type_matches_diagnosis": true,
+       "span_verbatim_in_evidence": false,
+       "evidence_support": 0.333,
+       "evidence_support_cleared": 0.333,
+       "constraint_traceable_to_evidence": "The mechanism must directly reference the specific failure mode \"corrosion of the positive electrode plate\" as identifie"
+      },
+      "reasons": [
+       "span_verbatim_in_evidence: the quoted span is NOT a verbatim substring of the cited evidence (fabricated spans are invalid — Art. VI)"
+      ],
+      "validated_at": "2026-09-10T14:34:04+00:00Z"
+     }
+    },
+    {
+     "proposal_id": "prop:e0d23525c43b",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "9013b8d8e83bb6c13978a853d265dbff2e0a73dd3502bbc2c90232f2777c320b",
+     "output_hash": "e0d23525c43b858a4d6be33db751a3d259d5ab9caa5bc5b4264de02f70544b8f",
+     "fields": {
+      "MUTATION_TYPE": "EVIDENCE_DERIVED_CONSTRAINT",
+      "MECHANISM": "corrosion of the positive electrode plate",
+      "INTERVENTION": "implement a grid alloy with antimony content below 2 percent and corrosion-inhibiting additives to reduce the rate of positive electrode plate corrosion",
+      "EXPECTED_EFFECT": "reduce positive grid corrosion rate during extended float charge, maintaining grid cross-section and internal resistance within acceptable limits for 15-year service life",
+      "FALSIFICATION_TEST": "falsification_test_from_candidate",
+      "MECHANISM_SOURCE_SPAN": "\"corrosion of the positive electrode plate\"",
+      "SOURCE_EVIDENCE_ID": "doi:10.1051/e3sconf/202018501058",
+      "EXPERIMENT": "compare the rate of positive electrode plate corrosion between the candidate battery and the baseline battery under identical float charge conditions",
+      "EXPERIMENT_BASELINE": "standard valve regulated lead acid battery without antimony content below 2 percent and corrosion-inhibiting additives",
+      "EXPERIMENT_EIG": "0.75",
+      "CONSTRAINT_DERIVED": "grid alloy must specifically target reduction of positive electrode plate corrosion rate",
+      "MUTATION_REASON": "repairs I1_MECHANISM_EVIDENCE_DERIVATION defect by re-anchoring mechanism's technical vocabulary in the evidence's exact text"
+     },
+     "validation": {
+      "valid": false,
+      "stage": "VALIDATION",
+      "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+      "checks": {
+       "mutation_type_matches_diagnosis": true,
+       "span_verbatim_in_evidence": false,
+       "evidence_support": 0.357,
+       "evidence_support_cleared": 0.357,
+       "constraint_traceable_to_evidence": "grid alloy must specifically target reduction of positive electrode plate corrosion rate"
+      },
+      "reasons": [
+       "span_verbatim_in_evidence: the quoted span is NOT a verbatim substring of the cited evidence (fabricated spans are invalid — Art. VI)"
+      ],
+      "validated_at": "2026-09-10T14:34:08+00:00Z"
+     }
+    },
+    {
+     "proposal_id": "prop:143fef69f15c",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "a8231ab5169b7dea38b4eaaf5ed5a5d11da032228effdcb615db1f9804e2a74c",
+     "output_hash": "143fef69f15ca63d83ee31695aec9b7ff4f9d8ba929ba71da44ad0e272b1a709",
+     "fields": {
+      "MUTATION_TYPE": "EVIDENCE_DERIVED_CONSTRAINT",
+      "MECHANISM": "corrosion of the positive electrode plate",
+      "INTERVENTION": "implement a grid alloy with antimony content below 2 percent and corrosion-inhibiting additives",
+      "EXPECTED_EFFECT": "reduce positive grid corrosion rate during extended float charge, maintaining grid cross-section and internal resistance within acceptable limits for 15-year service life",
+      "FALSIFICATION_TEST": "falsification_test_from_candidate",
+      "MECHANISM_SOURCE_SPAN": "\"corrosion of the positive electrode plate\"",
+      "SOURCE_EVIDENCE_ID": "doi:10.1051/e3sconf/202018501058",
+      "EXPERIMENT": "compare the candidate's positive grid corrosion rate during extended float charge against the baseline",
+      "EXPERIMENT_BASELINE": "\"corrosion of the positive electrode plate\"",
+      "EXPERIMENT_EIG": "0.8",
+      "CONSTRAINT_DERIVED": "NONE",
+      "MUTATION_REASON": "repairs I1_MECHANISM_EVIDENCE_DERIVATION defect by re-anchoring mechanism's technical vocabulary in the evidence's actual text"
+     },
+     "validation": {
+      "valid": false,
+      "stage": "VALIDATION",
+      "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+      "checks": {
+       "mutation_type_matches_diagnosis": true,
+       "span_verbatim_in_evidence": false,
+       "evidence_support": 0.333,
+       "evidence_support_cleared": 0.333,
+       "constraint_actually_derived": false
+      },
+      "reasons": [
+       "span_verbatim_in_evidence: the quoted span is NOT a verbatim substring of the cited evidence (fabricated spans are invalid — Art. VI)",
+       "constraint_actually_derived: EVIDENCE_DERIVED_CONSTRAINT requires a derived constraint, not NONE"
+      ],
+      "validated_at": "2026-09-10T14:34:11+00:00Z"
+     }
+    }
+   ]
+  }
+ ],
+ "outcome": "KILLED_NO_DEFENSIBLE_MUTATION",
+ "outcome_reason": "iteration 1: 3 proposal(s) generated; none passed deterministic validation — no defensible mutation exists for I1_MECHANISM_EVIDENCE_DERIVATION. Candidate killed.",
+ "baseline": {
+  "i_dimensions": {
+   "I1_MECHANISM_EVIDENCE_DERIVATION": {
+    "score": 0.333,
+    "state": "MEASURED"
+   },
+   "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_SURVIVORS"
+   },
+   "I3_RECOMBINATION_RISK": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_FAMILIES"
+   },
+   "I4_NEW_TECHNICAL_RELATIONSHIP": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+   },
+   "I5_EXPERIMENT_DISCRIMINATION": {
+    "score": 0.667,
+    "state": "MEASURED"
+   }
+  },
+  "i_flags": {
+   "underived_mechanism": false,
+   "recombination_only": false
+  },
+  "i_average": 0.5,
+  "q_dimensions": {
+   "Q1_EVIDENCE_BINDING": {
+    "score": 0.5,
+    "state": "MEASURED"
+   },
+   "Q2_PRIOR_ART_SPECIFICITY": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_PRIOR_ART"
+   },
+   "Q3_PRIOR_ART_RESOLUTION": {
+    "score": 0.0,
+    "state": "MEASURED"
+   },
+   "Q4_EXPERIMENT_DECISIVENESS": {
+    "score": 1.0,
+    "state": "MEASURED"
+   },
+   "Q5_CHAIN_COMPLETENESS": {
+    "score": 1.0,
+    "state": "MEASURED"
+   }
+  },
+  "q_average": 0.625,
+  "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE"
+ },
+ "final": {
+  "i_dimensions": {
+   "I1_MECHANISM_EVIDENCE_DERIVATION": {
+    "score": 0.333,
+    "state": "MEASURED"
+   },
+   "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_SURVIVORS"
+   },
+   "I3_RECOMBINATION_RISK": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_FAMILIES"
+   },
+   "I4_NEW_TECHNICAL_RELATIONSHIP": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+   },
+   "I5_EXPERIMENT_DISCRIMINATION": {
+    "score": 0.667,
+    "state": "MEASURED"
+   }
+  },
+  "i_flags": {
+   "underived_mechanism": false,
+   "recombination_only": false
+  },
+  "i_average": 0.5,
+  "q_dimensions": {
+   "Q1_EVIDENCE_BINDING": {
+    "score": 0.5,
+    "state": "MEASURED"
+   },
+   "Q2_PRIOR_ART_SPECIFICITY": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_PRIOR_ART"
+   },
+   "Q3_PRIOR_ART_RESOLUTION": {
+    "score": 0.0,
+    "state": "MEASURED"
+   },
+   "Q4_EXPERIMENT_DECISIVENESS": {
+    "score": 1.0,
+    "state": "MEASURED"
+   },
+   "Q5_CHAIN_COMPLETENESS": {
+    "score": 1.0,
+    "state": "MEASURED"
+   }
+  },
+  "q_average": 0.625,
+  "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE"
+ },
+ "finished_at": "2026-09-10T14:34:11+00:00Z",
+ "outcome_summary": {
+  "baseline_i_average": 0.5,
+  "final_i_average": 0.5,
+  "baseline_q_average": 0.625,
+  "final_q_average": 0.625,
+  "iterations_run": 1,
+  "keeps": 0
+ },
+ "status": "KILLED_NO_DEFENSIBLE_MUTATION"
+}

@@ -1,0 +1,56 @@
+{
+ "stage": "INDEPENDENT_ATTACK",
+ "candidate_id": "cand:DIV:constraint_first:zai:407a011e2c83",
+ "escalation": {
+  "gate_version": "attacker_calibration/1.0.0",
+  "instrument": "independent_attack/1.0.0",
+  "calibration_state": "NOT_CALIBRATED",
+  "terminal_kill_admissible": false,
+  "measured": {
+   "coverage": 1.0,
+   "parse_completeness": 1.0,
+   "tpr_scoped": 1.0,
+   "fpr_known_good": 1.0,
+   "n_cases_attacked": 40
+  },
+  "sealed_thresholds": {
+   "note": "registered BEFORE measurement; never tuned to results (Art. XXVII)",
+   "coverage_min": 0.875,
+   "parse_completeness_min": 0.875,
+   "tpr_min": 0.75,
+   "fpr_max": 0.3,
+   "ensemble": "NONE (single-attacker calibration only; majority-vote ensembles are deferred by the R412 directive)"
+  },
+  "measurement_path": "R412/CALIBRATION/engine_independent_attack_measurement.json",
+  "measurement_sha256": "4e1718e7088564333b5e1ef9be47ca452133d051001628cd6eed91f44e60ef5f",
+  "reason": "measured FPR 1.0 > sealed bar 0.3 (Art. L: the attacker is measured non-selective; its KILL is inadmissible as a terminal verdict and is escalated with the objection preserved)",
+  "rule": "the instrument's KILL is measured non-selective (FPR above the sealed bar); the objection is preserved verbatim and ESCALATED for adjudication — the candidate is NOT killed by this attack alone (Art. L); the deterministic gates are unchanged",
+  "reviewer_provenance": "AI_REVIEW (Art. LXVII)"
+ },
+ "preserved_objections": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "basis": "The proposed feedback loop debiasing mechanism fails to address the fundamental problem of positive feedback loops in collaborative filtering systems, where regularization of diversity only treats symptoms rather than the core issue of algorithmic bias amplification over time, as demonstrated in [doi:10.1145/3308560.3317303] which shows that simple regularization cannot prevent the gradual dominance of popular items in recommendation lists."
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "basis": "The candidate fails to define critical boundary conditions such as the minimum threshold for diversity metrics or the acceptable trade-off between diversity and relevance, making the solution undefined for practical implementation where these parameters directly determine system behavior."
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "basis": "The evidence bundle contains irrelevant citations including GNSS trajectory processing [doi:10.1109/icecet65726.2026.11632531], sentiment analysis [doi:10.31004/riggs.v4i4.4373], and banking applications [doi:10.3390/bdcc2030018], none of which provide valid support for a video recommendation system debiasing approach."
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "basis": "The predicted effect of maintaining recommendation diversity while preserving high throughput directly contradicts the well-established finding in [doi:10.3850/978-981-07-3043-7_090] that collaborative filtering systems inherently optimize for short-term engagement metrics at the expense of long-term diversity, making this outcome impossible without fundamentally changing the algorithm's objective function."
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "basis": "The proposed diversity regularization cannot be implemented in existing collaborative filtering architectures without completely retraining the entire recommendation pipeline, as the regularization term would require simultaneous optimization of both relevance and diversity metrics during model training, which is computationally infeasible for large-scale video recommendation systems."
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "basis": "The testable prediction fails to specify which diversity metrics will be measured (e.g., catalog coverage, list entropy, or user-item coverage) or how retention rates will be normalized against content availability, making the validation criteria ambiguous and subject to manipulation."
+  }
+ ]
+}

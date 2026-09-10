@@ -1,0 +1,1276 @@
+{
+ "invention_id": {
+  "value": "inv:bench-x03-llm-kvcache-fragmentation:a419976bb15a",
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "deterministic id inv:<problem_id>:<final envelope hash, first 12 chars>"
+ },
+ "problem": {
+  "value": {
+   "problem_id": "bench-x03-llm-kvcache-fragmentation",
+   "device": "LLM inference serving cluster with paged KV-cache on shared GPU nodes",
+   "failure": "mixed-length bursty requests fragment the paged KV-cache blocks, forcing live-token evictions and re-computation that blow tail latency budgets during traffic peaks",
+   "failure_mode": "memory_fragmentation",
+   "constraint": "hold p99 first-token latency below 800 ms at 3x baseline burst load without dropping requests or adding GPU nodes beyond the current fleet"
+  },
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "PROBLEM",
+  "evidence_ids": [
+   "problem:c11ba580"
+  ],
+  "note": "operator-supplied problem statement, custodied as the run's content-hashed problem.json artifact"
+ },
+ "user_need": {
+  "value": "reliable operation of LLM inference serving cluster with paged KV-cache on shared GPU nodes",
+  "epistemic_class": "ENGINEERING_PROPOSED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "derived from problem statement; not independently documented"
+ },
+ "mechanism": {
+  "value": {
+   "mechanism": "bit-flip vulnerability of shared KV-cache blocks",
+   "intervention": "implementing error correction codes on shared KV-cache blocks to detect and correct bit-flips without requiring cache invalidation",
+   "expected_effect": "reduce unnecessary cache evictions and re-computation during traffic peaks by maintaining cache integrity despite concurrent access patterns",
+   "mechanism_source_span": "\"Bit-Flip Vulnerability of Shared KV-Cache Blocks in LLM Serving Systems\"",
+   "span_derivation": {
+    "n_shared": 6,
+    "shared_terms": [
+     "bit",
+     "block",
+     "cache",
+     "flip",
+     "shared",
+     "vulnerability"
+    ],
+    "span_terms_n": 9,
+    "ratio": 0.667,
+    "underived": false,
+    "state": "MEASURED",
+    "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+   }
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "doi:10.5220/0015138800004103"
+  ],
+  "note": "LLM-proposed transfer mechanism from custodied evidence; proposal, not fact (Art. XVIII); evidence_ids cite the custodied observation the proposal was synthesized from; span_derivation measures whether the quoted span actually contains the mechanism's vocabulary (R377 — SPAN_UNDERIVED is an honest state, never silently dropped)"
+ },
+ "causal_chain": {
+  "value": {
+   "source_observation": "Bit-Flip Vulnerability of Shared KV-Cache Blocks in LLM Serving Systems",
+   "mechanism": "bit-flip vulnerability of shared KV-cache blocks",
+   "intervention_site": "LLM inference serving cluster with paged KV-cache on shared GPU nodes",
+   "expected_effect": "reduce unnecessary cache evictions and re-computation during traffic peaks by maintaining cache integrity despite concurrent access patterns",
+   "falsification_test": "measure p99 first-token latency under 3x baseline burst load with and without error correction codes on shared KV-cache blocks"
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "doi:10.5220/0015138800004103"
+  ],
+  "note": "source -> mechanism -> intervention -> effect chain; links are proposals until physically observed"
+ },
+ "novelty_hypothesis": {
+  "value": {
+   "collision_novelty_risk": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+   "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+   "multi_source_directions": {
+    "discovery": {
+     "sources_recorded": 0,
+     "sources_errored": 0
+    },
+    "destruction": {
+     "sources_recorded": 0,
+     "sources_errored": 0
+    },
+    "transfer": {
+     "sources_recorded": 0,
+     "sources_errored": 0
+    },
+    "reality": {
+     "sources_recorded": 0,
+     "sources_errored": 0
+    }
+   }
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "COLLISION",
+  "evidence_ids": [],
+  "note": "novelty is a HYPOTHESIS bounded by searched sources; zero hits is not proof of novelty (Art. XXI.2)"
+ },
+ "prior_art": {
+  "value": {
+   "status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+   "legacy_status": "",
+   "differentiation_resolution": {
+    "state": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+    "epistemic_class": "SEARCH_RESULT",
+    "constitutional_limitation": "a search-derived prior-art POSITION, not a novelty determination (Art. XXVIII); coverage measured by declared term-overlap thresholds, not a claim chart",
+    "evidence_tier_summary": "NO_FAMILIES",
+    "per_family": [],
+    "n_families": 0,
+    "n_search_errors": 10,
+    "search_errors": [
+     {
+      "query": "cache shared inference serving cluster blocks",
+      "source": "google_patents",
+      "error": "HTTP 503",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     },
+     {
+      "query": "cache shared inference serving cluster blocks",
+      "source": "lens_patent",
+      "error": "LENS_API_TOKEN not configured",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     },
+     {
+      "query": "cache shared blocks vulnerability bit flip",
+      "source": "google_patents",
+      "error": "HTTP 503",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     },
+     {
+      "query": "cache shared blocks vulnerability bit flip",
+      "source": "lens_patent",
+      "error": "LENS_API_TOKEN not configured",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     },
+     {
+      "query": "cache shared blocks bit flips correction correct",
+      "source": "google_patents",
+      "error": "HTTP 503",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     },
+     {
+      "query": "cache shared blocks bit flips correction correct",
+      "source": "lens_patent",
+      "error": "LENS_API_TOKEN not configured",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     },
+     {
+      "query": "cache detection computation during maintaining integrity",
+      "source": "google_patents",
+      "error": "HTTP 503",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     },
+     {
+      "query": "cache detection computation during maintaining integrity",
+      "source": "lens_patent",
+      "error": "LENS_API_TOKEN not configured",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     },
+     {
+      "query": "cache shared inference serving cluster llm",
+      "source": "google_patents",
+      "error": "HTTP 503",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     },
+     {
+      "query": "cache shared inference serving cluster llm",
+      "source": "lens_patent",
+      "error": "LENS_API_TOKEN not configured",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     }
+    ],
+    "search_execution": {
+     "mandatory_complete": false,
+     "n_errors": 10,
+     "rule": "RESOLVED_DIFFERENTIATED requires every mandatory (query_class x source) search to have completed successfully (R394 s2); provider failure never becomes absence (Art. XXI.3)"
+    },
+    "relevance_model_version": "collision_resolution/2.0.0",
+    "determinism_contract": {
+     "inputs": "problem + candidate profile + query ladder + source results (per-family adjudicated text, hash-custodied) + thresholds + relevance model version",
+     "check": "identical inputs must yield identical coverage decisions and state; divergence on replay is FLAG_INCONSISTENT_RETRIEVAL (R394 s3)"
+    },
+    "thresholds": {
+     "CROSS_DOMAIN_MIN_NONGENERIC_OVERLAP": {
+      "value": 3,
+      "epistemic_class": "ENGINEERING",
+      "justification": "R377 patent-text ground truth (TOSCANINI/R377_PATENT_TEXT_FETCH.json + R377_PATENT_TEXT_GROUND_TRUTH.json): 12/30 family representatives (40%) were substantively irrelevant cross-domain term collisions (CWDM optical link for a battery-thermal candidate; dental-condition monitoring for rolling stock; bone fracture forceps for rail steel...). A hit sharing NO entity term with the candidate now needs >= 3 NON-generic mechanism terms to be mechanism art: the measured true cross-domain analog (line-pipe steel with hydrogen fracture toughness for a rail-steel candidate) shares 3 non-generic terms and survives; every measured false positive shares <= 2 and is demoted. This RAISES the cross-domain bar (was the same >= 2 as same-domain) — stricter, not weaker (Art. VII).",
+      "uncertainty": "term overlap remains a proxy; entity word-sense collisions ('gear': steering vs draft) can still pass — disclosed limitation, not a solved problem"
+     },
+     "MIN_MECHANISM_OVERLAP": {
+      "value": 2,
+      "epistemic_class": "ENGINEERING",
+      "justification": "same term-overlap rule family as the pipeline relevance adjudicator and the Q2 instrument (>= 2 shared content terms = domain-specific rather than accidental collision); NOT weakened relative to any prior gate",
+      "uncertainty": "term overlap is a proxy for mechanism identity"
+     },
+     "ANTICIPATION_COVERAGE_RATIO": {
+      "value": 0.8,
+      "epistemic_class": "ENGINEERING",
+      "justification": "a family ANTICIPATES only when nearly ALL elements of the candidate's FULL distinguishing set (uncapped — the claim elements, not the 6-term query core) appear in the family's claim/abstract text; 0.8 leaves a >= 20% element margin — anything lower would convert partial art into a kill (Art. XXVIII forbids). Measured adversarial case: a domain-only patent reached 0.857 against a capped denominator whose true differentiators (acoustic, multi-modal) had been ranked out",
+      "uncertainty": "claim coverage measured by term overlap, not a claim chart; recorded per family with evidence tier"
+     },
+     "MAX_QUERY_TERMS": {
+      "value": 6,
+      "epistemic_class": "ENGINEERING",
+      "justification": "provider-measured sweet spot for keyword patent queries (longer queries dilute ranking)"
+     },
+     "ABSTRACT_TIER_MIN_CHARS": {
+      "value": 80,
+      "epistemic_class": "ENGINEERING",
+      "justification": "below ~80 chars a snippet carries title echoes, not mechanism description; it cannot support an abstract-tier coverage decision"
+     }
+    }
+   },
+   "nearest": [],
+   "queries": [
+    {
+     "query_class": "ENTITY",
+     "query": "cache shared inference serving cluster blocks"
+    },
+    {
+     "query_class": "MECHANISM",
+     "query": "cache shared blocks vulnerability bit flip"
+    },
+    {
+     "query_class": "DISTINGUISHING",
+     "query": "cache shared blocks bit flips correction correct"
+    },
+    {
+     "query_class": "FUNCTION",
+     "query": "cache detection computation during maintaining integrity"
+    },
+    {
+     "query_class": "ADJACENT",
+     "query": "cache shared inference serving cluster llm"
+    }
+   ],
+   "scientific": []
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "COLLISION",
+  "evidence_ids": [],
+  "note": "search RESULTS with source errors preserved as UNRESOLVED, never converted to absence (Art. XXV); FULL result list preserved (no truncation, Directive 6); resolution states are SEARCH_RESULT class positions, not novelty determinations (Art. XXVIII)"
+ },
+ "distinguishing_features": {
+  "value": {
+   "intervention": "implementing error correction codes on shared KV-cache blocks to detect and correct bit-flips without requiring cache invalidation",
+   "vs_nearest_prior_art": [],
+   "surviving_differentiators": null,
+   "note": "R376: nearest entries are mechanism-relevant family representatives with per-family coverage and evidence tier; differences below the term-overlap thresholds are recorded, not claim-charted (Art. XXVIII)"
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "doi:10.5220/0015138800004103"
+  ],
+  "note": "claim-level differentiation requires the inspection action recorded in next_best_action"
+ },
+ "constraints": {
+  "value": {
+   "stated_constraint": "hold p99 first-token latency below 800 ms at 3x baseline burst load without dropping requests or adding GPU nodes beyond the current fleet",
+   "failure_mode_of_device": "memory_fragmentation"
+  },
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "PROBLEM",
+  "evidence_ids": [
+   "problem:c11ba580"
+  ],
+  "note": "operator-stated constraints, custodied with the problem.json artifact"
+ },
+ "failure_modes": {
+  "value": [],
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "ATTACK",
+  "evidence_ids": [],
+  "note": "adversarial dimensions recorded by the attack engine"
+ },
+ "killer_experiment": {
+  "value": {
+   "selected": "falsification_test_from_candidate",
+   "eig": 0.4557178723356231,
+   "eig_per_cost": 0.4557178723356231,
+   "definition": "physical bench/clinical experiment — NOT simulation",
+   "hypotheses": [
+    {
+     "name": "H_effect_holds",
+     "description": "expected effect holds: Prevent silent data corruption in KV-cache blocks that cause live-token evictions and re-computation, maintaining p99 first-token latency below 800ms during traffic peaks",
+     "prior_probability": 0.45,
+     "provenance": {
+      "source": "adjudication.evidence_verification + candidate text",
+      "epistemic_class": "MODEL_DERIVED",
+      "uncertainty": "priors/likelihoods derived from text analysis, not measurement",
+      "created_at": "2026-09-10T17:08:14.164859+00:00"
+     }
+    },
+    {
+     "name": "H_effect_fails",
+     "description": "expected effect does not reproduce outside source context",
+     "prior_probability": 0.55,
+     "provenance": {
+      "source": "adjudication.evidence_verification + candidate text",
+      "epistemic_class": "MODEL_DERIVED",
+      "uncertainty": "priors/likelihoods derived from text analysis, not measurement",
+      "created_at": "2026-09-10T17:08:14.164859+00:00"
+     }
+    }
+   ],
+   "options_ranked": [
+    {
+     "name": "falsification_test_from_candidate",
+     "eig": 0.4557178723356231,
+     "eig_per_cost": 0.4557178723356231,
+     "minimum_epistemic_class": "EIGEpistemicClass.MODEL_DERIVED",
+     "can_influence_real_experiment": true
+    },
+    {
+     "name": "contradiction_attacking_experiment",
+     "eig": 0.3551108007068293,
+     "eig_per_cost": 0.1775554003534147,
+     "minimum_epistemic_class": "EIGEpistemicClass.MODEL_DERIVED",
+     "can_influence_real_experiment": true
+    }
+   ],
+   "epistemic_note": "all priors MODEL_DERIVED; no EXPERIMENTALLY_ESTIMATED inputs exist at this stage (Art. XXVIII/XXXVIII: no synthetic shortcut to physical observation)"
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "KILLER_EXPERIMENT",
+  "evidence_ids": [],
+  "note": "Bayesian EIG over MODEL_DERIVED priors; no physical claim"
+ },
+ "engineering_parameters": {
+  "value": {},
+  "epistemic_class": "UNKNOWN",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "no engineering parameters exist yet; physical geometry, materials and setpoints are ENGINEERING_PROPOSED at best and are produced by the engineering specification stage, never invented here"
+ },
+ "evidence": {
+  "value": [
+   {
+    "id": "doi:10.5220/0015138800004103",
+    "title": "Bit-Flip Vulnerability of Shared KV-Cache Blocks in LLM Serving Systems",
+    "source_uri": "https://doi.org/10.5220/0015138800004103",
+    "doi": "10.5220/0015138800004103",
+    "content_hash": "b7bcecf01176640871a64ec2d01f8b60b146a9159ad517789a18cc535964a4b8",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1109/icassp55912.2026.11461518",
+    "title": "MIDAS: A Dynamic Cross-GPU KV Cache Offloading Framework for LLM on GPU Cluster Systems",
+    "source_uri": "https://doi.org/10.1109/icassp55912.2026.11461518",
+    "doi": "10.1109/icassp55912.2026.11461518",
+    "content_hash": "89e9c820acb14ea67f4a133949a7857237c3dc04391298c88e1cbc4d2d418d76",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.14711/thesis-hdl152583",
+    "title": "Resource-Efficient Model Serving in Multi-Tenant GPU Clusters",
+    "source_uri": "https://doi.org/10.14711/thesis-hdl152583",
+    "doi": "10.14711/thesis-hdl152583",
+    "content_hash": "b057cf2f799640918bb195b85c529335e3c3887a6a766793c2f4e64d89b23854",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.70675/036b4171z0acfz4a50z9d51z481b92e5f4da",
+    "title": "Fundamental Limits of Shared-Cache Networks",
+    "source_uri": "https://doi.org/10.70675/036b4171z0acfz4a50z9d51z481b92e5f4da",
+    "doi": "10.70675/036b4171z0acfz4a50z9d51z481b92e5f4da",
+    "content_hash": "ff5ebd6c789f2c10ae10ad86892bfecc23ed28376ed8054e2729e4d7cf8f10b1",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.5463/thesis.308",
+    "title": "Latency-Critical Inference Serving for Deep Learning",
+    "source_uri": "https://doi.org/10.5463/thesis.308",
+    "doi": "10.5463/thesis.308",
+    "content_hash": "b409cacd1991be46eeb258d6eff75046afb97b8eca1fa81d801b73a56eed00b1",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.2139/ssrn.7273098",
+    "title": "Breaking the Memory Wall: A Survey of Key-Value (KV) Cache Compression for Efficient Large Language Model (LLM) Inference&amp;nbsp;",
+    "source_uri": "https://doi.org/10.2139/ssrn.7273098",
+    "doi": "10.2139/ssrn.7273098",
+    "content_hash": "20a8826aeb09db11af8cb88c2b6b161baa45204268e445831843837c14d87eb9",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.21203/rs.3.rs-10297225/v1",
+    "title": "Tamarin (HSQ): Reversible Hierarchical KV-Cache Compression for LLM Inference",
+    "source_uri": "https://doi.org/10.21203/rs.3.rs-10297225/v1",
+    "doi": "10.21203/rs.3.rs-10297225/v1",
+    "content_hash": "53a4d32ffa723fc89bdf0e7f609afbf15596b43a35b43af7b6db6d50594ce555",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.2139/ssrn.6153334",
+    "title": "Competitive Non-Clairvoyant KV-Cache Scheduling for LLM Inference",
+    "source_uri": "https://doi.org/10.2139/ssrn.6153334",
+    "doi": "10.2139/ssrn.6153334",
+    "content_hash": "6f46bad246790a664d93d45ab038917ecd9749edd719268d6aa2032801143910",
+    "frozen": false
+   },
+   {
+    "id": "title:ab3501741910a6e1",
+    "title": "vTensor: Flexible Virtual Tensor Management for Efficient LLM Serving",
+    "source_uri": "",
+    "doi": null,
+    "content_hash": "981a1ef8ec6c01f6da4803307662a0b39d2ab4085b9b10fd6e9598682801db46",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1109/hpca68181.2026.11408492",
+    "title": "ELORA: Efficient LoRA and KV Cache Management for Multi-LoRA LLM Serving",
+    "source_uri": "https://doi.org/10.1109/hpca68181.2026.11408492",
+    "doi": "10.1109/hpca68181.2026.11408492",
+    "content_hash": "0770ee5c587dff1d271d545f39b9a7300f57f912ebfeec9ef7b5b6f0ea9968c1",
+    "frozen": false
+   },
+   {
+    "id": "title:aecf2b4df8fe3a1b",
+    "title": "LLM-PQ: Serving LLM on Heterogeneous Clusters with Phase-Aware Partition\n  and Adaptive Quantization",
+    "source_uri": "",
+    "doi": null,
+    "content_hash": "8f03de4a61e1fb870bcfd3096bedd4310a4167544360dbef0a04414d1a587d4b",
+    "frozen": false
+   },
+   {
+    "id": "title:ac8a28c68c9d38da",
+    "title": "Mell: Memory-Efficient Large Language Model Serving via Multi-GPU KV Cache Management",
+    "source_uri": "",
+    "doi": null,
+    "content_hash": "b0b98c040182c261cd4c346b1e6999f16c6363b97dfa80b7dd7af9bed3d6dd97",
+    "frozen": false
+   }
+  ],
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "RETRIEVE+FREEZE",
+  "evidence_ids": [
+   "doi:10.1109/hpca68181.2026.11408492",
+   "doi:10.1109/icassp55912.2026.11461518",
+   "doi:10.14711/thesis-hdl152583",
+   "doi:10.21203/rs.3.rs-10297225/v1",
+   "doi:10.2139/ssrn.6153334",
+   "doi:10.2139/ssrn.7273098",
+   "doi:10.5220/0015138800004103",
+   "doi:10.5463/thesis.308",
+   "doi:10.70675/036b4171z0acfz4a50z9d51z481b92e5f4da",
+   "title:ab3501741910a6e1",
+   "title:ac8a28c68c9d38da",
+   "title:aecf2b4df8fe3a1b"
+  ],
+  "note": "custodied evidence with content hashes"
+ },
+ "uncertainties": {
+  "value": [
+   {
+    "contradiction_id": "con:verify:5fc42398",
+    "description": "evidence verification issue: missing_source_span",
+    "severity": "MEDIUM"
+   },
+   {
+    "contradiction_id": "con:verify:fc690a03",
+    "description": "evidence verification issue: mechanism_span_not_verbatim",
+    "severity": "MEDIUM"
+   },
+   {
+    "unresolved_source": "cache shared inference serving cluster blocks",
+    "error": "HTTP 503"
+   },
+   {
+    "unresolved_source": "cache shared inference serving cluster blocks",
+    "error": "LENS_API_TOKEN not configured"
+   },
+   {
+    "unresolved_source": "cache shared blocks vulnerability bit flip",
+    "error": "HTTP 503"
+   },
+   {
+    "unresolved_source": "cache shared blocks vulnerability bit flip",
+    "error": "LENS_API_TOKEN not configured"
+   },
+   {
+    "unresolved_source": "cache shared blocks bit flips correction correct",
+    "error": "HTTP 503"
+   },
+   {
+    "unresolved_source": "cache shared blocks bit flips correction correct",
+    "error": "LENS_API_TOKEN not configured"
+   },
+   {
+    "unresolved_source": "cache detection computation during maintaining integrity",
+    "error": "HTTP 503"
+   },
+   {
+    "unresolved_source": "cache detection computation during maintaining integrity",
+    "error": "LENS_API_TOKEN not configured"
+   },
+   {
+    "unresolved_source": "cache shared inference serving cluster llm",
+    "error": "HTTP 503"
+   },
+   {
+    "unresolved_source": "cache shared inference serving cluster llm",
+    "error": "LENS_API_TOKEN not configured"
+   }
+  ],
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "CONTRADICTION",
+  "evidence_ids": [],
+  "note": "unresolved contradictions and source failures preserved as unknowns (Art. XXV)"
+ },
+ "assumptions": {
+  "value": [
+   {
+    "assumption": "mechanism transfers across domain context",
+    "basis": "MODELLED",
+    "test": "measure p99 first-token latency under 3x baseline burst load with and without error correction codes on shared KV-cache blocks"
+   },
+   {
+    "assumption": "searched sources approximate the prior-art universe",
+    "basis": "MODELLED",
+    "test": "expand sources (see next_best_action)"
+   }
+  ],
+  "epistemic_class": "MODELLED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "explicit assumptions each carrying its own falsification path"
+ },
+ "provenance": {
+  "value": {
+   "run_id": "r401-bench-x03-llm-kvcache-fragmentation",
+   "final_envelope_hash": "a419976bb15a20462b3c3afebf8f1bfde5ae60005969947497a30112307aaf01",
+   "final_status": "REJECTED",
+   "adjudication_verdict": "CONTESTED",
+   "ranking": {
+    "formula": "score = 0.35*adjudication_w + 0.25*attack_pass + 0.20*novelty_w + 0.20*min(eig_per_cost,1)",
+    "formula_version": "engine-ranking-v1",
+    "components": {
+     "adjudication": 0.4,
+     "attack_pass": 0.0,
+     "novelty": 0.2,
+     "eig_per_cost_capped": 0.4557178723356231
+    },
+    "score": 0.2711,
+    "portfolio_context": {
+     "target_invention_count": 10,
+     "survivors": 0,
+     "active": 0
+    },
+    "is_allocation_policy_not_truth": true,
+    "timestamp": "2026-09-10T17:08:14+00:00Z"
+   },
+   "survivor_gate": {
+    "survivor": false,
+    "final_status": "REJECTED",
+    "verdict": "CONTESTED",
+    "reason": "only a classified candidate with sufficient adjudication may be specified (Art. XXVIII: no promotion by narrative)"
+   },
+   "code_commit": null,
+   "built_at": "2026-09-10T17:09:27+00:00Z"
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "every value above traces to a stage output in the envelope"
+ },
+ "_evidence_index": {
+  "doi:10.5220/0015138800004103": {
+   "id": "doi:10.5220/0015138800004103",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.5220/0015138800004103",
+   "source_uri": "https://doi.org/10.5220/0015138800004103",
+   "title": "Bit-Flip Vulnerability of Shared KV-Cache Blocks in LLM Serving Systems",
+   "abstract": "",
+   "doi": "10.5220/0015138800004103",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2026",
+   "retrieval_timestamp": "2026-09-10T17:04:12.522846+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "b7bcecf01176640871a64ec2d01f8b60b146a9159ad517789a18cc535964a4b8",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.5220/0015138800004103"
+    },
+    "queries_by_source": {
+     "crossref": "LLM inference serving cluster with paged KV-cache on shared GPU nodes memory fragmentation"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=proceedings-article"
+    ],
+    "oa_resolution": {
+     "provider": "unpaywall",
+     "resolved_at": "2026-09-10T17:04:11.866628+00:00",
+     "is_oa": true,
+     "oa_status": "gold",
+     "host_type": null,
+     "repository_institution": null
+    }
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "CONFERENCE",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.5220/0015138800004103",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "LLM inference serving cluster with paged KV-cache on shared GPU nodes memory fragmentation",
+   "source_rank": 0,
+   "fulltext_url": "https://doi.org/10.5220/0015138800004103",
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.1109/icassp55912.2026.11461518": {
+   "id": "doi:10.1109/icassp55912.2026.11461518",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.1109/icassp55912.2026.11461518",
+   "source_uri": "https://doi.org/10.1109/icassp55912.2026.11461518",
+   "title": "MIDAS: A Dynamic Cross-GPU KV Cache Offloading Framework for LLM on GPU Cluster Systems",
+   "abstract": "",
+   "doi": "10.1109/icassp55912.2026.11461518",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2026",
+   "retrieval_timestamp": "2026-09-10T17:04:12.522904+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "89e9c820acb14ea67f4a133949a7857237c3dc04391298c88e1cbc4d2d418d76",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.1109/icassp55912.2026.11461518"
+    },
+    "queries_by_source": {
+     "crossref": "LLM inference serving cluster with paged KV-cache on shared GPU nodes memory fragmentation"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=proceedings-article"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "CONFERENCE",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.1109/icassp55912.2026.11461518",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "LLM inference serving cluster with paged KV-cache on shared GPU nodes memory fragmentation",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.14711/thesis-hdl152583": {
+   "id": "doi:10.14711/thesis-hdl152583",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.14711/thesis-hdl152583",
+   "source_uri": "https://doi.org/10.14711/thesis-hdl152583",
+   "title": "Resource-Efficient Model Serving in Multi-Tenant GPU Clusters",
+   "abstract": "",
+   "doi": "10.14711/thesis-hdl152583",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-10T17:04:12.522929+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "b057cf2f799640918bb195b85c529335e3c3887a6a766793c2f4e64d89b23854",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.14711/thesis-hdl152583"
+    },
+    "queries_by_source": {
+     "crossref": "LLM inference serving cluster with paged KV-cache on shared GPU nodes memory fragmentation"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.14711/thesis-hdl152583",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "LLM inference serving cluster with paged KV-cache on shared GPU nodes memory fragmentation",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.70675/036b4171z0acfz4a50z9d51z481b92e5f4da": {
+   "id": "doi:10.70675/036b4171z0acfz4a50z9d51z481b92e5f4da",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.70675/036b4171z0acfz4a50z9d51z481b92e5f4da",
+   "source_uri": "https://doi.org/10.70675/036b4171z0acfz4a50z9d51z481b92e5f4da",
+   "title": "Fundamental Limits of Shared-Cache Networks",
+   "abstract": "",
+   "doi": "10.70675/036b4171z0acfz4a50z9d51z481b92e5f4da",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-10T17:04:12.522949+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "ff5ebd6c789f2c10ae10ad86892bfecc23ed28376ed8054e2729e4d7cf8f10b1",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.70675/036b4171z0acfz4a50z9d51z481b92e5f4da"
+    },
+    "queries_by_source": {
+     "crossref": "LLM inference serving cluster with paged KV-cache on shared GPU nodes memory fragmentation"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.70675/036b4171z0acfz4a50z9d51z481b92e5f4da",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "LLM inference serving cluster with paged KV-cache on shared GPU nodes memory fragmentation",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.5463/thesis.308": {
+   "id": "doi:10.5463/thesis.308",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.5463/thesis.308",
+   "source_uri": "https://doi.org/10.5463/thesis.308",
+   "title": "Latency-Critical Inference Serving for Deep Learning",
+   "abstract": "",
+   "doi": "10.5463/thesis.308",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-10T17:04:12.522962+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "b409cacd1991be46eeb258d6eff75046afb97b8eca1fa81d801b73a56eed00b1",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.5463/thesis.308"
+    },
+    "queries_by_source": {
+     "crossref": "LLM inference serving cluster with paged KV-cache on shared GPU nodes memory fragmentation"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.5463/thesis.308",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "LLM inference serving cluster with paged KV-cache on shared GPU nodes memory fragmentation",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.2139/ssrn.7273098": {
+   "id": "doi:10.2139/ssrn.7273098",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.2139/ssrn.7273098",
+   "source_uri": "https://doi.org/10.2139/ssrn.7273098",
+   "title": "Breaking the Memory Wall: A Survey of Key-Value (KV) Cache Compression for Efficient Large Language Model (LLM) Inference&amp;nbsp;",
+   "abstract": "",
+   "doi": "10.2139/ssrn.7273098",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2026",
+   "retrieval_timestamp": "2026-09-10T17:04:12.522975+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "20a8826aeb09db11af8cb88c2b6b161baa45204268e445831843837c14d87eb9",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.2139/ssrn.7273098"
+    },
+    "queries_by_source": {
+     "crossref": "LLM inference serving cluster with paged KV-cache on shared GPU nodes memory fragmentation"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=posted-content"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.2139/ssrn.7273098",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "LLM inference serving cluster with paged KV-cache on shared GPU nodes memory fragmentation",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.21203/rs.3.rs-10297225/v1": {
+   "id": "doi:10.21203/rs.3.rs-10297225/v1",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.21203/rs.3.rs-10297225/v1",
+   "source_uri": "https://doi.org/10.21203/rs.3.rs-10297225/v1",
+   "title": "Tamarin (HSQ): Reversible Hierarchical KV-Cache Compression for LLM Inference",
+   "abstract": "",
+   "doi": "10.21203/rs.3.rs-10297225/v1",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2026",
+   "retrieval_timestamp": "2026-09-10T17:04:12.522991+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "53a4d32ffa723fc89bdf0e7f609afbf15596b43a35b43af7b6db6d50594ce555",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.21203/rs.3.rs-10297225/v1"
+    },
+    "queries_by_source": {
+     "crossref": "LLM inference serving cluster with paged KV-cache on shared GPU nodes memory fragmentation"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=posted-content"
+    ],
+    "oa_resolution": {
+     "provider": "unpaywall",
+     "resolved_at": "2026-09-10T17:04:12.511071+00:00",
+     "is_oa": true,
+     "oa_status": "green",
+     "host_type": "repository",
+     "repository_institution": null
+    }
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.21203/rs.3.rs-10297225/v1",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "LLM inference serving cluster with paged KV-cache on shared GPU nodes memory fragmentation",
+   "source_rank": 1,
+   "fulltext_url": "https://www.researchsquare.com/article/rs-10297225/latest.pdf",
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.2139/ssrn.6153334": {
+   "id": "doi:10.2139/ssrn.6153334",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.2139/ssrn.6153334",
+   "source_uri": "https://doi.org/10.2139/ssrn.6153334",
+   "title": "Competitive Non-Clairvoyant KV-Cache Scheduling for LLM Inference",
+   "abstract": "",
+   "doi": "10.2139/ssrn.6153334",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2026",
+   "retrieval_timestamp": "2026-09-10T17:04:12.523004+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "6f46bad246790a664d93d45ab038917ecd9749edd719268d6aa2032801143910",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.2139/ssrn.6153334"
+    },
+    "queries_by_source": {
+     "crossref": "LLM inference serving cluster with paged KV-cache on shared GPU nodes memory fragmentation"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=posted-content"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.2139/ssrn.6153334",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "LLM inference serving cluster with paged KV-cache on shared GPU nodes memory fragmentation",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "title:ab3501741910a6e1": {
+   "id": "title:ab3501741910a6e1",
+   "source_type": "scientific_paper",
+   "source": "core",
+   "source_id": "core:core:391691415",
+   "source_uri": "",
+   "title": "vTensor: Flexible Virtual Tensor Management for Efficient LLM Serving",
+   "abstract": "Large Language Models (LLMs) are widely used across various domains, processing millions of daily requests. This surge in demand poses significant challenges in optimizing throughput and latency while keeping costs manageable. The Key-Value (KV) cache, a standard method for retaining previous computations, makes LLM inference highly bounded by memory. While batching strategies can enhance performance, they frequently lead to significant memory fragmentation. Even though cutting-edge systems like vLLM mitigate KV cache fragmentation using paged Attention mechanisms, they still suffer from inefficient memory and computational operations due to the tightly coupled page management and computation kernels.\n  This study introduces the vTensor, an innovative tensor structure for LLM inference based on GPU virtual memory management (VMM). vTensor addresses existing limitations by decoupling computation from memory defragmentation and offering dynamic extensibility. Our framework employs a CPU-GPU heterogeneous approach, ensuring efficient, fragmentation-free memory management while accommodating various computation kernels across different LLM architectures. Experimental results indicate that vTensor achieves an average speedup of 1.86x across different models, with up to 2.42x in multi-turn chat scenarios. Additionally, vTensor provides average speedups of 2.12x and 3.15x in kernel evaluation, reaching up to 3.92x and 3.27x compared to SGLang Triton prefix-prefilling kernels and vLLM paged Attention kernel, respectively. Furthermore, it frees approximately 71.25% (57GB) of memory on the NVIDIA A100 GPU compared to vLLM, enabling more memory-intensive workloads.16 pages, 12 figure",
+   "doi": null,
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-10T17:04:12.523017+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "981a1ef8ec6c01f6da4803307662a0b39d2ab4085b9b10fd6e9598682801db46",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "core",
+    "indexing_sources": [
+     "core"
+    ],
+    "record_ids_by_source": {
+     "core": "core:391691415"
+    },
+    "queries_by_source": {
+     "core": "llm inference serving cluster with paged experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "repository_aggregator_core",
+    "identity_basis": "TITLE_FINGERPRINT",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "repository_aggregator_core",
+   "canonical_id": "title:ab3501741910a6e1",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "llm inference serving cluster with paged experimental comparison",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [
+    "Zhang, Ke",
+    "Liu, Zihan",
+    "Wu, Feiyang",
+    "Shao, Changxu",
+    "Xu, Jiale",
+    "Guo, Cong",
+    "Sun, Shixuan",
+    "Leng, Jingwen",
+    "Guo, Minyi",
+    "Hu, Weiming",
+    "Feng, Yu",
+    "Guo, Yuhong",
+    "Zhang, Rui",
+    "Zhao, Junping"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
+    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
+   ]
+  },
+  "doi:10.1109/hpca68181.2026.11408492": {
+   "id": "doi:10.1109/hpca68181.2026.11408492",
+   "source_type": "scientific_paper",
+   "source": "core",
+   "source_id": "core:core:362478473",
+   "source_uri": "https://doi.org/10.1109/hpca68181.2026.11408492",
+   "title": "ELORA: Efficient LoRA and KV Cache Management for Multi-LoRA LLM Serving",
+   "abstract": "Multiple Low-Rank Adapters (Multi-LoRA) are gaining popularity for task-specific Large Language Model (LLM) applications. For Multi-LoRA serving, caching hot LoRAs and KV caches in the GPU memory can improve inference performance. However, existing Multi-LoRA inference systems fail to optimize serving performance like Time-To-First-Token (TTFT), neglecting usage dependencies when caching LoRAs and KV caches. We therefore propose ELORA, a Multi-LoRA caching system to optimize the serving performance. ELORA comprises a dependency-aware cache manager and a performancedriven cache swapper. The cache manager maintains the usage dependencies between LoRAs and KV caches during inference with a unified caching pool. The cache swapper determines the swap-in or swap-out of LoRAs and KV caches based on a unified cost model, when the GPU memory is idle or busy, respectively. Experimental results show that ELORA reduces the TTFT by 45.7% on average, compared to state-of-the-art works.</p",
+   "doi": "10.1109/hpca68181.2026.11408492",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-10T17:04:12.523032+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "0770ee5c587dff1d271d545f39b9a7300f57f912ebfeec9ef7b5b6f0ea9968c1",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "core",
+    "indexing_sources": [
+     "core"
+    ],
+    "record_ids_by_source": {
+     "core": "core:362478473"
+    },
+    "queries_by_source": {
+     "core": "LLM inference serving cluster paged KV-cache shared GPU nodes memory"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "repository_aggregator_core",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": {
+     "provider": "unpaywall",
+     "resolved_at": "2026-09-10T17:04:10.582893+00:00",
+     "is_oa": false,
+     "oa_status": "closed",
+     "host_type": null,
+     "repository_institution": null
+    }
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "repository_aggregator_core",
+   "canonical_id": "doi:10.1109/hpca68181.2026.11408492",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "LLM inference serving cluster paged KV-cache shared GPU nodes memory",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [
+    "Wang, Wei",
+    "Zhang, Hang",
+    "Chen, Quan",
+    "Shan, Yizhou",
+    "Shi, Jiuchen",
+    "Wang, Yixiao",
+    "Fu, Kaihua",
+    "Guo, Minyi"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
+    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
+   ]
+  },
+  "title:aecf2b4df8fe3a1b": {
+   "id": "title:aecf2b4df8fe3a1b",
+   "source_type": "scientific_paper",
+   "source": "core",
+   "source_id": "core:core:391611461",
+   "source_uri": "",
+   "title": "LLM-PQ: Serving LLM on Heterogeneous Clusters with Phase-Aware Partition\n  and Adaptive Quantization",
+   "abstract": "Recent breakthroughs in Large-scale language models (LLMs) have demonstrated\nimpressive performance on various tasks. The immense sizes of LLMs have led to\nvery high resource demand and cost for running the models. Though the models\nare largely served using uniform high-caliber GPUs nowadays, utilizing a\nheterogeneous cluster with a mix of available high- and low-capacity GPUs can\npotentially substantially reduce the serving cost. There is a lack of designs\nto support efficient LLM serving using a heterogeneous cluster, while the\ncurrent solutions focus on model partition and uniform compression among\nhomogeneous devices. This paper proposes LLM-PQ, a system that advocates\nadaptive model quantization and phase-aware partition to improve LLM serving\nefficiency on heterogeneous GPU clusters. We carefully decide on\nmixed-precision model quantization together with phase-aware model partition\nand micro-batch sizing in distributed LLM serving with an efficient algorithm,\nto greatly enhance inference throughput while fulfilling user-specified model\nquality targets. Extensive experiments on production inference workloads in 11\ndifferent clusters demonstrate that LLM-PQ achieves up to 2.88x (2.26x on\naverage) throughput improvement in inference, showing great advantages over\nstate-of-the-art works",
+   "doi": null,
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-10T17:04:12.523047+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "8f03de4a61e1fb870bcfd3096bedd4310a4167544360dbef0a04414d1a587d4b",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "core",
+    "indexing_sources": [
+     "core"
+    ],
+    "record_ids_by_source": {
+     "core": "core:391611461"
+    },
+    "queries_by_source": {
+     "core": "llm inference serving cluster with paged experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "repository_aggregator_core",
+    "identity_basis": "TITLE_FINGERPRINT",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "repository_aggregator_core",
+   "canonical_id": "title:aecf2b4df8fe3a1b",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "llm inference serving cluster with paged experimental comparison",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [
+    "Peng, Yanghua",
+    "Lin, Haibin",
+    "Wu, Chuan",
+    "Wan, Borui",
+    "Zhao, Juntao"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
+    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
+   ]
+  },
+  "title:ac8a28c68c9d38da": {
+   "id": "title:ac8a28c68c9d38da",
+   "source_type": "scientific_paper",
+   "source": "core",
+   "source_id": "core:core:353428361",
+   "source_uri": "",
+   "title": "Mell: Memory-Efficient Large Language Model Serving via Multi-GPU KV Cache Management",
+   "abstract": "Serving large language models (LLMs) for massive users is challenged by the significant memory footprint of the transient state, known as the key-value (KV) cache, which scales with sequence length and number of requests. Instead of renting or buying more expensive GPUs, the load imbalance of the KV cache across GPUs, coupled with recent advances in inter-GPU communication, provides an opportunity to serve more requests via request migration. However, high migration overhead and unpredictable request patterns make it challenging. Therefore, this paper proposes MELL, a memory-efficient LLM serving system via multi-GPU KV cache management. It saves the number of GPUs needed in the system by considering the dynamic KV cache load and the costly request migration. Specifically, we first develop an adaptive request migration mechanism to balance the computational and communication overheads and adapt to diverse resource conditions. Then, we design an online algorithm tailored to a multi-LLM request and multi-GPU scheduling problem with migration enabled. It aims to minimise the required GPUs while limiting the number of migrations. Finally, we implement a prototype of MELL and demonstrate that it reduces the number of GPUs by 31% and increases the GPU utilization by 43% at most compared to existing LLM serving systems",
+   "doi": null,
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-10T17:04:12.523059+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "b0b98c040182c261cd4c346b1e6999f16c6363b97dfa80b7dd7af9bed3d6dd97",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "core",
+    "indexing_sources": [
+     "core"
+    ],
+    "record_ids_by_source": {
+     "core": "core:353428361"
+    },
+    "queries_by_source": {
+     "core": "LLM inference serving cluster paged KV-cache shared GPU nodes memory"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "repository_aggregator_core",
+    "identity_basis": "TITLE_FINGERPRINT",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "repository_aggregator_core",
+   "canonical_id": "title:ac8a28c68c9d38da",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "LLM inference serving cluster paged KV-cache shared GPU nodes memory",
+   "source_rank": 3,
+   "fulltext_url": null,
+   "authors": [
+    "Qianli, Liu",
+    "Song, Guo",
+    "Peng, Li",
+    "Zicong, Hong",
+    "Fahao, Chen"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
+    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
+   ]
+  },
+  "problem:c11ba580": {
+   "id": "problem:c11ba580",
+   "title": "operator problem statement (problem.json)",
+   "content_hash": "c11ba58024f9324a14e26f86a3a4de1e5fa21c4d64160eeb3ed9de1fbbe37ed3",
+   "custody": "engine run problem.json artifact"
+  }
+ },
+ "_survivor_gate": {
+  "survivor": false,
+  "final_status": "REJECTED",
+  "verdict": "CONTESTED",
+  "reason": "only a classified candidate with sufficient adjudication may be specified (Art. XXVIII: no promotion by narrative)"
+ },
+ "_spec_hash": "07306c40643b282d4eac109ba4bc14a5fe4894091e9b2c5189dadaabe0f6127f",
+ "_integrity": {
+  "no_fact_promotion_violations": [],
+  "passed": true,
+  "checked_at": "2026-09-10T17:09:27+00:00Z"
+ },
+ "_exploration_candidate": {
+  "marker": "EXPLORATION_GRID_CANDIDATE",
+  "discovery_verification": "NOT_PERFORMED_FOR_THIS_CANDIDATE",
+  "consequence": "the E16-H release gate holds this dossier for human engineering review; a discovery-loop re-run is required before automatic release",
+  "angle": "EXPLORATION_GRID_simplification(zai)"
+ }
+}

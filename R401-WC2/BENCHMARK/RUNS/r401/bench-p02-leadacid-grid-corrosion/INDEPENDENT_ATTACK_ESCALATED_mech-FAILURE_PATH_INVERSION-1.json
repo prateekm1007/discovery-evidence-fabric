@@ -1,0 +1,48 @@
+{
+ "stage": "INDEPENDENT_ATTACK",
+ "candidate_id": "cand:MS:FAILURE_PATH_INVERSION:cc7635b3ee23",
+ "escalation": {
+  "gate_version": "attacker_calibration/1.0.0",
+  "instrument": "independent_attack/1.0.0",
+  "calibration_state": "NOT_CALIBRATED",
+  "terminal_kill_admissible": false,
+  "measured": {
+   "coverage": 1.0,
+   "parse_completeness": 1.0,
+   "tpr_scoped": 1.0,
+   "fpr_known_good": 1.0,
+   "n_cases_attacked": 40
+  },
+  "sealed_thresholds": {
+   "note": "registered BEFORE measurement; never tuned to results (Art. XXVII)",
+   "coverage_min": 0.875,
+   "parse_completeness_min": 0.875,
+   "tpr_min": 0.75,
+   "fpr_max": 0.3,
+   "ensemble": "NONE (single-attacker calibration only; majority-vote ensembles are deferred by the R412 directive)"
+  },
+  "measurement_path": "R412/CALIBRATION/engine_independent_attack_measurement.json",
+  "measurement_sha256": "4e1718e7088564333b5e1ef9be47ca452133d051001628cd6eed91f44e60ef5f",
+  "reason": "measured FPR 1.0 > sealed bar 0.3 (Art. L: the attacker is measured non-selective; its KILL is inadmissible as a terminal verdict and is escalated with the objection preserved)",
+  "rule": "the instrument's KILL is measured non-selective (FPR above the sealed bar); the objection is preserved verbatim and ESCALATED for adjudication — the candidate is NOT killed by this attack alone (Art. L); the deterministic gates are unchanged",
+  "reviewer_provenance": "AI_REVIEW (Art. LXVII)"
+ },
+ "preserved_objections": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "basis": "The claimed HER potential shift from -1.65 to -1.50 V is insufficient to meaningfully reduce positive grid corrosion, as grid corrosion occurs at more positive potentials where lead dioxide forms, not at the HER potential range. The candidate confuses hydrogen evolution kinetics with the dominant corrosion mechanism of lead grids."
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "basis": "The evidence bundle includes [doi:10.1016/s0378-7753(98)00028-7] which demonstrates that grid corrosion is primarily driven by the thermodynamic instability of PbO2 at the positive electrode potential, not by hydrogen evolution kinetics, directly contradicting the candidate's proposed mechanism."
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "basis": "The claimed additive ratio of 66:17:17 ppm Ni:Co:Sb is impossibly precise for industrial implementation given the challenges of homogeneous distribution in molten lead alloy and the potential for segregation during solidification, as evidenced by industry standard manufacturing tolerances."
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "basis": "The testable prediction of measuring grid cross-section retention after 10 years is methodologically flawed as it doesn't account for localized pitting corrosion that could cause premature failure even with average cross-section retention at 95%, a critical oversight noted in [doi:10.1109/intlec.1995.498976]."
+  }
+ ]
+}

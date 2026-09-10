@@ -1,0 +1,56 @@
+{
+ "stage": "INDEPENDENT_ATTACK",
+ "candidate_id": "cand:DIV:constraint_first:zai:678f12390056",
+ "escalation": {
+  "gate_version": "attacker_calibration/1.0.0",
+  "instrument": "independent_attack/1.0.0",
+  "calibration_state": "NOT_CALIBRATED",
+  "terminal_kill_admissible": false,
+  "measured": {
+   "coverage": 1.0,
+   "parse_completeness": 1.0,
+   "tpr_scoped": 1.0,
+   "fpr_known_good": 1.0,
+   "n_cases_attacked": 40
+  },
+  "sealed_thresholds": {
+   "note": "registered BEFORE measurement; never tuned to results (Art. XXVII)",
+   "coverage_min": 0.875,
+   "parse_completeness_min": 0.875,
+   "tpr_min": 0.75,
+   "fpr_max": 0.3,
+   "ensemble": "NONE (single-attacker calibration only; majority-vote ensembles are deferred by the R412 directive)"
+  },
+  "measurement_path": "R412/CALIBRATION/engine_independent_attack_measurement.json",
+  "measurement_sha256": "4e1718e7088564333b5e1ef9be47ca452133d051001628cd6eed91f44e60ef5f",
+  "reason": "measured FPR 1.0 > sealed bar 0.3 (Art. L: the attacker is measured non-selective; its KILL is inadmissible as a terminal verdict and is escalated with the objection preserved)",
+  "rule": "the instrument's KILL is measured non-selective (FPR above the sealed bar); the objection is preserved verbatim and ESCALATED for adjudication — the candidate is NOT killed by this attack alone (Art. L); the deterministic gates are unchanged",
+  "reviewer_provenance": "AI_REVIEW (Art. LXVII)"
+ },
+ "preserved_objections": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "basis": "The proposed mechanism fails to address the fundamental physics of shock-induced stiction, which occurs due to surface adhesion forces and electrostatic attraction during high-g events, not merely packaging issues. The candidate's focus on minimal post-processing ignores the fact that stiction primarily occurs at the micro-scale interface between comb fingers, where surface forces dominate, not at the package level."
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "basis": "The candidate completely omits critical boundary conditions such as temperature ranges, humidity levels, and operational environments where the accelerometer must function. Without defining these boundaries, the claimed reduction in shock-induced stiction cannot be validated, as adhesion forces are highly dependent on environmental conditions."
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "basis": "The provided evidence [doi:10.3390/mi17060732] explicitly states that CMOS MEMS foundries still require post-processing steps for reliable operation, directly contradicting the claim of \"minimal post-processing.\" Additionally, [doi:10.23919/ursi.2018.8406772] shows that shock-induced stiction remains a significant challenge even in optimized CMOS MEMS designs."
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "basis": "The candidate provides no quantitative comparison to the baseline, making it impossible to determine if the proposed design actually improves upon the status quo. Without data on the specific reduction in permanent zero-g offset compared to existing accelerometers, the claim of reduced susceptibility remains unsubstantiated."
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "basis": "The proposal requires achieving minimal post-processing while maintaining the necessary precision for MEMS comb structures, which is technically impossible with current CMOS MEMS foundry processes. The conflicting requirements of structural integrity and reduced processing steps cannot be simultaneously satisfied."
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "basis": "The testable prediction of measuring permanent zero-g offset after 10000g shock fails to define the critical parameters of shock duration, shock profile (sine, half-sine, etc.), and measurement conditions, making the results impossible to compare meaningfully with existing literature or baseline performance."
+  }
+ ]
+}

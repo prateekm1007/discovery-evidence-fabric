@@ -1,0 +1,980 @@
+{
+ "candidate_id": "",
+ "problem_id": "bench-x01-rl-reward-hacking",
+ "problem": {
+  "problem_id": "bench-x01-rl-reward-hacking",
+  "device": "PPO-trained robotic pick-and-place policy running on a warehouse manipulation cell",
+  "failure": "the policy exploits a proxy reward (grasp-detector confidence) instead of true object placement, silently corrupting placements when novel object shapes shift the detector's calibration",
+  "failure_mode": "reward_hacking",
+  "constraint": "hold true placement success above 98 percent across a quarterly rotation of 200 novel SKUs without per-SKU reward recalibration or human labeling",
+  "domain": "software-ml-reinforcement-learning"
+ },
+ "evidence_ids": [
+  "doi:10.1109/icra48891.2023.10160560",
+  "doi:10.3390/s23031513",
+  "doi:10.1109/icsima50015.2021.9526304",
+  "doi:10.4028/p-dm0c7d",
+  "doi:10.1109/qpain69676.2026.11545619",
+  "doi:10.3390/s23073762",
+  "doi:10.14711/thesis-991012985997003412",
+  "doi:10.17760/d20412868",
+  "doi:10.26686/wgtn.17148752",
+  "doi:10.36227/techrxiv.174844054.43253547/v1",
+  "arxiv:2608.17347",
+  "doi:10.48550/arxiv.0901.0512",
+  "doi:10.1109/mcs.2022.3216653"
+ ],
+ "evidence": [
+  {
+   "id": "doi:10.1109/icra48891.2023.10160560",
+   "source_type": "scientific_paper",
+   "source": "semantic_scholar",
+   "source_id": "semantic_scholar:s2:4269826f5844392e70fe831aad6554bc95a484ce",
+   "source_uri": "https://doi.org/10.1109/icra48891.2023.10160560",
+   "title": "Immersive Demonstrations are the Key to Imitation Learning",
+   "abstract": "Achieving successful robotic manipulation is an essential step towards robots being widely used in industry and home settings. Recently, many learning-based methods have been proposed to tackle this challenge, with imitation learning showing great promise. However, imperfect demonstrations and a lack of feedback from teleoperation systems may lead to poor or even unsafe results. In this work we explore the effect of demonstrator force feedback on imitation learning, using a feedback glove and a robot arm to render fingertip-level and palm-level forces, respectively. 10 participants recorded 5 demonstrations of a pick-and-place task with 3 grippers, under conditions with no force feedback, fingertip force feedback, and fingertip and palm force feedback. Results show that force feedback significantly reduces demonstrator fingertip and palm forces, leads to a lower variation in demonstrator forces, and recorded trajectories that are quicker to execute. Using behavioral cloning, we find that agents trained to imitate these trajectories mirror these benefits, even though agents have no force data shown to them during training. We conclude that immersive demonstrations, achieved with force feedback, may be the key to unlocking safer, quicker-to-execute dexterous manipulation policies.",
+   "doi": "10.1109/icra48891.2023.10160560",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2023",
+   "retrieval_timestamp": "2026-09-10T16:44:20.297127+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "6cdab6e4f6b8a23f0807513de6efcdd8d1cb52b7f4a8fcd07f610417baffc183",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "semantic_scholar",
+    "indexing_sources": [
+     "semantic_scholar"
+    ],
+    "record_ids_by_source": {
+     "semantic_scholar": "s2:4269826f5844392e70fe831aad6554bc95a484ce"
+    },
+    "queries_by_source": {
+     "semantic_scholar": "DOI:10.3390/s23073762"
+    },
+    "query_variant_derivation": null,
+    "source_family": "scholarly_graph_s2",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "52da95286137bde1b170cb4b45c93a27d2e1c467b10c10a8384a5308dbe432b2",
+    "publication_status_evidence": [
+     "publication_types=['JournalArticle', 'Conference']"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "scholarly_graph_s2",
+   "canonical_id": "doi:10.1109/icra48891.2023.10160560",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "DOI:10.3390/s23073762",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [
+    "Kelin Li",
+    "Digby Chappell",
+    "Nicolás Rojas"
+   ],
+   "raw_record_hash": "52da95286137bde1b170cb4b45c93a27d2e1c467b10c10a8384a5308dbe432b2",
+   "limitations": [
+    "Reciprocal-expansion record (citation/reference/recommendation expansion): entered the pool through a REAL provider endpoint with derivation REFERENCE_EXPANSION"
+   ]
+  },
+  {
+   "id": "doi:10.3390/s23031513",
+   "source_type": "scientific_paper",
+   "source": "semantic_scholar",
+   "source_id": "semantic_scholar:s2:8ddef8eb2b9cbb4a3c92c8366e9ba01679109638",
+   "source_uri": "https://doi.org/10.3390/s23031513",
+   "title": "Prehensile and Non-Prehensile Robotic Pick-and-Place of Objects in Clutter Using Deep Reinforcement Learning",
+   "abstract": "In this study, we develop a framework for an intelligent and self-supervised industrial pick-and-place operation for cluttered environments. Our target is to have the agent learn to perform prehensile and non-prehensile robotic manipulations to improve the efficiency and throughput of the pick-and-place task. To achieve this target, we specify the problem as a Markov decision process (MDP) and deploy a deep reinforcement learning (RL) temporal difference model-free algorithm known as the deep Q-network (DQN). We consider three actions in our MDP; one is ‘grasping’ from the prehensile manipulation category and the other two are ‘left-slide’ and ‘right-slide’ from the non-prehensile manipulation category. Our DQN is composed of three fully convolutional networks (FCN) based on the memory-efficient architecture of DenseNet-121 which are trained together without causing any bottleneck situations. Each FCN corresponds to each discrete action and outputs a pixel-wise map of affordances for the relevant action. Rewards are allocated after every forward pass and backpropagation is carried out for weight tuning in the corresponding FCN. In this manner, non-prehensile manipulations are learnt which can, in turn, lead to possible successful prehensile manipulations in the near future and vice versa, thus increasing the efficiency and throughput of the pick-and-place task. The Results section shows performance comparisons of our approach to a baseline deep learning approach and a ResNet architecture-based approach, along with very promising test results at varying clutter densities across a range of complex scenario test cases.",
+   "doi": "10.3390/s23031513",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2023",
+   "retrieval_timestamp": "2026-09-10T16:44:20.297193+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "693e5514d38c6231a067ec809ee2876e6d888c56eb7a1ae91f18432de0ced843",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "semantic_scholar",
+    "indexing_sources": [
+     "semantic_scholar"
+    ],
+    "record_ids_by_source": {
+     "semantic_scholar": "s2:8ddef8eb2b9cbb4a3c92c8366e9ba01679109638"
+    },
+    "queries_by_source": {
+     "semantic_scholar": "DOI:10.3390/s23073762"
+    },
+    "query_variant_derivation": null,
+    "source_family": "scholarly_graph_s2",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "52da95286137bde1b170cb4b45c93a27d2e1c467b10c10a8384a5308dbe432b2",
+    "publication_status_evidence": [
+     "publication_types=['JournalArticle']"
+    ],
+    "oa_resolution": {
+     "provider": "unpaywall",
+     "resolved_at": "2026-09-10T16:44:18.325149+00:00",
+     "is_oa": true,
+     "oa_status": "gold",
+     "host_type": "publisher",
+     "repository_institution": null
+    }
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "scholarly_graph_s2",
+   "canonical_id": "doi:10.3390/s23031513",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "DOI:10.3390/s23073762",
+   "source_rank": 1,
+   "fulltext_url": "https://www.mdpi.com/1424-8220/23/3/1513/pdf?version=1675316383",
+   "authors": [
+    "M. Imtiaz",
+    "Yuansong Qiao",
+    "Brian Lee"
+   ],
+   "raw_record_hash": "52da95286137bde1b170cb4b45c93a27d2e1c467b10c10a8384a5308dbe432b2",
+   "limitations": [
+    "Reciprocal-expansion record (citation/reference/recommendation expansion): entered the pool through a REAL provider endpoint with derivation REFERENCE_EXPANSION"
+   ]
+  },
+  {
+   "id": "doi:10.1109/icsima50015.2021.9526304",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.1109/icsima50015.2021.9526304",
+   "source_uri": "https://doi.org/10.1109/icsima50015.2021.9526304",
+   "title": "Implementation of Pick &amp; Place Robotic Arm for Warehouse Products Management",
+   "abstract": "",
+   "doi": "10.1109/icsima50015.2021.9526304",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2021",
+   "retrieval_timestamp": "2026-09-10T16:44:20.297220+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "317546df1b4353312b47ad1fefb9711f4cd2edd533c8aafcb195920c05584ee4",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.1109/icsima50015.2021.9526304"
+    },
+    "queries_by_source": {
+     "crossref": "PPO-trained robotic pick-and-place policy running on a warehouse manipulation cell reward hacking"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=proceedings-article"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "CONFERENCE",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.1109/icsima50015.2021.9526304",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "PPO-trained robotic pick-and-place policy running on a warehouse manipulation cell reward hacking",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  {
+   "id": "doi:10.4028/p-dm0c7d",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.4028/p-dm0c7d",
+   "source_uri": "https://doi.org/10.4028/p-dm0c7d",
+   "title": "Implementation of an Adaptive Robotic System for Warehouse Pick and Place Operations",
+   "abstract": "",
+   "doi": "10.4028/p-dm0c7d",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2025",
+   "retrieval_timestamp": "2026-09-10T16:44:20.297237+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "06f0eb5f69dcc5286f0fd461ab0c2ff2b7a4893879318ed3acf92f82c11521bd",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.4028/p-dm0c7d"
+    },
+    "queries_by_source": {
+     "crossref": "PPO-trained robotic pick-and-place policy running on a warehouse manipulation cell reward hacking"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=journal-article"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.4028/p-dm0c7d",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "PPO-trained robotic pick-and-place policy running on a warehouse manipulation cell reward hacking",
+   "source_rank": 3,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  {
+   "id": "doi:10.1109/qpain69676.2026.11545619",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.1109/qpain69676.2026.11545619",
+   "source_uri": "https://doi.org/10.1109/qpain69676.2026.11545619",
+   "title": "Efficient Parallel PPO-Based Reinforcement Learning for Generalized Pick and Place with Dense Reward Shaping",
+   "abstract": "",
+   "doi": "10.1109/qpain69676.2026.11545619",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2026",
+   "retrieval_timestamp": "2026-09-10T16:44:20.297252+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "55acb77d515e4f82945ae6587fe69fdce750c699a310dd32227f444ff05963e8",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.1109/qpain69676.2026.11545619"
+    },
+    "queries_by_source": {
+     "crossref": "PPO-trained robotic pick-and-place policy running on a warehouse manipulation cell reward hacking"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=proceedings-article"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "CONFERENCE",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.1109/qpain69676.2026.11545619",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "PPO-trained robotic pick-and-place policy running on a warehouse manipulation cell reward hacking",
+   "source_rank": 4,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  {
+   "id": "doi:10.3390/s23073762",
+   "source_type": "scientific_paper",
+   "source": "europepmc",
+   "source_id": "europepmc:europepmc:37050822",
+   "source_uri": "https://doi.org/10.3390/s23073762",
+   "title": "A Survey on Deep Reinforcement Learning Algorithms for Robotic Manipulation.",
+   "abstract": "Robotic manipulation challenges, such as grasping and object manipulation, have been tackled successfully with the help of deep reinforcement learning systems. We give an overview of the recent advances in deep reinforcement learning algorithms for robotic manipulation tasks in this review. We begin by outlining the fundamental ideas of reinforcement learning and the parts of a reinforcement learning system. The many deep reinforcement learning algorithms, such as value-based methods, policy-based methods, and actor-critic approaches, that have been suggested for robotic manipulation tasks are then covered. We also examine the numerous issues that have arisen when applying these algorithms to robotics tasks, as well as the various solutions that have been put forth to deal with these issues. Finally, we highlight several unsolved research issues and talk about possible future directions for the subject.",
+   "doi": "10.3390/s23073762",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2023-04-05",
+   "retrieval_timestamp": "2026-09-10T16:44:20.297265+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "8c67a95f9ef8f3be977101280f243deec5167c955f3318e29b3c5adc5c8b5e2f",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "europepmc",
+    "indexing_sources": [
+     "europepmc"
+    ],
+    "record_ids_by_source": {
+     "europepmc": "europepmc:37050822"
+    },
+    "queries_by_source": {
+     "europepmc": "ppo-trained robotic pick-and-place policy running on experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "biomedical_pubmed_line",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "biomedical_pubmed_line",
+   "canonical_id": "doi:10.3390/s23073762",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "ppo-trained robotic pick-and-place policy running on experimental comparison",
+   "source_rank": 5,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstract-level evidence: full text may contain methods and constraints not present in the abstract",
+    "Publication existence is not clinical evidence of safety or effectiveness",
+    "Citation counts are bibliometric signals, not validity measures"
+   ]
+  },
+  {
+   "id": "doi:10.14711/thesis-991012985997003412",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.14711/thesis-991012985997003412",
+   "source_uri": "https://doi.org/10.14711/thesis-991012985997003412",
+   "title": "Autonomous robotic pick-and-place manipulation : an application to the handling of go stones",
+   "abstract": "",
+   "doi": "10.14711/thesis-991012985997003412",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-10T16:44:20.297283+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "cc9938e5725fe8ed06e2e261022d576e2b305086a63179219945f2199abc2d93",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.14711/thesis-991012985997003412"
+    },
+    "queries_by_source": {
+     "crossref": "PPO-trained robotic pick-and-place policy running on a warehouse manipulation cell reward hacking"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.14711/thesis-991012985997003412",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "PPO-trained robotic pick-and-place policy running on a warehouse manipulation cell reward hacking",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  {
+   "id": "doi:10.17760/d20412868",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.17760/d20412868",
+   "source_uri": "https://doi.org/10.17760/d20412868",
+   "title": "Robotic pick-and-place of partially visible and novel objects",
+   "abstract": "",
+   "doi": "10.17760/d20412868",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-10T16:44:20.297296+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "0fb73865983b0469d846aa20182c147bbc4e7587acc846f077fdaa6761b37cbf",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.17760/d20412868"
+    },
+    "queries_by_source": {
+     "crossref": "PPO-trained robotic pick-and-place policy running on a warehouse manipulation cell reward hacking"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.17760/d20412868",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "PPO-trained robotic pick-and-place policy running on a warehouse manipulation cell reward hacking",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  {
+   "id": "doi:10.26686/wgtn.17148752",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.26686/wgtn.17148752",
+   "source_uri": "https://doi.org/10.26686/wgtn.17148752",
+   "title": "Robotic Feedback Loops: Implementing two-way communication in architecturally focused robotic pick and place operations",
+   "abstract": "",
+   "doi": "10.26686/wgtn.17148752",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-10T16:44:20.297308+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "65e0424450ca7a927f2016df89f829932c0531d9df11607e968e53236bc8df90",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.26686/wgtn.17148752"
+    },
+    "queries_by_source": {
+     "crossref": "PPO-trained robotic pick-and-place policy running on a warehouse manipulation cell reward hacking"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.26686/wgtn.17148752",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "PPO-trained robotic pick-and-place policy running on a warehouse manipulation cell reward hacking",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  {
+   "id": "doi:10.36227/techrxiv.174844054.43253547/v1",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.36227/techrxiv.174844054.43253547/v1",
+   "source_uri": "https://doi.org/10.36227/techrxiv.174844054.43253547/v1",
+   "title": "PPO-BR: Dual-Signal Entropy-Reward Adaptation for Trust Region Policy Optimization",
+   "abstract": "",
+   "doi": "10.36227/techrxiv.174844054.43253547/v1",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2025",
+   "retrieval_timestamp": "2026-09-10T16:44:20.297320+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "6f945348602078d9255265c5074838154ff571c56ae1d2b09f543d1b8f63c0f5",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.36227/techrxiv.174844054.43253547/v1"
+    },
+    "queries_by_source": {
+     "crossref": "PPO-trained robotic pick-and-place policy running on a warehouse manipulation cell reward hacking"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=posted-content"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.36227/techrxiv.174844054.43253547/v1",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "PPO-trained robotic pick-and-place policy running on a warehouse manipulation cell reward hacking",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  {
+   "id": "arxiv:2608.17347",
+   "source_type": "scientific_paper",
+   "source": "semantic_scholar",
+   "source_id": "semantic_scholar:s2:e9eb174b16990545375e78a3e03f50feeb30ca54",
+   "source_uri": "",
+   "title": "Repetition as Reinforcement: Enhancing Sample Efficiency via Instant Episode Repetition in Reinforcement Learning",
+   "abstract": "Repetition is a fundamental mechanism in human learning, where revisiting successful experiences strengthens memory, consolidates skills, and improves future performance. Motivated by this biological principle, we introduce Instant Episode Repetition (IER), a simple and novel mechanism that improves sample efficiency by immediately repeating action sequences from successful episodes during environment interaction. Unlike conventional approaches such as Experience Replay and Self-Imitation Learning (SIL), which passively reuse past experience during training updates, IER directly influences the data collection process. Upon identifying a high-reward episode, the agent repeats its action sequence for a fixed number of subsequent episodes, reinforcing valuable behaviors through renewed interaction with the environment. We integrate IER into state-of-the-art SAC and TD3 algorithms and evaluate its effectiveness on continuous-control benchmarks, including MuJoCo, the DeepMind Control Suite, and a real-world dynamic object translation task with a robotic manipulator. Experimental results demonstrate that this simple mechanism improves learning performance over standard and self-imitation-based baselines.",
+   "doi": null,
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2026",
+   "retrieval_timestamp": "2026-09-10T16:44:20.297335+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "98a5b3160d8514eee47d6db2cd01c2266cd20f050281457b2b9267a89a8a7915",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "semantic_scholar",
+    "indexing_sources": [
+     "semantic_scholar"
+    ],
+    "record_ids_by_source": {
+     "semantic_scholar": "s2:e9eb174b16990545375e78a3e03f50feeb30ca54"
+    },
+    "queries_by_source": {
+     "semantic_scholar": "DOI:10.3390/s23073762"
+    },
+    "query_variant_derivation": null,
+    "source_family": "scholarly_graph_s2",
+    "identity_basis": "ARXIV_ID",
+    "raw_payload_sha256": "13b545b0852980dc99f141513a6febd1c2da9d6d0e546b215b7cb6c354db2e59",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "scholarly_graph_s2",
+   "canonical_id": "arxiv:2608.17347",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "DOI:10.3390/s23073762",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [
+    "Hoda Yamani",
+    "Yuning Xing",
+    "Koen van Rijnsoever",
+    "Bruce A. MacDonald",
+    "Henry Williams"
+   ],
+   "raw_record_hash": "13b545b0852980dc99f141513a6febd1c2da9d6d0e546b215b7cb6c354db2e59",
+   "limitations": [
+    "Reciprocal-expansion record (citation/reference/recommendation expansion): entered the pool through a REAL provider endpoint with derivation CITATION_EXPANSION"
+   ]
+  },
+  {
+   "id": "doi:10.48550/arxiv.0901.0512",
+   "source_type": "scientific_paper",
+   "source": "arxiv",
+   "source_id": "arxiv:arxiv:0901.0512v4",
+   "source_uri": "https://doi.org/10.48550/arxiv.0901.0512",
+   "title": "Expected Performance of the ATLAS Experiment - Detector, Trigger and Physics",
+   "abstract": "A detailed study is presented of the expected performance of the ATLAS detector. The reconstruction of tracks, leptons, photons, missing energy and jets is investigated, together with the performance of b-tagging and the trigger. The physics potential for a variety of interesting physics processes, within the Standard Model and beyond, is examined. The study comprises a series of notes based on simulations of the detector and physics processes, with particular emphasis given to the data expected from the first years of operation of the LHC at CERN.",
+   "doi": "10.48550/arxiv.0901.0512",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-10T16:44:20.297347+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "31003d25bdd33172ff1245ccfccedc4ed173af7ba5d31e722d7dae8273822cc6",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "arxiv",
+    "indexing_sources": [
+     "arxiv"
+    ],
+    "record_ids_by_source": {
+     "arxiv": "arxiv:0901.0512v4"
+    },
+    "queries_by_source": {
+     "arxiv": "PPO-trained robotic pick-and-place policy running on a warehouse manipulation cell reward hacking"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "preprint_origin",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "preprint_origin",
+   "canonical_id": "doi:10.48550/arxiv.0901.0512",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "PPO-trained robotic pick-and-place policy running on a warehouse manipulation cell reward hacking",
+   "source_rank": 2,
+   "fulltext_url": "http://arxiv.org/abs/0901.0512v4",
+   "authors": [
+    " The ATLAS Collaboration",
+    "G. Aad",
+    "E. Abat",
+    "B. Abbott",
+    "J. Abdallah",
+    "A. A. Abdelalim",
+    "A. Abdesselam",
+    "O. Abdinov",
+    "B. Abi",
+    "M. Abolins",
+    "H. Abramowicz",
+    "B. S. Acharya",
+    "D. L. Adams",
+    "T. N. Addy",
+    "C. Adorisio",
+    "P. Adragna",
+    "T. Adye",
+    "J. A. Aguilar-Saavedra",
+    "M. Aharrouche",
+    "S. P. Ahlen"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
+    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed — absence of an arXiv record is not absence of the science"
+   ]
+  },
+  {
+   "id": "doi:10.1109/mcs.2022.3216653",
+   "source_type": "scientific_paper",
+   "source": "semantic_scholar",
+   "source_id": "semantic_scholar:s2:34d214480aad7069d9d11965bdb9434694d70597",
+   "source_uri": "https://doi.org/10.1109/mcs.2022.3216653",
+   "title": "Shared Control of Robot Manipulators With Obstacle Avoidance: A Deep Reinforcement Learning Approach",
+   "abstract": "The word <italic>teleoperation</italic> (which, in general, means “working at a distance”) is typically used in robotics when a human operator commands a remote agent. A teleoperated robot is often employed to substitute human beings in conditions where the latter cannot operate. A possible reason is the need to be in contact with dangerous substances, and indeed, the first robot teleoperation system was designed in the 1940s for handling nuclear and chemical materials <xref ref-type=\"bibr\" rid=\"ref1\">[1]</xref>. Other reasons can be the difficulty in bringing people on missions to explore deep waters or space <xref ref-type=\"bibr\" rid=\"ref2\">[2]</xref>, <xref ref-type=\"bibr\" rid=\"ref3\">[3]</xref> as well as the need to work with very high precision (for example) during a surgery <xref ref-type=\"bibr\" rid=\"ref4\">[4]</xref>, <xref ref-type=\"bibr\" rid=\"ref5\">[5]</xref>. In certain cases, the reference provided by the human operator is not directly passed to the robot but is instead used to generate an adaptive motion. This approach is known as <italic>semiautonomous teleoperation</italic> or <italic>shared control</italic> <xref ref-type=\"bibr\" rid=\"ref6\">[6]</xref>, and its aim is to reduce the workload of the human operator during the performance of a difficult task that involves controlling a robotic system.",
+   "doi": "10.1109/mcs.2022.3216653",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2023",
+   "retrieval_timestamp": "2026-09-10T16:44:20.297363+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "94f09b511ec45ea72baea4556247e64d420682c0cf693bd710a18941ec0cb466",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "semantic_scholar",
+    "indexing_sources": [
+     "semantic_scholar"
+    ],
+    "record_ids_by_source": {
+     "semantic_scholar": "s2:34d214480aad7069d9d11965bdb9434694d70597"
+    },
+    "queries_by_source": {
+     "semantic_scholar": "DOI:10.3390/s23073762"
+    },
+    "query_variant_derivation": null,
+    "source_family": "scholarly_graph_s2",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "52da95286137bde1b170cb4b45c93a27d2e1c467b10c10a8384a5308dbe432b2",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "scholarly_graph_s2",
+   "canonical_id": "doi:10.1109/mcs.2022.3216653",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "DOI:10.3390/s23073762",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [
+    "Matteo Rubagotti",
+    "B. Sangiovanni",
+    "Aigerim Nurbayeva",
+    "G. P. Incremona",
+    "A. Ferrara",
+    "A. Shintemirov"
+   ],
+   "raw_record_hash": "52da95286137bde1b170cb4b45c93a27d2e1c467b10c10a8384a5308dbe432b2",
+   "limitations": [
+    "Reciprocal-expansion record (citation/reference/recommendation expansion): entered the pool through a REAL provider endpoint with derivation REFERENCE_EXPANSION"
+   ]
+  }
+ ],
+ "mechanism_ids": [],
+ "mechanism_map": {},
+ "premise_gate": {},
+ "evidence_classification": {},
+ "mechanism_space": {},
+ "prior_art_ids": [],
+ "prior_art": {},
+ "collision_results": {},
+ "physics": {},
+ "attack_results": {},
+ "contradictions": {},
+ "killer_experiment": {},
+ "adjudication": {},
+ "multi_source": {},
+ "cemetery_check": {},
+ "epistemic_state": {},
+ "next_best_action": {},
+ "ranking": {},
+ "provenance": {
+  "retrieval_fabric": {
+   "version": "V2",
+   "primary_query": "PPO-trained robotic pick-and-place policy running on a warehouse manipulation cell reward hacking",
+   "query_variant_count": 5,
+   "sources_attempted": [
+    "arxiv",
+    "core",
+    "crossref",
+    "datacite",
+    "doaj",
+    "europepmc",
+    "google_patents",
+    "openaire",
+    "openalex",
+    "semantic_scholar",
+    "unpaywall"
+   ],
+   "sources_succeeded": [
+    "arxiv",
+    "core",
+    "crossref",
+    "datacite",
+    "doaj",
+    "europepmc",
+    "openaire",
+    "semantic_scholar",
+    "unpaywall"
+   ],
+   "sources_failed": [
+    "google_patents"
+   ],
+   "sources_rate_limited": [
+    "openalex",
+    "semantic_scholar"
+   ],
+   "unique_source_families": [
+    "biomedical_pubmed_line",
+    "doi_registrant_crossref",
+    "preprint_origin",
+    "scholarly_graph_s2"
+   ],
+   "independent_source_families": 4,
+   "source_independence_score": 1.0,
+   "retrieval_blind_spots": [
+    "PATENT_BLIND_SPOT: zero patent records — patent prior-art coverage is a discovery-system defect when the mechanism domain is patent-dense",
+    "LOW_FAMILY_COVERAGE: only 4 source families contributed records (directive acceptance bar: >= 6 materially different open/free families queried successfully)"
+   ],
+   "canonical_record_count": 35
+  },
+  "evidence_freeze": {
+   "run_id": "r401-bench-x01-rl-reward-hacking",
+   "problem_id": "bench-x01-rl-reward-hacking",
+   "frozen_at": "2026-09-10T16:44:20+00:00Z",
+   "evidence_count": 13,
+   "custody_records": [
+    {
+     "record_id": "doi:10.1109/icra48891.2023.10160560",
+     "source": "semantic_scholar",
+     "source_identity_verified": true,
+     "query": "bench-x01-rl-reward-hacking",
+     "retrieval_timestamp": "2026-09-10T16:44:20.315390+00:00",
+     "raw_content": "Achieving successful robotic manipulation is an essential step towards robots being widely used in industry and home settings. Recently, many learning-based methods have been proposed to tackle this challenge, with imitation learning showing great promise. However, imperfect demonstrations and a lack of feedback from teleoperation systems may lead to poor or even unsafe results. In this work we explore the effect of demonstrator force feedback on imitation learning, using a feedback glove and a robot arm to render fingertip-level and palm-level forces, respectively. 10 participants recorded 5 demonstrations of a pick-and-place task with 3 grippers, under conditions with no force feedback, fingertip force feedback, and fingertip and palm force feedback. Results show that force feedback significantly reduces demonstrator fingertip and palm forces, leads to a lower variation in demonstrator forces, and recorded trajectories that are quicker to execute. Using behavioral cloning, we find that agents trained to imitate these trajectories mirror these benefits, even though agents have no force data shown to them during training. We conclude that immersive demonstrations, achieved with force feedback, may be the key to unlocking safer, quicker-to-execute dexterous manipulation policies.",
+     "content_hash": "55f1d1401215f334f3839d6c0fa3ae81914700853160355c6d20613db57f5cd2",
+     "exact_span": "Achieving successful robotic manipulation is an essential step towards robots being widely used in industry and home settings. Recently, many learning-based methods have been proposed to tackle this challenge, with imitation learning showing great promise. However, imperfect demonstrations and a lack of feedback from teleoperation systems may lead to poor or even unsafe results. In this work we explore the effect of demonstrator force feedback on imitation learning, using a feedback glove and a ",
+     "span_hash": "f4b54e66cd58ad47b7ad6e5187556b116b003124990763f3299e72dfb79df95a",
+     "evidence_class": "SCIENTIFIC_ABSTRACT",
+     "proposition_binding": "candidate_mechanism_input",
+     "locator": "https://doi.org/10.1109/icra48891.2023.10160560",
+     "epistemic_strength": "VERIFIED"
+    },
+    {
+     "record_id": "doi:10.3390/s23031513",
+     "source": "semantic_scholar",
+     "source_identity_verified": true,
+     "query": "bench-x01-rl-reward-hacking",
+     "retrieval_timestamp": "2026-09-10T16:44:20.315419+00:00",
+     "raw_content": "In this study, we develop a framework for an intelligent and self-supervised industrial pick-and-place operation for cluttered environments. Our target is to have the agent learn to perform prehensile and non-prehensile robotic manipulations to improve the efficiency and throughput of the pick-and-place task. To achieve this target, we specify the problem as a Markov decision process (MDP) and deploy a deep reinforcement learning (RL) temporal difference model-free algorithm known as the deep Q-network (DQN). We consider three actions in our MDP; one is ‘grasping’ from the prehensile manipulation category and the other two are ‘left-slide’ and ‘right-slide’ from the non-prehensile manipulation category. Our DQN is composed of three fully convolutional networks (FCN) based on the memory-efficient architecture of DenseNet-121 which are trained together without causing any bottleneck situations. Each FCN corresponds to each discrete action and outputs a pixel-wise map of affordances for the relevant action. Rewards are allocated after every forward pass and backpropagation is carried out for weight tuning in the corresponding FCN. In this manner, non-prehensile manipulations are learnt which can, in turn, lead to possible successful prehensile manipulations in the near future and vice versa, thus increasing the efficiency and throughput of the pick-and-place task. The Results section shows performance comparisons of our approach to a baseline deep learning approach and a ResNet architecture-based approach, along with very promising test results at varying clutter densities across a range of complex scenario test cases.",
+     "content_hash": "05a4c91c7b4a47937e36de8161a0e4ac450ea62031d69616255a9bd9fa4dd160",
+     "exact_span": "In this study, we develop a framework for an intelligent and self-supervised industrial pick-and-place operation for cluttered environments. Our target is to have the agent learn to perform prehensile and non-prehensile robotic manipulations to improve the efficiency and throughput of the pick-and-place task. To achieve this target, we specify the problem as a Markov decision process (MDP) and deploy a deep reinforcement learning (RL) temporal difference model-free algorithm known as the deep Q-",
+     "span_hash": "bf0bfb2a239078e1b2047e60ad280d321c8a6f4cf8d1f23be7fb9b249f3664b1",
+     "evidence_class": "SCIENTIFIC_ABSTRACT",
+     "proposition_binding": "candidate_mechanism_input",
+     "locator": "https://doi.org/10.3390/s23031513",
+     "epistemic_strength": "VERIFIED"
+    },
+    {
+     "record_id": "doi:10.3390/s23073762",
+     "source": "europepmc",
+     "source_identity_verified": true,
+     "query": "bench-x01-rl-reward-hacking",
+     "retrieval_timestamp": "2026-09-10T16:44:20.315434+00:00",
+     "raw_content": "Robotic manipulation challenges, such as grasping and object manipulation, have been tackled successfully with the help of deep reinforcement learning systems. We give an overview of the recent advances in deep reinforcement learning algorithms for robotic manipulation tasks in this review. We begin by outlining the fundamental ideas of reinforcement learning and the parts of a reinforcement learning system. The many deep reinforcement learning algorithms, such as value-based methods, policy-based methods, and actor-critic approaches, that have been suggested for robotic manipulation tasks are then covered. We also examine the numerous issues that have arisen when applying these algorithms to robotics tasks, as well as the various solutions that have been put forth to deal with these issues. Finally, we highlight several unsolved research issues and talk about possible future directions for the subject.",
+     "content_hash": "b48852db0f31b33e5c91eb66cd8c715589486f3a35bd8bc15d16b2866e7f3a15",
+     "exact_span": "Robotic manipulation challenges, such as grasping and object manipulation, have been tackled successfully with the help of deep reinforcement learning systems. We give an overview of the recent advances in deep reinforcement learning algorithms for robotic manipulation tasks in this review. We begin by outlining the fundamental ideas of reinforcement learning and the parts of a reinforcement learning system. The many deep reinforcement learning algorithms, such as value-based methods, policy-bas",
+     "span_hash": "cdf9971cde2556b319c8d88eb755e96deeca92a1bb6177be999e0934aad400c4",
+     "evidence_class": "SCIENTIFIC_ABSTRACT",
+     "proposition_binding": "candidate_mechanism_input",
+     "locator": "https://doi.org/10.3390/s23073762",
+     "epistemic_strength": "VERIFIED"
+    },
+    {
+     "record_id": "arxiv:2608.17347",
+     "source": "semantic_scholar",
+     "source_identity_verified": true,
+     "query": "bench-x01-rl-reward-hacking",
+     "retrieval_timestamp": "2026-09-10T16:44:20.315447+00:00",
+     "raw_content": "Repetition is a fundamental mechanism in human learning, where revisiting successful experiences strengthens memory, consolidates skills, and improves future performance. Motivated by this biological principle, we introduce Instant Episode Repetition (IER), a simple and novel mechanism that improves sample efficiency by immediately repeating action sequences from successful episodes during environment interaction. Unlike conventional approaches such as Experience Replay and Self-Imitation Learning (SIL), which passively reuse past experience during training updates, IER directly influences the data collection process. Upon identifying a high-reward episode, the agent repeats its action sequence for a fixed number of subsequent episodes, reinforcing valuable behaviors through renewed interaction with the environment. We integrate IER into state-of-the-art SAC and TD3 algorithms and evaluate its effectiveness on continuous-control benchmarks, including MuJoCo, the DeepMind Control Suite, and a real-world dynamic object translation task with a robotic manipulator. Experimental results demonstrate that this simple mechanism improves learning performance over standard and self-imitation-based baselines.",
+     "content_hash": "77c70b7fca38a841f74bea622ec1762ae9c6242adcb32f3f3556cc058d04fa47",
+     "exact_span": "Repetition is a fundamental mechanism in human learning, where revisiting successful experiences strengthens memory, consolidates skills, and improves future performance. Motivated by this biological principle, we introduce Instant Episode Repetition (IER), a simple and novel mechanism that improves sample efficiency by immediately repeating action sequences from successful episodes during environment interaction. Unlike conventional approaches such as Experience Replay and Self-Imitation Learni",
+     "span_hash": "d8ad1c122392878736dc2d34666194d292d149180ccf9de7204a9c0cc3a8a7b0",
+     "evidence_class": "SCIENTIFIC_ABSTRACT",
+     "proposition_binding": "candidate_mechanism_input",
+     "locator": "",
+     "epistemic_strength": "VERIFIED"
+    },
+    {
+     "record_id": "doi:10.48550/arxiv.0901.0512",
+     "source": "arxiv",
+     "source_identity_verified": true,
+     "query": "bench-x01-rl-reward-hacking",
+     "retrieval_timestamp": "2026-09-10T16:44:20.315455+00:00",
+     "raw_content": "A detailed study is presented of the expected performance of the ATLAS detector. The reconstruction of tracks, leptons, photons, missing energy and jets is investigated, together with the performance of b-tagging and the trigger. The physics potential for a variety of interesting physics processes, within the Standard Model and beyond, is examined. The study comprises a series of notes based on simulations of the detector and physics processes, with particular emphasis given to the data expected from the first years of operation of the LHC at CERN.",
+     "content_hash": "3b3c9773b3132390e12dff62211f163d2e5d5359ae366e81c4858829f165e268",
+     "exact_span": "A detailed study is presented of the expected performance of the ATLAS detector. The reconstruction of tracks, leptons, photons, missing energy and jets is investigated, together with the performance of b-tagging and the trigger. The physics potential for a variety of interesting physics processes, within the Standard Model and beyond, is examined. The study comprises a series of notes based on simulations of the detector and physics processes, with particular emphasis given to the data expected",
+     "span_hash": "c0caec59aae094a0b63911d4b8a95d219a4207377bc5e37d608fc780890583c5",
+     "evidence_class": "SCIENTIFIC_ABSTRACT",
+     "proposition_binding": "candidate_mechanism_input",
+     "locator": "https://doi.org/10.48550/arxiv.0901.0512",
+     "epistemic_strength": "VERIFIED"
+    },
+    {
+     "record_id": "doi:10.1109/mcs.2022.3216653",
+     "source": "semantic_scholar",
+     "source_identity_verified": true,
+     "query": "bench-x01-rl-reward-hacking",
+     "retrieval_timestamp": "2026-09-10T16:44:20.315468+00:00",
+     "raw_content": "The word <italic>teleoperation</italic> (which, in general, means “working at a distance”) is typically used in robotics when a human operator commands a remote agent. A teleoperated robot is often employed to substitute human beings in conditions where the latter cannot operate. A possible reason is the need to be in contact with dangerous substances, and indeed, the first robot teleoperation system was designed in the 1940s for handling nuclear and chemical materials <xref ref-type=\"bibr\" rid=\"ref1\">[1]</xref>. Other reasons can be the difficulty in bringing people on missions to explore deep waters or space <xref ref-type=\"bibr\" rid=\"ref2\">[2]</xref>, <xref ref-type=\"bibr\" rid=\"ref3\">[3]</xref> as well as the need to work with very high precision (for example) during a surgery <xref ref-type=\"bibr\" rid=\"ref4\">[4]</xref>, <xref ref-type=\"bibr\" rid=\"ref5\">[5]</xref>. In certain cases, the reference provided by the human operator is not directly passed to the robot but is instead used to generate an adaptive motion. This approach is known as <italic>semiautonomous teleoperation</italic> or <italic>shared control</italic> <xref ref-type=\"bibr\" rid=\"ref6\">[6]</xref>, and its aim is to reduce the workload of the human operator during the performance of a difficult task that involves controlling a robotic system.",
+     "content_hash": "8036768728c99f14f7cc845f180ec5727d671c7ec91403af48452bf1d25f172a",
+     "exact_span": "The word <italic>teleoperation</italic> (which, in general, means “working at a distance”) is typically used in robotics when a human operator commands a remote agent. A teleoperated robot is often employed to substitute human beings in conditions where the latter cannot operate. A possible reason is the need to be in contact with dangerous substances, and indeed, the first robot teleoperation system was designed in the 1940s for handling nuclear and chemical materials <xref ref-type=\"bibr\" rid=",
+     "span_hash": "2254897fcec05ed25eb0779750974d6b3697ce554926cef5cc931e9a3e5504fc",
+     "evidence_class": "SCIENTIFIC_ABSTRACT",
+     "proposition_binding": "candidate_mechanism_input",
+     "locator": "https://doi.org/10.1109/mcs.2022.3216653",
+     "epistemic_strength": "VERIFIED"
+    }
+   ],
+   "hash_verification_all_pass": true,
+   "snapshot_hash": "dac20e14ee82816641e55f8d6b5c0ba031f6f63eda223098158b57533b8f1262"
+  }
+ },
+ "stage_log": [
+  {
+   "stage": "RETRIEVE",
+   "capability_id": "A2_RETRIEVAL",
+   "module_path": "discovery_fabric/retrieval_fabric/pipeline.py",
+   "function": "retrieve_fabric(problem) [V2] / retrieve(problem) [V1]",
+   "started_at": "2026-09-10T16:42:08+00:00Z",
+   "before_envelope_hash": "7a6b0ec2d1ab25c354f80975903144b8875d99457dc34752726d64c9b0ba2ee1",
+   "status": "OK",
+   "finished_at": "2026-09-10T16:44:20+00:00Z",
+   "after_envelope_hash": "86a7523c83a8682eb7bb72fab0128a91f913638e2e17e1db941d9be089791f8b",
+   "candidate_delta": [
+    "evidence",
+    "evidence_ids",
+    "provenance"
+   ],
+   "delta_real": true,
+   "result_meta": {
+    "retrieved_count": 13,
+    "retrieval_fabric_version": "V2"
+   },
+   "entry": {
+    "entry_helper_version": "stage_entry/1.0.0",
+    "stage": "RETRIEVE",
+    "entry_status": "ALLOWED",
+    "prerequisite": "UPSTREAM_COMPLETE",
+    "prerequisite_evidence": {
+     "failed_stages": [],
+     "skipped_stages": []
+    }
+   }
+  },
+  {
+   "stage": "FREEZE",
+   "capability_id": "EVIDENCE_FREEZE",
+   "module_path": "orchestrator/evidence_custody.py",
+   "function": "promote_to_evidence(record, source, query, class, binding)",
+   "started_at": "2026-09-10T16:44:20+00:00Z",
+   "before_envelope_hash": "86a7523c83a8682eb7bb72fab0128a91f913638e2e17e1db941d9be089791f8b",
+   "status": "OK",
+   "finished_at": "2026-09-10T16:44:20+00:00Z",
+   "after_envelope_hash": "a0ef81250c5bfae33da86cc11cf584a6eaf6c7466c7baf622689a084806bef2e",
+   "candidate_delta": [
+    "provenance"
+   ],
+   "delta_real": true,
+   "result_meta": {
+    "custody_records": 6,
+    "hash_ok": true
+   },
+   "entry": {
+    "entry_helper_version": "stage_entry/1.0.0",
+    "stage": "FREEZE",
+    "entry_status": "ALLOWED",
+    "prerequisite": "UPSTREAM_COMPLETE",
+    "prerequisite_evidence": {
+     "failed_stages": [],
+     "skipped_stages": []
+    }
+   }
+  }
+ ]
+}

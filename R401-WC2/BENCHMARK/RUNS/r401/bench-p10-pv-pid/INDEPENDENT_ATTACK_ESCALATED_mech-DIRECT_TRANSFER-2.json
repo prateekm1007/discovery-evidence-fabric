@@ -1,0 +1,56 @@
+{
+ "stage": "INDEPENDENT_ATTACK",
+ "candidate_id": "cand:MS:DIRECT_TRANSFER:682a6d1734d2",
+ "escalation": {
+  "gate_version": "attacker_calibration/1.0.0",
+  "instrument": "independent_attack/1.0.0",
+  "calibration_state": "NOT_CALIBRATED",
+  "terminal_kill_admissible": false,
+  "measured": {
+   "coverage": 1.0,
+   "parse_completeness": 1.0,
+   "tpr_scoped": 1.0,
+   "fpr_known_good": 1.0,
+   "n_cases_attacked": 40
+  },
+  "sealed_thresholds": {
+   "note": "registered BEFORE measurement; never tuned to results (Art. XXVII)",
+   "coverage_min": 0.875,
+   "parse_completeness_min": 0.875,
+   "tpr_min": 0.75,
+   "fpr_max": 0.3,
+   "ensemble": "NONE (single-attacker calibration only; majority-vote ensembles are deferred by the R412 directive)"
+  },
+  "measurement_path": "R412/CALIBRATION/engine_independent_attack_measurement.json",
+  "measurement_sha256": "4e1718e7088564333b5e1ef9be47ca452133d051001628cd6eed91f44e60ef5f",
+  "reason": "measured FPR 1.0 > sealed bar 0.3 (Art. L: the attacker is measured non-selective; its KILL is inadmissible as a terminal verdict and is escalated with the objection preserved)",
+  "rule": "the instrument's KILL is measured non-selective (FPR above the sealed bar); the objection is preserved verbatim and ESCALATED for adjudication — the candidate is NOT killed by this attack alone (Art. L); the deterministic gates are unchanged",
+  "reviewer_provenance": "AI_REVIEW (Art. LXVII)"
+ },
+ "preserved_objections": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "basis": "The proposed mechanism incorrectly assumes sodium ions are the primary migratory species causing PID; research shows that boron-oxygen complexes are the dominant failure mechanism in P-type modules, not sodium migration, making this intervention fundamentally misaligned with the actual degradation pathway."
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "basis": "The solution claims effectiveness for P-type crystalline silicon modules only, but the boundary conditions specify \"high-voltage string\" without specifying module type; this ignores that N-type modules exhibit PID resistance through different mechanisms, creating an undefined solution space where the intervention may be unnecessary or harmful."
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "basis": "The candidate's own evidence includes [doi:10.3390/en12224230] which documents that PID occurs irregularly and is influenced by multiple environmental factors beyond just voltage bias, yet the proposed solution only addresses voltage, ignoring these critical variables that significantly impact PID manifestation."
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "basis": "The predicted effect of limiting annual power loss below 0.5% over 25 years is indistinguishable from the baseline performance of modern PID-resistant modules already on the market, which achieve similar degradation rates without any intervention, failing to demonstrate meaningful improvement."
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "basis": "The proposed \"low positive voltage\" application requires precise control to avoid accelerated degradation, but the solution provides no mechanism for real-time voltage adjustment based on module temperature, irradiance, or string position, which are critical variables that directly affect the required voltage threshold."
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "basis": "The testable prediction fails to define \"significantly reduced below 0.5% annually\" with statistical significance thresholds, confidence intervals, or control for confounding variables like soiling, hot spots, or microcracks that could mask or exaggerate the intervention's effect."
+  }
+ ]
+}

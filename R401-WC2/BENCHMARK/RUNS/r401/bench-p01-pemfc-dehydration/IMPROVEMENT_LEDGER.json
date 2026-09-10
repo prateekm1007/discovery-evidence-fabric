@@ -1,0 +1,1094 @@
+{
+ "ledger": "IMPROVEMENT_LEDGER (R378 TECHNICAL IMPROVEMENT ENGINE)",
+ "version": "1.0.0",
+ "loop": "CANDIDATE -> DIAGNOSE WEAKNESS -> IDENTIFY LIMITING FEATURE -> GENERATE CONTROLLED MUTATION -> RE-EVALUATE EVIDENCE/MECHANISM/PRIOR ART -> RE-SCORE -> KEEP OR KILL -> REPEAT",
+ "collision_mode": "REPLAY_CACHE",
+ "live_sources": null,
+ "evaluators_registered": [
+  {
+   "evaluator_id": "term_rule_v1",
+   "fidelity_tier": "TERM_RULE",
+   "evidence_rank": 3
+  }
+ ],
+ "q_instrument": "discovery_fabric/benchmark/candidate_quality.py (FROZEN, hash-pinned, imported read-only)",
+ "i_instrument": "discovery_fabric/benchmark/invention_quality.py (R377, imported read-only)",
+ "thresholds": {
+  "SPAN_DERIVATION_MIN": {
+   "value": 0.2,
+   "epistemic_class": "ENGINEERING",
+   "justification": "the engine's own span-derivation rule (candidate_diversity.span_derivation_check): ratio < 0.20 = SPAN_UNDERIVED. A MECHANISM_STRENGTHENING mutation must CLEAR this floor — the same rule that gates the grid, not a new one."
+  },
+  "EVIDENCE_SUPPORT_MIN": {
+   "value": 0.2,
+   "epistemic_class": "ENGINEERING",
+   "justification": "I1's underived flag fires below 0.20; an EVIDENCE_DERIVED_CONSTRAINT mutation must clear the same floor on evidence_support."
+  },
+  "DOMAIN_OVERLAP_MIN": {
+   "value": 1,
+   "epistemic_class": "ENGINEERING",
+   "justification": "REPLAY_CACHE re-adjudication is valid only while the mutated candidate stays in the domain the cached art was found FOR. Guard: >= 1 NON-generic technical term shared between the child's mechanism+intervention and the cached family corpus. ZERO overlap means the mutation abandoned the domain (measured attack: re-adjudicating a cement-curing intervention against battery art fabricates surviving differentiators — false novelty from stale art). The overlap count is RECORDED on every cache adjudication so thin-domain links are auditable. NOTE: entity-term retention vs the problem CANNOT catch this class — entity terms are problem-derived and unchanged by mutations (measured while writing the guard's tests); it is recorded for audit only."
+  },
+  "MAX_ITERATIONS_DEFAULT": {
+   "value": 2,
+   "epistemic_class": "ENGINEERING",
+   "justification": "the CEO minimum loop is DIAGNOSE -> IMPROVE -> RE-EVALUATE -> IMPROVE AGAIN; two iterations demonstrate repeatability at bounded cost"
+  },
+  "MAX_PROPOSALS_PER_ITERATION": {
+   "value": 3,
+   "epistemic_class": "ENGINEERING",
+   "justification": "bounded proposal budget: three attempts, then the honest no-defensible-mutation verdict"
+  }
+ },
+ "started_at": "2026-09-10T14:24:56+00:00Z",
+ "iterations": [
+  {
+   "iteration": 1,
+   "diagnosis": {
+    "limiting_features": [
+     {
+      "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "measured_value": 0.238,
+      "weakness_kind": "LOW_SCORE",
+      "why_weak": "measured 0.238 < STRONG floor 0.7",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT"
+     },
+     {
+      "dimension": "I5_EXPERIMENT_DISCRIMINATION",
+      "measured_value": 0.667,
+      "weakness_kind": "LOW_SCORE",
+      "why_weak": "measured 0.667 < STRONG floor 0.7",
+      "mutation_type": "EXPERIMENT_DISCRIMINATION"
+     }
+    ],
+    "evidence_gaps": [
+     {
+      "dimension": "I2_DIFFERENTIATOR_TECHNICAL_MEANING",
+      "state": "UNMEASURABLE_NO_SURVIVORS",
+      "what_is_missing": "no surviving differentiators recorded",
+      "consequence": "no mutation targets this dimension until the gap closes (Art. XXV)"
+     },
+     {
+      "dimension": "I3_RECOMBINATION_RISK",
+      "state": "UNMEASURABLE_NO_FAMILIES",
+      "what_is_missing": "no prior-art families adjudicated — residue vs found art is unmeasured; absence of found art is not novelty",
+      "consequence": "no mutation targets this dimension until the gap closes (Art. XXV)"
+     },
+     {
+      "dimension": "I4_NEW_TECHNICAL_RELATIONSHIP",
+      "state": "UNMEASURABLE_NO_FAMILY_TEXT",
+      "what_is_missing": "no adjudicated family text stored — pair novelty vs found art is unmeasured",
+      "consequence": "no mutation targets this dimension until the gap closes (Art. XXV)"
+     }
+    ],
+    "target": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT"
+    }
+   },
+   "proposals": [
+    {
+     "proposal_id": "prop:878b642832e6",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "cf32b736d50559f3bd11990a8cba4d9ba44bedaa52fa4521b67629e785606fbc",
+     "output_hash": "878b642832e6b6b44408072f0979c3cab3e242037eca445f8d61671ff2ae3904",
+     "fields": {
+      "MUTATION_TYPE": "EVIDENCE_DERIVED_CONSTRAINT",
+      "MECHANISM": "Increasing pressure improves cell performance, enhances stack consistency, and mitigates the impacts of temperature and humidity on membrane dehydration by reducing the proportion of water vapor partial pressure in the total gas pressure",
+      "INTERVENTION": "Increase the operating pressure of the fuel cell stack while maintaining current density at 1.5 A/cm² and stack temperature at 80°C, with pressure differential between anode and cathode maintained at 20 kPa",
+      "EXPECTED_EFFECT": "Reduced membrane dehydration, lower ionic resistance, minimized hot spot formation, and maintained power output without significantly increasing cathode humidification load due to reduced water vapor partial pressure proportion",
+      "FALSIFICATION_TEST": "Measure membrane hydration state and ionic resistance at 1.5 A/cm² current density and 80°C stack temperature across varying pressure differentials (0-40 kPa)",
+      "MECHANISM_SOURCE_SPAN": "Increasing humidity notably improves performance under low-pressure conditions, but its effect diminishes under high pressure due to the reduced proportion of water vapor partial pressure in the total gas pressure",
+      "SOURCE_EVIDENCE_ID": "doi:10.21203/rs.3.rs-7081268/v1",
+      "EXPERIMENT": "Compare membrane hydration state and ionic resistance at 1.5 A/cm² current density and 80°C stack temperature with 20 kPa anode-cathode pressure differential against the baseline of equal pressure at both electrodes",
+      "EXPERIMENT_BASELINE": "equal pressure at both electrodes",
+      "EXPERIMENT_EIG": "0.75",
+      "CONSTRAINT_DERIVED": "Maintain anode-cathode pressure differential of 20 kPa",
+      "MUTATION_REASON": "Repairs I1_MECHANISM_EVIDENCE_DERIVATION weakness by anchoring mechanism in evidence-derived technical vocabulary about reduced proportion of water vapor partial pressure in total gas pressure"
+     },
+     "validation": {
+      "valid": true,
+      "stage": "VALIDATION",
+      "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+      "checks": {
+       "mutation_type_matches_diagnosis": true,
+       "span_evidence_exists": "doi:10.21203/rs.3.rs-7081268/v1",
+       "span_verbatim_in_evidence": true,
+       "evidence_support": 0.781,
+       "evidence_support_cleared": 0.781,
+       "constraint_traceable_to_evidence": "Maintain anode-cathode pressure differential of 20 kPa"
+      },
+      "reasons": [],
+      "validated_at": "2026-09-10T14:25:05+00:00Z"
+     }
+    }
+   ],
+   "mutation_attempts": [
+    {
+     "mutation_applied": {
+      "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+      "mutation_id": "mut:2dccf948184c",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+      "diagnostic_trigger": {
+       "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+       "measured_before": 0.238,
+       "basis": "R378 evaluator-contract diagnosis (deterministic)"
+      },
+      "proposal_provenance": {
+       "proposal_id": "prop:878b642832e6",
+       "provider": "zai",
+       "model": "glm-4-plus",
+       "prompt_hash": "cf32b736d50559f3bd11990a8cba4d9ba44bedaa52fa4521b67629e785606fbc",
+       "output_hash": "878b642832e6b6b44408072f0979c3cab3e242037eca445f8d61671ff2ae3904",
+       "llm_is_untrusted_proposer": true
+      },
+      "validation": {
+       "valid": true,
+       "stage": "VALIDATION",
+       "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+       "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+       "checks": {
+        "mutation_type_matches_diagnosis": true,
+        "span_evidence_exists": "doi:10.21203/rs.3.rs-7081268/v1",
+        "span_verbatim_in_evidence": true,
+        "evidence_support": 0.781,
+        "evidence_support_cleared": 0.781,
+        "constraint_traceable_to_evidence": "Maintain anode-cathode pressure differential of 20 kPa"
+       },
+       "reasons": [],
+       "validated_at": "2026-09-10T14:25:05+00:00Z"
+      },
+      "fields_changed": {
+       "mechanism": {
+        "before": "Increasing pressure improves cell performance, enhances stack consistency, and mitigates the impacts of temperature and humidity on membrane dehydration",
+        "after": "Increasing pressure improves cell performance, enhances stack consistency, and mitigates the impacts of temperature and humidity on membrane dehydration by reducing the proportion of water vapor partial pressure in the total gas pressure"
+       },
+       "intervention": {
+        "before": "Increase the operating pressure of the fuel cell stack while maintaining current density at 1.5 A/cm² and stack temperature at 80°C",
+        "after": "Increase the operating pressure of the fuel cell stack while maintaining current density at 1.5 A/cm² and stack temperature at 80°C, with pressure differential between anode and cathode maintained at 20 kPa"
+       },
+       "mechanism_source_span": {
+        "before": "\"Increasing pressure not only improves cell performance but also enhances stack consistency while mitigating the impacts of temperature and humidity. Under high-temperature and low-humidity conditions, the voltage increases 37.9%, i.e., from 0.472 V(@70/60kPa) to 0.651 V (@170/150kPa).\"",
+        "after": "Increasing humidity notably improves performance under low-pressure conditions, but its effect diminishes under high pressure due to the reduced proportion of water vapor partial pressure in the total gas pressure"
+       }
+      },
+      "inherited_negatives": {
+       "uncertainty_ids": [
+        "membrane cell stack dehydration temperature exchange",
+        "membrane cell stack dehydration temperature exchange",
+        "membrane cell stack dehydration temperature increasing",
+        "membrane cell stack dehydration temperature increasing",
+        "operating cell stack temperature pressure fuel current density",
+        "operating cell stack temperature pressure fuel current density",
+        "membrane dehydration resistance formation increasing humidification",
+        "membrane dehydration resistance formation increasing humidification",
+        "increasing reduced minimized formation maintained without",
+        "increasing reduced minimized formation maintained without"
+       ],
+       "collision_family_ids": [],
+       "source_errors": []
+      },
+      "parent_spec_hash": "aaf41c56386138bc7c971302621c5f2a4c088ba683fa44554bc35076269435f9",
+      "child_spec_hash": null,
+      "reason": "Repairs I1_MECHANISM_EVIDENCE_DERIVATION weakness by anchoring mechanism in evidence-derived technical vocabulary about reduced proportion of water vapor partial pressure in total gas pressure",
+      "applied_at": "2026-09-10T14:25:05+00:00Z"
+     },
+     "re_evaluation": {
+      "collision_mode": "REPLAY_CACHE",
+      "re_evaluated_at": "2026-09-10T14:25:05+00:00Z",
+      "re_adjudication": {
+       "mode": "REPLAY_CACHE",
+       "valid": false,
+       "reason": "NO_CACHED_FAMILIES"
+      },
+      "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+      "re_adjudication_failure": "NO_CACHED_FAMILIES",
+      "i_dimensions": {
+       "I1_MECHANISM_EVIDENCE_DERIVATION": {
+        "score": 0.438,
+        "state": "MEASURED"
+       },
+       "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_SURVIVORS"
+       },
+       "I3_RECOMBINATION_RISK": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_FAMILIES"
+       },
+       "I4_NEW_TECHNICAL_RELATIONSHIP": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+       },
+       "I5_EXPERIMENT_DISCRIMINATION": {
+        "score": 0.667,
+        "state": "MEASURED"
+       }
+      },
+      "i_flags": {
+       "underived_mechanism": false,
+       "recombination_only": false
+      },
+      "i_average": 0.552,
+      "q_dimensions": {
+       "Q1_EVIDENCE_BINDING": {
+        "score": 0.5,
+        "state": "MEASURED"
+       },
+       "Q2_PRIOR_ART_SPECIFICITY": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_PRIOR_ART"
+       },
+       "Q3_PRIOR_ART_RESOLUTION": {
+        "score": 0.0,
+        "state": "MEASURED"
+       },
+       "Q4_EXPERIMENT_DECISIVENESS": {
+        "score": 1.0,
+        "state": "MEASURED"
+       },
+       "Q5_CHAIN_COMPLETENESS": {
+        "score": 1.0,
+        "state": "MEASURED"
+       }
+      },
+      "q_average": 0.625
+     },
+     "decision": {
+      "action": "KEEP",
+      "improved": true,
+      "checks": {
+       "targeted_dimension": "0.238 -> 0.438 (improved)",
+       "negatives_preserved": true,
+       "no_new_structural_flags": true,
+       "no_unknown_conversion_without_new_evidence": true,
+       "text_gap_conversions_recorded": [],
+       "prior_art_position_not_degraded": true
+      },
+      "reasons": [],
+      "decided_at": "2026-09-10T14:25:05+00:00Z"
+     }
+    }
+   ],
+   "mutation_applied": {
+    "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+    "mutation_id": "mut:2dccf948184c",
+    "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+    "diagnostic_trigger": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "measured_before": 0.238,
+     "basis": "R378 evaluator-contract diagnosis (deterministic)"
+    },
+    "proposal_provenance": {
+     "proposal_id": "prop:878b642832e6",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "cf32b736d50559f3bd11990a8cba4d9ba44bedaa52fa4521b67629e785606fbc",
+     "output_hash": "878b642832e6b6b44408072f0979c3cab3e242037eca445f8d61671ff2ae3904",
+     "llm_is_untrusted_proposer": true
+    },
+    "validation": {
+     "valid": true,
+     "stage": "VALIDATION",
+     "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+     "checks": {
+      "mutation_type_matches_diagnosis": true,
+      "span_evidence_exists": "doi:10.21203/rs.3.rs-7081268/v1",
+      "span_verbatim_in_evidence": true,
+      "evidence_support": 0.781,
+      "evidence_support_cleared": 0.781,
+      "constraint_traceable_to_evidence": "Maintain anode-cathode pressure differential of 20 kPa"
+     },
+     "reasons": [],
+     "validated_at": "2026-09-10T14:25:05+00:00Z"
+    },
+    "fields_changed": {
+     "mechanism": {
+      "before": "Increasing pressure improves cell performance, enhances stack consistency, and mitigates the impacts of temperature and humidity on membrane dehydration",
+      "after": "Increasing pressure improves cell performance, enhances stack consistency, and mitigates the impacts of temperature and humidity on membrane dehydration by reducing the proportion of water vapor partial pressure in the total gas pressure"
+     },
+     "intervention": {
+      "before": "Increase the operating pressure of the fuel cell stack while maintaining current density at 1.5 A/cm² and stack temperature at 80°C",
+      "after": "Increase the operating pressure of the fuel cell stack while maintaining current density at 1.5 A/cm² and stack temperature at 80°C, with pressure differential between anode and cathode maintained at 20 kPa"
+     },
+     "mechanism_source_span": {
+      "before": "\"Increasing pressure not only improves cell performance but also enhances stack consistency while mitigating the impacts of temperature and humidity. Under high-temperature and low-humidity conditions, the voltage increases 37.9%, i.e., from 0.472 V(@70/60kPa) to 0.651 V (@170/150kPa).\"",
+      "after": "Increasing humidity notably improves performance under low-pressure conditions, but its effect diminishes under high pressure due to the reduced proportion of water vapor partial pressure in the total gas pressure"
+     }
+    },
+    "inherited_negatives": {
+     "uncertainty_ids": [
+      "membrane cell stack dehydration temperature exchange",
+      "membrane cell stack dehydration temperature exchange",
+      "membrane cell stack dehydration temperature increasing",
+      "membrane cell stack dehydration temperature increasing",
+      "operating cell stack temperature pressure fuel current density",
+      "operating cell stack temperature pressure fuel current density",
+      "membrane dehydration resistance formation increasing humidification",
+      "membrane dehydration resistance formation increasing humidification",
+      "increasing reduced minimized formation maintained without",
+      "increasing reduced minimized formation maintained without"
+     ],
+     "collision_family_ids": [],
+     "source_errors": []
+    },
+    "parent_spec_hash": "aaf41c56386138bc7c971302621c5f2a4c088ba683fa44554bc35076269435f9",
+    "child_spec_hash": null,
+    "reason": "Repairs I1_MECHANISM_EVIDENCE_DERIVATION weakness by anchoring mechanism in evidence-derived technical vocabulary about reduced proportion of water vapor partial pressure in total gas pressure",
+    "applied_at": "2026-09-10T14:25:05+00:00Z"
+   },
+   "re_evaluation": {
+    "collision_mode": "REPLAY_CACHE",
+    "re_evaluated_at": "2026-09-10T14:25:05+00:00Z",
+    "re_adjudication": {
+     "mode": "REPLAY_CACHE",
+     "valid": false,
+     "reason": "NO_CACHED_FAMILIES"
+    },
+    "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+    "re_adjudication_failure": "NO_CACHED_FAMILIES",
+    "i_dimensions": {
+     "I1_MECHANISM_EVIDENCE_DERIVATION": {
+      "score": 0.438,
+      "state": "MEASURED"
+     },
+     "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_SURVIVORS"
+     },
+     "I3_RECOMBINATION_RISK": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_FAMILIES"
+     },
+     "I4_NEW_TECHNICAL_RELATIONSHIP": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+     },
+     "I5_EXPERIMENT_DISCRIMINATION": {
+      "score": 0.667,
+      "state": "MEASURED"
+     }
+    },
+    "i_flags": {
+     "underived_mechanism": false,
+     "recombination_only": false
+    },
+    "i_average": 0.552,
+    "q_dimensions": {
+     "Q1_EVIDENCE_BINDING": {
+      "score": 0.5,
+      "state": "MEASURED"
+     },
+     "Q2_PRIOR_ART_SPECIFICITY": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_PRIOR_ART"
+     },
+     "Q3_PRIOR_ART_RESOLUTION": {
+      "score": 0.0,
+      "state": "MEASURED"
+     },
+     "Q4_EXPERIMENT_DECISIVENESS": {
+      "score": 1.0,
+      "state": "MEASURED"
+     },
+     "Q5_CHAIN_COMPLETENESS": {
+      "score": 1.0,
+      "state": "MEASURED"
+     }
+    },
+    "q_average": 0.625
+   },
+   "decision": {
+    "action": "KEEP",
+    "improved": true,
+    "checks": {
+     "targeted_dimension": "0.238 -> 0.438 (improved)",
+     "negatives_preserved": true,
+     "no_new_structural_flags": true,
+     "no_unknown_conversion_without_new_evidence": true,
+     "text_gap_conversions_recorded": [],
+     "prior_art_position_not_degraded": true
+    },
+    "reasons": [],
+    "decided_at": "2026-09-10T14:25:05+00:00Z"
+   }
+  },
+  {
+   "iteration": 2,
+   "diagnosis": {
+    "limiting_features": [
+     {
+      "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "measured_value": 0.438,
+      "weakness_kind": "LOW_SCORE",
+      "why_weak": "measured 0.438 < STRONG floor 0.7",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT"
+     },
+     {
+      "dimension": "I5_EXPERIMENT_DISCRIMINATION",
+      "measured_value": 0.667,
+      "weakness_kind": "LOW_SCORE",
+      "why_weak": "measured 0.667 < STRONG floor 0.7",
+      "mutation_type": "EXPERIMENT_DISCRIMINATION"
+     }
+    ],
+    "evidence_gaps": [
+     {
+      "dimension": "I2_DIFFERENTIATOR_TECHNICAL_MEANING",
+      "state": "UNMEASURABLE_NO_SURVIVORS",
+      "what_is_missing": "no surviving differentiators recorded",
+      "consequence": "no mutation targets this dimension until the gap closes (Art. XXV)"
+     },
+     {
+      "dimension": "I3_RECOMBINATION_RISK",
+      "state": "UNMEASURABLE_NO_FAMILIES",
+      "what_is_missing": "no prior-art families adjudicated — residue vs found art is unmeasured; absence of found art is not novelty",
+      "consequence": "no mutation targets this dimension until the gap closes (Art. XXV)"
+     },
+     {
+      "dimension": "I4_NEW_TECHNICAL_RELATIONSHIP",
+      "state": "UNMEASURABLE_NO_FAMILY_TEXT",
+      "what_is_missing": "no adjudicated family text stored — pair novelty vs found art is unmeasured",
+      "consequence": "no mutation targets this dimension until the gap closes (Art. XXV)"
+     }
+    ],
+    "target": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT"
+    }
+   },
+   "proposals": [
+    {
+     "proposal_id": "prop:65b8d94b96e3",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "a5fe0bd012f1b98219bc49a927bf7152b880d9648605b5517b24daa731f88b3f",
+     "output_hash": "65b8d94b96e3989c90115ef7eb560c9f1bcab2e9524659bf504e6324da32fffc",
+     "fields": {
+      "MUTATION_TYPE": "EVIDENCE_DERIVED_CONSTRAINT",
+      "MECHANISM": "Increasing pressure reduces the proportion of water vapor partial pressure in the total gas pressure, which mitigates the impacts of temperature and humidity on membrane dehydration while improving cell performance and enhancing stack consistency",
+      "INTERVENTION": "Increase the operating pressure of the fuel cell stack while maintaining current density at 1.5 A/cm² and stack temperature at 80°C, with pressure differential between anode and cathode maintained at 20 kPa",
+      "EXPECTED_EFFECT": "Reduced membrane dehydration, lower ionic resistance, minimized hot spot formation, and maintained power output without significantly increasing cathode humidification load due to the reduced proportion of water vapor partial pressure in the total gas pressure",
+      "FALSIFICATION_TEST": "Measure membrane hydration state and ionic resistance at 1.5 A/cm² current density and 80°C stack temperature across varying pressure differentials (0-40 kPa)",
+      "MECHANISM_SOURCE_SPAN": "Increasing pressure not only improves cell performance but also enhances stack consistency while mitigating the impacts of temperature and humidity. Under high-temperature and low-humidity conditions, the voltage increases 37.9%, i.e., from 0.472 V(@70/60kPa) to 0.651 V (@170/150kPa). Increasing humidity notably improves performance under low-pressure conditions, but its effect diminishes under high pressure due to the reduced proportion of water vapor partial pressure in the total gas pressure.",
+      "SOURCE_EVIDENCE_ID": "doi:10.21203/rs.3.rs-7081268/v1",
+      "EXPERIMENT": "Compare the voltage response of the fuel cell stack at 1.5 A/cm² current density and 80°C stack temperature under low-pressure (70/60 kPa) and high-pressure (170/150 kPa) conditions to quantify the pressure-induced performance improvement and membrane hydration benefit",
+      "EXPERIMENT_BASELINE": "low-pressure and low-humidity conditions, the voltage drops from 0.540 V to 0.472 V (a 12.6% decrease) as temperature rises from 75 to 84℃",
+      "EXPERIMENT_EIG": "0.75",
+      "CONSTRAINT_DERIVED": "The pressure differential must be maintained at or above 100 kPa to ensure the reduced proportion of water vapor partial pressure in the total gas pressure effectively mitigates membrane dehydration under high current density",
+      "MUTATION_REASON": "Repairs the I1_MECHANISM_EVIDENCE_DERIVATION weakness by anchoring the mechanism in the exact technical vocabulary from the evidence, specifically the phrase \"reduced proportion of water vapor partial pressure in the total gas pressure\""
+     },
+     "validation": {
+      "valid": true,
+      "stage": "VALIDATION",
+      "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+      "checks": {
+       "mutation_type_matches_diagnosis": true,
+       "span_evidence_exists": "doi:10.21203/rs.3.rs-7081268/v1",
+       "span_verbatim_in_evidence": true,
+       "evidence_support": 0.667,
+       "evidence_support_cleared": 0.667,
+       "constraint_traceable_to_evidence": "The pressure differential must be maintained at or above 100 kPa to ensure the reduced proportion of water vapor partial"
+      },
+      "reasons": [],
+      "validated_at": "2026-09-10T14:25:12+00:00Z"
+     }
+    },
+    {
+     "proposal_id": "prop:3843aef38236",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "9641f6df12c3a012f92a9a6ae783097355081ec2d10c3d9bcd593e673f060e6f",
+     "output_hash": "3843aef382360822496fc0e4a87fd21b05a74e150fe065035b3bbd184fbe35d9",
+     "fields": {
+      "MUTATION_TYPE": "EVIDENCE_DERIVED_CONSTRAINT",
+      "MECHANISM": "Increasing pressure improves cell performance, enhances stack consistency, and mitigates the impacts of temperature and humidity on membrane dehydration by reducing the proportion of water vapor partial pressure in the total gas pressure",
+      "INTERVENTION": "Increase the operating pressure of the fuel cell stack while maintaining current density at 1.5 A/cm² and stack temperature at 80°C, with pressure differential between anode and cathode maintained at 20 kPa, and limit pressure to 170/150 kPa (anode/cathode) based on evidence showing voltage increases 37.9% under these conditions compared to 70/60 kPa",
+      "EXPECTED_EFFECT": "Reduced membrane dehydration, lower ionic resistance, minimized hot spot formation, and maintained power output without significantly increasing cathode humidification load due to reduced water vapor partial pressure proportion",
+      "FALSIFICATION_TEST": "Measure membrane hydration state and ionic resistance at 1.5 A/cm² current density and 80°C stack temperature across varying pressure differentials (0-40 kPa) with special focus on the 170/150 kPa pressure condition",
+      "MECHANISM_SOURCE_SPAN": "Increasing pressure not only improves cell performance but also enhances stack consistency while mitigating the impacts of temperature and humidity. Under high-temperature and low-humidity conditions, the voltage increases 37.9%, i.e., from 0.472 V(@70/60kPa) to 0.651 V (@170/150kPa). Increasing humidity notably improves performance under low-pressure conditions, but its effect diminishes under high pressure due to the reduced proportion of water vapor partial pressure in the total gas pressure.",
+      "SOURCE_EVIDENCE_ID": "doi:10.21203/rs.3.rs-7081268/v1",
+      "EXPERIMENT": "Compare membrane hydration state and ionic resistance at 1.5 A/cm² current density and 80°C stack temperature between the 70/60 kPa baseline condition and the 170/150 kPa intervention condition",
+      "EXPERIMENT_BASELINE": "Under low-pressure and low-humidity conditions, the voltage drops from 0.540 V to 0.472 V (a 12.6% decrease) as temperature rises from 75 to 84℃",
+      "EXPERIMENT_EIG": "0.35",
+      "CONSTRAINT_DERIVED": "Limit operating pressure to 170/150 kPa (anode/cathode) maximum based on evidence showing optimal performance at this pressure level",
+      "MUTATION_REASON": "This repair addresses the I1_MECHANISM_EVIDENCE_DERIVATION weakness by anchoring the mechanism in specific evidence terms and deriving a precise pressure constraint from the verbatim evidence text"
+     },
+     "validation": {
+      "valid": true,
+      "stage": "VALIDATION",
+      "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+      "checks": {
+       "mutation_type_matches_diagnosis": true,
+       "span_evidence_exists": "doi:10.21203/rs.3.rs-7081268/v1",
+       "span_verbatim_in_evidence": true,
+       "evidence_support": 0.7,
+       "evidence_support_cleared": 0.7,
+       "constraint_traceable_to_evidence": "Limit operating pressure to 170/150 kPa (anode/cathode) maximum based on evidence showing optimal performance at this pr"
+      },
+      "reasons": [],
+      "validated_at": "2026-09-10T14:25:18+00:00Z"
+     }
+    }
+   ],
+   "mutation_attempts": [
+    {
+     "mutation_applied": {
+      "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+      "mutation_id": "mut:c6b5fb378abc",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+      "diagnostic_trigger": {
+       "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+       "measured_before": 0.438,
+       "basis": "R378 evaluator-contract diagnosis (deterministic)"
+      },
+      "proposal_provenance": {
+       "proposal_id": "prop:65b8d94b96e3",
+       "provider": "zai",
+       "model": "glm-4-plus",
+       "prompt_hash": "a5fe0bd012f1b98219bc49a927bf7152b880d9648605b5517b24daa731f88b3f",
+       "output_hash": "65b8d94b96e3989c90115ef7eb560c9f1bcab2e9524659bf504e6324da32fffc",
+       "llm_is_untrusted_proposer": true
+      },
+      "validation": {
+       "valid": true,
+       "stage": "VALIDATION",
+       "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+       "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+       "checks": {
+        "mutation_type_matches_diagnosis": true,
+        "span_evidence_exists": "doi:10.21203/rs.3.rs-7081268/v1",
+        "span_verbatim_in_evidence": true,
+        "evidence_support": 0.667,
+        "evidence_support_cleared": 0.667,
+        "constraint_traceable_to_evidence": "The pressure differential must be maintained at or above 100 kPa to ensure the reduced proportion of water vapor partial"
+       },
+       "reasons": [],
+       "validated_at": "2026-09-10T14:25:12+00:00Z"
+      },
+      "fields_changed": {
+       "mechanism": {
+        "before": "Increasing pressure improves cell performance, enhances stack consistency, and mitigates the impacts of temperature and humidity on membrane dehydration by reducing the proportion of water vapor partial pressure in the total gas pressure",
+        "after": "Increasing pressure reduces the proportion of water vapor partial pressure in the total gas pressure, which mitigates the impacts of temperature and humidity on membrane dehydration while improving cell performance and enhancing stack consistency"
+       },
+       "intervention": {
+        "before": "Increase the operating pressure of the fuel cell stack while maintaining current density at 1.5 A/cm² and stack temperature at 80°C, with pressure differential between anode and cathode maintained at 20 kPa",
+        "after": "Increase the operating pressure of the fuel cell stack while maintaining current density at 1.5 A/cm² and stack temperature at 80°C, with pressure differential between anode and cathode maintained at 20 kPa"
+       },
+       "mechanism_source_span": {
+        "before": "Increasing humidity notably improves performance under low-pressure conditions, but its effect diminishes under high pressure due to the reduced proportion of water vapor partial pressure in the total gas pressure",
+        "after": "Increasing pressure not only improves cell performance but also enhances stack consistency while mitigating the impacts of temperature and humidity. Under high-temperature and low-humidity conditions, the voltage increases 37.9%, i.e., from 0.472 V(@70/60kPa) to 0.651 V (@170/150kPa). Increasing hum"
+       }
+      },
+      "inherited_negatives": {
+       "uncertainty_ids": [
+        "membrane cell stack dehydration temperature exchange",
+        "membrane cell stack dehydration temperature exchange",
+        "membrane cell stack dehydration temperature increasing",
+        "membrane cell stack dehydration temperature increasing",
+        "operating cell stack temperature pressure fuel current density",
+        "operating cell stack temperature pressure fuel current density",
+        "membrane dehydration resistance formation increasing humidification",
+        "membrane dehydration resistance formation increasing humidification",
+        "increasing reduced minimized formation maintained without",
+        "increasing reduced minimized formation maintained without"
+       ],
+       "collision_family_ids": [],
+       "source_errors": []
+      },
+      "parent_spec_hash": "ef35a1c34f42fb87988a43c045d1cffe031a9ca521745e01d662230f011639d5",
+      "child_spec_hash": null,
+      "reason": "Repairs the I1_MECHANISM_EVIDENCE_DERIVATION weakness by anchoring the mechanism in the exact technical vocabulary from the evidence, specifically the phrase \"reduced proportion of water vapor partial pressure in the total gas pressure\"",
+      "applied_at": "2026-09-10T14:25:12+00:00Z"
+     },
+     "re_evaluation": {
+      "collision_mode": "REPLAY_CACHE",
+      "re_evaluated_at": "2026-09-10T14:25:12+00:00Z",
+      "re_adjudication": {
+       "mode": "REPLAY_CACHE",
+       "valid": false,
+       "reason": "NO_CACHED_FAMILIES"
+      },
+      "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+      "re_adjudication_failure": "NO_CACHED_FAMILIES",
+      "i_dimensions": {
+       "I1_MECHANISM_EVIDENCE_DERIVATION": {
+        "score": 0.425,
+        "state": "MEASURED"
+       },
+       "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_SURVIVORS"
+       },
+       "I3_RECOMBINATION_RISK": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_FAMILIES"
+       },
+       "I4_NEW_TECHNICAL_RELATIONSHIP": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+       },
+       "I5_EXPERIMENT_DISCRIMINATION": {
+        "score": 0.667,
+        "state": "MEASURED"
+       }
+      },
+      "i_flags": {
+       "underived_mechanism": false,
+       "recombination_only": false
+      },
+      "i_average": 0.546,
+      "q_dimensions": {
+       "Q1_EVIDENCE_BINDING": {
+        "score": 0.5,
+        "state": "MEASURED"
+       },
+       "Q2_PRIOR_ART_SPECIFICITY": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_PRIOR_ART"
+       },
+       "Q3_PRIOR_ART_RESOLUTION": {
+        "score": 0.0,
+        "state": "MEASURED"
+       },
+       "Q4_EXPERIMENT_DECISIVENESS": {
+        "score": 1.0,
+        "state": "MEASURED"
+       },
+       "Q5_CHAIN_COMPLETENESS": {
+        "score": 1.0,
+        "state": "MEASURED"
+       }
+      },
+      "q_average": 0.625
+     },
+     "decision": {
+      "action": "REJECT_MUTATION",
+      "improved": false,
+      "checks": {
+       "targeted_dimension": "0.438 -> 0.425 (no improvement)",
+       "negatives_preserved": true,
+       "no_new_structural_flags": true,
+       "no_unknown_conversion_without_new_evidence": true,
+       "text_gap_conversions_recorded": [],
+       "prior_art_position_not_degraded": true
+      },
+      "reasons": [],
+      "decided_at": "2026-09-10T14:25:12+00:00Z"
+     }
+    },
+    {
+     "mutation_applied": {
+      "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+      "mutation_id": "mut:916c2464e81e",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+      "diagnostic_trigger": {
+       "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+       "measured_before": 0.438,
+       "basis": "R378 evaluator-contract diagnosis (deterministic)"
+      },
+      "proposal_provenance": {
+       "proposal_id": "prop:3843aef38236",
+       "provider": "zai",
+       "model": "glm-4-plus",
+       "prompt_hash": "9641f6df12c3a012f92a9a6ae783097355081ec2d10c3d9bcd593e673f060e6f",
+       "output_hash": "3843aef382360822496fc0e4a87fd21b05a74e150fe065035b3bbd184fbe35d9",
+       "llm_is_untrusted_proposer": true
+      },
+      "validation": {
+       "valid": true,
+       "stage": "VALIDATION",
+       "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+       "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+       "checks": {
+        "mutation_type_matches_diagnosis": true,
+        "span_evidence_exists": "doi:10.21203/rs.3.rs-7081268/v1",
+        "span_verbatim_in_evidence": true,
+        "evidence_support": 0.7,
+        "evidence_support_cleared": 0.7,
+        "constraint_traceable_to_evidence": "Limit operating pressure to 170/150 kPa (anode/cathode) maximum based on evidence showing optimal performance at this pr"
+       },
+       "reasons": [],
+       "validated_at": "2026-09-10T14:25:18+00:00Z"
+      },
+      "fields_changed": {
+       "mechanism": {
+        "before": "Increasing pressure improves cell performance, enhances stack consistency, and mitigates the impacts of temperature and humidity on membrane dehydration by reducing the proportion of water vapor partial pressure in the total gas pressure",
+        "after": "Increasing pressure improves cell performance, enhances stack consistency, and mitigates the impacts of temperature and humidity on membrane dehydration by reducing the proportion of water vapor partial pressure in the total gas pressure"
+       },
+       "intervention": {
+        "before": "Increase the operating pressure of the fuel cell stack while maintaining current density at 1.5 A/cm² and stack temperature at 80°C, with pressure differential between anode and cathode maintained at 20 kPa",
+        "after": "Increase the operating pressure of the fuel cell stack while maintaining current density at 1.5 A/cm² and stack temperature at 80°C, with pressure differential between anode and cathode maintained at 20 kPa, and limit pressure to 170/150 kPa (anode/cathode) based on evidence showing voltage increase"
+       },
+       "mechanism_source_span": {
+        "before": "Increasing humidity notably improves performance under low-pressure conditions, but its effect diminishes under high pressure due to the reduced proportion of water vapor partial pressure in the total gas pressure",
+        "after": "Increasing pressure not only improves cell performance but also enhances stack consistency while mitigating the impacts of temperature and humidity. Under high-temperature and low-humidity conditions, the voltage increases 37.9%, i.e., from 0.472 V(@70/60kPa) to 0.651 V (@170/150kPa). Increasing hum"
+       }
+      },
+      "inherited_negatives": {
+       "uncertainty_ids": [
+        "membrane cell stack dehydration temperature exchange",
+        "membrane cell stack dehydration temperature exchange",
+        "membrane cell stack dehydration temperature increasing",
+        "membrane cell stack dehydration temperature increasing",
+        "operating cell stack temperature pressure fuel current density",
+        "operating cell stack temperature pressure fuel current density",
+        "membrane dehydration resistance formation increasing humidification",
+        "membrane dehydration resistance formation increasing humidification",
+        "increasing reduced minimized formation maintained without",
+        "increasing reduced minimized formation maintained without"
+       ],
+       "collision_family_ids": [],
+       "source_errors": []
+      },
+      "parent_spec_hash": "ef35a1c34f42fb87988a43c045d1cffe031a9ca521745e01d662230f011639d5",
+      "child_spec_hash": null,
+      "reason": "This repair addresses the I1_MECHANISM_EVIDENCE_DERIVATION weakness by anchoring the mechanism in specific evidence terms and deriving a precise pressure constraint from the verbatim evidence text",
+      "applied_at": "2026-09-10T14:25:18+00:00Z"
+     },
+     "re_evaluation": {
+      "collision_mode": "REPLAY_CACHE",
+      "re_evaluated_at": "2026-09-10T14:25:18+00:00Z",
+      "re_adjudication": {
+       "mode": "REPLAY_CACHE",
+       "valid": false,
+       "reason": "NO_CACHED_FAMILIES"
+      },
+      "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+      "re_adjudication_failure": "NO_CACHED_FAMILIES",
+      "i_dimensions": {
+       "I1_MECHANISM_EVIDENCE_DERIVATION": {
+        "score": 0.575,
+        "state": "MEASURED"
+       },
+       "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_SURVIVORS"
+       },
+       "I3_RECOMBINATION_RISK": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_FAMILIES"
+       },
+       "I4_NEW_TECHNICAL_RELATIONSHIP": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+       },
+       "I5_EXPERIMENT_DISCRIMINATION": {
+        "score": 0.667,
+        "state": "MEASURED"
+       }
+      },
+      "i_flags": {
+       "underived_mechanism": false,
+       "recombination_only": false
+      },
+      "i_average": 0.621,
+      "q_dimensions": {
+       "Q1_EVIDENCE_BINDING": {
+        "score": 0.5,
+        "state": "MEASURED"
+       },
+       "Q2_PRIOR_ART_SPECIFICITY": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_PRIOR_ART"
+       },
+       "Q3_PRIOR_ART_RESOLUTION": {
+        "score": 0.0,
+        "state": "MEASURED"
+       },
+       "Q4_EXPERIMENT_DECISIVENESS": {
+        "score": 1.0,
+        "state": "MEASURED"
+       },
+       "Q5_CHAIN_COMPLETENESS": {
+        "score": 1.0,
+        "state": "MEASURED"
+       }
+      },
+      "q_average": 0.625
+     },
+     "decision": {
+      "action": "KEEP",
+      "improved": true,
+      "checks": {
+       "targeted_dimension": "0.438 -> 0.575 (improved)",
+       "negatives_preserved": true,
+       "no_new_structural_flags": true,
+       "no_unknown_conversion_without_new_evidence": true,
+       "text_gap_conversions_recorded": [],
+       "prior_art_position_not_degraded": true
+      },
+      "reasons": [],
+      "decided_at": "2026-09-10T14:25:18+00:00Z"
+     }
+    }
+   ],
+   "mutation_applied": {
+    "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+    "mutation_id": "mut:c6b5fb378abc",
+    "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+    "diagnostic_trigger": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "measured_before": 0.438,
+     "basis": "R378 evaluator-contract diagnosis (deterministic)"
+    },
+    "proposal_provenance": {
+     "proposal_id": "prop:65b8d94b96e3",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "a5fe0bd012f1b98219bc49a927bf7152b880d9648605b5517b24daa731f88b3f",
+     "output_hash": "65b8d94b96e3989c90115ef7eb560c9f1bcab2e9524659bf504e6324da32fffc",
+     "llm_is_untrusted_proposer": true
+    },
+    "validation": {
+     "valid": true,
+     "stage": "VALIDATION",
+     "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+     "checks": {
+      "mutation_type_matches_diagnosis": true,
+      "span_evidence_exists": "doi:10.21203/rs.3.rs-7081268/v1",
+      "span_verbatim_in_evidence": true,
+      "evidence_support": 0.667,
+      "evidence_support_cleared": 0.667,
+      "constraint_traceable_to_evidence": "The pressure differential must be maintained at or above 100 kPa to ensure the reduced proportion of water vapor partial"
+     },
+     "reasons": [],
+     "validated_at": "2026-09-10T14:25:12+00:00Z"
+    },
+    "fields_changed": {
+     "mechanism": {
+      "before": "Increasing pressure improves cell performance, enhances stack consistency, and mitigates the impacts of temperature and humidity on membrane dehydration by reducing the proportion of water vapor partial pressure in the total gas pressure",
+      "after": "Increasing pressure reduces the proportion of water vapor partial pressure in the total gas pressure, which mitigates the impacts of temperature and humidity on membrane dehydration while improving cell performance and enhancing stack consistency"
+     },
+     "intervention": {
+      "before": "Increase the operating pressure of the fuel cell stack while maintaining current density at 1.5 A/cm² and stack temperature at 80°C, with pressure differential between anode and cathode maintained at 20 kPa",
+      "after": "Increase the operating pressure of the fuel cell stack while maintaining current density at 1.5 A/cm² and stack temperature at 80°C, with pressure differential between anode and cathode maintained at 20 kPa"
+     },
+     "mechanism_source_span": {
+      "before": "Increasing humidity notably improves performance under low-pressure conditions, but its effect diminishes under high pressure due to the reduced proportion of water vapor partial pressure in the total gas pressure",
+      "after": "Increasing pressure not only improves cell performance but also enhances stack consistency while mitigating the impacts of temperature and humidity. Under high-temperature and low-humidity conditions, the voltage increases 37.9%, i.e., from 0.472 V(@70/60kPa) to 0.651 V (@170/150kPa). Increasing hum"
+     }
+    },
+    "inherited_negatives": {
+     "uncertainty_ids": [
+      "membrane cell stack dehydration temperature exchange",
+      "membrane cell stack dehydration temperature exchange",
+      "membrane cell stack dehydration temperature increasing",
+      "membrane cell stack dehydration temperature increasing",
+      "operating cell stack temperature pressure fuel current density",
+      "operating cell stack temperature pressure fuel current density",
+      "membrane dehydration resistance formation increasing humidification",
+      "membrane dehydration resistance formation increasing humidification",
+      "increasing reduced minimized formation maintained without",
+      "increasing reduced minimized formation maintained without"
+     ],
+     "collision_family_ids": [],
+     "source_errors": []
+    },
+    "parent_spec_hash": "ef35a1c34f42fb87988a43c045d1cffe031a9ca521745e01d662230f011639d5",
+    "child_spec_hash": null,
+    "reason": "Repairs the I1_MECHANISM_EVIDENCE_DERIVATION weakness by anchoring the mechanism in the exact technical vocabulary from the evidence, specifically the phrase \"reduced proportion of water vapor partial pressure in the total gas pressure\"",
+    "applied_at": "2026-09-10T14:25:12+00:00Z"
+   },
+   "re_evaluation": {
+    "collision_mode": "REPLAY_CACHE",
+    "re_evaluated_at": "2026-09-10T14:25:18+00:00Z",
+    "re_adjudication": {
+     "mode": "REPLAY_CACHE",
+     "valid": false,
+     "reason": "NO_CACHED_FAMILIES"
+    },
+    "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+    "re_adjudication_failure": "NO_CACHED_FAMILIES",
+    "i_dimensions": {
+     "I1_MECHANISM_EVIDENCE_DERIVATION": {
+      "score": 0.575,
+      "state": "MEASURED"
+     },
+     "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_SURVIVORS"
+     },
+     "I3_RECOMBINATION_RISK": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_FAMILIES"
+     },
+     "I4_NEW_TECHNICAL_RELATIONSHIP": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+     },
+     "I5_EXPERIMENT_DISCRIMINATION": {
+      "score": 0.667,
+      "state": "MEASURED"
+     }
+    },
+    "i_flags": {
+     "underived_mechanism": false,
+     "recombination_only": false
+    },
+    "i_average": 0.621,
+    "q_dimensions": {
+     "Q1_EVIDENCE_BINDING": {
+      "score": 0.5,
+      "state": "MEASURED"
+     },
+     "Q2_PRIOR_ART_SPECIFICITY": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_PRIOR_ART"
+     },
+     "Q3_PRIOR_ART_RESOLUTION": {
+      "score": 0.0,
+      "state": "MEASURED"
+     },
+     "Q4_EXPERIMENT_DECISIVENESS": {
+      "score": 1.0,
+      "state": "MEASURED"
+     },
+     "Q5_CHAIN_COMPLETENESS": {
+      "score": 1.0,
+      "state": "MEASURED"
+     }
+    },
+    "q_average": 0.625
+   },
+   "decision": {
+    "action": "KEEP",
+    "improved": true,
+    "checks": {
+     "targeted_dimension": "0.438 -> 0.575 (improved)",
+     "negatives_preserved": true,
+     "no_new_structural_flags": true,
+     "no_unknown_conversion_without_new_evidence": true,
+     "text_gap_conversions_recorded": [],
+     "prior_art_position_not_degraded": true
+    },
+    "reasons": [],
+    "decided_at": "2026-09-10T14:25:18+00:00Z"
+   }
+  }
+ ],
+ "outcome": "IMPROVED",
+ "outcome_reason": "",
+ "baseline": {
+  "i_dimensions": {
+   "I1_MECHANISM_EVIDENCE_DERIVATION": {
+    "score": 0.238,
+    "state": "MEASURED"
+   },
+   "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_SURVIVORS"
+   },
+   "I3_RECOMBINATION_RISK": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_FAMILIES"
+   },
+   "I4_NEW_TECHNICAL_RELATIONSHIP": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+   },
+   "I5_EXPERIMENT_DISCRIMINATION": {
+    "score": 0.667,
+    "state": "MEASURED"
+   }
+  },
+  "i_flags": {
+   "underived_mechanism": false,
+   "recombination_only": false
+  },
+  "i_average": 0.453,
+  "q_dimensions": {
+   "Q1_EVIDENCE_BINDING": {
+    "score": 0.5,
+    "state": "MEASURED"
+   },
+   "Q2_PRIOR_ART_SPECIFICITY": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_PRIOR_ART"
+   },
+   "Q3_PRIOR_ART_RESOLUTION": {
+    "score": 0.0,
+    "state": "MEASURED"
+   },
+   "Q4_EXPERIMENT_DECISIVENESS": {
+    "score": 1.0,
+    "state": "MEASURED"
+   },
+   "Q5_CHAIN_COMPLETENESS": {
+    "score": 1.0,
+    "state": "MEASURED"
+   }
+  },
+  "q_average": 0.625,
+  "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE"
+ },
+ "final": {
+  "i_dimensions": {
+   "I1_MECHANISM_EVIDENCE_DERIVATION": {
+    "score": 0.575,
+    "state": "MEASURED"
+   },
+   "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_SURVIVORS"
+   },
+   "I3_RECOMBINATION_RISK": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_FAMILIES"
+   },
+   "I4_NEW_TECHNICAL_RELATIONSHIP": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+   },
+   "I5_EXPERIMENT_DISCRIMINATION": {
+    "score": 0.667,
+    "state": "MEASURED"
+   }
+  },
+  "i_flags": {
+   "underived_mechanism": false,
+   "recombination_only": false
+  },
+  "i_average": 0.621,
+  "q_dimensions": {
+   "Q1_EVIDENCE_BINDING": {
+    "score": 0.5,
+    "state": "MEASURED"
+   },
+   "Q2_PRIOR_ART_SPECIFICITY": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_PRIOR_ART"
+   },
+   "Q3_PRIOR_ART_RESOLUTION": {
+    "score": 0.0,
+    "state": "MEASURED"
+   },
+   "Q4_EXPERIMENT_DECISIVENESS": {
+    "score": 1.0,
+    "state": "MEASURED"
+   },
+   "Q5_CHAIN_COMPLETENESS": {
+    "score": 1.0,
+    "state": "MEASURED"
+   }
+  },
+  "q_average": 0.625,
+  "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE"
+ },
+ "finished_at": "2026-09-10T14:25:18+00:00Z",
+ "outcome_summary": {
+  "baseline_i_average": 0.453,
+  "final_i_average": 0.621,
+  "baseline_q_average": 0.625,
+  "final_q_average": 0.625,
+  "iterations_run": 2,
+  "keeps": 2
+ },
+ "status": "IMPROVED"
+}

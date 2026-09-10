@@ -1,0 +1,52 @@
+{
+ "stage": "INDEPENDENT_ATTACK",
+ "candidate_id": "cand:MS:GEOMETRIC_TRANSFORMATION:762d9a5ff803",
+ "escalation": {
+  "gate_version": "attacker_calibration/1.0.0",
+  "instrument": "independent_attack/1.0.0",
+  "calibration_state": "NOT_CALIBRATED",
+  "terminal_kill_admissible": false,
+  "measured": {
+   "coverage": 1.0,
+   "parse_completeness": 1.0,
+   "tpr_scoped": 1.0,
+   "fpr_known_good": 1.0,
+   "n_cases_attacked": 40
+  },
+  "sealed_thresholds": {
+   "note": "registered BEFORE measurement; never tuned to results (Art. XXVII)",
+   "coverage_min": 0.875,
+   "parse_completeness_min": 0.875,
+   "tpr_min": 0.75,
+   "fpr_max": 0.3,
+   "ensemble": "NONE (single-attacker calibration only; majority-vote ensembles are deferred by the R412 directive)"
+  },
+  "measurement_path": "R412/CALIBRATION/engine_independent_attack_measurement.json",
+  "measurement_sha256": "4e1718e7088564333b5e1ef9be47ca452133d051001628cd6eed91f44e60ef5f",
+  "reason": "measured FPR 1.0 > sealed bar 0.3 (Art. L: the attacker is measured non-selective; its KILL is inadmissible as a terminal verdict and is escalated with the objection preserved)",
+  "rule": "the instrument's KILL is measured non-selective (FPR above the sealed bar); the objection is preserved verbatim and ESCALATED for adjudication — the candidate is NOT killed by this attack alone (Art. L); the deterministic gates are unchanged",
+  "reviewer_provenance": "AI_REVIEW (Art. LXVII)"
+ },
+ "preserved_objections": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "basis": "The claimed energy dissipation through sliding interfaces contradicts the fundamental behavior of elastomers under cyclic loading, as evidenced by [doi:10.1016/j.matpr.2020.12.328] which shows that elastomeric bearings primarily dissipate energy through viscoelastic hysteresis, not sliding friction. The proposed mechanism would actually increase heat generation and accelerate ozone-induced cracking."
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "basis": "The design ignores the critical boundary condition of temperature cycling, as evidenced by [doi:10.5614/j.eng.technol.sci.2019.51.5.4] which shows that elastomer properties significantly degrade with temperature fluctuations. The sliding interfaces would create thermal discontinuities that would crack under repeated thermal expansion/contraction cycles, violating the temperature compatibility boundary condition."
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "basis": "The candidate's prediction of 30% less permanent deformation directly contradicts the evidence in [doi:10.1109/icmt.2011.6002885] which demonstrates that sliding interfaces in elastomeric bearings increase the seismic damage index by creating stress concentrations that initiate delamination and cracking, leading to greater permanent deformation."
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "basis": "The proposed sliding interface density and surface roughness parameters cannot be manufactured with the required precision, as elastomeric bearings require micron-level dimensional control to maintain load distribution. The evidence bundle provides no manufacturing methodology to achieve the necessary interface geometry without creating stress concentrations that would initiate delamination at the claimed failure points."
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "basis": "The testable prediction fails to specify critical measurement parameters such as loading frequency, temperature during testing, and humidity conditions, all of which significantly affect elastomer behavior. Without controlling for these variables, the 30% reduction claim is meaningless, as evidenced by [doi:10.1016/j.matpr.2020.12.328] which shows fatigue life varies by orders of magnitude under different environmental conditions."
+  }
+ ]
+}

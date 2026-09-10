@@ -1,0 +1,890 @@
+{
+ "ledger": "IMPROVEMENT_LEDGER (R378 TECHNICAL IMPROVEMENT ENGINE)",
+ "version": "1.0.0",
+ "loop": "CANDIDATE -> DIAGNOSE WEAKNESS -> IDENTIFY LIMITING FEATURE -> GENERATE CONTROLLED MUTATION -> RE-EVALUATE EVIDENCE/MECHANISM/PRIOR ART -> RE-SCORE -> KEEP OR KILL -> REPEAT",
+ "collision_mode": "REPLAY_CACHE",
+ "live_sources": null,
+ "evaluators_registered": [
+  {
+   "evaluator_id": "term_rule_v1",
+   "fidelity_tier": "TERM_RULE",
+   "evidence_rank": 3
+  }
+ ],
+ "q_instrument": "discovery_fabric/benchmark/candidate_quality.py (FROZEN, hash-pinned, imported read-only)",
+ "i_instrument": "discovery_fabric/benchmark/invention_quality.py (R377, imported read-only)",
+ "thresholds": {
+  "SPAN_DERIVATION_MIN": {
+   "value": 0.2,
+   "epistemic_class": "ENGINEERING",
+   "justification": "the engine's own span-derivation rule (candidate_diversity.span_derivation_check): ratio < 0.20 = SPAN_UNDERIVED. A MECHANISM_STRENGTHENING mutation must CLEAR this floor — the same rule that gates the grid, not a new one."
+  },
+  "EVIDENCE_SUPPORT_MIN": {
+   "value": 0.2,
+   "epistemic_class": "ENGINEERING",
+   "justification": "I1's underived flag fires below 0.20; an EVIDENCE_DERIVED_CONSTRAINT mutation must clear the same floor on evidence_support."
+  },
+  "DOMAIN_OVERLAP_MIN": {
+   "value": 1,
+   "epistemic_class": "ENGINEERING",
+   "justification": "REPLAY_CACHE re-adjudication is valid only while the mutated candidate stays in the domain the cached art was found FOR. Guard: >= 1 NON-generic technical term shared between the child's mechanism+intervention and the cached family corpus. ZERO overlap means the mutation abandoned the domain (measured attack: re-adjudicating a cement-curing intervention against battery art fabricates surviving differentiators — false novelty from stale art). The overlap count is RECORDED on every cache adjudication so thin-domain links are auditable. NOTE: entity-term retention vs the problem CANNOT catch this class — entity terms are problem-derived and unchanged by mutations (measured while writing the guard's tests); it is recorded for audit only."
+  },
+  "MAX_ITERATIONS_DEFAULT": {
+   "value": 2,
+   "epistemic_class": "ENGINEERING",
+   "justification": "the CEO minimum loop is DIAGNOSE -> IMPROVE -> RE-EVALUATE -> IMPROVE AGAIN; two iterations demonstrate repeatability at bounded cost"
+  },
+  "MAX_PROPOSALS_PER_ITERATION": {
+   "value": 3,
+   "epistemic_class": "ENGINEERING",
+   "justification": "bounded proposal budget: three attempts, then the honest no-defensible-mutation verdict"
+  }
+ },
+ "started_at": "2026-09-10T17:21:02+00:00Z",
+ "iterations": [
+  {
+   "iteration": 1,
+   "diagnosis": {
+    "limiting_features": [
+     {
+      "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "measured_value": 0.409,
+      "weakness_kind": "LOW_SCORE",
+      "why_weak": "measured 0.409 < STRONG floor 0.7",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT"
+     },
+     {
+      "dimension": "I5_EXPERIMENT_DISCRIMINATION",
+      "measured_value": 0.667,
+      "weakness_kind": "LOW_SCORE",
+      "why_weak": "measured 0.667 < STRONG floor 0.7",
+      "mutation_type": "EXPERIMENT_DISCRIMINATION"
+     }
+    ],
+    "evidence_gaps": [
+     {
+      "dimension": "I2_DIFFERENTIATOR_TECHNICAL_MEANING",
+      "state": "UNMEASURABLE_NO_SURVIVORS",
+      "what_is_missing": "no surviving differentiators recorded",
+      "consequence": "no mutation targets this dimension until the gap closes (Art. XXV)"
+     },
+     {
+      "dimension": "I3_RECOMBINATION_RISK",
+      "state": "UNMEASURABLE_NO_FAMILIES",
+      "what_is_missing": "no prior-art families adjudicated — residue vs found art is unmeasured; absence of found art is not novelty",
+      "consequence": "no mutation targets this dimension until the gap closes (Art. XXV)"
+     },
+     {
+      "dimension": "I4_NEW_TECHNICAL_RELATIONSHIP",
+      "state": "UNMEASURABLE_NO_FAMILY_TEXT",
+      "what_is_missing": "no adjudicated family text stored — pair novelty vs found art is unmeasured",
+      "consequence": "no mutation targets this dimension until the gap closes (Art. XXV)"
+     }
+    ],
+    "target": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT"
+    }
+   },
+   "proposals": [
+    {
+     "proposal_id": "prop:7ee7005e6610",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "c42a289dd59f2720aebfac76a404d67d2fe2cad9f10748f0e487f9233a43ebb4",
+     "output_hash": "7ee7005e66107bc2a40514118ebdce9b4d83bdedcef5ddae48543b95b2050495",
+     "fields": {
+      "MUTATION_TYPE": "EVIDENCE_DERIVED_CONSTRAINT",
+      "MECHANISM": "wavelet decomposition for feature extraction, Long Short-Term Memory (LSTM) networks for capturing temporal dependencies, and Support Vector Regression (SVR) for refined estimates with all model parameters optimized via a Developed Henry Gas Solubility Optimization (DHGSO) algorithm",
+      "INTERVENTION": "develop a hybrid forecasting model that integrates wavelet decomposition for feature extraction, Long Short-Term Memory (LSTM) networks to capture temporal dependencies in sales patterns, and employs Support Vector Regression (SVR) for refined forecast estimates with all model parameters optimized via a Developed Henry Gas Solubility Optimization (DHGSO) algorithm",
+      "EXPECTED_EFFECT": "enable early detection of feature drift by capturing subtle changes in temporal patterns that would otherwise go unnoticed in the gradient-boosted model while maintaining parameter optimization through DHGSO",
+      "FALSIFICATION_TEST": "falsification_test_from_candidate",
+      "MECHANISM_SOURCE_SPAN": "This study proposes a novel hybrid forecasting model that integrates wavelet decomposition for feature extraction, Long Short-Term Memory (LSTM) networks for capturing temporal dependencies, and Support Vector Regression (SVR) for refined estimates, with all model parameters optimized via a Developed Henry Gas Solubility Optimization (DHGSO) algorithm.",
+      "SOURCE_EVIDENCE_ID": "doi:10.1038/s41598-025-21835-4",
+      "EXPERIMENT": "compare the DHGSO-optimized hybrid model against the original gradient-boosted model in detecting feature drift within 7 days of onset at or above 15 percent WAPE inflation",
+      "EXPERIMENT_BASELINE": "standalone LSTM and SVR models",
+      "EXPERIMENT_EIG": "0.85",
+      "CONSTRAINT_DERIVED": "model parameters must be optimized via a Developed Henry Gas Solubility Optimization (DHGSO) algorithm",
+      "MUTATION_REASON": "repairs I1_MECHANISM_EVIDENCE_DERIVATION weakness by anchoring the mechanism's technical vocabulary in the actual evidence text and adding DHGSO optimization as a derived constraint"
+     },
+     "validation": {
+      "valid": true,
+      "stage": "VALIDATION",
+      "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+      "checks": {
+       "mutation_type_matches_diagnosis": true,
+       "span_evidence_exists": "doi:10.1038/s41598-025-21835-4",
+       "span_verbatim_in_evidence": true,
+       "evidence_support": 0.861,
+       "evidence_support_cleared": 0.861,
+       "constraint_traceable_to_evidence": "model parameters must be optimized via a Developed Henry Gas Solubility Optimization (DHGSO) algorithm"
+      },
+      "reasons": [],
+      "validated_at": "2026-09-10T17:21:07+00:00Z"
+     }
+    }
+   ],
+   "mutation_attempts": [
+    {
+     "mutation_applied": {
+      "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+      "mutation_id": "mut:2af0919fff7b",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+      "diagnostic_trigger": {
+       "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+       "measured_before": 0.409,
+       "basis": "R378 evaluator-contract diagnosis (deterministic)"
+      },
+      "proposal_provenance": {
+       "proposal_id": "prop:7ee7005e6610",
+       "provider": "zai",
+       "model": "glm-4-plus",
+       "prompt_hash": "c42a289dd59f2720aebfac76a404d67d2fe2cad9f10748f0e487f9233a43ebb4",
+       "output_hash": "7ee7005e66107bc2a40514118ebdce9b4d83bdedcef5ddae48543b95b2050495",
+       "llm_is_untrusted_proposer": true
+      },
+      "validation": {
+       "valid": true,
+       "stage": "VALIDATION",
+       "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+       "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+       "checks": {
+        "mutation_type_matches_diagnosis": true,
+        "span_evidence_exists": "doi:10.1038/s41598-025-21835-4",
+        "span_verbatim_in_evidence": true,
+        "evidence_support": 0.861,
+        "evidence_support_cleared": 0.861,
+        "constraint_traceable_to_evidence": "model parameters must be optimized via a Developed Henry Gas Solubility Optimization (DHGSO) algorithm"
+       },
+       "reasons": [],
+       "validated_at": "2026-09-10T17:21:07+00:00Z"
+      },
+      "fields_changed": {
+       "mechanism": {
+        "before": "wavelet decomposition for feature extraction, LSTM networks for capturing temporal dependencies, and SVR for refined estimates",
+        "after": "wavelet decomposition for feature extraction, Long Short-Term Memory (LSTM) networks for capturing temporal dependencies, and Support Vector Regression (SVR) for refined estimates with all model parameters optimized via a Developed Henry Gas Solubility Optimization (DHGSO) algorithm"
+       },
+       "intervention": {
+        "before": "develop a hybrid forecasting model that applies wavelet decomposition to retail data features, uses LSTM networks to capture temporal dependencies in sales patterns, and employs SVR for refined forecast estimates",
+        "after": "develop a hybrid forecasting model that integrates wavelet decomposition for feature extraction, Long Short-Term Memory (LSTM) networks to capture temporal dependencies in sales patterns, and employs Support Vector Regression (SVR) for refined forecast estimates with all model parameters optimized v"
+       },
+       "mechanism_source_span": {
+        "before": "This study proposes a novel hybrid forecasting model that integrates wavelet decomposition for feature extraction, Long Short-Term Memory (LSTM) networks for capturing temporal dependencies, and Support Vector Regression (SVR) for refined estimates, with all model parameters optimized via a Develope",
+        "after": "This study proposes a novel hybrid forecasting model that integrates wavelet decomposition for feature extraction, Long Short-Term Memory (LSTM) networks for capturing temporal dependencies, and Support Vector Regression (SVR) for refined estimates, with all model parameters optimized via a Develope"
+       }
+      },
+      "inherited_negatives": {
+       "uncertainty_ids": [
+        "con:attack:weak_transfer",
+        "feature gradient boosted forecast model planning",
+        "feature gradient boosted forecast model planning",
+        "feature capturing temporal wavelet decomposition extraction",
+        "feature capturing temporal wavelet decomposition extraction",
+        "features model temporal forecast wavelet decomposition retail networks",
+        "features model temporal forecast wavelet decomposition retail networks",
+        "feature estimation detection capturing forecasting decomposition",
+        "feature estimation detection capturing forecasting decomposition",
+        "gradient boosted forecast model planning capturing",
+        "gradient boosted forecast model planning capturing"
+       ],
+       "collision_family_ids": [],
+       "source_errors": []
+      },
+      "parent_spec_hash": "e8117b03ddc492d9908290b335d48ae5106439da8c7031bfdb07584508aaa016",
+      "child_spec_hash": null,
+      "reason": "repairs I1_MECHANISM_EVIDENCE_DERIVATION weakness by anchoring the mechanism's technical vocabulary in the actual evidence text and adding DHGSO optimization as a derived constraint",
+      "applied_at": "2026-09-10T17:21:07+00:00Z"
+     },
+     "re_evaluation": {
+      "collision_mode": "REPLAY_CACHE",
+      "re_evaluated_at": "2026-09-10T17:21:07+00:00Z",
+      "re_adjudication": {
+       "mode": "REPLAY_CACHE",
+       "valid": false,
+       "reason": "NO_CACHED_FAMILIES"
+      },
+      "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+      "re_adjudication_failure": "NO_CACHED_FAMILIES",
+      "i_dimensions": {
+       "I1_MECHANISM_EVIDENCE_DERIVATION": {
+        "score": 0.897,
+        "state": "MEASURED"
+       },
+       "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_SURVIVORS"
+       },
+       "I3_RECOMBINATION_RISK": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_FAMILIES"
+       },
+       "I4_NEW_TECHNICAL_RELATIONSHIP": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+       },
+       "I5_EXPERIMENT_DISCRIMINATION": {
+        "score": 0.667,
+        "state": "MEASURED"
+       }
+      },
+      "i_flags": {
+       "underived_mechanism": false,
+       "recombination_only": false
+      },
+      "i_average": 0.782,
+      "q_dimensions": {
+       "Q1_EVIDENCE_BINDING": {
+        "score": 0.5,
+        "state": "MEASURED"
+       },
+       "Q2_PRIOR_ART_SPECIFICITY": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_PRIOR_ART"
+       },
+       "Q3_PRIOR_ART_RESOLUTION": {
+        "score": 0.0,
+        "state": "MEASURED"
+       },
+       "Q4_EXPERIMENT_DECISIVENESS": {
+        "score": 1.0,
+        "state": "MEASURED"
+       },
+       "Q5_CHAIN_COMPLETENESS": {
+        "score": 1.0,
+        "state": "MEASURED"
+       }
+      },
+      "q_average": 0.625
+     },
+     "decision": {
+      "action": "KEEP",
+      "improved": true,
+      "checks": {
+       "targeted_dimension": "0.409 -> 0.897 (improved)",
+       "negatives_preserved": true,
+       "no_new_structural_flags": true,
+       "no_unknown_conversion_without_new_evidence": true,
+       "text_gap_conversions_recorded": [],
+       "prior_art_position_not_degraded": true
+      },
+      "reasons": [],
+      "decided_at": "2026-09-10T17:21:07+00:00Z"
+     }
+    }
+   ],
+   "mutation_applied": {
+    "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+    "mutation_id": "mut:2af0919fff7b",
+    "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+    "diagnostic_trigger": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "measured_before": 0.409,
+     "basis": "R378 evaluator-contract diagnosis (deterministic)"
+    },
+    "proposal_provenance": {
+     "proposal_id": "prop:7ee7005e6610",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "c42a289dd59f2720aebfac76a404d67d2fe2cad9f10748f0e487f9233a43ebb4",
+     "output_hash": "7ee7005e66107bc2a40514118ebdce9b4d83bdedcef5ddae48543b95b2050495",
+     "llm_is_untrusted_proposer": true
+    },
+    "validation": {
+     "valid": true,
+     "stage": "VALIDATION",
+     "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+     "checks": {
+      "mutation_type_matches_diagnosis": true,
+      "span_evidence_exists": "doi:10.1038/s41598-025-21835-4",
+      "span_verbatim_in_evidence": true,
+      "evidence_support": 0.861,
+      "evidence_support_cleared": 0.861,
+      "constraint_traceable_to_evidence": "model parameters must be optimized via a Developed Henry Gas Solubility Optimization (DHGSO) algorithm"
+     },
+     "reasons": [],
+     "validated_at": "2026-09-10T17:21:07+00:00Z"
+    },
+    "fields_changed": {
+     "mechanism": {
+      "before": "wavelet decomposition for feature extraction, LSTM networks for capturing temporal dependencies, and SVR for refined estimates",
+      "after": "wavelet decomposition for feature extraction, Long Short-Term Memory (LSTM) networks for capturing temporal dependencies, and Support Vector Regression (SVR) for refined estimates with all model parameters optimized via a Developed Henry Gas Solubility Optimization (DHGSO) algorithm"
+     },
+     "intervention": {
+      "before": "develop a hybrid forecasting model that applies wavelet decomposition to retail data features, uses LSTM networks to capture temporal dependencies in sales patterns, and employs SVR for refined forecast estimates",
+      "after": "develop a hybrid forecasting model that integrates wavelet decomposition for feature extraction, Long Short-Term Memory (LSTM) networks to capture temporal dependencies in sales patterns, and employs Support Vector Regression (SVR) for refined forecast estimates with all model parameters optimized v"
+     },
+     "mechanism_source_span": {
+      "before": "This study proposes a novel hybrid forecasting model that integrates wavelet decomposition for feature extraction, Long Short-Term Memory (LSTM) networks for capturing temporal dependencies, and Support Vector Regression (SVR) for refined estimates, with all model parameters optimized via a Develope",
+      "after": "This study proposes a novel hybrid forecasting model that integrates wavelet decomposition for feature extraction, Long Short-Term Memory (LSTM) networks for capturing temporal dependencies, and Support Vector Regression (SVR) for refined estimates, with all model parameters optimized via a Develope"
+     }
+    },
+    "inherited_negatives": {
+     "uncertainty_ids": [
+      "con:attack:weak_transfer",
+      "feature gradient boosted forecast model planning",
+      "feature gradient boosted forecast model planning",
+      "feature capturing temporal wavelet decomposition extraction",
+      "feature capturing temporal wavelet decomposition extraction",
+      "features model temporal forecast wavelet decomposition retail networks",
+      "features model temporal forecast wavelet decomposition retail networks",
+      "feature estimation detection capturing forecasting decomposition",
+      "feature estimation detection capturing forecasting decomposition",
+      "gradient boosted forecast model planning capturing",
+      "gradient boosted forecast model planning capturing"
+     ],
+     "collision_family_ids": [],
+     "source_errors": []
+    },
+    "parent_spec_hash": "e8117b03ddc492d9908290b335d48ae5106439da8c7031bfdb07584508aaa016",
+    "child_spec_hash": null,
+    "reason": "repairs I1_MECHANISM_EVIDENCE_DERIVATION weakness by anchoring the mechanism's technical vocabulary in the actual evidence text and adding DHGSO optimization as a derived constraint",
+    "applied_at": "2026-09-10T17:21:07+00:00Z"
+   },
+   "re_evaluation": {
+    "collision_mode": "REPLAY_CACHE",
+    "re_evaluated_at": "2026-09-10T17:21:07+00:00Z",
+    "re_adjudication": {
+     "mode": "REPLAY_CACHE",
+     "valid": false,
+     "reason": "NO_CACHED_FAMILIES"
+    },
+    "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+    "re_adjudication_failure": "NO_CACHED_FAMILIES",
+    "i_dimensions": {
+     "I1_MECHANISM_EVIDENCE_DERIVATION": {
+      "score": 0.897,
+      "state": "MEASURED"
+     },
+     "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_SURVIVORS"
+     },
+     "I3_RECOMBINATION_RISK": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_FAMILIES"
+     },
+     "I4_NEW_TECHNICAL_RELATIONSHIP": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+     },
+     "I5_EXPERIMENT_DISCRIMINATION": {
+      "score": 0.667,
+      "state": "MEASURED"
+     }
+    },
+    "i_flags": {
+     "underived_mechanism": false,
+     "recombination_only": false
+    },
+    "i_average": 0.782,
+    "q_dimensions": {
+     "Q1_EVIDENCE_BINDING": {
+      "score": 0.5,
+      "state": "MEASURED"
+     },
+     "Q2_PRIOR_ART_SPECIFICITY": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_PRIOR_ART"
+     },
+     "Q3_PRIOR_ART_RESOLUTION": {
+      "score": 0.0,
+      "state": "MEASURED"
+     },
+     "Q4_EXPERIMENT_DECISIVENESS": {
+      "score": 1.0,
+      "state": "MEASURED"
+     },
+     "Q5_CHAIN_COMPLETENESS": {
+      "score": 1.0,
+      "state": "MEASURED"
+     }
+    },
+    "q_average": 0.625
+   },
+   "decision": {
+    "action": "KEEP",
+    "improved": true,
+    "checks": {
+     "targeted_dimension": "0.409 -> 0.897 (improved)",
+     "negatives_preserved": true,
+     "no_new_structural_flags": true,
+     "no_unknown_conversion_without_new_evidence": true,
+     "text_gap_conversions_recorded": [],
+     "prior_art_position_not_degraded": true
+    },
+    "reasons": [],
+    "decided_at": "2026-09-10T17:21:07+00:00Z"
+   }
+  },
+  {
+   "iteration": 2,
+   "diagnosis": {
+    "limiting_features": [
+     {
+      "dimension": "I5_EXPERIMENT_DISCRIMINATION",
+      "measured_value": 0.667,
+      "weakness_kind": "LOW_SCORE",
+      "why_weak": "measured 0.667 < STRONG floor 0.7",
+      "mutation_type": "EXPERIMENT_DISCRIMINATION"
+     }
+    ],
+    "evidence_gaps": [
+     {
+      "dimension": "I2_DIFFERENTIATOR_TECHNICAL_MEANING",
+      "state": "UNMEASURABLE_NO_SURVIVORS",
+      "what_is_missing": "no surviving differentiators recorded",
+      "consequence": "no mutation targets this dimension until the gap closes (Art. XXV)"
+     },
+     {
+      "dimension": "I3_RECOMBINATION_RISK",
+      "state": "UNMEASURABLE_NO_FAMILIES",
+      "what_is_missing": "no prior-art families adjudicated — residue vs found art is unmeasured; absence of found art is not novelty",
+      "consequence": "no mutation targets this dimension until the gap closes (Art. XXV)"
+     },
+     {
+      "dimension": "I4_NEW_TECHNICAL_RELATIONSHIP",
+      "state": "UNMEASURABLE_NO_FAMILY_TEXT",
+      "what_is_missing": "no adjudicated family text stored — pair novelty vs found art is unmeasured",
+      "consequence": "no mutation targets this dimension until the gap closes (Art. XXV)"
+     }
+    ],
+    "target": {
+     "dimension": "I5_EXPERIMENT_DISCRIMINATION",
+     "mutation_type": "EXPERIMENT_DISCRIMINATION"
+    }
+   },
+   "proposals": [
+    {
+     "proposal_id": "prop:ad50e498281f",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "7f58763c60a6e2ea485aa74fd33148a18cdd48d2d78105f2255c20fb54bc8792",
+     "output_hash": "ad50e498281f06870c320af63a831aa4b5977bbe8284ea69e625113748d9c2de",
+     "fields": {
+      "MUTATION_TYPE": "EXPERIMENT_DISCRIMINATION",
+      "MECHANISM": "wavelet decomposition for feature extraction, Long Short-Term Memory (LSTM) networks for capturing temporal dependencies, and Support Vector Regression (SVR) for refined estimates with all model parameters optimized via a Developed Henry Gas Solubility Optimization (DHGSO) algorithm",
+      "INTERVENTION": "develop a hybrid forecasting model that integrates wavelet decomposition for feature extraction, Long Short-Term Memory (LSTM) networks to capture temporal dependencies in sales patterns, and employs Support Vector Regression (SVR) for refined forecast estimates with all model parameters optimized via a Developed Henry Gas Solubility Optimization (DHGSO) algorithm",
+      "EXPECTED_EFFECT": "enable early detection of feature drift by capturing subtle changes in temporal patterns that would otherwise go unnoticed in the gradient-boosted model while maintaining parameter optimization through DHGSO",
+      "FALSIFICATION_TEST": "falsification_test_from_candidate",
+      "MECHANISM_SOURCE_SPAN": "This study proposes a novel hybrid forecasting model that integrates wavelet decomposition for feature extraction, Long Short-Term Memory (LSTM) networks for capturing temporal dependencies, and Support Vector Regression (SVR) for refined estimates, with all model parameters optimized via a Developed Henry Gas Solubility Optimization (DHGSO) algorithm.",
+      "SOURCE_EVIDENCE_ID": "doi:10.1038/s41598-025-21835-4",
+      "EXPERIMENT": "conduct a physical experiment using real-world retail sales data from 50 stores across different regions with controlled assortment and pricing changes, comparing the wavelet-LSTM-SVR-DHGSO hybrid model against XGBoost on the same dataset to measure detection time of feature drift",
+      "EXPERIMENT_BASELINE": "XGBoost",
+      "EXPERIMENT_EIG": "0.35",
+      "CONSTRAINT_DERIVED": "NONE",
+      "MUTATION_REASON": "repairs I5_EXPERIMENT_DISCRIMINATION by implementing a physical experiment comparing candidate against XGBoost baseline to measure feature drift detection time"
+     },
+     "validation": {
+      "valid": true,
+      "stage": "VALIDATION",
+      "target_dimension": "I5_EXPERIMENT_DISCRIMINATION",
+      "mutation_type": "EXPERIMENT_DISCRIMINATION",
+      "checks": {
+       "mutation_type_matches_diagnosis": true,
+       "mutation_changes_candidate": true,
+       "experiment_is_physical": true,
+       "experiment_references_baseline": "XGBoost",
+       "experiment_eig_positive": 0.35
+      },
+      "reasons": [],
+      "validated_at": "2026-09-10T17:21:11+00:00Z"
+     }
+    }
+   ],
+   "mutation_attempts": [
+    {
+     "mutation_applied": {
+      "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+      "mutation_id": "mut:b42526e6f493",
+      "mutation_type": "EXPERIMENT_DISCRIMINATION",
+      "diagnostic_trigger": {
+       "dimension": "I5_EXPERIMENT_DISCRIMINATION",
+       "measured_before": 0.667,
+       "basis": "R378 evaluator-contract diagnosis (deterministic)"
+      },
+      "proposal_provenance": {
+       "proposal_id": "prop:ad50e498281f",
+       "provider": "zai",
+       "model": "glm-4-plus",
+       "prompt_hash": "7f58763c60a6e2ea485aa74fd33148a18cdd48d2d78105f2255c20fb54bc8792",
+       "output_hash": "ad50e498281f06870c320af63a831aa4b5977bbe8284ea69e625113748d9c2de",
+       "llm_is_untrusted_proposer": true
+      },
+      "validation": {
+       "valid": true,
+       "stage": "VALIDATION",
+       "target_dimension": "I5_EXPERIMENT_DISCRIMINATION",
+       "mutation_type": "EXPERIMENT_DISCRIMINATION",
+       "checks": {
+        "mutation_type_matches_diagnosis": true,
+        "mutation_changes_candidate": true,
+        "experiment_is_physical": true,
+        "experiment_references_baseline": "XGBoost",
+        "experiment_eig_positive": 0.35
+       },
+       "reasons": [],
+       "validated_at": "2026-09-10T17:21:11+00:00Z"
+      },
+      "fields_changed": {
+       "decisive_experiment": {
+        "before": "falsification_test_from_candidate",
+        "after": "conduct a physical experiment using real-world retail sales data from 50 stores across different regions with controlled assortment and pricing changes, comparing the wavelet-LSTM-SVR-DHGSO hybrid model against XGBoost on the same dataset to measure detection time of feature drift"
+       }
+      },
+      "inherited_negatives": {
+       "uncertainty_ids": [
+        "con:attack:weak_transfer",
+        "feature gradient boosted forecast model planning",
+        "feature gradient boosted forecast model planning",
+        "feature capturing temporal wavelet decomposition extraction",
+        "feature capturing temporal wavelet decomposition extraction",
+        "features model temporal forecast wavelet decomposition retail networks",
+        "features model temporal forecast wavelet decomposition retail networks",
+        "feature estimation detection capturing forecasting decomposition",
+        "feature estimation detection capturing forecasting decomposition",
+        "gradient boosted forecast model planning capturing",
+        "gradient boosted forecast model planning capturing"
+       ],
+       "collision_family_ids": [],
+       "source_errors": []
+      },
+      "parent_spec_hash": "949c5d6e4de7af37fad03c337d7d0f06dc0b33f15a2bc010e352b7317c130074",
+      "child_spec_hash": null,
+      "reason": "repairs I5_EXPERIMENT_DISCRIMINATION by implementing a physical experiment comparing candidate against XGBoost baseline to measure feature drift detection time",
+      "applied_at": "2026-09-10T17:21:11+00:00Z"
+     },
+     "re_evaluation": {
+      "collision_mode": "REPLAY_CACHE",
+      "re_evaluated_at": "2026-09-10T17:21:11+00:00Z",
+      "re_adjudication": {
+       "mode": "REPLAY_CACHE",
+       "valid": false,
+       "reason": "NO_CACHED_FAMILIES"
+      },
+      "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+      "re_adjudication_failure": "NO_CACHED_FAMILIES",
+      "i_dimensions": {
+       "I1_MECHANISM_EVIDENCE_DERIVATION": {
+        "score": 0.897,
+        "state": "MEASURED"
+       },
+       "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_SURVIVORS"
+       },
+       "I3_RECOMBINATION_RISK": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_FAMILIES"
+       },
+       "I4_NEW_TECHNICAL_RELATIONSHIP": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+       },
+       "I5_EXPERIMENT_DISCRIMINATION": {
+        "score": 1.0,
+        "state": "MEASURED"
+       }
+      },
+      "i_flags": {
+       "underived_mechanism": false,
+       "recombination_only": false
+      },
+      "i_average": 0.949,
+      "q_dimensions": {
+       "Q1_EVIDENCE_BINDING": {
+        "score": 0.5,
+        "state": "MEASURED"
+       },
+       "Q2_PRIOR_ART_SPECIFICITY": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_PRIOR_ART"
+       },
+       "Q3_PRIOR_ART_RESOLUTION": {
+        "score": 0.0,
+        "state": "MEASURED"
+       },
+       "Q4_EXPERIMENT_DECISIVENESS": {
+        "score": 1.0,
+        "state": "MEASURED"
+       },
+       "Q5_CHAIN_COMPLETENESS": {
+        "score": 1.0,
+        "state": "MEASURED"
+       }
+      },
+      "q_average": 0.625
+     },
+     "decision": {
+      "action": "KEEP",
+      "improved": true,
+      "checks": {
+       "targeted_dimension": "0.667 -> 1.0 (improved)",
+       "negatives_preserved": true,
+       "no_new_structural_flags": true,
+       "no_unknown_conversion_without_new_evidence": true,
+       "text_gap_conversions_recorded": [],
+       "prior_art_position_not_degraded": true
+      },
+      "reasons": [],
+      "decided_at": "2026-09-10T17:21:11+00:00Z"
+     }
+    }
+   ],
+   "mutation_applied": {
+    "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+    "mutation_id": "mut:b42526e6f493",
+    "mutation_type": "EXPERIMENT_DISCRIMINATION",
+    "diagnostic_trigger": {
+     "dimension": "I5_EXPERIMENT_DISCRIMINATION",
+     "measured_before": 0.667,
+     "basis": "R378 evaluator-contract diagnosis (deterministic)"
+    },
+    "proposal_provenance": {
+     "proposal_id": "prop:ad50e498281f",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "7f58763c60a6e2ea485aa74fd33148a18cdd48d2d78105f2255c20fb54bc8792",
+     "output_hash": "ad50e498281f06870c320af63a831aa4b5977bbe8284ea69e625113748d9c2de",
+     "llm_is_untrusted_proposer": true
+    },
+    "validation": {
+     "valid": true,
+     "stage": "VALIDATION",
+     "target_dimension": "I5_EXPERIMENT_DISCRIMINATION",
+     "mutation_type": "EXPERIMENT_DISCRIMINATION",
+     "checks": {
+      "mutation_type_matches_diagnosis": true,
+      "mutation_changes_candidate": true,
+      "experiment_is_physical": true,
+      "experiment_references_baseline": "XGBoost",
+      "experiment_eig_positive": 0.35
+     },
+     "reasons": [],
+     "validated_at": "2026-09-10T17:21:11+00:00Z"
+    },
+    "fields_changed": {
+     "decisive_experiment": {
+      "before": "falsification_test_from_candidate",
+      "after": "conduct a physical experiment using real-world retail sales data from 50 stores across different regions with controlled assortment and pricing changes, comparing the wavelet-LSTM-SVR-DHGSO hybrid model against XGBoost on the same dataset to measure detection time of feature drift"
+     }
+    },
+    "inherited_negatives": {
+     "uncertainty_ids": [
+      "con:attack:weak_transfer",
+      "feature gradient boosted forecast model planning",
+      "feature gradient boosted forecast model planning",
+      "feature capturing temporal wavelet decomposition extraction",
+      "feature capturing temporal wavelet decomposition extraction",
+      "features model temporal forecast wavelet decomposition retail networks",
+      "features model temporal forecast wavelet decomposition retail networks",
+      "feature estimation detection capturing forecasting decomposition",
+      "feature estimation detection capturing forecasting decomposition",
+      "gradient boosted forecast model planning capturing",
+      "gradient boosted forecast model planning capturing"
+     ],
+     "collision_family_ids": [],
+     "source_errors": []
+    },
+    "parent_spec_hash": "949c5d6e4de7af37fad03c337d7d0f06dc0b33f15a2bc010e352b7317c130074",
+    "child_spec_hash": null,
+    "reason": "repairs I5_EXPERIMENT_DISCRIMINATION by implementing a physical experiment comparing candidate against XGBoost baseline to measure feature drift detection time",
+    "applied_at": "2026-09-10T17:21:11+00:00Z"
+   },
+   "re_evaluation": {
+    "collision_mode": "REPLAY_CACHE",
+    "re_evaluated_at": "2026-09-10T17:21:11+00:00Z",
+    "re_adjudication": {
+     "mode": "REPLAY_CACHE",
+     "valid": false,
+     "reason": "NO_CACHED_FAMILIES"
+    },
+    "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+    "re_adjudication_failure": "NO_CACHED_FAMILIES",
+    "i_dimensions": {
+     "I1_MECHANISM_EVIDENCE_DERIVATION": {
+      "score": 0.897,
+      "state": "MEASURED"
+     },
+     "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_SURVIVORS"
+     },
+     "I3_RECOMBINATION_RISK": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_FAMILIES"
+     },
+     "I4_NEW_TECHNICAL_RELATIONSHIP": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+     },
+     "I5_EXPERIMENT_DISCRIMINATION": {
+      "score": 1.0,
+      "state": "MEASURED"
+     }
+    },
+    "i_flags": {
+     "underived_mechanism": false,
+     "recombination_only": false
+    },
+    "i_average": 0.949,
+    "q_dimensions": {
+     "Q1_EVIDENCE_BINDING": {
+      "score": 0.5,
+      "state": "MEASURED"
+     },
+     "Q2_PRIOR_ART_SPECIFICITY": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_PRIOR_ART"
+     },
+     "Q3_PRIOR_ART_RESOLUTION": {
+      "score": 0.0,
+      "state": "MEASURED"
+     },
+     "Q4_EXPERIMENT_DECISIVENESS": {
+      "score": 1.0,
+      "state": "MEASURED"
+     },
+     "Q5_CHAIN_COMPLETENESS": {
+      "score": 1.0,
+      "state": "MEASURED"
+     }
+    },
+    "q_average": 0.625
+   },
+   "decision": {
+    "action": "KEEP",
+    "improved": true,
+    "checks": {
+     "targeted_dimension": "0.667 -> 1.0 (improved)",
+     "negatives_preserved": true,
+     "no_new_structural_flags": true,
+     "no_unknown_conversion_without_new_evidence": true,
+     "text_gap_conversions_recorded": [],
+     "prior_art_position_not_degraded": true
+    },
+    "reasons": [],
+    "decided_at": "2026-09-10T17:21:11+00:00Z"
+   }
+  }
+ ],
+ "outcome": "IMPROVED",
+ "outcome_reason": "",
+ "baseline": {
+  "i_dimensions": {
+   "I1_MECHANISM_EVIDENCE_DERIVATION": {
+    "score": 0.409,
+    "state": "MEASURED"
+   },
+   "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_SURVIVORS"
+   },
+   "I3_RECOMBINATION_RISK": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_FAMILIES"
+   },
+   "I4_NEW_TECHNICAL_RELATIONSHIP": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+   },
+   "I5_EXPERIMENT_DISCRIMINATION": {
+    "score": 0.667,
+    "state": "MEASURED"
+   }
+  },
+  "i_flags": {
+   "underived_mechanism": false,
+   "recombination_only": false
+  },
+  "i_average": 0.538,
+  "q_dimensions": {
+   "Q1_EVIDENCE_BINDING": {
+    "score": 0.5,
+    "state": "MEASURED"
+   },
+   "Q2_PRIOR_ART_SPECIFICITY": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_PRIOR_ART"
+   },
+   "Q3_PRIOR_ART_RESOLUTION": {
+    "score": 0.0,
+    "state": "MEASURED"
+   },
+   "Q4_EXPERIMENT_DECISIVENESS": {
+    "score": 1.0,
+    "state": "MEASURED"
+   },
+   "Q5_CHAIN_COMPLETENESS": {
+    "score": 1.0,
+    "state": "MEASURED"
+   }
+  },
+  "q_average": 0.625,
+  "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE"
+ },
+ "final": {
+  "i_dimensions": {
+   "I1_MECHANISM_EVIDENCE_DERIVATION": {
+    "score": 0.897,
+    "state": "MEASURED"
+   },
+   "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_SURVIVORS"
+   },
+   "I3_RECOMBINATION_RISK": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_FAMILIES"
+   },
+   "I4_NEW_TECHNICAL_RELATIONSHIP": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+   },
+   "I5_EXPERIMENT_DISCRIMINATION": {
+    "score": 1.0,
+    "state": "MEASURED"
+   }
+  },
+  "i_flags": {
+   "underived_mechanism": false,
+   "recombination_only": false
+  },
+  "i_average": 0.949,
+  "q_dimensions": {
+   "Q1_EVIDENCE_BINDING": {
+    "score": 0.5,
+    "state": "MEASURED"
+   },
+   "Q2_PRIOR_ART_SPECIFICITY": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_PRIOR_ART"
+   },
+   "Q3_PRIOR_ART_RESOLUTION": {
+    "score": 0.0,
+    "state": "MEASURED"
+   },
+   "Q4_EXPERIMENT_DECISIVENESS": {
+    "score": 1.0,
+    "state": "MEASURED"
+   },
+   "Q5_CHAIN_COMPLETENESS": {
+    "score": 1.0,
+    "state": "MEASURED"
+   }
+  },
+  "q_average": 0.625,
+  "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE"
+ },
+ "finished_at": "2026-09-10T17:21:11+00:00Z",
+ "outcome_summary": {
+  "baseline_i_average": 0.538,
+  "final_i_average": 0.949,
+  "baseline_q_average": 0.625,
+  "final_q_average": 0.625,
+  "iterations_run": 2,
+  "keeps": 2
+ },
+ "status": "IMPROVED"
+}

@@ -1,0 +1,56 @@
+{
+ "stage": "INDEPENDENT_ATTACK",
+ "candidate_id": "cand:DIV:mechanism_inversion:zai:0fdb5f610c13",
+ "escalation": {
+  "gate_version": "attacker_calibration/1.0.0",
+  "instrument": "independent_attack/1.0.0",
+  "calibration_state": "NOT_CALIBRATED",
+  "terminal_kill_admissible": false,
+  "measured": {
+   "coverage": 1.0,
+   "parse_completeness": 1.0,
+   "tpr_scoped": 1.0,
+   "fpr_known_good": 1.0,
+   "n_cases_attacked": 40
+  },
+  "sealed_thresholds": {
+   "note": "registered BEFORE measurement; never tuned to results (Art. XXVII)",
+   "coverage_min": 0.875,
+   "parse_completeness_min": 0.875,
+   "tpr_min": 0.75,
+   "fpr_max": 0.3,
+   "ensemble": "NONE (single-attacker calibration only; majority-vote ensembles are deferred by the R412 directive)"
+  },
+  "measurement_path": "R412/CALIBRATION/engine_independent_attack_measurement.json",
+  "measurement_sha256": "4e1718e7088564333b5e1ef9be47ca452133d051001628cd6eed91f44e60ef5f",
+  "reason": "measured FPR 1.0 > sealed bar 0.3 (Art. L: the attacker is measured non-selective; its KILL is inadmissible as a terminal verdict and is escalated with the objection preserved)",
+  "rule": "the instrument's KILL is measured non-selective (FPR above the sealed bar); the objection is preserved verbatim and ESCALATED for adjudication — the candidate is NOT killed by this attack alone (Art. L); the deterministic gates are unchanged",
+  "reviewer_provenance": "AI_REVIEW (Art. LXVII)"
+ },
+ "preserved_objections": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "basis": "The proposed mechanism fails to address the fundamental chemistry of EVOH, where the vinyl alcohol component provides the barrier properties through hydrogen bonding. Replacing it with phenolic compounds would likely reduce oxygen barrier properties more than it improves moisture resistance, as evidenced by [doi:10.3390/nano16150934] which shows that barrier enhancement requires maintaining the polymer's crystalline structure."
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "basis": "The candidate fails to define boundary conditions for processing temperature, which is critical as phenolic compounds may degrade at temperatures required for EVOH extrusion (>200°C), potentially creating toxic byproducts in food packaging, contradicting safety requirements implied in [doi:10.3389/fchem.2019.00148]."
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "basis": "The candidate's evidence contradicts the approach, as [doi:10.1038/s43246-025-01040-6] demonstrates that barrier properties are maintained through catalytic deoxygenation rather than chemical substitution, and [doi:10.1021/acssuschemeng.5c13705] specifically shows that modifying EVOH structure degrades its oxygen barrier performance."
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "basis": "The modification cannot maintain baseline oxygen barrier properties while reducing moisture sensitivity, as these are intrinsically linked in EVOH copolymers. The trade-off is well-documented in [doi:10.3390/polym18121500], which shows that breathable multilayers sacrifice barrier properties for moisture management."
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "basis": "The proposed copolymer modification is chemically implausible as phenolic compounds cannot simply replace vinyl alcohol units in the polymer backbone without fundamentally altering the polymer's structure and properties, making it impossible to maintain the necessary ethylene-vinyl alcohol ratio for optimal barrier performance."
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "basis": "The testable prediction fails to specify critical measurement parameters including relative humidity levels during testing, temperature cycling conditions, and timeframes that would simulate real-world distribution conditions, making the results unverifiable and meaningless for practical application."
+  }
+ ]
+}
