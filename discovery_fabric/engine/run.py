@@ -455,15 +455,15 @@ class EngineRun:
         envelope. Any failure records an explicit FAILED state in the run
         directory; it never fabricates a package."""
         import os as _os
-        from .dossier_quality import (evaluate_dossier_quality,
-                                      assert_quality_gate)
+        # R440.1: `from .package_factory import generate_buyer_package` is
+        # REMOVED — the old factory is retired from production (archived,
+        # Art. LXIV); the canonical package compiler owns packaging.
         from .engineering_attack import (attack_engineering,
                                          repair_engineering,
                                          select_survivors)
         from .engineering_spec import build_engineering_spec
         from .experiment_selector import select_decisive_experiment
         from .invention_spec import build_invention_spec
-        from .package_factory import generate_buyer_package
         try:
             spec = build_invention_spec(self.env, run_ctx)
             self._spec = spec
@@ -1155,6 +1155,11 @@ class EngineRun:
                         self._persist(
                             f"ENGINEERING_SPECIFICATION_V1_{key}.json", eng1)
                         eng_final, repaired = eng2, True
+                # candidate-level dossier quality (pre-selection screen —
+                # R440 note: this is the CANDIDATE gate, distinct from the
+                # package boundary gates now owned by the compiler + the
+                # independent package quality gate)
+                from .dossier_quality import evaluate_dossier_quality
                 quality = evaluate_dossier_quality(s, eng_final)
                 if quality["verdict"] == "FAIL":
                     # Coder 2 register #1: the rejected candidate carries
@@ -1417,52 +1422,41 @@ class EngineRun:
                 run_ctx = dict(run_ctx, package_registry_row=row)
             else:
                 pkg_number = self.package_number
-            self.package_report = generate_buyer_package(
-                str(self.out), spec_rel, eng_rel, chosen["env_view"],
-                {"run_id": self.run_id,
-                 "package_number": pkg_number},
-                rehearsal=self.rehearsal)
-            self._persist("PACKAGE_REPORT.json",
-                          {k: v for k, v in self.package_report.items()
-                           if k != "rendered"} | {"rendered":
-                                                  self.package_report.get(
-                                                      "rendered", [])})
-            if not self.package_report.get("complete"):
-                self.package_failure = (
-                    "package incomplete: "
-                    f"missing={self.package_report.get('missing_links')} "
-                    f"failed={self.package_report.get('failed')}")
-            else:
-                # ---------- E15-B: substantive quality gate --------------
-                # the rendered package is evaluated WITH its artifacts;
-                # FAIL must not release (CEO: do not lower the benchmark)
-                quality_final = evaluate_dossier_quality(
-                    spec_rel, eng_rel, self.package_report)
-                self._persist("DOSSIER_QUALITY_EVALUATION.json",
-                              quality_final)
-                assert_quality_gate(quality_final)
-                # ---------- E16-H: holdout release gate -----------------
-                from .release_gate import (HELD_FOR_HUMAN_REVIEW,
-                                           RELEASED,
-                                           evaluate_release_gate)
-                gate = evaluate_release_gate(spec_rel, eng_rel,
-                                             self.package_report)
-                self._persist("RELEASE_GATE_EVALUATION.json", gate)
-                self.release_gate = gate
-                self._terminal_status = (RELEASED
-                                         if gate["decision"] == RELEASED
-                                         else HELD_FOR_HUMAN_REVIEW)
-            if (self.package_report.get("complete")
-                    and self.package_number is None):
-                # the allocated identity reaches its terminal state:
-                # RELEASED only when the E16-H gate passed all six gates;
-                # HELD_FOR_HUMAN_REVIEW when any gate is CONDITIONAL
-                # (never counted as an automatic PASS — CEO E16-H)
-                from .package_registry import mark_released
-                mark_released(invention_id,
-                              status=getattr(self, "_terminal_status",
-                                             "RELEASED"),
-                              registry_path=self.package_registry_path)
+            # ------------- R440.2: PACKAGE AFTER FINAL EVOLUTION -------------
+            # The buyer package is NO LONGER generated here. The old
+            # in-run call (package_factory.generate_buyer_package —
+            # candidate -> package -> evolution, the stale-generation
+            # defect this round exists to remove) is RETIRED from
+            # production (Art. LXIV disposition: ARCHIVED_TO
+            # archive/r440_retired/; architectural test asserts zero
+            # production call sites). The ONE canonical package compiler
+            # (discovery_fabric/engine/package_compiler.py) runs
+            # POST-EVOLUTION from the FINAL canonical state, invoked by
+            # the bridge gate (toscanini/worker.py phase 3.5):
+            #   DISCOVERY -> CHALLENGE -> DIAGNOSIS -> EVOLUTION ->
+            #   FINAL INVENTION -> ENGINEERING -> EXPERIMENT -> PACKAGE
+            # The E15-B dossier-quality / E16-H release gates move to the
+            # compiler boundary: the compiler's own validators plus the
+            # independent package quality gate (Gates A–V) decide the
+            # release, transactionally (no partial ZIP, ever).
+            self._persist("PACKAGE_DEFERRED.json", {
+                "schema": "R440_PACKAGE_DEFERRED/1.0",
+                "run_id": self.run_id,
+                "allocated_portfolio_number": pkg_number,
+                "invention_id": invention_id,
+                "deferred_to": ("CANONICAL_PACKAGE_COMPILER "
+                                "(discovery_fabric/engine/package_compiler."
+                                "py; the bridge gate invokes it AFTER the "
+                                "evolution pipeline settles the final "
+                                "invention state — R440.2)"),
+                "order_contract": ("DISCOVERY -> CHALLENGE -> DIAGNOSIS -> "
+                                   "EVOLUTION -> FINAL INVENTION -> "
+                                   "ENGINEERING -> EXPERIMENT -> PACKAGE"),
+                "never": ("candidate -> package -> evolution (a package "
+                          "may never represent a pre-evolution snapshot "
+                          "of the invention)"),
+                "recorded_at": utc_now(),
+            })
         except Exception as exc:  # noqa: BLE001 — explicit, never fabricated
             self.package_failure = f"{type(exc).__name__}: {exc}"
             self._persist("PACKAGE_FAILED.json", {
@@ -2509,16 +2503,19 @@ class EngineRun:
     # ------------------------------------------------------------------
     def _evolution_package_survivor(self, survivor: Dict[str, Any],
                                     run_ctx: Dict[str, Any]) -> None:
-        """The REAL package tail for an evolution survivor: registry
-        allocation -> buyer package -> quality gate -> release gate.
+        """The evolution survivor's post-run tail: geometry + identity
+        persistence. R440.2: the BUYER PACKAGE is no longer generated
+        here — the canonical package compiler (invoked post-run by the
+        bridge gate) compiles from the FINAL state this method persists
+        (INVENTION_SPECIFICATION.json / ENGINEERING_SPECIFICATION.json /
+        DECISIVE_EXPERIMENT.json below are exactly what the compiler
+        reads; the package records the final invention hash and the
+        quality gate reconciles it).
         The R378/R379 improvement passes are NOT re-run here (the
         evolution loop IS the mutation engine on this path — diagnose ->
         causal change -> re-evaluate; the deviation is recorded, never
         silent)."""
         import os as _os
-        from .dossier_quality import (evaluate_dossier_quality,
-                                      assert_quality_gate)
-        from .package_factory import generate_buyer_package
         spec = survivor.pop("_survivor_spec", None)
         eng = survivor.pop("_survivor_eng", None)
         env_view = survivor.pop("_survivor_env", None)
@@ -2567,39 +2564,19 @@ class EngineRun:
             from .experiment_selector import select_decisive_experiment
             self._persist("DECISIVE_EXPERIMENT.json",
                           select_decisive_experiment(env_view))
-            self.package_report = generate_buyer_package(
-                str(self.out), spec, eng, env_view,
-                {"run_id": self.run_id, "package_number": pkg_number},
-                rehearsal=self.rehearsal)
-            self._persist("PACKAGE_REPORT.json",
-                          {k: v for k, v in self.package_report.items()
-                           if k != "rendered"} | {"rendered":
-                                                  self.package_report.get(
-                                                      "rendered", [])})
-            if not self.package_report.get("complete"):
-                self.package_failure = (
-                    "evolution package incomplete: "
-                    f"missing={self.package_report.get('missing_links')} "
-                    f"failed={self.package_report.get('failed')}")
-                return
-            quality_final = evaluate_dossier_quality(
-                spec, eng, self.package_report)
-            self._persist("DOSSIER_QUALITY_EVALUATION.json", quality_final)
-            assert_quality_gate(quality_final)
-            from .release_gate import (HELD_FOR_HUMAN_REVIEW, RELEASED,
-                                       evaluate_release_gate)
-            gate = evaluate_release_gate(spec, eng, self.package_report)
-            self._persist("RELEASE_GATE_EVALUATION.json", gate)
-            self.release_gate = gate
-            self._terminal_status = (RELEASED
-                                     if gate["decision"] == RELEASED
-                                     else HELD_FOR_HUMAN_REVIEW)
-            if self.package_number is None:
-                from .package_registry import mark_released
-                mark_released(invention_id,
-                              status=getattr(self, "_terminal_status",
-                                             "RELEASED"),
-                              registry_path=self.package_registry_path)
+            # R440.2: package deferred — the bridge-gate compiler reads
+            # the FINAL artifacts persisted above (never a pre-evolution
+            # snapshot); the deferral is recorded, never silent.
+            self._persist("PACKAGE_DEFERRED.json", {
+                "schema": "R440_PACKAGE_DEFERRED/1.0",
+                "run_id": self.run_id,
+                "allocated_portfolio_number": pkg_number,
+                "invention_id": invention_id,
+                "evolution_generation": gen_n,
+                "deferred_to": ("CANONICAL_PACKAGE_COMPILER (post-"
+                                "evolution, final state; R440.2)"),
+                "recorded_at": utc_now(),
+            })
         except Exception as exc:  # noqa: BLE001 — explicit, never fabricated
             self.package_failure = (
                 f"evolution package tail: {type(exc).__name__}: {exc}")

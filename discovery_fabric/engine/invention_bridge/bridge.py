@@ -295,21 +295,68 @@ def bridge(run_result: Dict[str, Any], cio: Optional[Dict[str, Any]],
                            {"error": str(exc)})
 
     # ---------------------------------------------------------------- 3. package
-    pkg_dir = os.path.join(work_dir, "TECHNOLOGY_PACKAGE")
-    os.makedirs(pkg_dir, exist_ok=True)
-    package_out = package.assemble(
-        run_result, cio, geometry_out, pkg_dir,
+    # R440.1: THE CANONICAL PACKAGE COMPILER — this is the ONE runtime
+    # call site that creates the customer package. The old
+    # discovery_fabric.engine.package_factory buyer-package path is
+    # RETIRED from production (Art. LXIV disposition in ARCHIVE_MANIFEST);
+    # package.py::assemble is this compiler's rendering library, never an
+    # authority. R440.13: the compiler builds transactionally (temp dir ->
+    # validators -> independent quality gate -> atomic promotion or
+    # quarantine) — a BLOCKED build produces an honest
+    # PACKAGE_BUILD_BLOCKED record, never a partial ZIP.
+    from ..package_compiler import compile_package
+    package_out = compile_package(
+        run_result, cio, geometry_out, work_dir,
         visualizability=vis,
         zip_name=None,
         engine_identity=engine_identity,
     )
     package_out["package_endpoint"] = package_endpoint
     package_out["glb_endpoint"] = glb_endpoint
+    if package_out.get("blocked"):
+        # an honest BLOCKED build: no package is presented (Art. V/XXV);
+        # the typed record says exactly which dimension failed.
+        # R440 wiring completion: the 3D artifact and the package are
+        # SEPARATE products (invention existence != package maturity,
+        # R423A §5) — a blocked package must NOT take the CIO geometry
+        # projection down with it. The CIO update still runs; the
+        # downloads section records the blocked state honestly (no
+        # package_zip, package_blocked=true, the stage that failed).
+        _pipeline_step(steps, "PACKAGE", "PACKAGE_BUILD_BLOCKED", {
+            "stage": package_out.get("blocked_record", {}).get("stage"),
+            "run_id": package_out.get("run_id"),
+            "record": "PACKAGE_BUILD_BLOCKED.json",
+        })
+        cio_updated = cio_update.update_cio(
+            cio, geometry_out, package_out, vis)
+        _pipeline_step(steps, "CIO_UPDATE", "OK_GEOMETRY_ONLY", {
+            "geometry_present": cio_updated["geometry"]["present"],
+            "package_blocked": True,
+            "note": ("geometry projected; downloads honestly absent — "
+                     "the package compiler blocked this build"),
+        })
+        return {
+            "visualizability": vis,
+            "geometry_out": geometry_out,
+            "package_out": package_out,
+            "cio_updated": cio_updated,
+            "report": {
+                "bridge_version": BRIDGE_VERSION,
+                "steps": steps,
+                "outcome": "PACKAGE_BUILD_BLOCKED",
+                "visualizability_class": vis["visualizability_class"],
+                "package_blocked": True,
+                "package_blocked_reason": (
+                    package_out.get("blocked_record", {})
+                    .get("stage")),
+            },
+        }
     _pipeline_step(steps, "PACKAGE", "OK", {
         "zip_path": package_out["zip_path"],
         "zip_sha256": package_out["zip_sha256"],
         "package_maturity": package_out["package_maturity"],
         "files": package_out["manifest"]["file_count"],
+        "compiler": package_out.get("schema"),
     })
 
     # ---------------------------------------------------------------- 4. CIO update

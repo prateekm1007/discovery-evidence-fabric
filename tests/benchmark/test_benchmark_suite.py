@@ -54,18 +54,24 @@ _PROVIDER_ENV_VARS = [
 
 @pytest.fixture(scope="module")
 def two_runs(tmp_path_factory):
-    """Complete-dossier runs generated through Coder 1's real pipeline.
+    """Complete-dossier runs generated through Coder 1's real pipeline,
+    packaged through the R440 canonical package compiler.
 
-    The engine's E15-H gate honestly rejects some inputs (fail-closed is
-    correct behavior). Since the E16 merge the engine also no longer
-    auto-releases ANY independent benchmark input: dossiers it would
-    have released now come back HELD_FOR_HUMAN_REVIEW (complete buyer
-    package on disk, release gated pending human review — see
-    ENGINE_HEAD_REMEASUREMENT_E16MERGE.json for the measured status
-    distribution). The fixture needs real generated dossiers to attack,
-    so it accepts BOTH statuses as produced-dossier runs; the release-
-    YIELD measurement itself lives in the frozen baseline artifacts and
-    the engine-head re-measurement, never in this fixture.
+    R440.2: the engine run no longer generates the buyer package
+    in-run (candidate -> package -> evolution is the retired
+    stale-generation order). The run completes with status
+    PACKAGE_DEFERRED_TO_COMPILER and the canonical package compiler
+    (the ONE production package path, invoked post-run by the bridge
+    gate) compiles the dossier from the FINAL persisted state. This
+    fixture reproduces exactly that production sequence for benchmark
+    inputs: drive the run, then compile.
+
+    The engine's gauntlet honestly rejects some inputs (fail-closed is
+    correct behavior). The fixture needs real generated dossiers to
+    attack, so it accepts every run whose canonical state is complete
+    (spec + engineering persisted) and compiles those; the compile
+    itself may BLOCK (the R440 gate doing its job) — at least 2 must
+    promote for the adversarial suite to run.
 
     SELF-HERMETICITY (E20): strips provider credentials and neutralizes
     the .env.keys bootstrap for the ENTIRE module (yield/finally),
@@ -85,22 +91,64 @@ def two_runs(tmp_path_factory):
     try:
         root = tmp_path_factory.mktemp("bench_runs")
         info = corpus_runner.run_benchmark(root, limit=6)
-        released = []
+        packaged = []
         for p in info["run_dirs"]:
-            rel = json.loads((Path(p) / "DISCOVERY_RELEASE.json")
+            rd = Path(p)
+            rel = json.loads((rd / "DISCOVERY_RELEASE.json")
                              .read_text(encoding="utf-8"))
-            has_dossier = bool(rel.get("package_folder") and
-                               Path(rel["package_folder"]).exists())
-            if rel.get("status") in ("RELEASED", "HELD_FOR_HUMAN_REVIEW") \
-                    and has_dossier:
-                released.append(Path(p))
-        assert len(released) >= 2, (
-            f"expected at least 2 produced-dossier runs, got "
-            f"{len(released)} — engine E15-H rejection rate on independent "
-            f"inputs is itself a benchmark finding (see "
-            f"AUTOMATED_DOSSIER_BENCHMARK.json and "
-            f"ENGINE_HEAD_REMEASUREMENT_E16MERGE.json)")
-        yield released
+            has_state = (rd / "INVENTION_SPECIFICATION.json").is_file() \
+                and (rd / "ENGINEERING_SPECIFICATION.json").is_file()
+            if not has_state:
+                continue
+            # only runs that actually reached the package stage (the
+            # gauntlet-killed inputs have no package path by construction)
+            if rel.get("status") not in (
+                    "PACKAGE_DEFERRED_TO_COMPILER", "RELEASED",
+                    "HELD_FOR_HUMAN_REVIEW"):
+                continue
+            # R440 production sequence: compile post-run from the FINAL
+            # persisted state (the bridge gate's exact contract)
+            spec = json.loads((rd / "INVENTION_SPECIFICATION.json")
+                              .read_text(encoding="utf-8"))
+            eng = json.loads((rd / "ENGINEERING_SPECIFICATION.json")
+                             .read_text(encoding="utf-8"))
+            run_result = {
+                "session_id": rel.get("run_id"),
+                "run_id": rel.get("run_id"),
+                "problem_id": rel.get("problem_id"),
+                "user_text": (spec.get("problem") or {}).get("value", {})
+                .get("failure") if isinstance(
+                    (spec.get("problem") or {}).get("value"), dict)
+                else str((spec.get("problem") or {}).get("value", "")),
+                "title": (f"{((spec.get('problem') or {}).get('value') or {})
+                          .get('device', 'recorded technology')} — "
+                          f"{((spec.get('problem') or {}).get('value') or {})
+                          .get('failure_mode', 'problem')}"),
+                "invention_specification": spec,
+                "engineering_specification": eng,
+                "final_state": json.loads(
+                    (rd / "final_state.json").read_text(encoding="utf-8"))
+                if (rd / "final_state.json").is_file() else {},
+            }
+            geometry_out = _conceptual_geometry_for(eng)
+            from discovery_fabric.engine.package_compiler \
+                import compile_package
+            out = compile_package(run_result, None, geometry_out, str(rd))
+            if out.get("state") == "ZIP_READY":
+                # carry the compiled package identity in the release
+                # record so the audit machinery finds the dossier
+                rel["package_folder"] = out["package_dir"]
+                rel["package_zip"] = out["zip_path"]
+                rel["buyer_package_hash"] = out.get("zip_sha256")
+                rel["status"] = "HELD_FOR_HUMAN_REVIEW"
+                (rd / "DISCOVERY_RELEASE.json").write_text(
+                    json.dumps(rel, indent=2), encoding="utf-8")
+                packaged.append(rd)
+        assert len(packaged) >= 2, (
+            f"expected at least 2 compiled-dossier runs, got "
+            f"{len(packaged)} — R440 package-quality rejection rate on "
+            f"independent inputs is itself a benchmark finding")
+        yield packaged
     finally:
         if not live_opt_in:
             _adapters.load_credentials = _orig_load_credentials
@@ -109,6 +157,30 @@ def two_runs(tmp_path_factory):
                     os.environ.pop(k, None)
                 else:
                     os.environ[k] = v
+
+
+def _conceptual_geometry_for(eng: dict) -> dict:
+    """A conceptual SYSTEM_3D geometry for the run's own subsystem
+    architecture (labeled conceptual — never engineering CAD; the
+    honest CONCEPTUAL_3D disclaimer rides inside the package)."""
+    from discovery_fabric.engine.invention_bridge import \
+        conceptual_geometry
+    subsystems = [s.get("name", f"subsystem {i+1}") if isinstance(s, dict)
+                  else str(s)
+                  for i, s in enumerate(
+                      (eng.get("system_architecture") or {}).get(
+                          "subsystems") or [])] or [
+        "subsystem 1", "subsystem 2", "subsystem 3"]
+    built = conceptual_geometry.build_system_architecture(
+        subsystems, (eng.get("why_this_domain") or {}).get("domain", ""))
+    return {
+        "visualizability_class": "SYSTEM_3D",
+        "glb_bytes": built["glb_bytes"],
+        "glb_sha256": built.get("glb_sha256"),
+        "components": built.get("components") or [],
+        "domain_family": built.get("domain_family"),
+        "renders": {"status": "SKIPPED"},
+    }
 
 
 def _audit(run_dir):

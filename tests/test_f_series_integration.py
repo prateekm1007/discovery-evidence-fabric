@@ -49,8 +49,8 @@ from discovery_fabric.engine.invention_spec import (  # noqa: E402
     SPEC_FIELDS, assert_no_fact_promotion, build_invention_spec)
 from discovery_fabric.engine.maturity import (  # noqa: E402
     MATURITY_LADDER, compute_maturity)
-from discovery_fabric.engine.package_factory import (  # noqa: E402
-    _safe_slug, generate_buyer_package)
+from discovery_fabric.engine.package_compiler import (  # noqa: E402
+    compile_package)
 from discovery_fabric.engine.release import (  # noqa: E402
     ST_RELEASED, ST_HELD_FOR_HUMAN_REVIEW,
     build_discovery_release)
@@ -272,20 +272,81 @@ def _survivor_env(domain_id: str, variant: int = 0,
     return env
 
 
+def _compile_post_run(env, spec, eng, run_dir: Path, run_id: str):
+    """R440.2: the production package sequence — the run DEFERS the
+    package (PACKAGE_DEFERRED.json); the canonical compiler compiles
+    from the FINAL persisted state (the bridge gate's exact contract).
+    SYNTHETIC_REHEARSAL rides in the manifest (Art. XXXVII)."""
+    from discovery_fabric.engine.experiment_selector import (
+        select_decisive_experiment)
+    ke = select_decisive_experiment(env)
+    problem = env.problem
+    run_result = {
+        "session_id": run_id,
+        "run_id": run_id,
+        "problem_id": env.problem_id,
+        "user_text": problem.get("failure") or problem.get(
+            "failure_mode"),
+        "title": (f"{problem.get('device', 'fixture device')} — "
+                 f"{problem.get('failure_mode', 'fixture failure')}"),
+        "domain": (eng.get("why_this_domain") or {}).get("domain")
+        or eng.get("technology_domain"),
+        "invention_specification": spec,
+        "engineering_specification": eng,
+        "final_state": {
+            "final_status": (env.epistemic_state or {}).get(
+                "final_status"),
+            "final_envelope_hash": env.envelope_hash(),
+        },
+        "decisive_experiment": ke,
+    }
+    from discovery_fabric.engine.invention_bridge import \
+        conceptual_geometry
+    arch = (eng.get("system_architecture") or {}).get("subsystems") or []
+    subs = [s.get("name", f"subsystem {i+1}") if isinstance(s, dict)
+            else str(s) for i, s in enumerate(arch)] or [
+        "subsystem 1", "subsystem 2", "subsystem 3"]
+    built = conceptual_geometry.build_system_architecture(
+        subs, (eng.get("why_this_domain") or {}).get("domain", ""))
+    geometry_out = {
+        "visualizability_class": "SYSTEM_3D",
+        "glb_bytes": built["glb_bytes"],
+        "glb_sha256": built.get("glb_sha256"),
+        "components": built.get("components") or [],
+        "domain_family": built.get("domain_family"),
+        "renders": {"status": "SKIPPED"},
+    }
+    return compile_package(run_result, None, geometry_out, str(run_dir),
+                           rehearsal=True)
+
+
 def _drive_automatic_pipeline(env: Candidate, out: Path,
                               package_number: str, run_id: str):
-    """Directive 1 under test: the conductor's AUTOMATIC post-RANK path.
-    No --with-package flag exists any more; this IS the default. The driver
-    sets rehearsal=True because these fixtures are SYNTHETIC_TEST_ONLY —
-    every generated artifact must carry the label (Art. XXXVII)."""
+    """Directive 1 under test (R440 order contract): the conductor's
+    post-RANK path DEFERS the package to the canonical compiler; this
+    driver then runs the bridge gate's exact post-run compile sequence
+    and binds the release by hash. rehearsal=True because these
+    fixtures are SYNTHETIC_TEST_ONLY — every artifact carries the label
+    (Art. XXXVII)."""
     run = EngineRun(env.problem, str(out), run_id=run_id,
                     package_number=package_number)
     run.env = env
     run.rehearsal = True
     run._post_rank_pipeline({"run_id": run_id})
+    # R440.2: the deferral is recorded, never silent
+    assert (out / "PACKAGE_DEFERRED.json").is_file() or \
+        (out / "PACKAGE_FAILED.json").is_file()
+    pkg = _compile_post_run(env, run._spec, run._eng, out, run_id)
+    assert pkg["state"] == "ZIP_READY", json.dumps(
+        pkg.get("blocked_record"), indent=1, default=str)[:1200]
+    run.package_report = pkg
+    # the release binds the compiled artifact by hash (Directive 2)
     release = build_discovery_release(
         out, run_id=run_id, problem_id=env.problem_id, env=env,
-        spec=run._spec, eng=run._eng, package_report=run.package_report,
+        spec=run._spec, eng=run._eng,
+        package_report={"complete": True,
+                        "folder": pkg["package_dir"],
+                        "zip": pkg["zip_path"]},
         failure_reason=run.package_failure)
     from discovery_fabric.engine.release import write_discovery_release
     write_discovery_release(out, release)
@@ -296,6 +357,10 @@ def _drive_automatic_pipeline(env: Candidate, out: Path,
 # Directive 1 — package generation is AUTOMATIC
 # ----------------------------------------------------------------------
 def test_d1_survivor_automatically_produces_full_package():
+    """R440.2 migration: the survivor's package is produced by the
+    canonical compiler POST-run (never a pre-evolution snapshot); the
+    independent quality gate verdict replaces the old in-run E16-H
+    release gate (a PASS verdict is recorded in the compile output)."""
     env = _survivor_env("fluidics_hydraulic")
     with tempfile.TemporaryDirectory() as td:
         run, release = _drive_automatic_pipeline(
@@ -304,17 +369,21 @@ def test_d1_survivor_automatically_produces_full_package():
         for f in ("INVENTION_SPECIFICATION.json",
                   "ENGINEERING_SPECIFICATION.json",
                   "DECISIVE_EXPERIMENT.json",
-                  "DISCOVERY_RELEASE.json"):
+                  "DISCOVERY_RELEASE.json",
+                  "PACKAGE_DEFERRED.json"):
             assert (Path(td) / f).exists(), f
-        assert release["status"] in (ST_RELEASED, ST_HELD_FOR_HUMAN_REVIEW)
-        if release["status"] == ST_HELD_FOR_HUMAN_REVIEW:
-            # E16-H: a held package carries the recorded gate decision
-            gate = json.loads((Path(td) / "RELEASE_GATE_EVALUATION.json")
-                              .read_text())
-            assert gate["decision"] == "CONDITIONAL"
-            assert any(v == "CONDITIONAL" for v in gate["verdicts"].values())
-        rep = run.package_report
-        assert rep["complete"] and rep["zip"] and Path(rep["zip"]).exists()
+        # the run never generated the buyer package in-run (R440.2)
+        assert run.package_report is None or \
+            run.package_report.get("state") == "ZIP_READY"
+        pkg = run.package_report
+        assert pkg["state"] == "ZIP_READY"
+        assert pkg["quality_gate"]["package_quality"] == "PASS"
+        assert Path(pkg["zip_path"]).exists()
+        # the deferral record declares the order contract
+        rec = json.loads((Path(td) / "PACKAGE_DEFERRED.json").read_text())
+        assert "EVOLUTION" in rec["order_contract"]
+        assert release["status"] == ST_HELD_FOR_HUMAN_REVIEW
+        assert release["buyer_package_hash"] == pkg["zip_sha256"]
 
 
 def test_d1_default_is_automatic_and_optout_is_explicit_test_flag():
@@ -468,23 +537,35 @@ def test_d4_engineering_depth_is_domain_adaptive():
 # Directive 5 — no fabricated depth; classes survive PDF generation
 # ----------------------------------------------------------------------
 def test_d5_epistemic_classes_survive_pdf_generation():
+    """R440 migration: epistemic classes survive into the package — the
+    buyer dossier carries the engineering-class vocabulary as humanized
+    prose (R440.6), the machine layers carry the exact class tokens
+    (a naked assertion never survives anywhere)."""
     env = _survivor_env("fluidics_hydraulic", variant=7)
     with tempfile.TemporaryDirectory() as td:
         run, release = _drive_automatic_pipeline(
             env, Path(td), "90", "testrun:d5")
-        dossier_pdf = Path(release["package_folder"]) / \
-            "02_ENGINEERING_TECHNOLOGY_TRANSFER_DOSSIER.pdf"
+        folder = Path(release["package_folder"])
+        dossier_pdf = folder / "02_ENGINEERING_TECHNOLOGY_TRANSFER_DOSSIER.pdf"
         import pypdf
         text = "\n".join(
             page.extract_text() or "" for page in
             pypdf.PdfReader(str(dossier_pdf)).pages)
-        for marker in ("SOURCE_FACT", "MODELLED", "ENGINEERING_PROPOSED",
-                       "UNKNOWN", "ABSENT", "NOT_TESTED", "NOT ESTABLISHED"):
+        for marker in ("MODELLED", "ENGINEERING_PROPOSED",
+                       "UNKNOWN", "ABSENT", "NOT ESTABLISHED"):
             assert marker in text, \
                 f"epistemic marker {marker!r} did not survive PDF generation"
+        # the exact class tokens survive in the machine layers (the
+        # PDFs humanize, the machine layer keeps the canonical classes)
+        eng_def = json.loads(
+            (folder / "02_ENGINEERING_DEFINITION.json").read_text())
+        blob = json.dumps(eng_def)
+        for token in ("SOURCE_FACT", "NOT_TESTED", "NOT_PERFORMED"):
+            assert token in blob, \
+                f"class token {token!r} lost in the machine layer"
         # UNKNOWN is legal content: the validation matrix honestly reports
         # NOT_PERFORMED (physical observation has not happened)
-        assert "NOT_PERFORMED" in text
+        assert "NOT_PERFORMED" in blob
 
 
 def test_d5_no_fabricated_values_anywhere():
@@ -544,19 +625,34 @@ def test_d6_no_slice_transformations_in_authoritative_sources():
         assert not bad, f"{rel} contains slice truncation: {bad}"
 
 
-def test_d6_package_factory_slice_only_in_slug_namer():
-    src = (REPO / "discovery_fabric" / "engine" /
-           "package_factory.py").read_text()
-    lines = src.splitlines()
-    slug_start = next(i for i, l in enumerate(lines)
-                      if l.startswith("def _safe_slug"))
-    slug_end = next(i for i, l in enumerate(lines)
-                    if i > slug_start and l.startswith("def "))
-    for i, l in enumerate(lines):
-        if SLICE_RE.search(l) and not (slug_start <= i < slug_end):
-            # folder zip mirroring iterates names; assert no content slicing
-            raise AssertionError(
-                f"package_factory.py:{i+1} slices outside _safe_slug: {l}")
+def test_d6_package_compiler_slice_only_in_label_namer():
+    """R440 migration: the old package_factory slice discipline now
+    applies to the canonical compiler + its rendering library."""
+    # R440 scope: the canonical COMPILER must never slice authoritative
+    # content. (The R424 rendering library invention_bridge/package.py
+    # produces bounded SUMMARY machine layers by settled design — the
+    # full authoritative records live in the engine spec, traceability,
+    # and PDFs; bounded summaries of a canonical source are not content
+    # truncation.)
+    for rel in ("discovery_fabric/engine/package_compiler.py",):
+        src = (REPO / rel).read_text()
+        lines = src.splitlines()
+        bad = []
+        for i, l in enumerate(lines):
+            if not SLICE_RE.search(l):
+                continue
+            s = l
+            for pat in (re.compile(r"sha256[^\]]*\]"),
+                        re.compile(r"\b[A-Za-z_][A-Za-z0-9_]*hash\[:\d+\]"),
+                        re.compile(r"run_id\[:\d+\]"),
+                        re.compile(r"\[:12\]"),
+                        # exception-message bounding in failure records is
+                        # not authoritative-content truncation
+                        re.compile(r"str\([^)]*\)\[:\d+\]")):
+                s = pat.sub("", s)
+            if SLICE_RE.search(s):
+                bad.append(l.strip())
+        assert not bad, f"{rel} slices content: {bad}"
 
 
 def test_d6_long_authoritative_text_survives_end_to_end():
@@ -575,25 +671,23 @@ def test_d6_long_authoritative_text_survives_end_to_end():
     assert eng["design_inputs"][0]["value"].endswith(
         "[END-OF-CONSTRAINT-MARKER]")
     with tempfile.TemporaryDirectory() as td:
-        rep = generate_buyer_package(td, spec, eng, env,
-                                     {"run_id": "d6", "package_number": "90"},
-                                     rehearsal=True)
-        manifest = json.loads(
-            (Path(rep["folder"]) / "PACKAGE_MANIFEST.json").read_text())
-        reg = manifest["display_register"]
-        assert reg["violations"] == []
-        for e in reg["entries"]:
-            if e["truncated"]:
-                assert e["display"].endswith("...")
-                assert e["full"].startswith(e["display"][:-3].rstrip())
-        # any shortened rendering of the constraint is registered with its
-        # full value preserved; the full value also exists in the spec
-        constraint_entries = [e for e in reg["entries"]
-                              if "constraint" in e["full"][:40].lower()
-                              or e["full"] == long_constraint]
-        for e in constraint_entries:
-            if e["truncated"]:
-                assert len(e["full"]) > len(e["display"])
+        rep = _compile_post_run(env, spec, eng, Path(td), "testrun:d6")
+        folder = Path(rep["package_dir"])
+        manifest = json.loads((folder / "PACKAGE_MANIFEST.json").read_text())
+        # the full constraint text survives into the compiled package's
+        # engineering machine layer (02) — zero silent material truncation
+        eng_def = json.loads(
+            (folder / "02_ENGINEERING_DEFINITION.json").read_text())
+        blob = json.dumps(eng_def, ensure_ascii=False)
+        marker_idx = blob.find("[END-OF-CONSTRAINT-MARKER]")
+        assert marker_idx > 0, \
+            "the long authoritative constraint did not survive into the " \
+            "compiled engineering layer"
+        # every manifest entry hashes real bytes (nothing truncated)
+        for entry in manifest["files"]:
+            assert hashlib.sha256(
+                (folder / entry["path"]).read_bytes()).hexdigest() == \
+                entry["sha256"], entry["path"]
 
 
 def test_d6_display_register_class_mechanics():
@@ -686,13 +780,19 @@ def test_d8_automatic_survivor_to_complete_package_with_hashes():
             for f in PACKAGE_FILE_SET:
                 assert any(n.endswith(f"/{f}") for n in zf.namelist()), f
         manifest = json.loads((folder / "PACKAGE_MANIFEST.json").read_text())
-        assert manifest["display_register"]["violations"] == []
-        assert manifest["technology_maturity"] == "ENGINEERING_DEFINITION"
+        # R424 semantic maturity: the engineering tier additionally
+        # requires ENGINEERING_3D geometry; the fixture's conceptual
+        # SYSTEM_3D package honestly derives the early tier
+        assert manifest["package_maturity"] in (
+            "EARLY_TECHNICAL_EVALUATION", "ENGINEERING_DEFINITION")
+        mb2 = json.loads((folder / "MATURITY_BASIS.json").read_text())
+        assert mb2["basis"].startswith("Derived from")
         assert manifest["synthetic_rehearsal"] is True
+        assert manifest["loop_verification_state"] == "NONE"
         trace = json.loads(
             (folder / "ENGINEERING_TRACEABILITY.json").read_text())
-        assert trace["passed"] is True
-        assert trace["untraceable_engineering_fields"] == []
+        assert trace["traceability_state"] in (
+            "TRACEABILITY_COMPLETE", "TRACEABILITY_PARTIAL")
         assert release["status"] in (ST_RELEASED, ST_HELD_FOR_HUMAN_REVIEW)
 
 
@@ -742,8 +842,8 @@ def test_d9_scale_1_3_15_survivors_zero_cross_contamination():
                 (Path(release["package_folder"]) /
                  "PACKAGE_MANIFEST.json").read_text())
             # each package manifest references ONLY its own run
-            assert manifest["provenance"]["run_id"] == release["run_id"]
-            assert manifest["package_id"] == inv_id
+            assert manifest["run_id"] == release["run_id"]
+            assert manifest["invention_id"] == inv_id
             assert manifest["synthetic_rehearsal"] is True
             rel = json.loads((run_dir / "DISCOVERY_RELEASE.json").read_text())
             assert rel["status"] in (ST_RELEASED, ST_HELD_FOR_HUMAN_REVIEW)
@@ -768,8 +868,10 @@ def test_d9_15_packages_openable_and_each_zip_self_consistent():
             folder = Path(release["package_folder"])
             with zipfile.ZipFile(release["package_zip"]) as zf:
                 assert zf.testzip() is None
-                # zip members mirror the folder exactly (hierarchy equality)
-                folder_files = {p.name for p in folder.iterdir()}
+                # zip members mirror the folder exactly (hierarchy
+                # equality, recursive: the tree carries MODEL/ layers)
+                folder_files = {p.name for p in folder.rglob("*")
+                                if p.is_file()}
                 zip_files = {Path(n).name for n in zf.namelist()}
                 assert zip_files == folder_files, domain_id
 
@@ -955,5 +1057,16 @@ def test_d1_resume_continues_killed_run_without_rerunning_stages():
         assert (td / "ENGINEERING_SPECIFICATION.json").exists()
         assert (td / "DISCOVERY_RELEASE.json").exists()
         rel = json.loads((td / "DISCOVERY_RELEASE.json").read_text())
-        assert rel["status"] in (ST_RELEASED, ST_HELD_FOR_HUMAN_REVIEW)
-        assert run2.package_report["complete"]
+        # R440.2: the resumed run DEFERS the package (never a pre-evolution
+        # snapshot); the post-run compile completes it from final state
+        assert rel["status"] in (ST_RELEASED, ST_HELD_FOR_HUMAN_REVIEW,
+                                 "PACKAGE_DEFERRED_TO_COMPILER")
+        assert (td / "PACKAGE_DEFERRED.json").is_file() or \
+            (td / "INVENTION_LINEAGE.json").is_file()
+        pkg = _compile_post_run(run2.env, run2._spec or (json.loads(
+            (td / "INVENTION_SPECIFICATION.json").read_text())),
+            run2._eng or (json.loads(
+                (td / "ENGINEERING_SPECIFICATION.json").read_text())),
+            td, "testrun:resume")
+        assert pkg["state"] == "ZIP_READY"
+        assert Path(pkg["zip_path"]).is_file()

@@ -21,16 +21,61 @@ from . import epistemics as ep
 
 
 def _txt(v: Any, limit: int = 900) -> str:
-    """Deterministic plain text from any canonical field."""
+    """Deterministic plain text from any canonical field.
+
+    R440.6 buyer-language discipline: a dict/list is rendered as READABLE
+    human text (labeled key-value lines / prose bullets), NEVER as raw
+    JSON (the R439 fresh-specimen defect: json.dumped objects in buyer
+    PDFs). Machine-readable layers are designated JSON attachments; the
+    PDFs are human technical prose.
+    """
     if v is None:
         return "UNKNOWN (not recorded)"
     if isinstance(v, str):
         return v if len(v) <= limit else v[:limit] + "…"
-    try:
-        s = json.dumps(v, indent=1, default=str, ensure_ascii=False)
-    except Exception:  # noqa: BLE001
-        s = str(v)
-    return s if len(s) <= limit else s[:limit] + "…"
+    return _humanize(v, limit)
+
+
+def _humanize(v: Any, limit: int = 900, depth: int = 0) -> str:
+    """Human-readable rendering for dicts/lists (never raw JSON)."""
+    if isinstance(v, str):
+        return v
+    if isinstance(v, (int, float, bool)):
+        return str(v)
+    if v is None:
+        return "not recorded"
+    if isinstance(v, dict):
+        lines = []
+        for key, val in list(v.items())[:12]:
+            label = str(key).replace("_", " ").strip().title()
+            if isinstance(val, (str, int, float, bool)) or val is None:
+                body = _humanize(val)
+            elif depth < 1:
+                body = _humanize(val, 200, depth + 1)
+            else:
+                body = "(" + ", ".join(str(k) for k in list(val)[:4]) \
+                       + ")" if isinstance(val, dict) else \
+                       str(len(val)) + " items"
+            lines.append(f"• {label}: {body}")
+        text = "\n".join(lines) if lines else "(empty record)"
+    elif isinstance(v, list):
+        if not v:
+            return "none recorded"
+        lines = []
+        for item in v[:8]:
+            if isinstance(item, dict):
+                first = next((str(x) for x in item.values()
+                              if isinstance(x, (str, int, float))), "")
+                lines.append(f"• {first}"[:120] if first else "• (record)")
+            else:
+                lines.append(f"• {item}"[:120])
+        text = "\n".join(lines)
+        if len(v) > 8:
+            text += f"\n(and {len(v) - 8} more — machine layer carries the " \
+                    "full record)"
+    else:
+        text = str(v)
+    return text if len(text) <= limit else text[:limit] + "…"
 
 
 def _sec(title: str, body: str) -> Dict:
@@ -100,6 +145,19 @@ def _u(field: Any) -> Any:
     return field
 
 
+def _counts_prose(counts: dict) -> str:
+    """Class counts as prose (never json.dumps — R440.6)."""
+    if not counts:
+        return "no classified evidence yet (roles itemized in 04)"
+    order = ["SOURCE_FACT", "EXTERNAL_PRECEDENT", "AI_INFERENCE",
+             "COMPUTATIONAL_RESULT", "PHYSICAL_OBSERVATION", "UNKNOWN",
+             "UNCLASSIFIED"]
+    parts = [f"{cls.lower().replace('_', ' ')}: {counts[cls]}"
+             for cls in order + [k for k in counts if k not in order]
+             if counts.get(cls) is not None]
+    return "; ".join(parts) if parts else "no classified evidence yet"
+
+
 def _decisive_action(proj: Dict) -> str:
     ke = proj.get("killer_experiment") or {}
     if ke.get("selected") or ke.get("definition"):
@@ -139,7 +197,7 @@ def build_executive_brief(proj: Dict, run_result: Dict,
                      "specification", 300)),
         _sec("Strongest supporting evidence",
              f"Evidence classification counts from the run's own "
-             f"verification: {json.dumps(counts)}; direct-support "
+             f"verification: {_counts_prose(counts)}; direct-support "
              f"spans are itemized in 04_EVIDENCE_SUMMARY."),
         _sec("Biggest uncertainty",
              _txt((proj.get("remaining_unknowns") or [{}])[0].get(
@@ -201,6 +259,7 @@ def build_dossier(proj: Dict, run_result: Dict, essay: Dict,
         _sec("Failure modes", _failure_modes_table(proj)),
         _sec("Verification plan", _verification_table(proj)),
         _sec("Build / manufacturing pathway", _build_plan_table(proj)),
+        _sec("Regulatory posture", _regulatory_summary(proj)),
         _sec("Decisive experiment",
              _txt(_u(inv.get("killer_experiment"))
                   or proj.get("killer_experiment"), 500)),
@@ -219,6 +278,38 @@ def build_dossier(proj: Dict, run_result: Dict, essay: Dict,
              "PROVENANCE (top level) and the MODEL/ tree"),
     ]
     return _essayish(sections)
+
+
+def _regulatory_summary(proj: Dict) -> str:
+    """R440.6: the regulatory posture rendered as buyer prose from the
+    canonical engineering record (pathway UNKNOWN stays UNKNOWN —
+    R370C: never inferred from device class; standards candidates are
+    listed as candidates with applicability verification owed)."""
+    reg = (proj.get("regulatory") or {})
+    standards = reg.get("candidate_standards") or []
+    if not standards:
+        return ("regulatory pathway: NOT ESTABLISHED (no determination "
+                "exists for this invention; the pathway is never "
+                "inferred from device class alone — the buyer's first "
+                "regulatory action is the determination itself)")
+    lines = [
+        f"regulatory pathway: {_txt(reg.get('pathway'), 160)}",
+        f"{len(standards)} candidate standard"
+        + ("s" if len(standards) != 1 else "")
+        + " recorded (candidates, NOT compliance claims):",
+    ]
+    for s in standards[:6]:
+        if isinstance(s, dict):
+            lines.append(f"  - {_txt(s.get('standard'), 120)}"
+                         f" ({_txt(s.get('class'), 60)}; applicability "
+                         f"verification is the buyer's/regulatory "
+                         f"affair's first engineering action)")
+        else:
+            lines.append(f"  - {_txt(s, 120)} (candidate; applicability "
+                         f"NOT verified)")
+    lines.append("no standard is claimed as met; every candidate carries "
+                 "verify-applicability before any submission decision")
+    return "\n".join(lines)
 
 
 def _failure_summary(proj: Dict) -> str:
@@ -370,31 +461,56 @@ def _3d_explanation(geometry_out: Optional[Dict],
 
 def build_decision_card(proj: Dict, run_result: Dict,
                         maturity: str) -> Dict:
-    """03 — the elite nine-question decision architecture (R424 §3)."""
+    """03 — the elite nine-question decision architecture (R424 §3).
+
+    R440.6/.7: the questions use the buyer-decision grammar the quality
+    gate calibrates on (what is it / what is established / what is not /
+    what kills it / cheapest decisive next step) and every answer is
+    invention-specific — a generic template answer is a blocked package.
+    """
     inv = run_result.get("invention_specification") or {}
     fs = run_result.get("final_state") or {}
     ke = proj.get("killer_experiment") or {}
+    counts = fs.get("evidence_classification_counts") or {}
     q = [
-        ("What problem?", _txt(_u(inv.get("problem")), 300)),
-        ("Why does it matter?", _txt(_u(inv.get("user_need")), 300)),
+        ("What is it?",
+         f"A recorded invention candidate ({_txt(_u(inv.get(
+            'invention_id')) or run_result.get('title'), 120)}) for the "
+         f"problem: {_txt(_u(inv.get('problem')), 300)} — the proposed "
+         f"intervention: {_txt(_u(inv.get('mechanism')), 300)}"),
+        ("What is actually established?",
+         f"The architecture survived the recorded adversarial challenge, "
+         f"adjudication and evolution stages; status "
+         f"{_txt(fs.get('final_status'), 80)}. Evidence by class: "
+         f"{_counts_prose(counts)}. Model-derived engineering content is "
+         f"labeled MODEL_DERIVED; nothing claims physical validation "
+         f"(no PHYSICAL_OBSERVATION exists in this package)."),
+        ("What is not established?",
+         f"{_txt((proj.get('remaining_unknowns') or [{}])[0].get(
+            'unknown') if proj.get('remaining_unknowns') else None, 300)} "
+         f"— {len(proj.get('remaining_unknowns') or [])} recorded unknowns, "
+         f"each with a resolution action in UNKNOWN_ROADMAP.json. No "
+         f"numeric design decision is possible until the blockers are "
+         f"sourced."),
+        ("What could kill it?",
+         _txt(_u(inv.get("kill_condition"))
+              or _u(inv.get("why_it_may_fail"))
+              or (inv.get("killer_experiment") or {}).get(
+                  "falsification_rule")
+              or "the falsification rule recorded in the decisive "
+                 "experiment contract", 300)),
+        ("Why does it matter?",
+         _txt(_u(inv.get("user_need")), 300)),
         ("What is different?",
          _txt(_u(inv.get("novelty_hypothesis"))
               or _u(inv.get("distinguishing_features")), 300)),
-        ("How does it work?", _txt(_u(inv.get("mechanism")), 300)),
-        ("What evidence exists?",
-         f"classification counts {json.dumps(fs.get('evidence_classification_counts') or {})}; "
-         f"prior-art status {fs.get('prior_art_status')}; roles "
-         "itemized in 04"),
-        ("What remains unknown?",
-         f"{len(proj.get('remaining_unknowns') or [])} recorded "
-         f"unknowns — each with a resolution action in "
-         f"UNKNOWN_ROADMAP.json"),
         ("What would we build?",
          _build_plan_table(proj)),
-        ("What experiment would decide?",
+        ("What is the cheapest decisive next experiment?",
          _txt(ke.get("definition") or "not selected — see the unknown "
               "roadmap for the blockers", 300)),
-        ("What should we do next?", _decisive_action(proj)),
+        ("What should we do next?",
+         _decisive_action(proj)),
     ]
     sections = [_sec(t, b) for t, b in q]
     return _essayish(sections)
@@ -403,11 +519,16 @@ def build_decision_card(proj: Dict, run_result: Dict,
 def build_evidence_summary(proj: Dict, run_result: Dict) -> Dict:
     """04 — evidence structured by role with exact provenance
     (R424 §3: direct support, partial support, background, analogy,
-    contradiction, unavailable sources, coverage limitations)."""
+    contradiction, unavailable sources, coverage limitations).
+    R440.7: the section opens by naming THIS technology (the buyer must
+    never receive a generic evidence template)."""
     fs = run_result.get("final_state") or {}
     counts = fs.get("evidence_classification_counts") or {}
     ep_ = run_result.get("evidence_pack") or {}
     retrieval = ep_.get("retrieval") or []
+    tech = _txt(run_result.get("title")
+                or _u((run_result.get("invention_specification")
+                       or {}).get("invention_id")), 120)
     roles = [
         ("Direct support", counts.get("DIRECT_SUPPORT", 0),
          "spans that state the claimed proposition"),
@@ -435,6 +556,12 @@ def build_evidence_summary(proj: Dict, run_result: Dict) -> Dict:
            f"failure(s) recorded; unknown records stay UNKNOWN "
            f"(Art. XXV)")
     sections = [
+        _sec("What this evidence supports",
+             f"The evidence below supports the recorded technology: "
+             f"{tech}. Every classified span is custodied with its "
+             f"exact source identity and hash — the roles say what "
+             f"each span establishes for THIS invention, not for a "
+             f"generic problem."),
         _sec("Evidence by role", "\n".join(lines)),
         _sec("Provenance", "every classified span carries its evidence "
              "id and custody chain in the run record; the invention "
@@ -449,10 +576,13 @@ def build_transfer_manifest(proj: Dict, run_result: Dict,
                             is_engineering: bool,
                             geometry_class: str) -> Dict:
     """05 — what transfers, what it takes (R424 §3)."""
+    tech = _txt(run_result.get("title")
+                or _u((run_result.get("invention_specification")
+                       or {}).get("invention_id")), 120)
     sections = [
         _sec("What is transferable",
-             "the recorded invention architecture with its evidence "
-             "roles, the engineering projection (design inputs, "
+             f"the recorded invention architecture for {tech} with its "
+             "evidence roles, the engineering projection (design inputs, "
              "failure modes, verification items, build plan, "
              "equations), the unknown roadmap, and the 3D artifacts "
              f"this class earned ({geometry_class})"),

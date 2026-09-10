@@ -95,6 +95,8 @@ def derive_engineering_projection(run_result: Dict[str, Any],
             "subsystems") or [],
         "interfaces": eng.get("interfaces") or [],
         "materials": eng.get("materials") or [],
+        "regulatory": (run_result.get("engineering_specification")
+                       or {}).get("regulatory") or {},
         "manufacturing": eng.get("manufacturing") or {},
         "constraints": _unwrap(inv.get("constraints")) or [],
         "assumptions": _unwrap(inv.get("assumptions")) or [],

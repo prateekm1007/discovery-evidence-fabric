@@ -35,6 +35,7 @@ ST_PIPELINE_FAILED = "PIPELINE_FAILED"
 ST_PACKAGE_INCOMPLETE = "PACKAGE_INCOMPLETE"
 ST_DISCOVERY_INCOMPLETE = "DISCOVERY_INCOMPLETE"
 ST_DISABLED_BY_CONFIG = "DISABLED_BY_CONFIG"
+ST_PACKAGE_DEFERRED = "PACKAGE_DEFERRED_TO_COMPILER"
 
 
 def sha256_file(p: Path) -> str:
@@ -100,6 +101,14 @@ def build_discovery_release(
             status = ST_HELD_FOR_HUMAN_REVIEW
         else:
             status = ST_NOT_A_SURVIVOR
+    elif package_report is None and (run_dir / "PACKAGE_DEFERRED.json").exists():
+        # R440.2: the run did NOT fail — its package compiles POST-
+        # evolution through the canonical package compiler (the bridge
+        # gate invokes it after this record is written). The run-level
+        # release record honestly says so; the compiler's own outcome
+        # (ZIP promoted / PACKAGE_BUILD_BLOCKED) is recorded in the run
+        # dir by the bridge gate and is the authority for the package.
+        status = ST_PACKAGE_DEFERRED
     elif package_report is None or failure_reason:
         status = ST_PIPELINE_FAILED
     elif not package_report.get("complete") or not buyer_package_hash:

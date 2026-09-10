@@ -290,10 +290,16 @@ def assemble(
     visualizability: Optional[Dict[str, Any]] = None,
     zip_name: Optional[str] = None,
     engine_identity: Optional[Tuple[Optional[str], str]] = None,
+    build_zip: bool = True,
 ) -> Dict[str, Any]:
-    """Assemble the ELITE technology transfer package from one canonical
-    source (run state + CIO + bridge geometry). R424: every layer is
-    derived here — the weak-package gaps are closed by this factory.
+    """Assemble the package FILE TREE from one canonical source (run
+    state + CIO + bridge geometry). R424: every layer is derived here.
+
+    R440: this module is the RENDERING/DERIVATION library of the ONE
+    canonical package compiler (discovery_fabric/engine/package_compiler.py).
+    It is no longer a production entry point — the compiler calls it
+    inside a transactional temp build and owns ZIP creation
+    (build_zip=False; the compiler promotes only a gate-verified tree).
 
     geometry_out is the bridge's geometry result (glb bytes/path, class,
     key_dimensions, components, validation, parametric_source...).
@@ -684,20 +690,32 @@ def assemble(
         json.dump(manifest, f, indent=2)
 
     # ---- zip (R423A: ONE canonical customer artifact) -------------------------
+    # R440: the COMPILER owns ZIP creation (transactional build — the
+    # ZIP appears at the public download path only after the independent
+    # quality gate passes). build_zip=False leaves tree-only output.
     zip_path = os.path.join(
         os.path.dirname(out_dir.rstrip("/")) or ".",
         zip_name or f"TECHNOLOGY_TRANSFER_PACKAGE_{invention_label}.zip",
     )
-    with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zf:
-        for root, _, files in os.walk(out_dir):
-            for fn in sorted(files):
-                path = os.path.join(root, fn)
-                arc = os.path.join(os.path.basename(out_dir.rstrip("/")),
-                                   os.path.relpath(path, out_dir))
-                zf.write(path, arc)
+    if build_zip:
+        with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zf:
+            for root, _, files in os.walk(out_dir):
+                for fn in sorted(files):
+                    path = os.path.join(root, fn)
+                    arc = os.path.join(os.path.basename(out_dir.rstrip("/")),
+                                       os.path.relpath(path, out_dir))
+                    zf.write(path, arc)
 
+    if build_zip:
+        zip_sha = _sha256_file(zip_path)
+        zip_bytes = os.path.getsize(zip_path)
+    else:
+        # R440: the compiler owns the ZIP — hash/size are computed at
+        # promotion time, not here
+        zip_sha = None
+        zip_bytes = None
     return {
-        "zip_path": os.path.abspath(zip_path),
+        "zip_path": os.path.abspath(zip_path) if build_zip else None,
         "package_dir": os.path.abspath(out_dir),
         "manifest": manifest,
         "package_maturity": package_maturity,
@@ -706,8 +724,8 @@ def assemble(
         "glb_sha256": geometry_out.get("glb_sha256"),
         "render_artifacts": render_artifacts,
         "render_status": renders.get("status"),
-        "zip_sha256": _sha256_file(zip_path),
-        "zip_bytes": os.path.getsize(zip_path),
+        "zip_sha256": zip_sha,
+        "zip_bytes": zip_bytes,
         "invention_label": invention_label,
         "engine_commit": engine_commit,
         "package_version": provenance["package_version"],

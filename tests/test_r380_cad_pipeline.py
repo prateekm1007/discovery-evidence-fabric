@@ -25,6 +25,26 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
+
+def _archived_factory():
+    """R440 (Art. LXIV): the package_factory is RETIRED from production
+    (ARCHIVED_TO archive/r440_retired/). These R380 tests lock the FROZEN
+    historical behavior of its 3D-section builder; they load the archive
+    explicitly by path — the module name no longer resolves in the
+    import system (structural retirement, asserted by
+    tests/test_r440_canonical_package_compiler.py)."""
+    import importlib.util
+    name = "discovery_fabric.engine.package_factory_archived"
+    if name in sys.modules:
+        return sys.modules[name]
+    src_path = Path(__file__).resolve().parents[1] / "archive" / \
+        "r440_retired" / "package_factory.py"
+    spec = importlib.util.spec_from_file_location(name, str(src_path))
+    mod = importlib.util.module_from_spec(spec)
+    sys.modules[name] = mod
+    spec.loader.exec_module(mod)
+    return mod
+
 from discovery_fabric.engine import cad_pipeline as cp
 
 
@@ -578,8 +598,7 @@ class TestPackageThreeDSection(unittest.TestCase):
         return new_spec
 
     def test_section_present_with_all_ten_items(self):
-        from discovery_fabric.engine.package_factory import \
-            build_three_d_section
+        build_three_d_section = _archived_factory().build_three_d_section
         spec = self._spec()
         with tempfile.TemporaryDirectory() as td:
             section = build_three_d_section(spec, Path(td))
@@ -604,8 +623,7 @@ class TestPackageThreeDSection(unittest.TestCase):
         self.assertIn("glb", exts)
 
     def test_section_absent_without_model(self):
-        from discovery_fabric.engine.package_factory import \
-            build_three_d_section
+        build_three_d_section = _archived_factory().build_three_d_section
         spec = {"candidate_id": "X"}
         with tempfile.TemporaryDirectory() as td:
             section = build_three_d_section(spec, Path(td))
@@ -614,8 +632,7 @@ class TestPackageThreeDSection(unittest.TestCase):
         self.assertIn("never forced", section["reason"])
 
     def test_section_absent_when_geometry_rejected(self):
-        from discovery_fabric.engine.package_factory import \
-            build_three_d_section
+        build_three_d_section = _archived_factory().build_three_d_section
         spec = _spec_with_state(_dual_lumen_state(
             lumen_diameter_mm=1.7))
         with tempfile.TemporaryDirectory() as td:
@@ -625,8 +642,7 @@ class TestPackageThreeDSection(unittest.TestCase):
                       ("NOT_PRESENT", "REJECTED_BY_GEOMETRY_GATES"))
 
     def test_no_physical_evidence_claim_in_section(self):
-        from discovery_fabric.engine.package_factory import \
-            build_three_d_section
+        build_three_d_section = _archived_factory().build_three_d_section
         spec = self._spec()
         with tempfile.TemporaryDirectory() as td:
             section = build_three_d_section(spec, Path(td))

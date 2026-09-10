@@ -165,16 +165,28 @@ def update_cio(cio: Dict[str, Any], geometry_out: Dict[str, Any],
     updated["engineering"] = engineering
 
     # --- downloads ----------------------------------------------------------------
+    # A BLOCKED package (R440) is an honest absence, never a fake link:
+    # package_zip stays None, package_blocked carries the typed reason.
+    blocked = bool(package_out.get("blocked"))
     downloads = dict(updated.get("downloads") or {})
     downloads.update({
-        "package_zip": package_out.get("package_endpoint"),
-        "package_maturity": package_out.get("package_maturity"),
-        "package_zip_sha256": package_out.get("zip_sha256"),
+        "package_zip": None if blocked else
+        package_out.get("package_endpoint"),
+        "package_maturity": None if blocked else
+        package_out.get("package_maturity"),
+        "package_zip_sha256": None if blocked else
+        package_out.get("zip_sha256"),
+        "package_blocked": blocked,
+        "package_blocked_reason": (
+            (package_out.get("blocked_record") or {}).get("stage")
+            if blocked else None),
         "counsel_package": downloads.get("counsel_package"),
         "note": (
             "technology package = buyer-facing product; counsel package = technical "
             "evidence export for IP counsel review — not a legal document"
-        ),
+            + ("; package build BLOCKED by the canonical package compiler — "
+               "no ZIP exists (honest absence, never a partial package)"
+               if blocked else "")),
     })
     updated["downloads"] = downloads
 

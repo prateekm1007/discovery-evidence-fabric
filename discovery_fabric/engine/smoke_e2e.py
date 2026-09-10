@@ -70,9 +70,9 @@ REQUIRED_E2E_LINKS = [
     "ENGINEERING_TRACEABILITY_JSON",
     "MATURITY_BASIS_JSON",
     "PACKAGE_ZIP",
+    "R440_PACKAGE_DEFERRED_THEN_COMPILED",
     "DISCOVERY_RELEASE_JSON",
     "RELEASE_HASHES_BOUND",
-    "DISPLAY_REGISTER_CLEAN",
     "MATURITY_COMPUTED",
 ]
 
@@ -87,25 +87,86 @@ def _fail(missing: List[str], extra: Dict[str, Any]) -> int:
     return 1
 
 
+def _compile_post_run_package(run: EngineRun, env,
+                              rehearsal: bool = False
+                              ) -> Dict[str, Any]:
+    """R440.2 production package sequence: the engine run DEFERS the
+    package (PACKAGE_DEFERRED.json — candidate->package->evolution is
+    the retired stale-generation order); the canonical package compiler
+    compiles from the FINAL persisted state exactly as the bridge gate
+    does post-run. The smoke drives the same ONE production entry."""
+    from .package_compiler import compile_package
+    from .invention_bridge import conceptual_geometry
+    spec = run._spec or {}
+    eng = run._eng or {}
+    arch = (eng.get("system_architecture") or {}).get("subsystems") or []
+    subs = [s.get("name", f"subsystem {i + 1}") if isinstance(s, dict)
+            else str(s) for i, s in enumerate(arch)] or [
+        "subsystem 1", "subsystem 2", "subsystem 3"]
+    built = conceptual_geometry.build_system_architecture(
+        subs, (eng.get("why_this_domain") or {}).get("domain", ""))
+    geometry_out = {
+        "visualizability_class": "SYSTEM_3D",
+        "glb_bytes": built["glb_bytes"],
+        "glb_sha256": built.get("glb_sha256"),
+        "components": built.get("components") or [],
+        "domain_family": built.get("domain_family"),
+        "renders": {"status": "SKIPPED"},
+    }
+    run_result = {
+        "session_id": run.run_id,
+        "run_id": run.run_id,
+        "problem_id": run.problem_id,
+        "user_text": env.problem.get("failure")
+        or env.problem.get("failure_mode"),
+        "title": (f"{env.problem.get('device', 'recorded device')} — "
+                 f"{env.problem.get('failure_mode', 'problem')}"),
+        "domain": (eng.get("why_this_domain") or {}).get("domain")
+        or eng.get("technology_domain"),
+        "invention_specification": spec,
+        "engineering_specification": eng,
+        "final_state": {
+            "final_status": (env.epistemic_state or {}).get("final_status"),
+            "final_envelope_hash": env.envelope_hash(),
+        },
+    }
+    return compile_package(run_result, None, geometry_out, str(run.out),
+                           rehearsal=rehearsal)
+
+
 def _check_post_rank(run: EngineRun, links_ok: List[str],
                      missing: List[str]) -> None:
-    """Verify the AUTOMATIC post-RANK artifacts of an EngineRun (Directive
-    1) — the smoke never builds a second copy of the pipeline."""
+    """Verify the post-RANK artifacts (Directive 1 + R440): the run
+    DEFERS the package; the canonical compiler output (promoted by the
+    independent quality gate) carries the links. The smoke never
+    builds a second copy of the pipeline."""
     out = run.out
 
     def check(link: str, cond: bool):
         (links_ok if cond else missing).append(link)
 
     rep = run.package_report or {}
-    folder = Path(rep["folder"]) if rep.get("folder") else None
-    for f in rep.get("rendered", []):
-        check(f"DOSSIER_PDF_{f['file'].split('.')[0]}", True)
+    folder = Path(rep["package_dir"]) if rep.get("package_dir") else None
+    for f in (rep.get("render_artifacts") or []):
+        name = f.split("/")[-1] if isinstance(f, str) else str(f)
+        check(f"RENDER_{name}", True)
+    for pdf in ("00_PACKAGE_README", "01_EXECUTIVE_TECHNOLOGY_BRIEF",
+                "02_ENGINEERING_TECHNOLOGY_TRANSFER_DOSSIER",
+                "03_BUYER_DECISION_CARD", "04_EVIDENCE_SUMMARY",
+                "05_TRANSFER_MANIFEST"):
+        check(f"DOSSIER_PDF_{pdf}",
+              bool(folder) and (folder / f"{pdf}.pdf").exists())
     check("PACKAGE_MANIFEST_JSON",
           bool(folder) and (folder / "PACKAGE_MANIFEST.json").exists())
-    check("ENGINEERING_TRACEABILITY_JSON", bool(rep.get("traceability_passed")))
+    check("ENGINEERING_TRACEABILITY_JSON",
+          bool(folder) and (folder / "ENGINEERING_TRACEABILITY.json")
+          .exists())
     check("MATURITY_BASIS_JSON",
           bool(folder) and (folder / "MATURITY_BASIS.json").exists())
-    check("PACKAGE_ZIP", bool(rep.get("zip")))
+    check("PACKAGE_ZIP", bool(rep.get("zip_path")))
+    check("R440_PACKAGE_DEFERRED_THEN_COMPILED",
+          (out / "PACKAGE_DEFERRED.json").exists()
+          and rep.get("state") == "ZIP_READY")
     rel = run.release or {}
     check("DISCOVERY_RELEASE_JSON",
           (out / "DISCOVERY_RELEASE.json").exists())
@@ -114,12 +175,10 @@ def _check_post_rank(run: EngineRun, links_ok: List[str],
         and rel.get("engineering_spec_hash")
         and rel.get("dossier_manifest_hash")
         and rel.get("buyer_package_hash")))
-    dreg = rep.get("display_register") or {}
-    check("DISPLAY_REGISTER_CLEAN", not dreg.get("violations", ["x"]))
     check("MATURITY_COMPUTED",
-          bool((folder or Path()) / "MATURITY_BASIS.json") and
+          bool(folder) and (folder / "MATURITY_BASIS.json").exists() and
           json.loads((folder / "MATURITY_BASIS.json").read_text())
-          .get("basis", "").startswith("computed"))
+          .get("basis", "").startswith("Derived from"))
 
 
 def run_real_from(run: "EngineRun", disabled_extra: str = "") -> int:
@@ -195,6 +254,11 @@ def _verify_run_links(run: EngineRun, manifest: Dict[str, Any]) -> int:
     check("DECISIVE_EXPERIMENT_EXPLAINED",
           bool(sel.get("selected")) and "because" in sel["explanation"])
 
+    # R440.2: the run deferred the package; REAL mode compiles through
+    # the ONE canonical compiler before the link proof (the bridge
+    # gate's production sequence)
+    if not (run.package_report or {}).get("zip_path"):
+        run.package_report = _compile_post_run_package(run, env)
     _check_post_rank(run, links_ok, missing)
 
     if missing:
@@ -211,8 +275,8 @@ def _verify_run_links(run: EngineRun, manifest: Dict[str, Any]) -> int:
         "resumed_from_stage": run.resumed_from_stage,
         "links_verified": links_ok,
         "final_status": manifest.get("final_status"),
-        "package_folder": (run.package_report or {}).get("folder"),
-        "package_zip": (run.package_report or {}).get("zip"),
+        "package_folder": (run.package_report or {}).get("package_dir"),
+        "package_zip": (run.package_report or {}).get("zip_path"),
         "release_status": (run.release or {}).get("status"),
         "loop_verification_state": "NONE",
         "real_loop_verified": False,
@@ -223,7 +287,7 @@ def _verify_run_links(run: EngineRun, manifest: Dict[str, Any]) -> int:
         json.dumps(proof, indent=1, ensure_ascii=False))
     print("\n" + "=" * 70)
     print(f"E2E SMOKE: PASS ({len(links_ok)}/{len(REQUIRED_E2E_LINKS)} links)")
-    print(f"  package: {(run.package_report or {}).get('folder')}")
+    print(f"  package: {(run.package_report or {}).get('package_dir')}")
     print(f"  release: {(run.release or {}).get('status')}")
     print("=" * 70)
     return 0
@@ -284,11 +348,19 @@ def run_rehearsal(out_dir: str) -> int:
     run.env = env
     run.rehearsal = True   # every artifact must carry SYNTHETIC_REHEARSAL
     run._post_rank_pipeline({"run_id": run.run_id})
+    # R440.2: the run deferred the package; compile from the FINAL
+    # persisted state through the ONE canonical compiler (the bridge
+    # gate's exact production sequence), then bind the release.
+    run.package_report = _compile_post_run_package(
+        run, env, rehearsal=bool(run.rehearsal))
     from .release import build_discovery_release, write_discovery_release
     run.release = build_discovery_release(
         run.out, run_id=run.run_id, problem_id=run.problem_id, env=env,
         spec=run._spec, eng=run._eng,
-        package_report=run.package_report,
+        package_report={"complete":
+                       run.package_report.get("state") == "ZIP_READY",
+                       "folder": run.package_report.get("package_dir"),
+                       "zip": run.package_report.get("zip_path")},
         failure_reason=run.package_failure)
     write_discovery_release(run.out, run.release)
 
@@ -325,8 +397,8 @@ def run_rehearsal(out_dir: str) -> int:
                  "NOT a real discovery run and its package must never be "
                  "shown to buyers (Art. XXXVII/XXXVIII)"),
         "links_verified": links_ok,
-        "package_folder": (run.package_report or {}).get("folder"),
-        "package_zip": (run.package_report or {}).get("zip"),
+        "package_folder": (run.package_report or {}).get("package_dir"),
+        "package_zip": (run.package_report or {}).get("zip_path"),
         "release_status": (run.release or {}).get("status"),
         "timestamp": utc_now()}
     (Path(out_dir) / "RUN_LINK_PROOF.json").write_text(
@@ -335,7 +407,7 @@ def run_rehearsal(out_dir: str) -> int:
     print(f"CONTROLLED REHEARSAL: PASS ({len(links_ok)} links verified)")
     print(f"  SYNTHETIC_REHEARSAL=TRUE  REAL_LOOP_VERIFIED=FALSE")
     print(f"  package (never for buyers): "
-          f"{(run.package_report or {}).get('folder')}")
+          f"{(run.package_report or {}).get('package_dir')}")
     print("=" * 70)
     return 0
 

@@ -1243,7 +1243,10 @@ def build_engineering_spec(spec: Dict[str, Any], env: Optional[Candidate],
         "acceptance_criterion": "NOT ESTABLISHED (no sourced values)",
         "deliverable": "constraint-compliance characterization report",
         "estimated_effort": "NOT ESTABLISHED (to be quoted)",
-        "basis": "ENGINEERING_PROPOSED"})
+        "basis": "ENGINEERING_PROPOSED",
+        # R440.3: explicit pointer (this WP projects the constraint
+        # design-input row)
+        "source_refs": ["engineering_specification.design_inputs"]})
     for vf in graph["verifications"]:
         build_plan.append({
             "work_package": f"WP-{len(build_plan)+1:02d}",
@@ -1255,7 +1258,10 @@ def build_engineering_spec(spec: Dict[str, Any], env: Optional[Candidate],
             "acceptance_criterion": "NOT ESTABLISHED",
             "deliverable": f"{vf['id']} verification report",
             "estimated_effort": "NOT ESTABLISHED (to be quoted)",
-            "basis": vf["basis"]})
+            "basis": vf["basis"],
+            # R440.3: explicit pointer at the VF row this WP tests
+            "source_refs": [
+                f"engineering_specification.verification_matrix.{vf['id']}"]})
     # (domain verification methods enter the plan THROUGH their VF rows
     # above — no duplicated work packages)
 
@@ -1273,6 +1279,9 @@ def build_engineering_spec(spec: Dict[str, Any], env: Optional[Candidate],
             [{"id": "IF-NONE", "description": "NOT ESTABLISHED",
               "status": "UNKNOWN", "detail": None}],
         "status": "CONCEPTUAL — no interface is quantified",
+        # R440.3: explicit canonical derivation pointer (the interfaces
+        # are the design-output interface rows by id)
+        "source_refs": ["engineering_specification.design_outputs"],
     }
     regulatory_block = {
         "pathway": "UNKNOWN (no regulatory determination exists for this "
@@ -1287,6 +1296,11 @@ def build_engineering_spec(spec: Dict[str, Any], env: Optional[Candidate],
         "basis": "candidate standards from the engineering domain registry; "
                  "applicability verification is the buyer's/regulatory "
                  "affair's first engineering action",
+        # R440.3: explicit canonical derivation pointer (the standards
+        # candidates come from the DETECTED domain's registry — the
+        # domain was detected from the invention's own text)
+        "source_refs": ["engineering_domain_registry.standards_candidates",
+                        "engineering_specification.domain_detection"],
     }
     kill_condition_block = {
         "statement": _kill_statement(spec),
@@ -1305,6 +1319,10 @@ def build_engineering_spec(spec: Dict[str, Any], env: Optional[Candidate],
                               "eig_per_cost": ke.get("eig_per_cost")},
         "basis": "COMPUTED (killer experiment selection)" if ke_name
         else "UNKNOWN (no killer experiment selected)",
+        # R440.3: explicit canonical derivation pointers
+        "source_refs": ["invention_specification.killer_experiment",
+                        "invention_specification.causal_chain."
+                        "falsification_test"],
     }
     buyer_diligence_block = {
         "independent_review_required": True,
@@ -1330,6 +1348,10 @@ def build_engineering_spec(spec: Dict[str, Any], env: Optional[Candidate],
                                .get("value") or []),
         "basis": "COMPUTED from the invention specification's recorded "
                  "uncertainties and evidence index",
+        # R440.3: explicit canonical derivation pointers
+        "source_refs": ["invention_specification.uncertainties",
+                        "invention_specification."
+                        "distinguishing_features.vs_nearest_prior_art"],
     }
     investment_ladder = []
     for wp in build_plan:
@@ -1340,7 +1362,12 @@ def build_engineering_spec(spec: Dict[str, Any], env: Optional[Candidate],
                         "(kill condition governs)"),
             "estimated_effort": wp["estimated_effort"],
             "capital": "NOT ESTABLISHED (no quotation exists)",
-            "basis": wp["basis"]})
+            "basis": wp["basis"],
+            # R440.3: explicit pointer at the work package this rung
+            # projects (the ladder mirrors the build plan by id)
+            "source_refs": [
+                f"engineering_specification.engineering_build_plan."
+                f"{wp['work_package']}"]})
     investment_ladder.append({
         "stage": "TRANSFER_DECISION",
         "gate": "REAL_LOOP_VERIFIED via a gated external reality event "
@@ -1348,7 +1375,8 @@ def build_engineering_spec(spec: Dict[str, Any], env: Optional[Candidate],
         "unlocks": "technology-transfer transaction",
         "estimated_effort": "NOT ESTABLISHED",
         "capital": "NOT ESTABLISHED",
-        "basis": "UNKNOWN until the loop closes"})
+        "basis": "UNKNOWN until the loop closes",
+        "source_refs": ["final_state.loop_verification_state"]})
 
     acceptance_by_vf = {
         v["id"]: _propose_acceptance(v["method"], spec, module)
@@ -1393,6 +1421,10 @@ def build_engineering_spec(spec: Dict[str, Any], env: Optional[Candidate],
                 .get("intervention", ""),
             "key_physics": governing["summary"],
             "status": "MODELLED",
+            # R440.3: explicit canonical derivation pointer (the section
+            # projects the invention's own mechanism — recorded, never
+            # left to lexical coincidence)
+            "source_refs": ["invention_specification.mechanism.intervention"],
         },
         "design_inputs": [
             {"id": d["id"], "input": d["label"], "value": d["value"],
@@ -1475,6 +1507,10 @@ def build_engineering_spec(spec: Dict[str, Any], env: Optional[Candidate],
         "buyer_diligence": buyer_diligence_block,
         "investment_ladder": investment_ladder,
         "transfer_boundary": {
+            # R440.3: explicit canonical derivation pointers (the boundary
+            # enumerates exactly what the spec/engineering records carry)
+            "source_refs": ["invention_specification",
+                            "engineering_specification"],
             "buyer_receives": [
                 "canonical invention specification (with epistemic classes)",
                 "engineering specification (this document, all blocks classed)",
@@ -1584,7 +1620,11 @@ def build_engineering_spec(spec: Dict[str, Any], env: Optional[Candidate],
              "acceptance": "NOT ESTABLISHED",
              "result": "NOT_PERFORMED",
              "status": v["status"], "basis": v["basis"],
-             "reason": v["reason"]}
+             "reason": v["reason"],
+             # R440.3: explicit pointer (validations mirror the VF rows
+             # by id — the linkage is the recorded id pairing)
+             "source_refs": [
+                 f"engineering_specification.verification_matrix.{v['id']}"]}
             for v in graph["validations"]],
         "domain_validation_methods": list(module.get("validation_methods", [])),
         "design_graph": {

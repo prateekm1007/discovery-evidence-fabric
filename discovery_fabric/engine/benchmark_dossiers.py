@@ -87,6 +87,11 @@ DOSSIER_SECTIONS = [
 
 BUYER_PAGE_SECTIONS = [s for s in DOSSIER_SECTIONS if not s[0].isdigit()]
 
+# R440: the elite (R424) document vocabulary — the same substantive
+# units under the production schema's headings (kept in sync with
+# benchmark_corpus.ELITE_SECTIONS, the single vocabulary authority)
+from .benchmark_corpus import ELITE_SECTIONS  # noqa: E402
+
 # measurement instruments: regulatory standards vocabulary (we COUNT matches
 # in the corpus text; the counts themselves are measured, never preset)
 REGULATORY_SIGNALS = (
@@ -119,15 +124,22 @@ def sha256_file(p: Path) -> str:
 
 
 def dossier_text(pkg_dir: Path) -> str:
-    pdf = pkg_dir / "02_ENGINEERING_TECHNOLOGY_TRANSFER_DOSSIER.pdf"
-    if not pdf.exists():
-        return ""
-    try:
-        import pypdf
-        return "\n".join(pg.extract_text() or ""
-                         for pg in pypdf.PdfReader(str(pdf)).pages)
-    except Exception:  # noqa: BLE001 — recorded as empty, honest
-        return ""
+    """The buyer document text: the dossier + the decision card (the
+    R440/elite schema splits the buyer-decision unit into 03; the old
+    v4 schema carried it inside the dossier — both are read)."""
+    parts = []
+    for name in ("02_ENGINEERING_TECHNOLOGY_TRANSFER_DOSSIER.pdf",
+                 "03_BUYER_DECISION_CARD.pdf"):
+        pdf = pkg_dir / name
+        if not pdf.exists():
+            continue
+        try:
+            import pypdf
+            parts.append("\n".join(pg.extract_text() or ""
+                                    for pg in pypdf.PdfReader(str(pdf)).pages))
+        except Exception:  # noqa: BLE001 — recorded as empty, honest
+            continue
+    return "\n".join(parts)
 
 
 def _section_span(text: str, heading: str) -> tuple:
@@ -409,15 +421,28 @@ def measure_generated_vector(spec: Dict[str, Any], eng: Dict[str, Any],
     fields come from the generated engineering specification."""
     folder = Path(package_report["folder"])
     text = dossier_text(folder)
-    covered = sum(1 for s in DOSSIER_SECTIONS if s in text)
+    # R440: the elite schema carries the same substantive units under
+    # its own headings; the union keeps the like-for-like comparison
+    covered = sum(1 for s in DOSSIER_SECTIONS if s in text) + \
+        sum(1 for s in ELITE_SECTIONS if s in text)
 
     trace_path = folder / "ENGINEERING_TRACEABILITY.json"
     chains: List[Dict[str, Any]] = []
+    links: List[Dict[str, Any]] = []
     if trace_path.exists():
-        chains = json.loads(trace_path.read_text()) \
-            .get("traceability_chains", []) or []
-    linkage = [c for c in chains
-               if "failure_mode_id" in c and "design_input_id" in c]
+        tr = json.loads(trace_path.read_text())
+        chains = tr.get("traceability_chains", []) or []
+        links = tr.get("links", []) or []
+    if links and not chains:
+        # elite R425 graph: the chain-equivalent linkage is the FM/DO
+        # edge set with an EXPLICIT binding carrying its basis
+        linkage = [l for l in links
+                   if isinstance(l, dict) and str(
+                       l.get("link_kind", "")) in (
+                       "FM_TO_DO", "DO_TO_DI", "VF_TO_FM")]
+    else:
+        linkage = [c for c in chains
+                   if "failure_mode_id" in c and "design_input_id" in c]
     equations = (eng.get("engineering_core", {})
                  .get("governing_model", {}).get("equations", []))
     params = eng.get("engineering_core", {}).get("critical_parameters", [])
@@ -429,47 +454,67 @@ def measure_generated_vector(spec: Dict[str, Any], eng: Dict[str, Any],
     build_plan = eng.get("engineering_build_plan", [])
 
     complete = 0
-    for c in linkage:
-        fields_ok = all(str(c.get(k) or "").strip()
-                        for k in ("design_input_id", "parameter",
-                                  "design_output_id", "failure_mode_id",
-                                  "verification_id"))
-        if fields_ok and c.get("linked", False):
-            complete += 1
+    if links and not chains:
+        # elite: an EXPLICIT binding with a recorded basis is the
+        # complete-provenance equivalent
+        for l in links:
+            if str(l.get("binding", "")).upper() == "EXPLICIT" and \
+                    l.get("binding_basis"):
+                complete += 1
+    else:
+        for c in linkage:
+            fields_ok = all(str(c.get(k) or "").strip()
+                            for k in ("design_input_id", "parameter",
+                                      "design_output_id", "failure_mode_id",
+                                      "verification_id"))
+            if fields_ok and c.get("linked", False):
+                complete += 1
     provenance_density = round(complete / len(linkage), 3) if linkage else 0.0
-    consumed = [c for c in linkage
-                if c.get("design_output_id") not in ("NOT_LINKED", None, "")]
-    complete_consumed = sum(1 for c in consumed if c.get("linked", False))
+    if links and not chains:
+        consumed = [l for l in links
+                    if isinstance(l, dict) and l.get("target_id")
+                    and str(l.get("target_id")) not in (
+                        "NOT_LINKED", "UNKNOWN", "", None)]
+    else:
+        consumed = [c for c in linkage
+                    if c.get("design_output_id") not in ("NOT_LINKED",
+                                                         None, "")]
+    if links and not chains:
+        complete_consumed = sum(
+            1 for l in consumed
+            if str(l.get("binding", "")).upper() == "EXPLICIT")
+    else:
+        complete_consumed = sum(1 for c in consumed if c.get("linked", False))
     provenance_density_consumed = (round(complete_consumed / len(consumed), 3)
                                    if consumed else 0.0)
 
-    manifest_path = folder / "PACKAGE_MANIFEST.json"
-    build_plan_objs = 0
-    if manifest_path.exists():
-        build_plan_objs = json.loads(manifest_path.read_text()) \
-            .get("engineering_artifact_count", 0) or 0
-    objects = len(chains) + build_plan_objs
+    objects = len(chains) + len(links) + len(build_plan)
 
+    # R440: depth instruments count over the WHOLE buyer text — the
+    # elite schema carries the same content under different headings,
+    # so section-span extraction would false-zero the counts
     mfg_s, mfg_e = _section_span(text, "13. Manufacturing")
     bom_s, bom_e = _section_span(text, "12. Bill of Materials")
+    mfg_text = text[mfg_s:mfg_e] if mfg_s >= 0 else text
+    bom_text = text[bom_s:bom_e] if bom_s >= 0 else text
     manufacturing_depth = (
-        _substantive_count(text[mfg_s:mfg_e] if mfg_s >= 0 else "",
-                           MANUFACTURING_SIGNALS)
-        + _substantive_count(text[bom_s:bom_e] if bom_s >= 0 else "",
-                             MANUFACTURING_SIGNALS))
+        _substantive_count(mfg_text, MANUFACTURING_SIGNALS)
+        + _substantive_count(bom_text, MANUFACTURING_SIGNALS))
     regulatory_depth = len({m.group(0).strip().upper()
                             for sig in REGULATORY_SIGNALS
                             for m in re.finditer(sig, text, re.I)})
     tb_s, tb_e = _section_span(text, "15. Transfer Boundary")
+    tb_text = text[tb_s:tb_e] if tb_s >= 0 else text
     transfer_depth = (
-        _substantive_count(text[tb_s:tb_e] if tb_s >= 0 else "",
-                           BOUNDARY_SIGNALS)
+        _substantive_count(tb_text, BOUNDARY_SIGNALS)
         + len({m.group(0).upper() for sig in BOUNDARY_SIGNALS
                for m in re.finditer(sig, text, re.I)}))
     bdp_s, bdp_e = _section_span(text, "BUYER DECISION PAGE")
+    bdp_text = text[bdp_s:bdp_e] if bdp_s >= 0 else text
     buyer_decision_depth = (
-        sum(1 for s in BUYER_PAGE_SECTIONS if s in text)
-        + sum(1 for s in _sentences(text[bdp_s:bdp_e] if bdp_s >= 0 else "")
+        sum(1 for s in BUYER_PAGE_SECTIONS
+            if s in text or s.lower() in text.lower())
+        + sum(1 for s in _sentences(bdp_text)
               if re.search(r"\d", s)))
 
     return {
@@ -484,7 +529,8 @@ def measure_generated_vector(spec: Dict[str, Any], eng: Dict[str, Any],
         "parameter_count": len(params),
         "provenance_density": provenance_density,
         "provenance_density_consumed": provenance_density_consumed,
-        "traceability_density": (round(len(chains) / objects, 3)
+        "traceability_density": (round((len(chains) + len(links))
+                                        / objects, 3)
                                  if objects else 0.0),
         "manufacturing_depth": manufacturing_depth,
         "regulatory_depth": regulatory_depth,

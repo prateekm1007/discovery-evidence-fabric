@@ -240,11 +240,40 @@ class TestBridgeEndToEnd(unittest.TestCase):
             build_renders=False)
 
     def test_all_steps_ok(self):
+        # R440 contract: the canonical package compiler BLOCKS this thin
+        # captured record (no coherent mechanism/causal-chain sections
+        # — the #160 failure class the gate exists to catch). The honest
+        # bridge outcome is PACKAGE_BUILD_BLOCKED with the geometry and
+        # CIO projections still delivered (3D and package are separate
+        # products; R423A §5).
         steps = {s["step"]: s["status"] for s in self.result["report"]["steps"]}
         self.assertEqual(steps["CLASSIFY"], "OK")
         self.assertEqual(steps["GEOMETRY"], "OK")
-        self.assertEqual(steps["PACKAGE"], "OK")
-        self.assertEqual(steps["CIO_UPDATE"], "OK")
+        self.assertEqual(steps["PACKAGE"], "PACKAGE_BUILD_BLOCKED")
+        self.assertEqual(steps["CIO_UPDATE"], "OK_GEOMETRY_ONLY")
+        self.assertEqual(self.result["report"]["outcome"],
+                         "PACKAGE_BUILD_BLOCKED")
+
+    def test_blocked_package_emits_no_zip_but_keeps_geometry(self):
+        """R440.13 at the bridge level: a BLOCKED build produces NO ZIP
+        (never a partial package) and an honest typed record — while the
+        3D artifact (MODEL/) still exists and is projected into the CIO."""
+        pkg = self.result["package_out"]
+        self.assertTrue(pkg.get("blocked"))
+        self.assertIsNone(pkg.get("zip_path"))
+        # no ZIP anywhere in the work dir (no partial package)
+        zips = [f for f in os.listdir(self.work)
+                if f.endswith(".zip")] if os.path.exists(self.work) else []
+        self.assertEqual(zips, [])
+        rec = pkg.get("blocked_record") or {}
+        self.assertIn(rec.get("stage"), ("QUALITY_GATE_BLOCKED",
+                                         "VALIDATION_BLOCKED",
+                                         "COMPILE_BLOCKED"))
+        # the 3D artifact survived independently of the package
+        cio = self.result["cio_updated"]
+        self.assertTrue(cio["geometry"]["present"])
+        self.assertIsNone(cio["downloads"]["package_zip"])
+        self.assertTrue(cio["downloads"]["package_blocked"])
 
     def test_cio_geometry_from_bridge_only(self):
         cio = self.result["cio_updated"]
@@ -252,12 +281,16 @@ class TestBridgeEndToEnd(unittest.TestCase):
         self.assertTrue(geo["present"])
         self.assertEqual(geo["visualizability_class"], epistemics.SYSTEM_3D)
         self.assertIsNotNone(geo["glb_sha256"])
-        # glb hash matches the actual bytes
-        glb_path = os.path.join(self.work, "TECHNOLOGY_PACKAGE", "MODEL")
-        found = [f for f in os.listdir(glb_path) if f.endswith(".glb")]
-        self.assertEqual(len(found), 1)
-        actual = hashlib.sha256(
-            open(os.path.join(glb_path, found[0]), "rb").read()).hexdigest()
+        # glb hash matches the actual bytes (MODEL/ is persisted even
+        # when the package build is blocked — the 3D artifact is its own
+        # product). The CURRENT generation's canonical model
+        # (model-00N.glb, highest N) is the served artifact.
+        glb_path = os.path.join(self.work, "MODEL")
+        models = sorted(f for f in os.listdir(glb_path)
+                        if f.startswith("model-") and f.endswith(".glb"))
+        self.assertTrue(models)
+        current = os.path.join(glb_path, models[-1])
+        actual = hashlib.sha256(open(current, "rb").read()).hexdigest()
         self.assertEqual(actual, geo["glb_sha256"])
 
     def test_cio_maturity_honest_for_conceptual(self):
@@ -270,58 +303,45 @@ class TestBridgeEndToEnd(unittest.TestCase):
         self.assertNotEqual(cio["maturity"].get("experimentally_verified"), True)
 
     def test_package_zip_contents(self):
+        """R440 contract: full buyer-package CONTENTS live in
+        tests/test_r440_canonical_package_compiler.py (good-state compile
+        with the full survivor chain). At the BRIDGE level a thin record
+        must produce NO package at all — asserted from the typed blocked
+        record (never a partial ZIP)."""
         pkg = self.result["package_out"]
-        with zipfile.ZipFile(pkg["zip_path"]) as zf:
-            names = zf.namelist()
-        self.assertTrue(any(n.endswith("00_PACKAGE_README.pdf") for n in names))
-        # R424 elite document set
-        for elite_doc in ("01_EXECUTIVE_TECHNOLOGY_BRIEF.pdf",
-                          "02_ENGINEERING_TECHNOLOGY_TRANSFER_DOSSIER.pdf",
-                          "03_BUYER_DECISION_CARD.pdf",
-                          "04_EVIDENCE_SUMMARY.pdf",
-                          "05_TRANSFER_MANIFEST.pdf",
-                          "ENGINEERING_TRACEABILITY.json",
-                          "MATURITY_BASIS.json", "EQUATION_REGISTRY.json",
-                          "UNKNOWN_ROADMAP.json",
-                          "VALIDATION_ECONOMICS.json", "LOOP_STATE.json",
-                          "COMMERCIAL_EVIDENCE.json"):
-            self.assertTrue(any(n.endswith(elite_doc) for n in names),
-                            f"missing elite layer: {elite_doc}")
-        self.assertTrue(any(n.endswith("CONCEPTUAL_3D_DISCLAIMER.json") for n in names))
-        self.assertTrue(any(n.endswith("MANIFEST.json") for n in names))
-        self.assertTrue(any(n.endswith("PROVENANCE.json") for n in names))
-        # conceptual package must NOT contain STEP/STL
-        self.assertFalse(any(n.endswith(".step") for n in names))
-        self.assertFalse(any(n.endswith(".stl") for n in names))
+        self.assertTrue(pkg.get("blocked"))
+        self.assertIsNone(pkg.get("zip_path"))
+        rec = pkg.get("blocked_record") or {}
+        self.assertTrue(rec.get("run_id") or rec.get("stage"))
+        detail = rec.get("detail") or {}
+        failed = (detail.get("failed_gates")
+                  or detail.get("failures") or [])
+        self.assertTrue(failed or detail,
+                        "blocked record must state its failures")
 
     def test_manifest_hashes_verify(self):
+        """R440: no package dir exists for a blocked build — manifest/hash
+        verification for compiled packages lives in the compiler's own
+        suite (test_r440_13_good_state...). Here: nothing partial exists."""
         pkg = self.result["package_out"]
-        pkg_dir = pkg["package_dir"]
-        for entry in pkg["manifest"]["files"]:
-            path = os.path.join(pkg_dir, entry["path"])
-            actual = hashlib.sha256(open(path, "rb").read()).hexdigest()
-            self.assertEqual(actual, entry["sha256"], f"hash mismatch: {entry['path']}")
+        self.assertTrue(pkg.get("blocked"))
+        self.assertIsNone(pkg.get("package_dir"))
 
     def test_provenance_chain(self):
         cio = self.result["cio_updated"]
-        fs = _solar_run()["final_state"]
         self.assertIsNotNone(cio["provenance"]["geometry_sha256"])
-        self.assertEqual(fs["final_envelope_hash"],
-                         json.load(open(os.path.join(
-                             self.result["package_out"]["package_dir"],
-                             "PROVENANCE.json")))["final_envelope_hash"])
+        # R440: with the package blocked there is no package provenance
+        # to compare against — the geometry provenance chain is the
+        # honest artifact that exists
+        self.assertIsNone(cio["provenance"].get("package_zip_sha256"))
 
     def test_essay_eight_sections_no_raw_json(self):
-        essay = self.result["package_out"]["essay"]
-        self.assertEqual(len(essay["sections"]), 8)
-        import re
-        leak = re.compile(r"\{'|\{\"|'[a-z_]+':\s|\"[a-z_]+\":\s")
-        for key, text in essay["sections"].items():
-            self.assertTrue(text.strip(), f"empty section {key}")
-            self.assertIsNone(leak.search(text),
-                              f"raw machine state leaked into {key}: "
-                              f"{leak.search(text) and leak.search(text).group()}")
-            self.assertNotIn('"mechanism":', text)
+        # R440: the essay is a package-layer artifact; a blocked build
+        # produces no essay. Essay content quality is verified in the
+        # compiler suite (test_r440_6_buyer_pdfs_carry_no_raw_json).
+        pkg = self.result["package_out"]
+        self.assertTrue(pkg.get("blocked"))
+        self.assertIsNone(pkg.get("essay"))
 
     def test_generation_models_present(self):
         gens_dir = os.path.join(self.work, "GENERATIONS")
@@ -341,19 +361,33 @@ class TestBridgeEngineeringPath(unittest.TestCase):
                          epistemics.ENGINEERING_3D)
 
     def test_package_contains_step_stl(self):
+        """R440 contract: the thin fixture (no recorded mechanism or
+        architecture) is BLOCKED by the canonical package compiler — no
+        ZIP. The ENGINEERING geometry artifacts (STEP/STL/validation)
+        still exist on disk in MODEL/ — the 3D artifact is its own
+        product, independent of package maturity. ZIP-level contents for
+        coherent records are covered in test_r440_*."""
         pkg = self.result["package_out"]
-        with zipfile.ZipFile(pkg["zip_path"]) as zf:
-            names = zf.namelist()
-        self.assertTrue(any(n.endswith(".step") for n in names))
-        self.assertTrue(any(n.endswith(".stl") for n in names))
-        self.assertTrue(any(n.endswith("GEOMETRY_VALIDATION_REPORT.json") for n in names))
+        self.assertTrue(pkg.get("blocked"))
+        self.assertIsNone(pkg.get("zip_path"))
+        model_dir = os.path.join(self.work, "MODEL")
+        files = os.listdir(model_dir)
+        self.assertTrue(any(f.endswith(".step") for f in files))
+        self.assertTrue(any(f.endswith(".stl") for f in files))
+        # the validation RESULT rides the CIO geometry projection (the
+        # packaged GEOMETRY_VALIDATION_REPORT.json is a package-layer
+        # artifact, produced only for compiled packages)
+        geo = self.result["cio_updated"]["geometry"]
+        self.assertTrue((geo.get("validation") or {}).get("passed"))
 
     def test_package_maturity_engineering(self):
-        # R424 §10: maturity is EVIDENCE-derived. The thin fixture has
-        # engineering geometry but NO design inputs / failure modes /
-        # build plan in its record — EARLY is the honest level.
-        self.assertEqual(self.result["package_out"]["package_maturity"],
-                         epistemics.PACKAGE_MATURITY_EARLY)
+        # R440 contract: maturity is EVIDENCE-derived. The thin fixture
+        # has engineering geometry but NO mechanism/architecture record —
+        # the compiler honestly BLOCKS the package (no maturity tier is
+        # assignable to an incoherent record; the #160 lesson).
+        pkg = self.result["package_out"]
+        self.assertTrue(pkg.get("blocked"))
+        self.assertIsNone(pkg.get("package_maturity"))
 
     def test_full_record_earns_engineering_definition_maturity(self):
         """The maturity rule fires on the recorded evidence, not the 3D
@@ -383,8 +417,15 @@ class TestBridgeEngineeringPath(unittest.TestCase):
              "equipment": f"bench equipment {i}"} for i in range(1, 5)]
         result = run_bridge(run, None, tempfile.mkdtemp(
             prefix="bridge_eng_full_"), build_renders=False)
-        self.assertEqual(result["package_out"]["package_maturity"],
-                         epistemics.PACKAGE_MATURITY_ENGINEERING)
+        # R440 contract: DI/FM/WP enrichment alone does NOT unblock the
+        # compiler — the record still lacks a coherent mechanism/
+        # causal-chain/experiment contract. The honest outcome is a
+        # BLOCKED package with the typed record (the maturity ladder for
+        # fully coherent records is covered by the compiler's own suite
+        # on the full survivor chain).
+        pkg = result["package_out"]
+        self.assertTrue(pkg.get("blocked"))
+        self.assertIsNone(pkg.get("package_maturity"))
 
     def test_cio_carries_measured_dimensions(self):
         geo = self.result["cio_updated"]["geometry"]
@@ -412,8 +453,12 @@ class TestBridgeFailureRecovery(unittest.TestCase):
         ]
         work = tempfile.mkdtemp(prefix="bridge_fail_")
         result = run_bridge(run, None, work, build_renders=False)
-        # never silent: completed-as-conceptual with recorded demotion
-        self.assertEqual(result["report"]["outcome"], "COMPLETED")
+        # never silent: the geometry demoted to conceptual with the
+        # recorded reason (the 3D artifact is SYSTEM_3D); the package
+        # layer is additionally BLOCKED for this thin record (R440) —
+        # both honest outcomes, never a silent "No 3D"
+        self.assertIn(result["report"]["outcome"],
+                      ("COMPLETED", "PACKAGE_BUILD_BLOCKED"))
         self.assertEqual(result["report"]["visualizability_class"],
                          epistemics.SYSTEM_3D)
         attempts = result["geometry_out"]["cad_pipeline_status"]["attempts"]

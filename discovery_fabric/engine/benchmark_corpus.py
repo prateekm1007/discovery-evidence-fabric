@@ -65,6 +65,41 @@ DOSSIER_SECTIONS = [
     "13. Manufacturing", "14. External Evidence", "15. Transfer Boundary",
 ]
 
+# R440: the elite (R424) document vocabulary — the same substantive
+# buyer/engineering units under the production schema's headings; the
+# A10 instrument counts the union so the floor comparison stays
+# like-for-like across the schema migration.
+ELITE_SECTIONS = [
+    "Problem definition",
+    "Failure mode being addressed",
+    "Mechanism",
+    "Causal delta",
+    "Architecture",
+    "Subsystem breakdown",
+    "Governing equations",
+    "Parameter definitions",
+    "Constraints",
+    "Engineering assumptions",
+    "Failure modes",
+    "Verification plan",
+    "Build / manufacturing pathway",
+    "Decisive experiment",
+    "Expected measurements",
+    "Acceptance criteria",
+    "Unresolved technical risks",
+    "Artifact references",
+    "What is it?",
+    "What is actually established?",
+    "What is not established?",
+    "What could kill it?",
+    "Why does it matter?",
+    "What is different?",
+    "What would we build?",
+    "What is the cheapest decisive next experiment?",
+    "What should we do next?",
+]
+
+
 def _buyer_page_sections() -> List[str]:
     out: List[str] = []
     for s in DOSSIER_SECTIONS:
@@ -224,12 +259,19 @@ def measure_generated_package(spec: Dict[str, Any], eng: Dict[str, Any],
                               ) -> Dict[str, Any]:
     """Apply the SAME measurable dimensions to a generated package so the
     A10 comparison is like-for-like (identical instruments both sides)."""
+    # R440: the production package is the ELITE (R424) schema — the
+    # instrument measures BOTH vocabularies (the frozen contract's
+    # sections and the elite document headings) so the like-for-like
+    # floor comparison survives the schema migration without being
+    # lowered (BS-024: the instrument must stay causally connected to
+    # what production actually emits).
     chains = 0
     trace_path = Path(package_report["folder"]) / \
         "ENGINEERING_TRACEABILITY.json"
     if trace_path.exists():
-        chains = len(json.loads(trace_path.read_text())
-                     .get("traceability_chains", []))
+        tr = json.loads(trace_path.read_text())
+        chains = len(tr.get("traceability_chains", [])
+                     or tr.get("links", []))
     equations = eng.get("engineering_core", {}).get("governing_model", {}) \
         .get("equations", [])
     fms = eng.get("failure_analysis", [])
@@ -238,22 +280,35 @@ def measure_generated_package(spec: Dict[str, Any], eng: Dict[str, Any],
     build_plan = eng.get("engineering_build_plan", [])
     dos = eng.get("design_outputs", [])
     dis = eng.get("design_inputs", [])
-    # external evidence comes from the package manifest (single authority)
+    # external evidence: the manifest field (v4 schema) OR the elite
+    # evidence machine layer (retrieval count + classified roles)
     ext_ev = 0
     manifest_path = Path(package_report["folder"]) / "PACKAGE_MANIFEST.json"
     if manifest_path.exists():
         ext_ev = json.loads(manifest_path.read_text()) \
             .get("external_evidence_count", 0)
+    ev_path = Path(package_report["folder"]) / "03_EVIDENCE_SUMMARY.json"
+    if ev_path.exists() and not ext_ev:
+        ev = json.loads(ev_path.read_text())
+        retrieval = (ev.get("evidence_pack") or {}).get("retrieval") or []
+        ext_ev = len(retrieval) + len(
+            eng.get("external_engineering_precedent") or [])
     # section coverage: count the canonical sections present in the
-    # generated dossier PDF (same extraction as the frozen corpus)
+    # generated dossier + decision card (the elite vocabulary carries
+    # the same substantive units under R424 headings)
     covered = 0
-    pdf = Path(package_report["folder"]) / \
-        "02_ENGINEERING_TECHNOLOGY_TRANSFER_DOSSIER.pdf"
-    if pdf.exists():
-        import pypdf
-        text = "\n".join(pg.extract_text() or ""
-                         for pg in pypdf.PdfReader(str(pdf)).pages)
-        covered = sum(1 for s in DOSSIER_SECTIONS if s in text)
+    folder = Path(package_report["folder"])
+    texts = {}
+    for doc in ("02_ENGINEERING_TECHNOLOGY_TRANSFER_DOSSIER.pdf",
+                "03_BUYER_DECISION_CARD.pdf"):
+        p = folder / doc
+        if p.exists():
+            import pypdf
+            texts[doc] = "\n".join(pg.extract_text() or ""
+                                    for pg in pypdf.PdfReader(str(p)).pages)
+    combined = "\n".join(texts.values())
+    covered = sum(1 for s in DOSSIER_SECTIONS if s in combined) + \
+        sum(1 for s in ELITE_SECTIONS if s in combined)
     objects = chains + len(build_plan)
     return {
         "package_id": package_report.get("folder", ""),
