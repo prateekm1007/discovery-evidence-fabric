@@ -1,0 +1,99 @@
+{
+ "ensemble": "MULTI_MODEL_DISAGREEMENT (E15-E)",
+ "version": "1.0.0",
+ "requested_models": 3,
+ "available_providers": [
+  "openrouter",
+  "nvidia"
+ ],
+ "members": [
+  {
+   "role": "MODEL_A",
+   "provider_id": "openrouter",
+   "status": "OK",
+   "model": "nvidia/nemotron-3.5-content-safety:free",
+   "prompt_hash": "b0f4d3108eba1be81b37d1603e06fb6a4f10d3b032b4aad4d310a464c9ca6943",
+   "output_hash": "ddc1269f208a34561e2cc68eaec6fd8d66cb2d14e3f029efcdff40aff68e01bc",
+   "latency_ms": 2278,
+   "fields": {},
+   "missing_fields": [
+    "mechanism",
+    "intervention",
+    "expected_effect",
+    "falsification_test",
+    "mechanism_source_span"
+   ],
+   "candidate": {
+    "candidate_id": "cand:ENS:openrouter:ddc1269f208a",
+    "mechanism": "",
+    "intervention": "",
+    "expected_effect": "",
+    "falsification_test": "",
+    "mechanism_source_span": "",
+    "source_evidence": {
+     "source_id": "doi:10.1128/aem.02311-20",
+     "source_hash": "edfa86ba61b7e94c79cab2564623c8883fc9e9e9bab70bb7f7f1947e1d3f7143"
+    }
+   }
+  },
+  {
+   "role": "MODEL_B",
+   "provider_id": "nvidia",
+   "status": "OK",
+   "model": "meta/llama-3.2-11b-vision-instruct",
+   "prompt_hash": "b0f4d3108eba1be81b37d1603e06fb6a4f10d3b032b4aad4d310a464c9ca6943",
+   "output_hash": "c5bab49aa85b4c7aed99e870217775941d171c59f7b59098cf72c1f52ab81892",
+   "latency_ms": 62325,
+   "fields": {
+    "mechanism": "Temperature and total dissolved solids concentration have a cumulative effect on the biofilm and spore formation of Geobacillus stearothermophilus.",
+    "intervention": "Implement a temperature control system to maintain a temperature below 65°C in the district cooling loop, and adjust the total dissolved solids concentration to below 20% (w/v) to prevent biofilm and spore formation on the stainless steel plate heat exchanger.",
+    "expected_effect": "This intervention is expected to reduce biofilm and scale accumulation on the plate channels, thereby maintaining a heat transfer coefficient above 2500 W/m2K for 12 months between mechanical cleanings.",
+    "falsification_test": "Monitor the heat transfer coefficient and pressure drop across the heat exchanger over a period of 12 months, and perform regular cleaning and inspection to verify the effectiveness of the intervention.",
+    "mechanism_source_span": "\"Increasing the total dissolved milk solids concentration to 20% (w/v) caused an apparent delay in the onset of biofilm and spore formation to detectable concentrations among all the strains at 55°C.\""
+   },
+   "missing_fields": [],
+   "candidate": {
+    "candidate_id": "cand:ENS:nvidia:c5bab49aa85b",
+    "mechanism": "Temperature and total dissolved solids concentration have a cumulative effect on the biofilm and spore formation of Geobacillus stearothermophilus.",
+    "intervention": "Implement a temperature control system to maintain a temperature below 65°C in the district cooling loop, and adjust the total dissolved solids concentration to below 20% (w/v) to prevent biofilm and spore formation on the stainless steel plate heat exchanger.",
+    "expected_effect": "This intervention is expected to reduce biofilm and scale accumulation on the plate channels, thereby maintaining a heat transfer coefficient above 2500 W/m2K for 12 months between mechanical cleanings.",
+    "falsification_test": "Monitor the heat transfer coefficient and pressure drop across the heat exchanger over a period of 12 months, and perform regular cleaning and inspection to verify the effectiveness of the intervention.",
+    "mechanism_source_span": "\"Increasing the total dissolved milk solids concentration to 20% (w/v) caused an apparent delay in the onset of biofilm and spore formation to detectable concentrations among all the strains at 55°C.\"",
+    "source_evidence": {
+     "source_id": "doi:10.1128/aem.02311-20",
+     "source_hash": "edfa86ba61b7e94c79cab2564623c8883fc9e9e9bab70bb7f7f1947e1d3f7143"
+    }
+   }
+  }
+ ],
+ "common_claims": [],
+ "disagreements": [],
+ "unique_mechanisms": [],
+ "adjudication": {
+  "adjudicator": "DETERMINISTIC (field completeness -> falsifiability -> source span)",
+  "primary_role": "MODEL_B",
+  "primary_provider": "nvidia",
+  "primary_candidate_id": "cand:ENS:nvidia:c5bab49aa85b",
+  "ranking": [
+   {
+    "role": "MODEL_B",
+    "provider_id": "nvidia",
+    "score": [
+     5,
+     1,
+     1
+    ]
+   }
+  ],
+  "consensus_forced": false,
+  "note": "the primary candidate enters the pipeline; disagreement objects remain UNRESOLVED and travel with the artifact chain (E15-E: do not force consensus)",
+  "decided_at": "2026-09-10T21:07:32+00:00Z"
+ },
+ "built_at": "2026-09-10T21:06:20+00:00Z",
+ "status": "ENSEMBLE_DEGRADED",
+ "paths": [
+  "openrouter",
+  "nvidia"
+ ],
+ "note": "1 independent path(s) returned a usable candidate; disagreement requires >= 2 — nothing fabricated"
+}
