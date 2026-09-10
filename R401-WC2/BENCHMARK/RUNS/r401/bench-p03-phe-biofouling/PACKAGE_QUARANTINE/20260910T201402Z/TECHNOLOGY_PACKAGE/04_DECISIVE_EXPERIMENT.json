@@ -1,0 +1,371 @@
+{
+  "artifact": "DECISIVE_EXPERIMENT",
+  "schema": "R425_DECISIVE_EXPERIMENT_CONTRACT",
+  "run_id": "r401-bench-p03-phe-biofouling",
+  "contract": {
+    "experiment_id": {
+      "value": "falsification_test_from_candidate",
+      "status": "DEFINED",
+      "provenance_basis": "decisive_experiment.selected.experiment (the loop's own selection)"
+    },
+    "hypothesis": {
+      "value": [
+        {
+          "name": "H_effect_holds",
+          "description": "expected effect holds: Reduced biofilm and scale accumulation by minimizing chloride-induced corrosion that provides attachment sites for microbial growth",
+          "prior_probability": 0.45,
+          "provenance_class": "MODEL_DERIVED"
+        },
+        {
+          "name": "H_effect_fails",
+          "description": "expected effect does not reproduce outside source context",
+          "prior_probability": 0.55,
+          "provenance_class": "MODEL_DERIVED"
+        }
+      ],
+      "status": "DEFINED",
+      "provenance_basis": "invention_specification.killer_experiment.hypotheses (recorded names, descriptions, priors)"
+    },
+    "intervention": {
+      "value": "Real-time distributed fiber optic sensing combined with microcapsule-based self-healing agents that release when corrosion is detected",
+      "status": "DEFINED",
+      "provenance_basis": "invention_specification.causal_chain.mechanism (the recorded causal mechanism under test)"
+    },
+    "baseline_control": {
+      "value": "NOT_DEFINED_IN_CANONICAL_STATE",
+      "status": "NOT_DEFINED_IN_CANONICAL_STATE",
+      "provenance_basis": "verification_matrix VF-001.requirement mentions a baseline comparison in prose, but the canonical record carries no structured baseline_arm/control_arm field — the arms are the recipient's pre-registration work, fixed from the measured baseline per the recorded acceptance rule"
+    },
+    "test_article": {
+      "value": "first physical article implementing the proposed intervention (GEOMETRY ABSENT — must be designed)",
+      "status": "DEFINED",
+      "provenance_basis": "engineering_build_plan WP-01.test_article (the recorded article to build)"
+    },
+    "measurable_variables": {
+      "value": [
+        {
+          "parameter_id": "CP-001",
+          "name": "heat generation at source",
+          "symbol": "q",
+          "unit": "W",
+          "value_status": "UNKNOWN",
+          "value_class": null
+        },
+        {
+          "parameter_id": "CP-002",
+          "name": "spreader conductivity",
+          "symbol": "k_i",
+          "unit": "W/(m.K)",
+          "value_status": "UNKNOWN",
+          "value_class": null
+        },
+        {
+          "parameter_id": "CP-003",
+          "name": "interface contact resistance",
+          "symbol": "R_total",
+          "unit": "K/W",
+          "value_status": "UNKNOWN",
+          "value_class": null
+        },
+        {
+          "parameter_id": "CP-004",
+          "name": "reject-path area",
+          "symbol": "A",
+          "unit": "m^2",
+          "value_status": "UNKNOWN",
+          "value_class": null
+        },
+        {
+          "parameter_id": "CP-005",
+          "name": "allowable temperature rise",
+          "symbol": "dT",
+          "unit": "K",
+          "value_status": "UNKNOWN",
+          "value_class": null
+        },
+        {
+          "parameter_id": "CP-006",
+          "name": "ambient worst case",
+          "symbol": "NOT_ASSIGNED",
+          "unit": "UNKNOWN",
+          "value_status": "UNKNOWN",
+          "value_class": null
+        }
+      ],
+      "status": "DEFINED",
+      "provenance_basis": "engineering_core.critical_parameters (recorded symbols, units, and value_status — UNKNOWN values stay UNKNOWN)"
+    },
+    "apparatus_instrumentation": {
+      "value": "domain bench equipment per verification methods",
+      "status": "DEFINED",
+      "provenance_basis": "engineering_build_plan WP-01.equipment (the recorded equipment requirement)"
+    },
+    "procedure": {
+      "value": {
+        "verification_requirement": "Accelerated aging test with simultaneous chloride exposure and mechanical stress while monitoring healing agent depletion and repair effectiveness",
+        "work_package_measurement": "physical bench/clinical experiment — NOT simulation"
+      },
+      "status": "DEFINED",
+      "provenance_basis": "verification_matrix VF-001.requirement + engineering_build_plan WP-01.measurement (the recorded procedure texts)"
+    },
+    "acceptance_rule": {
+      "value": {
+        "rule": "pre-registered pass/fail against the problem-stated threshold(s) (SOURCE_FACT, problem statement; the sourced values and their provenance are recorded on the corresponding design-input records)",
+        "status": "SOURCE_FACT_THRESHOLD"
+      },
+      "status": "DEFINED",
+      "provenance_basis": "verification_matrix VF-001.acceptance (the recorded pre-registration rule — the numeric margin is fixed from the measured baseline at pre-registration, never invented here)"
+    },
+    "falsification_rule": {
+      "value": {
+        "kill_arm": {
+          "name": "H_effect_fails",
+          "description": "expected effect does not reproduce outside source context",
+          "prior_probability": 0.55,
+          "provenance_class": "MODEL_DERIVED"
+        },
+        "rule_basis": "pre-registered pass/fail against the problem-stated threshold(s) (SOURCE_FACT, problem statement; the sourced values and their provenance are recorded on the corresponding design-input records)",
+        "kill_probability": "UNKNOWN (no sourced base rate exists)"
+      },
+      "status": "DEFINED",
+      "provenance_basis": "invention_specification.killer_experiment.hypotheses (H_effect_fails is the recorded falsification arm) + verification_matrix VF-001.acceptance (the failing side of the recorded rule) + decisive_experiment.selected.kill_probability (UNKNOWN where no sourced base rate exists)"
+    },
+    "expected_discriminating_outcomes": {
+      "value": [
+        {
+          "outcome": "H_effect_holds",
+          "meaning": "expected effect holds: Reduced biofilm and scale accumulation by minimizing chloride-induced corrosion that provides attachment sites for microbial growth",
+          "prior_probability": 0.45
+        },
+        {
+          "outcome": "H_effect_fails",
+          "meaning": "expected effect does not reproduce outside source context",
+          "prior_probability": 0.55
+        }
+      ],
+      "status": "DEFINED",
+      "provenance_basis": "invention_specification.killer_experiment.hypotheses — the recorded arms the experiment separates (Bayesian EIG over MODEL_DERIVED priors per the recorded basis)"
+    },
+    "dependencies": {
+      "value": "design article must exist first (see build plan)",
+      "status": "DEFINED",
+      "provenance_basis": "decisive_experiment.selected.dependency (the recorded precondition)"
+    },
+    "safety_operational_constraints": {
+      "value": {
+        "regulatory_pathway": "UNKNOWN (no regulatory determination exists for this invention; per R370C correction the pathway is never inferred from device class alone)",
+        "candidate_standards": []
+      },
+      "status": "DEFINED",
+      "provenance_basis": "engineering_specification.regulatory (the recorded regulatory determination — UNKNOWN pathway stays UNKNOWN per the R370C correction; never inferred from device class)"
+    },
+    "decision_mapping": {
+      "value": {
+        "next_best_action": "run killer experiment: falsification_test_from_candidate",
+        "selection_explanation": "This is the next experiment because it has the greatest expected ability to change the candidate decision (KILLER_EXPERIMENT ranking; EIG/cost 0.4557178723356231)",
+        "decision_impact": 0.9,
+        "prior_update_rule": "the measured outcome updates the recorded priors (Bayesian, per decisive_experiment.selected.basis 'COMPUTED (Bayesian EIG over MODEL_DERIVED priors)')"
+      },
+      "status": "DEFINED",
+      "provenance_basis": "final_state.next_best_action + decisive_experiment.explanation/selected (the recorded decision semantics)"
+    },
+    "next_technical_state_transition": {
+      "value": {
+        "current_state": "INVENTION_REQUIRES_EXPERIMENT",
+        "transition": "the experiment's recorded arms map the transition: H_effect_holds graduates the recorded INVENTION_REQUIRES_EXPERIMENT state to a sourced measurement; H_effect_fails terminates the lineage (the recorded kill arm)"
+      },
+      "status": "DEFINED",
+      "provenance_basis": "final_state.evolution.current_invention.state (the recorded technical state) + the recorded hypothesis arms"
+    }
+  },
+  "contract_completeness": {
+    "fields_total": 15,
+    "fields_defined_in_canonical_state": 14,
+    "fields_not_defined": 1,
+    "not_defined_fields": [
+      "baseline_control"
+    ],
+    "discipline": "every field is either derived from a named canonical record or emitted as NOT_DEFINED_IN_CANONICAL_STATE with the exact record inspected — no generic filler, no invented values (R425 §5)"
+  },
+  "recorded_layer": {
+    "shortlist": [
+      {
+        "experiment": "falsification_test_from_candidate",
+        "source_stage": "KILLER_EXPERIMENT",
+        "expected_information_gain": 0.4557178723356231,
+        "eig_per_cost": 0.4557178723356231,
+        "decision_impact": 0.9,
+        "kill_probability": "UNKNOWN (no sourced base rate exists)",
+        "cost": "UNKNOWN absolute cost (options ranked on a relative-1.0 scale per bayesian_eig; no sourced dollar/time estimate exists — Art. XXV)",
+        "time": "UNKNOWN",
+        "dependency": "design article must exist first (see build plan)",
+        "is_selected_killer": true,
+        "basis": "COMPUTED (Bayesian EIG over MODEL_DERIVED priors)",
+        "hypotheses": [
+          {
+            "name": "H_effect_holds",
+            "description": "expected effect holds: Reduced biofilm and scale accumulation by minimizing chloride-induced corrosion that provides attachment sites for microbial growth",
+            "prior_probability": 0.45,
+            "provenance": {
+              "source": "adjudication.evidence_verification + candidate text",
+              "epistemic_class": "MODEL_DERIVED",
+              "uncertainty": "priors/likelihoods derived from text analysis, not measurement",
+              "created_at": "2026-09-10T14:41:56.922918+00:00"
+            }
+          },
+          {
+            "name": "H_effect_fails",
+            "description": "expected effect does not reproduce outside source context",
+            "prior_probability": 0.55,
+            "provenance": {
+              "source": "adjudication.evidence_verification + candidate text",
+              "epistemic_class": "MODEL_DERIVED",
+              "uncertainty": "priors/likelihoods derived from text analysis, not measurement",
+              "created_at": "2026-09-10T14:41:56.922918+00:00"
+            }
+          }
+        ]
+      },
+      {
+        "experiment": "run killer experiment: falsification_test_from_candidate",
+        "source_stage": "NEXT_BEST_ACTION",
+        "action_id": "action:killer_experiment",
+        "expected_information_gain": 0.4557178723356231,
+        "score": 0.36,
+        "decision_impact": 0.9,
+        "probability_of_decision_change": 0.8,
+        "kill_probability": "UNKNOWN (no sourced base rate exists)",
+        "cost": 0.9114357446712462,
+        "time": "UNKNOWN",
+        "dependency": "physical_lab",
+        "basis": "COMPUTED (NBA score formula engine-v1)"
+      },
+      {
+        "experiment": "contradiction_attacking_experiment",
+        "source_stage": "KILLER_EXPERIMENT",
+        "expected_information_gain": 0.3551108007068293,
+        "eig_per_cost": 0.1775554003534147,
+        "decision_impact": 0.6,
+        "kill_probability": "UNKNOWN (no sourced base rate exists)",
+        "cost": "UNKNOWN absolute cost (options ranked on a relative-1.0 scale per bayesian_eig; no sourced dollar/time estimate exists — Art. XXV)",
+        "time": "UNKNOWN",
+        "dependency": "design article must exist first (see build plan)",
+        "is_selected_killer": false,
+        "basis": "COMPUTED (Bayesian EIG over MODEL_DERIVED priors)"
+      }
+    ],
+    "administrative_actions_excluded": [
+      {
+        "action_id": "con:verify:5fc42398",
+        "description": "attack contradiction: evidence verification issue: missing_source_span",
+        "provider": "internal_attack",
+        "exclusion_reason": "administrative/research action, not a falsification experiment (R377: the decisive experiment must be an experiment; recorded here — a valid next-best-action but not a decisive experiment)"
+      },
+      {
+        "action_id": "con:verify:fc690a03",
+        "description": "attack contradiction: evidence verification issue: mechanism_span_not_verbatim",
+        "provider": "internal_attack",
+        "exclusion_reason": "administrative/research action, not a falsification experiment (R377: the decisive experiment must be an experiment; recorded here — a valid next-best-action but not a decisive experiment)"
+      }
+    ],
+    "exclusion_note": "R377: administrative actions from next_best_action are excluded from the decisive-experiment shortlist (measured defect: all six R376 survivors selected 'fetch and audit claims of nearest collision patents' as the decisive experiment — a literature task cannot distinguish the candidate from existing approaches)",
+    "selected": {
+      "experiment": "falsification_test_from_candidate",
+      "source_stage": "KILLER_EXPERIMENT",
+      "expected_information_gain": 0.4557178723356231,
+      "eig_per_cost": 0.4557178723356231,
+      "decision_impact": 0.9,
+      "kill_probability": "UNKNOWN (no sourced base rate exists)",
+      "cost": "UNKNOWN absolute cost (options ranked on a relative-1.0 scale per bayesian_eig; no sourced dollar/time estimate exists — Art. XXV)",
+      "time": "UNKNOWN",
+      "dependency": "design article must exist first (see build plan)",
+      "is_selected_killer": true,
+      "basis": "COMPUTED (Bayesian EIG over MODEL_DERIVED priors)",
+      "hypotheses": [
+        {
+          "name": "H_effect_holds",
+          "description": "expected effect holds: Reduced biofilm and scale accumulation by minimizing chloride-induced corrosion that provides attachment sites for microbial growth",
+          "prior_probability": 0.45,
+          "provenance": {
+            "source": "adjudication.evidence_verification + candidate text",
+            "epistemic_class": "MODEL_DERIVED",
+            "uncertainty": "priors/likelihoods derived from text analysis, not measurement",
+            "created_at": "2026-09-10T14:41:56.922918+00:00"
+          }
+        },
+        {
+          "name": "H_effect_fails",
+          "description": "expected effect does not reproduce outside source context",
+          "prior_probability": 0.55,
+          "provenance": {
+            "source": "adjudication.evidence_verification + candidate text",
+            "epistemic_class": "MODEL_DERIVED",
+            "uncertainty": "priors/likelihoods derived from text analysis, not measurement",
+            "created_at": "2026-09-10T14:41:56.922918+00:00"
+          }
+        }
+      ]
+    },
+    "explanation": "This is the next experiment because it has the greatest expected ability to change the candidate decision (KILLER_EXPERIMENT ranking; EIG/cost 0.4557178723356231)",
+    "no_invented_values_note": "cost/time/kill_probability remain UNKNOWN where no stage recorded them (Art. XXV)",
+    "falsification_contract": {
+      "HYPOTHESIS": "expected effect holds: Reduced biofilm and scale accumulation by minimizing chloride-induced corrosion that provides attachment sites for microbial growth (recorded prior 0.45, epistemic class MODEL_DERIVED per the killer-experiment provenance)",
+      "TREATMENT": "Embedding microstructured optical fiber sensors and corrosion-activated microcapsules containing healing agents throughout the stainless steel cooling system components",
+      "CONTROL_BLOCKER": "no executed baseline comparison on record (physics chain executed: ['PRE_REQUIREMENTS']; lifecycle MECHANISM_NOT_SIMULATABLE) — the control arm is not invented from the problem statement",
+      "MEASUREMENT": "Accelerated aging test with simultaneous chloride exposure and mechanical stress while monitoring healing agent depletion and repair effectiveness",
+      "APPARATUS_BLOCKER": "no separate apparatus record exists; the falsification test does not state a quantified instrumented procedure",
+      "SAMPLE_BLOCKER": "no sample-size / n= record exists in any engine stage (honest UNKNOWN — Art. XXV)",
+      "ACCEPTANCE_THRESHOLD": "Autonomous detection and repair of corrosion sites as they form, extending component lifespan by 300% and reducing maintenance costs by 70%",
+      "FALSIFICATION_THRESHOLD": "the recorded falsification test ('Accelerated aging test with simultaneous chloride exposure and mechanical stress while monitoring healing agent depletion and repair effectiveness') fails to show the recorded expected effect ('Autonomous detection and repair of corrosion sites as they form, extending component lifespan by 300% and reducing maintenance costs by 70%') — the mechanism is killed by its own test's negative outcome; the recorded failing hypothesis is 'expected effect does not reproduce outside source context'",
+      "UNCERTAINTY": "all priors MODEL_DERIVED; no EXPERIMENTALLY_ESTIMATED inputs exist at this stage (Art. XXVIII/XXXVIII: no synthetic shortcut to physical observation)",
+      "COST": "UNKNOWN absolute cost (options ranked on a relative-1.0 scale per bayesian_eig; no sourced dollar/time estimate exists — Art. XXV)",
+      "TIME": "UNKNOWN (no stage recorded a time estimate)",
+      "SAFETY_BLOCKER": "no safety-analysis stage output exists in the engine (honest UNKNOWN — Art. XXV; the engineering failure_modes record is a failure-mode list, not a safety case)"
+    },
+    "timestamp": "2026-09-10T14:51:05+00:00Z"
+  },
+  "discriminating_contract": {
+    "discriminating": true,
+    "requirements": {
+      "at_least_two_hypothesis_arms_with_priors": true,
+      "pre_registered_decision_rule": true,
+      "measurable_outcome_path": true,
+      "target_resolves_in_record": true,
+      "experiment_selected_by_loop": true
+    },
+    "hypothesis_arms": [
+      {
+        "name": "H_effect_holds",
+        "prior_probability": 0.45
+      },
+      {
+        "name": "H_effect_fails",
+        "prior_probability": 0.55
+      }
+    ],
+    "decision_rule": {
+      "source": "verification_matrix VF-001",
+      "acceptance": "pre-registered pass/fail against the problem-stated threshold(s) (SOURCE_FACT, problem statement; the sourced values and their provenance are recorded on the corresponding design-input records)"
+    },
+    "measurable_outcome": {
+      "source": "verification_matrix VF-001",
+      "method": "Accelerated aging test with simultaneous chloride exposure and mechanical stress while monitoring healing agent depletion and repair effectiveness"
+    },
+    "targets_resolved": [
+      "FM-001",
+      "FM-001",
+      "FM-DOM-003",
+      "FM-DOM-004",
+      "FM-DOM-001",
+      "FM-DOM-002",
+      "FM-DOM-003",
+      "FM-DOM-004"
+    ],
+    "basis": "EXPERIMENT_READY requires the full discriminating contract (R425 §3); each failed requirement is named above — the hypotheses array alone never grants the tier"
+  },
+  "invention_id": "inv:bench-p03-phe-biofouling:156ae5155c73",
+  "problem_id": "bench-p03-phe-biofouling",
+  "domain_family": "thermal",
+  "technology_name": "inv:bench-p03-phe-biofouling:156ae5155c73",
+  "final_invention_hash": "7c71444650d60dfc2bb6f6dc47a2bc08f5e76285fd49df134ac037c0e3d49785"
+}
