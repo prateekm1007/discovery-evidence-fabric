@@ -295,3 +295,19 @@ Work Log:
 Stage Summary:
 - Deliverable: the private HF production-validation deployment RUNNING at 601547ea (cpu-basic, 16 GB) + ten R446/HF_* artifacts + the round record; the environmental-vs-product separation the directive demanded: the visual ceiling was ENVIRONMENTAL (Case C full-path COMPLETE_PASS on 16 GB), and one real product defect (the R425 allowlist gap) was found, fixed, regression-pinned, and re-deployed within the round
 - Standing items: OPERATOR — rotate the GitHub PAT (live credential in repo history at d72073de; deployment surfaces clean); CODER 2 — the visual verification battery on the HF deployment (the per-run GLBs/shas/cookies persisted for the handoff); the W11-benchmark HF Job (designed); the memory-guard page-cache precision question (owner-gated, Art. XXVII)
+
+---
+Task ID: R446-HF (final delivery tuple)
+Agent: Coder 1 (main session)
+Task: final push + records-alignment deploy + identity verification
+
+Work Log:
+- Round commit d0c13611 pushed to GitHub main (remote verified via the API)
+- Records-alignment deploy to the Space (tree restaged at d0c13611; Dockerfile identity pin updated; delta uploaded — records/scripts only, zero engine-code change from 601547ea); rebuild -> RUNNING
+- /api/version verified: engine_commit d0c13611 == origin/main == baked artifact == health-reported; identity_tamper=false; running_artifact_sha256 == build_artifact_sha256
+- /api/health verified: ok=true, discovery_ready=true, portfolio_ready=true, zai HEALTHY via the HF router, durable branch runtime-state-hf
+
+Stage Summary:
+- Delivery tuple: origin/main d0c13611 + HF deployed d0c13611 + /api/version d0c13611 — all agree; the HF Space remains PRIVATE on cpu-basic
+- R446-HF COMPLETE: R446/R446_HF_ROUND_RECORD.json at the pushed main, classification HF_HOSTING_SUCCESS_WITH_LIMITATIONS
+- OPERATOR ACTION FLAGGED: rotate the GitHub PAT (live credential in repo history at d72073de; all deployment surfaces clean)
