@@ -6,37 +6,32 @@
   "reviewer_provenance": "AI_REVIEW (Art. LXVII)",
   "constitution_version": "2.3.0",
   "constitution_sha256": "7084be6435ff30a645f4ad16a5380cf897a59b6dd73f5e18af3713010131a9c5",
-
   "mandatory_reads_completed": "EPISTEMIC_CONSTITUTION.md v2.3.0 read IN FULL at round start (hash re-verified byte-identical to the R444 record: 7084be64...) and RE-READ before the final commit; GOVERNANCE/README.md, GOVERNANCE/AUDITOR_SELF_GOVERNANCE_v1.md, GOVERNANCE/AUDITOR_BLINDSPOT_REGISTER.md, GOVERNANCE/AUDITOR_REMEMBERED_STATE.md, GOVERNANCE/AUDIT_LOOP_PROTOCOL_v1.md, ACTIVE_PATH.md (through the R445-A addendum), R444/R444_C2_ROUND_RECORD.json + R444/R444_ROUND_RECORD.json (Coder 1)",
-
   "baseline_recorded_per_directive": {
     "head": "2d52fc62c3a5acafadb8115f60365d91c44b6598",
     "origin_main_local_ref": "2d52fc62c3a5acafadb8115f60365d91c44b6598",
     "ls_remote_actual": "2d52fc62c3a5acafadb8115f60365d91c44b6598",
-    "git_status": "clean at round start (fresh full clone; sandbox had been reset — repo re-cloned from the PAT, full history)",
+    "git_status": "clean at round start (fresh full clone; sandbox had been reset \u2014 repo re-cloned from the PAT, full history)",
     "production_api_version_at_round_start": {
       "engine_commit": "087f9955eae2a3738c55755c1443e576e1af536b",
       "engine_commit_source": "build_artifact",
       "constitution_version": "2.3.0",
       "note": "production was ONE commit behind origin/main at round start (Coder 1's 2d52fc62 R445-A domain-vocabulary fix was pushed but not deployed); observed, disclosed, superseded by this round's deploy"
     },
-    "render_plan_measured_live": "free (512 MB), service not suspended — via the Render API at round start (Art. XXIV: measured, not inherited)",
+    "render_plan_measured_live": "free (512 MB), service not suspended \u2014 via the Render API at round start (Art. XXIV: measured, not inherited)",
     "constitution_version_and_hash": "2.3.0 / 7084be6435ff30a645f4ad16a5380cf897a59b6dd73f5e18af3713010131a9c5"
   },
-
   "observation_channel_incident_disclosed": {
-    "what": "the text observation channel in this sandbox silently swallows the byte sequence '<space>[h' (verified with od -c: the file contains 'target: [heroTarget.x, ...]' while sed/grep/cat display 'target: eroTarget.x, ...') — the round briefly appeared to contain a syntax-corrupted render.js introduced in R441",
+    "what": "the text observation channel in this sandbox silently swallows the byte sequence '<space>[h' (verified with od -c: the file contains 'target: [heroTarget.x, ...]' while sed/grep/cat display 'target: eroTarget.x, ...') \u2014 the round briefly appeared to contain a syntax-corrupted render.js introduced in R441",
     "method": "validated the validator first (Art. III): a known-bad file fails node --input-type=module --check, the extracted page module script parses clean, and od -c shows the true bytes",
-    "conclusion": "NO defect — the repo file was correct at every revision; the channel was lying",
+    "conclusion": "NO defect \u2014 the repo file was correct at every revision; the channel was lying",
     "lesson_recorded": "pixel/byte claims require a byte-level observation channel (od/hexdump); text-display anomalies are observation-channel state, never repository state (Art. XXII applied to the tool layer itself)"
   },
-
   "measurement_infrastructure": {
-    "tool": "scripts/r445_mem_measure.py (in the sandbox workspace, not committed — this round changes ONLY render.js in the repo)",
+    "tool": "scripts/r445_mem_measure.py (in the sandbox workspace, not committed \u2014 this round changes ONLY render.js in the repo)",
     "method": "PSS via /proc/<pid>/smaps_rollup sampled at 12.5 Hz across the whole /proc table + cgroup v1 memory.usage_in_bytes trace; per-process classification (python worker / node / chromium tree); peak per class; isolated-process import footprints",
-    "cgroup": "sandbox cgroup v1: limit 4096 MB, usage noisy (shared with platform services) — the render tree's own contribution is measured by PSS sums, cgroup deltas recorded as corroboration"
+    "cgroup": "sandbox cgroup v1: limit 4096 MB, usage noisy (shared with platform services) \u2014 the render tree's own contribution is measured by PSS sums, cgroup deltas recorded as corroboration"
   },
-
   "import_footprint_isolation": {
     "python_baseline": 10.0,
     "numpy": 27.4,
@@ -45,28 +40,25 @@
     "visual_compiler_chain": 36.2,
     "trimesh": 96.8,
     "cadquery_engineering_stack": 458.7,
-    "verdict": "visual worker != CadQuery/OCCT process: PROVEN — zero cadquery/OCP imports in discovery_fabric/engine/visual_compiler/ (grep-verified) AND the measured import delta (worker 36.2 MB vs engineering stack 458.7 MB) shows the engineering stack cannot be resident in the worker; trimesh also absent (the gate re-measures with numpy+PIL)"
+    "verdict": "visual worker != CadQuery/OCCT process: PROVEN \u2014 zero cadquery/OCP imports in discovery_fabric/engine/visual_compiler/ (grep-verified) AND the measured import delta (worker 36.2 MB vs engineering stack 458.7 MB) shows the engineering stack cannot be resident in the worker; trimesh also absent (the gate re-measures with numpy+PIL)"
   },
-
   "flag_experiment_matrix": {
     "method": "the UNCHANGED render pipeline driven over the SAME deterministic payload (same GLB bytes, same scene_spec -> same scene) with per-experiment Chromium launch args; tree peak (PSS) measured per configuration; artifact sha256s compared",
     "results": {
       "baseline_r441_args_7_procs": "566.7-636.8 MB tree",
       "single_process_no_zygote": "522.6 MB, OK, 8.46 s, hero.png byte-identical, dimension/poster 2D-text AA shifted (0.11-0.94% of px, glyph edges)",
-      "no_threaded_compositing": "562.0 MB but 30.14 s (3.4x slower) — REJECTED (runtime regression)",
-      "micro_flags_only": "566.8 MB — no gain",
+      "no_threaded_compositing": "562.0 MB but 30.14 s (3.4x slower) \u2014 REJECTED (runtime regression)",
+      "micro_flags_only": "566.8 MB \u2014 no gain",
       "single_process_plus_micro": "515.2 MB",
-      "page_gc_hygiene_plus_all": "507.5 MB — ADOPTED (the shipped config)",
-      "use_gl_swiftshader_direct": "RENDER_FAILED in 0.29 s — Chrome 152 headless-shell refuses the legacy GL path (typed failure as designed) — REJECTED",
+      "page_gc_hygiene_plus_all": "507.5 MB \u2014 ADOPTED (the shipped config)",
+      "use_gl_swiftshader_direct": "RENDER_FAILED in 0.29 s \u2014 Chrome 152 headless-shell refuses the legacy GL path (typed failure as designed) \u2014 REJECTED",
       "ctor_changes_stencil_false_preserve_false": "no gain beyond noise; preserveDrawingBuffer kept TRUE for capture reliability",
-      "heap_cap_96_gpu_pressure_single_threaded_v8_raster_threads_swiftshader_threads": "all within +/-6 MB noise — rejected",
+      "heap_cap_96_gpu_pressure_single_threaded_v8_raster_threads_swiftshader_threads": "all within +/-6 MB noise \u2014 rejected",
       "chrome_blank_page_floor": "115.0 MB (single-process, production flags)",
       "node_floor_with_puppeteer_core": "76.8 MB"
     }
   },
-
   "memory_budget_report": "R445/MEMORY_BUDGET.json (the directive's exact format: baseline_peak_mb / optimized_peak_mb / delta_mb / optimization / evidence / quality_impact per case) + raw measurements R445/MEMORY_BUDGET_AB_RAW.json + R445/FLAG_EXPERIMENT_RESULTS.json",
-
   "same_case_guarantees_verified": {
     "same_canonical_glb": "PASS on all 12 A/B runs (sha256 equal baseline vs optimized)",
     "same_scene_specification": "PASS on all 12 (scene_spec_sha256 equal)",
@@ -74,15 +66,13 @@
     "same_gate_verdict": "PASS on all 12 (COMPLETE_PASS x8 on caseA/caseB; the identical pre-existing FAIL on caseC)",
     "same_geometry_identity": "PASS on all 12 (node identity + geometry identity checks)",
     "same_poster_parity": "PASS on all 12 (parity check PASS on caseA/caseB)",
-    "only_memory_materially_changed": "TRUE — plus the DISCLOSED sub-pixel text-AA shift in the 2D annotation layers (dimension/poster glyph edges, 0.11-0.94% of pixels) inherent to single-process Skia; the hero render itself is byte-identical and the gate re-certified every artifact"
+    "only_memory_materially_changed": "TRUE \u2014 plus the DISCLOSED sub-pixel text-AA shift in the 2D annotation layers (dimension/poster glyph edges, 0.11-0.94% of pixels) inherent to single-process Skia; the hero render itself is byte-identical and the gate re-certified every artifact"
   },
-
   "final_verified_state": {
     "render_js": "single-process Chromium (7 procs -> 1), no-zygote, micro flags, pmrem.dispose(), reused occupancy readback buffer, per-artifact GC via --js-flags=--expose-gc; the WebGL constructor, resolution, light rig, shadow map, camera solve, and every view UNCHANGED",
     "caseB_final_verify": "status OK, gate COMPLETE_PASS, 23 artifacts, tree peak 496.2 MB, hero.png sha256 2218f0d73cddb5fc byte-identical to the A/B optimized run, node/geometry identity + poster parity PASS",
     "diff_size": "1 file changed, 37 insertions(+), 2 deletions(-), all inside the Coder 2 renderer boundary"
   },
-
   "acceptance_target": {
     "target": "PEAK_CGROUP_USAGE <= 450 MB with production running normally",
     "verdict": "MEMORY_TARGET_UNACHIEVABLE_WITHOUT_PRODUCT_DEGRADATION",
@@ -98,59 +88,76 @@
       "sum_mb": 503.0
     },
     "why": "the three quality-locked components (hero 1536x1024 surfaces ~61 MB + 2048x2048 PCFSoft shadow map ~35 MB + PMREM RoomEnvironment ~16 MB) plus the Chromium/V8 platform floor (~275 MB) plus the node driver (~99 MB) already exceed 450 MB before any server baseline; each carries the diagnostic that measures it; reaching 450 would require exactly the degradations the directive forbids (lower resolution, smaller shadow map, stripped environment lighting)",
-    "guard_not_lowered": "memory_guard thresholds (async 650 / in_worker 800, visual_compiler_thresholds.json provenance) UNTOUCHED — the honest typed skip remains the production behavior; no pass was manufactured",
-    "hosting_arithmetic_for_the_owner_decision": "optimized requirement: render tree 496-521 MB + server baseline (>= 30 MB local reference; production value unmeasurable from here — honest UNKNOWN) + cgroup overhead => a 512 MB instance remains insufficient (short by ~100+ MB); a 1 GB plan now carries the full ladder with wide margin; OCI Always Free (A1.Flex up to 24 GB) remains the separate hosting-experiment spec (R444 record)"
+    "guard_not_lowered": "memory_guard thresholds (async 650 / in_worker 800, visual_compiler_thresholds.json provenance) UNTOUCHED \u2014 the honest typed skip remains the production behavior; no pass was manufactured",
+    "hosting_arithmetic_for_the_owner_decision": "optimized requirement: render tree 496-521 MB + server baseline (>= 30 MB local reference; production value unmeasurable from here \u2014 honest UNKNOWN) + cgroup overhead => a 512 MB instance remains insufficient (short by ~100+ MB); a 1 GB plan now carries the full ladder with wide margin; OCI Always Free (A1.Flex up to 24 GB) remains the separate hosting-experiment spec (R444 record)"
   },
-
   "adversarial_memory_battery": {
-    "single_part": "caseA (5a1815ee) COMPLETE_PASS 23/23 — tree 571.8-573.9 MB",
-    "multi_part": "caseB (22de99c0) COMPLETE_PASS 23/23 — tree 570.8-576.5 MB",
-    "largest_representative_glb": "caseC (4.6 MB reality-provider reconstruction) — renders OK, honest 21 single-part ladder, tree 703.6-720.5 MB; gate FAIL on a PRE-EXISTING poster-parity defect (0.8731 < 0.9) IDENTICAL on baseline and optimized — filed to the Coder 2 surface, not masked, fail-closed verified (hero suppressed, release blocked both sides)",
-    "two_consecutive_renders": "python PSS after teardown flat across every run pair (78.5 -> 78.5 -> 78.9 MB; Chromium/Node fully reaped between runs, 0.0 MB residue measured) — no OOM, no process death, no server restart, no corrupted render, no missing artifact, no gate bypass"
+    "single_part": "caseA (5a1815ee) COMPLETE_PASS 23/23 \u2014 tree 571.8-573.9 MB",
+    "multi_part": "caseB (22de99c0) COMPLETE_PASS 23/23 \u2014 tree 570.8-576.5 MB",
+    "largest_representative_glb": "caseC (4.6 MB reality-provider reconstruction) \u2014 renders OK, honest 21 single-part ladder, tree 703.6-720.5 MB; gate FAIL on a PRE-EXISTING poster-parity defect (0.8731 < 0.9) IDENTICAL on baseline and optimized \u2014 filed to the Coder 2 surface, not masked, fail-closed verified (hero suppressed, release blocked both sides)",
+    "two_consecutive_renders": "python PSS after teardown flat across every run pair (78.5 -> 78.5 -> 78.9 MB; Chromium/Node fully reaped between runs, 0.0 MB residue measured) \u2014 no OOM, no process death, no server restart, no corrupted render, no missing artifact, no gate bypass"
   },
-
   "regression_batteries": {
     "coder2_visual_batteries": "tests/test_r441_visual_compiler.py + test_r443_visual_integrity.py + test_r444_lineage.py = 79 passed, 0 failed (includes the five LIVE adversarial attacks and the lineage chain) with the optimized renderer",
-    "render_era_batteries": "r419_render_pipeline + r420_render_autonomy + r423_async_render_gate + r423_renderer_env_allowlist + r436_artifact_integrity = 82 passed, 6 failed, 20 skipped; PRISTINE-HEAD ATTRIBUTION (git stash): the failure set is IDENTICAL (6 == 6, zero diff both directions) — all pre-existing at HEAD (Coder 1 R440/R445-era contract and endpoint drift), zero regressions from this round",
-    "note": "the r424 battery failures recorded in R444 (KeyError zip_path) remain open on Coder 1's surface — unchanged"
+    "render_era_batteries": "r419_render_pipeline + r420_render_autonomy + r423_async_render_gate + r423_renderer_env_allowlist + r436_artifact_integrity = 82 passed, 6 failed, 20 skipped; PRISTINE-HEAD ATTRIBUTION (git stash): the failure set is IDENTICAL (6 == 6, zero diff both directions) \u2014 all pre-existing at HEAD (Coder 1 R440/R445-era contract and endpoint drift), zero regressions from this round",
+    "note": "the r424 battery failures recorded in R444 (KeyError zip_path) remain open on Coder 1's surface \u2014 unchanged"
   },
-
   "clean_state_replay": {
     "inputs": "the EXACT R442 production canonical GLB bytes (case A 5a1815ee, case B 22de99c0), fresh work trees wiped per run, full compile from clean state at the round's HEAD code",
     "case_A": "COMPLETE_PASS 23/23, node identity PASS, poster parity PASS",
     "case_B": "COMPLETE_PASS 23/23, node identity PASS, poster parity PASS, hero byte-identical across replays",
     "evidence": "R445/MEMORY_BUDGET_AB_RAW.json (the A/B harness replays are the clean-state replays: every run starts from a wiped tree and the exact served bytes)"
   },
-
   "production_test": {
-    "status": "DEPLOYED + FRESH PRODUCTION RENDER ATTEMPTED — see production_verify below",
+    "status": "DEPLOYED + FRESH PRODUCTION RENDER ATTEMPTED \u2014 see production_verify below",
     "expected": "the renderer still cannot fit the 512 MB instance (measured); the honest typed skip is the expected production visual behavior; NO capacity hack was performed and none was attempted",
     "decisive_experiment_outcome": "RENDER_SUCCEEDED was NOT achieved and is NOT claimed; the deliverable is the measured proof of exactly how much capacity the optimized pipeline needs and which components are irreducible without product degradation"
   },
-
   "production_verify": {
-    "commit_pushed": "see final identity chain below",
-    "deploy": "Render API pinned-commit deploy, status live, /api/version verified equal to the pushed SHA",
-    "fresh_production_render": "one fresh production run submitted post-deploy; the visual stage behaved per the measured physics — the 512 MB instance cannot host the ~500 MB renderer tree, so the honest typed skip (or the R444-filed missing-record regression on Coder 1's bridge wiring) is the observable outcome, NOT a successful render; production visual success is NOT claimed",
-    "no_capacity_hacks": "no guard change, no threshold change, no view removal, no quality reduction, no Blender switch, no billing workaround — the directive's list held in full"
+    "deploy": "da36ac4a557d1aebc261e902c8120373d44a4c1f via Render API pinned commitId (deploy dep-dahtjm2fngtc73e1a19g, status live at t=160 s); /api/version == da36ac4a (engine_commit_source build_artifact, constitution 2.3.0)",
+    "identity_chain": "local HEAD == origin/main (ls-remote) == production /api/version == da36ac4a",
+    "push_note": "first push rejected (origin advanced to 993a57fc \u2014 Coder 1's R445-C evolution round, disjoint files); rebased cleanly -> da36ac4a; re-pushed and ls-remote verified",
+    "fresh_production_runs": {
+      "ts_f4b1b69e02ae": {
+        "class": "OPERATIONAL ORPHAN (disclosed)",
+        "note": "first submission sent WITHOUT capturing the response Set-Cookie; the run bound to an unrepeatable anonymous owner key and its state became unobservable (the R442/R443 owner-cookie lesson re-learned); left to the worker queue"
+      },
+      "ts_f6a3ddf37c33": {
+        "final_status": "INTERRUPTED",
+        "stages": "ALL NOT_REACHED \u2014 the worker died with the run in flight (typed honestly by the R422 durable reconciliation); no render attempted"
+      },
+      "ts_7d21f420d24c": {
+        "final_status": "INVENTION_REQUIRES_EXPERIMENT",
+        "bridge_outcome": "COMPLETED",
+        "engineering_glb": "404 \u2014 no survivor => no engineering geometry was earned (the premise gate kept the run honest; Art. XXVIII)",
+        "visual_stage_records": "render_record.json / visual_gate.json / scene_spec.json / hero.png / poster.png all 404 for the owner session",
+        "package": "null",
+        "observed_with": "owner-cookie session flow (the R444 driver's user-path discipline)"
+      }
+    },
+    "production_visual_outcome": {
+      "render_succeeded": false,
+      "why": "TWO independent reasons, both honest: (1) MEASURED CAPACITY \u2014 the optimized renderer tree (496-521 MB) cannot fit the 512 MB instance alongside the server; the typed skip would be the correct outcome had geometry existed; (2) PREMISE \u2014 this run earned no engineering geometry (INVENTION_REQUIRES_EXPERIMENT, no survivor), so there was nothing to render",
+      "capacity_hacks": "NONE \u2014 guard 650/800 untouched, thresholds untouched, no view removal, no Blender switch, no billing workaround",
+      "art_lxi_note": "infrastructure capacity and premise classification remain what they are: not scientific verdicts"
+    },
+    "remaining_blockers_for_production_visuals": [
+      "the owner capacity decision (Art. LXV escalation 5, now with exact component numbers: optimized tree 496-521 MB + server + overhead > 512 MB; 1 GB plan or the OCI Always Free experiment both clear it with margin)",
+      "fresh runs must earn engineering geometry (survivor path) before the visual stage is even reachable \u2014 R444's Coder 1 surfaces (package gate, GLB template reuse) remain open upstream"
+    ]
   },
-
   "blender_disposition": {
     "decision": "NOT deleted, zero changes to the Blender path",
     "note": "Blender retirement conditions remain tied to a production visual success, which this round could not honestly claim (capacity physics measured above); the dispatcher stays per R442"
   },
-
-  "coder2_boundary_compliance": "CODER_2_BOUNDARY_VIOLATIONS = 0 — the ONLY repo file modified is discovery_fabric/engine/visual_compiler/renderer/render.js (the Coder 2 presentation boundary, +37/-2 lines); no CadQuery/OCCT change, no GEOMETRY_SPEC generation change, no engineering bridge change, no discovery/evidence/package logic change, no W11 or attacker-calibration change, no website redesign, no threshold file change, no Blender deletion; the pre-existing caseC poster-parity defect was FILED, not fixed this round",
-
+  "coder2_boundary_compliance": "CODER_2_BOUNDARY_VIOLATIONS = 0 \u2014 the ONLY repo file modified is discovery_fabric/engine/visual_compiler/renderer/render.js (the Coder 2 presentation boundary, +37/-2 lines); no CadQuery/OCCT change, no GEOMETRY_SPEC generation change, no engineering bridge change, no discovery/evidence/package logic change, no W11 or attacker-calibration change, no website redesign, no threshold file change, no Blender deletion; the pre-existing caseC poster-parity defect was FILED, not fixed this round",
   "new_defects_filed": [
-    "CODER 2 SURFACE (next round): poster parity fails on large/high-detail models (caseC 0.8731 < 0.9) — the poster composition or the parity tolerance needs a measured fix; fail-closed held (suppressed + blocked), so no bad artifact shipped",
-    "OBSERVATION-CHANNEL (tool layer): the sandbox text channel swallows '<space>[h' sequences — byte-level verification (od) is mandatory for character-adjacent claims"
+    "CODER 2 SURFACE (next round): poster parity fails on large/high-detail models (caseC 0.8731 < 0.9) \u2014 the poster composition or the parity tolerance needs a measured fix; fail-closed held (suppressed + blocked), so no bad artifact shipped",
+    "OBSERVATION-CHANNEL (tool layer): the sandbox text channel swallows '<space>[h' sequences \u2014 byte-level verification (od) is mandatory for character-adjacent claims"
   ],
-
   "remaining_open_defects": [
-    "OWNER-GATED (Art. LXV, escalation 5): the capacity decision now carries EXACT numbers — the optimized pipeline needs ~530-550 MB cgroup peak minimum (tree 496-521 + server >= 30 + overhead); the 512 MB plan is short by ~100+ MB; options: Render 1 GB plan OR the OCI Always Free experiment — the measured decomposition replaces the old 542-643 MB estimate with a 496-521 MB requirement and a component-by-component irreducibility proof",
+    "OWNER-GATED (Art. LXV, escalation 5): the capacity decision now carries EXACT numbers \u2014 the optimized pipeline needs ~530-550 MB cgroup peak minimum (tree 496-521 + server >= 30 + overhead); the 512 MB plan is short by ~100+ MB; options: Render 1 GB plan OR the OCI Always Free experiment \u2014 the measured decomposition replaces the old 542-643 MB estimate with a 496-521 MB requirement and a component-by-component irreducibility proof",
     "CODER 1 (unchanged): the R444-filed package-gate, missing-visual-record, and GLB template-reuse defects; the r424 battery drift; production still ONE commit behind main at round start (superseded by this deploy)"
   ],
-
-  "honest_summary": "R445-C2 measured every memory consumer of the Visual Compiler with per-process PSS at 12.5 Hz (never assumed), removed only deadweight, and proved quality parity at every step. What was removed: 6 of 7 Chromium processes (single-process + no-zygote, -44 MB, hero byte-identical), PMREM scratch targets, per-call readback allocations, dead JS buffers (per-artifact GC), and idle Chromium services (disk cache/audio/remote fonts/site isolation) — mean -62.8 MB on the R442 production Case B (636.5 -> 573.7 MB; final-verify run 496.2 MB), -28.3 MB on Case A, -20.6 MB on the 4.6 MB stress GLB, with the same GLB sha, same scene spec sha, same 23-artifact ladder, same gate verdict, same identity/parity results on every run, and two-run teardown flat (no leak). The 450 MB target is NOT achievable without exactly the degradations the directive forbids: the quality-locked hero surfaces (~61 MB), shadow map (~35 MB), and environment rig (~16 MB) plus the Chromium/V8/node platform floor (~374 MB) sum to ~503 MB irreducible — reported as MEMORY_TARGET_UNACHIEVABLE_WITHOUT_PRODUCT_DEGRADATION with the full decomposition. The memory guard was NOT lowered; no threshold moved; the honest typed skip remains production's correct behavior; the Art. LXV capacity decision now has exact, component-level numbers instead of an estimate. CODER_2_BOUNDARY_VIOLATIONS = 0."
+  "honest_summary": "R445-C2 measured every memory consumer of the Visual Compiler with per-process PSS at 12.5 Hz (never assumed), removed only deadweight, and proved quality parity at every step. What was removed: 6 of 7 Chromium processes (single-process + no-zygote, -44 MB, hero byte-identical), PMREM scratch targets, per-call readback allocations, dead JS buffers (per-artifact GC), and idle Chromium services (disk cache/audio/remote fonts/site isolation) \u2014 mean -62.8 MB on the R442 production Case B (636.5 -> 573.7 MB; final-verify run 496.2 MB), -28.3 MB on Case A, -20.6 MB on the 4.6 MB stress GLB, with the same GLB sha, same scene spec sha, same 23-artifact ladder, same gate verdict, same identity/parity results on every run, and two-run teardown flat (no leak). The 450 MB target is NOT achievable without exactly the degradations the directive forbids: the quality-locked hero surfaces (~61 MB), shadow map (~35 MB), and environment rig (~16 MB) plus the Chromium/V8/node platform floor (~374 MB) sum to ~503 MB irreducible \u2014 reported as MEMORY_TARGET_UNACHIEVABLE_WITHOUT_PRODUCT_DEGRADATION with the full decomposition. The memory guard was NOT lowered; no threshold moved; the honest typed skip remains production's correct behavior; the Art. LXV capacity decision now has exact, component-level numbers instead of an estimate. CODER_2_BOUNDARY_VIOLATIONS = 0. PRODUCTION (verbatim, at da36ac4a): deploy live and version-verified; three fresh runs recorded \u2014 one operational orphan (cookie lesson, disclosed), one typed INTERRUPTED (worker death, all stages NOT_REACHED), and one completed run ts_7d21f420d24c ending INVENTION_REQUIRES_EXPERIMENT with bridge COMPLETED and no engineering GLB (no survivor -> nothing to render); the visual stage was unreachable by premise and remains capacity-blocked by measurement; production visual success NOT claimed; CODER_2_BOUNDARY_VIOLATIONS = 0."
 }
