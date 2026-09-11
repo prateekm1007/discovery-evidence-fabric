@@ -1,0 +1,71 @@
+{
+ "attack_version": "independent_attack/1.0.0",
+ "candidate_id": "cal-11-bounded-flow-boost",
+ "generator_provider": null,
+ "attacker_provider": "nvidia",
+ "attacker_model": "meta/llama-3.2-11b-vision-instruct",
+ "independence_mode": "SEPARATE_CONTEXT",
+ "independence_note": "the attacker ran in an independent reasoning context (fresh adversarial conversation, generator reasoning never shown; no alternative provider credentialed \u2014 disclosed, never claimed as provider separation)",
+ "prompt_hash": "8201df5a8ae759ae1f91b6750b019801d69ef7bede40f274dfec779372b45924",
+ "output_hash": "f246c7e98ccc6735b4f408258756435d28c5fb3e0d37e99483948b9fd08ea38a",
+ "llm_status": "OK",
+ "attacked_at": "2026-09-11T12:53:41+00:00Z",
+ "items": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "verdict": "KILL",
+   "basis": "The candidate's mechanism relies on raising the header flow by 20 percent, but this increase is only possible within the existing pump headroom of 22 percent. However, the pump curve and thermal balance at higher entry temperatures (above 85 C) exceed the declared envelope, indicating that the increased flow may not be achievable at all operating conditions."
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "verdict": "KILL",
+   "basis": "The candidate's intervention is declared valid only for campaigns with strip entry temperature below 85 C, but the boundary condition of header pressure (13-15 bar) is not explicitly linked to the temperature constraint. This raises concerns about the robustness of the solution to variations in operating conditions."
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "verdict": "KILL",
+   "basis": "The candidate's evidence bundle is empty, which contradicts the expectation that a viable solution would provide supporting data or analysis to validate its claims."
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "verdict": "KILL",
+   "basis": "The candidate's predicted effect (clogging events fall from 4.1 to approximately 2.8) is not significantly different from the baseline behavior (clogging events at 4.1), which suggests that the intervention may not provide a meaningful improvement over the existing system."
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "verdict": "RISK",
+   "basis": "The candidate's proposed solution involves a supply valve setpoint change and a strip-entry-temperature interlock, but the feasibility of implementing these changes without disrupting the existing system is not clearly demonstrated."
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "verdict": "RISK",
+   "basis": "The candidate's testable prediction (clogging-event reduction to approximately 2.8 with 95 percent confidence band 2.4-3.2) relies on a single measurement, but the uncertainty in the measurement (2.4-3.2) is relatively large, which may limit the confidence in the predicted outcome."
+  }
+ ],
+ "state": "ATTACK_RUN",
+ "overall": "KILLED",
+ "kill_basis": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "basis": "The candidate's mechanism relies on raising the header flow by 20 percent, but this increase is only possible within the existing pump headroom of 22 percent. However, the pump curve and thermal balance at higher entry temperatures (above 85 C) exceed the declared envelope, indicating that the increased flow may not be achievable at all operating conditions."
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "basis": "The candidate's intervention is declared valid only for campaigns with strip entry temperature below 85 C, but the boundary condition of header pressure (13-15 bar) is not explicitly linked to the temperature constraint. This raises concerns about the robustness of the solution to variations in operating conditions."
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "basis": "The candidate's evidence bundle is empty, which contradicts the expectation that a viable solution would provide supporting data or analysis to validate its claims."
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "basis": "The candidate's predicted effect (clogging events fall from 4.1 to approximately 2.8) is not significantly different from the baseline behavior (clogging events at 4.1), which suggests that the intervention may not provide a meaningful improvement over the existing system."
+  }
+ ],
+ "counts": {
+  "KILL": 4,
+  "RISK": 2,
+  "SURVIVE": 0,
+  "INVALID": 0
+ }
+}

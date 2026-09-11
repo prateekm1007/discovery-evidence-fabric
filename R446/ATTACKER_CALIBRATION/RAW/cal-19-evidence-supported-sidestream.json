@@ -1,0 +1,71 @@
+{
+ "attack_version": "independent_attack/1.0.0",
+ "candidate_id": "cal-19-tail-sized-sidestream-filter",
+ "generator_provider": null,
+ "attacker_provider": "nvidia",
+ "attacker_model": "meta/llama-3.2-11b-vision-instruct",
+ "independence_mode": "SEPARATE_CONTEXT",
+ "independence_note": "the attacker ran in an independent reasoning context (fresh adversarial conversation, generator reasoning never shown; no alternative provider credentialed \u2014 disclosed, never claimed as provider separation)",
+ "prompt_hash": "017acd938dcd4f852158c1458f2a56a237ca6ccba33bf46cb2abf6c0c32683de",
+ "output_hash": "d7267557116593b35a80f42b49999497f8eaa908603e75784a5d4ff76318621a",
+ "llm_status": "OK",
+ "attacked_at": "2026-09-11T12:57:56+00:00Z",
+ "items": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "verdict": "KILL",
+   "basis": "The candidate's mechanism relies on a side-stream dual-media filter sized on the MEASURED TAIL (P95 = 3.6 kg/h), but the load study shows that the load is HEAVY-TAILED, with a P99 value not provided. This means that the filter may not be sized to capture the most extreme episodes, which drive 61 percent of clogging."
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "verdict": "KILL",
+   "basis": "The candidate's intervention is installed off-line during a roll change, but the problem statement specifies that there is no mill stop. This boundary condition is violated, and it is unclear how the intervention can be implemented without disrupting the mill's operation."
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "verdict": "KILL",
+   "basis": "The candidate's evidence bundle includes a hydraulic audit of the recirculation loop, which shows that 25 percent side-stream share is available within existing pump head. However, the candidate's mechanism requires a flow boost from 10 to 25 percent side-stream share, which contradicts the available capacity."
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "verdict": "KILL",
+   "basis": "The candidate's predicted effect is that episode-driven clogging is suppressed, but the baseline system already has a 25 percent side-stream share available, which is the same as the candidate's proposed flow boost. This means that the candidate's intervention does not provide any additional benefit over the existing system."
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "verdict": "RISK",
+   "basis": "The candidate's intervention requires a side-stream filtration skid with online turbidity trigger and a dump-response valve schedule, which may be difficult to implement in the existing system. The candidate does not provide any details on how this can be done, and it is unclear whether it is feasible."
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "verdict": "RISK",
+   "basis": "The candidate's testable prediction is that loop turbidity at the header stays below the bridging threshold during the next recorded dump episode. However, the candidate does not provide any details on how this measurement will be taken, and it is unclear what the bridging threshold is. This introduces ambiguity in the measurement, which may affect the accuracy of the prediction."
+  }
+ ],
+ "state": "ATTACK_RUN",
+ "overall": "KILLED",
+ "kill_basis": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "basis": "The candidate's mechanism relies on a side-stream dual-media filter sized on the MEASURED TAIL (P95 = 3.6 kg/h), but the load study shows that the load is HEAVY-TAILED, with a P99 value not provided. This means that the filter may not be sized to capture the most extreme episodes, which drive 61 percent of clogging."
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "basis": "The candidate's intervention is installed off-line during a roll change, but the problem statement specifies that there is no mill stop. This boundary condition is violated, and it is unclear how the intervention can be implemented without disrupting the mill's operation."
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "basis": "The candidate's evidence bundle includes a hydraulic audit of the recirculation loop, which shows that 25 percent side-stream share is available within existing pump head. However, the candidate's mechanism requires a flow boost from 10 to 25 percent side-stream share, which contradicts the available capacity."
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "basis": "The candidate's predicted effect is that episode-driven clogging is suppressed, but the baseline system already has a 25 percent side-stream share available, which is the same as the candidate's proposed flow boost. This means that the candidate's intervention does not provide any additional benefit over the existing system."
+  }
+ ],
+ "counts": {
+  "KILL": 4,
+  "RISK": 2,
+  "SURVIVE": 0,
+  "INVALID": 0
+ }
+}

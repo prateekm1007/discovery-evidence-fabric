@@ -1,0 +1,71 @@
+{
+ "attack_version": "independent_attack/1.0.0",
+ "candidate_id": "cal-03-150um-strainer",
+ "generator_provider": null,
+ "attacker_provider": "nvidia",
+ "attacker_model": "meta/llama-3.2-11b-vision-instruct",
+ "independence_mode": "SEPARATE_CONTEXT",
+ "independence_note": "the attacker ran in an independent reasoning context (fresh adversarial conversation, generator reasoning never shown; no alternative provider credentialed \u2014 disclosed, never claimed as provider separation)",
+ "prompt_hash": "6fa9d0a5138efb060d37668166ec4a64220ea4583e1efe645960a49846611786",
+ "output_hash": "d2078d9ed00718a449755131f6de21811b023ac3bb25ef60a96cf2335cbfdde8",
+ "llm_status": "OK",
+ "attacked_at": "2026-09-11T12:50:26+00:00Z",
+ "items": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "verdict": "KILL",
+   "basis": "The proposed 150-micron automatic backflush strainer may not effectively remove mill-scale (iron oxide) particles above 200 microns that dominate clogging, as the strainer's micron rating is below the size of the bridging particles."
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "verdict": "KILL",
+   "basis": "The candidate's prediction of reduced clogging events per campaign is based on differential-pressure rise, but the boundary condition of full header flow at 14 bar may not be sufficient to trigger the strainer's backflush, potentially leading to clogging events."
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "verdict": "KILL",
+   "basis": "The metallurgical analysis of 40 clogged nozzles across 6 campaigns shows that 70 percent of blockages are biofilm-slime, contradicting the candidate's claim that the strainer can effectively remove mill-scale particles and prevent clogging."
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "verdict": "KILL",
+   "basis": "The candidate's predicted effect of reducing clogging events per campaign from 4.1 to below 0.5 is equivalent to the baseline, as the baseline is not explicitly stated to be zero clogging events per campaign."
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "verdict": "RISK",
+   "basis": "The candidate's proposed single-stage 150-micron automatic backflush strainer may not be able to handle the full design flow of the 150 mm header supply line, potentially leading to strainer blinding during backflush failures."
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "verdict": "RISK",
+   "basis": "The candidate's testable prediction of reduced clogging events per campaign relies on campaign clogging counts, but the measurement of clogging events may be ambiguous, as the definition of a clogging event is not explicitly stated."
+  }
+ ],
+ "state": "ATTACK_RUN",
+ "overall": "KILLED",
+ "kill_basis": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "basis": "The proposed 150-micron automatic backflush strainer may not effectively remove mill-scale (iron oxide) particles above 200 microns that dominate clogging, as the strainer's micron rating is below the size of the bridging particles."
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "basis": "The candidate's prediction of reduced clogging events per campaign is based on differential-pressure rise, but the boundary condition of full header flow at 14 bar may not be sufficient to trigger the strainer's backflush, potentially leading to clogging events."
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "basis": "The metallurgical analysis of 40 clogged nozzles across 6 campaigns shows that 70 percent of blockages are biofilm-slime, contradicting the candidate's claim that the strainer can effectively remove mill-scale particles and prevent clogging."
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "basis": "The candidate's predicted effect of reducing clogging events per campaign from 4.1 to below 0.5 is equivalent to the baseline, as the baseline is not explicitly stated to be zero clogging events per campaign."
+  }
+ ],
+ "counts": {
+  "KILL": 4,
+  "RISK": 2,
+  "SURVIVE": 0,
+  "INVALID": 0
+ }
+}

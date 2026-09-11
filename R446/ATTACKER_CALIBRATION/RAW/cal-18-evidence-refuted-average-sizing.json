@@ -1,0 +1,71 @@
+{
+ "attack_version": "independent_attack/1.0.0",
+ "candidate_id": "cal-18-average-load-dual-media-filter",
+ "generator_provider": null,
+ "attacker_provider": "nvidia",
+ "attacker_model": "meta/llama-3.2-11b-vision-instruct",
+ "independence_mode": "SEPARATE_CONTEXT",
+ "independence_note": "the attacker ran in an independent reasoning context (fresh adversarial conversation, generator reasoning never shown; no alternative provider credentialed \u2014 disclosed, never claimed as provider separation)",
+ "prompt_hash": "e4d02cebbf5668a38e57d594047a348f3fb1439c0dda37051f3adce0f6cb94c7",
+ "output_hash": "6d573209bfeb6c31a8e57f70b1e2297e9f93c89f7823ca3a0407b0d38661f5f5",
+ "llm_status": "OK",
+ "attacked_at": "2026-09-11T12:57:08+00:00Z",
+ "items": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "verdict": "KILL",
+   "basis": "The proposed dual-media pressure filter mechanism is based on average-load sizing, which is not suitable for heavy-tailed load distributions. The 18-month suspended-solids load study shows that the load is heavy-tailed, with P95 = 3.6 kg/h and P99 = 6.3 kg/h, indicating that the filter will be frequently overloaded and unable to maintain the desired particle load below the nozzle bridging threshold."
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "verdict": "KILL",
+   "basis": "The proposed intervention assumes that the supply-side installation at full design flow will always be available, but the baseline system operates at 14 bar, and the candidate does not provide any information on how it will handle reduced flow rates or other boundary conditions that may arise during operation."
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "verdict": "KILL",
+   "basis": "The candidate's own evidence bundle shows that 61 percent of all campaign clogs are caused by high-load episodes, which are not addressed by the proposed mechanism. The cross-reference of the 14 recorded high-load episodes with the nozzle clogging log contradicts the predicted effect of reducing clogging events per campaign."
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "verdict": "KILL",
+   "basis": "The proposed system is equivalent to the baseline system in terms of supply header pressure (14 bar) and recirculated cooling water temperature (32-38 C), which means that the candidate does not provide any new or innovative solution to the problem of nozzle clogging."
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "verdict": "RISK",
+   "basis": "The proposed system requires automatic backwash on differential pressure, but the candidate does not provide any information on how this will be implemented or what the consequences will be if the backwash fails to occur."
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "verdict": "RISK",
+   "basis": "The candidate's testable prediction is based on continuous turbidity logging, but the evidence bundle does not provide any information on how the turbidity measurements will be taken or what the criteria will be for determining whether the loop TSS is at or below the 0.6 kg/h average design point."
+  }
+ ],
+ "state": "ATTACK_RUN",
+ "overall": "KILLED",
+ "kill_basis": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "basis": "The proposed dual-media pressure filter mechanism is based on average-load sizing, which is not suitable for heavy-tailed load distributions. The 18-month suspended-solids load study shows that the load is heavy-tailed, with P95 = 3.6 kg/h and P99 = 6.3 kg/h, indicating that the filter will be frequently overloaded and unable to maintain the desired particle load below the nozzle bridging threshold."
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "basis": "The proposed intervention assumes that the supply-side installation at full design flow will always be available, but the baseline system operates at 14 bar, and the candidate does not provide any information on how it will handle reduced flow rates or other boundary conditions that may arise during operation."
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "basis": "The candidate's own evidence bundle shows that 61 percent of all campaign clogs are caused by high-load episodes, which are not addressed by the proposed mechanism. The cross-reference of the 14 recorded high-load episodes with the nozzle clogging log contradicts the predicted effect of reducing clogging events per campaign."
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "basis": "The proposed system is equivalent to the baseline system in terms of supply header pressure (14 bar) and recirculated cooling water temperature (32-38 C), which means that the candidate does not provide any new or innovative solution to the problem of nozzle clogging."
+  }
+ ],
+ "counts": {
+  "KILL": 4,
+  "RISK": 2,
+  "SURVIVE": 0,
+  "INVALID": 0
+ }
+}

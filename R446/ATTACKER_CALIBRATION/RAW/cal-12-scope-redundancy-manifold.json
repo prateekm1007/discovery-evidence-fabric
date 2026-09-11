@@ -1,0 +1,67 @@
+{
+ "attack_version": "independent_attack/1.0.0",
+ "candidate_id": "cal-12-standby-nozzle-manifold",
+ "generator_provider": null,
+ "attacker_provider": "nvidia",
+ "attacker_model": "meta/llama-3.2-11b-vision-instruct",
+ "independence_mode": "SEPARATE_CONTEXT",
+ "independence_note": "the attacker ran in an independent reasoning context (fresh adversarial conversation, generator reasoning never shown; no alternative provider credentialed \u2014 disclosed, never claimed as provider separation)",
+ "prompt_hash": "41494abb49ceb302a3186054ab3da07f74b1f7367166133c9d51f0b3606f701d",
+ "output_hash": "af50c4b189a31657856d1a5206d5f07daa9e2f825dc3d0486a341f9125079983",
+ "llm_status": "OK",
+ "attacked_at": "2026-09-11T12:54:04+00:00Z",
+ "items": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "verdict": "KILL",
+   "basis": "The candidate's mechanism relies on a 0.4 s switchover transient, but the roll's thermal inertia is not accurately modeled. The computed crown perturbation of 1.1 microns is based on a simplified thermal model that does not account for the complex heat transfer dynamics between the roll and the cooling water. This oversimplification may lead to inaccurate predictions of the switchover transient and its impact on crown variation."
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "verdict": "RISK",
+   "basis": "The candidate's design assumes a constant water temperature of 32-38 C, but the actual temperature may vary significantly during operation. The temperature fluctuations could affect the roll's thermal inertia and the switchover transient, potentially leading to increased crown variation and reduced system performance."
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "verdict": "KILL",
+   "basis": "The candidate's evidence bundle is empty, which means there is no empirical data to support the claimed benefits of the proposed design. The lack of evidence contradicts the candidate's claims and raises significant concerns about the validity of the proposed solution."
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "verdict": "KILL",
+   "basis": "The candidate's design is equivalent to the baseline system, which means it does not offer any significant improvements over the current implementation. The proposed design relies on the same supply header, nozzles, and recirculated cooling water, which are all subject to the same clogging and scaling issues as the baseline system."
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "verdict": "RISK",
+   "basis": "The candidate's design requires the installation of dual-manifold nozzle blocks with per-position dP sensing and fast-redundancy valves. The implementation of this complex system may be challenging, especially considering the need for precise temperature control and the potential for valve sticking. The risk of implementation failure is high, which could lead to significant delays and cost overruns."
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "verdict": "SURVIVE",
+   "basis": "The candidate's design includes per-position dP sensing, which can provide real-time measurements of the system's performance. However, the accuracy of these measurements may be affected by the presence of noise and other sources of error. The candidate's design does not provide a clear explanation of how these measurement ambiguities will be addressed, which raises concerns about the reliability of the system's performance monitoring."
+  }
+ ],
+ "state": "ATTACK_RUN",
+ "overall": "KILLED",
+ "kill_basis": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "basis": "The candidate's mechanism relies on a 0.4 s switchover transient, but the roll's thermal inertia is not accurately modeled. The computed crown perturbation of 1.1 microns is based on a simplified thermal model that does not account for the complex heat transfer dynamics between the roll and the cooling water. This oversimplification may lead to inaccurate predictions of the switchover transient and its impact on crown variation."
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "basis": "The candidate's evidence bundle is empty, which means there is no empirical data to support the claimed benefits of the proposed design. The lack of evidence contradicts the candidate's claims and raises significant concerns about the validity of the proposed solution."
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "basis": "The candidate's design is equivalent to the baseline system, which means it does not offer any significant improvements over the current implementation. The proposed design relies on the same supply header, nozzles, and recirculated cooling water, which are all subject to the same clogging and scaling issues as the baseline system."
+  }
+ ],
+ "counts": {
+  "KILL": 3,
+  "RISK": 2,
+  "SURVIVE": 1,
+  "INVALID": 0
+ }
+}
