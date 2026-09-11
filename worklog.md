@@ -254,3 +254,18 @@ Work Log:
 Stage Summary:
 - R446-C1 delivered: the five directive tasks closed with measured artifacts; the attacker is now a MEASURED decision instrument (the falsifiable path to calibration defined); production truth verified across three never-seen problem classes at the deployed SHA
 - Standing blockers: the owner-gated >= 1 GB capacity decision (Art. LXV count 5); attacker calibration earned by a future instrument version
+
+---
+Task ID: R446-C1 (final delivery tuple)
+Agent: Coder 1 (main session)
+Task: final push + records-alignment deploy + version verification
+
+Work Log:
+- Final commit d72073de (R446_C1_ROUND_RECORD + the three production CIO captures + the driver recording-layer fixes + the production capture fixture) pushed via PAT
+- Records-alignment deploy dep-dai1dheq1p3s73al0i90 LIVE; /api/version verified: engine_commit d72073de == origin/main == local HEAD; constitution 2.3.0
+- /api/health verified after warmup: ok=true, discovery_ready=true, showcase_ready=true, openrouter HEALTHY
+- The three fresh production runs (ts_743ac866bac8 / ts_54ef89a1831c / ts_b6eaed67e319) were executed at the CODE deploy 8161cfa1 (the same tree modulo the records-only + driver-script delta — the engine code identity for the runs is 8161cfa1, recorded in the runs' version_check)
+
+Stage Summary:
+- Delivery tuple: origin/main d72073de + deployed d72073de + /api/version d72073de — all agree
+- R446-C1 COMPLETE: R446/R446_C1_ROUND_RECORD.json at the pushed main
