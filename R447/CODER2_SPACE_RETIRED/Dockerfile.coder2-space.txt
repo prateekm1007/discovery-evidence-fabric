@@ -1,0 +1,156 @@
+# Toscanini engine — Hugging Face Space adaptation (R446-HF-PRO Phase 4).
+#
+# DOCKERIZATION DISCIPLINE (directive PHASE 4): this Dockerizes the
+# EXISTING canonical application. It does NOT redesign, rewrite, or
+# simplify the engine. Everything under /app is the EXACT tracked tree
+# of engine commit 8a4c4635 (see HF_ENGINE_SHA.txt; pushed to this
+# Space repository as its founding commit).
+#
+# The ONLY deltas from the canonical Dockerfile (Dockerfile at that
+# commit, sha256 6df5e957b001afc6) — each required by the HF Space
+# runtime, none touching engine code:
+#   D1 IDENTITY: Render's RENDER_GIT_COMMIT build-arg does not exist on
+#      HF builds and the Space build context carries no .git, so the
+#      canonical bake would honestly fall to BUILD_CONTEXT_NO_GIT.
+#      Instead the pinned GitHub SHA is committed in HF_ENGINE_SHA.txt
+#      and baked with the SAME ARTIFACT_IDENTITY.json schema, source
+#      labeled 'hf_space_pin' (never guessed, Art. VI).
+#   D2 RUNTIME STACK: the canonical image deliberately ships no Node
+#      and no Chromium (Render's 512 MB plan honestly type-skips the
+#      visual stage). The HF experiment's PURPOSE is to test the full
+#      visual ladder with the constraint removed, so this image adds
+#      Node 20 (official image, targeted copy), Debian chromium, and
+#      the renderer's PINNED npm deps (three@0.175.0 + puppeteer-core
+#      @25.9.0 — versions already pinned in render_worker.py). The
+#      Visual Compiler's own fail-closed resolution (CHROME_PATH ->
+#      PATH -> puppeteer cache) is left untouched; we only supply what
+#      it already knows how to find.
+#   D3 HF RUNTIME CONTRACT: HF Space runs the container as uid 1001 on
+#      the port declared in README metadata (app_port: 7860). The
+#      image creates that user, grants it /app and /portfolio, and
+#      defaults PORT to 7860 (server.py already serves on $PORT).
+# Everything else — the webapp build + export assertion, the apt
+# library set, the sha-verified pinned Blender 5.2.1, requirements.txt,
+# the entrypoint, and the identity-bake schema — is byte-for-byte the
+# canonical recipe.
+
+# ---------- stage 1: webapp static export (canonical, unchanged) ----------
+FROM node:20-alpine AS webapp-builder
+WORKDIR /webapp
+COPY TOSCANINI_UI/webapp/package.json TOSCANINI_UI/webapp/package-lock.json ./
+RUN npm ci
+COPY TOSCANINI_UI/webapp/ ./
+RUN NEXT_OUTPUT=export npm run build && node verify-export.mjs
+
+# ---------- stage 2: the engine (canonical recipe + D1-D3 deltas) ----------
+FROM python:3.12-slim
+
+# Canonical apt set (R419 root-cause chain preserved verbatim) plus the
+# D2 additions: chromium (the fail-closed renderer's binary) and
+# fonts-liberation (baseline text coverage for headless rendering).
+RUN set -ux; \
+    if apt-get update >/tmp/aptu.log 2>&1 && apt-get install -y --no-install-recommends \
+      git ca-certificates curl xz-utils \
+      libgl1 libglu1-mesa libxext6 libx11-6 libxrender1 \
+      libxi6 libxfixes3 libsm6 libice6 libxkbcommon0 \
+      chromium fonts-liberation \
+    >/tmp/apti.log 2>&1 \
+    && rm -rf /var/lib/apt/lists/*; then \
+      :; \
+    else \
+      _rc=$?; \
+      echo "apt install failed rc=$_rc" >&2; \
+      tail -c 2000 /tmp/apti.log 2>/dev/null >&2 || true; \
+      exit 1; \
+    fi
+ENV CHROME_PATH=/usr/bin/chromium
+
+# ---------- D2: Node 20 (official binaries, targeted copy) ----------
+COPY --from=node:20-bookworm-slim /usr/local/bin/node /usr/local/bin/node
+COPY --from=node:20-bookworm-slim /usr/local/lib/node_modules /usr/local/lib/node_modules
+RUN set -ux; \
+    ln -sf ../lib/node_modules/npm/bin/npm-cli.js /usr/local/bin/npm && \
+    ln -sf ../lib/node_modules/npm/bin/npx-cli.js /usr/local/bin/npx && \
+    node --version && npm --version
+
+# ---------- R419: the pinned Blender build (canonical, unchanged) ----------
+ARG BLENDER_VERSION=5.2.1
+ARG BLENDER_RELEASE_PATH=5.2
+ARG BLENDER_TARBALL_SHA256=a31f524fa99a527d3d52b7f5aaa68c34e1a19d5a1c9473f79c5cc610fd5b10e9
+RUN set -ux; \
+    _ok=0; \
+    for _src in \
+      "https://download.blender.org/release/Blender${BLENDER_RELEASE_PATH}/blender-${BLENDER_VERSION}-linux-x64.tar.xz" \
+      "https://mirrors.dotsrc.org/blender/release/Blender${BLENDER_RELEASE_PATH}/blender-${BLENDER_VERSION}-linux-x64.tar.xz" \
+      "https://ftp.nluug.nl/pub/graphics/blender/release/Blender${BLENDER_RELEASE_PATH}/blender-${BLENDER_VERSION}-linux-x64.tar.xz" \
+      "https://mirror.clarkson.edu/blender/release/Blender${BLENDER_RELEASE_PATH}/blender-${BLENDER_VERSION}-linux-x64.tar.xz"; do \
+      if curl -fsSL --retry 2 --max-time 480 -o /tmp/blender.tar.xz "$_src"; then \
+        _ok=1; break; \
+      fi; \
+    done; \
+    [ "$_ok" = "1" ] || { echo "blender tarball: all sources failed" >&2; exit 1; }; \
+    echo "${BLENDER_TARBALL_SHA256}  /tmp/blender.tar.xz" | sha256sum -c - || exit 1; \
+    mkdir -p /opt && tar -xJf /tmp/blender.tar.xz -C /opt || exit 1; \
+    mv "/opt/blender-${BLENDER_VERSION}-linux-x64" /opt/blender; \
+    rm /tmp/blender.tar.xz; \
+    /opt/blender/blender --version | head -n1 || exit 1
+ENV BLENDER_PATH=/opt/blender/blender
+
+WORKDIR /app
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+COPY --from=webapp-builder /webapp/out ./TOSCANINI_UI/webapp-export
+
+# D2: the Visual Compiler renderer's own pinned deps (versions already
+# enforced at runtime by render_worker.py::renderer_deps_present).
+RUN set -ux; \
+    cd /app/discovery_fabric/engine/visual_compiler/renderer && \
+    npm ci --no-audit --no-fund && \
+    node -e "const p=require('./package-lock.json').packages['node_modules/three']; \
+             if(!p || p.version!=='0.175.0') process.exit(1)" && \
+    node -e "const p=require('./package-lock.json').packages['node_modules/puppeteer-core']; \
+             if(!p || p.version!=='25.9.0') process.exit(1)" && \
+    echo "renderer deps verified: three@0.175.0 puppeteer-core@25.9.0"
+
+# ---------- D1: identity bake (canonical schema, hf_space_pin source) ----------
+# HF_ENGINE_SHA.txt is committed at push time and names the EXACT engine
+# repository commit this Space carries. Same ARTIFACT_IDENTITY.json +
+# sha256 sidecar + ENGINE_COMMIT.txt contract as the canonical bake
+# (R396 A.3/A.4): BUILD == RUNNING == HEALTH remains mechanically
+# checkable; the source is honestly labeled 'hf_space_pin'.
+RUN python3 - <<'PYEOF'
+import hashlib, json, subprocess
+commit = open("HF_ENGINE_SHA.txt").read().strip()
+source = "hf_space_pin"
+doc = {
+    "engine_commit": commit,
+    "source": source,
+    "render_git_commit": None,
+    "build_context_git_head": None,
+    "baked_at_utc": subprocess.run(
+        ["date", "-u", "+%Y-%m-%dT%H:%M:%SZ"], capture_output=True,
+        text=True).stdout.strip(),
+}
+raw = json.dumps(doc, indent=1, sort_keys=True).encode() + b"\n"
+open("ARTIFACT_IDENTITY.json", "wb").write(raw)
+open("ARTIFACT_IDENTITY.sha256", "w").write(
+    hashlib.sha256(raw).hexdigest() + "  ARTIFACT_IDENTITY.json\n")
+open("ENGINE_COMMIT.txt", "w").write(commit + "\n")
+print(f"baked artifact identity: {commit} (source {source})")
+PYEOF
+
+# ---------- D3: HF runtime contract (uid 1001, app_port 7860) ----------
+RUN set -ux; \
+    useradd -m -u 1001 user && \
+    mkdir -p /portfolio && \
+    chmod +x /app/toscanini/container-entrypoint.sh && \
+    chown -R user:user /app /portfolio
+USER user
+ENV HOME=/home/user \
+    PORT=7860
+EXPOSE 7860
+
+ENTRYPOINT ["/app/toscanini/container-entrypoint.sh"]

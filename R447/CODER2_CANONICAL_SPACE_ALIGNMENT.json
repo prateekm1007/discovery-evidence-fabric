@@ -1,0 +1,168 @@
+{
+  "artifact_type": "R447_CODER2_CANONICAL_SPACE_ALIGNMENT",
+  "round": "R447-C2",
+  "created_at": "2026-09-12",
+  "reviewer_provenance": "AI_REVIEW",
+  "constitution_version": "2.3.0",
+  "constitution_sha256": "7084be6435ff30a645f4ad16a5380cf897a59b6dd73f5e18af3713010131a9c5",
+  "constitution_read_in_full": "at round start (all 2084 lines) AND re-read immediately before the final commit; GOVERNANCE/ five files read in full; ACTIVE_PATH.md incl. all addenda; R446_C1/R446_C2/R446_HF round records",
+  "directive": "R447-C2 — VISUAL IMPLEMENTATION ALIGNMENT: bring the existing Coder-2 visual implementation into the canonical Coder-1 HF Space without changing the canonical engineering/discovery/package logic; delete the Coder-2-created Space; verify Coder-1 canonical geometry -> GLB -> Coder-2 renderer -> visual compiler -> website -> buyer package with no second competing visual geometry authority; record in R447/CODER2_CANONICAL_SPACE_ALIGNMENT.json; run the complete visual regression and HF production verification against the canonical Space",
+
+  "canonical_space_selection": {
+    "directive_field": "the directive carried the literal placeholder '<CODER-1-SELECTED-SPACE-ID>' — the actual Space id was NOT supplied in the message",
+    "resolution_method": "the selection was RECONSTRUCTED from authoritative records (never invented, Art. VI): (a) the repo worklog R446-HF entry (Agent: Coder 1) states 'ONE private Docker Space created (prateekm1/toscanini-prod-validation, docker, cpu-basic)'; (b) R446/HF_DEPLOYMENT_RECORD.json and R446/HF_RUNTIME_MANIFEST.json name prateekm1/toscanini-prod-validation; (c) the account's OTHER Space, prateekm1/toscanini-production-validation, appears in NO record and its source commit eb73fe04 is authored 'toscanini-r446-hf-pro <coder2@toscanini.local>' — the Coder-2-created Space the directive orders deleted",
+    "canonical_space": "prateekm1/toscanini-prod-validation",
+    "deleted_space": "prateekm1/toscanini-production-validation",
+    "residual_risk_disclosed": "if the operator's intended canonical Space differs from the only record-evidenced candidate, this alignment must be re-pointed; the evidence basis above is the strongest available and is fully disclosed"
+  },
+
+  "baseline_identity": {
+    "github_main_at_round_start": "39e768da407ea18a82378427632c76d8505a5e17 (verified via authenticated REST API, not local refs)",
+    "local_checkout_at_round_start": "STALE_LOCAL_CHECKOUT per Art. XXII: the local hf_space repo was the Coder-2 Space source — a single SQUASHED commit eb73fe04 (authored coder2@toscanini.local, 'R446-HF-PRO: Space population at engine commit 39e768da'), no remote configured; the squash was the R446-HF PAT-scrub remediation",
+    "local_realignment": "origin added (prateekm1007/discovery-evidence-fabric); ls-remote verified 39e768da == main; local main reset --hard to GitHub main; post-reset engine text files verified identical to the pre-reset Space tree (git diff: only Space-adapter files + dockerignore-excluded binaries differed)",
+    "hf_spaces_at_round_start": "2 Spaces, both private docker cpu-basic RUNNING: toscanini-prod-validation (created 2026-09-11T15:46:35Z, sha 63e2ed5a, /api/version engine d0c13611) and toscanini-production-validation (created 2026-09-11T15:42:55Z, sha eb73fe04, /api/version engine 39e768da)",
+    "constitution_hash_unchanged": "7084be64... re-verified at round end"
+  },
+
+  "geometry_single_authority_verification": {
+    "chain_claim": "Coder 1 canonical geometry -> GLB -> Coder 2 renderer -> visual compiler -> website -> buyer package",
+    "measured_links": [
+      "geometry authority: discovery_fabric/engine/cad_pipeline.py (CadQuery + OCCT) writes MODEL/model-00N.glb — the ONLY geometry producer",
+      "GLB selection: visual_compiler.authoritative_glb() picks THE canonical GLB (generation-current > engineering_model > sorted-last) and records source_glb_sha256 — sha custody at every hop",
+      "renderer: visual_compiler/renderer/render.js + render_worker.py resolve Chromium/Node and rasterize the canonical GLB read-only; ZERO geometry-generation patterns in the visual layer (grep: no cadquery/OCP imports, no trimesh.Trimesh()/trimesh.creation, no mesh export in visual_compiler/)",
+      "dispatcher: invention_bridge/render.py::render_invention — PRIMARY = visual_compiler; the Blender path reachable ONLY via explicit backend choice and labeled BLENDER_HEADLESS_LEGACY",
+      "website: server.py serves MODEL/*.glb raw (model/gltf-binary, immutable cache + real-SHA ETag) and the MODEL/3D gallery; the webapp consumes detail.model.glb and surfaces artifact_identity.glb_matches_geometry_hash",
+      "buyer package: invention_bridge/package.py::_visual_release_ok — COMPLETE_PASS is the ONLY release-passing verdict; render_record validated BEFORE consumer fields; HERO_RELEASE_STATE.json carries the verdict verbatim"
+    ],
+    "second_geometry_authority_found": false,
+    "second_geometry_authority_search": "visual_compiler/, renderer/, webapp 3D components, package consumer paths — all read-only consumers of the canonical GLB"
+  },
+
+  "alignment_delta": {
+    "method": "Coder-1's own records-alignment procedure: verify the Space's staged content equals the exact staged engine blob, then upload exactly the GitHub-documented delta and update the Dockerfile identity pin (Art. III: the Space's render_worker.py was downloaded and proven sha256-identical to the d0c13611 blob BEFORE the upload was allowed)",
+    "space_content_verified_at": "d0c13611f6677fb5699ea4f67798f843245f0cbc (the commit Coder 1 identity-verified in R446-HF)",
+    "uploaded": [
+      "discovery_fabric/engine/visual_compiler/render_worker.py — the system-Chromium discovery probe (the Coder-2 visual implementation delta d0c13611..39e768da, +42/-1: adds _system_chrome_candidates() to find_chrome()'s documented discovery scan; priority order UNCHANGED — CHROME_PATH override still wins, puppeteer cache precedes system paths; verification contract UNCHANGED and fail-closed — the binary must answer --version; every candidate recorded in the trail, and the accepted candidate is now appended to the trail as evidence)",
+      "Dockerfile — ARG RENDER_GIT_COMMIT pin d0c13611 -> 39e768da (single-occurrence replacement; the R446-HF adapter otherwise untouched; deployment-config analog of Render's build-arg)"
+    ],
+    "deliberately_not_uploaded": [
+      "tests/test_r446_hf_system_chrome.py and worklog.md — the canonical Space carries the .dockerignore-filtered tree (lean-image doctrine: tests and worklogs do not ride in the image — verified live: the Space tree has no tests/, no worklog.md); the GitHub repo is their authority (they are IN this round's GitHub commit)"
+    ],
+    "space_commit": "4a09ec03b583db59e5e457c21316cbfc138af831",
+    "canonical_engineering_logic_changed": false,
+    "canonical_engineering_logic_note": "render_worker.py is the Coder-2 visual worker (presentation boundary); the change was already canonical on GitHub main (commit 39e768da, pushed during R446-HF); this round only brought the canonical Space source up to canonical main"
+  },
+
+  "space_deletion": {
+    "deleted": "prateekm1/toscanini-production-validation",
+    "pre_delete_verification": "repo_info sha == eb73fe045e13ed8783dce73035f6ef116e84ef39 (the exact round-baseline sha; any drift would have aborted the delete)",
+    "post_delete_verification": "repo_info raises RepositoryNotFoundError — the Space is unreachable",
+    "pre_delete_live_identity": "/api/version captured: engine_commit 39e768da, source build_artifact, constitution 2.3.0",
+    "adapter_evidence_custody": "R447/CODER2_SPACE_RETIRED/ (the Coder-2 Space Dockerfile, HF_ENGINE_SHA.txt, HF_SPACE_CONTENT_DELTAS.json, Space README — preserved before the local realignment overwrote them)",
+    "account_state_after": "exactly ONE Space remains: prateekm1/toscanini-prod-validation (private, docker, cpu-basic)",
+    "article_lxiv": "the superseded parallel deployment was retired in the same round that established the single canonical one — not left running as a second authority"
+  },
+
+  "production_verification_against_canonical_space": {
+    "identity_chain": {
+      "api_version_engine_commit": "39e768da407ea18a82378427632c76d8505a5e17 (source build_artifact)",
+      "build_artifact_commit == render_git_commit == health_reported_commit": true,
+      "build_artifact_sha256 == running_artifact_sha256": "99611fabba48be70aba4f9ec09e389eb7444be2f914cc25689aa4ee1e4b5614a",
+      "identity_tamper": false,
+      "deployment_drift": "GREEN",
+      "build_context_git_head": "4a09ec03 (the alignment commit — Space source commit and engine commit both recorded in the identity)",
+      "evidence_file": "R447/PRODUCTION_IDENTITY_POST_ALIGNMENT.json"
+    },
+    "health": "ok=true, discovery_ready=true, portfolio_ready=true, durable enabled on the isolated runtime-state-hf branch with last_snapshot ok; the llm-transport fields were not fully parsed this round (the R446-HF round verified the HF-router zai slot HEALTHY — not re-measured here)",
+    "live_visual_serving": "GET /api/showcase/{01,04,07}/model -> HTTP 200, valid glTF magic, distinct byte sizes 225172/48332/12420 (portfolio geometry differentiation re-observed on the live canonical Space)",
+    "post_boot_render_observation": "durable snapshot reason 'render_complete:ts_a45a10ea517b' at 2026-09-11T22:25:48Z, AFTER the 22:24:18Z boot — the async render path EXECUTED a render on the aligned deployment (session identity not observable without the operator key — disclosed in UNVERIFIED)"
+  },
+
+  "complete_visual_regression": {
+    "core_battery": "tests/test_r441_visual_compiler.py + test_r443_visual_integrity.py + test_r444_lineage.py + test_r446_visual_isolation.py + test_r446_hf_system_chrome.py = 88 passed, 0 failed, 0 skipped — TWICE consecutively (the second run confirms the first; the one transient first-run-after-npm-ci failure episode self-resolved and is attributed to cold renderer-deps environment, BS-020 class, disclosed)",
+    "render_era_battery": "test_r419_render_pipeline + r420_render_autonomy + r423_async_render_gate + r423_renderer_env_allowlist + r436_artifact_integrity = 82 passed, 6 failed, 20 skipped — EXACTLY the R446-C2-recorded pristine baseline ('PRISTINE-HEAD ATTRIBUTION'); the working tree is pristine 39e768da with ZERO code changes this round, so the attribution holds by construction",
+    "full_ladder_on_canonical_space_bytes": {
+      "input": "ts_e24b5247333f_canonical.glb (Case C microchannel HX, the R446-HF handoff bytes, sha256 f99ccc083fab11edc59829fdb8d25c6bf5d5cc2387fdabfe136cc1464f380ffa)",
+      "ladder": "23/23 artifacts (hero, poster, dimension, section, exploded, orthographic x4, turntable x12, probes)",
+      "gate_verdict": "COMPLETE_PASS — failed_rules: []; all 11 checks pass: hero_occupancy (area 0.2768), contact_shadow (ratio 0.02214), semantic_materials (11 nodes, 3 classes, 0 unmapped), node_identity (11 raw named / 11 spec, 0 primitive slices), source_agreement (max_bound_deviation 0.0 <= 0.02), geometry_identity (independent re-measure, identical), poster_parity (corr 1.0 — the R446 fix holding, threshold 0.9 UNTOUCHED), single_viewer (1), material_distinction (3 classes, min dE00 >= 10.0), view_hash_integrity (0 mismatches), visual_set_completeness (23/23)",
+      "two_run_determinism": "hero.png byte-identical across two clean-state ladders (sha b4b2830c...)",
+      "evidence_file": "R447/CANONICAL_CASEC_LADDER_GATE.json"
+    },
+    "buyer_surface_lineage": {
+      "input": "the canonical Space-produced Case B package (R446/HF_PRODUCTION_RUNS/ts_3a5d419028a3_package.zip)",
+      "verdict": "INCOMPLETE (fail-closed, never assumed)",
+      "verified_links": "release_state=VERIFIED (HERO_RELEASE_STATE.json carries the honest gate-FAIL verdict, release_allowed=false) and pdf_embedded_hero=VERIFIED (the PDF leg measured consistent with suppression) — the Article LXXII suppression contract re-verified at the buyer surface on Space-produced bytes",
+      "incomplete_links": "render_source / artifact_bytes / geometry_spec_link — the package does not carry that evidence; typed INCOMPLETE per Art. XXV",
+      "evidence_file": "R447/CASEB_PACKAGE_LINEAGE.json"
+    }
+  },
+
+  "preserved_and_verified": {
+    "full visual ladder": "23/23 measured on canonical bytes (visual_set_completeness pass)",
+    "hero": "rendered, gate-passed, two-run byte-identical",
+    "poster": "parity corr 1.0 vs threshold 0.9 UNTOUCHED",
+    "dimension view": "present in the ladder set",
+    "section view": "present in the ladder set",
+    "exploded view": "present in the ladder set",
+    "orthographic views": "front/side/top/back present in the ladder set",
+    "turntable": "x12 present in the ladder set",
+    "raw GLB identity": "source_glb_sha256 custody + geometry_identity independent re-measure pass + raw-chunk node identity 11/11",
+    "material differentiation": "material_distinction pass at min dE00 >= 10.0 (threshold untouched), semantic_materials 0 unmapped",
+    "visual compiler": "PRIMARY dispatch verified in invention_bridge/render.py",
+    "visual lineage": "lineage verifier run on Space-produced package bytes (release_state + pdf_embedded_hero VERIFIED)",
+    "typed render states": "R443 schema records finalized and validated on every exit; the render_record.json consumed this round validates",
+    "memory safeguards": "cgroup-aware guard thresholds UNTOUCHED (visual_compiler_thresholds.json unchanged this round); the R446 visual-isolation regression battery passes (worker != CadQuery/OCCT)",
+    "fail-closed behavior": "suppression contract re-verified on Space-produced buyer bytes; lineage fail-closed on missing evidence; the system-Chromium probe is itself fail-closed (unhealthy binary refused, full trail recorded)"
+  },
+
+  "OBSERVED": [
+    "the HF account held exactly two Spaces at round start: Coder 1's record-backed toscanini-prod-validation and the record-orphan toscanini-production-validation whose source commit is authored coder2@toscanini.local",
+    "the canonical Space's staged content was byte-identical to the d0c13611 blobs for every delta-affected file it carried (verified before upload, not assumed)",
+    "the canonical Space tree follows the .dockerignore lean-image doctrine (no tests/, no worklog.md) — the Coder-2 Space staging had carried both, a staging divergence now retired with the Space",
+    "after the alignment commit 4a09ec03, the Space rebuilt and reported the full identity chain at engine 39e768da with drift GREEN and tamper false",
+    "the async render path completed a render on the aligned deployment post-boot (durable reason render_complete:ts_a45a10ea517b)"
+  ],
+
+  "VERIFIED": [
+    "single geometry authority end-to-end: cad_pipeline (CadQuery/OCCT) -> MODEL/*.glb -> authoritative_glb (sha custody) -> read-only renderer/compiler -> server raw-GLB serving -> package COMPLETE_PASS-only release; zero geometry-generation patterns in the visual layer",
+    "the canonical Space runs the Coder-2 visual implementation at canonical main: engine_commit 39e768da == GitHub main == the pinned build artifact",
+    "the complete visual ladder + gate COMPLETE_PASS on the canonical Case C bytes with the poster-parity threshold UNTOUCHED at 0.9 (measured 1.0)",
+    "two-consecutive-render determinism on the canonical bytes (hero byte-identical)",
+    "the buyer-surface suppression contract on Space-produced package bytes (lineage release_state + pdf_embedded_hero VERIFIED)",
+    "88/88 core visual battery twice; render-era battery identical to the recorded pristine baseline; ZERO regressions (zero code changes to the engine this round)",
+    "exactly ONE Space remains on the account after the verified deletion"
+  ],
+
+  "INFERRED": [
+    "the post-boot render completion is most plausibly the async queue resuming a restored session's pending render on the 16 GB host (the R446-HF typed-skip class now renders where the R425-allowlist defect previously blocked) — plausible, not verified",
+    "the Coder-2 Space (deleted) most plausibly shared the runtime-state-hf durable branch (same tree defaults) — but this is NOT verifiable post-deletion; single-writer discipline is RESTORED either way by the deletion"
+  ],
+
+  "UNVERIFIED": [
+    "the identity of run ts_a45a10ea517b and its render outcome details (operator-key-gated routes; only the durable snapshot reason is observable)",
+    "whether the deleted Coder-2 Space had DURABLE_STATE_BRANCH=runtime-state-hf (its settings are unreachable post-deletion; its /api/health was not captured pre-deletion — a custody gap disclosed)",
+    "the HF host's per-process memory profile during the render (the R446-HF-assigned memory-audit item remains open; not instrumented this round)",
+    "the llm-transport slot on the canonical Space this round (fields not fully parsed; R446-HF's HEALTHY measurement stands, not re-measured)"
+  ],
+
+  "BLOCKED": [
+    "nothing this round — the directive's tasks were all executable; standing project blockers unaffected: the owner-gated production capacity decision (Art. LXV escalation count stands at 5, unchanged) and the PAT-rotation operator action flagged in R446-HF (unchanged)"
+  ],
+
+  "NEXT_DECISIVE_TEST": [
+    "run the remaining R446-HF handoff items on the canonical Space with operator access: the per-session memory audit (per-process PSS during a live ladder) and a fresh authenticated end-to-end run through the Space UI exercising the full visual join at engine 39e768da",
+    "verify the deleted Space's durable-branch question is moot by observing the canonical Space's next boot sweeps commit cleanly to runtime-state-hf with no foreign interleavings"
+  ],
+
+  "no_architecture_broadening": {
+    "new_solver_stacks": 0,
+    "new_package_compilers": 0,
+    "new_invention_frameworks": 0,
+    "new_domain_abstractions": 0,
+    "engine_code_delta_this_round": "ZERO (the uploaded render_worker.py is canonical main's own content, not a new change)",
+    "spaces_created": 0,
+    "spaces_deleted": 1,
+    "gates_weakened": 0,
+    "thresholds_changed": 0
+  }
+}

@@ -311,3 +311,25 @@ Stage Summary:
 - Delivery tuple: origin/main d0c13611 + HF deployed d0c13611 + /api/version d0c13611 — all agree; the HF Space remains PRIVATE on cpu-basic
 - R446-HF COMPLETE: R446/R446_HF_ROUND_RECORD.json at the pushed main, classification HF_HOSTING_SUCCESS_WITH_LIMITATIONS
 - OPERATOR ACTION FLAGGED: rotate the GitHub PAT (live credential in repo history at d72073de; all deployment surfaces clean)
+
+---
+Task ID: R447-C2
+Agent: Coder 2 (visual/presentation surface)
+Task: R447-C2 — VISUAL IMPLEMENTATION ALIGNMENT: bring the existing Coder-2 visual implementation into the canonical Coder-1 HF Space, delete the Coder-2-created Space, verify the single geometry authority chain, run the complete visual regression + HF production verification against the canonical Space
+
+Work Log:
+- Mandatory reads IN FULL: EPISTEMIC_CONSTITUTION.md v2.3.0 (2084 lines, hash 7084be64 verified unchanged at round end), GOVERNANCE/ five files, ACTIVE_PATH.md, the R446_C1/R446_C2/R446_HF records
+- Canonical Space selection reconstructed from records, not invented: the directive carried the literal placeholder '<CODER-1-SELECTED-SPACE-ID>'; the worklog R446-HF entry + R446/HF_DEPLOYMENT_RECORD.json + R446/HF_RUNTIME_MANIFEST.json name prateekm1/toscanini-prod-validation as Coder 1's creation; the other Space (toscanini-production-validation) appears in no record and its source commit eb73fe04 is authored coder2@toscanini.local — basis fully disclosed in the record
+- Baseline (Art. XXII/XXIII): GitHub main verified 39e768da via API; local checkout labeled STALE_LOCAL_CHECKOUT (the squashed Coder-2 Space source, no remote); origin added + ls-remote verified; local main reset to GitHub main after preserving the Coder-2 Space adapter evidence to R447/CODER2_SPACE_RETIRED/
+- Geometry single-authority audit: cad_pipeline (CadQuery/OCCT) -> MODEL/*.glb -> authoritative_glb (sha custody) -> read-only renderer/visual compiler (zero geometry-generation patterns) -> server raw-GLB serving -> package COMPLETE_PASS-only release — NO second visual geometry authority found
+- Visual regression: core battery (r441+r443-integrity+r444-lineage+r446-isolation+r446-system-chrome) 88 passed / 0 failed / 0 skipped TWICE; render-era battery 82/6/20 exactly matching the R446-C2-recorded pristine baseline (tree pristine, zero engine deltas this round)
+- Canonical Space aligned: Space content verified sha-identical to the d0c13611 blobs BEFORE upload; uploaded exactly the d0c13611..39e768da image-relevant delta (render_worker.py system-Chromium probe + Dockerfile pin -> 39e768da) as commit 4a09ec03; tests/worklog deliberately not uploaded (lean-image doctrine, verified live); zero canonical engineering/discovery/package logic touched
+- Coder-2 Space DELETED: pre-delete sha verified (eb73fe04) then delete issued; post-delete RepositoryNotFoundError; exactly ONE Space remains; adapter evidence preserved in R447/CODER2_SPACE_RETIRED/
+- HF production verification at the canonical Space: identity chain green at engine 39e768da (build==running sha 99611fab, tamper false, drift GREEN, Space commit 4a09ec03 as build-context HEAD); health ok/discovery_ready/portfolio_ready; durable isolated on runtime-state-hf; showcase GLBs 200 x3 valid glTF magic (225172/48332/12420 bytes); post-boot async render completed (render_complete:ts_a45a10ea517b — session identity operator-gated, disclosed)
+- Full ladder on the canonical Case C bytes (handoff sha f99ccc08): 23/23 artifacts, gate COMPLETE_PASS, all 11 checks pass incl. poster_parity corr 1.0 (threshold 0.9 UNTOUCHED) and geometry_identity independent re-measure; two-run hero byte-identical (determinism)
+- Buyer-surface lineage on the Space-produced Case B package: release_state VERIFIED + pdf_embedded_hero VERIFIED (Art. LXXII suppression contract), remaining links honestly INCOMPLETE (missing evidence never assumed)
+- Round record: R447/CODER2_CANONICAL_SPACE_ALIGNMENT.json (+ CANONICAL_CASEC_LADDER_GATE.json, CASEB_PACKAGE_LINEAGE.json, PRODUCTION_IDENTITY_POST_ALIGNMENT.json, CODER2_SPACE_RETIRED/)
+
+Stage Summary:
+- R447-C2 delivered: ONE canonical Space (Coder 1's toscanini-prod-validation) running the Coder-2 visual implementation at canonical main 39e768da; the duplicate Space deleted with custody evidence; the single geometry authority chain verified end-to-end; the complete visual regression green with zero regressions and zero threshold changes
+- Disclosed: the directive's unsubstituted Space-id placeholder (evidence-based resolution); the deleted Space's durable-branch question (unverifiable post-deletion); the operator-gated session identity of the post-boot render; the R446-HF memory-audit handoff item remains open
