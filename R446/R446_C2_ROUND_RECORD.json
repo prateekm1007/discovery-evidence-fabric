@@ -1,0 +1,120 @@
+{
+  "artifact_type": "R446_C2_ROUND_RECORD",
+  "round": "R446-C2",
+  "created_at": "2026-09-11",
+  "directive": "R446-C2 / VISUAL CLOSURE, NOT RENDERER REINVENTION: (1) fix the large-model poster parity defect (0.8731 < 0.9) by finding the actual presentation cause without lowering the threshold, preserving engineering bytes and scene identity; (2) prove the visual worker remains engineering-isolated with a regression; (3) preserve the honest low-memory state (RENDER_SKIPPED_LOW_MEMORY typed, visible, exact wording); (4) audit the website's 3D truth (ENGINEERING_GEOMETRY / COMPUTATIONAL_RENDER / PHYSICAL_VALIDATION); (5) no broad redesign; produce R446/R446_C2_ROUND_RECORD.json and reread the Constitution before committing",
+  "reviewer_provenance": "AI_REVIEW (Art. LXVII)",
+  "constitution_version": "2.3.0",
+  "constitution_sha256": "7084be6435ff30a645f4ad16a5380cf897a59b6dd73f5e18af3713010131a9c5",
+  "mandatory_reads_completed": "EPISTEMIC_CONSTITUTION.md v2.3.0 read IN FULL at round start (hash verified 7084be64..., byte-identical to the R444/R445 records) and RE-READ before the final commit (Art. XIX GREEN test answered explicitly); GOVERNANCE/README.md, GOVERNANCE/AUDITOR_SELF_GOVERNANCE_v1.md, GOVERNANCE/AUDITOR_BLINDSPOT_REGISTER.md, GOVERNANCE/AUDITOR_REMEMBERED_STATE.md, GOVERNANCE/AUDIT_LOOP_PROTOCOL_v1.md, ACTIVE_PATH.md (through the R445 addendum), R445/R445_C2_ROUND_RECORD.json + R445/MEMORY_BUDGET.json, R444/R444_C2_ROUND_RECORD.json (worklog)",
+  "baseline_recorded_per_directive": {
+    "head": "58ae6a8f23df0faeb11315cb7bcb4239c7508af0",
+    "origin_main_local_ref": "58ae6a8f23df0faeb11315cb7bcb4239c7508af0",
+    "ls_remote_actual": "58ae6a8f23df0faeb11315cb7bcb4239c7508af0",
+    "git_status": "clean at round start",
+    "production_api_version_at_round_start": "58ae6a8f (engine_commit_source build_artifact, constitution 2.3.0) — production == origin/main == HEAD",
+    "render_plan_measured_live": "free (512 MB), service not suspended — via the Render API at round start (Art. XXIV: measured, not inherited); the owner capacity decision has NOT happened (Art. LXV escalation 5 stands)",
+    "constitution_version_and_hash": "2.3.0 / 7084be6435ff30a645f4ad16a5380cf897a59b6dd73f5e18af3713010131a9c5"
+  },
+
+  "workstream_1_poster_parity": {
+    "defect_as_filed": "caseC (the R445 stress GLB, source sha256 7098b3d3..., 4.6 MB reality-provider reconstruction): poster parity 0.8731 < 0.90, PRE-EXISTING since R441, identical on the R445 baseline and optimized configs; fail-closed held (hero suppressed, release blocked)",
+    "diagnosis_method": "the gate's OWN poster_parity operator applied to the preserved failing bytes, plus a pixel-level decomposition (scripts/r446_parity_diagnose*.py, r446_paper_hypothesis.py, r446_residual_map.py in the sandbox workspace)",
+    "diagnosis_chain_measured": {
+      "step_0_canvas_state": "corr(hero_64, dimension_64) = 0.9999 — the canvas state at poster time equals the hero render; a wrong/ divergent source render was RULED OUT",
+      "step_1_resample_SUSPECTED": "the R441 poster default (1024-wide) resampled the 1536-wide hero; two low-pass operators (Skia 1536->1024 then BOX 1024->64 vs BOX 1536->64) decorrelate high-frequency content (caseC hero 64x64 Laplacian energy 5.22 vs 1.69 on the passing cases)",
+      "step_1_resample_FALSIFIED": "native-resolution 1:1 replay measured parity 0.8735 (unchanged); re-downscaling the hero to the rect size FIRST reproduces the gate number exactly (0.8732) — the embed was faithful all along; the resample was NOT the primary cause",
+      "step_2_paper_flattening_PROVEN": "the poster paints opaque paper (#f6f6f8) UNDER/OVER the hero image area, so every soft-alpha pixel is composited with the paper: posterRGB = heroRGB*a + paper*(1-a), verified pixel-exact on the 1:1 replay (max err 0.498 = half a quantization step over soft pixels; opaque model pixels err EXACTLY 0.0); 41,263 soft pixels (2.62% of the frame — dominated by the 42%-opacity PCFSoft contact shadow) carry a mean luma delta of -149.75 vs hero.png; the fully-transparent background also became opaque paper (luma 0.966 vs the gate's 1.0 mapping at alpha<0.2); painting the paper BEFORE vs AFTER the blit is the SAME premultiplied result (measured, second replay) — ORDER-IRRELEVANT, the flattening itself is the defect",
+      "conclusion": "the R441 comment 'the poster shows THE hero render, so the gate's parity check is exact, not statistical' was FALSE for every model since R441: any opaque paper layer under the image area destroys the soft alpha hero.png keeps. Simple parts measured 0.9037 (just above the bar); the shadow-heavy high-detail reconstruction measured 0.8731 (below it)"
+    },
+    "fix": "ALL inside render.js (the Coder 2 presentation boundary): the poster composes IMMEDIATELY after the hero shoot from the SAME canvas state that produced hero.png, at the hero's NATIVE resolution (1:1 blit, no resampling; an explicit payload.poster.width override is still honored and recorded honestly as resampled), and the paper is painted ONLY in the bands outside the hero rect (destination-over) — the image area carries the hero's exact RGBA (opaque model, soft shadow, transparent background). Typed disclosure record.poster_embed = {source: hero_canvas_state, width, height, resampled, image_area_alpha}. The native 2D surface is disposed after upload (R445 memory hygiene continued)",
+    "threshold_untouched": "poster_parity_min_corr 0.90 UNCHANGED in visual_gate.py; the gate and its verifier logic were NOT modified (Art. VII — the claim was corrected by correcting the presentation artifact, never by weakening the verifier)",
+    "acceptance_measured": {
+      "large_representative_case": "caseC: gate FAIL (0.8731) -> COMPLETE_PASS, parity corr = 1.0 EXACTLY (byte-faithful embed, identical operator both sides); 21 artifacts (the honest single-part ladder); R446/CASEC_FIX_VERIFY.json",
+      "other_cases_no_regression": "caseA (5a1815ee) and caseB (22de99c0, the R442 production bytes): COMPLETE_PASS before AND after, parity 0.9037 -> 1.0",
+      "geometry_source_hashes_unchanged": "source_glb_sha256 and scene_spec_sha256 EQUAL to the R445 records on all three cases (caseC 7098b3d3.../4b59400c...; caseA 5a1815ee...; caseB 22de99c0...)",
+      "byte_identity_vs_r445": "EVERY artifact byte-identical to the R445 optimized runs EXCEPT poster.png + the two JSONs that record it (render_record.json, visual_gate.json) — hero.png, turntable x12, orthographic x4, section, dimension, hero.glb, scene_spec.json, material_probe.png all sha256-equal (R446/AB_QUALITY_REPORT.json)",
+      "poster_visual_sanity": "bands opaque paper, typography scaled proportionally (layout preserved at 1536x2172), model + shadow intact; the image area now carries transparency (visually identical on the light surfaces the artifact ships on; no webapp/PDF consumer renders poster.png — verified by source search)"
+    },
+    "hidden_defect_surfaced": "the flattening penalty pressed on EVERY model since R441 (caseA/B measured 0.9037 — barely above the 0.90 bar); the fix moves the whole ladder to the exact 1.0 the R441 design comment always claimed"
+  },
+
+  "workstream_2_isolation_regression": {
+    "kept": "the R445 measurement proof stands (visual_compiler import chain 36.2 MB peak PSS vs CadQuery/OCCT stack 458.7 MB isolated import; zero cadquery/OCP references under discovery_fabric/engine/visual_compiler/ — re-verified this round)",
+    "new": "tests/test_r446_visual_isolation.py — the boundary is now a STANDING REGRESSION: (1) AST scan: zero engineering-stack import statements in the visual compiler package (comments about trimesh's retirement are documentation, not imports); (2) fresh-interpreter runtime probe: importing EVERY visual_compiler module leaves cadquery/OCP/build123d/trimesh absent from sys.modules; (3) footprint class bound: the chain's fresh-interpreter VmHWM stays below 150 MB — an order of magnitude above the measured 36.2 MB chain and far below the 458.7 MB engineering stack, so a process collapse trips it; (4) process boundary: render_worker drives node render.js (a node SUBPROCESS), never an in-process engineering call",
+    "attack_proven": "an injected 'import cadquery' into a visual_compiler module FAILS the battery (live, this round); the file was reverted and the battery passes 4/4 clean (Art. XVII: the control was attacked, not assumed)",
+    "battery": "4 passed in ~1 s; included in the 83-test visual battery"
+  },
+
+  "workstream_3_honest_low_memory_state": {
+    "typed_status_preserved": "render_record_schema.py canonical classes UNTOUCHED (RENDER_SUCCEEDED / RENDER_FAILED / RENDER_SKIPPED_LOW_MEMORY / RENDER_SKIPPED_INFRA_UNAVAILABLE / RENDER_NOT_RUN); memory guard thresholds (async 650 / in_worker 800) UNTOUCHED; no fake success, no partial hero, no hidden retry loop, no Blender substitution, no threshold edits",
+    "ui_surface_added": "TOSCANINI_UI/webapp/components/DossierSections.tsx — when the hero is honestly absent AND the typed render status exists, the dossier now shows a 'Presentation renders' block carrying the typed state: RENDER_SKIPPED_LOW_MEMORY reads VERBATIM 'Engineering geometry available; visual rendering unavailable at current deployment capacity.'; other RENDER_SKIPPED_* read 'Engineering geometry available; visual rendering unavailable in this deployment (renderer infrastructure unavailable).'; a gate-suppressed state reads 'Engineering geometry available; presentation renders are withheld — the visual quality gate did not certify them (fail-closed).'; never 'rendering failed', never 'visualization complete'",
+    "production_byte_proof": "the deployed production webapp chunk (page-03fb7ad62e04dc0f.js, 102,652 bytes) carries the exact strings 'Engineering geometry available' / 'visual rendering unavailable' / 'at current deployment capacity' / 'data-render-absent' — byte-verified from the live site at the deployed SHA (an initial 6 KB truncated download briefly looked like an absence; re-downloaded in full — the observation-channel lesson applied again)",
+    "data_chain_verified": "cio_update.py writes visualization.renders.status on every typed skip -> dossier.py projects it into the design tab -> types.ts carries status?: string -> the new UI branch renders it; the frontend renders, never re-derives (Art. X)"
+  },
+
+  "workstream_4_website_3d_truth_audit": {
+    "chain_tested": "canonical geometry -> rendered asset -> frontend state -> user-visible wording",
+    "model_viewer_labels_verified": "three distinct truth classes with honest tooltips: 'Engineering model' = 'deterministic CAD build from the canonical engineering geometry — a computational result, not a physical validation'; 'Conceptual design' = 'conceptual architecture visualization — engineering dimensions are not claimed'; 'Spatial reconstruction' = 'provider reconstruction — a spatial hypothesis, not a measurement'",
+    "dossier_renders_caption_verified": "'presentation renders — the authoritative geometry is the CAD-built model on stage; renders never validate physics'",
+    "physical_validation_word": "structurally absent from presentation surfaces; only the RealityLoopPanel can legitimately discuss physical validation (R370G-attested events) — unchanged this round",
+    "defect_found_and_fixed": "TechStage gate badge treated ONLY the legacy 'PASS' as passing — since R443 the canonical verdict is COMPLETE_PASS, so every post-R443 certified render displayed the FAILING badge style ('✕ COMPLETE_PASS', orange) on the primary stage: backend truth was UNDERstated (auditor principle 7: frontend claims traced to backend truth). Fixed: gateOk = PASS || COMPLETE_PASS, comment carries the reason",
+    "showcase_and_narrative_audited": "no inflation wording ('visualization complete' / 'rendering complete' exist NOWHERE in webapp/server/bridge source); no rendered image implies physical validation",
+    "no_redesign": "the webapp change is two surgical edits (a notice branch + a badge verdict); no layout, navigation, or experience redesign (directive §5 held)"
+  },
+
+  "regression_batteries": {
+    "coder2_visual_batteries": "tests/test_r441_visual_compiler.py + test_r443_visual_integrity.py + test_r444_lineage.py + test_r446_visual_isolation.py = 83 passed, 0 failed (includes the five LIVE adversarial attacks and the live lineage chain) with the fixed renderer",
+    "poster_adjacent": "tests/test_r443_audit_fixes.py + test_r419_product_surface.py = 32 passed",
+    "render_era_batteries": "r419_render_pipeline + r420_render_autonomy + r423_async_render_gate + r423_renderer_env_allowlist + r436_artifact_integrity = 82 passed, 6 failed, 20 skipped; PRISTINE-HEAD ATTRIBUTION (git stash at 58ae6a8f): the SAME 6 fail identically at pristine HEAD — zero regressions from this round",
+    "english_only": "tests/test_r419_english_only.py 5 passed",
+    "secret_scan": "tests/test_secret_scanning.py 1 failed — PRISTINE-HEAD ATTRIBUTION: fails identically at 58ae6a8f without this round's changes (the R443-disclosed pre-existing set)",
+    "webapp_build": "production 'next build' green locally with both TSX changes before the deploy; tsc --noEmit clean"
+  },
+
+  "memory_ab_same_sandbox": {
+    "method": "R445 render.js (git checkout HEAD) vs R446 render.js (working file), swapped in place, caseB + caseC x2 runs each, ProcSampler PSS at 12.5 Hz (R446/MEMORY_AB.json)",
+    "caseB": "R445 524.1/564.2 vs R446 579.9/545.6 tree PSS MB — mean +18.6 MB, INSIDE the measured run-to-run variance band (+/-20-40 MB visible inside the R445 baseline pair itself); the native poster canvas is ~13 MB transient and disposed after upload",
+    "caseC": "R445 700.5/701.1 vs R446 649.8/644.5 — mean -53.6 MB: composing the poster EARLY (right after the hero) avoids the late-ladder accumulation spike the R445 layout hit on the 4.6 MB model",
+    "gate_verdicts_during_memab": "R445 code: caseB COMPLETE_PASS x2, caseC FAIL x2 (the filed defect); R446 code: COMPLETE_PASS x4 — the fix holds under the memory harness too",
+    "capacity_verdict_unchanged": "the 512 MB Render plan still cannot fit the render tree (R445's irreducibility proof stands; the typed skip remains the correct production behavior); this round changes NOTHING about the capacity decision (Art. LXV escalation 5)"
+  },
+
+  "two_run_memory_recovery": {
+    "acceptance": "memory returns toward baseline after completion; no leak between jobs",
+    "evidence": "THREE consecutive caseB renders through the R446 renderer: python PSS after teardown 46.7 / 46.7 / 46.7 MB — flat; gate COMPLETE_PASS + poster parity 1.0 on every run (R446/TWO_RUN_RECOVERY.json)"
+  },
+
+  "production_test": {
+    "deploy": "03b55b623b2bd9841851eeaab72b407278367eb6 via Render API pinned commitId (deploy dep-dahvcnvqj5pc73an1prg, live at t=180 s); /api/version == 03b55b62 (engine_commit_source build_artifact, constitution 2.3.0); web_build_hash CHANGED (49f4f8a3... — the TSX changes are in the deployed export)",
+    "identity_chain": "local HEAD == origin/main (ls-remote) == production /api/version == 03b55b62",
+    "fresh_production_run_ts_2d3c5fe0746f": {
+      "submission": "owner cookie captured AT SUBMISSION and persisted before polling (the orphan lesson applied)",
+      "terminal": "COMPLETE -> INVENTION_REQUIRES_EXPERIMENT (premise: no survivor); bridge_outcome COMPLETED (bridge_case B)",
+      "surfaces_measured": "/model -> 200 model/gltf-binary (a bridge GLB exists); /renders/hero.png 404; /renders/poster.png 404; /renders/render_record.json 404; /renders/visual_gate.json 404; /renders/scene_spec.json 404; /package 404",
+      "interpretation": "the visual stage was NOT REACHED on this fresh run — the R444-filed Coder 1 upstream gap (fresh runs do not invoke the render stage) is UNCHANGED and remains on Coder 1's surface; production visual success is NOT claimed (Art. XXV: the stage's absence is recorded as not-reached, never converted into either success or failure)"
+    },
+    "operational_orphan_disclosed": "ts_a1528a533465 — the FIRST submission of this round; the polling script hit its timeout before persisting the owner cookie, making the run unobservable (anonymous access 404). Recorded as an operational orphan (the R442/R443/R445 cookie lesson RE-learned at cost); the fix (persist-at-submit) was applied and PROVEN by the second run"
+  },
+
+  "blender_disposition": {
+    "decision": "NOT deleted, zero changes to the Blender path",
+    "note": "retirement conditions remain tied to a production visual success (R442); unchanged this round"
+  },
+
+  "coder2_boundary_compliance": "CODER_2_BOUNDARY_VIOLATIONS = 0 — repo files touched: discovery_fabric/engine/visual_compiler/renderer/render.js (the Coder 2 presentation boundary), TOSCANINI_UI/webapp/components/DossierSections.tsx + TechStage.tsx (presentation-surface truth wording — the directive's WS3/WS4 explicitly own this surface), tests/test_r446_visual_isolation.py (new), ACTIVE_PATH.md (the R446-C2 addendum), R446/ records. NO CadQuery/OCCT change, NO GEOMETRY_SPEC generation change, NO engineering bridge change, NO discovery/evidence/attacker/causal-evolution/package-compiler/domain-routing change, NO threshold file change (poster_parity_min_corr 0.90 untouched; memory guard untouched), NO Blender deletion, NO website redesign",
+  "new_defects_filed": [
+    "CODER 1 (unchanged, re-confirmed live at 03b55b62): fresh production runs with bridge GLBs never invoke the visual stage (render_record/visual_gate/scene_spec all absent) — the R444-filed upstream gap; the R446 UI surfaces the typed state the moment the stage runs and skips",
+    "PROCESS (self-filed, fixed this round): a polling timeout before cookie persistence orphans a production run (ts_a1528a533465) — the submit script now persists the owner cookie atomically before any polling"
+  ],
+  "remaining_open_defects": [
+    "OWNER-GATED (Art. LXV, escalation 5, unchanged): the 512 MB capacity decision — R445's component-level irreducibility proof stands (optimized tree 496-521 MB + server + overhead > 512 MB); the R446 poster change is memory-neutral within variance; Render 1 GB or the OCI Always Free experiment both clear it",
+    "CODER 1 (unchanged): the R444-filed package-gate and GLB template-reuse defects; the r424 battery drift; the 6-failure render-era set; the secret-scan fixture failure"
+  ],
+  "honest_summary": "R446-C2 closed the R445-filed poster-parity defect INSIDE the presentation boundary with the cause measured, not guessed: the opaque paper underlay flattened the hero's soft alpha (pixel-exact identity posterRGB = heroRGB*a + paper*(1-a); mean luma delta -149.75 over the 2.62% of the frame the 42%-opacity contact shadow occupies), while the earlier resample suspicion was FALSIFIED by a controlled native-resolution replay (0.8735 unchanged). The fix composes the poster from the SAME canvas state that produced hero.png at native resolution with paper only in the bands — the gate's OWN unchanged 0.90 measurement now reports corr exactly 1.0 on the large case (FAIL 0.8731 -> COMPLETE_PASS) and on caseA/B (0.9037 -> 1.0, a hidden since-R441 penalty surfaced and removed); source GLB sha, scene spec sha, and every other artifact byte stay identical; the threshold and verifier were never touched. The R445 engineering-isolation proof became an attack-proven standing regression (4 tests; an injected import cadquery fails the battery). The typed RENDER_SKIPPED_LOW_MEMORY state is now VISIBLE in the deployed website with the directive's exact sentence (byte-verified in the production bundle), the stage badge now recognizes the canonical COMPLETE_PASS instead of showing a false failing style, and the 3D-truth vocabulary audit found the remaining surfaces already honest ('renders never validate physics'; no inflation wording anywhere). Batteries: 83 visual (incl. five live attacks) + 32 poster-adjacent passed; render-era 82/6/20 with the failure set pristine-identical; english-only 5; production next build green. Memory: same-sandbox A/B — caseB within variance, caseC peak LOWER, three-run teardown flat at 46.7 MB; the 512 MB capacity verdict and the Art. LXV escalation stand unchanged. Production: deployed and version-verified at 03b55b62; the fresh run ts_2d3c5fe0746f ended INVENTION_REQUIRES_EXPERIMENT with the visual stage not reached (the R444-filed Coder 1 upstream gap, re-confirmed live); one operational orphan (ts_a1528a533465) disclosed with the fix proven. CODER_2_BOUNDARY_VIOLATIONS = 0.",
+  "final_identity_chain": {
+    "code_deploy": "03b55b623b2bd9841851eeaab72b407278367eb6 (dep-dahvcnvqj5pc73an1prg, live; /api/version verified)",
+    "records_amendments": "this file rides the records commit that follows (self-consistent check: whatever SHA /api/version reports IS this file's final commit)",
+    "constitution": "2.3.0 / 7084be6435ff30a645f4ad16a5380cf897a59b6dd73f5e18af3713010131a9c5"
+  }
+}
