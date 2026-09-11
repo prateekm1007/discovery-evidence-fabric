@@ -211,3 +211,20 @@ layer continuity through engineering spec -> domain spec -> geometry ->
 artifact identity -> CIO -> package -> gate A, the F1 divergence
 injection detected as a broken invariant, the single-wrong-vocabulary
 shape detected, upstream-consumption override).
+
+## R445-C2 addendum (2026-09-11) — the renderer measured and slimmed, not weakened
+
+Operator directive R445-C2 (memory): the Visual Compiler's renderer
+tree was measured component by component (per-process PSS at 12.5 Hz)
+and reduced by deadweight removal only.
+
+| Change | Module | Notes |
+|---|---|---|
+| Chromium process tree | `renderer/render.js` | --single-process --no-zygote: 7 processes -> 1 (zygotes/utility/GPU-split/isolated renderer merged), measured -44 MB with byte-identical WebGL output; micro flags remove services a one-page deterministic render never uses (disk cache, audio, remote fonts, site isolation, process pool) |
+| Page memory hygiene | `renderer/render.js` | pmrem.dispose() once the environment texture exists; one reused occupancy readback buffer; per-artifact explicit GC (--js-flags=--expose-gc) |
+| Measured parity | `R445/MEMORY_BUDGET.json` | same canonical GLB sha, same scene_spec sha, same 23-artifact ladder, same gate verdict, same node/geometry identity, same poster parity on every A/B run (baseline vs optimized); hero.png byte-identical; two-run teardown flat (no leak) |
+| Outcome | `R445/R445_C2_ROUND_RECORD.json` | mean -62.8 MB on Case B (636.5 -> 573.7; final verify 496.2 MB); the 450 MB cgroup target reported MEMORY_TARGET_UNACHIEVABLE_WITHOUT_PRODUCT_DEGRADATION with the irreducible decomposition (quality-locked hero surface ~61 MB + 2048 shadow map ~35 MB + PMREM rig ~16 MB + Chromium/V8/node floor ~374 MB); memory guard thresholds UNTOUCHED; visual worker != CadQuery/OCCT proven by isolated import measurement (36.2 MB vs 458.7 MB) |
+
+New defect filed to the Coder 2 surface: poster parity fails on large
+high-detail models (caseC 0.8731 < 0.9, PRE-EXISTING — identical on
+baseline and optimized); fail-closed held (suppressed + blocked).

@@ -1660,3 +1660,23 @@ leg (bare replay trees carry no PDFs — the released-package lineage is
 proven in the battery). Production visual closure NOT achieved (no
 capacity decision); fresh production A/B + negative tests recorded in
 the round record.
+
+---
+Task ID: R445-C2
+Agent: Super Z (main session — Coder 2)
+Task: R445-C2 memory — reduce the production Visual Compiler footprint below the 512 MB Render limit by deadweight removal only (no guard change, no quality change, no view removal, no Chromium bypass, no Blender switch); full record in R445/R445_C2_ROUND_RECORD.json.
+
+Work Log:
+- Mandated reads in order: Constitution v2.3.0 FULL (hash 7084be64... re-verified), GOVERNANCE five files, ACTIVE_PATH.md through R445-A, R444_C2_ROUND_RECORD.json. Baseline: HEAD == origin/main == ls-remote == 2d52fc62 (clean); production /api/version 087f9955 (one behind — Coder 1's R445-A not yet deployed); Render plan measured 'free' via API; sandbox re-cloned from PAT.
+- Measurement first: scripts/r445_mem_measure.py — PSS (smaps_rollup, 12.5 Hz) + cgroup v1 trace + isolated import footprints. Worker chain = 36.2 MB vs CadQuery = 458.7 MB (worker != engineering stack, grep-proven zero OCP imports). Trimesh (96.8 MB) also absent from the chain.
+- Flag matrix on the SAME deterministic payload: single-process+no-zygote -44 MB byte-identical hero; threaded-compositing-off REJECTED (3.4x runtime); use-gl=swiftshader refused by Chrome 152 (typed failure); heap caps/gpu-pressure/v8-single-thread all noise. Chrome blank floor 115.0 MB; node floor 76.8 MB.
+- Decomposition: ladder is NOT the driver (hero-only 370.6 vs full 379.6 chrome MB); quality-locked components measured by diagnostics — hero surface ~61 MB, 2048 shadow map ~35 MB, PMREM rig ~16 MB; WebGL context base ~160 MB.
+- Shipped (render.js only, +37/-2): single-process + no-zygote + micro flags + pmrem.dispose() + reused occupancy readback buffer + per-artifact GC (--expose-gc).
+- A/B (R445/MEMORY_BUDGET.json + raw JSONs): baseline 636.5 -> optimized 573.7 MB mean on Case B (final verify 496.2 MB), -28.3 Case A, -20.6 Case C; all six same-case guarantees hold on all 12 runs (same GLB sha, same spec sha, same 23-artifact ladder, same gate verdict, same identity, same parity); hero.png byte-identical; two-run teardown flat (no leak); r441+r443+r444 batteries 79/79; render-era 82 passed / 6 failed with PRISTINE-IDENTICAL failure set (zero regressions).
+- 450 MB target: MEMORY_TARGET_UNACHIEVABLE_WITHOUT_PRODUCT_DEGRADATION — irreducible ~503 MB (quality-locked 112 + platform floor ~374 + node 99 + python 17); guard 650/800 UNTOUCHED; capacity decision now carries exact component numbers (Art. LXV escalation 5).
+- Disclosed: (1) sandbox text channel swallows '<space>[h' byte sequences — a suspected render.js corruption was disproven with od -c (file correct at every revision); byte-level verification recorded as mandatory. (2) PRE-EXISTING poster-parity defect on large models (caseC 0.8731 < 0.9, identical both configs) — filed to the Coder 2 surface, fail-closed held.
+- Blender NOT deleted; no threshold file touched; CODER_2_BOUNDARY_VIOLATIONS = 0.
+
+Stage Summary:
+- The renderer is measurably leaner with PROVEN identical product quality, and the capacity blocker now has a component-level irreducibility proof instead of an estimate; production visuals remain physically impossible on 512 MB (honest typed skip continues) — the owner decision (1 GB plan vs OCI experiment) is the single unblocker.
+- reviewer_provenance=AI_REVIEW.

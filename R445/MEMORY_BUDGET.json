@@ -1,0 +1,118 @@
+{
+  "artifact_type": "R445_C2_MEMORY_BUDGET",
+  "round": "R445-C2",
+  "created_at": "2026-09-11",
+  "reviewer_provenance": "AI_REVIEW (Art. LXVII)",
+  "measurement_tool": "scripts/r445_mem_measure.py (PSS via /proc/<pid>/smaps_rollup at 12.5 Hz + cgroup v1 usage trace; raw JSONs: MEMORY_BUDGET_AB_RAW.json, FLAG_EXPERIMENT_RESULTS.json)",
+
+  "memory_budget": [
+    {
+      "case": "caseB_multi_part (the R442 production helical heat-recovery module, canonical GLB sha256 22de99c0..., 348592 bytes)",
+      "baseline_peak_mb": 636.5,
+      "optimized_peak_mb": 573.7,
+      "delta_mb": -62.8,
+      "optimization": "--single-process --no-zygote (7 Chromium processes -> 1), micro flags (disk cache, audio, remote fonts, site isolation, renderer process limit), pmrem.dispose(), reused occupancy readback buffer, --js-flags=--expose-gc + per-artifact GC in shoot()",
+      "evidence": "MEMORY_BUDGET_AB_RAW.json cases baseline:caseB_multi_part / optimized:caseB_multi_part, runs 1+2, both COMPLETE_PASS 23/23",
+      "quality_impact": "NONE — same canonical GLB sha256, same scene_spec sha256, same 23-artifact set, same COMPLETE_PASS verdict, node identity PASS, geometry identity PASS, poster parity PASS on every run; hero.png byte-identical between baseline and optimized configs"
+    },
+    {
+      "case": "caseA_single_part (the R442 production benchtop autosampler, canonical GLB sha256 5a1815ee...)",
+      "baseline_peak_mb": 601.2,
+      "optimized_peak_mb": 572.9,
+      "delta_mb": -28.3,
+      "optimization": "same as above",
+      "evidence": "MEMORY_BUDGET_AB_RAW.json baseline/optimized:caseA_single_part, runs 1+2, both COMPLETE_PASS 23/23",
+      "quality_impact": "NONE — all six same-case guarantees hold on every run"
+    },
+    {
+      "case": "caseC_largest_glb (TOSCANINI reality-provider reconstruction, 4633848 bytes — the stress case)",
+      "baseline_peak_mb": 732.7,
+      "optimized_peak_mb": 712.1,
+      "delta_mb": -20.6,
+      "optimization": "same as above",
+      "evidence": "MEMORY_BUDGET_AB_RAW.json baseline/optimized:caseC_largest_glb; NOTE the gate verdict is FAIL (poster parity 0.8731 < 0.9) on BOTH baseline and optimized — a PRE-EXISTING defect this battery surfaced (filed to the Coder 2 surface, next round); the fail-closed contract worked as designed both sides (hero suppressed, release blocked), so the optimization introduced no behavior change",
+      "quality_impact": "NONE from this round's change — verdict identical (FAIL) both sides; suppression identical both sides"
+    }
+  ],
+
+  "final_verified_peak_mb": {
+    "value": 496.2,
+    "context": "Case B through the FULL visual compiler with the FINAL committed render.js (incl. pmrem.dispose()): status OK, gate COMPLETE_PASS, 23 artifacts, hero sha256 2218f0d73cddb5fc byte-identical to the A/B optimized run; node identity / geometry identity / poster parity all PASS",
+    "note": "run-to-run variance is +/-5-25 MB (measured across 8+ repeats); per-run numbers are recorded verbatim in the raw JSONs"
+  },
+
+  "consumer_decomposition_measured": {
+    "method": "per-process smaps_rollup PSS sampled at 12.5 Hz; blank-page floor probe; view-subset and component-diagnostics (tiny canvas / no-PMREM / no-shadow) — all with the production Chromium 152 headless-shell and the pinned renderer stack",
+    "consumers": {
+      "python_server_baseline": "30.4 MB local reference boot (flat); production baseline NOT directly observable — honest UNKNOWN, never guessed (Art. XXV)",
+      "python_visual_worker_at_render": "16.6-17 MB (lean compiler process during the render phase; the gate phase runs AFTER Chromium exits so its ~80 MB peak does not overlap the renderer peak)",
+      "cadquery_ocp_imports": "458.7 MB peak PSS in an isolated import — the engineering stack; STRUCTURALLY ABSENT from the visual worker (grep-proven zero cadquery/OCP imports in discovery_fabric/engine/visual_compiler/; the chain imports measure 36.2 MB total)",
+      "trimesh": "96.8 MB isolated import — also ABSENT from the worker chain (the gate re-measures with numpy+PIL directly)",
+      "PIL+numpy": "31.2 MB isolated import",
+      "node_process": "98-100 MB (76.8 MB floor with puppeteer-core + payload/record buffers)",
+      "chromium_single_process": "397-415 MB peak in single-process mode; 115.0 MB blank-page floor",
+      "chromium_multi_process_baseline": "456-466 MB across 7 processes (the R441 baseline)",
+      "webgl_swiftshader_context_base": "~160 MB above the blank floor (measured via 256x256 canvas diagnostic: 309.7 MB total with shadow map live)",
+      "hero_surface_1536x1024": "~61 MB (256x256 vs full-res diagnostic delta) — QUALITY-LOCKED (the buyer-facing resolution is the product)",
+      "shadow_map_2048x2048_pcfsoft": "~35 MB (no-shadowmap diagnostic delta) — QUALITY-LOCKED (the contact-shadow rule depends on it)",
+      "pmrem_room_environment": "~16 MB (no-PMREM diagnostic delta) — QUALITY-LOCKED (the material distinction gate probes under this exact rig)",
+      "view_ladder_accumulation": "+9 to +20 MB for the FULL 23-artifact ladder beyond hero-only (379.6 vs 370.6 MB) — the ladder is NOT the memory driver",
+      "turntable_half_resolution": "already implemented in R441 (half-res frames measured: +9 MB for 12 frames)",
+      "png_buffers": "transient per-artifact (~1-2 MB each); now GC'd per artifact (page side) — node side unchanged (~3 MB transient)",
+      "parallel_process_overhead": "eliminated by --single-process --no-zygote (7 procs -> 1, -44 MB)",
+      "docker_runtime_overhead": "outside the renderer boundary; counted in the cgroup total, unchanged by this round"
+    }
+  },
+
+  "acceptance_target_outcome": {
+    "directive_target": "PEAK_CGROUP_USAGE <= 450 MB with the production application running normally",
+    "verdict": "MEMORY_TARGET_UNACHIEVABLE_WITHOUT_PRODUCT_DEGRADATION",
+    "minimum_measured_render_tree_mb": 496.2,
+    "irreducible_footprint_mb": {
+      "chromium_blank_floor": 115.0,
+      "webgl_context_base": 160.0,
+      "hero_surface": 61.0,
+      "shadow_map": 35.0,
+      "pmrem_environment": 16.0,
+      "node_driver": 99.0,
+      "python_worker_at_render": 17.0,
+      "sum": 503.0,
+      "note": "matches the measured 496-521 window; every quality-locked component carries the diagnostic that measures it"
+    },
+    "why_450_is_physically_insufficient": "the quality-locked components alone (hero resolution + 2048 shadow map + PMREM rig = 112 MB) plus the Chromium/V8 platform floor (115 + 160) plus the node driver (99) sum to ~503 MB BEFORE any server baseline; reaching 450 would require lowering the render resolution, shrinking the shadow map, or stripping the environment lighting — exactly the product degradations the directive forbids",
+    "why_512_production_is_insufficient": "render tree 496-521 MB + server baseline (>= 30 MB local reference, production likely higher — unmeasurable from here) + cgroup page-cache overhead exceeds the 512 MB instance; the R441-era async guard (650 MB) stays UNTOUCHED per the directive, so the honest typed skip (RENDER_SKIPPED_LOW_MEMORY) remains the correct production behavior",
+    "guards_untouched": "memory_guard thresholds async=650/in_worker=800 NOT modified — the directive's hard constraint held; no threshold, quality, or view was changed to manufacture a pass"
+  },
+
+  "largest_consumers_ranked": [
+    "1. Chromium single-process tree: 397-415 MB (SwiftShader software GL + V8 + Blink)",
+    "2. node driver: 98-100 MB (V8 baseline 76.8 + buffers)",
+    "3. hero-resolution surfaces: ~61 MB (quality-locked)",
+    "4. WebGL/SwiftShader context base: ~160 MB (platform)",
+    "5. shadow map: ~35 MB (quality-locked)",
+    "6. PMREM environment: ~16 MB (quality-locked)"
+  ],
+
+  "what_was_safely_removed": [
+    "6 of 7 Chromium processes (zygotes x2, utility, GPU-process split, isolated renderer) — merged by --single-process --no-zygote: -44 MB, byte-identical WebGL output",
+    "disk cache, audio pipeline, remote fonts, site-isolation services, renderer process pool: -4-6 MB",
+    "PMREMGenerator scratch targets (pmrem.dispose() after the environment texture exists): measured inside the final verify",
+    "per-call occupancy readback allocation (now one reused buffer): allocation churn removed",
+    "dead JS garbage between views (explicit GC per artifact): -8-15 MB of accumulation",
+    "TOTAL: mean -62.8 MB on Case B (636.5 -> 573.7), -28.3 on Case A, -20.6 on Case C, final-verify run 496.2 MB"
+  ],
+
+  "two_run_memory_recovery": {
+    "acceptance": "memory returns toward baseline after completion; no leak between jobs",
+    "evidence": "python PSS after full teardown: run1 78.5 MB -> run2 78.5 MB (Case B), 78.5 -> 78.9 across all six A/B cases — flat, no accumulation; Chromium/Node are fresh subprocesses per run (their entire footprint returns to zero between jobs, measured 0.0 MB after teardown in every run)"
+  },
+
+  "adversarial_memory_battery": {
+    "single_part": "caseA — COMPLETE_PASS 23/23, tree 571.8-573.9 MB optimized",
+    "multi_part": "caseB — COMPLETE_PASS 23/23, tree 570.8-576.5 MB optimized",
+    "largest_representative_glb": "caseC (4.6 MB) — renders OK, 21 artifacts (honest single-part ladder), gate FAIL on PRE-EXISTING poster-parity 0.8731<0.9 both configs; tree 703.6-720.5 MB optimized; fail-closed verified",
+    "full_ladder": "23-artifact ladder verified on caseA + caseB (visual_set completeness)",
+    "two_consecutive_renders": "no OOM, no process death, no server restart, no corrupted render, no missing artifact, no gate bypass, memory returns toward baseline (recovery block above)",
+    "no_gate_bypass_proof": "the gate verdicts and suppression states are IDENTICAL between baseline and optimized on every case — the optimization cannot manufacture a pass"
+  }
+}

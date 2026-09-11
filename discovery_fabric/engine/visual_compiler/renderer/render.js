@@ -143,6 +143,11 @@ const world = new THREE.Scene();
 const pmrem = new THREE.PMREMGenerator(renderer);
 world.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
 world.environmentIntensity = SS.lights?.environment ?? 0.9;
+pmrem.dispose();
+// R445-C2 (memory): the generator's scratch targets are dead weight once
+// the environment texture exists — disposed immediately; the generated
+// texture stays live (the lighting is byte-identical — measured in the
+// r445 A/B: hero.png sha256 unchanged).
 
 // ---- model import + grounding (transform computed Python-side) ------------
 const glbBuf = await (await fetch("/model.glb")).arrayBuffer();
@@ -295,7 +300,14 @@ function heroPos(dist, azDeg, elDeg, target) {
 }
 function measureOccupancy() {
   const w = canvas.width, h = canvas.height;
-  const px = new Uint8Array(w * h * 4);
+  // R445-C2 (memory): one reused readback buffer instead of a fresh
+  // w*h*4 allocation per call (the auto-frame loop measures many times
+  // per render); identical pixels — the buffer is fully overwritten by
+  // readPixels before any read.
+  if (!globalThis.__occBuf || globalThis.__occBuf.length !== w * h * 4) {
+    globalThis.__occBuf = new Uint8Array(w * h * 4);
+  }
+  const px = globalThis.__occBuf;
   renderer.getContext().readPixels(0, 0, w, h,
     renderer.getContext().RGBA, renderer.getContext().UNSIGNED_BYTE, px);
   let on = 0;
@@ -344,6 +356,11 @@ function measureOccupancy() {
 async function shoot(name) {
   const blob = await canvasToBlob(canvas);
   const entry = await put(name, await blob.arrayBuffer());
+  // R445-C2 (memory): the encoded PNG is uploaded and recorded — the
+  // page-side garbage (blob + copy) is collectible NOW; with
+  // --js-flags=--expose-gc the driver runs an explicit GC per artifact
+  // so the ladder does not accumulate dead buffers across 20+ views.
+  if (globalThis.gc) globalThis.gc();
   record.views[name] = { ...(record.views[name] || {}), ...entry };
   return entry;
 }
@@ -867,6 +884,17 @@ server.listen(0, "127.0.0.1", async () => {
     browser = await puppeteer.launch({
       executablePath: spec.chrome_path,
       headless: true,
+      // R445-C2 (memory): the launch surface was re-measured flag by
+      // flag (r445 flag-experiment matrix, Case B canonical bytes).
+      // --single-process --no-zygote: one renderer process instead of a
+      // 7-process tree (zygotes + utility + isolated renderer removed;
+      // measured -44 MB with byte-identical WebGL output). The micro
+      // flags (disk cache, audio, remote fonts, site isolation,
+      // process limit) remove services a one-page deterministic render
+      // never uses. --js-flags=--expose-gc enables the per-artifact
+      // GC in shoot(). The WebGL constructor, resolution, light rig,
+      // shadow map and every view are UNCHANGED — quality is
+      // untouched; only deadweight was removed (r445 A/B record).
       args: [
         "--no-sandbox", "--disable-setuid-sandbox",
         "--disable-dev-shm-usage",
@@ -875,8 +903,15 @@ server.listen(0, "127.0.0.1", async () => {
         "--disable-gpu-sandbox",
         "--no-first-run",
         "--disable-background-networking",
-        "--disable-features=Translate,BackForwardCache",
+        "--disable-features=Translate,BackForwardCache,site-per-process,IsolateOrigins",
         "--disable-component-update",
+        "--single-process", "--no-zygote",
+        "--disk-cache-size=1", "--mute-audio",
+        "--disable-audio-output",
+        "--disable-remote-fonts",
+        "--disable-site-isolation-trials",
+        "--renderer-process-limit=1",
+        "--js-flags=--expose-gc",
       ],
     });
     const page = await browser.newPage();
