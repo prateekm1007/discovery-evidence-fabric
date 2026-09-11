@@ -228,3 +228,26 @@ and reduced by deadweight removal only.
 New defect filed to the Coder 2 surface: poster parity fails on large
 high-detail models (caseC 0.8731 < 0.9, PRE-EXISTING — identical on
 baseline and optimized); fail-closed held (suppressed + blocked).
+
+## R446-C2 addendum (2026-09-11) — poster parity closed by presentation fix, the boundary made a regression
+
+Operator directive R446-C2 (visual closure, not renderer reinvention):
+the pre-existing poster-parity defect is fixed INSIDE the presentation
+boundary; the isolation proof became a standing regression; the typed
+skip and the 3D truth vocabulary are surfaced honestly in the webapp.
+
+| Change | Module | Notes |
+|---|---|---|
+| Poster parity fix | `visual_compiler/renderer/render.js` | MEASURED cause: the opaque paper underlay flattened the hero's soft alpha (posterRGB = heroRGB*a + paper*(1-a) verified pixel-exact; mean luma delta -149.75 over 2.62% of the frame — the 42%-opacity contact shadow; a 1024-wide resample was suspected first and FALSIFIED by the native-resolution replay, parity 0.8735 unchanged). Fix: the poster composes IMMEDIATELY after the hero shoot from the SAME canvas state at the hero's NATIVE resolution (1:1 blit), and the paper is painted ONLY in the bands outside the hero rect — the image area carries the hero's exact RGBA. Gate measurement: caseC 0.8731 FAIL -> 1.0 COMPLETE_PASS; caseA/B 0.9037 -> 1.0; threshold 0.90 UNTOUCHED; hero.png byte-identical; source GLB + scene_spec shas unchanged; every other artifact byte-identical (A/B vs the R445 optimized artifacts) |
+| Isolation regression | `tests/test_r446_visual_isolation.py` | the R445 proof (worker != CadQuery/OCCT) is now mechanical: AST scan (no engineering imports), fresh-interpreter sys.modules probe, import-footprint class bound (chain 36.2 MB vs stack 458.7 MB measured R445; bound 150 MB), node-subprocess boundary; attack-proven (an injected `import cadquery` fails the battery) |
+| Typed skip surfaced | `TOSCANINI_UI/webapp/components/DossierSections.tsx` | the dossier now shows the typed render state when the hero is honestly absent: RENDER_SKIPPED_LOW_MEMORY reads verbatim "Engineering geometry available; visual rendering unavailable at current deployment capacity." — never "rendering failed", never "visualization complete" |
+| 3D truth badge | `TOSCANINI_UI/webapp/components/TechStage.tsx` | the gate badge now treats the canonical COMPLETE_PASS as a pass (it displayed the failing style on every post-R443 certified render); the existing vocabulary already separates engineering geometry / computational render / physical validation ("renders never validate physics") |
+
+Battery: r441+r443+r444+r446 = 83 passed (five live adversarial attacks
+included); r443_audit_fixes + r419_product_surface 32; render-era 82
+passed / 6 pre-existing (pristine-identical via git stash); english-only
+5 passed; production `next build` green. Memory A/B (same sandbox, R445
+vs R446 render.js): caseB within run variance, caseC peak LOWER
+(composing early avoids the late-ladder accumulation spike); two-run
+teardown flat at 46.7 MB x3. Production visuals remain blocked ONLY by
+the owner capacity decision (Art. LXV escalation 5 stands).

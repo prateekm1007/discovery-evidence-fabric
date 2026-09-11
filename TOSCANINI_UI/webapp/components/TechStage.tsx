@@ -278,7 +278,11 @@ export default function TechStage({
   const gateVerdict = (renders?.visual_gate as
     | { verdict?: string }
     | undefined)?.verdict;
-  const gateOk = gateVerdict === "PASS";
+  // R446-C2 WS4: the canonical release-passing verdict is COMPLETE_PASS
+  // (R443 visual-set completeness); legacy PASS remains valid while
+  // pre-R443 trees exist. Treating COMPLETE_PASS as a failure badge
+  // understated backend truth on every post-R443 certified render.
+  const gateOk = gateVerdict === "PASS" || gateVerdict === "COMPLETE_PASS";
   const modelKind: "engineering" | "conceptual" | undefined =
     design?.fallback_basis
       ? "conceptual"

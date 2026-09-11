@@ -474,6 +474,92 @@ record.views["hero.png"] = { occupancy: heroMeasure,
   auto_frame_trail: heroFrame.trail };
 if (VIEWS.hero !== false) await shoot("hero.png");
 
+// ---- poster (the hero render embedded 1:1 — parity by construction) --------
+// R446-C2: composed IMMEDIATELY after the hero shoot, from the SAME
+// canvas state that produced hero.png, at the hero's NATIVE resolution.
+// The R445 stress case measured parity 0.8731 < 0.90 (fail-closed,
+// PRE-EXISTING since R441); the R446 diagnostic measured the cause:
+// the opaque paper UNDERLAY flattened the hero's soft alpha. hero.png
+// keeps unpremultiplied semi-transparent pixels (the 42%-opacity
+// contact shadow, anti-aliased edges), but ANY opaque paper layer
+// under the image area — painted before OR after the blit; the two
+// orders are the same premultiplied result, verified pixel-exact —
+// bakes paper into those pixels (posterRGB = heroRGB*a + paper*(1-a),
+// mean luma delta -149.75 over 2.62% of the frame) and turns the
+// fully-transparent background opaque paper (luma 0.966 vs the gate's
+// 1.0 mapping). The fix: the image area carries the hero's pixels
+// EXACTLY (transparency included) and the paper is painted ONLY in
+// the bands outside the hero rect. The gate maps alpha<0.2 to the same
+// paper value on BOTH sides, so parity is exact — as this block always
+// claimed; the verifier and its threshold were never touched.
+if (VIEWS.poster !== false) {
+  // an explicit payload.poster.width is honored (recorded honestly as
+  // a resampled embed), but the shipped default is the hero's own
+  // resolution: a non-native width re-introduces the resample the
+  // parity gate measures, and the gate — not this comment — decides
+  const pw = payload.poster?.width || RES[0];
+  const k = pw / 1024;                        // layout scale (R441 = 1024)
+  const ph = payload.poster?.height || Math.round(pw * 1448 / 1024);
+  const bandH = Math.round(ph * 0.085);
+  // image area: the hero render at its OWN aspect, NATIVE size,
+  // centered vertically — at the default width imgH == RES[1] and the
+  // drawImage is a 1:1 blit (no resampling anywhere in the chain)
+  const imgH = Math.round(pw / (RES[0] / RES[1]));
+  const imgY = bandH + Math.max(0, Math.round((ph - 2 * bandH - imgH) / 2));
+  const poster = document.createElement("canvas");
+  poster.width = pw; poster.height = ph;
+  const c = poster.getContext("2d");
+  // 1:1 blit onto the TRANSPARENT canvas — every pixel inside the hero
+  // rect keeps its exact RGBA (opaque model, soft shadow, transparent
+  // background), the byte-faithful reference the gate re-measures
+  c.drawImage(canvas, 0, imgY, pw, imgH);
+  // paper ONLY where the hero is not: the bands above and below the
+  // image area (destination-over, so the blitted pixels are untouchable)
+  c.globalCompositeOperation = "destination-over";
+  c.fillStyle = "#f6f6f8";
+  c.fillRect(0, 0, pw, imgY);
+  c.fillRect(0, imgY + imgH, pw, ph - imgY - imgH);
+  c.globalCompositeOperation = "source-over";
+  const meta = payload.poster || {};
+  c.fillStyle = "#15171c";
+  c.font = "700 " + Math.round(44 * k) + "px system-ui, sans-serif";
+  c.textBaseline = "middle";
+  c.textAlign = "left";
+  c.fillText(String(meta.title || "Technology artifact").slice(0, 46),
+             Math.round(54 * k), bandH * 0.52);
+  c.fillStyle = "#5a6070";
+  c.font = "400 " + Math.round(26 * k) + "px system-ui, sans-serif";
+  c.fillText(String(meta.subtitle || "").slice(0, 90),
+             Math.round(54 * k), bandH * 1.32);
+  c.fillText(String(meta.date || ""), Math.round(54 * k),
+    ph - bandH * 0.55);
+  c.fillStyle = "#9aa1b0";
+  c.font = "400 " + Math.round(22 * k) + "px system-ui, sans-serif";
+  c.textAlign = "right";
+  c.fillText("Toscanini Visual Compiler", pw - Math.round(54 * k),
+    ph - bandH * 0.55);
+  c.strokeStyle = "#15171c"; c.lineWidth = 3 * k;
+  c.beginPath(); c.moveTo(Math.round(54 * k), bandH * 0.78);
+  c.lineTo(pw - Math.round(54 * k), bandH * 0.78);
+  c.stroke();
+  const blob = await canvasToBlob(poster);
+  record.views["poster.png"] = await put("poster.png",
+    await blob.arrayBuffer());
+  // the exact rect the hero render occupies — the gate crops HERE
+  record.poster_image_rect = { x: 0, y: imgY, w: pw, h: imgH };
+  record.poster_embed = {
+    source: "hero_canvas_state",
+    width: pw, height: ph,
+    resampled: pw !== RES[0] || imgH !== RES[1],
+    image_area_alpha: "preserved (paper bands only — the hero rect "
+      + "carries the hero's exact RGBA, soft shadow included)",
+  };
+  // R445-C2 memory hygiene continued: the native-resolution 2D surface
+  // (~13 MB at 1536-wide) is dead weight the moment its PNG is uploaded
+  poster.width = 0; poster.height = 0;
+  if (globalThis.gc) globalThis.gc();
+}
+
 // ---- turntable -------------------------------------------------------------
 // the turntable serves the website gallery at half resolution — twelve
 // full-size SwiftShader color buffers were the single largest memory
@@ -648,46 +734,9 @@ if (VIEWS.dimension !== false) {
   })();
 }
 
-// ---- poster (the hero render embedded 1:1 — parity by construction) --------
-if (VIEWS.poster !== false) {
-  const pw = payload.poster?.width || 1024;
-  const ph = payload.poster?.height || 1448;
-  const bandH = Math.round(ph * 0.085);
-  // image area: the hero render at its OWN aspect, fitted to the
-  // poster width and centered vertically (no re-render at a different
-  // aspect — the poster shows THE hero render, so the gate's parity
-  // check is exact, not statistical)
-  const imgH = Math.round(pw / (RES[0] / RES[1]));
-  const imgY = bandH + Math.max(0, Math.round((ph - 2 * bandH - imgH) / 2));
-  const poster = document.createElement("canvas");
-  poster.width = pw; poster.height = ph;
-  const c = poster.getContext("2d");
-  c.fillStyle = "#f6f6f8"; c.fillRect(0, 0, pw, ph);
-  c.drawImage(canvas, 0, imgY, pw, imgH);
-  const meta = payload.poster || {};
-  c.fillStyle = "#15171c";
-  c.font = "700 44px system-ui, sans-serif";
-  c.textBaseline = "middle";
-  c.textAlign = "left";
-  c.fillText(String(meta.title || "Technology artifact").slice(0, 46),
-             54, bandH * 0.52);
-  c.fillStyle = "#5a6070";
-  c.font = "400 26px system-ui, sans-serif";
-  c.fillText(String(meta.subtitle || "").slice(0, 90), 54, bandH * 1.32);
-  c.fillText(String(meta.date || ""), 54, ph - bandH * 0.55);
-  c.fillStyle = "#9aa1b0";
-  c.font = "400 22px system-ui, sans-serif";
-  c.textAlign = "right";
-  c.fillText("Toscanini Visual Compiler", pw - 54, ph - bandH * 0.55);
-  c.strokeStyle = "#15171c"; c.lineWidth = 3;
-  c.beginPath(); c.moveTo(54, bandH * 0.78); c.lineTo(pw - 54, bandH * 0.78);
-  c.stroke();
-  const blob = await canvasToBlob(poster);
-  record.views["poster.png"] = await put("poster.png",
-    await blob.arrayBuffer());
-  // the exact rect the hero render occupies — the gate crops HERE
-  record.poster_image_rect = { x: 0, y: imgY, w: pw, h: imgH };
-}
+// ---- poster: composed RIGHT AFTER the hero shoot (R446-C2, above) —
+// the canvas is re-rendered for the dimension view AFTER the poster has
+// captured the hero state; the poster no longer depends on view order.
 
 // ---- hero.glb (grounded + materialized; SAME vertices — verified) ----------
 if (VIEWS.export_hero_glb !== false) {

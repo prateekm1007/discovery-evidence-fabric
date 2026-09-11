@@ -30,6 +30,39 @@ import type {
 } from "@/lib/types";
 import { EpistemicBadge } from "./ScienceEvents";
 
+// ---- render availability (R446-C2 WS3) --------------------------------------
+// The typed render status is ALWAYS surfaced: a skipped or suppressed
+// visual stage is honest absence — never a silent gap, never re-labeled
+// as an engineering failure ("rendering failed"), and never inflated
+// into success ("visualization complete"). The authoritative engineering
+// geometry on stage is unaffected either way; these sentences state
+// exactly what exists and why the images do not.
+export function renderAvailabilityNotice(r: {
+  status?: string;
+  visual_gate?: { verdict?: string; hero_suppressed?: boolean };
+}): string {
+  const status = String(r.status ?? "");
+  if (status === "RENDER_SKIPPED_LOW_MEMORY") {
+    // the typed 512 MB capacity skip — the exact state, verbatim
+    return "Engineering geometry available; visual rendering unavailable "
+      + "at current deployment capacity.";
+  }
+  if (status.startsWith("RENDER_SKIPPED")) {
+    return "Engineering geometry available; visual rendering unavailable "
+      + "in this deployment (renderer infrastructure unavailable).";
+  }
+  if (r.visual_gate?.hero_suppressed
+      || (r.visual_gate?.verdict != null
+          && r.visual_gate.verdict !== "COMPLETE_PASS"
+          && r.visual_gate.verdict !== "PASS")) {
+    return "Engineering geometry available; presentation renders are "
+      + "withheld — the visual quality gate did not certify them "
+      + "(fail-closed).";
+  }
+  return "Engineering geometry available; visual rendering unavailable "
+    + "on this run (" + status + ").";
+}
+
 // ---- shared types (migrated from the retired DossierPane) ------------------
 
 type ScoreDim = {
@@ -71,6 +104,7 @@ export type DesignTabData = DossierTab & {
   key_dimensions?: unknown;
   components?: (string | { name?: string; role?: string; type?: string })[];
   renders?: {
+    status?: string;
     hero_png?: string;
     section_png?: string;
     exploded_png?: string;
@@ -615,6 +649,15 @@ export function ModelDetailsSection({
           <div className="faint" style={{ fontSize: 12 }}>
             presentation renders — the authoritative geometry is the
             CAD-built model on stage; renders never validate physics
+          </div>
+        </div>
+      )}
+
+      {!d.renders?.hero_png && d.renders?.status != null && (
+        <div className="ov-block" data-render-absent>
+          <h4>Presentation renders</h4>
+          <div className="faint" style={{ fontSize: 13 }}>
+            {renderAvailabilityNotice(d.renders)}
           </div>
         </div>
       )}
