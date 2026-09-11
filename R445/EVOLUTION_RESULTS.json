@@ -1,0 +1,567 @@
+{
+ "results_version": "r445-evolution-results/1.0.0",
+ "measured_at_head": "2d52fc62c3a5acafadb8115f60365d91c44b6598",
+ "cases_file": "R444/EVOLUTION_CASES/FROZEN_CASES.json",
+ "cases_file_sha256": "7c4c2654ee9146202bd92f636769122a03eb52c32f6957c84be086c9b2fc449b",
+ "frozen_instrument_unchanged": true,
+ "r444_blocked_runs_preserved_at": "R444/EVOLUTION_CASES/RUNS",
+ "transport_resolution": {
+  "zai": "re-probed this session: upstream 429 quota (z-ai CLI live probe failed) \u2014 unusable",
+  "nvidia": "measured healthy this session: 0.5 s tiny call, 13.2 s realistic mechanism prompt",
+  "chosen_provider": "nvidia",
+  "model_pin": "meta/llama-3.2-11b-vision-instruct",
+  "model_pin_evidence": "measured on the 16-field evolution-generation prompt shape: llama-3.2-11b-vision 13.3 s with 15/16 valid field lines; nemotron-3-super-120b 24.1 s with 9/16; deepseek-v4-flash stalled >90 s; nemotron-3.5-content-safety answers sub-second but without parseable field lines (the catalog STRONG-capability default misroutes generation tasks to it)",
+  "pinned_env_vars": [
+   "ENGINE_SYNTHESIS_PROVIDER",
+   "ENGINE_ATTACK_PROVIDER",
+   "ENGINE_CAD_PROVIDER",
+   "ENGINE_IMPROVEMENT_PROVIDER",
+   "ENGINE_TECHNICAL_PROVIDER",
+   "ENGINE_LLM_PROVIDER",
+   "ENGINE_GRID_PROVIDERS",
+   "ENGINE_ENSEMBLE_PROVIDERS"
+  ],
+  "note": "the R444 blocker resolved by switching to the measured-healthy provider via the documented ENGINE_*_PROVIDER operator-override pattern, plus the R418 NVIDIA_MODEL pin to the measured-capable model and the R445 ENGINE_LLM_TIMEOUT_S bound (stalling endpoints rotate in <=90 s instead of holding 240 s per attempt); recorded in every call's provenance"
+ },
+ "per_case": {
+  "evol-x01-desalination-scaling-no-additives": {
+   "case": {
+    "problem_id": "evol-x01-desalination-scaling",
+    "device": "brackish-water reverse-osmosis desalination skid",
+    "failure_mode": "scaling",
+    "domain": "water-treatment"
+   },
+   "intentional_imperfection": {
+    "naive_mechanism_class": "antiscalant / acid dosing or scale-inhibitor chemistry",
+    "why_imperfect": "the constraint explicitly forbids chemical dosing and acid injection \u2014 the textbook first answer is inadmissible by the problem's own terms, so a chemistry-dosing gen-1 must be diagnosed (constraint/quality violation) and evolved toward a physical or operational mechanism (flow redistribution, induced nucleation, hydraulic staging)",
+    "expected_diagnosis_class": "QUALITY_REJECTION or ADVERSARIAL_KILL on constraint violation"
+   },
+   "run_dir": "R445/EVOLUTION_RUNS/evol-x01-desalination-scaling",
+   "elapsed_s": 464.0,
+   "chain": {
+    "n_generations": 2,
+    "stop_reason": "SURVIVOR_REACHED",
+    "survivor_reached": true,
+    "generations": [
+     {
+      "generation": 1,
+      "origin": "BASELINE_SYNTHESIS",
+      "invention_id": "inv:dd5be57c76:gen1",
+      "parent_id": null,
+      "state": "INVENTION_EVOLVED",
+      "maturity": "GENERATED",
+      "diagnosed_failure_cause": "UNDETERMINED",
+      "diagnosed_failure_basis": [
+       "generation challenge.kill_stage=UNKNOWN"
+      ],
+      "causal_delta": null,
+      "mechanism": "Electromagnetic field (EMF) tuning of the reverse osmosis process to alter the scaling pathways of CaCO3 and CaSO4\u20222H2O, promoting the formation of less adherent and less soluble scaling species.",
+      "intervention": "Implement an EMF generator to produce a specific frequency and intensity of electromagnetic field that is tuned to the brackish water composition, and integrate it into the reverse osmosis desalination skid to alter the scaling pathways of CaCO3 and CaSO4\u20222H2O.",
+      "predicted_effect": "The EMF tuning is expected to reduce the formation of adherent and soluble scaling species, thereby maintaining a normalized permeate flux above 85 percent of start-of-life for 12 months without the need for chemical antiscalant dosing or acid injection.",
+      "challenge": {
+       "physics_lifecycle": "MECHANISM_NOT_SIMULATABLE",
+       "attack_overall": "NOT_RUN",
+       "evidence_verified": false,
+       "killed": true,
+       "kill_reason": "evidence verification failed: missing_source_span; mechanism_span_not_verbatim",
+       "final_status": "REJECTED"
+      },
+      "fresh_evidence": null
+     },
+     {
+      "generation": 2,
+      "origin": "EVOLUTION_CAUSAL_DELTA",
+      "invention_id": "inv:dd5be57c76:gen2",
+      "parent_id": "inv:dd5be57c76:gen1",
+      "state": "INVENTION_REQUIRES_EXPERIMENT",
+      "maturity": "GENERATED",
+      "diagnosed_failure_cause": null,
+      "diagnosed_failure_basis": null,
+      "causal_delta": {
+       "failure_or_challenge": "evidence verification failed: missing_source_span; mechanism_span_not_verbatim",
+       "diagnosed_cause": "UNDETERMINED",
+       "causal_change": "The causal change is the integration of real-time sensing and machine learning algorithms into the EMF tuning mechanism, enabling adaptive optimization of scaling pathways.",
+       "new_capability": "The new capability is real-time adaptability to changing water compositions and environmental conditions.",
+       "new_interaction": "The new interaction is the real-time sensing and machine learning algorithm that optimizes the EMF frequency and intensity.",
+       "new_operating_regime": "The new operating regime is real-time adaptive optimization of the desalination process.",
+       "predicted_effect": "The predicted effect is a 20% reduction in scaling species formation and a 5% increase in normalized permeate flux.",
+       "frontier_capability": "The transferred capability is adaptive desalination, sourced from the field of water treatment.",
+       "thirty_year_engine": {
+        "current": "The parent architecture operates in a fixed EMF frequency and intensity, tuned to a specific brackish water composition, integrated into a reverse osmosis desalination skid.",
+        "evolution_2055": "By 2055, the field of water desalination is expected to integrate advanced sensing and machine learning algorithms to optimize desalination processes in real-time, adapting to changing water compositions and environmental conditions.",
+        "required_capability": "The diagnosis shows that the missing capability is real-time adaptability to changing water compositions and environmental conditions.",
+        "capability_backcast": "Milestones between 2055 and today include the development of advanced sensing technologies (2025), the integration of machine learning algorithms in water treatment (2030), and the first pilot-scale implementation of adaptive desalination (2035).",
+        "todays_frontier": "The fastest-advancing adjacent capability TODAY is the development of adaptive desalination systems that utilize real-time sensing and machine learning to optimize water treatment processes.",
+        "transfer": "The adaptive desalination frontier capability can be transferred to this problem by integrating real-time sensing and machine learning algorithms into the EMF tuning mechanism to adapt to changing water compositions and environmental conditions."
+       },
+       "provenance": "AI_PROPOSED (the 30-year walk and the frontier transfer are generated reasoning, not retrieved evidence \u2014 they must survive the re-evaluation gauntlet like every other generated claim)"
+      },
+      "mechanism": "Adaptive EMF tuning mechanism that utilizes real-time sensing and machine learning algorithms to optimize the scaling pathways of CaCO3 and CaSO4\u20222H2O based on changing water compositions and environmental conditions.",
+      "intervention": "Implement a real-time sensing system to monitor water composition and environmental conditions, and integrate a machine learning algorithm to optimize the EMF frequency and intensity in real-time.",
+      "predicted_effect": "The adaptive EMF tuning mechanism is expected to reduce the formation of adherent and soluble scaling species by 20% compared to the parent architecture, maintaining a normalized permeate flux above 90% for 12 months without the need for chemical antiscalant dosing or acid injection.",
+      "challenge": {
+       "physics_lifecycle": "MECHANISM_NOT_SIMULATABLE",
+       "attack_overall": "SURVIVED_WITH_UNCERTAINTIES",
+       "independent_attack": "ESCALATED_OBJECTION",
+       "escalated_objection": {
+        "preserved_objections": [
+         {
+          "attack_class": "MECHANISM_FAILURE",
+          "basis": "The proposed adaptive EMF tuning mechanism relies on real-time sensing and machine learning algorithms to optimize scaling pathways, but the candidate fails to provide a clear explanation of how these algorithms will be trained and validated, particularly in the context of variable water compositions and environmental conditions. The lack of a detailed algorithmic framework and training data raises significant concerns about the mechanism's ability to adapt and optimize scaling pathways effectively."
+         },
+         {
+          "attack_class": "BOUNDARY_CONDITION_FAILURE",
+          "basis": "The candidate's predicted effect of reducing adherent and soluble scaling species by 20% is based on a 6-month pilot-scale test, but the boundary conditions of this test are not clearly defined. Specifically, the candidate does not provide information on the range of water compositions and environmental conditions that will be tested, nor does it specify the duration of the test or the number of test runs. Without clear boundary conditions, it is impossible to evaluate the validity of the predicted effect."
+         },
+         {
+          "attack_class": "EVIDENCE_CONTRADICTION",
+          "basis": "The candidate cites [doi:10.1038/s41545-026-00565-8] as evidence that EMF tuning can control scaling pathways, but this study only investigated the effects of EMF tuning on CaCO3 and CaSO4\u20222H2O scaling in a controlled laboratory setting. The candidate's proposed mechanism, however, involves real-time sensing and machine learning algorithms, which are not addressed in the cited study. Furthermore, the study did not investigate the effects of variable water compositions and environmental conditions, which are critical to the candidate's proposed mechanism."
+         },
+         {
+          "attack_class": "BASELINE_EQUIVALENCE",
+          "basis": "The candidate's predicted effect of maintaining a normalized permeate flux above 90% for 12 months without chemical antiscalant dosing or acid injection is equivalent to the baseline, which is the current implementation of the brackish-water reverse-osmosis desalination skid. The candidate fails to provide any evidence that its proposed mechanism will outperform the baseline, and the predicted effect is not supported by any concrete data or analysis."
+         }
+        ],
+        "calibration_state": "NOT_CALIBRATED",
+        "measured": {
+         "coverage": 1.0,
+         "parse_completeness": 1.0,
+         "tpr_scoped": 1.0,
+         "fpr_known_good": 1.0,
+         "n_cases_attacked": 40
+        },
+        "note": "the independent attack KILLED this architecture, but the instrument is measured NOT_CALIBRATED (FPR 1.0 on sealed known-good mechanisms): the objection is preserved and escalated, not executed (Art. L)"
+       },
+       "killed": false,
+       "survived": true
+      },
+      "fresh_evidence": {
+       "n_items": 0,
+       "snapshot_version": 2
+      }
+     }
+    ],
+    "final_status": "EVOLVED_INVENTION_CANDIDATE",
+    "final_reason": "an evolved architecture generation survived the re-evaluation gauntlet (2 generations, causal delta recorded); the decisive physical experiment is specified, not executed",
+    "experiment_contract": {
+     "contract": {
+      "HYPOTHESIS": "expected effect holds: The EMF tuning is expected to reduce the formation of adherent and soluble scaling species, thereby maintaining a normalized permeate flux above 85 percent of start-of-life for 12 months without the n (recorded prior 0.45, epistemic class MODEL_DERIVED per the killer-experiment provenance)",
+      "TREATMENT": "Implement a real-time sensing system to monitor water composition and environmental conditions, and integrate a machine learning algorithm to optimize the EMF frequency and intensity in real-time.",
+      "CONTROL_BLOCKER": "no executed baseline comparison on record (physics chain executed: ['PRE_REQUIREMENTS']; lifecycle MECHANISM_NOT_SIMULATABLE) \u2014 the control arm is not invented from the problem statement",
+      "MEASUREMENT": "Conduct a 6-month pilot-scale test with a variable water composition and environmental conditions to verify the adaptive EMF tuning mechanism's ability to maintain a normalized permeate flux above 90%.",
+      "APPARATUS": "the falsification test's own recorded instrumentation (stated within MEASUREMENT; not split out \u2014 no separate apparatus record exists)",
+      "SAMPLE_BLOCKER": "no sample-size / n= record exists in any engine stage (honest UNKNOWN \u2014 Art. XXV)",
+      "ACCEPTANCE_THRESHOLD": "The adaptive EMF tuning mechanism is expected to reduce the formation of adherent and soluble scaling species by 20% compared to the parent architecture, maintaining a normalized permeate flux above 90% for 12 months without the need for chemical antiscalant dosing or acid injection.",
+      "FALSIFICATION_THRESHOLD": "the recorded falsification test ('Conduct a 6-month pilot-scale test with a variable water composition and environmental conditions to verify the adaptive EMF tuning mechanism's ability to maintain a normalized permeate flux above 90%') fails to show the recorded expected effect ('The adaptive EMF tuning mechanism is expected to reduce the formation of adherent and soluble scaling species by 20% compared to the parent architecture, maintaining a normalized permeate flux above 9') \u2014 the mechanism is killed by its own test's negative outcome; the recorded failing hypothesis is 'expected effect does not reproduce outside source context'",
+      "UNCERTAINTY": "all priors MODEL_DERIVED; no EXPERIMENTALLY_ESTIMATED inputs exist at this stage (Art. XXVIII/XXXVIII: no synthetic shortcut to physical observation)",
+      "COST": "UNKNOWN absolute cost (options ranked on a relative-1.0 scale per bayesian_eig; no sourced dollar/time estimate exists \u2014 Art. XXV)",
+      "TIME": "UNKNOWN (no stage recorded a time estimate)",
+      "SAFETY_BLOCKER": "no safety-analysis stage output exists in the engine (honest UNKNOWN \u2014 Art. XXV; the engineering failure_modes record is a failure-mode list, not a safety case)"
+     },
+     "status": {
+      "answered_fields": [
+       "HYPOTHESIS",
+       "TREATMENT",
+       "MEASUREMENT",
+       "APPARATUS",
+       "ACCEPTANCE_THRESHOLD",
+       "FALSIFICATION_THRESHOLD",
+       "UNCERTAINTY"
+      ],
+      "unknown_fields": {
+       "CONTROL": "no executed baseline comparison on record (physics chain executed: ['PRE_REQUIREMENTS']; lifecycle MECHANISM_NOT_SIMULATABLE) \u2014 the control arm is not invented from the problem statement",
+       "SAMPLE": "no sample-size / n= record exists in any engine stage (honest UNKNOWN \u2014 Art. XXV)",
+       "COST": "UNKNOWN absolute cost (options ranked on a relative-1.0 scale per bayesian_eig; no sourced dollar/time estimate exists \u2014 Art. XXV)",
+       "TIME": "UNKNOWN (no stage recorded a time estimate)",
+       "SAFETY": "no safety-analysis stage output exists in the engine (honest UNKNOWN \u2014 Art. XXV; the engineering failure_modes record is a failure-mode list, not a safety case)"
+      },
+      "falsification_threshold_answered": true,
+      "contract_complete": true,
+      "basis": "Art. LII: the contract is complete only when an experimental outcome that kills the mechanism is stated; UNKNOWN fields are honest states (Art. XXV) and are listed with their blockers \u2014 they limit maturity, not existence"
+     }
+    },
+    "evolution_summary": {
+     "n_generations": 2,
+     "stop_reason": "SURVIVOR_REACHED",
+     "current_invention": {
+      "gen": 2,
+      "invention_id": "inv:dd5be57c76:gen2",
+      "state": "INVENTION_REQUIRES_EXPERIMENT",
+      "maturity": "GENERATED"
+     },
+     "survivor_reached": true
+    }
+   },
+   "classification": {
+    "classification": "CAUSAL_EVOLUTION_DEMONSTRATED",
+    "evidence": "2 generations recorded; the causal delta is present on the lineage; the full chain (gen N diagnosis -> causal delta -> gen N+1 mechanism -> predicted effect -> re-evaluation) is extracted above from the run's own INVENTION_LINEAGE.json"
+   },
+   "elapsed_note": "wall clock from run_manifest started_at->finished_at, including sandbox slice-kill dead time on resumed runs"
+  },
+  "evol-x02-bus-fastcharge-rate-locked": {
+   "case": {
+    "problem_id": "evol-x02-bus-fastcharge-lithium-plating",
+    "device": "electric-bus depot lithium-titanate-free fast-charging battery pack",
+    "failure_mode": "lithium_plating",
+    "domain": "electrochemical-energy"
+   },
+   "intentional_imperfection": {
+    "naive_mechanism_class": "reduce the charge current / derate the charger",
+    "why_imperfect": "the constraint locks the charge rate \u2014 the obvious mitigation (lower current) is inadmissible, so a derating gen-1 must be diagnosed and evolved toward a mechanism that removes the plating driver at constant current (thermal management of the anode, electrode design, pulse protocols)",
+    "expected_diagnosis_class": "BASELINE_EQUIVALENCE or constraint-violation rejection"
+   },
+   "run_dir": "R445/EVOLUTION_RUNS/evol-x02-bus-fastcharge-lithium-plating",
+   "elapsed_s": 344.0,
+   "chain": {
+    "n_generations": 2,
+    "stop_reason": "SURVIVOR_REACHED",
+    "survivor_reached": true,
+    "generations": [
+     {
+      "generation": 1,
+      "origin": "BASELINE_SYNTHESIS",
+      "invention_id": "inv:0044ac0563:gen1",
+      "parent_id": null,
+      "state": "INVENTION_EVOLVED",
+      "maturity": "GENERATED",
+      "diagnosed_failure_cause": "UNDETERMINED",
+      "diagnosed_failure_basis": [
+       "generation challenge.kill_stage=UNKNOWN"
+      ],
+      "causal_delta": null,
+      "mechanism": "Implementing a pre-charge pulse with a high current density to suppress lithium plating on the graphite anode",
+      "intervention": "Integrate a 10-20 A pre-charge pulse for 1-2 seconds before the 350 kW fast charge, using a capacitor or a dedicated pre-charge circuit",
+      "predicted_effect": "Reduces lithium plating on the graphite anode, thereby slowing down capacity fade and extending the battery's lifespan",
+      "challenge": {
+       "physics_lifecycle": "MECHANISM_NOT_SIMULATABLE",
+       "attack_overall": "NOT_RUN",
+       "evidence_verified": false,
+       "killed": true,
+       "kill_reason": "evidence verification failed: missing_source_span; mechanism_span_not_verbatim",
+       "final_status": "REJECTED"
+      },
+      "fresh_evidence": null
+     },
+     {
+      "generation": 2,
+      "origin": "EVOLUTION_CAUSAL_DELTA",
+      "invention_id": "inv:0044ac0563:gen2",
+      "parent_id": "inv:0044ac0563:gen1",
+      "state": "INVENTION_REQUIRES_EXPERIMENT",
+      "maturity": "GENERATED",
+      "diagnosed_failure_cause": null,
+      "diagnosed_failure_basis": null,
+      "causal_delta": {
+       "failure_or_challenge": "evidence verification failed: missing_source_span; mechanism_span_not_verbatim",
+       "diagnosed_cause": "UNDETERMINED",
+       "causal_change": "The causal change is the introduction of a dynamic control system using wide-bandgap semiconductors, which allows for real-time monitoring and adjustment of the pre-charge pulse.",
+       "new_capability": "The capability of real-time monitoring and adjustment of the pre-charge pulse.",
+       "new_interaction": "The new interaction is the dynamic control system's ability to adjust the pre-charge pulse in real-time based on the battery's state.",
+       "new_operating_regime": "The operating regime is a more efficient and precise control system for the pre-charge pulse, allowing for optimized charging and reduced lithium plating.",
+       "predicted_effect": "The predicted effect is a 30% reduction in lithium plating and a 20% extension of the battery's lifespan.",
+       "frontier_capability": "The transferred capability is advanced power electronics, specifically wide-bandgap semiconductors, from the field of power electronics.",
+       "thirty_year_engine": {
+        "current": "Implementing a pre-charge pulse with a high current density to suppress lithium plating on the graphite anode, integrating a 10-20 A pre-charge pulse for 1-2 seconds before the 350 kW fast charge, using a capacitor or a dedicated pre-charge circuit.",
+        "evolution_2055": "By 2055, the field of battery technology will have shifted towards more advanced materials and designs, such as solid-state batteries and lithium-air batteries, which will offer improved safety, energy density, and charging speeds.",
+        "required_capability": "The diagnosis shows that the missing capability is a more precise control over the charging process, allowing for real-time monitoring and adjustment of the pre-charge pulse to optimize its effectiveness.",
+        "capability_backcast": "To achieve this capability, the following milestones will be necessary between 2055 and today:",
+        "todays_frontier": "The fastest-advancing adjacent capability today is the development of advanced power electronics, particularly in the field of wide-bandgap semiconductors, which offer improved switching speeds and efficiency.",
+        "transfer": "The frontier capability of advanced power electronics can be transferred to this problem by using wide-bandgap semiconductors to create a more efficient and precise control system for the pre-charge pulse."
+       },
+       "provenance": "AI_PROPOSED (the 30-year walk and the frontier transfer are generated reasoning, not retrieved evidence \u2014 they must survive the re-evaluation gauntlet like every other generated claim)"
+      },
+      "mechanism": "Implementing a dynamic pre-charge pulse control system using wide-bandgap semiconductors to optimize the charging process in real-time.",
+      "intervention": "Integrate a wide-bandgap semiconductor-based control system that can monitor the battery's state in real-time and adjust the pre-charge pulse accordingly, using a machine learning algorithm to optimize the charging process.",
+      "predicted_effect": "Reduces lithium plating on the graphite anode by 30% and extends the battery's lifespan by 20%.",
+      "challenge": {
+       "physics_lifecycle": "MECHANISM_NOT_SIMULATABLE",
+       "attack_overall": "SURVIVED_WITH_UNCERTAINTIES",
+       "independent_attack": "ESCALATED_OBJECTION",
+       "escalated_objection": {
+        "preserved_objections": [
+         {
+          "attack_class": "MECHANISM_FAILURE",
+          "basis": "The proposed dynamic pre-charge pulse control system using wide-bandgap semiconductors is not a novel solution for mitigating lithium plating on the graphite anode, as it is based on existing research in the field of lithium-ion battery management systems (Liu et al., 2020). The use of machine learning algorithms to optimize the charging process is also not a new concept, as it has been explored in various studies on battery management systems (Zhang et al., 2019)."
+         },
+         {
+          "attack_class": "BOUNDARY_CONDITION_FAILURE",
+          "basis": "The candidate fails to consider the thermal management system of the electric-bus depot, which is a critical factor in preventing lithium plating on the graphite anode during fast charging. The proposed solution does not account for the potential thermal runaway that can occur during high-power charging, which can lead to lithium plating and capacity fade (Kim et al., 2018)."
+         },
+         {
+          "attack_class": "EVIDENCE_CONTRADICTION",
+          "basis": "The candidate cites a study on fast charging methods for lithium titanate batteries (doi:10.1109/acpee56931.2023.10135597), which is not relevant to the proposed solution, as the candidate is targeting lithium-titanate-free batteries. Additionally, the study does not provide any evidence that the proposed dynamic control system can reduce lithium plating on the graphite anode."
+         },
+         {
+          "attack_class": "BASELINE_EQUIVALENCE",
+          "basis": "The candidate's predicted effect of reducing lithium plating on the graphite anode by 30% and extending the battery's lifespan by 20% is not significantly different from the baseline, as the baseline is already a state-of-the-art lithium-titanate-free fast-charging battery pack. The candidate's solution does not provide any substantial improvement over the existing technology."
+         }
+        ],
+        "calibration_state": "NOT_CALIBRATED",
+        "measured": {
+         "coverage": 1.0,
+         "parse_completeness": 1.0,
+         "tpr_scoped": 1.0,
+         "fpr_known_good": 1.0,
+         "n_cases_attacked": 40
+        },
+        "note": "the independent attack KILLED this architecture, but the instrument is measured NOT_CALIBRATED (FPR 1.0 on sealed known-good mechanisms): the objection is preserved and escalated, not executed (Art. L)"
+       },
+       "killed": false,
+       "survived": true
+      },
+      "fresh_evidence": {
+       "n_items": 0,
+       "snapshot_version": 2
+      }
+     }
+    ],
+    "final_status": "EVOLVED_INVENTION_CANDIDATE",
+    "final_reason": "an evolved architecture generation survived the re-evaluation gauntlet (2 generations, causal delta recorded); the decisive physical experiment is specified, not executed",
+    "experiment_contract": {
+     "contract": {
+      "HYPOTHESIS": "expected effect holds: Reduces lithium plating on the graphite anode, thereby slowing down capacity fade and extending the battery's lifespan (recorded prior 0.45, epistemic class MODEL_DERIVED per the killer-experiment provenance)",
+      "TREATMENT": "Integrate a wide-bandgap semiconductor-based control system that can monitor the battery's state in real-time and adjust the pre-charge pulse accordingly, using a machine learning algorithm to optimize the charging process.",
+      "CONTROL_BLOCKER": "no executed baseline comparison on record (physics chain executed: ['PRE_REQUIREMENTS']; lifecycle MECHANISM_NOT_SIMULATABLE) \u2014 the control arm is not invented from the problem statement",
+      "MEASUREMENT": "Conduct a series of charging cycles with varying pre-charge pulse durations and intensities to verify the effectiveness of the dynamic control system.",
+      "APPARATUS_BLOCKER": "no separate apparatus record exists; the falsification test does not state a quantified instrumented procedure",
+      "SAMPLE_BLOCKER": "no sample-size / n= record exists in any engine stage (honest UNKNOWN \u2014 Art. XXV)",
+      "ACCEPTANCE_THRESHOLD": "Reduces lithium plating on the graphite anode by 30% and extends the battery's lifespan by 20%.",
+      "FALSIFICATION_THRESHOLD": "the recorded falsification test ('Conduct a series of charging cycles with varying pre-charge pulse durations and intensities to verify the effectiveness of the dynamic control system.') fails to show the recorded expected effect ('Reduces lithium plating on the graphite anode by 30% and extends the battery's lifespan by 20%.') \u2014 the mechanism is killed by its own test's negative outcome; the recorded failing hypothesis is 'expected effect does not reproduce outside source context'",
+      "UNCERTAINTY": "all priors MODEL_DERIVED; no EXPERIMENTALLY_ESTIMATED inputs exist at this stage (Art. XXVIII/XXXVIII: no synthetic shortcut to physical observation)",
+      "COST": "UNKNOWN absolute cost (options ranked on a relative-1.0 scale per bayesian_eig; no sourced dollar/time estimate exists \u2014 Art. XXV)",
+      "TIME": "UNKNOWN (no stage recorded a time estimate)",
+      "SAFETY_BLOCKER": "no safety-analysis stage output exists in the engine (honest UNKNOWN \u2014 Art. XXV; the engineering failure_modes record is a failure-mode list, not a safety case)"
+     },
+     "status": {
+      "answered_fields": [
+       "HYPOTHESIS",
+       "TREATMENT",
+       "MEASUREMENT",
+       "ACCEPTANCE_THRESHOLD",
+       "FALSIFICATION_THRESHOLD",
+       "UNCERTAINTY"
+      ],
+      "unknown_fields": {
+       "CONTROL": "no executed baseline comparison on record (physics chain executed: ['PRE_REQUIREMENTS']; lifecycle MECHANISM_NOT_SIMULATABLE) \u2014 the control arm is not invented from the problem statement",
+       "APPARATUS": "no separate apparatus record exists; the falsification test does not state a quantified instrumented procedure",
+       "SAMPLE": "no sample-size / n= record exists in any engine stage (honest UNKNOWN \u2014 Art. XXV)",
+       "COST": "UNKNOWN absolute cost (options ranked on a relative-1.0 scale per bayesian_eig; no sourced dollar/time estimate exists \u2014 Art. XXV)",
+       "TIME": "UNKNOWN (no stage recorded a time estimate)",
+       "SAFETY": "no safety-analysis stage output exists in the engine (honest UNKNOWN \u2014 Art. XXV; the engineering failure_modes record is a failure-mode list, not a safety case)"
+      },
+      "falsification_threshold_answered": true,
+      "contract_complete": true,
+      "basis": "Art. LII: the contract is complete only when an experimental outcome that kills the mechanism is stated; UNKNOWN fields are honest states (Art. XXV) and are listed with their blockers \u2014 they limit maturity, not existence"
+     }
+    },
+    "evolution_summary": {
+     "n_generations": 2,
+     "stop_reason": "SURVIVOR_REACHED",
+     "current_invention": {
+      "gen": 2,
+      "invention_id": "inv:0044ac0563:gen2",
+      "state": "INVENTION_REQUIRES_EXPERIMENT",
+      "maturity": "GENERATED"
+     },
+     "survivor_reached": true
+    }
+   },
+   "classification": {
+    "classification": "CAUSAL_EVOLUTION_DEMONSTRATED",
+    "evidence": "2 generations recorded; the causal delta is present on the lineage; the full chain (gen N diagnosis -> causal delta -> gen N+1 mechanism -> predicted effect -> re-evaluation) is extracted above from the run's own INVENTION_LINEAGE.json"
+   },
+   "elapsed_note": "wall clock from run_manifest started_at->finished_at, including sandbox slice-kill dead time on resumed runs"
+  },
+  "evol-x03-centrifuge-mass-capped-damping": {
+   "case": {
+    "problem_id": "evol-x03-centrifuge-vibration-mass-cap",
+    "device": "benchtop high-speed laboratory centrifuge rotor assembly",
+    "failure_mode": "vibration",
+    "domain": "mechanical-machinery"
+   },
+   "intentional_imperfection": {
+    "naive_mechanism_class": "add mass / heavier damping block / additional counterweights",
+    "why_imperfect": "the constraint caps total moving mass \u2014 the textbook vibration fix (more damping mass) is inadmissible, so a mass-adding gen-1 must be diagnosed and evolved toward a mass-neutral mechanism (active electromagnetic balancing, tuned absorbers within the cap, stiffness redistribution)",
+    "expected_diagnosis_class": "ADVERSARIAL_KILL or QUALITY_REJECTION on the mass cap"
+   },
+   "run_dir": "R445/EVOLUTION_RUNS/evol-x03-centrifuge-vibration-mass-cap",
+   "elapsed_s": 271.0,
+   "chain": {
+    "n_generations": 2,
+    "stop_reason": "SURVIVOR_REACHED",
+    "survivor_reached": true,
+    "generations": [
+     {
+      "generation": 1,
+      "origin": "BASELINE_SYNTHESIS",
+      "invention_id": "inv:64fc43eb2d:gen1",
+      "parent_id": null,
+      "state": "INVENTION_EVOLVED",
+      "maturity": "EVIDENCE_SUPPORTED",
+      "diagnosed_failure_cause": "ADVERSARIAL_KILL",
+      "diagnosed_failure_basis": [
+       "generation challenge.attack_overall=KILLED",
+       "adversarial challenge failed: weak_transfer: KILLED; killed dimensions: weak_transfer: KILLED"
+      ],
+      "causal_delta": null,
+      "mechanism": "user-adjustable sample attachment points via an interface or double-sided tape",
+      "intervention": "Implement adjustable sample attachment points on the benchtop high-speed laboratory centrifuge rotor assembly to dynamically adjust the mass distribution and minimize vibration",
+      "predicted_effect": "The adjustable attachment points would allow for optimal mass distribution, reducing the vibration displacement to below 20 micrometers at 15000 rpm",
+      "challenge": {
+       "physics_lifecycle": "MECHANISM_NOT_SIMULATABLE",
+       "attack_overall": "KILLED",
+       "evidence_verified": true,
+       "killed": true,
+       "kill_reason": "adversarial challenge failed: weak_transfer: KILLED; killed dimensions: weak_transfer: KILLED",
+       "final_status": "REJECTED"
+      },
+      "fresh_evidence": null
+     },
+     {
+      "generation": 2,
+      "origin": "EVOLUTION_CAUSAL_DELTA",
+      "invention_id": "inv:64fc43eb2d:gen2",
+      "parent_id": "inv:64fc43eb2d:gen1",
+      "state": "INVENTION_REQUIRES_EXPERIMENT",
+      "maturity": "EVIDENCE_SUPPORTED",
+      "diagnosed_failure_cause": null,
+      "diagnosed_failure_basis": null,
+      "causal_delta": {
+       "failure_or_challenge": "adversarial challenge failed: weak_transfer: KILLED; killed dimensions: weak_transfer: KILLED",
+       "diagnosed_cause": "ADVERSARIAL_KILL",
+       "causal_change": "The causal change is the introduction of soft, adaptive materials and machine learning algorithms, enabling real-time optimization of mass distribution.",
+       "new_capability": "The new capability is dynamic adjustment to varying sample types and sizes.",
+       "new_interaction": "The new interaction is the integration of EAPs and machine learning algorithms for real-time optimization.",
+       "new_operating_regime": "The new operating regime is real-time adaptation to varying sample types and sizes, enabling optimal performance and minimizing vibration displacement.",
+       "predicted_effect": "The predicted effect is a 30% improvement in overall centrifuge performance, with a 50% reduction in vibration displacement.",
+       "frontier_capability": "The transferred capability is soft robotics, specifically the development of wearable bioelectronics and soft exosuits.",
+       "thirty_year_engine": {
+        "current": "The parent invention operates in a laboratory setting, utilizing a user-adjustable sample attachment point mechanism to minimize vibration in a high-speed centrifuge rotor assembly.",
+        "evolution_2055": "By 2055, the field of laboratory equipment is expected to integrate advanced materials and soft robotics to enhance precision, safety, and user experience. Centrifuges will likely be designed with adaptive and self-correcting mechanisms to optimize performance.",
+        "required_capability": "The diagnosis shows that the parent invention lacks the capability to dynamically adjust to varying sample types and sizes, leading to weak transfer and vibration displacement.",
+        "capability_backcast": "To achieve this capability by 2055, milestones include:",
+        "todays_frontier": "The fastest-advancing adjacent capability today is in soft robotics, particularly in the development of wearable bioelectronics and soft exosuits.",
+        "transfer": "The frontier capability of soft robotics can be transferred to this problem by integrating soft, adaptive materials into the sample attachment points, allowing for real-time adjustment to varying sample types and sizes."
+       },
+       "provenance": "AI_PROPOSED (the 30-year walk and the frontier transfer are generated reasoning, not retrieved evidence \u2014 they must survive the re-evaluation gauntlet like every other generated claim)"
+      },
+      "mechanism": "Soft, adaptive sample attachment points utilizing electroactive polymers (EAPs) and machine learning algorithms for real-time optimization.",
+      "intervention": "Implement EAP-based sample attachment points on the centrifuge rotor assembly, integrating machine learning algorithms for real-time optimization of mass distribution.",
+      "predicted_effect": "The new architecture is expected to reduce vibration displacement to below 10 micrometers at 15000 rpm, with a 30% improvement in overall centrifuge performance.",
+      "challenge": {
+       "physics_lifecycle": "MECHANISM_NOT_SIMULATABLE",
+       "attack_overall": "SURVIVED_WITH_UNCERTAINTIES",
+       "independent_attack": "ESCALATED_OBJECTION",
+       "escalated_objection": {
+        "preserved_objections": [
+         {
+          "attack_class": "MECHANISM_FAILURE",
+          "basis": "The use of electroactive polymers (EAPs) for sample attachment points is not suitable for high-speed centrifugation due to their limited durability and stability at high temperatures and frequencies, as demonstrated in [europepmc:40977844] Centrifugal device for dust adhesion measurement, where EAPs failed to maintain their shape and functionality under high-speed conditions."
+         },
+         {
+          "attack_class": "BOUNDARY_CONDITION_FAILURE",
+          "basis": "The candidate fails to address the issue of rotor imbalance vibration at 15000 rpm, which is a critical boundary condition that the proposed mechanism is not designed to handle, as shown in [europepmc:38696375] OpenCell: A low-cost, open-source, 3-in-1 device for DNA extraction, where similar centrifugation issues led to device failure."
+         },
+         {
+          "attack_class": "EVIDENCE_CONTRADICTION",
+          "basis": "The candidate cites [europepmc:42590715] BioShield-12: A 3D-Printed Conformal Chest Shield for Wireless 12-Lead ECG Acquisition, which is unrelated to centrifugation and sample attachment, and [europepmc:38658969] Human-centered design of a novel soft exosuit for post-stroke gait rehabilitation, which is a completely different application, contradicting the claim that the proposed mechanism is novel and relevant to centrifugation."
+         },
+         {
+          "attack_class": "BASELINE_EQUIVALENCE",
+          "basis": "The predicted effect of reducing vibration displacement to below 10 micrometers at 15000 rpm is equivalent to the baseline, as the current benchtop high-speed laboratory centrifuge rotor assembly already achieves this level of performance, as demonstrated in [europepmc:42571444] Wearable bioelectronics enabled by conductive hydrogels: From materials innovation to clinical translation, which shows that similar centrifugation systems can achieve the desired performance without the proposed mechanism."
+         },
+         {
+          "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+          "basis": "The integration of machine learning algorithms for real-time optimization of mass distribution is not feasible due to the complexity of the system and the limited computational power available in a benchtop centrifuge, as shown in [europepmc:40977844] Centrifugal device for dust adhesion measurement, where similar attempts to implement complex algorithms led to system instability and failure."
+         }
+        ],
+        "calibration_state": "NOT_CALIBRATED",
+        "measured": {
+         "coverage": 1.0,
+         "parse_completeness": 1.0,
+         "tpr_scoped": 1.0,
+         "fpr_known_good": 1.0,
+         "n_cases_attacked": 40
+        },
+        "note": "the independent attack KILLED this architecture, but the instrument is measured NOT_CALIBRATED (FPR 1.0 on sealed known-good mechanisms): the objection is preserved and escalated, not executed (Art. L)"
+       },
+       "killed": false,
+       "survived": true
+      },
+      "fresh_evidence": {
+       "n_items": 5,
+       "snapshot_version": 2
+      }
+     }
+    ],
+    "final_status": "EVOLVED_INVENTION_CANDIDATE",
+    "final_reason": "an evolved architecture generation survived the re-evaluation gauntlet (2 generations, causal delta recorded); the decisive physical experiment is specified, not executed",
+    "experiment_contract": {
+     "contract": {
+      "HYPOTHESIS": "expected effect holds: The adjustable attachment points would allow for optimal mass distribution, reducing the vibration displacement to below 20 micrometers at 15000 rpm (recorded prior 0.6, epistemic class MODEL_DERIVED per the killer-experiment provenance)",
+      "TREATMENT": "Implement EAP-based sample attachment points on the centrifuge rotor assembly, integrating machine learning algorithms for real-time optimization of mass distribution.",
+      "CONTROL_BLOCKER": "no executed baseline comparison on record (physics chain executed: ['PRE_REQUIREMENTS']; lifecycle MECHANISM_NOT_SIMULATABLE) \u2014 the control arm is not invented from the problem statement",
+      "MEASUREMENT": "Conduct a series of experiments with varying sample types and sizes to test the adaptive capabilities of the EAP-based sample attachment points.",
+      "APPARATUS_BLOCKER": "no separate apparatus record exists; the falsification test does not state a quantified instrumented procedure",
+      "SAMPLE_BLOCKER": "no sample-size / n= record exists in any engine stage (honest UNKNOWN \u2014 Art. XXV)",
+      "ACCEPTANCE_THRESHOLD": "The new architecture is expected to reduce vibration displacement to below 10 micrometers at 15000 rpm, with a 30% improvement in overall centrifuge performance.",
+      "FALSIFICATION_THRESHOLD": "the recorded falsification test ('Conduct a series of experiments with varying sample types and sizes to test the adaptive capabilities of the EAP-based sample attachment points.') fails to show the recorded expected effect ('The new architecture is expected to reduce vibration displacement to below 10 micrometers at 15000 rpm, with a 30% improvement in overall centrifuge performance.') \u2014 the mechanism is killed by its own test's negative outcome; the recorded failing hypothesis is 'expected effect does not reproduce outside source context'",
+      "UNCERTAINTY": "all priors MODEL_DERIVED; no EXPERIMENTALLY_ESTIMATED inputs exist at this stage (Art. XXVIII/XXXVIII: no synthetic shortcut to physical observation)",
+      "COST": "UNKNOWN absolute cost (options ranked on a relative-1.0 scale per bayesian_eig; no sourced dollar/time estimate exists \u2014 Art. XXV)",
+      "TIME": "UNKNOWN (no stage recorded a time estimate)",
+      "SAFETY_BLOCKER": "no safety-analysis stage output exists in the engine (honest UNKNOWN \u2014 Art. XXV; the engineering failure_modes record is a failure-mode list, not a safety case)"
+     },
+     "status": {
+      "answered_fields": [
+       "HYPOTHESIS",
+       "TREATMENT",
+       "MEASUREMENT",
+       "ACCEPTANCE_THRESHOLD",
+       "FALSIFICATION_THRESHOLD",
+       "UNCERTAINTY"
+      ],
+      "unknown_fields": {
+       "CONTROL": "no executed baseline comparison on record (physics chain executed: ['PRE_REQUIREMENTS']; lifecycle MECHANISM_NOT_SIMULATABLE) \u2014 the control arm is not invented from the problem statement",
+       "APPARATUS": "no separate apparatus record exists; the falsification test does not state a quantified instrumented procedure",
+       "SAMPLE": "no sample-size / n= record exists in any engine stage (honest UNKNOWN \u2014 Art. XXV)",
+       "COST": "UNKNOWN absolute cost (options ranked on a relative-1.0 scale per bayesian_eig; no sourced dollar/time estimate exists \u2014 Art. XXV)",
+       "TIME": "UNKNOWN (no stage recorded a time estimate)",
+       "SAFETY": "no safety-analysis stage output exists in the engine (honest UNKNOWN \u2014 Art. XXV; the engineering failure_modes record is a failure-mode list, not a safety case)"
+      },
+      "falsification_threshold_answered": true,
+      "contract_complete": true,
+      "basis": "Art. LII: the contract is complete only when an experimental outcome that kills the mechanism is stated; UNKNOWN fields are honest states (Art. XXV) and are listed with their blockers \u2014 they limit maturity, not existence"
+     }
+    },
+    "evolution_summary": {
+     "n_generations": 2,
+     "stop_reason": "SURVIVOR_REACHED",
+     "current_invention": {
+      "gen": 2,
+      "invention_id": "inv:64fc43eb2d:gen2",
+      "state": "INVENTION_REQUIRES_EXPERIMENT",
+      "maturity": "EVIDENCE_SUPPORTED"
+     },
+     "survivor_reached": true
+    }
+   },
+   "classification": {
+    "classification": "CAUSAL_EVOLUTION_DEMONSTRATED",
+    "evidence": "2 generations recorded; the causal delta is present on the lineage; the full chain (gen N diagnosis -> causal delta -> gen N+1 mechanism -> predicted effect -> re-evaluation) is extracted above from the run's own INVENTION_LINEAGE.json"
+   },
+   "elapsed_note": "wall clock from run_manifest started_at->finished_at, including sandbox slice-kill dead time on resumed runs"
+  }
+ },
+ "summary": {
+  "n_cases_this_invocation": 3,
+  "n_causal_evolution_demonstrated": 3,
+  "n_no_evolution": 0,
+  "directive_target": "at least 2/3 cases demonstrate the full chain gen-1 -> diagnosed cause -> causal delta -> gen-2 -> predicted effect -> re-evaluation -> survivor or explicit kill; three honest failures are an acceptable outcome",
+  "note": "NO_EVOLUTION (including transport) is an honest outcome; never classified as evolved (state-integrity validators)",
+  "per_case_runtime_s_wall": {
+   "evol-x01-desalination-scaling-no-additives": 464.0,
+   "evol-x02-bus-fastcharge-rate-locked": 344.0,
+   "evol-x03-centrifuge-mass-capped-damping": 271.0
+  }
+ }
+}

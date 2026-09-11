@@ -1,0 +1,329 @@
+{
+ "ledger": "IMPROVEMENT_LEDGER (R378 TECHNICAL IMPROVEMENT ENGINE)",
+ "version": "1.0.0",
+ "loop": "CANDIDATE -> DIAGNOSE WEAKNESS -> IDENTIFY LIMITING FEATURE -> GENERATE CONTROLLED MUTATION -> RE-EVALUATE EVIDENCE/MECHANISM/PRIOR ART -> RE-SCORE -> KEEP OR KILL -> REPEAT",
+ "collision_mode": "REPLAY_CACHE",
+ "live_sources": null,
+ "evaluators_registered": [
+  {
+   "evaluator_id": "term_rule_v1",
+   "fidelity_tier": "TERM_RULE",
+   "evidence_rank": 3
+  }
+ ],
+ "q_instrument": "discovery_fabric/benchmark/candidate_quality.py (FROZEN, hash-pinned, imported read-only)",
+ "i_instrument": "discovery_fabric/benchmark/invention_quality.py (R377, imported read-only)",
+ "thresholds": {
+  "SPAN_DERIVATION_MIN": {
+   "value": 0.2,
+   "epistemic_class": "ENGINEERING",
+   "justification": "the engine's own span-derivation rule (candidate_diversity.span_derivation_check): ratio < 0.20 = SPAN_UNDERIVED. A MECHANISM_STRENGTHENING mutation must CLEAR this floor — the same rule that gates the grid, not a new one."
+  },
+  "EVIDENCE_SUPPORT_MIN": {
+   "value": 0.2,
+   "epistemic_class": "ENGINEERING",
+   "justification": "I1's underived flag fires below 0.20; an EVIDENCE_DERIVED_CONSTRAINT mutation must clear the same floor on evidence_support."
+  },
+  "DOMAIN_OVERLAP_MIN": {
+   "value": 1,
+   "epistemic_class": "ENGINEERING",
+   "justification": "REPLAY_CACHE re-adjudication is valid only while the mutated candidate stays in the domain the cached art was found FOR. Guard: >= 1 NON-generic technical term shared between the child's mechanism+intervention and the cached family corpus. ZERO overlap means the mutation abandoned the domain (measured attack: re-adjudicating a cement-curing intervention against battery art fabricates surviving differentiators — false novelty from stale art). The overlap count is RECORDED on every cache adjudication so thin-domain links are auditable. NOTE: entity-term retention vs the problem CANNOT catch this class — entity terms are problem-derived and unchanged by mutations (measured while writing the guard's tests); it is recorded for audit only."
+  },
+  "MAX_ITERATIONS_DEFAULT": {
+   "value": 2,
+   "epistemic_class": "ENGINEERING",
+   "justification": "the CEO minimum loop is DIAGNOSE -> IMPROVE -> RE-EVALUATE -> IMPROVE AGAIN; two iterations demonstrate repeatability at bounded cost"
+  },
+  "MAX_PROPOSALS_PER_ITERATION": {
+   "value": 3,
+   "epistemic_class": "ENGINEERING",
+   "justification": "bounded proposal budget: three attempts, then the honest no-defensible-mutation verdict"
+  }
+ },
+ "started_at": "2026-09-11T10:17:58+00:00Z",
+ "iterations": [
+  {
+   "iteration": 1,
+   "diagnosis": {
+    "limiting_features": [
+     {
+      "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "measured_value": 0.35,
+      "weakness_kind": "LOW_SCORE",
+      "why_weak": "measured 0.35 < STRONG floor 0.7",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT"
+     },
+     {
+      "dimension": "I5_EXPERIMENT_DISCRIMINATION",
+      "measured_value": 0.667,
+      "weakness_kind": "LOW_SCORE",
+      "why_weak": "measured 0.667 < STRONG floor 0.7",
+      "mutation_type": "EXPERIMENT_DISCRIMINATION"
+     }
+    ],
+    "evidence_gaps": [
+     {
+      "dimension": "I2_DIFFERENTIATOR_TECHNICAL_MEANING",
+      "state": "UNMEASURABLE_NO_SURVIVORS",
+      "what_is_missing": "no surviving differentiators recorded",
+      "consequence": "no mutation targets this dimension until the gap closes (Art. XXV)"
+     },
+     {
+      "dimension": "I3_RECOMBINATION_RISK",
+      "state": "UNMEASURABLE_NO_FAMILIES",
+      "what_is_missing": "no prior-art families adjudicated — residue vs found art is unmeasured; absence of found art is not novelty",
+      "consequence": "no mutation targets this dimension until the gap closes (Art. XXV)"
+     },
+     {
+      "dimension": "I4_NEW_TECHNICAL_RELATIONSHIP",
+      "state": "UNMEASURABLE_NO_FAMILY_TEXT",
+      "what_is_missing": "no adjudicated family text stored — pair novelty vs found art is unmeasured",
+      "consequence": "no mutation targets this dimension until the gap closes (Art. XXV)"
+     }
+    ],
+    "target": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT"
+    }
+   },
+   "proposals": [
+    {
+     "proposal_id": "prop:e6c70d99e687",
+     "provider": "nvidia",
+     "model": "meta/llama-3.2-11b-vision-instruct",
+     "prompt_hash": "53b6debc5fc55ac8cbabd7dc2287a66baf5c2069454846ea266f631139425b8c",
+     "output_hash": "e6c70d99e687cb33a05bb381ec6c34da3b409640c12ce5ac26caec08755d1e27",
+     "fields": {
+      "MUTATION_TYPE": "EVIDENCE_DERIVED_CONSTRAINT",
+      "MECHANISM": "Lithium plating on the graphite anode is a result of the high current density during fast charging, leading to a significant increase in the concentration of lithium ions at the anode surface, which in turn causes the lithium ions to plate out onto the graphite surface.",
+      "INTERVENTION": "Implement a high-frequency impedance matching circuit to dynamically adjust the charge current to match the electrochemical impedance of the battery during fast charging, thereby reducing the concentration of lithium ions at the anode surface and minimizing lithium plating.",
+      "EXPECTED_EFFECT": "The impedance matching circuit would help to reduce the concentration of lithium ions at the anode surface, thereby minimizing lithium plating and subsequent capacity fade.",
+      "FALSIFICATION_TEST": "falsification_test_from_candidate",
+      "MECHANISM_SOURCE_SPAN": "\"a significant increase in the concentration of lithium ions at the anode surface, which in turn causes the lithium ions to plate out onto the graphite surface.\"",
+      "SOURCE_EVIDENCE_ID": "doi:10.54337/aau681516574",
+      "EXPERIMENT": "The experiment would compare the capacity retention of the battery pack with and without the impedance matching circuit after 3000 fast-charge cycles at 350 kW.",
+      "EXPERIMENT_BASELINE": "The baseline would be the capacity retention of the battery pack without the impedance matching circuit.",
+      "EXPERIMENT_EIG": "0.8",
+      "CONSTRAINT_DERIVED": "NONE",
+      "MUTATION_REASON": "This mutation repairs the measured weakness of lithium plating on the graphite anode during fast charging by reducing the concentration of lithium ions at the anode surface."
+     },
+     "validation": {
+      "valid": false,
+      "stage": "VALIDATION",
+      "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+      "checks": {
+       "mutation_type_matches_diagnosis": true,
+       "span_verbatim_in_evidence": false,
+       "evidence_support": 0.121,
+       "evidence_support_cleared": false,
+       "constraint_actually_derived": false
+      },
+      "reasons": [
+       "span_verbatim_in_evidence: the quoted span is NOT a verbatim substring of the cited evidence (fabricated spans are invalid — Art. VI)",
+       "evidence_support_cleared: re-measured evidence support 0.121 < 0.2 — the cited evidence still does not contain the mechanism's non-generic vocabulary",
+       "constraint_actually_derived: EVIDENCE_DERIVED_CONSTRAINT requires a derived constraint, not NONE"
+      ],
+      "validated_at": "2026-09-11T10:18:09+00:00Z"
+     }
+    },
+    {
+     "proposal_id": "prop:d42abf27f097",
+     "provider": "nvidia",
+     "model": "meta/llama-3.2-11b-vision-instruct",
+     "prompt_hash": "aafb68f6d809c213124899983b571e789863085d1c0b7614dd24970428d17491",
+     "output_hash": "d42abf27f0972b8a02122135f459e7f488fdba938026a10955fc9cb1ab06c4ad",
+     "fields": {
+      "MUTATION_TYPE": "EVIDENCE_DERIVED_CONSTRAINT",
+      "MECHANISM": "Lithium plating on the graphite anode is caused by the high current density during fast charging, leading to a significant increase in the concentration of lithium ions at the anode surface, which in turn causes the lithium ions to plate out onto the graphite surface.",
+      "INTERVENTION": "Implement a high-frequency impedance matching circuit to dynamically adjust the charge current to match the electrochemical impedance of the battery during fast charging, thereby reducing the concentration of lithium ions at the anode surface and preventing lithium plating.",
+      "EXPECTED_EFFECT": "The impedance matching circuit would help to minimize the voltage drop across the battery during fast charging, reducing the likelihood of lithium plating and subsequent capacity fade.",
+      "FALSIFICATION_TEST": "falsification_test_from_candidate",
+      "MECHANISM_SOURCE_SPAN": "\"a significant increase in the concentration of lithium ions at the anode surface, which in turn causes the lithium ions to plate out onto the graphite surface.\"",
+      "SOURCE_EVIDENCE_ID": "doi:10.54337/aau681516574",
+      "EXPERIMENT": "The experiment would compare the capacity retention of the battery pack with and without the impedance matching circuit after 3000 fast-charge cycles at 350 kW.",
+      "EXPERIMENT_BASELINE": "The baseline would be the capacity retention of the battery pack without the impedance matching circuit.",
+      "EXPERIMENT_EIG": "0.8",
+      "CONSTRAINT_DERIVED": "The constraint derived from the evidence is that the impedance matching circuit must be designed to reduce the concentration of lithium ions at the anode surface by at least 20% to prevent lithium plating.",
+      "MUTATION_REASON": "This mutation repairs the measured defect of lithium plating on the graphite anode during fast charging by re-anchoring the mechanism's technical vocabulary in the cited evidence's actual text, specifically the phenomenon of lithium ion concentration at the anode surface."
+     },
+     "validation": {
+      "valid": false,
+      "stage": "VALIDATION",
+      "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+      "checks": {
+       "mutation_type_matches_diagnosis": true,
+       "span_verbatim_in_evidence": false,
+       "evidence_support": 0.121,
+       "evidence_support_cleared": false,
+       "constraint_traceable_to_evidence": "The constraint derived from the evidence is that the impedance matching circuit must be designed to reduce the concentra"
+      },
+      "reasons": [
+       "span_verbatim_in_evidence: the quoted span is NOT a verbatim substring of the cited evidence (fabricated spans are invalid — Art. VI)",
+       "evidence_support_cleared: re-measured evidence support 0.121 < 0.2 — the cited evidence still does not contain the mechanism's non-generic vocabulary"
+      ],
+      "validated_at": "2026-09-11T10:18:24+00:00Z"
+     }
+    },
+    {
+     "proposal_id": "prop:6cb2cee1dd7a",
+     "provider": "nvidia",
+     "model": "meta/llama-3.2-11b-vision-instruct",
+     "prompt_hash": "f1e0fe877c34be5851b41d974aef842087586dcfd55467ec6949103a24e29e1a",
+     "output_hash": "6cb2cee1dd7abbf094438bdceaf5949f3cb7362513ff196fcd96c3df2345ac75",
+     "fields": {
+      "MUTATION_TYPE": "EVIDENCE_DERIVED_CONSTRAINT",
+      "MECHANISM": "Lithium plating on the graphite anode is caused by the high current density during fast charging, leading to a significant increase in the concentration of lithium ions at the anode surface, which in turn causes the lithium ions to plate out onto the graphite surface.",
+      "INTERVENTION": "Implement a high-frequency impedance matching circuit to dynamically adjust the charge current to match the electrochemical impedance of the battery during fast charging, thereby reducing the concentration of lithium ions at the anode surface and preventing lithium plating.",
+      "EXPECTED_EFFECT": "The impedance matching circuit would help to minimize the voltage drop across the battery during fast charging, reducing the likelihood of lithium plating and subsequent capacity fade.",
+      "FALSIFICATION_TEST": "falsification_test_from_candidate",
+      "MECHANISM_SOURCE_SPAN": "\"high current density during fast charging, leading to a significant increase in the concentration of lithium ions at the anode surface\"",
+      "SOURCE_EVIDENCE_ID": "doi:10.54337/aau681516574",
+      "EXPERIMENT": "The proposed mechanism and intervention would be compared against the baseline of a battery pack without impedance matching, and the experiment would measure the capacity fade of the battery pack after 3000 fast-charge cycles.",
+      "EXPERIMENT_BASELINE": "A battery pack without impedance matching",
+      "EXPERIMENT_EIG": "0.8",
+      "CONSTRAINT_DERIVED": "The charge current must be adjusted to maintain a concentration of lithium ions at the anode surface below 10^-3 mol/cm^2 to prevent lithium plating.",
+      "MUTATION_REASON": "This mutation repairs the measured defect of lithium plating on the graphite anode during fast charging by re-anchoring the mechanism's technical vocabulary in the cited evidence's actual text, specifically the phenomenon of high current density leading to lithium ion concentration at the anode surface."
+     },
+     "validation": {
+      "valid": false,
+      "stage": "VALIDATION",
+      "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+      "checks": {
+       "mutation_type_matches_diagnosis": true,
+       "span_verbatim_in_evidence": false,
+       "evidence_support": 0.121,
+       "evidence_support_cleared": false,
+       "constraint_traceable_to_evidence": "The charge current must be adjusted to maintain a concentration of lithium ions at the anode surface below 10^-3 mol/cm^"
+      },
+      "reasons": [
+       "span_verbatim_in_evidence: the quoted span is NOT a verbatim substring of the cited evidence (fabricated spans are invalid — Art. VI)",
+       "evidence_support_cleared: re-measured evidence support 0.121 < 0.2 — the cited evidence still does not contain the mechanism's non-generic vocabulary"
+      ],
+      "validated_at": "2026-09-11T10:18:35+00:00Z"
+     }
+    }
+   ]
+  }
+ ],
+ "outcome": "KILLED_NO_DEFENSIBLE_MUTATION",
+ "outcome_reason": "iteration 1: 3 proposal(s) generated; none passed deterministic validation — no defensible mutation exists for I1_MECHANISM_EVIDENCE_DERIVATION. Candidate killed.",
+ "baseline": {
+  "i_dimensions": {
+   "I1_MECHANISM_EVIDENCE_DERIVATION": {
+    "score": 0.35,
+    "state": "MEASURED"
+   },
+   "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_SURVIVORS"
+   },
+   "I3_RECOMBINATION_RISK": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_FAMILIES"
+   },
+   "I4_NEW_TECHNICAL_RELATIONSHIP": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+   },
+   "I5_EXPERIMENT_DISCRIMINATION": {
+    "score": 0.667,
+    "state": "MEASURED"
+   }
+  },
+  "i_flags": {
+   "underived_mechanism": false,
+   "recombination_only": false
+  },
+  "i_average": 0.508,
+  "q_dimensions": {
+   "Q1_EVIDENCE_BINDING": {
+    "score": 0.5,
+    "state": "MEASURED"
+   },
+   "Q2_PRIOR_ART_SPECIFICITY": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_PRIOR_ART"
+   },
+   "Q3_PRIOR_ART_RESOLUTION": {
+    "score": 0.0,
+    "state": "MEASURED"
+   },
+   "Q4_EXPERIMENT_DECISIVENESS": {
+    "score": 1.0,
+    "state": "MEASURED"
+   },
+   "Q5_CHAIN_COMPLETENESS": {
+    "score": 1.0,
+    "state": "MEASURED"
+   }
+  },
+  "q_average": 0.625,
+  "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE"
+ },
+ "final": {
+  "i_dimensions": {
+   "I1_MECHANISM_EVIDENCE_DERIVATION": {
+    "score": 0.35,
+    "state": "MEASURED"
+   },
+   "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_SURVIVORS"
+   },
+   "I3_RECOMBINATION_RISK": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_FAMILIES"
+   },
+   "I4_NEW_TECHNICAL_RELATIONSHIP": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+   },
+   "I5_EXPERIMENT_DISCRIMINATION": {
+    "score": 0.667,
+    "state": "MEASURED"
+   }
+  },
+  "i_flags": {
+   "underived_mechanism": false,
+   "recombination_only": false
+  },
+  "i_average": 0.508,
+  "q_dimensions": {
+   "Q1_EVIDENCE_BINDING": {
+    "score": 0.5,
+    "state": "MEASURED"
+   },
+   "Q2_PRIOR_ART_SPECIFICITY": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_PRIOR_ART"
+   },
+   "Q3_PRIOR_ART_RESOLUTION": {
+    "score": 0.0,
+    "state": "MEASURED"
+   },
+   "Q4_EXPERIMENT_DECISIVENESS": {
+    "score": 1.0,
+    "state": "MEASURED"
+   },
+   "Q5_CHAIN_COMPLETENESS": {
+    "score": 1.0,
+    "state": "MEASURED"
+   }
+  },
+  "q_average": 0.625,
+  "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE"
+ },
+ "finished_at": "2026-09-11T10:18:35+00:00Z",
+ "outcome_summary": {
+  "baseline_i_average": 0.508,
+  "final_i_average": 0.508,
+  "baseline_q_average": 0.625,
+  "final_q_average": 0.625,
+  "iterations_run": 1,
+  "keeps": 0
+ },
+ "status": "KILLED_NO_DEFENSIBLE_MUTATION"
+}

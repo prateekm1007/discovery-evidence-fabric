@@ -1,0 +1,262 @@
+{
+ "diversity": "CANDIDATE_DIVERSITY (E16-E)",
+ "version": "1.1.0",
+ "min_candidates": 10,
+ "available_providers": [
+  "nvidia"
+ ],
+ "operator_override": [
+  "nvidia"
+ ],
+ "angles": [
+  "cross_industry_transfer",
+  "mechanism_inversion",
+  "simplification",
+  "multi_physics_hybrid",
+  "constraint_first"
+ ],
+ "candidates": [
+  {
+   "angle": "cross_industry_transfer",
+   "provider_id": "nvidia",
+   "status": "OK",
+   "model": "meta/llama-3.2-11b-vision-instruct",
+   "prompt_hash": "7d5b81ef9f7b1122655914a02a7ecab5def17d8ca3e3bff39826b3767ef045f7",
+   "output_hash": "6ee2d9e03ef370eb9eb068f6971d9907398a38640ba53acb86873ce6fb0c21ab",
+   "fields": {
+    "mechanism": "Electrochemical impedance spectroscopy (EIS) can be used to monitor the state of charge and state of health of lithium-ion batteries, allowing for real-time optimization of charging conditions to prevent lithium plating.",
+    "intervention": "Implement an EIS-based monitoring system that continuously measures the impedance of the battery during fast charging, and adjust the charging current in real-time to maintain an optimal impedance value that prevents lithium plating.",
+    "expected_effect": "The EIS-based monitoring system should be able to maintain the capacity fade below 8 percent over 3000 fast-charge cycles while preserving the 350 kW charge rate and 15-minute depot turnaround.",
+    "falsification_test": "Test the EIS-based monitoring system by charging the battery at 350 kW for 3000 cycles and measuring the capacity fade, comparing it to a control group that is charged without the monitoring system.",
+    "mechanism_source_span": "\"EIS can be used to monitor the state of charge and state of health of lithium-ion batteries, allowing for real-time optimization of charging conditions.\"",
+    "span_derivation": {
+     "n_shared": 16,
+     "shared_terms": [
+      "allowing",
+      "battery",
+      "can",
+      "charge",
+      "charging",
+      "condition",
+      "eis",
+      "health",
+      "ion",
+      "lithium",
+      "monitor",
+      "optimization",
+      "real",
+      "state",
+      "time",
+      "used"
+     ],
+     "span_terms_n": 16,
+     "ratio": 1.0,
+     "underived": false,
+     "state": "MEASURED",
+     "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+    }
+   },
+   "span_underived": false,
+   "candidate_id": "cand:DIV:cross_industry_transfer:nvidia:6ee2d9e03ef3"
+  },
+  {
+   "angle": "mechanism_inversion",
+   "provider_id": "nvidia",
+   "status": "OK",
+   "model": "meta/llama-3.2-11b-vision-instruct",
+   "prompt_hash": "1cc743d26f6023abbb5d9d56215c195bba0191bfcf11a3fa9b58ed1aa9f5eb3d",
+   "output_hash": "2ede19e9e499d138bbd7afde7e4f8ed21d72b021dc92722a2affe05838220901",
+   "fields": {
+    "mechanism": "Electrochemical impedance mismatch",
+    "intervention": "Introduce a controlled impedance mismatch between the battery and the charging circuit, creating a voltage drop that counteracts the lithium plating on the graphite anode.",
+    "expected_effect": "The impedance mismatch would help to reduce the charge/discharge current density on the anode, thereby minimizing lithium plating and capacity fade.",
+    "falsification_test": "Measure the battery's capacity retention after 3000 fast-charge cycles at 350 kW, comparing the results with and without the impedance mismatch.",
+    "mechanism_source_span": "(Note: This mechanism is not directly mentioned in the paper, but it is an inversion of the concept presented in the paper. The original paper discusses the benefits of impedance matching, whereas this inverted mechanism proposes the opposite effect.)",
+    "span_derivation": {
+     "n_shared": 1,
+     "shared_terms": [
+      "impedance"
+     ],
+     "span_terms_n": 21,
+     "ratio": 0.048,
+     "underived": true,
+     "state": "MEASURED",
+     "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+    }
+   },
+   "span_underived": true,
+   "candidate_id": "cand:DIV:mechanism_inversion:nvidia:2ede19e9e499"
+  },
+  {
+   "angle": "simplification",
+   "provider_id": "nvidia",
+   "status": "OK",
+   "model": "meta/llama-3.2-11b-vision-instruct",
+   "prompt_hash": "f89dd856d68d8e0a8fb21301bc2211ec19db74142a8729d0bf5ae209e9de59d1",
+   "output_hash": "fb6200bb1009cb0f268494e4125236f850d08f9fa2c8464cf3730cab27586941",
+   "fields": {
+    "mechanism": "Electrochemical impedance matching",
+    "intervention": "Implement a high-frequency impedance matching circuit to dynamically adjust the charge current to match the electrochemical impedance of the battery during fast charging, thereby reducing lithium plating on the graphite anode.",
+    "expected_effect": "The impedance matching circuit would help to minimize the voltage drop across the battery during fast charging, reducing the likelihood of lithium plating and subsequent capacity fade.",
+    "falsification_test": "Measure the battery's capacity fade after 3000 fast-charge cycles with and without the impedance matching circuit, and verify that the capacity fade is below 8% with the circuit.",
+    "mechanism_source_span": "\"The fast charging method can be realized by dynamically adjusting the charge current to match the electrochemical impedance of the battery.\"",
+    "span_derivation": {
+     "n_shared": 9,
+     "shared_terms": [
+      "battery",
+      "charge",
+      "charging",
+      "current",
+      "dynamically",
+      "electrochemical",
+      "fast",
+      "impedance",
+      "match"
+     ],
+     "span_terms_n": 13,
+     "ratio": 0.692,
+     "underived": false,
+     "state": "MEASURED",
+     "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+    }
+   },
+   "span_underived": false,
+   "candidate_id": "cand:DIV:simplification:nvidia:fb6200bb1009"
+  },
+  {
+   "angle": "multi_physics_hybrid",
+   "provider_id": "nvidia",
+   "status": "OK",
+   "model": "meta/llama-3.2-11b-vision-instruct",
+   "prompt_hash": "300a846fc8b35214f506ed302bae8e1b6ab66bada1b673870ad973b3e98e8825",
+   "output_hash": "b85c9bff90186f0c7343d813fac83d1a9faa3f7fd5efcafbe5355953b1429bcb",
+   "fields": {
+    "mechanism": "The study found that the temperature of the battery cell has a significant impact on the fast charging process, and that the high temperature can lead to lithium plating on the anode.",
+    "intervention": "Implement a thermal management system that uses a phase change material to regulate the temperature of the battery cell during fast charging, and integrate the real-time EIS monitoring system to detect the onset of lithium plating and adjust the charging parameters in real-time.",
+    "expected_effect": "The thermal management system can regulate the temperature of the battery cell and prevent lithium plating, while the real-time EIS monitoring system can detect the onset of lithium plating and adjust the charging parameters to prevent capacity fade.",
+    "falsification_test": "Test the battery pack with and without the thermal management system and real-time EIS monitoring system, and measure the capacity fade after 3000 fast-charge cycles to determine if the system is effective in preventing lithium plating.",
+    "mechanism_source_span": "\"The temperature of the battery cell has a significant impact on the fast charging process, and that the high temperature can lead to lithium plating on the anode.\"",
+    "span_derivation": {
+     "n_shared": 16,
+     "shared_terms": [
+      "anode",
+      "battery",
+      "can",
+      "cell",
+      "charging",
+      "fast",
+      "has",
+      "high",
+      "impact",
+      "lead",
+      "lithium",
+      "plating",
+      "process",
+      "significant",
+      "temperature",
+      "that"
+     ],
+     "span_terms_n": 16,
+     "ratio": 1.0,
+     "underived": false,
+     "state": "MEASURED",
+     "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+    }
+   },
+   "span_underived": false,
+   "candidate_id": "cand:DIV:multi_physics_hybrid:nvidia:b85c9bff9018"
+  },
+  {
+   "angle": "constraint_first",
+   "provider_id": "nvidia",
+   "status": "OK",
+   "model": "meta/llama-3.2-11b-vision-instruct",
+   "prompt_hash": "a3bff90ac2178e1745de2845e827eecd32327a12a565f93e3fd48c6ad9146364",
+   "output_hash": "b75be2b229a3322b41e3f4a92d7cfe7ab8ee58def3628e51738645e56b7c0ea7",
+   "fields": {
+    "mechanism": "Electrochemical stress relaxation",
+    "intervention": "Introduce a brief period of low-current relaxation (e.g., 1C) after each 350 kW fast charge to allow the battery's electrochemical stress to relax, thereby reducing the likelihood of lithium plating.",
+    "expected_effect": "The relaxation period would help to mitigate the electrochemical stress caused by the high-current charging, reducing the risk of lithium plating and capacity fade.",
+    "falsification_test": "Measure the battery's capacity fade after 3000 fast-charge cycles with and without the relaxation period, and verify that the capacity fade is below 8% with the relaxation period.",
+    "mechanism_source_span": "\"The fast charging method can be realized by matching the impedance of the battery with the impedance of the charger, which can reduce the voltage drop and improve the charging efficiency.\"",
+    "span_derivation": {
+     "n_shared": 2,
+     "shared_terms": [
+      "battery",
+      "fast"
+     ],
+     "span_terms_n": 15,
+     "ratio": 0.133,
+     "underived": true,
+     "state": "MEASURED",
+     "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+    }
+   },
+   "span_underived": true,
+   "candidate_id": "cand:DIV:constraint_first:nvidia:b75be2b229a3"
+  }
+ ],
+ "built_at": "2026-09-11T10:14:58+00:00Z",
+ "usable_candidates": 5,
+ "status": "GRID_RUN",
+ "diversity_metrics": {
+  "candidates_measured": 5,
+  "mean_pairwise_token_distance": 0.798,
+  "distinct_mechanism_clusters": 5,
+  "cluster_sizes": [
+   1,
+   1,
+   1,
+   1,
+   1
+  ],
+  "rewrite_pairs_jaccard_ge_0_8": [],
+  "architecture_term_count": 60,
+  "architecture_terms_sample": [
+   "adjust",
+   "after",
+   "allow",
+   "anode",
+   "battery",
+   "between",
+   "brief",
+   "cell",
+   "change",
+   "charge",
+   "charging",
+   "circuit",
+   "continuously",
+   "controlled",
+   "counteracts",
+   "creating",
+   "current",
+   "detect",
+   "drop",
+   "during",
+   "dynamically",
+   "electrochemical",
+   "fast",
+   "frequency"
+  ],
+  "failure_mode_signal_count": 1,
+  "failure_modes_invoked_sample": [
+   "image artifact corrupting quantification"
+  ],
+  "prior_art_query_set_count": 5,
+  "detected_domain": "mri_nmr"
+ },
+ "entry": {
+  "entry_helper_version": "stage_entry/1.0.0",
+  "stage": "EXPLORATION_GRID",
+  "entry_status": "ALLOWED",
+  "prerequisite": "VERIFIED_EVIDENCE",
+  "prerequisite_evidence": {
+   "n_verified_evidence_items": 8,
+   "n_direct_support": 5,
+   "n_partial_support": 3,
+   "n_items_total": 11,
+   "span_binding_verified": false,
+   "basis": ">=1 evidence item classified DIRECT_SUPPORT/PARTIAL_SUPPORT, or the candidate's span binding verified (R394 s5 classification + a2/verify)"
+  }
+ }
+}

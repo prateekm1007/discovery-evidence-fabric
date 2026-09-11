@@ -1,0 +1,622 @@
+{
+ "ledger": "IMPROVEMENT_LEDGER (R378 TECHNICAL IMPROVEMENT ENGINE)",
+ "version": "1.0.0",
+ "loop": "CANDIDATE -> DIAGNOSE WEAKNESS -> IDENTIFY LIMITING FEATURE -> GENERATE CONTROLLED MUTATION -> RE-EVALUATE EVIDENCE/MECHANISM/PRIOR ART -> RE-SCORE -> KEEP OR KILL -> REPEAT",
+ "collision_mode": "REPLAY_CACHE",
+ "live_sources": null,
+ "evaluators_registered": [
+  {
+   "evaluator_id": "term_rule_v1",
+   "fidelity_tier": "TERM_RULE",
+   "evidence_rank": 3
+  }
+ ],
+ "q_instrument": "discovery_fabric/benchmark/candidate_quality.py (FROZEN, hash-pinned, imported read-only)",
+ "i_instrument": "discovery_fabric/benchmark/invention_quality.py (R377, imported read-only)",
+ "thresholds": {
+  "SPAN_DERIVATION_MIN": {
+   "value": 0.2,
+   "epistemic_class": "ENGINEERING",
+   "justification": "the engine's own span-derivation rule (candidate_diversity.span_derivation_check): ratio < 0.20 = SPAN_UNDERIVED. A MECHANISM_STRENGTHENING mutation must CLEAR this floor — the same rule that gates the grid, not a new one."
+  },
+  "EVIDENCE_SUPPORT_MIN": {
+   "value": 0.2,
+   "epistemic_class": "ENGINEERING",
+   "justification": "I1's underived flag fires below 0.20; an EVIDENCE_DERIVED_CONSTRAINT mutation must clear the same floor on evidence_support."
+  },
+  "DOMAIN_OVERLAP_MIN": {
+   "value": 1,
+   "epistemic_class": "ENGINEERING",
+   "justification": "REPLAY_CACHE re-adjudication is valid only while the mutated candidate stays in the domain the cached art was found FOR. Guard: >= 1 NON-generic technical term shared between the child's mechanism+intervention and the cached family corpus. ZERO overlap means the mutation abandoned the domain (measured attack: re-adjudicating a cement-curing intervention against battery art fabricates surviving differentiators — false novelty from stale art). The overlap count is RECORDED on every cache adjudication so thin-domain links are auditable. NOTE: entity-term retention vs the problem CANNOT catch this class — entity terms are problem-derived and unchanged by mutations (measured while writing the guard's tests); it is recorded for audit only."
+  },
+  "MAX_ITERATIONS_DEFAULT": {
+   "value": 2,
+   "epistemic_class": "ENGINEERING",
+   "justification": "the CEO minimum loop is DIAGNOSE -> IMPROVE -> RE-EVALUATE -> IMPROVE AGAIN; two iterations demonstrate repeatability at bounded cost"
+  },
+  "MAX_PROPOSALS_PER_ITERATION": {
+   "value": 3,
+   "epistemic_class": "ENGINEERING",
+   "justification": "bounded proposal budget: three attempts, then the honest no-defensible-mutation verdict"
+  }
+ },
+ "started_at": "2026-09-11T10:27:08+00:00Z",
+ "iterations": [
+  {
+   "iteration": 1,
+   "diagnosis": {
+    "limiting_features": [
+     {
+      "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "measured_value": 0.267,
+      "weakness_kind": "LOW_SCORE",
+      "why_weak": "measured 0.267 < STRONG floor 0.7",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT"
+     },
+     {
+      "dimension": "I5_EXPERIMENT_DISCRIMINATION",
+      "measured_value": 0.667,
+      "weakness_kind": "LOW_SCORE",
+      "why_weak": "measured 0.667 < STRONG floor 0.7",
+      "mutation_type": "EXPERIMENT_DISCRIMINATION"
+     }
+    ],
+    "evidence_gaps": [
+     {
+      "dimension": "I2_DIFFERENTIATOR_TECHNICAL_MEANING",
+      "state": "UNMEASURABLE_NO_SURVIVORS",
+      "what_is_missing": "no surviving differentiators recorded",
+      "consequence": "no mutation targets this dimension until the gap closes (Art. XXV)"
+     },
+     {
+      "dimension": "I3_RECOMBINATION_RISK",
+      "state": "UNMEASURABLE_NO_FAMILIES",
+      "what_is_missing": "no prior-art families adjudicated — residue vs found art is unmeasured; absence of found art is not novelty",
+      "consequence": "no mutation targets this dimension until the gap closes (Art. XXV)"
+     },
+     {
+      "dimension": "I4_NEW_TECHNICAL_RELATIONSHIP",
+      "state": "UNMEASURABLE_NO_FAMILY_TEXT",
+      "what_is_missing": "no adjudicated family text stored — pair novelty vs found art is unmeasured",
+      "consequence": "no mutation targets this dimension until the gap closes (Art. XXV)"
+     }
+    ],
+    "target": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT"
+    }
+   },
+   "proposals": [
+    {
+     "proposal_id": "prop:ece868f7ce6a",
+     "provider": "nvidia",
+     "model": "meta/llama-3.2-11b-vision-instruct",
+     "prompt_hash": "d315bc85ebda4078d7f011b213099bff30fac11c774004258b762b9fc0d3f6c2",
+     "output_hash": "ece868f7ce6a1bafcc7db951cf76c00d95d882c887b6b000de8dd0c04cae67ed",
+     "fields": {
+      "MUTATION_TYPE": "EVIDENCE_DERIVED_CONSTRAINT",
+      "MECHANISM": "The non-linear effect in high speed rotor noise",
+      "INTERVENTION": "Utilize the non-linear effect in high speed rotor noise to dynamically adjust the rotor's mass distribution in real-time, allowing for precise control over the centrifuge's operation and minimizing vibration.",
+      "EXPECTED_EFFECT": "The non-linear effect in high speed rotor noise will enable the dynamic adjustment of the rotor's mass distribution, potentially reducing the vibration and improving the overall stability of the centrifuge.",
+      "FALSIFICATION_TEST": "falsification_test_from_candidate",
+      "MECHANISM_SOURCE_SPAN": "\"Non-linear effect in high speed rotor noise\"",
+      "SOURCE_EVIDENCE_ID": "doi:10.1016/0022-460x(82)90319-4",
+      "EXPERIMENT": "The experiment will compare the performance of the modified centrifuge with the non-linear effect in high speed rotor noise adjustment against the baseline centrifuge without this feature, with the expected information gain being the reduction in vibration and improvement in separation quality.",
+      "EXPERIMENT_BASELINE": "The current centrifuge design without the non-linear effect in high speed rotor noise adjustment",
+      "EXPERIMENT_EIG": "0.8",
+      "CONSTRAINT_DERIVED": "NONE",
+      "MUTATION_REASON": "This mutation repairs the measured weakness of rotor imbalance vibration at 15000 rpm by dynamically adjusting the rotor's mass distribution in real-time, utilizing the non-linear effect in high speed rotor noise."
+     },
+     "validation": {
+      "valid": false,
+      "stage": "VALIDATION",
+      "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+      "checks": {
+       "mutation_type_matches_diagnosis": true,
+       "span_verbatim_in_evidence": false,
+       "evidence_support": 0.333,
+       "evidence_support_cleared": 0.333,
+       "constraint_actually_derived": false
+      },
+      "reasons": [
+       "span_verbatim_in_evidence: the quoted span is NOT a verbatim substring of the cited evidence (fabricated spans are invalid — Art. VI)",
+       "constraint_actually_derived: EVIDENCE_DERIVED_CONSTRAINT requires a derived constraint, not NONE"
+      ],
+      "validated_at": "2026-09-11T10:27:25+00:00Z"
+     }
+    },
+    {
+     "proposal_id": "prop:56cecdeb568d",
+     "provider": "nvidia",
+     "model": "meta/llama-3.2-11b-vision-instruct",
+     "prompt_hash": "a6a41228b7bf55cfe247bf846f8e8e3750028c9136c738198a810b8610e11dd8",
+     "output_hash": "56cecdeb568d747bbc17a0930496799998873cfe6a6df710b2092f4f88fcd720",
+     "fields": {
+      "MUTATION_TYPE": "EVIDENCE_DERIVED_CONSTRAINT",
+      "MECHANISM": "The non-linear effect in high speed rotor noise",
+      "INTERVENTION": "Utilize the non-linear effect in high speed rotor noise to dynamically adjust the rotor's mass distribution in real-time, thereby minimizing vibration and improving the overall stability of the centrifuge",
+      "EXPECTED_EFFECT": "The non-linear effect in high speed rotor noise will enable the dynamic adjustment of the rotor's mass distribution, potentially reducing the vibration and improving the overall stability of the centrifuge",
+      "FALSIFICATION_TEST": "falsification_test_from_candidate",
+      "MECHANISM_SOURCE_SPAN": "Non-linear effect in high speed rotor noise",
+      "SOURCE_EVIDENCE_ID": "doi:10.1016/0022-460x(82)90319-4",
+      "EXPERIMENT": "The proposed intervention will be compared against the baseline of no dynamic adjustment, and the expected information gain is the reduction in vibration displacement below 20 micrometers at 15000 rpm",
+      "EXPERIMENT_BASELINE": "no dynamic adjustment",
+      "EXPERIMENT_EIG": "0.5",
+      "CONSTRAINT_DERIVED": "NONE",
+      "MUTATION_REASON": "This mutation repairs the measured weakness of rotor imbalance vibration at 15000 rpm by deriving a constraint from the non-linear effect in high speed rotor noise, which enables dynamic adjustment of the rotor's mass distribution."
+     },
+     "validation": {
+      "valid": false,
+      "stage": "VALIDATION",
+      "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+      "checks": {
+       "mutation_type_matches_diagnosis": true,
+       "span_evidence_exists": "doi:10.1016/0022-460x(82)90319-4",
+       "span_verbatim_in_evidence": true,
+       "evidence_support": 0.333,
+       "evidence_support_cleared": 0.333,
+       "constraint_actually_derived": false
+      },
+      "reasons": [
+       "constraint_actually_derived: EVIDENCE_DERIVED_CONSTRAINT requires a derived constraint, not NONE"
+      ],
+      "validated_at": "2026-09-11T10:27:36+00:00Z"
+     }
+    },
+    {
+     "proposal_id": "prop:d5336f592981",
+     "provider": "nvidia",
+     "model": "meta/llama-3.2-11b-vision-instruct",
+     "prompt_hash": "532a023eacd8021a9f47dd62090f87739962e76a037c7941ec5e360df1c7fed6",
+     "output_hash": "d5336f592981e495d5e6b051df31a8b18f634d511d4b9deab6cda373f8d088e3",
+     "fields": {
+      "MUTATION_TYPE": "EVIDENCE_DERIVED_CONSTRAINT",
+      "MECHANISM": "The phenomenon of dust adhesion presents significant challenges for measurement, and this centrifuge addresses these challenges through a compact, modular design.",
+      "INTERVENTION": "Utilize the compact, modular design of the centrifuge to minimize vibration by adjusting the mass distribution of the rotor in real-time, leveraging the user-adjustable sample attachment points via an interface or double-sided tape.",
+      "EXPECTED_EFFECT": "The real-time adjustment of the rotor's mass distribution would enable the dynamic minimization of vibration, potentially reducing the vibration and improving the overall stability of the centrifuge.",
+      "FALSIFICATION_TEST": "falsification_test_from_candidate",
+      "MECHANISM_SOURCE_SPAN": "The device is intentionally simple, leveraging widely available components and exclusively employing 3D printing as the manufacturing method.",
+      "SOURCE_EVIDENCE_ID": "doi:10.1016/j.ohx.2025.e00694",
+      "EXPERIMENT": "The proposed intervention would be compared against the baseline of the current centrifuge design, which does not utilize real-time adjustment of the rotor's mass distribution to minimize vibration.",
+      "EXPERIMENT_BASELINE": "The current centrifuge design",
+      "EXPERIMENT_EIG": "0.8",
+      "CONSTRAINT_DERIVED": "The mass distribution of the rotor must be adjusted in real-time to minimize vibration, and the user-adjustable sample attachment points via an interface or double-sided tape must be utilized to achieve this.",
+      "MUTATION_REASON": "This mutation repairs the measured defect of rotor imbalance vibration at 15000 rpm by leveraging the compact, modular design of the centrifuge to minimize vibration."
+     },
+     "validation": {
+      "valid": true,
+      "stage": "VALIDATION",
+      "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+      "checks": {
+       "mutation_type_matches_diagnosis": true,
+       "span_evidence_exists": "doi:10.1016/j.ohx.2025.e00694",
+       "span_verbatim_in_evidence": true,
+       "evidence_support": 0.767,
+       "evidence_support_cleared": 0.767,
+       "constraint_traceable_to_evidence": "The mass distribution of the rotor must be adjusted in real-time to minimize vibration, and the user-adjustable sample a"
+      },
+      "reasons": [],
+      "validated_at": "2026-09-11T10:28:06+00:00Z"
+     }
+    }
+   ],
+   "mutation_attempts": [
+    {
+     "mutation_applied": {
+      "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+      "mutation_id": "mut:ae3370b1255c",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+      "diagnostic_trigger": {
+       "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+       "measured_before": 0.267,
+       "basis": "R378 evaluator-contract diagnosis (deterministic)"
+      },
+      "proposal_provenance": {
+       "proposal_id": "prop:d5336f592981",
+       "provider": "nvidia",
+       "model": "meta/llama-3.2-11b-vision-instruct",
+       "prompt_hash": "532a023eacd8021a9f47dd62090f87739962e76a037c7941ec5e360df1c7fed6",
+       "output_hash": "d5336f592981e495d5e6b051df31a8b18f634d511d4b9deab6cda373f8d088e3",
+       "llm_is_untrusted_proposer": true
+      },
+      "validation": {
+       "valid": true,
+       "stage": "VALIDATION",
+       "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+       "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+       "checks": {
+        "mutation_type_matches_diagnosis": true,
+        "span_evidence_exists": "doi:10.1016/j.ohx.2025.e00694",
+        "span_verbatim_in_evidence": true,
+        "evidence_support": 0.767,
+        "evidence_support_cleared": 0.767,
+        "constraint_traceable_to_evidence": "The mass distribution of the rotor must be adjusted in real-time to minimize vibration, and the user-adjustable sample a"
+       },
+       "reasons": [],
+       "validated_at": "2026-09-11T10:28:06+00:00Z"
+      },
+      "fields_changed": {
+       "mechanism": {
+        "before": "Optical microscopy to determine the dust mass accurately",
+        "after": "The phenomenon of dust adhesion presents significant challenges for measurement, and this centrifuge addresses these challenges through a compact, modular design."
+       },
+       "intervention": {
+        "before": "Utilize optical microscopy to measure the mass of the sample or sample layer on the rotor, allowing for real-time monitoring and adjustment of the rotor's mass distribution to minimize vibration",
+        "after": "Utilize the compact, modular design of the centrifuge to minimize vibration by adjusting the mass distribution of the rotor in real-time, leveraging the user-adjustable sample attachment points via an interface or double-sided tape."
+       },
+       "mechanism_source_span": {
+        "before": "Optical microscopy may be employed to determine the dust mass accurately.",
+        "after": "The device is intentionally simple, leveraging widely available components and exclusively employing 3D printing as the manufacturing method."
+       }
+      },
+      "inherited_negatives": {
+       "uncertainty_ids": [
+        "con:attack:weak_transfer",
+        "centrifuge benchtop laboratory rotor assembly high",
+        "centrifuge benchtop laboratory rotor assembly high",
+        "optical microscopy determine mass accurately dust",
+        "optical microscopy determine mass accurately dust",
+        "rotor optical microscopy mass vibration sample layer adjustment",
+        "rotor optical microscopy mass vibration sample layer adjustment",
+        "centrifuge measurement adjustment distribution reducing vibration",
+        "centrifuge measurement adjustment distribution reducing vibration",
+        "mass measurement dynamic adjustment distribution potentially",
+        "mass measurement dynamic adjustment distribution potentially"
+       ],
+       "collision_family_ids": [],
+       "source_errors": []
+      },
+      "parent_spec_hash": "314478f4e477cff063cdabe311454122cef81ca215a6b082bd2eccfabe50bcf6",
+      "child_spec_hash": null,
+      "reason": "This mutation repairs the measured defect of rotor imbalance vibration at 15000 rpm by leveraging the compact, modular design of the centrifuge to minimize vibration.",
+      "applied_at": "2026-09-11T10:28:06+00:00Z"
+     },
+     "re_evaluation": {
+      "collision_mode": "REPLAY_CACHE",
+      "re_evaluated_at": "2026-09-11T10:28:06+00:00Z",
+      "re_adjudication": {
+       "mode": "REPLAY_CACHE",
+       "valid": false,
+       "reason": "NO_CACHED_FAMILIES"
+      },
+      "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+      "re_adjudication_failure": "NO_CACHED_FAMILIES",
+      "i_dimensions": {
+       "I1_MECHANISM_EVIDENCE_DERIVATION": {
+        "score": 0.091,
+        "state": "MEASURED"
+       },
+       "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_SURVIVORS"
+       },
+       "I3_RECOMBINATION_RISK": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_FAMILIES"
+       },
+       "I4_NEW_TECHNICAL_RELATIONSHIP": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+       },
+       "I5_EXPERIMENT_DISCRIMINATION": {
+        "score": 0.667,
+        "state": "MEASURED"
+       }
+      },
+      "i_flags": {
+       "underived_mechanism": true,
+       "recombination_only": false
+      },
+      "i_average": 0.379,
+      "q_dimensions": {
+       "Q1_EVIDENCE_BINDING": {
+        "score": 0.5,
+        "state": "MEASURED"
+       },
+       "Q2_PRIOR_ART_SPECIFICITY": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_PRIOR_ART"
+       },
+       "Q3_PRIOR_ART_RESOLUTION": {
+        "score": 0.0,
+        "state": "MEASURED"
+       },
+       "Q4_EXPERIMENT_DECISIVENESS": {
+        "score": 1.0,
+        "state": "MEASURED"
+       },
+       "Q5_CHAIN_COMPLETENESS": {
+        "score": 1.0,
+        "state": "MEASURED"
+       }
+      },
+      "q_average": 0.625
+     },
+     "decision": {
+      "action": "REJECT_MUTATION",
+      "improved": false,
+      "checks": {
+       "targeted_dimension": "0.267 -> 0.091 (no improvement)",
+       "negatives_preserved": true,
+       "no_new_structural_flags": false,
+       "no_unknown_conversion_without_new_evidence": true,
+       "text_gap_conversions_recorded": [],
+       "prior_art_position_not_degraded": true
+      },
+      "reasons": [
+       "mutation introduced new structural flags: ['underived_mechanism']"
+      ],
+      "decided_at": "2026-09-11T10:28:06+00:00Z"
+     }
+    }
+   ],
+   "mutation_applied": {
+    "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+    "mutation_id": "mut:ae3370b1255c",
+    "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+    "diagnostic_trigger": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "measured_before": 0.267,
+     "basis": "R378 evaluator-contract diagnosis (deterministic)"
+    },
+    "proposal_provenance": {
+     "proposal_id": "prop:d5336f592981",
+     "provider": "nvidia",
+     "model": "meta/llama-3.2-11b-vision-instruct",
+     "prompt_hash": "532a023eacd8021a9f47dd62090f87739962e76a037c7941ec5e360df1c7fed6",
+     "output_hash": "d5336f592981e495d5e6b051df31a8b18f634d511d4b9deab6cda373f8d088e3",
+     "llm_is_untrusted_proposer": true
+    },
+    "validation": {
+     "valid": true,
+     "stage": "VALIDATION",
+     "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+     "checks": {
+      "mutation_type_matches_diagnosis": true,
+      "span_evidence_exists": "doi:10.1016/j.ohx.2025.e00694",
+      "span_verbatim_in_evidence": true,
+      "evidence_support": 0.767,
+      "evidence_support_cleared": 0.767,
+      "constraint_traceable_to_evidence": "The mass distribution of the rotor must be adjusted in real-time to minimize vibration, and the user-adjustable sample a"
+     },
+     "reasons": [],
+     "validated_at": "2026-09-11T10:28:06+00:00Z"
+    },
+    "fields_changed": {
+     "mechanism": {
+      "before": "Optical microscopy to determine the dust mass accurately",
+      "after": "The phenomenon of dust adhesion presents significant challenges for measurement, and this centrifuge addresses these challenges through a compact, modular design."
+     },
+     "intervention": {
+      "before": "Utilize optical microscopy to measure the mass of the sample or sample layer on the rotor, allowing for real-time monitoring and adjustment of the rotor's mass distribution to minimize vibration",
+      "after": "Utilize the compact, modular design of the centrifuge to minimize vibration by adjusting the mass distribution of the rotor in real-time, leveraging the user-adjustable sample attachment points via an interface or double-sided tape."
+     },
+     "mechanism_source_span": {
+      "before": "Optical microscopy may be employed to determine the dust mass accurately.",
+      "after": "The device is intentionally simple, leveraging widely available components and exclusively employing 3D printing as the manufacturing method."
+     }
+    },
+    "inherited_negatives": {
+     "uncertainty_ids": [
+      "con:attack:weak_transfer",
+      "centrifuge benchtop laboratory rotor assembly high",
+      "centrifuge benchtop laboratory rotor assembly high",
+      "optical microscopy determine mass accurately dust",
+      "optical microscopy determine mass accurately dust",
+      "rotor optical microscopy mass vibration sample layer adjustment",
+      "rotor optical microscopy mass vibration sample layer adjustment",
+      "centrifuge measurement adjustment distribution reducing vibration",
+      "centrifuge measurement adjustment distribution reducing vibration",
+      "mass measurement dynamic adjustment distribution potentially",
+      "mass measurement dynamic adjustment distribution potentially"
+     ],
+     "collision_family_ids": [],
+     "source_errors": []
+    },
+    "parent_spec_hash": "314478f4e477cff063cdabe311454122cef81ca215a6b082bd2eccfabe50bcf6",
+    "child_spec_hash": null,
+    "reason": "This mutation repairs the measured defect of rotor imbalance vibration at 15000 rpm by leveraging the compact, modular design of the centrifuge to minimize vibration.",
+    "applied_at": "2026-09-11T10:28:06+00:00Z"
+   },
+   "re_evaluation": {
+    "collision_mode": "REPLAY_CACHE",
+    "re_evaluated_at": "2026-09-11T10:28:06+00:00Z",
+    "re_adjudication": {
+     "mode": "REPLAY_CACHE",
+     "valid": false,
+     "reason": "NO_CACHED_FAMILIES"
+    },
+    "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+    "re_adjudication_failure": "NO_CACHED_FAMILIES",
+    "i_dimensions": {
+     "I1_MECHANISM_EVIDENCE_DERIVATION": {
+      "score": 0.091,
+      "state": "MEASURED"
+     },
+     "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_SURVIVORS"
+     },
+     "I3_RECOMBINATION_RISK": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_FAMILIES"
+     },
+     "I4_NEW_TECHNICAL_RELATIONSHIP": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+     },
+     "I5_EXPERIMENT_DISCRIMINATION": {
+      "score": 0.667,
+      "state": "MEASURED"
+     }
+    },
+    "i_flags": {
+     "underived_mechanism": true,
+     "recombination_only": false
+    },
+    "i_average": 0.379,
+    "q_dimensions": {
+     "Q1_EVIDENCE_BINDING": {
+      "score": 0.5,
+      "state": "MEASURED"
+     },
+     "Q2_PRIOR_ART_SPECIFICITY": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_PRIOR_ART"
+     },
+     "Q3_PRIOR_ART_RESOLUTION": {
+      "score": 0.0,
+      "state": "MEASURED"
+     },
+     "Q4_EXPERIMENT_DECISIVENESS": {
+      "score": 1.0,
+      "state": "MEASURED"
+     },
+     "Q5_CHAIN_COMPLETENESS": {
+      "score": 1.0,
+      "state": "MEASURED"
+     }
+    },
+    "q_average": 0.625
+   },
+   "decision": {
+    "action": "REJECT_MUTATION",
+    "improved": false,
+    "checks": {
+     "targeted_dimension": "0.267 -> 0.091 (no improvement)",
+     "negatives_preserved": true,
+     "no_new_structural_flags": false,
+     "no_unknown_conversion_without_new_evidence": true,
+     "text_gap_conversions_recorded": [],
+     "prior_art_position_not_degraded": true
+    },
+    "reasons": [
+     "mutation introduced new structural flags: ['underived_mechanism']"
+    ],
+    "decided_at": "2026-09-11T10:28:06+00:00Z"
+   }
+  }
+ ],
+ "outcome": "KILLED_NO_IMPROVING_MUTATION",
+ "outcome_reason": "iteration 1: 1 validated EVIDENCE_DERIVED_CONSTRAINT mutation(s) were applied and fully re-evaluated; the targeted dimension I1_MECHANISM_EVIDENCE_DERIVATION did not improve (0.267 -> 0.091 (no improvement)); mutation introduced new structural flags: ['underived_mechanism']. No defensible improvement exists. Candidate killed.",
+ "baseline": {
+  "i_dimensions": {
+   "I1_MECHANISM_EVIDENCE_DERIVATION": {
+    "score": 0.267,
+    "state": "MEASURED"
+   },
+   "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_SURVIVORS"
+   },
+   "I3_RECOMBINATION_RISK": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_FAMILIES"
+   },
+   "I4_NEW_TECHNICAL_RELATIONSHIP": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+   },
+   "I5_EXPERIMENT_DISCRIMINATION": {
+    "score": 0.667,
+    "state": "MEASURED"
+   }
+  },
+  "i_flags": {
+   "underived_mechanism": false,
+   "recombination_only": false
+  },
+  "i_average": 0.467,
+  "q_dimensions": {
+   "Q1_EVIDENCE_BINDING": {
+    "score": 0.5,
+    "state": "MEASURED"
+   },
+   "Q2_PRIOR_ART_SPECIFICITY": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_PRIOR_ART"
+   },
+   "Q3_PRIOR_ART_RESOLUTION": {
+    "score": 0.0,
+    "state": "MEASURED"
+   },
+   "Q4_EXPERIMENT_DECISIVENESS": {
+    "score": 1.0,
+    "state": "MEASURED"
+   },
+   "Q5_CHAIN_COMPLETENESS": {
+    "score": 1.0,
+    "state": "MEASURED"
+   }
+  },
+  "q_average": 0.625,
+  "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE"
+ },
+ "final": {
+  "i_dimensions": {
+   "I1_MECHANISM_EVIDENCE_DERIVATION": {
+    "score": 0.267,
+    "state": "MEASURED"
+   },
+   "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_SURVIVORS"
+   },
+   "I3_RECOMBINATION_RISK": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_FAMILIES"
+   },
+   "I4_NEW_TECHNICAL_RELATIONSHIP": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+   },
+   "I5_EXPERIMENT_DISCRIMINATION": {
+    "score": 0.667,
+    "state": "MEASURED"
+   }
+  },
+  "i_flags": {
+   "underived_mechanism": false,
+   "recombination_only": false
+  },
+  "i_average": 0.467,
+  "q_dimensions": {
+   "Q1_EVIDENCE_BINDING": {
+    "score": 0.5,
+    "state": "MEASURED"
+   },
+   "Q2_PRIOR_ART_SPECIFICITY": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_PRIOR_ART"
+   },
+   "Q3_PRIOR_ART_RESOLUTION": {
+    "score": 0.0,
+    "state": "MEASURED"
+   },
+   "Q4_EXPERIMENT_DECISIVENESS": {
+    "score": 1.0,
+    "state": "MEASURED"
+   },
+   "Q5_CHAIN_COMPLETENESS": {
+    "score": 1.0,
+    "state": "MEASURED"
+   }
+  },
+  "q_average": 0.625,
+  "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE"
+ },
+ "finished_at": "2026-09-11T10:28:06+00:00Z",
+ "outcome_summary": {
+  "baseline_i_average": 0.467,
+  "final_i_average": 0.467,
+  "baseline_q_average": 0.625,
+  "final_q_average": 0.625,
+  "iterations_run": 1,
+  "keeps": 0
+ },
+ "status": "KILLED_NO_IMPROVING_MUTATION"
+}

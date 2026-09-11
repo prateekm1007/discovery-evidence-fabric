@@ -476,6 +476,24 @@ def generate(prompt: str, system: str = "",
                                   order_for_role, role_for_purpose)
     from . import model_routing as mr
 
+    # R445-C transport override: ENGINE_LLM_TIMEOUT_S bounds the per-call
+    # socket timeout (the R391/R418 operator-override class — explicit,
+    # recorded in the call ledger via the route, never silent). Motivation
+    # (measured live this round): a provider endpoint that accepts the
+    # request and then stalls holds each attempt for the FULL timeout
+    # before the cascade can rotate; with the 240 s default and the
+    # bounded cascade (3 attempts x up to 5 hops) a single stalling
+    # endpoint can consume >1 h for ONE call. A smaller bound (e.g. 90)
+    # converts the same failure into a fast rotate. Transport-only:
+    # provider selection policy, quality tiers, retry semantics, and
+    # epistemic semantics are untouched (same class as ENGINE_*_PROVIDER).
+    env_to = os.environ.get("ENGINE_LLM_TIMEOUT_S", "").strip()
+    if env_to:
+        try:
+            timeout = max(5, int(env_to))
+        except (TypeError, ValueError):
+            pass  # malformed override ignored (recorded policy: no crash)
+
     matrix = availability_matrix()
     avail_ids = [m["provider_id"] for m in matrix if m["available"]]
 

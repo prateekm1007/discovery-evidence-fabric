@@ -682,6 +682,21 @@ def eligible_models(provider_id: str, task: str,
         (":batch", ":extended"))]
     if pinned and not is_model_gone(provider_id, pinned):
         existing = next((r for r in recs if r.model == pinned), None)
+        # R445 fix (measured defect, part 2): when the pinned model is
+        # already in the catalog, the re-used CATALOG record kept
+        # source='CATALOG' — so the operator pin was INVISIBLE to every
+        # downstream consumer that honors the pin (build_ladder's
+        # pin-stays-first fix looks for source='OPERATOR_PINNED' and
+        # never matched). The pin marker travels on the record.
+        if existing is not None and existing.source != "OPERATOR_PINNED":
+            existing = ModelRecord(
+                provider=existing.provider, model=existing.model,
+                task_capabilities=existing.task_capabilities,
+                cost_class=existing.cost_class,
+                latency_class=existing.latency_class,
+                context_limit=existing.context_limit,
+                structured_output=existing.structured_output,
+                source="OPERATOR_PINNED")
         pinned_rec = existing or ModelRecord(
             provider=provider_id, model=pinned,
             task_capabilities=[TASK_STRONG, TASK_FAST, TASK_CHEAP],
@@ -775,6 +790,20 @@ def build_ladder(task: str, role: Optional[str] = None,
     for p in provs:
         recs = sorted([r for r in eligible_models(p, task)
                        if task in r.task_capabilities], key=_rank)
+        # R445 fix (measured defect): the R418 operator pin must stay the
+        # provider's FIRST rung. eligible_models() emits the pinned model
+        # at the head (source=OPERATOR_PINNED), but the availability-score
+        # sort above reordered it below fast-but-otherwise-incapable
+        # catalog models — measured live: NVIDIA_MODEL pinned to a
+        # field-line-capable model while generate() still routed to
+        # nvidia/nemotron-3.5-content-safety (sub-second "User Safety:
+        # safe" classifier verdicts, no field lines -> honest
+        # MECHANISM_GENERATION_FAILED / TRANSPORT_BLOCKED mislabels).
+        # The pin is an explicit recorded operator decision; the score
+        # heuristic ranks only BELOW it.
+        pinned = [r for r in recs if r.source == "OPERATOR_PINNED"]
+        if pinned:
+            recs = pinned + [r for r in recs if r.source != "OPERATOR_PINNED"]
         if recs:
             per_provider.append((p, recs))
 
