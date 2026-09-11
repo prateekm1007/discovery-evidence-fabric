@@ -149,9 +149,12 @@ def main() -> int:
             "stage": final_body.get("stage"),
         },
         "cio_http": cio.get("http_status"),
-        "cio_summary": (cio.get("body") or {}).get("summary")
-        or {k: (cio.get("body") or {}).get(k) for k in
-            ("mechanism", "technology_class", "n_components")},
+        # R446-C1: the phantom keys (summary / top-level mechanism /
+        # technology_class / n_components) RETIRED — the canonical
+        # CIO shape is extracted by scripts/r446_cio_extraction.py
+        # (one authority; HTTP 200 + missing fields is typed
+        # explicitly incomplete, never semantic success)
+        "cio_summary": pv._cio_summary(cio.get("body")),
         "glb_http": model.get("http_status"),
         "outcome": ("RUN_COMPLETED" if result.get("http_status") == 200
                     else "POLL_FAILED"),

@@ -1,0 +1,130 @@
+{
+  "schema_version": "1.0.0",
+  "kind": "CANONICAL_INVENTION_OBJECT",
+  "run_id": "ts_r446_fixture_positive",
+  "legal_position": {"position": "TECHNICAL_EVIDENCE_PACKAGE", "note": "fixture: production-shaped CIO body"},
+  "novelty_language": "NOVELTY_SIGNAL",
+  "present": true,
+  "identity": {
+    "invention_id": "ts_r446_fixture_positive",
+    "problem": "hot-rolling mill work-roll cooling spray system: cooling nozzle clogging causes non-uniform roll temperature and strip shape defects",
+    "mechanism": {
+      "mechanism": "cascade filtration with differential-pressure monitoring and automatic backflush of the cooling header, staged so the roll-face spray header sees constant supply pressure and flow distribution across the full spray bar length",
+      "intervention": "two-stage wedge-wire cascade (300 micron then 120 micron) on the recirculated cooling-water supply, each stage with a dP transmitter and a pigging-free automatic backflush valve arrangement, sized for the mill's declared duty point",
+      "expected_effect": "nozzle-clogging events per campaign reduced from the baseline 4.1 (scheduled manual cleaning at roll changes) to below 0.5, with roll thermal-crown variation held inside the declared 12 micron band across a full rolling campaign"
+    },
+    "novelty_hypothesis": "the backflush-at-dP-threshold arrangement on the spray header (not the mill supply) is the novel design variable",
+    "distinguishing_features": ["header-side staged filtration", "dP-triggered backflush"],
+    "survivor": true,
+    "final_status": "INVENTION_REQUIRES_EXPERIMENT",
+    "domain": {
+      "domain": "thermal",
+      "label": "Thermal / heat transfer",
+      "basis": "fixture: engineering_specification.why_this_domain",
+      "selection_basis": "problem's own physics",
+      "source_refs": ["engineering_specification.why_this_domain"]
+    },
+    "applicability": {
+      "context_class": "INDUSTRIAL_PROCESS",
+      "basis": "fixture",
+      "score": 0.8
+    }
+  },
+  "maturity": {
+    "design": true,
+    "simulation": false,
+    "evidence_supported": false,
+    "experimentally_verified": false,
+    "maturity_ladder": ["DESIGNED"],
+    "reality_loop_state": "NONE",
+    "maturity_basis": {}
+  },
+  "evidence": {"records": [], "record_count": 0, "prior_art": {"searched": false}},
+  "engineering": {
+    "specification_present": true,
+    "parameters": [
+      {"param_id": "filter_stage_1_micron", "value": 300, "unit": "um", "category": "geometry"},
+      {"param_id": "backflush_dP_threshold_mbar", "value": 180, "unit": "mbar", "category": "control"}
+    ],
+    "assumptions": "fixture: supply water scale load bounded by the declared recirculation class",
+    "failure_modes": ["backflush valve jam"],
+    "constraints": "no mill stop for retrofit; recirculated water with scale particles present",
+    "causal_chain": ["staged filtration removes scale above 120 um", "dP rise triggers backflush before nozzle-channel bridging", "constant header pressure keeps the spray distribution uniform", "roll thermal crown stays inside the declared band"]
+  },
+  "geometry": {
+    "present": true,
+    "class": "ENGINEERING_PARAMETRIC",
+    "conceptual": false,
+    "glb": "/api/run/ts_r446_fixture_positive/model",
+    "glb_sha256": "fixture-sha",
+    "step": [],
+    "stl": [],
+    "svg_views": [],
+    "parametric_model_present": true,
+    "cad_pipeline_status": "OK",
+    "bridge_outcome": "BRIDGED",
+    "bridge_why": "fixture",
+    "components": [
+      {"name": "spray_header", "role": "distribution"},
+      {"name": "filter_stage_1_wedge_wire", "role": "filtration"},
+      {"name": "filter_stage_2_wedge_wire", "role": "filtration"},
+      {"name": "backflush_valve_bank", "role": "maintenance"},
+      {"name": "dP_transmitter_pair", "role": "instrumentation"}
+    ],
+    "domain_family": "thermal",
+    "quality_gates": {"fixture": true},
+    "artifact_identity": {"fixture": true},
+    "fallback_basis": null,
+    "scores": {"fixture": true},
+    "evolution": {"fixture": true},
+    "generation_id": 1,
+    "generation_count": 1,
+    "authority": "fixture authority text"
+  },
+  "simulation": {"executed": false, "lifecycle_verdict": null, "baseline_outcome": null, "epistemic_class": null},
+  "visualization": {"viewer_required": ["orbit", "zoom"], "renders": [], "component_inspection": []},
+  "reality_loop": {"state": "NONE", "record": null},
+  "downloads": {
+    "package_zip": "/api/sessions/ts_r446_fixture_positive/package",
+    "package_maturity": "BRIDGE_PACKAGE",
+    "package_kind": "TECHNOLOGY_TRANSFER_PACKAGE",
+    "document_count": 6,
+    "package_origin": "INVENTION_BRIDGE"
+  },
+  "experiment": {
+    "decisive_experiment": {
+      "shortlist": ["campaign-scale clogging count with and without the cascade at the declared duty point"],
+      "administrative_actions_excluded": [],
+      "exclusion_note": "fixture",
+      "selected": "campaign-scale clogging count with and without the cascade at the declared duty point",
+      "explanation": "fixture: the cheapest measurement that can kill the mechanism",
+      "no_invented_values_note": "fixture",
+      "falsification_contract": {
+        "hypothesis": "staged header-side filtration with dP-triggered backflush keeps nozzle-clogging events below 0.5 per campaign",
+        "treatment": "cascade installed on the spray header supply",
+        "control": "the installed baseline (scheduled manual cleaning at roll changes)",
+        "measurement": "nozzle-clogging events per rolling campaign, counted by the mill's own spray-pattern inspection",
+        "apparatus": "one production mill campaign window",
+        "sample": "one campaign per arm",
+        "acceptance_threshold": "clogging events per campaign <= 0.5 on the treatment arm",
+        "falsification_threshold": "clogging events per campaign >= 4 on the treatment arm (no improvement on the baseline count)",
+        "uncertainty": "campaign-to-campaign scale-load variance",
+        "cost": "fixture",
+        "time": "fixture",
+        "safety": "no process safety change"
+      },
+      "timestamp": "2026-09-11T00:00:00Z"
+    },
+    "status": "SPECIFIED_NOT_EXECUTED"
+  },
+  "provenance": {
+    "run_id": "ts_r446_fixture_positive",
+    "origin": "r446 test fixture",
+    "invention_spec_sha256": "fixture",
+    "parametric_model_sha256": "fixture",
+    "final_state_sha256": "fixture",
+    "provider_route_note": "fixture",
+    "reviewer_provenance": "AI_REVIEW"
+  },
+  "language_guard": {"fixture": true}
+}

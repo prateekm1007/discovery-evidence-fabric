@@ -123,6 +123,28 @@ def run(session_id: str) -> None:
             _run_inner(session_id, forensics)
 
 
+def _phase4_terminal_state(run_dir, final, manifest):
+    """R446-C1 Task 4: the phase-4 terminal decision, bound to the
+    canonical completion marker (run_manifest.json — R445-C: the TRUE
+    completion marker; final_state.json is persisted PRE-evolution and
+    is NOT completion evidence). Returns (status, final_status, error):
+    COMPLETE only when the on-disk marker proves the run() tail
+    executed; INTERRUPTED (recoverable) otherwise — never a scientific
+    verdict either way (Art. LXI)."""
+    from toscanini import completion as _completion
+    marker_state = _completion.completion_marker_state(run_dir)
+    if marker_state["completion"] != _completion.COMPLETE_MARKED:
+        return ("INTERRUPTED",
+                (final or {}).get("final_status"),
+                ("run ended without the canonical completion marker "
+                 "(run_manifest.json): "
+                 + str(marker_state.get("reason", ""))[:300]))
+    return ("COMPLETE",
+            (final or {}).get("final_status")
+            or (manifest or {}).get("final_status", "UNKNOWN"),
+            None)
+
+
 def _run_inner(session_id: str, forensics) -> None:
     forensics.event("PHASE_STARTED", stage="SESSION_LOOKUP", phase=0)
     s = store.get_session(session_id)
@@ -308,10 +330,28 @@ def _run_inner(session_id: str, forensics) -> None:
     if fs_path.exists():
         import json
         final = json.loads(fs_path.read_text())
+    # R446-C1 Task 4: the canonical completion authority — the marker is
+    # verified ON DISK (defense in depth: engine.run() returns the
+    # manifest it persisted — this check binds the user-visible COMPLETE
+    # to the bytes, not the return value). INTERRUPTED (recoverable) on
+    # a missing/incomplete marker — NEVER COMPLETE (Art. XXV/LXI).
+    status, final_status, phase4_error = _phase4_terminal_state(
+        run_dir, final, manifest)
+    if status == "INTERRUPTED":
+        forensics.event(
+            "TERMINAL_STATE", terminal="INTERRUPTED",
+            stage="TERMINAL_STATUS",
+            reason=phase4_error[:400],
+            marker_authority="run_manifest.json")
+        store.update_session(
+            session_id, status=status,
+            final_status=final_status,
+            error=phase4_error)
+        _snapshot(session_id, f"terminal:INTERRUPTED:{session_id}")
+        return
     store.update_session(
         session_id, status="COMPLETE",
-        final_status=(final or {}).get("final_status")
-        or manifest.get("final_status", "UNKNOWN"))
+        final_status=final_status)
     # R431: the terminal event (infra vs scientific never collapsed)
     try:
         from toscanini import event_journal as _journal

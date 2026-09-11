@@ -621,7 +621,20 @@ def seed_benchmark_sessions() -> int:
             continue
         if not run_dir.exists():
             continue
+        # R446-C1 Task 4: the seeded session's COMPLETE is bound to the
+        # canonical completion marker (run_manifest.json), NOT to
+        # final_state.json — a seed run dir without the marker is
+        # seeded with its TRUE state (INTERRUPTED — historical, never
+        # presented complete). No state may become user-visible
+        # COMPLETE until the marker proves the run finished (Art. X /
+        # XXV; the R445-C completion authority).
+        from . import completion as _completion
+        marker = _completion.completion_marker_state(run_dir)
         fs = _read_json(run_dir / "final_state.json") or {}
+        seeded_status = ("COMPLETE"
+                         if marker["completion"]
+                         == _completion.COMPLETE_MARKED
+                         else "INTERRUPTED")
         session = {
             "session_id": f"ts_seed_{domain}",
             "title": DEMO_TITLES.get(domain, rec.get("problem_id")),
@@ -632,7 +645,12 @@ def seed_benchmark_sessions() -> int:
             # deliberate, labeled, operator-chosen (the directive's
             # "public sharing must be explicit and deliberate")
             "public": True,
-            "status": "COMPLETE",
+            "status": seeded_status,
+            "completion_basis": (
+                "run_manifest.json (canonical marker)"
+                if seeded_status == "COMPLETE" else
+                "seed run dir lacks the canonical completion marker — "
+                "seeded with its true interrupted state (R446-C1)"),
             "created_at": (fs.get("timestamp")
                            or "2026-08-30T12:00:00Z"),
             "run_dir": str(run_dir),
@@ -640,7 +658,8 @@ def seed_benchmark_sessions() -> int:
             "final_status": fs.get("final_status"),
             "package": package_info(run_dir),
             "share_id": None,
-            "error": None,
+            "error": None if seeded_status == "COMPLETE" else (
+                marker.get("reason", "")[:300]),
         }
         data = _locked_read(SESSIONS_PATH)
         data.setdefault("sessions", []).append(session)

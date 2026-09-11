@@ -860,13 +860,43 @@ def canonical_run_state(session: Dict) -> Dict[str, Any]:
     session record + run-dir artifacts; the frontend READS this and
     never re-derives states client-side."""
     run_dir = Path(session["run_dir"]) if session.get("run_dir") else None
+    # R446-C1 Task 4: the completion reconciliation — a session record
+    # that says COMPLETE is only user-visible COMPLETE when the run
+    # dir's canonical marker (run_manifest.json) proves it. Historical
+    # session records written before the marker authority (or restored
+    # from durable snapshots of that era) reconcile HERE, read-only:
+    # the projection reports the honest INTERRUPTED state with the
+    # reconciliation basis; the session record itself is never mutated
+    # during observation (Art. IX). No state may become user-visible
+    # COMPLETE until the marker proves the relevant stages completed.
+    projected_status = session.get("status")
+    completion_reconciliation = None
+    if projected_status == "COMPLETE":
+        from . import completion as _completion
+        marker = _completion.completion_marker_state(run_dir)
+        if marker["completion"] != _completion.COMPLETE_MARKED:
+            projected_status = "INTERRUPTED"
+            completion_reconciliation = {
+                "session_record_says": "COMPLETE",
+                "projected_status": "INTERRUPTED",
+                "authority": "run_manifest.json (the canonical "
+                             "completion marker, R445-C)",
+                "basis": marker.get("reason", ""),
+                "note": ("the session record predates the completion "
+                         "authority or was restored from a durable "
+                         "snapshot of that era; the run dir's own "
+                         "marker is the truth (Art. X/XXV)"),
+            }
+    reconciled = dict(session)
+    if completion_reconciliation:
+        reconciled["status"] = projected_status
     stage_status = _stage_status_map(session, run_dir)
-    outcome = terminal_outcome(session, run_dir)
-    return {
+    outcome = terminal_outcome(reconciled, run_dir)
+    out = {
         "run_id": session.get("session_id"),
         "user_problem": session.get("user_text"),
         "created_at": session.get("created_at"),
-        "status": session.get("status"),
+        "status": projected_status,
         "model_route": _model_route(session, run_dir),
         "retrieval_route": _evidence_state(session, run_dir).get(
             "retrieval_route"),
@@ -900,3 +930,6 @@ def canonical_run_state(session: Dict) -> Dict[str, Any]:
         "evolution_state": _evolution_live_phase(session, run_dir),
         "schema_version": "1.1.0",
     }
+    if completion_reconciliation:
+        out["completion_reconciliation"] = completion_reconciliation
+    return out

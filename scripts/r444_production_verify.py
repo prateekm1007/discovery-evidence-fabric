@@ -146,25 +146,28 @@ def _verify_run(problem: Dict[str, Any]) -> Dict[str, Any]:
                    else str(result.get("http_status")),
     }
     _log(f"{problem['problem_id']}: {rec['outcome']} "
-         f"(cio={rec['cio_http']}, glb={rec['glb_http']}, "
+         f"(cio={rec['cio_http']}, "
+         f"cio_extraction="
+         f"{(rec['cio_summary'] or {}).get('extraction_state')}, "
+         f"glb={rec['glb_http']}, "
          f"status={rec['user_visible_state'].get('final_status')})")
     return rec
 
 
 def _cio_summary(body: Any) -> Dict[str, Any]:
-    if not isinstance(body, dict):
-        return {"present": bool(body)}
-    arch = body.get("architecture") or {}
-    eng = body.get("engineering") or {}
-    return {
-        "present": True,
-        "mechanism": (arch.get("mechanism") or "")[:200],
-        "technology_class": eng.get("technology_class"),
-        "n_components": len(
-            (body.get("artifact_state") or {}).get("components") or []),
-        "experiment_contract_present": bool(
-            body.get("experiment_contract")),
-    }
+    """R446-C1: the canonical CIO field extraction (the R444 phantom
+    keys — architecture.mechanism / engineering.technology_class /
+    artifact_state.components / experiment_contract — are RETIRED:
+    they never existed in the CIO body; every R444/R45 recorded
+    cio_summary null on HTTP 200 was an extraction gap, not an engine
+    gap). The canonical shape is consumed by
+    scripts/r446_cio_extraction.py (one authority, Art. X):
+    identity.mechanism, geometry.domain_family, geometry.components,
+    experiment.decisive_experiment — and HTTP 200 with missing
+    fields is typed explicitly incomplete, never semantic success."""
+    sys.path.insert(0, str(REPO_ROOT / "scripts"))
+    from r446_cio_extraction import extract_cio_fields
+    return extract_cio_fields(None, body)
 
 
 def _glb_bytes(model_resp: Dict[str, Any]) -> Optional[int]:
