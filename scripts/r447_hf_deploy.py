@@ -215,7 +215,8 @@ def main() -> int:
     stage_ = None
     while time.time() < deadline:
         info = api.space_info(repo_id=SPACE)
-        stage_ = (info.runtime or {}).get("stage")
+        rt = info.runtime
+        stage_ = getattr(rt, "stage", None) if rt else None
         if stage_ == "RUNNING":
             break
         if stage_ in ("BUILD_ERROR", "RUNTIME_ERROR"):
