@@ -353,8 +353,14 @@ class PackageView:
 # ----------------------------------------------------------------- domains
 # Distinctive vocabulary per domain. Terms chosen to be domain-DISTINCTIVE
 # (rarely shared across domains); generic science words are excluded.
+# R445: the keys are the CANONICAL family ids (domains.py::
+# CANONICAL_DOMAIN_FAMILIES) — the gate's former private coarse set
+# (medical/vehicle/...) is retired as a second semantic namespace; the
+# terms are redistributed onto the canonical ids and the three families
+# the gate never knew (thermal, fluid, materials) are added so the
+# contradiction detector can adjudicate every canonical family.
 DOMAIN_VOCAB: dict[str, list[str]] = {
-    "medical": [
+    "biomedical": [
         "csf", "cerebrospinal", "shunt", "hydrocephalus", "catheter",
         "biocompatibility", "sterilization", "sterilisation", "fda",
         "gmlp", "clinical endpoint", "patient", "implant", "lumen",
@@ -362,11 +368,14 @@ DOMAIN_VOCAB: dict[str, list[str]] = {
         "iso 10993", "pyrogen", "endotoxin", "sterile", "implantable",
         "ventriculoperitoneal", "ventricular", "cannula", "infusion",
     ],
-    "vehicle": [
+    "mechanical": [
         "vehicle", "drivetrain", "powertrain", "aerodynamic drag",
         "chassis", "wheelbase", "curb weight", "highway speed",
         "passenger vehicle", "fuel economy", "l/100km", "mpg",
         "cabin", "wheel", "axle", "suspension", "steering",
+        "spindle", "bearing", "rotor", "runout", "tolerance band",
+        "machining", "mill", "lathe", "tolerance stack", "gearbox",
+        "shaft", "keyway",
     ],
     "software_ml": [
         "decision-support", "machine learning", "neural network",
@@ -374,18 +383,29 @@ DOMAIN_VOCAB: dict[str, list[str]] = {
         "api", "microservice", "training data", "model serving",
         "software system", "latency budget", "throughput",
     ],
-    "mechanical": [
-        "spindle", "bearing", "rotor", "runout", "tolerance band",
-        "machining", "mill", "lathe", "tolerance stack", "gearbox",
-        "shaft", "keyway",
-    ],
-    "electronics": [
-        "pcb", "emi shielding", "enclosure", "thermal pad",
-        "printed circuit", "solder", "conformal coating", "ip67",
+    "electronic": [
+        "pcb", "emi shielding", "printed circuit", "solder",
+        "conformal coating", "ip67",
     ],
     "energy": [
         "photovoltaic", "solar panel", "battery pack", "grid", "inverter",
         "kwh", "electrolyte", "anode", "cathode",
+    ],
+    "thermal": [
+        "heat exchanger", "heat sink", "cold plate", "thermal runaway",
+        "thermal management", "cooling tower", "radiator", "condenser",
+        "evaporator", "hvac", "refrigeration", "district heating",
+        "heat transfer coefficient",
+    ],
+    "fluid": [
+        "centrifugal pump", "impeller", "microfluidic", "nozzle",
+        "valve stage", "reverse osmosis", "desalination", "slurry",
+        "cavitation", "permeate flux", "metering pump",
+    ],
+    "materials": [
+        "composite laminate", "sintering", "coating adhesion",
+        "wear rate", "polymer blend", "metallurgical phase diagram",
+        "precipitation hardening", "grain boundary engineering",
     ],
 }
 

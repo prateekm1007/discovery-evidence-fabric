@@ -33,6 +33,8 @@ from typing import Any, Dict, List, Optional, Sequence, Tuple
 import numpy as np
 import trimesh
 
+from ..domains import canonical_family_of_bridge_archetype
+
 GATE_VERSION = "1.0.0"
 
 # Operating bands in abstract presentation units (the domain builders'
@@ -214,6 +216,7 @@ def component_interference_witness(
 def geometry_quality_gate(glb_bytes: bytes,
                           spec: Optional[Dict[str, Any]],
                           domain_family: Optional[str] = None,
+                          canonical_family: Optional[str] = None,
                           ) -> Dict[str, Any]:
     """Structural gate over the built GLB. Returns a typed report:
     {artifact, version, checks[], failures[], passed}.
@@ -379,7 +382,11 @@ def geometry_quality_gate(glb_bytes: bytes,
               kd)
 
     return {"artifact": "GEOMETRY_QUALITY_GATE", "version": GATE_VERSION,
-            "domain_family": domain_family,
+            "domain_family": canonical_family
+            or canonical_family_of_bridge_archetype(domain_family),
+            "technology_class": domain_family,
+            "technology_class_role": ("bridge geometry archetype "
+                                      "(presentation routing, R445)"),
             "checks": checks, "failures": failures,
             "passed": not failures}
 
@@ -387,6 +394,7 @@ def geometry_quality_gate(glb_bytes: bytes,
 def visual_quality_gate(glb_bytes: bytes,
                         spec: Optional[Dict[str, Any]],
                         domain_family: Optional[str] = None,
+                        canonical_family: Optional[str] = None,
                         ) -> Dict[str, Any]:
     """The PRESENTATION gate (section 17). Rejects flat slabs, generic
     box piles, and family models missing their defining physical
@@ -407,7 +415,9 @@ def visual_quality_gate(glb_bytes: bytes,
     if scene is None:
         check("loadable", False)
         return {"artifact": "VISUAL_QUALITY_GATE", "version": GATE_VERSION,
-                "domain_family": domain_family, "checks": checks,
+                "domain_family": canonical_family
+                or canonical_family_of_bridge_archetype(domain_family),
+                "technology_class": domain_family, "checks": checks,
                 "failures": failures, "passed": False,
                 "note": ("presentation audit — structural metrics only; "
                          "NOT scientific validation and NOT a vision "
@@ -484,7 +494,12 @@ def visual_quality_gate(glb_bytes: bytes,
                        f"'{family}' — visual identity uncheckable"})
 
     return {"artifact": "VISUAL_QUALITY_GATE", "version": GATE_VERSION,
-            "domain_family": family, "checks": checks,
+            "domain_family": canonical_family
+            or canonical_family_of_bridge_archetype(family),
+            "technology_class": family,
+            "technology_class_role": ("bridge geometry archetype "
+                                      "(presentation routing, R445)"),
+            "checks": checks,
             "failures": failures, "passed": not failures,
             "note": ("presentation audit — structural metrics only; "
                      "NOT scientific validation and NOT a vision model "
@@ -550,14 +565,21 @@ def engineering_provenance_gate(model_dir: str,
 
 def run_all_gates(glb_bytes: bytes, spec: Optional[Dict[str, Any]],
                   domain_family: Optional[str] = None,
+                  canonical_family: Optional[str] = None,
                   engineering: bool = False,
                   model_dir: Optional[str] = None,
                   geometry_out: Optional[Dict[str, Any]] = None,
                   ) -> Dict[str, Any]:
     """Composite gate record for the bridge report (typed, never an
-    exception — a gate failure is product information, Art. LXI)."""
-    geo = geometry_quality_gate(glb_bytes, spec, domain_family)
-    vis = visual_quality_gate(glb_bytes, spec, domain_family)
+    exception — a gate failure is product information, Art. LXI).
+
+    R445: `domain_family` is the bridge ARCHETYPE (the
+    FAMILY_REQUIRED/DOMAIN_ACCEPTANCE lookup key); `canonical_family`
+    is the canonical identity emitted in the records."""
+    geo = geometry_quality_gate(glb_bytes, spec, domain_family,
+                                canonical_family)
+    vis = visual_quality_gate(glb_bytes, spec, domain_family,
+                              canonical_family)
     eng = None
     if engineering and model_dir and geometry_out:
         eng = engineering_provenance_gate(model_dir, geometry_out)
@@ -620,6 +642,7 @@ def semantic_identity_gate(spec: Optional[Dict[str, Any]],
                            glb_bytes: bytes,
                            domain_family: Optional[str] = None,
                            requested_problem: str = "",
+                           canonical_family: Optional[str] = None,
                            ) -> Dict[str, Any]:
     """R433 section 6 — the GEOMETRIC SEMANTIC GATE.
 
@@ -701,7 +724,11 @@ def semantic_identity_gate(spec: Optional[Dict[str, Any]],
     return {
         "artifact": "SEMANTIC_IDENTITY_GATE",
         "version": SEMANTIC_VERSION,
-        "domain_family": effective_family,
+        "domain_family": canonical_family
+        or canonical_family_of_bridge_archetype(effective_family),
+        "technology_class": effective_family,
+        "technology_class_role": ("bridge geometry archetype "
+                                  "(presentation routing, R445)"),
         "not_visualized": sorted(
             ({c for c in required if c not in scene_nodes}
              | (spec_ids - scene_nodes))) if spec is not None else sorted(
@@ -721,6 +748,7 @@ def score_technology_model(spec: Optional[Dict[str, Any]],
                            domain_family: Optional[str] = None,
                            requested_problem: str = "",
                            identity: Optional[Dict[str, Any]] = None,
+                           canonical_family: Optional[str] = None,
                            ) -> Dict[str, Any]:
     """R433 section 13 — THREE SEPARATED quality scores.
 
@@ -739,9 +767,12 @@ def score_technology_model(spec: Optional[Dict[str, Any]],
     separation IS the product contract.
     """
     semantic = semantic_identity_gate(spec, glb_bytes, domain_family,
-                                      requested_problem)
-    coherence = geometry_quality_gate(glb_bytes, spec, domain_family)
-    presentation = visual_quality_gate(glb_bytes, spec, domain_family)
+                                      requested_problem,
+                                      canonical_family=canonical_family)
+    coherence = geometry_quality_gate(glb_bytes, spec, domain_family,
+                                       canonical_family)
+    presentation = visual_quality_gate(glb_bytes, spec, domain_family,
+                                        canonical_family)
 
     # engineering coherence additionally binds the identity chain when
     # the artifact identity is available (geometry_hash == GLB file)

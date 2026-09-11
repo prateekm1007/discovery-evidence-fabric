@@ -29,7 +29,7 @@ from __future__ import annotations
 
 import re
 
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Sequence, Tuple
 
 # --------------------------------------------------------------------------
 # Domain registry. Each template: disciplines, architecture blocks, materials,
@@ -450,6 +450,478 @@ GENERIC_TEMPLATE: Dict[str, Any] = {
         "boundary-condition stress testing"],
     "standards_candidates": [],
 }
+
+
+# ==========================================================================
+# R445 — THE CANONICAL DOMAIN-FAMILY VOCABULARY (the one semantic namespace)
+# ==========================================================================
+# Prior state (the F1 defect, R444): the domain-family identity was
+# declared in DIFFERENT vocabularies at different layers — the ENGINE
+# routing domain ('thermal', 'fluidics_hydraulic'...), the BRIDGE family
+# vocabulary ('THERMAL_SYSTEM', 'GENERIC_ARCHITECTURE'...), the gate's
+# private coarse set, and the benchmark's hyphenated labels — so one
+# field name meant different things at different layers and the R440
+# identity gate correctly blocked every fresh package
+# (A-INTERNAL-DIVERGENT: ['GENERIC_ARCHITECTURE', 'thermal']).
+#
+# This registry is the SINGLE authority (Art. X): the canonical family
+# id is the ONE domain identity that flows unchanged through
+# USER PROBLEM -> PROBLEM CONTEXT -> DOMAIN SPEC -> ENGINEERING SPEC ->
+# GEOMETRY -> CIO -> DOSSIER -> PACKAGE. Every layer resolves its
+# family HERE; no downstream component invents another namespace. The
+# engine routing domain (DOMAIN_TEMPLATES, the E21-D phenomena/physics
+# authority) and the bridge geometry archetypes (presentation routing)
+# remain what they are — internal routing vocabularies — and are
+# DECLARED as such by their mapping into this registry. The mapping is
+# declared in ONE direction only: routing id -> canonical family.
+#
+# Two orthogonal axes are kept orthogonal (the R443 applicability
+# precedent): the canonical family is the APPLICATION family of the
+# technology (thermal / fluid / materials / biomedical / software_ml /
+# ...), resolved from the PROBLEM's own text; the engine domain is the
+# MECHANISM-PHYSICS routing (a catheter is biomedical as a family and
+# fluidics as physics; both are recorded, neither is promoted to the
+# other).
+#
+# Epistemic contract (Art. XXVII): family resolution is deterministic
+# keyword routing with the FULL score table recorded; below the minimum
+# form score the honest 'generic' family is selected and labeled —
+# never a guess. 'generic' is a legitimate family id (the F1-era
+# GENERIC_ARCHITECTURE / GENERIC_FALLBACK fallbacks canonicalize here),
+# not an error.
+# ==========================================================================
+
+#: The canonical family ids — THE closed domain-family vocabulary.
+#: Extending this set is a contract change (same discipline as
+#: applicability.CONTEXT_CLASSES).
+CANONICAL_DOMAIN_FAMILIES: Dict[str, Dict[str, Any]] = {
+    "thermal": {
+        "label": "Thermal & heat-transfer systems",
+        "engine_domains": ["thermal"],
+        "bridge_archetypes": ["THERMAL_SYSTEM"],
+    },
+    "fluid": {
+        "label": "Fluid systems",
+        "engine_domains": ["fluidics_hydraulic"],
+        "bridge_archetypes": ["FLUID_DEVICE"],
+    },
+    "materials": {
+        "label": "Materials & chemical systems",
+        "engine_domains": [],
+        "bridge_archetypes": [],
+    },
+    "biomedical": {
+        "label": "Biomedical & life-science systems",
+        "engine_domains": ["mri_nmr", "enzyme_biocatalytic",
+                           "phage_microbio"],
+        "bridge_archetypes": ["MEDICAL_DEVICE"],
+    },
+    "software_ml": {
+        "label": "Software & machine-learning systems",
+        "engine_domains": ["ml_data"],
+        "bridge_archetypes": [],
+    },
+    "mechanical": {
+        "label": "Mechanical & structural systems",
+        "engine_domains": ["mechanical_structural"],
+        "bridge_archetypes": ["VEHICLE", "MECHANICAL_COMPONENT"],
+    },
+    "electronic": {
+        "label": "Electronic & RF systems",
+        "engine_domains": ["rf_wireless"],
+        "bridge_archetypes": ["ELECTRONIC_SYSTEM"],
+    },
+    "energy": {
+        "label": "Energy harvesting & storage systems",
+        "engine_domains": ["energy_harvesting"],
+        "bridge_archetypes": ["ENERGY_STORAGE"],
+    },
+    "optical_photonic": {
+        "label": "Optical & photonic systems",
+        "engine_domains": ["optical_photonic"],
+        "bridge_archetypes": [],
+    },
+    "acoustic": {
+        "label": "Acoustic systems",
+        "engine_domains": ["acoustic"],
+        "bridge_archetypes": [],
+    },
+    "generic": {
+        "label": "Not established (generic architecture)",
+        "engine_domains": ["UNKNOWN"],
+        "bridge_archetypes": ["GENERIC_ARCHITECTURE"],
+    },
+}
+
+#: Application-family keyword routing (the canonicalization layer).
+#: Signals absorbed from the bridge's former _FAMILY_SIGNALS (whole-form
+#: discipline kept: a problem that asks for a vehicle is a mechanical
+#: family problem even when subsystems mention batteries/thermal) plus
+#: the families the bridge never had (materials, software_ml,
+#: optical_photonic, acoustic). Weights follow the bridge precedent;
+#: the full score table is always returned with the decision (Art.
+#: XXVII — no magic thresholds).
+_CANONICAL_FAMILY_SIGNALS: List[Tuple[str, List[Tuple[str, int]]]] = [
+    ("biomedical", [
+        ("catheter", 6), ("shunt", 5), ("stent", 5), ("lumen", 4),
+        ("medical device", 5), ("implant", 4), ("implantable", 5),
+        ("intravascular", 4), ("surgical", 3), ("venous", 3),
+        ("patient", 1), ("clinical", 1), ("biocompatibility", 6),
+        ("in vivo", 6), ("in-vivo", 6), ("biosensor", 5),
+        ("bioreactor", 5), ("enzyme therapy", 5), ("assay", 4),
+        ("diagnostic test", 4), ("ventricular", 4), ("hydrocephalus", 6),
+        ("neurosurgery", 6), ("sterilization", 4),
+    ]),
+    ("thermal", [
+        ("heat sink", 4), ("heat exchanger", 5), ("heat transfer", 5),
+        ("thermal management", 4), ("thermal runaway", 5),
+        ("cooling", 4), ("heating", 3), ("thermal", 3), ("heat", 2),
+        ("radiator", 3), ("cold plate", 4), ("condenser", 4),
+        ("evaporator", 4), ("hvac", 4), ("refrigeration", 4),
+        ("boiler", 4), ("district heating", 5),
+    ]),
+    ("fluid", [
+        ("pump", 6), ("valve", 5), ("microfluidic", 6), ("nozzle", 4),
+        ("chamber", 3), ("channel", 2), ("flow sensor", 5),
+        ("fluid", 2), ("flow control", 4), ("diaphragm", 3),
+        ("impeller", 4), ("metering", 3), ("turbo", 4),
+        ("compressor", 4), ("filtration", 4),
+        ("desalination", 5), ("reverse osmosis", 5), ("permeate flux", 4),
+        # NOTE: 'pipe'/'pipeline' deliberately EXCLUDED — polysemous
+        # with software data pipelines and thermal heat pipes (Art. XXI:
+        # substring noise is not relevance)
+    ]),
+    ("materials", [
+        ("corrosion", 5), ("coating", 5), ("alloy", 5), ("composite", 4),
+        ("polymer", 4), ("metallurg", 5), ("electrode", 4),
+        ("electrolyte", 4), ("cathode", 4), ("anode", 4),
+        ("delamination", 5), ("material degradation", 5),
+        ("fatigue crack", 4), ("wear rate", 4), ("film", 2),
+        ("substrate", 3), ("sintering", 5), ("curing", 4),
+        ("adhesive", 4), ("surface treatment", 4),
+    ]),
+    ("software_ml", [
+        ("machine learning", 6), ("neural network", 5), ("deep learning", 5),
+        ("classifier", 4), ("recommender", 5), ("reinforcement learning", 6),
+        ("inference", 4), ("training data", 4), ("model drift", 5),
+        ("dataset", 3), ("software architecture", 4), ("latency budget", 3),
+        ("model serving", 4), ("forecasting model", 5), ("reward hacking", 5),
+        ("policy training", 4), ("microservice", 4), ("software system", 4),
+    ]),
+    ("mechanical", [
+        ("electric vehicle", 6), ("solar vehicle", 6), ("solar car", 6),
+        ("vehicle", 5), ("automotive", 5), ("car", 3), ("truck", 4),
+        ("bus", 4), ("chassis", 2), ("drivetrain", 2), ("wheel", 2),
+        ("traction", 2), ("road", 1), ("bearing", 5), ("shaft", 4),
+        ("spring", 4), ("fastener", 4), ("gear", 4), ("rail", 4),
+        ("joint", 2), ("structural", 2), ("load path", 3), ("damper", 3),
+        ("suspension", 3), ("fatigue", 1), ("fracture", 1),
+        ("rotor imbalance", 4), ("centrifuge", 5), ("vibration", 3),
+    ]),
+    ("electronic", [
+        ("circuit", 4), ("electronics", 4), ("board", 3), ("pcba", 5),
+        ("inverter", 4), ("converter", 3), ("power electronics", 5),
+        ("module electronics", 2), ("controller", 2), ("antenna", 3),
+        ("sensor node", 3), ("battery management", 2), ("pcb", 4),
+        ("rf front end", 4), ("transceiver", 4), ("semiconductor", 3),
+    ]),
+    ("energy", [
+        ("battery pack", 5), ("battery module", 5), ("battery cell", 4),
+        ("cell", 2), ("battery", 3), ("energy storage", 4),
+        ("supercapacitor", 5), ("pack", 2), ("photovoltaic", 5),
+        ("solar panel", 5), ("solar farm", 5), ("wind turbine", 5),
+        ("energy harvesting", 6), ("fuel cell", 5), ("grid-scale", 4),
+        ("lithium", 4), ("state of charge", 4),
+    ]),
+    ("optical_photonic", [
+        ("lens", 4), ("optical", 4), ("photonics", 5), ("laser", 5),
+        ("waveguide", 5), ("fiber optic", 5), ("optical fiber", 5),
+        ("spectrometer", 5), ("lithography", 4), ("photodetector", 5),
+        ("display pixel", 4), ("imaging optics", 5), ("lidar", 5),
+    ]),
+    ("acoustic", [
+        ("acoustic", 5), ("ultrasound", 5), ("sonar", 5),
+        ("transducer", 4), ("noise cancellation", 5), ("speaker", 4),
+        ("microphone array", 5), ("piezo", 4), ("audio", 3),
+        ("underwater sound", 5), ("acoustic emission", 5),
+    ]),
+]
+
+#: whole-form device identity (the bridge whole-form precedent: a
+#: problem that asks for a vehicle builds a vehicle even when its
+#: subsystems mention batteries). When the problem's own device/site
+#: statement declares an implantable or medical-device form, the
+#: application family is biomedical — component mentions (batteries,
+#: photovoltaics, telemetry, flow sensing) never turn an implant into
+#: an energy/optical/fluid product. Device-identity terms only; the
+#: DEPLOYMENT words (hospital, clinical, patient...) are deliberately
+#: NOT here (a hospital dashboard stays software_ml; hospital HVAC
+#: stays thermal — where a device is USED is not what it IS).
+_BIOMEDICAL_FORM_SIGNALS: List[str] = [
+    "implant", "implantable", "implanted", "catheter", "shunt", "stent",
+    "intravascular", "prosthesis", "prosthetic", "biosensor",
+    "bioreactor", "neurostimulator", "pacemaker", "defibrillator",
+    "dialysis", "dialyzer", "endoscope", "ventilator", "biopsy",
+    "medical device", "mr-conditional", "ventriculostomy", " cannula",
+    "surgical instrument", "diagnostic assay", "point-of-care test",
+]
+
+#: the honest floor — a whole-family form needs real signal, not one
+#: weak keyword (same rule and provenance as the bridge's former
+#: min_form_score = 3; Art. XXVII).
+MIN_CANONICAL_FAMILY_SCORE = 3
+
+#: reverse routing maps (declared ONCE, derived from the registry —
+#: never hand-maintained duplicates).
+_ENGINE_DOMAIN_TO_FAMILY: Dict[str, str] = {}
+_BRIDGE_ARCHETYPE_TO_FAMILY: Dict[str, str] = {}
+for _fam, _spec in CANONICAL_DOMAIN_FAMILIES.items():
+    for _d in _spec["engine_domains"]:
+        _ENGINE_DOMAIN_TO_FAMILY[_d] = _fam
+    for _a in _spec["bridge_archetypes"]:
+        _BRIDGE_ARCHETYPE_TO_FAMILY[_a] = _fam
+#: bridge-internal representation labels (never canonical families;
+#: they canonicalize to the resolved family or 'generic' — see
+#: canonical_family_of_bridge_archetype).
+_BRIDGE_REPRESENTATION_LABELS = {
+    "PROCESS_FLOW", "GENERIC_FALLBACK", "ENGINEERING_PARAMETRIC",
+}
+
+
+def is_canonical_family(value: Any) -> bool:
+    """True iff value is exactly a canonical family id."""
+    return isinstance(value, str) and value in CANONICAL_DOMAIN_FAMILIES
+
+
+def canonical_family_of_engine_domain(domain_id: Any) -> str:
+    """Engine physics-routing domain -> canonical family (UNKNOWN ->
+    'generic'; an unmapped id is NOT silently coerced to another
+    family — it resolves to 'generic' honestly)."""
+    return _ENGINE_DOMAIN_TO_FAMILY.get(str(domain_id or ""), "generic")
+
+
+def canonical_family_of_bridge_archetype(archetype: Any) -> str:
+    """Bridge geometry archetype -> canonical family. The bridge's
+    representation labels (PROCESS_FLOW / GENERIC_FALLBACK /
+    ENGINEERING_PARAMETRIC) are NOT families — they canonicalize to
+    'generic' (their run carries the resolved family separately)."""
+    a = str(archetype or "")
+    if a in _BRIDGE_REPRESENTATION_LABELS:
+        return "generic"
+    return _BRIDGE_ARCHETYPE_TO_FAMILY.get(a, "generic")
+
+
+def canonical_family_label(family_id: Any) -> str:
+    return CANONICAL_DOMAIN_FAMILIES.get(
+        str(family_id or ""), CANONICAL_DOMAIN_FAMILIES["generic"])["label"]
+
+
+def canonical_family_archetypes(family_id: Any) -> List[str]:
+    """The bridge geometry archetypes routed by a canonical family."""
+    return list(CANONICAL_DOMAIN_FAMILIES.get(
+        str(family_id or "generic"), {})["bridge_archetypes"])
+
+
+def resolve_canonical_family(problem_text: str,
+                             intervention_site: str = "",
+                             subsystems: Sequence[Any] = (),
+                             ) -> Dict[str, Any]:
+    """R445: resolve the ONE canonical domain family from the problem's
+    own text (application-family axis).
+
+    Deterministic keyword routing with the FULL score table recorded
+    (Art. XXVII): every keyword hit (family, keyword, weight, count)
+    is returned so the choice is auditable from the artifact alone.
+    Whole-form signals outrank component signals (the bridge
+    precedent). Ties resolve by the fixed registry order; below the
+    minimum form score the honest 'generic' family is selected and
+    labeled as such (Art. XXV: unknown stays unknown).
+    """
+    text = " ".join([
+        str(problem_text or ""),
+        str(intervention_site or ""),
+        " ".join(str(s) for s in (subsystems or [])),
+    ]).lower()
+    form_text = f"{str(problem_text or '')} {str(intervention_site or '')}".lower()
+    # Layer 1 — whole-form device identity: an implantable/medical
+    # device form dominates component mentions (recorded, never silent)
+    form_hits = [s.strip() for s in _BIOMEDICAL_FORM_SIGNALS
+                 if s.strip() in form_text]
+    scores: List[Dict[str, Any]] = []
+    best_family, best_score = "generic", 0
+    for family, signals in _CANONICAL_FAMILY_SIGNALS:
+        total = 0
+        hits: List[Dict[str, Any]] = []
+        for keyword, weight in signals:
+            kw = keyword.lower()
+            if len(kw) >= 5 or " " in kw:
+                count = text.count(kw)
+            else:
+                count = len(re.findall(rf"\b{re.escape(kw)}\b", text))
+            if count:
+                total += weight * count
+                hits.append({"keyword": keyword, "weight": weight,
+                             "count": count})
+        scores.append({"family": family, "score": total, "hits": hits})
+        if total > best_score:
+            best_family, best_score = family, total
+    if best_score < MIN_CANONICAL_FAMILY_SCORE:
+        best_family = "generic"
+    if form_hits:
+        return {
+            "canonical_family": "biomedical",
+            "label": canonical_family_label("biomedical"),
+            "score": best_score,
+            "min_form_score": MIN_CANONICAL_FAMILY_SCORE,
+            "score_table": scores,
+            "whole_form_basis": {
+                "matched_form_signals": form_hits,
+                "rule": ("whole-form device identity: the problem's own "
+                         "device/site statement declares an implantable "
+                         "or medical-device form — the application family "
+                         "is biomedical and dominates component-mention "
+                         "keyword scores (the bridge whole-form "
+                         "precedent; deployment words are deliberately "
+                         "excluded: a hospital dashboard stays "
+                         "software_ml)"),
+                "keyword_runner_up": best_family,
+            },
+            "basis": {
+                "derived_from": ["problem text", "intervention site",
+                                 "recorded subsystem names"],
+                "rule": "whole-form device identity layer, then highest "
+                        "keyword score; ties resolve by registry order; "
+                        "below the form threshold the generic family is "
+                        "selected and labeled",
+                "authority": ("discovery_fabric/engine/domains.py::"
+                              "CANONICAL_DOMAIN_FAMILIES (R445 — the one "
+                              "canonical domain-family vocabulary)"),
+                "deterministic": True,
+            },
+        }
+    return {
+        "canonical_family": best_family,
+        "label": canonical_family_label(best_family),
+        "score": best_score,
+        "min_form_score": MIN_CANONICAL_FAMILY_SCORE,
+        "score_table": scores,
+        "basis": {
+            "derived_from": ["problem text", "intervention site",
+                             "recorded subsystem names"],
+            "rule": "highest keyword score wins; ties resolve by "
+                    "registry order; below the form threshold the "
+                    "generic family is selected and labeled",
+            "authority": ("discovery_fabric/engine/domains.py::"
+                          "CANONICAL_DOMAIN_FAMILIES (R445 — the one "
+                          "canonical domain-family vocabulary)"),
+            "deterministic": True,
+        },
+    }
+
+
+def resolve_run_canonical_family(run_result: Any,
+                                 eng: Any = None) -> Dict[str, Any]:
+    """R445: the canonical family for a RECORDED run state — the ONE
+    consumer ladder every downstream layer uses (the bridge domain
+    spec, the bridge representation fallbacks, the package compiler):
+
+        1. engineering_specification.why_this_domain.canonical_family
+           (the fresh upstream decision — consumed, never re-derived)
+        2. engineering_specification.applicability.canonical_domain.
+           canonical_family (the alternate upstream shape)
+        3. registry resolution over the run's own recorded problem
+           words (user_text / problem fields / device / title)
+        4. the engine-domain registry mapping (the E21-D physics
+           decision — the most upstream domain decision a legacy state
+           carries; physics axis mapped through the SAME registry)
+        5. the honest 'generic' family
+
+    Cross-layer agreement is BY CONSTRUCTION: every consumer calls this
+    one function with the same inputs (the run record + the resolved
+    engineering specification — run-dir persisted files are the
+    authority per resolve_final_state, Art. X), so no layer can
+    re-derive a different family in a different vocabulary (the F1
+    defect class).
+    """
+    rr = run_result if isinstance(run_result, dict) else {}
+    eng = eng if isinstance(eng, dict) else {}
+    wd = eng.get("why_this_domain") if isinstance(
+        eng.get("why_this_domain"), dict) else {}
+    cf = wd.get("canonical_family")
+    if isinstance(cf, str) and is_canonical_family(cf):
+        return {
+            "canonical_family": cf,
+            "label": wd.get("canonical_family_label")
+            or canonical_family_label(cf),
+            "basis": {
+                "source": ("engineering_specification.why_this_domain."
+                           "canonical_family (the upstream R445 "
+                           "authority — consumed, never re-derived)"),
+                "ladder_step": 1,
+                "upstream_record": True,
+            },
+        }
+    ap = eng.get("applicability") if isinstance(
+        eng.get("applicability"), dict) else {}
+    cd = ap.get("canonical_domain") if isinstance(
+        ap.get("canonical_domain"), dict) else {}
+    cf2 = cd.get("canonical_family")
+    if isinstance(cf2, str) and is_canonical_family(cf2):
+        return {
+            "canonical_family": cf2,
+            "label": cd.get("canonical_family_label")
+            or canonical_family_label(cf2),
+            "basis": {
+                "source": ("engineering_specification.applicability."
+                           "canonical_domain.canonical_family (alternate "
+                           "upstream shape — consumed, never re-derived)"),
+                "ladder_step": 2,
+                "upstream_record": True,
+            },
+        }
+    # step 3: the run's own recorded problem words (the application
+    # axis's proper source)
+    problem = rr.get("problem") if isinstance(rr.get("problem"), dict) \
+        else {}
+    text = " ".join(str(x or "") for x in (
+        rr.get("user_text"), problem.get("text"), problem.get("device"),
+        problem.get("failure"), problem.get("constraint"),
+        problem.get("failure_mode"), rr.get("device"), rr.get("title")))
+    res = resolve_canonical_family(text)
+    if res["canonical_family"] != "generic":
+        res = dict(res)
+        res["basis"] = dict(res["basis"])
+        res["basis"]["ladder_step"] = 3
+        res["basis"]["source"] = ("registry resolution over the run's "
+                                  "own recorded problem words (no "
+                                  "upstream canonical field — legacy "
+                                  "state)")
+        return res
+    # step 4: the engine-domain registry mapping (legacy physics axis)
+    domain = wd.get("domain") or eng.get("technology_domain") \
+        or rr.get("domain")
+    if domain and str(domain) not in ("UNKNOWN", "NOT ESTABLISHED", ""):
+        fam = canonical_family_of_engine_domain(domain)
+        return {
+            "canonical_family": fam,
+            "label": canonical_family_label(fam),
+            "basis": {
+                "source": (f"registry mapping of the recorded engine "
+                           f"domain {str(domain)!r} (the E21-D physics "
+                           "decision — legacy state, mapped through the "
+                           "same registry)"),
+                "ladder_step": 4,
+            },
+        }
+    # step 5: the honest generic family
+    generic = resolve_canonical_family("")
+    generic = dict(generic)
+    generic["basis"] = dict(generic["basis"])
+    generic["basis"]["ladder_step"] = 5
+    generic["basis"]["source"] = ("no upstream canonical field, no "
+                                  "problem-word signal, no engine "
+                                  "domain — the honest generic family")
+    return generic
 
 
 # --------------------------------------------------------------------------
@@ -1895,14 +2367,22 @@ def get_domain_module(domain_id: str) -> Dict[str, Any]:
 
 
 def export_registry_json() -> Dict[str, Any]:
-    """Canonical ENGINEERING_DOMAIN_REGISTRY.json content (Directive 4)."""
+    """Canonical ENGINEERING_DOMAIN_REGISTRY.json content (Directive 4;
+    R445: also publishes THE canonical domain-family vocabulary)."""
     domains = {}
     for domain_id in DOMAIN_TEMPLATES:
         domains[domain_id] = get_domain_module(domain_id)
     domains["UNKNOWN"] = get_domain_module("UNKNOWN")
+    canonical_families = {}
+    for family_id, spec in CANONICAL_DOMAIN_FAMILIES.items():
+        canonical_families[family_id] = {
+            "label": spec["label"],
+            "engine_domains": list(spec["engine_domains"]),
+            "bridge_archetypes": list(spec["bridge_archetypes"]),
+        }
     return {
         "registry": "ENGINEERING_DOMAIN_REGISTRY",
-        "version": "1.0.0",
+        "version": "1.1.0",
         "generated_by": "discovery_fabric/engine/domains.py::export_registry_json",
         "contract": {
             "maps": "evidence/mechanism characteristics (signals) -> "
@@ -1924,7 +2404,18 @@ def export_registry_json() -> Dict[str, Any]:
             "epistemic_rule": ("module content is ENGINEERING_PROPOSED; "
                                "no parameter values are asserted; UNKNOWN "
                                "domain stays UNKNOWN (Art. XXV)"),
+            "canonical_domain_families_rule": (
+                "R445: the canonical_domain_families section is THE one "
+                "authoritative domain-family vocabulary (Art. X). The "
+                "canonical family id is the ONE domain identity that "
+                "flows unchanged through USER PROBLEM -> PROBLEM CONTEXT "
+                "-> DOMAIN SPEC -> ENGINEERING SPEC -> GEOMETRY -> CIO -> "
+                "DOSSIER -> PACKAGE; engine routing domains and bridge "
+                "geometry archetypes are internal routing vocabularies "
+                "declared here by their mapping into canonical families "
+                "— never a second semantic namespace"),
         },
+        "canonical_domain_families": canonical_families,
         "domains": domains,
         "exported_at": utc_now_iso(),
     }

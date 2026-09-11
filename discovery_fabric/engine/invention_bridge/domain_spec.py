@@ -60,7 +60,15 @@ import hashlib
 import json
 from typing import Any, Dict, List, Optional, Sequence, Tuple
 
-SPEC_VERSION = "1.0.0"
+from ..domains import (CANONICAL_DOMAIN_FAMILIES,
+                       canonical_family_archetypes,
+                       canonical_family_label,
+                       canonical_family_of_bridge_archetype,
+                       is_canonical_family,
+                       resolve_canonical_family,
+                       resolve_run_canonical_family)
+
+SPEC_VERSION = "1.1.0"  # R445: +canonical_family (the one domain identity)
 
 # ---------------------------------------------------------------------------
 # R432 section 4: domain families. Keyword routing is deterministic and the
@@ -140,7 +148,14 @@ def _text_of(problem_text: str, intervention_site: str,
 
 def select_domain_family(problem_text: str, intervention_site: str,
                          subsystems: Sequence[str]) -> Dict[str, Any]:
-    """Deterministic domain-family routing with the FULL basis recorded.
+    """Deterministic GEOMETRY-ARCHETYPE routing with the FULL basis
+    recorded (R445 re-labeling: this selects the bridge ARCHETYPE —
+    the presentation form the deterministic builders know — NOT the
+    canonical domain-family identity. The canonical family is decided
+    upstream (engineering_specification.why_this_domain.canonical_
+    family, resolved via domains.py::CANONICAL_DOMAIN_FAMILIES) and is
+    consumed by build_spec_from_state; this router only refines the
+    archetype WITHIN the canonical family's declared archetypes).
 
     Every keyword hit (family, keyword, weight, count) is returned in
     the score table so the choice is auditable from the artifact alone.
@@ -581,22 +596,51 @@ def _component(cid: str, label: str, form: str, material_class: str,
 
 def derive_geometry_spec(family: str, subsystems: Sequence[str],
                          intervention_site: str,
-                         selection: Optional[Dict[str, Any]] = None
+                         selection: Optional[Dict[str, Any]] = None,
+                         canonical_family: Optional[str] = None,
+                         canonical_basis: Optional[Dict[str, Any]] = None,
                          ) -> Dict[str, Any]:
-    """Build the canonical geometry spec for a domain family.
+    """Build the canonical geometry spec for a domain archetype.
+
+    R445: the spec declares `canonical_family` — the ONE domain-family
+    identity from domains.py::CANONICAL_DOMAIN_FAMILIES — alongside
+    `technology_class` (the bridge ARCHETYPE, an internal presentation
+    routing id, never a second semantic namespace). When
+    canonical_family is not supplied it is derived from the archetype
+    via the registry mapping (recorded as such in the basis).
 
     Mapped subsystems adopt their canonical slot; UNMAPPED recorded
     subsystems become mounted modules (labeled, in their recorded
     position order) so every recorded subsystem is represented. The
     spec hash covers the full content (deterministic identity).
     """
+    if canonical_family is None or not is_canonical_family(canonical_family):
+        derived = canonical_family_of_bridge_archetype(family)
+        canonical_family = derived
+        if canonical_basis is None:
+            canonical_basis = {
+                "canonical_family": derived,
+                "basis": {
+                    "derived_from": ["bridge archetype"],
+                    "rule": "registry mapping archetype -> canonical family",
+                    "authority": ("discovery_fabric/engine/domains.py::"
+                                  "CANONICAL_DOMAIN_FAMILIES (R445)"),
+                    "deterministic": True,
+                },
+            }
     mapping = _FAMILY_MAPS.get(family)
     if mapping is None:
-        # Only reachable for GENERIC/unknown families — honest refusal
+        # Only reachable for GENERIC/unknown archetypes — honest refusal
         # (the generic builder consumes recorded names directly).
         return {
             "spec_version": SPEC_VERSION,
+            "canonical_family": canonical_family,
+            "canonical_family_label":
+                canonical_family_label(canonical_family),
+            "canonical_family_basis": canonical_basis or {},
             "technology_class": family,
+            "technology_class_role": ("bridge geometry archetype "
+                                      "(presentation routing, R445)"),
             "dimension_class": "ABSTRACT_PRESENTATION_UNITS",
             "measurement_basis": "TOPOLOGY_ONLY",
             "selection_basis": selection or {},
@@ -673,7 +717,12 @@ def derive_geometry_spec(family: str, subsystems: Sequence[str],
 
     spec = {
         "spec_version": SPEC_VERSION,
+        "canonical_family": canonical_family,
+        "canonical_family_label": canonical_family_label(canonical_family),
+        "canonical_family_basis": canonical_basis or {},
         "technology_class": family,
+        "technology_class_role": ("bridge geometry archetype "
+                                  "(presentation routing, R445)"),
         "dimension_class": "ABSTRACT_PRESENTATION_UNITS",
         "measurement_basis": "TOPOLOGY_ONLY",
         "intervention_site": str(intervention_site or ""),
@@ -702,16 +751,89 @@ def derive_geometry_spec(family: str, subsystems: Sequence[str],
     return spec
 
 
+def _upstream_canonical_family(
+        run_result: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    """R445: consume the canonical-family decision for a recorded run
+    via the ONE shared consumer ladder (domains.py::
+    resolve_run_canonical_family — upstream authority first, registry
+    problem-words second, engine-domain mapping third). Returns the
+    resolution record; the caller labels the ladder step it used.
+    Never a second vocabulary, never an independent re-derivation."""
+    return resolve_run_canonical_family(
+        run_result, (run_result or {}).get("engineering_specification"))
+
+
+def _archetype_for_family(canonical_family: str,
+                           selection: Dict[str, Any],
+                           ) -> Tuple[str, str]:
+    """R445: the bridge ARCHETYPE derived FROM the canonical family
+    (never the reverse). Within-family refinement uses the archetype
+    keyword router's score table restricted to the family's declared
+    archetypes; no signal -> the family's FIRST archetype
+    (deterministic). A canonical family with no archetypes (materials,
+    software_ml, optical_photonic, acoustic) routes to the honest
+    GENERIC form — recorded, never a silently-wrong domain form."""
+    archetypes = canonical_family_archetypes(canonical_family)
+    if not archetypes or canonical_family == "generic":
+        return GENERIC_FAMILY, (
+            "no bridge geometry archetype for the canonical family "
+            f"'{canonical_family}' — the honest generic architecture "
+            "form (labeled; engineering geometry remains unearned)")
+    if len(archetypes) == 1:
+        return archetypes[0], (
+            f"registry routing: canonical family '{canonical_family}' "
+            f"-> archetype '{archetypes[0]}'")
+    # within-family refinement (e.g. mechanical: VEHICLE vs
+    # MECHANICAL_COMPONENT) — the keyword router's scores restricted
+    # to this family's archetypes
+    table = {s["family"]: s["score"] for s in selection.get("score_table", [])}
+    best, best_score = archetypes[0], -1
+    for a in archetypes:
+        if table.get(a, 0) > best_score:
+            best, best_score = a, table.get(a, 0)
+    if best_score <= 0:
+        return archetypes[0], (
+            f"registry routing: canonical family '{canonical_family}' "
+            f"-> first declared archetype '{archetypes[0]}' (no "
+            "within-family keyword signal)")
+    return best, (
+        f"registry routing: canonical family '{canonical_family}' -> "
+        f"archetype '{best}' (within-family keyword refinement, score "
+        f"{best_score})")
+
+
 def build_spec_from_state(run_result: Dict[str, Any],
                           vis: Dict[str, Any]) -> Dict[str, Any]:
-    """select + derive, straight from the recorded run state."""
+    """select + derive, straight from the recorded run state.
+
+    R445: the canonical family is CONSUMED via the ONE shared consumer
+    ladder (domains.py::resolve_run_canonical_family — upstream
+    engineering-spec authority first, then the registry over the run's
+    own problem words, then the engine-domain mapping) — the F1 defect
+    was this layer re-deriving a family in its own namespace. The
+    archetype is then derived FROM the canonical family via the
+    registry."""
     problem_text = str(
         (run_result or {}).get("user_text")
         or ((run_result or {}).get("problem") or {}).get("text")
         or "")
     site = str((vis or {}).get("intervention_site") or "")
     subsystems = (vis or {}).get("subsystems") or []
+    # 1. the canonical family: the shared consumer ladder (one
+    #    authority, one vocabulary — every layer uses THIS)
+    resolution = _upstream_canonical_family(run_result)
+    canonical_family = resolution["canonical_family"]
+    # 2. the archetype keyword router (whole-form discipline kept)
     selection = select_domain_family(problem_text, site, subsystems)
+    # 3. the archetype DERIVED from the canonical family (R445: the
+    #    family routes the archetype, never the reverse)
+    archetype, archetype_basis = _archetype_for_family(
+        canonical_family, selection)
+    resolution["archetype"] = archetype
+    resolution["archetype_basis"] = archetype_basis
     spec = derive_geometry_spec(
-        selection["family"], subsystems, site, selection=selection)
-    return {"selection": selection, "spec": spec}
+        archetype, subsystems, site, selection=selection,
+        canonical_family=canonical_family, canonical_basis=resolution)
+    return {"selection": selection, "spec": spec,
+            "canonical_family": canonical_family,
+            "canonical_resolution": resolution}

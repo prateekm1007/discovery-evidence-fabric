@@ -1,0 +1,588 @@
+{
+  "artifact": "R445_ATTACKER_FALSE_KILL_DIAGNOSIS",
+  "round": "R445-B",
+  "directive": "diagnose the false kills — record mechanism, challenge, exact claimed weakness, evidence basis, why lethal, why the control should survive; classify with evidence-emergent classes; the attacker is NOT weakened, the corpus is NOT changed, no clean control is relabeled",
+  "reviewer_provenance": "AI_REVIEW (Art. LXVII — the diagnosis author is the coder agent; the adjudication fields are marked MECHANICAL or JUDGMENT per basis)",
+  "measured_inputs": {
+    "calibration_results": "R401-WC2/ATTACKER_CALIBRATION/CALIBRATION_RESULTS.json",
+    "corpus": "R401-WC2/ATTACKER_CALIBRATION/CORPUS.json",
+    "tpr": "12/12 seeded defects killed",
+    "false_kill_rate": "4/4 clean controls killed",
+    "tnr": 0.0
+  },
+  "classes_emerged_from_evidence": {
+    "UNSUPPORTED_OBJECTION": "the attacker ASSERTED a problem: a bare physics/spec/statistic claim with no citation, no computation, no record binding — frequently contradicted by standard industrial practice or by arithmetic inside the basis text itself",
+    "RECORD_CONTRADICTED": "the basis claims the ABSENCE of content the candidate record explicitly carries (the instrumented prediction, the comparative arm, the boundary conditions) — the attacker did not bind its claim to the record",
+    "SCOPE_MISMATCH": "the basis demands content the candidate contract cannot carry (completed-experiment data from a prediction-stage record, product-level mitigation), performance outside the declared boundary conditions, or substitutes a different problem/requirement than the one addressed",
+    "SEVERITY_INFLATION": "a legitimate RISK-level observation (an enrichment, a plausible failure-mode scenario) escalated to a KILL verdict without lethality evidence"
+  },
+  "aggregate": {
+    "n_clean_controls": 4,
+    "n_kill_bases": 23,
+    "class_counts": {
+      "UNSUPPORTED_OBJECTION": 9,
+      "RECORD_CONTRADICTED": 3,
+      "SCOPE_MISMATCH": 7,
+      "SEVERITY_INFLATION": 4
+    },
+    "bases_grounded_in_evidence_or_computation": 0,
+    "bases_grounded_fraction": 0.0
+  },
+  "structural_findings": [
+    "GROUNDING: 0 of the 23 kill bases cites a source, a computation, or a record field — every claimed weakness is a bare assertion (several carry absolutist quantifiers: 'impossible', 'cannot', 'any', 'violating fundamental', 'immediately').",
+    "RECORD BINDING: 3 bases claim the ABSENCE of content the candidate record explicitly carries (the instrumented prediction, the comparative arm, the declared boundary conditions) — the attacker did not read-bind its claims to the record it was given.",
+    "SCOPE: 7 bases demand content outside the candidate contract (completed-experiment data from a prediction-stage record, performance outside the declared envelope, or a substituted problem/requirement).",
+    "PROPORTIONALITY: 4 bases are RISK-level enrichments or plausible failure-mode scenarios escalated to KILL without lethality evidence.",
+    "VERDICT STRUCTURE: each clean control received 5-6 simultaneous KILL verdicts across the six attack dimensions — the verdict pattern is INDISTINGUISHABLE from the seeded-defect cases' verdict pattern (TPR 12/12 with the same all-kill shape): the KILL verdict carries no per-dimension discriminative information.",
+    "THE DISTINCTION the machine must eventually make mechanically: 'found a real problem' = an objection BOUND to evidence/computation, to the candidate's actual record fields, and to the declared scope, with verdict proportionality (RISK for enrichment-level points). 'Asserted a problem' = a plausible sentence with none of those bindings. 0 of 23 bases satisfy the first definition; the 23 bases split across the four failure shapes above."
+  ],
+  "calibration_state_unchanged": {
+    "state": "NOT_CALIBRATED",
+    "abstain_escalate_gate": "discovery_fabric/engine/attacker_calibration.py — IN FORCE, UNCHANGED this round: an independent-attack KILL remains INADMISSIBLE as a terminal verdict (reclassified at consumption to ESCALATED_OBJECTION with the objection preserved verbatim)",
+    "what_would_change_it": "a future instrument version that mechanically binds each objection to evidence/computation, the record, and the declared scope — measured on a sealed corpus with FPR <= 0.30 at TPR >= 0.75 (the pre-registered bars, Art. XXVII). NOT implemented this round: this diagnosis is post-hoc analysis by the coder, not a machine capability (the adjudication is marked MECHANICAL where checkable and JUDGMENT where not)",
+    "forbidden_and_not_done": [
+      "attacker thresholds lowered to improve TNR",
+      "corpus modified because it produces false kills",
+      "difficult controls removed",
+      "clean controls relabeled defective without evidence"
+    ]
+  },
+  "per_case": [
+    {
+      "case_id": "cal-13-clean-vane-quantified",
+      "expected_outcome": "SURVIVE (clean control)",
+      "measured_outcome": "FALSE_KILL",
+      "mechanism": "a two-stage inertial vane pack with an intermediate quiescent zone separates droplets above 8 micrometers by staged inertial impaction with re-entrainment suppression",
+      "intervention": "two-stage vane pack (12 stages, 1.2 mm gaps, quiescent baffle between stages) replacing the cyclone element",
+      "testable_prediction": "chilled-mirror dew point at the outlet measures 3 plus or minus 1 C equivalent over a 4-hour 5 m3/h run, versus 12 C for the baseline cyclone in the same rig; pressure drop 62 plus or minus 5 mbar",
+      "boundary_conditions": "8 bar, 5 m3/h, inlet 20 C",
+      "ground_truth": "none — a sound control: quantified prediction with instrument and acceptance band, physics consistent with the regime (turbulent inertial separation at the vane stage's intended channel Reynolds regime), predicted effect beats the baseline on the problem quantity, pressure drop within the 70 mbar constraint",
+      "attacker_challenge": {
+        "overall": "KILLED",
+        "verdicts": {
+          "MECHANISM_FAILURE": "KILL",
+          "BOUNDARY_CONDITION_FAILURE": "KILL",
+          "EVIDENCE_CONTRADICTION": "KILL",
+          "BASELINE_EQUIVALENCE": "KILL",
+          "IMPLEMENTATION_IMPOSSIBILITY": "KILL",
+          "MEASUREMENT_AMBIGUITY": "KILL"
+        },
+        "independence_mode": "SEPARATE_CONTEXT",
+        "attacker_provider": "zai"
+      },
+      "why_the_control_should_survive": "none — a sound control: quantified prediction with instrument and acceptance band, physics consistent with the regime (turbulent inertial separation at the vane stage's intended channel Reynolds regime), predicted effect beats the baseline on the problem quantity, pressure drop within the 70 mbar constraint. The kill-basis analysis: RECORD_CONTRADICTED x2, SCOPE_MISMATCH x1, SEVERITY_INFLATION x1, UNSUPPORTED_OBJECTION x2",
+      "kill_bases": [
+        {
+          "attack_class": "MECHANISM_FAILURE",
+          "verdict": "KILL",
+          "exact_claimed_weakness": "The claimed re-entrainment suppression in the quiescent zone is physically implausible at 8 bar pressure where droplet re-entrainment forces would overwhelm any passive design",
+          "evidence_basis": {
+            "citations": [],
+            "computation_present": false,
+            "absolutist_markers": [
+              "\\bany\\b"
+            ],
+            "absence_claims": [],
+            "record_contradictions": [],
+            "grounded_in_evidence_or_computation": false
+          },
+          "why_considered_lethal_by_attacker": "the attacker returned KILL on the MECHANISM_FAILURE dimension (one of 6 simultaneous KILL verdicts across 6 dimensions — the verdict structure carries no per-dimension lethality discrimination)",
+          "classification": "UNSUPPORTED_OBJECTION",
+          "classification_basis": "asserted physics with no computation or source: re-entrainment 'overwhelming ANY passive design' at 8 bar — contradicted by standard vane-pack practice (higher gas density at constant mass flow raises the Stokes number per stage, strengthening inertial separation; inter-stage quiescent zones are the textbook re-entrainment countermeasure). JUDGMENT: the physics direction is asserted backwards."
+        },
+        {
+          "attack_class": "BOUNDARY_CONDITION_FAILURE",
+          "verdict": "KILL",
+          "exact_claimed_weakness": "No testing provided at the actual boundary condition of 8 bar, only theoretical predictions that cannot be validated without experimental data",
+          "evidence_basis": {
+            "citations": [],
+            "computation_present": false,
+            "absolutist_markers": [
+              "\\bcannot\\b"
+            ],
+            "absence_claims": [
+              "no testing"
+            ],
+            "record_contradictions": [
+              "basis claims no testing at the boundary; constraint_set.boundary_conditions = '8 bar, 5 m3/h, inlet 20 c' and the testable_prediction is an instrumented run at that boundary"
+            ],
+            "grounded_in_evidence_or_computation": false
+          },
+          "why_considered_lethal_by_attacker": "the attacker returned KILL on the BOUNDARY_CONDITION_FAILURE dimension (one of 6 simultaneous KILL verdicts across 6 dimensions — the verdict structure carries no per-dimension lethality discrimination)",
+          "classification": "RECORD_CONTRADICTED",
+          "classification_basis": "basis claims 'no testing provided at the actual boundary condition of 8 bar' — the record's constraint_set.boundary_conditions IS '8 bar, 5 m3/h, inlet 20 C' and the testable_prediction is a chilled-mirror rig run at exactly that boundary. MECHANICAL: absence claim + boundary field present."
+        },
+        {
+          "attack_class": "EVIDENCE_CONTRADICTION",
+          "verdict": "KILL",
+          "exact_claimed_weakness": "The candidate admits oil fouling is a known failure mode but provides no mitigation strategy, making the device unreliable in real-world compressed air systems",
+          "evidence_basis": {
+            "citations": [],
+            "computation_present": false,
+            "absolutist_markers": [],
+            "absence_claims": [
+              "provides no"
+            ],
+            "record_contradictions": [],
+            "grounded_in_evidence_or_computation": false
+          },
+          "why_considered_lethal_by_attacker": "the attacker returned KILL on the EVIDENCE_CONTRADICTION dimension (one of 6 simultaneous KILL verdicts across 6 dimensions — the verdict structure carries no per-dimension lethality discrimination)",
+          "classification": "SCOPE_MISMATCH",
+          "classification_basis": "the candidate DISCLOSES oil fouling as a known failure mode (honest epistemic posture per the corpus contract); the basis treats the disclosed-failure-mode list as an unrebutted contradiction and demands product-level mitigation from a prediction-stage candidate. JUDGMENT: category error about what a candidate record is."
+        },
+        {
+          "attack_class": "BASELINE_EQUIVALENCE",
+          "verdict": "KILL",
+          "exact_claimed_weakness": "The predicted 3°C dew point improvement over baseline is unsubstantiated without comparative testing data against the actual cyclone baseline",
+          "evidence_basis": {
+            "citations": [],
+            "computation_present": false,
+            "absolutist_markers": [],
+            "absence_claims": [
+              "without comparative"
+            ],
+            "record_contradictions": [
+              "basis demands comparative testing; testable_prediction specifies the comparative arm: 'chilled-mirror dew point at the outlet measures 3 plus or minus 1 c equivalent over a 4-hour 5 m3/h run, versus 12 c for'",
+              "basis claims no testing at the boundary; constraint_set.boundary_conditions = '8 bar, 5 m3/h, inlet 20 c' and the testable_prediction is an instrumented run at that boundary"
+            ],
+            "grounded_in_evidence_or_computation": false
+          },
+          "why_considered_lethal_by_attacker": "the attacker returned KILL on the BASELINE_EQUIVALENCE dimension (one of 6 simultaneous KILL verdicts across 6 dimensions — the verdict structure carries no per-dimension lethality discrimination)",
+          "classification": "RECORD_CONTRADICTED",
+          "classification_basis": "basis calls the 3 C improvement 'unsubstantiated without comparative testing data' — the testable_prediction specifies the comparative arm ('versus 12 C for the baseline cyclone in the same rig'). MECHANICAL: absence claim + comparative arm present in the prediction."
+        },
+        {
+          "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+          "verdict": "KILL",
+          "exact_claimed_weakness": "The 1.2mm gaps between 12 stages would be impossible to manufacture and maintain at micron-scale precision in a commercial product",
+          "evidence_basis": {
+            "citations": [],
+            "computation_present": false,
+            "absolutist_markers": [
+              "\\bimpossible\\b"
+            ],
+            "absence_claims": [],
+            "record_contradictions": [],
+            "grounded_in_evidence_or_computation": false
+          },
+          "why_considered_lethal_by_attacker": "the attacker returned KILL on the IMPLEMENTATION_IMPOSSIBILITY dimension (one of 6 simultaneous KILL verdicts across 6 dimensions — the verdict structure carries no per-dimension lethality discrimination)",
+          "classification": "UNSUPPORTED_OBJECTION",
+          "classification_basis": "'1.2 mm gaps ... impossible to manufacture ... at micron-scale precision' — 1.2 mm is NOT micron scale (three orders of magnitude), and 1-2 mm vane gaps are commercial stamped-/formed-sheet geometry. MECHANICAL: absolutist marker + no citation. JUDGMENT: factual self-contradiction inside the basis text itself."
+        },
+        {
+          "attack_class": "MEASUREMENT_AMBIGUITY",
+          "verdict": "KILL",
+          "exact_claimed_weakness": "The ±1°C dew point measurement tolerance is too wide to prove meaningful improvement over baseline and masks potential device ineffectiveness",
+          "evidence_basis": {
+            "citations": [],
+            "computation_present": false,
+            "absolutist_markers": [],
+            "absence_claims": [],
+            "record_contradictions": [],
+            "grounded_in_evidence_or_computation": false
+          },
+          "why_considered_lethal_by_attacker": "the attacker returned KILL on the MEASUREMENT_AMBIGUITY dimension (one of 6 simultaneous KILL verdicts across 6 dimensions — the verdict structure carries no per-dimension lethality discrimination)",
+          "classification": "SEVERITY_INFLATION",
+          "classification_basis": "the +/-1 C tolerance objection ignores that the predicted effect is 9 C (12 C -> 3 C) — nine times the tolerance; the point is an enrichment-level observation (RISK), escalated to KILL. MECHANICAL: magnitudes present in the prediction."
+        }
+      ]
+    },
+    {
+      "case_id": "cal-14-clean-coalescer-quantified",
+      "expected_outcome": "SURVIVE (clean control)",
+      "measured_outcome": "FALSE_KILL",
+      "mechanism": "borosilicate glass-fiber coalescing media merges sub-8-micrometer droplets into drops large enough for the downstream vane stage to intercept",
+      "intervention": "glass-fiber coalescing cartridge (layer-graded 8 to 2 micrometers) ahead of the vane pack",
+      "testable_prediction": "isokinetic gravimetric aerosol sampling at the outlet measures below 0.5 mg/m3 over 8 hours (versus 40 mg/m3 for the baseline cyclone), with pressure drop 58 plus or minus 6 mbar",
+      "boundary_conditions": "8 bar, 5 m3/h, oil-free inlet",
+      "ground_truth": "none — a sound control: graded coalescer media with an instrumented mass-based prediction, regime-consistent physics, effect beats baseline on the problem quantity",
+      "attacker_challenge": {
+        "overall": "KILLED",
+        "verdicts": {
+          "MECHANISM_FAILURE": "KILL",
+          "BOUNDARY_CONDITION_FAILURE": "KILL",
+          "EVIDENCE_CONTRADICTION": "KILL",
+          "BASELINE_EQUIVALENCE": "KILL",
+          "IMPLEMENTATION_IMPOSSIBILITY": "KILL",
+          "MEASUREMENT_AMBIGUITY": "RISK"
+        },
+        "independence_mode": "SEPARATE_CONTEXT",
+        "attacker_provider": "zai"
+      },
+      "why_the_control_should_survive": "none — a sound control: graded coalescer media with an instrumented mass-based prediction, regime-consistent physics, effect beats baseline on the problem quantity. The kill-basis analysis: SCOPE_MISMATCH x2, UNSUPPORTED_OBJECTION x3",
+      "kill_bases": [
+        {
+          "attack_class": "MECHANISM_FAILURE",
+          "verdict": "KILL",
+          "exact_claimed_weakness": "Borosilicate glass-fiber coalescing media cannot effectively merge sub-8-micrometer droplets at 8 bar pressure due to increased gas density reducing droplet collision efficiency, violating fundamental aerosol physics principles",
+          "evidence_basis": {
+            "citations": [],
+            "computation_present": false,
+            "absolutist_markers": [
+              "\\bcannot\\b",
+              "violating fundamental"
+            ],
+            "absence_claims": [],
+            "record_contradictions": [],
+            "grounded_in_evidence_or_computation": false
+          },
+          "why_considered_lethal_by_attacker": "the attacker returned KILL on the MECHANISM_FAILURE dimension (one of 5 simultaneous KILL verdicts across 6 dimensions — the verdict structure carries no per-dimension lethality discrimination)",
+          "classification": "UNSUPPORTED_OBJECTION",
+          "classification_basis": "'borosilicate glass-fiber coalescing media cannot effectively merge sub-8-micrometer droplets at 8 bar ... violating fundamental aerosol physics' — coalescing filter elements are THE standard industrial solution for sub-micron oil aerosol at 7-10 bar; at constant mass flow the higher gas density LOWERS velocity and lengthens media residence time. JUDGMENT: asserted physics contradicted by standard practice, no source."
+        },
+        {
+          "attack_class": "BOUNDARY_CONDITION_FAILURE",
+          "verdict": "KILL",
+          "exact_claimed_weakness": "The claimed 6-month media swap interval fails to account for oil-free air at 8 bar which will rapidly blind the glass fibers with atmospheric hydrocarbons and particulates, making the claimed maintenance interval impossible",
+          "evidence_basis": {
+            "citations": [],
+            "computation_present": false,
+            "absolutist_markers": [
+              "\\bimpossible\\b"
+            ],
+            "absence_claims": [],
+            "record_contradictions": [],
+            "grounded_in_evidence_or_computation": false
+          },
+          "why_considered_lethal_by_attacker": "the attacker returned KILL on the BOUNDARY_CONDITION_FAILURE dimension (one of 5 simultaneous KILL verdicts across 6 dimensions — the verdict structure carries no per-dimension lethality discrimination)",
+          "classification": "SCOPE_MISMATCH",
+          "classification_basis": "the 6-month swap objection invents atmospheric-hydrocarbon blinding BEYOND the declared boundary ('oil-free inlet' in the constraint set) — an unbounded contamination scenario outside the candidate's stated envelope, treated as a boundary failure of the candidate. MECHANICAL: scenario quantities absent from constraint_set."
+        },
+        {
+          "attack_class": "EVIDENCE_CONTRADICTION",
+          "verdict": "KILL",
+          "exact_claimed_weakness": "The candidate provides zero empirical data to support the predicted 0.5 mg/m3 outlet concentration, which contradicts the baseline 40 mg/m3 without any comparative testing",
+          "evidence_basis": {
+            "citations": [],
+            "computation_present": false,
+            "absolutist_markers": [
+              "\\bany\\b",
+              "\\bzero\\b"
+            ],
+            "absence_claims": [
+              "zero empirical"
+            ],
+            "record_contradictions": [
+              "basis demands comparative testing; testable_prediction specifies the comparative arm: 'isokinetic gravimetric aerosol sampling at the outlet measures below 0.5 mg/m3 over 8 hours (versus 40 mg/m3 for the bas'",
+              "basis claims no testing at the boundary; constraint_set.boundary_conditions = '8 bar, 5 m3/h, oil-free inlet' and the testable_prediction is an instrumented run at that boundary"
+            ],
+            "grounded_in_evidence_or_computation": false
+          },
+          "why_considered_lethal_by_attacker": "the attacker returned KILL on the EVIDENCE_CONTRADICTION dimension (one of 5 simultaneous KILL verdicts across 6 dimensions — the verdict structure carries no per-dimension lethality discrimination)",
+          "classification": "SCOPE_MISMATCH",
+          "classification_basis": "'zero empirical data to support the predicted 0.5 mg/m3' — candidates carry quantified PREDICTIONS plus falsification instruments; demanding completed-experiment data from a prediction-stage record is a category error (the corpus contract is prediction + instrument, not measured result). JUDGMENT: epistemic-stage mismatch."
+        },
+        {
+          "attack_class": "BASELINE_EQUIVALENCE",
+          "verdict": "KILL",
+          "exact_claimed_weakness": "The predicted effect (0.5 mg/m3) offers only marginal improvement over baseline (40 mg/m3), insufficient to prevent flooding in downstream instruments during high-demand cycling",
+          "evidence_basis": {
+            "citations": [],
+            "computation_present": false,
+            "absolutist_markers": [],
+            "absence_claims": [],
+            "record_contradictions": [
+              "basis calls the improvement marginal; the prediction carries the magnitudes ['0.5', '3', '8', '40', '3', '58'] (adjudicated against the problem quantity)"
+            ],
+            "grounded_in_evidence_or_computation": false
+          },
+          "why_considered_lethal_by_attacker": "the attacker returned KILL on the BASELINE_EQUIVALENCE dimension (one of 5 simultaneous KILL verdicts across 6 dimensions — the verdict structure carries no per-dimension lethality discrimination)",
+          "classification": "UNSUPPORTED_OBJECTION",
+          "classification_basis": "'0.5 mg/m3 ... offers only marginal improvement over baseline (40 mg/m3)' — an 80x reduction on the problem quantity called marginal. MECHANICAL: the magnitudes are in the basis text itself and contradict the adjective."
+        },
+        {
+          "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+          "verdict": "KILL",
+          "exact_claimed_weakness": "Layer-graded media (8 to 2 micrometers) cannot be manufactured with the claimed precision in borosilicate glass fibers at commercial scale due to material brittleness and inconsistent fiber diameters",
+          "evidence_basis": {
+            "citations": [],
+            "computation_present": false,
+            "absolutist_markers": [
+              "\\bcannot\\b"
+            ],
+            "absence_claims": [],
+            "record_contradictions": [],
+            "grounded_in_evidence_or_computation": false
+          },
+          "why_considered_lethal_by_attacker": "the attacker returned KILL on the IMPLEMENTATION_IMPOSSIBILITY dimension (one of 5 simultaneous KILL verdicts across 6 dimensions — the verdict structure carries no per-dimension lethality discrimination)",
+          "classification": "UNSUPPORTED_OBJECTION",
+          "classification_basis": "layer-graded glass-fiber media (8 -> 2 micrometers) is a standard commercial coalescer cartridge construction; the asserted manufacturing impossibility carries no process analysis, tolerance chain, or source. JUDGMENT: asserted impossibility of a catalog product."
+        }
+      ]
+    },
+    {
+      "case_id": "cal-15-clean-drain-failsafe",
+      "expected_outcome": "SURVIVE (clean control)",
+      "measured_outcome": "FALSE_KILL",
+      "mechanism": "a spring-to-close pilot-operated drain valve dumps condensate on level-sensor command and closes loss-free on power failure (spring return, fails CLOSED with the sump isolated)",
+      "intervention": "spring-to-close pilot drain valve with capacitive level trigger at 80 percent sump",
+      "testable_prediction": "in 20 power-drop trials the valve position sensor reads CLOSED within 2 seconds every trial; in a 12-week unattended trial zero liquid carryover events are detected by the downstream dew-point alarm (threshold 5 C equivalent)",
+      "boundary_conditions": "8 bar, 5 m3/h, 20 C",
+      "ground_truth": "none — a sound control: the fail-safe mechanism is stated with its actuation physics (spring return, fails closed), the prediction is instrumented with counts, timing and a threshold, and the mechanism class (spring-to-close, not magnetic-latch) has no contradicting record in this bundle",
+      "attacker_challenge": {
+        "overall": "KILLED",
+        "verdicts": {
+          "MECHANISM_FAILURE": "KILL",
+          "BOUNDARY_CONDITION_FAILURE": "KILL",
+          "EVIDENCE_CONTRADICTION": "KILL",
+          "BASELINE_EQUIVALENCE": "KILL",
+          "IMPLEMENTATION_IMPOSSIBILITY": "KILL",
+          "MEASUREMENT_AMBIGUITY": "KILL"
+        },
+        "independence_mode": "SEPARATE_CONTEXT",
+        "attacker_provider": "zai"
+      },
+      "why_the_control_should_survive": "none — a sound control: the fail-safe mechanism is stated with its actuation physics (spring return, fails closed), the prediction is instrumented with counts, timing and a threshold, and the mechanism class (spring-to-close, not magnetic-latch) has no contradicting record in this bundle. The kill-basis analysis: SCOPE_MISMATCH x1, SEVERITY_INFLATION x2, UNSUPPORTED_OBJECTION x3",
+      "kill_bases": [
+        {
+          "attack_class": "MECHANISM_FAILURE",
+          "verdict": "KILL",
+          "exact_claimed_weakness": "The spring-to-close mechanism fails to account for potential contamination-induced sticking in the pilot valve, which would prevent proper closure during power failure despite the spring return",
+          "evidence_basis": {
+            "citations": [],
+            "computation_present": false,
+            "absolutist_markers": [],
+            "absence_claims": [],
+            "record_contradictions": [],
+            "grounded_in_evidence_or_computation": false
+          },
+          "why_considered_lethal_by_attacker": "the attacker returned KILL on the MECHANISM_FAILURE dimension (one of 6 simultaneous KILL verdicts across 6 dimensions — the verdict structure carries no per-dimension lethality discrimination)",
+          "classification": "SEVERITY_INFLATION",
+          "classification_basis": "contamination-induced pilot sticking is a PLAUSIBLE failure mode worth flagging — the candidate's novel design variable is precisely the spring force margin (1.5-3x); the basis presents a risk scenario and jumps to mechanism failure with no sticking-probability evidence. JUDGMENT: RISK content, KILL verdict."
+        },
+        {
+          "attack_class": "BOUNDARY_CONDITION_FAILURE",
+          "verdict": "KILL",
+          "exact_claimed_weakness": "The 8 bar operating pressure exceeds the typical pressure rating of standard spring-loaded drain valves, risking catastrophic failure during high-demand cycling",
+          "evidence_basis": {
+            "citations": [],
+            "computation_present": false,
+            "absolutist_markers": [
+              "catastroph"
+            ],
+            "absence_claims": [],
+            "record_contradictions": [],
+            "grounded_in_evidence_or_computation": false
+          },
+          "why_considered_lethal_by_attacker": "the attacker returned KILL on the BOUNDARY_CONDITION_FAILURE dimension (one of 6 simultaneous KILL verdicts across 6 dimensions — the verdict structure carries no per-dimension lethality discrimination)",
+          "classification": "UNSUPPORTED_OBJECTION",
+          "classification_basis": "'8 bar exceeds the typical pressure rating of standard spring-loaded drain valves' — standard pneumatic condensate drains are rated 10-16 bar; the asserted spec limit is contradicted by catalog practice and carries no source. JUDGMENT: fabricated constraint."
+        },
+        {
+          "attack_class": "EVIDENCE_CONTRADICTION",
+          "verdict": "KILL",
+          "exact_claimed_weakness": "The candidate provides no evidence to support the claimed zero carryover prediction, while industry data shows similar systems typically experience carryover events at 5-8% of operating cycles",
+          "evidence_basis": {
+            "citations": [],
+            "computation_present": false,
+            "absolutist_markers": [
+              "\\bzero\\b"
+            ],
+            "absence_claims": [
+              "no evidence",
+              "provides no"
+            ],
+            "record_contradictions": [],
+            "grounded_in_evidence_or_computation": false
+          },
+          "why_considered_lethal_by_attacker": "the attacker returned KILL on the EVIDENCE_CONTRADICTION dimension (one of 6 simultaneous KILL verdicts across 6 dimensions — the verdict structure carries no per-dimension lethality discrimination)",
+          "classification": "UNSUPPORTED_OBJECTION",
+          "classification_basis": "'industry data shows similar systems typically experience carryover events at 5-8% of operating cycles' — an uncited invented statistic ('industry data shows' with no source, no span, no numbers provenance). MECHANICAL: zero citation markers."
+        },
+        {
+          "attack_class": "BASELINE_EQUIVALENCE",
+          "verdict": "KILL",
+          "exact_claimed_weakness": "The design fails to address the primary failure mode of moisture separators (coalescing element saturation) which remains unchanged from the baseline",
+          "evidence_basis": {
+            "citations": [],
+            "computation_present": false,
+            "absolutist_markers": [],
+            "absence_claims": [
+              "fails? to address"
+            ],
+            "record_contradictions": [],
+            "grounded_in_evidence_or_computation": false
+          },
+          "why_considered_lethal_by_attacker": "the attacker returned KILL on the BASELINE_EQUIVALENCE dimension (one of 6 simultaneous KILL verdicts across 6 dimensions — the verdict structure carries no per-dimension lethality discrimination)",
+          "classification": "SCOPE_MISMATCH",
+          "classification_basis": "the basis faults the candidate for 'coalescing element saturation ... unchanged from the baseline' — but the candidate's problem is SUMP-OVERFLOW carryover (the drain function), not coalescer saturation: the attack substitutes a different problem than the one the candidate addresses. JUDGMENT: problem substitution."
+        },
+        {
+          "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+          "verdict": "KILL",
+          "exact_claimed_weakness": "The capacitive level sensor cannot reliably detect condensate at 8 bar pressure due to dielectric constant variations under pressure, making the trigger mechanism unreliable",
+          "evidence_basis": {
+            "citations": [],
+            "computation_present": false,
+            "absolutist_markers": [
+              "\\bcannot\\b"
+            ],
+            "absence_claims": [],
+            "record_contradictions": [],
+            "grounded_in_evidence_or_computation": false
+          },
+          "why_considered_lethal_by_attacker": "the attacker returned KILL on the IMPLEMENTATION_IMPOSSIBILITY dimension (one of 6 simultaneous KILL verdicts across 6 dimensions — the verdict structure carries no per-dimension lethality discrimination)",
+          "classification": "UNSUPPORTED_OBJECTION",
+          "classification_basis": "'capacitive level sensor cannot reliably detect condensate at 8 bar due to dielectric constant variations' — capacitive condensate detection is the standard sensing principle in commercial compressed-air drains at these pressures; the asserted impossibility has no analysis or source. JUDGMENT: asserted impossibility of a catalog function."
+        },
+        {
+          "attack_class": "MEASUREMENT_AMBIGUITY",
+          "verdict": "KILL",
+          "exact_claimed_weakness": "The 2-second closure measurement lacks specification of the pressure decay curve during closure, allowing for false positives where the valve appears closed but still allows leakage",
+          "evidence_basis": {
+            "citations": [],
+            "computation_present": false,
+            "absolutist_markers": [],
+            "absence_claims": [
+              "lacks? specification"
+            ],
+            "record_contradictions": [],
+            "grounded_in_evidence_or_computation": false
+          },
+          "why_considered_lethal_by_attacker": "the attacker returned KILL on the MEASUREMENT_AMBIGUITY dimension (one of 6 simultaneous KILL verdicts across 6 dimensions — the verdict structure carries no per-dimension lethality discrimination)",
+          "classification": "SEVERITY_INFLATION",
+          "classification_basis": "specifying the pressure-decay curve during the 2-second closure is a FAIR enrichment of the measurement contract — an enrichment-level point (RISK) escalated to KILL. JUDGMENT: proportionality failure."
+        }
+      ]
+    },
+    {
+      "case_id": "cal-16-clean-staged-separator",
+      "expected_outcome": "SURVIVE (clean control)",
+      "measured_outcome": "FALSE_KILL",
+      "mechanism": "a staged cyclone-to-vane-to-coalescer separation train, each stage sized for the droplet band the previous stage passes, moves the residual dew point in quantified steps",
+      "intervention": "three-stage separation train with inter-stage pressure recovery rings",
+      "testable_prediction": "stage-by-stage dew-point instrumentation reads 9 C then 5 C then 2 C equivalent plus or minus 1 C at 5 m3/h; total pressure drop 66 plus or minus 6 mbar (below the 70 mbar constraint); the 3 C target met with 1 C margin",
+      "boundary_conditions": "8 bar, 5 m3/h",
+      "ground_truth": "none — a sound control: quantified stage-wise predictions with instruments, margins and the constraint honored (66 mbar below 70); the mechanism's physics (inertial staging by droplet band) is standard separator-design logic executed cleanly",
+      "attacker_challenge": {
+        "overall": "KILLED",
+        "verdicts": {
+          "MECHANISM_FAILURE": "KILL",
+          "BOUNDARY_CONDITION_FAILURE": "KILL",
+          "EVIDENCE_CONTRADICTION": "KILL",
+          "BASELINE_EQUIVALENCE": "KILL",
+          "IMPLEMENTATION_IMPOSSIBILITY": "KILL",
+          "MEASUREMENT_AMBIGUITY": "KILL"
+        },
+        "independence_mode": "SEPARATE_CONTEXT",
+        "attacker_provider": "zai"
+      },
+      "why_the_control_should_survive": "none — a sound control: quantified stage-wise predictions with instruments, margins and the constraint honored (66 mbar below 70); the mechanism's physics (inertial staging by droplet band) is standard separator-design logic executed cleanly. The kill-basis analysis: RECORD_CONTRADICTED x1, SCOPE_MISMATCH x3, SEVERITY_INFLATION x1, UNSUPPORTED_OBJECTION x1",
+      "kill_bases": [
+        {
+          "attack_class": "MECHANISM_FAILURE",
+          "verdict": "KILL",
+          "exact_claimed_weakness": "The cyclone-to-vane-to-coalescer separation train lacks validation of droplet capture efficiency at each stage, with no evidence that the staged approach achieves the claimed 7°C dew point reduction across three stages at 8 bar pressure",
+          "evidence_basis": {
+            "citations": [],
+            "computation_present": false,
+            "absolutist_markers": [],
+            "absence_claims": [
+              "no evidence",
+              "lacks? validation"
+            ],
+            "record_contradictions": [
+              "basis claims no stage-wise evidence; testable_prediction specifies stage-by-stage instrumentation: 'stage-by-stage dew-point instrumentation reads 9 c then 5 c then 2 c equivalent plus or minus 1 c at 5 m3/h; total press'"
+            ],
+            "grounded_in_evidence_or_computation": false
+          },
+          "why_considered_lethal_by_attacker": "the attacker returned KILL on the MECHANISM_FAILURE dimension (one of 6 simultaneous KILL verdicts across 6 dimensions — the verdict structure carries no per-dimension lethality discrimination)",
+          "classification": "RECORD_CONTRADICTED",
+          "classification_basis": "'lacks validation of droplet capture efficiency at each stage, with no evidence that the staged approach achieves the claimed 7 C reduction' — the testable_prediction specifies stage-by-stage dew-point instrumentation (9 C then 5 C then 2 C). MECHANICAL: absence claim + stage instrumentation present."
+        },
+        {
+          "attack_class": "BOUNDARY_CONDITION_FAILURE",
+          "verdict": "KILL",
+          "exact_claimed_weakness": "The candidate fails to address how the separator performs under variable flow conditions beyond the specified 5 m3/h, making it unsuitable for real-world applications with demand cycling",
+          "evidence_basis": {
+            "citations": [],
+            "computation_present": false,
+            "absolutist_markers": [],
+            "absence_claims": [
+              "fails? to address"
+            ],
+            "record_contradictions": [],
+            "grounded_in_evidence_or_computation": false
+          },
+          "why_considered_lethal_by_attacker": "the attacker returned KILL on the BOUNDARY_CONDITION_FAILURE dimension (one of 6 simultaneous KILL verdicts across 6 dimensions — the verdict structure carries no per-dimension lethality discrimination)",
+          "classification": "SCOPE_MISMATCH",
+          "classification_basis": "'variable flow conditions beyond the specified 5 m3/h' — the declared boundary IS 5 m3/h steady; demand cycling is a deployment concern OUTSIDE the stated envelope (a legitimate RISK for the envelope's edges, not a boundary failure of the candidate as specified). MECHANICAL: demanded quantity absent from constraint_set."
+        },
+        {
+          "attack_class": "EVIDENCE_CONTRADICTION",
+          "verdict": "KILL",
+          "exact_claimed_weakness": "The candidate provides no empirical data to support the claimed dew point reduction or pressure drop measurements, making the entire prediction speculative",
+          "evidence_basis": {
+            "citations": [],
+            "computation_present": false,
+            "absolutist_markers": [],
+            "absence_claims": [
+              "provides no",
+              "no empirical"
+            ],
+            "record_contradictions": [],
+            "grounded_in_evidence_or_computation": false
+          },
+          "why_considered_lethal_by_attacker": "the attacker returned KILL on the EVIDENCE_CONTRADICTION dimension (one of 6 simultaneous KILL verdicts across 6 dimensions — the verdict structure carries no per-dimension lethality discrimination)",
+          "classification": "SCOPE_MISMATCH",
+          "classification_basis": "'no empirical data ... making the entire prediction speculative' — the prediction-vs-data category error again: a quantified, instrumented prediction is a hypothesis BY DESIGN; 'speculative' is the honest epistemic class of every candidate, not a defect. JUDGMENT: epistemic-stage mismatch."
+        },
+        {
+          "attack_class": "BASELINE_EQUIVALENCE",
+          "verdict": "KILL",
+          "exact_claimed_weakness": "Without comparative testing against existing separators, there's no evidence this design outperforms the status quo, especially since the claimed 2°C dew point is still above typical instrument requirements",
+          "evidence_basis": {
+            "citations": [],
+            "computation_present": false,
+            "absolutist_markers": [],
+            "absence_claims": [
+              "no evidence",
+              "without comparative"
+            ],
+            "record_contradictions": [
+              "basis claims no testing at the boundary; constraint_set.boundary_conditions = '8 bar, 5 m3/h' and the testable_prediction is an instrumented run at that boundary"
+            ],
+            "grounded_in_evidence_or_computation": false
+          },
+          "why_considered_lethal_by_attacker": "the attacker returned KILL on the BASELINE_EQUIVALENCE dimension (one of 6 simultaneous KILL verdicts across 6 dimensions — the verdict structure carries no per-dimension lethality discrimination)",
+          "classification": "SCOPE_MISMATCH",
+          "classification_basis": "'the claimed 2 C dew point is still above typical instrument requirements' — the common problem's target is the 3 C dew point; 2 C BEATS it. The attack substitutes an unstated stricter requirement. MECHANICAL/JUDGMENT: requirement substitution against the corpus's own stated problem."
+        },
+        {
+          "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+          "verdict": "KILL",
+          "exact_claimed_weakness": "The 0.8-1.6mm vane gap in stage 2 is impractical for manufacturing at scale and would likely clog immediately in real compressed air systems containing oil aerosols",
+          "evidence_basis": {
+            "citations": [],
+            "computation_present": false,
+            "absolutist_markers": [
+              "\\bimmediately\\b"
+            ],
+            "absence_claims": [],
+            "record_contradictions": [],
+            "grounded_in_evidence_or_computation": false
+          },
+          "why_considered_lethal_by_attacker": "the attacker returned KILL on the IMPLEMENTATION_IMPOSSIBILITY dimension (one of 6 simultaneous KILL verdicts across 6 dimensions — the verdict structure carries no per-dimension lethality discrimination)",
+          "classification": "UNSUPPORTED_OBJECTION",
+          "classification_basis": "0.8-1.6 mm vane gaps are within commercial vane-pack geometry; 'would likely clog immediately' is asserted with no loading analysis (and stage-2 inlet oil loading is already reduced by the upstream cyclone). JUDGMENT: asserted immediacy without analysis."
+        },
+        {
+          "attack_class": "MEASUREMENT_AMBIGUITY",
+          "verdict": "KILL",
+          "exact_claimed_weakness": "The ±1°C tolerance on dew point measurements is too wide to validate the claimed performance, and the candidate doesn't specify how temperature, pressure, and humidity are measured at each stage",
+          "evidence_basis": {
+            "citations": [],
+            "computation_present": false,
+            "absolutist_markers": [],
+            "absence_claims": [],
+            "record_contradictions": [],
+            "grounded_in_evidence_or_computation": false
+          },
+          "why_considered_lethal_by_attacker": "the attacker returned KILL on the MEASUREMENT_AMBIGUITY dimension (one of 6 simultaneous KILL verdicts across 6 dimensions — the verdict structure carries no per-dimension lethality discrimination)",
+          "classification": "SEVERITY_INFLATION",
+          "classification_basis": "the +/-1 C tolerance objection against 4 C and 3 C stage steps; the T/P/RH-instrumentation enrichment is fair — both are RISK-level points escalated to KILL. JUDGMENT: proportionality failure."
+        }
+      ]
+    }
+  ]
+}

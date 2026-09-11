@@ -182,3 +182,32 @@ package, missing/legacy records, tampered engineering identity, wrong
 source GLB). Production visual closure remains BLOCKED on the owner-side
 capacity decision (Render plan measured 'free' at round start; Art. LXV
 escalation 4) — production visual success is NOT claimed this round.
+
+## R445 addendum (2026-09-11) — ONE canonical domain-family vocabulary
+
+Operator directive R445-A (the F1 fix): the domain-family identity is
+now ONE semantic namespace flowing unchanged through every layer
+(USER PROBLEM -> PROBLEM CONTEXT -> DOMAIN SPEC -> ENGINEERING SPEC ->
+GEOMETRY -> CIO -> DOSSIER -> PACKAGE).
+
+| Component | Module | Notes |
+|---|---|---|
+| THE canonical family registry | `engine/domains.py::CANONICAL_DOMAIN_FAMILIES` | 11 families (thermal, fluid, materials, biomedical, software_ml, mechanical, electronic, energy, optical_photonic, acoustic, generic) + engine-domain and bridge-archetype routing DECLARED by mapping into it; published in ENGINEERING_DOMAIN_REGISTRY.json v1.1.0 (sync test enforced) |
+| The upstream decision | `engineering_spec.py` | `why_this_domain.canonical_family` + `applicability.canonical_domain.canonical_family` — decided ONCE from the problem's own words (resolve_canonical_family: biomedical whole-form device-identity dominance + keyword routing, full score table recorded); the application axis, orthogonal to the E21-D physics domain (a catheter is biomedical as a family, fluidics as physics — both recorded) |
+| The shared consumer ladder | `engine/domains.py::resolve_run_canonical_family` | upstream field > registry problem-words > engine-domain mapping > honest generic — the ONE function the bridge domain spec AND the package compiler both call; cross-layer agreement by construction |
+| Bridge consumption | `invention_bridge/domain_spec.py` + `bridge.py` | `build_spec_from_state` consumes the ladder; the ARCHETYPE is derived FROM the family (registry routing; within-family keyword refinement); the spec declares `canonical_family` + `technology_class` (the archetype, re-labeled presentation routing — never a second namespace); PROCESS_FLOW / GENERIC_FALLBACK / ENGINEERING_PARAMETRIC survive only as `representation_class`; the bridge entry enriches run_result from the run-dir persisted ENGINEERING_SPECIFICATION.json (Art. X authority — the replay-divergence fix) |
+| Package compiler | `engine/package_compiler.py` v1.1 | identity.domain_family via the shared ladder; M-DOMAIN-CONTRADICTION compares in the canonical vocabulary (upstream decision vs declared; the two axes are orthogonal) |
+| Gate invariant | `package_quality_gate/gates.py` gate A | NEW `A-NONCANONICAL-DOMAIN`: every domain_family declaration must be a canonical family id ('THERMAL', 'thermal_fluid_process', 'GENERIC_ARCHITECTURE', engine-domain ids as domain_family = broken invariant); gate C/U vocabulary keys are the canonical family ids (view.py DOMAIN_VOCAB; polysemous terms excluded per Art. XXI) |
+
+The F1 defect (A-INTERNAL-DIVERGENT ['GENERIC_ARCHITECTURE',
+'thermal'], zero packages emitted in R444) is closed end-to-end: the
+recorded bench-p03 battery replay now emits ZIP_READY with 19/19
+domain_family declarations = 'thermal'
+(scripts/r445_buyer_package_continuity.py: bench-p03 thermal +
+bench-x03 software_ml, one coherent domain throughout each package).
+Battery: `tests/test_r445_canonical_domain.py` (16 tests: registry
+integrity, the five required families resolve deterministically,
+layer continuity through engineering spec -> domain spec -> geometry ->
+artifact identity -> CIO -> package -> gate A, the F1 divergence
+injection detected as a broken invariant, the single-wrong-vocabulary
+shape detected, upstream-consumption override).

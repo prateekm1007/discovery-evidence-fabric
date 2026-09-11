@@ -29,6 +29,7 @@ and EXPERIMENTALLY VERIFIED is never set by this bridge.
 
 from __future__ import annotations
 
+import json
 import os
 import time
 from typing import Any, Dict, List, Optional
@@ -39,9 +40,34 @@ from . import render as render_stage
 from . import domain_spec, domain_geometry
 from . import geometry_quality_gate as quality_gate
 from . import artifact_identity as artifact_id
+from ..domains import resolve_canonical_family, resolve_run_canonical_family
 
 BRIDGE_VERSION = "2.0.0"
 MAX_GEOMETRY_ATTEMPTS = 3
+
+
+def _resolved_run_state(run_result: Dict[str, Any],
+                        work_dir: Optional[str]) -> Dict[str, Any]:
+    """R445: run-dir persisted artifacts are the authority (the same
+    rule the package compiler's resolve_final_state applies, Art. X):
+    when the passed run_result lacks the engineering specification but
+    the run dir carries the persisted ENGINEERING_SPECIFICATION.json,
+    the persisted record joins the run state — so the bridge's
+    canonical-family ladder and the compiler's read the SAME upstream
+    decision (agreement by construction; the F1 replay divergence is
+    closed)."""
+    rr = dict(run_result or {})
+    if work_dir and not isinstance(
+            rr.get("engineering_specification"), dict):
+        p = os.path.join(work_dir, "ENGINEERING_SPECIFICATION.json")
+        try:
+            with open(p, "r") as f:
+                eng = json.load(f)
+            if isinstance(eng, dict):
+                rr["engineering_specification"] = eng
+        except (OSError, ValueError):
+            pass
+    return rr
 
 
 def _pipeline_step(steps: List[Dict[str, Any]], name: str, status: str,
@@ -77,6 +103,12 @@ def bridge(run_result: Dict[str, Any], cio: Optional[Dict[str, Any]],
     """
     steps: List[Dict[str, Any]] = []
     cio = cio or {}
+    # R445: run-dir persisted artifacts are the authority — when the
+    # passed run_result lacks the engineering specification but the run
+    # dir carries the persisted record, it joins the run state so the
+    # bridge's canonical-family ladder reads the SAME upstream decision
+    # the package compiler reads (agreement by construction)
+    run_result = _resolved_run_state(run_result, work_dir)
 
     # ---------------------------------------------------------------- 1. classify
     vis = classifier.classify(run_result, cio)
@@ -171,7 +203,9 @@ def bridge(run_result: Dict[str, Any], cio: Optional[Dict[str, Any]],
                 built = conceptual_geometry.build_system_architecture(
                     ["subsystem 1", "subsystem 2", "subsystem 3"],
                     vis.get("intervention_site", ""))
-                built["domain_family"] = "GENERIC_FALLBACK"
+                built["domain_family"] = _resolve_run_canonical_family(
+                    run_result, vis)
+                built["representation_class"] = "GENERIC_FALLBACK"
                 built["fallback_basis"] = (
                     f"domain build failed ({type(exc).__name__}: {exc}) — "
                     "explicitly labeled generic fallback; engineering "
@@ -432,6 +466,17 @@ def _persist_conceptual_artifacts(work_dir: str, built: Dict[str, Any],
     return built
 
 
+def _resolve_run_canonical_family(
+        run_result: Dict[str, Any], vis: Dict[str, Any]) -> str:
+    """R445 helper: the canonical family for a run — the ONE shared
+    consumer ladder (domains.py::resolve_run_canonical_family: upstream
+    authority > registry problem-words > engine-domain mapping >
+    generic), never a second vocabulary."""
+    return resolve_run_canonical_family(
+        run_result,
+        (run_result or {}).get("engineering_specification"))["canonical_family"]
+
+
 def _build_conceptual(vis: Dict[str, Any], run_result: Dict[str, Any],
                       work_dir: Optional[str] = None,
                       run_id: Optional[str] = None) -> Dict[str, Any]:
@@ -440,22 +485,32 @@ def _build_conceptual(vis: Dict[str, Any], run_result: Dict[str, Any],
     is honestly a flow, not a device). The generic architecture
     diagram remains ONLY as the explicitly labeled fallback (section
     3/15) — a family failure falls back LOUDLY with a recorded basis,
-    never silently (section 23)."""
+    never silently (section 23).
+
+    R445: every `domain_family` emitted here is the CANONICAL family
+    id (from the upstream engineering-spec decision via the bridge
+    domain spec); the former bridge-family labels survive only as
+    `representation_class` (a presentation routing note, never a
+    semantic identity)."""
     vclass = vis["visualizability_class"]
 
     if vclass == ep.PROCESS_3D:
+        canonical = _resolve_run_canonical_family(run_result, vis)
         built = conceptual_geometry.build_system_architecture(
             vis.get("subsystems") or [], vis.get("intervention_site", ""))
-        built["domain_family"] = "PROCESS_FLOW"
+        built["domain_family"] = canonical
+        built["representation_class"] = "PROCESS_FLOW"
         if work_dir:
             _persist_conceptual_artifacts(work_dir, built, None, vis,
                                           run_result, run_id)
         return built
 
-    # --- domain family selection (deterministic, basis recorded) ---------
+    # --- domain spec (R445: canonical family consumed from upstream,
+    #     archetype derived FROM it — basis recorded) ----------------------
     out = domain_spec.build_spec_from_state(run_result, vis)
     selection, spec = out["selection"], out["spec"]
-    family = selection["family"]
+    canonical = out["canonical_family"]
+    family = spec.get("technology_class") or domain_spec.GENERIC_FAMILY
 
     if family == domain_spec.GENERIC_FAMILY:
         # honest labeled generic fallback (R432 section 3: acceptable
@@ -473,23 +528,31 @@ def _build_conceptual(vis: Dict[str, Any], run_result: Dict[str, Any],
             built = conceptual_geometry.build_system_architecture(
                 vis.get("subsystems") or [],
                 vis.get("intervention_site", ""))
-        built["domain_family"] = "GENERIC_ARCHITECTURE"
+        built["domain_family"] = canonical
+        built["representation_class"] = "GENERIC_ARCHITECTURE"
         built["domain_selection"] = selection
+        built["canonical_resolution"] = out.get("canonical_resolution")
+        # R445: the domain SPEC persists even on the generic path — the
+        # spec carries the canonical family + resolution basis (the
+        # layer record must be traceable, whatever the representation)
+        built["geometry_spec"] = spec
         built["fallback_basis"] = (
-            "no domain family earned the minimum form score — the "
-            "generic architecture diagram is shown as the clearly "
-            "labeled early conceptual fallback (R432 section 3/15)")
+            "no bridge geometry archetype for the canonical family "
+            f"'{canonical}' — the generic architecture diagram is shown "
+            "as the clearly labeled early conceptual fallback (R432 "
+            "section 3/15; R445: the canonical family identity is "
+            "carried unchanged)")
         if work_dir:
-            _persist_conceptual_artifacts(work_dir, built, None, vis,
+            _persist_conceptual_artifacts(work_dir, built, spec, vis,
                                           run_result, run_id)
         # R433: the generic fallback FAILS semantic identity by record
         # (honest score, never hidden — section 13)
         built["scores"] = quality_gate.score_technology_model(
-            None, built["glb_bytes"], domain_family=built.get(
-                "domain_family"),
+            None, built["glb_bytes"], domain_family=domain_spec.GENERIC_FAMILY,
             requested_problem=str((run_result or {}).get("user_text")
                                    or ""),
-            identity=built.get("artifact_identity"))
+            identity=built.get("artifact_identity"),
+            canonical_family=canonical)
         return built
 
     # --- deterministic domain build + quality gates -------------------------
@@ -498,29 +561,34 @@ def _build_conceptual(vis: Dict[str, Any], run_result: Dict[str, Any],
     except Exception as exc:  # noqa: BLE001 — LOUD fallback, never silent
         built = conceptual_geometry.build_system_architecture(
             vis.get("subsystems") or [], vis.get("intervention_site", ""))
-        built["domain_family"] = "GENERIC_FALLBACK"
+        built["domain_family"] = canonical
+        built["representation_class"] = "GENERIC_FALLBACK"
         built["fallback_basis"] = (
-            f"domain family {family} was selected but its deterministic "
+            f"archetype {family} was routed but its deterministic "
             f"builder failed ({type(exc).__name__}: {exc}) — explicitly "
             "labeled generic fallback; the failure is recorded, the "
             "generic diagram never masquerades as the domain model "
-            "(R432 section 23)")
+            "(R432 section 23; R445: the canonical family identity is "
+            "carried unchanged)")
         if work_dir:
             _persist_conceptual_artifacts(work_dir, built, None, vis,
                                           run_result, run_id)
         # R433: the builder-failure fallback FAILS semantic identity by
         # record (honest score, never hidden — section 13)
         built["scores"] = quality_gate.score_technology_model(
-            None, built["glb_bytes"], domain_family=family,
+            None, built["glb_bytes"], domain_family=domain_spec.GENERIC_FAMILY,
             requested_problem=str((run_result or {}).get("user_text")
                                    or ""),
-            identity=built.get("artifact_identity"))
+            identity=built.get("artifact_identity"),
+            canonical_family=canonical)
         return built
 
     gates = quality_gate.run_all_gates(
-        built["glb_bytes"], spec, domain_family=family)
+        built["glb_bytes"], spec, domain_family=family,
+        canonical_family=canonical)
     built["quality_gates"] = gates
     built["domain_selection"] = selection
+    built["canonical_resolution"] = out.get("canonical_resolution")
     built["geometry_spec"] = spec
     if not gates["passed"]:
         # The domain build exists but failed its own quality gate: keep
@@ -537,7 +605,8 @@ def _build_conceptual(vis: Dict[str, Any], run_result: Dict[str, Any],
     built["scores"] = quality_gate.score_technology_model(
         spec, built["glb_bytes"], domain_family=family,
         requested_problem=str((run_result or {}).get("user_text") or ""),
-        identity=built.get("artifact_identity"))
+        identity=built.get("artifact_identity"),
+        canonical_family=canonical)
     return built
 
 
@@ -587,6 +656,10 @@ def _build_engineering(vis: Dict[str, Any], run_result: Dict[str, Any],
     # the canonical artifact identity (spec-less: the engineering
     # path's canonical source IS the FORM_LIBRARY builder — identity
     # carries cad_source instead of a spec hash).
+    # R445: the canonical family is consumed from the upstream
+    # engineering-spec decision (never re-derived here);
+    # ENGINEERING_PARAMETRIC survives only as representation_class.
+    canonical = _resolve_run_canonical_family(run_result, vis)
     result = {
         "glb_bytes": exported["glb_bytes"],
         "glb_sha256": exported["glb_sha256"],
@@ -602,10 +675,12 @@ def _build_engineering(vis: Dict[str, Any], run_result: Dict[str, Any],
             "parameters": params,
         },
         "validation": validation,
-        "domain_family": "ENGINEERING_PARAMETRIC",
+        "domain_family": canonical,
+        "representation_class": "ENGINEERING_PARAMETRIC",
     }
     result["quality_gates"] = quality_gate.run_all_gates(
         exported["glb_bytes"], None, domain_family=None,
+        canonical_family=canonical,
         engineering=True, model_dir=work_dir, geometry_out=result)
     tech_id = (((run_result.get("problem") or {}).get("problem_id"))
                or ((run_result.get("final_state") or {}).get(
@@ -618,16 +693,17 @@ def _build_engineering(vis: Dict[str, Any], run_result: Dict[str, Any],
         glb_path=exported["glb_path"],
         cad_source=engineering_geometry.canonical_source_identity(form),
         visualizability_class=ep.ENGINEERING_3D,
-        domain_family="ENGINEERING_PARAMETRIC")
+        domain_family=canonical)
     artifact_id.persist(work_dir, identity)
     result["artifact_identity"] = identity
     # R433 section 13: the engineering path carries the same three
     # separated scores (the parametric form IS the semantic identity
     # here; the canonical CAD source is the coherence authority)
     result["scores"] = quality_gate.score_technology_model(
-        None, exported["glb_bytes"], domain_family="ENGINEERING_PARAMETRIC",
+        None, exported["glb_bytes"], domain_family=None,
         requested_problem=str((run_result or {}).get("user_text") or ""),
-        identity=identity)
+        identity=identity,
+        canonical_family=canonical)
     return result
 
 
@@ -652,10 +728,13 @@ def _generation_models(vis: Dict[str, Any], run_result: Dict[str, Any],
                   for s in arch if (isinstance(s, dict) and s.get("name"))
                   or isinstance(s, str)] or (vis.get("subsystems") or [])
 
-    # the family selection is computed ONCE from the full state (the
-    # technology class does not change per generation)
+    # the domain spec is computed ONCE from the full state (the
+    # canonical family and archetype do not change per generation);
+    # R445: the canonical family is consumed from the upstream
+    # engineering-spec decision inside build_spec_from_state
     out = domain_spec.build_spec_from_state(run_result, vis)
-    family = out["selection"]["family"]
+    family = out["spec"].get("technology_class") or domain_spec.GENERIC_FAMILY
+    canonical = out["canonical_family"]
 
     models: List[Dict[str, Any]] = []
     for i in range(min(n, 5)):
@@ -672,18 +751,22 @@ def _generation_models(vis: Dict[str, Any], run_result: Dict[str, Any],
         try:
             gen_spec = domain_spec.derive_geometry_spec(
                 family, names, vis.get("intervention_site", ""),
-                selection=out["selection"])
+                selection=out["selection"],
+                canonical_family=canonical,
+                canonical_basis=out.get("canonical_resolution"))
             if gen_spec.get("technology_class") == domain_spec.GENERIC_FAMILY \
                     or not gen_spec.get("components"):
                 built = conceptual_geometry.build_system_architecture(
                     names, vis.get("intervention_site", ""))
-                built["domain_family"] = "GENERIC_ARCHITECTURE"
+                built["domain_family"] = canonical
+                built["representation_class"] = "GENERIC_ARCHITECTURE"
             else:
                 built = domain_geometry.build_domain_model(gen_spec)
         except Exception:  # noqa: BLE001 — lineage stays honest per gen
             built = conceptual_geometry.build_system_architecture(
                 names, vis.get("intervention_site", ""))
-            built["domain_family"] = "GENERIC_FALLBACK"
+            built["domain_family"] = canonical
+            built["representation_class"] = "GENERIC_FALLBACK"
         path = os.path.join(gens_dir, f"gen-{gen_no}.glb")
         with open(path, "wb") as f:
             f.write(built["glb_bytes"])

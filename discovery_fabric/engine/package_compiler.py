@@ -45,8 +45,10 @@ from typing import Any, Dict, List, Optional, Tuple
 
 from .invention_bridge import package as _render
 from .invention_bridge import epistemics as _ep
+from .domains import (canonical_family_of_engine_domain,  # R445
+                      resolve_run_canonical_family)
 
-COMPILER_VERSION = "R440_CANONICAL_PACKAGE_COMPILER/1.0"
+COMPILER_VERSION = "R440_CANONICAL_PACKAGE_COMPILER/1.1"  # R445: canonical domain family
 
 
 class PackageCompileError(RuntimeError):
@@ -185,14 +187,16 @@ def build_technology_package_model(
     else:
         pid_val = pid_field
     problem_id = str(run_result.get("problem_id") or pid_val or "")
-    domain_family = ""
-    wd = eng.get("why_this_domain") or {}
-    if wd.get("domain"):
-        domain_family = str(wd["domain"])
-    elif eng.get("technology_domain"):
-        domain_family = str(eng["technology_domain"])
-    elif run_result.get("domain"):
-        domain_family = str(run_result["domain"])
+    # R445: the package identity's domain_family is THE canonical family
+    # — consumed via the ONE shared consumer ladder (domains.py::
+    # resolve_run_canonical_family: the upstream engineering-spec
+    # canonical_family first, then the registry over the run's own
+    # problem words, then the engine-domain mapping). The same function
+    # the bridge's domain spec uses — cross-layer agreement by
+    # construction; never a compiler-side mapping of two vocabularies
+    # (the F1 fix is upstream, not here).
+    domain_family = resolve_run_canonical_family(
+        run_result, eng)["canonical_family"]
     technology_name = str(
         run_result.get("title")
         or _u(inv.get("invention_id"))
@@ -587,16 +591,37 @@ def validate_model(model: Dict[str, Any]) -> List[Dict[str, str]]:
                             f"be verified (R440.12)"})
 
     # R440.8 — domain coherence (model-side): declared domain must not
-    # be contradicted by the model's own engineering domain detection
+    # be contradicted by the model's own engineering domain detection.
+    # R445: the comparison happens in the ONE canonical vocabulary —
+    # the declared family (canonical, application axis) is checked
+    # against the upstream canonical decision when present, else
+    # against the canonical mapping of the engine's physics-domain
+    # detection (the two axes are orthogonal: a catheter is biomedical
+    # as a family and fluidics as physics; neither contradicts the
+    # other — what this check catches is the compiler diverging from
+    # the engineering spec's own recorded family decision).
     declared = ident.get("domain_family")
-    detected = str(eng.get("technology_domain") or
-                   (eng.get("why_this_domain") or {}).get("domain") or "")
-    if declared and detected and str(declared).strip().lower() \
-            != detected.strip().lower():
+    wd = eng.get("why_this_domain") or {}
+    upstream_cf = wd.get("canonical_family") if isinstance(
+        wd.get("canonical_family"), str) else ""
+    detected = str(eng.get("technology_domain") or wd.get("domain") or "")
+    detected_family = canonical_family_of_engine_domain(detected) \
+        if detected else ""
+    if declared and upstream_cf and str(declared).strip() \
+            != str(upstream_cf).strip():
+        v.append({"code": "M-DOMAIN-CONTRADICTION",
+                  "reason": f"declared domain_family {declared!r} "
+                            f"contradicts the engineering spec's own "
+                            f"canonical family decision {upstream_cf!r} "
+                            f"(R440.8/R445: the compiler must consume the "
+                            f"upstream authority unchanged)"})
+    elif declared and not upstream_cf and detected_family \
+            and str(declared).strip() != detected_family:
         v.append({"code": "M-DOMAIN-CONTRADICTION",
                   "reason": f"declared domain_family {declared!r} "
                             f"contradicts engineering domain detection "
-                            f"{detected!r} (R440.8)"})
+                            f"{detected!r} -> canonical family "
+                            f"{detected_family!r} (R440.8/R445)"})
     return v
 
 

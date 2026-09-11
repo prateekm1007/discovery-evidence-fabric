@@ -60,7 +60,9 @@ from .domain_reasoning import detect_domain_reasoned  # E21-D
 from . import applicability as _applicability  # R443: context authority
 from .candidate import Candidate, sha256_obj, utc_now
 from .design_outputs import compile_design_outputs
-from .domains import domain_label, get_domain_module
+from .domains import (canonical_family_label as _canonical_family_label,
+                      domain_label, get_domain_module)
+from . import domains as domains  # R445: canonical family authority
 from .equations import select_equations
 from . import quantity_reasoning
 from .invention_spec import tagged
@@ -741,6 +743,17 @@ def build_engineering_spec(spec: Dict[str, Any], env: Optional[Candidate],
             " ".join(str(problem.get(k, "")) for k in
                      ("device", "failure", "constraint")),
             mech_text))
+    # R445: the ONE canonical domain-family decision — recorded HERE
+    # (the upstream-most persisted domain decision in the runtime) and
+    # consumed unchanged by every downstream layer (bridge domain spec,
+    # geometry, CIO, dossier, package compiler — Art. X; the F1 defect
+    # was exactly these layers each re-deriving a family in their own
+    # namespace). The family is the APPLICATION axis, resolved from the
+    # problem's own words; the engine routing domain above stays the
+    # MECHANISM-PHYSICS axis (orthogonal, both recorded, neither
+    # promoted into the other).
+    canonical_family_resolution = domains.resolve_canonical_family(
+        problem_text)
     applicability = _applicability.detect_applicability(problem_text)
     context_class = applicability["context_class"]
     filtered = _applicability.filter_domain_module_content(
@@ -1002,6 +1015,16 @@ def build_engineering_spec(spec: Dict[str, Any], env: Optional[Candidate],
     why_this_domain = {
         "domain": domain,
         "label": domain_label(domain),
+        # R445: the canonical domain-family identity — THE one family
+        # vocabulary (domains.py::CANONICAL_DOMAIN_FAMILIES), decided
+        # here from the problem's own words and consumed unchanged by
+        # every downstream layer (bridge domain spec, geometry, CIO,
+        # dossier, package compiler). The full resolution basis (score
+        # table) rides with it so the family choice is auditable from
+        # the artifact alone (Art. XXVII).
+        "canonical_family": canonical_family_resolution["canonical_family"],
+        "canonical_family_label": canonical_family_resolution["label"],
+        "canonical_family_basis": canonical_family_resolution,
         "matched_signals": detection["matched_signals"],
         "matched_in_text": True,
         "runner_up": detection.get("runner_up"),
@@ -1448,9 +1471,20 @@ def build_engineering_spec(spec: Dict[str, Any], env: Optional[Candidate],
             "canonical_domain": {
                 "domain": domain,
                 "label": domain_label(domain),
+                # R445: the canonical family rides with the canonical
+                # applicability record — the CIO, the website, the
+                # dossier and the package compiler consume THIS field
+                # as the one domain-family identity (never re-derived).
+                "canonical_family":
+                    canonical_family_resolution["canonical_family"],
+                "canonical_family_label":
+                    canonical_family_resolution["label"],
                 "selection": "engineering_specification.why_this_domain "
                              "(the E21-D phenomena-layer domain decision "
-                             "— physics authority, unchanged by R443)",
+                             "— physics authority, unchanged by R443; the "
+                             "canonical family resolved per R445 from the "
+                             "problem's own words via "
+                             "domains.py::CANONICAL_DOMAIN_FAMILIES)",
             },
         },
         "engineering_disciplines": module["disciplines"],

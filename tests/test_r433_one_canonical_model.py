@@ -493,8 +493,13 @@ class TestFailureHandling(unittest.TestCase):
             out = run_bridge(run, None, work_dir=td,
                              build_renders=False, run_id="sess_g")
             g = out["geometry_out"]
-            self.assertIn(g.get("domain_family"),
-                          ("GENERIC_ARCHITECTURE", "PROCESS_FLOW"))
+            # R445: the canonical family vocabulary — the unsignaled
+            # problem resolves to the honest 'generic' family; the
+            # former bridge labels survive as representation_class
+            self.assertEqual(g.get("domain_family"), "generic")
+            self.assertIn(g.get("representation_class"),
+                          ("GENERIC_ARCHITECTURE", "PROCESS_FLOW",
+                           "GENERIC_FALLBACK"))
             scores = g.get("scores") or {}
             self.assertIn("semantic_identity", scores)
             self.assertFalse(scores["semantic_identity"]["passed"])
@@ -513,7 +518,10 @@ class TestCanonicalFlowEndToEnd(unittest.TestCase):
             out = run_bridge(run, None, work_dir=td, build_renders=False,
                              run_id="sess_r433")
             g = out["geometry_out"]
-            self.assertEqual(g["domain_family"], "VEHICLE")
+            # R445: domain_family is the CANONICAL family id; the
+            # vehicle form survives as the technology_class archetype
+            self.assertEqual(g["domain_family"], "mechanical")
+            self.assertEqual(g.get("technology_class"), "VEHICLE")
             self.assertEqual(g["generation_id"], "gen-2")
             self.assertEqual(g["generation_count"], 2)
             evo = g["evolution"]

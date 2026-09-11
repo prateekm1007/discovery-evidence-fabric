@@ -31,6 +31,8 @@ from .view import (
     CANONICAL_ID_PATTERNS, DOMAIN_VOCAB, GateResult, PackageView,
     domain_term_hits, distinctive_tokens, sha256_file,
 )
+from ..domains import (CANONICAL_DOMAIN_FAMILIES,  # R445
+                       is_canonical_family)
 
 # canonical_id_match is a tiny helper reused by several gates
 def canonical_id_hits(text: str) -> list[str]:
@@ -84,6 +86,26 @@ def gate_A_identity_coherence(pv: PackageView, canonical: Optional[dict]) -> Gat
             g.fail("A-INTERNAL-DIVERGENT", f"{field} has divergent declarations: "
                    f"{vals[:4]}", {"where": [d['where'] for d in ident[field]
                                              if d['value'] == vals[0]][:3]})
+    # R445 — the canonical vocabulary invariant: every domain_family
+    # declaration in the package must be a CANONICAL family id
+    # (domains.py::CANONICAL_DOMAIN_FAMILIES). A declaration in any other
+    # vocabulary (the former bridge families 'GENERIC_ARCHITECTURE' /
+    # 'THERMAL_SYSTEM' / ..., the engine routing domains
+    # 'fluidics_hydraulic' / ..., case variants 'THERMAL', benchmark
+    # labels 'thermal_fluid_process') is a broken invariant: a downstream
+    # layer invented a second semantic namespace — exactly the F1 defect
+    # class. This is the deliberately-injected-divergence detector the
+    # R445 directive requires (the single-value F1 shape where every
+    # layer agrees on the WRONG vocabulary is ALSO blocked).
+    for d in ident.get("domain_family", []):
+        if not is_canonical_family(d["value"]):
+            g.fail("A-NONCANONICAL-DOMAIN",
+                   f"domain_family declaration {d['value']!r} at "
+                   f"{d['where']} is not a canonical family id "
+                   f"(canonical vocabulary: {sorted(CANONICAL_DOMAIN_FAMILIES)}"
+                   f" — domains.py::CANONICAL_DOMAIN_FAMILIES, R445)",
+                   {"where": [d["where"]]})
+            break
     # PDF vs machine layer
     pid_machine = set(values("package_id"))
     pid_pdf = set(values("package_id_pdf"))
@@ -237,7 +259,7 @@ def gate_C_domain_integrity(pv: PackageView, canonical: Optional[dict]) -> GateR
     # Consumed from the canonical state, never re-guessed here.
     _app_ctx = str((canonical or {}).get("applicability_context") or "")
     if _app_ctx in ("MEDICAL_IN_VIVO", "MEDICAL_EX_VIVO"):
-        home_domains.add("medical")
+        home_domains.add("biomedical")
     dom_l = str(dom).strip().lower()
     # when the declared domain is outside the gate's known vocabulary the
     # contradiction detector cannot adjudicate foreign terms (Art. XXV:

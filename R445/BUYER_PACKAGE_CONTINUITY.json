@@ -1,0 +1,145 @@
+{
+  "artifact": "R445_BUYER_PACKAGE_CONTINUITY",
+  "round": "R445-D",
+  "directive": "two successful R444 benchmark cases from different domains, traced problem -> canonical domain -> mechanism -> engineering spec -> geometry -> experiment -> package; the package must be emitted successfully and contain one coherent domain throughout; no downstream vocabulary absent from canonical state",
+  "reviewer_provenance": "AI_REVIEW (Art. LXVII)",
+  "replay_basis": "the RECORDED R444 battery final states (frozen; deterministic bridge + package compiler replay, no LLM calls); run-dir persisted artifacts are the authority (Art. X)",
+  "cases": [
+    {
+      "case_id": "bench-p03-phe-biofouling",
+      "r444_note": "the R444 F1 case — PACKAGE_BUILD_BLOCKED by A-INTERNAL-DIVERGENT ['GENERIC_ARCHITECTURE', 'thermal'] with ZERO packages emitted",
+      "problem": {
+        "problem_id": "bench-p03-phe-biofouling",
+        "device": "stainless steel plate heat exchanger in a district cooling loop",
+        "failure": "biofilm and scale accumulation on plate channels reduces overall heat transfer coefficient and raises pressure drop between cleanings"
+      },
+      "canonical_domain": {
+        "family": "thermal",
+        "label": "Thermal & heat-transfer systems",
+        "basis": {
+          "derived_from": [
+            "problem text",
+            "intervention site",
+            "recorded subsystem names"
+          ],
+          "rule": "highest keyword score wins; ties resolve by registry order; below the form threshold the generic family is selected and labeled",
+          "authority": "discovery_fabric/engine/domains.py::CANONICAL_DOMAIN_FAMILIES (R445 — the one canonical domain-family vocabulary)",
+          "deterministic": true,
+          "ladder_step": 3,
+          "source": "registry resolution over the run's own recorded problem words (no upstream canonical field — legacy state)"
+        },
+        "expected_family": "thermal",
+        "matches_expected": true
+      },
+      "mechanism": {
+        "intervention": "Embedding microstructured optical fiber sensors and corrosion-activated microcapsules containing healing agents throughout the stainless steel cooling system components"
+      },
+      "engineering_spec": {
+        "path": "R401-WC2/BENCHMARK/RUNS/r401/bench-p03-phe-biofouling/ENGINEERING_SPECIFICATION.json",
+        "technology_domain": "thermal",
+        "why_this_domain_domain": "thermal"
+      },
+      "geometry": {
+        "visualizability_class": "SYSTEM_3D",
+        "domain_family": "thermal",
+        "technology_class": "THERMAL_SYSTEM",
+        "representation_class": null,
+        "glb_sha256": "f99ccc083fab11edc59829fdb8d25c6bf5d5cc2387fdabfe136cc1464f380ffa",
+        "components": 11
+      },
+      "experiment": {
+        "selected_experiment": "falsification_test_from_candidate",
+        "n_shortlist": 3
+      },
+      "package": {
+        "state": "ZIP_READY",
+        "zip_path": "<replay workdir>/TECHNOLOGY_TRANSFER_PACKAGE_invbench-p03-phe-biofouling156ae5155c73.zip",
+        "zip_sha256": "ed5fe029def9542689b7485d8a82db5d095aa447074b6a38ef0564f788a68234",
+        "zip_entries": 33,
+        "zip_bytes": 134628,
+        "domain_family_declarations": {
+          "thermal": 19
+        },
+        "one_coherent_domain_throughout": true,
+        "package_id": "invbench-p03-phe-biofouling156ae5155c73"
+      },
+      "gate": {
+        "package_quality": "PASS",
+        "failed_gates": [],
+        "warned_gates": [
+          "E",
+          "N"
+        ],
+        "source": "package_compiler compile-time independent quality gate (R440.13 — the verdict that gated the zip emission)"
+      }
+    },
+    {
+      "case_id": "bench-x03-llm-kvcache-fragmentation",
+      "r444_note": "a software/ML extension case — a canonical family with no bridge geometry archetype (the honest generic representation path)",
+      "problem": {
+        "problem_id": "bench-x03-llm-kvcache-fragmentation",
+        "device": "LLM inference serving cluster with paged KV-cache on shared GPU nodes",
+        "failure": "mixed-length bursty requests fragment the paged KV-cache blocks, forcing live-token evictions and re-computation that blow tail latency budgets during traffic peaks"
+      },
+      "canonical_domain": {
+        "family": "software_ml",
+        "label": "Software & machine-learning systems",
+        "basis": {
+          "derived_from": [
+            "problem text",
+            "intervention site",
+            "recorded subsystem names"
+          ],
+          "rule": "highest keyword score wins; ties resolve by registry order; below the form threshold the generic family is selected and labeled",
+          "authority": "discovery_fabric/engine/domains.py::CANONICAL_DOMAIN_FAMILIES (R445 — the one canonical domain-family vocabulary)",
+          "deterministic": true,
+          "ladder_step": 3,
+          "source": "registry resolution over the run's own recorded problem words (no upstream canonical field — legacy state)"
+        },
+        "expected_family": "software_ml",
+        "matches_expected": true
+      },
+      "mechanism": {
+        "intervention": "Implement a verification layer that models KV-cache behavior mathematically and tests for all possible bit-flip scenarios without requiring source code access"
+      },
+      "engineering_spec": {
+        "path": "R444/BENCHMARK_EXTENSION/RUNS/r401/bench-x03-llm-kvcache-fragmentation/ENGINEERING_SPECIFICATION.json",
+        "technology_domain": "ml_data",
+        "why_this_domain_domain": "ml_data"
+      },
+      "geometry": {
+        "visualizability_class": "SYSTEM_3D",
+        "domain_family": "software_ml",
+        "technology_class": null,
+        "representation_class": "GENERIC_ARCHITECTURE",
+        "glb_sha256": "ae89350d6589f96c317b76d46e5d660d59fd49ac7351159d9b5606f715e98fec",
+        "components": 11
+      },
+      "experiment": {
+        "selected_experiment": "falsification_test_from_candidate",
+        "n_shortlist": 3
+      },
+      "package": {
+        "state": "ZIP_READY",
+        "zip_path": "<replay workdir>/TECHNOLOGY_TRANSFER_PACKAGE_invbench-x03-llm-kvcache-fragmentation4033a4e6aff8.zip",
+        "zip_sha256": "404c32eecb18e860b7ac3c250045ad38011d20f8df3b46c0f6c73b6bc60e61b7",
+        "zip_entries": 33,
+        "zip_bytes": 130729,
+        "domain_family_declarations": {
+          "software_ml": 18
+        },
+        "one_coherent_domain_throughout": true,
+        "package_id": "invbench-x03-llm-kvcache-fragmentation4033a4e6aff8"
+      },
+      "gate": {
+        "package_quality": "PASS",
+        "failed_gates": [],
+        "warned_gates": [
+          "E",
+          "N"
+        ],
+        "source": "package_compiler compile-time independent quality gate (R440.13 — the verdict that gated the zip emission)"
+      }
+    }
+  ]
+}

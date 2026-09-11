@@ -33,6 +33,7 @@ import cadquery as cq
 import trimesh
 
 from .coloring import apply_gltf_yup, set_uniform_color
+from ..domains import canonical_family_of_bridge_archetype
 
 # Vertex-color palette per material class (abstract presentation colors;
 # the Blender stage replaces these with PBR material presets).
@@ -653,12 +654,23 @@ def build_domain_model(spec: Dict[str, Any]) -> Dict[str, Any]:
 
     Returns the bridge geometry contract:
       {glb_bytes, glb_sha256, components, key_dimensions,
-       domain_family, spec, spec_sha256, material_classes}
+       domain_family, technology_class, spec, spec_sha256,
+       material_classes}
+
+    R445: `domain_family` in the returned contract is the CANONICAL
+    family id (consumed from the spec's canonical_family, derived from
+    the archetype via the registry when absent) — the ONE identity that
+    flows to the artifact identity, CIO, dossier and package.
+    `technology_class` keeps the bridge ARCHETYPE (presentation
+    routing — never a second semantic namespace).
     """
     family = spec.get("technology_class") or "GENERIC_ARCHITECTURE"
     builder = _FAMILY_BUILDERS.get(family)
     if builder is None:
         raise ValueError(f"no deterministic builder for family '{family}'")
+    canonical_family = spec.get("canonical_family")
+    if not isinstance(canonical_family, str) or not canonical_family:
+        canonical_family = canonical_family_of_bridge_archetype(family)
 
     plan = builder(spec)
     scene = trimesh.Scene()
@@ -729,7 +741,8 @@ def build_domain_model(spec: Dict[str, Any]) -> Dict[str, Any]:
             {"from": i["from"], "to": i["to"], "kind": i["kind"]}
             for i in spec.get("interfaces") or []
         ],
-        "domain_family": family,
+        "domain_family": canonical_family,
+        "technology_class": family,
     }
 
     return {
@@ -737,7 +750,8 @@ def build_domain_model(spec: Dict[str, Any]) -> Dict[str, Any]:
         "glb_sha256": sha,
         "components": parts,
         "key_dimensions": key_dimensions,
-        "domain_family": family,
+        "domain_family": canonical_family,
+        "technology_class": family,
         "spec": spec,
         "spec_sha256": spec.get("spec_sha256"),
         "material_classes": sorted({
