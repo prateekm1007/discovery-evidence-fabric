@@ -1680,3 +1680,24 @@ Work Log:
 Stage Summary:
 - The renderer is measurably leaner with PROVEN identical product quality, and the capacity blocker now has a component-level irreducibility proof instead of an estimate; production visuals remain physically impossible on 512 MB (honest typed skip continues) — the owner decision (1 GB plan vs OCI experiment) is the single unblocker.
 - reviewer_provenance=AI_REVIEW.
+
+---
+Task ID: R445-C
+Agent: Super Z (main session — Coder 1, continuation)
+Task: R445-C — re-run the three FROZEN causal-evolution cases after resolving the transport/quota blocker; plus the R445-E production chain (push, deploy, /api/version, fresh production verification) and the R445 round record.
+
+Work Log:
+- Mandated reads: Constitution v2.3.0 FULL (2083 lines; hash 7084be64 unchanged before commit), GOVERNANCE five files, ACTIVE_PATH.md, R444 round record; baseline identity verified (round-start HEAD 087f9955 == origin/main == production; the earlier R445 session had committed 2d52fc62 = A/B/D).
+- Transport blocker diagnosis (measured): z-ai still upstream-429 (live probe); NVIDIA healthy at tiny calls (0.5 s) but with stall variance (a 499 s call, a >120 s hang) AND two operator-pin defects found live: (1) build_ladder's availability-score sort reordered the R418 NVIDIA_MODEL pin below fast-but-incapable catalog models — nvidia/nemotron-3.5-content-safety answered field-line prompts with "User Safety: safe" verdicts (no field lines) while the pin pointed elsewhere; (2) when the pinned model existed in the catalog, eligible_models re-used the CATALOG record so the OPERATOR_PINNED marker never traveled — the pin was invisible downstream.
+- Three measured transport fixes (all transport-only, operator-override class, default behavior unchanged): ENGINE_LLM_TIMEOUT_S override in llm_registry.generate (stalling endpoints rotate in <=90 s instead of holding 240 s per cascade attempt — >1 h per call worst case measured); the pin-stays-first fix in build_ladder; the pin-marker fix in eligible_models. Batteries: tests/test_r445_transport_timeout_override.py (5) + tests/test_r445_model_pin_routing.py (3) — all green; pin verified end-to-end through the registry.
+- NVIDIA_MODEL pinned to meta/llama-3.2-11b-vision-instruct (measured on the 16-field evolution-generation prompt shape: 13.3 s, 15/16 field lines; nemotron-3-super 24.1 s 9/16; deepseek-v4-flash stalled >90 s; content-safety sub-second but unparseable).
+- The runner (scripts/r445_evolution_rerun.py): frozen cases sha asserted (7c4c2654 — byte-identical), fresh run dir (R444 blocked attempts preserved), slice-resumable (EngineRun resume + run_manifest.json as the TRUE completion marker — final_state.json is written BEFORE the evolution pipeline, which made killed-slice runs look complete; measured on x02/x03: both then demonstrated on re-run).
+- RESULT: 3/3 cases CAUSAL_EVOLUTION_DEMONSTRATED (directive target >=2/3): each gen-1 BASELINE_SYNTHESIS -> typed challenge-gauntlet kill -> diagnosis -> causal delta -> gen-2 EVOLUTION_CAUSAL_DELTA -> predicted effect -> full re-evaluation -> SURVIVOR_REACHED; final EVOLVED_INVENTION_CANDIDATE with the honest INVENTION_REQUIRES_EXPERIMENT state. Wall times 464/344/271 s. State-integrity validators re-run: 29 passed.
+- Committed 993a57fc, pushed (PAT); deploy dep-dahthq2fngtc73e12jqg live at 993a57fc; verified /api/version == 993a57fc == origin/main == HEAD.
+- Concurrent-session coordination: the R445-C2 session pushed da36ac4a (built ON 993a57fc) and deployed dep-dahtjm2fngtc73e1a19g 4 minutes later — superseding mine; local fast-forwarded to da36ac4a (all R445 batteries re-run green at the merged HEAD: 53 passed).
+- Fresh production verification (slice-resumable driver scripts/r445_production_verify.py with persisted session cookie): run ts_8f53fcd4370b on the F1 case (bench-p03) — RUN_COMPLETED, user-visible COMPLETE / INVENTION_REQUIRES_EXPERIMENT, CIO HTTP 200, under deployed da36ac4a.
+- Round record assembled from measured artifacts: R445/R445_ROUND_RECORD.json (scripts/r445_round_record.py).
+
+Stage Summary:
+- R445-C COMPLETE at 3/3 demonstrated (target >=2/3); the transport/quota blocker resolved with three measured fixes and 8 new tests; production chain closed through the concurrent-session merge (da36ac4a includes all R445-C changes).
+- Known gaps recorded honestly: attacker still NOT_CALIBRATED (diagnosis-only round by design), CIO field extraction shape mismatch in the production driver, NVIDIA model quality below the frozen glm-4-plus on verbatim spans, visual stage still typed-skip on the free plan.
