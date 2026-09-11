@@ -1,0 +1,84 @@
+{
+  "artifact_type": "R446-HF Phase 32 security scan",
+  "surfaces": {
+    "git_history_200_commits": {
+      "scanned_bytes": 539548137
+    },
+    "build_log_attempt1": {
+      "scanned_bytes": 54915
+    },
+    "build_log_attempt2": {
+      "scanned_bytes": 51058
+    },
+    "hf_space_repo_staged_tree": {
+      "files_scanned": 4621,
+      "scanned_bytes": 264248370
+    },
+    "api_health": {
+      "scanned_bytes": 9857
+    },
+    "cio_bodies": {
+      "files": 3,
+      "scanned_bytes": 115919
+    },
+    "frontend_bundle_sources": {
+      "files": 1,
+      "scanned_bytes": 64154,
+      "note": "the DEPLOYED export is built in-image from these sources (build-verified pages/chunks); the built bytes derive deterministically from this tree"
+    },
+    "package_zip:ts_3a5d419028a3_package.zip": {
+      "bytes": 151171
+    },
+    "round_records": {
+      "files": 6,
+      "scanned_bytes": 71443
+    }
+  },
+  "pre_existing_findings": [
+    {
+      "surface": "git_history_200_commits",
+      "pattern": "openrouter_key_shape",
+      "count": 1,
+      "poison_fixture": true,
+      "sample_shape": "sk-or-...el"
+    },
+    {
+      "surface": "git_history_200_commits",
+      "pattern": "nvidia_key_shape",
+      "count": 2,
+      "poison_fixture": true,
+      "sample_shape": "nvapi-...el"
+    },
+    {
+      "surface": "hf_space_repo_staged_tree",
+      "pattern": "nvidia_key_shape",
+      "count": 1,
+      "poison_fixture": true,
+      "sample_shape": "nvapi-...el"
+    }
+  ],
+  "pre_existing_note": "the .env.keys local-gateway key is COMMITTED HISTORY in the engine repo (predates R446-HF; only usable against the sandbox-local zai gateway \u2014 inert on any hosted deployment; EXCLUDED from the HF Space tree by the .dockerignore filter and absent from the image; disclosed, not introduced, by this round); the nvapi-/sk-or- poison fixtures are the R425 boundary-test fixtures by design",
+  "git_history_pre_existing_findings": [
+    {
+      "surface": "git_history_200_commits",
+      "pattern": "EXACT:deployed_github_pat",
+      "count": 1
+    },
+    {
+      "surface": "git_history_200_commits",
+      "pattern": "github_pat_shape",
+      "count": 1,
+      "poison_fixture": false,
+      "sample_shape": "ghp_ag...rT"
+    }
+  ],
+  "git_history_note": "the LIVE GitHub PAT was committed at d72073de by the R446-C1 session inside scripts/r446_round_record.py (an embedded-credential URL). Caught by THIS scan; the WORKING TREE is scrubbed (credential-helper env pattern, this round), the HF Space repo scrubbed + history SQUASHED (the leaking commit unreachable), the image and all artifacts CLEAN. Remaining exposure: the GitHub repo's git history itself. Remediation: PAT ROTATION is the real fix (operator action \u2014 flagged); a history rewrite is an epistemic event (Art. XI) and an owner decision, NOT taken unilaterally.",
+  "introduced_findings": [],
+  "exact_value_guards": [
+    "deployed_github_pat",
+    "deployed_hf_token"
+  ],
+  "verdict": "HISTORY_CREDENTIAL_FINDING",
+  "release_blocking": false,
+  "reviewer_provenance": "AI_REVIEW"
+}

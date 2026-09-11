@@ -1,0 +1,28 @@
+{
+  "artifact_type": "R446-HF Phase 21 experiment plan",
+  "created_at_utc": "2026-09-11T19:07:30Z",
+  "reviewer_provenance": "AI_REVIEW",
+  "status": "DESIGNED_NOT_EXECUTED (the directive's sequencing: deployment validation first \u2014 DONE this round; the Job experiment is the next decisive test)",
+  "experiment_1_w11_benchmark_job": {
+    "objective": "run the W11 world-class discovery benchmark harness as ONE experimental HF Job (the latest audit identifies those measurement harnesses as still unexecuted)",
+    "why_a_job": "batch evaluation workload \u2014 pay-as-you-go, containerized, immutable experiment record; NOT the canonical user-facing runtime",
+    "job_spec": {
+      "image": "the same canonical Dockerfile family (the engine tree at the then-current main)",
+      "command": "the W11 machinery driver (r401wc2_benchmark_run.py battery class) over the frozen 12-problem benchmark \u2014 NO fixture alteration, NO threshold changes (Art. LIX)",
+      "hardware": "cpu-basic first (measured 16 GB suffices for the engine; the battery is transport-bound, not memory-bound)",
+      "outputs": "the frozen battery's own per-problem artifacts + an immutable experiment record (run ids, SHAs, timestamps) committed to the engine repo",
+      "transport": "the HF router provider path (the same operator-override wiring, recorded in provenance)"
+    },
+    "acceptance": "coverage recorded per problem with typed states; NO self-assigned success rate; the corpus sha verified byte-identical before and after",
+    "risk_note": "the battery is ~2 h of LLM calls; the Job budget must be sized accordingly"
+  },
+  "experiment_2_provider_benchmark": {
+    "objective": "Phase 20's formal measurement of the HF Inference Providers route vs the existing providers: availability, latency, cost, failure rate, structured/verbatim extraction, mechanism generation, candidate quality, attack quality",
+    "prerequisite": "experiment 1 complete (the directive's order); the models must NOT score themselves \u2014 the benchmark instruments are the engine's own frozen corpora",
+    "promotion_rule": "NO automatic promotion to default provider (transport-only until the benchmark earns otherwise)"
+  },
+  "experiment_3_deployment_automation": {
+    "objective": "GitHub Actions + Trusted Publishers (OIDC short-lived tokens) deploying main -> the Space with automatic identity verification",
+    "prerequisite": "sustained manual-deploy success (two verified this round; the directive asks for sustained)"
+  }
+}

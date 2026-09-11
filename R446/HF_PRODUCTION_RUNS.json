@@ -1,0 +1,587 @@
+{
+  "artifact_type": "R446-HF fresh production runs (Phases 8-9)",
+  "base": "https://prateekm1-toscanini-prod-validation.hf.space",
+  "started_at_utc": "2026-09-11T16:10:28Z",
+  "cases": [
+    {
+      "problem": {
+        "case_id": "hf-case-a-cold-plate",
+        "directive_class": "Case A: fresh multi-component engineering problem",
+        "submitted_text": "An EV fast-charging battery pack overheats unevenly during 350 kW charging: cell-to-cell temperature gradients reach 11 degrees C, accelerating cell degradation and risking thermal runaway propagation between modules. Design a liquid-cooled cold-plate architecture that keeps the cell-to-cell gradient below 5 degrees C across 12 modules of 44 prismatic cells each, holds coolant pressure drop under 20 kPa at the required flow rate, and keeps inlet coolant at 25 degrees C. The solution must fit under the pack's 90 mm floor and survive 10-year coolant exposure."
+      },
+      "evidence": {
+        "record_count": 21
+      },
+      "candidate": {
+        "mechanism_state": {
+          "state": "GENERATED",
+          "mechanism": "Increasing cold plate height improves thermal uniformity and reduces maximum temperature difference within the battery pack.",
+          "intervention": "Design the liquid-cooled cold-plate architecture with a 50 mm cold plate height and a coolant flow rate of 0.5\u20130.75 l/min per module, while keeping inlet coolant at 25\u00b0C and total pressure drop under 20 kPa.",
+          "expected_effect": "Cell-to-cell temperature gradient during 350 kW fast charging is reduced from 11\u00b0C to below 5\u00b0C, mitigating degradation and thermal runaway propagation risk.",
+          "candidate_count": 0
+        },
+        "gen1_mechanism": {
+          "mechanism": "The cooling efficiency of a cold plate varies with its height, altering heat transfer and flow distribution to affect the maximum temperature difference in the battery pack.",
+          "intervention": "Redesign the liquid-cooled cold-plate architecture to use a 50 mm cold plate height (the optimal value found) with flow rates in the 0.5\u20130.75 l/min range, ensuring uniform coolant distribution across all cells.",
+          "expected_effect": "Reduced cell-to-cell temperature gradient (from 11\u00b0C to a lower value) during 350 kW fast charging, while maintaining pressure drop below 20 kPa and fitting under the 90 mm floor constraint.",
+          "mechanism_source_span": "\"This study focuses on the numerical investigation of the cooling efficiency of a cold plate with different heights for a Li-ion battery pack.\"",
+          "span_derivation": {
+            "n_shared": 7,
+            "shared_terms": [
+              "battery",
+              "cold",
+              "cooling",
+              "efficiency",
+              "height",
+              "pack",
+              "plate"
+            ],
+            "span_terms_n": 14,
+            "ratio": 0.5,
+            "underived": false,
+            "state": "MEASURED",
+            "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+          }
+        },
+        "invention_id": "inv:ui_cell_to_cell_temperature_gradient_143050:6e8a04cd82f6"
+      },
+      "attack": {
+        "state": {
+          "state": "EXECUTED",
+          "overall": "KILLED",
+          "independence": null
+        },
+        "note": "abstain/escalate gate IN FORCE (attacker NOT_CALIBRATED): raw KILL travels as ESCALATED_OBJECTION; SKIPPED = honest blocker cascade, never a scientific verdict (Art. LXI)"
+      },
+      "evolution_diagnosis": {
+        "state": null,
+        "n_generations": 1,
+        "generations": [
+          {
+            "gen": 1,
+            "label": "INVENTION 01",
+            "origin": "BASELINE_SYNTHESIS",
+            "state": "INVENTION_EVOLVED",
+            "has_causal_delta": false
+          }
+        ],
+        "outcome": "INVENTION_UNDER_DEVELOPMENT",
+        "outcome_label": "Invention under development",
+        "outcome_basis": "final_status=INVENTION_UNDER_DEVELOPMENT \u2014 1 architecture generations explored; current invention GEN 1 at maturity SIMULATED; stop reason recorded on the lineage"
+      },
+      "technical_state": {
+        "canonical_domain": "energy",
+        "n_parameters": null,
+        "decisive_experiment_present": true,
+        "falsification_contract_present": true
+      },
+      "geometry": {
+        "glb_http": 200,
+        "glb_bytes": 180140,
+        "glb_sha256": "54e82cc1d030e8203c6a6480fb2b02e93723db14999af930e31c4b089bd36941",
+        "components": [
+          {
+            "name": "pack_enclosure",
+            "label": "pack enclosure",
+            "type": "structural",
+            "material_class": "body_metal",
+            "role": "pack enclosure (structural presentation element)",
+            "mapped_from": null
+          },
+          {
+            "name": "cell_stack",
+            "label": "cell stack",
+            "type": "structural",
+            "material_class": "battery",
+            "role": "cell stack (structural presentation element)",
+            "mapped_from": null
+          },
+          {
+            "name": "bus_bars",
+            "label": "bus bars",
+            "type": "structural",
+            "material_class": "machined_metal",
+            "role": "series interconnect bus bars (family-definitional presentation element of the energy-storage acceptance case; mapped subsystem recorded as alias)",
+            "mapped_from": null
+          },
+          {
+            "name": "module_01",
+            "label": "module: flow path / lumen architecture",
+            "type": "subsystem",
+            "material_class": "polymer",
+            "role": "recorded subsystem 'flow path / lumen architecture' (no canonical slot in the energy storage architecture; mounted as a labeled module)",
+            "mapped_from": "flow path / lumen architecture"
+          },
+          {
+            "name": "module_02",
+            "label": "module: pressure regulation element",
+            "type": "subsystem",
+            "material_class": "polymer",
+            "role": "recorded subsystem 'pressure regulation element' (no canonical slot in the energy storage architecture; mounted as a labeled module)",
+            "mapped_from": "pressure regulation element"
+          },
+          {
+            "name": "module_03",
+            "label": "module: sensing / feedback element (if closed-loop)",
+            "type": "subsystem",
+            "material_class": "polymer",
+            "role": "recorded subsystem 'sensing / feedback element (if closed-loop)' (no canonical slot in the energy storage architecture; mounted as a labeled module)",
+            "mapped_from": "sensing / feedback element (if closed-loop)"
+          },
+          {
+            "name": "module_04",
+            "label": "module: termination interfaces (application-context-specific: source and sink boundaries)",
+            "type": "subsystem",
+            "material_class": "polymer",
+            "role": "recorded subsystem 'termination interfaces (application-context-specific: source and sink boundaries)' (no canonical slot in the energy storage architecture; mounted as a labeled module)",
+            "mapped_from": "termination interfaces (application-context-specific: source and sink boundaries)"
+          },
+          {
+            "name": "link_cell_stack__bus_bars",
+            "label": "electrical link: cell_stack -> bus_bars",
+            "type": "interface",
+            "material_class": "conduit_power",
+            "role": "electrical coupling (topology only)",
+            "interface_id": "es_cells_bus"
+          }
+        ],
+        "domain_family": "energy",
+        "bridge_outcome": "COMPLETED"
+      },
+      "cio": {
+        "cio_http": 200,
+        "cio_extraction_state": "CIO_FIELDS_VERIFIED",
+        "cio_missing_fields": [],
+        "mechanism": "The cooling efficiency of a cold plate varies with its height, altering heat transfer and flow distribution to affect the maximum temperature difference in the battery pack.",
+        "domain_family": "energy",
+        "n_components": 8,
+        "decisive_experiment_present": true
+      },
+      "package_state": {
+        "downloads": {
+          "package_zip": null,
+          "package_maturity": null,
+          "package_kind": "TECHNOLOGY_TRANSFER_PACKAGE",
+          "document_count": null,
+          "package_origin": "INVENTION_BRIDGE",
+          "package_kind_note": "the technology transfer package for this run \u2014 one canonical deliverable; its maturity label is the honest state (UNKNOWN), and the buyer release gates are untouched"
+        },
+        "package_state": {
+          "state": "NOT_PRODUCED",
+          "maturity": null,
+          "zip_name": null,
+          "package_kind": null,
+          "package_origin": null
+        }
+      },
+      "visual_state": {
+        "render_record_status": 404,
+        "render_verdict": null,
+        "render_states": null,
+        "visual_gate_status": 404,
+        "visual_gate_verdict": null,
+        "hero_png": {
+          "http_status": 404
+        },
+        "poster_png": {
+          "http_status": 404
+        }
+      },
+      "user_visible_state": {
+        "status": "COMPLETE",
+        "final_status": "INVENTION_UNDER_DEVELOPMENT"
+      },
+      "engine_identity_for_run": null,
+      "run_id": "ts_cd737f153f70"
+    },
+    {
+      "problem": {
+        "case_id": "hf-case-b-piezo-tile",
+        "directive_class": "Case B: fresh structurally different engineering problem",
+        "submitted_text": "Railway-station corridor lighting beacons are powered by wiring that is expensive to retrofit. Pedestrian footfall under the station's busiest tiles averages 800 N peak force at 2 Hz, 18 hours per day. Design a piezoelectric energy-harvesting floor tile that converts this footfall into stored electricity with at least 15 percent conversion efficiency, sustains 200 mW average continuous output per tile for the wireless beacons, and keeps vertical deflection under 8 mm for accessibility compliance, with a 10-million-step fatigue life."
+      },
+      "evidence": {
+        "record_count": 16
+      },
+      "candidate": {
+        "mechanism_state": {
+          "state": "GENERATED",
+          "mechanism": "Using a mechanical stopper with a defined gap width to limit the deflection of the piezoelectric element, preventing excessive strain that causes fatigue.",
+          "intervention": "Integrate a stopper into the floor tile design with a gap width (e.g., 4 mm) that caps vertical deflection below the 8 mm constraint, while tuning the cover plate to transfer footfall force efficiently.",
+          "expected_effect": "Reduces piezoelectric element strain amplitude, mitigating fatigue crack initiation and propagation, thereby achieving the 10-million-step fatigue life while maintaining 200 mW average output.",
+          "candidate_count": 0
+        },
+        "gen1_mechanism": {
+          "mechanism": "The gap width between the cover plate and the stopper controls the mechanical actuation amplitude, thereby limiting the strain applied to the piezoelectric element during impact-driven loading.",
+          "intervention": "Add an adjustable stopper to the floor tile that sets a 4 mm maximum vertical deflection gap between the cover plate and the piezoelectric element, so that footfall impacts are mechanically limited to a safe strain range instead of transmitting full 800 N force directly to the element.",
+          "expected_effect": "Reduced peak mechanical stress on the piezoelectric element, decreasing fatigue crack initiation and propagation, thereby extending fatigue life toward the 10-million-step requirement while maintaining 200 mW average output.",
+          "mechanism_source_span": "\"At a 4 mm gap width between the cover plate and the stopper (the mechanical actuation components of both energy harvesters) and a cover plate pressing frequency of 2 Hz, PEH generated 27.64 mW, 1.\"",
+          "span_derivation": {
+            "n_shared": 8,
+            "shared_terms": [
+              "actuation",
+              "between",
+              "cover",
+              "gap",
+              "mechanical",
+              "plate",
+              "stopper",
+              "width"
+            ],
+            "span_terms_n": 16,
+            "ratio": 0.5,
+            "underived": false,
+            "state": "MEASURED",
+            "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+          }
+        },
+        "invention_id": "inv:ui_piezoelectric_element_fatigue_146337:7e8ff88ee660"
+      },
+      "attack": {
+        "state": {
+          "state": "EXECUTED",
+          "overall": "KILLED",
+          "independence": null
+        },
+        "note": "abstain/escalate gate IN FORCE (attacker NOT_CALIBRATED): raw KILL travels as ESCALATED_OBJECTION; SKIPPED = honest blocker cascade, never a scientific verdict (Art. LXI)"
+      },
+      "evolution_diagnosis": {
+        "state": null,
+        "n_generations": 1,
+        "generations": [
+          {
+            "gen": 1,
+            "label": "INVENTION 01",
+            "origin": "BASELINE_SYNTHESIS",
+            "state": "INVENTION_EVOLVED",
+            "has_causal_delta": false
+          }
+        ],
+        "outcome": "INVENTION_UNDER_DEVELOPMENT",
+        "outcome_label": "Invention under development",
+        "outcome_basis": "final_status=INVENTION_UNDER_DEVELOPMENT \u2014 1 architecture generations explored; current invention GEN 1 at maturity EVIDENCE_SUPPORTED; stop reason recorded on the lineage"
+      },
+      "technical_state": {
+        "canonical_domain": "acoustic",
+        "n_parameters": null,
+        "decisive_experiment_present": true,
+        "falsification_contract_present": true
+      },
+      "geometry": {
+        "glb_http": 200,
+        "glb_bytes": 7436,
+        "glb_sha256": "fb439c90226d5df7732a918cb5b4461b6a23175d5bd156c6b7e3b6badc5e16a6",
+        "components": [
+          {
+            "name": "substrate: piezoelectric energy-harvesting floor tile",
+            "type": "substrate",
+            "role": "physical intervention site (schematic form \u2014 no engineering dimensions)"
+          },
+          {
+            "name": "[01] load path / structural backbone",
+            "type": "interface",
+            "role": "recorded subsystem (conceptual form \u2014 no engineering dimensions)",
+            "subsystem_index": 1
+          },
+          {
+            "name": "[02] actuation or compliance element",
+            "type": "default",
+            "role": "recorded subsystem (conceptual form \u2014 no engineering dimensions)",
+            "subsystem_index": 2
+          },
+          {
+            "name": "[03] guidance / bearing interfaces",
+            "type": "interface",
+            "role": "recorded subsystem (conceptual form \u2014 no engineering dimensions)",
+            "subsystem_index": 3
+          },
+          {
+            "name": "[04] fatigue-critical features register",
+            "type": "default",
+            "role": "recorded subsystem (conceptual form \u2014 no engineering dimensions)",
+            "subsystem_index": 4
+          },
+          {
+            "name": "flow 1 -> 2",
+            "type": "conduit",
+            "role": "recorded data/material flow (topology only)"
+          },
+          {
+            "name": "flow 2 -> 3",
+            "type": "conduit",
+            "role": "recorded data/material flow (topology only)"
+          },
+          {
+            "name": "flow 3 -> 4",
+            "type": "conduit",
+            "role": "recorded data/material flow (topology only)"
+          }
+        ],
+        "domain_family": "acoustic",
+        "bridge_outcome": "COMPLETED"
+      },
+      "cio": {
+        "cio_http": 200,
+        "cio_extraction_state": "CIO_FIELDS_VERIFIED",
+        "cio_missing_fields": [],
+        "mechanism": "The gap width between the cover plate and the stopper controls the mechanical actuation amplitude, thereby limiting the strain applied to the piezoelectric element during impact-driven loading.",
+        "domain_family": "acoustic",
+        "n_components": 8,
+        "decisive_experiment_present": true
+      },
+      "package_state": {
+        "downloads": {
+          "package_zip": "/api/sessions/ts_3a5d419028a3/package",
+          "package_maturity": "EARLY_TECHNICAL_EVALUATION",
+          "package_kind": "TECHNOLOGY_TRANSFER_PACKAGE",
+          "document_count": 32,
+          "package_origin": "INVENTION_BRIDGE",
+          "package_kind_note": "the technology transfer package for this run \u2014 one canonical deliverable; its maturity label is the honest state (EARLY_TECHNICAL_EVALUATION), and the buyer release gates are untouched"
+        },
+        "package_state": {
+          "state": "READY",
+          "maturity": "EARLY_TECHNICAL_EVALUATION",
+          "zip_name": "TECHNOLOGY_TRANSFER_PACKAGE_invui_piezoelectric_element_fatigue_1463377e8ff88ee660.zip",
+          "package_kind": "TECHNOLOGY_TRANSFER_PACKAGE",
+          "package_origin": "INVENTION_BRIDGE"
+        }
+      },
+      "visual_state": {
+        "render_record_status": 200,
+        "render_verdict": "OK",
+        "render_states": null,
+        "visual_gate_status": 200,
+        "visual_gate_verdict": "FAIL",
+        "hero_png": {
+          "http_status": 200,
+          "bytes": 61524,
+          "sha256": "6308d3f8613a878006269befd02d03bc6d38aead2d068ec14371567ec31c2473"
+        },
+        "poster_png": {
+          "http_status": 200,
+          "bytes": 138598,
+          "sha256": "9ebe1c45e8a8c1de41e43d1a5c57228048d3d3acfeefc39db95ca5ac310a3512"
+        }
+      },
+      "user_visible_state": {
+        "status": "COMPLETE",
+        "final_status": "INVENTION_UNDER_DEVELOPMENT"
+      },
+      "engine_identity_for_run": null,
+      "run_id": "ts_3a5d419028a3",
+      "session_cookie": "tosca_owner=5d09af0a994c4c15bd3d104c5a665428; HttpOnly; SameSite=Lax; Path=/; Max-Age=31536000"
+    },
+    {
+      "problem": {
+        "case_id": "hf-case-c-microchannel-hx",
+        "directive_class": "Case C: large/high-detail geometry stress case",
+        "submitted_text": "A two-phase cooling system for a data-center GPU rack must remove 5 kW from a 700 W/cm2 hotspot using a diffusion-bonded printed-circuit heat exchanger. Design the channel architecture: 60 chemically-etched stainless steel sheets, 200 micrometer channel widths, a 120 mm by 80 mm footprint, vapor-side pressure drop under 3 kPa, and uniform flow distribution across all 60 layers within 10 percent. The evaporator must survive 5000 thermal cycles between 25 and 85 degrees C."
+      },
+      "evidence": {
+        "record_count": 16
+      },
+      "candidate": {
+        "mechanism_state": {
+          "state": "GENERATED",
+          "mechanism": "Two-phase spray cooling provides direct, localized heat removal with high heat transfer coefficients, reducing thermal gradients and thermal stress on the heat exchanger structure.",
+          "intervention": "Integrate a two-phase spray cooling module directly onto the hotspot region of the diffusion-bonded heat exchanger, while maintaining the existing channel architecture for the remaining heat load.",
+          "expected_effect": "Reduced thermal fatigue by lowering temperature cycling amplitude and gradient, improved flow uniformity across layers, and maintained vapor-side pressure drop below 3 kPa.",
+          "candidate_count": 0
+        },
+        "gen1_mechanism": {
+          "mechanism": "Closed-loop, sensor-guided two-phase spray cooling where spray parameters (droplet size, flow rate, duty cycle) are modulated in real time by a physics-informed neural network (PINN) that reconstructs local heat flux and thermal stress from distributed fiber-optic strain/temperature measurements, creating a self-verifying causal loop.",
+          "intervention": "Replace the static spray module with an array of piezoelectric micro-spray nozzles, each paired with a fiber Bragg grating",
+          "expected_effect": "",
+          "mechanism_source_span": "\"two-phase spray cooled\"",
+          "span_derivation": null
+        },
+        "invention_id": "inv:ui_thermal_fatigue_of_diffusion_bonded_heat_e_147841:fbbc33d357c0"
+      },
+      "attack": {
+        "state": {
+          "state": "EXECUTED",
+          "overall": "NOT_RUN",
+          "independence": null
+        },
+        "note": "abstain/escalate gate IN FORCE (attacker NOT_CALIBRATED): raw KILL travels as ESCALATED_OBJECTION; SKIPPED = honest blocker cascade, never a scientific verdict (Art. LXI)"
+      },
+      "evolution_diagnosis": {
+        "state": null,
+        "n_generations": 2,
+        "generations": [
+          {
+            "gen": 1,
+            "label": "INVENTION 01",
+            "origin": "BASELINE_SYNTHESIS",
+            "state": "INVENTION_EVOLVED",
+            "has_causal_delta": false
+          },
+          {
+            "gen": 2,
+            "label": "INVENTION 02",
+            "origin": "EVOLUTION_CAUSAL_DELTA",
+            "state": "INVENTION_REQUIRES_EXPERIMENT",
+            "has_causal_delta": true
+          }
+        ],
+        "outcome": "INVENTION_REQUIRES_EXPERIMENT",
+        "outcome_label": "Invention requires experiment",
+        "outcome_basis": "final_status=EVOLVED_INVENTION_CANDIDATE; the decisive physical experiment is specified, not executed (recorded fields: package.complete=false)"
+      },
+      "technical_state": {
+        "canonical_domain": "thermal",
+        "n_parameters": null,
+        "decisive_experiment_present": true,
+        "falsification_contract_present": true
+      },
+      "geometry": {
+        "glb_http": 200,
+        "glb_bytes": 24900,
+        "glb_sha256": "f99ccc083fab11edc59829fdb8d25c6bf5d5cc2387fdabfe136cc1464f380ffa",
+        "components": [
+          {
+            "name": "assembly_base",
+            "label": "assembly base",
+            "type": "structural",
+            "material_class": "body_metal",
+            "role": "assembly baseplate (structural presentation element)",
+            "mapped_from": null
+          },
+          {
+            "name": "heat_source",
+            "label": "heat source block",
+            "type": "structural",
+            "material_class": "battery",
+            "role": "heat source side (family-definitional presentation element of the thermal acceptance case; mapped subsystem recorded as alias)",
+            "mapped_from": "heat source characterization"
+          },
+          {
+            "name": "cold_plate",
+            "label": "cold plate / thermal interface",
+            "type": "subsystem",
+            "material_class": "machined_metal",
+            "role": "recorded subsystem 'reject interface' mapped onto the cold plate / thermal interface slot",
+            "mapped_from": "reject interface"
+          },
+          {
+            "name": "heat_sink",
+            "label": "heat sink fin stack",
+            "type": "structural",
+            "material_class": "machined_metal",
+            "role": "heat rejection side (family-definitional presentation element of the thermal acceptance case; mapped subsystem recorded as alias)",
+            "mapped_from": null
+          },
+          {
+            "name": "coolant_loop",
+            "label": "coolant loop",
+            "type": "structural",
+            "material_class": "conduit_power",
+            "role": "coolant transport circuit (family-definitional presentation element of the thermal acceptance case; mapped subsystem recorded as alias)",
+            "mapped_from": null
+          },
+          {
+            "name": "module_01",
+            "label": "module: conduction path / spreader",
+            "type": "subsystem",
+            "material_class": "polymer",
+            "role": "recorded subsystem 'conduction path / spreader' (no canonical slot in the thermal system architecture; mounted as a labeled module)",
+            "mapped_from": "conduction path / spreader"
+          },
+          {
+            "name": "module_02",
+            "label": "module: safety limit interlock",
+            "type": "subsystem",
+            "material_class": "polymer",
+            "role": "recorded subsystem 'safety limit interlock' (no canonical slot in the thermal system architecture; mounted as a labeled module)",
+            "mapped_from": "safety limit interlock"
+          },
+          {
+            "name": "link_heat_source__cold_plate",
+            "label": "heat link: heat_source -> cold_plate",
+            "type": "interface",
+            "material_class": "conduit_power",
+            "role": "heat coupling (topology only)",
+            "interface_id": "thm_source_plate"
+          },
+          {
+            "name": "link_cold_plate__heat_sink",
+            "label": "heat link: cold_plate -> heat_sink",
+            "type": "interface",
+            "material_class": "conduit_power",
+            "role": "heat coupling (topology only)",
+            "interface_id": "thm_plate_sink"
+          },
+          {
+            "name": "link_coolant_loop__heat_source",
+            "label": "coolant link: coolant_loop -> heat_source",
+            "type": "interface",
+            "material_class": "conduit_power",
+            "role": "coolant coupling (topology only)",
+            "interface_id": "thm_loop_source"
+          },
+          {
+            "name": "link_coolant_loop__heat_sink",
+            "label": "coolant link: coolant_loop -> heat_sink",
+            "type": "interface",
+            "material_class": "conduit_power",
+            "role": "coolant coupling (topology only)",
+            "interface_id": "thm_loop_sink"
+          }
+        ],
+        "domain_family": "thermal",
+        "bridge_outcome": "COMPLETED"
+      },
+      "cio": {
+        "cio_http": 200,
+        "cio_extraction_state": "CIO_FIELDS_VERIFIED",
+        "cio_missing_fields": [],
+        "mechanism": "Closed-loop, sensor-guided two-phase spray cooling where spray parameters (droplet size, flow rate, duty cycle) are modulated in real time by a physics-informed neural network (PINN) that reconstructs local heat flux and thermal stress from distributed fiber-optic strain/temperature measurements, creating a self-verifying causal loop.",
+        "domain_family": "thermal",
+        "n_components": 11,
+        "decisive_experiment_present": true
+      },
+      "package_state": {
+        "downloads": {
+          "package_zip": null,
+          "package_maturity": null,
+          "package_kind": "TECHNOLOGY_TRANSFER_PACKAGE",
+          "document_count": null,
+          "package_origin": "INVENTION_BRIDGE",
+          "package_kind_note": "the technology transfer package for this run \u2014 one canonical deliverable; its maturity label is the honest state (UNKNOWN), and the buyer release gates are untouched"
+        },
+        "package_state": {
+          "state": "NOT_PRODUCED",
+          "maturity": null,
+          "zip_name": null,
+          "package_kind": null,
+          "package_origin": null
+        }
+      },
+      "visual_state": {
+        "render_record_status": 200,
+        "render_verdict": "OK",
+        "render_states": null,
+        "visual_gate_status": 200,
+        "visual_gate_verdict": "COMPLETE_PASS",
+        "hero_png": {
+          "http_status": 200,
+          "bytes": 60726,
+          "sha256": "b4b2830c078e966962eb78d60e261bcce2e6d3f905f57f069c21a8a0c985ed12"
+        },
+        "poster_png": {
+          "http_status": 200,
+          "bytes": 137865,
+          "sha256": "cd52b6c1f6b7ace68a613a3096e05e48630ee9ce013127ed96943b9cb136100e"
+        }
+      },
+      "user_visible_state": {
+        "status": "COMPLETE",
+        "final_status": "EVOLVED_INVENTION_CANDIDATE"
+      },
+      "engine_identity_for_run": null,
+      "run_id": "ts_e24b5247333f",
+      "session_cookie": "tosca_owner=fd68a1e44aa248318cd93e6ccead8787; HttpOnly; SameSite=Lax; Path=/; Max-Age=31536000"
+    }
+  ],
+  "finished_at_utc": "2026-09-11T17:56:43Z"
+}

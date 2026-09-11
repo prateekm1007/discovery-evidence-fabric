@@ -1,0 +1,100 @@
+{
+  "artifact_type": "R446-HF-PRO baseline state capture (Phase 0)",
+  "round": "R446-HF",
+  "created_at_utc": "2026-09-11T15:55:00Z",
+  "reviewer_provenance": "AI_REVIEW",
+  "constitution_version": "2.3.0",
+  "constitution_sha256": "7084be6435ff30a645f4ad16a5380cf897a59b6dd73f5e18af3713010131a9c5",
+  "constitution_read_in_full_before_coding": true,
+  "governance_files_read": [
+    "EPISTEMIC_CONSTITUTION.md (2083 lines, full)",
+    "GOVERNANCE/README.md",
+    "GOVERNANCE/AUDITOR_SELF_GOVERNANCE_v1.md",
+    "GOVERNANCE/AUDITOR_BLINDSPOT_REGISTER.md",
+    "GOVERNANCE/AUDITOR_REMEMBERED_STATE.md",
+    "GOVERNANCE/AUDIT_LOOP_PROTOCOL_v1.md",
+    "ACTIVE_PATH.md"
+  ],
+  "baseline_identity": {
+    "current_engine_sha": "8a4c46359069a9c2ff48be237404874e7a2e83e0",
+    "current_branch": "main",
+    "worktree_status": "CLEAN (git status --short empty)",
+    "current_remote": "https://github.com/prateekm1007/discovery-evidence-fabric.git",
+    "remote_main_verified_via": "GitHub API (authenticated, token not printed)",
+    "remote_main_sha": "8a4c46359069a9c2ff48be237404874e7a2e83e0",
+    "local_matches_remote": true,
+    "stale_checkout": false,
+    "git_log_head_5": [
+      "8a4c4635 worklog: the R446-C1 final delivery tuple recorded",
+      "d72073de R446_C1_ROUND_RECORD: the machine-readable completion proof",
+      "8161cfa1 R446-C1 Tasks 3+5 — the three-class production driver + the visual-memory owner decision package",
+      "e9ed5c93 R446-C1 Task 2 — the attacker calibration experiment RUN",
+      "c74b3024 R446-C1 (freeze + tasks 1/2/4 implementation)"
+    ]
+  },
+  "production_baseline_render": {
+    "public_url": "https://toscanini-engine-docker.onrender.com/",
+    "api_version_engine_commit": "d72073de084aebf377dc1ec6b895dab021416868",
+    "engine_commit_source": "build_artifact",
+    "constitution_version": "2.3.0",
+    "api_health_ok": true,
+    "discovery_ready_after_warmup": true,
+    "showcase_ready": true,
+    "identity_tamper": false,
+    "active_llm_transport": "openrouter (HEALTHY, 50 models, credential CONFIGURED); nvidia UNKNOWN (19 models, credential CONFIGURED)",
+    "known_production_constraint": "512 MB free-plan cgroup; visual stage typed-skips RENDER_SKIPPED_LOW_MEMORY (R442/R443/R445 measured); visual memory floor ~496 MB measured (R445-C2/R446-C2)"
+  },
+  "hf_account_baseline": {
+    "account_name": "prateekm1",
+    "account_type": "user",
+    "is_pro": true,
+    "billing_mode": "prepaid",
+    "period_end_epoch": 1790812800,
+    "token_kind": "fine-grained (never printed; stored 0600 outside the repo)",
+    "token_scopes_verified": [
+      "repo.write (user prateekm1)",
+      "repo.content.read",
+      "repo.access.read",
+      "inference.serverless.write",
+      "inference.endpoints.infer.write",
+      "inference.endpoints.write",
+      "job.write",
+      "collection.read/write",
+      "user.billing.read"
+    ],
+    "existing_spaces": [],
+    "capability_probes": {
+      "whoami_v2": "HTTP 200, authenticated",
+      "router_v1_models": "HTTP 200, 137 models served",
+      "router_chat_completions_deepseek_v4_flash_0731": "HTTP 200, exact FIELD-line compliance, ~1 s latency (the frozen synthesis model family)",
+      "router_chat_completions_glm_5_3_flash": "HTTP 200 (thinking-off variant)",
+      "router_chat_completions_glm_5_3": "HTTP 200 (reasoning_content present — same thinking-mode class the tokenrouter precedent measured format-compliant)"
+    }
+  },
+  "transport_plan_hf": {
+    "mechanism": "R391 operator-override class (zero engine code change): the existing 'zai' provider slot re-pointed at the HF Inference Providers OpenAI-compatible router via ZAI_BASE_URL, credential via ZAI_API_KEY (HF token as Space secret), model via ZAI_MODEL",
+    "env_contract": {
+      "secrets": [
+        "ZAI_API_KEY (HF router bearer credential)",
+        "GITHUB_TOKEN (portfolio acquisition, GIT_ASKPASS only)",
+        "PORTFOLIO_COMMIT (pin)"
+      ],
+      "variables": [
+        "ZAI_BASE_URL=https://router.huggingface.co/v1/chat/completions",
+        "ZAI_MODEL=deepseek-ai/DeepSeek-V4-Flash-0731 (the a2 FROZEN_MODEL family)",
+        "PORT=7860 (0.0.0.0 bind; Space app_port)"
+      ]
+    },
+    "rationale": "Phase 20 sanctions HF Inference Providers as a provider route on the EXISTING provider abstraction; the R391 {PROVIDER}_BASE_URL override is the recorded operator mechanism (transport-only, no epistemic semantics touched). server.py::_spawn_worker auto-pins ENGINE_*_PROVIDER=zai when the zai slot is usable — same recorded-pinning class as production."
+  },
+  "deployment_target": {
+    "space_name": "toscanini-prod-validation",
+    "owner": "prateekm1",
+    "sdk": "docker",
+    "hardware": "CPU Basic (2 vCPU / 16 GB RAM / 50 GB ephemeral disk)",
+    "visibility": "PRIVATE",
+    "no_gpu": true,
+    "image_strategy": "the canonical Dockerfile (repo tree at 8a4c4635) + the minimal HF deployment adapter: (1) RENDER_GIT_COMMIT ARG default = 8a4c4635 (the HF analog of the Render build-arg identity pin), (2) Node 20 runtime copied from node:20-bookworm-slim, (3) Debian chromium + CHROME_PATH for the Visual Compiler renderer, (4) renderer npm ci (three@0.175.0, puppeteer-core@25.9.0), (5) non-root user (UID 1000) with /portfolio pre-created. Blender 5.2.1 pinned block KEPT for Render parity. All diffs disclosed in HF_DEPLOYMENT_RECORD.json."
+  },
+  "source_directive": "R446-HF-PRO MASTER EXECUTION DIRECTIVE (owner upload, 2026-09-11) — not trusted as current truth for repository state; every state above was re-measured from the live repo, the GitHub API, the Render production endpoints, and the HF API"
+}

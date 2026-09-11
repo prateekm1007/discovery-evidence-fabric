@@ -16,6 +16,7 @@ The record explicitly separates (the directive's acceptance format):
 from __future__ import annotations
 
 import json
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -36,12 +37,24 @@ def _sha(p: Path) -> str:
 def main() -> int:
     head = subprocess.run(["git", "rev-parse", "HEAD"], cwd=str(REPO),
                           capture_output=True, text=True).stdout.strip()
+    # R446-HF security fix: the token travels via a GIT_CONFIG
+    # credential helper reading TOSCANINI_REMOTE_TOKEN from the
+    # environment — NEVER embedded in the URL (the R446-C1 version
+    # committed the live PAT here; caught by the R446-HF Phase 32
+    # scan, disclosed in HF_SECURITY_SCAN.json)
     ls_remote = subprocess.run(
         ["git", "ls-remote",
-         "https://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@github.com/"
+         "https://github.com/"
          "prateekm1007/discovery-evidence-fabric.git",
          "refs/heads/main"],
-        cwd=str(REPO), capture_output=True, text=True).stdout.split()[0]
+        cwd=str(REPO), capture_output=True, text=True,
+        env={**os.environ,
+             "GIT_CONFIG_COUNT": "1",
+             "GIT_CONFIG_KEY_0":
+                 "credential.helper",
+             "GIT_CONFIG_VALUE_0":
+                 "!f() { echo username=x-access-token; "
+                 "echo password=${TOSCANINI_REMOTE_TOKEN}; "}).stdout.split()[0]
 
     calib = _load(REPO / "R446" / "ATTACKER_CALIBRATION" /
                   "CALIBRATION_RESULTS.json")

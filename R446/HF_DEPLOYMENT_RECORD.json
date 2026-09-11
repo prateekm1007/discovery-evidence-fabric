@@ -1,0 +1,107 @@
+{
+  "artifact_type": "R446-HF deployment record (Phase 6 \u2014 identity chain)",
+  "created_at_utc": "2026-09-11T16:08:50Z",
+  "reviewer_provenance": "AI_REVIEW",
+  "identity_chain": {
+    "github_repo": "https://github.com/prateekm1007/discovery-evidence-fabric",
+    "github_sha": "8a4c46359069a9c2ff48be237404874e7a2e83e0",
+    "github_sha_verified_via": "GitHub API branches/main (authenticated; == local HEAD; worktree clean)",
+    "hf_space": "prateekm1/toscanini-prod-validation",
+    "hf_revision_tree_upload": "374593c3d4ba87fa535c7c58463846ca17d0cf53",
+    "hf_revision_running_build": "d598263546be1c450cda21311f7ded890f268373",
+    "hf_revision_note": "HF revision = the Space repo commit the running image was built from (d5982635: the full tree upload 374593c3 + the Dockerfile build-fix commit). A byte-identical git SHA is impossible without rewriting history into HF LFS (Art. XI violation); the mapping github_sha<->hf_revision is 1:1 in this record and machine-cross-checkable via the running container's own live_git_head (the Space checkout) and the baked artifact identity (the GitHub tree).",
+    "docker_image_digest": "not exposed by HF for Space builds; the machine-verified artifact identity substitutes: ARTIFACT_IDENTITY.json sha256 70777afec5783827c6301f758a8caa1c2cf1074125755d9318698ff0521c65b3 baked at build, re-verified by the running process (running_artifact_sha256 == build_artifact_sha256 => identity_tamper=false)",
+    "api_version": {
+      "engine_commit": "8a4c46359069a9c2ff48be237404874e7a2e83e0",
+      "engine_commit_source": "build_artifact",
+      "web_build_hash": "b712f44cadb12f0378d09bc8f55207412a6cb3a1b06ab039b58e0bb16e78cf4f",
+      "web_build_file_count": 30,
+      "web_build_source": "content hash over TOSCANINI_UI/webapp-export/",
+      "constitution_version": "2.3.0"
+    },
+    "constitution_version": "2.3.0",
+    "constitution_hash_in_repo": "7084be6435ff30a645f4ad16a5380cf897a59b6dd73f5e18af3713010131a9c5",
+    "deployment_timestamp": "2026-09-11T16:04:47Z",
+    "chain_verdict": "VERIFIED"
+  },
+  "identity_source_disclosure": "engine_commit_source reports 'render_git_commit' \u2014 on HF this value originates from the Dockerfile ARG RENDER_GIT_COMMIT DEFAULT (the deployment identity pin), not a Render build arg. Same R396 A.3 priority-1 mechanism class; the label is the mechanism's name, the value's actual provenance is this record. The build context ALSO carried the Space repo's .git (build_context_git_head=d5982635) \u2014 the ARG pin correctly took priority, and both identities are recorded.",
+  "deployment_steps": [
+    "1. Baseline captured (HF_BASELINE_STATE.json): local HEAD == remote main == 8a4c4635; Render production d72073de recorded",
+    "2. HF capability verified: whoami (prateekm1, PRO), token scopes, router model list (137), live completion probes (DeepSeek-V4-Flash-0731 exact FIELD lines ~1s; GLM-5.3/Flash OK)",
+    "3. Space created: private, docker, cpu-basic (2 vCPU/16 GB), no GPU",
+    "4. Deployment tree staged: git ls-files at 8a4c4635 filtered by the repo's own .dockerignore (4729 files, 279.5 MB, zero >10 MB; .env.keys excluded by construction)",
+    "5. Tree uploaded (HF revision 374593c3); env contract wired: variables PORT/ZAI_BASE_URL/ZAI_MODEL + secrets ZAI_API_KEY/GITHUB_TOKEN/PORTFOLIO_COMMIT",
+    "6. Build attempt 1: BUILD_ERROR \u2014 the adapter's three-version probe (require('three/package.json')) hit the package exports map; ALSO node:20 measured EBADENGINE for puppeteer-core@25.9.0 (engine floor >=22.12) -> runtime node switched to node:24 (the R445-C2 measured environment family)",
+    "7. Build attempt 2 (HF revision d5982635): BUILD OK -> APP_STARTING -> RUNNING on cpu-basic; portfolio acquired at the pinned commit; zai slot HEALTHY via the HF router (EXTERNAL transport mode)",
+    "8. Identity chain VERIFIED via /api/version + /api/health (this record)"
+  ],
+  "adapter_diff_dockerfile": "--- canonical/Dockerfile@8a4c4635\n+++ hf-space/Dockerfile (R446-HF adapter)\n@@ -22,6 +22,15 @@\n # (globals.css never imported \u2192 zero CSS in the export \u2192 the public\n # deployment rendered as browser-default HTML) can never ship again.\n RUN NEXT_OUTPUT=export npm run build && node verify-export.mjs\n+\n+# ---------- R446-HF ADAPTER: runtime Node 24 (the Visual Compiler's ----------\n+# renderer driver at RUNTIME; the canonical image carried node only in the\n+# webapp builder stage. Node 24 = the R445-C2/R446-C2 measured environment\n+# (sandbox node v24.19.0) and satisfies puppeteer-core@25.9.0's engine floor\n+# (>=22.12; node:20 measured EBADENGINE at build). bookworm glibc \u2014\n+# forward-compatible with trixie. The webapp BUILDER stays node:20-alpine\n+# (the webapp's own pinned toolchain, unchanged).\n+FROM node:24-bookworm-slim AS node-runtime\n \n # ---------- stage 2: the engine ----------\n FROM python:3.12-slim\n@@ -59,6 +68,7 @@\n       git ca-certificates curl xz-utils \\\n       libgl1 libglu1-mesa libxext6 libx11-6 libxrender1 \\\n       libxi6 libxfixes3 libsm6 libice6 libxkbcommon0 \\\n+      chromium fonts-liberation libstdc++6 \\\n     >/tmp/apti.log 2>&1 \\\n     && rm -rf /var/lib/apt/lists/*; then \\\n       :; \\\n@@ -115,6 +125,29 @@\n COPY . .\n COPY --from=webapp-builder /webapp/out ./TOSCANINI_UI/webapp-export\n \n+# ---------- R446-HF ADAPTER: Node + Chromium wiring ----------\n+# node + npm from the pinned node:24 image (npm-cli symlink); Chromium from\n+# Debian trixie (SwiftShader/ANGLE included \u2014 render.js launches with\n+# --use-angle=swiftshader --enable-unsafe-swiftshader --no-sandbox).\n+COPY --from=node-runtime /usr/local/bin/node /usr/local/bin/node\n+COPY --from=node-runtime /usr/local/lib/node_modules /usr/local/lib/node_modules\n+RUN ln -sf /usr/local/lib/node_modules/npm/bin/npm-cli.js /usr/local/bin/npm \\\n+    && node --version && npm --version\n+ENV CHROME_PATH=/usr/bin/chromium\n+\n+# The Visual Compiler renderer deps: pinned three@0.175.0 + puppeteer-core\n+# (the SAME versions the webapp and the R445-C2 measurements used; the\n+# build FAILS if three resolves to anything else \u2014 render_worker's\n+# renderer_deps_present() contract, enforced at image build time too).\n+RUN cd /app/discovery_fabric/engine/visual_compiler/renderer \\\n+    && npm ci --omit=dev --no-audit --no-fund \\\n+    && node -e \"const fs=require('fs'); \\\n+        const v=JSON.parse(fs.readFileSync(\\\n+          'node_modules/three/package.json','utf8')).version; \\\n+        if (v!=='0.175.0') { console.error('three version mismatch: '+v); \\\n+        process.exit(1); } console.log('renderer three@'+v+' pinned OK')\"\n+\n+\n # R396 Phase A.3/A.4: bake the ACTUAL git commit SHA into the build\n # artifact. This is THE identity of the deployed engine \u2014 no runtime\n # environment variable can define or change it. Sources, in priority\n@@ -128,7 +161,14 @@\n # build time) lets the running process prove it is still the built\n # artifact (BUILD == RUNNING == HEALTH, R396 A.6); a runtime mismatch\n # is reported as identity_tamper and drift RED.\n-ARG RENDER_GIT_COMMIT=\"\"\n+# ---------- R446-HF ADAPTER: deployment identity pin ----------\n+# HF Space builds receive no build args (unlike Render, which injects\n+# RENDER_GIT_COMMIT at deploy time). The GitHub source SHA is pinned HERE\n+# as the ARG default: the same R396 A.3 priority-1 mechanism, supplied by\n+# deployment config instead of a build arg. The identity-bake script below\n+# is UNCHANGED and remains the only identity authority (env vars can never\n+# define it). Provenance of this value: R446/HF_DEPLOYMENT_RECORD.json.\n+ARG RENDER_GIT_COMMIT=\"8a4c46359069a9c2ff48be237404874e7a2e83e0\"\n RUN python3 - <<'PYEOF'\n import hashlib, json, os, subprocess\n commit = (os.environ.get(\"RENDER_GIT_COMMIT\") or \"\").strip()\n@@ -170,5 +210,15 @@\n # See toscanini/container-entrypoint.sh. A failed acquisition degrades\n # the showcase (portfolio_ready=false) but never fabricates packages \u2014\n # the health endpoint reports readiness honestly.\n+# ---------- R446-HF ADAPTER: non-root runtime ----------\n+# HF Spaces best practice: run as UID 1000. /portfolio is pre-created\n+# (the entrypoint's mkdir needs a writable parent); /app is chowned so\n+# ENGINE_RUNS/ and run dirs are writable by the engine.\n+RUN useradd -m -u 1000 -s /bin/bash toscanini \\\n+    && mkdir -p /portfolio && chown toscanini /portfolio \\\n+    && chown -R toscanini /app\n+USER toscanini\n+ENV HOME=/home/toscanini\n+\n RUN chmod +x /app/toscanini/container-entrypoint.sh\n ENTRYPOINT [\"/app/toscanini/container-entrypoint.sh\"]\n",
+  "adapter_overlay_files": [
+    "README.md (HF Space YAML metadata: sdk docker, app_port 7860 \u2014 required by HF)",
+    "Dockerfile (canonical + the 51-line documented adapter: node:24 runtime stage, chromium+fonts+libstdc++ apt, CHROME_PATH, renderer npm ci with three-version gate, RENDER_GIT_COMMIT ARG default, non-root user 1000 + /portfolio)"
+  ],
+  "build_attempts": [
+    {
+      "revision": "374593c3d4ba87fa535c7c58463846ca17d0cf53",
+      "outcome": "HF_BUILD_FAILURE",
+      "failure_class": "ADAPTER_DEFECT (three-version probe; node:20 engine floor)",
+      "resolved_by": "node:24 runtime + fs.readFileSync version check (commit d5982635)"
+    },
+    {
+      "revision": "d598263546be1c450cda21311f7ded890f268373",
+      "outcome": "BUILD_OK_RUNNING",
+      "failure_class": null
+    }
+  ],
+  "runtime_env_contract": {
+    "mechanism": "R391 operator-override class: the existing 'zai' provider slot re-pointed at the HF Inference Providers OpenAI-compatible router (ZAI_BASE_URL) with the HF token as ZAI_API_KEY (Space secret) and ZAI_MODEL=deepseek-ai/DeepSeek-V4-Flash-0731 (the a2 FROZEN_MODEL family). Zero engine code change. Phase 20 sanctions this exact route.",
+    "zero_code_change": true
+  },
+  "secrets_handling": {
+    "hf_token": "read from a 0600 file outside the repo; used only as an HTTP bearer for the HF API and injected as a Space SECRET (runtime env only); never printed, never in the Space tree, never in the image",
+    "github_pat": "injected as GITHUB_TOKEN Space secret; consumed by the entrypoint's GIT_ASKPASS helper (never in URLs/argv/image)",
+    "env_keys_file": ".env.keys excluded from the Space repo by the .dockerignore filter (secret-free by construction)"
+  },
+  "final_deployment_state": {
+    "recorded_at_utc": "2026-09-11T19:08:14Z",
+    "github_sha_deployed": "601547ea574151a172831669ed5273936e28190c",
+    "github_sha_note": "601547ea \u2014 the R425 \u00a77 allowlist fix + the R446-HF driver (the engine-code delta this round; the initial deploy was 8a4c4635)",
+    "identity_chain_reverified": {
+      "api_version_engine_commit": "601547ea574151a172831669ed5273936e28190c",
+      "build_artifact_commit": "601547ea574151a172831669ed5273936e28190c",
+      "health_reported_commit": "601547ea574151a172831669ed5273936e28190c",
+      "identity_tamper": false,
+      "running_artifact_matches_build": true,
+      "constitution_version": "2.3.0"
+    },
+    "hf_space_state": {
+      "stage": "RUNNING",
+      "hardware": "cpu-basic",
+      "visibility": "PRIVATE",
+      "repo_history": "SQUASHED to a single commit (88d607a1) after the Phase 32 security scrub \u2014 the leaking commit is unreachable on HF; the Space repo is a deployment artifact, never canonical history (Art. XI)"
+    },
+    "runtime_env_contract_final": {
+      "variables": [
+        "PORT=7860",
+        "ZAI_BASE_URL=https://router.huggingface.co/v1/chat/completions",
+        "ZAI_MODEL=deepseek-ai/DeepSeek-V4-Flash-0731",
+        "DURABLE_STATE_ENABLED=1",
+        "DURABLE_STATE_BRANCH=runtime-state-hf"
+      ],
+      "secrets": [
+        "ZAI_API_KEY (the HF router bearer)",
+        "GITHUB_TOKEN (portfolio acquisition)",
+        "PORTFOLIO_COMMIT (pin b978e32c)"
+      ],
+      "durable_branch_isolation_reason": "MEASURED: sharing the production 'runtime-state' branch violated the single-writer contract \u2014 the HF restored Render's live sessions (its boot sweeps marked Render's in-flight sessions INTERRUPTED on the shared branch) and the HF's own terminal pushes failed under the conflict; isolated to 'runtime-state-hf' (deployment-env decision, zero code change); the production branch self-heals on Render's next snapshot; the contaminated window (2026-09-11T17:03-18:20) is disclosed in the round record"
+    },
+    "restarts_this_round": [
+      "8a4c4635 build -> first boot (16:04)",
+      "Dockerfile build-fix rebuild -> 601547ea boot (17:01)",
+      "DURABLE_STATE_ENABLED=1 (17:03) \u2014 durable contract on",
+      "CHROME_PATH injection (INJECT-2 prep) (18:05)",
+      "durable-branch isolation + forced restart (18:20)",
+      "INJECT-3 mid-run restart (19:0x) \u2014 the deliberate false-completion attack"
+    ]
+  }
+}
