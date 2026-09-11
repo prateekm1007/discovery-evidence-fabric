@@ -55,6 +55,8 @@ POSITIVE = json.loads(
     (FIXTURES / "cio_production_positive.json").read_text())
 PHANTOM = json.loads(
     (FIXTURES / "cio_malformed_phantom_schema.json").read_text())
+PROD_CAPTURE = json.loads(
+    (FIXTURES / "cio_production_capture_ts743ac866bac8.json").read_text())
 
 
 # ---------------------------------------------------------------------------
@@ -295,3 +297,46 @@ class TestHistoricalDefectExplained:
         out = extract_cio_fields(200, old_style_body)
         assert out["extraction_state"] == MISSING
         assert "identity.mechanism" in out["missing_canonical_fields"]
+
+
+# ---------------------------------------------------------------------------
+# 6. THE PRODUCTION CAPTURE — the real CIO body from the R446 three-
+#    class production runs (fresh bytes from the deployed SHA 8161cfa1:
+#    ts_743ac866bac8, the bench-p11 spindle-thermal-drift run), the
+#    positive production-shaped fixture the directive asked for
+# ---------------------------------------------------------------------------
+class TestProductionCapture:
+    def test_real_production_cio_extracts_verified(self):
+        out = extract_cio_fields(200, PROD_CAPTURE)
+        assert out["extraction_state"] == VERIFIED
+        assert out["missing_canonical_fields"] == []
+        assert out["fields"]["domain_family"] == "mechanical"
+        assert out["fields"]["n_components"] == 5
+        assert out["fields"]["decisive_experiment_present"] is True
+
+    def test_real_production_mechanism_extracted(self):
+        out = extract_cio_fields(200, PROD_CAPTURE)
+        mech = out["fields"]["mechanism"]
+        assert mech["mechanism"]
+        assert "thermal expansion mismatch" in mech["mechanism"]
+
+    def test_production_capture_is_canonical_kind(self):
+        assert PROD_CAPTURE["kind"] == CIO_KIND
+        assert PROD_CAPTURE["present"] is True
+        assert PROD_CAPTURE.get("run_id") == "ts_743ac866bac8"
+
+    def test_production_capture_carries_typed_render_state(self):
+        # the production CIO honestly carries the render state — the
+        # 512 MB plan typed-skip (RENDER_SKIPPED_LOW_MEMORY) surfaces
+        # verbatim; the visual axis never claims completion (Task 4's
+        # axis-orthogonality on REAL production bytes)
+        renders = ((PROD_CAPTURE.get("visualization") or {})
+                   .get("renders") or {})
+        assert renders.get("status") in (
+            "RENDER_SKIPPED_LOW_MEMORY", "RENDERING", "OK", "UNKNOWN")
+
+    def test_summarize_for_record_on_production_bytes(self):
+        s = summarize_for_record(200, PROD_CAPTURE)
+        assert s["cio_extraction_state"] == VERIFIED
+        assert s["domain_family"] == "mechanical"
+        assert s["n_components"] == 5

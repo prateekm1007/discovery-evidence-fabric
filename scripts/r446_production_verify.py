@@ -110,7 +110,10 @@ def _chain_record(problem: Dict[str, Any], result_body: Dict[str, Any],
     inv = result_body.get("invention_specification") or {}
     eng = result_body.get("engineering_specification") or {}
     dex = result_body.get("decisive_experiment") or {}
-    gens = rs.get("generations") or []
+    _gens = rs.get("generations")
+    if isinstance(_gens, dict):
+        _gens = _gens.get("generations") or []
+    gens = _gens if isinstance(_gens, list) else []
 
     def _unwrap_v(field: Any) -> Any:
         if isinstance(field, dict) and "value" in field and set(
@@ -129,7 +132,7 @@ def _chain_record(problem: Dict[str, Any], result_body: Dict[str, Any],
         "evidence": {
             "state": (rs.get("evidence_state") or {}),
             "record_count": ((rs.get("evidence_state") or {}).get(
-                "record_count")),
+                "records_found")),
         },
         "candidate": {
             "mechanism_state": rs.get("mechanism_state"),
@@ -145,18 +148,27 @@ def _chain_record(problem: Dict[str, Any], result_body: Dict[str, Any],
             "note": ("the abstain/escalate gate is IN FORCE: a raw KILL "
                      "travels as ESCALATED_OBJECTION, never terminal "
                      "authority (the calibration state is "
-                     "NOT_CALIBRATED)"),
+                     "NOT_CALIBRATED); a SKIPPED attack stage is the "
+                     "honest blocker cascade (an upstream stage failure "
+                     "skips its downstream set — R399 W2.5), never a "
+                     "scientific verdict (Art. LXI)"),
         },
         "evolution_diagnosis": {
             "state": rs.get("evolution_state"),
             "n_generations": len(gens),
             "generations": [
-                {"gen": g.get("gen"),
+                {"gen": g.get("gen") or g.get("generation"),
+                 "label": g.get("label"),
+                 "origin": g.get("origin"),
+                 "state": g.get("state"),
                  "maturity": g.get("maturity"),
-                 "has_causal_delta": bool(g.get("causal_delta"))}
+                 "has_causal_delta": bool(
+                     g.get("causal_delta") or
+                     (g.get("architecture") or {}).get("causal_delta"))}
                 for g in gens[:6]],
             "outcome": rs.get("outcome"),
             "outcome_label": rs.get("outcome_label"),
+            "outcome_basis": rs.get("outcome_basis"),
         },
         "technical_state": {
             "engineering_specification_present": bool(eng),
@@ -188,6 +200,34 @@ def _chain_record(problem: Dict[str, Any], result_body: Dict[str, Any],
         "run_id": session_id,
     }
     return chain
+
+
+def _model_probe(session_id: str, cookie: Optional[str]) -> Dict[str, Any]:
+    """R446-C1: the model route serves BINARY GLB bytes — the R444
+    JSON-parsing probe recorded http_status None on every successful
+    (200) binary response (the same recording-layer defect class as
+    the phantom CIO keys). This probe captures the status + length
+    WITHOUT parsing JSON."""
+    import urllib.error
+    import urllib.request
+    url = pv.BASE + f"/api/run/{session_id}/model"
+    req = urllib.request.Request(url)
+    if cookie:
+        req.add_header("Cookie", cookie)
+    try:
+        with urllib.request.urlopen(req, timeout=120) as r:
+            n = 0
+            while True:
+                chunk = r.read(65536)
+                if not chunk:
+                    break
+                n += len(chunk)
+            return {"http_status": r.status, "bytes": n}
+    except urllib.error.HTTPError as e:
+        return {"http_status": e.code, "bytes": 0}
+    except Exception as exc:  # noqa: BLE001
+        return {"http_status": None, "error": f"{type(exc).__name__}: "
+                                              f"{str(exc)[:120]}"}
 
 
 def _run_case(problem: Dict[str, Any], report: Dict[str, Any],
@@ -233,8 +273,7 @@ def _run_case(problem: Dict[str, Any], report: Dict[str, Any],
 
     cio_resp = pv._req(f"/api/run/{session_id}/cio", timeout=60,
                        cookie=cookie)
-    model_resp = pv._req(f"/api/run/{session_id}/model", timeout=120,
-                         cookie=cookie)
+    model_resp = _model_probe(session_id, cookie)
     result_body = (result.get("body") or {}) \
         if result.get("http_status") == 200 else {}
 
@@ -293,14 +332,28 @@ def main() -> int:
             "runs": [],
         }
 
-    for case_id in CASES:
+    # if a persisted in-flight session exists, start the loop from ITS
+    # case (a slice deadline mid-poll must resume THAT case — never
+    # re-submit it, never submit later cases while one is in flight)
+    start_index = 0
+    persisted = _resume()
+    if persisted and persisted.get("case") in CASES:
+        start_index = CASES.index(persisted["case"])
+        _log(f"resuming from persisted case {persisted['case']} "
+             f"(session {persisted.get('session_id')})")
+
+    for case_id in CASES[start_index:]:
         problem = full.get(case_id)
         if problem is None:
             _log(f"{case_id}: not found in frozen corpora")
             continue
         rec = _run_case(problem, report, completed)
         if rec is None:
-            continue  # slice deadline: re-invoke
+            # slice deadline mid-poll: EXIT so the caller re-invokes and
+            # resumes THIS case (never submit the next case while one is
+            # in flight — the in-flight session + cookie are the resume
+            # state; overwriting them would orphan the run)
+            return 3
         report.setdefault("runs", []).append(rec)
         OUT.write_text(json.dumps(report, indent=1, default=str))
         SESSION.unlink(missing_ok=True)

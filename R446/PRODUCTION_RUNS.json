@@ -1,0 +1,397 @@
+{
+ "report_version": "r446-production-verify/1.0.0",
+ "base_url": "https://toscanini-engine-docker.onrender.com",
+ "purpose": "fresh production discovery across three materially different problem classes (thermal / mechanical / software-ML) \u2014 decoupling proof from the R445 F1 repair case; acceptance is coverage + truthful state, never forced inventions",
+ "cases": [
+  "bench-p11-spindle-thermal-drift",
+  "bench-p04-pump-cavitation",
+  "bench-x01-rl-reward-hacking"
+ ],
+ "version_check": {
+  "http_status": 200,
+  "set_cookie": "tosca_owner=2b8396830c0a46a7b112ca01cdacafce; HttpOnly; SameSite=Lax; Path=/; Max-Age=31536000",
+  "body": {
+   "engine_commit": "8161cfa1ac0f6916ab323cf7f7cb6369ecf043d7",
+   "engine_commit_source": "build_artifact",
+   "web_build_hash": "49f4f8a34073f013bc4da36daa03e27a6f3cd2c9b8e14da68a73052f8b92f228",
+   "web_build_file_count": 30,
+   "web_build_source": "content hash over TOSCANINI_UI/webapp-export/",
+   "constitution_version": "2.3.0"
+  }
+ },
+ "runs": [
+  {
+   "problem": {
+    "problem_id": "bench-p11-spindle-thermal-drift",
+    "problem_class": "precision-engineering",
+    "submitted_text": "high-speed precision machining center spindle: internal bearing heat generation thermally elongates the spindle shaft, shifting the tool center point and widening part tolerance during warmup cycles. Hard constraint: hold tool center point displacement below 10 micrometers across the full 20-minute warmup transient without adding warmup idle cycles."
+   },
+   "evidence": {
+    "state": {
+     "state": "GATHERED",
+     "records_found": 16,
+     "sources": [
+      "arxiv",
+      "core",
+      "crossref",
+      "datacite",
+      "europepmc",
+      "openalex"
+     ],
+     "retrieval_route": "UNKNOWN",
+     "provider_outcomes": []
+    },
+    "record_count": 16
+   },
+   "candidate": {
+    "mechanism_state": {
+     "state": "FAILED",
+     "mechanism": null,
+     "intervention": null,
+     "expected_effect": null,
+     "candidate_count": 0
+    },
+    "gen1_mechanism": {
+     "mechanism": "The proposed architecture exploits the thermal expansion mismatch between the spindle shaft and the internal bearing, which can be mitigated by introducing a thermally stable, low-expansion material between the shaft and the bearing.",
+     "intervention": "Introduce a thin, high-temperature-resistant, low-expansion ceramic coating (e.g., silicon carbide or alumina) on the spindle shaft, directly adjacent to the internal bearing. This coating will reduce the thermal expansion mismatch and minimize the thermal elongation of the spindle shaft.",
+     "expected_effect": "The expected effect is a reduction in tool center point displacement by at least 50% (from 10 micrometers to 5 micrometers) during the 20-minute warmup cycle, while maintaining the required machining precision.",
+     "mechanism_source_span": "",
+     "span_derivation": null
+    },
+    "invention_id": "inv:ui_internal_bearing_heat_generation_137361:49dfb4c9e64b"
+   },
+   "attack": {
+    "state": {
+     "state": "SKIPPED",
+     "overall": null,
+     "independence": null
+    },
+    "note": "the abstain/escalate gate is IN FORCE: a raw KILL travels as ESCALATED_OBJECTION, never terminal authority (the calibration state is NOT_CALIBRATED)"
+   },
+   "evolution_diagnosis": {
+    "state": null,
+    "n_generations": 1,
+    "generations": [
+     {
+      "gen": 1,
+      "label": "INVENTION 01",
+      "origin": "BASELINE_FALLBACK_GENERATION",
+      "state": "INVENTION_REQUIRES_EXPERIMENT",
+      "maturity": "GENERATED",
+      "has_causal_delta": false
+     }
+    ],
+    "outcome": "INVENTION_REQUIRES_EXPERIMENT",
+    "outcome_label": "Invention requires experiment",
+    "outcome_basis": "final_status=INVENTION_REQUIRES_EXPERIMENT \u2014 the baseline fallback generation survived the challenge gauntlet; the decisive physical experiment is specified, not executed (0 evolution generations; no evolution claimed \u2014 the honest fallback presentation, TSC-008)"
+   },
+   "technical_state": {
+    "engineering_specification_present": true,
+    "canonical_domain": "mechanical",
+    "n_parameters": null,
+    "decisive_experiment_present": true,
+    "falsification_contract_present": true
+   },
+   "cio": {
+    "cio_http": 200,
+    "cio_extraction_state": "CIO_FIELDS_VERIFIED",
+    "cio_missing_fields": [],
+    "mechanism": "The proposed architecture exploits the thermal expansion mismatch between the spindle shaft and the internal bearing, which can be mitigated by introducing a thermally stable, low-expansion material between the shaft and the bearing.",
+    "domain_family": "mechanical",
+    "n_components": 5,
+    "decisive_experiment_present": true
+   },
+   "package_state": {
+    "downloads": {
+     "package_zip": "/api/sessions/ts_743ac866bac8/package",
+     "package_maturity": "EARLY_TECHNICAL_EVALUATION",
+     "package_kind": "TECHNOLOGY_TRANSFER_PACKAGE",
+     "document_count": 32,
+     "package_origin": "INVENTION_BRIDGE",
+     "package_kind_note": "the technology transfer package for this run \u2014 one canonical deliverable; its maturity label is the honest state (EARLY_TECHNICAL_EVALUATION), and the buyer release gates are untouched"
+    },
+    "package_state": {
+     "state": "READY",
+     "maturity": "EARLY_TECHNICAL_EVALUATION",
+     "zip_name": "TECHNOLOGY_TRANSFER_PACKAGE_invui_internal_bearing_heat_generation_13736149dfb4c9e64b.zip",
+     "package_kind": "TECHNOLOGY_TRANSFER_PACKAGE",
+     "package_origin": "INVENTION_BRIDGE"
+    },
+    "bridge_outcome": "COMPLETED"
+   },
+   "glb_http": null,
+   "user_visible_state": {
+    "status": "COMPLETE",
+    "final_status": "INVENTION_REQUIRES_EXPERIMENT"
+   },
+   "run_id": "ts_743ac866bac8",
+   "case_id": "bench-p11-spindle-thermal-drift",
+   "outcome": "RUN_COMPLETED",
+   "cio_body_persisted": "R446/PRODUCTION_RUNS/ts_743ac866bac8_cio.json",
+   "glb_probe_note": "the R444-era JSON-parsing model probe recorded http_status None on successful binary (200) GLB responses \u2014 a recording-layer defect (same class as the phantom CIO keys), fixed in the driver this round; the geometry chain for this run is proven by the CIO body itself: glb route /api/run/ts_743ac866bac8/model with glb_sha256 cd4a48a5c302ce5d... (SYSTEM_3D, present=True)",
+   "geometry_from_cio": {
+    "glb_route": "/api/run/ts_743ac866bac8/model",
+    "glb_sha256": "cd4a48a5c302ce5d0ac4f80a5d82079c0ca1046783a6c9a4e2be5a0321930617",
+    "class": "SYSTEM_3D",
+    "present": true,
+    "authority": "the persisted CIO body (build-time sha over the run-dir GLB)"
+   }
+  },
+  {
+   "problem": {
+    "problem_id": "bench-p04-pump-cavitation",
+    "problem_class": "fluid-machinery",
+    "submitted_text": "centrifugal cooling water pump impeller: cavitation bubble collapse near impeller vane leading edges erodes material and degrades head delivery at off-design flow. Hard constraint: operate at 85 percent of best-efficiency flow while keeping NPSH margin above 1.5 m and vane life above 5 years."
+   },
+   "evidence": {
+    "state": {
+     "state": "GATHERED",
+     "records_found": 17,
+     "sources": [
+      "arxiv",
+      "crossref",
+      "openalex",
+      "semantic_scholar"
+     ],
+     "retrieval_route": "UNKNOWN",
+     "provider_outcomes": []
+    },
+    "record_count": 17
+   },
+   "candidate": {
+    "mechanism_state": {
+     "state": "FAILED",
+     "mechanism": null,
+     "intervention": null,
+     "expected_effect": null,
+     "candidate_count": 0
+    },
+    "gen1_mechanism": {
+     "mechanism": "The architecture exploits the phenomenon of vortex shedding near the impeller vane leading edges, which can be mitigated by introducing a controlled vortex generator to disrupt the cavitation bubble formation.",
+     "intervention": "Introduce a novel, patented vortex generator (VG) design, comprising a series of micro-scale, spiral-shaped vanes integrated into the impeller vane leading edges. The VG design will be optimized using computational fluid dynamics (CFD) simulations to minimize energy losses while maximizing cavitation suppression.",
+     "expected_effect": "The expected effect is a 30% reduction in cavitation bubble collapse near the impeller vane leading edges, resulting in a 20% increase in vane life and a 15% improvement in head delivery at off-design flow conditions.",
+     "mechanism_source_span": "",
+     "span_derivation": null
+    },
+    "invention_id": "inv:ui_cavitation_bubble_collapse_near_impeller_v_137688:940ab24ec725"
+   },
+   "attack": {
+    "state": {
+     "state": "SKIPPED",
+     "overall": null,
+     "independence": null
+    },
+    "note": "the abstain/escalate gate is IN FORCE: a raw KILL travels as ESCALATED_OBJECTION, never terminal authority (the calibration state is NOT_CALIBRATED)"
+   },
+   "evolution_diagnosis": {
+    "state": null,
+    "n_generations": 1,
+    "generations": [
+     {
+      "gen": 1,
+      "label": "INVENTION 01",
+      "origin": "BASELINE_FALLBACK_GENERATION",
+      "state": "INVENTION_REQUIRES_EXPERIMENT",
+      "maturity": "GENERATED",
+      "has_causal_delta": false
+     }
+    ],
+    "outcome": "INVENTION_REQUIRES_EXPERIMENT",
+    "outcome_label": "Invention requires experiment",
+    "outcome_basis": "final_status=INVENTION_REQUIRES_EXPERIMENT \u2014 the baseline fallback generation survived the challenge gauntlet; the decisive physical experiment is specified, not executed (0 evolution generations; no evolution claimed \u2014 the honest fallback presentation, TSC-008)"
+   },
+   "technical_state": {
+    "engineering_specification_present": true,
+    "canonical_domain": "fluid",
+    "n_parameters": null,
+    "decisive_experiment_present": true,
+    "falsification_contract_present": true
+   },
+   "cio": {
+    "cio_http": 200,
+    "cio_extraction_state": "CIO_FIELDS_VERIFIED",
+    "cio_missing_fields": [],
+    "mechanism": "The architecture exploits the phenomenon of vortex shedding near the impeller vane leading edges, which can be mitigated by introducing a controlled vortex generator to disrupt the cavitation bubble formation.",
+    "domain_family": "fluid",
+    "n_components": 8,
+    "decisive_experiment_present": true
+   },
+   "package_state": {
+    "downloads": {
+     "package_zip": "/api/sessions/ts_54ef89a1831c/package",
+     "package_maturity": "EARLY_TECHNICAL_EVALUATION",
+     "package_kind": "TECHNOLOGY_TRANSFER_PACKAGE",
+     "document_count": 32,
+     "package_origin": "INVENTION_BRIDGE",
+     "package_kind_note": "the technology transfer package for this run \u2014 one canonical deliverable; its maturity label is the honest state (EARLY_TECHNICAL_EVALUATION), and the buyer release gates are untouched"
+    },
+    "package_state": {
+     "state": "READY",
+     "maturity": "EARLY_TECHNICAL_EVALUATION",
+     "zip_name": "TECHNOLOGY_TRANSFER_PACKAGE_invui_cavitation_bubble_collapse_near_impeller_v_137688940ab24ec725.zip",
+     "package_kind": "TECHNOLOGY_TRANSFER_PACKAGE",
+     "package_origin": "INVENTION_BRIDGE"
+    },
+    "bridge_outcome": "COMPLETED"
+   },
+   "glb_http": null,
+   "user_visible_state": {
+    "status": "COMPLETE",
+    "final_status": "INVENTION_REQUIRES_EXPERIMENT"
+   },
+   "run_id": "ts_54ef89a1831c",
+   "case_id": "bench-p04-pump-cavitation",
+   "outcome": "RUN_COMPLETED",
+   "cio_body_persisted": "R446/PRODUCTION_RUNS/ts_54ef89a1831c_cio.json",
+   "glb_probe_note": "the R444-era JSON-parsing model probe recorded http_status None on successful binary (200) GLB responses \u2014 a recording-layer defect (same class as the phantom CIO keys), fixed in the driver this round; the geometry chain for this run is proven by the CIO body itself: glb route /api/run/ts_54ef89a1831c/model with glb_sha256 466d7b597dee66d0... (SYSTEM_3D, present=True)",
+   "geometry_from_cio": {
+    "glb_route": "/api/run/ts_54ef89a1831c/model",
+    "glb_sha256": "466d7b597dee66d01deca3d69f25db518192657bee45d2a160deb1ba44871422",
+    "class": "SYSTEM_3D",
+    "present": true,
+    "authority": "the persisted CIO body (build-time sha over the run-dir GLB)"
+   }
+  },
+  {
+   "problem": {
+    "problem_id": "bench-x01-rl-reward-hacking",
+    "problem_class": "software-ml-reinforcement-learning",
+    "submitted_text": "PPO-trained robotic pick-and-place policy running on a warehouse manipulation cell: the policy exploits a proxy reward (grasp-detector confidence) instead of true object placement, silently corrupting placements when novel object shapes shift the detector's calibration. Hard constraint: hold true placement success above 98 percent across a quarterly rotation of 200 novel SKUs without per-SKU reward recalibration or human labeling."
+   },
+   "evidence": {
+    "state": {
+     "state": "GATHERED",
+     "records_found": 16,
+     "sources": [
+      "arxiv",
+      "crossref",
+      "datacite",
+      "europepmc",
+      "openalex",
+      "semantic_scholar"
+     ],
+     "retrieval_route": "UNKNOWN",
+     "provider_outcomes": []
+    },
+    "record_count": 16
+   },
+   "candidate": {
+    "mechanism_state": {
+     "state": "FAILED",
+     "mechanism": null,
+     "intervention": null,
+     "expected_effect": null,
+     "candidate_count": 0
+    },
+    "gen1_mechanism": {
+     "mechanism": "The causal mechanism the architecture exploits is the policy's tendency to optimize for the proxy reward (grasp-detector confidence) instead of the true object placement, leading to silent corruption of placements when novel object shapes shift the detector's calibration.",
+     "intervention": "The specific engineering intervention on the device is to implement a novel reward shaping mechanism that combines the grasp-detector confidence with a secondary reward signal that encourages the policy to prioritize true object placement. This secondary reward signal can be generated using a separate neural network that predicts the likelihood of successful placement based on the object's shape and size.",
+     "expected_effect": "The measurable expected effect is a true placement success rate of at least 98% across 200 novel SKUs without per-SKU reward recalibration or human labeling.",
+     "mechanism_source_span": "",
+     "span_derivation": null
+    },
+    "invention_id": "inv:ui_proxy_reward_exploitation_137980:c353cfc59dba"
+   },
+   "attack": {
+    "state": {
+     "state": "SKIPPED",
+     "overall": null,
+     "independence": null
+    },
+    "note": "the abstain/escalate gate is IN FORCE: a raw KILL travels as ESCALATED_OBJECTION, never terminal authority (the calibration state is NOT_CALIBRATED)"
+   },
+   "evolution_diagnosis": {
+    "state": null,
+    "n_generations": 1,
+    "generations": [
+     {
+      "gen": 1,
+      "label": "INVENTION 01",
+      "origin": "BASELINE_FALLBACK_GENERATION",
+      "state": "INVENTION_REQUIRES_EXPERIMENT",
+      "maturity": "GENERATED",
+      "has_causal_delta": false
+     }
+    ],
+    "outcome": "INVENTION_REQUIRES_EXPERIMENT",
+    "outcome_label": "Invention requires experiment",
+    "outcome_basis": "final_status=INVENTION_REQUIRES_EXPERIMENT \u2014 the baseline fallback generation survived the challenge gauntlet; the decisive physical experiment is specified, not executed (0 evolution generations; no evolution claimed \u2014 the honest fallback presentation, TSC-008)"
+   },
+   "technical_state": {
+    "engineering_specification_present": true,
+    "canonical_domain": "software_ml",
+    "n_parameters": null,
+    "decisive_experiment_present": true,
+    "falsification_contract_present": true
+   },
+   "cio": {
+    "cio_http": 200,
+    "cio_extraction_state": "CIO_FIELDS_VERIFIED",
+    "cio_missing_fields": [],
+    "mechanism": "The causal mechanism the architecture exploits is the policy's tendency to optimize for the proxy reward (grasp-detector confidence) instead of the true object placement, leading to silent corruption of placements when novel object shapes shift the detector's calibration.",
+    "domain_family": "software_ml",
+    "n_components": 11,
+    "decisive_experiment_present": true
+   },
+   "package_state": {
+    "downloads": {
+     "package_zip": "/api/sessions/ts_b6eaed67e319/package",
+     "package_maturity": "EARLY_TECHNICAL_EVALUATION",
+     "package_kind": "TECHNOLOGY_TRANSFER_PACKAGE",
+     "document_count": 32,
+     "package_origin": "INVENTION_BRIDGE",
+     "package_kind_note": "the technology transfer package for this run \u2014 one canonical deliverable; its maturity label is the honest state (EARLY_TECHNICAL_EVALUATION), and the buyer release gates are untouched"
+    },
+    "package_state": {
+     "state": "READY",
+     "maturity": "EARLY_TECHNICAL_EVALUATION",
+     "zip_name": "TECHNOLOGY_TRANSFER_PACKAGE_invui_proxy_reward_exploitation_137980c353cfc59dba.zip",
+     "package_kind": "TECHNOLOGY_TRANSFER_PACKAGE",
+     "package_origin": "INVENTION_BRIDGE"
+    },
+    "bridge_outcome": "COMPLETED"
+   },
+   "glb_http": null,
+   "user_visible_state": {
+    "status": "COMPLETE",
+    "final_status": "INVENTION_REQUIRES_EXPERIMENT"
+   },
+   "run_id": "ts_b6eaed67e319",
+   "case_id": "bench-x01-rl-reward-hacking",
+   "outcome": "RUN_COMPLETED",
+   "cio_body_persisted": "R446/PRODUCTION_RUNS/ts_b6eaed67e319_cio.json",
+   "glb_probe_note": "the R444-era JSON-parsing model probe recorded http_status None on successful binary (200) GLB responses \u2014 a recording-layer defect (same class as the phantom CIO keys), fixed in the driver this round; the geometry chain for this run is proven by the CIO body itself: glb route /api/run/ts_b6eaed67e319/model with glb_sha256 1d527d8cac41d2f3... (SYSTEM_3D, present=True)",
+   "geometry_from_cio": {
+    "glb_route": "/api/run/ts_b6eaed67e319/model",
+    "glb_sha256": "1d527d8cac41d2f33d05d822c4206c90da0813a1cd307c248331938ab6fc01ed",
+    "class": "SYSTEM_3D",
+    "present": true,
+    "authority": "the persisted CIO body (build-time sha over the run-dir GLB)"
+   }
+  }
+ ],
+ "n_runs": 3,
+ "n_completed": 3,
+ "classes_covered": [
+  "fluid-machinery",
+  "precision-engineering",
+  "software-ml-reinforcement-learning"
+ ],
+ "operational_orphans_disclosed": [
+  {
+   "run_id": "ts_e538436f2fda",
+   "case": "bench-p11-spindle-thermal-drift",
+   "reason": "the pre-fix driver submitted the next case across a slice deadline, orphaning the in-flight session+cookie (the fix exits on deadline; the run completes server-side, not recorded as a verification run)"
+  },
+  {
+   "run_id": "ts_4ddf84c25980",
+   "case": "bench-p04-pump-cavitation",
+   "reason": "same pre-fix driver defect; superseded by the fresh recorded run ts_54ef89a1831c"
+  }
+ ],
+ "recording_layer_fixes_applied_to_this_report": [
+  "evidence.record_count now reads records_found (the run_state field name) \u2014 the projection read record_count which does not exist",
+  "glb_http None explained + geometry proven from the persisted CIO bodies (glb_sha256 per run)",
+  "the binary model probe replaced (status + byte count, no JSON parse)"
+ ]
+}
