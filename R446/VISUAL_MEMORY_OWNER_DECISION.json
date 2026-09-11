@@ -1,0 +1,69 @@
+{
+ "artifact_type": "VISUAL_MEMORY_OWNER_DECISION_PACKAGE",
+ "round": "R446-C1",
+ "created_at": "2026-09-11",
+ "reviewer_provenance": "AI_REVIEW",
+ "decision_owner": "OPERATOR (Article LXV — owner-gated; the machine does not pick a default and proceed)",
+ "decision_opened_in": "R443 (billing-gated capacity decision; escalation count 4 at R444-C2)",
+ "escalation_count_this_package": 5,
+ "cost_of_continued_inaction": "every round this stays open, the production visual stage typed-skips (RENDER_SKIPPED_LOW_MEMORY): fresh production runs ship packages with zero hero images, zero PDF cover renders, and render routes 404 — the buyer surface stays text-and-geometry only while the SAME bytes prove COMPLETE_PASS in the sandbox at the SAME SHA",
+ "measured_sources": {
+  "render_tree_floor": "R445/MEMORY_BUDGET.json (R445-C2, measured per-process PSS at 12.5 Hz)",
+  "guard_thresholds": "visual_compiler_thresholds.json (R441, MEASURED basis, ENGINEERING class, rev history append-only)",
+  "no_new_measurement_this_round": true,
+  "no_threshold_changed_this_round": true
+ },
+ "1_measured_minimum": {
+  "render_tree_peak_mb": 496.2,
+  "measured_window_mb": "496-521 (run-to-run variance +/-5-25 MB across 8+ repeats)",
+  "context": "Case B through the FULL visual compiler with the FINAL committed render.js (incl. pmrem.dispose()): status OK, gate COMPLETE_PASS, 23 artifacts, hero sha256 2218f0d73cddb5fc byte-identical to the A/B optimized run; node identity / geometry identity / poster parity all PASS",
+  "irreducible_decomposition_mb": {
+   "chromium_blank_floor": 115.0,
+   "webgl_context_base": 160.0,
+   "hero_surface": 61.0,
+   "shadow_map": 35.0,
+   "pmrem_environment": 16.0,
+   "node_driver": 99.0,
+   "python_worker_at_render": 17.0,
+   "sum": 503.0,
+   "note": "matches the measured 496-521 window; every quality-locked component carries the diagnostic that measures it"
+  },
+  "what_the_floor_is": "the FULL Visual Compiler render tree (quality-locked: hero at 1536x1024 + 2048 shadow map + PMREM + the single-process Chromium/V8/Node floor) at the final committed render.js after the R445-C2 deadweight-only optimization",
+  "why_450_is_unachievable": "the quality-locked components alone (hero resolution + 2048 shadow map + PMREM rig = 112 MB) plus the Chromium/V8 platform floor (115 + 160) plus the node driver (99) sum to ~503 MB BEFORE any server baseline; reaching 450 would require lowering the render resolution, shrinking the shadow map, or stripping the environment lighting — exactly the product degradations the directive forbids"
+ },
+ "2_expected_server_baseline": {
+  "python_server_local_reference_mb": "30.4 MB local reference boot (flat); production baseline NOT directly observable — honest UNKNOWN, never guessed (Art. XXV)",
+  "python_visual_worker_at_render_mb": "16.6-17 MB (lean compiler process during the render phase; the gate phase runs AFTER Chromium exits so its ~80 MB peak does not overlap the renderer peak)",
+  "cadquery_ocp_note": "the engineering stack (458.7 MB isolated import) is STRUCTURALLY ABSENT from the visual worker — the two never co-reside by construction",
+  "production_baseline_honesty": "the production container's own server baseline is NOT directly observable from outside Render — honest UNKNOWN, never guessed (Art. XXV); the local reference boot is 30.4 MB flat"
+ },
+ "3_safe_production_headroom": {
+  "async_memory_guard_mb": 650,
+  "in_worker_guard_mb": 800,
+  "guard_basis": "MEASURED (2026-09-10, sandbox verification host, R441 acceptance): headless Chromium + SwiftShader renderer tree peak PSS 542-643 MB across 8 processes (chrome-gpu SwiftShader ~393 MB dominant, node ~98 MB, chrome mains ~152 MB; measured per-process from /proc/<pid>/smaps_rollup during live R441 acceptance runs over two CAD GLBs at 1536x1024 with the full seven-view set). The guard values (800 in-",
+  "headroom_rule": "the async guard requires >= 650 MB FREE at render time; the render tree alone peaks at 496-521 MB, so a plan must cover tree + server + gateway + variance with the guard's own margin"
+ },
+ "4_recommended_minimum_memory_plan": {
+  "recommendation": ">= 1 GB plan (Render Starter upgrade)",
+  "basis": "1024 MB - ~35-60 MB server+gateway - variance (+/-25 MB) leaves ~940-965 MB free at render time — above the 650 MB async guard with margin; the guard's own consequence note states the visual compiler renders automatically on a >= 1 GB plan",
+  "comfortable_plan": "2 GB if the async render queue may run concurrently with a live discovery run (the engine gauntlet itself peaks well below 1 GB, but concurrency doubles the uncertainty band)",
+  "not_a_threshold_invention": "the recommendation derives from the MEASURED guard (650 MB) and the MEASURED tree floor (496-521 MB); no new number is invented (Art. XXVII)"
+ },
+ "5_exact_behavior_on_insufficient_capacity": {
+  "typed_skip": "RENDER_SKIPPED_LOW_MEMORY — the cgroup-aware guard measures the container's REAL free memory before Chromium launches and typed-skips below the guard",
+  "fail_closed_consequences": [
+   "the hero is suppressed in every medium (website, package PDFs, ZIP) — Article LXXII",
+   "the visual release decision blocks the package from buyer-release posture",
+   "the typed record (R443 schema) persists the skip with the plan-upgrade note — never a bare failure",
+   "the run's epistemic state is UNTOUCHED (Art. LXI: presentation infrastructure, never a scientific verdict)"
+  ],
+  "what_never_happens": [
+   "no threshold is lowered to force a render",
+   "no silent fallback to the Blender legacy path",
+   "no quality degradation (resolution, shadow map, view count all quality-locked)",
+   "no fabricated visual-complete claim"
+  ]
+ },
+ "explicit_non_goals": "this package does NOT attempt another renderer-pruning round: R445-C2 already measured the lower bound (496.2 MB) and classified the 450 MB target as MEMORY_TARGET_UNACHIEVABLE_WITHOUT_PRODUCT_DEGRADATION with the irreducible decomposition; the remaining gap is a capacity decision, not an engineering one",
+ "art_lxxv_note": "this package is the escalation artifact — the single most prominent unresolved item for this round; the machine correctly refuses to decide it (Art. XXXIII) and makes the cost of continued deferral explicit (Art. LXV)"
+}
