@@ -408,16 +408,36 @@ def _experiment_state(session: Dict, run_dir: Optional[Path]) -> Dict:
     executed = bool(
         (experiment.get("status") if isinstance(experiment, dict)
          else None) in ("EXECUTED", "COMPLETE", "RUN"))
+    # R447 Phase 7 (attack 4 closed at the surface): an experiment
+    # exists but its FALSIFICATION field may be absent — the canonical
+    # state must NEVER collapse that into a fine-looking experiment.
+    # The R444-D contract status (state_integrity) is consulted here so
+    # the /state surface carries contract_complete + the Art. LII basis
+    # (the engine-level presentation gate in run.py is unchanged).
+    contract_status = None
+    if spec:
+        try:
+            from discovery_fabric.engine.state_integrity import \
+                falsification_contract_status
+            contract_status = falsification_contract_status(spec)
+        except Exception:  # noqa: BLE001 — typed surface, never fatal
+            contract_status = None
     return {
         "state": ("SPECIFIED_NOT_EXECUTED" if spec and not executed
                   else "EXECUTED" if executed
                   else "PENDING" if session.get("status") in
                   _RUNNING_STATUSES else "NOT_SPECIFIED"),
         "decisive_experiment_present": bool(spec),
+        "falsification_contract": contract_status,
         "note": ("the decisive physical experiment is the run's own "
                  "falsification contract (Art. LII); in this machine it "
                  "is specified for survivors and executed only through "
-                 "the reality-loop interface"),
+                 "the reality-loop interface"
+                 + ("" if not contract_status else
+                    "; the contract is COMPLETE only when the "
+                    "FALSIFICATION_THRESHOLD answers what outcome kills "
+                    "the mechanism — an experiment without that answer "
+                    "is a specified experiment, never a complete one")),
     }
 
 
@@ -464,7 +484,28 @@ def package_terminal_state(session: Dict, run_dir: Optional[Path]) -> Dict:
     running = session.get("status") in _RUNNING_STATUSES
 
     # --- release verdict: the run's own records, never inferred ------
-    if gate_verdict:
+    # R447 Phase 7 (attack 2 closed at the canonical object): a package
+    # whose VISUAL release is blocked (Art. LXXII — HERO_RELEASE_STATE)
+    # is never presented as release-ready — the verdict is the typed
+    # VISUAL_RELEASE_BLOCKED with the gate's own verdict carried, BEFORE
+    # the package quality gate is even consulted (the visual gate
+    # outranks: no 3D artifact ships without it).
+    hero_release = _read_json(
+        run_dir / "MODEL" / "3D" / "HERO_RELEASE_STATE.json") \
+        if run_dir and run_dir.exists() else None
+    if hero_release and hero_release.get("release_blocked"):
+        release_verdict = {
+            "verdict": "VISUAL_RELEASE_BLOCKED",
+            "visual_gate_verdict": hero_release.get("gate_verdict"),
+            "failed_gates": [],
+            "warned_gates": [],
+            "source": "MODEL/3D/HERO_RELEASE_STATE.json",
+            "note": ("the Visual Quality Gate did not pass/run "
+                     "(Article LXXII): the package contains zero visual "
+                     "artifacts by design and the buyer release stays "
+                     "blocked until the visual gate passes"),
+        }
+    elif gate_verdict:
         release_verdict = {
             "verdict": gate_verdict.get("package_quality"),
             "failed_gates": (gate_verdict.get("failed_gates")
@@ -508,7 +549,25 @@ def package_terminal_state(session: Dict, run_dir: Optional[Path]) -> Dict:
                 blocked_reason = str(detail)[:600]
 
     # --- next_action: deterministic from the same records -------------
-    if blocked_rec:
+    if complete:
+        if release_verdict.get("verdict") == "VISUAL_RELEASE_BLOCKED":
+            next_action = {
+                "action": "RESOLVE_VISUAL_GATE",
+                "text": ("the technology package is built and downloadable "
+                         "as an engineering evaluation draft, but the "
+                         "Visual Quality Gate did not pass/run "
+                         "(Article LXXII): the buyer release stays blocked "
+                         "until the visual gate passes"),
+            }
+        else:
+            next_action = {
+                "action": "DOWNLOAD_PACKAGE",
+                "text": ("the technology transfer package is built and "
+                         "passed the recorded release gates — download it "
+                         "and evaluate the dossier, the experiment plan, "
+                         "and the engineering artifacts"),
+            }
+    elif blocked_rec:
         stage = blocked_stage or "UNKNOWN_STAGE"
         if stage == "QUALITY_GATE_BLOCKED":
             failed = ", ".join(
