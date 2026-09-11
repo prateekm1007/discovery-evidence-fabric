@@ -1100,9 +1100,10 @@ class EngineRun:
                                 f"INDEPENDENT_ATTACK_{key}.json",
                                 indep_attack)
                         except Exception as exc:  # noqa: BLE001 — rec
+                            from .independent_attack import (
+                                ATTACK_VERSION as _IAV)
                             indep_attack = {
-                                "attack_version":
-                                    "independent_attack/1.0.0",
+                                "attack_version": _IAV,
                                 "candidate_id": c["candidate_id"],
                                 "state": "ATTACK_INCOMPLETE",
                                 "overall": "ATTACK_INCOMPLETE",

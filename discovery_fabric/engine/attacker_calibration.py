@@ -92,10 +92,32 @@ MEASUREMENT_PATH = (REPO / "R412" / "CALIBRATION" /
 SEAL_PATH = REPO / "R412" / "CALIBRATION" / "r412_calibration_seal.json"
 
 ESCALATED = "ESCALATED_OBJECTION"
-GATE_VERSION = "attacker_calibration/1.0.0"
+GATE_VERSION = "attacker_calibration/1.1.0"
 
 # the instrument this gate binds (the product path's attacker)
 GATED_INSTRUMENT_VERSION = "independent_attack/1.0.0"
+
+# R447 Phase 6: the instrument-version MEASUREMENT REGISTRY. Each
+# instrument version earns its calibration state from ITS OWN committed
+# measurement + sealed thresholds (Art. X: the state is derived, never
+# asserted). v1 stays bound to the R417/R412 measurement; v2.0.0 (the
+# grounding-discipline instrument) is bound to the R447 rerun of the
+# R446 frozen corpus, whose pre-registered thresholds REUSE the R412
+# sealed bars (no new threshold invented, Art. XXVII). A version with
+# no committed measurement resolves UNKNOWN_NOT_CALIBRATED — fail
+# closed (an unmeasured instrument has no measured authority).
+INSTRUMENT_MEASUREMENTS = {
+    "independent_attack/1.0.0": {
+        "measurement": MEASUREMENT_PATH,
+        "seal": SEAL_PATH,
+    },
+    "independent_attack/2.0.0": {
+        "measurement": (REPO / "R447" / "ATTACKER_V2_RECALIBRATION" /
+                        "MEASUREMENT.json"),
+        "seal": (REPO / "R447" / "ATTACKER_V2_RECALIBRATION" /
+                 "SEAL.json"),
+    },
+}
 
 
 def _sha(path: Path) -> Optional[str]:
@@ -106,21 +128,47 @@ def _sha(path: Path) -> Optional[str]:
 
 
 def resolve_state(measurement_path: Optional[Path] = None,
-                  seal_path: Optional[Path] = None) -> Dict[str, Any]:
-    """Derive the canonical calibration state for the gated instrument
-    from the COMMITTED measurement + sealed thresholds (Art. X).
+                  seal_path: Optional[Path] = None,
+                  instrument_version: Optional[str] = None) -> Dict[str, Any]:
+    """Derive the canonical calibration state for an instrument
+    version from the COMMITTED measurement + sealed thresholds
+    (Art. X).
 
     Deterministic, no LLM, no network. The measurement record itself
     already carries its threshold verdict (computed by the sealed
     metrics module at measurement time); this function re-derives the
     admission decision from the record's numbers against the seal's
     pre-registered thresholds — the state is never trusted from prose.
+
+    R447: instrument_version selects the measurement registry entry
+    (v1 -> the R412/R417 record; v2 -> the R447 rerun of the frozen
+    corpus). Explicit measurement/seal paths still override (the
+    operator's verification entry point). No version given -> v1
+    (the historical default, backward compatible with every existing
+    consumption site and record).
     """
+    if instrument_version and not (measurement_path or seal_path):
+        entry = INSTRUMENT_MEASUREMENTS.get(instrument_version)
+        if entry:
+            measurement_path = entry["measurement"]
+            seal_path = entry["seal"]
+        else:
+            return {
+                "gate_version": GATE_VERSION,
+                "instrument": instrument_version,
+                "reviewer_provenance": "AI_REVIEW",
+                "state": "UNKNOWN_NOT_CALIBRATED",
+                "terminal_kill_admissible": False,
+                "reason": ("no measurement registry entry for this "
+                           "instrument version — an unmeasured "
+                           "instrument has no measured terminal "
+                           "authority (Art. L; fail-closed)"),
+            }
     m_path = Path(measurement_path or MEASUREMENT_PATH)
     s_path = Path(seal_path or SEAL_PATH)
     base = {
         "gate_version": GATE_VERSION,
-        "instrument": GATED_INSTRUMENT_VERSION,
+        "instrument": (instrument_version or GATED_INSTRUMENT_VERSION),
         "reviewer_provenance": "AI_REVIEW",
     }
     if not m_path.exists():
@@ -219,7 +267,13 @@ def gate_attack_record(attack_record: Optional[Dict[str, Any]],
         return attack_record
     if attack_record.get("overall") != "KILLED":
         return attack_record
-    st = state if state is not None else resolve_state()
+    # R447: resolve the calibration state FOR THE RECORD'S OWN
+    # instrument version (v2 records consult the v2 measurement;
+    # legacy v1 records consult the R412/R417 measurement; an unknown
+    # version fails closed above)
+    st = state if state is not None else resolve_state(
+        instrument_version=attack_record.get("attack_version")
+        or GATED_INSTRUMENT_VERSION)
     if st.get("terminal_kill_admissible"):
         return attack_record
     escalated = dict(attack_record)
@@ -237,7 +291,8 @@ def gate_attack_record(attack_record: Optional[Dict[str, Any]],
     escalated["preserved_objections"] = kills
     escalated["escalation"] = {
         "gate_version": GATE_VERSION,
-        "instrument": GATED_INSTRUMENT_VERSION,
+        "instrument": (attack_record.get("attack_version")
+                       or GATED_INSTRUMENT_VERSION),
         "calibration_state": st.get("state"),
         "terminal_kill_admissible": False,
         "measured": st.get("measured"),
