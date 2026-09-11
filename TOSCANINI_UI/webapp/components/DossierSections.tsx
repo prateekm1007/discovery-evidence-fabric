@@ -102,7 +102,12 @@ export type DesignTabData = DossierTab & {
     envelope?: [number, number] | null;
   }[];
   key_dimensions?: unknown;
-  components?: (string | { name?: string; role?: string; type?: string })[];
+  components?: (string | {
+    name?: string;
+    label?: string;
+    role?: string;
+    type?: string;
+  })[];
   renders?: {
     status?: string;
     hero_png?: string;
@@ -365,9 +370,20 @@ export function ModelDetailsSection({
   // component selector uses the CANONICAL component IDs — the same ids
   // the GLB scene graph carries (R433 section 5); chips highlight the
   // named node in the stage hero. NOT VISUALIZED entries are surfaced.
+  // R447: `name` is the stable-vocabulary GLB node id (what the
+  // browser's GLTFLoader actually produces); `label` is the recorded
+  // human text shown on the chip when present — match by name,
+  // display the label, never the reverse (frontend truth traces to
+  // the canonical backend object, Art. III/X).
   const componentIds = (d.components || [])
-    .map((c) => (typeof c === "string" ? c : (c as { name?: string })?.name))
-    .filter((c): c is string => Boolean(c));
+    .map((c) => (typeof c === "string"
+      ? { name: c, label: c }
+      : {
+          name: (c as { name?: string })?.name || "",
+          label: (c as { label?: string })?.label
+            || (c as { name?: string })?.name || "",
+        }))
+    .filter((c): c is { name: string; label: string } => Boolean(c.name));
   const notVisualized = d.not_visualized || d.scores?.not_visualized || [];
 
   return (
@@ -443,20 +459,20 @@ export function ModelDetailsSection({
           <div className="comp-select" data-component-selector>
             {componentIds.map((c) => (
               <button
-                key={c}
+                key={c.name}
                 type="button"
-                className={`chip${highlight === c ? " on" : ""}`}
-                data-component-id={c}
-                onClick={() => onHighlight(highlight === c ? null : c)}
+                className={`chip${highlight === c.name ? " on" : ""}`}
+                data-component-id={c.name}
+                onClick={() => onHighlight(highlight === c.name ? null : c.name)}
                 title={
                   heroSuppressed
                     ? "recorded component of the canonical architecture"
-                    : highlight === c
+                    : highlight === c.name
                       ? "clear highlight"
                       : "highlight on stage"
                 }
               >
-                {c}
+                {c.label}
               </button>
             ))}
             {notVisualized.map((c) => (

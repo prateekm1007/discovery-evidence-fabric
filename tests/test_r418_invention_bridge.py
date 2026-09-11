@@ -138,8 +138,16 @@ class TestConceptualGeometry(unittest.TestCase):
             ["ambient source characterization element",
              "transduction stage", "load interface"], "solar panel")
         names = [c["name"] for c in out["components"]]
-        self.assertTrue(any("ambient source characterization element" in n for n in names))
-        self.assertTrue(any("substrate: solar panel" == n for n in names))
+        labels = [c.get("label") or "" for c in out["components"]]
+        # R447: the canonical component identity is the stable-vocabulary
+        # id (the GLB node id); the recorded subsystem text survives as
+        # the label. Both halves are asserted.
+        self.assertTrue(any("01_ambient_source_characterization_element" == n
+                            for n in names))
+        self.assertTrue(any("substrate_solar_panel" == n for n in names))
+        self.assertTrue(any("ambient source characterization element" in l
+                            for l in labels))
+        self.assertTrue(any("substrate: solar panel" == l for l in labels))
 
     def test_glb_is_loadable_with_named_nodes(self):
         import trimesh

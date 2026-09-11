@@ -389,7 +389,8 @@ def _world_signature(glb_path: Path) -> Optional[Dict[str, Any]]:
 
 def independent_geometry_identity(
         source_glb: Optional[str],
-        exported_glb: Path) -> Dict[str, Any]:
+        exported_glb: Path,
+        source_sha_expected: Optional[str] = None) -> Dict[str, Any]:
     """R443-MERGED — geometry identity RE-MEASURED by the gate itself.
 
     The independent audit's geometry_attack demonstrated that a
@@ -400,7 +401,15 @@ def independent_geometry_identity(
     own tools, (2) compares mesh/vert/tri counts AND a scale-invariant
     per-part shape signature (non-uniform substitution changes the
     signature), (3) the caller re-verifies the source GLB's recorded
-    sha256 against the bytes on disk (source substitution catch)."""
+    sha256 against the bytes on disk (source substitution catch).
+
+    R447: the source-sha verification is part of THIS function's
+    contract (source_sha_expected optional param) — a source GLB whose
+    BYTES changed after the scene was solved (any post-solve mutation:
+    node reorder, name swap, transform nudge) fails here even when the
+    identity SET is unchanged, because the recorded source identity no
+    longer matches the bytes on disk. Order is not identity; bytes
+    are provenance."""
     if exported_glb is None or not Path(exported_glb).is_file():
         return {"pass": False,
                 "reason": "exported hero GLB missing on disk"}
@@ -420,6 +429,10 @@ def independent_geometry_identity(
     counts_match = (src_sig["counts"] == out_sig["counts"])
     shape_match = (src_sig["shape"] == out_sig["shape"])
     identical = counts_match and shape_match
+    if source_sha_expected:
+        actual_src = _sha256_file(Path(source_glb))
+        if actual_src != source_sha_expected:
+            identical = False
     diff_parts = sorted(set(src_sig["shape"]) ^ set(out_sig["shape"]))
     changed_parts = sorted(
         k for k in set(src_sig["shape"]) & set(out_sig["shape"])
@@ -727,7 +740,9 @@ def evaluate(out_dir: str,
     #    source_agreement witness above stays as the complementary
     #    spec-side bound check.
     source_glb = render_record.get("source_glb")
-    gi = independent_geometry_identity(source_glb, hero_glb)
+    gi = independent_geometry_identity(
+        source_glb, hero_glb,
+        source_sha_expected=render_record.get("source_glb_sha256"))
     src_sha_expected = render_record.get("source_glb_sha256")
     if src_sha_expected and source_glb and Path(source_glb).is_file():
         actual_src = _sha256_file(Path(source_glb))

@@ -5,18 +5,43 @@ Builds an inspectable conceptual architecture visualization with CadQuery/OCCT
 
 HONESTY RULES (binding):
   * Abstract presentation units only — never mm, never engineering dimensions.
-  * Node names mirror the recorded subsystem names so the viewer's
-    component-inspection panel can explain each component from the CIO.
+  * Node names are CANONICAL COMPONENT IDS in the stable vocabulary (R447);
+    the recorded subsystem text survives verbatim as each part's `label`
+    so the viewer's component-inspection panel can explain each component
+    from the CIO (name == the GLB node id; label == the human text).
   * Deterministic: identical run state -> identical geometry -> identical hash.
   * key_dimensions reports topology only (component count, adjacency);
     it must never carry volume/diameter/wall fields (guarded in epistemics).
+
+R447 — THE NODE-IDENTITY CLOSURE (the Case B defect fix):
+  three.js's GLTFLoader sanitizes every node name it loads
+  (PropertyBinding.sanitizeNodeName: whitespace -> '_', the characters
+  '[', ']', '.', ':', '/' removed; createUniqueName then suffixes
+  post-sanitize collisions). The webapp viewer, the Visual Compiler's
+  renderer, and the exported hero GLB ALL pass through that loader, so
+  a node name outside the sanitize-stable vocabulary can never survive
+  to any three.js surface. The R446-HF Case B gate FAIL
+  (node_identity + geometry_identity) was exactly that divergence:
+  '[01] load path / structural backbone' was authored as the canonical
+  identity but arrived at the hero GLB as
+  '01_load_path__structural_backbone'. The engineering path's
+  snake_case ids were already inside the closure; this module's
+  human-readable names were not. The fix is upstream authoring (never
+  a gate exception, never Coder-2 tolerance): `name` is derived by ONE
+  canonicalizer into the stable vocabulary, `label` keeps the human
+  text, and the identity set is pre-unique so the loader's collision
+  suffixing can never fire. Closure proof: every emitted id contains
+  only [0-9A-Za-z_] with no leading/trailing underscore, so applying
+  the three.js sanitize rule to it is the identity function (tested
+  adversarially in tests/test_r447_geometry_identity_join.py).
 """
 
 from __future__ import annotations
 
 import hashlib
 import math
-from typing import Any, Dict, List, Optional, Tuple
+import re
+from typing import Any, Dict, List, Optional, Set, Tuple
 
 import cadquery as cq
 import trimesh
@@ -42,6 +67,50 @@ BLOCK_H = 1.0 * U
 SUBSTRATE_W = 10.0 * U
 SUBSTRATE_D = 6.0 * U
 SUBSTRATE_T = 0.35 * U
+
+# R447: the stable-vocabulary canonicalizer. The emitted id contains
+# only ASCII alphanumerics and single interior underscores — a strict
+# subset of the three.js sanitize-fixed set, so the id survives
+# GLTFLoader -> scene -> GLTFExporter -> gate -> webapp viewer
+# UNCHANGED (the closure is proven by construction and tested).
+_NON_STABLE = re.compile(r"[^0-9A-Za-z_]+")
+
+
+def stable_node_id(label: str) -> str:
+    """Canonical component id from human-readable text — ONE rule,
+    deterministic, closed under the three.js node-name sanitizer.
+
+    Every character outside [0-9A-Za-z_] becomes an underscore; all
+    underscore runs collapse to one; edges are trimmed; an empty
+    result falls back to 'part'. Uniqueness within one scene is
+    enforced by the caller-side ``_UniqueId`` helper (the loader's
+    collision suffixing must never fire on authored ids — a suffix
+    would be a SECOND name mutation).
+    """
+    s = _NON_STABLE.sub("_", label or "")
+    s = re.sub(r"_+", "_", s).strip("_")
+    return s or "part"
+
+
+class _UniqueId:
+    """Per-scene unique id allocation (deterministic _2/_3 suffixes).
+
+    three.js createUniqueName appends _1, _2... when two names
+    collide AFTER sanitization; an authored collision would therefore
+    mutate a third surface. Allocation here keeps the authored set
+    injective so that path is unreachable."""
+
+    def __init__(self) -> None:
+        self._used: Set[str] = set()
+
+    def __call__(self, label: str) -> str:
+        base = stable_node_id(label)
+        sid, k = base, 1
+        while sid in self._used:
+            k += 1
+            sid = f"{base}_{k}"
+        self._used.add(sid)
+        return sid
 
 
 def _tessellate(shape: cq.Workplane) -> Dict[str, Any]:
@@ -133,9 +202,12 @@ def build_system_architecture(
     substrate = cq.Workplane("XY").box(
         SUBSTRATE_W, SUBSTRATE_D, SUBSTRATE_T, centered=(True, True, False)
     )
-    substrate_name = "substrate: " + (intervention_site or "intervention site")
+    uid = _UniqueId()
+    substrate_label = "substrate: " + (intervention_site or "intervention site")
+    substrate_name = uid(substrate_label)
     _add(scene, substrate, substrate_name, PALETTE["substrate"])
-    parts.append({"name": substrate_name, "type": "substrate",
+    parts.append({"name": substrate_name, "label": substrate_label,
+                  "type": "substrate",
                   "role": "physical intervention site (schematic form — no engineering dimensions)"})
 
     # --- subsystem blocks along the flow axis -------------------------------
@@ -152,11 +224,12 @@ def build_system_architecture(
         x = x0 + i * step
         z = SUBSTRATE_T + (0.0 if kind in ("sensing", "transduction") else 0.25 * U)
         shape = shape.translate((x, 0.0, z))
-        node = f"[{i+1:02d}] {name}"
+        node = uid(f"[{i+1:02d}] {name}")
         _add(scene, shape, node, PALETTE.get(kind, PALETTE["default"]))
         centers.append((x, z, node, kind))
         parts.append({
             "name": node,
+            "label": f"[{i+1:02d}] {name}",
             "type": kind,
             "role": "recorded subsystem (conceptual form — no engineering dimensions)",
             "subsystem_index": i + 1,
@@ -168,9 +241,10 @@ def build_system_architecture(
         x2, z2, _, _ = centers[i + 1]
         p1 = (x1 + block_w * 0.35, 0.95 * U, z1 + BLOCK_H * 0.6)
         p2 = (x2 - block_w * 0.35, 0.95 * U, z2 + BLOCK_H * 0.6)
-        node = f"flow {i+1} -> {i+2}"
+        flow_label = f"flow {i+1} -> {i+2}"
+        node = uid(flow_label)
         _add(scene, _beam(p1, p2, 0.18 * U), node, PALETTE["conduit_data"])
-        parts.append({"name": node, "type": "conduit",
+        parts.append({"name": node, "label": flow_label, "type": "conduit",
                       "role": "recorded data/material flow (topology only)"})
 
     # --- control conduits: compute core -> every other subsystem -------------
@@ -182,9 +256,10 @@ def build_system_architecture(
                 continue
             p1 = (cx, -0.95 * U, cz + BLOCK_H * 1.6 * 0.5)
             p2 = (x, -0.95 * U, z + BLOCK_H * 0.6)
-            node = f"control -> [{i+1:02d}]"
+            control_label = f"control -> [{i+1:02d}]"
+            node = uid(control_label)
             _add(scene, _beam(p1, p2, 0.14 * U), node, PALETTE["conduit_power"])
-            parts.append({"name": node, "type": "conduit",
+            parts.append({"name": node, "label": control_label, "type": "conduit",
                           "role": "control/optimization coupling (topology only)"})
 
     glb = scene.export(file_type="glb")
@@ -224,15 +299,17 @@ def build_conceptual_device(
     layers = layer_names or ["form", "mechanism layer", "interface"]
     scene = trimesh.Scene()
     parts: List[Dict[str, Any]] = []
+    uid = _UniqueId()
     z = 0.0
     w, d = 6.0 * U, 4.0 * U
     palette_cycle = ["substrate", "transduction", "compute", "sensing", "storage", "interface"]
     for i, name in enumerate(layers):
         t = 0.6 * U if i == 0 else 0.35 * U
         layer = cq.Workplane("XY").workplane(offset=z).box(w, d, t, centered=(True, True, False))
-        node = f"layer {i+1}: {name}"
+        layer_label = f"layer {i+1}: {name}"
+        node = uid(layer_label)
         _add(scene, layer, node, PALETTE[palette_cycle[i % len(palette_cycle)]])
-        parts.append({"name": node, "type": "layer",
+        parts.append({"name": node, "label": layer_label, "type": "layer",
                       "role": "conceptual layer (no engineering dimensions)"})
         z += t
 
