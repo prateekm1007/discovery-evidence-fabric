@@ -106,13 +106,53 @@ def _puppeteer_cache_candidates() -> List[str]:
     return out
 
 
+# the fixed system locations probed by _system_chrome_candidates (a
+# module constant so tests can patch the environment boundary)
+_SYSTEM_CHROME_FIXED_PATHS = (
+    "/usr/bin/chromium", "/usr/bin/chromium-browser",
+    "/usr/bin/google-chrome", "/usr/bin/google-chrome-stable",
+    "/snap/bin/chromium", "/opt/google/chrome/chrome",
+)
+
+
+def _system_chrome_candidates() -> List[str]:
+    """Well-known system Chromium/Chrome locations (the Debian/Ubuntu
+    packaging names plus the standard bin dirs). The detached artifact
+    worker's R425 §7 env allowlist legitimately strips CHROME_PATH (a
+    secret-hygiene boundary on the WORKER side), which left hosts whose
+    only Chromium is the system package unable to resolve the renderer:
+    observed live on the R446-HF-PRO Space (16 GB, chromium installed
+    at /usr/bin/chromium) as typed RENDER_SKIPPED_NO_RENDERER while the
+    binary was present and healthy. This probe ADDS candidates to the
+    documented discovery scan — the operator override still wins, the
+    puppeteer cache still precedes it, and the verification contract
+    (the binary must answer --version) is UNCHANGED and fail-closed
+    (every candidate is recorded; nothing is guessed silently)."""
+    names = ("chromium", "chromium-browser", "google-chrome",
+             "google-chrome-stable", "chrome")
+    out: List[str] = []
+    seen = set()
+    for name in names:
+        p = shutil.which(name)
+        if p and p not in seen:
+            seen.add(p)
+            out.append(p)
+    for p in _SYSTEM_CHROME_FIXED_PATHS:
+        if p not in seen and os.path.isfile(p) and os.access(p, os.X_OK):
+            seen.add(p)
+            out.append(p)
+    return out
+
+
 def find_chrome() -> Optional[str]:
     """Resolve + VERIFY the Chromium binary (fail-closed)."""
     trail: List[Dict[str, Any]] = []
     _LAST_RESOLUTION["chrome_candidates"] = trail
     cache_hits = _puppeteer_cache_candidates()
+    system_hits = _system_chrome_candidates()
     candidates = ([("CHROME_PATH", os.environ.get("CHROME_PATH") or "")]
-                  + [("PUPPETEER_CACHE", c) for c in cache_hits])
+                  + [("PUPPETEER_CACHE", c) for c in cache_hits]
+                  + [("SYSTEM_PATH", c) for c in system_hits])
     seen = set()
     for source, c in candidates:
         if not c or c in seen:
@@ -131,6 +171,7 @@ def find_chrome() -> Optional[str]:
             entry["result"] = "ACCEPTED"
             _LAST_RESOLUTION["accepted_chrome"] = c
             _LAST_RESOLUTION["chrome_version"] = ver
+            trail.append(entry)   # the accepted candidate IS evidence too
             return c
         trail.append(entry)
     _LAST_RESOLUTION["accepted_chrome"] = None
