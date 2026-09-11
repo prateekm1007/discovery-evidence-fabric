@@ -538,6 +538,12 @@ def build_cio(session: Dict[str, Any]) -> Optional[Dict[str, Any]]:
             rl.get("state") or "NONE"
 
     package = _package_info(run_dir)
+    # R447 Phase 2: the canonical package terminal state from the ONE
+    # derivation (run_state.package_terminal_state — the same object
+    # /state serves; the CIO consumes it, never re-derives its own
+    # package terminal state, Art. X)
+    from . import run_state as _rs
+    package_terminal = _rs.package_terminal_state(session, run_dir)
 
     cio: Dict[str, Any] = {
         "schema_version": "1.0.0",
@@ -748,6 +754,22 @@ def build_cio(session: Dict[str, Any]) -> Optional[Dict[str, Any]]:
                 if package.get("complete") else None),
             "package_maturity": package.get("maturity"),
             "package_kind": "TECHNOLOGY_TRANSFER_PACKAGE",
+            # R447 Phase 2 — the CANONICAL package terminal state, the
+            # ONE derivation consumed by /state, the CIO, and the
+            # dossier transfer tab (run_state.package_terminal_state):
+            # package_state / blocked_stage / blocked_reason /
+            # release_verdict / next_action. The blocked reason is
+            # never hidden on disk again (the R446-HF Case C defect);
+            # the field names match the in-run cio_update vocabulary
+            # (package_blocked / package_blocked_reason) so one
+            # consumer contract covers both the live and reloaded CIO.
+            "package_terminal": package_terminal,
+            "package_blocked": bool(
+                package_terminal.get("package_state") == "BLOCKED"),
+            "package_blocked_reason": (
+                package_terminal.get("blocked_stage")
+                if package_terminal.get("package_state") == "BLOCKED"
+                else None),
             # R422 (directive 3 — package UX): the REAL document count
             # from the package's own manifest (BRIDGE_REPORT
             # package_out.manifest file_count, or the buyer package's

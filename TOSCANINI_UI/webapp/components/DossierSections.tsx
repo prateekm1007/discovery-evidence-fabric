@@ -923,6 +923,10 @@ export function PackageSection({ tab }: { tab: DossierTab }) {
     document_count?: number | null;
     package_origin?: string | null;
     package_state?: string | null;
+    package_blocked_stage?: string | null;
+    package_blocked_reason?: string | null;
+    package_next_action?: string | null;
+    package_release_verdict?: string | null;
     visual_gate_verdict?: string | null;
     evidence_coverage?: { used_in_design?: number; retrieved?: number } | null;
     validation_state?: unknown;
@@ -931,6 +935,37 @@ export function PackageSection({ tab }: { tab: DossierTab }) {
     build_requirements?: unknown;
   };
   if (tab.availability !== "AVAILABLE") {
+    // R447 Phase 2: a BLOCKED package is a typed terminal state from
+    // the canonical object (run_state.package_terminal_state) — the
+    // stage, the verbatim reason, and the typed next action are
+    // rendered from the backend record, never guessed here.
+    if (t.package_blocked_stage) {
+      return (
+        <div className="tab-note tn-not_established">
+          <AvailPill tab={tab} />
+          <span>
+            The package build was blocked at{" "}
+            <b>{t.package_blocked_stage}</b> — no package is presented
+            (an honest absence, never a partial ZIP).
+          </span>
+          {t.package_blocked_reason && (
+            <div className="faint tab-reason">
+              <b>Reason:</b> {t.package_blocked_reason}
+            </div>
+          )}
+          {t.package_next_action && (
+            <div className="faint tab-reason">
+              <b>Next action:</b> {t.package_next_action}
+            </div>
+          )}
+          {t.package_release_verdict && (
+            <div className="faint tab-reason">
+              <b>Release verdict:</b> {t.package_release_verdict}
+            </div>
+          )}
+        </div>
+      );
+    }
     return <PendingNote tab={tab} />;
   }
   return (

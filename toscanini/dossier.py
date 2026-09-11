@@ -663,14 +663,37 @@ def build_dossier(session: Dict[str, Any]) -> Dict[str, Any]:
             "technology package pending — built automatically when the "
             "investigation completes with a surviving architecture")
     else:
-        why = (package_state.get("reason")
-               or (package_state.get("why")))
+        # R447 Phase 2: the canonical terminal object (run_state.
+        # package_terminal_state) — the blocked stage/reason and the
+        # typed next_action from the run's OWN records (the compiler's
+        # PACKAGE_BUILD_BLOCKED.json + the persisted gate verdict),
+        # never a generic guess (the R446-HF Case C defect: the reason
+        # existed on disk but no product route surfaced it)
+        blocked_stage = package_state.get("blocked_stage")
+        blocked_reason = package_state.get("blocked_reason")
+        next_action = (package_state.get("next_action") or {})
+        if blocked_stage:
+            why = (f"the package build was BLOCKED at {blocked_stage}"
+                   + (f" — {blocked_reason}"
+                      if blocked_reason else "")
+                   + f". {next_action.get('text', '')}".rstrip(".")
+                   + ".")
+        else:
+            why = (next_action.get("text")
+                   or ("no technology package on this run — the "
+                       "recorded reason is the truth"))
         transfer = _tab(
-            "NOT_ESTABLISHED", "UNKNOWN",
-            why or ("no technology package on this run — the recorded "
-                    "reason is the truth (typically: the decisive "
-                    "physical experiment is specified but not "
-                    "executed)"))
+            "NOT_ESTABLISHED", "UNKNOWN", why,
+            package_state=package_state.get("package_state"),
+            package_blocked_stage=blocked_stage,
+            package_blocked_reason=(blocked_reason
+                                    if isinstance(blocked_reason, str)
+                                    else None),
+            package_next_action=next_action.get("action"),
+            package_release_verdict=(
+                (package_state.get("release_verdict") or {})
+                .get("verdict")),
+        )
 
     # ------------------------------------------------------------------
     # FALSIFICATION DOSSIER (directive section 14) — only when a

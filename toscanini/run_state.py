@@ -421,7 +421,172 @@ def _experiment_state(session: Dict, run_dir: Optional[Path]) -> Dict:
     }
 
 
-def _package_state(session: Dict, run_dir: Optional[Path]) -> Dict:
+def package_terminal_state(session: Dict, run_dir: Optional[Path]) -> Dict:
+    """R447 Phase 2 — THE canonical package terminal state.
+
+    The R446-HF Case C defect: the package compiler wrote an honest
+    PACKAGE_BUILD_BLOCKED.json (stage + detail) into the run dir, but
+    no product route surfaced it — the canonical state said
+    NOT_PRODUCED with the reason hidden on disk, and the dossier
+    substituted a generic guess. This function is the ONE derivation
+    every surface consumes (the /state route, the CIO downloads
+    block, the dossier transfer tab — Art. X one authority):
+
+      package_state    READY | BLOCKED | PENDING | NOT_PRODUCED
+                       (BLOCKED = the compiler's own blocked record
+                       exists; NOT_PRODUCED = no package attempt
+                       record at all — distinct epistemic states,
+                       Art. LXI)
+      blocked_stage    the compiler's typed stage (e.g.
+                       QUALITY_GATE_BLOCKED, MODEL_VALIDATION_FAILED,
+                       COMPILE_ERROR) or None
+      blocked_reason   the record's detail, verbatim (capped for the
+                       surface, full text stays in the record)
+      release_verdict  from the run's OWN gate records — never
+                       guessed: the persisted
+                       PACKAGE_QUALITY_GATE_VERDICT.json when present
+                       (PASS/BLOCKED + failed gates), else typed
+                       NOT_RUN with the honest note
+      next_action      a deterministic typed action + one human
+                       sentence derived from the same records — the
+                       same object feeds the UI without frontend
+                       guessing (directive: the canonical state
+                       exposes it; the UI consumes it)
+    """
+    pkg = _package_artifact(run_dir)
+    session_pkg = session.get("package") or {}
+    complete = bool(pkg.get("complete") or session_pkg.get("complete"))
+    blocked_rec = _read_json(run_dir / "PACKAGE_BUILD_BLOCKED.json") \
+        if run_dir and run_dir.exists() else None
+    gate_verdict = _read_json(
+        run_dir / "PACKAGE_QUALITY_GATE_VERDICT.json") \
+        if run_dir and run_dir.exists() else None
+    running = session.get("status") in _RUNNING_STATUSES
+
+    # --- release verdict: the run's own records, never inferred ------
+    if gate_verdict:
+        release_verdict = {
+            "verdict": gate_verdict.get("package_quality"),
+            "failed_gates": (gate_verdict.get("failed_gates")
+                             or [])[:8],
+            "warned_gates": (gate_verdict.get("warned_gates")
+                             or [])[:8],
+            "source": "PACKAGE_QUALITY_GATE_VERDICT.json",
+        }
+    elif blocked_rec:
+        release_verdict = {
+            "verdict": "NOT_RUN",
+            "failed_gates": [],
+            "warned_gates": [],
+            "source": None,
+            "note": ("the package was blocked before the quality gate "
+                     "ran — no release verdict exists to report (the "
+                     "blocked stage is the reason)"),
+        }
+    else:
+        release_verdict = {
+            "verdict": None,
+            "failed_gates": [],
+            "warned_gates": [],
+            "source": None,
+            "note": ("no persisted package gate verdict for this run — "
+                     "unknown stays unknown (Art. XXV)"),
+        }
+
+    # --- the blocked reason, verbatim from the record ----------------
+    blocked_stage = None
+    blocked_reason = None
+    if blocked_rec:
+        blocked_stage = blocked_rec.get("stage")
+        detail = blocked_rec.get("detail")
+        if isinstance(detail, str):
+            blocked_reason = detail[:600]
+        elif detail is not None:
+            try:
+                blocked_reason = json.dumps(detail, default=str)[:600]
+            except Exception:  # noqa: BLE001 — record stands, cap fails
+                blocked_reason = str(detail)[:600]
+
+    # --- next_action: deterministic from the same records -------------
+    if blocked_rec:
+        stage = blocked_stage or "UNKNOWN_STAGE"
+        if stage == "QUALITY_GATE_BLOCKED":
+            failed = ", ".join(
+                str(g) for g in (release_verdict.get("failed_gates")
+                                 or [])[:4]) or "recorded gate failures"
+            next_action = {
+                "action": "RESOLVE_GATE_FAILURES",
+                "text": (f"the package quality gate blocked this build "
+                         f"({failed}); the run's geometry, evidence and "
+                         f"experiment records remain inspectable — no "
+                         f"package is presented until the recorded "
+                         f"gate failures are resolved"),
+            }
+        elif stage in ("MODEL_VALIDATION_FAILED", "COMPILE_ERROR"):
+            next_action = {
+                "action": "INSPECT_QUARANTINE",
+                "text": (f"the package compiler blocked this build at "
+                         f"{stage}; the quarantined build tree in "
+                         f"PACKAGE_QUARANTINE/ carries the evidence — "
+                         f"an honest absence, never a partial package"),
+            }
+        else:
+            next_action = {
+                "action": "INSPECT_BLOCKED_RECORD",
+                "text": (f"the package build was blocked at {stage}; "
+                         f"PACKAGE_BUILD_BLOCKED.json in the run "
+                         f"directory carries the full record"),
+            }
+    elif running:
+        next_action = {
+            "action": "WAIT_FOR_RUN",
+            "text": ("the run is still working — the package is built "
+                     "automatically when the investigation completes "
+                     "with a surviving architecture"),
+        }
+    else:
+        next_action = {
+            "action": "NO_PACKAGE_RECORD",
+            "text": ("no package record exists for this run — the "
+                     "package stage either did not run or its record "
+                     "is absent; the run's own stage records are the "
+                     "next place to look"),
+        }
+
+    # --- the terminal state resolution (the ONE place) -----------------
+    if complete:
+        package_state = "READY"
+        # the promoted ZIP is the current terminal authority; a blocked
+        # record from a superseded attempt stays ON DISK (history is
+        # evidence, Art. XI) but never surfaces as the CURRENT reason
+        blocked_stage = None
+        blocked_reason = None
+    elif blocked_stage is not None:
+        # the compiler's own blocked record: a BLOCKED build is a
+        # first-class terminal state, distinct from NOT_PRODUCED (no
+        # attempt record) — Art. LXI discipline at the package layer
+        package_state = "BLOCKED"
+    elif running:
+        package_state = "PENDING"
+    else:
+        package_state = "NOT_PRODUCED"
+
+    return {
+        "state": package_state,
+        "package_state": package_state,
+        "blocked_stage": blocked_stage,
+        "blocked_reason": blocked_reason,
+        "release_verdict": release_verdict,
+        "next_action": next_action,
+        "maturity": pkg.get("maturity") or session_pkg.get("maturity"),
+        "zip_name": pkg.get("zip_name") or session_pkg.get("zip_name"),
+        "package_kind": pkg.get("package_kind") or (
+            "TECHNOLOGY_TRANSFER_PACKAGE" if complete else None),
+        "package_origin": pkg.get("package_origin"),
+    }
+
+
+def _package_artifact(run_dir: Optional[Path]) -> Dict:
     # R414 fix: package presence from the run's own PACKAGE_REPORT +
     # DOWNLOAD dir (the worker persists it there; the session INDEX may
     # lag — the run dir is the authority, Art. X)
@@ -463,22 +628,20 @@ def _package_state(session: Dict, run_dir: Optional[Path]) -> Dict:
                        "zip_name": zp.name,
                        "package_kind": "TECHNOLOGY_TRANSFER_PACKAGE",
                        "package_origin": "INVENTION_BRIDGE"}
-    session_pkg = session.get("package") or {}
-    complete = bool(pkg.get("complete") or session_pkg.get("complete"))
-    return {
-        "state": ("READY" if complete
-                  else "PENDING" if session.get("status") in
-                  _RUNNING_STATUSES else "NOT_PRODUCED"),
-        "maturity": pkg.get("maturity") or session_pkg.get("maturity"),
-        "zip_name": pkg.get("zip_name") or session_pkg.get("zip_name"),
-        "package_kind": pkg.get("package_kind") or (
-            "TECHNOLOGY_TRANSFER_PACKAGE" if complete else None),
-        "package_origin": pkg.get("package_origin"),
-        # R423A Phase 3: ONE package — the counsel export is no longer a
-        # separate customer surface, so no counsel_package_available
-        # field is projected (the technical evidence rides inside the
-        # one technology transfer package).
-    }
+    return pkg
+
+
+def _package_state(session: Dict, run_dir: Optional[Path]) -> Dict:
+    # R447 Phase 2: the canonical terminal object — the ONE derivation
+    # (package_terminal_state) consumed by /state, the CIO downloads
+    # block, and the dossier transfer tab; the blocked reason is never
+    # hidden on disk again (the R446-HF Case C defect).
+    #
+    # R423A Phase 3: ONE package — the counsel export is no longer a
+    # separate customer surface, so no counsel_package_available
+    # field is projected (the technical evidence rides inside the
+    # one technology transfer package).
+    return package_terminal_state(session, run_dir)
 
 
 def _failure_state(session: Dict, run_dir: Optional[Path]) -> Dict:

@@ -908,6 +908,16 @@ def compile_package(
         for old in work.glob("TECHNOLOGY_TRANSFER_PACKAGE_*.zip"):
             if old != zip_final:
                 old.unlink()
+        # R447 Phase 2: a superseded BLOCKED record never survives a
+        # successful promotion — READY + a current blocked record is an
+        # impossible state at the canonical surface (the record's own
+        # history stays in git; the run dir reports the CURRENT build)
+        stale_blocked = work / "PACKAGE_BUILD_BLOCKED.json"
+        if stale_blocked.exists():
+            try:
+                stale_blocked.unlink()
+            except OSError:
+                pass
         shutil.rmtree(tmp, ignore_errors=True)
         # Directive 2 binding (R440): the DISCOVERY_RELEASE record now
         # binds to the promoted transfer artifact by hash — written
