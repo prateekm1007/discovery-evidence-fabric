@@ -359,6 +359,25 @@ def _spawn_job(session_id: str) -> subprocess.Popen:
 # and the observer snapshots terminal renders within its scan interval.
 # The R420 persistence contract (renders survive the next restart) is
 # preserved with a bounded delay instead of a worker-held secret.
+#
+# R446-HF (measured 2026-09-11): CHROME_PATH and NODE_PATH are added to
+# the allowlist. The R441 Visual Compiler's async render path resolves
+# its Chromium/Node pair inside THIS worker (render_worker.find_chrome:
+# CHROME_PATH env var first, then the puppeteer cache; find_node: PATH).
+# The allowlist predated the Visual Compiler and passed only the Blender
+# binary variables, so on any deployment where Chromium is a SYSTEM
+# binary (Debian apt / Docker ENV CHROME_PATH) rather than a
+# puppeteer-cache install, the detached render job typed-skipped
+# RENDER_SKIPPED_NO_RENDERER — measured live on the Hugging Face
+# production-validation deployment (hf-case-a, ts_cd737f153f70: memory
+# guard PASSED on the 16 GB host, renderer resolution FAILED). The
+# sandbox measurements never saw this because Chromium lived in the
+# puppeteer cache there; Render production never saw it because the
+# 512 MB memory guard skipped first. Transport/binary-resolution
+# variables only — same security class as BLENDER_PATH, and the Level-2
+# renderer allowlist (visual_compiler/render_worker.py::
+# RENDER_ENV_ALLOWLIST, which already carried both) is unchanged and
+# still filters everything else.
 # ---------------------------------------------------------------------------
 WORKER_ENV_ALLOWLIST = (
     "PATH",                 # resolve python/blender binaries + git for
@@ -370,6 +389,12 @@ WORKER_ENV_ALLOWLIST = (
     "PYTHONUNBUFFERED",     # log flushing discipline
     "OMP_NUM_THREADS",      # the thread pin the renderer applies
     "BLENDER_PATH",         # the pinned-build override (provenance)
+    "CHROME_PATH",          # R446-HF: the Visual Compiler's Chromium
+                            # binary resolution (see the block comment;
+                            # the async render's documented first
+                            # resolution candidate)
+    "NODE_PATH",            # R446-HF: parity with the Level-2 renderer
+                            # allowlist (visual_compiler render_worker)
     "ENGINE_RENDER_INWORKER_TIMEOUT_S",   # in-worker budget override
     "ENGINE_RENDER_ASYNC_TIMEOUT_S",      # async budget override
     "DURABLE_STATE_ENABLED",   # the worker still KNOWS whether durable

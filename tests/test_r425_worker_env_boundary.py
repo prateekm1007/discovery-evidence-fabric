@@ -238,3 +238,83 @@ class TestBoundaryNotWeakened:
                       "OMP_NUM_THREADS", "BLENDER_PATH",
                       "PYTHONIOENCODING"):
             assert entry in bridge_render.RENDER_ENV_ALLOWLIST
+
+
+class TestR446HfVisualBinaryResolution:
+    """R446-HF: the detached artifact worker must be able to resolve the
+    Visual Compiler's Chromium/Node pair.
+
+    Measured defect (2026-09-11, the HF production-validation deployment,
+    run ts_cd737f153f70): the async render job typed-skipped
+    RENDER_SKIPPED_NO_RENDERER on a 16 GB host whose memory guard PASSED —
+    because WORKER_ENV_ALLOWLIST predates the Visual Compiler and stripped
+    CHROME_PATH (system-Chromium deployments have no puppeteer cache).
+    The fix carries the binary-resolution variables at Level 1; these
+    tests pin BOTH halves: the renderer variables pass, and every secret
+    (including a future one) still does not."""
+
+    def test_chrome_and_node_path_pass_level1(self, poisoned_env,
+                                              monkeypatch):
+        monkeypatch.setenv("CHROME_PATH", "/usr/bin/chromium")
+        monkeypatch.setenv("NODE_PATH", "/usr/local/lib/node_modules")
+        env = artifact_worker._worker_subprocess_env()
+        assert env.get("CHROME_PATH") == "/usr/bin/chromium", \
+            "CHROME_PATH stripped: the async Visual Compiler render " \
+            "cannot resolve a system Chromium (the R446-HF measured " \
+            "RENDER_SKIPPED_NO_RENDERER defect)"
+        assert env.get("NODE_PATH") == "/usr/local/lib/node_modules"
+        # and the secrets are STILL absent in the same construction
+        for k, v in POISONED_SECRETS.items():
+            assert env.get(k) is None, f"SECRET {k} LEAKED alongside fix"
+
+    def test_system_chromium_resolution_contract(self, poisoned_env,
+                                                 monkeypatch, tmp_path):
+        """The exact deployment shape that failed on HF: CHROME_PATH set
+        to a system binary, no puppeteer cache under HOME. find_chrome
+        must ACCEPT it through the worker-level env (the Level-1
+        precondition for the async render)."""
+        chrome = tmp_path / "chromium"
+        chrome.write_text("#!/bin/sh\necho 'Chromium 140.0.0.0'\n")
+        chrome.chmod(0o755)
+        monkeypatch.setenv("CHROME_PATH", str(chrome))
+        monkeypatch.setenv("HOME", str(tmp_path))  # no puppeteer cache
+        env = artifact_worker._worker_subprocess_env()
+        from discovery_fabric.engine.visual_compiler import (
+            render_worker as vc_worker)
+        # simulate the worker process boundary: find_chrome reads THIS
+        # constructed env, not the test process's os.environ
+        import os as _os
+        old = _os.environ.copy()
+        try:
+            _os.environ.clear()
+            _os.environ.update(env)
+            accepted = vc_worker.find_chrome()
+        finally:
+            _os.environ.clear()
+            _os.environ.update(old)
+        assert accepted == str(chrome), (
+            "the Visual Compiler could not resolve a CHROME_PATH-pointed "
+            "system Chromium under the artifact-worker env — the async "
+            "render typed-skips NO_RENDERER (R446-HF defect regression)")
+
+    def test_level2_visual_compiler_allowlist_unchanged(self):
+        """The Level-2 visual-compiler renderer allowlist still carries
+        its documented pair (and still excludes every secret class)."""
+        from discovery_fabric.engine.visual_compiler import (
+            render_worker as vc_worker)
+        for entry in ("PATH", "HOME", "TMPDIR", "LANG", "LC_ALL",
+                      "OMP_NUM_THREADS", "PYTHONIOENCODING", "NODE_PATH",
+                      "CHROME_PATH", "ENGINE_VC_TIMEOUT_S"):
+            assert entry in vc_worker.RENDER_ENV_ALLOWLIST
+        for secret in POISONED_SECRETS:
+            assert secret not in vc_worker.RENDER_ENV_ALLOWLIST
+            assert secret not in artifact_worker.WORKER_ENV_ALLOWLIST
+
+    def test_allowlist_remains_absent_by_construction(self):
+        """The R425 §7 invariant survives the R446-HF addition: no
+        wildcard, no pass-through marker, explicit names only."""
+        assert "*" not in artifact_worker.WORKER_ENV_ALLOWLIST
+        assert len(set(artifact_worker.WORKER_ENV_ALLOWLIST)) == \
+            len(artifact_worker.WORKER_ENV_ALLOWLIST)
+        for entry in artifact_worker.WORKER_ENV_ALLOWLIST:
+            assert entry.isupper() and entry and entry.isidentifier()
