@@ -1,0 +1,118 @@
+{
+ "attack_version": "independent_attack/2.0.0",
+ "candidate_id": "cal-19-tail-sized-sidestream-filter",
+ "generator_provider": null,
+ "attacker_provider": "zai",
+ "attacker_model": "zai-org/GLM-5.3",
+ "independence_mode": "SEPARATE_CONTEXT",
+ "independence_note": "the attacker ran in an independent reasoning context (fresh adversarial conversation, generator reasoning never shown; no alternative provider credentialed \u2014 disclosed, never claimed as provider separation)",
+ "prompt_hash": "e23fff03a82974086cd8a557ae62ce838b6cc663b2b47820c76d11f5938835b8",
+ "output_hash": "8f66226f67e0bd553162c6bd4c27c423f38fe5efc399751f8555954299fac68c",
+ "llm_status": "OK",
+ "attacked_at": "2026-09-11T22:43:55+00:00Z",
+ "items": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "verdict": "KILL",
+   "basis": "The filter media is sized on P95 load (3.6 kg/h), but the mechanism's stated target is the dump episodes, which by the load study's own heavy-tailed structure sit ABOVE P95 (14 episodes in ~13,000 operating hours is roughly the P99-and-beyond region, not the P95 region). A media bed sized to capture 3.6 kg/h is, by its own sizing basis, undersized for the episodic loads it exists to catch; the flow-share boost (10%\u219225%) increases water throughput, not solids capture capacity per the sizing claim. The claimed 5x suppression of episode clogging therefore rests on a filter being adequate in exact",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item '18-month suspended-solids load study: the load is HEAVY-TAILED \u2014 median 0.6 kg/h but P95 = 3.6 kg/h and P99 = 6.1 kg/h (episodic descaling-line failures dump 6x the median for 2-6 hours, 14 events recorded); average-sized filters blind and bypass during exactly these episodes' (strong overlap: dump, episodes, episodic, exactly)",
+      "verified": true
+     },
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['95', '3.6', '95', '14', '13', '000']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'shows drive 61 percent' (field: mechanism)",
+      "verified": true
+     },
+     {
+      "binding": "declared_scope",
+      "ground": "boundary overlap ['media', 'side', 'sized', 'stream']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "RECORD \"a side-stream dual-media filter sized on the MEASURED TAIL (P95 = 3.6 kg/h)\" combined with RECORD \"catches the dump episodes that the load study shows drive 61 percent of clogging\" | COMPUTATI",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "verdict": "SURVIVE",
+   "basis": "The candidate stays within \"side-stream only (supply pressure untouched)\": the hydraulic audit confirms 25% side-stream share is available within existing pump head, and the dump-response peak is exactly 25%, so the boundary clause is respected at maximum demand. GROUNDED_IN: EVIDENCE ev:sidestream-flow \"25 percent side-stream share is available within existing pump head\" | COMPUTATION peak demand 25% = available 25%, no head shortfall; no clause violated."
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "verdict": "INVALID",
+   "basis": "The predicted",
+   "invalid_reason": "KILL without a concrete basis (< 40 chars) \u2014 a naked assertion is not a valid kill (Art. XVIII: model verdicts are validated, never blindly applied)"
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "verdict": "INVALID",
+   "basis": "",
+   "invalid_reason": "class absent from response"
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "verdict": "INVALID",
+   "basis": "",
+   "invalid_reason": "class absent from response"
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "verdict": "INVALID",
+   "basis": "",
+   "invalid_reason": "class absent from response"
+  }
+ ],
+ "state": "ATTACK_RUN",
+ "overall": "KILLED",
+ "kill_basis": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "basis": "The filter media is sized on P95 load (3.6 kg/h), but the mechanism's stated target is the dump episodes, which by the load study's own heavy-tailed structure sit ABOVE P95 (14 episodes in ~13,000 operating hours is roughly the P99-and-beyond region, not the P95 region). A media bed sized to capture 3.6 kg/h is, by its own sizing basis, undersized for the episodic loads it exists to catch; the flow-share boost (10%\u219225%) increases water throughput, not solids capture capacity per the sizing claim. The claimed 5x suppression of episode clogging therefore rests on a filter being adequate in exact",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item '18-month suspended-solids load study: the load is HEAVY-TAILED \u2014 median 0.6 kg/h but P95 = 3.6 kg/h and P99 = 6.1 kg/h (episodic descaling-line failures dump 6x the median for 2-6 hours, 14 events recorded); average-sized filters blind and bypass during exactly these episodes' (strong overlap: dump, episodes, episodic, exactly)",
+      "verified": true
+     },
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['95', '3.6', '95', '14', '13', '000']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'shows drive 61 percent' (field: mechanism)",
+      "verified": true
+     },
+     {
+      "binding": "declared_scope",
+      "ground": "boundary overlap ['media', 'side', 'sized', 'stream']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "RECORD \"a side-stream dual-media filter sized on the MEASURED TAIL (P95 = 3.6 kg/h)\" combined with RECORD \"catches the dump episodes that the load study shows drive 61 percent of clogging\" | COMPUTATI",
+    "absence_ground": false
+   }
+  }
+ ],
+ "counts": {
+  "KILL": 1,
+  "RISK": 0,
+  "SURVIVE": 1,
+  "ABSTAIN_DEMOTED": 0,
+  "INVALID": 4
+ }
+}

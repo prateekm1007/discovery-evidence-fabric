@@ -1,0 +1,156 @@
+{
+ "attack_version": "independent_attack/2.0.0",
+ "candidate_id": "cal-11-bounded-flow-boost",
+ "generator_provider": null,
+ "attacker_provider": "zai",
+ "attacker_model": "zai-org/GLM-5.3",
+ "independence_mode": "SEPARATE_CONTEXT",
+ "independence_note": "the attacker ran in an independent reasoning context (fresh adversarial conversation, generator reasoning never shown; no alternative provider credentialed \u2014 disclosed, never claimed as provider separation)",
+ "prompt_hash": "0d0c020a1885ce6d82eb8a5218201c44057808acad32f48f101c627ee3210ad4",
+ "output_hash": "6342946de90db5e767dc12280006895466d6391675a0c722fae6cfaa996f2a62",
+ "llm_status": "OK",
+ "attacked_at": "2026-09-11T22:41:55+00:00Z",
+ "items": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "verdict": "KILL",
+   "basis": "the claimed mechanism is hydraulically incoherent: the 120 flat-fan nozzles are fixed-area orifices, and flow through an orifice scales as Q \u221d \u221a\u0394P; a 20% flow increase through the same nozzle throats requires \u0394P to rise by 1.2\u00b2 = 1.44\u00d7, i.e., 14 bar \u00d7 1.44 \u2248 20.2 bar, which the candidate's own boundary clause forbids (\"header pressure stays 13-15 bar\"); at constant 13-15 bar the throat velocity the entire mechanism depends on cannot increase at all, so the settling-velocity transport claim has no physical driver GROUNDED_IN: RECORD \"raising header flow 20 percent using existing pump headroom i",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['120', '20', '1.2', '1.44', '14', '1.44']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'velocity through each nozzle' (field: mechanism)",
+      "verified": true
+     },
+     {
+      "binding": "declared_scope",
+      "ground": "boundary overlap ['envelope', 'header', 'headroom', 'percent']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "RECORD \"raising header flow 20 percent using existing pump headroom increases convective flushing velocity through each nozzle throat\" + COMPUTATION Q \u221d \u221a\u0394P: 1.2\u00d7 flow needs 1.44\u00d7 \u0394P = 20.2 bar from a",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "verdict": "KILL",
+   "basis": "the intervention as specified cannot satisfy its own boundary clause: delivering the 20% header flow increase through the unchanged 120-nozzle array mathematically forces header pressure to ~20 bar, directly violating the declared \"header pressure stays 13-15 bar\" envelope; the candidate simultaneously asserts the flow boost, the fixed nozzle hardware (\"no hardware change\"), and the pressure bound, and these three claims are mutually exclusive, so the declared operating envelope is violated by the intervention itself, not merely at risk GROUNDED_IN: SCOPE \"header pressure stays 13-15 bar\" + RE",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['20', '120', '20', '13', '15', '13']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'supply valve setpoint change' (field: intervention)",
+      "verified": true
+     },
+     {
+      "binding": "declared_scope",
+      "ground": "boundary overlap ['envelope', 'header', 'pressure', 'stays']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "SCOPE \"header pressure stays 13-15 bar\" + RECORD \"supply valve setpoint change ... no hardware",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "verdict": "INVALID",
+   "basis": "",
+   "invalid_reason": "class absent from response"
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "verdict": "INVALID",
+   "basis": "",
+   "invalid_reason": "class absent from response"
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "verdict": "INVALID",
+   "basis": "",
+   "invalid_reason": "class absent from response"
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "verdict": "INVALID",
+   "basis": "",
+   "invalid_reason": "class absent from response"
+  }
+ ],
+ "state": "ATTACK_RUN",
+ "overall": "KILLED",
+ "kill_basis": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "basis": "the claimed mechanism is hydraulically incoherent: the 120 flat-fan nozzles are fixed-area orifices, and flow through an orifice scales as Q \u221d \u221a\u0394P; a 20% flow increase through the same nozzle throats requires \u0394P to rise by 1.2\u00b2 = 1.44\u00d7, i.e., 14 bar \u00d7 1.44 \u2248 20.2 bar, which the candidate's own boundary clause forbids (\"header pressure stays 13-15 bar\"); at constant 13-15 bar the throat velocity the entire mechanism depends on cannot increase at all, so the settling-velocity transport claim has no physical driver GROUNDED_IN: RECORD \"raising header flow 20 percent using existing pump headroom i",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['120', '20', '1.2', '1.44', '14', '1.44']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'velocity through each nozzle' (field: mechanism)",
+      "verified": true
+     },
+     {
+      "binding": "declared_scope",
+      "ground": "boundary overlap ['envelope', 'header', 'headroom', 'percent']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "RECORD \"raising header flow 20 percent using existing pump headroom increases convective flushing velocity through each nozzle throat\" + COMPUTATION Q \u221d \u221a\u0394P: 1.2\u00d7 flow needs 1.44\u00d7 \u0394P = 20.2 bar from a",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "basis": "the intervention as specified cannot satisfy its own boundary clause: delivering the 20% header flow increase through the unchanged 120-nozzle array mathematically forces header pressure to ~20 bar, directly violating the declared \"header pressure stays 13-15 bar\" envelope; the candidate simultaneously asserts the flow boost, the fixed nozzle hardware (\"no hardware change\"), and the pressure bound, and these three claims are mutually exclusive, so the declared operating envelope is violated by the intervention itself, not merely at risk GROUNDED_IN: SCOPE \"header pressure stays 13-15 bar\" + RE",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['20', '120', '20', '13', '15', '13']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'supply valve setpoint change' (field: intervention)",
+      "verified": true
+     },
+     {
+      "binding": "declared_scope",
+      "ground": "boundary overlap ['envelope', 'header', 'pressure', 'stays']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "SCOPE \"header pressure stays 13-15 bar\" + RECORD \"supply valve setpoint change ... no hardware",
+    "absence_ground": false
+   }
+  }
+ ],
+ "counts": {
+  "KILL": 2,
+  "RISK": 0,
+  "SURVIVE": 0,
+  "ABSTAIN_DEMOTED": 0,
+  "INVALID": 4
+ }
+}

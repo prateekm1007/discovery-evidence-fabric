@@ -1,0 +1,97 @@
+{
+ "attack_version": "independent_attack/2.0.0",
+ "candidate_id": "cal-21-corrupt-evidence-bundle",
+ "generator_provider": null,
+ "attacker_provider": "zai",
+ "attacker_model": "zai-org/GLM-5.3",
+ "independence_mode": "SEPARATE_CONTEXT",
+ "independence_note": "the attacker ran in an independent reasoning context (fresh adversarial conversation, generator reasoning never shown; no alternative provider credentialed \u2014 disclosed, never claimed as provider separation)",
+ "prompt_hash": "f6e62bc9e449d24a31a06487e7bc66ba5157c11d5ff8c4a1bc34336f7c440bb7",
+ "output_hash": "d1fd40401d317cef94e5eddadc4afcaae79d4d747816645989f6b9c507753394",
+ "llm_status": "OK",
+ "attacked_at": "2026-09-11T22:44:26+00:00Z",
+ "items": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "verdict": "KILL",
+   "basis": "The stated mechanism acts exclusively on \"scale particles above 100 microns,\" but the failure mode to be beaten is clogging from \"scale particles AND biological growth\"; biological growth (planktonic cells, EPS slime, biofilm flocs) is predominantly sub-100-micron and deformable, so a fixed-apex cyclonic separator cannot remove it by construction, meaning the predicted overall clog-event reduction from 4.1 to 2.6 is unattainable through the claimed mechanism alone regardless of any evidence. GROUNDED_IN: RECORD \"centrifuges scale particles above 100 microns out of the loop continuously\" \u2014 the ",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['100', '100', '4.1', '2.6', '100']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'centrifuges scale particles above' (field: mechanism)",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "RECORD \"centrifuges scale particles above 100 microns out of the loop continuously\" \u2014 the mechanism's own scope excludes the biological co-cause named in the failure definition.",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "verdict": "SURVIVE",
+   "basis": "The intervention is sited on the return line with underflow collection and backflush at roll change, and the supply header is not modified, which is consistent with the stated boundary clauses; no boundary clause is violated by the installation as described. GROUNDED_IN: SCOPE \"return-line installation only; supply untouched; basin settling available\" \u2014 the candidate's siting claim \"one 150 mm hydrocyclone on the return line\" matches it."
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "verdict": "RISK",
+   "basis": "The candidate itself declares its evidence bundle malformed (fragments and truncated titles only), so no held item can either support or contradict the 85 percent removal claim or the 4.1-to-2.6 clog prediction; per the review rules this absence is uncertainty rather than demonstrated failure, but it leaves the quantitative predictions entirely unanchored. GROUNDED_IN: EVIDENCE ev:frag-01 \"TRL-2026-0x91 f... (truncated record)\" and ev:frag-03 \"Hydraulic audit summary (no figures; extraction failed)\" \u2014 no usable content exists to check the claimed numbers"
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "verdict": "INVALID",
+   "basis": "",
+   "invalid_reason": "class absent from response"
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "verdict": "INVALID",
+   "basis": "",
+   "invalid_reason": "class absent from response"
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "verdict": "INVALID",
+   "basis": "",
+   "invalid_reason": "class absent from response"
+  }
+ ],
+ "state": "ATTACK_RUN",
+ "overall": "KILLED",
+ "kill_basis": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "basis": "The stated mechanism acts exclusively on \"scale particles above 100 microns,\" but the failure mode to be beaten is clogging from \"scale particles AND biological growth\"; biological growth (planktonic cells, EPS slime, biofilm flocs) is predominantly sub-100-micron and deformable, so a fixed-apex cyclonic separator cannot remove it by construction, meaning the predicted overall clog-event reduction from 4.1 to 2.6 is unattainable through the claimed mechanism alone regardless of any evidence. GROUNDED_IN: RECORD \"centrifuges scale particles above 100 microns out of the loop continuously\" \u2014 the ",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['100', '100', '4.1', '2.6', '100']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'centrifuges scale particles above' (field: mechanism)",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "RECORD \"centrifuges scale particles above 100 microns out of the loop continuously\" \u2014 the mechanism's own scope excludes the biological co-cause named in the failure definition.",
+    "absence_ground": false
+   }
+  }
+ ],
+ "counts": {
+  "KILL": 1,
+  "RISK": 1,
+  "SURVIVE": 1,
+  "ABSTAIN_DEMOTED": 0,
+  "INVALID": 3
+ }
+}

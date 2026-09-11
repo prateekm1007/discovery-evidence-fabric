@@ -1,0 +1,156 @@
+{
+ "attack_version": "independent_attack/2.0.0",
+ "candidate_id": "cal-03-150um-strainer",
+ "generator_provider": null,
+ "attacker_provider": "zai",
+ "attacker_model": "zai-org/GLM-5.3",
+ "independence_mode": "SEPARATE_CONTEXT",
+ "independence_note": "the attacker ran in an independent reasoning context (fresh adversarial conversation, generator reasoning never shown; no alternative provider credentialed \u2014 disclosed, never claimed as provider separation)",
+ "prompt_hash": "7d194dec8eb18a793fd2d7ba4be06e1284c465aecbb219443e7f024d120e30cb",
+ "output_hash": "ad4005b375255cef531e7fb9458e0665f47ca2d79633e7dcaa6e60f8918a15e7",
+ "llm_status": "OK",
+ "attacked_at": "2026-09-11T22:39:18+00:00Z",
+ "items": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "verdict": "KILL",
+   "basis": "The candidate's core causal claim is that clogging is \"dominated by mill-scale (iron oxide) particles above 200 microns bridging the 3 mm nozzle throats,\" but its own metallurgical analysis of 40 clogged nozzles across 6 campaigns shows 70 percent of blockages are biofilm-slime AGG, not particulate bridging. The mechanism targets at most the residual 30 percent minority cause; a 150-micron strainer physically cannot remove sessile biofilm that colonizes header walls downstream of the strainer, and slime AGG passes a 150-micron screen as a deformable gel. Even with perfect particulate removal, ",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "record id ev:metanalysis-40",
+      "verified": true
+     },
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['200', '3', '40', '6', '70', '30']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'falls to near zero' (field: mechanism)",
+      "verified": true
+     },
+     {
+      "binding": "declared_scope",
+      "ground": "boundary overlap ['header', 'particles', 'present', 'recirculated']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "EVIDENCE ev:metanalysis-40 (\"70 percent of blockages are biofilm-slime AGG\") | RECORD \"clogging is dominated by mill-scale (iron oxide) particles above 200 microns bridging the 3 mm nozzle throats\" | ",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "verdict": "KILL",
+   "basis": "The stated boundary is recirculated water at 32-38 C with biological growth in the loop (per the problem record and the candidate's own microbiological survey showing sessile biofilm coverage on header walls",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Recirculation-loop microbiological survey: sessile biofilm coverage on header walls at 10^6 CFU per square centimeter, slime production rate correlated with 32-38 C water temperature, not with scale particle load' (strong overlap: biofilm, coverage, header, loop)",
+      "verified": true
+     },
+     {
+      "binding": "declared_scope",
+      "ground": "boundary overlap ['header', 'recirculated', 'water', 'with']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": null,
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "verdict": "INVALID",
+   "basis": "",
+   "invalid_reason": "class absent from response"
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "verdict": "INVALID",
+   "basis": "",
+   "invalid_reason": "class absent from response"
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "verdict": "INVALID",
+   "basis": "",
+   "invalid_reason": "class absent from response"
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "verdict": "INVALID",
+   "basis": "",
+   "invalid_reason": "class absent from response"
+  }
+ ],
+ "state": "ATTACK_RUN",
+ "overall": "KILLED",
+ "kill_basis": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "basis": "The candidate's core causal claim is that clogging is \"dominated by mill-scale (iron oxide) particles above 200 microns bridging the 3 mm nozzle throats,\" but its own metallurgical analysis of 40 clogged nozzles across 6 campaigns shows 70 percent of blockages are biofilm-slime AGG, not particulate bridging. The mechanism targets at most the residual 30 percent minority cause; a 150-micron strainer physically cannot remove sessile biofilm that colonizes header walls downstream of the strainer, and slime AGG passes a 150-micron screen as a deformable gel. Even with perfect particulate removal, ",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "record id ev:metanalysis-40",
+      "verified": true
+     },
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['200', '3', '40', '6', '70', '30']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'falls to near zero' (field: mechanism)",
+      "verified": true
+     },
+     {
+      "binding": "declared_scope",
+      "ground": "boundary overlap ['header', 'particles', 'present', 'recirculated']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "EVIDENCE ev:metanalysis-40 (\"70 percent of blockages are biofilm-slime AGG\") | RECORD \"clogging is dominated by mill-scale (iron oxide) particles above 200 microns bridging the 3 mm nozzle throats\" | ",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "basis": "The stated boundary is recirculated water at 32-38 C with biological growth in the loop (per the problem record and the candidate's own microbiological survey showing sessile biofilm coverage on header walls",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Recirculation-loop microbiological survey: sessile biofilm coverage on header walls at 10^6 CFU per square centimeter, slime production rate correlated with 32-38 C water temperature, not with scale particle load' (strong overlap: biofilm, coverage, header, loop)",
+      "verified": true
+     },
+     {
+      "binding": "declared_scope",
+      "ground": "boundary overlap ['header', 'recirculated', 'water', 'with']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": null,
+    "absence_ground": false
+   }
+  }
+ ],
+ "counts": {
+  "KILL": 2,
+  "RISK": 0,
+  "SURVIVE": 0,
+  "ABSTAIN_DEMOTED": 0,
+  "INVALID": 4
+ }
+}

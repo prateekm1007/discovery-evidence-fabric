@@ -1,0 +1,146 @@
+{
+ "attack_version": "independent_attack/2.0.0",
+ "candidate_id": "cal-15-large-throat-swirl-nozzle",
+ "generator_provider": null,
+ "attacker_provider": "zai",
+ "attacker_model": "zai-org/GLM-5.3",
+ "independence_mode": "SEPARATE_CONTEXT",
+ "independence_note": "the attacker ran in an independent reasoning context (fresh adversarial conversation, generator reasoning never shown; no alternative provider credentialed \u2014 disclosed, never claimed as provider separation)",
+ "prompt_hash": "c58efe2d85943865250901d462e2cf46b3fa8f40de45e635d7df92ae946706bd",
+ "output_hash": "a159629d71b45072b3e47bd785e132e9baf69df8eac8b99a3c799880bdd51038",
+ "llm_status": "OK",
+ "attacked_at": "2026-09-11T22:42:56+00:00Z",
+ "items": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "verdict": "KILL",
+   "basis": "The candidate's own scaling law contradicts its own headline number. It states \"bridging scales with throat-to-particle ratio,\" and the throat goes from 3 mm to 6 mm, so the throat-to-particle ratio doubles (6/3 = 2), yielding a 2x bridging-threshold shift, not the claimed \"roughly 4x.\" The entire predicted effect (4.1 \u2192 ~1.8 clogging events) is derived from the 4x figure; with the correct 2x shift per the candidate's own stated mechanism, the predicted reduction is unsupported at its stated magnitude. GROUNDED_IN: RECORD \"the doubled throat raises the bridging particle size threshold by rough",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['3', '6', '6', '3', '2', '2']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'throat raises the bridging' (field: mechanism)",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "RECORD \"the doubled throat raises the bridging particle size threshold by roughly 4x (bridging scales with throat-to-particle ratio)\" | COMPUTATION 6 mm / 3 mm = 2.0x throat-to-particle ratio per the ",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "verdict": "KILL",
+   "basis": "The candidate binds itself to \"same nominal flow class\" at \"14 bar supply,\" but a 6 mm throat versus a 3 mm throat is a 4x flow-area increase (\u03c0(3)\u00b2 = 28.3 mm\u00b2 vs \u03c0(1.5)\u00b2 = 7.1 mm\u00b2), and at fixed 14 bar supply pressure orifice flow scales with area, giving roughly 4x per-nozzle flow \u2014 a different flow class by roughly an order of magnitude more than the declared \"5 percent flow increase.\" The boundary clause and the geometry are mutually exclusive at the stated supply pressure. GROUNDED_IN: SCOPE \"14 bar supply; same nominal flow class\" | COMPUTATION flow area ratio = (6/3)\u00b2 = 4.0x at fixed 14",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['14', '6', '3', '4', '3', '28.3']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'same nominal flow class' (field: boundary_conditions)",
+      "verified": true
+     },
+     {
+      "binding": "declared_scope",
+      "ground": "boundary overlap ['class', 'flow', 'nominal', 'percent']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "SCOPE \"14 bar supply; same nominal flow class\" | COMPUTATION flow area ratio = (6/3)\u00b2 = 4.0x at fixed 14 bar, versus the",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "verdict": "INVALID",
+   "basis": "",
+   "invalid_reason": "class absent from response"
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "verdict": "INVALID",
+   "basis": "",
+   "invalid_reason": "class absent from response"
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "verdict": "INVALID",
+   "basis": "",
+   "invalid_reason": "class absent from response"
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "verdict": "INVALID",
+   "basis": "",
+   "invalid_reason": "class absent from response"
+  }
+ ],
+ "state": "ATTACK_RUN",
+ "overall": "KILLED",
+ "kill_basis": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "basis": "The candidate's own scaling law contradicts its own headline number. It states \"bridging scales with throat-to-particle ratio,\" and the throat goes from 3 mm to 6 mm, so the throat-to-particle ratio doubles (6/3 = 2), yielding a 2x bridging-threshold shift, not the claimed \"roughly 4x.\" The entire predicted effect (4.1 \u2192 ~1.8 clogging events) is derived from the 4x figure; with the correct 2x shift per the candidate's own stated mechanism, the predicted reduction is unsupported at its stated magnitude. GROUNDED_IN: RECORD \"the doubled throat raises the bridging particle size threshold by rough",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['3', '6', '6', '3', '2', '2']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'throat raises the bridging' (field: mechanism)",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "RECORD \"the doubled throat raises the bridging particle size threshold by roughly 4x (bridging scales with throat-to-particle ratio)\" | COMPUTATION 6 mm / 3 mm = 2.0x throat-to-particle ratio per the ",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "basis": "The candidate binds itself to \"same nominal flow class\" at \"14 bar supply,\" but a 6 mm throat versus a 3 mm throat is a 4x flow-area increase (\u03c0(3)\u00b2 = 28.3 mm\u00b2 vs \u03c0(1.5)\u00b2 = 7.1 mm\u00b2), and at fixed 14 bar supply pressure orifice flow scales with area, giving roughly 4x per-nozzle flow \u2014 a different flow class by roughly an order of magnitude more than the declared \"5 percent flow increase.\" The boundary clause and the geometry are mutually exclusive at the stated supply pressure. GROUNDED_IN: SCOPE \"14 bar supply; same nominal flow class\" | COMPUTATION flow area ratio = (6/3)\u00b2 = 4.0x at fixed 14",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['14', '6', '3', '4', '3', '28.3']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'same nominal flow class' (field: boundary_conditions)",
+      "verified": true
+     },
+     {
+      "binding": "declared_scope",
+      "ground": "boundary overlap ['class', 'flow', 'nominal', 'percent']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "SCOPE \"14 bar supply; same nominal flow class\" | COMPUTATION flow area ratio = (6/3)\u00b2 = 4.0x at fixed 14 bar, versus the",
+    "absence_ground": false
+   }
+  }
+ ],
+ "counts": {
+  "KILL": 2,
+  "RISK": 0,
+  "SURVIVE": 0,
+  "ABSTAIN_DEMOTED": 0,
+  "INVALID": 4
+ }
+}

@@ -1,0 +1,146 @@
+{
+ "attack_version": "independent_attack/2.0.0",
+ "candidate_id": "cal-05-per-nozzle-microvalves",
+ "generator_provider": null,
+ "attacker_provider": "zai",
+ "attacker_model": "zai-org/GLM-5.3",
+ "independence_mode": "SEPARATE_CONTEXT",
+ "independence_note": "the attacker ran in an independent reasoning context (fresh adversarial conversation, generator reasoning never shown; no alternative provider credentialed \u2014 disclosed, never claimed as provider separation)",
+ "prompt_hash": "1646f8323a0aecee8d74c0e79c9bf1d273e48038218aaf8d9578274708ebbf13",
+ "output_hash": "76277797bc64a6509955bf90fec37aa1260b0c7dcec333a1e000c296b6902356",
+ "llm_status": "OK",
+ "attacked_at": "2026-09-11T22:40:19+00:00Z",
+ "items": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "verdict": "KILL",
+   "basis": "The claimed novel variable is actuation response time vs particle transit time, and the arithmetic kills it: at 14 bar across a 3 mm throat, water exits at ~sqrt(2\u00b71.4e6/1000) \u2248 53 m/s, so a particle traverses the 3 mm throat in ~56 microseconds; no in-line micro-valve (typical response 1\u201310 ms for solenoid/micro-actuated valves) can actuate within a transit window ~20\u2013200x shorter than its own response time, so the valve fires after the particle has already passed into the throat it was supposed to protect. Additionally, the single standby throat is defeated by any second particle arriving wh",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['14', '3', '2', '1.4', '6', '1000']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'flow to standby throat' (field: mechanism)",
+      "verified": true
+     },
+     {
+      "binding": "declared_scope",
+      "ground": "boundary overlap ['abrasive', 'geometry', 'throat', 'water']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "RECORD \"micro-valve actuation response time versus particle transit time\" + \"diverts flow to a standby throat... so no throat ever bridges\"; COMPUTATION 3 mm / 53 m/s \u2248 5.6e-5 s transit vs \u22651e-3 s val",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "verdict": "KILL",
+   "basis": "The micro-ejector must blow particles back into the supply header, i.e., against a 14 bar static pressure, which requires a motive stream above 14 bar; the only shared supply specified is a 24 V electrical rail, which delivers no pressurized working fluid at all, so the back-blow function cannot operate within the stated 14 bar boundary condition. GROUNDED_IN: RECORD \"an integrated micro-ejector blows the particle back into the header\" + \"shared 24 V rails along the header\"; SCOPE \"supply header at",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['14', '14', '24', '14', '24']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'micro ejector blows the' (field: mechanism)",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "RECORD \"an integrated micro-ejector blows the particle back into the header\" + \"shared 24 V rails along the header\"; SCOPE \"supply header at",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "verdict": "INVALID",
+   "basis": "",
+   "invalid_reason": "class absent from response"
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "verdict": "INVALID",
+   "basis": "",
+   "invalid_reason": "class absent from response"
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "verdict": "INVALID",
+   "basis": "",
+   "invalid_reason": "class absent from response"
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "verdict": "INVALID",
+   "basis": "",
+   "invalid_reason": "class absent from response"
+  }
+ ],
+ "state": "ATTACK_RUN",
+ "overall": "KILLED",
+ "kill_basis": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "basis": "The claimed novel variable is actuation response time vs particle transit time, and the arithmetic kills it: at 14 bar across a 3 mm throat, water exits at ~sqrt(2\u00b71.4e6/1000) \u2248 53 m/s, so a particle traverses the 3 mm throat in ~56 microseconds; no in-line micro-valve (typical response 1\u201310 ms for solenoid/micro-actuated valves) can actuate within a transit window ~20\u2013200x shorter than its own response time, so the valve fires after the particle has already passed into the throat it was supposed to protect. Additionally, the single standby throat is defeated by any second particle arriving wh",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['14', '3', '2', '1.4', '6', '1000']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'flow to standby throat' (field: mechanism)",
+      "verified": true
+     },
+     {
+      "binding": "declared_scope",
+      "ground": "boundary overlap ['abrasive', 'geometry', 'throat', 'water']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "RECORD \"micro-valve actuation response time versus particle transit time\" + \"diverts flow to a standby throat... so no throat ever bridges\"; COMPUTATION 3 mm / 53 m/s \u2248 5.6e-5 s transit vs \u22651e-3 s val",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "basis": "The micro-ejector must blow particles back into the supply header, i.e., against a 14 bar static pressure, which requires a motive stream above 14 bar; the only shared supply specified is a 24 V electrical rail, which delivers no pressurized working fluid at all, so the back-blow function cannot operate within the stated 14 bar boundary condition. GROUNDED_IN: RECORD \"an integrated micro-ejector blows the particle back into the header\" + \"shared 24 V rails along the header\"; SCOPE \"supply header at",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['14', '14', '24', '14', '24']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'micro ejector blows the' (field: mechanism)",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "RECORD \"an integrated micro-ejector blows the particle back into the header\" + \"shared 24 V rails along the header\"; SCOPE \"supply header at",
+    "absence_ground": false
+   }
+  }
+ ],
+ "counts": {
+  "KILL": 2,
+  "RISK": 0,
+  "SURVIVE": 0,
+  "ABSTAIN_DEMOTED": 0,
+  "INVALID": 4
+ }
+}

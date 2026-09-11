@@ -438,7 +438,7 @@ def write_measurement(results: Dict[str, Any]) -> None:
                                    time.gmtime()),
         "reviewer_provenance": "AI_REVIEW",
         "pre_registered_thresholds":
-            results["pre_registered_thresholds"],
+            results["pre_registered_bars"],
         "provenance": ("REUSED verbatim from the frozen corpus header "
                        "(R446/ATTACKER_CALIBRATION/CORPUS.json "
                        "pre_registered_thresholds), which itself "

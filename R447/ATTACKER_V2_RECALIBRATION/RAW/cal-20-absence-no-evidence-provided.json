@@ -1,0 +1,135 @@
+{
+ "attack_version": "independent_attack/2.0.0",
+ "candidate_id": "cal-20-unevidenced-staged-cascade",
+ "generator_provider": null,
+ "attacker_provider": "zai",
+ "attacker_model": "zai-org/GLM-5.3",
+ "independence_mode": "SEPARATE_CONTEXT",
+ "independence_note": "the attacker ran in an independent reasoning context (fresh adversarial conversation, generator reasoning never shown; no alternative provider credentialed \u2014 disclosed, never claimed as provider separation)",
+ "prompt_hash": "9909aadaf58de5bf2674a6ea89572dbc3286bd1ad5381dbe1b2e5534c2f8c763",
+ "output_hash": "5ab7749a303ca2e7ce7a5f15cb2ad7695ced3ffb3a4cb0fe240433312e186bd1",
+ "llm_status": "OK",
+ "attacked_at": "2026-09-11T22:44:11+00:00Z",
+ "items": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "verdict": "KILL",
+   "basis": "The candidate's own problem statement names two clogging causes, \"scale particles and biological growth,\" but the claimed mechanism \"removes scale particles above 120 microns\" \u2014 a 300/120 micron wedge-wire cascade is transparent to biological growth (bacterial flocs and biofilm slough typically well below 120 microns, and biofilm adhering inside nozzle passages is unaffected by upstream straining), so the claimed mechanism addresses at most one of the two stated causes and cannot deliver the predicted clogging-event reduction from 4.1 to below 1.5 GROUNDED_IN: RECORD \"progressive nozzle cloggi",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['120', '300', '120', '120', '4.1', '1.5']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'particles above 120 microns' (field: mechanism)",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "RECORD \"progressive nozzle clogging from scale particles and biological growth in the recirculated water\" contradicted by RECORD \"removes scale particles above 120 microns\"",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "verdict": "RISK",
+   "basis": "Two staged screens plus a backflush loop inserted in the 150 mm supply at \"full design flow\" and \"13-15 bar\" impose an unquantified permanent dP; the candidate states no clean-element pressure-drop budget, so the boundary clause \"13-15 bar\" at the nozzles may be violated at full flow, but no number is given to bind a definite failure GROUNDED_IN: RECORD \"13-15 bar; full design flow; no mill stop\" with no stated dP allowance for the added cascade"
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "verdict": "KILL",
+   "basis": "The candidate's own predicted best case, \"crown excursions fall from 28 to below 16 microns,\" does not restore the system to its stated operating requirement of the 12 micron band; even full success of the invention leaves the failure condition (\"thermal-crown variation beyond the 12 micron band\") intact, so the candidate's own numbers concede the problem is not solved GROUNDED_IN: COMPUTATION predicted best case 16 microns > required band 12 microns, per RECORD \"c",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['28', '16', '12', '12', '16', '12']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span '28 to below 16' (field: predicted_effect)",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "COMPUTATION predicted best case 16 microns > required band 12 microns, per RECORD \"c",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "verdict": "INVALID",
+   "basis": "",
+   "invalid_reason": "class absent from response"
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "verdict": "INVALID",
+   "basis": "",
+   "invalid_reason": "class absent from response"
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "verdict": "INVALID",
+   "basis": "",
+   "invalid_reason": "class absent from response"
+  }
+ ],
+ "state": "ATTACK_RUN",
+ "overall": "KILLED",
+ "kill_basis": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "basis": "The candidate's own problem statement names two clogging causes, \"scale particles and biological growth,\" but the claimed mechanism \"removes scale particles above 120 microns\" \u2014 a 300/120 micron wedge-wire cascade is transparent to biological growth (bacterial flocs and biofilm slough typically well below 120 microns, and biofilm adhering inside nozzle passages is unaffected by upstream straining), so the claimed mechanism addresses at most one of the two stated causes and cannot deliver the predicted clogging-event reduction from 4.1 to below 1.5 GROUNDED_IN: RECORD \"progressive nozzle cloggi",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['120', '300', '120', '120', '4.1', '1.5']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'particles above 120 microns' (field: mechanism)",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "RECORD \"progressive nozzle clogging from scale particles and biological growth in the recirculated water\" contradicted by RECORD \"removes scale particles above 120 microns\"",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "basis": "The candidate's own predicted best case, \"crown excursions fall from 28 to below 16 microns,\" does not restore the system to its stated operating requirement of the 12 micron band; even full success of the invention leaves the failure condition (\"thermal-crown variation beyond the 12 micron band\") intact, so the candidate's own numbers concede the problem is not solved GROUNDED_IN: COMPUTATION predicted best case 16 microns > required band 12 microns, per RECORD \"c",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['28', '16', '12', '12', '16', '12']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span '28 to below 16' (field: predicted_effect)",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "COMPUTATION predicted best case 16 microns > required band 12 microns, per RECORD \"c",
+    "absence_ground": false
+   }
+  }
+ ],
+ "counts": {
+  "KILL": 2,
+  "RISK": 1,
+  "SURVIVE": 0,
+  "ABSTAIN_DEMOTED": 0,
+  "INVALID": 3
+ }
+}

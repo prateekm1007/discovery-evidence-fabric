@@ -1,0 +1,146 @@
+{
+ "attack_version": "independent_attack/2.0.0",
+ "candidate_id": "cal-09-piezo-header-vibration",
+ "generator_provider": null,
+ "attacker_provider": "zai",
+ "attacker_model": "zai-org/GLM-5.3",
+ "independence_mode": "SEPARATE_CONTEXT",
+ "independence_note": "the attacker ran in an independent reasoning context (fresh adversarial conversation, generator reasoning never shown; no alternative provider credentialed \u2014 disclosed, never claimed as provider separation)",
+ "prompt_hash": "a93bb2e7bcc170c753c9222835401e1ec6b17d70eb391ac507cd468671a50fba",
+ "output_hash": "a001e8afd7e32e6d6cc48ff9c30a3674dcda0f1c7990d4ef9d0601ade7b2fc86",
+ "llm_status": "OK",
+ "attacked_at": "2026-09-11T22:41:23+00:00Z",
+ "items": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "verdict": "KILL",
+   "basis": "The candidate's causal chain covers only one of the two stated clog sources. The failure is \"progressive nozzle clogging from scale particles and biological growth in the recirculated water,\" but the mechanism operates exclusively via \"prevents particle settling and early deposit consolidation\" \u2014 a gravity-settling/consolidation mechanism. Biological growth in 32-38 C recirculated water is biofilm adhesion and proliferation on nozzle surfaces, which proceeds under continuous shear and does not depend on particles settling or resting; nothing in the proposed mechanism (200 Hz header shake) inhi",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['32', '38', '200', '4.1', '0.3', '93']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'consolidation in nozzle inlets' (field: mechanism)",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "RECORD \"prevents particle settling and early deposit consolidation in nozzle inlets\" vs. the stated failure \"scale particles and biological growth in the recirculated water\"; COMPUTATION 4.1 \u2192 <0.3 ev",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "verdict": "KILL",
+   "basis": "The intervention and the boundary condition are mutually exclusive as written. The boundary requires \"header rigidly connected to mill frame at the roll-cooling interface,\" while the intervention places the \"header supported on tuned isolation mounts.\" A header on tuned isolation mounts is by definition not rigidly connected to the mill frame; conversely, if the rigid connection is honored, a 12 kW continuous 200 Hz excitation is injected directly into the mill frame at the roll-cooling interface. The minimum amplitude for the mechanism to work at all (particle acceleration exceeding 1 g so se",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['12', '200', '1']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'on tuned isolation mounts' (field: intervention)",
+      "verified": true
+     },
+     {
+      "binding": "declared_scope",
+      "ground": "boundary overlap ['connected', 'cooling', 'frame', 'header']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": null,
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "verdict": "INVALID",
+   "basis": "",
+   "invalid_reason": "class absent from response"
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "verdict": "INVALID",
+   "basis": "",
+   "invalid_reason": "class absent from response"
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "verdict": "INVALID",
+   "basis": "",
+   "invalid_reason": "class absent from response"
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "verdict": "INVALID",
+   "basis": "",
+   "invalid_reason": "class absent from response"
+  }
+ ],
+ "state": "ATTACK_RUN",
+ "overall": "KILLED",
+ "kill_basis": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "basis": "The candidate's causal chain covers only one of the two stated clog sources. The failure is \"progressive nozzle clogging from scale particles and biological growth in the recirculated water,\" but the mechanism operates exclusively via \"prevents particle settling and early deposit consolidation\" \u2014 a gravity-settling/consolidation mechanism. Biological growth in 32-38 C recirculated water is biofilm adhesion and proliferation on nozzle surfaces, which proceeds under continuous shear and does not depend on particles settling or resting; nothing in the proposed mechanism (200 Hz header shake) inhi",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['32', '38', '200', '4.1', '0.3', '93']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'consolidation in nozzle inlets' (field: mechanism)",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "RECORD \"prevents particle settling and early deposit consolidation in nozzle inlets\" vs. the stated failure \"scale particles and biological growth in the recirculated water\"; COMPUTATION 4.1 \u2192 <0.3 ev",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "basis": "The intervention and the boundary condition are mutually exclusive as written. The boundary requires \"header rigidly connected to mill frame at the roll-cooling interface,\" while the intervention places the \"header supported on tuned isolation mounts.\" A header on tuned isolation mounts is by definition not rigidly connected to the mill frame; conversely, if the rigid connection is honored, a 12 kW continuous 200 Hz excitation is injected directly into the mill frame at the roll-cooling interface. The minimum amplitude for the mechanism to work at all (particle acceleration exceeding 1 g so se",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['12', '200', '1']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'on tuned isolation mounts' (field: intervention)",
+      "verified": true
+     },
+     {
+      "binding": "declared_scope",
+      "ground": "boundary overlap ['connected', 'cooling', 'frame', 'header']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": null,
+    "absence_ground": false
+   }
+  }
+ ],
+ "counts": {
+  "KILL": 2,
+  "RISK": 0,
+  "SURVIVE": 0,
+  "ABSTAIN_DEMOTED": 0,
+  "INVALID": 4
+ }
+}

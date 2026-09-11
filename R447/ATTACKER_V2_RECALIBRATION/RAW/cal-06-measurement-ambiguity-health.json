@@ -1,0 +1,163 @@
+{
+ "attack_version": "independent_attack/2.0.0",
+ "candidate_id": "cal-06-swirl-vortex-nozzles",
+ "generator_provider": null,
+ "attacker_provider": "zai",
+ "attacker_model": "zai-org/GLM-5.3",
+ "independence_mode": "SEPARATE_CONTEXT",
+ "independence_note": "the attacker ran in an independent reasoning context (fresh adversarial conversation, generator reasoning never shown; no alternative provider credentialed \u2014 disclosed, never claimed as provider separation)",
+ "prompt_hash": "1500f6f413abf9311dc5d16c1be3764c63820c9500fad8dd23e6c20c47ede2e4",
+ "output_hash": "3a7a394ea96d9511facf85e9d1f0babc0b4552cceaa4cf8e08d877e21cbed222",
+ "llm_status": "OK",
+ "attacked_at": "2026-09-11T22:40:35+00:00Z",
+ "items": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "verdict": "KILL",
+   "basis": "The stated mechanism is physically inverted: in a swirling flow field, the radially outward centrifugal acceleration acts on the denser phase (scale particles, specific gravity ~2.7 vs water ~1.0), driving particles TOWARD the nozzle wall, not away from it; a vortex cannot centrifuge solids away from the boundary surface it rotates against, so the claimed self-cleaning effect at the throat wall contradicts the very flow physics the candidate invokes. GROUNDED_IN: RECORD \"the swirling flow centrifuges particles away from the throat wall\" | COMPUTATION particle-to-water density ratio ~2.7:1 mean",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['2.7', '1.0', '2.7', '1']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'centrifuges particles away from' (field: mechanism)",
+      "verified": true
+     },
+     {
+      "binding": "declared_scope",
+      "ground": "boundary overlap ['flow', 'nozzle']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "RECORD \"the swirling flow centrifuges particles away from the throat wall\" | COMPUTATION particle-to-water density ratio ~2.7:1 means the centrifugal body force on scale particles is directed radially",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "verdict": "KILL",
+   "basis": "The boundary fixes recirculated cooling water at 32-38 C, an environment that actively promotes biological growth, yet the candidate claims \"clogging becomes rare\" while its only mechanism (particle centrifugation) has no action against biofilm; the clogging failure is explicitly defined as scale particles AND biological growth, so the claimed elimination of clogging is asserted inside a boundary condition that preserves the biological half of the failure cause untouched. GROUNDED_IN: SCOPE \"same header supply at 14 bar; same nominal flow per nozzle\" combined with the fixed boundary \"recircula",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['32', '38', '14', '32', '38']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'same nominal flow per' (field: boundary_conditions)",
+      "verified": true
+     },
+     {
+      "binding": "declared_scope",
+      "ground": "boundary overlap ['flow', 'header', 'nominal', 'nozzle']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "SCOPE \"same header supply at 14 bar; same nominal flow per nozzle\" combined with the fixed boundary \"recirculated cooling water at 32-38 C\" | RECORD \"clogging becomes rare\" \u2014 the swirl mechanism addre",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "verdict": "ABSTAIN",
+   "basis": "The candidate's own record is internally inconsistent: it declares \"Known failure modes (claimed by the generator): undefined\" while simultaneously asserting a definitive failure-mode outcome, \"clogging becomes rare\"; one cannot both claim failure modes are undefined and claim a specific",
+   "grounding": {
+    "grounded": false,
+    "bindings": [],
+    "claimed_ground": null,
+    "absence_ground": false,
+    "demotion_reason": "no evidence / computation / record / declared-scope binding found in the kill basis \u2014 a bare assertion carries no verdict authority (Art. XVIII); the objection is preserved and escalated"
+   },
+   "demoted_from": "KILL"
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "verdict": "INVALID",
+   "basis": "",
+   "invalid_reason": "class absent from response"
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "verdict": "INVALID",
+   "basis": "",
+   "invalid_reason": "class absent from response"
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "verdict": "INVALID",
+   "basis": "",
+   "invalid_reason": "class absent from response"
+  }
+ ],
+ "state": "ATTACK_RUN",
+ "overall": "KILLED",
+ "kill_basis": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "basis": "The stated mechanism is physically inverted: in a swirling flow field, the radially outward centrifugal acceleration acts on the denser phase (scale particles, specific gravity ~2.7 vs water ~1.0), driving particles TOWARD the nozzle wall, not away from it; a vortex cannot centrifuge solids away from the boundary surface it rotates against, so the claimed self-cleaning effect at the throat wall contradicts the very flow physics the candidate invokes. GROUNDED_IN: RECORD \"the swirling flow centrifuges particles away from the throat wall\" | COMPUTATION particle-to-water density ratio ~2.7:1 mean",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['2.7', '1.0', '2.7', '1']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'centrifuges particles away from' (field: mechanism)",
+      "verified": true
+     },
+     {
+      "binding": "declared_scope",
+      "ground": "boundary overlap ['flow', 'nozzle']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "RECORD \"the swirling flow centrifuges particles away from the throat wall\" | COMPUTATION particle-to-water density ratio ~2.7:1 means the centrifugal body force on scale particles is directed radially",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "basis": "The boundary fixes recirculated cooling water at 32-38 C, an environment that actively promotes biological growth, yet the candidate claims \"clogging becomes rare\" while its only mechanism (particle centrifugation) has no action against biofilm; the clogging failure is explicitly defined as scale particles AND biological growth, so the claimed elimination of clogging is asserted inside a boundary condition that preserves the biological half of the failure cause untouched. GROUNDED_IN: SCOPE \"same header supply at 14 bar; same nominal flow per nozzle\" combined with the fixed boundary \"recircula",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['32', '38', '14', '32', '38']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'same nominal flow per' (field: boundary_conditions)",
+      "verified": true
+     },
+     {
+      "binding": "declared_scope",
+      "ground": "boundary overlap ['flow', 'header', 'nominal', 'nozzle']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "SCOPE \"same header supply at 14 bar; same nominal flow per nozzle\" combined with the fixed boundary \"recirculated cooling water at 32-38 C\" | RECORD \"clogging becomes rare\" \u2014 the swirl mechanism addre",
+    "absence_ground": false
+   }
+  }
+ ],
+ "counts": {
+  "KILL": 2,
+  "RISK": 0,
+  "SURVIVE": 0,
+  "ABSTAIN_DEMOTED": 1,
+  "INVALID": 3
+ }
+}

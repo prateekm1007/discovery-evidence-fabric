@@ -1,0 +1,173 @@
+{
+ "attack_version": "independent_attack/2.0.0",
+ "candidate_id": "cal-18-average-load-dual-media-filter",
+ "generator_provider": null,
+ "attacker_provider": "zai",
+ "attacker_model": "zai-org/GLM-5.3",
+ "independence_mode": "SEPARATE_CONTEXT",
+ "independence_note": "the attacker ran in an independent reasoning context (fresh adversarial conversation, generator reasoning never shown; no alternative provider credentialed \u2014 disclosed, never claimed as provider separation)",
+ "prompt_hash": "2933460e831988c7b843e2ae6ec0acc376839ebbf4c6e1012d25f5df366f1175",
+ "output_hash": "bd62fba196aeb18fd32733a5559a42628c11ce2e1ca8cb9ce4f807edf4c33cfd",
+ "llm_status": "OK",
+ "attacked_at": "2026-09-11T22:43:40+00:00Z",
+ "items": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "verdict": "KILL",
+   "basis": "The filter is sized at 0.6 kg/h, but the load is heavy-tailed with P95 = 3.6 kg/h, six times the design point; during these episodes the filter's capture capacity is exceeded, solids break through to the nozzles, and since 61% of all campaign clogs occur during exactly these 14 high-load episodes, the mechanism fails precisely at the moments that produce the majority of clogging, so the claimed effect (4.1 \u2192 below 1.0 clogs/campaign) cannot follow from average-load sizing GROUNDED_IN: EVIDENCE ev:load-distribution, ev:episode-clog | COMPUTATION P95 3.6 kg/h \u00f7 design 0.6 kg/h = 6x overload; 61%",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "record id ev:load-distribution",
+      "verified": true
+     },
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['0.6', '95', '3.6', '61', '14', '4.1']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "EVIDENCE ev:load-distribution, ev:episode-clog | COMPUTATION P95 3.6 kg/h \u00f7 design 0.6 kg/h = 6x overload; 61% of clogs occur in the 14 episodes the 0.6 kg/h sizing cannot cover, leaving at best ~39% ",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "verdict": "KILL",
+   "basis": "A single pressure filter vessel installed on the supply side at full design flow cannot backwash without either interrupting header flow (a mill stop) or bypassing unfiltered water to the 14-bar header; the candidate specifies one vessel, full-flow installation, and automatic backwash, which are mutually incompatible with the stated \"no mill stop for backwash\" clause GROUNDED_IN: RECORD \"one dual-media pressure filter vessel\" + \"supply-side installation at full design flow\" + \"no mill stop for backwash\" | SCOPE \"no mill stop for backwash\" violated by single-vessel full-flow architecture with D",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "record",
+      "ground": "verbatim span 'dual media pressure filter' (field: mechanism)",
+      "verified": true
+     },
+     {
+      "binding": "declared_scope",
+      "ground": "boundary overlap ['backwash', 'flow', 'full', 'installation']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "RECORD \"one dual-media pressure filter vessel\" + \"supply-side installation at full design flow\" + \"no mill stop for backwash\" | SCOPE \"no mill stop for backwash\" violated by single-vessel full-flow ar",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "verdict": "KILL",
+   "basis": "The candidate calls 0.6 kg/h the \"measured average load,\" but its own 18-month study states 0.6 kg/h is",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item '18-month suspended-solids load study: the load is HEAVY-TAILED \u2014 median 0.6 kg/h but P95 = 3.6 kg/h and P99 = 6.1 kg/h (episodic descaling-line failures dump 6x the median for 2-6 hours, 14 events recorded); average-sized filters blind and bypass during exactly these episodes' (strong overlap: average, load, month, study)",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'the measured average load' (field: intervention)",
+      "verified": true
+     }
+    ],
+    "claimed_ground": null,
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "verdict": "INVALID",
+   "basis": "",
+   "invalid_reason": "class absent from response"
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "verdict": "INVALID",
+   "basis": "",
+   "invalid_reason": "class absent from response"
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "verdict": "INVALID",
+   "basis": "",
+   "invalid_reason": "class absent from response"
+  }
+ ],
+ "state": "ATTACK_RUN",
+ "overall": "KILLED",
+ "kill_basis": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "basis": "The filter is sized at 0.6 kg/h, but the load is heavy-tailed with P95 = 3.6 kg/h, six times the design point; during these episodes the filter's capture capacity is exceeded, solids break through to the nozzles, and since 61% of all campaign clogs occur during exactly these 14 high-load episodes, the mechanism fails precisely at the moments that produce the majority of clogging, so the claimed effect (4.1 \u2192 below 1.0 clogs/campaign) cannot follow from average-load sizing GROUNDED_IN: EVIDENCE ev:load-distribution, ev:episode-clog | COMPUTATION P95 3.6 kg/h \u00f7 design 0.6 kg/h = 6x overload; 61%",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "record id ev:load-distribution",
+      "verified": true
+     },
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['0.6', '95', '3.6', '61', '14', '4.1']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "EVIDENCE ev:load-distribution, ev:episode-clog | COMPUTATION P95 3.6 kg/h \u00f7 design 0.6 kg/h = 6x overload; 61% of clogs occur in the 14 episodes the 0.6 kg/h sizing cannot cover, leaving at best ~39% ",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "basis": "A single pressure filter vessel installed on the supply side at full design flow cannot backwash without either interrupting header flow (a mill stop) or bypassing unfiltered water to the 14-bar header; the candidate specifies one vessel, full-flow installation, and automatic backwash, which are mutually incompatible with the stated \"no mill stop for backwash\" clause GROUNDED_IN: RECORD \"one dual-media pressure filter vessel\" + \"supply-side installation at full design flow\" + \"no mill stop for backwash\" | SCOPE \"no mill stop for backwash\" violated by single-vessel full-flow architecture with D",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "record",
+      "ground": "verbatim span 'dual media pressure filter' (field: mechanism)",
+      "verified": true
+     },
+     {
+      "binding": "declared_scope",
+      "ground": "boundary overlap ['backwash', 'flow', 'full', 'installation']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "RECORD \"one dual-media pressure filter vessel\" + \"supply-side installation at full design flow\" + \"no mill stop for backwash\" | SCOPE \"no mill stop for backwash\" violated by single-vessel full-flow ar",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "basis": "The candidate calls 0.6 kg/h the \"measured average load,\" but its own 18-month study states 0.6 kg/h is",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item '18-month suspended-solids load study: the load is HEAVY-TAILED \u2014 median 0.6 kg/h but P95 = 3.6 kg/h and P99 = 6.1 kg/h (episodic descaling-line failures dump 6x the median for 2-6 hours, 14 events recorded); average-sized filters blind and bypass during exactly these episodes' (strong overlap: average, load, month, study)",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'the measured average load' (field: intervention)",
+      "verified": true
+     }
+    ],
+    "claimed_ground": null,
+    "absence_ground": false
+   }
+  }
+ ],
+ "counts": {
+  "KILL": 3,
+  "RISK": 0,
+  "SURVIVE": 0,
+  "ABSTAIN_DEMOTED": 0,
+  "INVALID": 3
+ }
+}

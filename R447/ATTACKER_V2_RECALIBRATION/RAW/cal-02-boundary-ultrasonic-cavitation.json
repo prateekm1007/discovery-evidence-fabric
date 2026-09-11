@@ -1,0 +1,156 @@
+{
+ "attack_version": "independent_attack/2.0.0",
+ "candidate_id": "cal-02-ultrasonic-header",
+ "generator_provider": null,
+ "attacker_provider": "zai",
+ "attacker_model": "zai-org/GLM-5.3",
+ "independence_mode": "SEPARATE_CONTEXT",
+ "independence_note": "the attacker ran in an independent reasoning context (fresh adversarial conversation, generator reasoning never shown; no alternative provider credentialed \u2014 disclosed, never claimed as provider separation)",
+ "prompt_hash": "627e5608ce1072b51be92345b2027b97f2d4937f0e904963f109299d153c3f12",
+ "output_hash": "1b7783acd69466c5c48b0d2d6ffe2492efbab04083353364c693d6e0886f63f8",
+ "llm_status": "OK",
+ "attacked_at": "2026-09-11T22:39:05+00:00Z",
+ "items": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "verdict": "KILL",
+   "basis": "Cavitation cannot occur under the stated conditions: to nucleate and grow a bubble against 14 bar static pressure, the Blake threshold requires rarefaction pressure of roughly P0 + 0.77\u03c3/R \u2248 14 bar + ~1 bar \u2248 15 bar tensile at the liquid; a 600 W transducer of ~50 mm face (~0.002 m\u00b2) delivers intensity ~3\u00d710^5 W/m\u00b2, i.e. acoustic pressure amplitude p = \u221a(2\u03c1cI) \u2248 \u221a(2\u00d71.5\u00d710^6\u00d73\u00d710^5) \u2248 9.5 bar at its own face, and coupling from the steel header wall (Z_steel \u2248 47 MRayl) into water (Z_water \u2248 1.5 MRayl) transmits only ~4Z1Z2/(Z1+Z2)\u00b2 \u2248 12% of the power, cutting amplitude to ~3.3 bar in the water",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['14', '0', '0.77', '14', '1', '15']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'khz and the resulting' (field: mechanism)",
+      "verified": true
+     },
+     {
+      "binding": "declared_scope",
+      "ground": "boundary overlap ['header', 'pressure', 'static', 'water']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "RECORD \"cavitation bubbles collapse at 40 kHz and the resulting micro-jets keep throats clean in service\" | COMPUTATION Blake threshold \u2248 15 bar tensile required vs. ~3.3 bar acoustic amplitude delive",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "verdict": "KILL",
+   "basis": "The header operates at 14 bar static pressure while the transducers are rated to only 10 bar differential; 14 bar > 10 bar rating, so the specified component is out of its pressure rating in the as-proposed service environment, a direct violation of the candidate",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['14', '10', '14', '10']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span '14 bar static pressure' (field: boundary_conditions)",
+      "verified": true
+     },
+     {
+      "binding": "declared_scope",
+      "ground": "boundary overlap ['differential', 'header', 'pressure', 'rated']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": null,
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "verdict": "INVALID",
+   "basis": "",
+   "invalid_reason": "class absent from response"
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "verdict": "INVALID",
+   "basis": "",
+   "invalid_reason": "class absent from response"
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "verdict": "INVALID",
+   "basis": "",
+   "invalid_reason": "class absent from response"
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "verdict": "INVALID",
+   "basis": "",
+   "invalid_reason": "class absent from response"
+  }
+ ],
+ "state": "ATTACK_RUN",
+ "overall": "KILLED",
+ "kill_basis": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "basis": "Cavitation cannot occur under the stated conditions: to nucleate and grow a bubble against 14 bar static pressure, the Blake threshold requires rarefaction pressure of roughly P0 + 0.77\u03c3/R \u2248 14 bar + ~1 bar \u2248 15 bar tensile at the liquid; a 600 W transducer of ~50 mm face (~0.002 m\u00b2) delivers intensity ~3\u00d710^5 W/m\u00b2, i.e. acoustic pressure amplitude p = \u221a(2\u03c1cI) \u2248 \u221a(2\u00d71.5\u00d710^6\u00d73\u00d710^5) \u2248 9.5 bar at its own face, and coupling from the steel header wall (Z_steel \u2248 47 MRayl) into water (Z_water \u2248 1.5 MRayl) transmits only ~4Z1Z2/(Z1+Z2)\u00b2 \u2248 12% of the power, cutting amplitude to ~3.3 bar in the water",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['14', '0', '0.77', '14', '1', '15']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'khz and the resulting' (field: mechanism)",
+      "verified": true
+     },
+     {
+      "binding": "declared_scope",
+      "ground": "boundary overlap ['header', 'pressure', 'static', 'water']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "RECORD \"cavitation bubbles collapse at 40 kHz and the resulting micro-jets keep throats clean in service\" | COMPUTATION Blake threshold \u2248 15 bar tensile required vs. ~3.3 bar acoustic amplitude delive",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "basis": "The header operates at 14 bar static pressure while the transducers are rated to only 10 bar differential; 14 bar > 10 bar rating, so the specified component is out of its pressure rating in the as-proposed service environment, a direct violation of the candidate",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['14', '10', '14', '10']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span '14 bar static pressure' (field: boundary_conditions)",
+      "verified": true
+     },
+     {
+      "binding": "declared_scope",
+      "ground": "boundary overlap ['differential', 'header', 'pressure', 'rated']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": null,
+    "absence_ground": false
+   }
+  }
+ ],
+ "counts": {
+  "KILL": 2,
+  "RISK": 0,
+  "SURVIVE": 0,
+  "ABSTAIN_DEMOTED": 0,
+  "INVALID": 4
+ }
+}

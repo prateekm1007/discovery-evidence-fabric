@@ -465,7 +465,10 @@ def independent_attack(candidate: Dict[str, Any],
         purpose="independent_attack",
         exclude_providers=[generator_provider]
         if generator_provider else None,
-        max_tokens=700)
+        # v2: the output contract grew (six lines each carrying the
+        # basis AND the GROUNDED_IN binding tail) — the budget covers
+        # the contract (disclosed instrument parameter, not a threshold)
+        max_tokens=1600)
     record: Dict[str, Any] = {
         "attack_version": ATTACK_VERSION,
         "candidate_id": candidate.get("candidate_id"),

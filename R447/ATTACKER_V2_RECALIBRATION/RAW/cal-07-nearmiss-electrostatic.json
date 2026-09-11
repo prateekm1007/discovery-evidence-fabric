@@ -1,0 +1,183 @@
+{
+ "attack_version": "independent_attack/2.0.0",
+ "candidate_id": "cal-07-electrostatic-precipitator",
+ "generator_provider": null,
+ "attacker_provider": "zai",
+ "attacker_model": "zai-org/GLM-5.3",
+ "independence_mode": "SEPARATE_CONTEXT",
+ "independence_note": "the attacker ran in an independent reasoning context (fresh adversarial conversation, generator reasoning never shown; no alternative provider credentialed \u2014 disclosed, never claimed as provider separation)",
+ "prompt_hash": "60214a108f178cbcb8e3e2c0f2fa1e1b4806afb6e404fc87d49accda4a006897",
+ "output_hash": "2d91aeac00c569e7c55edee972274e5169c15fb084bbbd09182f4b4668490c56",
+ "llm_status": "OK",
+ "attacked_at": "2026-09-11T22:40:53+00:00Z",
+ "items": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "verdict": "KILL",
+   "basis": "Corona-discharge electrostatic precipitation is a gas-phase ionization process; it cannot occur inside a water-filled 150 mm pipe. Corona onset requires dielectric breakdown of the carrier medium (air breaks down at ~30 kV/cm), whereas liquid water has a breakdown strength orders of magnitude higher and, being conductive as the candidate itself specifies, would short the 50 kV field through continuous leakage current between corona wire and plates rather than forming ions. No corona means no particle charging, so the claimed 95% collection has no physical basis in the stated medium. GROUNDED_I",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['150', '30', '50', '95', '50']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span '50 kv corona field' (field: intervention)",
+      "verified": true
+     },
+     {
+      "binding": "declared_scope",
+      "ground": "boundary overlap ['conductivity', 'cooling', 'flow', 'full']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "RECORD \"50 kV corona field\" combined with SCOPE \"water conductivity typical of recirculated mill cooling water; full header flow\" \u2014 a corona cannot be sustained in conductive liquid water, so the char",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "verdict": "KILL",
+   "basis": "The candidate's own boundary clause (\"water conductivity typical of recirculated mill cooling water\") directly defeats its design variable (\"corona field strength versus particle charging efficiency\"): recirculated mill cooling water at 32-38 C typically has conductivity of hundreds to thousands of \u00b5S/cm, so the 50 kV supply across a 300 mm wetted section would drive kiloamp-scale leakage/electrolytic current, not a corona; the design variable is undefined outside its valid domain. GROUNDED_IN: SCOPE \"water conductivity typical of recirculated mill cooling water\" versus RECORD \"corona field st",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['32', '38', '50', '300']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'corona field strength versus' (field: novel_design_variable)",
+      "verified": true
+     },
+     {
+      "binding": "declared_scope",
+      "ground": "boundary overlap ['conductivity', 'cooling', 'mill', 'recirculated']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "SCOPE \"water conductivity typical of recirculated mill cooling water\" versus RECORD \"corona field strength versus particle charging efficiency\" \u2014 the stated boundary condition places the device in a m",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "verdict": "KILL",
+   "basis": "The candidate's own cited maturity claim (\"electrostatic collection is a mature industrial dust-removal technology\") refers to gas-stream dust precipitation, while the intervention installs it in a liquid line;",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "record",
+      "ground": "verbatim span 'industrial dust removal technology' (field: mechanism)",
+      "verified": true
+     }
+    ],
+    "claimed_ground": null,
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "verdict": "INVALID",
+   "basis": "",
+   "invalid_reason": "class absent from response"
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "verdict": "INVALID",
+   "basis": "",
+   "invalid_reason": "class absent from response"
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "verdict": "INVALID",
+   "basis": "",
+   "invalid_reason": "class absent from response"
+  }
+ ],
+ "state": "ATTACK_RUN",
+ "overall": "KILLED",
+ "kill_basis": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "basis": "Corona-discharge electrostatic precipitation is a gas-phase ionization process; it cannot occur inside a water-filled 150 mm pipe. Corona onset requires dielectric breakdown of the carrier medium (air breaks down at ~30 kV/cm), whereas liquid water has a breakdown strength orders of magnitude higher and, being conductive as the candidate itself specifies, would short the 50 kV field through continuous leakage current between corona wire and plates rather than forming ions. No corona means no particle charging, so the claimed 95% collection has no physical basis in the stated medium. GROUNDED_I",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['150', '30', '50', '95', '50']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span '50 kv corona field' (field: intervention)",
+      "verified": true
+     },
+     {
+      "binding": "declared_scope",
+      "ground": "boundary overlap ['conductivity', 'cooling', 'flow', 'full']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "RECORD \"50 kV corona field\" combined with SCOPE \"water conductivity typical of recirculated mill cooling water; full header flow\" \u2014 a corona cannot be sustained in conductive liquid water, so the char",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "basis": "The candidate's own boundary clause (\"water conductivity typical of recirculated mill cooling water\") directly defeats its design variable (\"corona field strength versus particle charging efficiency\"): recirculated mill cooling water at 32-38 C typically has conductivity of hundreds to thousands of \u00b5S/cm, so the 50 kV supply across a 300 mm wetted section would drive kiloamp-scale leakage/electrolytic current, not a corona; the design variable is undefined outside its valid domain. GROUNDED_IN: SCOPE \"water conductivity typical of recirculated mill cooling water\" versus RECORD \"corona field st",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['32', '38', '50', '300']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'corona field strength versus' (field: novel_design_variable)",
+      "verified": true
+     },
+     {
+      "binding": "declared_scope",
+      "ground": "boundary overlap ['conductivity', 'cooling', 'mill', 'recirculated']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "SCOPE \"water conductivity typical of recirculated mill cooling water\" versus RECORD \"corona field strength versus particle charging efficiency\" \u2014 the stated boundary condition places the device in a m",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "basis": "The candidate's own cited maturity claim (\"electrostatic collection is a mature industrial dust-removal technology\") refers to gas-stream dust precipitation, while the intervention installs it in a liquid line;",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "record",
+      "ground": "verbatim span 'industrial dust removal technology' (field: mechanism)",
+      "verified": true
+     }
+    ],
+    "claimed_ground": null,
+    "absence_ground": false
+   }
+  }
+ ],
+ "counts": {
+  "KILL": 3,
+  "RISK": 0,
+  "SURVIVE": 0,
+  "ABSTAIN_DEMOTED": 0,
+  "INVALID": 3
+ }
+}

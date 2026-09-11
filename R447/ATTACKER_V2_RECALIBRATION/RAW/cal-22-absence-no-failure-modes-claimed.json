@@ -1,0 +1,97 @@
+{
+ "attack_version": "independent_attack/2.0.0",
+ "candidate_id": "cal-22-thin-record-biocide",
+ "generator_provider": null,
+ "attacker_provider": "zai",
+ "attacker_model": "zai-org/GLM-5.3",
+ "independence_mode": "SEPARATE_CONTEXT",
+ "independence_note": "the attacker ran in an independent reasoning context (fresh adversarial conversation, generator reasoning never shown; no alternative provider credentialed \u2014 disclosed, never claimed as provider separation)",
+ "prompt_hash": "89c0a1b3ca7166bac8726691fa17cdacb8ef919f17424aa78033cc6e20d278dc",
+ "output_hash": "f825d06d9aef12c5456d239b9bcc4522195fe3ba685de1c70febd0ddbdfdc694",
+ "llm_status": "OK",
+ "attacked_at": "2026-09-11T22:44:41+00:00Z",
+ "items": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "verdict": "RISK",
+   "basis": "The mechanism targets only the biological share of clogging, yet the failure is explicitly joint (\"scale particles and biological growth\"); an oxidizing biocide and dispersant have no claimed action on scale particle generation or deposition, so the mechanism covers at most one of the two stated clogging causes. This is a coverage gap in the claimed causal chain, not a demonstrated impossibility, since the biofilm half of the mechanism is chemically coherent and mirrors the sound control's class. GROUNDED_IN: RECORD \"continuous low-dose oxidizing biocide with weekly dispersant slugs controls t"
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "verdict": "RISK",
+   "basis": "The weekly 8 ppm dispersant slug is dosed into a recirculated loop that discharges via blowdown under \"the existing discharge permit\"; whether surfactant peaks from slug dosing stay within that permit is asserted, not shown, and the continuous 0.3 ppm oxidizing biocide adds a new discharge constituent the permit may not enumerate. No specific permit limit is quoted by either side, so this cannot be bound as a violation, only flagged. GROUNDED_IN: RECORD \"weekly 15-minute dispersant slug at 8 ppm\" and \"dosing inside the existing discharge permit\" \u2014 the permit's actual constituent list and limit"
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "verdict": "KILL",
+   "basis": "The candidate simultaneously claims a mill-specific quantitative prediction with tight tolerance (\"biofilm-share clogging events fall from 2.9 to below 0.6 per campaign; total events to approximately 1.4,\" \"1.4 plus or minus 0.5 over two campaigns\") and admits in",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['2.9', '0.6', '1.4', '1.4', '0.5']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'below per campaign total' (field: predicted_effect)",
+      "verified": true
+     }
+    ],
+    "claimed_ground": null,
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "verdict": "INVALID",
+   "basis": "",
+   "invalid_reason": "class absent from response"
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "verdict": "INVALID",
+   "basis": "",
+   "invalid_reason": "class absent from response"
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "verdict": "INVALID",
+   "basis": "",
+   "invalid_reason": "class absent from response"
+  }
+ ],
+ "state": "ATTACK_RUN",
+ "overall": "KILLED",
+ "kill_basis": [
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "basis": "The candidate simultaneously claims a mill-specific quantitative prediction with tight tolerance (\"biofilm-share clogging events fall from 2.9 to below 0.6 per campaign; total events to approximately 1.4,\" \"1.4 plus or minus 0.5 over two campaigns\") and admits in",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['2.9', '0.6', '1.4', '1.4', '0.5']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'below per campaign total' (field: predicted_effect)",
+      "verified": true
+     }
+    ],
+    "claimed_ground": null,
+    "absence_ground": false
+   }
+  }
+ ],
+ "counts": {
+  "KILL": 1,
+  "RISK": 2,
+  "SURVIVE": 0,
+  "ABSTAIN_DEMOTED": 0,
+  "INVALID": 3
+ }
+}

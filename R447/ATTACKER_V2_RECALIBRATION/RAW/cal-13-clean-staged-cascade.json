@@ -1,0 +1,146 @@
+{
+ "attack_version": "independent_attack/2.0.0",
+ "candidate_id": "cal-13-staged-cascade-backflush",
+ "generator_provider": null,
+ "attacker_provider": "zai",
+ "attacker_model": "zai-org/GLM-5.3",
+ "independence_mode": "SEPARATE_CONTEXT",
+ "independence_note": "the attacker ran in an independent reasoning context (fresh adversarial conversation, generator reasoning never shown; no alternative provider credentialed \u2014 disclosed, never claimed as provider separation)",
+ "prompt_hash": "906e7b9da7b9eb275fab6bca81d5fb79c41dca90102c2663b12f37d63addc2e1",
+ "output_hash": "e91ce2da53df8bc3f799768170784053d56f70f15c68d3623bcbd2ac8a3647b6",
+ "llm_status": "OK",
+ "attacked_at": "2026-09-11T22:42:26+00:00Z",
+ "items": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "verdict": "KILL",
+   "basis": "the candidate's own failure-mode concession states that \"fine-passive slimes crossing both stages\" constitute a \"measured share 18 percent\" of the clogging load; these slimes cross the 120 micron final stage by the candidate's own design, so the wedge-wire cascade is structurally incapable of touching 18% of the measured clogging material, and the candidate's remedy for that share is the pre-existing biocide program that is already part of the baseline \u2014 meaning the mechanism's own arithmetic leaves 0.74 events (18% of 4.1) that the new hardware cannot suppress, consuming half of the entire cl",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['18', '120', '18', '0.74', '18', '4.1']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'passive slimes crossing both' (field: known_failure_modes)",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "RECORD \"fine-passive slimes crossing both stages (addressed by the biocide program, measured share 18 percent)\" | COMPUTATION 0.18 \u00d7 4.1 baseline events = 0.74 unaddressed events vs. claimed total red",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "verdict": "KILL",
+   "basis": "the candidate's backflush is \"reverse-flow\" on the single 150 mm supply header with no bypass line stated anywhere in the intervention; reversing flow through the cascade necessarily interrupts or diverts forward supply to all 120 flat-fan nozzles during every dP-triggered backflush event, and the candidate's own wording \"restores full flow\" concedes flow is degraded until restoration \u2014 this directly violates the stated boundary \"full design flow\" and \"no mill stop for operation,\" since loss of roll-cooling",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['150', '120']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'no mill stop for' (field: boundary_conditions)",
+      "verified": true
+     },
+     {
+      "binding": "declared_scope",
+      "ground": "boundary overlap ['flow', 'full', 'mill', 'operation']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": null,
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "verdict": "INVALID",
+   "basis": "",
+   "invalid_reason": "class absent from response"
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "verdict": "INVALID",
+   "basis": "",
+   "invalid_reason": "class absent from response"
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "verdict": "INVALID",
+   "basis": "",
+   "invalid_reason": "class absent from response"
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "verdict": "INVALID",
+   "basis": "",
+   "invalid_reason": "class absent from response"
+  }
+ ],
+ "state": "ATTACK_RUN",
+ "overall": "KILLED",
+ "kill_basis": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "basis": "the candidate's own failure-mode concession states that \"fine-passive slimes crossing both stages\" constitute a \"measured share 18 percent\" of the clogging load; these slimes cross the 120 micron final stage by the candidate's own design, so the wedge-wire cascade is structurally incapable of touching 18% of the measured clogging material, and the candidate's remedy for that share is the pre-existing biocide program that is already part of the baseline \u2014 meaning the mechanism's own arithmetic leaves 0.74 events (18% of 4.1) that the new hardware cannot suppress, consuming half of the entire cl",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['18', '120', '18', '0.74', '18', '4.1']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'passive slimes crossing both' (field: known_failure_modes)",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "RECORD \"fine-passive slimes crossing both stages (addressed by the biocide program, measured share 18 percent)\" | COMPUTATION 0.18 \u00d7 4.1 baseline events = 0.74 unaddressed events vs. claimed total red",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "basis": "the candidate's backflush is \"reverse-flow\" on the single 150 mm supply header with no bypass line stated anywhere in the intervention; reversing flow through the cascade necessarily interrupts or diverts forward supply to all 120 flat-fan nozzles during every dP-triggered backflush event, and the candidate's own wording \"restores full flow\" concedes flow is degraded until restoration \u2014 this directly violates the stated boundary \"full design flow\" and \"no mill stop for operation,\" since loss of roll-cooling",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['150', '120']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'no mill stop for' (field: boundary_conditions)",
+      "verified": true
+     },
+     {
+      "binding": "declared_scope",
+      "ground": "boundary overlap ['flow', 'full', 'mill', 'operation']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": null,
+    "absence_ground": false
+   }
+  }
+ ],
+ "counts": {
+  "KILL": 2,
+  "RISK": 0,
+  "SURVIVE": 0,
+  "ABSTAIN_DEMOTED": 0,
+  "INVALID": 4
+ }
+}

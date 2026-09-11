@@ -1,0 +1,87 @@
+{
+ "attack_version": "independent_attack/2.0.0",
+ "candidate_id": "cal-16-biofilm-dispersant-program",
+ "generator_provider": null,
+ "attacker_provider": "zai",
+ "attacker_model": "zai-org/GLM-5.3",
+ "independence_mode": "SEPARATE_CONTEXT",
+ "independence_note": "the attacker ran in an independent reasoning context (fresh adversarial conversation, generator reasoning never shown; no alternative provider credentialed \u2014 disclosed, never claimed as provider separation)",
+ "prompt_hash": "d6c288764666bb16ce7b401667839ea49806bd5a59af8bf01ca9ac1ee0ffb520",
+ "output_hash": "c2d99c86a0b0abb9b8637cfccf162b40348cfa6bc214ef0ea6326abdd47787d6",
+ "llm_status": "OK",
+ "attacked_at": "2026-09-11T22:43:12+00:00Z",
+ "items": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "verdict": "RISK",
+   "basis": "the weekly 8 ppm dispersant slug deliberately sloughs sessile biofilm and extracellular polymer from header walls in a system whose failure mode is blockage at 120 nozzle throats; the mechanism itself injects detached slime aggregate fragments directly into the stream feeding those throats during each slug event, and the candidate's own claimed failure-mode handling (\"biocide demand spikes from oil leaks in the loop (alarm + manual slug)\") shows the loop carries oil that consumes the 0.3 ppm oxidant, but no claim bounds slug-generated aggregate size against nozzle throat size, so this is an un"
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "verdict": "RISK",
+   "basis": "the candidate asserts permit compliance via dosing rate (\"dosing rates inside the mill's existing discharge permit\") but a recirculating loop with blowdown concentrates dosed chemistry, and permits govern effluent concentration, not dosing rate; however the candidate's own testable prediction (\"discharge permit compliance verified by the existing effluent monitoring\") makes this self-checking before deployment, so it is an unverified conflation rather than a violated clause GROUNDED_IN: RECORD \"dosing rates inside the mill's existing discharge permit\" vs RECORD \"discharge permit compliance ver"
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "verdict": "KILL",
+   "basis": "the candidate's own numbers are internally inconsistent twice over: (1) it claims biofilm-slime is 88 percent of blockages, but its own event counts give 2.9 biofilm events out of",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['1', '88', '2.9']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": null,
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "verdict": "INVALID",
+   "basis": "",
+   "invalid_reason": "class absent from response"
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "verdict": "INVALID",
+   "basis": "",
+   "invalid_reason": "class absent from response"
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "verdict": "INVALID",
+   "basis": "",
+   "invalid_reason": "class absent from response"
+  }
+ ],
+ "state": "ATTACK_RUN",
+ "overall": "KILLED",
+ "kill_basis": [
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "basis": "the candidate's own numbers are internally inconsistent twice over: (1) it claims biofilm-slime is 88 percent of blockages, but its own event counts give 2.9 biofilm events out of",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['1', '88', '2.9']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": null,
+    "absence_ground": false
+   }
+  }
+ ],
+ "counts": {
+  "KILL": 1,
+  "RISK": 2,
+  "SURVIVE": 0,
+  "ABSTAIN_DEMOTED": 0,
+  "INVALID": 3
+ }
+}

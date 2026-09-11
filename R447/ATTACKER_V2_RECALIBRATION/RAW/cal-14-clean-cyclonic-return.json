@@ -1,0 +1,156 @@
+{
+ "attack_version": "independent_attack/2.0.0",
+ "candidate_id": "cal-14-cyclonic-preseparator",
+ "generator_provider": null,
+ "attacker_provider": "zai",
+ "attacker_model": "zai-org/GLM-5.3",
+ "independence_mode": "SEPARATE_CONTEXT",
+ "independence_note": "the attacker ran in an independent reasoning context (fresh adversarial conversation, generator reasoning never shown; no alternative provider credentialed \u2014 disclosed, never claimed as provider separation)",
+ "prompt_hash": "62ad4194383316499feb5058087c02040c6a2594dde462427d2f84e1c156c84c",
+ "output_hash": "d42e888562d37337263c80da9a46a74624f3440a8032ea68cf07b8b1a8f36942",
+ "llm_status": "OK",
+ "attacked_at": "2026-09-11T22:42:42+00:00Z",
+ "items": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "verdict": "KILL",
+   "basis": "The stated failure is \"progressive nozzle clogging from scale particles and biological growth\" (two causes), but the candidate's mechanism only removes scale particles above 100 microns; it has no element that addresses biological growth, so the claimed clog reduction from 4.1 to 2.6 cannot be produced by the claimed mechanism alone for the bio-growth share of clogs, and the candidate itself concedes the separation is incomplete by outsourcing finishing to the basin that already exists in the failing baseline. GROUNDED_IN: RECORD \"centrifuges scale particles above 100 microns out of the loop\" ",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['100', '4.1', '2.6', '100', '4.1', '2.6']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'centrifuges scale particles above' (field: mechanism)",
+      "verified": true
+     },
+     {
+      "binding": "declared_scope",
+      "ground": "boundary overlap ['basin', 'only', 'untouched']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "RECORD \"centrifuges scale particles above 100 microns out of the loop\" vs the problem statement \"scale particles and biological growth in the recirculated water degrades spray uniformity\"; COMPUTATION",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "verdict": "KILL",
+   "basis": "The boundary clause \"return-line installation only\" is violated by the mechanism's own physics: a hydrocyclone requires a feed pressure differential (typically 1-3 bar for a 150 mm unit) to develop the tangential velocity that produces centrifugal separation, but the return leg of a recirculated spray system discharging into an open cooling basin at 32-38 C is gravity/unpressurized flow; the candidate claims \"no pressure-drop penalty\" yet provides no pump or head source, so the only way to make the device function is to add pressurization equipment outside the \"return-line installation only\" s",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['1', '3', '150', '32', '38', '13']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'the supply side the' (field: predicted_effect)",
+      "verified": true
+     },
+     {
+      "binding": "declared_scope",
+      "ground": "boundary overlap ['basin', 'installation', 'line', 'only']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "SCOPE \"return-line installation only; 13-15 bar supply untouched\" vs RECORD \"no pressure-drop penalty on the supply side (the cyclone sits on the return)",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "verdict": "INVALID",
+   "basis": "",
+   "invalid_reason": "class absent from response"
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "verdict": "INVALID",
+   "basis": "",
+   "invalid_reason": "class absent from response"
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "verdict": "INVALID",
+   "basis": "",
+   "invalid_reason": "class absent from response"
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "verdict": "INVALID",
+   "basis": "",
+   "invalid_reason": "class absent from response"
+  }
+ ],
+ "state": "ATTACK_RUN",
+ "overall": "KILLED",
+ "kill_basis": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "basis": "The stated failure is \"progressive nozzle clogging from scale particles and biological growth\" (two causes), but the candidate's mechanism only removes scale particles above 100 microns; it has no element that addresses biological growth, so the claimed clog reduction from 4.1 to 2.6 cannot be produced by the claimed mechanism alone for the bio-growth share of clogs, and the candidate itself concedes the separation is incomplete by outsourcing finishing to the basin that already exists in the failing baseline. GROUNDED_IN: RECORD \"centrifuges scale particles above 100 microns out of the loop\" ",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['100', '4.1', '2.6', '100', '4.1', '2.6']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'centrifuges scale particles above' (field: mechanism)",
+      "verified": true
+     },
+     {
+      "binding": "declared_scope",
+      "ground": "boundary overlap ['basin', 'only', 'untouched']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "RECORD \"centrifuges scale particles above 100 microns out of the loop\" vs the problem statement \"scale particles and biological growth in the recirculated water degrades spray uniformity\"; COMPUTATION",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "basis": "The boundary clause \"return-line installation only\" is violated by the mechanism's own physics: a hydrocyclone requires a feed pressure differential (typically 1-3 bar for a 150 mm unit) to develop the tangential velocity that produces centrifugal separation, but the return leg of a recirculated spray system discharging into an open cooling basin at 32-38 C is gravity/unpressurized flow; the candidate claims \"no pressure-drop penalty\" yet provides no pump or head source, so the only way to make the device function is to add pressurization equipment outside the \"return-line installation only\" s",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['1', '3', '150', '32', '38', '13']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'the supply side the' (field: predicted_effect)",
+      "verified": true
+     },
+     {
+      "binding": "declared_scope",
+      "ground": "boundary overlap ['basin', 'installation', 'line', 'only']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "SCOPE \"return-line installation only; 13-15 bar supply untouched\" vs RECORD \"no pressure-drop penalty on the supply side (the cyclone sits on the return)",
+    "absence_ground": false
+   }
+  }
+ ],
+ "counts": {
+  "KILL": 2,
+  "RISK": 0,
+  "SURVIVE": 0,
+  "ABSTAIN_DEMOTED": 0,
+  "INVALID": 4
+ }
+}
