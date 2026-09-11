@@ -1,0 +1,766 @@
+{
+  "stage": "BRIDGE_GATE",
+  "bridge_gate_version": "1.1.0",
+  "outcome": "COMPLETED",
+  "at": "2026-09-11T20:40:05Z",
+  "reviewer_provenance": "AI_REVIEW",
+  "case": "B",
+  "visualizability_class": "SYSTEM_3D",
+  "conceptual": true,
+  "visualizability": {
+    "visualizability_class": "SYSTEM_3D",
+    "classification_basis": {
+      "geometry_parameters_sourced": 0,
+      "subsystems_recorded": 4,
+      "physical_site_detected": true,
+      "process_signal": false,
+      "algorithmic_signal": false,
+      "intervention_site": "refrigerator",
+      "engineering_min_params": 3,
+      "reason": "4 recorded subsystems and only 0 sourced geometry parameters \u2014 conceptual system-architecture visualization (topology, not dimensions)",
+      "measured_from": [
+        "engineering_specification.parameters",
+        "engineering_specification.engineering_core.critical_parameters",
+        "engineering_specification.system_architecture.subsystems",
+        "final_state.causal_chain"
+      ]
+    },
+    "subsystems": [
+      "heat source characterization",
+      "conduction path / spreader",
+      "reject interface",
+      "safety limit interlock"
+    ],
+    "geometry_parameters": [],
+    "intervention_site": "refrigerator"
+  },
+  "geometry": {
+    "model_glbs": [
+      "model-001.glb",
+      "model-002.glb"
+    ],
+    "glb_sha256": "f99ccc083fab11edc59829fdb8d25c6bf5d5cc2387fdabfe136cc1464f380ffa",
+    "components": [
+      {
+        "name": "assembly_base",
+        "label": "assembly base",
+        "type": "structural",
+        "material_class": "body_metal",
+        "role": "assembly baseplate (structural presentation element)",
+        "mapped_from": null
+      },
+      {
+        "name": "heat_source",
+        "label": "heat source block",
+        "type": "structural",
+        "material_class": "battery",
+        "role": "heat source side (family-definitional presentation element of the thermal acceptance case; mapped subsystem recorded as alias)",
+        "mapped_from": "heat source characterization"
+      },
+      {
+        "name": "cold_plate",
+        "label": "cold plate / thermal interface",
+        "type": "subsystem",
+        "material_class": "machined_metal",
+        "role": "recorded subsystem 'reject interface' mapped onto the cold plate / thermal interface slot",
+        "mapped_from": "reject interface"
+      },
+      {
+        "name": "heat_sink",
+        "label": "heat sink fin stack",
+        "type": "structural",
+        "material_class": "machined_metal",
+        "role": "heat rejection side (family-definitional presentation element of the thermal acceptance case; mapped subsystem recorded as alias)",
+        "mapped_from": null
+      },
+      {
+        "name": "coolant_loop",
+        "label": "coolant loop",
+        "type": "structural",
+        "material_class": "conduit_power",
+        "role": "coolant transport circuit (family-definitional presentation element of the thermal acceptance case; mapped subsystem recorded as alias)",
+        "mapped_from": null
+      },
+      {
+        "name": "module_01",
+        "label": "module: conduction path / spreader",
+        "type": "subsystem",
+        "material_class": "polymer",
+        "role": "recorded subsystem 'conduction path / spreader' (no canonical slot in the thermal system architecture; mounted as a labeled module)",
+        "mapped_from": "conduction path / spreader"
+      },
+      {
+        "name": "module_02",
+        "label": "module: safety limit interlock",
+        "type": "subsystem",
+        "material_class": "polymer",
+        "role": "recorded subsystem 'safety limit interlock' (no canonical slot in the thermal system architecture; mounted as a labeled module)",
+        "mapped_from": "safety limit interlock"
+      },
+      {
+        "name": "link_heat_source__cold_plate",
+        "label": "heat link: heat_source -> cold_plate",
+        "type": "interface",
+        "material_class": "conduit_power",
+        "role": "heat coupling (topology only)",
+        "interface_id": "thm_source_plate"
+      },
+      {
+        "name": "link_cold_plate__heat_sink",
+        "label": "heat link: cold_plate -> heat_sink",
+        "type": "interface",
+        "material_class": "conduit_power",
+        "role": "heat coupling (topology only)",
+        "interface_id": "thm_plate_sink"
+      },
+      {
+        "name": "link_coolant_loop__heat_source",
+        "label": "coolant link: coolant_loop -> heat_source",
+        "type": "interface",
+        "material_class": "conduit_power",
+        "role": "coolant coupling (topology only)",
+        "interface_id": "thm_loop_source"
+      },
+      {
+        "name": "link_coolant_loop__heat_sink",
+        "label": "coolant link: coolant_loop -> heat_sink",
+        "type": "interface",
+        "material_class": "conduit_power",
+        "role": "coolant coupling (topology only)",
+        "interface_id": "thm_loop_sink"
+      }
+    ],
+    "key_dimensions": {
+      "measurement_basis": "TOPOLOGY_ONLY",
+      "note": "domain conceptual artifact \u2014 component identity, count and adjacency only; sizes are abstract presentation units, not engineering dimensions",
+      "component_count": 11,
+      "structural_form_components": 4,
+      "mapped_subsystem_components": 3,
+      "interface_count": 4,
+      "adjacency": [
+        {
+          "from": "heat_source",
+          "to": "cold_plate",
+          "kind": "heat"
+        },
+        {
+          "from": "cold_plate",
+          "to": "heat_sink",
+          "kind": "heat"
+        },
+        {
+          "from": "coolant_loop",
+          "to": "heat_source",
+          "kind": "coolant"
+        },
+        {
+          "from": "coolant_loop",
+          "to": "heat_sink",
+          "kind": "coolant"
+        }
+      ],
+      "domain_family": "thermal",
+      "technology_class": "THERMAL_SYSTEM"
+    },
+    "generation_models": [
+      {
+        "generation": 1,
+        "glb": "MODEL/model-001.glb",
+        "current": false
+      },
+      {
+        "generation": 2,
+        "glb": "MODEL/model-002.glb",
+        "current": true
+      }
+    ],
+    "domain_family": "thermal",
+    "quality_gates": {
+      "artifact": "R432_QUALITY_GATES",
+      "version": "1.0.0",
+      "geometry_gate": {
+        "artifact": "GEOMETRY_QUALITY_GATE",
+        "version": "1.0.0",
+        "domain_family": "thermal",
+        "technology_class": "THERMAL_SYSTEM",
+        "technology_class_role": "bridge geometry archetype (presentation routing, R445)",
+        "checks": [
+          {
+            "check": "valid_glb",
+            "passed": true
+          },
+          {
+            "check": "non_empty_scene",
+            "passed": true,
+            "measured": {
+              "node_count": 11,
+              "mesh_count": 11
+            }
+          },
+          {
+            "check": "component_ids_match_spec",
+            "passed": true,
+            "measured": {
+              "spec_components": 7,
+              "scene_nodes": 11,
+              "missing": [],
+              "unexpected": [],
+              "link_nodes_drawn": [
+                "link_cold_plate__heat_sink",
+                "link_coolant_loop__heat_sink",
+                "link_coolant_loop__heat_source",
+                "link_heat_source__cold_plate"
+              ]
+            }
+          },
+          {
+            "check": "named_components",
+            "passed": true,
+            "measured": {
+              "sample": [
+                "assembly_base",
+                "cold_plate",
+                "coolant_loop",
+                "heat_sink",
+                "heat_source",
+                "link_cold_plate__heat_sink",
+                "link_coolant_loop__heat_sink",
+                "link_coolant_loop__heat_source"
+              ]
+            }
+          },
+          {
+            "check": "bounding_box_sane",
+            "passed": true,
+            "measured": {
+              "extent": [
+                7.5,
+                2.3572,
+                5.0
+              ]
+            }
+          },
+          {
+            "check": "no_nan_inf_coordinates",
+            "passed": true
+          },
+          {
+            "check": "no_microscopic_geometry",
+            "passed": true,
+            "measured": {
+              "min_component_extent": 0.13
+            }
+          },
+          {
+            "check": "no_duplicate_model",
+            "passed": true,
+            "measured": {
+              "duplicates": []
+            }
+          },
+          {
+            "check": "normals_valid",
+            "passed": true
+          },
+          {
+            "check": "component_interference",
+            "passed": true,
+            "measured": {
+              "pairs_checked": 21,
+              "same_cell_unmated": [],
+              "nested_disclosed": [
+                {
+                  "pair": "cold_plate==coolant_loop",
+                  "overlap_fraction_min_part": 0.5,
+                  "overlap_fraction_max_part": 0.143,
+                  "mating_declared": false,
+                  "relation": "nested (conceptual containment \u2014 engineering realization must open access or declare mating)"
+                }
+              ],
+              "rule": "two distinct parts at the same cell (mutual overlap > 0.9 of the smaller and > 0.6 of the larger bbox) without a declared mating interface is an engineering-realization failure; nested parts are disclosed for the engineering boundary"
+            }
+          },
+          {
+            "check": "no_isolated_outlier_geometry",
+            "passed": true,
+            "measured": {
+              "islands": [],
+              "note": "components beyond 1.6x the assembly radius"
+            }
+          },
+          {
+            "check": "no_single_blob_domination",
+            "passed": true,
+            "measured": {
+              "largest_component_volume_fraction": 0.4365
+            }
+          },
+          {
+            "check": "interfaces_resolve",
+            "passed": true,
+            "measured": {
+              "unresolved": []
+            }
+          },
+          {
+            "check": "canonical_topology_preserved",
+            "passed": true,
+            "measured": {
+              "component_count": 7,
+              "interface_count": 4
+            }
+          }
+        ],
+        "failures": [],
+        "passed": true
+      },
+      "visual_gate": {
+        "artifact": "VISUAL_QUALITY_GATE",
+        "version": "1.0.0",
+        "domain_family": "thermal",
+        "technology_class": "THERMAL_SYSTEM",
+        "technology_class_role": "bridge geometry archetype (presentation routing, R445)",
+        "checks": [
+          {
+            "check": "not_flat_slab",
+            "passed": true,
+            "measured": {
+              "height_over_length": 0.3143,
+              "component_count": 11
+            }
+          },
+          {
+            "check": "not_generic_box_pile",
+            "passed": true,
+            "measured": {
+              "component_count": 11,
+              "pure_box_components": 0,
+              "box_ratio": 0.0
+            }
+          },
+          {
+            "check": "family_component_count",
+            "passed": true,
+            "measured": {
+              "family": "THERMAL_SYSTEM",
+              "components": 11,
+              "required": 4
+            }
+          },
+          {
+            "check": "family_feature_assembly_base",
+            "passed": true,
+            "measured": {
+              "family": "THERMAL_SYSTEM",
+              "found": 1,
+              "required": 1
+            }
+          },
+          {
+            "check": "family_feature_any_heat_heat_source_heat_sink",
+            "passed": true,
+            "measured": {
+              "family": "THERMAL_SYSTEM"
+            }
+          }
+        ],
+        "failures": [],
+        "passed": true,
+        "note": "presentation audit \u2014 structural metrics only; NOT scientific validation and NOT a vision model (R432 section 17 disclosure)"
+      },
+      "engineering_gate": null,
+      "passed": true,
+      "failures": []
+    },
+    "artifact_identity": {
+      "artifact": "ARTIFACT_IDENTITY",
+      "blender_scene_hash": null,
+      "cad_source": null,
+      "derivation": "assembled from persisted run artifacts only \u2014 every hash from a real file at build time (Art. VI); blender_scene_hash fills when the render stage records its scene",
+      "derived_at": "2026-09-11T20:40:03Z",
+      "domain_family": "thermal",
+      "generation_id": "gen-2",
+      "geometry_hash": "f99ccc083fab11edc59829fdb8d25c6bf5d5cc2387fdabfe136cc1464f380ffa",
+      "glb_disk_sha256": "f99ccc083fab11edc59829fdb8d25c6bf5d5cc2387fdabfe136cc1464f380ffa",
+      "glb_matches_geometry_hash": true,
+      "glb_path": "/app/ENGINE_RUNS/toscanini_ui_ui_energy_inefficiency_158485/MODEL/model-002.glb",
+      "identity_version": "1.0.0",
+      "run_id": "ts_a45a10ea517b",
+      "source_geometry_hash": "a987aebedd3d573bc5656b288b6730d0237b2584d05f016b1d2f32099b2fd181",
+      "technology_id": "ui_energy_inefficiency_158485",
+      "visualizability_class": "SYSTEM_3D"
+    },
+    "fallback_basis": null,
+    "scores": {
+      "artifact": "R433_MODEL_SCORES",
+      "version": "1.0.0",
+      "semantic_identity": {
+        "score": "PASS",
+        "passed": true,
+        "failures": [],
+        "not_visualized": [],
+        "checks": [
+          {
+            "check": "model_loads",
+            "passed": true,
+            "measured": {
+              "node_count": 11
+            }
+          },
+          {
+            "check": "family_selected",
+            "passed": true,
+            "measured": {
+              "family": "THERMAL_SYSTEM"
+            }
+          },
+          {
+            "check": "spec_components_visualized",
+            "passed": true,
+            "measured": {
+              "spec_components": 7,
+              "not_visualized": []
+            }
+          },
+          {
+            "check": "domain_architecture_present",
+            "passed": true,
+            "measured": {
+              "family": "THERMAL_SYSTEM",
+              "required": 4,
+              "not_visualized": []
+            }
+          },
+          {
+            "check": "major_interfaces_represented",
+            "passed": true,
+            "measured": {
+              "interfaces": 4,
+              "resolvable_in_scene": 4,
+              "note": "conduit links may run inside the body by design"
+            }
+          }
+        ]
+      },
+      "engineering_coherence": {
+        "score": "PASS",
+        "passed": true,
+        "failures": [],
+        "checks": [
+          {
+            "check": "valid_glb",
+            "passed": true
+          },
+          {
+            "check": "non_empty_scene",
+            "passed": true,
+            "measured": {
+              "node_count": 11,
+              "mesh_count": 11
+            }
+          },
+          {
+            "check": "component_ids_match_spec",
+            "passed": true,
+            "measured": {
+              "spec_components": 7,
+              "scene_nodes": 11,
+              "missing": [],
+              "unexpected": [],
+              "link_nodes_drawn": [
+                "link_cold_plate__heat_sink",
+                "link_coolant_loop__heat_sink",
+                "link_coolant_loop__heat_source",
+                "link_heat_source__cold_plate"
+              ]
+            }
+          },
+          {
+            "check": "named_components",
+            "passed": true,
+            "measured": {
+              "sample": [
+                "assembly_base",
+                "cold_plate",
+                "coolant_loop",
+                "heat_sink",
+                "heat_source",
+                "link_cold_plate__heat_sink",
+                "link_coolant_loop__heat_sink",
+                "link_coolant_loop__heat_source"
+              ]
+            }
+          },
+          {
+            "check": "bounding_box_sane",
+            "passed": true,
+            "measured": {
+              "extent": [
+                7.5,
+                2.3572,
+                5.0
+              ]
+            }
+          },
+          {
+            "check": "no_nan_inf_coordinates",
+            "passed": true
+          },
+          {
+            "check": "no_microscopic_geometry",
+            "passed": true,
+            "measured": {
+              "min_component_extent": 0.13
+            }
+          },
+          {
+            "check": "no_duplicate_model",
+            "passed": true,
+            "measured": {
+              "duplicates": []
+            }
+          },
+          {
+            "check": "normals_valid",
+            "passed": true
+          },
+          {
+            "check": "component_interference",
+            "passed": true,
+            "measured": {
+              "pairs_checked": 21,
+              "same_cell_unmated": [],
+              "nested_disclosed": [
+                {
+                  "pair": "cold_plate==coolant_loop",
+                  "overlap_fraction_min_part": 0.5,
+                  "overlap_fraction_max_part": 0.143,
+                  "mating_declared": false,
+                  "relation": "nested (conceptual containment \u2014 engineering realization must open access or declare mating)"
+                }
+              ],
+              "rule": "two distinct parts at the same cell (mutual overlap > 0.9 of the smaller and > 0.6 of the larger bbox) without a declared mating interface is an engineering-realization failure; nested parts are disclosed for the engineering boundary"
+            }
+          },
+          {
+            "check": "no_isolated_outlier_geometry",
+            "passed": true,
+            "measured": {
+              "islands": [],
+              "note": "components beyond 1.6x the assembly radius"
+            }
+          },
+          {
+            "check": "no_single_blob_domination",
+            "passed": true,
+            "measured": {
+              "largest_component_volume_fraction": 0.4365
+            }
+          },
+          {
+            "check": "interfaces_resolve",
+            "passed": true,
+            "measured": {
+              "unresolved": []
+            }
+          },
+          {
+            "check": "canonical_topology_preserved",
+            "passed": true,
+            "measured": {
+              "component_count": 7,
+              "interface_count": 4
+            }
+          },
+          {
+            "check": "artifact_identity_chain",
+            "passed": true,
+            "measured": {
+              "generation_id": "gen-1",
+              "geometry_hash": "f99ccc083fab11ed"
+            }
+          }
+        ]
+      },
+      "presentation_quality": {
+        "score": "PASS",
+        "passed": true,
+        "failures": [],
+        "checks": [
+          {
+            "check": "not_flat_slab",
+            "passed": true,
+            "measured": {
+              "height_over_length": 0.3143,
+              "component_count": 11
+            }
+          },
+          {
+            "check": "not_generic_box_pile",
+            "passed": true,
+            "measured": {
+              "component_count": 11,
+              "pure_box_components": 0,
+              "box_ratio": 0.0
+            }
+          },
+          {
+            "check": "family_component_count",
+            "passed": true,
+            "measured": {
+              "family": "THERMAL_SYSTEM",
+              "components": 11,
+              "required": 4
+            }
+          },
+          {
+            "check": "family_feature_assembly_base",
+            "passed": true,
+            "measured": {
+              "family": "THERMAL_SYSTEM",
+              "found": 1,
+              "required": 1
+            }
+          },
+          {
+            "check": "family_feature_any_heat_heat_source_heat_sink",
+            "passed": true,
+            "measured": {
+              "family": "THERMAL_SYSTEM"
+            }
+          }
+        ]
+      },
+      "note": "three separated dimensions \u2014 never combined into one score (R433 section 13); presentation PASS with semantic FAIL is a disclosed failure, never a pass"
+    },
+    "evolution": [
+      {
+        "generation": 1,
+        "invention_id": "inv:13bec8677b:gen1",
+        "status": "SUPERSEDED",
+        "status_basis": "state INVENTION_EVOLVED",
+        "why": "the control variable shifts from user behavior (door-opening habits) to food biochemistry (compositional metabolic state) \u2014 a new operating regime driven by the object being preserved, not the user",
+        "domain_family": "thermal",
+        "component_count": 7,
+        "glb": "/api/run/ts_a45a10ea517b/model?gen=1",
+        "glb_sha256": "84121d4e43abecbb6877214070f46b6ff28be6fd0077934d6c8628c361d8127d",
+        "current": false
+      },
+      {
+        "generation": 2,
+        "invention_id": "inv:13bec8677b:gen2",
+        "status": "CURRENT",
+        "status_basis": "state INVENTION_REQUIRES_EXPERIMENT \u00b7 maturity EVIDENCE_SUPPORTED",
+        "why": "the control variable shifts from user behavior (door-opening habits) to food biochemistry (compositional metabolic state) \u2014 a new operating regime driven by the object being preserved, not the user",
+        "domain_family": "thermal",
+        "component_count": 11,
+        "glb": "/api/run/ts_a45a10ea517b/model?gen=2",
+        "glb_sha256": "f99ccc083fab11edc59829fdb8d25c6bf5d5cc2387fdabfe136cc1464f380ffa",
+        "current": true
+      }
+    ],
+    "generation_id": "gen-2",
+    "generation_count": 2
+  },
+  "renders": {
+    "stage": "RENDER",
+    "status": "RENDER_REQUESTED",
+    "job": {
+      "status": "RUNNING",
+      "enqueued_at": "2026-09-11T20:40:05Z",
+      "worker_pid": 5255,
+      "readback": null
+    },
+    "execution": "async artifact job (waits for the run worker to exit, then renders through the quality ladder; poll the CIO visualization.renders)",
+    "note": "DISCOVERY COMPLETE does not mean PRESENTATION RENDER COMPLETE \u2014 the render runs asynchronously after the run's terminal state"
+  },
+  "package_out": {
+    "zip_name": "TECHNOLOGY_TRANSFER_PACKAGE_invui_energy_inefficiency_15848588c122c1ce96.zip",
+    "zip_sha256": "1e3dc1c0ccf859c2cef8ef16b4a02ab8319fa65818e0882cc2190865cc2f6e91",
+    "zip_bytes": 135316,
+    "package_maturity": "EARLY_TECHNICAL_EVALUATION",
+    "visualizability_class": "SYSTEM_3D",
+    "manifest_files": 32,
+    "package_kind": "TECHNOLOGY_TRANSFER_PACKAGE (bridge) \u2014 the ONE canonical technology-transfer artifact for this run, honestly maturity-labeled; distinct from the buyer release chain (Art. IV: no weakened gates)"
+  },
+  "report": {
+    "bridge_version": "2.0.0",
+    "steps": [
+      {
+        "step": "CLASSIFY",
+        "status": "OK",
+        "detail": {
+          "visualizability_class": "SYSTEM_3D",
+          "basis": {
+            "geometry_parameters_sourced": 0,
+            "subsystems_recorded": 4,
+            "physical_site_detected": true,
+            "process_signal": false,
+            "algorithmic_signal": false,
+            "intervention_site": "refrigerator",
+            "engineering_min_params": 3,
+            "reason": "4 recorded subsystems and only 0 sourced geometry parameters \u2014 conceptual system-architecture visualization (topology, not dimensions)",
+            "measured_from": [
+              "engineering_specification.parameters",
+              "engineering_specification.engineering_core.critical_parameters",
+              "engineering_specification.system_architecture.subsystems",
+              "final_state.causal_chain"
+            ]
+          }
+        },
+        "at": "2026-09-11T20:40:03Z"
+      },
+      {
+        "step": "GEOMETRY",
+        "status": "OK",
+        "detail": {
+          "visualizability_class": "SYSTEM_3D",
+          "domain_family": "thermal",
+          "glb_sha256": "f99ccc083fab11edc59829fdb8d25c6bf5d5cc2387fdabfe136cc1464f380ffa",
+          "components": 11,
+          "quality_gates": true,
+          "attempts": [
+            {
+              "attempt": 1,
+              "status": "OK",
+              "domain_family": "thermal"
+            }
+          ]
+        },
+        "at": "2026-09-11T20:40:03Z"
+      },
+      {
+        "step": "GENERATION_MODELS",
+        "status": "OK",
+        "detail": {
+          "count": 2,
+          "domain_family": "thermal"
+        },
+        "at": "2026-09-11T20:40:04Z"
+      },
+      {
+        "step": "PACKAGE",
+        "status": "OK",
+        "detail": {
+          "zip_path": "/app/ENGINE_RUNS/toscanini_ui_ui_energy_inefficiency_158485/TECHNOLOGY_TRANSFER_PACKAGE_invui_energy_inefficiency_15848588c122c1ce96.zip",
+          "zip_sha256": "1e3dc1c0ccf859c2cef8ef16b4a02ab8319fa65818e0882cc2190865cc2f6e91",
+          "package_maturity": "EARLY_TECHNICAL_EVALUATION",
+          "files": 32,
+          "compiler": "R440_CANONICAL_PACKAGE_COMPILER/1.1"
+        },
+        "at": "2026-09-11T20:40:05Z"
+      },
+      {
+        "step": "CIO_UPDATE",
+        "status": "OK",
+        "detail": {
+          "geometry_present": true,
+          "package_zip": "/api/run/ts_a45a10ea517b/package"
+        },
+        "at": "2026-09-11T20:40:05Z"
+      }
+    ],
+    "outcome": "COMPLETED",
+    "visualizability_class": "SYSTEM_3D"
+  }
+}

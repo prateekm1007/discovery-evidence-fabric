@@ -1,0 +1,254 @@
+{
+ "schema": "INVENTION_LINEAGE/1.0.0",
+ "run_id": "engrun:ui_energy_inefficiency_158485:2026-09-11T20:28:05",
+ "generations": [
+  {
+   "gen": 1,
+   "invention_id": "inv:13bec8677b:gen1",
+   "parent_id": null,
+   "lineage": [
+    "inv:13bec8677b:gen1"
+   ],
+   "origin": "BASELINE_SYNTHESIS",
+   "architecture": {
+    "mechanism": "Persistence of electricity consumption habits causes inertia and inefficient energy usage.",
+    "intervention": "Implement a smart adaptive controller in the refrigerator that learns door-opening and loading habits, then preemptively adjusts cooling cycles to minimize energy waste from habitual over-cooling.",
+    "expected_effect": "Reduced energy consumption while maintaining required cooling capacity.",
+    "falsification_test": "Run two identical fridges with same load and usage pattern, one with adaptive controller and one without; measure energy over a week; if adaptive does not show >10% reduction, mechanism fails."
+   },
+   "state": "INVENTION_EVOLVED",
+   "maturity": "EVIDENCE_SUPPORTED",
+   "challenge": {
+    "physics_lifecycle": "MECHANISM_NOT_SIMULATABLE",
+    "attack_overall": "KILLED",
+    "evidence_verified": true,
+    "killed": true,
+    "kill_reason": "adversarial challenge failed: weak_transfer: KILLED, obvious_combination: KILLED; killed dimensions: weak_transfer: KILLED, obvious_combination: KILLED",
+    "final_status": "REJECTED"
+   },
+   "causal_delta": null,
+   "change_delta": null,
+   "reason_for_change": null,
+   "fresh_evidence": null,
+   "model": null,
+   "artifacts": {},
+   "evidence_verified": true,
+   "diagnosis": {
+    "cause": "ADVERSARIAL_KILL",
+    "basis": [
+     "generation challenge.attack_overall=KILLED",
+     "adversarial challenge failed: weak_transfer: KILLED, obvious_combination: KILLED; killed dimensions: weak_transfer: KILLED, obvious_combination: KILLED"
+    ],
+    "infrastructure_class": false,
+    "diagnosed_by": "evolution.diagnose_from_generation/1.0.0 (per-generation challenge record)"
+   }
+  },
+  {
+   "gen": 2,
+   "invention_id": "inv:13bec8677b:gen2",
+   "parent_id": "inv:13bec8677b:gen1",
+   "lineage": [
+    "inv:13bec8677b:gen1",
+    "inv:13bec8677b:gen2"
+   ],
+   "origin": "EVOLUTION_CAUSAL_DELTA",
+   "architecture": {
+    "mechanism": "food items have composition-dependent metabolic decay rates; cooling that is matched to each item's actual biochemical state (not to user habits) minimizes energy waste while maximizing preservation",
+    "intervention": "embed a low-cost NIR/Raman spectroscopic sensor in each refrigerator compartment that continuously estimates the fat/protein/carbohydrate composition and ripeness state of stored items; a controller adjusts compartment temperature and humidity setpoints per-item-group to the minimum cooling that keeps each composition class's metabolic decay below a threshold",
+    "expected_effect": "20-35% reduction in cooling energy versus habit-based control, with equal or better preservation quality (measured by vitamin retention and microbial load)",
+    "falsification_test": "place two identical refrigerators with identical food loads (one habit-based, one compositional-state-based) for 14 days; if the compositional controller does not reduce energy by at least 15% at equal preservation quality, the mechanism is falsified"
+   },
+   "state": "INVENTION_REQUIRES_EXPERIMENT",
+   "maturity": "EVIDENCE_SUPPORTED",
+   "causal_delta": {
+    "failure_or_challenge": "adversarial challenge failed: weak_transfer: KILLED, obvious_combination: KILLED; killed dimensions: weak_transfer: KILLED, obvious_combination: KILLED",
+    "diagnosed_cause": "ADVERSARIAL_KILL",
+    "causal_change": "the control variable shifts from user behavior (door-opening habits) to food biochemistry (compositional metabolic state) — a new operating regime driven by the object being preserved, not the user",
+    "new_capability": "real-time compositional sensing and per-item metabolic-state estimation inside a domestic appliance",
+    "new_interaction": "spectroscopic light-matter interaction with food biomolecules (fat/protein/water bands) coupled to a metabolic decay model",
+    "new_operating_regime": "closed-loop biochemical preservation — cooling setpoints are continuously recomputed from sensed food composition rather than from historical user patterns",
+    "predicted_effect": "energy consumption drops 20-35% (vs. habit-based control) and shelf-life of high-protein/high-fat items extends 30-50% because cooling matches actual decay kinetics",
+    "frontier_capability": "real-time food composition spectroscopy and metabolomic fingerprinting, transferred from agri-food processing (milk blending optimization for cheese quality)",
+    "thirty_year_engine": {
+     "current": "rule-based adaptive cooling driven by door-opening habit statistics",
+     "evolution_2055": "cold storage becomes a closed-loop biochemical preservation system where each food item's metabolic state is continuously sensed and its preservation trajectory is actively managed",
+     "required_capability": "the parent lacked compositional/state-aware control — it only reacted to user behavior, so it could not transfer to any food type or storage context, and its habit-learning was an obvious combination of thermostat plus ML",
+     "capability_backcast": "2055 metabolic-state sensing → 2045 per-item preservation trajectory control → 2035 compositional spectroscopy in appliances → 2028 low-cost NIR/Raman food composition sensors → 2025 metabolomic fingerprinting of perishables",
+     "todays_frontier": "real-time food composition sensing and metabolomic fingerprinting in agri-food processing (e.g., milk blending optimization for cheese quality)",
+     "transfer": "the milk-blending evidence shows that compositional variation (fat/protein ratio) drives processing outcomes; the same compositional sensing can drive cooling decisions — the refrigerator becomes a compositional-state controller, not a habit controller"
+    },
+    "provenance": "AI_PROPOSED (the 30-year walk and the frontier transfer are generated reasoning, not retrieved evidence — they must survive the re-evaluation gauntlet like every other generated claim)"
+   },
+   "change_delta": "the control variable shifts from user behavior (door-opening habits) to food biochemistry (compositional metabolic state) — a new operating regime driven by the object being preserved, not the user",
+   "reason_for_change": "diagnosed cause ADVERSARIAL_KILL; real-time food composition spectroscopy and metabolomic fingerprinting, transferred from agri-food processing (milk blending optimization for cheese quality)",
+   "fresh_evidence": {
+    "snapshot_version": 2,
+    "query": "refrigerator Persistence electricity consumption habits causes inertia",
+    "n_items": 1,
+    "status": "OK",
+    "snapshot_hash": "9cc62e0fb06068c5",
+    "boundary": "NEW retrieval for this generation (Art. XLIV: new evidence -> new snapshot -> new freeze; never silently merged into the GEN-1 frozen set)",
+    "retrieved_at": "2026-09-11T20:38:48+00:00"
+   },
+   "generated_by": {
+    "provider": "zai",
+    "model": "deepseek-ai/DeepSeek-V4-Flash-0731",
+    "status": "OK",
+    "prompt_hash": "8eb4585ac46cdf43",
+    "output_hash": "070f480b677827b9",
+    "template_echo_rejected": [],
+    "provenance": "AI_PROPOSED",
+    "maturity_at_generation": "GENERATED"
+   },
+   "challenge": {
+    "physics_lifecycle": "MECHANISM_NOT_SIMULATABLE",
+    "attack_overall": "NEEDS_REPAIR",
+    "independent_attack": "ESCALATED_OBJECTION",
+    "escalated_objection": {
+     "preserved_objections": [
+      {
+       "attack_class": "MECHANISM_FAILURE",
+       "basis": "The mechanism assumes food metabolic heat dominates cooling load, but refrigerator energy is dominated by heat infiltration and door openings; metabolic heat of food is negligible (<1% of load), so adjusting to composition cannot yield 20-35% savings."
+      },
+      {
+       "attack_class": "BOUNDARY_CONDITION_FAILURE",
+       "basis": "The mechanism requires per-item-group temperature/humidity control, but standard refrigerators have a single evaporator and no ability to set different conditions for different items; no boundary conditions are claimed, making the claim unbounded and unrealistic."
+      },
+      {
+       "attack_class": "EVIDENCE_CONTRADICTION",
+       "basis": "The cited evidence (EuropePMC on milk blending for cheese) is irrelevant to refrigerator energy or spectroscopy; it does not support the mechanism, and the arxiv records are about thermodynamic cycles, not food preservation."
+      },
+      {
+       "attack_class": "BASELINE_EQUIVALENCE",
+       "basis": "The baseline habit-based control already optimizes for usage; the compositional controller would either raise temperature (degrading preservation) or not change energy, so it cannot beat baseline at equal preservation quality; the claimed 15% reduction is unsupported."
+      },
+      {
+       "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+       "basis": "Embedding NIR/Raman sensors in each compartment is impractical: Raman signals are weak, sensors cannot see through packaging or cluttered items, and per-item tracking is impossible; multiple compartments with independent control would require major hardware redesign and cost."
+      },
+      {
+       "attack_class": "MEASUREMENT_AMBIGUITY",
+       "basis": "The testable prediction lacks defined metrics for \"equal preservation quality\" (vitamin retention and microbial load are not specified thresholds) and does not control for sensor accuracy or food load variability; a 14-day test is insufficient to establish long-term equivalence."
+      }
+     ],
+     "calibration_state": "NOT_CALIBRATED",
+     "measured": {
+      "coverage": 1.0,
+      "parse_completeness": 1.0,
+      "tpr_scoped": 1.0,
+      "fpr_known_good": 1.0,
+      "n_cases_attacked": 40
+     },
+     "note": "the independent attack KILLED this architecture, but the instrument is measured NOT_CALIBRATED (FPR 1.0 on sealed known-good mechanisms): the objection is preserved and escalated, not executed (Art. L)"
+    },
+    "killed": false,
+    "survived": true
+   },
+   "model": null,
+   "artifacts": {
+    "invention_spec": "INVENTION_SPECIFICATION_gen-2.json",
+    "engineering_spec": "ENGINEERING_SPECIFICATION_gen-2.json"
+   },
+   "evidence_verified": true
+  }
+ ],
+ "n_generations": 2,
+ "n_evolution_generations": 1,
+ "survivor_reached": true,
+ "survivor_gen": 2,
+ "current_invention": {
+  "gen": 2,
+  "invention_id": "inv:13bec8677b:gen2",
+  "state": "INVENTION_REQUIRES_EXPERIMENT",
+  "maturity": "EVIDENCE_SUPPORTED"
+ },
+ "stop_reason": "SURVIVOR_REACHED",
+ "budget": {
+  "max_evolution_generations": 3,
+  "engine_evolution_env": "1"
+ },
+ "honesty_contract": "every generation's maturity label is derived from its own verification events (Art. LX); generated content carries AI_PROPOSED provenance and never claims evidence; infrastructure failures are typed and never converted into scientific verdicts (Art. LXI); the current invention is always presented with its true maturity, never softened (Art. LXVIII)",
+ "resumed": false,
+ "final_state": {
+  "run_id": "engrun:ui_energy_inefficiency_158485:2026-09-11T20:28:05",
+  "problem_id": "ui_energy_inefficiency_158485",
+  "device": "refrigerator",
+  "final_status": "EVOLVED_INVENTION_CANDIDATE",
+  "epistemic_state": "CANDIDATE_CONNECTION",
+  "reason": "an evolved architecture generation survived the re-evaluation gauntlet (2 generations, causal delta recorded); the decisive physical experiment is specified, not executed",
+  "premise_verdict": "PREMISE_COHERENT",
+  "premise_explanation": "no definitional contradiction matched; the gate cannot prove physical truth — only rule-table incoherence is checkable (disclosed limit)",
+  "evidence_verified": true,
+  "evidence_classification_counts": {
+   "DIRECT_SUPPORT": 0,
+   "PARTIAL_SUPPORT": 0,
+   "BACKGROUND": 0,
+   "ANALOGY": 20,
+   "CONTRADICTORY": 1,
+   "IRRELEVANT": 1
+  },
+  "prior_art_status": "UNRESOLVED_SEARCH_INCOMPLETE",
+  "collision_novelty_risk": "ADJACENT_COLLISION_CANDIDATES",
+  "collision_search_execution": {
+   "mandatory_complete": false,
+   "n_errors": 5,
+   "rule": "RESOLVED_DIFFERENTIATED requires every mandatory (query_class x source) search to have completed successfully (R394 s2); provider failure never becomes absence (Art. XXI.3)"
+  },
+  "adversarial_overall": "KILLED",
+  "adjudication_verdict": "CONTESTED",
+  "ranking_score": 0.3091,
+  "next_best_action": "fetch and audit claims of nearest collision patents",
+  "failed_stages": {},
+  "final_envelope_hash": "41ec23284d48cd23b015c1441e862e69b5389de85c0d0ac397a830f67bb69980",
+  "code_commit": "63e2ed5ac324b2fd273132089c48f4003d2d405d",
+  "timestamp": "2026-09-11T20:32:40+00:00Z",
+  "evolution": {
+   "n_generations": 2,
+   "stop_reason": "SURVIVOR_REACHED",
+   "current_invention": {
+    "gen": 2,
+    "invention_id": "inv:13bec8677b:gen2",
+    "state": "INVENTION_REQUIRES_EXPERIMENT",
+    "maturity": "EVIDENCE_SUPPORTED"
+   },
+   "survivor_reached": true
+  },
+  "experiment_contract": {
+   "contract": {
+    "HYPOTHESIS": "expected effect holds: Reduced energy consumption while maintaining required cooling capacity. (recorded prior 0.6, epistemic class MODEL_DERIVED per the killer-experiment provenance)",
+    "TREATMENT": "embed a low-cost NIR/Raman spectroscopic sensor in each refrigerator compartment that continuously estimates the fat/protein/carbohydrate composition and ripeness state of stored items; a controller adjusts compartment temperature and humidity setpoints per-item-group to the minimum cooling that keeps each composition class's metabolic decay below a threshold",
+    "CONTROL_BLOCKER": "no executed baseline comparison on record (physics chain executed: ['PRE_REQUIREMENTS']; lifecycle MECHANISM_NOT_SIMULATABLE) — the control arm is not invented from the problem statement",
+    "MEASUREMENT": "place two identical refrigerators with identical food loads (one habit-based, one compositional-state-based) for 14 days; if the compositional controller does not reduce energy by at least 15% at equal preservation quality, the mechanism is falsified",
+    "APPARATUS": "the falsification test's own recorded instrumentation (stated within MEASUREMENT; not split out — no separate apparatus record exists)",
+    "SAMPLE_BLOCKER": "no sample-size / n= record exists in any engine stage (honest UNKNOWN — Art. XXV)",
+    "ACCEPTANCE_THRESHOLD": "20-35% reduction in cooling energy versus habit-based control, with equal or better preservation quality (measured by vitamin retention and microbial load)",
+    "FALSIFICATION_THRESHOLD": "the recorded falsification test ('place two identical refrigerators with identical food loads (one habit-based, one compositional-state-based) for 14 days; if the compositional controller does not reduce energy by at least 15% at equa') fails to show the recorded expected effect ('20-35% reduction in cooling energy versus habit-based control, with equal or better preservation quality (measured by vitamin retention and microbial load)') — the mechanism is killed by its own test's negative outcome; the recorded failing hypothesis is 'expected effect does not reproduce outside source context'",
+    "UNCERTAINTY": "all priors MODEL_DERIVED; no EXPERIMENTALLY_ESTIMATED inputs exist at this stage (Art. XXVIII/XXXVIII: no synthetic shortcut to physical observation)",
+    "COST": "UNKNOWN absolute cost (options ranked on a relative-1.0 scale per bayesian_eig; no sourced dollar/time estimate exists — Art. XXV)",
+    "TIME": "UNKNOWN (no stage recorded a time estimate)",
+    "SAFETY_BLOCKER": "no safety-analysis stage output exists in the engine (honest UNKNOWN — Art. XXV; the engineering failure_modes record is a failure-mode list, not a safety case)"
+   },
+   "status": {
+    "answered_fields": [
+     "HYPOTHESIS",
+     "TREATMENT",
+     "MEASUREMENT",
+     "APPARATUS",
+     "ACCEPTANCE_THRESHOLD",
+     "FALSIFICATION_THRESHOLD",
+     "UNCERTAINTY"
+    ],
+    "unknown_fields": {
+     "CONTROL": "no executed baseline comparison on record (physics chain executed: ['PRE_REQUIREMENTS']; lifecycle MECHANISM_NOT_SIMULATABLE) — the control arm is not invented from the problem statement",
+     "SAMPLE": "no sample-size / n= record exists in any engine stage (honest UNKNOWN — Art. XXV)",
+     "COST": "UNKNOWN absolute cost (options ranked on a relative-1.0 scale per bayesian_eig; no sourced dollar/time estimate exists — Art. XXV)",
+     "TIME": "UNKNOWN (no stage recorded a time estimate)",
+     "SAFETY": "no safety-analysis stage output exists in the engine (honest UNKNOWN — Art. XXV; the engineering failure_modes record is a failure-mode list, not a safety case)"
+    },
+    "falsification_threshold_answered": true,
+    "contract_complete": true,
+    "basis": "Art. LII: the contract is complete only when an experimental outcome that kills the mechanism is stated; UNKNOWN fields are honest states (Art. XXV) and are listed with their blockers — they limit maturity, not existence"
+   }
+  }
+ }
+}
