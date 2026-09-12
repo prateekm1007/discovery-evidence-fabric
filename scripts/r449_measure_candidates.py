@@ -22,6 +22,7 @@ import metrics as M  # noqa: E402
 from negative_controls import _component_pose_delta, _projected_views, _view_agreement  # noqa: E402
 
 import trimesh  # noqa: E402
+import os
 
 OUT = Path("/home/z/my-project/hf_space/R449")
 BUCKET = "prateekm1/toscanini-visual-lab-benchmarks"
@@ -91,7 +92,7 @@ def measure_case(letter: str, candidate_path: Path) -> dict:
 def main() -> int:
     from huggingface_hub import hf_hub_download
 
-    token = "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"
+    token = os.environ.get("HF_TOKEN", "")
     results = {"artifact_type": "R449_CANDIDATE_MEASUREMENTS_HUNYUAN3D_OMNI",
                "round": "R449-C2", "created_at": "2026-09-12",
                "reviewer_provenance": "AI_REVIEW",

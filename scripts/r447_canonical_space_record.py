@@ -44,8 +44,14 @@ REPO_ROOT = subprocess.run(
 sys.path.insert(0, REPO_ROOT)
 
 HF_TOKEN = os.environ.get("HF_TOKEN", "")
-GITHUB_REMOTE = ("https://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"
-                 "@github.com/prateekm1007/discovery-evidence-fabric.git")
+GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN", "")
+if not GITHUB_TOKEN:
+    raise SystemExit(
+        "GITHUB_TOKEN missing: credentials come exclusively from "
+        "environment/secret injection (R451-C2 Step 1 scrub)")
+GITHUB_REMOTE = (
+    f"https://{GITHUB_TOKEN}"
+    "@github.com/prateekm1007/discovery-evidence-fabric.git")
 AUTH = {"Authorization": f"Bearer {HF_TOKEN}"}
 NOW = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 

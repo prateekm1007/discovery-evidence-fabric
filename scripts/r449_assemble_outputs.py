@@ -12,6 +12,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "visual-lab" / "benchmark"))
 
 import license_gate as LG  # noqa: E402
+import os
 
 REPO = Path(__file__).resolve().parents[1]
 OUT = REPO / "R449"
@@ -58,7 +59,7 @@ def bucket_json(filename):
     try:
         from huggingface_hub import hf_hub_download
         p = hf_hub_download(repo_id=BUCKET, repo_type="dataset", filename=filename,
-                            token="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")
+                            token=os.environ.get("HF_TOKEN", ""))
         return json.loads(Path(p).read_text())
     except Exception as e:  # noqa: BLE001
         return {"epistemic_status": "UNAVAILABLE_AT_ASSEMBLY_TIME", "error": str(e)[:200]}

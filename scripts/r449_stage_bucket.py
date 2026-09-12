@@ -11,8 +11,13 @@ import sys
 from pathlib import Path
 
 from huggingface_hub import HfApi
+import os
 
-TOKEN = "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"
+TOKEN = os.environ.get("HF_TOKEN", "")
+if not TOKEN:
+    raise SystemExit(
+        "HF_TOKEN missing: credentials come exclusively from "
+        "environment/secret injection (R451-C2 Step 1 scrub)")
 REPO = "prateekm1/toscanini-visual-lab-benchmarks"
 REF = Path("/home/z/my-project/download/R449_reference_inputs")
 REPODIR = Path("/home/z/my-project/hf_space")

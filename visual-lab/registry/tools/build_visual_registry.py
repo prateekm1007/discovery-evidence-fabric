@@ -1,13 +1,26 @@
 #!/usr/bin/env python3
-"""R448 - Toscanini HF Visual Model Registry builder.
+"""R448 - Toscanini HF Visual Model Registry builder (R451-C2 portability).
 
 Reads curated directives (r448_curation.json), verifies every candidate
-against the live Hugging Face Hub API, and writes:
+against the live Hugging Face Hub API, and writes the registry + the raw
+API verification record.
 
-  download/R448/visual-lab/registry/hf_visual_model_registry.json
-  download/R448/visual-lab/registry/hf_api_verification_raw.json
+PORTABLE (operator directive R451-C2 step 4): every path is derived from
+this file's checkout location (``__file__``) or from explicit CLI
+parameters. A fresh clone can run the full chain with no author-machine
+directories:
 
-Constitutional discipline (EPISTEMIC_CONSTITUTION.md v2.3.0, hash 7084be64...):
+  build registry    python3 visual-lab/registry/tools/build_visual_registry.py \
+                        [--out DIR] [--curation FILE]      # needs HF_TOKEN env
+  validate registry python3 visual-lab/registry/tools/build_visual_registry.py \
+                        --validate visual-lab/registry/hf_visual_model_registry.json
+  reproduce         diff the rebuilt registry against the committed one
+
+Credentials come exclusively from environment/secret injection
+(HF_TOKEN; R451-C2 step 1). The token is never defaulted, never logged.
+
+Constitutional discipline (EPISTEMIC_CONSTITUTION.md, ratified bytes at
+origin/main; v2.4.0 hash b54a1be9...):
   Art. VI   - provenance is never manufactured: API failures are recorded as
               api_status, verification fields the API cannot answer stay
               PENDING_VERIFICATION / NOT_MEASURED.
@@ -16,17 +29,23 @@ Constitutional discipline (EPISTEMIC_CONSTITUTION.md v2.3.0, hash 7084be64...):
   Art. LXXII - every entry hard-codes approved_for_canonical_geometry = false.
 """
 
+import argparse
 import json
 import os
 import re
+import sys
 import urllib.error
 import urllib.request
 from datetime import datetime, timezone
+from pathlib import Path
+
+TOOLS_DIR = Path(__file__).resolve().parent          # visual-lab/registry/tools
+REGISTRY_DIR = TOOLS_DIR.parent                      # visual-lab/registry
+DEFAULT_CURATION = TOOLS_DIR / "r448_curation.json"
+DEFAULT_OUT_DIR = REGISTRY_DIR
 
 HF_TOKEN = os.environ.get("HF_TOKEN", "").strip()
 BASE = "https://huggingface.co"
-OUT_DIR = "/home/z/my-project/download/R448/visual-lab/registry"
-CURATION = "/home/z/my-project/scripts/r448_curation.json"
 
 UA = "toscanini-visual-lab/1.0 (registry builder; contact prateekm1)"
 
@@ -255,9 +274,77 @@ def completeness(entry):
             "required_fields_total": len(REQUIRED_FIELDS), "missing": missing}
 
 
-def main():
-    os.makedirs(OUT_DIR, exist_ok=True)
-    cur = json.load(open(CURATION, encoding="utf-8"))
+def validate_registry(path: str) -> int:
+    """Offline validation of a committed/built registry (Art. V: the positive
+    half - a valid registry must be capable of passing)."""
+    with open(path, encoding="utf-8") as f:
+        registry = json.load(f)
+    problems: list = []
+    if registry.get("artifact_type") != "TOSCANINI_HF_VISUAL_MODEL_REGISTRY":
+        problems.append("artifact_type missing/incorrect")
+    ci = registry.get("constitutional_invariants") or {}
+    if "Coder 1" not in str(ci.get("canonical_geometry_authority", "")):
+        problems.append("constitutional_invariants.canonical_geometry_authority "
+                        "does not bind Coder 1 as the geometry authority")
+    if ci.get("promotion_path_to_engineering_geometry") != (
+        "NONE (guard-enforced, see guard/epistemic_guard.py)"
+    ):
+        problems.append("promotion_path_to_engineering_geometry is not NONE")
+    models = registry.get("models") or []
+    if not models:
+        problems.append("registry carries no models")
+    for entry in models:
+        mid = entry.get("model_id", "?")
+        missing = [f for f in REQUIRED_FIELDS
+                   if f not in entry or entry[f] in (None, "")]
+        if missing:
+            problems.append(f"{mid}: missing required fields {missing}")
+        decision = entry.get("decision") or {}
+        if decision.get("approved_for_canonical_geometry") is not False:
+            problems.append(
+                f"{mid}: approved_for_canonical_geometry must be exactly false "
+                "(Art. LXXII)"
+            )
+        hw = entry.get("hardware_targets") or {}
+        if hw.get("production_space_eligible") is not False:
+            problems.append(
+                f"{mid}: production_space_eligible must be exactly false "
+                "(HF Jobs lab separation)"
+            )
+    if problems:
+        print("REGISTRY VALIDATION: FAIL")
+        for p in problems:
+            print("  -", p)
+        return 1
+    print(f"REGISTRY VALIDATION: PASS ({len(models)} models, all fields "
+          "present, canonical-geometry and production-space invariants hold)")
+    return 0
+
+
+def main(argv=None) -> int:
+    ap = argparse.ArgumentParser(description=__doc__)
+    ap.add_argument("--out", default=None,
+                    help="output directory (default: visual-lab/registry in "
+                         "the checkout)")
+    ap.add_argument("--curation", default=None,
+                    help="curation directive file (default: the committed "
+                         "r448_curation.json alongside this tool)")
+    ap.add_argument("--validate", default=None, metavar="REGISTRY_JSON",
+                    help="offline-validate an existing registry and exit")
+    args = ap.parse_args(argv)
+
+    if args.validate:
+        return validate_registry(args.validate)
+
+    out_dir = Path(args.out) if args.out else DEFAULT_OUT_DIR
+    curation = Path(args.curation) if args.curation else DEFAULT_CURATION
+    return build_registry(out_dir, curation)
+
+
+def build_registry(out_dir: Path, curation_path: Path) -> int:
+    out_dir = Path(out_dir)
+    os.makedirs(out_dir, exist_ok=True)
+    cur = json.loads(Path(curation_path).read_text(encoding="utf-8"))
 
     token_probe = {"whoami_status": "SKIPPED_NO_TOKEN"}
     if HF_TOKEN:
@@ -346,8 +433,8 @@ def main():
         },
     }
 
-    reg_path = os.path.join(OUT_DIR, "hf_visual_model_registry.json")
-    raw_path = os.path.join(OUT_DIR, "hf_api_verification_raw.json")
+    reg_path = out_dir / "hf_visual_model_registry.json"
+    raw_path = out_dir / "hf_api_verification_raw.json"
     with open(reg_path, "w", encoding="utf-8") as f:
         json.dump(registry, f, indent=2)
     with open(raw_path, "w", encoding="utf-8") as f:
@@ -361,7 +448,8 @@ def main():
     for c in verification["collections"]:
         print(f"  collection {c['collection']}: {c.get('api_status')} members={len(c.get('members', c.get('author_models', [])))}")
     print("completeness all_complete:", registry["registry_integrity"]["all_complete"])
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())
