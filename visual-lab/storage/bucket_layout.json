@@ -1,0 +1,27 @@
+{
+  "layout_id": "TOSCANINI-VISUAL-LAB-BUCKET-LAYOUT",
+  "version": "1.0.0",
+  "purpose": "Persistent HF Storage Bucket contract for the visual lab: models, generated-asset cache, benchmark fixtures and records, render artifacts. Keeps Space git clean (Spaces have ephemeral disk).",
+  "tree": {
+    "/models/": {
+      "subdirs": ["trellis/", "hunyuan/", "depth/", "partpacker/", "meshanything/"],
+      "rule": "model weights cached per vendor family; each dir carries a MANIFEST.json with model_id, hf_sha, download timestamp"
+    },
+    "/visual-cache/generated-assets/": {
+      "rule": "every generated asset stored with a sidecar <asset>.epistemic.json carrying: epistemic_class (COMPUTATIONAL_RENDER at most), generator (hf:<model-id>@<sha>), lineage root (canonical GLB sha256), case id"
+    },
+    "/benchmarks/": {
+      "subdirs": ["case-A/", "case-B/", "case-C/"],
+      "rule": "canonical fixture GLBs (sha256-verified against protocol.json anchors) + typed VISUAL_BENCHMARK_RECORD outputs; append-only, never overwritten"
+    },
+    "/renders/": {
+      "subdirs": ["hero/", "section/", "exploded/", "orthographic/", "turntable/", "poster/"],
+      "rule": "canonical renderer outputs referenced by lineage; lab variants live under /visual-cache, never here unless they passed the fidelity gate and are labeled presentation_enhanced"
+    }
+  },
+  "rules": [
+    "no buyer-surface asset is ever published from the bucket directly; the visual compiler remains the only publisher",
+    "records are append-only; corrections are new records referencing the old record id",
+    "retention: benchmark records and fixtures are kept indefinitely (evidence); generated-asset cache may be pruned after registry entry point to the archived record"
+  ]
+}
