@@ -366,3 +366,23 @@ production_deployment tuple (per ratified Art. LXXI Section 2; this ratification
 Stage Summary:
 - Constitution v2.4.0 ratified and delivered at origin/main 6f50e67 (push condition GREEN); the article's first live application immediately surfaced a real production-provenance drift: the canonical Space's engine (2391024, carrying Coder 1's unpushed "Phase 1/2/6/7" geometry-identity fixes) is UNRELEASED by the article's own definition. NOT fixed unilaterally - the unpushed tree contains Coder 1's engine work; redeploying from main would roll it back in production. Escalated per Art. LXV: owner/Coder-1 decision required (push the tree to main, or rule main authoritative), then re-align the Space.
 - reviewer_provenance=AI_REVIEW.
+
+---
+Task ID: R449-C2
+Agent: Coder 2 (main session)
+Task: R449-C2 - turn the HF Visual Model Registry + Benchmark Lab from an unrun framework into an evidence-producing, canonical-geometry-preserving visual evaluation system.
+
+Work Log:
+- Constitution v2.4.0 read IN FULL this session (all 2153 lines; hash b54a1be9 re-verified byte-identical immediately before the final commit; binding regions re-read). Baseline: main 11b0916 == ls-remote; mid-round main advanced to a014d1a (Coder 1 R447 landed, rebased - the 2391024 drift escalated at 11b0916 is RESOLVED in content); r448/visual-lab rebased onto a014d1a as 81d1774.
+- Step 1: R448 published properly - branch r448/visual-lab (25 files) + PR #4 (base/head/files/tests/registry/runner/guard/license disclosed); guard 16/16 + metrics 8/8 re-green at publication.
+- Step 2: R449/BENCHMARK_INPUT_RECONCILIATION.json - Cases A/B/C bound to the R446-HF production GLBs (54e82cc1/fb439c90/f99ccc08), triple-verified (local bytes == live-run records == R447 records), re-verified on HF infrastructure by the referee job. No invented benchmark object.
+- Steps 3/6: VISUAL_BENCHMARK_PROTOCOL.json - 13 dimensions, engineering-vs-presentation separated, raw measurements only, PENDING_OWNER_RATIFICATION preserved.
+- Step 7: 33 negative-control records (10 mandatory + toppling variant x 3 cases) - all corruptions DETECTED; reordered_component correct-by-design; positive control clean; about-Z attack exposed a chamfer blind spot -> per-component pose instrument added (disclosed).
+- Steps 8/9: provenance.py (11 fields, fail-closed) + license_gate.py (CLEAR/REVIEW_REQUIRED/BLOCKED, unknown -> fail closed); battery test_r449.py 28/28 GREEN.
+- Steps 10/11: bucket prateekm1/toscanini-visual-lab-benchmarks staged; referee-prepare COMPLETE (cpu-basic, independent-infra verification); DA3 depth referee NOT_RUN (3 typed attempts - repo lacks transformers-compatible config); candidate Hunyuan3D-Omni BLOCKED (8 typed attempts, each fixing the exact recorded cause; final blocker: 24.4G dual-binary download on a100-large, last job canceled externally mid-download); TRELLIS.2 spec prepared, not launched. THE round question remains UNVERIFIED - honestly blocked (Art. LXI/XXXIV).
+- Step 12: all required R449 outputs (9 files) with the six-state taxonomy; delivery tuple per Art. LXXI in the round record (drift DRIFT disclosed; what_unblocks: PR merges + Coder 1's next Space deploy).
+- Round committed 4bff863 on r449-c2/visual-benchmark; PR #5 (stacked on #4). No second Space; canonical Space untouched; no GPU production dependency; zero canonical engineering/discovery/package logic changed.
+
+Stage Summary:
+- R449-C2 delivered: the lab is evidence-producing - calibrated instruments, enforced provenance and license gates, canonical-chain inputs, typed job ledger - with the first candidate arm honestly blocked at infrastructure, not epistemics. Thresholds await owner ratification; no pass/fail claims made.
+- reviewer_provenance=AI_REVIEW.
