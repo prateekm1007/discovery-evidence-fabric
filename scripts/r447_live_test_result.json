@@ -1,0 +1,46 @@
+{
+ "run_id": "ts_3994b407d087",
+ "all_pass": true,
+ "checks": [
+  {
+   "name": "POST /api/run returns 200 with a run id",
+   "pass": true,
+   "detail": "run=ts_3994b407d087"
+  },
+  {
+   "name": "the response carries the caller's own owner_key",
+   "pass": true,
+   "detail": "key=4946784c\u2026"
+  },
+  {
+   "name": "result poll with NO identity -> 404 (the pre-fix 'Run not found' condition reproduced live)",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "result poll with ONLY X-Tosca-Owner -> 200 (was the user-facing defect; now closed)",
+   "pass": true,
+   "detail": "status=RUNNING"
+  },
+  {
+   "name": "the rail shows the run to the header caller",
+   "pass": true,
+   "detail": "rail=1 run(s)"
+  },
+  {
+   "name": "the rail response also carries the caller's own owner_key",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "stream opens with the owner query parameter -> 200 SSE",
+   "pass": true,
+   "detail": "event: hello data: {\"session_id\": \"ts_3994b407d087\"}  event:"
+  },
+  {
+   "name": "a different valid key still gets the enumeration-safe 404",
+   "pass": true,
+   "detail": ""
+  }
+ ]
+}
