@@ -366,3 +366,59 @@ production_deployment tuple (per ratified Art. LXXI Section 2; this ratification
 Stage Summary:
 - Constitution v2.4.0 ratified and delivered at origin/main 6f50e67 (push condition GREEN); the article's first live application immediately surfaced a real production-provenance drift: the canonical Space's engine (2391024, carrying Coder 1's unpushed "Phase 1/2/6/7" geometry-identity fixes) is UNRELEASED by the article's own definition. NOT fixed unilaterally - the unpushed tree contains Coder 1's engine work; redeploying from main would roll it back in production. Escalated per Art. LXV: owner/Coder-1 decision required (push the tree to main, or rule main authoritative), then re-align the Space.
 - reviewer_provenance=AI_REVIEW.
+
+---
+Task ID: R449-C2
+Agent: Coder 2 (main session)
+Task: R449-C2 - turn the HF Visual Model Registry + Benchmark Lab from an unrun framework into an evidence-producing, canonical-geometry-preserving visual evaluation system.
+
+Work Log:
+- Constitution v2.4.0 read IN FULL this session (all 2153 lines; hash b54a1be9 re-verified byte-identical immediately before the final commit; binding regions re-read). Baseline: main 11b0916 == ls-remote; mid-round main advanced to a014d1a (Coder 1 R447 landed, rebased - the 2391024 drift escalated at 11b0916 is RESOLVED in content); r448/visual-lab rebased onto a014d1a as 81d1774.
+- Step 1: R448 published properly - branch r448/visual-lab (25 files) + PR #4 (base/head/files/tests/registry/runner/guard/license disclosed); guard 16/16 + metrics 8/8 re-green at publication.
+- Step 2: R449/BENCHMARK_INPUT_RECONCILIATION.json - Cases A/B/C bound to the R446-HF production GLBs (54e82cc1/fb439c90/f99ccc08), triple-verified (local bytes == live-run records == R447 records), re-verified on HF infrastructure by the referee job. No invented benchmark object.
+- Steps 3/6: VISUAL_BENCHMARK_PROTOCOL.json - 13 dimensions, engineering-vs-presentation separated, raw measurements only, PENDING_OWNER_RATIFICATION preserved.
+- Step 7: 33 negative-control records (10 mandatory + toppling variant x 3 cases) - all corruptions DETECTED; reordered_component correct-by-design; positive control clean; about-Z attack exposed a chamfer blind spot -> per-component pose instrument added (disclosed).
+- Steps 8/9: provenance.py (11 fields, fail-closed) + license_gate.py (CLEAR/REVIEW_REQUIRED/BLOCKED, unknown -> fail closed); battery test_r449.py 28/28 GREEN.
+- Steps 10/11: bucket prateekm1/toscanini-visual-lab-benchmarks staged; referee-prepare COMPLETE (cpu-basic, independent-infra verification); DA3 depth referee NOT_RUN (3 typed attempts - repo lacks transformers-compatible config); candidate Hunyuan3D-Omni BLOCKED (8 typed attempts, each fixing the exact recorded cause; final blocker: 24.4G dual-binary download on a100-large, last job canceled externally mid-download); TRELLIS.2 spec prepared, not launched. THE round question remains UNVERIFIED - honestly blocked (Art. LXI/XXXIV).
+- Step 12: all required R449 outputs (9 files) with the six-state taxonomy; delivery tuple per Art. LXXI in the round record (drift DRIFT disclosed; what_unblocks: PR merges + Coder 1's next Space deploy).
+- Round committed 4bff863 on r449-c2/visual-benchmark; PR #5 (stacked on #4). No second Space; canonical Space untouched; no GPU production dependency; zero canonical engineering/discovery/package logic changed.
+
+Stage Summary:
+- R449-C2 delivered: the lab is evidence-producing - calibrated instruments, enforced provenance and license gates, canonical-chain inputs, typed job ledger - with the first candidate arm honestly blocked at infrastructure, not epistemics. Thresholds await owner ratification; no pass/fail claims made.
+- reviewer_provenance=AI_REVIEW.
+
+---
+Task ID: R450-C2
+Agent: Super Z (main session — Coder 2 for the Toscanini project)
+Task: Operator directive R450-C2 — Build the Visual Feedback Layer, Not a Visual Discovery Engine: the trajectory viewer (Design Evolution), before/after/delta presentation, uncertainty badges, causal trajectory surface, sensitivity presentation, engineering-vs-presentation guard, visual regression for trajectories, R448 benchmark progression, real canonical GLB evaluation, round record.
+
+Work Log:
+- Read the COMPLETE Constitution v2.4.0 (2152 lines, sha b54a1be9...) from canonical origin/main — NOT the local workspace: authenticated ls-remote at round start revealed main had MOVED to d99e895 (the concurrent R447-C1 session's 16 commits past the R449 base a014d1a). Read the mandated governance corpus from origin/main (GOVERNANCE/README, AUDITOR_SELF_GOVERNANCE_v1, AUDITOR_BLINDSPOT_REGISTER, AUDITOR_REMEMBERED_STATE, AUDIT_LOOP_PROTOCOL_v1, ACTIVE_PATH.md).
+- State reconciliation (Art. XXII/XXIII): branch r450-c2/visual-feedback-layer from the R449 lab tip (39d4013) + clean merge of origin/main d99e895 (merge 9f30d28; disjoint file sets, zero conflicts).
+- Built visual-lab/trajectory/schema.py (TOSCANINI_TRAJECTORY/1.0.0): deterministic projection of the engine's INVENTION_LINEAGE into the V1 -> FAILURE -> CAUSE -> DIRECTION -> MUTATION -> V2 -> UPDATE presentation; five-class epistemic badges (MEASURED/SIMULATED/INFERRED/PROPOSED/UNVERIFIED) derived fail-closed from provenance FIELDS per Art. III (a claimed label never spoofs; MEASURED requires an R370G-shaped event); the lineage's own INVENTION_* vocabulary carried verbatim (Art. X); no timestamps/ids — byte-identical records from identical lineage bytes.
+- Built visual-lab/guard/trajectory_guard.py: the presentation/validation boundary — re-labeled status vocabulary, unknown badges, MEASURED-without-event, AI/hf geometry as ENGINEERING_GEOMETRY, engineering geometry without a verified canonical root, unevaluated predictions claiming HELD, multi-CURRENT, missing source provenance, and production-claim vocabulary all fail closed.
+- Built the webapp trajectory layer: lib/trajectory.ts (fail-closed client badge helpers — unknown badges degrade to UNVERIFIED, never upgrade), components/trajectory/{StateBadge,TrajectoryViewer,BeforeAfterDelta,CausalTrajectory,SensitivityPanel}.tsx, the /lab/trajectory route (banner: VISUAL FEEDBACK LABORATORY — provisional capability, not production truth), CSS vocabulary, and the dossier-side conditional: the production path renders TrajectoryViewer ONLY when the backend serves a TOSCANINI_TRAJECTORY record (honest absence today; the server route is deliberately NOT wired this round — no production integration without evidence).
+- Benchmarked the loop itself: visual-lab/benchmark/trajectory_dimensions.py adds four dimensions (before_after_correspondence, engineering_feature_visibility, lineage_preservation, artifact_determinism); protocol amended to v0.2.0-proposed with the directive's upgraded evaluation question and the fidelity/presentation dimension separation (never averaged).
+- Measured the real canonical GLBs (case A 54e82cc1..., B fb439c90..., C f99ccc08... sha-verified pre-measurement): identity controls read unchanged (chamfer 0.000000 across all three); incorrect_scale vs rotated_toppling produce DISTINCT visible deltas (25.00% max-axis vs 0.19-1.41%); cross-case control A-vs-B chamfer 0.1859; determinism byte-identical on all three; lineage chain VERIFIED with the tampered-expectation attack FAILing closed. Raw numbers only — no threshold invented (PENDING_OWNER, Art. XXVII).
+- NEW RAW FINDING recorded: Case A carries 9 and Case C 27 overlapping/enclosed component pairs — the R442-filed Coder-1 placement defect is now QUANTIFIED by the visibility instrument (raw data for the feedback file, no fix attempted inside the C2 boundary).
+- Visual regression battery tests: visual-lab/guard/test_r450_trajectory.py — 27 attacks, all green (determinism, ordering+single-CURRENT, identity/mutation delta visibility, mutation-signature distinctness, uncertainty labels verbatim + not-itemized fallback, AI-geometry authority, badge-spoof battery 9/9, sensitivity refusals, boundary-strip/status-relabel/unknown-badge/prediction-spoof/production-vocabulary/multi-CURRENT/source-provenance tamper attacks). R448 guard 16, R449 28, metrics 8: ALL GREEN (no regressions).
+- Live UI evidence: webapp tsc clean, next build green; the lab route rendered in headless Chromium (the repo's own renderer family): trajectory viewer + 2 states + 2 transitions + badges on every element + uncertainty label + BEFORE/AFTER/DELTA table (structured schema example) + prediction NOT_EVALUATED + sensitivity panel + badge legend, full-page screenshot captured.
+- Round record R450/R450_C2_ROUND_RECORD.json with the Article LXXI tuple; ACTIVE_PATH R450-C2 addendum; visual-lab README updated.
+- PRE-COMMIT DISCLOSURE (inconvenient result, Art. XV): the canonical production Space prateekm1/toscanini-prod-validation is PAUSED (authenticated live probe: /api/health and /api/version return 'The space is paused, ask a maintainer to restart it'; HF API runtime.stage=PAUSED; lastModified 00:51:39Z = the R447-C1 final deploy). Infrastructure state (Art. LXI), owner-gated: the Art. LXXI delivery triple is unsatisfiable for any round until the maintainer restarts the Space. Escalated as the first item of the round record.
+
+Stage Summary:
+- R450-C2 delivered: the improvement loop itself is now presentable — the trajectory layer renders WHAT changed, WHY, and WHAT HAPPENED from Coder 1's canonical lineage, with truth controlling the labels (five-class badges, fail-closed derivation), uncertainty never inferable-from-prose-only, sensitivity shown only when the engineering state supplies it, and the guard mechanically separating presentation from engineering validation. The lab line remains laboratory/provisional; zero canonical engineering logic changed; no model promoted; no production integration without evidence.
+- reviewer_provenance=AI_REVIEW.
+
+---
+Task ID: R450-C2 (delivery tuple)
+Agent: Super Z (main session)
+Task: Push verification + PR + the Article LXXI tuple, recorded.
+
+Work Log:
+- Pushed r450-c2/visual-feedback-layer: ls-remote 88848afb06806c43744a2948aca91287e450a884 == local HEAD (verified, Art. XXIII).
+- PR #6 opened via the GitHub API: base main @ d99e895c, head r450-c2/visual-feedback-layer @ 88848afb; the R448 (#4)/R449 (#5) lab commits are ancestors - one owner review closes the entire lab line.
+- Delivery tuple (Art. LXXI): DELIVERY_BLOCKED / DRIFT - blocked_by: (1) directive forbids production integration of the lab without owner evidence review (this PR), (2) the canonical Space prateekm1/toscanini-prod-validation is PAUSED (authenticated live probe; HF API runtime.stage=PAUSED) - escalated first-item in the round record; what_unblocks: Space restart (maintainer) + PR merge + Coder 1's next canonical deploy.
+
+Stage Summary:
+- The R450-C2 round is pushed and reviewed-ready; the delivery tuple is honestly BLOCKED with both blockers named and the unblock path recorded. reviewer_provenance=AI_REVIEW.

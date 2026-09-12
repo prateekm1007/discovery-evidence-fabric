@@ -1,0 +1,397 @@
+{
+  "registry_meta": {
+    "registry_id": "TOSCANINI-HF-VISUAL-MODEL-REGISTRY",
+    "version": "1.0.0",
+    "round": "R448",
+    "authority": "Coder 2 (visual layer) under operator directive",
+    "operator_directive_intent": "Build a Hugging Face Visual Model Registry + Benchmark Lab FIRST, rather than blindly integrating models. Run the same Toscanini canonical geometry through candidates and objectively determine which model improves presentation WITHOUT corrupting engineering truth.",
+    "epistemic_rule": "Canonical geometry is Coder 1's engineering truth. Every lab output is presentation (COMPUTATIONAL_RENDER at most). No AI-generated mesh may replace canonical geometry, enter the engineering GLB chain, or be presented as engineering or physical validation (Constitution Art. LXXII, XXXVIII, VI).",
+    "single_source_of_truth_chain": "Coder 1 canonical geometry -> GLB -> Coder 2 renderer -> visual compiler -> website -> buyer package",
+    "second_geometry_authority_allowed": false,
+    "lab_vs_production_architecture": {
+      "canonical_hf_space": "prateekm1/toscanini-prod-validation — the stable product. No experimental model is ever installed here.",
+      "hf_gpu_jobs": "the experimentation laboratory (billed by actual usage; PRO credits apply). Heavy models run here, never in the production Space.",
+      "hf_storage_buckets": "persistent models / visual cache / benchmark fixtures / render artifacts, keeping Space git clean.",
+      "coder2_visual_compiler": "the only component that may publish visual assets toward website and buyer package."
+    }
+  },
+  "models": [
+    {
+      "model_id": "microsoft/TRELLIS.2-4B",
+      "display_name": "TRELLIS.2 (4B)",
+      "vendor": "Microsoft",
+      "priority": "P1_GOLD",
+      "category": "image-to-3D high-fidelity generation (structured latents)",
+      "toscanini_role": {
+        "approved_scope": [
+          "presentation-quality visual asset generation seeded from canonical reference renders",
+          "high-quality material exploration including transparency/translucency studies",
+          "cinematic hero imagery and alternative visual treatments",
+          "reference-driven visualisation variants",
+          "non-engineering decorative surfaces"
+        ],
+        "forbidden_scope": [
+          "canonical dimensions",
+          "load paths",
+          "component relationships",
+          "engineering geometry",
+          "evidence-derived structure",
+          "any output entering the engineering GLB chain"
+        ],
+        "output_epistemic_class": "COMPUTATIONAL_RENDER"
+      },
+      "expected_io": {
+        "inputs": ["single reference image (canonical render of the canonical GLB recommended as the controlled input)"],
+        "outputs": ["textured 3D mesh (GLB with PBR materials, per model card)"]
+      },
+      "capability_claims": {
+        "mesh_topology": {"claim": "arbitrary topology with sharp features", "source": "MODEL_CARD_CLAIM_UNVERIFIED"},
+        "materials": {"claim": "PBR materials including transparency/translucency", "source": "MODEL_CARD_CLAIM_UNVERIFIED"},
+        "texture_quality": {"claim": "textured meshes at resolutions up to 1536^3 per model card", "source": "MODEL_CARD_CLAIM_UNVERIFIED"},
+        "part_separation": {"claim": "single-object generator; no engineering-part identity", "source": "USER_DIRECTIVE_ANALYSIS"},
+        "multi_view_consistency": {"claim": "single-image conditioned; multi-view consistency not guaranteed", "source": "USER_DIRECTIVE_ANALYSIS"}
+      },
+      "vram_claim": {"value": ">= 24 GB NVIDIA GPU", "source": "MODEL_CARD_CLAIM (operator directive cites the model card)"},
+      "hf_jobs_flavor": "a100-80gb recommended; l40s-48gb candidate for validation",
+      "hf_inference_provider_served": false,
+      "anticipated_failure_modes": [
+        "VRAM ceiling below 24 GB -> typed VRAM_INSUFFICIENT failure",
+        "hallucinated detail drift away from canonical geometry (decorative invention)",
+        "texture invented for untextured canonical surfaces",
+        "thin engineering features smoothed by sparse-structure latent representation",
+        "latency at high resolution not yet measured"
+      ],
+      "epistemic_risk_note": "Highest presentation upside AND highest drift risk of the candidate set; the geometry-fidelity gate is mandatory before any presentation approval.",
+      "decision": {"registry_status": "APPROVED_FOR_BENCHMARK_EVALUATION", "approved_for_production": false}
+    },
+    {
+      "model_id": "tencent/Hunyuan3D-2.1",
+      "display_name": "Hunyuan3D-2.1",
+      "vendor": "Tencent",
+      "priority": "P1_GOLD",
+      "category": "image-to-3D with production-oriented PBR material generation",
+      "toscanini_role": {
+        "approved_scope": [
+          "PBR material presentation for the buyer surface (after the geometry-fidelity gate)",
+          "physically-plausible appearance studies on canonical-derived assets"
+        ],
+        "forbidden_scope": [
+          "canonical dimensions",
+          "load paths",
+          "component relationships",
+          "engineering geometry",
+          "evidence-derived structure",
+          "any output entering the engineering GLB chain"
+        ],
+        "output_epistemic_class": "COMPUTATIONAL_RENDER"
+      },
+      "expected_io": {
+        "inputs": ["reference image (canonical render recommended)"],
+        "outputs": ["mesh + PBR material maps (per model card)"]
+      },
+      "capability_claims": {
+        "mesh_topology": {"claim": "high-fidelity 3D asset mesh generation", "source": "MODEL_CARD_CLAIM_UNVERIFIED"},
+        "materials": {"claim": "physically based rendering (PBR) material generation", "source": "MODEL_CARD_CLAIM_UNVERIFIED"},
+        "texture_quality": {"claim": "PBR texture generation (albedo/roughness/metalness class channels; exact channel set to be verified at benchmark)", "source": "MODEL_CARD_CLAIM_UNVERIFIED"},
+        "part_separation": {"claim": "single-object generator; no engineering-part identity", "source": "USER_DIRECTIVE_ANALYSIS"},
+        "multi_view_consistency": {"claim": "single-view conditioned", "source": "USER_DIRECTIVE_ANALYSIS"}
+      },
+      "vram_claim": {"value": "TO_BE_CONFIRMED_FROM_MODEL_CARD_AT_VERIFICATION", "source": "PENDING_VERIFICATION"},
+      "hf_jobs_flavor": "l40s-48gb recommended pending VRAM confirmation",
+      "hf_inference_provider_served": false,
+      "anticipated_failure_modes": [
+        "Tencent Hunyuan community license carries territorial/usage terms -> commercial gate required",
+        "PBR maps may not match canonical material semantics (material identity drift)",
+        "generated geometry drift from canonical dimensions",
+        "gated model: access acceptance flow required before Jobs usage"
+      ],
+      "epistemic_risk_note": "Coder 2's job is not 'make a mesh' but making the engineering invention understandable without falsely implying physical validation; PBR output must be labeled presentation.",
+      "decision": {"registry_status": "APPROVED_FOR_BENCHMARK_EVALUATION_LICENSE_REVIEW_REQUIRED", "approved_for_production": false}
+    },
+    {
+      "model_id": "tencent/Hunyuan3D-Omni",
+      "display_name": "Hunyuan3D-Omni",
+      "vendor": "Tencent",
+      "priority": "P1_GOLD",
+      "category": "controllable multimodal-conditioned 3D generation",
+      "toscanini_role": {
+        "approved_scope": [
+          "constraint-aware controlled generation experiments seeded from canonical signals (bounding box, point cloud, canonical renders)",
+          "the closest candidate to geometry-constrained presentation generation; benchmark priority for the control-fidelity question"
+        ],
+        "forbidden_scope": [
+          "canonical dimensions",
+          "load paths",
+          "component relationships",
+          "engineering geometry",
+          "evidence-derived structure",
+          "any output entering the engineering GLB chain"
+        ],
+        "output_epistemic_class": "COMPUTATIONAL_RENDER"
+      },
+      "expected_io": {
+        "inputs": ["image", "point cloud", "voxel", "bounding box", "skeletal pose (any subset; canonical-derived signals only)"],
+        "outputs": ["controlled 3D asset mesh"]
+      },
+      "capability_claims": {
+        "mesh_topology": {"claim": "controllable 3D object generation", "source": "MODEL_CARD_CLAIM_UNVERIFIED"},
+        "materials": {"claim": "textured asset generation (PBR extent to be verified at benchmark)", "source": "MODEL_CARD_CLAIM_UNVERIFIED"},
+        "texture_quality": {"claim": "textured output per model card; quality to be measured", "source": "MODEL_CARD_CLAIM_UNVERIFIED"},
+        "part_separation": {"claim": "single-object generator; no engineering-part identity", "source": "USER_DIRECTIVE_ANALYSIS"},
+        "multi_view_consistency": {"claim": "condition-mixing behavior across signals to be measured", "source": "USER_DIRECTIVE_ANALYSIS"}
+      },
+      "vram_claim": {"value": "~10 GB VRAM for generation", "source": "MODEL_CARD_CLAIM (operator directive cites the model card)"},
+      "hf_jobs_flavor": "l40s-48gb recommended; verify the 10 GB claim live",
+      "hf_inference_provider_served": false,
+      "anticipated_failure_modes": [
+        "condition-mixing instability when several canonical signals are combined",
+        "bounding-box / point-cloud conditioning fidelity may be loose relative to engineering tolerances",
+        "Tencent Hunyuan community license: territorial/usage terms -> license gate before any commercial path",
+        "gated model: access acceptance flow required"
+      ],
+      "epistemic_risk_note": "Control-signal conditioning is the strategic value: benchmark must measure how tightly canonical bbox/point-cloud constraints bound the generated geometry. Loose conditioning is a drift risk, not a feature.",
+      "decision": {"registry_status": "APPROVED_FOR_BENCHMARK_EVALUATION_LICENSE_REVIEW_REQUIRED", "approved_for_production": false}
+    },
+    {
+      "model_id": "tencent/Hunyuan3D-2mv",
+      "display_name": "Hunyuan3D-2mv (multi-view)",
+      "vendor": "Tencent",
+      "priority": "P2_SILVER",
+      "category": "multi-view controlled image-to-3D",
+      "toscanini_role": {
+        "approved_scope": [
+          "multi-view-consistent presentation assets using the canonical view ladder (hero/front/rear/left/right/top/bottom renders) as joint conditioning",
+          "treats the existing visual ladder as multi-view EVIDENCE rather than independent pictures"
+        ],
+        "forbidden_scope": [
+          "canonical dimensions",
+          "load paths",
+          "component relationships",
+          "engineering geometry",
+          "evidence-derived structure",
+          "any output entering the engineering GLB chain"
+        ],
+        "output_epistemic_class": "COMPUTATIONAL_RENDER"
+      },
+      "expected_io": {
+        "inputs": ["1-4 consistent views of the same object (canonical renders, pose-consistent)"],
+        "outputs": ["view-consistent 3D asset mesh"]
+      },
+      "capability_claims": {
+        "mesh_topology": {"claim": "multi-view conditioned mesh generation", "source": "MODEL_CARD_CLAIM_UNVERIFIED"},
+        "materials": {"claim": "textured output (family behavior; verify at benchmark)", "source": "MODEL_CARD_CLAIM_UNVERIFIED"},
+        "texture_quality": {"claim": "textured output per family model cards", "source": "MODEL_CARD_CLAIM_UNVERIFIED"},
+        "part_separation": {"claim": "single-object generator", "source": "USER_DIRECTIVE_ANALYSIS"},
+        "multi_view_consistency": {"claim": "explicitly multi-view controlled (model card claim); consistency to be MEASURED, not assumed", "source": "MODEL_CARD_CLAIM_UNVERIFIED"}
+      },
+      "vram_claim": {"value": "TO_BE_CONFIRMED_FROM_MODEL_CARD_AT_VERIFICATION", "source": "PENDING_VERIFICATION"},
+      "hf_jobs_flavor": "l40s-48gb pending VRAM confirmation",
+      "hf_inference_provider_served": false,
+      "anticipated_failure_modes": [
+        "requires pose-consistent canonical renders — the visual compiler must supply them or the input premise fails",
+        "view-count limits may force view selection from the seven-view ladder",
+        "texture seams across views",
+        "Tencent Hunyuan community license: territorial/usage terms"
+      ],
+      "epistemic_risk_note": "Multi-view conditioning consumes canonical RENDER evidence; benchmark must verify the output actually agrees with ALL supplied views, not just one.",
+      "decision": {"registry_status": "APPROVED_FOR_BENCHMARK_EVALUATION_LICENSE_REVIEW_REQUIRED", "approved_for_production": false}
+    },
+    {
+      "model_id": "depth-anything/Depth-Anything-3 (collection)",
+      "display_name": "Depth Anything 3 (collection: metric + monocular variants)",
+      "vendor": "ByteDance / depth-anything",
+      "priority": "P2_SILVER",
+      "category": "depth and geometry estimation (VERIFICATION instrument, not a generator)",
+      "toscanini_role": {
+        "approved_scope": [
+          "depth-aware visual verification of generated presentation views",
+          "camera/pose plausibility checks for canonical reference renders",
+          "cross-view consistency scoring used as an independent REFEREE metric in the benchmark",
+          "reference-image analysis and spatial-relationship sanity checks"
+        ],
+        "forbidden_scope": [
+          "using depth output as engineering geometry",
+          "any dimensional claim derived from monocular depth",
+          "any output entering the engineering GLB chain"
+        ],
+        "output_epistemic_class": "VERIFICATION_TOOL_OUTPUT"
+      },
+      "expected_io": {
+        "inputs": ["images / image sets (canonical renders or generated presentation views)"],
+        "outputs": ["depth maps, point clouds, camera poses (per model card)"]
+      },
+      "capability_claims": {
+        "mesh_topology": {"claim": "not applicable (non-generative estimator)", "source": "USER_DIRECTIVE_ANALYSIS"},
+        "materials": {"claim": "not applicable", "source": "USER_DIRECTIVE_ANALYSIS"},
+        "texture_quality": {"claim": "not applicable", "source": "USER_DIRECTIVE_ANALYSIS"},
+        "part_separation": {"claim": "not applicable", "source": "USER_DIRECTIVE_ANALYSIS"},
+        "multi_view_consistency": {"claim": "multi-view depth consistency is the capability (model card claim)", "source": "MODEL_CARD_CLAIM_UNVERIFIED"}
+      },
+      "vram_claim": {"value": "modest relative to generative 3D models; exact value TO_BE_CONFIRMED", "source": "PENDING_VERIFICATION"},
+      "hf_jobs_flavor": "cpu-upgrade or l4 class expected; confirm at first run",
+      "hf_inference_provider_served": false,
+      "anticipated_failure_modes": [
+        "monocular scale ambiguity on non-metric variants (metric variant required for dimensional sanity checks)",
+        "referee independence: scoring instrument must be independent of the generator it scores (Constitution Art. XLV discipline)",
+        "reflective/transparent surfaces degrade depth estimation"
+      ],
+      "epistemic_risk_note": "Referee, not generator. Its verdicts score OTHER models' multi-view consistency; its own output never becomes geometry evidence.",
+      "decision": {"registry_status": "APPROVED_FOR_BENCHMARK_EVALUATION", "approved_for_production": false}
+    },
+    {
+      "model_id": "VAST-AI/DetailGen3D",
+      "display_name": "DetailGen3D",
+      "vendor": "VAST-AI",
+      "priority": "P2_SILVER",
+      "category": "generative 3D geometry detail enhancement/refinement",
+      "toscanini_role": {
+        "approved_scope": [
+          "visual detail enhancement of canonical-derived presentation meshes (presentation only)"
+        ],
+        "forbidden_scope": [
+          "canonical dimensions",
+          "load paths",
+          "component relationships",
+          "engineering geometry",
+          "evidence-derived structure",
+          "any output entering the engineering GLB chain"
+        ],
+        "output_epistemic_class": "COMPUTATIONAL_RENDER"
+      },
+      "expected_io": {
+        "inputs": ["coarse mesh / image reference (canonical-derived)", "target-region conditioning per card"],
+        "outputs": ["detail-enhanced mesh"]
+      },
+      "capability_claims": {
+        "mesh_topology": {"claim": "generative geometry enhancement (card claim); topology change vs input is EXPECTED behavior and must be measured", "source": "MODEL_CARD_CLAIM_UNVERIFIED"},
+        "materials": {"claim": "to be verified", "source": "PENDING_VERIFICATION"},
+        "texture_quality": {"claim": "to be verified", "source": "PENDING_VERIFICATION"},
+        "part_separation": {"claim": "not a part-level generator", "source": "USER_DIRECTIVE_ANALYSIS"},
+        "multi_view_consistency": {"claim": "to be measured", "source": "PENDING_VERIFICATION"}
+      },
+      "vram_claim": {"value": "TO_BE_CONFIRMED_FROM_MODEL_CARD_AT_VERIFICATION", "source": "PENDING_VERIFICATION"},
+      "hf_jobs_flavor": "l4-26gb or l40s-48gb pending confirmation",
+      "hf_inference_provider_served": false,
+      "anticipated_failure_modes": [
+        "hallucinated micro-geometry must never be readable as engineering detail",
+        "topology drift from the canonical-derived input mesh",
+        "enhanced result is presentation, never engineering evidence"
+      ],
+      "epistemic_risk_note": "Refinement models are the easiest place to accidentally treat an enhanced mesh as better engineering truth. The guard must keep the enhanced asset strictly presentation-class.",
+      "decision": {"registry_status": "APPROVED_FOR_BENCHMARK_EVALUATION", "approved_for_production": false}
+    },
+    {
+      "model_id": "nvidia/PartPacker",
+      "display_name": "PartPacker",
+      "vendor": "NVIDIA",
+      "priority": "P2_SILVER_LICENSE_CONDITIONAL",
+      "category": "one-image part-level 3D decomposition",
+      "toscanini_role": {
+        "approved_scope": [
+          "RESEARCH / INTERNAL EVALUATION ONLY: part-separation experiments for exploded-view presentation on canonical-derived renders"
+        ],
+        "forbidden_scope": [
+          "AUTOMATIC SHIPMENT IN COMMERCIAL TOSCANINI OUTPUT (non-commercial license)",
+          "canonical dimensions",
+          "load paths",
+          "component relationships",
+          "engineering geometry",
+          "any output entering the engineering GLB chain"
+        ],
+        "output_epistemic_class": "COMPUTATIONAL_RENDER"
+      },
+      "expected_io": {
+        "inputs": ["single image (canonical render recommended)"],
+        "outputs": ["part-level 3D object: multiple separately editable components (per model card)"]
+      },
+      "capability_claims": {
+        "mesh_topology": {"claim": "part-level decomposition into meaningful components (card claim)", "source": "MODEL_CARD_CLAIM_UNVERIFIED"},
+        "materials": {"claim": "textured parts (verify at benchmark)", "source": "MODEL_CARD_CLAIM_UNVERIFIED"},
+        "texture_quality": {"claim": "textured output per card", "source": "MODEL_CARD_CLAIM_UNVERIFIED"},
+        "part_separation": {"claim": "explicit part-level output — the capability of interest for exploded views; parts are semantic-agnostic", "source": "MODEL_CARD_CLAIM_UNVERIFIED"},
+        "multi_view_consistency": {"claim": "single-image conditioned", "source": "USER_DIRECTIVE_ANALYSIS"}
+      },
+      "vram_claim": {"value": "TO_BE_CONFIRMED_FROM_MODEL_CARD_AT_VERIFICATION", "source": "PENDING_VERIFICATION"},
+      "hf_jobs_flavor": "l40s-48gb pending confirmation",
+      "hf_inference_provider_served": false,
+      "anticipated_failure_modes": [
+        "NON-COMMERCIAL LICENSE per model card -> cannot ship in any buyer package without license review",
+        "generated parts are semantic-agnostic: components may NOT match engineering component identity (housing / heat exchanger / spring / bearing / channel / cover)",
+        "part boundaries may cut across engineering component boundaries"
+      ],
+      "epistemic_risk_note": "The part-separation capability maps onto exploded-view requirements, but part IDENTITY must come from the engineering model, never from the packer. License gate is hard.",
+      "decision": {"registry_status": "APPROVED_FOR_INTERNAL_EVALUATION_ONLY_COMMERCIAL_BLOCKED", "approved_for_production": false}
+    },
+    {
+      "model_id": "Yiwen-ntu/MeshAnythingV2",
+      "display_name": "MeshAnythingV2",
+      "vendor": "Yiwen-ntu (NUS)",
+      "priority": "P3_BRONZE",
+      "category": "artist-like mesh generation aligned to an input shape",
+      "toscanini_role": {
+        "approved_scope": [
+          "mesh topology presentation experiments on canonical-derived meshes (within face budget)"
+        ],
+        "forbidden_scope": [
+          "canonical dimensions",
+          "load paths",
+          "component relationships",
+          "engineering geometry",
+          "any output entering the engineering GLB chain"
+        ],
+        "output_epistemic_class": "COMPUTATIONAL_RENDER"
+      },
+      "expected_io": {
+        "inputs": ["input shape (point cloud / mesh from the canonical pipeline)", "optional condition images"],
+        "outputs": ["artist-like mesh aligned to the input shape"]
+      },
+      "capability_claims": {
+        "mesh_topology": {"claim": "artist-created-like topology; face budget on the order of ~1600 faces per card", "source": "MODEL_CARD_CLAIM_UNVERIFIED"},
+        "materials": {"claim": "no material generation", "source": "USER_DIRECTIVE_ANALYSIS"},
+        "texture_quality": {"claim": "no texture generation", "source": "USER_DIRECTIVE_ANALYSIS"},
+        "part_separation": {"claim": "single mesh output", "source": "USER_DIRECTIVE_ANALYSIS"},
+        "multi_view_consistency": {"claim": "shape-conditioned, single output", "source": "USER_DIRECTIVE_ANALYSIS"}
+      },
+      "vram_claim": {"value": "modest; TO_BE_CONFIRMED_FROM_MODEL_CARD", "source": "PENDING_VERIFICATION"},
+      "hf_jobs_flavor": "l4-26gb expected; confirm at first run",
+      "hf_inference_provider_served": false,
+      "anticipated_failure_modes": [
+        "face budget oversmooths engineering detail on dense canonical meshes",
+        "not suited to large assemblies",
+        "output must never become the engineering source of truth"
+      ],
+      "epistemic_risk_note": "Lowest priority of the set: topology styling only; the input shape always comes from the canonical pipeline.",
+      "decision": {"registry_status": "APPROVED_FOR_BENCHMARK_EVALUATION", "approved_for_production": false}
+    }
+  ],
+  "infrastructure": [
+    {
+      "entry_id": "hf-jobs",
+      "priority": "P1_GOLD",
+      "role": "experimentation compute laboratory: arbitrary CPU/GPU/TPU workloads incl. Docker, billed by actual usage, PRO credits apply",
+      "rules": [
+        "every candidate-model benchmark run executes here, NEVER in the canonical production Space",
+        "each run emits a typed VISUAL_BENCHMARK_RECORD with reproducibility fields (model id + revision, config, hardware flavor, fixture sha256, code commit)",
+        "no experimental model is installed into the production Space at any time"
+      ]
+    },
+    {
+      "entry_id": "hf-storage-buckets",
+      "priority": "P1_GOLD",
+      "role": "persistent large data: models, visual cache, benchmark fixtures, render artifacts; keeps Space git clean",
+      "rules": [
+        "layout contract in storage/bucket_layout.json",
+        "every stored generated asset carries its epistemic class and lineage sidecar"
+      ]
+    },
+    {
+      "entry_id": "gpu-spaces-production",
+      "priority": "P1_GOLD",
+      "role": "production visual compute home; the canonical Space prateekm1/toscanini-prod-validation remains the single product deployment (R447 alignment stands)",
+      "rules": [
+        "no parallel production backend (R447: duplicate Space deleted; stays deleted)",
+        "visual compiler is the only publisher toward website and buyer package"
+      ]
+    }
+  ]
+}

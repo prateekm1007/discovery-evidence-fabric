@@ -2467,3 +2467,113 @@ details.tech li { font-size: 13.5px; color: var(--ink-soft); margin-bottom: 6px;
   text-decoration: underline;
   text-underline-offset: 2px;
 }
+
+/* ---------------- R450-C2: the visual feedback layer (trajectory) ---------------- */
+
+/* epistemic badges — truth controls the labels */
+.epi-badge.epi-MEASURED { color: #234d34; border-color: #c9dbd0; background: #f0f6f1; }
+.epi-badge.epi-SIMULATED { color: #3d5a80; border-color: #c7d6e8; background: #eff4fa; }
+.epi-badge.epi-INFERRED { color: #6b5b95; border-color: #d8d0e8; background: #f5f2fa; }
+.epi-badge.epi-PROPOSED { color: #8a6d3b; border-color: #e6d9bd; background: #faf5e8; }
+.epi-badge.epi-UNVERIFIED { color: #7a7a72; border-color: var(--line); background: #f6f6f3; }
+.epi-legend { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px; }
+.epi-legend-item { display: inline-flex; }
+
+/* trajectory flow */
+.traj-flow { display: flex; flex-direction: column; gap: 6px; }
+.traj-row { display: flex; flex-direction: column; }
+.traj-state {
+  border: 1px solid var(--line); border-radius: 12px; background: #fff;
+  padding: 12px 16px;
+}
+.traj-state.traj-current { border-color: var(--accent); }
+.traj-state-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.traj-gen {
+  font-weight: 700; font-size: 16px; color: var(--ink);
+  min-width: 34px;
+}
+.traj-status { text-transform: uppercase; }
+.traj-faint { color: var(--ink-faint); font-size: 12.5px; margin-top: 4px; }
+
+.traj-transition { display: flex; flex-direction: column; padding-left: 22px; border-left: 2px solid var(--line); margin: 6px 0 10px 16px; }
+.traj-arrow { color: var(--ink-faint); margin: 4px 0; }
+
+.traj-step {
+  border: 1px solid var(--line); border-radius: 10px; background: #fcfcfa;
+  padding: 10px 14px; margin: 6px 0;
+}
+.traj-step-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.traj-step-kind {
+  font-size: 11px; letter-spacing: 0.5px; text-transform: uppercase;
+  color: var(--ink-soft); font-weight: 700; min-width: 84px;
+}
+.traj-step-body { margin-top: 6px; font-size: 14px; }
+.traj-kill { color: var(--bad); font-weight: 600; }
+.traj-warn { color: var(--warn); }
+.traj-cause { font-weight: 600; }
+.traj-basis { margin: 6px 0 0; padding-left: 18px; color: var(--ink-soft); font-size: 13px; }
+.traj-dir { color: var(--ink); }
+.traj-mtype {
+  font-size: 11px; letter-spacing: 0.4px; color: var(--ink-soft);
+  border: 1px dashed var(--line); border-radius: 6px; padding: 2px 7px;
+}
+.traj-upd { font-weight: 600; }
+.traj-stop { margin-top: 14px; color: var(--ink-soft); font-size: 13.5px; }
+
+/* before / after / delta table */
+.traj-delta {
+  width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 6px;
+}
+.traj-delta th {
+  text-align: left; font-size: 11px; letter-spacing: 0.5px;
+  text-transform: uppercase; color: var(--ink-faint);
+  border-bottom: 1px solid var(--line); padding: 4px 8px 4px 0;
+}
+.traj-delta td {
+  border-bottom: 1px solid #f0f0ec; padding: 6px 8px 6px 0;
+  vertical-align: top;
+}
+.traj-df { font-weight: 600; white-space: nowrap; }
+.traj-db { color: var(--ink-faint); }
+.traj-da { color: var(--ink); }
+.traj-delta-changed { color: var(--accent); font-weight: 700; white-space: nowrap; }
+
+/* prediction outcomes */
+.pred-outcome { text-transform: uppercase; }
+.pred-HELD { color: var(--ok); border-color: #c9dbd0; background: #f0f6f1; }
+.pred-REFUTED { color: var(--bad); border-color: #e6c9c3; background: #f9eeec; }
+.pred-INDETERMINATE { color: var(--warn); border-color: #ecd9bd; background: #faf3e8; }
+.pred-NOT_EVALUATED { color: #7a7a72; border-color: var(--line); background: #f6f6f3; }
+
+/* causal trajectory surface (aggregated) */
+.causal-flow { margin-top: 8px; }
+.causal-chain { display: flex; flex-direction: column; gap: 0; max-width: 720px; }
+.causal-cell-wrap { display: flex; flex-direction: column; }
+.causal-cell {
+  border: 1px solid var(--line); border-radius: 10px; padding: 10px 14px;
+  background: #fff;
+}
+.causal-present { border-left: 3px solid var(--accent); }
+.causal-gap { opacity: 0.62; border-style: dashed; }
+.causal-stage {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 11px; letter-spacing: 0.5px; text-transform: uppercase;
+  font-weight: 700; color: var(--ink-soft);
+}
+.causal-summary { font-size: 13.5px; color: var(--ink-soft); margin-top: 4px; }
+.causal-arrow { color: var(--ink-faint); margin: 2px 0 2px 18px; }
+
+/* sensitivity panel */
+.sens-head { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.sens-chart { max-width: 640px; }
+.sens-row { display: flex; align-items: center; gap: 10px; margin: 6px 0; }
+.sens-val { min-width: 64px; font-variant-numeric: tabular-nums; font-size: 13.5px; }
+.sens-track {
+  flex: 1; height: 14px; background: #f4f4f0; border-radius: 999px;
+  overflow: hidden; border: 1px solid var(--line);
+}
+.sens-bar { display: block; height: 100%; background: var(--accent); opacity: 0.55; }
+.sens-obj {
+  min-width: 72px; text-align: right; font-variant-numeric: tabular-nums;
+  font-size: 13.5px; font-weight: 600;
+}
