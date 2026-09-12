@@ -451,3 +451,22 @@ Work Log:
 Stage Summary:
 - The Art. LXXI Section 4 credential blocker is RESOLVED for the branch: both R451-C2 rounds are now on origin, remote-verified. Round completion per Art. LXXI Section 1 remains conditional on the owner's merge + redeploy of the stacked lab line - the tuples now say exactly that instead of "credentials missing".
 - reviewer_provenance=AI_REVIEW.
+
+---
+Task ID: R451-C2.1
+Agent: Coder 2 (main session, continuation)
+Task: Operator directive R451-C2.1 — stop the false "3D unavailable" interpretation: five distinct presentation states with exact copy, a backend-derived six-value geometry/visual vocabulary the browser never infers from a missing file, and a DISCOVERY PIPELINE strip that answers "why don't I have a 3D model?" with the recorded truth.
+
+Work Log:
+- ROUND-START MANDATED READS: Constitution v2.4.0 hash verified (b54a1be9, == origin/main bytes) and read IN FULL this session; GOVERNANCE five files IN FULL; ACTIVE_PATH.md IN FULL.
+- SANDBOX ROLLBACK DISCOVERED AND RECOVERED (Art. XXII/XXIII): the local checkout had regressed to 09b44c5 (pre-round) while the remote branch held the delivered 68488087 — the pushes of the earlier delivery turn were verified via ls-remote, labeled STALE_LOCAL_CHECKOUT, and the branch fast-forwarded back to origin (zero loss; the push-first discipline saved the round). Sandbox worklog re-appended.
+- Backend: toscanini/dossier.py::_geometry_state derives the six-value vocabulary (upstream_not_reached / geometry_not_applicable / geometry_generation_failed / geometry_available / visual_render_failed / visual_complete) from canonical records only (bridge outcome, render record, visual gate); presentation_cause splits State C from State D; design tab carries the typed fields on all three branches and the blanket "3D GEOMETRY UNAVAILABLE" note is retired (the R430 pin test re-pinned in the same change, Art. LXIV).
+- Backend: pipeline_projection builds the seven-stage DISCOVERY PIPELINE strip (statuses RECEIVED / IN_PROGRESS / NOT_REACHED / STOPPED / PAUSED_INFRASTRUCTURE); the blocked run shows exactly the directive's strip; NOT_REACHED never carries a numeric count (the RETRIEVED zero is the only honest zero, C2.5-consistent); the package row reads IN_PROGRESS only once the frontier reaches engineering.
+- Frontend: presentationState.ts consumes the typed state (closed vocabulary, unknown values fall through); renderBlockedCopy/GEOMETRY_ABSENT_COPY carry the exact directive sentences; TechStage mounts DiscoveryPipelineStrip at the top, renders HeroNoVisualization for State B (never "Not established" for an invention that exists), and splits the C/D ribbon by the backend cause with the recorded detail line.
+- Batteries: tests/test_r451_c21_states.py 28 passed; r451_c2_ui_tests.mjs 55 passed (Attacks F1–F5: missing-GLB+typed-state never reads as technology absence; GLB-present+no-record never reads VISUAL_READY; gate-FAIL never reads as renderer absence; infrastructure authority holds over a typed visual_complete; closed vocabulary); regressions 83 (visual chain) + 64 (r447 join family) + r420/r419 green except two git-stash-verified pre-existing environment failures (BS-020, disclosed); tsc clean; next build green.
+- Fresh-browser DOM proof (R451/C2_PRODUCT/E2E_C21/, real server + production build + headless Chrome): all five states verified in the DOM with the exact sentences and the forbidden phrases ("Not established on this run." / "3D GEOMETRY UNAVAILABLE") verified ABSENT. MEASURED FINDING: the State C fixture was AUTO-HEALED by the live mechanical join (the renderer re-ran to COMPLETE_PASS — C2.7 doing exactly its job); the State C capture was taken with the artifact-build endpoint route-blocked so the typed skip stayed authoritative; both facts recorded in DOM_EVIDENCE.json.
+- Constitution v2.4.0 re-read IN FULL immediately before this commit (second full pass this session; hash b54a1be9 verified unchanged at round start).
+- Round record: R451/C2_PRODUCT/R451_C21_ROUND_RECORD.json with the Art. LXXI tuple (push available this session; production waits on the owner's stacked-PR merge + Space redeploy). reviewer_provenance=AI_REVIEW.
+
+Stage Summary:
+- The five states are distinct end-to-end and impossible to confuse: the browser renders the backend's typed truth verbatim and cannot reach the false "3D unavailable" interpretation from a missing file; the strip answers the "why no 3D" question with recorded facts. No Coder-1 canonical state changed; the gate untouched; thresholds untouched.

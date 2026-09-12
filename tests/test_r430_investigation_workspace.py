@@ -305,7 +305,14 @@ class TestDossier:
         s = _mk_run(tmp_path)
         design = dos.build_dossier(s)["tabs"]["design"]
         assert design["availability"] == "UNAVAILABLE"
-        assert "UNAVAILABLE" in design["note"].upper()
+        # R451-C2.1: the honest note follows the TYPED geometry state —
+        # the blanket "3D GEOMETRY UNAVAILABLE" reading the operator
+        # directive removed is gone; the note still states the absence
+        # and the recorded reason plainly.
+        assert "unavailable" in design["note"].lower() or \
+            "not reached" in design["note"].lower()
+        assert "3D GEOMETRY UNAVAILABLE" not in design["note"]
+        assert design["geometry_state"] == "upstream_not_reached"
         assert design["reason"]
 
     def test_falsification_dossier_on_killed_generation(self, tmp_path):

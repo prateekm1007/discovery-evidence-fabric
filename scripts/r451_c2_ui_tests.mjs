@@ -218,6 +218,176 @@ try {
     ps.isTerminal("RUN_BLOCKED_TRANSPORT") === true);
   check("RUNNING is not terminal", ps.isTerminal("RUNNING") === false);
   check("ERROR_* is terminal", ps.isTerminal("ERROR_TRANSPORT") === true);
+
+  // =================================================================
+  // R451-C2.1 — the five states with their exact copy, and the
+  // no-file-inference rule: the mapping consumes the backend-typed
+  // geometry_state and NEVER infers state from a missing file.
+  // =================================================================
+  console.log("\n== R451-C2.1: the five states, exact copy ==");
+
+  // State A — RUN_BLOCKED_TRANSPORT
+  r = resolvePresentationState(
+    detail({ status: "RUN_BLOCKED_TRANSPORT",
+      user_state_view: usv({ user_state: "BLOCKED_TRANSPORT" }) }),
+    dossier());
+  check("State A: INFRASTRUCTURE_PAUSED with the directive copy",
+    r.state === "INFRASTRUCTURE_PAUSED" &&
+    r.blocked?.verdictLine === "No scientific conclusion was reached." &&
+    r.blocked?.subline === "Infrastructure temporarily unavailable.");
+
+  // State B — invention exists, geometry absent (typed backend state)
+  r = resolvePresentationState(
+    detail({ user_state_view: usv({ user_state: "COMPLETED_CANDIDATE",
+      found_something: true }) }),
+    dossier({ tabs: { design: {
+      availability: "UNAVAILABLE",
+      geometry_state: "geometry_not_applicable",
+      geometry_state_detail:
+        "the recorded bridge outcome is NOT_VISUALIZABLE",
+    }, evidence: null } }));
+  check("State B: GEOMETRY_UNAVAILABLE with the absent reason",
+    r.state === "GEOMETRY_UNAVAILABLE" &&
+    r.geometryAbsent?.reason === "not_applicable");
+  check("State B: exact directive copy",
+    ps.GEOMETRY_ABSENT_COPY.line ===
+      "Engineering visualization not available on this invention.");
+
+  // State B variant — the geometry BUILD failed (also State B copy)
+  r = resolvePresentationState(
+    detail({ user_state_view: usv({ user_state: "COMPLETED_CANDIDATE",
+      found_something: true }) }),
+    dossier({ tabs: { design: {
+      availability: "UNAVAILABLE",
+      geometry_state: "geometry_generation_failed",
+      geometry_state_detail: "the recorded bridge outcome is GEOMETRY_FAILED",
+    }, evidence: null } }));
+  check("State B (generation failed): same state, failed reason",
+    r.state === "GEOMETRY_UNAVAILABLE" &&
+    r.geometryAbsent?.reason === "generation_failed" &&
+    r.geometryAbsent?.detail ===
+      "the recorded bridge outcome is GEOMETRY_FAILED");
+
+  // State C — GLB exists, renderer unavailable (typed backend state)
+  r = resolvePresentationState(detail(), dossier({ tabs: {
+    design: { availability: "AVAILABLE", glb: "/api/run/x/model.glb",
+      geometry_state: "visual_render_failed",
+      presentation_cause: "renderer_unavailable",
+      geometry_state_detail: "the presentation renderer recorded RENDER_FAILED",
+      renders: { status: "RENDER_FAILED" } }, evidence: null } }));
+  check("State C: GEOMETRY_READY_RENDER_BLOCKED + renderer cause",
+    r.state === "GEOMETRY_READY_RENDER_BLOCKED" &&
+    r.renderBlockCause === "renderer_unavailable");
+  check("State C: exact directive copy",
+    ps.renderBlockedCopy(r.renderBlockCause).line ===
+      "Engineering model ready. Presentation renderer unavailable.");
+
+  // State C variant — renderer skipped on infrastructure
+  r = resolvePresentationState(detail(), dossier({ tabs: {
+    design: { availability: "AVAILABLE", glb: "/api/run/x/model.glb",
+      geometry_state: "visual_render_failed",
+      presentation_cause: "infrastructure",
+      renders: { status: "RENDER_SKIPPED_LOW_MEMORY" } },
+    evidence: null } }));
+  check("State C (infra skip): renderer-unavailable copy, not gate copy",
+    r.renderBlockCause === "infrastructure" &&
+    ps.renderBlockedCopy(r.renderBlockCause).line ===
+      "Engineering model ready. Presentation renderer unavailable.");
+
+  // State D — GLB exists, renderer succeeded, gate FAILED
+  r = resolvePresentationState(detail(), dossier({ tabs: {
+    design: { availability: "AVAILABLE", glb: "/api/run/x/model.glb",
+      geometry_state: "visual_render_failed",
+      presentation_cause: "gate_not_passed",
+      geometry_state_detail:
+        "the render completed but the presentation integrity gate returned FAIL",
+      renders: { status: "OK",
+        visual_gate: { verdict: "FAIL" } } }, evidence: null } }));
+  check("State D: gate_not_passed cause",
+    r.state === "GEOMETRY_READY_RENDER_BLOCKED" &&
+    r.renderBlockCause === "gate_not_passed");
+  check("State D: exact directive copy",
+    ps.renderBlockedCopy(r.renderBlockCause).line ===
+      "Model rendered but did not pass the presentation integrity gate.");
+
+  // State E — gate COMPLETE_PASS: show the model
+  r = resolvePresentationState(detail(), dossier({ tabs: {
+    design: { availability: "AVAILABLE", glb: "/api/run/x/model.glb",
+      geometry_state: "visual_complete",
+      renders: { status: "OK",
+        visual_gate: { verdict: "COMPLETE_PASS" } } }, evidence: null } }));
+  check("State E: VISUAL_READY (the model shows)",
+    r.state === "VISUAL_READY" && r.glbReadyButRenderBlocked == null);
+
+  // ----------------------------------------------------------------
+  console.log("\n== R451-C2.1: no-file-inference attacks ==");
+  // Attack F1: geom.present == false (no glb field anywhere) must NOT
+  // collapse the state when the backend typed the real one. A missing
+  // file is never the browser's evidence for WHY geometry is absent.
+  r = resolvePresentationState(
+    detail({ user_state_view: usv({ user_state: "COMPLETED_CANDIDATE",
+      found_something: true }) }),
+    dossier({ tabs: { design: {
+      availability: "UNAVAILABLE", glb: null,
+      geometry_state: "geometry_not_applicable" }, evidence: null } }));
+  check("Attack F1: missing glb + typed not_applicable -> State B (never TECHNOLOGY_NOT_ESTABLISHED)",
+    r.state === "GEOMETRY_UNAVAILABLE" &&
+    r.state !== "TECHNOLOGY_NOT_ESTABLISHED");
+
+  // Attack F2: a GLB URL alone (stale design row) without the typed
+  // state, while the render never ran — stays render-blocked, never
+  // VISUAL_READY (file existence is not render success)
+  r = resolvePresentationState(detail(), dossier({ tabs: {
+    design: { availability: "AVAILABLE", glb: "/api/run/x/model.glb",
+      renders: { status: "" } }, evidence: null } }));
+  check("Attack F2: glb present + no render record -> render-blocked (never VISUAL_READY)",
+    r.state === "GEOMETRY_READY_RENDER_BLOCKED" &&
+    r.renderBlockCause === "renderer_unavailable");
+
+  // Attack F3: gate verdict FAIL with pixels rendered must NOT read as
+  // renderer absence (State D says the gate rejected, not the renderer)
+  r = resolvePresentationState(detail(), dossier({ tabs: {
+    design: { availability: "AVAILABLE", glb: "/api/run/x/model.glb",
+      renders: { status: "OK",
+        visual_gate: { verdict: "FAIL" } } }, evidence: null } }));
+  check("Attack F3: rendered + gate FAIL -> gate copy (not renderer copy)",
+    r.renderBlockCause === "gate_not_passed" &&
+    ps.renderBlockedCopy(r.renderBlockCause).title ===
+      "PRESENTATION INTEGRITY GATE");
+
+  // Attack F4: upstream_not_reached on a terminal run with an invention
+  // falls through to the honest absence resolution — never a fake
+  // geometry state
+  r = resolvePresentationState(
+    detail({ user_state_view: usv({ user_state: "COMPLETED_CANDIDATE",
+      found_something: true }) }),
+    dossier({ tabs: { design: {
+      availability: "PENDING",
+      geometry_state: "upstream_not_reached" }, evidence: null } }));
+  check("Attack F4: upstream_not_reached + invention -> GEOMETRY_UNAVAILABLE (honest)",
+    r.state === "GEOMETRY_UNAVAILABLE");
+
+  // Attack F5: an infrastructure-blocked run NEVER reaches a geometry
+  // state at all — even a typed geometry row cannot un-block it
+  r = resolvePresentationState(
+    detail({ status: "RUN_BLOCKED_TRANSPORT",
+      user_state_view: usv({ user_state: "BLOCKED_TRANSPORT" }) }),
+    dossier({ tabs: { design: designAvailable({
+      geometry_state: "visual_complete" }), evidence: null } }));
+  check("Attack F5: typed visual_complete cannot override INFRASTRUCTURE_PAUSED",
+    r.state === "INFRASTRUCTURE_PAUSED" &&
+    r.state !== "VISUAL_READY");
+
+  // unknown geometry_state values are never trusted into a geometry
+  // branch (the vocabulary is closed; anything else falls through)
+  r = resolvePresentationState(
+    detail({ user_state_view: usv({ user_state: "COMPLETED_CANDIDATE",
+      found_something: true }) }),
+    dossier({ tabs: { design: {
+      availability: "UNAVAILABLE", geometry_state: "SOMETHING_ELSE" },
+    evidence: null } }));
+  check("Closed vocabulary: unknown geometry_state falls through honestly",
+    r.state === "GEOMETRY_UNAVAILABLE");
 } finally {
   rmSync(OUT, { recursive: true, force: true });
 }

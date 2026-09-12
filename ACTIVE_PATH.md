@@ -336,3 +336,36 @@ production build + headless Chromium): `R451/C2_PRODUCT/E2E/`
 regression green (real 3D hero, gate badge, populated cards — unchanged).
 Constitution v2.4.0 read IN FULL at round start and re-read IN FULL
 immediately before this commit.
+
+## R451-C2.1 addendum (2026-09-12) — the false "3D unavailable" interpretation is impossible to reach
+
+Operator directive R451-C2.1: the frontend must stop using the existence
+of a 3D file as a proxy for the state of discovery. Five distinct
+states with exact copy; a typed six-value geometry/visual vocabulary
+derived by the BACKEND; and a DISCOVERY PIPELINE strip that answers
+"why don't I have a 3D model?" with the recorded truth.
+
+| Component | Module | Notes |
+|---|---|---|
+| Six-value geometry/visual state | `toscanini/dossier.py::_geometry_state` + `GEOMETRY_STATES` | upstream_not_reached / geometry_not_applicable / geometry_generation_failed / geometry_available / visual_render_failed / visual_complete — derived ONLY from canonical records (CIO geometry block, bridge outcome, render record, visual gate); `presentation_cause` splits State C from State D; the UI consumes it verbatim and NEVER infers it from a missing file |
+| The five hero states | `TOSCANINI_UI/webapp/lib/presentationState.ts` | A blocked=DISCOVERY PAUSED; B invention-exists=**"Engineering visualization not available on this invention."** (HeroNoVisualization — never "Not established on this run" for an invention that exists); C renderer=**"Engineering model ready. Presentation renderer unavailable."**; D gate=**"Model rendered but did not pass the presentation integrity gate."**; E COMPLETE_PASS=the model shows. C/D copy selected by the backend's `presentation_cause`, never by the browser |
+| DISCOVERY PIPELINE strip | `toscanini/dossier.py::pipeline_projection` + `components/DiscoveryPipelineStrip.tsx` | seven product stages (Problem/Evidence/Mechanism/Invention/Engineering/3D visualization/Package), typed statuses RECEIVED / IN_PROGRESS / NOT_REACHED / STOPPED / PAUSED_INFRASTRUCTURE derived from recorded artifacts only; the blocked run shows exactly the directive's strip (Problem RECEIVED, everything else NOT REACHED); the strip renders NOTHING when the projection is absent (never a guessed ladder) |
+| No-file-inference attacks | `scripts/r451_c2_ui_tests.mjs` | F1 missing-GLB+typed-not-applicable never reads as technology absence; F2 GLB-present+no-render-record never reads VISUAL_READY; F3 gate-FAIL never reads as renderer absence; F4 upstream_not_reached falls through honestly; F5 typed visual_complete cannot override INFRASTRUCTURE_PAUSED; the vocabulary is closed (unknown values fall through) |
+| Note honesty | `toscanini/dossier.py::design_tab` | the blanket "3D GEOMETRY UNAVAILABLE" note is gone; typed notes name the reach state or the State B sentence; the R430 pin test re-pinned to the new contract |
+
+Batteries: `tests/test_r451_c21_states.py` (28 — the six states from
+canonical records; the blocked strip == the directive's exact strip;
+NOT_REACHED never carries a numeric zero, the RETRIEVED zero may;
+source pins for the exact copy and the strip's backend-verbatim
+rendering); `scripts/r451_c2_ui_tests.mjs` 55 checks (34 prior + 21:
+five states, exact copy, Attacks F1–F5, closed vocabulary);
+test_r430 re-pin green; regressions r441+r443+r444+r446 83 passed,
+r447 join family 64 passed, r420/r419 green except two pre-existing
+environment-class failures identical at the pristine baseline
+(test_r419_scipy_free_geometry, test_r419_render_pipeline — BS-020
+disclosed); tsc clean; next build green. Fresh-browser DOM proof with
+real server + production build (R451/C2_PRODUCT/E2E_C21/): all five
+states verified in the DOM with the directive's exact sentences and
+the forbidden phrases verified ABSENT; the State C fixture was
+auto-healed by the live mechanical join (C2.7 proof) and captured with
+the artifact-build route blocked so the typed skip stayed authoritative.

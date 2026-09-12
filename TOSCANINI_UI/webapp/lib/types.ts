@@ -739,6 +739,11 @@ export interface DossierTab {
   contract?: Record<string, { status?: string; value?: unknown }> | null;
   recorded?: unknown;
   execution_note?: string;
+  // R451-C2.1: the typed geometry/visual state — the UI consumes THIS
+  // (backend-derived), never a missing-file inference
+  geometry_state?: string;
+  presentation_cause?: string | null;
+  geometry_state_detail?: string | null;
 }
 
 export interface FalsificationRecord {
@@ -769,4 +774,17 @@ export interface DossierBody {
     DossierTab
   >;
   falsification?: FalsificationRecord | null;
+  // R451-C2.1: the DISCOVERY PIPELINE strip projection (backend-derived)
+  pipeline?: PipelineStage[];
+}
+
+// R451-C2.1 — one row of the DISCOVERY PIPELINE strip. The status
+// vocabulary is backend-owned (toscanini/dossier.py::pipeline_projection);
+// the frontend renders it verbatim.
+export interface PipelineStage {
+  key: string;
+  label: string;
+  status: "RECEIVED" | "IN_PROGRESS" | "NOT_REACHED" | "STOPPED" |
+    "PAUSED_INFRASTRUCTURE";
+  detail?: string | null;
 }

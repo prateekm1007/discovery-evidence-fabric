@@ -2629,3 +2629,65 @@ details.tech li { font-size: 13.5px; color: var(--ink-soft); margin-bottom: 6px;
   text-decoration: underline;
   text-underline-offset: 2px;
 }
+
+/* ==========================================================================
+   R451-C2.1 — the DISCOVERY PIPELINE strip (top of the run page)
+   Seven product stages with backend-derived statuses. The strip answers
+   "why don't I have a 3D model?" from recorded facts. Colors reuse the
+   three documented semantic tones: done = ok-green, live = progress,
+   infra = the calm slate of INFRASTRUCTURE PAUSED (Art. LXI — never a
+   scientific statement), stopped/unreached = neutral.
+   ========================================================================== */
+.pipeline-strip {
+  border: 1px solid var(--line, #e4e0d8);
+  border-radius: 12px;
+  background: #fbfaf7;
+  padding: 10px 14px 8px;
+  margin-bottom: 14px;
+}
+.pipeline-title {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  margin-bottom: 6px;
+}
+.pipeline-rows {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 2px 18px;
+}
+.pipeline-row {
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+  padding: 3px 0;
+  font-size: 12.5px;
+  min-width: 0;
+  flex-wrap: wrap;
+}
+.pipeline-mark { width: 12px; text-align: center; flex: none; }
+.pipeline-label { font-weight: 600; white-space: nowrap; }
+.pipeline-status {
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.pipeline-detail {
+  flex-basis: 100%;
+  font-size: 11px;
+  padding-left: 19px;
+  margin-top: -1px;
+}
+.pr-done  .pipeline-mark, .pr-done  .pipeline-status { color: var(--ok, #3d7a4d); }
+.pr-live  .pipeline-mark, .pr-live  .pipeline-status { color: var(--ok, #3d7a4d); }
+.pr-live  .pipeline-mark { animation: none; }
+.pr-infra .pipeline-mark, .pr-infra .pipeline-status {
+  color: var(--state-infra, #4f6d8c);
+}
+.pr-stopped .pipeline-status { color: #8a5a3d; }
+.pr-unreached .pipeline-mark,
+.pr-unreached .pipeline-status { color: var(--faint, #9a948a); }
+
+/* State B (R451-C2.1) — the invention-exists visualization-absence hero */
+.hero-noviz .hero-honest-body { color: inherit; }

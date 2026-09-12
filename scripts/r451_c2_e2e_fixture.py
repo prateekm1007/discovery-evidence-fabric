@@ -32,6 +32,10 @@ RUNS = REPO / "ENGINE_RUNS"
 
 BLOCKED_ID = "tsr451c2blockedfixture"
 SUCCESS_ID = "tsr451c2successfixture"
+STATE_B_ID = "tsr451c2statebfixture"
+STATE_C_ID = "tsr451c2statecfixture"
+STATE_D_ID = "tsr451c2statedfixture"
+ALL_IDS = (BLOCKED_ID, SUCCESS_ID, STATE_B_ID, STATE_C_ID, STATE_D_ID)
 
 PROBLEM = ("How can hydropower turbine blade erosion from high-sediment "
            "water be reduced without sacrificing generating efficiency?")
@@ -73,8 +77,7 @@ def _make_glb(path: Path) -> None:
 def seed() -> None:
     data = _load()
     data["sessions"] = [s for s in data.get("sessions", [])
-                        if s.get("session_id") not in
-                        (BLOCKED_ID, SUCCESS_ID)]
+                        if s.get("session_id") not in ALL_IDS]
     now = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
 
     # ---- fixture 1: the infrastructure-blocked run ----------------------
@@ -159,7 +162,128 @@ def seed() -> None:
     })
 
     _save(data)
-    print(f"seeded {BLOCKED_ID} (blocked) and {SUCCESS_ID} (success)")
+
+    # ---- fixture 3: State B — invention exists, geometry not applicable
+    run_b = RUNS / STATE_B_ID
+    if run_b.exists():
+        import shutil
+        shutil.rmtree(run_b)
+    run_b.mkdir(parents=True)
+    (run_b / "INVENTION_SPECIFICATION.json").write_text(json.dumps({
+        "mechanism": ("a software-only scheduling mechanism (FIXTURE: "
+                      "an invention class with no physical geometry)"),
+        "intervention": "scheduler parametrization", "evidence": []}))
+    (run_b / "BRIDGE_REPORT.json").write_text(json.dumps({
+        "outcome": "NOT_VISUALIZABLE",
+        "visualizability_class": "NOT_VISUALIZABLE",
+        "classification_basis": {"reason": (
+            "FIXTURE: software/process invention — no physical "
+            "geometry applies")}}))
+    (run_b / "session.json").write_text(json.dumps(
+        {"status": "COMPLETE"}))
+    data["sessions"].append({
+        "session_id": STATE_B_ID,
+        "title": PROBLEM, "user_text": PROBLEM,
+        "status": "COMPLETE",
+        "created_at": now, "problem_id": None,
+        "final_status": "AUTOMATED_INVENTION_CANDIDATE",
+        "origin": ("FIXTURE r451-c2.1 State B (geometry not "
+                   "applicable) E2E proof (local sandbox)"),
+        "public": True, "run_dir": str(run_b), "fixture": True,
+        "package": {"complete": False},
+    })
+
+    # ---- fixture 4: State C — GLB exists, renderer unavailable ----------
+    run_c = RUNS / STATE_C_ID
+    if run_c.exists():
+        import shutil
+        shutil.rmtree(run_c)
+    _make_glb(run_c / "MODEL" / "engineering_model.glb")
+    m3d_c = run_c / "MODEL" / "3D"
+    m3d_c.mkdir(parents=True)
+    (m3d_c / "render_record.json").write_text(json.dumps({
+        "stage": "RENDER",
+        "render_pipeline": "VISUAL_COMPILER_HEADLESS_THREE",
+        "status": "RENDER_SKIPPED_LOW_MEMORY",
+        "skip_reason": ("FIXTURE: free-plan memory floor — the typed "
+                        "infrastructure skip"),
+        "out_dir": str(m3d_c)}))
+    (m3d_c / "VISUAL_COMPILER_INVOCATION.json").write_text(json.dumps({
+        "kind": "VISUAL_COMPILER_INVOCATION",
+        "run_id": STATE_C_ID, "generation_id": "gen-1",
+        "canonical_glb_sha256": hashlib.sha256(
+            (run_c / "MODEL"
+             / "engineering_model.glb").read_bytes()).hexdigest(),
+        "compiler_version": "VISUAL_COMPILER_HEADLESS_THREE",
+        "invoked_at": now, "status": "RENDER_SKIPPED_LOW_MEMORY",
+        "skip_reason": "LOW_MEMORY",
+        "output_directory": str(m3d_c)}))
+    (run_c / "INVENTION_SPECIFICATION.json").write_text(json.dumps({
+        "mechanism": "FIXTURE mechanism (state C renderer unavailable)",
+        "intervention": "inlet bypass", "evidence": []}))
+    (run_c / "session.json").write_text(json.dumps(
+        {"status": "COMPLETE"}))
+    data["sessions"].append({
+        "session_id": STATE_C_ID,
+        "title": PROBLEM, "user_text": PROBLEM,
+        "status": "COMPLETE",
+        "created_at": now, "problem_id": None,
+        "final_status": "AUTOMATED_INVENTION_CANDIDATE",
+        "origin": ("FIXTURE r451-c2.1 State C (renderer unavailable) "
+                   "E2E proof (local sandbox)"),
+        "public": True, "run_dir": str(run_c), "fixture": True,
+        "package": {"complete": False},
+    })
+
+    # ---- fixture 5: State D — GLB exists, render ran, gate FAILED -------
+    run_d = RUNS / STATE_D_ID
+    if run_d.exists():
+        import shutil
+        shutil.rmtree(run_d)
+    _make_glb(run_d / "MODEL" / "engineering_model.glb")
+    glb_sha_d = hashlib.sha256(
+        (run_d / "MODEL" / "engineering_model.glb").read_bytes()
+    ).hexdigest()
+    m3d_d = run_d / "MODEL" / "3D"
+    m3d_d.mkdir(parents=True)
+    (m3d_d / "hero.png").write_bytes(_tiny_png())
+    (m3d_d / "render_record.json").write_text(json.dumps({
+        "stage": "RENDER",
+        "render_pipeline": "VISUAL_COMPILER_HEADLESS_THREE",
+        "status": "OK",
+        "source_glb_sha256": glb_sha_d,
+        "visual_gate": {"verdict": "FAIL"},
+        "out_dir": str(m3d_d)}))
+    (m3d_d / "visual_gate.json").write_text(json.dumps({
+        "gate_version": "r451c21-fixture", "verdict": "FAIL",
+        "hero_suppressed": True, "release_blocked": True,
+        "failed_rules": ["occupancy_band"]}))
+    (m3d_d / "VISUAL_COMPILER_INVOCATION.json").write_text(json.dumps({
+        "kind": "VISUAL_COMPILER_INVOCATION",
+        "run_id": STATE_D_ID, "generation_id": "gen-1",
+        "canonical_glb_sha256": glb_sha_d,
+        "compiler_version": "VISUAL_COMPILER_HEADLESS_THREE",
+        "invoked_at": now, "status": "OK", "skip_reason": None,
+        "output_directory": str(m3d_d)}))
+    (run_d / "INVENTION_SPECIFICATION.json").write_text(json.dumps({
+        "mechanism": "FIXTURE mechanism (state D gate rejected)",
+        "intervention": "inlet bypass", "evidence": []}))
+    (run_d / "session.json").write_text(json.dumps(
+        {"status": "COMPLETE"}))
+    data["sessions"].append({
+        "session_id": STATE_D_ID,
+        "title": PROBLEM, "user_text": PROBLEM,
+        "status": "COMPLETE",
+        "created_at": now, "problem_id": None,
+        "final_status": "AUTOMATED_INVENTION_CANDIDATE",
+        "origin": ("FIXTURE r451-c2.1 State D (gate not passed) "
+                   "E2E proof (local sandbox)"),
+        "public": True, "run_dir": str(run_d), "fixture": True,
+        "package": {"complete": False},
+    })
+
+    _save(data)
+    print(f"seeded {ALL_IDS}")
     print(f"sessions: {SESSIONS}")
     print(f"success run dir: {run_dir}")
 
@@ -167,13 +291,16 @@ def seed() -> None:
 def clean() -> None:
     data = _load()
     data["sessions"] = [s for s in data.get("sessions", [])
-                        if s.get("session_id") not in
-                        (BLOCKED_ID, SUCCESS_ID)]
+                        if s.get("session_id") not in ALL_IDS]
     _save(data)
     import shutil
     run_dir = RUNS / SUCCESS_ID
     if run_dir.exists():
         shutil.rmtree(run_dir)
+    for sid in (STATE_B_ID, STATE_C_ID, STATE_D_ID):
+        rd = RUNS / sid
+        if rd.exists():
+            shutil.rmtree(rd)
     print("fixtures removed")
 
 

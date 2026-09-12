@@ -41,8 +41,13 @@ import {
   resolvePresentationState,
 } from "@/lib/presentationState";
 import type { PresentationView } from "@/lib/presentationState";
+import {
+  GEOMETRY_ABSENT_COPY,
+  renderBlockedCopy,
+} from "@/lib/presentationState";
 import { retryPresentation } from "@/lib/api";
 import InfrastructureBlockedHero from "./InfrastructureBlockedHero";
+import DiscoveryPipelineStrip from "./DiscoveryPipelineStrip";
 import {
   Gauntlet,
   InvestigationProgress,
@@ -92,15 +97,25 @@ function stageStatus(view: PresentationView): {
     case "SCIENTIFIC_REJECTION":
       return { label: "Premise refuted", tone: "refuted" };
     case "GEOMETRY_READY_RENDER_BLOCKED":
-      return {
-        label: "Model ready — presentation paused",
-        tone: "infra",
-      };
+      // R451-C2.1: States C and D say different things — the renderer
+      // being unavailable is never worded as a gate rejection, and a
+      // gate rejection is never worded as renderer absence
+      return view.renderBlockCause === "gate_not_passed"
+        ? {
+            label: "Model rendered — gate not passed",
+            tone: "infra",
+          }
+        : {
+            label: "Model ready — renderer unavailable",
+            tone: "infra",
+          };
     case "VISUAL_READY":
       return { label: "Technology ready", tone: "done" };
     case "GEOMETRY_UNAVAILABLE":
+      // State B (R451-C2.1): the invention exists — what is missing is
+      // the visualization, never the technology itself
       return {
-        label: "Investigation complete — no physical model",
+        label: "Engineering visualization not available",
         tone: "done",
       };
     case "TECHNOLOGY_NOT_ESTABLISHED":
@@ -142,12 +157,11 @@ function HeroInvestigating({
 
 // ---- the honest not-established hero ----------------------------------------
 // R451-C2: this surface is ONLY for a COMPLETED run that reached its
-// honest scientific end without establishing a technology (or whose
-// technology has no physical geometry). An infrastructure stop NEVER
-// reaches this component — the presentation-state mapping routes those
-// to InfrastructureBlockedHero before this branch is reachable (the
-// exact "Not established on this run"-while-blocked contradiction this
-// round removes).
+// honest scientific end without establishing a technology. An
+// infrastructure stop NEVER reaches this component — the presentation-
+// state mapping routes those to InfrastructureBlockedHero before this
+// branch is reachable. R451-C2.1: an invention WITH a visualization
+// absence never reaches here either — State B has its own hero below.
 function HeroNotEstablished({ design }: { design: DesignTabData | undefined }) {
   return (
     <div className="hero-honest" data-hero-not-established>
@@ -159,6 +173,34 @@ function HeroNotEstablished({ design }: { design: DesignTabData | undefined }) {
         {design?.note ||
           "A physical-looking model was not generated for this technology — " +
           "showing one anyway would misrepresent the engineering state."}
+      </div>
+    </div>
+  );
+}
+
+// ---- State B (R451-C2.1): the invention exists, the visualization does not --
+// The exact directive sentence — the absence is the VISUALIZATION's, never
+// the technology's. The recorded reason (not applicable vs the geometry
+// build having failed) rides beneath, verbatim from the backend.
+function HeroNoVisualization({
+  view,
+  design,
+}: {
+  view: PresentationView;
+  design: DesignTabData | undefined;
+}) {
+  return (
+    <div className="hero-honest hero-noviz" data-hero-no-visualization>
+      <div className="hero-honest-h">{GEOMETRY_ABSENT_COPY.heading}</div>
+      <div className="hero-honest-body">{GEOMETRY_ABSENT_COPY.line}</div>
+      {(view.geometryAbsent?.detail || design?.note) && (
+        <div className="hero-honest-note faint" data-noviz-reason>
+          {view.geometryAbsent?.detail || design?.note}
+        </div>
+      )}
+      <div className="hero-honest-note faint">
+        The full technical record — the invention itself, its scores, and
+        the recorded reason — is preserved below.
       </div>
     </div>
   );
@@ -389,6 +431,12 @@ export default function TechStage({
 
   return (
     <div className="tech-stage" data-tech-stage>
+      {/* ---- R451-C2.1: THE DISCOVERY PIPELINE strip (top of the page) ----
+          the seven product stages with backend-derived statuses — the
+          surface that answers "why don't I have a 3D model?" with the
+          recorded truth instead of a blanket geometry-unavailable line */}
+      <DiscoveryPipelineStrip pipeline={dossier?.pipeline} />
+
       {/* ---- the stage head ---- */}
       <div className="stage-head">
         <div className="stage-kicker faint">Designing</div>
@@ -422,18 +470,16 @@ export default function TechStage({
         />
       ) : (
       <>
-      {view.state === "GEOMETRY_READY_RENDER_BLOCKED" && (
-        // C2.6: geometry present, presentation unavailable — the state
-        // ribbon the directive requires, with the two actions. The
-        // canonical GLB stays interactive in the viewer below (it is
-        // served from the CadQuery-authored geometry regardless).
+      {view.state === "GEOMETRY_READY_RENDER_BLOCKED" && (() => {
+        // R451-C2.1: States C and D — the exact copy per the backend's
+        // typed presentation_cause; the canonical GLB stays interactive
+        // in the viewer below either way
+        const rb = renderBlockedCopy(view.renderBlockCause);
+        return (
         <div className="render-blocked-ribbon" data-render-blocked-ribbon>
           <div className="rbr-main">
-            <span className="rbr-title">ENGINEERING MODEL READY</span>
-            <span className="rbr-sub faint">
-              The engineering geometry exists. Presentation rendering is
-              temporarily unavailable.
-            </span>
+            <span className="rbr-title">{rb.title}</span>
+            <span className="rbr-sub faint">{rb.line}</span>
           </div>
           <div className="rbr-actions">
             <button
@@ -464,13 +510,19 @@ export default function TechStage({
               Open model files
             </button>
           </div>
+          {view.renderBlockDetail && (
+            <div className="rbr-note faint" data-render-block-detail>
+              {view.renderBlockDetail}
+            </div>
+          )}
           {renderRetryNote && (
             <div className="rbr-note faint" data-render-retry-note>
               {renderRetryNote}
             </div>
           )}
         </div>
-      )}
+        );
+      })()}
       <div className="hero-viewport" data-hero-viewport>
         {viewerUrl ? (
           <>
@@ -516,6 +568,11 @@ export default function TechStage({
           // R436 Direction 3: geometry exists but did not earn the hero —
           // the honest unearned state (no substitute model)
           <HeroNotFaithful design={design} />
+        ) : view.state === "GEOMETRY_UNAVAILABLE" ? (
+          // R451-C2.1 State B: the invention exists, the visualization
+          // does not — the exact directive sentence, never "Not
+          // established on this run" for an invention that DOES exist
+          <HeroNoVisualization view={view} design={design} />
         ) : done ? (
           <HeroNotEstablished design={design} />
         ) : (
