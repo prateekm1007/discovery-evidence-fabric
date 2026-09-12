@@ -76,12 +76,26 @@ def _sha256_file(path: str) -> str:
 def _write_invocation_receipt(work_dir: str, record: Dict[str, Any],
                               geometry_out: Optional[Dict[str, Any]],
                               ) -> Optional[str]:
-    """R451-C2 (C2.9): persist the invocation receipt for one boundary
-    pass. Written on EVERY exit (the caller wraps the whole compile);
-    every field is read from the record or the run's own files — never
-    invented (Art. VI). Returns the receipt path, or None when the
-    receipt could not be written (typed in the return value only; a
-    receipt failure never alters the render record's epistemic content)."""
+    """R451-C2 (C2.9) / R451-C2.2 (§5): persist the invocation receipt
+    for one boundary pass. Written on EVERY exit (the caller wraps the
+    whole compile); every field is read from the record or the run's
+    own files — never invented (Art. VI). Returns the receipt path, or
+    None when the receipt could not be written (typed in the return
+    value only; a receipt failure never alters the render record's
+    epistemic content).
+
+    Schema 1.1.0 (R451-C2.2 §5 — the directive's exact field contract;
+    the 1.0.0 names are superseded IN THE SAME CHANGE — Art. LXIV):
+
+        run_id, generation_id, geometry_spec_sha256, glb_sha256,
+        visual_compiler_version, invocation_status, skip_reason,
+        render_record_reference
+
+    render_record_reference points at the persisted render record when
+    one exists on disk (the success path wrote it before this receipt
+    is written); it is None for every skip/failure exit — the receipt
+    itself is then the boundary's only verdict (never an invented
+    reference, Art. VI)."""
     try:
         run_id = Path(work_dir).name
         generation_id = (geometry_out or {}).get("generation_id")
@@ -107,32 +121,35 @@ def _write_invocation_receipt(work_dir: str, record: Dict[str, Any],
                 work_dir, (geometry_out or {}).get("generation_models"))
             if waiting and Path(waiting).is_file():
                 glb_sha = _sha256_file(waiting)
-        status = str(record.get("status") or "UNKNOWN")
+        invocation_status = str(record.get("status") or "UNKNOWN")
         skip_reason = None
-        if status.startswith("RENDER_SKIPPED") or status in (
-                "RENDER_FAILED", "RENDER_TIMEOUT"):
+        if invocation_status.startswith("RENDER_SKIPPED") or \
+                invocation_status in ("RENDER_FAILED", "RENDER_TIMEOUT"):
             skip_reason = (record.get("reason") or record.get("note")
                            or record.get("error"))
+        # the boundary's output directory is canonical (always
+        # MODEL/3D under the run dir) — recorded even on the
+        # earliest skips, whose records may not carry out_dir
+        out_dir = Path(work_dir) / "MODEL" / "3D"
+        record_ref = out_dir / "render_record.json"
         receipt = {
             "kind": "VISUAL_COMPILER_INVOCATION",
-            "schema_version": "1.0.0",
+            "schema_version": "1.1.0",
             "run_id": run_id,
             "generation_id": generation_id,
-            "canonical_glb_sha256": glb_sha,
+            "glb_sha256": glb_sha,
             "geometry_spec_sha256": geometry_spec_sha256,
-            "compiler_version": RENDER_PIPELINE,
+            "visual_compiler_version": RENDER_PIPELINE,
+            "invocation_status": invocation_status,
             "gate_version": visual_gate.GATE_VERSION,
             "invoked_at": time.strftime("%Y-%m-%dT%H:%M:%SZ",
                                         time.gmtime()),
-            "status": status,
             "skip_reason": skip_reason,
-            # the boundary's output directory is canonical (always
-            # MODEL/3D under the run dir) — recorded even on the
-            # earliest skips, whose records may not carry out_dir
+            "render_record_reference":
+                str(record_ref) if record_ref.is_file() else None,
             "output_directory": record.get("out_dir")
-            or str(Path(work_dir) / "MODEL" / "3D"),
+            or str(out_dir),
         }
-        out_dir = Path(work_dir) / "MODEL" / "3D"
         out_dir.mkdir(parents=True, exist_ok=True)
         path = out_dir / RECEIPT_FILENAME
         path.write_text(json.dumps(receipt, indent=2))

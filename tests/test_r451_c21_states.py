@@ -266,7 +266,11 @@ class TestPipelineStrip:
         eng = next(r for r in rows if r["key"] == "engineering")
         assert eng["status"] == "RECEIVED"
 
-    def test_package_blocked_is_infrastructure_pause(self):
+    def test_package_blocked_is_typed_not_auto_infra(self):
+        """R451-C2.2 §4 SUPERSESSION: BLOCKED is NOT automatically an
+        infrastructure pause — the quality-gate reason classifies as
+        PACKAGE_INTEGRITY and stops the row (the C2.1 expectation of
+        PAUSED_INFRASTRUCTURE here is superseded by the directive)."""
         rows = dossier_mod.pipeline_projection(
             _session(), None, False,
             {"package_state": {"state": "BLOCKED",
@@ -275,7 +279,8 @@ class TestPipelineStrip:
             {"retrieval_state": "RETRIEVED", "retrieved_count": 4},
             {"geometry_state": "visual_complete"})
         pkg = next(r for r in rows if r["key"] == "package")
-        assert pkg["status"] == "PAUSED_INFRASTRUCTURE"
+        assert pkg["status"] == "STOPPED"
+        assert pkg["blocked_class"] == "PACKAGE_INTEGRITY"
         assert "quality gate" in (pkg.get("detail") or "")
 
 

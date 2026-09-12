@@ -30,7 +30,7 @@ ledger (Art. XXXVIII).
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 from toscanini import cio as _cio_mod
 from toscanini import run_state as _rs
@@ -334,80 +334,233 @@ GEOMETRY_STATES = ("upstream_not_reached", "geometry_not_applicable",
 # render-record statuses that mean the renderer produced pixels
 _RENDERER_RAN = ("OK", "SUCCEEDED", "COMPLETE")
 
+# ---------------------------------------------------------------------------
+# R451-C2.2 (directive §2): the ARTIFACT CONTRACT. The geometry state is
+# derived from the recorded engineering chain — PARAMETRIC_MODEL.json,
+# CAD_PIPELINE_LEDGER.json, ENGINEERING_SPECIFICATION.json,
+# BRIDGE_REPORT.json, the STEP/GLB artifacts — and NEVER from a single
+# file's presence. The directive's central rule: the presence of
+# PARAMETRIC_MODEL.json alone must NOT promote the user into
+# "engineering model ready" — a parametric DEFINITION is not a geometry
+# ARTIFACT. The authoritative conditions:
+#
+#   geometry_available          a canonical geometry artifact (GLB or
+#                               STEP) exists, and the chain does not
+#                               record a contradicting failure
+#   geometry_generation_failed  the chain RECORDS a generation failure
+#                               (bridge GEOMETRY_FAILED, CAD ledger
+#                               MODEL_REJECTED_BY_GEOMETRY_GATES) — or
+#                               the run concluded COMPLETE with the
+#                               engineering definition recorded and no
+#                               geometry artifact produced
+#   geometry_not_applicable     the chain RECORDS that geometry does
+#                               not apply (bridge NOT_VISUALIZABLE,
+#                               CAD ledger NOT_APPLICABLE_NO_GEOMETRY)
+#
+# Infrastructure-class outcomes (BLOCKED_TRANSPORT, NO_MODEL_NO_LLM)
+# are NEVER failures (Art. LXI) — they stay upstream_not_reached with
+# the recorded outcome as the detail.
+# ---------------------------------------------------------------------------
+_BRIDGE_GEOMETRY_FAILED = "GEOMETRY_FAILED"
+_BRIDGE_NOT_APPLICABLE = "NOT_VISUALIZABLE"
+# the bridge outcomes under which an engineering realization exists and
+# is valid (the strip's Engineering milestone predicate, §3)
+_BRIDGE_VALID_REALIZATIONS = ("COMPLETED", "ALREADY_COMPLETE",
+                              "PACKAGE_ADDED_TO_EXISTING_GEOMETRY",
+                              "CONCEPTUAL_FALLBACK")
+_CAD_LEDGER_FAILED = ("MODEL_REJECTED_BY_GEOMETRY_GATES",)
+_CAD_LEDGER_NOT_APPLICABLE = ("NOT_APPLICABLE_NO_GEOMETRY",)
+_CAD_LEDGER_INFRA = ("BLOCKED_TRANSPORT", "NO_MODEL_NO_LLM")
+
+
+def _geometry_artifact_contract(session: Dict[str, Any],
+                                run_dir: Optional[Path],
+                                geom: Dict[str, Any]) -> Dict[str, Any]:
+    """Audit the engineering chain from recorded facts and classify the
+    geometry side. Reads the CIO geometry block (the projection of the
+    chain) and, when the run directory exists, the CAD ledger's own
+    recorded outcome. Every field is a recorded fact; absence is the
+    honest absence (Art. XXV) — never a negative verdict."""
+    glb = bool(geom.get("glb"))
+    step = bool(geom.get("step"))
+    # legacy CIO projections (pre-R451-C2.2) carried only the boolean
+    # `present` — when NONE of the finer artifact fields exist, the
+    # recorded `present` is that era's strongest fact (Art. XI: read
+    # historical shapes honestly; never invent finer facts)
+    legacy_projection = ("glb" not in geom and "step" not in geom
+                         and "parametric_model_present" not in geom)
+    has_artifact = glb or step or \
+        (legacy_projection and bool(geom.get("present")))
+    # THE DIRECTIVE'S CENTRAL RULE: a parametric DEFINITION alone is
+    # not a geometry ARTIFACT — PARAMETRIC_MODEL.json without a GLB/STEP
+    # never satisfies the artifact condition
+    pm_only = bool(geom.get("parametric_model_present")) and \
+        not glb and not step
+
+    bridge_outcome = geom.get("bridge_outcome")
+    cad_outcome = None
+    if run_dir is not None:
+        ledger = _read_json(Path(run_dir) / "CAD_PIPELINE_LEDGER.json") \
+            if run_dir.exists() else None
+        cad_outcome = (ledger or {}).get("outcome") \
+            or (ledger or {}).get("status")
+    if not cad_outcome:
+        # the CIO projection's field (a recorded value; historical CIOs
+        # carried the ledger's status key — absent stays absent)
+        cad_outcome = geom.get("cad_pipeline_status") or None
+    eng_spec_present = bool(run_dir
+                            and (run_dir / "ENGINEERING_SPECIFICATION.json")
+                            .exists())
+
+    # the artifact contract's geometry-side state
+    if has_artifact:
+        state = "geometry_available"
+    elif bridge_outcome == _BRIDGE_GEOMETRY_FAILED or \
+            cad_outcome in _CAD_LEDGER_FAILED:
+        state = "geometry_generation_failed"
+    elif bridge_outcome == _BRIDGE_NOT_APPLICABLE or \
+            cad_outcome in _CAD_LEDGER_NOT_APPLICABLE:
+        state = "geometry_not_applicable"
+    elif cad_outcome in _CAD_LEDGER_INFRA:
+        # Art. LXI: an infrastructure block is never a failure
+        state = "upstream_not_reached"
+    elif pm_only:
+        # the engineering DEFINITION exists, the geometry ARTIFACT does
+        # not — the honest classification depends on the run's own
+        # terminal state (a COMPLETE run concluded without producing
+        # geometry; a live or infra-stopped run simply has not)
+        status = str((session or {}).get("status") or "")
+        if status == "COMPLETE":
+            state = "geometry_generation_failed"
+        else:
+            state = "upstream_not_reached"
+    else:
+        state = "upstream_not_reached"
+
+    return {
+        "has_artifact": has_artifact,
+        "pm_only": pm_only,
+        "glb": glb,
+        "step": step,
+        "bridge_outcome": bridge_outcome,
+        "cad_outcome": cad_outcome,
+        "eng_spec_present": eng_spec_present,
+        "geometry_state": state,
+    }
+
+
+def _renders_cause(renders: Dict[str, Any]) -> Tuple[str, Optional[str],
+                                                     Optional[str]]:
+    """The pre-receipt fallback: the render-side state + cause from the
+    CIO renders block alone (the R451-C2.1 derivation, preserved for
+    payloads whose run directory / receipt is not readable). Returns
+    (geometry_state, presentation_cause, detail)."""
+    status = str(renders.get("status") or "")
+    verdict = ((renders.get("visual_gate") or {}).get("verdict")) \
+        if isinstance(renders.get("visual_gate"), dict) else None
+    if verdict in ("PASS", "COMPLETE_PASS"):
+        return "visual_complete", None, None
+    if status in _RENDERER_RAN and verdict is not None:
+        # the renderer produced pixels and the gate said no (State D)
+        return ("visual_render_failed", "gate_not_passed",
+                f"the render completed but the presentation "
+                f"integrity gate returned {verdict}")
+    if "SKIPPED" in status or status in (
+            "FAILED", "RENDER_FAILED", "RENDER_TIMEOUT", "NOT_RUN",
+            "INTERRUPTED"):
+        cause = "renderer_unavailable"
+        detail = renders.get("note") or \
+            f"the presentation renderer recorded {status}"
+        if "SKIPPED" in status or status == "INTERRUPTED":
+            cause = "infrastructure"
+        return "visual_render_failed", cause, detail
+    if status in ("RUNNING", "RENDERING", "PENDING"):
+        return ("geometry_available", "rendering_in_progress",
+                "the presentation render job is running")
+    # no render record at all: the geometry exists and the
+    # presentation join has not produced an approved render yet —
+    # exactly the BS-003 surface the R451 watchdog also checks
+    return ("geometry_available", "not_attempted",
+            "no presentation render record exists for this geometry "
+            "yet")
+
 
 def _geometry_state(session: Dict[str, Any], geom: Dict[str, Any],
                     renders: Dict[str, Any], running: bool) -> Dict[str, Any]:
-    """The typed geometry/visual state + its recorded detail. Every
-    branch reads a RECORDED field; absence of records is classified as
-    `upstream_not_reached` (the honest state), never as a failure."""
-    has_geometry = bool(geom.get("present"))
-    if has_geometry:
-        status = str(renders.get("status") or "")
-        verdict = ((renders.get("visual_gate") or {}).get("verdict")) \
-            if isinstance(renders.get("visual_gate"), dict) else None
-        if verdict in ("PASS", "COMPLETE_PASS"):
-            return {"geometry_state": "visual_complete",
-                    "presentation_cause": None,
-                    "geometry_state_detail": None}
-        if status in _RENDERER_RAN and verdict is not None:
-            # the renderer produced pixels and the gate said no (State D)
-            return {
-                "geometry_state": "visual_render_failed",
-                "presentation_cause": "gate_not_passed",
-                "geometry_state_detail":
-                    f"the render completed but the presentation "
-                    f"integrity gate returned {verdict}",
-            }
-        if "SKIPPED" in status or status in (
-                "FAILED", "RENDER_FAILED", "RENDER_TIMEOUT", "NOT_RUN",
-                "INTERRUPTED"):
-            cause = "renderer_unavailable"
-            detail = renders.get("note") or \
-                f"the presentation renderer recorded {status}"
-            if "SKIPPED" in status or status == "INTERRUPTED":
-                cause = "infrastructure"
-            return {"geometry_state": "visual_render_failed",
-                    "presentation_cause": cause,
-                    "geometry_state_detail": detail}
-        if status in ("RUNNING", "RENDERING", "PENDING"):
-            return {"geometry_state": "geometry_available",
-                    "presentation_cause": "rendering_in_progress",
-                    "geometry_state_detail":
-                    "the presentation render job is running"}
-        # no render record at all: the geometry exists and the
-        # presentation join has not produced an approved render yet —
-        # exactly the BS-003 surface the R451 watchdog also checks
-        return {"geometry_state": "geometry_available",
-                "presentation_cause": "not_attempted",
-                "geometry_state_detail":
-                "no presentation render record exists for this geometry "
-                "yet"}
+    """The typed geometry/visual state + its recorded detail (R451-C2.2
+    edition). The geometry side comes from the ARTIFACT CONTRACT
+    (`_geometry_artifact_contract` — the recorded engineering chain,
+    never a single file's presence); the render side comes from the
+    visual join evaluator (toscanini/visual_join.py — the invocation
+    receipt is the boundary authority) with the CIO renders block as
+    the pre-receipt fallback. Every branch reads a RECORDED field;
+    absence of records is classified as `upstream_not_reached` (the
+    honest state), never as a failure."""
+    run_dir = Path(session["run_dir"]) if session.get("run_dir") else None
+    contract = _geometry_artifact_contract(session, run_dir, geom)
+    gst = contract["geometry_state"]
 
-    # ---- no geometry: the recorded bridge outcome decides -------------
-    outcome = geom.get("bridge_outcome")
-    if outcome == "NOT_VISUALIZABLE":
-        return {"geometry_state": "geometry_not_applicable",
+    # ---- geometry absent: the contract's recorded chain decides -------
+    if gst != "geometry_available":
+        detail = None
+        outcome = contract["bridge_outcome"]
+        cad = contract["cad_outcome"]
+        if outcome == _BRIDGE_NOT_APPLICABLE:
+            detail = geom.get("bridge_why") or \
+                "the recorded bridge outcome is NOT_VISUALIZABLE"
+        elif outcome == _BRIDGE_GEOMETRY_FAILED:
+            detail = geom.get("bridge_why") or \
+                "the recorded bridge outcome is GEOMETRY_FAILED"
+        elif cad in _CAD_LEDGER_FAILED:
+            detail = (f"the CAD pipeline ledger recorded {cad}")
+        elif cad in _CAD_LEDGER_NOT_APPLICABLE:
+            detail = (f"the CAD pipeline ledger recorded {cad}")
+        elif cad in _CAD_LEDGER_INFRA:
+            detail = (f"the geometry build was blocked by "
+                      f"infrastructure (the CAD pipeline ledger "
+                      f"recorded {cad})")
+        elif contract["pm_only"]:
+            if running:
+                detail = ("the engineering definition is recorded; the "
+                          "geometry artifact has not been produced yet")
+            elif (session or {}).get("status") == "COMPLETE":
+                detail = ("the run completed with the engineering "
+                          "definition recorded but no geometry artifact "
+                          "was produced")
+        elif not running and outcome == "NO_INVENTION":
+            detail = ("no invention-side artifacts were recorded on this "
+                      "run — the engineering stage had nothing to visualize")
+        elif running:
+            detail = ("the investigation has not reached the engineering "
+                      "stage yet")
+        return {"geometry_state": gst,
                 "presentation_cause": None,
-                "geometry_state_detail": geom.get("bridge_why") or
-                "the recorded bridge outcome is NOT_VISUALIZABLE"}
-    if outcome == "GEOMETRY_FAILED":
-        return {"geometry_state": "geometry_generation_failed",
-                "presentation_cause": None,
-                "geometry_state_detail": geom.get("bridge_why") or
-                "the recorded bridge outcome is GEOMETRY_FAILED"}
-    # no bridge geometry outcome recorded: the pipeline did not arrive
-    # at (or through) the engineering/geometry stage — including the
-    # NO_INVENTION bridge outcome and every infrastructure stop
-    detail = None
-    if running:
-        detail = ("the investigation has not reached the engineering "
-                  "stage yet")
-    elif geom.get("bridge_outcome") == "NO_INVENTION":
-        detail = ("no invention-side artifacts were recorded on this "
-                  "run — the engineering stage had nothing to visualize")
-    return {"geometry_state": "upstream_not_reached",
-            "presentation_cause": None,
-            "geometry_state_detail": detail}
+                "geometry_state_detail": detail}
+
+    # ---- geometry artifact exists: the visual join decides the rest ---
+    from toscanini import visual_join as _vj
+    join = _vj.evaluate_visual_join(
+        session, geom, renders, running,
+        engineering_geometry_ready=True,
+        geometry_state="geometry_available")
+    if join["visual_join_state"] is not None:
+        jstate, cause = _vj.join_cause(
+            join["visual_join_state"], join.get("visual_join_cause"))
+        if jstate:
+            detail = join.get("visual_join_detail")
+            if jstate == "visual_complete":
+                detail = None
+            return {"geometry_state": jstate,
+                    "presentation_cause": cause or None,
+                    "geometry_state_detail": detail,
+                    "visual_join": join}
+    # pre-receipt fallback: the CIO renders block (the R451-C2.1
+    # derivation, byte-compatible for payloads without a receipt)
+    fstate, fcause, fdetail = _renders_cause(renders)
+    return {"geometry_state": fstate,
+            "presentation_cause": fcause,
+            "geometry_state_detail": fdetail,
+            "visual_join": join}
 
 
 def design_tab(session: Dict[str, Any],
@@ -418,7 +571,22 @@ def design_tab(session: Dict[str, Any],
     geom = (cio or {}).get("geometry") or {}
     renders = ((cio or {}).get("visualization") or {}).get("renders") or {}
     gst = _geometry_state(session, geom, renders, running)
-    if geom.get("present"):
+    join = gst.get("visual_join") or {}
+    # R451-C2.2 (directive §2): the promotion into the AVAILABLE /
+    # ENGINEERING_DEFINED branch is the ARTIFACT CONTRACT's decision —
+    # a run whose geometry block is present only through
+    # PARAMETRIC_MODEL.json (a definition, not an artifact) is NEVER
+    # promoted into "engineering model ready"; it takes the honest
+    # unavailable/pending branch below with the contract's own detail.
+    contract = _geometry_artifact_contract(session, run_dir, geom)
+    promoted = bool(geom.get("present")) and (
+        contract["has_artifact"] or
+        # legacy CIO projections carried only the boolean present —
+        # that era's strongest recorded fact stays readable (Art. XI)
+        (not contract["pm_only"] and "glb" not in geom
+         and "step" not in geom
+         and "parametric_model_present" not in geom))
+    if promoted:
         return _tab(
             "AVAILABLE",
             "ENGINEERING_DEFINED" if not geom.get("conceptual")
@@ -467,9 +635,20 @@ def design_tab(session: Dict[str, Any],
             hero_eligibility=_hero_eligibility(geom),
             # R451-C2.1: the typed geometry/visual state — the UI's
             # States C/D/E consume THIS, never a missing-file inference
+            # R451-C2.2: the typed visual-join state rides beside it
+            # (the invocation→render→gate→hero chain, derived from the
+            # run's own records; the UI consumes, never re-derives)
+            # R451-C2.2: the artifact contract rides with it (the
+            # strip's Engineering milestone consumes the contract's
+            # recorded chain verdict, never artifact presence alone)
             geometry_state=gst["geometry_state"],
             presentation_cause=gst["presentation_cause"],
             geometry_state_detail=gst["geometry_state_detail"],
+            geometry_contract=contract,
+            visual_join_state=join.get("visual_join_state"),
+            visual_join_detail=join.get("visual_join_detail"),
+            visual_join_cause=join.get("visual_join_cause"),
+            pending_render_job=join.get("pending_render_job"),
             scores=geom.get("scores"),
             not_visualized=(geom.get("scores") or {}).get(
                 "not_visualized") or [],
@@ -509,14 +688,18 @@ def design_tab(session: Dict[str, Any],
                     if reason else None,
                     geometry_state=gst["geometry_state"],
                     presentation_cause=gst["presentation_cause"],
-                    geometry_state_detail=gst["geometry_state_detail"])
+                    geometry_state_detail=gst["geometry_state_detail"],
+                    visual_join_state=join.get("visual_join_state"),
+                    visual_join_detail=join.get("visual_join_detail"))
     return _tab("UNAVAILABLE", "UNKNOWN", note,
                 reason=reason,
                 epistemic_status=(cio or {}).get("identity", {}).get(
                     "final_status") or "UNKNOWN",
                 geometry_state=gst["geometry_state"],
                 presentation_cause=gst["presentation_cause"],
-                geometry_state_detail=gst["geometry_state_detail"])
+                geometry_state_detail=gst["geometry_state_detail"],
+                visual_join_state=join.get("visual_join_state"),
+                visual_join_detail=join.get("visual_join_detail"))
 
 
 # ---------------------------------------------------------------------------
@@ -549,6 +732,10 @@ PIPELINE_STAGES = ("problem", "evidence", "mechanism", "invention",
 # engine stages whose completion RECEIVES each product stage
 _MECHANISM_ENGINE_STAGES = ("PREMISE_GATE", "SYNTHESIZE", "MECHANISM_SPACE",
                             "MULTI_SOURCE_DISCOVERY", "COLLISION")
+# R451-C2.2 §3: the stages whose OWN canonical record can establish the
+# Mechanism milestone (the premise gate and the discovery sweep are
+# search activity — a mechanism RECORD is the milestone)
+_MECHANISM_RECORD_STAGES = ("SYNTHESIZE", "MECHANISM_SPACE", "COLLISION")
 _INVENTION_ENGINE_STAGES = ("PHYSICS", "ATTACK", "CONTRADICTION")
 _ENGINEERING_ARTIFACTS = ("ENGINEERING_SPECIFICATION.json",
                           "BRIDGE_REPORT.json", "PARAMETRIC_MODEL.json")
@@ -596,6 +783,78 @@ def _pipeline_row(key: str, label: str, received: bool, running: bool,
     return row
 
 
+def _canonical_stage_record(run_dir: Optional[Path],
+                            stages: Tuple[str, ...]) -> Tuple[bool, bool]:
+    """R451-C2.2 (directive §3): the CANONICAL-RECORD predicate for a
+    milestone family. Returns (record_ok, record_failed): the family's
+    milestone is RECEIVED only when a canonical stage record EXISTS on
+    disk AND its own recorded status is OK — 'some stage in the family
+    finished' is NEVER the definition of a product milestone. A record
+    whose status is a failure -> record_failed (a STOPPED row)."""
+    if not run_dir:
+        return False, False
+    for stage in stages:
+        env = _read_json(Path(run_dir) / f"envelope_{stage}.json") \
+            if run_dir.exists() else None
+        if not env:
+            continue
+        last = None
+        for entry in env.get("stage_log") or []:
+            if isinstance(entry, dict) and entry.get("stage") == stage:
+                last = str(entry.get("status") or "")
+        if last == "OK":
+            return True, False
+        if last and last != "OK" and not (
+                last.startswith("SKIPPED") or last.startswith("DISABLED")):
+            return False, True
+    return False, False
+
+
+def _package_blocked_class(pkg_block: Dict[str, Any]) -> Tuple[str, str]:
+    """R451-C2.2 (directive §4): BLOCKED is NOT automatically
+    PAUSED_INFRASTRUCTURE. The canonical blocked stage / reason /
+    release verdict decide the blocked class:
+      INFRASTRUCTURE     a transport/infrastructure-class block
+      VISUAL_GATE        the Article LXXII release block
+      PACKAGE_INTEGRITY  the compiler's own integrity/validation stages
+      SCIENTIFIC         the quality gate's scientific-substance gates
+    Returns (class, row_status): INFRASTRUCTURE pauses the row
+    (PAUSED_INFRASTRUCTURE); every other class is a typed STOPPED."""
+    stage = str(pkg_block.get("blocked_stage") or "")
+    reason = str(pkg_block.get("blocked_reason") or "")
+    release = pkg_block.get("release_verdict") or {}
+    verdict = str(release.get("verdict") or "")
+    if verdict == "VISUAL_RELEASE_BLOCKED":
+        # the Article LXXII release block is the strongest recorded
+        # verdict — it outranks everything else
+        return "VISUAL_GATE", "STOPPED"
+    transport_words = ("transport", "infrastructure", "memory",
+                       "timeout", "network")
+    if "TRANSPORT" in stage.upper() or "INFRA" in stage.upper() or \
+            any(w in reason.lower() for w in transport_words):
+        # Art. LXI: an infrastructure-class block is NEVER presented as
+        # a quality verdict, whatever stage it happened in
+        return "INFRASTRUCTURE", "PAUSED_INFRASTRUCTURE"
+    if stage == "QUALITY_GATE_BLOCKED":
+        failed = [str(g) for g in release.get("failed_gates") or []]
+        # the scientific-substance gate families: problem fidelity (B),
+        # evidence integrity (F), causal integrity (G), semantic audit
+        # (U). Everything else is a package-integrity dimension.
+        if any(g[:2] in ("B-", "F-", "G-", "U-") for g in failed):
+            return "SCIENTIFIC", "STOPPED"
+        return "PACKAGE_INTEGRITY", "STOPPED"
+    if stage in ("MODEL_VALIDATION_FAILED", "COMPILE_ERROR"):
+        return "PACKAGE_INTEGRITY", "STOPPED"
+    if "quality gate" in reason.lower():
+        # the reason names the quality gate but no failed-gate list is
+        # recorded — the integrity classification holds without
+        # inventing a scientific verdict (Art. XXV)
+        return "PACKAGE_INTEGRITY", "STOPPED"
+    # a blocked record with an unclassified stage: the record is shown
+    # verbatim, the class is honest UNKNOWN — never guessed into infra
+    return "UNKNOWN", "STOPPED"
+
+
 def pipeline_projection(session: Dict[str, Any],
                         run_dir: Optional[Path],
                         running: bool,
@@ -616,13 +875,24 @@ def pipeline_projection(session: Dict[str, Any],
         skipped = any(_rs._classify_stage(s) == "SKIPPED" for s in rec)
         return ok, failed, skipped, bool(rec)
 
-    # ---- 1. Problem — a session exists only after a problem was
-    #         submitted: the strip's Problem row is the RECEIPT of the
-    #         user's problem (the directive's blocked-run example shows
-    #         "Problem ✓ RECEIVED" — the problem is saved even when the
-    #         engine stopped before building anything from it)
-    rows = [{"key": "problem", "label": "Problem",
-             "status": "RECEIVED"}]
+    # ---- 1. Problem — a RECORDED problem exists (R451-C2.2 §3: the
+    #         predicate is the problem record, not the session's mere
+    #         existence): the structured problem.json the engine ran
+    #         on, or the session's own recorded problem text (the
+    #         submission receipt — a blocked-before-build run still
+    #         received its problem; the detail names the basis)
+    problem_record = bool(run_dir and (run_dir / "problem.json").exists())
+    problem_text = bool((session.get("user_text") or "").strip())
+    if problem_record:
+        rows = [{"key": "problem", "label": "Problem",
+                 "status": "RECEIVED"}]
+    elif problem_text:
+        rows = [{"key": "problem", "label": "Problem",
+                 "status": "RECEIVED",
+                 "detail": "the submitted problem is saved"}]
+    else:
+        rows = [{"key": "problem", "label": "Problem",
+                 "status": "NOT_REACHED"}]
 
     # ---- 2. Evidence — the ledger's typed retrieval_state (C2.5)
     rstate = evidence_tab.get("retrieval_state") or "NOT_REACHED"
@@ -653,14 +923,31 @@ def pipeline_projection(session: Dict[str, Any],
             reached=False, stage_failed=False, stage_skipped=False,
             infra_stop=infra_stop, detail=None))
 
-    # ---- 3. Mechanism — the engine's mechanism-stage records
-    m_ok, m_failed, m_skipped, m_rec = engine_row(_MECHANISM_ENGINE_STAGES)
+    # ---- 3. Mechanism — a CANONICAL MECHANISM RECORD exists
+    #         (R451-C2.2 §3: the record, not "any stage in the family
+    #         finished" — a premise gate that always executes must
+    #         never stand in for mechanism work)
+    m_record_ok, m_record_failed = _canonical_stage_record(
+        run_dir, _MECHANISM_RECORD_STAGES)
+    m_any_failed, m_any_skipped, m_rec = False, False, False
+    for s in _MECHANISM_ENGINE_STAGES:
+        cls = _rs._classify_stage(stage_status.get(s, ""))
+        if cls == "FAILED":
+            m_any_failed = True
+        elif cls == "SKIPPED":
+            m_any_skipped = True
+        if stage_status.get(s):
+            m_rec = True
     rows.append(_pipeline_row(
-        "mechanism", "Mechanism", received=m_ok, running=running,
-        reached=m_rec or m_ok, stage_failed=m_failed,
-        stage_skipped=m_skipped, infra_stop=infra_stop, detail=None))
+        "mechanism", "Mechanism", received=m_record_ok, running=running,
+        reached=m_record_ok or m_rec or m_record_failed,
+        stage_failed=m_record_failed or m_any_failed,
+        stage_skipped=m_any_skipped and not m_record_ok,
+        infra_stop=infra_stop, detail=None))
 
-    # ---- 4. Invention — the run's own invention record
+    # ---- 4. Invention — the CANONICAL INVENTION record exists
+    #         (the specification/survivor — engine-stage credit never
+    #         substitutes for the record, R451-C2.2 §3)
     inv_state = (state.get("invention_state") or {}).get("state") or ""
     invention_artifacts = bool(
         (run_dir and (run_dir / "INVENTION_SPECIFICATION.json").exists())
@@ -668,41 +955,83 @@ def pipeline_projection(session: Dict[str, Any],
     i_ok, i_failed, i_skipped, i_rec = engine_row(
         _INVENTION_ENGINE_STAGES)
     rows.append(_pipeline_row(
-        "invention", "Invention", received=invention_artifacts or i_ok,
-        running=running, reached=i_rec or i_ok or invention_artifacts,
+        "invention", "Invention", received=invention_artifacts,
+        running=running, reached=invention_artifacts or i_rec or i_ok,
         stage_failed=i_failed, stage_skipped=i_skipped,
         infra_stop=infra_stop, detail=None))
 
-    # ---- 5. Engineering — the engineering/geometry artifacts
+    # ---- 5. Engineering — the engineering REALIZATION exists AND its
+    #         authoritative state says valid (R451-C2.2 §3). The typed
+    #         geometry state IS that authoritative state (it is
+    #         contract-derived from the chain); artifact presence
+    #         alone — and PARAMETRIC_MODEL.json in particular — never
+    #         promotes this row on its own.
+    gstate = design_tab_data.get("geometry_state") or "upstream_not_reached"
+    contract = design_tab_data.get("geometry_contract") or {}
+    eng_valid_states = ("geometry_available", "visual_render_failed",
+                        "visual_complete")
+    eng_received = gstate in eng_valid_states
     eng_artifacts = bool(
         run_dir and any((run_dir / a).exists()
                         for a in _ENGINEERING_ARTIFACTS))
-    eng_received = eng_artifacts or \
-        design_tab_data.get("geometry_state") in (
-            "geometry_available", "visual_render_failed",
-            "visual_complete")
+    if not eng_received and eng_artifacts and \
+            contract.get("bridge_outcome") in _BRIDGE_VALID_REALIZATIONS:
+        # a recorded-valid bridge realization is the authoritative
+        # valid state when the typed geometry row is undecided
+        eng_received = True
     rows.append(_pipeline_row(
         "engineering", "Engineering", received=eng_received,
         running=running,
-        reached=eng_received
-        or design_tab_data.get("geometry_state")
-        in ("geometry_not_applicable", "geometry_generation_failed"),
-        stage_failed=design_tab_data.get("geometry_state")
-        == "geometry_generation_failed",
+        reached=eng_received or eng_artifacts
+        or gstate in ("geometry_not_applicable",
+                      "geometry_generation_failed"),
+        stage_failed=gstate == "geometry_generation_failed",
         stage_skipped=False, infra_stop=infra_stop,
         detail=design_tab_data.get("geometry_state_detail")))
 
-    # ---- 6. 3D visualization — the typed geometry_state decides
+    # ---- 6. 3D visualization — the typed geometry_state + the visual
+    #         join decide (R451-C2.2 §5: an invocation that never ran is
+    #         an explicit STOPPED failure — never silence, never an
+    #         infra pause unless infrastructure actually caused it)
     gstate = design_tab_data.get("geometry_state") or "upstream_not_reached"
     gcause = design_tab_data.get("presentation_cause")
+    jstate = design_tab_data.get("visual_join_state")
+    jdetail = design_tab_data.get("visual_join_detail")
     if gstate == "visual_complete":
         rows.append({"key": "visualization", "label": "3D visualization",
                      "status": "RECEIVED"})
+    elif jstate == "INVOCATION_MISSING":
+        # the no-silent-gap failure: geometry ready, invocation never
+        # recorded, no job pending — a typed STOPPED with the recorded
+        # failure (NOT an infra pause, NOT a scientific statement)
+        rows.append({
+            "key": "visualization", "label": "3D visualization",
+            "status": "STOPPED", "blocked_class": "JOIN_FAILURE",
+            "detail": jdetail
+            or "the geometry-to-visual invocation did not run — "
+               "recorded as an explicit join failure"})
+    elif jstate == "RENDER_RECORD_MISSING":
+        rows.append({
+            "key": "visualization", "label": "3D visualization",
+            "status": "STOPPED", "blocked_class": "JOIN_FAILURE",
+            "detail": jdetail
+            or "the invocation says the renderer produced pixels but "
+               "no render record exists — join integrity failure"})
+    elif jstate == "INVOCATION_PENDING":
+        # an interrupted recovery-owed job pauses; a running job is live
+        job = design_tab_data.get("pending_render_job")
+        rows.append({
+            "key": "visualization", "label": "3D visualization",
+            "status": ("PAUSED_INFRASTRUCTURE" if job == "INTERRUPTED"
+                       else "IN_PROGRESS"),
+            "detail": jdetail})
     elif gstate in ("geometry_available", "visual_render_failed"):
         if gcause in ("infrastructure", "renderer_unavailable"):
             rows.append({
                 "key": "visualization", "label": "3D visualization",
-                "status": "PAUSED_INFRASTRUCTURE",
+                "status": "PAUSED_INFRASTRUCTURE"
+                if gcause == "infrastructure" else "STOPPED",
+                "blocked_class": gcause.upper(),
                 "detail": design_tab_data.get("geometry_state_detail")
                 or "the presentation renderer is unavailable — the "
                    "engineering geometry remains available"})
@@ -713,14 +1042,14 @@ def pipeline_projection(session: Dict[str, Any],
         elif gcause == "gate_not_passed":
             rows.append({
                 "key": "visualization", "label": "3D visualization",
-                "status": "STOPPED",
+                "status": "STOPPED", "blocked_class": "VISUAL_GATE",
                 "detail": design_tab_data.get("geometry_state_detail")
                 or "the render did not pass the presentation integrity "
                    "gate"})
         else:  # not_attempted — the join has not produced a render yet
             rows.append({
                 "key": "visualization", "label": "3D visualization",
-                "status": "STOPPED",
+                "status": "STOPPED", "blocked_class": "NOT_ATTEMPTED",
                 "detail": design_tab_data.get("geometry_state_detail")
                 or "no presentation render has been produced for this "
                    "geometry yet"})
@@ -738,24 +1067,41 @@ def pipeline_projection(session: Dict[str, Any],
                        if gstate == "upstream_not_reached" else "STOPPED"),
             "detail": design_tab_data.get("geometry_state_detail")})
 
-    # ---- 7. Package — the package machine layer's own terminal state.
-    # A running run's PENDING means the state is OPEN, not that work is
-    # at packaging — the row reads IN_PROGRESS only once the pipeline
-    # frontier has reached engineering (the bridge builds the package
-    # after geometry); before that it is honestly NOT_REACHED.
+    # ---- 7. Package — the package machine layer's own terminal state
+    #         (R451-C2.2 §4: BLOCKED is NOT automatically an
+    #         infrastructure pause — the canonical blocked stage /
+    #         reason / release verdict decide the class). A running
+    #         run's PENDING means the state is OPEN, not that work is
+    #         at packaging — the row reads IN_PROGRESS only once the
+    #         pipeline frontier has reached engineering (the bridge
+    #         builds the package after geometry); before that it is
+    #         honestly NOT_REACHED.
     pkg_block = state.get("package_state") or {}
     pkg_state = pkg_block.get("state") or "NOT_PRODUCED"
     if pkg_state == "READY":
         rows.append({"key": "package", "label": "Package",
                      "status": "RECEIVED"})
     elif pkg_state == "BLOCKED":
-        rows.append({"key": "package", "label": "Package",
-                     "status": "PAUSED_INFRASTRUCTURE",
-                     "detail": pkg_block.get("blocked_reason")
-                     or "the package build recorded a blocked state"})
+        blocked_class, row_status = _package_blocked_class(pkg_block)
+        rows.append({
+            "key": "package", "label": "Package",
+            "status": row_status, "blocked_class": blocked_class,
+            "detail": (f"package build blocked — {blocked_class.lower()}"
+                       f": {pkg_block.get('blocked_reason')}"
+                       if pkg_block.get("blocked_reason") else
+                       f"package build blocked — "
+                       f"{blocked_class.lower()}")})
     elif pkg_state == "PENDING" and running and eng_received:
         rows.append({"key": "package", "label": "Package",
                      "status": "IN_PROGRESS"})
+    elif pkg_state == "NOT_PRODUCED" and not running and eng_received:
+        # the frontier reached engineering and the run ended without a
+        # package record — arrived, did not produce (never NOT_REACHED:
+        # the packaging stage sits directly downstream of the bridge)
+        rows.append({
+            "key": "package", "label": "Package", "status": "STOPPED",
+            "detail": "no package record exists — the package stage "
+                      "did not produce a record on this run"})
     else:
         rows.append({"key": "package", "label": "Package",
                      "status": "NOT_REACHED"})

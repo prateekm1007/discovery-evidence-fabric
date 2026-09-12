@@ -81,6 +81,18 @@ export default function DiscoveryPipelineStrip({
             <span className="pipeline-status">
               {STATUS_LABEL[row.status] ?? row.status}
             </span>
+            {/* R451-C2.2: the typed blocked class rides the row when the
+                backend recorded one (VISUAL_GATE / PACKAGE_INTEGRITY /
+                SCIENTIFIC / INFRASTRUCTURE / JOIN_FAILURE ...) — a
+                machine-readable disambiguation, rendered verbatim */}
+            {row.blocked_class ? (
+              <span
+                className="pipeline-detail faint"
+                data-pipeline-blocked-class={row.blocked_class}
+              >
+                {row.blocked_class}
+              </span>
+            ) : null}
             {row.detail ? (
               <span
                 className="pipeline-detail faint"

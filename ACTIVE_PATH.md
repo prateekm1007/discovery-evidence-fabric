@@ -369,3 +369,45 @@ states verified in the DOM with the directive's exact sentences and
 the forbidden phrases verified ABSENT; the State C fixture was
 auto-healed by the live mechanical join (C2.7 proof) and captured with
 the artifact-build route blocked so the typed skip stayed authoritative.
+
+## R451-C2.2 addendum (2026-09-13) — the presentation state is artifact-contract-driven and the geometry→visual join has NO silent gap
+
+Operator directive R451-C2.2 (Canonical Presentation-State Integrity +
+Automatic Geometry-to-Visual Continuity): `not_attempted` never reads
+as renderer absence; the geometry state is decided by the recorded
+engineering CHAIN (never by PARAMETRIC_MODEL.json alone); the strip's
+milestones are canonical-record predicates; package BLOCKED is typed,
+never auto-infrastructure; and the join
+GEOMETRY READY → INVOCATION → RENDER → GATE → HERO is machine-provable
+in both directions.
+
+| Component | Module | Notes |
+|---|---|---|
+| THE visual-join evaluator | `toscanini/visual_join.py` (NEW) | closed 8-state vocabulary (NOT_APPLICABLE / NOT_REACHED / INVOCATION_PENDING / INVOCATION_MISSING / RENDER_BLOCKED / RENDER_RECORD_MISSING / STOPPED_GATE / VISUAL_READY) derived ONLY from canonical records (receipt, render record, gate, job record); observational — it writes nothing (Art. IX); undecided (None) when no records exist — never a guess (Art. XXV) |
+| The artifact contract | `toscanini/dossier.py::_geometry_artifact_contract` | audits PARAMETRIC_MODEL → CAD_PIPELINE_LEDGER (outcome) → ENGINEERING_SPECIFICATION → BRIDGE_REPORT → STEP/GLB; PARAMETRIC_MODEL.json alone NEVER promotes into "engineering model ready" (pm-only COMPLETE runs classify geometry_generation_failed; live runs stay upstream_not_reached); CAD-ledger BLOCKED_TRANSPORT/NO_MODEL_NO_LLM are infrastructure, never failures (Art. LXI) |
+| Receipt schema 1.1.0 | `visual_compiler/visual_compiler.py::_write_invocation_receipt` | the directive's exact field contract: run_id, generation_id, geometry_spec_sha256, glb_sha256, visual_compiler_version, invocation_status, skip_reason, render_record_reference (+ gate_version, invoked_at, output_directory); the 1.0.0 names superseded in the same change (Art. LXIV); historical 1.0.0 receipts stay READABLE (era normalization in both readers) |
+| The join watchdog | `scripts/r451_c2_watchdog.py` | R8 (valid GLB + no invocation and no pending job → FAIL) + R9 (invocation claims pixels + no render record → FAIL) + the derived join_state in the report; the four directive implications each proven by an adversarial fixture |
+| Strip predicates | `toscanini/dossier.py::pipeline_projection` + `_canonical_stage_record` | Mechanism = a canonical mechanism RECORD (envelope SYNTHESIZE/MECHANISM_SPACE/COLLISION with status OK) — the always-executing PREMISE_GATE never stands in; Invention = the canonical invention record (stage credit never substitutes); Engineering = realization exists AND its authoritative state says valid; Problem = the problem record (problem.json or the recorded submission) |
+| Package blocked classes | `toscanini/dossier.py::_package_blocked_class` | VISUAL_GATE (release_verdict VISUAL_RELEASE_BLOCKED — outranks all) / SCIENTIFIC (failed gates B-/F-/G-/U-) / PACKAGE_INTEGRITY (other gate families, MODEL_VALIDATION_FAILED, COMPILE_ERROR) / INFRASTRUCTURE (transport-class stage/reason → PAUSED_INFRASTRUCTURE) / UNKNOWN (recorded verbatim, never guessed into infra); the row carries `blocked_class` and the strip renders it verbatim |
+| The copy split | `TOSCANINI_UI/webapp/lib/presentationState.ts` + `TechStage.tsx` | five causes, five distinct sentences: renderer_unavailable ("Presentation renderer unavailable."), not_attempted ("Presentation render not yet started." — NEW), infrastructure ("Presentation rendering paused by infrastructure."), rendering_in_progress ("Presentation render in progress."), gate_not_passed (State D unchanged); an empty render status is not_attempted, never renderer absence |
+
+Batteries: `tests/test_r451_c22_join.py` (50 — the contract negative
+controls incl. the PARAMETRIC_MODEL-alone promotion block; the join
+evaluator's eight states from records; the watchdog's four directive
+implications; the strip predicate negative controls incl.
+premise-gate-only ≠ mechanism; the package blocked-class matrix; the
+structural C1/C2 boundary pins); r451 C2/C2.1 regression 48 passed;
+r441+r443+r444+r446 83 passed; r447/r420/r419/r430 family 128 passed
+(2 failures identical at the pristine baseline — the standing BS-020
+environment pair); UI battery 54 checks (five distinct sentences,
+Attacks F1–F5 re-pinned); tsc clean; next build green. Fresh-browser
+DOM proof (R451/C2_PRODUCT/E2E_C22/): the not_attempted ribbon and
+JOIN_FAILURE strip class, the infrastructure/in-progress sentences,
+the VISUAL_GATE package class, and the A/E regressions all verified in
+the DOM; the LIVE mechanical join auto-healed a seeded no-receipt
+fixture end-to-end before the terminal-record guard was added to the
+fixtures — §5's automatic invocation proven live. Constitution v2.4.0
+(hash b54a1be9 == origin/main) read IN FULL at round start and re-read
+IN FULL before this commit. No Coder-1 canonical state changed: the
+CAD pipeline, the bridge, the package compiler, and the Visual Gate
+are consumed, never modified.

@@ -283,16 +283,50 @@ try {
       "Engineering model ready. Presentation renderer unavailable.");
 
   // State C variant — renderer skipped on infrastructure
+  // (R451-C2.2 §1: infrastructure gets its OWN sentence, distinct from
+  // renderer absence)
   r = resolvePresentationState(detail(), dossier({ tabs: {
     design: { availability: "AVAILABLE", glb: "/api/run/x/model.glb",
       geometry_state: "visual_render_failed",
       presentation_cause: "infrastructure",
       renders: { status: "RENDER_SKIPPED_LOW_MEMORY" } },
     evidence: null } }));
-  check("State C (infra skip): renderer-unavailable copy, not gate copy",
+  check("State C (infra skip): distinct infrastructure copy",
     r.renderBlockCause === "infrastructure" &&
     ps.renderBlockedCopy(r.renderBlockCause).line ===
-      "Engineering model ready. Presentation renderer unavailable.");
+      "Engineering model ready. Presentation rendering paused by " +
+      "infrastructure.");
+
+  // R451-C2.2 §1 — the not_attempted sentence: a render that was never
+  // started is NEVER worded as renderer unavailability
+  r = resolvePresentationState(detail(), dossier({ tabs: {
+    design: { availability: "AVAILABLE", glb: "/api/run/x/model.glb",
+      geometry_state: "geometry_available",
+      presentation_cause: "not_attempted",
+      renders: { status: "" } }, evidence: null } }));
+  check("not_attempted: exact new directive copy",
+    r.renderBlockCause === "not_attempted" &&
+    ps.renderBlockedCopy(r.renderBlockCause).line ===
+      "Engineering model ready. Presentation render not yet started.");
+
+  // R451-C2.2 §1 — the async render-in-progress sentence
+  r = resolvePresentationState(detail(), dossier({ tabs: {
+    design: { availability: "AVAILABLE", glb: "/api/run/x/model.glb",
+      geometry_state: "geometry_available",
+      presentation_cause: "rendering_in_progress",
+      renders: { status: "RENDERING" } }, evidence: null } }));
+  check("rendering_in_progress: distinct in-progress copy",
+    r.renderBlockCause === "rendering_in_progress" &&
+    ps.renderBlockedCopy(r.renderBlockCause).line ===
+      "Engineering model ready. Presentation render in progress.");
+
+  // R451-C2.2 §1 — the five causes are FIVE distinct sentences
+  {
+    const lines = new Set(ps.RENDER_BLOCK_CAUSES.map(
+      (c) => ps.renderBlockedCopy(c).line));
+    check("five causes -> five distinct sentences",
+      lines.size === 5);
+  }
 
   // State D — GLB exists, renderer succeeded, gate FAILED
   r = resolvePresentationState(detail(), dossier({ tabs: {
@@ -342,7 +376,10 @@ try {
       renders: { status: "" } }, evidence: null } }));
   check("Attack F2: glb present + no render record -> render-blocked (never VISUAL_READY)",
     r.state === "GEOMETRY_READY_RENDER_BLOCKED" &&
-    r.renderBlockCause === "renderer_unavailable");
+    r.renderBlockCause === "not_attempted");
+  check("Attack F2: the not_attempted copy, never renderer absence",
+    ps.renderBlockedCopy(r.renderBlockCause).line ===
+      "Engineering model ready. Presentation render not yet started.");
 
   // Attack F3: gate verdict FAIL with pixels rendered must NOT read as
   // renderer absence (State D says the gate rejected, not the renderer)

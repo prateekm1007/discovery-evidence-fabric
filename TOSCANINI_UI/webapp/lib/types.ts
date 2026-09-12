@@ -744,6 +744,13 @@ export interface DossierTab {
   geometry_state?: string;
   presentation_cause?: string | null;
   geometry_state_detail?: string | null;
+  // R451-C2.2: the typed visual-join state + the artifact contract
+  // (both backend-derived; consumed verbatim, never re-derived)
+  visual_join_state?: string | null;
+  visual_join_detail?: string | null;
+  visual_join_cause?: string | null;
+  pending_render_job?: string | null;
+  geometry_contract?: Record<string, unknown> | null;
 }
 
 export interface FalsificationRecord {
@@ -781,10 +788,16 @@ export interface DossierBody {
 // R451-C2.1 — one row of the DISCOVERY PIPELINE strip. The status
 // vocabulary is backend-owned (toscanini/dossier.py::pipeline_projection);
 // the frontend renders it verbatim.
+// R451-C2.2 — `blocked_class` carries the typed blocked reason class
+// (VISUAL_GATE / PACKAGE_INTEGRITY / SCIENTIFIC / INFRASTRUCTURE /
+// JOIN_FAILURE / NOT_ATTEMPTED / RENDERER_UNAVAILABLE) when the row is
+// stopped or paused — the directive's blocked-status disambiguation,
+// backend-owned and rendered verbatim.
 export interface PipelineStage {
   key: string;
   label: string;
   status: "RECEIVED" | "IN_PROGRESS" | "NOT_REACHED" | "STOPPED" |
     "PAUSED_INFRASTRUCTURE";
   detail?: string | null;
+  blocked_class?: string | null;
 }

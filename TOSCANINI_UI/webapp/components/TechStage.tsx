@@ -99,16 +99,25 @@ function stageStatus(view: PresentationView): {
     case "GEOMETRY_READY_RENDER_BLOCKED":
       // R451-C2.1: States C and D say different things — the renderer
       // being unavailable is never worded as a gate rejection, and a
-      // gate rejection is never worded as renderer absence
-      return view.renderBlockCause === "gate_not_passed"
-        ? {
-            label: "Model rendered — gate not passed",
-            tone: "infra",
-          }
-        : {
-            label: "Model ready — renderer unavailable",
+      // gate rejection is never worded as renderer absence.
+      // R451-C2.2 §1: every cause keeps its OWN label — a render that
+      // was never started is not "renderer unavailable", an
+      // infrastructure pause is not renderer absence either.
+      switch (view.renderBlockCause) {
+        case "gate_not_passed":
+          return { label: "Model rendered — gate not passed", tone: "infra" };
+        case "not_attempted":
+          return { label: "Model ready — render not started", tone: "infra" };
+        case "infrastructure":
+          return {
+            label: "Model ready — rendering paused (infrastructure)",
             tone: "infra",
           };
+        case "rendering_in_progress":
+          return { label: "Model ready — rendering in progress", tone: "live" };
+        default:
+          return { label: "Model ready — renderer unavailable", tone: "infra" };
+      }
     case "VISUAL_READY":
       return { label: "Technology ready", tone: "done" };
     case "GEOMETRY_UNAVAILABLE":

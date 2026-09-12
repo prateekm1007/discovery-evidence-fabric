@@ -198,9 +198,12 @@ class TestInvocationReceipt:
              / "VISUAL_COMPILER_INVOCATION.json").read_text())
         assert receipt["kind"] == "VISUAL_COMPILER_INVOCATION"
         assert receipt["run_id"] == tmp_path.name
-        assert receipt["status"] == rec["status"]
+        assert receipt["invocation_status"] == rec["status"]
         assert receipt["skip_reason"]
-        assert receipt["canonical_glb_sha256"]
+        assert receipt["glb_sha256"]
+        assert receipt["render_record_reference"] is None
+        assert receipt["visual_compiler_version"]
+        assert receipt["schema_version"] == "1.1.0"
         assert receipt["output_directory"].endswith("MODEL/3D")
 
     def test_no_source_glb_exit_writes_receipt(self, tmp_path, monkeypatch):
@@ -219,13 +222,18 @@ class TestInvocationReceipt:
         # the no-GLB receipt test, stub deps present too
         monkeypatch.setattr(render_worker, "renderer_deps_present",
                             lambda: None)
+        # hermetic memory guard: THIS test exercises the no-source exit,
+        # not the guard — a tight host must not reorder the exits
+        # (BS-020: the environment is never the product)
+        monkeypatch.setattr(render_worker, "memory_guard",
+                            lambda *a, **k: None)
         rec = visual_compiler.compile_visuals(str(tmp_path))
         assert rec["status"] == "RENDER_SKIPPED_NO_SOURCE_GLB"
         receipt = json.loads(
             (tmp_path / "MODEL" / "3D"
              / "VISUAL_COMPILER_INVOCATION.json").read_text())
-        assert receipt["status"] == "RENDER_SKIPPED_NO_SOURCE_GLB"
-        assert receipt["canonical_glb_sha256"] is None
+        assert receipt["invocation_status"] == "RENDER_SKIPPED_NO_SOURCE_GLB"
+        assert receipt["glb_sha256"] is None
         assert receipt["skip_reason"]
 
     def test_receipt_fields_complete(self, tmp_path, monkeypatch):
@@ -236,10 +244,11 @@ class TestInvocationReceipt:
         receipt = json.loads(
             (tmp_path / "MODEL" / "3D"
              / "VISUAL_COMPILER_INVOCATION.json").read_text())
-        for field in ("run_id", "generation_id", "canonical_glb_sha256",
-                      "geometry_spec_sha256", "compiler_version",
-                      "invoked_at", "status", "skip_reason",
-                      "output_directory"):
+        for field in ("run_id", "generation_id", "glb_sha256",
+                      "geometry_spec_sha256", "visual_compiler_version",
+                      "invoked_at", "invocation_status", "skip_reason",
+                      "render_record_reference", "output_directory",
+                      "schema_version"):
             assert field in receipt, field
 
     @pytest.mark.skipif(not _chrome_available(),
@@ -254,8 +263,8 @@ class TestInvocationReceipt:
         receipt = json.loads(
             (tmp_path / "MODEL" / "3D"
              / "VISUAL_COMPILER_INVOCATION.json").read_text())
-        assert receipt["status"] == rec["status"]
-        assert receipt["canonical_glb_sha256"]
+        assert receipt["invocation_status"] == rec["status"]
+        assert receipt["glb_sha256"]
         report = watchdog.run_watchdog(tmp_path)
         assert report["verdict"] == "PASS", report["violations"]
 
@@ -279,10 +288,11 @@ class TestWatchdog:
         (m3d / "VISUAL_COMPILER_INVOCATION.json").write_text(json.dumps({
             "kind": "VISUAL_COMPILER_INVOCATION",
             "run_id": run.name, "generation_id": "gen-1",
-            "canonical_glb_sha256": glb_sha,
+            "glb_sha256": glb_sha,
             "geometry_spec_sha256": "c" * 64,
-            "compiler_version": "VISUAL_COMPILER_HEADLESS_THREE",
-            "invoked_at": "2026-09-12T00:00:00Z", "status": "SUCCEEDED",
+            "visual_compiler_version": "VISUAL_COMPILER_HEADLESS_THREE",
+            "invoked_at": "2026-09-12T00:00:00Z", "invocation_status": "SUCCEEDED",
+            "render_record_reference": None,
             "skip_reason": None, "output_directory": str(m3d)}))
         (m3d / "visual_gate.json").write_text(json.dumps(
             {"verdict": "COMPLETE_PASS"}))
@@ -337,7 +347,7 @@ class TestWatchdog:
         m3d = run / "MODEL" / "3D"
         receipt = json.loads(
             (m3d / "VISUAL_COMPILER_INVOCATION.json").read_text())
-        receipt["status"] = "RENDER_SKIPPED_LOW_MEMORY"
+        receipt["invocation_status"] = "RENDER_SKIPPED_LOW_MEMORY"
         receipt["skip_reason"] = None
         (m3d / "VISUAL_COMPILER_INVOCATION.json").write_text(
             json.dumps(receipt))

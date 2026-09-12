@@ -43,6 +43,13 @@ export interface DesignTabProjection {
   geometry_state?: string;
   presentation_cause?: string | null;
   geometry_state_detail?: string | null;
+  // R451-C2.2: the typed visual-join state (toscanini/visual_join.py —
+  // the invocation→render→gate→hero chain) + the artifact contract's
+  // recorded verdict; consumed verbatim, never re-derived
+  visual_join_state?: string | null;
+  visual_join_detail?: string | null;
+  visual_join_cause?: string | null;
+  pending_render_job?: string | null;
   hero_eligibility?: { eligible?: boolean; reason?: string | null };
   renders?: {
     status?: string;
@@ -124,13 +131,24 @@ export const GEOMETRY_STATES = new Set([
   "visual_complete",
 ]);
 
-// why the presentation is not approved (State C vs State D)
+// why the presentation is not approved (State C vs State D, R451-C2.2
+// §1: every cause has its OWN sentence — a render that was never
+// started is never worded as "renderer unavailable", and vice versa)
 export type RenderBlockCause =
   | "renderer_unavailable"
   | "gate_not_passed"
   | "not_attempted"
   | "infrastructure"
   | "rendering_in_progress";
+
+// the closed cause vocabulary — the source pin the test battery walks
+export const RENDER_BLOCK_CAUSES: RenderBlockCause[] = [
+  "renderer_unavailable",
+  "gate_not_passed",
+  "not_attempted",
+  "infrastructure",
+  "rendering_in_progress",
+];
 
 export interface BlockedCopy {
   headline: "DISCOVERY PAUSED";
@@ -187,8 +205,10 @@ export const GEOMETRY_ABSENT_COPY = {
   line: "Engineering visualization not available on this invention.",
 };
 
-// States C/D — geometry exists, presentation not approved. The exact
-// sentence per cause; the canonical GLB stays interactive regardless.
+// States C/D — geometry exists, presentation not approved. R451-C2.2
+// §1: the EXACT sentence per cause — five causes, five distinct
+// sentences; the not_attempted join never reads as renderer absence.
+// The canonical GLB stays interactive regardless.
 export function renderBlockedCopy(cause?: RenderBlockCause): {
   title: string;
   line: string;
@@ -201,7 +221,32 @@ export function renderBlockedCopy(cause?: RenderBlockCause): {
         "integrity gate.",
     };
   }
-  // State C — renderer unavailable / never produced an approved render
+  if (cause === "not_attempted") {
+    // R451-C2.2 §1 — the explicit not_attempted sentence: the render
+    // was never started. It is NOT "renderer unavailable".
+    return {
+      title: "ENGINEERING MODEL READY",
+      line: "Engineering model ready. Presentation render not yet " +
+        "started.",
+    };
+  }
+  if (cause === "infrastructure") {
+    // R451-C2.2 §1 — infrastructure caused the skip (capacity,
+    // transport): distinct from renderer absence, Art. LXI vocabulary
+    return {
+      title: "ENGINEERING MODEL READY",
+      line: "Engineering model ready. Presentation rendering paused " +
+        "by infrastructure.",
+    };
+  }
+  if (cause === "rendering_in_progress") {
+    // R451-C2.2 §1 — the async render job is running right now
+    return {
+      title: "ENGINEERING MODEL READY",
+      line: "Engineering model ready. Presentation render in progress.",
+    };
+  }
+  // State C — the renderer itself is unavailable in this environment
   return {
     title: "ENGINEERING MODEL READY",
     line: "Engineering model ready. Presentation renderer unavailable.",
@@ -307,11 +352,14 @@ export function resolvePresentationState(
     // case C/D: the engineering geometry EXISTS; the presentation render
     // did not run or did not pass — the canonical GLB stays available
     // through the interactive viewer (C2.6: geometry absent != renderer
-    // unavailable)
+    // unavailable). R451-C2.2 §1: an empty render status (no record at
+    // all) is the not_attempted fact — never renderer absence.
     const cause: RenderBlockCause =
       renderRan && verdict != null ? "gate_not_passed"
       : renderStatus.includes("SKIPPED") || renderStatus === "INTERRUPTED"
         ? "infrastructure"
+      : renderStatus === ""
+        ? "not_attempted"
         : "renderer_unavailable";
     return {
       state: "GEOMETRY_READY_RENDER_BLOCKED",

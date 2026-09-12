@@ -473,3 +473,23 @@ Stage Summary:
 
 Work Log (continuation):
 - The R451-C2.1 round commit is 0d1bcc16 (the record above carries the full SHA); this worklog note is the follow-up commit that records it, per the standing round protocol.
+
+---
+Task ID: R451-C2.2
+Agent: Coder 2 (main session)
+Task: Operator directive R451-C2.2 — canonical presentation-state integrity + automatic geometry-to-visual continuity (7 fixes: not_attempted split; artifact-contract geometry state + negative controls; canonical strip predicates; package blocked semantics; the invocation contract; the join watchdog; the C1/C2 boundary).
+
+Work Log:
+- MANDATED READS: Constitution v2.4.0 (hash b54a1be9 verified == origin/main bytes on the live remote) read IN FULL at round start and AGAIN IN FULL before the round commit; GOVERNANCE x5 + ACTIVE_PATH.md (through the R451-C2.1 addendum) in full.
+- Baseline: branch r449-c2/visual-benchmark @ 83c06737 == ls-remote origin (no drift); the untracked R448 metrics fixture dir remains deliberately uncommitted; sandbox worklog read; the pushed in-repo worklog held the C2.1 delivery.
+- Chain audit: cio.py has_geometry=bool(glb|step|pm) — the PARAMETRIC_MODEL-alone promotion the directive names; bridge outcome vocabulary (COMPLETED/ALREADY_COMPLETE/PACKAGE_ADDED_TO_EXISTING_GEOMETRY/CONCEPTUAL_FALLBACK/GEOMETRY_FAILED/NOT_VISUALIZABLE/NO_INVENTION/PACKAGE_BUILD_BLOCKED); CAD ledger outcomes (MODEL_BUILT_AND_VALIDATED/NOT_APPLICABLE_NO_GEOMETRY/NO_MODEL_NO_LLM/BLOCKED_TRANSPORT/MODEL_REJECTED_BY_GEOMETRY_GATES); the invocation chain bridge_gate -> _request_renders -> artifact_worker -> compile_visuals (receipt on every exit).
+- IMPLEMENTED: toscanini/visual_join.py (NEW — the 8-state join evaluator, observational only); dossier.py::_geometry_artifact_contract + contract-driven _geometry_state (pm-only never promotes; infra outcomes never failures) + canonical strip predicates (_canonical_stage_record; premise-gate-only never establishes Mechanism; Engineering needs realization+valid) + _package_blocked_class (VISUAL_GATE/SCIENTIFIC/PACKAGE_INTEGRITY/INFRASTRUCTURE/UNKNOWN); receipt schema 1.1.0 with the directive's exact fields incl. render_record_reference (1.0.0 names superseded in the same change, both eras readable); watchdog R8/R9 + the derived join_state; frontend five-cause copy split + blocked_class on the strip + typed join fields in the projection types.
+- BATTERIES: test_r451_c22_join.py 50 passed (negative controls incl. pm-alone no-promotion, premise-gate-only no-mechanism, the watchdog four-implication matrix, the package blocked-class matrix, structural C1/C2 boundary pins); r451 C2/C2.1 48 passed; visual family 83 passed; product family 128 passed with the standing BS-020 pair identical at the pristine baseline (stash-verified); UI battery 54 ALL PASS; tsc clean; next build green.
+- FRESH-BROWSER PROOF (R451/C2_PRODUCT/E2E_C22/): real server (:8788, /api/version == 83c06737) + production next start (:3101) + headless Chrome; the not_attempted ribbon + JOIN_FAILURE strip class, the infrastructure and in-progress sentences, the VISUAL_GATE package class, and the A/E regressions verified in the DOM; fixtures removed after capture; sessions.json restored byte-identical.
+- LIVE JOIN PROOF: the recovery sweep re-enqueued a seeded no-receipt fixture and the real Chromium renderer produced the full ladder + COMPLETE_PASS with no human step — the §5 automatic invocation contract proven live; captures then used terminal seeded job records so the sweep's rule 4 kept the seeded states authoritative (all FIXTURE-labeled).
+- Environment note: one transient cgroup-pressure battery failure (RENDER_SKIPPED_LOW_MEMORY) classified BS-020 after identical-baseline verification.
+- Constitution re-read IN FULL pre-commit; round record R451/C2_PRODUCT/R451_C22_ROUND_RECORD.json (Art. LXXI tuple: production waits on the owner merge #4 -> #5 + Space redeploy, unchanged).
+
+Stage Summary:
+- The presentation state is now decided by the recorded engineering chain and the machine-verifiable invocation join — not_attempted never reads as renderer absence, PARAMETRIC_MODEL.json alone never promotes, the strip's milestones are canonical records, package BLOCKED is typed, and a GLB without an invocation is a visible, watchdog-FAILing gap. No Coder-1 canonical state changed; the Visual Gate untouched and fail-closed.
+- reviewer_provenance=AI_REVIEW.
