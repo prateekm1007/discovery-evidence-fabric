@@ -44,6 +44,7 @@ import {
   listShowcase,
   retryRun,
   startRun,
+  streamUrl,
 } from "@/lib/api";
 import type {
   CIO,
@@ -316,7 +317,10 @@ function WorkspaceInner() {
     // (only while the investigation is running; the terminal 'final'
     // event closes the stream)
     try {
-      const source = new EventSource(`/api/run/${id}/stream`);
+      // R447: the stream URL carries the owner capability (EventSource
+      // cannot set headers; embedded-iframe contexts cannot rely on
+      // cookies) — see lib/api.ts
+      const source = new EventSource(streamUrl(id));
       es.current = source;
       source.addEventListener("science", (m) => {
         try {

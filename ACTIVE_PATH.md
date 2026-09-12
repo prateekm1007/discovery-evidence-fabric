@@ -251,3 +251,54 @@ vs R446 render.js): caseB within run variance, caseC peak LOWER
 (composing early avoids the late-ladder accumulation spike); two-run
 teardown flat at 46.7 MB x3. Production visuals remain blocked ONLY by
 the owner capacity decision (Art. LXV escalation 5 stands).
+
+## R447-SPACE-OWNER addendum (2026-09-12) — ONE canonical Hugging Face Space
+
+Operator directive R447-SPACE-OWNER: the sole owner selected the canonical
+HF Space on repository/deployment evidence (never title, creation time,
+or appearance). The machine-readable authority is
+`R447/CANONICAL_HF_SPACE_RECORD.json` (regenerable:
+`scripts/r447_canonical_space_record.py`).
+
+| Component | Value | Notes |
+|---|---|---|
+| THE canonical HF Space | `prateekm1/toscanini-prod-validation` | private, Docker SDK, cpu-basic, app_port 7860; the Space repo main branch IS a git-archive tree of this engine repo + the R446-HF adapter Dockerfile hunks (byte-level relationship, verified by tree/raw probes) |
+| Deployed engine identity | `23910247` at selection time | verified through the authenticated `/api/version` (build_artifact source) AND git ancestry on the engine main line — never a dashboard claim |
+| Deployment-specific state | `DURABLE_STATE_ENABLED=1` → the engine repo's `runtime-state-hf` branch | ls-remote verified (9a60d0dc); the Render deployment's `runtime-state` branch is a different, separate lineage |
+| Noncanonical Space | NONE EXISTS in live state | the directive's premise of two Spaces is not verified by any channel (author listings for prateekm1/FounderPass/prateekm1007, three searches, 15 direct ID probes, one-branch Space repo); no Space was deleted, created, or modified by the selection; a pre-inspection deletion cannot be ruled out and is not claimed either way (Art. XI/XXV) |
+| Governance rule | The canonical Space is the ONLY HF production target | no additional Space may be created; every HF deploy goes here; the Render host is a separate legacy deployment, not an HF target, and is unchanged |
+
+Selection identity chain (all machine-verified at selection time): HF
+enumeration → Space repo = engine git-archive tree → deployed engine
+commit real on main line → R446 production implementation present in the
+tree → durable-state branch present on the GitHub remote → live health
+ok=true, discovery_ready=true (zai HEALTHY via the HF router at GLM-5.3).
+
+## R447 (run-not-found fix) addendum (2026-09-12) — the owner capability's second transport
+
+The operator-reported defect: a user starts a run on the HF Space and the
+workspace shows "Run not found … it belongs to a different visitor … if
+the rail is empty, the run did not register". Root cause: HF Spaces serve
+the app inside a third-party iframe on huggingface.co — the `tosca_owner`
+cookie (SameSite=Lax, third-party context) is never stored nor sent, so
+every browser request arrived as a NEW visitor; runs 404'd and the
+history rail was empty while the runs existed on disk the whole time (the
+BS-018 class: session/authorization continuity, never a discovery
+failure). The fix keeps R394 s15 semantics exactly (possession of the
+opaque token IS the capability; denial stays the enumeration-safe 404)
+and adds transports that do not depend on cookie policy:
+
+| Transport | Module | Notes |
+|---|---|---|
+| X-Tosca-Owner header | `toscanini/server.py::_owner_key` | validated uuid-hex shape; run creation + /api/sessions responses carry the caller's OWN owner_key; the header converges the cookie where cookies work |
+| Client persistence | `TOSCANINI_UI/webapp/lib/api.ts` | localStorage `tosca_owner_key`, attached by `apiFetch` to every API call; `streamUrl` for EventSource |
+| Stream owner parameter | both SSE routes | EventSource cannot set headers — the same opaque capability rides `?owner=` (validated identically; wrong owner → 404, never a silent hang) |
+| CHIPS cookie | `server.py::_owner_cookie_header` | behind an HTTPS proxy (X-Forwarded-Proto) the cookie is SameSite=None; Secure; Partitioned (Chromium embedded contexts); plain-HTTP local dev keeps SameSite=Lax |
+
+Battery: `tests/test_r447_owner_transport.py` (21 tests) — the exact
+embedded-context sequence (old defect reproduced as the negative control,
+then closed by the header), both run-creation API shapes, cookie/header
+convergence and precedence, second-visitor enumeration-safe 404, five
+forged-token bypass attempts, CHIPS-vs-Lax cookie shapes by context, the
+SSE owner parameter (granted/denied/wrong-owner), and the route-wiring
+contract pins.

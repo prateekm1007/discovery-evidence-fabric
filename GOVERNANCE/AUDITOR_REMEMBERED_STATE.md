@@ -103,7 +103,7 @@ Buyer repository: `prateekm1007/technology-transfer-portfolio-15` — buyer-dist
 
 ### Deployment
 
-Public product: `https://toscanini-engine-docker.onrender.com/`
+Canonical Hugging Face production target (R447-SPACE-OWNER, 2026-09-12): `https://huggingface.co/spaces/prateekm1/toscanini-prod-validation` (direct app: `https://prateekm1-toscanini-prod-validation.hf.space`, private). The machine-readable authority is `R447/CANONICAL_HF_SPACE_RECORD.json`. It is the ONLY HF production target — no additional Space may be created, and the directive's premise of a second Space was not verified by any live channel at selection time. Legacy Render host (unchanged, not an HF target): `https://toscanini-engine-docker.onrender.com/`
 
 Always verify the current deployment identity before making a completion claim.
 

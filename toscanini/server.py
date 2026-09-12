@@ -72,6 +72,25 @@ PORTFOLIO_COMMIT_PINNED = (os.environ.get("PORTFOLIO_COMMIT") or "").strip()
 # (enterprise operator path; set ENGINE_OPERATOR_KEY on the service).
 OPERATOR_KEY = (os.environ.get("ENGINE_OPERATOR_KEY") or "").strip()
 OWNER_COOKIE = "tosca_owner"
+# R447 (run-not-found fix): the owner capability's SECOND transport.
+# HuggingFace Spaces serve this app inside a third-party iframe on
+# huggingface.co: the browser treats *.hf.space as a third-party
+# context, so the SameSite=Lax tosca_owner cookie is never stored nor
+# sent there (Safari blocks third-party cookies outright; Chrome's
+# default now does too) — every browser request arrived as a NEW
+# visitor, runs 404'd ("Run not found"), and the history rail was
+# empty while the runs existed on disk the whole time (the BS-018
+# class). The SAME opaque capability uuid therefore also travels via
+# the X-Tosca-Owner request header (persisted client-side) and, for
+# EventSource (which cannot set headers), via the stream route's
+# `owner` query parameter. Possession of the token IS the capability —
+# identical semantics to the cookie, no identity attached (R394 s15
+# unchanged: denial stays the enumeration-safe 404).
+OWNER_HEADER = "X-Tosca-Owner"
+# uuid4().hex shape (the only keys this service ever mints); anything
+# else presented in the header is ignored — a forged token can never
+# converge the cookie or escalate to the operator key.
+_VALID_OWNER_KEY = __import__("re").compile(r"^[0-9a-f]{8,64}$")
 
 # R391 (deployment): same-origin static webapp. When the Docker image
 # builds the Next.js export into TOSCANINI_UI/webapp-export/, the engine
@@ -505,19 +524,45 @@ class Handler(BaseHTTPRequestHandler):
     # operator key (env, also acceptable via X-Operator-Key header)
     # grants full visibility for operations.
     def _owner_key(self) -> str:
-        """Resolve the caller's owner key: cookie, else X-Operator-Key,
-        else a fresh key (recorded so the response can set the cookie)."""
+        """Resolve the caller's owner key: cookie, else the X-Tosca-Owner
+        header (the R447 embedded-context transport — same opaque
+        capability, carried where third-party cookie policy cannot strip
+        it), else X-Operator-Key, else a fresh key (recorded so the
+        response can set the cookie)."""
         cookie = self.headers.get("Cookie") or ""
         for part in cookie.split(";"):
             k, _, v = part.strip().partition("=")
             if k == OWNER_COOKIE and v:
                 return v[:64]
+        hdr = self.headers.get(OWNER_HEADER) or ""
+        if hdr and _VALID_OWNER_KEY.match(hdr.strip()):
+            # converge the cookie transport to the presented capability
+            # so first-party contexts (where cookies DO work) stay in
+            # sync with the client-persisted one
+            self._pending_owner_cookie = hdr.strip()
+            return hdr.strip()
         hdr = self.headers.get("X-Operator-Key") or ""
         if hdr and OPERATOR_KEY and hdr == OPERATOR_KEY:
             return OPERATOR_KEY
         new_key = uuid.uuid4().hex
         self._pending_owner_cookie = new_key
         return new_key
+
+    def _owner_cookie_header(self, value: str) -> str:
+        """R447: the cookie attributes match the serving context. Behind
+        an HTTPS proxy (X-Forwarded-Proto) the cookie is emitted with
+        SameSite=None; Secure; Partitioned (CHIPS) so Chromium-based
+        embedded contexts store it; plain-HTTP local dev keeps the
+        original Lax shape (a Secure cookie over http://127.0.0.1 would
+        be rejected outright). The X-Tosca-Owner header remains the
+        transport that never depends on cookie policy."""
+        proto = (self.headers.get("X-Forwarded-Proto") or "") \
+            .split(",")[0].strip().lower()
+        if proto == "https":
+            attrs = "HttpOnly; SameSite=None; Secure; Partitioned"
+        else:
+            attrs = "HttpOnly; SameSite=Lax"
+        return f"{OWNER_COOKIE}={value}; {attrs}; Path=/; Max-Age=31536000"
 
     def _access(self, session_id: str) -> Optional[str]:
         return store.session_access(session_id, self._owner_key_cached,
@@ -537,8 +582,7 @@ class Handler(BaseHTTPRequestHandler):
         if getattr(self, "_pending_owner_cookie", None):
             self.send_header(
                 "Set-Cookie",
-                f"{OWNER_COOKIE}={self._pending_owner_cookie}; HttpOnly; "
-                "SameSite=Lax; Path=/; Max-Age=31536000")
+                self._owner_cookie_header(self._pending_owner_cookie))
             self._pending_owner_cookie = None
         self.end_headers()
         self.wfile.write(body)
@@ -672,7 +716,11 @@ class Handler(BaseHTTPRequestHandler):
             return self._json(200, {
                 "sessions": [public_session_view(s) for s in sessions],
                 "marked_stuck": stuck,
-                "marked_interrupted": interrupted})
+                "marked_interrupted": interrupted,
+                # R447: the caller's OWN capability — lets a browser that
+                # DID receive the cookie capture the equivalent header
+                # token once, then keep working where cookies are blocked
+                "owner_key": self._owner_key_cached})
         if p.path == "/api/cemetery":
             return self._json(200, store.cemetery_summary())
 
@@ -688,6 +736,15 @@ class Handler(BaseHTTPRequestHandler):
         if len(parts) >= 3 and parts[0] == "api" and parts[1] == "run":
             rid = parts[2]
             if len(parts) == 4 and parts[3] == "stream":
+                # R447: EventSource cannot set request headers — the SAME
+                # opaque owner capability travels as the stream route's
+                # `owner` query parameter (validated like the header;
+                # denial stays the enumeration-safe 404). The poll-based
+                # /events route remains the durable fallback either way.
+                q_owner = (urllib.parse.parse_qs(p.query).get("owner")
+                           or [""])[0].strip()
+                if q_owner and _VALID_OWNER_KEY.match(q_owner):
+                    self._owner_key_cached = q_owner
                 if self._access(rid) == "DENY":
                     return self._denied()
                 return self._sse(rid)
@@ -970,6 +1027,12 @@ class Handler(BaseHTTPRequestHandler):
                     return self._json(200, public_session_view(detail))
                 return self._json(404, {"error": "not found"})
             if len(parts) == 4 and parts[3] == "events":
+                # R447: same owner query-parameter capability for the
+                # sessions-alias stream route (EventSource, no headers)
+                q_owner = (urllib.parse.parse_qs(p.query).get("owner")
+                           or [""])[0].strip()
+                if q_owner and _VALID_OWNER_KEY.match(q_owner):
+                    self._owner_key_cached = q_owner
                 if self._access(sid) == "DENY":
                     return self._denied()
                 return self._sse(sid)
@@ -1035,8 +1098,15 @@ class Handler(BaseHTTPRequestHandler):
             except Exception:  # noqa: BLE001 — disclosed via health
                 pass
             self._spawn_worker(session["session_id"])
-            # R394 s15: the response carries the customer projection —
-            # never the owner_key, worker identity, or filesystem paths
+            # R447: the response carries the customer projection — never
+            # worker identity or filesystem paths — PLUS the caller's OWN
+            # owner capability (R394 s15's "never the owner_key" is
+            # amended for run creation ONLY): in embedded third-party
+            # contexts the Set-Cookie cannot persist, so the client must
+            # receive the same opaque capability to persist itself and
+            # send as X-Tosca-Owner. The key is returned ONLY to the
+            # caller who just created the run — possession of it was
+            # already that caller's capability via the cookie path.
             from toscanini.user_state import public_session_view
             view = public_session_view(session)
             if p.path == "/api/discovery":
@@ -1046,8 +1116,11 @@ class Handler(BaseHTTPRequestHandler):
                     "session_id": session["session_id"],
                     "status": "RUN_STARTED",
                     "state": "DISCOVERY_RUN_STARTED",
+                    "owner_key": self._owner_key_cached,
                     "detail": view})
-            return self._json(200, view)
+            payload = dict(view)
+            payload["owner_key"] = self._owner_key_cached
+            return self._json(200, payload)
 
         # R395: conversational Q&A over a run's / invention's own
         # artifacts — honest refusals are 200-body states (the client
