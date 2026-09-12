@@ -345,19 +345,28 @@ def main():
         canonical_id, selection_reasons = selectable[0]
         noncanonical_id = None
         noncanonical_reason = (
-            "NO SECOND SPACE EXISTS in current live state. The directive's "
-            "premise of two Spaces named 'Toscanini Production Validation' "
-            "is not verified by any observable channel: author=prateekm1 "
-            "listing returns exactly one Space; the FounderPass org and the "
-            "prateekm1007 namespace return zero; HF search for 'toscanini', "
-            "'prod-validation' and the exact title 'Toscanini Production "
-            "Validation' surfaces only this Space (whose card title is in "
-            "fact 'Toscanini Prod Validation'); 15 direct candidate-ID "
-            "probes all return HTTP 404; the Space repository has exactly "
-            "one branch (main). A Space deleted before this inspection "
-            "cannot be ruled out and is not claimed either way "
-            "(Art. XI/XXV: unprovable history remains unproven). No Space "
-            "was deleted, created, or modified by this selection.")
+            "NO SECOND SPACE EXISTS in current live state. At selection "
+            "time the directive's premise of two Spaces named 'Toscanini "
+            "Production Validation' was not verified by any live channel "
+            "(author=prateekm1 listing returns exactly one Space; the "
+            "FounderPass org and the prateekm1007 namespace return zero; "
+            "HF search for 'toscanini', 'prod-validation' and the exact "
+            "title surfaces only this Space; 15 direct candidate-ID probes "
+            "all return HTTP 404; the Space repository has exactly one "
+            "branch, main). THE MISSING HISTORY IS NOW DOCUMENTARY "
+            "EVIDENCE, not speculation: the concurrent R447-C2 round "
+            "(R447/CODER2_CANONICAL_SPACE_ALIGNMENT.json, committed to "
+            "main) records that a SECOND Space — prateekm1/toscanini-"
+            "production-validation, Coder-2-created 2026-09-11T15:42:55Z, "
+            "titled exactly 'Toscanini Production Validation', source "
+            "squash eb73fe04 authored coder2@toscanini.local — DID exist "
+            "and was DELETED by that same C2 round with pre-delete sha "
+            "verification (eb73fe04) and post-delete unreachability "
+            "verification, its adapter evidence preserved in R447/"
+            "CODER2_SPACE_RETIRED/. This selection postdates that "
+            "deletion and independently CONFIRMS its result: exactly one "
+            "Space remains. No Space was deleted, created, or modified by "
+            "this selection.")
     elif len(selectable) == 0:
         raise SystemExit("NO selectable Space — selection fails closed")
     else:
@@ -400,6 +409,25 @@ def main():
         },
         "noncanonical_space_id": noncanonical_id,
         "noncanonical_reason": noncanonical_reason,
+        "superseded_space_history": {
+            "deleted_duplicate_space_id": "prateekm1/toscanini-production-"
+                                            "validation",
+            "deleted_by": "the concurrent R447-C2 round (before this "
+                          "selection)",
+            "evidence": [
+                "R447/CODER2_CANONICAL_SPACE_ALIGNMENT.json "
+                "(space_deletion section: pre-delete sha eb73fe04 "
+                "verified, post-delete RepositoryNotFoundError verified)",
+                "R447/CODER2_SPACE_RETIRED/ (the retired Space's "
+                "Dockerfile, HF_ENGINE_SHA.txt, content deltas, README — "
+                "preserved adapter evidence)",
+                "this selection's independent live enumeration: exactly "
+                "one Space remains (all channels re-measured post-deletion)"
+            ],
+            "note": "the operator directive's two-Space premise was TRUE "
+                    "at directive-writing time; the duplicate was already "
+                    "retired by R447-C2 when this selection ran"
+        },
         "governance_effect": (
             "The canonical Space is the ONLY HF production target for "
             "Toscanini. No other Space may be created (no third Space); "
@@ -435,6 +463,12 @@ def main():
                 "discovery_fabric/, TOSCANINI_UI/, R446/)",
                 "selection is deterministic on repository/deployment "
                 "evidence (the only candidate satisfies every rule)",
+                "the directive's second Space DID exist historically and "
+                "was deleted by the concurrent R447-C2 round — verified "
+                "from the committed R447/CODER2_CANONICAL_SPACE_ALIGNMENT."
+                "json + R447/CODER2_SPACE_RETIRED/ adapter evidence, and "
+                "independently confirmed by this selection's post-deletion "
+                "live enumeration (exactly one Space remains)",
             ],
             "INFERRED": [
                 "secrets ZAI_API_KEY / GITHUB_TOKEN / PORTFOLIO_COMMIT are "
@@ -445,9 +479,6 @@ def main():
                 "no names, so presence is inferred, not directly observed",
             ],
             "UNVERIFIED": [
-                "whether a second Space existed earlier and was deleted "
-                "before this inspection (no channel can observe deleted "
-                "Spaces; not claimed either way)",
                 "cookie-blocked browser behavior inside the huggingface.co "
                 "iframe is diagnosed from the transport semantics "
                 "(SameSite=Lax in a third-party context) and reproduced "

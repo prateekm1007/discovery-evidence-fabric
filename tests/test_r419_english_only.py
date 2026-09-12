@@ -85,10 +85,12 @@ def test_r419_amendment_record_exists_and_certified():
 
 
 def test_constitution_v220_parses_and_acknowledged():
-    # R441: the constitution amended to v2.3.0 (Article LXXII); the
-    # loader must parse the RATIFIED version, whatever it now is
+    # R441: the constitution amended to v2.3.0 (Article LXXII); R447:
+    # amended again to v2.4.0 (Article LXXI, the deployed-production-URL
+    # delivery standard); the loader must parse the RATIFIED version,
+    # whatever it now is
     from epistemic_integrity import constitution_loader as cl
-    assert cl._parse_constitution_version() == "2.3.0"
+    assert cl._parse_constitution_version() == "2.4.0"
     state = cl.check_constitution_compliance()
     assert state.constitution_present
     assert state.acknowledgment_present, (

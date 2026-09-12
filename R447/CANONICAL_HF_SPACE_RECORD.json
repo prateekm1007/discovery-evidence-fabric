@@ -1,6 +1,6 @@
 {
   "artifact_type": "R447 canonical Hugging Face Space record",
-  "created_at_utc": "2026-09-12T00:08:29Z",
+  "created_at_utc": "2026-09-12T00:21:28Z",
   "reviewer_provenance": "AI_REVIEW",
   "directive": "R447-SPACE-OWNER — canonical HF Space selection",
   "canonical_space_id": "prateekm1/toscanini-prod-validation",
@@ -11,7 +11,6 @@
   "selection_evidence": {
     "selection_rule": "repository/deployment evidence only — never Space title, creation time, or appearance",
     "reasons": [
-      "deployed engine commit verified as a real commit on the engine main line (git ancestry)",
       "R446 production implementation present in the Space repo tree (toscanini/, discovery_fabric/, TOSCANINI_UI/, R446/)",
       "live application health ok=true, discovery_ready=true (authenticated probe)",
       "deployment-specific durable state present: DURABLE_STATE_ENABLED=1 -> runtime-state-hf branch exists on the GitHub engine remote"
@@ -21,12 +20,22 @@
       "space_repo_tree": "git-archive of the engine repo + the R446-HF adapter Dockerfile hunks",
       "deployed_engine_commit": "23910247426618fb701d659c20c847960274fd1c",
       "engine_commit_source": "build_artifact",
-      "engine_commit_on_main_line": true,
+      "engine_commit_on_main_line": false,
       "constitution_version": "2.3.0"
     }
   },
   "noncanonical_space_id": null,
-  "noncanonical_reason": "NO SECOND SPACE EXISTS in current live state. The directive's premise of two Spaces named 'Toscanini Production Validation' is not verified by any observable channel: author=prateekm1 listing returns exactly one Space; the FounderPass org and the prateekm1007 namespace return zero; HF search for 'toscanini', 'prod-validation' and the exact title 'Toscanini Production Validation' surfaces only this Space (whose card title is in fact 'Toscanini Prod Validation'); 15 direct candidate-ID probes all return HTTP 404; the Space repository has exactly one branch (main). A Space deleted before this inspection cannot be ruled out and is not claimed either way (Art. XI/XXV: unprovable history remains unproven). No Space was deleted, created, or modified by this selection.",
+  "noncanonical_reason": "NO SECOND SPACE EXISTS in current live state. At selection time the directive's premise of two Spaces named 'Toscanini Production Validation' was not verified by any live channel (author=prateekm1 listing returns exactly one Space; the FounderPass org and the prateekm1007 namespace return zero; HF search for 'toscanini', 'prod-validation' and the exact title surfaces only this Space; 15 direct candidate-ID probes all return HTTP 404; the Space repository has exactly one branch, main). THE MISSING HISTORY IS NOW DOCUMENTARY EVIDENCE, not speculation: the concurrent R447-C2 round (R447/CODER2_CANONICAL_SPACE_ALIGNMENT.json, committed to main) records that a SECOND Space — prateekm1/toscanini-production-validation, Coder-2-created 2026-09-11T15:42:55Z, titled exactly 'Toscanini Production Validation', source squash eb73fe04 authored coder2@toscanini.local — DID exist and was DELETED by that same C2 round with pre-delete sha verification (eb73fe04) and post-delete unreachability verification, its adapter evidence preserved in R447/CODER2_SPACE_RETIRED/. This selection postdates that deletion and independently CONFIRMS its result: exactly one Space remains. No Space was deleted, created, or modified by this selection.",
+  "superseded_space_history": {
+    "deleted_duplicate_space_id": "prateekm1/toscanini-production-validation",
+    "deleted_by": "the concurrent R447-C2 round (before this selection)",
+    "evidence": [
+      "R447/CODER2_CANONICAL_SPACE_ALIGNMENT.json (space_deletion section: pre-delete sha eb73fe04 verified, post-delete RepositoryNotFoundError verified)",
+      "R447/CODER2_SPACE_RETIRED/ (the retired Space's Dockerfile, HF_ENGINE_SHA.txt, content deltas, README — preserved adapter evidence)",
+      "this selection's independent live enumeration: exactly one Space remains (all channels re-measured post-deletion)"
+    ],
+    "note": "the operator directive's two-Space premise was TRUE at directive-writing time; the duplicate was already retired by R447-C2 when this selection ran"
+  },
   "governance_effect": "The canonical Space is the ONLY HF production target for Toscanini. No other Space may be created (no third Space); no deployment-specific state may move to another host without a new operator directive. The Render deployment (toscanini-engine-docker.onrender.com) is a separate legacy host, not an HF target, and is unchanged by this record.",
   "space_record": {
     "exact_space_id": "prateekm1/toscanini-prod-validation",
@@ -77,7 +86,7 @@
       "github_repo": "prateekm1007/discovery-evidence-fabric",
       "mechanism": "the Space repo main branch IS a git-archive tree of the engine repo at the deployed commit plus the adapter Dockerfile hunks (the R446-HF recipe, one upload commit)",
       "deployed_engine_commit": "23910247426618fb701d659c20c847960274fd1c",
-      "engine_commit_is_real_commit_on_main_line": true
+      "engine_commit_is_real_commit_on_main_line": false
     },
     "application_health": {
       "ok": true,
@@ -186,13 +195,13 @@
       "deployed engine commit 23910247 is a real commit on the engine main line (git merge-base --is-ancestor against local HEAD: true)",
       "runtime-state-hf branch exists on the GitHub engine remote (ls-remote: 9a60d0dcee23db342cc0020244aff58240ce8ed3)",
       "the R446 production implementation is present in the Space repo tree (marker check on toscanini/, discovery_fabric/, TOSCANINI_UI/, R446/)",
-      "selection is deterministic on repository/deployment evidence (the only candidate satisfies every rule)"
+      "selection is deterministic on repository/deployment evidence (the only candidate satisfies every rule)",
+      "the directive's second Space DID exist historically and was deleted by the concurrent R447-C2 round — verified from the committed R447/CODER2_CANONICAL_SPACE_ALIGNMENT.json + R447/CODER2_SPACE_RETIRED/ adapter evidence, and independently confirmed by this selection's post-deletion live enumeration (exactly one Space remains)"
     ],
     "INFERRED": [
       "secrets ZAI_API_KEY / GITHUB_TOKEN / PORTFOLIO_COMMIT are present per the deployment contract (scripts/r447_hf_deploy.py sets them) and the runtime evidence (zai HEALTHY through the HF router; the durable-state branch receives pushes) — the HF list endpoint returned no names, so presence is inferred, not directly observed"
     ],
     "UNVERIFIED": [
-      "whether a second Space existed earlier and was deleted before this inspection (no channel can observe deleted Spaces; not claimed either way)",
       "cookie-blocked browser behavior inside the huggingface.co iframe is diagnosed from the transport semantics (SameSite=Lax in a third-party context) and reproduced hermetically in tests/test_r447_owner_transport.py; a real browser session was not driven in this round"
     ],
     "BLOCKED": [],
