@@ -432,3 +432,22 @@ Stage Summary:
 - The blocked state is a first-class presentation state end-to-end: mapping -> hero -> cards -> CTA hierarchy -> journal -> colors, all consuming the backend user-state projection, with the geometry-to-visual join machine-provable (receipt + watchdog) and the success path regression-clean.
 - DELIVERY: Art. LXXI tuple DELIVERY_BLOCKED (carried): push to origin fails on missing GitHub credentials (the same-round credentials half, commit 3db194e, escalation 1); the canonical Space serves the older engine commit. Operator actions unchanged: push the branch, rotate the two exposed long-lived credentials, redeploy the Space at the pushed SHA.
 - Round record: R451/C2_PRODUCT/R451_C2_PRODUCT_ROUND_RECORD.json. reviewer_provenance=AI_REVIEW.
+
+---
+Task ID: R451-C2-delivery
+Agent: Coder 2 (main session, continuation)
+Task: Execute the delivery that both R451-C2 halves blocked on - the operator injected the GitHub PAT into the session; push branch r449-c2/visual-benchmark and close the Art. LXXI DELIVERY_BLOCKED tuples with remote-verified evidence.
+
+Work Log:
+- Baseline per Art. XXII/XXIII: local HEAD 3078367 (branch r449-c2/visual-benchmark) == the worklog-pinned round tip; the untracked visual-lab fixture dir (R448-era benchmark run output, bucket-backed) deliberately left out of the delivery.
+- Fetched origin with the operator PAT (first authenticated fetch this round line): origin/main advanced 3bf8bd0 -> b1418f4a during the credential gap (R450 C1 delivery completion - canonical Space identity GREEN at 317885af, constitution 2.4.0 live). The standing Space/2.4.0 alignment escalation from CONSTITUTION-RATIFICATION-LXXI is CLOSED by that work; recorded, not claimed as ours.
+- Topology verified before pushing: origin/r449-c2/visual-benchmark was at 39d4013 (R449 worklog); local HEAD is a clean fast-forward descendant; the push releases BOTH R451 halves (3db194e credentials/projection + c6ded29 product). Sibling r450-c2/visual-feedback-layer (PR #6, tip b64e0fa) not touched.
+- PUSHED: 39d40138..3078367e fast-forward; ls-remote origin refs/heads/r449-c2/visual-benchmark == 3078367e5e25ac251e2cf810de02342603fec445 == local HEAD (Art. XXIII - remote verified, not inferred). PR #5 head == 3078367e, state open (GitHub API verified).
+- Credential hygiene: PAT used transiently (env var on push/fetch/curl command lines only); NOT written to any tracked file, record, or log; BS-021 discipline held. The rotation action item from the original tuples remains the operator's (unchanged, escalation carried).
+- Constitution v2.4.0 read IN FULL before this records commit (all 2,152 lines; sha256 b54a1be9bcbdd2465d0b034e1e1f472f80b87174209c0d534b7d9e1223e649b2 verified identical across origin/main bytes and the working tree before the read).
+- Records updated (append-only; original DELIVERY_BLOCKED tuples preserved as history per Art. XI): delivery_closure sections added to R451/R451_C2_ROUND_RECORD.json (credentials half) and R451/C2_PRODUCT/R451_C2_PRODUCT_ROUND_RECORD.json (product half) with push range, ls-remote evidence, PR state, credential handling, production note, and the stacked-PR topology disclosure.
+- NOT done here, deliberately: no merge of origin/main into this branch (would invalidate the recorded round tip; merge order across stacked PRs #4 -> #5 is the owner's call); no Space redeploy (production serves main at 317885af; this branch reaches production only after the owner merges the lab PRs and redeploys at the merged SHA); no canonical state touched.
+
+Stage Summary:
+- The Art. LXXI Section 4 credential blocker is RESOLVED for the branch: both R451-C2 rounds are now on origin, remote-verified. Round completion per Art. LXXI Section 1 remains conditional on the owner's merge + redeploy of the stacked lab line - the tuples now say exactly that instead of "credentials missing".
+- reviewer_provenance=AI_REVIEW.
