@@ -40,8 +40,7 @@ SPACE = "prateekm1/toscanini-prod-validation"
 BASE = "https://prateekm1-toscanini-prod-validation.hf.space"
 HF_TOKEN = os.environ.get("HF_TOKEN", "")
 OUT = REPO / "R447" / "HF_DEPLOYMENT_RECORD.json"
-GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN",
-                              "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")
+GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN", "")
 PORTFOLIO_COMMIT = os.environ.get(
     "PORTFOLIO_COMMIT", "0914755c5832f332abe5d74ed1655cd27764ecc0")
 

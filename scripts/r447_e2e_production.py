@@ -35,6 +35,7 @@ from __future__ import annotations
 import hashlib
 import io
 import json
+import os
 import sys
 import time
 import urllib.error
@@ -48,7 +49,10 @@ sys.path.insert(0, str(REPO_ROOT / "scripts"))
 sys.path.insert(0, str(REPO_ROOT))
 
 BASE = "https://prateekm1-toscanini-prod-validation.hf.space"
-HF_TOKEN = "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"
+# R447 security scrub (BS-021): the token comes from the ENVIRONMENT only —
+# a hardcoded credential in a tracked file is exactly the leak class the
+# HF upload scanner rejected (and the reason this file needed scrubbing).
+HF_TOKEN = os.environ.get("HF_TOKEN", "")
 OUT = REPO_ROOT / "R447" / "E2E_PRODUCTION_RUNS.json"
 RUNS_DIR = REPO_ROOT / "R447" / "E2E_PRODUCTION_RUNS"
 SESSION = REPO_ROOT / "R447" / "E2E_SESSION.json"
