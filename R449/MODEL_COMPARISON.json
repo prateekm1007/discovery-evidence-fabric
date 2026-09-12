@@ -1,0 +1,133 @@
+{
+  "artifact_type": "R449_MODEL_COMPARISON",
+  "round": "R449-C2",
+  "created_at": "2026-09-12",
+  "reviewer_provenance": "AI_REVIEW",
+  "policy": "no 'best model' claim is made or derivable from this file (directive Step 5/12; Art. LVIII/LIX) - raw measurements only, comparison AFTER owner thresholds",
+  "sequence_directive": "DA3 referee (measurement instrument, never competitor) -> Hunyuan3D-Omni -> TRELLIS.2 (not yet launched: the benchmark must prove earlier candidates first, directive Step 5/12)",
+  "referee": {
+    "model_id": "depth-anything/DA3-METRIC-LARGE",
+    "role": "MEASUREMENT_INSTRUMENT",
+    "job": {
+      "job_id": "6aa4a40421047bf1b0379e6d",
+      "url": "https://huggingface.co/jobs/prateekm1/6aa4a40421047bf1b0379e6d",
+      "attempts": [
+        {
+          "job_id": "6aa4a1d521047bf1b0379db7",
+          "outcome": "NOT_RUN: torchvision missing in the UV environment (typed)"
+        },
+        {
+          "job_id": "6aa4a2bf5527934177ecb68d",
+          "outcome": "NOT_RUN: model id mis-derived as DA3-METRIC-LARGE; correct id is depth-anything/DA3METRIC-LARGE (registry had it right; the coder's job script did not - typed, disclosed)"
+        },
+        {
+          "job_id": "6aa4a40421047bf1b0379e6d",
+          "outcome": "NOT_RUN: AutoImageProcessor cannot load the repo (no compatible preprocessor config) - typed"
+        },
+        {
+          "job_id": "6aa4a56b5527934177ecb7bc",
+          "outcome": "NOT_RUN: 'Unrecognized model... Should have a model_type key in its config.json' - DA3METRIC-LARGE carries a custom architecture without a transformers-compatible config; loading it requires the DA3 authors' own inference stack (typed)"
+        }
+      ],
+      "final_state": "NOT_RUN this round - three typed attempts; the depth-referee layer needs the DA3 authors' stack, a distinct integration task; the geometry-side referee instruments ran and carried the calibration",
+      "record_path": "benchmarks/R449/records/REFEREE_DA3_DEPTH_RECORD.json"
+    },
+    "state_record": "NOT_RUN"
+  },
+  "candidates": [
+    {
+      "model_id": "tencent/Hunyuan3D-Omni",
+      "revision_pin": "70e803bfb4e127d534049d8ab8c8cb511780d485",
+      "license_verdict": "COMMERCIAL_REVIEW_REQUIRED (research-only arm)",
+      "conditioning_used": "canonical point cloud + canonical reference view",
+      "arm_job": {
+        "job_id": "6aa4aafd21047bf1b037a027 (final attempt this round)",
+        "url": "https://huggingface.co/jobs/prateekm1/6aa4aafd21047bf1b037a027",
+        "attempts": [
+          {
+            "job_id": "6aa4a1d721047bf1b0379dba",
+            "outcome": "BLOCKED: NameError (numpy import missing in the job script) - typed, cost bounded"
+          },
+          {
+            "job_id": "6aa4a28621047bf1b0379df5",
+            "outcome": "BLOCKED: ModuleNotFoundError pkg_resources (UV python 3.12 lacks setuptools) - typed"
+          },
+          {
+            "job_id": "6aa4a40621047bf1b0379e6f",
+            "outcome": "BLOCKED: skimage missing - typed; the pipeline fully loaded (0 missing keys) before the gap"
+          },
+          {
+            "job_id": "6aa4a56d5527934177ecb7be",
+            "outcome": "BLOCKED: libGL.so.1 missing (system GL runtime) - typed; fixed by apt-installing the same packages their Dockerfile installs"
+          },
+          {
+            "job_id": "6aa4aafd21047bf1b037a027",
+            "outcome": "BLOCKED: PyMeshLabException 'Unknown format for load: ply' on the conditioning PLY - typed; fixed by matching the authors' demo ASCII-2048 PLY contract"
+          },
+          {
+            "job_id": "6aa4a8e75527934177ecb906",
+            "outcome": "BLOCKED: PyMeshLabException persisted (record shows the prior attempt's state; disk/timeout context unclear)"
+          },
+          {
+            "job_id": "6aa4a6d55527934177ecb80f",
+            "outcome": "canceled by the coder immediately after launch (dep-set edit had not landed; no evidence value) - disclosed"
+          },
+          {
+            "job_id": "6aa4ad715527934177ecba5b",
+            "outcome": "CANCELED externally mid-download (12.2G model + 12.2G EMA dual-binary fetch ~26 percent; no record written); the a100-large host resource wall is the remaining blocker"
+          }
+        ],
+        "final_state": "BLOCKED - the job script is fully hardened (deps, GL runtime, demo-matched PLY contract, typed records); the next attempt needs a larger-memory flavor (h200/a100x4) or a selective download that skips the EMA binary",
+        "record_path": "benchmarks/R449/records/CANDIDATE_HUNYUAN_OMNI_RECORD.json"
+      },
+      "state": "ARM_STATE_BLOCKED",
+      "record": {
+        "artifact_type": "R449_CANDIDATE_HUNYUAN_OMNI_RECORD",
+        "round": "R449-C2",
+        "created": "2026-09-12",
+        "reviewer_provenance": "AI_REVIEW",
+        "candidate_model_id": "tencent/Hunyuan3D-Omni",
+        "candidate_model_revision": "70e803bfb4e127d534049d8ab8c8cb511780d485",
+        "candidate_model_license": "COMMERCIAL_REVIEW_REQUIRED_TERRITORIAL_TERMS (research-only arm; license gate blocks production pool entry)",
+        "conditioning": "point cloud (20k surface samples, seed 0, unit-box normalized) + deterministic reference projection view_pz.png",
+        "generator_seed": 1234,
+        "infrastructure": "hf-job a100-large",
+        "epistemic_status": "BLOCKED",
+        "cases": {},
+        "environment": {
+          "torch": "2.5.1+cu124",
+          "cuda": true,
+          "gpu": "NVIDIA A100-SXM4-80GB",
+          "vram_total_gb": 85.1
+        },
+        "pipeline_loaded": true,
+        "load_seconds": 87.8,
+        "failure_class": "PyMeshLabException",
+        "failure_detail": "Unknown format for load: ply",
+        "trace_tail": "Traceback (most recent call last):\n  File \"//r449_candidate_hunyuan_omni.py\", line 141, in main\n    infer_point(pipe, str(data_json_named), out_dir)\n  File \"/tmp/Hunyuan3D-Omni/inference.py\", line 322, in infer_point\n    postprocess(mesh, file_name, save_dir, sampled_point, image_file)\n  File \"/tmp/Hunyuan3D-Omni/inference.py\", line 103, in postprocess\n    mesh = FloaterRemover()(mesh)\n           ^^^^^^^^^^^^^^^^^^^^^^\n  File \"/tmp/Hunyuan3D-Omni/hy3dshape/postprocessors.py\", line 195, in __call__\n    ms = import_pymeshlab_mesh(mesh)\n         ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/tmp/Hunyuan3D-Omni/hy3dshape/postprocessors.py\", line 144, in import_pymeshlab_mesh\n    mesh = trimesh2pymeshlab(mesh)\n           ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/tmp/Hunyuan3D-Omni/hy3dshape/postprocessors.py\", line 94, in trimesh2pymeshlab\n    mesh.load_new_mesh(temp_file.name)\npymeshlab.pmeshlab.PyMeshLabException: Unknown format for load: ply\n",
+        "NEXT_DECISIVE_TEST": [
+          "read the exact failure class; fix the job spec (deps or API drift); relaunch - the arm is bounded and cheap to retry"
+        ]
+      }
+    },
+    {
+      "model_id": "microsoft/TRELLIS.2-4B",
+      "revision_pin": "af44b45f2e35a493886929c6d786e563ec68364d",
+      "license_verdict": "COMMERCIAL_CLEAR (provisional)",
+      "state": "NOT_LAUNCHED - sequence position 3; runs after the Hunyuan arm is measured",
+      "job_spec": "visual-lab/jobs/r449_candidate_trellis2_SPEC.md (prepared, not launched)"
+    }
+  ],
+  "OBSERVED": [
+    "referee + candidate arms launched as real HF Jobs with recorded ids"
+  ],
+  "VERIFIED": [],
+  "INFERRED": [],
+  "UNVERIFIED": [
+    "all model-side comparisons await job outputs and owner thresholds"
+  ],
+  "BLOCKED": [],
+  "NEXT_DECISIVE_TEST": [
+    "measure generated outputs vs canonical; only then consider the TRELLIS.2 arm"
+  ]
+}

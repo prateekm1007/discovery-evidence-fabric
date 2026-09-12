@@ -1,0 +1,108 @@
+{
+  "artifact_type": "R449_MULTIVIEW_RESULTS",
+  "round": "R449-C2",
+  "created_at": "2026-09-12",
+  "reviewer_provenance": "AI_REVIEW",
+  "definition": {
+    "metric": "mean pairwise IoU across six matched orthographic occupancy views (px/nx/py/ny/pz/nz, 48x48 grid, deterministic projection)",
+    "instrument": "negative_controls._projected_views/_view_agreement",
+    "class": "PRESENTATION_QUALITY (cross-view divergence) + referee-measurable"
+  },
+  "instrument_sensitivity_evidence": [
+    {
+      "corruption": "view_inconsistency",
+      "how": "the +Z view in the six-view set is swapped with the corresponding view of a different canonical case",
+      "self_consistency_iou": 1.0,
+      "swapped_set_agreement_iou": 0.8360215053763441,
+      "detected": true,
+      "expected_instrument_behavior": "a view-set containing a foreign view must score strictly lower cross-view agreement than the consistent set",
+      "case": "A"
+    },
+    {
+      "corruption": "view_inconsistency",
+      "how": "the +Z view in the six-view set is swapped with the corresponding view of a different canonical case",
+      "self_consistency_iou": 1.0,
+      "swapped_set_agreement_iou": 0.8360215053763441,
+      "detected": true,
+      "expected_instrument_behavior": "a view-set containing a foreign view must score strictly lower cross-view agreement than the consistent set",
+      "case": "B"
+    },
+    {
+      "corruption": "view_inconsistency",
+      "how": "the +Z view in the six-view set is swapped with the corresponding view of a different canonical case",
+      "self_consistency_iou": 1.0,
+      "swapped_set_agreement_iou": 0.8346666666666667,
+      "detected": true,
+      "expected_instrument_behavior": "a view-set containing a foreign view must score strictly lower cross-view agreement than the consistent set",
+      "case": "C"
+    }
+  ],
+  "reference_views_staged": "renders/R449/reference/case_{A,B,C}/view_{px,nx,py,ny,pz,nz}.png (deterministic projections; sha-pinned in the bucket MANIFEST.json)",
+  "referee_depth_layer": {
+    "job": {
+      "job_id": "6aa4a40421047bf1b0379e6d",
+      "url": "https://huggingface.co/jobs/prateekm1/6aa4a40421047bf1b0379e6d",
+      "attempts": [
+        {
+          "job_id": "6aa4a1d521047bf1b0379db7",
+          "outcome": "NOT_RUN: torchvision missing in the UV environment (typed)"
+        },
+        {
+          "job_id": "6aa4a2bf5527934177ecb68d",
+          "outcome": "NOT_RUN: model id mis-derived as DA3-METRIC-LARGE; correct id is depth-anything/DA3METRIC-LARGE (registry had it right; the coder's job script did not - typed, disclosed)"
+        },
+        {
+          "job_id": "6aa4a40421047bf1b0379e6d",
+          "outcome": "NOT_RUN: AutoImageProcessor cannot load the repo (no compatible preprocessor config) - typed"
+        },
+        {
+          "job_id": "6aa4a56b5527934177ecb7bc",
+          "outcome": "NOT_RUN: 'Unrecognized model... Should have a model_type key in its config.json' - DA3METRIC-LARGE carries a custom architecture without a transformers-compatible config; loading it requires the DA3 authors' own inference stack (typed)"
+        }
+      ],
+      "final_state": "NOT_RUN this round - three typed attempts; the depth-referee layer needs the DA3 authors' stack, a distinct integration task; the geometry-side referee instruments ran and carried the calibration",
+      "record_path": "benchmarks/R449/records/REFEREE_DA3_DEPTH_RECORD.json"
+    },
+    "record": {
+      "artifact_type": "R449_REFEREE_DA3_DEPTH_RECORD",
+      "round": "R449-C2",
+      "created": "2026-09-12",
+      "reviewer_provenance": "AI_REVIEW",
+      "referee_model_id": "depth-anything/DA3METRIC-LARGE",
+      "referee_role": "MEASUREMENT_INSTRUMENT_NOT_COMPETITOR",
+      "infrastructure": "hf-job t4-medium",
+      "epistemic_status": "NOT_RUN",
+      "environment": {
+        "torch": "2.14.0+cu130",
+        "transformers": "5.17.0",
+        "cuda_available": true,
+        "gpu": "Tesla T4"
+      },
+      "processor_fallback": "AutoImageProcessor unavailable (OSError); using a minimal deterministic preprocess (resize 518, ImageNet normalize)",
+      "model_loaded": false,
+      "failure_class": "ValueError",
+      "failure_detail": "Unrecognized model in depth-anything/DA3METRIC-LARGE. Should have a `model_type` key in its config.json.",
+      "trace_tail": "in main\n    model = AutoModelForDepthEstimation.from_pretrained(MODEL_ID, trust_remote_code=True).eval()\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/root/.cache/uv/environments-v2/r449-referee-da3-depth-981f50c1d6c3a5a3/lib/python3.12/site-packages/transformers/models/auto/auto_factory.py\", line 336, in from_pretrained\n    config, kwargs = AutoConfig.from_pretrained(\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/root/.cache/uv/environments-v2/r449-referee-da3-depth-981f50c1d6c3a5a3/lib/python3.12/site-packages/transformers/models/auto/configuration_auto.py\", line 433, in from_pretrained\n    raise ValueError(\nValueError: Unrecognized model in depth-anything/DA3METRIC-LARGE. Should have a `model_type` key in its config.json.\n",
+      "OBSERVED": [
+        "the referee instrument could not be loaded in this environment"
+      ],
+      "NEXT_DECISIVE_TEST": [
+        "retry with the DA3 authors' inference stack or a pinned transformers version known to support DA3"
+      ]
+    }
+  },
+  "OBSERVED": [
+    "view-inconsistency attack (foreign view swapped into a six-view set) scores strictly lower agreement than the consistent set on all 3 cases"
+  ],
+  "VERIFIED": [
+    "the view instrument distinguishes a consistent view-set from a corrupted one"
+  ],
+  "INFERRED": [],
+  "UNVERIFIED": [
+    "model-generated multi-view comparisons not yet measured (candidate arm)"
+  ],
+  "BLOCKED": [],
+  "NEXT_DECISIVE_TEST": [
+    "run the same six-view instrument on candidate renders; DA3 depth signatures as the independent referee layer"
+  ]
+}
