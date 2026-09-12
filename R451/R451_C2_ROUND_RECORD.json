@@ -20,7 +20,7 @@
       "GOVERNANCE/AUDIT_LOOP_PROTOCOL_v1.md (247 lines)",
       "ACTIVE_PATH.md (253 lines)"
     ],
-    "reread_before_final_commit": "recorded in the worklog entry for the final commit"
+    "reread_before_final_commit": "RE-READ IN FULL (all 2153 lines) immediately before commit 3db194e; hash b54a1be9 unchanged"
   },
   "step_1_credential_removal": {
     "scanner": "scripts held outside the repo (r451_credential_scan.py): 5715 tracked files + 2205 unique blobs across all 68 commits reachable from HEAD; token-prefix library (GitHub/PAT/HF/OpenAI/Anthropic/Slack/AWS/GitLab/DO/Resend/Google/JWT/private-key/OpenRouter/bearer) + generic assignment/cookie/export patterns",
@@ -94,7 +94,21 @@
       "binding_proof": "the canonical semantics of INVENTION_LINEAGE/1.0.0 carry each transition BY generation i+1 (parent_id + origin); the projection re-proves transition.from_gen == generations[i].gen, transition.to_gen == generations[i+1].gen, transition.result.gen == generations[i+1].gen, transition.result.status == generations[i+1].state, parent_id == previous invention_id, origin == EVOLUTION_CAUSAL_DELTA",
       "additional_bindings": "current_invention resolves into the array with state AND maturity equality; survivor_reached requires survivor_gen == current_invention.gen == terminal generation; declared expected_sha256 must match the consumed bytes",
       "fail_closed": "any break raises ProjectionRejected with typed codes; ALL detected breaks are exposed together; a rejected projection yields NO viewer_state - tampered data never reaches the viewer",
-      "rejection_codes": ["SOURCE_BYTES_UNPARSEABLE", "SCHEMA_UNRECOGNIZED", "GEN_SEQUENCE_NOT_CONSECUTIVE", "TRANSITION_PARENT_ORPHAN", "TRANSITION_PARENT_MISSING", "TRANSITION_ORIGIN_UNDECLARED", "CURRENT_INVENTION_PARTIAL", "CURRENT_INVENTION_UNRESOLVED", "CURRENT_INVENTION_STATE_MISMATCH", "CURRENT_INVENTION_MATURITY_MISMATCH", "SURVIVOR_BINDING_MISMATCH", "PROVENANCE_SHA_MISMATCH", "STATE_FIELD_TYPE_UNEXPECTED"]
+      "rejection_codes": [
+        "SOURCE_BYTES_UNPARSEABLE",
+        "SCHEMA_UNRECOGNIZED",
+        "GEN_SEQUENCE_NOT_CONSECUTIVE",
+        "TRANSITION_PARENT_ORPHAN",
+        "TRANSITION_PARENT_MISSING",
+        "TRANSITION_ORIGIN_UNDECLARED",
+        "CURRENT_INVENTION_PARTIAL",
+        "CURRENT_INVENTION_UNRESOLVED",
+        "CURRENT_INVENTION_STATE_MISMATCH",
+        "CURRENT_INVENTION_MATURITY_MISMATCH",
+        "SURVIVOR_BINDING_MISMATCH",
+        "PROVENANCE_SHA_MISMATCH",
+        "STATE_FIELD_TYPE_UNEXPECTED"
+      ]
     },
     "epistemic_badges": "declared deterministic translation table (GENERATED->PROPOSED, EVIDENCE_SUPPORTED->INFERRED, SIMULATED->SIMULATED; evidence_verified false -> UNVERIFIED overrides); every badge carries canonical_label + basis pointers + legend; MEASURED is unreachable from this schema and is never emitted (the visual layer does not invent physical observations)"
   },
@@ -183,14 +197,43 @@
     "the two live credentials remain recoverable from pushed history until the operator rotates them"
   ],
   "production_deployment": {
-    "target_sha": "PENDING_FINAL_COMMIT",
+    "target_sha": "3db194e8f2f8b747feb0660f29cf054c14d21a0b (branch r449-c2/visual-benchmark tip; DELIVERABLE-BLOCKED - push to origin failed on missing credentials, Art. LXXI Section 4)",
     "deployed_sha": "23910247426618fb701d659c20c847960274fd1c (pre-existing engine build, unchanged this round)",
     "deploy_id": "hf: prateekm1/toscanini-prod-validation rev 48cbba34a491 (unchanged this round)",
-    "health_check_result": "NOT_RECHECKED_NO_ENGINE_DELTA",
+    "health_check_result": "BLOCKED",
     "drift": "DRIFT",
     "blocked_by": "GitHub credentials unavailable in this session: git push/ls-remote against the private origin fail (no GH_TOKEN/PAT in env, no helper, no token file); the round's commits therefore cannot reach origin/main, and per Art. LXXI Section 1 a commit that exists only locally is UNRELEASED",
-    "what_unblocks": "operator injects GitHub credentials into the session environment (or runs the push); then Art. LXXI Section 1 conditions can be evaluated: ls-remote origin refs/heads/main == pushed SHA; the canonical Space re-alignment to constitution 2.4.0 remains a separate standing blocker owned by Coder 1/operator (escalated at CONSTITUTION-RATIFICATION-LXXI)"
+    "what_unblocks": "operator injects GitHub credentials into the session environment (or runs the push); then Art. LXXI Section 1 conditions can be evaluated: ls-remote origin refs/heads/main == pushed SHA; the canonical Space re-alignment to constitution 2.4.0 remains a separate standing blocker owned by Coder 1/operator (escalated at CONSTITUTION-RATIFICATION-LXXI)",
+    "push_attempted": true,
+    "push_verification": "git push origin r449-c2/visual-benchmark -> fatal: could not read Username for 'https://github.com' (terminal prompts disabled; no GH_TOKEN/env/helper); ls-remote likewise unreachable - condition 1 of Art. LXXI Section 1 CANNOT be satisfied this round and is named here",
+    "missing_credentials": [
+      "GITHUB_TOKEN (push/ls-remote to private origin)"
+    ],
+    "operator_actions_required": [
+      "1. inject GitHub credentials into the session environment or push branch r449-c2/visual-benchmark (tip 3db194e8f2f8b747feb0660f29cf054c14d21a0b) manually",
+      "2. ROTATE the exposed GitHub PAT (ghp_ag...ZarT) and HF token (hf_MrZ...NkNM) - both live in pushed history (escalation count 1, Art. LXV)",
+      "3. the standing Space/constitution-2.4.0 re-alignment remains owned by Coder 1/operator (escalated at CONSTITUTION-RATIFICATION-LXXI)"
+    ]
   },
   "next_decisive_test": "with credentials restored: push this branch, ls-remote-verify the tip, and re-run the whole-tree credential scan on the pushed tip (expected: zero live-token findings on the new tip's tree)",
-  "constitutional_articles_engaged": ["I", "III", "IV", "V", "VI", "X", "XI", "XV", "XXII", "XXIII", "XXV", "XXVII", "XXVIII", "LXV", "LXX", "LXXI", "LXXII"]
+  "constitutional_articles_engaged": [
+    "I",
+    "III",
+    "IV",
+    "V",
+    "VI",
+    "X",
+    "XI",
+    "XV",
+    "XXII",
+    "XXIII",
+    "XXV",
+    "XXVII",
+    "XXVIII",
+    "LXV",
+    "LXX",
+    "LXXI",
+    "LXXII"
+  ],
+  "round_commit_sha": "3db194e8f2f8b747feb0660f29cf054c14d21a0b"
 }
