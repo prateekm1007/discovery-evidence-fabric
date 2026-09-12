@@ -470,3 +470,6 @@ Work Log:
 
 Stage Summary:
 - The five states are distinct end-to-end and impossible to confuse: the browser renders the backend's typed truth verbatim and cannot reach the false "3D unavailable" interpretation from a missing file; the strip answers the "why no 3D" question with recorded facts. No Coder-1 canonical state changed; the gate untouched; thresholds untouched.
+
+Work Log (continuation):
+- The R451-C2.1 round commit is 0d1bcc16 (the record above carries the full SHA); this worklog note is the follow-up commit that records it, per the standing round protocol.
