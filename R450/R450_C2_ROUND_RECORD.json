@@ -23,17 +23,30 @@
   "classification": "OBSERVED (git ls-remote + merge executed)"
  },
  "deliverables": {
-  "constitution_reread": {"status": "DONE", "evidence": "constitutional_reads above"},
-  "current_governance_reread": {"status": "DONE", "evidence": "constitutional_reads.governance_corpus_read"},
+  "constitution_reread": {
+   "status": "DONE",
+   "evidence": "constitutional_reads above"
+  },
+  "current_governance_reread": {
+   "status": "DONE",
+   "evidence": "constitutional_reads.governance_corpus_read"
+  },
   "visual_trajectory_schema_rendering": {
    "status": "DONE",
-   "modules": ["visual-lab/trajectory/schema.py (TOSCANINI_TRAJECTORY/1.0.0)", "TOSCANINI_UI/webapp/components/trajectory/TrajectoryViewer.tsx", "TOSCANINI_UI/webapp/lib/trajectory.ts"],
+   "modules": [
+    "visual-lab/trajectory/schema.py (TOSCANINI_TRAJECTORY/1.0.0)",
+    "TOSCANINI_UI/webapp/components/trajectory/TrajectoryViewer.tsx",
+    "TOSCANINI_UI/webapp/lib/trajectory.ts"
+   ],
    "evidence": "the REAL R445 lineage (evol-x02-bus-fastcharge-lithium-plating INVENTION_LINEAGE.json) projects to a byte-deterministic trajectory (projection record R450/TRAJECTORY_PROJECTION_RESULTS.json) and renders live: lab route DOM report shows states INVENTION_EVOLVED -> INVENTION_REQUIRES_EXPERIMENT with 1 transition, badges on every element",
    "classification": "VERIFIED"
   },
   "before_after_delta_presentation": {
    "status": "DONE",
-   "modules": ["TrajectoryViewer.tsx::BeforeAfterDelta (field | BEFORE | AFTER | DELTA table)", "visual-lab/benchmark/trajectory_dimensions.py::before_after_correspondence"],
+   "modules": [
+    "TrajectoryViewer.tsx::BeforeAfterDelta (field | BEFORE | AFTER | DELTA table)",
+    "visual-lab/benchmark/trajectory_dimensions.py::before_after_correspondence"
+   ],
    "evidence": "identity pairs read unchanged (chamfer 0.000000 on all three canonical cases); recorded mutations read as distinct visible deltas (incorrect_scale max-axis 25.00% vs rotated_toppling 0.19-1.41%); structured-shape table rendered live on the lab route (DOM: 1 before_after_delta table) from the clearly-labeled SCHEMA EXAMPLE fixture; the REAL lineage renders the narrative shape honestly",
    "classification": "VERIFIED (measurement OBSERVED, rendering VERIFIED)"
   },
@@ -44,31 +57,43 @@
   },
   "causal_trajectory_presentation": {
    "status": "DONE",
-   "modules": ["TOSCANINI_UI/webapp/components/trajectory/CausalTrajectory.tsx"],
+   "modules": [
+    "TOSCANINI_UI/webapp/components/trajectory/CausalTrajectory.tsx"
+   ],
    "evidence": "all six stages (FAILURE CAUSE DIRECTION MUTATION RESULT UPDATE) render aggregated from the same projection; absent stages render as honest gaps",
    "classification": "VERIFIED"
   },
   "uncertainty_state_badges": {
    "status": "DONE",
-   "modules": ["StateBadge.tsx (MEASURED/SIMULATED/INFERRED/PROPOSED/UNVERIFIED)", "schema.py::derive_badge (fail-closed derivation from provenance fields, never from claimed labels)"],
+   "modules": [
+    "StateBadge.tsx (MEASURED/SIMULATED/INFERRED/PROPOSED/UNVERIFIED)",
+    "schema.py::derive_badge (fail-closed derivation from provenance fields, never from claimed labels)"
+   ],
    "evidence": "badge-spoof battery 9/9 (claimed-MEASURED text without an R370G event degrades to UNVERIFIED; a full R370G-shaped event is required for MEASURED); SURVIVED_WITH_UNCERTAINTIES renders its uncertainties verbatim, or the explicit not-itemized label when the lineage did not itemize them",
    "classification": "VERIFIED"
   },
   "parameter_sensitivity_visualization": {
    "status": "DONE (component + contract; NO canonical sensitivity data exists yet)",
-   "modules": ["SensitivityPanel.tsx", "schema.py::project_sensitivity"],
+   "modules": [
+    "SensitivityPanel.tsx",
+    "schema.py::project_sensitivity"
+   ],
    "evidence": "records without a declared basis are REFUSED (fail-closed); values render verbatim with the declared basis badge; the lab route demonstrates the contract with a clearly-labeled SCHEMA EXAMPLE; every real surface renders honest absence until Coder 1 supplies a legitimate sensitivity result",
    "classification": "VERIFIED (component) / OBSERVED-HONEST-ABSENCE (data)"
   },
   "engineering_vs_presentation_guard": {
    "status": "DONE",
-   "modules": ["visual-lab/guard/trajectory_guard.py"],
+   "modules": [
+    "visual-lab/guard/trajectory_guard.py"
+   ],
    "evidence": "attacks all fail closed: epistemic-boundary stripped -> refused; status vocabulary re-labeled -> refused; unknown badge -> refused; MEASURED without R370G event -> refused; AI mesh labeled ENGINEERING_GEOMETRY -> refused; engineering geometry without a verified canonical lineage root -> refused; production-claim vocabulary (production-ready / engineering-certified / physically validated) -> banned from the presentation surface; two CURRENT states -> refused; unevaluated prediction claiming HELD -> refused",
    "classification": "VERIFIED (27/27 battery green)"
   },
   "visual_regression_for_trajectories": {
    "status": "DONE",
-   "modules": ["visual-lab/guard/test_r450_trajectory.py"],
+   "modules": [
+    "visual-lab/guard/test_r450_trajectory.py"
+   ],
    "evidence": "all six directive regression items mechanically attacked: same engineering state -> byte-identical projection; same trajectory -> same state ordering + exactly one CURRENT; same mutation -> expected delta visible (identity control chamfer 0.0, scale mutation visible); different mutation -> different delta (scale vs toppling signatures distinct); uncertain state -> uncertainty label visible; unvalidated AI geometry -> cannot appear as engineering-certified",
    "classification": "VERIFIED"
   },
@@ -109,7 +134,7 @@
   "metrics_runner": "8 passed / 0 failed (ALL GREEN)"
  },
  "production_deployment": {
-  "target_sha": "the r450-c2/visual-feedback-layer branch tip (this record's commit); the lab line merges to main only via owner-reviewed PR",
+  "target_sha": "88848afb06806c43744a2948aca91287e450a884 (the branch tip; the commit carrying this round record is the records-only delta on top)",
   "deployed_sha": "NOT SERVING - the canonical Space prateekm1/toscanini-prod-validation is PAUSED (HF API runtime.stage=PAUSED, queried live this round; lastModified 2026-09-12T00:51:39Z = the R447-C1 final deploy)",
   "deploy_id": "no deployment this round (lab + webapp component round on a branch; zero engine-code delta on main by directive)",
   "health_check_result": "BLOCKED",
@@ -136,5 +161,20 @@
   "determinism_could_be_test_artifact": "determinism holds across fresh-interpreter replays AND across the three canonical GLBs measured twice each in separate processes; the record hash includes every measured value",
   "the_space_pause_could_be_transient": "both the direct app probe and the HF API were queried twice; the API carries runtime.stage=PAUSED durably - recorded as OBSERVED infrastructure state, not inferred"
  },
- "next_decisive_test": "restart the canonical Space (owner action), then one fresh user-path run through the owner-transport fix proves the Art. LXXI triple GREEN on a main SHA; separately, the first Coder-1 sensitivity result (any parameter -> response record with a declared basis) exercises the sensitivity panel on real data for the first time"
+ "next_decisive_test": "restart the canonical Space (owner action), then one fresh user-path run through the owner-transport fix proves the Art. LXXI triple GREEN on a main SHA; separately, the first Coder-1 sensitivity result (any parameter -> response record with a declared basis) exercises the sensitivity panel on real data for the first time",
+ "pull_request": {
+  "number": 6,
+  "url": "https://github.com/prateekm1007/discovery-evidence-fabric/pull/6",
+  "base_ref": "main",
+  "base_sha": "d99e895c589964e4de3e92b994acd69ca9fbc942",
+  "head_ref": "r450-c2/visual-feedback-layer",
+  "head_sha_at_open": "88848afb06806c43744a2948aca91287e450a884",
+  "covers": "the R448 (#4) and R449 (#5) lab commits are ancestors of this branch - one review closes the whole lab line"
+ },
+ "push_verification": {
+  "ls_remote_branch_sha": "88848afb06806c43744a2948aca91287e450a884",
+  "local_head_at_push": "88848afb06806c43744a2948aca91287e450a884",
+  "verified": true,
+  "method": "git ls-remote origin refs/heads/r450-c2/visual-feedback-layer (Art. XXIII)"
+ }
 }
