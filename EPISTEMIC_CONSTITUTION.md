@@ -1,6 +1,6 @@
 # Epistemic Constitution — Research & Coding
 
-**Version:** 2.3.0
+**Version:** 2.4.0
 **Ratified:** 2026-08-19
 **Amended:** 2026-08-20 (Articles XXIII–XXXIV — Anti-Gaming, Anti-Entropy, Anti-Hallucination Principles; Article XXXV — Closed-Loop Epistemic Control as the Completion Standard)
 **Amended:** 2026-08-25 (Article XXXVI — TECHNOLOGY_TRANSFER_READY as the Manufactured-Asset Completion Standard; see R309/constitution/ARTICLE_XXXVI_TECHNOLOGY_TRANSFER_READY.md)
@@ -11,6 +11,7 @@
 **Amended:** 2026-09-05 (Articles LXIV–LXIX — per external audit findings across six rounds of live review: superseded implementations left coexisting for months, an owner-gated decision left idle for four rounds without escalation, commercial figures drifting toward unsourced assertion in buyer dossiers, every review to date being AI-on-AI with no tracked independence field, and the standing risk — surfaced ahead of the R411 autonomous cross-domain discovery mission — that a fixed portfolio quota could pressure the bar down on a final candidate, or that broad discovery could quietly collapse back into the domain the system already knows best. These six articles are audit-derived, not aspirational: each responds to a specific, verified, repeated failure mode, not a hypothetical one.)
 **Amended:** 2026-09-07 (Article LXX — the Operational Language Rule (English Only), per the operator's CODER NEXT DIRECTIVE section 1; see `R419/constitution/ARTICLE_LXX_OPERATIONAL_LANGUAGE_RULE.md`)
 **Amended:** 2026-09-10 (Article LXXI is RESERVED; Article LXXII — No 3D Artifact Ships Without Passing the Visual Compiler, per the operator's R441 World-Class 3D Pipeline Constitution directive: the pipeline, not prompts, guarantees presentation quality; see `R441/constitution/ARTICLE_LXXII_VISUAL_COMPILER.md`)
+**Amended:** 2026-09-12 (Article LXXI — The Deployed Production URL Is the Delivery Standard, filling the slot reserved on 2026-09-10, per operator directive: a coder round is complete only when its work is at origin/main, the operator-specified production URL serves that exact commit, and a health check confirms deployment identity == pushed SHA; closes the R439 "patch bundle" failure mode)
 **Authority:** Constitutional — supersedes all coding directives, gate results, and research priorities
 **Scope:** Governs both research output AND modifications to the epistemic machinery itself, AND — from v2.0.0 — what the machine may call a discovery or an invention
 
@@ -2002,6 +2003,74 @@ artifacts create translation ambiguity no single reader can resolve).
 See the full text at `R419/constitution/ARTICLE_LXX_OPERATIONAL_LANGUAGE_RULE.md`
 for the scope table, enforcement mechanics, and the verification trail
 (old/new hashes, amendment process, certification chain).
+
+---
+
+## Article LXXI — The Deployed Production URL Is the Delivery Standard
+
+**Ratified:** 2026-09-12 (operator directive — the ratifying instrument for the slot this constitution reserved on 2026-09-10)
+**Amends:** Constitution v2.3.0 → v2.4.0
+**Sponsor:** Operator directive (constitution amendment: "add these principles to the constitution Article LXXI")
+
+A coder round is not complete until its work is at origin/main AND the declared production deployment at the operator-specified URL reflects that commit AND a health check has confirmed the deployment identity matches the pushed SHA. A commit that exists only in a local workspace is UNRELEASED. An unreleased patch bundle is not a delivery.
+
+### Section 1 — Three conditions for round completion
+
+Every coder round that produces code changes must satisfy all three before the round record is written as complete:
+
+1. `git push origin main` confirmed — `ls-remote origin refs/heads/main` matches the commit SHA
+2. Render/deployment triggered at the exact commit SHA — verified via `/api/version` `engine_commit` or equivalent health artifact
+3. Health check passes — `deployment_drift`: GREEN, BUILD == RUNNING == HEALTH == {SHA}
+
+If any of the three conditions cannot be satisfied within the round, the round record must declare `DELIVERY_BLOCKED` with the specific blocker and the operator action required. A blocked delivery is not a failed round — honest blocking is correct behavior. But it must be named, not silently omitted.
+
+### Section 2 — The round record must carry the deployment tuple
+
+Every round record `{ROUND}_ROUND_RECORD.json` must carry:
+
+```json
+"production_deployment": {
+  "target_sha": "...",
+  "deployed_sha": "...",
+  "deploy_id": "...",
+  "health_check_result": "GREEN | BLOCKED | DEGRADED",
+  "drift": "GREEN | DRIFT | UNKNOWN",
+  "blocked_by": "...",
+  "what_unblocks": "..."
+}
+```
+
+`deployed_sha != target_sha` → `DELIVERY_BLOCKED` regardless of other fields.
+
+### Section 3 — Local proof is not production proof (extends BS-003)
+
+A local sandbox run, a bridge test, a captured fixture, a manually executed script, or a "the tests pass" claim is not a production delivery. The only evidence of production delivery is:
+
+1. `ls-remote origin` showing the target SHA on main
+2. The production health endpoint returning `engine_commit == target_sha`
+3. These two facts recorded in the round record
+
+### Section 4 — Credential-blocked rounds must escalate immediately (extends Art. LXV)
+
+If a round cannot push to origin/main or cannot trigger a production deployment because credentials are unavailable or invalid, that is a `DELIVERY_BLOCKED` event. It must appear as the single most prominent item in the round record, with:
+
+1. the exact missing credential named
+2. the operator action required
+3. the escalation count (incremented each round it remains blocked)
+
+A credential blocker that persists more than two consecutive rounds must appear as the first item in the next auditor report with its cost stated. Work that cannot reach production must not accumulate in local sandboxes.
+
+### Section 5 — This article does not authorize bypassing the epistemic loop
+
+Deploying faster does not justify skipping any step of the 16-step constitutional coding loop. The commitment sequence is:
+
+```text
+IMPLEMENT → ADVERSARIAL TEST → REPLAY FROM CLEAN STATE → COMMIT → PUSH → DEPLOY → HEALTH VERIFY → ROUND RECORD
+```
+
+Speed is not a constitutional value. Deployment is the final step of a completed round, not a replacement for the earlier steps.
+
+Constitutional basis: Extends Article XXIII (never infer repository state from local state) and Article XXXIX (buyer-distribution repository is the final authority) to the production deployment: the deployed service is the product authority; work that doesn't reach it hasn't shipped. Closes the failure mode that produced the R439 "patch bundle" — 16/16 green tests in an ephemeral sandbox that was never pushed.
 
 ---
 
