@@ -346,3 +346,23 @@ Work Log:
 
 Stage Summary:
 - R447-C2 COMPLETE: ONE canonical Space (prateekm1/toscanini-prod-validation) at engine c221fe6-pinned build carrying the full Coder-2 visual implementation; the duplicate Space deleted with custody; the single geometry authority verified; the complete visual regression green; no thresholds touched; no canonical engineering/discovery/package logic changed
+
+---
+Task ID: CONSTITUTION-RATIFICATION-LXXI (operator directive, no round ID assigned)
+Agent: Coder 2 (main session)
+Task: Ratify Article LXXI - The Deployed Production URL Is the Delivery Standard - into EPISTEMIC_CONSTITUTION.md per operator directive, and deliver it at origin per the ratified article's own standard.
+
+Work Log:
+- Article LXXI inserted verbatim from the operator directive between LXX and LXXII (the slot RESERVED by v2.3.0 on 2026-09-10): preamble + Sections 1-5 + constitutional basis preserved word-for-word; markdown structure matched to house style (h3 sections, numbered conditions, json/text fences). The v2.3.0 reservation header line retained as history (append-only); new Amended line + Version 2.3.0 -> 2.4.0.
+- Constitution hash 7084be64 (v2.3.0) -> b54a1be9bcbdd2465d0b034e1e1f472f80b87174209c0d534b7d9e1223e649b2 (v2.4.0); article sequence verified LXX(1969) -> LXXI(2009) -> LXXII(2077); +70/-1 lines, no other file touched.
+- Commit 6f50e67 pushed to origin/main; ls-remote verified 6f50e670ede87a811d2595ad840a9388549a93a2 == local HEAD (ratified Art. LXXI Section 1 condition 1 GREEN - the article proved itself on its first delivery).
+- HEALTH CHECK EXECUTED (Art. LXXI Section 1 condition 3, voluntarily for this docs-only commit): /api/version + /api/health on https://prateekm1-toscanini-prod-validation.hf.space.
+- PRODUCTION IDENTITY FINDING (named, not silently omitted): the Space serves engine_commit 23910247426618fb701d659c20c847960274fd1c - internally consistent (BUILD_ARTIFACT == RUNNING == HEALTH == that SHA, identity_tamper=false, deployment_drift GREEN by the build's internal rule, baked_at 2026-09-11T23:12:05Z, Space rev 48cbba34a491) - but 2391024 resolves to NO commit in prateekm1007/discovery-evidence-fabric: GitHub API commits/{sha} -> 422 "No commit found"; object absent after fetching current main; no branch tip matches. Space repo history shows the provenance: after R447-C2's records-alignment deploy e9ba12fc (2026-09-11T22:32Z, GitHub main c221fe6), a parallel R447 session deployed "engine tree at 5bb4b7b2c65f" (22:58Z) then "engine tree at 239102474266 (the Phase 1/2/6/7 fixes: the geometry identity judgment)" (22:59Z) + README frontmatter restore 48cbba34 (23:11Z) - an engine state that reached production WITHOUT ever reaching origin/main. operator_declared_commit=null.
+- The Space serves constitution_version 2.3.0: the ratified v2.4.0 (6f50e67) is not yet reflected at the production URL.
+
+production_deployment tuple (per ratified Art. LXXI Section 2; this ratification is docs-only, conditions 2/3 evaluated against the observed production state):
+{ "target_sha": "6f50e670ede87a811d2595ad840a9388549a93a2", "deployed_sha": "23910247426618fb701d659c20c847960274fd1c (pre-existing engine build; docs-only commit, no engine delta)", "deploy_id": "hf: prateekm1/toscanini-prod-validation rev 48cbba34a491fa2dafc61f0421de37d929c5be20", "health_check_result": "GREEN", "drift": "DRIFT", "blocked_by": "deployed engine_commit 2391024 exists in NO GitHub ref (UNRELEASED per Art. LXXI Section 1); production serves constitution 2.3.0, not ratified 2.4.0; operator_declared_commit=null", "what_unblocks": "(a) Coder 1 pushes the 2391024/5bb4b7b2 engine trees (Phase 1/2/6/7 fixes) to origin/main, or the operator rules origin/main authoritative, THEN (b) a records-alignment Space deploy serves constitution 2.4.0 at a pushed SHA (R447-C2 precedent e9ba12fc)" }
+
+Stage Summary:
+- Constitution v2.4.0 ratified and delivered at origin/main 6f50e67 (push condition GREEN); the article's first live application immediately surfaced a real production-provenance drift: the canonical Space's engine (2391024, carrying Coder 1's unpushed "Phase 1/2/6/7" geometry-identity fixes) is UNRELEASED by the article's own definition. NOT fixed unilaterally - the unpushed tree contains Coder 1's engine work; redeploying from main would roll it back in production. Escalated per Art. LXV: owner/Coder-1 decision required (push the tree to main, or rule main authoritative), then re-align the Space.
+- reviewer_provenance=AI_REVIEW.
