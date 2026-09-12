@@ -302,3 +302,28 @@ convergence and precedence, second-visitor enumeration-safe 404, five
 forged-token bypass attempts, CHIPS-vs-Lax cookie shapes by context, the
 SSE owner parameter (granted/denied/wrong-owner), and the route-wiring
 contract pins.
+
+## R450-C2 addendum (2026-09-12) — the Visual Feedback Layer: the improvement loop, rendered
+
+Operator directive R450-C2 (build the visual feedback layer, not a visual
+discovery engine). Coder 2 presents and interrogates the engineering truth
+Coder 1 establishes; visual presentation is not engineering validation.
+The R448/R449 lab line continues as laboratory/provisional capability.
+
+| Component | Module | Notes |
+|---|---|---|
+| Trajectory projection | `visual-lab/trajectory/schema.py` | TOSCANINI_TRAJECTORY/1.0.0 — deterministic projection of the engine's INVENTION_LINEAGE into V1 -> FAILURE -> CAUSE -> DIRECTION -> MUTATION -> V2 -> UPDATE; badges derived fail-closed from provenance fields (MEASURED requires an R370G-shaped event), the lineage's own INVENTION_* vocabulary carried verbatim; no timestamps, no invented ids — same lineage bytes -> byte-identical record |
+| Trajectory guard | `visual-lab/guard/trajectory_guard.py` | the presentation/validation boundary, mechanically: re-labeled status vocabulary, unknown badges, MEASURED-without-event, AI geometry as ENGINEERING_GEOMETRY, unevaluated predictions claiming HELD, and production-claim vocabulary all fail closed |
+| Trajectory viewer | `TOSCANINI_UI/webapp/components/trajectory/` | TrajectoryViewer (+ BeforeAfterDelta table, PREDICTION with the closed outcome set, StateBadge five-class vocabulary, BadgeLegend) + CausalTrajectory (six aggregated stages) + SensitivityPanel (renders Coder-1-supplied parameter -> response verbatim with its declared basis; honest absence otherwise); the dossier renders the viewer ONLY when the backend serves a TOSCANINI_TRAJECTORY record |
+| Lab surface | `TOSCANINI_UI/webapp/app/lab/trajectory/page.tsx` | banner-labeled VISUAL FEEDBACK LABORATORY (provisional, not production truth): the REAL R445 lineage projection + clearly-labeled SCHEMA EXAMPLES (structured mutation shape, sensitivity contract) |
+| Benchmark progression | `visual-lab/benchmark/trajectory_dimensions.py` + protocol v0.2.0-proposed | the evaluation question upgraded (understanding without false engineering implications, not prettier meshes): before_after_correspondence, engineering_feature_visibility, lineage_preservation, artifact_determinism — all measured raw on the sha-verified canonical GLBs; fidelity and presentation dimensions separated, never averaged |
+
+Battery: `visual-lab/guard/test_r450_trajectory.py` (27: determinism,
+ordering, identity/mutation deltas, uncertainty labels, AI-geometry
+authority, badge-spoof, sensitivity refusals, tamper/production-vocabulary
+attacks) + R448 guard 16 + R449 28 + metrics 8, all green; webapp tsc
+clean, `next build` green; the lab route rendered live in headless
+Chromium (DOM-verified states, transitions, badges, uncertainty label,
+delta table, prediction NOT_EVALUATED). Raw evidence: `R450/*.json`.
+The canonical Space is PAUSED at round time (infrastructure state, owner
+escalation in R450/R450_C2_ROUND_RECORD.json).

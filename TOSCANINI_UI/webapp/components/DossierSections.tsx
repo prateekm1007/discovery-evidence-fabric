@@ -29,6 +29,8 @@ import type {
   FalsificationRecord,
 } from "@/lib/types";
 import { EpistemicBadge } from "./ScienceEvents";
+import { isTrajectoryRecord } from "@/lib/trajectory";
+import TrajectoryViewer from "./trajectory/TrajectoryViewer";
 
 // ---- render availability (R446-C2 WS3) --------------------------------------
 // The typed render status is ALWAYS surfaced: a skipped or suppressed
@@ -153,6 +155,12 @@ export type DesignTabData = DossierTab & {
   evolution?: EvolutionRowData[] | null;
   generation_id?: string | null;
   generation_count?: number | null;
+  // R450-C2: the canonical trajectory projection (TOSCANINI_TRAJECTORY),
+  // served by the backend when the run carries an INVENTION_LINEAGE.
+  // Absent -> the panel does not render (honest absence, zero behavior
+  // change). The frontend validates the schema and renders verbatim;
+  // it never derives trajectory content client-side.
+  trajectory?: unknown;
 };
 
 // ---- honest-state helpers ---------------------------------------------------
@@ -494,6 +502,12 @@ export function ModelDetailsSection({
               </button>
             )}
           </div>
+        </div>
+      )}
+
+      {isTrajectoryRecord(d.trajectory) && (
+        <div className="ov-block" data-trajectory>
+          <TrajectoryViewer trajectory={d.trajectory} />
         </div>
       )}
 

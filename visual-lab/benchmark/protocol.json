@@ -1,74 +1,139 @@
 {
-  "protocol_id": "TOSCANINI-VISUAL-BENCHMARK-PROTOCOL",
-  "version": "0.1.0-proposed",
-  "status": "PROPOSED_PENDING_OWNER_RATIFICATION",
-  "round": "R448",
-  "reviewer_provenance": "AI_REVIEW",
-  "constitution_version": "2.3.0",
-  "principles": {
-    "no_fabrication": "A benchmark result exists only when a HF Jobs run produced a typed VISUAL_BENCHMARK_RECORD (Art. VI, XVI).",
-    "fail_closed": "Every missing dependency is a typed failure code, never an improvised substitution (Art. IV).",
-    "unrun_is_not_rejected": "Candidates without runs stay NOT_RUN; infrastructure failure is INCOMPLETE_*, never REJECTED_* (Art. LXI).",
-    "presentation_only": "All benchmark outputs are COMPUTATIONAL_RENDER; metrics measure presentation acceptance, never engineering validation (Art. XXVIII, LXXII).",
-    "single_geometry_authority": "Reference inputs are always derived from Coder 1 canonical geometry through the canonical renderer; no second geometry source (Art. X, LXXII).",
-    "baseline_supremacy": "The canonical GLB is the fixed baseline; the same instrument (metrics.py) measures every candidate arm (Art. XLVII).",
-    "referee_independence": "Multi-view consistency scoring uses Depth Anything 3 as an instrument separate from every generator (Art. XLV)."
+ "protocol_id": "TOSCANINI-VISUAL-BENCHMARK-PROTOCOL",
+ "version": "0.2.0-proposed",
+ "status": "PROPOSED_PENDING_OWNER_RATIFICATION",
+ "round": "R448 (v0.1.0) -> R450-C2 (v0.2.0)",
+ "reviewer_provenance": "AI_REVIEW",
+ "constitution_version": "2.3.0",
+ "principles": {
+  "no_fabrication": "A benchmark result exists only when a HF Jobs run produced a typed VISUAL_BENCHMARK_RECORD (Art. VI, XVI).",
+  "fail_closed": "Every missing dependency is a typed failure code, never an improvised substitution (Art. IV).",
+  "unrun_is_not_rejected": "Candidates without runs stay NOT_RUN; infrastructure failure is INCOMPLETE_*, never REJECTED_* (Art. LXI).",
+  "presentation_only": "All benchmark outputs are COMPUTATIONAL_RENDER; metrics measure presentation acceptance, never engineering validation (Art. XXVIII, LXXII).",
+  "single_geometry_authority": "Reference inputs are always derived from Coder 1 canonical geometry through the canonical renderer; no second geometry source (Art. X, LXXII).",
+  "baseline_supremacy": "The canonical GLB is the fixed baseline; the same instrument (metrics.py) measures every candidate arm (Art. XLVII).",
+  "referee_independence": "Multi-view consistency scoring uses Depth Anything 3 as an instrument separate from every generator (Art. XLV)."
+ },
+ "fixtures": {
+  "case-A": {
+   "description": "bench-p11-spindle-thermal-drift",
+   "canonical_glb_sha256_prefix": "cd4a48a5"
   },
-  "fixtures": {
-    "case-A": {"description": "bench-p11-spindle-thermal-drift", "canonical_glb_sha256_prefix": "cd4a48a5"},
-    "case-B": {"description": "bench-p04-pump-cavitation", "canonical_glb_sha256_prefix": "466d7b59"},
-    "case-C": {"description": "bench-p05-bridge-bearing-aging", "canonical_glb_sha256_prefix": "b4fdfda5"},
-    "resolution": "Full hashes and GLB bytes are resolved from the canonical repo at run time and verified by sha256 before use; prefixes are the R446-HF-PRO cross-host reproducibility anchors."
+  "case-B": {
+   "description": "bench-p04-pump-cavitation",
+   "canonical_glb_sha256_prefix": "466d7b59"
   },
-  "procedure": [
-    "1. Resolve the case fixture GLB from the canonical repo; verify sha256 against the anchor prefix.",
-    "2. Read the candidate's registry entry; check license gate (COMMERCIAL_BLOCKED requires --internal-eval-only and stamps the record).",
-    "3. Probe hardware live (torch cuda mem_get_info); compare against the entry's vram_requirement claim; record measured peak.",
-    "4. Emit canonical reference inputs via the Coder 2 canonical renderer (typed hook; no ad-hoc renderer).",
-    "5. Run the candidate adapter on HF Jobs hardware; collect output mesh + timing + measured peak VRAM.",
-    "6. Compute geometry-fidelity metrics with benchmark/metrics.py (deterministic, seeded).",
-    "7. Score multi-view consistency with the Depth Anything 3 referee when reference views were supplied.",
-    "8. Append observed failure modes (typed codes) to the registry entry.",
-    "9. Write the typed record; the registry entry's benchmark status moves NOT_RUN -> COMPLETED only on a completed record."
-  ],
-  "metrics": {
-    "normalized_chamfer_p95_over_diag": "95th-percentile two-sided chamfer distance between canonical and candidate surface samples, normalized by the canonical bbox diagonal (rotation invariant).",
-    "max_abs_axis_deviation_pct": "Maximum per-axis bounding-box dimension deviation, axes sorted by length on both sides (rotation invariant).",
-    "volume_deviation_pct": "Signed volume deviation of candidate vs canonical.",
-    "multi_view_depth_consistency": "Cross-view depth agreement of generated views scored by the Depth Anything 3 referee (metric variant).",
-    "material_channel_inventory": "PBR channels present on the candidate output; visual differentiation vs the raw GLB identity.",
-    "part_count_and_identity": "Number of separated parts and whether part boundaries respect engineering component identity."
+  "case-C": {
+   "description": "bench-p05-bridge-bearing-aging",
+   "canonical_glb_sha256_prefix": "b4fdfda5"
   },
-  "thresholds": {
-    "ratification": "PENDING_OWNER - numbers below are PROPOSED, carry no directive provenance yet, and must not gate anything until ratified (Art. XXVII).",
-    "proposed": {
-      "normalized_chamfer_p95_over_diag_max": 0.02,
-      "max_abs_axis_deviation_pct_max": 2.0,
-      "note": "Values are initial engineering proposals to be calibrated on the first measured runs, then frozen before any approval use."
-    }
-  },
-  "decision_rubric": {
-    "APPROVE_PRESENTATION_USE": "All ratified fidelity thresholds pass AND license gate permits the intended surface AND multi-view referee accepts - grants presentation role ONLY.",
-    "REJECT_GEOMETRY_DRIFT": "Fidelity beyond ratified thresholds - candidate excluded from its proposed role; observed failure recorded.",
-    "REJECT_LICENSE": "License gate blocks the intended surface - no benchmark output may ship regardless of quality.",
-    "approval_never_means": "Approval never grants engineering status, physical validation claims, or entry into the engineering GLB chain."
-  },
-  "typed_failure_codes": [
-    "FIXTURE_GLB_MISSING", "FIXTURE_LOAD_FAILED", "REGISTRY_MISSING",
-    "MODEL_NOT_IN_REGISTRY", "LICENSE_GATE_BLOCKED", "HARDWARE_UNAVAILABLE",
-    "HARDWARE_PROBE_UNAVAILABLE", "NO_CUDA_DEVICE", "VRAM_INSUFFICIENT",
-    "RENDERER_HOOK_MISSING", "MODEL_ADAPTER_MISSING", "MODEL_LOAD_FAILED",
-    "INTEGRATION_POINT_MISSING", "METRICS_FAILED", "REFEREE_UNAVAILABLE"
-  ],
-  "record_schema": {
-    "record_type": "VISUAL_BENCHMARK_RECORD",
-    "required_fields": [
-      "model_id", "case", "fixture_glb_sha256", "benchmark_status",
-      "epistemic_class_of_outputs", "license_gate_at_run", "hardware_probe"
-    ],
-    "reproducibility_fields": [
-      "model_id + hf revision", "adapter version", "hardware flavor",
-      "fixture sha256", "metrics seed", "code commit", "started_at"
-    ]
+  "resolution": "Full hashes and GLB bytes are resolved from the canonical repo at run time and verified by sha256 before use; prefixes are the R446-HF-PRO cross-host reproducibility anchors."
+ },
+ "procedure": [
+  "1. Resolve the case fixture GLB from the canonical repo; verify sha256 against the anchor prefix.",
+  "2. Read the candidate's registry entry; check license gate (COMMERCIAL_BLOCKED requires --internal-eval-only and stamps the record).",
+  "3. Probe hardware live (torch cuda mem_get_info); compare against the entry's vram_requirement claim; record measured peak.",
+  "4. Emit canonical reference inputs via the Coder 2 canonical renderer (typed hook; no ad-hoc renderer).",
+  "5. Run the candidate adapter on HF Jobs hardware; collect output mesh + timing + measured peak VRAM.",
+  "6. Compute geometry-fidelity metrics with benchmark/metrics.py (deterministic, seeded).",
+  "7. Score multi-view consistency with the Depth Anything 3 referee when reference views were supplied.",
+  "8. Append observed failure modes (typed codes) to the registry entry.",
+  "9. Write the typed record; the registry entry's benchmark status moves NOT_RUN -> COMPLETED only on a completed record."
+ ],
+ "metrics": {
+  "normalized_chamfer_p95_over_diag": "95th-percentile two-sided chamfer distance between canonical and candidate surface samples, normalized by the canonical bbox diagonal (rotation invariant).",
+  "max_abs_axis_deviation_pct": "Maximum per-axis bounding-box dimension deviation, axes sorted by length on both sides (rotation invariant).",
+  "volume_deviation_pct": "Signed volume deviation of candidate vs canonical.",
+  "multi_view_depth_consistency": "Cross-view depth agreement of generated views scored by the Depth Anything 3 referee (metric variant).",
+  "material_channel_inventory": "PBR channels present on the candidate output; visual differentiation vs the raw GLB identity.",
+  "part_count_and_identity": "Number of separated parts and whether part boundaries respect engineering component identity.",
+  "before_after_correspondence": "Node-identity Jaccard + sorted-axis dimension deviation + normalized chamfer between BEFORE and AFTER geometry (the recorded mutation must be visible as a distinct delta; identity pairs must read unchanged).",
+  "engineering_feature_visibility": "Per-component bbox presence + pairwise bbox separation fractions from the canonical GLB bytes \u2014 whether declared engineering components are spatially knowable at all (measured from geometry, never from pixels).",
+  "lineage_preservation": "sha256 re-measurement of every declared chain hop (canonical root -> artifact); missing -> INCOMPLETE, mismatch -> FAIL, never a pass.",
+  "artifact_determinism": "Repeated measurement of the same bytes must yield the byte-identical record; instrument drift voids evidential weight (Art. LXII)."
+ },
+ "thresholds": {
+  "ratification": "PENDING_OWNER - numbers below are PROPOSED, carry no directive provenance yet, and must not gate anything until ratified (Art. XXVII).",
+  "proposed": {
+   "normalized_chamfer_p95_over_diag_max": 0.02,
+   "max_abs_axis_deviation_pct_max": 2.0,
+   "note": "Values are initial engineering proposals to be calibrated on the first measured runs, then frozen before any approval use."
   }
+ },
+ "decision_rubric": {
+  "APPROVE_PRESENTATION_USE": "All ratified fidelity thresholds pass AND license gate permits the intended surface AND multi-view referee accepts - grants presentation role ONLY.",
+  "REJECT_GEOMETRY_DRIFT": "Fidelity beyond ratified thresholds - candidate excluded from its proposed role; observed failure recorded.",
+  "REJECT_LICENSE": "License gate blocks the intended surface - no benchmark output may ship regardless of quality.",
+  "approval_never_means": "Approval never grants engineering status, physical validation claims, or entry into the engineering GLB chain."
+ },
+ "typed_failure_codes": [
+  "FIXTURE_GLB_MISSING",
+  "FIXTURE_LOAD_FAILED",
+  "REGISTRY_MISSING",
+  "MODEL_NOT_IN_REGISTRY",
+  "LICENSE_GATE_BLOCKED",
+  "HARDWARE_UNAVAILABLE",
+  "HARDWARE_PROBE_UNAVAILABLE",
+  "NO_CUDA_DEVICE",
+  "VRAM_INSUFFICIENT",
+  "RENDERER_HOOK_MISSING",
+  "MODEL_ADAPTER_MISSING",
+  "MODEL_LOAD_FAILED",
+  "INTEGRATION_POINT_MISSING",
+  "METRICS_FAILED",
+  "REFEREE_UNAVAILABLE"
+ ],
+ "record_schema": {
+  "record_type": "VISUAL_BENCHMARK_RECORD",
+  "required_fields": [
+   "model_id",
+   "case",
+   "fixture_glb_sha256",
+   "benchmark_status",
+   "epistemic_class_of_outputs",
+   "license_gate_at_run",
+   "hardware_probe"
+  ],
+  "reproducibility_fields": [
+   "model_id + hf revision",
+   "adapter version",
+   "hardware flavor",
+   "fixture sha256",
+   "metrics seed",
+   "code commit",
+   "started_at"
+  ]
+ },
+ "evaluation_question": {
+  "amended_by": "R450-C2 (operator directive section 7)",
+  "was": "Does the visual model produce a prettier mesh?",
+  "now": "Does the visual model improve human understanding of the engineering state without introducing false engineering implications?",
+  "dimension_split": {
+   "engineering_fidelity": [
+    "normalized_chamfer_p95_over_diag",
+    "max_abs_axis_deviation_pct",
+    "volume_deviation_pct",
+    "part_count_and_identity",
+    "before_after_correspondence",
+    "lineage_preservation"
+   ],
+   "presentation_quality": [
+    "multi_view_depth_consistency",
+    "material_channel_inventory",
+    "engineering_feature_visibility"
+   ],
+   "instrument_integrity": [
+    "artifact_determinism"
+   ],
+   "note": "engineering fidelity and presentation quality are reported SEPARATELY and never averaged into one score"
+  }
+ },
+ "amendment_history": [
+  {
+   "version": "0.2.0-proposed",
+   "round": "R450-C2",
+   "date": "2026-09-12",
+   "change": "added the four trajectory-understanding dimensions (before_after_correspondence, engineering_feature_visibility, lineage_preservation, artifact_determinism); recorded the upgraded evaluation question; engineering-fidelity and presentation-quality dimensions explicitly separated"
+  }
+ ]
 }

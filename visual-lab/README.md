@@ -27,6 +27,27 @@ Architecture: **canonical HF Space = stable product · HF GPU Jobs = laboratory
 · HF Storage Buckets = models/cache/artifacts · visual compiler = the only
 publisher.** No experimental model is ever installed in the production Space.
 
+## R450-C2 — the Visual Feedback Layer (trajectory)
+
+The lab now also presents the IMPROVEMENT LOOP itself (`trajectory/`):
+
+- `trajectory/schema.py` — TOSCANINI_TRAJECTORY/1.0.0: the deterministic
+  projection of the engine's INVENTION_LINEAGE into
+  V1 -> FAILURE -> CAUSE -> DIRECTION -> MUTATION -> V2 -> UPDATE,
+  with the five-class epistemic badge vocabulary
+  (MEASURED / SIMULATED / INFERRED / PROPOSED / UNVERIFIED) derived
+  fail-closed from provenance fields.
+- `guard/trajectory_guard.py` — the presentation/validation boundary for
+  the trajectory surface (AI mesh never engineering truth; MEASURED needs
+  an R370G event; no production-claim vocabulary).
+- `guard/test_r450_trajectory.py` — the trajectory visual-regression
+  battery (27 attacks).
+- `benchmark/trajectory_dimensions.py` — the four new benchmark dimensions
+  (before/after correspondence, engineering-feature visibility, lineage
+  preservation, artifact determinism), measured raw on the canonical GLBs.
+- Webapp: `TOSCANINI_UI/webapp/components/trajectory/` + the lab route
+  `app/lab/trajectory` (banner-labeled provisional capability).
+
 ## Contents
 
 | Path | What it is |
