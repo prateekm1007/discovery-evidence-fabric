@@ -247,6 +247,65 @@ class A2RetrievalAdapter(BaseAdapter):
         items, report = fabric.retrieve(env.problem)
         stats = report.get("retrieval_stats", {})
         diversity = report.get("retrieval_diversity", {})
+        # R449: the EVIDENCE-FABRIC channel — ADDITIVE federated evidence
+        # from the HF-hosted production sources (patents / engineering
+        # cases / materials / chemistry), normalized into the canonical
+        # EvidenceRecord and merged into the SAME evidence pool the V2
+        # fabric filled (engine-compatible items; the V2 fabric itself
+        # is untouched). The channel is disabled with
+        # ENGINE_EVIDENCE_FABRIC=0 (the comparison experiment's Arm A).
+        ef_provenance = None
+        try:
+            from discovery_fabric import evidence_fabric as _ef
+            if _ef.enabled():
+                ef_items, ef_report = _ef.retrieve_evidence(env.problem)
+                if ef_items:
+                    # additive merge: evidence-fabric items carry the a2
+                    # schema + `evidence_fabric` fields; ids are
+                    # deterministic (ev:<hash>) so dedup with the V2 pool
+                    # is by id
+                    have = {i.get("id") for i in items}
+                    items = items + [i for i in ef_items
+                                     if i.get("id") not in have]
+                ef_provenance = {
+                    "version": ef_report.get("fabric_version"),
+                    "federated": True,
+                    "production_sources": sorted({
+                        c.get("source_id") for c in
+                        ef_report.get("channels", [])
+                        if c.get("state") in ("SUCCESS", "EMPTY_RESULT")}),
+                    "channels": len(ef_report.get("channels", [])),
+                    "unknown_channels": len(
+                        ef_report.get("source_failures", [])),
+                    "substitutions": ef_report.get("substitutions", []),
+                    "coverage_limitations": ef_report.get(
+                        "coverage_limitations", []),
+                    "pool_items": ef_report.get("pool", {}).get("items", 0),
+                    "records_in_custody": len(
+                        ef_report.get("records", [])),
+                    "report_persisted": "EVIDENCE_FABRIC_REPORT.json",
+                }
+        except Exception as _ef_exc:  # noqa: BLE001 — infra, not verdict
+            ef_provenance = {
+                "state": "CHANNEL_ERROR",
+                "reason": f"{type(_ef_exc).__name__}: {_ef_exc}"[:300],
+                "note": "the evidence-fabric channel failed; the V2 fabric "
+                        "pool is unchanged — an infrastructure state, "
+                        "never a scientific result (Art. LXI)",
+            }
+        if ef_provenance is not None:
+            # persist the full fabric report inside the run directory
+            # (custody: an independent auditor can reconstruct the
+            # federated retrieval event from it)
+            try:
+                import json as _json
+                _p = Path(run_ctx.get("out_dir") or ".")
+                _p.mkdir(parents=True, exist_ok=True)
+                (_p / "EVIDENCE_FABRIC_REPORT.json").write_text(
+                    _json.dumps(ef_report, indent=1, ensure_ascii=False,
+                                default=str))
+            except Exception:  # noqa: BLE001 — best-effort persistence
+                pass
         return _engine_result(
             {"evidence": items,
              "evidence_ids": [i.get("id", "") for i in items],
@@ -274,6 +333,7 @@ class A2RetrievalAdapter(BaseAdapter):
                                     "retrieval_blind_spots", []),
                                 "canonical_record_count": report.get(
                                     "canonical_record_count"),
+                                "evidence_fabric": ef_provenance,
                             }}},
             retrieved_count=len(items),
             retrieval_fabric_version="V2")

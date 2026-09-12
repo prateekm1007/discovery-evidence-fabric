@@ -1,0 +1,296 @@
+{
+ "artifact_type": "EVIDENCE_RETRIEVAL_RUN",
+ "round": "R449",
+ "created_at_utc": "2026-09-12T03:39:08+00:00",
+ "reviewer_provenance": "AI_REVIEW",
+ "problem": {
+  "problem_id": "ui_degrading_seawater_intake_condensers_coast_182222",
+  "user_text": "Marine growth and chloride corrosion are degrading the seawater intake condensers of a coastal combined-cycle power plant: the 90/10 copper-nickel tubing develops pitting within 18 months in the polluted estuary water, biocide-resistant biofilm thickens the thermal resistance by 40 percent between cleanings, and each retubing outage costs 2.1 million dollars over a 5-week shutdown. Design a condenser tube-surface and water-treatment arrangement that keeps the clean-tube heat-transfer coefficient above 4500 watts per square meter kelvin, limits pitting penetration to under 0.1 millimeters per year, avoids environmental discharge of residual oxidants into the estuary, and sustains a 12-year retubing interval.",
+  "freshness": "genuinely fresh — never submitted to any environment prior to this round; authored for R449 Phase 6"
+ },
+ "source_selection": {
+  "registry": "R449/EVIDENCE_SOURCE_REGISTRY.json",
+  "production_sources": [
+   "wopto",
+   "openfoam_cases",
+   "colabfit_mp",
+   "lemat_rho",
+   "qm9",
+   "chemrag_reactions"
+  ],
+  "pending": [
+   "uspto_patents",
+   "openalex_mirror",
+   "s2orc_abstracts",
+   "cadgenbench"
+  ]
+ },
+ "queries": [
+  "marine growth chloride corrosion",
+  "documented problem degrading seawater intake condensers coastal combined",
+  "marine growth chloride corrosion degrading seawater intake condensers"
+ ],
+ "problem_elements": [
+  "Cu",
+  "Ni"
+ ],
+ "documents_retrieved": {
+  "arm_a_v2_fabric_items": 13,
+  "arm_b_total_items": 25,
+  "arm_b_evidence_fabric_items": 12,
+  "arm_b_evidence_fabric_sources": [
+   "colabfit_mp",
+   "lemat_rho",
+   "openfoam_cases",
+   "wopto"
+  ]
+ },
+ "exact_evidence_spans": [
+  {
+   "evidence_id": "ev:3a085c6a1ccce12d71e22e5b",
+   "source": "wopto",
+   "document_ref": "CN-117051326-A",
+   "span_sha256": "12dec290a2fd21a0e2a144529d69ef1caa448042538c10e7691ea800cdf09f87",
+   "admissibility": "PENDING_CORROBORATION",
+   "relevance": "RELEVANT"
+  },
+  {
+   "evidence_id": "ev:f8101c2ea2b6986087c0ef92",
+   "source": "wopto",
+   "document_ref": "CN-102674745-B",
+   "span_sha256": "809b053d48bb39cd93d267ded2ecfd8944a177c1107b25bc828337d2f2aecc0e",
+   "admissibility": "PENDING_CORROBORATION",
+   "relevance": "RELEVANT"
+  },
+  {
+   "evidence_id": "ev:7f93effc64b50e599b788c10",
+   "source": "wopto",
+   "document_ref": "CN-114605096-A",
+   "span_sha256": "a89ab54c439c1aa13fbded1c8ff8a88705fd333b2211063ccc6ac098c22cd3da",
+   "admissibility": "PENDING_CORROBORATION",
+   "relevance": "RELEVANT"
+  },
+  {
+   "evidence_id": "ev:98091bcf91c3a65621552a4e",
+   "source": "wopto",
+   "document_ref": "CN-113484229-B",
+   "span_sha256": "bbc445a275b578d4d0920213eacfee6f20a7b1dd812971588714ba3a62b93bd8",
+   "admissibility": "PENDING_CORROBORATION",
+   "relevance": "RELEVANT"
+  },
+  {
+   "evidence_id": "ev:038c5d02f7fd6698b4063e58",
+   "source": "openfoam_cases",
+   "document_ref": "<|im_start|>system\nYou are an expert OpenFOAM CFD engineer with deep knowledge of computational fluid dynamics, turbulence modelling, mesh generation, and numerical methods. When given a simulation request you:\n\n1. Analyse the flow physics: geometry, Reynolds number, flow regime,    compressibility, heat transfer, multiphase, and turbulence model.\n2. Choose the correct OpenFOAM solver based on problem physics:\n   - simpleFoam      : steady-state incompressible\n   - icoFoam         : transient laminar incompressible (Re < 2300)\n   - pimpleFoam      : transient turbulent incompressible\n   - rhoSimpleFoam   : steady compressible (density varies, e.g. Ma > 0.3)\n   - rhoPimpleFoam   : transient compressible\n   - buoyantSimpleFoam  : steady with buoyancy / heat transfer\n   - buoyantPimpleFoam  : transient with buoyancy / heat transfer\n   - interFoam       : VOF two-phase / free-surface (water + air)\n   If the user specifies a solver, use it; otherwise infer from the physics.\n3. Select turbulence model: laminar (Re<2300), kOmegaSST (most turbulent cases),    kEpsilon (high-Re free-shear flows).\n4. Specify mesh strategy and boundary conditions for each patch.\n5. Generate complete, production-quality OpenFOAM case files for 0/, constant/,    and system/ directories.\n\nYour response format:\n## CFD Analysis\nBrief engineering rationale (solver choice, turbulence model, mesh notes, expected physics).\n\n## OpenFOAM Case Files\nComplete file contents for all required OpenFOAM dictionaries.\n<|im_end|>\n<|im_start|>user\nflat plate flow in a box domain: Re=3000 (transitional), L=2m, H=0.1m, 2D\n<|im_end|>\n<|im_start|>assistant\n## CFD Analysis\n\n**Geometry:** box (2D), L=2m × W=0.1m\n**Fluid:** air (ν=1.50e-05 m²/s, ρ=1.23 kg/m³)\n**Re = 3000** → laminar regime\n**Solver:** simpleFoam (steady, incompressible)\n**Turbulence:** laminar — no turbulence model (laminar)\n**Simulation score:** 0.79 (converged=True)\n**Notes:** OK | Transitional Re, use laminar solver as conservative choice.\n\n## OpenFOAM Case Files\n\n### system/controlDict\n```\n/*--------------------------------*- C++ -*----------------------------------*\\\n| =========                 |                                                 |\n| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |\n|  \\    /   O peration     | Version:  v2412                                 |\n|   \\  /    A nd           | Website:  www.openfoam.com                      |\n|    \\/     M anipulation  |                                                 |\n\\*---------------------------------------------------------------------------*/\nFoamFile\n{\n    version     2.0;\n    format      ascii;\n    class       dictionary;\n    object      controlDict;\n}\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\napplication     simpleFoam;\n\nstartFrom       startTime;\nstartTime       0;\nstopAt          endTime;\nendTime         1000;\n\ndeltaT          1;\n\nwriteControl    timeStep;\nwriteInterval   100;\npurgeWrite      0;\nwriteFormat     ascii;\nwritePrecision  6;\nwriteCompression off;\ntimeFormat      general;\ntimePrecision   6;\nrunTimeModifiable true;\n\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\n```\n\n### system/fvSchemes\n```\n/*--------------------------------*- C++ -*----------------------------------*\\\n| =========                 |                                                 |\n| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |\n|  \\    /   O peration     | Version:  v2412                                 |\n|   \\  /    A nd           | Website:  www.openfoam.com                      |\n|    \\/     M anipulation  |                                                 |\n\\*---------------------------------------------------------------------------*/\nFoamFile\n{\n    version     2.0;\n    format      ascii;\n    class       dictionary;\n    object      fvSchemes;\n}\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\nddtSchemes\n{\n    default         steadyState;\n}\n\ngradSchemes\n{\n    default         Gauss linear;\n}\n\ndivSchemes\n{\n    default         none;\n    div(phi,U)      Gauss linearUpwind grad(U);\n    div(phi,p)      Gauss linear;\n    div((nuEff*dev2(T(grad(U))))) Gauss linear;\n}\n\nlaplacianSchemes\n{\n    default         Gauss linear corrected;\n}\n\ninterpolationSchemes\n{\n    default         linear;\n}\n\nsnGradSchemes\n{\n    default         corrected;\n}\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\n```\n\n### system/fvSolution\n```\n/*--------------------------------*- C++ -*----------------------------------*\\\n| =========                 |                                                 |\n| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |\n|  \\    /   O peration     | Version:  v2412                                 |\n|   \\  /    A nd           | Website:  www.openfoam.com                      |\n|    \\/     M anipulation  |                                                 |\n\\*---------------------------------------------------------------------------*/\nFoamFile\n{\n    version     2.0;\n    format      ascii;\n    class       dictionary;\n    object      fvSolution;\n}\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\nsolvers\n{\n    p\n    {\n        solver          PCG;\n        preconditioner  DIC;\n        tolerance       1.00e-06;\n        relTol          0;\n    }\n    pFinal\n    {\n        $p;\n        relTol          0;\n    }\n    U\n    {\n        solver          smoothSolver;\n        smoother        GaussSeidel;\n        tolerance       1.00e-05;\n        relTol          0;\n    }\n}\n\nSIMPLE\n{\n    nonOrthogonalCorrectors 2;\n    pRefCell        0;\n    pRefValue       0;\n}\n\nrelaxationFactors\n{\n    fields\n    {\n        p           0.4;\n    }\n    equations\n    {\n        U               0.7;\n    }\n}\n\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\n```\n\n### constant/transportProperties\n```\n/*--------------------------------*- C++ -*----------------------------------*\\\n| =========                 |                                                 |\n| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |\n|  \\    /   O peration     | Version:  v2412                                 |\n|   \\  /    A nd           | Website:  www.openfoam.com                      |\n|    \\/     M anipulation  |                                                 |\n\\*---------------------------------------------------------------------------*/\nFoamFile\n{\n    version     2.0;\n    format      ascii;\n    class       dictionary;\n    object      transportProperties;\n}\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\ntransportModel  Newtonian;\n\nnu              nu [0 2 -1 0 0 0 0] 1.5e-05;\n\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\n```\n\n### constant/turbulenceProperties\n```\n/*--------------------------------*- C++ -*----------------------------------*\\\n| =========                 |                                                 |\n| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |\n|  \\    /   O peration     | Version:  v2412                                 |\n|   \\  /    A nd           | Website:  www.openfoam.com                      |\n|    \\/     M anipulation  |                                                 |\n\\*---------------------------------------------------------------------------*/\nFoamFile\n{\n    version     2.0;\n    format      ascii;\n    class       dictionary;\n    object      turbulenceProperties;\n}\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\nsimulationType  laminar;\n\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\n```\n\n### 0/U\n```\n/*--------------------------------*- C++ -*----------------------------------*\\\n| =========                 |                                                 |\n| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |\n|  \\    /   O peration     | Version:  v2412                                 |\n|   \\  /    A nd           | Website:  www.openfoam.com                      |\n|    \\/     M anipulation  |                                                 |\n\\*---------------------------------------------------------------------------*/\nFoamFile\n{\n    version     2.0;\n    format      ascii;\n    class       volVectorField;\n    object      U;\n}\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\ndimensions      [0 1 -1 0 0 0 0];\n\ninternalField   uniform (0.44999999999999996 0 0);\n\nboundaryField\n{\n    frontAndBack\n    {\n        type            empty;\n    }\n    walls\n    {\n        type            noSlip;\n    }\n}\n\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\n```\n\n### 0/p\n```\n/*--------------------------------*- C++ -*----------------------------------*\\\n| =========                 |                                                 |\n| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |\n|  \\    /   O peration     | Version:  v2412                                 |\n|   \\  /    A nd           | Website:  www.openfoam.com                      |\n|    \\/     M anipulation  |                                                 |\n\\*---------------------------------------------------------------------------*/\nFoamFile\n{\n    version     2.0;\n    format      ascii;\n    class       volScalarField;\n    object      p;\n}\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\ndimensions      [0 2 -2 0 0 0 0];\n\ninternalField   uniform 0;\n\nboundaryField\n{\n    frontAndBack\n    {\n        type            empty;\n    }\n    walls\n    {\n        type            zeroGradient;\n    }\n}\n\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\n```\n<|im_end|>",
+   "span_sha256": "9340e32469e55fe1d8ec22d523dc46aa408da5bc4ade4c7a823577410f27366b",
+   "admissibility": "PENDING_CORROBORATION",
+   "relevance": "RELEVANT"
+  },
+  {
+   "evidence_id": "ev:405e2ad2b8294f9f1af1467d",
+   "source": "openfoam_cases",
+   "document_ref": "<|im_start|>system\nYou are an expert OpenFOAM CFD engineer with deep knowledge of computational fluid dynamics, turbulence modelling, mesh generation, and numerical methods. When given a simulation request you:\n\n1. Analyse the flow physics: geometry, Reynolds number, flow regime,    compressibility, heat transfer, multiphase, and turbulence model.\n2. Choose the correct OpenFOAM solver based on problem physics:\n   - simpleFoam      : steady-state incompressible\n   - icoFoam         : transient laminar incompressible (Re < 2300)\n   - pimpleFoam      : transient turbulent incompressible\n   - rhoSimpleFoam   : steady compressible (density varies, e.g. Ma > 0.3)\n   - rhoPimpleFoam   : transient compressible\n   - buoyantSimpleFoam  : steady with buoyancy / heat transfer\n   - buoyantPimpleFoam  : transient with buoyancy / heat transfer\n   - interFoam       : VOF two-phase / free-surface (water + air)\n   If the user specifies a solver, use it; otherwise infer from the physics.\n3. Select turbulence model: laminar (Re<2300), kOmegaSST (most turbulent cases),    kEpsilon (high-Re free-shear flows).\n4. Specify mesh strategy and boundary conditions for each patch.\n5. Generate complete, production-quality OpenFOAM case files for 0/, constant/,    and system/ directories.\n\nYour response format:\n## CFD Analysis\nBrief engineering rationale (solver choice, turbulence model, mesh notes, expected physics).\n\n## OpenFOAM Case Files\nComplete file contents for all required OpenFOAM dictionaries.\n<|im_end|>\n<|im_start|>user\nlaminar rectangular duct flow, Re=1000, length=2m, height=0.1m, 2D, air\n<|im_end|>\n<|im_start|>assistant\n## CFD Analysis\n\n**Geometry:** box (2D), L=2m × W=0.1m\n**Fluid:** air (ν=1.50e-05 m²/s, ρ=1.23 kg/m³)\n**Re = 1000** → laminar regime\n**Solver:** simpleFoam (steady, incompressible)\n**Turbulence:** laminar — no turbulence model (laminar)\n**Simulation score:** 0.80 (converged=True)\n**Notes:** OK | Laminar duct. Poiseuille-like profile. No turbulence model.\n\n## OpenFOAM Case Files\n\n### system/controlDict\n```\n/*--------------------------------*- C++ -*----------------------------------*\\\n| =========                 |                                                 |\n| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |\n|  \\    /   O peration     | Version:  v2412                                 |\n|   \\  /    A nd           | Website:  www.openfoam.com                      |\n|    \\/     M anipulation  |                                                 |\n\\*---------------------------------------------------------------------------*/\nFoamFile\n{\n    version     2.0;\n    format      ascii;\n    class       dictionary;\n    object      controlDict;\n}\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\napplication     simpleFoam;\n\nstartFrom       startTime;\nstartTime       0;\nstopAt          endTime;\nendTime         1000;\n\ndeltaT          1;\n\nwriteControl    timeStep;\nwriteInterval   100;\npurgeWrite      0;\nwriteFormat     ascii;\nwritePrecision  6;\nwriteCompression off;\ntimeFormat      general;\ntimePrecision   6;\nrunTimeModifiable true;\n\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\n```\n\n### system/fvSchemes\n```\n/*--------------------------------*- C++ -*----------------------------------*\\\n| =========                 |                                                 |\n| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |\n|  \\    /   O peration     | Version:  v2412                                 |\n|   \\  /    A nd           | Website:  www.openfoam.com                      |\n|    \\/     M anipulation  |                                                 |\n\\*---------------------------------------------------------------------------*/\nFoamFile\n{\n    version     2.0;\n    format      ascii;\n    class       dictionary;\n    object      fvSchemes;\n}\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\nddtSchemes\n{\n    default         steadyState;\n}\n\ngradSchemes\n{\n    default         Gauss linear;\n}\n\ndivSchemes\n{\n    default         none;\n    div(phi,U)      Gauss linearUpwind grad(U);\n    div(phi,p)      Gauss linear;\n    div((nuEff*dev2(T(grad(U))))) Gauss linear;\n}\n\nlaplacianSchemes\n{\n    default         Gauss linear corrected;\n}\n\ninterpolationSchemes\n{\n    default         linear;\n}\n\nsnGradSchemes\n{\n    default         corrected;\n}\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\n```\n\n### system/fvSolution\n```\n/*--------------------------------*- C++ -*----------------------------------*\\\n| =========                 |                                                 |\n| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |\n|  \\    /   O peration     | Version:  v2412                                 |\n|   \\  /    A nd           | Website:  www.openfoam.com                      |\n|    \\/     M anipulation  |                                                 |\n\\*---------------------------------------------------------------------------*/\nFoamFile\n{\n    version     2.0;\n    format      ascii;\n    class       dictionary;\n    object      fvSolution;\n}\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\nsolvers\n{\n    p\n    {\n        solver          PCG;\n        preconditioner  DIC;\n        tolerance       1.00e-06;\n        relTol          0;\n    }\n    pFinal\n    {\n        $p;\n        relTol          0;\n    }\n    U\n    {\n        solver          smoothSolver;\n        smoother        GaussSeidel;\n        tolerance       1.00e-05;\n        relTol          0;\n    }\n}\n\nSIMPLE\n{\n    nonOrthogonalCorrectors 2;\n    pRefCell        0;\n    pRefValue       0;\n}\n\nrelaxationFactors\n{\n    fields\n    {\n        p           0.4;\n    }\n    equations\n    {\n        U               0.7;\n    }\n}\n\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\n```\n\n### constant/transportProperties\n```\n/*--------------------------------*- C++ -*----------------------------------*\\\n| =========                 |                                                 |\n| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |\n|  \\    /   O peration     | Version:  v2412                                 |\n|   \\  /    A nd           | Website:  www.openfoam.com                      |\n|    \\/     M anipulation  |                                                 |\n\\*---------------------------------------------------------------------------*/\nFoamFile\n{\n    version     2.0;\n    format      ascii;\n    class       dictionary;\n    object      transportProperties;\n}\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\ntransportModel  Newtonian;\n\nnu              nu [0 2 -1 0 0 0 0] 1.5e-05;\n\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\n```\n\n### constant/turbulenceProperties\n```\n/*--------------------------------*- C++ -*----------------------------------*\\\n| =========                 |                                                 |\n| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |\n|  \\    /   O peration     | Version:  v2412                                 |\n|   \\  /    A nd           | Website:  www.openfoam.com                      |\n|    \\/     M anipulation  |                                                 |\n\\*---------------------------------------------------------------------------*/\nFoamFile\n{\n    version     2.0;\n    format      ascii;\n    class       dictionary;\n    object      turbulenceProperties;\n}\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\nsimulationType  laminar;\n\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\n```\n\n### 0/U\n```\n/*--------------------------------*- C++ -*----------------------------------*\\\n| =========                 |                                                 |\n| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |\n|  \\    /   O peration     | Version:  v2412                                 |\n|   \\  /    A nd           | Website:  www.openfoam.com                      |\n|    \\/     M anipulation  |                                                 |\n\\*---------------------------------------------------------------------------*/\nFoamFile\n{\n    version     2.0;\n    format      ascii;\n    class       volVectorField;\n    object      U;\n}\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\ndimensions      [0 1 -1 0 0 0 0];\n\ninternalField   uniform (0.15 0 0);\n\nboundaryField\n{\n    frontAndBack\n    {\n        type            empty;\n    }\n    walls\n    {\n        type            noSlip;\n    }\n}\n\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\n```\n\n### 0/p\n```\n/*--------------------------------*- C++ -*----------------------------------*\\\n| =========                 |                                                 |\n| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |\n|  \\    /   O peration     | Version:  v2412                                 |\n|   \\  /    A nd           | Website:  www.openfoam.com                      |\n|    \\/     M anipulation  |                                                 |\n\\*---------------------------------------------------------------------------*/\nFoamFile\n{\n    version     2.0;\n    format      ascii;\n    class       volScalarField;\n    object      p;\n}\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\ndimensions      [0 2 -2 0 0 0 0];\n\ninternalField   uniform 0;\n\nboundaryField\n{\n    frontAndBack\n    {\n        type            empty;\n    }\n    walls\n    {\n        type            zeroGradient;\n    }\n}\n\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\n```\n<|im_end|>",
+   "span_sha256": "bd2ee1053422d363faeb1fc766a6aab5a4c837f9dc800e68eef3d663738e5708",
+   "admissibility": "PENDING_CORROBORATION",
+   "relevance": "RELEVANT"
+  },
+  {
+   "evidence_id": "ev:e47bde2a3658274041fed551",
+   "source": "openfoam_cases",
+   "document_ref": "<|im_start|>system\nYou are an expert OpenFOAM CFD engineer with deep knowledge of computational fluid dynamics, turbulence modelling, mesh generation, and numerical methods. When given a simulation request you:\n\n1. Analyse the flow physics: geometry, Reynolds number, flow regime,    compressibility, heat transfer, multiphase, and turbulence model.\n2. Choose the correct OpenFOAM solver based on problem physics:\n   - simpleFoam      : steady-state incompressible\n   - icoFoam         : transient laminar incompressible (Re < 2300)\n   - pimpleFoam      : transient turbulent incompressible\n   - rhoSimpleFoam   : steady compressible (density varies, e.g. Ma > 0.3)\n   - rhoPimpleFoam   : transient compressible\n   - buoyantSimpleFoam  : steady with buoyancy / heat transfer\n   - buoyantPimpleFoam  : transient with buoyancy / heat transfer\n   - interFoam       : VOF two-phase / free-surface (water + air)\n   If the user specifies a solver, use it; otherwise infer from the physics.\n3. Select turbulence model: laminar (Re<2300), kOmegaSST (most turbulent cases),    kEpsilon (high-Re free-shear flows).\n4. Specify mesh strategy and boundary conditions for each patch.\n5. Generate complete, production-quality OpenFOAM case files for 0/, constant/,    and system/ directories.\n\nYour response format:\n## CFD Analysis\nBrief engineering rationale (solver choice, turbulence model, mesh notes, expected physics).\n\n## OpenFOAM Case Files\nComplete file contents for all required OpenFOAM dictionaries.\n<|im_end|>\n<|im_start|>user\nlaminar transient cavity Re=200 0.3m air icoFoam\n<|im_end|>\n<|im_start|>assistant\n## CFD Analysis\n\n**Geometry:** lid_driven_cavity (2D), L=0.3m × W=0.3m\n**Fluid:** air (ν=1.50e-05 m²/s, ρ=1.23 kg/m³)\n**Re = 200** → laminar regime\n**Solver:** icoFoam (transient, incompressible)\n**Turbulence:** laminar — no turbulence model (laminar)\n**Simulation score:** 0.81 (converged=True)\n**Notes:** OK | Re=200 small cavity icoFoam.\n\n## OpenFOAM Case Files\n\n### system/controlDict\n```\n/*--------------------------------*- C++ -*----------------------------------*\\\n| =========                 |                                                 |\n| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |\n|  \\    /   O peration     | Version:  v2412                                 |\n|   \\  /    A nd           | Website:  www.openfoam.com                      |\n|    \\/     M anipulation  |                                                 |\n\\*---------------------------------------------------------------------------*/\nFoamFile\n{\n    version     2.0;\n    format      ascii;\n    class       dictionary;\n    object      controlDict;\n}\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\napplication     icoFoam;\n\nstartFrom       startTime;\nstartTime       0;\nstopAt          endTime;\nendTime         10.0;\n\ndeltaT          0.1;\n\nwriteControl    timeStep;\nwriteInterval   5;\npurgeWrite      0;\nwriteFormat     ascii;\nwritePrecision  6;\nwriteCompression off;\ntimeFormat      general;\ntimePrecision   6;\nrunTimeModifiable true;\n\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\n```\n\n### system/fvSchemes\n```\n/*--------------------------------*- C++ -*----------------------------------*\\\n| =========                 |                                                 |\n| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |\n|  \\    /   O peration     | Version:  v2412                                 |\n|   \\  /    A nd           | Website:  www.openfoam.com                      |\n|    \\/     M anipulation  |                                                 |\n\\*---------------------------------------------------------------------------*/\nFoamFile\n{\n    version     2.0;\n    format      ascii;\n    class       dictionary;\n    object      fvSchemes;\n}\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\nddtSchemes\n{\n    default         Euler;\n}\n\ngradSchemes\n{\n    default         Gauss linear;\n}\n\ndivSchemes\n{\n    default         none;\n    div(phi,U)      Gauss linear;\n    div(phi,p)      Gauss linear;\n    div((nuEff*dev2(T(grad(U))))) Gauss linear;\n}\n\nlaplacianSchemes\n{\n    default         Gauss linear corrected;\n}\n\ninterpolationSchemes\n{\n    default         linear;\n}\n\nsnGradSchemes\n{\n    default         corrected;\n}\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\n```\n\n### system/fvSolution\n```\n/*--------------------------------*- C++ -*----------------------------------*\\\n| =========                 |                                                 |\n| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |\n|  \\    /   O peration     | Version:  v2412                                 |\n|   \\  /    A nd           | Website:  www.openfoam.com                      |\n|    \\/     M anipulation  |                                                 |\n\\*---------------------------------------------------------------------------*/\nFoamFile\n{\n    version     2.0;\n    format      ascii;\n    class       dictionary;\n    object      fvSolution;\n}\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\nsolvers\n{\n    p\n    {\n        solver          PCG;\n        preconditioner  DIC;\n        tolerance       1.00e-08;\n        relTol          0;\n    }\n    pFinal\n    {\n        $p;\n        relTol          0;\n    }\n    U\n    {\n        solver          PBiCGStab;\n        preconditioner  DILU;\n        tolerance       1.00e-07;\n        relTol          0.1;\n    }\n    UFinal\n    {\n        $U;\n        relTol          0;\n    }\n}\n\nPISO\n{\n    nCorrectors     4;\n    nNonOrthogonalCorrectors 2;\n    pRefCell        0;\n    pRefValue       0;\n}\n\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\n```\n\n### constant/transportProperties\n```\n/*--------------------------------*- C++ -*----------------------------------*\\\n| =========                 |                                                 |\n| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |\n|  \\    /   O peration     | Version:  v2412                                 |\n|   \\  /    A nd           | Website:  www.openfoam.com                      |\n|    \\/     M anipulation  |                                                 |\n\\*---------------------------------------------------------------------------*/\nFoamFile\n{\n    version     2.0;\n    format      ascii;\n    class       dictionary;\n    object      transportProperties;\n}\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\ntransportModel  Newtonian;\n\nnu              nu [0 2 -1 0 0 0 0] 1.5e-05;\n\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\n```\n\n### constant/turbulenceProperties\n```\n/*--------------------------------*- C++ -*----------------------------------*\\\n| =========                 |                                                 |\n| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |\n|  \\    /   O peration     | Version:  v2412                                 |\n|   \\  /    A nd           | Website:  www.openfoam.com                      |\n|    \\/     M anipulation  |                                                 |\n\\*---------------------------------------------------------------------------*/\nFoamFile\n{\n    version     2.0;\n    format      ascii;\n    class       dictionary;\n    object      turbulenceProperties;\n}\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\nsimulationType  laminar;\n\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\n```\n\n### 0/U\n```\n/*--------------------------------*- C++ -*----------------------------------*\\\n| =========                 |                                                 |\n| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |\n|  \\    /   O peration     | Version:  v2412                                 |\n|   \\  /    A nd           | Website:  www.openfoam.com                      |\n|    \\/     M anipulation  |                                                 |\n\\*---------------------------------------------------------------------------*/\nFoamFile\n{\n    version     2.0;\n    format      ascii;\n    class       volVectorField;\n    object      U;\n}\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\ndimensions      [0 1 -1 0 0 0 0];\n\ninternalField   uniform (0.01 0 0);\n\nboundaryField\n{\n    frontAndBack\n    {\n        type            empty;\n    }\n    fixedWalls\n    {\n        type            noSlip;\n    }\n    movingWall\n    {\n        type            fixedValue;\n        value           uniform (0.01 0 0);\n    }\n}\n\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\n```\n\n### 0/p\n```\n/*--------------------------------*- C++ -*----------------------------------*\\\n| =========                 |                                                 |\n| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |\n|  \\    /   O peration     | Version:  v2412                                 |\n|   \\  /    A nd           | Website:  www.openfoam.com                      |\n|    \\/     M anipulation  |                                                 |\n\\*---------------------------------------------------------------------------*/\nFoamFile\n{\n    version     2.0;\n    format      ascii;\n    class       volScalarField;\n    object      p;\n}\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\ndimensions      [0 2 -2 0 0 0 0];\n\ninternalField   uniform 0;\n\nboundaryField\n{\n    frontAndBack\n    {\n        type            empty;\n    }\n    fixedWalls\n    {\n        type            zeroGradient;\n    }\n    movingWall\n    {\n        type            zeroGradient;\n    }\n}\n\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\n```\n<|im_end|>",
+   "span_sha256": "0a2f70bef8e884ae71964ce75c8c8dc982e9d30bb6bd79df2f4e369ab145ea81",
+   "admissibility": "PENDING_CORROBORATION",
+   "relevance": "RELEVANT"
+  },
+  {
+   "evidence_id": "ev:e982c28659bb2b079423c9cc",
+   "source": "openfoam_cases",
+   "document_ref": "<|im_start|>system\nYou are an expert OpenFOAM CFD engineer with deep knowledge of computational fluid dynamics, turbulence modelling, mesh generation, and numerical methods. When given a simulation request you:\n\n1. Analyse the flow physics: geometry, Reynolds number, flow regime,    compressibility, heat transfer, multiphase, and turbulence model.\n2. Choose the correct OpenFOAM solver based on problem physics:\n   - simpleFoam      : steady-state incompressible\n   - icoFoam         : transient laminar incompressible (Re < 2300)\n   - pimpleFoam      : transient turbulent incompressible\n   - rhoSimpleFoam   : steady compressible (density varies, e.g. Ma > 0.3)\n   - rhoPimpleFoam   : transient compressible\n   - buoyantSimpleFoam  : steady with buoyancy / heat transfer\n   - buoyantPimpleFoam  : transient with buoyancy / heat transfer\n   - interFoam       : VOF two-phase / free-surface (water + air)\n   If the user specifies a solver, use it; otherwise infer from the physics.\n3. Select turbulence model: laminar (Re<2300), kOmegaSST (most turbulent cases),    kEpsilon (high-Re free-shear flows).\n4. Specify mesh strategy and boundary conditions for each patch.\n5. Generate complete, production-quality OpenFOAM case files for 0/, constant/,    and system/ directories.\n\nYour response format:\n## CFD Analysis\nBrief engineering rationale (solver choice, turbulence model, mesh notes, expected physics).\n\n## OpenFOAM Case Files\nComplete file contents for all required OpenFOAM dictionaries.\n<|im_end|>\n<|im_start|>user\nlow Reynolds number duct flow: Re=500, 2D box geometry, L=1m, H=0.05m, steady\n<|im_end|>\n<|im_start|>assistant\n## CFD Analysis\n\n**Geometry:** box (2D), L=1m × W=0.05m\n**Fluid:** air (ν=1.50e-05 m²/s, ρ=1.23 kg/m³)\n**Re = 500** → laminar regime\n**Solver:** simpleFoam (steady, incompressible)\n**Turbulence:** laminar — no turbulence model (laminar)\n**Simulation score:** 0.76 (converged=True)\n**Notes:** poor residual convergence trend | Very laminar duct. Entrance length short.\n\n## OpenFOAM Case Files\n\n### system/controlDict\n```\n/*--------------------------------*- C++ -*----------------------------------*\\\n| =========                 |                                                 |\n| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |\n|  \\    /   O peration     | Version:  v2412                                 |\n|   \\  /    A nd           | Website:  www.openfoam.com                      |\n|    \\/     M anipulation  |                                                 |\n\\*---------------------------------------------------------------------------*/\nFoamFile\n{\n    version     2.0;\n    format      ascii;\n    class       dictionary;\n    object      controlDict;\n}\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\napplication     simpleFoam;\n\nstartFrom       startTime;\nstartTime       0;\nstopAt          endTime;\nendTime         1000;\n\ndeltaT          1;\n\nwriteControl    timeStep;\nwriteInterval   100;\npurgeWrite      0;\nwriteFormat     ascii;\nwritePrecision  6;\nwriteCompression off;\ntimeFormat      general;\ntimePrecision   6;\nrunTimeModifiable true;\n\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\n```\n\n### system/fvSchemes\n```\n/*--------------------------------*- C++ -*----------------------------------*\\\n| =========                 |                                                 |\n| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |\n|  \\    /   O peration     | Version:  v2412                                 |\n|   \\  /    A nd           | Website:  www.openfoam.com                      |\n|    \\/     M anipulation  |                                                 |\n\\*---------------------------------------------------------------------------*/\nFoamFile\n{\n    version     2.0;\n    format      ascii;\n    class       dictionary;\n    object      fvSchemes;\n}\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\nddtSchemes\n{\n    default         steadyState;\n}\n\ngradSchemes\n{\n    default         Gauss linear;\n}\n\ndivSchemes\n{\n    default         none;\n    div(phi,U)      Gauss linearUpwind grad(U);\n    div(phi,p)      Gauss linear;\n    div((nuEff*dev2(T(grad(U))))) Gauss linear;\n}\n\nlaplacianSchemes\n{\n    default         Gauss linear corrected;\n}\n\ninterpolationSchemes\n{\n    default         linear;\n}\n\nsnGradSchemes\n{\n    default         corrected;\n}\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\n```\n\n### system/fvSolution\n```\n/*--------------------------------*- C++ -*----------------------------------*\\\n| =========                 |                                                 |\n| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |\n|  \\    /   O peration     | Version:  v2412                                 |\n|   \\  /    A nd           | Website:  www.openfoam.com                      |\n|    \\/     M anipulation  |                                                 |\n\\*---------------------------------------------------------------------------*/\nFoamFile\n{\n    version     2.0;\n    format      ascii;\n    class       dictionary;\n    object      fvSolution;\n}\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\nsolvers\n{\n    p\n    {\n        solver          PCG;\n        preconditioner  DIC;\n        tolerance       1.00e-06;\n        relTol          0;\n    }\n    pFinal\n    {\n        $p;\n        relTol          0;\n    }\n    U\n    {\n        solver          smoothSolver;\n        smoother        GaussSeidel;\n        tolerance       1.00e-05;\n        relTol          0;\n    }\n}\n\nSIMPLE\n{\n    nonOrthogonalCorrectors 2;\n    pRefCell        0;\n    pRefValue       0;\n}\n\nrelaxationFactors\n{\n    fields\n    {\n        p           0.6;\n    }\n    equations\n    {\n        U               0.8;\n    }\n}\n\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\n```\n\n### constant/transportProperties\n```\n/*--------------------------------*- C++ -*----------------------------------*\\\n| =========                 |                                                 |\n| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |\n|  \\    /   O peration     | Version:  v2412                                 |\n|   \\  /    A nd           | Website:  www.openfoam.com                      |\n|    \\/     M anipulation  |                                                 |\n\\*---------------------------------------------------------------------------*/\nFoamFile\n{\n    version     2.0;\n    format      ascii;\n    class       dictionary;\n    object      transportProperties;\n}\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\ntransportModel  Newtonian;\n\nnu              nu [0 2 -1 0 0 0 0] 1.5e-05;\n\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\n```\n\n### constant/turbulenceProperties\n```\n/*--------------------------------*- C++ -*----------------------------------*\\\n| =========                 |                                                 |\n| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |\n|  \\    /   O peration     | Version:  v2412                                 |\n|   \\  /    A nd           | Website:  www.openfoam.com                      |\n|    \\/     M anipulation  |                                                 |\n\\*---------------------------------------------------------------------------*/\nFoamFile\n{\n    version     2.0;\n    format      ascii;\n    class       dictionary;\n    object      turbulenceProperties;\n}\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\nsimulationType  laminar;\n\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\n```\n\n### 0/U\n```\n/*--------------------------------*- C++ -*----------------------------------*\\\n| =========                 |                                                 |\n| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |\n|  \\    /   O peration     | Version:  v2412                                 |\n|   \\  /    A nd           | Website:  www.openfoam.com                      |\n|    \\/     M anipulation  |                                                 |\n\\*---------------------------------------------------------------------------*/\nFoamFile\n{\n    version     2.0;\n    format      ascii;\n    class       volVectorField;\n    object      U;\n}\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\ndimensions      [0 1 -1 0 0 0 0];\n\ninternalField   uniform (0.15 0 0);\n\nboundaryField\n{\n    frontAndBack\n    {\n        type            empty;\n    }\n    walls\n    {\n        type            noSlip;\n    }\n}\n\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\n```\n\n### 0/p\n```\n/*--------------------------------*- C++ -*----------------------------------*\\\n| =========                 |                                                 |\n| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |\n|  \\    /   O peration     | Version:  v2412                                 |\n|   \\  /    A nd           | Website:  www.openfoam.com                      |\n|    \\/     M anipulation  |                                                 |\n\\*---------------------------------------------------------------------------*/\nFoamFile\n{\n    version     2.0;\n    format      ascii;\n    class       volScalarField;\n    object      p;\n}\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\ndimensions      [0 2 -2 0 0 0 0];\n\ninternalField   uniform 0;\n\nboundaryField\n{\n    frontAndBack\n    {\n        type            empty;\n    }\n    walls\n    {\n        type            zeroGradient;\n    }\n}\n\n// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\n```\n<|im_end|>",
+   "span_sha256": "07b5f76682d41b381e4873ce96c8e4377660b91acf2eec9bb01ec448c9fddf59",
+   "admissibility": "PENDING_CORROBORATION",
+   "relevance": "RELEVANT"
+  },
+  {
+   "evidence_id": "ev:258cd321afc7c84241a5861e",
+   "source": "colabfit_mp",
+   "document_ref": "PO_1254251044956768777575779",
+   "span_sha256": "256181a213665e57bb1cde091b4eeb4041312a634190a413e82af14854f96e1c",
+   "admissibility": "BLOCKED_RELEVANCE_REJECTED",
+   "relevance": "REJECTED"
+  },
+  {
+   "evidence_id": "ev:7a37d628ccaf9574968040e0",
+   "source": "colabfit_mp",
+   "document_ref": "PO_1254291888142246140208842",
+   "span_sha256": "8aff702380738fb5a1460dc188a3c44048cc31be621352e8b774dfa0f5d4ab74",
+   "admissibility": "PENDING_CORROBORATION",
+   "relevance": "RELEVANT"
+  },
+  {
+   "evidence_id": "ev:99e3b4257d82cb9b850357d4",
+   "source": "colabfit_mp",
+   "document_ref": "PO_1254216457533767354600718",
+   "span_sha256": "a4f7945ac9287e1f7fdd6b05fc199eaaced1ac5ca3e39f99a50defd966999d54",
+   "admissibility": "BLOCKED_RELEVANCE_REJECTED",
+   "relevance": "REJECTED"
+  },
+  {
+   "evidence_id": "ev:5db864a056692f6b19ade6ce",
+   "source": "colabfit_mp",
+   "document_ref": "PO_6709849770094806308637298",
+   "span_sha256": "6b8b62fc311a99dcd95640f8a71e5dfae6b97e4d506407ebe512fd392daa8ef5",
+   "admissibility": "BLOCKED_RELEVANCE_REJECTED",
+   "relevance": "REJECTED"
+  },
+  {
+   "evidence_id": "ev:68d21fb3464fb8da18425bc8",
+   "source": "lemat_rho",
+   "document_ref": "agm003157167",
+   "span_sha256": "b62c681738d13345b46a2bdd1d93ae251d1dcd65f60b83b6343ac33535738fdb",
+   "admissibility": "PENDING_CORROBORATION",
+   "relevance": "RELEVANT"
+  },
+  {
+   "evidence_id": "ev:24d63a79a41fb6e0ad39eb25",
+   "source": "lemat_rho",
+   "document_ref": "agm003157168",
+   "span_sha256": "b62c681738d13345b46a2bdd1d93ae251d1dcd65f60b83b6343ac33535738fdb",
+   "admissibility": "PENDING_CORROBORATION",
+   "relevance": "RELEVANT"
+  },
+  {
+   "evidence_id": "ev:bcec130a69941189146a033d",
+   "source": "lemat_rho",
+   "document_ref": "agm003804977",
+   "span_sha256": "08cc2b751ba4d323f6e123f812d5043e421778d75f5c1697b1e87325be81f269",
+   "admissibility": "BLOCKED_RELEVANCE_REJECTED",
+   "relevance": "REJECTED"
+  },
+  {
+   "evidence_id": "ev:362f10a0ec116fb8bfce5f89",
+   "source": "lemat_rho",
+   "document_ref": "agm003919300",
+   "span_sha256": "75a814816135368f79a295b20fc5311c5715e32b04525d87954e92639353b625",
+   "admissibility": "BLOCKED_RELEVANCE_REJECTED",
+   "relevance": "REJECTED"
+  },
+  {
+   "evidence_id": "ev:60f669e49b77bcac9395bc52",
+   "source": "lemat_rho",
+   "document_ref": "agm002137086",
+   "span_sha256": "4d3f5162a165979a684f2966d4d39ed64ac99b4e5ddb86fe61ef17a19fa2d857",
+   "admissibility": "BLOCKED_RELEVANCE_REJECTED",
+   "relevance": "REJECTED"
+  },
+  {
+   "evidence_id": "ev:8d6d436ede5e7ca4bde8a6ee",
+   "source": "lemat_rho",
+   "document_ref": "agm003783117",
+   "span_sha256": "f3571746e43bb10a0f998ec3bbba5659729987369c00d5e91938342d3980c3b1",
+   "admissibility": "BLOCKED_RELEVANCE_REJECTED",
+   "relevance": "REJECTED"
+  },
+  {
+   "evidence_id": "ev:efcdcd79b8ee3fe76af80483",
+   "source": "lemat_rho",
+   "document_ref": "agm002156466",
+   "span_sha256": "6dd487f26d851bd0c64aeb97214f38c33f7014b54cea1a609af0b593161128b4",
+   "admissibility": "BLOCKED_RELEVANCE_REJECTED",
+   "relevance": "REJECTED"
+  },
+  {
+   "evidence_id": "ev:68c8b97dcad1d0986452b837",
+   "source": "lemat_rho",
+   "document_ref": "agm002168783",
+   "span_sha256": "61a68c429065db63c416e8769420c9650267de0628bdf9ece8095a7496164f28",
+   "admissibility": "PENDING_CORROBORATION",
+   "relevance": "RELEVANT"
+  }
+ ],
+ "channel_states": [
+  {
+   "source_id": "wopto",
+   "query": "marine growth chloride corrosion",
+   "state": "SUCCESS",
+   "num_rows_total": 120263
+  },
+  {
+   "source_id": "wopto",
+   "query": "documented problem degrading seawater intake condensers coastal combined",
+   "state": "UNKNOWN",
+   "num_rows_total": null
+  },
+  {
+   "source_id": "openfoam_cases",
+   "query": "marine growth chloride corrosion",
+   "state": "EMPTY_RESULT",
+   "num_rows_total": 0
+  },
+  {
+   "source_id": "openfoam_cases",
+   "query": "documented problem degrading seawater intake condensers coastal combined",
+   "state": "SUCCESS",
+   "num_rows_total": 384
+  },
+  {
+   "source_id": "colabfit_mp",
+   "query": "Cu",
+   "state": "UNKNOWN",
+   "num_rows_total": null
+  },
+  {
+   "source_id": "colabfit_mp",
+   "query": "Ni",
+   "state": "SUCCESS",
+   "num_rows_total": 110427
+  },
+  {
+   "source_id": "lemat_rho",
+   "query": "Cu",
+   "state": "SUCCESS",
+   "num_rows_total": 369
+  },
+  {
+   "source_id": "lemat_rho",
+   "query": "Ni",
+   "state": "SUCCESS",
+   "num_rows_total": 191
+  },
+  {
+   "source_id": "qm9",
+   "query": "marine growth chloride corrosion",
+   "state": "UNKNOWN",
+   "num_rows_total": null
+  },
+  {
+   "source_id": "qm9",
+   "query": "documented problem degrading seawater intake condensers coastal combined",
+   "state": "UNKNOWN",
+   "num_rows_total": null
+  },
+  {
+   "source_id": "chemrag_reactions",
+   "query": "marine growth chloride corrosion",
+   "state": "EMPTY_RESULT",
+   "num_rows_total": 0
+  },
+  {
+   "source_id": "chemrag_reactions",
+   "query": "documented problem degrading seawater intake condensers coastal combined",
+   "state": "EMPTY_RESULT",
+   "num_rows_total": 0
+  }
+ ],
+ "coverage_limitations": [
+  {
+   "source_id": "qm9",
+   "limitation": "reaction records do not carry molecular electronic-structure properties (HOMO/LUMO/gap/dipole); property-based screening conclusions are NOT served"
+  },
+  {
+   "family": "E2_scientific_intelligence",
+   "limitation": "no PRODUCTION evidence-fabric source in this family this round; the evidence fabric serves NOTHING for this family (any paper/patent evidence in the engine pool comes from the existing V2 fabric channels, which are a different retrieval system — never conflated with evidence-fabric provenance)"
+  }
+ ],
+ "substitutions": [],
+ "epistemic_note": "document-count deltas are recorded but are NOT the success metric (Art. LVI); the decisive question is whether the mechanism search changed — see FRESH_EVIDENCE_POWERED_DISCOVERY.json"
+}
