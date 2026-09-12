@@ -129,13 +129,36 @@ def evidence_ledger(session: Dict[str, Any]) -> Dict[str, Any]:
     source, identifier/link, retrieval time, evidence class, and
     whether it influenced the surviving invention (the invention
     specification's own evidence index). Retrieved-but-unused items
-    stay VISIBLY distinct from used evidence — never merged."""
+    stay VISIBLY distinct from used evidence — never merged.
+
+    R451-C2 (C2.5 / Article XXV): every exit carries a typed
+    `retrieval_state`, and NUMERIC COUNTS exist ONLY when retrieval
+    actually executed (the envelope exists). "The system never reached
+    retrieval" and "the system searched and measured zero" are
+    different facts; the first must never render as "0 sources
+    retrieved" (Article XXI.3: provider failure is not absence;
+    Article XXV: unknown must remain unknown).
+
+      retrieval_state:
+        NOT_REACHED  — the run stopped before retrieval executed
+        PENDING      — the run is running and retrieval has not landed yet
+        FAILED       — the run manifest records the RETRIEVE stage failed
+        RETRIEVED    — the envelope exists; counts are MEASURED
+                       (zero counts here are a real measured zero)
+    """
     run_dir = Path(session["run_dir"]) if session.get("run_dir") else None
     if not run_dir or not run_dir.exists():
         return _tab("PENDING", "UNKNOWN",
                     "evidence not retrieved yet — the ledger populates "
                     "as records are actually retrieved", items=[],
-                    used_count=0, retrieved_count=0)
+                    retrieval_state="NOT_REACHED",
+                    retrieval_note=("the investigation has not reached "
+                                    "evidence acquisition"))
+    # the run manifest's failed_stages decide FAILED (same source
+    # run_state._evidence_state reads — one truth, two consumers)
+    manifest = _read_json(run_dir / "run_manifest.json") or {}
+    retrieve_failed = bool((manifest.get("failed_stages") or {})
+                           .get("RETRIEVE"))
     env = _read_json(run_dir / "envelope_RETRIEVE.json")
     if env is None:
         if session.get("status") in ("PENDING", "BUILDING_PROBLEM",
@@ -143,11 +166,24 @@ def evidence_ledger(session: Dict[str, Any]) -> Dict[str, Any]:
             return _tab("PENDING", "UNKNOWN",
                         "evidence retrieval in progress — nothing "
                         "fabricated before records exist", items=[],
-                        used_count=0, retrieved_count=0)
+                        retrieval_state="PENDING",
+                        retrieval_note=("evidence acquisition has not "
+                                        "completed yet"))
+        if retrieve_failed:
+            return _tab("UNAVAILABLE", "UNKNOWN",
+                        "evidence retrieval FAILED (recorded in the run "
+                        "manifest) — a transport/infrastructure state, "
+                        "never a measured zero", items=[],
+                        retrieval_state="FAILED",
+                        retrieval_note=("retrieval executed and failed — "
+                                        "no source count exists"))
         return _tab("UNAVAILABLE", "UNKNOWN",
                     "no retrieval envelope on this run — evidence was "
                     "not established (the run record is the truth)",
-                    items=[], used_count=0, retrieved_count=0)
+                    items=[],
+                    retrieval_state="NOT_REACHED",
+                    retrieval_note=("the investigation stopped before "
+                                    "evidence could be acquired"))
 
     records = [r for r in (env.get("evidence") or [])
                if isinstance(r, dict)]
@@ -192,6 +228,9 @@ def evidence_ledger(session: Dict[str, Any]) -> Dict[str, Any]:
          "retrieval envelope; used-in-design is decided by the "
          "invention specification's own evidence index"),
         items=items,
+        # the envelope exists: the counts are MEASURED (a zero here is
+        # a real measured zero — Art. XXI.3/XXV the other way round)
+        retrieval_state="RETRIEVED",
         retrieved_count=len(items),
         used_count=len(used),
         used_visible_distinction=True)

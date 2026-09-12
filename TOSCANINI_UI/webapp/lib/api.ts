@@ -152,6 +152,18 @@ export async function retryRun(id: string): Promise<unknown> {
   return json(await apiFetch(`/api/sessions/${id}/retry`, { method: "POST" }));
 }
 
+// R451-C2 (C2.6): re-run the PRESENTATION build for a run whose
+// engineering geometry exists but whose visual render skipped/failed
+// (the renderer was unavailable — the geometry was never the problem).
+// POSTs the existing idempotent artifact-build job (202 + detached;
+// the web request never waits on a renderer). Presentation-layer
+// action only — never touches run status, evidence, or invention state.
+export async function retryPresentation(id: string): Promise<unknown> {
+  return json(
+    await apiFetch(`/api/run/${id}/artifact-build`, { method: "POST" })
+  );
+}
+
 export async function listShowcase(): Promise<ShowcaseRow[]> {
   const data = await json<{ showcase: ShowcaseRow[] }>(
     await apiFetch("/api/showcase")

@@ -35,7 +35,14 @@ import type {
   ScienceEvent,
   SessionDetail,
 } from "@/lib/types";
-import { isTerminal } from "./RunNarrative";
+import {
+  blockedInsightCards,
+  isTerminal,
+  resolvePresentationState,
+} from "@/lib/presentationState";
+import type { PresentationView } from "@/lib/presentationState";
+import { retryPresentation } from "@/lib/api";
+import InfrastructureBlockedHero from "./InfrastructureBlockedHero";
 import {
   Gauntlet,
   InvestigationProgress,
@@ -65,30 +72,40 @@ function shortTitle(detail: SessionDetail): string {
   return t.slice(0, 89).replace(/\s+\S*$/, "") + "…";
 }
 
-// the stage status — product language, derived from the run's own
-// user_state_view (never re-derived from raw machine status here)
-function stageStatus(detail: SessionDetail): {
+// the stage status — product language mapped through THE ONE
+// presentation-state mapping (lib/presentationState.ts): the backend
+// user-state projection decides; the frontend renders, never re-derives
+// (Art. X). The three tones are the three documented semantic colors:
+//   live   = investigating (green)
+//   infra  = infrastructure paused (calm slate — distinct from failure)
+//   refuted= scientific rejection (red)
+//   done   = a completed scientific state (neutral)
+function stageStatus(view: PresentationView): {
   label: string;
   tone: string;
 } {
-  const usv = detail.user_state_view;
-  if (!isTerminal(detail.status)) {
-    return { label: "Investigating", tone: "live" };
+  switch (view.state) {
+    case "INVESTIGATING":
+      return { label: "Investigating", tone: "live" };
+    case "INFRASTRUCTURE_PAUSED":
+      return { label: "Discovery paused — infrastructure", tone: "infra" };
+    case "SCIENTIFIC_REJECTION":
+      return { label: "Premise refuted", tone: "refuted" };
+    case "GEOMETRY_READY_RENDER_BLOCKED":
+      return {
+        label: "Model ready — presentation paused",
+        tone: "infra",
+      };
+    case "VISUAL_READY":
+      return { label: "Technology ready", tone: "done" };
+    case "GEOMETRY_UNAVAILABLE":
+      return {
+        label: "Investigation complete — no physical model",
+        tone: "done",
+      };
+    case "TECHNOLOGY_NOT_ESTABLISHED":
+      return { label: "Investigation complete", tone: "done" };
   }
-  if (
-    detail.status === "RUN_BLOCKED_TRANSPORT" ||
-    detail.status === "INTERRUPTED" ||
-    detail.status.startsWith("ERROR")
-  ) {
-    return { label: "Paused — infrastructure", tone: "paused" };
-  }
-  if (usv?.package_available || usv?.found_something) {
-    return { label: "Technology ready", tone: "done" };
-  }
-  if (usv?.rejected) {
-    return { label: "Approach refuted", tone: "refuted" };
-  }
-  return { label: "Investigation complete", tone: "done" };
 }
 
 // ---- the hero surface while the investigation runs -------------------------
@@ -124,6 +141,13 @@ function HeroInvestigating({
 }
 
 // ---- the honest not-established hero ----------------------------------------
+// R451-C2: this surface is ONLY for a COMPLETED run that reached its
+// honest scientific end without establishing a technology (or whose
+// technology has no physical geometry). An infrastructure stop NEVER
+// reaches this component — the presentation-state mapping routes those
+// to InfrastructureBlockedHero before this branch is reachable (the
+// exact "Not established on this run"-while-blocked contradiction this
+// round removes).
 function HeroNotEstablished({ design }: { design: DesignTabData | undefined }) {
   return (
     <div className="hero-honest" data-hero-not-established>
@@ -238,14 +262,21 @@ export default function TechStage({
   const [viewingGen, setViewingGen] = useState<number | null>(null);
   const [highlight, setHighlight] = useState<string | null>(null);
   const [focusRequest, setFocusRequest] = useState<string | null>(null);
+  const [renderRetryNote, setRenderRetryNote] = useState<string | null>(null);
 
+  // R451-C2: THE ONE presentation-state mapping (lib/presentationState.ts)
+  // — consumed by every branch below. The backend user-state projection
+  // (user_state_view) is authoritative; the frontend never re-derives a
+  // state from raw fields and never reconciles conflicting signals
+  // silently (adversarial attacks A–E are pinned by the UI test battery).
+  const view = useMemo(
+    () => resolvePresentationState(detail, dossier),
+    [detail, dossier]
+  );
   const done = isTerminal(detail.status);
   const usv = detail.user_state_view;
-  const status = stageStatus(detail);
-  const blocked =
-    detail.status === "RUN_BLOCKED_TRANSPORT" ||
-    detail.status === "INTERRUPTED" ||
-    detail.status.startsWith("ERROR");
+  const status = stageStatus(view);
+  const blocked = view.infrastructurePaused;
 
   const design = dossier?.tabs?.design as DesignTabData | undefined;
   const overview = dossier?.tabs?.overview;
@@ -302,8 +333,24 @@ export default function TechStage({
   const strongestEvidence = overview?.strongest_evidence ?? null;
   const evidenceCounts =
     (evidence as
-      | { retrieved_count?: number; used_count?: number }
+      | {
+          retrieval_state?: string;
+          retrieval_note?: string | null;
+          retrieved_count?: number;
+          used_count?: number;
+        }
       | undefined) ?? undefined;
+  // R451-C2 (C2.5, Article XXV): numeric evidence counts exist ONLY when
+  // the backend says retrieval actually executed (retrieval_state
+  // RETRIEVED — its zero is a measured zero). NOT_REACHED / PENDING /
+  // FAILED are typed unknowns — they render as words, never as "0".
+  const evidenceSub =
+    evidenceCounts?.retrieval_state === "RETRIEVED" &&
+    evidenceCounts.retrieved_count != null
+      ? `${evidenceCounts.retrieved_count} sources retrieved · ${
+          evidenceCounts.used_count ?? 0
+        } shaped the design`
+      : null;
   const strongestChallenge =
     overview?.strongest_challenge ?? dossier?.falsification?.challenge_condition ?? null;
   const decisiveTest = overview?.decisive_experiment ?? null;
@@ -363,6 +410,67 @@ export default function TechStage({
       </div>
 
       {/* ---- THE HERO: the technology artifact ---- */}
+      {/* R451-C2: an infrastructure pause gets the dedicated COMPACT
+          blocked surface — never the large model viewport, never the
+          "Not established" hero (sections 1/2/6/9 of the directive). */}
+      {blocked ? (
+        <InfrastructureBlockedHero
+          view={view}
+          problemText={detail.user_text || detail.title || ""}
+          onResume={() => onRetry?.(detail.session_id)}
+          onOpenJournal={() => focus("journal")}
+        />
+      ) : (
+      <>
+      {view.state === "GEOMETRY_READY_RENDER_BLOCKED" && (
+        // C2.6: geometry present, presentation unavailable — the state
+        // ribbon the directive requires, with the two actions. The
+        // canonical GLB stays interactive in the viewer below (it is
+        // served from the CadQuery-authored geometry regardless).
+        <div className="render-blocked-ribbon" data-render-blocked-ribbon>
+          <div className="rbr-main">
+            <span className="rbr-title">ENGINEERING MODEL READY</span>
+            <span className="rbr-sub faint">
+              The engineering geometry exists. Presentation rendering is
+              temporarily unavailable.
+            </span>
+          </div>
+          <div className="rbr-actions">
+            <button
+              type="button"
+              className="btn small"
+              onClick={() =>
+                retryPresentation(detail.session_id)
+                  .then(() =>
+                    setRenderRetryNote(
+                      "presentation build queued — this page updates when it finishes"
+                    )
+                  )
+                  .catch(() =>
+                    setRenderRetryNote(
+                      "the presentation build could not be queued — the engineering model remains available below"
+                    )
+                  )
+              }
+              data-retry-presentation
+            >
+              Retry presentation
+            </button>
+            <button
+              type="button"
+              className="btn small ghost"
+              onClick={() => focus("model")}
+            >
+              Open model files
+            </button>
+          </div>
+          {renderRetryNote && (
+            <div className="rbr-note faint" data-render-retry-note>
+              {renderRetryNote}
+            </div>
+          )}
+        </div>
+      )}
       <div className="hero-viewport" data-hero-viewport>
         {viewerUrl ? (
           <>
@@ -445,8 +553,34 @@ export default function TechStage({
           </span>
         )}
       </div>
+      </>
+      )}
 
       {/* ---- the four insight cards ---- */}
+      {/* R451-C2: a blocked run gets the DEDICATED blocked-state cards
+          ("not evaluated because execution stopped") — never the
+          ordinary-incompleteness wording, never scientific absence. */}
+      {blocked ? (
+        <div className="stage-insights" data-stage-insights-blocked>
+          {blockedInsightCards(evidence as
+            | Parameters<typeof blockedInsightCards>[0]
+            | undefined).map((card) => (
+            <div
+              className="insight insight-blocked"
+              key={card.title}
+              data-blocked-insight={
+                card.title.toLowerCase().replace(/\s+/g, "-")
+              }
+            >
+              <div className="ic-title">{card.title}</div>
+              <div className="ic-body ic-blocked-headline">
+                {card.headline}
+              </div>
+              <div className="ic-sub faint">{card.body}</div>
+            </div>
+          ))}
+        </div>
+      ) : (
       <div className="stage-insights" data-stage-insights>
         <InsightCard
           title="What changed"
@@ -476,13 +610,7 @@ export default function TechStage({
               ? strongestEvidence.title
               : (evidence as { note?: string } | undefined)?.note ?? null
           }
-          sub={
-            evidenceCounts?.retrieved_count != null
-              ? `${evidenceCounts.retrieved_count} sources retrieved · ${
-                  evidenceCounts.used_count ?? 0
-                } shaped the design`
-              : null
-          }
+          sub={evidenceSub}
           state={!strongestEvidence && !done ? "pending" : undefined}
           onClick={() => focus("evidence")}
           dataAttr="what-supports-it"
@@ -496,8 +624,15 @@ export default function TechStage({
           dataAttr="what-could-kill-it"
         />
       </div>
+      )}
 
       {/* ---- the actions ---- */}
+      {/* R451-C2: for an infrastructure pause the action hierarchy is
+          owned by the blocked hero (Resume primary · journal secondary ·
+          package disabled with its reason). The standard row — where
+          "Test this" would read as the primary continuation path —
+          is not rendered for that state. */}
+      {!blocked && (
       <div className="stage-actions" data-stage-actions>
         <button
           type="button"
@@ -538,7 +673,8 @@ export default function TechStage({
           </button>
         )}
       </div>
-      {!packageAvailable && done && (
+      )}
+      {!blocked && !packageAvailable && done && (
         <div className="stage-actions-note faint">
           No technology package on this run —{" "}
           {(dossier?.tabs?.transfer as { note?: string } | undefined)?.note ??
@@ -554,23 +690,6 @@ export default function TechStage({
           {liveEvents.length > 0 && (
             <ScienceEventStream events={liveEvents} dense />
           )}
-        </div>
-      )}
-
-      {/* ---- blocked: the honest pause + resume ---- */}
-      {blocked && onRetry && (
-        <div className="retry-row">
-          <button
-            className="btn"
-            onClick={() => onRetry(detail.session_id)}
-            type="button"
-          >
-            Resume investigation
-          </button>
-          <span className="faint">
-            the problem is saved; this is an infrastructure state, never a
-            scientific verdict
-          </span>
         </div>
       )}
 
@@ -591,6 +710,7 @@ export default function TechStage({
         gauntlet={gauntlet}
         packageAvailable={packageAvailable}
         focusRequest={focusRequest}
+        paused={blocked}
         viewingGen={viewingGen}
         onSelectGen={setViewingGen}
         highlight={highlight}

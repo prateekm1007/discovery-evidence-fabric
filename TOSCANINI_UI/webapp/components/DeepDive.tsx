@@ -141,6 +141,7 @@ export default function DeepDive({
   gauntlet,
   packageAvailable,
   focusRequest,
+  paused,
   viewingGen,
   onSelectGen,
   highlight,
@@ -152,6 +153,10 @@ export default function DeepDive({
   gauntlet: GauntletCard[];
   packageAvailable: boolean;
   focusRequest: string | null;
+  /** R451-C2: the run is INFRASTRUCTURE_PAUSED — the journal renders
+      the blocked-state banner above the recorded history (no artificial
+      terminal "failure" event is manufactured). */
+  paused?: boolean;
   viewingGen: number | null;
   onSelectGen: (gen: number | null) => void;
   highlight: string | null;
@@ -207,6 +212,18 @@ export default function DeepDive({
           >
             {s.id === "journal" && (
               <>
+                {paused && (
+                  <div className="journal-paused-banner" data-journal-paused-banner>
+                    <div className="jpb-title">PAUSED AT INFRASTRUCTURE</div>
+                    <div className="jpb-line">
+                      The investigation has not produced a scientific verdict.
+                    </div>
+                    <div className="jpb-line faint">
+                      Earlier recorded events remain valid. Downstream stages
+                      were not evaluated.
+                    </div>
+                  </div>
+                )}
                 {hasJournal ? (
                   <>
                     <RunNarrative

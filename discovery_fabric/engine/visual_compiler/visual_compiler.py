@@ -37,6 +37,8 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import sys
+import time
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -47,9 +49,20 @@ from . import render_record_schema
 from . import RENDER_PIPELINE
 
 _META_ARTIFACTS = ("render_record.json", "scene_spec.json",
-                   "visual_gate.json")
+                   "visual_gate.json",
+                   "VISUAL_COMPILER_INVOCATION.json")
 DEFAULT_RESOLUTION = [1536, 1024]
 DEFAULT_TURNTABLE_FRAMES = visual_set.DEFAULT_TURNTABLE_FRAMES
+
+# R451-C2 (C2.9): the invocation receipt. "GLB exists" and "the GLB was
+# passed to the renderer" are different facts (the BS-003/BS-030 class:
+# built is not wired). The receipt is written at EVERY exit of the
+# compiler — success, typed skip, failure — so the join is
+# machine-distinguishable from the run directory alone:
+#   receipt absent                          -> the boundary was never reached
+#   receipt.status startswith RENDER_SKIPPED -> reached, did not render
+#   receipt.status SUCCEEDED/PARTIAL        -> reached AND rendered
+RECEIPT_FILENAME = "VISUAL_COMPILER_INVOCATION.json"
 
 
 def _sha256_file(path: str) -> str:
@@ -58,6 +71,80 @@ def _sha256_file(path: str) -> str:
         for chunk in iter(lambda: f.read(1 << 20), b""):
             h.update(chunk)
     return h.hexdigest()
+
+
+def _write_invocation_receipt(work_dir: str, record: Dict[str, Any],
+                              geometry_out: Optional[Dict[str, Any]],
+                              ) -> Optional[str]:
+    """R451-C2 (C2.9): persist the invocation receipt for one boundary
+    pass. Written on EVERY exit (the caller wraps the whole compile);
+    every field is read from the record or the run's own files — never
+    invented (Art. VI). Returns the receipt path, or None when the
+    receipt could not be written (typed in the return value only; a
+    receipt failure never alters the render record's epistemic content)."""
+    try:
+        run_id = Path(work_dir).name
+        generation_id = (geometry_out or {}).get("generation_id")
+        if not generation_id:
+            # the run's own artifact identity doc is the recorded source
+            aid = Path(work_dir) / "MODEL" / "ARTIFACT_IDENTITY.json"
+            if aid.is_file():
+                try:
+                    generation_id = (json.loads(aid.read_text())
+                                     or {}).get("generation_id")
+                except Exception:  # noqa: BLE001 — absent stays absent
+                    generation_id = None
+        spec_path = Path(work_dir) / "MODEL" / "GEOMETRY_SPEC.json"
+        geometry_spec_sha256 = (_sha256_file(str(spec_path))
+                                if spec_path.is_file() else None)
+        glb_sha = record.get("source_glb_sha256")
+        if not glb_sha:
+            # early typed skips (renderer/deps guards) exit before the
+            # source is resolved — the receipt still names the GLB that
+            # sat at the boundary, read from the same resolution order
+            # the compiler itself uses (never invented, Art. VI)
+            waiting = authoritative_glb(
+                work_dir, (geometry_out or {}).get("generation_models"))
+            if waiting and Path(waiting).is_file():
+                glb_sha = _sha256_file(waiting)
+        status = str(record.get("status") or "UNKNOWN")
+        skip_reason = None
+        if status.startswith("RENDER_SKIPPED") or status in (
+                "RENDER_FAILED", "RENDER_TIMEOUT"):
+            skip_reason = (record.get("reason") or record.get("note")
+                           or record.get("error"))
+        receipt = {
+            "kind": "VISUAL_COMPILER_INVOCATION",
+            "schema_version": "1.0.0",
+            "run_id": run_id,
+            "generation_id": generation_id,
+            "canonical_glb_sha256": glb_sha,
+            "geometry_spec_sha256": geometry_spec_sha256,
+            "compiler_version": RENDER_PIPELINE,
+            "gate_version": visual_gate.GATE_VERSION,
+            "invoked_at": time.strftime("%Y-%m-%dT%H:%M:%SZ",
+                                        time.gmtime()),
+            "status": status,
+            "skip_reason": skip_reason,
+            # the boundary's output directory is canonical (always
+            # MODEL/3D under the run dir) — recorded even on the
+            # earliest skips, whose records may not carry out_dir
+            "output_directory": record.get("out_dir")
+            or str(Path(work_dir) / "MODEL" / "3D"),
+        }
+        out_dir = Path(work_dir) / "MODEL" / "3D"
+        out_dir.mkdir(parents=True, exist_ok=True)
+        path = out_dir / RECEIPT_FILENAME
+        path.write_text(json.dumps(receipt, indent=2))
+        return str(path)
+    except Exception as exc:  # noqa: BLE001 — typed, never fatal
+        try:
+            print(f"[visual_compiler] invocation receipt not written: "
+                  f"{type(exc).__name__}: {exc}", file=sys.stderr,
+                  flush=True)
+        except Exception:  # noqa: BLE001
+            pass
+        return None
 
 
 def _finish(record: Dict[str, Any]) -> Dict[str, Any]:
@@ -129,7 +216,33 @@ def compile_visuals(work_dir: str,
     the caller (a presentation-layer failure never alters the run's
     epistemic state; Art. LXI). The record's `visual_gate` carries the
     release decision: `hero_suppressed` / `release_blocked`.
+
+    R451-C2 (C2.9): EVERY exit also persists the invocation receipt
+    (VISUAL_COMPILER_INVOCATION.json) — the mechanical, on-disk proof
+    that the presentation boundary was reached, and whether the
+    renderer actually ran (BS-003/BS-030: built is not wired).
     """
+    record = _compile_visuals_inner(
+        work_dir, geometry_out=geometry_out, is_conceptual=is_conceptual,
+        resolution=resolution, turntable_frames=turntable_frames,
+        timeout_s=timeout_s, memory_mode=memory_mode, views=views,
+        context=context)
+    _write_invocation_receipt(work_dir, record, geometry_out)
+    return record
+
+
+def _compile_visuals_inner(work_dir: str,
+                           geometry_out: Optional[Dict[str, Any]] = None,
+                           is_conceptual: bool = False,
+                           resolution: Optional[List[int]] = None,
+                           turntable_frames: Optional[int] = None,
+                           timeout_s: Optional[int] = None,
+                           memory_mode: str = "async",
+                           views: Optional[Dict[str, bool]] = None,
+                           context: str = "visual_compiler",
+                           ) -> Dict[str, Any]:
+    """The compile body (single entry, single typed record) — the
+    receipt wrapper above owns the boundary bookkeeping."""
     if timeout_s is None:
         try:
             timeout_s = max(120, int(os.environ.get(

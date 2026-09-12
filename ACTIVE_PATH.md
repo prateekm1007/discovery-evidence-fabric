@@ -302,3 +302,37 @@ convergence and precedence, second-visitor enumeration-safe 404, five
 forged-token bypass attempts, CHIPS-vs-Lax cookie shapes by context, the
 SSE owner parameter (granted/denied/wrong-owner), and the route-wiring
 contract pins.
+
+## R451-C2 addendum (2026-09-12) — the blocked state becomes a first-class presentation state, and the geometry-to-visual join becomes machine-provable
+
+Operator directive R451-C2 (Visual State Integrity + Guaranteed
+Geometry-to-Visual Join): an infrastructure interruption must never be
+visually confused with scientific absence (Art. LXI; BS-008/009/011/018),
+and a legitimate engineering artifact must always be presented — while an
+absent one must be explained without lying.
+
+| Component | Module | Notes |
+|---|---|---|
+| THE ONE presentation-state mapping | `TOSCANINI_UI/webapp/lib/presentationState.ts` | seven states (INVESTIGATING / INFRASTRUCTURE_PAUSED / TECHNOLOGY_NOT_ESTABLISHED / GEOMETRY_UNAVAILABLE / GEOMETRY_READY_RENDER_BLOCKED / VISUAL_READY / SCIENTIFIC_REJECTION) resolved ONLY from the canonical user-state projection + dossier tabs — the frontend never re-derives state from raw fields and never reconciles conflicting signals (Attack C: infrastructure wins over stale scientific-looking fields); owns the canonical `isTerminal` (re-exported by RunNarrative — one definition) |
+| The blocked surface | `TOSCANINI_UI/webapp/components/InfrastructureBlockedHero.tsx` | presentation-only; DISCOVERY PAUSED / Infrastructure temporarily unavailable. / No scientific conclusion was reached. / Your problem is saved and ready to resume.; compact (an absence state never occupies the model viewport); CTA hierarchy Resume primary · journal secondary · package disabled with its reason; the recovery rows (what happened / what was established / what remains unknown); the problem-context panel explicitly labeled "not an invention model" (no dimensional claims, no synthetic geometry) |
+| Blocked insight cards | `presentationState.ts::blockedInsightCards` + `TechStage.tsx` | "Not evaluated — discovery paused before a technology state was established" class wording; the evidence card distinguishes NOT_REACHED ("Evidence retrieval not reached") from a MEASURED zero (numeric zero only when `retrieval_state == RETRIEVED`); scientific-absence phrases are structurally absent from the blocked path |
+| NOT_REACHED != measured zero | `toscanini/dossier.py::evidence_ledger` | every exit carries typed `retrieval_state` (NOT_REACHED / PENDING / FAILED / RETRIEVED); numeric counts exist ONLY when the envelope exists (a RETRIEVED zero is the honest measured zero; Art. XXI.3/XXV) |
+| Render-blocked state (C2.6) | `TechStage.tsx` ribbon + `lib/api.ts::retryPresentation` | GLB present + renderer skipped/failed/gate-failed -> "ENGINEERING MODEL READY — the engineering geometry exists. Presentation rendering is temporarily unavailable." with Retry presentation (POSTs the existing idempotent artifact-build job) — the canonical GLB stays interactive regardless |
+| Invocation receipt (C2.9) | `visual_compiler/visual_compiler.py::_write_invocation_receipt` | `MODEL/3D/VISUAL_COMPILER_INVOCATION.json` written on EVERY compiler exit (render, typed skip, failure) with run_id / generation_id / canonical_glb_sha256 / geometry_spec_sha256 / compiler_version / invoked_at / status / skip_reason / output_directory — "GLB exists" vs "GLB was passed to the renderer" is now machine-distinguishable (BS-003/BS-030) |
+| The end-to-end watchdog (C2.10) | `scripts/r451_c2_watchdog.py` | deterministic file-rule integrity check (R1 engineering GLB -> receipt exists; R2 rendered -> gate exists; R3 COMPLETE_PASS -> full 23-artifact ladder on disk; R4 hero source hash == canonical GLB hash; R5 skip -> typed reason; R6 no-GLB blocked run -> upstream projection (source-pinned); R7 receipt identity == run); NOT_APPLICABLE is never a violation (an infrastructure stop manufactures no failure) |
+| Semantic colors (§10) | `TOSCANINI_UI/webapp/app/globals.css` | three documented state colors: LIVE = existing ok-green; INFRASTRUCTURE PAUSED = new calm slate --state-infra (documented reason: amber already means pending/progress, red is reserved for scientific rejection); SCIENTIFIC REJECTION = existing bad-red |
+| Journal banner (§7) | `DeepDive.tsx` | PAUSED AT INFRASTRUCTURE above the recorded history; no artificial terminal failure event is manufactured |
+
+Batteries: `tests/test_r451_c2_blocked_state.py` (20 — typed retrieval
+states incl. the failed-retrieval and measured-zero cases; the receipt on
+the no-renderer skip, the no-source skip and a REAL Chromium render; the
+watchdog positive + four tampered fixtures each failing the SPECIFIC
+rule + the CLI exit codes; the blocked user-state projection pins);
+`scripts/r451_c2_ui_tests.mjs` (34 — the full §12/C2.13 regression
+matrix over the compiled shipping module, Attacks A–E, the blocked-card
+set, the isTerminal contract). Fresh-browser DOM proof (real server +
+production build + headless Chromium): `R451/C2_PRODUCT/E2E/`
+(DOM_EVIDENCE.json + blocked/success screenshots); success-state
+regression green (real 3D hero, gate badge, populated cards — unchanged).
+Constitution v2.4.0 read IN FULL at round start and re-read IN FULL
+immediately before this commit.

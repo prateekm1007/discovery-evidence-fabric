@@ -15,6 +15,7 @@
 
 import type { RunPhase, RunStateObject, SessionDetail, StageDigest } from "@/lib/types";
 import type { GenerationRecord, RunOutcome } from "@/lib/types";
+import { isTerminal } from "@/lib/presentationState";
 
 export const NARRATIVE_GROUPS: { heading: string; stages: string[] }[] = [
   { heading: "Understanding the problem", stages: [] },
@@ -360,15 +361,10 @@ export function OutcomeBanner({
   );
 }
 
-export function isTerminal(status: string): boolean {
-  return (
-    status === "COMPLETE" ||
-    status === "INTERRUPTED" ||
-    status.startsWith("ERROR") ||
-    status.startsWith("RUN_BLOCKED")  // R415: RUN_BLOCKED_TRANSPORT —
-    // infrastructure-blocked terminal, distinct from every verdict
-  );
-}
+// R451-C2: the canonical isTerminal lives in lib/presentationState.ts
+// (dependency-free, deterministically testable); the re-export below
+// keeps every component caller unchanged — one definition, never two.
+export { isTerminal };
 
 export default function RunNarrative({
   detail,
