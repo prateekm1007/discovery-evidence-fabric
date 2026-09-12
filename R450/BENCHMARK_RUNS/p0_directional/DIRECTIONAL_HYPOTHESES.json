@@ -1,0 +1,206 @@
+{
+ "artifact_type": "DIRECTIONAL_HYPOTHESES",
+ "schema_version": "hypotheses/1.0",
+ "created_at": "2026-09-12T04:38:54+00:00",
+ "hypotheses": [
+  {
+   "hypothesis_id": "dh:e4bc70ad7267578a3493",
+   "candidate_id": "inv:0342a8a18a:gen1",
+   "failure_id": "diag:9a5ce0140dac8f21",
+   "causal_diagnosis_id": "diag:9a5ce0140dac8f21",
+   "target_variable": "Battery management system design",
+   "current_value": "SOC limitation to below 75%",
+   "proposed_value": "Multi-tiered SOC limits with dynamic adjustment based on thermal monitoring",
+   "direction": "CHANGE_MECHANISM",
+   "mechanism_affected": "Fraction of ejected heat during thermal runaway influenced by SOC and cell mass loss",
+   "causal_rationale": "The failure was due to engineering infeasibility and regulatory incompatibility of a simple SOC cap. A dynamic system that adjusts SOC limits based on real-time thermal monitoring would address the causal mechanism (heat ejection influenced by SOC and mass loss) while being more feasible and potentially meeting regulatory requirements.",
+   "predicted_effect": "Reduced thermal runaway propagation while maintaining higher average usable capacity",
+   "predicted_magnitude_or_range": "10-20% increase in usable capacity compared to fixed 75% limit",
+   "competing_explanations": [
+    "Dynamic systems may introduce complexity and failure points",
+    "regulatory concerns may persist"
+   ],
+   "evidence_support": [
+    {
+     "evidence_id": "europepmc:33671244"
+    },
+    {
+     "evidence_id": "ev:1f3ab24447585867bafa1af1"
+    },
+    {
+     "evidence_id": "ev:8723885d560c989da2f3bda6"
+    },
+    {
+     "evidence_id": "ev:28812b1d0e69e010e2f91c57",
+     "acquired_through": "EVIDENCE_GAP_RETRIEVAL",
+     "source": "wopto"
+    },
+    {
+     "evidence_id": "ev:7afdd45cd7a1b069ff28b521",
+     "acquired_through": "EVIDENCE_GAP_RETRIEVAL",
+     "source": "wopto"
+    },
+    {
+     "evidence_id": "ev:48550c88e9bd9fc088f3cdd0",
+     "acquired_through": "EVIDENCE_GAP_RETRIEVAL",
+     "source": "wopto"
+    }
+   ],
+   "evidence_gaps": [
+    "No evidence on regulatory acceptance of dynamic systems",
+    "no evidence on failure rates of such systems"
+   ],
+   "falsifier": "If the dynamic system shows equivalent or worse thermal runaway propagation compared to the fixed limit",
+   "measurement_required": "Thermal runaway propagation testing with dynamic SOC limits under various conditions",
+   "intervention_type": "MECHANISM_COMBINATION",
+   "confidence": "MODERATE",
+   "provenance": {
+    "class": "AI_PROPOSED",
+    "purpose": "directional:hypothesis",
+    "note": "the LLM proposed this hypothesis; the mechanical ground gate adjudicates it (Art. XVIII) — an ungrounded proposal is REJECTED and its mutation never executes",
+    "proposed_at": "2026-09-12T04:38:58+00:00"
+   },
+   "status": "SUPPORTED",
+   "gate": {
+    "gate_version": "directional_ground_gate/1.0",
+    "checks": [
+     {
+      "check": "G1_STRUCTURE",
+      "verdict": "PASS",
+      "basis": "all required fields present"
+     },
+     {
+      "check": "G2_DIAGNOSIS_RESOLVES",
+      "verdict": "PASS",
+      "basis": "causal_diagnosis_id='diag:9a5ce0140dac8f21' resolves to a recorded diagnosis (cause=ADVERSARIAL_KILL)"
+     },
+     {
+      "check": "G3_MECHANISM_GROUNDED",
+      "verdict": "PASS",
+      "basis": "mechanism terms grounded in the diagnosis/candidate: cell, ejected, fraction, heat, influenced, loss, mass, runaway"
+     },
+     {
+      "check": "G4_PREDICTION_FALSIFIABLE",
+      "verdict": "PASS",
+      "basis": "predicted_effect present; falsifier names a measurable quantity"
+     },
+     {
+      "check": "G5_EVIDENCE_HONEST",
+      "verdict": "PASS",
+      "basis": "3 evidence_support ids resolve to custody; 0 unresolved; evidence_gaps honestly declared (2)"
+     }
+    ],
+    "grounded": true,
+    "verdict": "GROUNDED",
+    "evidence_resolution": {
+     "resolved_ids": [
+      "europepmc:33671244",
+      "ev:1f3ab24447585867bafa1af1",
+      "ev:8723885d560c989da2f3bda6"
+     ],
+     "unresolved_ids": []
+    },
+    "adjudicated_at": "2026-09-12T04:38:58+00:00"
+   },
+   "gap_retrieval": {
+    "loop_step": "EVIDENCE_GAP_RETRIEVAL",
+    "derived_queries": [
+     "Battery management system design fraction ejected heat",
+     "Battery management system design failure mechanism",
+     "fraction ejected heat alternative"
+    ],
+    "derivation": "deterministic templates over the hypothesis's target_variable + mechanism_affected (the reverse path: direction -> required evidence -> retrieval)",
+    "retrieved_at": "2026-09-12T04:38:58+00:00",
+    "n_items": 8,
+    "evidence_ids": [
+     "ev:28812b1d0e69e010e2f91c57",
+     "ev:7afdd45cd7a1b069ff28b521",
+     "ev:48550c88e9bd9fc088f3cdd0",
+     "ev:7afdd45cd7a1b069ff28b521",
+     "ev:8723885d560c989da2f3bda6",
+     "ev:8723885d560c989da2f3bda6",
+     "ev:b5935b51ae9d4c950c95e7da",
+     "ev:b0947d15a1f77fea1671303a"
+    ],
+    "channel_states": [
+     {
+      "source_id": "wopto",
+      "query": "lithium ion grid storage racks 200",
+      "state": "SUCCESS"
+     },
+     {
+      "source_id": "wopto",
+      "query": "lithium ion grid storage racks 200 megawatt hour",
+      "state": "SUCCESS"
+     },
+     {
+      "source_id": "openfoam_cases",
+      "query": "lithium ion grid storage racks 200",
+      "state": "EMPTY_RESULT"
+     },
+     {
+      "source_id": "openfoam_cases",
+      "query": "lithium ion grid storage racks 200 megawatt hour",
+      "state": "EMPTY_RESULT"
+     },
+     {
+      "source_id": "colabfit_mp",
+      "query": "Li",
+      "state": "UNKNOWN"
+     },
+     {
+      "source_id": "lemat_rho",
+      "query": "Li",
+      "state": "SUCCESS"
+     },
+     {
+      "source_id": "qm9",
+      "query": "lithium ion grid storage racks 200",
+      "state": "UNKNOWN"
+     },
+     {
+      "source_id": "qm9",
+      "query": "lithium ion grid storage racks 200 megawatt hour",
+      "state": "SUCCESS"
+     },
+     {
+      "source_id": "chemrag_reactions",
+      "query": "lithium ion grid storage racks 200",
+      "state": "EMPTY_RESULT"
+     },
+     {
+      "source_id": "chemrag_reactions",
+      "query": "lithium ion grid storage racks 200 megawatt hour",
+      "state": "UNKNOWN"
+     }
+    ],
+    "state": "OK"
+   },
+   "evidence_changed_direction": true,
+   "mutation_id": "mut-2-dh:e4bc70ad7267578a3493",
+   "causal_updates": [
+    {
+     "causal_update_id": "cu:dhe4bc70ad7267578a3493ob",
+     "hypothesis_id": "dh:e4bc70ad7267578a3493",
+     "observation_id": "obs:inv0342a8a18agen2mut2dhe",
+     "prediction": {
+      "target_variable": "Battery management system design",
+      "direction": "CHANGE_MECHANISM",
+      "predicted_effect": "Reduced thermal runaway propagation while maintaining higher average usable capacity",
+      "predicted_magnitude": "10-20% increase in usable capacity compared to fixed 75% limit"
+     },
+     "observed": {
+      "killed": false,
+      "epistemic_state": "UNKNOWN",
+      "objective_delta": 1
+     },
+     "match": true,
+     "hypothesis_status_after": "SUPPORTED",
+     "basis": "the mutated candidate survived with a recorded improvement (verdict-rank delta 1)",
+     "updated_at": "2026-09-12T04:40:55+00:00",
+     "note": "the causal model update is recorded, not asserted: the direction's causal claim lives or dies by the recorded observation; FALSIFIED directions become negative knowledge for future search (Art. LI)"
+    }
+   ]
+  }
+ ]
+}

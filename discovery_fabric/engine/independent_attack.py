@@ -105,7 +105,7 @@ from __future__ import annotations
 import re
 from typing import Any, Dict, List, Optional, Tuple
 
-ATTACK_VERSION = "independent_attack/2.0.0"
+ATTACK_VERSION = "independent_attack/2.1.0"
 ATTACK_CLASSES = (
     "MECHANISM_FAILURE", "BOUNDARY_CONDITION_FAILURE",
     "EVIDENCE_CONTRADICTION", "BASELINE_EQUIVALENCE",
@@ -148,13 +148,35 @@ BOUNDARY_CONDITION_FAILURE: <KILL, RISK, or SURVIVE> — <specific basis> GROUND
 EVIDENCE_CONTRADICTION: <KILL, RISK, or SURVIVE> — <specific basis> GROUNDED_IN: <binding>
 BASELINE_EQUIVALENCE: <KILL, RISK, or SURVIVE> — <specific basis> GROUNDED_IN: <binding>
 IMPLEMENTATION_IMPOSSIBILITY: <KILL, RISK, or SURVIVE> — <specific basis> GROUNDED_IN: <binding>
-MEASUREMENT_AMBIGUITY: <KILL, RISK, or SURVIVE> — <specific basis> GROUNDED_IN: <binding>"""
+MEASUREMENT_AMBIGUITY: <KILL, RISK, or SURVIVE> — <specific basis> GROUNDED_IN: <binding>
+
+THEN — for each class where you did NOT answer SURVIVE, one improvement
+suggestion line (the machine uses these as candidate improvement
+directions; a suggestion is only usable when it binds to the same
+checkable grounds as its objection):
+INTERVENTION MECHANISM_FAILURE: <the variable to change, the direction, and why it addresses the failure basis> GROUNDED_IN: <binding>
+INTERVENTION BOUNDARY_CONDITION_FAILURE: <...> GROUNDED_IN: <binding>
+INTERVENTION EVIDENCE_CONTRADICTION: <...> GROUNDED_IN: <binding>
+INTERVENTION BASELINE_EQUIVALENCE: <...> GROUNDED_IN: <binding>
+INTERVENTION IMPLEMENTATION_IMPOSSIBILITY: <...> GROUNDED_IN: <binding>
+INTERVENTION MEASUREMENT_AMBIGUITY: <...> GROUNDED_IN: <binding>"""
 
 
 _ATTACK_LINE_RE = re.compile(
     r"^(MECHANISM_FAILURE|BOUNDARY_CONDITION_FAILURE|"
     r"EVIDENCE_CONTRADICTION|BASELINE_EQUIVALENCE|"
     r"IMPLEMENTATION_IMPOSSIBILITY|MEASUREMENT_AMBIGUITY)\s*:\s*(.*)$",
+    re.MULTILINE)
+
+# v2.1: the INTERVENTION suggestion lines (R450 §10) — same GROUNDED_IN
+# discipline as the objection lines; an ungrounded suggestion is
+# preserved as UNGROUNDED_SUGGESTION and NEVER enters the directional
+# loop's hypothesis space
+_INTERVENTION_LINE_RE = re.compile(
+    r"^INTERVENTION\s+(MECHANISM_FAILURE|BOUNDARY_CONDITION_FAILURE|"
+    r"EVIDENCE_CONTRADICTION|BASELINE_EQUIVALENCE|"
+    r"IMPLEMENTATION_IMPOSSIBILITY|MEASUREMENT_AMBIGUITY)"
+    r"\s*:\s*(.+)$",
     re.MULTILINE)
 
 # minimal basis length for a KILL verdict to be VALID (an adversarial
@@ -370,6 +392,52 @@ def _parse_attack(content: str) -> Dict[str, Dict[str, str]]:
     return parsed
 
 
+def _parse_interventions(content: str) -> Dict[str, str]:
+    """v2.1 (R450 §10): parse the INTERVENTION suggestion lines."""
+    out: Dict[str, str] = {}
+    for m in _INTERVENTION_LINE_RE.finditer(content or ""):
+        out[m.group(1)] = m.group(2).strip()
+    return out
+
+
+def _adjudicate_interventions(
+        parsed_interventions: Dict[str, str],
+        candidate: Dict[str, Any],
+        evidence: List[Dict[str, Any]]
+) -> List[Dict[str, Any]]:
+    """v2.1 (R450 §10): the intervention suggestions get the SAME
+    grounding discipline as the objections. A suggestion whose
+    GROUNDED_IN binding passes is GROUNDED_INTERVENTION (usable as a
+    directional-loop SEED — still subject to the DirectionalHypothesis
+    ground gate, never auto-admitted); a suggestion without a passing
+    binding is UNGROUNDED_SUGGESTION — preserved verbatim, explicitly
+    barred from the hypothesis space (the attacker does not get
+    authority to invent causal explanations). The verdict logic and
+    the calibration state are UNCHANGED (suggestions are non-verdict
+    output; the negative-knowledge calibration result carries forward)."""
+    out: List[Dict[str, Any]] = []
+    for cls, text in parsed_interventions.items():
+        grounding = grounding_check(text, candidate, evidence)
+        passed = bool(grounding.get("grounded"))
+        out.append({
+            "attack_class": cls,
+            "suggestion": text[:400],
+            "grounding": grounding,
+            "class": "GROUNDED_INTERVENTION" if passed else
+                     "UNGROUND_SUGGESTION",
+            "authority": (
+                "usable as a directional-loop SEED only (the "
+                "DirectionalHypothesis ground gate still adjudicates "
+                "any hypothesis built on it)"
+                if passed else
+                "NONE — an ungrounded suggestion is preserved for "
+                "human/escalation review and NEVER enters the "
+                "hypothesis space (R450 §10: the attacker does not "
+                "get authority to invent causal explanations)"),
+        })
+    return out
+
+
 def _validate_parsed(parsed: Dict[str, Dict[str, str]],
                      candidate: Dict[str, Any],
                      evidence: List[Dict[str, Any]]
@@ -510,6 +578,11 @@ def independent_attack(candidate: Dict[str, Any],
     items = _validate_parsed(_parse_attack(meta.get("content") or ""),
                              candidate, evidence or [])
     record["items"] = items
+    # v2.1 (R450 §10): the intervention suggestions — additive,
+    # non-verdict output with the same grounding discipline
+    record["intervention_suggestions"] = _adjudicate_interventions(
+        _parse_interventions(meta.get("content") or ""),
+        candidate, evidence or [])
     valid = [i for i in items if i["verdict"] in VALID_CLASS_VERDICTS]
     kills = [i for i in valid if i["verdict"] == "KILL"]
     demoted = [i for i in items if i["verdict"] == DEMOTED_CLASS_VERDICT]

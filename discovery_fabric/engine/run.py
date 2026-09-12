@@ -2015,7 +2015,25 @@ class EngineRun:
                 if child is not None:
                     self._persist(f"EVOLUTION_GEN_{gen_n}.json", child)
             if child is None:
+                # R450: distinguish a ground-gate REJECTION (a recorded
+                # scientific decision — the direction was ungrounded and
+                # the mutation refused) from a transport failure (an
+                # infrastructure state); the stop reason is honest about
+                # which one stopped the loop (Art. LXI)
                 stop_reason = "TRANSPORT_BLOCKED"
+                try:
+                    from discovery_fabric.directional.loop import (
+                        _load_hypotheses)
+                    hyps = _load_hypotheses(self.out).get(
+                        "hypotheses") or []
+                    last = hyps[-1] if hyps else {}
+                    if last.get("status") == "REJECTED":
+                        stop_reason = "DIRECTION_REJECTED_BY_GROUND_GATE"
+                    elif last.get("status") == \
+                            "ABSENT_PROPOSAL_TRANSPORT":
+                        stop_reason = "DIRECTIONAL_PROPOSAL_TRANSPORT"
+                except Exception:  # noqa: BLE001 — stop-reason hygiene
+                    pass
                 parent["state"] = ev.INVENTION_EVOLVED
                 break
             parent["state"] = ev.INVENTION_EVOLVED
@@ -2158,7 +2176,17 @@ class EngineRun:
         serves them, and the causal delta carries the evidence binding
         (consumed custody ids). The EuropePMC fresh-evidence path stays
         byte-unchanged beside it; the two never merge silently (the
-        snapshot records both channels separately)."""
+        snapshot records both channels separately).
+
+        R450: the DIRECTIONAL loop — DIAGNOSIS -> DIRECTIONAL HYPOTHESIS
+        (ground-gated; an ungrounded direction REJECTS the mutation,
+        recorded, never executed) -> CONTROLLED MUTATION (the generation
+        prompt EXECUTES the gated hypothesis) -> EVALUATION -> OBSERVATION
+        -> CAUSAL UPDATE -> NEXT DIRECTION, all persisted as the run's
+        IMPROVEMENT_TRAJECTORY.json + DIRECTIONAL_HYPOTHESES.json. The
+        UNGUIDED control mode (ENGINE_EVOLUTION_MODE=UNGUIDED) strips
+        the diagnosis AND the hypothesis from the prompt — the
+        benchmark's honest baseline arm."""
         from . import evolution as ev
         # ---- fresh evidence (new snapshot, versioned) ------------------
         fresh = ev.retrieve_fresh_evidence(
@@ -2191,11 +2219,61 @@ class EngineRun:
             fresh_items = fresh_items + [
                 i for i in ef_items if i.get("id") not in have]
 
+        # ---- R450: DIAGNOSIS -> DIRECTIONAL HYPOTHESIS (ground gate) ----
+        dir_mode = "LEGACY"
+        d_hypothesis: Optional[Dict[str, Any]] = None
+        try:
+            from discovery_fabric import directional as _dir
+            dir_mode = _dir.evolution_mode()
+            if dir_mode == "DIRECTIONAL" and not _dir.directional_enabled():
+                dir_mode = "LEGACY"
+            if dir_mode == "DIRECTIONAL":
+                failure_summary = str(
+                    parent.get("failure_or_challenge")
+                    or (parent.get("challenge") or {}).get("kill_reason")
+                    or "the parent architecture lost its challenge "
+                       "gauntlet")
+                d_hypothesis = _dir.directional_step(
+                    run_dir=self.out, problem=self.problem,
+                    parent=parent, diagnosis=diagnosis,
+                    failure_summary=failure_summary,
+                    evidence_items=fresh_items, gen_n=gen_n)
+                if d_hypothesis is None:
+                    # the gate REJECTED the direction (or the proposal
+                    # transport failed) — THE MUTATION NEVER EXECUTES
+                    # (R450 §4); the loop records the abstention and
+                    # this generation does not happen
+                    return None
+        except Exception as _dir_exc:  # noqa: BLE001 — infra, not verdict
+            # the directional layer itself failed (infrastructure): the
+            # LEGACY path continues, disclosed — never a silent second
+            # engine (Art. IV/LXI)
+            self._persist(f"DIRECTIONAL_LAYER_ERROR_gen-{gen_n}.json", {
+                "error": f"{type(_dir_exc).__name__}: "
+                         f"{_dir_exc}"[:300],
+                "fallback": "LEGACY evolution (the directional layer is "
+                            "infrastructure; its failure is recorded, "
+                            "never a scientific verdict)"})
+            dir_mode = "LEGACY"
+
         # ---- the causal-delta generation --------------------------------
         arch = ev.generate_evolved_architecture(
-            self.problem, parent, diagnosis, fresh_items, gen_n)
+            self.problem, parent, diagnosis, fresh_items, gen_n,
+            directional_hypothesis=d_hypothesis, mode=dir_mode)
         if arch is None:
             return None
+
+        # ---- R450: the mutation record (directional or unguided) --------
+        mutation_id = f"mut-{gen_n}-{(d_hypothesis or {}).get('hypothesis_id', 'unguided')}"
+        if d_hypothesis is not None:
+            d_hypothesis["mutation_id"] = mutation_id
+            arch["served_direction"] = {
+                "hypothesis_id": d_hypothesis.get("hypothesis_id"),
+                "target_variable": d_hypothesis.get("target_variable"),
+                "direction": d_hypothesis.get("direction"),
+                "intervention_type":
+                    d_hypothesis.get("intervention_type"),
+            }
 
         # ---- R449: bind the causal delta to the evidence it consumed ---
         if ef_evolution_record is not None and arch.get("causal_delta"):
@@ -2249,8 +2327,42 @@ class EngineRun:
             "model": None,
             "artifacts": {},
         }
-        return self._evolution_challenge_generation(gen, fresh_items,
-                                                     parent)
+        gen = self._evolution_challenge_generation(gen, fresh_items,
+                                                    parent)
+        # ---- R450: EVALUATION -> OBSERVATION -> CAUSAL UPDATE ----------
+        # the gauntlet has spoken; the directional layer records the
+        # observation + causal update (the hypothesis's prediction vs
+        # the recorded outcome) and appends the trajectory step. The
+        # UNGUIDED arm records the observation WITHOUT a causal update
+        # (the control's honest shape). Failures here are recorded,
+        # never fatal to the generation itself (the gauntlet verdict is
+        # the authority, not the trajectory bookkeeping).
+        try:
+            from discovery_fabric import directional as _dir
+            gauntlet_result = dict(gen.get("challenge") or {})
+            gauntlet_result.setdefault("killed", False)
+            cand_id = str(gen.get("invention_id") or
+                          parent.get("invention_id") or "")
+            if d_hypothesis is not None:
+                _dir.record_directional_outcome(
+                    run_dir=self.out, hypothesis=d_hypothesis,
+                    mutation_id=mutation_id,
+                    gauntlet_result=gauntlet_result,
+                    gen_n=gen_n, candidate_id=cand_id)
+            elif dir_mode == "UNGUIDED":
+                _dir.record_unguided_outcome(
+                    run_dir=self.out, mutation_id=mutation_id,
+                    gauntlet_result=gauntlet_result,
+                    gen_n=gen_n, candidate_id=cand_id)
+        except Exception as _obs_exc:  # noqa: BLE001 — bookkeeping only
+            self._persist(f"DIRECTIONAL_OUTCOME_ERROR_gen-{gen_n}.json", {
+                "error": f"{type(_obs_exc).__name__}: "
+                         f"{_obs_exc}"[:300],
+                "note": "the observation/causal-update recording failed; "
+                        "the gauntlet verdict is unchanged (the "
+                        "trajectory bookkeeping is not a verdict "
+                        "authority)"})
+        return gen
 
     # ------------------------------------------------------------------
     def _evolution_challenge_generation(self, gen: Dict[str, Any],

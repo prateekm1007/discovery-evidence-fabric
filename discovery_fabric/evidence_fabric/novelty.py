@@ -28,7 +28,17 @@ transferred/...).
 
 Vocabulary (closed):
     KNOWN_MECHANISM / CAUSAL_COMBINATION / MEANINGFUL_NEW_INTERACTION /
-    NEW_OPERATING_REGIME / INSUFFICIENT_EVIDENCE
+    NEW_OPERATING_REGIME / NOVEL_BEHAVIOR / INSUFFICIENT_EVIDENCE
+
+R450 §13 (obvious-combination protection, the reproduction leg): the
+strongest level — NOVEL_BEHAVIOR — requires the full chain
+    known A + known B -> unexpected interaction C -> predicted by
+    mechanism -> REPRODUCED BY EVALUATION
+where the reproduction is a RECORDED evaluation/observation artifact
+that grounds the interaction. A combination without the reproduction
+evidence stays at CAUSAL_COMBINATION/MEANINGFUL_NEW_INTERACTION —
+novelty-by-description is never upgraded to novelty-by-demonstration
+without the recorded reproduction (Art. XXVIII).
 """
 from __future__ import annotations
 
@@ -56,6 +66,7 @@ NOVELTY_LEVELS = [
     "CAUSAL_COMBINATION",
     "MEANINGFUL_NEW_INTERACTION",
     "NEW_OPERATING_REGIME",
+    "NOVEL_BEHAVIOR",
     "INSUFFICIENT_EVIDENCE",
 ]
 
@@ -73,7 +84,9 @@ def _markers(text: str, markers: List[str]) -> List[str]:
 def adjudicate_novelty_level(
         mechanism: str,
         intervention: str,
-        evidence_items: List[Dict[str, Any]]) -> Dict[str, Any]:
+        evidence_items: List[Dict[str, Any]],
+        reproduction_evidence: Optional[Dict[str, Any]] = None
+        ) -> Dict[str, Any]:
     """Adjudicate the novelty level of ONE candidate against its
     evidence pool.
 
@@ -146,6 +159,27 @@ def adjudicate_novelty_level(
             clusters.setdefault(t, 0)
             clusters[t] += 1
     n_clusters = len([t for t, c in clusters.items() if c >= 1])
+    # ---- R450 §13: the reproduction leg (NOVEL_BEHAVIOR) ----------
+    # known A + known B -> unexpected interaction C -> predicted by
+    # mechanism -> REPRODUCED BY EVALUATION. The reproduction is a
+    # RECORDED evaluation artifact (observation/gauntlet record) whose
+    # own text grounds the interaction; without it the level stays at
+    # the interaction/regime level (novelty-by-description only).
+    reproduced = False
+    reproduction_basis = ""
+    if reproduction_evidence and interaction_items:
+        rep_text = " ".join(str(reproduction_evidence.get(k) or "")
+                            for k in ("predicted_effect",
+                                      "observed_effect", "basis",
+                                      "kill_reason", "text"))
+        if rep_text.strip() and _markers(rep_text, _INTERACTION_MARKERS):
+            reproduced = True
+            reproduction_basis = (
+                "reproduction recorded: "
+                + str(reproduction_evidence.get("observation_id")
+                      or reproduction_evidence.get("evaluation_id")
+                      or "<recorded evaluation artifact>")
+                + " grounds the interaction in its own measured text")
     if regime_items:
         level = "NEW_OPERATING_REGIME"
         basis.append(
@@ -181,10 +215,20 @@ def adjudicate_novelty_level(
                       "pool"],
             "per_item": per_item,
         }
+    if reproduced and level in ("MEANINGFUL_NEW_INTERACTION",
+                               "NEW_OPERATING_REGIME"):
+        level = "NOVEL_BEHAVIOR"
+        basis.append(reproduction_basis)
+        basis.append(
+            "the full chain holds: known components + evidenced "
+            "interaction + mechanism prediction + RECORDED "
+            "reproduction — the strongest invention-evidence class "
+            "(novelty-by-demonstration, not novelty-by-description)")
     return {
         "level": level,
         "basis": basis,
         "per_item": per_item,
+        "reproduced_by_evaluation": reproduced,
         "credit_rule": (
             "invention credit at MEANINGFUL_NEW_INTERACTION or "
             "NEW_OPERATING_REGIME requires exact-span evidence grounding "

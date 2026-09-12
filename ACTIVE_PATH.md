@@ -302,3 +302,47 @@ convergence and precedence, second-visitor enumeration-safe 404, five
 forged-token bypass attempts, CHIPS-vs-Lax cookie shapes by context, the
 SSE owner parameter (granted/denied/wrong-owner), and the route-wiring
 contract pins.
+
+## R449 addendum (2026-09-12) — the Evidence Fabric: federated evidence into the engine
+
+Operator directive R449: connect HF-hosted datasets to the invention engine
+(federated, no bulk warehouse, no second knowledge graph, no replacement of
+the existing retrieval fabric).
+
+| Component | Module | Notes |
+|---|---|---|
+| Canonical EvidenceRecord | `discovery_fabric/evidence_fabric/evidence_record.py` | ONE representation for every source (evidence_id, source_identity, exact_span{dataset/config/split/row_idx/field/verbatim text/sha256/document_ref/retrieval_query}, proposition, measurements (same-row columns), provenance, admissibility). The LLM interprets the span; it can never redefine it (Art. II/III) |
+| Endpoint-aware custody | `evidence_record.py::verify_span_custody` | MEASURED LIVE: /search row_idx is NOT a stable address (the datasets-server search index numbers rows differently from /rows storage; load-balanced nodes disagree) while /filter row_idx IS aligned — filter records verify by pinned-row re-fetch, search records by RETRIEVAL REPLAY (same query re-issued, document_ref located, span bytes compared); tampered hash -> FAIL, wrong doc -> UNKNOWN |
+| Source registry (frozen) | `R449/EVIDENCE_SOURCE_REGISTRY.json` + `registry.py` | the 10-seat production subset with license texts read + hashed: WOPTO (cc-by-4.0), OpenFOAM-Agent (mit), ColabFit-MP (cc-by-4.0), LeMat-Rho (cc-by-4.0), QM9 (apache-2.0, gap in HARTREE — unit discovery recorded), ChemRAG (mit); FAIL-CLOSED promotion (uspto + s2orc: license=None -> PENDING_LICENSE_VERIFICATION, never production evidence) |
+| Federated connector | `evidence_fabric/connectors.py` | remote datasets-server /search //filter //rows; NOTHING bulk-downloaded; INDEX_LOADING + every failure class -> UNKNOWN (never absence, Art. XXI.3); the slash stays UNencoded in repo URLs (huggingface.co rejects encoded repo names — measured) |
+| RETRIEVE integration | `engine/adapters.py::A2RetrievalAdapter` | the evidence fabric is an ADDITIVE channel inside the engine's RETRIEVE (ENGINE_EVIDENCE_FABRIC=0 disables); EVIDENCE_FABRIC_REPORT.json persisted per run; relevance adjudicated per record (Art. XXI.4) with TEXT term-overlap and STRUCTURED element-overlap modes |
+| Source substitution | `evidence_fabric/substitution.py` | declared per-family ladders + coverage limitations; provenance preserved by construction; the forbidden LLM ladder has no functional representation (test-enforced) |
+| Contradiction search | `evidence_fabric/contradiction.py` | contradiction-seeking queries against the same federated sources; ABSENCE != CONTRADICTION (NO_CONTRADICTING_EVIDENCE_FOUND is an index-scoped absence claim, never confirmation) |
+| Novelty defense | `evidence_fabric/novelty.py` | KNOWN_MECHANISM / CAUSAL_COMBINATION (adjacency = LOW credit) / MEANINGFUL_NEW_INTERACTION / NEW_OPERATING_REGIME (+ R450's NOVEL_BEHAVIOR) |
+| Two-arm evidence-power experiment | `R449/FRESH_EVIDENCE_POWERED_DISCOVERY.json` + `EVIDENCE_RETRIEVAL_RUN.json` | genuinely fresh seawater-corrosion problem, same engine/transport/gauntlet: Arm A (V2 fabric only) 13 items vs Arm B (+ evidence fabric) 25 items, 12 fabric-sourced; HONEST VERDICT: mechanism_search_changed=true BUT evidence_fabric_sourced_mechanisms_present=false (the fabric's records entered the pool and did not win the synthesis rotation — recorded as the honest negative component) |
+
+## R450 addendum (2026-09-12) — the Directional Improvement Engine
+
+Operator directive R450: a failed candidate produces a grounded, testable
+direction of improvement; the loop executes a controlled intervention,
+evaluates, and updates the causal model. Coder 1 owns the truth-generating
+loop; the engine's evolution pipeline IS that loop (no second engine).
+
+| Component | Module | Notes |
+|---|---|---|
+| DirectionalHypothesis (canonical primitive) | `discovery_fabric/directional/hypothesis.py` | machine-evaluable + provenance-bearing: failure_id -> causal_diagnosis_id -> target_variable/current->proposed/direction -> mechanism_affected -> causal_rationale -> predicted_effect(+magnitude) -> competing_explanations -> evidence_support/gaps -> falsifier -> measurement_required -> intervention_type -> confidence -> status; closed vocabularies (9 directions, 8 intervention classes, 7 statuses) |
+| THE GROUND GATE | `hypothesis.py::ground_gate` | five mechanical checks (G1 structure+vocabularies, G2 diagnosis resolves, G3 mechanism term-grounding, G4 measurable falsifier — units/quantities/comparative-experiment forms, G5 evidence honest); UNGROUNDED -> REJECTED and the mutation NEVER executes ("increase fin size" with no causal chain is refused; brute-force mutation is not mistaken for intelligence) |
+| The loop | `directional/loop.py` + `engine/run.py::_evolution_generate_next` | DIAGNOSIS -> gated hypothesis -> CONTROLLED MUTATION (the generation prompt EXECUTES the direction) -> EVALUATION (the same gauntlet) -> OBSERVATION -> CAUSAL UPDATE -> NEXT DIRECTION; stop reasons DIRECTION_REJECTED_BY_GROUND_GATE / DIRECTIONAL_PROPOSAL_TRANSPORT distinct from transport failures (Art. LXI) |
+| Observation + signals | `directional/observation.py` | epistemic states (SUPPORTED/UNSUPPORTED/UNKNOWN/ABSTAIN/REQUIRES_EXPERIMENT) NEVER softened by the improvement-signal layer (objective_delta, constraint_delta, distance_to_target, information_gain, sensitivity); sensitivity ONLY from real recorded evaluation pairs (no fabricated gradients) |
+| Causal update | `observation.py::causal_update` | prediction-vs-observation: MATCH -> SUPPORTED, MISMATCH -> FALSIFIED (negative knowledge), undecided -> EXECUTED/UNKNOWN (never silently support) |
+| Trajectory persistence | `directional/trajectory.py` | IMPROVEMENT_TRAJECTORY.json (append-only V1->F1->D1->M1->R1->C1->V2 chain); raw counters only — NO composite score |
+| Unguided control | `engine/evolution.py::UNGUIDED_MUTATION_PROMPT` | the benchmark's honest Arm B: generic improvement mutation with NEITHER the diagnosis NOR a hypothesis (same gauntlet, same budget) |
+| Evidence -> direction (reverse path) | `directional/loop.py::serve_evidence_gaps` | DIRECTION -> declared gaps -> deterministic gap queries -> R449 fabric retrieval -> newly acquired support recorded ON the hypothesis (evidence_changed_direction) |
+| Attacker v2.1 | `engine/independent_attack.py` | INTERVENTION suggestions with the SAME grounding discipline: GROUNDED_INTERVENTION = directional-loop SEED (still gate-bound); UNGROUND_SUGGESTION never enters the hypothesis space; calibration state inherited NOT_CALIBRATED (negative knowledge preserved; discipline NOT weakened) |
+| Obvious-combination protection | `evidence_fabric/novelty.py` | NOVEL_BEHAVIOR: known A + known B -> evidenced interaction -> mechanism prediction -> RECORDED reproduction by evaluation (novelty-by-description never upgrades without the reproduction) |
+| The benchmark | `scripts/r450_directional_benchmark.py` + `R450/DIRECTIONAL_BENCHMARK.json` | 2 fresh problems x 2 arms, raw metrics only. P0: both arms survived, ONLY the directional arm produced supported causal knowledge (1 falsifiable hypothesis + measurement contract). P1: the directional arm REFUSED its ungrounded proposal (vague falsifier) at ZERO evaluation cost; the unguided arm blind-rolled a survivor with no causal knowledge. Honest limitation: N=2 x 1 iteration — a first live demonstration, not a powered comparison |
+
+The engine stage order is UNCHANGED; the directional layer lives inside the
+evolution step (between the diagnosis and the generation) and after the
+gauntlet (the observation/causal-update recording). No second invention
+graph, no second canonical database, no new solver, no new provider.

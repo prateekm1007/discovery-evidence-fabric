@@ -1,0 +1,79 @@
+{
+ "generation": 2,
+ "invention_id": "inv:c2afb1ea4f:gen2",
+ "escalation": {
+  "gate_version": "attacker_calibration/1.1.0",
+  "instrument": "independent_attack/2.1.0",
+  "calibration_state": "NOT_CALIBRATED",
+  "terminal_kill_admissible": false,
+  "measured": {
+   "coverage": 1.0,
+   "parse_completeness": 1.0,
+   "tpr_scoped": 1.0,
+   "fpr_known_good": 1.0,
+   "n_cases_attacked": 22
+  },
+  "sealed_thresholds": {
+   "provenance": "REUSED from the R412 sealed bars (r412_calibration_seal.json, pre-registered 2026-09-05); NO new threshold invented (Art. XXVII)",
+   "tpr_min": 0.75,
+   "fpr_max": 0.3,
+   "coverage_min": 0.875,
+   "parse_completeness_min": 0.875,
+   "scope": "TPR is measured over the TRUE-POSITIVES cohort; FPR/TNR over the TRUE-NEGATIVES cohort; the additional cohorts (near-miss, scope-conflict, evidence-contradicted, malformed-missing-evidence) are measured and reported as category disciplines, not folded into the headline TPR/FPR"
+  },
+  "measurement_path": "R447/ATTACKER_V2_RECALIBRATION/MEASUREMENT.json",
+  "measurement_sha256": "1e830a17803a387725c8732fdb0fcd71567e28865c969d5637096893a4d89ea3",
+  "reason": "measured FPR 1.0 > sealed bar 0.3 (Art. L: the attacker is measured non-selective; its KILL is inadmissible as a terminal verdict and is escalated with the objection preserved)",
+  "rule": "the instrument's KILL is measured non-selective (FPR above the sealed bar); the objection is preserved verbatim and ESCALATED for adjudication — the candidate is NOT killed by this attack alone (Art. L); the deterministic gates are unchanged",
+  "reviewer_provenance": "AI_REVIEW (Art. LXVII)"
+ },
+ "preserved_objections": [
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "basis": "The candidate claims a reduction in thermal propagation speed from 90 seconds to >300 seconds, but none of the provided evidence supports this specific claim or demonstrates that the proposed system can achieve this dramatic improvement in thermal propagation time. GROUNDED_IN: EVIDENCE [ev:fdc380e07a5f4157a1b2d0fb] | RECORD \"Reduction in thermal propagation speed from 90 seconds to >300 seconds\" | COMPUTATION \"90 seconds baseline vs. >300 seconds claimed improvement\"",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Fiber Optic Sensing Technologies for Battery Management Systems and Energy Storage Applications.' (strong overlap: thermal, this)",
+      "verified": true
+     },
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['90', '300', '380', '07', '5', '4157']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'in thermal propagation speed' (field: predicted_effect)",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "EVIDENCE [ev:fdc380e07a5f4157a1b2d0fb] | RECORD \"Reduction in thermal propagation speed from 90 seconds to >300 seconds\" | COMPUTATION \"90 seconds baseline vs. >300 seconds claimed improvement\"",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "basis": "The proposed integration of distributed fiber optic temperature sensors with machine learning algorithms for a 200-megawatt-hour grid-storage rack introduces significant computational complexity that is not addressed in the evidence. The processing requirements for real-time analysis of thermal data across such a large system are likely prohibitive. GROUNDED_IN: EVIDENCE [ev:7afdd45cd7a1b069ff28b521] | RECORD \"integration of distributed fiber optic temperature sensors with machine learning algorithms\" | SCOPE \"200-megawatt-hour grid-storage racks\"",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Fiber Optic Sensing Technologies for Battery Management Systems and Energy Storage Applications.' (strong overlap: fiber, grid, optic, sensors)",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'of distributed fiber optic' (field: intervention)",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "EVIDENCE [ev:7afdd45cd7a1b069ff28b521] | RECORD \"integration of distributed fiber optic temperature sensors with machine learning algorithms\" | SCOPE \"200-megawatt-hour grid-storage racks\"",
+    "absence_ground": false
+   }
+  }
+ ]
+}

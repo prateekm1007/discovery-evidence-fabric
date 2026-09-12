@@ -420,10 +420,13 @@ class TestNovelty:
         assert d["level"] == "INSUFFICIENT_EVIDENCE"
 
     def test_levels_closed(self):
+        # R450 §13 extended the ladder with NOVEL_BEHAVIOR (the
+        # reproduction leg: known A + known B -> evidenced interaction
+        # -> mechanism prediction -> RECORDED reproduction)
         assert set(NOVELTY_LEVELS) == {
             "KNOWN_MECHANISM", "CAUSAL_COMBINATION",
             "MEANINGFUL_NEW_INTERACTION", "NEW_OPERATING_REGIME",
-            "INSUFFICIENT_EVIDENCE"}
+            "NOVEL_BEHAVIOR", "INSUFFICIENT_EVIDENCE"}
 
 
 # ---------------------------------------------------------------------------
