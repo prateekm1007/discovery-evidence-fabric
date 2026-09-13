@@ -727,3 +727,17 @@ Stage Summary:
 - Round record: R451/C2_PRODUCT/R451_C2_CLOSURE_ROUND_RECORD.json (a NEW artifact; the prior C2.6 records are untouched - append-only, Art. XI; the two scan records carry forward redactions disclosed in both records).
 - No C2.7 was created; no new visual product was added; Coder 1's machinery is untouched.
 - reviewer_provenance=AI_REVIEW.
+
+---
+Task ID: R451-C2-CLOSURE (delivery closure)
+Agent: Coder 2 (main session)
+Task: record the round commit SHA in the closure round record and verify the remote per Art. XXIII.
+
+Work Log:
+- Round commit: 64977083141f116e421ce25d29cae89a0271da0b (12 files, +1266/-82).
+- Round record R451_C2_CLOSURE_ROUND_RECORD.json gains its SHA.
+- Push + ls-remote verification recorded immediately after this commit.
+
+Stage Summary:
+- The closure round is committed; delivery verification follows in the push step.
+- reviewer_provenance=AI_REVIEW.
