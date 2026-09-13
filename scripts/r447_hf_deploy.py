@@ -295,11 +295,15 @@ RUN set -eux; \
     apt-get install -y --no-install-recommends git ca-certificates cmake g++ make; \
     rm -rf /var/lib/apt/lists/*
 ARG LLAMA_CPP_TAG=b10930
+# NOTE (the first deploy's measured BUILD_ERROR, fixed): at b10930 the
+# server lives in the TOOLS tree — -DLLAMA_BUILD_TOOLS=OFF removes the
+# llama-server target entirely ("gmake: No rule to make target
+# 'llama-server'"). TOOLS stays ON (default); --target llama-server
+# limits the build to the server and its dependencies anyway.
 RUN set -eux; \
     git clone --depth 1 --branch "${LLAMA_CPP_TAG}" https://github.com/ggml-org/llama.cpp /src; \
     cmake -S /src -B /build -DGGML_NATIVE=OFF -DLLAMA_BUILD_TESTS=OFF \
-      -DLLAMA_BUILD_EXAMPLES=OFF -DLLAMA_BUILD_TOOLS=OFF \
-      -DLLAMA_CURL=OFF -DBUILD_SHARED_LIBS=OFF; \
+      -DLLAMA_BUILD_EXAMPLES=OFF -DLLAMA_CURL=OFF -DBUILD_SHARED_LIBS=OFF; \
     cmake --build /build --target llama-server -j"$(nproc)"; \
     /build/bin/llama-server --version
 """
