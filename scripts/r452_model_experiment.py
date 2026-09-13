@@ -5,22 +5,34 @@ exercising the A3 owner-gated escalation's unblock path as a MEASURED
 experiment — never a prose claim).
 
 DESIGN (Art. XLVII: the measurement instrument is IDENTICAL on both
-arms; the LLM route is the ONLY variable):
+arms; the MODEL WEIGHTS are the ONLY variable — both arms run the
+SAME policy class on the SAME provider slot):
 
-  Arm 1 (baseline)  localqwen  Qwen/Qwen3-1.7B  Q4_K_M (quality_tier 4)
-                    through the ordinary registry path under the
-                    DEPLOYED default policy
+  Arm 1 (baseline)  self-hosted Qwen/Qwen3-1.7B Q4_K_M
+                    (llama.cpp llama-server b10930, port 8790) under
+                    the DEPLOYED default policy
                     ENGINE_MODEL_COST_POLICY=ZERO_PAID_COST.
-  Arm 2 (stronger)  the sandbox z-ai gateway's embedded model
-                    (measured live: glm-4-plus, quality_tier 2)
-                    through the ordinary registry path under
-                    ENGINE_MODEL_COST_POLICY=UNRESTRICTED — the
-                    recorded operator escape hatch — with EVERY paid
-                    credential absent so no PAID_API route can ever
-                    serve (fail-closed on the zero-cost contract even
-                    under UNRESTRICTED), and with NO localqwen wiring
-                    so the arm is PURE (a mixed-model arm would
-                    contaminate the comparison).
+  Arm 2 (stronger)  self-hosted Qwen/Qwen3-4B Q4_K_M — the next size
+                    class up in the SAME family, SAME quantization
+                    discipline, SAME server build, port 8791, under
+                    the SAME deployed default policy. The operator's
+                    own model-selection flowchart logic governs this
+                    arm ("If RAM is insufficient, apply 4-bit/8-bit
+                    quantization and retry"): every elite-class
+                    route in the survey was MEASURED dead at zero
+                    cost (HF router 402 credits depleted, zero
+                    is_free catalog models; local GLM-5.2/GPT-OSS
+                    structurally infeasible on this 4 GB no-GPU
+                    host; OpenRouter paid, excluded; the sandbox
+                    z-ai grant's tier-2 route DIED with the
+                    environment reset — 401 missing X-Token,
+                    re-measured), so the strongest zero-cost route
+                    measurable on this host is the 4B step-up. HONEST
+                    SCOPE: this is NOT the elite-class comparison
+                    the survey targeted; it measures whether one
+                    self-hosted capability step changes the discovery
+                    chain. The elite-class question stays open with
+                    the A3 escalation's operator unblock paths.
 
   Same frozen problems (the R452 assay problems A/B/C, imported
   byte-identical from r452_assay.AUTHORED_PROBLEMS), same engine code
@@ -55,10 +67,12 @@ the run did not reach the producing stage — Art. XXV):
   8. engineering_reachability  CAD_PIPELINE_LEDGER_gen-N outcome +
                                STEP/STL artifacts on disk
 
-THE ZERO-COST INVARIANT (fail-closed, both arms): after each run the
-driver verifies from the run-owned routing-ledger lines that EVERY
-line's cost_class is in the arm's allowed set — a PAID_API line
-anywhere fails the experiment closed (Art. IV/VII).
+THE MODEL-PURITY + ZERO-COST INVARIANT (fail-closed, both arms):
+after each run the driver verifies from the run-owned routing-ledger
+lines that EVERY line's cost_class is in the arm's allowed set AND
+every line's model is the arm's model — a PAID_API line or a
+cross-arm model line anywhere fails the experiment closed
+(Art. IV/VII).
 
 ENVIRONMENT-RESET DISCLOSURE (Art. XI/XV): the first attempt at this
 experiment was destroyed mid-run by a sandbox environment reset
@@ -96,7 +110,16 @@ MX_ROOT = OUT_ROOT / "MODEL_EXPERIMENT"
 PROBE_RECORD = MX_ROOT / "ROUTE_AUTHORITY.json"
 MEASUREMENT_RECORD = MX_ROOT / "MODEL_EXPERIMENT.json"
 
-GATEWAY_KEY_FILE = Path("/home/z/my-project/local_llm/zai_gateway.key")
+#: the self-hosted servers (the R451 pinned builds; GGUF sha256
+#: fail-closed pins)
+LLAMA_BIN = Path("/home/z/my-project/local_llm/bin/llama-b10930/"
+                 "llama-server")
+GGUF_1_7B = Path("/home/z/my-project/local_llm/models/"
+                 "Qwen3-1.7B-Q4_K_M.gguf")
+GGUF_4B = Path("/home/z/my-project/local_llm/models/"
+               "Qwen3-4B-Q4_K_M.gguf")
+GGUF_4B_SHA256 = ("fbe1d5edd4ce802ae3ae7c7e4ab7d09789d697fdac1fc"
+                   "7929f8df4ca3c41bae3")
 
 #: every credential that could route a PAID_API call — removed from
 #: BOTH arms' environments (the zero-cost contract is structural, not
@@ -107,30 +130,42 @@ PAID_ENV_VARS = [
     "GEMINI_API_KEY", "QWEN_API_KEY", "TOKEN_ROUTER_API_KEY",
 ]
 
-#: the arms (closed set). allowed_cost_classes: the zero-cost
-#: invariant — every run-owned routing line must carry one of these.
+#: the arms (closed set). allowed_cost_classes + allowed_models: the
+#: fail-closed purity invariant — every run-owned routing line must
+#: carry one of these cost classes AND one of these models.
 ARMS: Dict[str, Dict[str, Any]] = {
-    "arm1-localqwen": {
+    "arm1-qwen3-1.7b": {
         "policy": "ZERO_PAID_COST",
         "model": "qwen3-1.7b",
         "provider": "localqwen",
         "quality_tier": 4,
         "cost_basis": "ZERO_PAID_COST_SELF_HOSTED",
         "allowed_cost_classes": ["ZERO_PAID_COST_SELF_HOSTED"],
+        "allowed_models": ["qwen3-1.7b"],
         "run_id_prefix": "r452mx1",
         "session_prefix": "r452mx1",
-        "transport_watchdog": "llama_server",
+        "transport_watchdog": "llama_server_1.7b",
+        "arm_note": ("the deployed-default baseline: the ONLY rung "
+                     "eligible under ZERO_PAID_COST (the A3 "
+                     "escalation's measured 1-of-11 collapse)"),
     },
-    "arm2-glm4plus": {
-        "policy": "UNRESTRICTED",
-        "model": "glm-4-plus",
-        "provider": "zai",
-        "quality_tier": 2,
-        "cost_basis": "ENVIRONMENT_GRANT",
-        "allowed_cost_classes": ["ENVIRONMENT_GRANT"],
+    "arm2-qwen3-4b": {
+        "policy": "ZERO_PAID_COST",
+        "model": "qwen3-4b",
+        "provider": "localqwen",
+        "quality_tier": 4,
+        "cost_basis": "ZERO_PAID_COST_SELF_HOSTED",
+        "allowed_cost_classes": ["ZERO_PAID_COST_SELF_HOSTED"],
+        "allowed_models": ["qwen3-4b"],
         "run_id_prefix": "r452mx2",
         "session_prefix": "r452mx2",
-        "transport_watchdog": "zai_gateway",
+        "transport_watchdog": "llama_server_4b",
+        "arm_note": ("the next size class up in the same family, same "
+                     "quantization discipline, same server build, same "
+                     "policy — the operator's own quantize-and-retry "
+                     "flowchart logic after every elite-class zero-cost "
+                     "route was measured dead; NOT the elite class, "
+                     "scope recorded honestly"),
     },
 }
 
@@ -168,34 +203,28 @@ def _now() -> str:
 # ---------------------------------------------------------------------------
 def arm_env(arm: str) -> Dict[str, str]:
     """The environment for one arm's engine run. BOTH arms strip every
-    paid credential (structural zero-cost). Arm 1 additionally strips
-    ZAI_API_KEY (the deployed-default discipline). Arm 2 sets the
-    gateway credential + the measured served model id and strips
-    LOCAL_QWEN_BASE_URL so the arm is PURE."""
+    paid credential (structural zero-cost) and both run the DEPLOYED
+    default policy; the ONLY variable is which self-hosted model the
+    localqwen slot serves (the base URL pins the server, the model
+    override pins the served weights — the purity invariant then
+    verifies every routing line carries the arm's model)."""
     spec = ARMS[arm]
     env = dict(os.environ)
     env["PYTHONPATH"] = str(REPO_ROOT)
     env["ENGINE_MODEL_COST_POLICY"] = spec["policy"]
     for k in PAID_ENV_VARS:
         env.pop(k, None)
-    if arm == "arm1-localqwen":
-        env.pop("ZAI_API_KEY", None)
-        env.pop("ZAI_MODEL", None)
+    env.pop("ZAI_API_KEY", None)
+    env.pop("ZAI_MODEL", None)
+    env.pop("ZAI_BASE_URL", None)
+    if arm == "arm1-qwen3-1.7b":
         env["LOCAL_QWEN_BASE_URL"] = \
             "http://127.0.0.1:8790/v1/chat/completions"
-    elif arm == "arm2-glm4plus":
-        key = GATEWAY_KEY_FILE.read_text().strip() \
-            if GATEWAY_KEY_FILE.exists() else ""
-        if not key:
-            raise SystemExit(
-                "FATAL: arm2 requires the z-ai gateway key file "
-                f"{GATEWAY_KEY_FILE} (start scripts/start_zai_gateway"
-                ".py first — the key never lives in the repo)")
-        env["ZAI_API_KEY"] = key
-        env["ZAI_MODEL"] = "glm-4-plus"   # the MEASURED served model
-        env["ZAI_BASE_URL"] = \
-            "http://127.0.0.1:8787/v1/chat/completions"
-        env.pop("LOCAL_QWEN_BASE_URL", None)   # PURE arm
+        env.pop("LOCALQWEN_MODEL", None)   # the spec default 1.7b
+    elif arm == "arm2-qwen3-4b":
+        env["LOCAL_QWEN_BASE_URL"] = \
+            "http://127.0.0.1:8791/v1/chat/completions"
+        env["LOCALQWEN_MODEL"] = "qwen3-4b"   # the 4B server's alias
     else:
         raise SystemExit(f"unknown arm {arm}")
     return env
@@ -213,22 +242,42 @@ def _http_ok(url: str, timeout: float = 3.0) -> bool:
         return False
 
 
+def _ensure_llama_server(port: int, gguf: Path, alias: str) -> bool:
+    """Start/keep one pinned llama-server (detached, the R451 survival
+    pattern). The 1.7B path reuses the repo's own r451_local_qwen
+    machinery; the 4B server is this module's own pinned instance."""
+    if _http_ok(f"http://127.0.0.1:{port}/health"):
+        return True
+    if port == 8790:
+        import r451_local_qwen as lq
+        return bool(lq.ensure_server())
+    if not (gguf.exists() and LLAMA_BIN.exists()):
+        return False
+    log = Path("/home/z/my-project/local_llm") / f"llama_{alias}.log"
+    pidf = Path("/home/z/my-project/local_llm") / f"llama_{alias}.pid"
+    cmd = [str(LLAMA_BIN), "-m", str(gguf),
+           "--port", str(port), "--host", "127.0.0.1",
+           "-c", "8192", "-np", "1", "-t", "2",
+           "--alias", alias, "--no-webui"]
+    log_fh = open(log, "ab")
+    proc = subprocess.Popen(cmd, stdout=log_fh,
+                            stderr=subprocess.STDOUT,
+                            start_new_session=True)
+    pidf.write_text(str(proc.pid))
+    for _ in range(120):
+        if _http_ok(f"http://127.0.0.1:{port}/health"):
+            return True
+        time.sleep(1.0)
+    return False
+
+
 def ensure_transport(arm: str) -> bool:
     """Ensure the arm's transport is up; restart through the recorded
     launchers when the sandbox reaper killed it."""
-    if arm == "arm1-localqwen":
-        if _http_ok("http://127.0.0.1:8790/health"):
-            return True
-        import r451_local_qwen as lq
-        return bool(lq.ensure_server())
-    if arm == "arm2-glm4plus":
-        if _http_ok("http://127.0.0.1:8787/healthz"):
-            return True
-        r = subprocess.run(
-            [sys.executable,
-             "/home/z/my-project/scripts/start_zai_gateway.py"],
-            capture_output=True, text=True, timeout=60)
-        return r.returncode == 0
+    if arm == "arm1-qwen3-1.7b":
+        return _ensure_llama_server(8790, GGUF_1_7B, "qwen3-1.7b")
+    if arm == "arm2-qwen3-4b":
+        return _ensure_llama_server(8791, GGUF_4B, "qwen3-4b")
     return False
 
 
@@ -337,47 +386,63 @@ def probe() -> int:
             "experiment (the structural key-stripping in arm_env)"),
     }
 
-    # --- the operative route: the sandbox z-ai gateway ----------------
+    # --- the tier-2 sandbox grant route: MEASURED DEAD ---------------
+    # (it served glm-4-plus earlier in this session — the environment
+    # reset wiped the platform-provisioned X-Token; the 401 below is
+    # the honest re-measured state, recorded per Art. XV/LXI)
     gw = {"provider": "zai (sandbox gateway, scripts/zai_gateway.mjs)",
           "cost_basis": "ENVIRONMENT_GRANT",
           "quality_tier": 2,
-          "note": ("the ONLY zero-cost stronger-model route measurable "
-                   "in this environment; substitutes for the survey's "
-                   "HF-hosted path (measured 402) with the substitution "
-                   "RECORDED — the served model is the sandbox grant's "
-                   "embedded model, measured live per call in the "
-                   "gateway log")}
-    key = GATEWAY_KEY_FILE.read_text().strip() \
-        if GATEWAY_KEY_FILE.exists() else ""
-    if key and _http_ok("http://127.0.0.1:8787/healthz"):
-        import urllib.request as _u
-        body = json.dumps({
-            "model": "glm-4-plus", "max_tokens": 48,
-            "messages": [{"role": "user", "content": (
-                "Transport capability probe. Reply with exactly two "
-                "lines, nothing else:\nMECHANISM: a catheter wall "
-                "resists kinking when the septum is thick enough\n"
-                "FALSIFIER: measure the collapse pressure of the "
-                "septum")}],
-        }).encode()
-        req = _u.Request(
-            "http://127.0.0.1:8787/v1/chat/completions", data=body,
-            headers={"Authorization": f"Bearer {key}",
-                     "Content-Type": "application/json"})
-        t0 = time.time()
-        try:
-            with _u.urlopen(req, timeout=90) as r:
-                d = json.loads(r.read().decode())
-            gw["served_model"] = d.get("model")
-            gw["probe_latency_ms"] = int((time.time() - t0) * 1000)
-            gw["field_line_compliant"] = "MECHANISM:" in (
-                d.get("choices") or [{}])[0].get("message", {}).get(
-                    "content", "")
-        except Exception as e:  # noqa: BLE001
-            gw["probe_error"] = f"{type(e).__name__}: {e}"[:200]
+          "pre_reset_measurement": ("served glm-4-plus at ~0.7-1.7 s per "
+                                    "call with FIELD-line compliance "
+                                    "(measured live 2026-09-13 ~17:36-"
+                                    "17:54 UTC, before the reset)"),
+          "post_reset_measurement": (
+              "DEAD — the z-ai SDK returns 401 'missing X-Token': the "
+              "platform-provisioned session token was wiped by the "
+              "environment reset and /etc/.z-ai-config was re-created "
+              "without it (root-owned, read-only; a manual X-Token "
+              "probe returns 401 'invalid X-Token' — the real token "
+              "value exists and is not recoverable from this session). "
+              "Re-measured live; infrastructure failure, never "
+              "scientific (Art. LXI)")}
+    rec["operative_route"]["sandbox_zai_grant"] = gw
+
+    # --- the OPERATIVE stronger route: the self-hosted 4B step-up ----
+    # The operator's own model-selection flowchart: "If RAM is
+    # insufficient, apply 4-bit/8-bit quantization (llama.cpp or
+    # bitsandbytes) and retry" — with every elite-class zero-cost route
+    # measured dead, the strongest zero-cost route measurable on this
+    # host is the next size class up in the SAME family, SAME
+    # quantization discipline, SAME server build.
+    arm2 = {
+        "provider": "localqwen (second pinned llama-server, port 8791)",
+        "model": "Qwen/Qwen3-4B Q4_K_M (gguf sha256 fbe1d5ed…, "
+                 "bartowski build, revision-pinned)",
+        "cost_basis": "ZERO_PAID_COST_SELF_HOSTED",
+        "policy": "ZERO_PAID_COST (the SAME deployed default as the "
+                  "baseline — the model weights are the ONLY variable)",
+        "honest_scope": (
+            "NOT the elite class the survey targeted (GLM-5.2 / "
+            "GPT-OSS-120B / GPT-4o); this arm measures whether ONE "
+            "self-hosted capability step (1.7B -> 4B, same family, "
+            "same Q4_K_M discipline) changes the discovery chain. The "
+            "elite-class comparison stays open with the A3 escalation's "
+            "operator unblock paths (fund HF credits / supply the "
+            "tokenrouter key / restore the sandbox grant token)"),
+        "operator_logic_cited": ("the survey's Model-Selection Logic "
+                                 "Flowchart: 'If RAM is insufficient, "
+                                 "apply 4-bit/8-bit quantization "
+                                 "(llama.cpp or bitsandbytes) and "
+                                 "retry'"),
+    }
+    if GGUF_4B.exists():
+        import hashlib as _h
+        h = _h.sha256(GGUF_4B.read_bytes()).hexdigest()
+        arm2["gguf_sha256_verified"] = (h == GGUF_4B_SHA256)
     else:
-        gw["state"] = "GATEWAY_DOWN (start scripts/start_zai_gateway.py)"
-    rec["operative_route"]["zai_gateway"] = gw
+        arm2["gguf_state"] = "GGUF absent (download the pinned 4B)"
+    rec["operative_route"]["arm2_self_hosted_4b"] = arm2
     rec["operative_route"]["baseline_route"] = {
         "provider": "localqwen",
         "model": "Qwen/Qwen3-1.7B Q4_K_M (gguf sha256 72c5c3cb…, "
@@ -524,7 +589,9 @@ def _verify_zero_cost_invariant(arm: str, case: str) -> bool:
                 lines.append(d)
     bad = [l for l in lines
            if (l.get("cost_class") or "") not in
-           spec["allowed_cost_classes"]]
+           spec["allowed_cost_classes"]
+           or str(l.get("model") or "") not in
+           spec.get("allowed_models", [spec["model"]])]
     out = _arm_dir(arm, case)
     out.mkdir(parents=True, exist_ok=True)
     out = out / "ZERO_COST_INVARIANT.json"
@@ -535,11 +602,12 @@ def _verify_zero_cost_invariant(arm: str, case: str) -> bool:
         "violations": [
             {"provider": b.get("provider"), "model": b.get("model"),
              "cost_class": b.get("cost_class")} for b in bad[:10]],
+        "allowed_models": spec.get("allowed_models"),
         "checked_at": _now(),
     }, indent=1))
     if bad:
-        _log(f"{arm}/{case}: ZERO-COST INVARIANT VIOLATED ({len(bad)} "
-             "lines) — the experiment fails closed")
+        _log(f"{arm}/{case}: PURITY/ZERO-COST INVARIANT VIOLATED "
+             f"({len(bad)} lines) — the experiment fails closed")
         return False
     _log(f"{arm}/{case}: zero-cost invariant GREEN ({len(lines)} "
          "run-owned lines)")
@@ -1018,10 +1086,21 @@ def record() -> int:
         "experiment": (
             "A3 stronger-model controlled experiment: the same frozen "
             "R452 assay problems (A/B/C) through the same engine code "
-            "at one commit, the LLM route as the ONLY variable — "
-            "Qwen/Qwen3-1.7B (localqwen, quality_tier 4, the deployed "
-            "default) vs the sandbox z-ai gateway's embedded model "
-            "(measured glm-4-plus, quality_tier 2, ENVIRONMENT_GRANT)"),
+            "at one commit under the SAME deployed default policy "
+            "(ZERO_PAID_COST), the MODEL WEIGHTS as the ONLY variable — "
+            "self-hosted Qwen/Qwen3-1.7B Q4_K_M (the A3 escalation's "
+            "measured 1-of-11 baseline) vs self-hosted Qwen/Qwen3-4B "
+            "Q4_K_M (the next size class up, same family/quantization/"
+            "server/policy). HONEST SCOPE: every elite-class zero-cost "
+            "route in the operator's survey was MEASURED dead (HF "
+            "router 402 credits depleted; local GLM-5.2/GPT-OSS "
+            "infeasible on this 4 GB no-GPU host; OpenRouter paid; the "
+            "sandbox z-ai tier-2 grant's token wiped by the environment "
+            "reset, 401 re-measured) — this is the strongest zero-cost "
+            "comparison measurable on this host per the operator's own "
+            "quantize-and-retry flowchart logic, NOT the elite-class "
+            "comparison; that question stays open with the A3 "
+            "escalation's operator unblock paths"),
         "operator_directive": ("the model survey of 2026-09-14: run the "
                                "same frozen problem and prompts, "
                                "measure grounding/reasoning/novelty "

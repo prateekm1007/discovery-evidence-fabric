@@ -3,10 +3,11 @@ the A3 controlled stronger-model experiment machinery (R452).
 
 Attacks the machine, not the narrative (Art. XVI/XVII):
   - arm environment hygiene: the zero-cost contract is STRUCTURAL
-    (paid keys stripped in BOTH arms; arm 2 additionally pure — no
-    localqwen fallback wiring);
-  - the zero-cost invariant verifier catches a fabricated PAID_API
-    line (the adversarial case — the invariant must fire, not pass);
+    (paid keys stripped in BOTH arms) and the arms differ ONLY in the
+    served model (same policy, same provider slot, pinned base URLs);
+  - the purity invariant catches a fabricated PAID_API line AND a
+    cross-arm model line (the adversarial cases — the invariant must
+    fire, not pass);
   - the domain-correctness extractor detects the E10 defect class
     (ml_data on a physical problem);
   - the engineering-reachability extractor types NOT_REACHED when no
@@ -33,7 +34,8 @@ import r452_assay as assay  # noqa: E402
 
 
 class TestArmEnvironmentHygiene(unittest.TestCase):
-    """The zero-cost contract is structural, not incidental."""
+    """The zero-cost contract is structural; the model is the only
+    variable between the arms."""
 
     def setUp(self):
         self._saved = dict(os.environ)
@@ -43,136 +45,111 @@ class TestArmEnvironmentHygiene(unittest.TestCase):
         os.environ.update(self._saved)
 
     def test_both_arms_strip_every_paid_credential(self):
-        # arm2's env construction requires the gateway key FILE — a
-        # dummy key is installed (and restored) so BOTH arms are
-        # always tested deterministically
-        kf = mx.GATEWAY_KEY_FILE
-        kf.parent.mkdir(parents=True, exist_ok=True)
-        saved = kf.read_text() if kf.exists() else None
+        for arm in mx.ARMS:
+            os.environ["OPENROUTER_API_KEY"] = "paid-key-present"
+            os.environ["OPENAI_API_KEY"] = "paid-key-present"
+            os.environ["TOKEN_ROUTER_API_KEY"] = "paid-key-present"
+            os.environ["ZAI_API_KEY"] = "paid-key-present"
+            env = mx.arm_env(arm)
+            for k in list(mx.PAID_ENV_VARS) + ["ZAI_API_KEY",
+                                               "ZAI_MODEL"]:
+                self.assertNotIn(
+                    k, env,
+                    f"{arm}: credential {k} survived arm_env — the "
+                    "zero-cost contract must be structural")
+
+    def test_both_arms_run_the_deployed_default_policy(self):
+        for arm in mx.ARMS:
+            env = mx.arm_env(arm)
+            self.assertEqual(
+                env["ENGINE_MODEL_COST_POLICY"], "ZERO_PAID_COST",
+                f"{arm}: the experiment must run the DEPLOYED default "
+                "policy — a policy difference would confound the A/B")
+
+    def test_arms_differ_only_in_the_served_model(self):
+        e1 = mx.arm_env("arm1-qwen3-1.7b")
+        e2 = mx.arm_env("arm2-qwen3-4b")
+        self.assertEqual(e1["ENGINE_MODEL_COST_POLICY"],
+                         e2["ENGINE_MODEL_COST_POLICY"])
+        self.assertIn("8790", e1["LOCAL_QWEN_BASE_URL"])
+        self.assertIn("8791", e2["LOCAL_QWEN_BASE_URL"])
+        self.assertNotIn("LOCALQWEN_MODEL", e1)   # spec default 1.7b
+        self.assertEqual(e2["LOCALQWEN_MODEL"], "qwen3-4b")
+
+    def test_arm2_pins_the_4b_server_exclusively(self):
+        env = mx.arm_env("arm2-qwen3-4b")
+        self.assertEqual(env["LOCAL_QWEN_BASE_URL"],
+                         "http://127.0.0.1:8791/v1/chat/completions",
+                         "arm2 must point ONLY at the 4B server — a "
+                         "1.7B fallback would mix models inside one arm "
+                         "(Art. XLVII)")
+
+
+class TestPurityInvariant(unittest.TestCase):
+    """The invariant must FIRE on bad lines — never pass them."""
+
+    def _with_ledger(self, arm, extra_line):
+        ledger = (mx.REPO_ROOT / "ENGINE_RUNS" /
+                  "model_routing" / "ledger.jsonl")
+        ledger.parent.mkdir(parents=True, exist_ok=True)
+        original = ledger.read_text() if ledger.exists() else ""
+        arm_dir = mx._arm_dir(arm, "A")
+        vrec = arm_dir / "ZERO_COST_INVARIANT.json"
+        had_vrec = vrec.exists()
+        saved_vrec = vrec.read_text() if had_vrec else None
         try:
-            kf.write_text("gw_dummy_key_for_env_test")
-            for arm in mx.ARMS:
-                os.environ["OPENROUTER_API_KEY"] = "paid-key-present"
-                os.environ["OPENAI_API_KEY"] = "paid-key-present"
-                os.environ["TOKEN_ROUTER_API_KEY"] = "paid-key-present"
-                env = mx.arm_env(arm)
-                for k in mx.PAID_ENV_VARS:
-                    self.assertNotIn(
-                        k, env,
-                        f"{arm}: paid credential {k} survived arm_env — "
-                        "the zero-cost contract must be structural")
+            ledger.write_text(original + json.dumps(extra_line) + "\n")
+            ok = mx._verify_zero_cost_invariant(arm, "A")
+            data = json.loads(vrec.read_text())
+            return ok, data
         finally:
-            if saved is not None:
-                kf.write_text(saved)
+            ledger.write_text(original)
+            if had_vrec:
+                vrec.write_text(saved_vrec)
             else:
-                kf.unlink(missing_ok=True)
-
-    def test_arm1_is_the_deployed_default_policy(self):
-        env = mx.arm_env("arm1-localqwen")
-        self.assertEqual(env["ENGINE_MODEL_COST_POLICY"],
-                         "ZERO_PAID_COST")
-        self.assertNotIn("ZAI_API_KEY", env)
-        self.assertNotIn("ZAI_MODEL", env)
-        self.assertIn("LOCAL_QWEN_BASE_URL", env)
-
-    def test_arm2_is_unrestricted_but_never_paid(self):
-        gw = Path("/home/z/my-project/local_llm/zai_gateway.key")
-        if not gw.exists():
-            self.skipTest("gateway key file absent (sandbox-only)")
-        env = mx.arm_env("arm2-glm4plus")
-        self.assertEqual(env["ENGINE_MODEL_COST_POLICY"],
-                         "UNRESTRICTED")
-        self.assertEqual(env["ZAI_MODEL"], "glm-4-plus")
-        for k in mx.PAID_ENV_VARS:
-            self.assertNotIn(k, env)
-
-    def test_arm2_is_pure_no_localqwen_fallback(self):
-        gw = Path("/home/z/my-project/local_llm/zai_gateway.key")
-        if not gw.exists():
-            self.skipTest("gateway key file absent (sandbox-only)")
-        os.environ["LOCAL_QWEN_BASE_URL"] = \
-            "http://127.0.0.1:8790/v1/chat/completions"
-        env = mx.arm_env("arm2-glm4plus")
-        self.assertNotIn(
-            "LOCAL_QWEN_BASE_URL", env,
-            "arm2 must be PURE — a localqwen fallback would mix models "
-            "inside one arm and contaminate the comparison (Art. XLVII)")
-
-    def test_arm2_refuses_to_build_without_gateway_key(self):
-        key_file = mx.GATEWAY_KEY_FILE
-        if key_file.exists():
-            self.skipTest("gateway key present (cannot test refusal)")
-        with self.assertRaises(SystemExit):
-            mx.arm_env("arm2-glm4plus")
-
-
-class TestZeroCostInvariant(unittest.TestCase):
-    """The invariant must FIRE on a paid line — never pass it."""
+                vrec.unlink(missing_ok=True)
+                try:
+                    arm_dir.rmdir()
+                except OSError:
+                    pass
 
     def test_fabricated_paid_line_fails_closed(self):
-        ledger = (mx.REPO_ROOT / "ENGINE_RUNS" /
-                  "model_routing" / "ledger.jsonl")
-        ledger.parent.mkdir(parents=True, exist_ok=True)
-        original = ledger.read_text() if ledger.exists() else ""
-        arm_dir = mx._arm_dir("arm2-glm4plus", "A")
-        vrec = arm_dir / "ZERO_COST_INVARIANT.json"
-        had_vrec = vrec.exists()
-        saved_vrec = vrec.read_text() if had_vrec else None
-        try:
-            ledger.write_text(original + json.dumps({
-                "run_id": "r452mx2-A: fabricated",
-                "provider": "openrouter",
-                "model": "gpt-4o",
-                "cost_class": "PAID_API",
-                "ok": True,
-            }) + "\n")
-            ok = mx._verify_zero_cost_invariant("arm2-glm4plus", "A")
-            self.assertFalse(
-                ok, "a PAID_API line MUST fail the invariant closed")
-            data = json.loads(vrec.read_text())
-            self.assertEqual(data["violation_lines"], 1)
-            self.assertEqual(data["violations"][0]["cost_class"],
-                             "PAID_API")
-        finally:
-            ledger.write_text(original)
-            if had_vrec:
-                vrec.write_text(saved_vrec)
-            else:
-                vrec.unlink(missing_ok=True)
-                try:
-                    arm_dir.rmdir()
-                except OSError:
-                    pass
+        ok, data = self._with_ledger("arm2-qwen3-4b", {
+            "run_id": "r452mx2-A: fabricated",
+            "provider": "openrouter",
+            "model": "gpt-4o",
+            "cost_class": "PAID_API",
+            "ok": True,
+        })
+        self.assertFalse(
+            ok, "a PAID_API line MUST fail the invariant closed")
+        self.assertEqual(data["violation_lines"], 1)
+        self.assertEqual(data["violations"][0]["cost_class"], "PAID_API")
+
+    def test_cross_arm_model_line_fails_closed(self):
+        """A 1.7B line inside arm2's run would mix models inside the
+        arm — the model-purity invariant must fire (Art. XLVII)."""
+        ok, data = self._with_ledger("arm2-qwen3-4b", {
+            "run_id": "r452mx2-A: cross-contamination",
+            "provider": "localqwen",
+            "model": "qwen3-1.7b",
+            "cost_class": "ZERO_PAID_COST_SELF_HOSTED",
+            "ok": True,
+        })
+        self.assertFalse(
+            ok, "a cross-arm model line MUST fail the purity invariant")
+        self.assertEqual(data["violations"][0]["model"], "qwen3-1.7b")
 
     def test_allowed_lines_pass(self):
-        ledger = (mx.REPO_ROOT / "ENGINE_RUNS" /
-                  "model_routing" / "ledger.jsonl")
-        ledger.parent.mkdir(parents=True, exist_ok=True)
-        original = ledger.read_text() if ledger.exists() else ""
-        arm_dir = mx._arm_dir("arm1-localqwen", "A")
-        vrec = arm_dir / "ZERO_COST_INVARIANT.json"
-        had_vrec = vrec.exists()
-        saved_vrec = vrec.read_text() if had_vrec else None
-        try:
-            ledger.write_text(original + json.dumps({
-                "run_id": "r452mx1-A: allowed",
-                "provider": "localqwen",
-                "model": "qwen3-1.7b",
-                "cost_class": "ZERO_PAID_COST_SELF_HOSTED",
-                "ok": True,
-            }) + "\n")
-            ok = mx._verify_zero_cost_invariant("arm1-localqwen", "A")
-            self.assertTrue(ok)
-        finally:
-            ledger.write_text(original)
-            if had_vrec:
-                vrec.write_text(saved_vrec)
-            else:
-                vrec.unlink(missing_ok=True)
-                try:
-                    arm_dir.rmdir()
-                except OSError:
-                    pass
+        ok, data = self._with_ledger("arm1-qwen3-1.7b", {
+            "run_id": "r452mx1-A: allowed",
+            "provider": "localqwen",
+            "model": "qwen3-1.7b",
+            "cost_class": "ZERO_PAID_COST_SELF_HOSTED",
+            "ok": True,
+        })
+        self.assertTrue(ok)
+        self.assertEqual(data["violation_lines"], 0)
 
 
 class TestExtractors(unittest.TestCase):
