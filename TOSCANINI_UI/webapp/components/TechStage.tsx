@@ -167,6 +167,16 @@ function stageStatus(view: PresentationView): {
         label: "Legacy projection — no current presentation state",
         tone: "infra",
       };
+    case "PRESENTATION_STATE_UNAVAILABLE":
+      // R451-C2-CLOSURE Direction B — the fail-closed unknown: the
+      // backend supplied a typed geometry/visual state this frontend
+      // does not recognize. The surface says exactly that — an
+      // interpretation failure, never a scientific claim (never
+      // "Technology ready", never "not established", never "no 3D").
+      return {
+        label: "Presentation state unavailable — backend state unrecognized",
+        tone: "infra",
+      };
     case "VISUAL_READY": {
       // R451-C2.5 §2 — the state itself already carries the authority
       // invariant (presentationState.ts refuses visual_complete +
@@ -248,6 +258,31 @@ function HeroLegacyState() {
         This projection predates the typed presentation contract. Legacy
         fields cannot establish a current technology, geometry, or
         visualization state — the scientific record below is unchanged.
+      </div>
+    </div>
+  );
+}
+
+// ---- the fail-closed unrecognized-state hero (R451-C2-CLOSURE B) -----------
+// The backend recorded a typed geometry/visual state this frontend does
+// not recognize. The ONLY honest surface: say the presentation state is
+// unavailable and the backend state is unrecognized — and make NO
+// scientific claim. It never renders a viewer (viewerUrl is computed
+// null above), never the gate badge, and its wording can never be read
+// as "technology not established" (a scientific absence) or as any
+// readiness claim. Unknown stays unknown (Art. XXV).
+function HeroUnrecognizedState({ detail }: { detail?: string | null }) {
+  return (
+    <div className="hero-honest" data-hero-unrecognized-state>
+      <div className="hero-honest-h">Presentation state unavailable</div>
+      <div className="hero-honest-body">
+        The backend recorded a state this frontend does not recognize.
+      </div>
+      <div className="hero-honest-note faint">
+        {detail ||
+          "The recorded geometry/visual state is outside this frontend's " +
+          "vocabulary — no scientific claim is made from an unrecognized " +
+          "state."}
       </div>
     </div>
   );
@@ -439,9 +474,17 @@ export default function TechStage({
   // renders the legacy hero first, and the adversarial browser test in
   // R451/C2_PRODUCT/E2E_C26 proves it in a real browser).
   const legacyUnavailable = view.state === "LEGACY_STATE_UNAVAILABLE";
+  // R451-C2-CLOSURE Direction B — the fail-closed unknown mounts NOTHING:
+  // a payload whose typed state is unrecognized is not interpretable, so
+  // its raw geometry/render fields can never mount the viewer, the
+  // history swap, or the gate badge — the SAME structural lock the
+  // legacy state received in R451-C2.6 §1, now covering the
+  // unrecognized-dialect case (an unknown state is not a rendering
+  // permission; unknown stays unknown in the DOM, not only in the state).
+  const unrecognizedState = view.state === "PRESENTATION_STATE_UNAVAILABLE";
   const heroEligible = design?.hero_eligibility?.eligible !== false;
   const heroGlb =
-    !legacyUnavailable && heroEligible && design &&
+    !legacyUnavailable && !unrecognizedState && heroEligible && design &&
     design.availability === "AVAILABLE"
       ? design.glb
       : null;
@@ -449,7 +492,8 @@ export default function TechStage({
     viewingGen != null ? evo.find((r) => r.generation === viewingGen) : undefined;
   // history swap is gated on the SAME eligibility — and on the legacy
   // rule: a legacy payload cannot mount a model from history rows either
-  const showingHistory = !legacyUnavailable && heroEligible &&
+  // (nor can an unrecognized-state payload — same lock, same reason)
+  const showingHistory = !legacyUnavailable && !unrecognizedState && heroEligible &&
     Boolean(activeRow?.glb);
   const viewerUrl = showingHistory && activeRow?.glb ? activeRow.glb : heroGlb;
   const genLabelNum = (design?.generation_id || "gen-1").replace("gen-", "");
@@ -654,6 +698,13 @@ export default function TechStage({
           // a current visualization ribbon, or a current technology-
           // ready surface. Legacy hero ONLY.
           <HeroLegacyState />
+        ) : view.state === "PRESENTATION_STATE_UNAVAILABLE" ? (
+          // R451-C2-CLOSURE Direction B — the fail-closed unknown hero,
+          // resolved BEFORE any viewerUrl branch: an unrecognized typed
+          // state renders the explicit unrecognized-state surface ONLY —
+          // no viewer, no gate badge, no scientific claim, even when the
+          // payload carries convincing raw geometry/render fields.
+          <HeroUnrecognizedState detail={view.renderBlockDetail} />
         ) : viewerUrl ? (
           <>
             <ModelViewer
@@ -727,7 +778,7 @@ export default function TechStage({
           : done
             ? "the scientific record below is complete regardless — a model is a presentation, never a claim"
             : ""}
-        {gateVerdict && !legacyUnavailable && (
+        {gateVerdict && !legacyUnavailable && !unrecognizedState && (
           // R451-C2.6 §1 — the R441 gate badge is a render-metadata
           // surface: a LEGACY payload's raw render metadata can never
           // surface it (it would read as a current certification claim

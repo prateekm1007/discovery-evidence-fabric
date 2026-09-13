@@ -703,3 +703,27 @@ Work Log:
 Stage Summary:
 - The FINAL CLOSEOUT is delivered: the blocked-terminal surface can no longer speak a scientific terminal verdict even when the payload carries every stale scientific field, proven by the attack that populates ALL of them — pre-fix leak proven, post-fix closed, in a real browser, on the production build, in the real DOM. The visual code is one owner merge away from the production authority test under Article LXXI.
 - reviewer_provenance=AI_REVIEW.
+
+---
+Task ID: R451-C2-CLOSURE
+Agent: Coder 2 (main session)
+Task: R451-C2-CLOSURE - the mandatory closure correction before C2 is accepted as production-ready (no C2.7; the architecture is frozen): A four retrieval states, B unknown geometry fail-closed, C one transport authority, D the pinned revision in the actual load, E the producer incapable of publishing without NONE_PRESENTATION_ONLY, F exact input provenance, G the DA3 pin re-verified and pinned in the real calls, H credential remediation, I full verification then Constitution reread #2, commit, push, remote-SHA verification.
+
+Work Log:
+- Mandatory reads BEFORE coding: EPISTEMIC_CONSTITUTION.md v2.4.0 IN FULL (2153 lines), all five GOVERNANCE files IN FULL, ACTIVE_PATH.md IN FULL (460 lines), and the three C2.6 records IN FULL (C2.6 + C2.6-CLOSEOUT + C2.6-FINAL-CLOSEOUT). Checkout aligned to the true remote tip 8de1d27a (the summary's bd7a12df was stale; Art. XXIV: the artifact wins).
+- A: blockedInsightCards() preserves all four retrieval states; a measured 12 no longer renders "not reached"; PENDING is "in progress", never collapsed.
+- B: PRESENTATION_STATE_UNAVAILABLE added as the fail-closed unknown (checked before every geometry resolution); TechStage mounts NOTHING under it (viewerUrl/history null, gate badge suppressed, dedicated hero); attacked with found_something=false AND true AND convincing raw fields.
+- C: THE singular transport authority - the run record's canonical status; RUN_BLOCKED_* is decisive (INFRASTRUCTURE_PAUSED) and the directive's exact contradiction fixture (stale COMPLETED_CANDIDATE projection + visual_complete + ENGINEERING) can never reach VISUAL_READY; the hole was REAL pre-fix; the authority is documented in the mapping source and attacked; positive control still reaches VISUAL_READY.
+- D: Hunyuan weights download AT revision 70e803bf via snapshot_download(revision=...), the snapshot path asserted to BE that revision's tree, from_pretrained loads FROM the snapshot; a dead pin refuses before any download; the false "pinned via env" comment is gone.
+- E: the hand-built sidecar DELETED; the only publish path is make_sidecar -> validate -> output-hash byte-equality -> upload; the six directive attacks + the placeholder attack ran against THE ACTUAL PRODUCER PATH (recorder upload) - every one ends with ZERO uploads; positive control publishes exactly two objects.
+- F: exact input hashes replace "see bucket MANIFEST.json" - canonical input paths, npz/png/PLY sha256s, the preprocessing description, model ID/revision/seed/hardware/output hash recorded per case.
+- G: DA3 SHA 4010e39f re-verified live against the Hub in this editing session (2026-09-13T10:50:37Z) and pinned in BOTH real from_pretrained calls; the latent numpy NameError in the signature metrics fixed (disclosed).
+- H: BOTH credentials PROVEN STILL LIVE (GitHub PAT by the session's own authenticated fetch; HF token by in-memory whoami-v2 HTTP 200 as prateekm1) - SECURITY STATE: OPEN; the R451 scan records were found re-leaking the full secret values in their own context fields (a genuine R451 defect) and were redacted FORWARD (no history rewrite); final tree scan CLEAN_OF_LIVE_CREDENTIALS (5777 files); full record R451/C2_PRODUCT/CREDENTIAL_REMEDIATION_RECORD.json; Art. LXV escalation 3.
+- I: batteries: UI battery 115 PASS (85 prior + 30 closure); r451 pytest family 223; producer battery 35; r449 battery 28/28; visual family 256 == pristine (per-file; the combined run reproduced the disclosed BS-020 Chromium contention class); product family green except the stash-verified pre-existing r430 pair; consumer sweep 178 + r436 back at its stash-verified 4-failure baseline (the ONE my-diff delta was the r436 hero source pin, re-pinned to the strengthened expression, disclosed); english-only 4; tsc clean; next build green (output cleaned); clean-state replay green.
+- Constitution reread #2 IN FULL immediately before this commit.
+
+Stage Summary:
+- The closure correction is delivered: the presentation layer can no longer lie through a collapsed retrieval state, an unrecognized backend state, or a stale projection on a transport-terminal record; the producer cannot publish decorative-revision, bypassed-provenance, or placeholder-input artifacts; and the credential question is answered with evidence, not hope: both live, state OPEN, rotation is the operator's unblocks.
+- Round record: R451/C2_PRODUCT/R451_C2_CLOSURE_ROUND_RECORD.json (a NEW artifact; the prior C2.6 records are untouched - append-only, Art. XI; the two scan records carry forward redactions disclosed in both records).
+- No C2.7 was created; no new visual product was added; Coder 1's machinery is untouched.
+- reviewer_provenance=AI_REVIEW.

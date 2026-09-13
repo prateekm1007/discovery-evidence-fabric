@@ -119,7 +119,15 @@ export type PresentationState =
   | "GEOMETRY_READY_RENDER_BLOCKED"
   | "VISUAL_READY"
   | "SCIENTIFIC_REJECTION"
-  | "LEGACY_STATE_UNAVAILABLE";
+  | "LEGACY_STATE_UNAVAILABLE"
+  // R451-C2-CLOSURE Direction B — the fail-closed unknown: the backend
+  // supplied a typed geometry/visual state this frontend does not
+  // recognize (a newer or foreign dialect). The presentation layer can
+  // say exactly that — WITHOUT making any scientific claim. Unknown
+  // never translates into GEOMETRY_UNAVAILABLE, never into
+  // TECHNOLOGY_NOT_ESTABLISHED, never into VISUAL_READY (Art. XXV:
+  // unknown must remain unknown; Art. IV: no fallback epistemology).
+  | "PRESENTATION_STATE_UNAVAILABLE";
 
 // the backend user-state keys that are INFRASTRUCTURE states (Art. LXI)
 // — the user-state projection is authoritative; a stale scientific-
@@ -380,12 +388,40 @@ export function resolvePresentationState(
     return { state: "INVESTIGATING", infrastructurePaused: false };
   }
 
-  // ---- 2. infrastructure stops -> INFRASTRUCTURE_PAUSED ----------------
-  // The backend user-state projection decides (Attack C: an unrelated
-  // stale `rejected`/scientific field NEVER reconciles this away —
-  // the canonical user-state authority wins, no silent frontend
-  // reconciliation).
-  if (INFRASTRUCTURE_USER_STATES.has(usv.user_state ?? "")) {
+  // ---- 2. transport-terminal / infrastructure stops -> INFRASTRUCTURE_PAUSED
+  // THE ONE AUTHORITY (R451-C2-CLOSURE Direction C, and it is SINGULAR):
+  //
+  //   The run record's canonical `status` is the ONLY transport
+  //   authority. A transport-terminal canonical status (the
+  //   RUN_BLOCKED_* family — the backend's infrastructure-blocked
+  //   terminal, R415) is DECISIVE: the presentation is
+  //   INFRASTRUCTURE_PAUSED and NO user_state_view content can change
+  //   that — not a stale scientific-looking projection, not a malformed
+  //   one, not even user_state COMPLETED_CANDIDATE.
+  //
+  //   WHY THIS AUTHORITY WINS (documented, explicit, attacked):
+  //   `user_state_view` is a DERIVED projection — a cache of the run
+  //   record that can be stale (delivered before/after the terminal
+  //   transition) or malformed (writer bug, partial payload). The
+  //   Constitution forbids letting a summary outrank the underlying
+  //   artifact (Art. XXIV), and Art. LXI forbids a transport-terminal
+  //   state from becoming a scientific state of any kind. The prior
+  //   rule treated the projection as authoritative for the
+  //   infrastructure question — which silently ASSUMED the projection
+  //   is faithful. The contradiction attack (status RUN_BLOCKED_TRANSPORT
+  //   + user_state COMPLETED_CANDIDATE + found_something/package_available
+  //   true + geometry_state visual_complete + ENGINEERING authority)
+  //   defeats exactly that assumption: under the old rule the stale
+  //   projection sailed past rule 2 and resolved to VISUAL_READY — a
+  //   falsely ready scientific surface on a blocked-terminal run.
+  //   The record wins; the projection never promotes transport-terminal
+  //   into anything. (The projection keeps exactly one job below: when
+  //   the record carries no transport-terminal marking, the projection
+  //   + dossier tabs still classify the scientific outcome as before —
+  //   that division is unchanged, and the RUN_BLOCKED_* check makes the
+  //   transport half independent of the projection entirely.)
+  if (detail.status.startsWith("RUN_BLOCKED") ||
+      INFRASTRUCTURE_USER_STATES.has(usv.user_state ?? "")) {
     return {
       state: "INFRASTRUCTURE_PAUSED",
       infrastructurePaused: true,
@@ -411,6 +447,34 @@ export function resolvePresentationState(
   // records which one holds).
   const gstate = design?.geometry_state;
   const typedGeometry = gstate != null && GEOMETRY_STATES.has(gstate);
+
+  // R451-C2-CLOSURE Direction B — THE FAIL-CLOSED UNKNOWN, and it sits
+  // BEFORE every other geometry resolution:
+  //
+  //   A geometry_state that is PRESENT but NOT in the known vocabulary
+  //   is an unrecognized backend dialect (a newer backend, a foreign
+  //   writer, a corrupted field). The presentation layer's ONLY honest
+  //   move is PRESENTATION_STATE_UNAVAILABLE — "the backend recorded a
+  //   state I cannot interpret". It must NEVER fall through to the
+  //   absence logic below, which would translate the unrecognized state
+  //   into GEOMETRY_UNAVAILABLE (when found_something=true) or
+  //   TECHNOLOGY_NOT_ESTABLISHED (when found_something=false) — both
+  //   are SCIENTIFIC CLAIMS manufactured by a frontend parse failure
+  //   (Art. XXV: unknown must remain unknown; Art. IV: no weaker
+  //   fallback path; the two attacks are pinned by the UI battery with
+  //   found_something=false AND found_something=true).
+  if (gstate != null && !typedGeometry) {
+    return {
+      state: "PRESENTATION_STATE_UNAVAILABLE",
+      infrastructurePaused: false,
+      renderBlockDetail:
+        "Presentation state unavailable — the backend recorded a " +
+        "geometry/visual state (" + String(gstate) + ") that this " +
+        "frontend does not recognize. No scientific claim is made " +
+        "from an unrecognized state.",
+      engineeringAuthority: null,
+    };
+  }
 
   if (typedGeometry) {
     if (gstate === "visual_complete") {
@@ -546,16 +610,56 @@ export interface BlockedInsightCard {
 export function blockedInsightCards(
   evidence?: EvidenceTabProjection | null,
 ): BlockedInsightCard[] {
-  // C2.5: distinguish "searched and measured zero" from "never reached
-  // retrieval" — the numeric zero exists ONLY in the RETRIEVED state
+  // R451-C2-CLOSURE Direction A — ALL FOUR typed retrieval states stay
+  // distinct; one typed state is never silently translated into
+  // another (Art. XXV; Art. LXI):
+  //
+  //   NOT_REACHED -> "not reached"        (the run stopped before retrieval)
+  //   PENDING     -> "in progress/pending" (retrieval started, not landed —
+  //                                   NEVER collapsed into not-reached)
+  //   FAILED      -> "retrieval failed"    (an infrastructure failure —
+  //                                   never a measured zero)
+  //   RETRIEVED   -> the ACTUAL measured count — zero is a measured zero,
+  //                  a positive count is shown as the measured count
+  //                  ("12 sources retrieved"); a RETRIEVED envelope can
+  //                  coexist with the infrastructure stop (the run
+  //                  retrieved evidence and was blocked LATER — the old
+  //                  code rendered that measured 12 as "not reached").
   const retrieval = evidence?.retrieval_state;
+  const measured = evidence?.retrieved_count;
   let supports: BlockedInsightCard;
-  if (retrieval === "RETRIEVED" && evidence?.retrieved_count === 0) {
+  if (retrieval === "RETRIEVED" && measured === 0) {
     supports = {
       title: "What supports it",
       headline: "0 sources retrieved",
       body: "Retrieval executed and measured zero records — the measured " +
         "zero, not an unavailable source.",
+    };
+  } else if (retrieval === "RETRIEVED" &&
+             typeof measured === "number" && measured > 0) {
+    supports = {
+      title: "What supports it",
+      headline: `${measured} sources retrieved`,
+      body: `Retrieval executed and measured ${measured} records before ` +
+        "the infrastructure stop — a measured count, not an absence " +
+        "and not an unreachable retrieval.",
+    };
+  } else if (retrieval === "RETRIEVED") {
+    // RETRIEVED whose count is absent from this projection: still never
+    // "not reached" — the envelope existed; the count is what is missing.
+    supports = {
+      title: "What supports it",
+      headline: "Retrieval executed",
+      body: "Retrieval executed and its envelope is recorded, but the " +
+        "measured count is not present in this projection — the count " +
+        "is unknown, not zero and not unreachable.",
+    };
+  } else if (retrieval === "PENDING") {
+    supports = {
+      title: "What supports it",
+      headline: "Evidence retrieval in progress",
+      body: "Retrieval started and has not landed yet — pending, not " +
+        "unreached and not failed.",
     };
   } else if (retrieval === "FAILED") {
     supports = {
@@ -565,6 +669,7 @@ export function blockedInsightCards(
         "records could be acquired — not a measured zero.",
     };
   } else {
+    // NOT_REACHED (and the absent-field case): the honest unreachable.
     supports = {
       title: "What supports it",
       headline: "Evidence retrieval not reached",

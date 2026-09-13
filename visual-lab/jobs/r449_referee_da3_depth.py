@@ -14,6 +14,15 @@ the REFERENCE depth signatures for the staged canonical views:
   - load depth-anything/DA3METRIC-LARGE through transformers
   - if unsupported: a typed NOT_RUN record with the exact failure is the
     evidence (Art. LXI: infrastructure failure is never a scientific result)
+
+R451-C2-CLOSURE Direction G: the live-observed revision
+4010e39f3634a45bc60553321fb49fb760bd594e was RE-VERIFIED against the Hub in
+the editing session (GET /api/models/depth-anything/DA3METRIC-LARGE/revision/
+4010e39f... -> sha == 4010e39f..., 2026-09-13T10:50:37Z) and is now pinned
+IN THE REAL from_pretrained() CALLS via the transformers `revision=` kwarg --
+both the processor and the model load exactly that revision's bytes. The pin
+is load-bearing: a revision that does not resolve fails the job (typed NOT_RUN
+record), it can never silently float to the repo's latest main.
 """
 import json
 import os
@@ -24,6 +33,9 @@ from pathlib import Path
 BUCKET = "prateekm1/toscanini-visual-lab-benchmarks"
 RECORD_DIR = "benchmarks/R449/records"
 MODEL_ID = "depth-anything/DA3METRIC-LARGE"
+# R451-C2-CLOSURE Direction G: live-verified in the editing session
+# (2026-09-13T10:50:37Z); participates in the actual from_pretrained calls.
+MODEL_SHA = "4010e39f3634a45bc60553321fb49fb760bd594e"
 
 record = {
     "artifact_type": "R449_REFEREE_DA3_DEPTH_RECORD",
@@ -31,6 +43,8 @@ record = {
     "created": "2026-09-12",
     "reviewer_provenance": "AI_REVIEW",
     "referee_model_id": MODEL_ID,
+    "referee_model_revision": MODEL_SHA,
+    "referee_model_revision_pinned_call": True,
     "referee_role": "MEASUREMENT_INSTRUMENT_NOT_COMPETITOR",
     "infrastructure": "hf-job t4-medium",
     "epistemic_status": "NOT_RUN",
@@ -52,6 +66,10 @@ def main():
 
     import torch
     import transformers
+    import numpy as np  # R451-C2-CLOSURE: the depth-signature metrics use
+    # np.percentile/np.abs/np.diff -- this import was MISSING since R449
+    # (a latent NameError that never executed because the job always
+    # blocked at model load first; disclosed in the closure record)
     record["environment"] = {"torch": torch.__version__,
                              "transformers": transformers.__version__,
                              "cuda_available": torch.cuda.is_available(),
@@ -63,13 +81,22 @@ def main():
         import torch
         proc = None
         try:
-            proc = AutoImageProcessor.from_pretrained(MODEL_ID)
+            # Direction G: the pinned revision participates in THIS call.
+            proc = AutoImageProcessor.from_pretrained(
+                MODEL_ID, revision=MODEL_SHA)
         except Exception as pe:  # noqa: BLE001
             record["processor_fallback"] = f"AutoImageProcessor unavailable ({type(pe).__name__}); using a minimal deterministic preprocess (resize 518, ImageNet normalize)"
-        model = AutoModelForDepthEstimation.from_pretrained(MODEL_ID, trust_remote_code=True).eval()
+        # Direction G: the pinned revision participates in THE ACTUAL MODEL
+        # LOAD -- the weights downloaded are exactly revision MODEL_SHA
+        # (verified live against the Hub in the editing session,
+        # 2026-09-13T10:50:37Z); an unresolved pin fails the job (typed
+        # NOT_RUN record) and can never float to latest main.
+        model = AutoModelForDepthEstimation.from_pretrained(
+            MODEL_ID, revision=MODEL_SHA, trust_remote_code=True).eval()
         dev = "cuda" if torch.cuda.is_available() else "cpu"
         model = model.to(dev)
         record["model_loaded"] = True
+        record["model_loaded_revision"] = MODEL_SHA
 
         def preprocess(img):
             if proc is not None:

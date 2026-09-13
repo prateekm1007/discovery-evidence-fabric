@@ -589,15 +589,24 @@ try {
     r.state !== "VISUAL_READY");
 
   // unknown geometry_state values are never trusted into a geometry
-  // branch (the vocabulary is closed; anything else falls through)
+  // branch. R451-C2-CLOSURE Direction B SUPERSEDES the C2.1-era
+  // expectation (disclosed per Art. LXIV): "falls through honestly" to
+  // the absence logic translated an unrecognized backend state into
+  // GEOMETRY_UNAVAILABLE / TECHNOLOGY_NOT_ESTABLISHED — scientific
+  // claims manufactured by a frontend parse failure. The fail-closed
+  // contract now: unknown -> PRESENTATION_STATE_UNAVAILABLE (the full
+  // Direction B attack matrix lives in its own section below).
   r = resolvePresentationState(
     detail({ user_state_view: usv({ user_state: "COMPLETED_CANDIDATE",
       found_something: true }) }),
     dossier({ tabs: { design: {
       availability: "UNAVAILABLE", geometry_state: "SOMETHING_ELSE" },
     evidence: null } }));
-  check("Closed vocabulary: unknown geometry_state falls through honestly",
-    r.state === "GEOMETRY_UNAVAILABLE");
+  check("Closed vocabulary: unknown geometry_state FAILS CLOSED to " +
+      "PRESENTATION_STATE_UNAVAILABLE (supersedes the C2.1 fall-through)",
+    r.state === "PRESENTATION_STATE_UNAVAILABLE" &&
+      r.state !== "GEOMETRY_UNAVAILABLE" &&
+      r.state !== "TECHNOLOGY_NOT_ESTABLISHED");
 
   // ----------------------------------------------------------------
   console.log("\n== R451-C2.6 §1: the legacy viewer is impossible ==");
@@ -718,6 +727,239 @@ try {
     check("Coupling (source pin): the unguarded done && usv condition " +
         "is gone",
       !stage.includes("{done && usv && ("));
+  }
+
+  // ----------------------------------------------------------------
+  console.log("\n== R451-C2-CLOSURE — Direction A: the four retrieval states ==");
+  // blockedInsightCards must keep NOT_REACHED / PENDING / FAILED /
+  // RETRIEVED mutually distinct; RETRIEVED shows the ACTUAL measured
+  // count (zero or positive); PENDING is never collapsed into
+  // not-reached; a positive measured count is never rendered as
+  // "not reached".
+  {
+    const supportsOf = (ev) => {
+      const cards = blockedInsightCards(ev);
+      return cards.find((c) => c.title === "What supports it");
+    };
+    let card = supportsOf({ retrieval_state: "NOT_REACHED" });
+    check("A: NOT_REACHED -> 'Evidence retrieval not reached'",
+      card.headline === "Evidence retrieval not reached");
+    card = supportsOf({ retrieval_state: "PENDING" });
+    check("A: PENDING -> 'Evidence retrieval in progress' (pending is " +
+        "NEVER collapsed into not-reached)",
+      card.headline === "Evidence retrieval in progress" &&
+        card.headline !== "Evidence retrieval not reached");
+    check("A: PENDING body says pending, not unreachable",
+      card.body.includes("pending"));
+    card = supportsOf({ retrieval_state: "FAILED" });
+    check("A: FAILED -> 'Evidence retrieval failed' (never a measured " +
+        "zero, never not-reached)",
+      card.headline === "Evidence retrieval failed");
+    card = supportsOf({ retrieval_state: "RETRIEVED", retrieved_count: 0 });
+    check("A: RETRIEVED zero -> the measured zero",
+      card.headline === "0 sources retrieved");
+    card = supportsOf({ retrieval_state: "RETRIEVED", retrieved_count: 12 });
+    check("A: RETRIEVED 12 -> the ACTUAL measured count is shown " +
+        "('12 sources retrieved')",
+      card.headline === "12 sources retrieved");
+    check("A: RETRIEVED 12 is NEVER worded as not-reached",
+      card.headline !== "Evidence retrieval not reached" &&
+        !card.body.includes("not reached"));
+    check("A: RETRIEVED 12 is never worded as an absence",
+      !card.body.includes("measured zero records"));
+    card = supportsOf({ retrieval_state: "RETRIEVED" });
+    check("A: RETRIEVED with no count in the projection -> 'Retrieval " +
+        "executed' (count unknown — never zero, never unreachable)",
+      card.headline === "Retrieval executed" &&
+        card.headline !== "Evidence retrieval not reached");
+    const fourHeadlines = new Set([
+      supportsOf({ retrieval_state: "NOT_REACHED" }).headline,
+      supportsOf({ retrieval_state: "PENDING" }).headline,
+      supportsOf({ retrieval_state: "FAILED" }).headline,
+      supportsOf({ retrieval_state: "RETRIEVED", retrieved_count: 7 }).headline,
+    ]);
+    check("A: all four typed states render four DISTINCT headlines",
+      fourHeadlines.size === 4);
+  }
+
+  // ----------------------------------------------------------------
+  console.log("\n== R451-C2-CLOSURE — Direction B: unknown geometry stays unknown ==");
+  // An unrecognized typed geometry_state fails closed to
+  // PRESENTATION_STATE_UNAVAILABLE — never GEOMETRY_UNAVAILABLE, never
+  // TECHNOLOGY_NOT_ESTABLISHED, never VISUAL_READY — under BOTH
+  // found_something attacks, and even with convincing raw fields.
+  {
+    const unknown = "quantum_lattice_render_v9";
+    // attack 1: unknown + found_something=false
+    let r = resolvePresentationState(
+      detail({ user_state_view: usv({ user_state: "COMPLETED_UNKNOWN",
+        finished: true, found_something: false }) }),
+      dossier({ tabs: { design: { geometry_state: unknown,
+        availability: "UNAVAILABLE" }, evidence: null } }));
+    check("B: unknown geometry + found_something=false -> " +
+        "PRESENTATION_STATE_UNAVAILABLE",
+      r.state === "PRESENTATION_STATE_UNAVAILABLE");
+    check("B: unknown + found_something=false NEVER becomes a scientific " +
+        "absence (TECHNOLOGY_NOT_ESTABLISHED / SCIENTIFIC_REJECTION)",
+      r.state !== "TECHNOLOGY_NOT_ESTABLISHED" &&
+        r.state !== "SCIENTIFIC_REJECTION");
+    // attack 2: unknown + found_something=true (+ package_available)
+    r = resolvePresentationState(
+      detail({ user_state_view: usv({ user_state: "COMPLETED_CANDIDATE",
+        finished: true, found_something: true, package_available: true }) }),
+      dossier({ tabs: { design: { geometry_state: unknown,
+        availability: "UNAVAILABLE" }, evidence: null } }));
+    check("B: unknown geometry + found_something=true -> " +
+        "PRESENTATION_STATE_UNAVAILABLE",
+      r.state === "PRESENTATION_STATE_UNAVAILABLE");
+    check("B: unknown + found_something=true NEVER becomes " +
+        "GEOMETRY_UNAVAILABLE (the backend never said it)",
+      r.state !== "GEOMETRY_UNAVAILABLE");
+    check("B: unknown + found_something=true NEVER becomes ready",
+      r.state !== "VISUAL_READY");
+    // attack 3: unknown state + CONVINCING raw fields (the raw fields
+    // of a visual-complete payload must not rescue an unrecognized
+    // typed state into any current state)
+    r = resolvePresentationState(
+      detail({ user_state_view: usv({ user_state: "COMPLETED_CANDIDATE",
+        found_something: true, package_available: true }) }),
+      dossier({ tabs: { design: {
+        geometry_state: unknown,
+        availability: "AVAILABLE",
+        glb: "/api/run/x/model/engineering_model.glb",
+        geometry_class: "ENGINEERING_3D",
+        engineering_authority: "ENGINEERING",
+        hero_eligibility: { eligible: true, reason: null },
+        renders: { status: "OK",
+          visual_gate: { verdict: "COMPLETE_PASS" } },
+      }, evidence: null } }));
+    check("B: unknown geometry + convincing raw fields STILL " +
+        "PRESENTATION_STATE_UNAVAILABLE",
+      r.state === "PRESENTATION_STATE_UNAVAILABLE");
+    check("B: the unrecognized state carries NO mountable field and no " +
+        "authority claim",
+      ["glb", "viewerUrl", "modelUrl"].every((k) => !(k in r)) &&
+        r.engineeringAuthority === null);
+    check("B: the detail names the unrecognized state and disclaims " +
+        "any scientific claim",
+      (r.renderBlockDetail ?? "").includes("unrecognized") &&
+        (r.renderBlockDetail ?? "").includes("No scientific claim"));
+    // source pins: the component locks the unrecognized state out of
+    // the viewer/history/gate-badge surfaces and renders its own hero
+    const stage = fsRead("components", "TechStage.tsx");
+    const vp = stage.indexOf("data-hero-viewport");
+    const legacyBranch = stage.indexOf(
+      'view.state === "LEGACY_STATE_UNAVAILABLE" ?', vp);
+    const unknownBranch = stage.indexOf(
+      'view.state === "PRESENTATION_STATE_UNAVAILABLE" ?', vp);
+    const viewerBranch = stage.indexOf(") : viewerUrl ? (", vp);
+    check("B: TechStage hero order — the unrecognized-state hero " +
+        "resolves BEFORE the viewerUrl branch (legacy first, unknown second)",
+      legacyBranch !== -1 && unknownBranch !== -1 &&
+        viewerBranch !== -1 && legacyBranch < unknownBranch &&
+        unknownBranch < viewerBranch);
+    check("B: TechStage computes viewerUrl null under the unrecognized " +
+        "state (heroGlb + showingHistory both gated)",
+      stage.includes("!legacyUnavailable && !unrecognizedState && heroEligible") &&
+        stage.includes("!legacyUnavailable && !unrecognizedState && heroEligible &&\n    Boolean(activeRow?.glb)"));
+    check("B: TechStage suppresses the gate badge under the " +
+        "unrecognized state",
+      stage.includes("gateVerdict && !legacyUnavailable && !unrecognizedState"));
+    check("B: TechStage has the fail-closed hero component " +
+        "(data-hero-unrecognized-state)",
+      stage.includes("data-hero-unrecognized-state"));
+  }
+
+  // ----------------------------------------------------------------
+  console.log("\n== R451-C2-CLOSURE — Direction C: the ONE transport authority ==");
+  // The directive's EXACT contradiction fixture: status
+  // RUN_BLOCKED_TRANSPORT + a stale/malformed projection claiming
+  // COMPLETED_CANDIDATE with every scientific-looking field populated.
+  // THE AUTHORITY (singular, explicit, attacked): the run record's
+  // canonical status is the transport authority — a transport-terminal
+  // status can NEVER become a ready scientific surface, whatever the
+  // projection says.
+  {
+    const contradictory = detail({
+      status: "RUN_BLOCKED_TRANSPORT",
+      user_state_view: usv({
+        user_state: "COMPLETED_CANDIDATE",
+        finished: true,
+        found_something: true,
+        rejected: false,
+        package_available: true,
+        label: "AUTOMATED INVENTION CANDIDATE",
+        decision: "Technology ready",
+        meaning: "The candidate survived.",
+        outcome: "INVENTION_SURVIVED",
+        outcome_label: "AUTOMATED INVENTION CANDIDATE",
+      }),
+    });
+    const convincingReady = dossier({ tabs: { design: {
+      geometry_state: "visual_complete",
+      engineering_authority: "ENGINEERING",
+      availability: "AVAILABLE",
+      glb: "/api/run/x/model/engineering_model.glb",
+      geometry_class: "ENGINEERING_3D",
+      generation_id: "gen-1",
+      hero_eligibility: { eligible: true, reason: null },
+      evolution: [{ generation: 1, current: true,
+        glb: "/api/run/x/model/engineering_model.glb" }],
+      renders: { status: "OK",
+        visual_gate: { verdict: "COMPLETE_PASS" } },
+    }, evidence: null } });
+    const r = resolvePresentationState(contradictory, convincingReady);
+    check("C: RUN_BLOCKED_TRANSPORT + COMPLETED_CANDIDATE + " +
+        "found_something + package_available + visual_complete + " +
+        "ENGINEERING -> INFRASTRUCTURE_PAUSED",
+      r.state === "INFRASTRUCTURE_PAUSED" &&
+        r.infrastructurePaused === true);
+    check("C: the contradiction NEVER becomes a ready scientific surface",
+      r.state !== "VISUAL_READY" &&
+        r.state !== "GEOMETRY_READY_RENDER_BLOCKED" &&
+        r.state !== "SCIENTIFIC_REJECTION" &&
+        r.state !== "TECHNOLOGY_NOT_ESTABLISHED" &&
+        r.state !== "GEOMETRY_UNAVAILABLE");
+    check("C: the blocked copy is the verdict the state speaks " +
+        "('No scientific conclusion was reached.')",
+      r.blocked?.verdictLine === "No scientific conclusion was reached.");
+    // the same transport authority must hold for the whole family and
+    // must not need the projection at all
+    for (const st of ["RUN_BLOCKED_TRANSPORT", "RUN_BLOCKED_ENGINE"]) {
+      const rr = resolvePresentationState(
+        detail({ status: st, user_state_view: usv({
+          user_state: "COMPLETED_CANDIDATE", found_something: true,
+          package_available: true }) }),
+        convincingReady);
+      check(`C: transport-terminal status ${st} -> INFRASTRUCTURE_PAUSED ` +
+          "regardless of the projection",
+        rr.state === "INFRASTRUCTURE_PAUSED" && rr.infrastructurePaused);
+    }
+    // positive control: the same scientific payload WITHOUT the
+    // transport-terminal status still reaches VISUAL_READY (the
+    // authority is transport-terminal-specific, not a universal
+    // rejector — Art. V)
+    const ok = resolvePresentationState(
+      detail({ status: "COMPLETE", user_state_view: usv({
+        user_state: "COMPLETED_CANDIDATE", found_something: true,
+        package_available: true }) }),
+      convincingReady);
+    check("C: positive control — status COMPLETE + the same ready " +
+        "payload still reaches VISUAL_READY",
+      ok.state === "VISUAL_READY");
+    // source pins: the status-first transport check exists in the
+    // mapping source, ahead of the projection-based rule
+    const psSource = fsRead("lib", "presentationState.ts");
+    const statusRule = psSource.indexOf(
+      'detail.status.startsWith("RUN_BLOCKED")');
+    const usvRule = psSource.indexOf("INFRASTRUCTURE_USER_STATES.has(");
+    check("C: source pin — the canonical-status transport check exists " +
+        "in the mapping (the record outranks the projection)",
+      statusRule !== -1 && usvRule !== -1 && statusRule < usvRule);
+    check("C: source pin — the authority is documented as singular in " +
+        "the mapping source",
+      psSource.includes("is the ONLY transport") ||
+        psSource.includes("ONLY transport\n//   authority"));
   }
 } finally {
   rmSync(OUT, { recursive: true, force: true });
