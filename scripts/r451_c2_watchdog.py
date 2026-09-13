@@ -1,7 +1,8 @@
 """r451_c2_watchdog.py — the R451-C2 (C2.10) end-to-end product watchdog,
 extended by R451-C2.2 (§6) into THE adversarial join checker, and
 re-founded by R451-C2.3 (§8) on THE one canonical evaluator.
-DUAL REPORTING hardened by R451-C2.5 (§6).
+DUAL REPORTING hardened by R451-C2.5 (§6). R3/R6 made evidence-producing
+by the R451-C2.6 CLOSEOUT (§3/§4).
 
 R451-C2.3 §8: the dossier and the watchdog consume the SAME state
 semantics. The join state below is derived by
@@ -23,6 +24,12 @@ state:
         valid GLB + invocation + no render record -> FAIL)
     if the gate verdict is COMPLETE_PASS:
         assert the required 23-artifact ladder exists on disk
+        (R451-C2.6 CLOSEOUT §3: a node_count that is missing or
+        uninspectable, a failed visual-set derivation, or an unknown
+        required set is an INTEGRITY FINDING under the TRUE
+        COMPLETE_PASS antecedent — never NOT_APPLICABLE;
+        NOT_APPLICABLE is legal only when the antecedent is genuinely
+        false)
     if a hero exists:
         assert the render record's source GLB hash == the canonical GLB
     if the renderer skipped:
@@ -30,8 +37,12 @@ state:
         (the UI renders the SAME typed fields — source-pinned by
         tests/test_r451_c2_blocked_state.py)
     if the GLB is absent and the run stopped upstream:
-        assert the design projection carries the upstream state
-        (the UI renders THIS, never a frontend guess)
+        assert the DERIVED canonical projection (build_dossier — the
+        same builder the UI consumes) carries the typed upstream
+        state, with no ready/geometry claim and no fabricated
+        RECEIVED engineering/visualization milestone
+        (R451-C2.6 CLOSEOUT §4: evidence from the run itself, never a
+        hard-coded pass)
     R10 (R451-C2.3 §8): the evaluator's announced join state must be
         consistent with the record invariants (VISUAL_READY only when
         the release chain verified).
@@ -234,36 +245,92 @@ def run_watchdog(run_dir: Path) -> Dict[str, Any]:
         evidence=GATE)
 
     # ---- R3: COMPLETE_PASS -> the full artifact ladder on disk ----
+    # R451-C2.6 CLOSEOUT §3 — THE CHECKER'S INABILITY IS A FINDING, NOT
+    # AN EXEMPTION: under a TRUE COMPLETE_PASS antecedent, a node_count
+    # that is missing or uninspectable, a failed visual-set derivation,
+    # or an unknown required artifact set is an INTEGRITY FINDING —
+    # never NOT_APPLICABLE. NOT_APPLICABLE is legal only when the
+    # antecedent is genuinely false (the gate verdict is not
+    # COMPLETE_PASS); it is never a shelter for "the checker could not
+    # determine it".
     verdict = (gate or {}).get("verdict")
     from discovery_fabric.engine.visual_compiler import visual_set  # noqa: E402
     node_count = 0
+    node_count_basis = None
+    node_count_error = None
     if render_record:
-        node_count = int(((render_record.get("scene_spec") or {})
-                          .get("model") or {}).get("node_count") or 0)
+        nc = ((render_record.get("scene_spec") or {})
+              .get("model") or {}).get("node_count")
+        if isinstance(nc, int) and nc > 0:
+            node_count = nc
+            node_count_basis = "render_record.scene_spec.model.node_count"
+        elif nc is not None:
+            node_count_error = (f"render-record node_count not inspectable "
+                                f"({nc!r})")
     if not node_count and glb is not None:
         try:
             from discovery_fabric.engine.visual_compiler import \
                 scene_builder  # noqa: E402
             node_count = int(
                 scene_builder.inspect_glb(str(glb))["model"]["node_count"])
-        except Exception:  # noqa: BLE001 — ladder check degrades to N/A
+            node_count_basis = "structural GLB inspection"
+        except Exception as exc:  # noqa: BLE001 — recorded, never exempted
+            node_count_error = ((node_count_error + "; ")
+                                if node_count_error else "") \
+                + f"structural GLB inspection failed: {exc}"
             node_count = 0
+    set_error = None
     required: List[str] = []
+    missing: List[str] = []
     if node_count:
-        required = visual_set.required_artifacts(
-            node_count,
-            visual_set.DEFAULT_TURNTABLE_FRAMES)["required"]
-    missing = [name for name in required
-               if not (run_dir / "MODEL" / "3D" / name).is_file()
-               or (run_dir / "MODEL" / "3D" / name).stat().st_size == 0]
-    record(
-        "R3_complete_pass_has_full_ladder",
-        applicable=verdict == "COMPLETE_PASS" and bool(required),
-        ok=not missing,
-        detail=("gate %s; %d/%d ladder artifacts on disk%s"
-                % (verdict, len(required) - len(missing), len(required),
-                   f"; missing: {missing[:6]}" if missing else "")),
-        evidence="MODEL/3D/")
+        try:
+            required = visual_set.required_artifacts(
+                node_count,
+                visual_set.DEFAULT_TURNTABLE_FRAMES)["required"]
+        except Exception as exc:  # noqa: BLE001 — a failed derivation is
+            # an integrity finding under COMPLETE_PASS, never an exemption
+            set_error = f"the visual-set derivation failed: {exc}"
+            required = []
+    if verdict == "COMPLETE_PASS" and not required:
+        # the antecedent is TRUE and the required set is undeterminable
+        # — an integrity finding (R451-C2.6 CLOSEOUT §3), never
+        # NOT_APPLICABLE
+        if set_error:
+            r3_detail = (f"gate COMPLETE_PASS; {set_error} — the required "
+                         "artifact set is UNKNOWN, an integrity finding "
+                         "under the COMPLETE_PASS antecedent "
+                         "(R451-C2.6 CLOSEOUT §3)")
+        else:
+            r3_detail = (
+                "gate COMPLETE_PASS; the required presentation set is "
+                "UNKNOWN — node_count is missing or uninspectable"
+                + (f" ({node_count_error})" if node_count_error else "")
+                + " — an integrity finding, never NOT_APPLICABLE "
+                "(R451-C2.6 CLOSEOUT §3)")
+        record("R3_complete_pass_has_full_ladder",
+               applicable=True, ok=False, detail=r3_detail,
+               evidence="MODEL/3D/")
+    elif verdict == "COMPLETE_PASS":
+        missing = [name for name in required
+                   if not (run_dir / "MODEL" / "3D" / name).is_file()
+                   or (run_dir / "MODEL" / "3D" / name).stat().st_size == 0]
+        record(
+            "R3_complete_pass_has_full_ladder",
+            applicable=True,
+            ok=not missing,
+            detail=("gate COMPLETE_PASS; %d/%d ladder artifacts on disk "
+                    "(node_count %d via %s)%s"
+                    % (len(required) - len(missing), len(required),
+                       node_count, node_count_basis,
+                       f"; missing: {missing[:6]}" if missing else "")),
+            evidence="MODEL/3D/")
+    else:
+        record("R3_complete_pass_has_full_ladder",
+               applicable=False, ok=False,
+               detail=(f"gate {verdict or 'absent'} — the ladder rule's "
+                       "antecedent (COMPLETE_PASS) is genuinely false "
+                       "(NOT_APPLICABLE)"),
+               evidence="MODEL/3D/")
 
     # ---- R4: hero exists -> source hash == canonical GLB hash ----
     hero = run_dir / "MODEL" / "3D" / "hero.png"
@@ -296,20 +363,66 @@ def run_watchdog(run_dir: Path) -> Dict[str, Any]:
                    f"{'present' if reason else 'MISSING'}"),
            evidence=RECEIPT)
 
-    # ---- R6: GLB absent + run stopped upstream -> the projection the
-    # UI renders carries the upstream state (never a frontend guess) ----
+    # ---- R6: GLB absent + run stopped upstream -> THE PROJECTION THE
+    # UI RENDERS CARRIES THE UPSTREAM STATE — verified from the run's
+    # OWN records by deriving the canonical dossier (build_dossier — the
+    # SAME projection builder the product surface consumes; one
+    # implementation, Art. X).
+    # R451-C2.6 CLOSEOUT §4 — THE WATCHDOG PRODUCES EVIDENCE FROM THE
+    # RUN ITSELF: no hard-coded pass, no pointer to another test. The
+    # rule passes only when the derived projection (a) carries a typed,
+    # NON-READY geometry state (never geometry_available /
+    # visual_complete from a GLB-less blocked run), (b) shows NO
+    # fabricated RECEIVED engineering/visualization milestone, and (c)
+    # can be derived at all — a projection that cannot be derived is an
+    # integrity finding (unverifiable evidence fails closed, Art. XXV),
+    # never a pass.
     stopped_upstream = session.get("status") in (
         "RUN_BLOCKED_TRANSPORT", "INTERRUPTED", "ERROR_TRANSPORT",
         "ERROR_RUN", "ERROR_BUILD", "ERROR_STUCK")
-    record(
-        "R6_no_glb_blocked_run_projects_upstream_state",
-        applicable=glb is None and stopped_upstream,
-        ok=True,  # the projection contract itself is source-pinned by
-        # tests/test_r451_c2_blocked_state.py; the run-dir side has no
-        # contradicting artifact to check (no GLB, no receipt expected)
-        detail=("no GLB and the session record is an infrastructure "
-                "stop — the design/evidence projections carry the "
-                "typed upstream state (source-pinned)"))
+    if glb is None and stopped_upstream:
+        r6_ok = False
+        try:
+            from toscanini import dossier as _dossier_mod  # noqa: E402
+            derived = _dossier_mod.build_dossier(session)
+            d_design = (derived.get("tabs") or {}).get("design") or {}
+            d_pipeline = derived.get("pipeline") or []
+            gst = d_design.get("geometry_state")
+            eng_row = next((r for r in d_pipeline
+                            if r.get("key") == "engineering"), {}) or {}
+            vis_row = next((r for r in d_pipeline
+                            if r.get("key") == "visualization"), {}) or {}
+            ready_claim = gst in ("geometry_available", "visual_complete")
+            rows_fabricated = (eng_row.get("status") == "RECEIVED"
+                               or vis_row.get("status") == "RECEIVED")
+            r6_ok = bool(gst) and not ready_claim and not rows_fabricated
+            r6_detail = (
+                "no GLB and the session record is an infrastructure "
+                "stop — the DERIVED canonical projection carries "
+                f"geometry_state={gst!r}; engineering row "
+                f"{eng_row.get('status')!r}; visualization row "
+                f"{vis_row.get('status')!r}"
+                + ("" if r6_ok else
+                   " — CONTRADICTION: the projection claims a ready or "
+                   "received state the run's own records cannot support "
+                   "(R451-C2.6 CLOSEOUT §4)"))
+        except Exception as exc:  # noqa: BLE001 — cannot verify fails closed
+            r6_ok = False
+            r6_detail = (
+                "no GLB and the session record is an infrastructure "
+                "stop, but the canonical projection could not be "
+                f"derived ({exc}) — unverifiable evidence fails closed, "
+                "never a pass (R451-C2.6 CLOSEOUT §4)")
+        record("R6_no_glb_blocked_run_projects_upstream_state",
+               applicable=True, ok=r6_ok, detail=r6_detail,
+               evidence="dossier")
+    else:
+        record("R6_no_glb_blocked_run_projects_upstream_state",
+               applicable=False, ok=False,
+               detail=("the antecedent is false (a canonical GLB exists "
+                       "or the session record is not an infrastructure "
+                       "stop) — NOT_APPLICABLE"),
+               evidence="dossier")
 
     # ---- R7: receipt identity matches the run it sits in ----
     if receipt is not None:
@@ -400,7 +513,7 @@ def run_watchdog(run_dir: Path) -> Dict[str, Any]:
         watchdog_verdict = "PASS"
     return {
         "kind": "R451_C2_PRODUCT_WATCHDOG",
-        "watchdog_version": "R451-C2.6",
+        "watchdog_version": "R451-C2.6-CLOSEOUT",
         "run_dir": str(run_dir),
         "canonical_glb": str(glb) if glb else None,
         "engineering_authority": contract.get("engineering_authority"),

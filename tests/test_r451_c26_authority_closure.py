@@ -646,3 +646,216 @@ class TestCouplingAndDeterminism:
         r2 = _watchdog_report(golden)
         assert json.dumps(r1, sort_keys=True) == \
             json.dumps(r2, sort_keys=True)
+
+
+# ---------------------------------------------------------------------------
+# R451-C2.6 CLOSEOUT AMENDMENT — the residual authority holes
+# (operator closeout directive: receipt identity mandatory; renderer
+# status mandatory on both sides; watchdog R3 fail-closed under a TRUE
+# COMPLETE_PASS antecedent; R6 produces evidence from the run itself;
+# exactly one blocked-terminal browser attack — the browser proof lives
+# in R451/C2_PRODUCT/E2E_C26_CLOSEOUT, this battery pins the evaluator,
+# the chain, and the watchdog)
+# ---------------------------------------------------------------------------
+def _rewrite_receipt(run: Path, mutate) -> None:
+    p = run / "MODEL" / "3D" / "VISUAL_COMPILER_INVOCATION.json"
+    data = json.loads(p.read_text())
+    mutate(data)
+    p.write_text(json.dumps(data))
+
+
+def _rewrite_record(run: Path, mutate) -> None:
+    p = run / "MODEL" / "3D" / "render_record.json"
+    data = json.loads(p.read_text())
+    mutate(data)
+    p.write_text(json.dumps(data))
+
+
+class TestCloseoutReceiptIdentityMandatory:
+    """CLOSEOUT §1 — receipt identity is MANDATORY: a receipt that
+    omits run_id FAILS the chain (omission is never agreement), a
+    mismatched run_id FAILS. The other mandatory identity fields
+    (glb_sha256, geometry_spec_sha256, generation_id) already failed
+    closed when absent (C2.4 §5 / C2.6 §2 batteries) — run_id was the
+    last omission-as-agreement hole."""
+
+    def test_receipt_missing_run_id_fails_the_chain(self, tmp_path):
+        run = _mutated(tmp_path, "ts_c26cl_norunid",
+                       lambda r: _rewrite_receipt(
+                           r, lambda d: d.pop("run_id", None)))
+        chain = vj.verify_release_chain(run, _ids[run.name]["glb_path"])
+        assert chain["verified"] is False
+        assert chain["first_failure"] == "invocation_receipt_identity"
+        rung = next(r for r in chain["rungs"]
+                    if r["rung"] == "invocation_receipt_identity")
+        assert "no run_id" in rung["detail"]
+        assert "CLOSEOUT" in rung["detail"]
+        # the gate passed, so the evaluator announces the fail-closed
+        # RELEASE_UNVERIFIED — never VISUAL_READY
+        out = _evaluator_state(run)
+        assert out["join"]["visual_join_state"] == "RELEASE_UNVERIFIED"
+
+    def test_receipt_run_id_mismatch_fails_the_chain(self, tmp_path):
+        run = _mutated(tmp_path, "ts_c26cl_wrongrunid",
+                       lambda r: _rewrite_receipt(
+                           r, lambda d: d.update(
+                               {"run_id": "ts_some_other_run"})))
+        chain = vj.verify_release_chain(run, _ids[run.name]["glb_path"])
+        assert chain["verified"] is False
+        assert chain["first_failure"] == "invocation_receipt_identity"
+        rung = next(r for r in chain["rungs"]
+                    if r["rung"] == "invocation_receipt_identity")
+        assert "run_id != the run it sits in" in rung["detail"]
+
+
+class TestCloseoutRendererStatusMandatory:
+    """CLOSEOUT §2 — the renderer status is mandatory on BOTH sides:
+    receipt.invocation_status must EXIST, render_record.status must
+    EXIST, and the two must AGREE. A missing status on either side
+    fails closed (it can never be read as agreement). The two
+    contradiction directions are fixtures 6 and 7 above; the two
+    missing-status cases close the remaining omission hole."""
+
+    def test_missing_receipt_status_fails_the_rung(self, tmp_path):
+        def strip(data):
+            data.pop("invocation_status", None)
+            data.pop("status", None)  # the 1.0.0-era alias too
+        run = _mutated(tmp_path, "ts_c26cl_noreceiptstatus",
+                       lambda r: _rewrite_receipt(r, strip))
+        chain = vj.verify_release_chain(run, _ids[run.name]["glb_path"])
+        assert chain["verified"] is False
+        assert chain["first_failure"] == "render_record_identity"
+        rung = next(r for r in chain["rungs"]
+                    if r["rung"] == "render_record_identity")
+        assert "no invocation_status" in rung["detail"]
+        assert "CLOSEOUT" in rung["detail"]
+        # the evaluator never announces readiness either (the join is
+        # not VISUAL_READY on a status-less receipt)
+        out = _evaluator_state(run)
+        assert out["join"]["visual_join_state"] != "VISUAL_READY"
+
+    def test_missing_render_record_status_fails_the_rung(self, tmp_path):
+        run = _mutated(tmp_path, "ts_c26cl_norecstatus",
+                       lambda r: _rewrite_record(
+                           r, lambda d: d.pop("status", None)))
+        chain = vj.verify_release_chain(run, _ids[run.name]["glb_path"])
+        assert chain["verified"] is False
+        assert chain["first_failure"] == "render_record_identity"
+        rung = next(r for r in chain["rungs"]
+                    if r["rung"] == "render_record_identity")
+        assert "no status" in rung["detail"]
+        out = _evaluator_state(run)
+        assert out["join"]["visual_join_state"] == "RELEASE_UNVERIFIED"
+
+
+class TestCloseoutWatchdogR3FailClosed:
+    """CLOSEOUT §3 — under a TRUE COMPLETE_PASS antecedent, a node_count
+    that is missing or uninspectable, a failed visual-set derivation,
+    or an unknown required artifact set is an INTEGRITY FINDING — never
+    NOT_APPLICABLE. NOT_APPLICABLE is legal only when the antecedent is
+    genuinely false."""
+
+    def test_complete_pass_with_unknown_required_set_is_a_finding(
+            self, tmp_path):
+        def blank_node_count(run: Path):
+            (run / "MODEL" / "engineering_model.glb").unlink()
+            _rewrite_record(
+                run, lambda d: d.get("scene_spec", {})
+                .get("model", {}).pop("node_count", None))
+        run = _mutated(tmp_path, "ts_c26cl_r3unknown", blank_node_count)
+        report = _watchdog_report(run)
+        check = next(c for c in report["checks"]
+                     if c["rule"] == "R3_complete_pass_has_full_ladder")
+        assert check["state"] == "FAIL"
+        assert "CLOSEOUT" in check["detail"]
+        assert report["watchdog_verdict"] == "INTEGRITY_VIOLATION"
+        assert report["verdict"] == "FAIL"
+
+    def test_complete_pass_with_uninspectable_glb_is_a_finding(
+            self, tmp_path):
+        def corrupt_glb(run: Path):
+            (run / "MODEL" / "engineering_model.glb").write_bytes(
+                b"NOT A GLTF CONTAINER")
+            _rewrite_record(
+                run, lambda d: d.get("scene_spec", {})
+                .get("model", {}).pop("node_count", None))
+        run = _mutated(tmp_path, "ts_c26cl_r3uninspect", corrupt_glb)
+        report = _watchdog_report(run)
+        check = next(c for c in report["checks"]
+                     if c["rule"] == "R3_complete_pass_has_full_ladder")
+        assert check["state"] == "FAIL"
+        assert ("UNKNOWN" in check["detail"])
+        assert report["watchdog_verdict"] == "INTEGRITY_VIOLATION"
+
+    def test_complete_pass_with_failed_set_derivation_is_a_finding(
+            self, golden: Path, monkeypatch):
+        from discovery_fabric.engine.visual_compiler import visual_set
+
+        def boom(node_count, frames):
+            raise RuntimeError("ladder definition unavailable")
+        monkeypatch.setattr(visual_set, "required_artifacts", boom)
+        report = _watchdog_report(golden)
+        check = next(c for c in report["checks"]
+                     if c["rule"] == "R3_complete_pass_has_full_ladder")
+        assert check["state"] == "FAIL"
+        assert "visual-set derivation failed" in check["detail"]
+        assert report["watchdog_verdict"] == "INTEGRITY_VIOLATION"
+
+    def test_ladder_rule_not_applicable_only_when_antecedent_false(
+            self, golden: Path):
+        # the antecedent is GENUINELY false: the gate verdict is not
+        # COMPLETE_PASS — NOT_APPLICABLE is the legal state here
+        (golden / "MODEL" / "3D" / "visual_gate.json").write_text(
+            json.dumps({"verdict": "PARTIAL"}))
+        report = _watchdog_report(golden)
+        check = next(c for c in report["checks"]
+                     if c["rule"] == "R3_complete_pass_has_full_ladder")
+        assert check["state"] == "NOT_APPLICABLE"
+
+
+class TestCloseoutWatchdogR6EvidenceFromTheRun:
+    """CLOSEOUT §4 — R6 produces evidence from the run itself: it
+    derives the canonical projection (build_dossier — the SAME builder
+    the product surface consumes) and verifies the typed non-ready
+    upstream state with no fabricated RECEIVED milestone. No hard-coded
+    pass; a projection that cannot be derived is an integrity finding
+    (fail closed, Art. XXV)."""
+
+    def test_blocked_run_projection_is_derived_and_passes(self, tmp_path):
+        run = tmp_path / "ts_c26cl_r6honest"
+        run.mkdir(parents=True)
+        (run / "session.json").write_text(json.dumps(
+            {"status": "RUN_BLOCKED_TRANSPORT",
+             "user_text": "fouling in compact heat exchangers"}))
+        (run / "problem.json").write_text("{}")
+        report = _watchdog_report(run)
+        check = next(c for c in report["checks"]
+                     if c["rule"] ==
+                     "R6_no_glb_blocked_run_projects_upstream_state")
+        assert check["state"] == "PASS"
+        # the evidence comes from the run's own derived projection
+        assert "upstream_not_reached" in check["detail"]
+        assert report["watchdog_verdict"] == "PASS"
+
+    def test_blocked_run_with_undeterminable_projection_fails(
+            self, tmp_path, monkeypatch):
+        # the derivation itself failing is an integrity finding —
+        # unverifiable evidence fails closed, never a pass (the crash
+        # path is simulated; the production builders raise typed
+        # failures, the watchdog must record them as findings)
+        run = tmp_path / "ts_c26cl_r6crash"
+        run.mkdir(parents=True)
+        (run / "session.json").write_text(json.dumps(
+            {"status": "RUN_BLOCKED_TRANSPORT"}))
+        from toscanini import dossier as dossier_mod
+
+        def boom(session):
+            raise RuntimeError("projection derivation unavailable")
+        monkeypatch.setattr(dossier_mod, "build_dossier", boom)
+        report = _watchdog_report(run)
+        check = next(c for c in report["checks"]
+                     if c["rule"] ==
+                     "R6_no_glb_blocked_run_projects_upstream_state")
+        assert check["state"] == "FAIL"
+        assert "could not be derived" in check["detail"]
+        assert report["watchdog_verdict"] == "INTEGRITY_VIOLATION"

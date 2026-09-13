@@ -1140,14 +1140,17 @@ def verify_release_chain(run_dir: Optional[Path],
         INDEPENDENT persisted current-generation anchor, and the
         container is STRUCTURALLY valid — R451-C2.5 §4, R451-C2.6 §2)
         -> invocation receipt identity verified (glb_sha256 == bytes;
-           run_id == run; geometry_spec_sha256 EXISTS and equals the
-           GEOMETRY_SPEC.json bytes — the spec lineage is MANDATORY,
-           R451-C2.4 §5)
+           run_id EXISTS and == run; geometry_spec_sha256 EXISTS and
+           equals the GEOMETRY_SPEC.json bytes — every mandatory
+           identity field must EXIST: omission is never agreement,
+           R451-C2.4 §5, R451-C2.6 CLOSEOUT §1)
         -> generation identity verified (artifact generation == receipt
            generation == independent persisted current generation —
            R451-C2.4 §5, R451-C2.6 §2)
         -> render record identity AND renderer-success records that
-           AGREE (receipt status == record status — R451-C2.6 §4)
+           AGREE (receipt.invocation_status EXISTS, render_record.status
+           EXISTS, and the two are EQUAL — a missing status on either
+           side fails closed, R451-C2.6 §4 + CLOSEOUT §2)
         -> gate PASS
         -> required presentation artifact set exists
         -> hero exists
@@ -1203,6 +1206,11 @@ def verify_release_chain(run_dir: Optional[Path],
 
     receipt = read_invocation_receipt(run_dir)
     # ---- rung 2: invocation receipt identity ------------------------
+    # R451-C2.6 CLOSEOUT §1 — RECEIPT IDENTITY IS MANDATORY: every
+    # identity field this rung's contract claims mandatory (run_id,
+    # glb_sha256, geometry_spec_sha256) must EXIST and match. Omission
+    # is never agreement — a receipt that omits a mandatory field fails
+    # the rung exactly like a mismatched one.
     receipt_ok = False
     detail = "no invocation receipt on disk"
     if receipt:
@@ -1213,7 +1221,11 @@ def verify_release_chain(run_dir: Optional[Path],
             problems.append("receipt carries no glb_sha256")
         elif rec_glb != glb_sha:
             problems.append("receipt glb_sha256 != canonical GLB bytes")
-        if rec_run and run_dir is not None and rec_run != run_dir.name:
+        if not rec_run:
+            problems.append("receipt carries no run_id — receipt identity "
+                            "is mandatory and omission is never agreement "
+                            "(R451-C2.6 CLOSEOUT §1)")
+        elif run_dir is not None and rec_run != run_dir.name:
             problems.append("receipt run_id != the run it sits in")
         spec_path = run_dir / GEOMETRY_SPEC_REL if run_dir else None
         spec_sha = _sha256_file(spec_path) if spec_path and \
@@ -1300,8 +1312,23 @@ def verify_release_chain(run_dir: Optional[Path],
         src = record.get("source_glb_sha256")
         rec_status = str(record.get("status") or "")
         receipt_status = str((receipt or {}).get("invocation_status") or "")
-        if receipt_status and rec_status and \
-                receipt_status != rec_status:
+        # R451-C2.6 CLOSEOUT §2 — THE RENDERER STATUS IS MANDATORY ON
+        # BOTH SIDES: receipt.invocation_status must exist,
+        # render_record.status must exist, and the two must agree. A
+        # missing status on EITHER side fails closed (it can never be
+        # read as agreement), and a contradiction fails closed exactly
+        # as before.
+        if not receipt_status:
+            detail = ("the invocation receipt carries no invocation_status "
+                      "— the renderer-success record is mandatory on both "
+                      "sides and a missing status fails closed "
+                      "(R451-C2.6 CLOSEOUT §2)")
+        elif not rec_status:
+            detail = ("the render record carries no status — the "
+                      "renderer-success record is mandatory on both "
+                      "sides and a missing status fails closed "
+                      "(R451-C2.6 CLOSEOUT §2)")
+        elif receipt_status != rec_status:
             detail = (f"the renderer-success records contradict: "
                       f"receipt.invocation_status ({receipt_status}) != "
                       f"render_record.status ({rec_status}) — the "

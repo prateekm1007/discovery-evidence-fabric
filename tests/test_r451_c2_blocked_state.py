@@ -335,7 +335,13 @@ class TestWatchdog:
             "skip_reason": None, "output_directory": str(m3d)}))
         (m3d / "visual_gate.json").write_text(json.dumps(
             {"verdict": "COMPLETE_PASS"}))
-        rec = {"source_glb_sha256": glb_sha,
+        # R451-C2.6 CLOSEOUT §2 (Art. XV fixture disclosure): the
+        # render record now carries its mandatory status — the
+        # renderer-success record is mandatory on BOTH sides and must
+        # equal the receipt's invocation_status; a status-less record
+        # can never prove renderer success.
+        rec = {"status": "SUCCEEDED",
+               "source_glb_sha256": glb_sha,
                "scene_spec": {"model": {"node_count": 1}}}
         (m3d / "render_record.json").write_text(json.dumps(rec))
         from discovery_fabric.engine.visual_compiler import visual_set

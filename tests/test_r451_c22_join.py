@@ -608,8 +608,13 @@ class TestWatchdogJoin:
         _write_receipt(tmp_path, invocation_status="SUCCEEDED",
                        glb_sha256=glb_sha,
                        geometry_spec_sha256=spec_sha)
+        # R451-C2.6 CLOSEOUT §2 (Art. XV fixture disclosure): the
+        # render record carries its mandatory status — the
+        # renderer-success records must EXIST on both sides and agree
+        # (receipt.invocation_status == render_record.status).
         (m3d / "render_record.json").write_text(json.dumps(
-            {"source_glb_sha256": glb_sha,
+            {"status": "SUCCEEDED",
+             "source_glb_sha256": glb_sha,
              "scene_spec": {"model": {"node_count": 1}}}))
         (m3d / "visual_gate.json").write_text(json.dumps(
             {"verdict": "COMPLETE_PASS"}))

@@ -555,7 +555,15 @@ export default function TechStage({
             <span className="cursor" aria-hidden="true" />
             {status.label}
           </span>
-          {done && usv?.outcome_label && (
+          {/* R451-C2.6 CLOSEOUT §5 — a blocked-terminal surface can
+              never carry a scientific terminal verdict: the stage's
+              verdict line under INFRASTRUCTURE_PAUSED is "No scientific
+              conclusion was reached", so a stale/scientific-looking
+              user-state outcome_label (a forged or pre-interruption
+              result carried in the payload) is SUPPRESSED here — the
+              blocked hero's own copy is the only verdict this state
+              speaks (proven by the closeout browser attack). */}
+          {done && !blocked && usv?.outcome_label && (
             <span className="faint stage-outcome">{usv.outcome_label}</span>
           )}
           {genCount > 1 && (
