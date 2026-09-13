@@ -81,26 +81,43 @@ RUN set -ux; \
 # substitutions).
 #
 # Acquisition is a multi-source ladder (download.blender.org is
-# Cloudflare-fronted; the three mirrors are the Blender project's own
+# Cloudflare-fronted; the mirrors are the Blender project's own
 # published mirror list) — the R419/R419b/R419c build failures were
 # root-caused to the trixie apt rename above (R419e); the ladder keeps
 # acquisition robust against a single mirror outage.
+#
+# R451-C1.3 acquisition hardening (the second C1.3 deploy's measured
+# BUILD_ERROR): the primary source delivered 357/383 MB at ~740 KB/s
+# and was killed by the 480 s cap; every mirror retry then RESTARTED
+# from zero bytes and the ladder exhausted itself. Three transport-side
+# fixes: (1) --max-time 1200 — a slow-but-alive source at 740 KB/s
+# needs ~530 s for the whole tarball; (2) -C - resume — a timed-out
+# attempt's partial bytes carry FORWARD, so progress accumulates across
+# tries and sources instead of restarting; (3) --speed-time 60
+# --speed-limit 20480 — a genuinely dead source (<20 KB/s for 60 s)
+# fails fast instead of burning the full budget. A fifth mirror joins
+# the ladder. The sha256 gate remains the SOLE success authority (the
+# tarball is byte-identical whichever source supplied the tail; the
+# fail-closed pin discipline is unchanged).
 ARG BLENDER_VERSION=5.2.1
 ARG BLENDER_RELEASE_PATH=5.2
 ARG BLENDER_TARBALL_SHA256=a31f524fa99a527d3d52b7f5aaa68c34e1a19d5a1c9473f79c5cc610fd5b10e9
 RUN set -ux; \
-    _ok=0; \
+    rm -f /tmp/blender.tar.xz; \
     for _src in \
       "https://download.blender.org/release/Blender${BLENDER_RELEASE_PATH}/blender-${BLENDER_VERSION}-linux-x64.tar.xz" \
       "https://mirrors.dotsrc.org/blender/release/Blender${BLENDER_RELEASE_PATH}/blender-${BLENDER_VERSION}-linux-x64.tar.xz" \
       "https://ftp.nluug.nl/pub/graphics/blender/release/Blender${BLENDER_RELEASE_PATH}/blender-${BLENDER_VERSION}-linux-x64.tar.xz" \
-      "https://mirror.clarkson.edu/blender/release/Blender${BLENDER_RELEASE_PATH}/blender-${BLENDER_VERSION}-linux-x64.tar.xz"; do \
-      if curl -fsSL --retry 2 --max-time 480 -o /tmp/blender.tar.xz "$_src"; then \
-        _ok=1; break; \
-      fi; \
+      "https://mirror.clarkson.edu/blender/release/Blender${BLENDER_RELEASE_PATH}/blender-${BLENDER_VERSION}-linux-x64.tar.xz" \
+      "https://ftp.gwdg.de/pub/graphics/blender/release/Blender${BLENDER_RELEASE_PATH}/blender-${BLENDER_VERSION}-linux-x64.tar.xz"; do \
+      for _try in 1 2 3; do \
+        if curl -fsSL -C - --max-time 1200 --speed-time 60 --speed-limit 20480 -o /tmp/blender.tar.xz "$_src"; then \
+          break 2; \
+        fi; \
+        ls -l /tmp/blender.tar.xz 2>/dev/null || true; \
+      done; \
     done; \
-    [ "$_ok" = "1" ] || { echo "blender tarball: all sources failed" >&2; exit 1; }; \
-    echo "${BLENDER_TARBALL_SHA256}  /tmp/blender.tar.xz" | sha256sum -c - || exit 1; \
+    echo "${BLENDER_TARBALL_SHA256}  /tmp/blender.tar.xz" | sha256sum -c - || { echo "blender tarball: all sources failed" >&2; exit 1; }; \
     mkdir -p /opt && tar -xJf /tmp/blender.tar.xz -C /opt || exit 1; \
     mv "/opt/blender-${BLENDER_VERSION}-linux-x64" /opt/blender; \
     rm /tmp/blender.tar.xz; \
