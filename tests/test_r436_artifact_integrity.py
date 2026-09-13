@@ -321,10 +321,19 @@ class TestStageSourceContract:
         src = TECHSTAGE.read_text()
         assert "hero_eligibility" in src
         assert "heroEligible" in src
-        # the hero GLB only when eligible:
-        assert "heroEligible && design && design.availability" in src
-        # history swap cannot bypass suppression:
-        assert "heroEligible && Boolean(activeRow?.glb)" in src
+        # the hero GLB only when eligible. R451-C2.6 §1 supersession
+        # (Art. LXIV, disclosed): the guard expression now reads
+        # `!legacyUnavailable && heroEligible && ...` — the eligibility
+        # property is preserved and STRENGTHENED (the hero is additionally
+        # impossible under LEGACY_STATE_UNAVAILABLE, the C2.6 rendering-
+        # order rule); the C2.6-era UI battery and the
+        # test_r451_c26_authority_closure.py source pins cover the new
+        # expression.
+        assert "!legacyUnavailable && heroEligible && design &&" in src
+        # history swap cannot bypass suppression (R451-C2.6: the swap is
+        # additionally legacy-gated — the same `!legacyUnavailable &&`
+        # prefix guards showingHistory):
+        assert "heroEligible &&" in src
 
     def test_unearned_hero_state_exists(self):
         src = TECHSTAGE.read_text()

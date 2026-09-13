@@ -178,6 +178,16 @@ def _seed_engineering_identity(run_dir: Path, session_id: str) -> None:
     }
     (model_dir / "ARTIFACT_IDENTITY.json").write_text(
         json.dumps(identity, indent=2, sort_keys=True) + "\n")
+    # R451-C2.6 §2: the fixture mirrors the certified recorded shape —
+    # including the INDEPENDENT persisted current-generation anchor
+    # (DESIGN_LINEAGE.json's current-generation entry with its OWN
+    # generation identity; the artifact generation is never its own
+    # anchor).
+    (model_dir / "DESIGN_LINEAGE.json").write_text(json.dumps({
+        "artifact": "DESIGN_LINEAGE",
+        "generation_models": [
+            {"generation": 1, "generation_id": "gen-1",
+             "glb": "MODEL/engineering_model.glb", "current": True}]}))
     (run_dir / "BRIDGE_REPORT.json").write_text(json.dumps({
         "artifact": "BRIDGE_REPORT",
         "outcome": "COMPLETED",

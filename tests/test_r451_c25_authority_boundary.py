@@ -120,6 +120,17 @@ def _complete_run(run: Path, session_id="ts_r451c25_golden",
         "visualizability_class": "ENGINEERING_3D",
     }
     (model / "ARTIFACT_IDENTITY.json").write_text(json.dumps(identity))
+    # R451-C2.6 §2 (Art. XV fixture disclosure): the fixture now carries
+    # the INDEPENDENT persisted current-generation anchor — the
+    # DESIGN_LINEAGE.json current-generation entry with its OWN
+    # generation identity — because the artifact generation is never its
+    # own anchor (the C2.5-era anchorless shape relied on the
+    # self-anchoring fallback this round supersedes).
+    (model / "DESIGN_LINEAGE.json").write_text(json.dumps({
+        "artifact": "DESIGN_LINEAGE",
+        "generation_models": [
+            {"generation": 1, "generation_id": "gen-1",
+             "glb": "MODEL/engineering_model.glb", "current": True}]}))
     (run / "BRIDGE_REPORT.json").write_text(json.dumps({
         "outcome": "COMPLETED",
         "visualizability_class": "ENGINEERING_3D",

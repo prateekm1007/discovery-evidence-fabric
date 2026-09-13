@@ -400,7 +400,7 @@ def run_watchdog(run_dir: Path) -> Dict[str, Any]:
         watchdog_verdict = "PASS"
     return {
         "kind": "R451_C2_PRODUCT_WATCHDOG",
-        "watchdog_version": "R451-C2.5",
+        "watchdog_version": "R451-C2.6",
         "run_dir": str(run_dir),
         "canonical_glb": str(glb) if glb else None,
         "engineering_authority": contract.get("engineering_authority"),

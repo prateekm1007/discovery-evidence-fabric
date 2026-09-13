@@ -1,6 +1,7 @@
 """visual_join.py — THE machine-verifiable geometry-to-visual join
 evaluator (R451-C2.2 §5/§6, hardened by R451-C2.3, certified by
-R451-C2.4, sovereignty-hardened by R451-C2.5).
+R451-C2.4, sovereignty-hardened by R451-C2.5, authority-closed by
+R451-C2.6).
 
 The directive's join contract:
 
@@ -100,6 +101,38 @@ header over malformed internal structure never certifies. Honest
 scope: this is container-level structural validity — the semantic
 render verification remains the Visual Quality Gate's job downstream
 (Article LXXII); this check never claims mesh/buffer semantics.
+
+R451-C2.6 — THE AUTHORITY CLOSURE (the last hardening round):
+
+  §2 THE INDEPENDENT PERSISTED CURRENT-GENERATION ANCHOR: the ONE
+  canonical persisted current-generation source is DESIGN_LINEAGE
+  .json's current-generation entry (its own generation_id when the
+  entry records one, else the entry's recorded generation number
+  normalized through the pipeline's own gen-<n> convention). The
+  artifact generation is NEVER its own current-generation anchor:
+  current_generation = artifact_generation is never inferred. The
+  triple identity is mandatory — artifact generation == receipt
+  generation == the independent persisted current generation — and a
+  missing anchor fails closed at every boundary: the certification
+  never completes (the artifact stays geometry_unverified with an
+  UNKNOWN authority), and the release chain's generation rung fails
+  (RELEASE_UNVERIFIED).
+
+  §3 verify_release_chain IS SOVEREIGN: the chain independently
+  obtains the CERTIFIED canonical artifact through the persisted
+  identity chain (certified_canonical_glb). A caller-provided glb_path
+  is a DIAGNOSTIC cross-check only — it may agree (recorded) or
+  contradict (fails closed), and it can never weaken the persisted-
+  identity requirement. The diagnostic locator's filename fallbacks
+  never satisfy a rung (discovery and certification remain separate).
+
+  §4 THE RENDERER-SUCCESS RECORDS CROSS-CHECK: the invocation
+  receipt's status, the render record's own status, and the gate must
+  agree on what happened. The production writer copies the record's
+  status into the receipt verbatim, so a disagreement between the two
+  success records is tampering or forgery — the rung fails closed and
+  neither contradiction (receipt OK / record FAILED, or the reverse)
+  can produce VISUAL_READY.
 
 PRESENTATION-ONLY (Coder 2 boundary): this module derives state from
 canonical records and changes no engineering truth. It WRITES nothing
@@ -396,12 +429,13 @@ def certified_canonical_glb(run_dir: Optional[Path],
       2. measured SHA     sha256 over the named file's own bytes,
                           equal to the SHA the PERSISTED identity
                           records (geometry_hash / glb_disk_sha256)
-      3. current          the persisted identity's generation_id
-         generation       exists and matches the persisted
-                          current-generation anchor (the lineage's
-                          current entry's own generation_id when it
-                          records one, else the persisted identity's
-                          generation_id)
+      3. current          the INDEPENDENT persisted current-generation
+         generation       anchor (DESIGN_LINEAGE.json's current-
+                          generation entry, R451-C2.6 §2) exists and
+                          matches the persisted identity's generation
+                          — the artifact generation is never its own
+                          anchor and the anchor is never inferred from
+                          it; a missing anchor never certifies
 
     R451-C2.5 §3: a projection-side geom.artifact_identity object —
     however complete — is DIAGNOSTIC ONLY. It can never name the
@@ -518,9 +552,10 @@ def certified_canonical_glb(run_dir: Optional[Path],
     identity_shas = [(s, v) for s, v in recorded_shas if v]
     if not identity_shas:
         out["failures"].append(
-            "the artifact identity records no SHA for the canonical "
+            "the PERSISTED identity records no SHA for the canonical "
             "GLB — identity without the required SHA is not a "
-            "certification")
+            "certification, and a projection-carried SHA can never "
+            "certify (R451-C2.5 §3)")
         return out
     mismatches = [s for s, v in identity_shas if str(v) != glb_sha]
     if mismatches:
@@ -530,22 +565,20 @@ def certified_canonical_glb(run_dir: Optional[Path],
             "broken (fail closed)")
         return out
 
-    # ---- 3. the generation identity (PERSISTED anchor, R451-C2.5 §3) --
-    # The generation identity is held against PERSISTED documents only:
-    # the persisted identity's generation_id, anchored by the lineage's
-    # current-generation entry's own generation_id when the lineage
-    # records one. The projection's carried generation fields are
-    # contradiction diagnostics (evaluate_geometry_contract) — they can
-    # fail this certification closed but can never anchor it.
-    id_generation = identity.get("generation_id") or \
-        (lineage or {}).get("generation_id")
-    lineage_anchor = None
-    if lineage:
-        for gen in lineage.get("generation_models") or []:
-            if gen.get("current") and gen.get("generation_id"):
-                lineage_anchor = str(gen["generation_id"])
-                break
-    current_anchor = lineage_anchor or id_generation
+    # ---- 3. the generation identity (INDEPENDENT anchor, R451-C2.6 §2)-
+    # The triple identity is mandatory: the persisted identity's
+    # generation == the INDEPENDENT persisted current-generation anchor
+    # (DESIGN_LINEAGE.json's current-generation entry) == the receipt's
+    # generation (checked on the release chain). R451-C2.6 §2: the
+    # artifact generation is NEVER its own anchor — the C2.5-era
+    # fallback that anchored the current generation with the identity's
+    # own generation_id when the lineage recorded none is SUPERSEDED
+    # (Art. LXIV: a missing anchor now fails closed at every boundary).
+    # The projection's carried generation fields are contradiction
+    # diagnostics (evaluate_geometry_contract) — they can fail this
+    # certification closed but can never anchor it.
+    id_generation = identity.get("generation_id")
+    current_anchor = lineage_anchor_generation(run_dir)
     out["generation_id"] = str(id_generation) if id_generation else None
     out["current_generation_id"] = str(current_anchor) \
         if current_anchor else None
@@ -555,11 +588,19 @@ def certified_canonical_glb(run_dir: Optional[Path],
             "generation identity is mandatory and cannot be anchored "
             "by a projection field (R451-C2.5 §3)")
         return out
-    if current_anchor and str(id_generation) != str(current_anchor):
+    if not current_anchor:
+        out["failures"].append(
+            "no independent persisted current-generation anchor exists "
+            "(DESIGN_LINEAGE.json's current-generation entry records no "
+            "generation identity) — the artifact generation is never "
+            "its own anchor and the current generation is never "
+            "inferred from it (R451-C2.6 §2)")
+        return out
+    if str(id_generation) != str(current_anchor):
         out["failures"].append(
             f"the artifact generation ({id_generation}) does not "
-            f"match the persisted current generation ({current_anchor}) "
-            "— a stale artifact never certifies")
+            f"match the independent persisted current generation "
+            f"({current_anchor}) — a stale artifact never certifies")
         return out
     # R451-C2.5 §3 — a projection-carried generation CONTRADICTING the
     # persisted identity fails the certification closed (the projection
@@ -595,15 +636,28 @@ def _load_lineage(run_dir: Optional[Path]) -> Dict[str, Any]:
 
 
 def lineage_anchor_generation(run_dir: Optional[Path]) -> Optional[str]:
-    """The PERSISTED current-generation anchor: the DESIGN_LINEAGE.json
-    current-generation entry's own generation_id when the lineage
-    records one. R451-C2.5 §3: the current-generation identity is
-    decided by persisted documents — never by the projection's carried
-    generation field (which may only contradict, fail-closed)."""
+    """R451-C2.6 §2 — THE INDEPENDENT PERSISTED CURRENT-GENERATION
+    ANCHOR: DESIGN_LINEAGE.json's current-generation entry. The entry
+    carries the current generation's OWN identity — its generation_id
+    when the entry records one, else the entry's recorded generation
+    number normalized through the pipeline's own convention (gen-<n>,
+    the same normalization the bridge's projection writer applies).
+    This persisted document — not the artifact's own identity, and
+    never the projection — is the ONE canonical current-generation
+    source. R451-C2.6 §2: the artifact generation is never its own
+    anchor; when the entry records no generation identity this returns
+    None and every consumer fails closed (the anchor is not invented
+    from the artifact — Art. VI/XXV)."""
     lineage = _load_lineage(run_dir)
     for gen in lineage.get("generation_models") or []:
-        if gen.get("current") and gen.get("generation_id"):
-            return str(gen["generation_id"])
+        if not gen.get("current"):
+            continue
+        gid = gen.get("generation_id")
+        if gid:
+            return str(gid)
+        n = gen.get("generation")
+        if n is not None:
+            return f"gen-{n}"
     return None
 
 
@@ -720,6 +774,13 @@ def evaluate_geometry_contract(session: Dict[str, Any],
         geom.get("artifact_identity"), dict) else {}
     projection_generation_id = geom.get("generation_id") or \
         br_identity.get("generation_id")
+
+    # ---- the independent persisted current-generation anchor ----------
+    # R451-C2.6 §2 — surfaced verbatim: the ONE canonical persisted
+    # current-generation source, read before the contradiction checks
+    # (the anchor decides the current side of the triple identity; it
+    # is never inferred from the artifact generation).
+    lineage_anchor = lineage_anchor_generation(run_dir)
 
     # ---- SHA verification: every RECORDED sha must match the bytes ---
     # (R451-C2.5 §3: the persisted identity's SHAs are the certification
@@ -841,26 +902,34 @@ def evaluate_geometry_contract(session: Dict[str, Any],
             verify_detail = ("no verifiable geometry artifact resolves "
                              "under the run directory")
 
-    # ---- generation identity (PERSISTED anchor, R451-C2.5 §3) --------
-    # The persisted identity's generation_id is the anchor. The
-    # projection's carried generation is a CONTRADICTION diagnostic:
-    # when it disagrees with the persisted chain, the artifact fails
-    # closed (the projection never anchors, never certifies).
+    # ---- generation identity (INDEPENDENT anchor, R451-C2.6 §2) -------
+    # The persisted identity's generation_id is the artifact side of the
+    # triple identity; the INDEPENDENT persisted current-generation
+    # anchor (DESIGN_LINEAGE.json's current-generation entry) is the
+    # current side. The projection's carried generation is a
+    # CONTRADICTION diagnostic: when it disagrees with the persisted
+    # identity OR with the independent anchor, the artifact fails closed
+    # (the projection never anchors, never certifies, never promotes).
     identity_generation = (identity or {}).get("generation_id") or \
-        (lineage_anchor_generation(run_dir) or
-         _load_lineage(run_dir).get("generation_id"))
+        lineage_anchor_generation(run_dir)
     generation_mismatch = bool(
         identity_generation and projection_generation_id
         and str(identity_generation) != str(projection_generation_id))
-    if generation_mismatch:
+    anchor_mismatch = bool(
+        lineage_anchor and projection_generation_id
+        and str(lineage_anchor) != str(projection_generation_id))
+    if generation_mismatch or anchor_mismatch:
         artifact_verified = False
         engineering_authority = "UNKNOWN"
+        mismatched = (f"persisted identity generation "
+                      f"({identity_generation})" if generation_mismatch
+                      else f"independent persisted current-generation "
+                      f"anchor ({lineage_anchor})")
         verify_detail = ("the projection's carried generation "
                          f"({projection_generation_id}) contradicts the "
-                         f"persisted identity generation "
-                         f"({identity_generation}) — a projection never "
+                         f"{mismatched} — a projection never "
                          "anchors the current generation (fail closed, "
-                         "R451-C2.5 §3)")
+                         "R451-C2.5 §3 / R451-C2.6 §2)")
 
     # ---- R451-C2.4 §2: the NINE mandatory proofs gate -----------------
     # A verified-LOOKING artifact whose certification is incomplete is
@@ -979,6 +1048,9 @@ def evaluate_geometry_contract(session: Dict[str, Any],
             "any_sha_recorded": any_sha_recorded,
             "sha_mismatch": sha_mismatch,
             "generation_mismatch": generation_mismatch,
+            "current_generation_anchor": lineage_anchor,
+            "independent_current_generation_anchor_present":
+                bool(lineage_anchor),
             "identity_present": identity is not None or bool(br_identity),
             "class_sources": class_sources,
         },
@@ -1054,17 +1126,28 @@ def verify_release_chain(run_dir: Optional[Path],
                          contract: Optional[Dict[str, Any]] = None,
                          ) -> Dict[str, Any]:
     """The Article LXXII release chain, verified from the run's own
-    records and bytes. VISUAL_READY requires AT MINIMUM:
+    records and bytes. R451-C2.6 §3 — THE CHAIN IS SOVEREIGN: rung 1
+    independently obtains the CERTIFIED canonical artifact through the
+    persisted identity chain (certified_canonical_glb). A caller-
+    provided glb_path is a DIAGNOSTIC cross-check only — it may agree
+    with the certified artifact (recorded) or contradict it (fails
+    closed), and it can NEVER weaken the persisted-identity requirement;
+    the diagnostic locator's filename fallbacks never satisfy a rung.
+    VISUAL_READY requires AT MINIMUM:
 
-      canonical GLB identity verified (exists, non-zero, VALID glTF 2.0
-        container — R451-C2.4 §3)
+      certified canonical GLB identity (persisted identity names it,
+        the SHA matches the bytes, the generation matches the
+        INDEPENDENT persisted current-generation anchor, and the
+        container is STRUCTURALLY valid — R451-C2.5 §4, R451-C2.6 §2)
         -> invocation receipt identity verified (glb_sha256 == bytes;
            run_id == run; geometry_spec_sha256 EXISTS and equals the
            GEOMETRY_SPEC.json bytes — the spec lineage is MANDATORY,
            R451-C2.4 §5)
         -> generation identity verified (artifact generation == receipt
-           generation == current generation — R451-C2.4 §5)
-        -> render record identity verified
+           generation == independent persisted current generation —
+           R451-C2.4 §5, R451-C2.6 §2)
+        -> render record identity AND renderer-success records that
+           AGREE (receipt status == record status — R451-C2.6 §4)
         -> gate PASS
         -> required presentation artifact set exists
         -> hero exists
@@ -1077,24 +1160,44 @@ def verify_release_chain(run_dir: Optional[Path],
     rungs: List[Dict[str, Any]] = []
     contract = contract or {}
 
-    # ---- rung 1: canonical GLB identity + container validity ---------
-    glb = glb_path if glb_path is not None \
-        else resolve_canonical_glb(run_dir)
-    glb_sha = _sha256_file(glb) if glb is not None and \
-        glb.stat().st_size > 0 else None
-    fmt = glb_format_check(glb) if glb is not None and glb_sha else None
-    if glb is None or not glb_sha:
-        rung1_detail = ("no non-empty canonical GLB resolves under the "
-                        "run directory")
-        rung1_pass = False
-    elif not fmt["valid"]:
-        rung1_detail = (f"{glb.name} fails the GLB container check "
-                        f"({fmt['detail']})")
+    # ---- rung 1: the CERTIFIED canonical artifact (R451-C2.6 §3) -----
+    # SOVEREIGN: the chain certifies through the persisted identity
+    # chain itself — never through a caller's path, never through the
+    # diagnostic locator's filename fallbacks (discovery locates;
+    # certification decides).
+    cert = certified_canonical_glb(run_dir)
+    glb = Path(cert["glb"]) if cert.get("certified") and cert.get("glb") \
+        else None
+    glb_sha = cert.get("sha256") if cert.get("certified") else None
+    fmt = cert.get("format") or {}
+    if glb is None or not glb_sha or not fmt.get("valid"):
+        rung1_detail = ("the persisted identity chain does not certify a "
+                        "canonical GLB"
+                        + (": " + "; ".join(cert["failures"])
+                           if cert.get("failures") else ""))
         rung1_pass = False
     else:
-        rung1_detail = (f"{glb.name} ({glb.stat().st_size} bytes, "
-                        "valid glTF 2.0)")
+        rung1_detail = (f"{glb.name} ({cert.get('size')} bytes, certified "
+                        f"via {cert.get('basis')}, structurally valid "
+                        "glTF 2.0)")
         rung1_pass = True
+    # the caller-provided path is a DIAGNOSTIC cross-check: agreement is
+    # harmless, disagreement FAILS CLOSED — a caller path never weakens
+    # the persisted-identity requirement (R451-C2.6 §3)
+    if glb_path is not None:
+        try:
+            same = glb is not None and \
+                Path(glb_path).resolve() == glb.resolve()
+        except OSError:
+            same = False
+        if not same:
+            rung1_pass = False
+            rung1_detail = (
+                rung1_detail + "; the caller-provided glb_path ("
+                f"{Path(glb_path).name}) does not name the certified "
+                "canonical artifact — a caller path is a diagnostic and "
+                "never weakens the persisted-identity requirement "
+                "(R451-C2.6 §3)")
     rungs.append({"rung": "canonical_glb_identity",
                   "pass": rung1_pass, "detail": rung1_detail})
 
@@ -1138,8 +1241,10 @@ def verify_release_chain(run_dir: Optional[Path],
     rungs.append({"rung": "invocation_receipt_identity",
                   "pass": receipt_ok, "detail": detail})
 
-    # ---- rung 3: the generation identity (R451-C2.4 §5) ---------------
-    # artifact generation == receipt generation == current generation
+    # ---- rung 3: the generation identity (R451-C2.4 §5, R451-C2.6 §2)-
+    # artifact generation == receipt generation == the INDEPENDENT
+    # persisted current generation (the anchor; the artifact generation
+    # is never its own anchor)
     gen_ok = False
     detail = "the invocation receipt is absent — no generation lineage"
     if receipt:
@@ -1147,11 +1252,10 @@ def verify_release_chain(run_dir: Optional[Path],
         art_gen = contract.get("artifact_generation_id")
         cur_gen = contract.get("current_generation_id")
         if (art_gen is None or cur_gen is None) and run_dir is not None:
-            # self-serve the certification's generation verdict (the
-            # standalone-chain callers get the same triple-check)
-            self_cert = certified_canonical_glb(run_dir)
-            art_gen = art_gen or self_cert.get("generation_id")
-            cur_gen = cur_gen or self_cert.get("current_generation_id")
+            # the rung-1 certification already holds the generation
+            # verdict — reuse it (one certification pass, one authority)
+            art_gen = art_gen or cert.get("generation_id")
+            cur_gen = cur_gen or cert.get("current_generation_id")
         problems = []
         if not rec_gen:
             problems.append("the receipt records no generation_id — the "
@@ -1160,12 +1264,20 @@ def verify_release_chain(run_dir: Optional[Path],
         if not art_gen:
             problems.append("the artifact identity records no "
                             "generation_id")
+        if not cur_gen:
+            problems.append("no independent persisted current-generation "
+                            "anchor exists (DESIGN_LINEAGE.json's "
+                            "current-generation entry records no "
+                            "generation identity) — the generation "
+                            "identity cannot hold three ways "
+                            "(R451-C2.6 §2)")
         if rec_gen and art_gen and str(rec_gen) != str(art_gen):
             problems.append(f"receipt generation ({rec_gen}) != the "
                             f"artifact generation ({art_gen})")
-        if cur_gen and art_gen and str(art_gen) != str(cur_gen):
+        if art_gen and cur_gen and str(art_gen) != str(cur_gen):
             problems.append(f"the artifact generation ({art_gen}) is "
-                            f"not the current generation ({cur_gen})")
+                            f"not the independent persisted current "
+                            f"generation ({cur_gen})")
         gen_ok = not problems
         detail = "; ".join(problems) if problems else \
             (f"generation identity holds three ways "
@@ -1173,13 +1285,30 @@ def verify_release_chain(run_dir: Optional[Path],
     rungs.append({"rung": "generation_identity",
                   "pass": gen_ok, "detail": detail})
 
-    # ---- rung 4: render record identity ------------------------------
+    # ---- rung 4: render record identity + the success-records
+    #      cross-check (R451-C2.6 §4) -----------------------------------
+    # The record's source link must name the certified canonical bytes,
+    # AND the renderer-success records must AGREE: the production
+    # receipt writer copies the render record's status verbatim, so a
+    # disagreement between receipt.invocation_status and
+    # render_record.status is tampering or forgery — the rung fails
+    # closed and neither contradiction can produce VISUAL_READY.
     record = _read_json(run_dir / RENDER_RECORD_REL) if run_dir else None
     record_ok = False
     detail = "no persisted render record on disk"
     if record:
         src = record.get("source_glb_sha256")
-        if not src:
+        rec_status = str(record.get("status") or "")
+        receipt_status = str((receipt or {}).get("invocation_status") or "")
+        if receipt_status and rec_status and \
+                receipt_status != rec_status:
+            detail = (f"the renderer-success records contradict: "
+                      f"receipt.invocation_status ({receipt_status}) != "
+                      f"render_record.status ({rec_status}) — the "
+                      "production writer copies the record's status "
+                      "verbatim, so a disagreement is tampering or "
+                      "forgery (fail closed, R451-C2.6 §4)")
+        elif not src:
             detail = ("the render record predates the source_glb_sha256 "
                       "field — the render-source link is UNPROVEN")
         elif src != glb_sha:
@@ -1187,11 +1316,13 @@ def verify_release_chain(run_dir: Optional[Path],
                       "GLB bytes — source substitution fail closed")
         else:
             record_ok = True
-            detail = "render record source == canonical GLB bytes"
+            detail = ("render record source == canonical GLB bytes; "
+                      "renderer-success records agree "
+                      f"({rec_status or 'unrecorded'})")
     rungs.append({"rung": "render_record_identity",
                   "pass": record_ok, "detail": detail})
 
-    # ---- rung 4: gate PASS -------------------------------------------
+    # ---- rung 5: gate PASS -------------------------------------------
     gate = _read_json(run_dir / GATE_REL) if run_dir else None
     verdict = (gate or {}).get("verdict")
     gate_ok = verdict in GATE_PASS_VERDICTS
@@ -1199,7 +1330,7 @@ def verify_release_chain(run_dir: Optional[Path],
                   "pass": gate_ok,
                   "detail": f"gate verdict {verdict or 'absent'}"})
 
-    # ---- rung 5: the required presentation artifact set --------------
+    # ---- rung 6: the required presentation artifact set --------------
     set_ok = False
     detail = "no render record — the required set cannot be derived"
     if record:
@@ -1232,16 +1363,16 @@ def verify_release_chain(run_dir: Optional[Path],
     rungs.append({"rung": "presentation_artifact_set",
                   "pass": set_ok, "detail": detail})
 
-    # ---- rung 6: hero exists ------------------------------------------
+    # ---- rung 7: hero exists ------------------------------------------
     hero = run_dir / HERO_PNG_REL if run_dir else None
     hero_ok = bool(hero and hero.is_file() and hero.stat().st_size > 0)
     rungs.append({"rung": "hero_exists", "pass": hero_ok,
                   "detail": "hero.png on disk" if hero_ok else
                   "hero.png missing or empty"})
 
-    # ---- rung 7: hero source identity == canonical GLB ---------------
+    # ---- rung 8: hero source identity == canonical GLB ---------------
     # The hero's SOURCE is what the renderer consumed: proven by the
-    # render record's source link (rung 3). An exported hero.glb is a
+    # render record's source link (rung 4). An exported hero.glb is a
     # scene artifact whose integrity is proven against the render
     # record's OWN recorded view hash (never against an assumption
     # that the export is byte-identical to the canonical GLB).

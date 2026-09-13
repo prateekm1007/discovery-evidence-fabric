@@ -310,6 +310,14 @@ class TestWatchdog:
             "visualizability_class": "ENGINEERING_3D"}
         (run / "MODEL"
          / "ARTIFACT_IDENTITY.json").write_text(json.dumps(identity))
+        # R451-C2.6 §2 (Art. XV fixture disclosure): the INDEPENDENT
+        # persisted current-generation anchor joins the recorded shape —
+        # the artifact generation is never its own anchor.
+        (run / "MODEL" / "DESIGN_LINEAGE.json").write_text(json.dumps({
+            "artifact": "DESIGN_LINEAGE",
+            "generation_models": [
+                {"generation": 1, "generation_id": "gen-1",
+                 "glb": "MODEL/engineering_model.glb", "current": True}]}))
         (run / "BRIDGE_REPORT.json").write_text(json.dumps({
             "outcome": "COMPLETED",
             "visualizability_class": "ENGINEERING_3D",

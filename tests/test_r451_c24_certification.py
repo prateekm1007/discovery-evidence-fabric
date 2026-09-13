@@ -113,6 +113,17 @@ def _complete_run(run: Path, session_id="ts_r451c24_golden",
         "visualizability_class": "ENGINEERING_3D",
     }
     (model / "ARTIFACT_IDENTITY.json").write_text(json.dumps(identity))
+    # R451-C2.6 §2 (Art. XV fixture disclosure): the INDEPENDENT persisted
+    # current-generation anchor — the DESIGN_LINEAGE.json current-
+    # generation entry with its OWN generation identity — is now part of
+    # the recorded shape (the artifact generation is never its own
+    # anchor; the anchorless C2.4-era shape relied on the superseded
+    # self-anchoring fallback).
+    (model / "DESIGN_LINEAGE.json").write_text(json.dumps({
+        "artifact": "DESIGN_LINEAGE",
+        "generation_models": [
+            {"generation": 1, "generation_id": "gen-1",
+             "glb": "MODEL/engineering_model.glb", "current": True}]}))
     (run / "BRIDGE_REPORT.json").write_text(json.dumps({
         "outcome": "COMPLETED",
         "visualizability_class": "ENGINEERING_3D",
@@ -367,8 +378,13 @@ class TestDiscoveryVsCertification:
         run = tmp_path / "ts_c24_fallbackonly"
         _ids[run.name] = _complete_run(run)
         # strip every recorded pointer to the artifact: no lineage, no
-        # glb_path, no recorded sha — the file itself remains
+        # glb_path, no recorded sha — the file itself remains.
+        # R451-C2.6 §2 supersession (Art. XV): the recorded shape now
+        # includes DESIGN_LINEAGE.json (the independent current-
+        # generation anchor), so "no identity document names it" means
+        # stripping BOTH persisted identity documents.
         (run / "MODEL" / "ARTIFACT_IDENTITY.json").unlink()
+        (run / "MODEL" / "DESIGN_LINEAGE.json").unlink()
         ident = json.loads(
             (run / "BRIDGE_REPORT.json").read_text())
         ident["geometry"]["artifact_identity"]["glb_path"] = None

@@ -430,16 +430,27 @@ export default function TechStage({
   // renders it (Art. X). An ineligible geometry renders the honest
   // unearned state — never a substitute object on the primary surface,
   // and never a second viewer to work around the first.
+  // R451-C2.6 §1 — THE RENDERING ORDER: the legacy state is resolved
+  // FIRST and structurally cannot mount viewerUrl, the canonical model
+  // viewer, the current visualization ribbon, or any current
+  // technology-ready surface. viewerUrl is computed NULL under
+  // LEGACY_STATE_UNAVAILABLE — a legacy payload's raw availability/glb
+  // route/render metadata can never mount the viewer (the branch below
+  // renders the legacy hero first, and the adversarial browser test in
+  // R451/C2_PRODUCT/E2E_C26 proves it in a real browser).
+  const legacyUnavailable = view.state === "LEGACY_STATE_UNAVAILABLE";
   const heroEligible = design?.hero_eligibility?.eligible !== false;
   const heroGlb =
-    heroEligible && design && design.availability === "AVAILABLE"
+    !legacyUnavailable && heroEligible && design &&
+    design.availability === "AVAILABLE"
       ? design.glb
       : null;
   const activeRow =
     viewingGen != null ? evo.find((r) => r.generation === viewingGen) : undefined;
-  // history swap is gated on the SAME eligibility: an unearned current
-  // generation cannot be bypassed by selecting a historical one
-  const showingHistory = heroEligible && Boolean(activeRow?.glb);
+  // history swap is gated on the SAME eligibility — and on the legacy
+  // rule: a legacy payload cannot mount a model from history rows either
+  const showingHistory = !legacyUnavailable && heroEligible &&
+    Boolean(activeRow?.glb);
   const viewerUrl = showingHistory && activeRow?.glb ? activeRow.glb : heroGlb;
   const genLabelNum = (design?.generation_id || "gen-1").replace("gen-", "");
   const genCount = design?.generation_count || evo.length || 1;
@@ -627,7 +638,15 @@ export default function TechStage({
         );
       })()}
       <div className="hero-viewport" data-hero-viewport>
-        {viewerUrl ? (
+        {view.state === "LEGACY_STATE_UNAVAILABLE" ? (
+          // R451-C2.6 §1 — THE RENDERING ORDER: the legacy state's hero
+          // is resolved FIRST — before any viewerUrl branch can exist —
+          // so a legacy payload's convincing viewerUrl / GLB metadata /
+          // render metadata can never mount the canonical model viewer,
+          // a current visualization ribbon, or a current technology-
+          // ready surface. Legacy hero ONLY.
+          <HeroLegacyState />
+        ) : viewerUrl ? (
           <>
             <ModelViewer
               url={viewerUrl}
@@ -667,13 +686,13 @@ export default function TechStage({
               </button>
             )}
           </>
-        ) : view.state === "LEGACY_STATE_UNAVAILABLE" ? (
-          // R451-C2.5 §1 — a legacy payload's ONLY hero surface: the
-          // explicit non-current compatibility notice. No model hero,
-          // no viewer, no current-state wording — a legacy projection
-          // derives no current presentation state at all.
-          <HeroLegacyState />
-        ) : done && design && design.availability === "AVAILABLE" ? (
+        ) : (
+          // R451-C2.6 §1: this branch is reachable only when the state is
+          // NOT legacy (the first branch owns LEGACY_STATE_UNAVAILABLE —
+          // TypeScript's narrowing proves the comparison exhaustive) and
+          // viewerUrl is null. For a legacy payload viewerUrl is computed
+          // null above, so the viewer can never mount from legacy fields.
+          done && design && design.availability === "AVAILABLE" ? (
           // R436 Direction 3: geometry exists but did not earn the hero —
           // the honest unearned state (no substitute model)
           <HeroNotFaithful design={design} />
@@ -692,7 +711,7 @@ export default function TechStage({
             active={activeLabel}
             paused={pausedLabel}
           />
-        )}
+        ))}
       </div>
       <div className="hero-hint faint">
         {viewerUrl
@@ -700,7 +719,11 @@ export default function TechStage({
           : done
             ? "the scientific record below is complete regardless — a model is a presentation, never a claim"
             : ""}
-        {gateVerdict && (
+        {gateVerdict && !legacyUnavailable && (
+          // R451-C2.6 §1 — the R441 gate badge is a render-metadata
+          // surface: a LEGACY payload's raw render metadata can never
+          // surface it (it would read as a current certification claim
+          // derived from legacy fields). Current payloads only.
           <span
             className="gate-badge"
             title={gateOk

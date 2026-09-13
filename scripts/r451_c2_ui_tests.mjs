@@ -36,6 +36,12 @@ function check(name, cond, detail) {
   }
 }
 
+// R451-C2.6 §1 — read a webapp source file (the TechStage source pins)
+import { readFileSync } from "node:fs";
+function fsRead(...parts) {
+  return readFileSync(path.join(WEBAPP, ...parts), "utf8");
+}
+
 try {
   execFileSync(path.join(WEBAPP, "node_modules", ".bin", "tsc"), [
     path.join(WEBAPP, "lib", "presentationState.ts"),
@@ -592,6 +598,63 @@ try {
     evidence: null } }));
   check("Closed vocabulary: unknown geometry_state falls through honestly",
     r.state === "GEOMETRY_UNAVAILABLE");
+
+  // ----------------------------------------------------------------
+  console.log("\n== R451-C2.6 §1: the legacy viewer is impossible ==");
+  // THE mandatory adversarial shape: LEGACY_STATE_UNAVAILABLE plus a
+  // convincing viewerUrl, convincing GLB metadata, and convincing
+  // render metadata. The browser proof (a real headless Chrome against
+  // the real component) lives in R451/C2_PRODUCT/E2E_C26; this battery
+  // pins the mapping-level contract the component consumes.
+  {
+    const convincingLegacy = dossier({ tabs: { design: {
+      availability: "AVAILABLE",
+      glb: "/api/run/x/model/engineering_model.glb",
+      geometry_class: "ENGINEERING_3D",
+      generation_id: "gen-1",
+      hero_eligibility: { eligible: true, reason: null },
+      evolution: [{ generation: 1, current: true,
+        glb: "/api/run/x/model/engineering_model.glb" }],
+      renders: { status: "OK",
+        visual_gate: { verdict: "COMPLETE_PASS" } },
+    }, evidence: null } });
+    r = resolvePresentationState(
+      detail({ user_state_view: usv({ user_state: "COMPLETED_CANDIDATE",
+        found_something: true, package_available: true }) }),
+      convincingLegacy);
+    check("Legacy+convincing viewerUrl: LEGACY_STATE_UNAVAILABLE only",
+      r.state === "LEGACY_STATE_UNAVAILABLE");
+    check("Legacy+convincing viewerUrl: VISUAL_READY impossible",
+      r.state !== "VISUAL_READY");
+    check("Legacy+convincing viewerUrl: current geometry state impossible",
+      r.state !== "GEOMETRY_READY_RENDER_BLOCKED");
+    check("Legacy+convincing viewerUrl: the view carries NO viewer-able " +
+        "field the component could mount",
+      ["glb", "viewerUrl", "modelUrl", "canonicalGlb"].every(
+        (k) => !(k in r)));
+    check("Legacy+convincing viewerUrl: not an infrastructure pause " +
+        "(the legacy hero, not the blocked surface)",
+      r.infrastructurePaused === false);
+  }
+  {
+    // the source pin: the component's hero-viewport resolves the legacy
+    // state FIRST (before the viewerUrl branch), viewerUrl computes null
+    // under the legacy state, and the gate badge is legacy-guarded
+    const stage = fsRead("components", "TechStage.tsx");
+    const vp = stage.indexOf("data-hero-viewport");
+    const legacyFirst = stage.indexOf(
+      'view.state === "LEGACY_STATE_UNAVAILABLE" ?', vp);
+    const viewerBranch = stage.indexOf(") : viewerUrl ? (", vp);
+    check("TechStage rendering order: the legacy hero branch is FIRST",
+      legacyFirst !== -1 && viewerBranch !== -1 && legacyFirst < viewerBranch);
+    check("TechStage: viewerUrl computes null under LEGACY_STATE_UNAVAILABLE",
+      stage.includes("const legacyUnavailable = view.state === " +
+        '"LEGACY_STATE_UNAVAILABLE"') &&
+      stage.indexOf("!legacyUnavailable && heroEligible") <
+        stage.indexOf("const showingHistory"));
+    check("TechStage: the R441 gate badge is legacy-guarded",
+      stage.includes("gateVerdict && !legacyUnavailable"));
+  }
 } finally {
   rmSync(OUT, { recursive: true, force: true });
 }
