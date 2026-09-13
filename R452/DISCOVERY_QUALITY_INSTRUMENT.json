@@ -1,0 +1,119 @@
+{
+ "artifact_type": "R452_DISCOVERY_QUALITY_INSTRUMENT",
+ "frozen_at": "2026-09-13T12:03:21+00:00",
+ "instrument_script": "scripts/r452_quality_instrument.py",
+ "instrument_sha256": "2ed928276c7b6e27e52095c6ef67938d6cef793b2a1885858e9116ebdb8839c0",
+ "freeze_enforcement": "apply() recomputes the script sha256 and REFUSES to run on any post-freeze modification (Art. LIX \u2014 no tuning against the results)",
+ "no_results_existed_at_freeze": true,
+ "checked_result_artifacts": [
+  "/home/z/my-project/repos/discovery-evidence-fabric/R452/ASSAY_CHAINS.json",
+  "/home/z/my-project/repos/discovery-evidence-fabric/R452/DISCOVERY_QUALITY_MEASUREMENT.json",
+  "/home/z/my-project/repos/discovery-evidence-fabric/R452/ASSAY_RUN_A/final_state.json",
+  "/home/z/my-project/repos/discovery-evidence-fabric/R452/ASSAY_RUN_B/final_state.json",
+  "/home/z/my-project/repos/discovery-evidence-fabric/R452/ASSAY_RUN_C/final_state.json",
+  "/home/z/my-project/repos/discovery-evidence-fabric/R452/ASSAY_RUN_A2/final_state.json"
+ ],
+ "metric_definitions": [
+  {
+   "metric": "evidence_relevance_rate",
+   "definition": "(DIRECT_SUPPORT + PARTIAL_SUPPORT) / n_items",
+   "source": "envelope_ADJUDICATION.evidence_classification.counts",
+   "direction": "higher_is_better"
+  },
+  {
+   "metric": "mechanism_grounding_rate",
+   "definition": "candidates with >=1 SUPPORTS-or-PARTIALLY_SUPPORTS item / total candidates",
+   "source": "mechanism_space.candidates[].mechanism_support.counts",
+   "direction": "higher_is_better"
+  },
+  {
+   "metric": "mechanism_span_verbatim_support",
+   "definition": "candidates with span_binding.verbatim_in_record == true / total candidates",
+   "source": "mechanism_space.candidates[].span_binding",
+   "direction": "higher_is_better"
+  },
+  {
+   "metric": "differentiated_mechanism_rate",
+   "definition": "candidates with distinctness_verdict == DISTINCT AND testable_prediction_check.sufficiently_specific == true AND non-empty novel_design_variable / total",
+   "source": "mechanism_space.candidates[]",
+   "direction": "higher_is_better"
+  },
+  {
+   "metric": "obvious_combination_rate",
+   "definition": "candidates with transformation_operator == DIRECT_TRANSFER OR distinctness_verdict in (EQUIVALENT, INDETERMINATE) OR empty novel_design_variable / total",
+   "source": "mechanism_space.candidates[]",
+   "direction": "lower_is_better"
+  },
+  {
+   "metric": "evidence_contradiction_rate",
+   "definition": "CONTRADICTORY / n_items + unresolved recorded contradictions count (reported jointly)",
+   "source": "evidence_classification.counts + contradictions",
+   "direction": "lower_is_better"
+  },
+  {
+   "metric": "false_kill_rate",
+   "definition": "unsupported_kills / total_kills; a kill is UNSUPPORTED when none of its recorded bases carries a source-id, a computed quantity, or an explicit record reference; total_kills == 0 -> UNKNOWN_NO_KILLS",
+   "source": "attack_results.attacks[]",
+   "direction": "lower_is_better"
+  },
+  {
+   "metric": "attack_completeness_rate",
+   "definition": "problems with attacks_recorded > 0 / problems reaching the ATTACK stage",
+   "source": "envelope_ATTACK.attack_results",
+   "direction": "higher_is_better"
+  },
+  {
+   "metric": "cross_domain_execution_rate",
+   "definition": "distinct families reaching ADJUDICATION / families scoped (3)",
+   "source": "envelope_ADJUDICATION + assay problem families",
+   "direction": "higher_is_better"
+  },
+  {
+   "metric": "repeated_run_variance",
+   "definition": "per-metric |value(A) - value(A2)| on the shared metric set + terminal-outcome agreement; reported as measured, no threshold",
+   "source": "the A and A2 run artifacts",
+   "direction": "reported"
+  }
+ ],
+ "candidate_composite": {
+  "dimensions": [
+   {
+    "dimension": "evidence_bound",
+    "check": "mechanism_support.counts.SUPPORTS + PARTIALLY_SUPPORTS >= 1"
+   },
+   {
+    "dimension": "span_verbatim",
+    "check": "span_binding.verbatim_in_record == true"
+   },
+   {
+    "dimension": "differentiated",
+    "check": "distinctness_verdict == DISTINCT AND sufficiently_specific AND novel_design_variable non-empty"
+   },
+   {
+    "dimension": "not_obvious_combination",
+    "check": "NOT (DIRECT_TRANSFER OR EQUIVALENT/INDETERMINATE OR empty novel_design_variable)"
+   },
+   {
+    "dimension": "not_contradicted",
+    "check": "no currently_unresolved HIGH-severity contradiction recorded against the candidate"
+   },
+   {
+    "dimension": "sufficiently_specific",
+    "check": "testable_prediction_check.sufficiently_specific == true"
+   }
+  ],
+  "good_discovery_rule": "ALL six dimensions true",
+  "critical_distinction": "a candidate surviving the pipeline is NOT automatically a good discovery; raw survival is reported separately from quality-weighted survival"
+ },
+ "unknown_states_honest": "any metric whose inputs do not exist is recorded UNKNOWN_<reason>, never 0.0 (Art. XXV)",
+ "refreeze_events": [
+  {
+   "refrozen_at": "2026-09-13T14:20:00+00:00Z",
+   "reason": "crash fix in the REPORTING loop only (KeyError on the survivors_failing_quality comprehension \u2014 the composite entries carry no case key); ZERO metric-definition changes: the ten metric definitions and the six-dimension composite are byte-identical to the original freeze",
+   "changed_lines": "the survivors_failing_quality list comprehension key access (c[\"case\"] -> the loop variable case)",
+   "no_results_existed_when_changed": true,
+   "note": "the freeze guard FIRED on the modification and refused to run \u2014 the discipline works; this re-freeze records the fix openly rather than bypassing the guard (Art. XV/XIX: the change is disclosed, never silent)",
+   "post_refreeze_sha256": "2ed928276c7b6e27e52095c6ef67938d6cef793b2a1885858e9116ebdb8839c0"
+  }
+ ]
+}

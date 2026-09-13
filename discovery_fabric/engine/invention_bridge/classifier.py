@@ -40,7 +40,21 @@ _NON_NUMERIC = {"UNKNOWN", "NOT ESTABLISHED", "NOT_ESTABLISHED", "", "NONE", "TB
 _PHYSICAL_SITE_SIGNALS = re.compile(
     r"\b(panel|catheter|valve|pump|device|module|cell|stack|battery|turbine|"
     r"exchanger|reactor|sensor|implant|floor|lumen|coil|antenna|array|"
-    r"absorber|receiver|nozzle|duct|blade|wafer|electrode|membrane|engine)\b",
+    r"absorber|receiver|nozzle|duct|blade|wafer|electrode|membrane|engine|"
+    # R452 (external audit A4): the widened physical vocabulary — the
+    # canonical domain families' own physical nouns. The closed 27-noun
+    # list measured physical_site_detected=False on 4 of 6 REAL
+    # physical inventions (no vial, no lyophilizer, no gearbox); the
+    # site check may never be narrower than the domain registry.
+    r"gearbox|gear|bearing|manifold|gallery|branch|pipe|pipeline|tube|"
+    r"tubing|channel|conduit|orifice|bore|vial|lyophilizer|freeze-?dry|"
+    r"shelf|tray|die|mold|punch|housing|chamber|tank|vessel|drum|rotor|"
+    r"stator|winding|casting|forging|shaft|seal|gasket|spring|fastener|"
+    r"weld|joint|flange|fitting|cannula|sheath|needle|circuit|inverter|"
+    r"heatsink|radiator|insulation|cable|busbar|terminal|frame|chassis|"
+    r"bracket|hinge|actuator|motor|generator|compressor|turbine "
+    r"stage|condenser|boiler|furnace|kiln|crucible|melter|extruder|"
+    r"injection molding|nozzle body|emitter|dripper|filter|strainer)\b",
     re.I,
 )
 
@@ -98,12 +112,23 @@ def _geometry_parameters(engineering_spec: Dict[str, Any]) -> List[Dict[str, Any
         value_status = str(p.get("value_status") or "").upper()
         val = _numeric(p.get("value"))
         if val is not None and "UNKNOWN" not in value_status and p.get("unit"):
+            # R452 (external audit A2): param_id is the SEMANTIC name
+            # (parameter/name) — NEVER the opaque CP-nnn registry id.
+            # The normalize_parameters -> FORM_LIBRARY join keys on
+            # semantic names; the CP-nnn join produced byte-identical
+            # geometry for every invention (80x dimension range, same
+            # GLB sha) because every builder lookup missed and fell
+            # through to hardcoded defaults.
             found.append({
-                "param_id": p.get("parameter_id") or p.get("parameter"),
+                "param_id": (p.get("parameter") or p.get("name")
+                             or p.get("parameter_id")),
                 "unit": p.get("unit"),
                 "value": val,
                 "envelope": p.get("envelope"),
                 "value_class": p.get("basis") or "MODELLED",
+                "value_status": value_status,
+                "source": p.get("source"),
+                "source_hash": p.get("source_hash"),
                 "origin": "engineering_core.critical_parameters",
             })
 

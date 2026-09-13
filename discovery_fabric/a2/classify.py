@@ -95,6 +95,36 @@ def classify(candidate: dict, evidence_verification: dict, prior_art: dict, adve
                 "verification_state": "NOT_EVALUATED"}
         issues = evidence_verification.get("issues") or []
         issue_text = "; ".join(str(i) for i in issues[:5]) or "no issues recorded"
+        # R452 (external audit B1-engine-half, Art. LXI): the
+        # output-contract issue classes (the proposer model failed to
+        # emit a verbatim span / any span at all) are CAPABILITY
+        # failures of the generation transport, not scientific
+        # properties of the candidate. They are typed
+        # INFRASTRUCTURE_CAPABILITY and recorded as
+        # INCOMPLETE_INFERENCE_FAILURE — the candidate is STILL NOT
+        # PROMOTED (the verifier is not weakened, Art. VII), but the
+        # failure is never laundered into a scientific REJECTED verdict
+        # (the R451 defect: 4 of 7 production runs carried
+        # 'missing_source_span' as the invention's kill_reason).
+        _CAPABILITY_ISSUES = {
+            "missing_source_span", "mechanism_span_not_verbatim",
+            "missing_mechanism_span", "missing_source_id",
+            "missing_source_hash"}
+        if issues and set(issues) <= _CAPABILITY_ISSUES:
+            return {
+                "epistemic_state": "OBSERVED",
+                "final_status": "INCOMPLETE_INFERENCE_FAILURE",
+                "failure_class": "INFRASTRUCTURE_CAPABILITY",
+                "reason": (
+                    f"model output contract failure: {issue_text} — "
+                    "the proposer model did not emit a verbatim "
+                    "evidence-bound span; an INFRASTRUCTURE CAPABILITY "
+                    "state, never a scientific rejection (Art. LXI); "
+                    "the candidate remains unpromoted and the run "
+                    "rerunnable on a capable route"),
+                "promotion_blocked": True,
+                "verification_state": "EVALUATED_FAILED_CAPABILITY",
+            }
         return {"epistemic_state": "OBSERVED", "final_status": "REJECTED",
                 "reason": (f"evidence verification failed: {issue_text}"),
                 "promotion_blocked": True,

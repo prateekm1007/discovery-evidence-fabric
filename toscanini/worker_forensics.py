@@ -62,10 +62,35 @@ def _boot_id() -> str:
 
 
 def _engine_commit() -> Optional[str]:
+    """The deployed engine commit for every forensics line.
+
+    R452 (external audit C5): engine_commit was null on all 509
+    persisted forensics lines — failures could not be attributed to a
+    deployed commit (exactly what Article LXXI diagnosis needs).
+    Resolution order: the env pins, then the BUILD-ARTIFACT-derived
+    identity (the same authority /api/version reports — never a
+    guess), then the live git head, then None (recorded honestly)."""
     for var in ("ENGINE_COMMIT", "BUILD_ARTIFACT_COMMIT", "RENDER_GIT_COMMIT"):
         val = os.environ.get(var)
         if val:
             return val
+    try:
+        from . import artifact_identity
+        ident = artifact_identity.identity()
+        commit = ident.get("engine_commit")
+        if commit:
+            return commit
+    except Exception:  # noqa: BLE001 — identity resolution is best-effort
+        pass
+    try:
+        import subprocess
+        out = subprocess.run(
+            ["git", "rev-parse", "HEAD"], capture_output=True,
+            text=True, timeout=10).stdout.strip()
+        if out:
+            return out
+    except Exception:  # noqa: BLE001
+        pass
     return None
 
 

@@ -2188,11 +2188,21 @@ class EngineRun:
             ph = (self.env.physics or {})
             physics_lifecycle = ph.get("lifecycle_verdict")
             killed = final_status in ("REJECTED",)
+            # R452 (audit B1-engine-half, Art. LXI): the challenge
+            # record carries the failure CLASS — a capability-failed
+            # generation (model output contract) is NOT a scientific
+            # kill; its kill_reason is the infrastructure reason and
+            # its state stays the honest CHALLENGED/UNVERIFIED shape
+            failure_class = final.get("failure_class") or (
+                "INFRASTRUCTURE_CAPABILITY"
+                if final_status == "INCOMPLETE_INFERENCE_FAILURE"
+                else None)
             gen["challenge"] = {
                 "physics_lifecycle": physics_lifecycle,
                 "attack_overall": adversarial,
                 "evidence_verified": evidence_verified,
                 "killed": killed,
+                "failure_class": failure_class,
                 "kill_reason": (final.get("reason") or "")[:400],
                 "final_status": final_status,
             }

@@ -66,6 +66,7 @@ from . import domains as domains  # R445: canonical family authority
 from .equations import select_equations
 from . import quantity_reasoning
 from .invention_spec import tagged
+from . import value_sourcing  # R452/audit-A1: the evidence->dimension binding stage
 
 # Epistemic gate for engineering: DO results are ABSENT until reality
 # produces them (Art. XXXVIII: COMPUTATIONAL_RESULT != PHYSICAL_OBSERVATION).
@@ -342,10 +343,22 @@ def _build_critical_parameters(spec: Dict[str, Any], module: Dict[str, Any],
                                domain: str,
                                equation_entries: List[Dict[str, Any]],
                                verification_methods: List[str],
+                               problem_text: str = "",
+                               candidate_parameters: Optional[Dict[str, Any]] = None,
+                               mechanistic_record: Optional[Dict[str, Any]] = None,
                                ) -> List[Dict[str, Any]]:
-    """CEO A5: full parameter records. The registry proposes WHAT matters;
-    every VALUE stays UNKNOWN with an explicit value_status (no naked
-    numbers, Art. XXVII)."""
+    """CEO A5: full parameter records. The registry proposes WHAT matters.
+
+    R452 (external audit A1): the VALUE is then bound by the
+    VALUE_SOURCING stage — SOURCE_FACT (the problem statement's own
+    number+unit with its exact span + sha256) > COMPUTED (the
+    deterministic mechanistic solver chain) > MODELLED (the
+    candidate's declared design). A parameter with no legitimate
+    source STAYS UNKNOWN — Article XXVII forbids INVENTING values, not
+    SOURCING them from evidence with a provenance hash; the absence is
+    a measured fact, never a universal constant (the pre-R452 defect:
+    value_status hardcoded UNKNOWN made ENGINEERING_3D unreachable
+    and CadQuery/OCCT dead code in production)."""
     params: List[Dict[str, Any]] = []
     for i, pname in enumerate(module.get("critical_parameters", []), 1):
         link = _link_parameter_to_equation(pname, equation_entries)
@@ -390,6 +403,15 @@ def _build_critical_parameters(spec: Dict[str, Any], module: Dict[str, Any],
                       (g.get("equation_ids") or [])),
                      "domain engineering principle per the registry")),
         })
+
+    # ---- R452: THE VALUE_SOURCING STAGE (external audit A1) ----------
+    # bind each parameter to a legitimate source; unsourced parameters
+    # STAY UNKNOWN (Art. XXVII preserved; the absence measured)
+    if problem_text:
+        params = value_sourcing.source_critical_parameters(
+            params, problem_text,
+            mechanistic_record=mechanistic_record,
+            candidate_parameters=candidate_parameters)
     return params
 
 
@@ -830,10 +852,35 @@ def build_engineering_spec(spec: Dict[str, Any], env: Optional[Candidate],
             "evidence_refs": [ev_id]})
     graph["counts"]["DI"] = len(graph["d_inputs"])
 
+    # ---- R452: the mechanistic chain (the COMPUTED sourcing arm) --------
+    # run the deterministic 1D hydraulic Poiseuille chain on the
+    # problem's own declared numbers; its canonical variables (with
+    # input/output hashes) are the legitimate COMPUTED sources for the
+    # value-sourcing stage (audit A1: the design-point solver the
+    # engine lacked). A chain that cannot resolve stays absent — the
+    # SOURCE_FACT arm still runs; nothing is fabricated.
+    mechanistic_record = None
+    try:
+        from . import mechanistic_solver as _ms
+        mechanistic_record = _ms.run_mechanistic_virtual_experiment(
+            problem_text, f"engspec:{run_ctx.get('run_id', 'run')}")
+    except Exception as _ms_exc:  # noqa: BLE001 — infra, never a verdict
+        mechanistic_record = {"status": "CHAIN_ERROR",
+                              "error": f"{type(_ms_exc).__name__}: "
+                                       f"{_ms_exc}"[:200]}
+
     # ---- CEO A5: full parameter records ---------------------------------
     critical_parameters = _build_critical_parameters(
         spec, module, domain, equation_entries,
-        module.get("verification_methods", []))
+        module.get("verification_methods", []),
+        problem_text=problem_text,
+        mechanistic_record=(mechanistic_record
+                            if isinstance(mechanistic_record, dict)
+                            and mechanistic_record.get("status") in
+                            ("COMPUTED_PASS", "COMPUTED_FAIL",
+                             "COMPUTED_NO_BASELINE_DIFF",
+                             "COMPUTED_PASS_BASELINE_INCONCLUSIVE")
+                            else None))
 
     # ---- CEO A7: compiled design outputs --------------------------------
     compiled = compile_design_outputs(
@@ -1629,6 +1676,8 @@ def build_engineering_spec(spec: Dict[str, Any], env: Optional[Candidate],
         "engineering_core": {
             "governing_model": governing,
             "critical_parameters": critical_parameters,
+            "value_sourcing": value_sourcing.sourcing_summary(
+                critical_parameters),
             "external_precedent": (
                 f"domain module {domain_label(domain)}; standards listed as "
                 "candidates requiring applicability verification"),

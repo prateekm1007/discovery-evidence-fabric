@@ -411,3 +411,26 @@ REVIEW, with 31 run-owned ledger lines (all 13 fields, run_id non-null,
 0 paid) + 8 capability-probe lines + the capability store persisted and
 verified from OUTSIDE the container through the durable push. Round
 record: R451/R451_C13_ROUND_RECORD.json.
+
+## R452 addendum (2026-09-13) — fresh discovery quality + the mechanistic falsification loop + the reachability restoration
+
+Operator directive R452 (Phases 0-9) + the independent external audit's
+Coder-1 fix mandate. The active-path stage map GAINS its missing organ:
+
+| Component | Module | Notes |
+|---|---|---|
+| THE VALUE_SOURCING STAGE (audit A1) | `engine/value_sourcing.py` | the evidence->dimension binding the engine lacked: SOURCE_FACT (the problem statement's own number+unit, exact span + sha256) > COMPUTED (the mechanistic chain) > MODELLED (the candidate's declared design); NO source STAYS UNKNOWN with the explicit derivation — the Article XXVII <-> Article LX collision resolved explicitly (sourcing from evidence with a provenance hash is not threshold invention). Wired INTO the producer; the sourcing summary rides every engineering spec |
+| THE MECHANISTIC SOLVER (Phase 5) | `engine/mechanistic_solver.py` | the R452 chain: candidate parameters -> canonical variables (all classified) -> Poiseuille equations -> baseline (never inherits the candidate's override, Art. XLVII) -> the problem's OWN threshold (requirement-context only, Art. XXVII) -> computed outcome; the closed epistemic vocabulary on every output; MODEL_INVALIDITY flags the solver's own validity limits |
+| THE DECISIVE-EXPERIMENT CONTRACT (Phase 6) | `engine/decisive_experiment.py` | the 13-field constitutional experiment object; THE INVARIANT enforced mechanically — an experiment whose kill outcome is vacuous (can only confirm) is REJECTED as incomplete |
+| THE CAUSAL LEARNING LOOP (Phase 7) | `engine/causal_learning.py` | CANDIDATE -> MECHANISTIC MODEL -> VIRTUAL EXPERIMENT -> FALSIFICATION/SUPPORT -> TECHNICAL STATE UPDATE -> AUTOMATIC MUTATION (the closed-form inverse of the experiment's own deficit — never an unrelated LLM proposal) -> NEW CANDIDATE -> RE-EVALUATION; the causal edge's six fields; SYNTHETIC_LOOP_VERIFIED honestly (computation, never external reality) |
+| THE REACHABILITY JOIN (audit A2/A4/AT-6) | `invention_bridge/classifier.py` + `engineering_geometry.py` | param_id = the SEMANTIC name (never CP-nnn); the physical-site vocabulary widened to the domain families' own nouns; a routed-default form carries ENGINEERING_PARAMETRIC_DEFAULT_FORM + form_basis |
+| LAZY OCP (audit C2) | `invention_bridge/bridge.py` | the ~500 MB cadquery/OCP import is paid ONLY on the ENGINEERING_3D path; the classifier is cadquery-free |
+| CAPABILITY vs SCIENCE (audit B1) | `a2/classify.py` + `engine/run.py` | the output-contract failure classes are typed INFRASTRUCTURE_CAPABILITY / INCOMPLETE_INFERENCE_FAILURE — promotion still blocked (the verifier NOT weakened), but a model-capability failure is never again laundered into a scientific kill_reason (Art. LXI) |
+| FORENSICS IDENTITY (audit C5) | `toscanini/worker_forensics.py` | engine_commit resolved from the BUILD-ARTIFACT identity (the /api/version authority) when the env pins are absent — new forensics lines attribute failures to the deployed commit |
+
+The frozen discovery-quality instrument (scripts/r452_quality_instrument.py)
+measures the ten directive metrics from the runs' OWN artifacts; the
+reachability contract test (tests/test_r452_engineering_geometry_is_
+reachable.py) spans producer -> classifier -> normalize -> builder ->
+export on REAL inputs only — the chain the audit proved had ZERO test
+coverage (its fixtures used a schema production never emitted).

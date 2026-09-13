@@ -35,7 +35,24 @@ import time
 from typing import Any, Dict, List, Optional
 
 from . import epistemics as ep
-from . import classifier, conceptual_geometry, engineering_geometry, package, cio_update
+from . import classifier, conceptual_geometry, package, cio_update
+
+# R452 (external audit C2): the HEAVY cadquery/OCP import
+# (~500 MB RSS — measured; it OOM-killed the 512 MB production
+# container once) is loaded LAZILY, gated behind the ENGINEERING_3D
+# warrant decision: a SYSTEM_3D/CONCEPTUAL_3D run never pays it.
+# (The classifier itself is cadquery-free: the warrant decision
+# pays no OCP.)
+
+def _eng_geom():
+    """Lazy access to the HEAVY engineering geometry module (cadquery/
+    OCP, ~500 MB RSS — external audit C2). Imported ONLY when the
+    warrant decision actually needs it: the ENGINEERING_3D build path
+    and its failure diagnosis. A SYSTEM_3D/CONCEPTUAL_3D run never
+    pays the import."""
+    from . import engineering_geometry
+    return engineering_geometry
+
 from . import render as render_stage
 from . import domain_spec, domain_geometry
 from . import geometry_quality_gate as quality_gate
@@ -147,7 +164,7 @@ def bridge(run_result: Dict[str, Any], cio: Optional[Dict[str, Any]],
                 attempts.append({"attempt": attempt, "status": "OK"})
                 break
             except Exception as exc:  # noqa: BLE001 — failure taxonomy is the product
-                failure = engineering_geometry.diagnose_failure(exc, "", {})
+                failure = _eng_geom().diagnose_failure(exc, "", {})
                 attempts.append({"attempt": attempt, "status": "FAILED", **failure})
                 last_failure = failure
                 # repair pass: clamp parameters to envelopes (where recorded)
@@ -613,6 +630,7 @@ def _build_conceptual(vis: Dict[str, Any], run_result: Dict[str, Any],
 def _build_engineering(vis: Dict[str, Any], run_result: Dict[str, Any],
                        work_dir: str, attempt: int,
                        run_id: Optional[str] = None) -> Dict[str, Any]:
+    engineering_geometry = _eng_geom()  # lazy OCP (audit C2)
     normalized = engineering_geometry.normalize_parameters(vis["geometry_parameters"])
     params = normalized["build_params"]
     meta = normalized["parameter_meta"]
