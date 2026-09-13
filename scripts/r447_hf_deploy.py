@@ -314,7 +314,7 @@ HUNK_LOCAL_QWEN = """
 # weights the R451 sandbox proof measured (gguf sha256 72c5c3cb...).
 # Acquisition is verified fail-closed; a mismatched artifact ABORTS the
 # build (never a silently different model).
-ARG QWEN_GGUF_SHA256=72c5c3cb38fa32d5256e2fe30d03e7a646c79e668ad84057e3bd66e250b24fb
+ARG QWEN_GGUF_SHA256=72c5c3cb38fa32d5256e2fe30d03e7a64c6c79e668ad84057e3bd66e250b24fb
 RUN set -eux; \
     apt-get update >/dev/null; \
     apt-get install -y --no-install-recommends libstdc++6 libgomp1 >/dev/null; \
