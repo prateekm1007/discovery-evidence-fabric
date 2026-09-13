@@ -197,11 +197,16 @@ def _llm_generate(prompt: str, system: str, schema: List[str],
                   ) -> Dict[str, Any]:
     """One LLM call through the engine's registry (the R415 routing
     ladder: provider cascade, every hop recorded). Returns
-    {status, fields, provider, model, error}. Never raises."""
+    {status, fields, provider, model, error}. Never raises.
+
+    R451-C1.3-3: the run identity comes from the BOUND CALL CONTEXT
+    (EngineRun binds it for the whole run) — the pre-C1.3 defect passed
+    run_id=purpose, polluting the ledger with purpose strings
+    masquerading as run ids. The purpose remains the STAGE label."""
     from . import llm_registry as reg
     res = reg.generate(prompt=prompt, system=system, schema=schema,
                        timeout=240, max_tokens=max_tokens,
-                       role="synthesis", run_id=purpose)
+                       role="synthesis")
     out: Dict[str, Any] = {
         "status": res.status,
         "provider": res.provider_id,

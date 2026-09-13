@@ -375,6 +375,17 @@ class LLMCallResult:
     # (or was attempted for) this content — model_id, model_revision,
     # transport, local_or_remote, license, cost_basis, policy.
     cost_provenance: Optional[Dict[str, Any]] = None
+    # R451-C1.3-3: run-level routing provenance — the effective call
+    # identity (run_id/session_id/engine_stage/call_class) resolved
+    # from the explicit parameter or the bound run context; carried on
+    # the RESULT so run records surface it without re-deriving it.
+    call_provenance: Optional[Dict[str, Any]] = None
+    # R451-C1.4: task degradation — requested_task vs the capability of
+    # the model that actually served. A critical scientific stage must
+    # KNOW whether it received STRONG or CHEAP_EMERGENCY_FALLBACK; the
+    # downgrade is explicit in provenance and final scientific records,
+    # never silently relabeled as the requested capability.
+    task_degradation: Optional[Dict[str, Any]] = None
 
     @property
     def ok(self) -> bool:
@@ -382,7 +393,10 @@ class LLMCallResult:
 
     def to_meta(self) -> Dict[str, Any]:
         """Provenance metadata for candidates (Art. VI: real values only;
-        R451: the cost provenance travels with every generation)."""
+        R451: the cost provenance travels with every generation;
+        R451-C1.3/C1.4: the run provenance and the task-degradation
+        record travel with it — a candidate states WHICH capability
+        class actually produced it)."""
         return {
             "provider": self.provider_id,
             "model": self.model,
@@ -392,6 +406,8 @@ class LLMCallResult:
             "substituted_from": self.substituted_from,
             "status": self.status,
             "cost_provenance": self.cost_provenance,
+            "call_provenance": self.call_provenance,
+            "task_degradation": self.task_degradation,
             "retry_notes": list(self.retry_notes or []),
             "provider_route": [
                 {"provider": h.get("provider_attempted"),
@@ -410,12 +426,20 @@ def availability_matrix() -> List[Dict[str, Any]]:
     R451: each row also carries the provider's declared cost basis,
     locality, license, model revision, and its eligibility under the
     ACTIVE cost policy — the matrix is the honest surface that answers
-    "which models, at what cost, may this engine use right now"."""
+    "which models, at what cost, may this engine use right now".
+    R451-C1.3: each row also carries the MEASURED ROUTE STATE (the
+    five-state capability vocabulary) for the provider's default
+    call-model — credential presence is a configuration fact, never
+    capability evidence (the C1.3-1 rule). Read-only derivation: this
+    function performs NO probes."""
+    from . import runtime_admission as _ra
     policy = _cost_policy.active_policy()
     out = []
     for p in PROVIDER_SPECS:
         key = os.environ.get(p.env_var, "")
         eligible, elig_note = _cost_policy.provider_eligibility(p, policy)
+        cap = _ra.capability_state(p.provider_id, p.model_for_call(),
+                                   policy=policy)
         out.append({
             "provider_id": p.provider_id,
             "env_var": p.env_var,
@@ -433,18 +457,34 @@ def availability_matrix() -> List[Dict[str, Any]]:
             "cost_policy": policy,
             "cost_policy_eligible": eligible,
             "cost_policy_note": elig_note,
+            "capability_state": cap["state"],
             "policy_note": p.policy_note,
         })
     return out
 
 
 def select_provider(policy: Optional[SelectionPolicy] = None) -> tuple:
-    """Return (spec_or_None, ledger). Pure — performs no I/O.
+    """Return (spec_or_None, ledger). Performs NO network I/O and NO
+    probes — it READS persisted capability measurements (the C1.3-1
+    five-state vocabulary) from the capability store.
 
     R451: the ACTIVE cost policy filters eligibility FIRST. A provider
     that is available but policy-ineligible (paid API, environment
     grant, undeclared basis) is excluded with its refusal recorded in
-    the ledger — never silently usable, never silently widened."""
+    the ledger — never silently usable, never silently widened.
+
+    R451-C1.3/C1.7: the ONE runtime-admission semantic shared with
+    generate() (no legacy selector with weaker rules):
+
+        available
+        AND cost_policy_eligible
+        AND measured_capability_eligible (PROBE_OK within TTL)
+
+    A provider with no CURRENT measured successful capability probe is
+    NOT selected (NOT_PROBED / PROBE_FAILED / PROBE_EXPIRED are honest
+    refusals recorded with their state — the caller probes before it
+    admits; generate() probes lazily on the rungs it walks)."""
+    from . import runtime_admission as _ra
     policy = policy or SelectionPolicy()
     matrix = availability_matrix()
     active_cost_policy = _cost_policy.active_policy()
@@ -452,18 +492,37 @@ def select_provider(policy: Optional[SelectionPolicy] = None) -> tuple:
                  if m["available"] and m["cost_policy_eligible"]]
     refusals = [m for m in matrix
                 if m["available"] and not m["cost_policy_eligible"]]
+    # C1.7: the same measured-capability gate generate() applies — a
+    # credential present is NOT runtime admissibility. Read-only: the
+    # states travel in the ledger (capability evidence persisted).
+    capability_refusals = []
+    admitted_ids = []
+    for m in matrix:
+        if not (m["available"] and m["cost_policy_eligible"]):
+            continue
+        ok, note, _ev = _ra.runtime_admission(
+            m["provider_id"], m["model"], policy=active_cost_policy)
+        if ok:
+            admitted_ids.append(m["provider_id"])
+        else:
+            capability_refusals.append({
+                "provider": m["provider_id"], "model": m["model"],
+                "capability_state": m["capability_state"],
+                "reason": note})
     wanted_head: Optional[str] = None
     if policy.preferred_providers:
-        eligible = [pid for pid in policy.preferred_providers if pid in avail_ids]
+        eligible = [pid for pid in policy.preferred_providers
+                    if pid in admitted_ids]
         order_source = policy.preferred_providers
     else:
         ranked = sorted(matrix, key=lambda m: (m["quality_tier"],
                                                m["cost_tier"], m["latency_tier"]))
-        eligible = [m["provider_id"] for m in ranked if m["available"]]
+        eligible = [m["provider_id"] for m in ranked
+                    if m["provider_id"] in admitted_ids]
         order_source = [m["provider_id"] for m in ranked]
     substituted_from = None
-    if order_source and avail_ids:
-        first_avail = next((pid for pid in order_source if pid in avail_ids), None)
+    if order_source and eligible:
+        first_avail = next((pid for pid in order_source if pid in eligible), None)
         wanted_head = order_source[0]
         if first_avail and wanted_head and first_avail != wanted_head:
             substituted_from = wanted_head
@@ -477,14 +536,21 @@ def select_provider(policy: Optional[SelectionPolicy] = None) -> tuple:
             "cost_policy_refusals": [
                 {"provider": r["provider_id"],
                  "reason": r["cost_policy_note"]} for r in refusals],
+            "capability_refusals": capability_refusals,
             "availability": matrix,
             "selected": None,
             "reason": ("no provider has a usable credential in the "
                        "environment" if not [m for m in matrix
                                              if m["available"]] else
-                       f"the active cost policy {active_cost_policy} "
-                       f"excluded every available provider — paid routes "
-                       f"are REFUSED, never silently widened (R451 §1)"),
+                       (f"the active cost policy {active_cost_policy} "
+                        f"excluded every available provider — paid routes "
+                        f"are REFUSED, never silently widened (R451 §1)"
+                        if capability_refusals == [] and refusals else
+                        "no available provider is RUNTIME-ADMISSIBLE: a "
+                        "current measured successful capability probe is "
+                        "required (C1.3-1) — states: "
+                        + "; ".join(f"{r['provider']}={r['capability_state']}"
+                                     for r in capability_refusals))),
             "decided_at": utc_now(),
         }
         return None, ledger
@@ -505,12 +571,16 @@ def select_provider(policy: Optional[SelectionPolicy] = None) -> tuple:
         "cost_policy_refusals": [
             {"provider": r["provider_id"],
              "reason": r["cost_policy_note"]} for r in refusals],
+        "capability_refusals": capability_refusals,
         "availability": matrix,
         "eligible_order": eligible,
         "selected": chosen,
         "substituted_from": substituted_from,
         "reason": ("explicit preferred order" if policy.preferred_providers
-                   else "default policy: availability -> quality -> cost -> latency"),
+                   else "default policy: availability -> quality -> cost -> "
+                        "latency (runtime-admission semantics: available "
+                        "AND cost_policy_eligible AND "
+                        "measured_capability_eligible)"),
         "decided_at": utc_now(),
     }
     return (_SPEC_BY_ID.get(chosen) if chosen else None), ledger
@@ -672,6 +742,17 @@ def generate(prompt: str, system: str = "",
         except (TypeError, ValueError):
             pass  # malformed override ignored (recorded policy: no crash)
 
+    # R451-C1.3-3: the effective run-level provenance for THIS call —
+    # the explicit run_id parameter or the bound run context (the
+    # conductor binds EngineRun's identity; mechanism_space/evolution
+    # call sites inherit it without new parameters). run_owned_call =>
+    # run_id != null is guaranteed by construction here: a bound
+    # context ALWAYS carries a non-null run_id (EngineRun.run_id), and
+    # an explicit run_id is non-null by definition.
+    from . import call_context as _cctx
+    from . import runtime_admission as _ra
+    call_prov = _cctx.effective(run_id)
+
     matrix = availability_matrix()
     avail_ids = [m["provider_id"] for m in matrix
                  if m["available"] and m["cost_policy_eligible"]]
@@ -735,7 +816,8 @@ def generate(prompt: str, system: str = "",
             prompt_hash=_sha(prompt),
             selection_ledger={**ledger,
                               "cost_policy_refusals": policy_refusals
-                              or ledger.get("cost_policy_refusals")})
+                              or ledger.get("cost_policy_refusals")},
+            call_provenance=call_prov)
 
     # -- R415: the (provider, model) rung list from the routing registry --
     eff_role = role or (role_for_purpose(
@@ -777,7 +859,14 @@ def generate(prompt: str, system: str = "",
                   "(see selection_ledger)",
             prompt_hash=_sha(prompt),
             selection_ledger={"chain": list(chain),
-                              "ladder": ladder})
+                              "ladder": ladder},
+            call_provenance=call_prov)
+
+    # R451-C1.3-1: persisted capability evidence for every rung of the
+    # ladder the walk considered (the acceptance gate: capability
+    # evidence is persisted — read-only snapshot BEFORE any probing)
+    ladder["capability_evidence"] = _ra.ladder_capability_evidence(
+        [{"provider": p, "model": m} for p, m, _meta in rungs])
 
     wanted_head = rungs[0][0]
 
@@ -803,6 +892,41 @@ def generate(prompt: str, system: str = "",
     route: List[Dict[str, Any]] = []
     last_err = None
     last_failure_type = None
+    # R451-C1.4: the task-degradation record of the rung that actually
+    # served (or the last attempted rung when everything fails)
+    last_degradation: Optional[Dict[str, Any]] = None
+
+    def _degradation_record(rung_meta: Dict[str, Any]) -> Dict[str, Any]:
+        """R451-C1.4: requested task vs the SERVING model's capability —
+        never silently use a CHEAP model as a STRONG model. The
+        emergency fallback stays PERMITTED (the system may continue
+        under an explicitly recorded emergency policy) but the
+        downgrade is visible in provenance and final scientific
+        records."""
+        caps = list(rung_meta.get("task_capabilities") or [])
+        match = task in caps
+        if match:
+            actual = task
+            reason = ("the serving model declares the requested "
+                      "task capability")
+        elif caps:
+            actual = ("CHEAP_EMERGENCY_FALLBACK"
+                      if task == mr.TASK_STRONG else caps[0])
+            reason = (
+                f"requested {task}; the serving model declares only "
+                f"{caps} — the call ran under the explicitly permitted "
+                f"emergency fallback (R451-C1.4): downstream readers "
+                f"must NOT interpret the result as {task}-class "
+                f"reasoning")
+        else:
+            actual = "UNKNOWN"
+            reason = "the serving model declares no task capabilities"
+        return {
+            "requested_task": task,
+            "actual_task_capability": actual,
+            "task_capability_match": match,
+            "degraded_reason": reason,
+        }
 
     for hop_idx, (provider_id, model_id, rung_meta) in enumerate(rungs):
         spec = _SPEC_BY_ID.get(provider_id)
@@ -816,6 +940,71 @@ def generate(prompt: str, system: str = "",
         # the provider's own 410 — a recorded fact, not a heuristic)
         if mr.is_model_gone(provider_id, model_id):
             continue
+        # -- R451-C1.3-1: RUNTIME ADMISSION — a route requires a CURRENT
+        # measured successful capability probe; credential presence is
+        # NOT admissibility. NOT_PROBED / PROBE_EXPIRED rungs are probed
+        # HERE (lazily, only when the walk reaches them — the TTL
+        # mechanism means at most one probe per route per window, never
+        # one per call). PROBE_FAILED / POLICY_REFUSED rungs are skipped
+        # with the state recorded on the route (never a silent skip). The
+        # LOCAL route uses the SAME rule — no bespoke local exception.
+        #
+        # Transient-failure absorption (the old cascade's measured
+        # resilience, applied to the admission authority): a probe that
+        # fails with a TRANSIENT class (NETWORK_FAILURE / TIMEOUT /
+        # RATE_LIMITED) is retried within the SAME bounded walk with the
+        # same backoff the real-call path uses — a ~5 s server restart
+        # window must not lock the route out for the TTL (the acceptance
+        # run's measured defect). PERMANENT classes (AUTH_FAILURE, GONE,
+        # MODEL_NOT_FOUND, CREDIT_EXHAUSTED) are never retried.
+        if _ra.requires_probe(provider_id, model_id):
+            _ra.probe_capability(provider_id, model_id,
+                                 timeout_s=min(timeout, 30))
+            _tries = 0
+            while (_tries < max_retries
+                   and _ra.probe_failure_is_transient(
+                       provider_id, model_id)):
+                time.sleep(2 * (_tries + 1))
+                _ra.probe_capability(provider_id, model_id,
+                                     timeout_s=min(timeout, 30))
+                _tries += 1
+        _adm, _adm_note, _adm_ev = _ra.runtime_admission(
+            provider_id, model_id)
+        if not _adm:
+            # the probe's own typed failure class (when the state is
+            # PROBE_FAILED) rides the hop — the route stays fully
+            # reconstructable: WHY this rung was refused is a measured
+            # class, never a bare "not admitted"
+            _probe_ftype = ((_adm_ev.get("record") or {}).get(
+                "failure_class") if _adm_ev.get("state") == "PROBE_FAILED"
+                else None)
+            route.append({
+                "provider_attempted": spec.provider_id,
+                "model": model_id,
+                "status": "SKIPPED_NOT_ADMITTED",
+                "failure_type": _probe_ftype,
+                "capability_state": _adm_ev.get("state"),
+                "timestamp": utc_now(),
+                "retry_count": 0,
+                "attempts": 0,
+                "latency_ms": 0,
+                "error": _adm_note[:300],
+                "fallback_provider": next_provider,
+                "fallback_model": next_model,
+                "fallback_reason": (
+                    f"runtime admission refused ({_adm_note[:160]}) -> "
+                    f"fallback to {next_provider or 'none (last rung)'}"),
+                "cost_class": spec.cost_basis,
+                "selected": False,
+                "rung_band": rung_meta.get("band"),
+                "task": task,
+            })
+            last_err = (f"runtime admission refused for {provider_id}/"
+                        f"{model_id}: {_adm_note}")
+            last_failure_type = None
+            continue
+        degradation = _degradation_record(rung_meta)
+        last_degradation = degradation
         attempt_budget = max_tokens
         retry_notes: List[str] = []
         hop_t0 = time.time()
@@ -839,8 +1028,14 @@ def generate(prompt: str, system: str = "",
                 mr.record_call_outcome(
                     provider_id, model_id, ok=True,
                     latency_ms=latency_ms, task=task, stage=purpose_tag,
-                    run_id=run_id, attempt=attempt + 1,
-                    cost_class=spec.cost_basis, selected=True)
+                    run_id=call_prov["run_id"], attempt=attempt + 1,
+                    cost_class=spec.cost_basis, selected=True,
+                    session_id=call_prov["session_id"],
+                    engine_stage=call_prov["engine_stage"],
+                    call_class=call_prov["call_class"],
+                    account_domain=spec.account_domain,
+                    task_degradation=degradation,
+                    capability_state="PROBE_OK")
                 # R451 §6: the SUCCESSFUL hop is part of the route too —
                 # the in-result route must reconstruct the exact path
                 # (every failure first, then the selected provider),
@@ -859,10 +1054,22 @@ def generate(prompt: str, system: str = "",
                     "fallback_model": None,
                     "fallback_reason": "",
                     "cost_class": spec.cost_basis,
+                    "account_domain": spec.account_domain,
                     "selected": True,
                     "rung_band": rung_meta.get("band"),
                     "task": task,
+                    "task_degradation": degradation,
+                    "capability_state": "PROBE_OK",
                 })
+                # a successful real call is a STRONGER capability
+                # measurement than the probe — refresh the TTL window
+                # (runtime_admission.record_capability source=real_call)
+                try:
+                    _ra.record_capability(
+                        provider_id, model_id, ok=True,
+                        latency_ms=latency_ms, source="real_call")
+                except Exception:  # noqa: BLE001 — telemetry best-effort
+                    pass
                 # success after a failed hop is OK ONLY with the route
                 # disclosing every failure that preceded it (never a
                 # silent failover — directive §8)
@@ -888,7 +1095,9 @@ def generate(prompt: str, system: str = "",
                     route=route or None,
                     failure_type=None,
                     cost_provenance=_cost_policy.cost_provenance(
-                        spec, model_id))
+                        spec, model_id),
+                    call_provenance=call_prov,
+                    task_degradation=degradation)
             except EmptyContentWithFinish as exc:
                 last_err = f"{type(exc).__name__}: {exc}"
                 ftype = classify_failure(exc)
@@ -930,7 +1139,13 @@ def generate(prompt: str, system: str = "",
                 provider_id, model_id, ok=False,
                 latency_ms=int((time.time() - hop_t0) * 1000),
                 failure_type=ftype, task=task, stage=purpose_tag,
-                run_id=run_id, attempt=attempt + 1,
+                run_id=call_prov["run_id"], attempt=attempt + 1,
+                session_id=call_prov["session_id"],
+                engine_stage=call_prov["engine_stage"],
+                call_class=call_prov["call_class"],
+                account_domain=spec.account_domain,
+                task_degradation=degradation,
+                capability_state="PROBE_OK",
                 fallback_from=(provider_id if next_provider else None),
                 fallback_to=next_provider,
                 error=str(last_err),
@@ -938,6 +1153,17 @@ def generate(prompt: str, system: str = "",
                 fallback_reason=(
                     f"{ftype}: {str(last_err)[:160]} -> fallback to "
                     f"{next_provider or 'none (last rung)'}"))
+            # a real-call transport failure invalidates the capability
+            # record so the NEXT admission re-probes instead of trusting
+            # the stale probe success (the R415 clear_probe_cache
+            # discipline, applied to the runtime authority)
+            if ftype not in ("INVALID_RESPONSE", "PARSER_FAILURE"):
+                try:
+                    _ra.invalidate_capability(
+                        provider_id, model_id,
+                        reason=f"real-call failure class {ftype}")
+                except Exception:  # noqa: BLE001
+                    pass
             route.append({
                 "provider_attempted": spec.provider_id,
                 "model": model_id,
@@ -954,9 +1180,12 @@ def generate(prompt: str, system: str = "",
                     f"{ftype}: {str(last_err)[:160]} -> fallback to "
                     f"{next_provider or 'none (last rung)'}"),
                 "cost_class": spec.cost_basis,
+                "account_domain": spec.account_domain,
                 "selected": False,
                 "rung_band": rung_meta.get("band"),
                 "task": task,
+                "task_degradation": degradation,
+                "capability_state": "PROBE_OK",
             })
             last_failure_type = ftype
             break
@@ -982,7 +1211,9 @@ def generate(prompt: str, system: str = "",
         failure_type=last_failure_type,
         cost_provenance=(
             _cost_policy.cost_provenance(last_spec, rungs[-1][1])
-            if last_spec else None))
+            if last_spec else None),
+        call_provenance=call_prov,
+        task_degradation=last_degradation)
 
 
 def availability_statement() -> Dict[str, Any]:

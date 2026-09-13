@@ -29,6 +29,7 @@ from .candidate import Candidate, StageFailure, canonical_json, sha256_obj, utc_
 from . import adapters as _adapters
 from .adapters import ADAPTERS, STAGE_ORDER
 from . import stage_entry  # R399 W2: the one shared entry-justification helper
+from . import call_context as _cctx  # R451-C1.3-3: run-level call provenance
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 # Stages whose failure is FATAL to the run (nothing downstream is meaningful)
@@ -72,7 +73,8 @@ class EngineRun:
                  package_number: Optional[str] = None,
                  package_registry_path: Optional[str] = None,
                  resume: bool = False,
-                 event_callback: Optional[Callable] = None):
+                 event_callback: Optional[Callable] = None,
+                 session_id: Optional[str] = None):
         # R431: optional journal callback — called (stage, envelope)
         # each time a stage envelope is persisted (the moment the
         # operation occurs). No engine-side journal dependency.
@@ -85,6 +87,11 @@ class EngineRun:
         self.problem = problem
         self.problem_id = problem.get("problem_id", "custom")
         self.run_id = run_id or f"engrun:{self.problem_id}:{utc_now()[:19]}"
+        # R451-C1.3-3: the owning session (the production worker passes
+        # the ts_ session id; CLI investigations honestly record None —
+        # the session field EXISTS on every ledger line either way, and
+        # the hard invariant is run_owned_call => run_id != null).
+        self.session_id = session_id
         self.out = Path(out_dir)
         self.out.mkdir(parents=True, exist_ok=True)
         self.disabled = set(disabled_stages or [])
@@ -146,8 +153,10 @@ class EngineRun:
                       package_number=manifest.get("package_number"),
                       package_registry_path=manifest.get(
                           "package_registry_path"),
+                      session_id=manifest.get("session_id"),
                       resume=True)
-        kwargs.update(overrides)
+        kwargs.update({k: v for k, v in overrides.items()
+                       if v is not None})
         return cls(**kwargs)
 
     # ------------------------------------------------------------------
@@ -182,6 +191,9 @@ class EngineRun:
             self._persist("problem.json", self.problem)
         manifest: Dict[str, Any] = {
             "run_id": self.run_id,
+            # R451-C1.3-3: the run's owning session travels in the
+            # manifest (resume re-binds the SAME run identity + session)
+            "session_id": self.session_id,
             "engine": "discovery_fabric.engine",
             "stage_order": [s for s in STAGE_ORDER if s not in self.disabled],
             "disabled_stages": sorted(self.disabled),
@@ -192,6 +204,22 @@ class EngineRun:
             "resumed": bool(self.resume),
             "started_at": utc_now(),
         }
+        # R451-C1.3-3: bind the run-level call context for the WHOLE
+        # run — every LLM call made by any stage (mechanism_space,
+        # evolution, adversarial, bridge) inherits the run identity
+        # through the contextvar, so the routing ledger lines carry
+        # run_id/session_id/engine_stage and run_owned_call =>
+        # run_id != null holds by construction. The context is unbound
+        # on exit (a worker process may run several investigations).
+        from . import call_context as _cctx
+        _ctx_token = _cctx.bind_run(self.run_id,
+                                    session_id=self.session_id)
+        try:
+            return self._run_inner(manifest)
+        finally:
+            _cctx.unbind(_ctx_token)
+
+    def _run_inner(self, manifest: Dict[str, Any]) -> Dict[str, Any]:
 
         # ---------------- resume: restore completed stages ---------------
         done_stages: set = set()
@@ -258,6 +286,10 @@ class EngineRun:
                 stage, self.env, self.failed_stages,
                 self._skipped_stages)
             try:
+                # R451-C1.3-3: the CURRENT conductor stage rides the call
+                # context so ledger lines carry engine_stage in addition
+                # to the call-site purpose
+                _cctx.set_stage(stage)
                 entry = self.env.run_stage(
                     stage, adapter.capability_id, adapter.module_path,
                     adapter.canonical_fn, adapter.execute, self.env,
@@ -380,6 +412,37 @@ class EngineRun:
             "final_envelope_hash": self.env.envelope_hash(),
         })
         self._persist("run_manifest.json", manifest)
+        # R451-C1.3-3: the run's OWN routing ledger, isolated BY RUN ID
+        # from the append-only global ledger (no time-window inference,
+        # no ledger-tail assumption) and persisted INTO the run dir —
+        # the run is self-contained transport evidence: every LLM call
+        # this investigation made, with provider/model/attempt/task/
+        # cost basis/account domain/failure class/fallback chain, the
+        # capability states, and the task-degradation records.
+        try:
+            from .model_routing import ledger_for_run
+            run_lines = ledger_for_run(self.run_id)
+            self._persist("ROUTING_LEDGER_RUN.json", {
+                "run_id": self.run_id,
+                "session_id": self.session_id,
+                "isolation_rule": ("run_id equality on the append-only "
+                                   "routing ledger — no time window, no "
+                                   "ledger tail (R451-C1.3-3)"),
+                "line_count": len(run_lines),
+                "run_owned_call_lines": sum(
+                    1 for l in run_lines
+                    if l.get("call_class") == "RUN_OWNED"),
+                "capability_probe_lines": sum(
+                    1 for l in run_lines
+                    if l.get("call_class") == "CAPABILITY_PROBE"),
+                "paid_cost_class_lines": sum(
+                    1 for l in run_lines
+                    if (l.get("cost_class") or "") not in (
+                        "ZERO_PAID_COST_SELF_HOSTED", None)),
+                "lines": run_lines,
+            })
+        except Exception:  # noqa: BLE001 — disclosed via absence
+            pass
         self._persist("candidate_envelope.json", self.env.to_dict())
         # Cemetery records RESEARCH kills only. An infrastructure failure
         # (e.g. missing LLM credential) is not negative knowledge about the
@@ -2939,6 +3002,15 @@ def main():
                     help="redirect the PACKAGE_ID_REGISTRY path (sandbox/"
                          "testing only; production uses the canonical "
                          "registry — CEO A1 forbids hardcoded numbers)")
+    ap.add_argument("--run-id", default=None,
+                    help="R451-C1.3: pin the run identity (the routing "
+                         "ledger isolates THIS run's calls by run_id — "
+                         "no time-window inference). The production "
+                         "worker derives it from the session; drivers "
+                         "pass it explicitly.")
+    ap.add_argument("--session-id", default=None,
+                    help="R451-C1.3: the owning session id (production: "
+                         "the ts_ session; CLI drivers may pin a label)")
     args = ap.parse_args()
 
     problem: Dict[str, Any]
@@ -2959,13 +3031,17 @@ def main():
             raise SystemExit("--resume requires --out <run dir>")
         run = EngineRun.from_run_dir(args.out,
                                      with_package=not args.no_package,
-                                     package_registry_path=args.package_registry)
+                                     package_registry_path=args.package_registry,
+                                     run_id=args.run_id,
+                                     session_id=args.session_id)
     else:
         out = args.out or str(REPO_ROOT / "ENGINE_RUNS"
                               / f"{problem.get('problem_id','custom')}_{utc_now()[:19].replace(':','')}")
         run = EngineRun(problem, out, disabled_stages=disabled,
                         with_package=not args.no_package,
-                        package_registry_path=args.package_registry)
+                        package_registry_path=args.package_registry,
+                        run_id=args.run_id,
+                        session_id=args.session_id)
     manifest = run.run()
     print(canonical_json(manifest))
     return 0

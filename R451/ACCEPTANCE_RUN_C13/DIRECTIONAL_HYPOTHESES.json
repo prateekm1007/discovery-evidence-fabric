@@ -1,0 +1,96 @@
+{
+ "artifact_type": "DIRECTIONAL_HYPOTHESES",
+ "schema_version": "hypotheses/1.0",
+ "created_at": "2026-09-13T06:17:22+00:00",
+ "hypotheses": [
+  {
+   "hypothesis_id": "dh:191a24680408ff1b5ee8",
+   "candidate_id": "inv:67462bcd9e:gen1",
+   "failure_id": "diag:65da9bf171c8c35d",
+   "causal_diagnosis_id": "diag:65da9bf171c8c35d",
+   "target_variable": "pressure-compensating emitters",
+   "current_value": "installed filters to remove biofilm and calcium carbonate",
+   "proposed_value": "remove filters to allow biofilm and calcium carbonate to remain",
+   "direction": "REMOVE",
+   "mechanism_affected": "unsupported_mechanism: KILLED, obvious_combination: KILLED, engineering_infeasibility: KILLED",
+   "causal_rationale": "the failure is due to adversarial kill, which is caused by unsupported mechanism, obvious combination, and engineering infeasibility. Removing filters would allow biofilm and calcium carbonate to remain, which could potentially support the mechanism and reduce the adversarial kill.",
+   "predicted_effect": "the system would be less vulnerable to adversarial kill, as the mechanism would be supported and the combination would be less obvious",
+   "predicted_magnitude_or_range": "increased resilience to adversarial kill",
+   "competing_explanations": [],
+   "evidence_support": [],
+   "evidence_gaps": [
+    "the evidence supporting the causal diagnosis and the mechanism is missing"
+   ],
+   "falsifier": "the system would still fail due to adversarial kill",
+   "measurement_required": "measure the system's resilience to adversarial kill",
+   "intervention_type": "CONSTRAINT_RELAXATION",
+   "confidence": "HIGH",
+   "provenance": {
+    "class": "AI_PROPOSED",
+    "purpose": "directional:hypothesis",
+    "note": "the LLM proposed this hypothesis; the mechanical ground gate adjudicates it (Art. XVIII) — an ungrounded proposal is REJECTED and its mutation never executes",
+    "proposed_at": "2026-09-13T06:18:26+00:00"
+   },
+   "status": "REJECTED",
+   "gate": {
+    "gate_version": "directional_ground_gate/2.0",
+    "checks": [
+     {
+      "check": "G1_STRUCTURE",
+      "verdict": "PASS",
+      "basis": "all required fields present"
+     },
+     {
+      "check": "G2_DIAGNOSIS_RESOLVES",
+      "verdict": "PASS",
+      "basis": "causal_diagnosis_id='diag:65da9bf171c8c35d' resolves to a recorded diagnosis (cause=ADVERSARIAL_KILL)"
+     },
+     {
+      "check": "G3_MECHANISM_GROUNDED",
+      "verdict": "PASS",
+      "basis": "mechanism terms grounded in the diagnosis/candidate: adversarial, kill"
+     },
+     {
+      "check": "G4_PREDICTION_FALSIFIABLE",
+      "verdict": "FAIL",
+      "basis": "predicted_effect=present; falsifier=present but not measurable — an unfalsifiable direction is a wish, not a hypothesis"
+     },
+     {
+      "check": "G5_EVIDENCE_CLASS",
+      "verdict": "PASS",
+      "basis": "class=EVIDENCE_MISSING: 0 verified support bindings (span-verified); 0 unresolved ids; 0 ids with failed/absent spans; gaps=1 (gaps are NEVER equated with support — R451 §4)"
+     },
+     {
+      "check": "G6_TARGET_IN_DESIGN_STATE",
+      "verdict": "PASS",
+      "basis": "target_variable grounded in the design state: biofilm, calcium, carbonate, compensating, emitters, filters, pressure, remove"
+     },
+     {
+      "check": "G7_PREDICTION_INTERVENTION_COHERENT",
+      "verdict": "PASS",
+      "basis": "predicted observable coupled to the intervention: combination, mechanism, obvious"
+     },
+     {
+      "check": "G8_FALSIFIER_BINDS_PREDICTION",
+      "verdict": "PASS",
+      "basis": "the falsifier measures the predicted observable: adversarial, kill, would"
+     },
+     {
+      "check": "G9_CAUSAL_MEMORY",
+      "verdict": "PASS",
+      "basis": "no prior FALSIFIED direction repeats (the causal memory is clean for this (target_variable, direction))"
+     }
+    ],
+    "grounded": false,
+    "verdict": "REJECTED",
+    "evidence_class": "EVIDENCE_MISSING",
+    "evidence_resolution": {
+     "verified_ids": [],
+     "unresolved_ids": [],
+     "span_failed_ids": []
+    },
+    "adjudicated_at": "2026-09-13T06:18:26+00:00"
+   }
+  }
+ ]
+}

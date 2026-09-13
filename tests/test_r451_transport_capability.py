@@ -50,7 +50,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from discovery_fabric.engine import llm_registry as reg  # noqa: E402
 from discovery_fabric.engine import model_cost_policy as cp  # noqa: E402
-from discovery_fabric.engine import model_routing as mr  # noqa: E402
+from discovery_fabric.engine import model_routing as mr
+from discovery_fabric.engine import runtime_admission as ra  # noqa: E402
 from discovery_fabric.engine import provider_health as ph  # noqa: E402
 from discovery_fabric.engine import transport_capability as tc  # noqa: E402
 
@@ -64,6 +65,9 @@ def hermetic(monkeypatch, tmp_path):
     monkeypatch.setattr(mr, "LEDGER", mr.RoutingLedger(
         path=tmp / "ledger.jsonl"))
     monkeypatch.setattr(mr, "STATE_PATH", tmp / "state.json")
+    # R451-C1.3: the capability store is production admission
+    # state — tests redirect it (Art. IX)
+    ra.set_state_path(tmp / "capability_state.json")
     monkeypatch.setattr(mr, "CATALOG_DIR", tmp / "catalog")
     monkeypatch.setattr(
         mr, "discover_catalog",

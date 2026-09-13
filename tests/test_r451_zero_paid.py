@@ -48,7 +48,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from discovery_fabric.engine import llm_registry as reg  # noqa: E402
 from discovery_fabric.engine import model_cost_policy as cp  # noqa: E402
-from discovery_fabric.engine import model_routing as mr  # noqa: E402
+from discovery_fabric.engine import model_routing as mr
+from discovery_fabric.engine import runtime_admission as ra  # noqa: E402
 from discovery_fabric.engine import provider_health as ph  # noqa: E402
 from discovery_fabric.directional.delta import (  # noqa: E402
     CAUSAL_FIELDS, direction_delta, parse_attribution_lines)
@@ -64,6 +65,9 @@ def hermetic(monkeypatch, tmp_path):
     monkeypatch.setattr(mr, "LEDGER", mr.RoutingLedger(
         path=tmp / "ledger.jsonl"))
     monkeypatch.setattr(mr, "STATE_PATH", tmp / "state.json")
+    # R451-C1.3: the capability store is production admission
+    # state — tests redirect it (Art. IX)
+    ra.set_state_path(tmp / "capability_state.json")
     monkeypatch.setattr(mr, "CATALOG_DIR", tmp / "catalog")
     monkeypatch.setattr(
         mr, "discover_catalog",
@@ -655,9 +659,12 @@ class TestRoutingObservability:
 
     def test_route_records_failed_then_selected_hops(
             self, hermetic, monkeypatch):
-        """First rung fails (a paid provider under UNRESTRICTED policy),
-        the second succeeds: the route discloses the failure AND the
-        selection — never a silent failover."""
+        """R451-C1.3 semantics (directive-pinned update): the first rung
+        FAILS ITS CAPABILITY PROBE (a paid provider answering 401 under
+        UNRESTRICTED policy), the second serves. The route discloses the
+        refused rung AND the selection — never a silent skip, never a
+        silent failover; the probe's typed failure class (AUTH_FAILURE)
+        is persisted in the routing ledger as a CAPABILITY_PROBE line."""
         monkeypatch, _ = hermetic
         _no_keys(monkeypatch)
         monkeypatch.setenv("ENGINE_MODEL_COST_POLICY", "UNRESTRICTED")
@@ -695,9 +702,77 @@ class TestRoutingObservability:
         assert res.status == reg.ST_OK
         assert res.provider_id == "localqwen"
         assert len(res.route) == 2
-        assert res.route[0]["status"] == "FAILED"
+        # the refused rung is DISCLOSED with its capability state (the
+        # pre-C1.3 behavior — a real 401 attempt — is now prevented by
+        # probe-before-admit; the skip is the honest record of WHY)
+        assert res.route[0]["status"] == "SKIPPED_NOT_ADMITTED"
         assert res.route[0]["fallback_reason"]
         assert res.route[1]["status"] == "OK"
+        # the probe failure is typed and persisted in the ledger
+        probe_lines = [l for l in mr.LEDGER.tail(20)
+                       if l.get("call_class") == "CAPABILITY_PROBE"
+                       and l.get("provider") == "openai"]
+        assert probe_lines, "the openai capability probe line exists"
+        assert probe_lines[-1]["failure_class"] == "AUTH_FAILURE"
+        assert probe_lines[-1]["run_id"] is None  # probes are not run-owned
+
+    def test_route_records_real_call_failure_after_admission(
+            self, hermetic, monkeypatch):
+        """The ORIGINAL failover contract under the new authority: a rung
+        whose probe SUCCEEDS but whose REAL call fails (a mid-call
+        failure after admission) walks to the next rung — the route
+        discloses the FAILED hop AND the selection, and the capability
+        record is invalidated so the next admission re-probes."""
+        monkeypatch, _ = hermetic
+        _no_keys(monkeypatch)
+        monkeypatch.setenv("ENGINE_MODEL_COST_POLICY", "UNRESTRICTED")
+        monkeypatch.setenv("OPENAI_API_KEY", "k")
+        monkeypatch.setenv("LOCAL_QWEN_BASE_URL",
+                           "http://127.0.0.1:8790/v1/chat/completions")
+        monkeypatch.setattr(mr, "PINNED_DEFAULT_MODELS", {
+            "openai": [
+                {"model": "gpt-4o",
+                 "task_capabilities": ["STRONG", "FAST", "CHEAP"],
+                 "cost_class": 3, "latency_class": 2,
+                 "context_limit": 128000}],
+            "localqwen": [
+                {"model": "qwen3-1.7b",
+                 "task_capabilities": ["STRONG", "FAST", "CHEAP"],
+                 "cost_class": 1, "latency_class": 4,
+                 "context_limit": 32768}],
+        })
+        # the openai transport succeeds ONCE (the probe) then fails the
+        # real call: a failure that arrives AFTER admission
+        calls = {"n": 0}
+
+        def fake_call(spec, messages, timeout, max_tokens,
+                      model_override=None):
+            if spec.provider_id == "openai":
+                calls["n"] += 1
+                if calls["n"] > 1:
+                    raise urllib.error.HTTPError(
+                        "u", 429, "Too Many Requests", None, None)
+                return "READY"
+            return "READY"
+
+        monkeypatch.setattr(reg, "_call_openai_flavor", fake_call)
+        res = reg.generate("Reply with: READY", system="probe",
+                           max_tokens=8, max_retries=0, timeout=10,
+                           policy=reg.SelectionPolicy(
+                               preferred_providers=["openai",
+                                                    "localqwen"],
+                               max_preference_fallback=2,
+                               purpose="synthesis"))
+        assert res.status == reg.ST_OK
+        assert res.provider_id == "localqwen"
+        assert res.route[0]["status"] == "FAILED"
+        assert res.route[0]["failure_type"] == "RATE_LIMITED"
+        assert res.route[0]["fallback_reason"]
+        assert res.route[1]["status"] == "OK"
+        # the real-call failure invalidated the capability record — the
+        # rung re-probes on the next admission (state NOT_PROBED)
+        st = ra.capability_state("openai", "gpt-4o")
+        assert st["state"] == ra.ST_NOT_PROBED
         assert res.route[1]["selected"] is True
 
     def test_availability_statement_names_refused_providers(
