@@ -511,3 +511,6 @@ Work Log:
 Stage Summary:
 - The exact engineering geometry -> canonical GLB -> Visual Compiler join is now provable WITHOUT trusting filenames, booleans, reports, or stale projections: every identity rung is verified from bytes inside ONE evaluator, fourteen forgeries each fail to promote, the milestone rows are validity/authority-gated, and the product cannot read an unverifiable presentation as ready. No Coder-1 canonical state changed; the Visual Gate untouched and fail-closed.
 - reviewer_provenance=AI_REVIEW.
+
+Work Log (continuation):
+- The R451-C2.3 round commit is cf4ad4b4d457e60b9617013b09dcf4cca9a547c3 (the record above carries the full SHA); the push and ls-remote verification are recorded in this commit's follow-up, per the standing round protocol.
