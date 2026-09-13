@@ -411,3 +411,49 @@ fixtures — §5's automatic invocation proven live. Constitution v2.4.0
 IN FULL before this commit. No Coder-1 canonical state changed: the
 CAD pipeline, the bridge, the package compiler, and the Visual Gate
 are consumed, never modified.
+
+## R451-C2.3 addendum (2026-09-13) — VISUAL_READY requires the release chain, and the identity chain is ONE
+
+Operator directive R451-C2.3: the system must prove the exact
+engineering geometry → canonical GLB → Visual Compiler join WITHOUT
+trusting filenames, booleans, reports, or stale projections. Route
+strings never establish geometry; a STEP never claims visual
+readiness; reports never constitute realizations; and every identity
+mismatch fails closed INSIDE the evaluator — not merely in a later
+watchdog report.
+
+| Component | Module | Notes |
+|---|---|---|
+| THE geometry artifact contract | `toscanini/visual_join.py::evaluate_geometry_contract` (moved from dossier.py — ONE implementation, two consumers) | geometry_available requires ALL seven conditions: artifact exists AND non-zero AND valid artifact identity AND generation identities match AND every recorded SHA matches the bytes on disk AND engineering authority is explicit AND no contradicting terminal failure. Authority reads RECORDED identity documents only (ARTIFACT_IDENTITY.json, the bridge report's class fields, the CAD ledger) — the CIO's derived class is never an authority source. Missing class stays UNKNOWN; legacy boolean-only stays readable but establishes nothing |
+| ENGINEERING_GEOMETRY_READY vs VISUAL_INPUT_READY | the contract's two typed fields | A valid STEP (byte-checked ISO-10303-21 header) establishes the first and NEVER the second — the visual boundary requires the canonical GLB contract |
+| THE release chain | `visual_join.verify_release_chain` | seven rungs verified from bytes: canonical GLB identity → receipt identity (glb_sha256 == bytes, run_id == run, geometry_spec_sha256 == the spec file) → render record source → gate PASS → required ladder on disk → hero exists → hero source identity (render record source == canonical; an exported hero.glb must match the record's own view hash) |
+| Release-chain join states | `VISUAL_JOIN_STATES` (8 → 10) | gate PASS + any broken rung → RELEASE_UNVERIFIED (fail closed, per rung detail); engineering-ready but no canonical GLB → VISUAL_INPUT_NOT_READY. VISUAL_READY now means the full chain |
+| One evaluator, two consumers | `scripts/r451_c2_watchdog.py` | the watchdog-local derive_join_state is DELETED (Art. LXIV disposition: superseded in the same change); the watchdog derives the state from `evaluate_visual_join` and keeps the record-level invariant rules (R1–R10: R10 couples the evaluator's announced state to the record invariants); the pre-C2.3 engineering-by-filename fallback is retired — missing class is UNKNOWN |
+| Invention milestone validity | `toscanini/dossier.py::_invention_record_validity` | the strip's Invention row RECEIVES only on the record's REQUIRED VALIDITY STATE: {} → INVALID_EMPTY, truncated JSON → INVALID_MALFORMED (never silently absent), placeholder core fields → INVALID_PLACEHOLDER, missing core fields → INVALID_MINIMAL, recorded adjudication rejection → INVALID_ADJUDICATION |
+| Engineering milestone | `toscanini/dossier.py::pipeline_projection` | RECEIVED requires the typed-valid geometry state AND the contract's ENGINEERING authority; the bridge-report fallback promotion is DELETED (a bridge report describes a realization, it does not constitute one); CONCEPTUAL/UNKNOWN never receive |
+| Typed package classification | `toscanini/dossier.py::_package_blocked_class` | the free-text inference ("transport" in reason.lower(), "quality gate" in reason) is DELETED; the class consumes the compiler's typed stages only (QUALITY_GATE_BLOCKED → failed-gate prefixes B-/F-/G-/U- → SCIENTIFIC else PACKAGE_INTEGRITY; MODEL_VALIDATION_FAILED/COMPILE_ERROR → PACKAGE_INTEGRITY; typed infra codes → INFRASTRUCTURE; anything else → UNKNOWN verbatim) |
+| Authority-aware ribbon | `presentationState.ts::renderBlockedTitle` + `TechStage.tsx` | the ENGINEERING MODEL READY claim exists only on the contract's recorded ENGINEERING authority; CONCEPTUAL → CONCEPTUAL MODEL; UNKNOWN/legacy → GEOMETRY AUTHORITY UNVERIFIED; two new typed causes with their own sentences: visual_input_missing, release_unverified (the cause vocabulary is closed at seven) |
+
+Batteries: `tests/test_r451_c23_identity_chain.py` (the fourteen
+directive false-positive attacks — fake GLB path, empty GLB, wrong GLB
+SHA, wrong generation, wrong run_id, STEP only, legacy present=true,
+empty/placeholder/minimal/malformed/adjudication-rejected invention
+records, bridge report without realization, render record with wrong
+GLB, receipt with wrong GLB, gate PASS + hero absent, gate PASS +
+incomplete ladder — plus the identity-chain equations, the
+one-evaluator coupling (dossier and watchdog announce the SAME state
+on every fixture), and the clean-state byte-identical replay);
+test_r451_c22_join.py 61 (supersessions disclosed in-file);
+test_r451_c21_states.py 29 + test_r451_c2_blocked_state.py 20;
+visual family 83 (== the pristine baseline); product family green
+except the stash-verified pre-existing failures (BS-020 class); UI
+battery 60 checks ALL PASS; tsc clean; next build green.
+Fresh-browser DOM proof (R451/C2_PRODUCT/E2E_C23/): the complete chain
+still reaches State E through the strict release chain (the
+false-negative guard), the no-silent-gap failure stays visible, and a
+mutated render-record source GLB fails closed live — STOPPED
+[RELEASE_UNVERIFIED], never "Technology ready". Constitution v2.4.0
+(hash b54a1be9 == origin/main) read IN FULL at round start and re-read
+IN FULL immediately before the commit. No Coder-1 canonical state
+changed: the CAD pipeline, the bridge, the package compiler, the
+Visual Gate, and the visual-set ladder are consumed, never modified.

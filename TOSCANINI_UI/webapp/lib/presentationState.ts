@@ -50,6 +50,13 @@ export interface DesignTabProjection {
   visual_join_detail?: string | null;
   visual_join_cause?: string | null;
   pending_render_job?: string | null;
+  // R451-C2.3 §1/§2: the contract's ENGINEERING authority verdict and
+  // the two separated boundary states (consumed verbatim from the
+  // backend's design tab — never re-derived here)
+  engineering_authority?: "ENGINEERING" | "CONCEPTUAL" | "UNKNOWN" | null;
+  engineering_geometry_ready?: boolean;
+  visual_input_ready?: boolean;
+  visual_input_basis?: string | null;
   hero_eligibility?: { eligible?: boolean; reason?: string | null };
   renders?: {
     status?: string;
@@ -133,13 +140,19 @@ export const GEOMETRY_STATES = new Set([
 
 // why the presentation is not approved (State C vs State D, R451-C2.2
 // §1: every cause has its OWN sentence — a render that was never
-// started is never worded as "renderer unavailable", and vice versa)
+// started is never worded as "renderer unavailable", and vice versa).
+// R451-C2.3 §2/§5: the visual-input boundary and the fail-closed
+// release chain get their OWN causes too — a missing canonical GLB is
+// never worded as renderer absence, and an unverifiable release chain
+// is never worded as a gate rejection or as visual readiness.
 export type RenderBlockCause =
   | "renderer_unavailable"
   | "gate_not_passed"
   | "not_attempted"
   | "infrastructure"
-  | "rendering_in_progress";
+  | "rendering_in_progress"
+  | "visual_input_missing"
+  | "release_unverified";
 
 // the closed cause vocabulary — the source pin the test battery walks
 export const RENDER_BLOCK_CAUSES: RenderBlockCause[] = [
@@ -148,6 +161,8 @@ export const RENDER_BLOCK_CAUSES: RenderBlockCause[] = [
   "not_attempted",
   "infrastructure",
   "rendering_in_progress",
+  "visual_input_missing",
+  "release_unverified",
 ];
 
 export interface BlockedCopy {
@@ -173,6 +188,9 @@ export interface PresentationView {
   renderBlockCause?: RenderBlockCause;
   /** the recorded detail line for the render-blocked state, verbatim */
   renderBlockDetail?: string | null;
+  /** R451-C2.3 §1: the contract's recorded ENGINEERING authority —
+   * the ribbon title never claims engineering without it */
+  engineeringAuthority?: "ENGINEERING" | "CONCEPTUAL" | "UNKNOWN" | null;
   /** case B: the invention exists but has no physical geometry */
   geometryAbsent?: {
     reason: "not_applicable" | "generation_failed";
@@ -246,11 +264,45 @@ export function renderBlockedCopy(cause?: RenderBlockCause): {
       line: "Engineering model ready. Presentation render in progress.",
     };
   }
+  if (cause === "visual_input_missing") {
+    // R451-C2.3 §2 — the engineering geometry is ready but the
+    // canonical GLB the Visual Compiler consumes was not produced:
+    // a valid STEP alone never satisfies the visual boundary
+    return {
+      title: "ENGINEERING MODEL READY",
+      line: "Engineering model ready. The canonical 3D model file " +
+        "required for presentation rendering was not produced on " +
+        "this run.",
+    };
+  }
+  if (cause === "release_unverified") {
+    // R451-C2.3 §5 — the gate passed but the release chain failed
+    // closed (identity mismatch / missing release artifacts / hero
+    // not the canonical GLB): never worded as visual readiness
+    return {
+      title: "ENGINEERING MODEL READY",
+      line: "Engineering model ready. The presentation could not be " +
+        "verified against the canonical geometry.",
+    };
+  }
   // State C — the renderer itself is unavailable in this environment
   return {
     title: "ENGINEERING MODEL READY",
     line: "Engineering model ready. Presentation renderer unavailable.",
   };
+}
+
+// R451-C2.3 §1 — the ribbon's title is authority-aware: the
+// ENGINEERING MODEL READY claim exists ONLY when the artifact
+// contract's recorded authority says ENGINEERING. A CONCEPTUAL
+// artifact and an UNKNOWN-authority (legacy boolean-only) artifact
+// stay readable but NEVER inherit the engineering claim.
+export function renderBlockedTitle(
+  authority?: "ENGINEERING" | "CONCEPTUAL" | "UNKNOWN" | null,
+): string {
+  if (authority === "ENGINEERING") return "ENGINEERING MODEL READY";
+  if (authority === "CONCEPTUAL") return "CONCEPTUAL MODEL";
+  return "GEOMETRY AUTHORITY UNVERIFIED";
 }
 
 export function resolvePresentationState(
@@ -307,7 +359,10 @@ export function resolvePresentationState(
     if (gstate === "geometry_available" ||
         gstate === "visual_render_failed") {
       // States C/D — the canonical GLB exists and stays interactive;
-      // `presentation_cause` (backend-typed) picks the exact copy
+      // `presentation_cause` (backend-typed) picks the exact copy;
+      // R451-C2.3 §1: the ribbon title follows the contract's
+      // recorded ENGINEERING authority (legacy/UNKNOWN authority
+      // never claims ENGINEERING MODEL READY)
       return {
         state: "GEOMETRY_READY_RENDER_BLOCKED",
         infrastructurePaused: false,
@@ -315,6 +370,7 @@ export function resolvePresentationState(
         renderBlockCause: (design?.presentation_cause ??
           undefined) as RenderBlockCause | undefined,
         renderBlockDetail: design?.geometry_state_detail ?? null,
+        engineeringAuthority: design?.engineering_authority ?? null,
       };
     }
     if (gstate === "geometry_not_applicable" ||

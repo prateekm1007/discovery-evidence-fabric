@@ -26,6 +26,7 @@ interpretation). Covered here:
 """
 from __future__ import annotations
 
+import json
 import sys
 from pathlib import Path
 
@@ -55,9 +56,37 @@ def _session(status="COMPLETE", run_dir=None, final_status=None,
     }
 
 
-def _geom_state(geom=None, renders=None, running=False):
+def _geom_state(geom=None, renders=None, running=False, session=None):
     return dossier_mod._geometry_state(
-        {}, geom or {}, renders or {}, running)
+        session or {}, geom or {}, renders or {}, running)
+
+
+def _conceptual_run(tmp_path, name="ts_c21_conceptual"):
+    """A verified CONCEPTUAL artifact run (R451-C2.3 supersession
+    basis): the pre-contract CIO-renders fallback fires exactly when
+    the contract establishes geometry but the join is undecided — a
+    conceptual authority run with render-side facts in the projection."""
+    import hashlib
+    import json as _json
+    run = tmp_path / name
+    (run / "MODEL").mkdir(parents=True)
+    glb = run / "MODEL" / "model-001.glb"
+    glb.write_bytes(b"conceptual-scene-bytes")
+    identity = {
+        "artifact": "ARTIFACT_IDENTITY", "run_id": name,
+        "generation_id": "gen-1",
+        "geometry_hash": hashlib.sha256(glb.read_bytes()).hexdigest(),
+        "glb_disk_sha256": hashlib.sha256(
+            glb.read_bytes()).hexdigest(),
+        "visualizability_class": "SYSTEM_3D"}
+    (run / "MODEL"
+     / "ARTIFACT_IDENTITY.json").write_text(_json.dumps(identity))
+    (run / "BRIDGE_REPORT.json").write_text(_json.dumps({
+        "outcome": "COMPLETED",
+        "visualizability_class": "SYSTEM_3D",
+        "geometry": {"generation_id": "gen-1",
+                     "visualizability_class": "SYSTEM_3D"}}))
+    return run
 
 
 # ---------------------------------------------------------------------------
@@ -79,46 +108,75 @@ class TestGeometryStates:
         assert out["geometry_state"] == "geometry_generation_failed"
         assert "CAD_BUILD_FAILURE" in out["geometry_state_detail"]
 
-    def test_state_c_renderer_unavailable(self):
-        out = _geom_state({"present": True},
-                          {"status": "RENDER_FAILED"})
+    def test_state_c_renderer_unavailable(self, tmp_path):
+        """R451-C2.3 SUPERSESSION: the CIO-renders fallback fires when
+        the contract establishes geometry (here: verified conceptual
+        artifact) and the join is undecided — the render-side fact in
+        the projection decides the sentence."""
+        run = _conceptual_run(tmp_path)
+        out = _geom_state(
+            {"present": True, "glb": "/api/run/x/model", "step": []},
+            {"status": "RENDER_FAILED"},
+            session=_session(run_dir=run))
         assert out["geometry_state"] == "visual_render_failed"
         assert out["presentation_cause"] == "renderer_unavailable"
 
-    def test_state_c_infra_skip(self):
-        out = _geom_state({"present": True},
-                          {"status": "RENDER_SKIPPED_LOW_MEMORY",
-                           "note": "below the memory floor"})
+    def test_state_c_infra_skip(self, tmp_path):
+        run = _conceptual_run(tmp_path)
+        out = _geom_state(
+            {"present": True, "glb": "/api/run/x/model", "step": []},
+            {"status": "RENDER_SKIPPED_LOW_MEMORY",
+             "note": "below the memory floor"},
+            session=_session(run_dir=run))
         assert out["geometry_state"] == "visual_render_failed"
         assert out["presentation_cause"] == "infrastructure"
         assert out["geometry_state_detail"] == "below the memory floor"
 
-    def test_geometry_available_never_attempted(self):
-        out = _geom_state({"present": True}, {})
+    def test_geometry_available_never_attempted(self, tmp_path):
+        run = _conceptual_run(tmp_path)
+        out = _geom_state(
+            {"present": True, "glb": "/api/run/x/model", "step": []},
+            {}, session=_session(run_dir=run))
         assert out["geometry_state"] == "geometry_available"
         assert out["presentation_cause"] == "not_attempted"
 
-    def test_state_d_gate_not_passed(self):
-        out = _geom_state({"present": True},
-                          {"status": "OK",
-                           "visual_gate": {"verdict": "FAIL"}})
+    def test_state_d_gate_not_passed(self, tmp_path):
+        run = _conceptual_run(tmp_path)
+        out = _geom_state(
+            {"present": True, "glb": "/api/run/x/model", "step": []},
+            {"status": "OK", "visual_gate": {"verdict": "FAIL"}},
+            session=_session(run_dir=run))
         assert out["geometry_state"] == "visual_render_failed"
         assert out["presentation_cause"] == "gate_not_passed"
         assert "integrity gate returned FAIL" in out["geometry_state_detail"]
 
-    def test_state_d_partial_is_also_gate_not_passed(self):
-        out = _geom_state({"present": True},
-                          {"status": "OK",
-                           "visual_gate": {"verdict": "PARTIAL"}})
+    def test_state_d_partial_is_also_gate_not_passed(self, tmp_path):
+        run = _conceptual_run(tmp_path)
+        out = _geom_state(
+            {"present": True, "glb": "/api/run/x/model", "step": []},
+            {"status": "OK", "visual_gate": {"verdict": "PARTIAL"}},
+            session=_session(run_dir=run))
         assert out["presentation_cause"] == "gate_not_passed"
 
-    def test_state_e_visual_complete(self):
+    def test_state_e_visual_complete(self, tmp_path):
+        run = _conceptual_run(tmp_path)
         for verdict in ("PASS", "COMPLETE_PASS"):
-            out = _geom_state({"present": True},
-                              {"status": "OK",
-                               "visual_gate": {"verdict": verdict}})
+            out = _geom_state(
+                {"present": True, "glb": "/api/run/x/model", "step": []},
+                {"status": "OK", "visual_gate": {"verdict": verdict}},
+                session=_session(run_dir=run))
             assert out["geometry_state"] == "visual_complete", verdict
             assert out["presentation_cause"] is None
+
+    def test_legacy_boolean_is_never_geometry_available(self):
+        """R451-C2.3 §1 SUPERSESSION (was: present=true alone reached
+        the fallback): a boolean-only projection establishes nothing —
+        the honest state is upstream_not_reached with the recorded
+        legacy detail, and the authority stays UNKNOWN."""
+        out = _geom_state({"present": True}, {})
+        assert out["geometry_state"] == "upstream_not_reached"
+        assert out["geometry_contract"]["engineering_authority"] == \
+            "UNKNOWN"
 
     def test_upstream_not_reached_running(self):
         out = _geom_state({"present": False}, {}, running=True)
@@ -205,10 +263,18 @@ class TestPipelineStrip:
         assert rows["evidence"]["status"] == "NOT_REACHED"
 
     def test_success_run_all_received(self, tmp_path):
+        """R451-C2.3 SUPERSESSION: the strip's fixtures carry the FULL
+        canonical shapes — the invention record at its required
+        validity state, and the design projection with the contract's
+        ENGINEERING authority (the milestone is authority-gated)."""
         run = tmp_path / "ts_success"
         run.mkdir()
         (run / "problem.json").write_text("{}")
-        (run / "INVENTION_SPECIFICATION.json").write_text("{}")
+        (run / "INVENTION_SPECIFICATION.json").write_text(json.dumps({
+            "invention_id": "INV-S",
+            "problem": "sediment erosion in hydropower turbines",
+            "mechanism": "sediment-bypassing runner inlet geometry",
+            "causal_chain": ["a", "b", "c"]}))
         (run / "ENGINEERING_SPECIFICATION.json").write_text("{}")
         (run / "envelope_SYNTHESIZE.json").write_text(
             '{"stage_log": [{"stage": "SYNTHESIZE", "status": "OK"}]}')
@@ -220,7 +286,9 @@ class TestPipelineStrip:
              "invention_state": {"state": "EXISTS"}},
             {"retrieval_state": "RETRIEVED", "retrieved_count": 7,
              "used_count": 3},
-            {"geometry_state": "visual_complete"})
+            {"geometry_state": "visual_complete",
+             "geometry_contract": {
+                 "engineering_authority": "ENGINEERING"}})
         by_key = {r["key"]: r for r in rows}
         for key in dossier_mod.PIPELINE_STAGES:
             assert by_key[key]["status"] == "RECEIVED", key
@@ -254,26 +322,28 @@ class TestPipelineStrip:
         assert viz.get("detail") == "below the memory floor"
 
     def test_engineering_row_receives_on_typed_geometry(self):
-        """The engineering row consumes the typed geometry_state — a
-        geometry-available run RECEIVED engineering even when the
-        artifacts check is inconclusive."""
+        """R451-C2.3 SUPERSESSION: the engineering row RECEIVES on the
+        typed geometry state AND the contract's ENGINEERING authority
+        (the authority-gated milestone) — presence alone never does."""
         rows = dossier_mod.pipeline_projection(
             _session(), None, False,
             {"package_state": {"state": "NOT_PRODUCED"}},
             {"retrieval_state": "RETRIEVED", "retrieved_count": 4},
             {"geometry_state": "geometry_available",
-             "presentation_cause": "not_attempted"})
+             "presentation_cause": "not_attempted",
+             "geometry_contract": {
+                 "engineering_authority": "ENGINEERING"}})
         eng = next(r for r in rows if r["key"] == "engineering")
         assert eng["status"] == "RECEIVED"
 
     def test_package_blocked_is_typed_not_auto_infra(self):
         """R451-C2.2 §4 SUPERSESSION: BLOCKED is NOT automatically an
-        infrastructure pause — the quality-gate reason classifies as
-        PACKAGE_INTEGRITY and stops the row (the C2.1 expectation of
-        PAUSED_INFRASTRUCTURE here is superseded by the directive)."""
+        infrastructure pause — R451-C2.3 §7: the TYPED stage decides
+        (the free-text reason is carried verbatim, never classified)."""
         rows = dossier_mod.pipeline_projection(
             _session(), None, False,
             {"package_state": {"state": "BLOCKED",
+                               "blocked_stage": "QUALITY_GATE_BLOCKED",
                                "blocked_reason": "the quality gate "
                                                  "did not pass"}},
             {"retrieval_state": "RETRIEVED", "retrieved_count": 4},

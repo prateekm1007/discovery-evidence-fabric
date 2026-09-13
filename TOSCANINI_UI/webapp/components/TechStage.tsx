@@ -44,6 +44,7 @@ import type { PresentationView } from "@/lib/presentationState";
 import {
   GEOMETRY_ABSENT_COPY,
   renderBlockedCopy,
+  renderBlockedTitle,
 } from "@/lib/presentationState";
 import { retryPresentation } from "@/lib/api";
 import InfrastructureBlockedHero from "./InfrastructureBlockedHero";
@@ -115,6 +116,21 @@ function stageStatus(view: PresentationView): {
           };
         case "rendering_in_progress":
           return { label: "Model ready — rendering in progress", tone: "live" };
+        case "visual_input_missing":
+          // R451-C2.3 §2 — the canonical GLB the Visual Compiler
+          // consumes was not produced: a STEP alone never satisfies
+          // the visual boundary
+          return {
+            label: "Model ready — canonical 3D model file not produced",
+            tone: "infra",
+          };
+        case "release_unverified":
+          // R451-C2.3 §5 — the gate passed but the release chain
+          // failed closed: never worded as visual readiness
+          return {
+            label: "Model rendered — release chain unverified",
+            tone: "infra",
+          };
         default:
           return { label: "Model ready — renderer unavailable", tone: "infra" };
       }
@@ -482,12 +498,17 @@ export default function TechStage({
       {view.state === "GEOMETRY_READY_RENDER_BLOCKED" && (() => {
         // R451-C2.1: States C and D — the exact copy per the backend's
         // typed presentation_cause; the canonical GLB stays interactive
-        // in the viewer below either way
+        // in the viewer below either way. R451-C2.3 §1: the ribbon's
+        // TITLE is authority-aware — the ENGINEERING MODEL READY claim
+        // exists only when the contract's recorded authority says
+        // ENGINEERING (a CONCEPTUAL or UNKNOWN-authority artifact
+        // stays readable, never engineering).
         const rb = renderBlockedCopy(view.renderBlockCause);
+        const title = renderBlockedTitle(view.engineeringAuthority);
         return (
         <div className="render-blocked-ribbon" data-render-blocked-ribbon>
           <div className="rbr-main">
-            <span className="rbr-title">{rb.title}</span>
+            <span className="rbr-title" data-render-blocked-title>{title}</span>
             <span className="rbr-sub faint">{rb.line}</span>
           </div>
           <div className="rbr-actions">

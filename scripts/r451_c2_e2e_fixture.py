@@ -105,6 +105,93 @@ def _make_glb(path: Path) -> None:
     s.export(path, file_type="glb")
 
 
+def _full_invention_spec(arch_note: str) -> dict:
+    """The canonical invention record shape the engine itself writes
+    (R451-C2.3 §4: the strip's Invention milestone consumes the
+    record's REQUIRED VALIDITY STATE — the fixtures carry the same
+    core-field shape a real run produces)."""
+    return {
+        "invention_id": "INV-R451C2-FIXTURE",
+        "problem": ("hydropower turbine blade erosion from "
+                    "high-sediment water (FIXTURE problem context)"),
+        "mechanism": ("sediment-bypassing runner inlet geometry that "
+                      "keeps abrasive particles out of the blade "
+                      f"boundary layer ({arch_note})"),
+        "causal_chain": [
+            "abrasive sediment entrains in the runner inlet flow",
+            "the bypass passage routes the sediment-bearing layer "
+            "away from the blade boundary layer",
+            "blade surface erosion exposure drops accordingly",
+        ],
+        "novelty_hypothesis": (
+            "FIXTURE: the bypass-passage placement relative to the "
+            "inlet velocity field is the hypothesized novel causal "
+            "arrangement (novelty SIGNAL only — never a legal "
+            "determination)"),
+        "intervention": "inlet sediment bypass + hardened blade coating",
+        "evidence": [],
+    }
+
+
+def _seed_engineering_identity(run_dir: Path, session_id: str) -> None:
+    """R451-C2.3 §1: the recorded engineering identity chain the
+    production bridge itself persists — MODEL/GEOMETRY_SPEC.json,
+    MODEL/ARTIFACT_IDENTITY.json (geometry_hash == the GLB bytes on
+    disk), and BRIDGE_REPORT.json with outcome COMPLETED and the
+    ENGINEERING_3D class. The artifact contract's authority verdict
+    reads THIS recorded chain (presence alone never claims
+    engineering)."""
+    model_dir = run_dir / "MODEL"
+    glb = model_dir / "engineering_model.glb"
+    glb_sha = hashlib.sha256(glb.read_bytes()).hexdigest()
+    spec = {
+        "artifact": "GEOMETRY_SPEC",
+        "schema_version": "1.0.0",
+        "technology_class": "hydropower_runner_fixture",
+        "domain_family": "fluid",
+        "parameters": [
+            {"param_id": "runner_diameter_mm", "value": 240.0,
+             "unit": "mm", "value_class": "MODELLED"},
+            {"param_id": "bypass_fraction", "value": 0.18,
+             "unit": "ratio", "value_class": "MODELLED"},
+        ],
+    }
+    spec_sha = hashlib.sha256(
+        json.dumps(spec, sort_keys=True).encode()).hexdigest()
+    spec["spec_sha256"] = spec_sha
+    (model_dir / "GEOMETRY_SPEC.json").write_text(json.dumps(spec))
+    spec_file_sha = hashlib.sha256(
+        (model_dir / "GEOMETRY_SPEC.json").read_bytes()).hexdigest()
+    identity = {
+        "artifact": "ARTIFACT_IDENTITY",
+        "identity_version": "r451c2-fixture",
+        "technology_id": "ts-fixture-runner",
+        "run_id": session_id,
+        "generation_id": "gen-1",
+        "geometry_hash": glb_sha,
+        "source_geometry_hash": spec_sha,
+        "glb_path": str(glb),
+        "glb_disk_sha256": glb_sha,
+        "glb_matches_geometry_hash": True,
+        "visualizability_class": "ENGINEERING_3D",
+        "domain_family": "fluid",
+    }
+    (model_dir / "ARTIFACT_IDENTITY.json").write_text(
+        json.dumps(identity, indent=2, sort_keys=True) + "\n")
+    (run_dir / "BRIDGE_REPORT.json").write_text(json.dumps({
+        "artifact": "BRIDGE_REPORT",
+        "outcome": "COMPLETED",
+        "visualizability_class": "ENGINEERING_3D",
+        "geometry": {
+            "generation_id": "gen-1",
+            "visualizability_class": "ENGINEERING_3D",
+            "artifact_identity": identity,
+            "domain_family": "fluid",
+        },
+    }))
+    return spec_file_sha
+
+
 def seed() -> None:
     data = _load()
     data["sessions"] = [s for s in data.get("sessions", [])
@@ -136,6 +223,10 @@ def seed() -> None:
     glb_sha = hashlib.sha256(
         (run_dir / "MODEL" / "engineering_model.glb").read_bytes()
     ).hexdigest()
+    # R451-C2.3: the recorded engineering identity chain (spec +
+    # identity + bridge report) — the success fixture carries the SAME
+    # recorded shape a real bridge completion produces
+    spec_file_sha = _seed_engineering_identity(run_dir, SUCCESS_ID)
     m3d = run_dir / "MODEL" / "3D"
     m3d.mkdir(parents=True, exist_ok=True)
     png = _tiny_png()
@@ -159,21 +250,24 @@ def seed() -> None:
         "source_glb_sha256": glb_sha,
         "visual_gate": {"verdict": "COMPLETE_PASS"},
         "scene_spec": {"model": {"node_count": 3}},
+        # R451-C2.3 §5 rung 7: the real render record carries each
+        # view's own hash — the exported hero.glb's provenance is part
+        # of the release chain
+        "views": {"hero.glb": {"sha256": glb_sha}},
         "out_dir": str(m3d)}))
     (m3d / "VISUAL_COMPILER_INVOCATION.json").write_text(json.dumps({
         "kind": "VISUAL_COMPILER_INVOCATION",
+        "schema_version": "1.1.0",
         "run_id": SUCCESS_ID, "generation_id": "gen-1",
-        "canonical_glb_sha256": glb_sha,
-        "compiler_version": "VISUAL_COMPILER_HEADLESS_THREE",
-        "invoked_at": now, "status": "OK", "skip_reason": None,
+        "glb_sha256": glb_sha,
+        "geometry_spec_sha256": spec_file_sha,
+        "visual_compiler_version": "VISUAL_COMPILER_HEADLESS_THREE",
+        "invoked_at": now, "invocation_status": "OK", "skip_reason": None,
+        "render_record_reference": str(m3d / "render_record.json"),
         "output_directory": str(m3d)}))
-    (run_dir / "INVENTION_SPECIFICATION.json").write_text(json.dumps({
-        "mechanism": ("sediment-bypassing runner inlet geometry that "
-                      "keeps abrasive particles out of the blade "
-                      "boundary layer (FIXTURE architecture for the "
-                      "success-hero regression)"),
-        "intervention": "inlet sediment bypass + hardened blade coating",
-        "evidence": []}))
+    (run_dir / "INVENTION_SPECIFICATION.json").write_text(json.dumps(
+        _full_invention_spec(
+            "FIXTURE architecture for the success-hero regression")))
     (run_dir / "session.json").write_text(json.dumps(
         {"status": "COMPLETE"}))
     data["sessions"].append({
@@ -200,10 +294,13 @@ def seed() -> None:
         import shutil
         shutil.rmtree(run_b)
     run_b.mkdir(parents=True)
-    (run_b / "INVENTION_SPECIFICATION.json").write_text(json.dumps({
-        "mechanism": ("a software-only scheduling mechanism (FIXTURE: "
-                      "an invention class with no physical geometry)"),
-        "intervention": "scheduler parametrization", "evidence": []}))
+    (run_b / "INVENTION_SPECIFICATION.json").write_text(json.dumps(
+        {**_full_invention_spec(
+            "FIXTURE: a software-only scheduling invention class with "
+            "no physical geometry"),
+         "mechanism": (
+             "a software-only scheduling mechanism (FIXTURE: an "
+             "invention class with no physical geometry)")}))
     (run_b / "BRIDGE_REPORT.json").write_text(json.dumps({
         "outcome": "NOT_VISUALIZABLE",
         "visualizability_class": "NOT_VISUALIZABLE",
@@ -239,6 +336,7 @@ def seed() -> None:
         "skip_reason": ("FIXTURE: free-plan memory floor — the typed "
                         "infrastructure skip"),
         "out_dir": str(m3d_c)}))
+    _seed_engineering_identity(run_c, STATE_C_ID)
     (m3d_c / "VISUAL_COMPILER_INVOCATION.json").write_text(json.dumps({
         "kind": "VISUAL_COMPILER_INVOCATION",
         "run_id": STATE_C_ID, "generation_id": "gen-1",
@@ -249,9 +347,9 @@ def seed() -> None:
         "invoked_at": now, "status": "RENDER_SKIPPED_LOW_MEMORY",
         "skip_reason": "LOW_MEMORY",
         "output_directory": str(m3d_c)}))
-    (run_c / "INVENTION_SPECIFICATION.json").write_text(json.dumps({
-        "mechanism": "FIXTURE mechanism (state C renderer unavailable)",
-        "intervention": "inlet bypass", "evidence": []}))
+    (run_c / "INVENTION_SPECIFICATION.json").write_text(json.dumps(
+        _full_invention_spec("FIXTURE mechanism (state C renderer "
+                             "unavailable)")))
     (run_c / "session.json").write_text(json.dumps(
         {"status": "COMPLETE"}))
     data["sessions"].append({
@@ -289,6 +387,7 @@ def seed() -> None:
         "gate_version": "r451c21-fixture", "verdict": "FAIL",
         "hero_suppressed": True, "release_blocked": True,
         "failed_rules": ["occupancy_band"]}))
+    _seed_engineering_identity(run_d, STATE_D_ID)
     (m3d_d / "VISUAL_COMPILER_INVOCATION.json").write_text(json.dumps({
         "kind": "VISUAL_COMPILER_INVOCATION",
         "run_id": STATE_D_ID, "generation_id": "gen-1",
@@ -296,9 +395,9 @@ def seed() -> None:
         "compiler_version": "VISUAL_COMPILER_HEADLESS_THREE",
         "invoked_at": now, "status": "OK", "skip_reason": None,
         "output_directory": str(m3d_d)}))
-    (run_d / "INVENTION_SPECIFICATION.json").write_text(json.dumps({
-        "mechanism": "FIXTURE mechanism (state D gate rejected)",
-        "intervention": "inlet bypass", "evidence": []}))
+    (run_d / "INVENTION_SPECIFICATION.json").write_text(json.dumps(
+        _full_invention_spec("FIXTURE mechanism (state D gate "
+                             "rejected)")))
     (run_d / "session.json").write_text(json.dumps(
         {"status": "COMPLETE"}))
     data["sessions"].append({
@@ -336,6 +435,7 @@ def _seed_c22(data: dict, now: str) -> None:
     _make_glb(run_na / "MODEL" / "engineering_model.glb")
     m3d_na = run_na / "MODEL" / "3D"
     m3d_na.mkdir(parents=True)
+    _seed_engineering_identity(run_na, C22_NOT_ATTEMPTED_ID)
     (m3d_na / "RENDER_JOB.json").write_text(json.dumps({
         "artifact": "RENDER_JOB",
         "session_id": C22_NOT_ATTEMPTED_ID,
@@ -345,9 +445,9 @@ def _seed_c22(data: dict, now: str) -> None:
         "error": ("FIXTURE: seeded terminal job record — the recovery "
                   "sweep must not heal this no-invocation capture"),
     }))
-    (run_na / "INVENTION_SPECIFICATION.json").write_text(json.dumps({
-        "mechanism": "FIXTURE mechanism (not_attempted join state)",
-        "intervention": "inlet bypass", "evidence": []}))
+    (run_na / "INVENTION_SPECIFICATION.json").write_text(json.dumps(
+        _full_invention_spec("FIXTURE mechanism (not_attempted join "
+                             "state)")))
     (run_na / "session.json").write_text(json.dumps({"status": "COMPLETE"}))
     data["sessions"].append({
         "session_id": C22_NOT_ATTEMPTED_ID,
@@ -368,6 +468,7 @@ def _seed_c22(data: dict, now: str) -> None:
     _make_glb(run_is / "MODEL" / "engineering_model.glb")
     m3d_is = run_is / "MODEL" / "3D"
     m3d_is.mkdir(parents=True)
+    _seed_engineering_identity(run_is, C22_INFRA_SKIP_ID)
     (m3d_is / "VISUAL_COMPILER_INVOCATION.json").write_text(json.dumps({
         "kind": "VISUAL_COMPILER_INVOCATION",
         "schema_version": "1.1.0",
@@ -392,9 +493,8 @@ def _seed_c22(data: dict, now: str) -> None:
         "error": ("FIXTURE: seeded terminal job record — the recovery "
                   "sweep must not heal this infrastructure-skip capture"),
     }))
-    (run_is / "INVENTION_SPECIFICATION.json").write_text(json.dumps({
-        "mechanism": "FIXTURE mechanism (infrastructure skip)",
-        "intervention": "inlet bypass", "evidence": []}))
+    (run_is / "INVENTION_SPECIFICATION.json").write_text(json.dumps(
+        _full_invention_spec("FIXTURE mechanism (infrastructure skip)")))
     (run_is / "session.json").write_text(json.dumps({"status": "COMPLETE"}))
     data["sessions"].append({
         "session_id": C22_INFRA_SKIP_ID,
@@ -415,6 +515,7 @@ def _seed_c22(data: dict, now: str) -> None:
     _make_glb(run_rp / "MODEL" / "engineering_model.glb")
     m3d_rp = run_rp / "MODEL" / "3D"
     m3d_rp.mkdir(parents=True)
+    _seed_engineering_identity(run_rp, C22_RENDER_IN_PROGRESS_ID)
     (m3d_rp / "RENDER_JOB.json").write_text(json.dumps({
         "artifact": "RENDER_JOB", "session_id": C22_RENDER_IN_PROGRESS_ID,
         "status": "RUNNING", "enqueued_by": "bridge_gate",
@@ -424,9 +525,8 @@ def _seed_c22(data: dict, now: str) -> None:
         "note": ("FIXTURE: the async artifact build is running — the "
                  "live pid keeps the recovery sweep out of this "
                  "explicit-pending capture")}))
-    (run_rp / "INVENTION_SPECIFICATION.json").write_text(json.dumps({
-        "mechanism": "FIXTURE mechanism (render in progress)",
-        "intervention": "inlet bypass", "evidence": []}))
+    (run_rp / "INVENTION_SPECIFICATION.json").write_text(json.dumps(
+        _full_invention_spec("FIXTURE mechanism (render in progress)")))
     (run_rp / "session.json").write_text(json.dumps({"status": "COMPLETE"}))
     data["sessions"].append({
         "session_id": C22_RENDER_IN_PROGRESS_ID,
@@ -447,6 +547,7 @@ def _seed_c22(data: dict, now: str) -> None:
     _make_glb(run_pv / "MODEL" / "engineering_model.glb")
     m3d_pv = run_pv / "MODEL" / "3D"
     m3d_pv.mkdir(parents=True)
+    _seed_engineering_identity(run_pv, C22_PKG_VISUAL_GATE_ID)
     # the recorded Art. LXXII release block (the gate never passed)
     (m3d_pv / "HERO_RELEASE_STATE.json").write_text(json.dumps({
         "verdict": "FAIL", "release_blocked": True,
@@ -467,9 +568,9 @@ def _seed_c22(data: dict, now: str) -> None:
         "error": ("FIXTURE: seeded terminal job record — the recovery "
                   "sweep must not heal this visual-gate-block capture"),
     }))
-    (run_pv / "INVENTION_SPECIFICATION.json").write_text(json.dumps({
-        "mechanism": "FIXTURE mechanism (package visual-gate block)",
-        "intervention": "inlet bypass", "evidence": []}))
+    (run_pv / "INVENTION_SPECIFICATION.json").write_text(json.dumps(
+        _full_invention_spec("FIXTURE mechanism (package visual-gate "
+                             "block)")))
     (run_pv / "session.json").write_text(json.dumps({"status": "COMPLETE"}))
     data["sessions"].append({
         "session_id": C22_PKG_VISUAL_GATE_ID,

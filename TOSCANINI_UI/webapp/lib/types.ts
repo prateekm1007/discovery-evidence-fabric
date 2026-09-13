@@ -751,6 +751,15 @@ export interface DossierTab {
   visual_join_cause?: string | null;
   pending_render_job?: string | null;
   geometry_contract?: Record<string, unknown> | null;
+  // R451-C2.3 §1/§2: the contract's ENGINEERING authority verdict and
+  // the two separated boundary states — ENGINEERING_GEOMETRY_READY
+  // (verified artifact + explicit engineering authority) and
+  // VISUAL_INPUT_READY (the canonical GLB contract the Visual
+  // Compiler consumes; a valid STEP never satisfies it by itself)
+  engineering_authority?: "ENGINEERING" | "CONCEPTUAL" | "UNKNOWN" | null;
+  engineering_geometry_ready?: boolean;
+  visual_input_ready?: boolean;
+  visual_input_basis?: string | null;
 }
 
 export interface FalsificationRecord {
@@ -790,7 +799,8 @@ export interface DossierBody {
 // the frontend renders it verbatim.
 // R451-C2.2 — `blocked_class` carries the typed blocked reason class
 // (VISUAL_GATE / PACKAGE_INTEGRITY / SCIENTIFIC / INFRASTRUCTURE /
-// JOIN_FAILURE / NOT_ATTEMPTED / RENDERER_UNAVAILABLE) when the row is
+// JOIN_FAILURE / NOT_ATTEMPTED / RENDERER_UNAVAILABLE /
+// RELEASE_UNVERIFIED / VISUAL_INPUT) when the row is
 // stopped or paused — the directive's blocked-status disambiguation,
 // backend-owned and rendered verbatim.
 export interface PipelineStage {

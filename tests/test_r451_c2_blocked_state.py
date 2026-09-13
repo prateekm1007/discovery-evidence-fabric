@@ -274,10 +274,12 @@ class TestInvocationReceipt:
 # ---------------------------------------------------------------------------
 class TestWatchdog:
     def _healthy_fixture(self, tmp_path: Path, name: str = "ts_watchdog_ok") -> Path:
-        """A synthetically healthy run dir: GLB + receipt (rendered) +
+        """A synthetically healthy run dir: GLB + the recorded identity
+        chain (R451-C2.3: the engineering authority reads recorded
+        identity documents) + receipt (rendered, spec sha matching) +
         gate COMPLETE_PASS + the full ladder + render record with the
-        true source hash. File-level fixture — the watchdog is a
-        deterministic file-rule checker."""
+        true source hash + the hero.glb provenance hash. File-level
+        fixture — the watchdog is a deterministic file-rule checker."""
         import hashlib
         run = tmp_path / name
         m3d = run / "MODEL" / "3D"
@@ -285,20 +287,42 @@ class TestWatchdog:
         glb = run / "MODEL" / "engineering_model.glb"
         glb.write_bytes(b"fake-glb-bytes")
         glb_sha = hashlib.sha256(glb.read_bytes()).hexdigest()
+        spec = {"artifact": "GEOMETRY_SPEC", "parameters": []}
+        spec["spec_sha256"] = hashlib.sha256(json.dumps(
+            {k: v for k, v in spec.items() if k != "spec_sha256"},
+            sort_keys=True).encode()).hexdigest()
+        (run / "MODEL" / "GEOMETRY_SPEC.json").write_text(json.dumps(spec))
+        spec_file_sha = hashlib.sha256(
+            (run / "MODEL" / "GEOMETRY_SPEC.json").read_bytes()).hexdigest()
+        identity = {
+            "artifact": "ARTIFACT_IDENTITY", "run_id": run.name,
+            "generation_id": "gen-1", "geometry_hash": glb_sha,
+            "source_geometry_hash": spec["spec_sha256"],
+            "glb_path": str(glb), "glb_disk_sha256": glb_sha,
+            "glb_matches_geometry_hash": True,
+            "visualizability_class": "ENGINEERING_3D"}
+        (run / "MODEL"
+         / "ARTIFACT_IDENTITY.json").write_text(json.dumps(identity))
+        (run / "BRIDGE_REPORT.json").write_text(json.dumps({
+            "outcome": "COMPLETED",
+            "visualizability_class": "ENGINEERING_3D",
+            "geometry": {"generation_id": "gen-1",
+                         "visualizability_class": "ENGINEERING_3D",
+                         "artifact_identity": identity}}))
         (m3d / "VISUAL_COMPILER_INVOCATION.json").write_text(json.dumps({
             "kind": "VISUAL_COMPILER_INVOCATION",
             "run_id": run.name, "generation_id": "gen-1",
             "glb_sha256": glb_sha,
-            "geometry_spec_sha256": "c" * 64,
+            "geometry_spec_sha256": spec_file_sha,
             "visual_compiler_version": "VISUAL_COMPILER_HEADLESS_THREE",
             "invoked_at": "2026-09-12T00:00:00Z", "invocation_status": "SUCCEEDED",
             "render_record_reference": None,
             "skip_reason": None, "output_directory": str(m3d)}))
         (m3d / "visual_gate.json").write_text(json.dumps(
             {"verdict": "COMPLETE_PASS"}))
-        (m3d / "render_record.json").write_text(json.dumps({
-            "source_glb_sha256": glb_sha,
-            "scene_spec": {"model": {"node_count": 1}}}))
+        rec = {"source_glb_sha256": glb_sha,
+               "scene_spec": {"model": {"node_count": 1}}}
+        (m3d / "render_record.json").write_text(json.dumps(rec))
         from discovery_fabric.engine.visual_compiler import visual_set
         required = visual_set.required_artifacts(
             1, visual_set.DEFAULT_TURNTABLE_FRAMES)["required"]
@@ -306,6 +330,11 @@ class TestWatchdog:
             p = m3d / name
             p.parent.mkdir(parents=True, exist_ok=True)
             p.write_bytes(b"artifact-" + name.encode().replace(b"/", b"_"))
+        # R451-C2.3 §5 rung 7: the exported hero.glb's provenance hash
+        # lives in the render record's own views block
+        rec["views"] = {"hero.glb": {"sha256": hashlib.sha256(
+            (m3d / "hero.glb").read_bytes()).hexdigest()}}
+        (m3d / "render_record.json").write_text(json.dumps(rec))
         (run / "session.json").write_text(json.dumps({"status": "COMPLETE"}))
         return run
 

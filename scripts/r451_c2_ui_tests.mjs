@@ -324,8 +324,70 @@ try {
   {
     const lines = new Set(ps.RENDER_BLOCK_CAUSES.map(
       (c) => ps.renderBlockedCopy(c).line));
-    check("five causes -> five distinct sentences",
-      lines.size === 5);
+    check("seven causes -> seven distinct sentences (R451-C2.3: two new typed causes)",
+      ps.RENDER_BLOCK_CAUSES.length === 7 && lines.size === 7);
+  }
+
+  // R451-C2.3 §2 — the visual-input boundary has its OWN sentence:
+  // a missing canonical GLB is never worded as renderer absence
+  r = resolvePresentationState(detail(), dossier({ tabs: {
+    design: { availability: "AVAILABLE", glb: "/api/run/x/model.glb",
+      geometry_state: "geometry_available",
+      presentation_cause: "visual_input_missing",
+      engineering_authority: "ENGINEERING",
+      visual_input_ready: false,
+      geometry_state_detail:
+        "the engineering geometry is verified but no canonical GLB " +
+        "resolves under the run directory" },
+    evidence: null } }));
+  check("visual_input_missing: own cause, own sentence",
+    r.renderBlockCause === "visual_input_missing" &&
+    ps.renderBlockedCopy(r.renderBlockCause).line ===
+      "Engineering model ready. The canonical 3D model file " +
+      "required for presentation rendering was not produced on " +
+      "this run.");
+
+  // R451-C2.3 §5 — the release chain failing closed has its OWN
+  // sentence and is NEVER worded as visual readiness
+  r = resolvePresentationState(detail(), dossier({ tabs: {
+    design: { availability: "AVAILABLE", glb: "/api/run/x/model.glb",
+      geometry_state: "visual_render_failed",
+      presentation_cause: "release_unverified",
+      engineering_authority: "ENGINEERING",
+      geometry_state_detail:
+        "the gate passed but the release chain fails closed at " +
+        "'invocation_receipt_identity' — not visual ready" },
+    evidence: null } }));
+  check("release_unverified: own cause, own sentence, never VISUAL_READY",
+    r.renderBlockCause === "release_unverified" &&
+    r.state === "GEOMETRY_READY_RENDER_BLOCKED" &&
+    ps.renderBlockedCopy(r.renderBlockCause).line ===
+      "Engineering model ready. The presentation could not be " +
+      "verified against the canonical geometry.");
+
+  // R451-C2.3 §1 — the ribbon title is AUTHORITY-AWARE: the
+  // ENGINEERING MODEL READY claim exists only on the contract's
+  // recorded ENGINEERING authority
+  check("authority-aware title: ENGINEERING authority keeps the claim",
+    ps.renderBlockedTitle("ENGINEERING") === "ENGINEERING MODEL READY");
+  check("authority-aware title: CONCEPTUAL never claims engineering",
+    ps.renderBlockedTitle("CONCEPTUAL") === "CONCEPTUAL MODEL");
+  check("authority-aware title: UNKNOWN (legacy boolean-only) never claims engineering",
+    ps.renderBlockedTitle("UNKNOWN") === "GEOMETRY AUTHORITY UNVERIFIED");
+  check("authority-aware title: absent authority defaults to unverified",
+    ps.renderBlockedTitle(undefined) === "GEOMETRY AUTHORITY UNVERIFIED");
+  {
+    // the view carries the backend's authority verdict into the ribbon
+    const view = resolvePresentationState(detail(), dossier({ tabs: {
+      design: { availability: "AVAILABLE", glb: "/api/run/x/model.glb",
+        geometry_state: "geometry_available",
+        presentation_cause: "not_attempted",
+        engineering_authority: "UNKNOWN" },
+      evidence: null } }));
+    check("the view projects engineering_authority for the ribbon",
+      view.engineeringAuthority === "UNKNOWN" &&
+      ps.renderBlockedTitle(view.engineeringAuthority) ===
+        "GEOMETRY AUTHORITY UNVERIFIED");
   }
 
   // State D — GLB exists, renderer succeeded, gate FAILED
