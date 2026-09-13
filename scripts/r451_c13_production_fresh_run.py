@@ -195,21 +195,32 @@ def _capture_run(session_id: str,
         else {"error": state.get("error")}
     rec["canonical_state_keys"] = sorted(st.keys()) \
         if isinstance(st, dict) else []
+    # the ACTUAL persisted state shapes (Art. X): the state endpoint
+    # carries evidence_state / mechanism_state / attack_state /
+    # evolution_state (the _state-suffixed canonical keys)
+    ev_state = st.get("evidence_state") or {}
+    mech_state = st.get("mechanism_state") or {}
+    atk_state = st.get("attack_state") or {}
     rec["chain"] = {
-        "problem": bool(st.get("problem") or st.get("phase_progression")),
+        "problem": bool(st.get("user_problem")
+                        or st.get("problem")
+                        or st.get("phase_progression")),
         "evidence_present": bool(
-            st.get("evidence")
-            or (st.get("evidence") or {}).get("fabric")),
+            ev_state.get("state") in ("GATHERED", "FROZEN")
+            or ev_state.get("records_found")),
+        "evidence_records": ev_state.get("records_found"),
         "mechanism_present": bool(
-            st.get("mechanism") or st.get("invention")
-            or st.get("mechanisms")),
+            mech_state.get("state") in ("GENERATED", "BUILT")
+            or mech_state.get("mechanism")),
         "attack_present": bool(
-            st.get("attack") or st.get("independent_attack")
-            or st.get("adjudication")),
-        "evolution_present": bool(st.get("evolution")
+            atk_state.get("state") in ("EXECUTED", "ADJUDICATED")
+            or atk_state.get("overall")),
+        "attack_overall": atk_state.get("overall"),
+        "evolution_present": bool(st.get("evolution_state")
                                   or st.get("generations")),
         "experiment_present": bool(st.get("experiment_state")),
         "package_terminal": (st.get("package_state") or {}),
+        "invention_state": st.get("invention_state") or {},
     }
     RUNS_DIR.mkdir(parents=True, exist_ok=True)
     (RUNS_DIR / f"{session_id}_state.json").write_text(

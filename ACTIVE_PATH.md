@@ -375,3 +375,39 @@ model-quality numbers are recorded, never repaired (50% span-verbatim
 synthesis; 13 validator-feedback attempts to a compliant technical
 state — the gates byte-identical throughout, Art. VII). Round record:
 R451/R451_C1_ROUND_RECORD.json.
+
+## R451-C1.3 addendum (2026-09-13) — the production transport authority + provenance closure
+
+Operator directive R451-C1.3: the runtime admission authority and
+run-level routing provenance, delivered and DEPLOYED to production.
+
+| Component | Module | Notes |
+|---|---|---|
+| THE runtime admission authority | `engine/runtime_admission.py` | the five closed states (NOT_PROBED / PROBE_OK / PROBE_FAILED / PROBE_EXPIRED / POLICY_REFUSED); a route is runtime-admissible ONLY with a current measured successful capability probe through the rung's REAL transport (the existing TTL mechanism — no per-call probing); successful real calls refresh the window; real-call transport failures invalidate it; the LOCAL route uses the SAME rule (test-enforced); transient probe failures get one bounded retry, permanent classes never |
+| Run-level routing provenance | `engine/call_context.py` + `run.py` + `model_routing.record_call_outcome/ledger_for_run` | `run_owned_call => run_id != null` FAILS CLOSED in the ledger; the 13 directive fields + capability_state + task_degradation on every line; provider probes are call_class=CAPABILITY_PROBE with run_id=null (legitimately not run-owned); ROUTING_LEDGER_RUN.json isolates one run BY RUN ID (no time-window/ledger-tail inference); the worker passes session_id; the durable push carries the ledger + capability store off the ephemeral container |
+| Explicit task degradation | `llm_registry.generate()` + `mechanism_space.assemble_candidate` | requested_task / actual_task_capability / task_capability_match / degraded_reason on every selected line and in the candidate's derivation trace — a CHEAP_EMERGENCY_FALLBACK candidate is never read as STRONG reasoning |
+| Catalog-discovered semantics | `model_routing._catalog_records` | DISCOVERED -> only catalog-present models are candidates (pinned-but-absent defaults are stale identifiers, never attempted); UNDISCOVERED -> PINNED_DEFAULT explicitly marked; the family allowlist stays |
+| MODEL_NOT_FOUND recovery | `model_routing.clear_known_dead_if_relisted` | a FRESH catalog relisting clears the known-dead mark and invalidates the stale capability record (deterministic, append-only recovery events; a TTL cache hit does not clear) |
+| THE unified admission semantic | `llm_registry.select_provider()` + `generate()` | one runtime_admission() (available AND cost_policy_eligible AND measured_capability_eligible); no legacy weaker selector |
+| The Space's OWN zero-paid route | `scripts/r447_hf_deploy.py` hunks + `toscanini/container-entrypoint.sh` | llama.cpp llama-server built from the pinned tag b10930 + the sha-pinned Qwen3-1.7B Q4_K_M GGUF (fail-closed acquisition — the sha256 gate rejected a malformed 63-char transcription during the third deploy build: THE PIN WORKED); env-gated LOCAL_QWEN_ENABLE=1; the entrypoint starts the server before the engine serves |
+
+Measured this round (Art. XV): the zero-paid acceptance rerun closed
+with ALL 14 gates on the run-level provenance invariants (a genuinely
+fresh third-domain problem, 14 run-owned localqwen calls / 0 paid / 0
+null-run_id lines, one live MODEL_FAILURE -> probe recovery measured in
+the window, the task degradation explicit); the ZeroGPU experiment
+closed at its honest structural terminal (HTTP 400 "ZeroGPU Spaces
+only work with Gradio SDK" — the resource class cannot attach to the
+Docker production Space; the two operator unblock paths recorded, not
+taken); the production deployment at the pushed commit e50d56c0 with
+the Article LXXI tuple VERIFIED (BUILD == RUNNING == HEALTH ==
+ls-remote; drift GREEN; identity_tamper false) after three measured
+build failures each root-caused and fixed; the fresh production run
+(a genuinely fresh fourth-domain lyophilization problem) completed ON
+PRODUCTION through the real user path: 22 evidence records -> mechanism
+-> gen-1 candidate -> ATTACK/ADJUDICATION (CONTESTED) -> the package
+honestly BLOCKED at the DOMAIN_INTEGRITY quality gate -> HELD_FOR_HUMAN
+REVIEW, with 31 run-owned ledger lines (all 13 fields, run_id non-null,
+0 paid) + 8 capability-probe lines + the capability store persisted and
+verified from OUTSIDE the container through the durable push. Round
+record: R451/R451_C13_ROUND_RECORD.json.
