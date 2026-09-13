@@ -95,6 +95,40 @@ def classify(candidate: dict, evidence_verification: dict, prior_art: dict, adve
                 "verification_state": "NOT_EVALUATED"}
         issues = evidence_verification.get("issues") or []
         issue_text = "; ".join(str(i) for i in issues[:5]) or "no issues recorded"
+        # R452 (external audit B1 engine half, Art. LXI): the span-format
+        # issue classes are MODEL CAPABILITY failures — the generator could
+        # not produce the required citation FORMAT — not scientific
+        # verdicts about the candidate. Measured production consequence:
+        # 4/7 runs were recorded INVENTION_REJECTED with kill_reason
+        # "evidence verification failed: missing_source_span;
+        # mechanism_span_not_verbatim" purely because the tier-4 model
+        # cannot emit verbatim spans. Converting a capability failure
+        # into REJECTED manufactures negative knowledge from
+        # infrastructure (Art. XXI.3/XXV/LXI) and was the mechanism by
+        # which killed inventions reached buyer-facing surfaces. The
+        # honest outcome: UNKNOWN + INFRASTRUCTURE_CAPABILITY —
+        # promotion blocked, rerunnable, cemetery NOT written.
+        _CAPABILITY_ISSUES = {
+            "missing_source_id", "missing_source_hash",
+            "missing_source_span", "missing_mechanism_span",
+            "mechanism_span_not_verbatim",
+        }
+        capability_issues = [i for i in issues if str(i) in _CAPABILITY_ISSUES]
+        if issues and len(capability_issues) == len(issues):
+            return {
+                "epistemic_state": "OBSERVED", "final_status": "UNKNOWN",
+                "reason": (
+                    "evidence verification could not be completed: "
+                    f"{issue_text} — the generator failed to produce the "
+                    "required citation format; a MODEL CAPABILITY failure, "
+                    "never a scientific rejection (Art. LXI: "
+                    "infrastructure failure is not scientific rejection); "
+                    "rerunnable"),
+                "promotion_blocked": True,
+                "adjudication_blocked": True,
+                "verification_state": "EVALUATED_FAILED",
+                "failure_class": "INFRASTRUCTURE_CAPABILITY",
+            }
         return {"epistemic_state": "OBSERVED", "final_status": "REJECTED",
                 "reason": (f"evidence verification failed: {issue_text}"),
                 "promotion_blocked": True,
