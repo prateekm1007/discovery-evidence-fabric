@@ -22,6 +22,7 @@ import hashlib
 import inspect
 import json
 import math
+import re
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -375,6 +376,86 @@ def verify_cad_source_provenance(model_dir: str) -> Dict[str, Any]:
 # Parameter normalization
 # ---------------------------------------------------------------------------
 
+def _resolve_form_key(pid: str) -> str:
+    """R452 A2 (external audit): resolve a semantic parameter name onto a
+    FORM_LIBRARY build key, deterministically and conservatively.
+
+    The measured defect: multi-word semantic names ("device outer
+    diameter") carried CP-nnn ids into this function, missed every
+    lookup, and every builder fell through to its hardcoded defaults —
+    three specs differing 80x produced byte-identical geometry. The
+    exact-key remap below is unchanged; the token-resolution fallback
+    adds the SMALLEST deterministic semantic join (most-specific token
+    combination first), and every resolution is recorded in
+    parameter_meta (resolved_key + resolution_basis) so a wrong join is
+    auditable, never silent (Art. XV).
+    """
+    key = str(pid or "").strip().lower()
+    # the historical exact-key path first (unchanged behavior)
+    base = key.replace("_mm", "").replace("-mm", "").replace(" ", "_")
+    if base in _FORM_KEY_ALIASES:
+        return _FORM_KEY_ALIASES[base], base, "exact-key"
+    tokens = set(re.findall(r"[a-z]+", key))
+    # most-specific compound keys first
+    if {"wall", "thickness"} <= tokens:
+        return "wall_thickness", base, "token-resolved"
+    if {"primary", "lumen", "diameter"} <= tokens or \
+            {"inner", "lumen", "diameter"} <= tokens:
+        return "primary_lumen_diameter", base, "token-resolved"
+    if {"floor", "lumen", "diameter"} <= tokens:
+        return "floor_lumen_diameter", base, "token-resolved"
+    if {"floor", "offset"} <= tokens:
+        return "floor_offset", base, "token-resolved"
+    if {"port", "diameter"} <= tokens:
+        return "port_diameter", base, "token-resolved"
+    if {"outer", "diameter"} <= tokens or "diameter" in tokens:
+        return "outer_diameter", base, "token-resolved"
+    if {"panel", "width"} <= tokens:
+        return "panel_width", base, "token-resolved"
+    if {"panel", "length"} <= tokens:
+        return "panel_length", base, "token-resolved"
+    if {"substrate", "thickness"} <= tokens or "substrate" in tokens:
+        return "substrate_t", base, "token-resolved"
+    if {"cell", "thickness"} <= tokens or ("cell" in tokens and "layer" in tokens):
+        return "cell_t", base, "token-resolved"
+    if {"functional", "thickness"} <= tokens or "functional" in tokens:
+        return "functional_t", base, "token-resolved"
+    if {"frame", "width"} <= tokens or "frame" in tokens:
+        return "frame_w", base, "token-resolved"
+    if "thickness" in tokens:
+        return "wall_thickness", base, "token-resolved"
+    if "height" in tokens:
+        return "height", base, "token-resolved"
+    if {"panel", "width"} & tokens and "width" in tokens:
+        return "panel_width", base, "token-resolved"
+    if "width" in tokens:
+        return "panel_width", base, "token-resolved"
+    if "length" in tokens:
+        return "length", base, "token-resolved"
+    return base, base, "unresolved"
+
+
+# the historical exact-key remap (unchanged from the pre-R452 table)
+_FORM_KEY_ALIASES = {
+    "outer_diameter": "outer_diameter",
+    "diameter": "outer_diameter",
+    "length": "length",
+    "primary_lumen_diameter": "primary_lumen_diameter",
+    "floor_lumen_diameter": "floor_lumen_diameter",
+    "floor_offset": "floor_offset",
+    "width": "panel_width",
+    "panel_width": "panel_width",
+    "panel_length": "panel_length",
+    "substrate_t": "substrate_t",
+    "cell_t": "cell_t",
+    "functional_t": "functional_t",
+    "frame_w": "frame_w",
+    "height": "height",
+    "wall_thickness": "wall_thickness",
+    "port_diameter": "port_diameter",
+}
+
+
 def normalize_parameters(geometry_parameters: List[Dict[str, Any]]) -> Dict[str, Any]:
     """Convert the classifier's geometry parameters into a build input dict.
 
@@ -390,34 +471,20 @@ def normalize_parameters(geometry_parameters: List[Dict[str, Any]]) -> Dict[str,
         unit = str(p.get("unit") or "")
         entry = {
             "param_id": pid,
+            "parameter_id": p.get("parameter_id"),
             "unit": unit,
             "value": float(p["value"]),
             "envelope": p.get("envelope"),
             "value_class": p.get("value_class") or VALUE_CLASS_MODELLED,
+            "source": p.get("source"),
+            "source_hash": p.get("source_hash"),
             "origin": p.get("origin", "run state"),
             "used_in_build": False,
         }
         if _in_mm(unit):
-            key = pid.replace("_mm", "").replace("-mm", "").replace(" ", "_").lower()
-            # remap known naming variants onto form-library keys
-            key = {
-                "outer_diameter": "outer_diameter",
-                "diameter": "outer_diameter",
-                "length": "length",
-                "primary_lumen_diameter": "primary_lumen_diameter",
-                "floor_lumen_diameter": "floor_lumen_diameter",
-                "floor_offset": "floor_offset",
-                "width": "panel_width",
-                "panel_width": "panel_width",
-                "panel_length": "panel_length",
-                "substrate_t": "substrate_t",
-                "cell_t": "cell_t",
-                "functional_t": "functional_t",
-                "frame_w": "frame_w",
-                "height": "height",
-                "wall_thickness": "wall_thickness",
-                "port_diameter": "port_diameter",
-            }.get(key, key)
+            key, base, basis = _resolve_form_key(pid)
+            entry["resolved_key"] = key
+            entry["resolution_basis"] = basis
             params[key] = float(p["value"])
             entry["used_in_build"] = True
         meta.append(entry)

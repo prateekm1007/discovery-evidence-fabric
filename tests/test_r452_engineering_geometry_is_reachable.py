@@ -63,9 +63,15 @@ CTX = {"run_id": "testrun:r452-contract"}
 
 #: dimension-bearing evidence spans. The abstracts state REAL numbers with
 #: REAL units near the parameter concepts — the raw material a legitimate
-#: evidence->dimension binding stage consumes. Article XXVII is preserved
-#: by construction: a value only becomes sourced when BOUND to these spans
-#: with their hashes; parameters with no binding stay UNKNOWN.
+#: evidence->dimension binding stage consumes. The spans deliberately use
+#: the FLUIDICS REGISTRY's own critical-parameter vocabulary ('lumen inner
+#: diameter', 'lumen length', 'surface roughness', 'operating pressure
+#: head', 'occlusion growth tolerance') so the binding is exact-token, and
+#: deliberately include a RANGE span and an unmatched span so the honest
+#: refusals (range guard, NO_BINDING) are exercised, not just the happy
+#: path. Article XXVII is preserved by construction: a value only becomes
+#: sourced when BOUND to these spans with their hashes; parameters with
+#: no binding stay UNKNOWN.
 _DIMENSION_EVIDENCE = [
     {
         "id": "europepmc:R452-DIM-1",
@@ -75,10 +81,12 @@ _DIMENSION_EVIDENCE = [
         "source_uri": "https://fixture.invalid/r452/dim-1",
         "title": "Dimensional design of shunt catheter assemblies",
         "abstract": (
-            "The catheter assembly was manufactured with an outer "
-            "diameter of 4.2 mm and a wall thickness of 0.8 mm. The "
-            "lumen length measured 180 mm across all samples. Long-term "
-            "patency was maintained at the stated dimensions."),
+            "The catheter lumen inner diameter was 3.0 mm in all "
+            "cohorts. The lumen length measured 180 mm across all "
+            "samples. Surface roughness of the flow bore was 0.8 um "
+            "after polishing. The occlusion growth tolerance was "
+            "specified as 0.2 mm. Long-term patency was maintained at "
+            "the stated dimensions."),
         "doi": "10.0000/r452.dim.1",
         "publication_date": "2022-01-01",
         "content_hash": ("a" * 63 + "1"),
@@ -92,9 +100,10 @@ _DIMENSION_EVIDENCE = [
         "title": "Chamber port sizing in implantable pump bodies",
         "abstract": (
             "The pump body's port diameter was fixed at 2.0 mm for the "
-            "implantable device housing. The device length was 60 mm in "
-            "all cohorts. No adverse events were recorded at these "
-            "dimensions over the follow-up window."),
+            "implantable device housing. The operating pressure head "
+            "reached 40 kPa at the design point. The system was "
+            "evaluated across a flow rate range of 0.5 to 2.0 ml/min "
+            "over 30 days. No adverse events were recorded."),
         "doi": "10.0000/r452.dim.2",
         "publication_date": "2022-02-01",
         "content_hash": ("b" * 63 + "2"),

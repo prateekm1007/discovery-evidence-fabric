@@ -835,6 +835,34 @@ def build_engineering_spec(spec: Dict[str, Any], env: Optional[Candidate],
         spec, module, domain, equation_entries,
         module.get("verification_methods", []))
 
+    # ---- R452 VALUE_SOURCING: the evidence->dimension binding stage -----
+    # (the external audit's A1: the registry proposes WHAT matters;
+    # this stage is the ONLY legitimate mechanism by which a parameter
+    # value becomes sourced — bound to an exact custodied evidence span
+    # with its content hash, deterministically, no model involvement.
+    # Parameters with NO binding stay value_status=UNKNOWN exactly as
+    # _build_critical_parameters emitted them — Article XXVII preserved,
+    # the absence now a per-parameter measured fact instead of a
+    # universal constant. Art. XXV.)
+    try:
+        from .value_sourcing import source_parameter_values
+        critical_parameters, _value_sourcing_report = \
+            source_parameter_values(
+                critical_parameters,
+                [ev for ev_id, ev in sorted(ev_index.items())
+                 if isinstance(ev, dict)
+                 and not str(ev_id).startswith("problem:")],
+                spec)
+    except Exception as exc:  # noqa: BLE001 — disclosed, never silent
+        _value_sourcing_report = {
+            "artifact": "VALUE_SOURCING_REPORT",
+            "stage": "value_sourcing/1.0.0",
+            "state": "STAGE_ERROR",
+            "error": f"{type(exc).__name__}: {exc}"[:300],
+            "n_parameters": len(critical_parameters),
+            "n_sourced": 0,
+        }
+
     # ---- CEO A7: compiled design outputs --------------------------------
     compiled = compile_design_outputs(
         spec, module, graph["d_inputs"], critical_parameters,
@@ -1629,6 +1657,10 @@ def build_engineering_spec(spec: Dict[str, Any], env: Optional[Candidate],
         "engineering_core": {
             "governing_model": governing,
             "critical_parameters": critical_parameters,
+            # R452: the VALUE_SOURCING report rides with the spec —
+            # which parameters got bound, from which spans, and which
+            # stayed UNKNOWN (never silent, Art. XV)
+            "value_sourcing": _value_sourcing_report,
             "external_precedent": (
                 f"domain module {domain_label(domain)}; standards listed as "
                 "candidates requiring applicability verification"),
