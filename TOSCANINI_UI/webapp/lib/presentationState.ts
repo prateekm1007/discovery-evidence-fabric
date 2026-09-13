@@ -67,7 +67,14 @@ export interface DesignTabProjection {
 
 export interface EvidenceTabProjection {
   availability?: string;
-  retrieval_state?: string; // NOT_REACHED | PENDING | FAILED | RETRIEVED
+  retrieval_state?: string;
+  // R452-C2 five-state vocabulary (decided by the BACKEND ledger —
+  // toscanini/dossier.py::evidence_ledger — the UI consumes it
+  // verbatim):
+  //   NOT_REACHED | PENDING | FAILED | RETRIEVED_ZERO | RETRIEVED_POSITIVE
+  // plus the legacy 4-state-era value RETRIEVED (readable, normalized
+  // below through the measured count when the projection carries one;
+  // never silently translated into a different typed state).
   retrieval_note?: string | null;
   retrieved_count?: number;
   used_count?: number;
@@ -610,50 +617,75 @@ export interface BlockedInsightCard {
 export function blockedInsightCards(
   evidence?: EvidenceTabProjection | null,
 ): BlockedInsightCard[] {
-  // R451-C2-CLOSURE Direction A — ALL FOUR typed retrieval states stay
-  // distinct; one typed state is never silently translated into
-  // another (Art. XXV; Art. LXI):
+  // R452-C2 — ALL FIVE typed retrieval states stay distinct; one typed
+  // state is never silently translated into another (Art. XXV;
+  // Art. LXI). The five states are DECIDED BY THE BACKEND ledger
+  // (evidence_ledger) and consumed verbatim:
   //
-  //   NOT_REACHED -> "not reached"        (the run stopped before retrieval)
-  //   PENDING     -> "in progress/pending" (retrieval started, not landed —
-  //                                   NEVER collapsed into not-reached)
-  //   FAILED      -> "retrieval failed"    (an infrastructure failure —
-  //                                   never a measured zero)
-  //   RETRIEVED   -> the ACTUAL measured count — zero is a measured zero,
-  //                  a positive count is shown as the measured count
-  //                  ("12 sources retrieved"); a RETRIEVED envelope can
-  //                  coexist with the infrastructure stop (the run
-  //                  retrieved evidence and was blocked LATER — the old
-  //                  code rendered that measured 12 as "not reached").
+  //   NOT_REACHED        -> "not reached"     (the run stopped before retrieval)
+  //   PENDING            -> "in progress"      (retrieval started, not landed —
+  //                                            NEVER collapsed into not-reached)
+  //   FAILED             -> "retrieval failed" (an infrastructure failure —
+  //                                            never a measured zero)
+  //   RETRIEVED_ZERO     -> the measured zero  (retrieval executed and
+  //                                            measured zero records)
+  //   RETRIEVED_POSITIVE -> the measured count ("N sources retrieved")
+  //
+  // Legacy normalization (the 4-state era emitted RETRIEVED + a raw
+  // count): a stale projection carrying RETRIEVED still renders its
+  // MEASURED distinction — a measured 12 never regresses into "not
+  // reached" and a measured 0 never becomes a failure or an absence;
+  // RETRIEVED with no count renders "executed, count unknown".
   const retrieval = evidence?.retrieval_state;
   const measured = evidence?.retrieved_count;
   let supports: BlockedInsightCard;
-  if (retrieval === "RETRIEVED" && measured === 0) {
+  if (retrieval === "RETRIEVED_ZERO") {
     supports = {
       title: "What supports it",
       headline: "0 sources retrieved",
       body: "Retrieval executed and measured zero records — the measured " +
         "zero, not an unavailable source.",
     };
-  } else if (retrieval === "RETRIEVED" &&
-             typeof measured === "number" && measured > 0) {
+  } else if (retrieval === "RETRIEVED_POSITIVE") {
+    const n = typeof measured === "number" ? measured : null;
     supports = {
       title: "What supports it",
-      headline: `${measured} sources retrieved`,
-      body: `Retrieval executed and measured ${measured} records before ` +
-        "the infrastructure stop — a measured count, not an absence " +
-        "and not an unreachable retrieval.",
+      headline: n != null ? `${n} sources retrieved` : "Sources retrieved",
+      body: n != null
+        ? `Retrieval executed and measured ${n} records before ` +
+          "the infrastructure stop — a measured count, not an absence " +
+          "and not an unreachable retrieval."
+        : "Retrieval executed and measured records — the exact count " +
+          "is not present in this projection and is not invented here.",
     };
   } else if (retrieval === "RETRIEVED") {
-    // RETRIEVED whose count is absent from this projection: still never
-    // "not reached" — the envelope existed; the count is what is missing.
-    supports = {
-      title: "What supports it",
-      headline: "Retrieval executed",
-      body: "Retrieval executed and its envelope is recorded, but the " +
-        "measured count is not present in this projection — the count " +
-        "is unknown, not zero and not unreachable.",
-    };
+    // legacy 4-state-era value — normalized through the measured count
+    if (measured === 0) {
+      supports = {
+        title: "What supports it",
+        headline: "0 sources retrieved",
+        body: "Retrieval executed and measured zero records — the measured " +
+          "zero, not an unavailable source.",
+      };
+    } else if (typeof measured === "number" && measured > 0) {
+      supports = {
+        title: "What supports it",
+        headline: `${measured} sources retrieved`,
+        body: `Retrieval executed and measured ${measured} records before ` +
+          "the infrastructure stop — a measured count, not an absence " +
+          "and not an unreachable retrieval.",
+      };
+    } else {
+      // RETRIEVED whose count is absent from this projection: still never
+      // "not reached" — the envelope existed; the count is what is missing.
+      supports = {
+        title: "What supports it",
+        headline: "Retrieval executed",
+        body: "Retrieval executed and its envelope is recorded, but the " +
+          "measured count is not present in this projection — the count " +
+          "is unknown, not zero and not unreachable.",
+      };
+    }
   } else if (retrieval === "PENDING") {
     supports = {
       title: "What supports it",

@@ -140,12 +140,21 @@ def evidence_ledger(session: Dict[str, Any]) -> Dict[str, Any]:
     retrieved" (Article XXI.3: provider failure is not absence;
     Article XXV: unknown must remain unknown).
 
+    R452-C2: the measured outcome is TYPED at this boundary — the
+    five-state vocabulary the directive names lives HERE, not in the
+    browser. A measured zero and a measured positive are DIFFERENT
+    typed states, decided by the backend from the envelope's own
+    count; the UI consumes them verbatim and never re-derives them
+    from a raw number (the same boundary rule as _geometry_state).
+
       retrieval_state:
-        NOT_REACHED  — the run stopped before retrieval executed
-        PENDING      — the run is running and retrieval has not landed yet
-        FAILED       — the run manifest records the RETRIEVE stage failed
-        RETRIEVED    — the envelope exists; counts are MEASURED
-                       (zero counts here are a real measured zero)
+        NOT_REACHED        — the run stopped before retrieval executed
+        PENDING            — the run is running, retrieval has not landed
+        FAILED             — the run manifest records RETRIEVE failed
+        RETRIEVED_ZERO     — the envelope exists; retrieval MEASURED zero
+        RETRIEVED_POSITIVE — the envelope exists; retrieval MEASURED > 0
+        RETRIEVED          — (legacy 4-state era value) readable by
+                             consumers, never emitted by this writer
     """
     run_dir = Path(session["run_dir"]) if session.get("run_dir") else None
     if not run_dir or not run_dir.exists():
@@ -223,6 +232,12 @@ def evidence_ledger(session: Dict[str, Any]) -> Dict[str, Any]:
     status = ("AVAILABLE" if records else
               "NOT_ESTABLISHED" if session.get("status") == "COMPLETE"
               else "PENDING")
+    # R452-C2: the measured outcome is a TYPED state, decided here —
+    # a measured zero (RETRIEVED_ZERO) and a measured positive
+    # (RETRIEVED_POSITIVE) are different facts and must never be
+    # collapsed into one another or into a not-reached state (Art.
+    # XXV; the R452-C2 directive's five-state vocabulary).
+    measured_state = "RETRIEVED_ZERO" if not items else "RETRIEVED_POSITIVE"
     return _tab(
         status, "RETRIEVED",
         ("every item is a custody-frozen record from this run's "
@@ -231,7 +246,7 @@ def evidence_ledger(session: Dict[str, Any]) -> Dict[str, Any]:
         items=items,
         # the envelope exists: the counts are MEASURED (a zero here is
         # a real measured zero — Art. XXI.3/XXV the other way round)
-        retrieval_state="RETRIEVED",
+        retrieval_state=measured_state,
         retrieved_count=len(items),
         used_count=len(used),
         used_visible_distinction=True)
@@ -1008,9 +1023,11 @@ def pipeline_projection(session: Dict[str, Any],
         rows = [{"key": "problem", "label": "Problem",
                  "status": "NOT_REACHED"}]
 
-    # ---- 2. Evidence — the ledger's typed retrieval_state (C2.5)
+    # ---- 2. Evidence — the ledger's typed retrieval_state (C2.5;
+    # R452-C2 five-state vocabulary; the legacy RETRIEVED value stays
+    # readable — era normalization, never a silent translation)
     rstate = evidence_tab.get("retrieval_state") or "NOT_REACHED"
-    if rstate == "RETRIEVED":
+    if rstate in ("RETRIEVED", "RETRIEVED_ZERO", "RETRIEVED_POSITIVE"):
         n = evidence_tab.get("retrieved_count")
         rows.append(_pipeline_row(
             "evidence", "Evidence", received=True, running=running,

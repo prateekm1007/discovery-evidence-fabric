@@ -106,12 +106,14 @@ class TestEvidenceRetrievalState:
 
     def test_envelope_with_zero_records_is_a_measured_zero(self, tmp_path):
         """The one case a numeric zero is honest: the envelope exists —
-        retrieval executed and measured zero records."""
+        retrieval executed and measured zero records. R452-C2: the
+        measured zero is its own TYPED state (RETRIEVED_ZERO) — the
+        five-state vocabulary is decided at the ledger boundary."""
         (tmp_path / "envelope_RETRIEVE.json").write_text(json.dumps(
             {"evidence": []}))
         s = _session(status="COMPLETE", run_dir=tmp_path)
         tab = dossier_mod.evidence_ledger(s)
-        assert tab["retrieval_state"] == "RETRIEVED"
+        assert tab["retrieval_state"] == "RETRIEVED_ZERO"
         assert tab["retrieved_count"] == 0
         assert tab["used_count"] == 0
 
@@ -125,8 +127,54 @@ class TestEvidenceRetrievalState:
             ]}))
         s = _session(status="COMPLETE", run_dir=tmp_path)
         tab = dossier_mod.evidence_ledger(s)
-        assert tab["retrieval_state"] == "RETRIEVED"
+        assert tab["retrieval_state"] == "RETRIEVED_POSITIVE"
         assert tab["retrieved_count"] == 2
+
+    def test_five_state_vocabulary_no_collapse(self, tmp_path):
+        """R452-C2 item 1a: the FIVE typed states are mutually distinct
+        and none is ever silently translated into another — a measured
+        positive is not 'not reached', a pending retrieval is not 'not
+        reached', a measured zero is not a failure, and the legacy
+        RETRIEVED value is still readable by the strip (era
+        normalization, never a translation)."""
+        # measured positive
+        run = tmp_path / "pos"
+        run.mkdir()
+        (run / "envelope_RETRIEVE.json").write_text(json.dumps(
+            {"evidence": [{"title": "t", "source": "s",
+                           "content_hash": "c" * 64}]}))
+        tab = dossier_mod.evidence_ledger(
+            _session(status="RUN_BLOCKED_TRANSPORT", run_dir=run))
+        assert tab["retrieval_state"] == "RETRIEVED_POSITIVE"
+        assert tab["retrieved_count"] == 1
+        # measured zero — a DIFFERENT typed state from the positive one
+        run0 = tmp_path / "zero"
+        run0.mkdir()
+        (run0 / "envelope_RETRIEVE.json").write_text(json.dumps(
+            {"evidence": []}))
+        tab0 = dossier_mod.evidence_ledger(
+            _session(status="RUN_BLOCKED_TRANSPORT", run_dir=run0))
+        assert tab0["retrieval_state"] == "RETRIEVED_ZERO"
+        assert tab0["retrieval_state"] != tab["retrieval_state"]
+        # the blocked-after-positive-retrieval run: the strip's evidence
+        # row is RECEIVED with the measured count — never NOT_REACHED
+        rows = dossier_mod.pipeline_projection(
+            _session(status="RUN_BLOCKED_TRANSPORT", run_dir=run),
+            run, False, {"package_state": {"state": "NOT_PRODUCED"}},
+            tab, {"geometry_state": "upstream_not_reached"})
+        ev = next(r for r in rows if r["key"] == "evidence")
+        assert ev["status"] == "RECEIVED"
+        assert (ev.get("detail") or "") == "1 sources retrieved"
+        # legacy RETRIEVED value: readable by the strip (era
+        # normalization) — the received milestone and the count stay
+        rows = dossier_mod.pipeline_projection(
+            _session(status="RUN_BLOCKED_TRANSPORT"), None, False,
+            {"package_state": {"state": "NOT_PRODUCED"}},
+            {"retrieval_state": "RETRIEVED", "retrieved_count": 4},
+            {"geometry_state": "upstream_not_reached"})
+        ev = next(r for r in rows if r["key"] == "evidence")
+        assert ev["status"] == "RECEIVED"
+        assert (ev.get("detail") or "") == "4 sources retrieved"
 
 
 # ---------------------------------------------------------------------------

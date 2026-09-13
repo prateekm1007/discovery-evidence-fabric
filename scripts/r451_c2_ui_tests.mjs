@@ -730,12 +730,83 @@ try {
   }
 
   // ----------------------------------------------------------------
+  console.log("\n== R452-C2 — item 1a: the FIVE typed retrieval states ==");
+  // blockedInsightCards consumes the BACKEND-decided five-state
+  // vocabulary verbatim: NOT_REACHED / PENDING / FAILED /
+  // RETRIEVED_ZERO / RETRIEVED_POSITIVE are mutually distinct; a
+  // measured zero and a measured positive are DIFFERENT typed states;
+  // the legacy RETRIEVED value normalizes through the measured count
+  // and never regresses into "not reached".
+  {
+    const supportsOf = (ev) => {
+      const cards = blockedInsightCards(ev);
+      return cards.find((c) => c.title === "What supports it");
+    };
+    let card;
+    // the five backend-decided states, each rendered distinctly
+    card = supportsOf({ retrieval_state: "RETRIEVED_ZERO" });
+    check("R452: RETRIEVED_ZERO -> the measured zero (typed, decided by " +
+        "the backend ledger)",
+      card.headline === "0 sources retrieved");
+    card = supportsOf({ retrieval_state: "RETRIEVED_POSITIVE",
+      retrieved_count: 12 });
+    check("R452: RETRIEVED_POSITIVE + count 12 -> the ACTUAL measured " +
+        "count is shown ('12 sources retrieved')",
+      card.headline === "12 sources retrieved");
+    check("R452: RETRIEVED_POSITIVE is NEVER worded as not-reached",
+      card.headline !== "Evidence retrieval not reached" &&
+        !card.body.includes("not reached"));
+    check("R452: RETRIEVED_POSITIVE is never worded as a measured zero",
+      !card.body.includes("measured zero records"));
+    card = supportsOf({ retrieval_state: "RETRIEVED_POSITIVE" });
+    check("R452: RETRIEVED_POSITIVE with no count in the projection -> " +
+        "'Sources retrieved' (the count is not invented here)",
+      card.headline === "Sources retrieved" &&
+        !card.body.includes("measured 0"));
+    // legacy RETRIEVED normalization: stale projections never regress
+    card = supportsOf({ retrieval_state: "RETRIEVED", retrieved_count: 0 });
+    check("R452: legacy RETRIEVED zero -> the measured zero (never a " +
+        "failure, never an absence)",
+      card.headline === "0 sources retrieved");
+    card = supportsOf({ retrieval_state: "RETRIEVED", retrieved_count: 12 });
+    check("R452: legacy RETRIEVED 12 -> the measured count (never " +
+        "'not reached')",
+      card.headline === "12 sources retrieved" &&
+        !card.body.includes("not reached"));
+    card = supportsOf({ retrieval_state: "RETRIEVED" });
+    check("R452: legacy RETRIEVED, no count -> 'Retrieval executed' " +
+        "(count unknown — never zero, never unreachable)",
+      card.headline === "Retrieval executed");
+    // the five states are mutually distinct
+    const fiveHeadlines = new Set([
+      supportsOf({ retrieval_state: "NOT_REACHED" }).headline,
+      supportsOf({ retrieval_state: "PENDING" }).headline,
+      supportsOf({ retrieval_state: "FAILED" }).headline,
+      supportsOf({ retrieval_state: "RETRIEVED_ZERO" }).headline,
+      supportsOf({ retrieval_state: "RETRIEVED_POSITIVE",
+        retrieved_count: 7 }).headline,
+    ]);
+    check("R452: all FIVE typed states render FIVE DISTINCT headlines " +
+        "(no collapse in any direction)",
+      fiveHeadlines.size === 5);
+    // the measured zero and the measured positive never share wording
+    const zero = supportsOf({ retrieval_state: "RETRIEVED_ZERO" });
+    const pos = supportsOf({ retrieval_state: "RETRIEVED_POSITIVE",
+      retrieved_count: 1 });
+    check("R452: RETRIEVED_ZERO and RETRIEVED_POSITIVE render different " +
+        "headlines AND different bodies (distinct facts, distinct " +
+        "surfaces)",
+      zero.headline !== pos.headline && zero.body !== pos.body);
+  }
+
+  // ----------------------------------------------------------------
   console.log("\n== R451-C2-CLOSURE — Direction A: the four retrieval states ==");
   // blockedInsightCards must keep NOT_REACHED / PENDING / FAILED /
   // RETRIEVED mutually distinct; RETRIEVED shows the ACTUAL measured
   // count (zero or positive); PENDING is never collapsed into
   // not-reached; a positive measured count is never rendered as
-  // "not reached".
+  // "not reached". (The legacy 4-state-era checks — retained as the
+  // era-normalization regression.)
   {
     const supportsOf = (ev) => {
       const cards = blockedInsightCards(ev);
@@ -960,6 +1031,89 @@ try {
         "the mapping source",
       psSource.includes("is the ONLY transport") ||
         psSource.includes("ONLY transport\n//   authority"));
+  }
+
+  // ----------------------------------------------------------------
+  console.log("\n== R452-C2 — item 2: the sovereign-state boundary ==");
+  // The visual layer may render UNKNOWN-class, BLOCKED,
+  // READY_FOR_REVIEW-class and VISUAL_READY states; it must NEVER
+  // manufacture VALIDATED / SURVIVOR / ENGINEERING_READY. Two pins:
+  // (a) the shipping presentation sources carry NO such state
+  // vocabulary at all (structural absence), and (b) a payload whose
+  // ONLY completion signals are artifact presence (a GLB route, a
+  // PDF, an engineering JSON, old UI fields, diagnostic metadata)
+  // resolves to a NON-CLAIM state — presence is never an authority.
+  {
+    // (a) structural absence of the forbidden state vocabulary
+    const forbidden = /\b(VALIDATED|SURVIVOR|ENGINEERING_READY)\b/;
+    const presentationSources = [
+      ["lib", "presentationState.ts"],
+      ["components", "TechStage.tsx"],
+      ["components", "InfrastructureBlockedHero.tsx"],
+      ["components", "DossierSections.tsx"],
+      ["components", "DeepDive.tsx"],
+      ["components", "DiscoveryPipelineStrip.tsx"],
+    ];
+    for (const [dir, file] of presentationSources) {
+      const src = fsRead(dir, file);
+      check(`R452: ${file} carries NO manufactured-state vocabulary ` +
+          "(VALIDATED / SURVIVOR / ENGINEERING_READY absent)",
+        !forbidden.test(src));
+    }
+    // (b) the presence-only payload: every directive-named presence
+    // signal populated, NO typed geometry_state, NO canonical contract
+    const presenceOnly = dossier({
+      tabs: {
+        design: {
+          // old UI fields + artifact presence, all stale/unauthoritative
+          availability: "AVAILABLE",
+          glb: "/runs/run/MODEL/model-001.glb",
+          renders: { status: "OK", visual_gate: "COMPLETE_PASS" },
+          pdf_available: true,
+          engineering_json_present: true,
+          diagnostics: { render_job: "done", watchdog: "PASS" },
+          // NO geometry_state field at all
+        },
+        evidence: null,
+      },
+    });
+    let r = resolvePresentationState(
+      detail({ status: "COMPLETE", user_state_view: usv({
+        user_state: "COMPLETED_CANDIDATE", finished: true,
+        found_something: true, package_available: true,
+        decision: "Technology ready",
+        meaning: "The candidate survived." }) }),
+      presenceOnly);
+    check("R452: presence-only payload (GLB route + PDF + engineering " +
+        "JSON + legacy fields + diagnostics, no typed state) NEVER " +
+        "resolves to VISUAL_READY",
+      r.state !== "VISUAL_READY");
+    check("R452: presence-only payload -> LEGACY_STATE_UNAVAILABLE " +
+        "(the legacy-payload rule: raw presence derives no current " +
+        "state at all)",
+      r.state === "LEGACY_STATE_UNAVAILABLE");
+    check("R452: presence-only payload never claims the engineering " +
+        "authority",
+      r.engineeringAuthority !== "ENGINEERING");
+    // the stale scientific decision strings cannot ride the mapping's
+    // output — the mapping returns typed states, never verdict copies
+    check("R452: the stale decision/meaning strings never ride the " +
+        "mapping output (the mapping returns states, not verdicts)",
+      !JSON.stringify(r).includes("Technology ready") &&
+        !JSON.stringify(r).includes("The candidate survived"));
+    // positive control: the SAME canonical shape through the typed
+    // contract still reaches VISUAL_READY (Art. V — not a universal
+    // rejector)
+    r = resolvePresentationState(
+      detail({ status: "COMPLETE", user_state_view: usv({
+        user_state: "COMPLETED_CANDIDATE", finished: true,
+        found_something: true, package_available: true }) }),
+      dossier({ tabs: { design: {
+        geometry_state: "visual_complete",
+        engineering_authority: "ENGINEERING" }, evidence: null } }));
+    check("R452: positive control — the typed canonical chain still " +
+        "reaches VISUAL_READY",
+      r.state === "VISUAL_READY");
   }
 } finally {
   rmSync(OUT, { recursive: true, force: true });
