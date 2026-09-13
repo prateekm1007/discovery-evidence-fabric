@@ -1,0 +1,125 @@
+{
+ "artifact_type": "DIRECTIONAL_HYPOTHESES",
+ "schema_version": "hypotheses/1.0",
+ "created_at": "2026-09-13T20:51:46+00:00",
+ "hypotheses": [
+  {
+   "hypothesis_id": "dh:bfa79d97a0a5e99c7a56",
+   "candidate_id": "inv:a6be71d5f0:gen1",
+   "failure_id": "diag:dd5087ab872a0173",
+   "causal_diagnosis_id": "diag:dd5087ab872a0173",
+   "target_variable": "Oil flow rate",
+   "current_value": "unknown",
+   "proposed_value": "increased",
+   "direction": "INCREASE",
+   "mechanism_affected": "Insufficient lubrication leading to bearing scuffing",
+   "causal_rationale": "The failure was due to insufficient lubrication, which is a known issue in mechanical systems, and increasing the oil flow rate can address this by ensuring adequate lubrication to the bearings.",
+   "predicted_effect": "Improved lubrication to the bearings, reducing scuffing and potential failure.",
+   "predicted_magnitude_or_range": "Unstated",
+   "competing_explanations": [],
+   "evidence_support": [
+    {
+     "evidence_id": "ev:038c5d02f7fd6698b4063e58",
+     "span": "You are an expert OpenFOAM CFD engineer with deep knowledge of computational fluid dynamics, turbulence modelling, mesh generation, and numerical methods. When given a simulation request you: 1. Analyse the flow physics: geometry, Reynolds number, flow regime"
+    }
+   ],
+   "evidence_gaps": [],
+   "falsifier": "No reduction in bearing scuffing despite increased oil flow rate.",
+   "measurement_required": "Measurement of oil flow rate and bearing scuffing frequency.",
+   "intervention_type": "PARAMETER_MUTATION",
+   "confidence": "HIGH",
+   "provenance": {
+    "class": "AI_PROPOSED",
+    "purpose": "directional:hypothesis",
+    "note": "the LLM proposed this hypothesis; the mechanical ground gate adjudicates it (Art. XVIII) — an ungrounded proposal is REJECTED and its mutation never executes",
+    "proposed_at": "2026-09-13T20:54:12+00:00"
+   },
+   "status": "SUPPORTED",
+   "gate": {
+    "gate_version": "directional_ground_gate/2.0",
+    "checks": [
+     {
+      "check": "G1_STRUCTURE",
+      "verdict": "PASS",
+      "basis": "all required fields present"
+     },
+     {
+      "check": "G2_DIAGNOSIS_RESOLVES",
+      "verdict": "PASS",
+      "basis": "causal_diagnosis_id='diag:dd5087ab872a0173' resolves to a recorded diagnosis (cause=UNDETERMINED)"
+     },
+     {
+      "check": "G3_MECHANISM_GROUNDED",
+      "verdict": "PASS",
+      "basis": "mechanism terms grounded in the diagnosis/candidate: bearing, insufficient, leading, lubrication, scuffing"
+     },
+     {
+      "check": "G4_PREDICTION_FALSIFIABLE",
+      "verdict": "PASS",
+      "basis": "predicted_effect present; falsifier names a measurable quantity"
+     },
+     {
+      "check": "G5_EVIDENCE_CLASS",
+      "verdict": "PASS",
+      "basis": "class=EVIDENCE_SUPPORTED: 1 verified support bindings (span-verified); 0 unresolved ids; 0 ids with failed/absent spans; gaps=0 (gaps are NEVER equated with support — R451 §4)"
+     },
+     {
+      "check": "G6_TARGET_IN_DESIGN_STATE",
+      "verdict": "PASS",
+      "basis": "target_variable grounded in the design state: flow, rate"
+     },
+     {
+      "check": "G7_PREDICTION_INTERVENTION_COHERENT",
+      "verdict": "PASS",
+      "basis": "predicted observable coupled to the intervention: lubrication, scuffing"
+     },
+     {
+      "check": "G8_FALSIFIER_BINDS_PREDICTION",
+      "verdict": "PASS",
+      "basis": "the falsifier measures the predicted observable: flow, rate, scuffing"
+     },
+     {
+      "check": "G9_CAUSAL_MEMORY",
+      "verdict": "PASS",
+      "basis": "no prior FALSIFIED direction repeats (the causal memory is clean for this (target_variable, direction))"
+     }
+    ],
+    "grounded": true,
+    "verdict": "GROUNDED",
+    "evidence_class": "EVIDENCE_SUPPORTED",
+    "evidence_resolution": {
+     "verified_ids": [
+      "ev:038c5d02f7fd6698b4063e58"
+     ],
+     "unresolved_ids": [],
+     "span_failed_ids": []
+    },
+    "adjudicated_at": "2026-09-13T20:54:12+00:00"
+   },
+   "mutation_id": "mut-2-dh:bfa79d97a0a5e99c7a56",
+   "causal_updates": [
+    {
+     "causal_update_id": "cu:dhbfa79d97a0a5e99c7a56ob",
+     "hypothesis_id": "dh:bfa79d97a0a5e99c7a56",
+     "observation_id": "obs:inva6be71d5f0gen2mut2dhb",
+     "prediction": {
+      "target_variable": "Oil flow rate",
+      "direction": "INCREASE",
+      "predicted_effect": "Improved lubrication to the bearings, reducing scuffing and potential failure.",
+      "predicted_magnitude": "Unstated"
+     },
+     "observed": {
+      "killed": false,
+      "epistemic_state": "SUPPORTED",
+      "objective_delta": 2
+     },
+     "match": true,
+     "hypothesis_status_after": "SUPPORTED",
+     "basis": "the mutated candidate survived with a recorded improvement (verdict-rank delta 2)",
+     "updated_at": "2026-09-13T20:57:39+00:00",
+     "note": "the causal model update is recorded, not asserted: the direction's causal claim lives or dies by the recorded observation; FALSIFIED directions become negative knowledge for future search (Art. LI)"
+    }
+   ]
+  }
+ ]
+}

@@ -591,3 +591,24 @@ mutated render-record source GLB fails closed live — STOPPED
 IN FULL immediately before the commit. No Coder-1 canonical state
 changed: the CAD pipeline, the bridge, the package compiler, the
 Visual Gate, and the visual-set ladder are consumed, never modified.
+
+## R452-A3 addendum (2026-09-13/14) — the stronger-model experiment, measured
+
+Operator directive (the model survey answering the A3 escalation):
+three recommended experiment paths, each MEASURED live before any arm
+ran (R452/MODEL_EXPERIMENT/ROUTE_AUTHORITY.json): HF-hosted inference
+402 credits-depleted + zero is_free catalog models (re-measured);
+local GLM-5.2/GPT-OSS-120B structurally infeasible on the 4 GB no-GPU
+host; OpenRouter paid, excluded; the sandbox z-ai tier-2 grant's
+platform token wiped by the mid-session environment reset (401
+missing X-Token, re-measured). Per the operator's own
+quantize-and-retry flowchart logic, the operative zero-cost comparison
+is the self-hosted 4B step-up.
+
+| Component | Module | Notes |
+|---|---|---|
+| THE EXPERIMENT DRIVER | `scripts/r452_model_experiment.py` | two arms, the frozen R452 assay problems imported byte-identical, the SAME deployed default policy on both arms (ZERO_PAID_COST), the MODEL WEIGHTS as the only variable (1.7B @8790 vs 4B @8791, same llama-server b10930, same Q4_K_M discipline); the model-purity + zero-cost invariant verified per run from the run-owned routing-ledger lines (a PAID_API or cross-arm model line fails the experiment closed) |
+| THE MEASUREMENT | the FROZEN `r452_quality_instrument._case_metrics` imported UNMODIFIED + typed extractors | the eight directive dimensions from the runs' OWN artifacts; UNKNOWN/NOT_REACHED typed, never zero-filled (Art. XXV) |
+| THE RECORD | `R452/MODEL_EXPERIMENT.json` | the honest reading is MIXED, dimension by dimension: evidence grounding 0.1367 -> 0.6459 (4.7x), the adversarial attack EXECUTED once (case C, honestly KILLED), the first live VALUE_SOURCING spec (5 SOURCE_FACT of 7, geometry_reachable) — but ZERO mechanism-space candidates retained (vs the 1.7B's 2), 2 of 3 attacks still NOT_RUN, no STEP exported; NO prose superiority claim |
+| THE A3 ESCALATION | `R452/OWNER_GATED_ESCALATION_A3.json` | escalation_count 2 with the measurement attached; the elite-class question stays unmeasured at zero cost — the operator's three unblock paths are the only route to a tier-2 ceiling |
+
