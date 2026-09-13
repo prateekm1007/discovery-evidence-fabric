@@ -50,8 +50,15 @@ function stageClass(status: string): string {
       return "infra";
     case "STOPPED":
       return "stopped";
-    default:
+    case "NOT_REACHED":
       return "unreached";
+    default:
+      // R454-C2 (directive §3): an unrecognized backend status is an
+      // UNKNOWN, never silently styled as NOT_REACHED (Art. XXV: unknown
+      // stays unknown — a frontend class must not translate it). The
+      // raw status still rides data-pipeline-status and the label
+      // fallback below renders it verbatim.
+      return "unknown";
   }
 }
 
@@ -75,7 +82,7 @@ export default function DiscoveryPipelineStrip({
             data-pipeline-status={row.status}
           >
             <span className="pipeline-mark" aria-hidden="true">
-              {STATUS_MARK[row.status] ?? "\u2014"}
+              {STATUS_MARK[row.status] ?? "?"}
             </span>
             <span className="pipeline-label">{row.label}</span>
             <span className="pipeline-status">
