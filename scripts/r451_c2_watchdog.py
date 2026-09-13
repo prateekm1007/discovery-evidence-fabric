@@ -1,6 +1,7 @@
 """r451_c2_watchdog.py — the R451-C2 (C2.10) end-to-end product watchdog,
 extended by R451-C2.2 (§6) into THE adversarial join checker, and
 re-founded by R451-C2.3 (§8) on THE one canonical evaluator.
+DUAL REPORTING hardened by R451-C2.5 (§6).
 
 R451-C2.3 §8: the dossier and the watchdog consume the SAME state
 semantics. The join state below is derived by
@@ -33,16 +34,40 @@ state:
         (the UI renders THIS, never a frontend guess)
     R10 (R451-C2.3 §8): the evaluator's announced join state must be
         consistent with the record invariants (VISUAL_READY only when
-        the release chain verified; RELEASE_UNVERIFIED / RENDER_RECORD_
-        MISSING / INVOCATION_MISSING are violations-by-state).
+        the release chain verified).
+
+R451-C2.5 §6 — THE TWO REPORTS ARE INDEPENDENT:
+
+  * `observed_join_state` — what THE evaluator observed, verbatim
+    (None = undecided). PURELY an observation: it never becomes a
+    scientific verdict.
+  * `watchdog_verdict` — the checker's own typed verdict over the
+    RECORD invariants:
+        PASS                 every applicable invariant held
+        INTEGRITY_VIOLATION  a record-invariant rule failed (R1-R9,
+                             or R10's announced-VISUAL_READY-vs-records
+                             coupling)
+        JOIN_FAILURE_OBSERVED  the evaluator announced an explicit
+                             non-ready join state (RELEASE_UNVERIFIED /
+                             RENDER_RECORD_MISSING / INVOCATION_MISSING)
+                             — recorded as the presentation-class
+                             finding it is (Art. LXI: an infrastructure/
+                             presentation failure is never a scientific
+                             rejection; the report never emits a
+                             scientific-rejection verdict)
+  Every violation carries its `violation_class` (RECORD_INVARIANT vs
+  JOIN_STATE_OBSERVATION). `verdict` (PASS/FAIL) remains as the CLI
+  exit-code projection — exit 1 on ANY finding class; the typed
+  watchdog_verdict is the authority for WHAT KIND of finding it was.
 
 R451-C2.3 §6: the identity chain (geometry spec / receipt GLB / render
 source / hero source == canonical GLB bytes) is enforced INSIDE the
 evaluator — a mismatch fails closed there and this checker's R4
 verifies the same bytes independently.
 
-Exit codes: 0 = every applicable rule held; 1 = at least one integrity
-violation (named, with the file and the rule); 2 = usage/argument error.
+Exit codes: 0 = every applicable rule held; 1 = at least one finding
+(integrity violation or observed join failure — each named, with the
+file, the rule, and the violation class); 2 = usage/argument error.
 A NOT_APPLICABLE rule is not a violation (the rule's antecedent is
 false) — every decision is recorded in the JSON report either way.
 """
@@ -61,6 +86,20 @@ RECEIPT = "MODEL/3D/VISUAL_COMPILER_INVOCATION.json"
 GATE = "MODEL/3D/visual_gate.json"
 RENDER_RECORD = "MODEL/3D/render_record.json"
 RENDER_JOB = "MODEL/3D/RENDER_JOB.json"
+
+# R451-C2.5 §6 — the typed verdict vocabulary (the two reports are
+# independent: the observed join state is an observation; the verdict
+# classifies the finding; neither silently translates into a scientific
+# rejection — Art. LXI)
+WATCHDOG_VERDICTS = ("PASS", "INTEGRITY_VIOLATION", "JOIN_FAILURE_OBSERVED")
+VIOLATION_RECORD_INVARIANT = "RECORD_INVARIANT"
+VIOLATION_JOIN_OBSERVATION = "JOIN_STATE_OBSERVATION"
+
+# the evaluator's explicit non-ready join states that are PRESENTATION-
+# class findings when observed (never record-integrity failures, never
+# scientific rejections)
+_JOIN_OBSERVATION_STATES = ("RELEASE_UNVERIFIED", "RENDER_RECORD_MISSING",
+                            "INVOCATION_MISSING")
 
 sys.path.insert(0, str(REPO))
 from toscanini import visual_join as vj  # noqa: E402 — THE evaluator
@@ -102,18 +141,26 @@ def canonical_glb(run_dir: Path) -> Optional[Path]:
 
 def run_watchdog(run_dir: Path) -> Dict[str, Any]:
     """The record invariant rules + THE evaluator's join state over one
-    run dir. Returns the JSON report; `violations` empty == PASS."""
+    run dir. Returns the JSON report; `violations` empty == PASS.
+    R451-C2.5 §6: `observed_join_state` and `watchdog_verdict` are
+    INDEPENDENT reports — the join state is what THE evaluator observed
+    (never a verdict), and the verdict classifies every finding as a
+    record-integrity violation or a presentation-class join
+    observation (never a scientific rejection)."""
     checks: List[Dict[str, Any]] = []
     violations: List[Dict[str, Any]] = []
 
     def record(rule: str, applicable: bool, ok: bool, detail: str,
-               evidence: Optional[str] = None) -> None:
+               evidence: Optional[str] = None,
+               violation_class: str = VIOLATION_RECORD_INVARIANT) -> None:
         state = ("NOT_APPLICABLE" if not applicable
                  else "PASS" if ok else "FAIL")
-        checks.append({"rule": rule, "state": state, "detail": detail})
+        checks.append({"rule": rule, "state": state, "detail": detail,
+                       "violation_class": violation_class})
         if applicable and not ok:
             violations.append({"rule": rule, "detail": detail,
-                               "evidence": evidence})
+                               "evidence": evidence,
+                               "violation_class": violation_class})
 
     glb = canonical_glb(run_dir)
     receipt = read_receipt(run_dir)
@@ -308,6 +355,13 @@ def run_watchdog(run_dir: Path) -> Dict[str, Any]:
     # coupling: the evaluator derives the state; THESE record checks
     # must agree with it, and the adversarial battery proves both
     # directions on independently authored fixtures.
+    # R451-C2.5 §6: an announced VISUAL_READY contradicted by the
+    # records is a RECORD_INVARIANT (integrity) finding; an announced
+    # explicit non-ready state (RELEASE_UNVERIFIED /
+    # RENDER_RECORD_MISSING / INVOCATION_MISSING) is a
+    # JOIN_STATE_OBSERVATION — a presentation-class finding the checker
+    # OBSERVES and records, never a scientific rejection and never a
+    # silent translation of a presentation state into one.
     if join_state == "VISUAL_READY":
         record("R10_evaluator_state_consistent",
                applicable=True,
@@ -318,32 +372,62 @@ def run_watchdog(run_dir: Path) -> Dict[str, Any]:
                        f"ladder complete={not missing}; "
                        f"hero source ok={hero_ok}"),
                evidence="release_chain")
-    elif join_state in ("INVOCATION_MISSING", "RENDER_RECORD_MISSING",
-                        "RELEASE_UNVERIFIED"):
-        # the evaluator announced an explicit integrity failure: the
-        # checker records it AS a violation (a failure state is a
-        # finding, never a pass — "No silent gap")
+    elif join_state in _JOIN_OBSERVATION_STATES:
+        # the evaluator announced an explicit non-ready join state: the
+        # checker OBSERVES it and records the presentation-class
+        # finding (a failure state is a finding, never a pass — "No
+        # silent gap"; and never a scientific rejection, Art. LXI)
         record("R10_evaluator_state_consistent", applicable=True,
                ok=False,
                detail=(f"the evaluator announced {join_state}: "
-                       f"{join_detail}"),
-               evidence="visual_join")
+                       f"{join_detail} — a presentation-class finding "
+                       "(never a scientific rejection, R451-C2.5 §6)"),
+               evidence="visual_join",
+               violation_class=VIOLATION_JOIN_OBSERVATION)
 
+    # ---- the two independent reports (R451-C2.5 §6) -------------------
+    integrity_violations = [v for v in violations
+                            if v["violation_class"]
+                            == VIOLATION_RECORD_INVARIANT]
+    join_observations = [v for v in violations
+                         if v["violation_class"]
+                         == VIOLATION_JOIN_OBSERVATION]
+    if integrity_violations:
+        watchdog_verdict = "INTEGRITY_VIOLATION"
+    elif join_observations:
+        watchdog_verdict = "JOIN_FAILURE_OBSERVED"
+    else:
+        watchdog_verdict = "PASS"
     return {
         "kind": "R451_C2_PRODUCT_WATCHDOG",
-        "watchdog_version": "R451-C2.4",
+        "watchdog_version": "R451-C2.5",
         "run_dir": str(run_dir),
         "canonical_glb": str(glb) if glb else None,
         "engineering_authority": contract.get("engineering_authority"),
         "visual_input_ready": visual_input_ready,
         "receipt_status": (receipt or {}).get("invocation_status"),
         "gate_verdict": verdict,
-        "join_state": join_state,
-        "join_state_detail": join_detail,
+        # R451-C2.5 §6 — REPORT 1: what THE evaluator observed
+        # (verbatim, None = undecided). An observation, never a verdict.
+        "observed_join_state": join_state,
+        "observed_join_state_detail": join_detail,
+        # R451-C2.5 §6 — REPORT 2: the checker's typed verdict over the
+        # record invariants (PASS / INTEGRITY_VIOLATION /
+        # JOIN_FAILURE_OBSERVED). Independent of the observation: a
+        # presentation-class join finding is never silently translated
+        # into a scientific rejection (Art. LXI).
+        "watchdog_verdict": watchdog_verdict,
+        "watchdog_verdicts_vocabulary": list(WATCHDOG_VERDICTS),
+        "integrity_violation_count": len(integrity_violations),
+        "join_observation_count": len(join_observations),
         "join_states_vocabulary": list(JOIN_STATES),
         "release_chain": release_chain,
         "checks": checks,
         "violations": violations,
+        # the CLI exit-code projection (superseded as the authority by
+        # watchdog_verdict — kept for the standing exit contract; Art.
+        # LXIV disclosure: a projection of watchdog_verdict, not a
+        # second derivation)
         "verdict": "PASS" if not violations else "FAIL",
     }
 
@@ -353,7 +437,9 @@ def main(argv: Optional[List[str]] = None) -> int:
         description="R451-C2 (C2.10) deterministic geometry-to-visual "
                     "join watchdog — integrity checking only, no visual "
                     "inference; the join state comes from THE canonical "
-                    "evaluator (toscanini/visual_join.py)")
+                    "evaluator (toscanini/visual_join.py); the report "
+                    "carries the independent pair observed_join_state + "
+                    "watchdog_verdict (R451-C2.5 §6)")
     ap.add_argument("run_dir", help="the run directory to inspect")
     ap.add_argument("--json-out", help="also write the report here")
     args = ap.parse_args(argv)

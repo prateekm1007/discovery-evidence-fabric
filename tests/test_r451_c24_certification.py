@@ -745,7 +745,7 @@ class TestEvaluatorCoupling:
             _session(run), {"geometry": _geom_block(_ids[run.name])})
         w = _watchdog()
         report = w.run_watchdog(run)
-        assert tab["visual_join_state"] == report["join_state"]
+        assert tab["visual_join_state"] == report["observed_join_state"]
         assert tab["visual_join_state"] == expected
 
     def test_watchdog_vocabulary_is_the_evaluators(self):
@@ -779,17 +779,27 @@ class TestClosedVocabulariesAndAuthority:
         # the two new typed causes exist and the vocabulary stays closed
         assert '"geometry_unverified"' in ps
         assert '"legacy_render_unverified"' in ps
-        # the legacy pre-C2.1 fallback can no longer resolve to
-        # VISUAL_READY (R451-C2.4 §1)
-        legacy_idx = ps.index("pre-C2.1 projection fallback")
+        # R451-C2.5 SUPERSESSION of the C2.4-era pin: the legacy
+        # pre-C2.1 fallback is now the LEGACY_STATE_UNAVAILABLE branch —
+        # the explicit NON-CURRENT state (a legacy payload derives no
+        # current state at all; the C2.4-era
+        # GEOMETRY_READY_RENDER_BLOCKED[legacy_render_unverified]
+        # resolution is superseded — see the C2.5 battery)
+        legacy_idx = ps.index("THE LEGACY PAYLOAD RULE")
         legacy_block = ps[legacy_idx:legacy_idx + 2200]
         assert 'state: "VISUAL_READY"' not in legacy_block
-        assert 'renderBlockCause: "legacy_render_unverified"' in \
+        assert 'state: "LEGACY_STATE_UNAVAILABLE"' in legacy_block
+        assert 'renderBlockCause: "legacy_render_unverified"' not in \
             legacy_block
-        # the VISUAL_READY branch carries the authority through
+        # the VISUAL_READY branch carries the authority through — and
+        # (R451-C2.5 §2) the branch exists ONLY behind the ENGINEERING
+        # guard: the contradiction pairs fail closed to the non-ready
+        # typed state
         visual_idx = ps.index('gstate === "visual_complete"')
-        visual_block = ps[visual_idx:visual_idx + 520]
+        visual_block = ps[visual_idx:visual_idx + 1500]
         assert "engineeringAuthority" in visual_block
+        assert 'design?.engineering_authority !== "ENGINEERING"' in \
+            visual_block
 
     def test_source_pin_technology_ready_is_authority_gated(self):
         stage = (WEBAPP / "components" / "TechStage.tsx").read_text()

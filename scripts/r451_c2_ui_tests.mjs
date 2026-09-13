@@ -81,10 +81,16 @@ try {
     engineering_authority: "ENGINEERING" }), evidence: null } }));
   check("SUCCESS+geometry(gate PASS) -> VISUAL_READY", r.state === "VISUAL_READY");
 
-  // SUCCESS + geometry, render skipped (case D)
+  // SUCCESS + geometry, render skipped (case D). R451-C2.5: the
+  // fixture is TYPED (a current backend payload carries the typed
+  // state + cause + authority); the untyped raw-field shape no longer
+  // derives any current state — see the LEGACY_STATE_UNAVAILABLE block.
   r = resolvePresentationState(detail(), dossier({ tabs: {
-    design: designAvailable({ renders: { status: "RENDER_SKIPPED_LOW_MEMORY",
-      visual_gate: { verdict: "NOT_RUN" } } }), evidence: null } }));
+    design: designAvailable({ geometry_state: "geometry_available",
+      presentation_cause: "infrastructure",
+      engineering_authority: "ENGINEERING",
+      renders: { status: "RENDER_SKIPPED_LOW_MEMORY",
+        visual_gate: { verdict: "NOT_RUN" } } }), evidence: null } }));
   check("GLB present + renderer skipped -> GEOMETRY_READY_RENDER_BLOCKED",
     r.state === "GEOMETRY_READY_RENDER_BLOCKED" && r.glbReadyButRenderBlocked === true);
 
@@ -328,30 +334,45 @@ try {
     ps.renderBlockedCopy(r.renderBlockCause).line ===
       "Engineering model ready. Presentation render in progress.");
 
-  // R451-C2.2 §1 — the causes are DISTINCT sentences; R451-C2.4 closes
-  // the vocabulary at nine (geometry_unverified +
-  // legacy_render_unverified)
+  // R451-C2.2 §1 — the causes are DISTINCT sentences; R451-C2.4 closed
+  // the vocabulary at nine; R451-C2.5 §2 closes it at TEN
+  // (visual_authority_not_engineering — the contradiction-pair state)
   {
     const lines = new Set(ps.RENDER_BLOCK_CAUSES.map(
       (c) => ps.renderBlockedCopy(c).line));
-    check("nine causes -> nine distinct sentences (R451-C2.4: certification + legacy causes)",
-      ps.RENDER_BLOCK_CAUSES.length === 9 && lines.size === 9);
+    check("ten causes -> ten distinct sentences (R451-C2.5: the contradiction-pair cause)",
+      ps.RENDER_BLOCK_CAUSES.length === 10 && lines.size === 10);
   }
 
-  // R451-C2.4 §1 — the legacy pre-C2.1 fallback can NEVER resolve to
-  // VISUAL_READY: a stale CIO gate PASS without the typed state is
-  // explicitly unverified historical state (the directive's
-  // unknown-authority + stale-CIO-PASS attack, frontend side)
+  // R451-C2.5 §1 — SUPERSESSION of the R451-C2.4 §1 branch: a legacy
+  // pre-C2.1 payload (raw availability/glb/renders fields, no typed
+  // geometry state) now resolves ONLY to LEGACY_STATE_UNAVAILABLE —
+  // the explicit NON-CURRENT compatibility state. A convincing render
+  // PASS in the payload upgrades nothing: a legacy payload derives no
+  // current presentation state at all.
   r = resolvePresentationState(detail(), dossier({ tabs: {
     design: { availability: "AVAILABLE", glb: "/api/run/x/model.glb",
       renders: { status: "OK",
         visual_gate: { verdict: "COMPLETE_PASS" } } }, evidence: null } }));
-  check("R451-C2.4 §1: legacy CIO PASS without the strict evaluator -> explicitly unverified (NEVER VISUAL_READY)",
-    r.state === "GEOMETRY_READY_RENDER_BLOCKED" &&
-    r.renderBlockCause === "legacy_render_unverified");
-  check("R451-C2.4 §1: the unverified-historical copy, never readiness",
-    ps.renderBlockedCopy(r.renderBlockCause).line.includes(
-      "explicitly unverified"));
+  check("R451-C2.5 §1: legacy payload + convincing render PASS -> LEGACY_STATE_UNAVAILABLE",
+    r.state === "LEGACY_STATE_UNAVAILABLE");
+  check("R451-C2.5 §1: the legacy payload NEVER produces a current state",
+    r.state !== "VISUAL_READY" && r.state !== "GEOMETRY_READY_RENDER_BLOCKED" &&
+    r.state !== "TECHNOLOGY_NOT_ESTABLISHED" && r.state !== "SCIENTIFIC_REJECTION");
+  // every legacy shape — with or without the convincing PASS — lands
+  // on the SAME explicit non-current state
+  for (const legacyDesign of [
+    { availability: "AVAILABLE", glb: "/api/run/x/model.glb" },
+    { availability: "AVAILABLE", glb: "/api/run/x/model.glb",
+      renders: { status: "RENDER_FAILED", note: "stale" } },
+    { glb: "/api/run/x/model.glb",
+      renders: { status: "OK", visual_gate: { verdict: "PASS" } } },
+  ]) {
+    r = resolvePresentationState(detail(),
+      dossier({ tabs: { design: legacyDesign, evidence: null } }));
+    check(`R451-C2.5 §1: legacy shape -> LEGACY_STATE_UNAVAILABLE`,
+      r.state === "LEGACY_STATE_UNAVAILABLE");
+  }
 
   // R451-C2.4 §2 — geometry_unverified: the artifact candidate's
   // mandatory certification is incomplete — its OWN cause + sentence
@@ -371,27 +392,40 @@ try {
     ps.renderBlockedCopy(r.renderBlockCause).title ===
       "GEOMETRY AUTHORITY UNVERIFIED");
 
-  // R451-C2.4 §6 — the authority is carried THROUGH the final state:
-  // "Technology ready" exists ONLY on the recorded ENGINEERING
-  // authority; CONCEPTUAL and UNKNOWN get their own explicit labels
+  // R451-C2.5 §2 — SUPERSESSION of the R451-C2.4 §6 mapping: the
+  // VISUAL_READY invariant is ABSOLUTE — the STATE exists only on
+  // (visual_complete, ENGINEERING). The contradiction pairs fail
+  // closed to the NON-READY typed state; "Technology ready" is
+  // structurally unreachable for them (the badge lock is the SECOND
+  // lock — the state itself is the first).
   r = resolvePresentationState(detail(), dossier({ tabs: {
     design: designAvailable({ geometry_state: "visual_complete",
       engineering_authority: "ENGINEERING" }), evidence: null } }));
-  check("R451-C2.4 §6: VISUAL_READY + ENGINEERING authority -> Technology ready",
+  check("R451-C2.5 §2: VISUAL_READY requires (visual_complete, ENGINEERING)",
     r.state === "VISUAL_READY" &&
     r.engineeringAuthority === "ENGINEERING");
   r = resolvePresentationState(detail(), dossier({ tabs: {
     design: designAvailable({ geometry_state: "visual_complete",
       engineering_authority: "CONCEPTUAL" }), evidence: null } }));
-  check("R451-C2.4 §6: VISUAL_READY carries the CONCEPTUAL authority (never Technology ready)",
-    r.state === "VISUAL_READY" &&
-    r.engineeringAuthority === "CONCEPTUAL");
+  check("R451-C2.5 §2: visual_complete + CONCEPTUAL fails closed to the non-ready state",
+    r.state === "GEOMETRY_READY_RENDER_BLOCKED" &&
+    r.renderBlockCause === "visual_authority_not_engineering" &&
+    r.state !== "VISUAL_READY");
+  check("R451-C2.5 §2: the contradiction pair's copy claims no readiness",
+    ps.renderBlockedCopy(r.renderBlockCause).line.includes(
+      "visual readiness is not claimed"));
   r = resolvePresentationState(detail(), dossier({ tabs: {
     design: designAvailable({ geometry_state: "visual_complete",
       engineering_authority: "UNKNOWN" }), evidence: null } }));
-  check("R451-C2.4 §6: VISUAL_READY carries the UNKNOWN authority (never Technology ready)",
-    r.state === "VISUAL_READY" &&
-    r.engineeringAuthority === "UNKNOWN");
+  check("R451-C2.5 §2: visual_complete + UNKNOWN fails closed to the non-ready state",
+    r.state === "GEOMETRY_READY_RENDER_BLOCKED" &&
+    r.renderBlockCause === "visual_authority_not_engineering");
+  r = resolvePresentationState(detail(), dossier({ tabs: {
+    design: designAvailable({ geometry_state: "visual_complete" }),
+    evidence: null } }));
+  check("R451-C2.5 §2: visual_complete + ABSENT authority fails closed (defensive)",
+    r.state === "GEOMETRY_READY_RENDER_BLOCKED" &&
+    r.renderBlockCause === "visual_authority_not_engineering");
 
   // R451-C2.3 §2 — the visual-input boundary has its OWN sentence:
   // a missing canonical GLB is never worded as renderer absence
@@ -471,12 +505,16 @@ try {
     ps.renderBlockedCopy(r.renderBlockCause).line ===
       "Model rendered but did not pass the presentation integrity gate.");
 
-  // State E — gate COMPLETE_PASS: show the model
+  // State E — gate COMPLETE_PASS: show the model.
+  // R451-C2.5 SUPERSESSION (was the C2.1-era State E fixture): the
+  // typed payload carries the recorded ENGINEERING authority — the
+  // authority field is part of the current-state contract now.
   r = resolvePresentationState(detail(), dossier({ tabs: {
-    design: { availability: "AVAILABLE", glb: "/api/run/x/model.glb",
+    design: designAvailable({
       geometry_state: "visual_complete",
+      engineering_authority: "ENGINEERING",
       renders: { status: "OK",
-        visual_gate: { verdict: "COMPLETE_PASS" } } }, evidence: null } }));
+        visual_gate: { verdict: "COMPLETE_PASS" } } }), evidence: null } }));
   check("State E: VISUAL_READY (the model shows)",
     r.state === "VISUAL_READY" && r.glbReadyButRenderBlocked == null);
 
@@ -495,29 +533,31 @@ try {
     r.state === "GEOMETRY_UNAVAILABLE" &&
     r.state !== "TECHNOLOGY_NOT_ESTABLISHED");
 
-  // Attack F2: a GLB URL alone (stale design row) without the typed
-  // state, while the render never ran — stays render-blocked, never
-  // VISUAL_READY (file existence is not render success)
+  // Attack F2 (R451-C2.5 SUPERSESSION): a GLB URL alone (stale design
+  // row) without the typed state is a LEGACY payload — it resolves to
+  // LEGACY_STATE_UNAVAILABLE, never any current state (file existence
+  // and render absence are both raw-field material the browser no
+  // longer interprets; the never-VISUAL_READY property is preserved
+  // and strengthened).
   r = resolvePresentationState(detail(), dossier({ tabs: {
     design: { availability: "AVAILABLE", glb: "/api/run/x/model.glb",
       renders: { status: "" } }, evidence: null } }));
-  check("Attack F2: glb present + no render record -> render-blocked (never VISUAL_READY)",
-    r.state === "GEOMETRY_READY_RENDER_BLOCKED" &&
-    r.renderBlockCause === "not_attempted");
-  check("Attack F2: the not_attempted copy, never renderer absence",
-    ps.renderBlockedCopy(r.renderBlockCause).line ===
-      "Engineering model ready. Presentation render not yet started.");
+  check("Attack F2: glb present + no render record -> LEGACY_STATE_UNAVAILABLE (never VISUAL_READY)",
+    r.state === "LEGACY_STATE_UNAVAILABLE" && r.state !== "VISUAL_READY");
+  check("Attack F2: the legacy payload derives no current state",
+    r.state !== "GEOMETRY_READY_RENDER_BLOCKED");
 
-  // Attack F3: gate verdict FAIL with pixels rendered must NOT read as
-  // renderer absence (State D says the gate rejected, not the renderer)
+  // Attack F3 (R451-C2.5 SUPERSESSION): a raw gate FAIL with no typed
+  // state is legacy material — the browser derives no current state
+  // from it at all (the gate is the backend evaluator's input, never
+  // the browser's; the typed State D path still renders the gate copy
+  // in the causes block above).
   r = resolvePresentationState(detail(), dossier({ tabs: {
     design: { availability: "AVAILABLE", glb: "/api/run/x/model.glb",
       renders: { status: "OK",
         visual_gate: { verdict: "FAIL" } } }, evidence: null } }));
-  check("Attack F3: rendered + gate FAIL -> gate copy (not renderer copy)",
-    r.renderBlockCause === "gate_not_passed" &&
-    ps.renderBlockedCopy(r.renderBlockCause).title ===
-      "PRESENTATION INTEGRITY GATE");
+  check("Attack F3: raw gate FAIL without the typed state -> LEGACY_STATE_UNAVAILABLE",
+    r.state === "LEGACY_STATE_UNAVAILABLE");
 
   // Attack F4: upstream_not_reached on a terminal run with an invention
   // falls through to the honest absence resolution — never a fake

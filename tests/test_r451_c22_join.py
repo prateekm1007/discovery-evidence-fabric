@@ -521,7 +521,7 @@ class TestWatchdogJoin:
         self._eng_glb(tmp_path)
         report = w.run_watchdog(tmp_path)
         assert report["verdict"] == "FAIL"
-        assert report["join_state"] == "INVOCATION_MISSING"
+        assert report["observed_join_state"] == "INVOCATION_MISSING"
         assert any(v["rule"] == "R8_valid_glb_requires_visual_invocation"
                    for v in report["violations"])
 
@@ -537,7 +537,7 @@ class TestWatchdogJoin:
                        skip_reason="below the memory floor")
         report = w.run_watchdog(tmp_path)
         assert report["verdict"] == "PASS", report["violations"]
-        assert report["join_state"] == "RENDER_BLOCKED"
+        assert report["observed_join_state"] == "RENDER_BLOCKED"
 
     def test_valid_glb_pending_job_is_explicit_pending(self, tmp_path):
         """§6 row 2b: invocation requested (job in flight), render
@@ -550,7 +550,7 @@ class TestWatchdogJoin:
             {"status": "RUNNING"}))
         report = w.run_watchdog(tmp_path)
         assert report["verdict"] == "PASS", report["violations"]
-        assert report["join_state"] == "INVOCATION_PENDING"
+        assert report["observed_join_state"] == "INVOCATION_PENDING"
 
     def test_valid_glb_invocation_rendered_no_record_fails(
             self, tmp_path):
@@ -562,7 +562,7 @@ class TestWatchdogJoin:
                        glb_sha256="a" * 64)
         report = w.run_watchdog(tmp_path)
         assert report["verdict"] == "FAIL"
-        assert report["join_state"] == "RENDER_RECORD_MISSING"
+        assert report["observed_join_state"] == "RENDER_RECORD_MISSING"
         assert any(v["rule"] == "R9_rendered_requires_render_record"
                    for v in report["violations"])
 
@@ -580,7 +580,7 @@ class TestWatchdogJoin:
             {"verdict": "FAIL"}))
         report = w.run_watchdog(tmp_path)
         assert report["verdict"] == "PASS", report["violations"]
-        assert report["join_state"] == "STOPPED_GATE"
+        assert report["observed_join_state"] == "STOPPED_GATE"
 
     def test_valid_glb_render_gate_pass_is_visual_ready(self, tmp_path):
         """§6 row 4: valid GLB + render + gate pass + the FULL release
@@ -620,7 +620,7 @@ class TestWatchdogJoin:
         (m3d / "render_record.json").write_text(json.dumps(rec))
         report = w.run_watchdog(tmp_path)
         assert report["verdict"] == "PASS", report["violations"]
-        assert report["join_state"] == "VISUAL_READY"
+        assert report["observed_join_state"] == "VISUAL_READY"
         assert report["release_chain"]["verified"] is True
 
     def test_no_glb_is_not_reached_never_a_failure(self, tmp_path):
@@ -632,7 +632,7 @@ class TestWatchdogJoin:
         w = self._load()
         report = w.run_watchdog(tmp_path)
         assert report["verdict"] == "PASS"
-        assert report["join_state"] == "NOT_REACHED"
+        assert report["observed_join_state"] == "NOT_REACHED"
 
     def test_missing_authority_is_unknown_never_engineering(
             self, tmp_path):

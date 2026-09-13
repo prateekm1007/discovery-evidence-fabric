@@ -1,6 +1,6 @@
 """visual_join.py — THE machine-verifiable geometry-to-visual join
 evaluator (R451-C2.2 §5/§6, hardened by R451-C2.3, certified by
-R451-C2.4).
+R451-C2.4, sovereignty-hardened by R451-C2.5).
 
 The directive's join contract:
 
@@ -79,6 +79,27 @@ THE one evaluator (R451-C2.3 §8): the dossier projection AND the
 r451_c2_watchdog consume THIS module's state semantics. The watchdog
 attacks it with independently authored adversarial fixtures — it does
 not implement a second state machine.
+
+R451-C2.5 PERSISTED IDENTITY SOVEREIGNTY (§3): certification traces
+to PERSISTED identity documents only — DESIGN_LINEAGE.json's
+current-generation entry or ARTIFACT_IDENTITY.json (the explicit
+canonical persisted equivalents). The projection's carried
+geom.artifact_identity object and generation field are DIAGNOSTICS:
+they may contradict the persisted chain (fail closed) and they are
+reported as diagnostics, but they can never name the artifact,
+certify a SHA, state the authority class, or anchor the current
+generation. A forged geom object carrying a complete artifact
+identity certifies nothing when the persisted document is absent.
+
+R451-C2.5 STRUCTURAL GLB VALIDITY (§4): glb_format_check proves the
+container's own structure — the header (magic, version 2, declared
+length == file size), the chunk framing (each chunk's declared length
+fits the container; the first chunk is the JSON chunk), and the JSON
+structure (the JSON chunk parses; asset.version is "2.0"). A valid
+header over malformed internal structure never certifies. Honest
+scope: this is container-level structural validity — the semantic
+render verification remains the Visual Quality Gate's job downstream
+(Article LXXII); this check never claims mesh/buffer semantics.
 
 PRESENTATION-ONLY (Coder 2 boundary): this module derives state from
 canonical records and changes no engineering truth. It WRITES nothing
@@ -166,9 +187,12 @@ CAD_LEDGER_INFRA = ("BLOCKED_TRANSPORT", "NO_MODEL_NO_LLM")
 _STEP_MAGIC = b"ISO-10303-21"
 
 # the glTF binary container magic — the deterministic GLB format check
-# (R451-C2.4 §3): a file whose bytes hash correctly is still not a GLB
-# unless the container itself is valid
+# (R451-C2.4 §3, upgraded to STRUCTURAL validation R451-C2.5 §4): a
+# file whose bytes hash correctly is still not a GLB unless the
+# container's structure itself is valid
 _GLB_MAGIC = b"glTF"
+_GLB_JSON_CHUNK = b"JSON"
+_GLB_BIN_CHUNK = b"BIN\x00"
 
 
 def _read_json(path: Path) -> Optional[Dict[str, Any]]:
@@ -193,15 +217,32 @@ def _sha256_file(path: Path) -> Optional[str]:
 
 
 def glb_format_check(path: Path) -> Dict[str, Any]:
-    """R451-C2.4 §3 — THE deterministic GLB format validity check
-    (no loaders, no interpretation — the container's own bytes):
+    """R451-C2.4 §3, upgraded R451-C2.5 §4 — THE deterministic
+    STRUCTURAL GLB validity check (no loaders, no interpretation — the
+    container's own bytes):
       * the file is at least the 12-byte glTF header
       * bytes 0..4 are the magic b"glTF"
       * the version field (uint32 LE at offset 4) is 2
       * the declared length (uint32 LE at offset 8) equals the file
         size on disk (a truncated or padded container fails)
-    A correct hash over INVALID bytes must never certify: the format
-    is a mandatory proof, separate from identity."""
+      * CHUNK FRAMING: walking chunks from offset 12, every chunk's
+        8-byte sub-header (uint32 LE length + 4-byte type) fits inside
+        the container; the FIRST chunk is the JSON chunk (0x4E4F534A);
+        chunk lengths do not overrun the declared container length
+      * JSON STRUCTURE: the JSON chunk decodes as UTF-8 and parses as
+        a JSON object carrying asset.version == "2.0" (the glTF 2.0
+        spec-mandatory asset block)
+      * a BIN chunk (0x004E4942), when present, is 4-byte aligned (the
+        spec's padding requirement) and never precedes the JSON chunk
+    A correct hash over INVALID bytes must never certify: the header
+    alone is not a proof — a valid header over a malformed internal
+    structure (a BIN first chunk, corrupt JSON, a chunk that overruns
+    the container) FAILS here.
+    Honest scope: this establishes container-level structural
+    validity — header + chunk framing + JSON structure. It does NOT
+    validate mesh/buffer/accessor semantics (the presentation's
+    semantic verification remains the Visual Quality Gate's rendered
+    measurement, Article LXXII)."""
     result = {"valid": False, "detail": "file missing"}
     try:
         size = path.stat().st_size
@@ -212,16 +253,15 @@ def glb_format_check(path: Path) -> Dict[str, Any]:
                            "12-byte glTF header"
         return result
     try:
-        with open(path, "rb") as fh:
-            header = fh.read(12)
+        data = path.read_bytes()
     except OSError:
-        result["detail"] = "header unreadable"
+        result["detail"] = "container unreadable"
         return result
-    if header[0:4] != _GLB_MAGIC:
+    if data[0:4] != _GLB_MAGIC:
         result["detail"] = ("bytes do not begin with the glTF magic — "
                             "this is not a GLB container")
         return result
-    version, declared = struct.unpack("<II", header[4:12])
+    version, declared = struct.unpack("<II", data[4:12])
     if version != 2:
         result["detail"] = f"glTF version {version} is not 2"
         return result
@@ -230,8 +270,66 @@ def glb_format_check(path: Path) -> Dict[str, Any]:
                             f"{size} bytes on disk — truncated or "
                             "padded container")
         return result
-    return {"valid": True, "detail": f"valid glTF 2.0 container "
-                                     f"({size} bytes)"}
+    # ---- chunk framing (R451-C2.5 §4) -------------------------------
+    offset = 12
+    first_chunk = True
+    seen_json = False
+    json_bytes: Optional[bytes] = None
+    while offset < declared:
+        if offset + 8 > declared:
+            result["detail"] = (f"chunk header at offset {offset} "
+                                "overruns the container — malformed "
+                                "chunk framing")
+            return result
+        chunk_len, chunk_type = struct.unpack("<I4s",
+                                              data[offset:offset + 8])
+        offset += 8
+        if offset + chunk_len > declared:
+            result["detail"] = (f"chunk of {chunk_len} bytes at offset "
+                                f"{offset} overruns the declared "
+                                "container length — malformed chunk "
+                                "framing")
+            return result
+        if first_chunk:
+            if chunk_type != _GLB_JSON_CHUNK:
+                result["detail"] = ("the first chunk is not the JSON "
+                                    "chunk — malformed GLB structure")
+                return result
+            first_chunk = False
+            seen_json = True
+            json_bytes = data[offset:offset + chunk_len]
+        elif chunk_type == _GLB_BIN_CHUNK:
+            if chunk_len % 4 != 0:
+                result["detail"] = ("the BIN chunk length is not "
+                                    "4-byte aligned — malformed GLB "
+                                    "structure")
+                return result
+        offset += chunk_len
+    if not seen_json:
+        result["detail"] = ("the container carries no JSON chunk — "
+                            "malformed GLB structure")
+        return result
+    # ---- JSON structure (R451-C2.5 §4) -------------------------------
+    try:
+        doc = json.loads(json_bytes.decode("utf-8"))
+    except (UnicodeDecodeError, ValueError):
+        result["detail"] = ("the JSON chunk does not parse as JSON — "
+                            "malformed GLB structure")
+        return result
+    if not isinstance(doc, dict):
+        result["detail"] = ("the JSON chunk is not a JSON object — "
+                            "malformed GLB structure")
+        return result
+    asset = doc.get("asset")
+    if not isinstance(asset, dict) or str(asset.get("version")) != "2.0":
+        result["detail"] = ("the glTF JSON carries no asset.version "
+                            "\"2.0\" — not a valid glTF 2.0 "
+                            "structure")
+        return result
+    return {"valid": True, "detail": f"structurally valid glTF 2.0 "
+                                     f"binary ({size} bytes, chunk "
+                                     "framing + JSON structure "
+                                     "verified)"}
 
 
 # ---------------------------------------------------------------------------
@@ -281,25 +379,40 @@ def resolve_canonical_glb(run_dir: Optional[Path]) -> Optional[Path]:
 def certified_canonical_glb(run_dir: Optional[Path],
                             geom: Optional[Dict[str, Any]] = None,
                             ) -> Dict[str, Any]:
-    """R451-C2.4 §2/§4 — THE certification path. The authoritative
-    resolution is: a RECORDED identity document names the exact
-    artifact -> the artifact's SHA is measured from its own bytes ->
-    the generation identity holds against the current generation.
+    """R451-C2.4 §2/§4 — THE certification path. PERSISTED IDENTITY
+    SOVEREIGNTY (R451-C2.5 §3): the authoritative resolution is a
+    PERSISTED identity document on the run's own disk —
+    DESIGN_LINEAGE.json's current-generation entry or
+    ARTIFACT_IDENTITY.json — naming the exact artifact -> the
+    artifact's SHA measured from its own bytes -> the generation
+    identity held against a PERSISTED current-generation anchor.
 
       1. exact artifact   named by DESIGN_LINEAGE.json's current-
                           generation entry, else by ARTIFACT_IDENTITY
-                          .glb_path (the recorded identity chain —
-                          never a filename that merely looks right)
+                          .glb_path (the persisted identity chain —
+                          never a filename that merely looks right,
+                          and NEVER the projection's carried
+                          geom.artifact_identity object)
       2. measured SHA     sha256 over the named file's own bytes,
-                          equal to the SHA the identity records
-                          (geometry_hash / glb_disk_sha256)
-      3. current          the identity's generation_id exists and
-         generation       matches the current-generation anchor (the
-                          projection's recorded generation_id, else
-                          the lineage's current entry)
+                          equal to the SHA the PERSISTED identity
+                          records (geometry_hash / glb_disk_sha256)
+      3. current          the persisted identity's generation_id
+         generation       exists and matches the persisted
+                          current-generation anchor (the lineage's
+                          current entry's own generation_id when it
+                          records one, else the persisted identity's
+                          generation_id)
+
+    R451-C2.5 §3: a projection-side geom.artifact_identity object —
+    however complete — is DIAGNOSTIC ONLY. It can never name the
+    artifact, never supply a certifying SHA, and never anchor the
+    current generation. Attack proven by the battery: a forged geom
+    object carrying a complete artifact identity does NOT certify an
+    artifact when no persisted identity document exists.
 
     Plus the container proofs: the file exists, is non-zero, and is a
-    VALID glTF 2.0 container (R451-C2.4 §3).
+    STRUCTURALLY VALID glTF 2.0 binary (R451-C2.5 §4: header + chunk
+    framing + JSON structure — glb_format_check).
 
     A file found only by the DIAGNOSTIC locator's filename fallbacks
     is reported as `diagnostic_candidate` — readable, never certified
@@ -309,18 +422,27 @@ def certified_canonical_glb(run_dir: Optional[Path],
     diagnostic_basis, format}. Observational: reads only."""
     run_dir = Path(run_dir) if run_dir else None
     geom = geom or {}
+    br_identity = (geom.get("artifact_identity") or {}) \
+        if isinstance(geom.get("artifact_identity"), dict) else {}
     out: Dict[str, Any] = {
         "certified": False, "glb": None, "sha256": None, "size": 0,
         "generation_id": None, "current_generation_id": None,
         "basis": None, "failures": [],
         "diagnostic_candidate": None, "diagnostic_basis": None,
         "format": None,
+        # R451-C2.5 §3 — a projection-carried identity object is
+        # reported AS a diagnostic; its presence never certifies
+        "projection_identity_diagnostic": bool(br_identity),
     }
     if run_dir is None or not run_dir.exists():
         out["failures"] = ["no run directory is readable"]
         return out
 
-    # ---- the recorded identity documents -----------------------------
+    # ---- the PERSISTED identity documents (R451-C2.5 §3) -------------
+    # ONLY documents persisted under the run directory can certify. The
+    # projection's carried geom.artifact_identity object is diagnostic
+    # only — it never names the artifact, never certifies a SHA, and
+    # never anchors the current generation.
     lineage = _read_json(run_dir / DESIGN_LINEAGE_REL) or \
         _read_json(run_dir / "MODEL" / DESIGN_LINEAGE_REL)
     identity = _read_json(run_dir / ARTIFACT_IDENTITY_REL) or {}
@@ -328,10 +450,8 @@ def certified_canonical_glb(run_dir: Optional[Path],
         run_dir / "MODEL" / ARTIFACT_IDENTITY_REL) or {}
     if not identity and model_identity:
         identity = model_identity
-    br_identity = (geom.get("artifact_identity") or {}) \
-        if isinstance(geom.get("artifact_identity"), dict) else {}
 
-    # ---- 1. the exact artifact, named by the identity chain ----------
+    # ---- 1. the exact artifact, named by the PERSISTED chain ---------
     named: Optional[Path] = None
     basis: Optional[str] = None
     if lineage:
@@ -340,22 +460,19 @@ def certified_canonical_glb(run_dir: Optional[Path],
                 named = run_dir / str(gen["glb"])
                 basis = "DESIGN_LINEAGE.json current generation entry"
                 break
-    if named is None:
-        for src_name, src in (("ARTIFACT_IDENTITY.json", identity),
-                              ("the bridge's artifact_identity",
-                               br_identity)):
-            id_path = src.get("glb_path")
-            if id_path:
-                named = run_dir / str(id_path)
-                basis = src_name
-                break
+    if named is None and identity:
+        id_path = identity.get("glb_path")
+        if id_path:
+            named = run_dir / str(id_path)
+            basis = "ARTIFACT_IDENTITY.json glb_path"
     if named is None:
         out["failures"].append(
-            "no recorded identity document names the canonical GLB "
+            "no PERSISTED identity document names the canonical GLB "
             "(DESIGN_LINEAGE.json current generation / "
             "ARTIFACT_IDENTITY.json glb_path) — a filename that "
-            "merely looks right is a diagnostic candidate, never a "
-            "certification")
+            "merely looks right is a diagnostic candidate, and a "
+            "projection-carried artifact identity is diagnostic only "
+            "(R451-C2.5 §3): neither certifies")
 
     # ---- the diagnostic candidate (readable, never certified) --------
     diag = resolve_canonical_glb(run_dir)
@@ -387,15 +504,16 @@ def certified_canonical_glb(run_dir: Optional[Path],
             f"({fmt['detail']})")
         return out
 
-    # ---- 2. the measured SHA vs the identity's recorded SHA ----------
+    # ---- 2. the measured SHA vs the PERSISTED identity's SHA --------
+    # R451-C2.5 §3: only the persisted identity's recorded SHAs can
+    # certify. The projection's carried SHA fields are contradiction
+    # diagnostics in evaluate_geometry_contract — never authority here.
     glb_sha = _sha256_file(named)
     out["sha256"] = glb_sha
     recorded_shas = [
         ("ARTIFACT_IDENTITY.geometry_hash", identity.get("geometry_hash")),
         ("ARTIFACT_IDENTITY.glb_disk_sha256",
          identity.get("glb_disk_sha256")),
-        ("bridge.artifact_identity.geometry_hash",
-         br_identity.get("geometry_hash")),
     ]
     identity_shas = [(s, v) for s, v in recorded_shas if v]
     if not identity_shas:
@@ -412,24 +530,52 @@ def certified_canonical_glb(run_dir: Optional[Path],
             "broken (fail closed)")
         return out
 
-    # ---- 3. the generation identity -----------------------------------
+    # ---- 3. the generation identity (PERSISTED anchor, R451-C2.5 §3) --
+    # The generation identity is held against PERSISTED documents only:
+    # the persisted identity's generation_id, anchored by the lineage's
+    # current-generation entry's own generation_id when the lineage
+    # records one. The projection's carried generation fields are
+    # contradiction diagnostics (evaluate_geometry_contract) — they can
+    # fail this certification closed but can never anchor it.
     id_generation = identity.get("generation_id") or \
-        br_identity.get("generation_id") or \
         (lineage or {}).get("generation_id")
-    current_anchor = geom.get("generation_id") or id_generation
+    lineage_anchor = None
+    if lineage:
+        for gen in lineage.get("generation_models") or []:
+            if gen.get("current") and gen.get("generation_id"):
+                lineage_anchor = str(gen["generation_id"])
+                break
+    current_anchor = lineage_anchor or id_generation
     out["generation_id"] = str(id_generation) if id_generation else None
     out["current_generation_id"] = str(current_anchor) \
         if current_anchor else None
     if not id_generation:
         out["failures"].append(
-            "the artifact identity records no generation ID — the "
-            "generation identity is mandatory")
+            "the PERSISTED identity records no generation ID — the "
+            "generation identity is mandatory and cannot be anchored "
+            "by a projection field (R451-C2.5 §3)")
         return out
     if current_anchor and str(id_generation) != str(current_anchor):
         out["failures"].append(
             f"the artifact generation ({id_generation}) does not "
-            f"match the current generation ({current_anchor}) — a "
-            "stale artifact never certifies")
+            f"match the persisted current generation ({current_anchor}) "
+            "— a stale artifact never certifies")
+        return out
+    # R451-C2.5 §3 — a projection-carried generation CONTRADICTING the
+    # persisted identity fails the certification closed (the projection
+    # never anchors the current generation; a contradiction is never
+    # resolved by trusting either side's promotion path)
+    proj_gen = None
+    if isinstance(geom.get("artifact_identity"), dict):
+        proj_gen = geom["artifact_identity"].get("generation_id")
+    proj_gen = proj_gen or geom.get("generation_id")
+    if proj_gen and str(id_generation) != str(proj_gen):
+        out["failures"].append(
+            f"the projection's carried generation ({proj_gen}) "
+            f"contradicts the persisted identity generation "
+            f"({id_generation}) — the projection never anchors the "
+            "current generation and its contradiction fails the "
+            "certification closed (R451-C2.5 §3)")
         return out
 
     out["certified"] = True
@@ -438,8 +584,33 @@ def certified_canonical_glb(run_dir: Optional[Path],
     return out
 
 
+def _load_lineage(run_dir: Optional[Path]) -> Dict[str, Any]:
+    """The PERSISTED DESIGN_LINEAGE.json (either location), read-only.
+    R451-C2.5 §3: the lineage is one of the two persisted identity
+    documents — the projection never substitutes for it."""
+    if run_dir is None:
+        return {}
+    return _read_json(Path(run_dir) / DESIGN_LINEAGE_REL) or \
+        _read_json(Path(run_dir) / "MODEL" / DESIGN_LINEAGE_REL) or {}
+
+
+def lineage_anchor_generation(run_dir: Optional[Path]) -> Optional[str]:
+    """The PERSISTED current-generation anchor: the DESIGN_LINEAGE.json
+    current-generation entry's own generation_id when the lineage
+    records one. R451-C2.5 §3: the current-generation identity is
+    decided by persisted documents — never by the projection's carried
+    generation field (which may only contradict, fail-closed)."""
+    lineage = _load_lineage(run_dir)
+    for gen in lineage.get("generation_models") or []:
+        if gen.get("current") and gen.get("generation_id"):
+            return str(gen["generation_id"])
+    return None
+
+
 def resolve_step_artifacts(run_dir: Optional[Path]) -> List[Path]:
-    """The run's STEP artifacts (real files, never route strings)."""
+    """The run's STEP artifacts (real files, never route strings).
+
+    Returns [] when there is no run directory."""
     if run_dir is None:
         return []
     out: List[Path] = []
@@ -536,22 +707,34 @@ def evaluate_geometry_contract(session: Dict[str, Any],
             continue
 
     # ---- the recorded identity chain --------------------------------
+    # R451-C2.5 §3 — PERSISTED IDENTITY SOVEREIGNTY: `identity` below is
+    # the PERSISTED ARTIFACT_IDENTITY.json (the only certification
+    # authority). `br_identity` (the projection's carried
+    # geom.artifact_identity) and the projection's own generation_id
+    # are DIAGNOSTICS: they may CONTRADICT the persisted chain (fail
+    # closed) but can never name an artifact, certify a SHA, state an
+    # authority class, or anchor the current generation.
     identity = _read_json(run_dir / ARTIFACT_IDENTITY_REL) if run_dir \
         else None
     br_identity = (geom.get("artifact_identity") or {}) if isinstance(
         geom.get("artifact_identity"), dict) else {}
-    generation_id = geom.get("generation_id") or \
+    projection_generation_id = geom.get("generation_id") or \
         br_identity.get("generation_id")
 
     # ---- SHA verification: every RECORDED sha must match the bytes ---
+    # (R451-C2.5 §3: the persisted identity's SHAs are the certification
+    # authority; the projection-carried SHAs are CONTRADICTION
+    # diagnostics — a projection SHA that disagrees with the bytes
+    # fails the artifact closed, never certifies it)
     sha_checks: List[Dict[str, Any]] = []
     recorded_shas = {
         "artifact_identity.geometry_hash":
             (identity or {}).get("geometry_hash"),
         "artifact_identity.glb_disk_sha256":
             (identity or {}).get("glb_disk_sha256"),
-        "cio.geometry.glb_sha256": geom.get("glb_sha256"),
-        "bridge.artifact_identity.geometry_hash":
+        "cio.geometry.glb_sha256 (projection diagnostic)":
+            geom.get("glb_sha256"),
+        "bridge.artifact_identity.geometry_hash (projection diagnostic)":
             br_identity.get("geometry_hash"),
     }
     any_sha_recorded = False
@@ -572,16 +755,18 @@ def evaluate_geometry_contract(session: Dict[str, Any],
 
     # ---- the engineering authority (explicit / conceptual / UNKNOWN) -
     # R451-C2.3: the authority reads RECORDED identity documents only
-    # (MODEL/ARTIFACT_IDENTITY.json, the bridge report's own class
-    # fields, the CAD ledger's completion). The CIO's DERIVED class
-    # field is never an authority source — for a bare GLB it is a
-    # filename-derived inference (exactly what this round removes).
+    # (the PERSISTED MODEL/ARTIFACT_IDENTITY.json, the PERSISTED bridge
+    # report's own class fields, the CAD ledger's completion).
+    # R451-C2.5 §3: the projection's carried
+    # geom.artifact_identity.visualizability_class is a DIAGNOSTIC — it
+    # never creates authority (a forged projection claiming
+    # ENGINEERING_3D certifies nothing). The CIO's DERIVED class field
+    # is never an authority source either — for a bare GLB it is a
+    # filename-derived inference.
     class_sources: List[str] = []
     for src, val in (
             ("artifact_identity.visualizability_class",
-             (identity or {}).get("visualizability_class")),
-            ("bridge.artifact_identity.visualizability_class",
-             br_identity.get("visualizability_class"))):
+             (identity or {}).get("visualizability_class")),):
         if val:
             class_sources.append(f"{src}={val}")
     bridge_report = _read_json(run_dir / "BRIDGE_REPORT.json") \
@@ -656,17 +841,26 @@ def evaluate_geometry_contract(session: Dict[str, Any],
             verify_detail = ("no verifiable geometry artifact resolves "
                              "under the run directory")
 
-    # ---- generation identity must match when both sides record it ----
+    # ---- generation identity (PERSISTED anchor, R451-C2.5 §3) --------
+    # The persisted identity's generation_id is the anchor. The
+    # projection's carried generation is a CONTRADICTION diagnostic:
+    # when it disagrees with the persisted chain, the artifact fails
+    # closed (the projection never anchors, never certifies).
     identity_generation = (identity or {}).get("generation_id") or \
-        br_identity.get("generation_id")
+        (lineage_anchor_generation(run_dir) or
+         _load_lineage(run_dir).get("generation_id"))
     generation_mismatch = bool(
-        identity_generation and generation_id
-        and str(identity_generation) != str(generation_id))
+        identity_generation and projection_generation_id
+        and str(identity_generation) != str(projection_generation_id))
     if generation_mismatch:
         artifact_verified = False
         engineering_authority = "UNKNOWN"
-        verify_detail = ("the recorded generation identity does not "
-                         "match the artifact identity (fail closed)")
+        verify_detail = ("the projection's carried generation "
+                         f"({projection_generation_id}) contradicts the "
+                         f"persisted identity generation "
+                         f"({identity_generation}) — a projection never "
+                         "anchors the current generation (fail closed, "
+                         "R451-C2.5 §3)")
 
     # ---- R451-C2.4 §2: the NINE mandatory proofs gate -----------------
     # A verified-LOOKING artifact whose certification is incomplete is

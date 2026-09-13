@@ -279,7 +279,7 @@ class TestGoldenChain:
             _session(golden), {"geometry": _geom_block(_ids[golden.name])})
         w = _watchdog()
         report = w.run_watchdog(golden)
-        assert tab["visual_join_state"] == report["join_state"] \
+        assert tab["visual_join_state"] == report["observed_join_state"] \
             == "VISUAL_READY"
 
 
@@ -556,7 +556,7 @@ class TestFalsePositiveBattery:
         w = _watchdog()
         report = w.run_watchdog(run)
         assert report["verdict"] == "FAIL"
-        assert report["join_state"] == "RELEASE_UNVERIFIED"
+        assert report["observed_join_state"] == "RELEASE_UNVERIFIED"
 
     # ---- 14. gate PASS but incomplete ladder --------------------------------
     def test_gate_pass_incomplete_ladder_never_visual_ready(
@@ -629,7 +629,7 @@ class TestOneEvaluatorTwoConsumers:
             _session(run), {"geometry": _geom_block(_ids[run.name])})
         w = _watchdog()
         report = w.run_watchdog(run)
-        assert tab["visual_join_state"] == report["join_state"]
+        assert tab["visual_join_state"] == report["observed_join_state"]
         assert tab["visual_join_state"] == expected
 
     def test_watchdog_vocabulary_is_the_evaluators(self):

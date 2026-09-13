@@ -103,8 +103,14 @@ export interface PresentationDossier {
   } | null;
 }
 
-// ---- the seven presentation states (directive C2.2) ----
-
+// ---- the presentation states (directive C2.2; extended R451-C2.5) ----
+// R451-C2.5 §1 — LEGACY_STATE_UNAVAILABLE: the explicit NON-CURRENT
+// compatibility state. A legacy payload (a pre-typed projection whose
+// geometry/render claims exist only as raw fields) can display ONLY
+// this state — never a current presentation state. The four states a
+// legacy payload must NEVER produce: VISUAL_READY,
+// GEOMETRY_READY_RENDER_BLOCKED, TECHNOLOGY_NOT_ESTABLISHED,
+// SCIENTIFIC_REJECTION.
 export type PresentationState =
   | "INVESTIGATING"
   | "INFRASTRUCTURE_PAUSED"
@@ -112,7 +118,8 @@ export type PresentationState =
   | "GEOMETRY_UNAVAILABLE"
   | "GEOMETRY_READY_RENDER_BLOCKED"
   | "VISUAL_READY"
-  | "SCIENTIFIC_REJECTION";
+  | "SCIENTIFIC_REJECTION"
+  | "LEGACY_STATE_UNAVAILABLE";
 
 // the backend user-state keys that are INFRASTRUCTURE states (Art. LXI)
 // — the user-state projection is authoritative; a stale scientific-
@@ -124,8 +131,10 @@ export const INFRASTRUCTURE_USER_STATES = new Set([
   "FAILED_ENGINE",
 ]);
 
-// the visual-gate verdicts that mean the presentation render is approved
-export const GATE_PASS_VERDICTS = new Set(["PASS", "COMPLETE_PASS"]);
+// R451-C2.5 §1: the C2-era GATE_PASS_VERDICTS frontend set is DELETED
+// (Art. LXIV disposition of the superseded legacy fallback that consumed
+// it — the frontend no longer reads gate verdicts at all; the gate is
+// the backend evaluator's input, never the browser's).
 
 // R451-C2.1 — the geometry/visual vocabulary (backend-owned;
 // toscanini/dossier.py::GEOMETRY_STATES is the authority). R451-C2.4
@@ -152,8 +161,11 @@ export const GEOMETRY_STATES = new Set([
 // R451-C2.4: geometry_unverified (the artifact candidate's mandatory
 // certification is incomplete) and legacy_render_unverified (a CIO-
 // block render verdict reached without the strict evaluator —
-// explicitly unverified historical state, R451-C2.4 §1) close the
-// vocabulary at nine.
+// explicitly unverified historical state, R451-C2.4 §1).
+// R451-C2.5 §2: visual_authority_not_engineering — the contradiction
+// pairs (visual_complete + CONCEPTUAL, visual_complete + UNKNOWN)
+// fail closed here: the STATE itself is not ready, not merely the
+// badge (the vocabulary closes at ten).
 export type RenderBlockCause =
   | "renderer_unavailable"
   | "gate_not_passed"
@@ -163,7 +175,8 @@ export type RenderBlockCause =
   | "visual_input_missing"
   | "release_unverified"
   | "geometry_unverified"
-  | "legacy_render_unverified";
+  | "legacy_render_unverified"
+  | "visual_authority_not_engineering";
 
 // the closed cause vocabulary — the source pin the test battery walks
 export const RENDER_BLOCK_CAUSES: RenderBlockCause[] = [
@@ -176,6 +189,7 @@ export const RENDER_BLOCK_CAUSES: RenderBlockCause[] = [
   "release_unverified",
   "geometry_unverified",
   "legacy_render_unverified",
+  "visual_authority_not_engineering",
 ];
 
 export interface BlockedCopy {
@@ -320,6 +334,18 @@ export function renderBlockedCopy(cause?: RenderBlockCause): {
         "state is explicitly unverified.",
     };
   }
+  if (cause === "visual_authority_not_engineering") {
+    // R451-C2.5 §2 — the contradiction pair (a verified presentation
+    // whose recorded geometry authority is NOT ENGINEERING) fails
+    // closed to a NON-READY STATE: the state itself is never visual
+    // readiness — hiding the badge is not enough
+    return {
+      title: "GEOMETRY AUTHORITY UNVERIFIED",
+      line: "A presentation render is recorded, but the geometry " +
+        "authority is not established as engineering — visual " +
+        "readiness is not claimed.",
+    };
+  }
   // State C — the renderer itself is unavailable in this environment
   return {
     title: "ENGINEERING MODEL READY",
@@ -388,10 +414,26 @@ export function resolvePresentationState(
 
   if (typedGeometry) {
     if (gstate === "visual_complete") {
-      // State E — render succeeded AND the gate passed: show the model.
-      // R451-C2.4 §6: the authority rides with the state — the badge
-      // NEVER claims "Technology ready" without the recorded
-      // ENGINEERING authority (a render alone is never the claim).
+      // R451-C2.5 §2 — THE VISUAL_READY INVARIANT IS ABSOLUTE:
+      // VISUAL_READY exists ONLY when geometry_state == visual_complete
+      // AND engineering_authority == ENGINEERING. A contradiction pair
+      // (visual_complete + CONCEPTUAL, visual_complete + UNKNOWN or
+      // absent) FAILS CLOSED to the non-ready typed state — the state
+      // itself is not ready ("Technology ready" and the top-level
+      // VISUAL_READY obey the same authority invariant; hiding the
+      // badge is not enough — the state is the claim).
+      if (design?.engineering_authority !== "ENGINEERING") {
+        return {
+          state: "GEOMETRY_READY_RENDER_BLOCKED",
+          infrastructurePaused: false,
+          glbReadyButRenderBlocked: true,
+          renderBlockCause: "visual_authority_not_engineering",
+          renderBlockDetail: design?.geometry_state_detail ?? null,
+          engineeringAuthority: design?.engineering_authority ?? null,
+        };
+      }
+      // State E — render succeeded AND the gate passed AND the
+      // recorded authority is ENGINEERING: show the model.
       return {
         state: "VISUAL_READY",
         infrastructurePaused: false,
@@ -445,53 +487,31 @@ export function resolvePresentationState(
     }
     // upstream_not_reached: falls through — the invention-existence
     // logic below resolves the honest absence state
-  } else if (design?.availability === "AVAILABLE" && design.glb) {
-    // pre-C2.1 projection fallback (documented): older dossier payloads
-    // without the typed field — R451-C2.4 §1 SUPERSESSION: this legacy
-    // path can NEVER resolve to VISUAL_READY. A CIO-block gate verdict
-    // without the strict evaluator's verification is explicitly
-    // unverified historical state — readable, never current visual
-    // readiness (the unknown-authority + stale-CIO-PASS attack is
-    // closed on the frontend too).
-    const verdict = design.renders?.visual_gate?.verdict;
-    const renderStatus = design.renders?.status ?? "";
-    const renderRan = !(
-      renderStatus.startsWith("RENDER_SKIPPED") ||
-      renderStatus === "RENDER_FAILED" ||
-      renderStatus === "RENDER_TIMEOUT" ||
-      renderStatus === ""
-    );
-    if (renderRan && verdict != null && GATE_PASS_VERDICTS.has(verdict)) {
-      return {
-        state: "GEOMETRY_READY_RENDER_BLOCKED",
-        infrastructurePaused: false,
-        glbReadyButRenderBlocked: true,
-        renderBlockCause: "legacy_render_unverified",
-        renderBlockDetail:
-          "a historical render is recorded, but it predates (or " +
-          "bypasses) the verifiable identity chain — the presentation " +
-          "state is explicitly unverified.",
-        engineeringAuthority: design?.engineering_authority ?? null,
-      };
-    }
-    // case C/D: the engineering geometry EXISTS; the presentation render
-    // did not run or did not pass — the canonical GLB stays available
-    // through the interactive viewer (C2.6: geometry absent != renderer
-    // unavailable). R451-C2.2 §1: an empty render status (no record at
-    // all) is the not_attempted fact — never renderer absence.
-    const cause: RenderBlockCause =
-      renderRan && verdict != null ? "gate_not_passed"
-      : renderStatus.includes("SKIPPED") || renderStatus === "INTERRUPTED"
-        ? "infrastructure"
-      : renderStatus === ""
-        ? "not_attempted"
-        : "renderer_unavailable";
+  } else if (design?.availability === "AVAILABLE" || design?.glb ||
+             design?.renders) {
+    // R451-C2.5 §1 — THE LEGACY PAYLOAD RULE: a projection with NO
+    // typed geometry state whose geometry/render claims exist only as
+    // RAW FIELDS (availability / glb route / render status / gate
+    // verdict) is a LEGACY payload. It can display ONLY the explicit
+    // NON-CURRENT compatibility state LEGACY_STATE_UNAVAILABLE — never
+    // a current presentation state. The four states a legacy payload
+    // can never produce, structurally: VISUAL_READY,
+    // GEOMETRY_READY_RENDER_BLOCKED, TECHNOLOGY_NOT_ESTABLISHED,
+    // SCIENTIFIC_REJECTION. (R451-C2.5 SUPERSESSION of the C2.4-era
+    // branch that resolved a convincing legacy render PASS to
+    // GEOMETRY_READY_RENDER_BLOCKED[legacy_render_unverified] — that
+    // was still a CURRENT-looking state; a legacy payload derives no
+    // current state at all.) No availability / glb / render status /
+    // gate verdict is read here — the branch's existence IS the
+    // legacy-payload fact; nothing inside the payload upgrades it.
     return {
-      state: "GEOMETRY_READY_RENDER_BLOCKED",
+      state: "LEGACY_STATE_UNAVAILABLE",
       infrastructurePaused: false,
-      glbReadyButRenderBlocked: true,
-      renderBlockCause: cause,
-      renderBlockDetail: design.renders?.note ?? null,
+      renderBlockDetail:
+        "This run's projection predates the typed presentation " +
+        "contract — no current presentation state can be derived " +
+        "from legacy fields.",
+      engineeringAuthority: design?.engineering_authority ?? null,
     };
   }
 

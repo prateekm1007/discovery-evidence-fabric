@@ -147,15 +147,34 @@ function stageStatus(view: PresentationView): {
             label: "Historical render — presentation state unverified",
             tone: "infra",
           };
+        case "visual_authority_not_engineering":
+          // R451-C2.5 §2 — the contradiction pair fails closed to a
+          // NON-READY STATE: the state itself is not visual readiness
+          // (the badge mapping below can never be reached with this
+          // cause — the state is the claim, not the badge)
+          return {
+            label: "Presentation recorded — visual readiness not claimed",
+            tone: "infra",
+          };
         default:
           return { label: "Model ready — renderer unavailable", tone: "infra" };
       }
+    case "LEGACY_STATE_UNAVAILABLE":
+      // R451-C2.5 §1 — a legacy payload's ONLY state: the explicit
+      // non-current compatibility state. It is never worded as a
+      // current presentation state of any kind.
+      return {
+        label: "Legacy projection — no current presentation state",
+        tone: "infra",
+      };
     case "VISUAL_READY": {
-      // R451-C2.4 §6 — the authority is CARRIED THROUGH to the final
-      // UI state: "Technology ready" is an ENGINEERING-authority claim
-      // and exists ONLY on the recorded ENGINEERING authority. A
-      // CONCEPTUAL or UNKNOWN authority never inherits it because a
-      // render happened — the render is not the claim.
+      // R451-C2.5 §2 — the state itself already carries the authority
+      // invariant (presentationState.ts refuses visual_complete +
+      // non-ENGINEERING). The badge mapping is the SECOND lock:
+      // "Technology ready" is an ENGINEERING-authority claim and exists
+      // ONLY on the recorded ENGINEERING authority. A CONCEPTUAL or
+      // UNKNOWN authority never inherits it because a render happened —
+      // the render is not the claim.
       if (view.engineeringAuthority === "CONCEPTUAL") {
         return { label: "Conceptual model ready", tone: "done" };
       }
@@ -206,6 +225,29 @@ function HeroInvestigating({
           The investigation is persisted on the server; you can leave and
           return to it.
         </div>
+      </div>
+    </div>
+  );
+}
+
+// ---- the legacy-payload hero (R451-C2.5 §1) -----------------------------
+// A legacy projection's ONLY surface: the explicit NON-CURRENT
+// compatibility notice. It never renders a model hero, never mounts the
+// viewer from legacy raw fields, and never uses the wording of any
+// current presentation state — the legacy payload derives no current
+// presentation state at all.
+function HeroLegacyState() {
+  return (
+    <div className="hero-honest" data-hero-legacy-state>
+      <div className="hero-honest-h">Legacy projection</div>
+      <div className="hero-honest-body">
+        No current presentation state is available for this run&apos;s
+        recorded projection.
+      </div>
+      <div className="hero-honest-note faint">
+        This projection predates the typed presentation contract. Legacy
+        fields cannot establish a current technology, geometry, or
+        visualization state — the scientific record below is unchanged.
       </div>
     </div>
   );
@@ -625,6 +667,12 @@ export default function TechStage({
               </button>
             )}
           </>
+        ) : view.state === "LEGACY_STATE_UNAVAILABLE" ? (
+          // R451-C2.5 §1 — a legacy payload's ONLY hero surface: the
+          // explicit non-current compatibility notice. No model hero,
+          // no viewer, no current-state wording — a legacy projection
+          // derives no current presentation state at all.
+          <HeroLegacyState />
         ) : done && design && design.availability === "AVAILABLE" ? (
           // R436 Direction 3: geometry exists but did not earn the hero —
           // the honest unearned state (no substitute model)
