@@ -259,15 +259,41 @@ def _ensure_llama_server(port: int, gguf: Path, alias: str) -> bool:
            "--port", str(port), "--host", "127.0.0.1",
            "-c", "8192", "-np", "1", "-t", "2",
            "--alias", alias, "--no-webui"]
+    if port == 8791:
+        # MEASURED (2026-09-13, this host's 4 GB cgroup): the 4B
+        # Q4_K_M with default fp16 KV is OOM-KILLED mid-load (anon RSS
+        # 3.56 GB and climbing, oom_kill recorded in dmesg); with q8_0
+        # KV cache the server loads and serves at a STABLE 3567 MB
+        # RSS. KV quantization is a serving-configuration change, NOT
+        # a weight change — the model weights stay the pinned
+        # sha-verified Q4_K_M GGUF (recorded per Art. XXVII).
+        cmd += ["--cache-type-k", "q8_0", "--cache-type-v", "q8_0"]
     log_fh = open(log, "ab")
     proc = subprocess.Popen(cmd, stdout=log_fh,
                             stderr=subprocess.STDOUT,
                             start_new_session=True)
     pidf.write_text(str(proc.pid))
-    for _ in range(120):
+    import urllib.request as _u
+    probe_body = json.dumps({
+        "model": alias, "max_tokens": 8,
+        "messages": [{"role": "user", "content": "OK"}]}).encode()
+    for _ in range(360):
         if _http_ok(f"http://127.0.0.1:{port}/health"):
-            return True
-        time.sleep(1.0)
+            # b10930's /health answers 200 while the model is STILL
+            # loading (measured: OOM-kill and healthy-response both at
+            # ~8 s) — the DEFINITIVE readiness check is a REAL
+            # completion, which blocks until the model serves
+            try:
+                req = _u.Request(
+                    f"http://127.0.0.1:{port}/v1/chat/completions",
+                    data=probe_body,
+                    headers={"Content-Type": "application/json"})
+                with _u.urlopen(req, timeout=300) as r:
+                    json.loads(r.read())
+                return True
+            except Exception:  # noqa: BLE001
+                pass
+        time.sleep(2.0)
     return False
 
 
