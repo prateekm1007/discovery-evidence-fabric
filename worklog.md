@@ -549,3 +549,6 @@ Work Log:
 Stage Summary:
 - The presentation boundary is now certified, not assumed: artifact identity is mandatory (nine proofs), GLB bytes are format-validated, discovery and certification are separate, the spec lineage and generation triple-match are mandatory for VISUAL_READY, the weak fallback is eliminated on both layers, and "Technology ready" is an ENGINEERING-authority claim the UI cannot reach through a render alone. No Coder-1 canonical state changed: the CAD pipeline, the bridge, the package compiler, the Visual Gate, and the visual-set ladder are consumed, never modified.
 - reviewer_provenance=AI_REVIEW.
+
+Work Log (continuation):
+- The R451-C2.4 round commit is 5c5774106e6b98be9e3a1604b9918b5e6aee7d60 (the record above carries the full SHA); the push and ls-remote verification are recorded in this commit's follow-up, per the standing round protocol.
