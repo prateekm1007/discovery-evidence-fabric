@@ -471,14 +471,49 @@ def _bridge_render_status(session: Dict[str, Any]) -> Optional[str]:
     return status if isinstance(status, str) else None
 
 
+def dead_candidate_hold(session: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    """R454-C2 (operator directive §2): the AUTOMATIC render path never
+    spends the Visual Compiler on a dead candidate.
+
+    When the run's own canonical outcome says the machine's challenge
+    KILLED the invention (run_state.OUTCOME_KILLED_BY_CHALLENGE — the
+    lineage's challenge verdict is authoritative, the R452 B1/AT-7
+    authority), the presentation artifacts are NOT auto-rendered: the
+    killed-invention presentation authority keeps the kill honest on
+    every surface, so the pixels would serve no buyer/audit consumer.
+
+    PURE and typed. Returns the outcome dict when the auto path must
+    hold, None otherwise. The explicit paths are the escape hatch and
+    are NOT gated here: `enqueue(enqueued_by="api"/...)` (a deliberate
+    request — the audit-artifact case) and INTERRUPTED-job recovery
+    (completing a job that already spoke partially) both bypass this
+    check by construction."""
+    try:
+        from . import run_state as _rs
+        run_dir = Path(session["run_dir"]) \
+            if session.get("run_dir") else None
+        outcome = _rs.terminal_outcome(session, run_dir)
+    except Exception:  # noqa: BLE001 — the hold must never break the
+        # enqueue contract; the conservative direction for RENDERING is
+        # today's behavior (the presentation authority downstream still
+        # holds)
+        return None
+    if outcome.get("outcome") == _rs.OUTCOME_KILLED_BY_CHALLENGE:
+        return outcome
+    return None
+
+
 def auto_enqueue(session_id: str, enqueued_by: str = "worker") \
         -> Optional[Dict[str, Any]]:
     """R420 §1 — the automatic handoff the production worker performs
     at the END of the run (its memory is freed by then; the async
     guard decides honestly whether the instance can render now).
 
-    Returns the job record when a followup was needed, None when the
-    state already satisfies the render contract (or nothing to render).
+    Returns the job record when a followup was needed, a
+    HELD_DEAD_CANDIDATE decision record when the R454-C2 liveness hold
+    fired (the candidate was killed — no visual compute is spent), and
+    None when the state already satisfies the render contract (or
+    nothing to render).
     Never raises into the caller (the run is complete; a presentation
     followup can not be allowed to damage the terminal record)."""
     try:
@@ -488,6 +523,21 @@ def auto_enqueue(session_id: str, enqueued_by: str = "worker") \
         why = needs_render_followup(session)
         if not why:
             return None
+        # R454-C2 (directive §2): the dead-candidate hold — the auto
+        # path never spends the Visual Compiler on a candidate the
+        # machine's own challenge killed. Observable in the job log,
+        # typed in the return (the worker records it on the session).
+        held = dead_candidate_hold(session)
+        if held is not None:
+            print(f"[artifact_worker] {session_id} render followup HELD: "
+                  f"dead candidate ({held.get('outcome')}) — no visual "
+                  f"computation spent on a killed invention; the "
+                  f"explicit API enqueue remains the audit-artifact "
+                  f"escape hatch", file=sys.stderr, flush=True)
+            return {"artifact": "RENDER_JOB", "session_id": session_id,
+                    "status": "HELD_DEAD_CANDIDATE",
+                    "held_outcome": held.get("outcome"),
+                    "held_basis": held.get("basis")}
         record = enqueue(session_id, enqueued_by=enqueued_by)
         return record | {"followup_reason": why}
     except Exception:  # noqa: BLE001 — disclosed via the job log, typed

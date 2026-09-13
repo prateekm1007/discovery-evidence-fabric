@@ -65,7 +65,12 @@ from typing import Any, Dict, Optional
 from . import cio as _cio
 from . import sessions as store
 
-BRIDGE_GATE_VERSION = "1.1.0"
+BRIDGE_GATE_VERSION = "1.2.0"
+# 1.2.0 (R454-C2): the dead-candidate short-circuit — the automatic
+# artifact path spends no engineering/packaging/visual compute on a
+# candidate the machine's own challenge killed (directive §2); the
+# explicit audit-artifact invocation is the untouched escape hatch.
+# Historical BRIDGE_REPORTs are never rewritten (Art. XI).
 
 _CONCEPTUAL_CLASSES = ("SYSTEM_3D", "CONCEPTUAL_3D", "PROCESS_3D")
 
@@ -156,6 +161,41 @@ def _invention_exists(detail: Dict[str, Any], cio_obj: Optional[Dict]) -> bool:
     return bool(detail.get("invention_specification"))
 
 
+def _dead_candidate_outcome(session: Dict[str, Any],
+                            run_dir: Path) -> Optional[Dict[str, Any]]:
+    """R454-C2 (operator directive §2): the candidate-liveness verdict
+    for the AUTOMATIC artifact path.
+
+    The preferred architecture is discovery -> surviving mechanism ->
+    engineering representation -> engineering validation -> visual
+    compiler. A run whose own canonical outcome says the machine's
+    challenge KILLED the invention (run_state.OUTCOME_KILLED_BY_
+    CHALLENGE — the lineage's challenge verdict is authoritative, the
+    R452 B1/AT-7 authority) has NO surviving mechanism: engineering
+    representation, CAD geometry, a package, and the expensive Visual
+    Compiler pass must NOT be spent on the dead candidate.
+
+    Returns the terminal_outcome dict when the candidate is dead,
+    None otherwise (every other outcome — survived, requires-experiment,
+    under-development, blocked, pending — keeps the existing contract;
+    BS-010 discipline: under-development is NOT a rejection).
+
+    The escape hatch stays explicit: an audit artifact for a dead
+    candidate is produced by a DELIBERATE invocation (the direct
+    bridge/render entry points), never by this automatic gate."""
+    try:
+        from . import run_state as _rs
+        outcome = _rs.terminal_outcome(session, run_dir)
+    except Exception:  # noqa: BLE001 — the liveness verdict must never
+        # break the gate; falling back to today's behavior is the
+        # conservative direction for the ARTIFACT contract (the killed
+        # presentation authority downstream still holds)
+        return None
+    if outcome.get("outcome") == _rs.OUTCOME_KILLED_BY_CHALLENGE:
+        return outcome
+    return None
+
+
 def _record(run_dir: Path, outcome: str, report: Dict[str, Any]) -> Dict:
     persisted = {
         "stage": "BRIDGE_GATE",
@@ -198,6 +238,29 @@ def ensure_artifacts(session_id: str) -> Dict[str, Any]:
             "note": ("no invention-side artifacts on this run — the "
                       "bridge generates nothing (Art. XXV: absence is "
                       "honest absence, never a placeholder object)"),
+        })
+
+    # R454-C2 (operator directive §2): the dead-candidate short-circuit.
+    # The gate sits AFTER the kill verdicts consumed the candidate —
+    # engineering representation, CAD, package, and the Visual Compiler
+    # pass are spendable ONLY on a surviving mechanism. The record is
+    # the durable, observable decision (Art. XV); the explicit audit-
+    # artifact path is untouched.
+    dead = _dead_candidate_outcome(session, run_dir)
+    if dead is not None:
+        return _record(run_dir, "DEAD_CANDIDATE_NO_ARTIFACTS", {
+            "case": "DEAD",
+            "canonical_outcome": dead.get("outcome"),
+            "outcome_basis": dead.get("basis"),
+            "note": ("the machine's own challenge killed this invention "
+                     "(the lineage verdict is authoritative) — the "
+                     "automatic artifact path spends no engineering, "
+                     "packaging, or visual computation on a dead "
+                     "candidate (directive §2; Art. LVI: information "
+                     "gain per unit of compute). The presentation "
+                     "authority downstream keeps the kill honest; an "
+                     "audit artifact for this candidate requires a "
+                     "DELIBERATE invocation, never this gate."),
         })
 
     # Case A: a visual artifact already exists — the geometry stage is

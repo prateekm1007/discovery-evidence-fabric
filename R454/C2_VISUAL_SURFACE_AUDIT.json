@@ -1,0 +1,233 @@
+{
+  "kind": "CODER_ROUND_ARTIFACT",
+  "round": "R454-C2",
+  "title": "THE VISUAL SURFACE INVENTORY — every visual/presentation machinery surface, classified",
+  "date": "2026-09-14",
+  "author": "Coder 2 (presentation layer)",
+  "reviewer_provenance": "AI_REVIEW",
+  "directive": "Operator directive R454-C2 (CODER 2 — VISUAL DEADWEIGHT + STATE HONESTY), section 1: audit every visual surface and classify REQUIRED / CONDITIONAL / DUPLICATE / DECORATIVE / LEGACY / DELETE. Hard stop honored: no new renderer, no new model, no new visual feature, no redesign, no new 3D capability.",
+  "method": "Measured against the live tree at the round base SHA (origin/main d88364b): every classification names the consuming surface or the retirement record it stands on. 'Consumed by nothing' is the DELETE criterion (Art. LXIV); nothing was deleted on this round that any consumer, gate, or constitution article requires.",
+  "classification_legend": {
+    "REQUIRED": "establishes geometry truth, engineering communication, visual-compiler compliance, buyer comprehension, or auditability — protected",
+    "CONDITIONAL": "executes only under an explicit recorded condition (typed skip, explicit choice, audit artifact)",
+    "DUPLICATE": "two machineries answering one question — one must be retired",
+    "DECORATIVE": "adds no decision value — delete or conditionalize",
+    "LEGACY": "superseded, kept readable under an explicit LXIV disposition",
+    "DELETE": "no consumer, no gate, no article requires it — removal scheduled or executed"
+  },
+  "surfaces": [
+    {
+      "id": "VS-01",
+      "surface": "Visual Compiler core (headless Three.js deterministic render)",
+      "modules": ["discovery_fabric/engine/visual_compiler/visual_compiler.py", "scene_builder.py", "camera_solver.py", "material_mapper.py", "render_worker.py"],
+      "classification": "REQUIRED",
+      "evidence": "Article LXXII mandates the compiler as the only path a 3D artifact may ship through; renderer family == the website's own three@0.175.0 (WYSIWYG, deterministic); the buyer surface and the PDF consume the SAME approved render.",
+      "disposition": "KEEP"
+    },
+    {
+      "id": "VS-02",
+      "surface": "Visual Quality Gate (independent PIL/numpy re-measurement, seven rules, CIEDE2000 material check)",
+      "modules": ["discovery_fabric/engine/visual_compiler/visual_gate.py", "visual_compiler_thresholds.json"],
+      "classification": "REQUIRED",
+      "evidence": "LXXII: no gate pass -> no hero, no release. Thresholds carry Article XXVII provenance (rev 3, JND 2.3 x4 with stated uncertainty); the gate is a verifier in the constitutional sense (Art. III/V).",
+      "disposition": "KEEP"
+    },
+    {
+      "id": "VS-03",
+      "surface": "The required view ladder (Hero, 12-frame Turntable, Exploded, Section, 4x Orthographic, Dimension, Poster = 23 artifacts)",
+      "modules": ["discovery_fabric/engine/visual_compiler/visual_set.py", "renderer/render.js"],
+      "classification": "REQUIRED",
+      "evidence": "Constitutionally enumerated by LXXII and inventoried fail-closed since R443-C2 WS2 (a missing view is a typed PARTIAL, never silence). Camera variants beyond this ladder: none exist (checked). Turntable frames are consumed (visual_set/gate/server whitelist/cio projection).",
+      "disposition": "KEEP — no duplicate camera variants found; the ladder is the single camera authority"
+    },
+    {
+      "id": "VS-04",
+      "surface": "Material system (13-class palette + material probe spheres)",
+      "modules": ["discovery_fabric/engine/visual_compiler/material_mapper.py", "renderer/render.js material probe"],
+      "classification": "REQUIRED",
+      "evidence": "The palette IS the gate's CIEDE2000 measurement instrument (R443 WS3); 'default' = flagging magenta per Art. XXV (unclassified surfaced, not hidden). No unused material passes exist (checked).",
+      "disposition": "KEEP"
+    },
+    {
+      "id": "VS-05",
+      "surface": "Render record schema + finalize/validate on every compiler exit",
+      "modules": ["discovery_fabric/engine/visual_compiler/render_record_schema.py"],
+      "classification": "REQUIRED",
+      "evidence": "R443 WS4: fail-closed typed records; package.py validates before consuming; the buyer surface carries the validated record (R444-C2). Provenance verified this round: renderer_stack + binary_resolution (chrome/node versions, pinned three/puppeteer, resolution trail) on every record path; source_glb_sha256 + scene_spec_sha256 exact inputs.",
+      "disposition": "KEEP — provenance verified, structurally pinned in tests/test_r454_state_honesty.py"
+    },
+    {
+      "id": "VS-06",
+      "surface": "Visual join + geometry artifact contract (invocation receipt -> render record -> gate -> release chain)",
+      "modules": ["toscanini/visual_join.py"],
+      "classification": "REQUIRED",
+      "evidence": "R451-C2.3: VISUAL_READY means the full verified identity chain; engineering-ready without a canonical GLB is VISUAL_INPUT_NOT_READY. The one evaluator, two consumers (dossier + watchdog).",
+      "disposition": "KEEP"
+    },
+    {
+      "id": "VS-07",
+      "surface": "Buyer-surface lineage verifier (GEOMETRY_SPEC -> GLB -> render source -> view hashes -> PDF page-1 pixels)",
+      "modules": ["discovery_fabric/engine/visual_compiler/lineage.py"],
+      "classification": "REQUIRED",
+      "evidence": "R444-C2: re-measures the buyer-surface chain from bytes; distinct question from VS-02 (pixel quality) and VS-06 (invocation/release chain) — three layers, three questions, not duplicates.",
+      "disposition": "KEEP"
+    },
+    {
+      "id": "VS-08",
+      "surface": "Async render job machinery (RENDER_JOB.json authority, quality ladder, memory guards, lock discipline, boot recovery)",
+      "modules": ["toscanini/artifact_worker.py"],
+      "classification": "REQUIRED",
+      "evidence": "R420 contract: the web request never waits for the renderer; typed skips (RENDER_SKIPPED_LOW_MEMORY etc.) are honest infrastructure states (Art. LXI). R454-C2 adds the dead-candidate hold on the AUTO path only (explicit API enqueue + INTERRUPTED recovery remain the audit-artifact escape hatch).",
+      "disposition": "KEEP"
+    },
+    {
+      "id": "VS-09",
+      "surface": "Blender legacy render path (pinned 5.2 LTS; hero script retired to r441_retired/)",
+      "modules": ["discovery_fabric/engine/invention_bridge/render.py::render_invention_blender_legacy", "r441_retired/blender_render.py", "tests/test_r452_blender_retirement.py"],
+      "classification": "LEGACY (CONDITIONAL by explicit choice)",
+      "evidence": "Retirement renewed R452-C4: nothing routes to it implicitly (call-site default visual_compiler; selecting 'blender' requires the explicit backend choice); records carry BLENDER_HEADLESS_LEGACY so a legacy render can never pass as a Visual Compiler render. KEPT_BECAUSE recorded: format-conversion role + the standing LXIV deletion conditions (two-step discipline) — deletion remains scheduled, NOT executed this round (conditions unchanged).",
+      "disposition": "KEEP-AS-LEGACY under the standing dated disposition; deletion conditions re-verified unchanged"
+    },
+    {
+      "id": "VS-10",
+      "surface": "Presentation-state mapping (the ONE canonical user-state -> presentation-state machine)",
+      "modules": ["TOSCANINI_UI/webapp/lib/presentationState.ts"],
+      "classification": "REQUIRED",
+      "evidence": "R451-C2.2..CLOSURE: seven presentation states + closed ten-cause render-block vocabulary + the fail-closed unknown (PRESENTATION_STATE_UNAVAILABLE) + the singular transport authority (a RUN_BLOCKED_* status can never become a ready scientific surface). The directive §5 contradiction fixture resolves INFRASTRUCTURE_PAUSED through the real compiled module (pinned this round on the pytest side).",
+      "disposition": "KEEP"
+    },
+    {
+      "id": "VS-11",
+      "surface": "Five-state retrieval vocabulary + blocked insight cards (NOT_REACHED / PENDING / FAILED / RETRIEVED_ZERO / RETRIEVED_POSITIVE)",
+      "modules": ["toscanini/dossier.py::evidence_ledger", "TOSCANINI_UI/webapp/lib/presentationState.ts::blockedInsightCards"],
+      "classification": "REQUIRED",
+      "evidence": "R452-C2 (directive §3 subject): all five typed states stay distinct end-to-end — measured zero never renders as failure or absence; PENDING never collapses into not-reached; FAILED stays infrastructure; legacy RETRIEVED normalizes through the MEASURED count only. Verified verbatim this round; no remaining collapse found on any UI surface.",
+      "disposition": "KEEP"
+    },
+    {
+      "id": "VS-12",
+      "surface": "Discovery pipeline strip (seven backend-owned stage statuses, verbatim rendering)",
+      "modules": ["TOSCANINI_UI/webapp/components/DiscoveryPipelineStrip.tsx"],
+      "classification": "REQUIRED",
+      "evidence": "R451-C2.1: the surface that answers 'why no 3D' with the truth. R454-C2 state-honesty fix: an unrecognized backend status now renders the distinct UNKNOWN class + '?' mark — never silently styled as NOT_REACHED (the one translation defect found; fixed, pinned).",
+      "disposition": "KEEP (one fix this round)"
+    },
+    {
+      "id": "VS-13",
+      "surface": "Blocked-state presentation (DISCOVERY PAUSED hero, InfrastructureBlockedHero, five blocked insight cards, authority-aware ribbon titles)",
+      "modules": ["TOSCANINI_UI/webapp/components/InfrastructureBlockedHero.tsx", "TechStage.tsx", "presentationState.ts BLOCKED_COPY"],
+      "classification": "REQUIRED",
+      "evidence": "The Art. LXI product surface: infrastructure stops render as infrastructure, never as scientific absence or rejection; the C2.6 real-browser attack proved the stale-verdict absence on a blocked-terminal run.",
+      "disposition": "KEEP"
+    },
+    {
+      "id": "VS-14",
+      "surface": "Webapp 3D viewer (React Three Fiber presentation of the canonical GLB)",
+      "modules": ["TOSCANINI_UI/webapp/components/ModelViewer.tsx"],
+      "classification": "REQUIRED",
+      "evidence": "The interactive GLB stays consumable in every geometry-present state (States C/D/E); it never renders for a blocked-terminal or killed surface (structural branch order pinned by the C2.6/C2.5 batteries). No camera-variant duplication exists in the UI (checked).",
+      "disposition": "KEEP"
+    },
+    {
+      "id": "VS-15",
+      "surface": "Package visual release gate + PDF visual pages (cover hero p1, exploded p2, orthographic p3, dimension p4 on gate PASS only)",
+      "modules": ["toscanini/server.py::package_release_decision", "package compiler PDF constitution pages"],
+      "classification": "REQUIRED",
+      "evidence": "LXXII same-render rule + R443 release decision (VISUAL_GATE NOT_RUN/FAIL -> typed 409, engineering-draft only under explicit request). Buyer comprehension surface.",
+      "disposition": "KEEP"
+    },
+    {
+      "id": "VS-16",
+      "surface": "Showcase portfolio 3D (released buyer packages, interactive)",
+      "modules": ["toscanini/showcase.py"],
+      "classification": "REQUIRED",
+      "evidence": "Serves the Art. XXXIX buyer-distribution authority; BS-017 discipline: released/reference artifacts are labeled separately from current-run artifacts.",
+      "disposition": "KEEP"
+    },
+    {
+      "id": "VS-17",
+      "surface": "CIO visual projection (the run's visualization block the website consumes)",
+      "modules": ["toscanini/cio.py"],
+      "classification": "REQUIRED",
+      "evidence": "The one projection carrying render status + gate verdict era-aware to the product surface; consumed by the design tab.",
+      "disposition": "KEEP"
+    },
+    {
+      "id": "VS-18",
+      "surface": "Visual-lab benchmark lab (registry + benchmark + jobs + guard + trajectory viewer)",
+      "modules": ["visual-lab/registry/", "visual-lab/benchmark/", "visual-lab/jobs/", "visual-lab/guard/", "visual-lab/trajectory/"],
+      "classification": "CONDITIONAL (provisional lab — evidence-producing, never canonical-promoting)",
+      "evidence": "R448/R449-C2: HF Visual Model Registry + benchmark lab with license gates, provenance sidecars, negative controls; stays provisional by design (forbid_promotion trio; unknown HF generators rejected; registry validator blocks canonical-geometry approval). Provenance verified this round (VS-19). Candidate arms ran as real HF Jobs (R449); the candidate arm's BLOCKED status at the weight-download wall is the recorded honest state.",
+      "disposition": "KEEP-CONDITIONAL"
+    },
+    {
+      "id": "VS-19",
+      "surface": "Visual-lab provenance sidecar contract (Hunyuan/DA3-class outputs)",
+      "modules": ["visual-lab/benchmark/provenance.py", "visual-lab/jobs/r449_candidate_hunyuan_omni.py", "visual-lab/jobs/r449_referee_da3_depth.py"],
+      "classification": "REQUIRED (within the lab)",
+      "evidence": "Directive §6 verified by measurement: REQUIRED_FIELDS pin model_id, model_revision (the pinned HF SHA participates in the load — byte-path proof in the producer battery), model_license, hf_space_or_job + hardware (production/runtime identity), input_hash/output_hash/source_glb_sha (exact inputs), visual_role; engineering_authority is structurally NONE_PRESENTATION_ONLY (any other value is a typed error — validate() blocks). Pinned in tests/test_r454_state_honesty.py this round.",
+      "disposition": "KEEP"
+    },
+    {
+      "id": "VS-20",
+      "surface": "CSS micro-animations (spin loading marker, fadein, blink caret, pulse)",
+      "modules": ["TOSCANINI_UI/webapp/app/globals.css"],
+      "classification": "CONDITIONAL (functional feedback, not decoration)",
+      "evidence": "Each keyframe is a loading/in-progress affordance bound to a live state (the strip's live marker, the blocked-state caret); zero render-pipeline cost; no decorative render passes or entrance animations exist (checked).",
+      "disposition": "KEEP — not process theater"
+    },
+    {
+      "id": "VS-21",
+      "surface": "Thumbnail machinery",
+      "modules": [],
+      "classification": "DELETE (already absent)",
+      "evidence": "No thumbnail generation, storage, or consumption exists anywhere in project code (measured sweep; the only 'thumbnail' matches are node_modules internals). Nothing to remove.",
+      "disposition": "NONE FOUND"
+    },
+    {
+      "id": "VS-22",
+      "surface": "Dead-candidate visual computation (engineering/CAD/package/render on a killed invention)",
+      "modules": ["toscanini/bridge_gate.py", "toscanini/artifact_worker.py"],
+      "classification": "DELETE (this round removes the automatic path)",
+      "evidence": "Directive §2 defect confirmed structurally: _invention_exists returned true for all-killed lineages, so the automatic bridge could spend engineering+package+visual compute on a dead candidate; the auto-render followup checked GLB presence but not liveness. Fixed: DEAD_CANDIDATE_NO_ARTIFACTS typed short-circuit (bridge gate) + HELD_DEAD_CANDIDATE auto-render hold; the explicit invocation remains the audit-artifact escape hatch; historical artifacts untouched (Art. XI).",
+      "disposition": "REMOVED (automatic paths), pinned in tests/test_r454_state_honesty.py"
+    },
+    {
+      "id": "VS-23",
+      "surface": "Legacy projection compatibility (LEGACY_STATE_UNAVAILABLE + era-normalized render records + RETRIEVED normalization)",
+      "modules": ["presentationState.ts", "render_record_schema finalize", "dossier.py era normalization"],
+      "classification": "LEGACY (readable, never current)",
+      "evidence": "R451-C2.5: a pre-typed payload can display ONLY the explicit non-current compatibility state — the four current-looking states are structurally unreachable from it; historical receipts stay READABLE (era normalization). This is the honest Art. XI handling of history, not deadweight.",
+      "disposition": "KEEP-AS-LEGACY"
+    },
+    {
+      "id": "VS-24",
+      "surface": "Watchdog visual join rules (R1-R10) + the strip's blocked-class projection",
+      "modules": ["scripts/r451_c2_watchdog.py", "toscanini/dossier.py::pipeline_projection"],
+      "classification": "REQUIRED (auditability)",
+      "evidence": "The watchdog derives its state from the ONE evaluator (its local duplicate derive_join_state was deleted at C2.3 — the DUPLICATE class was already retired); R6 is evidence-producing from the run's own projection (C2.6).",
+      "disposition": "KEEP"
+    }
+  ],
+  "deadweight_findings": {
+    "deleted_this_round": [
+      "VS-22: the automatic engineering/packaging/render path for killed candidates (typed guards; escape hatch preserved)"
+    ],
+    "fixed_this_round": [
+      "VS-12: unknown pipeline status no longer renders in the NOT_REACHED visual class (state-honesty fix)"
+    ],
+    "verified_clean_no_action": [
+      "no thumbnail machinery exists (VS-21)",
+      "no duplicate camera variants beyond the LXXII ladder (VS-03)",
+      "no unused material passes (VS-04)",
+      "no decorative render passes or entrance animations (VS-20)",
+      "no unreferenced render-record shapes (the node-side side-record was superseded by the merge-and-persist at R444-C2, Art. LXIV)",
+      "the one historical DUPLICATE (watchdog-local join derivation) was retired at R451-C2.3; verified still gone"
+    ],
+    "standing_dispositions_unchanged": [
+      "VS-09 Blender legacy: KEPT_BECAUSE format-conversion + the LXIV two-step deletion conditions (re-verified unchanged; deletion remains scheduled, owner-visible)"
+    ]
+  },
+  "consumers_checked": ["TOSCANINI_UI/webapp components + lib", "toscanini/server.py render/package routes", "toscanini/cio.py", "toscanini/showcase.py", "package compiler PDF pages", "scripts/r451_c2_watchdog.py", "visual-lab registry/benchmark/jobs/guard/trajectory"],
+  "boundary": "No Coder-1 canonical machinery was modified: the CAD pipeline, the invention bridge, the package compiler, and the Visual Gate are consumed, never modified. The bridge_gate/artifact_worker changes are the Coder-2 session artifact orchestration layer."
+}
