@@ -165,7 +165,12 @@ ARMS: Dict[str, Dict[str, Any]] = {
                      "policy — the operator's own quantize-and-retry "
                      "flowchart logic after every elite-class zero-cost "
                      "route was measured dead; NOT the elite class, "
-                     "scope recorded honestly"),
+                     "scope recorded honestly. First attempt (case A) "
+                     "failed on the MEASURED transport timeout above "
+                     "and is preserved at ARM2_QWEN3_4B_RUN_A_TRANSPORT"
+                     "_FAILED_ATTEMPT1 (Art. LXI: infrastructure, never "
+                     "scientific); re-run under ENGINE_LLM_TIMEOUT_S="
+                     "600"),
     },
 }
 
@@ -225,6 +230,20 @@ def arm_env(arm: str) -> Dict[str, str]:
         env["LOCAL_QWEN_BASE_URL"] = \
             "http://127.0.0.1:8791/v1/chat/completions"
         env["LOCALQWEN_MODEL"] = "qwen3-4b"   # the 4B server's alias
+        # MEASURED (2026-09-13): the 4B serves at ~2.7 tok/s on this
+        # 2-vCPU host — a 512-token completion plus ~1k-token prompt
+        # processing exceeds the 240 s default per-call timeout, the
+        # cascade abandons mid-generation, the single-slot server
+        # keeps generating the abandoned request, and the NEXT
+        # admission probe fails instantly (slot busy -> NETWORK_
+        # FAILURE -> PROBE_FAILED) — the whole stage dies as an
+        # infrastructure failure that MEASURES THE TIMEOUT, not the
+        # model. ENGINE_LLM_TIMEOUT_S=600 is the recorded operator-
+        # override class (R445-C: transport-only; provider selection,
+        # quality tiers, retry and epistemic semantics untouched) —
+        # the override rides the arm env so the comparison measures
+        # MODEL capability, not transport timeout artifacts.
+        env["ENGINE_LLM_TIMEOUT_S"] = "600"
     else:
         raise SystemExit(f"unknown arm {arm}")
     return env
