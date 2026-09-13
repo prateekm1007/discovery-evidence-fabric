@@ -602,3 +602,10 @@ Work Log:
 Stage Summary:
 - The presentation boundary's authority is now hardened end to end: certification is sovereign to persisted identity documents, the ready state is impossible to reach without the recorded ENGINEERING authority, a GLB must prove its structure, a legacy payload can say only "no current state", and the watchdog reports observation and verdict independently. No Coder-1 canonical state changed: the CAD pipeline, the bridge, the package compiler, the Visual Gate, and the visual-set ladder are consumed, never modified.
 - reviewer_provenance=AI_REVIEW.
+
+Work Log (continuation):
+- The R451-C2.5 round commit is 697d1ebf6999dc68ebe3ee04b20433a261f72a9c (the record above carries the full SHA); the branch was pushed 2cfd8827..697d1ebf (fast-forward), ls-remote origin == 697d1ebf == local HEAD (Art. XXIII remote-verified), PR #5 head API-verified at 697d1ebf (mergeable_state clean), origin/main unchanged at b1418f4a. The delivery_closure was appended to R451/C2_PRODUCT/R451_C25_ROUND_RECORD.json (the Art. LXXI BLOCKED tuple stands: production waits on the owner merge of stacked PRs #4 -> #5 plus the canonical Space redeploy at the merged SHA — the round is NOT described as production-complete while PR #5 remains unmerged). Credential handling per BS-021 (env-var transient only; rotation remains the operator's standing action).
+
+Stage Summary:
+- R451-C2.5 is delivered at the remote branch tip; the owner production path is unchanged (merge stacked PRs #4 -> #5, redeploy the canonical Space at the merged SHA). Per the directive's section 13: with the presentation authority hardened, the next moves are the auditor attack, the owner merge, the production redeploy, the live C2 attack, closing the presentation boundary — and then attention returns to Coder 1's discovery transport and the end-to-end scientific loop.
+- reviewer_provenance=AI_REVIEW.
