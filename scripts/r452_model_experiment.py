@@ -223,11 +223,23 @@ def arm_env(arm: str) -> Dict[str, str]:
     env.pop("ZAI_MODEL", None)
     env.pop("ZAI_BASE_URL", None)
     if arm == "arm1-qwen3-1.7b":
+        # TWO DISTINCT env vars (measured this session — the assay
+        # driver's single-var form only worked because the spec's
+        # default URL is already port 8790):
+        #   LOCAL_QWEN_BASE_URL  = the spec's env_var — the AVAILABILITY
+        #                          marker (a non-empty value makes the
+        #                          provider 'available' in the matrix)
+        #   LOCALQWEN_BASE_URL   = url_for_call()'s override — the URL
+        #                          the calls and probes actually hit
         env["LOCAL_QWEN_BASE_URL"] = \
+            "http://127.0.0.1:8790/v1/chat/completions"
+        env["LOCALQWEN_BASE_URL"] = \
             "http://127.0.0.1:8790/v1/chat/completions"
         env.pop("LOCALQWEN_MODEL", None)   # the spec default 1.7b
     elif arm == "arm2-qwen3-4b":
         env["LOCAL_QWEN_BASE_URL"] = \
+            "http://127.0.0.1:8791/v1/chat/completions"
+        env["LOCALQWEN_BASE_URL"] = \
             "http://127.0.0.1:8791/v1/chat/completions"
         env["LOCALQWEN_MODEL"] = "qwen3-4b"   # the 4B server's alias
         # MEASURED (2026-09-13): the 4B serves at ~2.7 tok/s on this
