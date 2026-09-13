@@ -18,31 +18,49 @@
   "implemented": {
     "req_1_fallback_eliminated": {
       "what": "the weak current-state path is REMOVED: strict evaluator undecided -> CIO render fallback -> visual_complete can no longer happen. _renders_cause's PASS branch now returns geometry_available + the new typed cause legacy_render_unverified ('a historical render is recorded, but it predates (or bypasses) the verifiable identity chain — the presentation state is explicitly unverified') — readable ONLY as explicitly unverified historical state, never visual_complete (source-pinned: no return of visual_complete in the function body). The frontend's pre-C2.1 legacy fallback can NEVER resolve to VISUAL_READY either. Legacy data stays readable; nothing stale upgrades.",
-      "files": ["toscanini/dossier.py", "TOSCANINI_UI/webapp/lib/presentationState.ts"]
+      "files": [
+        "toscanini/dossier.py",
+        "TOSCANINI_UI/webapp/lib/presentationState.ts"
+      ]
     },
     "req_2_artifact_identity_mandatory": {
       "what": "geometry_available requires ALL NINE proofs (new certified_canonical_glb + the contract's gate): canonical artifact exists AND non-zero AND a valid artifact identity exists AND the identity carries the required SHA AND SHA == actual bytes AND a generation ID exists AND the generation matches the current-generation anchor AND the authority is EXPLICIT (a recorded class from the identity documents — UNKNOWN is not explicit) AND no contradicting terminal failure. Missing any: not success. The new typed state geometry_unverified (vocabulary 6 -> 7) carries an artifact candidate whose certification is incomplete — never a failure, never a silent pass (Art. XXV). visual_input_ready now REQUIRES certification (the C2.3 byte-satisfiable-without-identity shortcut superseded, disclosed).",
-      "files": ["toscanini/visual_join.py", "toscanini/dossier.py"]
+      "files": [
+        "toscanini/visual_join.py",
+        "toscanini/dossier.py"
+      ]
     },
     "req_3_glb_format_validity": {
       "what": "glb_format_check: deterministic, loader-free container proof (glTF magic + version 2 + declared length == file size). A correct hash over non-GLB bytes never certifies; truncated/padded containers fail. Enforced in the contract AND release-chain rung 1.",
-      "files": ["toscanini/visual_join.py"]
+      "files": [
+        "toscanini/visual_join.py"
+      ]
     },
     "req_4_discovery_vs_certification": {
       "what": "resolve_canonical_glb is the DIAGNOSTIC locator only — it locates candidates for diagnostics and record invariants; a filename that looks right never certifies. The authoritative path: recorded identity document (DESIGN_LINEAGE.json current generation / ARTIFACT_IDENTITY.glb_path) -> exact artifact -> measured SHA -> current generation. Filename-fallback candidates are reported as diagnostic_candidate, never certified.",
-      "files": ["toscanini/visual_join.py"]
+      "files": [
+        "toscanini/visual_join.py"
+      ]
     },
     "req_5_mandatory_lineage": {
       "what": "release chain rung invocation_receipt_identity now REQUIRES receipt.geometry_spec_sha256 to EXIST and equal the GEOMETRY_SPEC.json bytes (the C2.3-era lenient both-absent pass SUPERSEDED — an unprovable lineage is a failed rung, never a pass); NEW rung generation_identity: artifact generation == receipt generation == current generation. The chain is 7 -> 8 rungs; rung names stable for consumers.",
-      "files": ["toscanini/visual_join.py"]
+      "files": [
+        "toscanini/visual_join.py"
+      ]
     },
     "req_6_authority_through_ui": {
       "what": "the VISUAL_READY view carries engineeringAuthority; the badge maps (VISUAL_READY, ENGINEERING) -> 'Technology ready' (the ONLY path to that label), (VISUAL_READY, CONCEPTUAL) -> 'Conceptual model ready', (VISUAL_READY, UNKNOWN/absent) -> 'Visualization ready — geometry authority unverified'. A render is never the claim. geometry_unverified + legacy_render_unverified have their own closed-vocabulary labels and sentences (the cause vocabulary closes at nine); the strip carries blocked_class IDENTITY_UNVERIFIED / LEGACY_RENDER_UNVERIFIED; the design tab's note names the certification gap; the Engineering milestone never RECEIVES on an unverified artifact.",
-      "files": ["TOSCANINI_UI/webapp/components/TechStage.tsx", "TOSCANINI_UI/webapp/lib/presentationState.ts", "toscanini/dossier.py"]
+      "files": [
+        "TOSCANINI_UI/webapp/components/TechStage.tsx",
+        "TOSCANINI_UI/webapp/lib/presentationState.ts",
+        "toscanini/dossier.py"
+      ]
     },
     "req_7_adversarial_battery": {
       "what": "tests/test_r451_c24_certification.py — the TWELVE directive attacks each proven NOT to promote, plus positive controls, format unit attacks, discovery-vs-certification separation, fallback-elimination proofs (behavioral + source pins), one-evaluator coupling, and the clean-state byte-identical replay.",
-      "files": ["tests/test_r451_c24_certification.py"]
+      "files": [
+        "tests/test_r451_c24_certification.py"
+      ]
     },
     "req_8_no_scope_expansion": {
       "what": "no new visual models, no Blender work, no camera improvements, no materials, no cinematic rendering, no new renderer infrastructure, no new scientific rules — the round is exactly the certification contract, the fallback removal, and their batteries.",
@@ -113,5 +131,17 @@
     "blocked_by": "the branch's production path is the owner merge of stacked PRs #4 -> #5 plus the canonical Space redeploy at the merged SHA (unchanged owner path); a Coder-2 push does not deploy",
     "what_unblocks": "owner merges the stacked lab PRs and redeploys the canonical Space at the merged SHA"
   },
-  "round_commit_sha": "5c5774106e6b98be9e3a1604b9918b5e6aee7d60"
+  "round_commit_sha": "5c5774106e6b98be9e3a1604b9918b5e6aee7d60",
+  "delivery_closure": {
+    "pushed": true,
+    "branch": "r449-c2/visual-benchmark",
+    "push_range": "0eec5bbe..afe6fb50",
+    "round_commit": "5c5774106e6b98be9e3a1604b9918b5e6aee7d60",
+    "branch_tip": "afe6fb509ae9a89fb09466f447975f298a0a0ac9",
+    "ls_remote_verified": true,
+    "pr_head_synced": "PR #5 head == afe6fb50 (API-verified, mergeable_state clean)",
+    "origin_main_unchanged": "b1418f4a (the branch's production path remains the owner merge of stacked PRs #4 -> #5 plus the Space redeploy at the merged SHA)",
+    "credential_handling": "BS-021: the PAT was used transiently from the session context for git push / ls-remote / the PR-head API probe only; it is written to NO tracked file; rotation remains the operator's standing action",
+    "constitution": "v2.4.0 hash b54a1be9bcbdd246... read IN FULL at round start and re-read IN FULL immediately before the round commit 5c577410 (both reads recorded in the worklog)"
+  }
 }
