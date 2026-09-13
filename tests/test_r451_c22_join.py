@@ -81,13 +81,22 @@ def _geom_state(geom=None, renders=None, running=False, session=None):
 
 def _seed_engineering(run: Path, session_id="ts_r451c22_test") -> str:
     """Seed the recorded engineering identity chain the production
-    bridge writes: a real GLB, GEOMETRY_SPEC.json, ARTIFACT_IDENTITY.json
-    (geometry_hash == the GLB bytes on disk), and a BRIDGE_REPORT with
-    outcome COMPLETED / class ENGINEERING_3D. Returns the GLB sha."""
+    bridge writes: a real (VALID glTF 2.0 container — R451-C2.4 §3
+    makes the container validity a mandatory certification proof)
+    GLB, GEOMETRY_SPEC.json, ARTIFACT_IDENTITY.json (geometry_hash ==
+    the GLB bytes on disk, glb_path naming the artifact), and a
+    BRIDGE_REPORT with outcome COMPLETED / class ENGINEERING_3D.
+    Returns the GLB sha."""
+    import struct
     model = run / "MODEL"
     model.mkdir(parents=True, exist_ok=True)
     glb = model / "engineering_model.glb"
-    glb.write_bytes(b"glb-bytes-" + session_id.encode())
+    json_data = (b'{"asset":{"version":"2.0"},"_run":"'
+                 + session_id.encode() + b'"}')
+    json_data += b" " * ((4 - len(json_data) % 4) % 4)
+    glb.write_bytes(
+        struct.pack("<III", 0x46546C67, 2, 12 + 8 + len(json_data))
+        + struct.pack("<I", len(json_data)) + b"JSON" + json_data)
     glb_sha = hashlib.sha256(glb.read_bytes()).hexdigest()
     spec = {"artifact": "GEOMETRY_SPEC", "parameters": [
         {"param_id": "d", "value": 1.0}]}

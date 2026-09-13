@@ -1,5 +1,6 @@
 """visual_join.py — THE machine-verifiable geometry-to-visual join
-evaluator (R451-C2.2 §5/§6, hardened by R451-C2.3).
+evaluator (R451-C2.2 §5/§6, hardened by R451-C2.3, certified by
+R451-C2.4).
 
 The directive's join contract:
 
@@ -54,6 +55,26 @@ contradicting terminal failure is recorded. A route string such as
 class stays UNKNOWN; legacy boolean-only projections remain readable
 but never inherit current ENGINEERING_DEFINED authority.
 
+R451-C2.4 certification contract: ARTIFACT IDENTITY IS MANDATORY.
+geometry_available requires ALL NINE conditions — the canonical
+artifact exists AND is non-zero AND a valid artifact identity exists
+AND the identity carries the required SHA AND the SHA equals the
+actual bytes AND a generation ID exists AND the generation matches
+AND the engineering authority is EXPLICIT (a recorded verdict from
+the identity documents — UNKNOWN is not explicit) AND no
+contradicting terminal failure is recorded. Missing ANY mandatory
+proof: not success. A GLB whose bytes merely hash correctly is NOT
+certified: the format itself is validated (glTF magic, version 2,
+declared length == file size), and the artifact must be NAMED by a
+recorded identity document — a filename that merely looks right
+("engineering_model.glb", "model-001.glb") is a DIAGNOSTIC candidate,
+never a certification (artifact DISCOVERY and artifact CERTIFICATION
+are separate: resolve_canonical_glb locates, certified_canonical_glb
+certifies). The receipt lineage is mandatory for VISUAL_READY:
+receipt.geometry_spec_sha256 must EXIST and equal the spec file
+bytes, and the generation identity must hold three ways (artifact
+generation == receipt generation == current generation).
+
 THE one evaluator (R451-C2.3 §8): the dossier projection AND the
 r451_c2_watchdog consume THIS module's state semantics. The watchdog
 attacks it with independently authored adversarial fixtures — it does
@@ -70,6 +91,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import struct
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -143,6 +165,11 @@ CAD_LEDGER_INFRA = ("BLOCKED_TRANSPORT", "NO_MODEL_NO_LLM")
 # an extension-only acceptance
 _STEP_MAGIC = b"ISO-10303-21"
 
+# the glTF binary container magic — the deterministic GLB format check
+# (R451-C2.4 §3): a file whose bytes hash correctly is still not a GLB
+# unless the container itself is valid
+_GLB_MAGIC = b"glTF"
+
 
 def _read_json(path: Path) -> Optional[Dict[str, Any]]:
     try:
@@ -165,15 +192,64 @@ def _sha256_file(path: Path) -> Optional[str]:
     return h.hexdigest()
 
 
+def glb_format_check(path: Path) -> Dict[str, Any]:
+    """R451-C2.4 §3 — THE deterministic GLB format validity check
+    (no loaders, no interpretation — the container's own bytes):
+      * the file is at least the 12-byte glTF header
+      * bytes 0..4 are the magic b"glTF"
+      * the version field (uint32 LE at offset 4) is 2
+      * the declared length (uint32 LE at offset 8) equals the file
+        size on disk (a truncated or padded container fails)
+    A correct hash over INVALID bytes must never certify: the format
+    is a mandatory proof, separate from identity."""
+    result = {"valid": False, "detail": "file missing"}
+    try:
+        size = path.stat().st_size
+    except OSError:
+        return result
+    if size < 12:
+        result["detail"] = f"file is {size} bytes — smaller than the " \
+                           "12-byte glTF header"
+        return result
+    try:
+        with open(path, "rb") as fh:
+            header = fh.read(12)
+    except OSError:
+        result["detail"] = "header unreadable"
+        return result
+    if header[0:4] != _GLB_MAGIC:
+        result["detail"] = ("bytes do not begin with the glTF magic — "
+                            "this is not a GLB container")
+        return result
+    version, declared = struct.unpack("<II", header[4:12])
+    if version != 2:
+        result["detail"] = f"glTF version {version} is not 2"
+        return result
+    if declared != size:
+        result["detail"] = (f"declared container length {declared} != "
+                            f"{size} bytes on disk — truncated or "
+                            "padded container")
+        return result
+    return {"valid": True, "detail": f"valid glTF 2.0 container "
+                                     f"({size} bytes)"}
+
+
 # ---------------------------------------------------------------------------
 # THE geometry artifact contract (R451-C2.3 §1) — one implementation,
 # two consumers (the dossier projection and the watchdog).
 # ---------------------------------------------------------------------------
 def resolve_canonical_glb(run_dir: Optional[Path]) -> Optional[Path]:
-    """The CURRENT generation's canonical GLB — the same resolution
-    order the Visual Compiler itself uses (one authority, all
-    consumers). A path string in a projection NEVER establishes the
-    artifact; only a real file on disk resolves here."""
+    """R451-C2.4 §4 — the DIAGNOSTIC locator only. Locates candidate
+    GLB files under the run directory (the same resolution order the
+    Visual Compiler itself uses) so diagnostics and record invariants
+    can name a candidate. It NEVER certifies canonicality: a filename
+    that looks right ("engineering_model.glb", "model-001.glb", a
+    root-level glob) is a candidate, not the certified canonical
+    artifact. Certification is certified_canonical_glb's verdict —
+    the recorded identity chain -> exact artifact -> measured SHA ->
+    current generation. A path string in a projection NEVER
+    establishes the artifact; only a real file on disk resolves
+    here."""
     if run_dir is None:
         return None
     model_dir = run_dir / "MODEL"
@@ -202,6 +278,166 @@ def resolve_canonical_glb(run_dir: Optional[Path]) -> Optional[Path]:
     return roots[0] if roots else None
 
 
+def certified_canonical_glb(run_dir: Optional[Path],
+                            geom: Optional[Dict[str, Any]] = None,
+                            ) -> Dict[str, Any]:
+    """R451-C2.4 §2/§4 — THE certification path. The authoritative
+    resolution is: a RECORDED identity document names the exact
+    artifact -> the artifact's SHA is measured from its own bytes ->
+    the generation identity holds against the current generation.
+
+      1. exact artifact   named by DESIGN_LINEAGE.json's current-
+                          generation entry, else by ARTIFACT_IDENTITY
+                          .glb_path (the recorded identity chain —
+                          never a filename that merely looks right)
+      2. measured SHA     sha256 over the named file's own bytes,
+                          equal to the SHA the identity records
+                          (geometry_hash / glb_disk_sha256)
+      3. current          the identity's generation_id exists and
+         generation       matches the current-generation anchor (the
+                          projection's recorded generation_id, else
+                          the lineage's current entry)
+
+    Plus the container proofs: the file exists, is non-zero, and is a
+    VALID glTF 2.0 container (R451-C2.4 §3).
+
+    A file found only by the DIAGNOSTIC locator's filename fallbacks
+    is reported as `diagnostic_candidate` — readable, never certified
+    (artifact discovery and artifact certification are separate).
+    Returns {certified, glb, sha256, size, generation_id,
+    current_generation_id, basis, failures, diagnostic_candidate,
+    diagnostic_basis, format}. Observational: reads only."""
+    run_dir = Path(run_dir) if run_dir else None
+    geom = geom or {}
+    out: Dict[str, Any] = {
+        "certified": False, "glb": None, "sha256": None, "size": 0,
+        "generation_id": None, "current_generation_id": None,
+        "basis": None, "failures": [],
+        "diagnostic_candidate": None, "diagnostic_basis": None,
+        "format": None,
+    }
+    if run_dir is None or not run_dir.exists():
+        out["failures"] = ["no run directory is readable"]
+        return out
+
+    # ---- the recorded identity documents -----------------------------
+    lineage = _read_json(run_dir / DESIGN_LINEAGE_REL) or \
+        _read_json(run_dir / "MODEL" / DESIGN_LINEAGE_REL)
+    identity = _read_json(run_dir / ARTIFACT_IDENTITY_REL) or {}
+    model_identity = _read_json(
+        run_dir / "MODEL" / ARTIFACT_IDENTITY_REL) or {}
+    if not identity and model_identity:
+        identity = model_identity
+    br_identity = (geom.get("artifact_identity") or {}) \
+        if isinstance(geom.get("artifact_identity"), dict) else {}
+
+    # ---- 1. the exact artifact, named by the identity chain ----------
+    named: Optional[Path] = None
+    basis: Optional[str] = None
+    if lineage:
+        for gen in lineage.get("generation_models") or []:
+            if gen.get("current") and gen.get("glb"):
+                named = run_dir / str(gen["glb"])
+                basis = "DESIGN_LINEAGE.json current generation entry"
+                break
+    if named is None:
+        for src_name, src in (("ARTIFACT_IDENTITY.json", identity),
+                              ("the bridge's artifact_identity",
+                               br_identity)):
+            id_path = src.get("glb_path")
+            if id_path:
+                named = run_dir / str(id_path)
+                basis = src_name
+                break
+    if named is None:
+        out["failures"].append(
+            "no recorded identity document names the canonical GLB "
+            "(DESIGN_LINEAGE.json current generation / "
+            "ARTIFACT_IDENTITY.json glb_path) — a filename that "
+            "merely looks right is a diagnostic candidate, never a "
+            "certification")
+
+    # ---- the diagnostic candidate (readable, never certified) --------
+    diag = resolve_canonical_glb(run_dir)
+    if diag is not None:
+        out["diagnostic_candidate"] = str(diag)
+        out["diagnostic_basis"] = \
+            "the diagnostic locator's resolution order" if named is None \
+            or diag != named else basis
+
+    if named is None:
+        return out
+
+    # ---- the container proofs ----------------------------------------
+    if not named.is_file():
+        out["failures"].append(
+            f"the recorded identity names {named.name} but the file "
+            "does not exist on disk")
+        return out
+    size = named.stat().st_size
+    out["size"] = size
+    if size == 0:
+        out["failures"].append("the named artifact is a zero-byte file")
+        return out
+    fmt = glb_format_check(named)
+    out["format"] = fmt
+    if not fmt["valid"]:
+        out["failures"].append(
+            f"the named artifact is not a valid GLB container "
+            f"({fmt['detail']})")
+        return out
+
+    # ---- 2. the measured SHA vs the identity's recorded SHA ----------
+    glb_sha = _sha256_file(named)
+    out["sha256"] = glb_sha
+    recorded_shas = [
+        ("ARTIFACT_IDENTITY.geometry_hash", identity.get("geometry_hash")),
+        ("ARTIFACT_IDENTITY.glb_disk_sha256",
+         identity.get("glb_disk_sha256")),
+        ("bridge.artifact_identity.geometry_hash",
+         br_identity.get("geometry_hash")),
+    ]
+    identity_shas = [(s, v) for s, v in recorded_shas if v]
+    if not identity_shas:
+        out["failures"].append(
+            "the artifact identity records no SHA for the canonical "
+            "GLB — identity without the required SHA is not a "
+            "certification")
+        return out
+    mismatches = [s for s, v in identity_shas if str(v) != glb_sha]
+    if mismatches:
+        out["failures"].append(
+            "the recorded artifact SHA does not match the bytes on "
+            f"disk (source: {', '.join(mismatches)}) — identity chain "
+            "broken (fail closed)")
+        return out
+
+    # ---- 3. the generation identity -----------------------------------
+    id_generation = identity.get("generation_id") or \
+        br_identity.get("generation_id") or \
+        (lineage or {}).get("generation_id")
+    current_anchor = geom.get("generation_id") or id_generation
+    out["generation_id"] = str(id_generation) if id_generation else None
+    out["current_generation_id"] = str(current_anchor) \
+        if current_anchor else None
+    if not id_generation:
+        out["failures"].append(
+            "the artifact identity records no generation ID — the "
+            "generation identity is mandatory")
+        return out
+    if current_anchor and str(id_generation) != str(current_anchor):
+        out["failures"].append(
+            f"the artifact generation ({id_generation}) does not "
+            f"match the current generation ({current_anchor}) — a "
+            "stale artifact never certifies")
+        return out
+
+    out["certified"] = True
+    out["glb"] = str(named)
+    out["basis"] = basis
+    return out
+
+
 def resolve_step_artifacts(run_dir: Optional[Path]) -> List[Path]:
     """The run's STEP artifacts (real files, never route strings)."""
     if run_dir is None:
@@ -227,13 +463,22 @@ def evaluate_geometry_contract(session: Dict[str, Any],
     bytes on disk:
 
       geometry_available          a canonical geometry artifact exists,
-                                  is non-zero, carries a valid artifact
-                                  identity whose generation matches,
-                                  every recorded SHA matches the bytes,
-                                  and no contradicting terminal failure
-                                  is recorded. The ENGINEERING authority
-                                  is reported separately — it is
-                                  explicit, conceptual, or UNKNOWN.
+                                  is non-zero, is a valid container,
+                                  carries a valid artifact identity
+                                  that names it and records the SHA,
+                                  the SHA matches the bytes, the
+                                  generation identity holds, the
+                                  authority verdict is EXPLICIT, and
+                                  no contradicting terminal failure
+                                  is recorded (R451-C2.4 §2: the
+                                  NINE mandatory proofs — missing
+                                  any: not success)
+      geometry_unverified         a geometry artifact candidate exists
+                                  under the run directory but its
+                                  mandatory certification is
+                                  incomplete — an explicit, typed
+                                  unverified state (Art. XXV: never
+                                  a failure, never a silent pass)
       geometry_generation_failed  the chain RECORDS a generation failure
                                   (or concluded COMPLETE with only a
                                   parametric DEFINITION and no artifact)
@@ -244,10 +489,12 @@ def evaluate_geometry_contract(session: Dict[str, Any],
 
     Route strings ("/api/run/x/model") never establish geometry: the
     artifact must resolve to real bytes under the run directory. A
-    missing engineering class is UNKNOWN — never silently engineering.
-    A legacy boolean-only projection stays readable as
-    geometry_available (that era's recorded fact, Art. XI) but its
-    engineering authority is UNKNOWN — it never inherits the current
+    missing engineering class is UNKNOWN — never silently engineering,
+    and (R451-C2.4 §2) UNKNOWN is not an EXPLICIT authority, so an
+    unclassed artifact is geometry_unverified, never geometry_available.
+    A legacy boolean-only projection stays readable (that era's
+    recorded fact, Art. XI) but establishes nothing — its engineering
+    authority is UNKNOWN and it never inherits the current
     ENGINEERING_DEFINED authority (R451-C2.3 §1).
     """
     run_dir = Path(run_dir) if run_dir else None
@@ -263,11 +510,20 @@ def evaluate_geometry_contract(session: Dict[str, Any],
                          and "parametric_model_present" not in geom)
     legacy_present = legacy_projection and bool(geom.get("present"))
 
-    # ---- resolve the actual artifacts from the run directory ---------
-    glb_path = resolve_canonical_glb(run_dir)
-    glb_size = glb_path.stat().st_size if glb_path is not None else 0
-    glb_bytes_ok = glb_path is not None and glb_size > 0
-    glb_sha = _sha256_file(glb_path) if glb_bytes_ok else None
+    # ---- resolve + CERTIFY the canonical artifact (R451-C2.4 §2/§4) --
+    # discovery (the diagnostic locator) and certification are separate:
+    # only the recorded identity chain's named artifact can certify.
+    cert = certified_canonical_glb(run_dir, geom)
+    diag_path = resolve_canonical_glb(run_dir)
+    diag_size = diag_path.stat().st_size if diag_path is not None else 0
+    diag_sha = _sha256_file(diag_path) \
+        if diag_path is not None and diag_size > 0 else None
+    glb_certified = bool(cert["certified"])
+    glb_path = Path(cert["glb"]) if glb_certified else None
+    glb_size = cert["size"] if glb_certified else 0
+    glb_bytes_ok = glb_certified
+    glb_sha = cert["sha256"] if glb_certified else None
+    glb_format = cert.get("format") or {}
     step_paths = resolve_step_artifacts(run_dir)
     step_ok: List[Path] = []
     for p in step_paths:
@@ -300,11 +556,15 @@ def evaluate_geometry_contract(session: Dict[str, Any],
     }
     any_sha_recorded = False
     sha_mismatch = False
+    # the SHA the recorded sources are checked against: the CERTIFIED
+    # artifact's measured SHA when certification held, else the
+    # diagnostic candidate's measured SHA (contradiction detection)
+    check_sha = glb_sha or diag_sha
     for source, recorded in recorded_shas.items():
         if not recorded:
             continue
         any_sha_recorded = True
-        ok = (glb_sha is not None and str(recorded) == glb_sha)
+        ok = (check_sha is not None and str(recorded) == check_sha)
         sha_checks.append({"source": source, "recorded": str(recorded),
                            "matches_bytes": ok})
         if not ok:
@@ -352,6 +612,12 @@ def evaluate_geometry_contract(session: Dict[str, Any],
     concept_classes = [c for c in class_sources
                        if any(k in c.upper()
                               for k in _CONCEPTUAL_CLASSES)]
+    # R451-C2.4 §2 (the NINTH mandatory proof): the authority verdict
+    # must be EXPLICIT — a recorded class from the identity documents
+    # (ENGINEERING or CONCEPTUAL) or the CAD ledger's own recorded
+    # completion. UNKNOWN (no recorded verdict) is not explicit.
+    authority_explicit = bool(
+        up_classes or concept_classes or cad_outcome == "COMPLETED")
     if sha_mismatch:
         # the recorded identity contradicts the bytes on disk — the
         # artifact fails closed and no authority survives it
@@ -402,6 +668,29 @@ def evaluate_geometry_contract(session: Dict[str, Any],
         verify_detail = ("the recorded generation identity does not "
                          "match the artifact identity (fail closed)")
 
+    # ---- R451-C2.4 §2: the NINE mandatory proofs gate -----------------
+    # A verified-LOOKING artifact whose certification is incomplete is
+    # never geometry_available — the missing proofs are named (Art. XV):
+    #   * the GLB path: certified_canonical_glb must have certified
+    #   * the STEP path keeps its R451-C2.3 semantics (a byte-valid
+    #     STEP establishes ENGINEERING_GEOMETRY_READY and NEVER the
+    #     visual input boundary — the GLB certification is what gates
+    #     the visual boundary)
+    #   * the authority must be EXPLICIT (UNKNOWN is not a verdict)
+    if artifact_verified and not step_ok and not glb_certified:
+        artifact_verified = False
+        engineering_authority = "UNKNOWN"
+        verify_detail = verify_detail or (
+            "the geometry artifact is present but its certification "
+            "is incomplete: " + "; ".join(cert["failures"]))
+    elif artifact_verified and not authority_explicit and not step_ok:
+        artifact_verified = False
+        engineering_authority = "UNKNOWN"
+        verify_detail = verify_detail or (
+            "the artifact bytes verified but no recorded identity "
+            "document states an explicit authority class — UNKNOWN "
+            "is not an explicit authority (R451-C2.4 §2)")
+
     # ---- contradicting terminal failure ------------------------------
     chain_failure = (bridge_outcome == BRIDGE_GEOMETRY_FAILED
                      or cad_outcome in CAD_LEDGER_FAILED)
@@ -411,7 +700,7 @@ def evaluate_geometry_contract(session: Dict[str, Any],
     pm_only = bool(geom.get("parametric_model_present")) and \
         not glb_bytes_ok and not step_ok and not legacy_present
 
-    # ---- the geometry-side state (the six-value vocabulary) ----------
+    # ---- the geometry-side state (the seven-value vocabulary) --------
     if artifact_verified and not chain_failure:
         state = "geometry_available"
     elif chain_failure:
@@ -429,6 +718,17 @@ def evaluate_geometry_contract(session: Dict[str, Any],
         status = str(session.get("status") or "")
         state = "geometry_generation_failed" if status == "COMPLETE" \
             else "upstream_not_reached"
+    elif diag_path is not None or step_paths:
+        # R451-C2.4 §2: an artifact candidate EXISTS under the run
+        # directory but its mandatory certification is incomplete —
+        # the explicit typed unverified state (never a failure, never
+        # a silent pass; Art. XXV). A route string alone is NOT a
+        # candidate — only real files make this state.
+        state = "geometry_unverified"
+        verify_detail = verify_detail or (
+            "a geometry artifact candidate exists but its mandatory "
+            "certification is incomplete: "
+            + "; ".join(cert["failures"]))
     else:
         state = "upstream_not_reached"
 
@@ -441,20 +741,27 @@ def evaluate_geometry_contract(session: Dict[str, Any],
         and engineering_authority == "ENGINEERING")
     # VISUAL_INPUT_READY: the canonical GLB contract — what the Visual
     # Compiler actually consumes. A STEP never satisfies it by itself.
-    visual_input_ready = bool(glb_bytes_ok and glb_sha and not sha_mismatch
+    # R451-C2.4 §2: the GLB must be CERTIFIED (identity-named, SHA-
+    # verified, generation-matched, format-valid) — measured bytes
+    # alone never satisfy the boundary (the C2.3 byte-satisfiable
+    # shortcut is superseded).
+    visual_input_ready = bool(glb_certified and not sha_mismatch
                               and not generation_mismatch
                               and not chain_failure)
     if visual_input_ready:
-        visual_input_basis = (f"canonical GLB {glb_path.name} verified "
-                              f"({glb_size} bytes, sha256 on record)")
+        visual_input_basis = (
+            f"canonical GLB {glb_path.name} certified ({glb_size} "
+            f"bytes, valid glTF 2.0 container, sha256 verified against "
+            f"the recorded identity, generation "
+            f"{cert.get('generation_id')})")
     elif engineering_geometry_ready:
         visual_input_basis = ("the engineering geometry is verified but "
-                              "no canonical GLB resolves under the run "
-                              "directory — the visual boundary contract "
-                              "is not satisfied by a STEP alone")
+                              "no certified canonical GLB resolves under "
+                              "the run directory — the visual boundary "
+                              "contract is not satisfied by a STEP alone")
     elif glb_route or legacy_present:
         visual_input_basis = ("the projection records geometry presence "
-                              "but no verifiable canonical GLB resolves "
+                              "but no certified canonical GLB resolves "
                               "under the run directory")
     else:
         visual_input_basis = None
@@ -468,6 +775,11 @@ def evaluate_geometry_contract(session: Dict[str, Any],
             "glb_resolved": str(glb_path) if glb_path else None,
             "glb_bytes": glb_size,
             "glb_sha256_measured": glb_sha,
+            "glb_certified": glb_certified,
+            "glb_format": glb_format,
+            "certification_basis": cert.get("basis"),
+            "certification_failures": cert.get("failures") or [],
+            "diagnostic_candidate": cert.get("diagnostic_candidate"),
             "step_files_verified": [str(p) for p in step_ok],
             "sha_checks": sha_checks,
             "any_sha_recorded": any_sha_recorded,
@@ -484,9 +796,14 @@ def evaluate_geometry_contract(session: Dict[str, Any],
         if run_dir and (run_dir / GEOMETRY_SPEC_REL).is_file() else None,
         "canonical_glb": str(glb_path) if glb_path else None,
         "canonical_glb_sha256": glb_sha,
+        # R451-C2.4 §5: the generation identity the release chain
+        # triple-checks (artifact == receipt == current)
+        "artifact_generation_id": cert.get("generation_id"),
+        "current_generation_id": cert.get("current_generation_id"),
         # recorded-chain facts (the dossier's detail strings build on
         # these; the watchdog consumes them directly)
-        "has_artifact": artifact_verified or legacy_present,
+        "has_artifact": artifact_verified or legacy_present
+        or diag_path is not None,
         "legacy_projection": legacy_projection,
         "legacy_present": legacy_present,
         "glb_route": glb_route,
@@ -545,8 +862,14 @@ def verify_release_chain(run_dir: Optional[Path],
     """The Article LXXII release chain, verified from the run's own
     records and bytes. VISUAL_READY requires AT MINIMUM:
 
-      canonical GLB identity verified
-        -> invocation receipt identity verified
+      canonical GLB identity verified (exists, non-zero, VALID glTF 2.0
+        container — R451-C2.4 §3)
+        -> invocation receipt identity verified (glb_sha256 == bytes;
+           run_id == run; geometry_spec_sha256 EXISTS and equals the
+           GEOMETRY_SPEC.json bytes — the spec lineage is MANDATORY,
+           R451-C2.4 §5)
+        -> generation identity verified (artifact generation == receipt
+           generation == current generation — R451-C2.4 §5)
         -> render record identity verified
         -> gate PASS
         -> required presentation artifact set exists
@@ -560,19 +883,26 @@ def verify_release_chain(run_dir: Optional[Path],
     rungs: List[Dict[str, Any]] = []
     contract = contract or {}
 
-    # ---- rung 1: canonical GLB identity ------------------------------
+    # ---- rung 1: canonical GLB identity + container validity ---------
     glb = glb_path if glb_path is not None \
         else resolve_canonical_glb(run_dir)
     glb_sha = _sha256_file(glb) if glb is not None and \
         glb.stat().st_size > 0 else None
-    rungs.append({
-        "rung": "canonical_glb_identity",
-        "pass": bool(glb is not None and glb_sha),
-        "detail": (f"{glb.name} ({glb.stat().st_size} bytes)"
-                   if glb is not None and glb_sha else
-                   "no non-empty canonical GLB resolves under the run "
-                   "directory"),
-    })
+    fmt = glb_format_check(glb) if glb is not None and glb_sha else None
+    if glb is None or not glb_sha:
+        rung1_detail = ("no non-empty canonical GLB resolves under the "
+                        "run directory")
+        rung1_pass = False
+    elif not fmt["valid"]:
+        rung1_detail = (f"{glb.name} fails the GLB container check "
+                        f"({fmt['detail']})")
+        rung1_pass = False
+    else:
+        rung1_detail = (f"{glb.name} ({glb.stat().st_size} bytes, "
+                        "valid glTF 2.0)")
+        rung1_pass = True
+    rungs.append({"rung": "canonical_glb_identity",
+                  "pass": rung1_pass, "detail": rung1_detail})
 
     receipt = read_invocation_receipt(run_dir)
     # ---- rung 2: invocation receipt identity ------------------------
@@ -592,13 +922,19 @@ def verify_release_chain(run_dir: Optional[Path],
         spec_sha = _sha256_file(spec_path) if spec_path and \
             spec_path.is_file() else None
         rec_spec = receipt.get("geometry_spec_sha256")
-        if spec_sha and rec_spec and rec_spec != spec_sha:
+        # R451-C2.4 §5: the geometry-spec lineage is MANDATORY for
+        # VISUAL_READY — the receipt must NAME the spec sha AND the
+        # name must equal the spec file's bytes. The C2.3-era lenient
+        # both-absent pass is superseded (disclosed in the battery):
+        # an unprovable lineage is a failed rung, never a pass.
+        if not rec_spec:
+            problems.append("the receipt carries no geometry_spec_sha256 "
+                            "— the geometry-spec lineage is mandatory "
+                            "(R451-C2.4 §5)")
+        elif spec_sha and rec_spec != spec_sha:
             problems.append("receipt geometry_spec_sha256 != the "
                             "GEOMETRY_SPEC.json bytes (identity chain "
                             "broken)")
-        elif spec_sha and not rec_spec:
-            problems.append("GEOMETRY_SPEC.json exists but the receipt "
-                            "carries no geometry_spec_sha256")
         elif rec_spec and not spec_sha:
             problems.append("receipt names a geometry spec sha but no "
                             "GEOMETRY_SPEC.json exists on disk")
@@ -608,7 +944,42 @@ def verify_release_chain(run_dir: Optional[Path],
     rungs.append({"rung": "invocation_receipt_identity",
                   "pass": receipt_ok, "detail": detail})
 
-    # ---- rung 3: render record identity ------------------------------
+    # ---- rung 3: the generation identity (R451-C2.4 §5) ---------------
+    # artifact generation == receipt generation == current generation
+    gen_ok = False
+    detail = "the invocation receipt is absent — no generation lineage"
+    if receipt:
+        rec_gen = receipt.get("generation_id")
+        art_gen = contract.get("artifact_generation_id")
+        cur_gen = contract.get("current_generation_id")
+        if (art_gen is None or cur_gen is None) and run_dir is not None:
+            # self-serve the certification's generation verdict (the
+            # standalone-chain callers get the same triple-check)
+            self_cert = certified_canonical_glb(run_dir)
+            art_gen = art_gen or self_cert.get("generation_id")
+            cur_gen = cur_gen or self_cert.get("current_generation_id")
+        problems = []
+        if not rec_gen:
+            problems.append("the receipt records no generation_id — the "
+                            "generation lineage is mandatory "
+                            "(R451-C2.4 §5)")
+        if not art_gen:
+            problems.append("the artifact identity records no "
+                            "generation_id")
+        if rec_gen and art_gen and str(rec_gen) != str(art_gen):
+            problems.append(f"receipt generation ({rec_gen}) != the "
+                            f"artifact generation ({art_gen})")
+        if cur_gen and art_gen and str(art_gen) != str(cur_gen):
+            problems.append(f"the artifact generation ({art_gen}) is "
+                            f"not the current generation ({cur_gen})")
+        gen_ok = not problems
+        detail = "; ".join(problems) if problems else \
+            (f"generation identity holds three ways "
+             f"({art_gen})")
+    rungs.append({"rung": "generation_identity",
+                  "pass": gen_ok, "detail": detail})
+
+    # ---- rung 4: render record identity ------------------------------
     record = _read_json(run_dir / RENDER_RECORD_REL) if run_dir else None
     record_ok = False
     detail = "no persisted render record on disk"
@@ -796,6 +1167,16 @@ def evaluate_visual_join(session: Dict[str, Any],
         result["visual_join_detail"] = \
             "engineering visualization is not applicable to this invention"
         return result
+    if geometry_state == "geometry_unverified":
+        # R451-C2.4 §2: an artifact candidate exists but the mandatory
+        # certification is incomplete — the join has NO certified
+        # geometry to invoke. UNDECIDED (never a state promotion, Art.
+        # XXV); the caller's explicitly-unverified historical treatment
+        # owns the render side.
+        result["visual_join_state"] = None
+        result["visual_join_detail"] = contract.get(
+            "geometry_state_detail") or None
+        return result
     if geometry_state != "geometry_available":
         # upstream_not_reached / geometry_generation_failed: the join
         # has no geometry to invoke. (Legacy render-side states are
@@ -808,6 +1189,9 @@ def evaluate_visual_join(session: Dict[str, Any],
         # R451-C2.3: geometry presence without the explicit ENGINEERING
         # authority never drives the join — the artifact contract's
         # authority verdict is recorded, nothing is claimed
+        # (R451-C2.4: a CONCEPTUAL or UNKNOWN authority can NEVER
+        # reach VISUAL_READY through a render — the fallback this
+        # round removed was the only path that let it happen)
         result["visual_join_state"] = None
         result["visual_join_detail"] = contract.get(
             "geometry_state_detail") or None

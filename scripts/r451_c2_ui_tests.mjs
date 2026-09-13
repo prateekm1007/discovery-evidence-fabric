@@ -72,8 +72,13 @@ try {
     dossier());
   check("RUNNING -> INVESTIGATING", r.state === "INVESTIGATING" && !r.infrastructurePaused);
 
-  // SUCCESS + geometry (gate pass)
-  r = resolvePresentationState(detail(), dossier({ tabs: { design: designAvailable(), evidence: null } }));
+  // SUCCESS + geometry (gate pass). R451-C2.4 SUPERSESSION: the typed
+  // geometry_state + the recorded ENGINEERING authority now ride the
+  // fixture — the untyped legacy shape resolves to explicitly
+  // unverified historical state (the fallback below), never readiness.
+  r = resolvePresentationState(detail(), dossier({ tabs: { design: designAvailable({
+    geometry_state: "visual_complete",
+    engineering_authority: "ENGINEERING" }), evidence: null } }));
   check("SUCCESS+geometry(gate PASS) -> VISUAL_READY", r.state === "VISUAL_READY");
 
   // SUCCESS + geometry, render skipped (case D)
@@ -178,8 +183,11 @@ try {
     r.state === "SCIENTIFIC_REJECTION" && !r.infrastructurePaused);
 
   // Attack E: successful technology -> technology hero + normal cards.
+  // R451-C2.4 SUPERSESSION: the fixture carries the typed state + the
+  // recorded ENGINEERING authority (see the regression-matrix note).
   r = resolvePresentationState(detail(), dossier({ tabs: {
-    design: designAvailable(), evidence: { retrieval_state: "RETRIEVED",
+    design: designAvailable({ geometry_state: "visual_complete",
+      engineering_authority: "ENGINEERING" }), evidence: { retrieval_state: "RETRIEVED",
       retrieved_count: 12, used_count: 4 } } }));
   check("Attack E: VISUAL_READY for a successful technology",
     r.state === "VISUAL_READY");
@@ -320,13 +328,70 @@ try {
     ps.renderBlockedCopy(r.renderBlockCause).line ===
       "Engineering model ready. Presentation render in progress.");
 
-  // R451-C2.2 §1 — the five causes are FIVE distinct sentences
+  // R451-C2.2 §1 — the causes are DISTINCT sentences; R451-C2.4 closes
+  // the vocabulary at nine (geometry_unverified +
+  // legacy_render_unverified)
   {
     const lines = new Set(ps.RENDER_BLOCK_CAUSES.map(
       (c) => ps.renderBlockedCopy(c).line));
-    check("seven causes -> seven distinct sentences (R451-C2.3: two new typed causes)",
-      ps.RENDER_BLOCK_CAUSES.length === 7 && lines.size === 7);
+    check("nine causes -> nine distinct sentences (R451-C2.4: certification + legacy causes)",
+      ps.RENDER_BLOCK_CAUSES.length === 9 && lines.size === 9);
   }
+
+  // R451-C2.4 §1 — the legacy pre-C2.1 fallback can NEVER resolve to
+  // VISUAL_READY: a stale CIO gate PASS without the typed state is
+  // explicitly unverified historical state (the directive's
+  // unknown-authority + stale-CIO-PASS attack, frontend side)
+  r = resolvePresentationState(detail(), dossier({ tabs: {
+    design: { availability: "AVAILABLE", glb: "/api/run/x/model.glb",
+      renders: { status: "OK",
+        visual_gate: { verdict: "COMPLETE_PASS" } } }, evidence: null } }));
+  check("R451-C2.4 §1: legacy CIO PASS without the strict evaluator -> explicitly unverified (NEVER VISUAL_READY)",
+    r.state === "GEOMETRY_READY_RENDER_BLOCKED" &&
+    r.renderBlockCause === "legacy_render_unverified");
+  check("R451-C2.4 §1: the unverified-historical copy, never readiness",
+    ps.renderBlockedCopy(r.renderBlockCause).line.includes(
+      "explicitly unverified"));
+
+  // R451-C2.4 §2 — geometry_unverified: the artifact candidate's
+  // mandatory certification is incomplete — its OWN cause + sentence
+  r = resolvePresentationState(detail(), dossier({ tabs: {
+    design: { availability: "UNAVAILABLE",
+      geometry_state: "geometry_unverified",
+      presentation_cause: "geometry_unverified",
+      engineering_authority: "UNKNOWN",
+      geometry_state_detail: "the certification is incomplete: no " +
+        "recorded identity document names the canonical GLB" },
+    evidence: null } }));
+  check("R451-C2.4 §2: geometry_unverified -> render-blocked with its own cause",
+    r.state === "GEOMETRY_READY_RENDER_BLOCKED" &&
+    r.renderBlockCause === "geometry_unverified" &&
+    r.engineeringAuthority === "UNKNOWN");
+  check("R451-C2.4 §2: the unverified copy claims no authority",
+    ps.renderBlockedCopy(r.renderBlockCause).title ===
+      "GEOMETRY AUTHORITY UNVERIFIED");
+
+  // R451-C2.4 §6 — the authority is carried THROUGH the final state:
+  // "Technology ready" exists ONLY on the recorded ENGINEERING
+  // authority; CONCEPTUAL and UNKNOWN get their own explicit labels
+  r = resolvePresentationState(detail(), dossier({ tabs: {
+    design: designAvailable({ geometry_state: "visual_complete",
+      engineering_authority: "ENGINEERING" }), evidence: null } }));
+  check("R451-C2.4 §6: VISUAL_READY + ENGINEERING authority -> Technology ready",
+    r.state === "VISUAL_READY" &&
+    r.engineeringAuthority === "ENGINEERING");
+  r = resolvePresentationState(detail(), dossier({ tabs: {
+    design: designAvailable({ geometry_state: "visual_complete",
+      engineering_authority: "CONCEPTUAL" }), evidence: null } }));
+  check("R451-C2.4 §6: VISUAL_READY carries the CONCEPTUAL authority (never Technology ready)",
+    r.state === "VISUAL_READY" &&
+    r.engineeringAuthority === "CONCEPTUAL");
+  r = resolvePresentationState(detail(), dossier({ tabs: {
+    design: designAvailable({ geometry_state: "visual_complete",
+      engineering_authority: "UNKNOWN" }), evidence: null } }));
+  check("R451-C2.4 §6: VISUAL_READY carries the UNKNOWN authority (never Technology ready)",
+    r.state === "VISUAL_READY" &&
+    r.engineeringAuthority === "UNKNOWN");
 
   // R451-C2.3 §2 — the visual-input boundary has its OWN sentence:
   // a missing canonical GLB is never worded as renderer absence

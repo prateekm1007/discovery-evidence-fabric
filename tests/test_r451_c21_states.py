@@ -65,19 +65,30 @@ def _conceptual_run(tmp_path, name="ts_c21_conceptual"):
     """A verified CONCEPTUAL artifact run (R451-C2.3 supersession
     basis): the pre-contract CIO-renders fallback fires exactly when
     the contract establishes geometry but the join is undecided — a
-    conceptual authority run with render-side facts in the projection."""
+    conceptual authority run with render-side facts in the projection.
+    R451-C2.4: the fixture carries the REAL recorded identity shape —
+    a valid glTF 2.0 container named by ARTIFACT_IDENTITY.glb_path
+    with the recorded SHA and generation — because the mandatory
+    certification correctly rejects an unclassed, unnamed, or
+    non-GLB blob."""
     import hashlib
     import json as _json
+    import struct
     run = tmp_path / name
     (run / "MODEL").mkdir(parents=True)
     glb = run / "MODEL" / "model-001.glb"
-    glb.write_bytes(b"conceptual-scene-bytes")
+    json_data = b'{"asset":{"version":"2.0"}}'
+    json_data += b" " * ((4 - len(json_data) % 4) % 4)
+    glb.write_bytes(
+        struct.pack("<III", 0x46546C67, 2, 12 + 8 + len(json_data))
+        + struct.pack("<I", len(json_data)) + b"JSON" + json_data)
+    glb_sha = hashlib.sha256(glb.read_bytes()).hexdigest()
     identity = {
         "artifact": "ARTIFACT_IDENTITY", "run_id": name,
         "generation_id": "gen-1",
-        "geometry_hash": hashlib.sha256(glb.read_bytes()).hexdigest(),
-        "glb_disk_sha256": hashlib.sha256(
-            glb.read_bytes()).hexdigest(),
+        "geometry_hash": glb_sha,
+        "glb_disk_sha256": glb_sha,
+        "glb_path": str(glb),
         "visualizability_class": "SYSTEM_3D"}
     (run / "MODEL"
      / "ARTIFACT_IDENTITY.json").write_text(_json.dumps(identity))
@@ -158,15 +169,25 @@ class TestGeometryStates:
             session=_session(run_dir=run))
         assert out["presentation_cause"] == "gate_not_passed"
 
-    def test_state_e_visual_complete(self, tmp_path):
+    def test_state_e_visual_complete_superseded(self, tmp_path):
+        """R451-C2.4 §1 SUPERSESSION (was: a CIO-block gate PASS on a
+        conceptual run reached visual_complete through the pre-receipt
+        fallback — the exact weak path the directive eliminates): the
+        strict evaluator is the ONE current-state authority, so the
+        fallback's PASS verdict is EXPLICITLY UNVERIFIED HISTORICAL
+        STATE — readable (geometry_available + legacy_render_
+unverified), never visual_complete, never Technology ready. The
+        CONCEPTUAL authority can never upgrade through a render."""
         run = _conceptual_run(tmp_path)
         for verdict in ("PASS", "COMPLETE_PASS"):
             out = _geom_state(
                 {"present": True, "glb": "/api/run/x/model", "step": []},
                 {"status": "OK", "visual_gate": {"verdict": verdict}},
                 session=_session(run_dir=run))
-            assert out["geometry_state"] == "visual_complete", verdict
-            assert out["presentation_cause"] is None
+            assert out["geometry_state"] == "geometry_available", verdict
+            assert out["presentation_cause"] == "legacy_render_unverified"
+            # the historical PASS stays readable as the recorded fact
+            assert "unverified" in (out["geometry_state_detail"] or "")
 
     def test_legacy_boolean_is_never_geometry_available(self):
         """R451-C2.3 §1 SUPERSESSION (was: present=true alone reached

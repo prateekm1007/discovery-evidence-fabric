@@ -131,11 +131,42 @@ function stageStatus(view: PresentationView): {
             label: "Model rendered — release chain unverified",
             tone: "infra",
           };
+        case "geometry_unverified":
+          // R451-C2.4 §2 — the artifact candidate's mandatory
+          // certification is incomplete: the artifact stays
+          // inspectable, no authority is claimed
+          return {
+            label: "Geometry artifact present — identity unverified",
+            tone: "infra",
+          };
+        case "legacy_render_unverified":
+          // R451-C2.4 §1 — a historical render verdict reached
+          // without the strict evaluator: explicitly unverified
+          // historical state, never visual readiness
+          return {
+            label: "Historical render — presentation state unverified",
+            tone: "infra",
+          };
         default:
           return { label: "Model ready — renderer unavailable", tone: "infra" };
       }
-    case "VISUAL_READY":
+    case "VISUAL_READY": {
+      // R451-C2.4 §6 — the authority is CARRIED THROUGH to the final
+      // UI state: "Technology ready" is an ENGINEERING-authority claim
+      // and exists ONLY on the recorded ENGINEERING authority. A
+      // CONCEPTUAL or UNKNOWN authority never inherits it because a
+      // render happened — the render is not the claim.
+      if (view.engineeringAuthority === "CONCEPTUAL") {
+        return { label: "Conceptual model ready", tone: "done" };
+      }
+      if (view.engineeringAuthority !== "ENGINEERING") {
+        return {
+          label: "Visualization ready — geometry authority unverified",
+          tone: "infra",
+        };
+      }
       return { label: "Technology ready", tone: "done" };
+    }
     case "GEOMETRY_UNAVAILABLE":
       // State B (R451-C2.1): the invention exists — what is missing is
       // the visualization, never the technology itself

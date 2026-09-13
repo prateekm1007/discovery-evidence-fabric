@@ -127,13 +127,17 @@ export const INFRASTRUCTURE_USER_STATES = new Set([
 // the visual-gate verdicts that mean the presentation render is approved
 export const GATE_PASS_VERDICTS = new Set(["PASS", "COMPLETE_PASS"]);
 
-// R451-C2.1 — the six-value geometry/visual vocabulary (backend-owned;
-// toscanini/dossier.py::GEOMETRY_STATES is the authority)
+// R451-C2.1 — the geometry/visual vocabulary (backend-owned;
+// toscanini/dossier.py::GEOMETRY_STATES is the authority). R451-C2.4
+// §2 adds geometry_unverified: an artifact candidate whose mandatory
+// certification is incomplete — an explicit typed state, never a
+// failure and never a silent pass.
 export const GEOMETRY_STATES = new Set([
   "upstream_not_reached",
   "geometry_not_applicable",
   "geometry_generation_failed",
   "geometry_available",
+  "geometry_unverified",
   "visual_render_failed",
   "visual_complete",
 ]);
@@ -145,6 +149,11 @@ export const GEOMETRY_STATES = new Set([
 // release chain get their OWN causes too — a missing canonical GLB is
 // never worded as renderer absence, and an unverifiable release chain
 // is never worded as a gate rejection or as visual readiness.
+// R451-C2.4: geometry_unverified (the artifact candidate's mandatory
+// certification is incomplete) and legacy_render_unverified (a CIO-
+// block render verdict reached without the strict evaluator —
+// explicitly unverified historical state, R451-C2.4 §1) close the
+// vocabulary at nine.
 export type RenderBlockCause =
   | "renderer_unavailable"
   | "gate_not_passed"
@@ -152,7 +161,9 @@ export type RenderBlockCause =
   | "infrastructure"
   | "rendering_in_progress"
   | "visual_input_missing"
-  | "release_unverified";
+  | "release_unverified"
+  | "geometry_unverified"
+  | "legacy_render_unverified";
 
 // the closed cause vocabulary — the source pin the test battery walks
 export const RENDER_BLOCK_CAUSES: RenderBlockCause[] = [
@@ -163,6 +174,8 @@ export const RENDER_BLOCK_CAUSES: RenderBlockCause[] = [
   "rendering_in_progress",
   "visual_input_missing",
   "release_unverified",
+  "geometry_unverified",
+  "legacy_render_unverified",
 ];
 
 export interface BlockedCopy {
@@ -285,6 +298,28 @@ export function renderBlockedCopy(cause?: RenderBlockCause): {
         "verified against the canonical geometry.",
     };
   }
+  if (cause === "geometry_unverified") {
+    // R451-C2.4 §2 — the artifact candidate's mandatory certification
+    // is incomplete: the artifact stays inspectable but no authority
+    // is claimed (UNKNOWN is not an explicit authority)
+    return {
+      title: "GEOMETRY AUTHORITY UNVERIFIED",
+      line: "A geometry artifact is present, but its mandatory " +
+        "identity could not be certified — the engineering " +
+        "authority is not established.",
+    };
+  }
+  if (cause === "legacy_render_unverified") {
+    // R451-C2.4 §1 — a historical CIO-block render verdict reached
+    // without the strict evaluator: readable as explicitly unverified
+    // historical state, NEVER visual readiness
+    return {
+      title: "GEOMETRY AUTHORITY UNVERIFIED",
+      line: "A historical render is recorded, but it predates (or " +
+        "bypasses) the verifiable identity chain — the presentation " +
+        "state is explicitly unverified.",
+    };
+  }
   // State C — the renderer itself is unavailable in this environment
   return {
     title: "ENGINEERING MODEL READY",
@@ -353,8 +388,28 @@ export function resolvePresentationState(
 
   if (typedGeometry) {
     if (gstate === "visual_complete") {
-      // State E — render succeeded AND the gate passed: show the model
-      return { state: "VISUAL_READY", infrastructurePaused: false };
+      // State E — render succeeded AND the gate passed: show the model.
+      // R451-C2.4 §6: the authority rides with the state — the badge
+      // NEVER claims "Technology ready" without the recorded
+      // ENGINEERING authority (a render alone is never the claim).
+      return {
+        state: "VISUAL_READY",
+        infrastructurePaused: false,
+        engineeringAuthority: design?.engineering_authority ?? null,
+      };
+    }
+    if (gstate === "geometry_unverified") {
+      // R451-C2.4 §2 — the artifact candidate's mandatory
+      // certification is incomplete: the state stays readable with
+      // the typed cause, never visual readiness
+      return {
+        state: "GEOMETRY_READY_RENDER_BLOCKED",
+        infrastructurePaused: false,
+        glbReadyButRenderBlocked: true,
+        renderBlockCause: "geometry_unverified",
+        renderBlockDetail: design?.geometry_state_detail ?? null,
+        engineeringAuthority: design?.engineering_authority ?? null,
+      };
     }
     if (gstate === "geometry_available" ||
         gstate === "visual_render_failed") {
@@ -392,8 +447,12 @@ export function resolvePresentationState(
     // logic below resolves the honest absence state
   } else if (design?.availability === "AVAILABLE" && design.glb) {
     // pre-C2.1 projection fallback (documented): older dossier payloads
-    // without the typed field — derive from the projection's OWN
-    // renders fields (never from raw file existence)
+    // without the typed field — R451-C2.4 §1 SUPERSESSION: this legacy
+    // path can NEVER resolve to VISUAL_READY. A CIO-block gate verdict
+    // without the strict evaluator's verification is explicitly
+    // unverified historical state — readable, never current visual
+    // readiness (the unknown-authority + stale-CIO-PASS attack is
+    // closed on the frontend too).
     const verdict = design.renders?.visual_gate?.verdict;
     const renderStatus = design.renders?.status ?? "";
     const renderRan = !(
@@ -403,7 +462,17 @@ export function resolvePresentationState(
       renderStatus === ""
     );
     if (renderRan && verdict != null && GATE_PASS_VERDICTS.has(verdict)) {
-      return { state: "VISUAL_READY", infrastructurePaused: false };
+      return {
+        state: "GEOMETRY_READY_RENDER_BLOCKED",
+        infrastructurePaused: false,
+        glbReadyButRenderBlocked: true,
+        renderBlockCause: "legacy_render_unverified",
+        renderBlockDetail:
+          "a historical render is recorded, but it predates (or " +
+          "bypasses) the verifiable identity chain — the presentation " +
+          "state is explicitly unverified.",
+        engineeringAuthority: design?.engineering_authority ?? null,
+      };
     }
     // case C/D: the engineering geometry EXISTS; the presentation render
     // did not run or did not pass — the canonical GLB stays available

@@ -321,16 +321,28 @@ def _hero_eligibility(geom: Dict[str, Any]) -> Dict[str, Any]:
 #   geometry_generation_failed  engineering ran; the recorded bridge
 #                               outcome says the geometry build failed
 #                               (GEOMETRY_FAILED)
-#   geometry_available          a canonical geometry artifact exists
+#   geometry_available          a certified canonical geometry artifact
+#                               exists (R451-C2.4 §2: the NINE mandatory
+#                               proofs — identity, SHA, generation,
+#                               container validity, explicit authority)
+#   geometry_unverified         a geometry artifact candidate exists but
+#                               its mandatory certification is
+#                               incomplete (R451-C2.4 §2: the explicit
+#                               typed unverified state — never a
+#                               failure, never a silent pass)
 #   visual_render_failed        geometry exists; the presentation render
 #                               did not produce an approved render
 #                               (renderer unavailable OR gate not passed
 #                               — `presentation_cause` distinguishes)
 #   visual_complete             render succeeded AND the visual gate
-#                               verdict is PASS / COMPLETE_PASS
+#                               verdict is PASS / COMPLETE_PASS —
+#                               reachable ONLY through THE strict
+#                               evaluator (R451-C2.4 §1: the CIO
+#                               fallback can never produce it)
 GEOMETRY_STATES = ("upstream_not_reached", "geometry_not_applicable",
                    "geometry_generation_failed", "geometry_available",
-                   "visual_render_failed", "visual_complete")
+                   "geometry_unverified", "visual_render_failed",
+                   "visual_complete")
 
 # render-record statuses that mean the renderer produced pixels
 _RENDERER_RAN = ("OK", "SUCCEEDED", "COMPLETE")
@@ -373,14 +385,29 @@ def _geometry_artifact_contract(session: Dict[str, Any],
 def _renders_cause(renders: Dict[str, Any]) -> Tuple[str, Optional[str],
                                                      Optional[str]]:
     """The pre-receipt fallback: the render-side state + cause from the
-    CIO renders block alone (the R451-C2.1 derivation, preserved for
-    payloads whose run directory / receipt is not readable). Returns
+    CIO renders block alone. R451-C2.4 §1 SUPERSESSION — the weak
+    fallback path is ELIMINATED: the strict evaluator is the only
+    current-state authority, and a CIO-block gate verdict reached
+    through this fallback is EXPLICITLY UNVERIFIED HISTORICAL STATE,
+    never visual_complete. The unknown-authority + stale-CIO-PASS
+    attack (unknown engineering authority + a stale CIO visual PASS
+    -> NOT VISUAL_READY) is closed exactly here: this function can no
+    longer return `visual_complete` in ANY branch. The render-side
+    failure/pending facts stay readable as they always were. Returns
     (geometry_state, presentation_cause, detail)."""
     status = str(renders.get("status") or "")
     verdict = ((renders.get("visual_gate") or {}).get("verdict")) \
         if isinstance(renders.get("visual_gate"), dict) else None
     if verdict in ("PASS", "COMPLETE_PASS"):
-        return "visual_complete", None, None
+        # R451-C2.4 §1: a CIO-block gate verdict without the strict
+        # evaluator's verification is an explicitly unverified
+        # historical render — READABLE, never visual_complete, never
+        # current visual readiness
+        return ("geometry_available", "legacy_render_unverified",
+                "a historical render is recorded in the projection, "
+                "but it predates (or bypasses) the verifiable identity "
+                "chain — the presentation state is explicitly "
+                "unverified (R451-C2.4 §1)")
     if status in _RENDERER_RAN and verdict is not None:
         # the renderer produced pixels and the gate said no (State D)
         return ("visual_render_failed", "gate_not_passed",
@@ -485,8 +512,10 @@ def _geometry_state(session: Dict[str, Any], geom: Dict[str, Any],
                     "geometry_state_detail": detail,
                     "geometry_contract": contract,
                     "visual_join": join}
-    # pre-receipt fallback: the CIO renders block (the R451-C2.1
-    # derivation, byte-compatible for payloads without a receipt)
+    # pre-receipt fallback: the CIO renders block stays READABLE only
+    # as explicitly unverified historical state (R451-C2.4 §1) — this
+    # path can no longer produce visual_complete, so the strict
+    # evaluator is the ONE current-state authority
     fstate, fcause, fdetail = _renders_cause(renders)
     return {"geometry_state": fstate,
             "presentation_cause": fcause,
@@ -627,6 +656,13 @@ def design_tab(session: Dict[str, Any],
                 "investigation has not produced engineering geometry "
                 "on this run; the scientific rationale is preserved "
                 "regardless")
+    elif gst["geometry_state"] == "geometry_unverified":
+        # R451-C2.4 §2: an artifact candidate exists but the mandatory
+        # certification is incomplete — the honest note names the
+        # missing proofs (never a failure claim, never a silent pass)
+        note = ("A geometry artifact is present on this run, but its "
+                "mandatory identity could not be certified — the "
+                "engineering authority is not established.")
     else:
         # geometry_not_applicable | geometry_generation_failed — the
         # State B copy, with the recorded reason as the detail
@@ -1069,7 +1105,8 @@ def pipeline_projection(session: Dict[str, Any],
         running=running,
         reached=eng_received or eng_artifacts
         or gstate in ("geometry_not_applicable",
-                      "geometry_generation_failed"),
+                      "geometry_generation_failed",
+                      "geometry_unverified"),
         stage_failed=gstate == "geometry_generation_failed",
         stage_skipped=False, infra_stop=infra_stop,
         detail=design_tab_data.get("geometry_state_detail")))
@@ -1130,6 +1167,17 @@ def pipeline_projection(session: Dict[str, Any],
             "status": ("PAUSED_INFRASTRUCTURE" if job == "INTERRUPTED"
                        else "IN_PROGRESS"),
             "detail": jdetail})
+    elif gstate == "geometry_unverified":
+        # R451-C2.4 §2: the artifact candidate's certification is
+        # incomplete — a typed STOPPED with the named missing proofs
+        # (never NOT_REACHED: the bytes exist; never visual-ready)
+        rows.append({
+            "key": "visualization", "label": "3D visualization",
+            "status": "STOPPED", "blocked_class": "IDENTITY_UNVERIFIED",
+            "detail": design_tab_data.get("geometry_state_detail")
+            or "the geometry artifact's mandatory identity could not "
+               "be certified — the presentation state is explicitly "
+               "unverified"})
     elif gstate in ("geometry_available", "visual_render_failed"):
         if gcause in ("infrastructure", "renderer_unavailable"):
             rows.append({
@@ -1165,6 +1213,18 @@ def pipeline_projection(session: Dict[str, Any],
                 "detail": design_tab_data.get("geometry_state_detail")
                 or "the canonical GLB required for presentation "
                    "rendering was not produced on this run"})
+        elif gcause == "legacy_render_unverified":
+            # R451-C2.4 §1: a CIO-block render verdict reached without
+            # the strict evaluator — readable as explicitly unverified
+            # historical state, never visual-ready
+            rows.append({
+                "key": "visualization", "label": "3D visualization",
+                "status": "STOPPED",
+                "blocked_class": "LEGACY_RENDER_UNVERIFIED",
+                "detail": design_tab_data.get("geometry_state_detail")
+                or "a historical render is recorded, but it predates "
+                   "(or bypasses) the verifiable identity chain — the "
+                   "presentation state is explicitly unverified"})
         else:  # not_attempted — the join has not produced a render yet
             rows.append({
                 "key": "visualization", "label": "3D visualization",

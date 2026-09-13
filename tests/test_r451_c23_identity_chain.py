@@ -35,11 +35,21 @@ watchdog announce the SAME join state on every fixture — no second
 state machine), the identity-chain equations, the typed package
 classification, and the clean-state replay (byte-identical reports on
 re-evaluation).
+
+R451-C2.4 SUPERSESSIONS (Art. LXIV, disclosed): the golden fixture's
+GLB_BYTES are now a REAL minimal glTF 2.0 container — the previous
+b"canonical-engineering-glb-bytes-v1" blob was a fixture artifact that
+misrepresented a non-GLB payload as the canonical GLB, and the C2.4
+format-validity proof (a mandatory certification condition) correctly
+rejects it. The battery's expectations are unchanged: the golden chain
+still reaches VISUAL_READY through the strict evaluator, and every
+attack still fails to promote.
 """
 from __future__ import annotations
 
 import hashlib
 import json
+import struct
 import sys
 from pathlib import Path
 
@@ -57,7 +67,17 @@ WEBAPP = REPO / "TOSCANINI_UI" / "webapp"
 # ---------------------------------------------------------------------------
 # fixture factory — a COMPLETE, honest engineering run the attacks mutate
 # ---------------------------------------------------------------------------
-GLB_BYTES = b"canonical-engineering-glb-bytes-v1"
+def _valid_glb(payload: bytes = b'{"asset":{"version":"2.0"}}') -> bytes:
+    """A REAL minimal glTF 2.0 binary container: 12-byte header
+    (magic, version 2, declared length) + one JSON chunk. The R451-C2.4
+    format-validity proof treats anything else as not-a-GLB."""
+    json_data = payload + b" " * ((4 - len(payload) % 4) % 4)
+    header = struct.pack("<III", 0x46546C67, 2, 12 + 8 + len(json_data))
+    chunk_header = struct.pack("<I", len(json_data)) + b"JSON"
+    return header + chunk_header + json_data
+
+
+GLB_BYTES = _valid_glb()
 
 
 def _sha(data: bytes) -> str:

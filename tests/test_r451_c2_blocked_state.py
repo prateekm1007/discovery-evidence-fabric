@@ -274,18 +274,25 @@ class TestInvocationReceipt:
 # ---------------------------------------------------------------------------
 class TestWatchdog:
     def _healthy_fixture(self, tmp_path: Path, name: str = "ts_watchdog_ok") -> Path:
-        """A synthetically healthy run dir: GLB + the recorded identity
-        chain (R451-C2.3: the engineering authority reads recorded
-        identity documents) + receipt (rendered, spec sha matching) +
-        gate COMPLETE_PASS + the full ladder + render record with the
-        true source hash + the hero.glb provenance hash. File-level
-        fixture — the watchdog is a deterministic file-rule checker."""
+        """A synthetically healthy run dir: GLB (a VALID glTF 2.0
+        container — R451-C2.4 §3 makes container validity a mandatory
+        certification proof) + the recorded identity chain (R451-C2.3:
+        the engineering authority reads recorded identity documents) +
+        receipt (rendered, spec sha matching) + gate COMPLETE_PASS +
+        the full ladder + render record with the true source hash +
+        the hero.glb provenance hash. File-level fixture — the watchdog
+        is a deterministic file-rule checker."""
         import hashlib
+        import struct
         run = tmp_path / name
         m3d = run / "MODEL" / "3D"
         m3d.mkdir(parents=True)
         glb = run / "MODEL" / "engineering_model.glb"
-        glb.write_bytes(b"fake-glb-bytes")
+        json_data = b'{"asset":{"version":"2.0"}}'
+        json_data += b" " * ((4 - len(json_data) % 4) % 4)
+        glb.write_bytes(
+            struct.pack("<III", 0x46546C67, 2, 12 + 8 + len(json_data))
+            + struct.pack("<I", len(json_data)) + b"JSON" + json_data)
         glb_sha = hashlib.sha256(glb.read_bytes()).hexdigest()
         spec = {"artifact": "GEOMETRY_SPEC", "parameters": []}
         spec["spec_sha256"] = hashlib.sha256(json.dumps(
