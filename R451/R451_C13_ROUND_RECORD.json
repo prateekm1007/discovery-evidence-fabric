@@ -1,0 +1,96 @@
+{
+  "artifact_type": "R451_C13_ROUND_RECORD",
+  "round": "R451-C1.3 — Production Transport Authority + Provenance Closure",
+  "recorded_at": "2026-09-13T12:30:00+00:00Z",
+  "engine_commit_at_record": "c783700e5027f7d070f1e13f236ebdc5e682ea6e (the R451-C1.3 work commit: 1940274a the engine authority + c783700e the ZeroGPU record; this record cannot contain its own commit hash — the R447-C2/R450 precedent)",
+  "directive": "R451-C1.3 (operator, 2026-09-13): the transport authority chain CATALOG -> CAPABILITY PROBE -> MEASURED ROUTE STATE -> COST POLICY -> RUNTIME ADMISSION -> ROUTING LADDER -> CALL; run-level routing provenance (run_owned_call => run_id != null); explicit task degradation; stale-default retirement; MODEL_NOT_FOUND recovery; the unified admission semantic; the production Space's own zero-paid route; ONE bounded ZeroGPU experiment; production deployment + a fresh real run. The three prohibitions held: no giant model benchmark, no scientific-engine redesign, no new candidate-generation heuristics.",
+  "runtime_admission_authority": {
+    "module": "discovery_fabric/engine/runtime_admission.py v1.1.0",
+    "five_states": ["NOT_PROBED", "PROBE_OK", "PROBE_FAILED", "PROBE_EXPIRED", "POLICY_REFUSED"],
+    "rule": "llm_registry.generate() never treats credential_present=true as runtime-admissible; a route requires a CURRENT measured successful capability probe through the rung's REAL transport (the same call functions the engine's real calls use), governed by the EXISTING TTL mechanism (model_routing.PROBE_TTL_S) — no per-call probing",
+    "refresh_and_invalidation": "successful real calls refresh the window (source=real_call, a stronger measurement); real-call transport failures invalidate the record (the R415 clear_probe_cache discipline); the failure floor PROBE_FAILURE_FLOOR_S=30 s ages failures out faster than successes (the acceptance run's measured defect — a ~5 s llama-server restart window — fixed at the authority layer and measured LIVE in the acceptance window: 06:12:10 PROBE_FAILED(MODEL_FAILURE) -> 06:12:47 PROBE_OK)",
+    "local_route": "the SAME rule, no bespoke local exception (test-enforced)",
+    "transient_vs_permanent": "NETWORK_FAILURE/TIMEOUT/RATE_LIMITED probes get ONE bounded in-walk retry; AUTH_FAILURE/GONE/MODEL_NOT_FOUND/CREDIT_EXHAUSTED are never retried"
+  },
+  "run_level_routing_provenance": {
+    "module": "discovery_fabric/engine/call_context.py + engine/run.py + model_routing.record_call_outcome/ledger_for_run",
+    "invariant": "run_owned_call => run_id != null — FAILS CLOSED in the ledger (ValueError; the caller fixes the call site, never the ledger)",
+    "thirteen_fields": ["run_id", "session_id", "request_id", "stage", "provider", "model", "attempt", "task", "cost_class (cost basis)", "account_domain", "failure_class", "fallback_from", "fallback_to"],
+    "call_classes": "RUN_OWNED (run-owned discovery calls) / CAPABILITY_PROBE (provider probes — legitimately run_id=null, test-separated) / STANDALONE (script calls outside any investigation, honestly null)",
+    "isolation": "ledger_for_run(run_id) — run_id equality on the append-only ledger, NO time-window or ledger-tail inference; ROUTING_LEDGER_RUN.json persisted INTO the run dir (self-contained transport evidence)",
+    "pre_c13_defect_closed": "the pre-C1.3 acceptance ledger's 802 null-run_id lines (evolution passed run_id=purpose; mechanism_space passed none) are structurally impossible now",
+    "production_wiring": "the worker passes session_id; EngineRun binds the run context for the whole run; the durable-state push carries the routing ledger + capability store off the ephemeral container"
+  },
+  "task_degradation": {
+    "fields": ["requested_task", "actual_task_capability", "task_capability_match", "degraded_reason"],
+    "surfaces": "every selected ledger line, the generate() result, and the candidate's derivation trace (assemble_candidate) — a CHEAP_EMERGENCY_FALLBACK candidate is never read as STRONG reasoning (the directive's explicit rule)",
+    "measured_example": "the acceptance run's selected synthesis line: requested STRONG, actual CHEAP_EMERGENCY_FALLBACK, the degraded_reason stating downstream readers must NOT interpret the result as STRONG-class reasoning"
+  },
+  "catalog_and_recovery": {
+    "c15_discovered_semantics": "catalog DISCOVERED -> ONLY catalog-present models are candidates (a pinned-but-absent default is a stale identifier, never attempted merely because it was once a default); UNDISCOVERED -> pinned defaults stand in, explicitly marked PINNED_DEFAULT; the model-FAMILY allowlist stays (the pinned family policy, distinct from a pinned dead identifier)",
+    "c16_model_not_found_recovery": "a FRESH catalog relisting clears the known-dead mark (clear_known_dead_if_relisted), records the append-only recovery event, and invalidates the stale capability record so the relisted id re-probes IMMEDIATELY; deterministic sequence test-pinned (404 -> mark dead -> fresh catalog lists -> mark cleared -> eligible again); a TTL cache hit does NOT clear",
+    "c17_unified_semantic": "ONE runtime_admission() shared by select_provider() and generate() (available AND cost_policy_eligible AND measured_capability_eligible); the availability matrix carries each provider's measured route state; no legacy weaker selector remains"
+  },
+  "zero_paid_acceptance_rerun": {
+    "source_artifact": "R451/ACCEPTANCE_RUN_C13.json (accepted=true, all 14 gates PASS)",
+    "problem": "r451-greenhouse-emitter-clogging (GENUINELY_FRESH — a third domain after P1 ozone diffuser fouling and P2 EV-bus battery thermal; never submitted to any environment)",
+    "run_id": "r451c13: greenhouse-emitter-clogging acceptance v3",
+    "session_id": "r451-c13-acceptance",
+    "chain": {
+      "model_response": "14 run-owned localqwen calls / 0 paid / 0 null-run_id lines; all 13 directive fields on every line; capability evidence persisted (3 CAPABILITY_PROBE lines inside the run's own window, including one live MODEL_FAILURE -> recovery)",
+      "evidence": "frozen records (envelope_FREEZE / RETRIEVE)",
+      "mechanism": "1 candidate (BUILT_BELOW_MIN — honest)",
+      "candidate": "cand:A2:r451-greenhouse-emitter-clogging:f84c6d23a130ad61 via localqwen qwen3-1.7b",
+      "attack": "ADJUDICATED — overall KILLED (3 killed, 2 corrections): a real adversarial verdict, honestly negative (Art. XV)",
+      "final_state": "INVENTION_UNDER_DEVELOPMENT"
+    },
+    "gates": ["fresh_problem", "model_response_run_owned", "zero_paid", "invariant_run_owned_non_null_run_id", "run_isolatable_by_run_id", "session_id_on_run_owned_lines", "capability_evidence_persisted", "task_degradation_explicit", "run_ledger_snapshot_persisted", "manifest_carries_session", "evidence", "mechanism", "candidate", "attack"]
+  },
+  "zerogpu_experiment": {
+    "source_artifact": "R451/ZEROGPU_EXPERIMENT.json",
+    "verdict": "FAILED_ZERO_GPU_NOT_ATTACHABLE_TO_DOCKER_SPACE",
+    "exact_failure": "request_space_hardware(zero-a10g) on the canonical Docker-SDK Space returned HTTP 400 'ZeroGPU Spaces only work with Gradio SDK' (measured live; hardware stayed cpu-basic)",
+    "account_facts": "isPro=true (the operator's 40-minute ZeroGPU allocation EXISTS on the account); billingMode=prepaid; periodEnd 2026-09-30",
+    "structural_finding": "the canonical production Space is sdk:docker BY NECESSITY (the engine image: Blender, CadQuery/OCCT, the C1.3 llama-server local route); the ZeroGPU resource class can NEVER attach to THIS production engine — a successful Gradio-side measurement would not change any deployment decision; the directive's own stop rule applied (record the exact failure, stop)",
+    "gpu_minutes_consumed": 0.0,
+    "no_model_leaderboard": true,
+    "operator_unblock_paths_recorded_not_taken": ["revisit the R447 single-Space decision for a temporary Gradio experiment Space", "re-architect the canonical deployment to the Gradio SDK — an owner decision (Art. XIII/LXV)"]
+  },
+  "production_local_route_c18": {
+    "dockerfile": "the C1.3 adapter: llama.cpp llama-server BUILT FROM THE PINNED TAG b10930 (GGML_NATIVE=OFF; tag verified live — the archive fetch returned HTTP 200) + the sha-pinned Qwen/Qwen3-1.7B Q4_K_M GGUF (72c5c3cb...b24fb) acquired at BUILD time with sha256sum -c fail-closed",
+    "entrypoint": "toscanini/container-entrypoint.sh — LOCAL_QWEN_ENABLE=1 starts llama-server (port 8790, ctx 8192, threads 2) BEFORE the engine serves; a failed start is HONEST (the route stays unprobed, other routes unaffected — Art. LXI)",
+    "admission": "the Space's engine measures this route like any other (probe-before-admit through the ordinary registry path — no bespoke local exception); the production Space independently proves the route (C1.8 — never a claim that the coding sandbox's compute transfers)"
+  },
+  "production_deployment": {
+    "target_sha": "c783700e5027f7d070f1e13f236ebdc5e682ea6e",
+    "deployed_sha": "FILLED_AT_VERIFICATION",
+    "deploy_id": "FILLED_AT_VERIFICATION",
+    "health_check_result": "FILLED_AT_VERIFICATION",
+    "drift": "FILLED_AT_VERIFICATION",
+    "deploy_script": "scripts/r451_c13_deploy.py (the phase-split uploader; Space revision recorded in scripts/r447_deploy_state.json)",
+    "verify_script": "scripts/r447_deploy_verify.py (ls-remote == /api/version engine_commit == /api/health deployment_drift GREEN)"
+  },
+  "production_fresh_run": {
+    "source_artifact": "R451/PRODUCTION_FRESH_RUN_C13.json",
+    "status": "FILLED_AFTER_THE_FRESH_RUN",
+    "requirement": "a fresh real user problem through the DEPLOYED production URL: fresh problem -> real evidence -> mechanism -> candidate -> attack, recording every LLM call with run_id, every routing selection, every fallback, every capability state, every cost domain (C1.10 — no local-only acceptance)"
+  },
+  "tests": {
+    "new": "tests/test_r451_c13_transport_authority.py — 39 adversarial tests: the closed five-state vocabulary; credential-presence-is-not-admissibility; TTL means no probe-per-call; transient absorption vs permanent never-retry; the failure floor; the local route's same rule; transport-vs-verdict separation (Art. LXI); the 13-field lines; the fail-closed null-run_id invariant; probes-legitimately-null; run isolation without time window; STRONG/cheap degradation explicitness; catalog-discovered semantics; the family allowlist; MODEL_NOT_FOUND relist recovery; the unified selector; the Art. XVII bypasses (forged capability record, spoofed run ownership, laundered probe failure)",
+    "regressions": "test_r451_zero_paid.py 36 + test_r451_transport_capability.py 32 + test_r415_discovery_availability routing battery + test_r450_directional + test_r444_state_integrity + test_r419_english_only + test_r445_canonical_domain — all green (112 focused + 128 broader in this session's runs)"
+  },
+  "known_failures_and_gaps": [
+    "the ZeroGPU experiment's structural failure (recorded above) — the ZeroGPU resource class is unreachable from the canonical Docker production Space; the operator's two unblock paths are recorded, not taken",
+    "the local model's honest quality limits carry over from R451-C1.1 (50% span-verbatim synthesis; multi-attempt technical states) — the C1.3 round did not repair them (Art. VII: model quality is never repaired by weakening gates)",
+    "the attack verdicts remain honestly negative on fresh problems (the 1.7B proposer's candidates are killed) — the zero-paid route is transport-proven, not quality-equivalent to a STRONG model (exactly what the C1.4 degradation record makes explicit)",
+    "the R451-C1.1 deferred items remain deferred by the operator's own directive (the recursive >=3-iteration loop proof, the causal-memory arm, the same-model two-arm comparison, the frozen >=6-problem benchmark)"
+  ],
+  "constitution": {
+    "version": "2.4.0",
+    "hash": "b54a1be9bcbdd2465d0b034e1e1f472f80b87174209c0d534b7d9e1223e649b2",
+    "read_in_full_at_session_start": true,
+    "re_read_in_full_before_final_commit": true,
+    "governance_read": "GOVERNANCE/README.md + AUDITOR_SELF_GOVERNANCE_v1.md + AUDITOR_BLINDSPOT_REGISTER.md + AUDITOR_REMEMBERED_STATE.md + AUDIT_LOOP_PROTOCOL_v1.md + ACTIVE_PATH.md + the full R451 C1 round record + the latest worklog (before coding, per the directive's mandatory order)",
+    "gates_untouched": "no verifier, gate, threshold, or epistemic semantics modified (Art. VII) — routing/transport machinery only; the assess-driver fix corrected the MEASUREMENT CODE to read the artifacts' actual shapes (Art. X), never the gates"
+  }
+}
