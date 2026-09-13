@@ -876,25 +876,29 @@ def _transport_facts(case_dir: Path, arm: str) -> Dict[str, Any]:
     ledger by run-id prefix as fallback) + latency/degradation stats."""
     spec = ARMS[arm]
     lines: List[Dict[str, Any]] = []
-    rl = _read_json(case_dir / "ROUTING_LEDGER_RUN.json")
-    if rl and rl.get("lines"):
-        lines = [l for l in rl["lines"]
-                 if str(l.get("run_id") or "").startswith(
-                     spec["run_id_prefix"] + "-")]
-        src = "ROUTING_LEDGER_RUN.json"
-    else:
-        ledger = REPO_ROOT / "ENGINE_RUNS" / "model_routing" / \
-            "ledger.jsonl"
-        if ledger.exists():
-            for raw in ledger.read_text().splitlines()[-2000:]:
-                try:
-                    d = json.loads(raw)
-                except Exception:  # noqa: BLE001
-                    continue
-                if str(d.get("run_id") or "").startswith(
-                        spec["run_id_prefix"] + "-"):
-                    lines.append(d)
+    # The GLOBAL ledger is the authority (the same run-id-prefix
+    # isolation the purity invariant uses; the run's own
+    # ROUTING_LEDGER_RUN.json is a snapshot that can be written before
+    # the final stages — measured this session: C's run file carried
+    # 2 lines while the global ledger's run-owned window carried 25)
+    ledger = REPO_ROOT / "ENGINE_RUNS" / "model_routing" / "ledger.jsonl"
+    if ledger.exists():
+        for raw in ledger.read_text().splitlines()[-4000:]:
+            try:
+                d = json.loads(raw)
+            except Exception:  # noqa: BLE001
+                continue
+            if str(d.get("run_id") or "").startswith(
+                    spec["run_id_prefix"] + "-"):
+                lines.append(d)
         src = "global ledger (run-id prefix isolation)"
+    else:
+        rl = _read_json(case_dir / "ROUTING_LEDGER_RUN.json")
+        if rl and rl.get("lines"):
+            lines = [l for l in rl["lines"]
+                     if str(l.get("run_id") or "").startswith(
+                         spec["run_id_prefix"] + "-")]
+            src = "ROUTING_LEDGER_RUN.json"
     ok_lines = [l for l in lines if l.get("ok")]
     lat = [int(l.get("latency_ms") or 0) for l in ok_lines
            if l.get("latency_ms")]
