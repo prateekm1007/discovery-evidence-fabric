@@ -321,10 +321,23 @@ class TestStageSourceContract:
         src = TECHSTAGE.read_text()
         assert "hero_eligibility" in src
         assert "heroEligible" in src
-        # the hero GLB only when eligible:
-        assert "heroEligible && design && design.availability" in src
-        # history swap cannot bypass suppression:
-        assert "heroEligible && Boolean(activeRow?.glb)" in src
+        # the hero GLB only when eligible. R451-C2-CLOSURE Direction B
+        # supersession (Art. LXIV, disclosed): the guard expression now
+        # reads `!legacyUnavailable && !unrecognizedState && heroEligible
+        # && ...` — the eligibility property is preserved and STRENGTHENED
+        # again (the hero is additionally impossible under
+        # PRESENTATION_STATE_UNAVAILABLE: a payload whose typed state the
+        # frontend cannot recognize mounts nothing — the fail-closed
+        # unknown rule). The prior supersession (R451-C2.6 §1, the
+        # LEGACY_STATE_UNAVAILABLE gate) is subsumed by this expression.
+        # The CLOSURE UI battery (scripts/r451_c2_ui_tests.mjs, Direction
+        # B source pins) covers the new expression.
+        assert ("!legacyUnavailable && !unrecognizedState && heroEligible "
+                "&& design &&") in src
+        # history swap cannot bypass suppression (R451-C2.6: the swap is
+        # additionally legacy-gated; R451-C2-CLOSURE: unrecognized-state-
+        # gated — the same double prefix guards showingHistory):
+        assert "!legacyUnavailable && !unrecognizedState && heroEligible" in src
 
     def test_unearned_hero_state_exists(self):
         src = TECHSTAGE.read_text()

@@ -462,6 +462,59 @@ def _worker_forensics_state() -> dict:
                 "last_write_error": f"{type(exc).__name__}: {exc}"[:200]}
 
 
+def survivor_release_gate(release_proof, discovery_release) -> Optional[
+        Dict[str, Any]]:
+    """R452 B4 (external audit / AT-10) — the survivor-release gate
+    (PURE FUNCTION, testable without a socket).
+
+    Article XXXIX makes the buyer-distribution repository the final
+    authority; a NOT_A_SURVIVOR package reaching a download route
+    inverts that authority. The measured defect: 3 production runs
+    carried downloadable ZIPs against RELEASE_PROOF.status =
+    NOT_A_SURVIVOR, and on the same runs DISCOVERY_RELEASE said
+    HELD_FOR_HUMAN_REVIEW (two release artifacts disagreeing).
+
+    Returns None when the survivor state permits a normal download;
+    otherwise a TYPED_STATE payload (409) naming the exact recorded
+    verdicts — including their DISAGREEMENT (surfaced, never hidden,
+    Art. XV). A NOT_A_SURVIVOR verdict blocks EVERY route: zero ZIPs
+    are reachable while the survivor gate has rejected the invention
+    (the engineering-draft escape hatch is itself withheld — the
+    audit's rule is zero reachable ZIPs)."""
+    rp = str((release_proof or {}).get("status") or "").upper()
+    dr = str((discovery_release or {}).get("status") or "").upper()
+    if rp == "NOT_A_SURVIVOR" or dr == "NOT_A_SURVIVOR":
+        return {
+            "error": "package release blocked",
+            "package_state": "SURVIVOR_RELEASE_BLOCKED",
+            "articles": ["XXXIX", "LXXII"],
+            "release_proof_status": rp or "ABSENT",
+            "discovery_release_status": dr or "ABSENT",
+            "records_agree": rp == dr,
+            "reason": ("the survivor gate rejected this invention "
+                       "(NOT_A_SURVIVOR): no ZIP is reachable from any "
+                       "download route — not even an engineering draft "
+                       "(the audit rule: zero reachable ZIPs)"),
+        }
+    if rp and dr and rp != dr:
+        # the two release artifacts disagree: the CONSERVATIVE reading
+        # governs the download route until the records are reconciled
+        # (Art. X: one authority — while two exist, nothing ships)
+        return {
+            "error": "package release blocked",
+            "package_state": "RELEASE_RECORDS_DISAGREE",
+            "articles": ["X", "XXXIX"],
+            "release_proof_status": rp,
+            "discovery_release_status": dr,
+            "records_agree": False,
+            "reason": ("RELEASE_PROOF and DISCOVERY_RELEASE disagree on "
+                       "this run's release state — the download route "
+                       "serves nothing until they agree; reconcile the "
+                       "records and re-verify"),
+        }
+    return None
+
+
 def package_release_decision(release_state, request_path,
                               available: bool = True) -> Dict[str, Any]:
     """R443 — the Article-LXXII release decision for the package
@@ -1527,6 +1580,21 @@ class Handler(BaseHTTPRequestHandler):
             return self._json(404, {"error": "no package produced on "
                                     "this run (no buyer release and no "
                                     "bridge technology transfer package)"})
+        # R452 B4 (external audit / AT-10): the survivor-release gate
+        # runs FIRST — a NOT_A_SURVIVOR verdict blocks EVERY ZIP route
+        # (zero reachable ZIPs, no draft escape), and disagreeing
+        # release records block until reconciled (Art. X/XXXIX).
+        def _read_status(name):
+            try:
+                import json as _json
+                return _json.loads((Path(run_dir) / name).read_text())
+            except Exception:  # noqa: BLE001 — absent = unknown
+                return None
+        gate = survivor_release_gate(
+            _read_status("RELEASE_PROOF.json"),
+            _read_status("DISCOVERY_RELEASE.json"))
+        if gate is not None:
+            return self._json(409, gate)
         # R443 package-release authority (Article LXXII, enforced at the
         # ACTUAL package consumer): the endpoint consults the run's
         # visual release state before serving. VISUAL_GATE = NOT_RUN or

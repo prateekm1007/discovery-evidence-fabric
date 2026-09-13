@@ -1,0 +1,573 @@
+"""r451_c2_watchdog.py — the R451-C2 (C2.10) end-to-end product watchdog,
+extended by R451-C2.2 (§6) into THE adversarial join checker, and
+re-founded by R451-C2.3 (§8) on THE one canonical evaluator.
+DUAL REPORTING hardened by R451-C2.5 (§6). R3/R6 made evidence-producing
+by the R451-C2.6 CLOSEOUT (§3/§4).
+
+R451-C2.3 §8: the dossier and the watchdog consume the SAME state
+semantics. The join state below is derived by
+toscanini/visual_join.py::evaluate_visual_join + evaluate_geometry_contract
+— the identical implementation the product surface uses. THIS checker
+does not implement a second state machine; it attacks the evaluator
+with independently authored adversarial fixtures (the battery in
+tests/test_r451_c23_identity_chain.py) and keeps the RECORD-LEVEL
+invariant rules that must hold whenever the evaluator announces a
+state:
+
+    if the canonical GLB is verified (visual input ready):
+        assert a Visual Compiler invocation receipt exists
+        (R451-C2.2 §6: valid GLB + no invocation -> FAIL — the
+        no-silent-gap rule)
+    if the receipt says the renderer ran (SUCCEEDED / OK / PARTIAL):
+        assert a visual gate record exists
+        AND the persisted render record exists (R9, R451-C2.2 §6:
+        valid GLB + invocation + no render record -> FAIL)
+    if the gate verdict is COMPLETE_PASS:
+        assert the required 23-artifact ladder exists on disk
+        (R451-C2.6 CLOSEOUT §3: a node_count that is missing or
+        uninspectable, a failed visual-set derivation, or an unknown
+        required set is an INTEGRITY FINDING under the TRUE
+        COMPLETE_PASS antecedent — never NOT_APPLICABLE;
+        NOT_APPLICABLE is legal only when the antecedent is genuinely
+        false)
+    if a hero exists:
+        assert the render record's source GLB hash == the canonical GLB
+    if the renderer skipped:
+        assert the receipt carries the typed skip reason
+        (the UI renders the SAME typed fields — source-pinned by
+        tests/test_r451_c2_blocked_state.py)
+    if the GLB is absent and the run stopped upstream:
+        assert the DERIVED canonical projection (build_dossier — the
+        same builder the UI consumes) carries the typed upstream
+        state, with no ready/geometry claim and no fabricated
+        RECEIVED engineering/visualization milestone
+        (R451-C2.6 CLOSEOUT §4: evidence from the run itself, never a
+        hard-coded pass)
+    R10 (R451-C2.3 §8): the evaluator's announced join state must be
+        consistent with the record invariants (VISUAL_READY only when
+        the release chain verified).
+
+R451-C2.5 §6 — THE TWO REPORTS ARE INDEPENDENT:
+
+  * `observed_join_state` — what THE evaluator observed, verbatim
+    (None = undecided). PURELY an observation: it never becomes a
+    scientific verdict.
+  * `watchdog_verdict` — the checker's own typed verdict over the
+    RECORD invariants:
+        PASS                 every applicable invariant held
+        INTEGRITY_VIOLATION  a record-invariant rule failed (R1-R9,
+                             or R10's announced-VISUAL_READY-vs-records
+                             coupling)
+        JOIN_FAILURE_OBSERVED  the evaluator announced an explicit
+                             non-ready join state (RELEASE_UNVERIFIED /
+                             RENDER_RECORD_MISSING / INVOCATION_MISSING)
+                             — recorded as the presentation-class
+                             finding it is (Art. LXI: an infrastructure/
+                             presentation failure is never a scientific
+                             rejection; the report never emits a
+                             scientific-rejection verdict)
+  Every violation carries its `violation_class` (RECORD_INVARIANT vs
+  JOIN_STATE_OBSERVATION). `verdict` (PASS/FAIL) remains as the CLI
+  exit-code projection — exit 1 on ANY finding class; the typed
+  watchdog_verdict is the authority for WHAT KIND of finding it was.
+
+R451-C2.3 §6: the identity chain (geometry spec / receipt GLB / render
+source / hero source == canonical GLB bytes) is enforced INSIDE the
+evaluator — a mismatch fails closed there and this checker's R4
+verifies the same bytes independently.
+
+Exit codes: 0 = every applicable rule held; 1 = at least one finding
+(integrity violation or observed join failure — each named, with the
+file, the rule, and the violation class); 2 = usage/argument error.
+A NOT_APPLICABLE rule is not a violation (the rule's antecedent is
+false) — every decision is recorded in the JSON report either way.
+"""
+from __future__ import annotations
+
+import argparse
+import hashlib
+import json
+import sys
+from pathlib import Path
+from typing import Any, Dict, List, Optional
+
+REPO = Path(__file__).resolve().parents[1]
+
+RECEIPT = "MODEL/3D/VISUAL_COMPILER_INVOCATION.json"
+GATE = "MODEL/3D/visual_gate.json"
+RENDER_RECORD = "MODEL/3D/render_record.json"
+RENDER_JOB = "MODEL/3D/RENDER_JOB.json"
+
+# R451-C2.5 §6 — the typed verdict vocabulary (the two reports are
+# independent: the observed join state is an observation; the verdict
+# classifies the finding; neither silently translates into a scientific
+# rejection — Art. LXI)
+WATCHDOG_VERDICTS = ("PASS", "INTEGRITY_VIOLATION", "JOIN_FAILURE_OBSERVED")
+VIOLATION_RECORD_INVARIANT = "RECORD_INVARIANT"
+VIOLATION_JOIN_OBSERVATION = "JOIN_STATE_OBSERVATION"
+
+# the evaluator's explicit non-ready join states that are PRESENTATION-
+# class findings when observed (never record-integrity failures, never
+# scientific rejections)
+_JOIN_OBSERVATION_STATES = ("RELEASE_UNVERIFIED", "RENDER_RECORD_MISSING",
+                            "INVOCATION_MISSING")
+
+sys.path.insert(0, str(REPO))
+from toscanini import visual_join as vj  # noqa: E402 — THE evaluator
+
+# the closed join-state vocabulary — re-exported from THE evaluator
+# (one vocabulary, no second definition, R451-C2.3 §8)
+JOIN_STATES = vj.VISUAL_JOIN_STATES
+
+# the statuses that mean "the boundary was reached and the renderer
+# ran" — THE evaluator's tuple (no second definition)
+_RENDERED_STATUSES = vj.RENDERER_RAN_STATUSES
+
+
+def _sha256_file(path: Path) -> str:
+    h = hashlib.sha256()
+    with open(path, "rb") as f:
+        for chunk in iter(lambda: f.read(1 << 20), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+
+def _read_json(path: Path) -> Optional[Dict[str, Any]]:
+    try:
+        return json.loads(path.read_text())
+    except (OSError, ValueError):
+        return None
+
+
+def read_receipt(run_dir: Path) -> Optional[Dict[str, Any]]:
+    """THE evaluator's era-normalizing reader (one implementation)."""
+    return vj.read_invocation_receipt(run_dir)
+
+
+def canonical_glb(run_dir: Path) -> Optional[Path]:
+    """THE evaluator's resolution order (one authority, all
+    consumers)."""
+    return vj.resolve_canonical_glb(run_dir)
+
+
+def run_watchdog(run_dir: Path) -> Dict[str, Any]:
+    """The record invariant rules + THE evaluator's join state over one
+    run dir. Returns the JSON report; `violations` empty == PASS.
+    R451-C2.5 §6: `observed_join_state` and `watchdog_verdict` are
+    INDEPENDENT reports — the join state is what THE evaluator observed
+    (never a verdict), and the verdict classifies every finding as a
+    record-integrity violation or a presentation-class join
+    observation (never a scientific rejection)."""
+    checks: List[Dict[str, Any]] = []
+    violations: List[Dict[str, Any]] = []
+
+    def record(rule: str, applicable: bool, ok: bool, detail: str,
+               evidence: Optional[str] = None,
+               violation_class: str = VIOLATION_RECORD_INVARIANT) -> None:
+        state = ("NOT_APPLICABLE" if not applicable
+                 else "PASS" if ok else "FAIL")
+        checks.append({"rule": rule, "state": state, "detail": detail,
+                       "violation_class": violation_class})
+        if applicable and not ok:
+            violations.append({"rule": rule, "detail": detail,
+                               "evidence": evidence,
+                               "violation_class": violation_class})
+
+    glb = canonical_glb(run_dir)
+    receipt = read_receipt(run_dir)
+    gate = _read_json(run_dir / GATE)
+    render_record = _read_json(run_dir / RENDER_RECORD)
+
+    # ---- THE geometry artifact contract (R451-C2.3 §1) — the same
+    # implementation the dossier consumes. The engineering authority is
+    # the contract's verdict: ENGINEERING / CONCEPTUAL / UNKNOWN. A
+    # missing class is UNKNOWN — never engineering-by-filename (the
+    # pre-C2.3 fallback that read a GLB under MODEL/ as engineering by
+    # construction is retired, Art. LXIV).
+    session = _read_json(run_dir / "session.json") or {}
+    # the evaluator reads the run directory THROUGH the session record
+    # (one input shape for every consumer) — the watchdog injects the
+    # run dir it was handed
+    session.setdefault("run_dir", str(run_dir))
+    session.setdefault("session_id", run_dir.name)
+    cio = (_read_json(run_dir / "CIO.json")
+           or _read_json(run_dir / "cio.json")) or {}
+    geom = cio.get("geometry") or {}
+    contract = vj.evaluate_geometry_contract(session, run_dir, geom)
+    eng = contract.get("engineering_authority") == "ENGINEERING"
+    visual_input_ready = contract.get("visual_input_ready") is True
+
+    # ---- THE evaluator's join state (no second derivation) ----------
+    join = vj.evaluate_visual_join(
+        session, geom, {}, running=False,
+        engineering_geometry_ready=eng,
+        geometry_state=contract.get("geometry_state") or "",
+        contract=contract)
+    join_state = join.get("visual_join_state")
+    join_detail = join.get("visual_join_detail")
+    release_chain = join.get("release_chain") or \
+        (vj.verify_release_chain(run_dir, glb, contract)
+         if join_state in ("VISUAL_READY", "RELEASE_UNVERIFIED")
+         else None)
+
+    job_rec = _read_json(run_dir / RENDER_JOB)
+    job_pending = (job_rec or {}).get("status") in ("RUNNING",
+                                                    "INTERRUPTED")
+
+    # ---- R1: verified canonical GLB under an EXPLICIT ENGINEERING
+    # authority -> the visual invocation is accounted for: a receipt on
+    # disk, or an in-flight render job (the invocation was requested and
+    # has not spoken — explicit pending, R451-C2.2 §6). An
+    # UNKNOWN-authority artifact demands no invocation claim (R451-C2.3
+    # §1: missing class stays UNKNOWN).
+    record(
+        "R1_engineering_glb_has_invocation_receipt",
+        applicable=eng and visual_input_ready,
+        ok=receipt is not None or job_pending,
+        detail=("canonical GLB %s verified; authority %s; receipt %s; "
+                "render job %s%s"
+                % (glb.name if glb else "-",
+                   contract.get("engineering_authority"),
+                   "found" if receipt else "MISSING",
+                   (job_rec or {}).get("status") or "none",
+                   " (explicit pending)" if job_pending else "")),
+        evidence=RECEIPT)
+
+    # ---- R2: renderer ran -> gate record exists ----
+    rendered = (receipt or {}).get("invocation_status") in _RENDERED_STATUSES
+    record(
+        "R2_rendered_has_gate",
+        applicable=rendered,
+        ok=gate is not None,
+        detail=("receipt status %s; gate %s"
+                % ((receipt or {}).get("invocation_status"),
+                   "found" if gate else "MISSING")),
+        evidence=GATE)
+
+    # ---- R3: COMPLETE_PASS -> the full artifact ladder on disk ----
+    # R451-C2.6 CLOSEOUT §3 — THE CHECKER'S INABILITY IS A FINDING, NOT
+    # AN EXEMPTION: under a TRUE COMPLETE_PASS antecedent, a node_count
+    # that is missing or uninspectable, a failed visual-set derivation,
+    # or an unknown required artifact set is an INTEGRITY FINDING —
+    # never NOT_APPLICABLE. NOT_APPLICABLE is legal only when the
+    # antecedent is genuinely false (the gate verdict is not
+    # COMPLETE_PASS); it is never a shelter for "the checker could not
+    # determine it".
+    verdict = (gate or {}).get("verdict")
+    from discovery_fabric.engine.visual_compiler import visual_set  # noqa: E402
+    node_count = 0
+    node_count_basis = None
+    node_count_error = None
+    if render_record:
+        nc = ((render_record.get("scene_spec") or {})
+              .get("model") or {}).get("node_count")
+        if isinstance(nc, int) and nc > 0:
+            node_count = nc
+            node_count_basis = "render_record.scene_spec.model.node_count"
+        elif nc is not None:
+            node_count_error = (f"render-record node_count not inspectable "
+                                f"({nc!r})")
+    if not node_count and glb is not None:
+        try:
+            from discovery_fabric.engine.visual_compiler import \
+                scene_builder  # noqa: E402
+            node_count = int(
+                scene_builder.inspect_glb(str(glb))["model"]["node_count"])
+            node_count_basis = "structural GLB inspection"
+        except Exception as exc:  # noqa: BLE001 — recorded, never exempted
+            node_count_error = ((node_count_error + "; ")
+                                if node_count_error else "") \
+                + f"structural GLB inspection failed: {exc}"
+            node_count = 0
+    set_error = None
+    required: List[str] = []
+    missing: List[str] = []
+    if node_count:
+        try:
+            required = visual_set.required_artifacts(
+                node_count,
+                visual_set.DEFAULT_TURNTABLE_FRAMES)["required"]
+        except Exception as exc:  # noqa: BLE001 — a failed derivation is
+            # an integrity finding under COMPLETE_PASS, never an exemption
+            set_error = f"the visual-set derivation failed: {exc}"
+            required = []
+    if verdict == "COMPLETE_PASS" and not required:
+        # the antecedent is TRUE and the required set is undeterminable
+        # — an integrity finding (R451-C2.6 CLOSEOUT §3), never
+        # NOT_APPLICABLE
+        if set_error:
+            r3_detail = (f"gate COMPLETE_PASS; {set_error} — the required "
+                         "artifact set is UNKNOWN, an integrity finding "
+                         "under the COMPLETE_PASS antecedent "
+                         "(R451-C2.6 CLOSEOUT §3)")
+        else:
+            r3_detail = (
+                "gate COMPLETE_PASS; the required presentation set is "
+                "UNKNOWN — node_count is missing or uninspectable"
+                + (f" ({node_count_error})" if node_count_error else "")
+                + " — an integrity finding, never NOT_APPLICABLE "
+                "(R451-C2.6 CLOSEOUT §3)")
+        record("R3_complete_pass_has_full_ladder",
+               applicable=True, ok=False, detail=r3_detail,
+               evidence="MODEL/3D/")
+    elif verdict == "COMPLETE_PASS":
+        missing = [name for name in required
+                   if not (run_dir / "MODEL" / "3D" / name).is_file()
+                   or (run_dir / "MODEL" / "3D" / name).stat().st_size == 0]
+        record(
+            "R3_complete_pass_has_full_ladder",
+            applicable=True,
+            ok=not missing,
+            detail=("gate COMPLETE_PASS; %d/%d ladder artifacts on disk "
+                    "(node_count %d via %s)%s"
+                    % (len(required) - len(missing), len(required),
+                       node_count, node_count_basis,
+                       f"; missing: {missing[:6]}" if missing else "")),
+            evidence="MODEL/3D/")
+    else:
+        record("R3_complete_pass_has_full_ladder",
+               applicable=False, ok=False,
+               detail=(f"gate {verdict or 'absent'} — the ladder rule's "
+                       "antecedent (COMPLETE_PASS) is genuinely false "
+                       "(NOT_APPLICABLE)"),
+               evidence="MODEL/3D/")
+
+    # ---- R4: hero exists -> source hash == canonical GLB hash ----
+    hero = run_dir / "MODEL" / "3D" / "hero.png"
+    hero_ok = False
+    detail = ""
+    if hero.is_file() and glb is not None:
+        src_hash = (render_record or {}).get("source_glb_sha256") \
+            or (receipt or {}).get("glb_sha256")
+        actual = _sha256_file(glb)
+        hero_ok = bool(src_hash) and src_hash == actual
+        detail = (f"render source sha {'==' if hero_ok else '!='} "
+                  f"canonical GLB sha ({glb.name})")
+    else:
+        detail = ("hero %s; glb %s"
+                  % ("present" if hero.is_file() else "absent",
+                     "present" if glb else "absent"))
+    record("R4_hero_source_matches_canonical_glb",
+           applicable=hero.is_file() and glb is not None,
+           ok=hero_ok, detail=detail, evidence=RENDER_RECORD)
+
+    # ---- R5: renderer skipped -> typed skip reason recorded ----
+    status = (receipt or {}).get("invocation_status") or ""
+    skipped = status.startswith("RENDER_SKIPPED") or status in (
+        "RENDER_FAILED", "RENDER_TIMEOUT")
+    reason = (receipt or {}).get("skip_reason")
+    record("R5_skip_carries_typed_reason",
+           applicable=skipped,
+           ok=bool(reason),
+           detail=(f"receipt status {status or '-'}; skip_reason "
+                   f"{'present' if reason else 'MISSING'}"),
+           evidence=RECEIPT)
+
+    # ---- R6: GLB absent + run stopped upstream -> THE PROJECTION THE
+    # UI RENDERS CARRIES THE UPSTREAM STATE — verified from the run's
+    # OWN records by deriving the canonical dossier (build_dossier — the
+    # SAME projection builder the product surface consumes; one
+    # implementation, Art. X).
+    # R451-C2.6 CLOSEOUT §4 — THE WATCHDOG PRODUCES EVIDENCE FROM THE
+    # RUN ITSELF: no hard-coded pass, no pointer to another test. The
+    # rule passes only when the derived projection (a) carries a typed,
+    # NON-READY geometry state (never geometry_available /
+    # visual_complete from a GLB-less blocked run), (b) shows NO
+    # fabricated RECEIVED engineering/visualization milestone, and (c)
+    # can be derived at all — a projection that cannot be derived is an
+    # integrity finding (unverifiable evidence fails closed, Art. XXV),
+    # never a pass.
+    stopped_upstream = session.get("status") in (
+        "RUN_BLOCKED_TRANSPORT", "INTERRUPTED", "ERROR_TRANSPORT",
+        "ERROR_RUN", "ERROR_BUILD", "ERROR_STUCK")
+    if glb is None and stopped_upstream:
+        r6_ok = False
+        try:
+            from toscanini import dossier as _dossier_mod  # noqa: E402
+            derived = _dossier_mod.build_dossier(session)
+            d_design = (derived.get("tabs") or {}).get("design") or {}
+            d_pipeline = derived.get("pipeline") or []
+            gst = d_design.get("geometry_state")
+            eng_row = next((r for r in d_pipeline
+                            if r.get("key") == "engineering"), {}) or {}
+            vis_row = next((r for r in d_pipeline
+                            if r.get("key") == "visualization"), {}) or {}
+            ready_claim = gst in ("geometry_available", "visual_complete")
+            rows_fabricated = (eng_row.get("status") == "RECEIVED"
+                               or vis_row.get("status") == "RECEIVED")
+            r6_ok = bool(gst) and not ready_claim and not rows_fabricated
+            r6_detail = (
+                "no GLB and the session record is an infrastructure "
+                "stop — the DERIVED canonical projection carries "
+                f"geometry_state={gst!r}; engineering row "
+                f"{eng_row.get('status')!r}; visualization row "
+                f"{vis_row.get('status')!r}"
+                + ("" if r6_ok else
+                   " — CONTRADICTION: the projection claims a ready or "
+                   "received state the run's own records cannot support "
+                   "(R451-C2.6 CLOSEOUT §4)"))
+        except Exception as exc:  # noqa: BLE001 — cannot verify fails closed
+            r6_ok = False
+            r6_detail = (
+                "no GLB and the session record is an infrastructure "
+                "stop, but the canonical projection could not be "
+                f"derived ({exc}) — unverifiable evidence fails closed, "
+                "never a pass (R451-C2.6 CLOSEOUT §4)")
+        record("R6_no_glb_blocked_run_projects_upstream_state",
+               applicable=True, ok=r6_ok, detail=r6_detail,
+               evidence="dossier")
+    else:
+        record("R6_no_glb_blocked_run_projects_upstream_state",
+               applicable=False, ok=False,
+               detail=("the antecedent is false (a canonical GLB exists "
+                       "or the session record is not an infrastructure "
+                       "stop) — NOT_APPLICABLE"),
+               evidence="dossier")
+
+    # ---- R7: receipt identity matches the run it sits in ----
+    if receipt is not None:
+        rid_ok = receipt.get("run_id") == run_dir.name
+        record("R7_receipt_identity_matches_run",
+               applicable=True, ok=rid_ok,
+               detail=(f"receipt run_id {receipt.get('run_id')!r} vs "
+                       f"run dir {run_dir.name!r}"),
+               evidence=RECEIPT)
+
+    # ---- R8 (R451-C2.2 §6): the no-silent-gap rule, adversarial form.
+    # A pending async render job is the explicit-pending exception: the
+    # invocation is IN FLIGHT (the job's own record proves it) — not a
+    # missing invocation. A job the run's records show as terminal
+    # without a receipt is still a gap (the job spoke without the
+    # boundary ever being reached — the bridge's request failed).
+    record(
+        "R8_valid_glb_requires_visual_invocation",
+        applicable=eng and visual_input_ready,
+        ok=receipt is not None or job_pending,
+        detail=("engineering geometry ready (authority %s); invocation "
+                "receipt %s; render job %s"
+                % (contract.get("engineering_authority"),
+                   "found" if receipt else "MISSING",
+                   f"{(job_rec or {}).get('status') or 'none'}"
+                   + (" (explicit pending)" if job_pending else ""))),
+        evidence=RECEIPT)
+
+    # ---- R9 (R451-C2.2 §6): invocation claims pixels -> the persisted
+    # render record must exist (the claim is never its own proof,
+    # Art. XXIV)
+    record(
+        "R9_rendered_requires_render_record",
+        applicable=rendered,
+        ok=render_record is not None,
+        detail=("receipt invocation_status %s; render record %s"
+                % (status or "-",
+                   "found" if render_record else "MISSING")),
+        evidence=RENDER_RECORD)
+
+    # ---- R10 (R451-C2.3 §8): the evaluator's announced state must be
+    # consistent with the record invariants. This is the attack
+    # coupling: the evaluator derives the state; THESE record checks
+    # must agree with it, and the adversarial battery proves both
+    # directions on independently authored fixtures.
+    # R451-C2.5 §6: an announced VISUAL_READY contradicted by the
+    # records is a RECORD_INVARIANT (integrity) finding; an announced
+    # explicit non-ready state (RELEASE_UNVERIFIED /
+    # RENDER_RECORD_MISSING / INVOCATION_MISSING) is a
+    # JOIN_STATE_OBSERVATION — a presentation-class finding the checker
+    # OBSERVES and records, never a scientific rejection and never a
+    # silent translation of a presentation state into one.
+    if join_state == "VISUAL_READY":
+        record("R10_evaluator_state_consistent",
+               applicable=True,
+               ok=bool(release_chain and release_chain.get("verified"))
+               and not missing and hero_ok,
+               detail=("VISUAL_READY announced: release chain verified="
+                       f"{bool(release_chain and release_chain.get('verified'))}; "
+                       f"ladder complete={not missing}; "
+                       f"hero source ok={hero_ok}"),
+               evidence="release_chain")
+    elif join_state in _JOIN_OBSERVATION_STATES:
+        # the evaluator announced an explicit non-ready join state: the
+        # checker OBSERVES it and records the presentation-class
+        # finding (a failure state is a finding, never a pass — "No
+        # silent gap"; and never a scientific rejection, Art. LXI)
+        record("R10_evaluator_state_consistent", applicable=True,
+               ok=False,
+               detail=(f"the evaluator announced {join_state}: "
+                       f"{join_detail} — a presentation-class finding "
+                       "(never a scientific rejection, R451-C2.5 §6)"),
+               evidence="visual_join",
+               violation_class=VIOLATION_JOIN_OBSERVATION)
+
+    # ---- the two independent reports (R451-C2.5 §6) -------------------
+    integrity_violations = [v for v in violations
+                            if v["violation_class"]
+                            == VIOLATION_RECORD_INVARIANT]
+    join_observations = [v for v in violations
+                         if v["violation_class"]
+                         == VIOLATION_JOIN_OBSERVATION]
+    if integrity_violations:
+        watchdog_verdict = "INTEGRITY_VIOLATION"
+    elif join_observations:
+        watchdog_verdict = "JOIN_FAILURE_OBSERVED"
+    else:
+        watchdog_verdict = "PASS"
+    return {
+        "kind": "R451_C2_PRODUCT_WATCHDOG",
+        "watchdog_version": "R451-C2.6-CLOSEOUT",
+        "run_dir": str(run_dir),
+        "canonical_glb": str(glb) if glb else None,
+        "engineering_authority": contract.get("engineering_authority"),
+        "visual_input_ready": visual_input_ready,
+        "receipt_status": (receipt or {}).get("invocation_status"),
+        "gate_verdict": verdict,
+        # R451-C2.5 §6 — REPORT 1: what THE evaluator observed
+        # (verbatim, None = undecided). An observation, never a verdict.
+        "observed_join_state": join_state,
+        "observed_join_state_detail": join_detail,
+        # R451-C2.5 §6 — REPORT 2: the checker's typed verdict over the
+        # record invariants (PASS / INTEGRITY_VIOLATION /
+        # JOIN_FAILURE_OBSERVED). Independent of the observation: a
+        # presentation-class join finding is never silently translated
+        # into a scientific rejection (Art. LXI).
+        "watchdog_verdict": watchdog_verdict,
+        "watchdog_verdicts_vocabulary": list(WATCHDOG_VERDICTS),
+        "integrity_violation_count": len(integrity_violations),
+        "join_observation_count": len(join_observations),
+        "join_states_vocabulary": list(JOIN_STATES),
+        "release_chain": release_chain,
+        "checks": checks,
+        "violations": violations,
+        # the CLI exit-code projection (superseded as the authority by
+        # watchdog_verdict — kept for the standing exit contract; Art.
+        # LXIV disclosure: a projection of watchdog_verdict, not a
+        # second derivation)
+        "verdict": "PASS" if not violations else "FAIL",
+    }
+
+
+def main(argv: Optional[List[str]] = None) -> int:
+    ap = argparse.ArgumentParser(
+        description="R451-C2 (C2.10) deterministic geometry-to-visual "
+                    "join watchdog — integrity checking only, no visual "
+                    "inference; the join state comes from THE canonical "
+                    "evaluator (toscanini/visual_join.py); the report "
+                    "carries the independent pair observed_join_state + "
+                    "watchdog_verdict (R451-C2.5 §6)")
+    ap.add_argument("run_dir", help="the run directory to inspect")
+    ap.add_argument("--json-out", help="also write the report here")
+    args = ap.parse_args(argv)
+
+    run_dir = Path(args.run_dir)
+    if not run_dir.is_dir():
+        print(f"watchdog: run dir not found: {run_dir}", file=sys.stderr)
+        return 2
+    report = run_watchdog(run_dir)
+    text = json.dumps(report, indent=2)
+    if args.json_out:
+        Path(args.json_out).write_text(text)
+    print(text)
+    return 0 if report["verdict"] == "PASS" else 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

@@ -865,9 +865,12 @@ def build_engineering_spec(spec: Dict[str, Any], env: Optional[Candidate],
         mechanistic_record = _ms.run_mechanistic_virtual_experiment(
             problem_text, f"engspec:{run_ctx.get('run_id', 'run')}")
     except Exception as _ms_exc:  # noqa: BLE001 — infra, never a verdict
+        # d6 discipline: the error detail is authoritative content and is
+        # recorded VERBATIM (no slice truncation — a truncated diagnostic
+        # is exactly the information loss d6 exists to prevent).
         mechanistic_record = {"status": "CHAIN_ERROR",
                               "error": f"{type(_ms_exc).__name__}: "
-                                       f"{_ms_exc}"[:200]}
+                                       f"{_ms_exc}"}
 
     # ---- CEO A5: full parameter records ---------------------------------
     critical_parameters = _build_critical_parameters(
@@ -881,6 +884,37 @@ def build_engineering_spec(spec: Dict[str, Any], env: Optional[Candidate],
                              "COMPUTED_NO_BASELINE_DIFF",
                              "COMPUTED_PASS_BASELINE_INCONCLUSIVE")
                             else None))
+
+    # ---- R452 VALUE_SOURCING: the evidence->dimension binding stage -----
+    # (the external audit's A1: the registry proposes WHAT matters;
+    # this stage is the ONLY legitimate mechanism by which a parameter
+    # value becomes sourced — bound to an exact custodied evidence span
+    # with its content hash, deterministically, no model involvement.
+    # Parameters with NO binding stay value_status=UNKNOWN exactly as
+    # _build_critical_parameters emitted them — Article XXVII preserved,
+    # the absence now a per-parameter measured fact instead of a
+    # universal constant. Art. XXV.)
+    try:
+        from .value_sourcing import source_parameter_values
+        critical_parameters, _value_sourcing_report = \
+            source_parameter_values(
+                critical_parameters,
+                [ev for ev_id, ev in sorted(ev_index.items())
+                 if isinstance(ev, dict)
+                 and not str(ev_id).startswith("problem:")],
+                spec)
+    except Exception as exc:  # noqa: BLE001 — disclosed, never silent
+        # d6 discipline: the error detail is authoritative content and is
+        # recorded VERBATIM (no slice truncation — a truncated diagnostic
+        # is exactly the information loss d6 exists to prevent).
+        _value_sourcing_report = {
+            "artifact": "VALUE_SOURCING_REPORT",
+            "stage": value_sourcing.VALUE_SOURCING_VERSION,
+            "state": "STAGE_ERROR",
+            "error": f"{type(exc).__name__}: {exc}",
+            "n_parameters": len(critical_parameters),
+            "n_sourced": 0,
+        }
 
     # ---- CEO A7: compiled design outputs --------------------------------
     compiled = compile_design_outputs(
@@ -1676,8 +1710,21 @@ def build_engineering_spec(spec: Dict[str, Any], env: Optional[Candidate],
         "engineering_core": {
             "governing_model": governing,
             "critical_parameters": critical_parameters,
-            "value_sourcing": value_sourcing.sourcing_summary(
-                critical_parameters),
+            # R452 merged-union: the VALUE_SOURCING record rides with the
+            # spec — the canonical summary over the FINAL parameters
+            # (post precedence arm + evidence arm; counts, n_sourced,
+            # geometry_reachable) UNIONED with the evidence-arm report
+            # (per-parameter accounting: ALREADY_SOURCED / BOUND /
+            # NO_BINDING / NO_TOKENS, spans, unit vocabulary — never
+            # silent, Art. XV). Summary keys win on collision (they
+            # describe the final state); report keys carry the detail.
+            "value_sourcing": {
+                **value_sourcing.sourcing_summary(critical_parameters),
+                **{k: v for k, v in _value_sourcing_report.items()
+                   if k not in ("value_sourcing_version", "counts",
+                                "n_total", "n_sourced",
+                                "geometry_reachable", "rule")},
+            },
             "external_precedent": (
                 f"domain module {domain_label(domain)}; standards listed as "
                 "candidates requiring applicability verification"),

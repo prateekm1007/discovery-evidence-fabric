@@ -1,0 +1,253 @@
+{
+  "artifact_type": "R451_C2_ROUND_RECORD",
+  "round": "R451-C2",
+  "agent": "Coder 2 (visual/presentation surface)",
+  "directive": "R451-C2 - remove every committed credential; repair the trajectory projection against canonical lineage bytes; harden transition binding; make visual-registry generation portable; prove projection fidelity with positive/negative fixtures; no visual-side causal inference; keep the visual-model lab provisional; prove the full handoff contract",
+  "created_at_utc": "2026-09-12T00:00:00Z (session-local timestamp; wall clock in sandbox)",
+  "reviewer_provenance": "AI_REVIEW",
+  "constitution": {
+    "read_in_full_before_coding": true,
+    "read_source": "commit 11b0916 (the origin/main tip verified via git ls-remote in the prior session; ratified Article LXXI record commit)",
+    "read_lines": 2153,
+    "version": "2.4.0",
+    "sha256": "b54a1be9bcbdd2465d0b034e1e1f472f80b87174209c0d534b7d9e1223e649b2",
+    "fetch_note": "git fetch origin failed this session: no GitHub credentials are available in the environment (https prompt disabled, no token file, no helper). The Constitution was therefore read from the locally cached git object 11b0916 - the commit the previous session verified via ls-remote as origin/main's tip - and its bytes re-verified against the ratified hash b54a1be9... EXACT MATCH. Disclosed per Art. XXII/XXIII: the live remote was not re-probed this session; the credential blocker is escalated in the delivery tuple below.",
+    "governance_read_in_full": [
+      "GOVERNANCE/README.md (48 lines)",
+      "GOVERNANCE/AUDITOR_SELF_GOVERNANCE_v1.md (183 lines)",
+      "GOVERNANCE/AUDITOR_BLINDSPOT_REGISTER.md (318 lines)",
+      "GOVERNANCE/AUDITOR_REMEMBERED_STATE.md (169 lines)",
+      "GOVERNANCE/AUDIT_LOOP_PROTOCOL_v1.md (247 lines)",
+      "ACTIVE_PATH.md (253 lines)"
+    ],
+    "reread_before_final_commit": "RE-READ IN FULL (all 2153 lines) immediately before commit 3db194e; hash b54a1be9 unchanged"
+  },
+  "step_1_credential_removal": {
+    "scanner": "scripts held outside the repo (r451_credential_scan.py): 5715 tracked files + 2205 unique blobs across all 68 commits reachable from HEAD; token-prefix library (GitHub/PAT/HF/OpenAI/Anthropic/Slack/AWS/GitLab/DO/Resend/Google/JWT/private-key/OpenRouter/bearer) + generic assignment/cookie/export patterns",
+    "pre_scrub_report": "R451/CREDENTIAL_SCAN_PRE_SCRUB.json (38 findings: 15 working-tree, 23 history-surface)",
+    "post_scrub_report": "R451/CREDENTIAL_SCAN_POST_SCRUB.json (32 findings: 9 working-tree all in the allowlist classes below, 23 history-surface unchanged)",
+    "live_credentials_found_and_scrubbed": {
+      "github_pat": {
+        "fingerprint": "ghp_ag...ZarT (40 chars)",
+        "files_scrubbed": [
+          "scripts/r447_canonical_space_record.py:47 (embedded in the GITHUB_REMOTE URL literal)",
+          "scripts/r447_hf_deploy.py:44 (hardcoded env default)"
+        ],
+        "also_in_history": "scripts/r446_round_record.py (scrubbed from the working tree in the R446 round; still present in pre-R447 history blobs)"
+      },
+      "huggingface_token": {
+        "fingerprint": "hf_MrZ...NkNM (37 chars)",
+        "files_scrubbed": [
+          "scripts/r447_e2e_production.py:51 (bare literal)",
+          "scripts/r449_assemble_outputs.py:61 (hf_hub_download token kwarg)",
+          "scripts/r449_measure_candidates.py:94 (bare literal)",
+          "scripts/r449_stage_bucket.py:15 (HfApi TOKEN)"
+        ]
+      },
+      "owner_capability_tokens_in_records": {
+        "note": "8 tosca_owner session capability tokens committed inside R444/R445/R446 evidence records (BS-021 class: session cookies must never enter the repository; the R447 round quarantined the same class out of E2E_SESSION.json but these record-embedded values predate that discipline)",
+        "files_scrubbed": {
+          "R444/PRODUCTION_RUNS.json": 2,
+          "R444/R444_ROUND_RECORD.json": 1,
+          "R445/PRODUCTION_RUNS.json": 1,
+          "R446/HF_PRODUCTION_RUNS.json": 2,
+          "R446/PRODUCTION_RUN.json": 1,
+          "R446/PRODUCTION_RUNS.json": 1
+        },
+        "method": "32-hex values replaced by the typed marker REDACTED-R451-OWNER-TOKEN; record structure and epistemic content preserved; the credential value is not evidence"
+      }
+    },
+    "env_injection_conversion": "all six scripts now read GITHUB_TOKEN / HF_TOKEN from the environment and fail closed (SystemExit with a typed message) when the credential is absent; no default values remain",
+    "validation": "python -m py_compile green on all six scripts; JSON validity re-verified on all six record files",
+    "history_disclosure": "NO HISTORY REWRITE was performed (per the directive). The scrubbed tokens remain in already-pushed historical commits (see the history-surface findings in the pre-scrub report). Consequence stated honestly: the bytes can still be recovered from those commits by anyone with repository read access until rotation.",
+    "rotation_escalation": {
+      "required_action": "OPERATOR: rotate the GitHub PAT (ghp_ag...ZarT) and the HuggingFace token (hf_MrZ...NkNM); both were live in pushed commits. Owner capability tokens are per-run ephemeral capabilities on private services; rotation of the two long-lived credentials is the material action.",
+      "escalation_count": 1,
+      "article": "Art. LXV (owner-gated decisions must escalate, never idle); Art. XI (unprovable history remains unproven)"
+    },
+    "allowlisted_working_tree_matches_post_scrub": [
+      "CEREVASC_POSITION_004_*: values are already the literal 'REDACTED-PATSNAP-PATTERN-MATCH' markers (sanitized in a prior round)",
+      "NOVELTY_EVIDENCE/restored/R354/patsnap_pipeline/patsnap_search.py:6: value is the literal 'sk-[S01-REDACTED:kWs]' redaction marker",
+      "epistemic_integrity/credential_audit_split.py:403: comment documenting a known fake-secret test vector",
+      "tests/test_r425_worker_env_boundary.py:45: deliberately poisoned fake value 'sk-or-poisoned-worker-level' in the env-boundary test",
+      "R446/HF_PRODUCTION_RUNS.json:372,583: now carry the typed REDACTED-R451-OWNER-TOKEN markers (flagged by the generic cookie pattern, values are the markers themselves)",
+      "tests/test_r447_owner_transport.py:206: synthetic hex test vector a1b2c3d4... (made-up convergence-test token, not a credential)"
+    ],
+    "scope_note": "the parallel R450 session's work (referenced by the directive's 'two files identified by review') is not reachable from this branch and could not be fetched (no credentials); the whole-tree scan covered every blob reachable from THIS branch's full history"
+  },
+  "steps_2_3_trajectory_projection": {
+    "module": "visual-lab/trajectory/lineage_projection.py",
+    "status": "IMPLEMENTED (the parallel session's defective projection was not reachable from this branch; the projection was implemented to the directive's exact contract against the real canonical records)",
+    "canonical_semantics_pinned_by_measurement": {
+      "method": "invariant scan across ALL 21 committed INVENTION_LINEAGE/1.0.0 records (12x R401-WC2 bench, 4x R444 bench extension, 5x R445 evolution runs)",
+      "findings": {
+        "generation_sequence_consecutive_from_1": "21/21",
+        "parent_id_binding_gen_i_plus_1_to_gen_i": "13/13 multi-generation records",
+        "origin_vocabulary": "gen1 always BASELINE_SYNTHESIS; evolution generations always EVOLUTION_CAUSAL_DELTA",
+        "current_invention_resolves_with_state_and_maturity_match": "20/21 (the single exception is the honest ALL-NULL current_invention of evol-x01.attempt2-pinignored - pinned as the NOT_RECORDED shape, exposed as an absence, never a violation)",
+        "survivor_binding_when_survivor_reached": "18/18 (survivor_gen == current_invention.gen == terminal generation)",
+        "architecture_native_fields_present": "21/21 in real records"
+      }
+    },
+    "native_location_projection": "architecture.expected_effect, architecture.falsification_test, mechanism, intervention are projected from /generations/i/architecture/<field> with the pointer recorded on every value; current_invention.state from /current_invention/state; NO convenience aliases exist in the module - an absent native field is exposed as status ABSENT_IN_CANONICAL_RECORD with its pointer and carries NO invented value",
+    "transition_binding_fail_closed": {
+      "binding_proof": "the canonical semantics of INVENTION_LINEAGE/1.0.0 carry each transition BY generation i+1 (parent_id + origin); the projection re-proves transition.from_gen == generations[i].gen, transition.to_gen == generations[i+1].gen, transition.result.gen == generations[i+1].gen, transition.result.status == generations[i+1].state, parent_id == previous invention_id, origin == EVOLUTION_CAUSAL_DELTA",
+      "additional_bindings": "current_invention resolves into the array with state AND maturity equality; survivor_reached requires survivor_gen == current_invention.gen == terminal generation; declared expected_sha256 must match the consumed bytes",
+      "fail_closed": "any break raises ProjectionRejected with typed codes; ALL detected breaks are exposed together; a rejected projection yields NO viewer_state - tampered data never reaches the viewer",
+      "rejection_codes": [
+        "SOURCE_BYTES_UNPARSEABLE",
+        "SCHEMA_UNRECOGNIZED",
+        "GEN_SEQUENCE_NOT_CONSECUTIVE",
+        "TRANSITION_PARENT_ORPHAN",
+        "TRANSITION_PARENT_MISSING",
+        "TRANSITION_ORIGIN_UNDECLARED",
+        "CURRENT_INVENTION_PARTIAL",
+        "CURRENT_INVENTION_UNRESOLVED",
+        "CURRENT_INVENTION_STATE_MISMATCH",
+        "CURRENT_INVENTION_MATURITY_MISMATCH",
+        "SURVIVOR_BINDING_MISMATCH",
+        "PROVENANCE_SHA_MISMATCH",
+        "STATE_FIELD_TYPE_UNEXPECTED"
+      ]
+    },
+    "epistemic_badges": "declared deterministic translation table (GENERATED->PROPOSED, EVIDENCE_SUPPORTED->INFERRED, SIMULATED->SIMULATED; evidence_verified false -> UNVERIFIED overrides); every badge carries canonical_label + basis pointers + legend; MEASURED is unreachable from this schema and is never emitted (the visual layer does not invent physical observations)"
+  },
+  "step_5_fixture_fidelity": {
+    "battery": "visual-lab/trajectory/test_trajectory_projection.py (pytest, 37 tests, ALL GREEN)",
+    "positive_fixtures": [
+      "real 2-generation record (evol-x01-desalination-scaling): PROJECTED, binding tuple exact",
+      "real 1-generation record (bench-p01-pemfc-dehydration): PROJECTED",
+      "real all-null-current record (attempt2-pinignored): PROJECTED with current NOT_RECORDED",
+      "native-location proof: every projected architecture value equals its native JSON pointer target in the source bytes",
+      "whole-corpus proof: ALL 21 real records project cleanly with zero rejections"
+    ],
+    "negative_fixtures_all_fail_closed": {
+      "tampered lineage (terminal invention_id altered)": "CURRENT_INVENTION_UNRESOLVED",
+      "missing prediction (expected_effect deleted)": "EXPOSED as ABSENT_IN_CANONICAL_RECORD at the exact pointer, no value invented, sibling fields untouched",
+      "missing falsification_test (deleted)": "EXPOSED as ABSENT_IN_CANONICAL_RECORD",
+      "wrong current state": "CURRENT_INVENTION_STATE_MISMATCH",
+      "wrong transition generation (gen skip)": "GEN_SEQUENCE_NOT_CONSECUTIVE",
+      "wrong result status (maturity flip)": "CURRENT_INVENTION_MATURITY_MISMATCH",
+      "survivor binding tamper": "SURVIVOR_BINDING_MISMATCH",
+      "reordered states": "GEN_SEQUENCE_NOT_CONSECUTIVE",
+      "orphan transition": "TRANSITION_PARENT_ORPHAN",
+      "parent missing": "TRANSITION_PARENT_MISSING",
+      "origin undeclared": "TRANSITION_ORIGIN_UNDECLARED",
+      "sha mismatch": "PROVENANCE_SHA_MISMATCH (fails closed before parse)",
+      "unparseable bytes": "SOURCE_BYTES_UNPARSEABLE",
+      "schema unrecognized": "SCHEMA_UNRECOGNIZED",
+      "double tamper": "both breaks exposed together"
+    }
+  },
+  "step_4_portability": {
+    "registry_builder": "visual-lab/registry/tools/build_visual_registry.py - author-machine absolute paths REMOVED (the old OUT_DIR/CURATION constants pinned /home/z/my-project/...); all paths now derive from __file__ (TOOLS_DIR/REGISTRY_DIR/DEFAULT_CURATION/DEFAULT_OUT_DIR) with --out/--curation/--validate CLI parameters; credentials remain env-only (HF_TOKEN)",
+    "validate_mode": "new offline --validate mode: artifact type, required fields per model, approved_for_canonical_geometry exactly false, production_space_eligible exactly false, promotion path NONE, Coder 1 geometry authority binding; the committed 8-model registry PASSES",
+    "negative_controls": "validation fails closed on a model quietly approved for canonical geometry, on a rewritten promotion path, and on a stripped required field",
+    "portability_battery": "visual-lab/registry/tools/test_registry_portability.py (7 tests GREEN): no author-machine paths in any visual-lab tool source or committed registry artifact; defaults resolve inside the checkout; validate passes from a foreign cwd; the trajectory viewer builds from /tmp with checkout-relative source paths",
+    "trajectory_viewer_cli": "visual-lab/trajectory/build_trajectory_view.py - fully CLI-parameterized, defaults derived from the lineage file's own location, runs from any cwd, never writes author-machine paths into artifacts"
+  },
+  "step_6_no_visual_side_causal_inference": {
+    "enforcement": "the projection carries recorded cause fields (change_delta, reason_for_change, challenge) VERBATIM with pointers and computes nothing causal; the module emits no causal/explanatory fields; the viewer_state embeds the presentation_boundary declaration",
+    "tests": "3 dedicated tests GREEN: no causal keys anywhere in the projection text; the may-not-decide list is exact; recorded cause equals the source verbatim",
+    "existing_guard": "visual-lab/guard/epistemic_guard.py (16/16 re-green) enforces the generator/class authority boundary"
+  },
+  "step_7_lab_stays_provisional": {
+    "enforcement": "epistemic_guard.forbid_promotion blocks every promotion into ENGINEERING_GEOMETRY and PHYSICAL_VALIDATION for every visual-lab asset class; unknown generators (hf:TRELLIS.2, hf:tencent/Hunyuan3D-Omni, hf:nvidia/PartPacker) are rejected as geometry authorities; the badge table can never emit MEASURED; the registry validator blocks any approved_for_canonical_geometry=true",
+    "tests": "4 dedicated tests GREEN; no model promoted to engineering authority; no production integration (the lab remains HF-Jobs-only, production_space_eligible exactly false)"
+  },
+  "step_8_handoff_contract": {
+    "chain": "Coder 1 canonical lineage bytes -> Coder 2 projection (typed, pointer-traceable) -> web viewer (self-contained HTML + JSON)",
+    "demonstration_record": {
+      "canonical_record": "R445/EVOLUTION_RUNS/evol-x01-desalination-scaling/INVENTION_LINEAGE.json",
+      "canonical_sha256": "00e09f5515d7e5f33128d37c0f3cf86933f9e4e5a8d4e000035b62955e520e43",
+      "projection_json": "R451/TRAJECTORY_HANDOFF/trajectory_projection_evol_x01.json",
+      "viewer_html": "R451/TRAJECTORY_HANDOFF/trajectory_viewer_evol_x01.html",
+      "states_projected": 2,
+      "transitions_bound": 1
+    },
+    "tests_proving_viewer_is_a_projection_not_a_truth_store": [
+      "determinism: two builds are byte-identical",
+      "pointer coverage: EVERY RECORDED value in the viewer resolves at its declared JSON pointer in the canonical bytes to the SAME value (>=20 entries checked)",
+      "absence honesty: every ABSENT_IN_CANONICAL_RECORD pointer is genuinely absent in the source",
+      "hash preservation: the artifact's source.sha256 equals sha256 of the exact canonical bytes consumed; run_id and invention_ids pass through verbatim",
+      "mutation non-authority: mutating the viewer artifact can never change what a fresh projection from the canonical bytes says; rebuilding regenerates the truth from the bytes",
+      "no author-machine paths in either artifact"
+    ]
+  },
+  "batteries": {
+    "trajectory_projection_pytest": 37,
+    "registry_portability_pytest": 7,
+    "epistemic_guard_direct_run": "16/16",
+    "r449_direct_run": "28/28",
+    "metrics_direct_run": "8/8",
+    "total_green": 96
+  },
+  "constitutional_boundary_reaffirmation": {
+    "ai_mesh_is_not_engineering_truth": true,
+    "no_model_promoted_to_engineering_authority": true,
+    "no_production_model_integration": true,
+    "visual_layer_may_explain_what_the_engine_recorded": true,
+    "visual_layer_may_not_decide_why_failed_or_whether_true": true,
+    "truth_controls_the_labels": true
+  },
+  "disclosed_limitations": [
+    "origin/main was not re-fetched this session (no credentials); the Constitution and governance files were read from the locally verified ratified commit 11b0916 - disclosed in constitution.read_source",
+    "the directive's referenced R450 trajectory-projection defects and 'two files identified by review' are not reachable from this branch (no fetch possible); the projection was implemented from the directive's contract and proven against the real canonical corpus",
+    "the r449_stage_bucket.py / r449_* driver scripts retain some historical round-specific path constants (single-use drivers whose outputs are committed); the registry generation chain itself is fully portable per step 4",
+    "the two live credentials remain recoverable from pushed history until the operator rotates them"
+  ],
+  "production_deployment": {
+    "target_sha": "3db194e8f2f8b747feb0660f29cf054c14d21a0b (branch r449-c2/visual-benchmark tip; DELIVERABLE-BLOCKED - push to origin failed on missing credentials, Art. LXXI Section 4)",
+    "deployed_sha": "23910247426618fb701d659c20c847960274fd1c (pre-existing engine build, unchanged this round)",
+    "deploy_id": "hf: prateekm1/toscanini-prod-validation rev 48cbba34a491 (unchanged this round)",
+    "health_check_result": "BLOCKED",
+    "drift": "DRIFT",
+    "blocked_by": "GitHub credentials unavailable in this session: git push/ls-remote against the private origin fail (no GH_TOKEN/PAT in env, no helper, no token file); the round's commits therefore cannot reach origin/main, and per Art. LXXI Section 1 a commit that exists only locally is UNRELEASED",
+    "what_unblocks": "operator injects GitHub credentials into the session environment (or runs the push); then Art. LXXI Section 1 conditions can be evaluated: ls-remote origin refs/heads/main == pushed SHA; the canonical Space re-alignment to constitution 2.4.0 remains a separate standing blocker owned by Coder 1/operator (escalated at CONSTITUTION-RATIFICATION-LXXI)",
+    "push_attempted": true,
+    "push_verification": "git push origin r449-c2/visual-benchmark -> fatal: could not read Username for 'https://github.com' (terminal prompts disabled; no GH_TOKEN/env/helper); ls-remote likewise unreachable - condition 1 of Art. LXXI Section 1 CANNOT be satisfied this round and is named here",
+    "missing_credentials": [
+      "GITHUB_TOKEN (push/ls-remote to private origin)"
+    ],
+    "operator_actions_required": [
+      "1. inject GitHub credentials into the session environment or push branch r449-c2/visual-benchmark (tip 3db194e8f2f8b747feb0660f29cf054c14d21a0b) manually",
+      "2. ROTATE the exposed GitHub PAT (ghp_ag...ZarT) and HF token (hf_MrZ...NkNM) - both live in pushed history (escalation count 1, Art. LXV)",
+      "3. the standing Space/constitution-2.4.0 re-alignment remains owned by Coder 1/operator (escalated at CONSTITUTION-RATIFICATION-LXXI)"
+    ]
+  },
+  "next_decisive_test": "with credentials restored: push this branch, ls-remote-verify the tip, and re-run the whole-tree credential scan on the pushed tip (expected: zero live-token findings on the new tip's tree)",
+  "constitutional_articles_engaged": [
+    "I",
+    "III",
+    "IV",
+    "V",
+    "VI",
+    "X",
+    "XI",
+    "XV",
+    "XXII",
+    "XXIII",
+    "XXV",
+    "XXVII",
+    "XXVIII",
+    "LXV",
+    "LXX",
+    "LXXI",
+    "LXXII"
+  ],
+  "round_commit_sha": "3db194e8f2f8b747feb0660f29cf054c14d21a0b",
+  "delivery_closure": {
+    "closed_at_utc": "2026-09-12T14:14:22Z",
+    "action": "operator injected the GitHub PAT into the session; the branch push was executed by Coder 2 in the same session",
+    "pushed": true,
+    "branch": "r449-c2/visual-benchmark",
+    "push_range": "39d40138..3078367e (fast-forward; origin tip before push was the R449-C2 worklog commit)",
+    "branch_tip_pushed": "3078367e5e25ac251e2cf810de02342603fec445",
+    "ls_remote_verified": "git ls-remote origin refs/heads/r449-c2/visual-benchmark == 3078367e5e25ac251e2cf810de02342603fec445 == local HEAD (Art. XXIII - remote state verified, not inferred)",
+    "pr_updated": "PR #5 (r449-c2/visual-benchmark -> r448/visual-lab) head == 3078367e, state open, verified via GitHub API after push",
+    "credential_handling": "the operator PAT was used transiently (env var on the push/fetch command line only); it is NOT written to any tracked file, record, or log; BS-021 discipline held; the operator's standing instruction 'rotate the exposed credentials' remains THEIR action item from the original tuple (unchanged)",
+    "production_note": "origin/main advanced independently during the credential gap (3bf8bd0 -> b1418f4a, R450 C1 delivery completion): the canonical Space prateekm1/toscanini-prod-validation now serves pushed commit 317885af with identity GREEN (BUILD == RUNNING == HEALTH == 317885af, drift GREEN, constitution 2.4.0 live). The standing Space/constitution-2.4.0 alignment escalation from CONSTITUTION-RATIFICATION-LXXI is CLOSED by that work. THIS round's branch reaches production only after the stacked lab PRs (#4 then #5) are merged by the owner and the Space is redeployed at the merged SHA - unchanged owner action, escalation state carried, not closed here",
+    "topology_note": "this branch's merge-base with origin/main is a014d1a (pre-R450); the sibling branch r450-c2/visual-feedback-layer (PR #6, tip b64e0fa) merged main at 9f30d28; merge order across the stacked lab PRs is the owner's call; potential conflict surfaces at merge time are disclosed, not pre-resolved",
+    "applies_to": "the credentials/projection half (round commit 3db194e, pinned in round_commit_sha below)"
+  }
+}

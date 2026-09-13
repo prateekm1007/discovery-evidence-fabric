@@ -47,6 +47,18 @@ OUTCOME_NO_DEFENSIBLE = "NO_DEFENSIBLE_INVENTION"   # R416: legacy key —
 #   map onto the UNDER_DEVELOPMENT projection instead of rendering the
 #   banned dead-end sentence
 OUTCOME_RUN_BLOCKED = "RUN_BLOCKED"
+# R452 (external audit B1/AT-7): the typed terminal for an invention the
+# machine's OWN adversarial challenge killed — the projection used to
+# read only final_status and promoted the killed lineage to a positive
+# outcome (measured 7/7 production runs)
+OUTCOME_KILLED_BY_CHALLENGE = "INVENTION_KILLED_BY_CHALLENGE"
+
+#: R452: the recorded kill_reason signature of a MODEL CAPABILITY failure
+#: (the generator could not emit the required citation format). A kill
+#: with this signature is an infrastructure/capability state, NEVER a
+#: scientific rejection (Art. LXI) — the a2/classify.py fix stops
+#: producing it; this detector keeps HISTORICAL records honest.
+_CAPABILITY_KILL_SIGNATURE = "evidence verification failed"
 
 OUTCOME_LABELS = {
     OUTCOME_PENDING: "Investigating",
@@ -56,6 +68,7 @@ OUTCOME_LABELS = {
     OUTCOME_FALSE_PREMISE: "Premise incoherent — reformulate the problem",
     OUTCOME_NO_DEFENSIBLE: "Invention under development",
     OUTCOME_RUN_BLOCKED: "Run blocked — infrastructure, not a verdict",
+    OUTCOME_KILLED_BY_CHALLENGE: "Killed by its own adversarial challenge",
 }
 
 _RUNNING_STATUSES = ("PENDING", "BUILDING_PROBLEM", "RUNNING", "")
@@ -805,9 +818,83 @@ def phase_progression(session: Dict, run_dir: Optional[Path],
     return out
 
 
+def _lineage_challenge_verdict(run_dir: Optional[Path]) -> Optional[Dict[str, Any]]:
+    """R452 (external audit B1): the CURRENT invention's own challenge
+    verdict, read from the run's lineage records (the run dir is the
+    authority, Art. X — this PROJECTS, never re-derives).
+
+    The measured defect: the projection read final_status only and
+    promoted a lineage whose generations were ALL killed (7/7
+    production runs: EVOLUTION_GEN_1.state=INVENTION_REJECTED,
+    challenge.killed=true, yet final_status positive and the product
+    surface said found_something=true).
+
+    Returns {current_killed, current_kill_genuine, any_kill_genuine,
+    current_evidence_verified, survivor_reached, n_kills, kill_reasons}.
+    None when no lineage exists (never fabricated).
+    """
+    lineage = _read_json(Path(run_dir) / "INVENTION_LINEAGE.json") \
+        if run_dir else None
+    if not lineage:
+        return None
+    gens = [g for g in (lineage.get("generations") or [])
+            if isinstance(g, dict)]
+    if not gens:
+        return None
+    current_gen = (lineage.get("current_invention") or {}).get("gen")
+    cur = None
+    for g in gens:
+        if g.get("gen") == current_gen:
+            cur = g
+    cur = cur or gens[-1]
+    ch = cur.get("challenge") or {}
+
+    def _genuine(g: Dict[str, Any]) -> bool:
+        """A kill is a GENUINE scientific verdict unless its recorded
+        reason carries the capability-failure signature (Art. LXI)."""
+        c = g.get("challenge") or {}
+        if not c.get("killed"):
+            return False
+        reason = str(c.get("kill_reason") or "")
+        return _CAPABILITY_KILL_SIGNATURE not in reason
+
+    kill_reasons = [str((g.get("challenge") or {}).get("kill_reason") or "")
+                    for g in gens
+                    if (g.get("challenge") or {}).get("killed")]
+    return {
+        "current_killed": bool(ch.get("killed")),
+        "current_kill_genuine": _genuine(cur),
+        "any_kill_genuine": any(_genuine(g) for g in gens),
+        "current_evidence_verified": bool(cur.get("evidence_verified"))
+        if "evidence_verified" in cur else None,
+        "survivor_reached": bool(lineage.get("survivor_reached")),
+        "n_kills": len(kill_reasons),
+        "kill_reasons": kill_reasons[:5],
+    }
+
+
 def terminal_outcome(session: Dict, run_dir: Optional[Path] = None) -> Dict:
     """The directive §18 four-state outcome + the recorded BASIS for it.
-    PENDING while the run is live. Derived from recorded fields only."""
+    PENDING while the run is live. Derived from recorded fields only.
+
+    R452 (external audit B1/AT-7): for the POSITIVE final statuses the
+    lineage's own challenge verdict is AUTHORITATIVE — the projection
+    never reads final_status alone:
+      * the current invention killed by a GENUINE adversarial verdict,
+        or genuine kills in the lineage with no VERIFIED survivor
+        replacing them  -> OUTCOME_KILLED_BY_CHALLENGE, rejected
+        (the R452 authority decision: a lineage whose kills were never
+        answered by a verified survivor is not "found something";
+        a future run whose later generation VERIFIES and survives is
+        found_something=true — the learning loop stays expressible);
+      * a "survivor" whose evidence was never verified (a capability
+        failure promoted it)             -> OUTCOME_UNDER_DEVELOPMENT,
+        found_something=false (Art. XXVIII: the model -> validated
+        transition requires evidence; Art. LXI: capability failure is
+        never a rejection either — the basis names it);
+      * no survivor at all               -> OUTCOME_UNDER_DEVELOPMENT
+        (today's wording already says none survived).
+    """
     status = session.get("status") or ""
     final = (session.get("final_status") or "").upper()
     pkg = session.get("package") or {}
@@ -815,6 +902,49 @@ def terminal_outcome(session: Dict, run_dir: Optional[Path] = None) -> Dict:
     if status in _RUNNING_STATUSES:
         return {"outcome": OUTCOME_PENDING, "basis":
                 f"machine status {status or 'PENDING'} — run in flight"}
+
+    if status == "COMPLETE" and final in (
+            "AUTOMATED_INVENTION_CANDIDATE", "EVOLVED_INVENTION_CANDIDATE",
+            "INVENTION_REQUIRES_EXPERIMENT", "INVENTION_UNDER_DEVELOPMENT"):
+        # R452: the lineage's challenge verdict is authoritative for the
+        # positive statuses (the audit measured the promotion defect 7/7)
+        verdict = _lineage_challenge_verdict(run_dir)
+        if verdict is not None:
+            found = (verdict["survivor_reached"]
+                     and not verdict["current_killed"]
+                     and verdict["current_evidence_verified"] is not False)
+            if verdict["current_kill_genuine"] or (
+                    verdict["any_kill_genuine"] and not found):
+                reasons = "; ".join(verdict["kill_reasons"][:2]) or \
+                    "no reason recorded"
+                return {"outcome": OUTCOME_KILLED_BY_CHALLENGE,
+                        "invention_found": False,
+                        "invention_rejected": True,
+                        "basis": (f"the machine's own challenge KILLED the "
+                                  f"invention ({verdict['n_kills']} kill(s) "
+                                  f"in the lineage; reasons: {reasons}) — "
+                                  "a killed invention is never presented "
+                                  "as found (external audit B1/AT-7)")}
+            if not found:
+                if verdict["survivor_reached"] and \
+                        verdict["current_evidence_verified"] is False:
+                    return {"outcome": OUTCOME_UNDER_DEVELOPMENT,
+                            "invention_found": False,
+                            "invention_rejected": False,
+                            "basis": ("a generation passed the attack "
+                                      "gauntlet but its evidence was "
+                                      "never verified (a model "
+                                      "capability failure promoted it) — "
+                                      "presented as under development, "
+                                      "never as a verified candidate "
+                                      "(Art. XXVIII/LXI)")}
+                return {"outcome": OUTCOME_UNDER_DEVELOPMENT,
+                        "invention_found": False,
+                        "invention_rejected": False,
+                        "basis": (f"final_status={final} but the lineage "
+                                  f"records {verdict['n_kills']} challenge "
+                                  "kill(s) and no verified survivor — "
+                                  "nothing is presented as found")}
 
     if status == "COMPLETE" and \
             final == "AUTOMATED_INVENTION_CANDIDATE":

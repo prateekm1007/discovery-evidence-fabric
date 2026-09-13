@@ -1,0 +1,145 @@
+{
+  "kind": "CODER_ROUND_RECORD",
+  "round": "R451-C2.6-CLOSEOUT",
+  "title": "The C2.6 closeout amendment — receipt identity mandatory, the renderer status mandatory on both sides, the watchdog's R3/R6 made evidence-producing, and the one blocked-terminal browser attack",
+  "date": "2026-09-13",
+  "author": "Coder 2 (presentation layer)",
+  "reviewer_provenance": "AI_REVIEW",
+  "directive": "Operator directive R451-C2.6 CLOSEOUT AMENDMENT (a closure amendment to C2.6 ONLY; do not create C2.7). Fix only the named authority holes; exactly one blocked-terminal browser attack; preserve the positive control; do not touch Coder 1's scientific machinery; PR #5 / r449-c2/visual-benchmark @ bd7a12df is the canonical C2.6 line and PR #6 must not supersede it; re-verify locally, then stop; production is the NEXT authority test.",
+  "round_question": "Can the release chain still be reached through an omitted or mismatched receipt identity, a missing renderer status on either side of the success-record pair, an undeterminable presentation artifact set under a COMPLETE_PASS gate, a hard-coded watchdog pass, or a stale scientific verdict on a blocked-terminal surface — and can the fully valid chain still reach VISUAL_READY?",
+  "answer": "NO for every attack — measured: the chain's invocation_receipt_identity rung now REQUIRES run_id to exist (omission is never agreement) and the render_record_identity rung REQUIRES receipt.invocation_status AND render_record.status to exist and be equal (a missing status on either side fails closed); the watchdog's R3 converts a missing/uninspectable node_count, a failed visual-set derivation, or an unknown required artifact set under a TRUE COMPLETE_PASS antecedent into an integrity finding (never NOT_APPLICABLE — that state is legal only when the antecedent is genuinely false); the watchdog's R6 no longer hard-codes ok=True but derives the canonical projection from the run's own records via build_dossier and passes only on the typed non-ready upstream state with no fabricated RECEIVED milestone; and the real-browser blocked-terminal attack proves the stale scientific verdict, the rejection surface, 'Technology ready', the visual-ready ribbon, and the model viewer are ALL absent while the InfrastructureBlockedHero is present. The positive control still reaches geometry_available + ENGINEERING + VISUAL_READY + watchdog PASS.",
+  "baseline": {
+    "branch": "r449-c2/visual-benchmark",
+    "head_at_round_start": "bd7a12df0655f2f468a9f4273fca2bcad998cb01",
+    "origin_verified": true,
+    "note": "the local sandbox was stale at 09b44c5 (the R451-C2 delivery-tuple commit); fast-forwarded to the canonical C2.6 tip bd7a12df == ls-remote origin branch tip == PR #5 head (Art. XXII/XXIII). origin/main verified at 55b6233c (advanced by Coder 1 rounds since b1418f4a; NOT merged — the branch's production path is unchanged). PR #6 (r450-c2/visual-feedback-layer @ b64e0fad) receives NO work and cannot supersede C2.6 (amendment §8). The untracked visual-lab metrics dir remains deliberately uncommitted.",
+    "constitution": "v2.4.0 sha256 b54a1be9bcbdd2465d0b034e1e1f472f80b87174209c0d534b7d9e1223e649b2 re-verified unchanged; read IN FULL (all 2153 lines) at round start; re-read IN FULL immediately before the round commit (the twice-read rule)"
+  },
+  "implemented": {
+    "req_1_receipt_identity_mandatory": {
+      "what": "verify_release_chain rung 2 (invocation_receipt_identity): missing run_id -> FAIL ('receipt carries no run_id — receipt identity is mandatory and omission is never agreement, R451-C2.6 CLOSEOUT §1'); run_id mismatch -> FAIL (unchanged). The other mandatory identity fields already failed closed when absent — glb_sha256 (C2.3-era), geometry_spec_sha256 (R451-C2.4 §5), generation_id (R451-C2.6 §2) — run_id was the last omission-as-agreement hole. The chain docstring states the existence requirement for every mandatory field.",
+      "files": ["toscanini/visual_join.py"]
+    },
+    "req_2_renderer_status_mandatory_both_sides": {
+      "what": "The render_record_identity rung requires receipt.invocation_status to EXIST, render_record.status to EXIST, and the two to be EQUAL. A missing status on EITHER side fails closed (it can never be read as agreement — the pre-closeout code read a status-less pair as 'renderer-success records agree (unrecorded)'). All three cases tested: missing receipt status, missing render-record status, contradictory statuses (the two contradiction directions were already proven by fixtures 6/7). Two battery fixtures upgraded with the now-mandatory record status (disclosed in-file, Art. XV/LXIV).",
+      "files": ["toscanini/visual_join.py", "tests/test_r451_c2_blocked_state.py", "tests/test_r451_c22_join.py"]
+    },
+    "req_3_watchdog_r3_fail_closed": {
+      "what": "R3_complete_pass_has_full_ladder: the antecedent is now exactly verdict == COMPLETE_PASS. Under the TRUE antecedent, a node_count that is missing or uninspectable (the render-record field absent/uninspectable AND the structural GLB inspection failed), a failed visual-set derivation (required_artifacts raised — previously an UNCAUGHT crash path in the watchdog), or an unknown required artifact set is an INTEGRITY FINDING (violation_class RECORD_INVARIANT) — never NOT_APPLICABLE. NOT_APPLICABLE occurs ONLY when the antecedent is genuinely false (verdict != COMPLETE_PASS). Watchdog version disclosure bumped to R451-C2.6-CLOSEOUT.",
+      "files": ["scripts/r451_c2_watchdog.py"]
+    },
+    "req_4_r6_evidence_from_the_run": {
+      "what": "The hard-coded ok=True (which pointed at tests/test_r451_c2_blocked_state.py instead of producing evidence) is DELETED. R6 now derives the canonical projection from the run's own records via toscanini/dossier.py::build_dossier — the SAME projection builder the product surface consumes (one implementation, Art. X) — and passes only when the derived projection (a) carries a typed NON-READY geometry state (never geometry_available/visual_complete from a GLB-less blocked run), (b) shows NO fabricated RECEIVED engineering/visualization milestone, and (c) can be derived at all — a projection that cannot be derived is an integrity finding (unverifiable evidence fails closed, Art. XXV), never a pass. The rule's detail carries the derived evidence (geometry_state, engineering row status, visualization row status).",
+      "files": ["scripts/r451_c2_watchdog.py"]
+    },
+    "req_5_one_blocked_terminal_browser_attack": {
+      "what": "EXACTLY ONE new browser attack (the visual test matrix NOT expanded): the amendment's attack shape — terminal infrastructure stop (RUN_BLOCKED_TRANSPORT, user_state BLOCKED_TRANSPORT) + stale scientific-looking user-state fields (final_status AUTOMATED_INVENTION_CANDIDATE, found_something=true, package_available=true, outcome INVENTION_CANDIDATE, outcome_label 'AUTOMATED INVENTION CANDIDATE') + convincing stale geometry/render fields (availability AVAILABLE, viewerUrl-shaped glb route, GLB metadata ENGINEERING_3D/gen-1, hero_eligibility eligible, an evolution glb row, renders.status OK, visual_gate COMPLETE_PASS, and NO typed geometry_state) — mounted on the REAL TechStage against the PRODUCTION build (next build + next start :3211) in a real headless Chrome. DOM-level proof (R451/C2_PRODUCT/E2E_C26_CLOSEOUT/): InfrastructureBlockedHero = present (1, headline DISCOVERY PAUSED, verdict 'No scientific conclusion was reached.'); scientific rejection surface = absent (Premise refuted absent, sp-refuted 0, not-established hero 0); 'Technology ready' = absent; current visual-ready ribbon = absent (0); scientific terminal verdict = absent (the stale AUTOMATED INVENTION CANDIDATE SUPPRESSED — stage_outcome_spans empty); model viewer = absent (0 canvases, 0 model-viewers, 0 gate badges). THE PRODUCT FIX the attack required: TechStage renders usv.outcome_label only when NOT infrastructurePaused (a blocked-terminal surface can never carry a scientific terminal verdict — the blocked hero's own copy is the only verdict the state speaks). The fixture route was TEST SCAFFOLDING and is REMOVED before the final build/commit (grep-verified absent from the shipped build).",
+      "files": ["TOSCANINI_UI/webapp/components/TechStage.tsx", "R451/C2_PRODUCT/E2E_C26_CLOSEOUT/DOM_EVIDENCE.json", "R451/C2_PRODUCT/E2E_C26_CLOSEOUT/dom_assertions.json", "R451/C2_PRODUCT/E2E_C26_CLOSEOUT/blocked_terminal_attack_production.png", "R451/C2_PRODUCT/E2E_C26_CLOSEOUT/snapshot_blocked_terminal.txt"]
+    },
+    "req_6_positive_control_preserved": {
+      "what": "The fully valid current chain still reaches geometry_available + ENGINEERING + VISUAL_READY + watchdog PASS (TestPositiveControl green after every change — the project has not become a universal rejector, Art. V).",
+      "files": []
+    },
+    "req_7_coder1_untouched": {
+      "what": "No changes to discovery, evidence retrieval, mechanism generation, attacker, causal evolution, engineering authority, package compiler, canonical state, provider routing, experiment engine, or the reality loop. The diff: toscanini/visual_join.py, scripts/r451_c2_watchdog.py, TOSCANINI_UI/webapp/components/TechStage.tsx, three C2 test batteries, the worklog, and the new evidence/record artifacts.",
+      "files": []
+    },
+    "req_8_branch_authority": {
+      "what": "PR #5 / r449-c2/visual-benchmark @ bd7a12df is treated as the canonical C2.6 line and received this work. PR #6 (r450-c2/visual-feedback-layer @ b64e0fad) received NO work and cannot supersede C2.6. The owner integration path (merge stacked PRs #4 -> #5, redeploy the canonical Space at the merged SHA) must result in ONE mainline visual state.",
+      "files": []
+    }
+  },
+  "batteries": {
+    "new_closure_tests": "tests/test_r451_c26_authority_closure.py extended with EXACTLY the amendment's closure set (10 tests, no test-count growth beyond it): TestCloseoutReceiptIdentityMandatory (missing run_id -> chain FAIL at invocation_receipt_identity + evaluator RELEASE_UNVERIFIED; run_id mismatch -> FAIL), TestCloseoutRendererStatusMandatory (missing receipt status -> rung FAIL; missing render-record status -> rung FAIL + RELEASE_UNVERIFIED; the contradictory directions already covered by fixtures 6/7), TestCloseoutWatchdogR3FailClosed (COMPLETE_PASS + unknown required set -> INTEGRITY_VIOLATION; uninspectable GLB -> INTEGRITY_VIOLATION; failed set derivation -> INTEGRITY_VIOLATION; non-COMPLETE_PASS verdict -> genuinely NOT_APPLICABLE), TestCloseoutWatchdogR6EvidenceFromTheRun (honest blocked run -> PASS with the derived upstream_not_reached evidence; undeterminable projection -> INTEGRITY_VIOLATION).",
+    "c26_battery": "tests/test_r451_c26_authority_closure.py — 27 passed (17 C2.6 + 10 closure)",
+    "r451_family": "test_r451_c2_blocked_state 20 + test_r451_c21_states 29 + test_r451_c22_join 61 + test_r451_c23_identity_chain 30 + test_r451_c24_certification 35 + test_r451_c25 21 + test_r451_c26 27 = 223 passed (213 prior + 10 new; zero regressions)",
+    "ui_battery": "scripts/r451_c2_ui_tests.mjs — 81 checks ALL PASS (unchanged mapping; the TechStage outcome_label suppression is proven by the browser attack, not by expanding this battery)",
+    "visual_family_per_file": "r441 33 + r443(audit 22, domain 19, release 11, state 18, visual 34) + r444(lineage 12, state 29) + r446(isolation 4, chrome 5, cio 27, completion 22, attacker 20) = 256 passed, every file green in isolation (the combined-run Chromium memory-contention class — BS-020 — recurs in this fresh sandbox; classified per BS-020/BS-021 discipline, not a code regression: the r441 flagship passes in isolation)",
+    "product_family_per_file": "r447 x5 = 81 passed + r420 41 passed 7 skipped + r430 29 passed 1 FAILED (test_falsification_dossier_on_killed_generation — git-stash-verified IDENTICAL at the pristine baseline bd7a12df this round; the standing BS-020 pair) + r419 product surface 10 passed",
+    "consumer_sweep_per_file": "a2 11 + campaign-bridge 18 + dossier-bridge 25 + e15 19 + e16 15 + forensic-hardening 9 + forensic-review 42 + l8 10 + r375-render 22 + r375-retrieval 7 = 178 passed; test_r436 28 passed 3 skipped 4 FAILED at its git-stash-verified pre-existing baseline (re-verified by stash this round, BS-020)",
+    "english_only": "test_r419_english_only 4 passed (all new artifacts English-only, Art. LXX)",
+    "typescript": "tsc --noEmit clean",
+    "production_build": "next build green TWICE: with the temporary fixture route (for the attack) and CLEAN after the fixture removal — the shipped tree contains no build output, no fixture route (grep-verified), and no test scaffolding",
+    "clean_state_replay": "the evaluator and watchdog reports are byte-identical across repeated evaluations (asserted in the battery: test_clean_state_replay_is_byte_identical)"
+  },
+  "supersessions": {
+    "disposition": "recorded per Art. LXIV; disclosed in-file; no superseded implementation left live",
+    "items": [
+      "the C2.6-era rung 2 (a receipt omitting run_id passed the identity rung) -> run_id is MANDATORY: omission fails the rung exactly like a mismatch (CLOSEOUT §1)",
+      "the C2.6-era rung 4 (a status-less receipt/record pair read as 'renderer-success records agree (unrecorded)') -> the status is MANDATORY on both sides; a missing status fails closed (CLOSEOUT §2)",
+      "the C2.6-era watchdog R3 (an undeterminable required set under COMPLETE_PASS degraded to NOT_APPLICABLE; a failed required_artifacts call crashed the watchdog) -> the checker's inability under a TRUE antecedent is an integrity finding; the derivation failure is caught and recorded (CLOSEOUT §3)",
+      "the C2.6-era watchdog R6 (hard-coded ok=True pointing at the source-pinned battery) -> R6 derives the canonical projection via build_dossier and produces evidence from the run itself (CLOSEOUT §4)",
+      "the C2.6-era TechStage stage head (a stale/scientific-looking usv.outcome_label rendered on a blocked-terminal surface) -> the outcome_label renders only when NOT infrastructurePaused (CLOSEOUT §5, proven by the browser attack)"
+    ]
+  },
+  "boundary_compliance": {
+    "coder1_ownership_untouched": "the amendment §7 list is fully respected — the diff touches only the Coder-2 presentation boundary (visual_join, the watchdog, TechStage, the C2 batteries) plus records/evidence; the CAD pipeline, the bridge, the package compiler, the Visual Gate, the lineage writer, and the visual-set ladder are consumed, never modified",
+    "no_scope_expansion": "no visual polish, no new model, no benchmark expansion, no new presentation feature beyond the one suppression the attack required; exactly one new browser test; the pytest closure set is exactly the amendment's holes",
+    "pr6_not_superseded": "no commit was made to r450-c2/visual-feedback-layer; PR #6 cannot supersede C2.6",
+    "honest_limitation": "the R6 derivation-failure path is proven with a simulated builder crash (monkeypatched build_dossier) — the production builders raise typed failures and the watchdog records any of them as a finding; the fixture-route SSR crashes during the attack build (a static prerender against a partial payload, then missing epistemic_class on fixture stubs) were fixture-shape gaps fixed in the FIXTURE (force-dynamic layout + the epistemic_class the real backend always emits), never in product code; one STALE next-server process served a pre-fix build during the attack (killed) — the disclosed C2.6 trap, recurred and re-disclosed"
+  },
+  "acceptance_gate": {
+    "full_constitution_read_before_coding": true,
+    "full_constitution_reread_before_final_commit": true,
+    "governance_active_path_and_c26_round_record_read": true,
+    "missing_run_id_fails_the_chain": true,
+    "run_id_mismatch_fails_the_chain": true,
+    "other_mandatory_identity_fields_required": true,
+    "missing_receipt_status_fails_closed": true,
+    "missing_render_record_status_fails_closed": true,
+    "contradictory_statuses_fail_closed": true,
+    "watchdog_r3_integrity_finding_not_not_applicable": true,
+    "not_applicable_only_when_antecedent_genuinely_false": true,
+    "r6_inspects_the_actual_canonical_projection": true,
+    "r6_hard_coded_success_removed": true,
+    "exactly_one_blocked_terminal_browser_attack": true,
+    "all_six_dom_absences_proven": true,
+    "positive_control_still_reaches_visual_ready": true,
+    "coder1_machinery_untouched": true,
+    "pr5_line_canonical_pr6_untouched": true,
+    "existing_suites_plus_only_the_closure_tests": true,
+    "clean_state_deterministic_replay_passes": true,
+    "no_benchmark_expansion_no_visual_redesign_no_new_model_no_new_presentation_feature": true,
+    "delivery_state_honestly_blocked_until_merge_and_deployment": true
+  },
+  "honest_notes": [
+    "the visual-family combined run in this fresh sandbox reproduces the BS-020 Chromium memory-contention class (8 failed + 8 errors combined; every file green in isolation, 256 passed) — classified per BS-020, not a code regression; the round ran the family per-file as the C2.3-C2.6 rounds did",
+    "the r430 falsification-dossier failure and the r436 4-failure baseline were both re-verified against the pristine baseline bd7a12df BY GIT STASH THIS ROUND (identical without the closeout changes) — the standing disclosed pairs",
+    "the fixture-route SSR crashes and the stale next-server process during the attack build are disclosed in E2E_C26_CLOSEOUT/DOM_EVIDENCE.json; no product code was changed to make the attack pass — the only product change is the §5 suppression itself, which the attack proves",
+    "ACTIVE_PATH.md carries addenda only through R451-C2.3 — the C2.4/C2.5/C2.6 rounds (and this closeout) did not add addenda; disclosed to the owner as a continuity observation (the round records remain the authorities)"
+  ],
+  "production_deployment": {
+    "deployed_sha": null,
+    "deploy_id": null,
+    "health_check_result": "BLOCKED",
+    "drift": "UNKNOWN",
+    "blocked_by": "the branch's production path is the owner merge of stacked PRs #4 -> #5 plus the canonical Space redeploy at the merged SHA (unchanged owner path); a Coder-2 push does not deploy. Per amendment §10, production is the NEXT authority test: deploy the exact merged SHA -> /api/version -> /api/health -> deployment identity == merged SHA -> a fresh production attack -> browser verification against the canonical production URL (Article LXXI)",
+    "what_unblocks": "owner merges the stacked lab PRs and redeploys the canonical Space at the merged SHA",
+    "target_sha": "the closeout round commit (recorded in delivery_closure once the push completes)"
+  },
+  "next_moves_per_directive": [
+    "the owner merges the current visual line (PRs #4 -> #5) into main",
+    "deploy the exact merged SHA; verify /api/version and /api/health; deployment identity == merged SHA",
+    "a fresh production attack + browser verification against the canonical production URL — the REAL closure step under Article LXXI (the local-browser result is useful evidence, not the delivery standard)",
+    "close C2",
+    "redirect the effort to Coder 1's bottleneck: AI transport -> real evidence discovery -> mechanism discovery -> invention -> engineering -> decisive experiment -> buyer package -> reality -> learning -> next discovery"
+  ],
+  "round_commit_sha": "799b4b2f2501bc9ceec7a3652dabb203104a827e",
+  "delivery_closure": {
+    "pushed": true,
+    "branch": "r449-c2/visual-benchmark",
+    "push_range": "bd7a12df..799b4b2f",
+    "round_commit": "799b4b2f2501bc9ceec7a3652dabb203104a827e",
+    "branch_tip": "799b4b2f2501bc9ceec7a3652dabb203104a827e",
+    "local_head": "799b4b2f2501bc9ceec7a3652dabb203104a827e",
+    "ls_remote_verified": true,
+    "ls_remote_branch_sha": "799b4b2f2501bc9ceec7a3652dabb203104a827e",
+    "ls_remote_origin_main_sha": "55b6233c84b1a17e82aa01df06d106c6b902eeb6",
+    "pr_head_synced": "PR #5 head == 799b4b2f (API-verified, state open, mergeable_state clean, base r448/visual-lab — the stacked owner path PRs #4 -> #5 unchanged)",
+    "pr6_status": "PR #6 (r450-c2/visual-feedback-layer @ b64e0fad, base main) API-verified UNTOUCHED — it received no work this round and cannot supersede C2.6 (amendment §8)",
+    "origin_main_unchanged": "55b6233c (advanced from b1418f4a by Coder 1 rounds since the C2.6 round; NOT merged by this round — the branch's production path remains the owner merge of stacked PRs #4 -> #5 plus the Space redeploy at the merged SHA)",
+    "production_status": "NOT production-complete and not described as such: PR #5 remains unmerged and the Space redeploy at the merged SHA has not happened (Art. LXXI tuple BLOCKED, unchanged owner path). Per amendment §10, production is the NEXT authority test: deploy the exact merged SHA -> /api/version -> /api/health -> deployment identity == merged SHA -> a fresh production attack -> browser verification against the canonical production URL; the local-browser result is useful evidence, not the delivery standard",
+    "credential_handling": "BS-021: the PAT was used transiently from the session context for git push / ls-remote / the PR-head API probes only; it is written to NO tracked file; rotation remains the operator's standing action",
+    "constitution": "v2.4.0 sha256 b54a1be9bcbdd2465d0b034e1e1f472f80b87174209c0d534b7d9e1223e649b2 re-verified unchanged and read IN FULL at round start and again IN FULL immediately before the round commit 799b4b2f (both reads recorded in the worklog)"
+  }
+}

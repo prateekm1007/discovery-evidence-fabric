@@ -1,0 +1,157 @@
+{
+  "kind": "CODER_ROUND_RECORD",
+  "round": "R451-C2.6",
+  "title": "The authority closure \u2014 the legacy viewer made impossible, the independent persisted current-generation anchor, the sovereign release chain, and the renderer-success records cross-check",
+  "date": "2026-09-13",
+  "author": "Coder 2 (presentation layer)",
+  "reviewer_provenance": "AI_REVIEW",
+  "directive": "Operator directive R451-C2.6 (the LAST authority-hardening round before the layer closes: close only the remaining authority-boundary defects; no visual polish, no new model, no Coder-1 modification, no benchmark expansion; add no more than the decisive tests; verify and stop). Acceptance gate: R451-C2.6.",
+  "round_question": "Can the presentation boundary still be reached through a legacy payload's convincing viewerUrl, through an artifact that anchors its own current generation, through a diagnostic filename with a complete set of presentation artifacts, or through two renderer-success records that contradict each other \u2014 and still claim visual readiness?",
+  "answer": "NO \u2014 measured: a legacy payload's only surface is the explicit non-current compatibility hero (the rendering order itself makes the viewer unmountable, proven in a real browser against the production build); the current generation is anchored by the INDEPENDENT persisted DESIGN_LINEAGE.json current-generation entry and the artifact generation never anchors itself (a missing anchor fails closed at every boundary); verify_release_chain independently certifies the canonical artifact through the persisted identity chain (a caller path and the diagnostic locator can never satisfy a rung); and the receipt's and the render record's success statuses must agree (the production writer copies one from the other, so disagreement is tampering \u2014 fail closed).",
+  "baseline": {
+    "branch": "r449-c2/visual-benchmark",
+    "head_at_round_start": "9237854d64f44c06b0efe3edd6c0803298063a5f",
+    "origin_verified": true,
+    "pr_head_verified": "PR #5 head == 9237854d (API-verified, state open, mergeable_state clean)",
+    "note": "HEAD == ls-remote origin branch tip (Art. XXII/XXIII verified live); origin/main independently verified at b1418f4a266ce45abf83298f6c2f9c7e8746ae8c (unchanged \u2014 the branch's production path remains the owner merge of stacked PRs #4 -> #5 plus the Space redeploy at the merged SHA)",
+    "constitution": "v2.4.0 sha256 b54a1be9bcbdd2465d0b034e1e1f472f80b87174209c0d534b7d9e1223e649b2, read IN FULL (all 2153 lines) at round start; re-read IN FULL immediately before the round commit (the twice-read rule)",
+    "pre_read_correction": "the inherited conversation summary claimed C2.5 was unimplemented; the git history and the C2.5 round record proved C2.5 delivered and pushed (Art. XXIV: the artifact wins over the summary)"
+  },
+  "implemented": {
+    "req_1_legacy_viewer_impossible": {
+      "what": "TechStage's hero resolution is REORDERED (C2.6 \u00a71): view.state === LEGACY_STATE_UNAVAILABLE is resolved FIRST \u2014 before any viewerUrl branch exists \u2014 and viewerUrl is COMPUTED NULL under the legacy state (heroGlb and the history swap are both gated on !legacyUnavailable). A legacy payload's convincing availability/glb route/GLB metadata/render metadata structurally cannot mount the canonical model viewer, the current visualization ribbon, or the R441 gate badge (now legacy-guarded). The stage label stays 'Legacy projection \u2014 no current presentation state'. The mandatory adversarial BROWSER test ran against the PRODUCTION build in a real headless Chrome (R451/C2_PRODUCT/E2E_C26/): legacy hero present (1), canvas count 0, model-viewer count 0, ribbon count 0, gate-badge count 0, 'Technology ready'/'ENGINEERING MODEL READY' absent, the legacy label and note present. The fixture page was TEST SCAFFOLDING and is REMOVED before the final build/commit.",
+      "files": [
+        "TOSCANINI_UI/webapp/components/TechStage.tsx",
+        "R451/C2_PRODUCT/E2E_C26/DOM_EVIDENCE.json"
+      ]
+    },
+    "req_2_independent_persisted_current_generation_anchor": {
+      "what": "THE ONE canonical persisted current-generation source is DEFINED (C2.6 \u00a72): DESIGN_LINEAGE.json's current-generation entry \u2014 its own generation_id when recorded, else its recorded generation number normalized through the pipeline's own gen-<n> convention. The C2.5-era fallback that anchored the current generation with the persisted identity's own generation_id when the lineage recorded none is SUPERSEDED (Art. LXIV): current_generation = artifact_generation is never inferred. The triple identity is mandatory \u2014 artifact generation == receipt generation == the independent persisted current generation. A MISSING anchor fails closed at every boundary: the certification never completes (geometry_unverified + UNKNOWN authority + the join undecided), and the release chain's generation rung fails (RELEASE_UNVERIFIED class). The contract surfaces current_generation_anchor and independent_current_generation_anchor_present verbatim; a projection generation contradicting the ANCHOR (not only the identity) also fails closed.",
+      "files": [
+        "toscanini/visual_join.py"
+      ]
+    },
+    "req_3_verify_release_chain_sovereign": {
+      "what": "verify_release_chain IS SOVEREIGN (C2.6 \u00a73): rung 1 independently obtains the CERTIFIED canonical artifact through certified_canonical_glb \u2014 the persisted identity chain, the measured SHA, the generation against the independent anchor, and the structural container proof. The caller-provided glb_path is a DIAGNOSTIC cross-check only: agreement is recorded, disagreement FAILS CLOSED ('a caller path is a diagnostic and never weakens the persisted-identity requirement'), and the diagnostic locator's filename fallbacks never satisfy a rung. Rung 1's detail names the certification basis. Rung names are unchanged (canonical_glb_identity, invocation_receipt_identity, generation_identity, render_record_identity, gate_pass, presentation_artifact_set, hero_exists, hero_source_identity) \u2014 the comment numbering was corrected (the pre-existing 'rung 4/rung 4' comment typo).",
+      "files": [
+        "toscanini/visual_join.py"
+      ]
+    },
+    "req_4_renderer_success_records_cross_check": {
+      "what": "The renderer-success records must AGREE (C2.6 \u00a74): receipt.invocation_status == render_record.status, enforced inside the chain's render_record_identity rung. The production receipt writer copies the record's status verbatim (visual_compiler.py: invocation_status = record.status), so any disagreement between the two success records is tampering or forgery \u2014 the rung fails closed. Neither contradiction (receipt OK / record FAILED, or receipt RENDER_FAILED / record OK, both over a COMPLETE_PASS gate) can produce VISUAL_READY: the first fails the chain (RELEASE_UNVERIFIED, JOIN_FAILURE_OBSERVED on the watchdog), the second is blocked by the receipt side (RENDER_BLOCKED) AND caught by the same rung when the chain is evaluated directly.",
+      "files": [
+        "toscanini/visual_join.py"
+      ]
+    },
+    "req_5_preserved_strong_controls": {
+      "what": "Everything C2.5 delivered is preserved and re-proven: projection identity sovereignty (the forged geom.artifact_identity still certifies nothing \u2014 C2.5 battery re-run green), the structural GLB check (unchanged), the legacy payload rule (LEGACY_STATE_UNAVAILABLE, now with the rendering-order lock on top), the absolute VISUAL_READY authority invariant (visual_complete + ENGINEERING, source-pinned, re-asserted), the watchdog's dual reporting (observed_join_state + watchdog_verdict, version disclosure bumped to R451-C2.6; no second state machine \u2014 it consumes THE evaluator), the typed join vocabulary (closed at ten states), and the fail-closed release chain (now sovereign). The positive controls keep working: the fully valid fresh chain reaches geometry_available + ENGINEERING + VISUAL_READY + 'Technology ready', and the watchdog PASSes it.",
+      "files": [
+        "scripts/r451_c2_watchdog.py",
+        "toscanini/visual_join.py"
+      ]
+    },
+    "req_6_decisive_tests_only": {
+      "what": "tests/test_r451_c26_authority_closure.py \u2014 17 tests, exactly the directive's eight fixtures plus the sovereignty sub-proofs and the standing coupling/replay proofs: (1) legacy payload + convincing viewerUrl/GLB metadata/render metadata -> LEGACY_STATE_UNAVAILABLE only, the view carries no mountable field, the TechStage order source-pinned; (2) artifact generation with no independent anchor -> geometry_unverified/UNKNOWN/join-undecided + the chain's generation rung fails + the watchdog never announces ready; (3) stale generation vs the anchor -> 'a stale artifact never certifies'; (4) projection claiming a newer generation -> contradiction fail-closed; (5) diagnostic filename + valid GLB + complete render set + receipt + gate PASS -> verify_release_chain NOT VERIFIED at canonical_glb_identity (and the caller-path variant fails closed, and an agreeing caller path changes nothing); (6) receipt OK / record FAILED / gate COMPLETE_PASS -> RELEASE_UNVERIFIED, rung detail names the contradiction, watchdog JOIN_FAILURE_OBSERVED; (7) receipt RENDER_FAILED / record OK / gate COMPLETE_PASS -> RENDER_BLOCKED and the direct chain fails the same rung; (8) the fully valid fresh chain -> VISUAL_READY (the positive control, Art. V). Plus one-evaluator coupling (dossier == watchdog on the new shapes) and the byte-identical clean-state replay. No test-count growth beyond this set.",
+      "files": [
+        "tests/test_r451_c26_authority_closure.py",
+        "scripts/r451_c2_ui_tests.mjs"
+      ]
+    },
+    "req_7_verify_and_stop": {
+      "what": "The C2 family (213 passed), the UI battery (81 checks ALL PASS incl. the C2.6 legacy-viewer matrix), the visual family (247 passed), the product family (161 passed + 7 skipped + the ONE stash-verified pre-existing failure), the consumer sweep (140 passed; r436 at its stash-verified pre-existing 4-failure baseline), english-only (green), tsc (clean), the production build (green), and the deterministic replay all ran this round; the remote branch verification follows the push. Production delivery is NOT claimed: the Art. LXXI tuple stays BLOCKED on the owner merge of stacked PRs #4 -> #5 plus the canonical Space redeploy at the merged SHA. Per the directive: after C2.6 the auditor attack, the owner merge, the redeploy, the live production attack, and the closure of C2 follow \u2014 then the effort redirects to Coder 1's discovery transport and the end-to-end scientific loop. No C2.7/C2.8/C2.9 will be invented.",
+      "files": []
+    }
+  },
+  "supersessions": {
+    "disposition": "recorded per Art. LXIV; every superseded expectation is disclosed in its test docstring or comment; no superseded implementation left live",
+    "items": [
+      "the C2.5-era current-generation anchoring (lineage anchor ELSE the persisted identity's own generation_id) -> the INDEPENDENT persisted anchor only (DESIGN_LINEAGE.json's current-generation entry); the self-anchoring fallback is DELETED from certified_canonical_glb (the artifact generation is never its own anchor, R451-C2.6 \u00a72)",
+      "the C2.4-era release-chain rung 1 (a caller glb_path or the diagnostic locator's resolution satisfies it) -> the sovereign certified-artifact rung (caller path = diagnostic cross-check; filename fallbacks never certify, R451-C2.6 \u00a73)",
+      "the C2.4-era render-record rung (source-link check only) -> the rung plus the renderer-success records cross-check (receipt status == record status, R451-C2.6 \u00a74)",
+      "the C2.5-era TechStage hero branch order (viewerUrl branch first, legacy branch reachable only when viewerUrl falsy) -> the legacy-first rendering order with viewerUrl computed null under the legacy state and the gate badge legacy-guarded (R451-C2.6 \u00a71)",
+      "the r436 hero source pin (the C2.6-era expression `!legacyUnavailable && heroEligible && design &&` supersedes the pinned `heroEligible && design && design.availability`; the eligibility property preserved and strengthened, disclosed in-file)",
+      "the C2.3/C2.4/C2.5-era golden fixtures (ARTIFACT_IDENTITY.json without a lineage current-generation entry) -> the recorded shape now includes the independent anchor (disclosed in-file in all six battery fixtures + the E2E fixture writer); the C2.4 discovery-vs-certification fixture strips BOTH persisted identity documents"
+    ]
+  },
+  "batteries": {
+    "new_c26_battery": "tests/test_r451_c26_authority_closure.py \u2014 17 passed: the EIGHT directive fixtures each proven (legacy+convincing-viewerUrl mapping+source-pins; anchorless artifact -> geometry_unverified/UNKNOWN/undecided + chain generation rung fail + watchdog never ready; stale generation -> 'a stale artifact never certifies'; projection-newer-generation -> contradiction closed; diagnostic filename + valid GLB + full presentation set -> verify_release_chain NOT VERIFIED at canonical_glb_identity, plus the caller-path fail-closed variant and the agreeing-path no-op; receipt-OK/record-FAILED/gate-PASS -> RELEASE_UNVERIFIED + JOIN_FAILURE_OBSERVED; receipt-RENDER_FAILED/record-OK/gate-PASS -> RENDER_BLOCKED + the direct-chain rung failure; the fully valid fresh chain -> VISUAL_READY) plus the one-evaluator coupling and the byte-identical clean-state replay",
+    "r451_family": "test_r451_c2_blocked_state 20 + test_r451_c21_states 29 + test_r451_c22_join 61 + test_r451_c23_identity_chain 30 + test_r451_c24_certification 35 + test_r451_c25 21 + test_r451_c26 17 = 213 passed (the anchor-bearing recorded shape disclosed in-file per Art. XV/LXIV)",
+    "ui_battery": "scripts/r451_c2_ui_tests.mjs \u2014 81 checks ALL PASS (73 C2.5-era + 8 new C2.6 checks: the legacy+convincing-viewerUrl matrix on the compiled mapping \u2014 LEGACY_STATE_UNAVAILABLE only, no mountable field on the view \u2014 and the TechStage rendering-order source pins: legacy branch FIRST, viewerUrl null under legacy, the gate badge legacy-guarded)",
+    "visual_family": "r441 + r443 x5 + r444 x2 + r446 x3 (+ the r446 chrome/isolation files in the same run) = 247 passed",
+    "product_family": "r447 x5 + r420 + r430 + r419 product surface = 161 passed, 7 skipped, 1 failure (test_falsification_dossier_on_killed_generation) git-stash-verified IDENTICAL at the pristine baseline (the standing BS-020 pair, disclosed). One additional first-run blip (test_run_writes_typed_record_without_blender) passed in isolation and on the family re-run \u2014 the BS-020 environment class, disclosed",
+    "consumer_sweep": "a-series/campaign-bridge/dossier-bridge/e15/e16/forensic-hardening/l8/r375 x2 = 140 passed; test_r436 at its git-stash-verified pre-existing 4-failure baseline (BS-020, disclosed); test_r419_english_only green (the new artifacts are English-only, Art. LXX)",
+    "browser_test": "R451/C2_PRODUCT/E2E_C26/ \u2014 the MANDATORY adversarial browser test on the PRODUCTION build (next build + next start) in a real headless Chrome: legacy hero 1, canvas 0, model-viewer 0, ribbon 0, gate badge 0, 'Technology ready' absent, 'ENGINEERING MODEL READY' absent, 'Conceptual model ready' absent, legacy label + note present. The fixture route is removed before the final build/commit",
+    "build": "tsc --noEmit clean; next build green (the shipped build contains NO fixture route)",
+    "clean_state_replay": "the evaluator and watchdog reports are byte-identical across repeated evaluations of the same bytes (asserted in the battery)"
+  },
+  "boundary_compliance": {
+    "coder1_ownership_untouched": "the CAD pipeline, the bridge, the package compiler, the Visual Quality Gate, the visual-set ladder, the render-record schema, the invocation receipt writer, the lineage WRITER, and CadQuery/OCCT authority are consumed, never modified; the independent anchor is a Coder-2 READ contract over the lineage document Coder 1 already persists; no alternative geometry authority introduced; no new 3D-model benchmark; no aesthetic work",
+    "structural_pins": "the legacy hero branch is the FIRST branch of the hero-viewport and viewerUrl computes null under the legacy state (source-pinned + browser-proven); the VISUAL_READY state exists exactly once behind the ENGINEERING guard; the certification's naming sources are the persisted documents only; the chain's rung 1 is certification, not discovery; the receipt/record statuses must agree; the watchdog defines no second state machine and imports THE evaluator's vocabulary",
+    "honest_limitation": "the independent anchor reads the lineage current-generation entry's generation_id, else normalizes the entry's recorded generation number through the pipeline's own gen-<n> convention (the same normalization the bridge's projection writer applies) \u2014 a lineage entry recording NEITHER field means no anchor exists and everything fails closed; the anchor is only as strong as the lineage document's own integrity, which the SHA chain and the structural checks continue to police"
+  },
+  "acceptance_gate": {
+    "full_constitution_read_before_coding": true,
+    "full_constitution_reread_before_final_commit": true,
+    "governance_and_active_path_and_prior_round_record_read": true,
+    "legacy_state_unavailable_cannot_mount_viewer_url_canonical_model_viewer_ribbon_or_technology_ready_surface": true,
+    "mandatory_adversarial_browser_test_run_on_production_build": true,
+    "canonical_persisted_current_generation_source_defined_and_independent": true,
+    "artifact_generation_never_its_own_anchor": true,
+    "triple_generation_identity_enforced": true,
+    "missing_anchor_fails_closed_per_boundary": true,
+    "verify_release_chain_independently_certifies_the_artifact": true,
+    "filename_resolver_diagnostic_only_never_certifying": true,
+    "caller_glb_path_never_weakens_persisted_identity": true,
+    "receipt_render_status_cross_check_enforced": true,
+    "both_status_contradictions_fail_closed": true,
+    "existing_strong_controls_preserved": true,
+    "positive_controls_reach_visual_ready": true,
+    "all_eight_directive_fixtures_proven": true,
+    "no_test_count_growth_beyond_the_decisive_set": true,
+    "clean_state_deterministic_replay_passes": true,
+    "no_scope_expansion": true,
+    "c1_c2_boundary_unchanged": true,
+    "delivery_state_honestly_blocked_until_merge_and_deployment": true
+  },
+  "honest_notes": [
+    "the fixture upgrades for the independent anchor touched six battery fixtures and the E2E fixture writer \u2014 each disclosed in-file (Art. XV); the C2.4 discovery-vs-certification fixture now strips BOTH persisted identity documents because the recorded shape now includes the lineage",
+    "the r419 first-run blip (test_run_writes_typed_record_without_blender) passed in isolation and on the family re-run \u2014 the BS-020 environment class the C2.3/C2.4/C2.5 records disclosed; disclosed again",
+    "the E2E browser test's first production attempt hit TWO obstacles, both disclosed: the fixture page's initial static prerender crashed on a partial payload (fixed with the force-dynamic layout + the overview tab's epistemic_class), and a STALE next-server process kept serving a pre-fix build (killed; the fresh production build served the corrected fixture). The final evidence is from the clean production build",
+    "the production build artifacts (.next) were cleaned after verification; the shipped tree contains no build output and no fixture route",
+    "the r451_family consumer sweep of this round ran 140 tests (the C2.5 record's sweep counted 136) \u2014 the same families; the count difference is the sweep's file set, not a behavior change"
+  ],
+  "production_deployment": {
+    "deployed_sha": null,
+    "deploy_id": null,
+    "health_check_result": "BLOCKED",
+    "drift": "UNKNOWN",
+    "blocked_by": "the branch's production path is the owner merge of stacked PRs #4 -> #5 plus the canonical Space redeploy at the merged SHA (unchanged owner path); a Coder-2 push does not deploy",
+    "what_unblocks": "owner merges the stacked lab PRs and redeploys the canonical Space at the merged SHA",
+    "target_sha": "2c504dbca1a6335940c1ec19a1a06574c2f65fad"
+  },
+  "next_moves_per_directive": [
+    "auditor attack",
+    "owner merge of stacked PRs #4 -> #5",
+    "redeploy the canonical Space at the merged SHA",
+    "live attack against production",
+    "close C2",
+    "redirect to Coder 1's discovery transport and the end-to-end scientific loop (AI transport -> real evidence discovery -> mechanism discovery -> invention -> engineering -> decisive experiment -> buyer package -> reality -> learning -> next discovery)"
+  ],
+  "round_commit_sha": "2c504dbca1a6335940c1ec19a1a06574c2f65fad",
+  "delivery_closure": {
+    "pushed": true,
+    "branch": "r449-c2/visual-benchmark",
+    "push_range": "9237854d..2c504dbc",
+    "round_commit": "2c504dbca1a6335940c1ec19a1a06574c2f65fad",
+    "branch_tip": "2c504dbca1a6335940c1ec19a1a06574c2f65fad",
+    "local_head": "2c504dbca1a6335940c1ec19a1a06574c2f65fad",
+    "ls_remote_verified": true,
+    "ls_remote_branch_sha": "2c504dbca1a6335940c1ec19a1a06574c2f65fad",
+    "ls_remote_origin_main_sha": "b1418f4a266ce45abf83298f6c2f9c7e8746ae8c",
+    "pr_head_synced": "PR #5 head == 2c504dbc (API-verified, state open, mergeable_state clean)",
+    "origin_main_unchanged": "b1418f4a (the branch's production path remains the owner merge of stacked PRs #4 -> #5 plus the Space redeploy at the merged SHA)",
+    "production_status": "NOT production-complete and not described as such: PR #5 remains unmerged and the Space redeploy at the merged SHA has not happened (Art. LXXI tuple BLOCKED, unchanged owner path)",
+    "credential_handling": "BS-021: the PAT was used transiently from the session context for git push / ls-remote / the PR-head API probe only; it is written to NO tracked file; rotation remains the operator's standing action",
+    "constitution": "v2.4.0 sha256 b54a1be9bcbdd2465d0b034e1e1f472f80b87174209c0d534b7d9e1223e649b2 read IN FULL at round start and re-read IN FULL immediately before the round commit 2c504dbc (both reads recorded in the worklog)"
+  }
+}

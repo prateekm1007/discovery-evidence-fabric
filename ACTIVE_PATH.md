@@ -303,6 +303,8 @@ forged-token bypass attempts, CHIPS-vs-Lax cookie shapes by context, the
 SSE owner parameter (granted/denied/wrong-owner), and the route-wiring
 contract pins.
 
+<!-- MERGE UNION (PRs #4 -> #5 delivery): the two parallel rounds (canonical main R449-C1..R452-C1 and the visual-benchmark branch R451-C2..R452-C2) are both recorded below; each addendum carries its own date and directive -->
+
 ## R449 addendum (2026-09-12) — the Evidence Fabric: federated evidence into the engine
 
 Operator directive R449: connect HF-hosted datasets to the invention engine
@@ -434,3 +436,158 @@ reachability contract test (tests/test_r452_engineering_geometry_is_
 reachable.py) spans producer -> classifier -> normalize -> builder ->
 export on REAL inputs only — the chain the audit proved had ZERO test
 coverage (its fixtures used a schema production never emitted).
+
+## R451-C2 addendum (2026-09-12) — the blocked state becomes a first-class presentation state, and the geometry-to-visual join becomes machine-provable
+
+Operator directive R451-C2 (Visual State Integrity + Guaranteed
+Geometry-to-Visual Join): an infrastructure interruption must never be
+visually confused with scientific absence (Art. LXI; BS-008/009/011/018),
+and a legitimate engineering artifact must always be presented — while an
+absent one must be explained without lying.
+
+| Component | Module | Notes |
+|---|---|---|
+| THE ONE presentation-state mapping | `TOSCANINI_UI/webapp/lib/presentationState.ts` | seven states (INVESTIGATING / INFRASTRUCTURE_PAUSED / TECHNOLOGY_NOT_ESTABLISHED / GEOMETRY_UNAVAILABLE / GEOMETRY_READY_RENDER_BLOCKED / VISUAL_READY / SCIENTIFIC_REJECTION) resolved ONLY from the canonical user-state projection + dossier tabs — the frontend never re-derives state from raw fields and never reconciles conflicting signals (Attack C: infrastructure wins over stale scientific-looking fields); owns the canonical `isTerminal` (re-exported by RunNarrative — one definition) |
+| The blocked surface | `TOSCANINI_UI/webapp/components/InfrastructureBlockedHero.tsx` | presentation-only; DISCOVERY PAUSED / Infrastructure temporarily unavailable. / No scientific conclusion was reached. / Your problem is saved and ready to resume.; compact (an absence state never occupies the model viewport); CTA hierarchy Resume primary · journal secondary · package disabled with its reason; the recovery rows (what happened / what was established / what remains unknown); the problem-context panel explicitly labeled "not an invention model" (no dimensional claims, no synthetic geometry) |
+| Blocked insight cards | `presentationState.ts::blockedInsightCards` + `TechStage.tsx` | "Not evaluated — discovery paused before a technology state was established" class wording; the evidence card distinguishes NOT_REACHED ("Evidence retrieval not reached") from a MEASURED zero (numeric zero only when `retrieval_state == RETRIEVED`); scientific-absence phrases are structurally absent from the blocked path |
+| NOT_REACHED != measured zero | `toscanini/dossier.py::evidence_ledger` | every exit carries typed `retrieval_state` (NOT_REACHED / PENDING / FAILED / RETRIEVED); numeric counts exist ONLY when the envelope exists (a RETRIEVED zero is the honest measured zero; Art. XXI.3/XXV) |
+| Render-blocked state (C2.6) | `TechStage.tsx` ribbon + `lib/api.ts::retryPresentation` | GLB present + renderer skipped/failed/gate-failed -> "ENGINEERING MODEL READY — the engineering geometry exists. Presentation rendering is temporarily unavailable." with Retry presentation (POSTs the existing idempotent artifact-build job) — the canonical GLB stays interactive regardless |
+| Invocation receipt (C2.9) | `visual_compiler/visual_compiler.py::_write_invocation_receipt` | `MODEL/3D/VISUAL_COMPILER_INVOCATION.json` written on EVERY compiler exit (render, typed skip, failure) with run_id / generation_id / canonical_glb_sha256 / geometry_spec_sha256 / compiler_version / invoked_at / status / skip_reason / output_directory — "GLB exists" vs "GLB was passed to the renderer" is now machine-distinguishable (BS-003/BS-030) |
+| The end-to-end watchdog (C2.10) | `scripts/r451_c2_watchdog.py` | deterministic file-rule integrity check (R1 engineering GLB -> receipt exists; R2 rendered -> gate exists; R3 COMPLETE_PASS -> full 23-artifact ladder on disk; R4 hero source hash == canonical GLB hash; R5 skip -> typed reason; R6 no-GLB blocked run -> upstream projection (source-pinned); R7 receipt identity == run); NOT_APPLICABLE is never a violation (an infrastructure stop manufactures no failure) |
+| Semantic colors (§10) | `TOSCANINI_UI/webapp/app/globals.css` | three documented state colors: LIVE = existing ok-green; INFRASTRUCTURE PAUSED = new calm slate --state-infra (documented reason: amber already means pending/progress, red is reserved for scientific rejection); SCIENTIFIC REJECTION = existing bad-red |
+| Journal banner (§7) | `DeepDive.tsx` | PAUSED AT INFRASTRUCTURE above the recorded history; no artificial terminal failure event is manufactured |
+
+Batteries: `tests/test_r451_c2_blocked_state.py` (20 — typed retrieval
+states incl. the failed-retrieval and measured-zero cases; the receipt on
+the no-renderer skip, the no-source skip and a REAL Chromium render; the
+watchdog positive + four tampered fixtures each failing the SPECIFIC
+rule + the CLI exit codes; the blocked user-state projection pins);
+`scripts/r451_c2_ui_tests.mjs` (34 — the full §12/C2.13 regression
+matrix over the compiled shipping module, Attacks A–E, the blocked-card
+set, the isTerminal contract). Fresh-browser DOM proof (real server +
+production build + headless Chromium): `R451/C2_PRODUCT/E2E/`
+(DOM_EVIDENCE.json + blocked/success screenshots); success-state
+regression green (real 3D hero, gate badge, populated cards — unchanged).
+Constitution v2.4.0 read IN FULL at round start and re-read IN FULL
+immediately before this commit.
+
+## R451-C2.1 addendum (2026-09-12) — the false "3D unavailable" interpretation is impossible to reach
+
+Operator directive R451-C2.1: the frontend must stop using the existence
+of a 3D file as a proxy for the state of discovery. Five distinct
+states with exact copy; a typed six-value geometry/visual vocabulary
+derived by the BACKEND; and a DISCOVERY PIPELINE strip that answers
+"why don't I have a 3D model?" with the recorded truth.
+
+| Component | Module | Notes |
+|---|---|---|
+| Six-value geometry/visual state | `toscanini/dossier.py::_geometry_state` + `GEOMETRY_STATES` | upstream_not_reached / geometry_not_applicable / geometry_generation_failed / geometry_available / visual_render_failed / visual_complete — derived ONLY from canonical records (CIO geometry block, bridge outcome, render record, visual gate); `presentation_cause` splits State C from State D; the UI consumes it verbatim and NEVER infers it from a missing file |
+| The five hero states | `TOSCANINI_UI/webapp/lib/presentationState.ts` | A blocked=DISCOVERY PAUSED; B invention-exists=**"Engineering visualization not available on this invention."** (HeroNoVisualization — never "Not established on this run" for an invention that exists); C renderer=**"Engineering model ready. Presentation renderer unavailable."**; D gate=**"Model rendered but did not pass the presentation integrity gate."**; E COMPLETE_PASS=the model shows. C/D copy selected by the backend's `presentation_cause`, never by the browser |
+| DISCOVERY PIPELINE strip | `toscanini/dossier.py::pipeline_projection` + `components/DiscoveryPipelineStrip.tsx` | seven product stages (Problem/Evidence/Mechanism/Invention/Engineering/3D visualization/Package), typed statuses RECEIVED / IN_PROGRESS / NOT_REACHED / STOPPED / PAUSED_INFRASTRUCTURE derived from recorded artifacts only; the blocked run shows exactly the directive's strip (Problem RECEIVED, everything else NOT REACHED); the strip renders NOTHING when the projection is absent (never a guessed ladder) |
+| No-file-inference attacks | `scripts/r451_c2_ui_tests.mjs` | F1 missing-GLB+typed-not-applicable never reads as technology absence; F2 GLB-present+no-render-record never reads VISUAL_READY; F3 gate-FAIL never reads as renderer absence; F4 upstream_not_reached falls through honestly; F5 typed visual_complete cannot override INFRASTRUCTURE_PAUSED; the vocabulary is closed (unknown values fall through) |
+| Note honesty | `toscanini/dossier.py::design_tab` | the blanket "3D GEOMETRY UNAVAILABLE" note is gone; typed notes name the reach state or the State B sentence; the R430 pin test re-pinned to the new contract |
+
+Batteries: `tests/test_r451_c21_states.py` (28 — the six states from
+canonical records; the blocked strip == the directive's exact strip;
+NOT_REACHED never carries a numeric zero, the RETRIEVED zero may;
+source pins for the exact copy and the strip's backend-verbatim
+rendering); `scripts/r451_c2_ui_tests.mjs` 55 checks (34 prior + 21:
+five states, exact copy, Attacks F1–F5, closed vocabulary);
+test_r430 re-pin green; regressions r441+r443+r444+r446 83 passed,
+r447 join family 64 passed, r420/r419 green except two pre-existing
+environment-class failures identical at the pristine baseline
+(test_r419_scipy_free_geometry, test_r419_render_pipeline — BS-020
+disclosed); tsc clean; next build green. Fresh-browser DOM proof with
+real server + production build (R451/C2_PRODUCT/E2E_C21/): all five
+states verified in the DOM with the directive's exact sentences and
+the forbidden phrases verified ABSENT; the State C fixture was
+auto-healed by the live mechanical join (C2.7 proof) and captured with
+the artifact-build route blocked so the typed skip stayed authoritative.
+
+## R451-C2.2 addendum (2026-09-13) — the presentation state is artifact-contract-driven and the geometry→visual join has NO silent gap
+
+Operator directive R451-C2.2 (Canonical Presentation-State Integrity +
+Automatic Geometry-to-Visual Continuity): `not_attempted` never reads
+as renderer absence; the geometry state is decided by the recorded
+engineering CHAIN (never by PARAMETRIC_MODEL.json alone); the strip's
+milestones are canonical-record predicates; package BLOCKED is typed,
+never auto-infrastructure; and the join
+GEOMETRY READY → INVOCATION → RENDER → GATE → HERO is machine-provable
+in both directions.
+
+| Component | Module | Notes |
+|---|---|---|
+| THE visual-join evaluator | `toscanini/visual_join.py` (NEW) | closed 8-state vocabulary (NOT_APPLICABLE / NOT_REACHED / INVOCATION_PENDING / INVOCATION_MISSING / RENDER_BLOCKED / RENDER_RECORD_MISSING / STOPPED_GATE / VISUAL_READY) derived ONLY from canonical records (receipt, render record, gate, job record); observational — it writes nothing (Art. IX); undecided (None) when no records exist — never a guess (Art. XXV) |
+| The artifact contract | `toscanini/dossier.py::_geometry_artifact_contract` | audits PARAMETRIC_MODEL → CAD_PIPELINE_LEDGER (outcome) → ENGINEERING_SPECIFICATION → BRIDGE_REPORT → STEP/GLB; PARAMETRIC_MODEL.json alone NEVER promotes into "engineering model ready" (pm-only COMPLETE runs classify geometry_generation_failed; live runs stay upstream_not_reached); CAD-ledger BLOCKED_TRANSPORT/NO_MODEL_NO_LLM are infrastructure, never failures (Art. LXI) |
+| Receipt schema 1.1.0 | `visual_compiler/visual_compiler.py::_write_invocation_receipt` | the directive's exact field contract: run_id, generation_id, geometry_spec_sha256, glb_sha256, visual_compiler_version, invocation_status, skip_reason, render_record_reference (+ gate_version, invoked_at, output_directory); the 1.0.0 names superseded in the same change (Art. LXIV); historical 1.0.0 receipts stay READABLE (era normalization in both readers) |
+| The join watchdog | `scripts/r451_c2_watchdog.py` | R8 (valid GLB + no invocation and no pending job → FAIL) + R9 (invocation claims pixels + no render record → FAIL) + the derived join_state in the report; the four directive implications each proven by an adversarial fixture |
+| Strip predicates | `toscanini/dossier.py::pipeline_projection` + `_canonical_stage_record` | Mechanism = a canonical mechanism RECORD (envelope SYNTHESIZE/MECHANISM_SPACE/COLLISION with status OK) — the always-executing PREMISE_GATE never stands in; Invention = the canonical invention record (stage credit never substitutes); Engineering = realization exists AND its authoritative state says valid; Problem = the problem record (problem.json or the recorded submission) |
+| Package blocked classes | `toscanini/dossier.py::_package_blocked_class` | VISUAL_GATE (release_verdict VISUAL_RELEASE_BLOCKED — outranks all) / SCIENTIFIC (failed gates B-/F-/G-/U-) / PACKAGE_INTEGRITY (other gate families, MODEL_VALIDATION_FAILED, COMPILE_ERROR) / INFRASTRUCTURE (transport-class stage/reason → PAUSED_INFRASTRUCTURE) / UNKNOWN (recorded verbatim, never guessed into infra); the row carries `blocked_class` and the strip renders it verbatim |
+| The copy split | `TOSCANINI_UI/webapp/lib/presentationState.ts` + `TechStage.tsx` | five causes, five distinct sentences: renderer_unavailable ("Presentation renderer unavailable."), not_attempted ("Presentation render not yet started." — NEW), infrastructure ("Presentation rendering paused by infrastructure."), rendering_in_progress ("Presentation render in progress."), gate_not_passed (State D unchanged); an empty render status is not_attempted, never renderer absence |
+
+Batteries: `tests/test_r451_c22_join.py` (50 — the contract negative
+controls incl. the PARAMETRIC_MODEL-alone promotion block; the join
+evaluator's eight states from records; the watchdog's four directive
+implications; the strip predicate negative controls incl.
+premise-gate-only ≠ mechanism; the package blocked-class matrix; the
+structural C1/C2 boundary pins); r451 C2/C2.1 regression 48 passed;
+r441+r443+r444+r446 83 passed; r447/r420/r419/r430 family 128 passed
+(2 failures identical at the pristine baseline — the standing BS-020
+environment pair); UI battery 54 checks (five distinct sentences,
+Attacks F1–F5 re-pinned); tsc clean; next build green. Fresh-browser
+DOM proof (R451/C2_PRODUCT/E2E_C22/): the not_attempted ribbon and
+JOIN_FAILURE strip class, the infrastructure/in-progress sentences,
+the VISUAL_GATE package class, and the A/E regressions all verified in
+the DOM; the LIVE mechanical join auto-healed a seeded no-receipt
+fixture end-to-end before the terminal-record guard was added to the
+fixtures — §5's automatic invocation proven live. Constitution v2.4.0
+(hash b54a1be9 == origin/main) read IN FULL at round start and re-read
+IN FULL before this commit. No Coder-1 canonical state changed: the
+CAD pipeline, the bridge, the package compiler, and the Visual Gate
+are consumed, never modified.
+
+## R451-C2.3 addendum (2026-09-13) — VISUAL_READY requires the release chain, and the identity chain is ONE
+
+Operator directive R451-C2.3: the system must prove the exact
+engineering geometry → canonical GLB → Visual Compiler join WITHOUT
+trusting filenames, booleans, reports, or stale projections. Route
+strings never establish geometry; a STEP never claims visual
+readiness; reports never constitute realizations; and every identity
+mismatch fails closed INSIDE the evaluator — not merely in a later
+watchdog report.
+
+| Component | Module | Notes |
+|---|---|---|
+| THE geometry artifact contract | `toscanini/visual_join.py::evaluate_geometry_contract` (moved from dossier.py — ONE implementation, two consumers) | geometry_available requires ALL seven conditions: artifact exists AND non-zero AND valid artifact identity AND generation identities match AND every recorded SHA matches the bytes on disk AND engineering authority is explicit AND no contradicting terminal failure. Authority reads RECORDED identity documents only (ARTIFACT_IDENTITY.json, the bridge report's class fields, the CAD ledger) — the CIO's derived class is never an authority source. Missing class stays UNKNOWN; legacy boolean-only stays readable but establishes nothing |
+| ENGINEERING_GEOMETRY_READY vs VISUAL_INPUT_READY | the contract's two typed fields | A valid STEP (byte-checked ISO-10303-21 header) establishes the first and NEVER the second — the visual boundary requires the canonical GLB contract |
+| THE release chain | `visual_join.verify_release_chain` | seven rungs verified from bytes: canonical GLB identity → receipt identity (glb_sha256 == bytes, run_id == run, geometry_spec_sha256 == the spec file) → render record source → gate PASS → required ladder on disk → hero exists → hero source identity (render record source == canonical; an exported hero.glb must match the record's own view hash) |
+| Release-chain join states | `VISUAL_JOIN_STATES` (8 → 10) | gate PASS + any broken rung → RELEASE_UNVERIFIED (fail closed, per rung detail); engineering-ready but no canonical GLB → VISUAL_INPUT_NOT_READY. VISUAL_READY now means the full chain |
+| One evaluator, two consumers | `scripts/r451_c2_watchdog.py` | the watchdog-local derive_join_state is DELETED (Art. LXIV disposition: superseded in the same change); the watchdog derives the state from `evaluate_visual_join` and keeps the record-level invariant rules (R1–R10: R10 couples the evaluator's announced state to the record invariants); the pre-C2.3 engineering-by-filename fallback is retired — missing class is UNKNOWN |
+| Invention milestone validity | `toscanini/dossier.py::_invention_record_validity` | the strip's Invention row RECEIVES only on the record's REQUIRED VALIDITY STATE: {} → INVALID_EMPTY, truncated JSON → INVALID_MALFORMED (never silently absent), placeholder core fields → INVALID_PLACEHOLDER, missing core fields → INVALID_MINIMAL, recorded adjudication rejection → INVALID_ADJUDICATION |
+| Engineering milestone | `toscanini/dossier.py::pipeline_projection` | RECEIVED requires the typed-valid geometry state AND the contract's ENGINEERING authority; the bridge-report fallback promotion is DELETED (a bridge report describes a realization, it does not constitute one); CONCEPTUAL/UNKNOWN never receive |
+| Typed package classification | `toscanini/dossier.py::_package_blocked_class` | the free-text inference ("transport" in reason.lower(), "quality gate" in reason) is DELETED; the class consumes the compiler's typed stages only (QUALITY_GATE_BLOCKED → failed-gate prefixes B-/F-/G-/U- → SCIENTIFIC else PACKAGE_INTEGRITY; MODEL_VALIDATION_FAILED/COMPILE_ERROR → PACKAGE_INTEGRITY; typed infra codes → INFRASTRUCTURE; anything else → UNKNOWN verbatim) |
+| Authority-aware ribbon | `presentationState.ts::renderBlockedTitle` + `TechStage.tsx` | the ENGINEERING MODEL READY claim exists only on the contract's recorded ENGINEERING authority; CONCEPTUAL → CONCEPTUAL MODEL; UNKNOWN/legacy → GEOMETRY AUTHORITY UNVERIFIED; two new typed causes with their own sentences: visual_input_missing, release_unverified (the cause vocabulary is closed at seven) |
+
+Batteries: `tests/test_r451_c23_identity_chain.py` (the fourteen
+directive false-positive attacks — fake GLB path, empty GLB, wrong GLB
+SHA, wrong generation, wrong run_id, STEP only, legacy present=true,
+empty/placeholder/minimal/malformed/adjudication-rejected invention
+records, bridge report without realization, render record with wrong
+GLB, receipt with wrong GLB, gate PASS + hero absent, gate PASS +
+incomplete ladder — plus the identity-chain equations, the
+one-evaluator coupling (dossier and watchdog announce the SAME state
+on every fixture), and the clean-state byte-identical replay);
+test_r451_c22_join.py 61 (supersessions disclosed in-file);
+test_r451_c21_states.py 29 + test_r451_c2_blocked_state.py 20;
+visual family 83 (== the pristine baseline); product family green
+except the stash-verified pre-existing failures (BS-020 class); UI
+battery 60 checks ALL PASS; tsc clean; next build green.
+Fresh-browser DOM proof (R451/C2_PRODUCT/E2E_C23/): the complete chain
+still reaches State E through the strict release chain (the
+false-negative guard), the no-silent-gap failure stays visible, and a
+mutated render-record source GLB fails closed live — STOPPED
+[RELEASE_UNVERIFIED], never "Technology ready". Constitution v2.4.0
+(hash b54a1be9 == origin/main) read IN FULL at round start and re-read
+IN FULL immediately before the commit. No Coder-1 canonical state
+changed: the CAD pipeline, the bridge, the package compiler, the
+Visual Gate, and the visual-set ladder are consumed, never modified.

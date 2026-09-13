@@ -2642,9 +2642,30 @@ class EngineRun:
             .get("evidence_verification", {}).get("verified", False))
         gen["evidence_verified"] = evidence_verified and \
             bool(fresh_items)
-        gen["challenge"]["killed"] = False
-        gen["challenge"]["survived"] = True
-        gen["state"] = ev.INVENTION_REQUIRES_EXPERIMENT
+        # R452 (external audit B1, Art. XXVIII): passing the attack
+        # gauntlet is not evidence verification. A generation whose
+        # evidence was never verified is NOT a survivor — it is
+        # INVENTION_CHALLENGED (alive, unverified, never a rejection —
+        # Art. LXI). The measured defect: gen 2 was marked
+        # survived=True unconditionally here, promoted to
+        # EVOLVED_INVENTION_CANDIDATE, rendered, and packaged while its
+        # evidence verification had failed on a capability class.
+        if gen["evidence_verified"]:
+            gen["challenge"]["killed"] = False
+            gen["challenge"]["survived"] = True
+            gen["state"] = ev.INVENTION_REQUIRES_EXPERIMENT
+        else:
+            gen["challenge"]["killed"] = False
+            gen["challenge"]["survived"] = False
+            gen["challenge"]["evidence_verification_state"] = \
+                "EVALUATED_FAILED_CAPABILITY"
+            gen["challenge"]["note"] = (
+                "the generation passed the attack gauntlet but its "
+                "evidence was never verified — it is NOT a survivor "
+                "and is NOT rejected; it stays challenge-pending "
+                "(Art. XXVIII: promotion requires evidence; Art. LXI: "
+                "a capability failure is not a scientific verdict)")
+            gen["state"] = ev.INVENTION_CHALLENGED
         gen["artifacts"]["invention_spec"] = \
             f"INVENTION_SPECIFICATION_gen-{gen_n}.json"
         gen["artifacts"]["engineering_spec"] = \
