@@ -524,9 +524,22 @@ def run_engine(arm: str, case: str, budget_s: int) -> None:
             return False
         try:
             os.kill(pid, 0)
-            return True
         except OSError:
             return False
+        # ZOMBIE-AWARE: a defunct child still answers kill(pid, 0) but
+        # is NOT alive — measured live this session (the engine exited
+        # and zombied under the surviving supervisor; the poll loop
+        # hung forever on the zombie's affirmative kill probe)
+        try:
+            with open(f"/proc/{pid}/status") as fh:
+                for line in fh:
+                    if line.startswith("State:"):
+                        if line.split()[1].startswith("Z"):
+                            return False
+                        break
+        except (OSError, IndexError):
+            pass
+        return True
 
     assert ensure_transport(arm), f"{arm}: transport failed to start"
     pid = _engine_pid()
