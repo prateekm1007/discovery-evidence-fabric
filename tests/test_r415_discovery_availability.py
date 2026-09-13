@@ -51,7 +51,8 @@ import pytest
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from discovery_fabric.engine import llm_registry as reg  # noqa: E402
-from discovery_fabric.engine import model_routing as mr  # noqa: E402
+from discovery_fabric.engine import model_routing as mr
+from discovery_fabric.engine import runtime_admission as ra  # noqa: E402
 from discovery_fabric.engine import provider_health as ph  # noqa: E402
 from toscanini import run_state as rs  # noqa: E402
 from toscanini import user_state as us  # noqa: E402
@@ -63,11 +64,22 @@ from toscanini import user_state as us  # noqa: E402
 @pytest.fixture()
 def hermetic(monkeypatch, tmp_path):
     """Redirect the routing ledger / state / probe cache to tmp and make
-    catalog discovery UNDISCOVERED (no network, pinned defaults)."""
+    catalog discovery UNDISCOVERED (no network, pinned defaults).
+
+    R451: this battery exercises the ROUTING MECHANICS (ladders, GONE,
+    cooldowns, typed routes) against paid providers — the cost policy
+    is therefore UNRESTRICTED here (the ZERO_PAID_COST policy's own
+    fail-closed contract is covered by tests/test_r451_zero_paid.py;
+    without this pin the default policy would rightly refuse every paid
+    rung and the ladder mechanics could never be exercised)."""
+    monkeypatch.setenv("ENGINE_MODEL_COST_POLICY", "UNRESTRICTED")
     tmp = Path(tmp_path)
     monkeypatch.setattr(mr, "LEDGER", mr.RoutingLedger(
         path=tmp / "ledger.jsonl"))
     monkeypatch.setattr(mr, "STATE_PATH", tmp / "state.json")
+    # R451-C1.3: the capability store is production admission
+    # state — tests redirect it (Art. IX)
+    ra.set_state_path(tmp / "capability_state.json")
     monkeypatch.setattr(mr, "CATALOG_DIR", tmp / "catalog")
     # keep the REAL catalog discoverer reachable for its own unit tests
     monkeypatch.setattr(mr, "_real_discover_catalog", mr.discover_catalog,

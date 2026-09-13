@@ -166,6 +166,13 @@ def llm_generate(prompt: str, system: str = "", timeout: int = 240,
         "prompt_hash": res.prompt_hash, "output_hash": res.output_hash,
         "error": res.error,
         "engine_llm_provider_pin": pin_status,
+        # R451-C1.3/C1.4: the run provenance + the task-degradation
+        # record travel into the scientific meta — a candidate states
+        # WHICH capability class actually produced it (STRONG vs
+        # CHEAP_EMERGENCY_FALLBACK), never silently relabeled
+        "call_provenance": res.call_provenance,
+        "task_degradation": res.task_degradation,
+        "cost_provenance": res.cost_provenance,
         "excluded_providers": list(exclude_providers or []),
         "fallback_to_excluded": bool(
             exclude_providers and not remaining) if exclude_providers
@@ -527,6 +534,14 @@ def assemble_candidate(operator: Dict[str, Any],
         "llm_model": llm_meta.get("model"),
         "prompt_hash": llm_meta.get("prompt_hash"),
         "output_hash": llm_meta.get("output_hash"),
+        # R451-C1.3/C1.4: the candidate's derivation trace carries the
+        # run provenance and the task-degradation record — the FINAL
+        # SCIENTIFIC RECORD states which capability class produced the
+        # candidate (a CHEAP_EMERGENCY_FALLBACK candidate is never
+        # read as STRONG reasoning; the directive's explicit rule)
+        "call_provenance": llm_meta.get("call_provenance"),
+        "task_degradation": llm_meta.get("task_degradation"),
+        "cost_provenance": llm_meta.get("cost_provenance"),
         "source_item_id": structured_item.get("item_id"),
         "derived_at": utc_now(),
     }

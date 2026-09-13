@@ -1,0 +1,82 @@
+{
+ "artifact_type": "R451_ACCEPTANCE_RUN",
+ "round": "R451-C1.1",
+ "accepted": true,
+ "acceptance_chain": {
+  "fresh_problem": true,
+  "model_response": true,
+  "evidence": true,
+  "mechanism": true,
+  "candidate": true,
+  "attack": true
+ },
+ "rule": "accepted ONLY when the engine's own records show: fresh problem built, >=1 selected localqwen model response, evidence records frozen, a mechanism + candidate from SYNTHESIZE, and the ATTACK stage actually adjudicating — with ZERO paid-provider calls in the routing ledger",
+ "paid_providers_disabled": [
+  "ANTHROPIC_API_KEY",
+  "OPENAI_API_KEY",
+  "OPENROUTER_API_KEY",
+  "NVIDIA_API_KEY",
+  "DEEPSEEK_API_KEY",
+  "MISTRAL_API_KEY",
+  "GEMINI_API_KEY",
+  "QWEN_API_KEY",
+  "TOKEN_ROUTER_API_KEY",
+  "ZAI_API_KEY"
+ ],
+ "cost_policy": "ZERO_PAID_COST",
+ "details": {
+  "problem_id": "r451-ev-bus-battery-thermal",
+  "routing_ledger": {
+   "localqwen_calls": 82,
+   "paid_provider_calls": 0,
+   "paid_calls_must_be_zero": true,
+   "example_selected_call": {
+    "attempt": 1,
+    "cost_class": "ZERO_PAID_COST_SELF_HOSTED",
+    "error": "",
+    "estimated_cost": null,
+    "failure_class": null,
+    "fallback_from": null,
+    "fallback_reason": "",
+    "fallback_to": null,
+    "latency": 31352,
+    "latency_ms": 31352,
+    "model": "qwen3-1.7b",
+    "ok": true,
+    "provider": "localqwen",
+    "recorded_at": "2026-09-13T00:27:40Z",
+    "recorded_at_epoch": 1789259260.352811,
+    "request_id": "req_d98b09cfdac5",
+    "run_id": null,
+    "selected": true,
+    "stage": "directional",
+    "status": "OK",
+    "task": "STRONG",
+    "tokens": null
+   }
+  },
+  "evidence_files": [
+   {
+    "file": "envelope_FREEZE.json",
+    "n_records": 31
+   },
+   {
+    "file": "envelope_RETRIEVE.json",
+    "n_records": 31
+   }
+  ],
+  "mechanism_source": "envelope_SYNTHESIZE.json",
+  "mechanism": "preconditioning algorithm to minimize the time an EV is connected to the charging station",
+  "candidate_source": "envelope_SYNTHESIZE.json",
+  "candidate_id": "cand:A2:r451-ev-bus-battery-thermal:b0eb58e9b7ae9199",
+  "candidate_provider": "localqwen",
+  "candidate_model": "qwen3-1.7b",
+  "candidate_transport_status": "OK",
+  "attack_source": "stage_ATTACK.json",
+  "attack_overall": "KILLED",
+  "attack_adjudicated": true,
+  "final_state": "INVENTION_UNDER_DEVELOPMENT",
+  "assessed_at": "2026-09-13T00:27:53+00:00"
+ },
+ "run_dir": "/home/z/my-project/repos/discovery-evidence-fabric/R451/ACCEPTANCE_RUN_P2"
+}

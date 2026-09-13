@@ -1,0 +1,118 @@
+{
+ "artifact_type": "R452_PREFLIGHT",
+ "phase": "R452 Phase 0 — close the R451 integrity defects",
+ "recorded_at": "2026-09-13T11:52:23+00:00",
+ "authoritative_state": {
+  "durable_branch": {
+   "fetched": true,
+   "run_dir": "toscanini_ui_ui_40_000_vial_batches_protein_injectable_she_291053",
+   "ledger_lines": 43
+  },
+  "committed_captures": {
+   "state_present": true,
+   "ledger_lines": 31,
+   "phase_ledger_stages": 16
+  }
+ },
+ "adjudication_determination": {
+  "adjudication_occurred": true,
+  "stage_status_ok": true,
+  "verdict": "CONTESTED",
+  "result_envelope_verdict": "CONTESTED",
+  "council_checks": 6,
+  "evidence_verified": false,
+  "evidence_class": "UNSUPPORTED",
+  "evidence_verification_issues": [
+   "missing_source_span",
+   "mechanism_span_not_verbatim"
+  ]
+ },
+ "rebuilt_attack_adjudication_record": {
+  "run_id": "engrun:ui_40_000_vial_batches_protein_injectable_she_291053:2026-09-13T09:17:33",
+  "session_id": "ts_6a4e518676db",
+  "attack_stage": {
+   "executed": true,
+   "stage_status": "OK"
+  },
+  "adversarial_attack": {
+   "status": "NOT_RUN",
+   "not_run_reason": "EVIDENCE_GATE_FAILED",
+   "transport_status": "NEVER_CALLED",
+   "attacks_recorded": 0,
+   "killed_count": 0,
+   "overall": "NOT_RUN"
+  },
+  "adjudication": {
+   "adjudication_occurred": true,
+   "stage_status_ok": true,
+   "verdict": "CONTESTED",
+   "result_envelope_verdict": "CONTESTED",
+   "council_checks": 6,
+   "evidence_verified": false,
+   "evidence_class": "UNSUPPORTED",
+   "evidence_verification_issues": [
+    "missing_source_span",
+    "mechanism_span_not_verbatim"
+   ]
+  },
+  "adversarial_overall_sources_agree": true,
+  "adversarial_overall_result": "NOT_RUN"
+ },
+ "defects_detected": [
+  {
+   "defect": "ROUND_RECORD_ATTACK_PROSE_CONTRADICTS_STATE",
+   "round_record_claim": "the ATTACK stage EXECUTED (envelope persisted)",
+   "canonical_state": {
+    "adversarial_status": "NOT_RUN",
+    "adversarial_not_run_reason": "EVIDENCE_GATE_FAILED",
+    "transport_status": "NEVER_CALLED",
+    "attacks_recorded": 0
+   },
+   "detail": "the round record's prose conflates ATTACK stage execution with adversarial attack execution; the canonical envelopes say the adversarial attack was NEVER CALLED (EVIDENCE_GATE_FAILED) — the derived record must carry the machine-checkable statement"
+  },
+  {
+   "defect": "RUN_IDS_FOUND_EMPTY_EXTRACTION_DEFECT",
+   "observed": [],
+   "authoritative": "engrun:ui_40_000_vial_batches_protein_injectable_she_291053:2026-09-13T09:17:33",
+   "detail": "the C1.3 extractor guessed run ids from sessions.json run_dir names instead of reading them from the ledger lines (the transport authority)"
+  }
+ ],
+ "fix_events": [
+  {
+   "fix": "RUN_IDENTITY_EXTRACTED_FROM_LEDGER",
+   "field": "durable_provenance.run_ids_found",
+   "before": [],
+   "after": [
+    "engrun:ui_40_000_vial_batches_protein_injectable_she_291053:2026-09-13T09:17:33"
+   ],
+   "authority": "the durable ledger's RUN_OWNED lines"
+  },
+  {
+   "fix": "DERIVED_ATTACK_ADJUDICATION_RECORD_REBUILT",
+   "field": "chain.derived_attack_adjudication_record",
+   "before": {
+    "attack_present": true,
+    "attack_overall": "NOT_RUN"
+   },
+   "after": {
+    "attack_stage_executed": true,
+    "adversarial_status": "NOT_RUN",
+    "adversarial_not_run_reason": "EVIDENCE_GATE_FAILED",
+    "adjudication_occurred": true,
+    "adjudication_verdict": "CONTESTED"
+   },
+   "authority": "envelope_ATTACK.json + envelope_ADJUDICATION.json + the phase ledger + the result envelope"
+  }
+ ],
+ "identity_assertions": {
+  "run_owned_lines_positive": true,
+  "no_foreign_run_ids": true,
+  "run_ids_found_equals_authoritative": true,
+  "every_run_owned_non_null_run_id": true,
+  "captured_session_matches_production": true,
+  "production_record_run_ids_repaired": true,
+  "production_record_adjudication_repaired": true
+ },
+ "status": "PASS",
+ "stop_rule": "the scientific phase proceeds only when both identity defects are resolved AND regression-tested (tests/test_r452_preflight.py, incl. the run-ID laundering adversarial case)"
+}

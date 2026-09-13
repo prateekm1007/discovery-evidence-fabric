@@ -12,9 +12,12 @@ The fix under test, two halves:
 
   * engine (a2/classify.py): the span-format verification issues
     (missing_source_span / mechanism_span_not_verbatim / ...) are MODEL
-    CAPABILITY failures — final_status UNKNOWN + failure_class
-    INFRASTRUCTURE_CAPABILITY, rerunnable, never the invention's
-    kill_reason (Art. LXI);
+    CAPABILITY failures — the TYPED status INCOMPLETE_INFERENCE_FAILURE
+    + failure_class INFRASTRUCTURE_CAPABILITY (the merged-union
+    vocabulary: the branch implementation's UNKNOWN terminal is
+    subsumed by canonical main's typed capability status, consumed by
+    run.py), promotion AND adjudication blocked, rerunnable, never the
+    invention's kill_reason (Art. LXI);
   * projection (run_state/user_state): the lineage's challenge verdict
     is authoritative over final_status — a killed or unverified lineage
     is never "found something"; a GENUINE adversarial kill surfaces as
@@ -95,9 +98,14 @@ class TestCapabilitySeparation:
               "issues": ["missing_source_span",
                          "mechanism_span_not_verbatim"]}
         out = a2_classify.classify({}, ev, {}, {"overall": "PASS"})
-        assert out["final_status"] == "UNKNOWN"
+        # merged-union vocabulary: the typed capability status (canonical
+        # main) carries the UNKNOWN terminal's semantics — never REJECTED,
+        # never promoted, never adjudicated, rerunnable
+        assert out["final_status"] == "INCOMPLETE_INFERENCE_FAILURE"
         assert out["failure_class"] == "INFRASTRUCTURE_CAPABILITY"
         assert out["promotion_blocked"] is True
+        assert out["adjudication_blocked"] is True
+        assert out["verification_state"] == "EVALUATED_FAILED_CAPABILITY"
         assert "rerunnable" in out["reason"]
 
     def test_mixed_issue_with_non_capability_still_rejects(self):

@@ -197,11 +197,16 @@ def _llm_generate(prompt: str, system: str, schema: List[str],
                   ) -> Dict[str, Any]:
     """One LLM call through the engine's registry (the R415 routing
     ladder: provider cascade, every hop recorded). Returns
-    {status, fields, provider, model, error}. Never raises."""
+    {status, fields, provider, model, error}. Never raises.
+
+    R451-C1.3-3: the run identity comes from the BOUND CALL CONTEXT
+    (EngineRun binds it for the whole run) — the pre-C1.3 defect passed
+    run_id=purpose, polluting the ledger with purpose strings
+    masquerading as run ids. The purpose remains the STAGE label."""
     from . import llm_registry as reg
     res = reg.generate(prompt=prompt, system=system, schema=schema,
                        timeout=240, max_tokens=max_tokens,
-                       role="synthesis", run_id=purpose)
+                       role="synthesis")
     out: Dict[str, Any] = {
         "status": res.status,
         "provider": res.provider_id,
@@ -532,6 +537,69 @@ PREDICTED_EFFECT: <what specifically improves and by roughly how much>
 FRONTIER_CAPABILITY: <the transferred capability and its source domain>
 """
 
+#: R450 — the directional EXECUTION block appended to the generation
+#: prompt when a GROUND-GATED DirectionalHypothesis drives the
+#: mutation: the mutation EXECUTES the direction (never a free
+#: re-roll) and the output records what it served.
+DIRECTIONAL_EXECUTION_BLOCK = """
+DIRECTIONAL IMPROVEMENT HYPOTHESIS (ground-gated; you are EXECUTING this
+direction, not free-rolling a new architecture):
+- TARGET_VARIABLE: {target_variable}
+- CURRENT -> PROPOSED: {current_value} -> {proposed_value}
+- DIRECTION: {direction}
+- MECHANISM AFFECTED: {mechanism_affected}
+- CAUSAL RATIONALE: {causal_rationale}
+- PREDICTED EFFECT: {predicted_effect}
+- PREDICTED MAGNITUDE: {predicted_magnitude}
+- FALSIFIER: {falsifier}
+- INTERVENTION TYPE: {intervention_type}
+
+The new architecture MUST enact this direction on the target variable,
+and its CAUSAL_CHANGE must state how the enacted direction addresses
+the diagnosed failure mechanism. If the direction is EVIDENCE_UPDATE,
+the architecture's change is the acquisition/restructuring of the
+evidence basis, stated explicitly.
+"""
+
+#: R450 — the UNGUIDED control arm's prompt (the benchmark's B):
+#: NEITHER the typed diagnosis NOR a directional hypothesis is
+#: provided — a generic improvement mutation. Same output schema, same
+#: gauntlet afterwards.
+UNGUIDED_MUTATION_PROMPT = """Improve the invention: generation {gen}.
+
+PARENT INVENTION (generation {parent_gen}):
+- Mechanism: {parent_mechanism}
+- Intervention: {parent_intervention}
+- Expected effect: {parent_expected_effect}
+
+Propose an improved architecture.
+
+FRESH EVIDENCE CONTEXT:
+{evidence_context}
+
+Respond with the same field lines as an evolution step:
+CURRENT: <the parent's operating regime today>
+EVOLUTION_2055: <a plausible long-term direction>
+REQUIRED_CAPABILITY: <a capability that would help>
+CAPABILITY_BACKCAST: <milestones>
+TODAYS_FRONTIER: <an adjacent advancing capability>
+TRANSFER: <how it could cross into this problem>
+MECHANISM: <the new causal mechanism>
+INTERVENTION: <the new specific engineering intervention>
+EXPECTED_EFFECT: <the new measurable expected effect>
+FALSIFICATION_TEST: <the cheapest concrete test that could kill it>
+CAUSAL_CHANGE: <the ONE causal change vs the parent>
+NEW_CAPABILITY: <the capability the parent lacked>
+NEW_INTERACTION: <the new physical/chemical/computational interaction>
+NEW_OPERATING_REGIME: <the operating regime this architecture opens>
+PREDICTED_EFFECT: <what specifically improves and by roughly how much>
+FRONTIER_CAPABILITY: <the transferred capability and its source domain>
+"""
+
+UNGUIDED_MUTATION_SYSTEM = ("You improve engineering architectures. "
+                            "English only. Follow the field-line "
+                            "format exactly.")
+
 
 def _evidence_context_block(evidence: List[Dict[str, Any]],
                              max_items: int = 8) -> str:
@@ -603,12 +671,24 @@ def generate_evolved_architecture(problem: Dict[str, Any],
                                   parent_record: Dict[str, Any],
                                   diagnosis: Dict[str, Any],
                                   evidence: List[Dict[str, Any]],
-                                  gen: int) -> Optional[Dict[str, Any]]:
+                                  gen: int,
+                                  directional_hypothesis: Optional[Dict[str, Any]] = None,
+                                  mode: str = "LEGACY"
+                                  ) -> Optional[Dict[str, Any]]:
     """Phase D + E + F: the causal evolution. The prompt forces the
     30-year engine walk and the frontier-to-laggard transfer, and the
     output carries the full causal delta. Stamped provenance
     AI_PROPOSED, maturity GENERATED — verification is the gauntlet's
-    job, not the generator's."""
+    job, not the generator's.
+
+    R450: two new modes ride the SAME generator (no second engine):
+      DIRECTIONAL — a GROUND-GATED DirectionalHypothesis is injected;
+                    the mutation must EXECUTE the direction (target
+                    variable, direction, predicted effect) and the
+                    output records the direction it served.
+      UNGUIDED    — the benchmark's control arm: the prompt carries
+                    NEITHER the diagnosis NOR a hypothesis (a generic
+                    "improve this candidate" mutation)."""
     schema = ["MECHANISM", "INTERVENTION", "EXPECTED_EFFECT",
               "FALSIFICATION_TEST", "CAUSAL_CHANGE", "NEW_CAPABILITY",
               "NEW_INTERACTION", "NEW_OPERATING_REGIME",
@@ -620,20 +700,62 @@ def generate_evolved_architecture(problem: Dict[str, Any],
     failure = (parent_record.get("failure_or_challenge")
                or ch.get("kill_reason")
                or "the parent architecture lost its challenge gauntlet")
-    prompt = EVOLUTION_GENERATION_PROMPT.format(
-        gen=gen,
-        parent_gen=parent_record.get("gen", gen - 1),
-        parent_mechanism=arch.get("mechanism", ""),
-        parent_intervention=arch.get("intervention", ""),
-        parent_expected_effect=arch.get("expected_effect", ""),
-        failure_or_challenge=str(failure)[:800],
-        diagnosed_cause=(f"{diagnosis.get('cause')} — basis: "
-                         f"{'; '.join(diagnosis.get('basis', [])[:2])}"
-                         )[:600],
-        evidence_context=_evidence_context_block(evidence),
-    )
-    call = _llm_generate(prompt, EVOLUTION_GENERATION_SYSTEM, schema,
-                         purpose=f"evolution:gen-{gen}")
+    if mode == "UNGUIDED":
+        prompt = UNGUIDED_MUTATION_PROMPT.format(
+            gen=gen,
+            parent_gen=parent_record.get("gen", gen - 1),
+            parent_mechanism=arch.get("mechanism", ""),
+            parent_intervention=arch.get("intervention", ""),
+            parent_expected_effect=arch.get("expected_effect", ""),
+            evidence_context=_evidence_context_block(evidence))
+    elif directional_hypothesis is not None:
+        prompt = EVOLUTION_GENERATION_PROMPT.format(
+            gen=gen,
+            parent_gen=parent_record.get("gen", gen - 1),
+            parent_mechanism=arch.get("mechanism", ""),
+            parent_intervention=arch.get("intervention", ""),
+            parent_expected_effect=arch.get("expected_effect", ""),
+            failure_or_challenge=str(failure)[:800],
+            diagnosed_cause=(f"{diagnosis.get('cause')} — basis: "
+                             f"{'; '.join(diagnosis.get('basis', [])[:2])}"
+                             )[:600],
+            evidence_context=_evidence_context_block(evidence),
+        ) + DIRECTIONAL_EXECUTION_BLOCK.format(
+            target_variable=directional_hypothesis.get("target_variable", ""),
+            current_value=directional_hypothesis.get("current_value", ""),
+            proposed_value=directional_hypothesis.get("proposed_value", ""),
+            direction=directional_hypothesis.get("direction", ""),
+            mechanism_affected=directional_hypothesis.get(
+                "mechanism_affected", ""),
+            causal_rationale=directional_hypothesis.get(
+                "causal_rationale", ""),
+            predicted_effect=directional_hypothesis.get(
+                "predicted_effect", ""),
+            predicted_magnitude=directional_hypothesis.get(
+                "predicted_magnitude_or_range", ""),
+            falsifier=directional_hypothesis.get("falsifier", ""),
+            intervention_type=directional_hypothesis.get(
+                "intervention_type", ""))
+    else:
+        prompt = EVOLUTION_GENERATION_PROMPT.format(
+            gen=gen,
+            parent_gen=parent_record.get("gen", gen - 1),
+            parent_mechanism=arch.get("mechanism", ""),
+            parent_intervention=arch.get("intervention", ""),
+            parent_expected_effect=arch.get("expected_effect", ""),
+            failure_or_challenge=str(failure)[:800],
+            diagnosed_cause=(f"{diagnosis.get('cause')} — basis: "
+                             f"{'; '.join(diagnosis.get('basis', [])[:2])}"
+                             )[:600],
+            evidence_context=_evidence_context_block(evidence),
+        )
+    system = EVOLUTION_GENERATION_SYSTEM
+    if mode == "UNGUIDED":
+        system = UNGUIDED_MUTATION_SYSTEM
+    call = _llm_generate(prompt, system, schema,
+                         purpose=f"evolution:gen-{gen}"
+                         if mode != "UNGUIDED"
+                         else f"unguided-mutation:gen-{gen}")
     fields = call.get("fields") or {}
     if call.get("status") != "OK" or not fields.get("intervention"):
         return None

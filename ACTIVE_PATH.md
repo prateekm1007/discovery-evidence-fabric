@@ -303,6 +303,140 @@ forged-token bypass attempts, CHIPS-vs-Lax cookie shapes by context, the
 SSE owner parameter (granted/denied/wrong-owner), and the route-wiring
 contract pins.
 
+<!-- MERGE UNION (PRs #4 -> #5 delivery): the two parallel rounds (canonical main R449-C1..R452-C1 and the visual-benchmark branch R451-C2..R452-C2) are both recorded below; each addendum carries its own date and directive -->
+
+## R449 addendum (2026-09-12) — the Evidence Fabric: federated evidence into the engine
+
+Operator directive R449: connect HF-hosted datasets to the invention engine
+(federated, no bulk warehouse, no second knowledge graph, no replacement of
+the existing retrieval fabric).
+
+| Component | Module | Notes |
+|---|---|---|
+| Canonical EvidenceRecord | `discovery_fabric/evidence_fabric/evidence_record.py` | ONE representation for every source (evidence_id, source_identity, exact_span{dataset/config/split/row_idx/field/verbatim text/sha256/document_ref/retrieval_query}, proposition, measurements (same-row columns), provenance, admissibility). The LLM interprets the span; it can never redefine it (Art. II/III) |
+| Endpoint-aware custody | `evidence_record.py::verify_span_custody` | MEASURED LIVE: /search row_idx is NOT a stable address (the datasets-server search index numbers rows differently from /rows storage; load-balanced nodes disagree) while /filter row_idx IS aligned — filter records verify by pinned-row re-fetch, search records by RETRIEVAL REPLAY (same query re-issued, document_ref located, span bytes compared); tampered hash -> FAIL, wrong doc -> UNKNOWN |
+| Source registry (frozen) | `R449/EVIDENCE_SOURCE_REGISTRY.json` + `registry.py` | the 10-seat production subset with license texts read + hashed: WOPTO (cc-by-4.0), OpenFOAM-Agent (mit), ColabFit-MP (cc-by-4.0), LeMat-Rho (cc-by-4.0), QM9 (apache-2.0, gap in HARTREE — unit discovery recorded), ChemRAG (mit); FAIL-CLOSED promotion (uspto + s2orc: license=None -> PENDING_LICENSE_VERIFICATION, never production evidence) |
+| Federated connector | `evidence_fabric/connectors.py` | remote datasets-server /search //filter //rows; NOTHING bulk-downloaded; INDEX_LOADING + every failure class -> UNKNOWN (never absence, Art. XXI.3); the slash stays UNencoded in repo URLs (huggingface.co rejects encoded repo names — measured) |
+| RETRIEVE integration | `engine/adapters.py::A2RetrievalAdapter` | the evidence fabric is an ADDITIVE channel inside the engine's RETRIEVE (ENGINE_EVIDENCE_FABRIC=0 disables); EVIDENCE_FABRIC_REPORT.json persisted per run; relevance adjudicated per record (Art. XXI.4) with TEXT term-overlap and STRUCTURED element-overlap modes |
+| Source substitution | `evidence_fabric/substitution.py` | declared per-family ladders + coverage limitations; provenance preserved by construction; the forbidden LLM ladder has no functional representation (test-enforced) |
+| Contradiction search | `evidence_fabric/contradiction.py` | contradiction-seeking queries against the same federated sources; ABSENCE != CONTRADICTION (NO_CONTRADICTING_EVIDENCE_FOUND is an index-scoped absence claim, never confirmation) |
+| Novelty defense | `evidence_fabric/novelty.py` | KNOWN_MECHANISM / CAUSAL_COMBINATION (adjacency = LOW credit) / MEANINGFUL_NEW_INTERACTION / NEW_OPERATING_REGIME (+ R450's NOVEL_BEHAVIOR) |
+| Two-arm evidence-power experiment | `R449/FRESH_EVIDENCE_POWERED_DISCOVERY.json` + `EVIDENCE_RETRIEVAL_RUN.json` | genuinely fresh seawater-corrosion problem, same engine/transport/gauntlet: Arm A (V2 fabric only) 13 items vs Arm B (+ evidence fabric) 25 items, 12 fabric-sourced; HONEST VERDICT: mechanism_search_changed=true BUT evidence_fabric_sourced_mechanisms_present=false (the fabric's records entered the pool and did not win the synthesis rotation — recorded as the honest negative component) |
+
+## R450 addendum (2026-09-12) — the Directional Improvement Engine
+
+Operator directive R450: a failed candidate produces a grounded, testable
+direction of improvement; the loop executes a controlled intervention,
+evaluates, and updates the causal model. Coder 1 owns the truth-generating
+loop; the engine's evolution pipeline IS that loop (no second engine).
+
+| Component | Module | Notes |
+|---|---|---|
+| DirectionalHypothesis (canonical primitive) | `discovery_fabric/directional/hypothesis.py` | machine-evaluable + provenance-bearing: failure_id -> causal_diagnosis_id -> target_variable/current->proposed/direction -> mechanism_affected -> causal_rationale -> predicted_effect(+magnitude) -> competing_explanations -> evidence_support/gaps -> falsifier -> measurement_required -> intervention_type -> confidence -> status; closed vocabularies (9 directions, 8 intervention classes, 7 statuses) |
+| THE GROUND GATE | `hypothesis.py::ground_gate` | five mechanical checks (G1 structure+vocabularies, G2 diagnosis resolves, G3 mechanism term-grounding, G4 measurable falsifier — units/quantities/comparative-experiment forms, G5 evidence honest); UNGROUNDED -> REJECTED and the mutation NEVER executes ("increase fin size" with no causal chain is refused; brute-force mutation is not mistaken for intelligence) |
+| The loop | `directional/loop.py` + `engine/run.py::_evolution_generate_next` | DIAGNOSIS -> gated hypothesis -> CONTROLLED MUTATION (the generation prompt EXECUTES the direction) -> EVALUATION (the same gauntlet) -> OBSERVATION -> CAUSAL UPDATE -> NEXT DIRECTION; stop reasons DIRECTION_REJECTED_BY_GROUND_GATE / DIRECTIONAL_PROPOSAL_TRANSPORT distinct from transport failures (Art. LXI) |
+| Observation + signals | `directional/observation.py` | epistemic states (SUPPORTED/UNSUPPORTED/UNKNOWN/ABSTAIN/REQUIRES_EXPERIMENT) NEVER softened by the improvement-signal layer (objective_delta, constraint_delta, distance_to_target, information_gain, sensitivity); sensitivity ONLY from real recorded evaluation pairs (no fabricated gradients) |
+| Causal update | `observation.py::causal_update` | prediction-vs-observation: MATCH -> SUPPORTED, MISMATCH -> FALSIFIED (negative knowledge), undecided -> EXECUTED/UNKNOWN (never silently support) |
+| Trajectory persistence | `directional/trajectory.py` | IMPROVEMENT_TRAJECTORY.json (append-only V1->F1->D1->M1->R1->C1->V2 chain); raw counters only — NO composite score |
+| Unguided control | `engine/evolution.py::UNGUIDED_MUTATION_PROMPT` | the benchmark's honest Arm B: generic improvement mutation with NEITHER the diagnosis NOR a hypothesis (same gauntlet, same budget) |
+| Evidence -> direction (reverse path) | `directional/loop.py::serve_evidence_gaps` | DIRECTION -> declared gaps -> deterministic gap queries -> R449 fabric retrieval -> newly acquired support recorded ON the hypothesis (evidence_changed_direction) |
+| Attacker v2.1 | `engine/independent_attack.py` | INTERVENTION suggestions with the SAME grounding discipline: GROUNDED_INTERVENTION = directional-loop SEED (still gate-bound); UNGROUND_SUGGESTION never enters the hypothesis space; calibration state inherited NOT_CALIBRATED (negative knowledge preserved; discipline NOT weakened) |
+| Obvious-combination protection | `evidence_fabric/novelty.py` | NOVEL_BEHAVIOR: known A + known B -> evidenced interaction -> mechanism prediction -> RECORDED reproduction by evaluation (novelty-by-description never upgrades without the reproduction) |
+| The benchmark | `scripts/r450_directional_benchmark.py` + `R450/DIRECTIONAL_BENCHMARK.json` | 2 fresh problems x 2 arms, raw metrics only. P0: both arms survived, ONLY the directional arm produced supported causal knowledge (1 falsifiable hypothesis + measurement contract). P1: the directional arm REFUSED its ungrounded proposal (vague falsifier) at ZERO evaluation cost; the unguided arm blind-rolled a survivor with no causal knowledge. Honest limitation: N=2 x 1 iteration — a first live demonstration, not a powered comparison |
+
+The engine stage order is UNCHANGED; the directional layer lives inside the
+evolution step (between the diagnosis and the generation) and after the
+gauntlet (the observation/causal-update recording). No second invention
+graph, no second canonical database, no new solver, no new provider.
+
+## R451 addendum (2026-09-13) — the zero-paid local route + the transport capability layer
+
+Operator directives R451-C1.1 (free-model closed-loop discovery) and
+R451-C1.2 (transport capability and resilience): the engine survives the
+HF account's credit exhaustion (402 on every router model) on a LOCAL
+self-hosted route, and every future route is admitted by MEASUREMENT,
+never by catalog presence.
+
+| Component | Module | Notes |
+|---|---|---|
+| THE cost policy | `engine/model_cost_policy.py` | `MODEL_COST_POLICY=ZERO_PAID_COST` (the default since R451): only `ZERO_PAID_COST_SELF_HOSTED` bases are eligible; paid/env-grant/free-tier/undeclared are REFUSED fail-closed with recorded refusals; a preferred chain naming only paid providers EXTENDS to eligible rungs (recorded) instead of dead-ending POLICY_BLOCKED |
+| The zero-paid provider | `engine/llm_registry.py` (`localqwen`) | Qwen/Qwen3-1.7B Q4_K_M (GGUF sha pinned, apache-2.0) on llama.cpp llama-server — an ORDINARY registry provider (same ProviderSpec shape, same rungs, no bespoke conductor branch); LOCAL_PROVIDER_READY six-rung proof chain (binary→model→server→HTTP→tiny completion→Toscanini structured output) |
+| THE capability layer | `engine/transport_capability.py` | the R451-C1.2 contract: MODEL vs PROVIDER vs ACCOUNT (account_domain on every spec/rung/ledger line/provenance); FREE-CATALOG vs FREE-TO-OUR-ACCOUNT (catalog claims are class-labeled, never admission evidence); probe-before-admit; economic redundancy counted across ACCOUNT domains only (the 7 HF-router probe rows = 5+ providers on ONE account); the honest ZeroGPU separate-budget note (NOT_ACCESSIBLE_FROM_THIS_CODING_ENVIRONMENT) |
+| MODEL_NOT_FOUND | `engine/provider_health.py` | a distinct failure class (404 + provider error bodies — the R450 glm-4-plus defect was INVALID_RESPONSE); marks the rung known-dead (never-retry), provider stays eligible; _CREDIT_HINTS classify 200-body credit wording |
+| Transport observability | `model_routing.py` + `llm_registry.py` | every actual attempt (success OR failure) persists provider/model/attempt/status/failure_class/latency/cost_class/selected/fallback_reason; the in-result route reconstructs the exact path including the selected hop |
+
+Measured this round (Art. XV): the acceptance chain CLOSED on a fresh
+problem with every paid provider disabled (82 local / 0 paid calls →
+evidence → mechanism → candidate → attack ADJUDICATED — an honestly
+negative KILLED verdict); the CAD bridge closed through the
+DETERMINISTIC ENGINE_TEMPLATE path (fresh geometric problem → warrants
+WARRANTED → CadQuery/OCCT MODEL_BUILT_AND_VALIDATED → STEP/GLB hashed
+derivatives → visual stage INVOKED with the typed low-memory skip, hero
+suppressed, release blocked — Art. LXXII fail-closed held); the honest
+model-quality numbers are recorded, never repaired (50% span-verbatim
+synthesis; 13 validator-feedback attempts to a compliant technical
+state — the gates byte-identical throughout, Art. VII). Round record:
+R451/R451_C1_ROUND_RECORD.json.
+
+## R451-C1.3 addendum (2026-09-13) — the production transport authority + provenance closure
+
+Operator directive R451-C1.3: the runtime admission authority and
+run-level routing provenance, delivered and DEPLOYED to production.
+
+| Component | Module | Notes |
+|---|---|---|
+| THE runtime admission authority | `engine/runtime_admission.py` | the five closed states (NOT_PROBED / PROBE_OK / PROBE_FAILED / PROBE_EXPIRED / POLICY_REFUSED); a route is runtime-admissible ONLY with a current measured successful capability probe through the rung's REAL transport (the existing TTL mechanism — no per-call probing); successful real calls refresh the window; real-call transport failures invalidate it; the LOCAL route uses the SAME rule (test-enforced); transient probe failures get one bounded retry, permanent classes never |
+| Run-level routing provenance | `engine/call_context.py` + `run.py` + `model_routing.record_call_outcome/ledger_for_run` | `run_owned_call => run_id != null` FAILS CLOSED in the ledger; the 13 directive fields + capability_state + task_degradation on every line; provider probes are call_class=CAPABILITY_PROBE with run_id=null (legitimately not run-owned); ROUTING_LEDGER_RUN.json isolates one run BY RUN ID (no time-window/ledger-tail inference); the worker passes session_id; the durable push carries the ledger + capability store off the ephemeral container |
+| Explicit task degradation | `llm_registry.generate()` + `mechanism_space.assemble_candidate` | requested_task / actual_task_capability / task_capability_match / degraded_reason on every selected line and in the candidate's derivation trace — a CHEAP_EMERGENCY_FALLBACK candidate is never read as STRONG reasoning |
+| Catalog-discovered semantics | `model_routing._catalog_records` | DISCOVERED -> only catalog-present models are candidates (pinned-but-absent defaults are stale identifiers, never attempted); UNDISCOVERED -> PINNED_DEFAULT explicitly marked; the family allowlist stays |
+| MODEL_NOT_FOUND recovery | `model_routing.clear_known_dead_if_relisted` | a FRESH catalog relisting clears the known-dead mark and invalidates the stale capability record (deterministic, append-only recovery events; a TTL cache hit does not clear) |
+| THE unified admission semantic | `llm_registry.select_provider()` + `generate()` | one runtime_admission() (available AND cost_policy_eligible AND measured_capability_eligible); no legacy weaker selector |
+| The Space's OWN zero-paid route | `scripts/r447_hf_deploy.py` hunks + `toscanini/container-entrypoint.sh` | llama.cpp llama-server built from the pinned tag b10930 + the sha-pinned Qwen3-1.7B Q4_K_M GGUF (fail-closed acquisition — the sha256 gate rejected a malformed 63-char transcription during the third deploy build: THE PIN WORKED); env-gated LOCAL_QWEN_ENABLE=1; the entrypoint starts the server before the engine serves |
+
+Measured this round (Art. XV): the zero-paid acceptance rerun closed
+with ALL 14 gates on the run-level provenance invariants (a genuinely
+fresh third-domain problem, 14 run-owned localqwen calls / 0 paid / 0
+null-run_id lines, one live MODEL_FAILURE -> probe recovery measured in
+the window, the task degradation explicit); the ZeroGPU experiment
+closed at its honest structural terminal (HTTP 400 "ZeroGPU Spaces
+only work with Gradio SDK" — the resource class cannot attach to the
+Docker production Space; the two operator unblock paths recorded, not
+taken); the production deployment at the pushed commit e50d56c0 with
+the Article LXXI tuple VERIFIED (BUILD == RUNNING == HEALTH ==
+ls-remote; drift GREEN; identity_tamper false) after three measured
+build failures each root-caused and fixed; the fresh production run
+(a genuinely fresh fourth-domain lyophilization problem) completed ON
+PRODUCTION through the real user path: 22 evidence records -> mechanism
+-> gen-1 candidate -> ATTACK/ADJUDICATION (CONTESTED) -> the package
+honestly BLOCKED at the DOMAIN_INTEGRITY quality gate -> HELD_FOR_HUMAN
+REVIEW, with 31 run-owned ledger lines (all 13 fields, run_id non-null,
+0 paid) + 8 capability-probe lines + the capability store persisted and
+verified from OUTSIDE the container through the durable push. Round
+record: R451/R451_C13_ROUND_RECORD.json.
+
+## R452 addendum (2026-09-13) — fresh discovery quality + the mechanistic falsification loop + the reachability restoration
+
+Operator directive R452 (Phases 0-9) + the independent external audit's
+Coder-1 fix mandate. The active-path stage map GAINS its missing organ:
+
+| Component | Module | Notes |
+|---|---|---|
+| THE VALUE_SOURCING STAGE (audit A1) | `engine/value_sourcing.py` | the evidence->dimension binding the engine lacked: SOURCE_FACT (the problem statement's own number+unit, exact span + sha256) > COMPUTED (the mechanistic chain) > MODELLED (the candidate's declared design); NO source STAYS UNKNOWN with the explicit derivation — the Article XXVII <-> Article LX collision resolved explicitly (sourcing from evidence with a provenance hash is not threshold invention). Wired INTO the producer; the sourcing summary rides every engineering spec |
+| THE MECHANISTIC SOLVER (Phase 5) | `engine/mechanistic_solver.py` | the R452 chain: candidate parameters -> canonical variables (all classified) -> Poiseuille equations -> baseline (never inherits the candidate's override, Art. XLVII) -> the problem's OWN threshold (requirement-context only, Art. XXVII) -> computed outcome; the closed epistemic vocabulary on every output; MODEL_INVALIDITY flags the solver's own validity limits |
+| THE DECISIVE-EXPERIMENT CONTRACT (Phase 6) | `engine/decisive_experiment.py` | the 13-field constitutional experiment object; THE INVARIANT enforced mechanically — an experiment whose kill outcome is vacuous (can only confirm) is REJECTED as incomplete |
+| THE CAUSAL LEARNING LOOP (Phase 7) | `engine/causal_learning.py` | CANDIDATE -> MECHANISTIC MODEL -> VIRTUAL EXPERIMENT -> FALSIFICATION/SUPPORT -> TECHNICAL STATE UPDATE -> AUTOMATIC MUTATION (the closed-form inverse of the experiment's own deficit — never an unrelated LLM proposal) -> NEW CANDIDATE -> RE-EVALUATION; the causal edge's six fields; SYNTHETIC_LOOP_VERIFIED honestly (computation, never external reality) |
+| THE REACHABILITY JOIN (audit A2/A4/AT-6) | `invention_bridge/classifier.py` + `engineering_geometry.py` | param_id = the SEMANTIC name (never CP-nnn); the physical-site vocabulary widened to the domain families' own nouns; a routed-default form carries ENGINEERING_PARAMETRIC_DEFAULT_FORM + form_basis |
+| LAZY OCP (audit C2) | `invention_bridge/bridge.py` | the ~500 MB cadquery/OCP import is paid ONLY on the ENGINEERING_3D path; the classifier is cadquery-free |
+| CAPABILITY vs SCIENCE (audit B1) | `a2/classify.py` + `engine/run.py` | the output-contract failure classes are typed INFRASTRUCTURE_CAPABILITY / INCOMPLETE_INFERENCE_FAILURE — promotion still blocked (the verifier NOT weakened), but a model-capability failure is never again laundered into a scientific kill_reason (Art. LXI) |
+| FORENSICS IDENTITY (audit C5) | `toscanini/worker_forensics.py` | engine_commit resolved from the BUILD-ARTIFACT identity (the /api/version authority) when the env pins are absent — new forensics lines attribute failures to the deployed commit |
+
+The frozen discovery-quality instrument (scripts/r452_quality_instrument.py)
+measures the ten directive metrics from the runs' OWN artifacts; the
+reachability contract test (tests/test_r452_engineering_geometry_is_
+reachable.py) spans producer -> classifier -> normalize -> builder ->
+export on REAL inputs only — the chain the audit proved had ZERO test
+coverage (its fixtures used a schema production never emitted).
+
 ## R451-C2 addendum (2026-09-12) — the blocked state becomes a first-class presentation state, and the geometry-to-visual join becomes machine-provable
 
 Operator directive R451-C2 (Visual State Integrity + Guaranteed

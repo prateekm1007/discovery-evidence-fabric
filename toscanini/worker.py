@@ -253,7 +253,8 @@ def _run_inner(session_id: str, forensics) -> None:
         from toscanini import event_journal as _journal
         _engine_cb = _journal.engine_callback(str(run_dir), session_id)
         engine = EngineRun(problem, str(run_dir), with_package=True,
-                           event_callback=_engine_cb)
+                           event_callback=_engine_cb,
+                           session_id=session_id)
         manifest = engine.run()
     except Exception as exc:  # noqa: BLE001
         forensics.event("TERMINAL_STATE", terminal="ERROR_RUN",

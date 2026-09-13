@@ -173,6 +173,39 @@ def route_form(intervention_site: str, subsystems: List[str]) -> str:
     return "cylindrical_device"  # conservative default form
 
 
+def default_form_basis(form: str, intervention_site: str,
+                       subsystems: List[str]) -> Dict[str, Any]:
+    """R452 (external audit C1/AT-6): a routed-default FORM_LIBRARY
+    form is recorded HONESTLY — representation_class
+    ENGINEERING_PARAMETRIC_DEFAULT_FORM with the explicit basis that
+    the three-shape library does not contain the invention's own form.
+    The default is never silently presented as the invention's
+    geometry (Art. XXVIII: no silent semantic promotion)."""
+    text = (intervention_site or "").lower() + " " + \
+        " ".join(s.lower() for s in subsystems)
+    matched = [(sig, form_name) for sigs, form_name in FORM_ROUTING
+               for sig in sigs if sig in text]
+    is_default = not matched
+    return {
+        "form": form,
+        "representation_class": (
+            "ENGINEERING_PARAMETRIC_DEFAULT_FORM" if is_default
+            else "ENGINEERING_PARAMETRIC_ROUTED_FORM"),
+        "form_basis": (
+            "the FORM_LIBRARY routing matched no form signal for "
+            f"site {intervention_site!r}; the conservative default "
+            f"{form!r} is used — the three-shape library does not "
+            "contain the invention's own form, and the default shape "
+            "is NOT the invention's geometry (audit C1: FORM_LIBRARY "
+            "insufficiency disclosed, never hidden)"
+            if is_default else
+            f"FORM_ROUTING matched {matched} for site "
+            f"{intervention_site!r}"),
+        "form_library_forms": sorted(FORM_LIBRARY),
+        "routed_signals_matched": matched,
+    }
+
+
 # ---------------------------------------------------------------------------
 # Canonical parametric-source export (R425 §2 — ONE CAD source of truth)
 # ---------------------------------------------------------------------------
@@ -455,7 +488,12 @@ def _resolve_form_key(pid: str) -> str:
     return base, base, "unresolved"
 
 
-# the historical exact-key remap (unchanged from the pre-R452 table)
+# the historical exact-key remap, MERGED UNION: the pre-R452 table plus
+# the mainline's canonical entries — the domain registry's own
+# DIMENSIONALLY-COMPATIBLE parameter names join to the same form keys
+# (a pressure or a viscosity is NEVER remapped onto a length — that
+# would misuse the value; non-mm parameters are recorded but do not
+# drive the build, which is the existing honest contract)
 _FORM_KEY_ALIASES = {
     "outer_diameter": "outer_diameter",
     "diameter": "outer_diameter",
@@ -473,6 +511,11 @@ _FORM_KEY_ALIASES = {
     "height": "height",
     "wall_thickness": "wall_thickness",
     "port_diameter": "port_diameter",
+    # R452 merged-union additions (mainline canonical entries)
+    "lumen_inner_diameter": "outer_diameter",
+    "inner_diameter": "outer_diameter",
+    "lumen_diameter": "outer_diameter",
+    "lumen_length": "length",
 }
 
 
@@ -502,6 +545,12 @@ def normalize_parameters(geometry_parameters: List[Dict[str, Any]]) -> Dict[str,
             "used_in_build": False,
         }
         if _in_mm(unit):
+            # R452 A2 MERGED UNION: the deterministic resolver (exact-key
+            # table first, then most-specific token compounds) resolves
+            # every semantic name; the resolution AND its basis travel in
+            # the record so a wrong join is auditable, never silent
+            # (Art. XV — the mainline's bare remap dict is subsumed by
+            # the alias table below).
             key, base, basis = _resolve_form_key(pid)
             entry["resolved_key"] = key
             entry["resolution_basis"] = basis

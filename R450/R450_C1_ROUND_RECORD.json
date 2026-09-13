@@ -1,0 +1,140 @@
+{
+ "artifact_type": "R450_C1_ROUND_RECORD",
+ "round": "R450",
+ "created_at_utc": "2026-09-12T05:12:27+00:00",
+ "reviewer_provenance": "AI_REVIEW",
+ "directive": "Build the Directional Improvement Engine: prove that a failed Toscanini candidate can produce a grounded, testable direction of improvement, execute a controlled intervention, evaluate the result, and update the causal model",
+ "constitution": {
+  "version": "2.4.0",
+  "sha256": "b54a1be9bcbdd2465d0b034e1e1f472f80b87174209c0d534b7d9e1223e649b2",
+  "read_in_full_at_round_start": true,
+  "re_read_in_full_before_final_commit": true,
+  "governance_files_read": [
+   "GOVERNANCE/README.md",
+   "GOVERNANCE/AUDITOR_SELF_GOVERNANCE_v1.md",
+   "GOVERNANCE/AUDITOR_BLINDSPOT_REGISTER.md",
+   "GOVERNANCE/AUDITOR_REMEMBERED_STATE.md",
+   "GOVERNANCE/AUDIT_LOOP_PROTOCOL_v1.md",
+   "ACTIVE_PATH.md"
+  ],
+  "acknowledgment": "epistemic_integrity/approved_provenance/CONSTITUTION_ACKNOWLEDGMENT.json bound to v2.4.0 at b54a1be9 (this session)"
+ },
+ "state_at_round_start": {
+  "head": "d99e895c589964e4de3e92b994acd69ca9fbc942",
+  "origin_main": "d99e895c589964e4de3e92b994acd69ca9fbc942",
+  "r449_foundation_commit": "10c7483d (the Evidence Fabric foundation, committed at this round's start)"
+ },
+ "delivered": {
+  "DirectionalHypothesis_canonical_schema": {
+   "module": "discovery_fabric/directional/hypothesis.py",
+   "fields": [
+    "hypothesis_id",
+    "candidate_id",
+    "failure_id",
+    "causal_diagnosis_id",
+    "target_variable",
+    "current_value",
+    "proposed_value",
+    "direction",
+    "mechanism_affected",
+    "causal_rationale",
+    "predicted_effect",
+    "predicted_magnitude_or_range",
+    "competing_explanations",
+    "evidence_support",
+    "evidence_gaps",
+    "falsifier",
+    "measurement_required",
+    "intervention_type",
+    "confidence",
+    "provenance",
+    "status",
+    "gate"
+   ],
+   "ground_gate_checks": [
+    "G1_STRUCTURE (closed vocabularies)",
+    "G2_DIAGNOSIS_RESOLVES (recorded diagnosis only)",
+    "G3_MECHANISM_GROUNDED (term overlap with the diagnosis/candidate)",
+    "G4_PREDICTION_FALSIFIABLE (measurable falsifier)",
+    "G5_EVIDENCE_HONEST (custody-resolved support or declared gaps)"
+   ]
+  },
+  "canonical_state_integration": "run.py::_evolution_generate_next — the directional step rides the ONE evolution pipeline (no second engine, no second invention graph; DIRECTIONAL_HYPOTHESES.json + IMPROVEMENT_TRAJECTORY.json are append-only records referencing canonical generation records)",
+  "loop_state_transitions": "EVIDENCE -> MECHANISM -> CANDIDATE -> ATTACK -> FAILURE -> CAUSAL DIAGNOSIS -> DIRECTIONAL HYPOTHESIS (gate) -> CONTROLLED MUTATION -> EVALUATION (the same gauntlet) -> OBSERVATION -> CAUSAL UPDATE -> NEXT DIRECTION",
+  "grounded_vs_ungrounded_handling": "the ground gate REJECTS ungrounded directions; the mutation never executes; the rejection is recorded; the stop reason is DIRECTION_REJECTED_BY_GROUND_GATE (distinct from transport failures — Art. LXI)",
+  "intervention_classes": [
+   "PARAMETER_MUTATION",
+   "TOPOLOGY_MUTATION",
+   "MATERIAL_MUTATION",
+   "OPERATING_CONDITION_MUTATION",
+   "MECHANISM_COMBINATION",
+   "EVIDENCE_UPDATE",
+   "CONSTRAINT_RELAXATION",
+   "CONSTRAINT_TIGHTENING"
+  ],
+  "improvement_signals": "observation.py — objective_delta / constraint_delta / distance_to_target / information_gain / sensitivity UNDER the epistemic gates; NO fabricated gradients (sensitivity only from real recorded evaluation pairs)",
+  "attacker_v2_upgrade": "independent_attack/2.1.0 — INTERVENTION suggestion lines with the SAME grounding discipline (GROUNDED_INTERVENTION = directional-loop SEED, still gate-bound; UNGROUND_SUGGESTION never enters the hypothesis space); the calibration state carries forward NOT_CALIBRATED (inherited binding, negative knowledge preserved, discipline NOT weakened)",
+  "obvious_combination_protection": "novelty.py gains NOVEL_BEHAVIOR — known A + known B -> evidenced interaction C -> mechanism prediction -> RECORDED reproduction by evaluation; novelty-by-description never upgrades without the recorded reproduction",
+  "improvement_trajectory_persistence": "IMPROVEMENT_TRAJECTORY.json per run (append-only; V1 -> F1 -> D1 -> M1 -> R1 -> C1 -> V2 chain with provenance at every transition)",
+  "evidence_to_direction_linkage": "the reverse path: DIRECTION -> declared gaps -> gap queries (deterministic) -> R449 evidence-fabric retrieval -> newly acquired support recorded ON the hypothesis (evidence_changed_direction)",
+  "fresh_directional_benchmark": {
+   "artifact": "R450/DIRECTIONAL_BENCHMARK.json",
+   "problems": [
+    "r450-battery-thermal-runaway",
+    "r450-slurry-pump-wear"
+   ],
+   "arms": "DIRECTIONAL vs UNGUIDED (same engine, same transport, same gauntlet, same budget)",
+   "raw_metrics_only": true
+  },
+  "tests": {
+   "tests/test_r450_directional.py": "35 passed",
+   "tests/test_r449_evidence_fabric.py": "41 passed",
+   "regressions": "r419 english-only + r447 owner transport 25 passed; r446 cio/completion 49 passed; r445 canonical domain passed (in the combined run); r443 visual integrity 6 failures BASELINE-IDENTICAL on git-stash (the known sandbox Chromium memory-contention class; no visual code touched this round — disclosed)"
+  }
+ },
+ "headline_result": "on this small first benchmark: causal directional feedback produced the same survivor outcome on P0 while additionally producing reusable causal knowledge (a supported, falsifiable hypothesis), and on P1 it refused an ungrounded mutation at zero evaluation cost while the unguided baseline spent its full evaluation budget on a blind roll — the directional discipline trades blind throughput for grounded, testable improvement knowledge",
+ "honest_limitations": [
+  "N=2 problems, 1 iteration per arm (the evolution loop stops at the first survivor or the first rejection — the budget design); this is a first live demonstration, NOT a statistically powered comparison",
+  "the unguided arm surviving P1 is NOT a defeat for the directional arm: the unguided survivor has no falsifier and no causal contract, so its 'success' cannot be re-tested or built upon — recorded as the raw difference in what each system KNOWS, not just what it produces",
+  "both arms share the same engine, transport, and gauntlet; the arms differ ONLY in the improvement-search mode",
+  "time-to-viable is measured from persisted-record mtimes (the generation records carry no timestamps)"
+ ],
+ "known_unknowns": [
+  "the benchmark is N=2 problems x 1 iteration per arm — a first live demonstration, NOT a statistically powered comparison",
+  "the R449 two-arm evidence-power experiment measured mechanism_search_changed=true but evidence_fabric_sourced_mechanisms_present=false (the fabric's records entered the pool and did not win the synthesis rotation) — recorded honestly in R449/FRESH_EVIDENCE_POWERED_DISCOVERY.json",
+  "the unguided arm's P1 survivor carries no falsifier and no causal contract — its 'success' is not re-testable; the benchmark records the difference in what each system KNOWS",
+  "uspto_patents + s2orc remain PENDING_LICENSE_VERIFICATION (no license declaration on their cards — fail-closed, never production evidence until verified); openalex_mirror + cadgenbench remain PENDING_INDEX",
+  "DELIVERY-SESSION UPDATE (2026-09-12): the §14 production fresh-run proof was SUBMITTED through the fixed owner transport on the deployed R449/R450 engine (run ts_9f304e19e2c1, R450/PRODUCTION_FRESH_RUN.json) and terminated honestly as RUN_BLOCKED_TRANSPORT — the machine's own classification: failure_state INFRASTRUCTURE, 'Run blocked — infrastructure, not a verdict' (Art. LXI), transport route zai-org/GLM-5.3 failure_class=CREDIT_EXHAUSTED; no geometry, no CIO, no package manufactured ('unknown stays unknown', Art. XXV). The ACCEPTANCE-CHAIN CONTENT of the §14 proof (a fresh run completing to a technology package) is NOT claimed and remains pending the operator's HF inference-credit top-up",
+  "ENGINE-SIDE DEFECT RECORDED (not fixed this session — no engine changes in a delivery-completion session, and it would not unblock anything while ALL router models return 402): the transport fallback route carries the stale model id 'glm-4-plus', which the HF router rejects with model_not_found (classified INVALID_RESPONSE) — the fallback is dead weight until a future round repoints it at a real router model",
+  "discovery_ready=false on the deployed engine is an ACCOUNT-BILLING state, not an engine defect: the HF router returns HTTP 402 'You have depleted your monthly included credits' for EVERY model on the prateekm1 account (verified by direct probes: zai-org/GLM-5.3, GLM-5.3-Flash, DeepSeek-V4.1-Flash, Qwen3-8B, gpt-oss-20b, Llama-3.1-8B — all 402; the token itself authenticates fine: whoami OK, upload OK, secret-wiring OK)"
+ ],
+ "next_decisive_test": "scale the benchmark (more problems, multi-iteration budgets) and connect the attacker's GROUNDED_INTERVENTION suggestions into the hypothesis proposal prompt as seeds (still gate-bound); the §14 content proof completes the moment the operator tops up HF inference credits — the fresh problem is SAVED and resumable on the deployed engine ('Your problem is saved and ready to resume', per the run's failure_state)",
+ "production_deployment": {
+  "target_sha": "317885afc4915b794c8b6b9c3a335b7202ecf3fa",
+  "deployed_sha": "317885afc4915b794c8b6b9c3a335b7202ecf3fa",
+  "deploy_id": "hf: prateekm1/toscanini-prod-validation rev c7eec8732a0ac39d76830d063759915729e42244 (upload 81 s; restart-triggered build on HF infrastructure; boot 2026-09-12T05:48:45Z)",
+  "health_check_result": "GREEN",
+  "drift": "GREEN",
+  "blocked_by": null,
+  "what_unblocks": null,
+  "delivery_state": "DEPLOY_COMPLETE__SECTION14_CONTENT_PROOF_BLOCKED_TRANSPORT_CREDITS",
+  "delivery_state_note": "the Article LXXI identity tuple is COMPLETE — the canonical Space serves the pushed commit 317885af (which contains the R449 Evidence Fabric foundation, the R450 Directional Improvement Engine, and this round's records): ls-remote origin/main == HEAD == 317885af == /api/version engine_commit == /api/health engine_commit (build_artifact source, identity_tamper false, deployment_drift GREEN, BUILD == RUNNING == HEALTH == 317885af). DISCLOSED ALONGSIDE (Art. XV): discovery_ready=false — the LLM transport through the HF router returns HTTP 402 (account inference credits depleted) for every model, so the §14 fresh-run CONTENT proof is blocked at the transport layer and honestly recorded as RUN_BLOCKED_TRANSPORT by the machine itself (Art. LXI); the target_sha supersedes the pre-delivery record's 10c7483d target (which predated the R450 engine commit 8309a1ce and this records commit)",
+  "escalation": {
+   "hf_token_blocker": "RESOLVED — the operator exported HF_TOKEN into the coding session (2026-09-12); the deploy, the env/secret wiring, and the authenticated probes all executed with it; the credential never entered the repository (BS-021 discipline held)",
+   "hf_inference_credits_blocker": {
+    "count": 1,
+    "article": "LXXI §4",
+    "missing_item": "HF Inference Providers credits on the prateekm1 account (not a token-scope issue: the token authenticates for whoami, Space upload, secret wiring, and the router accepts the auth then returns HTTP 402 'You have depleted your monthly included credits. Purchase pre-paid credits to continue using Inference Providers.' for every model)",
+    "cost_statement": "while this stays open, the deployed R449/R450 engine cannot run discovery: every LLM call fails at the router, the §14 acceptance-chain content proof cannot complete, and production shows 'Showcase ready · Discovery temporarily unavailable'",
+    "operator_action": "purchase pre-paid Inference Providers credits on the HF prateekm1 account (billing action only the account owner can perform), then re-invoke scripts/r450_production_fresh_run.py — the fresh problem is already saved and resumable on the deployed engine (run ts_9f304e19e2c1)"
+   }
+  },
+  "conditions_met": {
+   "push_confirmed": true,
+   "deploy_at_sha": true,
+   "health_identity": true
+  },
+  "note": "Article LXXI §1 applied honestly in both directions: the original record declared DELIVERY_BLOCKED with the exact operator action (export HF_TOKEN); the operator executed it; this delivery-session update records the completed identity tuple (deploy 317885af, GREEN) and names the NEXT blocker separately (inference credits, count 1) with its own operator action — a blocked content-proof is not a failed delivery of the engine, and honest blocking remains correct behavior"
+ },
+ "remote_main_at_record": "317885afc4915b794c8b6b9c3a335b7202ecf3fa (at the delivery-session update; the pre-delivery record carried 10c7483d, the remote before the R450 engine commit and this round's records)"
+}

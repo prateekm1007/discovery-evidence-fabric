@@ -1,0 +1,552 @@
+{
+ "artifact_type": "R452_CAUSAL_LEARNING_LOOP",
+ "recorded_at": "2026-09-13T13:42:45+00:00",
+ "selected_case": "B",
+ "selected_case_family": "energy_industrial",
+ "selection_rule": "the first assay case whose loop produced the complete causal edge (falsified constraint -> mechanistic mutation from the experiment result -> child re-evaluation)",
+ "candidate_source": "the assay run's OWN candidate (its declared parameters \u2014 never template values)",
+ "the_loop": {
+  "artifact_type": "R452_CAUSAL_LEARNING_LOOP",
+  "loop_id": "cl-98eb68257cabe552",
+  "run_label": "r452-causal-loop-b",
+  "causal_loop_version": "causal_learning/1.0.0",
+  "loop_stages_executed": [
+   "CANDIDATE",
+   "MECHANISTIC_MODEL",
+   "VIRTUAL_EXPERIMENT",
+   "FALSIFICATION_SUPPORT_OUTCOME",
+   "TECHNICAL_STATE_UPDATE",
+   "AUTOMATIC_MUTATION",
+   "NEW_CANDIDATE",
+   "RE_EVALUATION"
+  ],
+  "stages": [
+   {
+    "stage": "CANDIDATE",
+    "state": "ENTERED",
+    "recorded_at": "2026-09-13T13:42:45+00:00",
+    "candidate_id": "cand:A2:r452b-gearbox-coldstart-pinion-starvation:0e46f9dc7f45958b",
+    "declared_parameters": {}
+   },
+   {
+    "stage": "MECHANISTIC_MODEL",
+    "state": "BUILT",
+    "recorded_at": "2026-09-13T13:42:45+00:00",
+    "unknown_variables": [],
+    "variables": {
+     "primary_diameter_mm": 2.5,
+     "primary_length_mm": 60.0,
+     "viscosity_mPa_s": 1800.0,
+     "inlet_pressure_mmHg": 1875.155,
+     "required_flow_ml_min": 800.0
+    }
+   },
+   {
+    "stage": "VIRTUAL_EXPERIMENT",
+    "state": "COMPUTED_FAIL",
+    "recorded_at": "2026-09-13T13:42:45+00:00",
+    "experiment_id": "cl-98eb68257cabe552:vexp",
+    "solver_status": "COMPUTED_FAIL",
+    "contract_valid": true,
+    "contract_rejection": null
+   },
+   {
+    "stage": "FALSIFICATION_SUPPORT_OUTCOME",
+    "state": "FALSIFIED_CONSTRAINT",
+    "recorded_at": "2026-09-13T13:42:45+00:00",
+    "observed": "COMPUTED_FAIL",
+    "detail": "predicted 133.1577 mL/min < required 800.0000 mL/min"
+   },
+   {
+    "stage": "TECHNICAL_STATE_UPDATE",
+    "state": "UPDATED",
+    "recorded_at": "2026-09-13T13:42:45+00:00",
+    "observed_fact": {
+     "fact": "computed primary-segment flow 133.157743 mL/min under the declared parameters",
+     "epistemic_class": "COMPUTED",
+     "observed_at": "2026-09-13T13:42:45+00:00",
+     "experiment_id": "cl-98eb68257cabe552:vexp"
+    },
+    "failed_constraint": "primary-segment flow >= 800.0000 mL/min at the stated operating condition (the problem's own declared requirement)",
+    "deficit_ml_min": 666.842257
+   },
+   {
+    "stage": "AUTOMATIC_MUTATION",
+    "state": "EXECUTED",
+    "recorded_at": "2026-09-13T13:42:45+00:00",
+    "mutation_kind": "INVERSE_POISEUILLE_DIAMETER",
+    "from_value": 2.5,
+    "to_value": 3.914001,
+    "derivation": "d_new = d_old * (Q_required / Q_candidate)^(1/4) = 2.5000 * (800.0000 / 133.1577)^(1/4) = 3.9140 mm \u2014 the closed-form inverse of the Poiseuille relation for the required flow"
+   },
+   {
+    "stage": "NEW_CANDIDATE",
+    "state": "CREATED",
+    "recorded_at": "2026-09-13T13:42:45+00:00",
+    "candidate_id": "cand:A2:r452b-gearbox-coldstart-pinion-starvation:0e46f9dc7f45958b:mut1",
+    "mutated_parameter": [
+     "primary_diameter_mm",
+     2.5,
+     3.914001
+    ]
+   },
+   {
+    "stage": "RE_EVALUATION",
+    "state": "CHILD_SUPPORTS_HYPOTHESIS_COMPUTATIONALLY",
+    "recorded_at": "2026-09-13T13:42:45+00:00",
+    "child_experiment_id": "cl-98eb68257cabe552:vexp-child",
+    "child_flow_ml_min": 800.0002437816844,
+    "required_ml_min": 800.0
+   }
+  ],
+  "experiment": {
+   "experiment_id": "cl-98eb68257cabe552:vexp",
+   "candidate_id": "cand:A2:r452b-gearbox-coldstart-pinion-starvation:0e46f9dc7f45958b",
+   "status": "COMPUTED_FAIL",
+   "epistemic_class": "COMPUTED",
+   "solver_bridge_version": "mechanistic_solver/1.0.0",
+   "solver_version": "hydraulic_network_1d/1.0.0",
+   "equations": [
+    {
+     "equation_id": "FLUID-001",
+     "name": "Hagen-Poiseuille (laminar pipe flow)",
+     "expression": "Q = (pi * r^4 * dP) / (8 * mu * L)",
+     "source_class": "EXTERNAL_PRECEDENT",
+     "executed_by": "physics_core hydraulic_network_1d/1.0.0 (reference-validated: single tube, series, parallel closed forms < 1e-12 rel)"
+    }
+   ],
+   "canonical_variables": {
+    "candidate_arm": {
+     "variables": {
+      "primary_diameter_mm": {
+       "variable": "primary_diameter_mm",
+       "value": 2.5,
+       "unit": "mm",
+       "epistemic_class": "SOURCE_FACT",
+       "source": "problem statement span [269, 283]: '2.5-millimetre' (context keywords ('branch', 'pinion', 'bearing', 'cannula', 'lumen', 'sheath', 'tube', 'tubing', 'channel', 'orifice', 'needle', 'catheter') (score 3) \u2014 the segment feeding the failing component)"
+      },
+      "primary_length_mm": {
+       "variable": "primary_length_mm",
+       "value": 60.0,
+       "unit": "mm",
+       "epistemic_class": "SOURCE_FACT",
+       "source": "problem statement span [315, 329]: '60 millimetres' (context keywords ('long', 'length', 'branch', 'segment', 'tube', 'tubing', 'cannula') (score 2) \u2014 the segment feeding the failing component)"
+      },
+      "viscosity_mPa_s": {
+       "variable": "viscosity_mPa_s",
+       "value": 1800.0,
+       "unit": "mPa.s",
+       "epistemic_class": "SOURCE_FACT",
+       "source": "problem statement span [464, 480]: '1,800 centipoise' (first declared quantity of the class)"
+      },
+      "inlet_pressure_mmHg": {
+       "variable": "inlet_pressure_mmHg",
+       "value": 1875.155,
+       "unit": "mmHg",
+       "epistemic_class": "SOURCE_FACT",
+       "source": "problem statement span [168, 175]: '2.5 bar' (first declared quantity of the class)"
+      },
+      "required_flow_ml_min": {
+       "variable": "required_flow_ml_min",
+       "value": 800.0,
+       "unit": "mL/min",
+       "epistemic_class": "SOURCE_FACT",
+       "source": "problem statement span [1008, 1029]: '0.8 litres per minute' (first declared quantity of the class)"
+      }
+     },
+     "problem_quantities_found": 6,
+     "unknown_variables": [],
+     "all_inputs_classified": true
+    },
+    "baseline_arm": {
+     "variables": {
+      "primary_diameter_mm": {
+       "variable": "primary_diameter_mm",
+       "value": 2.5,
+       "unit": "mm",
+       "epistemic_class": "SOURCE_FACT",
+       "source": "problem statement span [269, 283]: '2.5-millimetre' (context keywords ('branch', 'pinion', 'bearing', 'cannula', 'lumen', 'sheath', 'tube', 'tubing', 'channel', 'orifice', 'needle', 'catheter') (score 3) \u2014 the segment feeding the failing component)"
+      },
+      "primary_length_mm": {
+       "variable": "primary_length_mm",
+       "value": 60.0,
+       "unit": "mm",
+       "epistemic_class": "SOURCE_FACT",
+       "source": "problem statement span [315, 329]: '60 millimetres' (context keywords ('long', 'length', 'branch', 'segment', 'tube', 'tubing', 'cannula') (score 2) \u2014 the segment feeding the failing component)"
+      },
+      "viscosity_mPa_s": {
+       "variable": "viscosity_mPa_s",
+       "value": 1800.0,
+       "unit": "mPa.s",
+       "epistemic_class": "SOURCE_FACT",
+       "source": "problem statement span [464, 480]: '1,800 centipoise' (first declared quantity of the class)"
+      },
+      "inlet_pressure_mmHg": {
+       "variable": "inlet_pressure_mmHg",
+       "value": 1875.155,
+       "unit": "mmHg",
+       "epistemic_class": "SOURCE_FACT",
+       "source": "problem statement span [168, 175]: '2.5 bar' (first declared quantity of the class)"
+      },
+      "required_flow_ml_min": {
+       "variable": "required_flow_ml_min",
+       "value": 800.0,
+       "unit": "mL/min",
+       "epistemic_class": "SOURCE_FACT",
+       "source": "problem statement span [1008, 1029]: '0.8 litres per minute' (first declared quantity of the class)"
+      }
+     },
+     "problem_quantities_found": 6,
+     "unknown_variables": [],
+     "all_inputs_classified": true
+    }
+   },
+   "baseline_prediction": {
+    "arm": "BASELINE (the problem's own current configuration)",
+    "diameter_mm": 2.5,
+    "predicted_flow_ml_min": 133.15774286617747,
+    "epistemic_class": "COMPUTED",
+    "solver_record_status": "COMPUTATIONAL_RESULT",
+    "model_validity": {
+     "laminar_valid": true,
+     "reynolds_flags": [],
+     "note": ""
+    },
+    "input_hash": "4ff1d71acfb12046fb24c7649e6d6fa4cbc3bc3a76f1a47d749384bc0918ab55",
+    "output_hash": "d194a9594a4978f784815e3793852ae4d395271c65879ed8cd14b6149f2b9aa3"
+   },
+   "candidate_prediction": {
+    "arm": "CANDIDATE (the candidate's declared parameters)",
+    "diameter_mm": 2.5,
+    "predicted_flow_ml_min": 133.15774286617747,
+    "epistemic_class": "COMPUTED",
+    "solver_record_status": "COMPUTATIONAL_RESULT",
+    "model_validity": {
+     "laminar_valid": true,
+     "reynolds_flags": [],
+     "note": ""
+    },
+    "input_hash": "4ff1d71acfb12046fb24c7649e6d6fa4cbc3bc3a76f1a47d749384bc0918ab55",
+    "output_hash": "d194a9594a4978f784815e3793852ae4d395271c65879ed8cd14b6149f2b9aa3"
+   },
+   "failure_threshold": {
+    "metric": "total_flow_ml_min",
+    "value_ml_min": 800.0,
+    "epistemic_class": "SOURCE_FACT",
+    "source": "problem statement span [1008, 1029]: '0.8 litres per minute' (first declared quantity of the class)",
+    "rule": "the problem's OWN declared requirement \u2014 never an invented threshold (Art. XXVII)"
+   },
+   "computed_outcome": {
+    "outcome": "COMPUTED_FAIL",
+    "candidate_flow_ml_min": 133.15774286617747,
+    "baseline_flow_ml_min": 133.15774286617747,
+    "required_flow_ml_min": 800.0,
+    "margin_over_threshold_ml_min": -666.842257,
+    "improvement_over_baseline_ml_min": 0.0,
+    "epistemic_class": "COMPUTED"
+   },
+   "honesty_note": "a PASS is a computational prediction of the declared model under the declared inputs \u2014 computational evidence, never a physical observation (Art. XXXVIII layer 4, Art. LIII: no level skipping, nothing silently 'validated')"
+  },
+  "experiment_contract": {
+   "experiment_id": "cl-98eb68257cabe552:vexp",
+   "candidate_id": "cand:A2:r452b-gearbox-coldstart-pinion-starvation:0e46f9dc7f45958b",
+   "experiment_kind": "VIRTUAL_DECISIVE_EXPERIMENT",
+   "hypothesis": "The candidate's declared primary-segment arrangement delivers at least 800.0000 mL/min through the problem's own stated operating condition",
+   "treatment": "the candidate's declared primary segment (diameter 2.5 mm) as the treatment arm",
+   "control": "the problem's own current configuration as the control arm (diameter 2.5 mm; identical solver, identical operating point \u2014 Art. XLVII)",
+   "measurement": "total_flow_ml_min computed by the 1D laminar Poiseuille network solver (hydraulic_network_1d/1.0.0) on the candidate's declared parameters, compared against the problem's own declared requirement of 800.0000 mL/min",
+   "apparatus": "the deterministic 1D hydraulic network solver hydraulic_network_1d/1.0.0 (reference-validated against Poiseuille closed forms; execution evidence class COMPUTATIONAL_RESULT \u2014 a virtual experiment, never a physical observation, Art. XXXVIII)",
+   "sample": "one parameterized network configuration per arm (the virtual experiment computes the full deterministic response \u2014 no sampling; n=1 per arm by construction, recorded honestly)",
+   "acceptance_threshold": "total flow at least 800.0000 mL/min (the problem's own declared requirement \u2014 problem statement span [1008, 1029]: '0.8 litres per minute' (first declared quantity of the class))",
+   "falsification_threshold": "total flow below 800.0000 mL/min under the stated operating condition",
+   "uncertainty": "MODEL_DERIVED model-class uncertainty: uniform stenosis model, junction losses unmodelled, viscosity is an input datum (the solver's own recorded limitations)",
+   "cost": "COMPUTED at negligible marginal cost (a linear solve; no physical experiment is conducted)",
+   "time": "COMPUTED in solver wall-clock (seconds; the linear solve is direct)",
+   "safety": "NOT_APPLICABLE_VIRTUAL \u2014 no physical apparatus, no operator, no patient (a physical follow-on experiment would require its own safety case \u2014 recorded as a required field of THAT experiment, never silently inherited)",
+   "kill_outcome": "the measured total flow stays BELOW the problem's own declared requirement of 800.0000 mL/min under the stated operating condition \u2014 the mechanism's claimed delivery effect is falsified and the candidate is killed",
+   "field_epistemic_classes": {
+    "hypothesis": "MODEL_DERIVED",
+    "treatment": "MODEL_DERIVED",
+    "control": "SOURCE_FACT",
+    "measurement": "COMPUTED",
+    "apparatus": "COMPUTED",
+    "sample": "MODEL_DERIVED",
+    "acceptance_threshold": "SOURCE_FACT",
+    "falsification_threshold": "SOURCE_FACT",
+    "uncertainty": "MODEL_DERIVED",
+    "cost": "COMPUTED",
+    "time": "COMPUTED",
+    "safety": "UNKNOWN",
+    "kill_outcome": "SOURCE_FACT"
+   },
+   "contract_version": "decisive_experiment/1.0.0",
+   "source_record_status": "COMPUTED_FAIL",
+   "validation": {
+    "contract_version": "decisive_experiment/1.0.0",
+    "valid": true,
+    "decisive": true,
+    "missing_fields": [],
+    "blocker_fields": [],
+    "kill_outcome_present": true,
+    "kill_outcome_vacuous": false,
+    "kill_outcome_directional": true,
+    "thresholds_distinct": true,
+    "epistemic_class_violations": [],
+    "rejection_reason": null,
+    "rule": "there must exist an outcome that kills the mechanism (Art. LII); an experiment that can only confirm the proposal is not a decisive experiment"
+   }
+  },
+  "loop_outcome": "FALSIFIED_CONSTRAINT",
+  "child_outcome": "CHILD_SUPPORTS_HYPOTHESIS_COMPUTATIONALLY",
+  "technical_state": {
+   "before": {
+    "constraint": "primary-segment flow >= 800.0000 mL/min at the stated operating condition (the problem's own declared requirement)",
+    "status": "UNMEASURED"
+   },
+   "after": {
+    "constraint": "primary-segment flow >= 800.0000 mL/min at the stated operating condition (the problem's own declared requirement)",
+    "status": "VIOLATED_COMPUTATIONALLY",
+    "measured": 133.15774286617747,
+    "required": 800.0,
+    "deficit_ml_min": 666.842257
+   },
+   "transition": "TECHNICAL_STATE_UPDATED_FROM_EXPERIMENT",
+   "transition_rule": "the technical state moves ONLY on the experiment's own computed observation \u2014 never on narrative"
+  },
+  "mutation": {
+   "mutation_kind": "INVERSE_POISEUILLE_DIAMETER",
+   "target_variable": "primary_diameter_mm",
+   "from_value": 2.5,
+   "to_value": 3.914001,
+   "derivation": "d_new = d_old * (Q_required / Q_candidate)^(1/4) = 2.5000 * (800.0000 / 133.1577)^(1/4) = 3.9140 mm \u2014 the closed-form inverse of the Poiseuille relation for the required flow",
+   "causal_basis": {
+    "observed_outcome": "COMPUTED_FAIL",
+    "failed_constraint": "predicted flow 133.1577 mL/min < required 800.0000 mL/min",
+    "mutation_reason": "the flow deficit is driven by the primary segment's diameter through the d^4 Poiseuille dependence; the mutation solves the inverse problem for exactly the required flow"
+   },
+   "epistemic_class": "COMPUTED"
+  },
+  "child_experiment": {
+   "experiment_id": "cl-98eb68257cabe552:vexp-child",
+   "candidate_id": "cand:A2:r452b-gearbox-coldstart-pinion-starvation:0e46f9dc7f45958b:mut1",
+   "status": "COMPUTED_PASS",
+   "epistemic_class": "COMPUTED",
+   "solver_bridge_version": "mechanistic_solver/1.0.0",
+   "solver_version": "hydraulic_network_1d/1.0.0",
+   "equations": [
+    {
+     "equation_id": "FLUID-001",
+     "name": "Hagen-Poiseuille (laminar pipe flow)",
+     "expression": "Q = (pi * r^4 * dP) / (8 * mu * L)",
+     "source_class": "EXTERNAL_PRECEDENT",
+     "executed_by": "physics_core hydraulic_network_1d/1.0.0 (reference-validated: single tube, series, parallel closed forms < 1e-12 rel)"
+    }
+   ],
+   "canonical_variables": {
+    "candidate_arm": {
+     "variables": {
+      "primary_diameter_mm": {
+       "variable": "primary_diameter_mm",
+       "value": 3.914001,
+       "unit": "mm",
+       "epistemic_class": "COMPUTED",
+       "source": "candidate parameter 'primary_diameter_mm' (mechanistic mutation INVERSE_POISEUILLE_DIAMETER from experiment cl-98eb68257cabe552:vexp (closed-form inverse Poiseuille for the required flow))"
+      },
+      "primary_length_mm": {
+       "variable": "primary_length_mm",
+       "value": 60.0,
+       "unit": "mm",
+       "epistemic_class": "SOURCE_FACT",
+       "source": "problem statement span [315, 329]: '60 millimetres' (context keywords ('long', 'length', 'branch', 'segment', 'tube', 'tubing', 'cannula') (score 2) \u2014 the segment feeding the failing component)"
+      },
+      "viscosity_mPa_s": {
+       "variable": "viscosity_mPa_s",
+       "value": 1800.0,
+       "unit": "mPa.s",
+       "epistemic_class": "SOURCE_FACT",
+       "source": "problem statement span [464, 480]: '1,800 centipoise' (first declared quantity of the class)"
+      },
+      "inlet_pressure_mmHg": {
+       "variable": "inlet_pressure_mmHg",
+       "value": 1875.155,
+       "unit": "mmHg",
+       "epistemic_class": "SOURCE_FACT",
+       "source": "problem statement span [168, 175]: '2.5 bar' (first declared quantity of the class)"
+      },
+      "required_flow_ml_min": {
+       "variable": "required_flow_ml_min",
+       "value": 800.0,
+       "unit": "mL/min",
+       "epistemic_class": "SOURCE_FACT",
+       "source": "problem statement span [1008, 1029]: '0.8 litres per minute' (first declared quantity of the class)"
+      }
+     },
+     "problem_quantities_found": 6,
+     "unknown_variables": [],
+     "all_inputs_classified": true
+    },
+    "baseline_arm": {
+     "variables": {
+      "primary_diameter_mm": {
+       "variable": "primary_diameter_mm",
+       "value": 2.5,
+       "unit": "mm",
+       "epistemic_class": "SOURCE_FACT",
+       "source": "problem statement span [269, 283]: '2.5-millimetre' (context keywords ('branch', 'pinion', 'bearing', 'cannula', 'lumen', 'sheath', 'tube', 'tubing', 'channel', 'orifice', 'needle', 'catheter') (score 3) \u2014 the segment feeding the failing component)"
+      },
+      "primary_length_mm": {
+       "variable": "primary_length_mm",
+       "value": 60.0,
+       "unit": "mm",
+       "epistemic_class": "SOURCE_FACT",
+       "source": "problem statement span [315, 329]: '60 millimetres' (context keywords ('long', 'length', 'branch', 'segment', 'tube', 'tubing', 'cannula') (score 2) \u2014 the segment feeding the failing component)"
+      },
+      "viscosity_mPa_s": {
+       "variable": "viscosity_mPa_s",
+       "value": 1800.0,
+       "unit": "mPa.s",
+       "epistemic_class": "SOURCE_FACT",
+       "source": "problem statement span [464, 480]: '1,800 centipoise' (first declared quantity of the class)"
+      },
+      "inlet_pressure_mmHg": {
+       "variable": "inlet_pressure_mmHg",
+       "value": 1875.155,
+       "unit": "mmHg",
+       "epistemic_class": "SOURCE_FACT",
+       "source": "problem statement span [168, 175]: '2.5 bar' (first declared quantity of the class)"
+      },
+      "required_flow_ml_min": {
+       "variable": "required_flow_ml_min",
+       "value": 800.0,
+       "unit": "mL/min",
+       "epistemic_class": "SOURCE_FACT",
+       "source": "problem statement span [1008, 1029]: '0.8 litres per minute' (first declared quantity of the class)"
+      }
+     },
+     "problem_quantities_found": 6,
+     "unknown_variables": [],
+     "all_inputs_classified": true
+    }
+   },
+   "baseline_prediction": {
+    "arm": "BASELINE (the problem's own current configuration)",
+    "diameter_mm": 2.5,
+    "predicted_flow_ml_min": 133.15774286617747,
+    "epistemic_class": "COMPUTED",
+    "solver_record_status": "COMPUTATIONAL_RESULT",
+    "model_validity": {
+     "laminar_valid": true,
+     "reynolds_flags": [],
+     "note": ""
+    },
+    "input_hash": "cb9c4e6fab7ada0ed418c9a8a76606817f1cfea762a7dfd16ba06ec51cfb5d20",
+    "output_hash": "04fee75fdfa5fcf038336a64bb23ba3a756ad7ef6af6d7a9c324b02db1856b14"
+   },
+   "candidate_prediction": {
+    "arm": "CANDIDATE (the candidate's declared parameters)",
+    "diameter_mm": 3.914001,
+    "predicted_flow_ml_min": 800.0002437816844,
+    "epistemic_class": "COMPUTED",
+    "solver_record_status": "COMPUTATIONAL_RESULT",
+    "model_validity": {
+     "laminar_valid": true,
+     "reynolds_flags": [],
+     "note": ""
+    },
+    "input_hash": "a72a69795e32e73b813fff1949c69a50882896aa8f57dbdb2a05ea8843504826",
+    "output_hash": "a4a8e9fec69b3c17ef1d5f169b71b47960b94a356dcf974fa97d9992fcb8ebf8"
+   },
+   "failure_threshold": {
+    "metric": "total_flow_ml_min",
+    "value_ml_min": 800.0,
+    "epistemic_class": "SOURCE_FACT",
+    "source": "problem statement span [1008, 1029]: '0.8 litres per minute' (first declared quantity of the class)",
+    "rule": "the problem's OWN declared requirement \u2014 never an invented threshold (Art. XXVII)"
+   },
+   "computed_outcome": {
+    "outcome": "COMPUTED_PASS",
+    "candidate_flow_ml_min": 800.0002437816844,
+    "baseline_flow_ml_min": 133.15774286617747,
+    "required_flow_ml_min": 800.0,
+    "margin_over_threshold_ml_min": 0.000244,
+    "improvement_over_baseline_ml_min": 666.842501,
+    "epistemic_class": "COMPUTED"
+   },
+   "honesty_note": "a PASS is a computational prediction of the declared model under the declared inputs \u2014 computational evidence, never a physical observation (Art. XXXVIII layer 4, Art. LIII: no level skipping, nothing silently 'validated')"
+  },
+  "causal_edge": {
+   "parent_candidate_id": "cand:A2:r452b-gearbox-coldstart-pinion-starvation:0e46f9dc7f45958b",
+   "experiment_id": "cl-98eb68257cabe552:vexp",
+   "observed_outcome": "COMPUTED_FAIL",
+   "failed_constraint": "primary-segment flow >= 800.0000 mL/min at the stated operating condition (the problem's own declared requirement)",
+   "mutation_reason": "the flow deficit is driven by the primary segment's diameter through the d^4 Poiseuille dependence; the mutation solves the inverse problem for exactly the required flow",
+   "child_candidate_id": "cand:A2:r452b-gearbox-coldstart-pinion-starvation:0e46f9dc7f45958b:mut1"
+  },
+  "stop_reason": null,
+  "note": null,
+  "bounded": true,
+  "loop_verification_state": "SYNTHETIC_LOOP_VERIFIED",
+  "loop_verification_basis": "the loop closed on COMPUTED evidence only (a virtual decisive experiment through the deterministic solver); the machinery works and the technical state moved on the experiment's own observation \u2014 but NO external reality produced the evidence (Art. XXXVII/XXXVIII: SYNTHETIC, never REAL_LOOP_VERIFIED; a virtual experiment may never be labeled a physical observation)",
+  "deterministic": true,
+  "llm_calls": 0,
+  "recorded_at": "2026-09-13T13:42:45+00:00"
+ },
+ "per_case_honest_states": {
+  "B": {
+   "available": true,
+   "candidate_id": "cand:A2:r452b-gearbox-coldstart-pinion-starvation:0e46f9dc7f45958b",
+   "declared_parameters": {},
+   "loop_outcome": "FALSIFIED_CONSTRAINT",
+   "child_outcome": "CHILD_SUPPORTS_HYPOTHESIS_COMPUTATIONALLY",
+   "stop_reason": null,
+   "stages_executed": [
+    "CANDIDATE",
+    "MECHANISTIC_MODEL",
+    "VIRTUAL_EXPERIMENT",
+    "FALSIFICATION_SUPPORT_OUTCOME",
+    "TECHNICAL_STATE_UPDATE",
+    "AUTOMATIC_MUTATION",
+    "NEW_CANDIDATE",
+    "RE_EVALUATION"
+   ]
+  },
+  "A": {
+   "available": true,
+   "candidate_id": "cand:A2:r452a-surgical-irrigation-pressure-instability:729103c0c6ed02f7",
+   "declared_parameters": {},
+   "loop_outcome": null,
+   "child_outcome": null,
+   "stop_reason": "EXPERIMENT_CONTRACT_INVALID",
+   "stages_executed": [
+    "CANDIDATE",
+    "MECHANISTIC_MODEL",
+    "VIRTUAL_EXPERIMENT"
+   ]
+  },
+  "C": {
+   "available": true,
+   "candidate_id": "cand:A2:r452c-sic-module-dieattach-delamination:edfbd680d85d99dd",
+   "declared_parameters": {},
+   "loop_outcome": null,
+   "child_outcome": null,
+   "stop_reason": "EXPERIMENT_CONTRACT_INVALID",
+   "stages_executed": [
+    "CANDIDATE",
+    "MECHANISTIC_MODEL",
+    "VIRTUAL_EXPERIMENT"
+   ]
+  }
+ },
+ "directive_fields_check": {
+  "parent_candidate_id": true,
+  "experiment_id": true,
+  "observed_outcome": true,
+  "failed_constraint": true,
+  "mutation_reason": true,
+  "child_candidate_id": true,
+  "mutation_from_experiment_result": true,
+  "zero_llm_calls": true,
+  "loop_verification_state": "SYNTHETIC_LOOP_VERIFIED"
+ },
+ "status": "COMPLETE"
+}

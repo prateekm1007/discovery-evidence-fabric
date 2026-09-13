@@ -6,7 +6,7 @@
  * collapse: 35 s .. >240 s variance on identical calls; tiny-call
  * timeouts re-verified 2026-08-30) and Mistral (401, re-verified).
  * The M1 campaign was transport-bound on this single path. The sandbox
- * provides a healthy LLM transport via the z-ai CLI (model glm-4-plus,
+ * provides a healthy LLM transport via the z-ai CLI (embedded model,
  * verified live: READY probe, ~2 s). This gateway exposes that transport
  * as an OpenAI-compatible /v1/chat/completions endpoint on 127.0.0.1 so
  * the engine's llm_registry can use it as an ordinary provider.

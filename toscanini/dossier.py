@@ -549,6 +549,17 @@ def design_tab(session: Dict[str, Any],
     join = gst.get("visual_join") or {}
     contract = gst.get("geometry_contract") or \
         _geometry_artifact_contract(session, run_dir, geom)
+    # R435 (restored at the PRs #4->#5 merge battery, Art. LXIV rule 2):
+    # the generation evolution projection is INDEPENDENT of the artifact
+    # contract — the rows are the BRIDGE_REPORT's own generation history,
+    # and the scaffold guard applies on EVERY path. A branch that drops
+    # the rows loses the recorded evolution narrative — exactly the
+    # information-loss class the external audit measured.
+    evolution_rows = [
+        {**row, "why": _suppress_scaffold(row.get("why"))}
+        if isinstance(row, dict) else row
+        for row in (geom.get("evolution") or [])
+    ]
     # R451-C2.2 (directive §2) + R451-C2.3 (directive §1): the promotion
     # into the AVAILABLE branch is the ARTIFACT CONTRACT's decision —
     # contract['geometry_state'] == 'geometry_available' means the
@@ -618,6 +629,7 @@ def design_tab(session: Dict[str, Any],
             # field regardless (the GLB stays inspectable/downloadable
             # in the deep layer — the projection never hides the
             # artifact, only the stage placement)
+            evolution=evolution_rows,
             hero_eligibility=_hero_eligibility(geom),
             # R451-C2.1: the typed geometry/visual state — the UI's
             # States C/D/E consume THIS, never a missing-file inference
@@ -648,11 +660,6 @@ def design_tab(session: Dict[str, Any],
             scores=geom.get("scores"),
             not_visualized=(geom.get("scores") or {}).get(
                 "not_visualized") or [],
-            evolution=[
-                {**row, "why": _suppress_scaffold(row.get("why"))}
-                if isinstance(row, dict) else row
-                for row in (geom.get("evolution") or [])
-            ],
             generation_id=(geom.get("generation_id")
                            or ((geom.get("artifact_identity") or {})
                                .get("generation_id"))),
@@ -689,6 +696,7 @@ def design_tab(session: Dict[str, Any],
         return _tab("PENDING", "UNKNOWN", note,
                     reason=reason, render_reason=(reason or "")
                     if reason else None,
+                    evolution=evolution_rows,
                     geometry_state=gst["geometry_state"],
                     presentation_cause=gst["presentation_cause"],
                     geometry_state_detail=gst["geometry_state_detail"],
@@ -698,6 +706,7 @@ def design_tab(session: Dict[str, Any],
                 reason=reason,
                 epistemic_status=(cio or {}).get("identity", {}).get(
                     "final_status") or "UNKNOWN",
+                evolution=evolution_rows,
                 geometry_state=gst["geometry_state"],
                 presentation_cause=gst["presentation_cause"],
                 geometry_state_detail=gst["geometry_state_detail"],

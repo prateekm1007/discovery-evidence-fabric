@@ -39,25 +39,57 @@ from .epistemics import (
 _NON_NUMERIC = {"UNKNOWN", "NOT ESTABLISHED", "NOT_ESTABLISHED", "", "NONE", "TBD", "N/A"}
 
 # ---------------------------------------------------------------------------
-# R452 A4 — the physical-site vocabulary (one authority: the registry)
+# R452 A4 — the physical-site vocabulary (one authority: the registry,
+# with an explicit canonical-noun floor)
 # ---------------------------------------------------------------------------
 # The pre-R452 check was a closed 27-noun regex and independently blocked
 # ENGINEERING_3D on 4/6 real physical inventions (no "vial", no
-# "lyophilizer", no "die", no "punch"). The vocabulary is now DERIVED
-# from the engine's own canonical domain registry (one authority, Art. X)
-# so the site check can never be narrower than the registry. The
-# derivation, its exclusion rules and its basis are recorded and travel
-# in every classification (the vocabulary is a threshold WITH provenance,
+# "lyophilizer", no "die", no "punch"). The vocabulary is DERIVED from
+# the engine's own canonical domain registry (one authority, Art. X) so
+# the site check can never be narrower than the registry, and is then
+# UNIONED with the canonical physical-noun floor (the merged-union of
+# the mainline's explicit widened vocabulary) so the check can never be
+# narrower than that floor either. The derivation, the floor, the
+# exclusion rules and the basis are recorded and travel in every
+# classification (the vocabulary is a threshold WITH provenance,
 # Art. XXVII).
+
+#: the canonical physical-noun floor (audit A4): every noun the domain
+#: families' own physical vocabulary is known to require, kept as an
+#: explicit floor under the registry-derived vocabulary
+_PHYSICAL_SITE_FLOOR_NOUNS = frozenset({
+    "panel", "catheter", "valve", "pump", "device", "module", "cell",
+    "stack", "battery", "turbine", "exchanger", "reactor", "sensor",
+    "implant", "floor", "lumen", "coil", "antenna", "array", "absorber",
+    "receiver", "nozzle", "duct", "blade", "wafer", "electrode",
+    "membrane", "engine", "gearbox", "gear", "bearing", "manifold",
+    "gallery", "branch", "pipe", "pipeline", "tube", "tubing",
+    "channel", "conduit", "orifice", "bore", "vial", "lyophilizer",
+    "freeze-dry", "freeze-drying", "freezedry", "shelf", "tray", "die",
+    "mold", "molding", "moulding", "punch", "housing", "chamber", "tank",
+    "vessel", "drum", "rotor", "stator", "winding", "casting", "forging",
+    "shaft", "seal",
+    "gasket", "spring", "fastener", "weld", "joint", "flange",
+    "fitting", "cannula", "sheath", "needle", "circuit", "inverter",
+    "heatsink", "radiator", "insulation", "cable", "busbar", "terminal",
+    "frame", "chassis", "bracket", "hinge", "actuator", "motor",
+    "generator", "compressor", "condenser", "boiler", "furnace", "kiln",
+    "crucible", "melter", "extruder", "emitter", "dripper", "filter",
+    "strainer",
+})
+
 
 def _build_physical_site_pattern() -> tuple:
     words, basis = physical_site_vocabulary()
-    ordered = sorted(words, key=len, reverse=True)
+    # the floor is unioned IN (never narrower than either authority)
+    union_words = set(words) | _PHYSICAL_SITE_FLOOR_NOUNS
+    ordered = sorted(union_words, key=len, reverse=True)
     pattern = re.compile(
         r"\b(" + "|".join(re.escape(w) for w in ordered) + r")\b",
         re.I,
     )
     return pattern, basis
+
 
 _PHYSICAL_SITE_PATTERN, _PHYSICAL_SITE_BASIS = _build_physical_site_pattern()
 
@@ -115,14 +147,15 @@ def _geometry_parameters(engineering_spec: Dict[str, Any]) -> List[Dict[str, Any
         value_status = str(p.get("value_status") or "").upper()
         val = _numeric(p.get("value"))
         if val is not None and "UNKNOWN" not in value_status and p.get("unit"):
-            # R452 A2 (external audit): the param id carried into the
-            # build chain is the SEMANTIC name ("device outer diameter"),
-            # never the registry's positional id ("CP-001") — the
-            # measured defect: every CP-nnn key missed the FORM_LIBRARY
-            # builders' semantic lookups and every build fell through to
-            # hardcoded defaults, producing byte-identical geometry for
-            # specs differing 80x. The positional id rides along as
-            # provenance (never lost, never the join key).
+            # R452 A2 (external audit) — MERGED UNION: the param id
+            # carried into the build chain is the SEMANTIC name ("device
+            # outer diameter"), never the registry's positional id
+            # ("CP-001") — the measured defect: every CP-nnn key missed
+            # the FORM_LIBRARY builders' semantic lookups and every
+            # build fell through to hardcoded defaults, producing
+            # byte-identical geometry for specs differing 80x. The
+            # positional id rides along as provenance (never lost, never
+            # the join key), and the raw value_status travels explicitly.
             found.append({
                 "param_id": (p.get("parameter") or p.get("name")
                              or p.get("parameter_id")),
@@ -132,6 +165,7 @@ def _geometry_parameters(engineering_spec: Dict[str, Any]) -> List[Dict[str, Any
                 "envelope": p.get("envelope"),
                 "value_class": p.get("value_status") or p.get("basis")
                 or "MODELLED",
+                "value_status": value_status,
                 "source": p.get("source"),
                 "source_hash": p.get("source_hash"),
                 "origin": "engineering_core.critical_parameters",

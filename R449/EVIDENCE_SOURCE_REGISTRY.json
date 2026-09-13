@@ -1,0 +1,1253 @@
+{
+ "artifact_type": "EVIDENCE_SOURCE_REGISTRY",
+ "round": "R449",
+ "created_at_utc": "2026-09-12T02:20:29+00:00",
+ "reviewer_provenance": "AI_REVIEW",
+ "directive": "R449 Phases 1-2: freeze the first production subset from the R447 15-source reconnaissance; verify the actual licensing/access state per source; fail-closed promotion (unverified license => never production evidence)",
+ "selection_criteria": {
+  "coverage": "family reach + federated endpoint reachability",
+  "quality": "provenance origin recorded + revision pinned + activity signals",
+  "license_clarity": "actual license text read and hashed (LICENSE file or card declaration)",
+  "technical_diversity": "evidence type diversity (text mechanism spans vs structured property tables)",
+  "information_gain": "family seat competition (first seat in family > duplicate coverage)"
+ },
+ "selection_basis": [
+  "E1_patent_intelligence seat 1: uspto_patents (designated; NOT promotable this round — license_verified=False, endpoint_reachable=True; no promotable same-family alternate; the seat keeps its honest PENDING status)",
+  "E1_patent_intelligence seat 2: wopto (designated, promotable; score 0.905; license cc-by-4.0)",
+  "E2_scientific_intelligence seat 1: openalex_mirror (designated; NOT promotable this round — license_verified=True, endpoint_reachable=False; no promotable same-family alternate; the seat keeps its honest PENDING status)",
+  "E2_scientific_intelligence seat 2: s2orc_abstracts (designated; NOT promotable this round — license_verified=False, endpoint_reachable=True; no promotable same-family alternate; the seat keeps its honest PENDING status)",
+  "E3_engineering_intelligence seat 1: cadgenbench (designated; NOT promotable this round — license_verified=True, endpoint_reachable=False; no promotable same-family alternate; the seat keeps its honest PENDING status)",
+  "E3_engineering_intelligence seat 2: openfoam_cases (designated, promotable; score 0.905; license mit)",
+  "E4_materials_intelligence seat 1: designated materials_project NOT promotable (license_verified=True, endpoint_reachable=False) -> seat resolved to colabfit_mp (highest-scoring promotable same-family candidate; score 0.77; coverage is a selection criterion)",
+  "E4_materials_intelligence AFLOW/OQMD seat: lemat_rho (score 0.752; promotable=True; considered debyet_aflow score 0.612)",
+  "E5_chemical_intelligence seat 1: qm9 (designated, promotable; score 0.85; license apache-2.0)",
+  "E5_chemical_intelligence seat 2: chemrag_reactions (designated, promotable; score 0.805; license mit)"
+ ],
+ "subset_shape": {
+  "target": "10 seats: 2 patents, 2 papers, 2 engineering, 1 Materials-Project-family, 1 AFLOW/OQMD-derived, 2 chemistry",
+  "selected": 10,
+  "promoted_production": 6,
+  "pending_license": 2,
+  "pending_index": 2,
+  "held_reserve": 5
+ },
+ "epistemic_rule": "hosted == available, NEVER automatically correct; promotion requires the verified license record; PENDING states are honest and fail-closed (Art. XXV/XXVII)",
+ "federated_rule": "NO bulk download; every production query goes to the remote datasets-server; no local vector store; no second knowledge graph",
+ "sources": [
+  {
+   "source_id": "uspto_patents",
+   "source_url": "https://huggingface.co/datasets/common-pile/uspto",
+   "dataset_id": "common-pile/uspto",
+   "dataset_revision": "e8b975381547f026e2ccfe721f785dcb6a2fa9a0",
+   "family": "E1_patent_intelligence",
+   "license": null,
+   "license_text_hash": null,
+   "license_basis": "UNVERIFIED",
+   "license_verified": false,
+   "gated": false,
+   "access_requirements": {
+    "gated": false,
+    "requirements": [],
+    "met": null
+   },
+   "provenance_origin": "Feder Cooper and Aviya Skowron and Shayne Longpre and Lintang Sutawika and Alon Albalak and Zhenlin Xu and Guilherme Penedo and Loubna Ben and Elie Bakouch and John David and Honglu Fan and Dashiell Stander and Guangyu Song and Aaron Gokaslan and John Kirchenbauer and Tom Goldstein and Brian R and Bhavya Kailkhura and Tyler Murray}, journal={arXiv preprint}, year={2025} } ``` <!-- # United States ",
+   "schema": {
+    "config": "default",
+    "split": "train",
+    "query_mode": "search",
+    "query_kind": "text_problem",
+    "text_field": "text",
+    "fallback_text_field": null,
+    "document_field": "id",
+    "where_template": null,
+    "measurement_fields": [],
+    "endpoint_reachable": true,
+    "splits_state": "SUCCESS",
+    "rows_probe_state": "SUCCESS",
+    "features": [
+     {
+      "name": "id",
+      "type": "Value"
+     },
+     {
+      "name": "text",
+      "type": "Value"
+     },
+     {
+      "name": "added",
+      "type": "Value"
+     },
+     {
+      "name": "created",
+      "type": "Value"
+     },
+     {
+      "name": "source",
+      "type": "Value"
+     },
+     {
+      "name": "metadata",
+      "type": null
+     }
+    ]
+   },
+   "last_verified": "2026-09-12T02:20:29+00:00",
+   "status": "PENDING_LICENSE_VERIFICATION",
+   "selection": {
+    "selected": true,
+    "operator_recommended": true,
+    "scores": {
+     "coverage": 1.0,
+     "quality": 0.75,
+     "license_clarity": 0.0,
+     "technical_diversity": 1.0,
+     "information_gain": 1.0
+    },
+    "weights": {
+     "coverage": 0.25,
+     "quality": 0.2,
+     "license_clarity": 0.2,
+     "technical_diversity": 0.2,
+     "information_gain": 0.15
+    },
+    "score_total": 0.75
+   },
+   "operator_note": "USPTO patent text corpus; historical technological knowledge + prior-art discovery + mechanism neighborhoods, NEVER patentability"
+  },
+  {
+   "source_id": "wopto",
+   "source_url": "https://huggingface.co/datasets/baber/WOPTO",
+   "dataset_id": "baber/WOPTO",
+   "dataset_revision": "b35b19cf1d2a3f30a30075bb86fd587b9a34e378",
+   "family": "E1_patent_intelligence",
+   "license": "cc-by-4.0",
+   "license_text_hash": "b2d5a89a3fc1b48f18dcfe388bc5416d9add392fa8152ea3af8e3ab3c23e07e5",
+   "license_basis": "CARD_DECLARATION_ONLY",
+   "license_verified": true,
+   "gated": false,
+   "access_requirements": {
+    "gated": false,
+    "requirements": [],
+    "met": null
+   },
+   "provenance_origin": "## World Patent Applications Bibliographic Data The dataset has been exported from [Google Patents Public Data ](https://console.",
+   "schema": {
+    "config": "default",
+    "split": "train",
+    "query_mode": "search",
+    "query_kind": "text_problem",
+    "text_field": "abstract_text",
+    "fallback_text_field": "title_text",
+    "document_field": "publication_number",
+    "where_template": null,
+    "measurement_fields": [],
+    "endpoint_reachable": true,
+    "splits_state": "SUCCESS",
+    "rows_probe_state": "SUCCESS",
+    "features": [
+     {
+      "name": "publication_number",
+      "type": "Value"
+     },
+     {
+      "name": "application_number",
+      "type": "Value"
+     },
+     {
+      "name": "country_code",
+      "type": "Value"
+     },
+     {
+      "name": "kind_code",
+      "type": "Value"
+     },
+     {
+      "name": "application_kind",
+      "type": "Value"
+     },
+     {
+      "name": "publication_date",
+      "type": "Value"
+     },
+     {
+      "name": "filing_date",
+      "type": "Value"
+     },
+     {
+      "name": "grant_date",
+      "type": "Value"
+     },
+     {
+      "name": "ipc",
+      "type": "Value"
+     },
+     {
+      "name": "inventor_name",
+      "type": "Value"
+     },
+     {
+      "name": "title_text",
+      "type": "Value"
+     },
+     {
+      "name": "title_language",
+      "type": "Value"
+     },
+     {
+      "name": "abstract_text",
+      "type": "Value"
+     },
+     {
+      "name": "abstract_language",
+      "type": "Value"
+     }
+    ]
+   },
+   "last_verified": "2026-09-12T02:20:29+00:00",
+   "status": "PRODUCTION",
+   "selection": {
+    "selected": true,
+    "operator_recommended": true,
+    "scores": {
+     "coverage": 1.0,
+     "quality": 0.75,
+     "license_clarity": 1.0,
+     "technical_diversity": 1.0,
+     "information_gain": 0.7
+    },
+    "weights": {
+     "coverage": 0.25,
+     "quality": 0.2,
+     "license_clarity": 0.2,
+     "technical_diversity": 0.2,
+     "information_gain": 0.15
+    },
+    "score_total": 0.905
+   },
+   "operator_note": "worldwide patent applications outside the US (bibliographic + titles/abstracts; many rows carry null abstracts — the title fallback is measured)"
+  },
+  {
+   "source_id": "ai_patents",
+   "source_url": "https://huggingface.co/datasets/istat-ai/ai-patents",
+   "dataset_id": "istat-ai/ai-patents",
+   "dataset_revision": "d697534d5383f5bb38269106248c3c04451adbd4",
+   "family": "E1_patent_intelligence",
+   "license": null,
+   "license_text_hash": null,
+   "license_basis": "UNVERIFIED+GATED",
+   "license_verified": false,
+   "gated": true,
+   "access_requirements": {
+    "gated": true,
+    "requirements": [
+     "hub gating mode auto: access requires the dataset's own approval (the HF Pro subscription does NOT bypass gated-dataset approval)"
+    ],
+    "met": false
+   },
+   "provenance_origin": "",
+   "schema": {
+    "config": "default",
+    "split": "train",
+    "query_mode": "search",
+    "query_kind": "text_problem",
+    "text_field": "text",
+    "fallback_text_field": null,
+    "document_field": "id",
+    "where_template": null,
+    "measurement_fields": [],
+    "endpoint_reachable": false,
+    "splits_state": "PROVIDER_ERROR:HTTP401",
+    "rows_probe_state": null,
+    "features": []
+   },
+   "last_verified": "2026-09-12T02:20:29+00:00",
+   "status": "HELD_RESERVE",
+   "selection": {
+    "selected": false,
+    "operator_recommended": false,
+    "scores": {
+     "coverage": 0.1,
+     "quality": 0.25,
+     "license_clarity": 0.0,
+     "technical_diversity": 1.0,
+     "information_gain": 0.4
+    },
+    "weights": {
+     "coverage": 0.25,
+     "quality": 0.2,
+     "license_clarity": 0.2,
+     "technical_diversity": 0.2,
+     "information_gain": 0.15
+    },
+    "score_total": 0.335
+   },
+   "operator_note": "AI-focused patent corpus; specialized index"
+  },
+  {
+   "source_id": "openalex_mirror",
+   "source_url": "https://huggingface.co/datasets/Mearman/OpenAlex",
+   "dataset_id": "Mearman/OpenAlex",
+   "dataset_revision": "ef02effac13bfbd0991612f444cebcef8a882453",
+   "family": "E2_scientific_intelligence",
+   "license": "cc0-1.0",
+   "license_text_hash": "885fc8c55ead661c043b529977a1c357b2ec5bb0b06284cfc07dfda992b64c33",
+   "license_basis": "CARD_DECLARATION_ONLY",
+   "license_verified": true,
+   "gated": false,
+   "access_requirements": {
+    "gated": false,
+    "requirements": [],
+    "met": null
+   },
+   "provenance_origin": "parquet # one edge table per list/dict field ``` The dataset viewer provides one subset per entity+relationship combination (e.",
+   "schema": {
+    "config": "works__work_abstracts",
+    "split": "train",
+    "query_mode": "search",
+    "query_kind": "text_problem",
+    "text_field": "abstract",
+    "fallback_text_field": null,
+    "document_field": "id",
+    "where_template": null,
+    "measurement_fields": [],
+    "endpoint_reachable": false,
+    "splits_state": "SUCCESS",
+    "rows_probe_state": "PROVIDER_ERROR:HTTP500",
+    "features": []
+   },
+   "last_verified": "2026-09-12T02:20:29+00:00",
+   "status": "PENDING_INDEX",
+   "selection": {
+    "selected": true,
+    "operator_recommended": true,
+    "scores": {
+     "coverage": 0.4,
+     "quality": 0.75,
+     "license_clarity": 1.0,
+     "technical_diversity": 1.0,
+     "information_gain": 1.0
+    },
+    "weights": {
+     "coverage": 0.25,
+     "quality": 0.2,
+     "license_clarity": 0.2,
+     "technical_diversity": 0.2,
+     "information_gain": 0.15
+    },
+    "score_total": 0.8
+   },
+   "operator_note": "OpenAlex snapshot mirror (works/abstracts)"
+  },
+  {
+   "source_id": "s2orc_abstracts",
+   "source_url": "https://huggingface.co/datasets/sentence-transformers/s2orc",
+   "dataset_id": "sentence-transformers/s2orc",
+   "dataset_revision": "8cfc394e83b2ebfcf38f90b508aea383df742439",
+   "family": "E2_scientific_intelligence",
+   "license": null,
+   "license_text_hash": null,
+   "license_basis": "UNVERIFIED",
+   "license_verified": false,
+   "gated": false,
+   "access_requirements": {
+    "gated": false,
+    "requirements": [],
+    "met": null
+   },
+   "provenance_origin": "## Dataset Subsets ### `title-abstract-pair` subset * Columns: \"title\", \"abstract\" * Column types: `str`, `str` * Examples: ```python { \"title\": \"Syntheses, Structures and Properties of Two Transition Metal-Flexible Ligand Coordination Polymers\", \"abstract\": \"Two coordination polymers based on 3,5-bis(4-carboxyphenylmethyloxy) benzoic acid (H3L), [M(HL)]·2H2O M = Mn(1), Co(2), have been synthesize",
+   "schema": {
+    "config": "title-abstract-pair",
+    "split": "train",
+    "query_mode": "search",
+    "query_kind": "text_problem",
+    "text_field": "title",
+    "fallback_text_field": null,
+    "document_field": "id",
+    "where_template": null,
+    "measurement_fields": [],
+    "endpoint_reachable": true,
+    "splits_state": "SUCCESS",
+    "rows_probe_state": "SUCCESS",
+    "features": [
+     {
+      "name": "title",
+      "type": "Value"
+     },
+     {
+      "name": "abstract",
+      "type": "Value"
+     }
+    ]
+   },
+   "last_verified": "2026-09-12T02:20:29+00:00",
+   "status": "PENDING_LICENSE_VERIFICATION",
+   "selection": {
+    "selected": true,
+    "operator_recommended": true,
+    "scores": {
+     "coverage": 1.0,
+     "quality": 0.75,
+     "license_clarity": 0.0,
+     "technical_diversity": 0.6,
+     "information_gain": 0.7
+    },
+    "weights": {
+     "coverage": 0.25,
+     "quality": 0.2,
+     "license_clarity": 0.2,
+     "technical_diversity": 0.2,
+     "information_gain": 0.15
+    },
+    "score_total": 0.625
+   },
+   "operator_note": "S2ORC embedding-oriented release (titles/abstracts/citations)"
+  },
+  {
+   "source_id": "scientific_papers",
+   "source_url": "https://huggingface.co/datasets/scientifi-papers/scientific-papers",
+   "dataset_id": "scientifi-papers/scientific-papers",
+   "dataset_revision": "d5313d11159f0d39549422c8ac3de461e1a445c4",
+   "family": "E2_scientific_intelligence",
+   "license": "cc-by-4.0",
+   "license_text_hash": "b2d5a89a3fc1b48f18dcfe388bc5416d9add392fa8152ea3af8e3ab3c23e07e5",
+   "license_basis": "CARD_DECLARATION_ONLY",
+   "license_verified": true,
+   "gated": false,
+   "access_requirements": {
+    "gated": false,
+    "requirements": [],
+    "met": null
+   },
+   "provenance_origin": "This dataset provides raw full text suitable for pre-training, fine-tuning, or building search indices over scientific literature.",
+   "schema": {
+    "config": "corex",
+    "split": "train",
+    "query_mode": "search",
+    "query_kind": "text_problem",
+    "text_field": "text",
+    "fallback_text_field": null,
+    "document_field": "id",
+    "where_template": null,
+    "measurement_fields": [],
+    "endpoint_reachable": false,
+    "splits_state": "SUCCESS",
+    "rows_probe_state": "PROVIDER_ERROR:HTTP500",
+    "features": []
+   },
+   "last_verified": "2026-09-12T02:20:29+00:00",
+   "status": "HELD_RESERVE",
+   "selection": {
+    "selected": false,
+    "operator_recommended": false,
+    "scores": {
+     "coverage": 0.4,
+     "quality": 0.75,
+     "license_clarity": 1.0,
+     "technical_diversity": 1.0,
+     "information_gain": 0.4
+    },
+    "weights": {
+     "coverage": 0.25,
+     "quality": 0.2,
+     "license_clarity": 0.2,
+     "technical_diversity": 0.2,
+     "information_gain": 0.15
+    },
+    "score_total": 0.71
+   },
+   "operator_note": "large multi-corpus scientific collection"
+  },
+  {
+   "source_id": "cadgenbench",
+   "source_url": "https://huggingface.co/datasets/HuggingAI4Engineering/cadgenbench-data",
+   "dataset_id": "HuggingAI4Engineering/cadgenbench-data",
+   "dataset_revision": "f76f965585817c621d6ea0d150d745adf670e66e",
+   "family": "E3_engineering_intelligence",
+   "license": "odc-by",
+   "license_text_hash": "ab611c17e50434772cb38e80b54158975e98ff072a981eba86fb40350b8a6392",
+   "license_basis": "CARD_DECLARATION_ONLY",
+   "license_verified": true,
+   "gated": false,
+   "access_requirements": {
+    "gated": false,
+    "requirements": [],
+    "met": null
+   },
+   "provenance_origin": "## Dataset Creation ### Source Data The underlying CAD geometry is sourced from [Mecado](https://www.",
+   "schema": {
+    "config": "default",
+    "split": "train",
+    "query_mode": "search",
+    "query_kind": "text_problem",
+    "text_field": "text",
+    "fallback_text_field": null,
+    "document_field": "id",
+    "where_template": null,
+    "measurement_fields": [],
+    "endpoint_reachable": false,
+    "splits_state": "PROVIDER_ERROR:HTTP501",
+    "rows_probe_state": null,
+    "features": []
+   },
+   "last_verified": "2026-09-12T02:20:29+00:00",
+   "status": "PENDING_INDEX",
+   "selection": {
+    "selected": true,
+    "operator_recommended": true,
+    "scores": {
+     "coverage": 0.1,
+     "quality": 0.75,
+     "license_clarity": 1.0,
+     "technical_diversity": 1.0,
+     "information_gain": 1.0
+    },
+    "weights": {
+     "coverage": 0.25,
+     "quality": 0.2,
+     "license_clarity": 0.2,
+     "technical_diversity": 0.2,
+     "information_gain": 0.15
+    },
+    "score_total": 0.725
+   },
+   "operator_note": "CADGenBench mechanical-part fixtures; external engineering-geometry benchmark"
+  },
+  {
+   "source_id": "openfoam_cases",
+   "source_url": "https://huggingface.co/datasets/arungovindneelan/openfoam-Agent-Dataset",
+   "dataset_id": "arungovindneelan/openfoam-Agent-Dataset",
+   "dataset_revision": "62c23b75fb4a0364a277efb08e71a27125702385",
+   "family": "E3_engineering_intelligence",
+   "license": "mit",
+   "license_text_hash": "204d0bce1ef327f348bccd1f6efe3397d28f54009edcb813a141198a262bd528",
+   "license_basis": "CARD_DECLARATION_ONLY",
+   "license_verified": true,
+   "gated": false,
+   "access_requirements": {
+    "gated": false,
+    "requirements": [],
+    "met": null
+   },
+   "provenance_origin": "# foam-openfoam-agent — Validated OpenFOAM Case Dataset A dataset of natural-language CFD prompts paired with **validated, converged OpenFOAM v2412 case files**. Every case in this dataset was generat",
+   "schema": {
+    "config": "per_case_chat",
+    "split": "train",
+    "query_mode": "search",
+    "query_kind": "text_problem",
+    "text_field": "text",
+    "fallback_text_field": null,
+    "document_field": "text",
+    "where_template": null,
+    "measurement_fields": [],
+    "endpoint_reachable": true,
+    "splits_state": "SUCCESS",
+    "rows_probe_state": "SUCCESS",
+    "features": [
+     {
+      "name": "text",
+      "type": "Value"
+     },
+     {
+      "name": "score",
+      "type": "Value"
+     }
+    ]
+   },
+   "last_verified": "2026-09-12T02:20:29+00:00",
+   "status": "PRODUCTION",
+   "selection": {
+    "selected": true,
+    "operator_recommended": true,
+    "scores": {
+     "coverage": 1.0,
+     "quality": 0.75,
+     "license_clarity": 1.0,
+     "technical_diversity": 1.0,
+     "information_gain": 0.7
+    },
+    "weights": {
+     "coverage": 0.25,
+     "quality": 0.2,
+     "license_clarity": 0.2,
+     "technical_diversity": 0.2,
+     "information_gain": 0.15
+    },
+    "score_total": 0.905
+   },
+   "operator_note": "validated OpenFOAM cases paired with NL prompts"
+  },
+  {
+   "source_id": "materials_project",
+   "source_url": "https://huggingface.co/datasets/materials-toolkits/materials-project",
+   "dataset_id": "materials-toolkits/materials-project",
+   "dataset_revision": "c6c45cbc608018c8593e8ebc8b61ba0ee4d892b6",
+   "family": "E4_materials_intelligence",
+   "license": "mit",
+   "license_text_hash": "204d0bce1ef327f348bccd1f6efe3397d28f54009edcb813a141198a262bd528",
+   "license_basis": "CARD_DECLARATION_ONLY",
+   "license_verified": true,
+   "gated": false,
+   "access_requirements": {
+    "gated": false,
+    "requirements": [],
+    "met": null
+   },
+   "provenance_origin": "# Dataset Materials project (2019 dump) This dataset contains 133420 materials with formation energy per atom.",
+   "schema": {
+    "config": "default",
+    "split": "train",
+    "query_mode": "search",
+    "query_kind": "text_problem",
+    "text_field": "text",
+    "fallback_text_field": null,
+    "document_field": "id",
+    "where_template": null,
+    "measurement_fields": [],
+    "endpoint_reachable": false,
+    "splits_state": "SUCCESS",
+    "rows_probe_state": "NO_SPLIT",
+    "features": []
+   },
+   "last_verified": "2026-09-12T02:20:29+00:00",
+   "status": "HELD_RESERVE",
+   "selection": {
+    "selected": false,
+    "operator_recommended": true,
+    "scores": {
+     "coverage": 0.4,
+     "quality": 0.75,
+     "license_clarity": 1.0,
+     "technical_diversity": 1.0,
+     "information_gain": 0.83
+    },
+    "weights": {
+     "coverage": 0.25,
+     "quality": 0.2,
+     "license_clarity": 0.2,
+     "technical_diversity": 0.2,
+     "information_gain": 0.15
+    },
+    "score_total": 0.775
+   },
+   "operator_note": "Materials Project structures + formation energies"
+  },
+  {
+   "source_id": "crystalreasoner_mp",
+   "source_url": "https://huggingface.co/datasets/CrystalReasoner/CrystalReasoner-MP",
+   "dataset_id": "CrystalReasoner/CrystalReasoner-MP",
+   "dataset_revision": "c80e8fcf9653b448dbd3b27dcb2af3e3e31d2d12",
+   "family": "E4_materials_intelligence",
+   "license": "other",
+   "license_text_hash": "3475ecbe98fa231b194ca26d297e834527e396ef4f9723f862993f78dc2b28fb",
+   "license_basis": "CARD_DECLARATION_ONLY",
+   "license_verified": false,
+   "gated": false,
+   "access_requirements": {
+    "gated": false,
+    "requirements": [],
+    "met": null
+   },
+   "provenance_origin": "## License This dataset is derived from the Materials Project database.",
+   "schema": {
+    "config": "default",
+    "split": "train",
+    "query_mode": "filter",
+    "query_kind": "text_problem",
+    "text_field": "formula",
+    "fallback_text_field": null,
+    "document_field": "material_id",
+    "where_template": "",
+    "measurement_fields": [],
+    "endpoint_reachable": true,
+    "splits_state": "SUCCESS",
+    "rows_probe_state": "SUCCESS",
+    "features": [
+     {
+      "name": "material_id",
+      "type": "Value"
+     },
+     {
+      "name": "structure",
+      "type": "Value"
+     },
+     {
+      "name": "energy_above_hull",
+      "type": "Value"
+     },
+     {
+      "name": "formation_energy_per_atom",
+      "type": "Value"
+     },
+     {
+      "name": "is_stable",
+      "type": "Value"
+     },
+     {
+      "name": "band_gap",
+      "type": "Value"
+     },
+     {
+      "name": "is_metal",
+      "type": "Value"
+     },
+     {
+      "name": "efermi",
+      "type": "Value"
+     },
+     {
+      "name": "bulk_modulus",
+      "type": "Value"
+     },
+     {
+      "name": "shear_modulus",
+      "type": "Value"
+     },
+     {
+      "name": "homogeneous_poisson",
+      "type": "Value"
+     },
+     {
+      "name": "description",
+      "type": "Value"
+     },
+     {
+      "name": "formula_pretty",
+      "type": "Value"
+     },
+     {
+      "name": "thermal_expansion_300k",
+      "type": "Value"
+     }
+    ]
+   },
+   "last_verified": "2026-09-12T02:20:29+00:00",
+   "status": "HELD_RESERVE",
+   "selection": {
+    "selected": false,
+    "operator_recommended": false,
+    "scores": {
+     "coverage": 1.0,
+     "quality": 0.75,
+     "license_clarity": 0.4,
+     "technical_diversity": 0.5,
+     "information_gain": 0.58
+    },
+    "weights": {
+     "coverage": 0.25,
+     "quality": 0.2,
+     "license_clarity": 0.2,
+     "technical_diversity": 0.2,
+     "information_gain": 0.15
+    },
+    "score_total": 0.667
+   },
+   "operator_note": "~200k structures with formation energy, stability, band gap, moduli"
+  },
+  {
+   "source_id": "colabfit_mp",
+   "source_url": "https://huggingface.co/datasets/colabfit/Materials_Project",
+   "dataset_id": "colabfit/Materials_Project",
+   "dataset_revision": "e77db8fb6c65e1d649e56298757e2b3295ac81b2",
+   "family": "E4_materials_intelligence",
+   "license": "cc-by-4.0",
+   "license_text_hash": "b2d5a89a3fc1b48f18dcfe388bc5416d9add392fa8152ea3af8e3ab3c23e07e5",
+   "license_basis": "CARD_DECLARATION_ONLY",
+   "license_verified": true,
+   "gated": false,
+   "access_requirements": {
+    "gated": false,
+    "requirements": [],
+    "met": null
+   },
+   "provenance_origin": "### <details><summary>Cite this dataset </summary>Jain, A., Ong, S. P., Hautier, G., Chen, W., Richards, W. D., Dacek, S., Cholia, S., Gunter, D., Skinner, D., Ceder, G., and Persson, K. A. _Materials",
+   "schema": {
+    "config": "default",
+    "split": "train",
+    "query_mode": "search",
+    "query_kind": "element",
+    "text_field": "chemical_formula_reduced",
+    "fallback_text_field": null,
+    "document_field": "property_id",
+    "where_template": null,
+    "measurement_fields": [
+     "formation_energy",
+     "energy_above_hull",
+     "electronic_band_gap",
+     "electronic_band_gap_type",
+     "method"
+    ],
+    "endpoint_reachable": true,
+    "splits_state": "SUCCESS",
+    "rows_probe_state": "SUCCESS",
+    "features": [
+     {
+      "name": "property_id",
+      "type": "Value"
+     },
+     {
+      "name": "property_hash",
+      "type": "Value"
+     },
+     {
+      "name": "last_modified",
+      "type": "Value"
+     },
+     {
+      "name": "dataset_id",
+      "type": "Value"
+     },
+     {
+      "name": "multiplicity",
+      "type": "Value"
+     },
+     {
+      "name": "software",
+      "type": "Value"
+     },
+     {
+      "name": "method",
+      "type": "Value"
+     },
+     {
+      "name": "energy",
+      "type": "Value"
+     },
+     {
+      "name": "atomic_forces",
+      "type": "List"
+     },
+     {
+      "name": "cauchy_stress",
+      "type": "List"
+     },
+     {
+      "name": "cauchy_stress_volume_normalized",
+      "type": "Value"
+     },
+     {
+      "name": "electronic_band_gap",
+      "type": "Value"
+     },
+     {
+      "name": "electronic_band_gap_type",
+      "type": "Value"
+     },
+     {
+      "name": "formation_energy",
+      "type": "Value"
+     },
+     {
+      "name": "adsorption_energy",
+      "type": "Value"
+     },
+     {
+      "name": "atomization_energy",
+      "type": "Value"
+     },
+     {
+      "name": "max_force_norm",
+      "type": "Value"
+     },
+     {
+      "name": "mean_force_norm",
+      "type": "Value"
+     },
+     {
+      "name": "energy_above_hull",
+      "type": "Value"
+     },
+     {
+      "name": "configuration_id",
+      "type": "Value"
+     },
+     {
+      "name": "configuration_hash",
+      "type": "Value"
+     },
+     {
+      "name": "structure_hash",
+      "type": "Value"
+     },
+     {
+      "name": "cell",
+      "type": "List"
+     },
+     {
+      "name": "positions",
+      "type": "List"
+     }
+    ]
+   },
+   "last_verified": "2026-09-12T02:20:29+00:00",
+   "status": "PRODUCTION",
+   "selection": {
+    "selected": true,
+    "operator_recommended": false,
+    "scores": {
+     "coverage": 1.0,
+     "quality": 0.75,
+     "license_clarity": 1.0,
+     "technical_diversity": 0.6,
+     "information_gain": 0.33
+    },
+    "weights": {
+     "coverage": 0.25,
+     "quality": 0.2,
+     "license_clarity": 0.2,
+     "technical_diversity": 0.2,
+     "information_gain": 0.15
+    },
+    "score_total": 0.77
+   },
+   "operator_note": "ColabFit MP 6.34M rows energies/forces/stresses/structures; formation energy + energy above hull (thermodynamic stability) per structure; element-symbol queries via the full-text index (string WHERE filters are rejected by the datasets-server — measured live: HTTP 422 invalid symbols)"
+  },
+  {
+   "source_id": "lemat_rho",
+   "source_url": "https://huggingface.co/datasets/LeMaterial/LeMat-Rho",
+   "dataset_id": "LeMaterial/LeMat-Rho",
+   "dataset_revision": "ead79c98ca9622302f67d850a4fd9bc6b195ed3d",
+   "family": "E4_materials_intelligence",
+   "license": "cc-by-4.0",
+   "license_text_hash": "b2d5a89a3fc1b48f18dcfe388bc5416d9add392fa8152ea3af8e3ab3c23e07e5",
+   "license_basis": "CARD_DECLARATION_ONLY",
+   "license_verified": true,
+   "gated": false,
+   "access_requirements": {
+    "gated": false,
+    "requirements": [],
+    "met": null
+   },
+   "provenance_origin": "# LeMat-Rho **LeMat-Rho** is a dataset of ~69,000 inorganic crystal structures computed with the **r2SCAN meta-GGA functional** in VASP, featuring charge densities, Bader charges, forces, stresses, an",
+   "schema": {
+    "config": "default",
+    "split": "train",
+    "query_mode": "search",
+    "query_kind": "element",
+    "text_field": "chemical_formula_reduced",
+    "fallback_text_field": null,
+    "document_field": "immutable_id",
+    "where_template": null,
+    "measurement_fields": [
+     "energy",
+     "energy_corrected",
+     "nsites",
+     "space_group_it_number",
+     "functional"
+    ],
+    "endpoint_reachable": true,
+    "splits_state": "SUCCESS",
+    "rows_probe_state": "SUCCESS",
+    "features": [
+     {
+      "name": "elements",
+      "type": "List"
+     },
+     {
+      "name": "nsites",
+      "type": "Value"
+     },
+     {
+      "name": "chemical_formula_anonymous",
+      "type": "Value"
+     },
+     {
+      "name": "chemical_formula_reduced",
+      "type": "Value"
+     },
+     {
+      "name": "chemical_formula_descriptive",
+      "type": "Value"
+     },
+     {
+      "name": "nelements",
+      "type": "Value"
+     },
+     {
+      "name": "dimension_types",
+      "type": "List"
+     },
+     {
+      "name": "nperiodic_dimensions",
+      "type": "Value"
+     },
+     {
+      "name": "lattice_vectors",
+      "type": "List"
+     },
+     {
+      "name": "immutable_id",
+      "type": "Value"
+     },
+     {
+      "name": "cartesian_site_positions",
+      "type": "List"
+     },
+     {
+      "name": "species",
+      "type": "Value"
+     },
+     {
+      "name": "species_at_sites",
+      "type": "List"
+     },
+     {
+      "name": "last_modified",
+      "type": "Value"
+     },
+     {
+      "name": "elements_ratios",
+      "type": "List"
+     },
+     {
+      "name": "stress_tensor",
+      "type": "List"
+     },
+     {
+      "name": "energy",
+      "type": "Value"
+     },
+     {
+      "name": "energy_corrected",
+      "type": "Value"
+     },
+     {
+      "name": "magnetic_moments",
+      "type": "Value"
+     },
+     {
+      "name": "forces",
+      "type": "List"
+     },
+     {
+      "name": "total_magnetization",
+      "type": "Value"
+     },
+     {
+      "name": "charges",
+      "type": "Value"
+     },
+     {
+      "name": "dos_ef",
+      "type": "Value"
+     },
+     {
+      "name": "functional",
+      "type": "Value"
+     }
+    ]
+   },
+   "last_verified": "2026-09-12T02:20:29+00:00",
+   "status": "PRODUCTION",
+   "selection": {
+    "selected": true,
+    "operator_recommended": true,
+    "scores": {
+     "coverage": 1.0,
+     "quality": 0.75,
+     "license_clarity": 1.0,
+     "technical_diversity": 0.6,
+     "information_gain": 0.21
+    },
+    "weights": {
+     "coverage": 0.25,
+     "quality": 0.2,
+     "license_clarity": 0.2,
+     "technical_diversity": 0.2,
+     "information_gain": 0.15
+    },
+    "score_total": 0.752
+   },
+   "operator_note": "~69k inorganic crystals from AFLOW/OQMD/MP with charge densities, Bader charges; element-symbol queries via the full-text index"
+  },
+  {
+   "source_id": "debyet_aflow",
+   "source_url": "https://huggingface.co/datasets/foundry-ml/dataset_debyet_aflow",
+   "dataset_id": "foundry-ml/dataset_debyet_aflow",
+   "dataset_revision": "957af85770cd9a34d2c2c312269dca29b17cb30a",
+   "family": "E4_materials_intelligence",
+   "license": "other",
+   "license_text_hash": "3475ecbe98fa231b194ca26d297e834527e396ef4f9723f862993f78dc2b28fb",
+   "license_basis": "CARD_DECLARATION_ONLY",
+   "license_verified": false,
+   "gated": false,
+   "access_requirements": {
+    "gated": false,
+    "requirements": [],
+    "met": null
+   },
+   "provenance_origin": "} title = {Benchmark AFLOW Data Sets for Machine Learning (Debye Temperature)} keywords = {machine learning, foundry} publisher = {Materials Data Facility} year = {root=2020}} ``` ## License other --- *This dataset was exported from [Foundry-ML](https://github.",
+   "schema": {
+    "config": "default",
+    "split": "train",
+    "query_mode": "filter",
+    "query_kind": "text_problem",
+    "text_field": "formula",
+    "fallback_text_field": null,
+    "document_field": "id",
+    "where_template": "",
+    "measurement_fields": [],
+    "endpoint_reachable": true,
+    "splits_state": "SUCCESS",
+    "rows_probe_state": "SUCCESS",
+    "features": [
+     {
+      "name": "formula",
+      "type": "Value"
+     },
+     {
+      "name": "target",
+      "type": "Value"
+     }
+    ]
+   },
+   "last_verified": "2026-09-12T02:20:29+00:00",
+   "status": "HELD_RESERVE",
+   "selection": {
+    "selected": false,
+    "operator_recommended": true,
+    "scores": {
+     "coverage": 1.0,
+     "quality": 0.75,
+     "license_clarity": 0.4,
+     "technical_diversity": 0.5,
+     "information_gain": 0.21
+    },
+    "weights": {
+     "coverage": 0.25,
+     "quality": 0.2,
+     "license_clarity": 0.2,
+     "technical_diversity": 0.2,
+     "information_gain": 0.15
+    },
+    "score_total": 0.612
+   },
+   "operator_note": "AFLOW-derived Debye-temperature property dataset"
+  },
+  {
+   "source_id": "qm9",
+   "source_url": "https://huggingface.co/datasets/liuganghuggingface/QM9",
+   "dataset_id": "liuganghuggingface/QM9",
+   "dataset_revision": "74ae1f169cbfbb73423fe6906c1b64c62c7f7aac",
+   "family": "E5_chemical_intelligence",
+   "license": "apache-2.0",
+   "license_text_hash": "f3cae36c4cdc3eb2e8a8d88ad4f1462364f750a68b490ba70821491d55f8de9e",
+   "license_basis": "CARD_DECLARATION_ONLY",
+   "license_verified": true,
+   "gated": false,
+   "access_requirements": {
+    "gated": false,
+    "requirements": [],
+    "met": null
+   },
+   "provenance_origin": "--- license: apache-2.0 tags: - chemistry ---",
+   "schema": {
+    "config": "default",
+    "split": "train",
+    "query_mode": "filter",
+    "query_kind": "text_problem",
+    "text_field": "smiles",
+    "fallback_text_field": null,
+    "document_field": "mol_id",
+    "where_template": "\"gap\">0.3",
+    "measurement_fields": [
+     "gap",
+     "homo",
+     "lumo",
+     "mu",
+     "alpha",
+     "zpve"
+    ],
+    "endpoint_reachable": true,
+    "splits_state": "SUCCESS",
+    "rows_probe_state": "SUCCESS",
+    "features": []
+   },
+   "last_verified": "2026-09-12T02:20:29+00:00",
+   "status": "PRODUCTION",
+   "selection": {
+    "selected": true,
+    "operator_recommended": true,
+    "scores": {
+     "coverage": 1.0,
+     "quality": 0.75,
+     "license_clarity": 1.0,
+     "technical_diversity": 0.5,
+     "information_gain": 1.0
+    },
+    "weights": {
+     "coverage": 0.25,
+     "quality": 0.2,
+     "license_clarity": 0.2,
+     "technical_diversity": 0.2,
+     "information_gain": 0.15
+    },
+    "score_total": 0.85
+   },
+   "operator_note": "QM9 molecular structures + computed properties (units: Hartree — measured live: gap>0.3 Ha ~ 8.2 eV selects insulator-class molecules, 25672 rows; gap>7 returned 0 rows under the eV assumption — the unit discovery is recorded)"
+  },
+  {
+   "source_id": "chemrag_reactions",
+   "source_url": "https://huggingface.co/datasets/ChemRAG/uspto",
+   "dataset_id": "ChemRAG/uspto",
+   "dataset_revision": "7a67c802ff0506ee4be0db0f3acf70aee41933e9",
+   "family": "E5_chemical_intelligence",
+   "license": "mit",
+   "license_text_hash": "204d0bce1ef327f348bccd1f6efe3397d28f54009edcb813a141198a262bd528",
+   "license_basis": "CARD_DECLARATION_ONLY",
+   "license_verified": true,
+   "gated": false,
+   "access_requirements": {
+    "gated": false,
+    "requirements": [],
+    "met": null
+   },
+   "provenance_origin": "",
+   "schema": {
+    "config": "default",
+    "split": "train",
+    "query_mode": "search",
+    "query_kind": "text_problem",
+    "text_field": "contents",
+    "fallback_text_field": null,
+    "document_field": "id",
+    "where_template": null,
+    "measurement_fields": [],
+    "endpoint_reachable": true,
+    "splits_state": "SUCCESS",
+    "rows_probe_state": "SUCCESS",
+    "features": [
+     {
+      "name": "id",
+      "type": "Value"
+     },
+     {
+      "name": "contents",
+      "type": "Value"
+     }
+    ]
+   },
+   "last_verified": "2026-09-12T02:20:29+00:00",
+   "status": "PRODUCTION",
+   "selection": {
+    "selected": true,
+    "operator_recommended": true,
+    "scores": {
+     "coverage": 1.0,
+     "quality": 0.25,
+     "license_clarity": 1.0,
+     "technical_diversity": 1.0,
+     "information_gain": 0.7
+    },
+    "weights": {
+     "coverage": 0.25,
+     "quality": 0.2,
+     "license_clarity": 0.2,
+     "technical_diversity": 0.2,
+     "information_gain": 0.15
+    },
+    "score_total": 0.805
+   },
+   "operator_note": "USPTO-derived reaction datasets"
+  }
+ ]
+}
