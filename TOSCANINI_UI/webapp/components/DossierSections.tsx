@@ -28,40 +28,19 @@ import type {
   EvidenceLedgerItem,
   FalsificationRecord,
 } from "@/lib/types";
+import { renderAvailabilityNotice } from "@/lib/renderAvailability";
 import { EpistemicBadge } from "./ScienceEvents";
 
-// ---- render availability (R446-C2 WS3) --------------------------------------
-// The typed render status is ALWAYS surfaced: a skipped or suppressed
-// visual stage is honest absence — never a silent gap, never re-labeled
-// as an engineering failure ("rendering failed"), and never inflated
-// into success ("visualization complete"). The authoritative engineering
-// geometry on stage is unaffected either way; these sentences state
-// exactly what exists and why the images do not.
-export function renderAvailabilityNotice(r: {
-  status?: string;
-  visual_gate?: { verdict?: string; hero_suppressed?: boolean };
-}): string {
-  const status = String(r.status ?? "");
-  if (status === "RENDER_SKIPPED_LOW_MEMORY") {
-    // the typed 512 MB capacity skip — the exact state, verbatim
-    return "Engineering geometry available; visual rendering unavailable "
-      + "at current deployment capacity.";
-  }
-  if (status.startsWith("RENDER_SKIPPED")) {
-    return "Engineering geometry available; visual rendering unavailable "
-      + "in this deployment (renderer infrastructure unavailable).";
-  }
-  if (r.visual_gate?.hero_suppressed
-      || (r.visual_gate?.verdict != null
-          && r.visual_gate.verdict !== "COMPLETE_PASS"
-          && r.visual_gate.verdict !== "PASS")) {
-    return "Engineering geometry available; presentation renders are "
-      + "withheld — the visual quality gate did not certify them "
-      + "(fail-closed).";
-  }
-  return "Engineering geometry available; visual rendering unavailable "
-    + "on this run (" + status + ").";
-}
+// ---- render availability (R446-C2 WS3; R452 B2/B3/C7) ----------------------
+// THE NOTICE MOVED: the pure string logic now lives in
+// lib/renderAvailability.ts (R452) so the deterministic battery compiles
+// and exercises the BEHAVIOR directly (the audit's three defects — the
+// false authority claim, the silent null-status gap, the undefined
+// throw — are pinned by behavior tests, not source-shape pins alone).
+// The summary comment below is the change record:
+// R452: the function body lives in lib/renderAvailability.ts (imported
+// above) — the audit's B2 (authority-derived phrase), B3 (NOT_ATTEMPTED
+// branch) and C7 (null-safe) fixes are behavior-tested in the battery.
 
 // ---- shared types (migrated from the retired DossierPane) ------------------
 
@@ -663,17 +642,29 @@ export function ModelDetailsSection({
             )}
           </div>
           <div className="faint" style={{ fontSize: 12 }}>
-            presentation renders — the authoritative geometry is the
-            CAD-built model on stage; renders never validate physics
+            presentation renders —{" "}
+            {d.engineering_authority === "ENGINEERING" && d.conceptual !== true
+              ? "the authoritative geometry is the CAD-built model on stage"
+              : "the geometry on stage is the recorded conceptual " +
+                "representation (no engineering CAD claim)"}{" "}
+            — renders never validate physics
           </div>
         </div>
       )}
 
-      {!d.renders?.hero_png && d.renders?.status != null && (
+      {!d.renders?.hero_png && (
+        // R452 B3: the guard no longer suppresses the notice when the
+        // renders object or its status is null — the NOT_ATTEMPTED case
+        // renders its own honest sentence (the "silent gap" the audit
+        // measured is closed); renderAvailabilityNotice is null-safe
+        // (C7), so an absent object cannot crash
         <div className="ov-block" data-render-absent>
           <h4>Presentation renders</h4>
           <div className="faint" style={{ fontSize: 13 }}>
-            {renderAvailabilityNotice(d.renders)}
+            {renderAvailabilityNotice(d.renders, {
+              engineering_authority: d.engineering_authority,
+              conceptual: d.conceptual,
+            })}
           </div>
         </div>
       )}

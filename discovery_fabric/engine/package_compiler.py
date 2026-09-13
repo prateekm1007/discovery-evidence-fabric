@@ -1022,7 +1022,15 @@ def _bind_release(work: Path, result: Dict[str, Any],
                 "buyer_package_hash"):
         if binding[key] is not None:
             data[key] = binding[key]
-    data["status"] = "HELD_FOR_HUMAN_REVIEW"
+    # R452 (external audit B4, Art. X + XXXIX): the survivor gate's
+    # verdict is AUTHORITATIVE. The measured defect: this rewrite set
+    # status=HELD_FOR_HUMAN_REVIEW unconditionally while RELEASE_PROOF
+    # kept NOT_A_SURVIVOR — two release artifacts disagreed on the same
+    # run (3/3 packaged production runs) and the HELD wording softened a
+    # rejected survivor into a reviewable one. The compiler binds
+    # hashes; it NEVER changes a survivor-gate verdict.
+    if str(data.get("status") or "") not in ("NOT_A_SURVIVOR", "RELEASED"):
+        data["status"] = "HELD_FOR_HUMAN_REVIEW"
     data["r440_package_compiled"] = binding
     rel.write_text(json.dumps(data, indent=2, default=str))
     return binding

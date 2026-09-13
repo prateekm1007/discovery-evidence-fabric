@@ -62,11 +62,26 @@ def _boot_id() -> str:
 
 
 def _engine_commit() -> Optional[str]:
+    """R452 C5 (external audit): the forensics ledger must attribute
+    every line to a deployed commit — the audit measured
+    `engine_commit: null` on ALL 509 lines including the 9 TERMINAL_STATE
+    events, so a failure can never be attributed to the deployed engine
+    (exactly what Article LXXI diagnosis needs on a blocked run).
+
+    Resolution order: the env-var pins first (cheap), then the CANONICAL
+    build-artifact identity (the same one-authority resolution the
+    server's /api/health consumes — `resolve_engine_commit` derives the
+    commit from the build artifact, never from the env expectation)."""
     for var in ("ENGINE_COMMIT", "BUILD_ARTIFACT_COMMIT", "RENDER_GIT_COMMIT"):
         val = os.environ.get(var)
         if val:
             return val
-    return None
+    try:
+        from .artifact_identity import resolve_engine_commit
+        commit, _source = resolve_engine_commit()
+        return commit or None
+    except Exception:  # noqa: BLE001 — forensics never raises (fail-open)
+        return None
 
 
 class ForensicsDegraded(Exception):

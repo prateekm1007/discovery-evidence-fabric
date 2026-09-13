@@ -130,6 +130,20 @@ def _mk_run(tmp_path: Path, *, status="COMPLETE",
             {"complete": True, "maturity": "EARLY",
              "zip_name": "TECHNOLOGY_TRANSFER_PACKAGE_INV-430.zip",
              "package_kind": "INVENTION_BRIDGE"}))
+    if status == "COMPLETE":
+        # R452 (dated investigation, Art. LXIV rule 2): this fixture
+        # failed as VALIDATION_INCOMPLETE ever since the R446-C1
+        # completion-marker authority made run_manifest.json the
+        # canonical proof of a COMPLETE run (the fixture predates it).
+        # The verifier is correct (Art. X/XXV: the run dir's own marker
+        # is the truth); the FIXTURE now carries the marker a real
+        # COMPLETE run writes — the claim is corrected, never the
+        # verifier (Art. VII).
+        (rd / "run_manifest.json").write_text(json.dumps(
+            {"finished_at": "2026-09-09T10:05:00Z",
+             "final_status": final,
+             "failed_stages": [],
+             "final_envelope_hash": "fixture-final-envelope-hash"}))
     return {
         "session_id": sid, "user_text": "keep minimum drainage when a "
                                         "shunt's primary lumen "

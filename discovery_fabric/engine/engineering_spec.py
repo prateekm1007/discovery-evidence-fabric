@@ -854,11 +854,14 @@ def build_engineering_spec(spec: Dict[str, Any], env: Optional[Candidate],
                  and not str(ev_id).startswith("problem:")],
                 spec)
     except Exception as exc:  # noqa: BLE001 — disclosed, never silent
+        # d6 discipline: the error detail is authoritative content and is
+        # recorded VERBATIM (no slice truncation — a truncated diagnostic
+        # is exactly the information loss d6 exists to prevent).
         _value_sourcing_report = {
             "artifact": "VALUE_SOURCING_REPORT",
             "stage": "value_sourcing/1.0.0",
             "state": "STAGE_ERROR",
-            "error": f"{type(exc).__name__}: {exc}"[:300],
+            "error": f"{type(exc).__name__}: {exc}",
             "n_parameters": len(critical_parameters),
             "n_sourced": 0,
         }

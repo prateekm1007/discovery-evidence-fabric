@@ -26,11 +26,31 @@ import re
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
-import cadquery as cq
 import trimesh
 
 from .coloring import apply_gltf_yup, set_uniform_color
 from .epistemics import VALUE_CLASS_MODELLED, VALUE_CLASS_SOURCE_FACT
+
+
+class _CadQueryLazy:
+    """R452 C2 (external audit): LAZY CadQuery/OCP loader.
+
+    The measured cost of importing OCP is ~500 MB RSS against a
+    container that has already OOM-crashed once at 512 MB — and the
+    bridge imports this module on EVERY run, conceptual included. The
+    audit's prescription: gate the CadQuery import behind the warrant
+    decision so a SYSTEM_3D run never pays it. First attribute access
+    (i.e. only when an engineering build actually executes) imports the
+    real module and REBINDS this global, so every later access is
+    direct and there is exactly one import (Art. X)."""
+
+    def __getattr__(self, name: str):
+        import cadquery as cq  # the ~500 MB boundary, crossed only on build
+        globals()["cq"] = cq
+        return getattr(cq, name)
+
+
+cq = _CadQueryLazy()
 
 MM_UNITS = {"mm", "millimeter", "millimetre", "mm."}
 

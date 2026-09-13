@@ -741,3 +741,21 @@ Work Log:
 Stage Summary:
 - The closure round is committed; delivery verification follows in the push step.
 - reviewer_provenance=AI_REVIEW.
+
+---
+Task ID: R452-C2 (completion + verification)
+Agent: Coder 2 (main session)
+Task: R452-C2 completion — verify and close the external-audit response batch for the presentation boundary (CANONICAL PRESENTATION STATE -> KILLED INVENTION SUPPRESSION -> CONCEPTUAL/ENGINEERING LANGUAGE -> RENDER STATES -> RELEASE STATE -> ADVERSARIAL CONTRADICTION), per the operator's execution order; fix what the verification exposed.
+
+Work Log:
+- Mandatory reads IN FULL: Constitution v2.4.0 (all 2153 lines, session start), the five GOVERNANCE files, ACTIVE_PATH.md (460 lines), the three C2.6 round records. The inherited summary's stale canonical SHA (bd7a12df) corrected from artifacts: the branch carries four R452 commits (c55e556c five-state vocabulary + sovereign boundary + render whitelist; 5735a3c2 contract test RED; 96e86476 VALUE_SOURCING/join/vocabulary GREEN; faaf0f19 killed-invention authority) plus the completed in-flight B2/B3/B4/B6/C2/C4/C5/C7 batch (Art. XXIV: the artifacts win).
+- Verified the in-flight batch green: renderAvailability.ts (B2 authority-derived phrase, B3 NOT_ATTEMPTED branch, C7 null-safety) + DossierSections refactor; bridge.py geometry_authority conditional (B6/AT-11); the lazy CadQuery/OCP loaders in all three geometry modules (C2/AT-20) + subprocess probes; the survivor-release gate in server.py + the compiler's verdict-preserving rewrite (B4/AT-10); the Blender retirement renewal + battery (C4); the forensics engine_commit resolution (C5).
+- TWO honest repairs the verification exposed: (1) d6 — the round's own committed VALUE_SOURCING error handler truncated the diagnostic ([:300]); fixed verbatim, verifier never weakened (Art. VII); (2) r430 — the four-rounds-standing "BS-020 pair" finally investigated (Art. LXIV rule 2): the R446-C1 completion-marker authority post-dates the fixture; the fixture now writes run_manifest.json for COMPLETE runs; 30/30 green, verifier untouched.
+- ONE dated investigation, deliberately not fixed: test_r418_bridge_gate 4 failures — stash-verified pre-R452 (fca2800d), root-caused to the R445 canonical-domain gate vs the captured pre-R445 solar fixture (package BLOCKs on gates C+W, no zip); live code, stale captured fixture; the captured-record upgrade is named as the follow-up and must not ride an audit-response commit.
+- Round record: R452/C2_PRODUCT/R452_C2_ROUND_RECORD.json. Credential state OPEN (automated history verification: 23486 blobs, both credentials LIVE; Art. LXV escalation 4; the operator reminder issued at the point of need only). Task 3 (production device path) stays staged pending Coder 1's physical run.
+- Batteries: R452 family all green (blender 4, lazy-OCP 2, survivor-gate 8, sovereign/killed/reachable 18); r451 family 224; UI battery 143 ALL PASS; visual r441+r443+r444 79; product families 52+31+15+30; consumer sweep 47; f-series 22+d6; r418_bridge_gate 4 pre-existing (dated); tsc clean; next build green (output cleaned); Constitution reread #2 IN FULL immediately before this commit.
+- No C2.7 invented; no scope expansion; Coder-1 canonical machinery consumed, never modified; production delivery honestly BLOCKED on the owner merge (PRs #4 -> #5) + the Space redeploy (Art. LXXI).
+
+Stage Summary:
+- The presentation boundary now holds on every axis the external audit measured: the killed invention cannot be presented as a success (projection authority), a rejected survivor's ZIPs are unreachable from every route (409 typed, disagreement surfaced), conceptual geometry is never called engineering (authority derived from what ran), a not-attempted render is an honest notice (never silence, never a crash, never a false authority claim), the legacy renderer requires a deliberate act (renewed LXIV record + escalation), a conceptual run never pays the OCP import, and every forensics line carries its commit identity.
+- reviewer_provenance=AI_REVIEW.

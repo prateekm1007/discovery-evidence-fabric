@@ -1115,6 +1115,77 @@ try {
         "reaches VISUAL_READY",
       r.state === "VISUAL_READY");
   }
+
+  // ---- R452 B2/B3/C7 — the render availability notice --------------------
+  // (external audit: every branch asserted "Engineering geometry available"
+  // over conceptual geometry; the null status rendered SILENCE; the
+  // function THREW on undefined). The pure logic lives in
+  // lib/renderAvailability.ts and is compiled + required like
+  // presentationState — the assertions exercise real behavior.
+  {
+    const src = fsRead("components", "DossierSections.tsx");
+    // AT-8: the false authority claim is structurally gone from the
+    // shipping sources
+    check("R452/AT-8: no UI string asserts 'Engineering geometry " +
+        "available' (the authority claim is derived, never asserted)",
+      !src.includes("Engineering geometry available"));
+    execFileSync(path.join(WEBAPP, "node_modules", ".bin", "tsc"), [
+      path.join(WEBAPP, "lib", "renderAvailability.ts"),
+      "--outDir", OUT,
+      "--module", "commonjs",
+      "--target", "es2020",
+      "--skipLibCheck",
+      "--noEmitOnError",
+    ], { stdio: "pipe" });
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { renderAvailabilityNotice } = require(
+      path.join(OUT, "renderAvailability.js"));
+    const conceptual = {
+      engineering_authority: "CONCEPTUAL", conceptual: true,
+    };
+    // C7: undefined / null never throw
+    let threw = false;
+    let out;
+    try { out = renderAvailabilityNotice(undefined, conceptual); }
+    catch { threw = true; }
+    check("R452/C7: renderAvailabilityNotice(undefined) does not throw",
+      !threw);
+    check("R452/B3: an absent renders object renders the " +
+        "NOT_ATTEMPTED notice, never silence",
+      typeof out === "string" && out.includes("No render was attempted"));
+    // B3: null status (the audit's silent-gap case)
+    out = renderAvailabilityNotice({ status: null }, conceptual);
+    check("R452/B3: status == null renders the NOT_ATTEMPTED notice",
+      out.includes("No render was attempted"));
+    // B2: the conceptual run never claims engineering geometry
+    out = renderAvailabilityNotice(
+      { status: "RENDER_SKIPPED_LOW_MEMORY" }, conceptual);
+    check("R452/B2: conceptual + skipped render states the conceptual " +
+        "representation, never 'Engineering geometry available'",
+      out.includes("conceptual representation") &&
+      !out.includes("Engineering geometry available"));
+    out = renderAvailabilityNotice(
+      { status: "", visual_gate: { verdict: "FAIL",
+                                   hero_suppressed: true } },
+      conceptual);
+    check("R452/B2: gate FAIL over conceptual geometry states the " +
+        "fail-closed withhold without the engineering claim",
+      out.includes("withheld") &&
+      out.includes("conceptual representation"));
+    // the honest engineering case: authority ENGINEERING may say so
+    const engineering = {
+      engineering_authority: "ENGINEERING", conceptual: false,
+    };
+    out = renderAvailabilityNotice(
+      { status: "RENDER_SKIPPED_NO_RENDERER" }, engineering);
+    check("R452/B2: ENGINEERING authority render skip states the " +
+        "engineering CAD authority (the positive control, Art. V)",
+      out.includes("CadQuery/OCCT"));
+    // an unrecognized status is typed, never folded into another state
+    out = renderAvailabilityNotice({ status: "WEIRD_STATE" }, conceptual);
+    check("R452: an unrecognized render status is surfaced verbatim",
+      out.includes("WEIRD_STATE"));
+  }
 } finally {
   rmSync(OUT, { recursive: true, force: true });
 }

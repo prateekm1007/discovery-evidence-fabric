@@ -43,10 +43,24 @@ import math
 import re
 from typing import Any, Dict, List, Optional, Set, Tuple
 
-import cadquery as cq
 import trimesh
 
 from .coloring import apply_gltf_yup, set_uniform_color
+
+
+class _CadQueryLazy:
+    """R452 C2 (external audit): LAZY CadQuery/OCP loader — the ~500 MB
+    RSS import is paid ONLY when a geometry build actually executes,
+    never by the bridge import itself (a conceptual-class run never
+    crosses it). First access rebinds this global to the real module."""
+
+    def __getattr__(self, name: str):
+        import cadquery as cq
+        globals()["cq"] = cq
+        return getattr(cq, name)
+
+
+cq = _CadQueryLazy()
 
 # Palette: warm/terracotta editorial direction (matches the product chrome)
 PALETTE = {

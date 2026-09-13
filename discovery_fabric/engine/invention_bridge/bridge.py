@@ -237,13 +237,24 @@ def bridge(run_result: Dict[str, Any], cio: Optional[Dict[str, Any]],
 
     geometry_out = dict(built)
     geometry_out["visualizability_class"] = vis["visualizability_class"]
+    # R452 B6 (external audit / AT-11): geometry_authority names
+    # CadQuery/OCCT ONLY when CadQuery actually ran and produced its
+    # artifacts — a reader of this field alone was previously told a
+    # lie on every conceptual run ("CadQuery/OCCT" written
+    # unconditionally while is_conceptual=true measured 7/7 in
+    # production). The honest authority for the conceptual path is the
+    # trimesh conceptual builder; only the presence of an emitted STEP
+    # (the OCCT artifact) establishes the engineering authority claim.
+    _eng_ran = vis["visualizability_class"] == ep.ENGINEERING_3D and \
+        bool(geometry_out.get("step_files"))
     geometry_out["cad_pipeline_status"] = {
         "artifact": "CAD_PIPELINE_STATUS",
         "bridge_version": BRIDGE_VERSION,
         "attempts": attempts,
         "status": "COMPLETED",
         "visualizability_class": vis["visualizability_class"],
-        "geometry_authority": "CadQuery/OCCT",
+        "geometry_authority": "CadQuery/OCCT" if _eng_ran
+        else "trimesh conceptual builder (no CAD executed)",
         "domain_family": geometry_out.get("domain_family"),
         "measure_step": "executed" if vis["visualizability_class"] == ep.ENGINEERING_3D
                         else "topology-only (conceptual)",
