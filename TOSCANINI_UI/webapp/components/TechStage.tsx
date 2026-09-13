@@ -891,7 +891,22 @@ export default function TechStage({
       )}
 
       {/* ---- the terminal verdict line ---- */}
-      {done && usv && (
+      {/* R451-C2.6 FINAL CLOSEOUT §1 — THE ONE RULE: INFRASTRUCTURE_PAUSED
+          -> NO scientific terminal verdict surface. The guard is the
+          canonical presentation state itself (!blocked === view.infrastructurePaused,
+          decided by lib/presentationState.ts from the backend user-state
+          projection): a terminal infrastructure stop (e.g. RUN_BLOCKED_TRANSPORT
+          carrying a stale `done`-shaped user_state_view with label/decision/
+          meaning populated) renders the InfrastructureBlockedHero — whose own
+          copy is the ONLY verdict that state speaks — and NEVER this
+          scientific terminal verdict line. This is not a second policy: it is
+          the same blocked-state authority the hero, the insight cards and the
+          action rows already consume (proven by the final-closeout browser
+          attack in R451/C2_PRODUCT/E2E_FINAL_CLOSEOUT/, which populates EVERY
+          stale field — label "AUTOMATED INVENTION CANDIDATE", decision
+          "Technology ready", meaning "The candidate survived." — and proves
+          the verdict surface absent in the real DOM). */}
+      {!blocked && done && usv && (
         <div className="stage-verdict" data-stage-verdict>
           <div className="sv-label">{usv.label}</div>
           <div className="sv-decision">{usv.decision}</div>

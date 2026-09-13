@@ -655,6 +655,70 @@ try {
     check("TechStage: the R441 gate badge is legacy-guarded",
       stage.includes("gateVerdict && !legacyUnavailable"));
   }
+
+  // ----------------------------------------------------------------
+  console.log("\n== R451-C2.6 FINAL CLOSEOUT — the ONE evaluator/UI coupling ==");
+  // The directive's coupling assertion: presentationState =
+  // INFRASTRUCTURE_PAUSED AND TechStage => NO terminal scientific
+  // verdict DOM. The mapping-level half runs here on the COMPILED
+  // shipping module with the directive's EXACT attack payload (every
+  // stale field populated — the attack does not pass by omission); the
+  // DOM half is the real-browser proof in
+  // R451/C2_PRODUCT/E2E_FINAL_CLOSEOUT/ (production build, real
+  // headless Chrome). One coupling, no second state machine: both
+  // halves read the SAME resolvePresentationState the component
+  // consumes.
+  {
+    const finalCloseoutUsv = usv({
+      user_state: "BLOCKED_TRANSPORT",
+      finished: true,
+      found_something: true,
+      rejected: true,
+      package_available: true,
+      label: "AUTOMATED INVENTION CANDIDATE",
+      decision: "Technology ready",
+      meaning: "The candidate survived.",
+      outcome: "INVENTION_SURVIVED",
+      outcome_label: "AUTOMATED INVENTION CANDIDATE",
+    });
+    const convincing = dossier({ tabs: { design: {
+      availability: "AVAILABLE",
+      glb: "/api/run/x/model/engineering_model.glb",
+      geometry_class: "ENGINEERING_3D",
+      generation_id: "gen-1",
+      hero_eligibility: { eligible: true, reason: null },
+      evolution: [{ generation: 1, current: true,
+        glb: "/api/run/x/model/engineering_model.glb" }],
+      renders: { status: "OK",
+        visual_gate: { verdict: "COMPLETE_PASS" } },
+    }, evidence: null } });
+    const coupled = resolvePresentationState(
+      detail({ status: "RUN_BLOCKED_TRANSPORT",
+        user_state_view: finalCloseoutUsv }),
+      convincing);
+    check("Coupling (mapping half): the directive's blocked-terminal " +
+        "payload resolves to INFRASTRUCTURE_PAUSED",
+      coupled.state === "INFRASTRUCTURE_PAUSED" &&
+        coupled.infrastructurePaused === true);
+    check("Coupling (mapping half): the stale scientific fields NEVER " +
+        "reconcile the pause into a ready/rejection state",
+      coupled.state !== "VISUAL_READY" &&
+        coupled.state !== "SCIENTIFIC_REJECTION" &&
+        coupled.state !== "TECHNOLOGY_NOT_ESTABLISHED");
+    // the source pin: the component's terminal verdict line is gated on
+    // the SAME blocked state the hero consumes — !blocked && done && usv
+    const stage = fsRead("components", "TechStage.tsx");
+    const verdictIdx = stage.indexOf("data-stage-verdict");
+    const guardIdx = stage.indexOf("{!blocked && done && usv && (");
+    check("Coupling (source pin): the terminal verdict line is guarded " +
+        "by !blocked && done && usv (INFRASTRUCTURE_PAUSED => no " +
+        "scientific terminal verdict surface)",
+      verdictIdx !== -1 && guardIdx !== -1 && guardIdx < verdictIdx &&
+        guardIdx > stage.indexOf("data-stage-journal-live"));
+    check("Coupling (source pin): the unguarded done && usv condition " +
+        "is gone",
+      !stage.includes("{done && usv && ("));
+  }
 } finally {
   rmSync(OUT, { recursive: true, force: true });
 }
