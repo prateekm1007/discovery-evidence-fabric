@@ -346,3 +346,32 @@ The engine stage order is UNCHANGED; the directional layer lives inside the
 evolution step (between the diagnosis and the generation) and after the
 gauntlet (the observation/causal-update recording). No second invention
 graph, no second canonical database, no new solver, no new provider.
+
+## R451 addendum (2026-09-13) — the zero-paid local route + the transport capability layer
+
+Operator directives R451-C1.1 (free-model closed-loop discovery) and
+R451-C1.2 (transport capability and resilience): the engine survives the
+HF account's credit exhaustion (402 on every router model) on a LOCAL
+self-hosted route, and every future route is admitted by MEASUREMENT,
+never by catalog presence.
+
+| Component | Module | Notes |
+|---|---|---|
+| THE cost policy | `engine/model_cost_policy.py` | `MODEL_COST_POLICY=ZERO_PAID_COST` (the default since R451): only `ZERO_PAID_COST_SELF_HOSTED` bases are eligible; paid/env-grant/free-tier/undeclared are REFUSED fail-closed with recorded refusals; a preferred chain naming only paid providers EXTENDS to eligible rungs (recorded) instead of dead-ending POLICY_BLOCKED |
+| The zero-paid provider | `engine/llm_registry.py` (`localqwen`) | Qwen/Qwen3-1.7B Q4_K_M (GGUF sha pinned, apache-2.0) on llama.cpp llama-server — an ORDINARY registry provider (same ProviderSpec shape, same rungs, no bespoke conductor branch); LOCAL_PROVIDER_READY six-rung proof chain (binary→model→server→HTTP→tiny completion→Toscanini structured output) |
+| THE capability layer | `engine/transport_capability.py` | the R451-C1.2 contract: MODEL vs PROVIDER vs ACCOUNT (account_domain on every spec/rung/ledger line/provenance); FREE-CATALOG vs FREE-TO-OUR-ACCOUNT (catalog claims are class-labeled, never admission evidence); probe-before-admit; economic redundancy counted across ACCOUNT domains only (the 7 HF-router probe rows = 5+ providers on ONE account); the honest ZeroGPU separate-budget note (NOT_ACCESSIBLE_FROM_THIS_CODING_ENVIRONMENT) |
+| MODEL_NOT_FOUND | `engine/provider_health.py` | a distinct failure class (404 + provider error bodies — the R450 glm-4-plus defect was INVALID_RESPONSE); marks the rung known-dead (never-retry), provider stays eligible; _CREDIT_HINTS classify 200-body credit wording |
+| Transport observability | `model_routing.py` + `llm_registry.py` | every actual attempt (success OR failure) persists provider/model/attempt/status/failure_class/latency/cost_class/selected/fallback_reason; the in-result route reconstructs the exact path including the selected hop |
+
+Measured this round (Art. XV): the acceptance chain CLOSED on a fresh
+problem with every paid provider disabled (82 local / 0 paid calls →
+evidence → mechanism → candidate → attack ADJUDICATED — an honestly
+negative KILLED verdict); the CAD bridge closed through the
+DETERMINISTIC ENGINE_TEMPLATE path (fresh geometric problem → warrants
+WARRANTED → CadQuery/OCCT MODEL_BUILT_AND_VALIDATED → STEP/GLB hashed
+derivatives → visual stage INVOKED with the typed low-memory skip, hero
+suppressed, release blocked — Art. LXXII fail-closed held); the honest
+model-quality numbers are recorded, never repaired (50% span-verbatim
+synthesis; 13 validator-feedback attempts to a compliant technical
+state — the gates byte-identical throughout, Art. VII). Round record:
+R451/R451_C1_ROUND_RECORD.json.

@@ -43,7 +43,15 @@ THE GROUND GATE (deterministic, Art. XVIII/III):
 
 Status vocabulary (closed):
     PROPOSED       gated but not yet executed
-    GROUNDED       passed all five checks; mutation may execute
+    GROUNDED       passed all checks with EVIDENCE_SUPPORTED class;
+                   mutation may execute
+    EXPLORATORY    R451 §4: structurally sound but its evidence class
+                   is EVIDENCE_PARTIAL / EVIDENCE_MISSING — the gaps
+                   were served (reverse path) and support still did not
+                   resolve. Recorded as an EXPLORATORY hypothesis: NO
+                   mutation executes; the next action is further
+                   retrieval or a decisive-experiment specification
+                   (never pretend-grounded -> mutate)
     REJECTED       failed a check (the failure basis is recorded); the
                    mutation NEVER executes
     EXECUTED       a controlled mutation was derived and evaluated
@@ -52,6 +60,34 @@ Status vocabulary (closed):
     SUPPORTED      the observation matched the predicted direction
     SUPERSEDED     a later hypothesis replaced this one on the same
                    target variable
+
+Evidence support classification (R451 §4 — the closed classes):
+    EVIDENCE_SUPPORTED  >=1 LLM-cited evidence id resolves to custody
+                        AND its claimed span verifies VERBATIM in the
+                        item's text, AND no evidence_gaps remain
+    EVIDENCE_PARTIAL    verified support exists BUT evidence_gaps are
+                        declared (gaps != empty is NEVER equated with
+                        support)
+    EVIDENCE_MISSING    no verified support; gaps only — the direction
+                        is at most an exploratory hypothesis
+
+THE STRUCTURED CAUSAL CHAIN (R451 §5 — the deterministic layer):
+    failure -> causal mechanism -> affected variable -> intervention
+    -> predicted observable, validated mechanically:
+    G2  the diagnosis id resolves to the RECORDED diagnosis
+    G3  mechanism term-grounding (ONE defensive signal — recorded,
+        required, but never sufficient alone)
+    G5  the evidence class (ids resolve, evidence exists, spans exist)
+    G6  the target variable corresponds to the DESIGN STATE (the
+        failed candidate's own declared variables/mechanism and the
+        problem's declared quantities)
+    G7  the predicted observable corresponds to the intervention (the
+        prediction speaks about what the intervention changes)
+    G8  the falsifier measures the PREDICTED observable and its
+        kill-direction does not contradict the prediction
+    G9  causal memory: the (target_variable, direction) pair does not
+        repeat a previously FALSIFIED direction (negative knowledge
+        changes future search — Art. LI)
 """
 from __future__ import annotations
 
@@ -62,7 +98,7 @@ from dataclasses import dataclass, field, asdict
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 
-DIRECTIONAL_ENGINE_VERSION = "directional_engine/1.0.0"
+DIRECTIONAL_ENGINE_VERSION = "directional_engine/1.1.0"
 
 #: direction vocabulary (closed) — the direction of the intervention on
 #: the target variable
@@ -84,8 +120,13 @@ INTERVENTION_CLASSES = [
 
 #: hypothesis status vocabulary (closed)
 HYPOTHESIS_STATUSES = [
-    "PROPOSED", "GROUNDED", "REJECTED", "EXECUTED", "FALSIFIED",
-    "SUPPORTED", "SUPERSEDED",
+    "PROPOSED", "GROUNDED", "EXPLORATORY", "REJECTED", "EXECUTED",
+    "FALSIFIED", "SUPPORTED", "SUPERSEDED",
+]
+
+#: evidence support classification (R451 §4 — closed)
+EVIDENCE_CLASSES = [
+    "EVIDENCE_SUPPORTED", "EVIDENCE_PARTIAL", "EVIDENCE_MISSING",
 ]
 
 #: measurable-quantity term pattern for the falsifier check (G4).
@@ -184,13 +225,52 @@ def make_hypothesis_id(candidate_id: str, failure_id: str,
 
 
 # ---------------------------------------------------------------------------
-# THE GROUND GATE — deterministic adjudication (R450 §4)
+# THE GROUND GATE — deterministic adjudication (R450 §4; R451 §§4-5)
 # ---------------------------------------------------------------------------
+
+#: kill-direction comparative words near the target/falsifier terms —
+#: used by G8's contradiction test (a falsifier that kills exactly what
+#: the prediction asserts as success contradicts the prediction)
+_KILL_UP_RE = re.compile(
+    r"\b(higher|increased|increases|above|exceeds?|surpass(?:es)?|"
+    r"greater|larger)\b", re.I)
+_KILL_DOWN_RE = re.compile(
+    r"\b(lower|decreased|decreases|below|fewer|smaller|reduced)\b",
+    re.I)
+
+
+def _norm_id(raw: str) -> str:
+    """Normalize a cited evidence id: strip whitespace/brackets/quotes
+    (a weak model emits '[ev:aaa111], [ev:bbb222]' — the id is the
+    bracketed token; normalization is parsing, never fabrication)."""
+    return (raw or "").strip().strip("[]()\"'").strip()
+
+
+def _design_state_terms(design_state: Optional[Dict[str, Any]]) -> set:
+    """The distinctive terms of the DESIGN STATE vocabulary: the failed
+    candidate's own declared variables/mechanism/intervention plus the
+    problem's declared quantities (G6's grounding surface)."""
+    if not design_state:
+        return set()
+    parts = []
+    for k in ("variables", "mechanism", "intervention",
+              "expected_effect", "problem_text", "constraints",
+              "targets"):
+        v = design_state.get(k)
+        if isinstance(v, list):
+            parts.extend(str(x) for x in v)
+        elif v:
+            parts.append(str(v))
+    return _terms(" ".join(parts))
+
 
 def ground_gate(hypothesis: Dict[str, Any],
                 diagnosis: Optional[Dict[str, Any]],
                 parent_mechanism: str = "",
-                known_evidence_ids: Optional[set] = None
+                known_evidence_ids: Optional[set] = None,
+                design_state: Optional[Dict[str, Any]] = None,
+                evidence_texts: Optional[Dict[str, Dict[str, Any]]] = None,
+                falsified_priors: Optional[List[Dict[str, Any]]] = None,
                 ) -> Dict[str, Any]:
     """Adjudicate a PROPOSED hypothesis. Returns the gate record (never
     raises; every failure is a recorded check verdict).
@@ -200,6 +280,22 @@ def ground_gate(hypothesis: Dict[str, Any],
     `parent_mechanism` — the failed candidate's mechanism text.
     `known_evidence_ids` — the evidence ids in the run's custody (the
                        only admissible evidence_support anchors).
+    `design_state`  — R451 §5 G6: {variables, mechanism, intervention,
+                       expected_effect, problem_text, ...} from the
+                       parent candidate + problem (the design's OWN
+                       state; a direction about a variable that is not
+                       in it speaks about nothing the machine controls).
+    `evidence_texts` — {evidence_id: item} for span verification (G5:
+                       ids resolve, evidence exists, spans exist).
+    `falsified_priors` — R451 §5 G9: prior hypotheses with status
+                       FALSIFIED — their (target_variable, direction)
+                       pairs are negative knowledge; repeating one is
+                       REJECTED (learning must change future search).
+
+    VERDICT: GROUNDED (evidence class EVIDENCE_SUPPORTED — the mutation
+    may execute) | EXPLORATORY (R451 §4: structure passes but support
+    is PARTIAL/MISSING — no mutation; retrieve or specify the decisive
+    experiment) | REJECTED (a structural/causal check failed).
     """
     checks: List[Dict[str, Any]] = []
 
@@ -249,7 +345,9 @@ def ground_gate(hypothesis: Dict[str, Any],
         f"recorded diagnosis — a narrative reference is not a causal "
         f"chain")
 
-    # G3 MECHANISM TERM-GROUNDING
+    # G3 MECHANISM TERM-GROUNDING (ONE defensive signal among the
+    # structured checks — R451 §5: term overlap alone never suffices,
+    # but the direction must still speak about the thing that failed)
     mech_terms = _terms(str(hypothesis.get("mechanism_affected") or "") +
                         " " + str(hypothesis.get("causal_rationale") or
                                   ""))
@@ -292,47 +390,187 @@ def ground_gate(hypothesis: Dict[str, Any],
                       'ABSENT')} — an unfalsifiable direction is a "
         f"wish, not a hypothesis")
 
-    # G5 EVIDENCE
+    # G5 EVIDENCE — the R451 §4 classification (closed) with span
+    # verification (R451 §5: ids resolve, evidence exists, spans exist)
     support = hypothesis.get("evidence_support") or []
     known = known_evidence_ids if known_evidence_ids is not None else set()
-    resolved = [e for e in support
-                if str((e or {}).get("evidence_id") or "") in known]
-    unresolved = [e for e in support
-                  if str((e or {}).get("evidence_id") or "") not in known]
+    texts = evidence_texts or {}
+    verified_support = []
+    unresolved_ids = []
+    span_failed = []
+    for e in support:
+        eid = _norm_id(str((e or {}).get("evidence_id") or ""))
+        if not eid or eid not in known:
+            unresolved_ids.append(eid)
+            continue
+        item = texts.get(eid)
+        claimed_span = str((e or {}).get("span") or "").strip()
+        if item is None:
+            # custody says the id exists but the text is not provided —
+            # the id resolves; span verification NOT RUN (recorded, not
+            # silently passed)
+            verified_support.append({"evidence_id": eid,
+                                     "span_verified": None})
+            continue
+        if not claimed_span:
+            # an LLM-cited id with NO claimed span: the binding is not
+            # exact (Art. II) — this is NOT verified support
+            span_failed.append(eid)
+            continue
+        from discovery_fabric.directional.delta import _span_in_item
+        if _span_in_item(claimed_span, item):
+            verified_support.append({"evidence_id": eid,
+                                     "span_verified": True,
+                                     "span": claimed_span[:200]})
+        else:
+            span_failed.append(eid)
     gaps = hypothesis.get("evidence_gaps") or []
+    if verified_support and not gaps:
+        evidence_class = "EVIDENCE_SUPPORTED"
+    elif verified_support and gaps:
+        evidence_class = "EVIDENCE_PARTIAL"
+    elif gaps:
+        evidence_class = "EVIDENCE_MISSING"
+    else:
+        evidence_class = "EVIDENCE_MISSING"
+    g5_ok = bool(verified_support) or bool(gaps)
     g5 = _check(
-        "G5_EVIDENCE_HONEST",
-        bool(resolved) or bool(gaps),
-        (f"{len(resolved)} evidence_support ids resolve to custody; "
-         f"{len(unresolved)} unresolved" if (resolved or unresolved)
-         else "") +
-        (f"; evidence_gaps honestly declared ({len(gaps)})"
-         if gaps else "") +
-        ("" if (resolved or gaps) else
-         " — no supporting evidence AND no declared gap: an unsupported "
-         "direction presented as if grounded") if (resolved or gaps)
-        else "no supporting evidence resolves and no evidence_gaps are "
-             "declared — an unsupported direction presented as if "
-             "grounded")
-    # unresolved support ids are never silently dropped: recorded
-    if resolved:
+        "G5_EVIDENCE_CLASS",
+        g5_ok,
+        (f"class={evidence_class}: {len(verified_support)} verified "
+         f"support bindings (span-verified); {len(unresolved_ids)} "
+         f"unresolved ids; {len(span_failed)} ids with failed/absent "
+         f"spans; gaps={len(gaps)} (gaps are NEVER equated with "
+         f"support — R451 §4)"))
+
+    # G6 TARGET VARIABLE IN DESIGN STATE (R451 §5: the structured
+    # chain's 'affected variable' leg — a direction about a variable
+    # the design does not declare is causally unanchored)
+    ds_terms = _design_state_terms(design_state)
+    tgt_terms = _terms(str(hypothesis.get("target_variable") or "") +
+                       " " + str(hypothesis.get("current_value") or ""))
+    ds_shared = sorted(tgt_terms & ds_terms) if ds_terms else sorted(
+        tgt_terms & diag_terms)
+    g6 = _check(
+        "G6_TARGET_IN_DESIGN_STATE",
+        bool(ds_shared),
+        f"target_variable grounded in the design state: "
+        f"{', '.join(ds_shared[:8])}" if ds_shared else
+        "the target_variable shares NO distinctive terms with the "
+        "design's declared state (the failed candidate's mechanism/"
+        "intervention, the problem's declared quantities, or the "
+        "diagnosis basis) — the direction moves a variable the "
+        "machine does not control")
+
+    # G7 PREDICTION <-> INTERVENTION COHERENCE (the prediction speaks
+    # about what the intervention changes)
+    pred_terms = _terms(str(hypothesis.get("predicted_effect") or ""))
+    interv_terms = _terms(
+        str(hypothesis.get("mechanism_affected") or "") + " " +
+        str(hypothesis.get("target_variable") or "") + " " +
+        str(hypothesis.get("proposed_value") or ""))
+    pred_shared = sorted(pred_terms & interv_terms)
+    g7 = _check(
+        "G7_PREDICTION_INTERVENTION_COHERENT",
+        bool(pred_shared),
+        f"predicted observable coupled to the intervention: "
+        f"{', '.join(pred_shared[:8])}" if pred_shared else
+        "the predicted_effect shares NO distinctive terms with the "
+        "intervention's own variables/mechanism — the prediction is "
+        "about an observable this intervention does not touch")
+
+    # G8 FALSIFIER <-> PREDICTION BINDING (the falsifier measures the
+    # predicted observable; its kill-direction does not contradict the
+    # prediction). The contradiction test compares the FALSIFIER's
+    # kill-direction with the PREDICTED EFFECT's own direction words ON
+    # THE SHARED QUANTITY — a falsifier that kills exactly on the
+    # predicted success (prediction 'X falls', falsifier kills 'X
+    # falls') is incoherent; a falsifier that kills on the opposite
+    # (prediction 'X falls', falsifier kills 'X above') is correct.
+    fals_terms = _terms(fals)
+    fals_shared = sorted(fals_terms & (pred_terms | tgt_terms))
+    g8_bind = bool(fals_shared)
+    contradiction = False
+    contra_basis = ""
+    if g8_bind:
+        pred_up = bool(_KILL_UP_RE.search(
+            str(hypothesis.get("predicted_effect") or "")))
+        pred_down = bool(_KILL_DOWN_RE.search(
+            str(hypothesis.get("predicted_effect") or "")))
+        up = bool(_KILL_UP_RE.search(fals))
+        down = bool(_KILL_DOWN_RE.search(fals))
+        if pred_up and up and not down:
+            contradiction = True
+            contra_basis = (
+                "the predicted effect moves UP and the falsifier kills "
+                "on the SAME upward movement — the kill-condition "
+                "contradicts the prediction (a direction whose own "
+                "success kills it is incoherent)")
+        elif pred_down and down and not up:
+            contradiction = True
+            contra_basis = (
+                "the predicted effect moves DOWN and the falsifier "
+                "kills on the SAME downward movement — the kill-"
+                "condition contradicts the prediction")
+    g8 = _check(
+        "G8_FALSIFIER_BINDS_PREDICTION",
+        g8_bind and not contradiction,
+        (f"the falsifier measures the predicted observable: "
+         f"{', '.join(fals_shared[:6])}"
+         + ("; " + contra_basis if contradiction else ""))
+        if g8_bind else
+        "the falsifier shares NO distinctive terms with the predicted "
+        "observable or the target variable — it measures an unrelated "
+        "thing (a measurable but irrelevant falsifier)")
+
+    # G9 CAUSAL MEMORY (R451 §§5/7/8: negative knowledge changes future
+    # search — a FALSIFIED (target_variable, direction) pair may not be
+    # re-proposed)
+    falsified_pairs = {
+        (_norm_id(str(p.get("target_variable") or "")).lower(),
+         str(p.get("direction") or "").upper())
+        for p in (falsified_priors or [])}
+    tgt_norm = _norm_id(str(hypothesis.get("target_variable") or ""))
+    repeat = (tgt_norm.lower(),
+              str(hypothesis.get("direction") or "").upper()) \
+        in falsified_pairs
+    g9 = _check(
+        "G9_CAUSAL_MEMORY",
+        not repeat,
+        "no prior FALSIFIED direction repeats (the causal memory is "
+        "clean for this (target_variable, direction))" if not repeat else
+        f"the (target_variable, direction) pair was FALSIFIED before "
+        f"(prior ids: {', '.join(sorted(str(p.get('hypothesis_id')) for p in (falsified_priors or []) if (_norm_id(str(p.get('target_variable') or '')).lower(), str(p.get('direction') or '').upper()) == (tgt_norm.lower(), str(hypothesis.get('direction') or '').upper()))[:4])}) — "
+        f"negative knowledge must change the next direction, not "
+        f"repeat it (Art. LI)")
+
+    structural = g1 and g2 and g3 and g4 and g6 and g7 and g8 and g9
+    if not structural:
+        verdict = "REJECTED"
+    elif evidence_class == "EVIDENCE_SUPPORTED":
+        verdict = "GROUNDED"
+    else:
+        # R451 §4: structurally sound, support PARTIAL/MISSING — an
+        # EXPLORATORY hypothesis: no mutation until the gaps are served
+        verdict = "EXPLORATORY"
+    if verified_support and not gaps:
         # confidence cap: unsupported/weakly-evidenced directions stay
         # capped (Art. XXVII — no silent promotion)
-        if not gaps and len(resolved) >= 2:
+        if len(verified_support) >= 2:
             hypothesis["confidence"] = max(
                 hypothesis.get("confidence", "LOW"), "MODERATE")
 
-    grounded = g1 and g2 and g3 and g4 and g5
     return {
-        "gate_version": "directional_ground_gate/1.0",
+        "gate_version": "directional_ground_gate/2.0",
         "checks": checks,
-        "grounded": grounded,
-        "verdict": "GROUNDED" if grounded else "REJECTED",
+        "grounded": verdict == "GROUNDED",
+        "verdict": verdict,
+        "evidence_class": evidence_class,
         "evidence_resolution": {
-            "resolved_ids": [str((e or {}).get("evidence_id") or "")
-                             for e in resolved],
-            "unresolved_ids": [str((e or {}).get("evidence_id") or "")
-                               for e in unresolved],
+            "verified_ids": [str(v.get("evidence_id"))
+                              for v in verified_support],
+            "unresolved_ids": [u for u in unresolved_ids],
+            "span_failed_ids": span_failed,
         },
         "adjudicated_at": utc_now(),
     }
@@ -380,6 +618,7 @@ PREDICTED_EFFECT: <the observable physical effect that should follow>
 PREDICTED_MAGNITUDE: <magnitude or range, if defensible; else 'unstated'>
 COMPETING_EXPLANATIONS: <alternative explanations, semicolon-separated; else 'none stated'>
 EVIDENCE_IDS: <comma-separated evidence ids from the spans above that support this; else 'none'>
+EVIDENCE_SPANS: one line per cited id, format <evidence_id> = "<verbatim substring copied EXACTLY from that evidence span above>"; else 'none'
 EVIDENCE_GAPS: <what evidence is missing, semicolon-separated; else 'none'>
 FALSIFIER: <the measurable outcome that would kill this direction>
 MEASUREMENT_REQUIRED: <the measurement that tests the prediction>
@@ -402,6 +641,28 @@ def _parse_field_lines(content: str) -> Dict[str, str]:
         if m:
             out[m.group(1)] = m.group(2).strip()
     return out
+
+
+#: EVIDENCE_SPANS lines: <evidence_id> = "<verbatim span>" (the
+#: per-citation exact binding the ground gate's G5 verifies — Art. II)
+_SPAN_LINE_RE = re.compile(
+    r"([A-Za-z0-9:_\-\.]+)\s*=\s*[\"\u201c\u201d]?([^\"\n]{8,400})")
+
+
+def _parse_evidence_spans(raw: str,
+                           cited_ids: List[str]) -> Dict[str, str]:
+    """Parse the EVIDENCE_SPANS block into {evidence_id: span}.
+
+    Only ids the model ALSO cited in EVIDENCE_IDS are kept (a span for
+    an uncited id is bookkeeping noise); the span text is recorded
+    VERBATIM as parsed — the gate verifies it against the item's own
+    text (never trusted here — Art. III)."""
+    spans: Dict[str, str] = {}
+    for m in _SPAN_LINE_RE.finditer(raw or ""):
+        eid, span = m.group(1).strip(), m.group(2).strip().rstrip(",;")
+        if eid in cited_ids and eid not in spans:
+            spans[eid] = span
+    return spans
 
 
 def propose_directional_hypothesis(
@@ -449,10 +710,18 @@ def propose_directional_hypothesis(
     if not fields.get("TARGET_VARIABLE"):
         return None
     evidence_support = []
+    cited: List[str] = []
     for eid in re.split(r"[,;]+", fields.get("EVIDENCE_IDS") or ""):
         eid = eid.strip()
         if eid and eid.lower() not in ("none", "n/a"):
-            evidence_support.append({"evidence_id": eid})
+            cited.append(eid)
+    spans = _parse_evidence_spans(
+        fields.get("EVIDENCE_SPANS") or "", cited)
+    for eid in cited:
+        entry = {"evidence_id": eid}
+        if eid in spans:
+            entry["span"] = spans[eid]  # verified by the gate (G5)
+        evidence_support.append(entry)
     return {
         "hypothesis_id": make_hypothesis_id(
             str(candidate.get("invention_id") or
@@ -501,6 +770,173 @@ def propose_directional_hypothesis(
         "status": "PROPOSED",
         "gate": {},
     }
+
+
+# ---------------------------------------------------------------------------
+# The re-proposal (R451 §3: HYPOTHESIS_BEFORE + NEW_EVIDENCE =
+# HYPOTHESIS_AFTER; the delta is then VERIFIED mechanically)
+# ---------------------------------------------------------------------------
+
+REPROPOSAL_PROMPT = """You proposed a directional improvement hypothesis. Its declared evidence
+gaps were then served: NEW evidence was retrieved. Re-examine the direction in
+the light of the new evidence.
+
+CURRENT HYPOTHESIS (before the new evidence):
+- TARGET_VARIABLE: {target_variable}
+- CURRENT_VALUE: {current_value}
+- PROPOSED_VALUE: {proposed_value}
+- DIRECTION: {direction}
+- MECHANISM_AFFECTED: {mechanism_affected}
+- CAUSAL_RATIONALE: {causal_rationale}
+- PREDICTED_EFFECT: {predicted_effect}
+- PREDICTED_MAGNITUDE: {predicted_magnitude}
+- INTERVENTION_TYPE: {intervention_type}
+
+DECLARED EVIDENCE GAPS (now served):
+{gaps_block}
+
+NEW EVIDENCE (exact spans, with ids):
+{evidence_block}
+
+Respond in EXACTLY this format (each field on ONE line). Keep a field
+UNCHANGED when the new evidence does not justify changing it; change it ONLY
+when the new evidence demands the change:
+TARGET_VARIABLE: <the design/physical variable to change>
+CURRENT_VALUE: <its current value or state, if known; else 'unknown'>
+PROPOSED_VALUE: <the proposed value or change>
+DIRECTION: <INCREASE | DECREASE | ADD | REMOVE | REPLACE | CHANGE_MECHANISM | TIGHTEN | RELAX | REVERSE>
+MECHANISM_AFFECTED: <the causal mechanism this acts on>
+CAUSAL_RATIONALE: <why this variable, referencing the diagnosed cause>
+PREDICTED_EFFECT: <the observable physical effect that should follow>
+PREDICTED_MAGNITUDE: <magnitude or range, if defensible; else 'unstated'>
+EVIDENCE_IDS: <comma-separated NEW evidence ids that support the direction; else 'none'>
+EVIDENCE_SPANS: one line per cited id, format <evidence_id> = "<verbatim substring copied EXACTLY from that new evidence span above>"; else 'none'
+EVIDENCE_GAPS: <what evidence is STILL missing, semicolon-separated; else 'none'>
+FALSIFIER: <the measurable outcome that would kill this direction>
+MEASUREMENT_REQUIRED: <the measurement that tests the prediction>
+INTERVENTION_TYPE: <PARAMETER_MUTATION | TOPOLOGY_MUTATION | MATERIAL_MUTATION | OPERATING_CONDITION_MUTATION | MECHANISM_COMBINATION | EVIDENCE_UPDATE | CONSTRAINT_RELAXATION | CONSTRAINT_TIGHTENING>
+CONFIDENCE: <LOW | MODERATE | HIGH>
+
+Then, ONLY for each field you CHANGED because of the new evidence, one line:
+EVIDENCE_CAUSED: <FIELD_NAME> <- <the new evidence id> because <the reason>
+(FIELD_NAME from: TARGET_VARIABLE, CURRENT_VALUE, PROPOSED_VALUE, DIRECTION,
+MECHANISM_AFFECTED, PREDICTED_EFFECT, PREDICTED_MAGNITUDE, INTERVENTION_TYPE)
+"""
+
+REPROPOSAL_SYSTEM = ("You re-examine a causal improvement hypothesis "
+                     "against newly retrieved evidence. Changed fields "
+                     "must each cite the exact evidence id that caused "
+                     "the change. The infrastructure will verify every "
+                     "claimed attribution against the evidence text. "
+                     "English only.")
+
+
+def repropose_with_evidence(
+        before: Dict[str, Any],
+        new_evidence: List[Dict[str, Any]],
+        attempt: int = 1) -> Optional[Dict[str, Any]]:
+    """HYPOTHESIS_BEFORE + NEW_EVIDENCE -> HYPOTHESIS_AFTER (LLM
+    proposal, stamped AI_PROPOSED; the DIRECTION_DELTA is then computed
+    and verified by the deterministic delta module — the model's own
+    attribution claims are parsed and CHECKED, never trusted; Art.
+    XVIII).
+
+    Returns the AFTER hypothesis dict (status PROPOSED) carrying the
+    parsed attribution claims, or None on transport failure (an
+    infrastructure state — Art. LXI).
+    """
+    from discovery_fabric.directional.delta import (
+        parse_attribution_lines)
+    ev_lines = []
+    for it in (new_evidence or [])[:6]:
+        ev_lines.append(
+            f"- [{it.get('id')}] {str(it.get('title'))[:100]}: "
+            f"{str(it.get('abstract'))[:280]}")
+    gaps_block = "\n".join(
+        f"- {g}" for g in (before.get("evidence_gaps") or [])[:6]) \
+        or "(none declared)"
+    prompt = REPROPOSAL_PROMPT.format(
+        target_variable=before.get("target_variable", ""),
+        current_value=before.get("current_value", ""),
+        proposed_value=before.get("proposed_value", ""),
+        direction=before.get("direction", ""),
+        mechanism_affected=before.get("mechanism_affected", ""),
+        causal_rationale=before.get("causal_rationale", ""),
+        predicted_effect=before.get("predicted_effect", ""),
+        predicted_magnitude=before.get("predicted_magnitude_or_range",
+                                       ""),
+        intervention_type=before.get("intervention_type", ""),
+        gaps_block=gaps_block,
+        evidence_block="\n".join(ev_lines) or "(no new evidence)")
+    try:
+        from discovery_fabric.engine.llm_registry import (
+            SelectionPolicy, generate)
+        res = generate(prompt, system=REPROPOSAL_SYSTEM,
+                       max_tokens=420,
+                       policy=SelectionPolicy(
+                           purpose="directional"))
+        if not res.ok:
+            return None
+        content = res.content or ""
+        fields = _parse_field_lines(content)
+    except Exception:  # noqa: BLE001 — infra, never a verdict
+        return None
+    if not fields.get("TARGET_VARIABLE"):
+        return None
+    evidence_support = []
+    cited: List[str] = []
+    for eid in re.split(r"[,;]+", fields.get("EVIDENCE_IDS") or ""):
+        eid = eid.strip()
+        if eid and eid.lower() not in ("none", "n/a"):
+            cited.append(eid)
+    spans = _parse_evidence_spans(
+        fields.get("EVIDENCE_SPANS") or "", cited)
+    for eid in cited:
+        entry = {"evidence_id": eid}
+        if eid in spans:
+            entry["span"] = spans[eid]  # verified by the re-gate (G5)
+        evidence_support.append(entry)
+    after = {
+        "hypothesis_id": make_hypothesis_id(
+            str(before.get("candidate_id") or "cand"),
+            str(before.get("failure_id") or "failure"),
+            fields.get("TARGET_VARIABLE", ""), attempt + 1000),
+        "candidate_id": before.get("candidate_id", ""),
+        "failure_id": before.get("failure_id", ""),
+        "causal_diagnosis_id": before.get("causal_diagnosis_id", ""),
+        "target_variable": fields.get("TARGET_VARIABLE", ""),
+        "current_value": fields.get("CURRENT_VALUE", ""),
+        "proposed_value": fields.get("PROPOSED_VALUE", ""),
+        "direction": (fields.get("DIRECTION") or "").upper(),
+        "mechanism_affected": fields.get("MECHANISM_AFFECTED", ""),
+        "causal_rationale": fields.get("CAUSAL_RATIONALE", ""),
+        "predicted_effect": fields.get("PREDICTED_EFFECT", ""),
+        "predicted_magnitude_or_range": fields.get(
+            "PREDICTED_MAGNITUDE", ""),
+        "evidence_support": evidence_support,
+        "evidence_gaps": [
+            s.strip() for s in re.split(
+                r"[;]+", fields.get("EVIDENCE_GAPS") or "")
+            if s.strip() and s.strip().lower() not in ("none",)],
+        "falsifier": fields.get("FALSIFIER", ""),
+        "measurement_required": fields.get("MEASUREMENT_REQUIRED", ""),
+        "intervention_type": fields.get("INTERVENTION_TYPE", ""),
+        "confidence": (fields.get("CONFIDENCE") or "LOW").upper(),
+        "provenance": {
+            "class": "AI_PROPOSED",
+            "purpose": "directional:reproposal",
+            "note": ("the LLM re-proposed the hypothesis against the "
+                     "newly served evidence; the deterministic delta "
+                     "module verifies which fields actually changed "
+                     "and whether the claimed evidence causes them "
+                     "(R451 §3 — the shortcut is REPLACED)"),
+            "proposed_at": utc_now(),
+        },
+        "status": "PROPOSED",
+        "gate": {},
+    }
+    after["_attribution_claims"] = parse_attribution_lines(content)
+    return after
 
 
 SCHEMA_JSON = {

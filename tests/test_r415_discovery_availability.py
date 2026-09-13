@@ -63,7 +63,15 @@ from toscanini import user_state as us  # noqa: E402
 @pytest.fixture()
 def hermetic(monkeypatch, tmp_path):
     """Redirect the routing ledger / state / probe cache to tmp and make
-    catalog discovery UNDISCOVERED (no network, pinned defaults)."""
+    catalog discovery UNDISCOVERED (no network, pinned defaults).
+
+    R451: this battery exercises the ROUTING MECHANICS (ladders, GONE,
+    cooldowns, typed routes) against paid providers — the cost policy
+    is therefore UNRESTRICTED here (the ZERO_PAID_COST policy's own
+    fail-closed contract is covered by tests/test_r451_zero_paid.py;
+    without this pin the default policy would rightly refuse every paid
+    rung and the ladder mechanics could never be exercised)."""
+    monkeypatch.setenv("ENGINE_MODEL_COST_POLICY", "UNRESTRICTED")
     tmp = Path(tmp_path)
     monkeypatch.setattr(mr, "LEDGER", mr.RoutingLedger(
         path=tmp / "ledger.jsonl"))

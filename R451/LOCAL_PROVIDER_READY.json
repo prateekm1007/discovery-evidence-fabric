@@ -1,0 +1,65 @@
+{
+ "artifact_type": "LOCAL_PROVIDER_READY",
+ "round": "R451-C1.1",
+ "local_provider_ready": true,
+ "rule": "LOCAL_PROVIDER_READY is true ONLY when all six rungs pass: binary -> model (sha256 verified) -> server -> HTTP endpoint -> tiny completion -> Toscanini structured-output completion. Process health is never equated with usable inference.",
+ "model_card": {
+  "model_id": "Qwen/Qwen3-1.7B",
+  "quantization": "Q4_K_M (GGUF build bartowski/Qwen_Qwen3-1.7B-GGUF repo sha dcb19155b962dbb6389f4691a982043a8e651022)",
+  "gguf_sha256": "72c5c3cb38fa32d5256e2fe30d03e7a64c6c79e668ad84057e3bd66e250b24fb",
+  "model_revision": "dcb19155b962dbb6389f4691a982043a8e651022 (GGUF build; base model Qwen/Qwen3-1.7B, apache-2.0)",
+  "transport": "llama.cpp llama-server b10930 (CPU, 2 threads, context 8192)",
+  "local_or_remote": "LOCAL",
+  "license": "apache-2.0",
+  "cost_basis": "ZERO_PAID_COST_SELF_HOSTED"
+ },
+ "rungs": [
+  {
+   "rung": "binary_available",
+   "ok": true,
+   "detail": "/home/z/my-project/local_llm/bin/llama-b10930/llama-server executable; version: 0.4.0-dev (build 10930, commit 56381e407)",
+   "path": "/home/z/my-project/local_llm/bin/llama-b10930/llama-server",
+   "version": "version: 0.4.0-dev (build 10930, commit 56381e407)"
+  },
+  {
+   "rung": "model_available",
+   "ok": true,
+   "detail": "GGUF present; sha256 VERIFIED",
+   "path": "/home/z/my-project/local_llm/models/Qwen3-1.7B-Q4_K_M.gguf",
+   "sha256": "72c5c3cb38fa32d5256e2fe30d03e7a64c6c79e668ad84057e3bd66e250b24fb",
+   "sha256_verified": true,
+   "size_bytes": 1282439584
+  },
+  {
+   "rung": "server_starts",
+   "ok": true,
+   "detail": "llama-server health endpoint reachable (already up at http://127.0.0.1:8790)",
+   "startup_s": 0.0,
+   "endpoint": "http://127.0.0.1:8790/health"
+  },
+  {
+   "rung": "http_endpoint_responds",
+   "ok": true,
+   "detail": "POST /v1/chat/completions (empty body) -> HTTP 400 — the inference route responds"
+  },
+  {
+   "rung": "tiny_completion_succeeds",
+   "ok": true,
+   "detail": "tiny completion in 0.3s -> 'READY'",
+   "latency_s": 0.29
+  },
+  {
+   "rung": "toscanini_structured_output_succeeds",
+   "ok": true,
+   "detail": "provider=localqwen model=qwen3-1.7b; required fields present: True; missing: none; span verbatim: False",
+   "fields": {
+    "mechanism": "Erosion-resistant materials in slurry transport",
+    "intervention": "Use of erosion-resistant materials (e.g., natural rubber linings) in the impeller",
+    "expected_effect": "Increased service life beyond 6000 hours and improved efficiency",
+    "falsification_test": "Measure the service life and efficiency after implementing the intervention",
+    "mechanism_source_span": "\"Natural rubber linings outlast white iron by 3x below 60 C in abrasive acid slurry, but degrade above 80 C\""
+   }
+  }
+ ],
+ "checked_at": "2026-09-12T21:13:00+00:00"
+}

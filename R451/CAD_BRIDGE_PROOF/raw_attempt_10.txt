@@ -1,0 +1,186 @@
+{
+ "objects": [
+   {
+     "object_id": "1",
+     "name": "Dual-lumen chest drainage catheter",
+     "role": "Main device"
+   }
+ ],
+ "parameters": [
+   {
+     "param_id": "1",
+     "name": "Outer diameter",
+     "category": "GEOMETRY",
+     "unit": "mm",
+     "value": "6.0",
+     "value_class": "EXTRACTED",
+     "value_span": "6.0",
+     "value_evidence_id": "EVIDENCE_EVIDENCE_PROBLEM_STATEMENT",
+     "range_min": 6,
+     "range_max": 8,
+     "range_span": "6 to 8 mm",
+     "range_evidence_id": null,
+     "role": "Outer diameter of the catheter"
+   },
+   {
+     "param_id": "2",
+     "name": "Lumen diameter",
+     "category": "GEOMETRY",
+     "unit": "mm",
+     "value": "2.5",
+     "value_class": "EXTRACTED",
+     "value_span": "2.5",
+     "value_evidence_id": "EVIDENCE_EVIDENCE_PROBLEM_STATEMENT",
+     "range_min": 2.2,
+     "range_max": 2.8,
+     "range_span": "2.2 to 2.8 mm",
+     "range_evidence_id": null,
+     "role": "Diameter of each lumen"
+   },
+   {
+     "param_id": "3",
+     "name": "Septum thickness",
+     "category": "GEOMETRY",
+     "unit": "mm",
+     "value": "1.0",
+     "value_class": "EXTRACTED",
+     "value_span": "1.0",
+     "value_evidence_id": "EVIDENCE_EVIDENCE_PROBLEM_STATEMENT",
+     "range_min": 0.6,
+     "range_max": 1.2,
+     "range_span": "0.6 to 1.2 mm",
+     "range_evidence_id": null,
+     "role": "Thickness of the septum"
+   },
+   {
+     "param_id": "4",
+     "name": "Working length",
+     "category": "GEOMETRY",
+     "unit": "mm",
+     "value": "400",
+     "value_class": "EXTRACTED",
+     "value_span": "400",
+     "value_evidence_id": "EVIDENCE_EVIDENCE_PROBLEM_STATEMENT",
+     "range_min": 300,
+     "range_max": 500,
+     "range_span": "300 to 500 mm",
+     "range_evidence_id": null,
+     "role": "Length of the catheter"
+   }
+ ],
+ "constraints": [
+   {
+     "constraint_id": "1",
+     "target": "1",
+     "bound": ">=",
+     "limit": 6,
+     "unit": "mm",
+     "limit_class": "EXTRACTED",
+     "limit_span": "6 to 8 mm",
+     "limit_evidence_id": null,
+     "justification": "Outer diameter must be at least 6 mm to ensure patent lumens"
+   },
+   {
+     "constraint_id": "2",
+     "target": "2",
+     "bound": ">=",
+     "limit": 2.2,
+     "unit": "mm",
+     "limit_class": "EXTRACTED",
+     "limit_span": "2.2 to 2.8 mm",
+     "limit_evidence_id": null,
+     "justification": "Lumen diameter must be at least 2.2 mm to prevent kinking"
+   },
+   {
+     "constraint_id": "3",
+     "target": "3",
+     "bound": ">=",
+     "limit": 0.6,
+     "unit": "mm",
+     "limit_class": "EXTRACTED",
+     "limit_span": "0.6 to 1.2 mm",
+     "limit_evidence_id": null,
+     "justification": "Septum thickness must be at least 0.6 mm to prevent collapse"
+   },
+   {
+     "constraint_id": "4",
+     "target": "4",
+     "bound": ">=",
+     "limit": 300,
+     "unit": "mm",
+     "limit_class": "EXTRACTED",
+     "limit_span": "300 to 500 mm",
+     "limit_evidence_id": null,
+     "justification": "Working length must be at least 300 mm to ensure functionality"
+   }
+ ],
+ "objectives": [
+   {
+     "objective_id": "1",
+     "target": "1",
+     "direction": "MAINTAIN_WITHIN",
+     "basis": "Ensure the outer diameter is within 6-8 mm to maintain patent lumens"
+   },
+   {
+     "objective_id": "2",
+     "target": "2",
+     "direction": "MAINTAIN_WITHIN",
+     "basis": "Maintain lumen diameter within 2.2-2.8 mm to prevent kinking"
+   },
+   {
+     "objective_id": "3",
+     "target": "3",
+     "direction": "MAINTAIN_WITHIN",
+     "basis": "Maintain septum thickness within 0.6-1.2 mm to prevent collapse"
+   },
+   {
+     "objective_id": "4",
+     "target": "4",
+     "direction": "MAINTAIN_WITHIN",
+     "basis": "Maintain working length within 300-500 mm to ensure functionality"
+   }
+ ],
+ "failure_modes": [
+   {
+     "mode_id": "1",
+     "name": "Kinking under 15-millimeter bend radius",
+     "problem_link": "The catheter must resist kinking under a 15-millimeter bend radius"
+   },
+   {
+     "mode_id": "2",
+     "name": "Septum collapse under 40 kilopascals of suction",
+     "problem_link": "The catheter must withstand 40 kilopascals of suction without septum collapse"
+   }
+ ],
+ "dependencies": [
+   {
+     "relation_id": "1",
+     "cause": "1",
+     "effect": "4",
+     "direction": "INCREASES",
+     "statement": "The working length is directly related to the catheter's functionality and must be at least 300 mm.",
+     "relation_class": "EXTRACTED",
+     "span": "300 to 500 mm",
+     "evidence_id": null
+   },
+   {
+     "relation_id": "2",
+     "cause": "2",
+     "effect": "1",
+     "direction": "INCREASES",
+     "statement": "The lumen diameter is directly related to the outer diameter and must be at least 2.2 mm.",
+     "relation_class": "EXTRACTED",
+     "span": "2.2 to 2.8 mm",
+     "evidence_id": null
+   },
+   {
+     "relation_id": "3",
+     "cause": "3",
+     "effect": "4",
+     "direction": "INCREASES",
+     "statement": "The septum thickness is directly related to the working length and must be at least 0.6 mm.",
+     "relation_class": "EXTRACTED",
+     "span": "0.6 to 1.2 mm",
+     "evidence_id": null
+   }
+ ]}

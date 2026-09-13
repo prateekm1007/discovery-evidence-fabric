@@ -1,7 +1,9 @@
-"""The directional improvement loop's state transitions (R450 §3).
+"""The directional improvement loop's state transitions (R450 §3;
+R451 §§3-5).
 
     EVIDENCE -> MECHANISM -> CANDIDATE -> ATTACK -> FAILURE
     -> CAUSAL DIAGNOSIS -> DIRECTIONAL HYPOTHESIS (ground-gated)
+    -> [GAP RETRIEVAL -> RE-PROPOSAL -> VERIFIED DIRECTION_DELTA]
     -> CONTROLLED MUTATION -> EVALUATION -> OBSERVATION
     -> CAUSAL UPDATE -> NEXT DIRECTION
 
@@ -20,12 +22,17 @@ carries NEITHER the diagnosis NOR a directional hypothesis — a generic
 "improve this candidate" mutation. This isolates the value of causal
 directional feedback (same gauntlet, same transport, same engine).
 
-The evidence-driven direction reversal (§5's reverse path): when a
-grounded hypothesis declares evidence_gaps, the gap queries are derived
-(from the target variable + the diagnosed mechanism) and served through
-the R449 evidence fabric — the retrieval is recorded on the hypothesis
-so the trajectory shows evidence CHANGING the direction, not decorating
-the explanation.
+The evidence-driven direction reversal (§5's reverse path, R451 §3):
+when a gated hypothesis declares evidence_gaps, the gap queries are
+derived (from the target variable + the diagnosed mechanism) and
+served through the R449 evidence fabric; the hypothesis is then
+RE-PROPOSED against the new evidence and the DIRECTION_DELTA is
+COMPUTED AND VERIFIED mechanically (before + new evidence + after,
+per-field attribution to exact evidence ids whose spans verify
+verbatim). evidence_changed_direction is True ONLY when a CLOSED
+causal field changed WITH a verified attribution — the R450 shortcut
+(retrieval returned items -> True) is REPLACED (fail-closed, no
+exceptions).
 """
 from __future__ import annotations
 
@@ -37,7 +44,10 @@ from typing import Any, Dict, List, Optional, Tuple
 
 from discovery_fabric.directional.hypothesis import (
     apply_gate, ground_gate, make_hypothesis_id, propose_directional_hypothesis,
-    utc_now,
+    repropose_with_evidence, utc_now,
+)
+from discovery_fabric.directional.delta import (
+    CAUSAL_FIELDS, direction_delta,
 )
 from discovery_fabric.directional.observation import (
     apply_causal_update, causal_update, extract_observation,
@@ -165,6 +175,35 @@ def serve_evidence_gaps(problem: Dict[str, Any],
 # THE STEP (called by the engine's evolution pipeline)
 # ---------------------------------------------------------------------------
 
+def _design_state(problem: Dict[str, Any],
+                  parent: Dict[str, Any]) -> Dict[str, Any]:
+    """R451 §5 G6: the design's OWN declared state — the failed
+    candidate's mechanism/intervention plus the problem's declared
+    quantities (a direction about a variable outside this state moves
+    a variable the machine does not control)."""
+    arch = parent.get("architecture") or {}
+    prob_text = " ".join(
+        str(problem.get(k) or "") for k in
+        ("device", "failure", "constraint", "text", "problem_text"))
+    return {
+        "mechanism": arch.get("mechanism") or parent.get("mechanism"),
+        "intervention": arch.get("intervention") or
+        parent.get("intervention"),
+        "expected_effect": arch.get("expected_effect") or
+        parent.get("expected_effect"),
+        "problem_text": prob_text,
+        "targets": [problem.get("device"), problem.get("constraint")],
+    }
+
+
+def _falsified_priors(store: Dict[str, Any]) -> List[Dict[str, Any]]:
+    """R451 §5 G9: the run's own FALSIFIED hypotheses — negative
+    knowledge (Art. LI): a falsified (target_variable, direction)
+    pair may not be re-proposed."""
+    return [h for h in (store.get("hypotheses") or [])
+            if h.get("status") == "FALSIFIED"]
+
+
 def directional_step(
         *,
         run_dir: Path,
@@ -176,12 +215,21 @@ def directional_step(
         gen_n: int,
         attempt: int = 1) -> Optional[Dict[str, Any]]:
     """DIAGNOSIS -> DIRECTIONAL HYPOTHESIS -> (ground gate) ->
-    [gap retrieval] -> returns the GROUNDED hypothesis (or None with
-    the rejection recorded — the mutation never executes).
+    [gap retrieval -> RE-PROPOSAL -> DIRECTION_DELTA] -> returns the
+    GROUNDED hypothesis (or None with the rejection recorded — the
+    mutation never executes).
 
     The caller (engine) derives the controlled mutation FROM the
     returned hypothesis; the observation/causal-update legs run after
     the gauntlet (record_directional_outcome).
+
+    R451 §3: evidence_changed_direction is set ONLY by the verified
+    DIRECTION_DELTA (before + new evidence + after, with per-field
+    attribution to exact evidence whose span verifies verbatim) —
+    the R450 shortcut (gap retrieval returned items -> True) is
+    REPLACED. R451 §4: an EXPLORATORY hypothesis (structure sound,
+    support PARTIAL/MISSING) returns with NO mutation — the next
+    action is retrieval or a decisive-experiment specification.
     """
     store = _load_hypotheses(run_dir)
     known_ids = {str(i.get("id") or "") for i in evidence_items or []}
@@ -235,30 +283,122 @@ def directional_step(
     # ---- GROUND GATE (mechanical) --------------------------------------
     parent_mechanism = str((parent.get("architecture") or {}).get(
         "mechanism") or parent.get("mechanism") or "")
-    gate = ground_gate(hyp, diagnosis, parent_mechanism,
-                       known_evidence_ids=known_ids)
+    evidence_texts = {str(i.get("id") or ""): i
+                      for i in (evidence_items or [])}
+    gate = ground_gate(
+        hyp, diagnosis, parent_mechanism,
+        known_evidence_ids=known_ids,
+        design_state=_design_state(problem, parent),
+        evidence_texts=evidence_texts,
+        falsified_priors=_falsified_priors(store))
     hyp = apply_gate(hyp, gate)
 
-    # ---- REVERSE PATH: declared gaps -> federated retrieval ------------
-    if hyp["status"] == "GROUNDED" and hyp.get("evidence_gaps"):
+    # ---- REVERSE PATH (R451 §3): gaps -> retrieval -> RE-PROPOSAL ->
+    # the VERIFIED DIRECTION_DELTA. The R450 shortcut (gap items
+    # returned -> evidence_changed_direction = True) is REPLACED: only
+    # a verified causal-field change attributed to exact new evidence
+    # (span verified verbatim) ever sets the flag. -----------------------
+    if hyp["status"] in ("GROUNDED", "EXPLORATORY") \
+            and hyp.get("evidence_gaps"):
         gap_items, gap_record = serve_evidence_gaps(problem, hyp)
         hyp["gap_retrieval"] = gap_record
         if gap_items:
-            # newly retrieved evidence that supports the direction is
-            # appended to the hypothesis's support (with its source and
-            # its state — the direction was visibly CHANGED by evidence)
-            for it in gap_items[:4]:
-                eid = str(it.get("id") or "")
-                if eid and eid not in {
-                        e.get("evidence_id")
-                        for e in hyp.get("evidence_support") or []}:
-                    hyp["evidence_support"].append({
-                        "evidence_id": eid,
-                        "acquired_through": "EVIDENCE_GAP_RETRIEVAL",
-                        "source": (it.get("provenance") or {}).get(
-                            "provider"),
-                    })
-            hyp["evidence_changed_direction"] = True
+            hyp_before = {k: hyp.get(k) for k in CAUSAL_FIELDS}
+            after = repropose_with_evidence(
+                hyp, gap_items, attempt=attempt)
+            if after is None:
+                # transport-class: the re-proposal failed — the BEFORE
+                # hypothesis stands, the evidence did NOT change the
+                # direction (an infrastructure state, never a verdict)
+                hyp["evidence_changed_direction"] = False
+                hyp["reproposal_transport_failed"] = True
+            else:
+                claims = after.pop("_attribution_claims", []) or []
+                delta = direction_delta(hyp_before, gap_items, after,
+                                       claims)
+                hyp["direction_delta"] = delta
+                hyp["evidence_changed_direction"] = bool(
+                    delta["evidence_changed_direction"])
+                if delta["evidence_changed_direction"]:
+                    # the AFTER direction replaces the BEFORE — the
+                    # changed causal fields are adopted (each carries
+                    # its verified or unverified attribution in the
+                    # delta record) and the merged hypothesis is
+                    # RE-GATED with the new evidence in custody
+                    for f in CAUSAL_FIELDS:
+                        if after.get(f):
+                            hyp[f] = after[f]
+                    hyp["evidence_support"] = after.get(
+                        "evidence_support") or hyp.get(
+                        "evidence_support")
+                    hyp["evidence_gaps"] = after.get("evidence_gaps") \
+                        or []
+                    for it in gap_items[:4]:
+                        eid = str(it.get("id") or "")
+                        if eid and eid not in {
+                                e.get("evidence_id")
+                                for e in hyp.get("evidence_support") or []}:
+                            # the span is the item's OWN retrieved text
+                            # (verbatim from custody — G5 verifies the
+                            # binding; Art. II/XII)
+                            hyp["evidence_support"].append({
+                                "evidence_id": eid,
+                                "span": str(it.get("abstract") or
+                                            "")[:200],
+                                "acquired_through":
+                                    "EVIDENCE_GAP_RETRIEVAL",
+                                "source": (it.get("provenance") or {}).get(
+                                    "provider"),
+                            })
+                    merged_texts = dict(evidence_texts)
+                    for it in gap_items:
+                        merged_texts[str(it.get("id") or "")] = it
+                    gate2 = ground_gate(
+                        hyp, diagnosis, parent_mechanism,
+                        known_evidence_ids=(known_ids | {
+                            str(i.get("id") or "") for i in gap_items}),
+                        design_state=_design_state(problem, parent),
+                        evidence_texts=merged_texts,
+                        falsified_priors=_falsified_priors(store))
+                    hyp = apply_gate(hyp, gate2)
+                else:
+                    # honest states (R451 §3): evidence arrived and
+                    # changed NOTHING (or the changes did not verify) —
+                    # recorded, never silently credited
+                    hyp.setdefault("evidence_arrived_with_no_direction_change",
+                                   True)
+                    hyp["evidence_gaps"] = after.get("evidence_gaps") \
+                        or []
+                    for it in gap_items[:4]:
+                        eid = str(it.get("id") or "")
+                        if eid and eid not in {
+                                e.get("evidence_id")
+                                for e in hyp.get("evidence_support") or []}:
+                            hyp["evidence_support"].append({
+                                "evidence_id": eid,
+                                "span": str(it.get("abstract") or
+                                            "")[:200],
+                                "acquired_through":
+                                    "EVIDENCE_GAP_RETRIEVAL",
+                                "source": (it.get("provenance") or {}).get(
+                                    "provider"),
+                            })
+                    # support may have arrived WITHOUT a direction
+                    # change — re-gate so the evidence class reflects
+                    # the served evidence (GROUNDED/EXPLORATORY)
+                    merged_texts = dict(evidence_texts)
+                    for it in gap_items:
+                        merged_texts[str(it.get("id") or "")] = it
+                    gate2 = ground_gate(
+                        hyp, diagnosis, parent_mechanism,
+                        known_evidence_ids=(known_ids | {
+                            str(i.get("id") or "") for i in gap_items}),
+                        design_state=_design_state(problem, parent),
+                        evidence_texts=merged_texts,
+                        falsified_priors=_falsified_priors(store))
+                    hyp = apply_gate(hyp, gate2)
+        else:
+            hyp["evidence_changed_direction"] = False
 
     store["hypotheses"].append(hyp)
     _persist_hypotheses(run_dir, store)
@@ -277,12 +417,46 @@ def directional_step(
             "hypothesis": {"hypothesis_id": hyp["hypothesis_id"],
                            "status": "REJECTED",
                            "target_variable": hyp["target_variable"],
-                           "gate": gate},
+                           "gate": hyp.get("gate")},
             "mutation": None,
             "observation": None,
             "causal_update": None,
             "rejection_note": ("the ground gate rejected the direction; "
                                "no mutation executed (R450 §4)"),
+            "mode": evolution_mode(),
+        })
+        return None
+    if hyp["status"] == "EXPLORATORY":
+        # R451 §4: structure passed but the evidence class is
+        # PARTIAL/MISSING — the direction is at most an EXPLORATORY
+        # hypothesis: NO mutation executes; the next action is further
+        # retrieval or a decisive-experiment specification (never
+        # pretend-grounded -> mutate)
+        append_step(run_dir, {
+            "gen": gen_n,
+            "candidate_id": parent.get("invention_id"),
+            "failure_id": diagnosis.get("diagnosis_id"),
+            "diagnosis": {"diagnosis_id": diagnosis.get("diagnosis_id"),
+                          "cause": diagnosis.get("cause")},
+            "hypothesis": {
+                "hypothesis_id": hyp["hypothesis_id"],
+                "status": "EXPLORATORY",
+                "target_variable": hyp["target_variable"],
+                "evidence_class": (hyp.get("gate") or {}).get(
+                    "evidence_class"),
+                "evidence_changed_direction": bool(
+                    hyp.get("evidence_changed_direction")),
+                "gate": hyp.get("gate"),
+            },
+            "mutation": None,
+            "observation": None,
+            "causal_update": None,
+            "exploratory_note": (
+                "structure sound, evidence class "
+                f"{(hyp.get('gate') or {}).get('evidence_class')} — "
+                "no mutation; next action: retrieve the missing "
+                "evidence or specify the decisive experiment "
+                "(R451 §4)"),
             "mode": evolution_mode(),
         })
         return None
@@ -300,7 +474,9 @@ def _upsert_hypothesis(store: Dict[str, Any],
             if hypothesis.get("mutation_id"):
                 h["mutation_id"] = hypothesis["mutation_id"]
             for k in ("causal_updates", "gap_retrieval",
-                      "evidence_changed_direction"):
+                      "evidence_changed_direction", "direction_delta",
+                      "evidence_arrived_with_no_direction_change",
+                      "reproposal_transport_failed"):
                 if hypothesis.get(k):
                     h[k] = hypothesis[k]
             return
@@ -352,6 +528,8 @@ def record_directional_outcome(
             "falsifier": hypothesis.get("falsifier"),
             "evidence_changed_direction": bool(
                 hypothesis.get("evidence_changed_direction")),
+            "direction_delta_verdict": (
+                (hypothesis.get("direction_delta") or {}).get("verdict")),
         },
         "mutation": {"mutation_id": mutation_id,
                      "intervention_type":

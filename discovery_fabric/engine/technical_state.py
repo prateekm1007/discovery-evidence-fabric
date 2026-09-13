@@ -41,6 +41,7 @@ Constitutional anchors:
 from __future__ import annotations
 
 import json
+import os
 import re
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -235,13 +236,30 @@ def propose_technical_state(problem: Dict[str, Any],
                 preferred_providers=preferred,
                 max_preference_fallback=0,
                 purpose="TECHNICAL_STATE_EXTRACTION"),
-            max_tokens=3000)
+            # R451-C1.1 measured: the full technical-state JSON runs
+            # ~2900 tokens on the local 1.7B model (attempt 6 parsed at
+            # 2892) and the validator-feedback retries (with the filled
+            # parameter example) push the response past 3000 — the
+            # truncated JSON then fails parse_json_proposal on BOTH
+            # content attempts (attempt 7: transport OK, proposal
+            # unparseable, 0 admitted). ENGINE_TS_MAX_TOKENS is the
+            # recorded operator-override class (transport-only bound;
+            # R445-C ENGINE_LLM_TIMEOUT_S precedent — no gate, no
+            # epistemic semantics touched).
+            max_tokens=int(os.environ.get("ENGINE_TS_MAX_TOKENS", "3000")
+                           or 3000))
         attempt_rec: Dict[str, Any] = {
             "attempt": attempt,
             "provider": res.provider_id, "model": res.model,
             "status": res.status, "prompt_hash": res.prompt_hash,
             "output_hash": res.output_hash,
             "latency_ms": res.latency_ms, "error": res.error,
+            # raw model output carried for DRIVER-SIDE diagnosis
+            # checkpointing (R451-C1.1: parse-failure forensics — the
+            # sha256 alone could not distinguish truncation from
+            # malformed shape). It is CONTENT, never evidence
+            # (Art. XVIII); consumers must not admit it anywhere.
+            "_raw_content": res.content or "",
         }
         record["attempts"].append(attempt_rec)
         record.update({

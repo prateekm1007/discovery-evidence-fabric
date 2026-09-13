@@ -171,17 +171,27 @@ class TestGroundGate:
                            known_evidence_ids=KNOWN_IDS)
         assert gate["verdict"] == "REJECTED"
 
-    def test_no_evidence_and_no_gap_declared_rejects(self):
+    def test_no_evidence_and_no_gap_declared_is_exploratory(self):
+        """R451 §4: an unsupported direction with NO declared gaps is
+        no longer REJECTED as a structure failure — it is EXPLORATORY
+        (evidence class EVIDENCE_MISSING): no mutation executes; the
+        next action is retrieval or a decisive-experiment spec."""
         h = _grounded_hypothesis(evidence_support=[], evidence_gaps=[])
         gate = ground_gate(h, DIAG, PARENT_MECH,
                            known_evidence_ids=KNOWN_IDS)
-        assert gate["verdict"] == "REJECTED"
-        assert any(c["check"] == "G5_EVIDENCE_HONEST" and
+        assert gate["verdict"] == "EXPLORATORY"
+        assert gate["evidence_class"] == "EVIDENCE_MISSING"
+        assert gate["grounded"] is False
+        assert any(c["check"] == "G5_EVIDENCE_CLASS" and
                    c["verdict"] == "FAIL" for c in gate["checks"])
+        # the mutation NEVER executes on EXPLORATORY either
+        assert gate["verdict"] not in ("GROUNDED",)
 
     def test_declared_gaps_keep_support_honest(self):
-        """An honest unsupported direction (gaps declared) passes G5 —
-        with confidence capped LOW."""
+        """An honest unsupported direction (gaps declared) passes G5's
+        structure — with confidence capped LOW and the R451 class
+        EVIDENCE_MISSING (never GROUNDED: gaps are never equated with
+        support)."""
         h = _grounded_hypothesis(evidence_support=[],
                                  evidence_gaps=["no seawater immersion "
                                                 "data for 500 nm "
@@ -190,11 +200,24 @@ class TestGroundGate:
         gate = ground_gate(h, DIAG, PARENT_MECH,
                            known_evidence_ids=KNOWN_IDS)
         # G5 passes with declared gaps; the confidence cap applies
-        assert gate["evidence_resolution"]["resolved_ids"] == []
+        assert gate["evidence_resolution"]["verified_ids"] == []
+        assert gate["evidence_class"] == "EVIDENCE_MISSING"
+        assert gate["verdict"] == "EXPLORATORY"  # R451 §4: no mutation
         assert h["confidence"] == "HIGH"  # unchanged: cap only lowers
         # when resolved evidence exists (the HIGH over unsupported
         # gaps stays HIGH in the record — the gap declaration itself is
         # the honesty marker, not a fabricated confidence)
+
+    def test_partial_support_with_gaps_is_exploratory(self):
+        """R451 §4: verified support AND declared gaps ->
+        EVIDENCE_PARTIAL -> EXPLORATORY (never GROUNDED)."""
+        h = _grounded_hypothesis(
+            evidence_support=[{"evidence_id": "ev:aaa111"}],
+            evidence_gaps=["no long-term immersion data"])
+        gate = ground_gate(h, DIAG, PARENT_MECH,
+                           known_evidence_ids=KNOWN_IDS)
+        assert gate["evidence_class"] == "EVIDENCE_PARTIAL"
+        assert gate["verdict"] == "EXPLORATORY"
 
     def test_out_of_vocabulary_direction_rejects(self):
         h = _grounded_hypothesis(direction="MORE")
@@ -214,10 +237,141 @@ class TestGroundGate:
             {"evidence_id": "ev:ghost999"}])
         gate = ground_gate(h, DIAG, PARENT_MECH,
                            known_evidence_ids=KNOWN_IDS)
-        assert gate["evidence_resolution"]["resolved_ids"] == \
+        assert gate["evidence_resolution"]["verified_ids"] == \
             ["ev:aaa111"]
         assert gate["evidence_resolution"]["unresolved_ids"] == \
             ["ev:ghost999"]
+
+    def test_span_verification_fails_closed_on_absent_span(self):
+        """R451 §5 G5: an LLM-cited id with NO claimed span does not
+        count as verified support when the evidence text IS provided
+        (the binding is not exact — Art. II)."""
+        texts = {"ev:aaa111": EVIDENCE[0], "ev:bbb222": EVIDENCE[1]}
+        h = _grounded_hypothesis(
+            evidence_support=[{"evidence_id": "ev:aaa111"}],
+            evidence_gaps=[])
+        gate = ground_gate(h, DIAG, PARENT_MECH,
+                           known_evidence_ids=KNOWN_IDS,
+                           evidence_texts=texts)
+        assert gate["evidence_resolution"]["span_failed_ids"] == \
+            ["ev:aaa111"]
+        assert gate["evidence_class"] == "EVIDENCE_MISSING"
+
+    def test_span_verification_passes_on_verbatim_span(self):
+        """R451 §5 G5: a claimed span that appears VERBATIM in the
+        evidence item's text verifies -> EVIDENCE_SUPPORTED."""
+        texts = {"ev:aaa111": EVIDENCE[0]}
+        h = _grounded_hypothesis(
+            evidence_support=[{
+                "evidence_id": "ev:aaa111",
+                "span": "Pitting penetration measured 0.18 mm/year",
+            }],
+            evidence_gaps=[])
+        gate = ground_gate(h, DIAG, PARENT_MECH,
+                           known_evidence_ids={"ev:aaa111"},
+                           evidence_texts=texts)
+        assert gate["evidence_resolution"]["verified_ids"] == \
+            ["ev:aaa111"]
+        assert gate["evidence_class"] == "EVIDENCE_SUPPORTED"
+        assert gate["verdict"] == "GROUNDED"
+
+    def test_fabricated_span_rejects_support(self):
+        """R451 §5 G5: a claimed span NOT present in the item's text is
+        a failed binding (a paraphrase is not a span — Art. II)."""
+        texts = {"ev:aaa111": EVIDENCE[0]}
+        h = _grounded_hypothesis(
+            evidence_support=[{
+                "evidence_id": "ev:aaa111",
+                "span": "titanium carbide coatings eliminate pitting "
+                        "entirely in all conditions",
+            }],
+            evidence_gaps=[])
+        gate = ground_gate(h, DIAG, PARENT_MECH,
+                           known_evidence_ids={"ev:aaa111"},
+                           evidence_texts=texts)
+        assert gate["evidence_resolution"]["span_failed_ids"] == \
+            ["ev:aaa111"]
+        assert gate["evidence_class"] == "EVIDENCE_MISSING"
+
+    def test_target_variable_outside_design_state_rejects(self):
+        """R451 §5 G6: a direction about a variable the design does not
+        declare is causally unanchored -> REJECTED."""
+        h = _grounded_hypothesis(
+            target_variable="lunar regolith berthing anchor mass",
+            causal_rationale="the lunar regolith berthing anchor mass "
+                             "drives the diagnosed pitting failure",
+            predicted_effect="lunar regolith berthing anchor mass "
+                             "reduces pitting penetration")
+        gate = ground_gate(h, DIAG, PARENT_MECH,
+                           known_evidence_ids=KNOWN_IDS,
+                           design_state={
+                               "mechanism": PARENT_MECH,
+                               "intervention": "ALD tantalum films on "
+                                               "CuNi tubing",
+                               "problem_text": "condenser tubing "
+                                               "seawater pitting",
+                           })
+        assert gate["verdict"] == "REJECTED"
+        assert any(c["check"] == "G6_TARGET_IN_DESIGN_STATE" and
+                   c["verdict"] == "FAIL" for c in gate["checks"])
+
+    def test_falsifier_measuring_unrelated_thing_rejects(self):
+        """R451 §5 G8: a measurable but irrelevant falsifier (measures
+        an unrelated observable) REJECTS."""
+        h = _grounded_hypothesis(
+            falsifier="the paint color luminance exceeds 40 units "
+                      "under identical shop lighting")
+        gate = ground_gate(h, DIAG, PARENT_MECH,
+                           known_evidence_ids=KNOWN_IDS)
+        assert gate["verdict"] == "REJECTED"
+        assert any(c["check"] == "G8_FALSIFIER_BINDS_PREDICTION" and
+                   c["verdict"] == "FAIL" for c in gate["checks"])
+
+    def test_falsifier_contradicting_prediction_rejects(self):
+        """R451 §5 G8: the prediction says penetration FALLS; a
+        falsifier that kills when penetration falls kills on the
+        predicted success itself -> REJECTED."""
+        h = _grounded_hypothesis(
+            falsifier="pitting penetration rate falls below 0.05 "
+                      "mm/year in the 500 nm barrier")
+        gate = ground_gate(h, DIAG, PARENT_MECH,
+                           known_evidence_ids=KNOWN_IDS)
+        assert gate["verdict"] == "REJECTED"
+        assert any(c["check"] == "G8_FALSIFIER_BINDS_PREDICTION" and
+                   "contradict" in c["basis"].lower()
+                   for c in gate["checks"])
+
+    def test_falsified_direction_repeat_rejects(self):
+        """R451 §5 G9 (Art. LI): a FALSIFIED (target_variable,
+        direction) pair may not be re-proposed."""
+        h = _grounded_hypothesis()
+        gate = ground_gate(h, DIAG, PARENT_MECH,
+                           known_evidence_ids=KNOWN_IDS,
+                           falsified_priors=[{
+                               "hypothesis_id": "dh:prior001",
+                               "target_variable": "ALD barrier film "
+                                                  "thickness",
+                               "direction": "INCREASE",
+                           }])
+        assert gate["verdict"] == "REJECTED"
+        assert any(c["check"] == "G9_CAUSAL_MEMORY" and
+                   c["verdict"] == "FAIL" for c in gate["checks"])
+
+    def test_falsified_direction_different_direction_allowed(self):
+        """G9 negative control: a DIFFERENT direction on the same
+        variable is new search, not a repeat."""
+        h = _grounded_hypothesis()
+        gate = ground_gate(h, DIAG, PARENT_MECH,
+                           known_evidence_ids=KNOWN_IDS,
+                           falsified_priors=[{
+                               "hypothesis_id": "dh:prior001",
+                               "target_variable": "ALD barrier film "
+                                                  "thickness",
+                               "direction": "DECREASE",
+                           }])
+        assert gate["verdict"] in ("GROUNDED", "EXPLORATORY")
+        assert any(c["check"] == "G9_CAUSAL_MEMORY" and
+                   c["verdict"] == "PASS" for c in gate["checks"])
 
 
 # ---------------------------------------------------------------------------
@@ -362,9 +516,11 @@ class TestVocabularies:
         assert gate["verdict"] == "GROUNDED"
 
     def test_statuses_closed(self):
+        # R451 §4: EXPLORATORY joins the closed vocabulary (structure
+        # sound, evidence class PARTIAL/MISSING — no mutation executes)
         assert set(HYPOTHESIS_STATUSES) == {
-            "PROPOSED", "GROUNDED", "REJECTED", "EXECUTED",
-            "FALSIFIED", "SUPPORTED", "SUPERSEDED"}
+            "PROPOSED", "GROUNDED", "EXPLORATORY", "REJECTED",
+            "EXECUTED", "FALSIFIED", "SUPPORTED", "SUPERSEDED"}
 
     def test_directions_closed(self):
         assert "CHANGE_MECHANISM" in DIRECTIONS

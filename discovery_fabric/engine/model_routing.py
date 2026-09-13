@@ -144,11 +144,21 @@ PINNED_MODEL_FAMILIES: Dict[str, List[str]] = {
         r"^z-ai/glm",
     ],
     "zai": [
+        # R451: the zai default rung now names the env-contract model
+        # zai-org/GLM-5.3 (the stale glm-4-plus id is retired); the
+        # family pattern admits both the bare glm- ids and the
+        # zai-org/GLM namespace — ONE GLM family, two hosting prefixes
         r"^glm-",
+        r"^zai-org/GLM",
     ],
     "tokenrouter": [
         r"^z-ai/glm",
         r"^glm-",
+    ],
+    # R451: the self-hosted local baseline (llama.cpp serves the alias
+    # 'qwen3-1.7b' — the Qwen3 family on local weights)
+    "localqwen": [
+        r"^qwen3-",
     ],
 }
 
@@ -181,9 +191,27 @@ PINNED_DEFAULT_MODELS: Dict[str, List[Dict[str, Any]]] = {
          "cost_class": 2, "latency_class": 2, "context_limit": 128000},
     ],
     "zai": [
-        {"model": "glm-4-plus",
+        # R451: the glm-4-plus rung is REMOVED — the R450-recorded engine
+        # defect (the HF router answers model_not_found for the stale paid
+        # id, classified INVALID_RESPONSE). The rung now names the env-
+        # contract model the R447 deployment actually serves; under
+        # MODEL_COST_POLICY=ZERO_PAID_COST the whole provider is ineligible
+        # anyway (ENVIRONMENT_GRANT / credit-router) — the rung exists for
+        # UNRESTRICTED operation only, recorded, never silent.
+        {"model": "zai-org/GLM-5.3",
          "task_capabilities": [TASK_STRONG, TASK_FAST, TASK_CHEAP],
          "cost_class": 1, "latency_class": 1, "context_limit": 128000},
+    ],
+    "localqwen": [
+        # R451 §1-2: the zero-paid local baseline — self-hosted
+        # Qwen/Qwen3-1.7B Q4_K_M via llama.cpp llama-server (CPU).
+        # HONEST classes: strong it is NOT (a 1.7B model is not a
+        # world-class scientific reasoner); fast it is NOT (measured
+        # 6.3 tok/s on 2 vCPU). It is CHEAP (zero paid cost) and it is
+        # the ONLY rung eligible under MODEL_COST_POLICY=ZERO_PAID_COST.
+        {"model": "qwen3-1.7b",
+         "task_capabilities": [TASK_CHEAP],
+         "cost_class": 1, "latency_class": 4, "context_limit": 32768},
     ],
     "tokenrouter": [
         {"model": "z-ai/glm-5.3-free",
@@ -394,6 +422,18 @@ LEDGER = RoutingLedger()
 # Routing state: the GONE model set (known-dead from the provider's own
 # 410 response — a recorded fact, never a heuristic)
 # ---------------------------------------------------------------------------
+def _provider_account_domain(provider_id: str) -> str:
+    """The economic account domain that pays for a provider's calls
+    (R451-C1.2). Declared on the ProviderSpec; UNDECLARED stays honest
+    (Art. XXV) — never guessed."""
+    try:
+        from .llm_registry import _SPEC_BY_ID
+        spec = _SPEC_BY_ID.get(provider_id)
+        return str(getattr(spec, "account_domain", "") or "UNDECLARED")
+    except Exception:  # noqa: BLE001 — registry not importable here
+        return "UNDECLARED"
+
+
 def _load_state() -> Dict[str, Any]:
     try:
         if STATE_PATH.exists():
@@ -405,15 +445,20 @@ def _load_state() -> Dict[str, Any]:
     return {}
 
 
-def mark_model_gone(provider: str, model: str) -> None:
-    """Record (provider, model) as GONE — the provider itself answered
-    410. The model is excluded from ladders until a fresh catalog lists
-    it again or a call succeeds; the PROVIDER stays eligible (Art. V)."""
+def mark_model_gone(provider: str, model: str,
+                    evidence: str = "provider responded HTTP 410 Gone on "
+                    "a live call") -> None:
+    """Record (provider, model) as known-dead — the provider itself
+    answered 410 GONE (retired) or model_not_found (the identifier is
+    permanently invalid on this route — R451-C1.2, the operator's
+    never-retry rule). The model is excluded from ladders until a fresh
+    catalog lists it again or a call succeeds; the PROVIDER stays
+    eligible (Art. V)."""
     state = _load_state()
     gone = state.setdefault("gone_models", {})
     gone[f"{provider}::{model}"] = {
         "at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
-        "evidence": "provider responded HTTP 410 Gone on a live call",
+        "evidence": evidence,
     }
     try:
         STATE_PATH.parent.mkdir(parents=True, exist_ok=True)
@@ -822,6 +867,11 @@ def build_ladder(task: str, role: Optional[str] = None,
             "latency_class": r.latency_class,
             "context_limit": r.context_limit,
             "source": r.source,
+            # R451-C1.2: the economic account that actually pays for
+            # this rung — MODEL vs PROVIDER vs ACCOUNT are three
+            # different failure domains (operator directive); two
+            # providers on ONE account domain are NOT redundant.
+            "account_domain": _provider_account_domain(r.provider),
         })
 
     # round-robin: slot 0 of every provider, then slot 1 of every
@@ -891,7 +941,16 @@ def record_call_outcome(provider: str, model: str, ok: bool,
                         estimated_cost: Optional[float] = None,
                         fallback_from: Optional[str] = None,
                         fallback_to: Optional[str] = None,
-                        error: str = "") -> None:
+                        error: str = "",
+                        # R451 §6 (provider routing observability): every
+                        # actual attempt carries its cost class, whether
+                        # THIS attempt's route was the selected one, and
+                        # the explicit reason a fallback followed — the
+                        # production record must reconstruct the exact
+                        # route with NO "models unavailable" summaries
+                        cost_class: Optional[str] = None,
+                        selected: Optional[bool] = None,
+                        fallback_reason: str = "") -> None:
     """One ledger line per attempt. Updates model_health /
     provider_health / task_health (all derived from this same ledger —
     one authority, Art. X) and invalidates the probe cache on failure
@@ -912,14 +971,28 @@ def record_call_outcome(provider: str, model: str, ok: bool,
         "latency": int(latency_ms or 0),   # directive §16 field name
         "tokens": tokens,
         "estimated_cost": estimated_cost,
+        "cost_class": cost_class,
+        "selected": selected,
         "fallback_from": fallback_from,
         "fallback_to": fallback_to,
+        "fallback_reason": str(fallback_reason or "")[:240],
         "error": str(error)[:240],
     })
     if not ok:
         clear_probe_cache(provider, model)
         if failure_type == "GONE":
             mark_model_gone(provider, model)
+        elif failure_type == "MODEL_NOT_FOUND":
+            # R451-C1.2 (operator directive: never retry a permanently
+            # invalid model identifier): the provider's own response
+            # says this id is not served on this route. The same
+            # known-dead discipline as GONE — the provider's OTHER
+            # models stay eligible (Art. V).
+            mark_model_gone(
+                provider, model,
+                evidence="provider responded model_not_found (404 or "
+                         "error body) — the identifier is permanently "
+                         "invalid on this route (R451-C1.2)")
     else:
         if is_model_gone(provider, model):
             clear_model_gone(provider, model)
