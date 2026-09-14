@@ -1,0 +1,61 @@
+{
+  "schema": "CODER1_NEXT_BEST_ACTION",
+  "version": "1.0.0",
+  "round": "R446-C1",
+  "authority": "toscanini/conversational/nba_controller.py (the runtime controller) + orchestrator/next_best_action.py (the end-of-run epistemic record - unchanged, Art. LXIV)",
+  "purpose": "The Next Best Action as the REAL controller: computed from the CURRENT recorded envelope before every stage boundary, consumed by the stage policy to determine the next execution path. The action actually determines the path (directive section 8); the decision and its full scored ledger are persisted (NBA_CONTROLLER.json) so 'why did the engine stop/skip here' is always an auditable record.",
+  "directive_reference": "CODER 1 - DISCOVERY INTELLIGENCE / CLAUDE-LIKE PROBLEM PROCESSING, section 8",
+  "action_vocabulary": {
+    "RETRIEVE_MORE_EVIDENCE": "more retrieval materially reduces uncertainty (verified items < 3 AND the frozen base is small)",
+    "GENERATE_COMPETING_MECHANISM": "evidence sufficient, no mechanism yet - synthesize with H1/H2/H3 competing (section 15)",
+    "ATTACK_CANDIDATE": "a mechanism exists but no recorded attack - the gauntlet is the highest-impact uncertainty reducer",
+    "ENGINEERING_ESCALATION": "candidate survived attack - escalate toward engineering representation (section 5)",
+    "PROPOSE_DECISIVE_EXPERIMENT": "high-value survivor with a recorded killer-experiment contract (Art. LII)",
+    "ASK_CLARIFICATION": "the Problem Understanding flags a field whose answer materially changes the search space (section 4)",
+    "STOP_HONEST": "classification ran, the evidence base is adequate (>= 8 records), and ZERO items support any mechanism of the stated problem - problem existence unestablished (Art. XX; directive section 5)",
+    "PACKAGE_READY": "engineering representation recorded - the buyer package is the remaining transfer step"
+  },
+  "action_fields": {
+    "action": "one of the closed vocabulary",
+    "target_uncertainty": "the uncertainty this action attacks",
+    "expected_information_gain": "0.0-1.0",
+    "probability_of_decision_change": "0.0-1.0",
+    "decision_impact": "0.0-1.0",
+    "estimated_cost": "planning constant (see cost_provenance)",
+    "estimated_latency_s": "planning constant (see cost_provenance)",
+    "required_capability": "the capability class that would execute it",
+    "risk": "the declared risk of taking (or refusing) the action",
+    "reason": "the recorded justification string",
+    "redundancy_penalty": "provider/action redundancy term",
+    "score": "(gain x p_change x impact) / cost - redundancy_penalty"
+  },
+  "scoring": {
+    "formula": "score = (expected_information_gain * probability_of_decision_change * decision_impact) / estimated_cost - redundancy_penalty",
+    "provenance": "the SAME V4 shape as orchestrator/next_best_action.py (one scoring authority, two sites); the runtime controller records the standing formula, it does not invent a second one",
+    "selection": "exactly ONE preferred action = highest score; returned with the full ranked ledger"
+  },
+  "cost_provenance": "MODEL_DERIVED - order-of-magnitude planning constants derived from the engine's call-site structure (adapters.py static LLM call-sites per stage) and the recorded routing ledger latency_ms distribution (ENGINE_RUNS/model_routing/ledger.jsonl, 612 lines). Used ONLY to rank controller actions by cost; never quoted as a measured result (Art. XXVII).",
+  "llm_calls_per_stage": {
+    "RETRIEVE": 0, "FREEZE": 0, "PREMISE_GATE": 0, "SYNTHESIZE": 1,
+    "VERIFY": 0, "MECHANISM_SPACE": 5, "MULTI_SOURCE_DISCOVERY": 0,
+    "COLLISION": 0, "PHYSICS": 0, "ATTACK": 1, "CONTRADICTION": 0,
+    "KILLER_EXPERIMENT": 0, "ADJUDICATION": 0, "CLASSIFY": 0,
+    "NEXT_BEST_ACTION": 0, "RANK": 1,
+    "provenance": "COMPUTED from source: static count of llm_registry.generate() call sites reachable from each stage's adapter (R446 audit)"
+  },
+  "declared_thresholds": {
+    "ADEQUATE_EVIDENCE_BASE": 8,
+    "provenance": "MODEL_DERIVED (Art. XXVII) - a base of >= 8 frozen records is a reasonable retrieval attempt for the problem-binding decision (aligned with the engine's depth-contract record floors); below it, more retrieval is the honest next move"
+  },
+  "control_wiring": {
+    "engine": "EngineRun(stage_gate=...) calls the controller before every stage; the stage policy consumes the preferred action to return RUN/SKIP/DEFER/BLOCK/STOP",
+    "worker": "toscanini/worker.py phase 3 constructs the gate closure; every controller decision is persisted to the run dir (NBA_CONTROLLER.json, last-wins)",
+    "record": "ranked_actions + preferred_action + decided_from (the measured state the decision rested on)"
+  },
+  "honesty_guards": [
+    "The decision is computed from RECORDED state only - never from inference about what a stage would produce",
+    "The absent-classification guard: STOP_HONEST never fires when the claim-level classification has not run (absence of the record is not a zero-support verdict, Art. XXV)",
+    "The adequate-base guard: a small evidence base earns RETRIEVE_MORE, never a stop (Art. V - not a universal rejector)",
+    "A controller failure fails OPEN to RUN - the orchestration layer can never hold the epistemic chain hostage"
+  ]
+}

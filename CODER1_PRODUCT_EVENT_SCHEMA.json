@@ -1,0 +1,51 @@
+{
+  "schema": "CODER1_PRODUCT_EVENT",
+  "version": "1.0.0",
+  "round": "R446-C1",
+  "authority": "toscanini/conversational/product_events.py (the code is the authority; this document is its published contract)",
+  "purpose": "The conversational event layer: product events derived EXCLUSIVELY from the run directory's persisted artifacts. Product events are NOT replacements for canonical state (directive section 9) - they are a projection of it, the same discipline as the R431 event journal applied to the directive's product vocabulary.",
+  "directive_reference": "CODER 1 - DISCOVERY INTELLIGENCE / CLAUDE-LIKE PROBLEM PROCESSING, sections 9 and 10",
+  "event_types": {
+    "DISCOVERY_STARTED": "the run's own problem.json exists - the stated problem began the run",
+    "UNDERSTANDING_PROBLEM": "PROBLEM_UNDERSTANDING.json exists - the structured interpretation was recorded (n_unknowns carried in detail)",
+    "CHECKING_PROBLEM_EXISTENCE": "the PREMISE_GATE stage executed (its own recorded status)",
+    "INVESTIGATING_EVIDENCE": "the RETRIEVE stage executed",
+    "EVIDENCE_UPDATED": "the FREEZE / VERIFY stages executed; also the terminal fallback for a non-verdict terminal state",
+    "MECHANISMS_IDENTIFIED": "SYNTHESIZE / MECHANISM_SPACE executed and produced a mechanism (HYPOTHESIZED - a hypothesis, never a fact)",
+    "CANDIDATES_GENERATED": "a candidate exists on the envelope - explicitly 'a hypothesis until attacked'",
+    "ATTACKING_CANDIDATE": "the ATTACK stage EXECUTED (non-execution statuses never emit this)",
+    "CANDIDATE_REJECTED": "the RECORDED verdict says killed: attack overall=KILL, a killed lineage generation, or a REJECTED/MALFORMED_OR_FALSE_PREMISE terminal",
+    "CANDIDATE_SURVIVED": "the RECORDED attack verdict is a pass (never inferred from completion - Art. X/XXVIII)",
+    "ENGINEERING_EVALUATION": "the bridge report's own completed outcome",
+    "EXPERIMENT_PROPOSED": "the envelope's recorded killer-experiment selection",
+    "OUTCOME_RECEIVED": "a REALITY_LOOP ledger event exists (PHYSICALLY_OBSERVED - only from real records)",
+    "MODEL_UPDATED": "the technical state was updated from a recorded observation (causal mutation chain)",
+    "CANDIDATE_MUTATED": "a lineage generation carries a causal delta / mutation reason",
+    "RE_EVALUATING": "the mutated generation was re-evaluated",
+    "PACKAGE_READY": "the package compiler's OWN report says complete (a stale bridge outcome cannot override it)",
+    "CLARIFICATION_REQUESTED": "the one-question pause opened (the session question + the PU record)",
+    "RUN_BLOCKED": "an infrastructure-class state (ERROR_*, RUN_BLOCKED_TRANSPORT, INTERRUPTED, BLOCKED/FAILED attack stage) - never a scientific verdict (Art. LXI)"
+  },
+  "event_fields": {
+    "schema": "CODER1_PRODUCT_EVENT/1.0.0",
+    "event_id": "deterministic hash of (run_id, seq, type)",
+    "run_id": "the owning run/session",
+    "seq": "deterministic order",
+    "type": "one of the closed vocabulary above",
+    "message": "one honest sentence derived from the artifact",
+    "basis_ref": "the EXACT persisted artifact this event derives from (envelope_*.json, PROBLEM_UNDERSTANDING.json, INVENTION_LINEAGE.json, BRIDGE_REPORT.json, PACKAGE_REPORT.json, REALITY_LOOP_LEDGER.json, final_state.json, run_manifest.json)",
+    "epistemic_class": "USER_STATED | RETRIEVED | INFERRED | HYPOTHESIZED | COMPUTED | SIMULATED | ENGINEERING_DEFINED | PHYSICALLY_OBSERVED | UNKNOWN - the class of the SOURCE artifact, never promoted (Art. XXVIII)",
+    "timestamp": "the source artifact's own recorded time when it has one",
+    "detail": "typed extras (generation number, counts)"
+  },
+  "derivation_rules": [
+    "Every event carries basis_ref - an event without a basis artifact is never emitted",
+    "A non-executed stage (projected to one of the six non-execution states) emits NO scientific event",
+    "ATTACK with a non-execution status can NEVER emit CANDIDATE_SURVIVED (acceptance test G: NOT_RUN is never 'survived')",
+    "An infrastructure-class attack state emits RUN_BLOCKED, never a scientific outcome (Art. LXI)",
+    "A killed lineage generation emits CANDIDATE_REJECTED (R452 killed-invention authority)",
+    "OUTCOME_RECEIVED / MODEL_UPDATED derive ONLY from the reality-loop ledger (Art. XXXVIII boundary)",
+    "PACKAGE_READY requires the package report's own complete field when a package report exists (acceptance test J)"
+  ],
+  "surface": "GET /api/run/{id}/product-events (owner-scoped; returns the stream with its validation problems list)"
+}

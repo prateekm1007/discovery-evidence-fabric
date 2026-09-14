@@ -74,10 +74,24 @@ class EngineRun:
                  package_registry_path: Optional[str] = None,
                  resume: bool = False,
                  event_callback: Optional[Callable] = None,
-                 session_id: Optional[str] = None):
+                 session_id: Optional[str] = None,
+                 stage_gate: Optional[Callable] = None):
         # R431: optional journal callback — called (stage, envelope)
         # each time a stage envelope is persisted (the moment the
         # operation occurs). No engine-side journal dependency.
+        # R446-C1 (conversational orchestration directive §5/§6/§8):
+        # optional adaptive stage gate — called BEFORE each stage with
+        # (stage, envelope_snapshot, nba_record). Returns None → RUN
+        # (the constitutionally-default path), or a typed policy
+        # decision {decision: RUN|SKIP|DEFER|BLOCK|STOP, reason,
+        # next_action, skip_class, prerequisite_evidence}. The gate
+        # makes conditional computation POSSIBLE; it never removes an
+        # epistemic control (the policy layer refuses only compute the
+        # recorded state makes redundant — every refusal is persisted
+        # as a typed stage entry, Art. XXV). Absent gate → behavior
+        # byte-identical to the pre-R446 conductor (all existing
+        # batteries pinned on that invariant).
+        self.stage_gate = stage_gate
         # CEO A1: there is NO default package number. Production numbers are
         # allocated ATOMICALLY from PACKAGE_ID_REGISTRY.json only after the
         # survivor gate passes. `package_number` exists solely as an explicit
@@ -285,6 +299,85 @@ class EngineRun:
             _entry_block = stage_entry.justify(
                 stage, self.env, self.failed_stages,
                 self._skipped_stages)
+            # R446-C1: the adaptive stage gate (conversational
+            # orchestration directive §5/§6/§8). Called BEFORE the
+            # admission check's own effects and BEFORE execution, with
+            # the CURRENT recorded envelope — the decision can only
+            # rest on state that is already persisted (never on
+            # inference about what the stage would produce). A None
+            # return means RUN. A gate failure is treated as RUN
+            # (fail-open for the POLICY layer — the epistemic chain is
+            # never held hostage by the orchestration layer; the
+            # failure is disclosed on the entry).
+            _gate_decision = None
+            if self.stage_gate is not None:
+                try:
+                    _gate_decision = self.stage_gate(
+                        stage, self.env, getattr(self, "_nba_record", None))
+                except Exception as _gate_exc:  # noqa: BLE001
+                    _entry_block["stage_gate_error"] = (
+                        f"{type(_gate_exc).__name__}: {_gate_exc}"[:200])
+                    _gate_decision = None
+            if _gate_decision is not None and \
+                    isinstance(_gate_decision, dict) and \
+                    _gate_decision.get("decision") in (
+                        "SKIP", "DEFER", "BLOCK", "STOP"):
+                _gd = _gate_decision
+                _status = {
+                    "SKIP": "SKIPPED_POLICY_LOW_VALUE"
+                            if _gd.get("skip_class") != "NOT_REQUIRED"
+                            else "SKIPPED_POLICY_NOT_REQUIRED",
+                    "DEFER": "DEFERRED_POLICY",
+                    "BLOCK": "BLOCKED_POLICY",
+                    "STOP": "STOPPED_POLICY",
+                }[_gd["decision"]]
+                self._skipped_stages.add(stage)
+                self.env.stage_log.append({
+                    "stage": stage,
+                    "capability_id": ADAPTERS[stage].capability_id,
+                    "status": _status,
+                    "decision": _gd["decision"],
+                    "skip_reason": _gd.get("reason"),
+                    "skip_class": _gd.get("skip_class"),
+                    "next_action": _gd.get("next_action"),
+                    "prerequisite_evidence": _gd.get(
+                        "prerequisite_evidence"),
+                    "policy_version": _gd.get("policy_version"),
+                    "candidate_delta": [],
+                    "delta_real": False,
+                    "started_at": utc_now(),
+                    "finished_at": utc_now(),
+                    "entry": _entry_block})
+                self._persist_envelope(stage)
+                if _gd["decision"] == "STOP":
+                    # a STOP halts the loop: everything downstream is
+                    # NOT_REACHED (recorded typed entries, never
+                    # silently absent — the same discipline as the
+                    # premise fatality cascade)
+                    self.failed_stages[stage] = (
+                        f"POLICY_STOP: {_gd.get('reason')}")
+                    for later in STAGE_ORDER[
+                            STAGE_ORDER.index(stage) + 1:]:
+                        if later in self.disabled or later in done_stages:
+                            continue
+                        self._skipped_stages.add(later)
+                        self.env.stage_log.append({
+                            "stage": later,
+                            "capability_id":
+                                ADAPTERS[later].capability_id,
+                            "status": "SKIPPED_POLICY_NOT_REACHED",
+                            "decision": "STOP",
+                            "skip_reason": (
+                                f"upstream policy STOP at {stage}: "
+                                f"{str(_gd.get('reason'))[:200]}"),
+                            "skip_class": "NOT_REACHED",
+                            "candidate_delta": [],
+                            "delta_real": False,
+                            "started_at": utc_now(),
+                            "finished_at": utc_now()})
+                        self._persist_envelope(later)
+                    break
+                continue
             if _entry_block.get("entry_status") == "SKIPPED":
                 # R453-LEAN-CORE adaptive admission: the stage is NOT
                 # allowed to consume compute (no retained candidate, or
@@ -396,7 +489,30 @@ class EngineRun:
         # nothing to invent (honest MALFORMED_OR_FALSE_PREMISE stands).
         # GEN-1's rejection is still recorded as negative knowledge
         # below (the cemetery decision uses final_pre_evolution).
-        if "PREMISE_GATE" not in self.failed_stages:
+        # R446-C1: a POLICY_STOP run does NOT enter evolution — the
+        # R416 "every valid query ends with an architecture" contract
+        # applies to VALID queries; a query whose problem existence
+        # could not be established from the frozen evidence is exactly
+        # the Art. XX case where generating a baseline architecture
+        # would optimize an unverified problem. The stop is recorded,
+        # the lineage records the honest reason.
+        _policy_stopped = any(
+            str(v).startswith("POLICY_STOP:")
+            for v in self.failed_stages.values())
+        if _policy_stopped:
+            self._persist("INVENTION_LINEAGE.json", {
+                "schema": "INVENTION_LINEAGE/1.0.0",
+                "run_id": self.run_id,
+                "status": "SKIPPED_POLICY_STOP",
+                "skip_reason": "the stage policy stopped the run before "
+                               "candidate generation (problem existence "
+                               "unestablished) — no architecture is owed "
+                               "for an unverified problem (Art. XX; "
+                               "directive §5)",
+                "n_generations": 0,
+            })
+        if "PREMISE_GATE" not in self.failed_stages \
+                and not _policy_stopped:
             from . import evolution as _ev
             standard_path_packaged = bool(
                 self.package_report and self.package_report.get("complete"))
@@ -1958,6 +2074,17 @@ class EngineRun:
         eps = self.env.epistemic_state or {}
         synthesis_ok = "SYNTHESIZE" not in self.failed_stages
         premise_reject = "PREMISE_GATE" in self.failed_stages
+        # R446-C1: a POLICY_STOP is the adaptive orchestration layer's
+        # honest halt (directive §5: "Stop early if problem existence
+        # cannot be established"). It is a THIRD terminal class —
+        # neither a premise-incoherence verdict (the premise is
+        # coherent) nor a mechanism-generation failure (nothing was
+        # attempted) nor a scientific rejection (no candidate existed
+        # to reject, Art. LXI discipline applied forward: refusing
+        # compute is not adjudicating it).
+        policy_stop = any(
+            str(v).startswith("POLICY_STOP:")
+            for v in self.failed_stages.values())
         status = eps.get("final_status")
         if premise_reject:
             # R394 s6: the REQUIRED outcome — a self-explaining terminal
@@ -1967,6 +2094,18 @@ class EngineRun:
             status = "MALFORMED_OR_FALSE_PREMISE"
             reason = ("the problem's premise is physically/scientifically "
                       f"incoherent: {self.failed_stages.get('PREMISE_GATE', '')[:300]}")
+        elif policy_stop:
+            status = "PROBLEM_EXISTENCE_UNESTABLISHED"
+            reason = ("the adaptive stage policy stopped the run before "
+                      "candidate generation: the frozen evidence does "
+                      "not establish the problem's existence, so "
+                      "mechanism optimization would solve an unverified "
+                      "problem (Art. XX; directive §5 weak-premise "
+                      "stop). This is not a scientific rejection and "
+                      "not negative knowledge — the recorded reason: "
+                      + "; ".join(
+                          str(v) for v in self.failed_stages.values()
+                          if str(v).startswith("POLICY_STOP:"))[:300])
         elif not synthesis_ok:
             # R416 honest-cause fix: a SYNTHESIZE stage failure means the
             # mechanism GENERATION failed BEFORE any candidate existed.

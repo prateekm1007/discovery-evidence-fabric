@@ -612,3 +612,33 @@ is the self-hosted 4B step-up.
 | THE RECORD | `R452/MODEL_EXPERIMENT.json` | the honest reading is MIXED, dimension by dimension: evidence grounding 0.1367 -> 0.6459 (4.7x), the adversarial attack EXECUTED once (case C, honestly KILLED), the first live VALUE_SOURCING spec (5 SOURCE_FACT of 7, geometry_reachable) — but ZERO mechanism-space candidates retained (vs the 1.7B's 2), 2 of 3 attacks still NOT_RUN, no STEP exported; NO prose superiority claim |
 | THE A3 ESCALATION | `R452/OWNER_GATED_ESCALATION_A3.json` | escalation_count 2 with the measurement attached; the elite-class question stays unmeasured at zero cost — the operator's three unblock paths are the only route to a tier-2 ceiling |
 
+
+## R446-C1 addendum (2026-09-14) — the conversational orchestration layer
+
+Operator directive R446-C1 (CODER 1 — Discovery Intelligence /
+Claude-like problem processing): the machinery above is UNCHANGED
+(the loop and the 16-stage STAGE_ORDER stay the authority); a layer
+ABOVE them makes them adaptive, selectively executed, and cleanly
+consumable by the product.
+
+| Component | Module | Notes |
+|---|---|---|
+| Problem Understanding contract | `toscanini/conversational/problem_understanding.py` | the 12-field structured interpretation BEFORE the pipeline; every field typed {value, origin, basis, confidence} over USER_STATED / INFERRED_MODEL / MODEL_DERIVED_LLM / UNKNOWN; deterministic constructor (zero LLM) + guarded LLM enrichment (USER_STATED never overridden); persisted to the run dir before the engine starts — an INPUT record, never a discovery claim |
+| Clarification rule | `toscanini/conversational/clarification.py` | ask iff materiality × uncertainty × answerability >= 0.35; at most ONE question per pause; "select your industry" structurally refused (directive §4's own bad example) |
+| Adaptive stage policy | `toscanini/conversational/stage_policy.py` | RUN/SKIP/DEFER/BLOCK/STOP with reason + next_action + prerequisite evidence; the six-state non-execution vocabulary (NOT_REQUIRED / NOT_REACHED / NOT_RUN / BLOCKED / FAILED / SKIPPED_LOW_VALUE) with a TOTAL one-way mapping from engine/bridge statuses; the §14 evidence-sufficiency stopping rule; the weak-premise STOP (typed PROBLEM_EXISTENCE_UNESTABLISHED terminal — never a scientific rejection); the §23 lazy-execution artifact policy |
+| NBA as controller | `toscanini/conversational/nba_controller.py` | re-computed from the CURRENT recorded envelope before every stage; the standing V4 formula (one scoring authority with orchestrator/next_best_action.py, two sites); preferred action + full ranked ledger persisted to NBA_CONTROLLER.json — the action actually determines the next execution path (directive §8) |
+| Engine integration | `discovery_fabric/engine/run.py` (stage_gate) | ONE surgical site: an optional pre-stage callback; typed policy statuses persisted on the stage entries (SKIPPED_POLICY_LOW_VALUE / _NOT_REQUIRED / BLOCKED_POLICY / DEFERRED_POLICY / STOPPED_POLICY + downstream NOT_REACHED); gate failure fails OPEN to RUN; ABSENT gate → the conductor is byte-identical to pre-R446 (pinned by test) |
+| Product events | `toscanini/conversational/product_events.py` | the directive §9 event vocabulary (+ CLARIFICATION_REQUESTED, RUN_BLOCKED) derived EXCLUSIVELY from persisted artifacts (basis_ref on every event); NOT_RUN attack can never emit CANDIDATE_SURVIVED; infra states emit RUN_BLOCKED never a verdict (Art. LXI); PACKAGE_READY requires the package report's own field |
+| Run contract | `toscanini/conversational/run_contract.py` | the ~7-field product view (run_id, current_state, human_progress, next_action, artifacts, blocking_reason, uncertainties) — a projection of canonical state (completion marker + run_state phases + NBA), never a second state store |
+| Conversation memory guard | `toscanini/conversational/conversation_memory.py` | "We proved candidate B" is CONTEXT-ONLY; the conversation path writes exactly three context fields — every scientific field refused with a typed record (directive §12) |
+| Model provenance | `toscanini/conversational/model_provenance.py` | the §18 work-routing declaration (deterministic work has zero LLM call sites, by audit); the §19 provenance pack + AUTHORITY_DOWNGRADED detector (a cheap fallback never inherits a strong route's scientific authority) |
+| Worker phases | `toscanini/worker.py` | phase 1.9 (PU + clarification pause → AWAITING_CLARIFICATION, resumable via POST /api/run/{id}/answer); phase 2.1 (enrichment + run-dir persistence); phase 3 (the NBA-driven gate closure); phase 3.5 (the artifact policy consulted before the bridge — a killed candidate generates no CAD/visual/package) |
+| Product surface | `toscanini/server.py` | POST /api/run/{id}/answer, GET /api/run/{id}/contract, GET /api/run/{id}/product-events |
+
+Acceptance: `tests/test_r446_conversational_orchestrator.py` (the
+directive §24 A–J battery, 48/48) + the §25 benchmark
+(`scripts/r446_adaptive_pipeline_benchmark.py` →
+CODER1_ADAPTIVE_PIPELINE_BENCHMARK.json: 10/10 quality gates
+preserved, LLM calls −33%, compute ops −13%, planning latency −22%,
+verdict ADAPTIVE_SUCCESSFUL). Audit:
+CODER1_CONVERSATIONAL_ORCHESTRATOR_AUDIT.md.

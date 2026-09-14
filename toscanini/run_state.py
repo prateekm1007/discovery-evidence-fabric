@@ -71,7 +71,9 @@ OUTCOME_LABELS = {
     OUTCOME_KILLED_BY_CHALLENGE: "Killed by its own adversarial challenge",
 }
 
-_RUNNING_STATUSES = ("PENDING", "BUILDING_PROBLEM", "RUNNING", "")
+_RUNNING_STATUSES = ("PENDING", "BUILDING_PROBLEM", "RUNNING", "",
+                     "AWAITING_CLARIFICATION")  # R446-C1: the
+#    one-question conversational pause — live, not terminal
 _BLOCKED_STATUSES = ("INTERRUPTED", "ERROR_TRANSPORT", "ERROR_BUILD",
                      "ERROR_RUN", "ERROR_STUCK",
                      "RUN_BLOCKED_TRANSPORT")   # R415: the directive §8

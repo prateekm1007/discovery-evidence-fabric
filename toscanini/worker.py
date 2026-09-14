@@ -215,6 +215,103 @@ def _run_inner(session_id: str, forensics) -> None:
         _snapshot(session_id, f"terminal:RUN_BLOCKED_TRANSPORT:{session_id}")
         return
 
+    # --- phase 1.9: the conversational problem understanding (R446-C1) ------
+    # Directive §3: BEFORE the discovery pipeline begins, produce the
+    # structured interpretation (PROBLEM_UNDERSTANDING contract) with
+    # every inferred field explicitly typed. Directive §4: ask at most
+    # ONE information-efficient clarification, and ONLY when the answer
+    # materially changes the search space — otherwise run autonomously.
+    forensics.event("PHASE_STARTED", stage="UNDERSTANDING_PROBLEM",
+                    phase=1.9)
+    try:
+        from toscanini.conversational import problem_understanding as _pu_mod
+        from toscanini.conversational import clarification as _cl_mod
+        from toscanini.conversational import conversation_memory as _cm_mod
+        pu = _pu_mod.build_problem_understanding(
+            s["user_text"], session_id=session_id)
+        # conversation memory: the user's opening message is CONTEXT
+        # (recorded, classified) — it can never mutate canonical
+        # scientific state (directive §12; the guard is structural)
+        _ctx = _cm_mod.record_conversation_context(
+            s, s["user_text"])
+        store.update_session(session_id,
+                             **_cm_mod.guard_session_update(
+                                 {"conversation": _ctx["conversation"]}
+                             )["allowed"])
+        # a stored clarification answer (from a prior pause) merges as
+        # USER_STATED before the need is re-evaluated
+        _answer = s.get("clarification_answer") or {}
+        if isinstance(_answer, dict) and _answer.get("field") \
+                and _answer.get("answer"):
+            pu = _pu_mod.apply_clarification_answer(
+                pu, _answer["field"], _answer["answer"])
+            store.update_session(session_id, clarification_answer={})
+        need = _cl_mod.evaluate_clarification_need(pu)
+        if need["needed"] and not s.get("clarification_answer"):
+            # directive §4: ONE useful clarification, then pause. The
+            # problem is saved; the answer resumes the SAME worker
+            # path (POST /api/run/{id}/answer re-enqueues). No LLM
+            # extraction or retrieval compute is burned while the
+            # question is open (the pause is BEFORE phase 2).
+            store.update_session(
+                session_id, status="AWAITING_CLARIFICATION",
+                clarification={
+                    "field": need["field"],
+                    "question": need["question"],
+                    "decision_changed": need["decision_changed"],
+                    "score": need["score"],
+                    "asked_at": time.strftime("%Y-%m-%dT%H:%M:%SZ",
+                                              time.gmtime()),
+                })
+            _pu_path = store.STORE_DIR / \
+                f"problem_understanding_{session_id}.json"
+            try:
+                import json as _json
+                _pu_path.write_text(_json.dumps(pu, indent=1,
+                                                ensure_ascii=False))
+            except Exception:  # noqa: BLE001 — input record, fail-open
+                pass
+            try:
+                from toscanini import event_journal as _journal
+                _journal.record(
+                    str(s.get("run_dir") or ""), session_id,
+                    kind="clarification.requested", stage="PROBLEM",
+                    status="BLOCKED",
+                    summary=("one clarification materially changes the "
+                             "search space: " +
+                             str(need["question"])[:200]),
+                    epistemic_class="INFERRED",
+                    basis_ref=f"problem_understanding (session "
+                              f"{session_id})")
+            except Exception:  # noqa: BLE001 — journaling is fail-open
+                pass
+            forensics.event("CLARIFICATION_REQUESTED",
+                            field=need["field"],
+                            question=str(need["question"])[:200])
+            _snapshot(session_id,
+                      f"awaiting_clarification:{session_id}")
+            return
+        # persist the PU alongside the session (the run-dir copy lands
+        # in phase 2.1 once the run dir exists — one record, two views;
+        # the session copy is per-session, never shared)
+        try:
+            import json as _json
+            _pu_path = store.STORE_DIR / \
+                f"problem_understanding_{session_id}.json"
+            _pu_path.write_text(_json.dumps(pu, indent=1,
+                                            ensure_ascii=False))
+        except Exception:  # noqa: BLE001 — input record, fail-open
+            pass
+        s = store.get_session(session_id) or s
+    except Exception as exc:  # noqa: BLE001 — disclosed, never fatal:
+        # the PU layer is an INPUT RECORD; a failure here degrades to
+        # the pre-R446 autonomous flow (recorded honestly, Art. XV)
+        forensics.event("PROBLEM_UNDERSTANDING_ERROR",
+                        error_class=type(exc).__name__,
+                        error=str(exc)[:200])
+        print(f"  [worker] problem understanding failed (continuing "
+              f"without it): {type(exc).__name__}: {exc}", file=sys.stderr)
+
     # --- phase 2: evidence-bound problem ------------------------------------
     forensics.event("PHASE_STARTED", stage="BUILDING_PROBLEM", phase=2)
     try:
@@ -243,7 +340,24 @@ def _run_inner(session_id: str, forensics) -> None:
                          run_dir=str(run_dir),
                          domain=built["domain"])
 
-    # --- phase 3: the engine (unchanged) -------------------------------------
+    # --- phase 2.1: enrich + persist the PU into the run dir (R446-C1) --
+    # The MODEL_DERIVED LLM extraction merges into the PU contract with
+    # every merged field typed MODEL_DERIVED_LLM; USER_STATED fields are
+    # never overridden (disagreements recorded). The run-dir copy is the
+    # one the product event layer and the run contract read.
+    try:
+        from toscanini.conversational import problem_understanding as _pu_mod
+        pu = _pu_mod.enrich_with_extraction(pu, built.get("extraction") or {})
+        _pu_mod.persist(pu, run_dir)
+    except Exception as exc:  # noqa: BLE001 — input record, fail-open
+        print(f"  [worker] PU enrichment/persist failed (disclosed): "
+              f"{type(exc).__name__}: {exc}", file=sys.stderr)
+
+    # --- phase 3: the engine — now with the adaptive stage gate ----------
+    # Directive §5/§8: the NBA controller decides from the CURRENT
+    # recorded envelope at every stage boundary; the stage policy turns
+    # that decision into RUN/SKIP/DEFER/BLOCK/STOP. Absent gate → the
+    # engine's default full-chain behavior (identical to pre-R446).
     forensics.event("PHASE_STARTED", stage="ENGINE_RUN", phase=3,
                     problem_id=problem["problem_id"])
     from discovery_fabric.engine.run import EngineRun
@@ -252,9 +366,30 @@ def _run_inner(session_id: str, forensics) -> None:
         # is persisted (the event_callback contract)
         from toscanini import event_journal as _journal
         _engine_cb = _journal.engine_callback(str(run_dir), session_id)
+
+        def _stage_gate(stage, env, _nba_record=None):
+            # directive §8: the action must ACTUALLY determine the next
+            # execution path — the controller recomputes from the
+            # CURRENT recorded envelope before every stage and the
+            # policy consumes its preferred action
+            import json as _json
+            from toscanini.conversational import nba_controller
+            from toscanini.conversational import stage_policy
+            try:
+                nba = nba_controller.decide(env.to_dict())
+                engine._nba_record = nba
+                # persist the controller record (last-wins; it is the
+                # run's own controller trail, read by the run contract)
+                (run_dir / "NBA_CONTROLLER.json").write_text(
+                    _json.dumps(nba, indent=1, ensure_ascii=False))
+            except Exception:  # noqa: BLE001 — controller fail-open
+                nba = None
+            return stage_policy.engine_gate(stage, env, nba)
+
         engine = EngineRun(problem, str(run_dir), with_package=True,
                            event_callback=_engine_cb,
-                           session_id=session_id)
+                           session_id=session_id,
+                           stage_gate=_stage_gate)
         manifest = engine.run()
     except Exception as exc:  # noqa: BLE001
         forensics.event("TERMINAL_STATE", terminal="ERROR_RUN",
@@ -275,54 +410,102 @@ def _run_inner(session_id: str, forensics) -> None:
     # script, no copied JSON, no manual post-processing. A bridge
     # failure is an honest typed record — it NEVER changes the run's
     # epistemic state (Art. VI/XV/LXI) and never blocks completion.
+    #
+    # R446-C1 §23 (lazy execution): the expensive-artifact policy is
+    # consulted FIRST — a killed candidate (the recorded challenge
+    # verdict is authoritative, R452) generates NO artifacts, and the
+    # refusal is a typed decision record (SKIP / NOT_REQUIRED with the
+    # directive's own example semantics), never a silent code path.
     forensics.event("PHASE_STARTED", stage="BRIDGE_GATE", phase=3.5)
+    _artifact_policy = None
     try:
-        from toscanini import bridge_gate
-        gate = bridge_gate.ensure_artifacts(session_id)
-        print(f"  [worker] bridge gate: {gate.get('outcome')}",
-              file=sys.stderr)
-        forensics.event("BRIDGE_GATE_OUTCOME",
-                        outcome=gate.get("outcome"),
-                        case=gate.get("case"))
-        # R431: geometry/package events from the gate's own record
+        from toscanini.conversational import stage_policy as _sp
+        _env_state = (engine.env.to_dict()
+                      if getattr(engine, "env", None) is not None else {})
+        import json as _json_l
+        _lineage = None
+        if (run_dir / "INVENTION_LINEAGE.json").is_file():
+            _lineage = _json_l.loads(
+                (run_dir / "INVENTION_LINEAGE.json").read_text())
+        _artifact_policy = _sp.expensive_artifact_policy(
+            _env_state, _lineage)
+        if _artifact_policy.get("decision") != "RUN":
+            _json_l.dump(_artifact_policy,
+                         open(run_dir / "EXPENSIVE_ARTIFACT_POLICY.json",
+                              "w"), indent=1, ensure_ascii=False)
+            forensics.event("ARTIFACT_POLICY_REFUSED",
+                            decision=_artifact_policy.get("decision"),
+                            skip_class=_artifact_policy.get("skip_class"),
+                            reason=str(
+                                _artifact_policy.get("reason"))[:200])
+            print(f"  [worker] artifact policy refused "
+                  f"({_artifact_policy.get('decision')}/"
+                  f"{_artifact_policy.get('skip_class')}): "
+                  f"{str(_artifact_policy.get('reason'))[:160]}",
+                  file=sys.stderr)
+    except Exception as exc:  # noqa: BLE001 — policy fail-open (the
+        # bridge's own gates still govern; the failure is disclosed)
+        print(f"  [worker] artifact policy consultation failed "
+              f"(disclosed): {type(exc).__name__}: {exc}", file=sys.stderr)
+    if _artifact_policy is not None and \
+            _artifact_policy.get("decision") != "RUN":
+        # the refusal record stands on its own; the bridge is NOT
+        # invoked (no CAD, no visual package, no buyer PDF for a dead
+        # candidate — directive §23) and the session records the typed
+        # outcome so the product surface can render the honest reason
+        store.update_session(session_id,
+                             bridge_outcome="SKIPPED_POLICY",
+                             bridge_case="ARTIFACT_POLICY")
+    else:
         try:
-            from toscanini import event_journal as _journal
-            _journal.record_bridge_outcomes(
-                str(run_dir), session_id, gate)
-        except Exception:  # noqa: BLE001 — journaling is fail-open
-            pass
-        store.update_session(
-            session_id,
-            bridge_outcome=gate.get("outcome"),
-            bridge_case=gate.get("case"))
-        # R422 (UI copy reconciliation, server-side companion): when the
-        # async artifact gate lands a package on a run whose completion
-        # snapshot recorded package_available=false, the session's package
-        # field is refreshed HERE — from the run dir's own package report
-        # (the authority, Art. X) — so the stored user_state_view and the
-        # product surface can never disagree about package existence.
-        # Presentation-snapshot only: no scientific field is touched.
-        try:
-            from toscanini import cio as _cio_mod
-            refreshed = _cio_mod._package_info(run_dir)
-            if refreshed.get("complete"):
-                store.update_session(
-                    session_id,
-                    package={"zip_name": refreshed.get("zip_name"),
-                             "maturity": refreshed.get("maturity"),
-                             "package_kind": refreshed.get("package_kind"),
-                             "complete": True})
+            from toscanini import bridge_gate
+            gate = bridge_gate.ensure_artifacts(session_id)
+            print(f"  [worker] bridge gate: {gate.get('outcome')}",
+                  file=sys.stderr)
+            forensics.event("BRIDGE_GATE_OUTCOME",
+                            outcome=gate.get("outcome"),
+                            case=gate.get("case"))
+            # R431: geometry/package events from the gate's own record
+            try:
+                from toscanini import event_journal as _journal
+                _journal.record_bridge_outcomes(
+                    str(run_dir), session_id, gate)
+            except Exception:  # noqa: BLE001 — journaling is fail-open
+                pass
+            store.update_session(
+                session_id,
+                bridge_outcome=gate.get("outcome"),
+                bridge_case=gate.get("case"))
+            # R422 (UI copy reconciliation, server-side companion): when
+            # the async artifact gate lands a package on a run whose
+            # completion snapshot recorded package_available=false, the
+            # session's package field is refreshed HERE — from the run
+            # dir's own package report (the authority, Art. X) — so the
+            # stored user_state_view and the product surface can never
+            # disagree about package existence.
+            # Presentation-snapshot only: no scientific field is touched.
+            try:
+                from toscanini import cio as _cio_mod
+                refreshed = _cio_mod._package_info(run_dir)
+                if refreshed.get("complete"):
+                    store.update_session(
+                        session_id,
+                        package={"zip_name": refreshed.get("zip_name"),
+                                 "maturity": refreshed.get("maturity"),
+                                 "package_kind":
+                                     refreshed.get("package_kind"),
+                                 "complete": True})
+            except Exception as exc:  # noqa: BLE001 — disclosed, never fatal
+                print(f"  [worker] package-field refresh failed: "
+                      f"{type(exc).__name__}: {exc}", file=sys.stderr)
         except Exception as exc:  # noqa: BLE001 — disclosed, never fatal
-            print(f"  [worker] package-field refresh failed: "
+            forensics.event("BRIDGE_GATE_ERROR",
+                            error_class=type(exc).__name__)
+            print(f"  [worker] bridge gate failed: "
                   f"{type(exc).__name__}: {exc}", file=sys.stderr)
-    except Exception as exc:  # noqa: BLE001 — disclosed, never fatal
-        forensics.event("BRIDGE_GATE_ERROR",
-                        error_class=type(exc).__name__)
-        print(f"  [worker] bridge gate failed: "
-              f"{type(exc).__name__}: {exc}", file=sys.stderr)
-        store.update_session(
-            session_id, bridge_outcome="GATE_ERROR",
-            bridge_error=f"{type(exc).__name__}: {exc}"[:400])
+            store.update_session(
+                session_id, bridge_outcome="GATE_ERROR",
+                bridge_error=f"{type(exc).__name__}: {exc}"[:400])
 
     # --- phase 4: honest terminal status -------------------------------------
     forensics.event("PHASE_STARTED", stage="TERMINAL_STATUS", phase=4)

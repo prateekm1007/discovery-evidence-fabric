@@ -1,0 +1,97 @@
+{
+  "schema": "R446_ROUND_RECORD/1.0.0",
+  "round": "R446-C1",
+  "coder": "CODER 1 — Discovery Intelligence / Claude-like problem processing",
+  "directive_title": "Make Toscanini behave like one intelligent conversational discovery engine rather than a user-operated sequence of internal stages",
+  "constitution": {
+    "version_read_at_round_start": "2.4.0",
+    "full_read_completed": true,
+    "reread_before_final_commit": true,
+    "governance_files_read": [
+      "GOVERNANCE/README.md",
+      "GOVERNANCE/AUDITOR_SELF_GOVERNANCE_v1.md",
+      "GOVERNANCE/AUDITOR_BLINDSPOT_REGISTER.md",
+      "GOVERNANCE/AUDITOR_REMEMBERED_STATE.md",
+      "GOVERNANCE/AUDIT_LOOP_PROTOCOL_v1.md",
+      "ACTIVE_PATH.md"
+    ]
+  },
+  "baseline": {
+    "stale_local_checkout_detected": true,
+    "local_head_at_open": "2d52fc62c3a5acafadb8115f60365d91c44b6598",
+    "remote_main_verified_by_ls_remote": "caf9fa54ba417403088e19052191a2fb6b58f63e",
+    "realigned_before_any_code": true,
+    "commits_behind": 111,
+    "note": "Art. XXII/XXIII applied: the checkout opened 111 commits stale (R446-R453-C2 existed on the remote, including the Claude-class UI reconstruction and Constitution v2.4.0); the checkout was reset to the remote truth BEFORE coding, and the audit was performed against that state"
+  },
+  "implementation": {
+    "new_package": "toscanini/conversational/ (8 modules)",
+    "engine_integration": "discovery_fabric/engine/run.py — the optional stage_gate callback (one surgical site; absent gate = pre-R446 behavior, pinned by test)",
+    "worker_wiring": "phases 1.9 / 2.1 / 3 / 3.5 (PU + clarification pause; enrichment; NBA-driven gate; artifact policy before the bridge)",
+    "server_routes": [
+      "POST /api/run/{id}/answer",
+      "GET /api/run/{id}/contract",
+      "GET /api/run/{id}/product-events"
+    ],
+    "status_vocabularies": {
+      "decisions": ["RUN", "SKIP", "DEFER", "BLOCK", "STOP"],
+      "non_execution_states": ["NOT_REQUIRED", "NOT_REACHED", "NOT_RUN", "BLOCKED", "FAILED", "SKIPPED_LOW_VALUE"],
+      "new_engine_terminal": "PROBLEM_EXISTENCE_UNESTABLISHED (policy STOP class — never a scientific rejection, never negative knowledge)"
+    },
+    "canonical_loop_touched": false,
+    "stage_order_touched": false,
+    "epistemic_controls_removed": "none — the policy refuses only compute the RECORDED state makes redundant; every refusal is a typed persisted record (Art. XXV)"
+  },
+  "deliverables": [
+    "CODER1_CONVERSATIONAL_ORCHESTRATOR_AUDIT.md",
+    "CODER1_PROBLEM_UNDERSTANDING_SCHEMA.json",
+    "CODER1_NEXT_BEST_ACTION_CONTRACT.json",
+    "CODER1_PRODUCT_EVENT_SCHEMA.json",
+    "CODER1_ADAPTIVE_PIPELINE_BENCHMARK.json"
+  ],
+  "acceptance": {
+    "battery": "tests/test_r446_conversational_orchestrator.py",
+    "directive_cases": "A-J all asserted",
+    "result": "48/48 passed",
+    "offline_discipline": "the engine conductor is exercised with typed stub adapters seeding each scenario's RECORDED state; the real adapters keep their own networked batteries (Art. LXI — an offline test never claims an online capability)"
+  },
+  "benchmark": {
+    "driver": "scripts/r446_adaptive_pipeline_benchmark.py",
+    "output": "CODER1_ADAPTIVE_PIPELINE_BENCHMARK.json",
+    "fixed_arm": "EngineRun with NO stage gate (the pre-R446 default conductor)",
+    "adaptive_arm": "EngineRun with the R446 conversational stage gate",
+    "quality_gates": "10/10 passed (the directive §24 A-J ground truths, quality preserved)",
+    "efficiency": {
+      "llm_calls": {"fixed": 42, "adaptive": 28, "delta_pct": -33},
+      "retrieval_operations": {"fixed": 13, "adaptive": 9, "delta_pct": -31},
+      "compute_stages_and_artifact_ops": {"fixed": 89, "adaptive": 77, "delta_pct": -13},
+      "estimated_latency_s": {"fixed": 2864, "adaptive": 2230, "delta_pct": -22}
+    },
+    "verdict": "ADAPTIVE_SUCCESSFUL",
+    "cost_provenance": "LLM-call table COMPUTED from source (static call-site scan); latencies MODEL_DERIVED from the routing ledger's recorded distribution — planning constants for arm-to-arm comparison only, never quoted as measured production latency (Art. XXVII)"
+  },
+  "regressions": {
+    "combined_battery": "169 passed + 5 subtests, 0 failed (r446 + r399 gates + r430 investigation + r419 english-only + status model + r443/r444 state integrity + r445 canonical domain)",
+    "known_environment_defect": "networked engine batteries hang in this sandbox (no working LLM transport; connector timeouts) — BS-020 environment class, not a code regression; they passed in the repo's CI per the R441-R453 round records",
+    "retrieval_log_side_effect": "7 honest append entries from real retrieval calls made by the round's smoke runs (http 200, ~650 ms) — retained per the append-only ledger discipline (Art. XI)"
+  },
+  "honest_limitations": [
+    "the benchmark is a POLICY benchmark (stub-seeded scenarios through the real conductor), not an adapter benchmark",
+    "DEFER currently degenerates to RUN-when-reached (the engine chain is linear); the vocabulary and record format are declared and total",
+    "the weak-premise engine STOP serves the resumed-run shape; the live first pass is protected by the R453 admission + premise gate + the NBA's retrieve-before-stop ordering",
+    "the clarification pause is a session-state pause (worker exit + re-spawn), not an engine suspend",
+    "no fresh production run this round (no working transport in the sandbox)",
+    "the product-event stream derives from terminal artifacts; live SSE still uses the R431 event journal"
+  ],
+  "production_deployment": {
+    "target_sha": "FILLED_AT_COMMIT",
+    "pushed_to_origin_main": "FILLED_AT_PUSH",
+    "deploy_id": null,
+    "health_check_result": null,
+    "drift": "UNKNOWN",
+    "blocked_by": "the sandbox has no Render/Space deploy trigger for this repo's production pipeline; the push is performed with the operator PAT (ls-remote verified), the deployment is the operator-side step",
+    "what_unblocks": "the operator triggers the deploy at the pushed SHA (or grants the deploy API access); the health tuple then verifies engine_commit == target_sha per Art. LXXI",
+    "art_lxxi_state": "DELIVERY_BLOCKED (deploy step) — honestly declared, not silently omitted"
+  },
+  "reviewer_provenance": "AI_REVIEW"
+}

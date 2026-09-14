@@ -74,7 +74,10 @@ EPISTEMIC_CLASSES = (
     "UNKNOWN",
 )
 
-_RUNNING_STATUSES = ("RUNNING", "PENDING", "BUILDING_PROBLEM", "RETRY")
+_RUNNING_STATUSES = ("RUNNING", "PENDING", "BUILDING_PROBLEM", "RETRY",
+                       "AWAITING_CLARIFICATION")  # R446-C1: the
+#   one-question pause is a live conversational state — the run is
+#   actively waiting on the user, not stalled and not terminal
 
 # Session-level terminal statuses that are infrastructure-class, never
 # scientific (Art. LXI; R415: RUN_BLOCKED_TRANSPORT is resumable).

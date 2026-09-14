@@ -1,0 +1,91 @@
+{
+  "schema": "CODER1_PROBLEM_UNDERSTANDING",
+  "version": "1.0.0",
+  "round": "R446-C1",
+  "authority": "toscanini/conversational/problem_understanding.py (the code is the authority; this document is its published contract)",
+  "purpose": "The canonical structured interpretation of a user's problem, produced BEFORE the discovery pipeline begins. An INPUT RECORD, never a discovery claim: it precedes and can never promote any epistemic state (Art. XXVIII). The engine-facing problem dict (toscanini/problem_builder.py) remains the engine's own authority; this contract interprets the problem for the product and the conversational layer.",
+  "directive_reference": "CODER 1 - DISCOVERY INTELLIGENCE / CLAUDE-LIKE PROBLEM PROCESSING, section 3",
+  "fields": {
+    "problem_statement": {
+      "type": "string (<=2000 chars)",
+      "origin_allowed": ["USER_STATED"],
+      "description": "The user's message, verbatim"
+    },
+    "desired_outcome": {
+      "type": "array of strings | null",
+      "origin_allowed": ["USER_STATED", "INFERRED_MODEL", "MODEL_DERIVED_LLM", "UNKNOWN"],
+      "description": "What the user wants to maximize/minimize/achieve, from outcome-verb phrases"
+    },
+    "observed_failure": {
+      "type": "array of strings | null",
+      "origin_allowed": ["USER_STATED", "INFERRED_MODEL", "MODEL_DERIVED_LLM", "UNKNOWN"],
+      "description": "The failure noun phrase(s) found in the message (trimmed to the failure-noun core)"
+    },
+    "constraints": {
+      "type": "array of strings",
+      "origin_allowed": ["USER_STATED", "INFERRED_MODEL", "MODEL_DERIVED_LLM"],
+      "description": "Engineering requirements any solution must satisfy; default engine constraint applied when the user stated none (typed INFERRED_MODEL)"
+    },
+    "context": {
+      "type": "object",
+      "origin_allowed": ["INFERRED_MODEL"],
+      "description": "Deterministic surface features of the message (length, interrogative form, domain words)"
+    },
+    "domain_hypothesis": {
+      "type": "string | null",
+      "origin_allowed": ["INFERRED_MODEL", "MODEL_DERIVED_LLM", "UNKNOWN"],
+      "description": "Deterministic keyword-scored domain hypothesis (medical/fluid/thermal/energy/automotive/aerospace/electronics/industrial/materials); full ranking in domain_scores"
+    },
+    "physical_system": {
+      "type": "string | null",
+      "origin_allowed": ["INFERRED_MODEL", "MODEL_DERIVED_LLM", "UNKNOWN"],
+      "description": "The system noun phrase matched in the message"
+    },
+    "target_variable": {
+      "type": "array of strings | null",
+      "origin_allowed": ["INFERRED_MODEL", "MODEL_DERIVED_LLM", "USER_STATED", "UNKNOWN"],
+      "description": "The quantity to optimize; the canonical clarification trigger when UNKNOWN"
+    },
+    "unknowns": {
+      "type": "array of {field, why_unknown, what_would_resolve}",
+      "origin_allowed": ["INFERRED_MODEL"],
+      "description": "Fields whose origin is UNKNOWN, with why and the resolution path — never filled with a guess (Art. XXV)"
+    },
+    "assumptions": {
+      "type": "array of {assumption, origin, basis, falsified_by}",
+      "origin_allowed": ["INFERRED_MODEL"],
+      "description": "Declared assumptions with their falsifiers"
+    },
+    "success_condition": {
+      "type": "string | null",
+      "origin_allowed": ["INFERRED_MODEL", "UNKNOWN"],
+      "description": "Composed from the stated outcome and target variable; UNKNOWN when either is unknown"
+    },
+    "failure_condition": {
+      "type": "string",
+      "origin_allowed": ["INFERRED_MODEL"],
+      "description": "The engine's standing falsification contract (Art. XX/LII)"
+    }
+  },
+  "origin_vocabulary": {
+    "USER_STATED": "the user's own words carry the content (never overridden by LLM extraction; disagreements recorded, never silent)",
+    "INFERRED_MODEL": "derived by deterministic rules from the text (the two-stage constructor's first stage; zero LLM)",
+    "MODEL_DERIVED_LLM": "proposed by the LLM extractor (untrusted, Art. XVIII; fills UNKNOWN slots only)",
+    "UNKNOWN": "not established - a legitimate epistemic state; never a plausible guess"
+  },
+  "construction": {
+    "deterministic_first": "build_problem_understanding(user_text) - zero LLM, offline-testable",
+    "llm_enrichment": "enrich_with_extraction(pu, extraction) - merges problem_builder's MODEL_DERIVED fields; USER_STATED fields are never overridden; disagreements are recorded",
+    "clarification_merge": "apply_clarification_answer(pu, field, answer) - the ONLY conversation-derived path that may touch a PU field; the answer is USER_STATED and the PU is an input record, not canonical scientific state"
+  },
+  "persistence": {
+    "run_dir": "PROBLEM_UNDERSTANDING.json (written by the worker phase 2.1, before the engine starts)",
+    "session_copy": "TOSCANINI_UI/problem_understanding_{session_id}.json (the pre-engine view, written at phase 1.9)"
+  },
+  "invariants": [
+    "Every field carries {value, origin, basis, confidence}",
+    "An inferred field NEVER silently becomes fact (Art. XXVIII)",
+    "UNKNOWN stays UNKNOWN until a user answer or LLM extraction fills it",
+    "The PU can never mutate canonical scientific state (conversation_memory guard)"
+  ]
+}

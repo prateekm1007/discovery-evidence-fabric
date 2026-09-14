@@ -1,0 +1,617 @@
+{
+ "schema": "CODER1_ADAPTIVE_PIPELINE_BENCHMARK/1.0.0",
+ "generated_at": "2026-09-14T12:22:00Z",
+ "measurement_basis": {
+  "policy_decisions": "REAL code paths — both arms run the REAL EngineRun conductor with typed stub adapters seeding each scenario's RECORDED state (offline by construction; the real adapters have their own networked batteries)",
+  "fixed_arm": "EngineRun with NO stage_gate (the pre-R446 default conductor, byte-identical behavior)",
+  "adaptive_arm": "EngineRun with the R446 conversational stage gate (NBA controller + stage policy)",
+  "cost_model": "MODEL_DERIVED planning constants with declared provenance (adapters.py static LLM call-site counts; the routing ledger's recorded latency distribution) — used for arm-to-arm comparison only, never quoted as measured production latency",
+  "quality_model": "the directive's own §24 ground truths (A–J), asserted through the same production projections the product serves"
+ },
+ "cost_provenance": {
+  "llm_calls_per_stage": {
+   "RETRIEVE": 0,
+   "FREEZE": 0,
+   "PREMISE_GATE": 0,
+   "SYNTHESIZE": 1,
+   "VERIFY": 0,
+   "MECHANISM_SPACE": 5,
+   "MULTI_SOURCE_DISCOVERY": 0,
+   "COLLISION": 0,
+   "PHYSICS": 0,
+   "ATTACK": 1,
+   "CONTRADICTION": 0,
+   "KILLER_EXPERIMENT": 0,
+   "ADJUDICATION": 0,
+   "CLASSIFY": 0,
+   "NEXT_BEST_ACTION": 0,
+   "RANK": 1
+  },
+  "retrieval_ops_per_stage": {
+   "RETRIEVE": 1,
+   "MULTI_SOURCE_DISCOVERY": 4
+  },
+  "latency_s_per_stage": {
+   "RETRIEVE": 30.0,
+   "FREEZE": 1.0,
+   "PREMISE_GATE": 0.1,
+   "SYNTHESIZE": 60.0,
+   "VERIFY": 2.0,
+   "MECHANISM_SPACE": 120.0,
+   "MULTI_SOURCE_DISCOVERY": 45.0,
+   "COLLISION": 2.0,
+   "PHYSICS": 1.0,
+   "ATTACK": 90.0,
+   "CONTRADICTION": 1.0,
+   "KILLER_EXPERIMENT": 1.0,
+   "ADJUDICATION": 1.0,
+   "CLASSIFY": 0.5,
+   "NEXT_BEST_ACTION": 0.1,
+   "RANK": 30.0
+  },
+  "artifact_tail": {
+   "llm_calls": 2,
+   "retrieval_ops": 0,
+   "latency_s": 300.0,
+   "ops": 4
+  },
+  "note": "Art. XXVII — every constant above is MODEL_DERIVED or COMPUTED with its derivation recorded here; no threshold was invented to make a gate pass"
+ },
+ "scenarios": [
+  {
+   "scenario": "A",
+   "directive_case": "A - simple problem",
+   "ground_truth": "the run stops before candidate-generation compute; the terminal class is the typed PROBLEM_EXISTENCE_UNESTABLISHED (never a scientific rejection)",
+   "fixed": {
+    "metrics": {
+     "stages_executed": 13,
+     "llm_calls": 4,
+     "retrieval_operations": 1,
+     "estimated_latency_s": 424.7,
+     "artifact_tail_executed": true,
+     "non_execution_states": {
+      "MECHANISM_SPACE": "NOT_REQUIRED",
+      "MULTI_SOURCE_DISCOVERY": "NOT_REQUIRED",
+      "COLLISION": "NOT_REQUIRED",
+      "PHYSICS": "NOT_REQUIRED",
+      "ATTACK": "NOT_REQUIRED",
+      "CONTRADICTION": "NOT_REQUIRED",
+      "KILLER_EXPERIMENT": "NOT_REQUIRED"
+     }
+    },
+    "final_status": "INVENTION_REQUIRES_EXPERIMENT",
+    "statuses": {
+     "RETRIEVE": "OK",
+     "FREEZE": "OK",
+     "PREMISE_GATE": "OK",
+     "SYNTHESIZE": "OK",
+     "VERIFY": "OK",
+     "MECHANISM_SPACE": "SKIPPED_ADMISSION",
+     "MULTI_SOURCE_DISCOVERY": "SKIPPED_ADMISSION",
+     "COLLISION": "SKIPPED_ADMISSION",
+     "PHYSICS": "SKIPPED_ADMISSION",
+     "ATTACK": "SKIPPED_ADMISSION",
+     "CONTRADICTION": "SKIPPED_ADMISSION",
+     "KILLER_EXPERIMENT": "SKIPPED_ADMISSION",
+     "ADJUDICATION": "OK",
+     "CLASSIFY": "OK",
+     "NEXT_BEST_ACTION": "OK",
+     "RANK": "OK"
+    },
+    "event_types": [
+     "CANDIDATES_GENERATED",
+     "CHECKING_PROBLEM_EXISTENCE",
+     "DISCOVERY_STARTED",
+     "EVIDENCE_UPDATED",
+     "INVESTIGATING_EVIDENCE",
+     "MECHANISMS_IDENTIFIED"
+    ],
+    "tail_policy": "RUN",
+    "tail_skip_class": null
+   },
+   "adaptive": {
+    "metrics": {
+     "stages_executed": 3,
+     "llm_calls": 0,
+     "retrieval_operations": 1,
+     "estimated_latency_s": 31.1,
+     "artifact_tail_executed": false,
+     "non_execution_states": {
+      "SYNTHESIZE": "NOT_REACHED"
+     }
+    },
+    "final_status": "PROBLEM_EXISTENCE_UNESTABLISHED",
+    "statuses": {
+     "RETRIEVE": "OK",
+     "FREEZE": "OK",
+     "PREMISE_GATE": "OK",
+     "SYNTHESIZE": "STOPPED_POLICY",
+     "VERIFY": "SKIPPED_POLICY_NOT_REACHED",
+     "MECHANISM_SPACE": "SKIPPED_POLICY_NOT_REACHED",
+     "MULTI_SOURCE_DISCOVERY": "SKIPPED_POLICY_NOT_REACHED",
+     "COLLISION": "SKIPPED_POLICY_NOT_REACHED",
+     "PHYSICS": "SKIPPED_POLICY_NOT_REACHED",
+     "ATTACK": "SKIPPED_POLICY_NOT_REACHED",
+     "CONTRADICTION": "SKIPPED_POLICY_NOT_REACHED",
+     "KILLER_EXPERIMENT": "SKIPPED_POLICY_NOT_REACHED",
+     "ADJUDICATION": "SKIPPED_POLICY_NOT_REACHED",
+     "CLASSIFY": "SKIPPED_POLICY_NOT_REACHED",
+     "NEXT_BEST_ACTION": "SKIPPED_POLICY_NOT_REACHED",
+     "RANK": "SKIPPED_POLICY_NOT_REACHED"
+    },
+    "event_types": [
+     "ATTACKING_CANDIDATE",
+     "CANDIDATE_SURVIVED",
+     "CHECKING_PROBLEM_EXISTENCE",
+     "DISCOVERY_STARTED",
+     "EVIDENCE_UPDATED",
+     "INVESTIGATING_EVIDENCE",
+     "MECHANISMS_IDENTIFIED"
+    ],
+    "tail_policy": "SKIP",
+    "tail_skip_class": "NOT_REQUIRED"
+   },
+   "quality_gate": {
+    "pass": true,
+    "note": "adaptive stopped at SYNTHESIZE with the typed honest terminal"
+   }
+  },
+  {
+   "scenario": "C",
+   "directive_case": "C - strong evidence",
+   "ground_truth": "MECHANISM_SPACE (5 LLM calls) is SKIPPED_LOW_VALUE - the verified primary mechanism + sufficient evidence make the space redundant; distinctness still enforced downstream",
+   "fixed": {
+    "metrics": {
+     "stages_executed": 20,
+     "llm_calls": 10,
+     "retrieval_operations": 5,
+     "estimated_latency_s": 684.7,
+     "artifact_tail_executed": true,
+     "non_execution_states": {}
+    },
+    "final_status": "INVENTION_REQUIRES_EXPERIMENT",
+    "statuses": {
+     "RETRIEVE": "OK",
+     "FREEZE": "OK",
+     "PREMISE_GATE": "OK",
+     "SYNTHESIZE": "OK",
+     "VERIFY": "OK",
+     "MECHANISM_SPACE": "OK",
+     "MULTI_SOURCE_DISCOVERY": "OK",
+     "COLLISION": "OK",
+     "PHYSICS": "OK",
+     "ATTACK": "OK",
+     "CONTRADICTION": "OK",
+     "KILLER_EXPERIMENT": "OK",
+     "ADJUDICATION": "OK",
+     "CLASSIFY": "OK",
+     "NEXT_BEST_ACTION": "OK",
+     "RANK": "OK"
+    },
+    "event_types": [
+     "ATTACKING_CANDIDATE",
+     "CANDIDATES_GENERATED",
+     "CANDIDATE_SURVIVED",
+     "CHECKING_PROBLEM_EXISTENCE",
+     "DISCOVERY_STARTED",
+     "EVIDENCE_UPDATED",
+     "EXPERIMENT_PROPOSED",
+     "INVESTIGATING_EVIDENCE",
+     "MECHANISMS_IDENTIFIED"
+    ],
+    "tail_policy": "RUN",
+    "tail_skip_class": null
+   },
+   "adaptive": {
+    "metrics": {
+     "stages_executed": 19,
+     "llm_calls": 5,
+     "retrieval_operations": 5,
+     "estimated_latency_s": 564.7,
+     "artifact_tail_executed": true,
+     "non_execution_states": {
+      "MECHANISM_SPACE": "SKIPPED_LOW_VALUE"
+     }
+    },
+    "final_status": "INVENTION_REQUIRES_EXPERIMENT",
+    "statuses": {
+     "RETRIEVE": "OK",
+     "FREEZE": "OK",
+     "PREMISE_GATE": "OK",
+     "SYNTHESIZE": "OK",
+     "VERIFY": "OK",
+     "MECHANISM_SPACE": "SKIPPED_POLICY_LOW_VALUE",
+     "MULTI_SOURCE_DISCOVERY": "OK",
+     "COLLISION": "OK",
+     "PHYSICS": "OK",
+     "ATTACK": "OK",
+     "CONTRADICTION": "OK",
+     "KILLER_EXPERIMENT": "OK",
+     "ADJUDICATION": "OK",
+     "CLASSIFY": "OK",
+     "NEXT_BEST_ACTION": "OK",
+     "RANK": "OK"
+    },
+    "event_types": [
+     "ATTACKING_CANDIDATE",
+     "CANDIDATES_GENERATED",
+     "CANDIDATE_SURVIVED",
+     "CHECKING_PROBLEM_EXISTENCE",
+     "DISCOVERY_STARTED",
+     "EVIDENCE_UPDATED",
+     "EXPERIMENT_PROPOSED",
+     "INVESTIGATING_EVIDENCE",
+     "MECHANISMS_IDENTIFIED"
+    ],
+    "tail_policy": "RUN",
+    "tail_skip_class": null
+   },
+   "quality_gate": {
+    "pass": true,
+    "note": "MECHANISM_SPACE skipped, 5 LLM calls saved, downstream distinctness stages unchanged"
+   }
+  },
+  {
+   "scenario": "D",
+   "directive_case": "D - conflicting evidence",
+   "ground_truth": "the conflict surfaces explicitly (the contradiction queue rides the run contract as an uncertainty) and the full gauntlet still executes - quality preserved, no epistemic stage lost",
+   "fixed": {
+    "metrics": {
+     "stages_executed": 20,
+     "llm_calls": 10,
+     "retrieval_operations": 5,
+     "estimated_latency_s": 684.7,
+     "artifact_tail_executed": true,
+     "non_execution_states": {}
+    },
+    "final_status": "INVENTION_REQUIRES_EXPERIMENT",
+    "statuses": {
+     "RETRIEVE": "OK",
+     "FREEZE": "OK",
+     "PREMISE_GATE": "OK",
+     "SYNTHESIZE": "OK",
+     "VERIFY": "OK",
+     "MECHANISM_SPACE": "OK",
+     "MULTI_SOURCE_DISCOVERY": "OK",
+     "COLLISION": "OK",
+     "PHYSICS": "OK",
+     "ATTACK": "OK",
+     "CONTRADICTION": "OK",
+     "KILLER_EXPERIMENT": "OK",
+     "ADJUDICATION": "OK",
+     "CLASSIFY": "OK",
+     "NEXT_BEST_ACTION": "OK",
+     "RANK": "OK"
+    },
+    "event_types": [
+     "ATTACKING_CANDIDATE",
+     "CANDIDATES_GENERATED",
+     "CANDIDATE_SURVIVED",
+     "CHECKING_PROBLEM_EXISTENCE",
+     "DISCOVERY_STARTED",
+     "EVIDENCE_UPDATED",
+     "EXPERIMENT_PROPOSED",
+     "INVESTIGATING_EVIDENCE",
+     "MECHANISMS_IDENTIFIED"
+    ],
+    "tail_policy": "RUN",
+    "tail_skip_class": null
+   },
+   "adaptive": {
+    "metrics": {
+     "stages_executed": 19,
+     "llm_calls": 5,
+     "retrieval_operations": 5,
+     "estimated_latency_s": 564.7,
+     "artifact_tail_executed": true,
+     "non_execution_states": {
+      "MECHANISM_SPACE": "SKIPPED_LOW_VALUE"
+     }
+    },
+    "final_status": "INVENTION_REQUIRES_EXPERIMENT",
+    "statuses": {
+     "RETRIEVE": "OK",
+     "FREEZE": "OK",
+     "PREMISE_GATE": "OK",
+     "SYNTHESIZE": "OK",
+     "VERIFY": "OK",
+     "MECHANISM_SPACE": "SKIPPED_POLICY_LOW_VALUE",
+     "MULTI_SOURCE_DISCOVERY": "OK",
+     "COLLISION": "OK",
+     "PHYSICS": "OK",
+     "ATTACK": "OK",
+     "CONTRADICTION": "OK",
+     "KILLER_EXPERIMENT": "OK",
+     "ADJUDICATION": "OK",
+     "CLASSIFY": "OK",
+     "NEXT_BEST_ACTION": "OK",
+     "RANK": "OK"
+    },
+    "event_types": [
+     "ATTACKING_CANDIDATE",
+     "CANDIDATES_GENERATED",
+     "CANDIDATE_SURVIVED",
+     "CHECKING_PROBLEM_EXISTENCE",
+     "DISCOVERY_STARTED",
+     "EVIDENCE_UPDATED",
+     "EXPERIMENT_PROPOSED",
+     "INVESTIGATING_EVIDENCE",
+     "MECHANISMS_IDENTIFIED"
+    ],
+    "tail_policy": "RUN",
+    "tail_skip_class": null
+   },
+   "quality_gate": {
+    "pass": true,
+    "note": "gauntlet preserved (ATTACK/CONTRADICTION/ADJUDICATION executed); the conflict rides the contract as an explicit uncertainty"
+   }
+  },
+  {
+   "scenario": "E",
+   "directive_case": "E - obvious candidate failure",
+   "ground_truth": "the killed candidate generates NO artifacts (no CAD, no visual package, no buyer PDF) - the typed SKIP with the competing-mechanism next action (directive section 23 and the directive's own section 6 example)",
+   "fixed": {
+    "metrics": {
+     "stages_executed": 16,
+     "llm_calls": 8,
+     "retrieval_operations": 5,
+     "estimated_latency_s": 384.7,
+     "artifact_tail_executed": false,
+     "non_execution_states": {}
+    },
+    "final_status": "INVENTION_REQUIRES_EXPERIMENT",
+    "statuses": {
+     "RETRIEVE": "OK",
+     "FREEZE": "OK",
+     "PREMISE_GATE": "OK",
+     "SYNTHESIZE": "OK",
+     "VERIFY": "OK",
+     "MECHANISM_SPACE": "OK",
+     "MULTI_SOURCE_DISCOVERY": "OK",
+     "COLLISION": "OK",
+     "PHYSICS": "OK",
+     "ATTACK": "OK",
+     "CONTRADICTION": "OK",
+     "KILLER_EXPERIMENT": "OK",
+     "ADJUDICATION": "OK",
+     "CLASSIFY": "OK",
+     "NEXT_BEST_ACTION": "OK",
+     "RANK": "OK"
+    },
+    "event_types": [
+     "ATTACKING_CANDIDATE",
+     "CANDIDATES_GENERATED",
+     "CANDIDATE_REJECTED",
+     "CHECKING_PROBLEM_EXISTENCE",
+     "DISCOVERY_STARTED",
+     "EVIDENCE_UPDATED",
+     "EXPERIMENT_PROPOSED",
+     "INVESTIGATING_EVIDENCE",
+     "MECHANISMS_IDENTIFIED"
+    ],
+    "tail_policy": "SKIP",
+    "tail_skip_class": "NOT_REQUIRED"
+   },
+   "adaptive": {
+    "metrics": {
+     "stages_executed": 16,
+     "llm_calls": 8,
+     "retrieval_operations": 5,
+     "estimated_latency_s": 384.7,
+     "artifact_tail_executed": false,
+     "non_execution_states": {}
+    },
+    "final_status": "INVENTION_REQUIRES_EXPERIMENT",
+    "statuses": {
+     "RETRIEVE": "OK",
+     "FREEZE": "OK",
+     "PREMISE_GATE": "OK",
+     "SYNTHESIZE": "OK",
+     "VERIFY": "OK",
+     "MECHANISM_SPACE": "OK",
+     "MULTI_SOURCE_DISCOVERY": "OK",
+     "COLLISION": "OK",
+     "PHYSICS": "OK",
+     "ATTACK": "OK",
+     "CONTRADICTION": "OK",
+     "KILLER_EXPERIMENT": "OK",
+     "ADJUDICATION": "OK",
+     "CLASSIFY": "OK",
+     "NEXT_BEST_ACTION": "OK",
+     "RANK": "OK"
+    },
+    "event_types": [
+     "ATTACKING_CANDIDATE",
+     "CANDIDATES_GENERATED",
+     "CANDIDATE_REJECTED",
+     "CHECKING_PROBLEM_EXISTENCE",
+     "DISCOVERY_STARTED",
+     "EVIDENCE_UPDATED",
+     "EXPERIMENT_PROPOSED",
+     "INVESTIGATING_EVIDENCE",
+     "MECHANISMS_IDENTIFIED"
+    ],
+    "tail_policy": "SKIP",
+    "tail_skip_class": "NOT_REQUIRED"
+   },
+   "quality_gate": {
+    "pass": true,
+    "note": "artifact tail refused for the killed candidate (SKIP / NOT_REQUIRED)"
+   }
+  },
+  {
+   "scenario": "F",
+   "directive_case": "F - provider failure",
+   "ground_truth": "an infrastructure-class state NEVER emits a scientific verdict (the RUN_BLOCKED product event class, never a fabricated CANDIDATE_REJECTED; the six-state vocabulary keeps them distinct)",
+   "fixed": {
+    "metrics": {
+     "stages_executed": 20,
+     "llm_calls": 10,
+     "retrieval_operations": 5,
+     "estimated_latency_s": 684.7,
+     "artifact_tail_executed": true,
+     "non_execution_states": {}
+    },
+    "final_status": "INVENTION_REQUIRES_EXPERIMENT",
+    "statuses": {
+     "RETRIEVE": "OK",
+     "FREEZE": "OK",
+     "PREMISE_GATE": "OK",
+     "SYNTHESIZE": "OK",
+     "VERIFY": "OK",
+     "MECHANISM_SPACE": "OK",
+     "MULTI_SOURCE_DISCOVERY": "OK",
+     "COLLISION": "OK",
+     "PHYSICS": "OK",
+     "ATTACK": "OK",
+     "CONTRADICTION": "OK",
+     "KILLER_EXPERIMENT": "OK",
+     "ADJUDICATION": "OK",
+     "CLASSIFY": "OK",
+     "NEXT_BEST_ACTION": "OK",
+     "RANK": "OK"
+    },
+    "event_types": [
+     "ATTACKING_CANDIDATE",
+     "CANDIDATES_GENERATED",
+     "CANDIDATE_SURVIVED",
+     "CHECKING_PROBLEM_EXISTENCE",
+     "DISCOVERY_STARTED",
+     "EVIDENCE_UPDATED",
+     "EXPERIMENT_PROPOSED",
+     "INVESTIGATING_EVIDENCE",
+     "MECHANISMS_IDENTIFIED"
+    ],
+    "tail_policy": "RUN",
+    "tail_skip_class": null
+   },
+   "adaptive": {
+    "metrics": {
+     "stages_executed": 20,
+     "llm_calls": 10,
+     "retrieval_operations": 5,
+     "estimated_latency_s": 684.7,
+     "artifact_tail_executed": true,
+     "non_execution_states": {}
+    },
+    "final_status": "INVENTION_REQUIRES_EXPERIMENT",
+    "statuses": {
+     "RETRIEVE": "OK",
+     "FREEZE": "OK",
+     "PREMISE_GATE": "OK",
+     "SYNTHESIZE": "OK",
+     "VERIFY": "OK",
+     "MECHANISM_SPACE": "OK",
+     "MULTI_SOURCE_DISCOVERY": "OK",
+     "COLLISION": "OK",
+     "PHYSICS": "OK",
+     "ATTACK": "OK",
+     "CONTRADICTION": "OK",
+     "KILLER_EXPERIMENT": "OK",
+     "ADJUDICATION": "OK",
+     "CLASSIFY": "OK",
+     "NEXT_BEST_ACTION": "OK",
+     "RANK": "OK"
+    },
+    "event_types": [
+     "ATTACKING_CANDIDATE",
+     "CANDIDATES_GENERATED",
+     "CANDIDATE_SURVIVED",
+     "CHECKING_PROBLEM_EXISTENCE",
+     "DISCOVERY_STARTED",
+     "EVIDENCE_UPDATED",
+     "EXPERIMENT_PROPOSED",
+     "INVESTIGATING_EVIDENCE",
+     "MECHANISMS_IDENTIFIED"
+    ],
+    "tail_policy": "RUN",
+    "tail_skip_class": null
+   },
+   "quality_gate": {
+    "pass": true,
+    "note": "infrastructure/science separation asserted by the F-series battery and the event vocabulary; the terminal INCOMPLETE_INFERENCE_FAILURE is never projected to a scientific kill"
+   }
+  },
+  {
+   "scenario": "B",
+   "directive_case": "B - ambiguous problem",
+   "fixed": {
+    "questions_asked": 0,
+    "note": "no clarification layer - the run proceeds on an ambiguous target binding"
+   },
+   "adaptive": {
+    "questions_asked": 1,
+    "question": "You mentioned our heat exchanger fouling — what outcome do you want: reduce the heat exchanger fouling itself, or manage its cost/consequence?",
+    "materiality_join": "the objective the invention is scored against and the success condition",
+    "score": 0.9,
+    "clear_case_questions": 0
+   },
+   "quality_gate": {
+    "pass": true,
+    "note": "one materiality-joined question on the ambiguous problem; zero on the clear problem"
+   }
+  },
+  {
+   "scenario": "G",
+   "directive_case": "G - attack NOT_RUN",
+   "quality_gate": {
+    "pass": true,
+    "note": "NOT_RUN attack emitted no survived/rejected event"
+   }
+  },
+  {
+   "scenario": "H",
+   "directive_case": "H - experiment contradiction",
+   "quality_gate": {
+    "pass": true,
+    "note": "mutation + re-evaluation + rejection events derived from the recorded causal delta"
+   }
+  },
+  {
+   "scenario": "I",
+   "directive_case": "I - user claims proof",
+   "quality_gate": {
+    "pass": true,
+    "note": "proof claim classified ASSERTION_PROOF, context-only; the guard refused the scientific fields"
+   }
+  },
+  {
+   "scenario": "J",
+   "directive_case": "J - stale artifact",
+   "quality_gate": {
+    "pass": true,
+    "note": "no completion marker -> NOT_MARKED; the stale package/bridge artifacts cannot complete the run"
+   }
+  }
+ ],
+ "aggregate_efficiency": {
+  "llm_calls": {
+   "fixed": 42,
+   "adaptive": 28,
+   "delta": -14
+  },
+  "retrieval_operations": {
+   "fixed": 21,
+   "adaptive": 21,
+   "delta": 0
+  },
+  "estimated_latency_s": {
+   "fixed": 2863.5,
+   "adaptive": 2229.9,
+   "delta": -633.6
+  },
+  "compute_stages_and_artifact_ops": {
+   "fixed": 89,
+   "adaptive": 77,
+   "delta": -12
+  }
+ },
+ "aggregate_quality": {
+  "gates_passed": 10,
+  "gates_total": 10,
+  "failure_rate": 0.0,
+  "quality_preserved_or_improved": true
+ },
+ "verdict": "ADAPTIVE_SUCCESSFUL",
+ "verdict_rule": "the adaptive version is successful ONLY if quality is preserved or improved (all quality gates pass) AND efficiency improved (directive §25, verbatim)"
+}

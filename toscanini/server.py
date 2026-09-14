@@ -1287,6 +1287,112 @@ class Handler(BaseHTTPRequestHandler):
             from toscanini.user_state import public_session_view
             return self._json(200, public_session_view(result))
 
+        # R446-C1 directive §4: the clarification ANSWER path —
+        # POST /api/run/{id}/answer {answer}. Only valid while the
+        # session is AWAITING_CLARIFICATION (the one-question pause).
+        # The answer is stored as conversation context (classified,
+        # guarded — it can never mutate scientific fields, directive
+        # §12) AND as the clarification_answer the worker merges into
+        # the Problem Understanding INPUT record (typed USER_STATED);
+        # then the SAME worker path resumes (re-spawned).
+        if len(parts) == 4 and parts[0] == "api" \
+                and parts[1] in ("run", "sessions") \
+                and parts[3] == "answer":
+            sid = parts[2]
+            body = self._body_json()
+            answer = str(body.get("answer") or "").strip()
+            if not answer:
+                return self._json(400, {"error": "answer required"})
+            if self._access(sid) == "DENY":
+                return self._denied()
+            s = store.get_session(sid)
+            if not s:
+                return self._json(404, {"error": "run not found"})
+            if s.get("status") != "AWAITING_CLARIFICATION":
+                return self._json(409, {
+                    "error": "run is not awaiting a clarification",
+                    "status": s.get("status"),
+                    "note": "the answer path exists only for the "
+                            "one-question pause (directive §4)"})
+            q = s.get("clarification") or {}
+            field = str(q.get("field") or "")
+            # conversation memory: the answer is CONTEXT (classified);
+            # the guard's allowed vocabulary carries only the
+            # clarification fields into the store
+            from toscanini.conversational import conversation_memory as _cm
+            _cls = _cm.classify_user_message(answer)
+            _ctx = _cm.record_conversation_context(s, answer, _cls)
+            _guarded = _cm.guard_session_update({
+                "conversation": _ctx["conversation"],
+                "clarification_answer": {
+                    "field": field, "answer": answer[:2000]},
+                "clarification": {**q, "answered_at":
+                                  time.strftime("%Y-%m-%dT%H:%M:%Z",
+                                                time.gmtime())},
+            })
+            store.update_session(sid,
+                                 status="BUILDING_PROBLEM",
+                                 **_guarded["allowed"])
+            try:
+                from toscanini import worker_forensics as _wfx
+                _fxq = _wfx.attach_session(
+                    sid, durable_root=_wfx.durable_root())
+                _fxq.event("CLARIFICATION_ANSWERED", origin="api",
+                           field=field)
+            except Exception:  # noqa: BLE001 — fail-open, never blocks
+                pass
+            self._spawn_worker(sid)
+            return self._json(200, {
+                "session_id": sid,
+                "status": "BUILDING_PROBLEM",
+                "answered_field": field,
+                "resumed": True,
+                "conversation_classification": _cls["classification"],
+                "refused_fields": _guarded["refused"],
+            })
+
+        # R446-C1 directive §11: the clean high-level run contract —
+        # GET /api/run/{id}/contract. The ~7-field product view derived
+        # from canonical state (never a second state store, Art. X).
+        if len(parts) == 4 and parts[0] == "api" and parts[1] == "run" \
+                and parts[3] == "contract":
+            sid = parts[2]
+            if self._access(sid) == "DENY":
+                return self._denied()
+            s = store.get_session(sid)
+            if not s:
+                return self._json(404, {"error": "run not found"})
+            from toscanini.conversational import run_contract as _rc
+            rd = Path(s["run_dir"]) if s.get("run_dir") else None
+            return self._json(200, _rc.high_level_run_contract(s, rd))
+
+        # R446-C1 directive §9/§10: the conversational product event
+        # stream — GET /api/run/{id}/product-events. Derived from the
+        # run directory's persisted artifacts only (basis_ref on every
+        # event; never inferred from artifact existence or render
+        # completion).
+        if len(parts) == 4 and parts[0] == "api" and parts[1] == "run" \
+                and parts[3] == "product-events":
+            sid = parts[2]
+            if self._access(sid) == "DENY":
+                return self._denied()
+            s = store.get_session(sid)
+            if not s:
+                return self._json(404, {"error": "run not found"})
+            from toscanini.conversational import product_events as _pe
+            rd = Path(s["run_dir"]) if s.get("run_dir") else None
+            events = _pe.derive_product_events(
+                rd, sid, str(s.get("status") or "")) if rd else []
+            problems = [p for ev in events
+                        for p in _pe.validate_event(ev)]
+            return self._json(200, {
+                "schema": _pe.EVENT_SCHEMA,
+                "run_id": sid,
+                "n_events": len(events),
+                "validation_problems": problems,
+                "events": events,
+            })
+
         # R419 section 21: async artifact build — POST
         # /api/run/{id}/artifact-build (aliases /api/sessions/{id}/
         # artifact-build). 202 + a detached render job; the WEB REQUEST
