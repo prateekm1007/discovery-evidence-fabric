@@ -913,3 +913,19 @@ Stage Summary:
 - The R453-LEAN-CORE mandate is implemented and measured: the empty path spends 1-2 LLM calls instead of 9, the nine expensive stages are conditionally admitted through the one existing door, degraded STRONG is a hard stop, the localqwen base-URL contract is one variable, and unkeyed providers are never probed
 - The scope discipline held: four mandated files + tests + records only; the pre-existing failures are disclosed with stash-A/B evidence, not silently repaired
 - Pending after the commit: the Art. LXXI delivery chain (push + deploy the final SHA + /api/health verification + the production no-candidate run) — filled into the round record at verification
+
+---
+Task ID: R453-LEAN-CORE (delivery closure)
+Agent: Coder 1 (main agent)
+Task: The Art. LXXI delivery chain + the production no-candidate verification
+
+Work Log:
+- R453 engine commit f092f1e5 pushed to origin/main (ls-remote verified)
+- Deployed via the R451-C1.3 adapter (Space revision 22444beefbe2); the build verified with scripts/r447_deploy_verify.py: /api/version engine_commit == f092f1e5 == pushed main; /api/health ok=true, discovery_ready=true, identity_tamper=false, drift GREEN — ARTICLE LXXI DELIVERY COMPLETE (the audit's P0 production-vs-main drift cf63f119-vs-d88364b7 is closed at the R453 SHA)
+- A deploy attempt first failed on disk exhaustion (the R452-A3 4B GGUF + caches; 98% full) — cleaned (the 4B GGUF removed; pip cache purged; 2.9 GB freed), retried successfully — environment, never code (BS-020)
+- THE PRODUCTION NO-CANDIDATE VERIFICATION (the mandate's productionVerification): a genuinely fresh problem (r453-fresh-railway-axle-bearing-fluting — electromagnetic fluting, never submitted anywhere) through the REAL user path on the deployed R453 engine: session ts_c0ea7b941e66 COMPLETE — (1) ALL NINE expensive stages record SKIPPED_ADMISSION in the production phase_progression (the typed skip_reason contract); (2) the run-owned routing ledger, verified from OUTSIDE the container via the runtime-state-hf branch, carries ONE line (SYNTHESIZE, qwen3-1.7b) — fewer than assay A's 9, the 'problem + synthesis then stop' shape; (3) the terminal state is the typed INCOMPLETE_INFERENCE_FAILURE with mechanism NOT promoted (null mechanism/intervention, candidate_count 0), attack not entered (nothing to attack), outcome RUN_BLOCKED — never a pseudo-invention, never a scientific rejection (Art. LXI)
+- The round record's production_deployment tuple filled with the measured identity chain (Art. VI: never pre-filled)
+
+Stage Summary:
+- R453-LEAN-CORE IS COMPLETE on the mandate's own terms: the empty path spends 1-2 LLM calls instead of 9 (measured in the sandbox AND on production), the nine expensive stages are conditionally admitted through the one existing door, degraded STRONG is a hard stop, the localqwen contract is one variable, unkeyed providers are never probed, the cost policy is untouched, and the delivery chain is closed at f092f1e5 (origin/main == deployed == verified)
+- The honest disclosures stand: the positive engine line count (guards) with the machinery removed measured in calls/subsystems; the two pre-existing failure sets (r416 sealed, dossier E1) stash-A/B-verified and never silently repaired; the A3 owner-gated escalation still carries the tier-2 question
