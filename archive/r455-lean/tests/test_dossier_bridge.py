@@ -4,7 +4,7 @@ Offline suite: proves the bridge machinery (registry, invention spec,
 engineering spec, design graph, equations, experiment selection, package
 generation, learning loop) with SYNTHETIC_TEST_ONLY fixtures and explicit
 labels. Live synthesis requires credentials and is covered by the E11 smoke
-(discovery_fabric.engine.smoke_e2e), not here.
+(archive.r455_retired.discovery_fabric.engine.smoke_e2e), not here.
 
 Constitutional attack cases included (Art. XVII):
   - SOURCE_FACT smuggling (fact promotion attempt) must fail
@@ -428,7 +428,7 @@ def test_e12_maturity_basis_is_derived_and_honest():
 
 # ---------------------------------------------------------------- E11
 def test_e11_rehearsal_smoke_proves_all_links():
-    from discovery_fabric.engine.smoke_e2e import run_rehearsal
+    from archive.r455_retired.discovery_fabric.engine.smoke_e2e import run_rehearsal
     with tempfile.TemporaryDirectory() as td:
         rc = run_rehearsal(td)
         assert rc == 0

@@ -43,6 +43,33 @@ REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO))
 
 from discovery_fabric.engine.adapters import load_credentials  # noqa: E402
+# R455-LEAN-1 reconciliation: this script's benchmark_corpus was
+# retired to
+# archive/r455-lean/ (ONE canonical archive; it carries a hyphen and is
+# deliberately not on the import path). The archived bytes are loaded
+# verbatim under their canonical module names so this kept surface
+# stays importable (Art. LXIV: importable history; the r440_retired
+# importlib precedent).
+import importlib.util as _ilu
+import sys as _sys
+from pathlib import Path as _Path
+
+_REPO_ROOT = _Path(__file__).resolve().parents[1]
+
+
+def _load_archived(rel: str, name: str):
+    if name in _sys.modules:
+        return _sys.modules[name]
+    _spec = _ilu.spec_from_file_location(name, _REPO_ROOT / rel)
+    _mod = _ilu.module_from_spec(_spec)
+    _sys.modules[name] = _mod
+    _spec.loader.exec_module(_mod)
+    return _mod
+
+
+_load_archived(
+    "archive/r455-lean/discovery_fabric/engine/benchmark_corpus.py",
+    "discovery_fabric.engine.benchmark_corpus")
 from discovery_fabric.engine.benchmark_corpus import (  # noqa: E402
     meets_floors, measure_generated_package, load_contract)
 from discovery_fabric.engine.run import EngineRun  # noqa: E402

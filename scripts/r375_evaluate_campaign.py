@@ -35,6 +35,33 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO))
 
+# R455-LEAN-1 reconciliation: calibration_v2/v3 were retired to
+# archive/r455-lean/ (ONE canonical archive; it carries a hyphen and is
+# deliberately not on the import path). The archived bytes are loaded
+# verbatim under their canonical module names so this kept surface
+# stays importable (Art. LXIV: importable history; the r440_retired
+# importlib precedent).
+import importlib.util as _ilu
+import sys as _sys
+from pathlib import Path as _Path
+
+_REPO_ROOT = _Path(__file__).resolve().parents[1]
+
+
+def _load_archived(rel: str, name: str):
+    if name in _sys.modules:
+        return _sys.modules[name]
+    _spec = _ilu.spec_from_file_location(name, _REPO_ROOT / rel)
+    _mod = _ilu.module_from_spec(_spec)
+    _sys.modules[name] = _mod
+    _spec.loader.exec_module(_mod)
+    return _mod
+
+
+_load_archived("archive/r455-lean/discovery_fabric/engine/benchmark_corpus.py",
+    "discovery_fabric.engine.benchmark_corpus")
+_load_archived("archive/r455-lean/discovery_fabric/engine/benchmark_dossiers.py",
+    "discovery_fabric.engine.benchmark_dossiers")
 from discovery_fabric.engine.benchmark_dossiers import (  # noqa: E402
     load_contract, measure_generated_vector, meets_floors)
 from discovery_fabric.engine.dossier_quality import DIMENSIONS  # noqa: E402

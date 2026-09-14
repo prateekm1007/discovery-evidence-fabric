@@ -36,9 +36,9 @@ import sys
 from pathlib import Path
 from typing import Any, Dict, List
 
-from .candidate import Candidate, canonical_json, utc_now
-from .llm_registry import availability_statement
-from .run import EngineRun, REPO_ROOT
+from discovery_fabric.engine.candidate import Candidate, canonical_json, utc_now
+from discovery_fabric.engine.llm_registry import availability_statement
+from discovery_fabric.engine.run import EngineRun, REPO_ROOT
 
 REQUIRED_E2E_LINKS = [
     "PROBLEM_RECORDED",
@@ -95,8 +95,8 @@ def _compile_post_run_package(run: EngineRun, env,
     the retired stale-generation order); the canonical package compiler
     compiles from the FINAL persisted state exactly as the bridge gate
     does post-run. The smoke drives the same ONE production entry."""
-    from .package_compiler import compile_package
-    from .invention_bridge import conceptual_geometry
+    from discovery_fabric.engine.package_compiler import compile_package
+    from discovery_fabric.engine.invention_bridge import conceptual_geometry
     spec = run._spec or {}
     eng = run._eng or {}
     arch = (eng.get("system_architecture") or {}).get("subsystems") or []
@@ -233,8 +233,8 @@ def _verify_run_links(run: EngineRun, manifest: Dict[str, Any]) -> int:
             if not avail["any_provider_available"] else
             "provider call failed — see stage log"})
 
-    from .invention_spec import SPEC_FIELDS
-    from .experiment_selector import select_decisive_experiment
+    from discovery_fabric.engine.invention_spec import SPEC_FIELDS
+    from discovery_fabric.engine.experiment_selector import select_decisive_experiment
     spec = run._spec or {}
     check("SURVIVOR_GATE_PASSED",
           (spec.get("_survivor_gate") or {}).get("survivor") is True)
@@ -353,7 +353,7 @@ def run_rehearsal(out_dir: str) -> int:
     # gate's exact production sequence), then bind the release.
     run.package_report = _compile_post_run_package(
         run, env, rehearsal=bool(run.rehearsal))
-    from .release import build_discovery_release, write_discovery_release
+    from discovery_fabric.engine.release import build_discovery_release, write_discovery_release
     run.release = build_discovery_release(
         run.out, run_id=run.run_id, problem_id=run.problem_id, env=env,
         spec=run._spec, eng=run._eng,
@@ -364,9 +364,9 @@ def run_rehearsal(out_dir: str) -> int:
         failure_reason=run.package_failure)
     write_discovery_release(run.out, run.release)
 
-    from .invention_spec import SPEC_FIELDS
-    from .engineering_spec import build_engineering_spec
-    from .experiment_selector import select_decisive_experiment
+    from discovery_fabric.engine.invention_spec import SPEC_FIELDS
+    from discovery_fabric.engine.engineering_spec import build_engineering_spec
+    from discovery_fabric.engine.experiment_selector import select_decisive_experiment
     spec = run._spec or {}
     check("SURVIVOR_GATE_PASSED",
           (spec.get("_survivor_gate") or {}).get("survivor") is True)
@@ -431,7 +431,7 @@ def main():
     if args.resume:
         if not args.out:
             raise SystemExit("--resume requires --out <run dir>")
-        from .run import EngineRun as _ER
+        from discovery_fabric.engine.run import EngineRun as _ER
         run = _ER.from_run_dir(args.out)
         return run_real_from(run, args.disable)
 

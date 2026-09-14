@@ -36,10 +36,12 @@ import statistics
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-REPO_ROOT = Path(__file__).resolve().parents[2]
+# R455-LEAN-1: this module was relocated 2 levels deeper
+# (archive/r455_retired/...); REPO_ROOT is 4 parents up
+REPO_ROOT = Path(__file__).resolve().parents[4]
 
 # canonical frozen portfolio location (cloned next to the dev repo)
-FROZEN_PORTFOLIO = Path(__file__).resolve().parents[2] / \
+FROZEN_PORTFOLIO = Path(__file__).resolve().parents[4] / \
     "BENCHMARK_ENGINEERING_DOSSIERS" / "frozen_corpus_r370"
 CANONICAL_ARTIFACT = REPO_ROOT / "BENCHMARK_DEPTH_CONTRACT.json"
 

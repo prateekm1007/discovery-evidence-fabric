@@ -9,9 +9,9 @@ THIS_DIR = Path(__file__).resolve().parent
 REPO_ROOT = THIS_DIR.parent.parent
 sys.path.insert(0, str(REPO_ROOT))
 
-from discovery_fabric.prior_art_v2.calibration_v2 import CALIBRATION_CASES_V2
+from archive.r455_retired.discovery_fabric.prior_art_v2.calibration_v2 import CALIBRATION_CASES_V2
 from discovery_fabric.prior_art_v2.elite_v3 import LLMClient, _now_utc, _sha256
-from discovery_fabric.prior_art_v2.calibration_v3 import (
+from archive.r455_retired.discovery_fabric.prior_art_v2.calibration_v3 import (
     stage_canonical_claim, stage_search_families, stage_claim_retrieval,
     build_case_ground_truth, THRESHOLDS,
 )

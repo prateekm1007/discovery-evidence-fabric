@@ -20,7 +20,7 @@ THIS_DIR = Path(__file__).resolve().parent
 REPO_ROOT = THIS_DIR.parent.parent
 sys.path.insert(0, str(REPO_ROOT))
 
-from discovery_fabric.prior_art_v2.calibration_v2 import CALIBRATION_CASES_V2
+from archive.r455_retired.discovery_fabric.prior_art_v2.calibration_v2 import CALIBRATION_CASES_V2
 from discovery_fabric.prior_art_v2.elite_v3 import LLMClient, _now_utc, _sha256
 from discovery_fabric.prior_art_v2.patsnap_claims import fetch_patsnap_claims
 from discovery_fabric.prior_art_v2.patsnap_discovery import (
@@ -29,7 +29,7 @@ from discovery_fabric.prior_art_v2.patsnap_discovery import (
 from discovery_fabric.prior_art_v2.source_failover import (
     patsnap_search_count,
 )
-from discovery_fabric.prior_art_v2.calibration_v3 import (
+from archive.r455_retired.discovery_fabric.prior_art_v2.calibration_v3 import (
     CanonicalClaim, SearchFamilyAttempt, RetrievedPatentEvidence,
     ElementMapping, NoveltyResult, FinalAdjudication,
     stage_canonical_claim, stage_search_families, stage_claim_retrieval,

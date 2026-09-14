@@ -42,12 +42,14 @@ def _blocking_reason(session: Dict[str, Any],
     blocker, and is carried by current_state instead."""
     status = str(session.get("status") or "")
     if status.startswith("ERROR_") or status in (
-            "RUN_BLOCKED_TRANSPORT", "INTERRUPTED"):
+            "RUN_BLOCKED_TRANSPORT", "RUN_BLOCKED_CAPABILITY",
+            "INTERRUPTED"):
         return {
             "kind": "INFRASTRUCTURE",
             "state": status,
             "detail": str(session.get("error") or "")[:400],
             "resumable": status in ("RUN_BLOCKED_TRANSPORT",
+                                    "RUN_BLOCKED_CAPABILITY",
                                     "INTERRUPTED"),
         }
     if status == "AWAITING_CLARIFICATION":

@@ -35,7 +35,7 @@ from test_f_series_integration import _survivor_env  # noqa: E402
 
 from discovery_fabric.engine import ensemble as ens  # noqa: E402
 from discovery_fabric.engine import engineering_attack as ea  # noqa: E402
-from discovery_fabric.engine.benchmark_dossiers import (  # noqa: E402
+from archive.r455_retired.discovery_fabric.engine.benchmark_dossiers import (  # noqa: E402
     CONTRACT_ARTIFACT, DIMENSIONS, extract_package_vector, load_contract,
     measure_generated_vector, meets_floors)
 from discovery_fabric.engine.candidate import Candidate  # noqa: E402
@@ -66,7 +66,7 @@ def test_e15a_benchmark_vectors_computed_from_frozen_corpus():
         assert pkg["_source_hashes"], pkg["package_id"]
     # values are COMPUTED, not hard-coded: re-extract one package and
     # compare against the stored vector
-    from discovery_fabric.engine.benchmark_dossiers import FROZEN_PORTFOLIO
+    from archive.r455_retired.discovery_fabric.engine.benchmark_dossiers import FROZEN_PORTFOLIO
     dirs = sorted(d for d in FROZEN_PORTFOLIO.iterdir()
                   if d.is_dir() and (d / "PACKAGE_MANIFEST.json").exists())
     fresh = extract_package_vector(dirs[0])
@@ -88,7 +88,7 @@ def test_e15a_benchmark_vectors_computed_from_frozen_corpus():
 
 
 def test_e15a_refuses_wrong_corpus_size():
-    from discovery_fabric.engine.benchmark_dossiers import extract_corpus
+    from archive.r455_retired.discovery_fabric.engine.benchmark_dossiers import extract_corpus
     with tempfile.TemporaryDirectory() as td:
         root = Path(td)
         (root / "only_one").mkdir()

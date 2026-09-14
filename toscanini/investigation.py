@@ -83,7 +83,9 @@ _RUNNING_STATUSES = ("RUNNING", "PENDING", "BUILDING_PROBLEM", "RETRY",
 # scientific (Art. LXI; R415: RUN_BLOCKED_TRANSPORT is resumable).
 _INFRA_TERMINAL = ("ERROR_TRANSPORT", "ERROR_BUILD", "ERROR_RUN",
                    "ERROR_STUCK", "INTERRUPTED")
-_RESUMABLE_BLOCK = ("RUN_BLOCKED_TRANSPORT",)
+# R455-LEAN-1 §2: the pre-retrieval capability block is the same
+# resumable infrastructure class as the transport block (Art. LXI).
+_RESUMABLE_BLOCK = ("RUN_BLOCKED_TRANSPORT", "RUN_BLOCKED_CAPABILITY")
 
 # Engine stage -> (scientific stage label, default epistemic class).
 # The class is the artifact class, chosen per what the stage PERSISTS:
@@ -442,14 +444,14 @@ def investigation_events(session: Dict[str, Any]) -> List[Dict[str, Any]]:
     # 6. terminal event — infra vs scientific NEVER collapsed (Art. LXI)
     outcome_obj = _rs.terminal_outcome(session, run_dir)
     outcome = outcome_obj.get("outcome")
-    if status == "RUN_BLOCKED_TRANSPORT":
+    if status in ("RUN_BLOCKED_TRANSPORT", "RUN_BLOCKED_CAPABILITY"):
         emit(kind="investigation.blocked", stage="INVESTIGATION",
              status="BLOCKED",
              summary=("discovery temporarily blocked by infrastructure — "
                       "the problem is saved and resumable; no scientific "
                       "conclusion was assigned"),
              epistemic_class="UNKNOWN",
-             basis_ref=f"session status RUN_BLOCKED_TRANSPORT",
+             basis_ref=f"session status {status}",
              detail={"resumable": True,
                      "error": (session.get("error") or "")[:300]})
     elif status in _INFRA_TERMINAL:

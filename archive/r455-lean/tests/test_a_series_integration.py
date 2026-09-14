@@ -27,7 +27,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 from test_f_series_integration import (  # noqa: E402
     CTX, REPO, _survivor_env)
 
-from discovery_fabric.engine.benchmark_corpus import (  # noqa: E402
+from archive.r455_retired.discovery_fabric.engine.benchmark_corpus import (  # noqa: E402
     DIMENSIONS, extract_corpus, load_contract, meets_floors,
     measure_generated_package)
 from discovery_fabric.engine.depth_contract import (  # noqa: E402
@@ -516,7 +516,7 @@ def test_a10_all_fifteen_meet_every_benchmark_floor():
                           if k != "provenance_density"}
             assert not unexpected, (res["i"], unexpected)
             if failed:
-                from discovery_fabric.engine.benchmark_dossiers import (
+                from archive.r455_retired.discovery_fabric.engine.benchmark_dossiers import (
                     measure_generated_vector)
                 vec = measure_generated_vector(res["run"]._spec, eng, rep)
                 assert vec["provenance_density_consumed"] == 1.0, (

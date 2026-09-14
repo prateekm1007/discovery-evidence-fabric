@@ -344,7 +344,8 @@ def derive_product_events(run_dir: Path, run_id: str,
              (manifest or {}).get("final_status")
         label = fs or terminal_status or "UNKNOWN"
         emit(RUN_BLOCKED if terminal_status.startswith("ERROR_") or
-             terminal_status in ("RUN_BLOCKED_TRANSPORT", "INTERRUPTED")
+             terminal_status in ("RUN_BLOCKED_TRANSPORT",
+                                 "RUN_BLOCKED_CAPABILITY", "INTERRUPTED")
              else CANDIDATE_SURVIVED if fs == "EVOLVED_INVENTION_CANDIDATE"
              else CANDIDATE_REJECTED if fs in ("REJECTED",
                                                "MALFORMED_OR_FALSE_PREMISE")

@@ -203,6 +203,10 @@ def _run_dir_files(run_dir: Path) -> List[Path]:
         # bridge report (the WHY of any artifact failure), the evolution
         # lineage (resume-safety per R416) and the per-generation records
         "BRIDGE_REPORT.json", "INVENTION_LINEAGE.json",
+        # R455-LEAN-1 §2: the pre-retrieval capability gate's typed
+        # refusal record — the durable record is the acceptance evidence
+        # that a degraded-capability run spent zero retrieval calls
+        "CAPABILITY_GATE.json",
     }
     out: List[Path] = []
     for f in sorted(run_dir.glob("*.json")):

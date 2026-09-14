@@ -37,8 +37,12 @@ import re
 from pathlib import Path
 from typing import Any, Dict, List
 
-from .benchmark_dossiers import (_section_span, _sentences,
-                                 dossier_text)
+# R455-LEAN-1 §6: benchmark_dossiers was retired to archive/
+# (Art. LXIV disposition); this kept module's helper imports point at
+# the archived location — importable history, not a live import.
+from archive.r455_retired.discovery_fabric.engine.benchmark_dossiers import (
+    _section_span, _sentences,
+    dossier_text)
 
 # physical-causal vocabulary: verbs/connectives that carry mechanism
 # reasoning (instrument, not expected values)

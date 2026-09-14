@@ -533,6 +533,30 @@ def _run_inner(session_id: str, forensics) -> None:
             error=phase4_error)
         _snapshot(session_id, f"terminal:INTERRUPTED:{session_id}")
         return
+    # R455-LEAN-1 §2: the pre-retrieval capability gate's terminal is a
+    # RUN_BLOCKED_* family member — the session carries the SAME
+    # infrastructure-class status the transport probe uses (the product
+    # surface then renders the blocked state, never a COMPLETE with a
+    # hidden failure and never a scientific verdict, Art. LXI).
+    if final_status == "RUN_BLOCKED_CAPABILITY":
+        forensics.event(
+            "TERMINAL_STATE", terminal="RUN_BLOCKED_CAPABILITY",
+            stage="TERMINAL_STATUS",
+            reason="pre-retrieval capability gate (R455-LEAN-1 §2): the "
+                   "synthesis route can only serve STRONG via "
+                   "CHEAP_EMERGENCY_FALLBACK — zero retrieval calls "
+                   "spent; resumable on a capable route")
+        store.update_session(
+            session_id, status="RUN_BLOCKED_CAPABILITY",
+            final_status=final_status,
+            error=("Discovery paused before spending: the available "
+                   "model route cannot serve this run's reasoning "
+                   "class (requested STRONG; only a degraded fallback "
+                   "exists). Your problem is saved and ready to resume "
+                   "on a capable route — this is an infrastructure "
+                   "state, not a verdict about your problem."))
+        _snapshot(session_id, f"terminal:RUN_BLOCKED_CAPABILITY:{session_id}")
+        return
     store.update_session(
         session_id, status="COMPLETE",
         final_status=final_status)

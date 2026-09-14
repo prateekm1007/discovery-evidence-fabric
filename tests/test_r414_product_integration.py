@@ -502,17 +502,35 @@ class TestCanonicalRunState:
         assert phases["MAPPING_MECHANISMS"]["state"] == "NOT_STARTED"
 
     def test_model_route_only_from_persisted_records(self, tmp_path):
-        """model_route aggregates provider records from envelopes — a
-        fabricated provider (never called) must not appear."""
+        """model_route reports ONLY the run's own routing-ledger
+        records — a fabricated provider (never called, embedded in an
+        envelope) must not appear.
+
+        R455-LEAN-1 §4 re-pin: the source is ROUTING_LEDGER_RUN.json
+        (the run-id-isolated routing ledger, R451-C1.3-3) — envelope
+        aggregation is dead (the audited 13-vs-1 defect, Art. XXIV)."""
         s = {"session_id": "s1", "user_text": "p", "status": "COMPLETE",
              "final_status": "REJECTED", "package": {},
              "run_dir": str(tmp_path)}
         state = rs.canonical_run_state(s)
         assert state["model_route"]["call_count"] == 0
+        # the fabricated record: an envelope-embedded provider entry
         env = {"mechanism_map": {"llm": {"provider": "zai",
                                          "model": "glm-4-plus"}}}
         (tmp_path / "envelope_SYNTHESIZE.json").write_text(
             json.dumps(env))
+        state = rs.canonical_run_state(s)
+        assert state["model_route"]["call_count"] == 0
+        assert not any(c.get("provider") == "zai"
+                       for c in state["model_route"]["calls"])
+        # the REAL record: the run's own ledger — and now it appears
+        (tmp_path / "ROUTING_LEDGER_RUN.json").write_text(json.dumps({
+            "run_id": "s1", "line_count": 1,
+            "run_owned_call_lines": 1,
+            "lines": [{"run_id": "s1", "call_class": "RUN_OWNED",
+                       "engine_stage": "SYNTHESIZE",
+                       "provider": "zai", "model": "glm-4-plus",
+                       "status": "OK", "task": "STRONG"}]}))
         state = rs.canonical_run_state(s)
         assert state["model_route"]["call_count"] >= 1
         assert any(c.get("provider") == "zai"
@@ -560,12 +578,22 @@ class TestCIO:
     def test_no_artifacts_no_cio(self, tmp_path):
         """An existing-but-empty run dir produces NO CIO — an empty
         object would still look like an invention surface (honest
-        absence instead, Art. XXV)."""
+        absence instead, Art. XXV).
+
+        R455-LEAN-1 §1 re-pin: `final_state.json` is RUN state, not
+        invention-side state — every run writes one, so it no longer
+        manufactures a CIO. ONE invention-side artifact is still enough
+        to build the object (Art. V: not a universal rejector)."""
         assert cio_mod.build_cio(
             {"session_id": "s", "run_dir": str(tmp_path)}) is None
-        # one invention-side artifact is enough to build the object
+        # the RUN's own state record alone manufactures nothing
         (tmp_path / "final_state.json").write_text(
             json.dumps({"final_status": "REJECTED"}))
+        assert cio_mod.build_cio(
+            {"session_id": "s", "run_dir": str(tmp_path)}) is None
+        # one invention-side artifact is enough
+        (tmp_path / "INVENTION_SPECIFICATION.json").write_text(
+            json.dumps({"invention_id": {"value": "INV-1"}}))
         assert cio_mod.build_cio(
             {"session_id": "s", "run_dir": str(tmp_path)}) is not None
 

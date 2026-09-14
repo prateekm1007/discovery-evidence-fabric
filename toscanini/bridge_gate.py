@@ -65,7 +65,32 @@ from typing import Any, Dict, Optional
 from . import cio as _cio
 from . import sessions as store
 
-BRIDGE_GATE_VERSION = "1.1.0"
+# R455-LEAN-1 §1: the survivor gate. A run whose canonical DISCOVERY
+# RELEASE record does not attest a surviving, promoted candidate gets
+# NOTHING from this gate — no bridge, no geometry, no render job, no
+# package. The audited failure (EXT-AUDIT-LEAN-R454 §0.2/§B.4):
+# `_invention_exists` was true whenever `build_cio` returned non-None,
+# and `build_cio` returned non-None whenever ANY invention-side file
+# existed — including `final_state.json`, which EVERY run writes. So
+# 18/18 production runs were bridged and 16 fully rendered, including
+# all 7 `INCOMPLETE_INFERENCE_FAILURE` runs with `invention_id: null`
+# — the machine asserted a technology that does not exist (Art.
+# XXV/XXVIII: a placeholder object is not honest absence; artifact
+# generation is not evidence of invention).
+BRIDGE_GATE_VERSION = "1.2.0"
+
+# The release-record statuses that attest NO promoted candidate
+# (discovery_fabric/engine/release.py's closed vocabulary). Everything
+# else (RELEASED / HELD_FOR_HUMAN_REVIEW / PACKAGE_INCOMPLETE /
+# PACKAGE_DEFERRED_TO_COMPILER / PIPELINE_FAILED) implies the
+# spec-side gauntlet was passed by a promoted candidate — those runs
+# keep the R418 automatic-artifact contract (Art. V: fail closed,
+# never become a universal rejector).
+_NON_SURVIVOR_RELEASE_STATUSES = (
+    "DISCOVERY_INCOMPLETE",
+    "NOT_A_SURVIVOR",
+    "DISABLED_BY_CONFIG",
+)
 
 _CONCEPTUAL_CLASSES = ("SYSTEM_3D", "CONCEPTUAL_3D", "PROCESS_3D")
 
@@ -142,11 +167,84 @@ def _has_model(run_dir: Path) -> bool:
     return bool(list(run_dir.glob("*.glb")))
 
 
+def _read_json(path: Path) -> Optional[Dict[str, Any]]:
+    try:
+        if path.is_file():
+            return json.loads(path.read_text())
+    except Exception:  # noqa: BLE001 — corrupt record reads as absent
+        return None
+    return None
+
+
+def _survivor_recorded(run_dir: Path) -> Dict[str, Any]:
+    """R455-LEAN-1 §1 — the survivor test, derived from canonical state.
+
+    THE authority is the run's own DISCOVERY_RELEASE.json (written by
+    the engine's Directive-2 tail on EVERY run — the single place a
+    downstream system looks to discover what exists). The gate may
+    only produce artifacts when that record attests a surviving,
+    promoted candidate:
+
+      1. `status` is NOT a non-survivor status (DISCOVERY_INCOMPLETE /
+         NOT_A_SURVIVOR / DISABLED_BY_CONFIG);
+      2. `invention_id` is non-null;
+      3. the specification identity is present (`invention_spec_hash`),
+         or a SURVIVOR_SELECTION record exists on disk.
+
+    When the release record is ABSENT entirely (pre-release-era run
+    records and test fixtures only — the current engine always writes
+    it), the legacy `_invention_exists` check decides, now that
+    `build_cio` no longer counts `final_state.json` as invention-side
+    state (the two directed changes together close the always-true
+    hole).
+
+    Returns {"recorded": bool, "evidence": {...}} — the evidence is
+    persisted verbatim on any refusal (Art. XV).
+    """
+    rel = _read_json(run_dir / "DISCOVERY_RELEASE.json")
+    if rel is not None:
+        status = rel.get("status")
+        inv_id = rel.get("invention_id")
+        spec_hash = rel.get("invention_spec_hash")
+        surv = _read_json(run_dir / "SURVIVOR_SELECTION.json")
+        non_survivor = status in _NON_SURVIVOR_RELEASE_STATUSES or \
+            status is None
+        recorded = (not non_survivor) and bool(inv_id) and \
+            bool(spec_hash or surv)
+        return {
+            "recorded": bool(recorded),
+            "evidence": {
+                "authority": "DISCOVERY_RELEASE.json",
+                "status": status,
+                "invention_id": inv_id,
+                "invention_spec_hash_present": bool(spec_hash),
+                "survivor_selection_present": bool(surv),
+                "non_survivor_statuses": list(
+                    _NON_SURVIVOR_RELEASE_STATUSES),
+            },
+        }
+    return {
+        "recorded": True,  # no release record -> legacy path decides
+        "evidence": {
+            "authority": None,
+            "note": ("no DISCOVERY_RELEASE.json on this run record "
+                     "(pre-release-era record) — the legacy "
+                     "invention-side check decides; final_state.json "
+                     "no longer manufactures invention presence"),
+        },
+    }
+
+
 def _invention_exists(detail: Dict[str, Any], cio_obj: Optional[Dict]) -> bool:
-    """An invention exists when the run recorded invention-side state:
-    a CIO (invention specification / lineage / decisive experiment), or
-    recorded evolution generations. Absence is honest absence (Art.
-    XXV) — no invention, no bridge, no fabricated artifact."""
+    """R455-LEAN-1 §1: LEGACY fallback, used ONLY when the run carries
+    no DISCOVERY_RELEASE.json (the current engine writes one on every
+    run — see `_survivor_recorded`). An invention exists when the run
+    recorded invention-side state: a CIO (invention specification /
+    engineering specification / parametric model / CAD ledger /
+    decisive experiment — never `final_state.json` alone, which every
+    run writes), or recorded evolution generations. Absence is honest
+    absence (Art. XXV) — no invention, no bridge, no fabricated
+    artifact."""
     if cio_obj is not None:
         return True
     rs = detail.get("run_state") or {}
@@ -191,8 +289,27 @@ def ensure_artifacts(session_id: str) -> Dict[str, Any]:
     detail = store.session_detail(session_id) or {}
     cio_obj = _cio.build_cio(session)
 
+    # R455-LEAN-1 §1: the survivor gate decides FIRST. A run whose own
+    # release record does not attest a surviving, promoted candidate
+    # gets exactly ONE honest record and NOTHING else — no GLB, no
+    # render job, no package (the audit's top deletion: the machine
+    # must stop asserting technologies that do not exist).
+    survivor = _survivor_recorded(run_dir)
+    if not survivor["recorded"]:
+        return _record(run_dir, "NO_SURVIVOR", {
+            "survivor_gate": survivor["evidence"],
+            "note": ("this run recorded no surviving, promoted "
+                      "candidate (its own DISCOVERY_RELEASE.json is "
+                      "the authority) — the bridge generates nothing: "
+                      "no geometry, no render job, no package (Art. "
+                      "XXV: honest absence; Art. XXVIII: artifact "
+                      "generation is never evidence of invention; "
+                      "R455-LEAN-1: no survivor, no artifact)"),
+        })
+
     if not _invention_exists(detail, cio_obj):
-        # honest: no invention on this run (e.g. FALSE_PREMISE or a
+        # legacy path (no release record on the run): honest — no
+        # invention-side state on this run (e.g. FALSE_PREMISE or a
         # transport-blocked run) — no artifact is fabricated
         return _record(run_dir, "NO_INVENTION", {
             "note": ("no invention-side artifacts on this run — the "

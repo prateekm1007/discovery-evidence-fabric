@@ -4,7 +4,7 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO_ROOT))
 from discovery_fabric.prior_art_v2.obviousness_v38 import ObviousnessEvidenceV38, OBVIOUSNESS_ADVERSARY_V38_PROMPT_HASH
-from discovery_fabric.prior_art_v2.calibration_v3_8 import CaseResultV38, calculate_v38_metrics
+from archive.r455_retired.discovery_fabric.prior_art_v2.calibration_v3_8 import CaseResultV38, calculate_v38_metrics
 V38_DIR = REPO_ROOT / "experiments" / "autonomous_calibration_v3_8"
 
 class TestV38Results:

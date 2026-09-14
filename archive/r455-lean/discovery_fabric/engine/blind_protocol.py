@@ -34,8 +34,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
-from .benchmark_dossiers import extract_package_vector
-from .substance_metrics import (content_vector, evaluate_substance,
+from archive.r455_retired.discovery_fabric.engine.benchmark_dossiers import extract_package_vector
+from discovery_fabric.engine.substance_metrics import (content_vector, evaluate_substance,
                                 reference_distribution)
 
 
@@ -141,7 +141,7 @@ def reveal_and_score(measurements: Dict[str, Any], key_path: Path,
     """Open the sealed key, then score every GENERATED subject against
     the REFERENCE distribution (E16-C) and the training floors."""
     key = json.loads(Path(key_path).read_text())
-    from .benchmark_dossiers import load_contract, meets_floors
+    from archive.r455_retired.discovery_fabric.engine.benchmark_dossiers import load_contract, meets_floors
     contract = floors_contract or load_contract()
     dist = reference_distribution(reference_dirs)
     results = []

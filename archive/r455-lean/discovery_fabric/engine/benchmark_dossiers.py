@@ -49,11 +49,13 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-REPO_ROOT = Path(__file__).resolve().parents[2]
+# R455-LEAN-1: this module was relocated 2 levels deeper
+# (archive/r455_retired/...); REPO_ROOT is 4 parents up
+REPO_ROOT = Path(__file__).resolve().parents[4]
 
 # canonical frozen portfolio location (cloned next to the dev repo; frozen
 # at 2e96b27 — read-only, never modified)
-FROZEN_PORTFOLIO = Path(__file__).resolve().parents[2] / \
+FROZEN_PORTFOLIO = Path(__file__).resolve().parents[4] / \
     "BENCHMARK_ENGINEERING_DOSSIERS" / "frozen_corpus_r370"
 
 # canonical E15-A artifact directory (committed to the dev repo)
@@ -90,7 +92,7 @@ BUYER_PAGE_SECTIONS = [s for s in DOSSIER_SECTIONS if not s[0].isdigit()]
 # R440: the elite (R424) document vocabulary — the same substantive
 # units under the production schema's headings (kept in sync with
 # benchmark_corpus.ELITE_SECTIONS, the single vocabulary authority)
-from .benchmark_corpus import ELITE_SECTIONS  # noqa: E402
+from archive.r455_retired.discovery_fabric.engine.benchmark_corpus import ELITE_SECTIONS  # noqa: E402
 
 # measurement instruments: regulatory standards vocabulary (we COUNT matches
 # in the corpus text; the counts themselves are measured, never preset)
@@ -316,7 +318,7 @@ def extract_corpus(corpus_root: Optional[Path] = None) -> Dict[str, Any]:
     informs floors; the BLIND_HOLDOUT stratum is sealed until evaluation
     (benchmark_split.py). All 15 measured vectors are recorded for
     transparency, each labeled with its stratum."""
-    from .benchmark_split import (SPLIT_ARTIFACT, assign_strata,
+    from archive.r455_retired.discovery_fabric.engine.benchmark_split import (SPLIT_ARTIFACT, assign_strata,
                                   load_split, stratum_of)
     root = Path(corpus_root) if corpus_root else FROZEN_PORTFOLIO
     dirs = [d for d in sorted(root.iterdir())
@@ -327,7 +329,7 @@ def extract_corpus(corpus_root: Optional[Path] = None) -> Dict[str, Any]:
             f"{len(dirs)} — E15-A extraction refused (benchmark "
             "integrity)")
     if not SPLIT_ARTIFACT.exists():
-        from .benchmark_split import write_canonical_artifacts
+        from archive.r455_retired.discovery_fabric.engine.benchmark_split import write_canonical_artifacts
         write_canonical_artifacts()
     split = load_split()
     # a foreign corpus cannot be stratified by the canonical assignment

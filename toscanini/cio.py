@@ -219,6 +219,12 @@ def _bridge_why(bridge_report: Dict[str, Any]) -> Optional[str]:
     if outcome == "NO_INVENTION":
         return ("no invention-side artifacts were recorded on this run — "
                 "the bridge generates nothing (honest absence)")
+    if outcome == "NO_SURVIVOR":
+        # R455-LEAN-1 §1: the run's own release record attests no
+        # surviving, promoted candidate — one honest record, no
+        # artifacts (historical NO_INVENTION records stay readable).
+        return ("this run recorded no surviving, promoted candidate — "
+                "the bridge generates nothing (honest absence)")
     report = bridge_report.get("report") or {}
     steps = report.get("steps") or []
     geom = next((s for s in steps if s.get("step") == "GEOMETRY"), {})
@@ -313,8 +319,17 @@ def build_cio(session: Dict[str, Any]) -> Optional[Dict[str, Any]]:
 
     # no invention-side artifacts anywhere -> no CIO (directive §12: the
     # frontend renders the CIO; an empty object would still LOOK like an
-    # invention surface — honest absence instead, Art. XXV)
-    if not any((inv, eng, pm, cad_ledger, dex, final_state)):
+    # invention surface — honest absence instead, Art. XXV).
+    #
+    # R455-LEAN-1 §1: `final_state.json` is the RUN's state record, not
+    # invention-side state — EVERY engine run writes one, so counting it
+    # here made the CIO exist (and with it `_invention_exists`) for a
+    # run that produced no invention at all (the audit's measured
+    # failure: 18/18 production runs bridged, 7 of them with
+    # `invention_id: null`). The run-state record is still READ below
+    # (identity hash); it just no longer MANUFACTURES invention
+    # presence (Art. XXVIII: no silent semantic promotion).
+    if not any((inv, eng, pm, cad_ledger, dex)):
         return None
 
     # geometry: MODEL/ dir (package path) or STEP/STL in the run dir

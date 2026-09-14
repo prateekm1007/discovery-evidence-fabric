@@ -485,6 +485,104 @@ def availability_matrix() -> List[Dict[str, Any]]:
     return out
 
 
+def strong_route_capability() -> Dict[str, Any]:
+    """R455-LEAN-1 §2 — read-only STRONG-route admission mirror.
+
+    Answers ONE question from PERSISTED state only (zero network, zero
+    probes, zero side effects — a mirror of `generate()`'s admission
+    inputs, not a new capability store): can the registry currently
+    serve a STRONG-class synthesis request at STRONG capability, or is
+    every reachable rung CHEAP-class (a guaranteed
+    CHEAP_EMERGENCY_FALLBACK)?
+
+    A rung is REACHABLE when its provider is available AND
+    cost-policy-eligible AND the model is not recorded known-dead. A
+    reachable rung's DECLARED task capabilities decide the class:
+    declared capability is a property of the model, independent of
+    probe freshness — so a STRONG rung with a stale/failed probe is
+    still strong-capable (the walk probes it lazily; this gate must
+    never deadlock a route behind its own probe TTL, Art. V).
+
+    Returns {"state": OK | DEGRADED_ONLY | UNKNOWN, ...} — UNKNOWN
+    fails OPEN (the conductor is never held hostage by the gate; the
+    disclosed error travels on the record, Art. XV).
+    """
+    from . import model_routing as mr
+
+    record: Dict[str, Any] = {
+        "gate": "R455-LEAN-1/strong_route_capability/1.0.0",
+        "state": "UNKNOWN",
+        "requested_task": mr.TASK_STRONG,
+        "strong_rungs": [],
+        "degraded_rungs": [],
+        "refused_rungs": [],
+        "basis": ("declared task capabilities of every reachable "
+                  "(available + cost-eligible + not known-dead) rung; "
+                  "probe state is deliberately NOT consulted — declared "
+                  "capability is probe-independent (Art. V: the gate "
+                  "must never deadlock a route behind its own probe "
+                  "TTL)"),
+    }
+    try:
+        matrix = availability_matrix()
+        avail_ids = [m["provider_id"] for m in matrix
+                     if m["available"] and m["cost_policy_eligible"]]
+        # the UNBOUNDED ladder view: the mirror asks whether ANY
+        # reachable rung declares STRONG anywhere in the registry, so
+        # the walk bound of generate() is deliberately not applied
+        # (a bound here could manufacture a false DEGRADED_ONLY)
+        ladder = mr.build_ladder(
+            mr.TASK_STRONG, role=mr.ROLE_SYNTHESIS,
+            available_providers=avail_ids, max_rungs=64)
+        active_cost_policy = _cost_policy.active_policy()
+        for r in ladder.get("rungs") or []:
+            pid, mid = r.get("provider"), r.get("model")
+            spec = _SPEC_BY_ID.get(pid)
+            if spec is None:
+                continue
+            ok_elig, elig_note = _cost_policy.provider_eligibility(spec)
+            if not ok_elig:
+                record["refused_rungs"].append({
+                    "provider": pid, "model": mid,
+                    "reason": f"cost policy {active_cost_policy}: "
+                              f"{elig_note}"})
+                continue
+            if mr.is_model_gone(pid, mid):
+                record["refused_rungs"].append({
+                    "provider": pid, "model": mid,
+                    "reason": "known-dead model (the provider's own "
+                              "recorded 410)"})
+                continue
+            caps = list(r.get("task_capabilities") or [])
+            entry = {"provider": pid, "model": mid,
+                     "task_capabilities": caps}
+            if mr.TASK_STRONG in caps:
+                record["strong_rungs"].append(entry)
+            else:
+                record["degraded_rungs"].append(entry)
+        if record["strong_rungs"]:
+            record["state"] = "OK"
+        elif record["degraded_rungs"]:
+            record["state"] = "DEGRADED_ONLY"
+        else:
+            # no reachable rung at all: NOT a capability verdict — the
+            # transport class owns that case (the worker's preflight
+            # probe records it honestly); this gate never fires here
+            record["state"] = "OK"
+            record["note"] = ("no reachable rung — not a capability "
+                              "block; the transport preflight owns the "
+                              "no-route case (Art. LXI)")
+        return record
+    except Exception as exc:  # noqa: BLE001 — fail OPEN, disclosed
+        record["state"] = "UNKNOWN"
+        record["error"] = f"{type(exc).__name__}: {exc}"
+        record["basis"] = (record["basis"] +
+                           " — the gate itself failed and fails OPEN "
+                           "(the conductor is never held hostage; the "
+                           "disclosed error travels on this record)")
+        return record
+
+
 def select_provider(policy: Optional[SelectionPolicy] = None) -> tuple:
     """Return (spec_or_None, ledger). Performs NO network I/O and NO
     probes — it READS persisted capability measurements (the C1.3-1

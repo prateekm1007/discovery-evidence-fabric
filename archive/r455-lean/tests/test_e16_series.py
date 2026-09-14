@@ -34,12 +34,12 @@ sys.path.insert(0, str(Path(__file__).parent))
 from test_a_series_integration import (  # noqa: E402
     _a9_survivor, _drive, ensure_registry)
 
-from discovery_fabric.engine import blind_protocol as bp  # noqa: E402
+from archive.r455_retired.discovery_fabric.engine import blind_protocol as bp  # noqa: E402
 from discovery_fabric.engine import causal_correctness as cc  # noqa: E402
 from discovery_fabric.engine import ensemble as ens  # noqa: E402
-from discovery_fabric.engine.benchmark_dossiers import (  # noqa: E402
+from archive.r455_retired.discovery_fabric.engine.benchmark_dossiers import (  # noqa: E402
     load_contract, measure_generated_vector)
-from discovery_fabric.engine.benchmark_split import (  # noqa: E402
+from archive.r455_retired.discovery_fabric.engine.benchmark_split import (  # noqa: E402
     SEALED_VECTORS, assign_strata, load_split, open_sealed_blind_vectors,
     stratum_of)
 from discovery_fabric.engine.candidate_diversity import (  # noqa: E402
@@ -121,7 +121,7 @@ def test_e16c_policy_fixed_before_use():
 
 
 def test_e16c_instruments_are_densities_not_counts():
-    from discovery_fabric.engine.benchmark_split import (
+    from archive.r455_retired.discovery_fabric.engine.benchmark_split import (
         list_frozen_packages, load_split)
     from discovery_fabric.engine.substance_metrics import (
         CONTENT_DIMENSIONS, content_vector)
@@ -143,7 +143,7 @@ def test_e16b_blind_protocol_hides_origin_and_scores_blind():
         ensure_registry(reg)
         run = _drive(_a9_survivor(0), Path(td) / "run01", "t:e16b",
                      registry_path=reg)
-        from discovery_fabric.engine.benchmark_split import (
+        from archive.r455_retired.discovery_fabric.engine.benchmark_split import (
             list_frozen_packages, load_split)
         strata = load_split()["strata"]
         # reference subjects come from the DEVELOPMENT_HOLDOUT stratum

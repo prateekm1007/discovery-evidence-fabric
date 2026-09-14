@@ -118,6 +118,11 @@ class EngineRun:
         self.package_registry_path = package_registry_path
         self._spec: Optional[Dict[str, Any]] = None
         self._eng: Optional[Dict[str, Any]] = None
+        # R455-LEAN-1 §2: the pre-retrieval capability gate's typed
+        # refusal record (None = the gate did not fire — the run is
+        # either capable, gate-UNKNOWN fail-open, or already past
+        # RETRIEVE on resume).
+        self._capability_blocked: Optional[Dict[str, Any]] = None
         # Resume support: continue a killed/interrupted REAL run from the
         # last persisted envelope snapshot. Completed stages are NOT re-run
         # (their recorded envelope + stage_log entries are restored); the
@@ -291,6 +296,76 @@ class EngineRun:
                 continue
 
             adapter = ADAPTERS[stage]
+            # R455-LEAN-1 §2: the pre-retrieval capability gate — NO
+            # REASONING, NO SPEND. Fires before the RETRIEVE fan-out when
+            # the synthesis route is GUARANTEED degraded (no reachable
+            # rung declares STRONG; at least one degraded rung exists):
+            # the run then records BLOCKED / CAPABILITY_INSUFFICIENT
+            # having spent ZERO retrieval source calls, and stays
+            # resumable on a capable route (Art. LXI — an infrastructure
+            # class state, never a scientific verdict).
+            if stage == "RETRIEVE":
+                _cap_gate = self._pre_retrieval_capability_gate()
+                if _cap_gate.get("state") == "DEGRADED_ONLY":
+                    self._capability_blocked = _cap_gate
+                    self._persist("CAPABILITY_GATE.json", {
+                        "stage": "CAPABILITY_GATE",
+                        "gate": "R455-LEAN-1 §2",
+                        "status": "BLOCKED",
+                        "blocked_class": "CAPABILITY",
+                        "reason": ("the synthesis route can only serve "
+                                   "the STRONG request via "
+                                   "CHEAP_EMERGENCY_FALLBACK — retrieval "
+                                   "and downstream compute refused "
+                                   "BEFORE spending (R455-LEAN-1: no "
+                                   "reasoning, no spend); infrastructure "
+                                   "class, resumable on a capable route, "
+                                   "never a scientific rejection "
+                                   "(Art. LXI)"),
+                        "capability_route": _cap_gate,
+                        "resumable": True,
+                        "recorded_at": utc_now(),
+                    })
+                    self.env.stage_log.append({
+                        "stage": stage,
+                        "capability_id": ADAPTERS[stage].capability_id,
+                        "status": "SKIPPED_ADMISSION",
+                        "skip_reason":
+                            "SYNTHESIS_CAPABILITY_INSUFFICIENT_PRE_"
+                            "RETRIEVAL: the synthesis route can only "
+                            "serve STRONG via CHEAP_EMERGENCY_FALLBACK "
+                            "— retrieval fan-out refused before "
+                            "spending (R455-LEAN-1 §2; Art. LXI: "
+                            "infrastructure class, resumable)",
+                        "skip_class": "BLOCKED",
+                        "capability_gate": _cap_gate,
+                        "candidate_delta": [],
+                        "delta_real": False,
+                        "started_at": utc_now(),
+                        "finished_at": utc_now()})
+                    self._skipped_stages.add(stage)
+                    for later in STAGE_ORDER[
+                            STAGE_ORDER.index(stage) + 1:]:
+                        if later in self.disabled or later in done_stages:
+                            continue
+                        self._skipped_stages.add(later)
+                        self.env.stage_log.append({
+                            "stage": later,
+                            "capability_id":
+                                ADAPTERS[later].capability_id,
+                            "status": "SKIPPED_ADMISSION",
+                            "skip_reason": (
+                                "not reached: the pre-retrieval "
+                                "capability gate blocked this run "
+                                "(see the RETRIEVE entry and "
+                                "CAPABILITY_GATE.json — R455-LEAN-1 "
+                                "§2)"),
+                            "skip_class": "NOT_REACHED",
+                            "candidate_delta": [],
+                            "delta_real": False,
+                            "started_at": utc_now(),
+                            "finished_at": utc_now()})
+                    break
             # R399 entry justification, stamped BEFORE execution: the
             # stamp is computed from the same state the conductor's own
             # decision used (failed/skipped sets + the envelope) — the
@@ -399,7 +474,15 @@ class EngineRun:
                     "delta_real": False,
                     "started_at": utc_now(),
                     "finished_at": utc_now()})
-                self._persist_envelope(stage)
+                # R455-LEAN-1 §3: no envelope for an admission skip.
+                # The skip line above IS the record (the stage ledger);
+                # a full `envelope_<STAGE>.json` — a snapshot of the
+                # unchanged problem block duplicated per skipped stage —
+                # added zero information (the audited run wrote 9 of
+                # them; each carried the full problem text and
+                # `candidate_id: ""`). The skip line stays; the
+                # envelope does not (Art. XXV: the refusal is still
+                # recorded — only the duplication is removed).
                 continue
             try:
                 # R451-C1.3-3: the CURRENT conductor stage rides the call
@@ -466,7 +549,25 @@ class EngineRun:
             # only the degraded-synthesis shape is blocked here.
             from . import stage_entry as _se_lean
             _cap = _se_lean.synthesis_capability_state(self.env)
-            if _cap["state"] == "CAPABILITY_INSUFFICIENT":
+            if self._capability_blocked is not None:
+                # R455-LEAN-1 §2: the pre-retrieval gate already refused
+                # the run — no synthesis envelope exists to re-measure,
+                # so R453's own check reads UNKNOWN here and the tail
+                # must be refused by the gate's recorded decision
+                # (zero LLM calls, zero retrieval, zero artifacts).
+                self._persist("POST_RANK_PIPELINE_SKIPPED.json", {
+                    "stage": "POST_RANK_PIPELINE",
+                    "status": "SKIPPED_ADMISSION",
+                    "skip_reason": ("SYNTHESIS_CAPABILITY_INSUFFICIENT_"
+                                    "PRE_RETRIEVAL"),
+                    "capability_gate": self._capability_blocked,
+                    "consequence": ("no engineering/package/grid compute "
+                                    "was spent — the pre-retrieval "
+                                    "capability gate refused the run "
+                                    "before any spend (R455-LEAN-1 §2; "
+                                    "Art. LXI: resumable infrastructure "
+                                    "class)")})
+            elif _cap["state"] == "CAPABILITY_INSUFFICIENT":
                 self._persist("POST_RANK_PIPELINE_SKIPPED.json", {
                     "stage": "POST_RANK_PIPELINE",
                     "status": "SKIPPED_ADMISSION",
@@ -541,6 +642,12 @@ class EngineRun:
                 _blocked_reason = None
                 if _cap["state"] == "CAPABILITY_INSUFFICIENT":
                     _blocked_reason = "SYNTHESIS_CAPABILITY_INSUFFICIENT"
+                elif self._capability_blocked is not None:
+                    # R455-LEAN-1 §2: the pre-retrieval gate refused the
+                    # run — evolution on a guaranteed-degraded route is
+                    # exactly the pseudo-invention spend R453 refuses.
+                    _blocked_reason = ("SYNTHESIS_CAPABILITY_INSUFFICIENT_"
+                                       "PRE_RETRIEVAL")
                 elif _synthesis_succeeded and not _facts["retained"]:
                     _blocked_reason = "NO_RETAINED_CANDIDATE"
                 if _blocked_reason is not None:
@@ -2055,6 +2162,38 @@ class EngineRun:
         return Candidate.from_dict(d)
 
     # ------------------------------------------------------------------
+    def _pre_retrieval_capability_gate(self) -> Dict[str, Any]:
+        """R455-LEAN-1 §2 — NO REASONING, NO SPEND.
+
+        The existing capability determination (R451-C1.4's
+        task-degradation record + R453-LEAN-CORE's
+        `synthesis_capability_state`) both fire AFTER the spend: the
+        audited production run spent 6 retrieval source calls and 26
+        artifacts feeding a synthesis route the registry itself
+        classified `CHEAP_EMERGENCY_FALLBACK` — "requested STRONG; the
+        serving model declares only ['CHEAP']". This gate asks the SAME
+        question BEFORE the RETRIEVE fan-out, from the same persisted
+        admission inputs (`llm_registry.strong_route_capability` — a
+        read-only mirror, zero network, zero probes).
+
+        Fires ONLY on the guaranteed-degraded shape: no reachable rung
+        declares STRONG AND at least one reachable degraded rung exists.
+        A STRONG-declaring rung — even one with a stale or failed probe
+        — never triggers the gate (the walk probes lazily; the gate
+        must not deadlock a route behind its own probe TTL, Art. V).
+        The refusal is an infrastructure-class state: resumable on a
+        capable route, never a scientific verdict (Art. LXI).
+        """
+        from .llm_registry import strong_route_capability
+        try:
+            record = strong_route_capability()
+        except Exception as exc:  # noqa: BLE001 — fail OPEN, disclosed
+            record = {"gate": "R455-LEAN-1/strong_route_capability/1.0.0",
+                      "state": "UNKNOWN",
+                      "error": f"{type(exc).__name__}: {exc}"}
+        return record
+
+    # ------------------------------------------------------------------
     def _blocked_by(self, stage: str) -> Optional[str]:
         for failed, blocked in DOWNSTREAM_BLOCKERS.items():
             if stage in blocked and failed in self.failed_stages:
@@ -2106,6 +2245,26 @@ class EngineRun:
                       + "; ".join(
                           str(v) for v in self.failed_stages.values()
                           if str(v).startswith("POLICY_STOP:"))[:300])
+        elif self._capability_blocked is not None:
+            # R455-LEAN-1 §2: the pre-retrieval capability gate fired —
+            # the run spent ZERO retrieval calls and zero downstream
+            # compute because the synthesis route is guaranteed
+            # degraded. The terminal is a RUN_BLOCKED_* family member:
+            # infrastructure class, resumable on a capable route, NEVER
+            # a scientific verdict (Art. LXI) — and distinct from
+            # RUN_BLOCKED_TRANSPORT (the route may be perfectly
+            # healthy; the CAPABILITY class is what is missing, the
+            # audit's typed-reason discipline).
+            status = "RUN_BLOCKED_CAPABILITY"
+            reason = ("the synthesis route can only serve the STRONG "
+                      "request via CHEAP_EMERGENCY_FALLBACK (no "
+                      "reachable rung declares STRONG) — retrieval "
+                      "and downstream compute were refused BEFORE "
+                      "spending (R455-LEAN-1 §2: no reasoning, no "
+                      "spend). Your problem is saved and resumable on "
+                      "a capable route; this is an infrastructure "
+                      "class state, never a scientific rejection "
+                      "(Art. LXI)")
         elif not synthesis_ok:
             # R416 honest-cause fix: a SYNTHESIZE stage failure means the
             # mechanism GENERATION failed BEFORE any candidate existed.
@@ -2134,6 +2293,9 @@ class EngineRun:
             "problem_id": self.problem_id,
             "device": self.problem.get("device"),
             "final_status": status,
+            # R455-LEAN-1 §2: the typed capability-gate refusal travels
+            # on the canonical state (None when the gate did not fire)
+            "capability_gate": self._capability_blocked,
             "epistemic_state": eps.get("epistemic_state",
                                        eps.get("state", "OBSERVED")),
             "reason": reason,

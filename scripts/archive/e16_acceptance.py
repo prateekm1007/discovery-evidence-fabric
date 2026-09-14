@@ -39,6 +39,34 @@ for _k in ("OPENROUTER_API_KEY", "NVIDIA_API_KEY", "ANTHROPIC_API_KEY",
 import discovery_fabric.engine.adapters as _adapters  # noqa: E402
 _adapters.load_credentials = lambda path=None: {}  # noqa: E402
 
+# R455-LEAN-1 reconciliation: the benchmark surfaces were retired to
+# archive/r455-lean/ (not on the import path by design); they are loaded
+# verbatim under their canonical names so this archived script stays
+# runnable (Art. LXIV: importable history).
+import importlib.util as _ilu
+import sys as _sys
+from pathlib import Path as _Path
+
+_REPO_ROOT = _Path(__file__).resolve().parents[1]
+
+
+def _load_archived(rel, name):
+    if name in _sys.modules:
+        return _sys.modules[name]
+    _spec = _ilu.spec_from_file_location(name, _REPO_ROOT / rel)
+    _mod = _ilu.module_from_spec(_spec)
+    _sys.modules[name] = _mod
+    _spec.loader.exec_module(_mod)
+    return _mod
+
+
+_E = "archive/r455-lean/discovery_fabric/engine/"
+_load_archived(_E + "benchmark_corpus.py", "discovery_fabric.engine.benchmark_corpus")
+_load_archived(_E + "benchmark_dossiers.py", "discovery_fabric.engine.benchmark_dossiers")
+_load_archived(_E + "substance_metrics.py", "discovery_fabric.engine.substance_metrics")
+_load_archived(_E + "benchmark_split.py", "discovery_fabric.engine.benchmark_split")
+_load_archived(_E + "blind_protocol.py", "discovery_fabric.engine.blind_protocol")
+
 from discovery_fabric.engine.benchmark_split import (  # noqa: E402
     load_split, open_sealed_blind_vectors)
 from discovery_fabric.engine.blind_protocol import (  # noqa: E402

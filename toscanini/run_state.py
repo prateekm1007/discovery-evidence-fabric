@@ -241,36 +241,85 @@ def _walk_providers(obj: Any, found: List[Dict[str, Any]],
 
 def _model_route(session: Dict[str, Any],
                  run_dir: Optional[Path]) -> Dict[str, Any]:
-    """Which providers/models actually executed work on this run, from
-    persisted bytes: the evidence pack's extraction call, the run
-    envelopes' provider records, and the preflight transport the worker
-    verified (the gateway probe is recorded in the evidence pack llm
-    block when a run exists)."""
-    calls: List[Dict[str, Any]] = []
-    ep = session.get("evidence_pack") or {}
-    llm = ep.get("llm") or (ep.get("problem") or {}).get("llm") or {}
-    if isinstance(llm, dict) and llm.get("provider"):
-        calls.append({"role": "evidence_extraction",
-                      "provider": llm.get("provider"),
-                      "model": llm.get("model"),
-                      "status": llm.get("status")})
+    """Which providers/models actually executed work on this run.
+
+    R455-LEAN-1 §4: THE source is the run's own routing ledger —
+    `ROUTING_LEDGER_RUN.json`, the run-id-isolated projection of the
+    append-only `model_routing/ledger.jsonl` persisted into the run dir
+    at run end (R451-C1.3-3) — never envelope aggregation. The audited
+    run's UI reported 13 "calls" aggregated from 16 envelopes while the
+    authoritative ledger held ONE run-owned call: a summary outranking
+    the artifact (Art. XXIV). `call_count` is the ledger's run-owned
+    count, full stop; capability probes and standalone calls are not
+    run-owned and are reported separately, never mixed in.
+    """
+    lines: List[Dict[str, Any]] = []
+    basis: Optional[str] = None
     if run_dir and run_dir.exists():
-        for env_path in sorted(run_dir.glob("envelope_*.json")):
-            env = _read_json(env_path)
-            if env:
-                found: List[Dict[str, Any]] = []
-                _walk_providers(env, found)
-                for rec in found[:8]:
-                    rec = dict(rec)
-                    rec["role"] = env_path.stem.replace("envelope_", "")
-                    if rec not in calls:
-                        calls.append(rec)
+        rl = _read_json(run_dir / "ROUTING_LEDGER_RUN.json")
+        if isinstance(rl, dict):
+            lines = [l for l in (rl.get("lines") or [])
+                     if isinstance(l, dict)]
+            basis = ("ROUTING_LEDGER_RUN.json — the run's own "
+                     "run-id-isolated routing ledger (R451-C1.3-3)")
+    if not lines and run_dir and run_dir.exists():
+        # run records predating the run-dir ledger file: the SAME
+        # authority, filtered by run id from the global ledger — never
+        # a ledger-tail or time-window inference (R451-C1.3-3)
+        manifest = _read_json(run_dir / "run_manifest.json") or {}
+        rid = manifest.get("run_id")
+        if rid:
+            try:
+                from discovery_fabric.engine.model_routing import (
+                    ledger_for_run,)
+                lines = [l for l in ledger_for_run(str(rid))
+                         if isinstance(l, dict)]
+                basis = ("model_routing/ledger.jsonl filtered by run_id "
+                         "(R451-C1.3-3)")
+            except Exception:  # noqa: BLE001 — honest absence below
+                lines = []
+    if basis is None:
+        basis = ("routing ledger absent on this run record — the honest "
+                 "absence is reported, never an envelope-derived count "
+                 "(Art. XXV)")
+    owned = [l for l in lines if l.get("call_class") == "RUN_OWNED"]
+    calls: List[Dict[str, Any]] = []
+    for l in owned:
+        rec: Dict[str, Any] = {
+            "role": l.get("engine_stage") or l.get("stage")
+            or l.get("task"),
+            "provider": l.get("provider"),
+            "model": l.get("model"),
+            "status": l.get("status"),
+            "call_class": l.get("call_class"),
+        }
+        if l.get("task"):
+            rec["task"] = l.get("task")
+        deg = l.get("task_degradation") or {}
+        if isinstance(deg, dict) and deg.get("actual_task_capability"):
+            rec["actual_task_capability"] = deg.get(
+                "actual_task_capability")
+            rec["task_capability_match"] = deg.get(
+                "task_capability_match")
+        if l.get("latency_ms") is not None:
+            rec["latency_ms"] = l.get("latency_ms")
+        if l.get("failure_class"):
+            rec["failure_class"] = l.get("failure_class")
+        if rec not in calls:
+            calls.append(rec)
     return {
         "calls": calls[:24],
         "call_count": len(calls),
-        "note": ("aggregated from persisted run artifacts (envelopes, "
-                 "evidence pack); configuration is never reported as "
-                 "execution"),
+        "call_count_note": (
+            "run-owned calls in the run's own routing ledger — "
+            "capability probes and standalone calls are not "
+            "run-owned (R451-C1.3-3)"),
+        "capability_probe_lines": sum(
+            1 for l in lines if l.get("call_class") == "CAPABILITY_PROBE"),
+        "basis": basis,
+        "note": ("derived from the routing ledger filtered by run_id "
+                 "(R455-LEAN-1 §4); configuration is never reported as "
+                 "execution and envelopes are never aggregated"),
     }
 
 
@@ -309,16 +358,33 @@ def _mechanism_state(session: Dict, run_dir: Optional[Path],
              for s in ("SYNTHESIZE", "MECHANISM_SPACE"))
     failed = any(_classify_stage(stage_status.get(s, "")) == "FAILED"
                  for s in ("SYNTHESIZE", "MECHANISM_SPACE"))
+    state = ("FAILED" if failed else
+             "GENERATED" if ok or mm else
+             "PENDING" if session.get("status") in _RUNNING_STATUSES
+             else "NOT_REACHED")
+    mechanism = mm.get("mechanism")
+    # R455-LEAN-1 §5: the invariant at THE canonical writer —
+    # `GENERATED` requires a recorded mechanism. `GENERATED` with
+    # `mechanism: null, candidate_count: 0` was observed live on a
+    # production run: a scientifically nonsensical combination that
+    # promoted candidate-slot activity into a mechanism claim (Art.
+    # XXVIII). The combination is now unrepresentable: without a
+    # recorded mechanism the honest state is NOT_ESTABLISHED.
+    reason = None
+    if state == "GENERATED" and not mechanism:
+        state = "NOT_ESTABLISHED"
+        reason = ("synthesis executed but recorded no mechanism — "
+                  "GENERATED requires a recorded mechanism "
+                  "(R455-LEAN-1 §5; Art. XXVIII: candidate count is "
+                  "never promoted into a mechanism)")
     return {
-        "state": ("FAILED" if failed else
-                  "GENERATED" if ok or mm else
-                  "PENDING" if session.get("status") in _RUNNING_STATUSES
-                  else "NOT_REACHED"),
-        "mechanism": mm.get("mechanism"),
+        "state": state,
+        "mechanism": mechanism,
         "intervention": mm.get("intervention"),
         "expected_effect": mm.get("expected_effect"),
         "candidate_count": (len(candidates)
                             if isinstance(candidates, list) else 0),
+        "reason": reason,
     }
 
 

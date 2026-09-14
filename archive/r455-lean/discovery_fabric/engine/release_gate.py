@@ -40,10 +40,10 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, Optional
 
-from .benchmark_split import open_sealed_blind_vectors
+from archive.r455_retired.discovery_fabric.engine.benchmark_split import open_sealed_blind_vectors
 from .substance_metrics import (CONTENT_DIMENSIONS, content_vector,
                                 evaluate_substance, reference_distribution)
-from .benchmark_split import list_frozen_packages, load_split
+from archive.r455_retired.discovery_fabric.engine.benchmark_split import list_frozen_packages, load_split
 
 GATES = ("SUBSTANTIVE_DEPTH", "CAUSAL_CORRECTNESS", "TRACEABILITY",
          "PROVENANCE", "DOMAIN_REASONING", "HOLDOUT_TEST")

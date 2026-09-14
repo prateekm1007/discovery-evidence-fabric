@@ -663,3 +663,29 @@ the entire §O.7/§N do-not-touch set are byte-identical.
 | Stale authority docs | ARCHIVED_TO (8 files) | R389 audit, RUNTIME_MODULE_PARTICIPATION_AUDIT, RELEASE_CHAIN_VERIFICATION ×3, HANDOFF_TO_NEXT_CHAT.md, DEPLOYMENT_CONFIG.json (contradicted live state on every axis — BS-019/BS-002) |
 | Audit defect found (Art. XV) | disclosed | the audit's import-closure method missed lazy imports: `orchestrator/__init__.py` → coverage_engine/alternative_ledger are runtime-loaded despite being "unreachable" in a static closure. The audit's own §M rule ("removes unnecessary machinery, not necessary epistemic protection") was applied as the tie-breaker for every KEPT_BECAUSE deviation |
 | Deferred (not this round) | — | the audit's behavioral items (survivor gate §O.1, capability-before-retrieval §O.2, skip envelopes §O.3, model_route truth §O.4, mechanism invariant §O.5), the §N.1 epistemic_integrity determination, the module-inventory merge (§B.3), round-artifact trees out of the image (§C.10), Blender tarball removal (§J) |
+
+## R455-LEAN-1 addendum (2026-09-14) — NO SURVIVOR, NO ARTIFACT; NO REASONING, NO SPEND
+
+Operator directive (the EXT-AUDIT-LEAN-R454 external audit's §O coder
+round, executed verbatim, scope-fenced by §O.7's do-not-touch list):
+the machine stops spending retrieval and rendering on runs that cannot
+produce a discovery, and stops asserting technologies that do not
+exist.
+
+| Change | Module | Notes |
+|---|---|---|
+| THE SURVIVOR GATE (§1, the audit's top deletion) | `toscanini/bridge_gate.py` v1.2.0 | bridge/geometry/render/package run ONLY when the run's own `DISCOVERY_RELEASE.json` attests a surviving, promoted candidate (status not DISCOVERY_INCOMPLETE/NOT_A_SURVIVOR/DISABLED_BY_CONFIG, `invention_id` non-null, spec identity present); otherwise ONE honest `NO_SURVIVOR` report and nothing else. `cio.py::build_cio` no longer counts `final_state.json` as invention-side state (the always-true `_invention_exists` hole the audit measured: 18/18 production runs bridged, 16 fully rendered, 7 with `invention_id: null`). Historical `NO_INVENTION` records stay readable (Art. XI) |
+| Capability gate before retrieval spend (§2) | `llm_registry.strong_route_capability()` + `engine/run.py` | a read-only admission mirror (zero network, zero probes, declared capabilities are probe-independent — the gate can never deadlock a route behind its own probe TTL): when NO reachable rung declares STRONG and a degraded rung exists, the conductor records `BLOCKED / CAPABILITY_INSUFFICIENT` BEFORE the RETRIEVE fan-out — zero source calls, zero downstream compute — and stays resumable on a capable route (Art. LXI). The typed terminal `RUN_BLOCKED_CAPABILITY` (RUN_BLOCKED_* family) travels to the session, the product events, the run contract, the investigation surface, and the durable push (`CAPABILITY_GATE.json`); the expensive tail and the evolution layer refuse with the same typed record |
+| No envelopes for admission skips (§3) | `engine/run.py` | a `SKIPPED_ADMISSION` stage writes its ledger line only; the per-stage `envelope_<STAGE>.json` duplication of the unchanged problem block is gone (the audited run wrote 9; the refusal is still a recorded refusal — Art. XXV) |
+| model_route tells the ledger's truth (§4) | `toscanini/run_state.py::_model_route` | derived from `ROUTING_LEDGER_RUN.json` (the run-id-isolated routing ledger, R451-C1.3-3) — `call_count` is the ledger's run-owned count; envelope aggregation is dead (the audited 13-vs-1 defect, Art. XXIV). R443's guarantee (retrieval sources are never attributed as model execution) is now structural |
+| GENERATED requires a mechanism (§5) | `toscanini/run_state.py::_mechanism_state` | `GENERATED` with a null mechanism is unrepresentable at the single canonical writer; the honest `NOT_ESTABLISHED` token carries the reason (the audited live nonsense combination; Art. XXVIII) |
+| Retirement (§6, Art. LXIV) | `archive/r455-lean/` (ONE canonical archive, this commit's `archive/r455_retired/` duplicate dropped at the rebase) | the §6 deletion set was executed in the parallel R455-LEAN-1-DELETIONS round at 378 files / 134,765 py LOC (R100 renames, history preserved — Art. XI), subsuming this commit's 7,217-LOC §6 set; THIS commit contributes the reconciled-live-tree repairs the deletion left behind: `calibration_v3_9.py` (kept live, its archived-v2/v3 imports re-pointed), `scripts/a12_capstone_run.py` + `scripts/r375_evaluate_campaign.py` (importlib file-path loading of the archived surfaces — `archive/r455-lean/` carries a hyphen and is deliberately not on the import path), and the surviving consumers' re-pointed imports |
+
+Battery: `tests/test_r455_lean1.py` — the five required §O.8 tests,
+14/14, offline by construction (stub-adapter tripwire proves zero
+retrieval fan-out on a degraded-only route; Art. V positive controls
+prove survivor-class runs and capable routes still pass; a resumability
+test proves a blocked run re-runs RETRIEVE on a capable route). Re-pins
+disclosed in-place: r414 CIO/model_route and r443 model-route
+provenance pins re-expressed against the new contracts (Art. XXXI).
+Round record: `R455/R455_LEAN1_ROUND_RECORD.json` (the behavioral half; the deletion half's record: `R455/R455_ROUND_RECORD.json`).

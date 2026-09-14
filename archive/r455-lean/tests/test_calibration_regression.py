@@ -7,7 +7,7 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO_ROOT))
 
-from discovery_fabric.prior_art_v2.calibration import (
+from archive.r455_retired.discovery_fabric.prior_art_v2.calibration import (
     CalibrationResult, CalibrationMetrics, CalibrationRunner,
     GRANTED_CASES, ABANDONED_CASES, ALL_CASES,
 )

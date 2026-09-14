@@ -12,7 +12,7 @@ from discovery_fabric.prior_art_v2.obviousness_v36 import (
     MOTIVATION_SEARCH_FAMILIES, COMPATIBILITY_DIMENSIONS,
     OBVIOUSNESS_ADVERSARY_V36_PROMPT_HASH,
 )
-from discovery_fabric.prior_art_v2.calibration_v3_6 import (
+from archive.r455_retired.discovery_fabric.prior_art_v2.calibration_v3_6 import (
     CaseResultV36, calculate_v36_metrics,
 )
 

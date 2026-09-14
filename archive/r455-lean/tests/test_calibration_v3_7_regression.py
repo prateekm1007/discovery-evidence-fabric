@@ -12,7 +12,7 @@ from discovery_fabric.prior_art_v2.obviousness_v37 import (
     COUNTERFACTUAL_STRONG, COUNTERFACTUAL_MEDIUM, COUNTERFACTUAL_WEAK, COUNTERFACTUAL_NONE,
     OBVIOUSNESS_ADVERSARY_V37_PROMPT_HASH,
 )
-from discovery_fabric.prior_art_v2.calibration_v3_7 import CaseResultV37, calculate_v37_metrics
+from archive.r455_retired.discovery_fabric.prior_art_v2.calibration_v3_7 import CaseResultV37, calculate_v37_metrics
 
 V37_DIR = REPO_ROOT / "experiments" / "autonomous_calibration_v3_7"
 

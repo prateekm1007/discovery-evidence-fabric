@@ -494,6 +494,15 @@ def _geometry_state(session: Dict[str, Any], geom: Dict[str, Any],
         elif not running and outcome == "NO_INVENTION":
             detail = ("no invention-side artifacts were recorded on this "
                       "run — the engineering stage had nothing to visualize")
+        elif not running and outcome == "NO_SURVIVOR":
+            # R455-LEAN-1 §1: the run's own DISCOVERY_RELEASE.json
+            # attests no surviving, promoted candidate. The pinned
+            # NO_INVENTION copy above stays byte-identical (R451-C2.1
+            # directive copy, Art. XI); the release-era refusal gets
+            # its own honest sentence.
+            detail = ("no surviving invention was recorded on this "
+                      "run — the engineering stage had nothing to "
+                      "visualize")
         elif running:
             detail = ("the investigation has not reached the engineering "
                       "stage yet")

@@ -581,23 +581,51 @@ class TestModelRouteProvenance:
         for stage in ("ADJUDICATION", "RANK", "FREEZE",
                       "NEXT_BEST_ACTION"):
             assert stage not in roles
-        # the honest route: the extraction LLM + the typed synthesize
-        # failure (execution attempted, transport failed)
-        assert "evidence_extraction" in roles
-        assert "SYNTHESIZE" in roles
+        # R455-LEAN-1 §4 re-pin: the source is the run's own routing
+        # ledger, filtered by run_id — a retrieval-source provenance
+        # field is STRUCTURALLY unable to appear (the ledger records
+        # real LLM transport attempts only), which is the stronger
+        # form of the R443 guarantee this test originally pinned.
+        # The evidence-pack extraction record (phase 2, pre-run) is
+        # not run-owned and is honestly not counted either.
+        assert route["call_count"] == 0
+        assert "routing ledger" in route["basis"]
+        # the genuine model-call record DOES appear once the run's own
+        # ledger carries it (the R451-C1.3-3 authority, positive side)
+        (run_dir / "ROUTING_LEDGER_RUN.json").write_text(json.dumps({
+            "run_id": "r443", "line_count": 1,
+            "run_owned_call_lines": 1,
+            "lines": [{"run_id": "r443", "call_class": "RUN_OWNED",
+                       "engine_stage": "SYNTHESIZE",
+                       "provider": "nvidia", "model": "glm-4.7",
+                       "status": "FAILED",
+                       "failure_class": "CALL_FAILED",
+                       "task": "STRONG",
+                       "task_degradation": None,
+                       "latency_ms": 812}]}))
+        route = rs._model_route(session, run_dir)
+        assert "unpaywall" not in [c.get("provider")
+                                   for c in route["calls"]]
         syn = next(c for c in route["calls"]
                    if c.get("role") == "SYNTHESIZE")
         assert syn["provider"] == "nvidia"
-        assert syn["status"] == "CALL_FAILED"
+        assert syn["status"] == "FAILED"
+        assert syn["failure_class"] == "CALL_FAILED"
 
     def test_llm_transport_records_still_reported(self, tmp_path: Path):
         import toscanini.run_state as rs
         run_dir = tmp_path / "run2"
         run_dir.mkdir()
-        (run_dir / "envelope_ATTACK.json").write_text(json.dumps({
-            "attack_results": {"transport": {
-                "provider": "zai", "model": "glm-4.7",
-                "status": "OK", "latency_ms": 3200}}})),
+        # R455-LEAN-1 §4 re-pin: transport records ARE reported — from
+        # the run's own routing ledger (never hidden, never fabricated;
+        # the envelope-embedded aggregation is superseded).
+        (run_dir / "ROUTING_LEDGER_RUN.json").write_text(json.dumps({
+            "run_id": "r443b", "line_count": 1,
+            "run_owned_call_lines": 1,
+            "lines": [{"run_id": "r443b", "call_class": "RUN_OWNED",
+                       "engine_stage": "ATTACK",
+                       "provider": "zai", "model": "glm-4.7",
+                       "status": "OK", "latency_ms": 3200}]}))
         route = rs._model_route({}, run_dir)
         roles = [c.get("role") for c in route["calls"]]
         assert roles == ["ATTACK"]

@@ -48,8 +48,10 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-REPO_ROOT = Path(__file__).resolve().parents[2]
-FROZEN_PORTFOLIO = Path(__file__).resolve().parents[2] / \
+# R455-LEAN-1: this module was relocated 2 levels deeper
+# (archive/r455_retired/...); REPO_ROOT is 4 parents up
+REPO_ROOT = Path(__file__).resolve().parents[4]
+FROZEN_PORTFOLIO = Path(__file__).resolve().parents[4] / \
     "BENCHMARK_ENGINEERING_DOSSIERS" / "frozen_corpus_r370"
 BENCHMARK_DIR = REPO_ROOT / "BENCHMARK_ENGINEERING_DOSSIERS"
 SPLIT_ARTIFACT = BENCHMARK_DIR / "E16_BENCHMARK_SPLIT.json"
@@ -122,7 +124,7 @@ def stratum_of(pkg_id: str,
 
 def write_canonical_artifacts(corpus_root: Optional[Path] = None) -> Path:
     """Write E16_BENCHMARK_SPLIT.json + the SEALED blind vectors."""
-    from .benchmark_dossiers import extract_package_vector
+    from archive.r455_retired.discovery_fabric.engine.benchmark_dossiers import extract_package_vector
     dirs = list_frozen_packages(corpus_root)
     strata = assign_strata(corpus_root)
     per_package = {}
@@ -138,7 +140,7 @@ def write_canonical_artifacts(corpus_root: Optional[Path] = None) -> Path:
             # and the E16-C content vector (the holdout release gate
             # compares the generated package's content against the blind
             # distribution, opened only at evaluation time)
-            from .substance_metrics import content_vector
+            from discovery_fabric.engine.substance_metrics import content_vector
             blind_vectors[d.name] = {
                 "structural": {k: v[k] for k in
                                ("package_id", "engineering_sections",
