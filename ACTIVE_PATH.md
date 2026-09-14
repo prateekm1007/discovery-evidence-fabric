@@ -709,3 +709,25 @@ Battery: `tests/test_r456_semantic_relevance.py` 12/12; the R455 battery
 (failing sets byte-identical — the 12 pre-existing failures are the
 R455-disclosed BS-020 captured-fixture class). Round record:
 `R456/R456_LEAN2_ROUND_RECORD.json`.
+
+## R457-OPERATOR-TRANSPORT addendum (2026-09-15) — the operator frontier ladder: the A3 unblock path exercised
+
+Operator directive (2026-09-15): four free-tier aggregator credentials
+with run-down-the-ladder depletion semantics. Transport layer ONLY —
+the stage map, the gates, and the epistemic semantics are untouched.
+
+| Change | Module | Notes |
+|---|---|---|
+| The cost-basis vocabulary gains OPERATOR_FREE_TIER_DECLARED | `engine/model_cost_policy.py` v1.1.0 | eligible under ZERO_PAID_COST: an operator-supplied aggregator account + explicit free-use directive + measured probe + free-tier model pins; depletion semantics = the operator's own directive (rung exhausted → next; localqwen terminal); the generic FREE_TIER_API stays INELIGIBLE |
+| The operator frontier ladder (4 rungs, operator's listed order) | `engine/llm_registry.py` | unorouter → xkiro → apinex → bai → localqwen (terminal); identical tiers preserve the order in the stable ranking; four DISTINCT account domains; each spec carries its own measured probe evidence (3 rounds, committed in `R456/OPERATOR_TRANSPORT_PROBE*.json`) |
+| Pinned rungs + family allowlists | `engine/model_routing.py` | the declared-capability source of `strong_route_capability()`; the unstable rungs (unorouter, bai — measured interstitials) and the null-content rung (apinex — measured 200-with-content=null) stay declared-STRONG: capability is a property of the MODEL; the transport defect is the RUNTIME PROBE's domain |
+| Account-domain vocabulary | `engine/transport_capability.py` | + OWNER_UNOROUTER/XKIRO/APINEX/BAI_ACCOUNT |
+| Key wiring (env-injection only) | `scripts/r451_c13_deploy.py` | the 4 API keys go to Space secrets from the deploy environment; a missing env var leaves the rung unwired and reports it honestly; no key material in the repo (test-enforced) |
+
+EFFECT (the audit's #1 remaining risk, owner-unblocked): with an
+operator key present, `strong_route_capability()` reports a non-empty
+STRONG ladder — the R455 `RUN_BLOCKED_CAPABILITY` terminal stops firing
+and synthesis/attack regain a STRONG-class route. The ladder order is a
+recorded policy input (Art. XXVII); the runtime probe gates every call
+so an unstable rung costs one probe, then the ladder advances — never a
+poisoned run. Round record: `R456/R457_OPERATOR_TRANSPORT_ROUND_RECORD.json`.

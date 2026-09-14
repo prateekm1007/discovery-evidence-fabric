@@ -1183,3 +1183,21 @@ Work Log:
 Stage Summary:
 - The relevance gate — the measured bottleneck of discovery quality — is now a semantic instrument with corpus-declared thresholds and a held-out measured result (24/24 frozen boilerplate rejections, on-domain admissions); the integrity tree carries only modules with named consumers; the image stops carrying 456 MB of round trees and a 383 MB render dependency it never uses; the two dead toscanini modules are archived. Zero new test failures; zero production-closure change.
 - reviewer_provenance=AI_REVIEW.
+
+---
+Task ID: R457-OPERATOR-TRANSPORT
+Agent: Super Z (main session — Coder, the operator's frontier-transport directive)
+Task: register the operator's four free-tier aggregator credentials (unorouter, xkiro, apinex, b.ai) as the frontier ladder with run-down-the-ladder depletion semantics — the audit's §N.1/A3 owner-gated unblock path exercised.
+
+Work Log:
+- PROBE-BEFORE-ADMIT (the R455 rule): THREE measured probe rounds before any registration (keys env-injected only, never recorded; scripts r457_probe_providers/round2/round3). Round 1: catalogs + one live completion per provider (unorouter 247 models PROBE_OK; xkiro 109 PROBE_OK; apinex 26; bai 47 PROBE_OK). Round 2: the INTENDED default models' own completions — xkiro qwen/qwen3.8-max:free LIVE_OK; xkiro glm-5.3-flash 403 premium (the :free pin is load-bearing); apinex paid 402 (free/paid split real); unorouter 307. Round 3: apinex free/ models measured 200-with-content=null (EMPTY-COMPLETION defect, recorded); bai measured HTML interstitials at ~30 ms (UNSTABLE, WAF); unorouter /en/v1 404 (the /en path is the web app).
+- THE POLICY ACTION: model_cost_policy.py 1.1.0 — OPERATOR_FREE_TIER_DECLARED added to the closed vocabulary and eligible under ZERO_PAID_COST; the docstring records it as the operator action it is (the generic FREE_TIER_API stays ineligible — the declared class is the sanctioned shape of "free").
+- THE LADDER: four ProviderSpecs at the HEAD of the registry in the operator's listed order (unorouter → xkiro → apinex → bai → localqwen terminal), identical tiers (stable sort preserves the order — test-pinned), four DISTINCT account domains (the redundancy is real across accounts), each spec carrying its own measured evidence + defect disclosures, model pins env-overridable. PINNED_DEFAULT_MODELS + family allowlists in model_routing (the declared-capability source); transport_capability's account vocabulary extended.
+- KEY WIRING: r451_c13_deploy.py wires the 4 keys via add_space_secret from the deploy environment (env-injection ONLY; a missing var leaves the rung unwired, honestly reported; no key material in the repo — test-enforced; secret scan 0 hits).
+- MEASURED EFFECT: strong_route_capability() with an operator key present reports a non-empty STRONG ladder (measured ["xkiro"] with the XKIRO_API_KEY marker) — the R455 RUN_BLOCKED_CAPABILITY terminal stops firing when the frontier is reachable; synthesis/attack regain a STRONG route for the first time since R451. The NOT_INDEPENDENT attack-independence recording (Art. XLV) and every degradation ledger remain in force.
+- TESTS: tests/test_r457_operator_transport.py 10/10 (offline); zero_paid 37/37, transport 32/32, r455 14/14, r456 12/12, routing_states 10/10, r443/r444/r445 green.
+- Constitution v2.4.0 re-read + re-acknowledged (hash b54a1be9 == round start) before this commit.
+
+Stage Summary:
+- The operator frontier slot — empty by honest choice since R451 — is now SUPPLIED with a measured, probe-gated, depletion-aware ladder exactly as the operator directed. The measured instabilities (unorouter/bai interstitials, apinex null-content) are disclosed in the artifacts and the specs, gated by the runtime probe, and cost at most one probe per rung per TTL — never a poisoned run.
+- reviewer_provenance=AI_REVIEW.

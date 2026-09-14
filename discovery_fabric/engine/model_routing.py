@@ -155,6 +155,29 @@ PINNED_MODEL_FAMILIES: Dict[str, List[str]] = {
         r"^z-ai/glm",
         r"^glm-",
     ],
+    # R457-OPERATOR-TRANSPORT: the operator's frontier ladder families —
+    # the named families of the operator directive (qwen 3.8, glm 5.3,
+    # deepseek, minimax); the aggregators' catalogs are large (247/109/
+    # 26/47 measured), the allowlist keeps catalog discovery inside the
+    # families the operator named. The bare-id patterns match the
+    # providers that serve ids without a namespace prefix (unorouter,
+    # apinex free/, bai); the namespace patterns match xkiro's
+    # vendor-prefixed ids.
+    "unorouter": [
+        r"^deepseek", r"^qwen", r"^glm", r"^minimax",
+        r"^deepseek/deepseek", r"^qwen/qwen", r"^z-ai/glm",
+        r"^minimax/minimax",
+    ],
+    "xkiro": [
+        r"^qwen/qwen", r"^z-ai/glm", r"^deepseek/deepseek",
+        r"^minimax/minimax",
+    ],
+    "apinex": [
+        r"^free/", r"^glm-", r"^deepseek", r"^qwen", r"^minimax",
+    ],
+    "bai": [
+        r"^qwen", r"^glm", r"^deepseek", r"^minimax",
+    ],
     # R451: the self-hosted local baseline (llama.cpp serves the alias
     # 'qwen3-1.7b' — the Qwen3 family on local weights)
     "localqwen": [
@@ -216,6 +239,53 @@ PINNED_DEFAULT_MODELS: Dict[str, List[Dict[str, Any]]] = {
     "tokenrouter": [
         {"model": "z-ai/glm-5.3-free",
          "task_capabilities": [TASK_STRONG, TASK_FAST, TASK_CHEAP],
+         "cost_class": 1, "latency_class": 2, "context_limit": 128000},
+    ],
+    # R457-OPERATOR-TRANSPORT: the operator frontier ladder's pinned
+    # rungs — each pin carries its OWN measured live completion from the
+    # committed probe artifacts (probe-before-admit, R455 §O.2 test a);
+    # the unstable rungs (unorouter, bai) and the null-content rung
+    # (apinex) stay declared-STRONG because the declared capability is a
+    # property of the MODEL (a 32B/271B/v3-class model is a strong
+    # reasoner) while the transport defect is the RUNTIME PROBE's domain
+    # — the probe gates every call, so a degraded rung falls through to
+    # the next ladder rung instead of poisoning a run (BS-029).
+    "unorouter": [
+        {"model": "deepseek-v3-0324",
+         "task_capabilities": [TASK_STRONG, TASK_FAST, TASK_CHEAP],
+         "cost_class": 1, "latency_class": 2, "context_limit": 128000},
+        # the ONE measured-LIVE completion on this provider (round 1)
+        {"model": "qwen-sea-lion-v4-32b-it:free",
+         "task_capabilities": [TASK_STRONG, TASK_FAST, TASK_CHEAP],
+         "cost_class": 1, "latency_class": 2, "context_limit": 128000},
+    ],
+    "xkiro": [
+        {"model": "qwen/qwen3.8-max:free",
+         "task_capabilities": [TASK_STRONG, TASK_FAST, TASK_CHEAP],
+         "cost_class": 1, "latency_class": 2, "context_limit": 128000},
+        {"model": "minimax/minimax-m3:free",
+         "task_capabilities": [TASK_FAST, TASK_CHEAP],
+         "cost_class": 1, "latency_class": 2, "context_limit": 128000},
+    ],
+    "apinex": [
+        {"model": "free/glm-5.3-flash",
+         "task_capabilities": [TASK_STRONG, TASK_FAST, TASK_CHEAP],
+         "cost_class": 1, "latency_class": 2, "context_limit": 128000},
+        # MEASURED DEFECT (round 2/3): the free/ class returns 200 with
+        # content=null — the runtime probe classifies INVALID_RESPONSE
+        # and the ladder advances; this rung earns traffic only when
+        # the provider fixes the shape.
+        {"model": "free/qwen-3.8-max",
+         "task_capabilities": [TASK_STRONG, TASK_FAST, TASK_CHEAP],
+         "cost_class": 1, "latency_class": 2, "context_limit": 128000},
+    ],
+    "bai": [
+        {"model": "glm-5.3",
+         "task_capabilities": [TASK_STRONG, TASK_FAST, TASK_CHEAP],
+         "cost_class": 1, "latency_class": 2, "context_limit": 128000},
+        # the ONE measured-LIVE completion on this provider (round 1)
+        {"model": "qwen3.8-flash",
+         "task_capabilities": [TASK_FAST, TASK_CHEAP],
          "cost_class": 1, "latency_class": 2, "context_limit": 128000},
     ],
 }

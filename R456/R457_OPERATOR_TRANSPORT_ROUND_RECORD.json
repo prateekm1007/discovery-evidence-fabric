@@ -1,0 +1,44 @@
+{
+  "round": "R457-OPERATOR-TRANSPORT",
+  "date": "2026-09-15",
+  "directive": "Operator (2026-09-15): 'Use these to use free ai models like qwen 3.8, glm 5.3, deepseek, minimax etc. once tokens run out of one go to the next provider' — four free-tier aggregator credentials (unorouter.com, xkiro.com, apinex.bond, b.ai). This is the audit's §N.1/A3 owner-gated unblock path exercised: the operator frontier slot is now SUPPLIED.",
+  "reviewer_provenance": "AI_REVIEW",
+  "baseline_identity": {
+    "head_at_round_start": "the R456-LEAN-2 commit on r456-lean-2 (post the R456 round record)",
+    "constitution_version": "2.4.0",
+    "constitution_sha256": "b54a1be9bcbdd2465d0b034e1e1f472f80b87174209c0d534b7d9e1223e649b2",
+    "constitution_read_in_full": {"round_start": true, "before_final_commit": true}
+  },
+  "probe_before_admit": {
+    "rule": "a spec cannot be admitted without a measured probe (R455 §O.2 test a) — THREE probe rounds measured before any registration (R456/OPERATOR_TRANSPORT_PROBE.json, _R2.json; keys env-injected only, never recorded)",
+    "round1": "GET /v1/models on 4 base candidates each + one live completion per provider: unorouter 247 models + PROBE_OK (1256 ms); xkiro 109 models + PROBE_OK (2182 ms); apinex 26 models (completion parse deferred); bai 47 models + PROBE_OK (1238 ms)",
+    "round2": "live completion on the INTENDED default models: xkiro qwen/qwen3.8-max:free LIVE_OK (2655 ms); xkiro z-ai/glm-5.3-flash HTTP 403 'premium model requires an active plan' (the :free pin is load-bearing); apinex paid glm-5.3 HTTP 402 insufficient balance (the free/paid split is real); unorouter HTTP 307 (locale redirect to the web path)",
+    "round3": "anomaly resolution: apinex free/ models return well-formed HTTP 200 chat.completion bodies with content=null AND reasoning_content=null at finish_reason=stop — an EMPTY-COMPLETION defect recorded in the spec; bai follow-ups serve the WEB APP HTML at ~30 ms — UNSTABLE (WAF challenge interleaves with the real API); unorouter /en/v1 404 HTML (the /en path is the web app)",
+    "measured_classification": {
+      "xkiro": "MEASURED-STABLEST (2/2 completions LIVE_OK) — rung 2 per the operator's listed order",
+      "unorouter": "UNSTABLE (1 real OK, then 307s) — rung 1 per the operator's listed order; the runtime probe gates each call",
+      "bai": "UNSTABLE (1 real OK, then HTML interstitials) — rung 4; the directive's URL was malformed ('https://b.ai/:sk-...'), the apex base measured",
+      "apinex": "CATALOG OK, EMPTY-COMPLETION defect on the free/ class — rung 3; gated by the runtime probe (INVALID_RESPONSE -> PROBE_FAILED -> ladder advances)"
+    }
+  },
+  "changes": {
+    "cost_policy": "model_cost_policy.py v1.0.0 -> 1.1.0 — the closed vocabulary gains OPERATOR_FREE_TIER_DECLARED, eligible under ZERO_PAID_COST: an operator-supplied aggregator account with an explicit free-use directive, measured-probed at wiring, pinned to free-tier model ids; the depletion semantics ARE the operator's own directive (rung exhausted -> next; localqwen terminal). The generic FREE_TIER_API stays INELIGIBLE — the declared class is the sanctioned shape of 'free'. The policy docstring records this as the operator action it is (never a coder's convenience).",
+    "registry": "llm_registry.py — four ProviderSpecs at the HEAD of PROVIDER_SPECS in the operator's listed order (unorouter -> xkiro -> apinex -> bai), identical (quality 2, cost 1, latency 2) tiers so the stable sort preserves that order; localqwen stays the terminal rung; four DISTINCT account domains (OWNER_UNOROUTER/XKIRO/APINEX/BAI_ACCOUNT — the ladder's redundancy is real across accounts); each spec's policy_note carries its own measured evidence and defect disclosures; pins: deepseek-v3-0324 / qwen-qwen3.8-max:free / free-glm-5.3-flash / glm-5.3 (env-overridable UNOROUTER_MODEL etc.)",
+    "routing": "model_routing.py — PINNED_MODEL_FAMILIES + PINNED_DEFAULT_MODELS for the four rungs (the declared-capability source of strong_route_capability; the unstable/null-content rungs stay declared-STRONG because capability is a property of the MODEL while the transport defect is the RUNTIME PROBE's domain — the probe gates every call, a degraded rung falls through, BS-029)",
+    "account_vocab": "transport_capability.py ACCOUNT_DOMAIN_VOCAB gains the four OWNER_*_ACCOUNT domains",
+    "deploy": "r451_c13_deploy.py wires UNOROUTER_API_KEY / XKIRO_API_KEY / APINEX_API_KEY / BAI_API_KEY from the deploy environment via add_space_secret — env-injection ONLY; a missing env var leaves the rung unwired and honestly reports it"
+  },
+  "tests": "tests/test_r457_operator_transport.py 10/10 (ladder order, closed-vocabulary membership, ZERO_PAID eligibility of the declared class + continued ineligibility of FREE_TIER_API, the exact eligible chain [unorouter,xkiro,apinex,bai,localqwen], distinct account domains, committed probe artifacts incl. the pinned models' own LIVE_OK + the disclosed 403/402 defects, per-rung measurement disclosures, NO key material in the registry source, identical-tiers stable-order property, availability gate on/off with the env key); the standing batteries: zero_paid 37/37, transport_capability 32/32 (after the vocabulary extension), r455 14/14, r456 12/12, routing_states 10/10, r443 18/18, r444 29/29, r445 16/16+5",
+  "capability_effect": "strong_route_capability() with an operator key present: strong_rungs non-empty (measured ['xkiro'] with the XKIRO_API_KEY marker) — the R455 RUN_BLOCKED_CAPABILITY typed terminal stops firing when the frontier is reachable; the engine's synthesis/attack stages regain a STRONG-class route for the first time since the R451 zero-paid collapse, while the honest single-model independence recording (NOT_INDEPENDENT, Art. XLV) and every degradation ledger remain in force",
+  "credential_discipline": "no key material in the repo, the image, or any URL (secret scan on the staged diff: 0 hits; the registry source carries env-var NAMES only, test-enforced); the tokens were supplied in the operator chat and are treated per the standing operator instruction ('dont pester me to revoke it') — the standing rotation-escalation item remains the operator's own",
+  "production_deployment": {
+    "target_sha": "PENDING_DEPLOY",
+    "deployed_sha": null,
+    "deploy_id": null,
+    "health_check_result": null,
+    "drift": null,
+    "blocked_by": null,
+    "what_unblocks": null
+  },
+  "delivery_note": "the tuple is finalized in-place after push + Space deploy + verification (nothing pre-filled, Art. VI); the fresh production acceptance run measures the frontier ladder live"
+}

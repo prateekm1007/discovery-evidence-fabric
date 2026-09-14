@@ -153,6 +153,20 @@ def main() -> int:
                          value=GITHUB_TOKEN)
     api.add_space_secret(repo_id=SPACE, key="PORTFOLIO_COMMIT",
                          value=PORTFOLIO_COMMIT)
+    # R457-OPERATOR-TRANSPORT: the operator frontier ladder's keys —
+    # env-injection ONLY (the values are read from the deploy
+    # environment; they never appear in the repo, the image, or a URL)
+    for _key_env, _secret in (("UNOROUTER_API_KEY", "UNOROUTER_KEY"),
+                              ("XKIRO_API_KEY", "XKIRO_KEY"),
+                              ("APINEX_API_KEY", "APINEX_KEY"),
+                              ("BAI_API_KEY", "BAI_KEY")):
+        _val = os.environ.get(_secret, "")
+        if _val:
+            api.add_space_secret(repo_id=SPACE, key=_key_env, value=_val)
+            print(f"[r451c13-deploy] secret wired: {_key_env}")
+        else:
+            print(f"[r451c13-deploy] {_secret} not in env — {_key_env} "
+                  f"NOT wired (the rung stays unavailable, honest)")
     print("[r451c13-deploy] env contract wired "
           "(LOCAL_QWEN_ENABLE=1, durable state on runtime-state-hf)")
 

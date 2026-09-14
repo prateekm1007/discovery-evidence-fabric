@@ -139,6 +139,109 @@ class ProviderSpec:
 # measurements; they encode the engine's default preference order and are
 # inspected in every ledger.
 PROVIDER_SPECS: List[ProviderSpec] = [
+    # ---- R457-OPERATOR-TRANSPORT: the operator's frontier ladder --------
+    # Operator directive 2026-09-15: "Use these to use free ai models
+    # like qwen 3.8, glm 5.3, deepseek, minimax etc. once tokens run out
+    # of one go to the next provider" — four aggregator credentials,
+    # registered with the probe-before-admit discipline (R455 §O.2 test
+    # a): every spec below carries its OWN measured probe evidence
+    # (R456/OPERATOR_TRANSPORT_PROBE*.json, three rounds, 2026-09-15).
+    # The ladder order IS the operator's listing (a recorded policy
+    # input, Art. XXVII — not a quality measurement): the four specs
+    # carry IDENTICAL tiers so the stable sort preserves that order;
+    # each rung's instability is gated at runtime by the probe
+    # (an interstitial/empty response classifies INVALID_RESPONSE ->
+    # PROBE_FAILED -> the ladder advances) and the self-hosted
+    # localqwen remains the terminal rung. Keys are env-injected Space
+    # secrets ONLY (R451-C2 scrub discipline) — never in the repo.
+    ProviderSpec(
+        "unorouter", "UNOROUTER_API_KEY",
+        "https://unorouter.com/v1/chat/completions",
+        "deepseek-v3-0324", "openai", 128_000,
+        quality_tier=2, cost_tier=1, latency_tier=2,
+        cost_basis="OPERATOR_FREE_TIER_DECLARED", locality="REMOTE",
+        license="proprietary aggregator serving terms (operator account)",
+        account_domain="OWNER_UNOROUTER_ACCOUNT",
+        model_revision="provider-served; revision UNDECLARED (aggregator)",
+        policy_note=(
+            "R457 operator frontier rung 1 (the operator's listed order). "
+            "MEASURED 2026-09-15: catalog 247 models (largest of the four); "
+            "one live completion PROBE_OK (qwen-sea-lion-v4-32b-it:free, "
+            "1256 ms); a follow-up completion on the same base measured "
+            "HTTP 307 redirecting to the /en WEB path and /en/v1 404s — "
+            "UNSTABLE routing (real API and web interstitials "
+            "interleave); the runtime probe gates each rung so an "
+            "interstitial classifies INVALID_RESPONSE and the ladder "
+            "advances. Pinned deepseek-v3-0324 (the operator's named "
+            "deepseek family, strongest non-reasoning workhorse in the "
+            "measured catalog; the reasoning r1 ids kept OFF the pin — "
+            "the R451 measured CoT-leak class); override with "
+            "UNOROUTER_MODEL.")),
+    ProviderSpec(
+        "xkiro", "XKIRO_API_KEY",
+        "https://xkiro.com/v1/chat/completions",
+        "qwen/qwen3.8-max:free", "openai", 128_000,
+        quality_tier=2, cost_tier=1, latency_tier=2,
+        cost_basis="OPERATOR_FREE_TIER_DECLARED", locality="REMOTE",
+        license="proprietary aggregator serving terms (operator account)",
+        account_domain="OWNER_XKIRO_ACCOUNT",
+        model_revision="provider-served; revision UNDECLARED (aggregator)",
+        policy_note=(
+            "R457 operator frontier rung 2 — the MEASURED-STABLEST of the "
+            "four: two of two completions LIVE_OK (qwen/qwen3.5-plus:free "
+            "2182 ms; the PINNED qwen/qwen3.8-max:free 2655 ms PROBE_OK); "
+            "catalog 109 models incl. the operator's named families "
+            "(qwen3.8-max, z-ai/glm-5.3-flash, deepseek-v4.1, "
+            "minimax-m3:free). The premium tier REFUSES properly "
+            "(z-ai/glm-5.3-flash -> 403 'requires an active plan') — "
+            "the :free pin is load-bearing; premium ids are NOT pinned "
+            "(a paid 403 is a wasted call, the free id is the operative "
+            "path). Override with XKIRO_MODEL.")),
+    ProviderSpec(
+        "apinex", "APINEX_API_KEY",
+        "https://apinex.bond/v1/chat/completions",
+        "free/glm-5.3-flash", "openai", 128_000,
+        quality_tier=2, cost_tier=1, latency_tier=2,
+        cost_basis="OPERATOR_FREE_TIER_DECLARED", locality="REMOTE",
+        license="proprietary aggregator serving terms (operator account)",
+        account_domain="OWNER_APINEX_ACCOUNT",
+        model_revision="provider-served; revision UNDECLARED (aggregator)",
+        policy_note=(
+            "R457 operator frontier rung 3. MEASURED 2026-09-15: catalog "
+            "26 models; the free/ class returns well-formed HTTP 200 "
+            "chat.completion bodies with content=null AND "
+            "reasoning_content=null at finish_reason=stop (measured on "
+            "free/glm-5.3-flash AND free/qwen-3.8-max) — an EMPTY-"
+            "COMPLETION defect for the engine's FIELD-line protocol; "
+            "the paid ids meter properly (glm-5.3 -> 402 insufficient "
+            "balance, confirming the free/paid split). The spec is "
+            "registered per the operator's directive and GATED: the "
+            "runtime probe classifies the null-content response "
+            "INVALID_RESPONSE -> PROBE_FAILED -> the ladder advances "
+            "(never a wasted full call after the first probe); the rung "
+            "earns traffic automatically if the provider fixes the "
+            "shape. Override with APINEX_MODEL.")),
+    ProviderSpec(
+        "bai", "BAI_API_KEY",
+        "https://b.ai/v1/chat/completions",
+        "glm-5.3", "openai", 128_000,
+        quality_tier=2, cost_tier=1, latency_tier=2,
+        cost_basis="OPERATOR_FREE_TIER_DECLARED", locality="REMOTE",
+        license="proprietary aggregator serving terms (operator account)",
+        account_domain="OWNER_BAI_ACCOUNT",
+        model_revision="provider-served; revision UNDECLARED (aggregator)",
+        policy_note=(
+            "R457 operator frontier rung 4 (the operator's directive "
+            "carried a malformed URL 'https://b.ai/:sk-...'; the apex "
+            "base measured). MEASURED 2026-09-15: catalog 47 models "
+            "incl. the operator's named families (qwen3.8-max, glm-5.3, "
+            "deepseek-v4.1, minimax-m3); ONE live completion PROBE_OK "
+            "(qwen3.8-flash, 1238 ms); follow-ups serve the WEB APP "
+            "HTML at ~30 ms — UNSTABLE (a WAF challenge interleaves "
+            "with the real API); the runtime probe gates each rung "
+            "(an HTML body classifies INVALID_RESPONSE -> the ladder "
+            "advances). Pinned glm-5.3 (the operator's named flagship, "
+            "in the measured catalog); override with BAI_MODEL.")),
     ProviderSpec(
         # R451 §1-2: the ZERO-PAID local baseline — self-hosted weights
         # (Qwen/Qwen3-1.7B, apache-2.0) served by llama.cpp llama-server

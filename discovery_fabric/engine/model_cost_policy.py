@@ -26,9 +26,30 @@ Cost-basis vocabulary (closed):
                               (llama.cpp llama-server), no per-token
                               billing of any kind — the R451 baseline
                               class (Qwen/Qwen3-1.7B, apache-2.0)
+  OPERATOR_FREE_TIER_DECLARED an aggregator account the OPERATOR
+                              supplied with an explicit free-use
+                              directive (2026-09-15: unorouter, xkiro,
+                              apinex, b.ai — "use free ai models ...
+                              once tokens run out of one go to the
+                              next provider"), MEASURED-probed at
+                              wiring (probe-before-admit), pinned to
+                              the provider's free-tier model ids where
+                              the catalog marks them. The depletion
+                              semantics are the operator's OWN
+                              directive: on a depleted/refusing rung
+                              the ladder advances to the next provider,
+                              with the self-hosted baseline as the
+                              terminal rung. A rung's measured defect
+                              (e.g. apinex's null-content free models)
+                              is recorded in its spec and gated by the
+                              runtime probe — never silently retried
+                              (Art. XXV).
   FREE_TIER_API               a provider route MEASURED free at wiring
                               time (may deplete — re-measured per run;
-                              the tokenrouter glm-5.3-free precedent)
+                              the tokenrouter glm-5.3-free precedent);
+                              stays INELIGIBLE under ZERO_PAID_COST —
+                              the operator-declared class above is the
+                              sanctioned shape of "free"
   ENVIRONMENT_GRANT           an embedding of the coding sandbox itself
                               (the z-ai CLI gateway); costs the operator
                               nothing but is NOT self-hosted weights —
@@ -41,7 +62,8 @@ Cost-basis vocabulary (closed):
 The active policy is read from ENGINE_MODEL_COST_POLICY at CALL time
 (default ZERO_PAID_COST from R451; UNRESTRICTED is the recorded
 operator escape hatch — a policy change is an operator action, never a
-coder's convenience).
+coder's convenience). The OPERATOR_FREE_TIER_DECLARED basis IS such an
+operator action, recorded in the round record R457.
 """
 from __future__ import annotations
 
@@ -54,6 +76,7 @@ POLICY_VOCAB = [ZERO_PAID_COST, UNRESTRICTED]
 
 COST_BASIS_VOCAB = [
     "ZERO_PAID_COST_SELF_HOSTED",
+    "OPERATOR_FREE_TIER_DECLARED",
     "FREE_TIER_API",
     "ENVIRONMENT_GRANT",
     "PAID_API",
@@ -61,11 +84,12 @@ COST_BASIS_VOCAB = [
 
 #: the bases eligible under each policy (closed mapping)
 _ELIGIBLE: Dict[str, List[str]] = {
-    ZERO_PAID_COST: ["ZERO_PAID_COST_SELF_HOSTED"],
+    ZERO_PAID_COST: ["ZERO_PAID_COST_SELF_HOSTED",
+                     "OPERATOR_FREE_TIER_DECLARED"],
     UNRESTRICTED: list(COST_BASIS_VOCAB),
 }
 
-COST_POLICY_VERSION = "model_cost_policy/1.0.0"
+COST_POLICY_VERSION = "model_cost_policy/1.1.0"
 
 
 def active_policy() -> str:

@@ -101,6 +101,13 @@ ACCOUNT_DOMAIN_VOCAB = (
     "OWNER_ALIBABA_ACCOUNT",
     "OWNER_DEEPSEEK_ACCOUNT",
     "OWNER_MISTRAL_ACCOUNT",
+    # R457-OPERATOR-TRANSPORT: the operator's four aggregator accounts
+    # (each its OWN account domain — the ladder's redundancy is real
+    # across accounts, the R451-C1.2 lesson applied)
+    "OWNER_UNOROUTER_ACCOUNT",
+    "OWNER_XKIRO_ACCOUNT",
+    "OWNER_APINEX_ACCOUNT",
+    "OWNER_BAI_ACCOUNT",
     "UNDECLARED",                 # honest unknown — never guessed
 )
 
