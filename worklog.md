@@ -1129,3 +1129,22 @@ Work Log:
 Stage Summary:
 - The machine no longer spends retrieval and rendering on runs that cannot produce a discovery, and no longer asserts technologies that do not exist: a no-survivor run gets one honest record and zero artifacts; a degraded-only route burns zero source calls and pauses resumably; the UI can no longer report 13 reasoning events for 1 real call; GENERATED + null-mechanism is unrepresentable. Art. LXXI: push + Space deploy + fresh-run acceptance measurements follow in this session (token provided); the round record's tuple will be finalized with the measured numbers.
 - reviewer_provenance=AI_REVIEW.
+
+---
+Task ID: R455-LEAN-1-DELETIONS (delivery closure)
+Agent: Coder 1 (main session)
+Task: Close the Art. LXXI delivery tuple for the deletion half of R455-LEAN-1
+
+Work Log:
+- ART. LXXI CHAIN: pushed 82d67625 (the deletion commit) + the deploy-driver records commits; deployed to the canonical Space through the standing pipeline (chunked foreground drivers — the sandbox reaps detached processes, the R437 precedent).
+- TWO DEPLOY ROOT CAUSES FIXED THIS ROUND (both disclosed, both pinned): (1) CONFIG_ERROR — the chunked upload clobbered the Space card frontmatter (the known first-R447-deploy failure mode); restored at Space revision 2c0babd7 and pinned in the drivers. (2) localqwen credential NOT_CONFIGURED — the plain r447 adapter used since the R446-C1 deploy omits the llama.cpp local route; this round redeployed with the R451-C1.3 production adapter, RESTORING the Space's zero-paid transport (verified HEALTHY/CONFIGURED live).
+- FRESH PRODUCTION RUN (BS-004): ts_6de17c8385bf (a genuinely fresh abrasive-slurry mechanical-seal problem) through the real public path — session create -> the R446-C1 clarification pause (one material question, answered, resumed) -> typed terminal. The run began under this session's deployment and finished under the reconciled one (see below); its terminal RUN_BLOCKED_CAPABILITY with 0 retrieval calls + 0 run-owned LLM calls is the §O.2 capability gate measured working on the public path (saved + resumable, never a scientific verdict, Art. LXI).
+- PARALLEL-ROUND DETECTION (Art. XXII/XXIII + no silent reconciliation, Art. XXVI): the live /state payload carried a §O.4 ledger-truth model_route note that does not exist in this session's tree; ls-remote showed origin/main advanced to f920fc99 — a concurrent coder session executed the audit's behavioral half (§O.1-§O.5 + §O.8 tests) explicitly rebased onto THIS deletion round, adopting archive/r455-lean/ as the one canonical archive (their duplicate dropped at the rebase; this round's bytes kept verbatim) and repairing the scripts the deletions left stranded. Local checkout realigned to f920fc99 BEFORE the closure commit after verifying 82d67625 is an ancestor.
+- RECONCILED-TREE VERIFICATION: pytest collection 3,724 tests, ZERO collection errors; the CI-invoked suites 119 passed; the behavioral half's §O.8 acceptance battery (tests/test_r455_lean1.py) 14/14; this round's KEPT_BECAUSE consumers all green at f920fc99.
+- FINAL TUPLE (live, authenticated): /api/version engine_commit f920fc99 == origin/main; constitution 2.4.0; /api/health ok=true, deployment_drift=GREEN, discovery_ready=true, showcase_ready=true, retrieval_ready=true, localqwen HEALTHY/CONFIGURED, portfolio pinned 0914755c. DELIVERY COMPLETE — the full §O directive closed as ONE reconciled round (deletion half + behavioral half).
+- Constitution v2.4.0 re-read + re-acknowledged (hash b54a1be9 == round start) before the closure commit.
+
+Stage Summary:
+- R455-LEAN-1 is closed on main as two reconciled halves executed in parallel by two coder sessions from the same baseline (7ae2027): the deadweight elimination (378 files / 134,765 py LOC archived; curated tree −43%; production closure unchanged; zero new test failures) and the behavioral fixes (survivor gate, capability-before-retrieval, ledger-truth model_route, mechanism invariant).
+- This session's independent contributions beyond the register execution: the audit's lazy-import closure defect found + disclosed (coverage_engine/alternative_ledger runtime-loaded); the local-transport regression introduced by the R446-C1 adapter choice root-caused + FIXED in production; the deploy pipeline's frontmatter + adapter selection pinned for future rounds.
+- reviewer_provenance=AI_REVIEW.
