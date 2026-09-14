@@ -27,6 +27,12 @@ import {
   type NextAction,
   type SurfaceId,
 } from "@/lib/present";
+// R454-C2 (brief §22/§25): backend events reach the conversation ONLY
+// through the product event map — machine vocabulary ("engine stage
+// SYNTHESIZE recorded at …") stays in the technical record, never in
+// the conversation (BS-009). The backend summary remains as the title
+// attribute here and in full in the journal surface.
+import { pickLiveEvent, productEventSentence } from "@/lib/productEvents";
 import { AnswerView } from "./AskBox";
 import { EpistemicBadge } from "./ScienceEvents";
 
@@ -170,9 +176,18 @@ export default function Conversation({
   const [busy, setBusy] = useState(false);
   const msgs = deriveConversation(detail, dossier, packageAvailable);
 
-  // the live line, from the run's own event record — never a guess
-  const active = [...events].reverse().find((e) => e.status === "ACTIVE");
+  // the live line, from the run's own event record — never a guess, and
+  // never machine vocabulary: the event is rendered through the product
+  // event map (brief §22). A pause is its own honest state, never
+  // rendered as active work (R436 §5B).
+  const live = pickLiveEvent(events);
+  const liveSentence = productEventSentence(live);
+  const liveSummary =
+    live && typeof live.summary === "string" ? live.summary : null;
   const paused = [...events].reverse().find((e) => e.status === "FAILED_INFRASTRUCTURE");
+  const pausedSentence = productEventSentence(paused);
+  const pausedSummary =
+    paused && typeof paused.summary === "string" ? paused.summary : null;
   const done = detail.status === "COMPLETE";
 
   async function submit() {
@@ -278,29 +293,42 @@ export default function Conversation({
         </div>
       ))}
 
-      {/* live investigation line — from the event record only */}
+      {/* live investigation line — from the event record only, in
+          product language (brief §22); the backend summary rides the
+          title attribute for transparency and lives in full in the
+          technical record (§15) */}
       {!done && (
         <div className="conv-row" data-conv-live-block>
-          {paused && !active && (
-            <div className="conv-live paused" data-conv-paused>
-              Paused — infrastructure: {paused.summary}
+          {paused && !liveSentence.loading && pausedSentence.text && (
+            <div className="conv-live paused" data-conv-paused title={pausedSummary ?? undefined}>
+              {pausedSentence.text}
             </div>
           )}
-          {active && (
-            <div className="conv-live" data-conv-active>
+          {liveSentence.loading && liveSentence.text && (
+            <div className="conv-live" data-conv-active title={liveSummary ?? undefined}>
               <span className="cursor" aria-hidden="true" />
-              {active.summary}
-              <EpistemicBadge cls={active.epistemic_class} />
+              {liveSentence.text}
+              {live && typeof live.epistemic_class === "string" && (
+                <EpistemicBadge cls={live.epistemic_class} />
+              )}
             </div>
           )}
           {events.length > 0 && (
             <div className="conv-events faint" data-conv-events>
-              {events.slice(-4).map((e) => (
-                <div className="conv-event" key={e.event_id}>
-                  <span className={`scdot sc-${(e.status || "unknown").toLowerCase()}`} aria-hidden="true" />
-                  {e.summary}
-                </div>
-              ))}
+              {events.slice(-4).map((e) => {
+                const s = productEventSentence(e);
+                if (!s.text) return null;
+                return (
+                  <div
+                    className="conv-event"
+                    key={e.event_id}
+                    title={e.summary}
+                  >
+                    <span className={`scdot sc-${(e.status || "unknown").toLowerCase()}`} aria-hidden="true" />
+                    {s.text}
+                  </div>
+                );
+              })}
             </div>
           )}
         </div>

@@ -1,183 +1,126 @@
 # CODER2_CLAUDE_CLASS_UI_AUDIT.md
 
-**Round:** R453-C2 — TOSCANINI CLAUDE-CLASS UI RECONSTRUCTION
-**Agent:** Coder 2 (visual specialist / truth presentation)
-**Branch:** `r453-c2/claude-class-ui` (from `09b44c5`, the R451-C2 tip)
-**Constitution:** v2.4.0 read IN FULL at round start (hash `b54a1be9…` verified); governance five files + ACTIVE_PATH.md read in full; Constitution re-read before the final commit.
+**Round:** R454-C2 — CODER 2: CLAUDE-CLASS CONVERSATIONAL UI (the 28-chapter briefing)
+**Agent:** Coder 2 (conversational product surface / truth presentation)
+**Base:** the R453-C2 Claude-class reconstruction (merged at `8d019f3`, deployed, acceptance-verified — its 16-section audit lives in git history and the R453-C2 worklog entries)
+**Constitution:** v2.4.0 read IN FULL at round start (hash `b54a1be9…` verified); the five GOVERNANCE files + `ACTIVE_PATH.md` read in full; Constitution re-read immediately before the final commit.
 **reviewer_provenance:** AI_REVIEW
 
 ---
 
 ## 0. Mission compliance summary
 
-The website was transformed from a stage-and-report engineering surface into a
-**conversation-first discovery interface**: one conversation → one discovery,
-with a contextual workspace for substantial output and a canonical-state
-presentation layer (`lib/present.ts`) that every state sentence flows through.
-No new backend, model, provider, retrieval system, database, or scientific
-algorithm was added (brief §43). Zero new npm dependencies. The engine job API
-is unchanged; the frontend remains a projection (Art. X).
+The product surface is a **calm conversational discovery engine with
+progressive disclosure**: one conversation → one discovery, a contextual
+workspace for substantial output, and one primary package action. The
+R453-C2 reconstruction established that shape; this round (R454-C2) closes
+the 28-chapter briefing's remaining deltas and produces its four
+deliverables. No new backend machinery was built (brief §27 held); the
+frontend remains a projection of canonical state (Art. X).
 
----
+**This round's changes (all presentation-layer):**
 
-## 1. Current UI problems (audit at round start)
+| # | Change | Brief | File(s) |
+|---|---|---|---|
+| 1 | **The product event map** — backend science events reach the conversation ONLY through one pure mapping into first-person human sentences; machine summaries ("engine stage SYNTHESIZE recorded at …") stay in the technical record | §22, §25 | `lib/productEvents.ts` (NEW), `components/Conversation.tsx` |
+| 2 | **Unknown geometry represented in the conversation** — terminal runs with no established geometry carry the honest sentence instead of silence | §13 | `lib/present.ts` |
+| 3 | **Blocked runs never auto-open the workspace** — the stale-positive suppression extends to the auto-open; one action (Resume) | §14 | `app/page.tsx` |
+| 4 | Brand wordmark nowrap at 390px | §18 | `app/globals.css` |
 
-| # | Problem | Evidence at audit | Severity |
-|---|---------|-------------------|----------|
-| P1 | **The run view was a report, not a conversation.** The user watched a stage + collapsible report; progress was pipeline-shaped (gauntlet cards + 13-stage sentence blocks visible on the primary surface). | `TechStage.tsx` layout: hero + 4 insight cards + journal below | High |
-| P2 | **Navigation exposed machinery-shaped IA.** Sidebar = "Your runs" + "Released inventions — proof the engine produces technology packages" (internal narrative in nav copy). | `HistoryRail.tsx` | Medium |
-| P3 | **The pipeline leaked as decoration**: home story strip `DISCOVER ↓ INVENT ↓ INSPECT ↓ CHALLENGE ↓ REBUILD ↓ EXPERIMENT`. | `page.tsx::STORY_STEPS` | Medium |
-| P4 | **Ask was buried** in the deep layer (`DeepDive` section 8); the product's conversational follow-up was hidden behind a disclosure click. | `DeepDive.tsx` SECTIONS | High |
-| P5 | **Three equally weighted actions** (Test this / Compare generations / Download package) — no single next-best-action recommendation. | `TechStage.tsx` stage-actions | Medium |
-| P6 | **No contextual workspace.** Substantial outputs (model, evidence ledger, package) lived in one long inline scroll instead of a dedicated surface beside the conversation. | R435 single-column layout | High |
-| P7 | **Honest loading gaps**: engine-unreachable during a run poll rendered a silent eternal "Loading investigation…" (BS-018 class: stale user-visible state). | `page.tsx` poll (pre-existing since R395) | Medium |
-| P8 | Deep-dive section IDs (`journal/summary/model/…`) were the only access path to evidence/engineering/experiment/package — mobile required endless scrolling. | `DeepDive.tsx` | Medium |
+## 1. The 28-chapter compliance matrix
 
-## 2. Components deleted (Art. LXIV dispositions)
+| § | Requirement | Status | Evidence |
+|---|---|---|---|
+| 1 | No dashboard thinking (no gates/stages/counters/JSON/worker states as UX) | DONE (R453-C2) + re-verified | served-bundle machine-vocab scan (R453-C2 acceptance §B) + every DOM state's `no_machine_vocab` check |
+| 2 | Home = DISCOVER. INVENT. ANYTHING. + one composer; text/files/URLs; no pre-classification | DONE + honest ingestion note | `app/page.tsx` NewDiscoveryPane; PDF/CAD/image ingestion named as a Coder-1 contract (§16.1 debt, below) |
+| 3 | One conversation as the primary application | DONE | `Conversation.tsx`; the run view IS the conversation |
+| 4 | Progressive disclosure (Investigating → found 18 sources → mechanisms → survivors) | DONE | `present.ts::deriveConversation` arc; §4 of the R453-C2 audit |
+| 5 | Never hide epistemic state; human language == canonical truth | DONE | epi meta chips (FOUND/INFERRED/HYPOTHESIS/TESTED/UNKNOWN); five retrieval states; geometry/attack vocabularies |
+| 6 | Right-side contextual workspace; conversation stays available; not every message is a card | DONE | `Workspace.tsx` (overview/model/evidence/engineering/experiment/package/journal); auto-open once, desktop only |
+| 7 | Evidence surface: counts first, inspectable provenance behind "View evidence" | DONE + Coder-1 contract | evidence card ("18 relevant sources · 14 shaped the design") → EvidenceSection (source/claim/date/provenance); support/conflict/unresolved split needs a Coder-1 field (§16 below) |
+| 8 | Mechanism surface (Observation → Mechanism → Expected effect → Design lever) without raw objects | DONE | conversation mechanism lines + overview/model surfaces reading canonical projections |
+| 9 | Candidate surface answers what/why/evidence/attacks/uncertain | DONE | `CandidateView` (label, intervention, mechanism, why, whatChanged, risk/kill, attack state) |
+| 10 | Attack surface in scientific language; never a bare green/red badge | DONE | `attackSentence` — CONTESTED escalation preserved; NOT_RUN explicit; challenge lines quoted |
+| 11 | Error semantics non-negotiable (provider ≠ candidate failed; retrieval failed ≠ no evidence; not-run ≠ survived) | DONE + pinned | Tests B/C/D/F (16/16) + DOM states 3/7/8 |
+| 12 | Retrieval-state UI: PENDING/NOT_REACHED/RETRIEVED_ZERO/RETRIEVED_POSITIVE/FAILED distinct | DONE | `deriveRetrievalState` (GATHERED+0 splits to RETRIEVED_ZERO; FAILED never absence) |
+| 13 | Unknown geometry ("not yet established", never "unavailable"/"complete") | **CLOSED THIS ROUND** | conversation note (terminal runs) + workspace model surface; Test E + new §13 pins |
+| 14 | Stale-positive attack fixture (BLOCKED + old COMPLETED + visual + engineering) | **STRENGTHENED THIS ROUND** | Test B (unit, 16/16) + DOM state 10 (desktop + mobile): zero stale positives; workspace auto-open now suppressed on blocked runs |
+| 15 | Raw IDs under Technical details | DONE | journal surface ("Show the technical record"); event summaries ride `title` + journal; Settings shows engine identity only |
+| 16 | Technology result: calm summary + ONE package action | DONE | positive outcome + single "Download the technology package"; §16 structure on the surfaces |
+| 17 | Never call everything an invention (no presentation upgrade) | DONE | epi meta never upgraded client-side; maturity from the record; conceptual ≠ engineering vocabulary (R452 B2/B3 pins re-run ALL PASS) |
+| 18 | Mobile-first (header/conversation/workspace/composer; sheets) | DONE + improved | mobile captures ×12 at 390px; brand nowrap fix; bottom-sheet workspace |
+| 19 | Desktop 3-pane (nav / conversation / current artifact) | DONE | ≥1181px grid; captures ×12 at 1440px |
+| 20 | Presentation deadweight audited (KEEP/MERGE/CONDITIONAL/DELETE; no scientific information deleted) | DONE (R453-C2 §2–4) + re-run | TechStage/HistoryRail/DeepDive deletions stand; the R451/R452 pin battery re-ran ALL PASS on the surviving surfaces |
+| 21 | CanonicalState → PresentationState (one canonical mapping) | DONE + extended | `lib/present.ts` composes `presentationState.ts` + `renderAvailability.ts`; NEW: events via `productEvents.ts`; machine-readable twin: `CODER2_UI_STATE_MAP.json` (12 maps) |
+| 22 | Conversation event rendering (MECHANISM_FOUND → human; BLOCKED_PROVIDER → "not been rejected") | **CLOSED THIS ROUND** | `lib/productEvents.ts`; `CODER2_PRODUCT_EVENT_MAP.json`; DOM states 1/8/10 show the mapped sentences |
+| 23 | Never fake thinking (no animated reasoning, no chain-of-thought; task progress from records) | DONE | the cursor is the only animation; every line derives from a persisted event/record; no CoT anywhere |
+| 24 | Empty state ("Start a discovery…", never "No records found") | DONE | sidebar empty states are conversational; home composer is the empty state |
+| 25 | Loading states are meaningful actions (§25 register) | **CLOSED THIS ROUND** | event-mapped live lines: "Investigating evidence…", "Comparing mechanisms…", "Challenging the leading candidate…", "Designing the decisive experiment…" |
+| 26 | Required visual tests (12 states × desktop + mobile) | **DELIVERED THIS ROUND** | `CODER2_VISUAL_REGRESSION_REPORT.md` — 12/12 DOM-verified, 24 captures |
+| 27 | No new backend machinery; smallest contracts for Coder 1 | HELD | zero engine/Python files changed; three Coder-1 contracts documented (below) |
+| 28 | The four deliverables | DELIVERED | this file + `CODER2_UI_STATE_MAP.json` + `CODER2_PRODUCT_EVENT_MAP.json` + `CODER2_VISUAL_REGRESSION_REPORT.md` |
 
-| Deleted | Superseded by | Disposition |
-|---|---|---|
-| `components/TechStage.tsx` (601 lines) | `Conversation.tsx` + `Workspace.tsx` | DELETED — the stage+report layout is superseded; the hero viewer moved into the workspace's model surface; git history preserves the file |
-| `components/HistoryRail.tsx` (131 lines) | `components/Sidebar.tsx` | DELETED — replaced by the new IA navigation |
-| `components/DeepDive.tsx` (357 lines) | `Workspace.tsx` surfaces | DELETED — its sections render inside the workspace; no second deep layer |
-| Home story strip (`STORY_STEPS`) | 4 lightweight suggestion chips + composer hints | DELETED — pipeline-as-decoration (P3) |
+## 2. Current UI deadweight (28-chapter audit at round start)
 
-No superseded implementation was left coexisting (Art. LXIV.1: `DELETED`, recorded here; verification: `rg -l "TechStage|HistoryRail|DeepDive"` shows no code imports, comments only).
+The R453-C2 deletion set stands (TechStage, HistoryRail, DeepDive, the home
+story strip — Art. LXIV dispositions in git). This round's deadweight scan
+of the surviving surface found one class: **machine-voiced event summaries
+in the conversation's live area** (the journal's own sentences rendered as
+chat). That was presentation deadweight in the human layer — closed by the
+product event map; the raw sentences remain exactly where they belong
+(journal surface, `title` attributes). No card/badge/icon/metric in the
+remaining surface failed the keep/merge/delete scan; nothing scientific was
+deleted this round.
 
-## 3. Components merged
+## 3. Deleted / merged / kept (delta this round)
 
-- **AskBox's `AnswerView` → Conversation**: one answer renderer now serves both the run conversation and the invention ask (exported from `AskBox.tsx`; honest refusal vocabulary identical everywhere).
-- **TechStage's insight cards → conversation messages**: "What changed / Why it works / What supports it / What could kill it" became the evidence/candidates/attack/outcome message arc derived in `present.ts`.
-- **DeepDive sections → Workspace surfaces**: identical section components (`DossierSections.tsx`, `RunNarrative`) reused unchanged — no second renderer, no drift.
-- **Hero honest states (R436/R446 vocabulary) → Workspace model surface**: `renderAvailabilityNotice` sentences moved to `present.ts::renderAvailabilitySentence` (single owner); `DossierSections` delegates.
+- **Deleted:** nothing (no superseded implementation was created; the event map REPLACES the raw-summary rendering in place — the superseded rendering path leaves no code behind).
+- **Merged:** the conversation's live line and the event feed now speak through ONE function (`productEventSentence`) — previously two raw-summary paths.
+- **Kept:** every DossierSections/RunNarrative/ScienceEvents surface (the journal intentionally keeps the raw summaries — brief §15).
 
-## 4. Components retained (audit verdict: ESSENTIAL / USEFUL)
-
-- `ModelViewer` (the ONE 3D viewer; Article LXXII presentation-only), `DossierSections.tsx` (canonical projections), `RunNarrative.tsx` (the journal + `isTerminal`), `ScienceEvents.tsx` (epistemic badges — never upgraded), `AskBox.tsx` (invention mode), `InventionStage.tsx` (released-package view), `InventionArtifact.tsx`, `InventionStory.tsx`, `InventionEssay.tsx`, `EngineeringArgument.tsx`, `RealityLoopPanel.tsx`, `ModelViewer.tsx`.
-- The transport dot + calm engine status text (honest health, never panic).
-- The Visual Quality Gate badge (Art. LXXII compliance receipt) — retained, moved with the model surface.
-- `/run` and `/showcase` redirect routes (old links keep working).
-
-## 5. New information architecture (brief §5)
+## 4. Information hierarchy (unchanged shape, cleaner voice)
 
 ```text
-SIDEBAR                MAIN                      RIGHT (contextual, when useful)
-New Discovery          The conversation          model · evidence · engineering
-Discoveries            (or the composer          experiment · package · overview
-Technology Packages     on the home screen)      · journal (technical record)
-Projects (honest empty state — the backend
-Settings (engine identity, honest)  grouping contract does not exist yet)
+HOME        brand statement → one composer → 4 suggestions
+CONVERSATION user problem → progress in first person → evidence →
+             candidates → attack → model/package cards → outcome →
+             ONE next action → follow-up asks
+WORKSPACE   model · evidence · engineering · experiment · package ·
+             overview · journal (technical record, raw provenance)
+SIDEBAR     New Discovery · Discoveries · Technology Packages ·
+             Projects (honest empty) · Settings (engine identity)
 ```
 
-Not 15 destinations; the pipeline is not navigation. Discoveries are states of
-one discovery rendered as conversation. The right panel appears when a
-substantial output exists (auto-open on desktop ≥1181px when a hero or package
-exists; always user-openable from artifact cards; Escape/click closes). On
-mobile it is a bottom sheet.
+## 5. Error / unknown / blocked vocabulary (unchanged contracts, now event-aware)
 
-## 6. New discovery flow
+The §10 table of the R453-C2 audit stands verbatim (Test C/D/E/F pins).
+This round extends the same discipline to the EVENT layer: an
+infrastructure event sentence never names a scientific verdict and a
+completed attack stage never announces survival (`test:events` G2/G3).
 
-1. **Home** = `DISCOVER. INVENT. ANYTHING.` + **What do you want to discover?** + one dominant composer (+ Attach for text files; URLs/specs/constraints typed or pasted naturally) + four suggestion chips. No dashboard wall, no KPI cards, no pipeline diagram.
-2. **Start** = one interaction (Enter or the button); the engine infers domain/mechanism space; the user never fills a form first (a typed "not-ingestable" note names PDF/CAD honestly).
-3. **Conversation** (derived in `lib/present.ts::deriveConversation`): user problem → opening → evidence (five canonical retrieval states, §10 below) → candidate mechanisms as competing hypotheses (label / why it might work / risk / attack status) → the attack ("now I'm trying to prove this wrong") → artifact cards (model/package) → outcome with ONE next-best action → follow-up asks answered from the record with honest refusals.
-4. **Workspace** opens contextually for substantial output; the conversation stays available.
-5. **Terminal** = honest outcome (positive / development / rejected / unknown / blocked) + single recommendation; "Show the technical record" opens the full journal (RunNarrative, engineering argument, essay, novelty/cemetery, gauntlet, event history with per-event provenance).
+## 6. Adversarial evidence summary
 
-## 7. Mobile design
-
-- Base CSS = phone: single column, conversation primary; composer sticky; sidebar behind ☰ (fixed drawer + backdrop, pre-existing pattern); workspace = bottom sheet (max-height 78vh, drag-handle bar, Escape/close button).
-- Fixed during this round: the panel grid rule previously leaked `268px …` columns into mobile (conversation squeezed to ~120px) — the 3-column grid now exists ONLY inside `@media (min-width: 1181px)`; verified at 390px (iPhone 14) that `[data-ws-main]` occupies the full width and the sheet opens over the conversation.
-- No dashboards crammed onto mobile; cards cap at 100% width; horizontal overflow defenses (pre-existing R393 wrap rules) retained.
-
-## 8. Desktop design
-
-- ≥1181px: persistent sidebar (268px) + conversation (max 720px measure, centered) + contextual workspace column (400–520px, sticky, independently scrollable).
-- ≥880px <1181px: sidebar collapses to drawer; workspace becomes the sheet.
-- The right panel appears **when useful** (auto-open once per run when a hero or package exists) — never permanently occupying the screen.
-
-## 9. Canonical-state mapping (summary — machine-readable twin in `CODER2_UI_STATE_MAP.json`)
-
-The frontend reads ONLY: `/api/run/{id}/result` (+embedded `run_state`, `user_state_view`), `/events`, `/dossier`, `/cio`, `/health`, `/sessions`, `/showcase`. **All presentation sentences are derived in `lib/present.ts`** — components render, never re-derive (Art. X; auditor principle 7). Key derivations: `deriveRetrievalState`, `deriveGeometryState`, `deriveAttackState`, `deriveCandidates`, `deriveNextAction`, `deriveConversation`, `suppressStalePositives`, `renderAvailabilitySentence`. Vocabulary ground truth: `toscanini/run_state.py` (evidence/attack/physics states), `toscanini/user_state.py` (user-facing keys), `CIO` maturity ladder (the UI cannot upgrade epistemic state; "invented/engineered/validated" wording never precedes canonical state — brief §26).
-
-## 10. Error / unknown / blocked mapping (briefs §18, §28, §29; Art. XXV/LXI)
-
-| Canonical state | User-facing sentence (verbatim source: `present.ts`) | Forbidden render |
+| Layer | Battery | Result |
 |---|---|---|
-| retrieval `PENDING` | "Evidence retrieval is in progress — I'm searching the indexed sources now." | "No evidence found" |
-| retrieval `NOT_REACHED` | "The evidence stage was not reached… never began… not a finding about the problem." | "No evidence exists" |
-| retrieval `GATHERED, 0` | "…returned no matching records. …not evidence that the concept is novel…" | "Nothing is known about this" |
-| retrieval `FAILED` | "Evidence retrieval failed — infrastructure state, not evidence of absence…" | "No evidence exists" / rejection |
-| geometry `NOT_ESTABLISHED` | "Engineering geometry is not established on this run…" | "Engineering unavailable" |
-| geometry `UNAVAILABLE` | "Engineering geometry exists on this run; the visual rendering is unavailable right now…" | "Engineering failed" |
-| renders `RENDER_SKIPPED_LOW_MEMORY` | "Engineering geometry available; visual rendering unavailable at current deployment capacity." | "rendering failed" / "visualization complete" |
-| attack `NOT_RUN` | "The adversarial test has not been completed. Nothing is claimed either way…" | "Survived attack" |
-| attack escalation (uncalibrated) | CONTESTED — "objection is preserved and escalated… not a verdict, and not a pass" | silent KILL or PASS |
-| `RUN_BLOCKED_TRANSPORT` / `INTERRUPTED` / `ERROR*` | "Current run blocked" / "Run interrupted" — "infrastructure state, never a scientific result" + Resume | "The invention failed" |
-| engine unreachable (browser) | "The discovery service is not responding right now. Your runs are persisted… nothing about any discovery outcome is implied by this." | eternal silent spinner |
-| ask `NOT_IN_RECORD` / `REFUSED_OVERCLAIM` / `TRANSPORT_ERROR` | first-class honest answers (shared AnswerView) | fabricated answers |
+| Unit (state honesty) | `npm run test:present` | 16/16 PASS (14 prior + 2 new §13 pins incl. the rejection metamorphic) |
+| Unit (event map) | `npm run test:events` | 12/12 PASS (G1 machine-vocab ban + metamorphic, G2 ×3, G3, G4 ×2, G5 ×3, closed vocabulary) |
+| Regression (R451/R452 pins) | `node scripts/r451_c2_ui_tests.mjs` | ALL PASS |
+| Build | `next build` | GREEN (all routes prerendered) |
+| DOM (real browser, real build) | 12 states × desktop+mobile | 12/12 PASS (`DOM_VERIFICATION.json`) |
 
-## 11. Adversarial UI tests (brief §40)
+## 7. Production URL and deployed SHA (Art. LXXI)
 
-`TOSCANINI_UI/webapp/tests/adversarial_present.test.mjs` — 14 tests, **14 PASS** (`npm run test:present`; compiles the React-free core with the repo's own `tsc`, runs `node --test`). The six required fixtures, all pinned as executable assertions:
+- Production URL: `https://prateekm1-toscanini-prod-validation.hf.space` (the single canonical HF Space, R447-SPACE-OWNER)
+- Deployed SHA at round start: `8d019f3` (the R453-C2 reconstruction; identity verified 8/8 in R453-C2 acceptance)
+- This round's commit: recorded in the worklog; the Art. LXXI deploy tuple (push → deploy → `/api/version` + `/api/health` identity) closes in the round record — a commit that exists only locally is UNRELEASED and is named as such until the tuple is green.
 
-- **Test A** `candidate=REJECTED, visual=complete` → outcome tone `rejected`, label "Rejected"; package artifact impossible; no package next-action.
-- **Test B** `run=BLOCKED_TRANSPORT + stale COMPLETED_CANDIDATE + visual_complete + ENGINEERING(+package.complete)` → conversation renders "Current run blocked" + Resume; **zero candidate cards, zero artifact cards**; `suppressStalePositives` gates every positive surface; metamorphic variant: suppression holds with the outcome field missing; a second metamorphic pins that the blocked label is derived from CURRENT status, never the stale `user_state_view.label` (this exact bug was caught by the test and fixed).
-- **Test C** `retrieval=PENDING` → "in progress", never "not found".
-- **Test D** `retrieval=FAILED` → "failed… not evidence of absence"; siblings pin `RETRIEVED_ZERO` (query-scoped, never novelty) and `NOT_REACHED` (never a finding).
-- **Test E** `geometry=UNKNOWN` → "not established" ≠ `UNAVAILABLE`'s sentence; sibling: conceptual never claims engineering geometry.
-- **Test F** `attack=NOT_RUN` → "has not been completed", never "survived"; metamorphic: escalated objection = CONTESTED, never silently survived.
-- Positive control: complete run with package → evidence card + candidates + SURVIVED + package artifact + "Download the technology package" next action.
-- Next-action ladder + epistemic-meta (FOUND/INFERRED/HYPOTHESIS/TESTED/UNKNOWN) mappings pinned.
+## 8. Remaining UX debt / smallest Coder-1 contracts (brief §27)
 
-**Browser-level verification (fresh production build via `next start` + agent-browser, fresh context):**
-- Home renders composer-first (brief §6/§45: brand, one composer, 4 suggestions; no pipeline UI) — desktop and 390px mobile screenshots captured.
-- Suggestion click fills the composer; Enter starts.
-- Test B fixture injected at the network layer → the REAL UI rendered "Current run blocked" with `data-conv-candidate` count = 0 and artifact count = 0 despite the stale positives (DOM-verified) + "Resume the investigation" button present.
-- Positive-control fixture → full arc rendered (evidence card "18 relevant sources", INVENTION 01 card with "survived attack" chip, attack sentence, outcome + single next action, package artifact card) and the workspace auto-opened on the package surface (desktop).
-- Engine-unreachable → the honest "discovery service is not responding" state (new this round; found by probing the fresh user path — BS-018 class fixed).
-- Mobile: `[data-ws-main]` = 374/390px full width; bottom sheet opens on artifact tap (`ws-panel open`).
-- Zero page errors observed across all probes.
-
-## 12. Visual regression results
-
-- `next build` **GREEN** (Next 15.4.5, all routes prerendered; type check + lint pass).
-- `npm run test:present`: **14/14 PASS**.
-- Presentation-layer compilation is part of the test script (`tsc --strict`): **GREEN**.
-- Pre-existing engine-side batteries untouched (no Python changed this round — zero engine files modified).
-- Manual visual regression of retained surfaces (hero honest states, gate badge, dossier sections, RunNarrative, invention view): component code unchanged; layout containers changed only as described in §3/§5.
-- Screenshots captured (fresh browser): home desktop, home mobile, positive-control desktop with workspace, Test-B blocked conversation, mobile bottom sheet. (Paths in the round worklog; not committed to the repo.)
-
-## 13. Before / after
-
-**Before** (audit state): run page = stage hero + 4 insight cards + 3 equal buttons + pipeline-shaped journal + 8-section collapsible report; sidebar = "Your runs / Released inventions — proof the engine produces technology packages"; home = brand + composer + pipeline story strip; ask buried in deep layer.
-
-**After**: run page = conversation (user → evidence → candidates → attack → outcome → next action → asks) with contextual right workspace; sidebar = New Discovery / Discoveries / Technology Packages / Projects (honest empty) / Settings; home = brand + one composer + 4 suggestions + attach; composer doubles as the follow-up ask box inside the conversation. The pipeline is visible as a story, not as machinery.
-
-## 14. Production URL
-
-`https://prateekm1-toscanini-prod-validation.hf.space` (the single canonical HF Space, R447-SPACE-OWNER). **This round's build is NOT yet deployed** — see §15.
-
-## 15. Exact deployed commit — Art. LXXI delivery tuple
-
-```json
-{
-  "target_sha": "THIS COMMIT (branch r453-c2/claude-class-ui; SHA recorded in the round worklog)",
-  "pushed_to_origin_main": false,
-  "deployed_sha": null,
-  "health_check_result": "BLOCKED",
-  "drift": "UNKNOWN",
-  "blocked_by": "no GitHub credentials in this session environment (ls-remote fails; Art. XXII/XXIII live-remote verification impossible; the R451-C2 credential blocker persists, escalation count now 2 consecutive Coder-2 rounds)",
-  "what_unblocks": "operator injects GitHub PAT (env-only per R451-C2 policy) so the branch can be pushed/merged to origin/main and the records-alignment Space deploy can serve it; then re-run /api/version + /api/health identity verification per Art. LXXI"
-}
-```
-
-Per Art. LXXI Section 1/4 this round record declares **DELIVERY_BLOCKED**: the reconstruction is complete, tested, and production-built in the workspace, but a commit that exists only in a local workspace is UNRELEASED. Honest blocking is correct behavior; the blocker is named with its operator action. (The operator is ALSO reminded: rotation of the two long-lived credentials exposed in history, escalated since R451-C2, remains outstanding.)
-
-## 16. Remaining UX debt (documented, not worked around — brief §43)
-
-1. **File/URL ingestion contract (needs Coder 1):** the composer accepts text files client-side today; PDF/CAD/image ingestion needs the smallest engine contract — `POST /api/run` accepting multipart or an attachments array with typed refs + provenance custody. The UI note names this honestly; no fake upload path exists.
-2. **Projects need a backend grouping contract** (`session.group_id` or a projects table + API). The sidebar Projects entry renders an honest empty state until then.
-3. **Conversational follow-up mid-run**: `/ask` honestly refuses while a run is active; a queued-questions contract (ask → answered on completion) would make the composer fully conversational during runs. Current refusal wording explains this.
-4. **Invention (showcase) view** keeps its R435 stage layout; migrating it into the conversation+workspace shell is straightforward follow-up work (its deep layer already reuses the same sections).
-5. **Streaming conversation updates**: the conversation currently re-derives on poll/SSE events (5s cadence + SSE append); per-message incremental streaming (event → message diff) would remove the visible step-jumps on slow links.
-6. **i18n**: operational language is English-only per Art. LXX; user-input languages are untouched by the UI.
+1. **File/URL ingestion** — `POST /api/run` multipart or an attachments array with typed refs + provenance custody (the composer honestly names the gap today).
+2. **Evidence relationship counts** (§7's "14 support / 3 conflict / 1 unresolved") — the ledger carries per-record `used_in_design` but not a relationship-to-mechanism classification; smallest contract: per-record `relationship: SUPPORTS|CONFLICTS_WITH|UNRESOLVED` on the evidence tab, derived by the existing verification stage — the UI renders the split only when the record carries it.
+3. **Per-candidate challenge events** + **reality-loop conversation events** (`candidate.challenge`, `reality.observed`, `candidate.mutated`) — enumerated with exact field shapes in `CODER2_PRODUCT_EVENT_MAP.json` §coder1_contracts.
+4. **Projects grouping contract** (sidebar stays an honest empty state).
+5. **Mid-run asks** — queued-questions contract (the honest refusal stands today).
+6. **Invention (showcase) view** keeps its R435 layout (documented debt).
+7. **Streaming conversation updates** — per-message incremental streaming to remove poll-step jumps.
+8. **Standing operator item** — rotation of the two long-lived credentials exposed in history (escalated since R451-C2; not re-pestered, kept on the record).

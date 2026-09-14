@@ -552,7 +552,10 @@ export function deriveConversation(
     });
   }
 
-  // 6 — the artifact (the model) — honest geometry states (Test E)
+  // 6 — the artifact (the model) — honest geometry states (Test E).
+  // When the run is terminal and NO geometry was established, the
+  // unknown is REPRESENTED in the conversation (brief §13) — never
+  // silently read as "unavailable" or as "complete".
   const geometry = deriveGeometryState(detail, dossier);
   if (
     geometry === "ENGINEERING" ||
@@ -568,6 +571,14 @@ export function deriveConversation(
       title: "The technology model",
       body: geometrySentence(geometry, dossier),
       cta: "Open the model",
+    });
+  } else if (!running && geometry === "UNKNOWN" && !isRejectedOutcome(detail)) {
+    // a rejection stays the terminal word (Test A) — no geometry noise
+    msgs.push({
+      kind: "note",
+      id: mid("g"),
+      epi: "UNKNOWN",
+      text: geometrySentence("UNKNOWN", dossier),
     });
   }
 

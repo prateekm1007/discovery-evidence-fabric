@@ -60,6 +60,7 @@ import type {
   ShowcaseRow,
 } from "@/lib/types";
 import type { NextAction, SurfaceId } from "@/lib/present";
+import { suppressStalePositives } from "@/lib/present";
 import Sidebar from "@/components/Sidebar";
 import Conversation from "@/components/Conversation";
 import Workspace from "@/components/Workspace";
@@ -467,9 +468,12 @@ function WorkspaceInner() {
   }, [slot]);
 
   // ---- auto-open the workspace when a substantial output exists ----
-  // (desktop only; the conversation stays primary on mobile)
+  // (desktop only; the conversation stays primary on mobile). A blocked
+  // run NEVER auto-opens a surface: stale-positive presentation stays
+  // suppressed (brief §14 / Test B — the Resume CTA is the one action).
   useEffect(() => {
     if (!runId || !detail || !isTerminal(detail.status)) return;
+    if (suppressStalePositives(detail)) return;
     if (autoOpened.current === runId) return;
     if (!window.matchMedia("(min-width: 1181px)").matches) return;
     const design = dossier?.tabs?.design as

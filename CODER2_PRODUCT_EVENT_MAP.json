@@ -1,0 +1,155 @@
+{
+  "artifact": "CODER2_PRODUCT_EVENT_MAP.json",
+  "round": "R454-C2",
+  "brief_section": "28 (deliverable); implements 22 (conversation event rendering) + 25 (loading states)",
+  "reviewer_provenance": "AI_REVIEW",
+  "purpose": "Map backend science events into human conversation language. One mapping, enforced in code (TOSCANINI_UI/webapp/lib/productEvents.ts), pinned by executable tests (tests/adversarial_product_events.test.mjs, 12/12). The frontend never renders the backend's machine summary as conversation (BS-009); the summary is preserved as technical detail (brief 15) via the title attribute and the journal surface.",
+  "ground_truth": {
+    "backend_event_writer": "toscanini/event_journal.py",
+    "backend_event_vocabulary": {
+      "kinds": [
+        "problem.extract",
+        "evidence.retrieval_started",
+        "evidence.retrieved",
+        "evidence.retrieval_failed",
+        "evidence.bound",
+        "stage.{STAGE} (STAGE in: RETRIEVE, FREEZE, PREMISE_GATE, SYNTHESIZE, VERIFY, MULTI_SOURCE_DISCOVERY, COLLISION, PHYSICS, ATTACK, CONTRADICTION, KILLER_EXPERIMENT, ADJUDICATION, CLASSIFY, NEXT_BEST_ACTION, RANK)",
+        "geometry.created",
+        "package.completed",
+        "investigation.terminal"
+      ],
+      "statuses": ["QUEUED", "ACTIVE", "COMPLETED", "BLOCKED", "FAILED_INFRASTRUCTURE", "FAILED_SCIENTIFIC", "UNKNOWN"],
+      "epistemic_classes": ["RETRIEVED", "INFERRED", "HYPOTHESIZED", "COMPUTED", "ENGINEERING_DEFINED", "PHYSICALLY_OBSERVED", "UNKNOWN"],
+      "transport": "/api/run/{id}/stream (SSE 'science' frames) + /api/run/{id}/events (merged journal + investigation projection, deduplicated by event_id)"
+    },
+    "frontend_map_implementation": "TOSCANINI_UI/webapp/lib/productEvents.ts::productEventSentence",
+    "frontend_consumers": [
+      "components/Conversation.tsx (live line + last-4 event feed; backend summary rides title)",
+      "components/ScienceEvents.tsx (journal surface keeps the raw summary under Technical details - brief 15)"
+    ],
+    "executable_evidence": "TOSCANINI_UI/webapp/tests/adversarial_product_events.test.mjs (12/12 PASS; npm run test:events)"
+  },
+  "mapping": {
+    "problem.extract|ACTIVE": {
+      "conversation": "I'm reading your problem — extracting what it claims, what it assumes, and what would count as success.",
+      "loading": true,
+      "brief_25_register": "meaningful action, not telemetry"
+    },
+    "problem.extract|COMPLETED": {
+      "conversation": "The problem is framed — the investigation works from your own words.",
+      "loading": false
+    },
+    "evidence.retrieval_started|ACTIVE": {
+      "conversation": "Investigating evidence — I'm searching the indexed sources now.",
+      "loading": true,
+      "brief_25_example": "Investigating evidence…"
+    },
+    "evidence.retrieved|COMPLETED": {
+      "conversation": "Evidence came in from {source} — {count} records. (structured source/count fields used when the event carries them; otherwise a generic honest sentence)",
+      "loading": false,
+      "guard": "never implies relevance beyond what the record established (Art. XXI: search count is not evidence; per-record relevance lives in the evidence surface)"
+    },
+    "evidence.retrieval_failed|FAILED_INFRASTRUCTURE": {
+      "conversation": "One of the evidence sources could not be reached. That is an infrastructure state — absence is never concluded from a failed source, and the investigation continues.",
+      "loading": false,
+      "infrastructure": true,
+      "forbidden": "No evidence exists. / Nothing was found.",
+      "constitutional_basis": "Art. XXI.3 + XXV + LXI; BS-013"
+    },
+    "evidence.bound|COMPLETED": {
+      "conversation": "The evidence base is bound to the problem — every record is custody-tracked.",
+      "loading": false
+    },
+    "stage.RETRIEVE|ACTIVE": { "conversation": "Investigating evidence — I'm searching the indexed sources now.", "loading": true },
+    "stage.FREEZE|ACTIVE": { "conversation": "Freezing the evidence base so every claim traces to a hashed record.", "loading": true },
+    "stage.PREMISE_GATE|ACTIVE": { "conversation": "Checking that the problem itself holds up before building on it.", "loading": true },
+    "stage.SYNTHESIZE|ACTIVE": { "conversation": "Comparing mechanisms — I'm working out what could actually cause this effect.", "loading": true },
+    "stage.SYNTHESIZE|COMPLETED": {
+      "conversation": "Candidate mechanisms are formed. They are hypotheses to be tested, not conclusions.",
+      "forbidden": "I found the answer. / The mechanism is proven.",
+      "constitutional_basis": "Art. XXVIII (no silent semantic promotion); brief 17"
+    },
+    "stage.VERIFY|ACTIVE": { "conversation": "Verifying that the evidence actually says what it is claimed to say.", "loading": true },
+    "stage.MULTI_SOURCE_DISCOVERY|ACTIVE": { "conversation": "Searching beyond the obvious sources for supporting and contradicting work.", "loading": true },
+    "stage.COLLISION|ACTIVE": { "conversation": "Checking the emerging ideas against prior art.", "loading": true },
+    "stage.PHYSICS|ACTIVE": { "conversation": "Checking the physics of the emerging candidates.", "loading": true },
+    "stage.ATTACK|ACTIVE": {
+      "conversation": "Challenging the leading candidate — I'm trying to disprove it.",
+      "brief_22_example": "ATTACKING_CANDIDATE -> I'm trying to disprove the strongest candidate."
+    },
+    "stage.ATTACK|COMPLETED": {
+      "conversation": "The adversarial challenge has run. Its outcome is in the record, stated exactly as recorded.",
+      "loading": false,
+      "forbidden": "Survived. (a completed attack stage is not a survival verdict - the candidate surface derives the verdict from the challenge record, Test F)",
+      "constitutional_basis": "brief 10/11; Art. LXI"
+    },
+    "stage.CONTRADICTION|ACTIVE": { "conversation": "Cross-checking the evidence for contradictions.", "loading": true },
+    "stage.KILLER_EXPERIMENT|ACTIVE": { "conversation": "Designing the decisive experiment — the one that could kill the candidate.", "loading": true },
+    "stage.ADJUDICATION|ACTIVE": { "conversation": "Weighing what survived the challenges.", "loading": true },
+    "stage.CLASSIFY|ACTIVE": { "conversation": "Classifying what the investigation actually established.", "loading": true },
+    "stage.NEXT_BEST_ACTION|ACTIVE": { "conversation": "Deciding what comes next.", "loading": true },
+    "stage.RANK|ACTIVE": { "conversation": "Ranking the remaining candidates by evidence and risk.", "loading": true },
+    "stage.*|FAILED_INFRASTRUCTURE|BLOCKED": {
+      "conversation": "A technical step could not complete — that is infrastructure, not a verdict about the idea.",
+      "infrastructure": true,
+      "forbidden": "The candidate failed."
+    },
+    "stage.*|FAILED_SCIENTIFIC": {
+      "conversation": "A step of the investigation recorded a scientific failure — kept as a finding, stated in the record.",
+      "loading": false
+    },
+    "stage.*|QUEUED": { "conversation": "", "render": "nothing — never a fake action line" },
+    "geometry.created|COMPLETED": {
+      "conversation": "The technology model is ready to inspect.",
+      "forbidden": "The invention is validated. (a render never validates physics - BS-025, Art. XXVIII)"
+    },
+    "package.completed|COMPLETED": { "conversation": "The technology package is assembled and ready.", "loading": false },
+    "investigation.terminal|COMPLETED": { "conversation": "The investigation reached its outcome — stated below exactly as recorded.", "loading": false },
+    "investigation.terminal|FAILED_INFRASTRUCTURE": {
+      "conversation": "The technical work hit an infrastructure wall. The test could not be completed — nothing has been rejected because of it, and the run can resume where it stopped.",
+      "infrastructure": true,
+      "brief_22_example": "BLOCKED_PROVIDER -> The technical test is temporarily unavailable. The candidate has not been rejected.",
+      "forbidden": "The candidate failed. / No invention survived."
+    },
+    "investigation.terminal|FAILED_SCIENTIFIC": {
+      "conversation": "The investigation ended without a supported candidate. That is a recorded scientific outcome, not an infrastructure failure.",
+      "loading": false
+    },
+    "unknown_kind|ACTIVE": { "conversation": "Still working — the investigation is progressing.", "loading": true },
+    "unknown_kind|COMPLETED": { "conversation": "A step of the investigation is recorded.", "loading": false },
+    "unknown_kind|infrastructure": { "conversation": "A technical step paused — infrastructure, not a verdict.", "infrastructure": true }
+  },
+  "closed_vocabulary_rules": [
+    "Every event kind the journal can emit maps to a sentence; unknown kinds/statuses fall through to honest generic sentences, never to silence (ACTIVE) and never to machinery.",
+    "QUEUED renders nothing (never a fake action line).",
+    "The map is a pure function of (kind, status, structured event fields) — it never parses the backend summary string and never invents counts.",
+    "Infrastructure statuses: FAILED_INFRASTRUCTURE, BLOCKED (+TRANSPORT_ERROR defensively). infrastructure:true sentences must never name a scientific verdict.",
+    "No sentence contains machine vocabulary (pinned by the G1 test regex: engine stage / persisted its envelope / envelope_* / recorded at / raw kind tokens / event ids)."
+  ],
+  "briefing_idealized_events_without_a_backend_counterpart": {
+    "note": "The 28-chapter briefing's examples (MECHANISM_FOUND, ATTACKING_CANDIDATE, BLOCKED_PROVIDER) are covered by real backend events (stage.SYNTHESIZE, stage.ATTACK, investigation.terminal/evidence.retrieval_failed). The following idealized event names from the product-event direction have NO distinct backend kind today; the UI does not fabricate them. Smallest Coder-1 contracts defined per brief 27.",
+    "coder1_contracts": [
+      {
+        "idealized_event": "CANDIDATE_REJECTED / CANDIDATE_SURVIVED (as distinct conversation events)",
+        "current_behavior": "the candidate arc is derived from the canonical challenge records (deriveCandidates + deriveAttackState), and the ATTACK stage events render through the map; no per-candidate event exists in the journal",
+        "smallest_contract": "one journal kind 'candidate.challenge' with {gen, verdict: REJECTED|SURVIVED|CONTESTED, reason} emitted when the challenge record lands; the UI maps verdicts to the existing candidate-surface language (no new epistemology)"
+      },
+      {
+        "idealized_event": "MECHANISMS_IDENTIFIED with a count ('I found three plausible mechanisms')",
+        "current_behavior": "stage.SYNTHESIZE COMPLETED renders the honest hypothesis sentence; a mechanism count is only shown from the canonical generations projection on the candidates message (the count the record actually carries)",
+        "smallest_contract": "the SYNTHESIZE envelope persistence already carries the candidate list; if a count-bearing conversation sentence is wanted, add {count} to the stage event payload — the map renders it only when the record carries it (never invented)"
+      },
+      {
+        "idealized_event": "MODEL_UPDATED / CANDIDATE_MUTATED / RE-EVALUATING (reality-loop events)",
+        "current_behavior": "reality-loop state is surfaced on the invention view (RealityLoopPanel); fresh-run conversations have no such events yet",
+        "smallest_contract": "journal kinds 'reality.observed' and 'candidate.mutated' emitted by the reality loop closure path; the UI maps them to outcome-difference language ('The new observation changed the design: {delta}')"
+      }
+    ]
+  },
+  "verification": {
+    "npm_run_test:events": "12/12 PASS (G1 machine-vocabulary ban incl. metamorphic; G2 infra-never-verdict x3; G3 attack-verdict-neutrality; G4 loading register + no-verdict-language; G5 pickLiveEvent ordering x2 + structured fields; closed-vocabulary fall-throughs)",
+    "npm_run_test:present": "14/14 PASS (the R453-C2 state-honesty contracts unchanged)",
+    "next_build": "GREEN (all routes prerendered)",
+    "dom_verification": "CODER2_VISUAL_REGRESSION_REPORT.md (fixtures V2/V4/V8 render the event-mapped conversation lines)"
+  }
+}

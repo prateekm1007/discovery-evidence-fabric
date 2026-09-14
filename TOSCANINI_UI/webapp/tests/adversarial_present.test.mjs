@@ -419,3 +419,41 @@ test("epistemic meta mapping preserves the recorded class", () => {
   assert.equal(mod.epistemicMeta("UNKNOWN"), "UNKNOWN");
   assert.equal(mod.epistemicMeta("SOMETHING_NEW"), null);
 });
+
+// ---------------------------------------------------------------------------
+// R454-C2 (brief §13) — unknown geometry is REPRESENTED in the
+// conversation for terminal runs, never silently absent
+// ---------------------------------------------------------------------------
+
+test("brief §13: terminal run with no established geometry says so in the conversation", () => {
+  const detail = detailWithRunState("COMPLETE", {
+    evidence_state: { state: "GATHERED", records_found: 11, sources: ["core"] },
+    attack_state: { state: "PENDING", overall: null },
+  });
+  const dossier = {
+    tabs: {
+      overview: { availability: "AVAILABLE", mechanism: null },
+      evidence: { availability: "AVAILABLE", retrieved_count: 11 },
+      design: { availability: "NOT_ESTABLISHED", note: "no geometry was established on this run" },
+    },
+  };
+  const msgs = mod.deriveConversation(detail, dossier, false);
+  const geoNote = msgs.find((m) => m.kind === "note" && /not established on this run/.test(m.text));
+  assert.ok(geoNote, "the geometry-unknown note is present");
+  assert.equal(geoNote.epi, "UNKNOWN");
+  // and no model card / no false claim
+  assert.ok(!msgs.some((m) => m.kind === "artifact" && m.surface === "model"));
+  assert.ok(!msgs.some((m) => m.kind === "artifact" && /unavailable/i.test(m.body ?? "")));
+});
+
+test("brief §13 (metamorphic): a rejected run does not gain a geometry note", () => {
+  const detail = detailWithRunState("COMPLETE", {
+    outcome: "FALSE_PREMISE_INCOHERENT",
+    generations: { generations: [{ gen: 1, architecture: { intervention: "x" }, challenge: { killed: true } }], current_invention: { gen: 1 } },
+  }, {
+    user_state_view: { user_state: "COMPLETED_FALSE_PREMISE", label: "Completed — false premise", decision: "", meaning: "", finished: true, found_something: false, rejected: true, package_available: false },
+  });
+  const msgs = mod.deriveConversation(detail, { tabs: {} }, false);
+  assert.ok(!msgs.some((m) => m.kind === "note" && /not established on this run/.test(m.text)),
+    "rejection outcome stays the terminal word — no geometry noise");
+});
