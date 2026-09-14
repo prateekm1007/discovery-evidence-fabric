@@ -337,7 +337,7 @@ export function OutcomeBanner({
         <div className="outcome-detail faint">
           {runState?.failure_state?.error ?
             "retry from the run page — every transport failure was recorded with its full route detail" : "retry from the run page — the failure is recorded in the run's own artifacts"}{" "}
-          (Art. LXI: infrastructure failure is never a scientific rejection)
+          (an infrastructure failure is never a scientific rejection)
         </div>
       )}
       {/* R422 (directive 1 — UI copy reconciliation): the async artifact

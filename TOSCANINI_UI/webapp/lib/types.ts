@@ -97,6 +97,15 @@ export interface SessionDetail {
   // R414: the canonical DiscoveryRun state (directive §4) — carried by
   // the result endpoint; the UI reads phases/outcomes from here
   run_state?: RunStateObject;
+  // R459 (audit P1-2): queue visibility — a queued run SAYS it is
+  // waiting for the engine's single run slot instead of spinning.
+  queue_state?: { queued: boolean; reason: string };
+  // R459: the investigation thread — set on rounds opened by a
+  // conversational action (the parent run's record stays untouched).
+  parent_session_id?: string | null;
+  // R459 (audit P0-3): attachments bound to this run (engine-side
+  // custody; the conversation references them, never absorbs them)
+  attachment_ids?: string[];
   // R458-C2 (§4): the one-question clarification pause — the engine set
   // status AWAITING_CLARIFICATION and asks exactly one material question
   // (C1's R446 §4 contract). The conversation renders it and the answer

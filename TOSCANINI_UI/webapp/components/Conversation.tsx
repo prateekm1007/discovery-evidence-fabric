@@ -45,8 +45,8 @@ import {
   ACTION_NOT_AVAILABLE_COPY,
   type ActionVerb,
 } from "@/lib/actionContract";
+import { apiPost } from "@/lib/api";
 import { AnswerView } from "./AskBox";
-import { EpistemicBadge } from "./ScienceEvents";
 
 const ATTACK_LABEL: Record<string, string> = {
   NOT_RUN: "not yet tested",
@@ -191,6 +191,7 @@ export default function Conversation({
   onAsk,
   onTechnical,
   onNextAction,
+  onActionRound,
   askEnabledNote,
 }: {
   detail: SessionDetail;
@@ -202,6 +203,9 @@ export default function Conversation({
   onAsk: (q: string) => Promise<void>;
   onTechnical: () => void;
   onNextAction: (n: NextAction) => void;
+  /** R459: an accepted steering action opens a NEW round of the same
+   * investigation — the shell navigates to it. */
+  onActionRound?: (newRunId: string) => void;
   askEnabledNote?: string | null;
 }) {
   const [q, setQ] = useState("");
@@ -257,15 +261,23 @@ export default function Conversation({
       setQ("");
       const verb = route.verb;
       try {
-        const result = await sendAction(detail.session_id, verb);
+        // R459: the invocation rides the owner-capability transport
+        // (apiPost) — the same header every run-scoped call carries.
+        const result = await sendAction(detail.session_id, verb, {}, apiPost);
         if (result.not_available) {
           setActionNote(ACTION_NOT_AVAILABLE_COPY);
+        } else if (result.accepted && result.new_run_id) {
+          // the engine opened a NEW round of this investigation with the
+          // user's direction recorded — navigate to it
+          onActionRound?.(result.new_run_id);
         } else if (result.accepted) {
           setActionNote(
             `Done — "${ACTION_LABEL[verb]}" is with the engine. ` +
               `The conversation will show what actually changed, ` +
               `from the record, when it happens.`
           );
+        } else if (result.refusal) {
+          setActionNote(result.refusal);
         } else {
           setActionNote(
             "The action could not be delivered — an infrastructure " +
@@ -426,7 +438,7 @@ export default function Conversation({
           product language (§7/§16/§22); the backend summary rides the
           title attribute and lives in full in the technical record */}
       {!done && !clarificationPending && (
-        <div className="conv-row" data-conv-live-block>
+        <div className="conv-row" data-conv-live-block aria-live="polite">
           {rotationNote && (
             <div className="conv-note faint" data-conv-rotation>
               {rotationNote}
@@ -441,9 +453,6 @@ export default function Conversation({
             <div className="conv-live" data-conv-active title={liveSummary ?? undefined}>
               <span className="cursor" aria-hidden="true" />
               {liveSentence.text}
-              {live && typeof live.epistemic_class === "string" && (
-                <EpistemicBadge cls={live.epistemic_class} />
-              )}
             </div>
           )}
         </div>

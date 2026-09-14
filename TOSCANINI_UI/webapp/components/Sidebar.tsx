@@ -35,6 +35,10 @@ function stateDot(usv: UserStateView | undefined): { cls: string; label: string 
       return { cls: "rejected", label: "Rejected" };
     case "COMPLETED_UNKNOWN":
       return { cls: "unknown", label: "Outcome unknown" };
+    // R459 (audit P0-1): the one-question pause is ACTIVE work — amber,
+      // pulsing, and named, never a gray "outcome unknown"
+    case "AWAITING_CLARIFICATION":
+      return { cls: "attention", label: "Action needed — answer below" };
     case "INTERRUPTED":
     case "FAILED_TRANSPORT":
     case "FAILED_ENGINE":

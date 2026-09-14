@@ -246,6 +246,38 @@ def _run_inner(session_id: str, forensics) -> None:
             pu = _pu_mod.apply_clarification_answer(
                 pu, _answer["field"], _answer["answer"])
             store.update_session(session_id, clarification_answer={})
+        # R459 (audit P0-2): a conversational steering directive (from
+        # the action contract) merges as USER_STATED context on the NEW
+        # round's input record — the engine decides what it means
+        # scientifically; the directive never mutates a verdict.
+        _directive = s.get("user_directive") or {}
+        if isinstance(_directive, dict) and _directive.get("directive"):
+            pu = _pu_mod.apply_user_directive(
+                pu, str(_directive["directive"]),
+                str(_directive.get("verb") or ""))
+            store.update_session(session_id, user_directive={})
+        # R459 (audit P0-3): bound attachments merge as typed
+        # USER_EVIDENCE (server-side extraction, content hash on record)
+        try:
+            from toscanini import attachments as _att_mod
+            _bound = _att_mod.resolve_bindings(s, s.get("owner_key") or "")
+            if _bound:
+                pu = _pu_mod.apply_attachments(pu, _bound)
+                try:
+                    from toscanini import event_journal as _journal
+                    _journal.record(
+                        str(s.get("run_dir") or ""), session_id,
+                        kind="attachment.ingested", stage="PROBLEM",
+                        status="COMPLETED",
+                        summary=(f"{len(_bound)} user document(s) joined "
+                                 "the investigation's record (content "
+                                 "hashes on file)"),
+                        epistemic_class="SOURCE_FACT",
+                        basis_ref="attachments ledger")
+                except Exception:  # noqa: BLE001 — journaling is fail-open
+                    pass
+        except Exception:  # noqa: BLE001 — attachments must never kill a run
+            pass
         need = _cl_mod.evaluate_clarification_need(pu)
         if need["needed"] and not s.get("clarification_answer"):
             # directive §4: ONE useful clarification, then pause. The

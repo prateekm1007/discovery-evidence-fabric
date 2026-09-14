@@ -20,7 +20,10 @@ export function AnswerView({ a }: { a: AskResponse }) {
       <div className="qa-answer">
         {a.answer}
         <div className="qa-meta faint">
-          AI_INTERPRETATION · {a.basis}
+          {/* R459 (audit P1-1): the raw class name is replaced by the
+              sentence it stands for; the basis rides as plain text */}
+          Answered from this investigation&apos;s own records
+          {a.basis ? ` — ${a.basis}` : ""}
         </div>
       </div>
     );

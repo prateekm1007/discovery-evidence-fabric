@@ -884,7 +884,7 @@ export function ExperimentSection({ tab }: { tab: DossierTab }) {
       <div className="exp-note">
         The decisive (falsification) experiment — specified, not
         executed. Executing it is a physical act this machine never
-        claims (reality boundary).
+        claims.
       </div>
       {killer && (
         <div className="ov-block" data-experiment-prose>
@@ -938,7 +938,7 @@ export function ExperimentSection({ tab }: { tab: DossierTab }) {
       )}
       {fields.length > 0 && (
         <div className="ov-block">
-          <h4>Buyer-runnable contract</h4>
+          <h4>The buyer-runnable test plan</h4>
           <table className="param-table">
             <tbody>
               {fields.map(([k, v]) => (

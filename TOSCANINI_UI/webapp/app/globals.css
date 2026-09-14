@@ -2456,3 +2456,95 @@ details.tech li { font-size: 13.5px; color: var(--ink-soft); margin-bottom: 6px;
   .wk-siblings { display: none; } /* the sheet keeps one artifact; switching via close+reopen keeps the conversation primary */
   .rail-item { min-height: 40px; }
 }
+
+/* ==========================================================================
+   R459 — EXTERNAL PRODUCT AUDIT EXECUTION
+   (P0-1 clarification state · P0-2 actions · P0-3 attachments ·
+   P0-4 diagnostic package · P1-2 queue visibility · P1-3 share ·
+   P1-4 mobile sheet · P2-1 contrast · P2-3 aria-live)
+   ========================================================================== */
+
+/* ---- P2-1: WCAG AA secondary text (was ~3.4:1) ------------------------ */
+:root { --ink-faint: #6f6a5e; }
+
+/* ---- P0-1: the clarification pause is ACTIVE work (amber pulse) ------- */
+.rail-dot-attention {
+  background: #d9a441;
+  animation: attention-pulse 1.6s ease-in-out infinite;
+}
+@keyframes attention-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rail-dot-attention { animation: none; }
+}
+.queue-note {
+  max-width: 60ch;
+  margin: 8px auto 0;
+  padding: 8px 12px;
+  border: 1px dashed var(--line);
+  border-radius: 10px;
+  text-align: center;
+  font-size: 12.5px;
+}
+
+/* ---- P0-3: attachment chips with ingestion state ----------------------- */
+.ask-attachment.bad { border-color: #a05a3d; color: #a05a3d; }
+
+/* ---- P1-3: the public share view --------------------------------------- */
+.share-page {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 32px 20px 80px;
+}
+.share-page .brand { font-size: 20px; text-decoration: none; color: var(--ink); }
+.share-body { margin-top: 28px; }
+.share-outcome {
+  display: inline-block;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 4px 12px;
+  font-size: 12.5px;
+  color: var(--ink-soft);
+}
+.share-problem { font-size: 26px; line-height: 1.25; margin: 14px 0 8px; }
+.share-decision { color: var(--ink-soft); font-size: 15px; }
+.share-titles ul { margin: 8px 0 0 18px; padding: 0; }
+.share-titles li { margin: 4px 0; font-size: 14px; }
+.share-foot { margin-top: 32px; font-size: 12px; }
+
+/* ---- P1-4: mobile — the sheet keeps its sibling switcher --------------- */
+@media (max-width: 880px) {
+  .wk-siblings {
+    display: flex; /* R459: restoring one-tap surface switching on mobile */
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin-left: 0;
+  }
+  .wk-sibling { white-space: nowrap; padding: 6px 8px; }
+  .wk-head { flex-wrap: wrap; }
+}
+
+/* ---- P1-4: the 3D canvas touch shield (no scroll trapping) ------------- */
+.hero-touch-shield {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 14px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  z-index: 3;
+}
+.hero-touch-shield span {
+  background: rgba(31, 30, 28, 0.72);
+  color: #fff;
+  font-size: 12px;
+  padding: 6px 12px;
+  border-radius: 999px;
+}
+.hero-viewport { position: relative; } /* R459: anchor for the touch shield */

@@ -579,9 +579,8 @@ export function resolvePresentationState(
       state: "LEGACY_STATE_UNAVAILABLE",
       infrastructurePaused: false,
       renderBlockDetail:
-        "This run's projection predates the typed presentation " +
-        "contract — no current presentation state can be derived " +
-        "from legacy fields.",
+        "This run's record predates the current presentation format — " +
+        "no current presentation state can be derived from its fields.",
       engineeringAuthority: design?.engineering_authority ?? null,
     };
   }

@@ -79,6 +79,13 @@ function ModelSurface({
   highlight: string | null;
   onHighlight: (id: string | null) => void;
 }) {
+  // R459 (audit P1-4): on touch devices the canvas traps scroll — a
+  // one-tap shield stands between the page and the viewer until the
+  // user explicitly engages with the 3D interaction.
+  const [touchEngaged, setTouchEngaged] = useState(false);
+  const isTouch =
+    typeof window !== "undefined" &&
+    window.matchMedia("(pointer: coarse)").matches;
   const design = dossier?.tabs?.design as DesignTabShape | undefined;
   // structural subset of the design tab's evolution rows (the canonical
   // shape lives in DossierSections::EvolutionRowData — React-owned)
@@ -110,6 +117,17 @@ function ModelSurface({
   return (
     <div className="wk-model" data-wk-model>
       <div className="hero-viewport" data-hero-viewport>
+        {viewerUrl && isTouch && !touchEngaged && (
+          <button
+            type="button"
+            className="hero-touch-shield"
+            data-touch-shield
+            aria-label="tap to interact with the 3D model"
+            onClick={() => setTouchEngaged(true)}
+          >
+            <span>Tap to explore the model in 3D</span>
+          </button>
+        )}
         {viewerUrl ? (
           <>
             <ModelViewer
@@ -198,7 +216,7 @@ function ModelSurface({
           >
             {gateOk ? "✓" : "✕"} {gateVerdict}
           </span>
-          — the presentation is what the gate certified, no more (Art. LXXII)
+          — the presentation is exactly what the visual quality gate certified, no more
         </div>
       )}
       <ModelDetailsSection

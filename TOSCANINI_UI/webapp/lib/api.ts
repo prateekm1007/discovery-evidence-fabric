@@ -89,6 +89,16 @@ async function apiFetch(path: string, init?: RequestInit): Promise<Response> {
   return fetch(path, { ...init, headers, cache: "no-store" });
 }
 
+// the authenticated JSON POST helper (the action contract rides the
+// owner-capability transport like every other run-scoped call)
+export async function apiPost(path: string, body: unknown): Promise<Response> {
+  return apiFetch(path, {
+    method: "POST",
+    headers: JSON_HEADERS,
+    body: JSON.stringify(body),
+  });
+}
+
 // R395: the ask endpoint returns the answer INSIDE a 200 body even for
 // honest refusals (NOT_IN_RECORD etc.) — only transport/protocol-level
 // failures are HTTP errors. This keeps the honest states first-class.
@@ -171,24 +181,48 @@ export interface AttachmentUploadResult {
   media_type?: string;
   bytes?: number;
   sha256?: string;
-  ingestion?: { status?: string; document_ref?: string | null };
-  not_available?: boolean;
+  ingestion?: {
+    status?: string;
+    text_chars_total?: number;
+    note?: string;
+  };
+  rejected?: boolean;
 }
 
+// R459 (audit P0-3): files upload the moment they are selected —
+// server-side ingestion (extraction + content hash) happens BEFORE the
+// run starts; the submit path can never hit a missing-capability wall.
 export async function uploadAttachment(
-  runId: string,
-  file: File
+  file: File,
+  runId?: string
 ): Promise<AttachmentUploadResult> {
   const body = new FormData();
   body.append("file", file);
-  const res = await apiFetch(`/api/run/${runId}/attachments`, {
-    method: "POST",
-    body,
-  });
+  const path = runId
+    ? `/api/run/${runId}/attachments`
+    : "/api/attachments";
+  const res = await apiFetch(path, { method: "POST", body });
   if (res.status === 404 || res.status === 501) {
-    return { not_available: true };
+    return { rejected: true, name: file.name,
+             ingestion: { status: "NOT_AVAILABLE",
+                          note: "the engine does not accept uploads yet" } };
   }
-  return json<AttachmentUploadResult>(res);
+  const payload = await json<{ attachments?: AttachmentUploadResult[] }>(res);
+  return payload.attachments?.[0] ?? { rejected: true, name: file.name };
+}
+
+// R459 (audit P1-3): the share flow — the backend endpoints existed;
+// the product surface now uses them.
+export async function createShare(id: string): Promise<string | null> {
+  const data = await json<{ share_id?: string }>(
+    await apiFetch(`/api/sessions/${id}/share`, { method: "POST" })
+  );
+  return data.share_id ?? null;
+}
+
+export function diagnosticPackageUrl(id: string): string {
+  const key = storedOwnerKey();
+  return `/api/run/${id}/diagnostic-package${key ? `?owner=${encodeURIComponent(key)}` : ""}`;
 }
 
 export async function getRunResult(id: string): Promise<SessionDetail> {

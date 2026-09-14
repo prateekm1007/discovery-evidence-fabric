@@ -78,10 +78,13 @@ FORBIDDEN_CONVERSATION_FIELDS = frozenset({
 })
 
 # Fields the conversation path MAY write (context + clarification
-# state only).
+# state only). R459: user_directive joins the vocabulary — the
+# conversational ACTION path records the user's steering directive as
+# context (verb + their own words), the same category as
+# clarification_answer: an INPUT-record field, never scientific state.
 ALLOWED_CONVERSATION_FIELDS = frozenset({
     "conversation", "clarification", "clarification_answer",
-    "clarification_history",
+    "clarification_history", "user_directive",
 })
 
 

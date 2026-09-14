@@ -453,6 +453,51 @@ def apply_clarification_answer(pu: Dict[str, Any],
     return pu
 
 
+def apply_user_directive(pu: Dict[str, Any], directive: str,
+                         verb: str = "") -> Dict[str, Any]:
+    """R459: merge ONE conversational steering directive (from the
+    action contract). The directive is USER_STATED CONTEXT — it steers
+    the search; it never becomes a scientific verdict and never mutates
+    a PU field's value directly (the engine decides what it means)."""
+    ctx = pu.get("context")
+    additions = f"[user directive{'/' + verb if verb else ''}] {directive}"
+    if isinstance(ctx, dict) and isinstance(ctx.get("value"), list):
+        ctx["value"] = (ctx["value"] + [additions])[-10:]
+    elif isinstance(ctx, dict) and isinstance(ctx.get("value"), str) and ctx.get("value"):
+        ctx["value"] = f"{ctx['value']} | {additions}"
+    else:
+        pu["context"] = _field(additions, ORIGIN_USER_STATED,
+                               "user steering directive (conversation)")
+    pu.setdefault("directive_history", []).append({
+        "verb": verb, "directive": directive[:500],
+        "applied_at": _now()})
+    return pu
+
+
+def apply_attachments(pu: Dict[str, Any],
+                      attachments: List[Dict[str, Any]]) -> Dict[str, Any]:
+    """R459: merge the run's bound attachments as typed USER_EVIDENCE —
+    the user's own claimed material, distinct from retrieved evidence
+    (which keeps its Evidence-Fabric custody chain). Each entry carries
+    the content hash; the text is the SERVER-SIDE bounded extract."""
+    entries = []
+    for a in attachments or []:
+        entries.append({
+            "name": a.get("name"),
+            "sha256": a.get("sha256"),
+            "bytes": a.get("bytes"),
+            "text_chars": len(a.get("text") or ""),
+            "note": a.get("note"),
+        })
+    if not entries:
+        return pu
+    pu["user_evidence"] = _field(
+        entries, ORIGIN_USER_STATED,
+        "user-uploaded documents (server-side extraction; content hash "
+        "on record) — inputs, never scientific verdicts")
+    return pu
+
+
 def persist(pu: Dict[str, Any], run_dir: Path) -> Path:
     p = Path(run_dir) / PERSIST_NAME
     p.parent.mkdir(parents=True, exist_ok=True)

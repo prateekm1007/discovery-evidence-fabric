@@ -402,7 +402,11 @@ export function deriveNextAction(
         surface: "model",
       };
     }
-    return { label: "Review the full record", kind: "surface", surface: "overview" };
+    // R459 (audit P0-4): the always-available deliverable — every
+    // terminal run carries a diagnostic record (executive brief,
+    // evidence summary, what was killed and why). No run ends with
+    // nothing to take away.
+    return { label: "Download the diagnostic record", kind: "diagnostic" };
   }
   // running: the investigation is the action — no button theater
   return null;
@@ -661,7 +665,7 @@ export function deriveConversation(
           id: mid("p"),
           surface: "package",
           title: "Technology package",
-          body: "Everything needed to evaluate, build, or commission the decisive experiment — evidence, engineering, risks, and the falsification contract.",
+          body: "Everything needed to evaluate, build, or commission the decisive experiment — evidence, engineering, risks, and the falsification plan.",
           cta: "Open the package",
         });
       }

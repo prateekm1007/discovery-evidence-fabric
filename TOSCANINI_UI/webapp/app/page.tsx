@@ -33,7 +33,10 @@ import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   answerClarification,
+  apiPost,
   askRun,
+  createShare,
+  diagnosticPackageUrl,
   getCIO,
   getDossier,
   getEvents,
@@ -46,6 +49,8 @@ import {
   retryRun,
   startRun,
   streamUrl,
+  uploadAttachment,
+  type AttachmentUploadResult,
 } from "@/lib/api";
 import type {
   AskResponse,
@@ -133,12 +138,16 @@ function NewDiscoveryPane({
 }) {
   const [text, setText] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [pendingFiles, setPendingFiles] = useState<File[]>([]);
-  const [attachNote, setAttachNote] = useState<string | null>(null);
+  // R459 (audit P0-3): files upload the moment they are selected —
+  // server-side extraction + content hash happen up front, so submit
+  // can never hit a missing-capability wall.
+  const [pending, setPending] = useState<
+    { file: File; state: "uploading" | "ingested" | "rejected"; record?: AttachmentUploadResult }[]
+  >([]);
   const [submitting, setSubmitting] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
-  async function submit(startWithoutAttachments = false) {
+  async function submit() {
     const t = text.trim();
     if (t.length < 15) {
       setError(
@@ -147,26 +156,15 @@ function NewDiscoveryPane({
       return;
     }
     if (submitting) return;
-
-    // attachments requested but the engine can't take them yet: say so,
-    // offer the honest path forward — never a silent drop, never a fake
-    // success (§2)
-    if (pendingFiles.length > 0 && !startWithoutAttachments) {
-      setAttachNote(
-        "Attachments can't be ingested yet — the engine's server-side " +
-          "attachment contract (R458) isn't live, so nothing was uploaded " +
-          "and nothing from the files will be assumed. Start the discovery " +
-          "from your description alone, paste a link or the key contents, " +
-          "or wait for the engine to accept documents."
-      );
-      return;
-    }
+    if (pending.some((p) => p.state === "uploading")) return; // uploads in flight
     setError(null);
-    setAttachNote(null);
     setSubmitting(true);
     onStarted("busy");
     try {
-      const session = await startRun(t, []);
+      const ids = pending
+        .filter((p) => p.state === "ingested" && p.record?.attachment_id)
+        .map((p) => p.record!.attachment_id!);
+      const session = await startRun(t, ids);
       onStarted(session.session_id);
     } catch (e) {
       setError(e instanceof Error ? e.message : "failed to start the run");
@@ -175,10 +173,39 @@ function NewDiscoveryPane({
     }
   }
 
-  function onFiles(files: FileList | null) {
+  async function onFiles(files: FileList | null) {
     if (!files || files.length === 0) return;
-    setAttachNote(null);
-    setPendingFiles((prev) => [...prev, ...Array.from(files)]);
+    const incoming = Array.from(files).map((file) => ({
+      file,
+      state: "uploading" as const,
+    }));
+    setPending((prev) => [...prev, ...incoming]);
+    for (const item of incoming) {
+      try {
+        const rec = await uploadAttachment(item.file);
+        setPending((prev) =>
+          prev.map((p) =>
+            p.file === item.file
+              ? { ...p, state: rec.rejected ? "rejected" : "ingested", record: rec }
+              : p
+          )
+        );
+      } catch {
+        setPending((prev) =>
+          prev.map((p) =>
+            p.file === item.file
+              ? {
+                  ...p,
+                  state: "rejected",
+                  record: { name: item.file.name, rejected: true,
+                            ingestion: { status: "UPLOAD_FAILED",
+                                         note: "the upload could not be delivered" } },
+                }
+              : p
+          )
+        );
+      }
+    }
   }
 
   return (
@@ -198,26 +225,38 @@ function NewDiscoveryPane({
             }
           }}
         />
-        {pendingFiles.length > 0 && (
+        {pending.length > 0 && (
           <div className="ask-attachments" data-pending-attachments>
-            {pendingFiles.map((f, i) => (
-              <span className="ask-attachment" key={`${f.name}-${i}`}>
-                {f.name}
+            {pending.map((p, i) => (
+              <span
+                className={`ask-attachment ${p.state === "rejected" ? "bad" : ""}`}
+                key={`${p.file.name}-${i}`}
+                title={p.record?.ingestion?.note ?? (p.state === "uploading" ? "uploading…" : undefined)}
+              >
+                {p.file.name}
+                {p.state === "ingested" && p.record?.ingestion?.status === "TEXT_EXTRACTED" && (
+                  <span className="faint">
+                    {" · "}{p.record.ingestion.text_chars_total ?? 0} characters read
+                  </span>
+                )}
+                {p.state === "uploading" && <span className="faint"> · uploading…</span>}
+                {p.state === "rejected" && (
+                  <span className="faint">
+                    {" · "}{p.record?.ingestion?.note ?? "could not be read"}
+                  </span>
+                )}
                 <button
                   type="button"
                   className="ask-attachment-x"
-                  aria-label={`remove ${f.name}`}
+                  aria-label={`remove ${p.file.name}`}
                   onClick={() =>
-                    setPendingFiles((prev) => prev.filter((_, j) => j !== i))
+                    setPending((prev) => prev.filter((_, j) => j !== i))
                   }
                 >
                   ×
                 </button>
               </span>
             ))}
-            <span className="faint">
-              will be ingested server-side when the engine accepts documents
-            </span>
           </div>
         )}
         <div className="ask-foot">
@@ -232,7 +271,7 @@ function NewDiscoveryPane({
               multiple
               hidden
               onChange={(e) => {
-                onFiles(e.target.files);
+                void onFiles(e.target.files);
                 e.target.value = "";
               }}
             />
@@ -240,33 +279,21 @@ function NewDiscoveryPane({
               type="button"
               className="btn small ghost"
               onClick={() => fileRef.current?.click()}
-              title="attach evidence — documents are ingested server-side and become part of the record"
+              title="attach a document — it is read server-side, hashed, and joins the investigation's record"
             >
               + Attach
             </button>
-            <button className="btn" onClick={() => void submit()} type="button">
+            <button
+              className="btn"
+              onClick={() => void submit()}
+              type="button"
+              disabled={pending.some((p) => p.state === "uploading")}
+            >
               {submitting ? "Starting…" : "Start the discovery"}
             </button>
           </div>
         </div>
       </div>
-      {attachNote && (
-        <div className="errbox" style={{ textAlign: "left" }} data-attach-note>
-          {attachNote}
-          <div style={{ marginTop: 8 }}>
-            <button
-              type="button"
-              className="btn small ghost"
-              onClick={() => {
-                setPendingFiles([]);
-                void submit(true);
-              }}
-            >
-              Start without the attachments
-            </button>
-          </div>
-        </div>
-      )}
       {error && (
         <div className="errbox" style={{ textAlign: "left" }}>
           {error}
@@ -323,6 +350,10 @@ function WorkspaceInner() {
   // the contextual workspace surface (brief §12) — null = closed
   const [surface, setSurface] = useState<SurfaceId | null>(null);
   const [asks, setAsks] = useState<{ question: string; response: AskResponse }[]>([]);
+  // R459 (audit P1-3): the share flow — the backend endpoint existed;
+  // the product surface now offers it.
+  const [shareUrl, setShareUrl] = useState<string | null>(null);
+  const [shareCopied, setShareCopied] = useState(false);
   const autoOpened = useRef<string | null>(null);
   const timer = useRef<ReturnType<typeof setInterval> | null>(null);
   const evtTimer = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -648,6 +679,12 @@ function WorkspaceInner() {
       setSurface("package");
       return;
     }
+    // R459 (audit P0-4): the always-available deliverable — a direct,
+    // authenticated download of the run's diagnostic record
+    if (next.kind === "diagnostic") {
+      window.location.href = diagnosticPackageUrl(detail.session_id);
+      return;
+    }
     if (next.kind === "new") {
       newProblem();
       return;
@@ -678,6 +715,31 @@ function WorkspaceInner() {
           </span>
         </span>
         <span className="ws-spacer" />
+        {activeMode === "run" && (
+          <button
+            className="btn small ghost"
+            type="button"
+            data-share-btn
+            onClick={() => {
+              if (shareUrl) {
+                navigator.clipboard?.writeText(shareUrl).catch(() => {});
+                setShareCopied(true);
+                setTimeout(() => setShareCopied(false), 2000);
+                return;
+              }
+              if (detail)
+                createShare(detail.session_id)
+                  .then((sid) => {
+                    if (sid) {
+                      setShareUrl(`${window.location.origin}/share?id=${sid}`);
+                    }
+                  })
+                  .catch(() => setShareUrl(null));
+            }}
+          >
+            {shareCopied ? "Link copied" : shareUrl ? "Copy share link" : "Share"}
+          </button>
+        )}
         <button className="btn small ghost" onClick={newProblem} type="button">
           + New Discovery
         </button>
@@ -713,17 +775,26 @@ function WorkspaceInner() {
 
           {activeMode === "run" &&
             (detail ? (
-              <Conversation
-                detail={detail}
-                dossier={dossier}
-                events={events}
-                packageAvailable={packageAvailable}
-                asks={asks}
-                onOpenSurface={(s) => setSurface(s)}
-                onAsk={handleAsk}
-                onTechnical={() => setSurface("journal")}
-                onNextAction={handleNext}
-              />
+              <>
+                {/* R459 (audit P1-2): a queued run SAYS it is queued */}
+                {detail.queue_state?.queued && (
+                  <div className="queue-note faint" data-queue-note>
+                    {detail.queue_state.reason}
+                  </div>
+                )}
+                <Conversation
+                  detail={detail}
+                  dossier={dossier}
+                  events={events}
+                  packageAvailable={packageAvailable}
+                  asks={asks}
+                  onOpenSurface={(s) => setSurface(s)}
+                  onAsk={handleAsk}
+                  onTechnical={() => setSurface("journal")}
+                  onNextAction={handleNext}
+                  onActionRound={(newId) => selectRun(newId)}
+                />
+              </>
             ) : runNotFound ? (
               <div className="errbox" style={{ marginTop: 24 }}>
                 <b>Run not found.</b> This run id does not exist, or it

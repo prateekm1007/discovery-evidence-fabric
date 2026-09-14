@@ -271,6 +271,29 @@ def mark_boot_pending_interrupted() -> List[str]:
     return interrupted
 
 
+def run_lock_held() -> bool:
+    """R459 (audit P1-2 queue visibility): non-blocking probe of the
+    engine run lock. The lock itself stays (concurrent workers burned
+    the shared transport into RATE_LIMITED — measured 2026-08-30); this
+    probe lets a queued run SAY it is queued instead of spinning."""
+    import fcntl
+
+    lock = STORE_DIR / "run.lock"
+    try:
+        lock.parent.mkdir(parents=True, exist_ok=True)
+        f = open(lock, "w")
+        try:
+            fcntl.flock(f, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            fcntl.flock(f, fcntl.LOCK_UN)
+            return False
+        except BlockingIOError:
+            return True
+        finally:
+            f.close()
+    except OSError:
+        return False
+
+
 def retry_session(session_id: str) -> Optional[Dict[str, Any]]:
     """Re-enqueue an errored session through the SAME worker path.
 

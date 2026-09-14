@@ -54,6 +54,7 @@ _USER_STATE_LABELS = {
         "Completed — invention in development",
     "COMPLETED_FALSE_PREMISE": "Completed — false premise",
     "COMPLETED_UNKNOWN": "Completed — outcome unknown",
+    "AWAITING_CLARIFICATION": "Action needed — answer Toscanini's question below",
     "INTERRUPTED": "Interrupted — recoverable",
     "BLOCKED_TRANSPORT": "Blocked by infrastructure — saved and resumable",
     "FAILED_TRANSPORT": "Failed — transport",
@@ -103,6 +104,12 @@ _USER_STATE_EXPLANATIONS = {
     "COMPLETED_UNKNOWN": ("The run reached a terminal state without a "
                           "recorded verdict — the outcome could not be "
                           "established from the run's own artifacts."),
+    "AWAITING_CLARIFICATION": ("The investigation paused BEFORE spending "
+                               "compute because one answer from you "
+                               "materially changes what to look for. "
+                               "Nothing is running while the question is "
+                               "open — type your answer below and the "
+                               "same investigation resumes instantly."),
     "INTERRUPTED": ("The worker died before reaching a verdict (restart "
                     "or crash). The run is recoverable through the same "
                     "worker path — retry from the run page."),
@@ -218,6 +225,14 @@ def user_state(session: Dict[str, Any]) -> str:
         return "COMPLETED_UNKNOWN"
     if status == "INTERRUPTED":
         return "INTERRUPTED"
+    if status == "AWAITING_CLARIFICATION":
+        # R459 (external product audit P0-1, measured live on production:
+        # session ts_7fdb31b19012): the one-question pause is an ACTIVE
+        # state — the engine is waiting for the user's answer, and the
+        # projection must never read it as a terminal outcome. The
+        # pre-R459 fallthrough rendered "Completed — outcome unknown
+        # (finished: true)" on a run that was waiting for input.
+        return "AWAITING_CLARIFICATION"
     if status == "RUN_BLOCKED_TRANSPORT":
         return "BLOCKED_TRANSPORT"   # R415 (directive §8): infrastructure
         # blocked ≠ discovery failure — distinct projection, never a kill
@@ -301,6 +316,9 @@ def user_state_view(session: Dict[str, Any]) -> Dict[str, Any]:
                     "shows what was diagnosed and what comes next")
     elif key == "COMPLETED_UNKNOWN":
         decision = "outcome not established"
+    elif key == "AWAITING_CLARIFICATION":
+        decision = ("waiting for your answer — one question decides what "
+                    "the investigation looks for next")
     elif key == "RUNNING":
         decision = "investigating"
     elif key == "INTERRUPTED":

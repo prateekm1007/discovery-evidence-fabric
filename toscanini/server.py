@@ -649,6 +649,38 @@ class Handler(BaseHTTPRequestHandler):
         except Exception:  # noqa: BLE001
             return {}
 
+    def _body_multipart(self):
+        """R459: parse multipart/form-data uploads (the attachment
+        contract). Returns (fields, files) where files is a list of
+        {filename, content_type, data}. Uses the stdlib email parser —
+        no third-party dependency, no temp files."""
+        import email
+        import email.policy
+
+        ctype = self.headers.get("Content-Type") or ""
+        if "multipart/form-data" not in ctype:
+            return {}, []
+        n = int(self.headers.get("Content-Length") or 0)
+        if not n:
+            return {}, []
+        body = self.rfile.read(n)
+        raw = (f"Content-Type: {ctype}\r\nMIME-Version: 1.0\r\n\r\n"
+               ).encode("utf-8") + body
+        msg = email.message_from_bytes(raw, policy=email.policy.default)
+        fields: dict = {}
+        files: list = []
+        for part in msg.iter_parts():
+            name = part.get_param("name", header="content-disposition")
+            filename = part.get_filename()
+            payload = part.get_payload(decode=True) or b""
+            if filename:
+                files.append({"filename": filename,
+                              "content_type": part.get_content_type(),
+                              "data": payload})
+            elif name:
+                fields[name] = payload.decode("utf-8", errors="replace")
+        return fields, files
+
     def log_message(self, fmt, *args):  # quiet
         pass
 
@@ -659,6 +691,15 @@ class Handler(BaseHTTPRequestHandler):
         # R394 s15: resolve the caller's owner capability ONCE per request
         # (before any handler that needs scoping).
         self._owner_key_cached = self._owner_key()
+        # R459: the `owner` query parameter is the capability transport
+        # for DIRECT DOWNLOADS (EventSource precedent — a browser
+        # navigation cannot set headers, so the diagnostic-package link
+        # carries the same opaque token the stream route already
+        # accepts; validated identically, never logged).
+        q_owner = (urllib.parse.parse_qs(p.query).get("owner")
+                   or [""])[0].strip()
+        if q_owner and _VALID_OWNER_KEY.match(q_owner):
+            self._owner_key_cached = q_owner
 
         if p.path == "/healthz" or p.path == "/api/health":
             # R391: /api/health is the deployment healthcheck alias.
@@ -807,7 +848,23 @@ class Handler(BaseHTTPRequestHandler):
                 detail = store.session_detail(rid)
                 if detail:
                     from toscanini.user_state import public_session_view
-                    return self._json(200, public_session_view(detail))
+                    payload = public_session_view(detail)
+                    # R459 (audit P1-2, queue visibility): one worker
+                    # serializes engine runs BY MEASUREMENT (concurrent
+                    # workers burned the shared transport into
+                    # RATE_LIMITED — the lock is the fix, not the bug).
+                    # The honest product behavior is a VISIBLE queue:
+                    # a queued run says so instead of spinning silently.
+                    if detail.get("status") == "PENDING" and \
+                            store.run_lock_held():
+                        payload["queue_state"] = {
+                            "queued": True,
+                            "reason": "another discovery is running on "
+                                      "the engine — this one starts "
+                                      "automatically when the run slot "
+                                      "frees up",
+                        }
+                    return self._json(200, payload)
                 return self._json(404, {"error": "not found"})
             # ---- R414 product-integration endpoints ------------------
             # GET /api/run/{id}/state — the canonical DiscoveryRun state
@@ -1159,6 +1216,45 @@ class Handler(BaseHTTPRequestHandler):
                 "events": events,
             })
 
+        # ---- R459 (audit P0-4): the diagnostic package — the
+        # always-available deliverable. Every terminal run yields a
+        # downloadable record (executive brief + evidence summary +
+        # diagnostic report) compiled from canonical records only; no
+        # invention is claimed for a run that did not earn one.
+        if len(parts) == 4 and parts[0] == "api" and parts[1] == "run" \
+                and parts[3] == "diagnostic-package":
+            sid = parts[2]
+            if self._access(sid) == "DENY":
+                return self._denied()
+            detail = store.session_detail(sid)
+            if not detail:
+                return self._json(404, {"error": "run not found"})
+            from toscanini import diagnostic_package as _dp
+            built = _dp.build_diagnostic_package(
+                sid, Path(detail["run_dir"]) if detail.get("run_dir") else None,
+                detail)
+            if not built:
+                return self._json(409, {
+                    "error": "the investigation has not reached a "
+                             "terminal state yet — the diagnostic "
+                             "package exists when the run does"})
+            body = built["bytes"]
+            self.send_response(200)
+            self.send_header("Content-Type", "application/zip")
+            self.send_header("Content-Length", str(len(body)))
+            self.send_header("Content-Disposition",
+                             f'attachment; filename="toscanini-diagnostic-{sid[:16]}.zip"')
+            self.send_header("X-Diagnostic-Package-Sha256", built["sha256"])
+            self.end_headers()
+            self.wfile.write(body)
+            return
+
+        # ---- R459 (audit P0-3): the uploader's attachment list ----
+        if p.path == "/api/attachments":
+            from toscanini import attachments as _att
+            return self._json(200, {
+                "attachments": _att.list_attachments(self._owner_key_cached)})
+
         # R391: same-origin static webapp (Render deployment shape).
         # API paths never fall through here — /api 404s stay honest JSON.
         if not p.path.startswith("/api"):
@@ -1188,6 +1284,22 @@ class Handler(BaseHTTPRequestHandler):
             session = store.create_session(
                 title=text.split("\n")[0][:120], user_text=text,
                 owner_key=self._owner_key_cached)
+            # R459 (audit P0-3): attachments selected in the composer
+            # travel as engine-side references and bind to the run at
+            # creation. Every binding is ownership-verified — a caller
+            # cannot attach another user's upload to their run.
+            requested_ids = body.get("attachment_ids") or []
+            if requested_ids:
+                from toscanini import attachments as _att
+                owned = []
+                for aid in requested_ids[:10]:
+                    rec = _att.get_attachment(str(aid), self._owner_key_cached)
+                    if rec and not rec.get("rejected"):
+                        owned.append(rec["attachment_id"])
+                if owned:
+                    store.update_session(session["session_id"],
+                                         attachment_ids=owned)
+                    session = store.get_session(session["session_id"])
             # R392 (directive 5): the job exists durably from the moment
             # it is accepted — an immediate restart cannot erase it.
             try:
@@ -1219,6 +1331,150 @@ class Handler(BaseHTTPRequestHandler):
             payload = dict(view)
             payload["owner_key"] = self._owner_key_cached
             return self._json(200, payload)
+
+        # ---- R459 (audit P0-3): the attachment ingestion endpoints ----
+        # POST /api/attachments (multipart) — upload BEFORE a run exists
+        # (the composer's attach flow). POST /api/run/{id}/attachments —
+        # upload into a conversation. Both: sha256 custody, typed
+        # extraction, owner-scoped storage (toscanini/attachments.py).
+        if p.path == "/api/attachments" or (
+                len(parts) == 4 and parts[0] == "api"
+                and parts[1] == "run" and parts[3] == "attachments"):
+            fields, files = self._body_multipart()
+            if not files:
+                return self._json(400, {"error": "no file in upload"})
+            from toscanini import attachments as _att
+            role = str(fields.get("role") or "evidence")
+            bound_run = None
+            if len(parts) == 4 and parts[1] == "run":
+                # in-conversation upload: the caller must OWN the run
+                if self._access(parts[2]) not in ("OWNER", "PUBLIC"):
+                    return self._denied()
+                if not store.get_session(parts[2]):
+                    return self._json(404, {"error": "run not found"})
+                bound_run = parts[2]
+            saved = []
+            for f in files[:10]:
+                rec = _att.save_attachment(self._owner_key_cached,
+                                           f["filename"], f["data"], role)
+                saved.append(rec)
+            if bound_run:
+                # bind to the run: the documents join the investigation's
+                # custody; the worker merges their extracted text as
+                # typed USER_EVIDENCE
+                s = store.get_session(bound_run)
+                cur = list(s.get("attachment_ids") or [])
+                cur += [r["attachment_id"] for r in saved
+                        if not r.get("rejected")]
+                store.update_session(bound_run, attachment_ids=cur[:10])
+            return self._json(201, {
+                "attachments": saved,
+                "rejected": [r["attachment_id"] for r in saved
+                             if r.get("rejected")],
+                "bound_run": bound_run,
+            })
+
+        # ---- R459 (audit P0-2): the conversational action endpoint ----
+        # POST /api/run/{id}/actions {action, params} — the engine side
+        # of the R458 contract (toscanini/actions.py). Accepted actions
+        # are recorded (append-only ledger + session context) and open a
+        # NEW investigation round carrying the user's directive — a
+        # finished verdict is never mutated in place (the R422 rule).
+        if len(parts) == 4 and parts[0] == "api" and parts[1] == "run" \
+                and parts[3] == "actions":
+            sid = parts[2]
+            # steering is an OWNER capability — a public share must
+            # never be able to mutate or fork someone's investigation
+            if self._access(sid) != "OWNER":
+                return self._denied()
+            s = store.get_session(sid)
+            if not s:
+                return self._json(404, {"error": "run not found"})
+            body = self._body_json()
+            verb = str(body.get("action") or "").strip().upper()
+            params = body.get("params") or {}
+            if not isinstance(params, dict):
+                params = {}
+            from toscanini import actions as _actions
+            verdict = _actions.accept_action(s, verb, params)
+            if not verdict.get("accepted"):
+                return self._json(409, {
+                    "accepted": False,
+                    "code": verdict.get("code"),
+                    "reason": verdict.get("message"),
+                })
+            action_id = f"act_{uuid.uuid4().hex[:12]}"
+            directive = _actions.directive_text(verb, params)
+            entry = {
+                "action_id": action_id,
+                "action": verb,
+                "params": {k: str(v)[:200] for k, v in params.items()},
+                "directive": directive,
+                "requested_via": str(body.get("requested_via")
+                                     or "conversation"),
+                "from_session": sid,
+                "from_status": s.get("status"),
+                "created_at": time.strftime("%Y-%m-%dT%H:%M:%SZ",
+                                            time.gmtime()),
+            }
+            _actions.record_action(s.get("run_dir"), entry)
+
+            if not verdict.get("reenqueue"):
+                # presentation verbs (REVIEW_PACKAGE): recorded, no new round
+                return self._json(202, {"accepted": True,
+                                        "action_id": action_id,
+                                        "reenqueue": False})
+
+            # a NEW session in the same investigation thread — the
+            # original run's record stays untouched (append-only)
+            new_s = store.create_session(
+                title=s.get("title") or (s.get("user_text") or "")[:120],
+                user_text=s.get("user_text") or "",
+                owner_key=self._owner_key_cached)
+            from toscanini.conversational import conversation_memory as _cm
+            cls = _cm.classify_user_message(directive)
+            _ctx = _cm.record_conversation_context(new_s, directive, cls)
+            _guarded = _cm.guard_session_update({
+                "conversation": _ctx["conversation"],
+                "user_directive": {
+                    "action_id": action_id,
+                    "verb": verb,
+                    "directive": directive,
+                    "parent_session_id": sid,
+                    "params": entry["params"],
+                },
+            })
+            # carry the parent run's attachments forward: the same
+            # documents remain in the investigation's custody
+            carried = list(s.get("attachment_ids") or [])
+            store.update_session(new_s["session_id"],
+                                 parent_session_id=sid,
+                                 attachment_ids=carried,
+                                 **_guarded["allowed"])
+            new_s = store.get_session(new_s["session_id"])
+            try:
+                from toscanini import durable
+                durable.snapshot(f"action:{action_id}:{new_s['session_id']}")
+            except Exception:  # noqa: BLE001 — disclosed via health
+                pass
+            self._spawn_worker(new_s["session_id"])
+            try:
+                from toscanini import worker_forensics as _wfx
+                _fxq = _wfx.attach_session(
+                    new_s["session_id"], durable_root=_wfx.durable_root())
+                _fxq.event("ACTION_REQUESTED", verb=verb,
+                           parent=sid, action_id=action_id)
+            except Exception:  # noqa: BLE001 — fail-open, never blocks
+                pass
+            from toscanini.user_state import public_session_view
+            return self._json(202, {
+                "accepted": True,
+                "action_id": action_id,
+                "reenqueue": True,
+                "run_id": new_s["session_id"],
+                "session_id": new_s["session_id"],
+                "detail": public_session_view(new_s),
+            })
 
         # R395: conversational Q&A over a run's / invention's own
         # artifacts — honest refusals are 200-body states (the client

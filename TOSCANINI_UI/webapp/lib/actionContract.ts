@@ -60,16 +60,16 @@ export const ACTION_LABEL: Record<Exclude<ActionVerb, "ASK">, string> = {
   REVIEW_PACKAGE: "Review the technology package",
 };
 
-/** What the conversation may HONESTLY say when the engine has not yet
- * implemented the action endpoint. Never a fake success; never a
- * scientific claim (Art. LXI vocabulary — an unavailable capability is
- * an infrastructure state, not a verdict). */
+/** What the conversation may HONESTLY say when the engine cannot
+ * execute the action. Never a fake success; never a scientific claim
+ * (Art. LXI vocabulary — an unavailable capability is an infrastructure
+ * state, not a verdict). R459 (P1-1 complexity hiding): internal
+ * protocol names and round numbers stay out of user-facing copy. */
 export const ACTION_NOT_AVAILABLE_COPY =
-  "I can't change the investigation from the conversation yet — the " +
-  "engine does not accept discovery actions from the user until its " +
-  "action contract goes live. Nothing was changed by that message, and " +
-  "the investigation's record is unaffected. Your message is preserved " +
-  "here; asking about the record still works.";
+  "I can't change the investigation from the conversation yet — that " +
+  "capability isn't available right now. Nothing was changed by that " +
+  "message, and the investigation's record is unaffected. Your message " +
+  "is preserved here; asking about the record still works.";
 
 // ---------------------------------------------------------------------------
 // the deterministic phrase router (presentation-level, no semantics)
@@ -181,6 +181,12 @@ export interface ActionResult {
   /** not_available — the engine does not implement the action endpoint
    * yet (the contract is defined; the capability is honestly absent). */
   not_available: boolean;
+  /** R459: the engine opened a NEW investigation round carrying the
+   * user's directive — the UI navigates to it. */
+  new_run_id?: string;
+  /** R459: a typed engine refusal (e.g. the run is still running) —
+   * rendered verbatim, never guessed. */
+  refusal?: string;
   action_id?: string;
   detail?: string;
 }
@@ -218,6 +224,17 @@ export async function sendAction(
     // the action endpoint yet
     return { accepted: false, not_available: true };
   }
+  if (res.status === 409) {
+    // a typed engine refusal — render the engine's own words
+    let reason = "";
+    try {
+      const b = (await res.json()) as Record<string, unknown>;
+      reason = typeof b.reason === "string" ? b.reason : "";
+    } catch {
+      /* non-json error body */
+    }
+    return { accepted: false, not_available: false, refusal: reason };
+  }
   if (res.ok) {
     let body: Record<string, unknown> = {};
     try {
@@ -228,6 +245,8 @@ export async function sendAction(
     return {
       accepted: true,
       not_available: false,
+      new_run_id:
+        typeof body.run_id === "string" ? body.run_id : undefined,
       action_id:
         typeof body.action_id === "string" ? body.action_id : undefined,
     };
