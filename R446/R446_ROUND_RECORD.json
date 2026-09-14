@@ -114,15 +114,29 @@
     "the product-event stream derives from terminal artifacts; live SSE still uses the R431 event journal"
   ],
   "production_deployment": {
-    "target_sha": "df399948",
-    "pushed_to_origin_main": "FILLED_AT_PUSH",
-    "deploy_id": null,
-    "health_check_result": null,
-    "drift": "UNKNOWN",
-    "blocked_by": "the sandbox has no Render/Space deploy trigger for this repo's production pipeline; the push is performed with the operator PAT (ls-remote verified), the deployment is the operator-side step",
-    "what_unblocks": "the operator triggers the deploy at the pushed SHA (or grants the deploy API access); the health tuple then verifies engine_commit == target_sha per Art. LXXI",
-    "art_lxxi_state": "DELIVERY_BLOCKED (deploy step) — honestly declared, not silently omitted",
-    "target_sha_note": "the implementation (work) commit; the follow-up record commits ride on top per the standing round protocol"
+    "target_sha": "a4809b28e96561672cd3946a14e4e51340ca4b14",
+    "target_sha_note": "the final round commit (work commit df399948 + the record commits + the routing-fix commit 67b77a73 + this record)",
+    "deployed_sha": "a4809b28e96561672cd3946a14e4e51340ca4b14",
+    "space": "prateekm1/toscanini-prod-validation",
+    "space_revision": "a9ea8038c210fa524119fc8686c3d1f72d5929c0",
+    "pushed_to_origin_main": true,
+    "health_check_result": "GREEN",
+    "drift": "GREEN",
+    "identity_tamper": false,
+    "deploy_id": "HF Space revision a9ea8038 (the r447 deploy pipeline, reused verbatim per Art. X)",
+    "first_iteration": {
+      "deployed_sha": "2e611d7a28e73a7f6d16fb842dfdca9d2a8155ab",
+      "verified": "engine_commit == target, drift GREEN, tamper False — ARTICLE LXXI COMPLETE",
+      "production_smoke_finding": "the GET routes /contract and /product-events were mis-registered in do_POST (live probe returned the honest no-such-endpoint 404); FIXED in 67b77a73 with the HTTP-level routing battery pinning the regression (Art. XXXI)"
+    },
+    "production_smoke_final": {
+      "contract_route": "GET /api/run/ts_bfe11ba5027e/contract -> CODER1_RUN_CONTRACT/1.0.0; the honest RUN_BLOCKED_TRANSPORT infrastructure state with complete_marker NOT_MARKED",
+      "product_events_route": "GET /api/run/ts_bfe11ba5027e/product-events -> CODER1_PRODUCT_EVENT/1.0.0; 0 events (the run has no run_dir — honest absence)",
+      "fresh_production_runs": "ts_c1a3864f5583 + ts_bfe11ba5027e (the directive own example problems) — both honestly RUN_BLOCKED_TRANSPORT (the Space model routing is UNAVAILABLE: the standing owner-gated transport decision; the problems are saved and resumable)"
+    },
+    "blocked_by": "discovery_ready=False remains: the Space model routing (localqwen/tokenrouter) is UNAVAILABLE — the standing owner-gated transport decision documented since R452; the engine, retrieval, showcase, portfolio, and reality-loop subsystems are all healthy on the deployed build",
+    "what_unblocks": "the operator resolves the model-transport decision (the R452-A3 escalation); everything else on the deployed surface is verified",
+    "art_lxxi_state": "DELIVERY COMPLETE (push + deploy + health tuple all GREEN at a4809b28)"
   },
   "reviewer_provenance": "AI_REVIEW"
 }
