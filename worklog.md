@@ -986,3 +986,22 @@ Stage Summary:
 - R453-C2 RELEASED: origin/main now carries the Claude-class reconstruction - one conversation -> one discovery, composer-first home, the honest engine-unreachable state, the six adversarial fixtures A-F executable and green, and the presentation layer consolidated with the mainline's R451-C2.x/R452 honesty vocabulary into ONE owned chain (present.ts composes presentationState.ts + renderAvailability.ts; components render, never re-derive).
 - Disclosed: the production Space has NOT been redeployed at the merged SHA (identity verification pending); the section-15 tuple inside the committed CODER2_CLAUDE_CLASS_UI_AUDIT.md stands as the as-committed round record - this entry supersedes its delivery status.
 - reviewer_provenance=AI_REVIEW.
+
+---
+Task ID: R453-C2-deploy-verify
+Agent: Coder 2 (main session, deploy execution)
+Task: The last Art. LXXI item — redeploy the canonical HF Space at the merged SHA (8d019f3) and run the /api/version + /api/health identity verification.
+
+Work Log:
+- Pre-flight: deployed-vs-main diff scope measured (git log 7e4ed47d..8d019f3 — ONLY the webapp/UI commits 5891294 + e4c8a33; engine bytes identical); all 6 adapter Dockerfile anchors verified present at the merged SHA; constitution re-hashed b54a1be9... == the ratified v2.4.0 bytes (re-verified again immediately before THIS closure commit).
+- Recipe: the R451-C1.3 phase-split deploy verbatim (the CURRENT Space contract incl. the llama.cpp b10930 local route) — scripts/r453_c2_space_deploy.py + scripts/r453_c2_space_verify.py (versioned with this commit; written outside the tree during execution so the deployed tree stayed byte-exact at the merged SHA; env-injection credentials, fail-closed, nothing persisted).
+- Deploy executed: target ls-remote-pinned from ORIGIN (8d019f3df7ef, Art. XXIII — not local state), 6930 tracked files archived (579 MB tar), adapter Dockerfile 262 lines (RENDER_GIT_COMMIT pinned to the merged SHA), README frontmatter upfront, ONE upload_folder -> Space revision 486bc0c7d430719f083cdd377122d74269bd24a5 (139 s upload), the full R451-C1.3 env contract re-wired (8 variables + 3 secrets).
+- Build + verification: HF Docker build RUNNING_BUILDING -> RUNNING_APP_STARTING -> RUNNING (~8 min); the Art. LXXI tuple ALL GREEN on the first verify invocation:
+  1. push confirmed: ls-remote origin/main 8d019f3df7ef == target
+  2. /api/version engine_commit 8d019f3df7ef (source build_artifact) == target — IDENTITY VERIFIED; web_build_hash fe6529dcd8052f28... (the NEW Claude-class UI build — differs from the pre-reconstruction 9894885..., proving the reconstruction is actually served); constitution_version 2.4.0
+  3. /api/health ok=True, deployment_drift=GREEN, identity_tamper=False, discovery_ready=True
+- Record: R453/HF_DEPLOYMENT_RECORD.json (the full Art. LXXI §2 deployment tuple, delivery_complete=True).
+
+Stage Summary:
+- ARTICLE LXXI DELIVERY COMPLETE: the operator-specified production URL serves the EXACT merged SHA (8d019f3); the Claude-class UI reconstruction is LIVE in production; the R453-C2 round's delivery tuple is closed end-to-end (branch -> PR #8 -> merge -> deploy -> identity verification). The residual "records-only trailing commits" class (this commit) is the standing R450/R451 precedent. The standing credential-rotation escalation remains the operator's sole open item.
+- reviewer_provenance=AI_REVIEW.
