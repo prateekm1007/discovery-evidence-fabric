@@ -135,19 +135,39 @@ _CREDIT_HINTS = ("depleted your monthly included credits",
                  "payment required", "billing hard limit",
                  # R456-A3 measured free-tier router specimens
                  "insufficient balance", "deposit required",
-                 "deposited balance")
+                 "deposited balance",
+                 # R461 bynara per-model plan-gate specimen
+                 "plan does not include")
 # R456-A3: the free-tier routers' own words for "this model needs a
 # deposit / the account cannot pay" — MEASURED specimens (2026-09-14):
 #   xkiro 403: "requires real deposited balance — it is billed from
 #               your [wallet]"
 #   b.ai 403:  "Deposit required to unlock premium models"
 #   b.ai 400:  "credit insufficient balance: balance=0 required=2406"
-# Unambiguous credit wording — checked BEFORE the 401/403 auth
+# R461 bynara specimens (2026-09-15, post-telegram-join):
+#   bynara 403: "Your plan does not include the requested model."
+#               (per-model PLAN gate — the xkiro deposit-gate class:
+#               valid key, gated model, cascade advances, provider
+#               stays eligible)
+# Unambiguous credit/plan wording — checked BEFORE the 401/403 auth
 # shortcut so a deposit-gated model classifies CREDIT_EXHAUSTED (the
 # cascade advances to the next rung/provider; the provider stays
 # eligible — the gate is per-model, not per-key)
 _FREE_TIER_CREDIT_HINTS = ("insufficient balance", "deposit required",
-                            "deposited balance")
+                            "deposited balance",
+                            "plan does not include")
+# R461: bynara's ACCOUNT-ENTRY GATE specimen (measured 2026-09-14,
+# pre-owner-action): 403 "telegram_required: Join the required
+# Telegram group/channel and relink at /settings to continue." The
+# KEY is valid; the ACCOUNT must take the provider's entry action.
+# The owner RESOLVED it 2026-09-15 (telegram joined — R461/
+# BYNARA_OWNER_ACTION_ESCALATION.json). If it RECURS, the honest
+# action-bearing reading is the account-gate class (CREDIT_EXHAUSTED
+# family: retrying and waiting cannot fix it; the fix is at the
+# provider's settings page, not the wallet and not the key) — the
+# cascade advances and the escalation record tells the operator the
+# exact relink action. Never AUTH_FAILURE: the key is valid.
+_ACCOUNT_ENTRY_GATE_HINTS = ("telegram_required", "relink at")
 # R456-A3: unorouter's free-pool congestion wording (403 body — the
 # provider's own remedy is 'switch to another model'):
 #   "This model is busy right now (free providers hit their rate
@@ -205,6 +225,11 @@ def classify_failure(exc: BaseException, http_status: Optional[int] = None,
         # the auth shortcut (a valid key behind a deposit-gated model or
         # a busy free pool is NOT an auth failure). 401 stays strictly
         # AUTH: a failed key is a failed key whatever the body says.
+        # R461: the bynara account-entry-gate specimen (telegram /
+        # relink) classifies the same way — an account that must take
+        # the provider's entry action is not a failed key.
+        if status == 403 and _hints(_ACCOUNT_ENTRY_GATE_HINTS):
+            return CREDIT_EXHAUSTED
         if status == 403 and _hints(_FREE_TIER_CREDIT_HINTS):
             return CREDIT_EXHAUSTED
         if status == 403 and _hints(_FREE_TIER_RATE_HINTS):

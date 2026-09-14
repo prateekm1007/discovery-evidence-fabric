@@ -109,6 +109,13 @@ ACCOUNT_DOMAIN_VOCAB = (
     "OWNER_XKIRO_ACCOUNT",
     "OWNER_APINEX_ACCOUNT",
     "OWNER_BAI_ACCOUNT",
+    # R461: the FIFTH router joins the rotation — bynara
+    # (router.bynara.id). A DISTINCT economic account behind an
+    # account-entry gate the owner resolved (telegram join, the Art.
+    # LXV escalation answered 2026-09-15); its free-tier credit
+    # allowance is separate from the quartet's, so its depletion
+    # advances the cascade without touching the others.
+    "OWNER_BYNARA_ACCOUNT",
     "UNDECLARED",                 # honest unknown — never guessed
 )
 

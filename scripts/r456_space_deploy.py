@@ -170,15 +170,18 @@ def main() -> int:
                          value=GITHUB_TOKEN)
     api.add_space_secret(repo_id=SPACE, key="PORTFOLIO_COMMIT",
                          value=PORTFOLIO_COMMIT)
-    # R456-A3: the operator's free-tier router quartet (four DISTINCT
+    # R456-A3 + R461: the operator's free-tier router set (FIVE DISTINCT
     # economic accounts; token exhaustion on one advances the cascade to
     # the next — the operator's rotation rule). The keys come from the
     # operator via env injection at deploy time; they are NEVER in the
-    # repo, the commit, or any artifact (BS-021).
+    # repo, the commit, or any artifact (BS-021). R461 adds BYNARA (the
+    # fifth router, its account-entry gate resolved by the owner's
+    # telegram join 2026-09-15).
     for env_name, var in (("UNOROUTER_API_KEY", "UNOROUTER_API_KEY"),
                           ("XKIRO_API_KEY", "XKIRO_API_KEY"),
                           ("APINEX_API_KEY", "APINEX_API_KEY"),
-                          ("BAI_API_KEY", "BAI_API_KEY")):
+                          ("BAI_API_KEY", "BAI_API_KEY"),
+                          ("BYNARA_API_KEY", "BYNARA_API_KEY")):
         val = os.environ.get(var, "")
         if val:
             api.add_space_secret(repo_id=SPACE, key=env_name, value=val)

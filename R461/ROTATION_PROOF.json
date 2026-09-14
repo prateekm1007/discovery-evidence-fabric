@@ -1,0 +1,110 @@
+{
+  "round": "R461",
+  "measured_at": "2026-09-14T23:40:48Z",
+  "policy": "ZERO_PAID_COST (FREE_TIER_API eligible, model_cost_policy v1.1.0)",
+  "arms": {
+    "A_new_rung_serves": {
+      "preferred": [
+        "bynara"
+      ],
+      "role": "extraction",
+      "status": "OK",
+      "provider": "bynara",
+      "model": "tencent-hy3-free",
+      "latency_ms": 7986,
+      "wall_s": 8.83,
+      "content_head": "APPLICATION: sealed electronic enclosure \u2014 THERMAL CONSTRAINT: The single most important thermal design constraint for a sealed electronic enclosure is maintaining internal component temperatures below maximum rated limi",
+      "cost_provenance": {
+        "cost_basis": "FREE_TIER_API",
+        "account_domain": "OWNER_BYNARA_ACCOUNT",
+        "policy": "ZERO_PAID_COST",
+        "model_id": "tencent-hy3-free",
+        "provider": "bynara"
+      },
+      "route": [
+        {
+          "provider": "bynara",
+          "model": "tencent-hy3-free",
+          "status": "OK",
+          "failure_type": null,
+          "latency_ms": 7986,
+          "detail": ""
+        }
+      ],
+      "failure_type": null
+    },
+    "B_rotation_live": {
+      "preferred": [
+        "bynara",
+        "unorouter"
+      ],
+      "role": "synthesis",
+      "status": "OK",
+      "provider": "xkiro",
+      "model": "qwen/qwen3.5-plus:free",
+      "latency_ms": 76,
+      "wall_s": 1.29,
+      "content_head": "FIELD: Chloride accumulation and acidification \u2014 FIELD mechanism: Hydrolysis of Al\u00b3\u207a ions within the crevice lowers pH, destabilizing the passive film; FIELD variable: Local pH; FIELD falsifier: In-situ micro-electrode m",
+      "cost_provenance": {
+        "cost_basis": "FREE_TIER_API",
+        "account_domain": "OWNER_XKIRO_ACCOUNT",
+        "policy": "ZERO_PAID_COST",
+        "model_id": "qwen/qwen3.5-plus:free",
+        "provider": "xkiro"
+      },
+      "route": [
+        {
+          "provider": "bynara",
+          "model": "qwen3.8-flash-free",
+          "status": "SKIPPED_NOT_ADMITTED",
+          "failure_type": "CREDIT_EXHAUSTED",
+          "latency_ms": 0,
+          "detail": "PROBE_FAILED (failure_class=CREDIT_EXHAUSTED)"
+        },
+        {
+          "provider": "xkiro",
+          "model": "qwen/qwen3.5-plus:free",
+          "status": "OK",
+          "failure_type": null,
+          "latency_ms": 76,
+          "detail": ""
+        }
+      ],
+      "failure_type": null
+    },
+    "C_quintet_default": {
+      "preferred": [],
+      "role": "synthesis",
+      "status": "OK",
+      "provider": "xkiro",
+      "model": "qwen/qwen3.5-plus:free",
+      "latency_ms": 73,
+      "wall_s": 0.85,
+      "content_head": "FIELD: Chloride accumulation and acidification \u2014 FIELD mechanism: Hydrolysis of Al\u00b3\u207a ions within the crevice lowers pH, destabilizing the passive film; FIELD variable: Local pH; FIELD falsifier: In-situ micro-electrode m",
+      "cost_provenance": {
+        "cost_basis": "FREE_TIER_API",
+        "account_domain": "OWNER_XKIRO_ACCOUNT",
+        "policy": "ZERO_PAID_COST",
+        "model_id": "qwen/qwen3.5-plus:free",
+        "provider": "xkiro"
+      },
+      "route": [
+        {
+          "provider": "xkiro",
+          "model": "qwen/qwen3.5-plus:free",
+          "status": "OK",
+          "failure_type": null,
+          "latency_ms": 73,
+          "detail": ""
+        }
+      ],
+      "failure_type": null
+    }
+  },
+  "verdict": {
+    "new_rung_serves": true,
+    "rotation_advanced_on_typed_failure": true,
+    "quintet_route_recorded": true
+  },
+  "note": "real generate() calls through admission+cascade; no faked state \u2014 the only failure state used is the providers' own live gate/credit conditions"
+}

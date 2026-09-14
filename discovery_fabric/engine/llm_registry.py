@@ -343,6 +343,63 @@ PROVIDER_SPECS: List[ProviderSpec] = [
             "strong flagships here are premium-gated). Default urllib "
             "User-Agent passes (no CF block on api.b.ai). Tiers are "
             "recorded policy inputs (Art. XXVII).")),
+    # ------------------------------------------------------------------
+    # R461 (2026-09-15): the FIFTH free-tier router — bynara. The key
+    # arrived 2026-09-14 with the quartet but measured 403
+    # telegram_required ("Join the required Telegram group/channel and
+    # relink at /settings to continue") — a typed ACCOUNT-ENTRY GATE,
+    # escalated to the owner per Art. LXV (R461/
+    # BYNARA_OWNER_ACTION_ESCALATION.json). The owner acted ("bynara
+    # (new router) — key valid telegram joined", 2026-09-15): the gate
+    # is RESOLVED and the account now serves. Probe-before-admit held
+    # throughout — the registration below quotes only measurements
+    # taken AFTER the owner action (R461/PROBE_CATALOG.json +
+    # PROBE_COMPLETIONS.json).
+    # ------------------------------------------------------------------
+    ProviderSpec(
+        "bynara", "BYNARA_API_KEY",
+        "https://router.bynara.id/v1/chat/completions",
+        "tencent-hy3-free", "openai", 128_000,
+        quality_tier=3, cost_tier=1, latency_tier=2,
+        cost_basis="FREE_TIER_API", locality="REMOTE",
+        license="provider serving terms (free tier, no deposit)",
+        account_domain="OWNER_BYNARA_ACCOUNT",
+        model_revision="router free tier; tencent-hy3-free measured "
+                       "live 2026-09-15 (tiny completions 1.91-2.53 s, "
+                       "3x stable); no per-model revision pin exposed "
+                       "by the router — recorded honest (Art. VI)",
+        policy_note=(
+            "R461 operator-supplied free-tier router #5 (bynara, "
+            "router.bynara.id — the account-entry gate resolved by the "
+            "owner's telegram join, the Art. LXV escalation answered). "
+            "LIVE-MEASURED at registration (post-owner-action): GET "
+            "/v1/models -> 200 with 49 models incl. an explicit -free "
+            "family (glm-5.3-free, qwen3.8-flash-free, mimo-v2.5-free, "
+            "muse-spark-1.3-contributor-free, tencent-hy3-free); "
+            "tencent-hy3-free tiny completion -> 200 PROBE_OK 2.53 s / "
+            "1.91 s / 1.91 s (3 passes, stable). The account's OTHER "
+            "-free models measured credit/plan-gated on this key at "
+            "registration time: glm-5.3-free -> 402 'Insufficient "
+            "credits. Please top up your balance.' and mimo-v2.5-free "
+            "-> 429 'Insufficient credits ... try again in a few "
+            "minutes' (the account's small free credit allowance is "
+            "depleted for those rungs — typed CREDIT_EXHAUSTED / "
+            "RATE_LIMITED, the cascade advances and the cooldown "
+            "ladder retries); qwen3.8-flash-free + muse-spark-1.3-"
+            "contributor-free -> 403 'Your plan does not include the "
+            "requested model.' (per-model plan gate, the xkiro "
+            "deposit-gate precedent — typed CREDIT_EXHAUSTED, the "
+            "provider stays eligible). Default urllib User-Agent "
+            "passes (no CF block on router.bynara.id). HONEST TIERS: "
+            "quality_tier 3 — tencent-hy3 carries flagship-family "
+            "naming but the free-tier serving path is UNMEASURED on "
+            "the engine's structured protocol; no STRONG claim (the "
+            "measured rung registers FAST+CHEAP, latency_tier 2, "
+            "measured ~2 s). The -free family allowlist admits all "
+            "five ids so catalog discovery can route to whichever "
+            "rung the account's credit state admits (family policy, "
+            "never today's availability — Art. XXVII). Tiers are "
+            "recorded policy inputs (Art. XXVII).")),
     ProviderSpec(
         "tokenrouter", "TOKEN_ROUTER_API_KEY",
         "https://api.tokenrouter.com/v1/chat/completions",

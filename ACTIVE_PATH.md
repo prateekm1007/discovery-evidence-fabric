@@ -787,3 +787,35 @@ model_quality_proven, adaptive_routing_proven, causal_learning_proven
 = TRUE; reality_loop_proven = FALSE — computation is never external
 reality; world_class_claim_supported = FALSE — Art. LVIII, every
 review is AI_REVIEW).
+
+## R461 addendum (2026-09-15) — the FIFTH free-tier router + the owner-action escalation closed
+
+Operator directive R461: "bynara (new router) — key valid  telegram
+joined save the 5 keys as HF Space secrets, register the
+newly-measured free rungs, record the bynara owner-action escalation,
+run the live rotation proof, then commit → push → deploy." (Extends
+the R456-A3 rotation to five DISTINCT economic accounts.)
+
+| Component | Module / artifact | Notes |
+|---|---|---|
+| THE Art. LXV escalation, closed | `R461/BYNARA_OWNER_ACTION_ESCALATION.json` | opened 2026-09-14: the bynara key measured 403 telegram_required ("Join the required Telegram group/channel and relink at /settings") — a typed ACCOUNT_ENTRY_GATE (never AUTH_FAILURE; the key is valid). The owner acted 2026-09-15 (telegram joined, quoted verbatim); resolved with the post-action measurement; recurrence protocol recorded (re-open at escalation_count 2 with the exact relink action — the machine can never take that action itself, Art. XXXIII) |
+| THE fifth router | `llm_registry.py` bynara spec + `OWNER_BYNARA_ACCOUNT` in `transport_capability.ACCOUNT_DOMAIN_VOCAB` | router.bynara.id (plain urllib UA passes — no CF block), FREE_TIER_API under the standing v1.1.0 amendment, default rung tencent-hy3-free (measured 200 PROBE_OK 2.53/1.91/1.91 s, 3 passes); HONEST tiers: FAST+CHEAP only, no STRONG claim (the free-tier serving path is unmeasured on the structured protocol) |
+| THE -free family allowlist | `model_routing.PINNED_MODEL_FAMILIES['bynara']` | the five ids the catalog serves (tencent-hy3-free, glm-5.3-free, qwen3.8-flash-free, mimo-v2.5-free, muse-spark-1.3-contributor-free); premium ids (claude/gpt/gemini/flagship glm/qwen) NEVER become rungs silently |
+| THE newly-measured free rungs | `model_routing.PINNED_DEFAULT_MODELS` | xkiro qwen/qwen3.5-plus:free (STRONG+FAST, 2.25 s); apinex free/deepseek-v4-pro-0813 (STRONG+FAST, 5.64 s, 72 reasoning tokens) + free/glm-5.3-flash (FAST+CHEAP, 3.35 s); bynara tencent-hy3-free (FAST+CHEAP) |
+| THE rotation rule, extended | `provider_health.py` | the measured bynara specimens classify: 402 "Insufficient credits" + 403 "Your plan does not include the requested model." → CREDIT_EXHAUSTED; 429 "...try again in a few minutes" → RATE_LIMITED; the account-entry-gate hints (telegram_required / relink at) → CREDIT_EXHAUSTED-class (a valid key behind an account gate is not a failed key); 401 stays strictly AUTH |
+| THE persisted secrets | `scripts/r461_hf_secrets.py` → `R461/HF_SPACE_SECRETS.json` | the FIVE router keys saved as HF Space secrets on the canonical Space prateekm1/toscanini-prod-validation (5/5 set, masked fingerprints only, BS-021) — the operator's "so i dont have to keep insertig them again"; the deploy driver wires the same five at every deploy |
+| THE live rotation proof | `scripts/r461_rotation_proof.py` → `R461/ROTATION_PROOF.json` | real generate() through admission+cascade, no faked state; the R418 operator pin BYNARA_MODEL=tencent-hy3-free (evidence-backed, the documented mechanism): Arm A — bynara SERVES on tencent-hy3-free with FREE_TIER_API / OWNER_BYNARA_ACCOUNT / ZERO_PAID_COST; Arm B — the engine's own capability probe typed bynara's gated rungs (CREDIT_EXHAUSTED) and unorouter's 429 (RATE_LIMITED), the cascade ADVANCED, xkiro qwen/qwen3.5-plus:free served — token exhaustion on one provider automatically going to the next, measured live; Arm C — the natural five-key route recorded. Verdict: all three TRUE |
+| The probe artifacts | `scripts/r461_probe_routers.py` + `r461_probe_completions.py` → `R461/PROBE_{CATALOG,COMPLETIONS}.json` | all five providers re-measured 2026-09-15 (catalog + admission-grade completions; unorouter 264 models / xkiro 109 / apinex 26 / bai 47 / bynara 49); 11 PROBE_OK completions measured live |
+
+Tests: `tests/test_r461_bynara_router.py` 25/25 (registration, the
+escalation-record contracts, the -free family vs premium ids, the
+measured specimens + 401/403 discipline, the new rungs, secret
+discipline with full-value markers); `test_r456_free_tier_routers.py`
+27/27 unchanged; r458 30/30; the wide family 250+ green;
+MODULE_INVENTORY regenerated (123 files / 59,487 LOC, drift GREEN).
+Pre-existing failures disclosed (BS-020, stash-verified identical at
+the pristine 7e89e40c baseline): test_r418_routing_pin 1 +
+test_r446_completion_authority 2; collection 3,937/45 errors vs
+baseline 3,910/45.
+
+Round record: `R461/R461_ROUND_RECORD.json`.

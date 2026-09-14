@@ -175,6 +175,7 @@ PINNED_MODEL_FAMILIES: Dict[str, List[str]] = {
     ],
     "xkiro": [
         r"^qwen/qwen3\.8-max:free$",
+        r"^qwen/qwen3\.5-plus:free$",
         r"^qwen/qwen3-max:free$",
         r"^minimax/minimax-m3:free$",
         r"^minimax/minimax-m2\.7:free$",
@@ -182,6 +183,7 @@ PINNED_MODEL_FAMILIES: Dict[str, List[str]] = {
     ],
     "apinex": [
         r"^free/deepseek-v[0-9.]+[a-z-]*$",
+        r"^free/deepseek-v4-pro-0813$",
         r"^free/glm-5\.3-flash$",
         r"^free/qwen-3\.8-max$",
         r"^free/mimo-v[0-9.]+$",
@@ -190,6 +192,17 @@ PINNED_MODEL_FAMILIES: Dict[str, List[str]] = {
     "bai": [
         r"^qwen3\.8-flash$",
         r"^mimo-v[0-9.]+$",
+    ],
+    # R461: the FIFTH router — bynara's -free family (the ids the
+    # catalog actually serves; premium ids like glm-5.3, qwen3.8-max,
+    # claude-opus-5, gpt-6-astra NEVER become rungs silently — the
+    # -free suffix is the free-tier marker this router uses)
+    "bynara": [
+        r"^tencent-hy3-free$",
+        r"^glm-5\.3-free$",
+        r"^qwen3\.8-flash-free$",
+        r"^mimo-v2\.5-free$",
+        r"^muse-spark-1\.3-contributor-free$",
     ],
 }
 
@@ -276,10 +289,28 @@ PINNED_DEFAULT_MODELS: Dict[str, List[Dict[str, Any]]] = {
         {"model": "qwen/qwen3-max:free",
          "task_capabilities": [TASK_STRONG, TASK_FAST],
          "cost_class": 1, "latency_class": 2, "context_limit": 128000},
+        # R461: the newly-measured free rung (tiny completion 2.25 s,
+        # 2026-09-15) — the qwen3.5-plus generation sits at the
+        # qwen3-max class's depth (STRONG+FAST, the plus tier is
+        # Qwen's deep-reasoning class below MAX)
+        {"model": "qwen/qwen3.5-plus:free",
+         "task_capabilities": [TASK_STRONG, TASK_FAST],
+         "cost_class": 1, "latency_class": 2, "context_limit": 128000},
     ],
     "apinex": [
         {"model": "free/deepseek-v4.1-flash",
          "task_capabilities": [TASK_STRONG, TASK_FAST, TASK_CHEAP],
+         "cost_class": 1, "latency_class": 3, "context_limit": 128000},
+        # R461: the newly-measured free rungs (tiny completions 5.64 s
+        # with 72 reasoning tokens / 3.35 s with 27, 2026-09-15) —
+        # deepseek-v4-PRO is the flagship PRO class (STRONG, measured
+        # reasoning latency honest at latency_class 3); glm-5.3-flash
+        # is the flash class (FAST+CHEAP, no STRONG claim)
+        {"model": "free/deepseek-v4-pro-0813",
+         "task_capabilities": [TASK_STRONG, TASK_FAST],
+         "cost_class": 1, "latency_class": 3, "context_limit": 128000},
+        {"model": "free/glm-5.3-flash",
+         "task_capabilities": [TASK_FAST, TASK_CHEAP],
          "cost_class": 1, "latency_class": 3, "context_limit": 128000},
         {"model": "free/mimo-v2.5",
          "task_capabilities": [TASK_FAST, TASK_CHEAP],
@@ -292,6 +323,22 @@ PINNED_DEFAULT_MODELS: Dict[str, List[Dict[str, Any]]] = {
         {"model": "mimo-v2.5",
          "task_capabilities": [TASK_FAST, TASK_CHEAP],
          "cost_class": 1, "latency_class": 1, "context_limit": 128000},
+    ],
+    # R461: the FIFTH router — every rung below is a MEASURED
+    # free-tier answerer on the bynara account (post-telegram-join,
+    # 2026-09-15). tencent-hy3-free answered 3 consecutive probes
+    # (1.91-2.53 s); the account's other -free ids are credit/plan-
+    # gated AT REGISTRATION TIME (typed specimens in provider_health)
+    # — the family allowlist still admits them so catalog discovery
+    # routes to whichever rung the account's credit state admits.
+    # HONEST classes: FAST+CHEAP only — the free-tier serving path is
+    # unmeasured on the engine's structured protocol; no STRONG claim
+    # (the b.ai precedent: flagship-family naming is not a quality
+    # measurement).
+    "bynara": [
+        {"model": "tencent-hy3-free",
+         "task_capabilities": [TASK_FAST, TASK_CHEAP],
+         "cost_class": 1, "latency_class": 2, "context_limit": 128000},
     ],
 }
 
