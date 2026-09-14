@@ -98,8 +98,9 @@ export interface SessionDetail {
   // the result endpoint; the UI reads phases/outcomes from here
   run_state?: RunStateObject;
   // R459 (audit P1-2): queue visibility — a queued run SAYS it is
-  // waiting for the engine's single run slot instead of spinning.
-  queue_state?: { queued: boolean; reason: string };
+  // waiting for a run slot (R459-reaudit: the engine holds a slot
+  // pool) instead of spinning.
+  queue_state?: { queued: boolean; reason: string; position?: number };
   // R459: the investigation thread — set on rounds opened by a
   // conversational action (the parent run's record stays untouched).
   parent_session_id?: string | null;

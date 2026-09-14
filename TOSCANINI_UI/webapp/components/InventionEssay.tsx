@@ -9,6 +9,7 @@
 import { useEffect, useState } from "react";
 import type { EssayBody } from "@/lib/types";
 import { getEssay } from "@/lib/api";
+import MathText from "@/lib/MathText";
 
 const TITLES: Record<string, string> = {
   what_toscanini_invented: "What Toscanini invented",
@@ -67,7 +68,7 @@ export default function InventionEssay({
           {entries.map(([key, text]) => (
             <section className="essay-section" key={key}>
               <h4>{TITLES[key] ?? key.replace(/_/g, " ")}</h4>
-              <p>{text}</p>
+              <MathText text={text} />
             </section>
           ))}
         </div>

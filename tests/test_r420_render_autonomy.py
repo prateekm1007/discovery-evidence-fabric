@@ -833,31 +833,53 @@ class TestLadderAndTypedTerminal(unittest.TestCase):
 
     def test_render_job_mutually_excludes_with_run_workers(self):
         """R420c — the crash-loop root cause, guarded: an async render
-        attempt holds the SAME run.lock the discovery worker holds for
-        its whole lifetime, so an engine run and a Blender never share
-        the 512 MB instance (observed live: the recovery Blender +
-        fresh-run worker OOM-crashed the container at 23:04)."""
+        attempt holds the ENTIRE run capacity (every slot the discovery
+        workers hold), so an engine run and a heavy render never share
+        instance memory (observed live: the recovery Blender +
+        fresh-run worker OOM-crashed the container at 23:04).
+        R459-reaudit P1-1 re-expression: the binary run.lock became an
+        N-slot flock semaphore in toscanini.sessions — the render's
+        exclusion is a full-capacity hold over the SAME slot files the
+        workers use, so the mutual exclusion is structural, not
+        path-nominal."""
         src = inspect.getsource(artifact_worker.run)
         self.assertIn("_acquire_run_lock_blocking()", src)
         self.assertIn("run_lock", src)
-        # CRITICAL: the render job and the run worker must share the
-        # SAME lock FILE (the worker's existing production path) —
-        # different paths would silently provide no mutual exclusion
+        # the render and the run worker must acquire from the SAME
+        # slot directory (different dirs would silently provide no
+        # mutual exclusion)
         worker_src = inspect.getsource(worker_mod)
-        self.assertIn('store.STORE_DIR / "run.lock"', worker_src)
-        self.assertEqual(str(artifact_worker._run_lock_path()),
-                         str(__import__(
-                             "toscanini.sessions", fromlist=["x"])
-                             .STORE_DIR / "run.lock"))
-        # functional: the non-blocking probe honors a held lock
-        handle, acquired = artifact_worker._try_run_lock_nonblocking()
-        self.assertTrue(acquired)
+        self.assertIn("store.acquire_run_slot()", worker_src)
+        self.assertIn(
+            "store.acquire_run_slots_all()",
+            inspect.getsource(artifact_worker._acquire_run_lock_blocking))
+        # functional (capacity pinned to 1 → the historical binary
+        # semantics are the exact special case): hold the full
+        # capacity, a second full-capacity attempt fails; release
+        # restores it
+        import os as _os
+        import toscanini.sessions as _sessions
+        old = _os.environ.get("TOSCANINI_RUN_SLOTS")
+        _os.environ["TOSCANINI_RUN_SLOTS"] = "1"
         try:
-            handle2, acquired2 = artifact_worker._try_run_lock_nonblocking()
-            self.assertFalse(acquired2)  # one holder at a time
-            self.assertIsNone(handle2)
+            handles, acquired = artifact_worker._try_run_lock_nonblocking()
+            self.assertTrue(acquired)
+            try:
+                handles2, acquired2 = (
+                    artifact_worker._try_run_lock_nonblocking())
+                self.assertFalse(acquired2)  # the capacity is held
+                self.assertEqual(handles2, [])
+            finally:
+                for h in handles:
+                    h.close()
+            # released → a run slot is available again
+            cap = _sessions.run_capacity()
+            self.assertEqual(cap["free"], cap["slots"])
         finally:
-            handle.close()
+            if old is None:
+                _os.environ.pop("TOSCANINI_RUN_SLOTS", None)
+            else:
+                _os.environ["TOSCANINI_RUN_SLOTS"] = old
 
 
 # ---------------------------------------------------------------------------

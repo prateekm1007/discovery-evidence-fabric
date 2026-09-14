@@ -146,6 +146,9 @@ function NewDiscoveryPane({
   >([]);
   const [submitting, setSubmitting] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
+  // drag-and-drop: a dropped file is the same as a selected file — it
+  // uploads server-side the moment it lands
+  const [dragging, setDragging] = useState(false);
 
   async function submit() {
     const t = text.trim();
@@ -212,10 +215,25 @@ function NewDiscoveryPane({
     <section className="hero workspace-hero" data-new-discovery>
       <h1 className="brand-statement">DISCOVER. INVENT. ANYTHING.</h1>
       <h2 className="ask-title">What do you want to discover?</h2>
-      <div className="ask">
+      <div
+        className={`ask${dragging ? " dragging" : ""}`}
+        onDragOver={(e) => {
+          e.preventDefault();
+          setDragging(true);
+        }}
+        onDragLeave={(e) => {
+          if (e.currentTarget.contains(e.relatedTarget as Node)) return;
+          setDragging(false);
+        }}
+        onDrop={(e) => {
+          e.preventDefault();
+          setDragging(false);
+          void onFiles(e.dataTransfer.files);
+        }}
+      >
         <textarea
           autoFocus
-          placeholder="Describe a problem, an observation, or a technology you want investigated — in your own words. A URL, constraints, and specs are welcome."
+          placeholder="What problem do you want to solve or invent?"
           value={text}
           onChange={(e) => setText(e.target.value)}
           onKeyDown={(e) => {
@@ -225,6 +243,12 @@ function NewDiscoveryPane({
             }
           }}
         />
+        {dragging && (
+          <div className="ask-dropnote" role="status">
+            Drop to attach — it is read server-side and joins the
+            investigation&apos;s record
+          </div>
+        )}
         {pending.length > 0 && (
           <div className="ask-attachments" data-pending-attachments>
             {pending.map((p, i) => (

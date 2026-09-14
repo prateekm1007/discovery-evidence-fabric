@@ -6,16 +6,41 @@
 //
 // R458-C2 (§10/§11): Projects is GONE — the product never advertises
 // unfinished capability as navigation (the section was an honest empty
-// state, but honesty does not make an unusable surface navigable;
-// grouping needs a backend contract that does not exist). Settings
-// stays account-level, outside the discovery navigation.
+// state, but honesty does not make an unusable surface navigable).
+// Settings stays account-level, outside the discovery navigation.
 //
 // §11 — history items lead with WHAT you were working on: human title,
 // small date, a subtle state dot (color-independent: the state also
 // rides an aria-label). No large status pills — the state-machine
 // vocabulary is not the headline.
+//
+// R459-reaudit (P1-2): the flat 14-item list gains CLIENT-SIDE search
+// (a substring filter over the already-loaded titles — presentational,
+// no new backend contract) and honest time grouping (Today / This
+// week / Earlier, derived from each item's own created_at — no
+// invented folder entity). Search runs across EVERY loaded discovery;
+// the idle view keeps the calm 14-item cap.
 
+import { useMemo, useState } from "react";
 import type { HealthSummary, SessionRow, ShowcaseRow, UserStateView } from "@/lib/types";
+
+// the three honest recency buckets, derived from the item's own date
+function timeBucket(iso: string | undefined): "today" | "week" | "earlier" {
+  if (!iso) return "earlier";
+  const t = Date.parse(iso);
+  if (Number.isNaN(t)) return "earlier";
+  const now = Date.now();
+  const dayStart = new Date(); dayStart.setHours(0, 0, 0, 0);
+  if (t >= dayStart.getTime()) return "today";
+  if (now - t <= 7 * 24 * 60 * 60 * 1000) return "week";
+  return "earlier";
+}
+
+const BUCKET_LABELS: Record<string, string> = {
+  today: "Today",
+  week: "This week",
+  earlier: "Earlier",
+};
 
 // the subtle state dot — a small visual cue, never the headline.
 // Classes are the dot's color family only; the meaning is carried by
@@ -71,6 +96,45 @@ export default function Sidebar({
   const focus = showcase.filter((s) => s.demo_focus);
   const others = showcase.filter((s) => !s.demo_focus);
 
+  // client-side search over the already-loaded titles + honest time
+  // grouping (both derived from data already in the browser)
+  const [query, setQuery] = useState("");
+  const q = query.trim().toLowerCase();
+  const searching = q.length > 0;
+
+  const visible = useMemo(
+    () =>
+      searching
+        ? sessions.filter((s) => (s.title ?? "").toLowerCase().includes(q))
+        : sessions.slice(0, 14),
+    [searching, q, sessions]
+  );
+
+  const grouped = useMemo(() => {
+    const g: Record<"today" | "week" | "earlier", SessionRow[]> = {
+      today: [], week: [], earlier: [],
+    };
+    for (const s of visible) g[timeBucket(s.created_at)].push(s);
+    return g;
+  }, [visible]);
+
+  const renderItem = (s: SessionRow) => {
+    const dot = stateDot(s.user_state_view);
+    return (
+      <button
+        key={s.session_id}
+        className={`rail-item ${activeRun === s.session_id ? "active" : ""}`}
+        onClick={() => onSelectRun(s.session_id)}
+        type="button"
+        title={s.title}
+      >
+        <span className={`rail-dot rail-dot-${dot.cls}`} role="img" aria-label={dot.label} />
+        <span className="rail-title">{s.title}</span>
+        <span className="rail-when">{s.created_at?.slice(0, 10)}</span>
+      </button>
+    );
+  };
+
   return (
     <nav className="rail" aria-label="navigation">
       <button className="rail-new" onClick={onNewProblem} type="button">
@@ -85,20 +149,41 @@ export default function Sidebar({
             observation, or technology you&apos;d like to investigate.
           </div>
         )}
-        {sessions.slice(0, 14).map((s) => {
-          const dot = stateDot(s.user_state_view);
+        {sessions.length > 0 && (
+          <input
+            className="rail-search"
+            type="search"
+            placeholder="Search discoveries"
+            aria-label="Search discoveries"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+          />
+        )}
+        {searching && visible.length === 0 && (
+          <div className="rail-empty">
+            No discovery matches &ldquo;{query.trim()}&rdquo;.
+          </div>
+        )}
+        {searching && visible.length > 0 && (
+          <>
+            <div className="rail-group-h" aria-hidden="true">
+              {visible.length} match{visible.length === 1 ? "" : "es"}
+            </div>
+            {visible.map(renderItem)}
+          </>
+        )}
+        {!searching && (["today", "week", "earlier"] as const).map((b) => {
+          const items = grouped[b];
+          if (items.length === 0) return null;
           return (
-            <button
-              key={s.session_id}
-              className={`rail-item ${activeRun === s.session_id ? "active" : ""}`}
-              onClick={() => onSelectRun(s.session_id)}
-              type="button"
-              title={s.title}
-            >
-              <span className={`rail-dot rail-dot-${dot.cls}`} role="img" aria-label={dot.label} />
-              <span className="rail-title">{s.title}</span>
-              <span className="rail-when">{s.created_at?.slice(0, 10)}</span>
-            </button>
+            <div key={b}>
+              {b !== "today" || grouped.week.length > 0 || grouped.earlier.length > 0 ? (
+                <div className="rail-group-h" aria-hidden="true">
+                  {BUCKET_LABELS[b]}
+                </div>
+              ) : null}
+              {items.map(renderItem)}
+            </div>
           );
         })}
       </div>

@@ -11,7 +11,8 @@ Covers:
         binding, empty/oversize rejection — and the PU merge.
   P0-4  diagnostic package: every terminal run yields a ZIP whose
         members never claim an invention.
-  P1-2  queue visibility: run_lock_held probes the flock honestly.
+  P1-2  queue visibility: run_capacity probes the slot pool honestly
+        (the pool itself is battery-tested in test_r459b_run_capacity).
 """
 from __future__ import annotations
 
@@ -259,11 +260,15 @@ def test_p0_4_transport_blocked_run_still_yields_a_record():
 
 
 # ---------------------------------------------------------------------------
-# P1-2 — the lock probe
+# P1-2 — the capacity probe (R459-reaudit P1-1: generalized to the slot
+# pool; the binary run.lock is superseded — see test_r459b_run_capacity)
 # ---------------------------------------------------------------------------
 
-def test_p1_2_run_lock_probe_returns_bool():
-    held = store.run_lock_held()
-    assert held in (True, False)
+def test_p1_2_capacity_probe_is_honest_and_idempotent():
+    cap = store.run_capacity()
+    assert set(cap) == {"slots", "free", "waiting"}
+    assert cap["slots"] >= 1
+    assert 0 <= cap["free"] <= cap["slots"]
+    assert cap["waiting"] >= 0
     # two consecutive probes agree (idempotent, no side effects)
-    assert store.run_lock_held() == held
+    assert store.run_capacity() == cap

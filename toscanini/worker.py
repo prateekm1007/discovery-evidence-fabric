@@ -30,7 +30,6 @@ R415 (P0 directive §§1, 8, 9):
 """
 from __future__ import annotations
 
-import fcntl
 import os
 import sys
 import time
@@ -46,15 +45,16 @@ from toscanini import sessions as store  # noqa: E402
 
 
 def _serialize_run():
-    """One engine run at a time. The zai gateway rate-limits bursts
-    (measured live 2026-08-30: concurrent workers -> RATE_LIMITED_RETRY ->
-    probe timeouts). Workers block on an exclusive flock instead of
-    burning the transport concurrently."""
-    lock = store.STORE_DIR / "run.lock"
-    lock.parent.mkdir(parents=True, exist_ok=True)
-    f = open(lock, "w")
-    fcntl.flock(f, fcntl.LOCK_EX)
-    return f  # keep the handle open for the process lifetime
+    """R459-reaudit (P1-1): the binary run.lock is superseded by the
+    run-capacity semaphore in store (N flock'd slots, default 3;
+    arrival-priority queue; kernel-released on process death). This
+    wrapper keeps the historical call site and holds ONE slot for the
+    whole run — the heavy-render full-capacity exclusion and the
+    transport-cascade protection are unchanged in kind."""
+    handle = store.acquire_run_slot()
+    if handle is None:  # unreachable with timeout_s=0; kept fail-closed
+        raise RuntimeError("run slot acquire returned None")
+    return handle
 
 
 def _register_running(session_id: str) -> None:
@@ -158,11 +158,14 @@ def _run_inner(session_id: str, forensics) -> None:
     forensics.event("PHASE_STARTED", stage="REGISTER_RUNNING", phase=0)
     _register_running(session_id)
 
-    # Serialize engine runs (transport protection). Held for the whole run.
-    forensics.event("PHASE_STARTED", stage="ACQUIRING_RUN_LOCK", phase=0)
+    # Hold ONE run-capacity slot for the whole run (R459-reaudit P1-1:
+    # up to TOSCANINI_RUN_SLOTS engine runs execute concurrently; the
+    # arrival-priority queue keeps start order honest).
+    forensics.event("PHASE_STARTED", stage="ACQUIRING_RUN_LOCK", phase=0,
+                    note=f"capacity={store.run_slot_count()} slots")
     _lock_handle = _serialize_run()
     forensics.event("PHASE_STARTED", stage="TRANSPORT_PROBE", phase=1,
-                    note="lock acquired — one serialized engine run")
+                    note="run slot acquired")
 
     # --- phase 1: transport -------------------------------------------------
     # R415 (P0 directive §§1, 6-9): the probe is a REAL completion through

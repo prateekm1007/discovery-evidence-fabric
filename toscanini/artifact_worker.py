@@ -78,31 +78,22 @@ _JOB_LOCK = "RENDER_JOB.json"
 
 
 def _run_lock_path() -> Path:
-    """The SAME exclusive lock file the discovery run worker holds for
-    its whole lifetime (worker._serialize_run: store.STORE_DIR /
-    'run.lock' — the EXISTING production path, unchanged). The async
-    render job acquires it around each Blender attempt — on the 512 MB
-    instance there must be EXACTLY ONE heavy process at a time (an
-    engine run OR a render); without this mutual exclusion the
-    background recovery renders OOM-killed live run workers (observed
-    live 2026-09-07: the fresh run ts_a5a7eee35361's worker died and
-    the container restarted at 23:04 while the boot-recovery Blender
-    held memory)."""
-    p = store.STORE_DIR / "run.lock"
-    p.parent.mkdir(parents=True, exist_ok=True)
-    return p
+    """SUPERSEDED (R459-reaudit P1-1, Art. LXIV disposition: deleted in
+    the same change that ships the replacement) — the single run.lock
+    file no longer exists as an authority. The heavy-render exclusion
+    now holds ALL run-capacity slots (store.acquire_run_slots_all): a
+    render still never shares instance memory with ANY engine run, and
+    engine runs themselves may now overlap up to N slots. Retained only
+    as a name for the historical test pin, pointing at the new truth."""
+    return store.STORE_DIR / "runslots"
 
 
 def _try_run_lock_nonblocking():
-    """(handle, acquired) — used by tests and diagnostics; the job
-    itself uses the blocking acquire."""
-    f = open(_run_lock_path(), "w")
-    try:
-        fcntl.flock(f, fcntl.LOCK_EX | fcntl.LOCK_NB)
-        return f, True
-    except OSError:
-        f.close()
-        return None, False
+    """(handles, acquired_all) — test/diagnostic helper re-expressed on
+    the run-capacity semaphore: acquired_all is True only when the
+    caller could hold the ENTIRE capacity (what a heavy render needs)."""
+    handles = store.acquire_run_slots_all(timeout_s=0.5)
+    return handles, len(handles) == store.run_slot_count()
 
 # R420 quality ladder, re-expressed for the R441 rasterizer (Art.
 # XXVII provenance: visual_compiler_thresholds.json — Cycles "samples"
@@ -597,15 +588,14 @@ def _acquire_render_lock():
 
 
 def _acquire_run_lock_blocking():
-    """R420c: block until no discovery run worker is active, then hold
-    the run lock for ONE render attempt (bounded by the attempt's
-    budget). A fresh user run therefore waits at most one attempt
-    (<= 900 s) before its worker proceeds — the calm, correct price
-    of a 512 MB instance. The run worker holds this same lock for its
-    whole lifetime, so an engine run and a Blender never overlap."""
-    f = open(_run_lock_path(), "w")
-    fcntl.flock(f, fcntl.LOCK_EX)  # blocking — jobs are patient
-    return f
+    """R420c, re-expressed on the run-capacity semaphore (R459-reaudit
+    P1-1): block until the caller can hold ALL run slots, then keep
+    them for ONE render attempt (bounded by the attempt's budget). A
+    fresh user run therefore waits at most one attempt (<= 900 s)
+    before its worker proceeds — the calm, correct price of a small
+    instance. An engine run and a heavy render still never overlap:
+    the render excludes the ENTIRE capacity, not one slot."""
+    return store.acquire_run_slots_all()  # blocking — jobs are patient
 
 
 def run(session_id: str) -> Dict[str, Any]:
@@ -673,9 +663,10 @@ def run(session_id: str) -> Dict[str, Any]:
         rec: Dict[str, Any] = {}
         for idx, (scale, resolution, budget_s) in enumerate(
                 QUALITY_LADDER, start=1):
-            # R420c: mutual exclusion with the discovery runs — hold
-            # the run lock for exactly one attempt (an engine run and
-            # a Blender must never share the 512 MB instance)
+            # R420c, re-expressed (R459-reaudit P1-1): mutual exclusion
+            # with the discovery runs — hold the ENTIRE run capacity
+            # for exactly one attempt (an engine run and a heavy
+            # render must never share instance memory)
             run_lock = _acquire_run_lock_blocking()
             try:
                 try:
@@ -689,7 +680,8 @@ def run(session_id: str) -> Dict[str, Any]:
                            "error": f"{type(exc).__name__}: {exc}"}
             finally:
                 try:
-                    run_lock.close()
+                    for _h in run_lock:
+                        _h.close()
                 except Exception:  # noqa: BLE001
                     pass
             attempts.append({

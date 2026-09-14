@@ -145,6 +145,22 @@ a { color: inherit; }
 
 .ask .hint { color: var(--ink-faint); font-size: 12.5px; }
 
+/* drag-and-drop attach (R459-reaudit): the composer highlights while a
+   file hovers over it; the note replaces the old wall of instructions */
+.ask.dragging {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(31, 30, 28, 0.06),
+    0 8px 30px rgba(31, 30, 28, 0.05);
+}
+.ask-dropnote {
+  font-size: 13px;
+  color: var(--ink-soft);
+  padding: 8px 10px;
+  border: 1px dashed var(--line-strong, var(--line));
+  border-radius: 10px;
+  background: #faf9f5;
+}
+
 .btn {
   appearance: none;
   border: none;
@@ -746,6 +762,28 @@ details.tech li { font-size: 13.5px; color: var(--ink-soft); margin-bottom: 6px;
 }
 .rail-empty { font-size: 12px; color: var(--ink-faint); margin: 2px 0 8px 4px; }
 
+/* sidebar search + time-group headers (R459-reaudit P1-2) */
+.rail-search {
+  appearance: none;
+  border: 1px solid var(--line);
+  background: #fff;
+  border-radius: 9px;
+  padding: 7px 10px;
+  font: inherit;
+  font-size: 12.5px;
+  color: var(--ink);
+  width: 100%;
+  margin: 0 0 8px;
+}
+.rail-search::placeholder { color: var(--ink-faint); }
+.rail-group-h {
+  font-size: 10.5px;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin: 8px 4px 4px;
+}
+
 .rail-item {
   appearance: none;
   border: none;
@@ -1257,6 +1295,21 @@ details.tech li { font-size: 13.5px; color: var(--ink-soft); margin-bottom: 6px;
   margin: 0;
   white-space: pre-line;
 }
+
+/* math typography (lazy KaTeX): inline sits with the sentence, display
+   is centered and scroll-safe on narrow screens */
+.essay-section [data-math-text] [data-math-pending] {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12.5px;
+}
+.essay-section .math-inline .katex { font-size: 1.02em; }
+.essay-section .math-display {
+  display: block;
+  overflow-x: auto;
+  padding: 4px 0;
+  text-align: center;
+}
+.essay-section .math-display .katex-display { margin: 0; }
 
 /* R419 section 12: the component inspection panel — named component
    chips; the selected one isolates in the viewer (highlight = pure

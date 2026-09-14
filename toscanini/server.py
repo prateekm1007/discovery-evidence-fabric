@@ -849,21 +849,23 @@ class Handler(BaseHTTPRequestHandler):
                 if detail:
                     from toscanini.user_state import public_session_view
                     payload = public_session_view(detail)
-                    # R459 (audit P1-2, queue visibility): one worker
-                    # serializes engine runs BY MEASUREMENT (concurrent
-                    # workers burned the shared transport into
-                    # RATE_LIMITED — the lock is the fix, not the bug).
-                    # The honest product behavior is a VISIBLE queue:
-                    # a queued run says so instead of spinning silently.
-                    if detail.get("status") == "PENDING" and \
-                            store.run_lock_held():
-                        payload["queue_state"] = {
-                            "queued": True,
-                            "reason": "another discovery is running on "
-                                      "the engine — this one starts "
-                                      "automatically when the run slot "
-                                      "frees up",
-                        }
+                    # R459 (audit P1-2, queue visibility): a queued run
+                    # SAYS it is queued instead of spinning silently.
+                    # R459-reaudit (P1-1): the engine holds a slot pool
+                    # (TOSCANINI_RUN_SLOTS, default 3) — the run queues
+                    # only when the WHOLE pool is busy, and the honest
+                    # copy names the capacity, never the machinery.
+                    if detail.get("status") == "PENDING":
+                        cap = store.run_capacity()
+                        if cap["free"] == 0:
+                            payload["queue_state"] = {
+                                "queued": True,
+                                "position": cap["waiting"] + 1,
+                                "reason": f"all {cap['slots']} engine "
+                                          "run slots are busy — this "
+                                          "one starts automatically "
+                                          "when a slot frees up",
+                            }
                     return self._json(200, payload)
                 return self._json(404, {"error": "not found"})
             # ---- R414 product-integration endpoints ------------------
@@ -2104,7 +2106,12 @@ class Handler(BaseHTTPRequestHandler):
             return False
         rel = clean.strip("/")
         # page routes → their exported shells (query params carry state)
-        if rel in ("", "run", "showcase"):
+        # R459-reaudit (P0-final): "share" joins the page routes — the
+        # share page exported to WEBAPP_EXPORT/share/index.html but this
+        # tuple never mapped /share to it, so every generated share link
+        # (POST /share → ${origin}/share?id=…) 404'd unless the visitor
+        # manually appended /index.html (auditor-measured live).
+        if rel in ("", "run", "showcase", "share"):
             rel = (rel + "/" if rel else "") + "index.html"
         if not rel or ".." in rel.split("/"):
             return False

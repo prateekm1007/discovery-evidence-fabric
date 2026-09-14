@@ -1,0 +1,82 @@
+{
+  "kind": "round_record",
+  "round": "R460",
+  "directive": "Execute the R459 re-audit (operator-uploaded, measured live at 8827e2a; overall 8.16/10): the P0-final /share static-route defect, the P1 finishing items (multi-worker run capacity, sidebar search + organization, inline equation rendering), and the named quick polish (composer placeholder, drag-and-drop attach). Zero scientific-authority changes.",
+  "generated_by": "Coder (main session)",
+  "reviewer_provenance": "AI_REVIEW",
+  "constitution": {
+    "version": "2.4.0",
+    "sha256_prefix": "b54a1be9",
+    "read_in_full_at_round_start": true,
+    "reread_in_full_before_commit": true
+  },
+  "audit_source": {
+    "document": "RE-AUDIT REPORT: TOSCANINI R459 (independent senior product auditor)",
+    "measured_against": "8827e2a9 deployed at prateekm1-toscanini-prod-validation.hf.space",
+    "score_before": 8.16,
+    "identified_items": [
+      "P0-FINAL /share route 404",
+      "P1-1 multi-worker semaphore pool",
+      "P1-2 sidebar search & folders",
+      "P1-3 inline equation rendering (KaTeX)",
+      "composer placeholder shortening",
+      "drag-and-drop file overlay"
+    ]
+  },
+  "executed": {
+    "P0_final_share_route": {
+      "change": "toscanini/server.py _serve_static page-route tuple gains \"share\" — /share?id=… now serves the exported share shell (WEBAPP_EXPORT/share/index.html) like /run and /showcase already did",
+      "tests": "tests/test_r459b_share_route.py (6: the audit acceptance /share?id=… → 200 share shell; /share/ and /share/index.html; /run and / regressions; unknown path fails closed; traversal rejected; /api/* never routed static)"
+    },
+    "P1_1_run_capacity_pool": {
+      "change": "toscanini/sessions.py: the binary run.lock is SUPERSEDED (Art. LXIV disposition: replaced in the same change) by an N-slot flock semaphore (runslots/run.{i}.lock, TOSCANINI_RUN_SLOTS default 3, clamp 1..8) with arrival-priority queuing (runqueue/*.wait markers, dead-owner pruning by /proc liveness + age) and a non-blocking run_capacity() probe. worker.py holds ONE slot per run; artifact_worker.py's heavy-render exclusion now holds ALL slots (full-capacity hold — a heavy render still never shares instance memory with any engine run; the R420c OOM protection is strengthened, not weakened); server.py queue visibility names the capacity and the queue position.",
+      "invariants": [
+        "flock release-on-death preserved (a killed worker can never wedge the pool) — proven with a real subprocess",
+        "an engine run and a heavy render never overlap (full-capacity hold) — functional test at capacity 1 (the historical binary semantics as the exact special case) plus the R420 source pins re-expressed",
+        "transport protection unchanged in kind: the R456 router cascade (4 distinct account domains, typed RATE_LIMITED advancement) is the burst protection",
+        "no new provider, no engine-stage change, no scientific-authority change"
+      ],
+      "tests": "tests/test_r459b_run_capacity.py (8: default+clamp matrix; held-slot probe honesty; REAL concurrent acquisition on threads (the change's reason to exist); full-capacity exclusion of single-slot acquirers; arrival-priority yield; dead-waiter-marker pruning; kernel release-on-death via real subprocess; server queue payload wiring)"
+    },
+    "P1_2_sidebar_search_and_organization": {
+      "change": "components/Sidebar.tsx: client-side search over the already-loaded discovery titles (substring, case-insensitive; search spans every loaded session, idle view keeps the calm 14-item cap, honest no-match state) + honest time grouping (Today / This week / Earlier derived from each item's own created_at — no invented folder entity, no new backend contract)",
+      "tests": "copy audit green on all new strings; tsc clean"
+    },
+    "P1_3_inline_equations": {
+      "change": "lib/math.ts (pure deterministic delimiter splitter: $…$, $$…$$, \\(…\\), \\[…\\]; money and unbalanced input NEVER become math; splitting lossless modulo consumed delimiters) + lib/MathText.tsx (KaTeX loaded lazily ONLY when a math segment exists — zero first-paint cost, main bundle unchanged at 139 kB First Load; load failure degrades to the exact prior text, never a broken page) wired into the essay paragraphs (the summary surface)",
+      "disclosure": "engine prose currently carries plain-text equations without delimiters, so the renderer is latent by design — it activates when recorded prose contains delimited math; no engine output was rewritten to force a demo (Art. I/II)",
+      "tests": "webapp tests/math_render.test.mjs (12: all four delimiter forms; money-vs-math tightness; unbalanced fallback; losslessness; empty-body handling; adjacency)"
+    },
+    "quick_polish": {
+      "composer_placeholder": "\"What problem do you want to solve or invent?\" — the audit's own suggested copy (app/page.tsx)",
+      "drag_and_drop": "the home composer accepts dropped files (dragover highlight + role=status note; drop → the SAME server-side upload path as + Attach — no second ingestion path)"
+    }
+  },
+  "not_done": [
+    "3D canvas keyboard controls (audit accessibility follow-up; untouched this round)",
+    "CSV/STEP attachment ingestion (audit roadmap Days 11-20; the attachment contract is Coder-1 surface)",
+    "KaTeX auto-detection of undelimited plain-text equations (deliberately not attempted — interpretation in the presentation layer would risk rendering prose as math, Art. II)"
+  ],
+  "tests": {
+    "backend_new": "test_r459b_run_capacity.py (8) + test_r459b_share_route.py (6)",
+    "backend_updated": "test_r459_audit_execution.py (P1-2 pin re-expressed), test_r420_render_autonomy.py (mutual-exclusion pin re-expressed on the pool)",
+    "backend_run": "69 passed + 7 skipped (pre-existing) across the three round families; 76 passed across the owner-transport/blocked-state families; collection 3,760 OK",
+    "frontend": "tsc clean; next export build green (/share exported; KaTeX in its own async chunk, main HTML references only the app CSS); batteries: present 16/16, events 12/12, r458 21/21, math 12/12, copy audit green"
+  },
+  "self_caught_defects": [
+    "session-slot marker guard used Path.name (which is 'null', not '/dev/null') — a failed marker touch could have attempted to unlink /dev/null; fixed to a parent-dir identity check before first run",
+    "queue-marker pid parse split the timestamp field instead of the pid; fixed before first run",
+    "the semaphore battery's child process dropped its slot handle (CPython refcount closed it), making a correct implementation look broken — the test was fixed to hold the reference the way the real worker does"
+  ],
+  "production_deployment": {
+    "target_sha": "PENDING_DEPLOY",
+    "deployed_sha": "PENDING_DEPLOY",
+    "deploy_id": null,
+    "health_check_result": "PENDING",
+    "drift": "PENDING",
+    "discovery_ready": null,
+    "blocked_by": null,
+    "what_unblocks": null
+  },
+  "created_at": "2026-09-15T00:00:00Z"
+}

@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import fcntl
 import json
+import os
 import time
 import uuid
 from pathlib import Path
@@ -271,27 +272,205 @@ def mark_boot_pending_interrupted() -> List[str]:
     return interrupted
 
 
-def run_lock_held() -> bool:
-    """R459 (audit P1-2 queue visibility): non-blocking probe of the
-    engine run lock. The lock itself stays (concurrent workers burned
-    the shared transport into RATE_LIMITED — measured 2026-08-30); this
-    probe lets a queued run SAY it is queued instead of spinning."""
+# ---------------------------------------------------------------------------
+# R459-reaudit (P1-1) — THE RUN-CAPACITY SEMAPHORE.
+#
+# The binary run.lock (one engine run at a time across all users) is
+# superseded by a counting semaphore over N flock'd slot files
+# (TOSCANINI_UI/runslots/run.{i}.lock, N = TOSCANINI_RUN_SLOTS, default
+# 3, clamped 1..8). flock keeps the property the single lock was chosen
+# for: the kernel releases it when the holder process dies, so a killed
+# worker can never wedge the queue. A heavy artifact render still
+# excludes engine runs completely — it acquires ALL slots (a
+# full-capacity hold), preserving the measured OOM protection
+# ("exactly one heavy process" generalized to "all capacity or
+# nothing"). Arrival priority: each waiter registers a marker in
+# TOSCANINI_UI/runqueue/ and yields to older markers, so a run that
+# asked first starts first (FIFO among heavy work); markers of dead
+# owners are pruned by /proc liveness so a crashed waiter cannot stall
+# the queue. Transport protection is unchanged in kind: the R456
+# router cascade (4 distinct account domains, typed RATE_LIMITED
+# handling) is what makes measured concurrency tolerable — a slot
+# burst that trips a provider advances the cascade exactly as a
+# single run's burst would.
+# ---------------------------------------------------------------------------
+
+_RUN_SLOTS_DIR = STORE_DIR / "runslots"
+_RUN_QUEUE_DIR = STORE_DIR / "runqueue"
+
+
+def run_slot_count() -> int:
+    """Configured engine run capacity (slots). Env-overridable, clamped."""
+    try:
+        n = int(os.environ.get("TOSCANINI_RUN_SLOTS", "3"))
+    except (TypeError, ValueError):
+        n = 3
+    return max(1, min(n, 8))
+
+
+def _prune_stale_waiters() -> None:
+    """Remove queue markers whose owner is provably gone: a marker
+    carries its pid; when /proc/<pid> no longer exists and the marker
+    is >10 s old (fork/exec grace), the waiter is dead. A marker older
+    than 1 h is pruned regardless (belt and braces for exotic PIDs)."""
+    import time as _time
+
+    try:
+        _RUN_QUEUE_DIR.mkdir(parents=True, exist_ok=True)
+        now = _time.time()
+        for p in _RUN_QUEUE_DIR.glob("*.wait"):
+            try:
+                age = now - p.stat().st_mtime
+            except OSError:
+                continue
+            if age > 3600:
+                p.unlink(missing_ok=True)
+                continue
+            stem = p.name[:-5] if p.name.endswith(".wait") else p.name
+            pid_part = stem.rsplit("-", 1)[-1]
+            try:
+                pid = int(pid_part)
+            except ValueError:
+                if age > 600:
+                    p.unlink(missing_ok=True)
+                continue
+            if age > 10 and not Path(f"/proc/{pid}").exists():
+                p.unlink(missing_ok=True)
+    except OSError:
+        return  # queue hygiene is best-effort; never blocks a run
+
+
+def _register_waiter() -> Path:
+    """Record this waiter's arrival (the queue's priority order)."""
+    import time as _time
+
+    _RUN_QUEUE_DIR.mkdir(parents=True, exist_ok=True)
+    marker = _RUN_QUEUE_DIR / (
+        f"{_time.time_ns():020d}-{os.getpid()}.wait")
+    try:
+        marker.touch()
+    except OSError:
+        marker = Path("/dev/null")  # no priority order; slots still work
+    return marker
+
+
+def _waiters_before(marker: Path) -> int:
+    """How many LIVE waiters registered before this one (0 → my turn).
+    A marker outside the queue directory (the /dev/null fallback) never
+    blocks on priority — capacity alone decides."""
+    try:
+        if marker.parent != _RUN_QUEUE_DIR:
+            return 0
+        return sum(
+            1 for p in sorted(_RUN_QUEUE_DIR.glob("*.wait"))
+            if p.name < marker.name)
+    except OSError:
+        return 0
+
+
+def _open_slot(i: int, blocking: bool):
+    """Open slot file i; flock it exclusively (non-blocking or blocking).
+    Returns the open handle or None (non-blocking + contended)."""
     import fcntl
 
-    lock = STORE_DIR / "run.lock"
+    _RUN_SLOTS_DIR.mkdir(parents=True, exist_ok=True)
+    f = open(_RUN_SLOTS_DIR / f"run.{i}.lock", "w")
     try:
-        lock.parent.mkdir(parents=True, exist_ok=True)
-        f = open(lock, "w")
+        fcntl.flock(f, fcntl.LOCK_EX if blocking
+                    else fcntl.LOCK_EX | fcntl.LOCK_NB)
+        return f
+    except (BlockingIOError, OSError):
+        f.close()
+        return None
+
+
+def acquire_run_slot(timeout_s: float = 0.0):
+    """Acquire ONE engine-run slot (the discovery worker's whole-run
+    hold). Arrival-priority: yields to older live waiters. Returns the
+    open slot handle (hold it for the run's lifetime; the kernel
+    releases the flock if the process dies). timeout_s 0 = wait
+    forever (the worker's historical semantics)."""
+    import time as _time
+
+    n = run_slot_count()
+    marker = _register_waiter()
+    try:
+        _prune_stale_waiters()
+        deadline = _time.monotonic() + timeout_s if timeout_s else None
+        while True:
+            if _waiters_before(marker) == 0:
+                for i in range(n):
+                    f = _open_slot(i, blocking=False)
+                    if f is not None:
+                        return f
+            if deadline is not None and _time.monotonic() >= deadline:
+                return None
+            _time.sleep(0.25)
+    finally:
         try:
-            fcntl.flock(f, fcntl.LOCK_EX | fcntl.LOCK_NB)
-            fcntl.flock(f, fcntl.LOCK_UN)
-            return False
-        except BlockingIOError:
-            return True
-        finally:
+            if marker.parent == _RUN_QUEUE_DIR:
+                marker.unlink(missing_ok=True)
+        except OSError:
+            pass
+
+
+def acquire_run_slots_all(timeout_s: float = 0.0):
+    """Acquire ALL slots (the heavy render's full-capacity hold — a
+    Blender/Chromium attempt never shares instance memory with an
+    engine run, extending today's measured exclusion rather than
+    weakening it). Slots are taken in index order; a partial hold is
+    released before retrying. Returns a list of open handles."""
+    import time as _time
+
+    n = run_slot_count()
+    marker = _register_waiter()
+    try:
+        _prune_stale_waiters()
+        deadline = _time.monotonic() + timeout_s if timeout_s else None
+        while True:
+            if _waiters_before(marker) == 0:
+                held = []
+                for i in range(n):
+                    f = _open_slot(i, blocking=False)
+                    if f is None:
+                        break
+                    held.append(f)
+                if len(held) == n:
+                    return held
+                for f in held:  # partial hold → release, retry calmly
+                    f.close()
+            if deadline is not None and _time.monotonic() >= deadline:
+                return []
+            _time.sleep(0.5)
+    finally:
+        try:
+            if marker.parent == _RUN_QUEUE_DIR:
+                marker.unlink(missing_ok=True)
+        except OSError:
+            pass
+
+
+def run_capacity() -> Dict[str, int]:
+    """Non-blocking probe of the run-capacity semaphore (R459 audit
+    P1-2's visibility contract, generalized to the pool): slots, free
+    slots, and live waiters. Lets a queued run SAY it is queued — and
+    from R459-reaudit, say how deep the queue is. The probe never
+    enqueues, never blocks, never mutates."""
+    import fcntl
+
+    n = run_slot_count()
+    free = 0
+    for i in range(n):
+        f = _open_slot(i, blocking=False)
+        if f is not None:
+            free += 1
             f.close()
+    try:
+        _RUN_QUEUE_DIR.mkdir(parents=True, exist_ok=True)
+        waiting = len(list(_RUN_QUEUE_DIR.glob("*.wait")))
     except OSError:
-        return False
+        waiting = 0
+    return {"slots": n, "free": free, "waiting": waiting}
 
 
 def retry_session(session_id: str) -> Optional[Dict[str, Any]]:
