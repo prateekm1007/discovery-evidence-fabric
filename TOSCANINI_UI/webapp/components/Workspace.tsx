@@ -23,7 +23,7 @@ import type {
   ScienceEvent,
   SessionDetail,
 } from "@/lib/present-types";
-import type { DesignTabShape } from "@/lib/present";
+import type { DesignTabShape, SurfaceId } from "@/lib/present";
 import { renderAvailabilitySentence } from "@/lib/present";
 import RunNarrative from "./RunNarrative";
 import { EngineeringArgument, NoveltyAndCemetery } from "./EngineeringArgument";
@@ -282,6 +282,7 @@ export default function Workspace({
   packageAvailable,
   surface,
   onClose,
+  onSwitch,
 }: {
   detail: SessionDetail;
   dossier: DossierBody | null;
@@ -290,6 +291,9 @@ export default function Workspace({
   packageAvailable: boolean;
   surface: string | null;
   onClose: () => void;
+  /** §13: contextual switching between sibling surfaces (one artifact,
+   * no tab strip) — the parent owns the surface state. */
+  onSwitch: (s: SurfaceId) => void;
 }) {
   // the model surface's generation navigation + component highlight live
   // HERE (they act on the ONE viewer inside this workspace)
@@ -309,10 +313,37 @@ export default function Workspace({
   if (!surface) return null;
   const tabs = dossier?.tabs;
 
+  // R458-C2 (§13): ONE current workspace title + a SMALL secondary nav
+  // to the sibling surfaces — the workspace is one artifact with
+  // contextual switching, not a second pipeline browser with a
+  // permanent tab strip. The journal is deliberately NOT in this row
+  // (§14: the technical record must not compete with the discovery
+  // surface); it stays reachable via the outcome's "Show the technical
+  // record" and the small link at the bottom of this panel.
+  const siblings = (Object.keys(SURFACE_TITLES) as SurfaceId[]).filter(
+    (s) => s !== surface && s !== "journal"
+  );
+  const siblingLabel = (s: SurfaceId): string =>
+    ({ overview: "Summary", model: "Technology model", evidence: "Evidence",
+       engineering: "Engineering", experiment: "Experiment",
+       package: "Package", journal: "Journal" }[s] ?? SURFACE_TITLES[s]);
+
   return (
     <aside className="wk" data-workspace data-wk-surface={surface}>
       <div className="wk-head">
         <span className="wk-title">{SURFACE_TITLES[surface] ?? surface}</span>
+        <div className="wk-siblings" data-wk-siblings>
+          {siblings.map((s) => (
+            <button
+              key={s}
+              type="button"
+              className="wk-sibling faint"
+              onClick={() => onSwitch(s)}
+            >
+              {siblingLabel(s)}
+            </button>
+          ))}
+        </div>
         <button
           type="button"
           className="wk-close"
@@ -396,6 +427,17 @@ export default function Workspace({
           />
         )}
       </div>
+      {surface !== "journal" && (
+        <div className="wk-foot">
+          <button
+            type="button"
+            className="conv-technical faint"
+            onClick={() => onSwitch("journal")}
+          >
+            Technical record
+          </button>
+        </div>
+      )}
     </aside>
   );
 }

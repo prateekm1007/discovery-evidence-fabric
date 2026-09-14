@@ -32,6 +32,7 @@
 import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
+  answerClarification,
   askRun,
   getCIO,
   getDossier,
@@ -81,8 +82,6 @@ const SUGGESTIONS = [
   { label: "Find an unmet need", example: EXAMPLES[3] },
 ];
 
-const TEXT_EXT = /\.(txt|md|markdown|csv|json|log|tsv)$/i;
-
 function TransportDot({ health }: { health: HealthSummary | null }) {
   const r = health?.readiness;
   const ready = r?.discovery_ready ?? health?.discovery_ready ??
@@ -119,6 +118,13 @@ function EngineStatusText({ health }: { health: HealthSummary | null }) {
 // ---------------------------------------------------------------------------
 // HOME — one dominant composer, a few lightweight suggestions. No
 // dashboard wall, no KPI cards, no pipeline diagram (brief §6).
+//
+// R458-C2 — THE INPUT MODEL (§2/§3/§15): one interaction carries the
+// problem + a URL + attachments + constraints. Attachments are ingested
+// SERVER-SIDE (upload → canonical document/reference → evidence) — the
+// browser never reads a file into the problem string. Until the
+// engine's attachment endpoint goes live (contract → Coder 1), the
+// limitation is stated honestly and nothing is pretended.
 // ---------------------------------------------------------------------------
 function NewDiscoveryPane({
   onStarted,
@@ -127,11 +133,12 @@ function NewDiscoveryPane({
 }) {
   const [text, setText] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [pendingFiles, setPendingFiles] = useState<File[]>([]);
   const [attachNote, setAttachNote] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
-  async function submit() {
+  async function submit(startWithoutAttachments = false) {
     const t = text.trim();
     if (t.length < 15) {
       setError(
@@ -140,11 +147,26 @@ function NewDiscoveryPane({
       return;
     }
     if (submitting) return;
+
+    // attachments requested but the engine can't take them yet: say so,
+    // offer the honest path forward — never a silent drop, never a fake
+    // success (§2)
+    if (pendingFiles.length > 0 && !startWithoutAttachments) {
+      setAttachNote(
+        "Attachments can't be ingested yet — the engine's server-side " +
+          "attachment contract (R458) isn't live, so nothing was uploaded " +
+          "and nothing from the files will be assumed. Start the discovery " +
+          "from your description alone, paste a link or the key contents, " +
+          "or wait for the engine to accept documents."
+      );
+      return;
+    }
     setError(null);
+    setAttachNote(null);
     setSubmitting(true);
     onStarted("busy");
     try {
-      const session = await startRun(t);
+      const session = await startRun(t, []);
       onStarted(session.session_id);
     } catch (e) {
       setError(e instanceof Error ? e.message : "failed to start the run");
@@ -153,27 +175,10 @@ function NewDiscoveryPane({
     }
   }
 
-  async function onFiles(files: FileList | null) {
+  function onFiles(files: FileList | null) {
     if (!files || files.length === 0) return;
     setAttachNote(null);
-    let appended = "";
-    let rejected: string[] = [];
-    for (const f of Array.from(files)) {
-      if (TEXT_EXT.test(f.name)) {
-        const body = (await f.text()).slice(0, 4000);
-        appended += `\n\n— attached file: ${f.name} —\n${body}`;
-      } else {
-        rejected.push(f.name);
-      }
-    }
-    if (appended) setText((prev) => prev + appended);
-    if (rejected.length > 0) {
-      setAttachNote(
-        `${rejected.join(", ")}: PDF, CAD, and image ingestion needs the ` +
-        `engine's file contract (not yet exposed). Paste a URL or the key ` +
-        `contents for now — the engine reads plain text in the problem.`
-      );
-    }
+    setPendingFiles((prev) => [...prev, ...Array.from(files)]);
   }
 
   return (
@@ -183,7 +188,7 @@ function NewDiscoveryPane({
       <div className="ask">
         <textarea
           autoFocus
-          placeholder="Describe a problem, an observation, or a technology you want investigated — in your own words. Constraints, links, and specs are welcome."
+          placeholder="Describe a problem, an observation, or a technology you want investigated — in your own words. A URL, constraints, and specs are welcome."
           value={text}
           onChange={(e) => setText(e.target.value)}
           onKeyDown={(e) => {
@@ -193,6 +198,28 @@ function NewDiscoveryPane({
             }
           }}
         />
+        {pendingFiles.length > 0 && (
+          <div className="ask-attachments" data-pending-attachments>
+            {pendingFiles.map((f, i) => (
+              <span className="ask-attachment" key={`${f.name}-${i}`}>
+                {f.name}
+                <button
+                  type="button"
+                  className="ask-attachment-x"
+                  aria-label={`remove ${f.name}`}
+                  onClick={() =>
+                    setPendingFiles((prev) => prev.filter((_, j) => j !== i))
+                  }
+                >
+                  ×
+                </button>
+              </span>
+            ))}
+            <span className="faint">
+              will be ingested server-side when the engine accepts documents
+            </span>
+          </div>
+        )}
         <div className="ask-foot">
           <span className="hint">
             Enter to start · Shift+Enter for a new line · runs take minutes;
@@ -204,17 +231,20 @@ function NewDiscoveryPane({
               type="file"
               multiple
               hidden
-              onChange={(e) => void onFiles(e.target.files)}
+              onChange={(e) => {
+                onFiles(e.target.files);
+                e.target.value = "";
+              }}
             />
             <button
               type="button"
               className="btn small ghost"
               onClick={() => fileRef.current?.click()}
-              title="attach a text file — it joins the conversation"
+              title="attach evidence — documents are ingested server-side and become part of the record"
             >
               + Attach
             </button>
-            <button className="btn" onClick={submit} type="button">
+            <button className="btn" onClick={() => void submit()} type="button">
               {submitting ? "Starting…" : "Start the discovery"}
             </button>
           </div>
@@ -223,6 +253,18 @@ function NewDiscoveryPane({
       {attachNote && (
         <div className="errbox" style={{ textAlign: "left" }} data-attach-note>
           {attachNote}
+          <div style={{ marginTop: 8 }}>
+            <button
+              type="button"
+              className="btn small ghost"
+              onClick={() => {
+                setPendingFiles([]);
+                void submit(true);
+              }}
+            >
+              Start without the attachments
+            </button>
+          </div>
         </div>
       )}
       {error && (
@@ -292,6 +334,9 @@ function WorkspaceInner() {
     listShowcase().then(setShowcase).catch(() => setShowcase([]));
     getHealth().then(setHealth).catch(() => setHealth(null));
     const h = setInterval(() => {
+      // R458-C2 (§21): a hidden tab needs no engine traffic — polling
+      // resumes on return; SSE and the poll keep the same truth
+      if (typeof document !== "undefined" && document.hidden) return;
       getHealth().then(setHealth).catch(() => {});
       if (!runId) {
         listSessions().then(setSessions).catch(() => {});
@@ -316,6 +361,9 @@ function WorkspaceInner() {
     if (!id) return;
     let alive = true;
     async function poll() {
+      // R458-C2 (§21): skip engine traffic while the tab is hidden —
+      // the interval keeps ticking so recovery is immediate on return
+      if (typeof document !== "undefined" && document.hidden) return;
       try {
         const d = await getRunResult(id);
         if (!alive) return;
@@ -362,6 +410,7 @@ function WorkspaceInner() {
     let alive = true;
 
     async function refresh() {
+      if (typeof document !== "undefined" && document.hidden) return;
       try {
         const body: EventsBody = await getEvents(id);
         if (!alive) return;
@@ -471,6 +520,9 @@ function WorkspaceInner() {
   // (desktop only; the conversation stays primary on mobile). A blocked
   // run NEVER auto-opens a surface: stale-positive presentation stays
   // suppressed (brief §14 / Test B — the Resume CTA is the one action).
+  // R458-C2 (§12): the surface opens BECAUSE something important exists
+  // — package ready → Package; a real model → Model; a decisive test
+  // defined → Experiment. Never all of them, never as navigation.
   useEffect(() => {
     if (!runId || !detail || !isTerminal(detail.status)) return;
     if (suppressStalePositives(detail)) return;
@@ -488,6 +540,12 @@ function WorkspaceInner() {
     } else if (heroEligible) {
       autoOpened.current = runId;
       setSurface("model");
+    } else if (
+      (dossier?.tabs?.experiment as { availability?: string } | undefined)
+        ?.availability === "AVAILABLE"
+    ) {
+      autoOpened.current = runId;
+      setSurface("experiment");
     }
   }, [runId, detail?.status, dossier, packageAvailable]);
 
@@ -524,6 +582,39 @@ function WorkspaceInner() {
 
   async function handleAsk(question: string) {
     if (!detail) return;
+    // R458-C2 (§4): while the engine's ONE material question is open,
+    // every composer message is an ANSWER to it — resuming the same run
+    // through C1's live contract. Anything else stays a read-only ask.
+    if (detail.status === "AWAITING_CLARIFICATION") {
+      try {
+        await answerClarification(detail.session_id, question);
+        setAsks((prev) => [
+          ...prev,
+          {
+            question,
+            response: {
+              status: "ANSWERED",
+              answer:
+                "Answer recorded — the investigation resumes with it. What happens next appears here, from the record.",
+              basis: "the engine's clarification pause (one material question)",
+            },
+          },
+        ]);
+      } catch (e) {
+        setAsks((prev) => [
+          ...prev,
+          {
+            question,
+            response: {
+              status: "TRANSPORT_ERROR",
+              reason:
+                e instanceof Error ? e.message : "the answer could not be delivered",
+            },
+          },
+        ]);
+      }
+      return;
+    }
     try {
       const response = await askRun(detail.session_id, question);
       setAsks((prev) => [...prev, { question, response }]);
@@ -675,6 +766,7 @@ function WorkspaceInner() {
               packageAvailable={packageAvailable}
               surface={surface}
               onClose={() => setSurface(null)}
+              onSwitch={(s) => setSurface(s)}
             />
           </div>
         )}

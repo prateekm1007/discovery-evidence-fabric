@@ -449,6 +449,34 @@ export function deriveConversation(
     text: detail.user_text || detail.title || "Untitled problem",
   });
 
+  // R458-C2 (§4) — THE CLARIFICATION PAUSE. The engine asked exactly ONE
+  // material question (C1's R446 §4 rule: ask only when the answer
+  // changes the search space or the next action). This is the
+  // conversation changing the discovery — it renders as Toscanini's own
+  // question, and the composer becomes the answer box. The pause is a
+  // first-class state, never a stall and never an error (nothing is
+  // burned while the question is open).
+  if (detail.status === "AWAITING_CLARIFICATION") {
+    const q = detail.clarification;
+    msgs.push({
+      kind: "clarification",
+      id: mid("cl"),
+      question:
+        (q && typeof q.question === "string" && q.question) ||
+        "Before I continue: is there anything about the problem I should know that would change what to look for?",
+      decisionChanged:
+        q && typeof q.decision_changed === "string"
+          ? q.decision_changed
+          : null,
+    });
+    msgs.push({
+      kind: "note",
+      id: mid("n-cl"),
+      text: "The investigation is paused — it will resume the moment you answer.",
+    });
+    return msgs;
+  }
+
   // Test B: a blocked run renders the honest pause and SUPPRESSES every
   // stale positive interpretation (candidate/package/visual_complete).
   // The blocked wording is derived from the CURRENT status only — never

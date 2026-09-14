@@ -10,7 +10,10 @@ export type SessionStatus =
   | "ERROR_BUILD"
   | "ERROR_RUN"
   | "ERROR_STUCK"
-  | "RUN_BLOCKED_TRANSPORT"; // R415: infrastructure-blocked, resumable — never a verdict
+  | "RUN_BLOCKED_TRANSPORT" // R415: infrastructure-blocked, resumable — never a verdict
+  // R446-C1 §4 (consumed by the UI from R458-C2 §4): the one-question
+  // pause — the engine asked ONE material question; POST /answer resumes
+  | "AWAITING_CLARIFICATION";
 
 export interface SessionRow {
   session_id: string;
@@ -94,6 +97,17 @@ export interface SessionDetail {
   // R414: the canonical DiscoveryRun state (directive §4) — carried by
   // the result endpoint; the UI reads phases/outcomes from here
   run_state?: RunStateObject;
+  // R458-C2 (§4): the one-question clarification pause — the engine set
+  // status AWAITING_CLARIFICATION and asks exactly one material question
+  // (C1's R446 §4 contract). The conversation renders it and the answer
+  // resumes the SAME run via POST /api/run/{id}/answer.
+  clarification?: {
+    field?: string;
+    question?: string;
+    decision_changed?: string;
+    score?: number;
+    asked_at?: string;
+  } | null;
 }
 
 // R395: conversational Q&A over a run's / invention's own artifacts.

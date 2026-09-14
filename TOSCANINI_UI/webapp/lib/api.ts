@@ -130,12 +130,21 @@ export async function listSessions(): Promise<SessionRow[]> {
   return data.sessions ?? [];
 }
 
-export async function startRun(text: string): Promise<SessionRow> {
+export async function startRun(
+  text: string,
+  attachmentIds: string[] = []
+): Promise<SessionRow> {
   const session = await json<SessionRow & { owner_key?: string }>(
     await apiFetch("/api/run", {
       method: "POST",
       headers: JSON_HEADERS,
-      body: JSON.stringify({ text }),
+      // R458-C2 (input model): attachments travel as engine-side
+      // references (attachment_ids), never as pasted content. When no
+      // attachments exist the payload is byte-compatible with the
+      // pre-R458 contract.
+      body: JSON.stringify(
+        attachmentIds.length > 0 ? { text, attachment_ids: attachmentIds } : { text }
+      ),
     })
   );
   // R447: persist the capability the engine just issued for THIS run —
@@ -144,12 +153,67 @@ export async function startRun(text: string): Promise<SessionRow> {
   return session;
 }
 
+// ---------------------------------------------------------------------------
+// R458-C2 — THE INPUT MODEL (directive §2/§3): attachments are ingested
+// SERVER-SIDE into canonical documents/references — the browser never
+// reads a file into the problem string (the conversation references the
+// attachment; it does not become the database).
+//
+// The engine side of this contract is R458/
+// CODER2_CONVERSATIONAL_ACTION_CONTRACT.json → Coder 1. Until that
+// endpoint exists the call 404s and the UI states the limitation
+// honestly (never a fake success — §2).
+// ---------------------------------------------------------------------------
+
+export interface AttachmentUploadResult {
+  attachment_id?: string;
+  name?: string;
+  media_type?: string;
+  bytes?: number;
+  sha256?: string;
+  ingestion?: { status?: string; document_ref?: string | null };
+  not_available?: boolean;
+}
+
+export async function uploadAttachment(
+  runId: string,
+  file: File
+): Promise<AttachmentUploadResult> {
+  const body = new FormData();
+  body.append("file", file);
+  const res = await apiFetch(`/api/run/${runId}/attachments`, {
+    method: "POST",
+    body,
+  });
+  if (res.status === 404 || res.status === 501) {
+    return { not_available: true };
+  }
+  return json<AttachmentUploadResult>(res);
+}
+
 export async function getRunResult(id: string): Promise<SessionDetail> {
   return json<SessionDetail>(await apiFetch(`/api/run/${id}/result`));
 }
 
 export async function retryRun(id: string): Promise<unknown> {
   return json(await apiFetch(`/api/sessions/${id}/retry`, { method: "POST" }));
+}
+
+// R458-C2 (§4): the one-question clarification pause — the engine asked
+// ONE material question (status AWAITING_CLARIFICATION) and this call
+// answers it, resuming the SAME run (C1's R446 contract, already live:
+// POST /api/run/{id}/answer). The conversation controls the discovery.
+export async function answerClarification(
+  id: string,
+  answer: string
+): Promise<unknown> {
+  return json(
+    await apiFetch(`/api/run/${id}/answer`, {
+      method: "POST",
+      headers: JSON_HEADERS,
+      body: JSON.stringify({ answer }),
+    })
+  );
 }
 
 // R451-C2 (C2.6): re-run the PRESENTATION build for a run whose

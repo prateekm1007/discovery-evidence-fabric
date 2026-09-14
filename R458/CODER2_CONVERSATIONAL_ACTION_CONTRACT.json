@@ -1,0 +1,155 @@
+{
+  "kind": "CODER2_CONVERSATIONAL_ACTION_CONTRACT",
+  "round": "R458-C2",
+  "generated_by": "Coder 2 (presentation & invocation owner)",
+  "consumers": ["Coder 1 (execution-semantics owner)"],
+  "constitution_basis": [
+    "Art. X — one canonical authority: an accepted action produces new canonical state ONLY through the engine; the UI renders the record, never its own conclusions.",
+    "Art. LXI — infrastructure failure is never a scientific rejection: an unavailable or refused action is an infrastructure/contract state, never a verdict about the candidate.",
+    "Art. XXV — unknown stays unknown: while an action is pending, nothing is claimed about its effect.",
+    "Directive R458 §2/§4/§5/§18/§27 — no new backend machinery from Coder 2; this contract IS the deliverable; Coder 1 owns execution semantics, Coder 2 owns presentation and invocation."
+  ],
+  "ownership": {
+    "coder_2_owns": [
+      "message routing (ASK vs ACT) in the composer",
+      "canonical action invocation and payload shape",
+      "honest rendering of accepted / refused / not_available outcomes",
+      "quick-action affordances mapped to canonical verbs"
+    ],
+    "coder_1_owns": [
+      "action interpretation and execution semantics",
+      "authorization of state-changing actions against the run's canonical state",
+      "emission of canonical events for every accepted action's effect",
+      "the new canonical state and its provenance after execution"
+    ],
+    "forbidden": [
+      "frontend-side epistemology (the UI never decides what an action means scientifically)",
+      "a second run system or duplicate backend authority",
+      "fake success: an action that was not accepted by the engine is never rendered as executed"
+    ]
+  },
+  "wire_protocol": {
+    "endpoint": "POST /api/run/{run_id}/actions",
+    "status_when_implemented": "NOT_YET_IMPLEMENTED (defined by this contract for Coder 1)",
+    "request": {
+      "action": "one of the verbs below (exact string)",
+      "params": "verb-specific object (may be empty)",
+      "requested_via": "conversation"
+    },
+    "responses": {
+      "202": {
+        "meaning": "engine accepted the action request for execution",
+        "body": { "action_id": "opaque engine id", "accepted": true }
+      },
+      "409": {
+        "meaning": "engine refused for a recorded reason (e.g. action invalid for current canonical state, run terminal)",
+        "body": { "accepted": false, "reason": "human-readable, machine-typed" }
+      },
+      "404/501": {
+        "meaning": "the engine has not adopted the action endpoint yet — the UI renders the honest-absence copy and changes NOTHING",
+        "ui_copy_key": "ACTION_NOT_AVAILABLE_COPY (lib/actionContract.ts)"
+      }
+    },
+    "auth": "X-Tosca-Owner capability header or session cookie (same as every other run-scoped route)",
+    "idempotency": "a retried request with the same action_id MUST NOT double-execute"
+  },
+  "verbs": {
+    "ASK": {
+      "is": "READ-ONLY (already live, NOT part of the new endpoint)",
+      "endpoint_today": "POST /api/run/{id}/ask",
+      "semantics": "answers from the run's own persisted artifacts; honest refusal states (ANSWERED / NOT_IN_RECORD / REFUSED_OVERCLAIM / TRANSPORT_ERROR); never changes canonical state",
+      "ui_examples": ["Why was candidate 2 rejected?", "What remains unknown?", "What does Toscanini believe here?"]
+    },
+    "CLARIFY": {
+      "is": "STATE-CHANGING (already live via C1's R446 §4 pause)",
+      "endpoint_today": "POST /api/run/{id}/answer",
+      "semantics": "the engine's ONE material question; the answer merges as USER_STATED context and resumes the SAME run; never a questionnaire (max one question per pause)",
+      "ui_examples": ["(answering) Outer diameter, keep the current one."]
+    },
+    "RESEARCH": {
+      "params": { "focus": "optional human phrase describing what to dig into" },
+      "semantics": "continue the investigation: additional retrieval and reasoning rounds on the current problem"
+    },
+    "FIND_EVIDENCE": {
+      "params": { "mode": "contradictory | supporting | general", "topic": "optional human phrase" },
+      "semantics": "a targeted retrieval pass; contradictory mode actively hunts disconfirming records (Art. XXXII: state the strongest alternative explanation, then test it)"
+    },
+    "COMPARE_MECHANISMS": {
+      "params": { "candidates": "optional list of candidate ids; default = all live candidates" },
+      "semantics": "produce a recorded comparison of the named candidates across evidence support, mechanism coherence, and risk"
+    },
+    "ATTACK": {
+      "params": { "target": "candidate id or 'current'" },
+      "semantics": "run (or re-run) the adversarial stage against the named candidate; outcome enters the canonical record with its existing epistemic vocabulary (SURVIVED / CONTESTED / FAILED / NOT_RUN — never a frontend-inferred verdict)"
+    },
+    "CHANGE_MECHANISM": {
+      "params": {
+        "preserve": "optional list, e.g. ['engineering_constraints']",
+        "direction": "optional human phrase (the user's own words)"
+      },
+      "semantics": "abandon the current mechanism search direction and synthesize a NEW candidate; preserved constraints are honored; the old candidate's record is untouched (Art. XI)"
+    },
+    "REQUEST_ENGINEERING": {
+      "params": {},
+      "semantics": "establish/extend the engineering representation of the current candidate (geometry authority stays CadQuery/OCCT per the settled decision)"
+    },
+    "REQUEST_EXPERIMENT": {
+      "params": { "purpose": "optional: decisive | parameter_establishment" },
+      "semantics": "design the falsification experiment for the current candidate (Art. LII contract fields)"
+    },
+    "UPLOAD_EVIDENCE": {
+      "params": { "attachment_ids": ["ids from the attachment contract"] },
+      "semantics": "ingested attachments join the run's evidence pool through the SAME relevance/custody gates as retrieved records (Art. XXI: provenance custody; never a side door)"
+    },
+    "REVIEW_PACKAGE": {
+      "params": {},
+      "semantics": "navigate to / regenerate the package projection from canonical state (presentation-level; the package is never rebuilt from anything but the record)"
+    }
+  },
+  "event_expectations": {
+    "accepted_action": "Coder 1 emits a product-event for the action's acceptance and for each resulting canonical transition; the conversation renders effects ONLY from those events (one-line progress discipline, §7)",
+    "refused_action": "the refusal reason renders verbatim in the conversation; no state change; no verdict implied",
+    "not_available": "the UI renders ACTION_NOT_AVAILABLE_COPY; nothing changes; the message is preserved in the thread"
+  },
+  "error_semantics_invariants": [
+    "BLOCKED != FAILED != UNKNOWN != NOT_RUN != REJECTED != PENDING — the six-word vocabulary stays distinct in every rendering (§8)",
+    "'The simulation service was unavailable.' != 'The candidate failed.'",
+    "'Evidence retrieval failed' != 'No evidence exists.'",
+    "'The adversarial test has not been completed' != 'Survived.'",
+    "an accepted action's EFFECT is unknown until the engine records it — the UI says so, in those words"
+  ],
+  "attachment_ingestion_contract": {
+    "endpoint": "POST /api/run/{run_id}/attachments (multipart/form-data: file, optional role)",
+    "status_when_implemented": "NOT_YET_IMPLEMENTED (defined for Coder 1; directive §2/§3)",
+    "request": {
+      "file": "binary part; any type accepted at the transport layer; ingestion capability is typed per type",
+      "role": "optional: evidence | specification | context"
+    },
+    "responses": {
+      "201": {
+        "body": {
+          "attachment_id": "opaque id, referencable by UPLOAD_EVIDENCE and by POST /api/run {attachment_ids}",
+          "name": "original filename",
+          "media_type": "detected type",
+          "bytes": "size",
+          "sha256": "content hash (provenance custody from the first byte)",
+          "ingestion": { "status": "ACCEPTED | UNSUPPORTED_TYPE | FAILED", "document_ref": "canonical document/reference id when ACCEPTED" }
+        }
+      },
+      "413": "size limit exceeded (engine-defined)",
+      "404/501": "endpoint not live yet — the UI states the limitation honestly and starts nothing"
+    },
+    "invariants": [
+      "the browser NEVER reads a file into the problem string (§3 — the conversation references the attachment; it does not become the database)",
+      "an UNSUPPORTED_TYPE or FAILED ingestion is disclosed verbatim; nothing is assumed from an un-ingested attachment",
+      "ingested documents enter canonical custody (hash + provenance) before any evidence use",
+      "startRun accepts attachment_ids: POST /api/run {text, attachment_ids} — backward compatible (the old {text} payload is unchanged when no attachments exist)"
+    ]
+  },
+  "client_implementation": {
+    "module": "TOSCANINI_UI/webapp/lib/actionContract.ts",
+    "api_client": "TOSCANINI_UI/webapp/lib/api.ts (uploadAttachment, answerClarification, startRun attachment_ids)",
+    "ui": "TOSCANINI_UI/webapp/components/Conversation.tsx (composer route chip, quick actions, honest delivery notes)",
+    "tests": "TOSCANINI_UI/webapp/tests/adversarial_r458.test.mjs (route table, honesty copies, clarification pause)"
+  }
+}

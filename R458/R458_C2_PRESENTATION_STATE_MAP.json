@@ -1,0 +1,159 @@
+{
+  "kind": "R458_C2_PRESENTATION_STATE_MAP",
+  "round": "R458-C2",
+  "generated_by": "Coder 2",
+  "schema_version": "2.0.0",
+  "supersedes": "CODER2_UI_STATE_MAP.json (amended in place; the amended file remains the working map — this deliverable is the R458 §24 closure snapshot with the directive's required 14-state coverage plus the conversational additions)",
+  "authority": "Every canonical user-visible state maps to EXACTLY ONE honest human representation. The frontend is a projection of canonical state (Art. X); it never re-derives, upgrades, or softens state (Art. XXVIII), never converts unknown into certainty (Art. XXV), and never converts infrastructure into a scientific verdict (Art. LXI).",
+  "canonical_sources": [
+    "toscanini/run_state.py (evidence_state five-state ledger, attack_state, mechanism_state)",
+    "toscanini/user_state.py (user_state projection + FINal status vocabulary)",
+    "toscanini/dossier.py (evidence ledger, design tab + geometry_state, experiment tab, transfer tab)",
+    "toscanini/event_journal.py + conversational/product_events.py (the event stream)",
+    "SessionDetail.status (the terminal/transport authority — R451-C2-CLOSURE Direction C)"
+  ],
+  "implementation": {
+    "pure_core": ["TOSCANINI_UI/webapp/lib/present.ts", "TOSCANINI_UI/webapp/lib/presentationState.ts", "TOSCANINI_UI/webapp/lib/productEvents.ts"],
+    "executable_evidence": ["TOSCANINI_UI/webapp/tests/adversarial_present.test.mjs", "TOSCANINI_UI/webapp/tests/adversarial_product_events.test.mjs", "TOSCANINI_UI/webapp/tests/adversarial_r458.test.mjs"]
+  },
+  "states": {
+    "PENDING": {
+      "canonical": "run active; retrieval started, not landed",
+      "human": "Evidence retrieval is in progress — I'm searching the indexed sources now.",
+      "tone": "live",
+      "forbidden": ["'No results yet'", "any phrasing that implies absence or completion"]
+    },
+    "NOT_REACHED": {
+      "canonical": "the run stopped before retrieval began",
+      "human": "The evidence stage was not reached on this run — retrieval never began. That is not a finding about the problem.",
+      "tone": "honest-absence",
+      "forbidden": ["collapsing into PENDING", "collapsing into RETRIEVED_ZERO"]
+    },
+    "RETRIEVED_ZERO": {
+      "canonical": "retrieval executed and measured zero records",
+      "human": "The searches completed and returned no matching records. That is a statement about these queries in these databases — it is not evidence that the concept is novel or that no relevant work exists.",
+      "tone": "measured-zero",
+      "forbidden": ["'no prior art exists'", "novelty claims from zero (Art. XXI.2)"]
+    },
+    "RETRIEVED_POSITIVE": {
+      "canonical": "records_found > 0, custody-frozen",
+      "human": "I found N relevant sources in the evidence base. Each one is custody-frozen with a content hash.",
+      "tone": "positive"
+    },
+    "FAILED": {
+      "canonical": "retrieval infrastructure failure (server-declared, or stage status FAIL)",
+      "human": "Evidence retrieval failed — the sources could not be reached. This is an infrastructure state, not evidence of absence. Nothing was concluded from it, and the run can resume where it stopped.",
+      "tone": "infrastructure",
+      "forbidden": ["rendering as no-evidence-exists", "rendering as a scientific conclusion of any kind"]
+    },
+    "BLOCKED": {
+      "canonical": "RUN_BLOCKED_* terminal status (transport/capability) — THE singular authority; user_state_view cannot override it",
+      "human": "Current run blocked — I stopped partway; the infrastructure I need became unavailable. Nothing was concluded about your problem. Resume the investigation.",
+      "tone": "blocked",
+      "rule": "suppressStalePositives: every stale positive artifact on the record (older COMPLETED candidate, visual_complete, engineering=true) stays in the technical view and is NEVER read as a present-tense result",
+      "forbidden": ["any success language", "the stale positive as current achievement"]
+    },
+    "UNKNOWN": {
+      "canonical": "terminal with no recorded outcome (COMPLETED_UNKNOWN) or geometry_state NOT_ESTABLISHED",
+      "human": "Outcome unknown / Engineering geometry is not established on this run. Nothing is rendered because nothing was established.",
+      "tone": "honest-unknown",
+      "forbidden": ["translating unknown into unavailable (they are different facts)", "filling with a plausible model"]
+    },
+    "NOT_RUN": {
+      "canonical": "attack_state empty / never reached on a terminal run",
+      "human": "The adversarial test has not been completed. Nothing is claimed either way — a candidate is never called 'survived' by default.",
+      "tone": "honest-absence",
+      "forbidden": ["defaulting to SURVIVED", "defaulting to FAILED"]
+    },
+    "REJECTED": {
+      "canonical": "COMPLETED_FALSE_PREMISE / rejected=true — a REAL scientific verdict",
+      "human": "Rejected — the evidence contradicted the problem's premise. Rejected is a finding — the investigation did its job.",
+      "tone": "rejected",
+      "forbidden": ["softening into 'in development'", "hiding the rejection behind the next action"]
+    },
+    "CONTESTED": {
+      "canonical": "attack escalated_objection (instrument not calibrated to decide)",
+      "human": "The adversarial instrument raised an objection it is not calibrated to decide, so the objection is preserved and escalated for adjudication — it is not treated as a verdict, and not treated as a pass either.",
+      "tone": "contested",
+      "forbidden": ["green badge", "red badge", "collapse into SURVIVED or FAILED"]
+    },
+    "SURVIVED": {
+      "canonical": "attack_state SURVIVED/PASS/COMPLETE_PASS or generation challenge survived",
+      "human": "I tried to prove the leading candidate wrong — it survived the specified adversarial tests, including: \"<strongest objection>\".",
+      "tone": "positive-with-precision",
+      "rule": "survived is always stated WITH the tests it survived; it never implies physical validation (Art. XXVIII)"
+    },
+    "ENGINEERING": {
+      "canonical": "design availability AVAILABLE + engineering_authority ENGINEERING + geometry_state visual_complete (for VISUAL_READY)",
+      "human": "The technology model is the run's canonical engineering geometry — the same geometry the record carries, not an illustration.",
+      "tone": "positive"
+    },
+    "EXPERIMENT_READY": {
+      "canonical": "experiment tab availability AVAILABLE (Art. LII falsification contract present)",
+      "human": "The decisive test is specified — the experiment that could kill the candidate, with its acceptance and falsification thresholds.",
+      "tone": "positive",
+      "next_action": "Review the decisive experiment"
+    },
+    "PACKAGE_READY": {
+      "canonical": "package.complete / transfer download present",
+      "human": "The technology package is assembled and ready — everything needed to evaluate, build, or commission the decisive experiment.",
+      "tone": "positive",
+      "single_action": "Download the technology package (the ONE package action; never a package wizard)"
+    },
+    "AWAITING_CLARIFICATION": {
+      "canonical": "status AWAITING_CLARIFICATION + clarification{question, decision_changed} (C1 R446 §4; consumed by the UI from R458-C2)",
+      "human": "Toscanini's one material question, verbatim, plus: Your answer decides: <decision_changed>. The investigation is paused — it will resume the moment you answer.",
+      "tone": "conversation-controls-the-discovery",
+      "forbidden": ["rendering as an error or stall", "asking a second question", "resuming on anything but POST /api/run/{id}/answer"]
+    },
+    "PROVIDER_ROTATION": {
+      "canonical": "event record: infrastructure failure followed by later recorded progress (the R456 cascade precedent)",
+      "human": "I continued the investigation using another available reasoning route.",
+      "tone": "calm-continuation",
+      "rule": "THE FRONTEND NEVER NAMES PROVIDERS OR MODELS. The route identity (provider A → failure class → provider B → model → latency → provenance) lives in the run's routing ledger in the TECHNICAL RECORD only (§26; BS-009).",
+      "forbidden": ["provider/model names in the conversation", "counting rotations for the user", "rendering the failure as a verdict"]
+    },
+    "GEOMETRY_UNAVAILABLE_vs_UNKNOWN": {
+      "canonical": "UNAVAILABLE = established but presentation path down; UNKNOWN = nothing established; UNEARNED = architecture exists but no faithful visual could be produced",
+      "human_map": {
+        "UNAVAILABLE": "Engineering geometry exists on this run; the visual rendering is unavailable right now — an infrastructure state, and the geometry itself is unaffected.",
+        "UNKNOWN": "Engineering geometry is not established on this run. Nothing is rendered because nothing was established.",
+        "UNEARNED": "The investigation recorded an architecture, but the system could not produce a visual model that faithfully represents it — so no model is shown."
+      },
+      "rule": "conflating these was the R451-C2 identified defect; the separation is load-bearing"
+    }
+  },
+  "presentation_states_terminal_map": {
+    "note": "lib/presentationState.ts::resolvePresentationState — the ONE mapping for the model/workspace surface",
+    "INVESTIGATING": "run active — the conversation is the surface",
+    "INFRASTRUCTURE_PAUSED": "transport-terminal (RUN_BLOCKED_*/INTERRUPTED/FAILED_*) — status is the singular authority; a stale scientific-looking user_state_view NEVER promotes it",
+    "TECHNOLOGY_NOT_ESTABLISHED": "terminal, no invention, no geometry — honest scientific absence",
+    "GEOMETRY_UNAVAILABLE": "invention exists, geometry absent (not applicable / generation failed) with the recorded reason",
+    "GEOMETRY_READY_RENDER_BLOCKED": "canonical GLB exists and stays interactive; the typed cause (renderer_unavailable | gate_not_passed | not_attempted | infrastructure | rendering_in_progress | visual_input_missing | release_unverified | geometry_unverified | legacy_render_unverified | visual_authority_not_engineering) picks the EXACT sentence",
+    "VISUAL_READY": "geometry_state == visual_complete AND engineering_authority == ENGINEERING — the absolute invariant; a contradiction pair fails closed to GEOMETRY_READY_RENDER_BLOCKED[visual_authority_not_engineering]",
+    "SCIENTIFIC_REJECTION": "COMPLETED_FALSE_PREMISE only",
+    "LEGACY_STATE_UNAVAILABLE": "pre-typed projection — displays ONLY this compatibility state, never a current-looking state",
+    "PRESENTATION_STATE_UNAVAILABLE": "an unrecognized backend geometry/visual state — fail-closed unknown, no scientific claim from a parse failure"
+  },
+  "error_semantics_vocabulary": {
+    "invariant": "BLOCKED / FAILED / UNKNOWN / NOT_RUN / REJECTED / PENDING stay distinct in every rendering",
+    "conversational_translations": {
+      "BLOCKED": "The technical work hit an infrastructure wall. The test could not be completed — nothing has been rejected because of it.",
+      "FAILED (infrastructure)": "A technical step could not complete — that is infrastructure, not a verdict about the idea.",
+      "FAILED (scientific)": "A step of the investigation recorded a scientific failure — kept as a finding, stated in the record.",
+      "UNKNOWN": "The recorded state carries no verdict — unknown stays unknown.",
+      "NOT_RUN": "The adversarial test has not been completed. Nothing is claimed either way.",
+      "REJECTED": "The adversarial tests contradicted this candidate. Recorded cause: <cause>.",
+      "PENDING": "In progress — the search is running now."
+    }
+  },
+  "never_rendered_as": {
+    "candidate": "an invention (Art. XXVIII)",
+    "conceptual geometry": "engineering-valid geometry",
+    "simulation": "reality",
+    "prediction": "observation",
+    "retrieval failure": "evidence of absence",
+    "transport blocked": "a scientific result",
+    "raw enums/IDs/provider names": "primary UI (technical record only)"
+  }
+}

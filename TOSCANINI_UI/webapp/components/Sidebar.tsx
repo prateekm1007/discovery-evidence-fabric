@@ -1,42 +1,48 @@
 "use client";
 
-// R453-C2 — THE SIDEBAR: the new information architecture (brief §5).
+// R453-C2 — THE SIDEBAR: the information architecture (brief §5).
 //
-//   New Discovery · Discoveries · Technology Packages · Projects · Settings
+//   New Discovery · Discoveries · Technology Packages
 //
-// Not 15 navigation destinations, and never the internal pipeline as
-// navigation. Discoveries are states of ONE discovery (the conversation
-// renders them); the rail only decides WHERE you are. Projects is an
-// honest empty state until the backend grouping contract exists — no
-// fake data (brief §43). Settings carries the engine identity honestly.
+// R458-C2 (§10/§11): Projects is GONE — the product never advertises
+// unfinished capability as navigation (the section was an honest empty
+// state, but honesty does not make an unusable surface navigable;
+// grouping needs a backend contract that does not exist). Settings
+// stays account-level, outside the discovery navigation.
+//
+// §11 — history items lead with WHAT you were working on: human title,
+// small date, a subtle state dot (color-independent: the state also
+// rides an aria-label). No large status pills — the state-machine
+// vocabulary is not the headline.
 
 import type { HealthSummary, SessionRow, ShowcaseRow, UserStateView } from "@/lib/types";
 
-function stateClass(usv: UserStateView | undefined): string {
-  if (!usv) return "RUNNING";
+// the subtle state dot — a small visual cue, never the headline.
+// Classes are the dot's color family only; the meaning is carried by
+// the aria-label text (§20: color-independent status).
+function stateDot(usv: UserStateView | undefined): { cls: string; label: string } {
+  if (!usv) return { cls: "running", label: "In progress" };
   switch (usv.user_state) {
     case "COMPLETED_PACKAGE":
     case "COMPLETED_CANDIDATE":
     case "COMPLETED_EVOLVED":
-      return "COMPLETE";
+      return { cls: "complete", label: "Complete" };
+    case "COMPLETED_UNDER_DEVELOPMENT":
+    case "COMPLETED_GENERATION_FAILED":
+      return { cls: "development", label: "In development" };
     case "COMPLETED_REJECTED":
     case "COMPLETED_FALSE_PREMISE":
-      return "REJECTED";
+      return { cls: "rejected", label: "Rejected" };
     case "COMPLETED_UNKNOWN":
-      return "ERROR";
+      return { cls: "unknown", label: "Outcome unknown" };
     case "INTERRUPTED":
     case "FAILED_TRANSPORT":
     case "FAILED_ENGINE":
     case "BLOCKED_TRANSPORT":
-      return "ERROR";
+      return { cls: "paused", label: "Paused by infrastructure" };
     default:
-      return "RUNNING";
+      return { cls: "running", label: "In progress" };
   }
-}
-
-function stateLabel(usv: UserStateView | undefined): string {
-  if (!usv) return "Running";
-  return usv.label;
 }
 
 export default function Sidebar({
@@ -76,7 +82,7 @@ export default function Sidebar({
           </div>
         )}
         {sessions.slice(0, 14).map((s) => {
-          const usv = s.user_state_view;
+          const dot = stateDot(s.user_state_view);
           return (
             <button
               key={s.session_id}
@@ -85,9 +91,7 @@ export default function Sidebar({
               type="button"
               title={s.title}
             >
-              <span className={`pill ${stateClass(usv)}`}>
-                {stateLabel(usv)}
-              </span>
+              <span className={`rail-dot rail-dot-${dot.cls}`} role="img" aria-label={dot.label} />
               <span className="rail-title">{s.title}</span>
               <span className="rail-when">{s.created_at?.slice(0, 10)}</span>
             </button>
@@ -131,18 +135,6 @@ export default function Sidebar({
             ))}
           </details>
         )}
-      </div>
-
-      <div className="rail-section">
-        <details className="rail-projects" data-sidebar-projects>
-          <summary className="rail-h">Projects</summary>
-          <div className="rail-empty">
-            Projects will group discoveries, knowledge, and packages around
-            one goal. Grouping needs a backend contract that doesn&apos;t
-            exist yet — until then every discovery lives in Discoveries, and
-            nothing is pretending otherwise.
-          </div>
-        </details>
       </div>
 
       <div className="rail-section rail-settings" data-sidebar-settings>

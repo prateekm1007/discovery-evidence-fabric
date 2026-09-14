@@ -2,24 +2,28 @@
 
 // R453-C2 — THE CONVERSATION: one discovery told as one conversation.
 //
-// The pipeline is visible as a STORY, not as machinery (the directive's
-// closing correction). Every message here is derived from canonical
-// state through lib/present.ts — the component renders; it never
-// re-derives epistemic state, never upgrades a class, never converts
-// unknown into certainty (Art. X / XXV / XXVIII / LXI).
+// The pipeline is visible as a STORY, not as machinery. Every message
+// here is derived from canonical state through lib/present.ts — the
+// component renders; it never re-derives epistemic state, never
+// upgrades a class, never converts unknown into certainty (Art. X /
+// XXV / XXVIII / LXI).
 //
-// Message → surface mapping:
-//   user        the problem, right-aligned
-//   note        plain conversational text (no card — brief §13)
-//   progress    the live line while the run records steps
-//   evidence    ONE inline card (the counts are meaningful structure)
-//   candidates  the inventions as competing hypotheses (brief §16)
-//   attack      "now I'm trying to prove this wrong" (brief §17)
-//   artifact    substantial output → opens the right-side workspace
-//   outcome     the terminal state + THE single next-best action
-//   ask         the user's follow-up + the honest answer/refusal
+// R458-C2 — THE CONVERSATION CONTROLS THE DISCOVERY (§4/§5/§6/§7):
+//   * Ask vs Act — the composer distinguishes a question over the
+//     record (read-only /ask, live today) from a canonical action
+//     request (lib/actionContract.ts → the engine's action endpoint).
+//     An action the engine cannot yet execute is stated honestly —
+//     never a fake success, never a frontend-side state change.
+//   * The clarification pause — the engine's ONE material question
+//     renders as Toscanini's own message; the composer becomes the
+//     answer box (POST /api/run/{id}/answer — C1's live contract).
+//   * ONE progress sentence (§7) — the live line is a single
+//     meaningful sentence; the four-event tail is gone (the full
+//     stream stays in the technical record). A rotation after a
+//     transport failure renders as one calm sentence (§26) — the
+//     route identity stays in the technical record.
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import type { ScienceEvent, SessionDetail, DossierBody, AskResponse } from "@/lib/present-types";
 import {
   deriveConversation,
@@ -27,12 +31,20 @@ import {
   type NextAction,
   type SurfaceId,
 } from "@/lib/present";
-// R454-C2 (brief §22/§25): backend events reach the conversation ONLY
-// through the product event map — machine vocabulary ("engine stage
-// SYNTHESIZE recorded at …") stays in the technical record, never in
-// the conversation (BS-009). The backend summary remains as the title
-// attribute here and in full in the journal surface.
-import { pickLiveEvent, productEventSentence } from "@/lib/productEvents";
+// Backend events reach the conversation ONLY through the product event
+// map — machine vocabulary stays in the technical record (BS-009).
+import {
+  pickLiveEvent,
+  productEventSentence,
+  deriveRotationNote,
+} from "@/lib/productEvents";
+import {
+  classifyMessage,
+  sendAction,
+  ACTION_LABEL,
+  ACTION_NOT_AVAILABLE_COPY,
+  type ActionVerb,
+} from "@/lib/actionContract";
 import { AnswerView } from "./AskBox";
 import { EpistemicBadge } from "./ScienceEvents";
 
@@ -86,8 +98,10 @@ function EvidenceCard({
 
 function Candidates({
   m,
+  onQuickAction,
 }: {
   m: Extract<Msg, { kind: "candidates" }>;
+  onQuickAction?: (verb: Exclude<ActionVerb, "ASK">, label: string) => void;
 }) {
   return (
     <div className="conv-candidates" data-conv-candidates>
@@ -110,6 +124,24 @@ function Candidates({
             <div className="conv-cand-body faint"><b>What changed:</b> {c.whatChanged}</div>
           )}
           {c.risk && <div className="conv-cand-body faint"><b>Risk / kill condition:</b> {c.risk}</div>}
+          {!c.killed && c.attack !== "SURVIVED" && onQuickAction && (
+            <div className="conv-cand-actions">
+              <button
+                type="button"
+                className="conv-quick faint"
+                onClick={() => onQuickAction("ATTACK", `Challenge ${c.label}`)}
+              >
+                Challenge this candidate
+              </button>
+              <button
+                type="button"
+                className="conv-quick faint"
+                onClick={() => onQuickAction("CHANGE_MECHANISM", "Try another mechanism")}
+              >
+                Try another mechanism
+              </button>
+            </div>
+          )}
         </div>
       ))}
     </div>
@@ -174,12 +206,13 @@ export default function Conversation({
 }) {
   const [q, setQ] = useState("");
   const [busy, setBusy] = useState(false);
+  const [sendAsAction, setSendAsAction] = useState(false);
+  const [actionNote, setActionNote] = useState<string | null>(null);
   const msgs = deriveConversation(detail, dossier, packageAvailable);
 
-  // the live line, from the run's own event record — never a guess, and
-  // never machine vocabulary: the event is rendered through the product
-  // event map (brief §22). A pause is its own honest state, never
-  // rendered as active work (R436 §5B).
+  // R458-C2 (§7) — ONE progress sentence. The live line is the newest
+  // ACTIVE event (or the honest pause) in product language; the full
+  // event stream stays in the technical record, not under the composer.
   const live = pickLiveEvent(events);
   const liveSentence = productEventSentence(live);
   const liveSummary =
@@ -188,19 +221,89 @@ export default function Conversation({
   const pausedSentence = productEventSentence(paused);
   const pausedSummary =
     paused && typeof paused.summary === "string" ? paused.summary : null;
+  // §26 — the provider-rotation abstraction: work stopped, then
+  // continued. One calm sentence; the route stays in the ledger.
+  const rotationNote = useMemo(() => deriveRotationNote(events), [events]);
   const done = detail.status === "COMPLETE";
 
+  // §4 — the clarification pause: the composer is the answer box.
+  const clarificationPending = detail.status === "AWAITING_CLARIFICATION";
+
+  // §5 — Ask vs Act: the composer routes the message. The phrase table
+  // is deterministic presentation logic (lib/actionContract.ts); the
+  // user always sees which way their message will go and can flip it.
+  const route = useMemo(() => classifyMessage(q), [q]);
+  const routeIsAction = route.kind === "action";
+
   async function submit() {
-    const question = q.trim();
-    if (!question || busy) return;
+    const text = q.trim();
+    if (!text || busy) return;
+
+    // — the clarification pause: every message answers the question —
+    if (clarificationPending) {
+      setBusy(true);
+      setQ("");
+      try {
+        await onAsk(text); // renders the answer in the thread honestly
+      } finally {
+        setBusy(false);
+      }
+      return;
+    }
+
+    // — an action: send the canonical action request to the engine —
+    if (sendAsAction && route.kind === "action") {
+      setBusy(true);
+      setQ("");
+      const verb = route.verb;
+      try {
+        const result = await sendAction(detail.session_id, verb);
+        if (result.not_available) {
+          setActionNote(ACTION_NOT_AVAILABLE_COPY);
+        } else if (result.accepted) {
+          setActionNote(
+            `Done — "${ACTION_LABEL[verb]}" is with the engine. ` +
+              `The conversation will show what actually changed, ` +
+              `from the record, when it happens.`
+          );
+        } else {
+          setActionNote(
+            "The action could not be delivered — an infrastructure " +
+              "state, not a verdict about the idea. " +
+              (result.detail ?? "")
+          );
+        }
+      } finally {
+        setBusy(false);
+        setSendAsAction(false);
+      }
+      return;
+    }
+
+    // — a question: the live read-only path over the run's record —
     setBusy(true);
     setQ("");
     try {
-      await onAsk(question);
+      await onAsk(text);
     } finally {
       setBusy(false);
     }
   }
+
+  function quickAction(verb: Exclude<ActionVerb, "ASK">, label: string) {
+    setActionNote(null);
+    setQ(label);
+    setSendAsAction(true);
+    void routeAnnounce(verb);
+  }
+
+  async function routeAnnounce(_verb: Exclude<ActionVerb, "ASK">) {
+    // the composer text is pre-filled; the user presses Enter to send
+  }
+
+  const actionToggleLabel = routeIsAction
+    ? `Send as: ${ACTION_LABEL[(route as { verb: Exclude<ActionVerb, "ASK"> }).verb]}`
+    : "Send as a question";
 
   return (
     <div className="conv" data-conversation>
@@ -210,6 +313,19 @@ export default function Conversation({
             return (
               <div className="conv-row user" key={m.id} data-conv-user>
                 <div className="conv-user-bubble">{m.text}</div>
+              </div>
+            );
+          case "clarification":
+            return (
+              <div className="conv-row" key={m.id}>
+                <div className="conv-clarification" data-conv-clarification>
+                  <div className="conv-clarification-q">{m.question}</div>
+                  {m.decisionChanged && (
+                    <div className="conv-clarification-why faint">
+                      Your answer decides: {m.decisionChanged}
+                    </div>
+                  )}
+                </div>
               </div>
             );
           case "note":
@@ -239,7 +355,7 @@ export default function Conversation({
           case "candidates":
             return (
               <div className="conv-row" key={m.id}>
-                <Candidates m={m} />
+                <Candidates m={m} onQuickAction={quickAction} />
               </div>
             );
           case "attack":
@@ -293,12 +409,25 @@ export default function Conversation({
         </div>
       ))}
 
-      {/* live investigation line — from the event record only, in
-          product language (brief §22); the backend summary rides the
-          title attribute for transparency and lives in full in the
-          technical record (§15) */}
-      {!done && (
+      {/* the action delivery note — honest, one line, never a fake
+          success (§4/§27: the engine's record is the only authority on
+          what actually changed) */}
+      {actionNote && (
+        <div className="conv-row" data-conv-action-note>
+          <div className="conv-note conv-action-note">{actionNote}</div>
+        </div>
+      )}
+
+      {/* live investigation — ONE sentence from the event record, in
+          product language (§7/§16/§22); the backend summary rides the
+          title attribute and lives in full in the technical record */}
+      {!done && !clarificationPending && (
         <div className="conv-row" data-conv-live-block>
+          {rotationNote && (
+            <div className="conv-note faint" data-conv-rotation>
+              {rotationNote}
+            </div>
+          )}
           {paused && !liveSentence.loading && pausedSentence.text && (
             <div className="conv-live paused" data-conv-paused title={pausedSummary ?? undefined}>
               {pausedSentence.text}
@@ -313,55 +442,56 @@ export default function Conversation({
               )}
             </div>
           )}
-          {events.length > 0 && (
-            <div className="conv-events faint" data-conv-events>
-              {events.slice(-4).map((e) => {
-                const s = productEventSentence(e);
-                if (!s.text) return null;
-                return (
-                  <div
-                    className="conv-event"
-                    key={e.event_id}
-                    title={e.summary}
-                  >
-                    <span className={`scdot sc-${(e.status || "unknown").toLowerCase()}`} aria-hidden="true" />
-                    {s.text}
-                  </div>
-                );
-              })}
-            </div>
-          )}
         </div>
       )}
 
-      {/* the composer — conversation-first (brief §7) */}
+      {/* the composer — conversation-first (§4: it can ask, act, and
+          answer the engine's question) */}
       <div className="conv-composer" data-conv-composer>
         <input
           className="conv-input"
           value={q}
           placeholder={
-            done || detail.status === "RUN_BLOCKED_TRANSPORT"
-              ? "Ask about this discovery — answered from its own record…"
-              : askEnabledNote ?? "Ask while I work — I'll answer honestly if the record can't yet…"
+            clarificationPending
+              ? "Type your answer — the investigation resumes the moment you send it…"
+              : done || detail.status === "RUN_BLOCKED_TRANSPORT"
+                ? "Ask about this discovery — answered from its own record…"
+                : askEnabledNote ?? "Ask about this, or tell me what to do next…"
           }
-          onChange={(e) => setQ(e.target.value)}
+          onChange={(e) => {
+            setQ(e.target.value);
+            if (!routeIsAction) setSendAsAction(false);
+          }}
           onKeyDown={(e) => {
             if (e.key === "Enter" && !e.shiftKey) {
               e.preventDefault();
               void submit();
             }
           }}
-          aria-label="Ask Toscanini"
+          aria-label={
+            clarificationPending ? "Answer the investigation's question" : "Message Toscanini"
+          }
         />
         <button
           type="button"
-          className="btn small"
+          className={`btn small ${sendAsAction && routeIsAction ? "primary" : ""}`}
           onClick={() => void submit()}
           disabled={busy || !q.trim()}
         >
-          {busy ? "…" : "Ask"}
+          {busy ? "…" : clarificationPending ? "Answer" : sendAsAction && routeIsAction ? "Do it" : "Ask"}
         </button>
       </div>
+      {!clarificationPending && routeIsAction && (
+        <div className="conv-routenote faint" data-conv-route-note>
+          <button
+            type="button"
+            className="conv-route-toggle"
+            onClick={() => setSendAsAction(!sendAsAction)}
+          >
+            {sendAsAction ? actionToggleLabel : actionToggleLabel + " (send as a question instead)"}
+          </button>
+        </div>
+      )}
       <div className="conv-composer-note faint">
         answers come from this investigation&apos;s own records — unknowns stay
         unknown, and nothing is presented as physically validated unless the

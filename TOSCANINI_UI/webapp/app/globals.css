@@ -42,21 +42,7 @@ html, body {
 
 a { color: inherit; }
 
-/* ---------------- layout shell ---------------- */
-.shell {
-  max-width: 1060px;
-  margin: 0 auto;
-  padding: 0 24px 80px;
-}
 
-.topbar {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  padding: 26px 0 18px;
-  border-bottom: 1px solid var(--line);
-  margin-bottom: 40px;
-}
 
 .brand {
   font-family: var(--serif);
@@ -115,36 +101,9 @@ a { color: inherit; }
   color: var(--ink);
 }
 
-/* the story strip: DISCOVER → INVENT → INSPECT → CHALLENGE → REBUILD →
-   EXPERIMENT (directive §21 — that is the story of the product) */
-.story-strip {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: 4px 10px;
-  margin: 26px auto 0;
-  max-width: 640px;
-}
 
-.story-step {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-}
 
-.story-word {
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.14em;
-  color: var(--ink-faint);
-}
 
-.story-arrow {
-  color: var(--line-strong, #c9c4bd);
-  font-size: 11px;
-  line-height: 1;
-}
 
 .hero p.lede {
   color: var(--ink-soft);
@@ -196,6 +155,7 @@ a { color: inherit; }
   font-weight: 600;
   padding: 10px 22px;
   cursor: pointer;
+  white-space: nowrap; /* R458-C2: a label never wraps inside its own button */
   transition: transform 0.06s ease, box-shadow 0.15s ease;
 }
 
@@ -211,25 +171,7 @@ a { color: inherit; }
 }
 .btn.small { padding: 6px 14px; font-size: 13px; border-radius: 8px; }
 
-/* ---------------- examples ---------------- */
-.examples {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  justify-content: center;
-  margin-top: 18px;
-}
 
-.example {
-  border: 1px solid var(--line);
-  background: #fff;
-  border-radius: 999px;
-  padding: 7px 14px;
-  font-size: 13px;
-  color: var(--ink-soft);
-  cursor: pointer;
-}
-.example:hover { border-color: var(--accent); color: var(--accent); }
 
 /* ---------------- section headers ---------------- */
 .section { margin-top: 54px; }
@@ -243,23 +185,9 @@ a { color: inherit; }
 
 .section .sub { color: var(--ink-faint); font-size: 14px; margin-bottom: 18px; }
 
-/* ---------------- history list ---------------- */
-.history { display: flex; flex-direction: column; gap: 10px; }
 
-.history a.run-row {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 14px 16px;
-  background: #fff;
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  text-decoration: none;
-}
 
-.history a.run-row:hover { border-color: var(--accent); }
 
-.run-row .title { flex: 1; font-size: 14.5px; }
 .run-row .when { color: var(--ink-faint); font-size: 12.5px; }
 
 .pill {
@@ -279,8 +207,6 @@ a { color: inherit; }
 .pill.INTERRUPTED { color: var(--warn); border-color: #ecd9bd; background: #faf3e8; }
 .pill.PENDING { color: var(--warn); border-color: #ecd9bd; background: #faf3e8; }
 
-/* ---------------- showcase gallery ---------------- */
-.gallery { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
 
 .card {
   display: block;
@@ -312,7 +238,7 @@ a { color: inherit; }
 .card p { margin: 0; color: var(--ink-soft); font-size: 13.5px; }
 .card .foot { margin-top: 12px; color: var(--ink-faint); font-size: 12px; }
 
-@media (max-width: 780px) { .gallery { grid-template-columns: 1fr; } }
+@media (max-width: 780px) {  }
 
 /* ---------------- run page ---------------- */
 .runpage .problem {
@@ -331,12 +257,6 @@ a { color: inherit; }
 }
 .runpage .problem .text { font-size: 16.5px; }
 
-.statusbar {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin: 26px 0 8px;
-}
 
 .statusbar .phase {
   font-family: var(--mono);
@@ -344,13 +264,6 @@ a { color: inherit; }
   color: var(--ink-soft);
 }
 
-.spinner {
-  width: 14px; height: 14px;
-  border-radius: 50%;
-  border: 2px solid var(--accent-soft);
-  border-top-color: var(--accent);
-  animation: spin 0.9s linear infinite;
-}
 @keyframes spin { to { transform: rotate(360deg); } }
 
 /* narrative stream — the engineering argument as it emerges (R391:
@@ -387,21 +300,7 @@ a { color: inherit; }
 }
 @keyframes blink { 50% { opacity: 0; } }
 
-/* ---------------- reasoning summary ---------------- */
-.reasoning {
-  background: #fff;
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  padding: 26px 28px;
-  margin-top: 30px;
-}
 
-.reasoning h3 {
-  font-family: var(--serif);
-  font-weight: 400;
-  font-size: 21px;
-  margin: 0 0 4px;
-}
 .reasoning .sub { color: var(--ink-faint); font-size: 13px; margin-bottom: 20px; }
 
 .arg { display: flex; flex-direction: column; gap: 0; }
@@ -583,22 +482,7 @@ a { color: inherit; }
 .kv { display: grid; grid-template-columns: auto 1fr; gap: 6px 14px; font-size: 13.5px; }
 .kv .k { color: var(--ink-faint); }
 
-/* download CTA */
-.download-cta {
-  margin-top: 34px;
-  background: #1f1e1c;
-  border-radius: 16px;
-  padding: 30px 32px;
-  color: var(--paper);
-  display: flex;
-  align-items: center;
-  gap: 26px;
-  flex-wrap: wrap;
-}
 
-.download-cta .msg { flex: 1; min-width: 260px; }
-.download-cta .msg h3 { font-family: var(--serif); font-weight: 400; font-size: 22px; margin: 0 0 6px; }
-.download-cta .msg p { color: #b8b4ac; font-size: 13.5px; margin: 0; }
 
 .btn.download {
   background: var(--accent);
@@ -606,15 +490,6 @@ a { color: inherit; }
   padding: 13px 28px;
 }
 
-.notavail {
-  background: var(--paper-2);
-  border: 1px dashed var(--line);
-  border-radius: 14px;
-  padding: 22px;
-  color: var(--ink-soft);
-  font-size: 14px;
-  margin-top: 34px;
-}
 
 /* error / empty */
 .errbox {
@@ -629,9 +504,6 @@ a { color: inherit; }
 
 .loading { color: var(--ink-faint); padding: 60px 0; text-align: center; }
 
-.backrow { margin-top: 30px; }
-.backrow a { color: var(--ink-faint); font-size: 13px; text-decoration: none; }
-.backrow a:hover { color: var(--accent); }
 
 /* ---------------- R393: run narrative groups (the eight states) ------- */
 .ngroup { margin-top: 26px; }
@@ -711,8 +583,6 @@ details.tech li { font-size: 13.5px; color: var(--ink-soft); margin-bottom: 6px;
 
 /* ---------------- R393: responsive pass (directive 8) ----------------- */
 @media (max-width: 720px) {
-  .shell { padding: 0 16px 60px; }
-  .topbar { padding: 20px 0 14px; margin-bottom: 26px; }
   .topbar .meta { display: none; }
 
   .hero { margin-top: 18px; }
@@ -723,15 +593,12 @@ details.tech li { font-size: 13.5px; color: var(--ink-soft); margin-bottom: 6px;
   .hero h1.brand-statement { font-size: clamp(28px, 8.4vw, 34px); }
   .hero p.brand-subline { font-size: 15px; margin-bottom: 22px; }
   .hero h2.ask-title { font-size: 18px; }
-  .story-strip { gap: 3px 8px; }
-  .story-word { font-size: 10.5px; letter-spacing: 0.12em; }
   .hero p.lede { font-size: 14.5px; }
   .ask { padding: 16px; }
   .ask textarea { font-size: 15px; min-height: 110px; }
   .ask .ask-foot { flex-direction: column; align-items: stretch; gap: 10px; }
   .ask .hint { order: 2; text-align: center; }
   .ask .btn { order: 1; width: 100%; }
-  .examples { justify-content: center; }
 
   .section { margin-top: 38px; }
   .section h2 { font-size: 19px; }
@@ -739,15 +606,10 @@ details.tech li { font-size: 13.5px; color: var(--ink-soft); margin-bottom: 6px;
   .briefsec .briefbody, .briefsec .brieffoot { font-size: 13.5px; }
   .killbox { font-size: 13.5px; padding: 12px 14px; }
 
-  .statusbar { flex-wrap: wrap; gap: 8px; }
-  .run-row { flex-wrap: wrap; }
-  .run-row .title { flex-basis: 100%; order: 3; margin-top: 4px; }
 
   .arg .step { grid-template-columns: 1fr; gap: 4px; padding: 10px 0; }
 
   .canvas-wrap { height: 320px !important; }
-  .download-cta { padding: 22px 18px; }
-  .download-cta .msg { min-width: 100%; }
   .download-cta .btn.download { width: 100%; text-align: center; }
 
   .ngroup { margin-top: 20px; }
@@ -882,12 +744,6 @@ details.tech li { font-size: 13.5px; color: var(--ink-soft); margin-bottom: 6px;
   color: var(--ink-faint);
   margin: 0 0 8px 4px;
 }
-.rail-sub {
-  font-size: 11.5px;
-  color: var(--ink-faint);
-  margin: -4px 0 10px 4px;
-  line-height: 1.45;
-}
 .rail-empty { font-size: 12px; color: var(--ink-faint); margin: 2px 0 8px 4px; }
 
 .rail-item {
@@ -938,17 +794,6 @@ details.tech li { font-size: 13.5px; color: var(--ink-soft); margin-bottom: 6px;
 .rail-more[open] summary::before { content: "− "; }
 .rail-more summary:hover { color: var(--ink); }
 
-/* ---- conversation messages ---- */
-.msg { display: flex; flex-direction: column; gap: 6px; margin-bottom: 22px; }
-.msg-role {
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.8px;
-  color: var(--ink-faint);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
 .msg.user { margin-left: 8%; }
 .msg.user .msg-body {
   background: var(--accent-soft);
@@ -956,16 +801,7 @@ details.tech li { font-size: 13.5px; color: var(--ink-soft); margin-bottom: 6px;
   padding: 14px 16px;
   font-size: 15px;
 }
-.msg.tosca .msg-body { padding: 2px 0; }
 
-.narrative-summary {
-  margin-top: 18px;
-  padding: 12px 16px;
-  border-left: 3px solid var(--accent);
-  background: #fff;
-  border-radius: 0 10px 10px 0;
-  font-size: 14px;
-}
 
 /* ---- the ask box ---- */
 .askbox { margin-top: 30px; }
@@ -1014,18 +850,6 @@ details.tech li { font-size: 13.5px; color: var(--ink-soft); margin-bottom: 6px;
   letter-spacing: 0.8px;
   color: var(--ink-faint);
 }
-.artifact-live {
-  display: flex;
-  gap: 12px;
-  align-items: flex-start;
-  background: #fff;
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  padding: 14px;
-}
-.artifact-state { font-size: 14.5px; font-weight: 600; }
-.artifact-decision { font-size: 14px; margin-top: 8px; }
-.artifact-meaning { font-size: 12.5px; margin-top: 6px; }
 .artifact-dl { margin-top: 6px; }
 .artifact-note {
   background: #fff;
@@ -1036,28 +860,6 @@ details.tech li { font-size: 13.5px; color: var(--ink-soft); margin-bottom: 6px;
   color: var(--ink-soft);
   line-height: 1.55;
 }
-.artifact-explore { margin-top: 8px; }
-.artifact-placeholder {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  align-items: center;
-  text-align: center;
-  background: #fff;
-  border: 1px dashed var(--line);
-  border-radius: 14px;
-  padding: 30px 20px;
-  font-size: 13px;
-  color: var(--ink-soft);
-}
-.ph-shape {
-  width: 72px;
-  height: 72px;
-  border-radius: 50%;
-  border: 1.5px dashed var(--ink-faint);
-  background: radial-gradient(circle, #efece4 0%, #fbfaf7 70%);
-}
-.artifact-quite { padding-top: 26px; }
 
 .artifact-dls, .artifact-params, .artifact-dims {
   display: flex;
@@ -1110,16 +912,6 @@ details.tech li { font-size: 13.5px; color: var(--ink-soft); margin-bottom: 6px;
 .viewer .canvas-wrap { position: relative; }
 .clSplabel, .cliplabel { color: var(--ink-faint); }
 
-.ab-compare {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-  background: #fff;
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  padding: 8px 12px;
-}
 .ab-label { font-size: 11px; color: var(--ink-faint); }
 .ab-toggle {
   display: inline-flex;
@@ -1149,7 +941,6 @@ details.tech li { font-size: 13.5px; color: var(--ink-soft); margin-bottom: 6px;
 
 .pill.REJECTED { color: var(--bad); border-color: #e6c9c3; background: #f9eeec; }
 
-.invstory { max-width: 720px; }
 
 .workspace-hero { margin: 40px auto 40px; }
 
@@ -1198,8 +989,6 @@ details.tech li { font-size: 13.5px; color: var(--ink-soft); margin-bottom: 6px;
   .stage-insights { grid-template-columns: 1fr; }
   .stage-actions { flex-direction: column; align-items: stretch; }
   .stage-actions .btn { width: 100%; text-align: center; }
-  .msg-role { flex-wrap: wrap; }
-  .evt-count { flex-basis: 100%; margin-left: 0; text-align: left; }
   .msg.user { margin-left: 0; }
   .rail-toggle { display: inline-flex; }
   .canvas-wrap { height: 300px !important; }
@@ -1262,30 +1051,10 @@ details.tech li { font-size: 13.5px; color: var(--ink-soft); margin-bottom: 6px;
 .outcome-detail { margin-top: 6px; font-size: 12.5px; color: #4b5550; }
 .outcome-detail b { color: #2d3833; }
 
-.maturity-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin: 10px 0 4px;
-}
-.maturity {
-  font-size: 10.5px;
-  letter-spacing: 0.04em;
-  padding: 3px 8px;
-  border-radius: 999px;
-  border: 1px solid var(--line);
-  font-weight: 700;
-}
 .maturity.on {
   background: #f0f6f1;
   border-color: #c9dbd0;
   color: #234d34;
-}
-.maturity.off {
-  background: #f6f6f6;
-  color: #9aa39e;
-  border-color: #e4e6e4;
-  text-decoration: none;
 }
 
 /* R425 §10: the .btn.counsel rule block is DELETED — the counsel
@@ -1299,7 +1068,6 @@ details.tech li { font-size: 13.5px; color: var(--ink-soft); margin-bottom: 6px;
   flex-wrap: wrap;
 }
 
-.artifact-3d { margin-top: 10px; }
 
 /* ==========================================================================
    R416 — the invention generations (INVENTION 01, 02, …): the timeline
@@ -1375,35 +1143,7 @@ details.tech li { font-size: 13.5px; color: var(--ink-soft); margin-bottom: 6px;
 .mat-simulated { background: #eef1f7; color: #2c3a5e; border: 1px solid #c6cde0; }
 .mat-experimentally_verified { background: #f1eef7; color: #44305e; border: 1px solid #cec4e0; }
 
-/* the generation navigator (artifact pane) */
-.gen-nav { margin-top: 10px; }
-.gen-nav-tabs {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-  margin-bottom: 8px;
-}
-.gen-tab {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  padding: 4px 10px;
-  border-radius: 999px;
-  border: 1px solid var(--line);
-  background: #fcfcfb;
-  color: #6b6353;
-  cursor: pointer;
-}
-.gen-tab.sel { border-color: #b9a06c; background: #f7f1e2; color: #5c4a1e; }
-.gen-tab.dead { color: #8a3d2e; }
 .gen-tab.ok { color: #234d34; }
-.gen-view { display: flex; flex-direction: column; gap: 8px; }
-.gen-what-changed {
-  border-top: 1px dashed var(--line);
-  padding-top: 8px;
-  font-size: 13px;
-  color: #333;
-}
 
 /* R418: the geometry class chip — engineering vs conceptual, from the
    CIO's own class field (operator §8: ENGINEERING MODEL or CONCEPTUAL
@@ -1468,43 +1208,6 @@ details.tech li { font-size: 13.5px; color: var(--ink-soft); margin-bottom: 6px;
   background: #fbfaf7;
   padding: 8px;
 }
-.gallery-tabs {
-  display: flex;
-  gap: 6px;
-}
-.gallery-tab {
-  font-size: 10.5px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  padding: 3px 9px;
-  border-radius: 999px;
-  border: 1px solid var(--line);
-  background: #fff;
-  color: #6b6353;
-  cursor: pointer;
-}
-.gallery-tab.sel {
-  border-color: #b9a06c;
-  background: #f7f1e2;
-  color: #5c4a1e;
-}
-.gallery-img {
-  width: 100%;
-  height: auto;
-  display: block;
-  border-radius: 6px;
-  background: #101216;
-}
-.gallery-caption {
-  font-size: 11.5px;
-  line-height: 1.45;
-}
-.gallery-rule {
-  font-size: 10.5px;
-  line-height: 1.4;
-  border-top: 1px dashed var(--line);
-  padding-top: 4px;
-}
 
 /* R419 section 11: the 8-section technical essay in the center pane —
    engineer's narrative, calm typography, collapsible. */
@@ -1564,30 +1267,6 @@ details.tech li { font-size: 13.5px; color: var(--ink-soft); margin-bottom: 6px;
   gap: 5px;
   margin-top: 6px;
 }
-.component-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
-}
-.component-chip {
-  font-size: 11px;
-  padding: 3px 9px;
-  border-radius: 999px;
-  border: 1px solid var(--line);
-  background: #fff;
-  color: #55503f;
-  cursor: pointer;
-  max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.component-chip.sel {
-  border-color: #b9a06c;
-  background: #f7f1e2;
-  color: #5c4a1e;
-  font-weight: 700;
-}
 
 /* ---------------------------------------------------------------------------
    R430.1 — the Scientific Technology Artifact Workspace
@@ -1597,67 +1276,14 @@ details.tech li { font-size: 13.5px; color: var(--ink-soft); margin-bottom: 6px;
 
 /* ---- the dossier pane ---- */
 .dossier { display: flex; flex-direction: column; gap: 0; min-width: 0; }
-.dossier-h {
-  font-size: 13px;
-  letter-spacing: 0.08em;
-  font-weight: 600;
-  color: var(--ink-soft);
-  text-transform: uppercase;
-  padding-bottom: 10px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.dossier-placeholder {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  padding: 28px 6px;
-  color: var(--ink-soft);
-  font-size: 14px;
-  line-height: 1.55;
-}
 
-.dossier-tabs {
-  display: flex;
-  gap: 2px;
-  border-bottom: 1px solid var(--line);
-  flex-wrap: wrap;
-  position: sticky;
-  top: 0;
-  background: #fbfaf7;
-  z-index: 5;
-}
-.dtab-btn {
-  appearance: none;
-  border: none;
-  background: none;
-  padding: 8px 12px 7px;
-  font-size: 13.5px;
-  color: var(--ink-faint);
-  cursor: pointer;
-  border-bottom: 2px solid transparent;
-  border-radius: 6px 6px 0 0;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-.dtab-btn:hover { color: var(--ink); background: rgba(0,0,0,0.025); }
 .dtab-btn.active {
   color: var(--ink);
   border-bottom-color: var(--ink);
   font-weight: 600;
 }
-.dtab-btn.has-content { color: var(--ink-soft); }
 .dtab-btn.has-content.active { color: var(--ink); }
-.tab-pend {
-  width: 5px; height: 5px;
-  border-radius: 50%;
-  background: var(--ink-faint);
-  display: inline-block;
-}
 
-.dossier-body { padding: 14px 2px 10px; display: flex; flex-direction: column; gap: 14px; }
 .dossier-foot { font-size: 11.5px; line-height: 1.5; padding-top: 6px; border-top: 1px dashed var(--line); }
 
 /* tab availability states (section 3: an incomplete dossier is honest) */
@@ -1755,50 +1381,7 @@ details.tech li { font-size: 13.5px; color: var(--ink-soft); margin-bottom: 6px;
 .viewer-hints { font-size: 11.5px; padding: 6px 2px; }
 .render-row { display: flex; gap: 8px; flex-wrap: wrap; }
 .render-row img { width: 120px; border-radius: 6px; border: 1px solid var(--line); }
-.component-list { margin: 0; padding-left: 18px; font-size: 13px; line-height: 1.7; }
 
-/* R433 — the ONE canonical technology model (design tab) */
-.tech-model-head {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  padding: 6px 2px 10px;
-}
-.tm-title {
-  font-size: 15px;
-  font-weight: 650;
-  letter-spacing: 0.12em;
-  color: var(--ink);
-}
-.tm-gen {
-  display: flex;
-  align-items: baseline;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-.tm-current {
-  font-size: 13px;
-  font-weight: 600;
-  color: #3d6b4f;
-  letter-spacing: 0.04em;
-}
-.tm-history {
-  font-size: 13px;
-  font-weight: 600;
-  color: #8a4429;
-  letter-spacing: 0.04em;
-}
-.tm-return {
-  border: 1px solid var(--line);
-  background: #fff;
-  color: var(--ink-soft);
-  border-radius: 999px;
-  font-size: 11.5px;
-  padding: 2px 10px;
-  cursor: pointer;
-}
-.tm-return:hover { border-color: var(--accent); color: var(--accent); }
-.tm-family { font-size: 12px; }
 .comp-select {
   display: flex;
   flex-wrap: wrap;
@@ -1806,7 +1389,6 @@ details.tech li { font-size: 13.5px; color: var(--ink-soft); margin-bottom: 6px;
   align-items: center;
   padding: 4px 0 10px;
 }
-.cs-label { font-size: 11.5px; letter-spacing: 0.06em; }
 .chip {
   border: 1px solid var(--line);
   background: #fff;
@@ -1831,23 +1413,6 @@ details.tech li { font-size: 13.5px; color: var(--ink-soft); margin-bottom: 6px;
   background: rgba(178, 60, 30, 0.05);
 }
 .chip.clear { color: var(--ink-faint); }
-.ov-disclose {
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  background: #fff;
-  margin-bottom: 10px;
-}
-.ov-disclose > summary {
-  cursor: pointer;
-  padding: 9px 12px;
-  font-size: 13px;
-  font-weight: 550;
-  list-style: none;
-}
-.ov-disclose > summary::-webkit-details-marker { display: none; }
-.ov-disclose > summary::before { content: "+ "; color: var(--ink-faint); }
-.ov-disclose[open] > summary::before { content: "− "; }
-.ov-disclose[open] > summary { border-bottom: 1px solid var(--line); }
 .ov-disclose .ov-block { border: none; padding: 10px 12px; margin: 0; }
 .score-row {
   display: flex;
@@ -1956,7 +1521,6 @@ details.tech li { font-size: 13.5px; color: var(--ink-soft); margin-bottom: 6px;
 
 /* ---- the investigation pane ---- */
 .investigation { display: flex; flex-direction: column; gap: 14px; }
-.evt-count { font-size: 11.5px; margin-left: auto; font-weight: 400; }
 .inv-progress {
   background: #fff;
   border: 1px solid var(--line);
@@ -1969,7 +1533,6 @@ details.tech li { font-size: 13.5px; color: var(--ink-soft); margin-bottom: 6px;
 }
 .inv-progress-h { font-weight: 600; display: flex; align-items: center; gap: 8px; letter-spacing: 0.05em; font-size: 12px; color: var(--ink-soft); }
 
-.retry-row { display: flex; align-items: center; gap: 12px; margin-top: 10px; font-size: 12px; }
 
 /* ---- the gauntlet (section 9) ---- */
 .gauntlet { display: flex; flex-direction: column; gap: 6px; margin: 4px 0 10px; }
@@ -2053,7 +1616,6 @@ details.tech li { font-size: 13.5px; color: var(--ink-soft); margin-bottom: 6px;
 .ep-engineering { background: rgba(120, 90, 60, 0.10); color: #78593c; border-color: rgba(120,90,60,0.25); }
 .ep-physical { background: rgba(160, 60, 60, 0.12); color: #8a3030; border-color: rgba(160,60,60,0.3); }
 .ep-unknown { background: rgba(120, 110, 95, 0.10); color: #6b6252; border-color: rgba(120,110,95,0.2); }
-.epi-footer { font-size: 11.5px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; padding-top: 4px; }
 .epi-row { display: flex; align-items: center; gap: 6px; font-size: 12px; }
 
 /* build steps */
@@ -2162,66 +1724,12 @@ details.tech li { font-size: 13.5px; color: var(--ink-soft); margin-bottom: 6px;
    artifact (directive §9): a calm short panel, then recovery, then
    the problem context. No fake model viewport anywhere. */
 .infra-block { display: flex; flex-direction: column; gap: 14px; }
-.infra-hero {
-  border: 1px solid var(--state-infra-line);
-  border-left: 4px solid var(--state-infra);
-  border-radius: 14px;
-  background: linear-gradient(180deg, #fbfcfd 0%, var(--state-infra-bg) 100%);
-  padding: 26px 30px 22px;
-  text-align: center;
-}
-.infra-hero-state {
-  font-size: clamp(19px, 2.4vw, 26px);
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  color: var(--state-infra);
-}
-.infra-hero-sub {
-  margin-top: 7px;
-  font-family: var(--serif);
-  font-size: clamp(15px, 1.8vw, 19px);
-  color: var(--ink);
-}
-.infra-hero-verdict {
-  margin-top: 12px;
-  font-size: 14.5px;
-  color: var(--ink-soft);
-}
-.infra-hero-saved { margin-top: 3px; font-size: 14.5px; color: var(--ink-soft); }
-.infra-hero-cta {
-  margin-top: 18px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  justify-content: center;
-  align-items: center;
-}
 .infra-hero-cta .btn.primary {
   background: var(--state-infra);
   border-color: var(--state-infra);
 }
 .infra-hero-cta .btn.primary:hover { filter: brightness(1.08); }
-.infra-hero-note { margin-top: 14px; font-size: 12px; }
 
-.infra-recovery {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-  gap: 10px;
-}
-.infra-recovery-row {
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  background: #fff;
-  padding: 12px 14px;
-}
-.infra-recovery-h {
-  font-size: 11px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--ink-faint);
-  margin-bottom: 5px;
-}
-.infra-recovery-b { font-size: 13.5px; line-height: 1.5; color: var(--ink-soft); }
 
 /* C2.4 — the problem-context panel: the USER'S problem, explicitly
    not an invention model */
@@ -2231,50 +1739,11 @@ details.tech li { font-size: 13.5px; color: var(--ink-soft); margin-bottom: 6px;
   background: var(--paper-2);
   padding: 14px 16px;
 }
-.pc-state {
-  font-size: 11px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--state-infra);
-  margin-bottom: 8px;
-}
-.pc-label { font-size: 11.5px; margin-bottom: 4px; }
-.pc-problem {
-  font-family: var(--serif);
-  font-size: 14.5px;
-  line-height: 1.55;
-  color: var(--ink);
-}
-.pc-note { margin-top: 8px; font-size: 11.5px; line-height: 1.5; }
 
 /* blocked-state insight cards: "not evaluated because execution
    stopped" — visibly calmer than the standard cards, never a zero */
 .insight-blocked { cursor: default; border-style: dashed; }
-.ic-blocked-headline { color: var(--state-infra); font-weight: 600; }
 
-/* C2.6 — the render-blocked ribbon: ENGINEERING MODEL READY */
-.render-blocked-ribbon {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 12px;
-  border: 1px solid var(--state-infra-line);
-  border-left: 4px solid var(--state-infra);
-  border-radius: 12px;
-  background: var(--state-infra-bg);
-  padding: 10px 16px;
-  margin-bottom: 10px;
-}
-.rbr-main { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; }
-.rbr-title {
-  font-size: 12.5px;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  color: var(--state-infra);
-}
-.rbr-sub { font-size: 12.5px; }
-.rbr-actions { display: flex; gap: 8px; align-items: center; }
-.rbr-note { width: 100%; font-size: 11.5px; }
 
 /* §7 — the journal's blocked-state banner */
 .journal-paused-banner {
@@ -2421,22 +1890,6 @@ details.tech li { font-size: 13.5px; color: var(--ink-soft); margin-bottom: 6px;
 @keyframes dots { 0% { content: ""; } 25% { content: "."; } 50% { content: ".."; } 75% { content: "..."; } 100% { content: ""; } }
 .hero-preparing-sub { font-size: 12.5px; max-width: 420px; color: var(--ink-faint); }
 
-/* the live investigating surface */
-.hero-live {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 36px;
-}
-.hero-live-inner { max-width: 560px; width: 100%; }
-.hero-live-line {
-  margin-top: 14px;
-  font-size: 12.5px;
-  line-height: 1.6;
-  text-align: center;
-}
 
 /* the honest not-established block */
 .hero-honest {
@@ -2520,7 +1973,6 @@ details.tech li { font-size: 13.5px; color: var(--ink-soft); margin-bottom: 6px;
   overflow: hidden;
   overflow-wrap: anywhere;
 }
-.ic-sub { font-size: 12px; }
 .ic-more { font-size: 12px; letter-spacing: 0.04em; color: var(--ink-faint); }
 
 /* ---- the actions ---- */
@@ -2532,44 +1984,8 @@ details.tech li { font-size: 13.5px; color: var(--ink-soft); margin-bottom: 6px;
 }
 .stage-actions .btn.big { font-size: 15px; padding: 12px 22px; }
 .stage-download { flex: 1 1 auto; min-width: 220px; text-align: center; }
-.stage-actions-note { font-size: 12.5px; margin-top: -4px; }
 
-/* ---- the live journal (while the investigation runs) ---- */
-.stage-journal {
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  background: #fff;
-  padding: 16px 18px 18px;
-  min-width: 0;
-}
-.stage-journal-h {
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--ink-faint);
-  margin-bottom: 10px;
-}
 
-/* ---- the terminal verdict ---- */
-.stage-verdict {
-  border: 1px solid var(--line);
-  border-left: 3px solid var(--accent);
-  border-radius: 12px;
-  background: #fff;
-  padding: 14px 18px;
-  max-width: 860px;
-}
-.sv-label {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--accent);
-  margin-bottom: 4px;
-}
-.sv-decision { font-size: 14.5px; line-height: 1.55; }
-.sv-meaning { font-size: 12.5px; margin-top: 4px; }
 
 /* ---- the deep layer (progressive disclosure) ---- */
 .deep-dive {
@@ -2694,8 +2110,6 @@ details.tech li { font-size: 13.5px; color: var(--ink-soft); margin-bottom: 6px;
   flex-wrap: wrap;
 }
 .conv-live.paused { border-left-color: var(--warn); color: var(--warn); }
-.conv-events { display: flex; flex-direction: column; gap: 4px; font-size: 12.5px; padding-left: 14px; }
-.conv-event { display: flex; gap: 7px; align-items: baseline; overflow-wrap: anywhere; }
 
 /* inline evidence card — the ONE structured surface the conversation
    earns (the counts are meaningful structure, not decoration) */
@@ -2895,4 +2309,149 @@ details.tech li { font-size: 13.5px; color: var(--ink-soft); margin-bottom: 6px;
   .conv-card, .conv-cand, .conv-outcome { max-width: 100%; }
   .conv-composer { bottom: 8px; }
   .stage-actions { flex-direction: column; }
+}
+
+/* ==========================================================================
+   R458-C2 — CONVERSATIONAL PRODUCT CLOSURE
+   (§4 clarification/answer + Ask/Act · §7 one-line progress · §10/§11
+   sidebar dots · §13 workspace contextual switching · §19 mobile ·
+   §20 accessibility)
+   ========================================================================== */
+
+/* ---- §20 accessibility: focus + motion -------------------------------- */
+:focus-visible {
+  outline: 2px solid #3e5c46;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .cursor { animation: none; opacity: 0.5; }
+  .ws-panel .wk { transition: none; }
+  * { scroll-behavior: auto; }
+}
+
+/* ---- §4: the engine's one material question (clarification pause) ----- */
+.conv-clarification {
+  max-width: 78%;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-left: 3px solid #3e5c46;
+  border-radius: 4px 14px 14px 14px;
+  padding: 12px 14px;
+  box-shadow: 0 1px 2px rgba(31, 30, 28, 0.05);
+}
+.conv-clarification-q { font-size: 14px; line-height: 1.5; }
+.conv-clarification-why { font-size: 12px; margin-top: 6px; }
+
+/* ---- §4: quick actions on candidates + the action delivery note ------- */
+.conv-cand-actions { display: flex; gap: 10px; margin-top: 8px; flex-wrap: wrap; }
+.conv-quick {
+  appearance: none;
+  background: none;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 5px 11px;
+  font-size: 12px;
+  cursor: pointer;
+  min-height: 28px;
+}
+.conv-quick:hover { background: #edeae2; color: var(--ink); }
+.conv-action-note { border-left: 3px solid var(--line); padding-left: 10px; }
+
+/* ---- §5: the Ask/Act route note under the composer --------------------- */
+.conv-routenote { text-align: center; margin-top: 4px; }
+.conv-route-toggle {
+  appearance: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 11.5px;
+  color: inherit;
+  text-decoration: underline dotted;
+  padding: 4px 6px;
+}
+
+/* ---- §2: pending attachment chips on the home composer ----------------- */
+.ask-attachments {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  padding: 8px 12px 0;
+  font-size: 12px;
+}
+.ask-attachment {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 3px 6px 3px 10px;
+  background: #fff;
+  max-width: 260px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ask-attachment-x {
+  appearance: none;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 13px;
+  line-height: 1;
+  color: var(--ink-soft);
+  padding: 2px 4px;
+}
+.ask-attachment-x:hover { color: var(--bad); }
+
+/* ---- §11: the subtle history state dot --------------------------------- */
+.rail-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  flex: 0 0 auto;
+  margin-top: 5px;
+  background: var(--line);
+}
+.rail-dot-complete { background: #3d7a4d; }
+.rail-dot-development { background: #b08a3e; }
+.rail-dot-rejected { background: #a05a3d; }
+.rail-dot-paused { background: #8a8577; }
+.rail-dot-running { background: transparent; border: 1.5px solid #b08a3e; }
+.rail-dot-unknown { background: transparent; border: 1.5px solid var(--line); }
+
+/* ---- §13: contextual sibling switching in the workspace head ---------- */
+.wk-head { gap: 8px; }
+.wk-siblings {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 10px;
+  margin-left: auto;
+  min-width: 0;
+}
+.wk-sibling {
+  appearance: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 11.5px;
+  padding: 4px 2px;
+  color: inherit;
+}
+.wk-sibling:hover { color: var(--ink); text-decoration: underline; }
+.wk-foot {
+  border-top: 1px solid var(--line);
+  padding: 8px 18px;
+  text-align: center;
+}
+.wk-close { margin-left: 8px; }
+
+/* ---- §19/§20 mobile: thumb-sized targets, no overflow ------------------ */
+@media (max-width: 880px) {
+  .conv-clarification { max-width: 94%; }
+  .conv-quick, .conv-route-toggle { min-height: 36px; }
+  .conv-composer .btn { min-height: 40px; min-width: 64px; }
+  .wk-siblings { display: none; } /* the sheet keeps one artifact; switching via close+reopen keeps the conversation primary */
+  .rail-item { min-height: 40px; }
 }

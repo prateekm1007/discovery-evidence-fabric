@@ -169,6 +169,18 @@ function kindSentence(kind: string, status: string, evt: ProductEventInput): Pro
       };
     case "evidence.bound":
       return { text: "The evidence base is bound to the problem — every record is custody-tracked.", loading: false, infrastructure: false };
+    // R458-C2 (§4): the engine's one material question. A pause to ask
+    // the user something is NOT infrastructure and NOT work — it is the
+    // conversation changing the discovery. (The question itself renders
+    // as its own conversation message; this line only covers the event.)
+    case "clarification.requested":
+      if (status === "BLOCKED" || status === "ACTIVE")
+        return {
+          text: "I have one question before I continue — it decides what to look for.",
+          loading: false,
+          infrastructure: false,
+        };
+      return null;
     case "geometry.created":
       return { text: "The technology model is ready to inspect.", loading: false, infrastructure: false };
     case "package.completed":
@@ -257,6 +269,42 @@ export function pickLiveEvent(events: ProductEventInput[]): ProductEventInput | 
   for (let i = events.length - 1; i >= 0; i--) {
     const e = events[i];
     if (isInfra(String(e?.status ?? "").toUpperCase())) return e;
+  }
+  return null;
+}
+
+// ---------------------------------------------------------------------------
+// R458-C2 (§26) — THE PROVIDER-ABSTRACTION SENTENCE.
+//
+// The frontend must not know — and must never name — which provider or
+// model ultimately answered. What the CONVERSATION may say when the
+// event record shows a technical failure followed by continued progress
+// is exactly one sentence: "I continued the investigation using another
+// available reasoning route." The route identity (provider A → failure
+// class → provider B → model → latency → provenance) stays where it
+// belongs: the run's routing ledger in the TECHNICAL RECORD, never the
+// conversation (BS-009; the R456 cascade is the measured precedent).
+//
+// Derivation is presentation-level sequencing of the run's own recorded
+// events: an infrastructure failure, followed by any later recorded
+// progress. No provider field is read, no route is inferred — the
+// sentence asserts only what the record shows: work stopped, then
+// continued.
+// ---------------------------------------------------------------------------
+
+export function deriveRotationNote(
+  events: ProductEventInput[]
+): string | null {
+  let sawInfra = false;
+  for (const e of events) {
+    const status = String(e?.status ?? "").toUpperCase();
+    if (isInfra(status)) {
+      sawInfra = true;
+      continue;
+    }
+    if (sawInfra && (status === "ACTIVE" || status === "COMPLETED")) {
+      return "I continued the investigation using another available reasoning route.";
+    }
   }
   return null;
 }

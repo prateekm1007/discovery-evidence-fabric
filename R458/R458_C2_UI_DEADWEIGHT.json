@@ -1,0 +1,102 @@
+{
+  "kind": "R458_C2_UI_DEADWEIGHT",
+  "round": "R458-C2",
+  "generated_by": "Coder 2",
+  "method": "measured, not asserted: a class-inventory scanner cross-referenced every selector in app/globals.css against every literal and template-literal class construction in webapp source (components/app/lib/tests, dynamic prefix families whitelisted); every candidate then survived a word-boundary grep re-verification before deletion; a brace-aware rule remover deleted only rules whose ENTIRE selector list was dead (shared rules never dropped). Art. LXIV: superseded implementations are retired, not accumulated; Art. XI: nothing was deleted that carries scientific or historical record — all removed bytes remain in git history.",
+  "summary": {
+    "css_lines_before": 3043,
+    "css_lines_after": 2456,
+    "css_rules_removed": 136,
+    "css_lines_removed": 587,
+    "css_source_lines_total": 2898,
+    "css_reduction_vs_round_start": "20.3%",
+    "build_after_deletion": "GREEN (next build, static export)",
+    "typecheck_after_deletion": "GREEN (tsc --noEmit)",
+    "tests_after_deletion": "48/48 (present 16 + product-events 12 + r458 20)"
+  },
+  "deleted": [
+    {
+      "what": "136 dead CSS rules / 587 lines (137 candidate classes, all verified unreferenced)",
+      "classes": ["shell", "topbar", "backrow", "statusbar", "story-strip", "story-step", "story-word", "story-arrow", "examples", "example", "history", "run-row", "title", "gallery", "gallery-caption", "gallery-img", "gallery-rule", "gallery-tab", "gallery-tabs", "infra-hero", "infra-hero-cta", "infra-hero-note", "infra-hero-saved", "infra-hero-state", "infra-hero-sub", "infra-hero-verdict", "infra-recovery", "infra-recovery-b", "infra-recovery-h", "infra-recovery-row", "infra-block", "msg", "msg-body", "msg-role", "dossier", "dossier-body", "dossier-h", "dossier-placeholder", "dossier-tabs", "dtab-btn", "gen-nav", "gen-nav-tabs", "gen-tab", "gen-view", "gen-what-changed", "hero-hud", "hero-live", "hero-live-inner", "hero-live-line", "ic-blocked-headline", "ic-pending", "ic-sub", "insight-blocked", "rbr-actions", "rbr-main", "rbr-note", "rbr-sub", "rbr-title", "render-blocked-ribbon", "render-gallery", "sp-infra", "sp-live", "sp-paused", "sp-refuted", "stage-actions-note", "stage-journal", "stage-journal-h", "stage-verdict", "sv-decision", "sv-label", "sv-meaning", "pc-label", "pc-note", "pc-problem", "pc-state", "problem-context", "tm-current", "tm-family", "tm-gen", "tm-history", "tm-return", "tm-title", "tech-model-head", "techbody", "runpage", "retry-row", "rail-sub", "rail-inv-id", "invstory", "investigation", "narrative-summary", "kicker", "lede", "brand-subline", "maturity", "maturity-row", "notavail", "off", "dead", "sel", "has-content", "clSplabel", "cs-label", "ph-shape", "ov-disclose", "epi-footer", "evt-count", "ev-failed_scientific", "geo-class-chip", "component-chip", "component-list", "component-panel", "ab-compare", "artifact-3d", "artifact-decision", "artifact-explore", "artifact-live", "artifact-meaning", "artifact-placeholder", "artifact-quite", "artifact-state", "download-cta", "tosca", "reasoning", "foot", "ai", "spinner", "conv-events", "conv-event", "PENDING", "REJECTED", "INTERRUPTED", "ERROR", "ERROR_BUILD", "ERROR_RUN", "ERROR_STUCK", "ERROR_TRANSPORT"],
+      "reason": "R435-era and pre-R453 surfaces (stage dashboard, story strip, showcase gallery, old dossier tab strip, old history rail, old infra hero, old generation nav, the large status pills this round replaced) — every rule verified unreferenced by the current component tree; the conversation's four-event tail classes (conv-events/conv-event) died with the §7 one-line-discipline change this round",
+      "consumer": "none (verified by word-boundary grep + build + 48 tests)",
+      "risk": "low — rules are recovered from git history if a future surface re-needs them"
+    },
+    {
+      "what": "blockedInsightCards() + BlockedInsightCard interface in lib/presentationState.ts (~120 lines)",
+      "reason": "zero consumers since the R453-C2 reconstruction (grep-verified across components/app/lib/tests); the blocked-state treatment it once served is owned by BLOCKED_COPY + the conversation's suppressed-stale-positive path",
+      "consumer": "none",
+      "risk": "none — typecheck + batteries green after deletion"
+    },
+    {
+      "what": "Sidebar 'Projects' empty-state section",
+      "reason": "§10: the product must never advertise unfinished capability as navigation; grouping needs a backend contract that does not exist",
+      "consumer": "none (the section rendered an honest 'not usable yet' note — honest but still a dead navigation surface)",
+      "risk": "none; Projects returns when C1 delivers a grouping contract"
+    }
+  ],
+  "merged": [
+    {
+      "what": "the R453-era workspace head (title + close) and the surface switching affordances",
+      "into": "ONE current workspace title + a small sibling-switcher row (wk-siblings) + a bottom Technical record link (wk-foot)",
+      "reason": "§13: one current workspace title with contextual switching instead of a permanent tab strip; §14: the journal stays secondary",
+      "consumer": "components/Workspace.tsx",
+      "risk": "none — same navigation reachability, fewer permanent chrome elements"
+    }
+  ],
+  "hidden": [
+    {
+      "what": "the four-event conversation tail (events.slice(-4) block)",
+      "reason": "§7: one meaningful progress sentence while working; the full event stream remains in the technical record (journal surface)",
+      "consumer": "moved to components/Workspace.tsx JournalSurface (ScienceEventStream) — nothing lost",
+      "risk": "none — the events endpoint is unchanged"
+    },
+    {
+      "what": "route identity (provider/model/latency) after a transport failure",
+      "reason": "§26: the conversation says 'I continued the investigation using another available reasoning route.' — the run's routing ledger in the technical record carries provider A → failure class → provider B → model → provenance",
+      "consumer": "lib/productEvents.ts deriveRotationNote (presentation-level sequencing only)",
+      "risk": "none — no route information was ever in the conversation to lose"
+    }
+  ],
+  "conditional": [
+    {
+      "what": "attachment upload path (uploadAttachment → POST /api/run/{id}/attachments)",
+      "reason": "the engine endpoint is defined by R458/CODER2_CONVERSATIONAL_ACTION_CONTRACT.json but NOT yet implemented; the UI attempts it only after C1 adoption; until then the composer holds pending chips and states the limitation honestly on submit — never a fake success",
+      "consumer": "components/page.tsx NewDiscoveryPane",
+      "risk": "the honest-limitation copy must be removed when C1 ships the endpoint (one string)"
+    },
+    {
+      "what": "conversation actions (POST /api/run/{id}/actions)",
+      "reason": "same contract status as above; the composer's Ask/Act chip and quick actions invoke it, and the not_available response renders the honest-absence copy and changes nothing",
+      "consumer": "lib/actionContract.ts sendAction + components/Conversation.tsx",
+      "risk": "none — ASK (the live /ask endpoint) remains the default path"
+    }
+  ],
+  "retained": [
+    {
+      "what": "the full CONVERSATION → CONTEXTUAL WORKSPACE → RESULT architecture (§1)",
+      "reason": "the directive: the current approach is directionally correct; no stage dashboard restored; the 15-stage pipeline stays non-navigable",
+      "consumer": "app/page.tsx"
+    },
+    {
+      "what": "the six-word error-semantics vocabulary and the five-state retrieval ledger",
+      "reason": "§8: preserve explicit distinctions; they are load-bearing honesty contracts",
+      "consumer": "lib/present.ts + lib/presentationState.ts + 48 executable tests"
+    },
+    {
+      "what": "the single-viewer invariant (ONE [data-model-viewer])",
+      "reason": "§21: simplicity of appearance must not become a slow page; the viewer mounts only inside the workspace model surface",
+      "consumer": "components/Workspace.tsx"
+    },
+    {
+      "what": "poll intervals (result 2.5s / events 5s / health 30s) with the new document.hidden guard",
+      "reason": "§21: identical recovery semantics, zero engine traffic from hidden tabs",
+      "consumer": "app/page.tsx"
+    }
+  ],
+  "not_done_in_this_round": {
+    "css_rewrite": "not performed — §22: deletion of the truly unused only; no aesthetic rewrite of surviving rules",
+    "component_deletions": "none — every component in the current tree has a live consumer; the R453-C2 reconstruction already retired TechStage/HistoryRail",
+    "scope": "no providers, models, engine redesign, new epistemic state, second run system, second 3D authority, or package architecture (§27 forbidden list held)"
+  }
+}

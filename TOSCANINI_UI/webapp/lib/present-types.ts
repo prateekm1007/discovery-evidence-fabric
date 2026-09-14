@@ -117,6 +117,15 @@ export type Msg =
   | { kind: "user"; id: string; text: string }
   | { kind: "note"; id: string; text: string; epi?: EpistemicMeta | null }
   | { kind: "progress"; id: string; text: string; live: boolean }
+  // R458-C2 (§4): the engine's one material question — the conversation
+  // can change the discovery. The composer becomes the answer box while
+  // this message is the newest thing on the record.
+  | {
+      kind: "clarification";
+      id: string;
+      question: string;
+      decisionChanged: string | null;
+    }
   | {
       kind: "evidence";
       id: string;
