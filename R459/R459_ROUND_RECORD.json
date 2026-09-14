@@ -1,0 +1,69 @@
+{
+  "kind": "R459_ROUND_RECORD",
+  "round": "R459",
+  "directive": "EXECUTE the external product & UX audit (measured live at 181a22f) — the 9/10 blockers + P1/P2 fixes",
+  "generated_by": "Coder (main session)",
+  "reviewer_provenance": "AI_REVIEW",
+  "constitution": {"version": "2.4.0", "sha256_prefix": "b54a1be9", "read_in_full": true, "reread_before_commits": true},
+  "audit_source": "operator-uploaded EXTERNAL PRODUCT & UX AUDIT REPORT (713 lines; overall 4.9/10 with six 9/10 blockers)",
+  "blockers_executed": {
+    "P0_1_clarification_state": {
+      "was": "AWAITING_CLARIFICATION fell through user_state.py to COMPLETED_UNKNOWN ('Completed — outcome unknown', finished=true) while the engine waited for the user's answer (audit evidence: session ts_7fdb31b19012)",
+      "now": "user_state() returns AWAITING_CLARIFICATION as an ACTIVE state; label 'Action needed — answer Toscanini's question below'; finished=false; honest decision line; sidebar dot pulses amber 'Action needed'",
+      "acceptance": "user_state({'status':'AWAITING_CLARIFICATION'}) == 'AWAITING_CLARIFICATION', finished false — pinned by tests/test_r459_audit_execution.py",
+      "live": "mapping verified by unit battery; UI dot shipped"
+    },
+    "P0_2_conversational_actions": {
+      "was": "POST /api/run/{id}/actions -> 404; every steering attempt died on an apology note",
+      "now": "endpoint implemented per the R458 contract (toscanini/actions.py + server route): typed accept/refuse; OWNER-scoped; accepted computation verbs record an append-only ACTION_LEDGER_RUN.json and open a NEW session in the same investigation thread (parent_session_id, append-only history preserved) carrying the directive as guarded USER_STATED context; the worker merges it into the Problem Understanding input; 202 {run_id}; the UI navigates to the new round",
+      "acceptance": "POST {action: CHANGE_MECHANISM} returns 202 + product-side new run — MEASURED LIVE: act_ab786f28371c -> new round ts_a5d30906beeb RUNNING with parent_session_id + directive context recorded",
+      "honest_boundary": "mid-flight steering refuses (RUN_IN_PROGRESS) — the one clarification pause remains the only in-run interaction; a finished verdict is never mutated in place"
+    },
+    "P0_3_attachment_ingestion": {
+      "was": "+ Attach accepted files then blocked submission with an error wall naming internal contracts; no backend endpoint existed",
+      "now": "toscanini/attachments.py: multipart upload (pre-run + in-conversation), sha256 custody from the first byte, typed extraction (pypdf for PDFs; STORED_TEXT_UNREADABLE honest for scans), 20MB/empty typed rejections, owner-scoped storage; POST /api/run binds ownership-verified attachment_ids; the worker merges extracted text as typed USER_EVIDENCE in the PU input; the composer uploads ON SELECTION with progress + characters-read on the chip",
+      "acceptance": "dropping a file shows its extracted character count and submits cleanly without error disclaimers — MEASURED LIVE: upload 201 TEXT_EXTRACTED (139 chars, sha256); UI chip 'attach_r459.txt · 46 characters read' (screenshot R459/PROOF/prod_attach_ingested.png)",
+      "design_note": "client-side text injection into the problem string (the audit's alternative) was REJECTED — it violates directive R458 §3 and Art. XXI custody; server-side ingestion is the R458 contract's own path"
+    },
+    "P0_4_diagnostic_package": {
+      "was": "killed/contested runs skipped the artifact bridge: no PDF, no ZIP, no CAD — a 10-minute wait ended with nothing (bridge_outcome SKIPPED_POLICY)",
+      "now": "toscanini/diagnostic_package.py compiles every terminal run's own records into a ZIP (executive brief + evidence summary + diagnostic report + sha256 manifest); GET /api/run/{id}/diagnostic-package; the UI's next-best action falls to 'Download the diagnostic record'; the package asserts it is NOT a technology package and claims no invention (the R455 no-survivor-no-invention-artifact gate stays intact)",
+      "acceptance": "every terminal run produces a downloadable package — MEASURED LIVE: 200, 2,390 bytes, 4 members on the previously-empty run ts_da602dc2c698, outcome line in the product's words"
+    }
+  },
+  "p1_p2_executed": {
+    "P1_1_complexity_hiding": "internal round numbers, constitutional citations, provider names, raw epistemic class names, and the word 'contract' purged from primary-surface copy (AI_INTERPRETATION -> a sentence; 'falsification contract' -> plan); enforced by tests/copy_audit.test.mjs — a static string scanner (comment-stripping state machine; ALWAYS vs IN_STRINGS token classes)",
+    "P1_2_queue_visibility": "the single-run lock STAYS (it is a measured protection: concurrent workers burned the shared transport into RATE_LIMITED, R392); the honest half shipped: run_lock_held() probe + queue_state on the result payload + UI 'another discovery is running — this one starts automatically'; full multi-worker concurrency NOT done (disclosed — an engine-capacity decision, not a UI patch)",
+    "P1_3_share": "header Share button -> POST /api/sessions/{id}/share -> copyable /share?id= link; app/share renders the public read-only payload; measured live (share_id 6f061e932c834e0e). NOTE: the Space is PRIVATE — HF's platform gate 404s unauthenticated platform-level access; the app layer is public-by-design and platform visibility is an operator toggle",
+    "P1_4_mobile": "the sibling switcher is restored on the bottom sheet (horizontal scroll pills); the 3D canvas gets a one-tap touch shield ('Tap to explore the model in 3D') ending scroll trapping",
+    "P2_1_contrast": "--ink-faint #8a867e -> #6f6a5e (3.4:1 -> 5.0:1, WCAG AA)",
+    "P2_3_aria_live": "the conversation live block announces stage transitions (aria-live polite)"
+  },
+  "not_done": [
+    "P2-2 3D keyboard controls (deferred — renderer rework risk vs. P2 value)",
+    "P2-4 sidebar search/folders (deferred — needs a grouping contract)",
+    "full multi-worker concurrency (see P1-2)"
+  ],
+  "tests": {
+    "backend_r459": "20/20 (tests/test_r459_audit_execution.py)",
+    "regressions": "r455 14/14, r446-conversational + r415 + r422-forensics 96/96, r419-english + r443 + r419-product 46/46 (70 with r459); collection 3,747 clean",
+    "frontend": "present 16 + events 12 + r458 21 + copy-audit 1 = 50/50 from clean compile; tsc clean; export build green",
+    "live_production": "attachment 201 (TEXT_EXTRACTED, sha256, no owner echo after the fix); diagnostic 200 (2,390 bytes, product-worded outcome); action 202 -> new round RUNNING with directive context; share 200 (platform gate on private Spaces disclosed)"
+  },
+  "self_caught_defects": [
+    "the attachment owner-directory sanitizer collapsed distinct owner keys onto one directory — caught by the isolation test before commit, fixed with sha-derived dirs (Art. XVI: the bypass attempt built and defeated)",
+    "the upload response echoed the owner capability — found in the first live acceptance, fixed, re-verified (0 echoes)",
+    "the diagnostic brief read the raw detail (Outcome: unknown) — fixed to build from the public projection (the product's words)"
+  ],
+  "production_deployment": {
+    "target_sha": "8827e2a9f7731cb35bb0cc769e9b643a938c9744",
+    "deployed_sha": "8827e2a9f7731cb35bb0cc769e9b643a938c9744",
+    "deploy_id": "Space revision bdc27ed62d1fce53b4536bb7820e36421dd72a58",
+    "health_check_result": "GREEN",
+    "drift": "GREEN",
+    "discovery_ready": true,
+    "blocked_by": null,
+    "what_unblocks": null
+  },
+  "created_at": "2026-09-14T20:45:00Z"
+}

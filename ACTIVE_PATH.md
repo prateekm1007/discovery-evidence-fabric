@@ -740,3 +740,26 @@ user path (ts_da602dc2c698) walked conversation → evidence (16 sources)
 screenshots (R458/UX_PROOF/). Art. LXXI tuple GREEN at 7567d30.
 
 Round record: `R458/R458_C2_ROUND_RECORD.json`.
+
+## R459 addendum (2026-09-14) — the external product audit executed: the conversation can steer the discovery
+
+Operator directive: execute the external product & UX audit (measured live
+at 181a22f; overall 4.9/10, six 9/10 blockers). All six closed; zero
+scientific-authority changes.
+
+| Blocker | Fix | Measured |
+|---|---|---|
+| Clarification pause rendered as "Completed — outcome unknown" | `user_state.py` returns AWAITING_CLARIFICATION as an ACTIVE state; amber pulsing sidebar dot | unit-pinned (P0-1 tests) |
+| `/api/run/{id}/actions` → 404 | `toscanini/actions.py` + the server route: accepted verbs record an append-only action ledger and open a NEW round in the same investigation thread carrying the directive as USER_STATED context | 202 measured live: act_ab786f28371c → ts_a5d30906beeb RUNNING with the directive |
+| Attachments dead (upload blocked, 404) | `toscanini/attachments.py`: sha256 custody + typed extraction (pypdf), owner-scoped, worker merges as USER_EVIDENCE; the composer uploads on selection | 201 TEXT_EXTRACTED measured; chip shows "characters read" |
+| Empty deliverable on killed runs | `toscanini/diagnostic_package.py`: every terminal run yields a ZIP (brief + evidence + diagnostic report, sha256 manifest); asserts it is NOT a technology package | 200 measured on the previously-empty run |
+| Single-run lock invisible | the lock STAYS (measured protection); `run_lock_held()` + queue_state: a queued run SAYS it is queued | probe pinned by test |
+| Share backend with zero UI | header Share → copyable /share?id= link; app/share public read-only view | share_id 6f061e93 measured (platform gate on the private Space disclosed) |
+
+P1/P2: complexity-hiding copy scan (tests/copy_audit.test.mjs — no
+round numbers, article citations, provider names, raw enums in the
+primary surface); WCAG AA faint text; aria-live on the live line;
+mobile sheet sibling switcher restored; 3D touch shield.
+
+Round record: `R459/R459_ROUND_RECORD.json` (Art. LXXI tuple GREEN at
+8827e2a).

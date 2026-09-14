@@ -1218,3 +1218,22 @@ Work Log:
 Stage Summary:
 - The front door is now the product: the conversation asks its one material question and answers change the run; Ask and Act are distinct with an honest action contract awaiting Coder 1; attachments reference engine custody instead of polluting prompts; one progress line speaks product language; provider rotation is invisible except as calm continuation; the dead CSS and the ghost Space tree are gone (measured); the killed-candidate story keeps its one honest word and its forward step. Delivery tuple GREEN; the two Coder-1 contracts are the round's explicit handoff.
 - reviewer_provenance=AI_REVIEW.
+
+---
+Task ID: R459
+Agent: Super Z (main session — Coder)
+Task: R459 — EXECUTE the external product & UX audit (operator-uploaded, 713 lines, measured at 181a22f): close the six 9/10 blockers + the P1/P2 fixes.
+
+Work Log:
+- P0-1: user_state.py maps AWAITING_CLARIFICATION to an active state (label/decision/finished=false; the audit's false "Completed — outcome unknown" is unrepresentable); amber pulsing sidebar dot.
+- P0-2: POST /api/run/{id}/actions implemented per the R458 contract — typed refusals; OWNER-scoped; append-only ACTION_LEDGER_RUN.json; accepted verbs open a NEW session in the same thread (append-only history preserved) carrying the directive as guarded USER_STATED context (user_directive added to the guard vocabulary); the worker merges it into the PU input; MEASURED LIVE: 202 + new round ts_a5d30906beeb RUNNING with the directive.
+- P0-3: toscanini/attachments.py (sha256 custody, typed extraction incl. pypdf, owner-scoped storage, typed rejections) + upload routes + run-creation binding + the worker's USER_EVIDENCE merge; the composer uploads ON SELECTION — the submit-time error wall is gone; MEASURED LIVE: 201 TEXT_EXTRACTED; chip "46 characters read" (screenshot).
+- P0-4: toscanini/diagnostic_package.py + GET route + the diagnostic next action — every terminal run yields a downloadable record that claims no invention; MEASURED LIVE: 200 on the previously-empty run, product-worded outcome.
+- P1-2: the lock stays (measured protection); queue visibility shipped (run_lock_held + queue_state + UI note). P1-3: Share button + /share public view (platform gate disclosed). P1-4: mobile sibling pills + 3D touch shield. P2-1: WCAG AA contrast. P2-3: aria-live. P1-1: the copy audit test (static scan of the primary surface) + purged copy.
+- SELF-CAUGHT: the owner-dir sanitizer collapsed keys (isolation test); the upload response echoed the owner capability (live-found, fixed); the diagnostic brief read raw detail (fixed to the public projection).
+- NOT DONE (disclosed): full multi-worker concurrency (the lock is a measured protection); 3D keyboard controls; sidebar search/folders.
+- ART. LXXI: origin/main == deployed == health == 8827e2a9 (Space revision bdc27ed6…), drift GREEN, discovery_ready TRUE. Backend 20/20 new + regressions green (collection 3,747); frontend 50/50; export build green; diffs secret-scanned CLEAN.
+
+Stage Summary:
+- The audit's six blockers are closed with live-measured proof: steering forks a new investigation round carrying the user's words; attachments flow into the record with custody; every run yields a deliverable; a paused run says "answer me" instead of "unknown"; the lock is visible; sharing is a product surface. The scientific authority is untouched — every new path reuses the engine's own input-record and re-entry machinery.
+- reviewer_provenance=AI_REVIEW.
