@@ -1045,3 +1045,22 @@ Stage Summary:
 - The product surface now speaks with ONE voice from canonical state: conversation sentences, event sentences, and honest states all flow through tested pure layers (present.ts + productEvents.ts); the pipeline remains a story, never machinery; stale positives cannot surface in any layer including the workspace auto-open.
 - Disclosed: the showcase (invention) view keeps its R435 layout (standing debt); file/URL ingestion, evidence relationship counts, per-candidate events, projects grouping, mid-run queued asks remain Coder-1 contracts (documented, not improvised); the standing credential-rotation escalation remains the operator's item.
 - reviewer_provenance=AI_REVIEW.
+
+---
+Task ID: R454-C2 (delivery)
+Agent: Coder 2 (main session, deploy execution)
+Task: The Art. LXXI tuple for R454-C2 — push origin/main, redeploy the canonical HF Space at the round SHA, verify /api/version + /api/health identity.
+
+Work Log:
+- Pushed: r454-c2/conversational-ui -> origin/main, FAST-FORWARD caf9fa5..a16c54e (no history rewrite); branch also pushed; ls-remote re-verified a16c54e == local HEAD (Art. XXIII).
+- Deploy: the R453-C2 driver (r453_c2_space_deploy.py) reused VERBATIM (Art. X — ONE implementation; the R451-C1.3 phase-split recipe: ls-remote-pinned target, git archive, adapter Dockerfile, frontmatter-first README, ONE upload_folder, the full env contract; env-injection credentials only). Space revision 156614ee5696581a359811271a3db9c50658d3dd (90 s upload). Disclosed: the driver's fixed upload-commit label reads "R453-C2 deploy" — a fixed string in the reused driver; the sha/revision/identity fields are the R454-C2 values (recorded in the deployment record's round_note).
+- Build + verify (r453_c2_space_verify.py --wait 8): RUNNING_BUILDING -> RUNNING_APP_STARTING -> RUNNING; the Art. LXXI tuple ALL GREEN:
+  1. push confirmed: ls-remote origin/main == a16c54e2dd9b == target
+  2. /api/version engine_commit == a16c54e2dd9b (source build_artifact), constitution 2.4.0
+  3. /api/health ok=True, drift=GREEN, tamper=False, discovery_ready=True
+- Served-build proof: web_build_hash CHANGED fe6529dc... -> a2ed6b3c... (the R454-C2 build is actually served) and the served page chunk carries the product event map sentences ("Investigating evidence", "Challenging the leading candidate", productEventSentence).
+- Record: R453/HF_DEPLOYMENT_RECORD.json updated (round_note + production_deployment tuple + served_build_markers; delivery_complete=True).
+
+Stage Summary:
+- ARTICLE LXXI DELIVERY COMPLETE for R454-C2: origin/main == deployed SHA == health-reported identity at the canonical production URL; the four briefing deliverables are live on the served build.
+- reviewer_provenance=AI_REVIEW.
