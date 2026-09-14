@@ -1005,3 +1005,21 @@ Work Log:
 Stage Summary:
 - ARTICLE LXXI DELIVERY COMPLETE: the operator-specified production URL serves the EXACT merged SHA (8d019f3); the Claude-class UI reconstruction is LIVE in production; the R453-C2 round's delivery tuple is closed end-to-end (branch -> PR #8 -> merge -> deploy -> identity verification). The residual "records-only trailing commits" class (this commit) is the standing R450/R451 precedent. The standing credential-rotation escalation remains the operator's sole open item.
 - reviewer_provenance=AI_REVIEW.
+
+---
+Task ID: R453-C2-acceptance
+Agent: Coder 2 (main session, production acceptance)
+Task: The briefing's §44 STEP 15 (test fresh production behavior) + §46 final-comparison evidence, against the LIVE Claude-class deployment; refresh the §47 deliverables with production evidence.
+
+Work Log:
+- Acceptance script (scripts/r453_c2_production_acceptance.py, five phases, slice-resumable) run against https://prateekm1-toscanini-prod-validation.hf.space at the merged SHA:
+  A. IDENTITY 8/8: engine_commit == 8d019f3df7ef (build_artifact), constitution 2.4.0, web_build_file_count 30, health ok/drift GREEN/tamper False/discovery_ready.
+  B. SERVED SURFACE 14/14: 8 served files fetched, two-fetch content stability TRUE; the §6 home markers (DISCOVER. INVENT. ANYTHING. + the composer prompt) verified IN THE SERVED BUNDLE (the static export prerenders a 'Toscanini Loading…' hydration shell — the home renders client-side; recorded as a first-paint refinement opportunity for §46); the honest-state vocabulary present; the Art. LXIV deletions (TechStage/DeepDive/DiscoveryPipelineStrip/InfrastructureBlockedHero) ABSENT from the served chunks; the §37 machine vocabulary absent from the served HTML.
+  C. LOCAL REBUILD CROSS-CHECK (honest, Art. XXV): the committed lockfile rebuilds 30 files (count == served) with verify-export exit 0; content hash f0a82069... diverges from the served fe6529dc... — the sandbox rebuild (node 24) vs the image builder (node:20); the SERVER-side fresh recompute over its own served dir remains the identity authority; divergence recorded, never silently passed.
+  D. FRESH DISCOVERY: a genuinely fresh problem (supermarket refrigerated-display-case door fogging, authored for this round, never submitted anywhere) through the real user path -> run ts_94d163221011 -> 13 REAL evidence records (core/crossref/europepmc), mechanism GENERATED, attack SKIPPED, terminal COMPLETE with final_status INCOMPLETE_INFERENCE_FAILURE — the honest partial arc: the engine's own user_state_view declared 'Completed — outcome unknown' / 'Run blocked — infrastructure, not a verdict' with found_something=false, rejected=false (§18/§29 behavior verified in PRODUCTION).
+  E. STATE-MAP CONFORMANCE: the production observation caught a REAL §47 deliverable gap — three canonical wire tokens (evidence_state GATHERED, mechanism_state GENERATED, final_status INCOMPLETE_INFERENCE_FAILURE) were not enumerated in CODER2_UI_STATE_MAP.json (the interface handled them; the document did not). AMENDED (pure addition, provenance block recorded): retrieval_state.GATHERED (with the present.ts derivation to RETRIEVED_POSITIVE/ZERO), a NEW mechanism_state section (4 canonical tokens), run_outcome.INCOMPLETE_INFERENCE_FAILURE. Re-run: 5/5 MAPPED.
+- Constitution re-verified b54a1be9... (the ratified v2.4.0 bytes) immediately before this closure commit.
+
+Stage Summary:
+- §44 STEP 15 CLOSED: the live deployment serves the exact merged SHA with the Claude-class surface verified in the served bytes, honest states exercised by a genuinely fresh production problem, and the state map now conformant by direct production evidence. Records-only trailing commit (the standing R450/R451 precedent class). Remaining UX debt unchanged + one new recorded item: the prerendered first paint is a hydration shell (the home text lands at hydration) — a candidate refinement for the next round.
+- reviewer_provenance=AI_REVIEW.
