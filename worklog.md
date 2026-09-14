@@ -1276,3 +1276,19 @@ Work Log:
 Stage Summary:
 - The operator's five-router rotation is COMPLETE and MEASURED: five distinct free-tier accounts, the keys persisted as Space secrets, the newly-measured rungs registered with honest tiers, the bynara account-entry escalation closed by the owner's action and recorded with its recurrence protocol, and the live rotation proof green on all three arms. Remaining: commit → push → deploy → Art. LXXI tuple → records follow-up.
 - reviewer_provenance=AI_REVIEW.
+
+---
+Task ID: R461 (delivery)
+Agent: Super Z (main session — Coder 1)
+Task: R461 final delivery tuple
+
+Work Log:
+- DEPLOYED: the canonical Space prateekm1/toscanini-prod-validation at revision 8b2be1b3 through the standing r456_space_deploy driver (round trees pruned; the FIVE router secrets wired — unorouter, xkiro, apinex, bai, bynara; env contract LOCAL_QWEN_ENABLE/LOCAL_EMBED_ENABLE/durable state unchanged)
+- THE TUPLE (live-verified by scripts/r456_deploy_verify.py): ls-remote origin/main == /api/version engine_commit == 617eb432 (the round's final SHA: the R461 commit 37f94786 + the deploy-driver message refresh 617eb432); /api/health ok=true, discovery_ready=true (post-boot), identity_tamper=false, drift GREEN. ARTICLE LXXI: GREEN.
+- The deployed provider surface lists bynara with 5 available models (the -free family discovered on the Space through its wired secret) alongside the quartet's rungs — the fifth router is LIVE in production.
+- Records: the round record's production_deployment tuple filled (target == deployed == health, drift GREEN); records-only follow-up commit (the standing R455/R456/R459/R458-C1 protocol — the tuple pins the deployed code commit; the records commit changes no engine code).
+- Secret discipline: the full round diff secret-scan CLEAN (0 hits — the five key values, the HF token, the GitHub PAT never in the repo; BS-021).
+
+Stage Summary:
+- R461 COMPLETE AND DELIVERED: the fifth free-tier router registered with probe-before-admit discipline, the bynara owner-action escalation closed and recorded with its recurrence protocol, the five keys persisted as HF Space secrets, the newly-measured free rungs pinned with honest tiers, and the live rotation proof green on all three arms — with the Art. LXXI delivery tuple GREEN at 617eb432.
+- reviewer_provenance=AI_REVIEW.
