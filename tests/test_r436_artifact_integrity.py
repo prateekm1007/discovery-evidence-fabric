@@ -38,7 +38,7 @@ sys.path.insert(0, str(REPO))
 
 from discovery_fabric.engine import provider_health as ph  # noqa: E402
 from toscanini import dossier as dos  # noqa: E402
-from toscanini import identity_continuity as ic  # noqa: E402
+# R456: toscanini/identity_continuity.py ARCHIVED_TO archive/r456-lean/ (zero production/script importers) — the identity-continuity class moved to the archive with the module (Art. LXIV).
 
 WEBAPP = REPO / "TOSCANINI_UI" / "webapp"
 TECHSTAGE = WEBAPP / "components" / "TechStage.tsx"
@@ -511,60 +511,3 @@ def _mk_cont_run(tmp_path: Path, *, break_join=None) -> Path:
     return rd
 
 
-class TestIdentityContinuity:
-    def test_all_joins_pass_on_faithful_run(self, tmp_path):
-        r = ic.check_run(_mk_cont_run(tmp_path), "ts_cont_test")
-        assert r["passed"] is True
-        by = {j["join"]: j["passed"] for j in r["joins"]}
-        assert by == {
-            "J1_problem_identity": True,
-            "J2_geometry_hash_matches_file": True,
-            "J3_run_identity": True,
-            "J4_decisive_experiment_binding": True,
-            "J5_package_identity": True}
-
-    def test_broken_artifact_identity_fails_j1(self, tmp_path):
-        r = ic.check_run(_mk_cont_run(tmp_path, break_join="artifact"),
-                         "ts_cont_test")
-        assert r["passed"] is False
-        j1 = next(j for j in r["joins"] if j["join"] == "J1_problem_identity")
-        assert j1["passed"] is False
-
-    def test_broken_experiment_binding_fails_j4(self, tmp_path):
-        r = ic.check_run(_mk_cont_run(tmp_path, break_join="experiment"),
-                         "ts_cont_test")
-        assert r["passed"] is False
-        j4 = next(j for j in r["joins"] if j["join"] == "J4_decisive_experiment_binding")
-        assert j4["passed"] is False
-
-    def test_broken_package_identity_fails_j5(self, tmp_path):
-        r = ic.check_run(_mk_cont_run(tmp_path, break_join="package"),
-                         "ts_cont_test")
-        assert r["passed"] is False
-        j5 = next(j for j in r["joins"] if j["join"] == "J5_package_identity")
-        assert j5["passed"] is False
-
-    def test_missing_glb_fails_j2_not_fabricates(self, tmp_path):
-        rd = _mk_cont_run(tmp_path)
-        (rd / "MODEL" / "model-002.glb").unlink()
-        r = ic.check_run(rd, "ts_cont_test")
-        j2 = next(j for j in r["joins"] if j["join"] == "J2_geometry_hash_matches_file")
-        assert j2["passed"] is False
-
-    def test_bridge_package_observation_recorded(self, tmp_path):
-        """The superseded bridge package generation is disclosed as an
-        observation — never silently dropped (Art. LXIV)."""
-        r = ic.check_run(_mk_cont_run(tmp_path), "ts_cont_test")
-        obs = [o for o in r.get("observations", [])
-               if o["observation"] == "bridge_package_generation_superseded"]
-        assert obs and obs[0]["bridge_zip_on_disk"] is False
-
-    @pytest.mark.skipif(not HEATPUMP_RUN.exists(),
-                        reason="real heat-pump run not present locally")
-    def test_real_run_identity_continuity(self):
-        """REAL integration evidence: the completed ts_387d8467cbb5
-        heat-pump run (real LLM, real bridge, real package) carries one
-        canonical invention identity across all five surfaces."""
-        r = ic.check_run(HEATPUMP_RUN, "ts_387d8467cbb5")
-        assert r["passed"] is True, json.dumps(
-            [j for j in r["joins"] if not j["passed"]], indent=1)

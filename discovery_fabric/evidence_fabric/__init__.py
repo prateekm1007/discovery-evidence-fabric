@@ -39,6 +39,12 @@ import re
 import time
 from typing import Any, Dict, List, Optional, Tuple
 
+# R456: the Phase-P1 semantic relevance instrument (one implementation;
+# the retrieval-side query_relevance adjudicator shares it)
+from discovery_fabric.source_registry.semantic_relevance import (
+    adjudicate as semantic_adjudicate,
+)
+
 from discovery_fabric.evidence_fabric import connectors as hc
 from discovery_fabric.evidence_fabric.evidence_record import (
     ADMISSIBILITY_STATES, EVIDENCE_FABRIC_VERSION, EvidenceRecord,
@@ -120,21 +126,32 @@ def problem_queries(problem: Dict[str, Any]) -> List[str]:
 def adjudicate_relevance(record: EvidenceRecord,
                          problem_terms: List[str],
                          problem_elems: List[str],
-                         query: str) -> Dict[str, Any]:
+                         query: str,
+                         problem_text: str = "",
+                         pool_texts: Optional[List[str]] = None
+                         ) -> Dict[str, Any]:
     """Art. XXI.4 relevance adjudication — deterministic, recorded.
 
-    TWO modes, both recorded with their basis:
-    TEXT spans (patents/papers/cases): the span's terms must overlap the
-    problem's DISTINCT domain terms (not just the query echo). Two or
-    more shared terms, or one rare (>=7 char) shared term, adjudicates
-    RELEVANT.
+    THREE modes, all recorded with their basis:
+    SEMANTIC spans (the default for TEXT records — R456): the Phase-P1
+    semantic relevance instrument
+    (source_registry/semantic_relevance.py) scores the problem text
+    against the span text — IDF-weighted soft coverage of the query's
+    informative core + directional trigram coverage + phrase bonus,
+    banded RELEVANT / WEAK_RELEVANCE / REJECTED by the declared corpus
+    floors. The measured defect this replaces: the lexical
+    TEXT_TERM_OVERLAP gate admitted OpenFOAM prompt-template boilerplate
+    as RELEVANT for four unrelated problems on the shared generic words
+    ['problem','state'] (the R452 frozen assay, 24 records), while
+    rejecting on-domain records whose morphology diverged.
     STRUCTURED spans (formula/SMILES — materials/chemistry families):
     element-level overlap — the problem's elements (names expanded to
     symbols) vs the span's element tokens. At least one STRUCTURAL
     METAL shared (Cu/Ni/Ti/Zn/Fe/Al/...) adjudicates RELEVANT; only
     non-metal overlap (C/H/O in organics) is WEAK (every organic
     molecule shares them — not problem-specific); zero overlap is
-    REJECTED (keyword/proximity collision).
+    REJECTED (keyword/proximity collision). This mode is UNCHANGED:
+    element overlap is exact chemistry, not vocabulary.
     """
     span = record.exact_span
     structured = record.source_type in (
@@ -174,22 +191,28 @@ def adjudicate_relevance(record: EvidenceRecord,
     span_terms = set(_terms(span.text))
     prob_terms = set(problem_terms)
     shared_terms = sorted(span_terms & prob_terms)
-    rare_shared = [t for t in shared_terms if len(t) >= 7]
-    if len(shared_terms) >= 2 or rare_shared:
-        verdict = "RELEVANT"
-    elif len(shared_terms) == 1:
-        verdict = "WEAK_RELEVANCE"
-    else:
-        verdict = "REJECTED"
+    # R456: the lexical TEXT_TERM_OVERLAP branch is REPLACED by the
+    # Phase-P1 semantic instrument (Art. LXIV — the superseded method
+    # is retired here, its disposition recorded in the round record;
+    # the term overlap is one reported component of the new basis, not
+    # a separate fallback path — Art. IV). The verdict vocabulary and
+    # the custody semantics below are UNCHANGED.
+    qtext = problem_text or " ".join(sorted(prob_terms))
+    sem = semantic_adjudicate(qtext, span.text, pool_texts or [])
+    verdict = sem["verdict"]
     return {
         "verdict": verdict,
-        "mode": "TEXT_TERM_OVERLAP",
+        "mode": "SEMANTIC_RELEVANCE",
+        "score": sem["score"],
+        "components": sem["components"],
         "shared_terms": shared_terms,
-        "rare_shared_terms": rare_shared,
+        "matched_terms": sem["matched_terms"],
+        "soft_matched": sem["soft_matched"],
+        "phrase_hits": sem["phrase_hits"],
+        "rare_shared_terms": [t for t in shared_terms if len(t) >= 7],
         "query": query,
-        "method": "deterministic term-overlap (problem terms vs span "
-                  "terms); the decision is recorded per record "
-                  "(Art. XXI.4)",
+        "method": sem["method"] + "; the decision is recorded per "
+                  "record (Art. XXI.4)",
     }
 
 
@@ -510,9 +533,19 @@ def retrieve_evidence(problem: Dict[str, Any],
             })
 
     # ---- relevance adjudication (recorded per record) ----------------
+    # R456: the pool's span texts feed the instrument's pool IDF —
+    # computed ONCE over the records being adjudicated (deterministic,
+    # disclosed per decision as idf_source=pool_idf)
+    _pool_texts = [str(r.exact_span.text or "") if r.exact_span else ""
+                   for r in records_all]
+    _problem_text = ". ".join(
+        str(problem.get(k) or "") for k in
+        ("device", "failure", "user_text")).strip(". ")
     for rec in records_all:
         decision = adjudicate_relevance(rec, problem_terms,
-                                        problem_elems, "")
+                                        problem_elems, "",
+                                        problem_text=_problem_text,
+                                        pool_texts=_pool_texts)
         _relevance_promote(rec, decision)
         report["records"].append(rec.to_dict())
 

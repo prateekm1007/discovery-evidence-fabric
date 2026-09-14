@@ -41,7 +41,7 @@ sys.path.insert(0, str(REPO))
 from discovery_fabric.engine import provider_health as ph  # noqa: E402
 from discovery_fabric.engine import llm_registry as reg  # noqa: E402
 from toscanini import cio as cio_mod  # noqa: E402
-from toscanini import counsel as counsel_mod  # noqa: E402
+# R456: toscanini/counsel.py ARCHIVED_TO archive/r456-lean/ (route retired R423A; zero importers) — the builder-pin class moved to the archive with the module (Art. LXIV).
 from toscanini import run_state as rs  # noqa: E402
 
 
@@ -702,82 +702,7 @@ class TestLanguageGuard:
 # ---------------------------------------------------------------------------
 # 8. The counsel package (directive §20)
 # ---------------------------------------------------------------------------
-class TestCounselPackage:
-    def _run(self, tmp_path):
-        (tmp_path / "INVENTION_SPECIFICATION.json").write_text(
-            json.dumps({
-                "invention_id": "INV-9", "mechanism": "mech",
-                "problem": "the problem", "evidence": [
-                    {"id": "e1", "title": "t", "source": "s",
-                     "evidence_class": "SOURCE_FACT"}],
-                "uncertainties": ["u1"], "assumptions": ["a1"],
-                "killer_experiment": {"name": "exp"}}))
-        (tmp_path / "run_manifest.json").write_text(json.dumps(
-            {"stage_log": [
-                {"stage": "RETRIEVE", "status": "OK",
-                 "started_at": "t1", "finished_at": "t2"},
-                {"stage": "SYNTHESIZE", "status": "OK",
-                 "started_at": "t2", "finished_at": "t3"}]}))
-        (tmp_path / "final_state.json").write_text(
-            json.dumps({"final_status": "REJECTED"}))
-        (tmp_path / "envelope_MULTI_SOURCE_DISCOVERY.json").write_text(
-            json.dumps({"prior_art": [
-                {"title": "prior art one", "source": "patents"}]}))
-        return {"session_id": "s9", "user_text": "the user problem",
-                "status": "COMPLETE", "final_status": "REJECTED",
-                "package": {}, "run_dir": str(tmp_path)}
 
-    def test_package_built_with_directive_sections(self, tmp_path):
-        s = self._run(tmp_path)
-        p = counsel_mod.build_counsel_package(s)
-        assert p and p.exists()
-        with zipfile.ZipFile(p) as z:
-            names = set(z.namelist())
-        for want in ("00_COVER_NOTE.txt", "01_INVENTION_DESCRIPTION.txt",
-                     "03_CITED_EVIDENCE.txt", "04_PRIOR_ART_RESULTS.txt",
-                     "05_ARCHITECTURE_COMPARISON.txt",
-                     "06_DECISIVE_EXPERIMENT.txt",
-                     "07_UNRESOLVED_QUESTIONS.txt",
-                     "08_PROVENANCE_MANIFEST.json"):
-            assert want in names, want
-        with zipfile.ZipFile(p) as z:
-            cover = z.read("00_COVER_NOTE.txt").decode()
-            prov = json.loads(z.read("08_PROVENANCE_MANIFEST.json"))
-        cover_l = cover.lower()
-        # the directive's exact preferred framing is present
-        assert "formal patentability" in cover_l
-        assert "ip counsel" in cover_l
-        assert prov["reviewer_provenance"] == "AI_REVIEW"
-        assert prov["source_files"]["INVENTION_SPECIFICATION.json"][
-            "sha256"]
-
-    def test_cover_never_asserts_patentability(self, tmp_path):
-        s = self._run(tmp_path)
-        p = counsel_mod.build_counsel_package(s)
-        with zipfile.ZipFile(p) as z:
-            cover = z.read("00_COVER_NOTE.txt").decode().lower()
-        for banned in ("patentable", "patent guaranteed",
-                       "patent cleared", "fto confirmed"):
-            assert banned not in cover, banned
-        assert "not a legal document" in cover
-
-    def test_none_when_no_artifacts(self, tmp_path):
-        assert counsel_mod.build_counsel_package(
-            {"session_id": "s", "run_dir": str(tmp_path)}) is None
-
-    def test_sections_derived_from_artifacts(self, tmp_path):
-        """04_PRIOR_ART carries the run's own prior-art records — not
-        placeholder text (Art. VI)."""
-        s = self._run(tmp_path)
-        p = counsel_mod.build_counsel_package(s)
-        with zipfile.ZipFile(p) as z:
-            pa = z.read("04_PRIOR_ART_RESULTS.txt").decode()
-        assert "prior art one" in pa
-
-
-# ---------------------------------------------------------------------------
-# 9. User-state projection + health payload integration
-# ---------------------------------------------------------------------------
 class TestProjections:
     def test_user_state_view_carries_outcome(self):
         from toscanini.user_state import user_state_view

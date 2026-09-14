@@ -1,58 +1,16 @@
-"""End-to-End Invention Loop Engine.
+"""Invention Loop Engine — the live canon is bayesian_eig.py only.
 
-Per Article XXXV (Constitution v1.5.0):
-  A completed invention is a closed-loop validated system that can generate
-  its own next falsification experiment from new evidence.
+R456-LEAN-2 disposition (the owner's determination): of the R339-R370
+reality-loop instrument family, ONLY bayesian_eig.py remains live — it
+is the KILLER_EXPERIMENT stage's canonical calculator, path-loaded by
+discovery_fabric/engine/adapters.py (BayesianEIGCalculator.rank_experiments).
+The R452 causal-learning loop lives in discovery_fabric/engine/
+(causal_learning/decisive_experiment/mechanistic_solver — §N.2
+do-not-touch), NOT in this package.
 
-One engine, four adapters:
-  - R6Adapter (Slot 1: Passive Rescue / Obstruction Bypass)
-  - SensingAdapter (Slot 2: Adaptive / Sensing eShunt)
-  - TherapeuticAdapter (Slot 3: Controlled CNS Therapeutic)
-  - LifecycleAdapter (Slot 4: CNS / Lifecycle Intelligence)
-
-Usage:
-    from epistemic_integrity.invention_loop_engine import InventionLoopEngine, R6Adapter
-
-    adapter = R6Adapter()
-    engine = InventionLoopEngine(adapter, random_seed=42)
-    engine.run_candidate(candidate)
-    engine.run_problem_proof()
-    engine.run_destruction()
-    # ... continue through the loop
+The other 22 modules (the four slot adapters, the engine harness, the
+patent-destruction replay family, the live_replay capture JSONs) are
+ARCHIVED_TO archive/r456-lean/epistemic_integrity/invention_loop_engine/
+— importable history, zero consumers (Art. LXIV; per-item accounting in
+that archive's MANIFEST.json).
 """
-
-from .engine import InventionLoopEngine
-from .schemas import (
-    # Core types
-    Candidate, ProblemHypothesis, CausalGraph, CausalEdge,
-    MechanisticModel, Assumption, UncertaintyBudget,
-    VirtualCohort, VirtualPatient, Experiment, RawObservation,
-    ModelUpdate, FalsificationProposal, BuyerRequirement,
-    RegulatoryEvidence, Dossier,
-    # Falsifiability + evidence predicates
-    FalsifiablePrediction, FalsifiabilityStatus, MechanismRefutationVerdict,
-    EvidencePredicate,
-    # Enums
-    EpistemicClass, EvidenceType, LoopState, ParameterClassification,
-    ClassifiedParameter,
-    # Provenance
-    Provenance,
-)
-from .adapters.r6_adapter import R6Adapter
-from .adapters.sensing_adapter import SensingAdapter
-from .adapters.therapeutic_adapter import TherapeuticAdapter
-from .adapters.lifecycle_adapter import LifecycleAdapter
-from .adapters.base import InventionLoopAdapter
-
-__all__ = [
-    "InventionLoopEngine",
-    "InventionLoopAdapter",
-    "R6Adapter", "SensingAdapter", "TherapeuticAdapter", "LifecycleAdapter",
-    "Candidate", "ProblemHypothesis", "CausalGraph", "CausalEdge",
-    "MechanisticModel", "Assumption", "UncertaintyBudget",
-    "VirtualCohort", "VirtualPatient", "Experiment", "RawObservation",
-    "ModelUpdate", "FalsificationProposal", "BuyerRequirement",
-    "RegulatoryEvidence", "Dossier",
-    "EpistemicClass", "EvidenceType", "LoopState",
-    "Provenance",
-]

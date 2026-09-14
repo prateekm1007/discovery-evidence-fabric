@@ -17,6 +17,14 @@ R451-C1.3 changes:
   4. the env contract: the R447/R450 variables + LOCAL_QWEN_ENABLE=1
      (the entrypoint's gate for the local route).
 
+R456-LEAN-2 (image slimming): the staged upload EXCLUDES the
+round-evidence trees and CI-instrument directories (the runtime reads
+none of them — the R455 measured production import closure + the
+.dockerignore rule; ~520 MB of tracked bytes stay out of the Space
+build). One canonical exclusion list lives in
+scripts/r456_deploy_excludes.py; the drivers import it verbatim
+(Art. X — one implementation).
+
 Usage: HF_TOKEN=... GITHUB_TOKEN=... python scripts/r451_c13_deploy.py
 """
 from __future__ import annotations
@@ -68,9 +76,26 @@ def main() -> int:
                            check=True, cwd=str(REPO))
         with tarfile.open(archive) as tf:
             tf.extractall(str(stage))
+        # R456-LEAN-2: the round-evidence + CI-instrument exclusion
+        # (one canonical list; the runtime reads none of it)
+        from r456_deploy_excludes import EXCLUDE_DIRS, EXCLUDE_FILES
+        excluded_mb = 0.0
+        for name in EXCLUDE_DIRS:
+            target = stage / name
+            if target.exists():
+                excluded_mb += sum(f.stat().st_size for f in target.rglob("*")
+                                   if f.is_file()) / 1e6
+                import shutil
+                shutil.rmtree(target, ignore_errors=True)
+        for name in EXCLUDE_FILES:
+            target = stage / name
+            if target.exists():
+                excluded_mb += target.stat().st_size / 1e6
+                target.unlink()
         n_files = sum(1 for _ in stage.rglob("*") if _.is_file())
         print(f"[r451c13-deploy] staged {n_files} tracked files "
-              f"({archive.stat().st_size / 1e6:.0f} MB tar)")
+              f"({archive.stat().st_size / 1e6:.0f} MB tar; "
+              f"excluded {excluded_mb:.0f} MB of round/CI trees)")
 
         # the R451-C1.3 adapter Dockerfile (llama.cpp pinned tag build +
         # sha-pinned GGUF + the env-gated entrypoint route)

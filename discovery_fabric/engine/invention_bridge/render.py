@@ -484,6 +484,21 @@ def render_invention_blender_legacy(work_dir: str,
             "contract")
         return record
 
+    # R456-LEAN-2: the image no longer ships Blender and the legacy
+    # hero-render script is archived (R455-LEAN-1 §6) — an explicit
+    # operator opt-in ($BLENDER_PATH at an external install) skips
+    # TYPED instead of failing inside the subprocess (Art. LXI: the
+    # infrastructure gap is named, never a silent substitute)
+    if not os.path.isfile(RENDER_SCRIPT):
+        record["status"] = "RENDER_SKIPPED_LEGACY_SCRIPT_ARCHIVED"
+        record["legacy_script"] = RENDER_SCRIPT
+        record["note"] = (
+            "the legacy Blender hero-render script is archived "
+            "(R455-LEAN-1 §6; image slimming R456) — the legacy "
+            "renderer is not installed; the interactive GLB is served "
+            "unchanged from the Visual Compiler path")
+        return record
+
     # R419c memory guard — typed skip before the subprocess is launched
     # (a Blender OOM on a small instance can kill the run worker itself)
     guard = _memory_guard("bridge_render", mode=memory_mode)

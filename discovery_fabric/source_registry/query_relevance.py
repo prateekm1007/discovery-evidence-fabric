@@ -58,6 +58,14 @@ from __future__ import annotations
 import re
 from typing import Any, Dict, List, Optional, Tuple
 
+# R456: the Phase-P1 semantic relevance instrument — ONE implementation
+# shared with the evidence-fabric's evidence-side adjudicator
+# (source_registry/semantic_relevance.py). The lexical term-overlap is
+# one reported component of its basis, not a separate decision path.
+from discovery_fabric.source_registry.semantic_relevance import (
+    adjudicate as _semantic_adjudicate,
+)
+
 # ---------------------------------------------------------------------------
 # Adjudication vocabulary (mirrors discovery_modes/device_failure.py)
 # ---------------------------------------------------------------------------
@@ -200,15 +208,24 @@ def record_text(rec: Dict[str, Any]) -> str:
     return " ".join(parts)
 
 
-def adjudicate_record(rec: Dict[str, Any], query: str) -> Dict[str, Any]:
+def adjudicate_record(rec: Dict[str, Any], query: str,
+                      pool_texts: Optional[List[str]] = None
+                      ) -> Dict[str, Any]:
     """Adjudicate one record against one query (transparent basis).
 
-    Threshold rule (instrument defect fixed 2026-08-30 after the first
-    battery run): required overlap is min(MIN_OVERLAP_TERMS, number of
-    query content terms). The >=2 rule exists to prevent single-word
-    accidental collisions on MULTI-concept queries; for a single-concept
-    query ('aspirin', 'medtronic', '10993') the single term IS the
-    concept and demanding 2 overlaps is impossible-by-construction.
+    R456: the decision core is the Phase-P1 SEMANTIC relevance
+    instrument (deterministic; IDF-weighted soft core coverage +
+    directional trigram coverage + phrase bonus, corpus-declared
+    bands). The measured defect this replaces: the lexical >=2
+    term-overlap rule admitted generic-vocabulary collisions (the
+    R452 frozen assay's ['problem','state'] boilerplate class) and
+    rejected on-domain records whose morphology diverged.
+
+    Mapping into the battery's vocabulary (bands unchanged, Art.
+    XXVII): the instrument's RELEVANT band -> RELEVANT; WEAK_RELEVANCE
+    and REJECTED -> IRRELEVANT_FILTERED (the score and band are
+    recorded either way — a gray-zone record is measured as
+    not-yet-relevant, never silently dropped, Art. XXV).
 
     Field-binding rule (Art. II spirit): when the query uses a
     field:value grammar, the value is ALSO checked against the
@@ -217,11 +234,8 @@ def adjudicate_record(rec: Dict[str, Any], query: str) -> Dict[str, Any]:
     is where exact evidence lives, not the title.
     """
     qterms_list, field = query_content_terms(query)
-    qterms = set(qterms_list)
-    rterms = set(terms(record_text(rec)))
-    overlap = sorted(qterms & rterms)
-    required = min(MIN_OVERLAP_TERMS, len(qterms)) if qterms else 1
-    relevant = len(overlap) >= required
+    sem = _semantic_adjudicate(query, record_text(rec), pool_texts)
+    relevant = sem["verdict"] == "RELEVANT"
     basis_extra = ""
     if field and relevant is False:
         # field-bound second chance: exact substring of the value in the
@@ -238,13 +252,14 @@ def adjudicate_record(rec: Dict[str, Any], query: str) -> Dict[str, Any]:
         "record_id": rec.get("record_id"),
         "title": (rec.get("title") or "")[:140],
         "relevance": RELEVANT if relevant else IRRELEVANT,
+        "relevance_score": sem["score"],
+        "relevance_band": sem["verdict"],
         "relevance_basis": {
-            "method": f"term overlap >= {required} (min({MIN_OVERLAP_TERMS}, "
-                      f"{len(qterms)} query terms)) between query content "
-                      f"terms and record text terms (transparent, "
-                      f"adjudicable — same rule family as the pipeline)"
-                      f"{basis_extra}",
-            "overlapping_terms": overlap,
+            "method": sem["method"] + basis_extra,
+            "components": sem["components"],
+            "matched_terms": sem["matched_terms"],
+            "soft_matched": sem["soft_matched"],
+            "overlapping_terms": sem["matched_terms"],
         },
     }
 
@@ -413,6 +428,10 @@ def aggregate(results: Dict[str, List[Dict[str, Any]]]) -> Dict[str, Dict[str, A
         for q in queries:
             recs = q.get("records") or []
             adj = []
+            # R456: the query's own returned records form the IDF pool
+            # (deterministic, disclosed per adjudication as
+            # idf_source=pool_idf when the batch is large enough)
+            _pool = [record_text(r) for r in recs]
             for r in recs:
                 years.extend(extract_record_years(r))
                 if structural:
@@ -430,7 +449,8 @@ def aggregate(results: Dict[str, List[Dict[str, Any]]]) -> Dict[str, Dict[str, A
                         },
                     })
                 else:
-                    adj.append(adjudicate_record(r, q["query"]))
+                    adj.append(adjudicate_record(r, q["query"],
+                                                 pool_texts=_pool))
             n_rel = sum(1 for a in adj if a["relevance"] == RELEVANT)
             adjudicated += len(adj)
             relevant += n_rel
@@ -462,6 +482,11 @@ def aggregate(results: Dict[str, List[Dict[str, Any]]]) -> Dict[str, Dict[str, A
             "relevant_rate": round(rate, 3) if rate is not None else None,
             "query_differentiation": differentiation,
             "measured_temporal_span": measured_temporal_span(years),
+            "relevance_method": (
+                "SEMANTIC_RELEVANCE_V1 (R456 Phase-P1; lexical "
+                "TEXT_TERM_OVERLAP retired — see source_registry/"
+                "semantic_relevance.py)" if not structural
+                else "STRUCTURAL"),
         }
     return agg
 

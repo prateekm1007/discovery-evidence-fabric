@@ -131,7 +131,9 @@ def _adapter_dockerfile(commit: str) -> str:
     df = df.replace(anchor, anchor + HUNK_NODE_RUNTIME, 1)
 
     # 2. chromium in the apt set
-    apt_anchor = "      libxi6 libxfixes3 libsm6 libice6 libxkbcommon0 \\\n"
+    #    (R456: the apt set's tail is the OCP geometry libs — the Blender
+    #    X11 libs were removed from the canonical Dockerfile)
+    apt_anchor = "      libgl1 libglu1-mesa libxext6 libx11-6 libxrender1 \\\n"
     assert apt_anchor in df, "apt anchor not found"
     df = df.replace(apt_anchor, apt_anchor + HUNK_APT, 1)
 
@@ -339,18 +341,23 @@ def _r451_c13_adapter_dockerfile(commit: str) -> str:
     hunks: the llama-builder stage FIRST (it must precede the engine
     stage so COPY --from can reference it), the pinned model + server
     copy INSIDE the engine stage (after the apt set), and the binary
-    staged via a temp COPY so the engine stage can place it."""
+    staged via a temp COPY so the engine stage can place it.
+
+    R456: the insert anchor moved from the retired
+    `ENV BLENDER_PATH=...` line (the Blender block left the image) to
+    the engine stage's `WORKDIR /app` line — the dependency block's
+    new end."""
     df = _adapter_dockerfile(commit)
     # 1. prepend the builder stage (before stage 1 — Docker allows any
     #    order; referencing it later via COPY --from)
     df = HUNK_LLAMA_BUILDER + "\n" + df
     # 2. stage the built binary into the engine stage: insert the
-    #    local-qwen hunk right after the Blender ENV line (the engine
-    #    stage's dependency block end), with the binary COPY first
-    wire = ("ENV BLENDER_PATH=/opt/blender/blender\n")
+    #    local-qwen hunk right before the engine stage's WORKDIR (the
+    #    dependency block end)
+    wire = ("WORKDIR /app\n")
     assert wire in df
     binary_copy = (
         "# the built llama-server binary from the pinned-tag builder\n"
         "COPY --from=llama-builder /build/bin/llama-server /tmp/llama-server\n")
-    df = df.replace(wire, wire + binary_copy + HUNK_LOCAL_QWEN, 1)
+    df = df.replace(wire, binary_copy + HUNK_LOCAL_QWEN + wire, 1)
     return df

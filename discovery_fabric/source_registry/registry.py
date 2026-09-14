@@ -1640,10 +1640,22 @@ _ROUTING_STATE_OVERRIDES: Dict[str, Dict[str, Any]] = {
             "DETERMINISM_GAP flagged in the R394 production audit) — "
             "records poison synthesis-feeding retrieval more than they "
             "feed it until relevance is semantically adjudicated"),
+        # R456: the semantic reranker (the criterion's first condition)
+        # has LANDED — discovery_fabric/source_registry/semantic_relevance.py,
+        # validated on the committed corpus (19/19) and on the frozen
+        # R452 records. The flip to ACTIVE still requires the criterion's
+        # second condition: a MEASURED relevance re-run of this source.
+        # The sandbox's egress could not reach api.osti.gov (measured:
+        # ConnectionError 2026-09-15) — the re-run happens at production
+        # verification; until then the suspension stands (Art. XXV: a
+        # blocked measurement is never graded as its own result).
         "reinstatement_criterion": (
-            "the Phase P1 semantic reranker lands (semantic relevance "
-            "adjudication between query and record, replacing lexical "
-            "overlap); flip to ACTIVE + a measured relevance re-run + "
+            "the Phase P1 semantic reranker has landed (R456: semantic "
+            "relevance adjudication between query and record, replacing "
+            "lexical overlap — the criterion's first condition is MET); "
+            "flip to ACTIVE when a MEASURED relevance re-run of this "
+            "source passes (the rerun requires reachable egress — the "
+            "2026-09-15 sandbox probe could not reach api.osti.gov) + "
             "worklog entry"),
     },
 }
@@ -1780,6 +1792,21 @@ _register(_src(
     auth_requires=[],
 ))
 
+# R456 disclosed fix of the standing test_r399_routing_states red: the
+# explicit routing-state invariant requires every source to declare one;
+# zenodo was the sole source registered without a routing_state field.
+# Within the closed 3-state vocabulary the honest value is
+# ARCHIVED_ROUTING (NO_CONNECTOR + the measured 2026-09-05 egress 403
+# block = nothing routed; reinstatement when a connector is wired AND
+# the egress block clears).
+SOURCE_REGISTRY["zenodo"]["routing_state"] = "ARCHIVED_ROUTING"
+SOURCE_REGISTRY["zenodo"]["routing_basis"] = (
+    "measured 2026-09-05 egress: HTTP 403 network-side block "
+    "(3 attempts); NO_CONNECTOR — nothing routed")
+SOURCE_REGISTRY["zenodo"]["reinstatement_criterion"] = (
+    "a connector is wired AND the egress block clears (measured probe; "
+    "flip to ACTIVE + worklog entry)")
+
 _register(_src(
     source_id="ndltd",
     name="NDLTD Global ETD Search (theses/dissertations)",
@@ -1800,4 +1827,18 @@ _register(_src(
     connector=NO_CONNECTOR,
     auth_requires=[],
 ))
+
+# R456 (completes the zenodo fix): ndltd was the one remaining source
+# without an explicit routing_state (the test_r399_routing_states
+# invariant). Honest value: ARCHIVED_ROUTING (NO_CONNECTOR + the
+# measured 2026-09-05 egress 503; thesis coverage served by the
+# datacite/openaire/core/crossref lanes).
+SOURCE_REGISTRY["ndltd"]["routing_state"] = "ARCHIVED_ROUTING"
+SOURCE_REGISTRY["ndltd"]["routing_basis"] = (
+    "measured 2026-09-05 egress: HTTP 503 service unavailable "
+    "(2 attempts); NO_CONNECTOR — thesis coverage served by the "
+    "datacite/openaire/core/crossref lanes")
+SOURCE_REGISTRY["ndltd"]["reinstatement_criterion"] = (
+    "a connector is wired AND the egress serves records (measured "
+    "probe; flip to ACTIVE + worklog entry)")
 

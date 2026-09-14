@@ -689,3 +689,23 @@ test proves a blocked run re-runs RETRIEVE on a capable route). Re-pins
 disclosed in-place: r414 CIO/model_route and r443 model-route
 provenance pins re-expressed against the new contracts (Art. XXXI).
 Round record: `R455/R455_LEAN1_ROUND_RECORD.json` (the behavioral half; the deletion half's record: `R455/R455_ROUND_RECORD.json`).
+
+## R456-LEAN-2 addendum (2026-09-15) — the relevance gate becomes semantic, the integrity tree is scoped to its consumers, the image slims
+
+Operator directive (the R455-deferred items, executed as one round:
+the §N.1 epistemic_integrity determination, the §B.3 inventory merge,
+the §C.10/§J image slimming, "delete useless code and fix bottleneck").
+
+| Change | Module | Notes |
+|---|---|---|
+| THE BOTTLENECK: semantic relevance (Phase-P1) | `source_registry/semantic_relevance.py` + `evidence_fabric/__init__.py` + `source_registry/query_relevance.py` + `retrieval_fabric/pipeline.py` | the lexical TEXT_TERM_OVERLAP gate is retired (Art. LXIV): the R452 frozen assay measured it admitting 24 OpenFOAM prompt-template records as RELEVANT for four unrelated problems on generic terms `['problem','state']` — while the audit measured on-domain records rejected on morphology. The new deterministic instrument (IDF-weighted soft core coverage + directional trigram coverage + phrase bonus; floors 0.36/0.18 from the committed corpus, Art. XXVII) rejects 24/24 of those frozen records and admits the corpus's on-domain set; verdict vocabulary + custody semantics unchanged; STRUCTURED element-overlap mode unchanged. Found-defect disclosure: the lane-ranking relevance tier was dead code (read a key the lexical adjudicator never emitted). Experiment + thresholds: `R456/SEMANTIC_RELEVANCE_EXPERIMENT.json`, `RELEVANCE_CORPUS_R456.json` |
+| epistemic_integrity determination (§N.1, owner-gated — Art. LXV closed) | `epistemic_integrity/` | the package is scoped to its MEASURED-CONSUMER closure (AST, lazy imports included): the 6 CI-called modules + their import closure + bayesian_eig (the KILLER_EXPERIMENT canon) + the two test-consumed modules + their data files; 49 files / 16,472 LOC ARCHIVED_TO `archive/r456-lean/` with per-item reasons (the first pass over-archived 13 closure modules — caught by the straggler scan and restored before commit, Art. XV) |
+| Inventory merge (§B.3) | `MODULE_INVENTORY.json` | three zero-consumer root JSONs (530 KB) -> one 145 KB derived view (364 modules: runtime_status, graph_degree, dormancy); originals in `archive/r456-lean/inventory/` |
+| Image slimming (§C.10/§J) | `Dockerfile` + `.dockerignore` + `scripts/r456_deploy_excludes.py` | the 383 MB Blender build + 5 X11 libs OUT (legacy renderer = operator-opt-in via $BLENDER_PATH; explicit opt-in skips TYPED when the archived script is absent); ~521 MB of round/CI trees OUT of the image build context AND the Space upload (one canonical exclusion list imported by the deploy driver) |
+| Dead code | `toscanini/counsel.py`, `toscanini/identity_continuity.py` | ARCHIVED_TO with their pinning test classes (the retirement pins stay); registry routing hygiene: zenodo + ndltd declared (the standing test_r399 red fixed honestly) |
+
+Battery: `tests/test_r456_semantic_relevance.py` 12/12; the R455 battery
+14/14 unchanged; every touched suite at its recorded pristine baseline
+(failing sets byte-identical — the 12 pre-existing failures are the
+R455-disclosed BS-020 captured-fixture class). Round record:
+`R456/R456_LEAN2_ROUND_RECORD.json`.

@@ -94,10 +94,19 @@ def poisoned_env(tmp_path, monkeypatch):
     # ACTIVE boundary (Chromium/Node) carries the same allowlist
     # contract, adversarially covered in tests/test_r441_visual_compiler.py.
     monkeypatch.setenv("TOSCANINI_RENDER_BACKEND", "blender")
+    # R456: the legacy hero-render script is archived (R455-LEAN-1 §6;
+    # the image slimming removed Blender) — these tests' target is the
+    # ENV ALLOWLIST, so the script path is monkeypatched to the stub
+    # tree (the archived bytes are NOT re-wired into the live tree,
+    # Art. LXIV)
+    import discovery_fabric.engine.invention_bridge.render as _r
+    stub_script = tmp_path / "stub_render_script.py"
+    stub_script.write_text("# the env-dump stub stands in for the "
+                           "archived blender_render.py\n")
+    monkeypatch.setattr(_r, "RENDER_SCRIPT", str(stub_script))
     # isolate the MEMORY dimension: the boundary under adversarial test
     # is the env allowlist — a momentary dip in sandbox headroom must
     # not convert the scenario into a low-memory skip
-    import discovery_fabric.engine.invention_bridge.render as _r
     monkeypatch.setattr(_r, "_mem_available_mb", lambda: 4096)
     return {"stub": stub, "tmp": tmp_path}
 
@@ -197,3 +206,29 @@ class TestRendererEnvAllowlist:
         assert rec["status"] in ("OK", "RENDER_PARTIAL"), rec
         assert rec.get("blender_version_verified") == "Blender 5.2.1 LTS"
         assert (work / "MODEL" / "3D" / "hero.png").is_file()
+
+
+class TestLegacyRendererArchived:
+    """R456-LEAN-2: the image no longer ships Blender and the legacy
+    script is archived — an EXPLICIT legacy-backend selection with an
+    operator-supplied $BLENDER_PATH skips TYPED (never a raw subprocess
+    failure, never a silent substitute; Art. LXI)."""
+
+    def test_explicit_legacy_backend_skips_typed_without_script(
+            self, tmp_path, monkeypatch):
+        import discovery_fabric.engine.invention_bridge.render as _r
+        stub = _stub_blender(tmp_path)
+        monkeypatch.setenv("BLENDER_PATH", str(stub))
+        monkeypatch.setenv("TOSCANINI_RENDER_BACKEND", "blender")
+        monkeypatch.setattr(_r, "_mem_available_mb", lambda: 4096)
+        monkeypatch.setattr(_r, "RENDER_SCRIPT",
+                            str(tmp_path / "archived_blender_render.py"))
+        work = _make_work_dir(tmp_path)
+        rec = _r.render_invention(
+            str(work), {"generation_models": None}, is_conceptual=True,
+            memory_mode="async")
+        assert rec["status"] == "RENDER_SKIPPED_LEGACY_SCRIPT_ARCHIVED", rec
+        assert "archived" in rec["note"]
+        # the interactive GLB contract is unaffected — nothing rendered,
+        # nothing fabricated
+        assert rec.get("blender_exit_code") is None

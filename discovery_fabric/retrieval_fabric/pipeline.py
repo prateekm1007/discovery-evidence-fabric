@@ -52,7 +52,7 @@ from discovery_fabric.retrieval_fabric.query_expansion import (
 )
 from discovery_fabric.source_registry.base import SourceQueryResult
 from discovery_fabric.source_registry.query_relevance import (
-    adjudicate_record, keyword_form, record_text, terms,
+    adjudicate_record, keyword_form,
 )
 
 FABRIC_VERSION_STRING = f"V{FABRIC_VERSION}"
@@ -384,6 +384,14 @@ def retrieve_fabric(problem: Dict[str, Any],
     # ---- per-lane relevance ranking (deterministic, same instrument
     # the discovery pipeline uses; lanes ranked SEPARATELY so a highly
     # cited review cannot bury a relevant patent claim or dissertation)
+    # R456: the ranking score IS the Phase-P1 semantic relevance score
+    # (source_registry/semantic_relevance.py), computed against the
+    # lane's own pool for IDF. Found-defect disclosure (Art. XV): the
+    # previous ranking read adj.get("relevant"), a key the lexical
+    # adjudicator never emitted (it returned "relevance"), so the
+    # relevance tier was dead code — lanes ranked by raw overlap count
+    # only. The defect is unrepresentable here: the score is read from
+    # the field the instrument actually returns.
     lane_pools: Dict[str, List[CanonicalRecord]] = {}
     for rec in canonical_records:
         # blank-title records cannot serve synthesis or downstream
@@ -392,16 +400,16 @@ def retrieve_fabric(problem: Dict[str, Any],
         if not (rec.title or "").strip():
             continue
         lane_pools.setdefault(rec.evidence_lane, []).append(rec)
-    primary_terms = set(terms(primary))
     for lane, pool in lane_pools.items():
-        def _score(rec: CanonicalRecord) -> Tuple[int, int, int]:
+        lane_texts = [f"{r.title} {json.dumps(r.best_record.get('abstract') or '')}"
+                      for r in pool]
+
+        def _score(rec: CanonicalRecord) -> Tuple[float, int]:
             adj = adjudicate_record(
                 {"title": rec.title,
                  "normalized": rec.best_record,
                  "query": rec.queries_by_source.get(rec.origin_source, "")},
-                primary)
-            overlap = len(primary_terms & set(terms(record_text(
-                {"title": rec.title, "normalized": rec.best_record}))))
+                primary, pool_texts=lane_texts)
             # synthesis-compatibility ordering (disclosed): records with
             # an abstract (mechanism-bearing text) rank above metadata-only
             # records within the same relevance tier — SYNTHESIZE consumes
@@ -409,9 +417,8 @@ def retrieve_fabric(problem: Dict[str, Any],
             abstract_len = len((rec.best_record.get("abstract") or ""))
             has_text = 1 if abstract_len >= 50 or \
                 rec.best_record.get("claim_text_available") else 0
-            return (1 if adj.get("relevant") else 0, overlap, has_text)
+            return (adj["relevance_score"], has_text)
         pool.sort(key=lambda rec: (_score(rec)[0], _score(rec)[1],
-                                   _score(rec)[2],
                                    -len((rec.best_record.get("abstract") or ""))),
                   reverse=True)
 
@@ -429,6 +436,11 @@ def retrieve_fabric(problem: Dict[str, Any],
     fabric_report = {
         "fabric_version": FABRIC_VERSION_STRING,
         "fabric_name": "RETRIEVAL_FABRIC_V2",
+        "relevance_method": (
+            "SEMANTIC_RELEVANCE_V1 (Phase-P1: deterministic IDF-weighted "
+            "soft core coverage + directional trigram coverage + phrase "
+            "bonus; corpus-declared bands; per-record basis recorded in "
+            "the canonical records' relevance fields)"),
         "retrieved_at": started_at,
         "completed_at": utc_now(),
         "problem": {"device": problem.get("device", ""),

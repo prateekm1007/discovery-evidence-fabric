@@ -30,35 +30,23 @@ FROM python:3.12-slim
 # libGL/libGLU/X11: cadquery/OCP native geometry (the interactive 3D
 # rebuild path) — python:3.12-slim lacks them; discovered by the R392
 # live failure matrix (BUILD_ERROR libGL.so.1 on /api/showcase/*/evaluate)
-# libXi/libXfixes/libICE/libSM/libxkbcommon: Blender headless links
-# (R419 fixed 3D stack — the render stage's subprocess).
 #
-# THE R419 BUILD-FAILED ROOT CAUSE CHAIN (fully evidenced, R419d/R419e):
-# python:3.12-slim is Debian TRIXIE in 2026, and trixie RENAMED the
-# libXfixes binary package: bookworm's libxfixes6 does not exist; the
-# trixie package is libxfixes3 (same libXfixes.so.3 the blender binary
-# links). 'E: Unable to locate package libxfixes6' -> apt exit 100 ->
-# every R419-family build died in ~17-19s BEFORE the Blender layer ever
-# ran. Separately, libxkbcommon0 is a REAL latent dependency: the blender
-# binary links libxkbcommon.so.0 DIRECTLY (dt_needed), it is not bundled
-# in the tarball's lib/ (37 of the 62 needed libs are), and nothing else
-# pulls it — without it the version check would have failed after the
-# apt fix. Both verified: trixie Packages index (deb.debian.org) for the
-# rename; ldd over the pinned 5.2.1 tarball for the link closure.
-#
-# R420: the temporary external build-diagnostics (webhook.site step
-# posts, R419d) are REMOVED from the production Dockerfile — their
-# purpose (identifying the failing step) was served and the root cause
-# is documented above. Build observability now rests on the repository
-# itself: this comment chain, the R419d-5/R419e commit trail, and the
-# runtime /api/ops/worker-log + /api/ops/artifact-log routes. The
-# canonical production image must not carry outbound diagnostic
-# callbacks (operator R420 §6).
+# R456-LEAN-2 (image slimming): the Blender build (the R419 pinned 5.2.1
+# tarball, 383 MB per build) and its five X11 link libraries
+# (libxi6 libxfixes3 libsm6 libice6 libxkbcommon0) are REMOVED from the
+# image. Disposition (Art. LXIV): the hero-render Blender path was
+# superseded by the R441 Visual Compiler and its last live role (USD/DAE
+# format conversion) never shipped; the legacy renderer stays an
+# EXPLICIT operator opt-in — render.find_blender() resolves $BLENDER_PATH
+# when the operator supplies an external install, and typed-skips
+# (RENDER_SKIPPED_NO_BLENDER, fail-closed, never silent) when none is
+# present. The R419 build-failure root cause (the trixie libxfixes6
+# rename) died with the dependency; the history remains in this file's
+# git record and the R419d/e commit trail.
 RUN set -ux; \
     if apt-get update >/tmp/aptu.log 2>&1 && apt-get install -y --no-install-recommends \
       git ca-certificates curl xz-utils \
       libgl1 libglu1-mesa libxext6 libx11-6 libxrender1 \
-      libxi6 libxfixes3 libsm6 libice6 libxkbcommon0 \
     >/tmp/apti.log 2>&1 \
     && rm -rf /var/lib/apt/lists/*; then \
       :; \
@@ -69,60 +57,9 @@ RUN set -ux; \
       exit 1; \
     fi
 
-# ---------- R419: the pinned Blender build (fixed 3D stack) ----------
-# Operator directive: Blender 5.2 LTS is the pinned render authority.
-# The tarball sha256 is VERIFIED at build time from WHICHEVER source
-# supplied the bytes — a changed upstream artifact FAILS the build
-# (fail-closed pin, same discipline as the engine commit). /opt/blender
-# is the canonical install location the render stage resolves
-# (render.find_blender(); R420: the render stage additionally verifies
-# the binary reports EXACTLY 'Blender 5.2.1 LTS' before every use —
-# version mismatches are typed honest skips, never silent
-# substitutions).
-#
-# Acquisition is a multi-source ladder (download.blender.org is
-# Cloudflare-fronted; the mirrors are the Blender project's own
-# published mirror list) — the R419/R419b/R419c build failures were
-# root-caused to the trixie apt rename above (R419e); the ladder keeps
-# acquisition robust against a single mirror outage.
-#
-# R451-C1.3 acquisition hardening (the second C1.3 deploy's measured
-# BUILD_ERROR): the primary source delivered 357/383 MB at ~740 KB/s
-# and was killed by the 480 s cap; every mirror retry then RESTARTED
-# from zero bytes and the ladder exhausted itself. Three transport-side
-# fixes: (1) --max-time 1200 — a slow-but-alive source at 740 KB/s
-# needs ~530 s for the whole tarball; (2) -C - resume — a timed-out
-# attempt's partial bytes carry FORWARD, so progress accumulates across
-# tries and sources instead of restarting; (3) --speed-time 60
-# --speed-limit 20480 — a genuinely dead source (<20 KB/s for 60 s)
-# fails fast instead of burning the full budget. A fifth mirror joins
-# the ladder. The sha256 gate remains the SOLE success authority (the
-# tarball is byte-identical whichever source supplied the tail; the
-# fail-closed pin discipline is unchanged).
-ARG BLENDER_VERSION=5.2.1
-ARG BLENDER_RELEASE_PATH=5.2
-ARG BLENDER_TARBALL_SHA256=a31f524fa99a527d3d52b7f5aaa68c34e1a19d5a1c9473f79c5cc610fd5b10e9
-RUN set -ux; \
-    rm -f /tmp/blender.tar.xz; \
-    for _src in \
-      "https://download.blender.org/release/Blender${BLENDER_RELEASE_PATH}/blender-${BLENDER_VERSION}-linux-x64.tar.xz" \
-      "https://mirrors.dotsrc.org/blender/release/Blender${BLENDER_RELEASE_PATH}/blender-${BLENDER_VERSION}-linux-x64.tar.xz" \
-      "https://ftp.nluug.nl/pub/graphics/blender/release/Blender${BLENDER_RELEASE_PATH}/blender-${BLENDER_VERSION}-linux-x64.tar.xz" \
-      "https://mirror.clarkson.edu/blender/release/Blender${BLENDER_RELEASE_PATH}/blender-${BLENDER_VERSION}-linux-x64.tar.xz" \
-      "https://ftp.gwdg.de/pub/graphics/blender/release/Blender${BLENDER_RELEASE_PATH}/blender-${BLENDER_VERSION}-linux-x64.tar.xz"; do \
-      for _try in 1 2 3; do \
-        if curl -fsSL -C - --max-time 1200 --speed-time 60 --speed-limit 20480 -o /tmp/blender.tar.xz "$_src"; then \
-          break 2; \
-        fi; \
-        ls -l /tmp/blender.tar.xz 2>/dev/null || true; \
-      done; \
-    done; \
-    echo "${BLENDER_TARBALL_SHA256}  /tmp/blender.tar.xz" | sha256sum -c - || { echo "blender tarball: all sources failed" >&2; exit 1; }; \
-    mkdir -p /opt && tar -xJf /tmp/blender.tar.xz -C /opt || exit 1; \
-    mv "/opt/blender-${BLENDER_VERSION}-linux-x64" /opt/blender; \
-    rm /tmp/blender.tar.xz; \
-    /opt/blender/blender --version | head -n1 || exit 1
-ENV BLENDER_PATH=/opt/blender/blender
+# (R456: the R419 Blender download block is retired — see the apt block
+# comment above. /opt/blender no longer exists in this image; the legacy
+# render path is operator-opt-in via $BLENDER_PATH only.)
 
 WORKDIR /app
 

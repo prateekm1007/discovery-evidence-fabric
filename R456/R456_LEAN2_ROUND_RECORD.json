@@ -1,0 +1,74 @@
+{
+  "round": "R456-LEAN-2",
+  "date": "2026-09-15",
+  "directive": "Operator: 'the epistemic_integrity/ determination (§N.1, owner-gated), the module-inventory merge, and image slimming (456 MB of round trees + the 383 MB Blender tarball). Delete useless code and fix bottleneck.' — the deferred R455 items, executed as one round",
+  "reviewer_provenance": "AI_REVIEW",
+  "baseline_identity": {
+    "head_at_round_start": "6cbc3afeae02028cb5947667a7e048cabe26df6d",
+    "ls_remote_main": "6cbc3afeae02028cb5947667a7e048cabe26df6d",
+    "checkout_state": "CURRENT (PAT-fetched; local ff-pulled to origin/main before any edit)",
+    "constitution_version": "2.4.0",
+    "constitution_sha256": "b54a1be9bcbdd2465d0b034e1e1f472f80b87174209c0d534b7d9e1223e649b2",
+    "constitution_read_in_full": {"round_start": true, "before_final_commit": true},
+    "governance_read": ["GOVERNANCE/README.md", "GOVERNANCE/AUDITOR_SELF_GOVERNANCE_v1.md", "GOVERNANCE/AUDITOR_BLINDSPOT_REGISTER.md", "GOVERNANCE/AUDITOR_REMEMBERED_STATE.md", "GOVERNANCE/AUDIT_LOOP_PROTOCOL_v1.md", "ACTIVE_PATH.md", "worklog.md (R455 entries)", "R455/R455_ROUND_RECORD.json", "R455/R455_LEAN1_ROUND_RECORD.json", "the EXT-AUDIT-LEAN-R454 report (operator-uploaded)"]
+  },
+  "work_items": {
+    "1_bottleneck_semantic_relevance": {
+      "what": "the Phase-P1 semantic relevance instrument landed (the audit's measured bottleneck: 'the machine currently rejects 12 of 12 evidence records with a keyword-overlap test')",
+      "module": "discovery_fabric/source_registry/semantic_relevance.py (SEMANTIC_RELEVANCE_V1; stdlib-only, deterministic, zero network)",
+      "instrument": "IDF-weighted soft coverage of the query's informative core (MASS_TOP_K=8) + directional query-side char-trigram coverage + capped phrase bonus; declared floors 0.36/0.18 (ENGINEERING class, corpus-derived, Art. XXVII)",
+      "corpus": "discovery_fabric/source_registry/RELEVANCE_CORPUS_R456.json — 19 cases, labels authored from problem facts BEFORE the scorer ran (Art. VIII); two hard-paraphrase positives carry disclosed expected_any_of gray-zone pins (never-REJECTED recall floor); two calibration label revisions disclosed in-place (Art. XXXI)",
+      "experiment": "R456/SEMANTIC_RELEVANCE_EXPERIMENT.json — phase 1 (dev corpus, calibration allowed here only): 19/19 verdicts + metamorphic contract PASS both pairs (one band step, no REJECTED<->RELEVANT flip); phase 2 (held-out, never tuned): the REAL frozen R452 assay records — 24/24 lexical-branch boilerplate records REJECTED (the lexical gate had admitted all 24 on shared generic terms ['problem','state'] / ['deep','model','problem','state'] across four unrelated problems)",
+      "integration": ["evidence_fabric/adjudicate_relevance: TEXT mode -> SEMANTIC_RELEVANCE (STRUCTURED element-overlap mode UNCHANGED; verdict vocabulary + custody semantics unchanged)", "query_relevance/adjudicate_record: the decision core is the shared instrument (battery bands unchanged; WEAK maps to IRRELEVANT_FILTERED with score+band recorded — Art. XXV)", "retrieval_fabric/pipeline lane ranking: ordered by the instrument score; fabric_report carries relevance_method"],
+      "found_defects_disclosed": [
+        "the lane-ranking relevance tier read adj.get('relevant') — a key the lexical adjudicator never emitted ('relevance') — so the tier was dead code; lanes ranked by raw overlap count only (Art. XV; fixed by construction: the score is read from the field the instrument returns)",
+        "the DOE-OSTI suspension's own reinstatement criterion is now MET in its first condition (the reranker landed) — the criterion text records the landed instrument; the FLIP to ACTIVE still requires the criterion's measured relevance re-run: the sandbox egress could not reach api.osti.gov (measured ConnectionError 2026-09-15) — suspension stands (Art. XXV: a blocked measurement is never graded)"
+      ],
+      "tests": "tests/test_r456_semantic_relevance.py 12/12 (corpus held, gray-zone pins, metamorphic contract, determinism byte-identical, totality on empty/tiny inputs, threshold provenance, custody states through the real promotion path, the frozen R452 boilerplate rejects, the generic-token padding gaming attack REJECTED, registry integration)"
+    },
+    "2_epistemic_integrity_determination": {
+      "what": "the owner-gated §N.1 determination EXECUTED (Art. LXV closure): the package is scoped to its measured-consumer closure; everything else archived",
+      "method": "AST import closure (module-level AND lazy/indented imports) from the 6 CI-called modules + the engine's path-loaded bayesian_eig + the two test-consumed modules; resolved against live AND archive locations",
+      "kept_because": "CI-called set (epistemic_certification.yml): post_scrub_evidence_revalidation, historical_artifact_audit, credential_audit_split, attestation_binding, research_authorization_gate, post_scrub_certification_capsule; closure: path_utils, version_manifest, epistemic_preflight, credential_fingerprints, claim_registry, evidence_binding, supersession_engine, evidence_classes, dossier_firewall, proposition_verifier, evidence_span_verifier, entity_registry, slot_territory_derivation, detached_certification_runner + independent_certification_corpus.json (data); test-consumed: state_transition_ledger (r412_g5), constitution_loader (r419_english_only + pre-commit hook); engine-consumed: invention_loop_engine/bayesian_eig.py (KILLER_EXPERIMENT canon, stdlib-only, path-loaded); data: credential_false_positive_registry.json, real_production_certification_corpus.json, approved_*/",
+      "archived": "49 files / 16,472 LOC -> archive/r456-lean/ (invention_loop_engine's other 27 files incl. the four slot adapters + engine harness + live_replay captures; the pre-R396 corpus builders, populate_*, hash/semantic/proposition verifiers outside the closure, append_only_binding_registry, evidence_identity_adapter consumers of nothing, patent_coverage_contract, state_reconciliation, 7 stale per-run report JSONs, reproducibility_capsules/)",
+      "self_correction": "the FIRST archive pass used a top-of-file import scan and over-archived 13 closure modules — the full AST lazy-import scan caught them BEFORE commit and they were RESTORED (Art. XV disclosure; the straggler scan is now 0 hits, re-run twice)",
+      "package_docstrings": "epistemic_integrity/__init__ + invention_loop_engine/__init__ rewritten to the honest post-determination state"
+    },
+    "3_module_inventory_merge": {
+      "what": "the audit's §B.3 item: three zero-consumer root JSONs (530 KB) -> ONE MODULE_INVENTORY.json (145 KB, 364 modules: runtime_status + entry_point + graph_degree + dormant_status/scores per module)",
+      "sources": ["RUNTIME_MODULE_PARTICIPATION_AUDIT.json (already archived by R455)", "DISCOVERY_RUNTIME_GRAPH.json -> archive/r456-lean/inventory/", "DORMANT_HIGH_VALUE_MODULES.json -> archive/r456-lean/inventory/"],
+      "supersession": "the merged file is a DERIVED view; the full bytes stay in the archive (Art. X/XI); the merge script is scripts/r456_inventory_merge.py (idempotent)"
+    },
+    "4_image_slimming": {
+      "blender_removed": "the R419 pinned 5.2.1 tarball download (383 MB per build) + its five X11 link libs (libxi6 libxfixes3 libsm6 libice6 libxkbcommon0) are OUT of the canonical Dockerfile; the OCP geometry set (libgl1 libglu1-mesa libxext6 libx11-6 libxrender1) stays; the legacy renderer is operator-opt-in via $BLENDER_PATH only — an explicit opt-in with the script archived skips TYPED (RENDER_SKIPPED_LEGACY_SCRIPT_ARCHIVED, new member of the typed-skip family, tested)",
+      "adapter_anchors": "r447_hf_deploy apt anchor + r451_c13 wire anchor re-pointed off the retired Blender lines (both adapter builds verified: no Blender acquisition, GGUF sha-pin intact, chromium present)",
+      "dockerignore": "the R-digit round-tree rule (R[0-9][0-9][0-9]*) + patentability + archive + visual-lab + CI-instrument trees — ~521 MB of tracked bytes leave the image build context",
+      "deploy_upload_exclusion": "scripts/r456_deploy_excludes.py — the ONE canonical exclusion list (round trees R452/R451/R450/R449/R445/R444/R412/R411/R401*, tests, experiments, tournament_v3, visual-lab, .github, archive, superseded evidence snapshots); r451_c13_deploy imports it verbatim and reports the excluded MB per deploy"
+    },
+    "5_dead_code": {
+      "counsel.py": "ARCHIVED_TO archive/r456-lean/ (route retired R423A; server returns the typed retired answer without the module; zero importers) — TestCounselPackage moved with it; the retirement pin (test_counsel_download_route) kept",
+      "identity_continuity.py": "ARCHIVED_TO archive/r456-lean/ (zero production/script importers) — TestIdentityContinuity moved with it",
+      "registry_routing_hygiene": "the standing test_r399_routing_states red FIXED with honest declarations: zenodo + ndltd (the two NO_CONNECTOR sources) declared ARCHIVED_ROUTING with their measured egress evidence and reinstatement criteria — 10/10 green"
+    }
+  },
+  "verification": {
+    "battery": "the focused suites on the staged tree: r456 12/12, r455 14/14, r419_english 4/4, r399_routing_states 10/10 (incl. the standing red fixed), r399_gates 6/6, r396 31/31, r397 17/17, r423 allowlist 5+1 (the archived-script guard typed-skip test added), r414 6 failed == pristine 6 failed (byte-identical sets; delta = the archived class), r436 11 failed == pristine 11 failed (byte-identical sets), r401/r387/r412_g5/r412_fpc: 4 failed == pristine 4 failed",
+    "straggler_scan": "0 live-tree files import any archived module (AST, dotted-path resolution, lazy imports included; re-run after each restore pass)",
+    "production_closure": "entrypoint imports verified via the adapter builds; the R455 measured closure (168 files) untouched by every archive"
+  },
+  "explicitly_deferred": [
+    "the doe_osti ACTIVE flip (awaiting the measured relevance re-run from a network-capable environment)",
+    "the repo-level round-evidence branch split (§O.6: R452 et al. stay on main; 6 replay tests read them; the IMAGE and the Space upload no longer carry them — the transport-level goal is met without rewriting evidence custody)",
+    "the 12 pre-existing test failures (byte-identical to the R455-recorded sets; BS-020 captured-fixture class)"
+  ],
+  "production_deployment": {
+    "target_sha": "PENDING_DEPLOY",
+    "deployed_sha": null,
+    "deploy_id": null,
+    "health_check_result": null,
+    "drift": null,
+    "blocked_by": null,
+    "what_unblocks": null
+  },
+  "delivery_note": "the deployment tuple is finalized in-place after the push + Space deploy + /api/version + /api/health verification (nothing pre-filled, Art. VI); the operator ALSO supplied the frontier transport tokens mid-round — the provider registration is the NEXT commit on this branch (R457-OPERATOR-TRANSPORT) so this round's record stays scope-coherent"
+}

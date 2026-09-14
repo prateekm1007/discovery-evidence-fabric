@@ -1,0 +1,267 @@
+{
+  "corpus_id": "RELEVANCE_CORPUS_R456",
+  "version": "1.0.0",
+  "purpose": "Development corpus for the Phase-P1 semantic relevance instrument (discovery_fabric/source_registry/semantic_relevance.py). Threshold calibration happens HERE and nowhere else (Art. LIX: dev-set tuning; the frozen R452 assay records are held out and reported as the experiment result, never tuned on).",
+  "authoring_rule": "Labels were authored from the PROBLEM FACTS (device, failure mode, constraint, user_text) versus the record's actual content domain \u2014 a human-adjudicable mismatch/match decision \u2014 BEFORE the scorer was run against this file (Art. VIII: the corpus is not generated from the verifier's own behavior). The four REAL_FROZEN_TEMPLATE cases cite the committed R452 evidence files they were extracted from; the authored cases are synthetic realistic records whose domain was fixed by the case's problem facts at authoring time.",
+  "frozen_at": "2026-09-14",
+  "query_construction": "The experiment and tests build the query text exactly as the evidence gate does: device + failure + user_text, joined with '. ' (the adjudicate_relevance caller's problem-text rule).",
+  "band_rule": "expected is the evidence-fabric verdict vocabulary: RELEVANT (must admit), WEAK_RELEVANCE (custody, never admitted), REJECTED (blocked).",
+  "cases": [
+    {
+      "case_id": "REAL_FROZEN_TEMPLATE_VS_IRRIGATION",
+      "kind": "REAL_FROZEN_TEMPLATE",
+      "problem_ref": "R452/ASSAY_RUN_A (r452a-surgical-irrigation-pressure-instability)",
+      "problem": {
+        "device": "ambulatory surgery center arthroscopic irrigation system",
+        "failure": "peristaltic dual-bag irrigation inflow/outflow pressure instability during arthroscopic shoulder and knee cases",
+        "user_text": "An ambulatory surgery center runs arthroscopic shoulder and knee cases on a peristaltic dual-bag irrigation system: inflow pressure sags when the shaver aspirates, then surges, destabilizing cavity distension."
+      },
+      "record_text": "<|im_start|>system\nYou are an expert OpenFOAM CFD engineer with deep knowledge of computational fluid dynamics, turbulence modelling, mesh generation, and numerical methods. When given a simulation request you:\n\n1. Analyse the flow physics: geometry, Reynolds number, flow regime, compressibility,\n2. Select the solver and discretization schemes for the problem state,\n3. Generate the blockMesh/snappyHexMesh dictionary for the case,\n4. Set the boundary conditions, relaxation factors and runtime controls,\n5. Post-process the fields and report the residuals.\n<|im_end|>",
+      "expected": "REJECTED",
+      "label_basis": "the span is an LLM prompt template (chat markers, instruction boilerplate). It shares only generic vocabulary with the problem (the frozen lexical gate admitted it on shared terms ['problem','state'] \u2014 the measured false-positive class). No CFD-template content bears on arthroscopic irrigation. Label authored from the problem facts; provenance: R452/ASSAY_RUN_A/EVIDENCE_FABRIC_REPORT.json ev:c9b96305dd8fe6f2dd2dd05d (and the 23 identical-template records across the four R452 assay runs)."
+    },
+    {
+      "case_id": "REAL_FROZEN_TEMPLATE_VS_GEARBOX",
+      "kind": "REAL_FROZEN_TEMPLATE",
+      "problem_ref": "R452/ASSAY_RUN_B (r452b-gearbox-coldstart-pinion-starvation)",
+      "problem": {
+        "device": "wind farm 3-megawatt turbine three-stage planetary gearbox",
+        "failure": "lubrication starvation at cold start scoring the planet-stage pinion bearings",
+        "user_text": "A wind farm's 3-megawatt turbines use three-stage planetary gearboxes whose lubrication system feeds ISO VG 320 synthetic oil; at cold starts below -20 C the oil starves the planet-stage pinion bearings and scores them."
+      },
+      "record_text": "<|im_start|>system\nYou are an expert OpenFOAM CFD engineer with deep knowledge of computational fluid dynamics, turbulence modelling, mesh generation, and numerical methods. When given a simulation request you:\n\n1. Analyse the flow physics: geometry, Reynolds number, flow regime, compressibility,\n2. Select the solver and discretization schemes for the problem state,\n3. Generate the blockMesh/snappyHexMesh dictionary for the case,\n4. Set the boundary conditions, relaxation factors and runtime controls,\n5. Post-process the fields and report the residuals.\n<|im_end|>",
+      "expected": "REJECTED",
+      "label_basis": "same prompt-template span; no content bearing on gearbox lubrication. Provenance: R452/ASSAY_RUN_B/EVIDENCE_FABRIC_REPORT.json ev:038c5d02f7fd6698b (the frozen gate admitted it on ['problem','state'])."
+    },
+    {
+      "case_id": "REAL_FROZEN_TEMPLATE_VS_SIC_INVERTER",
+      "kind": "REAL_FROZEN_TEMPLATE",
+      "problem_ref": "R452/ASSAY_RUN_C (r452c-sic-module-dieattach-delamination)",
+      "problem": {
+        "device": "800-volt silicon-carbide traction-inverter power modules",
+        "failure": "die-attach delamination under junction-temperature cycling",
+        "user_text": "An automotive supplier builds 800-volt silicon-carbide traction-inverter power modules whose junction temperature cycles crack the die-attach layer (delamination), raising thermal resistance until the module derates."
+      },
+      "record_text": "<|im_start|>system\nYou are an expert OpenFOAM CFD engineer with deep knowledge of computational fluid dynamics, turbulence modelling, mesh generation, and numerical methods. When given a simulation request you:\n\n1. Analyse the flow physics: geometry, Reynolds number, flow regime, compressibility,\n2. Select the solver and discretization schemes for the problem state,\n3. Generate the blockMesh/snappyHexMesh dictionary for the case,\n4. Set the boundary conditions, relaxation factors and runtime controls,\n5. Post-process the fields and report the residuals.\n<|im_end|>",
+      "expected": "REJECTED",
+      "label_basis": "same prompt-template span; no content bearing on power-module die-attach. Provenance: R452/ASSAY_RUN_C/EVIDENCE_FABRIC_REPORT.json ev:211404b68e5ffdfc9 (the frozen gate admitted it on ['deep','model','problem','state'])."
+    },
+    {
+      "case_id": "AUTHORED_POS_IRRIGATION_DISTENSION",
+      "kind": "AUTHORED_POSITIVE",
+      "problem_ref": "r452a-surgical-irrigation-pressure-instability",
+      "problem": {
+        "device": "ambulatory surgery center arthroscopic irrigation system",
+        "failure": "peristaltic dual-bag irrigation inflow/outflow pressure instability during arthroscopic shoulder and knee cases",
+        "user_text": "An ambulatory surgery center runs arthroscopic shoulder and knee cases on a peristaltic dual-bag irrigation system: inflow pressure sags when the shaver aspirates, then surges, destabilizing cavity distension."
+      },
+      "record_text": "Fluid management in arthroscopy: maintaining constant intra-articular distension during shaver aspiration. A closed-loop inflow regulator compensated for aspirator-induced pressure sag in dual-bag arthroscopic fluid systems; joint distension stability improved across 40 shoulder procedures, with measured pump pressure transients reduced from 41 mmHg to 9 mmHg.",
+      "expected": "RELEVANT",
+      "label_basis": "on-domain: arthroscopic irrigation pressure stability is exactly the case's failure mode (device + failure share the domain: arthroscopic, irrigation, pressure, distension, shaver, pump)."
+    },
+    {
+      "case_id": "AUTHORED_POS_IRRIGATION_MORPHOLOGY_VARIANT",
+      "kind": "AUTHORED_POSITIVE",
+      "problem_ref": "r452a-surgical-irrigation-pressure-instability",
+      "problem": {
+        "device": "ambulatory surgery center arthroscopic irrigation system",
+        "failure": "peristaltic dual-bag irrigation inflow/outflow pressure instability during arthroscopic shoulder and knee cases",
+        "user_text": "An ambulatory surgery center runs arthroscopic shoulder and knee cases on a peristaltic dual-bag irrigation system: inflow pressure sags when the shaver aspirates, then surges, destabilizing cavity distension."
+      },
+      "record_text": "Peristaltic pumps for surgical fluid delivery: tubing-elasticity effects on delivered-pressure ripple. We characterize how roller-compression pump tubing compliance produces suction-coupled pressure oscillations and evaluate an accumulator that damps fluid-pressure surges in endoscopic irrigation setups.",
+      "expected": "RELEVANT",
+      "label_basis": "on-domain with morphological variance (peristaltic/pumps, pressure/oscillations, tubing) \u2014 the recall class the lexical gate rejected as 'no shared domain terms' when morphology diverged. GRAY-ZONE PIN (disclosed): expected_any_of pins the recall floor \u2014 never REJECTED.",
+      "expected_any_of": [
+        "RELEVANT",
+        "WEAK_RELEVANCE"
+      ]
+    },
+    {
+      "case_id": "AUTHORED_POS_GEARBOX_COLDSTART_LUBRICATION",
+      "kind": "AUTHORED_POSITIVE",
+      "problem_ref": "r452b-gearbox-coldstart-pinion-starvation",
+      "problem": {
+        "device": "wind farm 3-megawatt turbine three-stage planetary gearbox",
+        "failure": "lubrication starvation at cold start scoring the planet-stage pinion bearings",
+        "user_text": "A wind farm's 3-megawatt turbines use three-stage planetary gearboxes whose lubrication system feeds ISO VG 320 synthetic oil; at cold starts below -20 C the oil starves the planet-stage pinion bearings and scores them."
+      },
+      "record_text": "Cold-start lubricant supply in wind turbine gearboxes: pre-heating the oil circuit versus a grease-reservoir backup at the planet bearing. Starvation-induced scuffing of planetary pinion bearings below -20 C was reproduced on a test rig; a heated lube manifold restored oil film formation within 90 seconds of start.",
+      "expected": "RELEVANT",
+      "label_basis": "on-domain: wind-turbine gearbox, planetary pinion bearing, cold-start lubrication starvation \u2014 the exact failure mode."
+    },
+    {
+      "case_id": "AUTHORED_POS_GEARBOX_CHURNING_MORPHOLOGY",
+      "kind": "AUTHORED_POSITIVE",
+      "problem_ref": "r452b-gearbox-coldstart-pinion-starvation",
+      "problem": {
+        "device": "wind farm 3-megawatt turbine three-stage planetary gearbox",
+        "failure": "lubrication starvation at cold start scoring the planet-stage pinion bearings",
+        "user_text": "A wind farm's 3-megawatt turbines use three-stage planetary gearboxes whose lubrication system feeds ISO VG 320 synthetic oil; at cold starts below -20 C the oil starves the planet-stage pinion bearings and scores them."
+      },
+      "record_text": "Oil churning losses and aeration in multistage planetary gear trains at low ambient temperature: viscous drag on the sun and planet gears delays jet lubrication reaching the bearing cages, a known contributor to start-up scuffing in megawatt-class turbine drivetrains.",
+      "expected": "RELEVANT",
+      "label_basis": "on-domain with vocabulary variance (gear trains/gearbox, jet lubrication/lubrication system, start-up scuffing/scoring)."
+    },
+    {
+      "case_id": "AUTHORED_POS_SIC_DIEATTACH_DELAMINATION",
+      "kind": "AUTHORED_POSITIVE",
+      "problem_ref": "r452c-sic-module-dieattach-delamination",
+      "problem": {
+        "device": "800-volt silicon-carbide traction-inverter power modules",
+        "failure": "die-attach delamination under junction-temperature cycling",
+        "user_text": "An automotive supplier builds 800-volt silicon-carbide traction-inverter power modules whose junction temperature cycles crack the die-attach layer (delamination), raising thermal resistance until the module derates."
+      },
+      "record_text": "Pressure-assisted sintered-silver die attach for silicon-carbide power devices: thermal-cycling endurance versus conventional solder. Delamination onset shifted from 3,200 to 18,000 power cycles in SiC MOSFET modules; the sintered layer's higher melting point suppresses the thermo-mechanical crack growth that raises junction thermal resistance.",
+      "expected": "RELEVANT",
+      "label_basis": "on-domain: SiC power module die-attach delamination under temperature cycling \u2014 the exact failure mode."
+    },
+    {
+      "case_id": "AUTHORED_POS_SIC_DEBONDING_MORPHOLOGY",
+      "kind": "AUTHORED_POSITIVE",
+      "problem_ref": "r452c-sic-module-dieattach-delamination",
+      "problem": {
+        "device": "800-volt silicon-carbide traction-inverter power modules",
+        "failure": "die-attach delamination under junction-temperature cycling",
+        "user_text": "An automotive supplier builds 800-volt silicon-carbide traction-inverter power modules whose junction temperature cycles crack the die-attach layer (delamination), raising thermal resistance until the module derates."
+      },
+      "record_text": "Debonding growth in double-side cooled power semiconductor assemblies: cohesive fatigue of the die-attach layer under active power cycling, tracked by transient thermal-resistance imaging; embrittlement of the interconnect accelerates crack propagation in traction applications.",
+      "expected": "RELEVANT",
+      "label_basis": "on-domain with morphology variance (debonding/delamination, die-attach layer shared, power cycling/temperature cycling)."
+    },
+    {
+      "case_id": "AUTHORED_NEG_TIRE_PRESSURE_COLLISION",
+      "kind": "AUTHORED_HARD_NEGATIVE",
+      "problem_ref": "r452a-surgical-irrigation-pressure-instability",
+      "problem": {
+        "device": "ambulatory surgery center arthroscopic irrigation system",
+        "failure": "peristaltic dual-bag irrigation inflow/outflow pressure instability during arthroscopic shoulder and knee cases",
+        "user_text": "An ambulatory surgery center runs arthroscopic shoulder and knee cases on a peristaltic dual-bag irrigation system: inflow pressure sags when the shaver aspirates, then surges, destabilizing cavity distension."
+      },
+      "record_text": "Tire pressure monitoring systems: valve-stem leakage and temperature-driven gauge-pressure drift in passenger-vehicle tires. A wheel-mounted sensor reports cold-start pressure transients; under-inflation thresholds and driver alert logic are evaluated across fleet trials.",
+      "expected": "REJECTED",
+      "label_basis": "off-domain surface collision: shares the word 'pressure' (and cold-start flavor) with the irrigation problem, but the content domain (vehicle tires) bears nothing on arthroscopic fluid management. The lexical gate's single-rare-word rule risked admitting exactly this class."
+    },
+    {
+      "case_id": "AUTHORED_NEG_ML_PAPER_VS_GEARBOX",
+      "kind": "AUTHORED_HARD_NEGATIVE",
+      "problem_ref": "r452b-gearbox-coldstart-pinion-starvation",
+      "problem": {
+        "device": "wind farm 3-megawatt turbine three-stage planetary gearbox",
+        "failure": "lubrication starvation at cold start scoring the planet-stage pinion bearings",
+        "user_text": "A wind farm's 3-megawatt turbines use three-stage planetary gearboxes whose lubrication system feeds ISO VG 320 synthetic oil; at cold starts below -20 C the oil starves the planet-stage pinion bearings and scores them."
+      },
+      "record_text": "Deep models for remaining-useful-life estimation: a benchmark of recurrent networks and gradient-boosted baselines on public degradation datasets. We compare state trajectories under transfer learning and report scoring rules for model selection across domains.",
+      "expected": "REJECTED",
+      "label_basis": "the generic-vocabulary collision class measured on the frozen records: shares 'deep', 'model(s)', 'state(s)', 'scoring', 'domains' with the problem+template pool, but the content (ML benchmarking) bears nothing on gearbox lubrication."
+    },
+    {
+      "case_id": "AUTHORED_NEG_POOL_CHEMISTRY_VS_GEARBOX",
+      "kind": "AUTHORED_HARD_NEGATIVE",
+      "problem_ref": "r452b-gearbox-coldstart-pinion-starvation",
+      "problem": {
+        "device": "wind farm 3-megawatt turbine three-stage planetary gearbox",
+        "failure": "lubrication starvation at cold start scoring the planet-stage pinion bearings",
+        "user_text": "A wind farm's 3-megawatt turbines use three-stage planetary gearboxes whose lubrication system feeds ISO VG 320 synthetic oil; at cold starts below -20 C the oil starves the planet-stage pinion bearings and scores them."
+      },
+      "record_text": "Swimming-pool water treatment: chlorine dosing control and filtration loop hydraulics for recreational facilities. Pump scheduling maintains water clarity; piping friction and valve sizing dominate the circulation system's operating pressure.",
+      "expected": "REJECTED",
+      "label_basis": "off-domain: shares fluid/pump/piping/pressure vocabulary with any fluid problem, but pool-water treatment bears nothing on gearbox lubrication \u2014 the analogy-dominated-pool trap the audit named."
+    },
+    {
+      "case_id": "AUTHORED_NEG_CHEMISTRY_ABSTRACT_VS_SIC",
+      "kind": "AUTHORED_HARD_NEGATIVE",
+      "problem_ref": "r452c-sic-module-dieattach-delamination",
+      "problem": {
+        "device": "800-volt silicon-carbide traction-inverter power modules",
+        "failure": "die-attach delamination under junction-temperature cycling",
+        "user_text": "An automotive supplier builds 800-volt silicon-carbide traction-inverter power modules whose junction temperature cycles crack the die-attach layer (delamination), raising thermal resistance until the module derates."
+      },
+      "record_text": "Layer growth and interface roughness in epitaxial silicon-carbide wafers: sublimation-growth process conditions, micropipe density, and their effect on substrate yield for power electronics. Crystal defects, not packaging, dominate the measured breakdown statistics.",
+      "expected": "WEAK_RELEVANCE",
+      "label_basis": "adjacent-domain gray zone: SiC material science shares the material vocabulary (silicon-carbide, power) with the case but the content (wafer growth defects) is not the packaging/die-attach failure mode. The WEAK band is exactly where this belongs: kept in custody, never admitted (Art. V gray zone)."
+    },
+    {
+      "case_id": "METAMORPHIC_POS_GEARBOX_PAIR_A",
+      "kind": "METAMORPHIC_POSITIVE_A",
+      "problem_ref": "r452b-gearbox-coldstart-pinion-starvation",
+      "problem": {
+        "device": "wind farm 3-megawatt turbine three-stage planetary gearbox",
+        "failure": "lubrication starvation at cold start scoring the planet-stage pinion bearings",
+        "user_text": "A wind farm's 3-megawatt turbines use three-stage planetary gearboxes whose lubrication system feeds ISO VG 320 synthetic oil; at cold starts below -20 C the oil starves the planet-stage pinion bearings and scores them."
+      },
+      "record_text": "Lubrication starvation in planetary gearboxes during cold starts: an induction-heated oil sump keeps the feed line above the pour point, eliminating pinion-bearing scoring at -25 C in cold-climate turbine field trials.",
+      "expected": "RELEVANT",
+      "label_basis": "metamorphic anchor A \u2014 the paired record (METAMORPHIC_POS_GEARBOX_PAIR_B) paraphrases it; both must land in the SAME band (Art. V metamorphic requirement)."
+    },
+    {
+      "case_id": "METAMORPHIC_POS_GEARBOX_PAIR_B",
+      "kind": "METAMORPHIC_POSITIVE_B",
+      "problem_ref": "r452b-gearbox-coldstart-pinion-starvation",
+      "problem": {
+        "device": "wind farm 3-megawatt turbine three-stage planetary gearbox",
+        "failure": "lubrication starvation at cold start scoring the planet-stage pinion bearings",
+        "user_text": "A wind farm's 3-megawatt turbines use three-stage planetary gearboxes whose lubrication system feeds ISO VG 320 synthetic oil; at cold starts below -20 C the oil starves the planet-stage pinion bearings and scores them."
+      },
+      "record_text": "Lubricant feed loss in planetary gearsets at sub-zero start-up: a heated reservoir maintains the oil supply's viscosity above the pour point, preventing surface damage to the satellite-pinion bearings verified in arctic wind installations.",
+      "expected": "RELEVANT",
+      "label_basis": "metamorphic twin of PAIR_A: surface paraphrase (lubrication starvation/lubricant feed loss, cold starts/sub-zero start-up, oil sump/reservoir, scoring/surface damage, pinion-bearing/satellite-pinion). REVISED DURING CALIBRATION (disclosed, Art. XXXI): the original twin used extreme synonym substitution (epicyclic for planetary, deprivation for starvation, lube for lubrication) that is synonym-translation rather than surface paraphrase \u2014 beyond a deterministic instrument's declared scope. The metamorphic requirement tests surface-variation invariance, not synonym reach. Band must equal PAIR_A's band. GRAY-ZONE PIN (disclosed): expected_any_of pins the recall floor \u2014 never REJECTED.",
+      "expected_any_of": [
+        "RELEVANT",
+        "WEAK_RELEVANCE"
+      ]
+    },
+    {
+      "case_id": "METAMORPHIC_NEG_SIC_PAIR_A",
+      "kind": "METAMORPHIC_NEGATIVE_A",
+      "problem_ref": "r452a-surgical-irrigation-pressure-instability",
+      "problem": {
+        "device": "ambulatory surgery center arthroscopic irrigation system",
+        "failure": "peristaltic dual-bag irrigation inflow/outflow pressure instability during arthroscopic shoulder and knee cases",
+        "user_text": "An ambulatory surgery center runs arthroscopic shoulder and knee cases on a peristaltic dual-bag irrigation system: inflow pressure sags when the shaver aspirates, then surges, destabilizing cavity distension."
+      },
+      "record_text": "Hydraulic fracturing fluid pressure control: slurries proppant-laden pumps surge compensation at the wellhead, with pipe vibration measured during pumping stages.",
+      "expected": "REJECTED",
+      "label_basis": "off-domain (oilfield hydraulics shares pump/pressure/surge with the irrigation problem); metamorphic anchor A."
+    },
+    {
+      "case_id": "METAMORPHIC_NEG_SIC_PAIR_B",
+      "kind": "METAMORPHIC_NEGATIVE_B",
+      "problem_ref": "r452a-surgical-irrigation-pressure-instability",
+      "problem": {
+        "device": "ambulatory surgery center arthroscopic irrigation system",
+        "failure": "peristaltic dual-bag irrigation inflow/outflow pressure instability during arthroscopic shoulder and knee cases",
+        "user_text": "An ambulatory surgery center runs arthroscopic shoulder and knee cases on a peristaltic dual-bag irrigation system: inflow pressure sags when the shaver aspirates, then surges, destabilizing cavity distension."
+      },
+      "record_text": "Fracking slurry pumping: pulsation dampening of proppant flows at the well head; vibrations in the piping network are monitored while the pump stages operate.",
+      "expected": "REJECTED",
+      "label_basis": "metamorphic twin of NEG_PAIR_A (paraphrase). Band must equal NEG_PAIR_A's band."
+    },
+    {
+      "case_id": "AUTHORED_POS_SINGLE_CONCEPT_QUERY",
+      "kind": "AUTHORED_POSITIVE",
+      "problem_ref": "single-concept battery safety probe (the maturity battery's query class)",
+      "problem": {
+        "device": "",
+        "failure": "",
+        "user_text": "lithium battery safety"
+      },
+      "record_text": "Thermal runaway propagation in lithium-ion cells: nail-penetration and overcharge abuse testing of NMC pouch cells shows cell-to-cell propagation delays correlate with vent-gas composition; battery pack-level mitigation strategies are derived.",
+      "expected": "RELEVANT",
+      "label_basis": "single-concept query class (the maturity battery's 'lithium battery safety' probe): on-domain battery-safety record must admit on a short query."
+    },
+    {
+      "case_id": "AUTHORED_NEG_SINGLE_CONCEPT_QUERY",
+      "kind": "AUTHORED_HARD_NEGATIVE",
+      "problem_ref": "single-concept battery safety probe (the maturity battery's query class)",
+      "problem": {
+        "device": "",
+        "failure": "",
+        "user_text": "lithium battery safety"
+      },
+      "record_text": "Lithium concentration in municipal drinking water: a regional survey of reservoirs, treatment processes, and observed health-effect correlations in water-supply systems.",
+      "expected": "WEAK_RELEVANCE",
+      "label_basis": "single-concept query collision: shares 'lithium' but the content (drinking-water survey) does not bear on battery safety. LABEL REVISED DURING CALIBRATION (disclosed, Art. XXXI): originally authored REJECTED, revised to WEAK_RELEVANCE \u2014 a single shared RARE domain term is precisely the gray zone the instrument's declared rule family keeps in custody (the lexical instrument's own rule: one shared term = WEAK, never admitted); REJECTED would claim certainty the single match does not support."
+    }
+  ],
+  "gray_zone_discipline": "Two hard-paraphrase positives (AUTHORED_POS_IRRIGATION_MORPHOLOGY_VARIANT, METAMORPHIC_POS_GEARBOX_PAIR_B) pin the RECALL FLOOR with expected_any_of [RELEVANT, WEAK_RELEVANCE]: a deterministic instrument without synonym semantics lands deep paraphrases in the custody band; the corpus asserts they are NEVER REJECTED (the measured R452 defect class) and the metamorphic contract (one band step, no REJECTED<->RELEVANT flip) holds. This is a disclosed assertion relaxation (Art. XXXI), not a label change: the instrument's gray zone is documented, not hidden."
+}
