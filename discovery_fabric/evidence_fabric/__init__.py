@@ -76,7 +76,17 @@ _STOP = set("""a an and are as at be by for from has have in into is it of
 on or that the their there these they this to was were will with without
 using used use can could design designs designed system systems method
 methods new novel improve improved improvement reducing reduce reduces
-high low more less than then when where which while""".split())
+high low more less than then when where which while
+not problem state limited documented
+invention relates discloses""".split())
+# R456 (measured lexical-gate defect, frozen R449 arm_b evidence): the
+# generic terms {problem, state, not, limited, documented} admitted four
+# OpenFOAM prompt-template garbage records as RELEVANT via shared_terms
+# ["problem", "state"] - pure filler collisions, zero domain content.
+# The patent-structural trio {invention, relates, discloses} is the
+# same class: every patent span carries them, so they carry no
+# relevance information (the R449 records 0-3 all open with "The
+# invention discloses/provides...").
 
 
 def _terms(text: str) -> List[str]:
@@ -200,20 +210,23 @@ def _relevance_promote(record: EvidenceRecord,
     if v == "RELEVANT":
         record.admissibility.state = "PENDING_CORROBORATION"
         record.admissibility.reasons = [
-            "relevance adjudicated RELEVANT (deterministic term "
-            "overlap); corroboration across independent families "
-            "pending"]
+            "relevance adjudicated RELEVANT ("
+            + str(decision.get("authority") or
+                  "deterministic term overlap")
+            + "); corroboration across independent families pending"]
     elif v == "WEAK_RELEVANCE":
         record.admissibility.state = "PENDING_RELEVANCE"
         record.admissibility.reasons = [
-            "single shared domain term — insufficient for relevance "
-            "(kept in custody, NOT admitted)"]
+            "insufficient for admission ("
+            + str(decision.get("mode") or "single shared domain term")
+            + ") — kept in custody, NOT admitted"]
     else:
         record.admissibility.state = "BLOCKED_RELEVANCE_REJECTED"
         record.admissibility.reasons = [
-            "no shared domain terms with the problem (keyword "
-            "collision — Art. XXI.4); record kept in custody, never "
-            "admitted"]
+            "rejected by BOTH relevance authorities ("
+            + str(decision.get("mode") or
+                  "no shared domain terms")
+            + "; Art. XXI.4); record kept in custody, never admitted"]
 
 
 #: element names -> symbols (the deterministic problem-element
@@ -510,11 +523,60 @@ def retrieve_evidence(problem: Dict[str, Any],
             })
 
     # ---- relevance adjudication (recorded per record) ----------------
+    # R456: the Phase-P1 semantic layer composes with the lexical gate
+    lexical_decisions = [
+        adjudicate_relevance(rec, problem_terms, problem_elems, "")
+        for rec in records_all]
+    problem_text = " ".join(
+        [str(problem.get(k) or "") for k in
+         ("device", "failure", "constraint", "problem")]
+        + [str(problem.get("user_text") or "")]).strip()
+    record_texts = []
     for rec in records_all:
-        decision = adjudicate_relevance(rec, problem_terms,
-                                        problem_elems, "")
+        title = str(_title_of(rec) or "")
+        span = str((rec.exact_span.text or "")[:1000])
+        record_texts.append(f"{title}. {span}".strip())
+    try:
+        from discovery_fabric.source_registry import semantic_relevance
+        semantic_decisions = semantic_relevance.semantic_adjudicate(
+            problem_text, record_texts)
+    except Exception:  # noqa: BLE001 — the semantic layer can never
+        # break the fabric channel (Art. LXI): typed unavailability
+        semantic_decisions = None
+    for i, rec in enumerate(records_all):
+        decision = lexical_decisions[i]
+        if semantic_decisions is not None:
+            if decision.get("mode") == "TEXT_TERM_OVERLAP":
+                # TEXT spans: the composed gate (OR for admission — the
+                # Phase-P1 reranker restores the semantically-clear
+                # records the lexical gate dark-rejects)
+                decision = semantic_relevance.compose_verdict(
+                    decision, semantic_decisions[i])
+            else:
+                # STRUCTURED spans (element overlap): the element rule
+                # stays authoritative — a bare formula's dense embedding
+                # carries no domain semantics; the semantic decision is
+                # RECORDED (custody) but does not compose
+                decision = dict(decision)
+                decision["semantic"] = semantic_decisions[i]
+                decision["semantic_composition"] = (
+                    "STRUCTURED span: element authority retained; "
+                    "semantic recorded for custody only")
         _relevance_promote(rec, decision)
         report["records"].append(rec.to_dict())
+    if semantic_decisions is not None:
+        report["semantic_relevance"] = {
+            "version": semantic_relevance.SEMANTIC_RELEVANCE_VERSION,
+            "model": semantic_relevance.model_name(),
+            "engine_url_present": semantic_relevance.endpoint_url()
+            is not None,
+            "states": {
+                s: sum(1 for d in semantic_decisions
+                       if d["semantic_state"] == s)
+                for s in semantic_relevance.SEMANTIC_STATES},
+            "note": "OR-composition for admission; both authorities "
+                    "recorded per record (the Phase-P1 reranker, R456)",
+        }
 
     # ---- pool assembly: admissible-side only, family-balanced ---------
     admissible = [r for r in records_all if r.admissibility.state in

@@ -334,6 +334,23 @@ RUN set -eux; \
     /opt/llama/llama-server --version
 """
 
+# R456: the zero-paid semantic-relevance engine's pinned embedding
+# model (bge-small-en-v1.5 Q8_0, 36,685,152 bytes — the Phase-P1
+# reranker's dense encoder; CLS pooling per the model's training; the
+# same fail-closed sha discipline as the chat weights). Env-gated at
+# runtime by LOCAL_EMBED_ENABLE (the entrypoint's second llama-server;
+# unavailability is TYPED SEMANTIC_UNAVAILABLE, never a silent
+# lexical-as-semantic substitution).
+HUNK_LOCAL_EMBED = """
+# ---------- R456: the pinned zero-paid embedding model ----------------
+ARG BGE_GGUF_SHA256=f046db1dc724cf4f6f0a0c5917e922823b73eb1d27b8f9a9c2797f7866974804
+RUN set -eux; \
+    curl -fsSL --retry 3 --max-time 300 \
+      -o /opt/models/bge-small-en-v1.5-q8_0.gguf \
+      https://huggingface.co/ggml-org/bge-small-en-v1.5-Q8_0-GGUF/resolve/main/bge-small-en-v1.5-q8_0.gguf; \
+    echo "${BGE_GGUF_SHA256}  /opt/models/bge-small-en-v1.5-q8_0.gguf" | sha256sum -c -
+"""
+
 
 def _r451_c13_adapter_dockerfile(commit: str) -> str:
     """The canonical adapter Dockerfile + the R451-C1.3 local-route
@@ -355,4 +372,9 @@ def _r451_c13_adapter_dockerfile(commit: str) -> str:
         "# the built llama-server binary from the pinned-tag builder\n"
         "COPY --from=llama-builder /build/bin/llama-server /tmp/llama-server\n")
     df = df.replace(wire, wire + binary_copy + HUNK_LOCAL_QWEN, 1)
+    # R456: the pinned embedding model joins the local-route hunk (the
+    # same /opt/models discipline; env-gated at runtime)
+    anchor = "    /opt/llama/llama-server --version\n"
+    assert anchor in df
+    df = df.replace(anchor, anchor + HUNK_LOCAL_EMBED, 1)
     return df

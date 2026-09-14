@@ -87,4 +87,43 @@ if [ "$LOCAL_QWEN_ENABLE" = "1" ] \
   export LOCAL_QWEN_BASE_URL=http://127.0.0.1:8790/v1/chat/completions
 fi
 
+# ---------------------------------------------------------------------------
+# R456: the zero-paid semantic-relevance engine (env-gated, the same
+# llama.cpp discipline as the chat route). LOCAL_EMBED_ENABLE=1 starts a
+# second llama-server in EMBEDDING mode with the sha-pinned
+# bge-small-en-v1.5 Q8_0 GGUF (CLS pooling — the model's trained
+# pooling) and wires LOCAL_EMBED_URL for the Phase-P1 semantic
+# relevance adjudicator (discovery_fabric/source_registry/
+# semantic_relevance.py — the measured evidence-relevance bottleneck).
+# A failed start is HONEST and TYPED: the adjudicator records
+# SEMANTIC_UNAVAILABLE per record and the lexical gate stays the
+# recorded authority (Art. IV) — the entrypoint never fabricates a
+# working semantic engine.
+# ---------------------------------------------------------------------------
+if [ "$LOCAL_EMBED_ENABLE" = "1" ] \
+    && [ -x /opt/llama/llama-server ] \
+    && [ -f /opt/models/bge-small-en-v1.5-q8_0.gguf ]; then
+  echo "[entrypoint] starting llama-server (embedding mode, the zero-paid semantic route)..."
+  ( LD_LIBRARY_PATH=/opt/llama /opt/llama/llama-server \
+      -m /opt/models/bge-small-en-v1.5-q8_0.gguf \
+      --embedding --pooling cls \
+      --port 8791 --host 127.0.0.1 \
+      -c 1024 -t "${LOCAL_EMBED_THREADS:-1}" \
+      --alias bge-small-en-v1.5 --no-webui \
+      > /tmp/llama-embed-server.log 2>&1 & )
+  _le_i=0
+  while [ "$_le_i" -lt 60 ]; do
+    if curl -fsS http://127.0.0.1:8791/health >/dev/null 2>&1; then
+      echo "[entrypoint] embedding llama-server UP (semantic relevance route available)"
+      break
+    fi
+    _le_i=$((_le_i + 1))
+    sleep 1
+  done
+  if ! curl -fsS http://127.0.0.1:8791/health >/dev/null 2>&1; then
+    echo "WARN: embedding llama-server did not become healthy in 60 s — the semantic layer stays SEMANTIC_UNAVAILABLE (typed, honest; the lexical gate is unaffected)"
+  fi
+  export LOCAL_EMBED_URL=http://127.0.0.1:8791
+fi
+
 exec python3 -m toscanini.server

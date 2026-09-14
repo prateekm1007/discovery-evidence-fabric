@@ -393,6 +393,48 @@ def retrieve_fabric(problem: Dict[str, Any],
             continue
         lane_pools.setdefault(rec.evidence_lane, []).append(rec)
     primary_terms = set(terms(primary))
+    # R456: the Phase-P1 semantic rerank of the lane pools — when the
+    # zero-paid embedding engine is configured+reachable, records sort
+    # by semantic proximity to the problem FIRST (the audited
+    # lexical-only ordering let a highly-cited off-domain review bury a
+    # relevant patent claim or dissertation); the lexical keys remain
+    # the tie-breakers and the WHOLE layer is skipped (byte-identical
+    # ordering) when the engine is off/unreachable — typed, never
+    # silent (Art. IV).
+    sem_scores: Dict[str, float] = {}
+    sem_note = "off (LOCAL_EMBED_URL unset — lexical ordering, unchanged)"
+    try:
+        from discovery_fabric.source_registry import semantic_relevance
+        if semantic_relevance.endpoint_url() is not None:
+            lane_recs = [rec for pool in lane_pools.values()
+                         for rec in pool]
+            texts = [
+                f"{rec.title}. "
+                f"{rec.best_record.get('abstract') or ''}".strip()
+                for rec in lane_recs]
+            problem_text = " ".join(
+                [str(problem.get(k) or "") for k in
+                 ("device", "failure", "failure_mode", "constraint",
+                  "problem")] + [str(primary)]).strip()
+            sems = semantic_relevance.semantic_adjudicate(
+                problem_text, texts)
+            if sems and sems[0]["semantic_state"] != "SEMANTIC_UNAVAILABLE":
+                sem_scores = {
+                    rec.canonical_id: (sems[i]["semantic_cosine"] or 0.0)
+                    for i, rec in enumerate(lane_recs)}
+                sem_note = (
+                    f"on ({semantic_relevance.SEMANTIC_RELEVANCE_VERSION}, "
+                    f"{len(lane_recs)} records ranked semantically)")
+            elif sems:
+                sem_note = ("typed SEMANTIC_UNAVAILABLE — lexical "
+                            "ordering, unchanged (the engine's typed "
+                            "reason rides the fabric report)")
+    except Exception:  # noqa: BLE001 — ranking aid only, never a break
+        sem_note = "error-contained (lexical ordering, unchanged)"
+
+    def _sem_key(rec: CanonicalRecord) -> float:
+        return sem_scores.get(rec.canonical_id, 0.0)
+
     for lane, pool in lane_pools.items():
         def _score(rec: CanonicalRecord) -> Tuple[int, int, int]:
             adj = adjudicate_record(
@@ -410,9 +452,15 @@ def retrieve_fabric(problem: Dict[str, Any],
             has_text = 1 if abstract_len >= 50 or \
                 rec.best_record.get("claim_text_available") else 0
             return (1 if adj.get("relevant") else 0, overlap, has_text)
-        pool.sort(key=lambda rec: (_score(rec)[0], _score(rec)[1],
-                                   _score(rec)[2],
-                                   -len((rec.best_record.get("abstract") or ""))),
+        pool.sort(key=lambda rec: (
+                      # R456: semantic proximity is the PRIMARY key when
+                      # the engine is on (sem_scores empty -> 0.0 for
+                      # every record -> this key is a no-op and the
+                      # lexical ordering below is byte-identical)
+                      round(_sem_key(rec), 3),
+                      _score(rec)[0], _score(rec)[1],
+                      _score(rec)[2],
+                      -len((rec.best_record.get("abstract") or ""))),
                   reverse=True)
 
     # ---- 9. engine evidence items (a2-compatible + fabric fields) ----
@@ -442,6 +490,15 @@ def retrieve_fabric(problem: Dict[str, Any],
         "retrieval_stats": stats,
         "retrieval_diversity": diversity,
         "retrieval_blind_spots": blind_spots,
+        "semantic_lane_rerank": {
+            "note": sem_note,
+            "version": "retrieval_fabric+semantic_relevance/1.0.0 (R456)",
+            "disclosure": ("semantic proximity is the primary lane-order "
+                           "key ONLY when the zero-paid embedding engine "
+                           "is configured and reachable; otherwise the "
+                           "ordering is byte-identical to the lexical "
+                           "instrument (typed in this note, never silent)"),
+        },
         "canonical_record_count": len(canonical_records),
         "dedup_merge_events": canonicalizer.merge_events,
         "patent_claim_fetches": claim_fetches,

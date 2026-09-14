@@ -160,6 +160,11 @@ def main() -> int:
                            value="8192")
     api.add_space_variable(repo_id=SPACE, key="LOCAL_QWEN_THREADS",
                            value="2")
+    # R456: the zero-paid semantic-relevance engine (Phase-P1 reranker)
+    api.add_space_variable(repo_id=SPACE, key="LOCAL_EMBED_ENABLE",
+                           value="1")
+    api.add_space_variable(repo_id=SPACE, key="LOCAL_EMBED_THREADS",
+                           value="1")
     api.add_space_secret(repo_id=SPACE, key="ZAI_API_KEY", value=HF_TOKEN)
     api.add_space_secret(repo_id=SPACE, key="GITHUB_TOKEN",
                          value=GITHUB_TOKEN)

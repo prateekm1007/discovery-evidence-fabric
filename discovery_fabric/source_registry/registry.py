@@ -1645,6 +1645,17 @@ _ROUTING_STATE_OVERRIDES: Dict[str, Dict[str, Any]] = {
             "adjudication between query and record, replacing lexical "
             "overlap); flip to ACTIVE + a measured relevance re-run + "
             "worklog entry"),
+        # R456 status (NOT a flip): the Phase-P1 semantic adjudicator
+        # LANDED (discovery_fabric/source_registry/semantic_relevance.
+        # py — the composed relevance gate, calibrated + benchmarked in
+        # R456/SEMANTIC_RELEVANCE_*). The remaining criterion is the
+        # MEASURED relevance re-run against this source's records
+        # (requires a live retrieval battery) before the flip to
+        # ACTIVE. Until then: SUSPENDED_RELEVANCE stands.
+        "reranker_status_r456": (
+            "LANDED (semantic_relevance.py, composed gate) — the "
+            "measured OSTI relevance re-run remains before "
+            "reinstatement"),
     },
 }
 
