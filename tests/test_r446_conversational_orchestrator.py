@@ -972,5 +972,92 @@ class TestRunContractShape(unittest.TestCase):
         self.assertTrue(contract["blocking_reason"]["resumable"])
 
 
+# ---------------------------------------------------------------------------
+# HTTP routing (the production-smoke regression): the GET routes must be
+# registered in do_GET — the first deploy's live probe caught them
+# mis-registered in do_POST ("no such endpoint"); this pins the fix
+# (Art. XXXI: every correction creates its memory artifact).
+# ---------------------------------------------------------------------------
+
+class TestHttpRouting(unittest.TestCase):
+
+    def _server(self):
+        import threading
+        from http.server import ThreadingHTTPServer
+        from toscanini import server as sv
+
+        class _MemStore:
+            def __init__(self):
+                self.sessions = {
+                    "ts_route_1": {
+                        "session_id": "ts_route_1",
+                        "user_text": "reduce pressure loss",
+                        "status": "COMPLETE",
+                        "final_status": "REJECTED",
+                        "run_dir": None,
+                        "created_at": "2026-09-14T00:00:00Z",
+                        "updated_at": "2026-09-14T00:01:00Z",
+                    }}
+
+            def get_session(self, sid):
+                return self.sessions.get(sid)
+
+            @staticmethod
+            def session_access(sid, owner_key=None, operator_key=None):
+                return "OWNER"
+
+        mem = _MemStore()
+        orig_store = sv.store
+
+        class _Quiet(ThreadingHTTPServer):
+            def handle_error(self, request, client_address):
+                pass
+
+        srv = _Quiet(("127.0.0.1", 0), sv.Handler)
+        thread = threading.Thread(target=srv.serve_forever, daemon=True)
+        thread.start()
+        return srv, mem, sv, orig_store
+
+    def test_contract_route_is_a_get_route(self):
+        import http.client
+        srv, mem, sv, orig_store = self._server()
+        port = srv.server_address[1]
+        try:
+            sv.store = mem
+            conn = http.client.HTTPConnection("127.0.0.1", port,
+                                              timeout=10)
+            conn.request("GET", "/api/run/ts_route_1/contract")
+            resp = conn.getresponse()
+            body = json.loads(resp.read())
+            self.assertEqual(resp.status, 200,
+                             f"contract route failed: {body}")
+            self.assertIn("run_id", body)
+            self.assertIn("current_state", body)
+            self.assertIn("next_action", body)
+        finally:
+            sv.store = orig_store
+            srv.shutdown()
+            srv.server_close()
+
+    def test_product_events_route_is_a_get_route(self):
+        import http.client
+        srv, mem, sv, orig_store = self._server()
+        port = srv.server_address[1]
+        try:
+            sv.store = mem
+            conn = http.client.HTTPConnection("127.0.0.1", port,
+                                              timeout=10)
+            conn.request("GET", "/api/run/ts_route_1/product-events")
+            resp = conn.getresponse()
+            body = json.loads(resp.read())
+            self.assertEqual(resp.status, 200,
+                             f"product-events route failed: {body}")
+            self.assertIn("events", body)
+        finally:
+            sv.store = orig_store
+            srv.shutdown()
+            srv.server_close()
+
+
 if __name__ == "__main__":
     unittest.main()

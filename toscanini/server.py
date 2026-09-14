@@ -1114,6 +1114,51 @@ class Handler(BaseHTTPRequestHandler):
             state.pop("provenance", None)  # no run_dir paths here
             return self._json(200, state)
 
+        # ---- R446-C1 directive §11: the clean high-level run contract —
+        # GET /api/run/{id}/contract. The ~7-field product view derived
+        # from canonical state (never a second state store, Art. X).
+        # (Registered in do_GET — the production smoke of the first
+        # deploy caught the mis-registration in do_POST; this comment
+        # records the correction.)
+        if len(parts) == 4 and parts[0] == "api" and parts[1] == "run" \
+                and parts[3] == "contract":
+            sid = parts[2]
+            if self._access(sid) == "DENY":
+                return self._denied()
+            s = store.get_session(sid)
+            if not s:
+                return self._json(404, {"error": "run not found"})
+            from toscanini.conversational import run_contract as _rc
+            rd = Path(s["run_dir"]) if s.get("run_dir") else None
+            return self._json(200, _rc.high_level_run_contract(s, rd))
+
+        # ---- R446-C1 directive §9/§10: the conversational product event
+        # stream — GET /api/run/{id}/product-events. Derived from the
+        # run directory's persisted artifacts only (basis_ref on every
+        # event; never inferred from artifact existence or render
+        # completion).
+        if len(parts) == 4 and parts[0] == "api" and parts[1] == "run" \
+                and parts[3] == "product-events":
+            sid = parts[2]
+            if self._access(sid) == "DENY":
+                return self._denied()
+            s = store.get_session(sid)
+            if not s:
+                return self._json(404, {"error": "run not found"})
+            from toscanini.conversational import product_events as _pe
+            rd = Path(s["run_dir"]) if s.get("run_dir") else None
+            events = _pe.derive_product_events(
+                rd, sid, str(s.get("status") or "")) if rd else []
+            problems = [p for ev in events
+                        for p in _pe.validate_event(ev)]
+            return self._json(200, {
+                "schema": _pe.EVENT_SCHEMA,
+                "run_id": sid,
+                "n_events": len(events),
+                "validation_problems": problems,
+                "events": events,
+            })
+
         # R391: same-origin static webapp (Render deployment shape).
         # API paths never fall through here — /api 404s stay honest JSON.
         if not p.path.startswith("/api"):
@@ -1349,48 +1394,6 @@ class Handler(BaseHTTPRequestHandler):
                 "resumed": True,
                 "conversation_classification": _cls["classification"],
                 "refused_fields": _guarded["refused"],
-            })
-
-        # R446-C1 directive §11: the clean high-level run contract —
-        # GET /api/run/{id}/contract. The ~7-field product view derived
-        # from canonical state (never a second state store, Art. X).
-        if len(parts) == 4 and parts[0] == "api" and parts[1] == "run" \
-                and parts[3] == "contract":
-            sid = parts[2]
-            if self._access(sid) == "DENY":
-                return self._denied()
-            s = store.get_session(sid)
-            if not s:
-                return self._json(404, {"error": "run not found"})
-            from toscanini.conversational import run_contract as _rc
-            rd = Path(s["run_dir"]) if s.get("run_dir") else None
-            return self._json(200, _rc.high_level_run_contract(s, rd))
-
-        # R446-C1 directive §9/§10: the conversational product event
-        # stream — GET /api/run/{id}/product-events. Derived from the
-        # run directory's persisted artifacts only (basis_ref on every
-        # event; never inferred from artifact existence or render
-        # completion).
-        if len(parts) == 4 and parts[0] == "api" and parts[1] == "run" \
-                and parts[3] == "product-events":
-            sid = parts[2]
-            if self._access(sid) == "DENY":
-                return self._denied()
-            s = store.get_session(sid)
-            if not s:
-                return self._json(404, {"error": "run not found"})
-            from toscanini.conversational import product_events as _pe
-            rd = Path(s["run_dir"]) if s.get("run_dir") else None
-            events = _pe.derive_product_events(
-                rd, sid, str(s.get("status") or "")) if rd else []
-            problems = [p for ev in events
-                        for p in _pe.validate_event(ev)]
-            return self._json(200, {
-                "schema": _pe.EVENT_SCHEMA,
-                "run_id": sid,
-                "n_events": len(events),
-                "validation_problems": problems,
-                "events": events,
             })
 
         # R419 section 21: async artifact build — POST
