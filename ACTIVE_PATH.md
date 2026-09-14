@@ -712,3 +712,31 @@ escalation answered).
 Round record: `R456/R456_ROUND_RECORD.json` (+ A3_RESOLUTION.json,
 SEMANTIC_RELEVANCE_CALIBRATION.json, SEMANTIC_RELEVANCE_BENCHMARK.json,
 EPISTEMIC_INTEGRITY_DETERMINATION.json).
+
+## R458-C2 addendum (2026-09-14) — the conversation controls the discovery
+
+Operator directive R458-C2 (product interaction closure): the
+conversation-native layer closed without new backend machinery — the
+frontend remains a projection of canonical state (Art. X), and every
+gap the UI found became the smallest contract for Coder 1, never a
+frontend-side epistemology.
+
+| Piece | Surface | Notes |
+|---|---|---|
+| THE CLARIFICATION PAUSE, finally rendered | `TOSCANINI_UI/webapp/components/Conversation.tsx` + `lib/present.ts` | C1's R446 §4 one-material-question pause (live since R456) was NEVER rendered by the UI; it now renders as Toscanini's own message and every composer message answers it via POST /api/run/{id}/answer — the conversation changes the discovery through an endpoint that already existed |
+| ASK vs ACT | `TOSCANINI_UI/webapp/lib/actionContract.ts` + `R458/CODER2_CONVERSATIONAL_ACTION_CONTRACT.json` | the deterministic phrase router (fixed table, no interpretation) sends questions to the read-only /ask and directives to POST /api/run/{id}/actions (11 canonical verbs — CONTRACT for Coder 1, not yet implemented); the not-available response renders the honest-absence copy and changes nothing |
+| THE INPUT MODEL | `components` page composer + `lib/api.ts::uploadAttachment` | the browser file-read-and-paste-into-prompt architecture DELETED (§3); attachments travel as engine-side references; the upload endpoint is contract-defined; until adoption the limitation is stated honestly — never a fake upload |
+| ONE PROGRESS SENTENCE | `lib/productEvents.ts` + `Conversation.tsx` | the four-event tail removed; the derived progress line yields to the live event sentence; the provider-rotation abstraction (`deriveRotationNote`) says exactly "I continued the investigation using another available reasoning route." — route identity stays in the technical record (§26; the R456 cascade precedent) |
+| THE ONE-WORD RULE | `lib/present.ts::isRejectedOutcome` + `isKilledByChallenge` | measured live: the stale `rejected` boolean rendered killed-by-challenge as bare "Rejected" (two words for one canonical state); the verdict now reads the canonical KEY only; false premise remains the one bare rejection; pinned by battery B6b |
+| SIDEBAR + HISTORY | `components/Sidebar.tsx` | Projects DELETED (never advertise unfinished capability); history = title + small date + subtle state dot (aria-labeled) |
+| WORKSPACE AS ARTIFACT | `components/Workspace.tsx` | one current title + small sibling switcher (no tab strip); journal secondary; experiment auto-open; the experiment surface renders HUMAN PROSE first (BS-009 measured and fixed), raw record collapsed |
+| CSS DEADWEIGHT (§22) | `app/globals.css` 2898→2456 lines | 136 dead rules / 587 lines measured-deleted (class inventory + word-boundary re-verification + brace-aware remover); the ghost-tree audit this exposed: 439 files deleted from git still lived in the SPACE — `scripts/r458_space_prune.py` retired them and `r453_c2_space_deploy.py` now prunes BEFORE every upload (Art. LXIV) |
+| MOBILE + A11Y + PERF (§19-21) | `app/globals.css` + `app/page.tsx` | iPhone-14 measured zero horizontal overflow; thumb targets; :focus-visible; prefers-reduced-motion; polling sleeps while document.hidden |
+
+Acceptance measured on production: fresh discovery on the real browser
+user path (ts_da602dc2c698) walked conversation → evidence (16 sources)
+→ candidate (SIMULATED) → attack (KILLED, recorded cause) → next action
+(Reformulate) → workspace (human-prose decisive test) → mobile + desktop
+screenshots (R458/UX_PROOF/). Art. LXXI tuple GREEN at 7567d30.
+
+Round record: `R458/R458_C2_ROUND_RECORD.json`.
