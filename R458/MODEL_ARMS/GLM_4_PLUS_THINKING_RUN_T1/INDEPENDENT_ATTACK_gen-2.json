@@ -1,0 +1,313 @@
+{
+ "attack_version": "independent_attack/2.1.0",
+ "candidate_id": "inv:deb91b7eb5:gen2",
+ "generator_provider": "zai",
+ "attacker_provider": "zai",
+ "attacker_model": "glm-4-plus-thinking",
+ "independence_mode": "SEPARATE_CONTEXT",
+ "independence_note": "the attacker ran in an independent reasoning context (fresh adversarial conversation, generator reasoning never shown; no alternative provider credentialed — disclosed, never claimed as provider separation)",
+ "prompt_hash": "130ad496ff1a322d188ce430b3bfb7ebae0548bb5c57b5e0dd7f093a651d7217",
+ "output_hash": "c8cccf5a594de35ea9adc16d9c4c82fc4f4ec672351adad8b94979bf9233fc35",
+ "llm_status": "OK",
+ "attacked_at": "2026-09-14T21:06:21+00:00Z",
+ "items": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "verdict": "KILL",
+   "basis": "The proposed mechanism relies on magnetic field control of nanoparticle alignment to enhance thermal conductivity, but none of the provided evidence demonstrates this specific effect in a microfluidic cooling context. GROUNDED_IN: EVIDENCE [europepmc:42726178] | RECORD \"Bioconvection driven flow of magnetized micropolar hybrid nanofluid with Ohmic heating and variable thermal co\" | SCOPE <boundary conditions not specified for data center application>",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "record id europepmc:42726178",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'to enhance thermal conductivity' (field: novel_design_variable)",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "EVIDENCE [europepmc:42726178] | RECORD \"Bioconvection driven flow of magnetized micropolar hybrid nanofluid with Ohmic heating and variable thermal co\" | SCOPE <boundary conditions not specified for d",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "verdict": "KILL",
+   "basis": "The candidate fails to address the specific boundary conditions of a legacy 2011 data hall with existing 30% open area perforated tiles and 75-ton CRAC units designed for 35°C design day. GROUNDED_IN: SCOPE <the boundary condition clause violated>",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Thermal Effects in Microfluidic Electrokinetic Flows: From Limitation to Design Opportunity.' (strong overlap: open, with)",
+      "verified": true
+     },
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['2011', '30', '75', '35']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "SCOPE <the boundary condition clause violated>",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "verdict": "ABSTAIN",
+   "basis": "The predicted 40% improvement in heat transfer coefficient with 25% energy reduction is not substantiated by any evidence in the provided bundle. The evidence focuses on theoretical models rather than empirical validation. GROUNDED_IN: EVIDENCE [europepmc:42076274] | RECORD \"Thermal Effects in Microfluidic Electrokinetic Flows: From Limitation to Design Opportunity\" | COMPUTATION <40% improvement claim vs. no supporting data>",
+   "grounding": {
+    "grounded": false,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Bioconvection driven flow of magnetized micropolar hybrid nanofluid with Ohmic heating and variable thermal conductivity.' (strong overlap: coefficient, effects, energy, from)",
+      "verified": true
+     },
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['40', '25', '42076274', '40']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'heat transfer coefficient with' (field: predicted_effect)",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "EVIDENCE [europepmc:42076274] | RECORD \"Thermal Effects in Microfluidic Electrokinetic Flows: From Limitation to Design Opportunity\" | COMPUTATION <40% improvement claim vs. no supporting data>",
+    "absence_ground": true,
+    "demotion_reason": "the asserted ground is an ABSENCE of evidence/support — absence is uncertainty, not failure (Art. XXI.3/XXV); the objection is preserved and escalated, never executed as a kill"
+   },
+   "demoted_from": "KILL"
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "verdict": "ABSTAIN",
+   "basis": "The candidate claims superiority over electrokinetic-only systems but provides no comparative data against the actual baseline of existing CRAC units in the legacy data hall. GROUNDED_IN: SCOPE <the boundary condition clause violated>",
+   "grounding": {
+    "grounded": false,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Thermal Effects in Microfluidic Electrokinetic Flows: From Limitation to Design Opportunity.' (strong overlap: electrokinetic, over, systems)",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "SCOPE <the boundary condition clause violated>",
+    "absence_ground": true,
+    "demotion_reason": "the asserted ground is an ABSENCE of evidence/support — absence is uncertainty, not failure (Art. XXI.3/XXV); the objection is preserved and escalated, never executed as a kill"
+   },
+   "demoted_from": "KILL"
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "verdict": "KILL",
+   "basis": "Integrating electromagnetic actuators into existing perforated floor tiles of a legacy data hall would require structural modifications not accounted for, potentially compromising floor integrity and creating new failure points. GROUNDED_IN: SCOPE <the boundary condition clause violated>",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Bioconvection driven flow of magnetized micropolar hybrid nanofluid with Ohmic heating and variable thermal conductivity.' (strong overlap: accounted, into)",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "SCOPE <the boundary condition clause violated>",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "verdict": "RISK",
+   "basis": "The testable prediction focuses on heat transfer performance but doesn't specify critical measurement parameters like flow rate, nanoparticle concentration, or magnetic field strength variables. GROUNDED_IN: EVIDENCE [europepmc:41535321] | RECORD \"SOR-Based numerical modeling of hybrid nanofluid flow over a rotating disk with magneto-nonlinear radiation an\" | SCOPE <measurement parameters not fully specified>"
+  }
+ ],
+ "intervention_suggestions": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "suggestion": "Increase nanoparticle concentration and optimize magnetic field strength based on empirical data from similar microfluidic applications. GROUNDED_IN: EVIDENCE [europepmc:42726178] | RECORD \"Bioconvection driven flow of magnetized micropolar hybrid nanofluid with Ohmic heating and variable thermal co\"",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "record id europepmc:42726178",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "EVIDENCE [europepmc:42726178] | RECORD \"Bioconvection driven flow of magnetized micropolar hybrid nanofluid with Ohmic heating and variable thermal co\"",
+    "absence_ground": false
+   },
+   "class": "GROUNDED_INTERVENTION",
+   "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "suggestion": "Design a retrofit kit that can be installed under existing perforated tiles without structural modifications, maintaining the original 30% open area. GROUNDED_IN: SCOPE <the boundary condition clause violated>",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Bioconvection driven flow of magnetized micropolar hybrid nanofluid with Ohmic heating and variable thermal conductivity.' (strong overlap: that, under)",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "SCOPE <the boundary condition clause violated>",
+    "absence_ground": false
+   },
+   "class": "GROUNDED_INTERVENTION",
+   "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "suggestion": "Conduct empirical testing to validate the 40% heat transfer improvement claim against actual electrokinetic systems in a controlled environment. GROUNDED_IN: EVIDENCE [europepmc:42076274] | RECORD \"Thermal Effects in Microfluidic Electrokinetic Flows: From Limitation to Design Opportunity\"",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Bioconvection driven flow of magnetized micropolar hybrid nanofluid with Ohmic heating and variable thermal conductivity.' (strong overlap: effects, from, heat, systems)",
+      "verified": true
+     },
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['40', '42076274']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "EVIDENCE [europepmc:42076274] | RECORD \"Thermal Effects in Microfluidic Electrokinetic Flows: From Limitation to Design Opportunity\"",
+    "absence_ground": false
+   },
+   "class": "GROUNDED_INTERVENTION",
+   "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "suggestion": "Compare performance against existing CRAC units in identical conditions rather than electrokinetic-only systems to establish true baseline equivalence. GROUNDED_IN: SCOPE <the boundary condition clause violated>",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Bioconvection driven flow of magnetized micropolar hybrid nanofluid with Ohmic heating and variable thermal conductivity.' (strong overlap: performance, systems)",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "SCOPE <the boundary condition clause violated>",
+    "absence_ground": false
+   },
+   "class": "GROUNDED_INTERVENTION",
+   "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "suggestion": "Develop a modular electromagnetic actuator system that can be surface-mounted on existing tiles without requiring structural penetration. GROUNDED_IN: SCOPE <the boundary condition clause violated>",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Bioconvection driven flow of magnetized micropolar hybrid nanofluid with Ohmic heating and variable thermal conductivity.' (strong overlap: surface, that)",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "SCOPE <the boundary condition clause violated>",
+    "absence_ground": false
+   },
+   "class": "GROUNDED_INTERVENTION",
+   "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "suggestion": "Specify exact measurement parameters including flow rates, nanoparticle concentrations, magnetic field strengths, and environmental conditions in the testable prediction. GROUNDED_IN: EVIDENCE [europepmc:41535321] | RECORD \"SOR-Based numerical modeling of hybrid nanofluid flow over a rotating disk with magneto-nonlinear radiation an\"",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Bioconvection driven flow of magnetized micropolar hybrid nanofluid with Ohmic heating and variable thermal conductivity.' (strong overlap: environmental, field, flow, hybrid)",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "EVIDENCE [europepmc:41535321] | RECORD \"SOR-Based numerical modeling of hybrid nanofluid flow over a rotating disk with magneto-nonlinear radiation an\"",
+    "absence_ground": false
+   },
+   "class": "GROUNDED_INTERVENTION",
+   "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+  }
+ ],
+ "state": "ATTACK_RUN",
+ "overall": "KILLED",
+ "kill_basis": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "basis": "The proposed mechanism relies on magnetic field control of nanoparticle alignment to enhance thermal conductivity, but none of the provided evidence demonstrates this specific effect in a microfluidic cooling context. GROUNDED_IN: EVIDENCE [europepmc:42726178] | RECORD \"Bioconvection driven flow of magnetized micropolar hybrid nanofluid with Ohmic heating and variable thermal co\" | SCOPE <boundary conditions not specified for data center application>",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "record id europepmc:42726178",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'to enhance thermal conductivity' (field: novel_design_variable)",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "EVIDENCE [europepmc:42726178] | RECORD \"Bioconvection driven flow of magnetized micropolar hybrid nanofluid with Ohmic heating and variable thermal co\" | SCOPE <boundary conditions not specified for d",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "basis": "The candidate fails to address the specific boundary conditions of a legacy 2011 data hall with existing 30% open area perforated tiles and 75-ton CRAC units designed for 35°C design day. GROUNDED_IN: SCOPE <the boundary condition clause violated>",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Thermal Effects in Microfluidic Electrokinetic Flows: From Limitation to Design Opportunity.' (strong overlap: open, with)",
+      "verified": true
+     },
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['2011', '30', '75', '35']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "SCOPE <the boundary condition clause violated>",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "basis": "Integrating electromagnetic actuators into existing perforated floor tiles of a legacy data hall would require structural modifications not accounted for, potentially compromising floor integrity and creating new failure points. GROUNDED_IN: SCOPE <the boundary condition clause violated>",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Bioconvection driven flow of magnetized micropolar hybrid nanofluid with Ohmic heating and variable thermal conductivity.' (strong overlap: accounted, into)",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "SCOPE <the boundary condition clause violated>",
+    "absence_ground": false
+   }
+  }
+ ],
+ "counts": {
+  "KILL": 3,
+  "RISK": 1,
+  "SURVIVE": 0,
+  "ABSTAIN_DEMOTED": 2,
+  "INVALID": 0
+ }
+}

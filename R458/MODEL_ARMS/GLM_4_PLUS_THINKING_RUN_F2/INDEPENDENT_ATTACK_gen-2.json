@@ -1,0 +1,411 @@
+{
+ "attack_version": "independent_attack/2.1.0",
+ "candidate_id": "inv:ccaf2e7ccf:gen2",
+ "generator_provider": "zai",
+ "attacker_provider": "zai",
+ "attacker_model": "glm-4-plus-thinking",
+ "independence_mode": "SEPARATE_CONTEXT",
+ "independence_note": "the attacker ran in an independent reasoning context (fresh adversarial conversation, generator reasoning never shown; no alternative provider credentialed — disclosed, never claimed as provider separation)",
+ "prompt_hash": "9d30e406b87a922794be1e15fa50105de4d2277cc64177344e10972059d0f527",
+ "output_hash": "ccdc16a7bf0172abd904fceb20f7fd58d634b04d48cf175d4266a4f76c5d38e1",
+ "llm_status": "OK",
+ "attacked_at": "2026-09-14T21:41:30+00:00Z",
+ "items": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "verdict": "KILL",
+   "basis": "The proposed closed-loop adaptive control system with nanoscale sensors and machine learning lacks any demonstrated capability to handle the crosstalk issues inherent in high-frequency firing arrays, which is the primary cause of velocity reduction in the center nozzles. GROUNDED_IN: EVIDENCE [europepmc:37840768] | RECORD \"Piezoelectric Drop-on-Demand Inkjet Printing with Ultra-High Droplet Velocity\"",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "record id europepmc:37840768",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'closed loop adaptive control' (field: mechanism)",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "EVIDENCE [europepmc:37840768] | RECORD \"Piezoelectric Drop-on-Demand Inkjet Printing with Ultra-High Droplet Velocity\"",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "verdict": "KILL",
+   "basis": "The candidate fails to address the specific boundary condition of \"center 40 percent of each module\" showing drop velocity falling from 7 to under 5 m/s, instead making a general claim about \"adaptive performance across varying ink formulations and environmental conditions\" without targeting the spatial crosstalk problem. GROUNDED_IN: SCOPE <the boundary condition clause violated>",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Piezoelectric Drop-on-Demand Inkjet Printing with Ultra-High Droplet Velocity.' (strong overlap: crosstalk, drop, from, velocity)",
+      "verified": true
+     },
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['40', '7', '5']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'varying ink formulations and' (field: predicted_effect)",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "SCOPE <the boundary condition clause violated>",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "verdict": "KILL",
+   "basis": "The candidate claims to restore nozzle drop velocity to \"at least 8 m/s\" while maintaining \"150 m/min print speed and 26 kHz firing frequency within 2W power limit,\" but the provided evidence [europepmc:37840768] discusses ultra-high droplet velocity without addressing simultaneous high-speed, high-frequency operation within such strict power constraints. GROUNDED_IN: EVIDENCE [europepmc:37840768] | RECORD \"Piezoelectric Drop-on-Demand Inkjet Printing with Ultra-High Droplet Velocity\"",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "record id europepmc:37840768",
+      "verified": true
+     },
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['8', '150', '26', '2', '37840768', '37840768']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'velocity to at least' (field: predicted_effect)",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "EVIDENCE [europepmc:37840768] | RECORD \"Piezoelectric Drop-on-Demand Inkjet Printing with Ultra-High Droplet Velocity\"",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "verdict": "ABSTAIN",
+   "basis": "The candidate fails to demonstrate any improvement over baseline performance in the specific failure scenario of center nozzles experiencing velocity drop during solid-area coverage at 30 kHz firing frequency. GROUNDED_IN: COMPUTATION <the baseline shows 7→5 m/s drop in center nozzles at 30 kHz; candidate claims 8 m/s at 26 kHz without addressing center nozzle crosstalk>",
+   "grounding": {
+    "grounded": false,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Piezoelectric Drop-on-Demand Inkjet Printing with Ultra-High Droplet Velocity.' (strong overlap: crosstalk, demonstrate, drop, velocity)",
+      "verified": true
+     },
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['30', '7', '5', '30', '8', '26']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "COMPUTATION <the baseline shows 7→5 m/s drop in center nozzles at 30 kHz; candidate claims 8 m/s at 26 kHz without addressing center nozzle crosstalk>",
+    "absence_ground": true,
+    "demotion_reason": "the asserted ground is an ABSENCE of evidence/support — absence is uncertainty, not failure (Art. XXI.3/XXV); the objection is preserved and escalated, never executed as a kill"
+   },
+   "demoted_from": "KILL"
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "verdict": "KILL",
+   "basis": "Embedding a network of micro-sensors in the printhead substrate to measure ink properties in real-time while maintaining the required 26 kHz firing frequency is physically impossible due to sensor response time limitations and power constraints. GROUNDED_IN: COMPUTATION <26 kHz = 38.46 µs per cycle; typical microsensor response times are measured in milliseconds, orders of magnitude too slow>",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Piezoelectric Drop-on-Demand Inkjet Printing with Ultra-High Droplet Velocity.' (strong overlap: impossible, limitations, printhead, times)",
+      "verified": true
+     },
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['26', '26', '38.46']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'in the printhead substrate' (field: intervention)",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "COMPUTATION <26 kHz = 38.46 µs per cycle; typical microsensor response times are measured in milliseconds, orders of magnitude too slow>",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "verdict": "KILL",
+   "basis": "The testable prediction \"Compare droplet velocity consistency when switching between ink formulations\" fails to measure the actual failure condition (center nozzle velocity drop during high-frequency operation) and instead focuses on a different parameter that doesn't address the core problem. GROUNDED_IN: SCOPE <the boundary condition clause violated>",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Piezoelectric Drop-on-Demand Inkjet Printing with Ultra-High Droplet Velocity.' (strong overlap: different, drop, droplet, high)",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'droplet velocity consistency when' (field: testable_prediction)",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "SCOPE <the boundary condition clause violated>",
+    "absence_ground": false
+   }
+  }
+ ],
+ "intervention_suggestions": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "suggestion": "Replace nanoscale sensors with distributed piezoelectric actuators that actively counteract crosstalk signals, as the current approach doesn't address the mechanical coupling between nozzles that causes center nozzle velocity reduction. GROUNDED_IN: EVIDENCE [europepmc:37840768] | RECORD \"Piezoelectric Drop-on-Demand Inkjet Printing with Ultra-High Droplet Velocity\"",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "record id europepmc:37840768",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "EVIDENCE [europepmc:37840768] | RECORD \"Piezoelectric Drop-on-Demand Inkjet Printing with Ultra-High Droplet Velocity\"",
+    "absence_ground": false
+   },
+   "class": "GROUNDED_INTERVENTION",
+   "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "suggestion": "Target the specific center 40% of printhead modules with dedicated crosstalk compensation circuitry rather than attempting system-wide adaptation, as the failure is spatially localized. GROUNDED_IN: SCOPE <the boundary condition clause violated>",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Piezoelectric Drop-on-Demand Inkjet Printing with Ultra-High Droplet Velocity.' (strong overlap: crosstalk, printhead, with)",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "SCOPE <the boundary condition clause violated>",
+    "absence_ground": false
+   },
+   "class": "GROUNDED_INTERVENTION",
+   "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "suggestion": "Provide experimental data showing simultaneous achievement of 8 m/s droplet velocity, 150 m/min print speed, and 26 kHz firing frequency within 2W power limit, as the current evidence bundle lacks this critical validation. GROUNDED_IN: EVIDENCE [europepmc:37840768] | RECORD \"Piezoelectric Drop-on-Demand Inkjet Printing with Ultra-High Droplet Velocity\"",
+   "grounding": {
+    "grounded": false,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "record id europepmc:37840768",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span '26 khz firing frequency' (field: predicted_effect)",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "EVIDENCE [europepmc:37840768] | RECORD \"Piezoelectric Drop-on-Demand Inkjet Printing with Ultra-High Droplet Velocity\"",
+    "absence_ground": true,
+    "demotion_reason": "the asserted ground is an ABSENCE of evidence/support — absence is uncertainty, not failure (Art. XXI.3/XXV); the objection is preserved and escalated, never executed as a kill"
+   },
+   "class": "UNGROUND_SUGGESTION",
+   "authority": "NONE — an ungrounded suggestion is preserved for human/escalation review and NEVER enters the hypothesis space (R450 §10: the attacker does not get authority to invent causal explanations)"
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "suggestion": "Demonstrate improvement specifically in center nozzle performance during solid-area coverage at high frequencies, rather than general adaptive claims that don't address the documented failure mode. GROUNDED_IN: COMPUTATION <the baseline shows 7→5 m/s drop in center nozzles at 30 kHz>",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Piezoelectric Drop-on-Demand Inkjet Printing with Ultra-High Droplet Velocity.' (strong overlap: demonstrate, drop, high, that)",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "COMPUTATION <the baseline shows 7→5 m/s drop in center nozzles at 30 kHz>",
+    "absence_ground": false
+   },
+   "class": "GROUNDED_INTERVENTION",
+   "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "suggestion": "Utilize predictive modeling based on pre-characterized ink properties rather than real-time sensing, as sensor response times cannot meet the microsecond requirements of 26 kHz operation. GROUNDED_IN: COMPUTATION <26 kHz = 38.46 µs per cycle; typical microsensor response times are measured in milliseconds>",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['26', '26', '38.46']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "COMPUTATION <26 kHz = 38.46 µs per cycle; typical microsensor response times are measured in milliseconds>",
+    "absence_ground": false
+   },
+   "class": "GROUNDED_INTERVENTION",
+   "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "suggestion": "Design test protocols that specifically measure center nozzle velocity during high-frequency solid-area coverage, rather than testing ink formulation switching which doesn't address the actual failure mechanism. GROUNDED_IN: SCOPE <the boundary condition clause violated>",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Piezoelectric Drop-on-Demand Inkjet Printing with Ultra-High Droplet Velocity.' (strong overlap: high, that, velocity, which)",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "SCOPE <the boundary condition clause violated>",
+    "absence_ground": false
+   },
+   "class": "GROUNDED_INTERVENTION",
+   "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+  }
+ ],
+ "state": "ATTACK_RUN",
+ "overall": "KILLED",
+ "kill_basis": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "basis": "The proposed closed-loop adaptive control system with nanoscale sensors and machine learning lacks any demonstrated capability to handle the crosstalk issues inherent in high-frequency firing arrays, which is the primary cause of velocity reduction in the center nozzles. GROUNDED_IN: EVIDENCE [europepmc:37840768] | RECORD \"Piezoelectric Drop-on-Demand Inkjet Printing with Ultra-High Droplet Velocity\"",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "record id europepmc:37840768",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'closed loop adaptive control' (field: mechanism)",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "EVIDENCE [europepmc:37840768] | RECORD \"Piezoelectric Drop-on-Demand Inkjet Printing with Ultra-High Droplet Velocity\"",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "basis": "The candidate fails to address the specific boundary condition of \"center 40 percent of each module\" showing drop velocity falling from 7 to under 5 m/s, instead making a general claim about \"adaptive performance across varying ink formulations and environmental conditions\" without targeting the spatial crosstalk problem. GROUNDED_IN: SCOPE <the boundary condition clause violated>",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Piezoelectric Drop-on-Demand Inkjet Printing with Ultra-High Droplet Velocity.' (strong overlap: crosstalk, drop, from, velocity)",
+      "verified": true
+     },
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['40', '7', '5']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'varying ink formulations and' (field: predicted_effect)",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "SCOPE <the boundary condition clause violated>",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "basis": "The candidate claims to restore nozzle drop velocity to \"at least 8 m/s\" while maintaining \"150 m/min print speed and 26 kHz firing frequency within 2W power limit,\" but the provided evidence [europepmc:37840768] discusses ultra-high droplet velocity without addressing simultaneous high-speed, high-frequency operation within such strict power constraints. GROUNDED_IN: EVIDENCE [europepmc:37840768] | RECORD \"Piezoelectric Drop-on-Demand Inkjet Printing with Ultra-High Droplet Velocity\"",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "record id europepmc:37840768",
+      "verified": true
+     },
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['8', '150', '26', '2', '37840768', '37840768']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'velocity to at least' (field: predicted_effect)",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "EVIDENCE [europepmc:37840768] | RECORD \"Piezoelectric Drop-on-Demand Inkjet Printing with Ultra-High Droplet Velocity\"",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "basis": "Embedding a network of micro-sensors in the printhead substrate to measure ink properties in real-time while maintaining the required 26 kHz firing frequency is physically impossible due to sensor response time limitations and power constraints. GROUNDED_IN: COMPUTATION <26 kHz = 38.46 µs per cycle; typical microsensor response times are measured in milliseconds, orders of magnitude too slow>",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Piezoelectric Drop-on-Demand Inkjet Printing with Ultra-High Droplet Velocity.' (strong overlap: impossible, limitations, printhead, times)",
+      "verified": true
+     },
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['26', '26', '38.46']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'in the printhead substrate' (field: intervention)",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "COMPUTATION <26 kHz = 38.46 µs per cycle; typical microsensor response times are measured in milliseconds, orders of magnitude too slow>",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "basis": "The testable prediction \"Compare droplet velocity consistency when switching between ink formulations\" fails to measure the actual failure condition (center nozzle velocity drop during high-frequency operation) and instead focuses on a different parameter that doesn't address the core problem. GROUNDED_IN: SCOPE <the boundary condition clause violated>",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Piezoelectric Drop-on-Demand Inkjet Printing with Ultra-High Droplet Velocity.' (strong overlap: different, drop, droplet, high)",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'droplet velocity consistency when' (field: testable_prediction)",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "SCOPE <the boundary condition clause violated>",
+    "absence_ground": false
+   }
+  }
+ ],
+ "counts": {
+  "KILL": 5,
+  "RISK": 0,
+  "SURVIVE": 0,
+  "ABSTAIN_DEMOTED": 1,
+  "INVALID": 0
+ }
+}

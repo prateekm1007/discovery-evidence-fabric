@@ -1,0 +1,240 @@
+{
+ "candidate_id": "",
+ "problem_id": "r458-s1-ranking-model-distribution-shift",
+ "problem": {
+  "problem_id": "r458-s1-ranking-model-distribution-shift",
+  "device": "marketplace's search ranking model",
+  "failure_mode": "decay in normalized discounted cumulative gain",
+  "objective": "recover at least 3.5 points of the 4-percent revenue-per-search gap",
+  "failure": "Documented problem 'decay in normalized discounted cumulative gain' concerning marketplace's search ranking model. User-submitted engineering problem (session input): \"A marketplace's search ranking model, trained on 18 months of interaction logs, decays measurably after a redesign moves the buy button above the fold on mobile: offline replay shows a 6-percent drop in normalized discounted cumulative gain against held-out post-launch traffic, click-through on rank\".  ROUTING: nhtsa_complaints: routing state ARCHIVED_ROUTING — measured: NOT_QUERIED_GRAMMAR on every non-vehicle problem (70 recorded grammar mismatches, zero production-run uses in the current domain set — R399 audit W3); reinstatement: the production domain set includes vehicle problems with extracted make|model|year parameters (flip to ACTIVE + worklog entry; connector implementation archived in place). ROUTING: nhtsa_recalls: routing state ARCHIVED_ROUTING — measured: NOT_QUERIED_GRAMMAR on every non-vehicle problem (70 recorded grammar mismatches, zero production-run uses in the current domain set — R399 audit W3); reinstatement: the production domain set includes vehicle problems with extracted make|model|year parameters (flip to ACTIVE + worklog entry; connector implementation archived in place). [nhtsa_complaints] retrieval status NOT_QUERIED_ARCHIVED_ROUTING (engine routing decision (R399 W3): ARCHIVED_ROUTING — not a provider failure and not absence) — provider outcome recorded, not treated as absence (Art. XXI.3). [nhtsa_recalls] retrieval status NOT_QUERIED_ARCHIVED_ROUTING (engine routing decision (R399 W3): ARCHIVED_ROUTING — not a provider failure and not absence) — provider outcome recorded, not treated as absence (Art. XXI.3). Problem-existence basis: NO SOURCE RETURNED RECORDS — problem existence UNVERIFIED by live evidence (Art. XX); treat as hypothesis.",
+  "constraint": "cannot launch a full retraining pipeline redesign, cannot increase serving latency beyond 45 milliseconds, cannot buy new labeling beyond the current budget",
+  "sources": {
+   "nhtsa_complaints": "NOT_QUERIED_ARCHIVED_ROUTING",
+   "nhtsa_recalls": "NOT_QUERIED_ARCHIVED_ROUTING"
+  },
+  "origin": "toscanini_ui",
+  "user_text": "A marketplace's search ranking model, trained on 18 months of interaction logs, decays measurably after a redesign moves the buy button above the fold on mobile: offline replay shows a 6-percent drop in normalized discounted cumulative gain against held-out post-launch traffic, click-through on ranked position 3 falls 11 percent, and revenue-per-search is down 4 percent over five weeks while the site's overall traffic is flat. The model is a gradient-boosted ranking model over 240 features with a 45-millisecond serving deadline including feature fetches, and the label pipeline (delayed conversion labels arriving 1 to 9 days after click) cannot be rebuilt this quarter. The team cannot launch a full retraining pipeline redesign (one release per quarter, already committed), cannot increase serving latency beyond 45 milliseconds (the page-speed budget is contractual), cannot buy new labeling beyond the current budget, and must recover at least 3.5 points of the 4-percent revenue-per-search gap within one quarter on the existing serving stack.",
+  "r458_benchmark": {
+   "class": "FROZEN_BENCHMARK_DEV",
+   "arm": "qwen3-1.7b",
+   "content_sha256": "7a51fe4869ecbf40f38e6c8e3d8934d28c354b7ce209073e80ee56ede07969a1",
+   "corpus_freeze": "R458/BENCHMARK_FREEZE.json"
+  }
+ },
+ "evidence_ids": [],
+ "evidence": [],
+ "mechanism_ids": [],
+ "mechanism_map": {},
+ "premise_gate": {},
+ "evidence_classification": {},
+ "mechanism_space": {},
+ "prior_art_ids": [],
+ "prior_art": {},
+ "collision_results": {},
+ "physics": {},
+ "attack_results": {},
+ "contradictions": {},
+ "killer_experiment": {},
+ "adjudication": {},
+ "multi_source": {},
+ "cemetery_check": {},
+ "epistemic_state": {},
+ "next_best_action": {},
+ "ranking": {},
+ "provenance": {},
+ "stage_log": [
+  {
+   "stage": "RETRIEVE",
+   "capability_id": "A2_RETRIEVAL",
+   "status": "SKIPPED_ADMISSION",
+   "skip_reason": "SYNTHESIS_CAPABILITY_INSUFFICIENT_PRE_RETRIEVAL: the synthesis route can only serve STRONG via CHEAP_EMERGENCY_FALLBACK — retrieval fan-out refused before spending (R455-LEAN-1 §2; Art. LXI: infrastructure class, resumable)",
+   "skip_class": "BLOCKED",
+   "capability_gate": {
+    "gate": "R455-LEAN-1/strong_route_capability/1.0.0",
+    "state": "DEGRADED_ONLY",
+    "requested_task": "STRONG",
+    "strong_rungs": [],
+    "degraded_rungs": [
+     {
+      "provider": "localqwen",
+      "model": "qwen3-1.7b",
+      "task_capabilities": [
+       "CHEAP"
+      ]
+     }
+    ],
+    "refused_rungs": [],
+    "basis": "declared task capabilities of every reachable (available + cost-eligible + not known-dead) rung; probe state is deliberately NOT consulted — declared capability is probe-independent (Art. V: the gate must never deadlock a route behind its own probe TTL)"
+   },
+   "candidate_delta": [],
+   "delta_real": false,
+   "started_at": "2026-09-14T20:17:29+00:00Z",
+   "finished_at": "2026-09-14T20:17:29+00:00Z"
+  },
+  {
+   "stage": "FREEZE",
+   "capability_id": "EVIDENCE_FREEZE",
+   "status": "SKIPPED_ADMISSION",
+   "skip_reason": "not reached: the pre-retrieval capability gate blocked this run (see the RETRIEVE entry and CAPABILITY_GATE.json — R455-LEAN-1 §2)",
+   "skip_class": "NOT_REACHED",
+   "candidate_delta": [],
+   "delta_real": false,
+   "started_at": "2026-09-14T20:17:29+00:00Z",
+   "finished_at": "2026-09-14T20:17:29+00:00Z"
+  },
+  {
+   "stage": "PREMISE_GATE",
+   "capability_id": "PREMISE_GATE",
+   "status": "SKIPPED_ADMISSION",
+   "skip_reason": "not reached: the pre-retrieval capability gate blocked this run (see the RETRIEVE entry and CAPABILITY_GATE.json — R455-LEAN-1 §2)",
+   "skip_class": "NOT_REACHED",
+   "candidate_delta": [],
+   "delta_real": false,
+   "started_at": "2026-09-14T20:17:29+00:00Z",
+   "finished_at": "2026-09-14T20:17:29+00:00Z"
+  },
+  {
+   "stage": "SYNTHESIZE",
+   "capability_id": "SYNTHESIS",
+   "status": "SKIPPED_ADMISSION",
+   "skip_reason": "not reached: the pre-retrieval capability gate blocked this run (see the RETRIEVE entry and CAPABILITY_GATE.json — R455-LEAN-1 §2)",
+   "skip_class": "NOT_REACHED",
+   "candidate_delta": [],
+   "delta_real": false,
+   "started_at": "2026-09-14T20:17:29+00:00Z",
+   "finished_at": "2026-09-14T20:17:29+00:00Z"
+  },
+  {
+   "stage": "VERIFY",
+   "capability_id": "EVIDENCE_VERIFY",
+   "status": "SKIPPED_ADMISSION",
+   "skip_reason": "not reached: the pre-retrieval capability gate blocked this run (see the RETRIEVE entry and CAPABILITY_GATE.json — R455-LEAN-1 §2)",
+   "skip_class": "NOT_REACHED",
+   "candidate_delta": [],
+   "delta_real": false,
+   "started_at": "2026-09-14T20:17:29+00:00Z",
+   "finished_at": "2026-09-14T20:17:29+00:00Z"
+  },
+  {
+   "stage": "MECHANISM_SPACE",
+   "capability_id": "MECHANISM_SPACE",
+   "status": "SKIPPED_ADMISSION",
+   "skip_reason": "not reached: the pre-retrieval capability gate blocked this run (see the RETRIEVE entry and CAPABILITY_GATE.json — R455-LEAN-1 §2)",
+   "skip_class": "NOT_REACHED",
+   "candidate_delta": [],
+   "delta_real": false,
+   "started_at": "2026-09-14T20:17:29+00:00Z",
+   "finished_at": "2026-09-14T20:17:29+00:00Z"
+  },
+  {
+   "stage": "MULTI_SOURCE_DISCOVERY",
+   "capability_id": "MULTI_SOURCE_DISCOVERY",
+   "status": "SKIPPED_ADMISSION",
+   "skip_reason": "not reached: the pre-retrieval capability gate blocked this run (see the RETRIEVE entry and CAPABILITY_GATE.json — R455-LEAN-1 §2)",
+   "skip_class": "NOT_REACHED",
+   "candidate_delta": [],
+   "delta_real": false,
+   "started_at": "2026-09-14T20:17:29+00:00Z",
+   "finished_at": "2026-09-14T20:17:29+00:00Z"
+  },
+  {
+   "stage": "COLLISION",
+   "capability_id": "COLLISION_ENGINE",
+   "status": "SKIPPED_ADMISSION",
+   "skip_reason": "not reached: the pre-retrieval capability gate blocked this run (see the RETRIEVE entry and CAPABILITY_GATE.json — R455-LEAN-1 §2)",
+   "skip_class": "NOT_REACHED",
+   "candidate_delta": [],
+   "delta_real": false,
+   "started_at": "2026-09-14T20:17:29+00:00Z",
+   "finished_at": "2026-09-14T20:17:29+00:00Z"
+  },
+  {
+   "stage": "PHYSICS",
+   "capability_id": "PHYSICS_GATE",
+   "status": "SKIPPED_ADMISSION",
+   "skip_reason": "not reached: the pre-retrieval capability gate blocked this run (see the RETRIEVE entry and CAPABILITY_GATE.json — R455-LEAN-1 §2)",
+   "skip_class": "NOT_REACHED",
+   "candidate_delta": [],
+   "delta_real": false,
+   "started_at": "2026-09-14T20:17:29+00:00Z",
+   "finished_at": "2026-09-14T20:17:29+00:00Z"
+  },
+  {
+   "stage": "ATTACK",
+   "capability_id": "ATTACK_ENGINE",
+   "status": "SKIPPED_ADMISSION",
+   "skip_reason": "not reached: the pre-retrieval capability gate blocked this run (see the RETRIEVE entry and CAPABILITY_GATE.json — R455-LEAN-1 §2)",
+   "skip_class": "NOT_REACHED",
+   "candidate_delta": [],
+   "delta_real": false,
+   "started_at": "2026-09-14T20:17:29+00:00Z",
+   "finished_at": "2026-09-14T20:17:29+00:00Z"
+  },
+  {
+   "stage": "CONTRADICTION",
+   "capability_id": "CONTRADICTION_QUEUE",
+   "status": "SKIPPED_ADMISSION",
+   "skip_reason": "not reached: the pre-retrieval capability gate blocked this run (see the RETRIEVE entry and CAPABILITY_GATE.json — R455-LEAN-1 §2)",
+   "skip_class": "NOT_REACHED",
+   "candidate_delta": [],
+   "delta_real": false,
+   "started_at": "2026-09-14T20:17:29+00:00Z",
+   "finished_at": "2026-09-14T20:17:29+00:00Z"
+  },
+  {
+   "stage": "KILLER_EXPERIMENT",
+   "capability_id": "KILLER_EXPERIMENT",
+   "status": "SKIPPED_ADMISSION",
+   "skip_reason": "not reached: the pre-retrieval capability gate blocked this run (see the RETRIEVE entry and CAPABILITY_GATE.json — R455-LEAN-1 §2)",
+   "skip_class": "NOT_REACHED",
+   "candidate_delta": [],
+   "delta_real": false,
+   "started_at": "2026-09-14T20:17:29+00:00Z",
+   "finished_at": "2026-09-14T20:17:29+00:00Z"
+  },
+  {
+   "stage": "ADJUDICATION",
+   "capability_id": "ADJUDICATION",
+   "status": "SKIPPED_ADMISSION",
+   "skip_reason": "not reached: the pre-retrieval capability gate blocked this run (see the RETRIEVE entry and CAPABILITY_GATE.json — R455-LEAN-1 §2)",
+   "skip_class": "NOT_REACHED",
+   "candidate_delta": [],
+   "delta_real": false,
+   "started_at": "2026-09-14T20:17:29+00:00Z",
+   "finished_at": "2026-09-14T20:17:29+00:00Z"
+  },
+  {
+   "stage": "CLASSIFY",
+   "capability_id": "EPISTEMIC_CLASSIFICATION",
+   "status": "SKIPPED_ADMISSION",
+   "skip_reason": "not reached: the pre-retrieval capability gate blocked this run (see the RETRIEVE entry and CAPABILITY_GATE.json — R455-LEAN-1 §2)",
+   "skip_class": "NOT_REACHED",
+   "candidate_delta": [],
+   "delta_real": false,
+   "started_at": "2026-09-14T20:17:29+00:00Z",
+   "finished_at": "2026-09-14T20:17:29+00:00Z"
+  },
+  {
+   "stage": "NEXT_BEST_ACTION",
+   "capability_id": "NEXT_BEST_ACTION",
+   "status": "SKIPPED_ADMISSION",
+   "skip_reason": "not reached: the pre-retrieval capability gate blocked this run (see the RETRIEVE entry and CAPABILITY_GATE.json — R455-LEAN-1 §2)",
+   "skip_class": "NOT_REACHED",
+   "candidate_delta": [],
+   "delta_real": false,
+   "started_at": "2026-09-14T20:17:29+00:00Z",
+   "finished_at": "2026-09-14T20:17:29+00:00Z"
+  },
+  {
+   "stage": "RANK",
+   "capability_id": "PORTFOLIO_RANKING",
+   "status": "SKIPPED_ADMISSION",
+   "skip_reason": "not reached: the pre-retrieval capability gate blocked this run (see the RETRIEVE entry and CAPABILITY_GATE.json — R455-LEAN-1 §2)",
+   "skip_class": "NOT_REACHED",
+   "candidate_delta": [],
+   "delta_real": false,
+   "started_at": "2026-09-14T20:17:29+00:00Z",
+   "finished_at": "2026-09-14T20:17:29+00:00Z"
+  }
+ ]
+}

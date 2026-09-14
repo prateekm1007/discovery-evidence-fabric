@@ -1,0 +1,1355 @@
+{
+ "candidate_id": "cand:A2:r458-s1-ranking-model-distribution-shift:7a6c3d309b9ec3d4",
+ "problem_id": "r458-s1-ranking-model-distribution-shift",
+ "problem": {
+  "problem_id": "r458-s1-ranking-model-distribution-shift",
+  "device": "search ranking model",
+  "failure_mode": "performance decay after redesign",
+  "objective": "recover at least 3.5 points of the 4-percent revenue-per-search gap within one quarter",
+  "failure": "Documented problem 'performance decay after redesign' concerning search ranking model. User-submitted engineering problem (session input): \"A marketplace's search ranking model, trained on 18 months of interaction logs, decays measurably after a redesign moves the buy button above the fold on mobile: offline replay shows a 6-percent drop in normalized discounted cumulative gain against held-out post-launch traffic, click-through on rank\".  ROUTING: doe_osti: routing state SUSPENDED_RELEVANCE — measured relevance instability (R375: same fusion papers relevant 3 -> 0; pooled relevant-rate 0.175 pre-fix; DETERMINISM_GAP flagged in the R394 production audit) — records poison synthesis-feeding retrieval more than they feed it until relevance is semantically adjudicated; reinstatement: the Phase P1 semantic reranker lands (semantic relevance adjudication between query and record, replacing lexical overlap); flip to ACTIVE + a measured relevance re-run + worklog entry. [europepmc] 10 records retrieved live (2024-2026). Illustrative records: 'Argus: A Sparse-Label Machine-Learning Workflow for Passive DAS Seismic Catalogue Expansion in CO&lt;sub&gt;2&lt;/sub&gt; Storage Monitoring-Application to the CO2CRC Otway Stage 4 Dataset.'; 'Application of deep learning in prognostic prediction of non-small cell lung cancer.'. LIMITS STAMPED INLINE: literature context establishes the problem class, not event rates. [arxiv] 5 records retrieved live (1902-2021). Illustrative records: 'SPSA-FSR: Simultaneous Perturbation Stochastic Approximation for Feature Selection and Ranking'; 'Insights into the multiplicity-induced-dominancy for scalar delay-differential equations with two delays'. LIMITS STAMPED INLINE: literature context establishes the problem class, not event rates. [doe_osti] retrieval status NOT_QUERIED_SUSPENDED_RELEVANCE (engine routing decision (R399 W3): SUSPENDED_RELEVANCE — not a provider failure and not absence) — provider outcome recorded, not treated as absence (Art. XXI.3). Problem-existence basis: live records retrieved.",
+  "constraint": "maintain 45-millisecond serving deadline with existing feature stack and label pipeline",
+  "sources": {
+   "europepmc": "OK",
+   "arxiv": "OK",
+   "doe_osti": "NOT_QUERIED_SUSPENDED_RELEVANCE"
+  },
+  "origin": "toscanini_ui",
+  "user_text": "A marketplace's search ranking model, trained on 18 months of interaction logs, decays measurably after a redesign moves the buy button above the fold on mobile: offline replay shows a 6-percent drop in normalized discounted cumulative gain against held-out post-launch traffic, click-through on ranked position 3 falls 11 percent, and revenue-per-search is down 4 percent over five weeks while the site's overall traffic is flat. The model is a gradient-boosted ranking model over 240 features with a 45-millisecond serving deadline including feature fetches, and the label pipeline (delayed conversion labels arriving 1 to 9 days after click) cannot be rebuilt this quarter. The team cannot launch a full retraining pipeline redesign (one release per quarter, already committed), cannot increase serving latency beyond 45 milliseconds (the page-speed budget is contractual), cannot buy new labeling beyond the current budget, and must recover at least 3.5 points of the 4-percent revenue-per-search gap within one quarter on the existing serving stack.",
+  "r458_benchmark": {
+   "class": "FROZEN_BENCHMARK_DEV",
+   "arm": "glm-4-plus-thinking",
+   "content_sha256": "7a51fe4869ecbf40f38e6c8e3d8934d28c354b7ce209073e80ee56ede07969a1",
+   "corpus_freeze": "R458/BENCHMARK_FREEZE.json"
+  }
+ },
+ "evidence_ids": [
+  "doi:10.3390/s26134247",
+  "doi:10.3390/biomimetics11070516",
+  "doi:10.1038/s41598-026-56933-4",
+  "doi:10.1038/s41598-026-62977-3",
+  "doi:10.3390/e28050568",
+  "doi:10.70729/j2013213",
+  "doi:10.5281/zenodo.19250879",
+  "doi:10.18130/v3tg0k",
+  "doi:10.12794/metadc2726",
+  "doi:10.48550/arxiv.2605.05991",
+  "doi:10.48550/arxiv.2305.18431",
+  "doi:10.2139/ssrn.4892616",
+  "title:42357e1d4fa97cc1",
+  "title:d835c56d3785ac6b",
+  "doi:10.1109/aiiot65859.2025.11105329",
+  "title:0ad8c1fcf101a71e"
+ ],
+ "evidence": [
+  {
+   "id": "doi:10.3390/s26134247",
+   "source_type": "scientific_paper",
+   "source": "europepmc",
+   "source_id": "europepmc:europepmc:42451488",
+   "source_uri": "https://doi.org/10.3390/s26134247",
+   "title": "AHGA-SA: A Novel Adaptive Hybrid Framework for Feature Selection in IoT-Oriented Intrusion Detection with Explainable AI.",
+   "abstract": "The increasing connectivity of Internet of Things (IoT)-oriented environments has made them more vulnerable to cyberattacks, requiring intrusion-detection systems (IDSs) to ensure their secure and reliable operation. The feature selection (FS) process of an IDS affects its performance, as effective FS can enhance detection accuracy and reduce the computational cost and model complexity. This paper presents Adaptive Hybrid Genetic Algorithm-Simulated Annealing (AHGA-SA) as an FS framework that integrates the global search ability of a genetic algorithm and the local exploitation ability of simulated annealing. AHGA-SA aims to find compact, informative feature subsets in high-dimensional intrusion-detection datasets at an acceptable computational cost while maintaining detection performance. The experimental results on three recent benchmarks demonstrate feature-space reduction, with classification accuracies of 99.04% on IoTID20 (using 12 features), 98.25% on WUSTL-EHMS (using seven features), and 99.18% on Edge-IIoTset (using nine features). The results also demonstrate reduced training and testing times, central processing unit usage, resident set size overhead, and subset size compared to the baseline. Furthermore, Shapley additive explanations, as an explainable artificial intelligence technique, are applied to explain the model's predictions and to show the contribution of the selected features to the IDS decision-making process.",
+   "doi": "10.3390/s26134247",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2026-07-04",
+   "retrieval_timestamp": "2026-09-14T20:49:44.361975+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "8e67ea9177517a94a6e2aef9629ab2e266821cc21795cd9ccfa5c8f642ebdf64",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "europepmc",
+    "indexing_sources": [
+     "europepmc"
+    ],
+    "record_ids_by_source": {
+     "europepmc": "europepmc:42451488"
+    },
+    "queries_by_source": {
+     "europepmc": "search ranking model performance decay after experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "biomedical_pubmed_line",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "biomedical_pubmed_line",
+   "canonical_id": "doi:10.3390/s26134247",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "search ranking model performance decay after experimental comparison",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstract-level evidence: full text may contain methods and constraints not present in the abstract",
+    "Publication existence is not clinical evidence of safety or effectiveness",
+    "Citation counts are bibliometric signals, not validity measures"
+   ]
+  },
+  {
+   "id": "doi:10.3390/biomimetics11070516",
+   "source_type": "scientific_paper",
+   "source": "europepmc",
+   "source_id": "europepmc:europepmc:42505549",
+   "source_uri": "https://doi.org/10.3390/biomimetics11070516",
+   "title": "Evolutionary, Neural, or LLM-Driven Heuristic Generation? A Unified Ant Colony Optimization Benchmark for Nature-Inspired Routing Heuristics on the TSP and CVRP.",
+   "abstract": "Biomimetic optimization transfers biological information-processing mechanisms into computational systems. Ant colony optimization (ACO) is a canonical example: artificial ants functionally abstract pheromone-mediated stigmergy, decentralized exploration, trail decay through algorithmic evaporation, and adaptive path reinforcement. Building on this functional biological analogue, we present a controlled cross-paradigm evaluation of routing-heuristic generation. A standardized interface embeds human-designed rules, the genetic programming hyper-heuristic GHPP, a resource-constrained DeepACO-MLP proxy, and an offline ReEvo-style proxy into the same ACO solver. The methods are evaluated on held-out TSP and CVRP instances in terms of solution quality, reported generation or training cost, interpretability, and cross-scale behavior under a matched distribution. GHPP yields the shortest routes at all tested scales; the ReEvo-offline proxy and strong human-designed rules generally form a second tier, whereas the resource-constrained neural proxy degrades markedly as problem size increases. These results do not establish an intrinsic ranking of full-capability paradigms. Instead, they show that method selection depends on the operating constraint and on evidence provenance: longer locally measured offline search favors GHPP, while auditable explicit rules characterize the human and ReEvo-offline proxies. By holding the ant-inspired execution mechanism fixed and varying the source of heuristic information, the benchmark clarifies how evolutionary, neural, and LLM-style design strategies interact with a common biomimetic substrate.",
+   "doi": "10.3390/biomimetics11070516",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2026-07-22",
+   "retrieval_timestamp": "2026-09-14T20:49:44.362068+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "098d1b56c5e818199516077e4ac0d3cdd72c4c9a97ecc284338dc654b735b1c6",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "europepmc",
+    "indexing_sources": [
+     "europepmc"
+    ],
+    "record_ids_by_source": {
+     "europepmc": "europepmc:42505549"
+    },
+    "queries_by_source": {
+     "europepmc": "search ranking model performance decay after redesign"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "biomedical_pubmed_line",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "biomedical_pubmed_line",
+   "canonical_id": "doi:10.3390/biomimetics11070516",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "search ranking model performance decay after redesign",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstract-level evidence: full text may contain methods and constraints not present in the abstract",
+    "Publication existence is not clinical evidence of safety or effectiveness",
+    "Citation counts are bibliometric signals, not validity measures"
+   ]
+  },
+  {
+   "id": "doi:10.1038/s41598-026-56933-4",
+   "source_type": "scientific_paper",
+   "source": "europepmc",
+   "source_id": "europepmc:europepmc:42277162",
+   "source_uri": "https://doi.org/10.1038/s41598-026-56933-4",
+   "title": "Intelligent english education resource recommendation via LLM-knowledge graph integration and ecological niche fitness modeling.",
+   "abstract": "Teaching English to large and varied student populations has made adaptive, learner-aware resource recommendation a pressing need, yet most deployed systems still lean on collaborative filtering or content heuristics that read learners only at the surface. Such systems tend to stumble in four recurring ways: they miss the finer grain of linguistic competence, they reason over sparse and brittle knowledge associations, they falter whenever a learner or a resource is new, and they rarely travel well to settings their training never saw. We address these problems together through a framework in which a large language model and a knowledge graph inform one another, their match to each learner mediated by a fitness function adapted from ecological niche theory. The language model reads a learner's own writing to estimate evolving competence and proposes relations that fill thin regions of the graph, while the graph keeps the model's inferences anchored to the prerequisite and difficulty structure of English. A niche fitness score then judges how closely each resource's demands meet a learner's needs, and a path generator orders the survivors into prerequisite-respecting study sequences. On logs from 3,214 learners, 12,486 resources, and 287,653 interactions, the method reaches a Precision@5 of 0.782 and an NDCG@10 of 0.724, ahead of five baselines. Ablation was, frankly, the part that surprised us: the niche filter matters more to ranking quality than the model's semantic re-scoring. A three-axis generalization protocol, splitting transfer across learners, resource types, and difficulty levels, yields a composite index of 0.863, with cold-start decay held to 18.3%.",
+   "doi": "10.1038/s41598-026-56933-4",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2026-06-11",
+   "retrieval_timestamp": "2026-09-14T20:49:44.362095+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "8b85382c76ae0e2c875323bf306668b56226822d66a824622bb59840865c9e8f",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "europepmc",
+    "indexing_sources": [
+     "europepmc"
+    ],
+    "record_ids_by_source": {
+     "europepmc": "europepmc:42277162"
+    },
+    "queries_by_source": {
+     "europepmc": "search ranking model performance decay after experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "biomedical_pubmed_line",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "biomedical_pubmed_line",
+   "canonical_id": "doi:10.1038/s41598-026-56933-4",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "search ranking model performance decay after experimental comparison",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstract-level evidence: full text may contain methods and constraints not present in the abstract",
+    "Publication existence is not clinical evidence of safety or effectiveness",
+    "Citation counts are bibliometric signals, not validity measures"
+   ]
+  },
+  {
+   "id": "doi:10.1038/s41598-026-62977-3",
+   "source_type": "scientific_paper",
+   "source": "europepmc",
+   "source_id": "europepmc:europepmc:42542450",
+   "source_uri": "https://doi.org/10.1038/s41598-026-62977-3",
+   "title": "Hyperparameter-optimized deep learning for next-day pH forecasting in distributed water quality monitoring systems.",
+   "abstract": "Accurate short-horizon water-quality forecasting is important for environmental monitoring systems that aim to move from passive observation toward timely, data-driven intervention. Next-day pH prediction is particularly relevant because pH reflects aquatic chemical balance, pollutant behavior, and ecosystem health. This study addresses next-day pH prediction in a spatio-temporal monitoring context using the public Water Quality Prediction dataset from Georgia, USA, where distributed monitoring records reflect temporal continuity and spatial dependency. Here, spatio-temporal refers to the multi-site and time-indexed dataset structure rather than to an explicit graph-based spatial neural architecture. A two-stage learning framework is used: baseline models are first benchmarked under a unified protocol, and the strongest baseline is then refined through metaheuristic hyperparameter optimization. The framework combines preprocessing, comparative benchmarking, and optimizer-guided refinement, with RegNet as the focal predictive model and the Ocotillo Optimization Algorithm (OCOA) as the hyperparameter search mechanism. OCOA-RegNet is compared with optimizer-assisted RegNet variants based on PSO, GA, WOA DE, MVO, BA, SFS, BBO, and APO. In the baseline stage, RegNet achieved the strongest untuned performance, with an RMSE of 0.0285. In the optimization stage, OCOA + RegNet achieved the lowest RMSE, [Formula: see text] across independent runs, under the adopted protocol. These findings indicate that next-day pH forecasting benefits from both model selection and disciplined hyperparameter optimization, supporting the proposed workflow as a decision-support component for distributed water-quality monitoring.",
+   "doi": "10.1038/s41598-026-62977-3",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2026-08-01",
+   "retrieval_timestamp": "2026-09-14T20:49:44.362117+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "662500c7eb882c679fe251c08ff355f07bf109d0e42403e505689e16fa2ef38d",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "europepmc",
+    "indexing_sources": [
+     "europepmc"
+    ],
+    "record_ids_by_source": {
+     "europepmc": "europepmc:42542450"
+    },
+    "queries_by_source": {
+     "europepmc": "search ranking model performance decay after redesign"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "biomedical_pubmed_line",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "biomedical_pubmed_line",
+   "canonical_id": "doi:10.1038/s41598-026-62977-3",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "search ranking model performance decay after redesign",
+   "source_rank": 3,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstract-level evidence: full text may contain methods and constraints not present in the abstract",
+    "Publication existence is not clinical evidence of safety or effectiveness",
+    "Citation counts are bibliometric signals, not validity measures"
+   ]
+  },
+  {
+   "id": "doi:10.3390/e28050568",
+   "source_type": "scientific_paper",
+   "source": "europepmc",
+   "source_id": "europepmc:europepmc:42187983",
+   "source_uri": "https://doi.org/10.3390/e28050568",
+   "title": "Research on Error Compensation Methods of Dynamic Gravity Measurement Based on Swarm Cooperation Evolution Strategy and Optimized LSTM.",
+   "abstract": "Dynamic gravity measurement, crucial for engineering application, suffers accuracy degradation due to errors induced by carrier maneuvers. To address the limitations of conventional swarm optimization algorithms in precision, stability, and generalizability, this study proposes a Swarm Cooperation Evolution Strategy (SCES) that efficiently integrates multiple algorithms. The proposed SCES is extensively evaluated on the CEC2022 benchmark suite in comparison with several cooperative fusion-related algorithms and representative single optimization algorithms. The experimental results demonstrate that SCES achieves an overall effectiveness score of 0.034 and an optimal accessibility rate exceeding 95%. Compared to the best-performing fusion-based algorithm, these metrics represent improvements of 54.67% and 31.11%, respectively. Moreover, relative to the best-performing single optimization algorithm, the improvements amount to 37.73% and 32.69%, respectively. These findings robustly validate the superior performance of the proposed algorithm. Moreover, an in-depth investigation based on SCES into dynamic error compensation methodologies is conducted. Firstly, a polynomial compensation model is established through error mechanism analysis, with parameters identified via SCES. Secondly, a data-driven compensation model employing a multi-layer long short-term memory (LSTM) network optimized via neural architecture search (NAS) guided by SCES is proposed, circumventing the performance limitations inherent in manually designed networks. Furthermore, an innovative two-stage hybrid strategy is introduced. Systematic trend errors are compensated using the polynomial model, followed by the NAS-LSTM model addressing complex residual nonlinear errors, effectively combining mechanism-based and data-driven approaches. Validation on three lines exhibiting varying maneuverability shows all methods significantly improve accuracy. The hybrid strategy delivers optimal performance, achieving 0.58 mGal internal coincidence accuracy on stable lines and up to 91.58% improvement in external coincidence accuracy under high maneuverability. This research provides an effective high-precision dynamic gravity measurement and compensation solution, advancing engineering applications.",
+   "doi": "10.3390/e28050568",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2026-05-19",
+   "retrieval_timestamp": "2026-09-14T20:49:44.362133+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "5b99ee37dbce91bd02fbf346942349cf3b3298b1ff631cbe09961361c1c7ac8e",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "europepmc",
+    "indexing_sources": [
+     "europepmc"
+    ],
+    "record_ids_by_source": {
+     "europepmc": "europepmc:42187983"
+    },
+    "queries_by_source": {
+     "europepmc": "search ranking model performance decay after experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "biomedical_pubmed_line",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": {
+     "provider": "unpaywall",
+     "resolved_at": "2026-09-14T20:49:43.698653+00:00",
+     "is_oa": true,
+     "oa_status": "gold",
+     "host_type": "publisher",
+     "repository_institution": null
+    }
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "biomedical_pubmed_line",
+   "canonical_id": "doi:10.3390/e28050568",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "search ranking model performance decay after experimental comparison",
+   "source_rank": 4,
+   "fulltext_url": "https://doi.org/10.3390/e28050568",
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstract-level evidence: full text may contain methods and constraints not present in the abstract",
+    "Publication existence is not clinical evidence of safety or effectiveness",
+    "Citation counts are bibliometric signals, not validity measures"
+   ]
+  },
+  {
+   "id": "doi:10.70729/j2013213",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.70729/j2013213",
+   "source_uri": "https://doi.org/10.70729/j2013213",
+   "title": "A Global Fusion Re-Ranking for Effective Data Search with Correlation Model",
+   "abstract": "",
+   "doi": "10.70729/j2013213",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2014",
+   "retrieval_timestamp": "2026-09-14T20:49:44.362149+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "c1de9fd16750725e26eac78e7a6d2b0a4e9d928b7eec9f59e6e7126db94ce809",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.70729/j2013213"
+    },
+    "queries_by_source": {
+     "crossref": "search ranking model performance decay after redesign"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=journal-article"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.70729/j2013213",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "search ranking model performance decay after redesign",
+   "source_rank": 5,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  {
+   "id": "doi:10.5281/zenodo.19250879",
+   "source_type": "scientific_paper",
+   "source": "datacite",
+   "source_id": "datacite:datacite:10.5281/zenodo.19250879",
+   "source_uri": "https://doi.org/10.5281/zenodo.19250879",
+   "title": "Evolutionary Compass: A Cross-Domain Framework for Evolutionary Problem Solving",
+   "abstract": "Evolutionary progress in complex systems unfolds through organized change across time. Models are refined, policies are realigned, structures are reconfigured, external resources are incorporated, and the outcomes of change are consolidated, diversified, refreshed, or propagated into later rounds or broader contexts. Across disciplines, these processes are described through highly local vocabularies, e.g., fine-tuning, continual adaptation, transfer, policy updating, cumulative innovation, structural redesign, and self-modification. Evolutionary Compass provides a common design grammar for this broader methodological territory.\n\nAs the paradigm-specific zoom-in of the Evolutionary-Based branch of the Eight Universal Methodology Paradigms (UM8) (DOI: 10.5281/zenodo.18790203), Evolutionary Compass develops evolutionary methodology into a decision-oriented framework for researchers, system designers, and practitioners. Its purpose is to make the architecture of evolutionary routes explicit. The framework offers a structured way to diagnose the evolutionary design challenge presented by a system, determine how change should be organized across time, and reason about the longer-horizon consequences of present design choices.\n\nThe value of the framework\n\n\n\nIt supports earlier and better design decisions. Evolutionary Compass makes the main commitments of an evolutionary route explicit before implementation locks them into system architecture: the strategic role of the route, the object of change, the regime of update, the mechanism through which change enters, the signal that governs selection, and the logic that shapes what is carried forward. This gives planning and system design a more disciplined starting point and makes it easier to choose an appropriate route before effort is absorbed by the wrong form of change.\n\nIt makes evolutionary routes easier to diagnose and redesign. Many projects continue to update without producing robust progress because the difficulty lies in the route itself: the wrong role has been chosen, change is directed at the wrong target, the update regime is misaligned with the problem, or the mechanism and signal generate weak or distorted selection pressure. Evolutionary Compass makes those mismatches easier to detect, which supports more precise diagnosis and more disciplined redesign when a route stalls, fragments, or narrows future",
+   "doi": "10.5281/zenodo.19250879",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2026",
+   "retrieval_timestamp": "2026-09-14T20:49:44.362172+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "432b6784a789a4cbc9f965261f5f24a55a012a90447a49003cbe3f9d1e44741f",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "datacite",
+    "indexing_sources": [
+     "datacite"
+    ],
+    "record_ids_by_source": {
+     "datacite": "datacite:10.5281/zenodo.19250879"
+    },
+    "queries_by_source": {
+     "datacite": "search ranking model performance decay after redesign"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_datacite",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "resource_type_general=Image; resource_type=Figure"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_datacite",
+   "canonical_id": "doi:10.5281/zenodo.19250879",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "search ranking model performance decay after redesign",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [
+    "Liu, Ran"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "DataCite holds repository/datacentre-registered DOIs; publisher-registered literature is Crossref's space — neither covers the other (Art. XXV)"
+   ]
+  },
+  {
+   "id": "doi:10.18130/v3tg0k",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.18130/v3tg0k",
+   "source_uri": "https://doi.org/10.18130/v3tg0k",
+   "title": "First Search for the Standard Model Higgs Boson Using the Semileptonic Decay Channel: H-WW----",
+   "abstract": "",
+   "doi": "10.18130/v3tg0k",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-14T20:49:44.362187+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "280d5ef547bef21d7f34fa212005eb196b5c22a678b510f46b65fa67af60064b",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.18130/v3tg0k"
+    },
+    "queries_by_source": {
+     "crossref": "search ranking model performance decay after redesign"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.18130/v3tg0k",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "search ranking model performance decay after redesign",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  {
+   "id": "doi:10.12794/metadc2726",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.12794/metadc2726",
+   "source_uri": "https://doi.org/10.12794/metadc2726",
+   "title": "Performance Improvement in an Accounting Firm: Comparing Operational and Financial Data Before and After Process Redesign",
+   "abstract": "",
+   "doi": "10.12794/metadc2726",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-14T20:49:44.362201+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "44533fad274c0622f278fce20ad24f037b9725e21e0d8550ab5de303eb249326",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.12794/metadc2726"
+    },
+    "queries_by_source": {
+     "crossref": "search ranking model performance decay after redesign"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.12794/metadc2726",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "search ranking model performance decay after redesign",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  {
+   "id": "doi:10.48550/arxiv.2605.05991",
+   "source_type": "scientific_paper",
+   "source": "arxiv",
+   "source_id": "arxiv:arxiv:2605.05991v1",
+   "source_uri": "https://doi.org/10.48550/arxiv.2605.05991",
+   "title": "A Case-Driven Multi-Agent Framework for E-Commerce Search Relevance",
+   "abstract": "Relevance is a foundation of user experience in e-commerce search. We view relevance optimization as a closed-loop ecosystem involving multiple human roles: users who provide feedback, product managers who define standards, annotators who label data, algorithm engineers who optimize models, and evaluators who assess performance. Because improving relevance in practice means systematically resolving user-perceived bad cases, we ask a system-level question: can this ecosystem be reimagined by replacing its human roles with autonomous agents? To answer this question, we propose a case-driven multi-agent framework that automates the pipeline from bad-case identification to resolution. The framework instantiates an Annotator Agent for multi-turn annotation, an Optimizer Agent for autonomous bad-case analysis and resolution, and a User Agent that identifies bad cases through conversational interaction, together forming an autonomous and continually evolving system. To make the framework practical in production, we further adopt a harness-engineering paradigm and build a unified retrieval-and-ranking relevance model for efficient training, an instruction-following relevance model for real-time case resolution, Global Memory to reduce information asymmetry across agents, a Deep Search Agent to target underestimation failures, and an agent-based chatbot for human--agent collaboration. Extensive human evaluation shows that the framework performs relevance-related tasks effectively, improves annotation accuracy, and enables more timely and generalizable bad-case resolution, indicating a practical paradigm for industrial search relevance optimization.",
+   "doi": "10.48550/arxiv.2605.05991",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-14T20:49:44.362217+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "555b24112c54b927a622b5ce334af1d7a2100bbc2e02883205ac94f2b726f775",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "arxiv",
+    "indexing_sources": [
+     "arxiv"
+    ],
+    "record_ids_by_source": {
+     "arxiv": "arxiv:2605.05991v1"
+    },
+    "queries_by_source": {
+     "arxiv": "search ranking model performance decay after redesign"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "preprint_origin",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "preprint_origin",
+   "canonical_id": "doi:10.48550/arxiv.2605.05991",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "search ranking model performance decay after redesign",
+   "source_rank": 0,
+   "fulltext_url": "http://arxiv.org/abs/2605.05991v1",
+   "authors": [
+    "Global E-Commerce Search Relevance Team"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
+    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed — absence of an arXiv record is not absence of the science"
+   ]
+  },
+  {
+   "id": "doi:10.48550/arxiv.2305.18431",
+   "source_type": "scientific_paper",
+   "source": "arxiv",
+   "source_id": "arxiv:arxiv:2305.18431v1",
+   "source_uri": "https://doi.org/10.48550/arxiv.2305.18431",
+   "title": "Optimizing Airbnb Search Journey with Multi-task Learning",
+   "abstract": "At Airbnb, an online marketplace for stays and experiences, guests often spend weeks exploring and comparing multiple items before making a final reservation request. Each reservation request may then potentially be rejected or cancelled by the host prior to check-in. The long and exploratory nature of the search journey, as well as the need to balance both guest and host preferences, present unique challenges for Airbnb search ranking. In this paper, we present Journey Ranker, a new multi-task deep learning model architecture that addresses these challenges. Journey Ranker leverages intermediate guest actions as milestones, both positive and negative, to better progress the guest towards a successful booking. It also uses contextual information such as guest state and search query to balance guest and host preferences. Its modular and extensible design, consisting of four modules with clear separation of concerns, allows for easy application to use cases beyond the Airbnb search ranking context. We conducted offline and online testing of the Journey Ranker and successfully deployed it in production to four different Airbnb products with significant business metrics improvements.",
+   "doi": "10.48550/arxiv.2305.18431",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-14T20:49:44.362232+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "a129e8076661b82b266a1b7b2ac147c8185ac62e497de1f6e64906e74f91759a",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "arxiv",
+    "indexing_sources": [
+     "arxiv"
+    ],
+    "record_ids_by_source": {
+     "arxiv": "arxiv:2305.18431v1"
+    },
+    "queries_by_source": {
+     "arxiv": "search ranking model performance decay after redesign"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "preprint_origin",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "preprint_origin",
+   "canonical_id": "doi:10.48550/arxiv.2305.18431",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "search ranking model performance decay after redesign",
+   "source_rank": 1,
+   "fulltext_url": "http://arxiv.org/abs/2305.18431v1",
+   "authors": [
+    "Chun How Tan",
+    "Austin Chan",
+    "Malay Haldar",
+    "Jie Tang",
+    "Xin Liu",
+    "Mustafa Abdool",
+    "Huiji Gao",
+    "Liwei He",
+    "Sanjeev Katariya"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
+    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed — absence of an arXiv record is not absence of the science"
+   ]
+  },
+  {
+   "id": "doi:10.2139/ssrn.4892616",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.2139/ssrn.4892616",
+   "source_uri": "https://doi.org/10.2139/ssrn.4892616",
+   "title": "A Ranking Model Framework for Multiple Vertical Search Domains",
+   "abstract": "",
+   "doi": "10.2139/ssrn.4892616",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2024",
+   "retrieval_timestamp": "2026-09-14T20:49:44.362246+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "950e4348f4861b9a1441def1ecde903d56c462478bf502822926dd3e77057188",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.2139/ssrn.4892616"
+    },
+    "queries_by_source": {
+     "crossref": "search ranking model performance decay after redesign"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=posted-content"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.2139/ssrn.4892616",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "search ranking model performance decay after redesign",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  {
+   "id": "title:42357e1d4fa97cc1",
+   "source_type": "scientific_paper",
+   "source": "core",
+   "source_id": "core:core:400385",
+   "source_uri": "",
+   "title": "The information search behaviour of individuals in experimental markets",
+   "abstract": "Individual consumers as well as managers within any\n\norganisation regularly make purchasing decisions. Some of\n\nthese decisions will relate to product or service markets\n\nthat are characterised by homogeneity in all aspects\n\nexcept price. There may be a benefit, therefore, from\n\nsearching for a lower price. The bulk of this thesis is\n\nconcerned with investigating individual search behaviour\n\nwhen making purchases in such circumstances. After a\n\ncomprehensive review of formal search models, together\n\nwith the corresponding experimental evidence, a series of\n\nnew experiments are described that, in particular,\n\nuncover several heuristics that might govern search\n\nbehaviour in practice. A large number of simulated\n\npurchases is used to assess the performance of these\n\nheuristics in comparison with the optimal, theoretical\n\nmodel. A related judgemental bias - functional fixation -\n\nis also reviewed in detail and tested experimentally.\n\nFinally, the understanding of individual search behaviour\n\nis further developed using a research experiment set in a\n\nmore complex, and less highly structured, business\n\ndecision context",
+   "doi": null,
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-14T20:49:44.362260+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "d88508b5a4f9a997bc2769d6204dbb186e3384f366a8516f13f2daeff8975e75",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "core",
+    "indexing_sources": [
+     "core"
+    ],
+    "record_ids_by_source": {
+     "core": "core:400385"
+    },
+    "queries_by_source": {
+     "core": "search ranking model performance decay after experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "repository_aggregator_core",
+    "identity_basis": "TITLE_FINGERPRINT",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "repository_aggregator_core",
+   "canonical_id": "title:42357e1d4fa97cc1",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "search ranking model performance decay after experimental comparison",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [
+    "Moon, Philip"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
+    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
+   ]
+  },
+  {
+   "id": "title:d835c56d3785ac6b",
+   "source_type": "scientific_paper",
+   "source": "core",
+   "source_id": "core:core:145364841",
+   "source_uri": "",
+   "title": "360 Degree personnel performance appraisal using the MADM models and presenting a model for overall ranking",
+   "abstract": "Since in the late observations, personnel performance appraisal is considered as a tool towards achieving organization goals, in which, the main idea is to increase the abilities and suitability and growth of personnel. In this paper the performance appraisal is seen as an element of group decision making and therefore, the 360 degree model performance appraisal has been used, in which, the personnel are evaluated from different points of view, (Boss, Colleagues (Co-worker), Inferior, employee him/herself, customer and etc…), keeping in mind the attributes weights, and relative importance of auditors evaluations, the MADM models have been used for personnel ranking. Finally an overall ranking resulted from new model",
+   "doi": null,
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-14T20:49:44.362276+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "374df49a13c5e70dc5743ed11a7df79271d62fdd0080d753e4d98abf4fbdb70f",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "core",
+    "indexing_sources": [
+     "core"
+    ],
+    "record_ids_by_source": {
+     "core": "core:145364841"
+    },
+    "queries_by_source": {
+     "core": "search ranking model performance decay after redesign"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "repository_aggregator_core",
+    "identity_basis": "TITLE_FINGERPRINT",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "repository_aggregator_core",
+   "canonical_id": "title:d835c56d3785ac6b",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "search ranking model performance decay after redesign",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [
+    "Anisseh, M.",
+    "Daniel, J.",
+    "Dashti, M.A.",
+    "Piri, F."
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
+    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
+   ]
+  },
+  {
+   "id": "doi:10.1109/aiiot65859.2025.11105329",
+   "source_type": "scientific_paper",
+   "source": "semantic_scholar",
+   "source_id": "semantic_scholar:s2:38969d03afa7c9c1242d173433614271919a8e5d",
+   "source_uri": "https://doi.org/10.1109/aiiot65859.2025.11105329",
+   "title": "Performance Impact of Feature-Selection and Hyperparameter Tuning in IIoT Attack Detection",
+   "abstract": "Industrial Internet of Things (IIoT) has brought convenience to businesses but has also increased their visibility and thus the attack surface of corporate networks. Machine learning (ML) methods for attack detection and prevention have been studied extensively and have shown great cyber-defense potential for IIoT devices. During the ML model training process, a careful selection of important features and parameter tuning is essential for accurate traffic classification. This paper investigates extensively the impact of feature selection and hyperparameter (HP) tuning on the performance of ML algorithms in the detection of attacks on IIoT devices. Using an ensemble of feature selection algorithms, we identify the most relevant features in the Edge-IIoT dataset. Based on the ranking of features thus obtained, we create three distinct datasets. We then demonstrate that the datasets that retain smaller subsets of the most important features greatly reduce the computational cost compared to the original, cleansed dataset from which they are derived. However, this computational speed-up comes with only a very minor decrease in detection efficacy. Next, we test ML algorithms to determine what gains, if any, can be obtained with HP tuning over the same models without such tuning. We demonstrate that HP tuning enhances the correctness of predictions of an ML algorithm by an average of less than 1% at the cost of a multi-fold increase in computation time. Finally, we recommend a selection of the optimum number of features and hyperparameters to effectively balance the performance and the complexity and computation cost of the model.",
+   "doi": "10.1109/aiiot65859.2025.11105329",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2025",
+   "retrieval_timestamp": "2026-09-14T20:49:44.362289+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "43e76339b90a8397cd4c5f3db0f46a3ae013efa53da71931d19af46e3b1d85bf",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "semantic_scholar",
+    "indexing_sources": [
+     "semantic_scholar"
+    ],
+    "record_ids_by_source": {
+     "semantic_scholar": "s2:38969d03afa7c9c1242d173433614271919a8e5d"
+    },
+    "queries_by_source": {
+     "semantic_scholar": "DOI:10.3390/s26134247"
+    },
+    "query_variant_derivation": null,
+    "source_family": "scholarly_graph_s2",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "11e18bd8f10ffed9b69a6baf541a1af6ed8da19a451ae942fccde739d5561952",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "scholarly_graph_s2",
+   "canonical_id": "doi:10.1109/aiiot65859.2025.11105329",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "DOI:10.3390/s26134247",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [
+    "Prathibha Keshavamurthy",
+    "Erin Colleen Smith",
+    "Aasif Majeed",
+    "Sarvesh Kulkarni"
+   ],
+   "raw_record_hash": "11e18bd8f10ffed9b69a6baf541a1af6ed8da19a451ae942fccde739d5561952",
+   "limitations": [
+    "Reciprocal-expansion record (citation/reference/recommendation expansion): entered the pool through a REAL provider endpoint with derivation REFERENCE_EXPANSION"
+   ]
+  },
+  {
+   "id": "title:0ad8c1fcf101a71e",
+   "source_type": "scientific_paper",
+   "source": "core",
+   "source_id": "core:core:4189609",
+   "source_uri": "",
+   "title": "Ranking expansion terms using partial and ostensive evidence",
+   "abstract": "In this paper we examine the problem of ranking candidate expansion terms for query expansion. We show, by an extension to the traditional F4 scheme, how partial relevance assessments (how relevant a document is) and ostensive evidence (when a document was assessed relevant) can be incorporated into a term ranking function. We then investigate this new term ranking function in three user experiments, examining the performance of our function for automatic and interactive query expansion. We show that the new function not only suggests terms that are preferred by searchers but suggests terms that can lead to more use of expansion terms",
+   "doi": null,
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-14T20:49:44.362302+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "63f7043c7655ed056b0ed91cd529a37c93cd2f4e28d136993690e49ff934ba80",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "core",
+    "indexing_sources": [
+     "core"
+    ],
+    "record_ids_by_source": {
+     "core": "core:4189609"
+    },
+    "queries_by_source": {
+     "core": "search ranking model performance decay after experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "repository_aggregator_core",
+    "identity_basis": "TITLE_FINGERPRINT",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "repository_aggregator_core",
+   "canonical_id": "title:0ad8c1fcf101a71e",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "search ranking model performance decay after experimental comparison",
+   "source_rank": 3,
+   "fulltext_url": null,
+   "authors": [
+    "Ruthven, Ian",
+    "Lalmas, Mounia",
+    "van Rijsbergen, Keith"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
+    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
+   ]
+  }
+ ],
+ "mechanism_ids": [
+  "mech:de407f1644f8"
+ ],
+ "mechanism_map": {
+  "mechanism": "Adaptive Hybrid Genetic Algorithm-Simulated Annealing (AHGA-SA) framework that integrates global search ability of genetic algorithm and local exploitation ability of simulated annealing to find compact, informative feature subsets",
+  "intervention": "Implement an adaptive hybrid feature selection mechanism that combines genetic algorithm and simulated annealing approaches to identify and maintain optimal feature subsets in the search ranking model",
+  "expected_effect": "Reduced model complexity while maintaining or improving search relevance, potentially counteracting performance decay by optimizing feature selection",
+  "falsification_test": "Compare search performance metrics (normalized discounted cumulative gain, click-through rates) between current model and model with AHGA-SA feature selection applied to same dataset",
+  "mechanism_source_span": "\"Adaptive Hybrid Genetic Algorithm-Simulated Annealing (AHGA-SA) as an FS framework that integrates the global search ability of a genetic algorithm and the local exploitation ability of simulated annealing. AHGA-SA aims to find compact, informative feature subsets in high-dimensional intrusion-detection datasets at an acceptable computational cost while maintaining detection performance.\"",
+  "raw_candidate": {
+   "candidate_id": "cand:A2:r458-s1-ranking-model-distribution-shift:7a6c3d309b9ec3d4",
+   "problem_id": "r458-s1-ranking-model-distribution-shift",
+   "device": "search ranking model",
+   "failure_mode": "performance decay after redesign",
+   "failure": "Documented problem 'performance decay after redesign' concerning search ranking model. User-submitted engineering problem (session input): \"A marketplace's search ranking model, trained on 18 months of interaction logs, decays measurably after a redesign moves the buy button above the fold on mobile: offline replay shows a 6-percent drop in normalized discounted cumulative gain against held-out post-launch traffic, click-through on rank\".  ROUTING: doe_osti: routing state SUSPENDED_RELEVANCE — measured relevance instability (R375: same fusion papers relevant 3 -> 0; pooled relevant-rate 0.175 pre-fix; DETERMINISM_GAP flagged in the R394 production audit) — records poison synthesis-feeding retrieval more than they feed it until relevance is semantically adjudicated; reinstatement: the Phase P1 semantic reranker lands (semantic relevance adjudication between query and record, replacing lexical overlap); flip to ACTIVE + a measured relevance re-run + worklog entry. [europepmc] 10 records retrieved live (2024-2026). Illustrative records: 'Argus: A Sparse-Label Machine-Learning Workflow for Passive DAS Seismic Catalogue Expansion in CO&lt;sub&gt;2&lt;/sub&gt; Storage Monitoring-Application to the CO2CRC Otway Stage 4 Dataset.'; 'Application of deep learning in prognostic prediction of non-small cell lung cancer.'. LIMITS STAMPED INLINE: literature context establishes the problem class, not event rates. [arxiv] 5 records retrieved live (1902-2021). Illustrative records: 'SPSA-FSR: Simultaneous Perturbation Stochastic Approximation for Feature Selection and Ranking'; 'Insights into the multiplicity-induced-dominancy for scalar delay-differential equations with two delays'. LIMITS STAMPED INLINE: literature context establishes the problem class, not event rates. [doe_osti] retrieval status NOT_QUERIED_SUSPENDED_RELEVANCE (engine routing decision (R399 W3): SUSPENDED_RELEVANCE — not a provider failure and not absence) — provider outcome recorded, not treated as absence (Art. XXI.3). Problem-existence basis: live records retrieved.",
+   "constraint": "maintain 45-millisecond serving deadline with existing feature stack and label pipeline",
+   "mechanism": "Adaptive Hybrid Genetic Algorithm-Simulated Annealing (AHGA-SA) framework that integrates global search ability of genetic algorithm and local exploitation ability of simulated annealing to find compact, informative feature subsets",
+   "intervention": "Implement an adaptive hybrid feature selection mechanism that combines genetic algorithm and simulated annealing approaches to identify and maintain optimal feature subsets in the search ranking model",
+   "expected_effect": "Reduced model complexity while maintaining or improving search relevance, potentially counteracting performance decay by optimizing feature selection",
+   "falsification_test": "Compare search performance metrics (normalized discounted cumulative gain, click-through rates) between current model and model with AHGA-SA feature selection applied to same dataset",
+   "mechanism_source_span": "\"Adaptive Hybrid Genetic Algorithm-Simulated Annealing (AHGA-SA) as an FS framework that integrates the global search ability of a genetic algorithm and the local exploitation ability of simulated annealing. AHGA-SA aims to find compact, informative feature subsets in high-dimensional intrusion-detection datasets at an acceptable computational cost while maintaining detection performance.\"",
+   "source_evidence": {
+    "source_id": "doi:10.3390/s26134247",
+    "source_hash": "8e67ea9177517a94a6e2aef9629ab2e266821cc21795cd9ccfa5c8f642ebdf64",
+    "source_title": "AHGA-SA: A Novel Adaptive Hybrid Framework for Feature Selection in IoT-Oriented Intrusion Detection with Explainable AI.",
+    "source_span": "The increasing connectivity of Internet of Things (IoT)-oriented environments has made them more vulnerable to cyberattacks, requiring intrusion-detection systems (IDSs) to ensure their secure and reliable operation. The feature selection (FS) process of an IDS affects its performance, as effective FS can enhance detection accuracy and reduce the computational cost and model complexity. This paper presents Adaptive Hybrid Genetic Algorithm-Simulated Annealing (AHGA-SA) as an FS framework that integrates the global search ability of a genetic algorithm and the local exploitation ability of simulated annealing. AHGA-SA aims to find compact, informative feature subsets in high-dimensional intrusion-detection datasets at an acceptable computational cost while maintaining detection performance. The experimental results on three recent benchmarks demonstrate feature-space reduction, with classification accuracies of 99.04% on IoTID20 (using 12 features), 98.25% on WUSTL-EHMS (using seven features), and 99.18% on Edge-IIoTset (using nine features). The results also demonstrate reduced training and testing times, central processing unit usage, resident set size overhead, and subset size compared to the baseline. Furthermore, Shapley additive explanations, as an explainable artificial intelligence technique, are applied to explain the model's predictions and to show the contribution of the selected features to the IDS decision-making process.",
+    "retrieval_timestamp": "2026-09-14T20:49:44.361975+00:00"
+   },
+   "model": "glm-4-plus-thinking",
+   "provider": "zai",
+   "transport_status": "OK",
+   "prompt_hash": "2428f61bf4b6cb1e",
+   "input_hash": "3a19130497b16c6d",
+   "output_hash": "2e1ea596361735ab",
+   "synthesis_timestamp": "2026-09-14T20:52:05.036122+00:00"
+  }
+ },
+ "premise_gate": {
+  "verdict": "PREMISE_COHERENT",
+  "explanation": "no definitional contradiction matched; the gate cannot prove physical truth — only rule-table incoherence is checkable (disclosed limit)",
+  "matched_rules": [],
+  "n_rules_checked": 4,
+  "gate_version": "premise_gate/1.0.0",
+  "limitations": [
+   "deterministic hard-rule table (definitional contradictions only): a physically false but non-contradictory premise passes this gate",
+   "no LLM opinion is a blocking authority (Art. XVIII)",
+   "gate blindness is recorded, never converted into a coherence claim (Art. XXV)"
+  ]
+ },
+ "evidence_classification": {},
+ "mechanism_space": {},
+ "prior_art_ids": [],
+ "prior_art": {},
+ "collision_results": {},
+ "physics": {},
+ "attack_results": {},
+ "contradictions": {},
+ "killer_experiment": {},
+ "adjudication": {},
+ "multi_source": {},
+ "cemetery_check": {},
+ "epistemic_state": {},
+ "next_best_action": {},
+ "ranking": {},
+ "provenance": {
+  "retrieval_fabric": {
+   "version": "V2",
+   "primary_query": "search ranking model performance decay after redesign",
+   "query_variant_count": 5,
+   "sources_attempted": [
+    "arxiv",
+    "core",
+    "crossref",
+    "datacite",
+    "doaj",
+    "europepmc",
+    "google_patents",
+    "openaire",
+    "openalex",
+    "semantic_scholar",
+    "unpaywall"
+   ],
+   "sources_succeeded": [
+    "arxiv",
+    "core",
+    "crossref",
+    "datacite",
+    "doaj",
+    "europepmc",
+    "openaire",
+    "semantic_scholar",
+    "unpaywall"
+   ],
+   "sources_failed": [
+    "google_patents"
+   ],
+   "sources_rate_limited": [
+    "openalex",
+    "semantic_scholar"
+   ],
+   "unique_source_families": [
+    "biomedical_pubmed_line",
+    "doi_registrant_crossref",
+    "doi_registrant_datacite",
+    "preprint_origin",
+    "repository_aggregator_core",
+    "scholarly_graph_s2"
+   ],
+   "independent_source_families": 6,
+   "source_independence_score": 1.0,
+   "retrieval_blind_spots": [
+    "PATENT_BLIND_SPOT: zero patent records — patent prior-art coverage is a discovery-system defect when the mechanism domain is patent-dense"
+   ],
+   "canonical_record_count": 46,
+   "evidence_fabric": {
+    "state": "CHANNEL_ERROR",
+    "reason": "NameError: name '_title_of' is not defined",
+    "note": "the evidence-fabric channel failed; the V2 fabric pool is unchanged — an infrastructure state, never a scientific result (Art. LXI)"
+   }
+  },
+  "evidence_freeze": {
+   "run_id": "r458mcb-S1: r458-s1-ranking-model-distribution-shift",
+   "problem_id": "r458-s1-ranking-model-distribution-shift",
+   "frozen_at": "2026-09-14T20:52:02+00:00Z",
+   "evidence_count": 16,
+   "custody_records": [
+    {
+     "record_id": "doi:10.3390/s26134247",
+     "source": "europepmc",
+     "source_identity_verified": true,
+     "query": "r458-s1-ranking-model-distribution-shift",
+     "retrieval_timestamp": "2026-09-14T20:52:02.043152+00:00",
+     "raw_content": "The increasing connectivity of Internet of Things (IoT)-oriented environments has made them more vulnerable to cyberattacks, requiring intrusion-detection systems (IDSs) to ensure their secure and reliable operation. The feature selection (FS) process of an IDS affects its performance, as effective FS can enhance detection accuracy and reduce the computational cost and model complexity. This paper presents Adaptive Hybrid Genetic Algorithm-Simulated Annealing (AHGA-SA) as an FS framework that integrates the global search ability of a genetic algorithm and the local exploitation ability of simulated annealing. AHGA-SA aims to find compact, informative feature subsets in high-dimensional intrusion-detection datasets at an acceptable computational cost while maintaining detection performance. The experimental results on three recent benchmarks demonstrate feature-space reduction, with classification accuracies of 99.04% on IoTID20 (using 12 features), 98.25% on WUSTL-EHMS (using seven features), and 99.18% on Edge-IIoTset (using nine features). The results also demonstrate reduced training and testing times, central processing unit usage, resident set size overhead, and subset size compared to the baseline. Furthermore, Shapley additive explanations, as an explainable artificial intelligence technique, are applied to explain the model's predictions and to show the contribution of the selected features to the IDS decision-making process.",
+     "content_hash": "18acdd02e3cf29c6f552b7d50411226aa5537186c712cd5520c3b70e138880c6",
+     "exact_span": "The increasing connectivity of Internet of Things (IoT)-oriented environments has made them more vulnerable to cyberattacks, requiring intrusion-detection systems (IDSs) to ensure their secure and reliable operation. The feature selection (FS) process of an IDS affects its performance, as effective FS can enhance detection accuracy and reduce the computational cost and model complexity. This paper presents Adaptive Hybrid Genetic Algorithm-Simulated Annealing (AHGA-SA) as an FS framework that in",
+     "span_hash": "c2c1ab6af0d5b20df5289c167d7bd208e0ef49ca4f1a02b3dbb7bb7e1b98ff10",
+     "evidence_class": "SCIENTIFIC_ABSTRACT",
+     "proposition_binding": "candidate_mechanism_input",
+     "locator": "https://doi.org/10.3390/s26134247",
+     "epistemic_strength": "VERIFIED"
+    },
+    {
+     "record_id": "doi:10.3390/biomimetics11070516",
+     "source": "europepmc",
+     "source_identity_verified": true,
+     "query": "r458-s1-ranking-model-distribution-shift",
+     "retrieval_timestamp": "2026-09-14T20:52:02.043181+00:00",
+     "raw_content": "Biomimetic optimization transfers biological information-processing mechanisms into computational systems. Ant colony optimization (ACO) is a canonical example: artificial ants functionally abstract pheromone-mediated stigmergy, decentralized exploration, trail decay through algorithmic evaporation, and adaptive path reinforcement. Building on this functional biological analogue, we present a controlled cross-paradigm evaluation of routing-heuristic generation. A standardized interface embeds human-designed rules, the genetic programming hyper-heuristic GHPP, a resource-constrained DeepACO-MLP proxy, and an offline ReEvo-style proxy into the same ACO solver. The methods are evaluated on held-out TSP and CVRP instances in terms of solution quality, reported generation or training cost, interpretability, and cross-scale behavior under a matched distribution. GHPP yields the shortest routes at all tested scales; the ReEvo-offline proxy and strong human-designed rules generally form a second tier, whereas the resource-constrained neural proxy degrades markedly as problem size increases. These results do not establish an intrinsic ranking of full-capability paradigms. Instead, they show that method selection depends on the operating constraint and on evidence provenance: longer locally measured offline search favors GHPP, while auditable explicit rules characterize the human and ReEvo-offline proxies. By holding the ant-inspired execution mechanism fixed and varying the source of heuristic information, the benchmark clarifies how evolutionary, neural, and LLM-style design strategies interact with a common biomimetic substrate.",
+     "content_hash": "9b64cccb44a5a36312ffb870135a548e2e260a4e41b436e187a4cafec646a1e7",
+     "exact_span": "Biomimetic optimization transfers biological information-processing mechanisms into computational systems. Ant colony optimization (ACO) is a canonical example: artificial ants functionally abstract pheromone-mediated stigmergy, decentralized exploration, trail decay through algorithmic evaporation, and adaptive path reinforcement. Building on this functional biological analogue, we present a controlled cross-paradigm evaluation of routing-heuristic generation. A standardized interface embeds hu",
+     "span_hash": "4c692a9ec6c5d0a147ae5429986821e90220b7c35405770284d5da80b32787d7",
+     "evidence_class": "SCIENTIFIC_ABSTRACT",
+     "proposition_binding": "candidate_mechanism_input",
+     "locator": "https://doi.org/10.3390/biomimetics11070516",
+     "epistemic_strength": "VERIFIED"
+    },
+    {
+     "record_id": "doi:10.1038/s41598-026-56933-4",
+     "source": "europepmc",
+     "source_identity_verified": true,
+     "query": "r458-s1-ranking-model-distribution-shift",
+     "retrieval_timestamp": "2026-09-14T20:52:02.043195+00:00",
+     "raw_content": "Teaching English to large and varied student populations has made adaptive, learner-aware resource recommendation a pressing need, yet most deployed systems still lean on collaborative filtering or content heuristics that read learners only at the surface. Such systems tend to stumble in four recurring ways: they miss the finer grain of linguistic competence, they reason over sparse and brittle knowledge associations, they falter whenever a learner or a resource is new, and they rarely travel well to settings their training never saw. We address these problems together through a framework in which a large language model and a knowledge graph inform one another, their match to each learner mediated by a fitness function adapted from ecological niche theory. The language model reads a learner's own writing to estimate evolving competence and proposes relations that fill thin regions of the graph, while the graph keeps the model's inferences anchored to the prerequisite and difficulty structure of English. A niche fitness score then judges how closely each resource's demands meet a learner's needs, and a path generator orders the survivors into prerequisite-respecting study sequences. On logs from 3,214 learners, 12,486 resources, and 287,653 interactions, the method reaches a Precision@5 of 0.782 and an NDCG@10 of 0.724, ahead of five baselines. Ablation was, frankly, the part that surprised us: the niche filter matters more to ranking quality than the model's semantic re-scoring. A three-axis generalization protocol, splitting transfer across learners, resource types, and difficulty levels, yields a composite index of 0.863, with cold-start decay held to 18.3%.",
+     "content_hash": "552db4100b22d0a4c04c8e3170f018311fa29699442b721a1d33620a7fc753b3",
+     "exact_span": "Teaching English to large and varied student populations has made adaptive, learner-aware resource recommendation a pressing need, yet most deployed systems still lean on collaborative filtering or content heuristics that read learners only at the surface. Such systems tend to stumble in four recurring ways: they miss the finer grain of linguistic competence, they reason over sparse and brittle knowledge associations, they falter whenever a learner or a resource is new, and they rarely travel we",
+     "span_hash": "191d7d033afbdc83db5a59642c8ff1544791f37fcb3dad4158601be61f96b8ee",
+     "evidence_class": "SCIENTIFIC_ABSTRACT",
+     "proposition_binding": "candidate_mechanism_input",
+     "locator": "https://doi.org/10.1038/s41598-026-56933-4",
+     "epistemic_strength": "VERIFIED"
+    },
+    {
+     "record_id": "doi:10.1038/s41598-026-62977-3",
+     "source": "europepmc",
+     "source_identity_verified": true,
+     "query": "r458-s1-ranking-model-distribution-shift",
+     "retrieval_timestamp": "2026-09-14T20:52:02.043203+00:00",
+     "raw_content": "Accurate short-horizon water-quality forecasting is important for environmental monitoring systems that aim to move from passive observation toward timely, data-driven intervention. Next-day pH prediction is particularly relevant because pH reflects aquatic chemical balance, pollutant behavior, and ecosystem health. This study addresses next-day pH prediction in a spatio-temporal monitoring context using the public Water Quality Prediction dataset from Georgia, USA, where distributed monitoring records reflect temporal continuity and spatial dependency. Here, spatio-temporal refers to the multi-site and time-indexed dataset structure rather than to an explicit graph-based spatial neural architecture. A two-stage learning framework is used: baseline models are first benchmarked under a unified protocol, and the strongest baseline is then refined through metaheuristic hyperparameter optimization. The framework combines preprocessing, comparative benchmarking, and optimizer-guided refinement, with RegNet as the focal predictive model and the Ocotillo Optimization Algorithm (OCOA) as the hyperparameter search mechanism. OCOA-RegNet is compared with optimizer-assisted RegNet variants based on PSO, GA, WOA DE, MVO, BA, SFS, BBO, and APO. In the baseline stage, RegNet achieved the strongest untuned performance, with an RMSE of 0.0285. In the optimization stage, OCOA + RegNet achieved the lowest RMSE, [Formula: see text] across independent runs, under the adopted protocol. These findings indicate that next-day pH forecasting benefits from both model selection and disciplined hyperparameter optimization, supporting the proposed workflow as a decision-support component for distributed water-quality monitoring.",
+     "content_hash": "8a27e374df459d0c11db4766f5943d9cf5c3fcfecabcf7541a6bb015cc56a644",
+     "exact_span": "Accurate short-horizon water-quality forecasting is important for environmental monitoring systems that aim to move from passive observation toward timely, data-driven intervention. Next-day pH prediction is particularly relevant because pH reflects aquatic chemical balance, pollutant behavior, and ecosystem health. This study addresses next-day pH prediction in a spatio-temporal monitoring context using the public Water Quality Prediction dataset from Georgia, USA, where distributed monitoring ",
+     "span_hash": "d045330ef1e85ada2fd57b8f7b9bd1d22a3e9d4968ede8b4014e3f6638974bea",
+     "evidence_class": "SCIENTIFIC_ABSTRACT",
+     "proposition_binding": "candidate_mechanism_input",
+     "locator": "https://doi.org/10.1038/s41598-026-62977-3",
+     "epistemic_strength": "VERIFIED"
+    },
+    {
+     "record_id": "doi:10.3390/e28050568",
+     "source": "europepmc",
+     "source_identity_verified": true,
+     "query": "r458-s1-ranking-model-distribution-shift",
+     "retrieval_timestamp": "2026-09-14T20:52:02.043214+00:00",
+     "raw_content": "Dynamic gravity measurement, crucial for engineering application, suffers accuracy degradation due to errors induced by carrier maneuvers. To address the limitations of conventional swarm optimization algorithms in precision, stability, and generalizability, this study proposes a Swarm Cooperation Evolution Strategy (SCES) that efficiently integrates multiple algorithms. The proposed SCES is extensively evaluated on the CEC2022 benchmark suite in comparison with several cooperative fusion-related algorithms and representative single optimization algorithms. The experimental results demonstrate that SCES achieves an overall effectiveness score of 0.034 and an optimal accessibility rate exceeding 95%. Compared to the best-performing fusion-based algorithm, these metrics represent improvements of 54.67% and 31.11%, respectively. Moreover, relative to the best-performing single optimization algorithm, the improvements amount to 37.73% and 32.69%, respectively. These findings robustly validate the superior performance of the proposed algorithm. Moreover, an in-depth investigation based on SCES into dynamic error compensation methodologies is conducted. Firstly, a polynomial compensation model is established through error mechanism analysis, with parameters identified via SCES. Secondly, a data-driven compensation model employing a multi-layer long short-term memory (LSTM) network optimized via neural architecture search (NAS) guided by SCES is proposed, circumventing the performance limitations inherent in manually designed networks. Furthermore, an innovative two-stage hybrid strategy is introduced. Systematic trend errors are compensated using the polynomial model, followed by the NAS-LSTM model addressing complex residual nonlinear errors, effectively combining mechanism-based and data-driven approaches. Validation on three lines exhibiting varying maneuverability shows all methods significantly improve accuracy. The hybrid strategy delivers optimal performance, achieving 0.58 mGal internal coincidence accuracy on stable lines and up to 91.58% improvement in external coincidence accuracy under high maneuverability. This research provides an effective high-precision dynamic gravity measurement and compensation solution, advancing engineering applications.",
+     "content_hash": "6068b7066dd8c8c6456a90a34d1d1d965c955f5f00c01f06a5672cc26fcfdd86",
+     "exact_span": "Dynamic gravity measurement, crucial for engineering application, suffers accuracy degradation due to errors induced by carrier maneuvers. To address the limitations of conventional swarm optimization algorithms in precision, stability, and generalizability, this study proposes a Swarm Cooperation Evolution Strategy (SCES) that efficiently integrates multiple algorithms. The proposed SCES is extensively evaluated on the CEC2022 benchmark suite in comparison with several cooperative fusion-relate",
+     "span_hash": "7d2dad5f47a41bb1cd4b107a287b5f18c68e7559ec1ba94a84a3f13ae6885828",
+     "evidence_class": "SCIENTIFIC_ABSTRACT",
+     "proposition_binding": "candidate_mechanism_input",
+     "locator": "https://doi.org/10.3390/e28050568",
+     "epistemic_strength": "VERIFIED"
+    },
+    {
+     "record_id": "doi:10.5281/zenodo.19250879",
+     "source": "datacite",
+     "source_identity_verified": true,
+     "query": "r458-s1-ranking-model-distribution-shift",
+     "retrieval_timestamp": "2026-09-14T20:52:02.043227+00:00",
+     "raw_content": "Evolutionary progress in complex systems unfolds through organized change across time. Models are refined, policies are realigned, structures are reconfigured, external resources are incorporated, and the outcomes of change are consolidated, diversified, refreshed, or propagated into later rounds or broader contexts. Across disciplines, these processes are described through highly local vocabularies, e.g., fine-tuning, continual adaptation, transfer, policy updating, cumulative innovation, structural redesign, and self-modification. Evolutionary Compass provides a common design grammar for this broader methodological territory.\n\nAs the paradigm-specific zoom-in of the Evolutionary-Based branch of the Eight Universal Methodology Paradigms (UM8) (DOI: 10.5281/zenodo.18790203), Evolutionary Compass develops evolutionary methodology into a decision-oriented framework for researchers, system designers, and practitioners. Its purpose is to make the architecture of evolutionary routes explicit. The framework offers a structured way to diagnose the evolutionary design challenge presented by a system, determine how change should be organized across time, and reason about the longer-horizon consequences of present design choices.\n\nThe value of the framework\n\n\n\nIt supports earlier and better design decisions. Evolutionary Compass makes the main commitments of an evolutionary route explicit before implementation locks them into system architecture: the strategic role of the route, the object of change, the regime of update, the mechanism through which change enters, the signal that governs selection, and the logic that shapes what is carried forward. This gives planning and system design a more disciplined starting point and makes it easier to choose an appropriate route before effort is absorbed by the wrong form of change.\n\nIt makes evolutionary routes easier to diagnose and redesign. Many projects continue to update without producing robust progress because the difficulty lies in the route itself: the wrong role has been chosen, change is directed at the wrong target, the update regime is misaligned with the problem, or the mechanism and signal generate weak or distorted selection pressure. Evolutionary Compass makes those mismatches easier to detect, which supports more precise diagnosis and more disciplined redesign when a route stalls, fragments, or narrows future",
+     "content_hash": "452a67986ed0131febda02e8101942536f17cffca193441efd836ed24beb6c02",
+     "exact_span": "Evolutionary progress in complex systems unfolds through organized change across time. Models are refined, policies are realigned, structures are reconfigured, external resources are incorporated, and the outcomes of change are consolidated, diversified, refreshed, or propagated into later rounds or broader contexts. Across disciplines, these processes are described through highly local vocabularies, e.g., fine-tuning, continual adaptation, transfer, policy updating, cumulative innovation, struc",
+     "span_hash": "3bf609179033e0139e2324c0007b5d2c4c6e2164185439eaa112e93e7ab6ca16",
+     "evidence_class": "SCIENTIFIC_ABSTRACT",
+     "proposition_binding": "candidate_mechanism_input",
+     "locator": "https://doi.org/10.5281/zenodo.19250879",
+     "epistemic_strength": "VERIFIED"
+    },
+    {
+     "record_id": "doi:10.48550/arxiv.2605.05991",
+     "source": "arxiv",
+     "source_identity_verified": true,
+     "query": "r458-s1-ranking-model-distribution-shift",
+     "retrieval_timestamp": "2026-09-14T20:52:02.043237+00:00",
+     "raw_content": "Relevance is a foundation of user experience in e-commerce search. We view relevance optimization as a closed-loop ecosystem involving multiple human roles: users who provide feedback, product managers who define standards, annotators who label data, algorithm engineers who optimize models, and evaluators who assess performance. Because improving relevance in practice means systematically resolving user-perceived bad cases, we ask a system-level question: can this ecosystem be reimagined by replacing its human roles with autonomous agents? To answer this question, we propose a case-driven multi-agent framework that automates the pipeline from bad-case identification to resolution. The framework instantiates an Annotator Agent for multi-turn annotation, an Optimizer Agent for autonomous bad-case analysis and resolution, and a User Agent that identifies bad cases through conversational interaction, together forming an autonomous and continually evolving system. To make the framework practical in production, we further adopt a harness-engineering paradigm and build a unified retrieval-and-ranking relevance model for efficient training, an instruction-following relevance model for real-time case resolution, Global Memory to reduce information asymmetry across agents, a Deep Search Agent to target underestimation failures, and an agent-based chatbot for human--agent collaboration. Extensive human evaluation shows that the framework performs relevance-related tasks effectively, improves annotation accuracy, and enables more timely and generalizable bad-case resolution, indicating a practical paradigm for industrial search relevance optimization.",
+     "content_hash": "7981279246e1d6ff94f65463b4dcd844dfcbac915f97690036508f480a94ba90",
+     "exact_span": "Relevance is a foundation of user experience in e-commerce search. We view relevance optimization as a closed-loop ecosystem involving multiple human roles: users who provide feedback, product managers who define standards, annotators who label data, algorithm engineers who optimize models, and evaluators who assess performance. Because improving relevance in practice means systematically resolving user-perceived bad cases, we ask a system-level question: can this ecosystem be reimagined by repl",
+     "span_hash": "ad47d047437fbc153f08b7dee483000c1a07fd75a2eaf18ed1bb22eb16d54242",
+     "evidence_class": "SCIENTIFIC_ABSTRACT",
+     "proposition_binding": "candidate_mechanism_input",
+     "locator": "https://doi.org/10.48550/arxiv.2605.05991",
+     "epistemic_strength": "VERIFIED"
+    },
+    {
+     "record_id": "doi:10.48550/arxiv.2305.18431",
+     "source": "arxiv",
+     "source_identity_verified": true,
+     "query": "r458-s1-ranking-model-distribution-shift",
+     "retrieval_timestamp": "2026-09-14T20:52:02.043248+00:00",
+     "raw_content": "At Airbnb, an online marketplace for stays and experiences, guests often spend weeks exploring and comparing multiple items before making a final reservation request. Each reservation request may then potentially be rejected or cancelled by the host prior to check-in. The long and exploratory nature of the search journey, as well as the need to balance both guest and host preferences, present unique challenges for Airbnb search ranking. In this paper, we present Journey Ranker, a new multi-task deep learning model architecture that addresses these challenges. Journey Ranker leverages intermediate guest actions as milestones, both positive and negative, to better progress the guest towards a successful booking. It also uses contextual information such as guest state and search query to balance guest and host preferences. Its modular and extensible design, consisting of four modules with clear separation of concerns, allows for easy application to use cases beyond the Airbnb search ranking context. We conducted offline and online testing of the Journey Ranker and successfully deployed it in production to four different Airbnb products with significant business metrics improvements.",
+     "content_hash": "55ce76083e4824301a744ecf858b7ed7ca61ab893ecc169a5fa17853678ae79b",
+     "exact_span": "At Airbnb, an online marketplace for stays and experiences, guests often spend weeks exploring and comparing multiple items before making a final reservation request. Each reservation request may then potentially be rejected or cancelled by the host prior to check-in. The long and exploratory nature of the search journey, as well as the need to balance both guest and host preferences, present unique challenges for Airbnb search ranking. In this paper, we present Journey Ranker, a new multi-task ",
+     "span_hash": "3cda9055c0706b61a15808270b82a20539c5b1a9770c85edcb9548905ef0d41d",
+     "evidence_class": "SCIENTIFIC_ABSTRACT",
+     "proposition_binding": "candidate_mechanism_input",
+     "locator": "https://doi.org/10.48550/arxiv.2305.18431",
+     "epistemic_strength": "VERIFIED"
+    },
+    {
+     "record_id": "title:42357e1d4fa97cc1",
+     "source": "core",
+     "source_identity_verified": true,
+     "query": "r458-s1-ranking-model-distribution-shift",
+     "retrieval_timestamp": "2026-09-14T20:52:02.043257+00:00",
+     "raw_content": "Individual consumers as well as managers within any\n\norganisation regularly make purchasing decisions. Some of\n\nthese decisions will relate to product or service markets\n\nthat are characterised by homogeneity in all aspects\n\nexcept price. There may be a benefit, therefore, from\n\nsearching for a lower price. The bulk of this thesis is\n\nconcerned with investigating individual search behaviour\n\nwhen making purchases in such circumstances. After a\n\ncomprehensive review of formal search models, together\n\nwith the corresponding experimental evidence, a series of\n\nnew experiments are described that, in particular,\n\nuncover several heuristics that might govern search\n\nbehaviour in practice. A large number of simulated\n\npurchases is used to assess the performance of these\n\nheuristics in comparison with the optimal, theoretical\n\nmodel. A related judgemental bias - functional fixation -\n\nis also reviewed in detail and tested experimentally.\n\nFinally, the understanding of individual search behaviour\n\nis further developed using a research experiment set in a\n\nmore complex, and less highly structured, business\n\ndecision context",
+     "content_hash": "02476785924965c54c46d5b7fd90d80f7e806114ad1fc56ee72e5438b21b0464",
+     "exact_span": "Individual consumers as well as managers within any\n\norganisation regularly make purchasing decisions. Some of\n\nthese decisions will relate to product or service markets\n\nthat are characterised by homogeneity in all aspects\n\nexcept price. There may be a benefit, therefore, from\n\nsearching for a lower price. The bulk of this thesis is\n\nconcerned with investigating individual search behaviour\n\nwhen making purchases in such circumstances. After a\n\ncomprehensive review of formal search models, toget",
+     "span_hash": "242405ce465925b4aa492148c78aaa70589cb9e2508a0fefaac75bd5a13b5f05",
+     "evidence_class": "SCIENTIFIC_ABSTRACT",
+     "proposition_binding": "candidate_mechanism_input",
+     "locator": "",
+     "epistemic_strength": "VERIFIED"
+    },
+    {
+     "record_id": "title:d835c56d3785ac6b",
+     "source": "core",
+     "source_identity_verified": true,
+     "query": "r458-s1-ranking-model-distribution-shift",
+     "retrieval_timestamp": "2026-09-14T20:52:02.043265+00:00",
+     "raw_content": "Since in the late observations, personnel performance appraisal is considered as a tool towards achieving organization goals, in which, the main idea is to increase the abilities and suitability and growth of personnel. In this paper the performance appraisal is seen as an element of group decision making and therefore, the 360 degree model performance appraisal has been used, in which, the personnel are evaluated from different points of view, (Boss, Colleagues (Co-worker), Inferior, employee him/herself, customer and etc…), keeping in mind the attributes weights, and relative importance of auditors evaluations, the MADM models have been used for personnel ranking. Finally an overall ranking resulted from new model",
+     "content_hash": "62e9e4ca79e65279ccfaef12cb65927210d4a6b2a72551fdf017f462e9949a1a",
+     "exact_span": "Since in the late observations, personnel performance appraisal is considered as a tool towards achieving organization goals, in which, the main idea is to increase the abilities and suitability and growth of personnel. In this paper the performance appraisal is seen as an element of group decision making and therefore, the 360 degree model performance appraisal has been used, in which, the personnel are evaluated from different points of view, (Boss, Colleagues (Co-worker), Inferior, employee h",
+     "span_hash": "bd4dbf86aae50fe4fbb4c26a36f965dfe93b25420fc6e98b4f3105271cc9da70",
+     "evidence_class": "SCIENTIFIC_ABSTRACT",
+     "proposition_binding": "candidate_mechanism_input",
+     "locator": "",
+     "epistemic_strength": "VERIFIED"
+    },
+    {
+     "record_id": "doi:10.1109/aiiot65859.2025.11105329",
+     "source": "semantic_scholar",
+     "source_identity_verified": true,
+     "query": "r458-s1-ranking-model-distribution-shift",
+     "retrieval_timestamp": "2026-09-14T20:52:02.043273+00:00",
+     "raw_content": "Industrial Internet of Things (IIoT) has brought convenience to businesses but has also increased their visibility and thus the attack surface of corporate networks. Machine learning (ML) methods for attack detection and prevention have been studied extensively and have shown great cyber-defense potential for IIoT devices. During the ML model training process, a careful selection of important features and parameter tuning is essential for accurate traffic classification. This paper investigates extensively the impact of feature selection and hyperparameter (HP) tuning on the performance of ML algorithms in the detection of attacks on IIoT devices. Using an ensemble of feature selection algorithms, we identify the most relevant features in the Edge-IIoT dataset. Based on the ranking of features thus obtained, we create three distinct datasets. We then demonstrate that the datasets that retain smaller subsets of the most important features greatly reduce the computational cost compared to the original, cleansed dataset from which they are derived. However, this computational speed-up comes with only a very minor decrease in detection efficacy. Next, we test ML algorithms to determine what gains, if any, can be obtained with HP tuning over the same models without such tuning. We demonstrate that HP tuning enhances the correctness of predictions of an ML algorithm by an average of less than 1% at the cost of a multi-fold increase in computation time. Finally, we recommend a selection of the optimum number of features and hyperparameters to effectively balance the performance and the complexity and computation cost of the model.",
+     "content_hash": "8a93161f237c1fc4a08cc861ba63b98a54ab04ca76d81dcd2e6c49662b45f47d",
+     "exact_span": "Industrial Internet of Things (IIoT) has brought convenience to businesses but has also increased their visibility and thus the attack surface of corporate networks. Machine learning (ML) methods for attack detection and prevention have been studied extensively and have shown great cyber-defense potential for IIoT devices. During the ML model training process, a careful selection of important features and parameter tuning is essential for accurate traffic classification. This paper investigates ",
+     "span_hash": "939c2403d85087a56009262a32ec440dd1226accaa4fec6962f3432fb2982074",
+     "evidence_class": "SCIENTIFIC_ABSTRACT",
+     "proposition_binding": "candidate_mechanism_input",
+     "locator": "https://doi.org/10.1109/aiiot65859.2025.11105329",
+     "epistemic_strength": "VERIFIED"
+    },
+    {
+     "record_id": "title:0ad8c1fcf101a71e",
+     "source": "core",
+     "source_identity_verified": true,
+     "query": "r458-s1-ranking-model-distribution-shift",
+     "retrieval_timestamp": "2026-09-14T20:52:02.043280+00:00",
+     "raw_content": "In this paper we examine the problem of ranking candidate expansion terms for query expansion. We show, by an extension to the traditional F4 scheme, how partial relevance assessments (how relevant a document is) and ostensive evidence (when a document was assessed relevant) can be incorporated into a term ranking function. We then investigate this new term ranking function in three user experiments, examining the performance of our function for automatic and interactive query expansion. We show that the new function not only suggests terms that are preferred by searchers but suggests terms that can lead to more use of expansion terms",
+     "content_hash": "231516fb1ce7a7c9bd98d39a3b1aac89f74b5f076d5354439d417d9369775975",
+     "exact_span": "In this paper we examine the problem of ranking candidate expansion terms for query expansion. We show, by an extension to the traditional F4 scheme, how partial relevance assessments (how relevant a document is) and ostensive evidence (when a document was assessed relevant) can be incorporated into a term ranking function. We then investigate this new term ranking function in three user experiments, examining the performance of our function for automatic and interactive query expansion. We show",
+     "span_hash": "2f5b2c1374d19be7e175e6a2f0d049f0febc55aa09e52868c3f684fd5737e97f",
+     "evidence_class": "SCIENTIFIC_ABSTRACT",
+     "proposition_binding": "candidate_mechanism_input",
+     "locator": "",
+     "epistemic_strength": "VERIFIED"
+    }
+   ],
+   "hash_verification_all_pass": true,
+   "snapshot_hash": "5f74f514679c9b0891cd8a94a4a7bcf9ea1149cffc082a14535a29cd2165be56"
+  },
+  "synthesis": {
+   "model": "glm-4-plus-thinking",
+   "provider": "zai",
+   "transport_status": "OK",
+   "task_degradation": {
+    "requested_task": "STRONG",
+    "actual_task_capability": "STRONG",
+    "task_capability_match": true,
+    "degraded_reason": "the serving model declares the requested task capability"
+   },
+   "prompt_hash": "2428f61bf4b6cb1e",
+   "input_hash": "3a19130497b16c6d",
+   "output_hash": "2e1ea596361735ab",
+   "synthesis_timestamp": "2026-09-14T20:52:05.036122+00:00"
+  }
+ },
+ "stage_log": [
+  {
+   "stage": "RETRIEVE",
+   "capability_id": "A2_RETRIEVAL",
+   "module_path": "discovery_fabric/retrieval_fabric/pipeline.py",
+   "function": "retrieve_fabric(problem) [V2] / retrieve(problem) [V1]",
+   "started_at": "2026-09-14T20:47:45+00:00Z",
+   "before_envelope_hash": "9a1c629bf5f62ea7a4dc26bd86a741c06f93ae51d4add047b99f1bea32ca5de6",
+   "status": "OK",
+   "finished_at": "2026-09-14T20:52:02+00:00Z",
+   "after_envelope_hash": "95c89863c05bb02de1b6527e09d21de5539e9e7a03e8574bc9e10f95f7fc2127",
+   "candidate_delta": [
+    "evidence",
+    "evidence_ids",
+    "provenance"
+   ],
+   "delta_real": true,
+   "result_meta": {
+    "retrieved_count": 16,
+    "retrieval_fabric_version": "V2"
+   },
+   "entry": {
+    "entry_helper_version": "stage_entry/1.1.0",
+    "stage": "RETRIEVE",
+    "entry_status": "ALLOWED",
+    "prerequisite": "UPSTREAM_COMPLETE",
+    "prerequisite_evidence": {
+     "failed_stages": [],
+     "skipped_stages": []
+    }
+   }
+  },
+  {
+   "stage": "FREEZE",
+   "capability_id": "EVIDENCE_FREEZE",
+   "module_path": "orchestrator/evidence_custody.py",
+   "function": "promote_to_evidence(record, source, query, class, binding)",
+   "started_at": "2026-09-14T20:52:02+00:00Z",
+   "before_envelope_hash": "95c89863c05bb02de1b6527e09d21de5539e9e7a03e8574bc9e10f95f7fc2127",
+   "status": "OK",
+   "finished_at": "2026-09-14T20:52:02+00:00Z",
+   "after_envelope_hash": "bc92b1ec5eae9c45a8bcd6a578d2635ebeaff5da5444e450e86bbf1cd990f478",
+   "candidate_delta": [
+    "provenance"
+   ],
+   "delta_real": true,
+   "result_meta": {
+    "custody_records": 12,
+    "hash_ok": true
+   },
+   "entry": {
+    "entry_helper_version": "stage_entry/1.1.0",
+    "stage": "FREEZE",
+    "entry_status": "ALLOWED",
+    "prerequisite": "UPSTREAM_COMPLETE",
+    "prerequisite_evidence": {
+     "failed_stages": [],
+     "skipped_stages": []
+    }
+   }
+  },
+  {
+   "stage": "PREMISE_GATE",
+   "capability_id": "PREMISE_GATE",
+   "module_path": "discovery_fabric/engine/premise_gate.py",
+   "function": "check_premise(problem)",
+   "started_at": "2026-09-14T20:52:02+00:00Z",
+   "before_envelope_hash": "bc92b1ec5eae9c45a8bcd6a578d2635ebeaff5da5444e450e86bbf1cd990f478",
+   "status": "OK",
+   "finished_at": "2026-09-14T20:52:02+00:00Z",
+   "after_envelope_hash": "395000e23456eb8b36d10fd5e5036e8c8a2889241e736a04b793e502cda1a046",
+   "candidate_delta": [
+    "premise_gate"
+   ],
+   "delta_real": true,
+   "result_meta": {
+    "premise_verdict": "PREMISE_COHERENT"
+   },
+   "entry": {
+    "entry_helper_version": "stage_entry/1.1.0",
+    "stage": "PREMISE_GATE",
+    "entry_status": "ALLOWED",
+    "prerequisite": "UPSTREAM_COMPLETE",
+    "prerequisite_evidence": {
+     "failed_stages": [],
+     "skipped_stages": []
+    }
+   }
+  },
+  {
+   "stage": "SYNTHESIZE",
+   "capability_id": "SYNTHESIS",
+   "module_path": "discovery_fabric/a2/synthesize.py",
+   "function": "synthesize(problem, evidence)",
+   "started_at": "2026-09-14T20:52:02+00:00Z",
+   "before_envelope_hash": "395000e23456eb8b36d10fd5e5036e8c8a2889241e736a04b793e502cda1a046",
+   "status": "OK",
+   "finished_at": "2026-09-14T20:52:05+00:00Z",
+   "after_envelope_hash": "cd61d983686d5e718d5da5f28ae0856a4d9ad2a505755354c2101cd42ceb76d3",
+   "candidate_delta": [
+    "candidate_id",
+    "mechanism_ids",
+    "mechanism_map",
+    "provenance"
+   ],
+   "delta_real": true,
+   "result_meta": {
+    "model": "glm-4-plus-thinking",
+    "provider": "zai"
+   },
+   "entry": {
+    "entry_helper_version": "stage_entry/1.1.0",
+    "stage": "SYNTHESIZE",
+    "entry_status": "ALLOWED",
+    "prerequisite": "UPSTREAM_COMPLETE",
+    "prerequisite_evidence": {
+     "failed_stages": [],
+     "skipped_stages": []
+    }
+   }
+  }
+ ]
+}

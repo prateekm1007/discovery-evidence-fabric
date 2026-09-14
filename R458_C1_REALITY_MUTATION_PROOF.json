@@ -1,0 +1,163 @@
+{
+ "artifact_type": "R458_REALITY_MUTATION_PROOF/1.0.0",
+ "causal_edge": {
+  "child_candidate_id": "cand:MS:DIRECT_TRANSFER:b6194dd502c7:mut1",
+  "experiment_id": "cl-a942be59e6f82c40:vexp",
+  "failed_constraint": "primary-segment flow >= 40.0000 mL/min at the stated operating condition (the problem's own declared requirement)",
+  "mutation_reason": "the flow deficit is driven by the primary segment's diameter through the d^4 Poiseuille dependence; the mutation solves the inverse problem for exactly the required flow",
+  "observed_outcome": "COMPUTED_FAIL",
+  "parent_candidate_id": "cand:MS:DIRECT_TRANSFER:b6194dd502c7"
+ },
+ "causal_learning_proven": true,
+ "directive_quote": "A changed log entry is insufficient. The successor design must measurably differ because of the observed result.",
+ "flip_regression": {
+  "flip_tested": true,
+  "mutation_base": {
+   "primary_diameter_mm": 1.672402
+  },
+  "mutation_changed_measurably": true,
+  "mutation_perturbed": {
+   "primary_diameter_mm": 1.988832
+  },
+  "observed_deficit_base": 40.0,
+  "observed_deficit_perturbed": 80.0
+ },
+ "honesty": "the loop is SYNTHETIC_LOOP_VERIFIED (Art. XXXVII): the machinery works and the posterior moved by COMPUTATION; the virtual experiment's evidence class is COMPUTATIONAL_RESULT and can never be labeled a physical observation (Art. XXXVIII / LIII); REAL_LOOP_VERIFIED requires an externally supplied observation through the reality gate \u2014 not claimed here",
+ "loop_verification_state": "SYNTHETIC_LOOP_VERIFIED",
+ "provenance_note": "proven == the successor's design parameters measurably differ from the parent BECAUSE of the observed deficit (the closed-form inverse) AND the flip regression holds (perturbing the observation changes the mutation measurably) AND the causal edge links parent -> child with the six directive fields",
+ "recorded_at_utc": "2026-09-14T19:58:23+00:00Z",
+ "reviewer_provenance": "AI_REVIEW",
+ "source": {
+  "benchmark_case": "P1-proof-fixture",
+  "candidate_id": "cand:MS:DIRECT_TRANSFER:b6194dd502c7",
+  "declared_parameters": {},
+  "domain_family": "fluid",
+  "model_arm": "glm-4-plus",
+  "parameters_origin": "extracted from the run's OWN persisted artifacts by the FROZEN R452 extraction instrument (never template values, never invented numbers)",
+  "proof_fixture": true,
+  "proof_fixture_disclosure": "the \u00a76 fixture problem was AUTHORED with the full Poiseuille variable set BY DESIGN \u2014 the R452 case-B precedent (scripts/r452_causal_loop.py: 'the hydraulic family \u2014 case B by design'); it is NOT part of the frozen benchmark corpus and never a model-comparison surface; the candidate and the engine run are REAL (the run's own records are the parameter source)",
+  "run_dir": "R458/MUTATION_PROOF_RUN"
+ },
+ "the_chain": {
+  "candidate": {
+   "candidate_id": "cand:MS:DIRECT_TRANSFER:b6194dd502c7",
+   "declared_parameters": {}
+  },
+  "causal_update": {
+   "after": {
+    "constraint": "primary-segment flow >= 40.0000 mL/min at the stated operating condition (the problem's own declared requirement)",
+    "deficit_ml_min": 29.39715,
+    "measured": 10.602850391320532,
+    "required": 40.0,
+    "status": "VIOLATED_COMPUTATIONALLY"
+   },
+   "before": {
+    "constraint": "primary-segment flow >= 40.0000 mL/min at the stated operating condition (the problem's own declared requirement)",
+    "status": "UNMEASURED"
+   },
+   "transition": "TECHNICAL_STATE_UPDATED_FROM_EXPERIMENT",
+   "transition_rule": "the technical state moves ONLY on the experiment's own computed observation \u2014 never on narrative"
+  },
+  "decisive_experiment": {
+   "acceptance_threshold": "total flow at least 40.0000 mL/min (the problem's own declared requirement \u2014 problem statement span [853, 878]: '40 millilitres per minute' (first declared quantity of the class))",
+   "apparatus": "the deterministic 1D hydraulic network solver hydraulic_network_1d/1.0.0 (reference-validated against Poiseuille closed forms; execution evidence class COMPUTATIONAL_RESULT \u2014 a virtual experiment, never a physical observation, Art. XXXVIII)",
+   "candidate_id": "cand:MS:DIRECT_TRANSFER:b6194dd502c7",
+   "contract_version": "decisive_experiment/1.0.0",
+   "control": "the problem's own current configuration as the control arm (diameter 1.2 mm; identical solver, identical operating point \u2014 Art. XLVII)",
+   "cost": "COMPUTED at negligible marginal cost (a linear solve; no physical experiment is conducted)",
+   "experiment_id": "cl-a942be59e6f82c40:vexp",
+   "experiment_kind": "VIRTUAL_DECISIVE_EXPERIMENT",
+   "falsification_threshold": "total flow below 40.0000 mL/min under the stated operating condition",
+   "field_epistemic_classes": {
+    "acceptance_threshold": "SOURCE_FACT",
+    "apparatus": "COMPUTED",
+    "control": "SOURCE_FACT",
+    "cost": "COMPUTED",
+    "falsification_threshold": "SOURCE_FACT",
+    "hypothesis": "MODEL_DERIVED",
+    "kill_outcome": "SOURCE_FACT",
+    "measurement": "COMPUTED",
+    "safety": "UNKNOWN",
+    "sample": "MODEL_DERIVED",
+    "time": "COMPUTED",
+    "treatment": "MODEL_DERIVED",
+    "uncertainty": "MODEL_DERIVED"
+   },
+   "hypothesis": "The candidate's declared primary-segment arrangement delivers at least 40.0000 mL/min through the problem's own stated operating condition",
+   "kill_outcome": "the measured total flow stays BELOW the problem's own declared requirement of 40.0000 mL/min under the stated operating condition \u2014 the mechanism's claimed delivery effect is falsified and the candidate is killed",
+   "measurement": "total_flow_ml_min computed by the 1D laminar Poiseuille network solver (hydraulic_network_1d/1.0.0) on the candidate's declared parameters, compared against the problem's own declared requirement of 40.0000 mL/min",
+   "safety": "NOT_APPLICABLE_VIRTUAL \u2014 no physical apparatus, no operator, no patient (a physical follow-on experiment would require its own safety case \u2014 recorded as a required field of THAT experiment, never silently inherited)",
+   "sample": "one parameterized network configuration per arm (the virtual experiment computes the full deterministic response \u2014 no sampling; n=1 per arm by construction, recorded honestly)",
+   "source_record_status": "COMPUTED_FAIL",
+   "time": "COMPUTED in solver wall-clock (seconds; the linear solve is direct)",
+   "treatment": "the candidate's declared primary segment (diameter 1.2 mm) as the treatment arm",
+   "uncertainty": "MODEL_DERIVED model-class uncertainty: uniform stenosis model, junction losses unmodelled, viscosity is an input datum (the solver's own recorded limitations)",
+   "validation": {
+    "blocker_fields": [],
+    "contract_version": "decisive_experiment/1.0.0",
+    "decisive": true,
+    "epistemic_class_violations": [],
+    "kill_outcome_directional": true,
+    "kill_outcome_present": true,
+    "kill_outcome_vacuous": false,
+    "missing_fields": [],
+    "rejection_reason": null,
+    "rule": "there must exist an outcome that kills the mechanism (Art. LII); an experiment that can only confirm the proposal is not a decisive experiment",
+    "thresholds_distinct": true,
+    "valid": true
+   }
+  },
+  "discrepancy": "predicted 10.6029 mL/min < required 40.0000 mL/min",
+  "mutation": {
+   "causal_basis": {
+    "failed_constraint": "predicted flow 10.6029 mL/min < required 40.0000 mL/min",
+    "mutation_reason": "the flow deficit is driven by the primary segment's diameter through the d^4 Poiseuille dependence; the mutation solves the inverse problem for exactly the required flow",
+    "observed_outcome": "COMPUTED_FAIL"
+   },
+   "derivation": "d_new = d_old * (Q_required / Q_candidate)^(1/4) = 1.2000 * (40.0000 / 10.6029)^(1/4) = 1.6724 mm \u2014 the closed-form inverse of the Poiseuille relation for the required flow",
+   "epistemic_class": "COMPUTED",
+   "from_value": 1.2,
+   "mutation_kind": "INVERSE_POISEUILLE_DIAMETER",
+   "target_variable": "primary_diameter_mm",
+   "to_value": 1.672402
+  },
+  "observed_outcome": {
+   "loop_outcome": "FALSIFIED_CONSTRAINT",
+   "outcome": "COMPUTED_FAIL",
+   "stage_detail": "predicted 10.6029 mL/min < required 40.0000 mL/min"
+  },
+  "predicted_outcome": {
+   "baseline_flow_ml_min": 10.602850391320532,
+   "candidate_flow_ml_min": 10.602850391320532,
+   "epistemic_class": "COMPUTED",
+   "required_flow_ml_min": 40.0
+  },
+  "re_evaluation": {
+   "child_computed_outcome": {
+    "baseline_flow_ml_min": 10.602850391320532,
+    "candidate_flow_ml_min": 40.00003416258409,
+    "epistemic_class": "COMPUTED",
+    "improvement_over_baseline_ml_min": 29.397184,
+    "margin_over_threshold_ml_min": 3.4e-05,
+    "outcome": "COMPUTED_PASS",
+    "required_flow_ml_min": 40.0
+   },
+   "child_outcome": "CHILD_SUPPORTS_HYPOTHESIS_COMPUTATIONALLY"
+  },
+  "successor": {
+   "candidate_id": "cand:MS:DIRECT_TRANSFER:b6194dd502c7:mut1",
+   "measurable_difference_from_parent": {
+    "primary_diameter_mm": {
+     "delta": 0.472402,
+     "delta_pct": 39.37,
+     "parent": 1.2,
+     "successor": 1.672402
+    }
+   },
+   "measurably_differs": true,
+   "parameters": {
+    "primary_diameter_mm": 1.672402
+   }
+  }
+ }
+}

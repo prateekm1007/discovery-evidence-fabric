@@ -1,0 +1,3978 @@
+{
+ "candidate_id": "cand:A2:r458-s2-db-tail-latency-flash-sale:565f958a925ed5a4",
+ "problem_id": "r458-s2-db-tail-latency-flash-sale",
+ "problem": {
+  "problem_id": "r458-s2-db-tail-latency-flash-sale",
+  "device": "sharded PostgreSQL database cluster",
+  "failure_mode": "connection pool exhaustion due to lock waits",
+  "objective": "hold p99.9 read latency at or below 120 milliseconds",
+  "failure": "Documented problem 'connection pool exhaustion due to lock waits' concerning sharded PostgreSQL database cluster. User-submitted engineering problem (session input): \"An e-commerce platform's order database, a sharded PostgreSQL cluster with 3 replicas per shard, shows p99.9 read latency collapsing from 40 to 900 milliseconds for 3 to 7 minutes during flash sales: checkout error rates hit 2 percent at peak as the 250-millisecond client timeout fires, and the post\".  ROUTING: cpsc_recalls: not queried — the failure query is free text and this source answers date-floor questions only (grammar: YYYY-MM-DD date window (RecallDateStart)). [cpsc_recalls] retrieval status NOT_QUERIED_GRAMMAR (planned query is free text; source grammar is a YYYY-MM-DD date floor (R443 routing decision, not absence)) — provider outcome recorded, not treated as absence (Art. XXI.3). [arxiv] 5 records retrieved live (2011-2024). Illustrative records: 'On the solution existence and stability of polynomial optimization problems'; 'A Concurrency Control Method Based on Commitment Ordering in Mobile Databases'. LIMITS STAMPED INLINE: literature context establishes the problem class, not event rates. Problem-existence basis: live records retrieved.",
+  "constraint": "cannot change schema or add cache invalidation complexity, cannot increase replication factor, cannot raise client timeout above 250 milliseconds",
+  "sources": {
+   "cpsc_recalls": "NOT_QUERIED_GRAMMAR",
+   "arxiv": "OK"
+  },
+  "origin": "toscanini_ui",
+  "user_text": "An e-commerce platform's order database, a sharded PostgreSQL cluster with 3 replicas per shard, shows p99.9 read latency collapsing from 40 to 900 milliseconds for 3 to 7 minutes during flash sales: checkout error rates hit 2 percent at peak as the 250-millisecond client timeout fires, and the postmortems show lock waits on the inventory row for the featured item cascading through connection pools until the pool exhausts and unrelated queries queue behind it. The featured-item pages drive 40 percent of sale-window traffic to one shard. The platform cannot change the schema or add cache invalidation complexity this quarter (the migration freeze before the holiday code freeze), cannot increase the replication factor (storage budget), cannot raise the client timeout above 250 milliseconds (the mobile team's page budget), and must hold p99.9 at or below 120 milliseconds during flash-sale peaks with the existing cluster.",
+  "r458_benchmark": {
+   "class": "FROZEN_BENCHMARK_DEV",
+   "arm": "glm-4-plus-thinking",
+   "content_sha256": "00101ffc9c6d6069519eacfd13feb0fece1646a8828903845e3a1134c11439fd",
+   "corpus_freeze": "R458/BENCHMARK_FREEZE.json"
+  }
+ },
+ "evidence_ids": [
+  "doi:10.59945/jpnm.v4i3.1377",
+  "doi:10.31979/etd.ykxw-rr89",
+  "doi:10.32469/10355/98842",
+  "doi:10.22215/etd/2004-05922",
+  "doi:10.48550/arxiv.2608.15994",
+  "doi:10.48550/arxiv.0605060",
+  "doi:10.48550/arxiv.1112.2155",
+  "title:c0fe6becfe95402d",
+  "title:e33248b61a467609",
+  "doi:10.18420/btw2019-ws-24",
+  "doi:10.1007/979-8-8688-0817-3_8",
+  "doi:10.32614/cran.package.rredshiftsql"
+ ],
+ "evidence": [
+  {
+   "id": "doi:10.59945/jpnm.v4i3.1377",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.59945/jpnm.v4i3.1377",
+   "source_uri": "https://doi.org/10.59945/jpnm.v4i3.1377",
+   "title": "Analisis Perbandingan Performa Koneksi Database Postgresql 17 Dengan Arsitektur Direct Connection Dan Connection Pooling Pgbouncer",
+   "abstract": "",
+   "doi": "10.59945/jpnm.v4i3.1377",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2026",
+   "retrieval_timestamp": "2026-09-14T21:59:27.502600+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "d125a14978581b926e43e0c74648fbccf7285939a021d2d78dc37f36a472bf6c",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.59945/jpnm.v4i3.1377"
+    },
+    "queries_by_source": {
+     "crossref": "sharded PostgreSQL database cluster connection pool exhaustion due to lock waits"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=journal-article"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.59945/jpnm.v4i3.1377",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "sharded PostgreSQL database cluster connection pool exhaustion due to lock waits",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  {
+   "id": "doi:10.31979/etd.ykxw-rr89",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.31979/etd.ykxw-rr89",
+   "source_uri": "https://doi.org/10.31979/etd.ykxw-rr89",
+   "title": "Benchmarking MongoDB multi-document transactions in a sharded cluster",
+   "abstract": "",
+   "doi": "10.31979/etd.ykxw-rr89",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-14T21:59:27.502676+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "4e73ab7869b004d5825c1214587412faf4b63bba63880394c6490c22d35e2db0",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.31979/etd.ykxw-rr89"
+    },
+    "queries_by_source": {
+     "crossref": "sharded PostgreSQL database cluster connection pool exhaustion due to lock waits"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.31979/etd.ykxw-rr89",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "sharded PostgreSQL database cluster connection pool exhaustion due to lock waits",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  {
+   "id": "doi:10.32469/10355/98842",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.32469/10355/98842",
+   "source_uri": "https://doi.org/10.32469/10355/98842",
+   "title": "A hierarchical time-indexed database for multi-modal derived sensor data using GPU-accelerated PostgreSQL",
+   "abstract": "",
+   "doi": "10.32469/10355/98842",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-14T21:59:27.502703+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "660ca8758ec36f24cbe2e1ba273ff36e97822b7ad94dd3ec6e6ef3eee8921fee",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.32469/10355/98842"
+    },
+    "queries_by_source": {
+     "crossref": "sharded PostgreSQL database cluster connection pool exhaustion due to lock waits"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.32469/10355/98842",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "sharded PostgreSQL database cluster connection pool exhaustion due to lock waits",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  {
+   "id": "doi:10.22215/etd/2004-05922",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.22215/etd/2004-05922",
+   "source_uri": "https://doi.org/10.22215/etd/2004-05922",
+   "title": "Parallel query processing on a cluster-based database system",
+   "abstract": "",
+   "doi": "10.22215/etd/2004-05922",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-14T21:59:27.502721+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "25cd6bd2c153bc627e95106d3eeaeba3a44ea4ff87e49b2f6773707c81932def",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.22215/etd/2004-05922"
+    },
+    "queries_by_source": {
+     "crossref": "sharded PostgreSQL database cluster connection pool exhaustion due to lock waits"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.22215/etd/2004-05922",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "sharded PostgreSQL database cluster connection pool exhaustion due to lock waits",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  {
+   "id": "doi:10.48550/arxiv.2608.15994",
+   "source_type": "scientific_paper",
+   "source": "arxiv",
+   "source_id": "arxiv:arxiv:2608.15994v1",
+   "source_uri": "https://doi.org/10.48550/arxiv.2608.15994",
+   "title": "Building An Integrated Vector Database System in PostgreSQL",
+   "abstract": "This paper presents PostgreSQL-V 2.0, a scalable integrated vector database system inside PostgreSQL. Existing PostgreSQL-based vector search systems such as pgvector embed vector indexes into PostgreSQL's page-oriented storage engine, incurring significant overhead that leads to a huge performance gap with specialized vector databases. In our earlier work, we introduced PostgreSQL-V 1.0, which addresses this issue by separating vector index structures from PostgreSQL's storage engine, enabling vector search performance close to that of native vector index libraries while preserving SQL compatibility. However, we find that PostgreSQL-V 1.0 has three limitations that matter for real-world workloads: it only supports a single connection (without concurrency), recovery time grows with index size, and physical replication is unsupported.\n  We further present PostgreSQL-V 2.0, which closes all three gaps. PostgreSQL-V 2.0's concurrency support enables fully concurrent vector searches and updates across PostgreSQL's multi-process backends, delivering up to 36.4x the throughput of PostgreSQL-V 1.0 while serving 32 concurrent clients. PostgreSQL-V 2.0's fast crash recovery keeps cost independent of total index size, remaining near 20 ms while PostgreSQL-V 1.0's grows into seconds-scale. PostgreSQL-V 2.0's physical replication support extends physical replication to the decoupled index, preserving index consistency on standbys without burdening the primary node. Together, these advances make PostgreSQL-V 2.0 a fully concurrent, crash-resilient, and replication-ready vector database inside PostgreSQL.",
+   "doi": "10.48550/arxiv.2608.15994",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-14T21:59:27.502742+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "47224aff6da57bc8c1153bea67f2cf14afda3535789e2f020212315363d191c2",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "arxiv",
+    "indexing_sources": [
+     "arxiv"
+    ],
+    "record_ids_by_source": {
+     "arxiv": "arxiv:2608.15994v1"
+    },
+    "queries_by_source": {
+     "arxiv": "sharded PostgreSQL database cluster connection pool exhaustion due to lock waits"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "preprint_origin",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "preprint_origin",
+   "canonical_id": "doi:10.48550/arxiv.2608.15994",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "sharded PostgreSQL database cluster connection pool exhaustion due to lock waits",
+   "source_rank": 0,
+   "fulltext_url": "http://arxiv.org/abs/2608.15994v1",
+   "authors": [
+    "Jiayi Liu",
+    "Te Guo",
+    "Jianguo Wang"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
+    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed — absence of an arXiv record is not absence of the science"
+   ]
+  },
+  {
+   "id": "doi:10.48550/arxiv.0605060",
+   "source_type": "scientific_paper",
+   "source": "arxiv",
+   "source_id": "arxiv:arxiv:0605060v1",
+   "source_uri": "https://doi.org/10.48550/arxiv.0605060",
+   "title": "A Case for Cooperative and Incentive-Based Coupling of Distributed Clusters",
+   "abstract": "Research interest in Grid computing has grown significantly over the past five years. Management of distributed resources is one of the key issues in Grid computing. Central to management of resources is the effectiveness of resource allocation as it determines the overall utility of the system. The current approaches to superscheduling in a grid environment are non-coordinated since application level schedulers or brokers make scheduling decisions independently of the others in the system. Clearly, this can exacerbate the load sharing and utilization problems of distributed resources due to suboptimal schedules that are likely to occur. To overcome these limitations, we propose a mechanism for coordinated sharing of distributed clusters based on computational economy. The resulting environment, called \\emph{Grid-Federation}, allows the transparent use of resources from the federation when local resources are insufficient to meet its users' requirements. The use of computational economy methodology in coordinating resource allocation not only facilitates the QoS based scheduling, but also enhances utility delivered by resources.",
+   "doi": "10.48550/arxiv.0605060",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-14T21:59:27.502759+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "5d37be222ebc8d6666a9c00c89bfef8386117b1b9160eddf35c1dfee29e0b4c5",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "arxiv",
+    "indexing_sources": [
+     "arxiv"
+    ],
+    "record_ids_by_source": {
+     "arxiv": "arxiv:0605060v1"
+    },
+    "queries_by_source": {
+     "arxiv": "sharded PostgreSQL database cluster connection pool exhaustion due to lock waits"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "preprint_origin",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "preprint_origin",
+   "canonical_id": "doi:10.48550/arxiv.0605060",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "sharded PostgreSQL database cluster connection pool exhaustion due to lock waits",
+   "source_rank": 1,
+   "fulltext_url": "http://arxiv.org/abs/cs/0605060v1",
+   "authors": [
+    "Rajiv Ranjan",
+    "Aaron Harwood",
+    "Rajkumar Buyya"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
+    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed — absence of an arXiv record is not absence of the science"
+   ]
+  },
+  {
+   "id": "doi:10.48550/arxiv.1112.2155",
+   "source_type": "scientific_paper",
+   "source": "arxiv",
+   "source_id": "arxiv:arxiv:1112.2155v1",
+   "source_uri": "https://doi.org/10.48550/arxiv.1112.2155",
+   "title": "A Concurrency Control Method Based on Commitment Ordering in Mobile Databases",
+   "abstract": "Disconnection of mobile clients from server, in an unclear time and for an unknown duration, due to mobility of mobile clients, is the most important challenges for concurrency control in mobile database with client-server model. Applying pessimistic common classic methods of concurrency control (like 2pl) in mobile database leads to long duration blocking and increasing waiting time of transactions. Because of high rate of aborting transactions, optimistic methods aren`t appropriate in mobile database. In this article, OPCOT concurrency control algorithm is introduced based on optimistic concurrency control method. Reducing communications between mobile client and server, decreasing blocking rate and deadlock of transactions, and increasing concurrency degree are the most important motivation of using optimistic method as the basis method of OPCOT algorithm. To reduce abortion rate of transactions, in execution time of transactions` operators a timestamp is assigned to them. In other to checking commitment ordering property of scheduler, the assigned timestamp is used in server on time of commitment. In this article, serializability of OPCOT algorithm scheduler has been proved by using serializability graph. Results of evaluating simulation show that OPCOT algorithm decreases abortion rate and waiting time of transactions in compare to 2pl and optimistic algorithms.",
+   "doi": "10.48550/arxiv.1112.2155",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-14T21:59:27.502772+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "583601a7174ec42c911c1db9fec657122b79822dcf8d31c6c2fd12d461f9fd07",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "arxiv",
+    "indexing_sources": [
+     "arxiv"
+    ],
+    "record_ids_by_source": {
+     "arxiv": "arxiv:1112.2155v1"
+    },
+    "queries_by_source": {
+     "arxiv": "sharded PostgreSQL database cluster connection pool exhaustion due to lock waits"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "preprint_origin",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "preprint_origin",
+   "canonical_id": "doi:10.48550/arxiv.1112.2155",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "sharded PostgreSQL database cluster connection pool exhaustion due to lock waits",
+   "source_rank": 2,
+   "fulltext_url": "http://arxiv.org/abs/1112.2155v1",
+   "authors": [
+    "Ali Karami",
+    "Ahmad Baraani-Dastjerdi"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
+    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed — absence of an arXiv record is not absence of the science"
+   ]
+  },
+  {
+   "id": "title:c0fe6becfe95402d",
+   "source_type": "scientific_paper",
+   "source": "core",
+   "source_id": "core:core:166636830",
+   "source_uri": "",
+   "title": "OPTIMALISASI KINERJA SERVER DATABASE POSTGRESQL\n\nMELALUI CLUSTER PATRONI",
+   "abstract": "Kebutuhan akan tersedianya data dan informasi melalui media digital pada saat\n\nini sangat tinggi. Hal ini tidak terlepas dari pesatnya perkembangan sistem teknologi\n\ninformasi di masa sekarang. Dalam sistem teknologi informasi terdapat berbagai data\n\ndan informasi yang seluruhnya tersimpan dalam suatu server basis data atau kerap\n\ndisebut dengan database server. Database server merupakan server yang memiliki\n\nfungsi vital dalam suatu sistem teknologi informasi. Seperti server pada umumnya\n\nsebuah database server tidak luput dari suatu gangguan yang sering saja terjadi, oleh\n\nkarenanya penting untuk menjaga ketersediaan dan stabilitas pada database server.\n\nUntuk menjaga ketersediaan dan stabilitas pada database server dapat dilakukan\n\nmelalui implementasi suatu Cluster database server.\n\nService database server yang mendukung untuk berjalan pada Cluster database\n\nsalah satunya adalah PostgreSQL. Dan untuk teknologi Cluster yang mendukung pada\n\nservice PostgreSQL salah satunya adalah Patroni. Penelitian pada Cluster Patroni ini\n\nakan menggunakan tiga buah virtual machine dengan spesifikasi 2 Core CPU, 4GB\n\nRAM & 20GB Disk Storage. Ketiga buah virtual machine tersebut akan terhubung\n\ndalam suatu internal network dan menjadi sebuah Cluster Patroni. Agar ketiga server\n\ntersebut dapat menjadi kesatuan Cluster Patroni, dibutuhkan untuk melakukan instalasi\n\nbeberapa software. Software tersebut diataranya PostgreSQL, etcd, HAProxy,\n\nKeepalived dan juga Patroni. Dalam memastikan Cluster Patroni berjalan dengan\n\nsesuai, dibutuhkan beberapa skenario pengujian yang butuh dilakukan. Skenario\n\npengujian ini akan dilakukan melalui dua metode, metode pertama melalui aplikasi web\n\nPOS yang berbasis web dan metode kedua melalui proses uji dump & restore database.\n\nUntuk melakukan pengujian tersebut terdapat satu buah virtual machine dengan\n\nspesifikasi 2 Core CPU, 2GB RAM & 10GB Disk Storage yang disebut sebagaiserver\n\naplikasi. Server aplikasi ini menggunakan beberapa service yang berjalandiantaranya\n\nadalah NGINX dan juga PHP. Baik server yang berada dalam Cluster Patroni maupun\n\nserver aplikasi menggunakan Sistem Operasi Fedora 39.\n\nDari beberapa skenario pengujian yang telah dilakukan, sebuah Cluster Patroni\n\nmemiliki fitur yang handal berupa autofailover, fitur ini mendukung untuk terciptanya\n\nhigh availability dalam layanan database yang dikelola. Dengan terciptanya high",
+   "doi": null,
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-14T21:59:27.502786+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "e41c2da7f82d7208a37a7838187d36ac08e218ee9453edaf480b5f6448b52e34",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "core",
+    "indexing_sources": [
+     "core"
+    ],
+    "record_ids_by_source": {
+     "core": "core:166636830"
+    },
+    "queries_by_source": {
+     "core": "sharded PostgreSQL database cluster connection pool exhaustion due lock waits"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "repository_aggregator_core",
+    "identity_basis": "TITLE_FINGERPRINT",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "repository_aggregator_core",
+   "canonical_id": "title:c0fe6becfe95402d",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "sharded PostgreSQL database cluster connection pool exhaustion due lock waits",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [
+    "Apriandi, Rizqi"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
+    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
+   ]
+  },
+  {
+   "id": "title:e33248b61a467609",
+   "source_type": "scientific_paper",
+   "source": "core",
+   "source_id": "core:core:19105618",
+   "source_uri": "",
+   "title": "Functions to Expand a PostgreSQL Database",
+   "abstract": "This is a set of functions to expand a PostgreSQL database via functions which analyze and manipulate graphs.  The functions are internal, written in c.  The import/export functions (using GraphML) are written in Java",
+   "doi": null,
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-14T21:59:27.502803+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "a79dca13ed5b6d2b55571d702c55858127de1502a67c497d5111a857b437167d",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "core",
+    "indexing_sources": [
+     "core"
+    ],
+    "record_ids_by_source": {
+     "core": "core:19105618"
+    },
+    "queries_by_source": {
+     "core": "sharded PostgreSQL database cluster connection pool exhaustion due lock waits"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "repository_aggregator_core",
+    "identity_basis": "TITLE_FINGERPRINT",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "repository_aggregator_core",
+   "canonical_id": "title:e33248b61a467609",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "sharded PostgreSQL database cluster connection pool exhaustion due lock waits",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [
+    "Liu, Simon",
+    "Duvall, Greg",
+    "Dixon, Brandon"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
+    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
+   ]
+  },
+  {
+   "id": "doi:10.18420/btw2019-ws-24",
+   "source_type": "scientific_paper",
+   "source": "core",
+   "source_id": "core:core:294050139",
+   "source_uri": "https://doi.org/10.18420/btw2019-ws-24",
+   "title": "PgCuckoo – Injecting Physical Plans into PostgreSQL",
+   "abstract": "Plan forcing is the most capable plan hinting that a database system can implement. It allows the specification of almost every aspect of an execution plan. The open source database system PostgreSQL does not implement any plan hints by default. We will show how an extension can be used to provide plan forcing for PostgreSQL. This extension allows to use the query executor directly and independently of SQL. We sketch some of the interesting use case scenarios for plan forcing in PostgreSQL",
+   "doi": "10.18420/btw2019-ws-24",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-14T21:59:27.502816+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "bfb519ef50fa1e55579bf7d1b54f4520f2d7fbd4dac0af4bd9985baeecf03aee",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "core",
+    "indexing_sources": [
+     "core"
+    ],
+    "record_ids_by_source": {
+     "core": "core:294050139"
+    },
+    "queries_by_source": {
+     "core": "sharded PostgreSQL database cluster connection pool exhaustion due lock waits"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "repository_aggregator_core",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "repository_aggregator_core",
+   "canonical_id": "doi:10.18420/btw2019-ws-24",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "sharded PostgreSQL database cluster connection pool exhaustion due lock waits",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [
+    "Hirn, Denis"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
+    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
+   ]
+  },
+  {
+   "id": "doi:10.1007/979-8-8688-0817-3_8",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.1007/979-8-8688-0817-3_8",
+   "source_uri": "https://doi.org/10.1007/979-8-8688-0817-3_8",
+   "title": "Postgres Cluster and Database Backup",
+   "abstract": "",
+   "doi": "10.1007/979-8-8688-0817-3_8",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2024",
+   "retrieval_timestamp": "2026-09-14T21:59:27.502840+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "3ea6209c56a8691bc73f6f479b703c058fe352af62d39058d55612f8bc6abe44",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.1007/979-8-8688-0817-3_8"
+    },
+    "queries_by_source": {
+     "crossref": "sharded PostgreSQL database cluster connection pool exhaustion due to lock waits"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=book-chapter"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.1007/979-8-8688-0817-3_8",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "sharded PostgreSQL database cluster connection pool exhaustion due to lock waits",
+   "source_rank": 3,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  {
+   "id": "doi:10.32614/cran.package.rredshiftsql",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.32614/cran.package.rredshiftsql",
+   "source_uri": "https://doi.org/10.32614/cran.package.rredshiftsql",
+   "title": "RRedshiftSQL: R Interface to the 'Redshift' Database",
+   "abstract": "",
+   "doi": "10.32614/cran.package.rredshiftsql",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2016",
+   "retrieval_timestamp": "2026-09-14T21:59:27.502860+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "e3c518af70e15d3110c2b4ac7fd244b09b1d77d5187309dc52a1f151cc0676b0",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.32614/cran.package.rredshiftsql"
+    },
+    "queries_by_source": {
+     "crossref": "sharded PostgreSQL database cluster connection pool exhaustion due to lock waits"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dataset"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "DATASET",
+   "document_type": "",
+   "evidence_lane": "DATASET",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.32614/cran.package.rredshiftsql",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "sharded PostgreSQL database cluster connection pool exhaustion due to lock waits",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  }
+ ],
+ "mechanism_ids": [
+  "mech:111536938ecf"
+ ],
+ "mechanism_map": {
+  "mechanism": "Connection pooling with PgBouncer improves database performance by managing connections more efficiently",
+  "intervention": "Implement PgBouncer connection pooling in front of the sharded PostgreSQL cluster",
+  "expected_effect": "Reduced connection pool exhaustion and lower latency during peak load periods",
+  "falsification_test": "Compare read latency and connection pool metrics with and without PgBouncer during simulated flash sale conditions",
+  "mechanism_source_span": "\"Analisis Perbandingan Performa Koneksi Database Postgresql 17 Dengan Arsitektur Direct Connection Dan Connection Pooling Pgbouncer\"",
+  "raw_candidate": {
+   "candidate_id": "cand:A2:r458-s2-db-tail-latency-flash-sale:565f958a925ed5a4",
+   "problem_id": "r458-s2-db-tail-latency-flash-sale",
+   "device": "sharded PostgreSQL database cluster",
+   "failure_mode": "connection pool exhaustion due to lock waits",
+   "failure": "Documented problem 'connection pool exhaustion due to lock waits' concerning sharded PostgreSQL database cluster. User-submitted engineering problem (session input): \"An e-commerce platform's order database, a sharded PostgreSQL cluster with 3 replicas per shard, shows p99.9 read latency collapsing from 40 to 900 milliseconds for 3 to 7 minutes during flash sales: checkout error rates hit 2 percent at peak as the 250-millisecond client timeout fires, and the post\".  ROUTING: cpsc_recalls: not queried — the failure query is free text and this source answers date-floor questions only (grammar: YYYY-MM-DD date window (RecallDateStart)). [cpsc_recalls] retrieval status NOT_QUERIED_GRAMMAR (planned query is free text; source grammar is a YYYY-MM-DD date floor (R443 routing decision, not absence)) — provider outcome recorded, not treated as absence (Art. XXI.3). [arxiv] 5 records retrieved live (2011-2024). Illustrative records: 'On the solution existence and stability of polynomial optimization problems'; 'A Concurrency Control Method Based on Commitment Ordering in Mobile Databases'. LIMITS STAMPED INLINE: literature context establishes the problem class, not event rates. Problem-existence basis: live records retrieved.",
+   "constraint": "cannot change schema or add cache invalidation complexity, cannot increase replication factor, cannot raise client timeout above 250 milliseconds",
+   "mechanism": "Connection pooling with PgBouncer improves database performance by managing connections more efficiently",
+   "intervention": "Implement PgBouncer connection pooling in front of the sharded PostgreSQL cluster",
+   "expected_effect": "Reduced connection pool exhaustion and lower latency during peak load periods",
+   "falsification_test": "Compare read latency and connection pool metrics with and without PgBouncer during simulated flash sale conditions",
+   "mechanism_source_span": "\"Analisis Perbandingan Performa Koneksi Database Postgresql 17 Dengan Arsitektur Direct Connection Dan Connection Pooling Pgbouncer\"",
+   "source_evidence": {
+    "source_id": "doi:10.59945/jpnm.v4i3.1377",
+    "source_hash": "d125a14978581b926e43e0c74648fbccf7285939a021d2d78dc37f36a472bf6c",
+    "source_title": "Analisis Perbandingan Performa Koneksi Database Postgresql 17 Dengan Arsitektur Direct Connection Dan Connection Pooling Pgbouncer",
+    "source_span": "",
+    "retrieval_timestamp": "2026-09-14T21:59:27.502600+00:00"
+   },
+   "model": "glm-4-plus-thinking",
+   "provider": "zai",
+   "transport_status": "OK",
+   "prompt_hash": "2428f61bf4b6cb1e",
+   "input_hash": "4447962998c1ed90",
+   "output_hash": "7bfe496f71d55511",
+   "synthesis_timestamp": "2026-09-14T22:02:32.483695+00:00"
+  }
+ },
+ "premise_gate": {
+  "verdict": "PREMISE_COHERENT",
+  "explanation": "no definitional contradiction matched; the gate cannot prove physical truth — only rule-table incoherence is checkable (disclosed limit)",
+  "matched_rules": [],
+  "n_rules_checked": 4,
+  "gate_version": "premise_gate/1.0.0",
+  "limitations": [
+   "deterministic hard-rule table (definitional contradictions only): a physically false but non-contradictory premise passes this gate",
+   "no LLM opinion is a blocking authority (Art. XVIII)",
+   "gate blindness is recorded, never converted into a coherence claim (Art. XXV)"
+  ]
+ },
+ "evidence_classification": {
+  "classifier_version": "evidence_classification/1.0.0",
+  "n_items": 12,
+  "counts": {
+   "DIRECT_SUPPORT": 2,
+   "PARTIAL_SUPPORT": 6,
+   "BACKGROUND": 0,
+   "ANALOGY": 3,
+   "CONTRADICTORY": 1,
+   "IRRELEVANT": 0
+  },
+  "items": [
+   {
+    "source_id": "doi:10.59945/jpnm.v4i3.1377",
+    "title": "Analisis Perbandingan Performa Koneksi Database Postgresql 17 Dengan Arsitektur Direct Connection Dan Connection Pooling Pgbouncer",
+    "classification": "DIRECT_SUPPORT",
+    "relevance": {
+     "domain": {
+      "relevant": true,
+      "overlapping_terms": [
+       "database",
+       "postgresql"
+      ]
+     },
+     "failure_mode": {
+      "relevant": true,
+      "overlapping_terms": [
+       "connection",
+       "database",
+       "postgresql"
+      ]
+     },
+     "mechanism": {
+      "relevant": true,
+      "overlapping_terms": [
+       "connection",
+       "database",
+       "pgbouncer",
+       "pooling"
+      ]
+     },
+     "expected_effect": {
+      "relevant": true,
+      "overlapping_terms": [
+       "connection"
+      ]
+     },
+     "material": {
+      "relevant": false,
+      "overlapping_terms": []
+     },
+     "operating_regime": {
+      "relevant": false,
+      "overlapping_terms": []
+     }
+    },
+    "classification_basis": {
+     "rule": "term-overlap rule table: domain=True, failure_mode=True, mechanism=True",
+     "contradiction_basis": null,
+     "thresholds_applied": {
+      "min_domain_overlap": 2,
+      "min_failure_mode_overlap": 1,
+      "min_mechanism_overlap": 2,
+      "min_specialty_overlap": 1
+     }
+    },
+    "buyer_statement": "This source is relevant to the domain, the failure mode, and the mechanism.",
+    "classifier_version": "evidence_classification/1.0.0"
+   },
+   {
+    "source_id": "doi:10.31979/etd.ykxw-rr89",
+    "title": "Benchmarking MongoDB multi-document transactions in a sharded cluster",
+    "classification": "PARTIAL_SUPPORT",
+    "relevance": {
+     "domain": {
+      "relevant": true,
+      "overlapping_terms": [
+       "cluster",
+       "sharded"
+      ]
+     },
+     "failure_mode": {
+      "relevant": true,
+      "overlapping_terms": [
+       "cluster",
+       "sharded"
+      ]
+     },
+     "mechanism": {
+      "relevant": false,
+      "overlapping_terms": []
+     },
+     "expected_effect": {
+      "relevant": false,
+      "overlapping_terms": []
+     },
+     "material": {
+      "relevant": false,
+      "overlapping_terms": []
+     },
+     "operating_regime": {
+      "relevant": false,
+      "overlapping_terms": []
+     }
+    },
+    "classification_basis": {
+     "rule": "term-overlap rule table: domain=True, failure_mode=True, mechanism=False",
+     "contradiction_basis": null,
+     "thresholds_applied": {
+      "min_domain_overlap": 2,
+      "min_failure_mode_overlap": 1,
+      "min_mechanism_overlap": 2,
+      "min_specialty_overlap": 1
+     }
+    },
+    "buyer_statement": "This source is relevant to the domain but does not support the mechanism.",
+    "classifier_version": "evidence_classification/1.0.0"
+   },
+   {
+    "source_id": "doi:10.32469/10355/98842",
+    "title": "A hierarchical time-indexed database for multi-modal derived sensor data using GPU-accelerated PostgreSQL",
+    "classification": "PARTIAL_SUPPORT",
+    "relevance": {
+     "domain": {
+      "relevant": true,
+      "overlapping_terms": [
+       "database",
+       "postgresql"
+      ]
+     },
+     "failure_mode": {
+      "relevant": true,
+      "overlapping_terms": [
+       "database",
+       "postgresql"
+      ]
+     },
+     "mechanism": {
+      "relevant": false,
+      "overlapping_terms": [
+       "database"
+      ]
+     },
+     "expected_effect": {
+      "relevant": false,
+      "overlapping_terms": []
+     },
+     "material": {
+      "relevant": false,
+      "overlapping_terms": []
+     },
+     "operating_regime": {
+      "relevant": false,
+      "overlapping_terms": []
+     }
+    },
+    "classification_basis": {
+     "rule": "term-overlap rule table: domain=True, failure_mode=True, mechanism=False",
+     "contradiction_basis": null,
+     "thresholds_applied": {
+      "min_domain_overlap": 2,
+      "min_failure_mode_overlap": 1,
+      "min_mechanism_overlap": 2,
+      "min_specialty_overlap": 1
+     }
+    },
+    "buyer_statement": "This source is relevant to the domain but does not support the mechanism.",
+    "classifier_version": "evidence_classification/1.0.0"
+   },
+   {
+    "source_id": "doi:10.22215/etd/2004-05922",
+    "title": "Parallel query processing on a cluster-based database system",
+    "classification": "PARTIAL_SUPPORT",
+    "relevance": {
+     "domain": {
+      "relevant": true,
+      "overlapping_terms": [
+       "cluster",
+       "database"
+      ]
+     },
+     "failure_mode": {
+      "relevant": true,
+      "overlapping_terms": [
+       "based",
+       "cluster",
+       "database",
+       "query"
+      ]
+     },
+     "mechanism": {
+      "relevant": false,
+      "overlapping_terms": [
+       "database"
+      ]
+     },
+     "expected_effect": {
+      "relevant": false,
+      "overlapping_terms": []
+     },
+     "material": {
+      "relevant": false,
+      "overlapping_terms": []
+     },
+     "operating_regime": {
+      "relevant": false,
+      "overlapping_terms": []
+     }
+    },
+    "classification_basis": {
+     "rule": "term-overlap rule table: domain=True, failure_mode=True, mechanism=False",
+     "contradiction_basis": null,
+     "thresholds_applied": {
+      "min_domain_overlap": 2,
+      "min_failure_mode_overlap": 1,
+      "min_mechanism_overlap": 2,
+      "min_specialty_overlap": 1
+     }
+    },
+    "buyer_statement": "This source is relevant to the domain but does not support the mechanism.",
+    "classifier_version": "evidence_classification/1.0.0"
+   },
+   {
+    "source_id": "doi:10.48550/arxiv.2608.15994",
+    "title": "Building An Integrated Vector Database System in PostgreSQL",
+    "classification": "DIRECT_SUPPORT",
+    "relevance": {
+     "domain": {
+      "relevant": true,
+      "overlapping_terms": [
+       "database",
+       "postgresql"
+      ]
+     },
+     "failure_mode": {
+      "relevant": true,
+      "overlapping_terms": [
+       "based",
+       "client",
+       "concurrency",
+       "connection",
+       "database",
+       "only",
+       "postgresql",
+       "thi"
+      ]
+     },
+     "mechanism": {
+      "relevant": true,
+      "overlapping_terms": [
+       "connection",
+       "database",
+       "performance"
+      ]
+     },
+     "expected_effect": {
+      "relevant": true,
+      "overlapping_terms": [
+       "connection"
+      ]
+     },
+     "material": {
+      "relevant": false,
+      "overlapping_terms": []
+     },
+     "operating_regime": {
+      "relevant": true,
+      "overlapping_terms": [
+       "current",
+       "load",
+       "ph"
+      ]
+     }
+    },
+    "classification_basis": {
+     "rule": "term-overlap rule table: domain=True, failure_mode=True, mechanism=True",
+     "contradiction_basis": null,
+     "thresholds_applied": {
+      "min_domain_overlap": 2,
+      "min_failure_mode_overlap": 1,
+      "min_mechanism_overlap": 2,
+      "min_specialty_overlap": 1
+     }
+    },
+    "buyer_statement": "This source is relevant to the domain, the failure mode, and the mechanism.",
+    "classifier_version": "evidence_classification/1.0.0"
+   },
+   {
+    "source_id": "doi:10.48550/arxiv.0605060",
+    "title": "A Case for Cooperative and Incentive-Based Coupling of Distributed Clusters",
+    "classification": "ANALOGY",
+    "relevance": {
+     "domain": {
+      "relevant": false,
+      "overlapping_terms": [
+       "cluster"
+      ]
+     },
+     "failure_mode": {
+      "relevant": true,
+      "overlapping_terms": [
+       "based",
+       "cluster",
+       "decision",
+       "due",
+       "not",
+       "only",
+       "problem",
+       "thi",
+       "user"
+      ]
+     },
+     "mechanism": {
+      "relevant": false,
+      "overlapping_terms": []
+     },
+     "expected_effect": {
+      "relevant": true,
+      "overlapping_terms": [
+       "load"
+      ]
+     },
+     "material": {
+      "relevant": false,
+      "overlapping_terms": []
+     },
+     "operating_regime": {
+      "relevant": true,
+      "overlapping_terms": [
+       "current",
+       "load",
+       "ph"
+      ]
+     }
+    },
+    "classification_basis": {
+     "rule": "term-overlap rule table: domain=False, failure_mode=True, mechanism=False",
+     "contradiction_basis": null,
+     "thresholds_applied": {
+      "min_domain_overlap": 2,
+      "min_failure_mode_overlap": 1,
+      "min_mechanism_overlap": 2,
+      "min_specialty_overlap": 1
+     }
+    },
+    "buyer_statement": "This source is from an adjacent domain but speaks to the mechanism or failure mode (analogy, not direct domain evidence).",
+    "classifier_version": "evidence_classification/1.0.0"
+   },
+   {
+    "source_id": "doi:10.48550/arxiv.1112.2155",
+    "title": "A Concurrency Control Method Based on Commitment Ordering in Mobile Databases",
+    "classification": "ANALOGY",
+    "relevance": {
+     "domain": {
+      "relevant": false,
+      "overlapping_terms": [
+       "database"
+      ]
+     },
+     "failure_mode": {
+      "relevant": true,
+      "overlapping_terms": [
+       "based",
+       "basi",
+       "client",
+       "commitment",
+       "concurrency",
+       "control",
+       "database",
+       "due",
+       "method",
+       "mobile",
+       "ordering",
+       "rate",
+       "show",
+       "thi"
+      ]
+     },
+     "mechanism": {
+      "relevant": false,
+      "overlapping_terms": [
+       "database"
+      ]
+     },
+     "expected_effect": {
+      "relevant": false,
+      "overlapping_terms": []
+     },
+     "material": {
+      "relevant": false,
+      "overlapping_terms": []
+     },
+     "operating_regime": {
+      "relevant": true,
+      "overlapping_terms": [
+       "ph"
+      ]
+     }
+    },
+    "classification_basis": {
+     "rule": "term-overlap rule table: domain=False, failure_mode=True, mechanism=False",
+     "contradiction_basis": null,
+     "thresholds_applied": {
+      "min_domain_overlap": 2,
+      "min_failure_mode_overlap": 1,
+      "min_mechanism_overlap": 2,
+      "min_specialty_overlap": 1
+     }
+    },
+    "buyer_statement": "This source is from an adjacent domain but speaks to the mechanism or failure mode (analogy, not direct domain evidence).",
+    "classifier_version": "evidence_classification/1.0.0"
+   },
+   {
+    "source_id": "title:c0fe6becfe95402d",
+    "title": "OPTIMALISASI KINERJA SERVER DATABASE POSTGRESQL\n\nMELALUI CLUSTER PATRONI",
+    "classification": "PARTIAL_SUPPORT",
+    "relevance": {
+     "domain": {
+      "relevant": true,
+      "overlapping_terms": [
+       "cluster",
+       "database",
+       "postgresql"
+      ]
+     },
+     "failure_mode": {
+      "relevant": true,
+      "overlapping_terms": [
+       "basi",
+       "cluster",
+       "database",
+       "postgresql"
+      ]
+     },
+     "mechanism": {
+      "relevant": false,
+      "overlapping_terms": [
+       "database"
+      ]
+     },
+     "expected_effect": {
+      "relevant": false,
+      "overlapping_terms": []
+     },
+     "material": {
+      "relevant": false,
+      "overlapping_terms": []
+     },
+     "operating_regime": {
+      "relevant": true,
+      "overlapping_terms": [
+       "ph"
+      ]
+     }
+    },
+    "classification_basis": {
+     "rule": "term-overlap rule table: domain=True, failure_mode=True, mechanism=False",
+     "contradiction_basis": null,
+     "thresholds_applied": {
+      "min_domain_overlap": 2,
+      "min_failure_mode_overlap": 1,
+      "min_mechanism_overlap": 2,
+      "min_specialty_overlap": 1
+     }
+    },
+    "buyer_statement": "This source is relevant to the domain but does not support the mechanism.",
+    "classifier_version": "evidence_classification/1.0.0"
+   },
+   {
+    "source_id": "title:e33248b61a467609",
+    "title": "Functions to Expand a PostgreSQL Database",
+    "classification": "PARTIAL_SUPPORT",
+    "relevance": {
+     "domain": {
+      "relevant": true,
+      "overlapping_terms": [
+       "database",
+       "postgresql"
+      ]
+     },
+     "failure_mode": {
+      "relevant": true,
+      "overlapping_terms": [
+       "database",
+       "postgresql",
+       "thi"
+      ]
+     },
+     "mechanism": {
+      "relevant": false,
+      "overlapping_terms": [
+       "database"
+      ]
+     },
+     "expected_effect": {
+      "relevant": false,
+      "overlapping_terms": []
+     },
+     "material": {
+      "relevant": false,
+      "overlapping_terms": []
+     },
+     "operating_regime": {
+      "relevant": true,
+      "overlapping_terms": [
+       "ph"
+      ]
+     }
+    },
+    "classification_basis": {
+     "rule": "term-overlap rule table: domain=True, failure_mode=True, mechanism=False",
+     "contradiction_basis": null,
+     "thresholds_applied": {
+      "min_domain_overlap": 2,
+      "min_failure_mode_overlap": 1,
+      "min_mechanism_overlap": 2,
+      "min_specialty_overlap": 1
+     }
+    },
+    "buyer_statement": "This source is relevant to the domain but does not support the mechanism.",
+    "classifier_version": "evidence_classification/1.0.0"
+   },
+   {
+    "source_id": "doi:10.18420/btw2019-ws-24",
+    "title": "PgCuckoo – Injecting Physical Plans into PostgreSQL",
+    "classification": "CONTRADICTORY",
+    "relevance": {
+     "domain": {
+      "relevant": true,
+      "overlapping_terms": [
+       "database",
+       "postgresql"
+      ]
+     },
+     "failure_mode": {
+      "relevant": true,
+      "overlapping_terms": [
+       "database",
+       "not",
+       "postgresql",
+       "query",
+       "show",
+       "source",
+       "thi"
+      ]
+     },
+     "mechanism": {
+      "relevant": false,
+      "overlapping_terms": [
+       "database"
+      ]
+     },
+     "expected_effect": {
+      "relevant": false,
+      "overlapping_terms": []
+     },
+     "material": {
+      "relevant": false,
+      "overlapping_terms": []
+     },
+     "operating_regime": {
+      "relevant": true,
+      "overlapping_terms": [
+       "ph"
+      ]
+     }
+    },
+    "classification_basis": {
+     "rule": "negation marker co-located with claim terms (transparent proxy — not a claim chart)",
+     "contradiction_basis": "negation marker co-located with claim terms ['database', 'not', 'postgresql', 'source'] in: 'The open source database system PostgreSQL does not implement any plan hints by default.'",
+     "thresholds_applied": {
+      "min_domain_overlap": 2,
+      "min_failure_mode_overlap": 1,
+      "min_mechanism_overlap": 2,
+      "min_specialty_overlap": 1
+     }
+    },
+    "buyer_statement": "This source contains a negated claim co-located with the candidate's mechanism/effect terms — treated as potential contradictory evidence.",
+    "classifier_version": "evidence_classification/1.0.0"
+   },
+   {
+    "source_id": "doi:10.1007/979-8-8688-0817-3_8",
+    "title": "Postgres Cluster and Database Backup",
+    "classification": "PARTIAL_SUPPORT",
+    "relevance": {
+     "domain": {
+      "relevant": true,
+      "overlapping_terms": [
+       "cluster",
+       "database"
+      ]
+     },
+     "failure_mode": {
+      "relevant": true,
+      "overlapping_terms": [
+       "cluster",
+       "database"
+      ]
+     },
+     "mechanism": {
+      "relevant": false,
+      "overlapping_terms": [
+       "database"
+      ]
+     },
+     "expected_effect": {
+      "relevant": false,
+      "overlapping_terms": []
+     },
+     "material": {
+      "relevant": false,
+      "overlapping_terms": []
+     },
+     "operating_regime": {
+      "relevant": false,
+      "overlapping_terms": []
+     }
+    },
+    "classification_basis": {
+     "rule": "term-overlap rule table: domain=True, failure_mode=True, mechanism=False",
+     "contradiction_basis": null,
+     "thresholds_applied": {
+      "min_domain_overlap": 2,
+      "min_failure_mode_overlap": 1,
+      "min_mechanism_overlap": 2,
+      "min_specialty_overlap": 1
+     }
+    },
+    "buyer_statement": "This source is relevant to the domain but does not support the mechanism.",
+    "classifier_version": "evidence_classification/1.0.0"
+   },
+   {
+    "source_id": "doi:10.32614/cran.package.rredshiftsql",
+    "title": "RRedshiftSQL: R Interface to the 'Redshift' Database",
+    "classification": "ANALOGY",
+    "relevance": {
+     "domain": {
+      "relevant": false,
+      "overlapping_terms": [
+       "database"
+      ]
+     },
+     "failure_mode": {
+      "relevant": true,
+      "overlapping_terms": [
+       "database"
+      ]
+     },
+     "mechanism": {
+      "relevant": false,
+      "overlapping_terms": [
+       "database"
+      ]
+     },
+     "expected_effect": {
+      "relevant": false,
+      "overlapping_terms": []
+     },
+     "material": {
+      "relevant": false,
+      "overlapping_terms": []
+     },
+     "operating_regime": {
+      "relevant": false,
+      "overlapping_terms": []
+     }
+    },
+    "classification_basis": {
+     "rule": "term-overlap rule table: domain=False, failure_mode=True, mechanism=False",
+     "contradiction_basis": null,
+     "thresholds_applied": {
+      "min_domain_overlap": 2,
+      "min_failure_mode_overlap": 1,
+      "min_mechanism_overlap": 2,
+      "min_specialty_overlap": 1
+     }
+    },
+    "buyer_statement": "This source is from an adjacent domain but speaks to the mechanism or failure mode (analogy, not direct domain evidence).",
+    "classifier_version": "evidence_classification/1.0.0"
+   }
+  ],
+  "mechanism_support": {
+   "n_direct_support": 2,
+   "direct_support_source_ids": [
+    "doi:10.59945/jpnm.v4i3.1377",
+    "doi:10.48550/arxiv.2608.15994"
+   ],
+   "n_contradictory": 1,
+   "contradictory_source_ids": [
+    "doi:10.18420/btw2019-ws-24"
+   ],
+   "note": "DIRECT_SUPPORT requires domain + failure-mode + mechanism relevance; domain-only relevance is BACKGROUND and can never support a mechanism claim (R394 s5)"
+  },
+  "thresholds": {
+   "MIN_DOMAIN_OVERLAP": {
+    "value": 2,
+    "epistemic_class": "ENGINEERING",
+    "justification": "same rule family as the engine's standing domain-specificity bar (>= 2 shared content terms = domain-specific rather than accidental collision)",
+    "uncertainty": "term overlap is a proxy for domain identity"
+   },
+   "MIN_MECHANISM_OVERLAP": {
+    "value": 2,
+    "epistemic_class": "ENGINEERING",
+    "justification": "the collision core's MIN_MECHANISM_OVERLAP — one rule family across the engine (Art. VII: no per-callsite threshold invention)",
+    "uncertainty": "term overlap is a proxy for mechanism identity"
+   },
+   "MIN_FAILURE_MODE_OVERLAP": {
+    "value": 1,
+    "epistemic_class": "ENGINEERING",
+    "justification": "failure-mode vocabulary is sparse and specific ('occlusion', 'drift', 'delamination'); a single shared specific term is a real signal, accidental single-term collisions are already filtered by the domain gate",
+    "uncertainty": "word-sense collisions remain possible"
+   },
+   "MIN_SPECIALTY_OVERLAP": {
+    "value": 1,
+    "epistemic_class": "ENGINEERING",
+    "justification": "material and operating-regime vocabulary (polyethylene, titanium, 310 K, cyclic load) is highly specific; one shared term is signal",
+    "uncertainty": "none disclosed beyond term-overlap proxy limits"
+   }
+  }
+ },
+ "mechanism_space": {
+  "mechanism_space_version": "mechanism_space/1.0.0",
+  "construction": "R453_LEAN (external auditor mandate: no extraction fan-out; FREEZE/VERIFY facts reused; at most one operator call)",
+  "built_at": "2026-09-14T22:02:32+00:00Z",
+  "problem_id": "r458-s2-db-tail-latency-flash-sale",
+  "operator_ids": [
+   "DIRECT_TRANSFER"
+  ],
+  "n_structured_items": 8,
+  "structured_evidence": {
+   "state": "BUILT",
+   "n_items": 8,
+   "construction": "R453_LEAN_REUSE_FREEZE_VERIFY_FACTS",
+   "items": [
+    {
+     "item_id": "lean_doi:10.59945/jpnm.v4i3.1377",
+     "structured_hash": "68974baacfa1e1c5044d361cf6af12b30fe17af2c1a38aae94d7a5d3c8622e09",
+     "fields": {
+      "system": {
+       "value": "Analisis Perbandingan Performa Koneksi Database Postgresql 17 Dengan Arsitektur Direct Connection Dan Connection Pooling Pgbouncer"
+      }
+     },
+     "source": "crossref",
+     "provenance": {
+      "content_hash": "d125a14978581b926e43e0c74648fbccf7285939a021d2d78dc37f36a472bf6c",
+      "retrieval_timestamp": "2026-09-14T21:59:27.502600+00:00",
+      "construction": "R453_LEAN_REUSE_FREEZE_VERIFY_FACTS",
+      "claim_classification": "DIRECT_SUPPORT"
+     }
+    },
+    {
+     "item_id": "lean_doi:10.31979/etd.ykxw-rr89",
+     "structured_hash": "bcc293e8b90664e8601558b93b7b6d3d34f5ab5ff659db7fdbdf9bba7ccff645",
+     "fields": {
+      "system": {
+       "value": "Benchmarking MongoDB multi-document transactions in a sharded cluster"
+      }
+     },
+     "source": "crossref",
+     "provenance": {
+      "content_hash": "4e73ab7869b004d5825c1214587412faf4b63bba63880394c6490c22d35e2db0",
+      "retrieval_timestamp": "2026-09-14T21:59:27.502676+00:00",
+      "construction": "R453_LEAN_REUSE_FREEZE_VERIFY_FACTS",
+      "claim_classification": "PARTIAL_SUPPORT"
+     }
+    },
+    {
+     "item_id": "lean_doi:10.32469/10355/98842",
+     "structured_hash": "db9cab9ac1cb78eecc90c4111fe404f55a928765b139ffcbd87027cf21b373ea",
+     "fields": {
+      "system": {
+       "value": "A hierarchical time-indexed database for multi-modal derived sensor data using GPU-accelerated PostgreSQL"
+      }
+     },
+     "source": "crossref",
+     "provenance": {
+      "content_hash": "660ca8758ec36f24cbe2e1ba273ff36e97822b7ad94dd3ec6e6ef3eee8921fee",
+      "retrieval_timestamp": "2026-09-14T21:59:27.502703+00:00",
+      "construction": "R453_LEAN_REUSE_FREEZE_VERIFY_FACTS",
+      "claim_classification": "PARTIAL_SUPPORT"
+     }
+    },
+    {
+     "item_id": "lean_doi:10.22215/etd/2004-05922",
+     "structured_hash": "88fbdc958b1933a30f47f5365b9b700a758a313fd4d78bbf488cf951e8c0bb37",
+     "fields": {
+      "system": {
+       "value": "Parallel query processing on a cluster-based database system"
+      }
+     },
+     "source": "crossref",
+     "provenance": {
+      "content_hash": "25cd6bd2c153bc627e95106d3eeaeba3a44ea4ff87e49b2f6773707c81932def",
+      "retrieval_timestamp": "2026-09-14T21:59:27.502721+00:00",
+      "construction": "R453_LEAN_REUSE_FREEZE_VERIFY_FACTS",
+      "claim_classification": "PARTIAL_SUPPORT"
+     }
+    },
+    {
+     "item_id": "lean_doi:10.48550/arxiv.2608.15994",
+     "structured_hash": "0c6aa85ae20535db882752881e444447712fff36df1e3004783d741eab949e00",
+     "fields": {
+      "system": {
+       "value": "Building An Integrated Vector Database System in PostgreSQL"
+      }
+     },
+     "source": "arxiv",
+     "provenance": {
+      "content_hash": "47224aff6da57bc8c1153bea67f2cf14afda3535789e2f020212315363d191c2",
+      "retrieval_timestamp": "2026-09-14T21:59:27.502742+00:00",
+      "construction": "R453_LEAN_REUSE_FREEZE_VERIFY_FACTS",
+      "claim_classification": "DIRECT_SUPPORT"
+     }
+    },
+    {
+     "item_id": "lean_title:c0fe6becfe95402d",
+     "structured_hash": "08dfd66728b25f118dc14edfbd77192891012c60dbcbdf42478755f39a9d04fd",
+     "fields": {
+      "system": {
+       "value": "OPTIMALISASI KINERJA SERVER DATABASE POSTGRESQL\n\nMELALUI CLUSTER PATRONI"
+      }
+     },
+     "source": "core",
+     "provenance": {
+      "content_hash": "e41c2da7f82d7208a37a7838187d36ac08e218ee9453edaf480b5f6448b52e34",
+      "retrieval_timestamp": "2026-09-14T21:59:27.502786+00:00",
+      "construction": "R453_LEAN_REUSE_FREEZE_VERIFY_FACTS",
+      "claim_classification": "PARTIAL_SUPPORT"
+     }
+    },
+    {
+     "item_id": "lean_title:e33248b61a467609",
+     "structured_hash": "d70eebaa1014cac492177acf7eb074472decfb038d515219e0ae52bbb9036584",
+     "fields": {
+      "system": {
+       "value": "Functions to Expand a PostgreSQL Database"
+      }
+     },
+     "source": "core",
+     "provenance": {
+      "content_hash": "a79dca13ed5b6d2b55571d702c55858127de1502a67c497d5111a857b437167d",
+      "retrieval_timestamp": "2026-09-14T21:59:27.502803+00:00",
+      "construction": "R453_LEAN_REUSE_FREEZE_VERIFY_FACTS",
+      "claim_classification": "PARTIAL_SUPPORT"
+     }
+    },
+    {
+     "item_id": "lean_doi:10.1007/979-8-8688-0817-3_8",
+     "structured_hash": "2f3ef889685af225b5e986a4c6ac6495628b877230ace35eac6de24520db67b0",
+     "fields": {
+      "system": {
+       "value": "Postgres Cluster and Database Backup"
+      }
+     },
+     "source": "crossref",
+     "provenance": {
+      "content_hash": "3ea6209c56a8691bc73f6f479b703c058fe352af62d39058d55612f8bc6abe44",
+      "retrieval_timestamp": "2026-09-14T21:59:27.502840+00:00",
+      "construction": "R453_LEAN_REUSE_FREEZE_VERIFY_FACTS",
+      "claim_classification": "PARTIAL_SUPPORT"
+     }
+    }
+   ]
+  },
+  "operator_results": [
+   {
+    "operator": "DIRECT_TRANSFER",
+    "operator_version": "DIRECT_TRANSFER/1.0.0",
+    "transformation_rule": "instantiate the domain-matched mechanism unchanged; re-derive only the intervention site and design variable",
+    "search_constraint": "the region where the evidence system IS the problem system (same-domain demonstrated mechanisms)",
+    "n_items_examined": 8,
+    "n_items_selected": 1,
+    "selected_item_ids": [
+     "lean_doi:10.59945/jpnm.v4i3.1377"
+    ],
+    "input_contract": {
+     "operator": "DIRECT_TRANSFER",
+     "satisfied": true,
+     "shared_system_terms": [
+      "connection",
+      "database",
+      "postgresql"
+     ],
+     "basis": "evidence system-domain overlaps the problem device domain (>= 2 terms)"
+    },
+    "lean_path": "one instantiation call, no corrective retry (R453-LEAN; the span/semantic gates unchanged)",
+    "state": "OPERATED"
+   }
+  ],
+  "operator_candidates_full": [
+   {
+    "operator": "DIRECT_TRANSFER",
+    "operator_version": "DIRECT_TRANSFER/1.0.0",
+    "transformation_rule": "instantiate the domain-matched mechanism unchanged; re-derive only the intervention site and design variable",
+    "search_constraint": "the region where the evidence system IS the problem system (same-domain demonstrated mechanisms)",
+    "n_items_examined": 8,
+    "n_items_selected": 1,
+    "selected_item_ids": [
+     "lean_doi:10.59945/jpnm.v4i3.1377"
+    ],
+    "input_contract": {
+     "operator": "DIRECT_TRANSFER",
+     "satisfied": true,
+     "shared_system_terms": [
+      "connection",
+      "database",
+      "postgresql"
+     ],
+     "basis": "evidence system-domain overlaps the problem device domain (>= 2 terms)"
+    },
+    "lean_path": "one instantiation call, no corrective retry (R453-LEAN; the span/semantic gates unchanged)",
+    "candidates": [
+     {
+      "candidate_schema": "mechanism_candidate/1.0.0",
+      "mechanism_space_version": "mechanism_space/1.0.0",
+      "candidate_id": "cand:MS:DIRECT_TRANSFER:3677e2ab5edf",
+      "transformation_operator": "DIRECT_TRANSFER",
+      "mechanism": "Connection pooling reduces the overhead of establishing new database connections by reusing existing connections instead of creating new ones for each request",
+      "intervention": "Implement PgBouncer connection pooling between the application servers and the sharded PostgreSQL database cluster",
+      "mechanism_graph": {
+       "nodes": {
+        "intervention_site": {
+         "label": "INTERVENTION",
+         "terms": [
+          "application",
+          "between",
+          "cluster",
+          "connection",
+          "database",
+          "implement",
+          "pgbouncer",
+          "pooling",
+          "postgresql",
+          "server",
+          "sharded"
+         ]
+        },
+        "causal_agent": {
+         "label": "MECHANISM",
+         "terms": [
+          "connection",
+          "creating",
+          "database",
+          "each",
+          "establishing",
+          "existing",
+          "instead",
+          "new",
+          "one",
+          "overhead",
+          "pooling",
+          "reduce",
+          "request",
+          "reusing"
+         ]
+        },
+        "physical_effect": {
+         "label": "PREDICTED_EFFECT",
+         "terms": [
+          "250",
+          "below",
+          "connection",
+          "during",
+          "establishment",
+          "event",
+          "exhaustion",
+          "flash",
+          "latency",
+          "maintaining",
+          "millisecond",
+          "overhead",
+          "p99",
+          "pool",
+          "preventing",
+          "read",
+          "reduced",
+          "sale"
+         ]
+        },
+        "observed_outcome": {
+         "label": "OBSERVED_EFFECT",
+         "terms": []
+        }
+       },
+       "edges": [
+        {
+         "from": "intervention_site",
+         "to": "causal_agent",
+         "relation": "ACTIVATES"
+        },
+        {
+         "from": "causal_agent",
+         "to": "physical_effect",
+         "relation": "PRODUCES"
+        }
+       ],
+       "graph_version": "mechanism_graph/1.0.0"
+      },
+      "evidence_bundle": {
+       "primary_item_id": "lean_doi:10.59945/jpnm.v4i3.1377",
+       "primary_structured_hash": "68974baacfa1e1c5044d361cf6af12b30fe17af2c1a38aae94d7a5d3c8622e09",
+       "primary_source": "crossref",
+       "mechanism_source_span": "Analisis Perbandingan Performa Koneksi Database Postgresql 17 Dengan Arsitektur Direct Connection Dan Connection Pooling Pgbouncer",
+       "evidence_plane": "",
+       "evidence_snapshot_id": "",
+       "evidence_hash": "",
+       "retrieval_role": "",
+       "retrieval_version": "a2_retrieve/frozen_envelope",
+       "retrieval_sources": "",
+       "retrieval_timestamp": ""
+      },
+      "constraint_set": {
+       "problem_constraint": "cannot change schema or add cache invalidation complexity, cannot increase replication factor, cannot raise client timeout above 250 milliseconds",
+       "boundary_conditions": "Effective when connection establishment is the bottleneck; requires proper sizing based on expected concurrent connections; works best with read-heavy workloads",
+       "stated_constraints": ""
+      },
+      "predicted_effect": "Reduced connection establishment overhead during flash sales events, preventing connection pool exhaustion and maintaining p99.9 read latency below 250 milliseconds",
+      "known_failure_modes": [
+       "Connection pool exhaustion if pool size is too small",
+       "increased latency if pool size is too large",
+       "potential deadlocks if connection pool isn't properly monitored and tuned"
+      ],
+      "novel_design_variable": "Connection pool configuration parameters (max_connections, pool_size, reserve_pool)",
+      "testable_prediction": "Under peak load conditions (flash sales), the system with PgBouncer connection pooling will show 70% lower connection establishment time compared to direct connections",
+      "testable_prediction_check": {
+       "present": true,
+       "measurable_quantity": true,
+       "sufficiently_specific": true,
+       "testable": true
+      },
+      "derivation_trace": {
+       "operator": "DIRECT_TRANSFER",
+       "operator_rule_version": "DIRECT_TRANSFER/1.0.0",
+       "input_contract": {
+        "operator": "DIRECT_TRANSFER",
+        "satisfied": true,
+        "shared_system_terms": [
+         "connection",
+         "database",
+         "postgresql"
+        ],
+        "basis": "evidence system-domain overlaps the problem device domain (>= 2 terms)"
+       },
+       "selection_result": {
+        "selected_by": "DIRECT_TRANSFER",
+        "contract": {
+         "operator": "DIRECT_TRANSFER",
+         "satisfied": true,
+         "shared_system_terms": [
+          "connection",
+          "database",
+          "postgresql"
+         ],
+         "basis": "evidence system-domain overlaps the problem device domain (>= 2 terms)"
+        }
+       },
+       "llm_provider": "zai",
+       "llm_model": "glm-4-plus-thinking",
+       "prompt_hash": "555efb8f073fa9d340be5df988e31ade58a5b1c11c911f66f0da0955aabf499d",
+       "output_hash": "a4d3d8e4bae822bfa7c1dbaa7928f72a049f135acb8227f77cb510a8ec00b37e",
+       "call_provenance": {
+        "run_id": "r458mcb-S2: r458-s2-db-tail-latency-flash-sale (blind holdout)",
+        "session_id": "r458mcb-s2",
+        "engine_stage": "MECHANISM_SPACE",
+        "call_class": "RUN_OWNED"
+       },
+       "task_degradation": {
+        "requested_task": "STRONG",
+        "actual_task_capability": "STRONG",
+        "task_capability_match": true,
+        "degraded_reason": "the serving model declares the requested task capability"
+       },
+       "cost_provenance": {
+        "model_id": "glm-4-plus-thinking",
+        "model_revision": "UNDECLARED",
+        "transport": "http://127.0.0.1:8787/v1/chat/completions",
+        "local_or_remote": "LOCAL",
+        "license": "UNDECLARED",
+        "cost_basis": "ENVIRONMENT_GRANT",
+        "account_domain": "SANDBOX_ENVIRONMENT_GRANT",
+        "policy": "UNRESTRICTED",
+        "policy_version": "model_cost_policy/1.1.0"
+       },
+       "source_item_id": "lean_doi:10.59945/jpnm.v4i3.1377",
+       "derived_at": "2026-09-14T22:02:35+00:00Z"
+      },
+      "falsification_test": "Under peak load conditions (flash sales), the system with PgBouncer connection pooling will show 70% lower connection establishment time compared to direct connections",
+      "expected_effect": "Reduced connection establishment overhead during flash sales events, preventing connection pool exhaustion and maintaining p99.9 read latency below 250 milliseconds",
+      "mechanism_source_span": "Analisis Perbandingan Performa Koneksi Database Postgresql 17 Dengan Arsitektur Direct Connection Dan Connection Pooling Pgbouncer",
+      "extraction_confidence": "UNEXTRACTED",
+      "candidate_state": "CANDIDATE",
+      "candidate_hash": "3677e2ab5edf889b37fb17c9b1552608eb9f00a280dec5efcab24c7227682089",
+      "operator_semantic_check": {
+       "operator": "DIRECT_TRANSFER",
+       "source_item_id": "lean_doi:10.59945/jpnm.v4i3.1377",
+       "checked_fields": {
+        "mechanism_preserved": {
+         "shared_terms": []
+        },
+        "intervention_in_target_system": {
+         "target_terms": [
+          "cluster",
+          "database",
+          "postgresql",
+          "sharded"
+         ]
+        }
+       },
+       "invariant_held": false,
+       "required_change_present": true,
+       "invariant_basis": "M2 mechanism shares >= 2 specific terms with M1's demonstrated mechanism/effect",
+       "required_change_basis": "M2 intervention carries target-device vocabulary (cluster, database, postgresql, sharded) — the receiving system is instantiated, traceably",
+       "semantic_verdict": "SEMANTIC_INVARIANT_BROKEN"
+      },
+      "cemetery_warnings": [
+       {
+        "cemetery_entry": "CE-007",
+        "territory": "CV-T07",
+        "mechanism": "M5 mechanical anti-trauma flexible neck",
+        "epistemic_class": "STRONG_CONSTRAINT",
+        "lesson": "Before optimizing a solution, VERIFY THE PROBLEM EXISTS at the physics level. The IVC filter analogy (cantilevered) does not apply to the eShunt (both-ends-anchored supported beam). A compliant tube deforms around a rigid object, not the other way around.",
+        "action_required": "Explicit justification required to proceed despite this constraint"
+       },
+       {
+        "cemetery_entry": "CE-009",
+        "territory": "CV-T06",
+        "mechanism": "Mechanical snare via catheter (R1)",
+        "epistemic_class": "STRONG_CONSTRAINT",
+        "lesson": "Changing retrieval ACTIVATION does NOT change retrieval PHYSICS. Any retrieval mechanism for a permanently implanted endovascular anchor faces the same ingrowth ceiling. The problem is not HOW you pull — it is that the anchor is DESIGNED to be ingrown.",
+        "action_required": "Explicit justification required to proceed despite this constraint"
+       },
+       {
+        "cemetery_entry": "CE-011",
+        "territory": "CV-T06",
+        "mechanism": "Magnetic actuated release (R4)",
+        "epistemic_class": "STRONG_CONSTRAINT",
+        "lesson": "Magnetic actuation is incompatible with neurosurgical implants that must coexist with brain MRI. The 1/r3 force decay makes deep-tissue magnetic actuation fundamentally insufficient. Any mechanism requiring external magnetic actuation for a deep endovascular implant faces both MRI safety and force-distance constraints.",
+        "action_required": "Explicit justification required to proceed despite this constraint"
+       },
+       {
+        "cemetery_entry": "CE-012",
+        "territory": "CV-T05 (R2-C3 phenotype discovery, Round 56 series)",
+        "mechanism": "R2-C3 predictor v1 — pressure-trajectory + phenotype classification for VSS failure-type prediction",
+        "epistemic_class": "STRONG_CONSTRAINT",
+        "lesson": "FROZEN THEOREM (sharpened per CEO Round 56o): 'Existing information + existing transformation + existing control, merely recombined, is insufficient. A combination qualifies only if it produces a demonstrably new technical effect that survives prior art and non-obviousness attack. A world-class invention needs a genuinely new technical information source, transformation, or control capability. Do not build an AI layer on top of an already-claimed sensing/control architecture.' NOTE: This theorem does NOT create a universal 'new sensor required' rule. A novel combination of existing measurements CAN qualify if it produces a new, technically non-obvious effect. The theorem rejects TRIVIAL recombination, not all combinations.",
+        "action_required": "Explicit justification required to proceed despite this constraint"
+       },
+       {
+        "cemetery_entry": "CE-013",
+        "territory": "CV-T05 (R2-C3 phenotype discovery, Round 56 orthogonal search)",
+        "mechanism": "OSV-4: HRV/autonomic state as orthogonal predictor for R2-C3",
+        "epistemic_class": "STRONG_CONSTRAINT",
+        "lesson": "A signal can be GENUINELY ORTHOGONAL to a specific measurement architecture (Hakim measures pressure, not HRV) and still be a DOWNSTREAM CONSEQUENCE of the same physiological variable (ICP → sympathetic → HRV). Orthogonality to one architecture does not imply independence from the underlying physiology. Before claiming a signal is 'new information,' test whether it is causally downstream of an already-measured variable. If A → B and A is measured, then B is a proxy for A, not new information — even if B is measured by a different sensor.",
+        "action_required": "Explicit justification required to proceed despite this constraint"
+       },
+       {
+        "cemetery_entry": "CE-014",
+        "territory": "RES-4 adaptive VSS (Round 56q-56r)",
+        "mechanism": "RES-4 broad: adaptive cerebrospinal venous stent with sensing + flow regulation",
+        "epistemic_class": "STRONG_CONSTRAINT",
+        "lesson": "FROZEN THEOREM CE-014: 'No result for our formulation is not evidence that the capability is absent. Patent searches must generate terminology from patent claims + descriptions + CPC classes + inventor vocabulary + adjacent technologies, not just internally coined phrases. A query-fragile search produces false negatives.' The machine must be better at discovering what competitors actually claimed than it is at inventing elegant names for what we hope is new.",
+        "action_required": "Explicit justification required to proceed despite this constraint"
+       },
+       {
+        "cemetery_entry": "CE-016",
+        "territory": "Stroke thrombectomy (Round 56w-58)",
+        "mechanism": "Stroke: clot-vessel adhesion isolation + measurement + strategy selection (Layer A: force-decomposition estimator v1)",
+        "epistemic_class": "STRONG_CONSTRAINT",
+        "lesson": "FROZEN THEOREM CE-016 (sharpened per CEO Round 58): A proposed latent quantity survives only when (1) identifiability is demonstrated under an EXPLICIT observation/dynamics model with full rank/observability analysis (not naive unknown-count), AND (2) identifiability REMAINS under plausible model uncertainty (each ideal assumption relaxed toward realistic physics and re-tested). A single favorable rank calculation under a convenient model is INSUFFICIENT. A single unfavorable perturbation model is ALSO INSUFFICIENT to claim universal non-identifiability — it only kills the specific estimator tested under that specific perturbation model. The correct procedure: (a) define state, observables, inputs, noise, known/unknown params; (b) build measurement equations; (c) test rank of Jacobian wrt unknown params; (d) perform adversarial model-uncertainty test: relax each assumption toward realistic physics and re-test identifiability under the combined relaxed model; (e) only if BOTH the ideal-model rank AND the adversarial-model rank hold (or constructively fail) can a universal claim (measurable OR non-measurable) be recorded.",
+        "action_required": "Explicit justification required to proceed despite this constraint"
+       },
+       {
+        "cemetery_entry": "CE-017",
+        "territory": "Cross-cutting (extracted from Stroke Round 58; applies to all latent-variable inventions)",
+        "mechanism": "Structural identifiability under a convenient model is not enough — adversarial model-uncertainty and practical-operation survival are mandatory",
+        "epistemic_class": "STRONG_CONSTRAINT",
+        "lesson": "FROZEN THEOREM CE-017: A discovery engine earns trust when it attacks its own successful proof harder than its unsuccessful ideas. Structural identifiability under a convenient model is not enough. A candidate must survive adversarial model uncertainty AND practical operation (safety, timing, decision value, first-pass vs post-hoc). The burden is bidirectional: (a) the proposer must demonstrate identifiability survives realistic model relaxation; (b) the killer must demonstrate non-identifiability holds under EVERY plausible estimator and measurement protocol, not just the one they chose to attack. When in doubt, the implementation is killed; the scientific question stays open until either (a) a survivor is found or (b) an explicit non-identifiability counterexample is constructed (two physically distinct latent states producing indistinguishable observations under ALL measurement protocols).",
+        "action_required": "Explicit justification required to proceed despite this constraint"
+       },
+       {
+        "cemetery_entry": "CE-018",
+        "territory": "Cross-cutting (extracted from Round 62 capability collision failure; applies to ALL novelty claims)",
+        "mechanism": "Capability collision test — keyword collision search is insufficient to establish novelty",
+        "epistemic_class": "STRONG_CONSTRAINT",
+        "lesson": "FROZEN THEOREM CE-018: A novelty claim survives only when the candidate's CAPABILITY (what it can DO) is demonstrably absent from the prior art landscape — not when the candidate's KEYWORDS (what words it uses) are absent. The correct procedure: (1) decompose the candidate into its functional capabilities (e.g., 'intrapprocedural clot sensing' not 'retrieved-clot physical signature measurement'); (2) search the prior art landscape for each capability using the prior art's own vocabulary (assignee names, CPC classes, commercial product names, inventor terminology); (3) build a capability collision matrix mapping each capability to prior art coverage; (4) only if at least one capability is genuinely UNOCCUPIED (confirmed by both patent search AND commercial frontier analysis) can a novelty claim be recorded. Semantic re-skins (CE-012 violation) include: 'retrieved-clot' vs 'in-situ clot'; 'physical signature' vs 'composition'; 'integrated sensor' vs 'catheter-mounted sensor.' These distinctions prove nothing. The test is capability, not vocabulary.\n\nSHARPENED (per CEO Round 62 audit): Capability novelty must be evaluated at the FUNCTIONAL END-TO-END level: input → inference → decision → physical effect → measurable outcome. Otherwise the machine can still find a 'novel' intermediate layer (e.g., a new sensor modality, a new feature, a new algorithm) that is already covered by an existing end-to-end system. The correct end-to-end test: (5) decompose the candidate into the complete causal loop — what is observed → what is inferred → what is predicted → what physical action becomes possible → what measurable outcome changes; (6) map each step of this loop to the prior art's end-to-end systems (not just individual capabilities); (7) only if the candidate's complete causal loop is demonstrably absent from the prior art's end-to-end systems can a novelty claim be recorded. A 'novel' intermediate layer that plugs into an existing end-to-end system is NOT novel — it is a substitution, not an invention. The unit of novelty is the complete causal loop, not the sensor, feature, algorithm, or capability.",
+        "action_required": "Explicit justification required to proceed despite this constraint"
+       }
+      ],
+      "distinctness_verdict": "DISTINCT",
+      "distinctness_basis": "first candidate — the first mechanism family in this space; no prior family to compare",
+      "mechanism_support": {
+       "candidate_id": "cand:MS:DIRECT_TRANSFER:3677e2ab5edf",
+       "mechanism_support_state": "NOT_ENOUGH_EVIDENCE",
+       "counts": {
+        "SUPPORTS": 0,
+        "PARTIALLY_SUPPORTS": 0,
+        "CONTRADICTS": 0,
+        "IRRELEVANT": 0,
+        "NOT_ENOUGH_EVIDENCE": 8
+       },
+       "n_items": 8,
+       "verdicts": [
+        {
+         "item_id": "lean_doi:10.59945/jpnm.v4i3.1377",
+         "relation": "NOT_ENOUGH_EVIDENCE",
+         "basis": "phenomenon/domain overlap present (3 terms) but the candidate's mechanism vocabulary is absent (overlap 0 < 2) — phenomenon support is NOT mechanism support (R401 Phase 4)",
+         "overlaps": {
+          "mechanism_terms": [],
+          "system_match": true,
+          "phenomenon_terms": [],
+          "domain_terms": [
+           "connection",
+           "database",
+           "postgresql"
+          ]
+         },
+         "contradiction_basis": null
+        },
+        {
+         "item_id": "lean_doi:10.31979/etd.ykxw-rr89",
+         "relation": "NOT_ENOUGH_EVIDENCE",
+         "basis": "phenomenon/domain overlap present (2 terms) but the candidate's mechanism vocabulary is absent (overlap 0 < 2) — phenomenon support is NOT mechanism support (R401 Phase 4)",
+         "overlaps": {
+          "mechanism_terms": [],
+          "system_match": true,
+          "phenomenon_terms": [],
+          "domain_terms": [
+           "cluster",
+           "sharded"
+          ]
+         },
+         "contradiction_basis": null
+        },
+        {
+         "item_id": "lean_doi:10.32469/10355/98842",
+         "relation": "NOT_ENOUGH_EVIDENCE",
+         "basis": "phenomenon/domain overlap present (2 terms) but the candidate's mechanism vocabulary is absent (overlap 0 < 2) — phenomenon support is NOT mechanism support (R401 Phase 4)",
+         "overlaps": {
+          "mechanism_terms": [],
+          "system_match": true,
+          "phenomenon_terms": [],
+          "domain_terms": [
+           "database",
+           "postgresql"
+          ]
+         },
+         "contradiction_basis": null
+        },
+        {
+         "item_id": "lean_doi:10.22215/etd/2004-05922",
+         "relation": "NOT_ENOUGH_EVIDENCE",
+         "basis": "phenomenon/domain overlap present (4 terms) but the candidate's mechanism vocabulary is absent (overlap 0 < 2) — phenomenon support is NOT mechanism support (R401 Phase 4)",
+         "overlaps": {
+          "mechanism_terms": [],
+          "system_match": true,
+          "phenomenon_terms": [],
+          "domain_terms": [
+           "based",
+           "cluster",
+           "database",
+           "query"
+          ]
+         },
+         "contradiction_basis": null
+        },
+        {
+         "item_id": "lean_doi:10.48550/arxiv.2608.15994",
+         "relation": "NOT_ENOUGH_EVIDENCE",
+         "basis": "phenomenon/domain overlap present (2 terms) but the candidate's mechanism vocabulary is absent (overlap 0 < 2) — phenomenon support is NOT mechanism support (R401 Phase 4)",
+         "overlaps": {
+          "mechanism_terms": [],
+          "system_match": true,
+          "phenomenon_terms": [],
+          "domain_terms": [
+           "database",
+           "postgresql"
+          ]
+         },
+         "contradiction_basis": null
+        },
+        {
+         "item_id": "lean_title:c0fe6becfe95402d",
+         "relation": "NOT_ENOUGH_EVIDENCE",
+         "basis": "phenomenon/domain overlap present (3 terms) but the candidate's mechanism vocabulary is absent (overlap 0 < 2) — phenomenon support is NOT mechanism support (R401 Phase 4)",
+         "overlaps": {
+          "mechanism_terms": [],
+          "system_match": true,
+          "phenomenon_terms": [],
+          "domain_terms": [
+           "cluster",
+           "database",
+           "postgresql"
+          ]
+         },
+         "contradiction_basis": null
+        },
+        {
+         "item_id": "lean_title:e33248b61a467609",
+         "relation": "NOT_ENOUGH_EVIDENCE",
+         "basis": "phenomenon/domain overlap present (2 terms) but the candidate's mechanism vocabulary is absent (overlap 0 < 2) — phenomenon support is NOT mechanism support (R401 Phase 4)",
+         "overlaps": {
+          "mechanism_terms": [],
+          "system_match": true,
+          "phenomenon_terms": [],
+          "domain_terms": [
+           "database",
+           "postgresql"
+          ]
+         },
+         "contradiction_basis": null
+        },
+        {
+         "item_id": "lean_doi:10.1007/979-8-8688-0817-3_8",
+         "relation": "NOT_ENOUGH_EVIDENCE",
+         "basis": "phenomenon/domain overlap present (2 terms) but the candidate's mechanism vocabulary is absent (overlap 0 < 2) — phenomenon support is NOT mechanism support (R401 Phase 4)",
+         "overlaps": {
+          "mechanism_terms": [],
+          "system_match": true,
+          "phenomenon_terms": [],
+          "domain_terms": [
+           "cluster",
+           "database"
+          ]
+         },
+         "contradiction_basis": null
+        }
+       ],
+       "contradictions_visible": [],
+       "note": "CONTESTED keeps contradictions VISIBLE alongside any support (never absorbed); cross-system items cap at PARTIALLY_SUPPORTS (analogy never becomes direct support); phenomenon-only overlap is NOT_ENOUGH_EVIDENCE (never weak support)"
+      }
+     }
+    ],
+    "state": "OPERATED"
+   }
+  ],
+  "cemetery_consumption": {
+   "consumption_version": "cemetery_consumption/1.0.0",
+   "rule": "Art. LI: negative knowledge is a state-transition mechanism — killed invariants must be capable of changing future search; a written-but-never-read cemetery is a log, not a memory",
+   "n_candidates_consulted": 1,
+   "n_blocked": 0,
+   "n_warned": 1,
+   "blocked": [],
+   "state": "CONSULTED",
+   "total_lessons_consulted": 174
+  },
+  "distinctness": {
+   "n_input": 1,
+   "n_kept": 1,
+   "kept_ids": [
+    "cand:MS:DIRECT_TRANSFER:3677e2ab5edf"
+   ],
+   "n_distinct": 1,
+   "n_indeterminate": 0,
+   "n_equivalent_merged": 0,
+   "distinctness_verdicts": {
+    "DISTINCT": 1,
+    "INDETERMINATE": 0,
+    "EQUIVALENT": 0
+   },
+   "instrument_version": "mechanism_distinctness/2.0.0",
+   "dedup_events": [],
+   "retain_events": [
+    {
+     "retained_id": "cand:MS:DIRECT_TRANSFER:3677e2ab5edf",
+     "verdict": "DISTINCT",
+     "reason": "GENUINE_MECHANISM_DIFFERENCE: the causal core is materially different (recorded)",
+     "difference_basis": {
+      "nearest_kept": null,
+      "verdict": "DISTINCT",
+      "differing_dimensions": null,
+      "causal_core_jaccard": null,
+      "comparison": null,
+      "note": "first family — baseline of the space"
+     }
+    }
+   ],
+   "distinctness_rule": "v2 three-verdict rule (Art. XLII): the mechanism graph aggregate (node term sets + edge signatures) is the causal core; DISTINCT iff its Jaccard < 0.45; EQUIVALENT (merge) iff >= 0.8 with at most a design-knob difference (knob/parameter/synonym renames cannot independently create an invention); INDETERMINATE for boundary-regime or failure-mode deltas on an equivalent core, or cores in the ambiguous band — kept visible, never counted as distinct; every verdict records its basis"
+  },
+  "candidates": [
+   {
+    "candidate_id": "cand:MS:DIRECT_TRANSFER:3677e2ab5edf",
+    "candidate_hash": "3677e2ab5edf889b37fb17c9b1552608eb9f00a280dec5efcab24c7227682089",
+    "candidate_schema": "mechanism_candidate/1.0.0",
+    "candidate_state": "CANDIDATE",
+    "transformation_operator": "DIRECT_TRANSFER",
+    "mechanism": "Connection pooling reduces the overhead of establishing new database connections by reusing existing connections instead of creating new ones for each request",
+    "intervention": "Implement PgBouncer connection pooling between the application servers and the sharded PostgreSQL database cluster",
+    "mechanism_graph": {
+     "nodes": {
+      "intervention_site": {
+       "label": "INTERVENTION",
+       "terms": [
+        "application",
+        "between",
+        "cluster",
+        "connection",
+        "database",
+        "implement",
+        "pgbouncer",
+        "pooling",
+        "postgresql",
+        "server",
+        "sharded"
+       ]
+      },
+      "causal_agent": {
+       "label": "MECHANISM",
+       "terms": [
+        "connection",
+        "creating",
+        "database",
+        "each",
+        "establishing",
+        "existing",
+        "instead",
+        "new",
+        "one",
+        "overhead",
+        "pooling",
+        "reduce",
+        "request",
+        "reusing"
+       ]
+      },
+      "physical_effect": {
+       "label": "PREDICTED_EFFECT",
+       "terms": [
+        "250",
+        "below",
+        "connection",
+        "during",
+        "establishment",
+        "event",
+        "exhaustion",
+        "flash",
+        "latency",
+        "maintaining",
+        "millisecond",
+        "overhead",
+        "p99",
+        "pool",
+        "preventing",
+        "read",
+        "reduced",
+        "sale"
+       ]
+      },
+      "observed_outcome": {
+       "label": "OBSERVED_EFFECT",
+       "terms": []
+      }
+     },
+     "edges": [
+      {
+       "from": "intervention_site",
+       "to": "causal_agent",
+       "relation": "ACTIVATES"
+      },
+      {
+       "from": "causal_agent",
+       "to": "physical_effect",
+       "relation": "PRODUCES"
+      }
+     ],
+     "graph_version": "mechanism_graph/1.0.0"
+    },
+    "evidence_bundle": {
+     "primary_item_id": "lean_doi:10.59945/jpnm.v4i3.1377",
+     "primary_structured_hash": "68974baacfa1e1c5044d361cf6af12b30fe17af2c1a38aae94d7a5d3c8622e09",
+     "primary_source": "crossref",
+     "mechanism_source_span": "Analisis Perbandingan Performa Koneksi Database Postgresql 17 Dengan Arsitektur Direct Connection Dan Connection Pooling Pgbouncer",
+     "evidence_plane": "",
+     "evidence_snapshot_id": "",
+     "evidence_hash": "",
+     "retrieval_role": "",
+     "retrieval_version": "a2_retrieve/frozen_envelope",
+     "retrieval_sources": "",
+     "retrieval_timestamp": ""
+    },
+    "constraint_set": {
+     "problem_constraint": "cannot change schema or add cache invalidation complexity, cannot increase replication factor, cannot raise client timeout above 250 milliseconds",
+     "boundary_conditions": "Effective when connection establishment is the bottleneck; requires proper sizing based on expected concurrent connections; works best with read-heavy workloads",
+     "stated_constraints": ""
+    },
+    "predicted_effect": "Reduced connection establishment overhead during flash sales events, preventing connection pool exhaustion and maintaining p99.9 read latency below 250 milliseconds",
+    "known_failure_modes": [
+     "Connection pool exhaustion if pool size is too small",
+     "increased latency if pool size is too large",
+     "potential deadlocks if connection pool isn't properly monitored and tuned"
+    ],
+    "novel_design_variable": "Connection pool configuration parameters (max_connections, pool_size, reserve_pool)",
+    "testable_prediction": "Under peak load conditions (flash sales), the system with PgBouncer connection pooling will show 70% lower connection establishment time compared to direct connections",
+    "testable_prediction_check": {
+     "present": true,
+     "measurable_quantity": true,
+     "sufficiently_specific": true,
+     "testable": true
+    },
+    "derivation_trace": {
+     "operator": "DIRECT_TRANSFER",
+     "operator_rule_version": "DIRECT_TRANSFER/1.0.0",
+     "input_contract": {
+      "operator": "DIRECT_TRANSFER",
+      "satisfied": true,
+      "shared_system_terms": [
+       "connection",
+       "database",
+       "postgresql"
+      ],
+      "basis": "evidence system-domain overlaps the problem device domain (>= 2 terms)"
+     },
+     "selection_result": {
+      "selected_by": "DIRECT_TRANSFER",
+      "contract": {
+       "operator": "DIRECT_TRANSFER",
+       "satisfied": true,
+       "shared_system_terms": [
+        "connection",
+        "database",
+        "postgresql"
+       ],
+       "basis": "evidence system-domain overlaps the problem device domain (>= 2 terms)"
+      }
+     },
+     "llm_provider": "zai",
+     "llm_model": "glm-4-plus-thinking",
+     "prompt_hash": "555efb8f073fa9d340be5df988e31ade58a5b1c11c911f66f0da0955aabf499d",
+     "output_hash": "a4d3d8e4bae822bfa7c1dbaa7928f72a049f135acb8227f77cb510a8ec00b37e",
+     "call_provenance": {
+      "run_id": "r458mcb-S2: r458-s2-db-tail-latency-flash-sale (blind holdout)",
+      "session_id": "r458mcb-s2",
+      "engine_stage": "MECHANISM_SPACE",
+      "call_class": "RUN_OWNED"
+     },
+     "task_degradation": {
+      "requested_task": "STRONG",
+      "actual_task_capability": "STRONG",
+      "task_capability_match": true,
+      "degraded_reason": "the serving model declares the requested task capability"
+     },
+     "cost_provenance": {
+      "model_id": "glm-4-plus-thinking",
+      "model_revision": "UNDECLARED",
+      "transport": "http://127.0.0.1:8787/v1/chat/completions",
+      "local_or_remote": "LOCAL",
+      "license": "UNDECLARED",
+      "cost_basis": "ENVIRONMENT_GRANT",
+      "account_domain": "SANDBOX_ENVIRONMENT_GRANT",
+      "policy": "UNRESTRICTED",
+      "policy_version": "model_cost_policy/1.1.0"
+     },
+     "source_item_id": "lean_doi:10.59945/jpnm.v4i3.1377",
+     "derived_at": "2026-09-14T22:02:35+00:00Z"
+    },
+    "falsification_test": "Under peak load conditions (flash sales), the system with PgBouncer connection pooling will show 70% lower connection establishment time compared to direct connections",
+    "expected_effect": "Reduced connection establishment overhead during flash sales events, preventing connection pool exhaustion and maintaining p99.9 read latency below 250 milliseconds",
+    "mechanism_source_span": "Analisis Perbandingan Performa Koneksi Database Postgresql 17 Dengan Arsitektur Direct Connection Dan Connection Pooling Pgbouncer",
+    "span_binding": null,
+    "extraction_confidence": "UNEXTRACTED",
+    "mechanism_support": {
+     "candidate_id": "cand:MS:DIRECT_TRANSFER:3677e2ab5edf",
+     "mechanism_support_state": "NOT_ENOUGH_EVIDENCE",
+     "counts": {
+      "SUPPORTS": 0,
+      "PARTIALLY_SUPPORTS": 0,
+      "CONTRADICTS": 0,
+      "IRRELEVANT": 0,
+      "NOT_ENOUGH_EVIDENCE": 8
+     },
+     "n_items": 8,
+     "verdicts": [
+      {
+       "item_id": "lean_doi:10.59945/jpnm.v4i3.1377",
+       "relation": "NOT_ENOUGH_EVIDENCE",
+       "basis": "phenomenon/domain overlap present (3 terms) but the candidate's mechanism vocabulary is absent (overlap 0 < 2) — phenomenon support is NOT mechanism support (R401 Phase 4)",
+       "overlaps": {
+        "mechanism_terms": [],
+        "system_match": true,
+        "phenomenon_terms": [],
+        "domain_terms": [
+         "connection",
+         "database",
+         "postgresql"
+        ]
+       },
+       "contradiction_basis": null
+      },
+      {
+       "item_id": "lean_doi:10.31979/etd.ykxw-rr89",
+       "relation": "NOT_ENOUGH_EVIDENCE",
+       "basis": "phenomenon/domain overlap present (2 terms) but the candidate's mechanism vocabulary is absent (overlap 0 < 2) — phenomenon support is NOT mechanism support (R401 Phase 4)",
+       "overlaps": {
+        "mechanism_terms": [],
+        "system_match": true,
+        "phenomenon_terms": [],
+        "domain_terms": [
+         "cluster",
+         "sharded"
+        ]
+       },
+       "contradiction_basis": null
+      },
+      {
+       "item_id": "lean_doi:10.32469/10355/98842",
+       "relation": "NOT_ENOUGH_EVIDENCE",
+       "basis": "phenomenon/domain overlap present (2 terms) but the candidate's mechanism vocabulary is absent (overlap 0 < 2) — phenomenon support is NOT mechanism support (R401 Phase 4)",
+       "overlaps": {
+        "mechanism_terms": [],
+        "system_match": true,
+        "phenomenon_terms": [],
+        "domain_terms": [
+         "database",
+         "postgresql"
+        ]
+       },
+       "contradiction_basis": null
+      },
+      {
+       "item_id": "lean_doi:10.22215/etd/2004-05922",
+       "relation": "NOT_ENOUGH_EVIDENCE",
+       "basis": "phenomenon/domain overlap present (4 terms) but the candidate's mechanism vocabulary is absent (overlap 0 < 2) — phenomenon support is NOT mechanism support (R401 Phase 4)",
+       "overlaps": {
+        "mechanism_terms": [],
+        "system_match": true,
+        "phenomenon_terms": [],
+        "domain_terms": [
+         "based",
+         "cluster",
+         "database",
+         "query"
+        ]
+       },
+       "contradiction_basis": null
+      },
+      {
+       "item_id": "lean_doi:10.48550/arxiv.2608.15994",
+       "relation": "NOT_ENOUGH_EVIDENCE",
+       "basis": "phenomenon/domain overlap present (2 terms) but the candidate's mechanism vocabulary is absent (overlap 0 < 2) — phenomenon support is NOT mechanism support (R401 Phase 4)",
+       "overlaps": {
+        "mechanism_terms": [],
+        "system_match": true,
+        "phenomenon_terms": [],
+        "domain_terms": [
+         "database",
+         "postgresql"
+        ]
+       },
+       "contradiction_basis": null
+      },
+      {
+       "item_id": "lean_title:c0fe6becfe95402d",
+       "relation": "NOT_ENOUGH_EVIDENCE",
+       "basis": "phenomenon/domain overlap present (3 terms) but the candidate's mechanism vocabulary is absent (overlap 0 < 2) — phenomenon support is NOT mechanism support (R401 Phase 4)",
+       "overlaps": {
+        "mechanism_terms": [],
+        "system_match": true,
+        "phenomenon_terms": [],
+        "domain_terms": [
+         "cluster",
+         "database",
+         "postgresql"
+        ]
+       },
+       "contradiction_basis": null
+      },
+      {
+       "item_id": "lean_title:e33248b61a467609",
+       "relation": "NOT_ENOUGH_EVIDENCE",
+       "basis": "phenomenon/domain overlap present (2 terms) but the candidate's mechanism vocabulary is absent (overlap 0 < 2) — phenomenon support is NOT mechanism support (R401 Phase 4)",
+       "overlaps": {
+        "mechanism_terms": [],
+        "system_match": true,
+        "phenomenon_terms": [],
+        "domain_terms": [
+         "database",
+         "postgresql"
+        ]
+       },
+       "contradiction_basis": null
+      },
+      {
+       "item_id": "lean_doi:10.1007/979-8-8688-0817-3_8",
+       "relation": "NOT_ENOUGH_EVIDENCE",
+       "basis": "phenomenon/domain overlap present (2 terms) but the candidate's mechanism vocabulary is absent (overlap 0 < 2) — phenomenon support is NOT mechanism support (R401 Phase 4)",
+       "overlaps": {
+        "mechanism_terms": [],
+        "system_match": true,
+        "phenomenon_terms": [],
+        "domain_terms": [
+         "cluster",
+         "database"
+        ]
+       },
+       "contradiction_basis": null
+      }
+     ],
+     "contradictions_visible": [],
+     "note": "CONTESTED keeps contradictions VISIBLE alongside any support (never absorbed); cross-system items cap at PARTIALLY_SUPPORTS (analogy never becomes direct support); phenomenon-only overlap is NOT_ENOUGH_EVIDENCE (never weak support)"
+    },
+    "distinctness_verdict": "DISTINCT",
+    "distinctness_basis": "first candidate — the first mechanism family in this space; no prior family to compare"
+   }
+  ],
+  "state": "BUILT",
+  "n_candidates_generated": 1,
+  "n_candidates_retained": 1,
+  "min_candidates_required": 1,
+  "metrics": {
+   "mechanism_candidates_generated": 1,
+   "mechanism_candidates_after_dedup": 1,
+   "operator_counts": {
+    "DIRECT_TRANSFER": {
+     "generated": 1,
+     "retained": 1
+    },
+    "CROSS_DOMAIN_ANALOGY": {
+     "generated": 0,
+     "retained": 0
+    },
+    "GEOMETRIC_TRANSFORMATION": {
+     "generated": 0,
+     "retained": 0
+    },
+    "BOUNDARY_CONDITION_CHANGE": {
+     "generated": 0,
+     "retained": 0
+    },
+    "FAILURE_PATH_INVERSION": {
+     "generated": 0,
+     "retained": 0
+    }
+   },
+   "material_distinctness_rate": 1.0,
+   "material_mechanism_diversity": {
+    "n_distinct": 1,
+    "n_indeterminate": 0,
+    "n_equivalent_merged": 0,
+    "instrument_version": "mechanism_distinctness/2.0.0",
+    "note": "MMD per Art. XLVIII: counts DISTINCT verdicts only — EQUIVALENT merges and INDETERMINATE referrals are reported but never counted as distinct mechanisms (Art. XLII/XXV)"
+   },
+   "evidence_mechanism_support_rate": 0.0,
+   "contradiction_rate": 0.0,
+   "testable_prediction_rate": 1.0,
+   "n_structured_evidence_items": 8,
+   "states_vocabulary_note": "rates expose behavior; NOT_ENOUGH_EVIDENCE/CONTESTED are never affirmative (Art. XXV)"
+  }
+ },
+ "prior_art_ids": [],
+ "prior_art": {
+  "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+  "legacy_status": "NO_MATCHING_EVIDENCE_FOUND",
+  "differentiation_resolution": {
+   "state": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+   "epistemic_class": "SEARCH_RESULT",
+   "constitutional_limitation": "a search-derived prior-art POSITION, not a novelty determination (Art. XXVIII); coverage measured by declared term-overlap thresholds, not a claim chart",
+   "evidence_tier_summary": "NO_FAMILIES",
+   "per_family": [],
+   "n_families": 0,
+   "n_search_errors": 10,
+   "search_errors": [
+    {
+     "query": "database databases connection sharded postgresql cluster",
+     "source": "google_patents",
+     "error": "HTTP 503",
+     "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+    },
+    {
+     "query": "database databases connection sharded postgresql cluster",
+     "source": "lens_patent",
+     "error": "LENS_API_TOKEN not configured",
+     "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+    },
+    {
+     "query": "database connection connections pooling pgbouncer improves",
+     "source": "google_patents",
+     "error": "HTTP 503",
+     "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+    },
+    {
+     "query": "database connection connections pooling pgbouncer improves",
+     "source": "lens_patent",
+     "error": "LENS_API_TOKEN not configured",
+     "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+    },
+    {
+     "query": "connection sharded postgresql cluster pgbouncer pooling front",
+     "source": "google_patents",
+     "error": "HTTP 503",
+     "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+    },
+    {
+     "query": "connection sharded postgresql cluster pgbouncer pooling front",
+     "source": "lens_patent",
+     "error": "LENS_API_TOKEN not configured",
+     "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+    },
+    {
+     "query": "database connection exhaustion during pooling concerning",
+     "source": "google_patents",
+     "error": "HTTP 503",
+     "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+    },
+    {
+     "query": "database connection exhaustion during pooling concerning",
+     "source": "lens_patent",
+     "error": "LENS_API_TOKEN not configured",
+     "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+    },
+    {
+     "query": "reduced periods lower load",
+     "source": "google_patents",
+     "error": "HTTP 503",
+     "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+    },
+    {
+     "query": "reduced periods lower load",
+     "source": "lens_patent",
+     "error": "LENS_API_TOKEN not configured",
+     "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+    }
+   ],
+   "search_execution": {
+    "mandatory_complete": false,
+    "n_errors": 10,
+    "rule": "RESOLVED_DIFFERENTIATED requires every mandatory (query_class x source) search to have completed successfully (R394 s2); provider failure never becomes absence (Art. XXI.3)"
+   },
+   "relevance_model_version": "collision_resolution/2.0.0",
+   "determinism_contract": {
+    "inputs": "problem + candidate profile + query ladder + source results (per-family adjudicated text, hash-custodied) + thresholds + relevance model version",
+    "check": "identical inputs must yield identical coverage decisions and state; divergence on replay is FLAG_INCONSISTENT_RETRIEVAL (R394 s3)"
+   },
+   "thresholds": {
+    "CROSS_DOMAIN_MIN_NONGENERIC_OVERLAP": {
+     "value": 3,
+     "epistemic_class": "ENGINEERING",
+     "justification": "R377 patent-text ground truth (TOSCANINI/R377_PATENT_TEXT_FETCH.json + R377_PATENT_TEXT_GROUND_TRUTH.json): 12/30 family representatives (40%) were substantively irrelevant cross-domain term collisions (CWDM optical link for a battery-thermal candidate; dental-condition monitoring for rolling stock; bone fracture forceps for rail steel...). A hit sharing NO entity term with the candidate now needs >= 3 NON-generic mechanism terms to be mechanism art: the measured true cross-domain analog (line-pipe steel with hydrogen fracture toughness for a rail-steel candidate) shares 3 non-generic terms and survives; every measured false positive shares <= 2 and is demoted. This RAISES the cross-domain bar (was the same >= 2 as same-domain) — stricter, not weaker (Art. VII).",
+     "uncertainty": "term overlap remains a proxy; entity word-sense collisions ('gear': steering vs draft) can still pass — disclosed limitation, not a solved problem"
+    },
+    "MIN_MECHANISM_OVERLAP": {
+     "value": 2,
+     "epistemic_class": "ENGINEERING",
+     "justification": "same term-overlap rule family as the pipeline relevance adjudicator and the Q2 instrument (>= 2 shared content terms = domain-specific rather than accidental collision); NOT weakened relative to any prior gate",
+     "uncertainty": "term overlap is a proxy for mechanism identity"
+    },
+    "ANTICIPATION_COVERAGE_RATIO": {
+     "value": 0.8,
+     "epistemic_class": "ENGINEERING",
+     "justification": "a family ANTICIPATES only when nearly ALL elements of the candidate's FULL distinguishing set (uncapped — the claim elements, not the 6-term query core) appear in the family's claim/abstract text; 0.8 leaves a >= 20% element margin — anything lower would convert partial art into a kill (Art. XXVIII forbids). Measured adversarial case: a domain-only patent reached 0.857 against a capped denominator whose true differentiators (acoustic, multi-modal) had been ranked out",
+     "uncertainty": "claim coverage measured by term overlap, not a claim chart; recorded per family with evidence tier"
+    },
+    "MAX_QUERY_TERMS": {
+     "value": 6,
+     "epistemic_class": "ENGINEERING",
+     "justification": "provider-measured sweet spot for keyword patent queries (longer queries dilute ranking)"
+    },
+    "ABSTRACT_TIER_MIN_CHARS": {
+     "value": 80,
+     "epistemic_class": "ENGINEERING",
+     "justification": "below ~80 chars a snippet carries title echoes, not mechanism description; it cannot support an abstract-tier coverage decision"
+    }
+   }
+  },
+  "scientific_report": {
+   "prior_art_status": "NO_MATCHING_EVIDENCE_FOUND",
+   "search_execution": {
+    "n_queries": 2,
+    "n_executed_ok": 2,
+    "n_failed": 0,
+    "failure_states": [],
+    "timeout_present": false,
+    "note": "status is derived from execution, not findings: a failed/timeout query set can never support a no-match claim (R394 s2/s4, Art. XXI.3)"
+   },
+   "databases_searched": [
+    "EuropePMC"
+   ],
+   "queries": [
+    "sharded PostgreSQL database cluster Documented problem",
+    "Connection pooling PgBouncer improves database performance"
+   ],
+   "query_log": [
+    {
+     "query": "sharded PostgreSQL database cluster Documented problem",
+     "status": "OK",
+     "connector_state": "EMPTY_RESULT",
+     "result_count": 0
+    },
+    {
+     "query": "Connection pooling PgBouncer improves database performance",
+     "status": "OK",
+     "connector_state": "EMPTY_RESULT",
+     "result_count": 0
+    }
+   ],
+   "instrument_version": "a2_prior_art/2.0.0",
+   "connector_semantics": "connector_states/1.0.0",
+   "date_range": "all",
+   "timestamp": "2026-09-14T22:03:04.870189+00:00",
+   "result_count": 0,
+   "results": [],
+   "limitations": [
+    "Only EuropePMC searched",
+    "No patent databases searched (patent side handled by the collision core)",
+    "No ClinicalTrials.gov searched",
+    "Zero-result searches support 'no matching evidence in the searched universe' only — never 'nobody has done this' (Art. XXI.2)"
+   ],
+   "note": "Never claim 'nobody has done this.' Only report 'No matching evidence found within the searched universe.'"
+  },
+  "state_vocabulary": "collision_resolution R376 + classify/v4"
+ },
+ "collision_results": {
+  "strategy": "mechanism-centered multi-query (R376; R377 adds the FUNCTION class, entity-anchored cross-domain precision, canonical claims fetch + Lens full abstract)",
+  "query_ladder": [
+   {
+    "query_class": "ENTITY",
+    "query": "database databases connection sharded postgresql cluster",
+    "query_compact": "database databases",
+    "terms": [
+     "database",
+     "databases",
+     "connection",
+     "sharded",
+     "postgresql",
+     "cluster"
+    ],
+    "purpose": "anchor the device/failure domain"
+   },
+   {
+    "query_class": "MECHANISM",
+    "query": "database connection connections pooling pgbouncer improves",
+    "query_compact": "database connection",
+    "terms": [
+     "database",
+     "connection",
+     "connections",
+     "pooling",
+     "pgbouncer",
+     "improves"
+    ],
+    "purpose": "direct prior art on the causal mechanism"
+   },
+   {
+    "query_class": "DISTINGUISHING",
+    "query": "connection sharded postgresql cluster pgbouncer pooling front",
+    "query_compact": "connection sharded",
+    "terms": [
+     "connection",
+     "sharded",
+     "postgresql",
+     "cluster",
+     "pgbouncer",
+     "pooling",
+     "front"
+    ],
+    "purpose": "direct prior art on the candidate's technical core (technical terms lead; entity anchors follow — R377 anchor-crowding fix)"
+   },
+   {
+    "query_class": "FUNCTION",
+    "query": "database connection exhaustion during pooling concerning",
+    "query_compact": "database connection",
+    "terms": [
+     "database",
+     "connection",
+     "exhaustion",
+     "during",
+     "pooling",
+     "concerning"
+    ],
+    "purpose": "prior art on the FUNCTION itself (detection / protection / regulation...): patents are titled with function nouns; a detection candidate whose ladder lacks 'detection' cannot find detection art (R377 measured: the EV run missed the entire thermal-runaway-DETECTION family)"
+   },
+   {
+    "query_class": "ADJACENT",
+    "query": "reduced periods lower load",
+    "query_compact": "reduced periods",
+    "terms": [
+     "reduced",
+     "periods",
+     "lower",
+     "load"
+    ],
+    "purpose": "adjacent technical approaches that could destroy differentiation (function without implementation; entity terms excluded so it never collapses into the entity query — R377 fix)"
+   }
+  ],
+  "candidate_profile": {
+   "entity_terms": [
+    "database",
+    "databases",
+    "connection",
+    "sharded",
+    "postgresql",
+    "cluster"
+   ],
+   "mechanism_terms": [
+    "database",
+    "connection",
+    "connections",
+    "pooling",
+    "pgbouncer",
+    "improves"
+   ],
+   "distinguishing_terms": [
+    "connection",
+    "sharded",
+    "postgresql",
+    "cluster",
+    "pgbouncer",
+    "pooling",
+    "front"
+   ],
+   "function_terms": [
+    "database",
+    "connection",
+    "exhaustion",
+    "during",
+    "pooling",
+    "concerning"
+   ],
+   "adjacent_terms": [
+    "reduced",
+    "periods",
+    "lower",
+    "load"
+   ]
+  },
+  "patent": {
+   "sources": [
+    "google_patents",
+    "lens_patent"
+   ],
+   "metered_sources": {
+    "patentbear": {
+     "policy": "OPT-IN since R378 (CEO directive: 'Use PatentBear for patents'); queried only when listed in sources; persistent quota guard with reserve floor (patentbear_meter.json)",
+     "not_queried_when_absent": "metered-source policy — not spent on default collision search (K-series)"
+    }
+   },
+   "hit_count": 0,
+   "hits": [],
+   "source_errors": [
+    {
+     "query": "database databases connection sharded postgresql cluster",
+     "source": "google_patents",
+     "error": "HTTP 503",
+     "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+    },
+    {
+     "query": "database databases connection sharded postgresql cluster",
+     "source": "lens_patent",
+     "error": "LENS_API_TOKEN not configured",
+     "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+    },
+    {
+     "query": "database connection connections pooling pgbouncer improves",
+     "source": "google_patents",
+     "error": "HTTP 503",
+     "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+    },
+    {
+     "query": "database connection connections pooling pgbouncer improves",
+     "source": "lens_patent",
+     "error": "LENS_API_TOKEN not configured",
+     "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+    },
+    {
+     "query": "connection sharded postgresql cluster pgbouncer pooling front",
+     "source": "google_patents",
+     "error": "HTTP 503",
+     "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+    },
+    {
+     "query": "connection sharded postgresql cluster pgbouncer pooling front",
+     "source": "lens_patent",
+     "error": "LENS_API_TOKEN not configured",
+     "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+    },
+    {
+     "query": "database connection exhaustion during pooling concerning",
+     "source": "google_patents",
+     "error": "HTTP 503",
+     "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+    },
+    {
+     "query": "database connection exhaustion during pooling concerning",
+     "source": "lens_patent",
+     "error": "LENS_API_TOKEN not configured",
+     "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+    },
+    {
+     "query": "reduced periods lower load",
+     "source": "google_patents",
+     "error": "HTTP 503",
+     "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+    },
+    {
+     "query": "reduced periods lower load",
+     "source": "lens_patent",
+     "error": "LENS_API_TOKEN not configured",
+     "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+    }
+   ],
+   "relevance_adjudications": [],
+   "relevant_hit_count": 0,
+   "adjacent_only_hits": [],
+   "cross_domain_term_collisions": [],
+   "cross_domain_collision_note": "R377: demoted with recorded terms — mechanism overlap without entity overlap and below the non-generic bar is a term collision, not prior art (measured: 40% of R376 family reps were collisions)"
+  },
+  "families": [],
+  "mandatory_searches": {
+   "mandatory_pairs": 10,
+   "failed_pairs": 10,
+   "complete": false,
+   "failed": [
+    {
+     "query": "database databases connection sharded postgresql cluster",
+     "source": "google_patents",
+     "error": "HTTP 503"
+    },
+    {
+     "query": "database databases connection sharded postgresql cluster",
+     "source": "lens_patent",
+     "error": "LENS_API_TOKEN not configured"
+    },
+    {
+     "query": "database connection connections pooling pgbouncer improves",
+     "source": "google_patents",
+     "error": "HTTP 503"
+    },
+    {
+     "query": "database connection connections pooling pgbouncer improves",
+     "source": "lens_patent",
+     "error": "LENS_API_TOKEN not configured"
+    },
+    {
+     "query": "connection sharded postgresql cluster pgbouncer pooling front",
+     "source": "google_patents",
+     "error": "HTTP 503"
+    },
+    {
+     "query": "connection sharded postgresql cluster pgbouncer pooling front",
+     "source": "lens_patent",
+     "error": "LENS_API_TOKEN not configured"
+    },
+    {
+     "query": "database connection exhaustion during pooling concerning",
+     "source": "google_patents",
+     "error": "HTTP 503"
+    },
+    {
+     "query": "database connection exhaustion during pooling concerning",
+     "source": "lens_patent",
+     "error": "LENS_API_TOKEN not configured"
+    },
+    {
+     "query": "reduced periods lower load",
+     "source": "google_patents",
+     "error": "HTTP 503"
+    },
+    {
+     "query": "reduced periods lower load",
+     "source": "lens_patent",
+     "error": "LENS_API_TOKEN not configured"
+    }
+   ],
+   "rule": "every attempted (query_class x source) pair must complete successfully before RESOLVED_DIFFERENTIATED is permitted (R394 s2; a partial search cannot support a no-covering-art claim)",
+   "relevance_model_version": "collision_resolution/2.0.0"
+  },
+  "differentiation_resolution": {
+   "state": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+   "epistemic_class": "SEARCH_RESULT",
+   "constitutional_limitation": "a search-derived prior-art POSITION, not a novelty determination (Art. XXVIII); coverage measured by declared term-overlap thresholds, not a claim chart",
+   "evidence_tier_summary": "NO_FAMILIES",
+   "per_family": [],
+   "n_families": 0,
+   "n_search_errors": 10,
+   "search_errors": [
+    {
+     "query": "database databases connection sharded postgresql cluster",
+     "source": "google_patents",
+     "error": "HTTP 503",
+     "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+    },
+    {
+     "query": "database databases connection sharded postgresql cluster",
+     "source": "lens_patent",
+     "error": "LENS_API_TOKEN not configured",
+     "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+    },
+    {
+     "query": "database connection connections pooling pgbouncer improves",
+     "source": "google_patents",
+     "error": "HTTP 503",
+     "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+    },
+    {
+     "query": "database connection connections pooling pgbouncer improves",
+     "source": "lens_patent",
+     "error": "LENS_API_TOKEN not configured",
+     "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+    },
+    {
+     "query": "connection sharded postgresql cluster pgbouncer pooling front",
+     "source": "google_patents",
+     "error": "HTTP 503",
+     "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+    },
+    {
+     "query": "connection sharded postgresql cluster pgbouncer pooling front",
+     "source": "lens_patent",
+     "error": "LENS_API_TOKEN not configured",
+     "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+    },
+    {
+     "query": "database connection exhaustion during pooling concerning",
+     "source": "google_patents",
+     "error": "HTTP 503",
+     "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+    },
+    {
+     "query": "database connection exhaustion during pooling concerning",
+     "source": "lens_patent",
+     "error": "LENS_API_TOKEN not configured",
+     "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+    },
+    {
+     "query": "reduced periods lower load",
+     "source": "google_patents",
+     "error": "HTTP 503",
+     "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+    },
+    {
+     "query": "reduced periods lower load",
+     "source": "lens_patent",
+     "error": "LENS_API_TOKEN not configured",
+     "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+    }
+   ],
+   "search_execution": {
+    "mandatory_complete": false,
+    "n_errors": 10,
+    "rule": "RESOLVED_DIFFERENTIATED requires every mandatory (query_class x source) search to have completed successfully (R394 s2); provider failure never becomes absence (Art. XXI.3)"
+   },
+   "relevance_model_version": "collision_resolution/2.0.0",
+   "determinism_contract": {
+    "inputs": "problem + candidate profile + query ladder + source results (per-family adjudicated text, hash-custodied) + thresholds + relevance model version",
+    "check": "identical inputs must yield identical coverage decisions and state; divergence on replay is FLAG_INCONSISTENT_RETRIEVAL (R394 s3)"
+   },
+   "thresholds": {
+    "CROSS_DOMAIN_MIN_NONGENERIC_OVERLAP": {
+     "value": 3,
+     "epistemic_class": "ENGINEERING",
+     "justification": "R377 patent-text ground truth (TOSCANINI/R377_PATENT_TEXT_FETCH.json + R377_PATENT_TEXT_GROUND_TRUTH.json): 12/30 family representatives (40%) were substantively irrelevant cross-domain term collisions (CWDM optical link for a battery-thermal candidate; dental-condition monitoring for rolling stock; bone fracture forceps for rail steel...). A hit sharing NO entity term with the candidate now needs >= 3 NON-generic mechanism terms to be mechanism art: the measured true cross-domain analog (line-pipe steel with hydrogen fracture toughness for a rail-steel candidate) shares 3 non-generic terms and survives; every measured false positive shares <= 2 and is demoted. This RAISES the cross-domain bar (was the same >= 2 as same-domain) — stricter, not weaker (Art. VII).",
+     "uncertainty": "term overlap remains a proxy; entity word-sense collisions ('gear': steering vs draft) can still pass — disclosed limitation, not a solved problem"
+    },
+    "MIN_MECHANISM_OVERLAP": {
+     "value": 2,
+     "epistemic_class": "ENGINEERING",
+     "justification": "same term-overlap rule family as the pipeline relevance adjudicator and the Q2 instrument (>= 2 shared content terms = domain-specific rather than accidental collision); NOT weakened relative to any prior gate",
+     "uncertainty": "term overlap is a proxy for mechanism identity"
+    },
+    "ANTICIPATION_COVERAGE_RATIO": {
+     "value": 0.8,
+     "epistemic_class": "ENGINEERING",
+     "justification": "a family ANTICIPATES only when nearly ALL elements of the candidate's FULL distinguishing set (uncapped — the claim elements, not the 6-term query core) appear in the family's claim/abstract text; 0.8 leaves a >= 20% element margin — anything lower would convert partial art into a kill (Art. XXVIII forbids). Measured adversarial case: a domain-only patent reached 0.857 against a capped denominator whose true differentiators (acoustic, multi-modal) had been ranked out",
+     "uncertainty": "claim coverage measured by term overlap, not a claim chart; recorded per family with evidence tier"
+    },
+    "MAX_QUERY_TERMS": {
+     "value": 6,
+     "epistemic_class": "ENGINEERING",
+     "justification": "provider-measured sweet spot for keyword patent queries (longer queries dilute ranking)"
+    },
+    "ABSTRACT_TIER_MIN_CHARS": {
+     "value": 80,
+     "epistemic_class": "ENGINEERING",
+     "justification": "below ~80 chars a snippet carries title echoes, not mechanism description; it cannot support an abstract-tier coverage decision"
+    }
+   }
+  },
+  "determinism": {
+   "model_version": "determinism/1.0.0",
+   "classification": "BASELINE_RUN",
+   "verdict": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+   "relevance_model_version": "collision_resolution/2.0.0",
+   "evidence_set_identity": "cbd3c37b0955449ab36373911fb80c75bf27921c3f6933372598628086ec5ddb",
+   "problem_fingerprint": "7d85711fd9d26e9d7c651a030009f6e56f3e564aa080ada8e53e538ca7e032e9",
+   "n_prior_replays": 0,
+   "variance_summary": null,
+   "rule": "identical problem + identical relevant evidence set + identical relevance model must yield the identical verdict; any divergence is classified NON_DETERMINISTIC and disclosed, never silently resolved (R396 P6 / R394 s3)"
+  },
+  "nearest_prior_art": [],
+  "nearest_prior_art_note": "family representatives; every entry is MECHANISM_RELEVANT (>= 2 term overlap with the candidate's mechanism ∪ distinguishing terms against title+snippet text) with per-family coverage and evidence tier recorded",
+  "novelty_risk": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+  "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+  "actions": [
+   "expand_search_sources"
+  ],
+  "scientific": {
+   "legacy_status": "NO_MATCHING_EVIDENCE_FOUND",
+   "mapped_status": "NO_MATCH_FOUND",
+   "mapping_rationale": "direct vocabulary alignment; EuropePMC-only search",
+   "result_count": 0,
+   "results": [],
+   "queries": [
+    "sharded PostgreSQL database cluster Documented problem",
+    "Connection pooling PgBouncer improves database performance"
+   ],
+   "limitations": [
+    "Only EuropePMC searched",
+    "No patent databases searched (patent side handled by the collision core)",
+    "No ClinicalTrials.gov searched",
+    "Zero-result searches support 'no matching evidence in the searched universe' only — never 'nobody has done this' (Art. XXI.2)"
+   ]
+  },
+  "prior_art_status_basis": {
+   "authority": "patent-side differentiation_resolution",
+   "scientific_mapped_status": "NO_MATCH_FOUND",
+   "note": "scientific (EuropePMC) status recorded; the prior-art POSITION comes from the patent-side resolution with per-family evidence tiers"
+  }
+ },
+ "physics": {
+  "stage_version": "physics_stage/1.0.0",
+  "solver_version": "hydraulic_network_1d/1.0.0",
+  "run_id": "r458mcb-S2: r458-s2-db-tail-latency-flash-sale (blind holdout)",
+  "directive_chain": [
+   "PRE_REQUIREMENTS",
+   "PLAUSIBILITY",
+   "SOLVER",
+   "FAILURE_MODES",
+   "BASELINE_COMPARISON",
+   "COMPUTATIONAL_RESULT"
+  ],
+  "chain_executed": [
+   "PRE_REQUIREMENTS"
+  ],
+  "pre_requirements": {
+   "mechanism_present": true,
+   "domain": "UNKNOWN",
+   "domain_detection": {
+    "domain": "UNKNOWN"
+   },
+   "solver_domain": "fluidics_hydraulic",
+   "representable": false
+  },
+  "lifecycle_verdict": "MECHANISM_NOT_SIMULATABLE",
+  "applicability": {
+   "domain": "UNKNOWN",
+   "solver_domain": "fluidics_hydraulic",
+   "reason": "the V0 solver's declared domain is 1D hydraulic networks; this candidate's mechanism is outside it — no physics comparison is FABRICATED (R397 Phase 2 / R394 s9 honest refusal)"
+  },
+  "lifecycle_effect": {
+   "candidate_pool": "PROCEEDS",
+   "automatic_release": "BLOCKED_NO_PHYSICS_CLAIM",
+   "release_must_disclose": "the mechanism is outside the solver's domain — no physics improvement is claimed or implied",
+   "reason": "domain UNKNOWN not representable by the V0 solver"
+  },
+  "evidence_class_note": "no computational evidence emitted; the refusal is the honest result (Art. XXVIII: no silent semantic promotion)"
+ },
+ "attack_results": {
+  "overall": "NOT_RUN",
+  "adversarial_status": "NOT_RUN",
+  "adversarial_not_run_reason": "EVIDENCE_GATE_FAILED",
+  "attacks": {},
+  "killed_count": 0,
+  "v4_corrections_applied": [
+   "evidence_gate_skip"
+  ],
+  "timestamp": "2026-09-14T22:03:11.248777+00:00",
+  "transport": {
+   "status": "NEVER_CALLED"
+  }
+ },
+ "contradictions": {
+  "contradictions": [
+   {
+    "contradiction_id": "con:verify:5fc42398",
+    "description": "evidence verification issue: missing_source_span",
+    "claim_or_limitation_affected": "evidence_binding",
+    "severity": "MEDIUM",
+    "probability": 0.5,
+    "evidence_quality": "STRONG",
+    "decision_impact": 0.5,
+    "currently_unresolved": true,
+    "resolution_action": "",
+    "resolution_result": ""
+   },
+   {
+    "contradiction_id": "con:verify:fc690a03",
+    "description": "evidence verification issue: mechanism_span_not_verbatim",
+    "claim_or_limitation_affected": "evidence_binding",
+    "severity": "MEDIUM",
+    "probability": 0.5,
+    "evidence_quality": "STRONG",
+    "decision_impact": 0.5,
+    "currently_unresolved": true,
+    "resolution_action": "",
+    "resolution_result": ""
+   }
+  ],
+  "blocking_count": 0,
+  "unresolved_count": 2,
+  "all_blocking_resolved": true
+ },
+ "killer_experiment": {
+  "hypotheses": [
+   {
+    "name": "H_effect_holds",
+    "description": "expected effect holds: Reduced connection pool exhaustion and lower latency during peak load periods",
+    "prior_probability": 0.45,
+    "provenance": {
+     "source": "adjudication.evidence_verification + candidate text",
+     "epistemic_class": "MODEL_DERIVED",
+     "uncertainty": "priors/likelihoods derived from text analysis, not measurement",
+     "created_at": "2026-09-14T22:03:11.271241+00:00"
+    }
+   },
+   {
+    "name": "H_effect_fails",
+    "description": "expected effect does not reproduce outside source context",
+    "prior_probability": 0.55,
+    "provenance": {
+     "source": "adjudication.evidence_verification + candidate text",
+     "epistemic_class": "MODEL_DERIVED",
+     "uncertainty": "priors/likelihoods derived from text analysis, not measurement",
+     "created_at": "2026-09-14T22:03:11.271241+00:00"
+    }
+   }
+  ],
+  "options_ranked": [
+   {
+    "name": "falsification_test_from_candidate",
+    "eig": 0.4557178723356231,
+    "eig_per_cost": 0.4557178723356231,
+    "minimum_epistemic_class": "EIGEpistemicClass.MODEL_DERIVED",
+    "can_influence_real_experiment": true
+   },
+   {
+    "name": "contradiction_attacking_experiment",
+    "eig": 0.3551108007068293,
+    "eig_per_cost": 0.1775554003534147,
+    "minimum_epistemic_class": "EIGEpistemicClass.MODEL_DERIVED",
+    "can_influence_real_experiment": true
+   }
+  ],
+  "selected": {
+   "name": "falsification_test_from_candidate",
+   "eig": 0.4557178723356231,
+   "eig_per_cost": 0.4557178723356231,
+   "rationale": "highest eig_per_cost (cheapest decisive experiment)",
+   "definition": "physical bench/clinical experiment — NOT simulation"
+  },
+  "epistemic_note": "all priors MODEL_DERIVED; no EXPERIMENTALLY_ESTIMATED inputs exist at this stage (Art. XXVIII/XXXVIII: no synthetic shortcut to physical observation)",
+  "timestamp": "2026-09-14T22:03:11+00:00Z"
+ },
+ "adjudication": {
+  "evidence_verification": {
+   "verified": false,
+   "evidence_class": "UNSUPPORTED",
+   "issues": [
+    "missing_source_span",
+    "mechanism_span_not_verbatim"
+   ],
+   "source_id": "doi:10.59945/jpnm.v4i3.1377",
+   "source_hash": "d125a14978581b926e43e0c74648fbccf7285939a021d2d78dc37f36a472bf6c",
+   "span_present": false,
+   "mechanism_span_verbatim": false
+  }
+ },
+ "multi_source": {
+  "candidate_name": "Implement PgBouncer connection pooling in front of the sharded PostgreSQL cluster",
+  "discovery": {
+   "pubmed": {
+    "source": "PubMed",
+    "query": "Connection pooling with PgBouncer improves database performance by managing connections more efficiently AND Documented problem 'connection pool exhaustion due to lock waits' concerning sharded PostgreSQL database cluster. User-submitted engineering problem (session input): \"An e-commerce platform's order database, a sharded PostgreSQL cluster with 3 replicas per shard, shows p99.9 read latency collapsing ",
+    "total": 0,
+    "results": [],
+    "connector_state": "EMPTY_RESULT"
+   },
+   "crossref": {
+    "source": "Crossref",
+    "query": "Connection pooling with PgBouncer improves database performance by managing connections more efficiently AND Documented problem 'connection pool exhaustion due to lock waits' concerning sharded PostgreSQL database cluster. User-submitted engineering problem (session input): \"An e-commerce platform's order database, a sharded PostgreSQL cluster with 3 replicas per shard, shows p99.9 read latency collapsing ",
+    "total": 53,
+    "results": [
+     {
+      "doi": "10.59945/jpnm.v4i3.1377",
+      "title": "Analisis Perbandingan Performa Koneksi Database Postgresql 17 Dengan Arsitektur Direct Connection Dan Connection Pooling",
+      "year": 2026
+     },
+     {
+      "doi": "10.32614/cran.package.rpgconn",
+      "title": "rpgconn: User-Friendly PostgreSQL Connection Management",
+      "year": 2025
+     },
+     {
+      "doi": "10.30595/juita.v14i2.28822",
+      "title": "Performance Evaluation of PHP Data Object and Native Database Connection for CRUD Optimization Across MySQL, PostgreSQL,",
+      "year": 2026
+     }
+    ]
+   },
+   "nih_reporter": {
+    "source": "NIH RePORTER",
+    "query": "Connection pooling with PgBouncer improves database performance by managing connections more efficiently AND Documented problem 'connection pool exhaustion due to lock waits' concerning sharded PostgreSQL database cluster. User-submitted engineering problem (session input): \"An e-commerce platform's order database, a sharded PostgreSQL cluster with 3 replicas per shard, shows p99.9 read latency collapsing ",
+    "total": 2977968,
+    "results": [
+     {
+      "project_num": "1F31AG099736-01",
+      "title": "Evaluating the Contribution of Care Pathways and Clinical Features To Home Health Quality Outcomes for People with Demen",
+      "pi": "Maxwell  Cutty",
+      "fiscal_year": 2026,
+      "award_amount": 45938
+     },
+     {
+      "project_num": "75N93023D00001-P00003-759302400001-1",
+      "title": "Expertise in Using Bitter Taste Receptor Blockers to Improve the Palatability of Pediatric Medicines: Blocker Discovery",
+      "pi": "PETER  SILVERA",
+      "fiscal_year": 2026,
+      "award_amount": 1205898
+     },
+     {
+      "project_num": "75N93023D00001-P00004-759302400002-1",
+      "title": "Expertise in Using Bitter Taste Receptor Blockers to Improve the Palatability of Pediatric Medicines: Trained Human Sens",
+      "pi": "PETER  SILVERA",
+      "fiscal_year": 2026,
+      "award_amount": 440943
+     }
+    ],
+    "connector_state": "SUCCESS"
+   }
+  },
+  "destruction": {
+   "pubmed_failures": {
+    "source": "PubMed",
+    "query": "connection pool exhaustion due to lock waits OR (Connection pooling with PgBouncer improves database performance by managing connections more efficiently failure) OR (Connection pooling with PgBouncer improves database performance by managing connections more efficiently limitation)",
+    "total": 0,
+    "results": [],
+    "connector_state": "EMPTY_RESULT"
+   },
+   "openfda_adverse": {
+    "source": "openFDA",
+    "query": "Documented problem 'connection pool exhaustion due to lock waits' concerning sharded PostgreSQL database cluster. User-submitted engineering problem (session input): \"An e-commerce platform's order database, a sharded PostgreSQL cluster with 3 replicas per shard, shows p99.9 read latency collapsing ",
+    "total": 0,
+    "results": [],
+    "error": "fetch failed or no results",
+    "connector_state": "UNAVAILABLE_OR_TIMEOUT",
+    "note": "outage — NOT absence (R394 s4)"
+   },
+   "clinical_trials_fail": {
+    "source": "ClinicalTrials.gov",
+    "query": "Documented problem 'connection pool exhaustion due to lock waits' concerning sharded PostgreSQL database cluster. User-submitted engineering problem (session input): \"An e-commerce platform's order database, a sharded PostgreSQL cluster with 3 replicas per shard, shows p99.9 read latency collapsing  failure",
+    "total": 0,
+    "results": [],
+    "error": "fetch failed",
+    "connector_state": "UNAVAILABLE_OR_TIMEOUT",
+    "note": "outage — NOT absence (R394 s4)"
+   }
+  },
+  "transfer": {
+   "aerospace": {
+    "source": "Crossref",
+    "query": "Documented problem 'connection pool exhaustion due to lock waits' concerning sharded PostgreSQL database cluster. User-submitted engineering problem (session input): \"An e-commerce platform's order database, a sharded PostgreSQL cluster with 3 replicas per shard, shows p99.9 read latency collapsing  aerospace",
+    "total": 19,
+    "results": [
+     {
+      "doi": "10.1007/978-3-642-25789-6_33",
+      "title": "Dynamic-Feedback-Based Connection Pool Framework for Database Cluster",
+      "year": 2012
+     },
+     {
+      "doi": "10.15514/syrcose-2013-7-19",
+      "title": "The Formal Statement of the Load-Balancing Problem for a Multi-Tenant Database Cluster With a Constant Flow of Queries",
+      "year": 2013
+     }
+    ]
+   },
+   "automotive": {
+    "source": "Crossref",
+    "query": "Documented problem 'connection pool exhaustion due to lock waits' concerning sharded PostgreSQL database cluster. User-submitted engineering problem (session input): \"An e-commerce platform's order database, a sharded PostgreSQL cluster with 3 replicas per shard, shows p99.9 read latency collapsing  automotive",
+    "total": 19,
+    "results": [
+     {
+      "doi": "10.1007/978-3-642-25789-6_33",
+      "title": "Dynamic-Feedback-Based Connection Pool Framework for Database Cluster",
+      "year": 2012
+     },
+     {
+      "doi": "10.15514/syrcose-2013-7-19",
+      "title": "The Formal Statement of the Load-Balancing Problem for a Multi-Tenant Database Cluster With a Constant Flow of Queries",
+      "year": 2013
+     }
+    ]
+   },
+   "industrial automation": {
+    "source": "Crossref",
+    "query": "Documented problem 'connection pool exhaustion due to lock waits' concerning sharded PostgreSQL database cluster. User-submitted engineering problem (session input): \"An e-commerce platform's order database, a sharded PostgreSQL cluster with 3 replicas per shard, shows p99.9 read latency collapsing  industrial automation",
+    "total": 25,
+    "results": [
+     {
+      "doi": "10.1007/978-3-642-25789-6_33",
+      "title": "Dynamic-Feedback-Based Connection Pool Framework for Database Cluster",
+      "year": 2012
+     },
+     {
+      "doi": "10.15514/syrcose-2013-7-19",
+      "title": "The Formal Statement of the Load-Balancing Problem for a Multi-Tenant Database Cluster With a Constant Flow of Queries",
+      "year": 2013
+     }
+    ]
+   }
+  },
+  "reality": {
+   "clinical_trials": {
+    "source": "ClinicalTrials.gov",
+    "query": "Documented problem 'connection pool exhaustion due to lock waits' concerning sharded PostgreSQL database cluster. User-submitted engineering problem (session input): \"An e-commerce platform's order database, a sharded PostgreSQL cluster with 3 replicas per shard, shows p99.9 read latency collapsing ",
+    "total": 0,
+    "results": [],
+    "error": "fetch failed",
+    "connector_state": "UNAVAILABLE_OR_TIMEOUT",
+    "note": "outage — NOT absence (R394 s4)"
+   },
+   "nih_funding": {
+    "source": "NIH RePORTER",
+    "query": "Documented problem 'connection pool exhaustion due to lock waits' concerning sharded PostgreSQL database cluster. User-submitted engineering problem (session input): \"An e-commerce platform's order database, a sharded PostgreSQL cluster with 3 replicas per shard, shows p99.9 read latency collapsing ",
+    "total": 2977968,
+    "results": [
+     {
+      "project_num": "1F31AG099736-01",
+      "title": "Evaluating the Contribution of Care Pathways and Clinical Features To Home Health Quality Outcomes for People with Demen",
+      "pi": "Maxwell  Cutty",
+      "fiscal_year": 2026,
+      "award_amount": 45938
+     },
+     {
+      "project_num": "75N93023D00001-P00003-759302400001-1",
+      "title": "Expertise in Using Bitter Taste Receptor Blockers to Improve the Palatability of Pediatric Medicines: Blocker Discovery",
+      "pi": "PETER  SILVERA",
+      "fiscal_year": 2026,
+      "award_amount": 1205898
+     },
+     {
+      "project_num": "75N93023D00001-P00004-759302400002-1",
+      "title": "Expertise in Using Bitter Taste Receptor Blockers to Improve the Palatability of Pediatric Medicines: Trained Human Sens",
+      "pi": "PETER  SILVERA",
+      "fiscal_year": 2026,
+      "award_amount": 440943
+     },
+     {
+      "project_num": "75N94023D00001-0-759402600001-1",
+      "title": "IMPAACT 2050 / CREATE - Phase IV Study of the Pharmacokinetics of Long-Acting Injectable Cabotegravir and Rilpivirine in",
+      "pi": "ISA  TREJOS",
+      "fiscal_year": 2026,
+      "award_amount": 2502640
+     },
+     {
+      "project_num": "1RF1NS141359-01A1",
+      "title": "Human Chemo-Nociceptor Signaling",
+      "pi": "Steve  Davidson",
+      "fiscal_year": 2026,
+      "award_amount": 3851810
+     }
+    ],
+    "connector_state": "SUCCESS"
+   },
+   "fda_adverse": {
+    "source": "openFDA",
+    "query": "Documented problem 'connection pool exhaustion due to lock waits' concerning sharded PostgreSQL database cluster. User-submitted engineering problem (session input): \"An e-commerce platform's order database, a sharded PostgreSQL cluster with 3 replicas per shard, shows p99.9 read latency collapsing ",
+    "total": 0,
+    "results": [],
+    "error": "fetch failed or no results",
+    "connector_state": "UNAVAILABLE_OR_TIMEOUT",
+    "note": "outage — NOT absence (R394 s4)"
+   }
+  },
+  "timestamp": "2026-09-14T22:03:00.946970+00:00",
+  "summary": "Discovery: 2978021 results | Destruction: 0 results | Transfer: 63 results | Reality: 2977968 results",
+  "evidence_plane": {
+   "role": "VERIFICATION_SUPPORT",
+   "purpose": "four-direction search attack around a serious candidate: discovery/destruction/transfer/reality directions feed collision, adjudication and the dossier",
+   "complementary_plane": {
+    "role": "DISCOVERY_SUPPORT",
+    "location": "RETRIEVE -> MECHANISM_SPACE (the structured evidence consumed by the five transformation operators)",
+    "stamp": "mechanism_space.structured_evidence.items[].retrieval_role"
+   },
+   "state_vocabulary_contract": "SEARCH_FAILED / SEARCH_PARTIAL / UNRESOLVED / UNKNOWN stay exactly what they are on BOTH planes — no outage may become absence; per-source error/unavailable fields are preserved in sources_hit"
+  },
+  "adjacent_industries_derivation": {
+   "value": [
+    "aerospace",
+    "automotive",
+    "industrial automation"
+   ],
+   "epistemic_class": "MODEL_DERIVED",
+   "method": "keyword map ADJACENT_INDUSTRY_MAP in adapters.py"
+  },
+  "sources_hit": []
+ },
+ "cemetery_check": {},
+ "epistemic_state": {},
+ "next_best_action": {},
+ "ranking": {},
+ "provenance": {
+  "retrieval_fabric": {
+   "version": "V2",
+   "primary_query": "sharded PostgreSQL database cluster connection pool exhaustion due to lock waits",
+   "query_variant_count": 5,
+   "sources_attempted": [
+    "arxiv",
+    "core",
+    "crossref",
+    "datacite",
+    "doaj",
+    "europepmc",
+    "google_patents",
+    "openaire",
+    "openalex",
+    "semantic_scholar",
+    "unpaywall"
+   ],
+   "sources_succeeded": [
+    "arxiv",
+    "core",
+    "crossref",
+    "datacite",
+    "doaj",
+    "europepmc",
+    "openaire",
+    "unpaywall"
+   ],
+   "sources_failed": [
+    "google_patents"
+   ],
+   "sources_rate_limited": [
+    "openalex",
+    "semantic_scholar"
+   ],
+   "unique_source_families": [
+    "doi_registrant_crossref",
+    "preprint_origin",
+    "repository_aggregator_core"
+   ],
+   "independent_source_families": 3,
+   "source_independence_score": 1.0,
+   "retrieval_blind_spots": [
+    "PATENT_BLIND_SPOT: zero patent records — patent prior-art coverage is a discovery-system defect when the mechanism domain is patent-dense",
+    "LOW_FAMILY_COVERAGE: only 3 source families contributed records (directive acceptance bar: >= 6 materially different open/free families queried successfully)"
+   ],
+   "canonical_record_count": 18,
+   "evidence_fabric": {
+    "version": "evidence_fabric/1.0.0",
+    "federated": true,
+    "production_sources": [
+     "openfoam_cases"
+    ],
+    "channels": 8,
+    "unknown_channels": 7,
+    "substitutions": [],
+    "coverage_limitations": [
+     {
+      "source_id": "wopto",
+      "limitation": "USPTO text covers United States patent applications only; the worldwide (non-US) bibliographic coverage of WOPTO is NOT served by the alternate — any worldwide-prior-art conclusion drawn from the substituted run is coverage-limited and must be re-run when WOPTO's index is warm"
+     },
+     {
+      "source_id": "qm9",
+      "limitation": "reaction records do not carry molecular electronic-structure properties (HOMO/LUMO/gap/dipole); property-based screening conclusions are NOT served"
+     },
+     {
+      "source_id": "chemrag_reactions",
+      "limitation": "QM9 property rows do not carry reaction transformations; reactant->product conclusions are NOT served"
+     },
+     {
+      "family": "E2_scientific_intelligence",
+      "limitation": "no PRODUCTION evidence-fabric source in this family this round; the evidence fabric serves NOTHING for this family (any paper/patent evidence in the engine pool comes from the existing V2 fabric channels, which are a different retrieval system — never conflated with evidence-fabric provenance)"
+     }
+    ],
+    "pool_items": 0,
+    "records_in_custody": 0,
+    "report_persisted": "EVIDENCE_FABRIC_REPORT.json"
+   }
+  },
+  "evidence_freeze": {
+   "run_id": "r458mcb-S2: r458-s2-db-tail-latency-flash-sale (blind holdout)",
+   "problem_id": "r458-s2-db-tail-latency-flash-sale",
+   "frozen_at": "2026-09-14T22:02:30+00:00Z",
+   "evidence_count": 12,
+   "custody_records": [
+    {
+     "record_id": "doi:10.48550/arxiv.2608.15994",
+     "source": "arxiv",
+     "source_identity_verified": true,
+     "query": "r458-s2-db-tail-latency-flash-sale",
+     "retrieval_timestamp": "2026-09-14T22:02:30.356503+00:00",
+     "raw_content": "This paper presents PostgreSQL-V 2.0, a scalable integrated vector database system inside PostgreSQL. Existing PostgreSQL-based vector search systems such as pgvector embed vector indexes into PostgreSQL's page-oriented storage engine, incurring significant overhead that leads to a huge performance gap with specialized vector databases. In our earlier work, we introduced PostgreSQL-V 1.0, which addresses this issue by separating vector index structures from PostgreSQL's storage engine, enabling vector search performance close to that of native vector index libraries while preserving SQL compatibility. However, we find that PostgreSQL-V 1.0 has three limitations that matter for real-world workloads: it only supports a single connection (without concurrency), recovery time grows with index size, and physical replication is unsupported.\n  We further present PostgreSQL-V 2.0, which closes all three gaps. PostgreSQL-V 2.0's concurrency support enables fully concurrent vector searches and updates across PostgreSQL's multi-process backends, delivering up to 36.4x the throughput of PostgreSQL-V 1.0 while serving 32 concurrent clients. PostgreSQL-V 2.0's fast crash recovery keeps cost independent of total index size, remaining near 20 ms while PostgreSQL-V 1.0's grows into seconds-scale. PostgreSQL-V 2.0's physical replication support extends physical replication to the decoupled index, preserving index consistency on standbys without burdening the primary node. Together, these advances make PostgreSQL-V 2.0 a fully concurrent, crash-resilient, and replication-ready vector database inside PostgreSQL.",
+     "content_hash": "28927fd31648c8071616dce993b64c48669bfa096bb26522d34b6075a3f97ffb",
+     "exact_span": "This paper presents PostgreSQL-V 2.0, a scalable integrated vector database system inside PostgreSQL. Existing PostgreSQL-based vector search systems such as pgvector embed vector indexes into PostgreSQL's page-oriented storage engine, incurring significant overhead that leads to a huge performance gap with specialized vector databases. In our earlier work, we introduced PostgreSQL-V 1.0, which addresses this issue by separating vector index structures from PostgreSQL's storage engine, enabling ",
+     "span_hash": "4852a1f4861c97d5982f0502897c836425cc13cfc3b4682f2fb06b05e0f7b7a9",
+     "evidence_class": "SCIENTIFIC_ABSTRACT",
+     "proposition_binding": "candidate_mechanism_input",
+     "locator": "https://doi.org/10.48550/arxiv.2608.15994",
+     "epistemic_strength": "VERIFIED"
+    },
+    {
+     "record_id": "doi:10.48550/arxiv.0605060",
+     "source": "arxiv",
+     "source_identity_verified": true,
+     "query": "r458-s2-db-tail-latency-flash-sale",
+     "retrieval_timestamp": "2026-09-14T22:02:30.356542+00:00",
+     "raw_content": "Research interest in Grid computing has grown significantly over the past five years. Management of distributed resources is one of the key issues in Grid computing. Central to management of resources is the effectiveness of resource allocation as it determines the overall utility of the system. The current approaches to superscheduling in a grid environment are non-coordinated since application level schedulers or brokers make scheduling decisions independently of the others in the system. Clearly, this can exacerbate the load sharing and utilization problems of distributed resources due to suboptimal schedules that are likely to occur. To overcome these limitations, we propose a mechanism for coordinated sharing of distributed clusters based on computational economy. The resulting environment, called \\emph{Grid-Federation}, allows the transparent use of resources from the federation when local resources are insufficient to meet its users' requirements. The use of computational economy methodology in coordinating resource allocation not only facilitates the QoS based scheduling, but also enhances utility delivered by resources.",
+     "content_hash": "23a4b335f6c2db3dbf14179b07d4fc90eaaab5188fb491429a20d671cbe5166c",
+     "exact_span": "Research interest in Grid computing has grown significantly over the past five years. Management of distributed resources is one of the key issues in Grid computing. Central to management of resources is the effectiveness of resource allocation as it determines the overall utility of the system. The current approaches to superscheduling in a grid environment are non-coordinated since application level schedulers or brokers make scheduling decisions independently of the others in the system. Clea",
+     "span_hash": "ea1b51e043d78b2285ae048eeea249eb0fa769f8391345dbe446bdf8c20bb04c",
+     "evidence_class": "SCIENTIFIC_ABSTRACT",
+     "proposition_binding": "candidate_mechanism_input",
+     "locator": "https://doi.org/10.48550/arxiv.0605060",
+     "epistemic_strength": "VERIFIED"
+    },
+    {
+     "record_id": "doi:10.48550/arxiv.1112.2155",
+     "source": "arxiv",
+     "source_identity_verified": true,
+     "query": "r458-s2-db-tail-latency-flash-sale",
+     "retrieval_timestamp": "2026-09-14T22:02:30.356554+00:00",
+     "raw_content": "Disconnection of mobile clients from server, in an unclear time and for an unknown duration, due to mobility of mobile clients, is the most important challenges for concurrency control in mobile database with client-server model. Applying pessimistic common classic methods of concurrency control (like 2pl) in mobile database leads to long duration blocking and increasing waiting time of transactions. Because of high rate of aborting transactions, optimistic methods aren`t appropriate in mobile database. In this article, OPCOT concurrency control algorithm is introduced based on optimistic concurrency control method. Reducing communications between mobile client and server, decreasing blocking rate and deadlock of transactions, and increasing concurrency degree are the most important motivation of using optimistic method as the basis method of OPCOT algorithm. To reduce abortion rate of transactions, in execution time of transactions` operators a timestamp is assigned to them. In other to checking commitment ordering property of scheduler, the assigned timestamp is used in server on time of commitment. In this article, serializability of OPCOT algorithm scheduler has been proved by using serializability graph. Results of evaluating simulation show that OPCOT algorithm decreases abortion rate and waiting time of transactions in compare to 2pl and optimistic algorithms.",
+     "content_hash": "eb85e8e510c3b11d90a6a039d9ec3c3ec71a9a322af40a5eb95aea5b6bd19b49",
+     "exact_span": "Disconnection of mobile clients from server, in an unclear time and for an unknown duration, due to mobility of mobile clients, is the most important challenges for concurrency control in mobile database with client-server model. Applying pessimistic common classic methods of concurrency control (like 2pl) in mobile database leads to long duration blocking and increasing waiting time of transactions. Because of high rate of aborting transactions, optimistic methods aren`t appropriate in mobile d",
+     "span_hash": "5bd84eeeb3612508ad951b8e483ac0a56ee386ae812516dff5a8ea68c1ff28a2",
+     "evidence_class": "SCIENTIFIC_ABSTRACT",
+     "proposition_binding": "candidate_mechanism_input",
+     "locator": "https://doi.org/10.48550/arxiv.1112.2155",
+     "epistemic_strength": "VERIFIED"
+    },
+    {
+     "record_id": "title:c0fe6becfe95402d",
+     "source": "core",
+     "source_identity_verified": true,
+     "query": "r458-s2-db-tail-latency-flash-sale",
+     "retrieval_timestamp": "2026-09-14T22:02:30.356566+00:00",
+     "raw_content": "Kebutuhan akan tersedianya data dan informasi melalui media digital pada saat\n\nini sangat tinggi. Hal ini tidak terlepas dari pesatnya perkembangan sistem teknologi\n\ninformasi di masa sekarang. Dalam sistem teknologi informasi terdapat berbagai data\n\ndan informasi yang seluruhnya tersimpan dalam suatu server basis data atau kerap\n\ndisebut dengan database server. Database server merupakan server yang memiliki\n\nfungsi vital dalam suatu sistem teknologi informasi. Seperti server pada umumnya\n\nsebuah database server tidak luput dari suatu gangguan yang sering saja terjadi, oleh\n\nkarenanya penting untuk menjaga ketersediaan dan stabilitas pada database server.\n\nUntuk menjaga ketersediaan dan stabilitas pada database server dapat dilakukan\n\nmelalui implementasi suatu Cluster database server.\n\nService database server yang mendukung untuk berjalan pada Cluster database\n\nsalah satunya adalah PostgreSQL. Dan untuk teknologi Cluster yang mendukung pada\n\nservice PostgreSQL salah satunya adalah Patroni. Penelitian pada Cluster Patroni ini\n\nakan menggunakan tiga buah virtual machine dengan spesifikasi 2 Core CPU, 4GB\n\nRAM & 20GB Disk Storage. Ketiga buah virtual machine tersebut akan terhubung\n\ndalam suatu internal network dan menjadi sebuah Cluster Patroni. Agar ketiga server\n\ntersebut dapat menjadi kesatuan Cluster Patroni, dibutuhkan untuk melakukan instalasi\n\nbeberapa software. Software tersebut diataranya PostgreSQL, etcd, HAProxy,\n\nKeepalived dan juga Patroni. Dalam memastikan Cluster Patroni berjalan dengan\n\nsesuai, dibutuhkan beberapa skenario pengujian yang butuh dilakukan. Skenario\n\npengujian ini akan dilakukan melalui dua metode, metode pertama melalui aplikasi web\n\nPOS yang berbasis web dan metode kedua melalui proses uji dump & restore database.\n\nUntuk melakukan pengujian tersebut terdapat satu buah virtual machine dengan\n\nspesifikasi 2 Core CPU, 2GB RAM & 10GB Disk Storage yang disebut sebagaiserver\n\naplikasi. Server aplikasi ini menggunakan beberapa service yang berjalandiantaranya\n\nadalah NGINX dan juga PHP. Baik server yang berada dalam Cluster Patroni maupun\n\nserver aplikasi menggunakan Sistem Operasi Fedora 39.\n\nDari beberapa skenario pengujian yang telah dilakukan, sebuah Cluster Patroni\n\nmemiliki fitur yang handal berupa autofailover, fitur ini mendukung untuk terciptanya\n\nhigh availability dalam layanan database yang dikelola. Dengan terciptanya high",
+     "content_hash": "3449eb9eba7b5d63f70d2201630d29e2421337e5135160eed5937572c7f91179",
+     "exact_span": "Kebutuhan akan tersedianya data dan informasi melalui media digital pada saat\n\nini sangat tinggi. Hal ini tidak terlepas dari pesatnya perkembangan sistem teknologi\n\ninformasi di masa sekarang. Dalam sistem teknologi informasi terdapat berbagai data\n\ndan informasi yang seluruhnya tersimpan dalam suatu server basis data atau kerap\n\ndisebut dengan database server. Database server merupakan server yang memiliki\n\nfungsi vital dalam suatu sistem teknologi informasi. Seperti server pada umumnya\n\nsebua",
+     "span_hash": "961fa07dd7f322c9f93788b54ff8ed916445c3ae439aebf8e496f1286df2b7c6",
+     "evidence_class": "SCIENTIFIC_ABSTRACT",
+     "proposition_binding": "candidate_mechanism_input",
+     "locator": "",
+     "epistemic_strength": "VERIFIED"
+    },
+    {
+     "record_id": "title:e33248b61a467609",
+     "source": "core",
+     "source_identity_verified": true,
+     "query": "r458-s2-db-tail-latency-flash-sale",
+     "retrieval_timestamp": "2026-09-14T22:02:30.356574+00:00",
+     "raw_content": "This is a set of functions to expand a PostgreSQL database via functions which analyze and manipulate graphs.  The functions are internal, written in c.  The import/export functions (using GraphML) are written in Java",
+     "content_hash": "be7663425ab43b9710346966c61c583a7e1022f9f0836d756d53c9ef485e6681",
+     "exact_span": "This is a set of functions to expand a PostgreSQL database via functions which analyze and manipulate graphs.  The functions are internal, written in c.  The import/export functions (using GraphML) are written in Java",
+     "span_hash": "be7663425ab43b9710346966c61c583a7e1022f9f0836d756d53c9ef485e6681",
+     "evidence_class": "SCIENTIFIC_ABSTRACT",
+     "proposition_binding": "candidate_mechanism_input",
+     "locator": "",
+     "epistemic_strength": "VERIFIED"
+    },
+    {
+     "record_id": "doi:10.18420/btw2019-ws-24",
+     "source": "core",
+     "source_identity_verified": true,
+     "query": "r458-s2-db-tail-latency-flash-sale",
+     "retrieval_timestamp": "2026-09-14T22:02:30.356582+00:00",
+     "raw_content": "Plan forcing is the most capable plan hinting that a database system can implement. It allows the specification of almost every aspect of an execution plan. The open source database system PostgreSQL does not implement any plan hints by default. We will show how an extension can be used to provide plan forcing for PostgreSQL. This extension allows to use the query executor directly and independently of SQL. We sketch some of the interesting use case scenarios for plan forcing in PostgreSQL",
+     "content_hash": "b2a63d654085b4b8efb076525e9936dcb614430734d4c1ea91275da6fc592c9b",
+     "exact_span": "Plan forcing is the most capable plan hinting that a database system can implement. It allows the specification of almost every aspect of an execution plan. The open source database system PostgreSQL does not implement any plan hints by default. We will show how an extension can be used to provide plan forcing for PostgreSQL. This extension allows to use the query executor directly and independently of SQL. We sketch some of the interesting use case scenarios for plan forcing in PostgreSQL",
+     "span_hash": "b2a63d654085b4b8efb076525e9936dcb614430734d4c1ea91275da6fc592c9b",
+     "evidence_class": "SCIENTIFIC_ABSTRACT",
+     "proposition_binding": "candidate_mechanism_input",
+     "locator": "https://doi.org/10.18420/btw2019-ws-24",
+     "epistemic_strength": "VERIFIED"
+    }
+   ],
+   "hash_verification_all_pass": true,
+   "snapshot_hash": "24f02dbc71b46914f5498417d782e20da8b2804a42b07aea5c90da78c96b6713"
+  },
+  "synthesis": {
+   "model": "glm-4-plus-thinking",
+   "provider": "zai",
+   "transport_status": "OK",
+   "task_degradation": {
+    "requested_task": "STRONG",
+    "actual_task_capability": "STRONG",
+    "task_capability_match": true,
+    "degraded_reason": "the serving model declares the requested task capability"
+   },
+   "prompt_hash": "2428f61bf4b6cb1e",
+   "input_hash": "4447962998c1ed90",
+   "output_hash": "7bfe496f71d55511",
+   "synthesis_timestamp": "2026-09-14T22:02:32.483695+00:00"
+  }
+ },
+ "stage_log": [
+  {
+   "stage": "RETRIEVE",
+   "capability_id": "A2_RETRIEVAL",
+   "module_path": "discovery_fabric/retrieval_fabric/pipeline.py",
+   "function": "retrieve_fabric(problem) [V2] / retrieve(problem) [V1]",
+   "started_at": "2026-09-14T21:57:15+00:00Z",
+   "before_envelope_hash": "d12327dc19855c4cf402eda12b0be104db6a66af9b2acf2c6767a3f9aeed4880",
+   "status": "OK",
+   "finished_at": "2026-09-14T22:02:30+00:00Z",
+   "after_envelope_hash": "16f59cf3c1ed699fccfae40639d3f4377236224e48fe0810f24a767e628af55c",
+   "candidate_delta": [
+    "evidence",
+    "evidence_ids",
+    "provenance"
+   ],
+   "delta_real": true,
+   "result_meta": {
+    "retrieved_count": 12,
+    "retrieval_fabric_version": "V2"
+   },
+   "entry": {
+    "entry_helper_version": "stage_entry/1.1.0",
+    "stage": "RETRIEVE",
+    "entry_status": "ALLOWED",
+    "prerequisite": "UPSTREAM_COMPLETE",
+    "prerequisite_evidence": {
+     "failed_stages": [],
+     "skipped_stages": []
+    }
+   }
+  },
+  {
+   "stage": "FREEZE",
+   "capability_id": "EVIDENCE_FREEZE",
+   "module_path": "orchestrator/evidence_custody.py",
+   "function": "promote_to_evidence(record, source, query, class, binding)",
+   "started_at": "2026-09-14T22:02:30+00:00Z",
+   "before_envelope_hash": "16f59cf3c1ed699fccfae40639d3f4377236224e48fe0810f24a767e628af55c",
+   "status": "OK",
+   "finished_at": "2026-09-14T22:02:30+00:00Z",
+   "after_envelope_hash": "99dce1741a31574e473d987964a3607b622dd84d087e08af676e910a4b20533a",
+   "candidate_delta": [
+    "provenance"
+   ],
+   "delta_real": true,
+   "result_meta": {
+    "custody_records": 6,
+    "hash_ok": true
+   },
+   "entry": {
+    "entry_helper_version": "stage_entry/1.1.0",
+    "stage": "FREEZE",
+    "entry_status": "ALLOWED",
+    "prerequisite": "UPSTREAM_COMPLETE",
+    "prerequisite_evidence": {
+     "failed_stages": [],
+     "skipped_stages": []
+    }
+   }
+  },
+  {
+   "stage": "PREMISE_GATE",
+   "capability_id": "PREMISE_GATE",
+   "module_path": "discovery_fabric/engine/premise_gate.py",
+   "function": "check_premise(problem)",
+   "started_at": "2026-09-14T22:02:30+00:00Z",
+   "before_envelope_hash": "99dce1741a31574e473d987964a3607b622dd84d087e08af676e910a4b20533a",
+   "status": "OK",
+   "finished_at": "2026-09-14T22:02:30+00:00Z",
+   "after_envelope_hash": "5242d49b03c7d345dab7b3dbea7561d1c3a361c33223e609f642db9db8d3ff9d",
+   "candidate_delta": [
+    "premise_gate"
+   ],
+   "delta_real": true,
+   "result_meta": {
+    "premise_verdict": "PREMISE_COHERENT"
+   },
+   "entry": {
+    "entry_helper_version": "stage_entry/1.1.0",
+    "stage": "PREMISE_GATE",
+    "entry_status": "ALLOWED",
+    "prerequisite": "UPSTREAM_COMPLETE",
+    "prerequisite_evidence": {
+     "failed_stages": [],
+     "skipped_stages": []
+    }
+   }
+  },
+  {
+   "stage": "SYNTHESIZE",
+   "capability_id": "SYNTHESIS",
+   "module_path": "discovery_fabric/a2/synthesize.py",
+   "function": "synthesize(problem, evidence)",
+   "started_at": "2026-09-14T22:02:30+00:00Z",
+   "before_envelope_hash": "5242d49b03c7d345dab7b3dbea7561d1c3a361c33223e609f642db9db8d3ff9d",
+   "status": "OK",
+   "finished_at": "2026-09-14T22:02:32+00:00Z",
+   "after_envelope_hash": "bb55011ac012b61dbdded8dbcb7cfaf2d8cd14cea064605a2869782fa52be2bf",
+   "candidate_delta": [
+    "candidate_id",
+    "mechanism_ids",
+    "mechanism_map",
+    "provenance"
+   ],
+   "delta_real": true,
+   "result_meta": {
+    "model": "glm-4-plus-thinking",
+    "provider": "zai"
+   },
+   "entry": {
+    "entry_helper_version": "stage_entry/1.1.0",
+    "stage": "SYNTHESIZE",
+    "entry_status": "ALLOWED",
+    "prerequisite": "UPSTREAM_COMPLETE",
+    "prerequisite_evidence": {
+     "failed_stages": [],
+     "skipped_stages": []
+    }
+   }
+  },
+  {
+   "stage": "VERIFY",
+   "capability_id": "EVIDENCE_VERIFY",
+   "module_path": "discovery_fabric/a2/verify.py",
+   "function": "verify_evidence(candidate, evidence)",
+   "started_at": "2026-09-14T22:02:32+00:00Z",
+   "before_envelope_hash": "bb55011ac012b61dbdded8dbcb7cfaf2d8cd14cea064605a2869782fa52be2bf",
+   "status": "OK",
+   "finished_at": "2026-09-14T22:02:32+00:00Z",
+   "after_envelope_hash": "410bbb640133d7f8954889b915a6bbacfc7f9794777d73c60a9abde1d31ae426",
+   "candidate_delta": [
+    "adjudication",
+    "evidence_classification"
+   ],
+   "delta_real": true,
+   "result_meta": {
+    "verified": false
+   },
+   "entry": {
+    "entry_helper_version": "stage_entry/1.1.0",
+    "stage": "VERIFY",
+    "entry_status": "ALLOWED",
+    "prerequisite": "UPSTREAM_COMPLETE",
+    "prerequisite_evidence": {
+     "failed_stages": [],
+     "skipped_stages": []
+    }
+   }
+  },
+  {
+   "stage": "MECHANISM_SPACE",
+   "capability_id": "MECHANISM_SPACE",
+   "module_path": "discovery_fabric/engine/mechanism_space.py",
+   "function": "build_mechanism_space(problem, evidence)",
+   "started_at": "2026-09-14T22:02:32+00:00Z",
+   "before_envelope_hash": "410bbb640133d7f8954889b915a6bbacfc7f9794777d73c60a9abde1d31ae426",
+   "status": "OK",
+   "finished_at": "2026-09-14T22:02:35+00:00Z",
+   "after_envelope_hash": "e9275c24dfd8cc77b4f8df0a3310556513a77b3179fbc0ce89b5c09e459237ba",
+   "candidate_delta": [
+    "mechanism_space"
+   ],
+   "delta_real": true,
+   "result_meta": {
+    "state": "BUILT",
+    "n_candidates": 1
+   },
+   "entry": {
+    "entry_helper_version": "stage_entry/1.1.0",
+    "stage": "MECHANISM_SPACE",
+    "entry_status": "ALLOWED",
+    "prerequisite": "VERIFIED_EVIDENCE",
+    "prerequisite_evidence": {
+     "n_verified_evidence_items": 8,
+     "n_direct_support": 2,
+     "n_partial_support": 6,
+     "n_items_total": 12,
+     "span_binding_verified": false,
+     "basis": ">=1 evidence item classified DIRECT_SUPPORT/PARTIAL_SUPPORT, or the candidate's span binding verified (R394 s5 classification + a2/verify)"
+    }
+   }
+  },
+  {
+   "stage": "MULTI_SOURCE_DISCOVERY",
+   "capability_id": "MULTI_SOURCE_DISCOVERY",
+   "module_path": "orchestrator/multi_source_discovery.py",
+   "function": "run_four_search_attack(name, mechanism, problem, failure_mode, adjacent)",
+   "started_at": "2026-09-14T22:02:35+00:00Z",
+   "before_envelope_hash": "e9275c24dfd8cc77b4f8df0a3310556513a77b3179fbc0ce89b5c09e459237ba",
+   "status": "OK",
+   "finished_at": "2026-09-14T22:03:00+00:00Z",
+   "after_envelope_hash": "c2be3d0468364e7e6e15e0236267db8294752814c2ddd982b26283ee86619fe7",
+   "candidate_delta": [
+    "multi_source"
+   ],
+   "delta_real": true,
+   "result_meta": {
+    "directions": [
+     "discovery",
+     "destruction",
+     "transfer",
+     "reality"
+    ]
+   },
+   "entry": {
+    "entry_helper_version": "stage_entry/1.1.0",
+    "stage": "MULTI_SOURCE_DISCOVERY",
+    "entry_status": "ALLOWED",
+    "prerequisite": "UPSTREAM_COMPLETE",
+    "prerequisite_evidence": {
+     "failed_stages": [],
+     "skipped_stages": []
+    }
+   }
+  },
+  {
+   "stage": "COLLISION",
+   "capability_id": "COLLISION_ENGINE",
+   "module_path": "discovery_fabric/prior_art_v2/collision_resolution.py + discovery_fabric/a2/prior_art.py",
+   "function": "run_collision (mechanism-centered) + search_prior_art",
+   "started_at": "2026-09-14T22:03:00+00:00Z",
+   "before_envelope_hash": "c2be3d0468364e7e6e15e0236267db8294752814c2ddd982b26283ee86619fe7",
+   "status": "OK",
+   "finished_at": "2026-09-14T22:03:11+00:00Z",
+   "after_envelope_hash": "0b1a1152deb7657b221efd5d416a6f58aa9ed8825a3c798b62784d57deca546c",
+   "candidate_delta": [
+    "collision_results",
+    "prior_art"
+   ],
+   "delta_real": true,
+   "result_meta": {
+    "novelty_risk": "UNRESOLVED_INSUFFICIENT_EVIDENCE"
+   },
+   "entry": {
+    "entry_helper_version": "stage_entry/1.1.0",
+    "stage": "COLLISION",
+    "entry_status": "ALLOWED",
+    "prerequisite": "UPSTREAM_COMPLETE",
+    "prerequisite_evidence": {
+     "failed_stages": [],
+     "skipped_stages": []
+    }
+   }
+  },
+  {
+   "stage": "PHYSICS",
+   "capability_id": "PHYSICS_GATE",
+   "module_path": "discovery_fabric/engine/physics_stage.py",
+   "function": "evaluate_envelope_physics(env, run_ctx)",
+   "started_at": "2026-09-14T22:03:11+00:00Z",
+   "before_envelope_hash": "0b1a1152deb7657b221efd5d416a6f58aa9ed8825a3c798b62784d57deca546c",
+   "status": "OK",
+   "finished_at": "2026-09-14T22:03:11+00:00Z",
+   "after_envelope_hash": "d7e78aa1b5d7cb5a0ea2adc1130f4bf637eec051096dd27b4c8dde0c184321d0",
+   "candidate_delta": [
+    "physics"
+   ],
+   "delta_real": true,
+   "result_meta": {
+    "lifecycle_verdict": "MECHANISM_NOT_SIMULATABLE",
+    "chain": [
+     "PRE_REQUIREMENTS"
+    ]
+   },
+   "entry": {
+    "entry_helper_version": "stage_entry/1.1.0",
+    "stage": "PHYSICS",
+    "entry_status": "ALLOWED",
+    "prerequisite": "UPSTREAM_COMPLETE",
+    "prerequisite_evidence": {
+     "failed_stages": [],
+     "skipped_stages": []
+    }
+   }
+  },
+  {
+   "stage": "ATTACK",
+   "capability_id": "ATTACK_ENGINE",
+   "module_path": "discovery_fabric/a2/adversarial.py",
+   "function": "adversarial_challenge(candidate, evidence_verified, prior_art_state)",
+   "started_at": "2026-09-14T22:03:11+00:00Z",
+   "before_envelope_hash": "d7e78aa1b5d7cb5a0ea2adc1130f4bf637eec051096dd27b4c8dde0c184321d0",
+   "status": "OK",
+   "finished_at": "2026-09-14T22:03:11+00:00Z",
+   "after_envelope_hash": "8adc614d2a98877d32cabbed4a35831731c0b9ba459304be733662e92703c475",
+   "candidate_delta": [
+    "attack_results"
+   ],
+   "delta_real": true,
+   "result_meta": {
+    "overall": "NOT_RUN"
+   },
+   "entry": {
+    "entry_helper_version": "stage_entry/1.1.0",
+    "stage": "ATTACK",
+    "entry_status": "ALLOWED",
+    "prerequisite": "UPSTREAM_COMPLETE",
+    "prerequisite_evidence": {
+     "failed_stages": [],
+     "skipped_stages": []
+    }
+   }
+  },
+  {
+   "stage": "CONTRADICTION",
+   "capability_id": "CONTRADICTION_QUEUE",
+   "module_path": "orchestrator/contradiction_queue.py",
+   "function": "ContradictionQueue.add / to_dict",
+   "started_at": "2026-09-14T22:03:11+00:00Z",
+   "before_envelope_hash": "8adc614d2a98877d32cabbed4a35831731c0b9ba459304be733662e92703c475",
+   "status": "OK",
+   "finished_at": "2026-09-14T22:03:11+00:00Z",
+   "after_envelope_hash": "1f55f7c01f9aa35ffe3b8f30b16e886b2f133317836e3d6427ca42ff8144230e",
+   "candidate_delta": [
+    "contradictions"
+   ],
+   "delta_real": true,
+   "result_meta": {
+    "added": 2
+   },
+   "entry": {
+    "entry_helper_version": "stage_entry/1.1.0",
+    "stage": "CONTRADICTION",
+    "entry_status": "ALLOWED",
+    "prerequisite": "UPSTREAM_COMPLETE",
+    "prerequisite_evidence": {
+     "failed_stages": [],
+     "skipped_stages": []
+    }
+   }
+  },
+  {
+   "stage": "KILLER_EXPERIMENT",
+   "capability_id": "KILLER_EXPERIMENT",
+   "module_path": "epistemic_integrity/invention_loop_engine/bayesian_eig.py",
+   "function": "BayesianEIGCalculator.rank_experiments",
+   "started_at": "2026-09-14T22:03:11+00:00Z",
+   "before_envelope_hash": "1f55f7c01f9aa35ffe3b8f30b16e886b2f133317836e3d6427ca42ff8144230e",
+   "status": "OK",
+   "finished_at": "2026-09-14T22:03:11+00:00Z",
+   "after_envelope_hash": "f491bc2a6458fddbb64d9e3e16d7327a6ba4340cef529c3a2e3f673d09adef5d",
+   "candidate_delta": [
+    "killer_experiment"
+   ],
+   "delta_real": true,
+   "result_meta": {
+    "selected": "falsification_test_from_candidate"
+   },
+   "entry": {
+    "entry_helper_version": "stage_entry/1.1.0",
+    "stage": "KILLER_EXPERIMENT",
+    "entry_status": "ALLOWED",
+    "prerequisite": "UPSTREAM_COMPLETE",
+    "prerequisite_evidence": {
+     "failed_stages": [],
+     "skipped_stages": []
+    }
+   }
+  }
+ ]
+}

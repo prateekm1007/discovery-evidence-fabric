@@ -1,0 +1,66 @@
+{
+ "ledger": "CAD_PIPELINE_LEDGER (R380 3D ENGINEERING DESIGN PIPELINE)",
+ "version": "1.0.0",
+ "kernel": "cadquery-occt 2.6.1",
+ "secondary_verifier": "trimesh (STL watertight, independent)",
+ "pass": "TECHNICAL STATE -> PARAMETER MAP -> PARAMETRIC 3D MODEL -> STEP/STL/GLB -> GEOMETRY VALIDATION",
+ "thresholds": {
+  "MEASURED_VS_CLAIMED_TOLERANCE": {
+   "value": 0.001,
+   "unit": "mm",
+   "epistemic_class": "ENGINEERING",
+   "justification": "OCCT builds at mm scale; a build program that actually uses the declared parameter reproduces the claimed dimension to floating-point exactness. Tolerance absorbs only kernel tessellation noise, not design divergence"
+  },
+  "MIN_POSITIVE_VOLUME": {
+   "value": 1e-09,
+   "unit": "mm^3",
+   "epistemic_class": "ENGINEERING",
+   "justification": "a valid manufactured part has strictly positive material volume; zero/negative volume catches fully-erased and degenerate solids"
+  },
+  "DEGENERATE_BBOX_TOLERANCE": {
+   "value": 1e-06,
+   "unit": "mm",
+   "epistemic_class": "ENGINEERING",
+   "justification": "a 3D engineering solid must have positive extent on all three axes"
+  },
+  "STL_WATERTIGHT_REQUIRED": {
+   "value": true,
+   "epistemic_class": "ENGINEERING",
+   "justification": "the CEO's non-manifold detection list: the STL derivative must be watertight (each edge shared by exactly two triangles) — checked by an INDEPENDENT verifier (trimesh), not by OCCT alone (Art. III verifier separation)"
+  },
+  "STL_MAIN_BYTES_CAP": {
+   "value": 2000000,
+   "unit": "bytes",
+   "epistemic_class": "ENGINEERING",
+   "justification": "R387 deliverable budget for one component mesh: a buyer importing an STL into SolidWorks/Fusion/Magics must get a practically usable artifact, not a 30 MB 600k-triangle tessellation of a sub-millimetre wire helix (external audit 2026-09-01). The cap mirrors the R384 section-solid budget design: exceeded only by measured size, walked down a declared tolerance ladder, every attempt recorded, watertightness re-verified at the chosen tolerance"
+  },
+  "MESH_VOLUME_RATIO_FLOOR": {
+   "value": 0.85,
+   "unit": "ratio",
+   "epistemic_class": "ENGINEERING",
+   "justification": "R387 G2b floor separating an honestly-declared approximate mesh from a degenerate one: a mesh whose measured volume is below 85% of the OCCT B-rep volume has lost real material (collapsed features) and is a defect; above the floor the mesh is an APPROXIMATE_DECLARED derivative carrying its chosen tolerance, face count and measured volume ratio in the buyer-visible report — the exact STEP B-rep remains the engineering reference (Art. XXXVIII: COMPUTATIONAL_RESULT discipline; nothing is silently degraded)"
+  }
+ },
+ "started_at": "2026-09-14T21:23:05+00:00Z",
+ "attempts": [],
+ "outcome": "NOT_APPLICABLE_NO_GEOMETRY",
+ "outcome_reason": "technical state declares no physical OBJECTS; no bounded GEOMETRY/PARAMETERS variable with a declared envelope (an unbounded parameter cannot drive a reproducible parametric model — ADR_R379 immutability rule); candidate carries no structured technical state",
+ "warrants": {
+  "gate": "GEOMETRY_WARRANTS_3D",
+  "warranted": false,
+  "verdict": "NOT_APPLICABLE",
+  "measured_basis": {
+   "objects_declared": 0,
+   "bounded_geometry_like_variables": 0,
+   "length_like_variables": 0
+  },
+  "reasons": [
+   "technical state declares no physical OBJECTS",
+   "no bounded GEOMETRY/PARAMETERS variable with a declared envelope (an unbounded parameter cannot drive a reproducible parametric model — ADR_R379 immutability rule)",
+   "candidate carries no structured technical state"
+  ],
+  "note": "a NOT_APPLICABLE verdict is the honest state for non-geometric inventions (methods, compositions, protocols); forcing a decorative 3D image would violate the CEO directive and Art. XXVIII",
+  "decided_at": "2026-09-14T21:23:05+00:00Z"
+ },
+ "finished_at": "2026-09-14T21:23:05+00:00Z"
+}

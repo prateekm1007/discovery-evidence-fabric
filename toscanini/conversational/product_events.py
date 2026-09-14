@@ -92,6 +92,19 @@ def _read_json(p: Path) -> Optional[Dict[str, Any]]:
     return None
 
 
+def _transport_message(rd: Path) -> Optional[str]:
+    """R458-C1 §5: the scientific-state transport sentence for this
+    run, composed through transport_invisibility (one authority);
+    None when the run had no transport-class outcome (the caller's
+    own honest message stands)."""
+    try:
+        from toscanini.conversational import transport_invisibility
+        view = transport_invisibility.scientific_state_message(rd)
+        return view.get("message")
+    except Exception:   # noqa: BLE001 — events never break on the view
+        return None
+
+
 def _evt(run_id: str, seq: int, event_type: str, message: str,
          basis_ref: str, epistemic_class: str,
          timestamp: Optional[str] = None,
@@ -225,12 +238,23 @@ def derive_product_events(run_dir: Path, run_id: str,
             # emit the honest blocked/rejected event ONLY when a
             # SCIENTIFIC kill is recorded; infrastructure states emit
             # RUN_BLOCKED (Art. LXI), never a scientific outcome.
+            # R458-C1 §5: the message is composed through
+            # transport_invisibility — the scientific-state sentence,
+            # never provider/HTTP plumbing (the technical record keeps
+            # the stage's own typed status).
             if non_exec in (stage_policy.BLOCKED, stage_policy.FAILED):
+                _invis = _transport_message(rd)
                 emit(RUN_BLOCKED,
-                     f"attack stage did not complete ({status}) — "
-                     f"infrastructure-class, not a scientific verdict",
+                     _invis or (
+                         f"attack stage did not complete — "
+                         f"infrastructure-class, not a scientific "
+                         f"verdict"),
                      "envelope_ATTACK.json", "UNKNOWN",
-                     timestamp=attack.get("finished_at"))
+                     timestamp=attack.get("finished_at"),
+                     detail={"stage_status": status,
+                             "technical_record":
+                                 "envelope_ATTACK.json + "
+                                 "ROUTING_LEDGER_RUN.json"})
         else:
             emit(ATTACKING_CANDIDATE,
                  "adversarial challenges executed against the candidate",
@@ -343,16 +367,32 @@ def derive_product_events(run_dir: Path, run_id: str,
         fs = (final or {}).get("final_status") or \
              (manifest or {}).get("final_status")
         label = fs or terminal_status or "UNKNOWN"
-        emit(RUN_BLOCKED if terminal_status.startswith("ERROR_") or
-             terminal_status in ("RUN_BLOCKED_TRANSPORT",
-                                 "RUN_BLOCKED_CAPABILITY", "INTERRUPTED")
-             else CANDIDATE_SURVIVED if fs == "EVOLVED_INVENTION_CANDIDATE"
-             else CANDIDATE_REJECTED if fs in ("REJECTED",
-                                               "MALFORMED_OR_FALSE_PREMISE")
-             else EVIDENCE_UPDATED,
-             f"run terminal state recorded: {label}",
-             "final_state.json" if final else "run_manifest.json",
-             "COMPUTED")
+        is_transport_terminal = terminal_status.startswith("ERROR_") or \
+            terminal_status in ("RUN_BLOCKED_TRANSPORT",
+                                "RUN_BLOCKED_CAPABILITY", "INTERRUPTED")
+        # R458-C1 §5: a transport-class terminal message is the
+        # scientific-state sentence (transport_invisibility), never
+        # the raw session error / provider detail; the technical
+        # record pointer rides the event detail.
+        if is_transport_terminal:
+            _invis = _transport_message(rd)
+            emit(RUN_BLOCKED,
+                 _invis or ("The requested test could not be "
+                            "completed."),
+                 "final_state.json" if final else "run_manifest.json",
+                 "COMPUTED",
+                 detail={"terminal_status": terminal_status,
+                         "technical_record":
+                             "ROUTING_LEDGER_RUN.json (providers, "
+                             "HTTP statuses, failure classes)"})
+        else:
+            emit(CANDIDATE_SURVIVED if fs == "EVOLVED_INVENTION_CANDIDATE"
+                 else CANDIDATE_REJECTED if fs in ("REJECTED",
+                                                   "MALFORMED_OR_FALSE_PREMISE")
+                 else EVIDENCE_UPDATED,
+                 f"run terminal state recorded: {label}",
+                 "final_state.json" if final else "run_manifest.json",
+                 "COMPUTED")
 
     return events
 

@@ -39,8 +39,23 @@ def _blocking_reason(session: Dict[str, Any],
                      run_dir: Optional[Path]) -> Optional[Dict[str, Any]]:
     """The honest blocker: infrastructure states and owner gates only
     (Art. LXI / LXV) — a scientific rejection is an OUTCOME, not a
-    blocker, and is carried by current_state instead."""
+    blocker, and is carried by current_state instead.
+
+    R458-C1 §5: the INFRASTRUCTURE branch is composed through
+    transport_invisibility (the provider routing layer stays where it
+    belongs — the user sees the scientific-state sentence, never
+    'provider X hit 403'; the raw session error remains in the session
+    store = the technical record the user can open deliberately)."""
     status = str(session.get("status") or "")
+    invis = None
+    try:
+        from toscanini.conversational import transport_invisibility
+        invis = transport_invisibility.blocking_reason_view(
+            session, run_dir)
+    except Exception:   # noqa: BLE001 — the contract never breaks on
+        pass            # the view layer; honest fallback below
+    if invis is not None:
+        return invis
     if status.startswith("ERROR_") or status in (
             "RUN_BLOCKED_TRANSPORT", "RUN_BLOCKED_CAPABILITY",
             "INTERRUPTED"):

@@ -1,0 +1,104 @@
+{
+ "artifact_type": "DIRECTIONAL_HYPOTHESES",
+ "schema_version": "hypotheses/1.0",
+ "created_at": "2026-09-14T20:54:48+00:00",
+ "hypotheses": [
+  {
+   "hypothesis_id": "dh:dce9604e6655c52c5034",
+   "candidate_id": "inv:95738b79ec:gen1",
+   "failure_id": "diag:9c5051df477f2519",
+   "causal_diagnosis_id": "diag:9c5051df477f2519",
+   "target_variable": "Feature selection stability mechanism",
+   "current_value": "Unknown",
+   "proposed_value": "Implement Head-Tail Population Initialization (HTPI)",
+   "direction": "REPLACE",
+   "mechanism_affected": "Stochastic metaheuristic feature selection",
+   "causal_rationale": "The failure was due to adversarial kills, specifically weak_transfer and engineering_infeasibility being killed. The evidence indicates that stochastic metaheuristic feature selection generates unstable feature subsets across repeated runs, which likely contributes to poor performance in adversarial scenarios where consistent feature selection is critical for robust transfer and engineering feasibility.",
+   "predicted_effect": "More stable feature subsets across repeated runs",
+   "predicted_magnitude_or_range": "Moderate improvement in adversarial challenge performance",
+   "competing_explanations": [],
+   "evidence_support": [
+    {
+     "evidence_id": "europepmc:42655516",
+     "span": "Stochastic metaheuristic feature selection (FS) may generate unstable feature subsets across repeated runs, undermining reproducibility in Internet of Things (IoT) intrusion detection systems (IDSs). This paper presents Head-Tail Population Initialization (HTPI), a feature-import"
+    }
+   ],
+   "evidence_gaps": [
+    "Evidence showing direct comparison of HTPI with AHGA-SA in adversarial scenarios",
+    "quantitative data on HTPI's impact on transfer learning and engineering feasibility"
+   ],
+   "falsifier": "Continued poor performance in adversarial challenges after implementing HTPI",
+   "measurement_required": "Stability metric measuring feature subset consistency across repeated runs",
+   "intervention_type": "MECHANISM_COMBINATION",
+   "confidence": "MODERATE",
+   "provenance": {
+    "class": "AI_PROPOSED",
+    "purpose": "directional:hypothesis",
+    "note": "the LLM proposed this hypothesis; the mechanical ground gate adjudicates it (Art. XVIII) — an ungrounded proposal is REJECTED and its mutation never executes",
+    "proposed_at": "2026-09-14T20:54:51+00:00"
+   },
+   "status": "REJECTED",
+   "gate": {
+    "gate_version": "directional_ground_gate/2.0",
+    "checks": [
+     {
+      "check": "G1_STRUCTURE",
+      "verdict": "PASS",
+      "basis": "all required fields present"
+     },
+     {
+      "check": "G2_DIAGNOSIS_RESOLVES",
+      "verdict": "PASS",
+      "basis": "causal_diagnosis_id='diag:9c5051df477f2519' resolves to a recorded diagnosis (cause=ADVERSARIAL_KILL)"
+     },
+     {
+      "check": "G3_MECHANISM_GROUNDED",
+      "verdict": "PASS",
+      "basis": "mechanism terms grounded in the diagnosis/candidate: adversarial, feature, subsets"
+     },
+     {
+      "check": "G4_PREDICTION_FALSIFIABLE",
+      "verdict": "FAIL",
+      "basis": "predicted_effect=present; falsifier=present but not measurable — an unfalsifiable direction is a wish, not a hypothesis"
+     },
+     {
+      "check": "G5_EVIDENCE_CLASS",
+      "verdict": "PASS",
+      "basis": "class=EVIDENCE_PARTIAL: 1 verified support bindings (span-verified); 0 unresolved ids; 0 ids with failed/absent spans; gaps=2 (gaps are NEVER equated with support — R451 §4)"
+     },
+     {
+      "check": "G6_TARGET_IN_DESIGN_STATE",
+      "verdict": "PASS",
+      "basis": "target_variable grounded in the design state: feature, mechanism, selection"
+     },
+     {
+      "check": "G7_PREDICTION_INTERVENTION_COHERENT",
+      "verdict": "PASS",
+      "basis": "predicted observable coupled to the intervention: feature"
+     },
+     {
+      "check": "G8_FALSIFIER_BINDS_PREDICTION",
+      "verdict": "FAIL",
+      "basis": "the falsifier shares NO distinctive terms with the predicted observable or the target variable — it measures an unrelated thing (a measurable but irrelevant falsifier)"
+     },
+     {
+      "check": "G9_CAUSAL_MEMORY",
+      "verdict": "PASS",
+      "basis": "no prior FALSIFIED direction repeats (the causal memory is clean for this (target_variable, direction))"
+     }
+    ],
+    "grounded": false,
+    "verdict": "REJECTED",
+    "evidence_class": "EVIDENCE_PARTIAL",
+    "evidence_resolution": {
+     "verified_ids": [
+      "europepmc:42655516"
+     ],
+     "unresolved_ids": [],
+     "span_failed_ids": []
+    },
+    "adjudicated_at": "2026-09-14T20:54:51+00:00"
+   }
+  }
+ ]
+}

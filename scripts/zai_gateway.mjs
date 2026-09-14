@@ -58,8 +58,19 @@ function logCall(entry) {
  *  one batch exhausted it). The gateway retries 429s with 30/60/90 s
  *  backoff BEFORE surfacing the error, so the engine's own retry budget
  *  (2 attempts, 2-4 s apart — tuned for network errors, not quotas) is
- *  not burned on a transient rate limit. */
-function zaiComplete(messages, timeoutMs) {
+ *  not burned on a transient rate limit.
+ *
+ *  R458-C1 (model-capability benchmark, disclosed in place — Art. LXIV):
+ *  the requested model id "glm-4-plus-thinking" maps to the z-ai CLI's
+ *  OWN --thinking flag (the same serving model, reasoning mode on).
+ *  This is transport plumbing for the CLI's own mode switch — NOT a new
+ *  provider, NOT a second model authority: the served weights are the
+ *  grant's single embedded model either way, and the mode is recorded
+ *  verbatim in the gateway call log (model field) and the engine's
+ *  routing ledger. Any other model id passes through unchanged (the
+ *  CLI serves the grant's current model; the id is recorded, never
+ *  silently rewritten). */
+function zaiComplete(messages, timeoutMs, thinkingMode = false) {
   return new Promise((resolve, reject) => {
     const system = messages.filter(m => m.role === "system")
       .map(m => m.content).join("\n") || undefined;
@@ -71,6 +82,7 @@ function zaiComplete(messages, timeoutMs) {
         `zai_gw_${crypto.randomBytes(6).toString("hex")}.json`);
       const args = ["chat", "--prompt", user, "-o", tmp];
       if (system) args.push("--system", system);
+      if (thinkingMode) args.push("--thinking");
       const t0 = Date.now();
       const child = spawn("z-ai", args, { stdio: ["ignore", "ignore", "pipe"] });
       let stderr = "";
@@ -149,12 +161,18 @@ const server = http.createServer(async (req, res) => {
       return json(400, { error: { message: "messages required" } });
     }
     const promptText = messages.map(m => m.content).join("\n");
+    // R458-C1: the requested model id selects the CLI's own thinking
+    // mode (disclosed above); recorded verbatim in the call log.
+    const requestedModel = String(payload?.model || "");
+    const thinkingMode = requestedModel.endsWith("-thinking");
     const t0 = Date.now();
     try {
-      const out = await zaiComplete(messages, 400_000);
+      const out = await zaiComplete(messages, 400_000, thinkingMode);
       const entry = {
         ts: new Date().toISOString(),
         model: out.model,
+        requested_model: requestedModel,
+        thinking_mode: thinkingMode,
         n_messages: messages.length,
         prompt_sha256: sha(promptText),
         content_sha256: sha(out.content),

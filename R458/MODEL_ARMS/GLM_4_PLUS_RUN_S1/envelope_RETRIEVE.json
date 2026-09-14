@@ -1,0 +1,1030 @@
+{
+ "candidate_id": "",
+ "problem_id": "r458-s1-ranking-model-distribution-shift",
+ "problem": {
+  "problem_id": "r458-s1-ranking-model-distribution-shift",
+  "device": "marketplace search ranking model",
+  "failure_mode": "model performance decay",
+  "objective": "recover at least 3.5 points of the 4-percent revenue-per-search gap",
+  "failure": "Documented problem 'model performance decay' concerning marketplace search ranking model. User-submitted engineering problem (session input): \"A marketplace's search ranking model, trained on 18 months of interaction logs, decays measurably after a redesign moves the buy button above the fold on mobile: offline replay shows a 6-percent drop in normalized discounted cumulative gain against held-out post-launch traffic, click-through on rank\".  ROUTING: doe_osti: routing state SUSPENDED_RELEVANCE — measured relevance instability (R375: same fusion papers relevant 3 -> 0; pooled relevant-rate 0.175 pre-fix; DETERMINISM_GAP flagged in the R394 production audit) — records poison synthesis-feeding retrieval more than they feed it until relevance is semantically adjudicated; reinstatement: the Phase P1 semantic reranker lands (semantic relevance adjudication between query and record, replacing lexical overlap); flip to ACTIVE + a measured relevance re-run + worklog entry. [europepmc] 10 records retrieved live (2025-2026). Illustrative records: 'Explainable machine learning for breast cancer prediction in resource-constrained settings: A multi-algorithmic framework integrating shap-based transparency with clinical decision support.'; 'Explainable ensemble learning using SHAP for ERP anomaly detection.'. LIMITS STAMPED INLINE: literature context establishes the problem class, not event rates. [arxiv] 5 records retrieved live (2007-2026). Illustrative records: 'SPSA-FSR: Simultaneous Perturbation Stochastic Approximation for Feature Selection and Ranking'; 'Online Gradient Boosting Decision Tree: In-Place Updates for Efficient Adding/Deleting Data'. LIMITS STAMPED INLINE: literature context establishes the problem class, not event rates. [doe_osti] retrieval status NOT_QUERIED_SUSPENDED_RELEVANCE (engine routing decision (R399 W3): SUSPENDED_RELEVANCE — not a provider failure and not absence) — provider outcome recorded, not treated as absence (Art. XXI.3). Problem-existence basis: live records retrieved.",
+  "constraint": "45 millisecond serving deadline delayed conversion labels",
+  "sources": {
+   "europepmc": "OK",
+   "arxiv": "OK",
+   "doe_osti": "NOT_QUERIED_SUSPENDED_RELEVANCE"
+  },
+  "origin": "toscanini_ui",
+  "user_text": "A marketplace's search ranking model, trained on 18 months of interaction logs, decays measurably after a redesign moves the buy button above the fold on mobile: offline replay shows a 6-percent drop in normalized discounted cumulative gain against held-out post-launch traffic, click-through on ranked position 3 falls 11 percent, and revenue-per-search is down 4 percent over five weeks while the site's overall traffic is flat. The model is a gradient-boosted ranking model over 240 features with a 45-millisecond serving deadline including feature fetches, and the label pipeline (delayed conversion labels arriving 1 to 9 days after click) cannot be rebuilt this quarter. The team cannot launch a full retraining pipeline redesign (one release per quarter, already committed), cannot increase serving latency beyond 45 milliseconds (the page-speed budget is contractual), cannot buy new labeling beyond the current budget, and must recover at least 3.5 points of the 4-percent revenue-per-search gap within one quarter on the existing serving stack.",
+  "r458_benchmark": {
+   "class": "FROZEN_BENCHMARK_DEV",
+   "arm": "glm-4-plus",
+   "content_sha256": "7a51fe4869ecbf40f38e6c8e3d8934d28c354b7ce209073e80ee56ede07969a1",
+   "corpus_freeze": "R458/BENCHMARK_FREEZE.json"
+  }
+ },
+ "evidence_ids": [
+  "doi:10.1016/j.namjnl.2026.100111",
+  "doi:10.1097/gox.0000000000007841",
+  "doi:10.70729/j2013213",
+  "doi:10.1108/10662240210422530",
+  "doi:10.1371/journal.pone.0332894",
+  "doi:10.1038/s41598-026-47284-1",
+  "doi:10.18130/v3tg0k",
+  "doi:10.22215/etd/2013-09971",
+  "doi:10.5353/th_b4514970",
+  "doi:10.48550/arxiv.2305.18431",
+  "doi:10.48550/arxiv.2508.05661",
+  "doi:10.2139/ssrn.4892616",
+  "title:d2b3902accae0d69",
+  "title:e5e039305af54970",
+  "title:009826951c4c98bb",
+  "title:840f4fb828553d65"
+ ],
+ "evidence": [
+  {
+   "id": "doi:10.1016/j.namjnl.2026.100111",
+   "source_type": "scientific_paper",
+   "source": "europepmc",
+   "source_id": "europepmc:europepmc:42519109",
+   "source_uri": "https://doi.org/10.1016/j.namjnl.2026.100111",
+   "title": "Defining benchmarking in the context of safety assessment of personal care and cosmetic products using New Approach Methodologies.",
+   "abstract": "The concept of benchmark materials in the personal care and cosmetic industry is often based on the positioning of prototypes relative to the leading brand within a given product category. The main points of comparison are the market ranking, performance regarding consumers' perception, aesthetics, cost, complexity of the manufacturing process and patents covering the product and/or its components. Even though benchmark materials are often included when conducting safety tests of cosmetic and personal care products, the concept is rather loosely defined in toxicological profiling. The use of benchmarks becomes of particular interest when safety testing is based on New Approach Methodologies (NAMs) ( in silico, in vitro or ex vivo technologies) that allow for toxicity ranking of the prototypes and provide mechanistic insights without having an established prediction model. It is therefore important to define the properties and performance of the benchmark materials to better guide the safety testing of candidate formulations. In this review manuscript we discuss the criteria to select benchmarks, and provide specific examples of such finished products incorporated in the safety assessment studies of a wide range of cosmetic and personal care product classes. We also discuss strategies using benchmarks to evaluate the predictive capacity of test systems and methodologies that do not rely on the use of animals for safety assessments.",
+   "doi": "10.1016/j.namjnl.2026.100111",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2026-07-07",
+   "retrieval_timestamp": "2026-09-14T19:57:42.303391+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "b91633ced6a52651235f31c3ac2068d27b81f3dfb67cf5bdceb9b58ace58c99d",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "europepmc",
+    "indexing_sources": [
+     "europepmc"
+    ],
+    "record_ids_by_source": {
+     "europepmc": "europepmc:42519109"
+    },
+    "queries_by_source": {
+     "europepmc": "marketplace search ranking model model performance experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "biomedical_pubmed_line",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "biomedical_pubmed_line",
+   "canonical_id": "doi:10.1016/j.namjnl.2026.100111",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "marketplace search ranking model model performance experimental comparison",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstract-level evidence: full text may contain methods and constraints not present in the abstract",
+    "Publication existence is not clinical evidence of safety or effectiveness",
+    "Citation counts are bibliometric signals, not validity measures"
+   ]
+  },
+  {
+   "id": "doi:10.1097/gox.0000000000007841",
+   "source_type": "scientific_paper",
+   "source": "europepmc",
+   "source_id": "europepmc:europepmc:42317591",
+   "source_uri": "https://doi.org/10.1097/gox.0000000000007841",
+   "title": "Beyond Search Engine Optimization: How Large Language Models Are Redefining Surgeon Visibility.",
+   "abstract": "Large language models (LLMs), such as ChatGPT, are rapidly transforming how patients identify and evaluate surgeons, marking the most significant shift in digital patient acquisition since the emergence of search engines. For decades, surgeon visibility online has depended on search engine optimization (SEO), a marketing strategy built around technical website performance, backlinks, and strategic content marketing designed to match keyword-based search behavior. This is in direct contrast to LLMs, which operate as \"recommendation engines\" and synthesize information across vast sources to generate personalized, conversational guidance in response to user queries. Rather than scanning ranked lists of links, patients increasingly can ask nuanced questions and receive narrative, context-sensitive answers. This shift fundamentally alters how expertise is recognized online. LLMs deemphasize traditional SEO signals and instead can emphasize more nuanced information (\"language\"), such as academic affiliation, peer-reviewed scholarship, institutional reputation, high-quality educational writing, and consistency across credible sources. This article outlines how LLMs form surgeon recommendations, why conventional SEO approaches are increasingly insufficient, and what practical steps surgeons can take to strengthen visibility in an artificial intelligence-mediated digital landscape. As generative artificial intelligence becomes embedded into everyday patient information-seeking, surgeons who adapt to this new recommendation paradigm can be best positioned for the next era of online discoverability.",
+   "doi": "10.1097/gox.0000000000007841",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2026-06-17",
+   "retrieval_timestamp": "2026-09-14T19:57:42.303481+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "19f80de31d11df2fc04d66eb219767255f374efba484338f1a5265a84dd7e25b",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "europepmc",
+    "indexing_sources": [
+     "europepmc"
+    ],
+    "record_ids_by_source": {
+     "europepmc": "europepmc:42317591"
+    },
+    "queries_by_source": {
+     "europepmc": "marketplace search ranking model model performance experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "biomedical_pubmed_line",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "biomedical_pubmed_line",
+   "canonical_id": "doi:10.1097/gox.0000000000007841",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "marketplace search ranking model model performance experimental comparison",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstract-level evidence: full text may contain methods and constraints not present in the abstract",
+    "Publication existence is not clinical evidence of safety or effectiveness",
+    "Citation counts are bibliometric signals, not validity measures"
+   ]
+  },
+  {
+   "id": "doi:10.70729/j2013213",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.70729/j2013213",
+   "source_uri": "https://doi.org/10.70729/j2013213",
+   "title": "A Global Fusion Re-Ranking for Effective Data Search with Correlation Model",
+   "abstract": "",
+   "doi": "10.70729/j2013213",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2014",
+   "retrieval_timestamp": "2026-09-14T19:57:42.303509+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "c1de9fd16750725e26eac78e7a6d2b0a4e9d928b7eec9f59e6e7126db94ce809",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.70729/j2013213"
+    },
+    "queries_by_source": {
+     "crossref": "marketplace search ranking model model performance decay"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=journal-article"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.70729/j2013213",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "marketplace search ranking model model performance decay",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  {
+   "id": "doi:10.1108/10662240210422530",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.1108/10662240210422530",
+   "source_uri": "https://doi.org/10.1108/10662240210422530",
+   "title": "A model of price search behavior in electronic marketplace",
+   "abstract": "",
+   "doi": "10.1108/10662240210422530",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2002",
+   "retrieval_timestamp": "2026-09-14T19:57:42.303541+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "565be9ce2c6a5918a5163d84b8ec8c1c21c9e81e5d44f6e586207564029ada28",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.1108/10662240210422530"
+    },
+    "queries_by_source": {
+     "crossref": "marketplace search ranking model model performance decay"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=journal-article"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.1108/10662240210422530",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "marketplace search ranking model model performance decay",
+   "source_rank": 3,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  {
+   "id": "doi:10.1371/journal.pone.0332894",
+   "source_type": "scientific_paper",
+   "source": "europepmc",
+   "source_id": "europepmc:europepmc:41129532",
+   "source_uri": "https://doi.org/10.1371/journal.pone.0332894",
+   "title": "Contrastive learning-enhanced personalized interaction dual tower network for recommendation.",
+   "abstract": "Dual-tower retrieval models have become a prevalent solution in large-scale recommendation systems due to their scalability and deployment efficiency. However, they face critical limitations including insufficient modeling of user behavior sequences, lack of personalized inter-tower interactions, and poor representation learning for long-tail content. To address these issues, we propose a novel framework called Contrastive Learning-Enhanced Personalized Interaction Dual Tower Network (CL-EPIDTN). This model integrates a multi-layer Transformer to capture dynamic user preference shifts, and introduces a dual-path personalized enhancement mechanism to strengthen user-item feature dependencies. Additionally, a contrastive learning strategy is employed to enhance the representation learning of long-tail items and low-activity users under sparse data conditions. Extensive experiments on two public datasets (Amazon Books and TmallData) demonstrate the effectiveness of our method. CL-EPIDTN achieves the best performance across multiple metrics, with Hit Rate@10 of 0.0351 and Recall@50 of 0.1123 on Amazon Books, and Hit Rate@10 of 0.0901 and Recall@50 of 0.1599 on TmallData, outperforming six state-of-the-art baselines. These results highlight the potential of CL-EPIDTN for both academic research and practical deployment in real-world recommender systems, particularly in handling personalization and data sparsity challenges.",
+   "doi": "10.1371/journal.pone.0332894",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2025-10-23",
+   "retrieval_timestamp": "2026-09-14T19:57:42.303557+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "5e8ffaa863f66db15635853f2f1cd9ef95ee644f4b12f59d69d9dd389612fc59",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "europepmc",
+    "indexing_sources": [
+     "europepmc"
+    ],
+    "record_ids_by_source": {
+     "europepmc": "europepmc:41129532"
+    },
+    "queries_by_source": {
+     "europepmc": "marketplace search ranking model model performance experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "biomedical_pubmed_line",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "biomedical_pubmed_line",
+   "canonical_id": "doi:10.1371/journal.pone.0332894",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "marketplace search ranking model model performance experimental comparison",
+   "source_rank": 4,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstract-level evidence: full text may contain methods and constraints not present in the abstract",
+    "Publication existence is not clinical evidence of safety or effectiveness",
+    "Citation counts are bibliometric signals, not validity measures"
+   ]
+  },
+  {
+   "id": "doi:10.1038/s41598-026-47284-1",
+   "source_type": "scientific_paper",
+   "source": "europepmc",
+   "source_id": "europepmc:europepmc:41965399",
+   "source_uri": "https://doi.org/10.1038/s41598-026-47284-1",
+   "title": "Explaining and predicting consumer decision-making in E-commerce using an intelligent hybrid framework for impulsive and planned purchase behavior.",
+   "abstract": "Accurately distinguishing between impulsive and planned purchasing behavior remains a critical challenge in e-commerce analytics, given the multidimensional and dynamic nature of consumer data. Existing machine learning approaches often rely on conventional hyperparameter tuning strategies, which may limit model robustness and generalization. This study proposes a hybrid framework that integrates two bio-inspired metaheuristic algorithms—Walrus Optimization Algorithm (WaOA) and Weevil Damage Optimization Algorithm (WDOA)—with three gradient boosting classifiers (XGBoost, LightGBM, and CatBoost) to improve hyperparameter optimization and classification performance. Empirical evaluation indicates that the WaOA-optimized XGBoost model achieved strong predictive performance, reaching F1-scores of 0.9879 for impulsive purchases and 0.9798 for need-based purchases, with an overall testing accuracy of 97.3%. Although statistical tests suggest that performance differences among the evaluated models are not significant, the optimized configurations demonstrate consistently high predictive capability across evaluation metrics. Feature importance analysis identifies product rating, customer satisfaction, and loyalty program membership as key predictors of consumer decision type. The proposed framework demonstrates promising performance and interpretability, offering practical support for data-driven decision-making in digital retail environments.",
+   "doi": "10.1038/s41598-026-47284-1",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2026-04-11",
+   "retrieval_timestamp": "2026-09-14T19:57:42.303573+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "27135de7557b62ca9e7da406b2f2d6fc990f74f6242c9c55d89ef8c9707cbacd",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "europepmc",
+    "indexing_sources": [
+     "europepmc"
+    ],
+    "record_ids_by_source": {
+     "europepmc": "europepmc:41965399"
+    },
+    "queries_by_source": {
+     "europepmc": "marketplace search ranking model model performance experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "biomedical_pubmed_line",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "biomedical_pubmed_line",
+   "canonical_id": "doi:10.1038/s41598-026-47284-1",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "marketplace search ranking model model performance experimental comparison",
+   "source_rank": 5,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstract-level evidence: full text may contain methods and constraints not present in the abstract",
+    "Publication existence is not clinical evidence of safety or effectiveness",
+    "Citation counts are bibliometric signals, not validity measures"
+   ]
+  },
+  {
+   "id": "doi:10.18130/v3tg0k",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.18130/v3tg0k",
+   "source_uri": "https://doi.org/10.18130/v3tg0k",
+   "title": "First Search for the Standard Model Higgs Boson Using the Semileptonic Decay Channel: H-WW----",
+   "abstract": "",
+   "doi": "10.18130/v3tg0k",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-14T19:57:42.303588+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "280d5ef547bef21d7f34fa212005eb196b5c22a678b510f46b65fa67af60064b",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.18130/v3tg0k"
+    },
+    "queries_by_source": {
+     "crossref": "marketplace search ranking model model performance decay"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.18130/v3tg0k",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "marketplace search ranking model model performance decay",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  {
+   "id": "doi:10.22215/etd/2013-09971",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.22215/etd/2013-09971",
+   "source_uri": "https://doi.org/10.22215/etd/2013-09971",
+   "title": "Search for the Standard Model Higgs boson in the vector boson fusion-mediated diphoton decay channel using multivariate analysis techniques",
+   "abstract": "",
+   "doi": "10.22215/etd/2013-09971",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-14T19:57:42.303601+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "9101abb03337a322961c21589ee14d5a1cae3e40b760aa479e2f1bff136870bd",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.22215/etd/2013-09971"
+    },
+    "queries_by_source": {
+     "crossref": "marketplace search ranking model model performance decay"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.22215/etd/2013-09971",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "marketplace search ranking model model performance decay",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  {
+   "id": "doi:10.5353/th_b4514970",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.5353/th_b4514970",
+   "source_uri": "https://doi.org/10.5353/th_b4514970",
+   "title": "Model-based decision trees for ranking data",
+   "abstract": "",
+   "doi": "10.5353/th_b4514970",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-14T19:57:42.303614+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "1c03654516dec8c66092e10fa8da0940b69414a8c2ff429bd6ec1d0b4edce2fd",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.5353/th_b4514970"
+    },
+    "queries_by_source": {
+     "crossref": "marketplace search ranking model model performance decay"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.5353/th_b4514970",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "marketplace search ranking model model performance decay",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  {
+   "id": "doi:10.48550/arxiv.2305.18431",
+   "source_type": "scientific_paper",
+   "source": "arxiv",
+   "source_id": "arxiv:arxiv:2305.18431v1",
+   "source_uri": "https://doi.org/10.48550/arxiv.2305.18431",
+   "title": "Optimizing Airbnb Search Journey with Multi-task Learning",
+   "abstract": "At Airbnb, an online marketplace for stays and experiences, guests often spend weeks exploring and comparing multiple items before making a final reservation request. Each reservation request may then potentially be rejected or cancelled by the host prior to check-in. The long and exploratory nature of the search journey, as well as the need to balance both guest and host preferences, present unique challenges for Airbnb search ranking. In this paper, we present Journey Ranker, a new multi-task deep learning model architecture that addresses these challenges. Journey Ranker leverages intermediate guest actions as milestones, both positive and negative, to better progress the guest towards a successful booking. It also uses contextual information such as guest state and search query to balance guest and host preferences. Its modular and extensible design, consisting of four modules with clear separation of concerns, allows for easy application to use cases beyond the Airbnb search ranking context. We conducted offline and online testing of the Journey Ranker and successfully deployed it in production to four different Airbnb products with significant business metrics improvements.",
+   "doi": "10.48550/arxiv.2305.18431",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-14T19:57:42.303630+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "a129e8076661b82b266a1b7b2ac147c8185ac62e497de1f6e64906e74f91759a",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "arxiv",
+    "indexing_sources": [
+     "arxiv"
+    ],
+    "record_ids_by_source": {
+     "arxiv": "arxiv:2305.18431v1"
+    },
+    "queries_by_source": {
+     "arxiv": "marketplace search ranking model model performance decay"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "preprint_origin",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "preprint_origin",
+   "canonical_id": "doi:10.48550/arxiv.2305.18431",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "marketplace search ranking model model performance decay",
+   "source_rank": 0,
+   "fulltext_url": "http://arxiv.org/abs/2305.18431v1",
+   "authors": [
+    "Chun How Tan",
+    "Austin Chan",
+    "Malay Haldar",
+    "Jie Tang",
+    "Xin Liu",
+    "Mustafa Abdool",
+    "Huiji Gao",
+    "Liwei He",
+    "Sanjeev Katariya"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
+    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed — absence of an arXiv record is not absence of the science"
+   ]
+  },
+  {
+   "id": "doi:10.48550/arxiv.2508.05661",
+   "source_type": "scientific_paper",
+   "source": "arxiv",
+   "source_id": "arxiv:arxiv:2508.05661v1",
+   "source_uri": "https://doi.org/10.48550/arxiv.2508.05661",
+   "title": "Zero-Shot Retrieval for Scalable Visual Search in a Two-Sided Marketplace",
+   "abstract": "Visual search offers an intuitive way for customers to explore diverse product catalogs, particularly in consumer-to-consumer (C2C) marketplaces where listings are often unstructured and visually driven. This paper presents a scalable visual search system deployed in Mercari's C2C marketplace, where end-users act as buyers and sellers. We evaluate recent vision-language models for zero-shot image retrieval and compare their performance with an existing fine-tuned baseline. The system integrates real-time inference and background indexing workflows, supported by a unified embedding pipeline optimized through dimensionality reduction. Offline evaluation using user interaction logs shows that the multilingual SigLIP model outperforms other models across multiple retrieval metrics, achieving a 13.3% increase in nDCG@5 over the baseline. A one-week online A/B test in production further confirms real-world impact, with the treatment group showing substantial gains in engagement and conversion, up to a 40.9% increase in transaction rate via image search. Our findings highlight that recent zero-shot models can serve as a strong and practical baseline for production use, which enables teams to deploy effective visual search systems with minimal overhead, while retaining the flexibility to fine-tune based on future data or domain-specific needs.",
+   "doi": "10.48550/arxiv.2508.05661",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-14T19:57:42.303646+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "b6291103a81fcebe16fa091807d360b842776248aac7f88bf28842bfac3e0318",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "arxiv",
+    "indexing_sources": [
+     "arxiv"
+    ],
+    "record_ids_by_source": {
+     "arxiv": "arxiv:2508.05661v1"
+    },
+    "queries_by_source": {
+     "arxiv": "marketplace search ranking model model performance decay"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "preprint_origin",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "preprint_origin",
+   "canonical_id": "doi:10.48550/arxiv.2508.05661",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "marketplace search ranking model model performance decay",
+   "source_rank": 1,
+   "fulltext_url": "http://arxiv.org/abs/2508.05661v1",
+   "authors": [
+    "Andre Rusli",
+    "Shoma Ishimoto",
+    "Sho Akiyama",
+    "Aman Kumar Singh"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
+    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed — absence of an arXiv record is not absence of the science"
+   ]
+  },
+  {
+   "id": "doi:10.2139/ssrn.4892616",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.2139/ssrn.4892616",
+   "source_uri": "https://doi.org/10.2139/ssrn.4892616",
+   "title": "A Ranking Model Framework for Multiple Vertical Search Domains",
+   "abstract": "",
+   "doi": "10.2139/ssrn.4892616",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2024",
+   "retrieval_timestamp": "2026-09-14T19:57:42.303658+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "950e4348f4861b9a1441def1ecde903d56c462478bf502822926dd3e77057188",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.2139/ssrn.4892616"
+    },
+    "queries_by_source": {
+     "crossref": "marketplace search ranking model model performance decay"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=posted-content"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.2139/ssrn.4892616",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "marketplace search ranking model model performance decay",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  {
+   "id": "title:d2b3902accae0d69",
+   "source_type": "scientific_paper",
+   "source": "core",
+   "source_id": "core:core:163796928",
+   "source_uri": "",
+   "title": "Sub-series 2: Publications",
+   "abstract": "Bimonthly magazine discussing topics related to aviation and model airplane engines including collecting, restoring, maintaining, and identifying engines, along with advertising",
+   "doi": null,
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-14T19:57:42.303672+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "55d7018d372f585e94aaa6a131601a420fb1b59d623b67224b88688d518a3761",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "core",
+    "indexing_sources": [
+     "core"
+    ],
+    "record_ids_by_source": {
+     "core": "core:163796928"
+    },
+    "queries_by_source": {
+     "core": "marketplace search ranking model model performance decay"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "repository_aggregator_core",
+    "identity_basis": "TITLE_FINGERPRINT",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "repository_aggregator_core",
+   "canonical_id": "title:d2b3902accae0d69",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "marketplace search ranking model model performance decay",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [
+    "The Model Museum"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
+    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
+   ]
+  },
+  {
+   "id": "title:e5e039305af54970",
+   "source_type": "scientific_paper",
+   "source": "core",
+   "source_id": "core:core:89758015",
+   "source_uri": "",
+   "title": "Paris on Stage: 1889-1914 [exhibition]; Cabaret de L’Enfer Model",
+   "abstract": "Model of the facade of L'Enfer (Hell); Le Ciel (Heaven) is not shown, it was to the immediate left; A scale model, part of the Paris on Stage: 1889-1914 exhibition held June 19, 2013 to February 23, 2014. The cafe or cabaret L'Enfer (Hell) once stood at No. 54 Boulevard de Clichy, along with another called Le Ciel (Heaven), in the Pigalle neighborhood. Both cabarets were a result of a rising trend in Paris ca. 1885-1889 for themed establishments. At L'Enfer the waiters dressed as \"red imps\" and the doorman dressed as Satan or Mephisto. While the original bohemians stopped patronizing these in the 1890s, they continued to cater to tourists. Cabaret de l’Enfer remained open until 1952",
+   "doi": null,
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-14T19:57:42.303688+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "58c5789c8dac9335908f3538704a1a0c597faaf368271c040388e8f99f060933",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "core",
+    "indexing_sources": [
+     "core"
+    ],
+    "record_ids_by_source": {
+     "core": "core:89758015"
+    },
+    "queries_by_source": {
+     "core": "marketplace search ranking model model performance decay"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "repository_aggregator_core",
+    "identity_basis": "TITLE_FINGERPRINT",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "repository_aggregator_core",
+   "canonical_id": "title:e5e039305af54970",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "marketplace search ranking model model performance decay",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [
+    "unknown (Canadian model maker)"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
+    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
+   ]
+  },
+  {
+   "id": "title:009826951c4c98bb",
+   "source_type": "scientific_paper",
+   "source": "core",
+   "source_id": "core:core:89706214",
+   "source_uri": "",
+   "title": "Pergamon Acropolis Model",
+   "abstract": "Detail, Temple of Dionysus at lowest point, center, Temple of Trajan (2nd century CE) in courtyard, theater, lower right; Pergamon was an ancient Greek city in Asia Minor (now Bergama, Turkey), later part of the Roman Empire. Pergamon (Gr.: \"fort\" or \"stronghold\") occupies a steep-sided hill (height 355 m). In Hellenistic times it was ruled by the Attalid dynasty (282-133 BCE), following the death of Alexander the Great. The summit of the hill of Pergamon forms the acropolis proper, with its own massive fortifications. The model shows the Acropolis (the upper city) as it was in the 2nd century CE (under Roman rule). Source: Wikipedia; http://en.wikipedia.org/wiki/Main_Page (accessed 8/1/2012",
+   "doi": null,
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-14T19:57:42.303702+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "236f64efb98c285bada71b6f68649f4cb6d1795dfed4acfda9322e8a5404d139",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "core",
+    "indexing_sources": [
+     "core"
+    ],
+    "record_ids_by_source": {
+     "core": "core:89706214"
+    },
+    "queries_by_source": {
+     "core": "marketplace search ranking model model performance decay"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "repository_aggregator_core",
+    "identity_basis": "TITLE_FINGERPRINT",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "repository_aggregator_core",
+   "canonical_id": "title:009826951c4c98bb",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "marketplace search ranking model model performance decay",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [
+    "unknown (German model maker)"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
+    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
+   ]
+  },
+  {
+   "id": "title:840f4fb828553d65",
+   "source_type": "scientific_paper",
+   "source": "core",
+   "source_id": "core:core:89707083",
+   "source_uri": "",
+   "title": "Scale model of Sainte-Chapelle",
+   "abstract": "Model, detail on the north wall, originally the staircase (the Grands Degres); The Galerie des Moulages (cast collection) not only contains 19th plaster casts, but also scale models of buildings done by artisans on staff at the museum. The Sainte-Chapelle in Paris was built by Louis IX in his palace on the Ile-de-la-Cité to provide a suitable home for the Crown of Thorns, purchased in 1239 from Baldwin II, Emperor of Constantinople and for other relics obtained in 1241. The chapel was also designed as a place of worship for the royal family. Architecturally, the chapel resembles one of the radiating chapels of Amiens Cathedral, but the enriched decoration on both the interior and the exterior appears to be influenced by contemporary metalwork. It retains one of the most extensive in-situ collections of 13th century stained glass anywhere in the world. Source: Grove Art Online; http://www.oxfordartonline.com/ (accessed 7/23/2012",
+   "doi": null,
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-14T19:57:42.303713+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "0fcf5ce044aea22104ed27a2c64f75bf036430d01c446561f1e1a2c81e3fb2c1",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "core",
+    "indexing_sources": [
+     "core"
+    ],
+    "record_ids_by_source": {
+     "core": "core:89707083"
+    },
+    "queries_by_source": {
+     "core": "marketplace search ranking model model performance decay"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "repository_aggregator_core",
+    "identity_basis": "TITLE_FINGERPRINT",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "repository_aggregator_core",
+   "canonical_id": "title:840f4fb828553d65",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "marketplace search ranking model model performance decay",
+   "source_rank": 3,
+   "fulltext_url": null,
+   "authors": [
+    "unknown (French model maker)"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
+    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
+   ]
+  }
+ ],
+ "mechanism_ids": [],
+ "mechanism_map": {},
+ "premise_gate": {},
+ "evidence_classification": {},
+ "mechanism_space": {},
+ "prior_art_ids": [],
+ "prior_art": {},
+ "collision_results": {},
+ "physics": {},
+ "attack_results": {},
+ "contradictions": {},
+ "killer_experiment": {},
+ "adjudication": {},
+ "multi_source": {},
+ "cemetery_check": {},
+ "epistemic_state": {},
+ "next_best_action": {},
+ "ranking": {},
+ "provenance": {
+  "retrieval_fabric": {
+   "version": "V2",
+   "primary_query": "marketplace search ranking model model performance decay",
+   "query_variant_count": 5,
+   "sources_attempted": [
+    "arxiv",
+    "core",
+    "crossref",
+    "datacite",
+    "doaj",
+    "europepmc",
+    "google_patents",
+    "openaire",
+    "openalex",
+    "semantic_scholar",
+    "unpaywall"
+   ],
+   "sources_succeeded": [
+    "arxiv",
+    "core",
+    "crossref",
+    "datacite",
+    "doaj",
+    "europepmc",
+    "openaire",
+    "semantic_scholar",
+    "unpaywall"
+   ],
+   "sources_failed": [
+    "google_patents"
+   ],
+   "sources_rate_limited": [
+    "openalex",
+    "semantic_scholar"
+   ],
+   "unique_source_families": [
+    "biomedical_pubmed_line",
+    "doi_registrant_crossref",
+    "preprint_origin",
+    "repository_aggregator_core",
+    "scholarly_graph_s2"
+   ],
+   "independent_source_families": 5,
+   "source_independence_score": 1.0,
+   "retrieval_blind_spots": [
+    "PATENT_BLIND_SPOT: zero patent records — patent prior-art coverage is a discovery-system defect when the mechanism domain is patent-dense",
+    "LOW_FAMILY_COVERAGE: only 5 source families contributed records (directive acceptance bar: >= 6 materially different open/free families queried successfully)"
+   ],
+   "canonical_record_count": 42,
+   "evidence_fabric": {
+    "version": "evidence_fabric/1.0.0",
+    "federated": true,
+    "production_sources": [],
+    "channels": 8,
+    "unknown_channels": 8,
+    "substitutions": [],
+    "coverage_limitations": [
+     {
+      "source_id": "wopto",
+      "limitation": "USPTO text covers United States patent applications only; the worldwide (non-US) bibliographic coverage of WOPTO is NOT served by the alternate — any worldwide-prior-art conclusion drawn from the substituted run is coverage-limited and must be re-run when WOPTO's index is warm"
+     },
+     {
+      "source_id": "openfoam_cases",
+      "limitation": "no validated-CFD-case alternate in this subset; validated fluid-mechanism case knowledge is NOT served when this source is unavailable"
+     },
+     {
+      "source_id": "qm9",
+      "limitation": "reaction records do not carry molecular electronic-structure properties (HOMO/LUMO/gap/dipole); property-based screening conclusions are NOT served"
+     },
+     {
+      "source_id": "chemrag_reactions",
+      "limitation": "QM9 property rows do not carry reaction transformations; reactant->product conclusions are NOT served"
+     },
+     {
+      "family": "E2_scientific_intelligence",
+      "limitation": "no PRODUCTION evidence-fabric source in this family this round; the evidence fabric serves NOTHING for this family (any paper/patent evidence in the engine pool comes from the existing V2 fabric channels, which are a different retrieval system — never conflated with evidence-fabric provenance)"
+     }
+    ],
+    "pool_items": 0,
+    "records_in_custody": 0,
+    "report_persisted": "EVIDENCE_FABRIC_REPORT.json"
+   }
+  }
+ },
+ "stage_log": [
+  {
+   "stage": "RETRIEVE",
+   "capability_id": "A2_RETRIEVAL",
+   "module_path": "discovery_fabric/retrieval_fabric/pipeline.py",
+   "function": "retrieve_fabric(problem) [V2] / retrieve(problem) [V1]",
+   "started_at": "2026-09-14T19:55:55+00:00Z",
+   "before_envelope_hash": "f91dc5e20a43cdd30199394ba1cec1a4ae17171cd30640cd0779ea06af268b9b",
+   "status": "OK",
+   "finished_at": "2026-09-14T20:01:18+00:00Z",
+   "after_envelope_hash": "06b86090dd20585372f08d10c010fe47e0d753bb6bb9351c37985172e12f83ab",
+   "candidate_delta": [
+    "evidence",
+    "evidence_ids",
+    "provenance"
+   ],
+   "delta_real": true,
+   "result_meta": {
+    "retrieved_count": 16,
+    "retrieval_fabric_version": "V2"
+   },
+   "entry": {
+    "entry_helper_version": "stage_entry/1.1.0",
+    "stage": "RETRIEVE",
+    "entry_status": "ALLOWED",
+    "prerequisite": "UPSTREAM_COMPLETE",
+    "prerequisite_evidence": {
+     "failed_stages": [],
+     "skipped_stages": []
+    }
+   }
+  }
+ ]
+}

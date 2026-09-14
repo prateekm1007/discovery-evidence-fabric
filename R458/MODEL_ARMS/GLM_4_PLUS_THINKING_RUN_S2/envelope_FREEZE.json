@@ -1,0 +1,937 @@
+{
+ "candidate_id": "",
+ "problem_id": "r458-s2-db-tail-latency-flash-sale",
+ "problem": {
+  "problem_id": "r458-s2-db-tail-latency-flash-sale",
+  "device": "sharded PostgreSQL database cluster",
+  "failure_mode": "connection pool exhaustion due to lock waits",
+  "objective": "hold p99.9 read latency at or below 120 milliseconds",
+  "failure": "Documented problem 'connection pool exhaustion due to lock waits' concerning sharded PostgreSQL database cluster. User-submitted engineering problem (session input): \"An e-commerce platform's order database, a sharded PostgreSQL cluster with 3 replicas per shard, shows p99.9 read latency collapsing from 40 to 900 milliseconds for 3 to 7 minutes during flash sales: checkout error rates hit 2 percent at peak as the 250-millisecond client timeout fires, and the post\".  ROUTING: cpsc_recalls: not queried — the failure query is free text and this source answers date-floor questions only (grammar: YYYY-MM-DD date window (RecallDateStart)). [cpsc_recalls] retrieval status NOT_QUERIED_GRAMMAR (planned query is free text; source grammar is a YYYY-MM-DD date floor (R443 routing decision, not absence)) — provider outcome recorded, not treated as absence (Art. XXI.3). [arxiv] 5 records retrieved live (2011-2024). Illustrative records: 'On the solution existence and stability of polynomial optimization problems'; 'A Concurrency Control Method Based on Commitment Ordering in Mobile Databases'. LIMITS STAMPED INLINE: literature context establishes the problem class, not event rates. Problem-existence basis: live records retrieved.",
+  "constraint": "cannot change schema or add cache invalidation complexity, cannot increase replication factor, cannot raise client timeout above 250 milliseconds",
+  "sources": {
+   "cpsc_recalls": "NOT_QUERIED_GRAMMAR",
+   "arxiv": "OK"
+  },
+  "origin": "toscanini_ui",
+  "user_text": "An e-commerce platform's order database, a sharded PostgreSQL cluster with 3 replicas per shard, shows p99.9 read latency collapsing from 40 to 900 milliseconds for 3 to 7 minutes during flash sales: checkout error rates hit 2 percent at peak as the 250-millisecond client timeout fires, and the postmortems show lock waits on the inventory row for the featured item cascading through connection pools until the pool exhausts and unrelated queries queue behind it. The featured-item pages drive 40 percent of sale-window traffic to one shard. The platform cannot change the schema or add cache invalidation complexity this quarter (the migration freeze before the holiday code freeze), cannot increase the replication factor (storage budget), cannot raise the client timeout above 250 milliseconds (the mobile team's page budget), and must hold p99.9 at or below 120 milliseconds during flash-sale peaks with the existing cluster.",
+  "r458_benchmark": {
+   "class": "FROZEN_BENCHMARK_DEV",
+   "arm": "glm-4-plus-thinking",
+   "content_sha256": "00101ffc9c6d6069519eacfd13feb0fece1646a8828903845e3a1134c11439fd",
+   "corpus_freeze": "R458/BENCHMARK_FREEZE.json"
+  }
+ },
+ "evidence_ids": [
+  "doi:10.59945/jpnm.v4i3.1377",
+  "doi:10.31979/etd.ykxw-rr89",
+  "doi:10.32469/10355/98842",
+  "doi:10.22215/etd/2004-05922",
+  "doi:10.48550/arxiv.2608.15994",
+  "doi:10.48550/arxiv.0605060",
+  "doi:10.48550/arxiv.1112.2155",
+  "title:c0fe6becfe95402d",
+  "title:e33248b61a467609",
+  "doi:10.18420/btw2019-ws-24",
+  "doi:10.1007/979-8-8688-0817-3_8",
+  "doi:10.32614/cran.package.rredshiftsql"
+ ],
+ "evidence": [
+  {
+   "id": "doi:10.59945/jpnm.v4i3.1377",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.59945/jpnm.v4i3.1377",
+   "source_uri": "https://doi.org/10.59945/jpnm.v4i3.1377",
+   "title": "Analisis Perbandingan Performa Koneksi Database Postgresql 17 Dengan Arsitektur Direct Connection Dan Connection Pooling Pgbouncer",
+   "abstract": "",
+   "doi": "10.59945/jpnm.v4i3.1377",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2026",
+   "retrieval_timestamp": "2026-09-14T21:59:27.502600+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "d125a14978581b926e43e0c74648fbccf7285939a021d2d78dc37f36a472bf6c",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.59945/jpnm.v4i3.1377"
+    },
+    "queries_by_source": {
+     "crossref": "sharded PostgreSQL database cluster connection pool exhaustion due to lock waits"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=journal-article"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.59945/jpnm.v4i3.1377",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "sharded PostgreSQL database cluster connection pool exhaustion due to lock waits",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  {
+   "id": "doi:10.31979/etd.ykxw-rr89",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.31979/etd.ykxw-rr89",
+   "source_uri": "https://doi.org/10.31979/etd.ykxw-rr89",
+   "title": "Benchmarking MongoDB multi-document transactions in a sharded cluster",
+   "abstract": "",
+   "doi": "10.31979/etd.ykxw-rr89",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-14T21:59:27.502676+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "4e73ab7869b004d5825c1214587412faf4b63bba63880394c6490c22d35e2db0",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.31979/etd.ykxw-rr89"
+    },
+    "queries_by_source": {
+     "crossref": "sharded PostgreSQL database cluster connection pool exhaustion due to lock waits"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.31979/etd.ykxw-rr89",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "sharded PostgreSQL database cluster connection pool exhaustion due to lock waits",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  {
+   "id": "doi:10.32469/10355/98842",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.32469/10355/98842",
+   "source_uri": "https://doi.org/10.32469/10355/98842",
+   "title": "A hierarchical time-indexed database for multi-modal derived sensor data using GPU-accelerated PostgreSQL",
+   "abstract": "",
+   "doi": "10.32469/10355/98842",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-14T21:59:27.502703+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "660ca8758ec36f24cbe2e1ba273ff36e97822b7ad94dd3ec6e6ef3eee8921fee",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.32469/10355/98842"
+    },
+    "queries_by_source": {
+     "crossref": "sharded PostgreSQL database cluster connection pool exhaustion due to lock waits"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.32469/10355/98842",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "sharded PostgreSQL database cluster connection pool exhaustion due to lock waits",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  {
+   "id": "doi:10.22215/etd/2004-05922",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.22215/etd/2004-05922",
+   "source_uri": "https://doi.org/10.22215/etd/2004-05922",
+   "title": "Parallel query processing on a cluster-based database system",
+   "abstract": "",
+   "doi": "10.22215/etd/2004-05922",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-14T21:59:27.502721+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "25cd6bd2c153bc627e95106d3eeaeba3a44ea4ff87e49b2f6773707c81932def",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.22215/etd/2004-05922"
+    },
+    "queries_by_source": {
+     "crossref": "sharded PostgreSQL database cluster connection pool exhaustion due to lock waits"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.22215/etd/2004-05922",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "sharded PostgreSQL database cluster connection pool exhaustion due to lock waits",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  {
+   "id": "doi:10.48550/arxiv.2608.15994",
+   "source_type": "scientific_paper",
+   "source": "arxiv",
+   "source_id": "arxiv:arxiv:2608.15994v1",
+   "source_uri": "https://doi.org/10.48550/arxiv.2608.15994",
+   "title": "Building An Integrated Vector Database System in PostgreSQL",
+   "abstract": "This paper presents PostgreSQL-V 2.0, a scalable integrated vector database system inside PostgreSQL. Existing PostgreSQL-based vector search systems such as pgvector embed vector indexes into PostgreSQL's page-oriented storage engine, incurring significant overhead that leads to a huge performance gap with specialized vector databases. In our earlier work, we introduced PostgreSQL-V 1.0, which addresses this issue by separating vector index structures from PostgreSQL's storage engine, enabling vector search performance close to that of native vector index libraries while preserving SQL compatibility. However, we find that PostgreSQL-V 1.0 has three limitations that matter for real-world workloads: it only supports a single connection (without concurrency), recovery time grows with index size, and physical replication is unsupported.\n  We further present PostgreSQL-V 2.0, which closes all three gaps. PostgreSQL-V 2.0's concurrency support enables fully concurrent vector searches and updates across PostgreSQL's multi-process backends, delivering up to 36.4x the throughput of PostgreSQL-V 1.0 while serving 32 concurrent clients. PostgreSQL-V 2.0's fast crash recovery keeps cost independent of total index size, remaining near 20 ms while PostgreSQL-V 1.0's grows into seconds-scale. PostgreSQL-V 2.0's physical replication support extends physical replication to the decoupled index, preserving index consistency on standbys without burdening the primary node. Together, these advances make PostgreSQL-V 2.0 a fully concurrent, crash-resilient, and replication-ready vector database inside PostgreSQL.",
+   "doi": "10.48550/arxiv.2608.15994",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-14T21:59:27.502742+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "47224aff6da57bc8c1153bea67f2cf14afda3535789e2f020212315363d191c2",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "arxiv",
+    "indexing_sources": [
+     "arxiv"
+    ],
+    "record_ids_by_source": {
+     "arxiv": "arxiv:2608.15994v1"
+    },
+    "queries_by_source": {
+     "arxiv": "sharded PostgreSQL database cluster connection pool exhaustion due to lock waits"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "preprint_origin",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "preprint_origin",
+   "canonical_id": "doi:10.48550/arxiv.2608.15994",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "sharded PostgreSQL database cluster connection pool exhaustion due to lock waits",
+   "source_rank": 0,
+   "fulltext_url": "http://arxiv.org/abs/2608.15994v1",
+   "authors": [
+    "Jiayi Liu",
+    "Te Guo",
+    "Jianguo Wang"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
+    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed — absence of an arXiv record is not absence of the science"
+   ]
+  },
+  {
+   "id": "doi:10.48550/arxiv.0605060",
+   "source_type": "scientific_paper",
+   "source": "arxiv",
+   "source_id": "arxiv:arxiv:0605060v1",
+   "source_uri": "https://doi.org/10.48550/arxiv.0605060",
+   "title": "A Case for Cooperative and Incentive-Based Coupling of Distributed Clusters",
+   "abstract": "Research interest in Grid computing has grown significantly over the past five years. Management of distributed resources is one of the key issues in Grid computing. Central to management of resources is the effectiveness of resource allocation as it determines the overall utility of the system. The current approaches to superscheduling in a grid environment are non-coordinated since application level schedulers or brokers make scheduling decisions independently of the others in the system. Clearly, this can exacerbate the load sharing and utilization problems of distributed resources due to suboptimal schedules that are likely to occur. To overcome these limitations, we propose a mechanism for coordinated sharing of distributed clusters based on computational economy. The resulting environment, called \\emph{Grid-Federation}, allows the transparent use of resources from the federation when local resources are insufficient to meet its users' requirements. The use of computational economy methodology in coordinating resource allocation not only facilitates the QoS based scheduling, but also enhances utility delivered by resources.",
+   "doi": "10.48550/arxiv.0605060",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-14T21:59:27.502759+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "5d37be222ebc8d6666a9c00c89bfef8386117b1b9160eddf35c1dfee29e0b4c5",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "arxiv",
+    "indexing_sources": [
+     "arxiv"
+    ],
+    "record_ids_by_source": {
+     "arxiv": "arxiv:0605060v1"
+    },
+    "queries_by_source": {
+     "arxiv": "sharded PostgreSQL database cluster connection pool exhaustion due to lock waits"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "preprint_origin",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "preprint_origin",
+   "canonical_id": "doi:10.48550/arxiv.0605060",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "sharded PostgreSQL database cluster connection pool exhaustion due to lock waits",
+   "source_rank": 1,
+   "fulltext_url": "http://arxiv.org/abs/cs/0605060v1",
+   "authors": [
+    "Rajiv Ranjan",
+    "Aaron Harwood",
+    "Rajkumar Buyya"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
+    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed — absence of an arXiv record is not absence of the science"
+   ]
+  },
+  {
+   "id": "doi:10.48550/arxiv.1112.2155",
+   "source_type": "scientific_paper",
+   "source": "arxiv",
+   "source_id": "arxiv:arxiv:1112.2155v1",
+   "source_uri": "https://doi.org/10.48550/arxiv.1112.2155",
+   "title": "A Concurrency Control Method Based on Commitment Ordering in Mobile Databases",
+   "abstract": "Disconnection of mobile clients from server, in an unclear time and for an unknown duration, due to mobility of mobile clients, is the most important challenges for concurrency control in mobile database with client-server model. Applying pessimistic common classic methods of concurrency control (like 2pl) in mobile database leads to long duration blocking and increasing waiting time of transactions. Because of high rate of aborting transactions, optimistic methods aren`t appropriate in mobile database. In this article, OPCOT concurrency control algorithm is introduced based on optimistic concurrency control method. Reducing communications between mobile client and server, decreasing blocking rate and deadlock of transactions, and increasing concurrency degree are the most important motivation of using optimistic method as the basis method of OPCOT algorithm. To reduce abortion rate of transactions, in execution time of transactions` operators a timestamp is assigned to them. In other to checking commitment ordering property of scheduler, the assigned timestamp is used in server on time of commitment. In this article, serializability of OPCOT algorithm scheduler has been proved by using serializability graph. Results of evaluating simulation show that OPCOT algorithm decreases abortion rate and waiting time of transactions in compare to 2pl and optimistic algorithms.",
+   "doi": "10.48550/arxiv.1112.2155",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-14T21:59:27.502772+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "583601a7174ec42c911c1db9fec657122b79822dcf8d31c6c2fd12d461f9fd07",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "arxiv",
+    "indexing_sources": [
+     "arxiv"
+    ],
+    "record_ids_by_source": {
+     "arxiv": "arxiv:1112.2155v1"
+    },
+    "queries_by_source": {
+     "arxiv": "sharded PostgreSQL database cluster connection pool exhaustion due to lock waits"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "preprint_origin",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "preprint_origin",
+   "canonical_id": "doi:10.48550/arxiv.1112.2155",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "sharded PostgreSQL database cluster connection pool exhaustion due to lock waits",
+   "source_rank": 2,
+   "fulltext_url": "http://arxiv.org/abs/1112.2155v1",
+   "authors": [
+    "Ali Karami",
+    "Ahmad Baraani-Dastjerdi"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
+    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed — absence of an arXiv record is not absence of the science"
+   ]
+  },
+  {
+   "id": "title:c0fe6becfe95402d",
+   "source_type": "scientific_paper",
+   "source": "core",
+   "source_id": "core:core:166636830",
+   "source_uri": "",
+   "title": "OPTIMALISASI KINERJA SERVER DATABASE POSTGRESQL\n\nMELALUI CLUSTER PATRONI",
+   "abstract": "Kebutuhan akan tersedianya data dan informasi melalui media digital pada saat\n\nini sangat tinggi. Hal ini tidak terlepas dari pesatnya perkembangan sistem teknologi\n\ninformasi di masa sekarang. Dalam sistem teknologi informasi terdapat berbagai data\n\ndan informasi yang seluruhnya tersimpan dalam suatu server basis data atau kerap\n\ndisebut dengan database server. Database server merupakan server yang memiliki\n\nfungsi vital dalam suatu sistem teknologi informasi. Seperti server pada umumnya\n\nsebuah database server tidak luput dari suatu gangguan yang sering saja terjadi, oleh\n\nkarenanya penting untuk menjaga ketersediaan dan stabilitas pada database server.\n\nUntuk menjaga ketersediaan dan stabilitas pada database server dapat dilakukan\n\nmelalui implementasi suatu Cluster database server.\n\nService database server yang mendukung untuk berjalan pada Cluster database\n\nsalah satunya adalah PostgreSQL. Dan untuk teknologi Cluster yang mendukung pada\n\nservice PostgreSQL salah satunya adalah Patroni. Penelitian pada Cluster Patroni ini\n\nakan menggunakan tiga buah virtual machine dengan spesifikasi 2 Core CPU, 4GB\n\nRAM & 20GB Disk Storage. Ketiga buah virtual machine tersebut akan terhubung\n\ndalam suatu internal network dan menjadi sebuah Cluster Patroni. Agar ketiga server\n\ntersebut dapat menjadi kesatuan Cluster Patroni, dibutuhkan untuk melakukan instalasi\n\nbeberapa software. Software tersebut diataranya PostgreSQL, etcd, HAProxy,\n\nKeepalived dan juga Patroni. Dalam memastikan Cluster Patroni berjalan dengan\n\nsesuai, dibutuhkan beberapa skenario pengujian yang butuh dilakukan. Skenario\n\npengujian ini akan dilakukan melalui dua metode, metode pertama melalui aplikasi web\n\nPOS yang berbasis web dan metode kedua melalui proses uji dump & restore database.\n\nUntuk melakukan pengujian tersebut terdapat satu buah virtual machine dengan\n\nspesifikasi 2 Core CPU, 2GB RAM & 10GB Disk Storage yang disebut sebagaiserver\n\naplikasi. Server aplikasi ini menggunakan beberapa service yang berjalandiantaranya\n\nadalah NGINX dan juga PHP. Baik server yang berada dalam Cluster Patroni maupun\n\nserver aplikasi menggunakan Sistem Operasi Fedora 39.\n\nDari beberapa skenario pengujian yang telah dilakukan, sebuah Cluster Patroni\n\nmemiliki fitur yang handal berupa autofailover, fitur ini mendukung untuk terciptanya\n\nhigh availability dalam layanan database yang dikelola. Dengan terciptanya high",
+   "doi": null,
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-14T21:59:27.502786+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "e41c2da7f82d7208a37a7838187d36ac08e218ee9453edaf480b5f6448b52e34",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "core",
+    "indexing_sources": [
+     "core"
+    ],
+    "record_ids_by_source": {
+     "core": "core:166636830"
+    },
+    "queries_by_source": {
+     "core": "sharded PostgreSQL database cluster connection pool exhaustion due lock waits"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "repository_aggregator_core",
+    "identity_basis": "TITLE_FINGERPRINT",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "repository_aggregator_core",
+   "canonical_id": "title:c0fe6becfe95402d",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "sharded PostgreSQL database cluster connection pool exhaustion due lock waits",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [
+    "Apriandi, Rizqi"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
+    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
+   ]
+  },
+  {
+   "id": "title:e33248b61a467609",
+   "source_type": "scientific_paper",
+   "source": "core",
+   "source_id": "core:core:19105618",
+   "source_uri": "",
+   "title": "Functions to Expand a PostgreSQL Database",
+   "abstract": "This is a set of functions to expand a PostgreSQL database via functions which analyze and manipulate graphs.  The functions are internal, written in c.  The import/export functions (using GraphML) are written in Java",
+   "doi": null,
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-14T21:59:27.502803+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "a79dca13ed5b6d2b55571d702c55858127de1502a67c497d5111a857b437167d",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "core",
+    "indexing_sources": [
+     "core"
+    ],
+    "record_ids_by_source": {
+     "core": "core:19105618"
+    },
+    "queries_by_source": {
+     "core": "sharded PostgreSQL database cluster connection pool exhaustion due lock waits"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "repository_aggregator_core",
+    "identity_basis": "TITLE_FINGERPRINT",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "repository_aggregator_core",
+   "canonical_id": "title:e33248b61a467609",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "sharded PostgreSQL database cluster connection pool exhaustion due lock waits",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [
+    "Liu, Simon",
+    "Duvall, Greg",
+    "Dixon, Brandon"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
+    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
+   ]
+  },
+  {
+   "id": "doi:10.18420/btw2019-ws-24",
+   "source_type": "scientific_paper",
+   "source": "core",
+   "source_id": "core:core:294050139",
+   "source_uri": "https://doi.org/10.18420/btw2019-ws-24",
+   "title": "PgCuckoo – Injecting Physical Plans into PostgreSQL",
+   "abstract": "Plan forcing is the most capable plan hinting that a database system can implement. It allows the specification of almost every aspect of an execution plan. The open source database system PostgreSQL does not implement any plan hints by default. We will show how an extension can be used to provide plan forcing for PostgreSQL. This extension allows to use the query executor directly and independently of SQL. We sketch some of the interesting use case scenarios for plan forcing in PostgreSQL",
+   "doi": "10.18420/btw2019-ws-24",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-14T21:59:27.502816+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "bfb519ef50fa1e55579bf7d1b54f4520f2d7fbd4dac0af4bd9985baeecf03aee",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "core",
+    "indexing_sources": [
+     "core"
+    ],
+    "record_ids_by_source": {
+     "core": "core:294050139"
+    },
+    "queries_by_source": {
+     "core": "sharded PostgreSQL database cluster connection pool exhaustion due lock waits"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "repository_aggregator_core",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "repository_aggregator_core",
+   "canonical_id": "doi:10.18420/btw2019-ws-24",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "sharded PostgreSQL database cluster connection pool exhaustion due lock waits",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [
+    "Hirn, Denis"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
+    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
+   ]
+  },
+  {
+   "id": "doi:10.1007/979-8-8688-0817-3_8",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.1007/979-8-8688-0817-3_8",
+   "source_uri": "https://doi.org/10.1007/979-8-8688-0817-3_8",
+   "title": "Postgres Cluster and Database Backup",
+   "abstract": "",
+   "doi": "10.1007/979-8-8688-0817-3_8",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2024",
+   "retrieval_timestamp": "2026-09-14T21:59:27.502840+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "3ea6209c56a8691bc73f6f479b703c058fe352af62d39058d55612f8bc6abe44",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.1007/979-8-8688-0817-3_8"
+    },
+    "queries_by_source": {
+     "crossref": "sharded PostgreSQL database cluster connection pool exhaustion due to lock waits"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=book-chapter"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.1007/979-8-8688-0817-3_8",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "sharded PostgreSQL database cluster connection pool exhaustion due to lock waits",
+   "source_rank": 3,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  {
+   "id": "doi:10.32614/cran.package.rredshiftsql",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.32614/cran.package.rredshiftsql",
+   "source_uri": "https://doi.org/10.32614/cran.package.rredshiftsql",
+   "title": "RRedshiftSQL: R Interface to the 'Redshift' Database",
+   "abstract": "",
+   "doi": "10.32614/cran.package.rredshiftsql",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2016",
+   "retrieval_timestamp": "2026-09-14T21:59:27.502860+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "e3c518af70e15d3110c2b4ac7fd244b09b1d77d5187309dc52a1f151cc0676b0",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.32614/cran.package.rredshiftsql"
+    },
+    "queries_by_source": {
+     "crossref": "sharded PostgreSQL database cluster connection pool exhaustion due to lock waits"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dataset"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "DATASET",
+   "document_type": "",
+   "evidence_lane": "DATASET",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.32614/cran.package.rredshiftsql",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "sharded PostgreSQL database cluster connection pool exhaustion due to lock waits",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  }
+ ],
+ "mechanism_ids": [],
+ "mechanism_map": {},
+ "premise_gate": {},
+ "evidence_classification": {},
+ "mechanism_space": {},
+ "prior_art_ids": [],
+ "prior_art": {},
+ "collision_results": {},
+ "physics": {},
+ "attack_results": {},
+ "contradictions": {},
+ "killer_experiment": {},
+ "adjudication": {},
+ "multi_source": {},
+ "cemetery_check": {},
+ "epistemic_state": {},
+ "next_best_action": {},
+ "ranking": {},
+ "provenance": {
+  "retrieval_fabric": {
+   "version": "V2",
+   "primary_query": "sharded PostgreSQL database cluster connection pool exhaustion due to lock waits",
+   "query_variant_count": 5,
+   "sources_attempted": [
+    "arxiv",
+    "core",
+    "crossref",
+    "datacite",
+    "doaj",
+    "europepmc",
+    "google_patents",
+    "openaire",
+    "openalex",
+    "semantic_scholar",
+    "unpaywall"
+   ],
+   "sources_succeeded": [
+    "arxiv",
+    "core",
+    "crossref",
+    "datacite",
+    "doaj",
+    "europepmc",
+    "openaire",
+    "unpaywall"
+   ],
+   "sources_failed": [
+    "google_patents"
+   ],
+   "sources_rate_limited": [
+    "openalex",
+    "semantic_scholar"
+   ],
+   "unique_source_families": [
+    "doi_registrant_crossref",
+    "preprint_origin",
+    "repository_aggregator_core"
+   ],
+   "independent_source_families": 3,
+   "source_independence_score": 1.0,
+   "retrieval_blind_spots": [
+    "PATENT_BLIND_SPOT: zero patent records — patent prior-art coverage is a discovery-system defect when the mechanism domain is patent-dense",
+    "LOW_FAMILY_COVERAGE: only 3 source families contributed records (directive acceptance bar: >= 6 materially different open/free families queried successfully)"
+   ],
+   "canonical_record_count": 18,
+   "evidence_fabric": {
+    "version": "evidence_fabric/1.0.0",
+    "federated": true,
+    "production_sources": [
+     "openfoam_cases"
+    ],
+    "channels": 8,
+    "unknown_channels": 7,
+    "substitutions": [],
+    "coverage_limitations": [
+     {
+      "source_id": "wopto",
+      "limitation": "USPTO text covers United States patent applications only; the worldwide (non-US) bibliographic coverage of WOPTO is NOT served by the alternate — any worldwide-prior-art conclusion drawn from the substituted run is coverage-limited and must be re-run when WOPTO's index is warm"
+     },
+     {
+      "source_id": "qm9",
+      "limitation": "reaction records do not carry molecular electronic-structure properties (HOMO/LUMO/gap/dipole); property-based screening conclusions are NOT served"
+     },
+     {
+      "source_id": "chemrag_reactions",
+      "limitation": "QM9 property rows do not carry reaction transformations; reactant->product conclusions are NOT served"
+     },
+     {
+      "family": "E2_scientific_intelligence",
+      "limitation": "no PRODUCTION evidence-fabric source in this family this round; the evidence fabric serves NOTHING for this family (any paper/patent evidence in the engine pool comes from the existing V2 fabric channels, which are a different retrieval system — never conflated with evidence-fabric provenance)"
+     }
+    ],
+    "pool_items": 0,
+    "records_in_custody": 0,
+    "report_persisted": "EVIDENCE_FABRIC_REPORT.json"
+   }
+  },
+  "evidence_freeze": {
+   "run_id": "r458mcb-S2: r458-s2-db-tail-latency-flash-sale (blind holdout)",
+   "problem_id": "r458-s2-db-tail-latency-flash-sale",
+   "frozen_at": "2026-09-14T22:02:30+00:00Z",
+   "evidence_count": 12,
+   "custody_records": [
+    {
+     "record_id": "doi:10.48550/arxiv.2608.15994",
+     "source": "arxiv",
+     "source_identity_verified": true,
+     "query": "r458-s2-db-tail-latency-flash-sale",
+     "retrieval_timestamp": "2026-09-14T22:02:30.356503+00:00",
+     "raw_content": "This paper presents PostgreSQL-V 2.0, a scalable integrated vector database system inside PostgreSQL. Existing PostgreSQL-based vector search systems such as pgvector embed vector indexes into PostgreSQL's page-oriented storage engine, incurring significant overhead that leads to a huge performance gap with specialized vector databases. In our earlier work, we introduced PostgreSQL-V 1.0, which addresses this issue by separating vector index structures from PostgreSQL's storage engine, enabling vector search performance close to that of native vector index libraries while preserving SQL compatibility. However, we find that PostgreSQL-V 1.0 has three limitations that matter for real-world workloads: it only supports a single connection (without concurrency), recovery time grows with index size, and physical replication is unsupported.\n  We further present PostgreSQL-V 2.0, which closes all three gaps. PostgreSQL-V 2.0's concurrency support enables fully concurrent vector searches and updates across PostgreSQL's multi-process backends, delivering up to 36.4x the throughput of PostgreSQL-V 1.0 while serving 32 concurrent clients. PostgreSQL-V 2.0's fast crash recovery keeps cost independent of total index size, remaining near 20 ms while PostgreSQL-V 1.0's grows into seconds-scale. PostgreSQL-V 2.0's physical replication support extends physical replication to the decoupled index, preserving index consistency on standbys without burdening the primary node. Together, these advances make PostgreSQL-V 2.0 a fully concurrent, crash-resilient, and replication-ready vector database inside PostgreSQL.",
+     "content_hash": "28927fd31648c8071616dce993b64c48669bfa096bb26522d34b6075a3f97ffb",
+     "exact_span": "This paper presents PostgreSQL-V 2.0, a scalable integrated vector database system inside PostgreSQL. Existing PostgreSQL-based vector search systems such as pgvector embed vector indexes into PostgreSQL's page-oriented storage engine, incurring significant overhead that leads to a huge performance gap with specialized vector databases. In our earlier work, we introduced PostgreSQL-V 1.0, which addresses this issue by separating vector index structures from PostgreSQL's storage engine, enabling ",
+     "span_hash": "4852a1f4861c97d5982f0502897c836425cc13cfc3b4682f2fb06b05e0f7b7a9",
+     "evidence_class": "SCIENTIFIC_ABSTRACT",
+     "proposition_binding": "candidate_mechanism_input",
+     "locator": "https://doi.org/10.48550/arxiv.2608.15994",
+     "epistemic_strength": "VERIFIED"
+    },
+    {
+     "record_id": "doi:10.48550/arxiv.0605060",
+     "source": "arxiv",
+     "source_identity_verified": true,
+     "query": "r458-s2-db-tail-latency-flash-sale",
+     "retrieval_timestamp": "2026-09-14T22:02:30.356542+00:00",
+     "raw_content": "Research interest in Grid computing has grown significantly over the past five years. Management of distributed resources is one of the key issues in Grid computing. Central to management of resources is the effectiveness of resource allocation as it determines the overall utility of the system. The current approaches to superscheduling in a grid environment are non-coordinated since application level schedulers or brokers make scheduling decisions independently of the others in the system. Clearly, this can exacerbate the load sharing and utilization problems of distributed resources due to suboptimal schedules that are likely to occur. To overcome these limitations, we propose a mechanism for coordinated sharing of distributed clusters based on computational economy. The resulting environment, called \\emph{Grid-Federation}, allows the transparent use of resources from the federation when local resources are insufficient to meet its users' requirements. The use of computational economy methodology in coordinating resource allocation not only facilitates the QoS based scheduling, but also enhances utility delivered by resources.",
+     "content_hash": "23a4b335f6c2db3dbf14179b07d4fc90eaaab5188fb491429a20d671cbe5166c",
+     "exact_span": "Research interest in Grid computing has grown significantly over the past five years. Management of distributed resources is one of the key issues in Grid computing. Central to management of resources is the effectiveness of resource allocation as it determines the overall utility of the system. The current approaches to superscheduling in a grid environment are non-coordinated since application level schedulers or brokers make scheduling decisions independently of the others in the system. Clea",
+     "span_hash": "ea1b51e043d78b2285ae048eeea249eb0fa769f8391345dbe446bdf8c20bb04c",
+     "evidence_class": "SCIENTIFIC_ABSTRACT",
+     "proposition_binding": "candidate_mechanism_input",
+     "locator": "https://doi.org/10.48550/arxiv.0605060",
+     "epistemic_strength": "VERIFIED"
+    },
+    {
+     "record_id": "doi:10.48550/arxiv.1112.2155",
+     "source": "arxiv",
+     "source_identity_verified": true,
+     "query": "r458-s2-db-tail-latency-flash-sale",
+     "retrieval_timestamp": "2026-09-14T22:02:30.356554+00:00",
+     "raw_content": "Disconnection of mobile clients from server, in an unclear time and for an unknown duration, due to mobility of mobile clients, is the most important challenges for concurrency control in mobile database with client-server model. Applying pessimistic common classic methods of concurrency control (like 2pl) in mobile database leads to long duration blocking and increasing waiting time of transactions. Because of high rate of aborting transactions, optimistic methods aren`t appropriate in mobile database. In this article, OPCOT concurrency control algorithm is introduced based on optimistic concurrency control method. Reducing communications between mobile client and server, decreasing blocking rate and deadlock of transactions, and increasing concurrency degree are the most important motivation of using optimistic method as the basis method of OPCOT algorithm. To reduce abortion rate of transactions, in execution time of transactions` operators a timestamp is assigned to them. In other to checking commitment ordering property of scheduler, the assigned timestamp is used in server on time of commitment. In this article, serializability of OPCOT algorithm scheduler has been proved by using serializability graph. Results of evaluating simulation show that OPCOT algorithm decreases abortion rate and waiting time of transactions in compare to 2pl and optimistic algorithms.",
+     "content_hash": "eb85e8e510c3b11d90a6a039d9ec3c3ec71a9a322af40a5eb95aea5b6bd19b49",
+     "exact_span": "Disconnection of mobile clients from server, in an unclear time and for an unknown duration, due to mobility of mobile clients, is the most important challenges for concurrency control in mobile database with client-server model. Applying pessimistic common classic methods of concurrency control (like 2pl) in mobile database leads to long duration blocking and increasing waiting time of transactions. Because of high rate of aborting transactions, optimistic methods aren`t appropriate in mobile d",
+     "span_hash": "5bd84eeeb3612508ad951b8e483ac0a56ee386ae812516dff5a8ea68c1ff28a2",
+     "evidence_class": "SCIENTIFIC_ABSTRACT",
+     "proposition_binding": "candidate_mechanism_input",
+     "locator": "https://doi.org/10.48550/arxiv.1112.2155",
+     "epistemic_strength": "VERIFIED"
+    },
+    {
+     "record_id": "title:c0fe6becfe95402d",
+     "source": "core",
+     "source_identity_verified": true,
+     "query": "r458-s2-db-tail-latency-flash-sale",
+     "retrieval_timestamp": "2026-09-14T22:02:30.356566+00:00",
+     "raw_content": "Kebutuhan akan tersedianya data dan informasi melalui media digital pada saat\n\nini sangat tinggi. Hal ini tidak terlepas dari pesatnya perkembangan sistem teknologi\n\ninformasi di masa sekarang. Dalam sistem teknologi informasi terdapat berbagai data\n\ndan informasi yang seluruhnya tersimpan dalam suatu server basis data atau kerap\n\ndisebut dengan database server. Database server merupakan server yang memiliki\n\nfungsi vital dalam suatu sistem teknologi informasi. Seperti server pada umumnya\n\nsebuah database server tidak luput dari suatu gangguan yang sering saja terjadi, oleh\n\nkarenanya penting untuk menjaga ketersediaan dan stabilitas pada database server.\n\nUntuk menjaga ketersediaan dan stabilitas pada database server dapat dilakukan\n\nmelalui implementasi suatu Cluster database server.\n\nService database server yang mendukung untuk berjalan pada Cluster database\n\nsalah satunya adalah PostgreSQL. Dan untuk teknologi Cluster yang mendukung pada\n\nservice PostgreSQL salah satunya adalah Patroni. Penelitian pada Cluster Patroni ini\n\nakan menggunakan tiga buah virtual machine dengan spesifikasi 2 Core CPU, 4GB\n\nRAM & 20GB Disk Storage. Ketiga buah virtual machine tersebut akan terhubung\n\ndalam suatu internal network dan menjadi sebuah Cluster Patroni. Agar ketiga server\n\ntersebut dapat menjadi kesatuan Cluster Patroni, dibutuhkan untuk melakukan instalasi\n\nbeberapa software. Software tersebut diataranya PostgreSQL, etcd, HAProxy,\n\nKeepalived dan juga Patroni. Dalam memastikan Cluster Patroni berjalan dengan\n\nsesuai, dibutuhkan beberapa skenario pengujian yang butuh dilakukan. Skenario\n\npengujian ini akan dilakukan melalui dua metode, metode pertama melalui aplikasi web\n\nPOS yang berbasis web dan metode kedua melalui proses uji dump & restore database.\n\nUntuk melakukan pengujian tersebut terdapat satu buah virtual machine dengan\n\nspesifikasi 2 Core CPU, 2GB RAM & 10GB Disk Storage yang disebut sebagaiserver\n\naplikasi. Server aplikasi ini menggunakan beberapa service yang berjalandiantaranya\n\nadalah NGINX dan juga PHP. Baik server yang berada dalam Cluster Patroni maupun\n\nserver aplikasi menggunakan Sistem Operasi Fedora 39.\n\nDari beberapa skenario pengujian yang telah dilakukan, sebuah Cluster Patroni\n\nmemiliki fitur yang handal berupa autofailover, fitur ini mendukung untuk terciptanya\n\nhigh availability dalam layanan database yang dikelola. Dengan terciptanya high",
+     "content_hash": "3449eb9eba7b5d63f70d2201630d29e2421337e5135160eed5937572c7f91179",
+     "exact_span": "Kebutuhan akan tersedianya data dan informasi melalui media digital pada saat\n\nini sangat tinggi. Hal ini tidak terlepas dari pesatnya perkembangan sistem teknologi\n\ninformasi di masa sekarang. Dalam sistem teknologi informasi terdapat berbagai data\n\ndan informasi yang seluruhnya tersimpan dalam suatu server basis data atau kerap\n\ndisebut dengan database server. Database server merupakan server yang memiliki\n\nfungsi vital dalam suatu sistem teknologi informasi. Seperti server pada umumnya\n\nsebua",
+     "span_hash": "961fa07dd7f322c9f93788b54ff8ed916445c3ae439aebf8e496f1286df2b7c6",
+     "evidence_class": "SCIENTIFIC_ABSTRACT",
+     "proposition_binding": "candidate_mechanism_input",
+     "locator": "",
+     "epistemic_strength": "VERIFIED"
+    },
+    {
+     "record_id": "title:e33248b61a467609",
+     "source": "core",
+     "source_identity_verified": true,
+     "query": "r458-s2-db-tail-latency-flash-sale",
+     "retrieval_timestamp": "2026-09-14T22:02:30.356574+00:00",
+     "raw_content": "This is a set of functions to expand a PostgreSQL database via functions which analyze and manipulate graphs.  The functions are internal, written in c.  The import/export functions (using GraphML) are written in Java",
+     "content_hash": "be7663425ab43b9710346966c61c583a7e1022f9f0836d756d53c9ef485e6681",
+     "exact_span": "This is a set of functions to expand a PostgreSQL database via functions which analyze and manipulate graphs.  The functions are internal, written in c.  The import/export functions (using GraphML) are written in Java",
+     "span_hash": "be7663425ab43b9710346966c61c583a7e1022f9f0836d756d53c9ef485e6681",
+     "evidence_class": "SCIENTIFIC_ABSTRACT",
+     "proposition_binding": "candidate_mechanism_input",
+     "locator": "",
+     "epistemic_strength": "VERIFIED"
+    },
+    {
+     "record_id": "doi:10.18420/btw2019-ws-24",
+     "source": "core",
+     "source_identity_verified": true,
+     "query": "r458-s2-db-tail-latency-flash-sale",
+     "retrieval_timestamp": "2026-09-14T22:02:30.356582+00:00",
+     "raw_content": "Plan forcing is the most capable plan hinting that a database system can implement. It allows the specification of almost every aspect of an execution plan. The open source database system PostgreSQL does not implement any plan hints by default. We will show how an extension can be used to provide plan forcing for PostgreSQL. This extension allows to use the query executor directly and independently of SQL. We sketch some of the interesting use case scenarios for plan forcing in PostgreSQL",
+     "content_hash": "b2a63d654085b4b8efb076525e9936dcb614430734d4c1ea91275da6fc592c9b",
+     "exact_span": "Plan forcing is the most capable plan hinting that a database system can implement. It allows the specification of almost every aspect of an execution plan. The open source database system PostgreSQL does not implement any plan hints by default. We will show how an extension can be used to provide plan forcing for PostgreSQL. This extension allows to use the query executor directly and independently of SQL. We sketch some of the interesting use case scenarios for plan forcing in PostgreSQL",
+     "span_hash": "b2a63d654085b4b8efb076525e9936dcb614430734d4c1ea91275da6fc592c9b",
+     "evidence_class": "SCIENTIFIC_ABSTRACT",
+     "proposition_binding": "candidate_mechanism_input",
+     "locator": "https://doi.org/10.18420/btw2019-ws-24",
+     "epistemic_strength": "VERIFIED"
+    }
+   ],
+   "hash_verification_all_pass": true,
+   "snapshot_hash": "24f02dbc71b46914f5498417d782e20da8b2804a42b07aea5c90da78c96b6713"
+  }
+ },
+ "stage_log": [
+  {
+   "stage": "RETRIEVE",
+   "capability_id": "A2_RETRIEVAL",
+   "module_path": "discovery_fabric/retrieval_fabric/pipeline.py",
+   "function": "retrieve_fabric(problem) [V2] / retrieve(problem) [V1]",
+   "started_at": "2026-09-14T21:57:15+00:00Z",
+   "before_envelope_hash": "d12327dc19855c4cf402eda12b0be104db6a66af9b2acf2c6767a3f9aeed4880",
+   "status": "OK",
+   "finished_at": "2026-09-14T22:02:30+00:00Z",
+   "after_envelope_hash": "16f59cf3c1ed699fccfae40639d3f4377236224e48fe0810f24a767e628af55c",
+   "candidate_delta": [
+    "evidence",
+    "evidence_ids",
+    "provenance"
+   ],
+   "delta_real": true,
+   "result_meta": {
+    "retrieved_count": 12,
+    "retrieval_fabric_version": "V2"
+   },
+   "entry": {
+    "entry_helper_version": "stage_entry/1.1.0",
+    "stage": "RETRIEVE",
+    "entry_status": "ALLOWED",
+    "prerequisite": "UPSTREAM_COMPLETE",
+    "prerequisite_evidence": {
+     "failed_stages": [],
+     "skipped_stages": []
+    }
+   }
+  },
+  {
+   "stage": "FREEZE",
+   "capability_id": "EVIDENCE_FREEZE",
+   "module_path": "orchestrator/evidence_custody.py",
+   "function": "promote_to_evidence(record, source, query, class, binding)",
+   "started_at": "2026-09-14T22:02:30+00:00Z",
+   "before_envelope_hash": "16f59cf3c1ed699fccfae40639d3f4377236224e48fe0810f24a767e628af55c",
+   "status": "OK",
+   "finished_at": "2026-09-14T22:02:30+00:00Z",
+   "after_envelope_hash": "99dce1741a31574e473d987964a3607b622dd84d087e08af676e910a4b20533a",
+   "candidate_delta": [
+    "provenance"
+   ],
+   "delta_real": true,
+   "result_meta": {
+    "custody_records": 6,
+    "hash_ok": true
+   },
+   "entry": {
+    "entry_helper_version": "stage_entry/1.1.0",
+    "stage": "FREEZE",
+    "entry_status": "ALLOWED",
+    "prerequisite": "UPSTREAM_COMPLETE",
+    "prerequisite_evidence": {
+     "failed_stages": [],
+     "skipped_stages": []
+    }
+   }
+  }
+ ]
+}

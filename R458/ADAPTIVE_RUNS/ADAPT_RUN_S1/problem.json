@@ -1,0 +1,20 @@
+{
+ "problem_id": "r458-s1-ranking-model-distribution-shift",
+ "device": "search ranking model",
+ "failure_mode": "model decay after interface redesign",
+ "objective": "recover at least 3.5 points of the 4-percent revenue-per-search gap within one quarter",
+ "failure": "Documented problem 'model decay after interface redesign' concerning search ranking model. User-submitted engineering problem (session input): \"A marketplace's search ranking model, trained on 18 months of interaction logs, decays measurably after a redesign moves the buy button above the fold on mobile: offline replay shows a 6-percent drop in normalized discounted cumulative gain against held-out post-launch traffic, click-through on rank\".  ROUTING: doe_osti: routing state SUSPENDED_RELEVANCE — measured relevance instability (R375: same fusion papers relevant 3 -> 0; pooled relevant-rate 0.175 pre-fix; DETERMINISM_GAP flagged in the R394 production audit) — records poison synthesis-feeding retrieval more than they feed it until relevance is semantically adjudicated; reinstatement: the Phase P1 semantic reranker lands (semantic relevance adjudication between query and record, replacing lexical overlap); flip to ACTIVE + a measured relevance re-run + worklog entry. [europepmc] 10 records retrieved live (2025-2026). Illustrative records: 'Explainable machine learning for breast cancer prediction in resource-constrained settings: A multi-algorithmic framework integrating shap-based transparency with clinical decision support.'; 'Explainable ensemble learning using SHAP for ERP anomaly detection.'. LIMITS STAMPED INLINE: literature context establishes the problem class, not event rates. [arxiv] retrieval status TIMEOUT (TimeoutError) — provider outcome recorded, not treated as absence (Art. XXI.3). [doe_osti] retrieval status NOT_QUERIED_SUSPENDED_RELEVANCE (engine routing decision (R399 W3): SUSPENDED_RELEVANCE — not a provider failure and not absence) — provider outcome recorded, not treated as absence (Art. XXI.3). Problem-existence basis: live records retrieved.",
+ "constraint": "must maintain 45-millisecond serving deadline and use existing labeling pipeline",
+ "sources": {
+  "europepmc": "OK",
+  "arxiv": "TIMEOUT",
+  "doe_osti": "NOT_QUERIED_SUSPENDED_RELEVANCE"
+ },
+ "origin": "toscanini_ui",
+ "user_text": "A marketplace's search ranking model, trained on 18 months of interaction logs, decays measurably after a redesign moves the buy button above the fold on mobile: offline replay shows a 6-percent drop in normalized discounted cumulative gain against held-out post-launch traffic, click-through on ranked position 3 falls 11 percent, and revenue-per-search is down 4 percent over five weeks while the site's overall traffic is flat. The model is a gradient-boosted ranking model over 240 features with a 45-millisecond serving deadline including feature fetches, and the label pipeline (delayed conversion labels arriving 1 to 9 days after click) cannot be rebuilt this quarter. The team cannot launch a full retraining pipeline redesign (one release per quarter, already committed), cannot increase serving latency beyond 45 milliseconds (the page-speed budget is contractual), cannot buy new labeling beyond the current budget, and must recover at least 3.5 points of the 4-percent revenue-per-search gap within one quarter on the existing serving stack.",
+ "r458_benchmark": {
+  "class": "FROZEN_BENCHMARK_DEV",
+  "arm": "adaptive",
+  "corpus_freeze": "R458/BENCHMARK_FREEZE.json"
+ }
+}

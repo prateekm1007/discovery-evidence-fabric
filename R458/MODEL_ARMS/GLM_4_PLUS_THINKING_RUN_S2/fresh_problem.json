@@ -1,0 +1,20 @@
+{
+ "problem_id": "r458-s2-db-tail-latency-flash-sale",
+ "device": "sharded PostgreSQL database cluster",
+ "failure_mode": "connection pool exhaustion due to lock waits",
+ "objective": "hold p99.9 read latency at or below 120 milliseconds",
+ "failure": "Documented problem 'connection pool exhaustion due to lock waits' concerning sharded PostgreSQL database cluster. User-submitted engineering problem (session input): \"An e-commerce platform's order database, a sharded PostgreSQL cluster with 3 replicas per shard, shows p99.9 read latency collapsing from 40 to 900 milliseconds for 3 to 7 minutes during flash sales: checkout error rates hit 2 percent at peak as the 250-millisecond client timeout fires, and the post\".  ROUTING: cpsc_recalls: not queried \u2014 the failure query is free text and this source answers date-floor questions only (grammar: YYYY-MM-DD date window (RecallDateStart)). [cpsc_recalls] retrieval status NOT_QUERIED_GRAMMAR (planned query is free text; source grammar is a YYYY-MM-DD date floor (R443 routing decision, not absence)) \u2014 provider outcome recorded, not treated as absence (Art. XXI.3). [arxiv] 5 records retrieved live (2011-2024). Illustrative records: 'On the solution existence and stability of polynomial optimization problems'; 'A Concurrency Control Method Based on Commitment Ordering in Mobile Databases'. LIMITS STAMPED INLINE: literature context establishes the problem class, not event rates. Problem-existence basis: live records retrieved.",
+ "constraint": "cannot change schema or add cache invalidation complexity, cannot increase replication factor, cannot raise client timeout above 250 milliseconds",
+ "sources": {
+  "cpsc_recalls": "NOT_QUERIED_GRAMMAR",
+  "arxiv": "OK"
+ },
+ "origin": "toscanini_ui",
+ "user_text": "An e-commerce platform's order database, a sharded PostgreSQL cluster with 3 replicas per shard, shows p99.9 read latency collapsing from 40 to 900 milliseconds for 3 to 7 minutes during flash sales: checkout error rates hit 2 percent at peak as the 250-millisecond client timeout fires, and the postmortems show lock waits on the inventory row for the featured item cascading through connection pools until the pool exhausts and unrelated queries queue behind it. The featured-item pages drive 40 percent of sale-window traffic to one shard. The platform cannot change the schema or add cache invalidation complexity this quarter (the migration freeze before the holiday code freeze), cannot increase the replication factor (storage budget), cannot raise the client timeout above 250 milliseconds (the mobile team's page budget), and must hold p99.9 at or below 120 milliseconds during flash-sale peaks with the existing cluster.",
+ "r458_benchmark": {
+  "class": "FROZEN_BENCHMARK_DEV",
+  "arm": "glm-4-plus-thinking",
+  "content_sha256": "00101ffc9c6d6069519eacfd13feb0fece1646a8828903845e3a1134c11439fd",
+  "corpus_freeze": "R458/BENCHMARK_FREEZE.json"
+ }
+}

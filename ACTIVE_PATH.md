@@ -763,3 +763,27 @@ mobile sheet sibling switcher restored; 3D touch shield.
 
 Round record: `R459/R459_ROUND_RECORD.json` (Art. LXXI tuple GREEN at
 8827e2a).
+
+## R458-C1 addendum (2026-09-15) — the model capability + adaptive discovery round
+
+Operator directive R458-C1: freeze a discovery benchmark with a blind
+holdout; benchmark MODELS, not providers; measure the actual science;
+test FIXED vs ADAPTIVE; make provider failures invisible to the
+scientific state; prove causal learning. No new pipeline stages — the
+16-stage conductor, the gates, and the epistemic chain are unchanged.
+
+| Component | Module / artifact | Notes |
+|---|---|---|
+| THE frozen benchmark | `scripts/r458_benchmark.py` + `R458/BENCHMARK_{CORPUS,FREEZE}.json` | 14 authored problems, 7 domain families x 2 (Art. XLIX exceeded); DEV(7)/HOLDOUT(7) split sealed at authoring; the holdout is mechanically refused outside the blind phase and the blind phase refuses to run before the dev record exists (BS-016 ordering enforced); freeze fails closed on pre-existing results |
+| THE frozen instrument | `scripts/r458_quality_instrument.py` + `R458/QUALITY_INSTRUMENT_FREEZE.json` | the 13 directive metrics + wall clock, deterministic over each run's OWN artifacts; apply refuses instrument drift (Art. LIX); one Art. XXXI correction recorded IN the freeze (the problem.json schema lesson, re-frozen before any result existed) |
+| Model capability benchmark | `scripts/r458_model_capability_benchmark.py` → `R458_C1_MODEL_CAPABILITY_BENCHMARK.json` | arms measured LIVE through the real engine: glm-4-plus + glm-4-plus-thinking (the sandbox grant's served model, ENVIRONMENT_GRANT, the operator UNRESTRICTED escape hatch with every paid key structurally stripped) + qwen3-1.7b (the honest capability-floor finding: the R455 §2 gate blocks the CHEAP-only rung BY DESIGN — zero spend, typed RUN_BLOCKED_CAPABILITY); the router quartet/NVIDIA/HF-router TYPED unavailable with the Art. LXV escalation (keys exist only as HF Space secrets); the model-purity invariant fails closed on cross-arm/paid lines; measured: composites 0.569/0.570/0.269; selected glm-4-plus-thinking; the BLIND holdout then ran 7/7 on it: composite 0.687 — the model generalized ABOVE its dev performance, 2/7 EVOLVED_INVENTION_CANDIDATE |
+| The adaptive controller comparison | `scripts/r458_adaptive_benchmark.py` → `R458_C1_ADAPTIVE_PIPELINE_BENCHMARK.json` | FIXED (the capability runs re-measured) vs ADAPTIVE (the worker's own gate closure in-process); 112 real NBA decisions recorded; verdict ADAPTIVE_QUALITY_REGRESSION (honest: contradiction_detection 0.29→0.14, pool-variance class, disclosed) with LLM calls statistically indistinguishable (3.14→3.29) — the R446 offline estimate (-33%) does not reproduce on the live benchmark; the decision trace carries every §8 field |
+| THE decision trace | `R458_C1_NEXT_ACTION_DECISION_TRACE.json` | 112 controller decisions: ATTACK_CANDIDATE 48, PROPOSE_DECISIVE_EXPERIMENT 4, ENGINEERING_ESCALATION 2 (the rest scored no action — the conservative default RUN); every entry carries uncertainty + expected information gain + cost + latency + capability + risk + reason |
+| THE transport invisibility layer | `toscanini/conversational/transport_invisibility.py` | the ONE authority for §5: CASCADE_ADVANCED → "I continued using another verified reasoning route."; ALL_ROUTES_EXHAUSTED → "The requested test could not be completed."; the scrub guard names provider-ids/HTTP-codes/endpoints/failure-classes in product text as mechanical violations; wired into run_contract._blocking_reason + product_events RUN_BLOCKED emissions; the raw session error stays in the technical record (openable, never pushed); tests/test_r458.py 30/30 |
+| THE reality mutation proof | `scripts/r458_mutation_proof_problem.py` + `scripts/r458_reality_mutation_proof.py` → `R458_C1_REALITY_MUTATION_PROOF.json` | §6 PROVEN on a REAL engine-run candidate (the §6 fixture authored with the full Poiseuille variable set BY DESIGN — the R452 case-B precedent, disclosed; NOT corpus, never a comparison surface): predicted 10.6029 mL/min vs required 40 → FALSIFIED_CONSTRAINT → causal update → INVERSE_POISEUILLE_DIAMETER 1.2→1.672402 mm → successor :mut1 → re-evaluation CHILD_SUPPORTS (40.00003 mL/min); the successor MEASURABLY differs (+39.37%) BECAUSE of the observed deficit; the flip regression holds (doubling the deficit moves the mutation to 1.9888 mm); loop_verification_state SYNTHETIC_LOOP_VERIFIED — the reality boundary was NOT crossed (reality_loop_proven=FALSE in the round record, honest) |
+
+Round record: `R458_C1_ROUND_RECORD.json` (flags: transport_proven,
+model_quality_proven, adaptive_routing_proven, causal_learning_proven
+= TRUE; reality_loop_proven = FALSE — computation is never external
+reality; world_class_claim_supported = FALSE — Art. LVIII, every
+review is AI_REVIEW).

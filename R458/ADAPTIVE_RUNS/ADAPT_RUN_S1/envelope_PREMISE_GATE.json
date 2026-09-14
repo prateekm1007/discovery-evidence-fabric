@@ -1,0 +1,1063 @@
+{
+ "candidate_id": "",
+ "problem_id": "r458-s1-ranking-model-distribution-shift",
+ "problem": {
+  "problem_id": "r458-s1-ranking-model-distribution-shift",
+  "device": "search ranking model",
+  "failure_mode": "model decay after interface redesign",
+  "objective": "recover at least 3.5 points of the 4-percent revenue-per-search gap within one quarter",
+  "failure": "Documented problem 'model decay after interface redesign' concerning search ranking model. User-submitted engineering problem (session input): \"A marketplace's search ranking model, trained on 18 months of interaction logs, decays measurably after a redesign moves the buy button above the fold on mobile: offline replay shows a 6-percent drop in normalized discounted cumulative gain against held-out post-launch traffic, click-through on rank\".  ROUTING: doe_osti: routing state SUSPENDED_RELEVANCE — measured relevance instability (R375: same fusion papers relevant 3 -> 0; pooled relevant-rate 0.175 pre-fix; DETERMINISM_GAP flagged in the R394 production audit) — records poison synthesis-feeding retrieval more than they feed it until relevance is semantically adjudicated; reinstatement: the Phase P1 semantic reranker lands (semantic relevance adjudication between query and record, replacing lexical overlap); flip to ACTIVE + a measured relevance re-run + worklog entry. [europepmc] 10 records retrieved live (2025-2026). Illustrative records: 'Explainable machine learning for breast cancer prediction in resource-constrained settings: A multi-algorithmic framework integrating shap-based transparency with clinical decision support.'; 'Explainable ensemble learning using SHAP for ERP anomaly detection.'. LIMITS STAMPED INLINE: literature context establishes the problem class, not event rates. [arxiv] retrieval status TIMEOUT (TimeoutError) — provider outcome recorded, not treated as absence (Art. XXI.3). [doe_osti] retrieval status NOT_QUERIED_SUSPENDED_RELEVANCE (engine routing decision (R399 W3): SUSPENDED_RELEVANCE — not a provider failure and not absence) — provider outcome recorded, not treated as absence (Art. XXI.3). Problem-existence basis: live records retrieved.",
+  "constraint": "must maintain 45-millisecond serving deadline and use existing labeling pipeline",
+  "sources": {
+   "europepmc": "OK",
+   "arxiv": "TIMEOUT",
+   "doe_osti": "NOT_QUERIED_SUSPENDED_RELEVANCE"
+  },
+  "origin": "toscanini_ui",
+  "user_text": "A marketplace's search ranking model, trained on 18 months of interaction logs, decays measurably after a redesign moves the buy button above the fold on mobile: offline replay shows a 6-percent drop in normalized discounted cumulative gain against held-out post-launch traffic, click-through on ranked position 3 falls 11 percent, and revenue-per-search is down 4 percent over five weeks while the site's overall traffic is flat. The model is a gradient-boosted ranking model over 240 features with a 45-millisecond serving deadline including feature fetches, and the label pipeline (delayed conversion labels arriving 1 to 9 days after click) cannot be rebuilt this quarter. The team cannot launch a full retraining pipeline redesign (one release per quarter, already committed), cannot increase serving latency beyond 45 milliseconds (the page-speed budget is contractual), cannot buy new labeling beyond the current budget, and must recover at least 3.5 points of the 4-percent revenue-per-search gap within one quarter on the existing serving stack.",
+  "r458_benchmark": {
+   "class": "FROZEN_BENCHMARK_DEV",
+   "arm": "adaptive",
+   "corpus_freeze": "R458/BENCHMARK_FREEZE.json"
+  }
+ },
+ "evidence_ids": [
+  "doi:10.3390/biomimetics11070516",
+  "doi:10.1038/s41598-026-56933-4",
+  "doi:10.70729/j2013213",
+  "doi:10.20948/graphicon-2021-3027-1131-1138",
+  "doi:10.3390/s26134247",
+  "doi:10.1039/d4sc02233e",
+  "doi:10.18130/v3tg0k",
+  "doi:10.22215/etd/2013-09971",
+  "doi:10.30707/etd2017.mcfaul.h",
+  "doi:10.2139/ssrn.4892616",
+  "title:79b7e00e0977ce94",
+  "doi:10.1142/14835",
+  "title:d2b3902accae0d69",
+  "title:e5e039305af54970"
+ ],
+ "evidence": [
+  {
+   "id": "doi:10.3390/biomimetics11070516",
+   "source_type": "scientific_paper",
+   "source": "europepmc",
+   "source_id": "europepmc:europepmc:42505549",
+   "source_uri": "https://doi.org/10.3390/biomimetics11070516",
+   "title": "Evolutionary, Neural, or LLM-Driven Heuristic Generation? A Unified Ant Colony Optimization Benchmark for Nature-Inspired Routing Heuristics on the TSP and CVRP.",
+   "abstract": "Biomimetic optimization transfers biological information-processing mechanisms into computational systems. Ant colony optimization (ACO) is a canonical example: artificial ants functionally abstract pheromone-mediated stigmergy, decentralized exploration, trail decay through algorithmic evaporation, and adaptive path reinforcement. Building on this functional biological analogue, we present a controlled cross-paradigm evaluation of routing-heuristic generation. A standardized interface embeds human-designed rules, the genetic programming hyper-heuristic GHPP, a resource-constrained DeepACO-MLP proxy, and an offline ReEvo-style proxy into the same ACO solver. The methods are evaluated on held-out TSP and CVRP instances in terms of solution quality, reported generation or training cost, interpretability, and cross-scale behavior under a matched distribution. GHPP yields the shortest routes at all tested scales; the ReEvo-offline proxy and strong human-designed rules generally form a second tier, whereas the resource-constrained neural proxy degrades markedly as problem size increases. These results do not establish an intrinsic ranking of full-capability paradigms. Instead, they show that method selection depends on the operating constraint and on evidence provenance: longer locally measured offline search favors GHPP, while auditable explicit rules characterize the human and ReEvo-offline proxies. By holding the ant-inspired execution mechanism fixed and varying the source of heuristic information, the benchmark clarifies how evolutionary, neural, and LLM-style design strategies interact with a common biomimetic substrate.",
+   "doi": "10.3390/biomimetics11070516",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2026-07-22",
+   "retrieval_timestamp": "2026-09-14T21:46:59.437027+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "098d1b56c5e818199516077e4ac0d3cdd72c4c9a97ecc284338dc654b735b1c6",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "europepmc",
+    "indexing_sources": [
+     "europepmc"
+    ],
+    "record_ids_by_source": {
+     "europepmc": "europepmc:42505549"
+    },
+    "queries_by_source": {
+     "europepmc": "search ranking model model decay after interface redesign"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "biomedical_pubmed_line",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "biomedical_pubmed_line",
+   "canonical_id": "doi:10.3390/biomimetics11070516",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "search ranking model model decay after interface redesign",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstract-level evidence: full text may contain methods and constraints not present in the abstract",
+    "Publication existence is not clinical evidence of safety or effectiveness",
+    "Citation counts are bibliometric signals, not validity measures"
+   ]
+  },
+  {
+   "id": "doi:10.1038/s41598-026-56933-4",
+   "source_type": "scientific_paper",
+   "source": "europepmc",
+   "source_id": "europepmc:europepmc:42277162",
+   "source_uri": "https://doi.org/10.1038/s41598-026-56933-4",
+   "title": "Intelligent english education resource recommendation via LLM-knowledge graph integration and ecological niche fitness modeling.",
+   "abstract": "Teaching English to large and varied student populations has made adaptive, learner-aware resource recommendation a pressing need, yet most deployed systems still lean on collaborative filtering or content heuristics that read learners only at the surface. Such systems tend to stumble in four recurring ways: they miss the finer grain of linguistic competence, they reason over sparse and brittle knowledge associations, they falter whenever a learner or a resource is new, and they rarely travel well to settings their training never saw. We address these problems together through a framework in which a large language model and a knowledge graph inform one another, their match to each learner mediated by a fitness function adapted from ecological niche theory. The language model reads a learner's own writing to estimate evolving competence and proposes relations that fill thin regions of the graph, while the graph keeps the model's inferences anchored to the prerequisite and difficulty structure of English. A niche fitness score then judges how closely each resource's demands meet a learner's needs, and a path generator orders the survivors into prerequisite-respecting study sequences. On logs from 3,214 learners, 12,486 resources, and 287,653 interactions, the method reaches a Precision@5 of 0.782 and an NDCG@10 of 0.724, ahead of five baselines. Ablation was, frankly, the part that surprised us: the niche filter matters more to ranking quality than the model's semantic re-scoring. A three-axis generalization protocol, splitting transfer across learners, resource types, and difficulty levels, yields a composite index of 0.863, with cold-start decay held to 18.3%.",
+   "doi": "10.1038/s41598-026-56933-4",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2026-06-11",
+   "retrieval_timestamp": "2026-09-14T21:46:59.437111+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "8b85382c76ae0e2c875323bf306668b56226822d66a824622bb59840865c9e8f",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "europepmc",
+    "indexing_sources": [
+     "europepmc"
+    ],
+    "record_ids_by_source": {
+     "europepmc": "europepmc:42277162"
+    },
+    "queries_by_source": {
+     "europepmc": "search ranking model model decay after experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "biomedical_pubmed_line",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "biomedical_pubmed_line",
+   "canonical_id": "doi:10.1038/s41598-026-56933-4",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "search ranking model model decay after experimental comparison",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstract-level evidence: full text may contain methods and constraints not present in the abstract",
+    "Publication existence is not clinical evidence of safety or effectiveness",
+    "Citation counts are bibliometric signals, not validity measures"
+   ]
+  },
+  {
+   "id": "doi:10.70729/j2013213",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.70729/j2013213",
+   "source_uri": "https://doi.org/10.70729/j2013213",
+   "title": "A Global Fusion Re-Ranking for Effective Data Search with Correlation Model",
+   "abstract": "",
+   "doi": "10.70729/j2013213",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2014",
+   "retrieval_timestamp": "2026-09-14T21:46:59.437140+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "c1de9fd16750725e26eac78e7a6d2b0a4e9d928b7eec9f59e6e7126db94ce809",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.70729/j2013213"
+    },
+    "queries_by_source": {
+     "crossref": "search ranking model model decay after interface redesign"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=journal-article"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.70729/j2013213",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "search ranking model model decay after interface redesign",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  {
+   "id": "doi:10.20948/graphicon-2021-3027-1131-1138",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.20948/graphicon-2021-3027-1131-1138",
+   "source_uri": "https://doi.org/10.20948/graphicon-2021-3027-1131-1138",
+   "title": "A Mathematical Model for Ranking High-Level User Interface Regression Tests",
+   "abstract": "",
+   "doi": "10.20948/graphicon-2021-3027-1131-1138",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2021",
+   "retrieval_timestamp": "2026-09-14T21:46:59.437163+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "eb560c1860c4754606905bdfe534c0eedd439132d1834d3a3b8bd5c07f8bc854",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.20948/graphicon-2021-3027-1131-1138"
+    },
+    "queries_by_source": {
+     "crossref": "search ranking model model decay after interface redesign"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=proceedings-article"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "CONFERENCE",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.20948/graphicon-2021-3027-1131-1138",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "search ranking model model decay after interface redesign",
+   "source_rank": 3,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  {
+   "id": "doi:10.3390/s26134247",
+   "source_type": "scientific_paper",
+   "source": "europepmc",
+   "source_id": "europepmc:europepmc:42451488",
+   "source_uri": "https://doi.org/10.3390/s26134247",
+   "title": "AHGA-SA: A Novel Adaptive Hybrid Framework for Feature Selection in IoT-Oriented Intrusion Detection with Explainable AI.",
+   "abstract": "The increasing connectivity of Internet of Things (IoT)-oriented environments has made them more vulnerable to cyberattacks, requiring intrusion-detection systems (IDSs) to ensure their secure and reliable operation. The feature selection (FS) process of an IDS affects its performance, as effective FS can enhance detection accuracy and reduce the computational cost and model complexity. This paper presents Adaptive Hybrid Genetic Algorithm-Simulated Annealing (AHGA-SA) as an FS framework that integrates the global search ability of a genetic algorithm and the local exploitation ability of simulated annealing. AHGA-SA aims to find compact, informative feature subsets in high-dimensional intrusion-detection datasets at an acceptable computational cost while maintaining detection performance. The experimental results on three recent benchmarks demonstrate feature-space reduction, with classification accuracies of 99.04% on IoTID20 (using 12 features), 98.25% on WUSTL-EHMS (using seven features), and 99.18% on Edge-IIoTset (using nine features). The results also demonstrate reduced training and testing times, central processing unit usage, resident set size overhead, and subset size compared to the baseline. Furthermore, Shapley additive explanations, as an explainable artificial intelligence technique, are applied to explain the model's predictions and to show the contribution of the selected features to the IDS decision-making process.",
+   "doi": "10.3390/s26134247",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2026-07-04",
+   "retrieval_timestamp": "2026-09-14T21:46:59.437182+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "8e67ea9177517a94a6e2aef9629ab2e266821cc21795cd9ccfa5c8f642ebdf64",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "europepmc",
+    "indexing_sources": [
+     "europepmc"
+    ],
+    "record_ids_by_source": {
+     "europepmc": "europepmc:42451488"
+    },
+    "queries_by_source": {
+     "europepmc": "search ranking model model decay after experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "biomedical_pubmed_line",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "biomedical_pubmed_line",
+   "canonical_id": "doi:10.3390/s26134247",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "search ranking model model decay after experimental comparison",
+   "source_rank": 4,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstract-level evidence: full text may contain methods and constraints not present in the abstract",
+    "Publication existence is not clinical evidence of safety or effectiveness",
+    "Citation counts are bibliometric signals, not validity measures"
+   ]
+  },
+  {
+   "id": "doi:10.1039/d4sc02233e",
+   "source_type": "scientific_paper",
+   "source": "europepmc",
+   "source_id": "europepmc:europepmc:39568891",
+   "source_uri": "https://doi.org/10.1039/d4sc02233e",
+   "title": "ProBID-Net: a deep learning model for protein-protein binding interface design.",
+   "abstract": "Protein-protein interactions are pivotal in numerous biological processes. The computational design of these interactions facilitates the creation of novel binding proteins, crucial for advancing biopharmaceutical products. With the evolution of artificial intelligence (AI), protein design tools have swiftly transitioned from scoring-function-based to AI-based models. However, many AI models for protein design are constrained by assuming complete unfamiliarity with the amino acid sequence of the input protein, a feature most suited for de novo design but posing challenges in designing protein-protein interactions when the receptor sequence is known. To bridge this gap in computational protein design, we introduce ProBID-Net. Trained using natural protein-protein complex structures and protein domain-domain interface structures, ProBID-Net can discern features from known target protein structures to design specific binding proteins based on their binding sites. In independent tests, ProBID-Net achieved interface sequence recovery rates of 52.7%, 43.9%, and 37.6%, surpassing or being on par with ProteinMPNN in binding protein design. Validated using AlphaFold-Multimer, the sequences designed by ProBID-Net demonstrated a close correspondence between the design target and the predicted structure. Moreover, the model's output can predict changes in binding affinity upon mutations in protein complexes, even in scenarios where no data on such mutations were provided during training (zero-shot prediction). In summary, the ProBID-Net model is poised to significantly advance the design of protein-protein interactions.",
+   "doi": "10.1039/d4sc02233e",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2024-10-30",
+   "retrieval_timestamp": "2026-09-14T21:46:59.437202+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "17b9fa5f11b56fdeb2fc822594a6877081616adb916b23f4a44463ed18701cc8",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "europepmc",
+    "indexing_sources": [
+     "europepmc"
+    ],
+    "record_ids_by_source": {
+     "europepmc": "europepmc:39568891"
+    },
+    "queries_by_source": {
+     "europepmc": "search ranking model model decay after interface redesign"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "biomedical_pubmed_line",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "biomedical_pubmed_line",
+   "canonical_id": "doi:10.1039/d4sc02233e",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "search ranking model model decay after interface redesign",
+   "source_rank": 5,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstract-level evidence: full text may contain methods and constraints not present in the abstract",
+    "Publication existence is not clinical evidence of safety or effectiveness",
+    "Citation counts are bibliometric signals, not validity measures"
+   ]
+  },
+  {
+   "id": "doi:10.18130/v3tg0k",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.18130/v3tg0k",
+   "source_uri": "https://doi.org/10.18130/v3tg0k",
+   "title": "First Search for the Standard Model Higgs Boson Using the Semileptonic Decay Channel: H-WW----",
+   "abstract": "",
+   "doi": "10.18130/v3tg0k",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-14T21:46:59.437221+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "280d5ef547bef21d7f34fa212005eb196b5c22a678b510f46b65fa67af60064b",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.18130/v3tg0k"
+    },
+    "queries_by_source": {
+     "crossref": "search ranking model model decay after interface redesign"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.18130/v3tg0k",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "search ranking model model decay after interface redesign",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  {
+   "id": "doi:10.22215/etd/2013-09971",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.22215/etd/2013-09971",
+   "source_uri": "https://doi.org/10.22215/etd/2013-09971",
+   "title": "Search for the Standard Model Higgs boson in the vector boson fusion-mediated diphoton decay channel using multivariate analysis techniques",
+   "abstract": "",
+   "doi": "10.22215/etd/2013-09971",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-14T21:46:59.437250+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "9101abb03337a322961c21589ee14d5a1cae3e40b760aa479e2f1bff136870bd",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.22215/etd/2013-09971"
+    },
+    "queries_by_source": {
+     "crossref": "search ranking model model decay after interface redesign"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.22215/etd/2013-09971",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "search ranking model model decay after interface redesign",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  {
+   "id": "doi:10.30707/etd2017.mcfaul.h",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.30707/etd2017.mcfaul.h",
+   "source_uri": "https://doi.org/10.30707/etd2017.mcfaul.h",
+   "title": "The Redesign Of School Discipline: One Schoolâs Approach To Rethink And Redesign Discipline Practices Through The Restorative Justice Model",
+   "abstract": "",
+   "doi": "10.30707/etd2017.mcfaul.h",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-14T21:46:59.437269+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "0aedfc0c6cf5b9d4cf3bfd63f5d1d409a78d155ee43b8b3646ad260373c63140",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.30707/etd2017.mcfaul.h"
+    },
+    "queries_by_source": {
+     "crossref": "search ranking model model decay after interface redesign"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.30707/etd2017.mcfaul.h",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "search ranking model model decay after interface redesign",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  {
+   "id": "doi:10.2139/ssrn.4892616",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.2139/ssrn.4892616",
+   "source_uri": "https://doi.org/10.2139/ssrn.4892616",
+   "title": "A Ranking Model Framework for Multiple Vertical Search Domains",
+   "abstract": "",
+   "doi": "10.2139/ssrn.4892616",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2024",
+   "retrieval_timestamp": "2026-09-14T21:46:59.437294+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "950e4348f4861b9a1441def1ecde903d56c462478bf502822926dd3e77057188",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.2139/ssrn.4892616"
+    },
+    "queries_by_source": {
+     "crossref": "search ranking model model decay after interface redesign"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=posted-content"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.2139/ssrn.4892616",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "search ranking model model decay after interface redesign",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  {
+   "id": "title:79b7e00e0977ce94",
+   "source_type": "scientific_paper",
+   "source": "core",
+   "source_id": "core:core:4453851",
+   "source_uri": "",
+   "title": "Model family photo album : Happy anniversary : II. 3. 1948 / EM 1948",
+   "abstract": "Scrapbook photo album by Elisabeth Model, originally February 1948 with many later inclusions until about 1989.Digital imageThe artist Elisabeth Model, née Dittmann, the daughter of Therese Dittmann, was born in Bayreuth, Germany at the turn of the century. She studied in Munich, and moved to Amsterdam after her marriage to Max Model (1895-1950). They immigrated to the USA in c. 1938.Elisabeth Model Collection, AR 6306.Model Elisabeth, Memories, handwritten manuscript, 1981, ME 758.Alyne, Justin, and Alexa ModelDigitize",
+   "doi": null,
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-14T21:46:59.437319+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "e44467ad49b687f061ce10a9d8a9a9863d99826e798a6f6416bdc192a71de674",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "core",
+    "indexing_sources": [
+     "core"
+    ],
+    "record_ids_by_source": {
+     "core": "core:4453851"
+    },
+    "queries_by_source": {
+     "core": "search ranking model model decay after interface redesign"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "repository_aggregator_core",
+    "identity_basis": "TITLE_FINGERPRINT",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "repository_aggregator_core",
+   "canonical_id": "title:79b7e00e0977ce94",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "search ranking model model decay after interface redesign",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [
+    "Model, Elisabeth"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
+    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
+   ]
+  },
+  {
+   "id": "doi:10.1142/14835",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.1142/14835",
+   "source_uri": "https://doi.org/10.1142/14835",
+   "title": "The Search for Nucleon Decay",
+   "abstract": "",
+   "doi": "10.1142/14835",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2026",
+   "retrieval_timestamp": "2026-09-14T21:46:59.437341+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "b4b54167034881f908d3cd8e9bc0658c06a98f7843c7a30fb5ebc5cee58dd1af",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.1142/14835"
+    },
+    "queries_by_source": {
+     "crossref": "search ranking model model decay after interface redesign"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=monograph"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.1142/14835",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "search ranking model model decay after interface redesign",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  {
+   "id": "title:d2b3902accae0d69",
+   "source_type": "scientific_paper",
+   "source": "core",
+   "source_id": "core:core:163796928",
+   "source_uri": "",
+   "title": "Sub-series 2: Publications",
+   "abstract": "Bimonthly magazine discussing topics related to aviation and model airplane engines including collecting, restoring, maintaining, and identifying engines, along with advertising",
+   "doi": null,
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-14T21:46:59.437360+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "55d7018d372f585e94aaa6a131601a420fb1b59d623b67224b88688d518a3761",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "core",
+    "indexing_sources": [
+     "core"
+    ],
+    "record_ids_by_source": {
+     "core": "core:163796928"
+    },
+    "queries_by_source": {
+     "core": "search ranking model model decay after interface redesign"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "repository_aggregator_core",
+    "identity_basis": "TITLE_FINGERPRINT",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "repository_aggregator_core",
+   "canonical_id": "title:d2b3902accae0d69",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "search ranking model model decay after interface redesign",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [
+    "The Model Museum"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
+    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
+   ]
+  },
+  {
+   "id": "title:e5e039305af54970",
+   "source_type": "scientific_paper",
+   "source": "core",
+   "source_id": "core:core:89758015",
+   "source_uri": "",
+   "title": "Paris on Stage: 1889-1914 [exhibition]; Cabaret de L’Enfer Model",
+   "abstract": "Model of the facade of L'Enfer (Hell); Le Ciel (Heaven) is not shown, it was to the immediate left; A scale model, part of the Paris on Stage: 1889-1914 exhibition held June 19, 2013 to February 23, 2014. The cafe or cabaret L'Enfer (Hell) once stood at No. 54 Boulevard de Clichy, along with another called Le Ciel (Heaven), in the Pigalle neighborhood. Both cabarets were a result of a rising trend in Paris ca. 1885-1889 for themed establishments. At L'Enfer the waiters dressed as \"red imps\" and the doorman dressed as Satan or Mephisto. While the original bohemians stopped patronizing these in the 1890s, they continued to cater to tourists. Cabaret de l’Enfer remained open until 1952",
+   "doi": null,
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-14T21:46:59.437376+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "58c5789c8dac9335908f3538704a1a0c597faaf368271c040388e8f99f060933",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "core",
+    "indexing_sources": [
+     "core"
+    ],
+    "record_ids_by_source": {
+     "core": "core:89758015"
+    },
+    "queries_by_source": {
+     "core": "search ranking model model decay after interface redesign"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "repository_aggregator_core",
+    "identity_basis": "TITLE_FINGERPRINT",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "repository_aggregator_core",
+   "canonical_id": "title:e5e039305af54970",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "search ranking model model decay after interface redesign",
+   "source_rank": 3,
+   "fulltext_url": null,
+   "authors": [
+    "unknown (Canadian model maker)"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
+    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
+   ]
+  }
+ ],
+ "mechanism_ids": [],
+ "mechanism_map": {},
+ "premise_gate": {
+  "verdict": "PREMISE_COHERENT",
+  "explanation": "no definitional contradiction matched; the gate cannot prove physical truth — only rule-table incoherence is checkable (disclosed limit)",
+  "matched_rules": [],
+  "n_rules_checked": 4,
+  "gate_version": "premise_gate/1.0.0",
+  "limitations": [
+   "deterministic hard-rule table (definitional contradictions only): a physically false but non-contradictory premise passes this gate",
+   "no LLM opinion is a blocking authority (Art. XVIII)",
+   "gate blindness is recorded, never converted into a coherence claim (Art. XXV)"
+  ]
+ },
+ "evidence_classification": {},
+ "mechanism_space": {},
+ "prior_art_ids": [],
+ "prior_art": {},
+ "collision_results": {},
+ "physics": {},
+ "attack_results": {},
+ "contradictions": {},
+ "killer_experiment": {},
+ "adjudication": {},
+ "multi_source": {},
+ "cemetery_check": {},
+ "epistemic_state": {},
+ "next_best_action": {},
+ "ranking": {},
+ "provenance": {
+  "retrieval_fabric": {
+   "version": "V2",
+   "primary_query": "search ranking model model decay after interface redesign",
+   "query_variant_count": 5,
+   "sources_attempted": [
+    "arxiv",
+    "core",
+    "crossref",
+    "datacite",
+    "doaj",
+    "europepmc",
+    "google_patents",
+    "openaire",
+    "openalex",
+    "semantic_scholar",
+    "unpaywall"
+   ],
+   "sources_succeeded": [
+    "core",
+    "crossref",
+    "datacite",
+    "doaj",
+    "europepmc",
+    "openaire",
+    "semantic_scholar",
+    "unpaywall"
+   ],
+   "sources_failed": [
+    "arxiv",
+    "google_patents"
+   ],
+   "sources_rate_limited": [
+    "openalex",
+    "semantic_scholar"
+   ],
+   "unique_source_families": [
+    "biomedical_pubmed_line",
+    "doi_registrant_crossref",
+    "repository_aggregator_core",
+    "scholarly_graph_s2"
+   ],
+   "independent_source_families": 4,
+   "source_independence_score": 1.0,
+   "retrieval_blind_spots": [
+    "PATENT_BLIND_SPOT: zero patent records — patent prior-art coverage is a discovery-system defect when the mechanism domain is patent-dense",
+    "LOW_FAMILY_COVERAGE: only 4 source families contributed records (directive acceptance bar: >= 6 materially different open/free families queried successfully)"
+   ],
+   "canonical_record_count": 44,
+   "evidence_fabric": {
+    "state": "CHANNEL_ERROR",
+    "reason": "NameError: name '_title_of' is not defined",
+    "note": "the evidence-fabric channel failed; the V2 fabric pool is unchanged — an infrastructure state, never a scientific result (Art. LXI)"
+   }
+  },
+  "evidence_freeze": {
+   "run_id": "r458ad-S1: adaptive benchmark",
+   "problem_id": "r458-s1-ranking-model-distribution-shift",
+   "frozen_at": "2026-09-14T21:48:41+00:00Z",
+   "evidence_count": 14,
+   "custody_records": [
+    {
+     "record_id": "doi:10.3390/biomimetics11070516",
+     "source": "europepmc",
+     "source_identity_verified": true,
+     "query": "r458-s1-ranking-model-distribution-shift",
+     "retrieval_timestamp": "2026-09-14T21:48:41.871770+00:00",
+     "raw_content": "Biomimetic optimization transfers biological information-processing mechanisms into computational systems. Ant colony optimization (ACO) is a canonical example: artificial ants functionally abstract pheromone-mediated stigmergy, decentralized exploration, trail decay through algorithmic evaporation, and adaptive path reinforcement. Building on this functional biological analogue, we present a controlled cross-paradigm evaluation of routing-heuristic generation. A standardized interface embeds human-designed rules, the genetic programming hyper-heuristic GHPP, a resource-constrained DeepACO-MLP proxy, and an offline ReEvo-style proxy into the same ACO solver. The methods are evaluated on held-out TSP and CVRP instances in terms of solution quality, reported generation or training cost, interpretability, and cross-scale behavior under a matched distribution. GHPP yields the shortest routes at all tested scales; the ReEvo-offline proxy and strong human-designed rules generally form a second tier, whereas the resource-constrained neural proxy degrades markedly as problem size increases. These results do not establish an intrinsic ranking of full-capability paradigms. Instead, they show that method selection depends on the operating constraint and on evidence provenance: longer locally measured offline search favors GHPP, while auditable explicit rules characterize the human and ReEvo-offline proxies. By holding the ant-inspired execution mechanism fixed and varying the source of heuristic information, the benchmark clarifies how evolutionary, neural, and LLM-style design strategies interact with a common biomimetic substrate.",
+     "content_hash": "9b64cccb44a5a36312ffb870135a548e2e260a4e41b436e187a4cafec646a1e7",
+     "exact_span": "Biomimetic optimization transfers biological information-processing mechanisms into computational systems. Ant colony optimization (ACO) is a canonical example: artificial ants functionally abstract pheromone-mediated stigmergy, decentralized exploration, trail decay through algorithmic evaporation, and adaptive path reinforcement. Building on this functional biological analogue, we present a controlled cross-paradigm evaluation of routing-heuristic generation. A standardized interface embeds hu",
+     "span_hash": "4c692a9ec6c5d0a147ae5429986821e90220b7c35405770284d5da80b32787d7",
+     "evidence_class": "SCIENTIFIC_ABSTRACT",
+     "proposition_binding": "candidate_mechanism_input",
+     "locator": "https://doi.org/10.3390/biomimetics11070516",
+     "epistemic_strength": "VERIFIED"
+    },
+    {
+     "record_id": "doi:10.1038/s41598-026-56933-4",
+     "source": "europepmc",
+     "source_identity_verified": true,
+     "query": "r458-s1-ranking-model-distribution-shift",
+     "retrieval_timestamp": "2026-09-14T21:48:41.871794+00:00",
+     "raw_content": "Teaching English to large and varied student populations has made adaptive, learner-aware resource recommendation a pressing need, yet most deployed systems still lean on collaborative filtering or content heuristics that read learners only at the surface. Such systems tend to stumble in four recurring ways: they miss the finer grain of linguistic competence, they reason over sparse and brittle knowledge associations, they falter whenever a learner or a resource is new, and they rarely travel well to settings their training never saw. We address these problems together through a framework in which a large language model and a knowledge graph inform one another, their match to each learner mediated by a fitness function adapted from ecological niche theory. The language model reads a learner's own writing to estimate evolving competence and proposes relations that fill thin regions of the graph, while the graph keeps the model's inferences anchored to the prerequisite and difficulty structure of English. A niche fitness score then judges how closely each resource's demands meet a learner's needs, and a path generator orders the survivors into prerequisite-respecting study sequences. On logs from 3,214 learners, 12,486 resources, and 287,653 interactions, the method reaches a Precision@5 of 0.782 and an NDCG@10 of 0.724, ahead of five baselines. Ablation was, frankly, the part that surprised us: the niche filter matters more to ranking quality than the model's semantic re-scoring. A three-axis generalization protocol, splitting transfer across learners, resource types, and difficulty levels, yields a composite index of 0.863, with cold-start decay held to 18.3%.",
+     "content_hash": "552db4100b22d0a4c04c8e3170f018311fa29699442b721a1d33620a7fc753b3",
+     "exact_span": "Teaching English to large and varied student populations has made adaptive, learner-aware resource recommendation a pressing need, yet most deployed systems still lean on collaborative filtering or content heuristics that read learners only at the surface. Such systems tend to stumble in four recurring ways: they miss the finer grain of linguistic competence, they reason over sparse and brittle knowledge associations, they falter whenever a learner or a resource is new, and they rarely travel we",
+     "span_hash": "191d7d033afbdc83db5a59642c8ff1544791f37fcb3dad4158601be61f96b8ee",
+     "evidence_class": "SCIENTIFIC_ABSTRACT",
+     "proposition_binding": "candidate_mechanism_input",
+     "locator": "https://doi.org/10.1038/s41598-026-56933-4",
+     "epistemic_strength": "VERIFIED"
+    },
+    {
+     "record_id": "doi:10.3390/s26134247",
+     "source": "europepmc",
+     "source_identity_verified": true,
+     "query": "r458-s1-ranking-model-distribution-shift",
+     "retrieval_timestamp": "2026-09-14T21:48:41.871806+00:00",
+     "raw_content": "The increasing connectivity of Internet of Things (IoT)-oriented environments has made them more vulnerable to cyberattacks, requiring intrusion-detection systems (IDSs) to ensure their secure and reliable operation. The feature selection (FS) process of an IDS affects its performance, as effective FS can enhance detection accuracy and reduce the computational cost and model complexity. This paper presents Adaptive Hybrid Genetic Algorithm-Simulated Annealing (AHGA-SA) as an FS framework that integrates the global search ability of a genetic algorithm and the local exploitation ability of simulated annealing. AHGA-SA aims to find compact, informative feature subsets in high-dimensional intrusion-detection datasets at an acceptable computational cost while maintaining detection performance. The experimental results on three recent benchmarks demonstrate feature-space reduction, with classification accuracies of 99.04% on IoTID20 (using 12 features), 98.25% on WUSTL-EHMS (using seven features), and 99.18% on Edge-IIoTset (using nine features). The results also demonstrate reduced training and testing times, central processing unit usage, resident set size overhead, and subset size compared to the baseline. Furthermore, Shapley additive explanations, as an explainable artificial intelligence technique, are applied to explain the model's predictions and to show the contribution of the selected features to the IDS decision-making process.",
+     "content_hash": "18acdd02e3cf29c6f552b7d50411226aa5537186c712cd5520c3b70e138880c6",
+     "exact_span": "The increasing connectivity of Internet of Things (IoT)-oriented environments has made them more vulnerable to cyberattacks, requiring intrusion-detection systems (IDSs) to ensure their secure and reliable operation. The feature selection (FS) process of an IDS affects its performance, as effective FS can enhance detection accuracy and reduce the computational cost and model complexity. This paper presents Adaptive Hybrid Genetic Algorithm-Simulated Annealing (AHGA-SA) as an FS framework that in",
+     "span_hash": "c2c1ab6af0d5b20df5289c167d7bd208e0ef49ca4f1a02b3dbb7bb7e1b98ff10",
+     "evidence_class": "SCIENTIFIC_ABSTRACT",
+     "proposition_binding": "candidate_mechanism_input",
+     "locator": "https://doi.org/10.3390/s26134247",
+     "epistemic_strength": "VERIFIED"
+    },
+    {
+     "record_id": "doi:10.1039/d4sc02233e",
+     "source": "europepmc",
+     "source_identity_verified": true,
+     "query": "r458-s1-ranking-model-distribution-shift",
+     "retrieval_timestamp": "2026-09-14T21:48:41.871816+00:00",
+     "raw_content": "Protein-protein interactions are pivotal in numerous biological processes. The computational design of these interactions facilitates the creation of novel binding proteins, crucial for advancing biopharmaceutical products. With the evolution of artificial intelligence (AI), protein design tools have swiftly transitioned from scoring-function-based to AI-based models. However, many AI models for protein design are constrained by assuming complete unfamiliarity with the amino acid sequence of the input protein, a feature most suited for de novo design but posing challenges in designing protein-protein interactions when the receptor sequence is known. To bridge this gap in computational protein design, we introduce ProBID-Net. Trained using natural protein-protein complex structures and protein domain-domain interface structures, ProBID-Net can discern features from known target protein structures to design specific binding proteins based on their binding sites. In independent tests, ProBID-Net achieved interface sequence recovery rates of 52.7%, 43.9%, and 37.6%, surpassing or being on par with ProteinMPNN in binding protein design. Validated using AlphaFold-Multimer, the sequences designed by ProBID-Net demonstrated a close correspondence between the design target and the predicted structure. Moreover, the model's output can predict changes in binding affinity upon mutations in protein complexes, even in scenarios where no data on such mutations were provided during training (zero-shot prediction). In summary, the ProBID-Net model is poised to significantly advance the design of protein-protein interactions.",
+     "content_hash": "308011705f9e25a5f0ac1014d79d21d40b5ac01bc5237c02a60480f859898cbf",
+     "exact_span": "Protein-protein interactions are pivotal in numerous biological processes. The computational design of these interactions facilitates the creation of novel binding proteins, crucial for advancing biopharmaceutical products. With the evolution of artificial intelligence (AI), protein design tools have swiftly transitioned from scoring-function-based to AI-based models. However, many AI models for protein design are constrained by assuming complete unfamiliarity with the amino acid sequence of the",
+     "span_hash": "109c801d816e67aba65f67357137b0ebaaa58c9fe5379a897604adc6c9b5e641",
+     "evidence_class": "SCIENTIFIC_ABSTRACT",
+     "proposition_binding": "candidate_mechanism_input",
+     "locator": "https://doi.org/10.1039/d4sc02233e",
+     "epistemic_strength": "VERIFIED"
+    },
+    {
+     "record_id": "title:79b7e00e0977ce94",
+     "source": "core",
+     "source_identity_verified": true,
+     "query": "r458-s1-ranking-model-distribution-shift",
+     "retrieval_timestamp": "2026-09-14T21:48:41.871837+00:00",
+     "raw_content": "Scrapbook photo album by Elisabeth Model, originally February 1948 with many later inclusions until about 1989.Digital imageThe artist Elisabeth Model, née Dittmann, the daughter of Therese Dittmann, was born in Bayreuth, Germany at the turn of the century. She studied in Munich, and moved to Amsterdam after her marriage to Max Model (1895-1950). They immigrated to the USA in c. 1938.Elisabeth Model Collection, AR 6306.Model Elisabeth, Memories, handwritten manuscript, 1981, ME 758.Alyne, Justin, and Alexa ModelDigitize",
+     "content_hash": "e563be0b1af5a18d1ad732c137946a1c407be4bd674381a67400b7f6494fc068",
+     "exact_span": "Scrapbook photo album by Elisabeth Model, originally February 1948 with many later inclusions until about 1989.Digital imageThe artist Elisabeth Model, née Dittmann, the daughter of Therese Dittmann, was born in Bayreuth, Germany at the turn of the century. She studied in Munich, and moved to Amsterdam after her marriage to Max Model (1895-1950). They immigrated to the USA in c. 1938.Elisabeth Model Collection, AR 6306.Model Elisabeth, Memories, handwritten manuscript, 1981, ME 758.Alyne, Justin",
+     "span_hash": "cbe152b72efdc4e572772edafc530b4a3689c5317c6b40fc7138e2287653dd7d",
+     "evidence_class": "SCIENTIFIC_ABSTRACT",
+     "proposition_binding": "candidate_mechanism_input",
+     "locator": "",
+     "epistemic_strength": "VERIFIED"
+    },
+    {
+     "record_id": "title:d2b3902accae0d69",
+     "source": "core",
+     "source_identity_verified": true,
+     "query": "r458-s1-ranking-model-distribution-shift",
+     "retrieval_timestamp": "2026-09-14T21:48:41.871847+00:00",
+     "raw_content": "Bimonthly magazine discussing topics related to aviation and model airplane engines including collecting, restoring, maintaining, and identifying engines, along with advertising",
+     "content_hash": "5079c3e558237da0d1b519c40c44a987ca37ec9d30e2a55b7bf635b21e19bf4a",
+     "exact_span": "Bimonthly magazine discussing topics related to aviation and model airplane engines including collecting, restoring, maintaining, and identifying engines, along with advertising",
+     "span_hash": "5079c3e558237da0d1b519c40c44a987ca37ec9d30e2a55b7bf635b21e19bf4a",
+     "evidence_class": "SCIENTIFIC_ABSTRACT",
+     "proposition_binding": "candidate_mechanism_input",
+     "locator": "",
+     "epistemic_strength": "VERIFIED"
+    },
+    {
+     "record_id": "title:e5e039305af54970",
+     "source": "core",
+     "source_identity_verified": true,
+     "query": "r458-s1-ranking-model-distribution-shift",
+     "retrieval_timestamp": "2026-09-14T21:48:41.871854+00:00",
+     "raw_content": "Model of the facade of L'Enfer (Hell); Le Ciel (Heaven) is not shown, it was to the immediate left; A scale model, part of the Paris on Stage: 1889-1914 exhibition held June 19, 2013 to February 23, 2014. The cafe or cabaret L'Enfer (Hell) once stood at No. 54 Boulevard de Clichy, along with another called Le Ciel (Heaven), in the Pigalle neighborhood. Both cabarets were a result of a rising trend in Paris ca. 1885-1889 for themed establishments. At L'Enfer the waiters dressed as \"red imps\" and the doorman dressed as Satan or Mephisto. While the original bohemians stopped patronizing these in the 1890s, they continued to cater to tourists. Cabaret de l’Enfer remained open until 1952",
+     "content_hash": "d4d9f83bc0ab2c9fa8b3939e196229f4d0b88c7116ff33fddbd47d3657735fbd",
+     "exact_span": "Model of the facade of L'Enfer (Hell); Le Ciel (Heaven) is not shown, it was to the immediate left; A scale model, part of the Paris on Stage: 1889-1914 exhibition held June 19, 2013 to February 23, 2014. The cafe or cabaret L'Enfer (Hell) once stood at No. 54 Boulevard de Clichy, along with another called Le Ciel (Heaven), in the Pigalle neighborhood. Both cabarets were a result of a rising trend in Paris ca. 1885-1889 for themed establishments. At L'Enfer the waiters dressed as \"red imps\" and ",
+     "span_hash": "a467d3ad6ae7caf94ee9dccaacefa92ecbe4176f915b7159d4fcae6eb2caf977",
+     "evidence_class": "SCIENTIFIC_ABSTRACT",
+     "proposition_binding": "candidate_mechanism_input",
+     "locator": "",
+     "epistemic_strength": "VERIFIED"
+    }
+   ],
+   "hash_verification_all_pass": true,
+   "snapshot_hash": "50a3d8bf749f31ae6f86f232488326dcb4b34632d1feb29dfebb308bf1bcf154"
+  }
+ },
+ "stage_log": [
+  {
+   "stage": "RETRIEVE",
+   "capability_id": "A2_RETRIEVAL",
+   "module_path": "discovery_fabric/retrieval_fabric/pipeline.py",
+   "function": "retrieve_fabric(problem) [V2] / retrieve(problem) [V1]",
+   "started_at": "2026-09-14T21:44:50+00:00Z",
+   "before_envelope_hash": "42da053635d5c24e1c7bff2192b3d2099605330fcf40dfbc2ebba998befdc2a0",
+   "status": "OK",
+   "finished_at": "2026-09-14T21:48:41+00:00Z",
+   "after_envelope_hash": "4836a2f9a1babe124dbafbef08a9cf6b616c0f6c93c510583669a1678ee55b4c",
+   "candidate_delta": [
+    "evidence",
+    "evidence_ids",
+    "provenance"
+   ],
+   "delta_real": true,
+   "result_meta": {
+    "retrieved_count": 14,
+    "retrieval_fabric_version": "V2"
+   },
+   "entry": {
+    "entry_helper_version": "stage_entry/1.1.0",
+    "stage": "RETRIEVE",
+    "entry_status": "ALLOWED",
+    "prerequisite": "UPSTREAM_COMPLETE",
+    "prerequisite_evidence": {
+     "failed_stages": [],
+     "skipped_stages": []
+    }
+   }
+  },
+  {
+   "stage": "FREEZE",
+   "capability_id": "EVIDENCE_FREEZE",
+   "module_path": "orchestrator/evidence_custody.py",
+   "function": "promote_to_evidence(record, source, query, class, binding)",
+   "started_at": "2026-09-14T21:48:41+00:00Z",
+   "before_envelope_hash": "4836a2f9a1babe124dbafbef08a9cf6b616c0f6c93c510583669a1678ee55b4c",
+   "status": "OK",
+   "finished_at": "2026-09-14T21:48:41+00:00Z",
+   "after_envelope_hash": "0b8b23eab391334f3e495e0411ffcb514080a0bc2fa96e62c0c9d82522c528ad",
+   "candidate_delta": [
+    "provenance"
+   ],
+   "delta_real": true,
+   "result_meta": {
+    "custody_records": 7,
+    "hash_ok": true
+   },
+   "entry": {
+    "entry_helper_version": "stage_entry/1.1.0",
+    "stage": "FREEZE",
+    "entry_status": "ALLOWED",
+    "prerequisite": "UPSTREAM_COMPLETE",
+    "prerequisite_evidence": {
+     "failed_stages": [],
+     "skipped_stages": []
+    }
+   }
+  },
+  {
+   "stage": "PREMISE_GATE",
+   "capability_id": "PREMISE_GATE",
+   "module_path": "discovery_fabric/engine/premise_gate.py",
+   "function": "check_premise(problem)",
+   "started_at": "2026-09-14T21:48:41+00:00Z",
+   "before_envelope_hash": "0b8b23eab391334f3e495e0411ffcb514080a0bc2fa96e62c0c9d82522c528ad",
+   "status": "OK",
+   "finished_at": "2026-09-14T21:48:41+00:00Z",
+   "after_envelope_hash": "ff7c261e82ce841888ff7fd83e22d51ce4d9c1930e88f2e12a25f0b85b01bb5e",
+   "candidate_delta": [
+    "premise_gate"
+   ],
+   "delta_real": true,
+   "result_meta": {
+    "premise_verdict": "PREMISE_COHERENT"
+   },
+   "entry": {
+    "entry_helper_version": "stage_entry/1.1.0",
+    "stage": "PREMISE_GATE",
+    "entry_status": "ALLOWED",
+    "prerequisite": "UPSTREAM_COMPLETE",
+    "prerequisite_evidence": {
+     "failed_stages": [],
+     "skipped_stages": []
+    }
+   }
+  }
+ ]
+}

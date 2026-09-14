@@ -1,0 +1,185 @@
+{
+ "adaptive_pipeline": {
+  "costs": {
+   "adaptive": {
+    "llm_calls_ok_mean": 3.29,
+    "retrieval_operations_mean": 4.0,
+    "token_cost_mean": 0.0
+   },
+   "fixed": {
+    "llm_calls_ok_mean": 3.14,
+    "retrieval_operations_mean": 4.71,
+    "token_cost_mean": 0.0
+   },
+   "llm_calls_delta_pct": 4.8
+  },
+  "model_arm": "glm-4-plus-thinking",
+  "n_problems": 7,
+  "quality_preserved_all": false,
+  "verdict": "ADAPTIVE_QUALITY_REGRESSION"
+ },
+ "benchmark": {
+  "corpus_hash": "d308fae33f40e03223bbacf48ef3f8475a9ecc3c6991e80c30bcd8778b7ae1f5",
+  "instrument_art_xxxi_correction": true,
+  "instrument_sha256": "342f9c8250a50fc366991026eb94d254089b50ece877785f494e8822e38334ac",
+  "n_problems": 14,
+  "split": "one DEV + one HOLDOUT problem per family, fixed at authoring time; each pair differs in industry, scale, and failure physics so the holdout probes transfer, not memorized numbers"
+ },
+ "date_utc": "2026-09-14T22:21:05+00:00Z",
+ "decision_trace": {
+  "action_histogram": {
+   "ATTACK_CANDIDATE": 48,
+   "ENGINEERING_ESCALATION": 2,
+   "PROPOSE_DECISIVE_EXPERIMENT": 4
+  },
+  "n_decisions": 112
+ },
+ "directive": "R458-C1 \u2014 MODEL CAPABILITY + ADAPTIVE DISCOVERY ROUND (freeze a discovery benchmark with a blind holdout; benchmark models, not providers; measure the actual science; build the adaptive controller; make provider failures invisible to the scientific state; prove causal learning; no new pipeline stages)",
+ "engine_commit_at_record": "639329b3cfb6d1d91351f80fab04d46c801c22ce",
+ "evidence_artifacts": {
+  "adaptive_pipeline_benchmark": "R458_C1_ADAPTIVE_PIPELINE_BENCHMARK.json",
+  "model_capability_benchmark": "R458_C1_MODEL_CAPABILITY_BENCHMARK.json",
+  "next_action_decision_trace": "R458_C1_NEXT_ACTION_DECISION_TRACE.json",
+  "reality_mutation_proof": "R458_C1_REALITY_MUTATION_PROOF.json",
+  "round_record": "R458_C1_ROUND_RECORD.json"
+ },
+ "flag_semantics": {
+  "adaptive_routing_proven": "the FIXED-vs-ADAPTIVE benchmark record exists with its quality-preservation verdict AND the next-action decision trace is non-empty (the controller actually decided, and the decisions drove execution)",
+  "causal_learning_proven": "the reality-mutation proof's own flag: the successor design measurably differs because of the observed result AND the flip regression holds (perturbing the observation changes the mutation)",
+  "model_quality_proven": "the dev-phase capability record exists (frozen corpus + frozen instrument; >=2 arms measured with the quality composite) AND the blind holdout ran on the selected model",
+  "reality_loop_proven": "FALSE \u2014 Art. XXXVII/LIII: this round's loop closed on a COMPUTATIONAL observation (SYNTHETIC_LOOP_VERIFIED); REAL_LOOP_VERIFIED requires an externally supplied observation through the reality gate and was not crossed this round; the machinery proof is carried by causal_learning_proven; conflating the two would launder computation into reality",
+  "transport_proven": "the arms' transports measured live (probe + run-owned routing-ledger lines through each arm's own route) + the \u00a75 invisibility layer wired with its battery green (tests/test_r458.py)",
+  "world_class_claim_supported": "FALSE \u2014 Art. LVIII: every review this round is AI_REVIEW (Art. LXVII independence ceiling); no independent external evaluation, independent benchmark, or physical validation occurred; the blind-test evidence does not support a world-class claim"
+ },
+ "flags": {
+  "adaptive_routing_proven": true,
+  "causal_learning_proven": true,
+  "model_quality_proven": true,
+  "real_loop_verified": false,
+  "reality_loop_proven": false,
+  "transport_proven": true,
+  "world_class_claim_supported": false
+ },
+ "honest_disclosures": [
+  "the four free-tier router keys (unorouter/xkiro/apinex/bai) exist only as env-injected HF Space secrets and were NOT present in this coding environment \u2014 the directive-listed strong free routes (qwen3.8-max, glm-5.3, deepseek-v4.1-flash, minimax-m3 \u2026) are TYPED CREDENTIAL_UNAVAILABLE with the Art. LXV escalation; the benchmark harness runs them the moment the keys are re-injected (zero driver changes)",
+  "the GLM family arm actually reachable from this environment is glm-4-plus (the sandbox grant's served model) \u2014 NOT GLM-5.3; the HF router carrying GLM-5.3 was re-measured 402 credits-depleted",
+  "the a2 verify stage binds the mechanism span against evidence[0].abstract while synthesis rotates over papers \u2014 on pools whose first record is metadata-only (empty abstract) the span-verbatim contract is structurally unsatisfiable for ANY model (both verdict directions disclosed; NOT fixed mid-benchmark per Art. XLVII instrument identity; filed for the next round)",
+  "span-verbatim failures are MODEL-CAPABILITY failures by the system's own recorded design (R452 audit: the honest terminal is INCOMPLETE_INFERENCE_FAILURE, rerunnable on a capable route) \u2014 the benchmark measures exactly this axis",
+  "OpenAlex measured $0 budget (resets midnight UTC) \u2014 retrieval ran on the remaining live sources (crossref/europepmc/semantic_scholar/core/datacite/google_patents + the HF datasets-server fabric), identical condition across arms",
+  "the reality mutation proof's observation is a COMPUTATIONAL_RESULT (the mechanistic solver's virtual experiment) \u2014 SYNTHETIC_LOOP_VERIFIED per Art. XXXVII; REAL_LOOP_VERIFIED requires an externally supplied observation and is NOT claimed"
+ ],
+ "known_limitations": [
+  "the model-quality comparison covers the arms reachable from this environment (the grant route in two modes + the self-hosted zero-paid baseline); the elite free routes await key re-injection",
+  "the adaptive-vs-fixed comparison runs on the selected model over the DEV set; the holdout is never a comparison surface (BS-016)",
+  "all reviews are AI_REVIEW; the independence ceiling is structural (Art. LXVII)"
+ ],
+ "model_capability": {
+  "arms_measured": [
+   "glm-4-plus",
+   "glm-4-plus-thinking",
+   "qwen3-1.7b"
+  ],
+  "blind_test_cases": 7,
+  "escalation_art_lxv": "the four free-tier router keys (unorouter/xkiro/apinex/bai) are env-injected HF Space secrets and are NOT present in this coding environment; the benchmark driver reads them from env when present \u2014 the moment the operator re-injects them, the router model arms run with ZERO driver changes; the model-quality question for those arms stays open with the operator (Art. LXV: the gate is named, not silently dropped)",
+  "quality_composites": {
+   "glm-4-plus": 0.569,
+   "glm-4-plus-thinking": 0.57,
+   "qwen3-1.7b": 0.269
+  },
+  "selected_model": "glm-4-plus-thinking",
+  "unavailable_arms_typed": [
+   {
+    "models": [
+     "unorouter:glm-5.3:free",
+     "unorouter:glm-5.3-flash:free",
+     "unorouter:qwen3.8-27b:free"
+    ],
+    "state": "CREDENTIAL_UNAVAILABLE"
+   },
+   {
+    "models": [
+     "xkiro:qwen/qwen3.8-max:free",
+     "xkiro:minimax/minimax-m3:free",
+     "xkiro:qwen/qwen3.7-max:free (operator-reported)",
+     "xkiro:qwen/qwen3.6-35b-a3b:free (operator-reported)"
+    ],
+    "state": "CREDENTIAL_UNAVAILABLE"
+   },
+   {
+    "models": [
+     "apinex:free/deepseek-v4.1-flash",
+     "apinex:free/deepseek-v4-pro (where genuinely free)"
+    ],
+    "state": "CREDENTIAL_UNAVAILABLE"
+   },
+   {
+    "models": [
+     "bai:qwen3.8-flash"
+    ],
+    "state": "CREDENTIAL_UNAVAILABLE"
+   },
+   {
+    "models": [
+     "nvidia:nemotron free offerings"
+    ],
+    "state": "CREDENTIAL_UNAVAILABLE"
+   },
+   {
+    "models": [
+     "hf-router:zai-org/GLM-5.3",
+     "hf-router:zai-org/GLM-5.3-Flash"
+    ],
+    "state": "CREDIT_EXHAUSTED"
+   },
+   {
+    "models": [
+     "openrouter:free pool"
+    ],
+    "state": "CREDENTIAL_UNAVAILABLE"
+   }
+  ]
+ },
+ "reality_mutation": {
+  "flip_regression": {
+   "flip_tested": true,
+   "mutation_base": {
+    "primary_diameter_mm": 1.672402
+   },
+   "mutation_changed_measurably": true,
+   "mutation_perturbed": {
+    "primary_diameter_mm": 1.988832
+   },
+   "observed_deficit_base": 40.0,
+   "observed_deficit_perturbed": 80.0
+  },
+  "loop_verification_state": "SYNTHETIC_LOOP_VERIFIED",
+  "proven": true,
+  "reality_loop_note": "FALSE this round: the \u00a76 loop closed on a COMPUTATIONAL observation (SYNTHETIC_LOOP_VERIFIED, Art. XXXVII) \u2014 the machinery is proven (causal_learning_proven=TRUE) but the reality boundary was not crossed; REAL_LOOP_VERIFIED requires an externally supplied observation through the R370G gate; the system's one prior REAL closure (R390, P-07 water viscosity) is historical evidence, not this round's claim",
+  "source_case": "P1-proof-fixture",
+  "successor_measurable_difference": {
+   "primary_diameter_mm": {
+    "delta": 0.472402,
+    "delta_pct": 39.37,
+    "parent": 1.2,
+    "successor": 1.672402
+   }
+  }
+ },
+ "reviewer_provenance": "AI_REVIEW",
+ "round": "R458-C1",
+ "schema": "R458_C1_ROUND_RECORD/1.0.0",
+ "title": "THE MODEL CAPABILITY + ADAPTIVE DISCOVERY ROUND: the frozen multi-domain benchmark, the model capability measurement, the adaptive controller comparison, the next-action decision trace, the reality mutation proof, and provider failures made invisible to the scientific state",
+ "transport_invisibility": {
+  "battery": "tests/test_r458.py (24 tests)",
+  "module": "toscanini/conversational/transport_invisibility.py",
+  "scrub_guard": "provider-ids / HTTP codes / endpoint hosts / failure classes in product text are named violations (mechanical, test-enforced)",
+  "the_two_sentences": [
+   "I continued using another verified reasoning route.",
+   "The requested test could not be completed."
+  ],
+  "wired_into": [
+   "toscanini/conversational/run_contract.py (_blocking_reason INFRASTRUCTURE branch)",
+   "toscanini/conversational/product_events.py (RUN_BLOCKED emissions)"
+  ]
+ }
+}

@@ -1,0 +1,3493 @@
+{
+ "candidate_id": "cand:A2:r458-s1-ranking-model-distribution-shift:621cd40ea962f192",
+ "problem_id": "r458-s1-ranking-model-distribution-shift",
+ "problem": {
+  "problem_id": "r458-s1-ranking-model-distribution-shift",
+  "device": "search ranking model",
+  "failure_mode": "model decay after interface redesign",
+  "objective": "recover at least 3.5 points of the 4-percent revenue-per-search gap within one quarter",
+  "failure": "Documented problem 'model decay after interface redesign' concerning search ranking model. User-submitted engineering problem (session input): \"A marketplace's search ranking model, trained on 18 months of interaction logs, decays measurably after a redesign moves the buy button above the fold on mobile: offline replay shows a 6-percent drop in normalized discounted cumulative gain against held-out post-launch traffic, click-through on rank\".  ROUTING: doe_osti: routing state SUSPENDED_RELEVANCE — measured relevance instability (R375: same fusion papers relevant 3 -> 0; pooled relevant-rate 0.175 pre-fix; DETERMINISM_GAP flagged in the R394 production audit) — records poison synthesis-feeding retrieval more than they feed it until relevance is semantically adjudicated; reinstatement: the Phase P1 semantic reranker lands (semantic relevance adjudication between query and record, replacing lexical overlap); flip to ACTIVE + a measured relevance re-run + worklog entry. [europepmc] 10 records retrieved live (2025-2026). Illustrative records: 'Explainable machine learning for breast cancer prediction in resource-constrained settings: A multi-algorithmic framework integrating shap-based transparency with clinical decision support.'; 'Explainable ensemble learning using SHAP for ERP anomaly detection.'. LIMITS STAMPED INLINE: literature context establishes the problem class, not event rates. [arxiv] retrieval status TIMEOUT (TimeoutError) — provider outcome recorded, not treated as absence (Art. XXI.3). [doe_osti] retrieval status NOT_QUERIED_SUSPENDED_RELEVANCE (engine routing decision (R399 W3): SUSPENDED_RELEVANCE — not a provider failure and not absence) — provider outcome recorded, not treated as absence (Art. XXI.3). Problem-existence basis: live records retrieved.",
+  "constraint": "must maintain 45-millisecond serving deadline and use existing labeling pipeline",
+  "sources": {
+   "europepmc": "OK",
+   "arxiv": "TIMEOUT",
+   "doe_osti": "NOT_QUERIED_SUSPENDED_RELEVANCE"
+  },
+  "origin": "toscanini_ui",
+  "user_text": "A marketplace's search ranking model, trained on 18 months of interaction logs, decays measurably after a redesign moves the buy button above the fold on mobile: offline replay shows a 6-percent drop in normalized discounted cumulative gain against held-out post-launch traffic, click-through on ranked position 3 falls 11 percent, and revenue-per-search is down 4 percent over five weeks while the site's overall traffic is flat. The model is a gradient-boosted ranking model over 240 features with a 45-millisecond serving deadline including feature fetches, and the label pipeline (delayed conversion labels arriving 1 to 9 days after click) cannot be rebuilt this quarter. The team cannot launch a full retraining pipeline redesign (one release per quarter, already committed), cannot increase serving latency beyond 45 milliseconds (the page-speed budget is contractual), cannot buy new labeling beyond the current budget, and must recover at least 3.5 points of the 4-percent revenue-per-search gap within one quarter on the existing serving stack.",
+  "r458_benchmark": {
+   "class": "FROZEN_BENCHMARK_DEV",
+   "arm": "adaptive",
+   "corpus_freeze": "R458/BENCHMARK_FREEZE.json"
+  }
+ },
+ "evidence_ids": [
+  "doi:10.3390/biomimetics11070516",
+  "doi:10.1038/s41598-026-56933-4",
+  "doi:10.70729/j2013213",
+  "doi:10.20948/graphicon-2021-3027-1131-1138",
+  "doi:10.3390/s26134247",
+  "doi:10.1039/d4sc02233e",
+  "doi:10.18130/v3tg0k",
+  "doi:10.22215/etd/2013-09971",
+  "doi:10.30707/etd2017.mcfaul.h",
+  "doi:10.2139/ssrn.4892616",
+  "title:79b7e00e0977ce94",
+  "doi:10.1142/14835",
+  "title:d2b3902accae0d69",
+  "title:e5e039305af54970"
+ ],
+ "evidence": [
+  {
+   "id": "doi:10.3390/biomimetics11070516",
+   "source_type": "scientific_paper",
+   "source": "europepmc",
+   "source_id": "europepmc:europepmc:42505549",
+   "source_uri": "https://doi.org/10.3390/biomimetics11070516",
+   "title": "Evolutionary, Neural, or LLM-Driven Heuristic Generation? A Unified Ant Colony Optimization Benchmark for Nature-Inspired Routing Heuristics on the TSP and CVRP.",
+   "abstract": "Biomimetic optimization transfers biological information-processing mechanisms into computational systems. Ant colony optimization (ACO) is a canonical example: artificial ants functionally abstract pheromone-mediated stigmergy, decentralized exploration, trail decay through algorithmic evaporation, and adaptive path reinforcement. Building on this functional biological analogue, we present a controlled cross-paradigm evaluation of routing-heuristic generation. A standardized interface embeds human-designed rules, the genetic programming hyper-heuristic GHPP, a resource-constrained DeepACO-MLP proxy, and an offline ReEvo-style proxy into the same ACO solver. The methods are evaluated on held-out TSP and CVRP instances in terms of solution quality, reported generation or training cost, interpretability, and cross-scale behavior under a matched distribution. GHPP yields the shortest routes at all tested scales; the ReEvo-offline proxy and strong human-designed rules generally form a second tier, whereas the resource-constrained neural proxy degrades markedly as problem size increases. These results do not establish an intrinsic ranking of full-capability paradigms. Instead, they show that method selection depends on the operating constraint and on evidence provenance: longer locally measured offline search favors GHPP, while auditable explicit rules characterize the human and ReEvo-offline proxies. By holding the ant-inspired execution mechanism fixed and varying the source of heuristic information, the benchmark clarifies how evolutionary, neural, and LLM-style design strategies interact with a common biomimetic substrate.",
+   "doi": "10.3390/biomimetics11070516",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2026-07-22",
+   "retrieval_timestamp": "2026-09-14T21:46:59.437027+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "098d1b56c5e818199516077e4ac0d3cdd72c4c9a97ecc284338dc654b735b1c6",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "europepmc",
+    "indexing_sources": [
+     "europepmc"
+    ],
+    "record_ids_by_source": {
+     "europepmc": "europepmc:42505549"
+    },
+    "queries_by_source": {
+     "europepmc": "search ranking model model decay after interface redesign"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "biomedical_pubmed_line",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "biomedical_pubmed_line",
+   "canonical_id": "doi:10.3390/biomimetics11070516",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "search ranking model model decay after interface redesign",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstract-level evidence: full text may contain methods and constraints not present in the abstract",
+    "Publication existence is not clinical evidence of safety or effectiveness",
+    "Citation counts are bibliometric signals, not validity measures"
+   ]
+  },
+  {
+   "id": "doi:10.1038/s41598-026-56933-4",
+   "source_type": "scientific_paper",
+   "source": "europepmc",
+   "source_id": "europepmc:europepmc:42277162",
+   "source_uri": "https://doi.org/10.1038/s41598-026-56933-4",
+   "title": "Intelligent english education resource recommendation via LLM-knowledge graph integration and ecological niche fitness modeling.",
+   "abstract": "Teaching English to large and varied student populations has made adaptive, learner-aware resource recommendation a pressing need, yet most deployed systems still lean on collaborative filtering or content heuristics that read learners only at the surface. Such systems tend to stumble in four recurring ways: they miss the finer grain of linguistic competence, they reason over sparse and brittle knowledge associations, they falter whenever a learner or a resource is new, and they rarely travel well to settings their training never saw. We address these problems together through a framework in which a large language model and a knowledge graph inform one another, their match to each learner mediated by a fitness function adapted from ecological niche theory. The language model reads a learner's own writing to estimate evolving competence and proposes relations that fill thin regions of the graph, while the graph keeps the model's inferences anchored to the prerequisite and difficulty structure of English. A niche fitness score then judges how closely each resource's demands meet a learner's needs, and a path generator orders the survivors into prerequisite-respecting study sequences. On logs from 3,214 learners, 12,486 resources, and 287,653 interactions, the method reaches a Precision@5 of 0.782 and an NDCG@10 of 0.724, ahead of five baselines. Ablation was, frankly, the part that surprised us: the niche filter matters more to ranking quality than the model's semantic re-scoring. A three-axis generalization protocol, splitting transfer across learners, resource types, and difficulty levels, yields a composite index of 0.863, with cold-start decay held to 18.3%.",
+   "doi": "10.1038/s41598-026-56933-4",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2026-06-11",
+   "retrieval_timestamp": "2026-09-14T21:46:59.437111+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "8b85382c76ae0e2c875323bf306668b56226822d66a824622bb59840865c9e8f",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "europepmc",
+    "indexing_sources": [
+     "europepmc"
+    ],
+    "record_ids_by_source": {
+     "europepmc": "europepmc:42277162"
+    },
+    "queries_by_source": {
+     "europepmc": "search ranking model model decay after experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "biomedical_pubmed_line",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "biomedical_pubmed_line",
+   "canonical_id": "doi:10.1038/s41598-026-56933-4",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "search ranking model model decay after experimental comparison",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstract-level evidence: full text may contain methods and constraints not present in the abstract",
+    "Publication existence is not clinical evidence of safety or effectiveness",
+    "Citation counts are bibliometric signals, not validity measures"
+   ]
+  },
+  {
+   "id": "doi:10.70729/j2013213",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.70729/j2013213",
+   "source_uri": "https://doi.org/10.70729/j2013213",
+   "title": "A Global Fusion Re-Ranking for Effective Data Search with Correlation Model",
+   "abstract": "",
+   "doi": "10.70729/j2013213",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2014",
+   "retrieval_timestamp": "2026-09-14T21:46:59.437140+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "c1de9fd16750725e26eac78e7a6d2b0a4e9d928b7eec9f59e6e7126db94ce809",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.70729/j2013213"
+    },
+    "queries_by_source": {
+     "crossref": "search ranking model model decay after interface redesign"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=journal-article"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.70729/j2013213",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "search ranking model model decay after interface redesign",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  {
+   "id": "doi:10.20948/graphicon-2021-3027-1131-1138",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.20948/graphicon-2021-3027-1131-1138",
+   "source_uri": "https://doi.org/10.20948/graphicon-2021-3027-1131-1138",
+   "title": "A Mathematical Model for Ranking High-Level User Interface Regression Tests",
+   "abstract": "",
+   "doi": "10.20948/graphicon-2021-3027-1131-1138",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2021",
+   "retrieval_timestamp": "2026-09-14T21:46:59.437163+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "eb560c1860c4754606905bdfe534c0eedd439132d1834d3a3b8bd5c07f8bc854",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.20948/graphicon-2021-3027-1131-1138"
+    },
+    "queries_by_source": {
+     "crossref": "search ranking model model decay after interface redesign"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=proceedings-article"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "CONFERENCE",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.20948/graphicon-2021-3027-1131-1138",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "search ranking model model decay after interface redesign",
+   "source_rank": 3,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  {
+   "id": "doi:10.3390/s26134247",
+   "source_type": "scientific_paper",
+   "source": "europepmc",
+   "source_id": "europepmc:europepmc:42451488",
+   "source_uri": "https://doi.org/10.3390/s26134247",
+   "title": "AHGA-SA: A Novel Adaptive Hybrid Framework for Feature Selection in IoT-Oriented Intrusion Detection with Explainable AI.",
+   "abstract": "The increasing connectivity of Internet of Things (IoT)-oriented environments has made them more vulnerable to cyberattacks, requiring intrusion-detection systems (IDSs) to ensure their secure and reliable operation. The feature selection (FS) process of an IDS affects its performance, as effective FS can enhance detection accuracy and reduce the computational cost and model complexity. This paper presents Adaptive Hybrid Genetic Algorithm-Simulated Annealing (AHGA-SA) as an FS framework that integrates the global search ability of a genetic algorithm and the local exploitation ability of simulated annealing. AHGA-SA aims to find compact, informative feature subsets in high-dimensional intrusion-detection datasets at an acceptable computational cost while maintaining detection performance. The experimental results on three recent benchmarks demonstrate feature-space reduction, with classification accuracies of 99.04% on IoTID20 (using 12 features), 98.25% on WUSTL-EHMS (using seven features), and 99.18% on Edge-IIoTset (using nine features). The results also demonstrate reduced training and testing times, central processing unit usage, resident set size overhead, and subset size compared to the baseline. Furthermore, Shapley additive explanations, as an explainable artificial intelligence technique, are applied to explain the model's predictions and to show the contribution of the selected features to the IDS decision-making process.",
+   "doi": "10.3390/s26134247",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2026-07-04",
+   "retrieval_timestamp": "2026-09-14T21:46:59.437182+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "8e67ea9177517a94a6e2aef9629ab2e266821cc21795cd9ccfa5c8f642ebdf64",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "europepmc",
+    "indexing_sources": [
+     "europepmc"
+    ],
+    "record_ids_by_source": {
+     "europepmc": "europepmc:42451488"
+    },
+    "queries_by_source": {
+     "europepmc": "search ranking model model decay after experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "biomedical_pubmed_line",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "biomedical_pubmed_line",
+   "canonical_id": "doi:10.3390/s26134247",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "search ranking model model decay after experimental comparison",
+   "source_rank": 4,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstract-level evidence: full text may contain methods and constraints not present in the abstract",
+    "Publication existence is not clinical evidence of safety or effectiveness",
+    "Citation counts are bibliometric signals, not validity measures"
+   ]
+  },
+  {
+   "id": "doi:10.1039/d4sc02233e",
+   "source_type": "scientific_paper",
+   "source": "europepmc",
+   "source_id": "europepmc:europepmc:39568891",
+   "source_uri": "https://doi.org/10.1039/d4sc02233e",
+   "title": "ProBID-Net: a deep learning model for protein-protein binding interface design.",
+   "abstract": "Protein-protein interactions are pivotal in numerous biological processes. The computational design of these interactions facilitates the creation of novel binding proteins, crucial for advancing biopharmaceutical products. With the evolution of artificial intelligence (AI), protein design tools have swiftly transitioned from scoring-function-based to AI-based models. However, many AI models for protein design are constrained by assuming complete unfamiliarity with the amino acid sequence of the input protein, a feature most suited for de novo design but posing challenges in designing protein-protein interactions when the receptor sequence is known. To bridge this gap in computational protein design, we introduce ProBID-Net. Trained using natural protein-protein complex structures and protein domain-domain interface structures, ProBID-Net can discern features from known target protein structures to design specific binding proteins based on their binding sites. In independent tests, ProBID-Net achieved interface sequence recovery rates of 52.7%, 43.9%, and 37.6%, surpassing or being on par with ProteinMPNN in binding protein design. Validated using AlphaFold-Multimer, the sequences designed by ProBID-Net demonstrated a close correspondence between the design target and the predicted structure. Moreover, the model's output can predict changes in binding affinity upon mutations in protein complexes, even in scenarios where no data on such mutations were provided during training (zero-shot prediction). In summary, the ProBID-Net model is poised to significantly advance the design of protein-protein interactions.",
+   "doi": "10.1039/d4sc02233e",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2024-10-30",
+   "retrieval_timestamp": "2026-09-14T21:46:59.437202+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "17b9fa5f11b56fdeb2fc822594a6877081616adb916b23f4a44463ed18701cc8",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "europepmc",
+    "indexing_sources": [
+     "europepmc"
+    ],
+    "record_ids_by_source": {
+     "europepmc": "europepmc:39568891"
+    },
+    "queries_by_source": {
+     "europepmc": "search ranking model model decay after interface redesign"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "biomedical_pubmed_line",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "biomedical_pubmed_line",
+   "canonical_id": "doi:10.1039/d4sc02233e",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "search ranking model model decay after interface redesign",
+   "source_rank": 5,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstract-level evidence: full text may contain methods and constraints not present in the abstract",
+    "Publication existence is not clinical evidence of safety or effectiveness",
+    "Citation counts are bibliometric signals, not validity measures"
+   ]
+  },
+  {
+   "id": "doi:10.18130/v3tg0k",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.18130/v3tg0k",
+   "source_uri": "https://doi.org/10.18130/v3tg0k",
+   "title": "First Search for the Standard Model Higgs Boson Using the Semileptonic Decay Channel: H-WW----",
+   "abstract": "",
+   "doi": "10.18130/v3tg0k",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-14T21:46:59.437221+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "280d5ef547bef21d7f34fa212005eb196b5c22a678b510f46b65fa67af60064b",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.18130/v3tg0k"
+    },
+    "queries_by_source": {
+     "crossref": "search ranking model model decay after interface redesign"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.18130/v3tg0k",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "search ranking model model decay after interface redesign",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  {
+   "id": "doi:10.22215/etd/2013-09971",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.22215/etd/2013-09971",
+   "source_uri": "https://doi.org/10.22215/etd/2013-09971",
+   "title": "Search for the Standard Model Higgs boson in the vector boson fusion-mediated diphoton decay channel using multivariate analysis techniques",
+   "abstract": "",
+   "doi": "10.22215/etd/2013-09971",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-14T21:46:59.437250+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "9101abb03337a322961c21589ee14d5a1cae3e40b760aa479e2f1bff136870bd",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.22215/etd/2013-09971"
+    },
+    "queries_by_source": {
+     "crossref": "search ranking model model decay after interface redesign"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.22215/etd/2013-09971",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "search ranking model model decay after interface redesign",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  {
+   "id": "doi:10.30707/etd2017.mcfaul.h",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.30707/etd2017.mcfaul.h",
+   "source_uri": "https://doi.org/10.30707/etd2017.mcfaul.h",
+   "title": "The Redesign Of School Discipline: One Schoolâs Approach To Rethink And Redesign Discipline Practices Through The Restorative Justice Model",
+   "abstract": "",
+   "doi": "10.30707/etd2017.mcfaul.h",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-14T21:46:59.437269+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "0aedfc0c6cf5b9d4cf3bfd63f5d1d409a78d155ee43b8b3646ad260373c63140",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.30707/etd2017.mcfaul.h"
+    },
+    "queries_by_source": {
+     "crossref": "search ranking model model decay after interface redesign"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.30707/etd2017.mcfaul.h",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "search ranking model model decay after interface redesign",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  {
+   "id": "doi:10.2139/ssrn.4892616",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.2139/ssrn.4892616",
+   "source_uri": "https://doi.org/10.2139/ssrn.4892616",
+   "title": "A Ranking Model Framework for Multiple Vertical Search Domains",
+   "abstract": "",
+   "doi": "10.2139/ssrn.4892616",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2024",
+   "retrieval_timestamp": "2026-09-14T21:46:59.437294+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "950e4348f4861b9a1441def1ecde903d56c462478bf502822926dd3e77057188",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.2139/ssrn.4892616"
+    },
+    "queries_by_source": {
+     "crossref": "search ranking model model decay after interface redesign"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=posted-content"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.2139/ssrn.4892616",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "search ranking model model decay after interface redesign",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  {
+   "id": "title:79b7e00e0977ce94",
+   "source_type": "scientific_paper",
+   "source": "core",
+   "source_id": "core:core:4453851",
+   "source_uri": "",
+   "title": "Model family photo album : Happy anniversary : II. 3. 1948 / EM 1948",
+   "abstract": "Scrapbook photo album by Elisabeth Model, originally February 1948 with many later inclusions until about 1989.Digital imageThe artist Elisabeth Model, née Dittmann, the daughter of Therese Dittmann, was born in Bayreuth, Germany at the turn of the century. She studied in Munich, and moved to Amsterdam after her marriage to Max Model (1895-1950). They immigrated to the USA in c. 1938.Elisabeth Model Collection, AR 6306.Model Elisabeth, Memories, handwritten manuscript, 1981, ME 758.Alyne, Justin, and Alexa ModelDigitize",
+   "doi": null,
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-14T21:46:59.437319+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "e44467ad49b687f061ce10a9d8a9a9863d99826e798a6f6416bdc192a71de674",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "core",
+    "indexing_sources": [
+     "core"
+    ],
+    "record_ids_by_source": {
+     "core": "core:4453851"
+    },
+    "queries_by_source": {
+     "core": "search ranking model model decay after interface redesign"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "repository_aggregator_core",
+    "identity_basis": "TITLE_FINGERPRINT",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "repository_aggregator_core",
+   "canonical_id": "title:79b7e00e0977ce94",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "search ranking model model decay after interface redesign",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [
+    "Model, Elisabeth"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
+    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
+   ]
+  },
+  {
+   "id": "doi:10.1142/14835",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.1142/14835",
+   "source_uri": "https://doi.org/10.1142/14835",
+   "title": "The Search for Nucleon Decay",
+   "abstract": "",
+   "doi": "10.1142/14835",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2026",
+   "retrieval_timestamp": "2026-09-14T21:46:59.437341+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "b4b54167034881f908d3cd8e9bc0658c06a98f7843c7a30fb5ebc5cee58dd1af",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.1142/14835"
+    },
+    "queries_by_source": {
+     "crossref": "search ranking model model decay after interface redesign"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=monograph"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.1142/14835",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "search ranking model model decay after interface redesign",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  {
+   "id": "title:d2b3902accae0d69",
+   "source_type": "scientific_paper",
+   "source": "core",
+   "source_id": "core:core:163796928",
+   "source_uri": "",
+   "title": "Sub-series 2: Publications",
+   "abstract": "Bimonthly magazine discussing topics related to aviation and model airplane engines including collecting, restoring, maintaining, and identifying engines, along with advertising",
+   "doi": null,
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-14T21:46:59.437360+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "55d7018d372f585e94aaa6a131601a420fb1b59d623b67224b88688d518a3761",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "core",
+    "indexing_sources": [
+     "core"
+    ],
+    "record_ids_by_source": {
+     "core": "core:163796928"
+    },
+    "queries_by_source": {
+     "core": "search ranking model model decay after interface redesign"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "repository_aggregator_core",
+    "identity_basis": "TITLE_FINGERPRINT",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "repository_aggregator_core",
+   "canonical_id": "title:d2b3902accae0d69",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "search ranking model model decay after interface redesign",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [
+    "The Model Museum"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
+    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
+   ]
+  },
+  {
+   "id": "title:e5e039305af54970",
+   "source_type": "scientific_paper",
+   "source": "core",
+   "source_id": "core:core:89758015",
+   "source_uri": "",
+   "title": "Paris on Stage: 1889-1914 [exhibition]; Cabaret de L’Enfer Model",
+   "abstract": "Model of the facade of L'Enfer (Hell); Le Ciel (Heaven) is not shown, it was to the immediate left; A scale model, part of the Paris on Stage: 1889-1914 exhibition held June 19, 2013 to February 23, 2014. The cafe or cabaret L'Enfer (Hell) once stood at No. 54 Boulevard de Clichy, along with another called Le Ciel (Heaven), in the Pigalle neighborhood. Both cabarets were a result of a rising trend in Paris ca. 1885-1889 for themed establishments. At L'Enfer the waiters dressed as \"red imps\" and the doorman dressed as Satan or Mephisto. While the original bohemians stopped patronizing these in the 1890s, they continued to cater to tourists. Cabaret de l’Enfer remained open until 1952",
+   "doi": null,
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-14T21:46:59.437376+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "58c5789c8dac9335908f3538704a1a0c597faaf368271c040388e8f99f060933",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "core",
+    "indexing_sources": [
+     "core"
+    ],
+    "record_ids_by_source": {
+     "core": "core:89758015"
+    },
+    "queries_by_source": {
+     "core": "search ranking model model decay after interface redesign"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "repository_aggregator_core",
+    "identity_basis": "TITLE_FINGERPRINT",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "repository_aggregator_core",
+   "canonical_id": "title:e5e039305af54970",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "search ranking model model decay after interface redesign",
+   "source_rank": 3,
+   "fulltext_url": null,
+   "authors": [
+    "unknown (Canadian model maker)"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
+    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
+   ]
+  }
+ ],
+ "mechanism_ids": [
+  "mech:2f7f33f41eaa"
+ ],
+ "mechanism_map": {
+  "mechanism": "Ant colony optimization with trail decay through algorithmic evaporation and adaptive path reinforcement",
+  "intervention": "Implement a dynamic decay mechanism for ranking signals that mimics pheromone evaporation, where the influence of historical ranking patterns gradually decreases over time unless reinforced by recent positive user interactions",
+  "expected_effect": "Mitigate the decay in search ranking performance after interface redesign by allowing the model to adapt to changing user behavior patterns while maintaining the stability of historically relevant signals",
+  "falsification_test": "Compare search ranking performance metrics (normalized discounted cumulative gain, click-through rates) between the current model and the modified model with the decay mechanism after implementing the interface redesign, using the same evaluation methodology that detected the original 6% performance drop",
+  "mechanism_source_span": "\"Ant colony optimization (ACO) is a canonical example: artificial ants functionally abstract pheromone-mediated stigmergy, decentralized exploration, trail decay through algorithmic evaporation, and adaptive path reinforcement.\"",
+  "raw_candidate": {
+   "candidate_id": "cand:A2:r458-s1-ranking-model-distribution-shift:621cd40ea962f192",
+   "problem_id": "r458-s1-ranking-model-distribution-shift",
+   "device": "search ranking model",
+   "failure_mode": "model decay after interface redesign",
+   "failure": "Documented problem 'model decay after interface redesign' concerning search ranking model. User-submitted engineering problem (session input): \"A marketplace's search ranking model, trained on 18 months of interaction logs, decays measurably after a redesign moves the buy button above the fold on mobile: offline replay shows a 6-percent drop in normalized discounted cumulative gain against held-out post-launch traffic, click-through on rank\".  ROUTING: doe_osti: routing state SUSPENDED_RELEVANCE — measured relevance instability (R375: same fusion papers relevant 3 -> 0; pooled relevant-rate 0.175 pre-fix; DETERMINISM_GAP flagged in the R394 production audit) — records poison synthesis-feeding retrieval more than they feed it until relevance is semantically adjudicated; reinstatement: the Phase P1 semantic reranker lands (semantic relevance adjudication between query and record, replacing lexical overlap); flip to ACTIVE + a measured relevance re-run + worklog entry. [europepmc] 10 records retrieved live (2025-2026). Illustrative records: 'Explainable machine learning for breast cancer prediction in resource-constrained settings: A multi-algorithmic framework integrating shap-based transparency with clinical decision support.'; 'Explainable ensemble learning using SHAP for ERP anomaly detection.'. LIMITS STAMPED INLINE: literature context establishes the problem class, not event rates. [arxiv] retrieval status TIMEOUT (TimeoutError) — provider outcome recorded, not treated as absence (Art. XXI.3). [doe_osti] retrieval status NOT_QUERIED_SUSPENDED_RELEVANCE (engine routing decision (R399 W3): SUSPENDED_RELEVANCE — not a provider failure and not absence) — provider outcome recorded, not treated as absence (Art. XXI.3). Problem-existence basis: live records retrieved.",
+   "constraint": "must maintain 45-millisecond serving deadline and use existing labeling pipeline",
+   "mechanism": "Ant colony optimization with trail decay through algorithmic evaporation and adaptive path reinforcement",
+   "intervention": "Implement a dynamic decay mechanism for ranking signals that mimics pheromone evaporation, where the influence of historical ranking patterns gradually decreases over time unless reinforced by recent positive user interactions",
+   "expected_effect": "Mitigate the decay in search ranking performance after interface redesign by allowing the model to adapt to changing user behavior patterns while maintaining the stability of historically relevant signals",
+   "falsification_test": "Compare search ranking performance metrics (normalized discounted cumulative gain, click-through rates) between the current model and the modified model with the decay mechanism after implementing the interface redesign, using the same evaluation methodology that detected the original 6% performance drop",
+   "mechanism_source_span": "\"Ant colony optimization (ACO) is a canonical example: artificial ants functionally abstract pheromone-mediated stigmergy, decentralized exploration, trail decay through algorithmic evaporation, and adaptive path reinforcement.\"",
+   "source_evidence": {
+    "source_id": "doi:10.3390/biomimetics11070516",
+    "source_hash": "098d1b56c5e818199516077e4ac0d3cdd72c4c9a97ecc284338dc654b735b1c6",
+    "source_title": "Evolutionary, Neural, or LLM-Driven Heuristic Generation? A Unified Ant Colony Optimization Benchmark for Nature-Inspired Routing Heuristics on the TSP and CVRP.",
+    "source_span": "Biomimetic optimization transfers biological information-processing mechanisms into computational systems. Ant colony optimization (ACO) is a canonical example: artificial ants functionally abstract pheromone-mediated stigmergy, decentralized exploration, trail decay through algorithmic evaporation, and adaptive path reinforcement. Building on this functional biological analogue, we present a controlled cross-paradigm evaluation of routing-heuristic generation. A standardized interface embeds human-designed rules, the genetic programming hyper-heuristic GHPP, a resource-constrained DeepACO-MLP proxy, and an offline ReEvo-style proxy into the same ACO solver. The methods are evaluated on held-out TSP and CVRP instances in terms of solution quality, reported generation or training cost, interpretability, and cross-scale behavior under a matched distribution. GHPP yields the shortest routes at all tested scales; the ReEvo-offline proxy and strong human-designed rules generally form a second tier, whereas the resource-constrained neural proxy degrades markedly as problem size increases. These results do not establish an intrinsic ranking of full-capability paradigms. Instead, they show that method selection depends on the operating constraint and on evidence provenance: longer locally measured offline search favors GHPP, while auditable explicit rules characterize the human and ReEvo-offline proxies. By holding the ant-inspired execution mechanism fixed and varying the source of heuristic information, the benchmark clarifies how evolutionary, neural, and LLM-style design strategies interact with a common biomimetic substrate.",
+    "retrieval_timestamp": "2026-09-14T21:46:59.437027+00:00"
+   },
+   "model": "glm-4-plus-thinking",
+   "provider": "zai",
+   "transport_status": "OK",
+   "prompt_hash": "2428f61bf4b6cb1e",
+   "input_hash": "07c31d30553d04f5",
+   "output_hash": "93eaf5a34e18ca8e",
+   "synthesis_timestamp": "2026-09-14T21:48:45.096985+00:00"
+  }
+ },
+ "premise_gate": {
+  "verdict": "PREMISE_COHERENT",
+  "explanation": "no definitional contradiction matched; the gate cannot prove physical truth — only rule-table incoherence is checkable (disclosed limit)",
+  "matched_rules": [],
+  "n_rules_checked": 4,
+  "gate_version": "premise_gate/1.0.0",
+  "limitations": [
+   "deterministic hard-rule table (definitional contradictions only): a physically false but non-contradictory premise passes this gate",
+   "no LLM opinion is a blocking authority (Art. XVIII)",
+   "gate blindness is recorded, never converted into a coherence claim (Art. XXV)"
+  ]
+ },
+ "evidence_classification": {
+  "classifier_version": "evidence_classification/1.0.0",
+  "n_items": 14,
+  "counts": {
+   "DIRECT_SUPPORT": 2,
+   "PARTIAL_SUPPORT": 6,
+   "BACKGROUND": 0,
+   "ANALOGY": 6,
+   "CONTRADICTORY": 0,
+   "IRRELEVANT": 0
+  },
+  "items": [
+   {
+    "source_id": "doi:10.3390/biomimetics11070516",
+    "title": "Evolutionary, Neural, or LLM-Driven Heuristic Generation? A Unified Ant Colony Optimization Benchmark for Nature-Inspired Routing Heuristics",
+    "classification": "DIRECT_SUPPORT",
+    "relevance": {
+     "domain": {
+      "relevant": true,
+      "overlapping_terms": [
+       "ranking",
+       "search"
+      ]
+     },
+     "failure_mode": {
+      "relevant": true,
+      "overlapping_terms": [
+       "algorithmic",
+       "constrained",
+       "decay",
+       "held",
+       "interface",
+       "measured",
+       "not",
+       "offline",
+       "out",
+       "problem",
+       "ranking",
+       "resource",
+       "routing",
+       "same",
+       "search",
+       "show",
+       "they",
+       "through"
+      ]
+     },
+     "mechanism": {
+      "relevant": true,
+      "overlapping_terms": [
+       "adaptive",
+       "algorithmic",
+       "ant",
+       "colony",
+       "decay",
+       "evaporation",
+       "optimization",
+       "path",
+       "reinforcement",
+       "through",
+       "trail"
+      ]
+     },
+     "expected_effect": {
+      "relevant": true,
+      "overlapping_terms": [
+       "behavior",
+       "decay",
+       "interface",
+       "ranking",
+       "search",
+       "while"
+      ]
+     },
+     "material": {
+      "relevant": false,
+      "overlapping_terms": []
+     },
+     "operating_regime": {
+      "relevant": true,
+      "overlapping_terms": [
+       "ph",
+       "strain"
+      ]
+     }
+    },
+    "classification_basis": {
+     "rule": "term-overlap rule table: domain=True, failure_mode=True, mechanism=True",
+     "contradiction_basis": null,
+     "thresholds_applied": {
+      "min_domain_overlap": 2,
+      "min_failure_mode_overlap": 1,
+      "min_mechanism_overlap": 2,
+      "min_specialty_overlap": 1
+     }
+    },
+    "buyer_statement": "This source is relevant to the domain, the failure mode, and the mechanism.",
+    "classifier_version": "evidence_classification/1.0.0"
+   },
+   {
+    "source_id": "doi:10.1038/s41598-026-56933-4",
+    "title": "Intelligent english education resource recommendation via LLM-knowledge graph integration and ecological niche fitness modeling.",
+    "classification": "DIRECT_SUPPORT",
+    "relevance": {
+     "domain": {
+      "relevant": true,
+      "overlapping_terms": [
+       "model",
+       "ranking"
+      ]
+     },
+     "failure_mode": {
+      "relevant": true,
+      "overlapping_terms": [
+       "decay",
+       "framework",
+       "held",
+       "interaction",
+       "log",
+       "model",
+       "more",
+       "problem",
+       "ranking",
+       "resource",
+       "semantic",
+       "setting",
+       "than",
+       "they",
+       "through"
+      ]
+     },
+     "mechanism": {
+      "relevant": true,
+      "overlapping_terms": [
+       "adaptive",
+       "decay",
+       "path",
+       "through"
+      ]
+     },
+     "expected_effect": {
+      "relevant": true,
+      "overlapping_terms": [
+       "decay",
+       "model",
+       "ranking",
+       "while"
+      ]
+     },
+     "material": {
+      "relevant": true,
+      "overlapping_terms": [
+       "composite"
+      ]
+     },
+     "operating_regime": {
+      "relevant": true,
+      "overlapping_terms": [
+       "ph"
+      ]
+     }
+    },
+    "classification_basis": {
+     "rule": "term-overlap rule table: domain=True, failure_mode=True, mechanism=True",
+     "contradiction_basis": null,
+     "thresholds_applied": {
+      "min_domain_overlap": 2,
+      "min_failure_mode_overlap": 1,
+      "min_mechanism_overlap": 2,
+      "min_specialty_overlap": 1
+     }
+    },
+    "buyer_statement": "This source is relevant to the domain, the failure mode, and the mechanism.",
+    "classifier_version": "evidence_classification/1.0.0"
+   },
+   {
+    "source_id": "doi:10.70729/j2013213",
+    "title": "A Global Fusion Re-Ranking for Effective Data Search with Correlation Model",
+    "classification": "PARTIAL_SUPPORT",
+    "relevance": {
+     "domain": {
+      "relevant": true,
+      "overlapping_terms": [
+       "model",
+       "ranking",
+       "search"
+      ]
+     },
+     "failure_mode": {
+      "relevant": true,
+      "overlapping_terms": [
+       "fusion",
+       "model",
+       "ranking",
+       "search"
+      ]
+     },
+     "mechanism": {
+      "relevant": false,
+      "overlapping_terms": []
+     },
+     "expected_effect": {
+      "relevant": true,
+      "overlapping_terms": [
+       "model",
+       "ranking",
+       "search"
+      ]
+     },
+     "material": {
+      "relevant": false,
+      "overlapping_terms": []
+     },
+     "operating_regime": {
+      "relevant": false,
+      "overlapping_terms": []
+     }
+    },
+    "classification_basis": {
+     "rule": "term-overlap rule table: domain=True, failure_mode=True, mechanism=False",
+     "contradiction_basis": null,
+     "thresholds_applied": {
+      "min_domain_overlap": 2,
+      "min_failure_mode_overlap": 1,
+      "min_mechanism_overlap": 2,
+      "min_specialty_overlap": 1
+     }
+    },
+    "buyer_statement": "This source is relevant to the domain but does not support the mechanism.",
+    "classifier_version": "evidence_classification/1.0.0"
+   },
+   {
+    "source_id": "doi:10.20948/graphicon-2021-3027-1131-1138",
+    "title": "A Mathematical Model for Ranking High-Level User Interface Regression Tests",
+    "classification": "PARTIAL_SUPPORT",
+    "relevance": {
+     "domain": {
+      "relevant": true,
+      "overlapping_terms": [
+       "model",
+       "ranking"
+      ]
+     },
+     "failure_mode": {
+      "relevant": true,
+      "overlapping_terms": [
+       "interface",
+       "model",
+       "ranking",
+       "user"
+      ]
+     },
+     "mechanism": {
+      "relevant": false,
+      "overlapping_terms": []
+     },
+     "expected_effect": {
+      "relevant": true,
+      "overlapping_terms": [
+       "interface",
+       "model",
+       "ranking",
+       "user"
+      ]
+     },
+     "material": {
+      "relevant": false,
+      "overlapping_terms": []
+     },
+     "operating_regime": {
+      "relevant": false,
+      "overlapping_terms": []
+     }
+    },
+    "classification_basis": {
+     "rule": "term-overlap rule table: domain=True, failure_mode=True, mechanism=False",
+     "contradiction_basis": null,
+     "thresholds_applied": {
+      "min_domain_overlap": 2,
+      "min_failure_mode_overlap": 1,
+      "min_mechanism_overlap": 2,
+      "min_specialty_overlap": 1
+     }
+    },
+    "buyer_statement": "This source is relevant to the domain but does not support the mechanism.",
+    "classifier_version": "evidence_classification/1.0.0"
+   },
+   {
+    "source_id": "doi:10.3390/s26134247",
+    "title": "AHGA-SA: A Novel Adaptive Hybrid Framework for Feature Selection in IoT-Oriented Intrusion Detection with Explainable AI.",
+    "classification": "PARTIAL_SUPPORT",
+    "relevance": {
+     "domain": {
+      "relevant": true,
+      "overlapping_terms": [
+       "model",
+       "search"
+      ]
+     },
+     "failure_mode": {
+      "relevant": true,
+      "overlapping_terms": [
+       "decision",
+       "detection",
+       "explainable",
+       "framework",
+       "model",
+       "more",
+       "paper",
+       "prediction",
+       "search",
+       "show",
+       "using"
+      ]
+     },
+     "mechanism": {
+      "relevant": false,
+      "overlapping_terms": [
+       "adaptive"
+      ]
+     },
+     "expected_effect": {
+      "relevant": true,
+      "overlapping_terms": [
+       "maintaining",
+       "model",
+       "performance",
+       "search",
+       "while"
+      ]
+     },
+     "material": {
+      "relevant": false,
+      "overlapping_terms": []
+     },
+     "operating_regime": {
+      "relevant": false,
+      "overlapping_terms": []
+     }
+    },
+    "classification_basis": {
+     "rule": "term-overlap rule table: domain=True, failure_mode=True, mechanism=False",
+     "contradiction_basis": null,
+     "thresholds_applied": {
+      "min_domain_overlap": 2,
+      "min_failure_mode_overlap": 1,
+      "min_mechanism_overlap": 2,
+      "min_specialty_overlap": 1
+     }
+    },
+    "buyer_statement": "This source is relevant to the domain but does not support the mechanism.",
+    "classifier_version": "evidence_classification/1.0.0"
+   },
+   {
+    "source_id": "doi:10.1039/d4sc02233e",
+    "title": "ProBID-Net: a deep learning model for protein-protein binding interface design.",
+    "classification": "ANALOGY",
+    "relevance": {
+     "domain": {
+      "relevant": false,
+      "overlapping_terms": [
+       "model"
+      ]
+     },
+     "failure_mode": {
+      "relevant": true,
+      "overlapping_terms": [
+       "based",
+       "between",
+       "constrained",
+       "gap",
+       "input",
+       "interaction",
+       "interface",
+       "learning",
+       "model",
+       "prediction",
+       "rate",
+       "trained",
+       "using"
+      ]
+     },
+     "mechanism": {
+      "relevant": false,
+      "overlapping_terms": []
+     },
+     "expected_effect": {
+      "relevant": true,
+      "overlapping_terms": [
+       "interface",
+       "model"
+      ]
+     },
+     "material": {
+      "relevant": false,
+      "overlapping_terms": []
+     },
+     "operating_regime": {
+      "relevant": true,
+      "overlapping_terms": [
+       "ph",
+       "strain"
+      ]
+     }
+    },
+    "classification_basis": {
+     "rule": "term-overlap rule table: domain=False, failure_mode=True, mechanism=False",
+     "contradiction_basis": null,
+     "thresholds_applied": {
+      "min_domain_overlap": 2,
+      "min_failure_mode_overlap": 1,
+      "min_mechanism_overlap": 2,
+      "min_specialty_overlap": 1
+     }
+    },
+    "buyer_statement": "This source is from an adjacent domain but speaks to the mechanism or failure mode (analogy, not direct domain evidence).",
+    "classifier_version": "evidence_classification/1.0.0"
+   },
+   {
+    "source_id": "doi:10.18130/v3tg0k",
+    "title": "First Search for the Standard Model Higgs Boson Using the Semileptonic Decay Channel: H-WW----",
+    "classification": "PARTIAL_SUPPORT",
+    "relevance": {
+     "domain": {
+      "relevant": true,
+      "overlapping_terms": [
+       "model",
+       "search"
+      ]
+     },
+     "failure_mode": {
+      "relevant": true,
+      "overlapping_terms": [
+       "decay",
+       "model",
+       "search",
+       "using"
+      ]
+     },
+     "mechanism": {
+      "relevant": false,
+      "overlapping_terms": [
+       "decay"
+      ]
+     },
+     "expected_effect": {
+      "relevant": true,
+      "overlapping_terms": [
+       "decay",
+       "model",
+       "search"
+      ]
+     },
+     "material": {
+      "relevant": false,
+      "overlapping_terms": []
+     },
+     "operating_regime": {
+      "relevant": false,
+      "overlapping_terms": []
+     }
+    },
+    "classification_basis": {
+     "rule": "term-overlap rule table: domain=True, failure_mode=True, mechanism=False",
+     "contradiction_basis": null,
+     "thresholds_applied": {
+      "min_domain_overlap": 2,
+      "min_failure_mode_overlap": 1,
+      "min_mechanism_overlap": 2,
+      "min_specialty_overlap": 1
+     }
+    },
+    "buyer_statement": "This source is relevant to the domain but does not support the mechanism.",
+    "classifier_version": "evidence_classification/1.0.0"
+   },
+   {
+    "source_id": "doi:10.22215/etd/2013-09971",
+    "title": "Search for the Standard Model Higgs boson in the vector boson fusion-mediated diphoton decay channel using multivariate analysis techniques",
+    "classification": "PARTIAL_SUPPORT",
+    "relevance": {
+     "domain": {
+      "relevant": true,
+      "overlapping_terms": [
+       "model",
+       "search"
+      ]
+     },
+     "failure_mode": {
+      "relevant": true,
+      "overlapping_terms": [
+       "decay",
+       "fusion",
+       "model",
+       "search",
+       "using"
+      ]
+     },
+     "mechanism": {
+      "relevant": false,
+      "overlapping_terms": [
+       "decay"
+      ]
+     },
+     "expected_effect": {
+      "relevant": true,
+      "overlapping_terms": [
+       "decay",
+       "model",
+       "search"
+      ]
+     },
+     "material": {
+      "relevant": false,
+      "overlapping_terms": []
+     },
+     "operating_regime": {
+      "relevant": true,
+      "overlapping_terms": [
+       "ph"
+      ]
+     }
+    },
+    "classification_basis": {
+     "rule": "term-overlap rule table: domain=True, failure_mode=True, mechanism=False",
+     "contradiction_basis": null,
+     "thresholds_applied": {
+      "min_domain_overlap": 2,
+      "min_failure_mode_overlap": 1,
+      "min_mechanism_overlap": 2,
+      "min_specialty_overlap": 1
+     }
+    },
+    "buyer_statement": "This source is relevant to the domain but does not support the mechanism.",
+    "classifier_version": "evidence_classification/1.0.0"
+   },
+   {
+    "source_id": "doi:10.30707/etd2017.mcfaul.h",
+    "title": "The Redesign Of School Discipline: One Schoolâs Approach To Rethink And Redesign Discipline Practices Through The Restorative Justice Mode",
+    "classification": "ANALOGY",
+    "relevance": {
+     "domain": {
+      "relevant": false,
+      "overlapping_terms": [
+       "model"
+      ]
+     },
+     "failure_mode": {
+      "relevant": true,
+      "overlapping_terms": [
+       "model",
+       "redesign",
+       "through"
+      ]
+     },
+     "mechanism": {
+      "relevant": false,
+      "overlapping_terms": [
+       "through"
+      ]
+     },
+     "expected_effect": {
+      "relevant": true,
+      "overlapping_terms": [
+       "model",
+       "redesign"
+      ]
+     },
+     "material": {
+      "relevant": false,
+      "overlapping_terms": []
+     },
+     "operating_regime": {
+      "relevant": false,
+      "overlapping_terms": []
+     }
+    },
+    "classification_basis": {
+     "rule": "term-overlap rule table: domain=False, failure_mode=True, mechanism=False",
+     "contradiction_basis": null,
+     "thresholds_applied": {
+      "min_domain_overlap": 2,
+      "min_failure_mode_overlap": 1,
+      "min_mechanism_overlap": 2,
+      "min_specialty_overlap": 1
+     }
+    },
+    "buyer_statement": "This source is from an adjacent domain but speaks to the mechanism or failure mode (analogy, not direct domain evidence).",
+    "classifier_version": "evidence_classification/1.0.0"
+   },
+   {
+    "source_id": "doi:10.2139/ssrn.4892616",
+    "title": "A Ranking Model Framework for Multiple Vertical Search Domains",
+    "classification": "PARTIAL_SUPPORT",
+    "relevance": {
+     "domain": {
+      "relevant": true,
+      "overlapping_terms": [
+       "model",
+       "ranking",
+       "search"
+      ]
+     },
+     "failure_mode": {
+      "relevant": true,
+      "overlapping_terms": [
+       "framework",
+       "model",
+       "ranking",
+       "search"
+      ]
+     },
+     "mechanism": {
+      "relevant": false,
+      "overlapping_terms": []
+     },
+     "expected_effect": {
+      "relevant": true,
+      "overlapping_terms": [
+       "model",
+       "ranking",
+       "search"
+      ]
+     },
+     "material": {
+      "relevant": false,
+      "overlapping_terms": []
+     },
+     "operating_regime": {
+      "relevant": false,
+      "overlapping_terms": []
+     }
+    },
+    "classification_basis": {
+     "rule": "term-overlap rule table: domain=True, failure_mode=True, mechanism=False",
+     "contradiction_basis": null,
+     "thresholds_applied": {
+      "min_domain_overlap": 2,
+      "min_failure_mode_overlap": 1,
+      "min_mechanism_overlap": 2,
+      "min_specialty_overlap": 1
+     }
+    },
+    "buyer_statement": "This source is relevant to the domain but does not support the mechanism.",
+    "classifier_version": "evidence_classification/1.0.0"
+   },
+   {
+    "source_id": "title:79b7e00e0977ce94",
+    "title": "Model family photo album : Happy anniversary : II. 3. 1948 / EM 1948",
+    "classification": "ANALOGY",
+    "relevance": {
+     "domain": {
+      "relevant": false,
+      "overlapping_terms": [
+       "model"
+      ]
+     },
+     "failure_mode": {
+      "relevant": true,
+      "overlapping_terms": [
+       "after",
+       "model",
+       "they",
+       "until"
+      ]
+     },
+     "mechanism": {
+      "relevant": false,
+      "overlapping_terms": []
+     },
+     "expected_effect": {
+      "relevant": true,
+      "overlapping_terms": [
+       "after",
+       "model"
+      ]
+     },
+     "material": {
+      "relevant": false,
+      "overlapping_terms": []
+     },
+     "operating_regime": {
+      "relevant": true,
+      "overlapping_terms": [
+       "ph"
+      ]
+     }
+    },
+    "classification_basis": {
+     "rule": "term-overlap rule table: domain=False, failure_mode=True, mechanism=False",
+     "contradiction_basis": null,
+     "thresholds_applied": {
+      "min_domain_overlap": 2,
+      "min_failure_mode_overlap": 1,
+      "min_mechanism_overlap": 2,
+      "min_specialty_overlap": 1
+     }
+    },
+    "buyer_statement": "This source is from an adjacent domain but speaks to the mechanism or failure mode (analogy, not direct domain evidence).",
+    "classifier_version": "evidence_classification/1.0.0"
+   },
+   {
+    "source_id": "doi:10.1142/14835",
+    "title": "The Search for Nucleon Decay",
+    "classification": "ANALOGY",
+    "relevance": {
+     "domain": {
+      "relevant": false,
+      "overlapping_terms": [
+       "search"
+      ]
+     },
+     "failure_mode": {
+      "relevant": true,
+      "overlapping_terms": [
+       "decay",
+       "search"
+      ]
+     },
+     "mechanism": {
+      "relevant": false,
+      "overlapping_terms": [
+       "decay"
+      ]
+     },
+     "expected_effect": {
+      "relevant": true,
+      "overlapping_terms": [
+       "decay",
+       "search"
+      ]
+     },
+     "material": {
+      "relevant": false,
+      "overlapping_terms": []
+     },
+     "operating_regime": {
+      "relevant": false,
+      "overlapping_terms": []
+     }
+    },
+    "classification_basis": {
+     "rule": "term-overlap rule table: domain=False, failure_mode=True, mechanism=False",
+     "contradiction_basis": null,
+     "thresholds_applied": {
+      "min_domain_overlap": 2,
+      "min_failure_mode_overlap": 1,
+      "min_mechanism_overlap": 2,
+      "min_specialty_overlap": 1
+     }
+    },
+    "buyer_statement": "This source is from an adjacent domain but speaks to the mechanism or failure mode (analogy, not direct domain evidence).",
+    "classifier_version": "evidence_classification/1.0.0"
+   },
+   {
+    "source_id": "title:d2b3902accae0d69",
+    "title": "Sub-series 2: Publications",
+    "classification": "ANALOGY",
+    "relevance": {
+     "domain": {
+      "relevant": false,
+      "overlapping_terms": [
+       "model"
+      ]
+     },
+     "failure_mode": {
+      "relevant": true,
+      "overlapping_terms": [
+       "engine",
+       "model"
+      ]
+     },
+     "mechanism": {
+      "relevant": false,
+      "overlapping_terms": []
+     },
+     "expected_effect": {
+      "relevant": true,
+      "overlapping_terms": [
+       "maintaining",
+       "model"
+      ]
+     },
+     "material": {
+      "relevant": false,
+      "overlapping_terms": []
+     },
+     "operating_regime": {
+      "relevant": false,
+      "overlapping_terms": []
+     }
+    },
+    "classification_basis": {
+     "rule": "term-overlap rule table: domain=False, failure_mode=True, mechanism=False",
+     "contradiction_basis": null,
+     "thresholds_applied": {
+      "min_domain_overlap": 2,
+      "min_failure_mode_overlap": 1,
+      "min_mechanism_overlap": 2,
+      "min_specialty_overlap": 1
+     }
+    },
+    "buyer_statement": "This source is from an adjacent domain but speaks to the mechanism or failure mode (analogy, not direct domain evidence).",
+    "classifier_version": "evidence_classification/1.0.0"
+   },
+   {
+    "source_id": "title:e5e039305af54970",
+    "title": "Paris on Stage: 1889-1914 [exhibition]; Cabaret de L’Enfer Model",
+    "classification": "ANALOGY",
+    "relevance": {
+     "domain": {
+      "relevant": false,
+      "overlapping_terms": [
+       "model"
+      ]
+     },
+     "failure_mode": {
+      "relevant": true,
+      "overlapping_terms": [
+       "held",
+       "model",
+       "not",
+       "they",
+       "until"
+      ]
+     },
+     "mechanism": {
+      "relevant": false,
+      "overlapping_terms": []
+     },
+     "expected_effect": {
+      "relevant": true,
+      "overlapping_terms": [
+       "model",
+       "while"
+      ]
+     },
+     "material": {
+      "relevant": false,
+      "overlapping_terms": []
+     },
+     "operating_regime": {
+      "relevant": true,
+      "overlapping_terms": [
+       "ph"
+      ]
+     }
+    },
+    "classification_basis": {
+     "rule": "term-overlap rule table: domain=False, failure_mode=True, mechanism=False",
+     "contradiction_basis": null,
+     "thresholds_applied": {
+      "min_domain_overlap": 2,
+      "min_failure_mode_overlap": 1,
+      "min_mechanism_overlap": 2,
+      "min_specialty_overlap": 1
+     }
+    },
+    "buyer_statement": "This source is from an adjacent domain but speaks to the mechanism or failure mode (analogy, not direct domain evidence).",
+    "classifier_version": "evidence_classification/1.0.0"
+   }
+  ],
+  "mechanism_support": {
+   "n_direct_support": 2,
+   "direct_support_source_ids": [
+    "doi:10.3390/biomimetics11070516",
+    "doi:10.1038/s41598-026-56933-4"
+   ],
+   "n_contradictory": 0,
+   "contradictory_source_ids": [],
+   "note": "DIRECT_SUPPORT requires domain + failure-mode + mechanism relevance; domain-only relevance is BACKGROUND and can never support a mechanism claim (R394 s5)"
+  },
+  "thresholds": {
+   "MIN_DOMAIN_OVERLAP": {
+    "value": 2,
+    "epistemic_class": "ENGINEERING",
+    "justification": "same rule family as the engine's standing domain-specificity bar (>= 2 shared content terms = domain-specific rather than accidental collision)",
+    "uncertainty": "term overlap is a proxy for domain identity"
+   },
+   "MIN_MECHANISM_OVERLAP": {
+    "value": 2,
+    "epistemic_class": "ENGINEERING",
+    "justification": "the collision core's MIN_MECHANISM_OVERLAP — one rule family across the engine (Art. VII: no per-callsite threshold invention)",
+    "uncertainty": "term overlap is a proxy for mechanism identity"
+   },
+   "MIN_FAILURE_MODE_OVERLAP": {
+    "value": 1,
+    "epistemic_class": "ENGINEERING",
+    "justification": "failure-mode vocabulary is sparse and specific ('occlusion', 'drift', 'delamination'); a single shared specific term is a real signal, accidental single-term collisions are already filtered by the domain gate",
+    "uncertainty": "word-sense collisions remain possible"
+   },
+   "MIN_SPECIALTY_OVERLAP": {
+    "value": 1,
+    "epistemic_class": "ENGINEERING",
+    "justification": "material and operating-regime vocabulary (polyethylene, titanium, 310 K, cyclic load) is highly specific; one shared term is signal",
+    "uncertainty": "none disclosed beyond term-overlap proxy limits"
+   }
+  }
+ },
+ "mechanism_space": {
+  "mechanism_space_version": "mechanism_space/1.0.0",
+  "construction": "R453_LEAN (external auditor mandate: no extraction fan-out; FREEZE/VERIFY facts reused; at most one operator call)",
+  "built_at": "2026-09-14T21:48:45+00:00Z",
+  "problem_id": "r458-s1-ranking-model-distribution-shift",
+  "operator_ids": [
+   "DIRECT_TRANSFER"
+  ],
+  "n_structured_items": 8,
+  "structured_evidence": {
+   "state": "BUILT",
+   "n_items": 8,
+   "construction": "R453_LEAN_REUSE_FREEZE_VERIFY_FACTS",
+   "items": [
+    {
+     "item_id": "lean_doi:10.3390/biomimetics11070516",
+     "structured_hash": "e760cdcc9edab705401cfc32f819bb564f5743bc5f199a2b30f79cfcb409a817",
+     "fields": {
+      "system": {
+       "value": "Evolutionary, Neural, or LLM-Driven Heuristic Generation? A Unified Ant Colony Optimization Benchmark for Nature-Inspired Routing Heuristics on the TSP and CVRP."
+      }
+     },
+     "source": "europepmc",
+     "provenance": {
+      "content_hash": "098d1b56c5e818199516077e4ac0d3cdd72c4c9a97ecc284338dc654b735b1c6",
+      "retrieval_timestamp": "2026-09-14T21:46:59.437027+00:00",
+      "construction": "R453_LEAN_REUSE_FREEZE_VERIFY_FACTS",
+      "claim_classification": "DIRECT_SUPPORT"
+     }
+    },
+    {
+     "item_id": "lean_doi:10.1038/s41598-026-56933-4",
+     "structured_hash": "36840d4b567ec02e0e620d73280faf26f191772aa469bb930a26060affc22a39",
+     "fields": {
+      "system": {
+       "value": "Intelligent english education resource recommendation via LLM-knowledge graph integration and ecological niche fitness modeling."
+      }
+     },
+     "source": "europepmc",
+     "provenance": {
+      "content_hash": "8b85382c76ae0e2c875323bf306668b56226822d66a824622bb59840865c9e8f",
+      "retrieval_timestamp": "2026-09-14T21:46:59.437111+00:00",
+      "construction": "R453_LEAN_REUSE_FREEZE_VERIFY_FACTS",
+      "claim_classification": "DIRECT_SUPPORT"
+     }
+    },
+    {
+     "item_id": "lean_doi:10.70729/j2013213",
+     "structured_hash": "a2646b72285c0245c1dec3b7a1e974ffecc6166191a4eab856b53a86396c8179",
+     "fields": {
+      "system": {
+       "value": "A Global Fusion Re-Ranking for Effective Data Search with Correlation Model"
+      }
+     },
+     "source": "crossref",
+     "provenance": {
+      "content_hash": "c1de9fd16750725e26eac78e7a6d2b0a4e9d928b7eec9f59e6e7126db94ce809",
+      "retrieval_timestamp": "2026-09-14T21:46:59.437140+00:00",
+      "construction": "R453_LEAN_REUSE_FREEZE_VERIFY_FACTS",
+      "claim_classification": "PARTIAL_SUPPORT"
+     }
+    },
+    {
+     "item_id": "lean_doi:10.20948/graphicon-2021-3027-1131-1138",
+     "structured_hash": "68e41cec06dd3afd6c3d02fb85a325c0f0e865ac7fa73fd0a191aea8dde6fee0",
+     "fields": {
+      "system": {
+       "value": "A Mathematical Model for Ranking High-Level User Interface Regression Tests"
+      }
+     },
+     "source": "crossref",
+     "provenance": {
+      "content_hash": "eb560c1860c4754606905bdfe534c0eedd439132d1834d3a3b8bd5c07f8bc854",
+      "retrieval_timestamp": "2026-09-14T21:46:59.437163+00:00",
+      "construction": "R453_LEAN_REUSE_FREEZE_VERIFY_FACTS",
+      "claim_classification": "PARTIAL_SUPPORT"
+     }
+    },
+    {
+     "item_id": "lean_doi:10.3390/s26134247",
+     "structured_hash": "278ba7bc204596b201e27bc0c4c04546947601cff2be04c5911fd8e2c023c562",
+     "fields": {
+      "system": {
+       "value": "AHGA-SA: A Novel Adaptive Hybrid Framework for Feature Selection in IoT-Oriented Intrusion Detection with Explainable AI."
+      }
+     },
+     "source": "europepmc",
+     "provenance": {
+      "content_hash": "8e67ea9177517a94a6e2aef9629ab2e266821cc21795cd9ccfa5c8f642ebdf64",
+      "retrieval_timestamp": "2026-09-14T21:46:59.437182+00:00",
+      "construction": "R453_LEAN_REUSE_FREEZE_VERIFY_FACTS",
+      "claim_classification": "PARTIAL_SUPPORT"
+     }
+    },
+    {
+     "item_id": "lean_doi:10.18130/v3tg0k",
+     "structured_hash": "4c16de3cffb03dbfac750286870a3cb2f41ae2b810c54f0fdb098a8cc2505210",
+     "fields": {
+      "system": {
+       "value": "First Search for the Standard Model Higgs Boson Using the Semileptonic Decay Channel: H-WW----"
+      }
+     },
+     "source": "crossref",
+     "provenance": {
+      "content_hash": "280d5ef547bef21d7f34fa212005eb196b5c22a678b510f46b65fa67af60064b",
+      "retrieval_timestamp": "2026-09-14T21:46:59.437221+00:00",
+      "construction": "R453_LEAN_REUSE_FREEZE_VERIFY_FACTS",
+      "claim_classification": "PARTIAL_SUPPORT"
+     }
+    },
+    {
+     "item_id": "lean_doi:10.22215/etd/2013-09971",
+     "structured_hash": "f826fe21bd97918d89483a757bb9f1f06df8bb984b23fd355b737893dfc382a6",
+     "fields": {
+      "system": {
+       "value": "Search for the Standard Model Higgs boson in the vector boson fusion-mediated diphoton decay channel using multivariate analysis techniques"
+      }
+     },
+     "source": "crossref",
+     "provenance": {
+      "content_hash": "9101abb03337a322961c21589ee14d5a1cae3e40b760aa479e2f1bff136870bd",
+      "retrieval_timestamp": "2026-09-14T21:46:59.437250+00:00",
+      "construction": "R453_LEAN_REUSE_FREEZE_VERIFY_FACTS",
+      "claim_classification": "PARTIAL_SUPPORT"
+     }
+    },
+    {
+     "item_id": "lean_doi:10.2139/ssrn.4892616",
+     "structured_hash": "4271c91bc809929d1d03009d74c03d486b0ab0b60b070ec04edd155123acde90",
+     "fields": {
+      "system": {
+       "value": "A Ranking Model Framework for Multiple Vertical Search Domains"
+      }
+     },
+     "source": "crossref",
+     "provenance": {
+      "content_hash": "950e4348f4861b9a1441def1ecde903d56c462478bf502822926dd3e77057188",
+      "retrieval_timestamp": "2026-09-14T21:46:59.437294+00:00",
+      "construction": "R453_LEAN_REUSE_FREEZE_VERIFY_FACTS",
+      "claim_classification": "PARTIAL_SUPPORT"
+     }
+    }
+   ]
+  },
+  "operator_results": [
+   {
+    "operator": "DIRECT_TRANSFER",
+    "operator_version": "DIRECT_TRANSFER/1.0.0",
+    "transformation_rule": "instantiate the domain-matched mechanism unchanged; re-derive only the intervention site and design variable",
+    "search_constraint": "the region where the evidence system IS the problem system (same-domain demonstrated mechanisms)",
+    "n_items_examined": 8,
+    "n_items_selected": 0,
+    "selected_item_ids": [],
+    "input_contract": {
+     "operator": "DIRECT_TRANSFER",
+     "satisfied": false,
+     "shared_system_terms": [
+      "routing"
+     ],
+     "basis": "evidence system-domain overlaps the problem device domain (>= 2 terms)"
+    },
+    "lean_path": "one instantiation call, no corrective retry (R453-LEAN; the span/semantic gates unchanged)",
+    "state": "NO_APPLICABLE_EVIDENCE",
+    "note": "the DIRECT_TRANSFER input contract was not satisfied by the top verified item — honest refusal, nothing fabricated (Art. XXV)"
+   }
+  ],
+  "operator_candidates_full": [
+   {
+    "operator": "DIRECT_TRANSFER",
+    "operator_version": "DIRECT_TRANSFER/1.0.0",
+    "transformation_rule": "instantiate the domain-matched mechanism unchanged; re-derive only the intervention site and design variable",
+    "search_constraint": "the region where the evidence system IS the problem system (same-domain demonstrated mechanisms)",
+    "n_items_examined": 8,
+    "n_items_selected": 0,
+    "selected_item_ids": [],
+    "input_contract": {
+     "operator": "DIRECT_TRANSFER",
+     "satisfied": false,
+     "shared_system_terms": [
+      "routing"
+     ],
+     "basis": "evidence system-domain overlaps the problem device domain (>= 2 terms)"
+    },
+    "lean_path": "one instantiation call, no corrective retry (R453-LEAN; the span/semantic gates unchanged)",
+    "candidates": [],
+    "state": "NO_APPLICABLE_EVIDENCE",
+    "note": "the DIRECT_TRANSFER input contract was not satisfied by the top verified item — honest refusal, nothing fabricated (Art. XXV)"
+   }
+  ],
+  "cemetery_consumption": {
+   "consumption_version": "cemetery_consumption/1.0.0",
+   "rule": "Art. LI: negative knowledge is a state-transition mechanism — killed invariants must be capable of changing future search; a written-but-never-read cemetery is a log, not a memory",
+   "n_candidates_consulted": 0,
+   "n_blocked": 0,
+   "n_warned": 0,
+   "blocked": [],
+   "state": "CONSULTED",
+   "total_lessons_consulted": null
+  },
+  "distinctness": {
+   "n_input": 0,
+   "n_kept": 0,
+   "kept_ids": [],
+   "n_distinct": 0,
+   "n_indeterminate": 0,
+   "n_equivalent_merged": 0,
+   "distinctness_verdicts": {
+    "DISTINCT": 0,
+    "INDETERMINATE": 0,
+    "EQUIVALENT": 0
+   },
+   "instrument_version": "mechanism_distinctness/2.0.0",
+   "dedup_events": [],
+   "retain_events": [],
+   "distinctness_rule": "v2 three-verdict rule (Art. XLII): the mechanism graph aggregate (node term sets + edge signatures) is the causal core; DISTINCT iff its Jaccard < 0.45; EQUIVALENT (merge) iff >= 0.8 with at most a design-knob difference (knob/parameter/synonym renames cannot independently create an invention); INDETERMINATE for boundary-regime or failure-mode deltas on an equivalent core, or cores in the ambiguous band — kept visible, never counted as distinct; every verdict records its basis"
+  },
+  "candidates": [],
+  "state": "NO_CANDIDATES",
+  "n_candidates_generated": 0,
+  "n_candidates_retained": 0,
+  "min_candidates_required": 1,
+  "metrics": {
+   "mechanism_candidates_generated": 0,
+   "mechanism_candidates_after_dedup": 0,
+   "operator_counts": {
+    "DIRECT_TRANSFER": {
+     "generated": 0,
+     "retained": 0
+    },
+    "CROSS_DOMAIN_ANALOGY": {
+     "generated": 0,
+     "retained": 0
+    },
+    "GEOMETRIC_TRANSFORMATION": {
+     "generated": 0,
+     "retained": 0
+    },
+    "BOUNDARY_CONDITION_CHANGE": {
+     "generated": 0,
+     "retained": 0
+    },
+    "FAILURE_PATH_INVERSION": {
+     "generated": 0,
+     "retained": 0
+    }
+   },
+   "material_distinctness_rate": null,
+   "material_mechanism_diversity": {
+    "n_distinct": 0,
+    "n_indeterminate": 0,
+    "n_equivalent_merged": 0,
+    "instrument_version": "mechanism_distinctness/2.0.0",
+    "note": "MMD per Art. XLVIII: counts DISTINCT verdicts only — EQUIVALENT merges and INDETERMINATE referrals are reported but never counted as distinct mechanisms (Art. XLII/XXV)"
+   },
+   "evidence_mechanism_support_rate": null,
+   "contradiction_rate": null,
+   "testable_prediction_rate": null,
+   "n_structured_evidence_items": 8,
+   "states_vocabulary_note": "rates expose behavior; NOT_ENOUGH_EVIDENCE/CONTESTED are never affirmative (Art. XXV)"
+  }
+ },
+ "prior_art_ids": [],
+ "prior_art": {
+  "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+  "legacy_status": "LIKELY_PRIOR_ART_EXISTS",
+  "differentiation_resolution": {
+   "state": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+   "epistemic_class": "SEARCH_RESULT",
+   "constitutional_limitation": "a search-derived prior-art POSITION, not a novelty determination (Art. XXVIII); coverage measured by declared term-overlap thresholds, not a claim chart",
+   "evidence_tier_summary": "NO_FAMILIES",
+   "per_family": [],
+   "n_families": 0,
+   "n_search_errors": 10,
+   "search_errors": [
+    {
+     "query": "ranking decay decays through algorithmic search",
+     "source": "google_patents",
+     "error": "HTTP 503",
+     "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+    },
+    {
+     "query": "ranking decay decays through algorithmic search",
+     "source": "lens_patent",
+     "error": "LENS_API_TOKEN not configured",
+     "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+    },
+    {
+     "query": "decay through algorithmic optimization evaporation adaptive",
+     "source": "google_patents",
+     "error": "HTTP 503",
+     "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+    },
+    {
+     "query": "decay through algorithmic optimization evaporation adaptive",
+     "source": "lens_patent",
+     "error": "LENS_API_TOKEN not configured",
+     "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+    },
+    {
+     "query": "dynamic mechanism decay ranking evaporation user interactions signals",
+     "source": "google_patents",
+     "error": "HTTP 503",
+     "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+    },
+    {
+     "query": "dynamic mechanism decay ranking evaporation user interactions signals",
+     "source": "lens_patent",
+     "error": "LENS_API_TOKEN not configured",
+     "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+    },
+    {
+     "query": "ranking mitigation performance allowing changing maintaining",
+     "source": "google_patents",
+     "error": "HTTP 503",
+     "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+    },
+    {
+     "query": "ranking mitigation performance allowing changing maintaining",
+     "source": "lens_patent",
+     "error": "LENS_API_TOKEN not configured",
+     "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+    },
+    {
+     "query": "mitigate performance allowing changing behavior patterns",
+     "source": "google_patents",
+     "error": "HTTP 503",
+     "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+    },
+    {
+     "query": "mitigate performance allowing changing behavior patterns",
+     "source": "lens_patent",
+     "error": "LENS_API_TOKEN not configured",
+     "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+    }
+   ],
+   "search_execution": {
+    "mandatory_complete": false,
+    "n_errors": 10,
+    "rule": "RESOLVED_DIFFERENTIATED requires every mandatory (query_class x source) search to have completed successfully (R394 s2); provider failure never becomes absence (Art. XXI.3)"
+   },
+   "relevance_model_version": "collision_resolution/2.0.0",
+   "determinism_contract": {
+    "inputs": "problem + candidate profile + query ladder + source results (per-family adjudicated text, hash-custodied) + thresholds + relevance model version",
+    "check": "identical inputs must yield identical coverage decisions and state; divergence on replay is FLAG_INCONSISTENT_RETRIEVAL (R394 s3)"
+   },
+   "thresholds": {
+    "CROSS_DOMAIN_MIN_NONGENERIC_OVERLAP": {
+     "value": 3,
+     "epistemic_class": "ENGINEERING",
+     "justification": "R377 patent-text ground truth (TOSCANINI/R377_PATENT_TEXT_FETCH.json + R377_PATENT_TEXT_GROUND_TRUTH.json): 12/30 family representatives (40%) were substantively irrelevant cross-domain term collisions (CWDM optical link for a battery-thermal candidate; dental-condition monitoring for rolling stock; bone fracture forceps for rail steel...). A hit sharing NO entity term with the candidate now needs >= 3 NON-generic mechanism terms to be mechanism art: the measured true cross-domain analog (line-pipe steel with hydrogen fracture toughness for a rail-steel candidate) shares 3 non-generic terms and survives; every measured false positive shares <= 2 and is demoted. This RAISES the cross-domain bar (was the same >= 2 as same-domain) — stricter, not weaker (Art. VII).",
+     "uncertainty": "term overlap remains a proxy; entity word-sense collisions ('gear': steering vs draft) can still pass — disclosed limitation, not a solved problem"
+    },
+    "MIN_MECHANISM_OVERLAP": {
+     "value": 2,
+     "epistemic_class": "ENGINEERING",
+     "justification": "same term-overlap rule family as the pipeline relevance adjudicator and the Q2 instrument (>= 2 shared content terms = domain-specific rather than accidental collision); NOT weakened relative to any prior gate",
+     "uncertainty": "term overlap is a proxy for mechanism identity"
+    },
+    "ANTICIPATION_COVERAGE_RATIO": {
+     "value": 0.8,
+     "epistemic_class": "ENGINEERING",
+     "justification": "a family ANTICIPATES only when nearly ALL elements of the candidate's FULL distinguishing set (uncapped — the claim elements, not the 6-term query core) appear in the family's claim/abstract text; 0.8 leaves a >= 20% element margin — anything lower would convert partial art into a kill (Art. XXVIII forbids). Measured adversarial case: a domain-only patent reached 0.857 against a capped denominator whose true differentiators (acoustic, multi-modal) had been ranked out",
+     "uncertainty": "claim coverage measured by term overlap, not a claim chart; recorded per family with evidence tier"
+    },
+    "MAX_QUERY_TERMS": {
+     "value": 6,
+     "epistemic_class": "ENGINEERING",
+     "justification": "provider-measured sweet spot for keyword patent queries (longer queries dilute ranking)"
+    },
+    "ABSTRACT_TIER_MIN_CHARS": {
+     "value": 80,
+     "epistemic_class": "ENGINEERING",
+     "justification": "below ~80 chars a snippet carries title echoes, not mechanism description; it cannot support an abstract-tier coverage decision"
+    }
+   }
+  },
+  "scientific_report": {
+   "prior_art_status": "LIKELY_PRIOR_ART_EXISTS",
+   "search_execution": {
+    "n_queries": 2,
+    "n_executed_ok": 2,
+    "n_failed": 0,
+    "failure_states": [],
+    "timeout_present": false,
+    "note": "status is derived from execution, not findings: a failed/timeout query set can never support a no-match claim (R394 s2/s4, Art. XXI.3)"
+   },
+   "databases_searched": [
+    "EuropePMC"
+   ],
+   "queries": [
+    "search ranking model Documented problem model",
+    "Ant colony optimization trail decay through"
+   ],
+   "query_log": [
+    {
+     "query": "search ranking model Documented problem model",
+     "status": "OK",
+     "connector_state": "SUCCESS",
+     "result_count": 3
+    },
+    {
+     "query": "Ant colony optimization trail decay through",
+     "status": "OK",
+     "connector_state": "SUCCESS",
+     "result_count": 3
+    }
+   ],
+   "instrument_version": "a2_prior_art/2.0.0",
+   "connector_semantics": "connector_states/1.0.0",
+   "date_range": "all",
+   "timestamp": "2026-09-14T21:49:15.527602+00:00",
+   "result_count": 6,
+   "results": [
+    {
+     "title": "A Technology Selection Support Model in Industry 4.0 for Quality Assurance and Traceability in the Production of Waste-Derived Functional Materials.",
+     "id": "42654514",
+     "query": "search ranking model Documented problem model"
+    },
+    {
+     "title": "Hyperparameter-optimized deep learning for next-day pH forecasting in distributed water quality monitoring systems.",
+     "id": "42542450",
+     "query": "search ranking model Documented problem model"
+    },
+    {
+     "title": "A method for forensic-ready intrusion detection using explainable learning, prediction-aware graph modeling, and counterfactual analysis.",
+     "id": "42318552",
+     "query": "search ranking model Documented problem model"
+    },
+    {
+     "title": "Evolutionary, Neural, or LLM-Driven Heuristic Generation? A Unified Ant Colony Optimization Benchmark for Nature-Inspired Routing Heuristics on the TSP and CVRP.",
+     "id": "42505549",
+     "query": "Ant colony optimization trail decay through"
+    },
+    {
+     "title": "Path planning for mobile robots by fusing ant colony optimization and dynamic window approach.",
+     "id": "42507717",
+     "query": "Ant colony optimization trail decay through"
+    }
+   ],
+   "limitations": [
+    "Only EuropePMC searched",
+    "No patent databases searched (patent side handled by the collision core)",
+    "No ClinicalTrials.gov searched",
+    "Zero-result searches support 'no matching evidence in the searched universe' only — never 'nobody has done this' (Art. XXI.2)"
+   ],
+   "note": "Never claim 'nobody has done this.' Only report 'No matching evidence found within the searched universe.'"
+  },
+  "state_vocabulary": "collision_resolution R376 + classify/v4"
+ },
+ "collision_results": {
+  "strategy": "mechanism-centered multi-query (R376; R377 adds the FUNCTION class, entity-anchored cross-domain precision, canonical claims fetch + Lens full abstract)",
+  "query_ladder": [
+   {
+    "query_class": "ENTITY",
+    "query": "ranking decay decays through algorithmic search",
+    "query_compact": "ranking decay",
+    "terms": [
+     "ranking",
+     "decay",
+     "decays",
+     "through",
+     "algorithmic",
+     "search"
+    ],
+    "purpose": "anchor the device/failure domain"
+   },
+   {
+    "query_class": "MECHANISM",
+    "query": "decay through algorithmic optimization evaporation adaptive",
+    "query_compact": "decay through",
+    "terms": [
+     "decay",
+     "through",
+     "algorithmic",
+     "optimization",
+     "evaporation",
+     "adaptive"
+    ],
+    "purpose": "direct prior art on the causal mechanism"
+   },
+   {
+    "query_class": "DISTINGUISHING",
+    "query": "dynamic mechanism decay ranking evaporation user interactions signals",
+    "query_compact": "dynamic mechanism",
+    "terms": [
+     "dynamic",
+     "mechanism",
+     "decay",
+     "ranking",
+     "evaporation",
+     "user",
+     "interactions",
+     "signals"
+    ],
+    "purpose": "direct prior art on the candidate's technical core (technical terms lead; entity anchors follow — R377 anchor-crowding fix)"
+   },
+   {
+    "query_class": "FUNCTION",
+    "query": "ranking mitigation performance allowing changing maintaining",
+    "query_compact": "ranking mitigation",
+    "terms": [
+     "ranking",
+     "mitigation",
+     "performance",
+     "allowing",
+     "changing",
+     "maintaining"
+    ],
+    "purpose": "prior art on the FUNCTION itself (detection / protection / regulation...): patents are titled with function nouns; a detection candidate whose ladder lacks 'detection' cannot find detection art (R377 measured: the EV run missed the entire thermal-runaway-DETECTION family)"
+   },
+   {
+    "query_class": "ADJACENT",
+    "query": "mitigate performance allowing changing behavior patterns",
+    "query_compact": "mitigate performance",
+    "terms": [
+     "mitigate",
+     "performance",
+     "allowing",
+     "changing",
+     "behavior",
+     "patterns"
+    ],
+    "purpose": "adjacent technical approaches that could destroy differentiation (function without implementation; entity terms excluded so it never collapses into the entity query — R377 fix)"
+   }
+  ],
+  "candidate_profile": {
+   "entity_terms": [
+    "ranking",
+    "decay",
+    "decays",
+    "through",
+    "algorithmic",
+    "search"
+   ],
+   "mechanism_terms": [
+    "decay",
+    "through",
+    "algorithmic",
+    "optimization",
+    "evaporation",
+    "adaptive"
+   ],
+   "distinguishing_terms": [
+    "dynamic",
+    "mechanism",
+    "decay",
+    "ranking",
+    "evaporation",
+    "user",
+    "interactions",
+    "signals"
+   ],
+   "function_terms": [
+    "ranking",
+    "mitigation",
+    "performance",
+    "allowing",
+    "changing",
+    "maintaining"
+   ],
+   "adjacent_terms": [
+    "mitigate",
+    "performance",
+    "allowing",
+    "changing",
+    "behavior",
+    "patterns"
+   ]
+  },
+  "patent": {
+   "sources": [
+    "google_patents",
+    "lens_patent"
+   ],
+   "metered_sources": {
+    "patentbear": {
+     "policy": "OPT-IN since R378 (CEO directive: 'Use PatentBear for patents'); queried only when listed in sources; persistent quota guard with reserve floor (patentbear_meter.json)",
+     "not_queried_when_absent": "metered-source policy — not spent on default collision search (K-series)"
+    }
+   },
+   "hit_count": 0,
+   "hits": [],
+   "source_errors": [
+    {
+     "query": "ranking decay decays through algorithmic search",
+     "source": "google_patents",
+     "error": "HTTP 503",
+     "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+    },
+    {
+     "query": "ranking decay decays through algorithmic search",
+     "source": "lens_patent",
+     "error": "LENS_API_TOKEN not configured",
+     "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+    },
+    {
+     "query": "decay through algorithmic optimization evaporation adaptive",
+     "source": "google_patents",
+     "error": "HTTP 503",
+     "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+    },
+    {
+     "query": "decay through algorithmic optimization evaporation adaptive",
+     "source": "lens_patent",
+     "error": "LENS_API_TOKEN not configured",
+     "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+    },
+    {
+     "query": "dynamic mechanism decay ranking evaporation user interactions signals",
+     "source": "google_patents",
+     "error": "HTTP 503",
+     "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+    },
+    {
+     "query": "dynamic mechanism decay ranking evaporation user interactions signals",
+     "source": "lens_patent",
+     "error": "LENS_API_TOKEN not configured",
+     "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+    },
+    {
+     "query": "ranking mitigation performance allowing changing maintaining",
+     "source": "google_patents",
+     "error": "HTTP 503",
+     "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+    },
+    {
+     "query": "ranking mitigation performance allowing changing maintaining",
+     "source": "lens_patent",
+     "error": "LENS_API_TOKEN not configured",
+     "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+    },
+    {
+     "query": "mitigate performance allowing changing behavior patterns",
+     "source": "google_patents",
+     "error": "HTTP 503",
+     "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+    },
+    {
+     "query": "mitigate performance allowing changing behavior patterns",
+     "source": "lens_patent",
+     "error": "LENS_API_TOKEN not configured",
+     "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+    }
+   ],
+   "relevance_adjudications": [],
+   "relevant_hit_count": 0,
+   "adjacent_only_hits": [],
+   "cross_domain_term_collisions": [],
+   "cross_domain_collision_note": "R377: demoted with recorded terms — mechanism overlap without entity overlap and below the non-generic bar is a term collision, not prior art (measured: 40% of R376 family reps were collisions)"
+  },
+  "families": [],
+  "mandatory_searches": {
+   "mandatory_pairs": 10,
+   "failed_pairs": 10,
+   "complete": false,
+   "failed": [
+    {
+     "query": "ranking decay decays through algorithmic search",
+     "source": "google_patents",
+     "error": "HTTP 503"
+    },
+    {
+     "query": "ranking decay decays through algorithmic search",
+     "source": "lens_patent",
+     "error": "LENS_API_TOKEN not configured"
+    },
+    {
+     "query": "decay through algorithmic optimization evaporation adaptive",
+     "source": "google_patents",
+     "error": "HTTP 503"
+    },
+    {
+     "query": "decay through algorithmic optimization evaporation adaptive",
+     "source": "lens_patent",
+     "error": "LENS_API_TOKEN not configured"
+    },
+    {
+     "query": "dynamic mechanism decay ranking evaporation user interactions signals",
+     "source": "google_patents",
+     "error": "HTTP 503"
+    },
+    {
+     "query": "dynamic mechanism decay ranking evaporation user interactions signals",
+     "source": "lens_patent",
+     "error": "LENS_API_TOKEN not configured"
+    },
+    {
+     "query": "ranking mitigation performance allowing changing maintaining",
+     "source": "google_patents",
+     "error": "HTTP 503"
+    },
+    {
+     "query": "ranking mitigation performance allowing changing maintaining",
+     "source": "lens_patent",
+     "error": "LENS_API_TOKEN not configured"
+    },
+    {
+     "query": "mitigate performance allowing changing behavior patterns",
+     "source": "google_patents",
+     "error": "HTTP 503"
+    },
+    {
+     "query": "mitigate performance allowing changing behavior patterns",
+     "source": "lens_patent",
+     "error": "LENS_API_TOKEN not configured"
+    }
+   ],
+   "rule": "every attempted (query_class x source) pair must complete successfully before RESOLVED_DIFFERENTIATED is permitted (R394 s2; a partial search cannot support a no-covering-art claim)",
+   "relevance_model_version": "collision_resolution/2.0.0"
+  },
+  "differentiation_resolution": {
+   "state": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+   "epistemic_class": "SEARCH_RESULT",
+   "constitutional_limitation": "a search-derived prior-art POSITION, not a novelty determination (Art. XXVIII); coverage measured by declared term-overlap thresholds, not a claim chart",
+   "evidence_tier_summary": "NO_FAMILIES",
+   "per_family": [],
+   "n_families": 0,
+   "n_search_errors": 10,
+   "search_errors": [
+    {
+     "query": "ranking decay decays through algorithmic search",
+     "source": "google_patents",
+     "error": "HTTP 503",
+     "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+    },
+    {
+     "query": "ranking decay decays through algorithmic search",
+     "source": "lens_patent",
+     "error": "LENS_API_TOKEN not configured",
+     "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+    },
+    {
+     "query": "decay through algorithmic optimization evaporation adaptive",
+     "source": "google_patents",
+     "error": "HTTP 503",
+     "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+    },
+    {
+     "query": "decay through algorithmic optimization evaporation adaptive",
+     "source": "lens_patent",
+     "error": "LENS_API_TOKEN not configured",
+     "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+    },
+    {
+     "query": "dynamic mechanism decay ranking evaporation user interactions signals",
+     "source": "google_patents",
+     "error": "HTTP 503",
+     "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+    },
+    {
+     "query": "dynamic mechanism decay ranking evaporation user interactions signals",
+     "source": "lens_patent",
+     "error": "LENS_API_TOKEN not configured",
+     "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+    },
+    {
+     "query": "ranking mitigation performance allowing changing maintaining",
+     "source": "google_patents",
+     "error": "HTTP 503",
+     "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+    },
+    {
+     "query": "ranking mitigation performance allowing changing maintaining",
+     "source": "lens_patent",
+     "error": "LENS_API_TOKEN not configured",
+     "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+    },
+    {
+     "query": "mitigate performance allowing changing behavior patterns",
+     "source": "google_patents",
+     "error": "HTTP 503",
+     "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+    },
+    {
+     "query": "mitigate performance allowing changing behavior patterns",
+     "source": "lens_patent",
+     "error": "LENS_API_TOKEN not configured",
+     "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+    }
+   ],
+   "search_execution": {
+    "mandatory_complete": false,
+    "n_errors": 10,
+    "rule": "RESOLVED_DIFFERENTIATED requires every mandatory (query_class x source) search to have completed successfully (R394 s2); provider failure never becomes absence (Art. XXI.3)"
+   },
+   "relevance_model_version": "collision_resolution/2.0.0",
+   "determinism_contract": {
+    "inputs": "problem + candidate profile + query ladder + source results (per-family adjudicated text, hash-custodied) + thresholds + relevance model version",
+    "check": "identical inputs must yield identical coverage decisions and state; divergence on replay is FLAG_INCONSISTENT_RETRIEVAL (R394 s3)"
+   },
+   "thresholds": {
+    "CROSS_DOMAIN_MIN_NONGENERIC_OVERLAP": {
+     "value": 3,
+     "epistemic_class": "ENGINEERING",
+     "justification": "R377 patent-text ground truth (TOSCANINI/R377_PATENT_TEXT_FETCH.json + R377_PATENT_TEXT_GROUND_TRUTH.json): 12/30 family representatives (40%) were substantively irrelevant cross-domain term collisions (CWDM optical link for a battery-thermal candidate; dental-condition monitoring for rolling stock; bone fracture forceps for rail steel...). A hit sharing NO entity term with the candidate now needs >= 3 NON-generic mechanism terms to be mechanism art: the measured true cross-domain analog (line-pipe steel with hydrogen fracture toughness for a rail-steel candidate) shares 3 non-generic terms and survives; every measured false positive shares <= 2 and is demoted. This RAISES the cross-domain bar (was the same >= 2 as same-domain) — stricter, not weaker (Art. VII).",
+     "uncertainty": "term overlap remains a proxy; entity word-sense collisions ('gear': steering vs draft) can still pass — disclosed limitation, not a solved problem"
+    },
+    "MIN_MECHANISM_OVERLAP": {
+     "value": 2,
+     "epistemic_class": "ENGINEERING",
+     "justification": "same term-overlap rule family as the pipeline relevance adjudicator and the Q2 instrument (>= 2 shared content terms = domain-specific rather than accidental collision); NOT weakened relative to any prior gate",
+     "uncertainty": "term overlap is a proxy for mechanism identity"
+    },
+    "ANTICIPATION_COVERAGE_RATIO": {
+     "value": 0.8,
+     "epistemic_class": "ENGINEERING",
+     "justification": "a family ANTICIPATES only when nearly ALL elements of the candidate's FULL distinguishing set (uncapped — the claim elements, not the 6-term query core) appear in the family's claim/abstract text; 0.8 leaves a >= 20% element margin — anything lower would convert partial art into a kill (Art. XXVIII forbids). Measured adversarial case: a domain-only patent reached 0.857 against a capped denominator whose true differentiators (acoustic, multi-modal) had been ranked out",
+     "uncertainty": "claim coverage measured by term overlap, not a claim chart; recorded per family with evidence tier"
+    },
+    "MAX_QUERY_TERMS": {
+     "value": 6,
+     "epistemic_class": "ENGINEERING",
+     "justification": "provider-measured sweet spot for keyword patent queries (longer queries dilute ranking)"
+    },
+    "ABSTRACT_TIER_MIN_CHARS": {
+     "value": 80,
+     "epistemic_class": "ENGINEERING",
+     "justification": "below ~80 chars a snippet carries title echoes, not mechanism description; it cannot support an abstract-tier coverage decision"
+    }
+   }
+  },
+  "determinism": {
+   "model_version": "determinism/1.0.0",
+   "classification": "BASELINE_RUN",
+   "verdict": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+   "relevance_model_version": "collision_resolution/2.0.0",
+   "evidence_set_identity": "716fce77bc0a459cc50c35b52c05b5d43a1141243f6d331b3c1f3166601fc088",
+   "problem_fingerprint": "127b24760f24828a2f899afae9006d3e2beb1d4f0ca86337e33f6f368a890630",
+   "n_prior_replays": 0,
+   "variance_summary": null,
+   "rule": "identical problem + identical relevant evidence set + identical relevance model must yield the identical verdict; any divergence is classified NON_DETERMINISTIC and disclosed, never silently resolved (R396 P6 / R394 s3)"
+  },
+  "nearest_prior_art": [],
+  "nearest_prior_art_note": "family representatives; every entry is MECHANISM_RELEVANT (>= 2 term overlap with the candidate's mechanism ∪ distinguishing terms against title+snippet text) with per-family coverage and evidence tier recorded",
+  "novelty_risk": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+  "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+  "actions": [
+   "expand_search_sources"
+  ],
+  "scientific": {
+   "legacy_status": "LIKELY_PRIOR_ART_EXISTS",
+   "mapped_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+   "mapping_rationale": "legacy 'likely' is not a specific disclosure; patent-grade collision search is required before any KILL promotion",
+   "result_count": 6,
+   "results": [
+    {
+     "title": "A Technology Selection Support Model in Industry 4.0 for Quality Assurance and Traceability in the Production of Waste-Derived Functional Materials.",
+     "id": "42654514",
+     "query": "search ranking model Documented problem model"
+    },
+    {
+     "title": "Hyperparameter-optimized deep learning for next-day pH forecasting in distributed water quality monitoring systems.",
+     "id": "42542450",
+     "query": "search ranking model Documented problem model"
+    },
+    {
+     "title": "A method for forensic-ready intrusion detection using explainable learning, prediction-aware graph modeling, and counterfactual analysis.",
+     "id": "42318552",
+     "query": "search ranking model Documented problem model"
+    },
+    {
+     "title": "Evolutionary, Neural, or LLM-Driven Heuristic Generation? A Unified Ant Colony Optimization Benchmark for Nature-Inspired Routing Heuristics on the TSP and CVRP.",
+     "id": "42505549",
+     "query": "Ant colony optimization trail decay through"
+    },
+    {
+     "title": "Path planning for mobile robots by fusing ant colony optimization and dynamic window approach.",
+     "id": "42507717",
+     "query": "Ant colony optimization trail decay through"
+    }
+   ],
+   "queries": [
+    "search ranking model Documented problem model",
+    "Ant colony optimization trail decay through"
+   ],
+   "limitations": [
+    "Only EuropePMC searched",
+    "No patent databases searched (patent side handled by the collision core)",
+    "No ClinicalTrials.gov searched",
+    "Zero-result searches support 'no matching evidence in the searched universe' only — never 'nobody has done this' (Art. XXI.2)"
+   ]
+  },
+  "prior_art_status_basis": {
+   "authority": "patent-side differentiation_resolution",
+   "scientific_mapped_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+   "note": "scientific (EuropePMC) status recorded; the prior-art POSITION comes from the patent-side resolution with per-family evidence tiers"
+  }
+ },
+ "physics": {
+  "stage_version": "physics_stage/1.0.0",
+  "solver_version": "hydraulic_network_1d/1.0.0",
+  "run_id": "r458ad-S1: adaptive benchmark",
+  "directive_chain": [
+   "PRE_REQUIREMENTS",
+   "PLAUSIBILITY",
+   "SOLVER",
+   "FAILURE_MODES",
+   "BASELINE_COMPARISON",
+   "COMPUTATIONAL_RESULT"
+  ],
+  "chain_executed": [
+   "PRE_REQUIREMENTS"
+  ],
+  "pre_requirements": {
+   "mechanism_present": true,
+   "domain": "ml_data",
+   "domain_detection": {
+    "domain": "ml_data"
+   },
+   "solver_domain": "fluidics_hydraulic",
+   "representable": false
+  },
+  "lifecycle_verdict": "MECHANISM_NOT_SIMULATABLE",
+  "applicability": {
+   "domain": "ml_data",
+   "solver_domain": "fluidics_hydraulic",
+   "reason": "the V0 solver's declared domain is 1D hydraulic networks; this candidate's mechanism is outside it — no physics comparison is FABRICATED (R397 Phase 2 / R394 s9 honest refusal)"
+  },
+  "lifecycle_effect": {
+   "candidate_pool": "PROCEEDS",
+   "automatic_release": "BLOCKED_NO_PHYSICS_CLAIM",
+   "release_must_disclose": "the mechanism is outside the solver's domain — no physics improvement is claimed or implied",
+   "reason": "domain ml_data not representable by the V0 solver"
+  },
+  "evidence_class_note": "no computational evidence emitted; the refusal is the honest result (Art. XXVIII: no silent semantic promotion)"
+ },
+ "attack_results": {
+  "overall": "KILLED",
+  "killed_count": 1,
+  "reason": "",
+  "attacks": {
+   "unsupported_mechanism": "PASS",
+   "weak_transfer": "KILLED",
+   "obvious_combination": "PASS",
+   "prior_art": "PASS",
+   "contradiction": "PASS",
+   "boundary_failure": "INSUFFICIENT_EVIDENCE (INSUFFICIENT_EVIDENCE)",
+   "engineering_infeasibility": "PASS",
+   "regulatory_incompatibility": "PASS"
+  },
+  "invalid_dimensions": [],
+  "v4_corrections_applied": [
+   "boundary_evidence:INSUFFICIENT_EVIDENCE"
+  ],
+  "prior_art_state": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+  "evidence_verified": true,
+  "prompt_hash": "eac82daaf1efed3a",
+  "output_hash": "b2e236e33d200630",
+  "timestamp": "2026-09-14T21:49:22.863531+00:00",
+  "transport": {
+   "provider": "zai",
+   "model": "glm-4-plus-thinking",
+   "prompt_hash": "191ab4b6bd887b9b04fa217b6aedb1ab2da1d0bf8ba5dca130ac87a744f4b07f",
+   "output_hash": "b2e236e33d20063045de99d0d36f4d9a5bb4e148effb8cc63196ae9410667bd2",
+   "latency_ms": 1344,
+   "substituted_from": null,
+   "status": "OK",
+   "cost_provenance": {
+    "model_id": "glm-4-plus-thinking",
+    "model_revision": "UNDECLARED",
+    "transport": "http://127.0.0.1:8787/v1/chat/completions",
+    "local_or_remote": "LOCAL",
+    "license": "UNDECLARED",
+    "cost_basis": "ENVIRONMENT_GRANT",
+    "account_domain": "SANDBOX_ENVIRONMENT_GRANT",
+    "policy": "UNRESTRICTED",
+    "policy_version": "model_cost_policy/1.1.0"
+   },
+   "call_provenance": {
+    "run_id": "r458ad-S1: adaptive benchmark",
+    "session_id": "r458ad-s1",
+    "engine_stage": "ATTACK",
+    "call_class": "RUN_OWNED"
+   },
+   "task_degradation": {
+    "requested_task": "FAST",
+    "actual_task_capability": "FAST",
+    "task_capability_match": true,
+    "degraded_reason": "the serving model declares the requested task capability"
+   },
+   "retry_notes": [],
+   "provider_route": [
+    {
+     "provider": "zai",
+     "failure_type": null,
+     "fallback_provider": null
+    }
+   ],
+   "failure_type": null
+  }
+ },
+ "contradictions": {
+  "contradictions": [
+   {
+    "contradiction_id": "con:attack:weak_transfer",
+    "description": "attack dimension weak_transfer returned KILL",
+    "claim_or_limitation_affected": "weak_transfer",
+    "severity": "HIGH",
+    "probability": 0.7,
+    "evidence_quality": "MODERATE",
+    "decision_impact": 0.8,
+    "currently_unresolved": true,
+    "resolution_action": "",
+    "resolution_result": ""
+   }
+  ],
+  "blocking_count": 1,
+  "unresolved_count": 1,
+  "all_blocking_resolved": false
+ },
+ "killer_experiment": {},
+ "adjudication": {
+  "evidence_verification": {
+   "verified": true,
+   "evidence_class": "SUPPORTED",
+   "issues": [],
+   "source_id": "doi:10.3390/biomimetics11070516",
+   "source_hash": "098d1b56c5e818199516077e4ac0d3cdd72c4c9a97ecc284338dc654b735b1c6",
+   "span_present": true,
+   "mechanism_span_verbatim": true
+  }
+ },
+ "multi_source": {
+  "candidate_name": "Implement a dynamic decay mechanism for ranking signals that mimics pheromone evaporation, where the",
+  "discovery": {
+   "pubmed": {
+    "source": "PubMed",
+    "query": "Ant colony optimization with trail decay through algorithmic evaporation and adaptive path reinforcement AND Documented problem 'model decay after interface redesign' concerning search ranking model. User-submitted engineering problem (session input): \"A marketplace's search ranking model, trained on 18 months of interaction logs, decays measurably after a redesign moves the buy button above the fold on mo",
+    "total": 0,
+    "results": [],
+    "connector_state": "EMPTY_RESULT"
+   },
+   "crossref": {
+    "source": "Crossref",
+    "query": "Ant colony optimization with trail decay through algorithmic evaporation and adaptive path reinforcement AND Documented problem 'model decay after interface redesign' concerning search ranking model. User-submitted engineering problem (session input): \"A marketplace's search ranking model, trained on 18 months of interaction logs, decays measurably after a redesign moves the buy button above the fold on mo",
+    "total": 130,
+    "results": [
+     {
+      "doi": "10.23919/picmet.2019.8893868",
+      "title": "In Search of Adaptive Capacity: Development of a Strategic Management Model through a Co-Redesign Effort",
+      "year": 2019
+     },
+     {
+      "doi": "10.22266/ijies2023.0630.03",
+      "title": "Spiral Search Ant Colony Optimization Based AlexNet Model for Emotion Recognition",
+      "year": 2023
+     },
+     {
+      "doi": "10.3901/jme.2009.05.095",
+      "title": "Hybrid Behavior Ant Colony Optimization for Mixed-model Assembly Line Balancing Problem",
+      "year": 2009
+     }
+    ]
+   },
+   "nih_reporter": {
+    "source": "NIH RePORTER",
+    "query": "Ant colony optimization with trail decay through algorithmic evaporation and adaptive path reinforcement AND Documented problem 'model decay after interface redesign' concerning search ranking model. User-submitted engineering problem (session input): \"A marketplace's search ranking model, trained on 18 months of interaction logs, decays measurably after a redesign moves the buy button above the fold on mo",
+    "total": 2977968,
+    "results": [
+     {
+      "project_num": "1F31AG099736-01",
+      "title": "Evaluating the Contribution of Care Pathways and Clinical Features To Home Health Quality Outcomes for People with Demen",
+      "pi": "Maxwell  Cutty",
+      "fiscal_year": 2026,
+      "award_amount": 45938
+     },
+     {
+      "project_num": "75N93023D00001-P00003-759302400001-1",
+      "title": "Expertise in Using Bitter Taste Receptor Blockers to Improve the Palatability of Pediatric Medicines: Blocker Discovery",
+      "pi": "PETER  SILVERA",
+      "fiscal_year": 2026,
+      "award_amount": 1205898
+     },
+     {
+      "project_num": "75N93023D00001-P00004-759302400002-1",
+      "title": "Expertise in Using Bitter Taste Receptor Blockers to Improve the Palatability of Pediatric Medicines: Trained Human Sens",
+      "pi": "PETER  SILVERA",
+      "fiscal_year": 2026,
+      "award_amount": 440943
+     }
+    ],
+    "connector_state": "SUCCESS"
+   }
+  },
+  "destruction": {
+   "pubmed_failures": {
+    "source": "PubMed",
+    "query": "model decay after interface redesign OR (Ant colony optimization with trail decay through algorithmic evaporation and adaptive path reinforcement failure) OR (Ant colony optimization with trail decay through algorithmic evaporation and adaptive path reinforcement limitation)",
+    "total": 0,
+    "results": [],
+    "connector_state": "EMPTY_RESULT"
+   },
+   "openfda_adverse": {
+    "source": "openFDA",
+    "query": "Documented problem 'model decay after interface redesign' concerning search ranking model. User-submitted engineering problem (session input): \"A marketplace's search ranking model, trained on 18 months of interaction logs, decays measurably after a redesign moves the buy button above the fold on mo",
+    "total": 0,
+    "results": [],
+    "error": "fetch failed or no results",
+    "connector_state": "UNAVAILABLE_OR_TIMEOUT",
+    "note": "outage — NOT absence (R394 s4)"
+   },
+   "clinical_trials_fail": {
+    "source": "ClinicalTrials.gov",
+    "query": "Documented problem 'model decay after interface redesign' concerning search ranking model. User-submitted engineering problem (session input): \"A marketplace's search ranking model, trained on 18 months of interaction logs, decays measurably after a redesign moves the buy button above the fold on mo failure",
+    "total": 0,
+    "results": [],
+    "error": "fetch failed",
+    "connector_state": "UNAVAILABLE_OR_TIMEOUT",
+    "note": "outage — NOT absence (R394 s4)"
+   }
+  },
+  "transfer": {
+   "aerospace": {
+    "source": "Crossref",
+    "query": "Documented problem 'model decay after interface redesign' concerning search ranking model. User-submitted engineering problem (session input): \"A marketplace's search ranking model, trained on 18 months of interaction logs, decays measurably after a redesign moves the buy button above the fold on mo aerospace",
+    "total": 1038,
+    "results": [
+     {
+      "doi": "10.70729/j2013213",
+      "title": "A Global Fusion Re-Ranking for Effective Data Search with Correlation Model",
+      "year": 2014
+     },
+     {
+      "doi": "10.2139/ssrn.4892616",
+      "title": "A Ranking Model Framework for Multiple Vertical Search Domains",
+      "year": 2024
+     }
+    ]
+   },
+   "automotive": {
+    "source": "Crossref",
+    "query": "Documented problem 'model decay after interface redesign' concerning search ranking model. User-submitted engineering problem (session input): \"A marketplace's search ranking model, trained on 18 months of interaction logs, decays measurably after a redesign moves the buy button above the fold on mo automotive",
+    "total": 1028,
+    "results": [
+     {
+      "doi": "10.70729/j2013213",
+      "title": "A Global Fusion Re-Ranking for Effective Data Search with Correlation Model",
+      "year": 2014
+     },
+     {
+      "doi": "10.2139/ssrn.4892616",
+      "title": "A Ranking Model Framework for Multiple Vertical Search Domains",
+      "year": 2024
+     }
+    ]
+   },
+   "industrial automation": {
+    "source": "Crossref",
+    "query": "Documented problem 'model decay after interface redesign' concerning search ranking model. User-submitted engineering problem (session input): \"A marketplace's search ranking model, trained on 18 months of interaction logs, decays measurably after a redesign moves the buy button above the fold on mo industrial automation",
+    "total": 1516,
+    "results": [
+     {
+      "doi": "10.70729/j2013213",
+      "title": "A Global Fusion Re-Ranking for Effective Data Search with Correlation Model",
+      "year": 2014
+     },
+     {
+      "doi": "10.2139/ssrn.4892616",
+      "title": "A Ranking Model Framework for Multiple Vertical Search Domains",
+      "year": 2024
+     }
+    ]
+   }
+  },
+  "reality": {
+   "clinical_trials": {
+    "source": "ClinicalTrials.gov",
+    "query": "Documented problem 'model decay after interface redesign' concerning search ranking model. User-submitted engineering problem (session input): \"A marketplace's search ranking model, trained on 18 months of interaction logs, decays measurably after a redesign moves the buy button above the fold on mo",
+    "total": 0,
+    "results": [],
+    "error": "fetch failed",
+    "connector_state": "UNAVAILABLE_OR_TIMEOUT",
+    "note": "outage — NOT absence (R394 s4)"
+   },
+   "nih_funding": {
+    "source": "NIH RePORTER",
+    "query": "Documented problem 'model decay after interface redesign' concerning search ranking model. User-submitted engineering problem (session input): \"A marketplace's search ranking model, trained on 18 months of interaction logs, decays measurably after a redesign moves the buy button above the fold on mo",
+    "total": 2977968,
+    "results": [
+     {
+      "project_num": "1F31AG099736-01",
+      "title": "Evaluating the Contribution of Care Pathways and Clinical Features To Home Health Quality Outcomes for People with Demen",
+      "pi": "Maxwell  Cutty",
+      "fiscal_year": 2026,
+      "award_amount": 45938
+     },
+     {
+      "project_num": "75N93023D00001-P00003-759302400001-1",
+      "title": "Expertise in Using Bitter Taste Receptor Blockers to Improve the Palatability of Pediatric Medicines: Blocker Discovery",
+      "pi": "PETER  SILVERA",
+      "fiscal_year": 2026,
+      "award_amount": 1205898
+     },
+     {
+      "project_num": "75N93023D00001-P00004-759302400002-1",
+      "title": "Expertise in Using Bitter Taste Receptor Blockers to Improve the Palatability of Pediatric Medicines: Trained Human Sens",
+      "pi": "PETER  SILVERA",
+      "fiscal_year": 2026,
+      "award_amount": 440943
+     },
+     {
+      "project_num": "75N94023D00001-0-759402600001-1",
+      "title": "IMPAACT 2050 / CREATE - Phase IV Study of the Pharmacokinetics of Long-Acting Injectable Cabotegravir and Rilpivirine in",
+      "pi": "ISA  TREJOS",
+      "fiscal_year": 2026,
+      "award_amount": 2502640
+     },
+     {
+      "project_num": "1RF1NS141359-01A1",
+      "title": "Human Chemo-Nociceptor Signaling",
+      "pi": "Steve  Davidson",
+      "fiscal_year": 2026,
+      "award_amount": 3851810
+     }
+    ],
+    "connector_state": "SUCCESS"
+   },
+   "fda_adverse": {
+    "source": "openFDA",
+    "query": "Documented problem 'model decay after interface redesign' concerning search ranking model. User-submitted engineering problem (session input): \"A marketplace's search ranking model, trained on 18 months of interaction logs, decays measurably after a redesign moves the buy button above the fold on mo",
+    "total": 0,
+    "results": [],
+    "error": "fetch failed or no results",
+    "connector_state": "UNAVAILABLE_OR_TIMEOUT",
+    "note": "outage — NOT absence (R394 s4)"
+   }
+  },
+  "timestamp": "2026-09-14T21:49:11.552514+00:00",
+  "summary": "Discovery: 2978098 results | Destruction: 0 results | Transfer: 3582 results | Reality: 2977968 results",
+  "evidence_plane": {
+   "role": "VERIFICATION_SUPPORT",
+   "purpose": "four-direction search attack around a serious candidate: discovery/destruction/transfer/reality directions feed collision, adjudication and the dossier",
+   "complementary_plane": {
+    "role": "DISCOVERY_SUPPORT",
+    "location": "RETRIEVE -> MECHANISM_SPACE (the structured evidence consumed by the five transformation operators)",
+    "stamp": "mechanism_space.structured_evidence.items[].retrieval_role"
+   },
+   "state_vocabulary_contract": "SEARCH_FAILED / SEARCH_PARTIAL / UNRESOLVED / UNKNOWN stay exactly what they are on BOTH planes — no outage may become absence; per-source error/unavailable fields are preserved in sources_hit"
+  },
+  "adjacent_industries_derivation": {
+   "value": [
+    "aerospace",
+    "automotive",
+    "industrial automation"
+   ],
+   "epistemic_class": "MODEL_DERIVED",
+   "method": "keyword map ADJACENT_INDUSTRY_MAP in adapters.py"
+  },
+  "sources_hit": []
+ },
+ "cemetery_check": {},
+ "epistemic_state": {},
+ "next_best_action": {},
+ "ranking": {},
+ "provenance": {
+  "retrieval_fabric": {
+   "version": "V2",
+   "primary_query": "search ranking model model decay after interface redesign",
+   "query_variant_count": 5,
+   "sources_attempted": [
+    "arxiv",
+    "core",
+    "crossref",
+    "datacite",
+    "doaj",
+    "europepmc",
+    "google_patents",
+    "openaire",
+    "openalex",
+    "semantic_scholar",
+    "unpaywall"
+   ],
+   "sources_succeeded": [
+    "core",
+    "crossref",
+    "datacite",
+    "doaj",
+    "europepmc",
+    "openaire",
+    "semantic_scholar",
+    "unpaywall"
+   ],
+   "sources_failed": [
+    "arxiv",
+    "google_patents"
+   ],
+   "sources_rate_limited": [
+    "openalex",
+    "semantic_scholar"
+   ],
+   "unique_source_families": [
+    "biomedical_pubmed_line",
+    "doi_registrant_crossref",
+    "repository_aggregator_core",
+    "scholarly_graph_s2"
+   ],
+   "independent_source_families": 4,
+   "source_independence_score": 1.0,
+   "retrieval_blind_spots": [
+    "PATENT_BLIND_SPOT: zero patent records — patent prior-art coverage is a discovery-system defect when the mechanism domain is patent-dense",
+    "LOW_FAMILY_COVERAGE: only 4 source families contributed records (directive acceptance bar: >= 6 materially different open/free families queried successfully)"
+   ],
+   "canonical_record_count": 44,
+   "evidence_fabric": {
+    "state": "CHANNEL_ERROR",
+    "reason": "NameError: name '_title_of' is not defined",
+    "note": "the evidence-fabric channel failed; the V2 fabric pool is unchanged — an infrastructure state, never a scientific result (Art. LXI)"
+   }
+  },
+  "evidence_freeze": {
+   "run_id": "r458ad-S1: adaptive benchmark",
+   "problem_id": "r458-s1-ranking-model-distribution-shift",
+   "frozen_at": "2026-09-14T21:48:41+00:00Z",
+   "evidence_count": 14,
+   "custody_records": [
+    {
+     "record_id": "doi:10.3390/biomimetics11070516",
+     "source": "europepmc",
+     "source_identity_verified": true,
+     "query": "r458-s1-ranking-model-distribution-shift",
+     "retrieval_timestamp": "2026-09-14T21:48:41.871770+00:00",
+     "raw_content": "Biomimetic optimization transfers biological information-processing mechanisms into computational systems. Ant colony optimization (ACO) is a canonical example: artificial ants functionally abstract pheromone-mediated stigmergy, decentralized exploration, trail decay through algorithmic evaporation, and adaptive path reinforcement. Building on this functional biological analogue, we present a controlled cross-paradigm evaluation of routing-heuristic generation. A standardized interface embeds human-designed rules, the genetic programming hyper-heuristic GHPP, a resource-constrained DeepACO-MLP proxy, and an offline ReEvo-style proxy into the same ACO solver. The methods are evaluated on held-out TSP and CVRP instances in terms of solution quality, reported generation or training cost, interpretability, and cross-scale behavior under a matched distribution. GHPP yields the shortest routes at all tested scales; the ReEvo-offline proxy and strong human-designed rules generally form a second tier, whereas the resource-constrained neural proxy degrades markedly as problem size increases. These results do not establish an intrinsic ranking of full-capability paradigms. Instead, they show that method selection depends on the operating constraint and on evidence provenance: longer locally measured offline search favors GHPP, while auditable explicit rules characterize the human and ReEvo-offline proxies. By holding the ant-inspired execution mechanism fixed and varying the source of heuristic information, the benchmark clarifies how evolutionary, neural, and LLM-style design strategies interact with a common biomimetic substrate.",
+     "content_hash": "9b64cccb44a5a36312ffb870135a548e2e260a4e41b436e187a4cafec646a1e7",
+     "exact_span": "Biomimetic optimization transfers biological information-processing mechanisms into computational systems. Ant colony optimization (ACO) is a canonical example: artificial ants functionally abstract pheromone-mediated stigmergy, decentralized exploration, trail decay through algorithmic evaporation, and adaptive path reinforcement. Building on this functional biological analogue, we present a controlled cross-paradigm evaluation of routing-heuristic generation. A standardized interface embeds hu",
+     "span_hash": "4c692a9ec6c5d0a147ae5429986821e90220b7c35405770284d5da80b32787d7",
+     "evidence_class": "SCIENTIFIC_ABSTRACT",
+     "proposition_binding": "candidate_mechanism_input",
+     "locator": "https://doi.org/10.3390/biomimetics11070516",
+     "epistemic_strength": "VERIFIED"
+    },
+    {
+     "record_id": "doi:10.1038/s41598-026-56933-4",
+     "source": "europepmc",
+     "source_identity_verified": true,
+     "query": "r458-s1-ranking-model-distribution-shift",
+     "retrieval_timestamp": "2026-09-14T21:48:41.871794+00:00",
+     "raw_content": "Teaching English to large and varied student populations has made adaptive, learner-aware resource recommendation a pressing need, yet most deployed systems still lean on collaborative filtering or content heuristics that read learners only at the surface. Such systems tend to stumble in four recurring ways: they miss the finer grain of linguistic competence, they reason over sparse and brittle knowledge associations, they falter whenever a learner or a resource is new, and they rarely travel well to settings their training never saw. We address these problems together through a framework in which a large language model and a knowledge graph inform one another, their match to each learner mediated by a fitness function adapted from ecological niche theory. The language model reads a learner's own writing to estimate evolving competence and proposes relations that fill thin regions of the graph, while the graph keeps the model's inferences anchored to the prerequisite and difficulty structure of English. A niche fitness score then judges how closely each resource's demands meet a learner's needs, and a path generator orders the survivors into prerequisite-respecting study sequences. On logs from 3,214 learners, 12,486 resources, and 287,653 interactions, the method reaches a Precision@5 of 0.782 and an NDCG@10 of 0.724, ahead of five baselines. Ablation was, frankly, the part that surprised us: the niche filter matters more to ranking quality than the model's semantic re-scoring. A three-axis generalization protocol, splitting transfer across learners, resource types, and difficulty levels, yields a composite index of 0.863, with cold-start decay held to 18.3%.",
+     "content_hash": "552db4100b22d0a4c04c8e3170f018311fa29699442b721a1d33620a7fc753b3",
+     "exact_span": "Teaching English to large and varied student populations has made adaptive, learner-aware resource recommendation a pressing need, yet most deployed systems still lean on collaborative filtering or content heuristics that read learners only at the surface. Such systems tend to stumble in four recurring ways: they miss the finer grain of linguistic competence, they reason over sparse and brittle knowledge associations, they falter whenever a learner or a resource is new, and they rarely travel we",
+     "span_hash": "191d7d033afbdc83db5a59642c8ff1544791f37fcb3dad4158601be61f96b8ee",
+     "evidence_class": "SCIENTIFIC_ABSTRACT",
+     "proposition_binding": "candidate_mechanism_input",
+     "locator": "https://doi.org/10.1038/s41598-026-56933-4",
+     "epistemic_strength": "VERIFIED"
+    },
+    {
+     "record_id": "doi:10.3390/s26134247",
+     "source": "europepmc",
+     "source_identity_verified": true,
+     "query": "r458-s1-ranking-model-distribution-shift",
+     "retrieval_timestamp": "2026-09-14T21:48:41.871806+00:00",
+     "raw_content": "The increasing connectivity of Internet of Things (IoT)-oriented environments has made them more vulnerable to cyberattacks, requiring intrusion-detection systems (IDSs) to ensure their secure and reliable operation. The feature selection (FS) process of an IDS affects its performance, as effective FS can enhance detection accuracy and reduce the computational cost and model complexity. This paper presents Adaptive Hybrid Genetic Algorithm-Simulated Annealing (AHGA-SA) as an FS framework that integrates the global search ability of a genetic algorithm and the local exploitation ability of simulated annealing. AHGA-SA aims to find compact, informative feature subsets in high-dimensional intrusion-detection datasets at an acceptable computational cost while maintaining detection performance. The experimental results on three recent benchmarks demonstrate feature-space reduction, with classification accuracies of 99.04% on IoTID20 (using 12 features), 98.25% on WUSTL-EHMS (using seven features), and 99.18% on Edge-IIoTset (using nine features). The results also demonstrate reduced training and testing times, central processing unit usage, resident set size overhead, and subset size compared to the baseline. Furthermore, Shapley additive explanations, as an explainable artificial intelligence technique, are applied to explain the model's predictions and to show the contribution of the selected features to the IDS decision-making process.",
+     "content_hash": "18acdd02e3cf29c6f552b7d50411226aa5537186c712cd5520c3b70e138880c6",
+     "exact_span": "The increasing connectivity of Internet of Things (IoT)-oriented environments has made them more vulnerable to cyberattacks, requiring intrusion-detection systems (IDSs) to ensure their secure and reliable operation. The feature selection (FS) process of an IDS affects its performance, as effective FS can enhance detection accuracy and reduce the computational cost and model complexity. This paper presents Adaptive Hybrid Genetic Algorithm-Simulated Annealing (AHGA-SA) as an FS framework that in",
+     "span_hash": "c2c1ab6af0d5b20df5289c167d7bd208e0ef49ca4f1a02b3dbb7bb7e1b98ff10",
+     "evidence_class": "SCIENTIFIC_ABSTRACT",
+     "proposition_binding": "candidate_mechanism_input",
+     "locator": "https://doi.org/10.3390/s26134247",
+     "epistemic_strength": "VERIFIED"
+    },
+    {
+     "record_id": "doi:10.1039/d4sc02233e",
+     "source": "europepmc",
+     "source_identity_verified": true,
+     "query": "r458-s1-ranking-model-distribution-shift",
+     "retrieval_timestamp": "2026-09-14T21:48:41.871816+00:00",
+     "raw_content": "Protein-protein interactions are pivotal in numerous biological processes. The computational design of these interactions facilitates the creation of novel binding proteins, crucial for advancing biopharmaceutical products. With the evolution of artificial intelligence (AI), protein design tools have swiftly transitioned from scoring-function-based to AI-based models. However, many AI models for protein design are constrained by assuming complete unfamiliarity with the amino acid sequence of the input protein, a feature most suited for de novo design but posing challenges in designing protein-protein interactions when the receptor sequence is known. To bridge this gap in computational protein design, we introduce ProBID-Net. Trained using natural protein-protein complex structures and protein domain-domain interface structures, ProBID-Net can discern features from known target protein structures to design specific binding proteins based on their binding sites. In independent tests, ProBID-Net achieved interface sequence recovery rates of 52.7%, 43.9%, and 37.6%, surpassing or being on par with ProteinMPNN in binding protein design. Validated using AlphaFold-Multimer, the sequences designed by ProBID-Net demonstrated a close correspondence between the design target and the predicted structure. Moreover, the model's output can predict changes in binding affinity upon mutations in protein complexes, even in scenarios where no data on such mutations were provided during training (zero-shot prediction). In summary, the ProBID-Net model is poised to significantly advance the design of protein-protein interactions.",
+     "content_hash": "308011705f9e25a5f0ac1014d79d21d40b5ac01bc5237c02a60480f859898cbf",
+     "exact_span": "Protein-protein interactions are pivotal in numerous biological processes. The computational design of these interactions facilitates the creation of novel binding proteins, crucial for advancing biopharmaceutical products. With the evolution of artificial intelligence (AI), protein design tools have swiftly transitioned from scoring-function-based to AI-based models. However, many AI models for protein design are constrained by assuming complete unfamiliarity with the amino acid sequence of the",
+     "span_hash": "109c801d816e67aba65f67357137b0ebaaa58c9fe5379a897604adc6c9b5e641",
+     "evidence_class": "SCIENTIFIC_ABSTRACT",
+     "proposition_binding": "candidate_mechanism_input",
+     "locator": "https://doi.org/10.1039/d4sc02233e",
+     "epistemic_strength": "VERIFIED"
+    },
+    {
+     "record_id": "title:79b7e00e0977ce94",
+     "source": "core",
+     "source_identity_verified": true,
+     "query": "r458-s1-ranking-model-distribution-shift",
+     "retrieval_timestamp": "2026-09-14T21:48:41.871837+00:00",
+     "raw_content": "Scrapbook photo album by Elisabeth Model, originally February 1948 with many later inclusions until about 1989.Digital imageThe artist Elisabeth Model, née Dittmann, the daughter of Therese Dittmann, was born in Bayreuth, Germany at the turn of the century. She studied in Munich, and moved to Amsterdam after her marriage to Max Model (1895-1950). They immigrated to the USA in c. 1938.Elisabeth Model Collection, AR 6306.Model Elisabeth, Memories, handwritten manuscript, 1981, ME 758.Alyne, Justin, and Alexa ModelDigitize",
+     "content_hash": "e563be0b1af5a18d1ad732c137946a1c407be4bd674381a67400b7f6494fc068",
+     "exact_span": "Scrapbook photo album by Elisabeth Model, originally February 1948 with many later inclusions until about 1989.Digital imageThe artist Elisabeth Model, née Dittmann, the daughter of Therese Dittmann, was born in Bayreuth, Germany at the turn of the century. She studied in Munich, and moved to Amsterdam after her marriage to Max Model (1895-1950). They immigrated to the USA in c. 1938.Elisabeth Model Collection, AR 6306.Model Elisabeth, Memories, handwritten manuscript, 1981, ME 758.Alyne, Justin",
+     "span_hash": "cbe152b72efdc4e572772edafc530b4a3689c5317c6b40fc7138e2287653dd7d",
+     "evidence_class": "SCIENTIFIC_ABSTRACT",
+     "proposition_binding": "candidate_mechanism_input",
+     "locator": "",
+     "epistemic_strength": "VERIFIED"
+    },
+    {
+     "record_id": "title:d2b3902accae0d69",
+     "source": "core",
+     "source_identity_verified": true,
+     "query": "r458-s1-ranking-model-distribution-shift",
+     "retrieval_timestamp": "2026-09-14T21:48:41.871847+00:00",
+     "raw_content": "Bimonthly magazine discussing topics related to aviation and model airplane engines including collecting, restoring, maintaining, and identifying engines, along with advertising",
+     "content_hash": "5079c3e558237da0d1b519c40c44a987ca37ec9d30e2a55b7bf635b21e19bf4a",
+     "exact_span": "Bimonthly magazine discussing topics related to aviation and model airplane engines including collecting, restoring, maintaining, and identifying engines, along with advertising",
+     "span_hash": "5079c3e558237da0d1b519c40c44a987ca37ec9d30e2a55b7bf635b21e19bf4a",
+     "evidence_class": "SCIENTIFIC_ABSTRACT",
+     "proposition_binding": "candidate_mechanism_input",
+     "locator": "",
+     "epistemic_strength": "VERIFIED"
+    },
+    {
+     "record_id": "title:e5e039305af54970",
+     "source": "core",
+     "source_identity_verified": true,
+     "query": "r458-s1-ranking-model-distribution-shift",
+     "retrieval_timestamp": "2026-09-14T21:48:41.871854+00:00",
+     "raw_content": "Model of the facade of L'Enfer (Hell); Le Ciel (Heaven) is not shown, it was to the immediate left; A scale model, part of the Paris on Stage: 1889-1914 exhibition held June 19, 2013 to February 23, 2014. The cafe or cabaret L'Enfer (Hell) once stood at No. 54 Boulevard de Clichy, along with another called Le Ciel (Heaven), in the Pigalle neighborhood. Both cabarets were a result of a rising trend in Paris ca. 1885-1889 for themed establishments. At L'Enfer the waiters dressed as \"red imps\" and the doorman dressed as Satan or Mephisto. While the original bohemians stopped patronizing these in the 1890s, they continued to cater to tourists. Cabaret de l’Enfer remained open until 1952",
+     "content_hash": "d4d9f83bc0ab2c9fa8b3939e196229f4d0b88c7116ff33fddbd47d3657735fbd",
+     "exact_span": "Model of the facade of L'Enfer (Hell); Le Ciel (Heaven) is not shown, it was to the immediate left; A scale model, part of the Paris on Stage: 1889-1914 exhibition held June 19, 2013 to February 23, 2014. The cafe or cabaret L'Enfer (Hell) once stood at No. 54 Boulevard de Clichy, along with another called Le Ciel (Heaven), in the Pigalle neighborhood. Both cabarets were a result of a rising trend in Paris ca. 1885-1889 for themed establishments. At L'Enfer the waiters dressed as \"red imps\" and ",
+     "span_hash": "a467d3ad6ae7caf94ee9dccaacefa92ecbe4176f915b7159d4fcae6eb2caf977",
+     "evidence_class": "SCIENTIFIC_ABSTRACT",
+     "proposition_binding": "candidate_mechanism_input",
+     "locator": "",
+     "epistemic_strength": "VERIFIED"
+    }
+   ],
+   "hash_verification_all_pass": true,
+   "snapshot_hash": "50a3d8bf749f31ae6f86f232488326dcb4b34632d1feb29dfebb308bf1bcf154"
+  },
+  "synthesis": {
+   "model": "glm-4-plus-thinking",
+   "provider": "zai",
+   "transport_status": "OK",
+   "task_degradation": {
+    "requested_task": "STRONG",
+    "actual_task_capability": "STRONG",
+    "task_capability_match": true,
+    "degraded_reason": "the serving model declares the requested task capability"
+   },
+   "prompt_hash": "2428f61bf4b6cb1e",
+   "input_hash": "07c31d30553d04f5",
+   "output_hash": "93eaf5a34e18ca8e",
+   "synthesis_timestamp": "2026-09-14T21:48:45.096985+00:00"
+  }
+ },
+ "stage_log": [
+  {
+   "stage": "RETRIEVE",
+   "capability_id": "A2_RETRIEVAL",
+   "module_path": "discovery_fabric/retrieval_fabric/pipeline.py",
+   "function": "retrieve_fabric(problem) [V2] / retrieve(problem) [V1]",
+   "started_at": "2026-09-14T21:44:50+00:00Z",
+   "before_envelope_hash": "42da053635d5c24e1c7bff2192b3d2099605330fcf40dfbc2ebba998befdc2a0",
+   "status": "OK",
+   "finished_at": "2026-09-14T21:48:41+00:00Z",
+   "after_envelope_hash": "4836a2f9a1babe124dbafbef08a9cf6b616c0f6c93c510583669a1678ee55b4c",
+   "candidate_delta": [
+    "evidence",
+    "evidence_ids",
+    "provenance"
+   ],
+   "delta_real": true,
+   "result_meta": {
+    "retrieved_count": 14,
+    "retrieval_fabric_version": "V2"
+   },
+   "entry": {
+    "entry_helper_version": "stage_entry/1.1.0",
+    "stage": "RETRIEVE",
+    "entry_status": "ALLOWED",
+    "prerequisite": "UPSTREAM_COMPLETE",
+    "prerequisite_evidence": {
+     "failed_stages": [],
+     "skipped_stages": []
+    }
+   }
+  },
+  {
+   "stage": "FREEZE",
+   "capability_id": "EVIDENCE_FREEZE",
+   "module_path": "orchestrator/evidence_custody.py",
+   "function": "promote_to_evidence(record, source, query, class, binding)",
+   "started_at": "2026-09-14T21:48:41+00:00Z",
+   "before_envelope_hash": "4836a2f9a1babe124dbafbef08a9cf6b616c0f6c93c510583669a1678ee55b4c",
+   "status": "OK",
+   "finished_at": "2026-09-14T21:48:41+00:00Z",
+   "after_envelope_hash": "0b8b23eab391334f3e495e0411ffcb514080a0bc2fa96e62c0c9d82522c528ad",
+   "candidate_delta": [
+    "provenance"
+   ],
+   "delta_real": true,
+   "result_meta": {
+    "custody_records": 7,
+    "hash_ok": true
+   },
+   "entry": {
+    "entry_helper_version": "stage_entry/1.1.0",
+    "stage": "FREEZE",
+    "entry_status": "ALLOWED",
+    "prerequisite": "UPSTREAM_COMPLETE",
+    "prerequisite_evidence": {
+     "failed_stages": [],
+     "skipped_stages": []
+    }
+   }
+  },
+  {
+   "stage": "PREMISE_GATE",
+   "capability_id": "PREMISE_GATE",
+   "module_path": "discovery_fabric/engine/premise_gate.py",
+   "function": "check_premise(problem)",
+   "started_at": "2026-09-14T21:48:41+00:00Z",
+   "before_envelope_hash": "0b8b23eab391334f3e495e0411ffcb514080a0bc2fa96e62c0c9d82522c528ad",
+   "status": "OK",
+   "finished_at": "2026-09-14T21:48:41+00:00Z",
+   "after_envelope_hash": "ff7c261e82ce841888ff7fd83e22d51ce4d9c1930e88f2e12a25f0b85b01bb5e",
+   "candidate_delta": [
+    "premise_gate"
+   ],
+   "delta_real": true,
+   "result_meta": {
+    "premise_verdict": "PREMISE_COHERENT"
+   },
+   "entry": {
+    "entry_helper_version": "stage_entry/1.1.0",
+    "stage": "PREMISE_GATE",
+    "entry_status": "ALLOWED",
+    "prerequisite": "UPSTREAM_COMPLETE",
+    "prerequisite_evidence": {
+     "failed_stages": [],
+     "skipped_stages": []
+    }
+   }
+  },
+  {
+   "stage": "SYNTHESIZE",
+   "capability_id": "SYNTHESIS",
+   "module_path": "discovery_fabric/a2/synthesize.py",
+   "function": "synthesize(problem, evidence)",
+   "started_at": "2026-09-14T21:48:41+00:00Z",
+   "before_envelope_hash": "ff7c261e82ce841888ff7fd83e22d51ce4d9c1930e88f2e12a25f0b85b01bb5e",
+   "status": "OK",
+   "finished_at": "2026-09-14T21:48:45+00:00Z",
+   "after_envelope_hash": "d8c62ae5a271b7e45b985cf611e6511966c927c1afece2e17dc00ead3db182fa",
+   "candidate_delta": [
+    "candidate_id",
+    "mechanism_ids",
+    "mechanism_map",
+    "provenance"
+   ],
+   "delta_real": true,
+   "result_meta": {
+    "model": "glm-4-plus-thinking",
+    "provider": "zai"
+   },
+   "entry": {
+    "entry_helper_version": "stage_entry/1.1.0",
+    "stage": "SYNTHESIZE",
+    "entry_status": "ALLOWED",
+    "prerequisite": "UPSTREAM_COMPLETE",
+    "prerequisite_evidence": {
+     "failed_stages": [],
+     "skipped_stages": []
+    }
+   }
+  },
+  {
+   "stage": "VERIFY",
+   "capability_id": "EVIDENCE_VERIFY",
+   "module_path": "discovery_fabric/a2/verify.py",
+   "function": "verify_evidence(candidate, evidence)",
+   "started_at": "2026-09-14T21:48:45+00:00Z",
+   "before_envelope_hash": "d8c62ae5a271b7e45b985cf611e6511966c927c1afece2e17dc00ead3db182fa",
+   "status": "OK",
+   "finished_at": "2026-09-14T21:48:45+00:00Z",
+   "after_envelope_hash": "9606edb30e50812c57d3e41cde9d76294b8d4339679342d11b046b3164ce9a9b",
+   "candidate_delta": [
+    "adjudication",
+    "evidence_classification"
+   ],
+   "delta_real": true,
+   "result_meta": {
+    "verified": true
+   },
+   "entry": {
+    "entry_helper_version": "stage_entry/1.1.0",
+    "stage": "VERIFY",
+    "entry_status": "ALLOWED",
+    "prerequisite": "UPSTREAM_COMPLETE",
+    "prerequisite_evidence": {
+     "failed_stages": [],
+     "skipped_stages": []
+    }
+   }
+  },
+  {
+   "stage": "MECHANISM_SPACE",
+   "capability_id": "MECHANISM_SPACE",
+   "module_path": "discovery_fabric/engine/mechanism_space.py",
+   "function": "build_mechanism_space(problem, evidence)",
+   "started_at": "2026-09-14T21:48:45+00:00Z",
+   "before_envelope_hash": "9606edb30e50812c57d3e41cde9d76294b8d4339679342d11b046b3164ce9a9b",
+   "status": "OK",
+   "finished_at": "2026-09-14T21:48:45+00:00Z",
+   "after_envelope_hash": "9d4b3e62cabafb59938dc49ed7f01337b8540b7b5468866515706c6eac3316fb",
+   "candidate_delta": [
+    "mechanism_space"
+   ],
+   "delta_real": true,
+   "result_meta": {
+    "state": "NO_CANDIDATES",
+    "n_candidates": 0
+   },
+   "entry": {
+    "entry_helper_version": "stage_entry/1.1.0",
+    "stage": "MECHANISM_SPACE",
+    "entry_status": "ALLOWED",
+    "prerequisite": "VERIFIED_EVIDENCE",
+    "prerequisite_evidence": {
+     "n_verified_evidence_items": 8,
+     "n_direct_support": 2,
+     "n_partial_support": 6,
+     "n_items_total": 14,
+     "span_binding_verified": true,
+     "basis": ">=1 evidence item classified DIRECT_SUPPORT/PARTIAL_SUPPORT, or the candidate's span binding verified (R394 s5 classification + a2/verify)"
+    }
+   }
+  },
+  {
+   "stage": "MULTI_SOURCE_DISCOVERY",
+   "capability_id": "MULTI_SOURCE_DISCOVERY",
+   "module_path": "orchestrator/multi_source_discovery.py",
+   "function": "run_four_search_attack(name, mechanism, problem, failure_mode, adjacent)",
+   "started_at": "2026-09-14T21:48:45+00:00Z",
+   "before_envelope_hash": "9d4b3e62cabafb59938dc49ed7f01337b8540b7b5468866515706c6eac3316fb",
+   "status": "OK",
+   "finished_at": "2026-09-14T21:49:11+00:00Z",
+   "after_envelope_hash": "697f682b12a37d5080ea8ebd2bb13d610606e132e91c4f462b7d5aaa4375558b",
+   "candidate_delta": [
+    "multi_source"
+   ],
+   "delta_real": true,
+   "result_meta": {
+    "directions": [
+     "discovery",
+     "destruction",
+     "transfer",
+     "reality"
+    ]
+   },
+   "entry": {
+    "entry_helper_version": "stage_entry/1.1.0",
+    "stage": "MULTI_SOURCE_DISCOVERY",
+    "entry_status": "ALLOWED",
+    "prerequisite": "UPSTREAM_COMPLETE",
+    "prerequisite_evidence": {
+     "failed_stages": [],
+     "skipped_stages": []
+    }
+   }
+  },
+  {
+   "stage": "COLLISION",
+   "capability_id": "COLLISION_ENGINE",
+   "module_path": "discovery_fabric/prior_art_v2/collision_resolution.py + discovery_fabric/a2/prior_art.py",
+   "function": "run_collision (mechanism-centered) + search_prior_art",
+   "started_at": "2026-09-14T21:49:11+00:00Z",
+   "before_envelope_hash": "697f682b12a37d5080ea8ebd2bb13d610606e132e91c4f462b7d5aaa4375558b",
+   "status": "OK",
+   "finished_at": "2026-09-14T21:49:21+00:00Z",
+   "after_envelope_hash": "3018616748f1e62e37c7bad1d880cec9e44390158832d163a749fa57220b0d33",
+   "candidate_delta": [
+    "collision_results",
+    "prior_art"
+   ],
+   "delta_real": true,
+   "result_meta": {
+    "novelty_risk": "UNRESOLVED_INSUFFICIENT_EVIDENCE"
+   },
+   "entry": {
+    "entry_helper_version": "stage_entry/1.1.0",
+    "stage": "COLLISION",
+    "entry_status": "ALLOWED",
+    "prerequisite": "UPSTREAM_COMPLETE",
+    "prerequisite_evidence": {
+     "failed_stages": [],
+     "skipped_stages": []
+    }
+   }
+  },
+  {
+   "stage": "PHYSICS",
+   "capability_id": "PHYSICS_GATE",
+   "module_path": "discovery_fabric/engine/physics_stage.py",
+   "function": "evaluate_envelope_physics(env, run_ctx)",
+   "started_at": "2026-09-14T21:49:21+00:00Z",
+   "before_envelope_hash": "3018616748f1e62e37c7bad1d880cec9e44390158832d163a749fa57220b0d33",
+   "status": "OK",
+   "finished_at": "2026-09-14T21:49:21+00:00Z",
+   "after_envelope_hash": "97210cb8eaf960fa3c3b7d8d02d22e37979b1ca2aef9f93338f51f06272644f9",
+   "candidate_delta": [
+    "physics"
+   ],
+   "delta_real": true,
+   "result_meta": {
+    "lifecycle_verdict": "MECHANISM_NOT_SIMULATABLE",
+    "chain": [
+     "PRE_REQUIREMENTS"
+    ]
+   },
+   "entry": {
+    "entry_helper_version": "stage_entry/1.1.0",
+    "stage": "PHYSICS",
+    "entry_status": "ALLOWED",
+    "prerequisite": "UPSTREAM_COMPLETE",
+    "prerequisite_evidence": {
+     "failed_stages": [],
+     "skipped_stages": []
+    }
+   }
+  },
+  {
+   "stage": "ATTACK",
+   "capability_id": "ATTACK_ENGINE",
+   "module_path": "discovery_fabric/a2/adversarial.py",
+   "function": "adversarial_challenge(candidate, evidence_verified, prior_art_state)",
+   "started_at": "2026-09-14T21:49:21+00:00Z",
+   "before_envelope_hash": "97210cb8eaf960fa3c3b7d8d02d22e37979b1ca2aef9f93338f51f06272644f9",
+   "status": "OK",
+   "finished_at": "2026-09-14T21:49:22+00:00Z",
+   "after_envelope_hash": "caa17c5b4fca587a4da790f78956ee74b9ba443c7ec2484cf710e85eab173b60",
+   "candidate_delta": [
+    "attack_results"
+   ],
+   "delta_real": true,
+   "result_meta": {
+    "overall": "KILLED"
+   },
+   "entry": {
+    "entry_helper_version": "stage_entry/1.1.0",
+    "stage": "ATTACK",
+    "entry_status": "ALLOWED",
+    "prerequisite": "UPSTREAM_COMPLETE",
+    "prerequisite_evidence": {
+     "failed_stages": [],
+     "skipped_stages": []
+    }
+   }
+  },
+  {
+   "stage": "CONTRADICTION",
+   "capability_id": "CONTRADICTION_QUEUE",
+   "module_path": "orchestrator/contradiction_queue.py",
+   "function": "ContradictionQueue.add / to_dict",
+   "started_at": "2026-09-14T21:49:22+00:00Z",
+   "before_envelope_hash": "caa17c5b4fca587a4da790f78956ee74b9ba443c7ec2484cf710e85eab173b60",
+   "status": "OK",
+   "finished_at": "2026-09-14T21:49:22+00:00Z",
+   "after_envelope_hash": "d029510d369c4cdd3609dd100dfba67c5ef1ab73795d87ad83f57bf83085b3c8",
+   "candidate_delta": [
+    "contradictions"
+   ],
+   "delta_real": true,
+   "result_meta": {
+    "added": 1
+   },
+   "entry": {
+    "entry_helper_version": "stage_entry/1.1.0",
+    "stage": "CONTRADICTION",
+    "entry_status": "ALLOWED",
+    "prerequisite": "UPSTREAM_COMPLETE",
+    "prerequisite_evidence": {
+     "failed_stages": [],
+     "skipped_stages": []
+    }
+   }
+  }
+ ]
+}

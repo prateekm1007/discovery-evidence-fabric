@@ -1,0 +1,20 @@
+{
+ "problem_id": "r458-s1-ranking-model-distribution-shift",
+ "device": "marketplace's search ranking model",
+ "failure_mode": "decay in normalized discounted cumulative gain",
+ "objective": "recover at least 3.5 points of the 4-percent revenue-per-search gap",
+ "failure": "Documented problem 'decay in normalized discounted cumulative gain' concerning marketplace's search ranking model. User-submitted engineering problem (session input): \"A marketplace's search ranking model, trained on 18 months of interaction logs, decays measurably after a redesign moves the buy button above the fold on mobile: offline replay shows a 6-percent drop in normalized discounted cumulative gain against held-out post-launch traffic, click-through on rank\".  ROUTING: nhtsa_complaints: routing state ARCHIVED_ROUTING \u2014 measured: NOT_QUERIED_GRAMMAR on every non-vehicle problem (70 recorded grammar mismatches, zero production-run uses in the current domain set \u2014 R399 audit W3); reinstatement: the production domain set includes vehicle problems with extracted make|model|year parameters (flip to ACTIVE + worklog entry; connector implementation archived in place). ROUTING: nhtsa_recalls: routing state ARCHIVED_ROUTING \u2014 measured: NOT_QUERIED_GRAMMAR on every non-vehicle problem (70 recorded grammar mismatches, zero production-run uses in the current domain set \u2014 R399 audit W3); reinstatement: the production domain set includes vehicle problems with extracted make|model|year parameters (flip to ACTIVE + worklog entry; connector implementation archived in place). [nhtsa_complaints] retrieval status NOT_QUERIED_ARCHIVED_ROUTING (engine routing decision (R399 W3): ARCHIVED_ROUTING \u2014 not a provider failure and not absence) \u2014 provider outcome recorded, not treated as absence (Art. XXI.3). [nhtsa_recalls] retrieval status NOT_QUERIED_ARCHIVED_ROUTING (engine routing decision (R399 W3): ARCHIVED_ROUTING \u2014 not a provider failure and not absence) \u2014 provider outcome recorded, not treated as absence (Art. XXI.3). Problem-existence basis: NO SOURCE RETURNED RECORDS \u2014 problem existence UNVERIFIED by live evidence (Art. XX); treat as hypothesis.",
+ "constraint": "cannot launch a full retraining pipeline redesign, cannot increase serving latency beyond 45 milliseconds, cannot buy new labeling beyond the current budget",
+ "sources": {
+  "nhtsa_complaints": "NOT_QUERIED_ARCHIVED_ROUTING",
+  "nhtsa_recalls": "NOT_QUERIED_ARCHIVED_ROUTING"
+ },
+ "origin": "toscanini_ui",
+ "user_text": "A marketplace's search ranking model, trained on 18 months of interaction logs, decays measurably after a redesign moves the buy button above the fold on mobile: offline replay shows a 6-percent drop in normalized discounted cumulative gain against held-out post-launch traffic, click-through on ranked position 3 falls 11 percent, and revenue-per-search is down 4 percent over five weeks while the site's overall traffic is flat. The model is a gradient-boosted ranking model over 240 features with a 45-millisecond serving deadline including feature fetches, and the label pipeline (delayed conversion labels arriving 1 to 9 days after click) cannot be rebuilt this quarter. The team cannot launch a full retraining pipeline redesign (one release per quarter, already committed), cannot increase serving latency beyond 45 milliseconds (the page-speed budget is contractual), cannot buy new labeling beyond the current budget, and must recover at least 3.5 points of the 4-percent revenue-per-search gap within one quarter on the existing serving stack.",
+ "r458_benchmark": {
+  "class": "FROZEN_BENCHMARK_DEV",
+  "arm": "qwen3-1.7b",
+  "content_sha256": "7a51fe4869ecbf40f38e6c8e3d8934d28c354b7ce209073e80ee56ede07969a1",
+  "corpus_freeze": "R458/BENCHMARK_FREEZE.json"
+ }
+}

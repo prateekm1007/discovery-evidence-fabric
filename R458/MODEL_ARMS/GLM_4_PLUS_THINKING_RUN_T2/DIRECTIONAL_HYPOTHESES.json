@@ -1,0 +1,108 @@
+{
+ "artifact_type": "DIRECTIONAL_HYPOTHESES",
+ "schema_version": "hypotheses/1.0",
+ "created_at": "2026-09-14T22:18:39+00:00",
+ "hypotheses": [
+  {
+   "hypothesis_id": "dh:8f5a66d5f4c20d5d57f5",
+   "candidate_id": "inv:0771a2d11c:gen1",
+   "failure_id": "diag:ff8750d78303f46b",
+   "causal_diagnosis_id": "diag:ff8750d78303f46b",
+   "target_variable": "Integration location of NEPCMs",
+   "current_value": "Between prismatic lithium iron phosphate cells",
+   "proposed_value": "Directly integrated into cell structure",
+   "direction": "CHANGE_MECHANISM",
+   "mechanism_affected": "Thermal transfer mechanism",
+   "causal_rationale": "The failure indicates weak thermal transfer and engineering infeasibility when integrating NEPCMs between cells. The adversarial kill suggests the current approach doesn't provide adequate thermal management for the battery pack.",
+   "predicted_effect": "Improved thermal conductivity and more efficient heat dissipation within the cells",
+   "predicted_magnitude_or_range": "Moderate improvement in thermal transfer efficiency",
+   "competing_explanations": [
+    "NEPCMs may have inherent limitations in thermal conductivity",
+    "the material may not be compatible with cell internals"
+   ],
+   "evidence_support": [
+    {
+     "evidence_id": "europepmc:39286145",
+     "span": "However, mostly Li-batteries have a limited lifespan of up to three years af"
+    }
+   ],
+   "evidence_gaps": [
+    "Specific thermal conductivity data of NEPCMs",
+    "compatibility data with lithium iron phosphate cells",
+    "integration method feasibility"
+   ],
+   "falsifier": "If thermal conductivity measurements show no improvement after direct integration",
+   "measurement_required": "Thermal conductivity testing of modified cells vs. original configuration",
+   "intervention_type": "MECHANISM_COMBINATION",
+   "confidence": "MODERATE",
+   "provenance": {
+    "class": "AI_PROPOSED",
+    "purpose": "directional:hypothesis",
+    "note": "the LLM proposed this hypothesis; the mechanical ground gate adjudicates it (Art. XVIII) — an ungrounded proposal is REJECTED and its mutation never executes",
+    "proposed_at": "2026-09-14T22:18:41+00:00"
+   },
+   "status": "REJECTED",
+   "gate": {
+    "gate_version": "directional_ground_gate/2.0",
+    "checks": [
+     {
+      "check": "G1_STRUCTURE",
+      "verdict": "PASS",
+      "basis": "all required fields present"
+     },
+     {
+      "check": "G2_DIAGNOSIS_RESOLVES",
+      "verdict": "PASS",
+      "basis": "causal_diagnosis_id='diag:ff8750d78303f46b' resolves to a recorded diagnosis (cause=ADVERSARIAL_KILL)"
+     },
+     {
+      "check": "G3_MECHANISM_GROUNDED",
+      "verdict": "PASS",
+      "basis": "mechanism terms grounded in the diagnosis/candidate: adversarial, kill, nepcms"
+     },
+     {
+      "check": "G4_PREDICTION_FALSIFIABLE",
+      "verdict": "FAIL",
+      "basis": "predicted_effect=present; falsifier=present but not measurable — an unfalsifiable direction is a wish, not a hypothesis"
+     },
+     {
+      "check": "G5_EVIDENCE_CLASS",
+      "verdict": "PASS",
+      "basis": "class=EVIDENCE_PARTIAL: 1 verified support bindings (span-verified); 0 unresolved ids; 0 ids with failed/absent spans; gaps=3 (gaps are NEVER equated with support — R451 §4)"
+     },
+     {
+      "check": "G6_TARGET_IN_DESIGN_STATE",
+      "verdict": "PASS",
+      "basis": "target_variable grounded in the design state: cells, iron, lithium, nepcms, phosphate, prismatic"
+     },
+     {
+      "check": "G7_PREDICTION_INTERVENTION_COHERENT",
+      "verdict": "PASS",
+      "basis": "predicted observable coupled to the intervention: thermal"
+     },
+     {
+      "check": "G8_FALSIFIER_BINDS_PREDICTION",
+      "verdict": "PASS",
+      "basis": "the falsifier measures the predicted observable: conductivity, integration, thermal"
+     },
+     {
+      "check": "G9_CAUSAL_MEMORY",
+      "verdict": "PASS",
+      "basis": "no prior FALSIFIED direction repeats (the causal memory is clean for this (target_variable, direction))"
+     }
+    ],
+    "grounded": false,
+    "verdict": "REJECTED",
+    "evidence_class": "EVIDENCE_PARTIAL",
+    "evidence_resolution": {
+     "verified_ids": [
+      "europepmc:39286145"
+     ],
+     "unresolved_ids": [],
+     "span_failed_ids": []
+    },
+    "adjudicated_at": "2026-09-14T22:18:41+00:00"
+   }
+  }
+ ]
+}
