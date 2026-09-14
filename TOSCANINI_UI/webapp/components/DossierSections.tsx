@@ -854,6 +854,31 @@ export function ExperimentSection({ tab }: { tab: DossierTab }) {
   }
   const contract = x.contract ?? {};
   const fields = Object.entries(contract);
+  // R458-C2 (§1/BS-009): the recorded experiment renders as HUMAN PROSE
+  // — what would kill the candidate, what the answer decides, and what
+  // it costs (UNKNOWN stays UNKNOWN, Art. XXV). The raw recorded object
+  // stays one disclosure away in the collapsed record (§15: technical
+  // details remain accessible — they are just not the surface).
+  const rec = (x.recorded ?? null) as
+    | {
+        shortlist?: {
+          experiment?: string;
+          source_stage?: string;
+          decision_impact?: string;
+          kill_probability?: string;
+          cost?: string;
+          time?: string;
+          dependency?: string;
+          is_selected_killer?: boolean;
+          basis?: string;
+          hypotheses?: { name?: string; description?: string }[];
+        }[];
+      }
+    | null;
+  const killer =
+    rec?.shortlist?.find((s) => s.is_selected_killer) ??
+    rec?.shortlist?.[0] ??
+    null;
   return (
     <div className="dtab experiment-tab">
       <div className="exp-note">
@@ -861,10 +886,55 @@ export function ExperimentSection({ tab }: { tab: DossierTab }) {
         executed. Executing it is a physical act this machine never
         claims (reality boundary).
       </div>
+      {killer && (
+        <div className="ov-block" data-experiment-prose>
+          {killer.experiment && (
+            <div>
+              <b>Decisive test:</b> {String(killer.experiment).replace(/_/g, " ")}
+            </div>
+          )}
+          {killer.hypotheses?.[0]?.description && (
+            <div>
+              <b>What it tests:</b> {killer.hypotheses[0].description}
+            </div>
+          )}
+          {killer.decision_impact != null && (
+            <div>
+              <b>What the answer decides:</b>{" "}
+              {typeof killer.decision_impact === "number"
+                ? `decision impact ${killer.decision_impact} on the 0–1 information-gain scale`
+                : String(killer.decision_impact)}
+            </div>
+          )}
+          {killer.kill_probability != null && (
+            <div>
+              <b>Chance it kills the candidate:</b>{" "}
+              {killer.kill_probability === "UNKNOWN"
+                ? "unknown — no sourced base rate exists"
+                : String(killer.kill_probability)}
+            </div>
+          )}
+          <div>
+            <b>Cost:</b> {String(killer.cost ?? "UNKNOWN").replace(/_/g, " ")} ·{" "}
+            <b>Time:</b> {String(killer.time ?? "UNKNOWN").replace(/_/g, " ")}
+          </div>
+          {killer.dependency && (
+            <div className="faint">
+              Depends on: {String(killer.dependency).replace(/_/g, " ")}
+            </div>
+          )}
+          {killer.basis && (
+            <div className="faint">Basis: {killer.basis}</div>
+          )}
+        </div>
+      )}
       {x.recorded != null && (
-        <pre className="mono-block">
-          {JSON.stringify(x.recorded, null, 1).slice(0, 900)}
-        </pre>
+        <details className="dd-record" data-experiment-record>
+          <summary className="faint">The recorded experiment object</summary>
+          <pre className="mono-block">
+            {JSON.stringify(x.recorded, null, 1).slice(0, 900)}
+          </pre>
+        </details>
       )}
       {fields.length > 0 && (
         <div className="ov-block">

@@ -66,10 +66,17 @@
       "forbidden": ["defaulting to SURVIVED", "defaulting to FAILED"]
     },
     "REJECTED": {
-      "canonical": "COMPLETED_FALSE_PREMISE / rejected=true — a REAL scientific verdict",
+      "canonical": "COMPLETED_FALSE_PREMISE / outcome FALSE_PREMISE_INCOHERENT — the ONE bare scientific rejection (R451-C2 SCIENTIFIC_REJECTION vocabulary)",
       "human": "Rejected — the evidence contradicted the problem's premise. Rejected is a finding — the investigation did its job.",
       "tone": "rejected",
-      "forbidden": ["softening into 'in development'", "hiding the rejection behind the next action"]
+      "forbidden": ["softening into 'in development'", "hiding the rejection behind the next action"],
+      "r458_rule": "the verdict is read from the canonical user_state KEY only — the raw `rejected` boolean on the projection is a stale field (R452-B1 corrected it at the key layer) and is retired from the presentation decision path (measured live: run ts_da602dc2c698 rendered 'Rejected' where the canonical layer says killed-by-challenge/in-development; fixed and pinned by battery test B6b)"
+    },
+    "KILLED_BY_CHALLENGE": {
+      "canonical": "user_state COMPLETED_UNDER_DEVELOPMENT + outcome INVENTION_KILLED_BY_CHALLENGE (run_state.OUTCOME_KILLED_BY_CHALLENGE — the machine's own adversarial challenge killed the invention and no verified survivor replaced it)",
+      "human": "Completed — invention in development: the machine's own adversarial challenge killed this invention and no verified survivor replaced it — the generation records show exactly what was killed and why. Next step: Reformulate the problem and run again.",
+      "tone": "development",
+      "forbidden": ["a bare 'Rejected' (two words for one canonical state violates §24)", "presenting the killed candidate as current achievement", "a dead end with no forward action"]
     },
     "CONTESTED": {
       "canonical": "attack escalated_objection (instrument not calibrated to decide)",

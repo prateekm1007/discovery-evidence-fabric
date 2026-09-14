@@ -98,13 +98,36 @@ export function suppressStalePositives(detail: SessionDetail): boolean {
   return outcome === "RUN_BLOCKED";
 }
 
+// R458-C2 (§24: one canonical state → exactly ONE honest word): the
+// rejection verdict is read from the canonical user_state KEY — never
+// from the raw `rejected` boolean, which is the stale field the R452-B1
+// audit corrected at the key layer (the challenge-killed case is
+// COMPLETED_UNDER_DEVELOPMENT with the killed-by-challenge decision
+// text, never a bare "Rejected"). A false premise remains the one
+// honest scientific rejection (R451-C2 resolvePresentationState
+// vocabulary: SCIENTIFIC_REJECTION == COMPLETED_FALSE_PREMISE only).
 export function isRejectedOutcome(detail: SessionDetail): boolean {
   if (suppressStalePositives(detail)) return false;
+  const usv = detail.user_state_view;
   const outcome =
     detail.run_state?.outcome ?? detail.user_state_view?.outcome;
   return (
-    detail.user_state_view?.rejected === true ||
+    usv?.user_state === "COMPLETED_FALSE_PREMISE" ||
     outcome === "FALSE_PREMISE_INCOHERENT"
+  );
+}
+
+// R458-C2 (§6): the machine killed its own invention and no verified
+// survivor replaced it. The run is terminal — nothing more happens
+// without the user, so the next-best action is a fresh, better-aimed
+// formulation. The generation records (what was killed and why) stay
+// one click away in the workspace.
+export function isKilledByChallenge(detail: SessionDetail): boolean {
+  if (suppressStalePositives(detail)) return false;
+  const usv = detail.user_state_view;
+  return (
+    usv?.user_state === "COMPLETED_UNDER_DEVELOPMENT" &&
+    (usv?.outcome ?? "") === "INVENTION_KILLED_BY_CHALLENGE"
   );
 }
 
@@ -342,6 +365,12 @@ export function deriveNextAction(
   if (isTerminal(detail.status)) {
     if (packageAvailable) {
       return { label: "Download the technology package", kind: "package" };
+    }
+    if (isKilledByChallenge(detail)) {
+      return {
+        label: "Reformulate the problem and run again",
+        kind: "new",
+      };
     }
     if (isRejectedOutcome(detail)) {
       return { label: "Reformulate the problem and run again", kind: "new" };

@@ -338,6 +338,10 @@ export default function Conversation({
               </div>
             );
           case "progress":
+            // §7 — ONE progress sentence: when the live event line (or
+            // the honest pause) is rendering below, the derived "still
+            // working" line is redundant — exactly one line, ever.
+            if (liveSentence.text || pausedSentence.text) return null;
             return (
               <div className="conv-row" key={m.id}>
                 <div className="conv-live" data-conv-live>

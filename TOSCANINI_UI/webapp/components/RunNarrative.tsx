@@ -155,6 +155,10 @@ const OUTCOME_CLASS: Record<RunOutcome, string> = {
   INVENTION_SURVIVED: "COMPLETE",
   INVENTION_REQUIRES_EXPERIMENT: "COMPLETE",
   INVENTION_UNDER_DEVELOPMENT: "RUNNING",
+  // R458-C2: the machine killed its own invention and no verified
+  // survivor replaced it — presented as in-development (R416), never a
+  // bare dead end; the generation records carry what was killed and why
+  INVENTION_KILLED_BY_CHALLENGE: "RUNNING",
   FALSE_PREMISE_INCOHERENT: "REJECTED",
   NO_DEFENSIBLE_INVENTION: "RUNNING",
   RUN_BLOCKED: "ERROR",

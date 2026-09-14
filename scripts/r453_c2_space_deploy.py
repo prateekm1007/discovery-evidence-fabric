@@ -171,7 +171,42 @@ def main() -> int:
             return 0
 
         # ---- 5. ONE upload call; the build runs on HF ---------------
+        # R458-C2 GHOST PRUNE (Art. LXIV): upload_folder only ADDS —
+        # every file deleted from git stayed in the Space as a ghost
+        # (439 measured in R458; a latent ghost TechStage.tsx importing
+        # a retired export broke the build). Before uploading: delete
+        # every Space file that is not in the staged tree. The prune is
+        # deletion-only (never writes content) and leaves the pre-prune
+        # revision in Space history (Art. XI).
         from huggingface_hub import HfApi
+        api = HfApi(token=hf_token)
+        _log("ghost prune: reconciling the Space tree with the staged tree ...")
+        space_files = set(api.list_repo_files(driver.SPACE, repo_type="space"))
+        staged_files = {
+            str(p.relative_to(stage)) for p in stage.rglob("*") if p.is_file()
+        }
+        # driver-written extras live outside the git tree
+        staged_files |= {"README.md", ".gitattributes"}
+        ghosts = sorted(
+            f for f in space_files - staged_files if not f.startswith(".git")
+        )
+        if ghosts:
+            _log(f"ghost prune: deleting {len(ghosts)} stale files")
+            BATCH = 100
+            for i in range(0, len(ghosts), BATCH):
+                api.delete_files(
+                    repo_id=driver.SPACE,
+                    repo_type="space",
+                    delete_patterns=ghosts[i : i + BATCH],
+                    commit_message=(
+                        "R458-C2 ghost prune: retire files not in the "
+                        f"staged tree (batch {i // BATCH + 1}; Art. LXIV)"
+                    ),
+                )
+            _log(f"ghost prune: {len(ghosts)} files retired "
+                 "(rebuild will follow the upload commit)")
+        else:
+            _log("ghost prune: tree is clean")
         api = HfApi(token=hf_token)
         _log("uploading to the canonical Space ...")
         t0 = time.time()

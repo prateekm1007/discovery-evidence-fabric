@@ -148,6 +148,37 @@ test("B6 candidate rejection: a real scientific verdict reads as Rejected — a 
   assert.match(t, /a finding|did its job/i);
 });
 
+test("B6b killed-by-challenge (R458 §24): one honest word, never two", () => {
+  // the measured production case (ts_da602dc2c698): the machine killed
+  // its own invention; the canonical KEY layer says UNDER_DEVELOPMENT
+  // with the killed-by-challenge outcome — the stale `rejected` boolean
+  // on the projection must never turn that into a bare "Rejected"
+  const detail = baseDetail({
+    status: "COMPLETE",
+    final_status: "INVENTION_UNDER_DEVELOPMENT",
+    run_state: { outcome: "INVENTION_KILLED_BY_CHALLENGE" },
+    user_state_view: {
+      user_state: "COMPLETED_UNDER_DEVELOPMENT",
+      label: "Completed — invention in development",
+      decision:
+        "the machine's own adversarial challenge killed this invention and no verified survivor replaced it",
+      rejected: true, // the stale field — deliberately present in the fixture
+      outcome: "INVENTION_KILLED_BY_CHALLENGE",
+    },
+  });
+  const msgs = present.deriveConversation(detail, null, false);
+  const outcome = msgs.find((m) => m.kind === "outcome");
+  assert.equal(outcome.tone, "development");
+  assert.equal(outcome.label, "Completed — invention in development");
+  assert.match(outcome.body, /killed this invention/);
+  // the next action is the reformulation — the honest forward step
+  const next = present.deriveNextAction(detail, null, false);
+  assert.equal(next.kind, "new");
+  assert.match(next.label, /Reformulate the problem/);
+  // and the false premise remains the ONLY bare rejection
+  assert.equal(present.isRejectedOutcome(detail), false);
+});
+
 test("B7 attack NOT_RUN: never a default 'survived'", () => {
   const detail = baseDetail({
     status: "COMPLETE",

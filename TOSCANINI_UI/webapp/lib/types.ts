@@ -351,6 +351,7 @@ export type RunOutcome =
   | "INVENTION_SURVIVED"
   | "INVENTION_REQUIRES_EXPERIMENT"
   | "INVENTION_UNDER_DEVELOPMENT"
+  | "INVENTION_KILLED_BY_CHALLENGE" // run_state.OUTCOME_KILLED_BY_CHALLENGE — the machine killed it, no verified survivor (R458-C2: consumed by isKilledByChallenge)
   | "FALSE_PREMISE_INCOHERENT"
   | "NO_DEFENSIBLE_INVENTION"
   | "RUN_BLOCKED";
