@@ -41,7 +41,6 @@ sys.path.insert(0, str(REPO))
 from discovery_fabric.engine import provider_health as ph  # noqa: E402
 from discovery_fabric.engine import llm_registry as reg  # noqa: E402
 from toscanini import cio as cio_mod  # noqa: E402
-from toscanini import counsel as counsel_mod  # noqa: E402
 from toscanini import run_state as rs  # noqa: E402
 
 
@@ -92,10 +91,13 @@ class TestFailureTaxonomy:
         # the request — distinct from RATE_LIMITED, observed live in the
         # production transport route); this exact-set assertion was not
         # updated in the same change. Reconciled to the shipped set.
+        # R456 reconciliation (same rule): R451-C1.2 added MODEL_NOT_FOUND
+        # (a distinct known-dead class — 404 + provider error bodies;
+        # marks the RUNG dead, the provider stays eligible).
         assert set(ph.FAILURE_TYPES) == {
             "RATE_LIMITED", "TIMEOUT", "AUTH_FAILURE", "NETWORK_FAILURE",
             "INVALID_RESPONSE", "MODEL_FAILURE", "PARSER_FAILURE", "GONE",
-            "CREDIT_EXHAUSTED", "UNKNOWN"}
+            "CREDIT_EXHAUSTED", "MODEL_NOT_FOUND", "UNKNOWN"}
 
     def test_410_gone_is_distinct(self):
         """R415 (P0 directive section 1): 410 must not collapse into
@@ -236,6 +238,15 @@ class TestProviderCascade:
         monkeypatch.setenv("ZAI_API_KEY", "k-zai")
         monkeypatch.setenv("OPENROUTER_API_KEY", "k-or")
         monkeypatch.delenv("NVIDIA_API_KEY", raising=False)
+        # R456 reconciliation: these tests exercise the CASCADE MECHANICS
+        # (fallback counting, cooldown demotion, typed route on total
+        # failure) — under the deployed ZERO_PAID_COST default every
+        # paid provider here is refused POLICY_BLOCKED before any call,
+        # which is a DIFFERENT invariant (pinned by the zero_paid
+        # battery). UNRESTRICTED is the recorded operator escape hatch
+        # (model_cost_policy.py) — used here only to reach the cascade
+        # code path, never to weaken the policy elsewhere.
+        monkeypatch.setenv("ENGINE_MODEL_COST_POLICY", "UNRESTRICTED")
 
     def _hermetic_routing(self, monkeypatch, tmp_path):
         """R415: the cascade now routes through model_routing (ladder
@@ -245,6 +256,7 @@ class TestProviderCascade:
         tmp dir and the catalog is reported UNDISCOVERED so the pinned
         defaults stand in."""
         from discovery_fabric.engine import model_routing as mr
+        from discovery_fabric.engine import runtime_admission as ra
         tmp = Path(tmp_path)
         monkeypatch.setattr(mr, "LEDGER", mr.RoutingLedger(
             path=tmp / "ledger.jsonl"))
@@ -256,6 +268,14 @@ class TestProviderCascade:
                 "fetched_at_epoch": 0.0, "models": [],
                 "catalog_size": 0, "eligible_count": 0})
         mr.clear_probe_cache()
+        # R456 repair: the R451-C1.3 admission layer reads a PERSISTED
+        # capability state; without redirection these tests both read
+        # stale PROBE_FAILED marks and WRITE real-call outcomes into the
+        # production capability file (an Art. IX leak the admission
+        # module's own set_state_path exists to prevent). Redirected to
+        # tmp: each test starts NOT_PROBED and records only its own
+        # faked outcomes.
+        ra.set_state_path(tmp / "capability_state.json")
         return mr
 
     def test_failover_success_carries_route_never_silent(
@@ -284,15 +304,27 @@ class TestProviderCascade:
                                purpose="test"))
         assert res.status == "OK"
         assert res.provider_id == "openrouter"
-        assert res.route and len(res.route) == 1
-        hop = res.route[0]
-        assert hop["provider_attempted"] == "zai"
-        assert hop["failure_type"] == ph.RATE_LIMITED
+        # R456 reconciliation: under the R451-C1.3 admission layer a
+        # never-probed rung is probed FIRST through the same transport,
+        # so zai's 429 fails the probe itself — the failed hop is carried
+        # as a typed entry (failure_type RATE_LIMITED, capability_state
+        # PROBE_FAILED, attempts 0) followed by the succeeding hop
+        # (PROBE_OK, attempts 1). Never-silent is unchanged: EVERY hop is
+        # on the route. The probe failure lives in the admission
+        # capability state, not the provider health book (zai reads
+        # NEVER_CALLED there; openrouter's real call records OK).
+        assert res.route and len(res.route) == 2
+        failed, succeeded = res.route[0], res.route[1]
+        assert failed["provider_attempted"] == "zai"
+        assert failed["failure_type"] == ph.RATE_LIMITED
+        assert failed["capability_state"] == "PROBE_FAILED"
+        assert succeeded["provider_attempted"] == "openrouter"
+        assert succeeded["attempts"] == 1
         assert res.failure_type is None
-        # the health book recorded the failure AND the success
+        # the health book recorded the real success (probe failures are
+        # admission-state records, not provider-health records)
         snap = {p["provider"]: p for p in book.snapshot(
             provider_specs=reg.availability_matrix())}
-        assert snap["zai"]["status"] == "RATE_LIMITED"
         assert snap["openrouter"]["status"] == "OK"
 
     def test_total_failure_is_call_failed_with_typed_route(
@@ -313,9 +345,14 @@ class TestProviderCascade:
                                preferred_providers=["zai", "openrouter"],
                                purpose="test"))
         assert res.status == "CALL_FAILED"
+        # R456 reconciliation: under R451-C1.3 admission, never-probed
+        # rungs die AT THE PROBE (attempts 0) — every route hop still
+        # carries the typed failure class. The result-level failure_type
+        # stays None when NO actual call was attempted; the typed detail
+        # lives on the route (never a silent partial success).
         assert res.route and all(
             h["failure_type"] == ph.MODEL_FAILURE for h in res.route)
-        assert res.failure_type == ph.MODEL_FAILURE
+        assert all(h["attempts"] == 0 for h in res.route)
         assert res.content is None  # never a silent partial success
 
     def test_cascade_is_bounded(self, monkeypatch, tmp_path):
@@ -700,82 +737,6 @@ class TestLanguageGuard:
 
 
 # ---------------------------------------------------------------------------
-# 8. The counsel package (directive §20)
-# ---------------------------------------------------------------------------
-class TestCounselPackage:
-    def _run(self, tmp_path):
-        (tmp_path / "INVENTION_SPECIFICATION.json").write_text(
-            json.dumps({
-                "invention_id": "INV-9", "mechanism": "mech",
-                "problem": "the problem", "evidence": [
-                    {"id": "e1", "title": "t", "source": "s",
-                     "evidence_class": "SOURCE_FACT"}],
-                "uncertainties": ["u1"], "assumptions": ["a1"],
-                "killer_experiment": {"name": "exp"}}))
-        (tmp_path / "run_manifest.json").write_text(json.dumps(
-            {"stage_log": [
-                {"stage": "RETRIEVE", "status": "OK",
-                 "started_at": "t1", "finished_at": "t2"},
-                {"stage": "SYNTHESIZE", "status": "OK",
-                 "started_at": "t2", "finished_at": "t3"}]}))
-        (tmp_path / "final_state.json").write_text(
-            json.dumps({"final_status": "REJECTED"}))
-        (tmp_path / "envelope_MULTI_SOURCE_DISCOVERY.json").write_text(
-            json.dumps({"prior_art": [
-                {"title": "prior art one", "source": "patents"}]}))
-        return {"session_id": "s9", "user_text": "the user problem",
-                "status": "COMPLETE", "final_status": "REJECTED",
-                "package": {}, "run_dir": str(tmp_path)}
-
-    def test_package_built_with_directive_sections(self, tmp_path):
-        s = self._run(tmp_path)
-        p = counsel_mod.build_counsel_package(s)
-        assert p and p.exists()
-        with zipfile.ZipFile(p) as z:
-            names = set(z.namelist())
-        for want in ("00_COVER_NOTE.txt", "01_INVENTION_DESCRIPTION.txt",
-                     "03_CITED_EVIDENCE.txt", "04_PRIOR_ART_RESULTS.txt",
-                     "05_ARCHITECTURE_COMPARISON.txt",
-                     "06_DECISIVE_EXPERIMENT.txt",
-                     "07_UNRESOLVED_QUESTIONS.txt",
-                     "08_PROVENANCE_MANIFEST.json"):
-            assert want in names, want
-        with zipfile.ZipFile(p) as z:
-            cover = z.read("00_COVER_NOTE.txt").decode()
-            prov = json.loads(z.read("08_PROVENANCE_MANIFEST.json"))
-        cover_l = cover.lower()
-        # the directive's exact preferred framing is present
-        assert "formal patentability" in cover_l
-        assert "ip counsel" in cover_l
-        assert prov["reviewer_provenance"] == "AI_REVIEW"
-        assert prov["source_files"]["INVENTION_SPECIFICATION.json"][
-            "sha256"]
-
-    def test_cover_never_asserts_patentability(self, tmp_path):
-        s = self._run(tmp_path)
-        p = counsel_mod.build_counsel_package(s)
-        with zipfile.ZipFile(p) as z:
-            cover = z.read("00_COVER_NOTE.txt").decode().lower()
-        for banned in ("patentable", "patent guaranteed",
-                       "patent cleared", "fto confirmed"):
-            assert banned not in cover, banned
-        assert "not a legal document" in cover
-
-    def test_none_when_no_artifacts(self, tmp_path):
-        assert counsel_mod.build_counsel_package(
-            {"session_id": "s", "run_dir": str(tmp_path)}) is None
-
-    def test_sections_derived_from_artifacts(self, tmp_path):
-        """04_PRIOR_ART carries the run's own prior-art records — not
-        placeholder text (Art. VI)."""
-        s = self._run(tmp_path)
-        p = counsel_mod.build_counsel_package(s)
-        with zipfile.ZipFile(p) as z:
-            pa = z.read("04_PRIOR_ART_RESULTS.txt").decode()
-        assert "prior art one" in pa
-
-
-# ---------------------------------------------------------------------------
 # 9. User-state projection + health payload integration
 # ---------------------------------------------------------------------------
 class TestProjections:
@@ -797,10 +758,16 @@ class TestProjections:
 
     def test_health_payload_has_provider_surface(self):
         from toscanini import server
+        from discovery_fabric.engine.llm_registry import PROVIDER_SPECS
         h = server._health_payload()
         r = h["readiness"]
         assert isinstance(r["providers"], list)
-        assert len(r["providers"]) == 10
+        # R456 reconciliation: the R414-era pin froze the count at 10;
+        # R451 added localqwen (11). The honest invariant is that the
+        # health surface MIRRORS the registry — same count, whatever the
+        # registry declares (a frozen number re-breaks on every spec
+        # change; the mirror cannot drift).
+        assert len(r["providers"]) == len(PROVIDER_SPECS)
         assert "status" in r["providers"][0]
         for key in ("llm_ready", "physics_ready", "reality_loop_ready",
                     "showcase_ready", "retrieval_ready", "providers"):

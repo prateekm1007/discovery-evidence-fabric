@@ -311,13 +311,18 @@ class TestRealArtifactAnchors:
 
     def test_r372_diagram_adequacy_clean(self):
         """The pass_source lowercase-identifier finding is resolved by
-        the uppercase-key requirement (measured class)."""
+        the uppercase-key requirement (measured class). R456: the file
+        was archived by the R455 deadweight elimination
+        (premium_package_factory -> archive/r455-lean/); the audit now
+        reads the archived bytes — the file remains in the repo tree,
+        so its secret audit keeps its value."""
         from epistemic_integrity.credential_audit_split import (
             _object_audit_blob)
-        blob = (REPO / "premium_package_factory" / "r372" /
-                "diagram_adequacy.py").read_bytes()
+        blob = (REPO / "archive" / "r455-lean" / "premium_package_factory" /
+                "r372" / "diagram_adequacy.py").read_bytes()
         _, env, _, _, _, samples = _object_audit_blob(
-            blob, "premium_package_factory/r372/diagram_adequacy.py")
+            blob, "archive/r455-lean/premium_package_factory/r372/"
+                  "diagram_adequacy.py")
         assert env == 0, samples
 
     def test_r389_fixture_scrub_proof(self):

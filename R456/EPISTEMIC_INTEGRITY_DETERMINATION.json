@@ -1,0 +1,253 @@
+{
+  "archive_candidates": [
+    "epistemic_integrity.append_only_binding_registry",
+    "epistemic_integrity.commit_provenance_verifier",
+    "epistemic_integrity.hash_verifier",
+    "epistemic_integrity.independent_certification_corpus",
+    "epistemic_integrity.invention_loop_engine",
+    "epistemic_integrity.invention_loop_engine.adapters",
+    "epistemic_integrity.invention_loop_engine.adapters.base",
+    "epistemic_integrity.invention_loop_engine.adapters.lifecycle_adapter",
+    "epistemic_integrity.invention_loop_engine.adapters.r6_adapter",
+    "epistemic_integrity.invention_loop_engine.adapters.sensing_adapter",
+    "epistemic_integrity.invention_loop_engine.adapters.therapeutic_adapter",
+    "epistemic_integrity.invention_loop_engine.ai_adjudication_ensemble",
+    "epistemic_integrity.invention_loop_engine.ai_model_execution_receipt",
+    "epistemic_integrity.invention_loop_engine.anti_gaming_tests",
+    "epistemic_integrity.invention_loop_engine.correspondence_engine",
+    "epistemic_integrity.invention_loop_engine.deterministic_evidence_arbiter",
+    "epistemic_integrity.invention_loop_engine.direct_patent_page_reader",
+    "epistemic_integrity.invention_loop_engine.engine",
+    "epistemic_integrity.invention_loop_engine.external_legal_review",
+    "epistemic_integrity.invention_loop_engine.honest_blind_replay",
+    "epistemic_integrity.invention_loop_engine.limitation_mapper",
+    "epistemic_integrity.invention_loop_engine.live_vs_synthetic_transport",
+    "epistemic_integrity.invention_loop_engine.patent_destruction_adapter",
+    "epistemic_integrity.invention_loop_engine.patent_destruction_replay",
+    "epistemic_integrity.invention_loop_engine.provider_transport_boundary",
+    "epistemic_integrity.invention_loop_engine.r6_synthetic_harness",
+    "epistemic_integrity.invention_loop_engine.schemas",
+    "epistemic_integrity.invention_loop_engine.search_intermediary_transport",
+    "epistemic_integrity.patent_coverage_contract",
+    "epistemic_integrity.populate_ledger",
+    "epistemic_integrity.populate_production_claims",
+    "epistemic_integrity.real_production_certification_corpus",
+    "epistemic_integrity.state_reconciliation",
+    "epistemic_integrity.evidence_identity_adapter"
+  ],
+  "audit_defects_disclosed": [
+    "EXT-AUDIT-LEAN-R454 claims gauntlet v1+v2 are CI-called (G2/G3); the CURRENT workflow files invoke no gauntlet step (measured: zero references in both .github/workflows/*.yml) \u2014 the audit's premise is stale; both versions archive with this disclosure (Art. XV, governance principle 1: live state beats narrative)"
+  ],
+  "defects_caught_by_import_battery": [
+    "epistemic_integrity.evidence_identity_adapter: kept for script importers only (two v30-era attack scripts), but its own dependency orchestrator/evidence_identity.py was archived by R455 \u2014 the module was unimportable AT ROUND START (pre-existing breakage, disclosed Art. XV); archived with this record"
+  ],
+  "instrument": "scripts/r456_module_inventory.py",
+  "kept_by_internal_dependency": {
+    "epistemic_integrity.claim_registry": {
+      "dependency_of": [
+        "epistemic_integrity.epistemic_preflight",
+        "epistemic_integrity.gauntlet.hallucination_gauntlet",
+        "epistemic_integrity.gauntlet.hallucination_gauntlet_v2",
+        "epistemic_integrity.research_authorization_gate"
+      ]
+    },
+    "epistemic_integrity.detached_certification_runner": {
+      "dependency_of": [
+        "epistemic_integrity.research_authorization_gate"
+      ]
+    },
+    "epistemic_integrity.entity_registry": {
+      "dependency_of": [
+        "epistemic_integrity.research_authorization_gate"
+      ]
+    },
+    "epistemic_integrity.epistemic_preflight": {
+      "dependency_of": [
+        "epistemic_integrity.research_authorization_gate"
+      ]
+    },
+    "epistemic_integrity.evidence_classes": {
+      "dependency_of": [
+        "epistemic_integrity.epistemic_preflight",
+        "epistemic_integrity.gauntlet.hallucination_gauntlet",
+        "epistemic_integrity.gauntlet.hallucination_gauntlet_v2",
+        "epistemic_integrity.research_authorization_gate"
+      ]
+    },
+    "epistemic_integrity.evidence_span_verifier": {
+      "dependency_of": [
+        "epistemic_integrity.research_authorization_gate"
+      ]
+    },
+    "epistemic_integrity.gauntlet": {
+      "dependency_of": []
+    },
+    "epistemic_integrity.gauntlet.hallucination_gauntlet": {
+      "dependency_of": [
+        "epistemic_integrity.research_authorization_gate"
+      ]
+    },
+    "epistemic_integrity.gauntlet.hallucination_gauntlet_v2": {
+      "dependency_of": [
+        "epistemic_integrity.research_authorization_gate"
+      ]
+    },
+    "epistemic_integrity.path_utils": {
+      "dependency_of": [
+        "epistemic_integrity.gauntlet.hallucination_gauntlet",
+        "epistemic_integrity.gauntlet.hallucination_gauntlet_v2",
+        "epistemic_integrity.historical_artifact_audit"
+      ]
+    },
+    "epistemic_integrity.proposition_verifier": {
+      "dependency_of": [
+        "epistemic_integrity.research_authorization_gate"
+      ]
+    },
+    "epistemic_integrity.slot_territory_derivation": {
+      "dependency_of": [
+        "epistemic_integrity.post_scrub_certification_capsule"
+      ]
+    },
+    "epistemic_integrity.supersession_engine": {
+      "dependency_of": [
+        "epistemic_integrity.epistemic_preflight",
+        "epistemic_integrity.gauntlet.hallucination_gauntlet",
+        "epistemic_integrity.gauntlet.hallucination_gauntlet_v2",
+        "epistemic_integrity.research_authorization_gate"
+      ]
+    },
+    "epistemic_integrity.version_manifest": {
+      "dependency_of": [
+        "epistemic_integrity.attestation_binding",
+        "epistemic_integrity.post_scrub_certification_capsule"
+      ]
+    }
+  },
+  "method": "AST import closure from the 3 production entrypoints + engine/run.py, lazy (function-level) imports included + importlib literal loads; CI invocations parsed from the workflow files; test/script consumers AST-scanned; internal epistemic_integrity dependency closure resolved the same way. Disclosed limit: non-literal dynamic imports (importlib with computed strings) are not visible to this instrument; none are known in epistemic_integrity/.",
+  "seeds_with_evidence": {
+    "epistemic_integrity": {
+      "script_importers": [
+        "scripts/r419_amend_constitution.py"
+      ],
+      "test_importers": [
+        "tests/test_r419_english_only.py"
+      ]
+    },
+    "epistemic_integrity.attestation_binding": {
+      "ci_invoked": [
+        ".github/workflows/epistemic_certification.yml"
+      ]
+    },
+    "epistemic_integrity.constitution_loader": {
+      "constitution_enforcement": [
+        "EPISTEMIC_CONSTITUTION.md Enforcement"
+      ],
+      "script_importers": [
+        "scripts/pre_commit_constitution_check.py",
+        "scripts/r419_amend_constitution.py"
+      ],
+      "test_importers": [
+        "tests/test_r419_english_only.py"
+      ]
+    },
+    "epistemic_integrity.credential_audit_split": {
+      "ci_invoked": [
+        ".github/workflows/epistemic_certification.yml"
+      ],
+      "test_importers": [
+        "tests/test_r412_false_positive_classification.py",
+        "tests/test_r401_ci_capsule_green.py",
+        "tests/test_r387_ci_red_state_fixes.py",
+        "tests/test_r412_false_positive_classification.py",
+        "tests/test_r401_ci_capsule_green.py"
+      ]
+    },
+    "epistemic_integrity.credential_fingerprints": {
+      "test_importers": [
+        "tests/test_r412_false_positive_classification.py",
+        "tests/test_r401_ci_capsule_green.py"
+      ]
+    },
+    "epistemic_integrity.dossier_firewall": {
+      "constitution_enforcement": [
+        "EPISTEMIC_CONSTITUTION.md Enforcement"
+      ]
+    },
+    "epistemic_integrity.evidence_binding": {
+      "script_importers": [
+        "scripts/attack_external_anchor_v30_12.py",
+        "scripts/attack_real_dossier_loopholes_v30_9.py",
+        "scripts/attack_production_dossier_path_v30_8.py",
+        "scripts/attack_anchor_semantics_v30_13.py",
+        "scripts/attack_source_type_hierarchy_v30_10.py",
+        "scripts/attack_persistence_restart_v30_11.py"
+      ]
+    },
+    "epistemic_integrity.evidence_identity_adapter": {
+      "script_importers": [
+        "scripts/attack_production_dossier_path_v30_8.py",
+        "scripts/attack_real_dossier_loopholes_v30_9.py"
+      ]
+    },
+    "epistemic_integrity.historical_artifact_audit": {
+      "ci_invoked": [
+        ".github/workflows/epistemic_certification.yml"
+      ],
+      "test_importers": [
+        "tests/test_r387_ci_red_state_fixes.py",
+        "tests/test_r412_false_positive_classification.py",
+        "tests/test_r401_ci_capsule_green.py"
+      ]
+    },
+    "epistemic_integrity.invention_loop_engine.bayesian_eig": {
+      "runtime_importers": [
+        "discovery_fabric/engine/adapters.py"
+      ]
+    },
+    "epistemic_integrity.post_scrub_certification_capsule": {
+      "ci_invoked": [
+        ".github/workflows/epistemic_certification.yml"
+      ]
+    },
+    "epistemic_integrity.post_scrub_evidence_revalidation": {
+      "ci_invoked": [
+        ".github/workflows/epistemic_certification.yml"
+      ],
+      "script_importers": [
+        "scripts/r412_fix_correction_event_format.py"
+      ],
+      "test_importers": [
+        "tests/test_r387_ci_red_state_fixes.py"
+      ]
+    },
+    "epistemic_integrity.research_authorization_gate": {
+      "ci_invoked": [
+        ".github/workflows/epistemic_certification.yml"
+      ],
+      "constitution_enforcement": [
+        "EPISTEMIC_CONSTITUTION.md Enforcement"
+      ]
+    },
+    "epistemic_integrity.semantic_verifier": {
+      "script_importers": [
+        "scripts/attack_real_dossier_loopholes_v30_9.py"
+      ]
+    },
+    "epistemic_integrity.state_transition_ledger": {
+      "script_importers": [
+        "scripts/r412_reconcile_g5.py",
+        "scripts/r412_pcef_remediation.py"
+      ],
+      "test_importers": [
+        "tests/test_r412_g5_reconciliation.py"
+      ]
+    }
+  },
+  "totals": {
+    "archive_candidate_loc": 15141,
+    "archive_candidates": 34,
+    "epistemic_integrity_modules": 62,
+    "keep": 29
+  }
+}

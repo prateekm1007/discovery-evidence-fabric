@@ -216,6 +216,10 @@ jobs:
           python -m epistemic_integrity.research_authorization_gate --in-place
         continue-on-error: true
 
+      - name: Module inventory drift check (R456 §B.3)
+        run: |
+          python3 scripts/r456_module_inventory.py --check
+
       - name: Build Deterministic Certification Capsule
         id: capsule
         run: |
@@ -386,6 +390,12 @@ jobs:
           # hermetic CAD kernel suite only (e21 needs gitignored
           # LLM-regenerated benchmark runs — see the certify job note)
           python -m pytest tests/test_r380_cad_pipeline.py -q
+      - name: Module inventory drift check (R456 §B.3 — the one
+          CI-regenerated module inventory; hand-maintained module lists
+          are superseded)
+        run: |
+          python3 scripts/r456_module_inventory.py --check
+
       - name: Webapp build check (R401-WC2 — the fast tier is where UI
           changes land)
         run: |
