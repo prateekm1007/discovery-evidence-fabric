@@ -127,18 +127,12 @@ def main() -> int:
             repo_id=SPACE,
             repo_type="space",
             commit_message=(
-                f"R456 deploy: engine tree at {commit[:12]} — the §N.1 "
-                f"epistemic_integrity determination (34 dead modules / "
-                f"15.1K LOC archived with consumer evidence; bayesian_eig "
-                f"kept — path-loaded KILLER_EXPERIMENT canon) + the §B.3 "
-                f"module-inventory merge (MODULE_INVENTORY.json, "
-                f"CI-regenerated) + §C.10/§J image slimming: round trees "
-                f"pruned from the Space tree ({accounting['mb_freed']} MB, "
-                f"keep set R412/R413/R449 live-read) + the Blender tarball "
-                f"and its X11 apt set REMOVED from the Dockerfile (legacy "
-                f"path typed RENDER_SKIPPED_NO_BLENDER, fail-closed) + the "
-                f"semantic relevance adjudication (the measured evidence "
-                f"bottleneck — see R456/ records)"),
+                f"Toscanini engine deploy at {commit[:12]} — the standing "
+                f"R456+ tree shape (round trees pruned from the Space "
+                f"tree, keep set R412/R413/R449 live-read; the R451-C1.3 "
+                f"adapter Dockerfile, NO Blender) + the R461 fifth "
+                f"free-tier router (bynara; FIVE router secrets wired — "
+                f"see R461/ records)"),
         )
         _log(f"upload DONE in {time.time()-t0:.0f}s — Space revision: {rev}")
 
