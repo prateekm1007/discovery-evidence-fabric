@@ -35,6 +35,8 @@ from r447_hf_deploy import (  # noqa: E402
     _adapter_dockerfile,
 )
 
+HF_SPACE_CARD_HEAD = '---\ntitle: Toscanini Prod Validation\nemoji: "\\U0001F3B5"\ncolorFrom: blue\ncolorTo: green\nsdk: docker\napp_port: 7860\npinned: false\n---\n\n<!-- The HF Space card frontmatter (sdk: docker, app_port: 7860) — the\ncanonical engine README follows. The git-archive deploy would otherwise\nstrip it (the CONFIG_ERROR of the first R447 deploy, fixed upfront). -->\n'
+
 STATE_OUT = SCRIPTS / "r455_deploy_state.json"
 
 
@@ -72,6 +74,10 @@ def main() -> int:
              f"({archive.stat().st_size / 1e6:.0f} MB tar)")
 
         (stage / "Dockerfile").write_text(_adapter_dockerfile(commit))
+        # the HF Space card front matter — the git-archive tree's bare
+        # README would otherwise strip it (the known first-R447-deploy
+        # CONFIG_ERROR; fixed upfront in the standing pipeline)
+        (stage / "README.md").write_text(HF_SPACE_CARD_HEAD + "\n" + (REPO / "README.md").read_text())
 
         _log("uploading to the canonical Space (build runs on HF)...")
         rev = api.upload_folder(

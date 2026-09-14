@@ -59,6 +59,10 @@ def main() -> int:
         _log(f"staged {n_files} tracked files ({archive.stat().st_size / 1e6:.0f} MB tar)")
 
         (stage / "Dockerfile").write_text(_adapter_dockerfile(commit))
+        # the HF Space card front matter — the git-archive tree's bare
+        # README would otherwise strip it (the known first-R447-deploy
+        # CONFIG_ERROR; fixed upfront in the standing pipeline)
+        (stage / "README.md").write_text(HF_SPACE_CARD_HEAD + "\n" + (REPO / "README.md").read_text())
 
         _log("uploading to the canonical Space (single commit; may take several minutes)...")
         t0 = time.time()
