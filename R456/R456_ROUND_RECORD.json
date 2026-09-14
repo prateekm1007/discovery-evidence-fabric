@@ -1,13 +1,6 @@
 {
-  "schema": "R456_ROUND_RECORD/1.0.0",
-  "round": "R456",
-  "title": "THE DEFERRED SET CLOSED: epistemic_integrity determination, module-inventory merge, image slimming, and the Phase-P1 semantic relevance reranker (the measured bottleneck)",
-  "directive": "Operator: 'the epistemic_integrity/ determination (§N.1, owner-gated), the module-inventory merge, and image slimming (456 MB of round trees + the 383 MB Blender tarball). Delete useless code and fix bottleneck.' — the R455-deferred items + the external audit's next-round job (the semantic relevance reranker)",
-  "date_utc": "2026-09-15",
-  "reviewer_provenance": "AI_REVIEW",
   "baseline": {
-    "origin_main_at_round_start": "6cbc3afe",
-    "constitution": "v2.4.0, sha256 b54a1be9bcbdd2465d0b034e1e1f472f80b87174209c0d534b7d9e1223e649b2 — read IN FULL (all 2153 lines) at round start; re-read IN FULL before the final commit",
+    "constitution": "v2.4.0, sha256 b54a1be9bcbdd2465d0b034e1e1f472f80b87174209c0d534b7d9e1223e649b2 \u2014 read IN FULL (all 2153 lines) at round start; re-read IN FULL before the final commit",
     "governance_read": [
       "GOVERNANCE/README.md",
       "GOVERNANCE/AUDITOR_SELF_GOVERNANCE_v1.md",
@@ -16,86 +9,100 @@
       "GOVERNANCE/AUDIT_LOOP_PROTOCOL_v1.md",
       "ACTIVE_PATH.md"
     ],
+    "origin_main_at_round_start": "6cbc3afe",
     "stale_checkout_discipline": "the local checkout was 18 commits behind on a stale ref with 3,939 mode-only file changes; fetched with the PAT, verified every local commit already on the remote, hard-reset to origin/main (Art. XXII/XXIII, the R442-VERIFY precedent)"
   },
-  "implemented": {
-    "epistemic_integrity_determination": {
-      "directive_section": "§N.1 (the R455-deferred determination; operator-authorized this round)",
-      "instrument": "scripts/r456_module_inventory.py — AST import closure from the 3 production entrypoints + engine/run.py with lazy-import, importlib-literal, path-literal (_load_by_path), AND subprocess-embedded-code-string scanning",
-      "instrument_lessons": [
-        "bayesian_eig — the LIVE KILLER_EXPERIMENT canon — loads BY PATH (adapters._load_by_path); a pure import scan calls it dead (the R455 lazy-import lesson's next layer, Art. XXXI)",
-        "the research_authorization_gate runs preflight + gauntlet v1/v2 via subprocess CODE STRINGS (G1/G2/G3) — the audit's 'gauntlet CI-called' claim is CORRECT through that indirection; a first-pass instrument fix wrongly called them dead and was corrected in-session",
-        "evidence_identity_adapter was UNIMPORTABLE AT ROUND START (its dependency orchestrator/evidence_identity was archived by R455; only two v30-era attack scripts import it) — caught by the import battery, archived with the disclosure (Art. XV)"
-      ],
-      "disposition": "KEEP 28 modules (bayesian_eig [runtime, path-loaded]; the 6 CI-invoked P0 modules; preflight + gauntlet v1/v2 [gate G1/G2/G3 subprocess]; state_transition_ledger; the firewall family + dependency closure; constitution enforcement trio). ARCHIVE 34 modules / 15,142 py LOC (invention_loop_engine minus bayesian_eig — audit §B.1 row 63 / §C.9; populate_*; state_reconciliation; hash_verifier; commit_provenance_verifier; the corpora .py generators; append_only_binding_registry; patent_coverage_contract; + evidence_identity_adapter)",
-      "package_init_rule": "path-aware: gauntlet/__init__.py KEPT (dotted-import children via the gate's embedded scripts); invention_loop_engine/__init__.py ARCHIVED (imports its dead siblings; bayesian_eig needs no package init)",
-      "data_files": "corpus JSONs STAY (golden/independent/real_production read by KEPT modules); reproducibility_capsules STAYS (epistemic_preflight reads it); live_replay/ + 3 orphaned report JSONs archived with their owners; A_SERIES_ACCEPTANCE.json KEPT_BECAUSE scripts/a12_capstone_run.py (live, R455-repointed); ACTIVE_DISCOVERY_GRAPH.json KEPT_BECAUSE the r407 collision-registration pin",
-      "evidence": "R456/EPISTEMIC_INTEGRITY_DETERMINATION.json (per-module consumer evidence; archive/r456-lean/MANIFEST.json Art. LXIV dispositions)"
-    },
-    "module_inventory_merge": {
-      "directive_section": "§B.3 (single CI-regenerated module inventory)",
-      "what": "MODULE_INVENTORY.json at the repo root — ONE inventory regenerated from the ACTUAL production import closure (118 files / 57,022 LOC) + the CI-invoked set + the epistemic_integrity keep set with consumer evidence",
-      "determinism": "byte-identical across runs (PYTHONHASHSEED nondeterminism found in the first version and fixed — set-iteration order leaked into consumer lists)",
-      "ci_gate": "python3 scripts/r456_module_inventory.py --check wired into epistemic_certification.yml (BOTH tiers) + MODULE_INVENTORY.json registered in the lightweight registry-parse step — the inventory can never again be hand-maintained (BS-019)",
-      "archived": "DORMANT_HIGH_VALUE_MODULES.json (217 KB watchlist — Art. LXIV's own example), DISCOVERY_RUNTIME_GRAPH.json (67 KB), E15/E16/F_SERIES_ACCEPTANCE.json (zero Python consumers, verified)"
-    },
-    "image_slimming": {
-      "directive_section": "§O.4/§J (Blender) + §C.10 (round trees)",
-      "dockerfile": "the Blender 5.2.1 tarball download (383 MB + mirrors ladder + sha pin) and its X11 apt set (libxi6 libxfixes3 libsm6 libice6 libxkbcommon0) REMOVED; the OCP lib set stays (the R392 live-failure evidence); the legacy render path fails closed with the typed RENDER_SKIPPED_NO_BLENDER state + resolution trail (never silent); health carries no blender_ready to drop",
-      "adapter": "scripts/r447_hf_deploy.py anchors re-pointed (apt -> the OCP lib line; the local-qwen wire -> WORKDIR /app); the generated adapter verified Blender-free by test",
-      "dockerignore": "R3[0-9][0-9][0-9]* -> R[0-9]* with the !R412/!R413/!R449 live-read keep set (path-literal-verified: attacker_calibration MEASUREMENT_PATH/SEAL_PATH; physics_stack solver probes; evidence_fabric source+license registries)",
-      "deploy_driver": "scripts/r456_space_deploy.py prunes round trees from the staged Space tree (the audited 579 MB tar; keep set recorded in r456_deploy_state.json) — belt (prune) + suspenders (.dockerignore)"
-    },
-    "semantic_relevance_reranker": {
-      "directive_section": "the measured bottleneck (audit §A/§I: lexical-only relevance; the suspended Phase-P1 reranker; 12/12 records rejected with 'no shared domain terms'; R452 assay relevance 0.115/0.333/0.706/0.095, ANALOGY-dominated, zero good discoveries)",
-      "the_instrument": "discovery_fabric/source_registry/semantic_relevance.py — the Phase-P1 adjudicator: an OpenAI-compatible /v1/embeddings client (the zero-paid local route: llama.cpp llama-server --embedding, sha-pinned bge-small-en-v1.5 Q8_0 GGUF f046db1d..., CLS pooling, the documented bge query instruction) + cosine(problem, record) + the composed verdict",
-      "composition_rule": "OR-composition for ADMISSION (lexical OR semantic -> RELEVANT; BOTH must reject -> REJECTED; else WEAK custody): restores the semantically-clear records the lexical gate dark-rejects while every working lexical admit survives; both authorities recorded per record (Art. XXI.4); SEMANTIC_UNAVAILABLE is typed and keeps the lexical verdict the recorded authority (Art. IV); STRUCTURED spans keep the element authority (a bare formula's dense embedding carries no domain semantics — semantic recorded for custody only)",
-      "wiring": [
-        "evidence_fabric: the relevance gate composes per record (batch embed; the report carries the semantic state distribution)",
-        "retrieval_fabric/pipeline.py: semantic proximity is the PRIMARY lane-order key when the engine is on; byte-identical lexical ordering when off (the no-op key + the typed note ride the fabric report)"
-      ],
-      "calibration": "R456/SEMANTIC_RELEVANCE_CALIBRATION.json — 50 labeled pairs authored from the frozen runs' OWN records (labels by reading each pair, recorded with reasons; Art. VIII), scored BEFORE threshold selection; MEASURED FINDING (Art. XV, disclosed): the 384-dim cosine RANKS correctly (median relevant 0.69 / hard-adjacent 0.69 / irrelevant 0.60) but the 0.60-0.72 band overlaps — relevant-vs-adjacent separation is the DOWNSTREAM adjudication's job (the frozen assay's own evidence_classification proves it); thresholds 0.75/0.60 declared ENGINEERING-class with this analysis",
-      "benchmark": "R456/SEMANTIC_RELEVANCE_BENCHMARK.json — held-out on the frozen R452 assay pools (lexical 76/5/1 -> composed 76/5/1: ZERO regressions, the composed gate never removes a working lexical admit) + the R449 arm_b fabric A/B: recorded 12 RELEVANT/8 REJECTED -> current 8/12 — the four OpenFOAM prompt-template garbage records (admitted via shared_terms ['problem','state']) fall out; genuine domain + element-mode records unchanged",
-      "stopword_hygiene": "the measured generic-filler terms {problem, state, not, limited, documented} + the patent-structural trio {invention, relates, discloses} added to _STOP (the frozen R449 false-admit evidence, test-pinned)",
-      "production_wiring": "toscanini/container-entrypoint.sh LOCAL_EMBED block (second llama-server, port 8791, env-gated; failed start = TYPED SEMANTIC_UNAVAILABLE, never fabricated); the adapter Dockerfile carries the pinned bge GGUF hunk; the deploy driver sets LOCAL_EMBED_ENABLE=1",
-      "doe_osti": "NOT flipped — the registry entry records the reranker LANDED; the reinstatement criterion still requires the MEASURED OSTI relevance re-run (a live retrieval battery, next round)",
-      "engineering_note": "two engine-limit defects found and fixed in-session: the 512-token context cap (head+tail fit, the server's 'input is too large' error) and mean-vs-CLS pooling (the model's trained pooling)"
-    },
-    "dead_code_deletions": {
-      "toscanini/counsel.py": "ARCHIVED_TO archive/r456-lean/ (route retired R423A; audit §B.1 row 61)",
-      "toscanini/identity_continuity.py": "ARCHIVED_TO (zero importers; audit §B.1 row 62; its test archived with it — the dead-surface discipline)",
-      "empty packages": "discovery_fabric/{adversarial_review, mechanisms, normalization, reports, prior_art} ARCHIVED_TO; quarantine KEPT_BECAUSE test_a2_migration pins the TEE quarantine (the historical decision, ACTIVE_PATH)",
-      "stale_test_pins_fixed": "test_r414: 6 stale provider pins reconciled (MODEL_NOT_FOUND in the vocabulary [R451-C1.2]; the health provider surface == len(PROVIDER_SPECS) mirror invariant; the cascade tests run under ENGINE_MODEL_COST_POLICY=UNRESTRICTED — the recorded operator escape hatch — because the paid cascade is POLICY_BLOCKED under the deployed ZERO_PAID_COST, a DIFFERENT invariant pinned by the zero_paid battery) + the runtime_admission set_state_path hermetic repair (a pre-existing Art. IX leak: tests read stale PROBE_FAILED marks and WROTE real-call outcomes into the production capability file — the module's own redirection mechanism, never used by these tests); test_r436 archived with identity_continuity; test_r401 r372 anchor re-pointed to the archived bytes (a pre-existing R455 miss, stash-verified); the TestCounselPackage class removed while the R423A retirement-pin test is RETAINED"
-    }
+  "date_utc": "2026-09-15",
+  "deletion_accounting": {
+    "added": "MODULE_INVENTORY.json (one CI-regenerated inventory), semantic_relevance.py (the reranker), the R456 instruments + tests + records",
+    "dead_modules": "counsel.py (554 ln) + identity_continuity.py (~1K ln) + test_r436 + 5 empty packages",
+    "epistemic_integrity": "34 modules / 15,142 py LOC + 4 data moves",
+    "image": "Blender tarball 383 MB + X11 apt set removed from the Dockerfile; round trees 456 MB pruned from the Space tree by the deploy driver (keep set R412/R413/R449)",
+    "root_artifacts": "5 zero-consumer JSONs (DORMANT_HIGH_VALUE_MODULES 217 KB, DISCOVERY_RUNTIME_GRAPH 67 KB, E15/E16/F acceptance)"
   },
-  "tests": {
-    "new": "tests/test_r456_semantic_relevance.py (16: the composition rules incl. the dark-reject restoration + both-must-reject; the typed unavailability contract; threshold provenance; the stopword hygiene incl. the R449 garbage case; the live round-trip — green with the engine, skipped offline)",
-    "regression": "r449 evidence_fabric 40, r450 directional, r455 lean1 14, r446 conversational 48, r414 product integration 50, the CI family (r412 x2, r401 capsule, r387, r419, a2_migration) 92 — 214+ passed, zero new failures",
-    "collection": "3,685 tests / 0 collection errors",
-    "import_battery": "28/28 kept epistemic_integrity modules import + bayesian_eig path-loads + 2 CI modules smoke-run rc=0"
-  },
+  "directive": "Operator: 'the epistemic_integrity/ determination (\u00a7N.1, owner-gated), the module-inventory merge, and image slimming (456 MB of round trees + the 383 MB Blender tarball). Delete useless code and fix bottleneck.' \u2014 the R455-deferred items + the external audit's next-round job (the semantic relevance reranker)",
   "honest_disclosures": [
-    "the calibration bands OVERLAP (0.60-0.72 mixes relevant/adjacent/irrelevant): the semantic layer is a RANKING + recall-restoration authority, not a mechanism-specificity classifier — that separation remains the downstream ADJUDICATION's job (the frozen assay's ANALOGY-heavy classifications are exactly that stage working)",
-    "on the frozen R452 assay V2 pools the composed gate changes NOTHING (76/5/1 -> 76/5/1): those pools were not lexically dark-rejected — the gate's measured wins this round are the R449 false admits (4 garbage records) and the composition's zero-regression guarantee; the dark-reject restoration is measured by the calibration + the live round-trip test, and the full production effect (fresh runs with the engine on) is the NEXT round's measurement",
+    "the calibration bands OVERLAP (0.60-0.72 mixes relevant/adjacent/irrelevant): the semantic layer is a RANKING + recall-restoration authority, not a mechanism-specificity classifier \u2014 that separation remains the downstream ADJUDICATION's job (the frozen assay's ANALOGY-heavy classifications are exactly that stage working)",
+    "on the frozen R452 assay V2 pools the composed gate changes NOTHING (76/5/1 -> 76/5/1): those pools were not lexically dark-rejected \u2014 the gate's measured wins this round are the R449 false admits (4 garbage records) and the composition's zero-regression guarantee; the dark-reject restoration is measured by the calibration + the live round-trip test, and the full production effect (fresh runs with the engine on) is the NEXT round's measurement",
     "the first instrument version called the gauntlet dead and was WRONG (the gate's subprocess code strings run it as G2/G3); the second called invention_loop_engine/__init__ keepable and was WRONG (it imports its dead siblings); both corrections are recorded here (Art. XXXI)",
     "DOE OSTI remains SUSPENDED_RELEVANCE: the reranker landed but the reinstatement requires the measured OSTI relevance re-run (not run this round)",
     "the R452-era stale provider pins (r414) were pre-existing failures at the round-start HEAD (stash-verified), now reconciled to the current contracts with dated comments (Art. LXIV rule 2)"
   ],
-  "deletion_accounting": {
-    "epistemic_integrity": "34 modules / 15,142 py LOC + 4 data moves",
-    "root_artifacts": "5 zero-consumer JSONs (DORMANT_HIGH_VALUE_MODULES 217 KB, DISCOVERY_RUNTIME_GRAPH 67 KB, E15/E16/F acceptance)",
-    "dead_modules": "counsel.py (554 ln) + identity_continuity.py (~1K ln) + test_r436 + 5 empty packages",
-    "image": "Blender tarball 383 MB + X11 apt set removed from the Dockerfile; round trees 456 MB pruned from the Space tree by the deploy driver (keep set R412/R413/R449)",
-    "added": "MODULE_INVENTORY.json (one CI-regenerated inventory), semantic_relevance.py (the reranker), the R456 instruments + tests + records"
+  "implemented": {
+    "a3_free_tier_routers": {
+      "directive_section": "the operator's R456-A3 directive (delivered mid-round): 'Use these to use free ai models like qwen 3.8, glm 5.3, deepseek, minimax etc. once tokens run out of one go to the next provider'",
+      "evidence": "R456/A3_RESOLUTION.json (the escalation answered; the honest disclosures: free tiers deplete honestly, no per-model revision pins from routers, b.ai premium stays deposit-gated, discovery-quality measurement = this round's fresh production run)",
+      "measurement": "gate DEGRADED_ONLY -> OK (6 STRONG free rungs); a REAL generate() through the full admission+cascade: OK on xkiro qwen/qwen3.8-max:free with FREE_TIER_API/OWNER_XKIRO_ACCOUNT/ZERO_PAID_COST provenance; 25 new contract tests + the re-pinned zero_paid battery",
+      "what": "the A3 capability-floor unblock: 4 free-tier router providers registered LIVE-MEASURED (unorouter glm-5.3:free; xkiro qwen3.8-max:free + minimax-m3:free [browser-UA transport, measured CF 403-1010 bypass]; apinex free/deepseek-v4.1-flash [browser-UA]; bai qwen3.8-flash [FAST+CHEAP honest tier]) + the operator policy amendment (model_cost_policy v1.1.0: FREE_TIER_API eligible under ZERO_PAID_COST, directive quoted verbatim) + the rotation rule (the measured failure specimens classified: busy-pool 403 -> RATE_LIMITED, deposit 403/400 -> CREDIT_EXHAUSTED, HTTPError bodies now read and merged into the classification text; 401 stays strictly AUTH) + 4 distinct account domains (genuine economic redundancy)"
+    },
+    "dead_code_deletions": {
+      "empty packages": "discovery_fabric/{adversarial_review, mechanisms, normalization, reports, prior_art} ARCHIVED_TO; quarantine KEPT_BECAUSE test_a2_migration pins the TEE quarantine (the historical decision, ACTIVE_PATH)",
+      "stale_test_pins_fixed": "test_r414: 6 stale provider pins reconciled (MODEL_NOT_FOUND in the vocabulary [R451-C1.2]; the health provider surface == len(PROVIDER_SPECS) mirror invariant; the cascade tests run under ENGINE_MODEL_COST_POLICY=UNRESTRICTED \u2014 the recorded operator escape hatch \u2014 because the paid cascade is POLICY_BLOCKED under the deployed ZERO_PAID_COST, a DIFFERENT invariant pinned by the zero_paid battery) + the runtime_admission set_state_path hermetic repair (a pre-existing Art. IX leak: tests read stale PROBE_FAILED marks and WROTE real-call outcomes into the production capability file \u2014 the module's own redirection mechanism, never used by these tests); test_r436 archived with identity_continuity; test_r401 r372 anchor re-pointed to the archived bytes (a pre-existing R455 miss, stash-verified); the TestCounselPackage class removed while the R423A retirement-pin test is RETAINED",
+      "toscanini/counsel.py": "ARCHIVED_TO archive/r456-lean/ (route retired R423A; audit \u00a7B.1 row 61)",
+      "toscanini/identity_continuity.py": "ARCHIVED_TO (zero importers; audit \u00a7B.1 row 62; its test archived with it \u2014 the dead-surface discipline)"
+    },
+    "epistemic_integrity_determination": {
+      "data_files": "corpus JSONs STAY (golden/independent/real_production read by KEPT modules); reproducibility_capsules STAYS (epistemic_preflight reads it); live_replay/ + 3 orphaned report JSONs archived with their owners; A_SERIES_ACCEPTANCE.json KEPT_BECAUSE scripts/a12_capstone_run.py (live, R455-repointed); ACTIVE_DISCOVERY_GRAPH.json KEPT_BECAUSE the r407 collision-registration pin",
+      "directive_section": "\u00a7N.1 (the R455-deferred determination; operator-authorized this round)",
+      "disposition": "KEEP 28 modules (bayesian_eig [runtime, path-loaded]; the 6 CI-invoked P0 modules; preflight + gauntlet v1/v2 [gate G1/G2/G3 subprocess]; state_transition_ledger; the firewall family + dependency closure; constitution enforcement trio). ARCHIVE 34 modules / 15,142 py LOC (invention_loop_engine minus bayesian_eig \u2014 audit \u00a7B.1 row 63 / \u00a7C.9; populate_*; state_reconciliation; hash_verifier; commit_provenance_verifier; the corpora .py generators; append_only_binding_registry; patent_coverage_contract; + evidence_identity_adapter)",
+      "evidence": "R456/EPISTEMIC_INTEGRITY_DETERMINATION.json (per-module consumer evidence; archive/r456-lean/MANIFEST.json Art. LXIV dispositions)",
+      "instrument": "scripts/r456_module_inventory.py \u2014 AST import closure from the 3 production entrypoints + engine/run.py with lazy-import, importlib-literal, path-literal (_load_by_path), AND subprocess-embedded-code-string scanning",
+      "instrument_lessons": [
+        "bayesian_eig \u2014 the LIVE KILLER_EXPERIMENT canon \u2014 loads BY PATH (adapters._load_by_path); a pure import scan calls it dead (the R455 lazy-import lesson's next layer, Art. XXXI)",
+        "the research_authorization_gate runs preflight + gauntlet v1/v2 via subprocess CODE STRINGS (G1/G2/G3) \u2014 the audit's 'gauntlet CI-called' claim is CORRECT through that indirection; a first-pass instrument fix wrongly called them dead and was corrected in-session",
+        "evidence_identity_adapter was UNIMPORTABLE AT ROUND START (its dependency orchestrator/evidence_identity was archived by R455; only two v30-era attack scripts import it) \u2014 caught by the import battery, archived with the disclosure (Art. XV)"
+      ],
+      "package_init_rule": "path-aware: gauntlet/__init__.py KEPT (dotted-import children via the gate's embedded scripts); invention_loop_engine/__init__.py ARCHIVED (imports its dead siblings; bayesian_eig needs no package init)"
+    },
+    "image_slimming": {
+      "adapter": "scripts/r447_hf_deploy.py anchors re-pointed (apt -> the OCP lib line; the local-qwen wire -> WORKDIR /app); the generated adapter verified Blender-free by test",
+      "deploy_driver": "scripts/r456_space_deploy.py prunes round trees from the staged Space tree (the audited 579 MB tar; keep set recorded in r456_deploy_state.json) \u2014 belt (prune) + suspenders (.dockerignore)",
+      "directive_section": "\u00a7O.4/\u00a7J (Blender) + \u00a7C.10 (round trees)",
+      "dockerfile": "the Blender 5.2.1 tarball download (383 MB + mirrors ladder + sha pin) and its X11 apt set (libxi6 libxfixes3 libsm6 libice6 libxkbcommon0) REMOVED; the OCP lib set stays (the R392 live-failure evidence); the legacy render path fails closed with the typed RENDER_SKIPPED_NO_BLENDER state + resolution trail (never silent); health carries no blender_ready to drop",
+      "dockerignore": "R3[0-9][0-9][0-9]* -> R[0-9]* with the !R412/!R413/!R449 live-read keep set (path-literal-verified: attacker_calibration MEASUREMENT_PATH/SEAL_PATH; physics_stack solver probes; evidence_fabric source+license registries)"
+    },
+    "module_inventory_merge": {
+      "archived": "DORMANT_HIGH_VALUE_MODULES.json (217 KB watchlist \u2014 Art. LXIV's own example), DISCOVERY_RUNTIME_GRAPH.json (67 KB), E15/E16/F_SERIES_ACCEPTANCE.json (zero Python consumers, verified)",
+      "ci_gate": "python3 scripts/r456_module_inventory.py --check wired into epistemic_certification.yml (BOTH tiers) + MODULE_INVENTORY.json registered in the lightweight registry-parse step \u2014 the inventory can never again be hand-maintained (BS-019)",
+      "determinism": "byte-identical across runs (PYTHONHASHSEED nondeterminism found in the first version and fixed \u2014 set-iteration order leaked into consumer lists)",
+      "directive_section": "\u00a7B.3 (single CI-regenerated module inventory)",
+      "what": "MODULE_INVENTORY.json at the repo root \u2014 ONE inventory regenerated from the ACTUAL production import closure (118 files / 57,022 LOC) + the CI-invoked set + the epistemic_integrity keep set with consumer evidence"
+    },
+    "semantic_relevance_reranker": {
+      "benchmark": "R456/SEMANTIC_RELEVANCE_BENCHMARK.json \u2014 held-out on the frozen R452 assay pools (lexical 76/5/1 -> composed 76/5/1: ZERO regressions, the composed gate never removes a working lexical admit) + the R449 arm_b fabric A/B: recorded 12 RELEVANT/8 REJECTED -> current 8/12 \u2014 the four OpenFOAM prompt-template garbage records (admitted via shared_terms ['problem','state']) fall out; genuine domain + element-mode records unchanged",
+      "calibration": "R456/SEMANTIC_RELEVANCE_CALIBRATION.json \u2014 50 labeled pairs authored from the frozen runs' OWN records (labels by reading each pair, recorded with reasons; Art. VIII), scored BEFORE threshold selection; MEASURED FINDING (Art. XV, disclosed): the 384-dim cosine RANKS correctly (median relevant 0.69 / hard-adjacent 0.69 / irrelevant 0.60) but the 0.60-0.72 band overlaps \u2014 relevant-vs-adjacent separation is the DOWNSTREAM adjudication's job (the frozen assay's own evidence_classification proves it); thresholds 0.75/0.60 declared ENGINEERING-class with this analysis",
+      "composition_rule": "OR-composition for ADMISSION (lexical OR semantic -> RELEVANT; BOTH must reject -> REJECTED; else WEAK custody): restores the semantically-clear records the lexical gate dark-rejects while every working lexical admit survives; both authorities recorded per record (Art. XXI.4); SEMANTIC_UNAVAILABLE is typed and keeps the lexical verdict the recorded authority (Art. IV); STRUCTURED spans keep the element authority (a bare formula's dense embedding carries no domain semantics \u2014 semantic recorded for custody only)",
+      "directive_section": "the measured bottleneck (audit \u00a7A/\u00a7I: lexical-only relevance; the suspended Phase-P1 reranker; 12/12 records rejected with 'no shared domain terms'; R452 assay relevance 0.115/0.333/0.706/0.095, ANALOGY-dominated, zero good discoveries)",
+      "doe_osti": "NOT flipped \u2014 the registry entry records the reranker LANDED; the reinstatement criterion still requires the MEASURED OSTI relevance re-run (a live retrieval battery, next round)",
+      "engineering_note": "two engine-limit defects found and fixed in-session: the 512-token context cap (head+tail fit, the server's 'input is too large' error) and mean-vs-CLS pooling (the model's trained pooling)",
+      "production_wiring": "toscanini/container-entrypoint.sh LOCAL_EMBED block (second llama-server, port 8791, env-gated; failed start = TYPED SEMANTIC_UNAVAILABLE, never fabricated); the adapter Dockerfile carries the pinned bge GGUF hunk; the deploy driver sets LOCAL_EMBED_ENABLE=1",
+      "stopword_hygiene": "the measured generic-filler terms {problem, state, not, limited, documented} + the patent-structural trio {invention, relates, discloses} added to _STOP (the frozen R449 false-admit evidence, test-pinned)",
+      "the_instrument": "discovery_fabric/source_registry/semantic_relevance.py \u2014 the Phase-P1 adjudicator: an OpenAI-compatible /v1/embeddings client (the zero-paid local route: llama.cpp llama-server --embedding, sha-pinned bge-small-en-v1.5 Q8_0 GGUF f046db1d..., CLS pooling, the documented bge query instruction) + cosine(problem, record) + the composed verdict",
+      "wiring": [
+        "evidence_fabric: the relevance gate composes per record (batch embed; the report carries the semantic state distribution)",
+        "retrieval_fabric/pipeline.py: semantic proximity is the PRIMARY lane-order key when the engine is on; byte-identical lexical ordering when off (the no-op key + the typed note ride the fabric report)"
+      ]
+    }
   },
   "production_deployment": {
-    "target_sha": "(the work commit — recorded by the follow-up records commit; a record cannot contain its own sha)",
-    "deployed_sha": null,
-    "deploy_id": null,
-    "health_check_result": null,
-    "drift": null,
     "blocked_by": null,
-    "what_unblocks": null,
-    "note": "the tuple is filled by the standing records-only follow-up commit after the deploy + verification (the R455 protocol)"
-  }
+    "deploy_id": null,
+    "deployed_sha": null,
+    "drift": null,
+    "health_check_result": null,
+    "note": "the tuple is filled by the standing records-only follow-up commit after the deploy + verification (the R455 protocol)",
+    "target_sha": "(the work commit \u2014 recorded by the follow-up records commit; a record cannot contain its own sha)",
+    "what_unblocks": null
+  },
+  "reviewer_provenance": "AI_REVIEW",
+  "round": "R456",
+  "schema": "R456_ROUND_RECORD/1.0.0",
+  "tests": {
+    "collection": "3,685 tests / 0 collection errors",
+    "import_battery": "28/28 kept epistemic_integrity modules import + bayesian_eig path-loads + 2 CI modules smoke-run rc=0",
+    "new": "tests/test_r456_semantic_relevance.py (16) + tests/test_r456_free_tier_routers.py (25: registration + policy amendment provenance + account domains + browser-UA transport + the 6 measured failure specimens + the capability unblock + the hermetic degraded tripwire)",
+    "regression": "r449 evidence_fabric 40, r450 directional, r455 lean1 14, r446 conversational 48, r414 product integration 50, the CI family (r412 x2, r401 capsule, r387, r419, a2_migration) 92 \u2014 214+ passed, zero new failures",
+    "repins": "test_r451_zero_paid: test_only_self_hosted_basis_eligible re-pinned to the v1.1.0 eligible set (dated R456-A3 comment) + test_paid_keys_present_are_refused excludes TOKEN_ROUTER (FREE_TIER_API \u2014 eligible-and-attempted, garbage keys fail honestly; the PAID refusal invariant unchanged)"
+  },
+  "title": "THE DEFERRED SET CLOSED: epistemic_integrity determination, module-inventory merge, image slimming, and the Phase-P1 semantic relevance reranker (the measured bottleneck)"
 }

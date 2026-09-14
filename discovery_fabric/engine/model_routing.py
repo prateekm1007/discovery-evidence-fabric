@@ -160,6 +160,37 @@ PINNED_MODEL_FAMILIES: Dict[str, List[str]] = {
     "localqwen": [
         r"^qwen3-",
     ],
+    # R456-A3: the operator's free-tier router quartet (the family
+    # allowlists admit the MEASURED free answerers; catalog discovery
+    # intersects against these so premium/gated ids never become rungs
+    # silently)
+    "unorouter": [
+        r"^glm-5\.3:free$",
+        r"^glm-5\.3-flash:free$",
+        r"^glm-5\.2:free$",
+        r"^qwen3\.8-27b:free$",
+        r"^qwen3\.5-122b-a10b:free$",
+        r"^deepseek-v[0-9.]+[a-z-]*:free$",
+        r"^minimax-m[0-9.]+:free$",
+    ],
+    "xkiro": [
+        r"^qwen/qwen3\.8-max:free$",
+        r"^qwen/qwen3-max:free$",
+        r"^minimax/minimax-m3:free$",
+        r"^minimax/minimax-m2\.7:free$",
+        r"^deepseek/deepseek-v[0-9.]+[a-z-]*:free$",
+    ],
+    "apinex": [
+        r"^free/deepseek-v[0-9.]+[a-z-]*$",
+        r"^free/glm-5\.3-flash$",
+        r"^free/qwen-3\.8-max$",
+        r"^free/mimo-v[0-9.]+$",
+        r"^free/gpt-5\.6-luna$",
+    ],
+    "bai": [
+        r"^qwen3\.8-flash$",
+        r"^mimo-v[0-9.]+$",
+    ],
 }
 
 # Pinned DEFAULT models (the standing fallback set when the live catalog
@@ -218,6 +249,50 @@ PINNED_DEFAULT_MODELS: Dict[str, List[Dict[str, Any]]] = {
          "task_capabilities": [TASK_STRONG, TASK_FAST, TASK_CHEAP],
          "cost_class": 1, "latency_class": 2, "context_limit": 128000},
     ],
+    # R456-A3: the operator's free-tier router quartet — every rung
+    # below is a MEASURED free-tier answerer (the registration probes,
+    # recorded in the llm_registry policy notes). The STRONG rungs are
+    # the flagship-class free models (GLM-5.3, Qwen3.8-MAX, Minimax-M3,
+    # DeepSeek-v4.1-flash); bai's rungs are FAST+CHEAP only (its free
+    # answerers are the flash/derived class — the honest tier).
+    "unorouter": [
+        {"model": "glm-5.3:free",
+         "task_capabilities": [TASK_STRONG, TASK_FAST, TASK_CHEAP],
+         "cost_class": 1, "latency_class": 2, "context_limit": 128000},
+        {"model": "glm-5.3-flash:free",
+         "task_capabilities": [TASK_FAST, TASK_CHEAP],
+         "cost_class": 1, "latency_class": 2, "context_limit": 128000},
+        {"model": "qwen3.8-27b:free",
+         "task_capabilities": [TASK_STRONG, TASK_FAST, TASK_CHEAP],
+         "cost_class": 1, "latency_class": 2, "context_limit": 128000},
+    ],
+    "xkiro": [
+        {"model": "qwen/qwen3.8-max:free",
+         "task_capabilities": [TASK_STRONG, TASK_FAST, TASK_CHEAP],
+         "cost_class": 1, "latency_class": 2, "context_limit": 128000},
+        {"model": "minimax/minimax-m3:free",
+         "task_capabilities": [TASK_STRONG, TASK_FAST, TASK_CHEAP],
+         "cost_class": 1, "latency_class": 2, "context_limit": 128000},
+        {"model": "qwen/qwen3-max:free",
+         "task_capabilities": [TASK_STRONG, TASK_FAST],
+         "cost_class": 1, "latency_class": 2, "context_limit": 128000},
+    ],
+    "apinex": [
+        {"model": "free/deepseek-v4.1-flash",
+         "task_capabilities": [TASK_STRONG, TASK_FAST, TASK_CHEAP],
+         "cost_class": 1, "latency_class": 3, "context_limit": 128000},
+        {"model": "free/mimo-v2.5",
+         "task_capabilities": [TASK_FAST, TASK_CHEAP],
+         "cost_class": 1, "latency_class": 3, "context_limit": 128000},
+    ],
+    "bai": [
+        {"model": "qwen3.8-flash",
+         "task_capabilities": [TASK_FAST, TASK_CHEAP],
+         "cost_class": 1, "latency_class": 1, "context_limit": 128000},
+        {"model": "mimo-v2.5",
+         "task_capabilities": [TASK_FAST, TASK_CHEAP],
+         "cost_class": 1, "latency_class": 1, "context_limit": 128000},
+    ],
 }
 
 # ---------------------------------------------------------------------------
@@ -256,10 +331,15 @@ def _provider_env_key(provider_id: str) -> Optional[str]:
         return None
 
 
-def _get_json(url: str, key: Optional[str], timeout: int = 20) -> dict:
+def _get_json(url: str, key: Optional[str], timeout: int = 20,
+              extra_headers: Optional[Dict[str, str]] = None) -> dict:
     req = urllib.request.Request(url)
     if key:
         req.add_header("Authorization", f"Bearer {key}")
+    # R456-A3: per-provider transport headers (the CF browser-UA
+    # requirement on xkiro/apinex — see the ProviderSpec notes)
+    for h, v in (extra_headers or {}).items():
+        req.add_header(h, v)
     with urllib.request.urlopen(req, timeout=timeout) as resp:
         return json.loads(resp.read())
 
@@ -301,9 +381,20 @@ def discover_catalog(provider_id: str,
     key_var = _provider_env_key(provider_id)
     key = (os.environ.get(key_var, "").strip()) if key_var else ""
     url = base.rstrip("/") + "/models"
+    # R456-A3: the spec's transport headers ride catalog discovery too
+    # (the CF browser-UA requirement — ONE transport authority)
+    extra_headers = None
+    try:
+        from .llm_registry import _SPEC_BY_ID
+        _spec = _SPEC_BY_ID.get(provider_id)
+        if _spec is not None and _spec.extra_headers:
+            extra_headers = dict(_spec.extra_headers)
+    except Exception:  # noqa: BLE001 — discovery stays best-effort
+        extra_headers = None
     out: Dict[str, Any]
     try:
-        data = _get_json(url, key or None, timeout=20)
+        data = _get_json(url, key or None, timeout=20,
+                         extra_headers=extra_headers)
         raw = [m.get("id") for m in (data.get("data") or [])
                if isinstance(m, dict) and m.get("id")]
         allow = PINNED_MODEL_FAMILIES.get(provider_id, [])

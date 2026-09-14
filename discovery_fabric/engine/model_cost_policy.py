@@ -59,13 +59,33 @@ COST_BASIS_VOCAB = [
     "PAID_API",
 ]
 
-#: the bases eligible under each policy (closed mapping)
+#: the bases eligible under each policy (closed mapping).
+#
+# R456-A3 (2026-09-15) — OPERATOR POLICY AMENDMENT, recorded verbatim
+# as the provenance (Art. XXVII discipline: a policy change is an
+# operator action, never a coder's convenience). The operator delivered
+# four free-tier router credentials with the directive:
+#
+#   "Use these to use free ai models like qwen 3.8, glm 5.3, deepseek,
+#    minimax etc. once tokens run out of one go to the next provider"
+#
+# The amendment: FREE_TIER_API joins the ZERO_PAID_COST eligible set.
+# The policy name stays TRUE — a free-tier API costs $0 (no card, no
+# deposit); its distinct failure mode (token/quota depletion) is a TYPED
+# transport failure (CREDIT_EXHAUSTED / RATE_LIMITED) that ADVANCES the
+# provider cascade — the operator's own rotation rule — never a bill.
+# PAID_API, ENVIRONMENT_GRANT, and UNDECLARED remain refused fail-closed
+# (a paid route can never silently ride this amendment: the basis is
+# declared per spec, and the paid bases are still filtered).
 _ELIGIBLE: Dict[str, List[str]] = {
-    ZERO_PAID_COST: ["ZERO_PAID_COST_SELF_HOSTED"],
+    ZERO_PAID_COST: ["ZERO_PAID_COST_SELF_HOSTED", "FREE_TIER_API"],
     UNRESTRICTED: list(COST_BASIS_VOCAB),
 }
 
-COST_POLICY_VERSION = "model_cost_policy/1.0.0"
+#: operator amendments are dated and quoted — the audit trail for this
+#: map change (the R451 original pinned self-hosted only; the R456-A3
+#: operator directive above is the sole authority for the change)
+COST_POLICY_VERSION = "model_cost_policy/1.1.0"
 
 
 def active_policy() -> str:

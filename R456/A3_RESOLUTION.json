@@ -1,0 +1,36 @@
+{
+  "schema": "R456_A3_RESOLUTION/1.0.0",
+  "title": "THE A3 OWNER-GATED ESCALATION — ANSWERED BY THE OPERATOR",
+  "date_utc": "2026-09-15",
+  "reviewer_provenance": "AI_REVIEW",
+  "the_escalation": {
+    "record": "R452/OWNER_GATED_ESCALATION_A3.json (escalation_count 2)",
+    "question": "the elite-class model ceiling: at zero paid cost the system runs Qwen3-1.7B (quality_tier 4) which measurably fails synthesis on fresh problems — every production run ended INCOMPLETE_INFERENCE_FAILURE / RUN_BLOCKED_CAPABILITY",
+    "external_audit_section": "EXT-AUDIT-LEAN-R454 §N.1: 'the dominant risk to the mission and it is outside code'; §O: 'the next round's intelligence where the measurement says the bottleneck is'",
+    "operator_action": {
+      "date": "2026-09-15",
+      "directive_verbatim": "Use these to use free ai models like qwen 3.8, glm 5.3, deepseek, minimax etc. once tokens run out of one go to the next provider",
+      "what_was_delivered": "four free-tier API router credentials (unorouter, xkiro, apinex, b.ai) — each a distinct economic account",
+      "keys_handling": "delivered via the IM channel; wired as HF Space secrets at deploy time (env-injected, never in the repo, commits, logs, or records — BS-021; masked fingerprints only in the probe artifact)"
+    }
+  },
+  "the_implementation": {
+    "policy_amendment": "model_cost_policy.py v1.1.0 — FREE_TIER_API joins the ZERO_PAID_COST eligible set, the operator directive quoted verbatim as the provenance (Art. XXVII: a policy change is an operator action; PAID_API / ENVIRONMENT_GRANT / UNDECLARED stay refused fail-closed)",
+    "registration": "4 ProviderSpecs (llm_registry.py), each LIVE-MEASURED before registration (probe-before-admit): unorouter glm-5.3:free 3.9s; xkiro qwen/qwen3.8-max:free 3.2s + minimax/minimax-m3:free 3.4s; apinex free/deepseek-v4.1-flash 2.4s; bai qwen3.8-flash 1.5s + mimo-v2.5 1.9s (FAST+CHEAP honest tier — its flagships are deposit-gated)",
+    "transport": "xkiro + apinex carry a browser User-Agent on EVERY call/probe/catalog fetch (measured: Cloudflare 403 error 1010 bans the default urllib UA; a Chrome UA passes) — the new ProviderSpec.extra_headers field, transport-only",
+    "rotation_rule": "the operator's 'once tokens run out of one go to the next provider' maps to the existing bounded cascade + typed failure classes, EXTENDED with the measured specimens: unorouter 403 'free providers hit their rate limit' -> RATE_LIMITED (cooldown + advance); xkiro 403 'requires real deposited balance' / b.ai 403 'Deposit required' / b.ai 400 'credit insufficient balance' -> CREDIT_EXHAUSTED (advance); classify_failure now reads the HTTPError BODY (merged into the hint text, exc.code pulled into the status) so the provider's own words classify — 401 stays strictly AUTH",
+    "accounts": "four DISTINCT account domains added to the closed vocabulary (OWNER_{UNOROUTER,XKIRO,APINEX,BAI}_ACCOUNT) — genuine economic redundancy (one account's exhaustion cannot kill the others)"
+  },
+  "the_measurement": {
+    "gate_before": "strong_route_capability() = DEGRADED_ONLY (localqwen CHEAP-only) — every run RUN_BLOCKED_CAPABILITY",
+    "gate_after": "strong_route_capability() = OK with 6 STRONG free rungs (unorouter glm-5.3:free + qwen3.8-27b:free, xkiro qwen3.8-max:free + minimax-m3:free, apinex free/deepseek-v4.1-flash + free/glm-5.3-flash)",
+    "live_generate": "a REAL generate() through the full admission + cascade: OK on xkiro qwen/qwen3.8-max:free, content ENGINE_LIVE_OK, cost_provenance FREE_TIER_API / OWNER_XKIRO_ACCOUNT / ZERO_PAID_COST",
+    "tests": "tests/test_r456_free_tier_routers.py (25: registration + measured-evidence notes; the policy amendment + provenance; distinct account domains; the browser-UA transport on call + catalog; the 6 measured failure specimens + the 401/403 discipline; the capability unblock + the hermetic degraded tripwire) + the re-pinned zero_paid battery (37) — 97/97 with r415, 294+ green across the wide battery"
+  },
+  "honest_disclosures": [
+    "free tiers are NOT permanent: pools congest (unorouter busy 403 measured; apinex glm/deepseek timeouts measured) — the cascade advances and the cooldown ladder retries; a fully-exhausted quartet degrades honestly to the localqwen baseline (typed, never silent)",
+    "the free routers expose NO per-model revision pin (no GGUF-sha equivalent) — recorded honest in each spec's model_revision (Art. VI); provenance rides the run-owned ledger lines (provider/model/attempt/status per call)",
+    "b.ai's premium catalog (claude/gpt/gemini flagships) stays deposit-gated: 403 'Deposit required' -> CREDIT_EXHAUSTED -> cascade advances; the operator has NOT authorized any deposit (ZERO_PAID_COST holds)",
+    "model quality on the engine's STRUCTURED protocol is unmeasured until a fresh production run completes — the registration proves TRANSPORT capability (probe-before-admit); the discovery-quality measurement is the next acceptance step (this round's fresh run)"
+  ]
+}

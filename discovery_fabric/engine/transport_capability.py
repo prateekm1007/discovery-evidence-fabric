@@ -101,6 +101,14 @@ ACCOUNT_DOMAIN_VOCAB = (
     "OWNER_ALIBABA_ACCOUNT",
     "OWNER_DEEPSEEK_ACCOUNT",
     "OWNER_MISTRAL_ACCOUNT",
+    # R456-A3: the operator's free-tier router quartet — four DISTINCT
+    # economic accounts (the operator's rotation rule: token exhaustion
+    # on one advances the cascade to the next; genuine redundancy
+    # because the accounts do not share a billing domain)
+    "OWNER_UNOROUTER_ACCOUNT",
+    "OWNER_XKIRO_ACCOUNT",
+    "OWNER_APINEX_ACCOUNT",
+    "OWNER_BAI_ACCOUNT",
     "UNDECLARED",                 # honest unknown — never guessed
 )
 

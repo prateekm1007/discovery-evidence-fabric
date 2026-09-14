@@ -119,12 +119,19 @@ class TestCostPolicy:
             def __init__(self, basis):
                 self.cost_basis = basis
 
-        for basis in ("PAID_API", "ENVIRONMENT_GRANT", "FREE_TIER_API"):
+        # R456-A3 reconciliation (Art. LXIV rule 2, dated 2026-09-15):
+        # the R451 pin froze the eligible set to self-hosted only; the
+        # operator's recorded amendment (model_cost_policy.py v1.1.0,
+        # directive quoted verbatim there) admits FREE_TIER_API. The
+        # fail-closed invariant is unchanged: PAID_API,
+        # ENVIRONMENT_GRANT, and UNDECLARED are still refused — a paid
+        # route can never silently ride the amendment.
+        for basis in ("PAID_API", "ENVIRONMENT_GRANT", "UNDECLARED"):
             ok, _ = cp.provider_eligibility(Spec(basis))
             assert ok is False, basis
-        ok, _ = cp.provider_eligibility(
-            Spec("ZERO_PAID_COST_SELF_HOSTED"))
-        assert ok is True
+        for basis in ("ZERO_PAID_COST_SELF_HOSTED", "FREE_TIER_API"):
+            ok, _ = cp.provider_eligibility(Spec(basis))
+            assert ok is True, basis
 
     def test_undeclared_cost_basis_is_never_silently_free(
             self, monkeypatch):
@@ -235,9 +242,17 @@ class TestFailClosed:
         _no_keys(monkeypatch)
         monkeypatch.delenv("LOCAL_QWEN_BASE_URL", raising=False)
         monkeypatch.setenv("ENGINE_MODEL_COST_POLICY", "ZERO_PAID_COST")
-        # every paid credential PRESENT
+        # every PAID credential PRESENT.
+        # R456-A3 reconciliation: TOKEN_ROUTER_API_KEY leaves the
+        # adversary set — its provider is FREE_TIER_API (the operator
+        # amendment, model_cost_policy v1.1.0), so a present key makes
+        # it ELIGIBLE and an attempted call, not a policy refusal; with
+        # garbage credentials it fails honestly (CALL_FAILED, typed
+        # classification, recorded in the ledger) and can never
+        # silently serve. The invariant this test pins is unchanged:
+        # every PAID basis is refused, no paid route is ever reached.
         for k in _ALL_KEY_VARS:
-            if k != "LOCAL_QWEN_BASE_URL":
+            if k not in ("LOCAL_QWEN_BASE_URL", "TOKEN_ROUTER_API_KEY"):
                 monkeypatch.setenv(k, "adversary-supplied-key")
         res = reg.generate("Reply with: READY", system="policy probe",
                            max_tokens=8, max_retries=0, timeout=10)

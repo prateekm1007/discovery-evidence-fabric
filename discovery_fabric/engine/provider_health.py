@@ -132,7 +132,29 @@ _MODEL_NOT_FOUND_HINTS = ("model not found", "model_not_found",
 _CREDIT_HINTS = ("depleted your monthly included credits",
                  "purchase pre-paid credits", "insufficient credits",
                  "credit balance is", "out of credits",
-                 "payment required", "billing hard limit")
+                 "payment required", "billing hard limit",
+                 # R456-A3 measured free-tier router specimens
+                 "insufficient balance", "deposit required",
+                 "deposited balance")
+# R456-A3: the free-tier routers' own words for "this model needs a
+# deposit / the account cannot pay" — MEASURED specimens (2026-09-14):
+#   xkiro 403: "requires real deposited balance — it is billed from
+#               your [wallet]"
+#   b.ai 403:  "Deposit required to unlock premium models"
+#   b.ai 400:  "credit insufficient balance: balance=0 required=2406"
+# Unambiguous credit wording — checked BEFORE the 401/403 auth
+# shortcut so a deposit-gated model classifies CREDIT_EXHAUSTED (the
+# cascade advances to the next rung/provider; the provider stays
+# eligible — the gate is per-model, not per-key)
+_FREE_TIER_CREDIT_HINTS = ("insufficient balance", "deposit required",
+                            "deposited balance")
+# R456-A3: unorouter's free-pool congestion wording (403 body — the
+# provider's own remedy is 'switch to another model'):
+#   "This model is busy right now (free providers hit their rate
+#    limit). Please try again in a little while, or switch to another
+#    model." — RATE_LIMITED (cooldown demotion + cascade advance),
+# never AUTH_FAILURE (the key is valid; the pool is busy)
+_FREE_TIER_RATE_HINTS = ("hit their rate limit",)
 _TIMEOUT_HINTS = ("timed out", "timeout", "timeouterror",
                   "socket timeout", "deadline exceeded", "sigkilled")
 _NETWORK_HINTS = ("connection refused", "connection reset",
@@ -151,6 +173,25 @@ def classify_failure(exc: BaseException, http_status: Optional[int] = None,
     (Art. XXV)."""
     msg = f"{type(exc).__name__}: {exc}".lower()
     status = http_status
+    # R456-A3: HTTPError is file-like — the provider's own error BODY is
+    # readable here (once, best-effort). The measured free-tier router
+    # specimens carry their credit/rate wording in the 403/400 BODY (the
+    # exception's str is only 'HTTP Error 403: Forbidden'), so the body
+    # is merged into the hint text AND the code becomes the status —
+    # every downstream branch (status shortcuts AND hint checks) sees
+    # the provider's own words. Body read failure degrades to the
+    # status-only classification (unchanged pre-R456 behavior).
+    if isinstance(exc, urllib.error.HTTPError):
+        _eb = ""
+        try:
+            _eb = exc.read().decode(errors="replace")[:400]
+        except Exception:  # noqa: BLE001 — body is best-effort context
+            _eb = ""
+        if _eb:
+            body_snippet = f"{body_snippet or ''} {_eb}".strip()
+            msg = f"{msg} {_eb.lower()}".strip()
+        if status is None:
+            status = getattr(exc, "code", None)
 
     def _hints(hit: tuple) -> bool:
         text = " ".join([msg, str(body_snippet or "").lower()])
@@ -159,6 +200,15 @@ def classify_failure(exc: BaseException, http_status: Optional[int] = None,
     if status == 429:
         return RATE_LIMITED
     if status in (401, 403):
+        # R456-A3: free-tier router 403s carry credit/rate wording in
+        # the BODY — the measured specimens classify correctly before
+        # the auth shortcut (a valid key behind a deposit-gated model or
+        # a busy free pool is NOT an auth failure). 401 stays strictly
+        # AUTH: a failed key is a failed key whatever the body says.
+        if status == 403 and _hints(_FREE_TIER_CREDIT_HINTS):
+            return CREDIT_EXHAUSTED
+        if status == 403 and _hints(_FREE_TIER_RATE_HINTS):
+            return RATE_LIMITED
         return AUTH_FAILURE
     if status == 410:
         return GONE                  # R415: retired model/endpoint
@@ -185,6 +235,23 @@ def classify_failure(exc: BaseException, http_status: Optional[int] = None,
     if isinstance(exc, (ConnectionError,)):
         return NETWORK_FAILURE
     if isinstance(exc, urllib.error.HTTPError):
+        # HTTPError is a file-like object — the provider's own error
+        # BODY is readable here. R456-A3: the free-tier routers answer
+        # 403/400 with credit/rate wording in the body (measured
+        # specimens above); the body is read ONCE, best-effort, and the
+        # unambiguous wording classifies BEFORE the status shortcuts
+        # (a valid key behind a deposit-gated model or a busy free pool
+        # is NOT an auth failure — the cascade must advance)
+        _body = ""
+        try:
+            _body = exc.read().decode(errors="replace")[:400]
+        except Exception:  # noqa: BLE001 — body is best-effort context
+            _body = ""
+        _text = f"{msg} {_body}".lower()
+        if any(h in _text for h in _FREE_TIER_CREDIT_HINTS):
+            return CREDIT_EXHAUSTED
+        if "hit their rate limit" in _text:
+            return RATE_LIMITED
         # HTTPError is a URLError subclass — check it FIRST so the
         # provider's own status code wins over generic transport hints.
         code = getattr(exc, "code", None)
