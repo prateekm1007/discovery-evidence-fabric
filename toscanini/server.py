@@ -1230,9 +1230,12 @@ class Handler(BaseHTTPRequestHandler):
             if not detail:
                 return self._json(404, {"error": "run not found"})
             from toscanini import diagnostic_package as _dp
+            from toscanini.user_state import public_session_view
+            # the projection (label/decision) rides the same view the UI
+            # sees — the brief speaks in the product's words, Art. X
             built = _dp.build_diagnostic_package(
                 sid, Path(detail["run_dir"]) if detail.get("run_dir") else None,
-                detail)
+                public_session_view(detail))
             if not built:
                 return self._json(409, {
                     "error": "the investigation has not reached a "
@@ -1357,6 +1360,9 @@ class Handler(BaseHTTPRequestHandler):
             for f in files[:10]:
                 rec = _att.save_attachment(self._owner_key_cached,
                                            f["filename"], f["data"], role)
+                # R459: the owner capability never echoes back — the
+                # record's key is storage metadata, not user content
+                rec.pop("owner_key", None)
                 saved.append(rec)
             if bound_run:
                 # bind to the run: the documents join the investigation's
