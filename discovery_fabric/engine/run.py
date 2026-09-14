@@ -285,6 +285,29 @@ class EngineRun:
             _entry_block = stage_entry.justify(
                 stage, self.env, self.failed_stages,
                 self._skipped_stages)
+            if _entry_block.get("entry_status") == "SKIPPED":
+                # R453-LEAN-CORE adaptive admission: the stage is NOT
+                # allowed to consume compute (no retained candidate, or
+                # SYNTHESIZE did not run at the requested capability).
+                # The skip is registered so everything downstream of it
+                # is dead compute too (the R399 W2.5 rule), the typed
+                # skip_reason travels on the entry, and the stage never
+                # executes (the mandate: stop spending intelligence on
+                # empty stages). A skip is a RECORDED refusal — never
+                # an absence claim (Art. XXV).
+                self._skipped_stages.add(stage)
+                self.env.stage_log.append({
+                    "stage": stage,
+                    "capability_id": ADAPTERS[stage].capability_id,
+                    "status": "SKIPPED_ADMISSION",
+                    "skip_reason": _entry_block.get("skip_reason"),
+                    "entry": _entry_block,
+                    "candidate_delta": [],
+                    "delta_real": False,
+                    "started_at": utc_now(),
+                    "finished_at": utc_now()})
+                self._persist_envelope(stage)
+                continue
             try:
                 # R451-C1.3-3: the CURRENT conductor stage rides the call
                 # context so ledger lines carry engine_stage in addition
@@ -339,7 +362,30 @@ class EngineRun:
         # R394 s6: a premise-rejected run has no survivor by construction.
         if self.with_package and "SYNTHESIZE" not in self.failed_stages \
                 and "PREMISE_GATE" not in self.failed_stages:
-            self._post_rank_pipeline(run_ctx={"run_id": self.run_id})
+            # R453-LEAN-CORE: the survivor/package tail (including the
+            # exploration grid's LLM generation) is admitted only when
+            # SYNTHESIZE ran at the requested capability — on a
+            # capability-insufficient path the tail would burn LLM
+            # calls on a pseudo-invention that was never promoted (the
+            # audit's empty-path finding). The grid's OWN unverified-
+            # evidence gate still governs the verified-but-rejected
+            # shape (E16-F unchanged — the mandate does not touch it);
+            # only the degraded-synthesis shape is blocked here.
+            from . import stage_entry as _se_lean
+            _cap = _se_lean.synthesis_capability_state(self.env)
+            if _cap["state"] == "CAPABILITY_INSUFFICIENT":
+                self._persist("POST_RANK_PIPELINE_SKIPPED.json", {
+                    "stage": "POST_RANK_PIPELINE",
+                    "status": "SKIPPED_ADMISSION",
+                    "skip_reason": "SYNTHESIS_CAPABILITY_INSUFFICIENT",
+                    "capability": _cap,
+                    "consequence": ("no engineering/package/grid compute "
+                                    "was spent on a degraded synthesis "
+                                    "(R453-LEAN-CORE); the run's final "
+                                    "state comes from the standard "
+                                    "classifiers (ADJUDICATION/CLASSIFY)")})
+            else:
+                self._post_rank_pipeline(run_ctx={"run_id": self.run_id})
 
         # ------------- R416: the causal evolution pipeline -----------------
         # Product contract (honest-causes-evolution-v1): every valid
@@ -355,25 +401,68 @@ class EngineRun:
             standard_path_packaged = bool(
                 self.package_report and self.package_report.get("complete"))
             if not standard_path_packaged and _ev.evolution_enabled():
-                try:
-                    evolution_summary = self._evolution_pipeline(
-                        {"run_id": self.run_id}, final)
-                    if evolution_summary and \
-                            evolution_summary.get("final_state"):
-                        final = dict(evolution_summary["final_state"])
-                        self._persist("final_state.json", final)
-                except Exception as exc:  # noqa: BLE001 — recorded honest
+                # R453-LEAN-CORE: the evolution layer (the DIRECTIONAL
+                # hypothesis call, the causal-delta generation — the
+                # RANK-tagged STRONG call the audit measured burning on
+                # an empty set) is admitted only when the run has
+                # something to evolve or a synthesis that hard-failed
+                # on transport (the R416 mandatory-fallback contract:
+                # a working transport still owes the query its
+                # baseline architecture; a dead one records the
+                # transport failure honestly). The two blocked shapes:
+                #   SYNTHESIS_CAPABILITY_INSUFFICIENT — a degraded
+                #     pseudo-invention is not something to evolve;
+                #   synthesis SUCCEEDED but nothing was retained —
+                #     the assay-A shape (the directional call on an
+                #     empty set, the audit's measured waste).
+                # The mandate: RANK must not call an LLM when
+                # n_candidates==0.
+                from . import stage_entry as _se_lean
+                _cap = _se_lean.synthesis_capability_state(self.env)
+                _facts = _se_lean.retained_candidate_facts(self.env)
+                _synthesis_succeeded = bool(
+                    (self.env.mechanism_map or {}).get("intervention"))
+                _blocked_reason = None
+                if _cap["state"] == "CAPABILITY_INSUFFICIENT":
+                    _blocked_reason = "SYNTHESIS_CAPABILITY_INSUFFICIENT"
+                elif _synthesis_succeeded and not _facts["retained"]:
+                    _blocked_reason = "NO_RETAINED_CANDIDATE"
+                if _blocked_reason is not None:
                     self._persist("INVENTION_LINEAGE.json", {
                         "schema": "INVENTION_LINEAGE/1.0.0",
                         "run_id": self.run_id,
-                        "status": "EVOLUTION_PIPELINE_ERROR",
-                        "error": f"{type(exc).__name__}: {exc}"[:400],
-                        "consequence": ("the run's epistemic record stands "
-                                        "as completed by the standard "
-                                        "path; the evolution layer failed "
-                                        "and is disclosed, never hidden "
-                                        "(Art. XV)"),
+                        "status": "SKIPPED_ADMISSION",
+                        "skip_reason": _blocked_reason,
+                        "capability": _cap,
+                        "retention": _facts,
+                        "n_generations": 0,
+                        "consequence": (
+                            "the evolution layer spent ZERO LLM calls — "
+                            "nothing was retained to evolve (the audit's "
+                            "empty-path finding: the directional STRONG "
+                            "call on an empty set); the standard path's "
+                            "final state stands (R453-LEAN-CORE)"),
                     })
+                else:
+                    try:
+                        evolution_summary = self._evolution_pipeline(
+                            {"run_id": self.run_id}, final)
+                        if evolution_summary and \
+                                evolution_summary.get("final_state"):
+                            final = dict(evolution_summary["final_state"])
+                            self._persist("final_state.json", final)
+                    except Exception as exc:  # noqa: BLE001 — recorded honest
+                        self._persist("INVENTION_LINEAGE.json", {
+                            "schema": "INVENTION_LINEAGE/1.0.0",
+                            "run_id": self.run_id,
+                            "status": "EVOLUTION_PIPELINE_ERROR",
+                            "error": f"{type(exc).__name__}: {exc}"[:400],
+                            "consequence": ("the run's epistemic record stands "
+                                            "as completed by the standard "
+                                            "path; the evolution layer failed "
+                                            "and is disclosed, never hidden "
+                                            "(Art. XV)"),
+                        })
             elif not _ev.evolution_enabled():
                 self._persist("INVENTION_LINEAGE.json", {
                     "schema": "INVENTION_LINEAGE/1.0.0",

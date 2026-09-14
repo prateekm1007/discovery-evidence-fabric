@@ -106,9 +106,27 @@ class ProviderSpec:
         without the sandbox-local gateway. Transport-only: provider
         selection policy, quality tiers, and epistemic semantics are
         untouched (same operator-override class as the ENGINE_*_PROVIDER
-        pins — recorded, never silent)."""
-        return (os.environ.get(f"{self.provider_id.upper()}_BASE_URL", "")
-                .strip() or self.url)
+        pins — recorded, never silent).
+
+        R453-LEAN-CORE (the external auditor mandate, "one generate()
+        contract — a single documented base URL"): when no override is
+        set, the provider's OWN env_var (the availability marker) is
+        honored as the URL if it carries one. This closes the dual-
+        variable footgun measured live in R452-A3 (LOCAL_QWEN_BASE_URL
+        the availability marker vs LOCALQWEN_BASE_URL the URL override:
+        drivers that set only the marker silently called the spec's
+        DEFAULT port while the actual server lived elsewhere). ONE
+        documented variable per provider is now sufficient — the
+        override remains the explicit escape hatch, never a second
+        required configuration."""
+        override = (os.environ.get(
+            f"{self.provider_id.upper()}_BASE_URL", "").strip())
+        if override:
+            return override
+        marker = (os.environ.get(self.env_var, "").strip())
+        if "://" in marker:
+            return marker
+        return self.url
 
     def model_for_call(self) -> str:
         override = os.environ.get(f"{self.provider_id.upper()}_MODEL", "")
@@ -154,7 +172,11 @@ PROVIDER_SPECS: List[ProviderSpec] = [
             "OpenAI-compatible endpoint; measured 6.3 tok/s on the "
             "benchmark host 2026-09-12 (513-token prompt, 191-token "
             "completion, 30.2 s). No API key: the wrapper sets "
-            "LOCAL_QWEN_BASE_URL when it owns the server. Thinking mode "
+            "LOCAL_QWEN_BASE_URL when it owns the server — R453-LEAN: "
+            "that ONE documented variable is BOTH the availability "
+            "marker AND the endpoint URL (a second override variable "
+            "is no longer required; the dual-variable footgun is "
+            "closed in url_for_call). Thinking mode "
             "DISABLED via chat_template_kwargs (measured: Qwen3's default "
             "thinking leaks meta-commentary into FIELD lines). Cost basis "
             "ZERO_PAID_COST_SELF_HOSTED: self-hosted weights, local "
@@ -957,6 +979,40 @@ def generate(prompt: str, system: str = "",
         # window must not lock the route out for the TTL (the acceptance
         # run's measured defect). PERMANENT classes (AUTH_FAILURE, GONE,
         # MODEL_NOT_FOUND, CREDIT_EXHAUSTED) are never retried.
+        # R453-LEAN-CORE (the mandate, "do not probe providers with
+        # empty credentials"): a rung whose provider credential is
+        # empty is skipped WITHOUT a probe or a call attempt — the
+        # typed refusal is recorded on the route (structural: an
+        # unkeyed provider can never be probed through generate(),
+        # whatever the ladder pinned). The availability matrix is the
+        # same authority the chain was built from, so this fires only
+        # for rungs added beyond the keyed chain (last-resort bands,
+        # stale pins) — never as a silent availability change.
+        _spec_rung = _SPEC_BY_ID.get(provider_id)
+        if _spec_rung is not None and not os.environ.get(
+                _spec_rung.env_var, "").strip():
+            route.append({
+                "provider_attempted": provider_id,
+                "model": model_id,
+                "status": "SKIPPED_NO_CREDENTIAL",
+                "failure_type": "NO_CREDENTIAL",
+                "timestamp": utc_now(),
+                "latency_ms": 0,
+                "error": (f"provider {provider_id} has no credential "
+                          f"in the environment ({_spec_rung.env_var} "
+                          "empty) — not probed, not called "
+                          "(R453-LEAN-CORE)"),
+                "fallback_provider": next_provider,
+                "fallback_model": next_model,
+                "cost_class": _spec_rung.cost_basis,
+                "selected": False,
+                "rung_band": rung_meta.get("band"),
+                "task": task,
+            })
+            last_err = (f"provider {provider_id} unkeyed — no probe, "
+                        "no call (empty credential)")
+            last_failure_type = "NO_CREDENTIAL"
+            continue
         if _ra.requires_probe(provider_id, model_id):
             _ra.probe_capability(provider_id, model_id,
                                  timeout_s=min(timeout, 30))
