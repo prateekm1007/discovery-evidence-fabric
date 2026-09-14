@@ -22,7 +22,8 @@
     "remote_main_verified_by_ls_remote": "caf9fa54ba417403088e19052191a2fb6b58f63e",
     "realigned_before_any_code": true,
     "commits_behind": 111,
-    "note": "Art. XXII/XXIII applied: the checkout opened 111 commits stale (R446-R453-C2 existed on the remote, including the Claude-class UI reconstruction and Constitution v2.4.0); the checkout was reset to the remote truth BEFORE coding, and the audit was performed against that state"
+    "note": "Art. XXII/XXIII applied: the checkout opened 111 commits stale (R446-R453-C2 existed on the remote, including the Claude-class UI reconstruction and Constitution v2.4.0); the checkout was reset to the remote truth BEFORE coding, and the audit was performed against that state",
+    "rebased_onto": "267a723b (R454-C2 — the remote advanced during the round; the R446-C1 commits rebased cleanly, only the append-only worklog junction needed the separator)"
   },
   "implementation": {
     "new_package": "toscanini/conversational/ (8 modules)",
@@ -34,8 +35,21 @@
       "GET /api/run/{id}/product-events"
     ],
     "status_vocabularies": {
-      "decisions": ["RUN", "SKIP", "DEFER", "BLOCK", "STOP"],
-      "non_execution_states": ["NOT_REQUIRED", "NOT_REACHED", "NOT_RUN", "BLOCKED", "FAILED", "SKIPPED_LOW_VALUE"],
+      "decisions": [
+        "RUN",
+        "SKIP",
+        "DEFER",
+        "BLOCK",
+        "STOP"
+      ],
+      "non_execution_states": [
+        "NOT_REQUIRED",
+        "NOT_REACHED",
+        "NOT_RUN",
+        "BLOCKED",
+        "FAILED",
+        "SKIPPED_LOW_VALUE"
+      ],
       "new_engine_terminal": "PROBLEM_EXISTENCE_UNESTABLISHED (policy STOP class — never a scientific rejection, never negative knowledge)"
     },
     "canonical_loop_touched": false,
@@ -62,10 +76,26 @@
     "adaptive_arm": "EngineRun with the R446 conversational stage gate",
     "quality_gates": "10/10 passed (the directive §24 A-J ground truths, quality preserved)",
     "efficiency": {
-      "llm_calls": {"fixed": 42, "adaptive": 28, "delta_pct": -33},
-      "retrieval_operations": {"fixed": 13, "adaptive": 9, "delta_pct": -31},
-      "compute_stages_and_artifact_ops": {"fixed": 89, "adaptive": 77, "delta_pct": -13},
-      "estimated_latency_s": {"fixed": 2864, "adaptive": 2230, "delta_pct": -22}
+      "llm_calls": {
+        "fixed": 42,
+        "adaptive": 28,
+        "delta_pct": -33
+      },
+      "retrieval_operations": {
+        "fixed": 13,
+        "adaptive": 9,
+        "delta_pct": -31
+      },
+      "compute_stages_and_artifact_ops": {
+        "fixed": 89,
+        "adaptive": 77,
+        "delta_pct": -13
+      },
+      "estimated_latency_s": {
+        "fixed": 2864,
+        "adaptive": 2230,
+        "delta_pct": -22
+      }
     },
     "verdict": "ADAPTIVE_SUCCESSFUL",
     "cost_provenance": "LLM-call table COMPUTED from source (static call-site scan); latencies MODEL_DERIVED from the routing ledger's recorded distribution — planning constants for arm-to-arm comparison only, never quoted as measured production latency (Art. XXVII)"
@@ -84,7 +114,7 @@
     "the product-event stream derives from terminal artifacts; live SSE still uses the R431 event journal"
   ],
   "production_deployment": {
-    "target_sha": "FILLED_AT_COMMIT",
+    "target_sha": "f1254c598f50c67004d2084af36905b59e56d1df",
     "pushed_to_origin_main": "FILLED_AT_PUSH",
     "deploy_id": null,
     "health_check_result": null,
