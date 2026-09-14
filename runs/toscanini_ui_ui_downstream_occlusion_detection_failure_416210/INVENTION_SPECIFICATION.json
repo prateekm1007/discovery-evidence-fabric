@@ -1,6 +1,6 @@
 {
  "invention_id": {
-  "value": "inv:ui_downstream_occlusion_detection_failure_416210:998898af3e5d",
+  "value": "inv:ui_downstream_occlusion_detection_failure_416210:0fac44bc9a6b",
   "epistemic_class": "COMPUTED",
   "origin_stage": "INVENTION_SPEC",
   "evidence_ids": [],
@@ -30,11 +30,25 @@
  },
  "mechanism": {
   "value": {
-   "mechanism": "Real-time physiological intolerance monitoring to detect vascular occlusion onset immediately or within a defined delay threshold.",
-   "intervention": "Integrate an inline pressure sensor with dual-threshold alarm logic that triggers immediate alert on rapid pressure rise (true occlusion) and a secondary 25-minute cumulative pressure integral alarm for delayed occlusion, while filtering transient spikes caused by patient movement via time-integration rather than instantaneous peak detection.",
-   "expected_effect": "Downstream occlusions are detected either immediately or within 25 minutes before patient harm occurs, while transient pressure artifacts from patient movement do not trigger false alarms because they fail to sustain the required time-integrated pressure threshold.",
+   "mechanism": "Immediate or delayed physiological intolerance response triggered by vascular occlusion during controlled unilateral fluid suffusion",
+   "intervention": "Integrate an inline pressure sensor that applies a brief, controlled micro-suffusion test bolus into the infusion line and monitors the downstream pressure-time profile; true downstream occlusion produces an immediate or predictably delayed (up to 25 minutes) monotonic pressure rise matching the intolerance signature reported in the paper, whereas transient patient movement produces non-monotonic, rapidly decaying pressure spikes that do not match this temporal profile.",
+   "expected_effect": "The pump distinguishes true downstream occlusion from transient patient movement by matching the measured pressure-time curve against the immediate or delayed occlusion-intolerance signature, triggering an alarm and halting flow before patient injury occurs.",
    "mechanism_source_span": "Vascular occlusion intolerance was immediate or delayed (25 min) in two cases.",
-   "span_derivation": null
+   "span_derivation": {
+    "n_shared": 5,
+    "shared_terms": [
+     "delayed",
+     "immediate",
+     "intolerance",
+     "occlusion",
+     "vascular"
+    ],
+    "span_terms_n": 8,
+    "ratio": 0.625,
+    "underived": false,
+    "state": "MEASURED",
+    "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+   }
   },
   "epistemic_class": "MODELLED",
   "origin_stage": "SYNTHESIZE",
@@ -46,10 +60,10 @@
  "causal_chain": {
   "value": {
    "source_observation": "Pulmonary Suffusion Refinements for Primary and Secondary Malignancies: Preliminary Analyses of Phase I Safety and Drug Delivery Data.",
-   "mechanism": "Real-time physiological intolerance monitoring to detect vascular occlusion onset immediately or within a defined delay threshold.",
+   "mechanism": "Immediate or delayed physiological intolerance response triggered by vascular occlusion during controlled unilateral fluid suffusion",
    "intervention_site": "infusion pump",
-   "expected_effect": "Downstream occlusions are detected either immediately or within 25 minutes before patient harm occurs, while transient pressure artifacts from patient movement do not trigger false alarms because they fail to sustain the required time-integrated pressure threshold.",
-   "falsification_test": "Bench-test the infusion pump against a calibrated downstream occlusion simulator introducing both step-function total occlusions and transient pressure pulses mimicking patient movement; failure is declared if the system does not alarm within 25 minutes for true occlusion or issues a false alarm during transient movement simulation."
+   "expected_effect": "The pump distinguishes true downstream occlusion from transient patient movement by matching the measured pressure-time curve against the immediate or delayed occlusion-intolerance signature, triggering an alarm and halting flow before patient injury occurs.",
+   "falsification_test": "Induce complete downstream occlusions and simulated patient-movement artifacts in a benchtop infusion loop; if the micro-suffusion pressure-time profiles for true occlusions fail to exhibit the immediate or 25-minute delayed rise described in the paper, or if patient-movement artifacts produce identical signatures, the mechanism is falsified."
   },
   "epistemic_class": "MODELLED",
   "origin_stage": "SYNTHESIZE",
@@ -89,7 +103,7 @@
  "prior_art": {
   "value": {
    "status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
-   "legacy_status": "LIKELY_PRIOR_ART_EXISTS",
+   "legacy_status": "",
    "differentiation_resolution": {
     "state": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
     "epistemic_class": "SEARCH_RESULT",
@@ -100,61 +114,61 @@
     "n_search_errors": 10,
     "search_errors": [
      {
-      "query": "occlusion infusion detect pump downstream pumps",
+      "query": "occlusion infusion pump pumps downstream patient",
       "source": "google_patents",
       "error": "HTTP 503",
       "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
      },
      {
-      "query": "occlusion infusion detect pump downstream pumps",
+      "query": "occlusion infusion pump pumps downstream patient",
       "source": "lens_patent",
       "error": "LENS_API_TOKEN not configured",
       "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
      },
      {
-      "query": "occlusion detect immediately threshold time physiological",
+      "query": "occlusion immediate delayed intolerance physiological response",
       "source": "google_patents",
       "error": "HTTP 503",
       "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
      },
      {
-      "query": "occlusion detect immediately threshold time physiological",
+      "query": "occlusion immediate delayed intolerance physiological response",
       "source": "lens_patent",
       "error": "LENS_API_TOKEN not configured",
       "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
      },
      {
-      "query": "integrate triggers occlusion threshold pressure transient patient movement",
+      "query": "occlusion infusion immediate delayed intolerance pressure controlled suffusion",
       "source": "google_patents",
       "error": "HTTP 503",
       "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
      },
      {
-      "query": "integrate triggers occlusion threshold pressure transient patient movement",
+      "query": "occlusion infusion immediate delayed intolerance pressure controlled suffusion",
       "source": "lens_patent",
       "error": "LENS_API_TOKEN not configured",
       "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
      },
      {
-      "query": "occlusion detection movement filtering integration concerning",
+      "query": "occlusion monitoring detection movement matching intolerance",
       "source": "google_patents",
       "error": "HTTP 503",
       "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
      },
      {
-      "query": "occlusion detection movement filtering integration concerning",
+      "query": "occlusion monitoring detection movement matching intolerance",
       "source": "lens_patent",
       "error": "LENS_API_TOKEN not configured",
       "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
      },
      {
-      "query": "occlusions occlusion infusion immediately detect pump",
+      "query": "occlusion infusion pump pumps downstream transient",
       "source": "google_patents",
       "error": "HTTP 503",
       "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
      },
      {
-      "query": "occlusions occlusion infusion immediately detect pump",
+      "query": "occlusion infusion pump pumps downstream transient",
       "source": "lens_patent",
       "error": "LENS_API_TOKEN not configured",
       "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
@@ -205,52 +219,26 @@
    "queries": [
     {
      "query_class": "ENTITY",
-     "query": "occlusion infusion detect pump downstream pumps"
+     "query": "occlusion infusion pump pumps downstream patient"
     },
     {
      "query_class": "MECHANISM",
-     "query": "occlusion detect immediately threshold time physiological"
+     "query": "occlusion immediate delayed intolerance physiological response"
     },
     {
      "query_class": "DISTINGUISHING",
-     "query": "integrate triggers occlusion threshold pressure transient patient movement"
+     "query": "occlusion infusion immediate delayed intolerance pressure controlled suffusion"
     },
     {
      "query_class": "FUNCTION",
-     "query": "occlusion detection movement filtering integration concerning"
+     "query": "occlusion monitoring detection movement matching intolerance"
     },
     {
      "query_class": "ADJACENT",
-     "query": "occlusions occlusion infusion immediately detect pump"
+     "query": "occlusion infusion pump pumps downstream transient"
     }
    ],
-   "scientific": [
-    {
-     "title": "Recombinant human brain natriuretic peptide for the recovery stage of septic shock: an interventional study protocol.",
-     "id": "42192636",
-     "query": "infusion pump Documented problem downstream occlusion"
-    },
-    {
-     "title": "Selected Large-Animal Models of Ventricular Arrhythmias.",
-     "id": "41744651",
-     "query": "infusion pump Documented problem downstream occlusion"
-    },
-    {
-     "title": "Determinants of Intravenous Infusion Longevity and Infusion Failure via a Nonlinear Model Analysis of Smart Pump Event Logs: Retrospective Study.",
-     "id": "38875535",
-     "query": "infusion pump Documented problem downstream occlusion"
-    },
-    {
-     "title": "Integrating Cardiopulmonary Exercise Testing, Stress Echocardiography and Near-Infrared Spectroscopy for Multimodal Assessment of Exercise Intolerance: A Narrative Review.",
-     "id": "42278764",
-     "query": "Real-time physiological intolerance monitoring detect vascular"
-    },
-    {
-     "title": "Integrated haemodynamic monitoring of fluid responsiveness and fluid tolerance in critical care: from physiology to bedside applications.",
-     "id": "42430050",
-     "query": "Real-time physiological intolerance monitoring detect vascular"
-    }
-   ]
+   "scientific": []
   },
   "epistemic_class": "COMPUTED",
   "origin_stage": "COLLISION",
@@ -259,7 +247,7 @@
  },
  "distinguishing_features": {
   "value": {
-   "intervention": "Integrate an inline pressure sensor with dual-threshold alarm logic that triggers immediate alert on rapid pressure rise (true occlusion) and a secondary 25-minute cumulative pressure integral alarm for delayed occlusion, while filtering transient spikes caused by patient movement via time-integration rather than instantaneous peak detection.",
+   "intervention": "Integrate an inline pressure sensor that applies a brief, controlled micro-suffusion test bolus into the infusion line and monitors the downstream pressure-time profile; true downstream occlusion produces an immediate or predictably delayed (up to 25 minutes) monotonic pressure rise matching the intolerance signature reported in the paper, whereas transient patient movement produces non-monotonic, rapidly decaying pressure spikes that do not match this temporal profile.",
    "vs_nearest_prior_art": [],
    "surviving_differentiators": null,
    "note": "R376: nearest entries are mechanism-relevant family representatives with per-family coverage and evidence tier; differences below the term-overlap thresholds are recorded, not claim-charted (Art. XXVIII)"
@@ -580,43 +568,43 @@
     "severity": "HIGH"
    },
    {
-    "unresolved_source": "occlusion infusion detect pump downstream pumps",
+    "unresolved_source": "occlusion infusion pump pumps downstream patient",
     "error": "HTTP 503"
    },
    {
-    "unresolved_source": "occlusion infusion detect pump downstream pumps",
+    "unresolved_source": "occlusion infusion pump pumps downstream patient",
     "error": "LENS_API_TOKEN not configured"
    },
    {
-    "unresolved_source": "occlusion detect immediately threshold time physiological",
+    "unresolved_source": "occlusion immediate delayed intolerance physiological response",
     "error": "HTTP 503"
    },
    {
-    "unresolved_source": "occlusion detect immediately threshold time physiological",
+    "unresolved_source": "occlusion immediate delayed intolerance physiological response",
     "error": "LENS_API_TOKEN not configured"
    },
    {
-    "unresolved_source": "integrate triggers occlusion threshold pressure transient patient movement",
+    "unresolved_source": "occlusion infusion immediate delayed intolerance pressure controlled suffusion",
     "error": "HTTP 503"
    },
    {
-    "unresolved_source": "integrate triggers occlusion threshold pressure transient patient movement",
+    "unresolved_source": "occlusion infusion immediate delayed intolerance pressure controlled suffusion",
     "error": "LENS_API_TOKEN not configured"
    },
    {
-    "unresolved_source": "occlusion detection movement filtering integration concerning",
+    "unresolved_source": "occlusion monitoring detection movement matching intolerance",
     "error": "HTTP 503"
    },
    {
-    "unresolved_source": "occlusion detection movement filtering integration concerning",
+    "unresolved_source": "occlusion monitoring detection movement matching intolerance",
     "error": "LENS_API_TOKEN not configured"
    },
    {
-    "unresolved_source": "occlusions occlusion infusion immediately detect pump",
+    "unresolved_source": "occlusion infusion pump pumps downstream transient",
     "error": "HTTP 503"
    },
    {
-    "unresolved_source": "occlusions occlusion infusion immediately detect pump",
+    "unresolved_source": "occlusion infusion pump pumps downstream transient",
     "error": "LENS_API_TOKEN not configured"
    }
   ],
@@ -630,7 +618,7 @@
    {
     "assumption": "mechanism transfers across domain context",
     "basis": "MODELLED",
-    "test": "Bench-test the infusion pump against a calibrated downstream occlusion simulator introducing both step-function total occlusions and transient pressure pulses mimicking patient movement; failure is declared if the system does not alarm within 25 minutes for true occlusion or issues a false alarm during transient movement simulation."
+    "test": "Induce complete downstream occlusions and simulated patient-movement artifacts in a benchtop infusion loop; if the micro-suffusion pressure-time profiles for true occlusions fail to exhibit the immediate or 25-minute delayed rise described in the paper, or if patient-movement artifacts produce identical signatures, the mechanism is falsified."
    },
    {
     "assumption": "searched sources approximate the prior-art universe",
@@ -646,7 +634,7 @@
  "provenance": {
   "value": {
    "run_id": "engrun:ui_downstream_occlusion_detection_failure_416210:2026-09-14T20:03:30",
-   "final_envelope_hash": "998898af3e5d67378f170ea900057428865b7db9842af70480db7f522316280e",
+   "final_envelope_hash": "0fac44bc9a6bfb0ef096cc6856ab3f2070b86f223b7d10ab9a3da55598c1bd05",
    "final_status": "REJECTED",
    "adjudication_verdict": "CONTESTED",
    "ranking": {
@@ -674,7 +662,7 @@
     "reason": "only a classified candidate with sufficient adjudication may be specified (Art. XXVIII: no promotion by narrative)"
    },
    "code_commit": null,
-   "built_at": "2026-09-14T20:07:37+00:00Z"
+   "built_at": "2026-09-14T20:08:44+00:00Z"
   },
   "epistemic_class": "COMPUTED",
   "origin_stage": "INVENTION_SPEC",
@@ -1558,10 +1546,16 @@
   "verdict": "CONTESTED",
   "reason": "only a classified candidate with sufficient adjudication may be specified (Art. XXVIII: no promotion by narrative)"
  },
- "_spec_hash": "c571a9ddbb759560bf8ee02792d82cdf701a284540a8e4ac1c5cb23fab1b263c",
+ "_spec_hash": "89eaab135e8fdba3bc44a6599f0a916b033a2a7458c96e966c63acb0765f4da8",
  "_integrity": {
   "no_fact_promotion_violations": [],
   "passed": true,
-  "checked_at": "2026-09-14T20:07:37+00:00Z"
+  "checked_at": "2026-09-14T20:08:44+00:00Z"
+ },
+ "_exploration_candidate": {
+  "marker": "EXPLORATION_GRID_CANDIDATE",
+  "discovery_verification": "NOT_PERFORMED_FOR_THIS_CANDIDATE",
+  "consequence": "the E16-H release gate holds this dossier for human engineering review; a discovery-loop re-run is required before automatic release",
+  "angle": "EXPLORATION_GRID_cross_industry_transfer(zai)"
  }
 }
