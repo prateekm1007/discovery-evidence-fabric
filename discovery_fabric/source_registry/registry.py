@@ -1791,6 +1791,21 @@ _register(_src(
     auth_requires=[],
 ))
 
+# R456-LEAN-2 (reconciliation session) disclosed fix of the standing
+# test_r399_routing_states red: the explicit routing-state invariant
+# requires every source to declare one; zenodo was registered without a
+# routing_state field. Within the closed 3-state vocabulary the honest
+# value is ARCHIVED_ROUTING (NO_CONNECTOR + the measured 2026-09-05
+# egress 403 block = nothing routed; reinstatement when a connector is
+# wired AND the egress block clears).
+SOURCE_REGISTRY["zenodo"]["routing_state"] = "ARCHIVED_ROUTING"
+SOURCE_REGISTRY["zenodo"]["routing_basis"] = (
+    "measured 2026-09-05 egress: HTTP 403 network-side block "
+    "(3 attempts); NO_CONNECTOR - nothing routed")
+SOURCE_REGISTRY["zenodo"]["reinstatement_criterion"] = (
+    "a connector is wired AND the egress block clears (measured probe; "
+    "flip to ACTIVE + worklog entry)")
+
 _register(_src(
     source_id="ndltd",
     name="NDLTD Global ETD Search (theses/dissertations)",
@@ -1811,4 +1826,18 @@ _register(_src(
     connector=NO_CONNECTOR,
     auth_requires=[],
 ))
+
+# R456-LEAN-2 (reconciliation session): ndltd was the one remaining
+# source without an explicit routing_state (the test_r399_routing_states
+# invariant). Honest value: ARCHIVED_ROUTING (NO_CONNECTOR + the
+# measured 2026-09-05 egress 503; thesis coverage served by the
+# datacite/openaire/core/crossref lanes).
+SOURCE_REGISTRY["ndltd"]["routing_state"] = "ARCHIVED_ROUTING"
+SOURCE_REGISTRY["ndltd"]["routing_basis"] = (
+    "measured 2026-09-05 egress: HTTP 503 service unavailable "
+    "(2 attempts); NO_CONNECTOR - thesis coverage served by the "
+    "datacite/openaire/core/crossref lanes")
+SOURCE_REGISTRY["ndltd"]["reinstatement_criterion"] = (
+    "a connector is wired AND the egress serves records (measured "
+    "probe; flip to ACTIVE + worklog entry)")
 

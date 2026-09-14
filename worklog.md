@@ -1161,3 +1161,19 @@ Work Log:
 Stage Summary:
 - R455-LEAN-1 is COMPLETE as a two-half round: the machine no longer spends retrieval and rendering on runs that cannot produce a discovery, no longer asserts technologies that do not exist, reports the ledger's call count (not envelopes'), cannot represent GENERATED-without-mechanism, and pauses resumably at a typed capability terminal — measured on the live production path at the pushed SHA, with 134,765+7,217 LOC of deadweight retired to importable archive history.
 - reviewer_provenance=AI_REVIEW.
+
+---
+Task ID: R456-RECONCILIATION (parallel-session reconciliation, Art. XXVI)
+Agent: Super Z (main session — Coder)
+Task: reconcile this session's r456-lean-2 branch (R456-LEAN-2 + R457-OPERATOR-TRANSPORT, commits 52dff8d + 4096198, preserved on backup-r456-lean-2) with the parallel session's canonical R456-1/2/3/A3 series now on main.
+
+Work Log:
+- PARALLEL-ROUND DETECTION (the R455 precedent): the push to main was refused non-fast-forward — ls-remote showed FOUR new commits (1230417 R456-1, c6d4139 R456-2, 895dfa8 R456-3, 5c6585f R456-A3) executing the SAME operator directive this session was executing. Reset to origin/main; the branch was preserved as backup-r456-lean-2 (Art. XI: the alternative implementation's record).
+- ADOPTED MAIN WHOLESALE (Art. X: one implementation) for every duplicated surface: the epistemic_integrity determination (theirs verified the gauntlet's subprocess-code-string CI path — a consumer class this session's import-only scan could not see), the CI-regenerated MODULE_INVENTORY with the drift gate, the image slimming (their extra_headers browser-UA measurement explains this session's plain-UA 307/HTML interstitials — the same WAF class defeated at the header), the Phase-P1 reranker (their local-embedding OR-composition, calibrated 50 pairs, benchmarked ZERO regressions), and the quartet registration with failure-classification rotation.
+- RETAINED (additive, non-duplicated): (1) the zenodo + ndltd ARCHIVED_ROUTING declarations — the standing test_r399_routing_states red was STILL live on main; fixed with the measured 2026-09-05 egress evidence, 10/10 green; (2) this session's three probe rounds as supplementary artifacts (R456/OPERATOR_TRANSPORT_PROBE*.json): the apinex free/glm-5.3-flash + free/qwen-3.8-max NULL-CONTENT measurement (model-specific hazard distinct from main's working free/deepseek-v4.1-flash pin) and the plain-UA interstitial specimens; (3) the reconciliation record R456/RECONCILIATION_PARALLEL_SESSION.json with the full adopt/drop accounting.
+- VERIFIED RESOLVED: this session's falsification of the audit's acceptance-JSON 'zero consumers' claim — on the reconciled tree the split is clean (A_SERIES kept as the r407 reader-readiness contract; E15/E16/F archived with zero live consumers; test_r407 68/68 green).
+- DROPPED as duplicates (disclosed in the reconciliation record): this session's OPERATOR_FREE_TIER_DECLARED basis, its four ProviderSpecs + pinned models + family patterns, its IDF/trigram reranker + corpus + battery, its archive set + MODULE_INVENTORY, its Dockerfile/.dockerignore/deploy edits, its key wiring, its r414/r436 re-pins. Everything lives on backup-r456-lean-2.
+- Battery on the reconciled tree: routing_states 10/10, test_r407 68/68, the main-series suites green per their records. Constitution v2.4.0 hash b54a1be9 unchanged.
+
+Stage Summary:
+- ONE canonical implementation of the R456 directive on main (the parallel session's), this session's unique measurements and fixes folded in with full disclosure, zero duplicated machinery, the alternative preserved in branch history. reviewer_provenance=AI_REVIEW.
