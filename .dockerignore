@@ -55,7 +55,20 @@ elite_v3
 scripts_v25_t6v2
 scripts_v6_v4_v3_2l
 engine
-R3[0-9][0-9][0-9]*
+# R456 (audit §C.10 — round trees out of the shipping image): the
+# R3[0-9][0-9][0-9]* pattern only excluded R3xxx; R401…R455 (456 MB of
+# round evidence the engine never reads) still shipped. Now ALL R*
+# round trees are excluded EXCEPT the three dirs with LIVE runtime file
+# reads (verified by path-literal scan of toscanini/ +
+# discovery_fabric/ + orchestrator/):
+#   R412/  attacker_calibration.py MEASUREMENT_PATH + SEAL_PATH
+#   R413/  physics_stack/solver_registry.py SOLVER_AVAILABILITY_PROBES
+#   R449/  evidence_fabric/registry.py EVIDENCE_SOURCE_REGISTRY +
+#          EVIDENCE_LICENSE_REGISTRY
+R[0-9]*
+!R412
+!R413
+!R449
 BENCHMARK_ENGINEERING_DOSSIERS
 discovery_campaigns/CAMPAIGN_L8_2026-08-29
 discovery_campaigns/M1_DOSSIER_CAMPAIGN_2026-08-29

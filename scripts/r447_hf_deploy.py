@@ -130,8 +130,9 @@ def _adapter_dockerfile(commit: str) -> str:
     assert anchor in df
     df = df.replace(anchor, anchor + HUNK_NODE_RUNTIME, 1)
 
-    # 2. chromium in the apt set
-    apt_anchor = "      libxi6 libxfixes3 libsm6 libice6 libxkbcommon0 \\\n"
+    # 2. chromium in the apt set (R456: the Blender X11 line is gone —
+    #    the slimmed engine apt set ends at the OCP lib line)
+    apt_anchor = "      libgl1 libglu1-mesa libxext6 libx11-6 libxrender1 \\\n"
     assert apt_anchor in df, "apt anchor not found"
     df = df.replace(apt_anchor, apt_anchor + HUNK_APT, 1)
 
@@ -345,9 +346,10 @@ def _r451_c13_adapter_dockerfile(commit: str) -> str:
     #    order; referencing it later via COPY --from)
     df = HUNK_LLAMA_BUILDER + "\n" + df
     # 2. stage the built binary into the engine stage: insert the
-    #    local-qwen hunk right after the Blender ENV line (the engine
-    #    stage's dependency block end), with the binary COPY first
-    wire = ("ENV BLENDER_PATH=/opt/blender/blender\n")
+    #    local-qwen hunk right after the engine stage's WORKDIR line
+    #    (R456: the former wire anchor ENV BLENDER_PATH is gone with the
+    #    Blender tarball removal — audit §O.4/§J image slimming)
+    wire = "WORKDIR /app\n"
     assert wire in df
     binary_copy = (
         "# the built llama-server binary from the pinned-tag builder\n"
