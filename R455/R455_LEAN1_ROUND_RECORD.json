@@ -1,100 +1,163 @@
 {
-  "schema": "R455_ROUND_RECORD/1.0.0",
-  "round": "R455-LEAN-1",
-  "title": "NO SURVIVOR, NO ARTIFACT; NO REASONING, NO SPEND",
-  "directive": "EXT-AUDIT-LEAN-R454 §O (the external audit's one smallest high-information round)",
-  "date_utc": "2026-09-14",
-  "baseline": {
-    "origin_main_at_round_start": "7ae2027",
-    "constitution": "v2.4.0, sha256 b54a1be9bcbdd2465d0b034e1e1f472f80b87174209c0d534b7d9e1223e649b2 — read IN FULL (all 2153 lines) at round start and re-read IN FULL immediately before the round commit (both reads recorded here, hash re-verified at both times)",
-    "governance_read": ["GOVERNANCE/README.md", "GOVERNANCE/AUDITOR_SELF_GOVERNANCE_v1.md", "GOVERNANCE/AUDITOR_BLINDSPOT_REGISTER.md", "GOVERNANCE/AUDITOR_REMEMBERED_STATE.md", "GOVERNANCE/AUDIT_LOOP_PROTOCOL_v1.md", "ACTIVE_PATH.md"],
-    "stale_checkout_discipline": "the local checkout was on a stale branch (r449-c2/visual-benchmark @ 09b44c5); the round branch was cut from the PAT-authenticated fetched origin/main BEFORE any edit (Art. XXII/XXIII)"
+ "schema": "R455_ROUND_RECORD/1.0.0",
+ "round": "R455-LEAN-1",
+ "title": "NO SURVIVOR, NO ARTIFACT; NO REASONING, NO SPEND",
+ "directive": "EXT-AUDIT-LEAN-R454 §O (the external audit's one smallest high-information round)",
+ "date_utc": "2026-09-14",
+ "baseline": {
+  "origin_main_at_round_start": "7ae2027",
+  "constitution": "v2.4.0, sha256 b54a1be9bcbdd2465d0b034e1e1f472f80b87174209c0d534b7d9e1223e649b2 — read IN FULL (all 2153 lines) at round start and re-read IN FULL immediately before the round commit (both reads recorded here, hash re-verified at both times)",
+  "governance_read": [
+   "GOVERNANCE/README.md",
+   "GOVERNANCE/AUDITOR_SELF_GOVERNANCE_v1.md",
+   "GOVERNANCE/AUDITOR_BLINDSPOT_REGISTER.md",
+   "GOVERNANCE/AUDITOR_REMEMBERED_STATE.md",
+   "GOVERNANCE/AUDIT_LOOP_PROTOCOL_v1.md",
+   "ACTIVE_PATH.md"
+  ],
+  "stale_checkout_discipline": "the local checkout was on a stale branch (r449-c2/visual-benchmark @ 09b44c5); the round branch was cut from the PAT-authenticated fetched origin/main BEFORE any edit (Art. XXII/XXIII)"
+ },
+ "implemented": {
+  "survivor_gate": {
+   "directive_section": "§1 (the audit's top deletion)",
+   "files": [
+    "toscanini/bridge_gate.py",
+    "toscanini/cio.py",
+    "toscanini/dossier.py"
+   ],
+   "what": "bridge/geometry/render/package run ONLY on a run whose DISCOVERY_RELEASE.json attests a surviving promoted candidate (status not in DISCOVERY_INCOMPLETE/NOT_A_SURVIVOR/DISABLED_BY_CONFIG, invention_id non-null, spec identity present); otherwise exactly one honest NO_SURVIVOR record. build_cio no longer counts final_state.json as invention-side state (the always-true _invention_exists hole: 18/18 audited production runs bridged, 16 fully rendered, 7 with invention_id null). Historical NO_INVENTION outcome strings stay readable.",
+   "disposition_note": "Art. LXIV: the release-era refusal outcome is NO_SURVIVOR; the no-release-record legacy path keeps NO_INVENTION (pre-release-era records and fixtures only — the current engine writes a release on every run)."
   },
-  "implemented": {
-    "survivor_gate": {
-      "directive_section": "§1 (the audit's top deletion)",
-      "files": ["toscanini/bridge_gate.py", "toscanini/cio.py", "toscanini/dossier.py"],
-      "what": "bridge/geometry/render/package run ONLY on a run whose DISCOVERY_RELEASE.json attests a surviving promoted candidate (status not in DISCOVERY_INCOMPLETE/NOT_A_SURVIVOR/DISABLED_BY_CONFIG, invention_id non-null, spec identity present); otherwise exactly one honest NO_SURVIVOR record. build_cio no longer counts final_state.json as invention-side state (the always-true _invention_exists hole: 18/18 audited production runs bridged, 16 fully rendered, 7 with invention_id null). Historical NO_INVENTION outcome strings stay readable.",
-      "disposition_note": "Art. LXIV: the release-era refusal outcome is NO_SURVIVOR; the no-release-record legacy path keeps NO_INVENTION (pre-release-era records and fixtures only — the current engine writes a release on every run)."
-    },
-    "capability_gate_precedes_retrieval": {
-      "directive_section": "§2",
-      "files": ["discovery_fabric/engine/llm_registry.py", "discovery_fabric/engine/run.py", "toscanini/worker.py", "toscanini/conversational/product_events.py", "toscanini/conversational/run_contract.py", "toscanini/investigation.py", "toscanini/durable.py"],
-      "what": "read-only strong_route_capability() mirror (zero network, zero probes; declared capabilities are probe-independent so the gate can never deadlock a route behind its own probe TTL — Art. V). When no reachable rung declares STRONG and a degraded rung exists, the conductor records BLOCKED/CAPABILITY_INSUFFICIENT before the RETRIEVE fan-out: zero retrieval source calls, zero downstream compute, resumable on a capable route (Art. LXI). New typed terminal RUN_BLOCKED_CAPABILITY (a RUN_BLOCKED_* family member — run_state outcome mapping, product events, run contract, investigation, worker phase 4, presentationState isTerminal/INFRASTRUCTURE_PAUSED all treat it as infrastructure class). The expensive tail and the evolution layer refuse with the same typed record; CAPABILITY_GATE.json joins the durable push.",
-      "no_new_backend_machinery_note": "the gate is a read-only mirror of generate()'s own admission inputs (catalog, pinned capability declarations, cost policy, known-dead marks) — no new capability store, no new probe, no second routing authority (Art. X)"
-    },
-    "no_skip_envelopes": {
-      "directive_section": "§3",
-      "files": ["discovery_fabric/engine/run.py"],
-      "what": "SKIPPED_ADMISSION stages write their ledger line only; the per-stage envelope duplication of the unchanged problem block (9 per degraded run, candidate_id empty) is removed. The refusal remains a recorded refusal (Art. XXV)."
-    },
-    "model_route_from_ledger": {
-      "directive_section": "§4",
-      "files": ["toscanini/run_state.py"],
-      "what": "model_route.calls derive from ROUTING_LEDGER_RUN.json (the run-id-isolated routing ledger persisted into the run dir at run end, R451-C1.3-3) with a ledger_for_run(run_id) fallback for legacy records; call_count is the ledger's run-owned count; envelope aggregation is dead. R443's retrieval-source exclusion is now structural (the ledger cannot contain a retrieval source)."
-    },
-    "mechanism_invariant": {
-      "directive_section": "§5",
-      "files": ["toscanini/run_state.py", "CODER2_UI_STATE_MAP.json"],
-      "what": "mechanism_state.state = GENERATED requires a recorded mechanism; otherwise NOT_ESTABLISHED with the typed reason (the audited live GENERATED + mechanism:null + candidate_count:0 combination is unrepresentable — Art. XXVIII). Pure-addition amendment to the UI state map."
-    },
-    "deletions": {
-      "directive_section": "§6",
-      "location": "archive/r455_retired/ (importable history, git mv — no history rewrite, Art. XI)",
-      "loc_removed_per_item": {
-        "discovery_fabric/engine/invention_bridge/r441_retired/blender_render.py": 754,
-        "prior_art_v2/calibration.py": 342,
-        "prior_art_v2/calibration_v2.py": 368,
-        "prior_art_v2/calibration_v3.py": 1372,
-        "prior_art_v2/calibration_v3_3.py": 584,
-        "prior_art_v2/calibration_v3_4.py": 627,
-        "prior_art_v2/calibration_v3_5.py": 441,
-        "prior_art_v2/calibration_v3_6.py": 386,
-        "prior_art_v2/calibration_v3_7.py": 347,
-        "prior_art_v2/calibration_v3_8.py": 276,
-        "engine/smoke_e2e.py": 461,
-        "engine/benchmark_corpus.py": 329,
-        "engine/benchmark_split.py": 204,
-        "engine/blind_protocol.py": 184,
-        "engine/benchmark_dossiers.py": 542
-      },
-      "loc_total": 7217,
-      "kept": "prior_art_v2/calibration_v3_9.py (the highest retained) — its two imports of the archived v2/v3 data re-pointed to the archive location",
-      "importers_repointed": 19,
-      "no_test_deleted": true
-    }
+  "capability_gate_precedes_retrieval": {
+   "directive_section": "§2",
+   "files": [
+    "discovery_fabric/engine/llm_registry.py",
+    "discovery_fabric/engine/run.py",
+    "toscanini/worker.py",
+    "toscanini/conversational/product_events.py",
+    "toscanini/conversational/run_contract.py",
+    "toscanini/investigation.py",
+    "toscanini/durable.py"
+   ],
+   "what": "read-only strong_route_capability() mirror (zero network, zero probes; declared capabilities are probe-independent so the gate can never deadlock a route behind its own probe TTL — Art. V). When no reachable rung declares STRONG and a degraded rung exists, the conductor records BLOCKED/CAPABILITY_INSUFFICIENT before the RETRIEVE fan-out: zero retrieval source calls, zero downstream compute, resumable on a capable route (Art. LXI). New typed terminal RUN_BLOCKED_CAPABILITY (a RUN_BLOCKED_* family member — run_state outcome mapping, product events, run contract, investigation, worker phase 4, presentationState isTerminal/INFRASTRUCTURE_PAUSED all treat it as infrastructure class). The expensive tail and the evolution layer refuse with the same typed record; CAPABILITY_GATE.json joins the durable push.",
+   "no_new_backend_machinery_note": "the gate is a read-only mirror of generate()'s own admission inputs (catalog, pinned capability declarations, cost policy, known-dead marks) — no new capability store, no new probe, no second routing authority (Art. X)"
   },
-  "not_touched": {
-    "directive_section": "§O.7 do-not-touch list, held exactly",
-    "items": ["epistemic_integrity/ (§N.1 determination pending — untouched)", "the causal-learning/reality-loop modules (§N.2 — untouched)", "the R453 adaptive-admission logic (§N.3 — extended only by the two typed refusal sites the directive itself specifies)", "sealed experiment records (§N.4 — untouched)", "the typed infrastructure-failure vocabulary (§N.5 — extended by one RUN_BLOCKED_* family member with its own typed reason, never collapsed)"]
+  "no_skip_envelopes": {
+   "directive_section": "§3",
+   "files": [
+    "discovery_fabric/engine/run.py"
+   ],
+   "what": "SKIPPED_ADMISSION stages write their ledger line only; the per-stage envelope duplication of the unchanged problem block (9 per degraded run, candidate_id empty) is removed. The refusal remains a recorded refusal (Art. XXV)."
   },
-  "r454_c2_branch_resolution": {
-    "directive_reference": "§N.7",
-    "finding": "origin/r454-c2/visual-deadweight (tip a5a8149d) predates the R446-C1 conversational layer; diffing against main shows main's stage_policy.py/worker phases as DELETED on the branch — the branch is stale relative to main and is not mergeable as-is. Its dead-candidate guard targeted challenge-killed candidates; the audited failure mode (INCOMPLETE_INFERENCE_FAILURE, no candidate at all) is covered by THIS round's release-record survivor gate, which gates on canonical state independent of candidate existence. §N.7's confirmation requirement is discharged by implementation + test, not by merging the stale branch."
+  "model_route_from_ledger": {
+   "directive_section": "§4",
+   "files": [
+    "toscanini/run_state.py"
+   ],
+   "what": "model_route.calls derive from ROUTING_LEDGER_RUN.json (the run-id-isolated routing ledger persisted into the run dir at run end, R451-C1.3-3) with a ledger_for_run(run_id) fallback for legacy records; call_count is the ledger's run-owned count; envelope aggregation is dead. R443's retrieval-source exclusion is now structural (the ledger cannot contain a retrieval source)."
   },
-  "tests": {
-    "required_battery": "tests/test_r455_lean1.py — 14/14 PASSED (the five §O.8 tests + Art. V positive/negative controls + the resumability test)",
-    "re_pins_disclosed": [
-      "tests/test_r414_product_integration.py TestCIO::test_no_artifacts_no_cio (final_state no longer manufactures a CIO; one invention-side artifact still suffices — Art. V)",
-      "tests/test_r414_product_integration.py TestCanonicalRunState::test_model_route_only_from_persisted_records (fabricated envelope providers excluded — now stronger; the ledger record appears)",
-      "tests/test_r443_audit_fixes.py TestModelRouteProvenance::test_no_evidence_source_attributed_as_model_execution (structural guarantee re-pinned on the ledger source)",
-      "tests/test_r443_audit_fixes.py TestModelRouteProvenance::test_llm_transport_records_still_reported (transport records still reported — from the ledger)"
-    ],
-    "pre_existing_failures_disclosed": "stash-verified identical on the pristine tree at 7ae2027 (BS-020/captured-fixture class, previously disclosed by R454-C2): r418_bridge_gate captured-solar-fixture x4 (the fixture's R37x-era engineering content fails the CURRENT C/W package gates correctly), r451_c21_states webapp source pins x3 + r451_c22 x1 + r451_c23 x1 (components removed by the R454-C2 UI restructure), test_dossier_bridge E1-era provider pins x4, batch-2 environment class x10 (r443 visual live-Chromium battery, r419 blender worker pin, r418 routing pin, r451_c24 UI pin, r399 routing-states credential class). ZERO new failures from this round across 469 executed tests.",
-    "no_test_deletions": true
+  "mechanism_invariant": {
+   "directive_section": "§5",
+   "files": [
+    "toscanini/run_state.py",
+    "CODER2_UI_STATE_MAP.json"
+   ],
+   "what": "mechanism_state.state = GENERATED requires a recorded mechanism; otherwise NOT_ESTABLISHED with the typed reason (the audited live GENERATED + mechanism:null + candidate_count:0 combination is unrepresentable — Art. XXVIII). Pure-addition amendment to the UI state map."
   },
-  "acceptance": {
-    "directive_section": "§10 — reported after the production verification run",
-    "production_deployment": {
-      "target_sha": null,
-      "deployed_sha": null,
-      "deploy_id": null,
-      "health_check_result": "PENDING",
-      "drift": "UNKNOWN",
-      "blocked_by": "deploy executes after the push in this session (HF token provided by the operator)",
-      "what_unblocks": "scripts/r447_hf_deploy.py pipeline at the pushed commit"
-    },
-    "fresh_run_measurements": "PENDING — to be filled after the genuinely fresh production problem completes (retrieval source count on a degraded-only route, run-owned LLM calls, stages skipped, artifacts produced)"
+  "deletions": {
+   "directive_section": "§6",
+   "location": "archive/r455_retired/ (importable history, git mv — no history rewrite, Art. XI)",
+   "loc_removed_per_item": {
+    "discovery_fabric/engine/invention_bridge/r441_retired/blender_render.py": 754,
+    "prior_art_v2/calibration.py": 342,
+    "prior_art_v2/calibration_v2.py": 368,
+    "prior_art_v2/calibration_v3.py": 1372,
+    "prior_art_v2/calibration_v3_3.py": 584,
+    "prior_art_v2/calibration_v3_4.py": 627,
+    "prior_art_v2/calibration_v3_5.py": 441,
+    "prior_art_v2/calibration_v3_6.py": 386,
+    "prior_art_v2/calibration_v3_7.py": 347,
+    "prior_art_v2/calibration_v3_8.py": 276,
+    "engine/smoke_e2e.py": 461,
+    "engine/benchmark_corpus.py": 329,
+    "engine/benchmark_split.py": 204,
+    "engine/blind_protocol.py": 184,
+    "engine/benchmark_dossiers.py": 542
+   },
+   "loc_total": 7217,
+   "kept": "prior_art_v2/calibration_v3_9.py (the highest retained) — its two imports of the archived v2/v3 data re-pointed to the archive location",
+   "importers_repointed": 19,
+   "no_test_deleted": true
+  }
+ },
+ "not_touched": {
+  "directive_section": "§O.7 do-not-touch list, held exactly",
+  "items": [
+   "epistemic_integrity/ (§N.1 determination pending — untouched)",
+   "the causal-learning/reality-loop modules (§N.2 — untouched)",
+   "the R453 adaptive-admission logic (§N.3 — extended only by the two typed refusal sites the directive itself specifies)",
+   "sealed experiment records (§N.4 — untouched)",
+   "the typed infrastructure-failure vocabulary (§N.5 — extended by one RUN_BLOCKED_* family member with its own typed reason, never collapsed)"
+  ]
+ },
+ "r454_c2_branch_resolution": {
+  "directive_reference": "§N.7",
+  "finding": "origin/r454-c2/visual-deadweight (tip a5a8149d) predates the R446-C1 conversational layer; diffing against main shows main's stage_policy.py/worker phases as DELETED on the branch — the branch is stale relative to main and is not mergeable as-is. Its dead-candidate guard targeted challenge-killed candidates; the audited failure mode (INCOMPLETE_INFERENCE_FAILURE, no candidate at all) is covered by THIS round's release-record survivor gate, which gates on canonical state independent of candidate existence. §N.7's confirmation requirement is discharged by implementation + test, not by merging the stale branch."
+ },
+ "tests": {
+  "required_battery": "tests/test_r455_lean1.py — 14/14 PASSED (the five §O.8 tests + Art. V positive/negative controls + the resumability test)",
+  "re_pins_disclosed": [
+   "tests/test_r414_product_integration.py TestCIO::test_no_artifacts_no_cio (final_state no longer manufactures a CIO; one invention-side artifact still suffices — Art. V)",
+   "tests/test_r414_product_integration.py TestCanonicalRunState::test_model_route_only_from_persisted_records (fabricated envelope providers excluded — now stronger; the ledger record appears)",
+   "tests/test_r443_audit_fixes.py TestModelRouteProvenance::test_no_evidence_source_attributed_as_model_execution (structural guarantee re-pinned on the ledger source)",
+   "tests/test_r443_audit_fixes.py TestModelRouteProvenance::test_llm_transport_records_still_reported (transport records still reported — from the ledger)"
+  ],
+  "pre_existing_failures_disclosed": "stash-verified identical on the pristine tree at 7ae2027 (BS-020/captured-fixture class, previously disclosed by R454-C2): r418_bridge_gate captured-solar-fixture x4 (the fixture's R37x-era engineering content fails the CURRENT C/W package gates correctly), r451_c21_states webapp source pins x3 + r451_c22 x1 + r451_c23 x1 (components removed by the R454-C2 UI restructure), test_dossier_bridge E1-era provider pins x4, batch-2 environment class x10 (r443 visual live-Chromium battery, r419 blender worker pin, r418 routing pin, r451_c24 UI pin, r399 routing-states credential class). ZERO new failures from this round across 469 executed tests.",
+  "no_test_deletions": true
+ },
+ "acceptance": {
+  "directive_section": "§10 — BOTH conditions MET, measured on the live production Space",
+  "conditions": {
+   "fresh_no_survivor_run_zero_artifacts": {
+    "target": 0,
+    "measured": 0,
+    "evidence": "fresh problem '1960s riveted aluminium aircraft fuselage panels…' (session ts_bf0f07739ea3, run dir runs/toscanini_ui_ui_fuselage_panels_widespread_pillowing_corro_399465 on durable branch runtime-state-hf @ b7dc6fe): the run dir carries EXACTLY 9 record files (CAPABILITY_GATE.json, DISCOVERY_RELEASE.json, INVENTION_LINEAGE.json, RELEASE_PROOF.json, candidate_envelope.json, cemetery_update.json, final_state.json, problem.json, run_manifest.json) — ZERO GLB, zero render records, zero package artifacts (the audited failure shape produced 26 files incl. model-001.glb + a render job). The bridge was refused (bridge_outcome SKIPPED_POLICY; DISCOVERY_RELEASE.status DISCOVERY_INCOMPLETE, invention_id null — the survivor gate's second layer never even needed)."
+   },
+   "degraded_route_zero_retrieval_calls": {
+    "target": 0,
+    "measured": 0,
+    "evidence": "evidence_state.state=NOT_REACHED, records_found=0, sources=[]; stage_log: RETRIEVE SKIPPED_ADMISSION with skip_class BLOCKED + SYNTHESIS_CAPABILITY_INSUFFICIENT_PRE_RETRIEVAL, 15 downstream stages SKIPPED_ADMISSION/NOT_REACHED (16 typed entries); model_routing/ledger.jsonl carries ZERO lines for the run (0 run-owned, 0 probes); the registry mirror recorded capability_route.state=DEGRADED_ONLY (localqwen CHEAP-only, the audited production shape)"
+   },
+   "second_independent_acceptance_run": {
+    "run": "ts_6de17c8385bf — the deletions half's own fresh public-path run, recorded in R455/R455_ROUND_RECORD.json (0 retrieval calls, 0 run-owned LLM calls, typed RUN_BLOCKED_CAPABILITY, resumable) — the §O.2 gate measured twice, independently"
+   }
   },
-  "reviewer_provenance": "AI_REVIEW"
+  "terminal": {
+   "final_status": "RUN_BLOCKED_CAPABILITY",
+   "user_outcome": "RUN_BLOCKED — 'Run blocked — infrastructure, not a verdict'",
+   "honest_error_copy": "Discovery paused before spending… Your problem is saved and ready to resume on a capable route — this is an infrastructure state, not a verdict about your problem.",
+   "resumable": true,
+   "clarification_layer_live": "the R446-C1 one-question clarification asked and was answered mid-run (score 0.9) — the conversational layer and the capability gate compose correctly"
+  },
+  "production_deployment": {
+   "target_sha": "f920fc993dd4be9db1d1704424a5e04c27c1ca14",
+   "deployed_sha": "f920fc993dd4be9db1d1704424a5e04c27c1ca14",
+   "deploy_id": "HF Space revision ba521bb1805fd44b299bd642678ea0c1b753d683 (upload at 2026-09-14T15:0xZ, R451-C1.3 adapter, Space RUNNING)",
+   "health_check_result": "GREEN",
+   "drift": "GREEN",
+   "identity_tamper": false,
+   "tuple_evidence": "ls-remote main == local HEAD == /api/version engine_commit == deployment_identity.build_artifact_commit == render_git_commit == health_reported_commit == f920fc993dd4be9db1d1704424a5e04c27c1ca14; constitution 2.4.0 served; localqwen HEALTHY (the zero-paid local route restored by the v2 driver); verified 2026-09-14T15:3xZ via authenticated /api/version + /api/health probes",
+   "blocked_by": null,
+   "what_unblocks": null
+  },
+  "parallel_half_reference": {
+   "deletions_round_record": "R455/R455_ROUND_RECORD.json (R455-LEAN-1-DELETIONS: 378 files / 134,765 py LOC to archive/r455-lean/; behavioral items §O.1–O.5 deferred to THIS record)",
+   "deployment_note": "the deployed tree f920fc9 contains BOTH halves; the deploy drivers were contributed by the deletions half (scripts/r455_deploy_v2_upload.py + r455_deploy_chunk2_verify.py, reused verbatim per Art. X)"
+  },
+  "fresh_run_measurements": "RECORDED ABOVE (conditions.evidence) — pre-filled with nothing; every number read from the live production surfaces and the durable branch bytes (Art. VI)"
+ },
+ "reviewer_provenance": "AI_REVIEW",
+ "round_commit": "ddadd98 (behavioral half, rebased); deployed tree f920fc9",
+ "records_note": "this record commit follows the deploy (the standing records-only follow-up-commit protocol); the tuple pins the DEPLOYED sha f920fc9",
+ "reconciliation_note": "the two halves' records are merged: this file carries the behavioral half (§1-§5 + §8 + the deployment tuple + the ts_bf0f07739ea3 acceptance); R455/R455_ROUND_RECORD.json carries the deletions half + the ts_6de17c8385bf acceptance; both halves verified the same deployed tree f920fc9"
 }
