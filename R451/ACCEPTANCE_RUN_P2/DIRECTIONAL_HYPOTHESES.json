@@ -1,0 +1,96 @@
+{
+ "artifact_type": "DIRECTIONAL_HYPOTHESES",
+ "schema_version": "hypotheses/1.0",
+ "created_at": "2026-09-13T00:27:08+00:00",
+ "hypotheses": [
+  {
+   "hypothesis_id": "dh:7907633b18f4146bb964",
+   "candidate_id": "inv:4cf8dce145:gen1",
+   "failure_id": "diag:786203eefc4498a3",
+   "causal_diagnosis_id": "diag:786203eefc4498a3",
+   "target_variable": "charging_station_connection_time",
+   "current_value": "unknown",
+   "proposed_value": "increase",
+   "direction": "INCREASE",
+   "mechanism_affected": "preconditioning_algorithm",
+   "causal_rationale": "the failure is due to adversarial kill, which could be mitigated by increasing the time the EV is connected to the charging station",
+   "predicted_effect": "reduced adversarial kill",
+   "predicted_magnitude_or_range": "reduced",
+   "competing_explanations": [],
+   "evidence_support": [],
+   "evidence_gaps": [
+    "evidence gaps in the mechanism and intervention"
+   ],
+   "falsifier": "reduced adversarial kill",
+   "measurement_required": "measurement of adversarial kill",
+   "intervention_type": "PARAMETER_MUTATION",
+   "confidence": "MODERATE",
+   "provenance": {
+    "class": "AI_PROPOSED",
+    "purpose": "directional:hypothesis",
+    "note": "the LLM proposed this hypothesis; the mechanical ground gate adjudicates it (Art. XVIII) — an ungrounded proposal is REJECTED and its mutation never executes",
+    "proposed_at": "2026-09-13T00:27:40+00:00"
+   },
+   "status": "REJECTED",
+   "gate": {
+    "gate_version": "directional_ground_gate/2.0",
+    "checks": [
+     {
+      "check": "G1_STRUCTURE",
+      "verdict": "PASS",
+      "basis": "all required fields present"
+     },
+     {
+      "check": "G2_DIAGNOSIS_RESOLVES",
+      "verdict": "PASS",
+      "basis": "causal_diagnosis_id='diag:786203eefc4498a3' resolves to a recorded diagnosis (cause=ADVERSARIAL_KILL)"
+     },
+     {
+      "check": "G3_MECHANISM_GROUNDED",
+      "verdict": "PASS",
+      "basis": "mechanism terms grounded in the diagnosis/candidate: adversarial, algorithm, charging, connected, kill, preconditioning, station, time"
+     },
+     {
+      "check": "G4_PREDICTION_FALSIFIABLE",
+      "verdict": "FAIL",
+      "basis": "predicted_effect=present; falsifier=present but not measurable — an unfalsifiable direction is a wish, not a hypothesis"
+     },
+     {
+      "check": "G5_EVIDENCE_CLASS",
+      "verdict": "PASS",
+      "basis": "class=EVIDENCE_MISSING: 0 verified support bindings (span-verified); 0 unresolved ids; 0 ids with failed/absent spans; gaps=1 (gaps are NEVER equated with support — R451 §4)"
+     },
+     {
+      "check": "G6_TARGET_IN_DESIGN_STATE",
+      "verdict": "PASS",
+      "basis": "target_variable grounded in the design state: charging, station, time"
+     },
+     {
+      "check": "G7_PREDICTION_INTERVENTION_COHERENT",
+      "verdict": "FAIL",
+      "basis": "the predicted_effect shares NO distinctive terms with the intervention's own variables/mechanism — the prediction is about an observable this intervention does not touch"
+     },
+     {
+      "check": "G8_FALSIFIER_BINDS_PREDICTION",
+      "verdict": "FAIL",
+      "basis": "the falsifier measures the predicted observable: adversarial, kill, reduced; the predicted effect moves DOWN and the falsifier kills on the SAME downward movement — the kill-condition contradicts the prediction"
+     },
+     {
+      "check": "G9_CAUSAL_MEMORY",
+      "verdict": "PASS",
+      "basis": "no prior FALSIFIED direction repeats (the causal memory is clean for this (target_variable, direction))"
+     }
+    ],
+    "grounded": false,
+    "verdict": "REJECTED",
+    "evidence_class": "EVIDENCE_MISSING",
+    "evidence_resolution": {
+     "verified_ids": [],
+     "unresolved_ids": [],
+     "span_failed_ids": []
+    },
+    "adjudicated_at": "2026-09-13T00:27:40+00:00"
+   }
+  }
+ ]
+}

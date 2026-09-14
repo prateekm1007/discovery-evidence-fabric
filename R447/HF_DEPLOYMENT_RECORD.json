@@ -1,26 +1,36 @@
 {
  "artifact_type": "R447 HF deployment record",
- "created_at_utc": "2026-09-11T23:14:08Z",
+ "created_at_utc": "2026-09-14T02:53:32Z",
  "reviewer_provenance": "AI_REVIEW",
  "github_repo": "https://github.com/prateekm1007/discovery-evidence-fabric",
- "github_sha": "23910247426618fb701d659c20c847960274fd1c",
+ "github_sha": "7e4ed47d3f36abd6896138c7b3075cad66a11cd5",
  "hf_space": "prateekm1/toscanini-prod-validation",
- "hf_revision": "22a2bfea91c7d75945daf26587e2944b9c28bdc1 (tree upload) + README frontmatter restore",
+ "hf_revision": "77fb2d09889a96b39ee14dea217cfc0752ec044c (tree upload; README frontmatter preserved upfront this time)",
  "space_stage": "RUNNING",
  "zai_model": "zai-org/GLM-5.3",
- "zai_model_basis": "the Phase 6 live measurement: the R446 pin deepseek-ai/DeepSeek-V4-Flash-0731 reasons unboundedly on long prompts through the router (empty content at 2048 tokens); GLM-5.3 measured serving content in 7-31 s",
  "api_version": {
-  "engine_commit": "23910247426618fb701d659c20c847960274fd1c",
+  "engine_commit": "7e4ed47d3f36abd6896138c7b3075cad66a11cd5",
   "engine_commit_source": "build_artifact",
-  "web_build_hash": "1a4c9e35b713ddebc2a1e295485fa6896501c3de3e91469d0abecc0018ff1ff6",
+  "web_build_hash": "9894885793d475f643bfb71543a64016f1555e18698b330a29a3a2a12e02a4bb",
   "web_build_file_count": 30,
   "web_build_source": "content hash over TOSCANINI_UI/webapp-export/",
-  "constitution_version": "2.3.0"
+  "constitution_version": "2.4.0"
  },
  "identity_verified": true,
+ "article_lxxi_delivery_tuple": {
+  "condition_1_push_confirmed": true,
+  "condition_2_deployed_sha_matches_target": true,
+  "condition_3_health_check": true,
+  "target_sha": "7e4ed47d3f36abd6896138c7b3075cad66a11cd5",
+  "deployed_sha": "7e4ed47d3f36abd6896138c7b3075cad66a11cd5",
+  "health_check_result": "GREEN",
+  "drift": "GREEN",
+  "delivery_complete": true
+ },
  "deployment_notes": [
-  "the git-archive upload overwrote the Space README frontmatter (CONFIG_ERROR) \u2014 restored with sdk: docker / app_port: 7860",
-  "the Dockerfile adapter hunks applied programmatically to the canonical Dockerfile (the R446-HF recipe)",
-  "identity chain: local HEAD == deployed /api/version engine_commit (verified)"
+  "the phase-split uploader (scripts/r447_deploy_upload.py): the sandbox kills spawned processes at the tool-call boundary, so upload+env ran in one call; the build ran on HF infrastructure",
+  "the Space README frontmatter (sdk: docker, app_port: 7860) was written INTO the upload upfront \u2014 the CONFIG_ERROR of the first R447 deploy (git-archive overwrote it) fixed at the source",
+  "the deploy carries: the run-not-found owner-capability transport fix + the canonical Space selection record + phases 1/2/6/7 (geometry identity join, package terminal join, attacker v2, join attacks) + the C2 system-Chromium alignment + the BS-021 credential scrub",
+  "the prior deployed engine 23910247 resolved to no GitHub ref (the R447-C2 worklog finding) \u2014 THIS deploy serves dca25537, pushed and ls-remote verified, closing that finding"
  ]
 }

@@ -1,0 +1,181 @@
+{
+ "artifact_type": "R451_C13_ACCEPTANCE_RUN",
+ "directive": "R451-C1.3 (rerun the zero-paid acceptance with the runtime-admission authority and run-level routing provenance)",
+ "run_id": "r451c13: greenhouse-emitter-clogging acceptance v3",
+ "session_id": "r451-c13-acceptance",
+ "cost_policy": "ZERO_PAID_COST",
+ "paid_providers_disabled": [
+  "ANTHROPIC_API_KEY",
+  "OPENAI_API_KEY",
+  "OPENROUTER_API_KEY",
+  "NVIDIA_API_KEY",
+  "DEEPSEEK_API_KEY",
+  "MISTRAL_API_KEY",
+  "GEMINI_API_KEY",
+  "QWEN_API_KEY",
+  "TOKEN_ROUTER_API_KEY",
+  "ZAI_API_KEY"
+ ],
+ "problem": "r451-greenhouse-emitter-clogging",
+ "problem_freshness": {
+  "class": "GENUINELY_FRESH",
+  "authored_for": "R451-C1.3",
+  "never_submitted_to": [
+   "render",
+   "hf-space",
+   "batteries",
+   "prior-rounds"
+  ]
+ },
+ "chain": {
+  "fresh_problem": true,
+  "model_response": true,
+  "run_ledger_snapshot_persisted": true,
+  "manifest_carries_session": true,
+  "evidence": true,
+  "mechanism": true,
+  "candidate": true,
+  "attack": true
+ },
+ "details": {
+  "run_id": "r451c13: greenhouse-emitter-clogging acceptance v3",
+  "session_id": "r451-c13-acceptance",
+  "problem_id": "r451-greenhouse-emitter-clogging",
+  "routing_provenance": {
+   "isolation": "run_id equality (ledger_for_run) — no time window, no ledger tail",
+   "run_lines_total": 14,
+   "run_owned_call_lines": 14,
+   "capability_probe_lines_in_run_ledger": 0,
+   "capability_probe_lines_global_window": 3,
+   "capability_probe_window": [
+    "_manifest_t0",
+    "_manifest_t1"
+   ],
+   "capability_probe_examples": [
+    {
+     "recorded_at": "2026-09-13T06:01:13Z",
+     "provider": "localqwen",
+     "status": "OK",
+     "capability_state": "PROBE_OK",
+     "failure_class": null
+    },
+    {
+     "recorded_at": "2026-09-13T06:12:10Z",
+     "provider": "localqwen",
+     "status": "FAILED",
+     "capability_state": "PROBE_FAILED",
+     "failure_class": "MODEL_FAILURE"
+    },
+    {
+     "recorded_at": "2026-09-13T06:12:47Z",
+     "provider": "localqwen",
+     "status": "OK",
+     "capability_state": "PROBE_OK",
+     "failure_class": null
+    }
+   ],
+   "invariant_capability_state_on_run_lines": true,
+   "paid_cost_lines": 0,
+   "localqwen_selected_lines": 13,
+   "invariant_run_owned_non_null_run_id": true,
+   "invariant_session_id_present": true,
+   "invariant_engine_stage_present": true,
+   "invariant_account_domain_present": true,
+   "distinct_engine_stages": [
+    "ATTACK",
+    "MECHANISM_SPACE",
+    "RANK",
+    "SYNTHESIZE"
+   ],
+   "example_selected_line": {
+    "account_domain": "LOCAL_COMPUTE",
+    "attempt": 1,
+    "call_class": "RUN_OWNED",
+    "capability_state": "PROBE_OK",
+    "cost_class": "ZERO_PAID_COST_SELF_HOSTED",
+    "engine_stage": "RANK",
+    "error": "",
+    "estimated_cost": null,
+    "failure_class": null,
+    "fallback_from": null,
+    "fallback_reason": "",
+    "fallback_to": null,
+    "latency": 64581,
+    "latency_ms": 64581,
+    "model": "qwen3-1.7b",
+    "ok": true,
+    "provider": "localqwen",
+    "recorded_at": "2026-09-13T06:18:26Z",
+    "recorded_at_epoch": 1789280306.7877743,
+    "request_id": "req_96ef8a76198d",
+    "run_id": "r451c13: greenhouse-emitter-clogging acceptance v3",
+    "selected": true,
+    "session_id": "r451-c13-acceptance",
+    "stage": "directional",
+    "status": "OK",
+    "task": "STRONG",
+    "task_degradation": {
+     "actual_task_capability": "CHEAP_EMERGENCY_FALLBACK",
+     "degraded_reason": "requested STRONG; the serving model declares only ['CHEAP'] — the call ran under the explicitly permitted emergency fallback (R451-C1.4): downstream readers must NOT interpret the result as STRONG-class reasoning",
+     "requested_task": "STRONG",
+     "task_capability_match": false
+    },
+    "tokens": null
+   }
+  },
+  "task_degradation": {
+   "records_on_selected_lines": 13,
+   "any_degraded_strong_request": true,
+   "example": {
+    "actual_task_capability": "CHEAP_EMERGENCY_FALLBACK",
+    "degraded_reason": "requested STRONG; the serving model declares only ['CHEAP'] — the call ran under the explicitly permitted emergency fallback (R451-C1.4): downstream readers must NOT interpret the result as STRONG-class reasoning",
+    "requested_task": "STRONG",
+    "task_capability_match": false
+   }
+  },
+  "routing_ledger_run": {
+   "line_count": 14,
+   "run_owned_call_lines": 14,
+   "paid_cost_class_lines": 0
+  },
+  "evidence_files": [
+   {
+    "file": "envelope_FREEZE.json",
+    "n_records": 18
+   },
+   {
+    "file": "envelope_RETRIEVE.json",
+    "n_records": 18
+   }
+  ],
+  "mechanism_space": {
+   "state": "BUILT_BELOW_MIN",
+   "n_candidates": 1
+  },
+  "synthesize": {
+   "provider": "localqwen",
+   "model": "qwen3-1.7b",
+   "candidate_id": "cand:A2:r451-greenhouse-emitter-clogging:f84c6d23a130ad61"
+  },
+  "final_status": "INVENTION_UNDER_DEVELOPMENT",
+  "stage_log_tail": []
+ },
+ "assessed_at": "2026-09-13T06:25:01+00:00",
+ "acceptance_gates": {
+  "fresh_problem": true,
+  "model_response_run_owned": true,
+  "zero_paid": true,
+  "invariant_run_owned_non_null_run_id": true,
+  "run_isolatable_by_run_id": true,
+  "session_id_on_run_owned_lines": true,
+  "capability_evidence_persisted": true,
+  "task_degradation_explicit": true,
+  "run_ledger_snapshot_persisted": true,
+  "manifest_carries_session": true,
+  "evidence": true,
+  "mechanism": true,
+  "candidate": true,
+  "attack": true
+ },
+ "accepted": true
+}

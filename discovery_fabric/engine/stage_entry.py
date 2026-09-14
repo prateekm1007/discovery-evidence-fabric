@@ -21,6 +21,20 @@ Vocabulary (directive examples):
     SKIPPED / EVIDENCE_VERIFICATION_FAILED
     SKIPPED / UPSTREAM_TERMINAL_FAILURE
 
+R453-LEAN-CORE (the external auditor mandate — subtraction, not
+features) adds the ADAPTIVE ADMISSION rule through this SAME door (no
+new framework): the expensive stages admit only when the run actually
+has something for them to work on —
+    SKIPPED / SYNTHESIS_CAPABILITY_INSUFFICIENT   SYNTHESIZE was served
+        by a CHEAP_EMERGENCY_FALLBACK model on a STRONG request — a
+        degraded synthesis is not an ok synthesis, and downstream
+        compute would be ceremony on a pseudo-invention (Art. IV/XVIII)
+    SKIPPED / NO_RETAINED_CANDIDATE                nothing survived the
+        chain's own retention gates — there is nothing to attack, rank,
+        or design experiments for (attack is skippable ONLY when there
+        is nothing to attack; a verified primary candidate or a
+        retained mechanism-space candidate both count as something)
+
 Semantics:
     entry_status     ALLOWED | SKIPPED
     prerequisite     the condition that must hold for the stage to be
@@ -40,7 +54,18 @@ from typing import Any, Dict, List, Optional, Set
 
 from discovery_fabric.engine.candidate import Candidate
 
-ENTRY_HELPER_VERSION = "stage_entry/1.0.0"
+ENTRY_HELPER_VERSION = "stage_entry/1.1.0"
+
+#: R453-LEAN-CORE: the stages whose compute is admitted only when the
+#: run has something for them to work on. ADJUDICATION and CLASSIFY are
+#: deliberately NOT here — they are the run's terminal classifiers and
+#: must stay reachable to record the honest UNKNOWN/INSUFFICIENT state
+#: (the mandate's capability fail-closed contract).
+ADAPTIVE_ADMISSION_STAGES = frozenset({
+    "MECHANISM_SPACE", "MULTI_SOURCE_DISCOVERY", "COLLISION",
+    "PHYSICS", "ATTACK", "CONTRADICTION", "KILLER_EXPERIMENT",
+    "NEXT_BEST_ACTION", "RANK",
+})
 
 # Evidence classes that count as a VERIFIED_EVIDENCE_ITEM: an item the
 # classification adjudicated as carrying mechanism support (R394 s5).
@@ -88,6 +113,68 @@ def verified_evidence_prerequisite(env: Candidate) -> Dict[str, Any]:
                       "span binding verified (R394 s5 classification + "
                       "a2/verify)"),
         },
+    }
+
+
+def synthesis_capability_state(env: Optional[Candidate]) -> Dict[str, Any]:
+    """R453-LEAN-CORE: did SYNTHESIZE run at the REQUESTED capability?
+
+    Reads the synthesis provenance the SynthesizeAdapter stamps onto
+    the envelope (provenance.synthesis.task_degradation — the registry's
+    own measured record of the call that actually served). A STRONG
+    request served by CHEAP_EMERGENCY_FALLBACK is CAPABILITY_INSUFFICIENT
+    — the mandate's fail-closed rule: degraded STRONG is a hard stop,
+    never a cheap success. No record (legacy envelopes) is UNKNOWN —
+    never silently treated as either blocked or fine (Art. XXV)."""
+    if env is None:
+        return {"state": "UNKNOWN", "basis": "no envelope"}
+    syn = ((env.provenance or {}).get("synthesis") or {})
+    deg = syn.get("task_degradation") or {}
+    if not deg:
+        return {"state": "UNKNOWN",
+                "basis": "no task_degradation record on the synthesis "
+                         "provenance (legacy envelope)"}
+    degraded = (deg.get("task_capability_match") is False
+                and str(deg.get("actual_task_capability")) ==
+                "CHEAP_EMERGENCY_FALLBACK")
+    return {
+        "state": "CAPABILITY_INSUFFICIENT" if degraded else "OK",
+        "requested_task": deg.get("requested_task"),
+        "actual_task_capability": deg.get("actual_task_capability"),
+        "serving_model": syn.get("model"),
+        "serving_provider": syn.get("provider"),
+        "basis": ("the registry's own task-degradation record for the "
+                  "call that served SYNTHESIZE (R451-C1.4) — a STRONG "
+                  "stage served by CHEAP_EMERGENCY_FALLBACK is not an "
+                  "ok synthesis"),
+    }
+
+
+def retained_candidate_facts(env: Optional[Candidate]) -> Dict[str, Any]:
+    """R453-LEAN-CORE: the measured retention facts — is there anything
+    for the expensive stages to work on?
+
+    A retained candidate exists iff the mechanism space retained >= 1
+    candidate OR the primary synthesized candidate's evidence
+    verification passed (a verified primary is something to attack; a
+    mechanism-space candidate is something to rank). Both counts are
+    recorded — never a bare boolean."""
+    if env is None:
+        return {"retained": False, "n_ms_retained": 0,
+                "primary_verified": False, "basis": "no envelope"}
+    ms = env.mechanism_space or {}
+    ms_retained = int(ms.get("n_candidates_retained") or 0)
+    verified = bool(((env.adjudication or {})
+                     .get("evidence_verification") or {})
+                    .get("verified", False))
+    return {
+        "n_ms_retained": ms_retained,
+        "primary_verified": verified,
+        "retained": bool(ms_retained or verified),
+        "ms_state": ms.get("state"),
+        "basis": ("mechanism-space retained candidates OR the primary "
+                  "candidate's evidence verification — either is "
+                  "something to attack/rank; neither is a fabrication"),
     }
 
 
@@ -144,6 +231,48 @@ def justify(stage: str,
                 "prerequisite_evidence": {"skipped_stage": blocker},
             })
             return out
+    # 1b. R453-LEAN-CORE adaptive admission — the expensive stages are
+    #     admitted only when the run has something for them to work on:
+    #     (i)  SYNTHESIZE must have run at the requested capability (a
+    #          CHEAP_EMERGENCY_FALLBACK synthesis is not an ok synthesis);
+    #     (ii) a retained candidate must exist for the stages that
+    #          consume one (MECHANISM_SPACE itself only needs the
+    #          synthesized primary + verified evidence — it CREATES the
+    #          retained set). ADJUDICATION/CLASSIFY never hit this rule
+    #          (terminal classifiers; the honest UNKNOWN state must stay
+    #          reachable).
+    if stage in ADAPTIVE_ADMISSION_STAGES and env is not None:
+        cap = synthesis_capability_state(env)
+        if cap["state"] == "CAPABILITY_INSUFFICIENT":
+            out.update({
+                "entry_status": "SKIPPED",
+                "prerequisite": "SYNTHESIS_AT_REQUESTED_CAPABILITY",
+                "skip_reason": (
+                    "SYNTHESIS_CAPABILITY_INSUFFICIENT: the synthesis "
+                    "call was served by a CHEAP_EMERGENCY_FALLBACK model "
+                    "on a STRONG request — a degraded synthesis is not "
+                    "an ok synthesis, and this stage's compute would be "
+                    "ceremony on a pseudo-invention (R453-LEAN-CORE "
+                    "fail-closed; Art. IV/XVIII)"),
+                "prerequisite_evidence": cap,
+            })
+            return out
+        if stage != "MECHANISM_SPACE":
+            facts = retained_candidate_facts(env)
+            if not facts["retained"]:
+                out.update({
+                    "entry_status": "SKIPPED",
+                    "prerequisite": "RETAINED_CANDIDATE",
+                    "skip_reason": (
+                        "NO_RETAINED_CANDIDATE: zero mechanism-space "
+                        "candidates retained and the primary candidate's "
+                        "evidence verification did not pass — there is "
+                        "nothing to attack, rank, or design experiments "
+                        "for (R453-LEAN-CORE; attack is skippable only "
+                        "when there is nothing to attack)"),
+                    "prerequisite_evidence": facts,
+                })
+                return out
     # 2. verified-evidence prerequisite for expensive candidate
     #    generation (the grid / ensemble / mechanism-space sites call
     #    this helper with their stage names; the conductor's core stages

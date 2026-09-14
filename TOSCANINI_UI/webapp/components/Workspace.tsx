@@ -163,7 +163,16 @@ function ModelSurface({
           <div className="hero-honest" data-hero-render-unavailable>
             <div className="hero-honest-h">Technology model</div>
             <div className="hero-honest-body">
-              {renderAvailabilitySentence(renders)}
+              {renderAvailabilitySentence(renders, {
+                // R453-C2 merge: the geometry phrase is DERIVED from the
+                // recorded authority — never asserted (R452 B2, Art. XXVIII)
+                engineering_authority: (design?.engineering_authority ?? null) as
+                  | "ENGINEERING"
+                  | "CONCEPTUAL"
+                  | "UNKNOWN"
+                  | null,
+                conceptual: design?.conceptual,
+              })}
             </div>
           </div>
         ) : (

@@ -1,0 +1,143 @@
+{
+  "kind": "CODER_ROUND_RECORD",
+  "round": "R451-C2.5",
+  "title": "Final presentation authority hardening — persisted identity sovereignty, the absolute VISUAL_READY invariant, structural GLB validity, the legacy-payload rule, and the watchdog's independent dual report",
+  "date": "2026-09-13",
+  "author": "Coder 2 (presentation layer)",
+  "reviewer_provenance": "AI_REVIEW",
+  "directive": "Operator directive R451-C2.5 (Final Presentation Authority Hardening — deliberately narrow: seven required changes + live verification; no visual product expansion, no new 3D-model benchmark, no UI polish). Acceptance gate: R451-C2.5.",
+  "round_question": "Can the presentation boundary be reached through a projection (a forged geom.artifact_identity or generation), through a contradiction (visual_complete + CONCEPTUAL/UNKNOWN, lineage-vs-identity, a valid header over malformed structure), or through a legacy payload with a convincing render PASS — and still claim visual readiness?",
+  "answer": "NO — measured: certification traces to PERSISTED identity documents only; the VISUAL_READY state exists only behind the (visual_complete, ENGINEERING) invariant on BOTH layers; the GLB check proves structure, not just a header; a legacy payload can display only LEGACY_STATE_UNAVAILABLE; and the watchdog reports the observed join state and its typed verdict independently — a presentation-class finding is never a scientific rejection.",
+  "baseline": {
+    "branch": "r449-c2/visual-benchmark",
+    "head_at_round_start": "2cfd882796f00287a81f4cf5281de37de6a4bf4d",
+    "origin_verified": true,
+    "pr_head_verified": "PR #5 head == 2cfd8827 (API-verified, mergeable_state clean)",
+    "note": "HEAD == ls-remote origin branch tip (Art. XXII/XXIII verified live); origin/main independently verified at b1418f4a (unchanged — the branch's production path remains the owner merge of stacked PRs #4 -> #5 plus the Space redeploy at the merged SHA)",
+    "constitution": "v2.4.0 hash b54a1be9bcbdd2465d0b034e1e1f472f80b87174209c0d534b7d9e1223e649b2 == the recorded origin/main bytes, read IN FULL at round start; re-read IN FULL immediately before the round commit (the twice-read rule)",
+    "pre_read_correction": "the inherited conversation summary claimed C2.1-C2.4 were unimplemented; the git history proved all four rounds delivered (Art. XXIV: the artifact wins over the summary) — the C2.4 round record EXISTS and was read in full as the directive required"
+  },
+  "implemented": {
+    "req_1_no_frontend_state_inference": {
+      "what": "the pre-C2.1 legacy fallback is REPLACED by the legacy-payload rule: a projection with no typed geometry_state whose geometry/render claims exist only as raw fields (availability / glb route / render status / gate verdict) resolves ONLY to the new explicit NON-CURRENT state LEGACY_STATE_UNAVAILABLE (the presentation vocabulary closes at eight). The branch reads NO payload field — its existence IS the legacy fact — so the four forbidden states (VISUAL_READY / GEOMETRY_READY_RENDER_BLOCKED / TECHNOLOGY_NOT_ESTABLISHED / SCIENTIFIC_REJECTION) are structurally unreachable from a legacy payload. The C2-era frontend GATE_PASS_VERDICTS set is DELETED (Art. LXIV): the browser no longer reads gate verdicts at all. TechStage renders the legacy state as its own hero (no model, no viewer from legacy fields) with its own stage label.",
+      "files": [
+        "TOSCANINI_UI/webapp/lib/presentationState.ts",
+        "TOSCANINI_UI/webapp/components/TechStage.tsx"
+      ]
+    },
+    "req_2_visual_ready_absolute_invariant": {
+      "what": "the VISUAL_READY invariant is ABSOLUTE: the state exists ONLY when geometry_state == visual_complete AND engineering_authority == ENGINEERING. The contradiction pairs (visual_complete + CONCEPTUAL, visual_complete + UNKNOWN, visual_complete + absent authority) fail closed to the NON-READY typed state GEOMETRY_READY_RENDER_BLOCKED with the new cause visual_authority_not_engineering (the cause vocabulary closes at ten) — the STATE itself is not ready, not merely the badge. 'Technology ready' remains produced exactly once behind the ENGINEERING guard (the second lock). The backend evaluator already refuses to announce visual readiness without the explicit ENGINEERING authority (the join is undecided for CONCEPTUAL/UNKNOWN) — the frontend is the layer where the pair is reachable, and it now refuses too.",
+      "files": [
+        "TOSCANINI_UI/webapp/lib/presentationState.ts",
+        "TOSCANINI_UI/webapp/components/TechStage.tsx"
+      ]
+    },
+    "req_3_persisted_identity_sovereignty": {
+      "what": "certified_canonical_glb certifies through PERSISTED documents only: DESIGN_LINEAGE.json's current-generation entry or ARTIFACT_IDENTITY.json (glb_path). The projection's carried geom.artifact_identity object is DIAGNOSTIC ONLY — it can never name the artifact, never supply a certifying SHA, never state the authority class, and never anchor the current generation (a forged geom object carrying a complete artifact identity certifies nothing when the persisted document is absent — attack 1). The current-generation anchor is persisted: the lineage current entry's own generation_id when recorded, else the persisted identity's generation_id; the projection's generation field is a contradiction diagnostic whose disagreement fails the certification CLOSED (never anchors). evaluate_geometry_contract mirrors the split: authority classes read the persisted identity, the PERSISTED BRIDGE_REPORT.json class fields, and the CAD ledger — the projection's carried class is removed from the authority sources; projection-carried SHAs remain contradiction-only checks (they can fail closed, never certify).",
+      "files": [
+        "toscanini/visual_join.py"
+      ]
+    },
+    "req_4_structural_glb_validation": {
+      "what": "OPTION (a) chosen: glb_format_check is upgraded from a header check to INDEPENDENT STRUCTURAL VALIDATION — the header (magic, version 2, declared length == file size) AND the chunk framing (every chunk's 8-byte sub-header fits; the first chunk is the JSON chunk; no chunk overruns the container; a BIN chunk is 4-byte aligned) AND the JSON structure (the JSON chunk parses as a JSON object carrying asset.version == \"2.0\"). A valid header over malformed internal structure (BIN first chunk, corrupt JSON, chunk overrun, missing asset version) FAILS. The contract wording is honest about scope: container-level structural validity (header + framing + JSON) — the semantic render verification remains the Visual Quality Gate's rendered measurement (Article LXXII); mesh/buffer semantics are not claimed.",
+      "files": [
+        "toscanini/visual_join.py"
+      ]
+    },
+    "req_5_adversarial_battery": {
+      "what": "tests/test_r451_c25_authority_boundary.py — the EIGHT directive attacks each proven to fail closed, plus the engineering positive control, the one-evaluator coupling, the watchdog dual-report proofs, and the byte-identical clean-state replay.",
+      "files": [
+        "tests/test_r451_c25_authority_boundary.py",
+        "scripts/r451_c2_ui_tests.mjs"
+      ]
+    },
+    "req_6_watchdog_dual_report": {
+      "what": "the watchdog report now carries the INDEPENDENT pair: observed_join_state (what THE evaluator observed, verbatim — an observation, never a verdict) and watchdog_verdict (the typed verdict: PASS / INTEGRITY_VIOLATION / JOIN_FAILURE_OBSERVED). Every violation carries its violation_class: RECORD_INVARIANT (R1-R9, or R10's announced-VISUAL_READY-vs-records coupling) vs JOIN_STATE_OBSERVATION (the evaluator's explicit non-ready states RELEASE_UNVERIFIED / RENDER_RECORD_MISSING / INVOCATION_MISSING — presentation-class findings). A presentation state is NEVER silently translated into a scientific rejection: the report's verdict vocabulary contains no scientific-rejection verdict at all (Art. LXI). The legacy verdict (PASS/FAIL) remains as the CLI exit-code projection, disclosed as such (Art. LXIV).",
+      "files": [
+        "scripts/r451_c2_watchdog.py"
+      ]
+    },
+    "req_7_live_verification": {
+      "what": "the deterministic adversarial suite, the UI battery, the visual and product regression families, the consumer sweep, tsc, the production build, and the clean-state replay all ran this round; the branch was pushed and the remote state verified (ls-remote + PR head API probe). Production delivery is NOT claimed: the Art. LXXI tuple stays BLOCKED on the owner merge of stacked PRs #4 -> #5 plus the canonical Space redeploy at the merged SHA. An upstream transport block remains a transport block.",
+      "files": []
+    }
+  },
+  "supersessions": {
+    "disposition": "recorded per Art. LXIV; every superseded expectation is disclosed in its test docstring or comment; no superseded implementation left live",
+    "items": [
+      "the C2.4-era frontend legacy fallback (raw renders/gate reads -> GEOMETRY_READY_RENDER_BLOCKED[legacy_render_unverified]) -> the LEGACY_STATE_UNAVAILABLE branch (no raw reads, no current state); the C2-era GATE_PASS_VERDICTS frontend set DELETED",
+      "the C2.4-era UI mapping (visual_complete -> VISUAL_READY with an authority-carrying badge) -> the absolute invariant (VISUAL_READY only on ENGINEERING; CONCEPTUAL/UNKNOWN/absent -> visual_authority_not_engineering)",
+      "the C2.4-era certification's acceptance of the projection-side geom.artifact_identity as a naming/SHA/generation source -> persisted documents only, projection demoted to diagnostic",
+      "the C2.4-era glb_format_check (header-only) -> structural validation (chunk framing + JSON structure); the certification wording upgraded from 'valid glTF 2.0 container' to 'structurally valid glTF 2.0 binary'",
+      "the watchdog report's join_state field -> observed_join_state (renamed, one derivation, consumers updated in the same change); the verdict FAIL fold-all -> the typed watchdog_verdict with violation classes; the PASS/FAIL field kept as the disclosed CLI projection",
+      "the C2.4-era UI battery checks for the legacy fallback and the CONCEPTUAL/UNKNOWN VISUAL_READY mappings -> superseded in-file with disclosure comments (the properties they protected — never-ready, authority-carried — are preserved and strengthened)",
+      "the C2.4-era UI battery fixtures that relied on untyped raw-field shapes -> typed fixtures (a current backend payload carries the typed state + cause + authority)"
+    ]
+  },
+  "batteries": {
+    "new_c25_battery": "tests/test_r451_c25_authority_boundary.py — 21 passed: the EIGHT directive attacks (1 projection identity forged / persisted identity absent — the forged complete geom.artifact_identity certifies NOTHING and is reported as a diagnostic; 2 projection generation forged / canonical generation absent — the projection never anchors, and a contradiction fails closed; 3 visual_complete + CONCEPTUAL — the join never announces it, the strip never RECEIVES; 4 visual_complete + UNKNOWN — geometry_unverified, join undecided; 5 lineage points A / identity points B — the persisted SHA contradiction fails closed; 6 valid header / malformed internal structure — BIN-first, corrupt JSON, chunk overrun, missing asset.version, and the certification-level shape with re-recorded SHAs all fail; 7 two GLBs / only one identity-named — only the named artifact certifies, the decoy alone never does; 8 legacy payload + convincing render PASS — the mapping source pin + the behavioral UI battery) each fail closed, plus: the positive control (the complete ENGINEERING chain reaches geometry_available + ENGINEERING + VISUAL_READY + 'Technology ready', the watchdog PASSes it, real containers pass the structural check incl. a JSON+BIN two-chunk GLB), the one-evaluator coupling (dossier == watchdog on golden/forged/structural/decoy fixtures), the dual-report proofs (RELEASE_UNVERIFIED -> JOIN_FAILURE_OBSERVED with a clean violation-class split and no scientific-rejection verdict anywhere), and the byte-identical clean-state replay",
+    "r451_family": "test_r451_c2_blocked_state 20 + test_r451_c21_states 29 + test_r451_c22_join 61 + test_r451_c23_identity_chain 30 + test_r451_c24_certification 35 + test_r451_c25 21 = 196 passed (the C2.4 frontend-vocabulary source pin superseded in-file with disclosure)",
+    "visual_family": "r441 + r443 + r444 + r446 = 83 passed == the recorded pristine baseline (the first combined run produced a failure cluster that passed identically in isolation and on re-run — the BS-020 environment class the C2.3/C2.4 records disclosed; disclosed again)",
+    "product_family": "r447 x5 + r420 + r430 + r419 product surface = 161 passed, 7 skipped, 1 failure (test_falsification_dossier_on_killed_generation) git-stash-verified IDENTICAL at the pristine baseline (the standing BS-020 pair, disclosed)",
+    "consumer_sweep": "a-series/campaign-bridge/dossier-bridge/e15/e16/forensic-hardening/l8/r375 x2 = 136 passed; test_r436's 4 failures git-stash-verified identical at the pristine baseline (pre-existing, BS-020, disclosed); test_r419_english_only green (the new artifacts are English-only, Art. LXX)",
+    "ui_battery": "scripts/r451_c2_ui_tests.mjs — 73 checks ALL PASS (the legacy-payload matrix incl. the convincing-PASS attack; the absolute VISUAL_READY invariant incl. the ABSENT-authority defensive case; ten causes -> ten distinct sentences; the closed eight-state vocabulary; the superseded C2.1-C2.4 fixtures re-typed with disclosure comments)",
+    "build": "tsc --noEmit clean; next build green",
+    "clean_state_replay": "the evaluator and watchdog reports are byte-identical across repeated evaluations of the same bytes (asserted in the battery)"
+  },
+  "boundary_compliance": {
+    "coder1_ownership_untouched": "the CAD pipeline, the bridge, the package compiler, the Visual Quality Gate, the visual-set ladder, the render-record schema, the invocation receipt writer, and CadQuery/OCCT authority are consumed, never modified; no alternative geometry authority introduced; no new 3D-model benchmark; no aesthetic work; the Visual Gate remains release-chain rung 5",
+    "structural_pins": "the legacy branch reads no payload field (source-pinned); the mapping produces VISUAL_READY exactly once, behind the ENGINEERING guard; 'Technology ready' is produced exactly once behind the same authority; the cause vocabulary is closed at ten and the state vocabulary at eight; the certification's naming sources are the two persisted documents only (source-read); the watchdog defines no second state machine and imports THE evaluator's vocabulary",
+    "honest_limitation": "the structural GLB check proves container-level structure (header + chunk framing + JSON) and does not validate mesh/buffer semantics — that remains the Visual Quality Gate's rendered measurement (Article LXXII); the wording claims exactly what is proven"
+  },
+  "acceptance_gate": {
+    "full_constitution_read_before_coding": true,
+    "full_constitution_reread_before_final_commit": true,
+    "governance_and_active_path_and_prior_round_record_read": true,
+    "no_frontend_current_state_from_legacy_payload": true,
+    "legacy_payload_state_is_explicitly_non_current": true,
+    "visual_ready_requires_visual_complete_and_engineering": true,
+    "contradiction_pairs_fail_closed_to_non_ready_typed_state": true,
+    "state_itself_not_ready_not_merely_badge": true,
+    "persisted_identity_documents_are_the_only_certification_authority": true,
+    "projection_identity_and_generation_are_diagnostic_only": true,
+    "current_generation_anchor_is_persisted": true,
+    "structural_glb_validation_implemented": true,
+    "certification_wording_claims_exactly_what_is_proven": true,
+    "all_eight_directive_attacks_fail_closed": true,
+    "engineering_positive_control_reaches_visual_ready": true,
+    "watchdog_reports_observed_join_state_and_verdict_independently": true,
+    "release_unverified_never_translates_to_scientific_rejection": true,
+    "clean_state_deterministic_replay_passes": true,
+    "no_scope_expansion": true,
+    "c1_c2_boundary_unchanged": true,
+    "delivery_state_honestly_blocked_until_merge_and_deployment": true
+  },
+  "honest_notes": [
+    "the C2.4-era UI battery fixture shapes (untyped raw-field payloads) were superseded to typed shapes with in-file disclosure comments — the untyped shapes now land on LEGACY_STATE_UNAVAILABLE by design, which is exactly the directive's rule",
+    "the watchdog verdict precedence: when a run produces BOTH a record-invariant violation and a join observation, watchdog_verdict reads INTEGRITY_VIOLATION (the stricter class) while both findings remain listed with their own violation_class — no finding is ever hidden",
+    "the certification-level generation-contradiction check (a projection generation disagreeing with the persisted identity) preserves the C2.4 battery's wrong-generation attack semantics under the new persisted-anchor rule — the projection may deny, never establish",
+    "the first visual-family combined run failed a cluster that passed in isolation and on re-run (BS-020 environment class, identical to the disclosed C2.3/C2.4 phenomenon); every other red in this round was stash-verified pre-existing"
+  ],
+  "production_deployment": {
+    "target_sha": "697d1ebf6999dc68ebe3ee04b20433a261f72a9c",
+    "deployed_sha": null,
+    "deploy_id": null,
+    "health_check_result": "BLOCKED",
+    "drift": "UNKNOWN",
+    "blocked_by": "the branch's production path is the owner merge of stacked PRs #4 -> #5 plus the canonical Space redeploy at the merged SHA (unchanged owner path); a Coder-2 push does not deploy",
+    "what_unblocks": "owner merges the stacked lab PRs and redeploys the canonical Space at the merged SHA"
+  },
+  "round_commit_sha": "697d1ebf6999dc68ebe3ee04b20433a261f72a9c",
+  "delivery_closure": {
+    "pushed": true,
+    "branch": "r449-c2/visual-benchmark",
+    "push_range": "2cfd8827..697d1ebf",
+    "round_commit": "697d1ebf6999dc68ebe3ee04b20433a261f72a9c",
+    "branch_tip": "697d1ebf6999dc68ebe3ee04b20433a261f72a9c",
+    "ls_remote_verified": true,
+    "pr_head_synced": "PR #5 head == 697d1ebf (API-verified, mergeable_state clean)",
+    "origin_main_unchanged": "b1418f4a (the branch's production path remains the owner merge of stacked PRs #4 -> #5 plus the Space redeploy at the merged SHA)",
+    "credential_handling": "BS-021: the PAT was used transiently from the session context for git push / ls-remote / the PR-head API probe only; it is written to NO tracked file; rotation remains the operator's standing action",
+    "constitution": "v2.4.0 hash b54a1be9bcbdd246... read IN FULL at round start and re-read IN FULL immediately before the round commit 697d1ebf (both reads recorded in the worklog)"
+  }
+}

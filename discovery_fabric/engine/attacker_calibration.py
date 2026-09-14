@@ -117,6 +117,30 @@ INSTRUMENT_MEASUREMENTS = {
         "seal": (REPO / "R447" / "ATTACKER_V2_RECALIBRATION" /
                  "SEAL.json"),
     },
+    # R450 §10: v2.1.0 adds the INTERVENTION suggestion output — an
+    # ADDITIVE, NON-VERDICT field. The KILL/RISK/SURVIVE/ABSTAIN
+    # verdict logic, the grounding check, and the demotion rules are
+    # byte-identical to 2.0.0; the suggestions carry no verdict
+    # authority (GROUNDED_INTERVENTION is a directional-loop SEED,
+    # still subject to the DirectionalHypothesis ground gate; an
+    # UNGROUND_SUGGESTION never enters the hypothesis space). The
+    # measurement binding is INHERITED from the R447 v2.0.0
+    # measurement with the delta disclosed — the derived state (the
+    # bars unmet: FPR 1.0 measured on the frozen corpus) carries
+    # forward unchanged: the negative knowledge is preserved and the
+    # calibration discipline is NOT weakened to produce improvement
+    # suggestions (the directive's explicit constraint).
+    "independent_attack/2.1.0": {
+        "measurement": (REPO / "R447" / "ATTACKER_V2_RECALIBRATION" /
+                        "MEASUREMENT.json"),
+        "seal": (REPO / "R447" / "ATTACKER_V2_RECALIBRATION" /
+                 "SEAL.json"),
+        "inherited_from": "independent_attack/2.0.0",
+        "inheritance_basis": (
+            "verdict logic byte-identical; additive non-verdict output "
+            "only (intervention suggestions); the NOT_CALIBRATED state "
+            "derives identically from the R447 measurement"),
+    },
 }
 
 

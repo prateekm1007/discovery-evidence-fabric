@@ -269,6 +269,23 @@ def _collect_payload() -> Dict[str, Path]:
         for f in sorted(_fx_dir.iterdir()):
             if f.is_file() and f.suffix == ".jsonl":
                 payload[f"{_wfx.FORENSICS_DIRNAME}/{f.name}"] = f
+    # R451-C1.3: the MODEL_ROUTING_LEDGER rides the SAME durable push —
+    # run-level routing provenance that lives only inside the ephemeral
+    # container is provenance that dies with it (the R421 P0 lesson,
+    # applied to the transport authority: the ledger is the evidence
+    # base for isolating a run's calls by run_id on production, and the
+    # capability store is the admission authority's replayable state).
+    _routing_dir = REPO_ROOT / "ENGINE_RUNS" / "model_routing"
+    _ledger_file = _routing_dir / "ledger.jsonl"
+    if _ledger_file.exists():
+        payload["model_routing/ledger.jsonl"] = _ledger_file
+    _routing_state = _routing_dir / "state.json"
+    if _routing_state.exists():
+        payload["model_routing/state.json"] = _routing_state
+    _cap_state = (REPO_ROOT / "ENGINE_RUNS" / "transport_capability"
+                  / "capability_state.json")
+    if _cap_state.exists():
+        payload["transport_capability/capability_state.json"] = _cap_state
     for s in store.list_sessions():
         rd = s.get("run_dir")
         if not rd or s.get("origin") != "toscanini_ui":

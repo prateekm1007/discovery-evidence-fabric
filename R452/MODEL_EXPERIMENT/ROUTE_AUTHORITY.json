@@ -1,0 +1,53 @@
+{
+ "artifact_type": "R452_MODEL_EXPERIMENT_ROUTE_AUTHORITY",
+ "measured_at": "2026-09-13T18:32:55+00:00Z",
+ "directive": "the operator's model survey (2026-09-14): three recommended experiment paths \u2014 local open-weight GLM-5.2, HF-hosted GPT-OSS-120B, OpenRouter GPT-4o \u2014 each measured live here; the A3 escalation's unblock paths exercised as an experiment, never a deployed-policy change",
+ "survey_paths_measured": {
+  "hf_hosted_inference": {
+   "path": "HF Inference router (router.huggingface.co)",
+   "token_present": true,
+   "catalog_models": 144,
+   "catalog_free_models": 0,
+   "gpt_oss_120b_probe": "HTTP 402: {\"error\":\"You have depleted your monthly included credits. Purchase pre-paid credits to continue using Inference Providers.\"}",
+   "verdict": "ZERO_COST_UNAVAILABLE \u2014 the account's monthly included credits are depleted and the live catalog lists ZERO is_free models; every router route bills (the R450 402 state, re-measured live this session)"
+  },
+  "local_open_weight_glm_5_2": {
+   "path": "local GGUF (unsloth/GLM-5.2-GGUF dynamic 2-bit ~239 GB disk / 24-32 GB GPU class, per the survey)",
+   "measured_host": {
+    "mem_total_kb": "4138560 kB",
+    "cpus": 2,
+    "gpu": "ABSENT (no nvidia-smi; no /dev/nvidia*)",
+    "disk_free_gb": 3.6
+   },
+   "verdict": "STRUCTURALLY_INFEASIBLE on this host \u2014 the survey's own minimum (24-32 GB GPU + ~256 GB RAM + ~250 GB disk) is not present; recorded, not narrated"
+  },
+  "openrouter_paid": {
+   "path": "OpenRouter (gpt-4o class, per the survey)",
+   "verdict": "EXCLUDED_BY_THE_ZERO_COST_CONTRACT \u2014 the survey itself marks it 'not free'; no paid route is ever called by this experiment (the structural key-stripping in arm_env)"
+  }
+ },
+ "operative_route": {
+  "sandbox_zai_grant": {
+   "provider": "zai (sandbox gateway, scripts/zai_gateway.mjs)",
+   "cost_basis": "ENVIRONMENT_GRANT",
+   "quality_tier": 2,
+   "pre_reset_measurement": "served glm-4-plus at ~0.7-1.7 s per call with FIELD-line compliance (measured live 2026-09-13 ~17:36-17:54 UTC, before the reset)",
+   "post_reset_measurement": "DEAD \u2014 the z-ai SDK returns 401 'missing X-Token': the platform-provisioned session token was wiped by the environment reset and /etc/.z-ai-config was re-created without it (root-owned, read-only; a manual X-Token probe returns 401 'invalid X-Token' \u2014 the real token value exists and is not recoverable from this session). Re-measured live; infrastructure failure, never scientific (Art. LXI)"
+  },
+  "arm2_self_hosted_4b": {
+   "provider": "localqwen (second pinned llama-server, port 8791)",
+   "model": "Qwen/Qwen3-4B Q4_K_M (gguf sha256 fbe1d5ed\u2026, bartowski build, revision-pinned)",
+   "cost_basis": "ZERO_PAID_COST_SELF_HOSTED",
+   "policy": "ZERO_PAID_COST (the SAME deployed default as the baseline \u2014 the model weights are the ONLY variable)",
+   "honest_scope": "NOT the elite class the survey targeted (GLM-5.2 / GPT-OSS-120B / GPT-4o); this arm measures whether ONE self-hosted capability step (1.7B -> 4B, same family, same Q4_K_M discipline) changes the discovery chain. The elite-class comparison stays open with the A3 escalation's operator unblock paths (fund HF credits / supply the tokenrouter key / restore the sandbox grant token)",
+   "operator_logic_cited": "the survey's Model-Selection Logic Flowchart: 'If RAM is insufficient, apply 4-bit/8-bit quantization (llama.cpp or bitsandbytes) and retry'",
+   "gguf_sha256_verified": true
+  },
+  "baseline_route": {
+   "provider": "localqwen",
+   "model": "Qwen/Qwen3-1.7B Q4_K_M (gguf sha256 72c5c3cb\u2026, revision-pinned)",
+   "cost_basis": "ZERO_PAID_COST_SELF_HOSTED",
+   "quality_tier": 4
+  }
+ }
+}

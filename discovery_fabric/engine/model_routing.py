@@ -144,11 +144,21 @@ PINNED_MODEL_FAMILIES: Dict[str, List[str]] = {
         r"^z-ai/glm",
     ],
     "zai": [
+        # R451: the zai default rung now names the env-contract model
+        # zai-org/GLM-5.3 (the stale glm-4-plus id is retired); the
+        # family pattern admits both the bare glm- ids and the
+        # zai-org/GLM namespace — ONE GLM family, two hosting prefixes
         r"^glm-",
+        r"^zai-org/GLM",
     ],
     "tokenrouter": [
         r"^z-ai/glm",
         r"^glm-",
+    ],
+    # R451: the self-hosted local baseline (llama.cpp serves the alias
+    # 'qwen3-1.7b' — the Qwen3 family on local weights)
+    "localqwen": [
+        r"^qwen3-",
     ],
 }
 
@@ -181,9 +191,27 @@ PINNED_DEFAULT_MODELS: Dict[str, List[Dict[str, Any]]] = {
          "cost_class": 2, "latency_class": 2, "context_limit": 128000},
     ],
     "zai": [
-        {"model": "glm-4-plus",
+        # R451: the glm-4-plus rung is REMOVED — the R450-recorded engine
+        # defect (the HF router answers model_not_found for the stale paid
+        # id, classified INVALID_RESPONSE). The rung now names the env-
+        # contract model the R447 deployment actually serves; under
+        # MODEL_COST_POLICY=ZERO_PAID_COST the whole provider is ineligible
+        # anyway (ENVIRONMENT_GRANT / credit-router) — the rung exists for
+        # UNRESTRICTED operation only, recorded, never silent.
+        {"model": "zai-org/GLM-5.3",
          "task_capabilities": [TASK_STRONG, TASK_FAST, TASK_CHEAP],
          "cost_class": 1, "latency_class": 1, "context_limit": 128000},
+    ],
+    "localqwen": [
+        # R451 §1-2: the zero-paid local baseline — self-hosted
+        # Qwen/Qwen3-1.7B Q4_K_M via llama.cpp llama-server (CPU).
+        # HONEST classes: strong it is NOT (a 1.7B model is not a
+        # world-class scientific reasoner); fast it is NOT (measured
+        # 6.3 tok/s on 2 vCPU). It is CHEAP (zero paid cost) and it is
+        # the ONLY rung eligible under MODEL_COST_POLICY=ZERO_PAID_COST.
+        {"model": "qwen3-1.7b",
+         "task_capabilities": [TASK_CHEAP],
+         "cost_class": 1, "latency_class": 4, "context_limit": 32768},
     ],
     "tokenrouter": [
         {"model": "z-ai/glm-5.3-free",
@@ -248,7 +276,15 @@ def discover_catalog(provider_id: str,
     is TTL-cached on disk (catalog/<provider>.json) so a process restart
     does not re-fetch, and intersected with the pinned family allowlist.
     Discovery failure is DISCLOSED (status UNDISCOVERED + error) and the
-    pinned default models stand in — never silent, never fatal."""
+    pinned default models stand in — never silent, never fatal.
+
+    R451-C1.6 (MODEL_NOT_FOUND recovery): when a FRESH catalog fetch
+    lists a model previously marked known-dead (GONE /
+    MODEL_NOT_FOUND), the dead mark is CLEARED and the recovery event
+    is recorded in the routing state (recovered_models, append-only) —
+    deterministic: 404 -> mark dead -> fresh catalog lists the model ->
+    mark cleared -> the model is eligible again. A TTL cache hit does
+    NOT clear marks (only a fresh fetch is evidence of relisting)."""
     base = _provider_base_url(provider_id)
     if not base:
         return {"provider": provider_id, "status": "NO_BASE_URL",
@@ -283,6 +319,10 @@ def discover_catalog(provider_id: str,
             "models": eligible[:60],
             "discovered_via": url,
         }
+        # R451-C1.6: a fresh catalog listing is the evidence that a
+        # previously-dead identifier is served again — clear the mark,
+        # record the recovery (deterministic, append-only state).
+        _clear_known_dead_if_relisted(provider_id, raw)
     except Exception as exc:  # noqa: BLE001 — disclosed, never fatal
         out = {
             "provider": provider_id,
@@ -394,6 +434,18 @@ LEDGER = RoutingLedger()
 # Routing state: the GONE model set (known-dead from the provider's own
 # 410 response — a recorded fact, never a heuristic)
 # ---------------------------------------------------------------------------
+def _provider_account_domain(provider_id: str) -> str:
+    """The economic account domain that pays for a provider's calls
+    (R451-C1.2). Declared on the ProviderSpec; UNDECLARED stays honest
+    (Art. XXV) — never guessed."""
+    try:
+        from .llm_registry import _SPEC_BY_ID
+        spec = _SPEC_BY_ID.get(provider_id)
+        return str(getattr(spec, "account_domain", "") or "UNDECLARED")
+    except Exception:  # noqa: BLE001 — registry not importable here
+        return "UNDECLARED"
+
+
 def _load_state() -> Dict[str, Any]:
     try:
         if STATE_PATH.exists():
@@ -405,15 +457,20 @@ def _load_state() -> Dict[str, Any]:
     return {}
 
 
-def mark_model_gone(provider: str, model: str) -> None:
-    """Record (provider, model) as GONE — the provider itself answered
-    410. The model is excluded from ladders until a fresh catalog lists
-    it again or a call succeeds; the PROVIDER stays eligible (Art. V)."""
+def mark_model_gone(provider: str, model: str,
+                    evidence: str = "provider responded HTTP 410 Gone on "
+                    "a live call") -> None:
+    """Record (provider, model) as known-dead — the provider itself
+    answered 410 GONE (retired) or model_not_found (the identifier is
+    permanently invalid on this route — R451-C1.2, the operator's
+    never-retry rule). The model is excluded from ladders until a fresh
+    catalog lists it again (R451-C1.6 clear_known_dead_if_relisted) or
+    a call succeeds; the PROVIDER stays eligible (Art. V)."""
     state = _load_state()
     gone = state.setdefault("gone_models", {})
     gone[f"{provider}::{model}"] = {
         "at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
-        "evidence": "provider responded HTTP 410 Gone on a live call",
+        "evidence": evidence,
     }
     try:
         STATE_PATH.parent.mkdir(parents=True, exist_ok=True)
@@ -422,6 +479,11 @@ def mark_model_gone(provider: str, model: str) -> None:
         pass
     # a GONE model is not in the live catalog by definition — refresh it
     clear_probe_cache(provider, model)
+    # R451-C1.3: the capability record is KEPT (a PROBE_FAILED record
+    # with the typed class is the honest evidence for the rung's skip
+    # hop); the dead-id ladder exclusion above is what actually removes
+    # the rung — and the C1.6 relist recovery invalidates the record so
+    # a relisted id re-probes immediately.
 
 
 def is_model_gone(provider: str, model: str) -> bool:
@@ -439,6 +501,62 @@ def clear_model_gone(provider: str, model: str) -> None:
                                              sort_keys=True))
         except Exception:  # noqa: BLE001
             pass
+
+
+# ---------------------------------------------------------------------------
+# R451-C1.6 — MODEL_NOT_FOUND recovery: a fresh catalog listing clears
+# the known-dead mark (deterministic relisting recovery)
+# ---------------------------------------------------------------------------
+def _clear_known_dead_if_relisted(provider: str,
+                                  fresh_catalog_models: List[str]) \
+        -> List[str]:
+    """When a FRESH catalog fetch lists a previously-dead model, clear
+    the dead mark and record the recovery event (append-only). Returns
+    the recovered model ids. The provider's own relisting is the
+    evidence — never a heuristic, never a timeout (Art. XXV).
+
+    The directive's exact deterministic sequence (test-pinned):
+        404 -> mark dead -> fresh catalog lists model -> dead mark
+        cleared -> model eligible again
+    """
+    recovered: List[str] = []
+    if not fresh_catalog_models:
+        return recovered
+    state = _load_state()
+    gone = state.setdefault("gone_models", {})
+    for mid in list(fresh_catalog_models):
+        key = f"{provider}::{mid}"
+        if key in gone:
+            del gone[key]
+            recovered.append(mid)
+    if recovered:
+        recov = state.setdefault("recovered_models", {})
+        for mid in recovered:
+            recov[f"{provider}::{mid}"] = {
+                "recovered_at": time.strftime(
+                    "%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+                "evidence": ("fresh catalog discovery lists the model "
+                             "again (R451-C1.6 clear_known_dead_if_"
+                             "relisted)"),
+            }
+        # the recovered model re-probes IMMEDIATELY (no TTL wait): the
+        # stale PROBE_FAILED record would refuse admission for up to the
+        # TTL window after the provider relisted the id
+        try:
+            from . import runtime_admission as _ra
+            for mid in recovered:
+                _ra.invalidate_capability(
+                    provider, mid,
+                    reason="relisted in a fresh catalog (R451-C1.6)")
+        except Exception:  # noqa: BLE001
+            pass
+        try:
+            STATE_PATH.parent.mkdir(parents=True, exist_ok=True)
+            STATE_PATH.write_text(json.dumps(state, indent=1,
+                                             sort_keys=True))
+        except Exception:  # noqa: BLE001 — best-effort, disclosed via
+            pass                  # the catalog state report
+    return recovered
 
 
 # ---------------------------------------------------------------------------
@@ -594,11 +712,26 @@ class ModelRecord:
 
 
 def _catalog_records(provider_id: str) -> List[ModelRecord]:
+    """R451-C1.5 (stop using stale defaults after successful catalog
+    discovery) — the semantics are EXACTLY:
+
+        catalog DISCOVERED    -> only models actually present in the
+                                 catalog are eligible candidates (the
+                                 pinned defaults are NOT merged in — a
+                                 pinned-but-absent default is a stale
+                                 identifier and is never attempted
+                                 merely because it was once a default)
+        catalog UNDISCOVERED   -> the pinned defaults may be used,
+                                 explicitly marked PINNED_DEFAULT
+
+    The model-family allowlist STAYS (the pinned FAMILY policy, as
+    distinct from a pinned dead identifier — the directive's own
+    distinction). An empty DISCOVERED catalog honestly yields NO
+    records for the provider (Art. XXV: absence stays absence)."""
     cat = discover_catalog(provider_id)
     if cat.get("status") != "DISCOVERED":
         return []
     out: List[ModelRecord] = []
-    emitted: set = set()
     for mid in cat.get("models") or []:
         if is_model_gone(provider_id, mid):
             continue
@@ -612,19 +745,6 @@ def _catalog_records(provider_id: str) -> List[ModelRecord]:
             latency_class=(d["latency_class"] if d else 2),
             context_limit=(d["context_limit"] if d else 128000),
             source="CATALOG"))
-        emitted.add(mid)
-    # pinned defaults stay visible even when the live catalog is smaller
-    # (they are allowlist members; a 410 marks them GONE individually)
-    for d in PINNED_DEFAULT_MODELS.get(provider_id, []):
-        if d["model"] in emitted or is_model_gone(provider_id, d["model"]):
-            continue
-        out.append(ModelRecord(
-            provider=provider_id, model=d["model"],
-            task_capabilities=d["task_capabilities"],
-            cost_class=d["cost_class"],
-            latency_class=d["latency_class"],
-            context_limit=d["context_limit"],
-            source="PINNED_DEFAULT"))
     return out
 
 
@@ -672,10 +792,20 @@ def eligible_models(provider_id: str, task: str,
        (source=OPERATOR_PINNED) so an operator who has measured a
        working model routes the engine's very first attempt there
        instead of burning the cascade on paid models the account
-       cannot afford."""
+       cannot afford.
+
+    R451-C1.5: a DISCOVERED catalog yields ONLY catalog-present models
+    (even when the eligible set is empty); the pinned defaults stand
+    in ONLY when the catalog is UNDISCOVERED/NO_BASE_URL (explicitly
+    marked PINNED_DEFAULT). The old behavior — catalog discovered but
+    pinned stale models retained — is REMOVED (the directive's named
+    defect)."""
     pinned = _operator_pinned_model(provider_id)
-    recs = _catalog_records(provider_id) if catalog else []
-    if not recs:
+    if catalog:
+        cat_state = discover_catalog(provider_id).get("status")
+        recs = _catalog_records(provider_id) \
+            if cat_state == "DISCOVERED" else _pinned_records(provider_id)
+    else:
         recs = _pinned_records(provider_id)
     # batch/alternate endpoint variants are not chat endpoints
     recs = [r for r in recs if not r.model.endswith(
@@ -710,10 +840,13 @@ def all_models(provider_id: str) -> List[ModelRecord]:
     """The provider's models WITHOUT the task filter (the LAST_RESORT
     band's any-capability pool — same GONE exclusion, same sources).
     R418: batch/alternate endpoint variants are excluded here too —
-    they are not chat-completions endpoints (measured 404)."""
-    recs = _catalog_records(provider_id)
-    if not recs:
-        recs = _pinned_records(provider_id)
+    they are not chat-completions endpoints (measured 404).
+    R451-C1.5: same DISCOVERED/UNDISCOVERED semantics as
+    eligible_models (catalog-present models only when DISCOVERED;
+    PINNED_DEFAULT otherwise)."""
+    cat_state = discover_catalog(provider_id).get("status")
+    recs = _catalog_records(provider_id) \
+        if cat_state == "DISCOVERED" else _pinned_records(provider_id)
     return [r for r in recs if not r.model.endswith(
         (":batch", ":extended"))]
 
@@ -822,6 +955,16 @@ def build_ladder(task: str, role: Optional[str] = None,
             "latency_class": r.latency_class,
             "context_limit": r.context_limit,
             "source": r.source,
+            # R451-C1.4: the rung's DECLARED task capabilities travel on
+            # the rung so the degradation record (requested task vs the
+            # serving model's capability) is computed at call time
+            # without a second lookup.
+            "task_capabilities": list(r.task_capabilities),
+            # R451-C1.2: the economic account that actually pays for
+            # this rung — MODEL vs PROVIDER vs ACCOUNT are three
+            # different failure domains (operator directive); two
+            # providers on ONE account domain are NOT redundant.
+            "account_domain": _provider_account_domain(r.provider),
         })
 
     # round-robin: slot 0 of every provider, then slot 1 of every
@@ -891,15 +1034,55 @@ def record_call_outcome(provider: str, model: str, ok: bool,
                         estimated_cost: Optional[float] = None,
                         fallback_from: Optional[str] = None,
                         fallback_to: Optional[str] = None,
-                        error: str = "") -> None:
+                        error: str = "",
+                        # R451 §6 (provider routing observability): every
+                        # actual attempt carries its cost class, whether
+                        # THIS attempt's route was the selected one, and
+                        # the explicit reason a fallback followed — the
+                        # production record must reconstruct the exact
+                        # route with NO "models unavailable" summaries
+                        cost_class: Optional[str] = None,
+                        selected: Optional[bool] = None,
+                        fallback_reason: str = "",
+                        # R451-C1.3-3 (run-level routing provenance): the
+                        # operator's required per-call fields — every REAL
+                        # engine call inside an investigation carries
+                        # run_id, session_id, stage, provider, model,
+                        # attempt, task, cost basis, account domain,
+                        # failure class, fallback_from, fallback_to.
+                        # call_class separates RUN_OWNED discovery calls
+                        # from CAPABILITY_PROBE lines (which legitimately
+                        # carry run_id=None) and STANDALONE script calls.
+                        session_id: Optional[str] = None,
+                        engine_stage: Optional[str] = None,
+                        call_class: str = "STANDALONE",
+                        account_domain: Optional[str] = None,
+                        task_degradation: Optional[Dict[str, Any]] = None,
+                        capability_state: Optional[str] = None) -> None:
     """One ledger line per attempt. Updates model_health /
     provider_health / task_health (all derived from this same ledger —
     one authority, Art. X) and invalidates the probe cache on failure
-    (directive section 6)."""
+    (directive section 6).
+
+    R451-C1.3-3: the run-owned-call invariant is enforced HERE — a
+    call marked call_class=RUN_OWNED with a null run_id is a
+    provenance defect and raises (fail-closed: the record cannot be
+    written without its run identity; the caller fixes the call site,
+    never the ledger)."""
     import uuid
+    if call_class == "RUN_OWNED" and not (run_id or "").strip():
+        raise ValueError(
+            "run_owned_call => run_id != null (R451-C1.3-3 invariant): "
+            "the ledger refuses a run-owned line with no run identity "
+            f"(provider={provider}, model={model}, stage={stage})")
+    if account_domain is None:
+        account_domain = _provider_account_domain(provider)
     LEDGER.record({
         "request_id": request_id or f"req_{uuid.uuid4().hex[:12]}",
         "run_id": run_id,
+        "session_id": session_id,
+        "engine_stage": engine_stage,
+        "call_class": call_class,
         "stage": stage,
         "task": task,
         "provider": provider,
@@ -912,20 +1095,63 @@ def record_call_outcome(provider: str, model: str, ok: bool,
         "latency": int(latency_ms or 0),   # directive §16 field name
         "tokens": tokens,
         "estimated_cost": estimated_cost,
+        "cost_class": cost_class,
+        "account_domain": account_domain,
+        "selected": selected,
         "fallback_from": fallback_from,
         "fallback_to": fallback_to,
+        "fallback_reason": str(fallback_reason or "")[:240],
+        "task_degradation": task_degradation,
+        "capability_state": capability_state,
         "error": str(error)[:240],
     })
     if not ok:
         clear_probe_cache(provider, model)
         if failure_type == "GONE":
             mark_model_gone(provider, model)
+        elif failure_type == "MODEL_NOT_FOUND":
+            # R451-C1.2 (operator directive: never retry a permanently
+            # invalid model identifier): the provider's own response
+            # says this id is not served on this route. The same
+            # known-dead discipline as GONE — the provider's OTHER
+            # models stay eligible (Art. V).
+            mark_model_gone(
+                provider, model,
+                evidence="provider responded model_not_found (404 or "
+                         "error body) — the identifier is permanently "
+                         "invalid on this route (R451-C1.2)")
     else:
         if is_model_gone(provider, model):
             clear_model_gone(provider, model)
         probe_cache_put(provider, model, {
             "status": "HEALTHY", "latency_ms": int(latency_ms or 0),
             "ok": True})
+
+
+def ledger_for_run(run_id: str, tail: Optional[int] = None) \
+        -> List[Dict[str, Any]]:
+    """R451-C1.3-3: isolate ONE run's routing records from the
+    append-only ledger BY RUN ID — no time-window inference, no
+    ledger-tail assumption (the directive's acceptance: 'the evidence
+    must allow us to isolate this run's calls without relying on a
+    time window or ledger tail'). Reads the full ledger bytes (the
+    ledger is the authority, Art. X)."""
+    try:
+        if not LEDGER._path.exists():
+            return []
+        with LEDGER._path.open() as fh:
+            lines = fh.readlines()
+        out = []
+        for ln in lines:
+            try:
+                d = json.loads(ln)
+                if isinstance(d, dict) and d.get("run_id") == run_id:
+                    out.append(d)
+            except Exception:  # noqa: BLE001 — a torn line is skipped
+                pass
+        return out[-tail:] if tail else out
+    except Exception:  # noqa: BLE001
+        return []
 
 
 # ---------------------------------------------------------------------------

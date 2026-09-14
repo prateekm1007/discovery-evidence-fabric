@@ -62,10 +62,46 @@ def _boot_id() -> str:
 
 
 def _engine_commit() -> Optional[str]:
+    """R452 C5 (external audit) — MERGED UNION: the forensics ledger
+    must attribute every line to a deployed commit — the audit measured
+    `engine_commit: null` on ALL 509 lines including the 9 TERMINAL_STATE
+    events, so a failure can never be attributed to the deployed engine
+    (exactly what Article LXXI diagnosis needs on a blocked run).
+
+    Resolution order: the env-var pins first (cheap), then the CANONICAL
+    build-artifact identity (the same one-authority resolution the
+    server's /api/health consumes — `resolve_engine_commit` derives the
+    commit from the build artifact, never from the env expectation),
+    then the identity dict's engine_commit field, then the live git
+    head, then None (recorded honestly)."""
     for var in ("ENGINE_COMMIT", "BUILD_ARTIFACT_COMMIT", "RENDER_GIT_COMMIT"):
         val = os.environ.get(var)
         if val:
             return val
+    try:
+        from .artifact_identity import resolve_engine_commit
+        commit, _source = resolve_engine_commit()
+        if commit:
+            return commit
+    except Exception:  # noqa: BLE001 — identity resolution is best-effort
+        pass
+    try:
+        from . import artifact_identity
+        ident = artifact_identity.identity()
+        commit = ident.get("engine_commit")
+        if commit:
+            return commit
+    except Exception:  # noqa: BLE001 — identity resolution is best-effort
+        pass
+    try:
+        import subprocess
+        out = subprocess.run(
+            ["git", "rev-parse", "HEAD"], capture_output=True,
+            text=True, timeout=10).stdout.strip()
+        if out:
+            return out
+    except Exception:  # noqa: BLE001
+        pass
     return None
 
 

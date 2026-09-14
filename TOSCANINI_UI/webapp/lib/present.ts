@@ -45,6 +45,13 @@ import type {
   SessionDetail,
   UserStateView,
 } from "./present-types";
+// R453-C2 merge: the canonical single definitions live in the two pure
+// sibling libs — isTerminal in lib/presentationState.ts (one definition,
+// never two) and the render-availability notice in lib/renderAvailability.ts
+// (the R452 B2/B3/C7 authority-derived, null-safe version). present.ts
+// composes them; every component renders, never re-derives.
+import { isTerminal } from "./presentationState";
+import { renderAvailabilityNotice } from "./renderAvailability";
 
 export type {
   AskResponse,
@@ -60,17 +67,13 @@ export type {
 };
 
 // ---------------------------------------------------------------------------
-// run-status classification (mirrors toscanini/user_state.py + RunNarrative)
+// run-status classification — RE-EXPORT (R453-C2 merge): the canonical
+// isTerminal lives in lib/presentationState.ts (RunNarrative re-exports it
+// from there; one definition, never two). Ground truth unchanged:
+// toscanini/user_state.py + run status vocabulary.
 // ---------------------------------------------------------------------------
 
-export function isTerminal(status: string): boolean {
-  return (
-    status === "COMPLETE" ||
-    status === "INTERRUPTED" ||
-    status.startsWith("ERROR") ||
-    status.startsWith("RUN_BLOCKED")
-  );
-}
+export { isTerminal };
 
 // Infrastructure-blocked / dead-without-verdict statuses. Art. LXI: these
 // are NOT scientific verdicts and must never be presented as one.
@@ -634,34 +637,28 @@ export function deriveConversation(
 }
 
 // ---------------------------------------------------------------------------
-// presentation-only render availability (moved here so ONE module owns the
-// sentences; DossierSections delegates to this).
+// presentation-only render availability — DELEGATED (R453-C2 merge).
+// The sentence implementation lives in lib/renderAvailability.ts: the R452
+// external-audit version whose geometry phrase is DERIVED from the recorded
+// authority (a conceptual model is never described as engineering geometry,
+// Art. XXVIII), whose NOT_ATTEMPTED state is an explicit branch (never
+// silence), and which is null-safe by construction. The old copy here
+// asserted a blanket availability claim in every branch — the exact R452-B2
+// defect class; the merge removes it so ONE implementation serves every
+// surface. Callers pass the recorded geometry authority when they have it.
 // ---------------------------------------------------------------------------
 
-export function renderAvailabilitySentence(r: {
-  status?: string;
-  visual_gate?: { verdict?: string; hero_suppressed?: boolean };
-}): string {
-  const status = String(r.status ?? "");
-  if (status === "RENDER_SKIPPED_LOW_MEMORY") {
-    return "Engineering geometry available; visual rendering unavailable at current deployment capacity.";
-  }
-  if (status.startsWith("RENDER_SKIPPED")) {
-    return "Engineering geometry available; visual rendering unavailable in this deployment (renderer infrastructure unavailable).";
-  }
-  if (
-    r.visual_gate?.hero_suppressed ||
-    (r.visual_gate?.verdict != null &&
-      r.visual_gate.verdict !== "COMPLETE_PASS" &&
-      r.visual_gate.verdict !== "PASS")
-  ) {
-    return "Engineering geometry available; presentation renders are withheld — the visual quality gate did not certify them (fail-closed).";
-  }
-  return (
-    "Engineering geometry available; visual rendering unavailable on this run (" +
-    status +
-    ")."
-  );
+export function renderAvailabilitySentence(
+  r: {
+    status?: string;
+    visual_gate?: { verdict?: string; hero_suppressed?: boolean };
+  } | null | undefined,
+  geometry?: {
+    engineering_authority?: string | null;
+    conceptual?: boolean | null;
+  },
+): string {
+  return renderAvailabilityNotice(r, geometry);
 }
 
 // re-export the ask-response type consumer components already use

@@ -739,6 +739,27 @@ export interface DossierTab {
   contract?: Record<string, { status?: string; value?: unknown }> | null;
   recorded?: unknown;
   execution_note?: string;
+  // R451-C2.1: the typed geometry/visual state — the UI consumes THIS
+  // (backend-derived), never a missing-file inference
+  geometry_state?: string;
+  presentation_cause?: string | null;
+  geometry_state_detail?: string | null;
+  // R451-C2.2: the typed visual-join state + the artifact contract
+  // (both backend-derived; consumed verbatim, never re-derived)
+  visual_join_state?: string | null;
+  visual_join_detail?: string | null;
+  visual_join_cause?: string | null;
+  pending_render_job?: string | null;
+  geometry_contract?: Record<string, unknown> | null;
+  // R451-C2.3 §1/§2: the contract's ENGINEERING authority verdict and
+  // the two separated boundary states — ENGINEERING_GEOMETRY_READY
+  // (verified artifact + explicit engineering authority) and
+  // VISUAL_INPUT_READY (the canonical GLB contract the Visual
+  // Compiler consumes; a valid STEP never satisfies it by itself)
+  engineering_authority?: "ENGINEERING" | "CONCEPTUAL" | "UNKNOWN" | null;
+  engineering_geometry_ready?: boolean;
+  visual_input_ready?: boolean;
+  visual_input_basis?: string | null;
 }
 
 export interface FalsificationRecord {
@@ -769,4 +790,24 @@ export interface DossierBody {
     DossierTab
   >;
   falsification?: FalsificationRecord | null;
+  // R451-C2.1: the DISCOVERY PIPELINE strip projection (backend-derived)
+  pipeline?: PipelineStage[];
+}
+
+// R451-C2.1 — one row of the DISCOVERY PIPELINE strip. The status
+// vocabulary is backend-owned (toscanini/dossier.py::pipeline_projection);
+// the frontend renders it verbatim.
+// R451-C2.2 — `blocked_class` carries the typed blocked reason class
+// (VISUAL_GATE / PACKAGE_INTEGRITY / SCIENTIFIC / INFRASTRUCTURE /
+// JOIN_FAILURE / NOT_ATTEMPTED / RENDERER_UNAVAILABLE /
+// RELEASE_UNVERIFIED / VISUAL_INPUT) when the row is
+// stopped or paused — the directive's blocked-status disambiguation,
+// backend-owned and rendered verbatim.
+export interface PipelineStage {
+  key: string;
+  label: string;
+  status: "RECEIVED" | "IN_PROGRESS" | "NOT_REACHED" | "STOPPED" |
+    "PAUSED_INFRASTRUCTURE";
+  detail?: string | null;
+  blocked_class?: string | null;
 }

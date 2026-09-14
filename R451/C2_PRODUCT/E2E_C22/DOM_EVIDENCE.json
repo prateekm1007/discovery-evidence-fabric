@@ -1,0 +1,118 @@
+{
+ "artifact_type": "FRESH_BROWSER_DOM_EVIDENCE",
+ "round": "R451-C2.2 (canonical presentation-state integrity + automatic geometry-to-visual continuity)",
+ "captured_at_utc": "2026-09-13T00:10:00Z",
+ "method": "real engine server (python -m toscanini.server, :8788, engine_commit 83c06737 via /api/version) + production next build (next start, :3101) + headless Chrome (agent-browser), fresh page load per state; labeled PUBLIC fixture sessions (fixture=true, origin records it) removed after capture; sessions.json restored",
+ "live_join_proof": "BEFORE the terminal-record guard was added to the fixtures, the LIVE mechanical join auto-healed the seeded no-receipt fixture end to end: boot_render_recovery re-enqueued the async artifact build, the real Chromium renderer produced the full 23-artifact ladder, and the gate returned COMPLETE_PASS — the run honestly became VISUAL_READY with no human step (R451-C2.2 §5: GLB exists AND engineering geometry valid -> visual invocation occurs automatically, proven live). The captures below therefore seed a TERMINAL job record (or a live RUNNING pid) so the recovery sweep's own rule 4 keeps the seeded states authoritative; every seeded record is FIXTURE-labeled on disk.",
+ "states": {
+  "C22_not_attempted": {
+   "url": "/?run=tsr451c22notattemptedfixture",
+   "screenshot": "stateC22_not_attempted.png",
+   "dom_present": [
+    "ENGINEERING MODEL READY",
+    "Engineering model ready. Presentation render not yet started.",
+    "Model ready — render not started",
+    "data-render-blocked-ribbon",
+    "data-retry-presentation"
+   ],
+   "dom_absent": [
+    "Presentation renderer unavailable",
+    "Model rendered but did not pass",
+    "3D GEOMETRY UNAVAILABLE"
+   ],
+   "strip": {
+    "problem": "RECEIVED",
+    "evidence": "NOT_REACHED",
+    "mechanism": "NOT_REACHED",
+    "invention": "RECEIVED",
+    "engineering": "RECEIVED",
+    "visualization": "STOPPED[JOIN_FAILURE]",
+    "package": "STOPPED"
+   },
+   "note": "the no-silent-gap failure is VISIBLE: GLB ready + no invocation record + no pending job -> the strip stops the visualization row with blocked_class JOIN_FAILURE and the ribbon says the render was never started — never renderer absence"
+  },
+  "C22_infrastructure_skip": {
+   "url": "/?run=tsr451c22infraskipfixture",
+   "screenshot": "stateC22_infra_skip.png",
+   "dom_present": [
+    "ENGINEERING MODEL READY",
+    "Engineering model ready. Presentation rendering paused by infrastructure.",
+    "Model ready — rendering paused (infrastructure)",
+    "FIXTURE: free-plan memory floor — the typed infrastructure skip"
+   ],
+   "dom_absent": [
+    "Presentation renderer unavailable",
+    "Engineering model ready. Presentation render not yet started."
+   ],
+   "strip": {
+    "visualization": "PAUSED_INFRASTRUCTURE[INFRASTRUCTURE]"
+   },
+   "note": "R451-C2.2 §1: the infrastructure cause has its OWN sentence — distinct from renderer_unavailable and from not_attempted (receipt schema 1.1.0, invocation_status RENDER_SKIPPED_LOW_MEMORY)"
+  },
+  "C22_render_in_progress": {
+   "url": "/?run=tsr451c22renderinprogressfixture",
+   "screenshot": "stateC22_render_in_progress.png",
+   "dom_present": [
+    "ENGINEERING MODEL READY",
+    "Engineering model ready. Presentation render in progress.",
+    "Model ready — rendering in progress"
+   ],
+   "strip": {
+    "visualization": "IN_PROGRESS"
+   },
+   "note": "the explicit-pending join (INVOCATION_PENDING via the RUNNING async job record) renders IN_PROGRESS on the strip — never a silent wait, never a fake completion"
+  },
+  "C22_package_visual_gate_blocked": {
+   "url": "/?run=tsr451c22pkgvisualgatefixture",
+   "screenshot": "stateC22_pkg_visual_gate.png",
+   "dom_present": [
+    "Package",
+    "STOPPED",
+    "VISUAL_GATE",
+    "package build blocked — visual_gate: FIXTURE: the buyer release stays blocked until the visual gate passes (Article LXXII)"
+   ],
+   "dom_absent": [
+    "PAUSED — INFRASTRUCTURE (on the package row)"
+   ],
+   "strip": {
+    "package": "STOPPED[VISUAL_GATE]"
+   },
+   "note": "R451-C2.2 §4: a package whose release the Visual Quality Gate blocked (HERO_RELEASE_STATE.json release_blocked -> VISUAL_RELEASE_BLOCKED) reads STOPPED with the typed blocked_class VISUAL_GATE — never an infrastructure pause"
+  },
+  "A_blocked_regression": {
+   "url": "/?run=tsr451c2blockedfixture",
+   "screenshot": "stateA_regression.png",
+   "dom_present": [
+    "DISCOVERY PAUSED",
+    "No scientific conclusion was reached."
+   ],
+   "strip": {
+    "problem": "RECEIVED",
+    "evidence": "NOT_REACHED",
+    "mechanism": "NOT_REACHED",
+    "invention": "NOT_REACHED",
+    "engineering": "NOT_REACHED",
+    "visualization": "NOT_REACHED",
+    "package": "NOT_REACHED"
+   },
+   "note": "the R451-C2.1 directive strip is unchanged (regression green)"
+  },
+  "E_visual_ready_regression": {
+   "url": "/?run=tsr451c2successfixture",
+   "screenshot": "stateE_regression.png",
+   "dom_present": [
+    "Technology ready"
+   ],
+   "strip": {
+    "visualization": "RECEIVED",
+    "package": "STOPPED"
+   },
+   "note": "success regression green; the package row honestly reads STOPPED (the frontier reached engineering on a terminal run and no package record exists — the R451-C2.2 predicate, replacing the C2.1-era NOT_REACHED for this shape)"
+  }
+ },
+ "forbidden_phrases_global": [
+  "3D GEOMETRY UNAVAILABLE",
+  "Not established on this run. (for any run where an invention exists or infrastructure stopped it)"
+ ],
+ "reviewer_provenance": "AI_REVIEW"
+}

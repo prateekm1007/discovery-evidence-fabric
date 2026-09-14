@@ -1,0 +1,93 @@
+{
+ "artifact_type": "IMPROVEMENT_TRAJECTORY",
+ "schema_version": "trajectory/1.0",
+ "created_at": "2026-09-13T19:40:25+00:00",
+ "steps": [
+  {
+   "gen": 2,
+   "candidate_id": "inv:7fab3d2d89:gen1",
+   "failure_id": "diag:1f8da71487b93d25",
+   "diagnosis": {
+    "diagnosis_id": "diag:1f8da71487b93d25",
+    "cause": "UNDETERMINED"
+   },
+   "hypothesis": {
+    "hypothesis_id": "dh:1e31284aa2cef636f3b2",
+    "status": "REJECTED",
+    "target_variable": "openfoam_cases",
+    "gate": {
+     "gate_version": "directional_ground_gate/2.0",
+     "checks": [
+      {
+       "check": "G1_STRUCTURE",
+       "verdict": "PASS",
+       "basis": "all required fields present"
+      },
+      {
+       "check": "G2_DIAGNOSIS_RESOLVES",
+       "verdict": "PASS",
+       "basis": "causal_diagnosis_id='diag:1f8da71487b93d25' resolves to a recorded diagnosis (cause=UNDETERMINED)"
+      },
+      {
+       "check": "G3_MECHANISM_GROUNDED",
+       "verdict": "FAIL",
+       "basis": "the mechanism_affected/rationale share NO distinctive terms with the recorded diagnosis or the failed candidate's mechanism — the direction speaks about nothing that failed"
+      },
+      {
+       "check": "G4_PREDICTION_FALSIFIABLE",
+       "verdict": "FAIL",
+       "basis": "predicted_effect=present; falsifier=present but not measurable — an unfalsifiable direction is a wish, not a hypothesis"
+      },
+      {
+       "check": "G5_EVIDENCE_CLASS",
+       "verdict": "PASS",
+       "basis": "class=EVIDENCE_MISSING: 0 verified support bindings (span-verified); 4 unresolved ids; 0 ids with failed/absent spans; gaps=1 (gaps are NEVER equated with support — R451 §4)"
+      },
+      {
+       "check": "G6_TARGET_IN_DESIGN_STATE",
+       "verdict": "FAIL",
+       "basis": "the target_variable shares NO distinctive terms with the design's declared state (the failed candidate's mechanism/intervention, the problem's declared quantities, or the diagnosis basis) — the direction moves a variable the machine does not control"
+      },
+      {
+       "check": "G7_PREDICTION_INTERVENTION_COHERENT",
+       "verdict": "PASS",
+       "basis": "predicted observable coupled to the intervention: analysis, flow, physics"
+      },
+      {
+       "check": "G8_FALSIFIER_BINDS_PREDICTION",
+       "verdict": "PASS",
+       "basis": "the falsifier measures the predicted observable: analysis, flow, physics"
+      },
+      {
+       "check": "G9_CAUSAL_MEMORY",
+       "verdict": "PASS",
+       "basis": "no prior FALSIFIED direction repeats (the causal memory is clean for this (target_variable, direction))"
+      }
+     ],
+     "grounded": false,
+     "verdict": "REJECTED",
+     "evidence_class": "EVIDENCE_MISSING",
+     "evidence_resolution": {
+      "verified_ids": [],
+      "unresolved_ids": [
+       "e1bc2505b0872b9216c5842c4",
+       "c2216a182b0029a30152ccb5",
+       "e845b9d66bfa2257599a5167",
+       "e47bde2a3658274041fed551"
+      ],
+      "span_failed_ids": []
+     },
+     "adjudicated_at": "2026-09-13T19:40:25+00:00"
+    }
+   },
+   "mutation": null,
+   "observation": null,
+   "causal_update": null,
+   "rejection_note": "the ground gate rejected the direction; no mutation executed (R450 §4)",
+   "mode": "DIRECTIONAL",
+   "recorded_at": "2026-09-13T19:40:25+00:00"
+  }
+ ],
+ "note": "append-only: one step per (failure -> diagnosis -> direction -> mutation -> evaluation -> observation -> causal update) cycle; entries reference the canonical generation records by id — this file never duplicates invention state (no second canonical database)",
+ "last_appended_at": "2026-09-13T19:40:25+00:00"
+}

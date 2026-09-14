@@ -95,6 +95,48 @@ def classify(candidate: dict, evidence_verification: dict, prior_art: dict, adve
                 "verification_state": "NOT_EVALUATED"}
         issues = evidence_verification.get("issues") or []
         issue_text = "; ".join(str(i) for i in issues[:5]) or "no issues recorded"
+        # R452 (external audit B1 engine half, Art. LXI) — MERGED UNION of
+        # the Coder-2 branch and the canonical main implementations: the
+        # span-format issue classes are MODEL CAPABILITY failures — the
+        # generator could not produce the required citation FORMAT — not
+        # scientific verdicts about the candidate. Measured production
+        # consequence: 4/7 runs were recorded INVENTION_REJECTED with
+        # kill_reason "evidence verification failed: missing_source_span;
+        # mechanism_span_not_verbatim" purely because the tier-4 model
+        # cannot emit verbatim spans. Converting a capability failure
+        # into REJECTED manufactures negative knowledge from
+        # infrastructure (Art. XXI.3/XXV/LXI) and was the mechanism by
+        # which killed inventions reached buyer-facing surfaces. The
+        # honest outcome is the TYPED capability status
+        # INCOMPLETE_INFERENCE_FAILURE (the canonical main vocabulary,
+        # consumed by run.py) with failure_class INFRASTRUCTURE_CAPABILITY:
+        # promotion blocked AND adjudication blocked (the cemetery is NOT
+        # written — negative knowledge is never recorded from
+        # infrastructure), the run rerunnable on a capable route.
+        _CAPABILITY_ISSUES = {
+            "missing_source_span", "mechanism_span_not_verbatim",
+            "missing_mechanism_span", "missing_source_id",
+            "missing_source_hash",
+        }
+        capability_issues = [i for i in issues if str(i) in _CAPABILITY_ISSUES]
+        if issues and len(capability_issues) == len(issues):
+            return {
+                "epistemic_state": "OBSERVED",
+                "final_status": "INCOMPLETE_INFERENCE_FAILURE",
+                "failure_class": "INFRASTRUCTURE_CAPABILITY",
+                "reason": (
+                    "model output contract failure: evidence verification "
+                    f"could not be completed: {issue_text} — the proposer "
+                    "model did not emit a verbatim evidence-bound span / "
+                    "the required citation format; a MODEL CAPABILITY "
+                    "failure, never a scientific rejection (Art. LXI: "
+                    "infrastructure failure is not scientific rejection); "
+                    "the candidate remains unpromoted, adjudication is "
+                    "blocked, and the run is rerunnable on a capable route"),
+                "promotion_blocked": True,
+                "adjudication_blocked": True,
+                "verification_state": "EVALUATED_FAILED_CAPABILITY",
+            }
         return {"epistemic_state": "OBSERVED", "final_status": "REJECTED",
                 "reason": (f"evidence verification failed: {issue_text}"),
                 "promotion_blocked": True,

@@ -15,6 +15,8 @@
 
 import type { RunPhase, RunStateObject, SessionDetail, StageDigest } from "@/lib/types";
 import type { GenerationRecord, RunOutcome } from "@/lib/types";
+import { isTerminal } from "@/lib/presentationState";
+import { isBlockedStatus } from "@/lib/present";
 
 export const NARRATIVE_GROUPS: { heading: string; stages: string[] }[] = [
   { heading: "Understanding the problem", stages: [] },
@@ -360,15 +362,10 @@ export function OutcomeBanner({
   );
 }
 
-export function isTerminal(status: string): boolean {
-  return (
-    status === "COMPLETE" ||
-    status === "INTERRUPTED" ||
-    status.startsWith("ERROR") ||
-    status.startsWith("RUN_BLOCKED")  // R415: RUN_BLOCKED_TRANSPORT —
-    // infrastructure-blocked terminal, distinct from every verdict
-  );
-}
+// R451-C2: the canonical isTerminal lives in lib/presentationState.ts
+// (dependency-free, deterministically testable); the re-export below
+// keeps every component caller unchanged — one definition, never two.
+export { isTerminal };
 
 export default function RunNarrative({
   detail,
@@ -386,6 +383,23 @@ export default function RunNarrative({
 
   return (
     <div className="narrative" aria-live="polite">
+      {/* R453-C2 merge: the R451-C2 §10 journal banner, ported from the
+          retired DeepDive surface — an infrastructure stop renders here
+          too, so the technical record can never read as a scientific
+          verdict. The predicate is the presentation layer's blocked-state
+          classifier (one owner); the banner CSS (.jpb-*) is unchanged. */}
+      {isBlockedStatus(detail.status) && (
+        <div className="journal-paused-banner" data-journal-paused-banner>
+          <div className="jpb-title">PAUSED AT INFRASTRUCTURE</div>
+          <div className="jpb-line">
+            The investigation has not produced a scientific verdict.
+          </div>
+          <div className="jpb-line faint">
+            Earlier recorded events remain valid. Downstream stages were not
+            evaluated.
+          </div>
+        </div>
+      )}
       <PhaseProgression phases={runState?.phase_progression} />
 
       {/* R416: the live evolution line — "Developing architecture 3 ·

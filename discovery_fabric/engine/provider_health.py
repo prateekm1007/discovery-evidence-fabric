@@ -81,11 +81,25 @@ GONE = "GONE"                   # R415: HTTP 410 — resource retired
 # ts_bf144222321f (2026-09-08T21:53Z, root-caused R436 §1: OpenRouter
 # 402 "can only afford 0 tokens" on every rung of the ladder).
 CREDIT_EXHAUSTED = "CREDIT_EXHAUSTED"
+# R451-C1.2 (operator transport-capability directive): HTTP 404 / a
+# provider error body saying the MODEL IDENTIFIER does not exist on
+# that route ("model_not_found", "unknown model", ...). Before this
+# amendment the R450 production defect fell here: the stale glm-4-plus
+# id on the HF router answered model_not_found and was classified
+# INVALID_RESPONSE — pointing at the response shape when the knowable
+# fact was "this identifier is permanently invalid on this route".
+# This EXTENDS the vocabulary the same way R415 extended it for GONE
+# and R436 for CREDIT_EXHAUSTED; it never reclassifies an existing
+# member. The distinction is action-bearing (directive: "never retry
+# a permanently invalid model identifier"): MODEL_NOT_FOUND marks the
+# (provider, model) rung dead in the routing state — the provider's
+# OTHER models stay eligible (Art. V).
+MODEL_NOT_FOUND = "MODEL_NOT_FOUND"
 UNKNOWN = "UNKNOWN"
 
 FAILURE_TYPES = (RATE_LIMITED, TIMEOUT, AUTH_FAILURE, NETWORK_FAILURE,
                  INVALID_RESPONSE, MODEL_FAILURE, PARSER_FAILURE, GONE,
-                 CREDIT_EXHAUSTED, UNKNOWN)
+                 CREDIT_EXHAUSTED, MODEL_NOT_FOUND, UNKNOWN)
 
 # Cooldown ladder for rate limits (seconds). A rate-limited provider is
 # demoted (not removed) for this long; repeated consecutive rate limits
@@ -100,6 +114,25 @@ _RATE_HINTS = ("429", "too many requests", "rate limit", "rate_limit",
 _AUTH_HINTS = ("401", "403", "unauthorized", "unauthorised",
                "invalid api key", "invalid_api_key", "authentication",
                "permission denied", "insufficient_user_quota")
+# R451-C1.2: the provider's own words for "this model id does not
+# exist here". These hints classify the 200-body error envelope the
+# HF router returns (measured R450: glm-4-plus -> "model_not_found"
+# inside a successful HTTP exchange) — the exact case INVALID_RESPONSE
+# misdiagnosed.
+_MODEL_NOT_FOUND_HINTS = ("model not found", "model_not_found",
+                          "no such model", "unknown model",
+                          "model does not exist", "does not exist",
+                          "invalid model", "model_id not found")
+# R451-C1.2: the provider's own words for "this account cannot pay" —
+# the HF router's measured 402 wording is the canonical specimen
+# (R450: 'You have depleted your monthly included credits. Purchase
+# pre-paid credits to continue using Inference Providers.'). Checked
+# BEFORE the rate hints: 'quota' is ambiguous between rate windows
+# and credit balances, these strings are not.
+_CREDIT_HINTS = ("depleted your monthly included credits",
+                 "purchase pre-paid credits", "insufficient credits",
+                 "credit balance is", "out of credits",
+                 "payment required", "billing hard limit")
 _TIMEOUT_HINTS = ("timed out", "timeout", "timeouterror",
                   "socket timeout", "deadline exceeded", "sigkilled")
 _NETWORK_HINTS = ("connection refused", "connection reset",
@@ -131,6 +164,15 @@ def classify_failure(exc: BaseException, http_status: Optional[int] = None,
         return GONE                  # R415: retired model/endpoint
     if status == 402:
         return CREDIT_EXHAUSTED      # R436: cannot afford the request
+    if status == 404:
+        return MODEL_NOT_FOUND       # R451-C1.2: the identifier is not
+        #                              # served on this route (the call
+        #                              # path's URLs are fixed config,
+        #                              # so a 404 names the model)
+    if _hints(_MODEL_NOT_FOUND_HINTS):
+        return MODEL_NOT_FOUND       # R451-C1.2: router 200-body error
+    if _hints(_CREDIT_HINTS):
+        return CREDIT_EXHAUSTED      # R451-C1.2: 200-body credit wording
     if _hints(_RATE_HINTS):
         return RATE_LIMITED
     if status in (400, 422):
@@ -154,6 +196,8 @@ def classify_failure(exc: BaseException, http_status: Optional[int] = None,
             return GONE              # R415: retired model/endpoint
         if code == 402:
             return CREDIT_EXHAUSTED  # R436: credits exhausted upstream
+        if code == 404:
+            return MODEL_NOT_FOUND   # R451-C1.2: identifier not served
         if code and code >= 500:
             return MODEL_FAILURE      # model service failed server-side
         if code is not None:

@@ -29,6 +29,7 @@ from .candidate import Candidate, StageFailure, canonical_json, sha256_obj, utc_
 from . import adapters as _adapters
 from .adapters import ADAPTERS, STAGE_ORDER
 from . import stage_entry  # R399 W2: the one shared entry-justification helper
+from . import call_context as _cctx  # R451-C1.3-3: run-level call provenance
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 # Stages whose failure is FATAL to the run (nothing downstream is meaningful)
@@ -72,7 +73,8 @@ class EngineRun:
                  package_number: Optional[str] = None,
                  package_registry_path: Optional[str] = None,
                  resume: bool = False,
-                 event_callback: Optional[Callable] = None):
+                 event_callback: Optional[Callable] = None,
+                 session_id: Optional[str] = None):
         # R431: optional journal callback — called (stage, envelope)
         # each time a stage envelope is persisted (the moment the
         # operation occurs). No engine-side journal dependency.
@@ -85,6 +87,11 @@ class EngineRun:
         self.problem = problem
         self.problem_id = problem.get("problem_id", "custom")
         self.run_id = run_id or f"engrun:{self.problem_id}:{utc_now()[:19]}"
+        # R451-C1.3-3: the owning session (the production worker passes
+        # the ts_ session id; CLI investigations honestly record None —
+        # the session field EXISTS on every ledger line either way, and
+        # the hard invariant is run_owned_call => run_id != null).
+        self.session_id = session_id
         self.out = Path(out_dir)
         self.out.mkdir(parents=True, exist_ok=True)
         self.disabled = set(disabled_stages or [])
@@ -146,8 +153,10 @@ class EngineRun:
                       package_number=manifest.get("package_number"),
                       package_registry_path=manifest.get(
                           "package_registry_path"),
+                      session_id=manifest.get("session_id"),
                       resume=True)
-        kwargs.update(overrides)
+        kwargs.update({k: v for k, v in overrides.items()
+                       if v is not None})
         return cls(**kwargs)
 
     # ------------------------------------------------------------------
@@ -182,6 +191,9 @@ class EngineRun:
             self._persist("problem.json", self.problem)
         manifest: Dict[str, Any] = {
             "run_id": self.run_id,
+            # R451-C1.3-3: the run's owning session travels in the
+            # manifest (resume re-binds the SAME run identity + session)
+            "session_id": self.session_id,
             "engine": "discovery_fabric.engine",
             "stage_order": [s for s in STAGE_ORDER if s not in self.disabled],
             "disabled_stages": sorted(self.disabled),
@@ -192,6 +204,22 @@ class EngineRun:
             "resumed": bool(self.resume),
             "started_at": utc_now(),
         }
+        # R451-C1.3-3: bind the run-level call context for the WHOLE
+        # run — every LLM call made by any stage (mechanism_space,
+        # evolution, adversarial, bridge) inherits the run identity
+        # through the contextvar, so the routing ledger lines carry
+        # run_id/session_id/engine_stage and run_owned_call =>
+        # run_id != null holds by construction. The context is unbound
+        # on exit (a worker process may run several investigations).
+        from . import call_context as _cctx
+        _ctx_token = _cctx.bind_run(self.run_id,
+                                    session_id=self.session_id)
+        try:
+            return self._run_inner(manifest)
+        finally:
+            _cctx.unbind(_ctx_token)
+
+    def _run_inner(self, manifest: Dict[str, Any]) -> Dict[str, Any]:
 
         # ---------------- resume: restore completed stages ---------------
         done_stages: set = set()
@@ -257,11 +285,39 @@ class EngineRun:
             _entry_block = stage_entry.justify(
                 stage, self.env, self.failed_stages,
                 self._skipped_stages)
+            if _entry_block.get("entry_status") == "SKIPPED":
+                # R453-LEAN-CORE adaptive admission: the stage is NOT
+                # allowed to consume compute (no retained candidate, or
+                # SYNTHESIZE did not run at the requested capability).
+                # The skip is registered so everything downstream of it
+                # is dead compute too (the R399 W2.5 rule), the typed
+                # skip_reason travels on the entry, and the stage never
+                # executes (the mandate: stop spending intelligence on
+                # empty stages). A skip is a RECORDED refusal — never
+                # an absence claim (Art. XXV).
+                self._skipped_stages.add(stage)
+                self.env.stage_log.append({
+                    "stage": stage,
+                    "capability_id": ADAPTERS[stage].capability_id,
+                    "status": "SKIPPED_ADMISSION",
+                    "skip_reason": _entry_block.get("skip_reason"),
+                    "entry": _entry_block,
+                    "candidate_delta": [],
+                    "delta_real": False,
+                    "started_at": utc_now(),
+                    "finished_at": utc_now()})
+                self._persist_envelope(stage)
+                continue
             try:
+                # R451-C1.3-3: the CURRENT conductor stage rides the call
+                # context so ledger lines carry engine_stage in addition
+                # to the call-site purpose
+                _cctx.set_stage(stage)
                 entry = self.env.run_stage(
                     stage, adapter.capability_id, adapter.module_path,
                     adapter.canonical_fn, adapter.execute, self.env,
-                    {"run_id": self.run_id, "problem_id": self.problem_id})
+                    {"run_id": self.run_id, "problem_id": self.problem_id,
+                     "out_dir": str(self.out)})
                 entry["entry"] = _entry_block
                 self._persist(f"stage_{stage}.json", entry.get("result_meta", {}))
                 # R394 s6: conductor-level premise fatality. The stage is
@@ -306,7 +362,30 @@ class EngineRun:
         # R394 s6: a premise-rejected run has no survivor by construction.
         if self.with_package and "SYNTHESIZE" not in self.failed_stages \
                 and "PREMISE_GATE" not in self.failed_stages:
-            self._post_rank_pipeline(run_ctx={"run_id": self.run_id})
+            # R453-LEAN-CORE: the survivor/package tail (including the
+            # exploration grid's LLM generation) is admitted only when
+            # SYNTHESIZE ran at the requested capability — on a
+            # capability-insufficient path the tail would burn LLM
+            # calls on a pseudo-invention that was never promoted (the
+            # audit's empty-path finding). The grid's OWN unverified-
+            # evidence gate still governs the verified-but-rejected
+            # shape (E16-F unchanged — the mandate does not touch it);
+            # only the degraded-synthesis shape is blocked here.
+            from . import stage_entry as _se_lean
+            _cap = _se_lean.synthesis_capability_state(self.env)
+            if _cap["state"] == "CAPABILITY_INSUFFICIENT":
+                self._persist("POST_RANK_PIPELINE_SKIPPED.json", {
+                    "stage": "POST_RANK_PIPELINE",
+                    "status": "SKIPPED_ADMISSION",
+                    "skip_reason": "SYNTHESIS_CAPABILITY_INSUFFICIENT",
+                    "capability": _cap,
+                    "consequence": ("no engineering/package/grid compute "
+                                    "was spent on a degraded synthesis "
+                                    "(R453-LEAN-CORE); the run's final "
+                                    "state comes from the standard "
+                                    "classifiers (ADJUDICATION/CLASSIFY)")})
+            else:
+                self._post_rank_pipeline(run_ctx={"run_id": self.run_id})
 
         # ------------- R416: the causal evolution pipeline -----------------
         # Product contract (honest-causes-evolution-v1): every valid
@@ -322,25 +401,68 @@ class EngineRun:
             standard_path_packaged = bool(
                 self.package_report and self.package_report.get("complete"))
             if not standard_path_packaged and _ev.evolution_enabled():
-                try:
-                    evolution_summary = self._evolution_pipeline(
-                        {"run_id": self.run_id}, final)
-                    if evolution_summary and \
-                            evolution_summary.get("final_state"):
-                        final = dict(evolution_summary["final_state"])
-                        self._persist("final_state.json", final)
-                except Exception as exc:  # noqa: BLE001 — recorded honest
+                # R453-LEAN-CORE: the evolution layer (the DIRECTIONAL
+                # hypothesis call, the causal-delta generation — the
+                # RANK-tagged STRONG call the audit measured burning on
+                # an empty set) is admitted only when the run has
+                # something to evolve or a synthesis that hard-failed
+                # on transport (the R416 mandatory-fallback contract:
+                # a working transport still owes the query its
+                # baseline architecture; a dead one records the
+                # transport failure honestly). The two blocked shapes:
+                #   SYNTHESIS_CAPABILITY_INSUFFICIENT — a degraded
+                #     pseudo-invention is not something to evolve;
+                #   synthesis SUCCEEDED but nothing was retained —
+                #     the assay-A shape (the directional call on an
+                #     empty set, the audit's measured waste).
+                # The mandate: RANK must not call an LLM when
+                # n_candidates==0.
+                from . import stage_entry as _se_lean
+                _cap = _se_lean.synthesis_capability_state(self.env)
+                _facts = _se_lean.retained_candidate_facts(self.env)
+                _synthesis_succeeded = bool(
+                    (self.env.mechanism_map or {}).get("intervention"))
+                _blocked_reason = None
+                if _cap["state"] == "CAPABILITY_INSUFFICIENT":
+                    _blocked_reason = "SYNTHESIS_CAPABILITY_INSUFFICIENT"
+                elif _synthesis_succeeded and not _facts["retained"]:
+                    _blocked_reason = "NO_RETAINED_CANDIDATE"
+                if _blocked_reason is not None:
                     self._persist("INVENTION_LINEAGE.json", {
                         "schema": "INVENTION_LINEAGE/1.0.0",
                         "run_id": self.run_id,
-                        "status": "EVOLUTION_PIPELINE_ERROR",
-                        "error": f"{type(exc).__name__}: {exc}"[:400],
-                        "consequence": ("the run's epistemic record stands "
-                                        "as completed by the standard "
-                                        "path; the evolution layer failed "
-                                        "and is disclosed, never hidden "
-                                        "(Art. XV)"),
+                        "status": "SKIPPED_ADMISSION",
+                        "skip_reason": _blocked_reason,
+                        "capability": _cap,
+                        "retention": _facts,
+                        "n_generations": 0,
+                        "consequence": (
+                            "the evolution layer spent ZERO LLM calls — "
+                            "nothing was retained to evolve (the audit's "
+                            "empty-path finding: the directional STRONG "
+                            "call on an empty set); the standard path's "
+                            "final state stands (R453-LEAN-CORE)"),
                     })
+                else:
+                    try:
+                        evolution_summary = self._evolution_pipeline(
+                            {"run_id": self.run_id}, final)
+                        if evolution_summary and \
+                                evolution_summary.get("final_state"):
+                            final = dict(evolution_summary["final_state"])
+                            self._persist("final_state.json", final)
+                    except Exception as exc:  # noqa: BLE001 — recorded honest
+                        self._persist("INVENTION_LINEAGE.json", {
+                            "schema": "INVENTION_LINEAGE/1.0.0",
+                            "run_id": self.run_id,
+                            "status": "EVOLUTION_PIPELINE_ERROR",
+                            "error": f"{type(exc).__name__}: {exc}"[:400],
+                            "consequence": ("the run's epistemic record stands "
+                                            "as completed by the standard "
+                                            "path; the evolution layer failed "
+                                            "and is disclosed, never hidden "
+                                            "(Art. XV)"),
+                        })
             elif not _ev.evolution_enabled():
                 self._persist("INVENTION_LINEAGE.json", {
                     "schema": "INVENTION_LINEAGE/1.0.0",
@@ -379,6 +501,37 @@ class EngineRun:
             "final_envelope_hash": self.env.envelope_hash(),
         })
         self._persist("run_manifest.json", manifest)
+        # R451-C1.3-3: the run's OWN routing ledger, isolated BY RUN ID
+        # from the append-only global ledger (no time-window inference,
+        # no ledger-tail assumption) and persisted INTO the run dir —
+        # the run is self-contained transport evidence: every LLM call
+        # this investigation made, with provider/model/attempt/task/
+        # cost basis/account domain/failure class/fallback chain, the
+        # capability states, and the task-degradation records.
+        try:
+            from .model_routing import ledger_for_run
+            run_lines = ledger_for_run(self.run_id)
+            self._persist("ROUTING_LEDGER_RUN.json", {
+                "run_id": self.run_id,
+                "session_id": self.session_id,
+                "isolation_rule": ("run_id equality on the append-only "
+                                   "routing ledger — no time window, no "
+                                   "ledger tail (R451-C1.3-3)"),
+                "line_count": len(run_lines),
+                "run_owned_call_lines": sum(
+                    1 for l in run_lines
+                    if l.get("call_class") == "RUN_OWNED"),
+                "capability_probe_lines": sum(
+                    1 for l in run_lines
+                    if l.get("call_class") == "CAPABILITY_PROBE"),
+                "paid_cost_class_lines": sum(
+                    1 for l in run_lines
+                    if (l.get("cost_class") or "") not in (
+                        "ZERO_PAID_COST_SELF_HOSTED", None)),
+                "lines": run_lines,
+            })
+        except Exception:  # noqa: BLE001 — disclosed via absence
+            pass
         self._persist("candidate_envelope.json", self.env.to_dict())
         # Cemetery records RESEARCH kills only. An infrastructure failure
         # (e.g. missing LLM credential) is not negative knowledge about the
@@ -2014,7 +2167,25 @@ class EngineRun:
                 if child is not None:
                     self._persist(f"EVOLUTION_GEN_{gen_n}.json", child)
             if child is None:
+                # R450: distinguish a ground-gate REJECTION (a recorded
+                # scientific decision — the direction was ungrounded and
+                # the mutation refused) from a transport failure (an
+                # infrastructure state); the stop reason is honest about
+                # which one stopped the loop (Art. LXI)
                 stop_reason = "TRANSPORT_BLOCKED"
+                try:
+                    from discovery_fabric.directional.loop import (
+                        _load_hypotheses)
+                    hyps = _load_hypotheses(self.out).get(
+                        "hypotheses") or []
+                    last = hyps[-1] if hyps else {}
+                    if last.get("status") == "REJECTED":
+                        stop_reason = "DIRECTION_REJECTED_BY_GROUND_GATE"
+                    elif last.get("status") == \
+                            "ABSENT_PROPOSAL_TRANSPORT":
+                        stop_reason = "DIRECTIONAL_PROPOSAL_TRANSPORT"
+                except Exception:  # noqa: BLE001 — stop-reason hygiene
+                    pass
                 parent["state"] = ev.INVENTION_EVOLVED
                 break
             parent["state"] = ev.INVENTION_EVOLVED
@@ -2106,11 +2277,21 @@ class EngineRun:
             ph = (self.env.physics or {})
             physics_lifecycle = ph.get("lifecycle_verdict")
             killed = final_status in ("REJECTED",)
+            # R452 (audit B1-engine-half, Art. LXI): the challenge
+            # record carries the failure CLASS — a capability-failed
+            # generation (model output contract) is NOT a scientific
+            # kill; its kill_reason is the infrastructure reason and
+            # its state stays the honest CHALLENGED/UNVERIFIED shape
+            failure_class = final.get("failure_class") or (
+                "INFRASTRUCTURE_CAPABILITY"
+                if final_status == "INCOMPLETE_INFERENCE_FAILURE"
+                else None)
             gen["challenge"] = {
                 "physics_lifecycle": physics_lifecycle,
                 "attack_overall": adversarial,
                 "evidence_verified": evidence_verified,
                 "killed": killed,
+                "failure_class": failure_class,
                 "kill_reason": (final.get("reason") or "")[:400],
                 "final_status": final_status,
             }
@@ -2149,7 +2330,25 @@ class EngineRun:
         engine + frontier transfer) -> the REAL re-evaluation gauntlet
         (collision, spec, engineering spec, CAD per-generation geometry,
         physics gate, engineering attack, independent attack). A
-        brand-new invention identity; the full lineage preserved."""
+        brand-new invention identity; the full lineage preserved.
+
+        R449 Phase 9: the evidence-driven channel rides the SAME step —
+        the gap queries derive from the diagnosis (what evidence would
+        change the mechanism), the federated evidence-fabric retrieval
+        serves them, and the causal delta carries the evidence binding
+        (consumed custody ids). The EuropePMC fresh-evidence path stays
+        byte-unchanged beside it; the two never merge silently (the
+        snapshot records both channels separately).
+
+        R450: the DIRECTIONAL loop — DIAGNOSIS -> DIRECTIONAL HYPOTHESIS
+        (ground-gated; an ungrounded direction REJECTS the mutation,
+        recorded, never executed) -> CONTROLLED MUTATION (the generation
+        prompt EXECUTES the gated hypothesis) -> EVALUATION -> OBSERVATION
+        -> CAUSAL UPDATE -> NEXT DIRECTION, all persisted as the run's
+        IMPROVEMENT_TRAJECTORY.json + DIRECTIONAL_HYPOTHESES.json. The
+        UNGUIDED control mode (ENGINE_EVOLUTION_MODE=UNGUIDED) strips
+        the diagnosis AND the hypothesis from the prompt — the
+        benchmark's honest baseline arm."""
         from . import evolution as ev
         # ---- fresh evidence (new snapshot, versioned) ------------------
         fresh = ev.retrieve_fresh_evidence(
@@ -2157,11 +2356,96 @@ class EngineRun:
             snapshot_version=gen_n)
         fresh_items = fresh.get("items") or []
 
+        # ---- R449: the evidence-driven evolution channel ----------------
+        ef_evolution_record: Optional[Dict[str, Any]] = None
+        ef_items: List[Dict[str, Any]] = []
+        try:
+            from discovery_fabric import evidence_fabric as _ef
+            if _ef.enabled():
+                from discovery_fabric.evidence_fabric import (
+                    evolution_bridge as efeb)
+                ef_items, ef_evolution_record = \
+                    efeb.retrieve_evolution_evidence(
+                        self.problem, diagnosis, parent, gen_n)
+        except Exception as _ef_exc:  # noqa: BLE001 — infra, not verdict
+            ef_evolution_record = {
+                "loop_step": "EVIDENCE_DRIVEN_CAUSAL_EVOLUTION_RETRIEVAL",
+                "state": "CHANNEL_ERROR",
+                "reason": f"{type(_ef_exc).__name__}: {_ef_exc}"[:300],
+                "note": "the evidence-fabric evolution channel failed; "
+                        "the EuropePMC fresh-evidence path is unchanged "
+                        "— an infrastructure state (Art. LXI)",
+            }
+        if ef_items:
+            have = {i.get("id") for i in fresh_items}
+            fresh_items = fresh_items + [
+                i for i in ef_items if i.get("id") not in have]
+
+        # ---- R450: DIAGNOSIS -> DIRECTIONAL HYPOTHESIS (ground gate) ----
+        dir_mode = "LEGACY"
+        d_hypothesis: Optional[Dict[str, Any]] = None
+        try:
+            from discovery_fabric import directional as _dir
+            dir_mode = _dir.evolution_mode()
+            if dir_mode == "DIRECTIONAL" and not _dir.directional_enabled():
+                dir_mode = "LEGACY"
+            if dir_mode == "DIRECTIONAL":
+                failure_summary = str(
+                    parent.get("failure_or_challenge")
+                    or (parent.get("challenge") or {}).get("kill_reason")
+                    or "the parent architecture lost its challenge "
+                       "gauntlet")
+                d_hypothesis = _dir.directional_step(
+                    run_dir=self.out, problem=self.problem,
+                    parent=parent, diagnosis=diagnosis,
+                    failure_summary=failure_summary,
+                    evidence_items=fresh_items, gen_n=gen_n)
+                if d_hypothesis is None:
+                    # the gate REJECTED the direction (or the proposal
+                    # transport failed) — THE MUTATION NEVER EXECUTES
+                    # (R450 §4); the loop records the abstention and
+                    # this generation does not happen
+                    return None
+        except Exception as _dir_exc:  # noqa: BLE001 — infra, not verdict
+            # the directional layer itself failed (infrastructure): the
+            # LEGACY path continues, disclosed — never a silent second
+            # engine (Art. IV/LXI)
+            self._persist(f"DIRECTIONAL_LAYER_ERROR_gen-{gen_n}.json", {
+                "error": f"{type(_dir_exc).__name__}: "
+                         f"{_dir_exc}"[:300],
+                "fallback": "LEGACY evolution (the directional layer is "
+                            "infrastructure; its failure is recorded, "
+                            "never a scientific verdict)"})
+            dir_mode = "LEGACY"
+
         # ---- the causal-delta generation --------------------------------
         arch = ev.generate_evolved_architecture(
-            self.problem, parent, diagnosis, fresh_items, gen_n)
+            self.problem, parent, diagnosis, fresh_items, gen_n,
+            directional_hypothesis=d_hypothesis, mode=dir_mode)
         if arch is None:
             return None
+
+        # ---- R450: the mutation record (directional or unguided) --------
+        mutation_id = f"mut-{gen_n}-{(d_hypothesis or {}).get('hypothesis_id', 'unguided')}"
+        if d_hypothesis is not None:
+            d_hypothesis["mutation_id"] = mutation_id
+            arch["served_direction"] = {
+                "hypothesis_id": d_hypothesis.get("hypothesis_id"),
+                "target_variable": d_hypothesis.get("target_variable"),
+                "direction": d_hypothesis.get("direction"),
+                "intervention_type":
+                    d_hypothesis.get("intervention_type"),
+            }
+
+        # ---- R449: bind the causal delta to the evidence it consumed ---
+        if ef_evolution_record is not None and arch.get("causal_delta"):
+            try:
+                from discovery_fabric.evidence_fabric import (
+                    evolution_bridge as efeb)
+                arch["causal_delta"] = efeb.bind_causal_delta_to_evidence(
+                    arch["causal_delta"], ef_items, ef_evolution_record)
+            except Exception:  # noqa: BLE001 — binding is annotation-only
+                pass
 
         invention_id = ev.new_invention_id(self.run_id, gen_n)
         lineage = list(parent.get("lineage") or []) + [invention_id]
@@ -2195,14 +2479,52 @@ class EngineRun:
                 "snapshot_hash": fresh.get("snapshot_hash"),
                 "boundary": fresh.get("boundary"),
                 "retrieved_at": fresh.get("retrieved_at"),
+                # R449: the evidence-driven channel's own snapshot record
+                # (separate channel, separately versioned — never merged
+                # into the EuropePMC snapshot's numbers)
+                "evidence_fabric_channel": ef_evolution_record,
             },
             "generated_by": arch.get("generated_by"),
             "challenge": {},
             "model": None,
             "artifacts": {},
         }
-        return self._evolution_challenge_generation(gen, fresh_items,
-                                                     parent)
+        gen = self._evolution_challenge_generation(gen, fresh_items,
+                                                    parent)
+        # ---- R450: EVALUATION -> OBSERVATION -> CAUSAL UPDATE ----------
+        # the gauntlet has spoken; the directional layer records the
+        # observation + causal update (the hypothesis's prediction vs
+        # the recorded outcome) and appends the trajectory step. The
+        # UNGUIDED arm records the observation WITHOUT a causal update
+        # (the control's honest shape). Failures here are recorded,
+        # never fatal to the generation itself (the gauntlet verdict is
+        # the authority, not the trajectory bookkeeping).
+        try:
+            from discovery_fabric import directional as _dir
+            gauntlet_result = dict(gen.get("challenge") or {})
+            gauntlet_result.setdefault("killed", False)
+            cand_id = str(gen.get("invention_id") or
+                          parent.get("invention_id") or "")
+            if d_hypothesis is not None:
+                _dir.record_directional_outcome(
+                    run_dir=self.out, hypothesis=d_hypothesis,
+                    mutation_id=mutation_id,
+                    gauntlet_result=gauntlet_result,
+                    gen_n=gen_n, candidate_id=cand_id)
+            elif dir_mode == "UNGUIDED":
+                _dir.record_unguided_outcome(
+                    run_dir=self.out, mutation_id=mutation_id,
+                    gauntlet_result=gauntlet_result,
+                    gen_n=gen_n, candidate_id=cand_id)
+        except Exception as _obs_exc:  # noqa: BLE001 — bookkeeping only
+            self._persist(f"DIRECTIONAL_OUTCOME_ERROR_gen-{gen_n}.json", {
+                "error": f"{type(_obs_exc).__name__}: "
+                         f"{_obs_exc}"[:300],
+                "note": "the observation/causal-update recording failed; "
+                        "the gauntlet verdict is unchanged (the "
+                        "trajectory bookkeeping is not a verdict "
+                        "authority)"})
+        return gen
 
     # ------------------------------------------------------------------
     def _evolution_challenge_generation(self, gen: Dict[str, Any],
@@ -2409,9 +2731,30 @@ class EngineRun:
             .get("evidence_verification", {}).get("verified", False))
         gen["evidence_verified"] = evidence_verified and \
             bool(fresh_items)
-        gen["challenge"]["killed"] = False
-        gen["challenge"]["survived"] = True
-        gen["state"] = ev.INVENTION_REQUIRES_EXPERIMENT
+        # R452 (external audit B1, Art. XXVIII): passing the attack
+        # gauntlet is not evidence verification. A generation whose
+        # evidence was never verified is NOT a survivor — it is
+        # INVENTION_CHALLENGED (alive, unverified, never a rejection —
+        # Art. LXI). The measured defect: gen 2 was marked
+        # survived=True unconditionally here, promoted to
+        # EVOLVED_INVENTION_CANDIDATE, rendered, and packaged while its
+        # evidence verification had failed on a capability class.
+        if gen["evidence_verified"]:
+            gen["challenge"]["killed"] = False
+            gen["challenge"]["survived"] = True
+            gen["state"] = ev.INVENTION_REQUIRES_EXPERIMENT
+        else:
+            gen["challenge"]["killed"] = False
+            gen["challenge"]["survived"] = False
+            gen["challenge"]["evidence_verification_state"] = \
+                "EVALUATED_FAILED_CAPABILITY"
+            gen["challenge"]["note"] = (
+                "the generation passed the attack gauntlet but its "
+                "evidence was never verified — it is NOT a survivor "
+                "and is NOT rejected; it stays challenge-pending "
+                "(Art. XXVIII: promotion requires evidence; Art. LXI: "
+                "a capability failure is not a scientific verdict)")
+            gen["state"] = ev.INVENTION_CHALLENGED
         gen["artifacts"]["invention_spec"] = \
             f"INVENTION_SPECIFICATION_gen-{gen_n}.json"
         gen["artifacts"]["engineering_spec"] = \
@@ -2779,6 +3122,15 @@ def main():
                     help="redirect the PACKAGE_ID_REGISTRY path (sandbox/"
                          "testing only; production uses the canonical "
                          "registry — CEO A1 forbids hardcoded numbers)")
+    ap.add_argument("--run-id", default=None,
+                    help="R451-C1.3: pin the run identity (the routing "
+                         "ledger isolates THIS run's calls by run_id — "
+                         "no time-window inference). The production "
+                         "worker derives it from the session; drivers "
+                         "pass it explicitly.")
+    ap.add_argument("--session-id", default=None,
+                    help="R451-C1.3: the owning session id (production: "
+                         "the ts_ session; CLI drivers may pin a label)")
     args = ap.parse_args()
 
     problem: Dict[str, Any]
@@ -2799,13 +3151,17 @@ def main():
             raise SystemExit("--resume requires --out <run dir>")
         run = EngineRun.from_run_dir(args.out,
                                      with_package=not args.no_package,
-                                     package_registry_path=args.package_registry)
+                                     package_registry_path=args.package_registry,
+                                     run_id=args.run_id,
+                                     session_id=args.session_id)
     else:
         out = args.out or str(REPO_ROOT / "ENGINE_RUNS"
                               / f"{problem.get('problem_id','custom')}_{utc_now()[:19].replace(':','')}")
         run = EngineRun(problem, out, disabled_stages=disabled,
                         with_package=not args.no_package,
-                        package_registry_path=args.package_registry)
+                        package_registry_path=args.package_registry,
+                        run_id=args.run_id,
+                        session_id=args.session_id)
     manifest = run.run()
     print(canonical_json(manifest))
     return 0

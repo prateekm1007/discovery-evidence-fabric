@@ -140,10 +140,20 @@ def transport_snapshot() -> dict:
     zai_key = _load_env_keys().get("ZAI_API_KEY") or \
         os.environ.get("ZAI_API_KEY")
     if zai_key:
+        # R451: the historical hard-coded glm-4-plus label is REMOVED —
+        # the model id is reported HONESTLY from the environment (the
+        # ZAI_MODEL override) or the registry spec default, never a
+        # stale paid id pretending to be the configured transport.
+        try:
+            from discovery_fabric.engine import llm_registry as _reg
+            _zai_model = _reg._SPEC_BY_ID["zai"].model_for_call()
+        except Exception:  # noqa: BLE001 — label only
+            _zai_model = os.environ.get("ZAI_MODEL", "").strip() \
+                or "(registry default)"
         return {"status": "LOCAL_CONFIGURED",
                 "base_url": f"http://127.0.0.1:{GATEWAY_PORT}/v1/chat/"
                             "completions",
-                "provider": "zai", "model": "glm-4-plus",
+                "provider": "zai", "model": _zai_model,
                 "selection": "sandbox local gateway (spawned on first run)"}
     reg_ext = registry_external_transport()
     if reg_ext:

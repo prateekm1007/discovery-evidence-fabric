@@ -1,0 +1,86 @@
+{
+  "artifact_type": "ROUND_RECORD",
+  "round": "R451-C2.1 (stop the false '3D unavailable' interpretation; the five presentation states; the DISCOVERY PIPELINE strip)",
+  "agent": "Coder 2 (presentation layer; Coder 1 remains the engineering/scientific truth authority \u2014 no canonical discovery/engineering state changed)",
+  "created_at_utc": "2026-09-12T16:05:00Z",
+  "reviewer_provenance": "AI_REVIEW (self-adversarial battery + fresh-browser DOM evidence; no independent human review \u2014 Art. LXVII tracked field, INDEPENDENCE unchanged)",
+  "constitution": {
+    "version": "2.4.0",
+    "sha256": "b54a1be9bcbdd2465d0b034e1e1f472f80b87174209c0d534b7d9e1223e649b2",
+    "read_in_full_at_round_start": true,
+    "read_in_full_before_commit": true,
+    "note": "hash verified identical to origin/main bytes before the pre-commit re-read; full text re-read in two passes this session",
+    "governance_read": [
+      "GOVERNANCE/README.md",
+      "GOVERNANCE/AUDITOR_SELF_GOVERNANCE_v1.md",
+      "GOVERNANCE/AUDITOR_BLINDSPOT_REGISTER.md",
+      "GOVERNANCE/AUDITOR_REMEMBERED_STATE.md",
+      "GOVERNANCE/AUDIT_LOOP_PROTOCOL_v1.md",
+      "ACTIVE_PATH.md (in full)"
+    ]
+  },
+  "directive": {
+    "five_states": {
+      "A": "RUN_BLOCKED_TRANSPORT -> 'Discovery paused \u2014 infrastructure / No scientific conclusion was reached.' (InfrastructureBlockedHero, unchanged copy)",
+      "B": "invention exists + geometry absent -> 'Engineering visualization not available on this invention.' (new HeroNoVisualization; NEVER 'Not established on this run' for an invention that exists)",
+      "C": "GLB exists + renderer failed -> 'Engineering model ready. Presentation renderer unavailable.'",
+      "D": "GLB exists + renderer succeeded + gate failed -> 'Model rendered but did not pass the presentation integrity gate.'",
+      "E": "gate COMPLETE_PASS -> the model shows (VISUAL_READY, unchanged)"
+    },
+    "central_rule": "the frontend must stop using the existence of a 3D file as a proxy for the state of discovery \u2014 the six-value vocabulary (upstream_not_reached / geometry_not_applicable / geometry_generation_failed / geometry_available / visual_render_failed / visual_complete) is DERIVED BY THE BACKEND from canonical records and consumed verbatim; the browser never infers it from a missing file",
+    "pipeline_strip": "DISCOVERY PIPELINE at the top of the run page: seven product stages with backend-derived statuses; the blocked run shows exactly the directive's strip (Problem RECEIVED, everything else NOT REACHED), which answers 'why don't I have a 3D model?' with the truth"
+  },
+  "work_products": {
+    "backend_vocabulary": "toscanini/dossier.py::_geometry_state + GEOMETRY_STATES + presentation_cause/geometry_state_detail on the design tab (all three branches: AVAILABLE, PENDING, UNAVAILABLE)",
+    "backend_pipeline": "toscanini/dossier.py::pipeline_projection + PIPELINE_STAGES; dossier['pipeline'] consumed by the run page strip; statuses RECEIVED/IN_PROGRESS/NOT_REACHED/STOPPED/PAUSED_INFRASTRUCTURE from recorded artifacts only; NOT_REACHED never carries a numeric count (Art. XXV); the RETRIEVED measured zero is the only numeric zero",
+    "mapping": "TOSCANINI_UI/webapp/lib/presentationState.ts \u2014 THE ONE mapping now consumes design.geometry_state (closed vocabulary; unknown values fall through); renderBlockedCopy(cause) produces the exact C/D sentences; GEOMETRY_ABSENT_COPY the exact B sentence; pre-C2.1 payload fallback documented and pinned",
+    "components": "components/DiscoveryPipelineStrip.tsx (new; renders backend statuses verbatim; renders NOTHING without the projection); TechStage.tsx (strip mounted top-of-page; HeroNoVisualization for State B; the C/D ribbon split with the recorded detail line)",
+    "superseded_copy": "the blanket '3D GEOMETRY UNAVAILABLE' note and the collapsed render-blocked ribbon are retired (Art. LXIV: the R430 pin test re-pinned to the typed contract in the same change)"
+  },
+  "batteries": {
+    "test_r451_c21_states_py": "28 passed (six states from canonical records; blocked strip == directive's exact strip; running-run frontier; measured-zero-only-when-RETRIEVED; gate-fail STOPPED with typed detail; renderer-skip PAUSED_INFRASTRUCTURE; package BLOCKED; source pins for the exact copy, the strip's verbatim rendering, and the no-file-inference rule)",
+    "ui_tests_mjs": "55 passed (34 prior + 21: States A-E exact copy over the COMPILED shipping module; Attacks F1-F5; closed vocabulary)",
+    "regressions": {
+      "r441+r443+r444+r446": "83 passed",
+      "r447_join_family": "64 passed",
+      "r420+r419": "green except 2 pre-existing environment-class failures identical at the pristine baseline (test_r419_scipy_free_geometry, test_r419_render_pipeline::test_bridge_with_no_blender_still_completes \u2014 BS-020: this sandbox's dependency state, not this round's changes; git-stash-verified)",
+      "r430": "re-pinned design note contract green; test_falsification_dossier_on_killed_generation remains pre-existing-failing at the pristine baseline (disclosed, carried from the prior round record)",
+      "tsc_noEmit": "clean",
+      "next_build_production": "green"
+    }
+  },
+  "fresh_browser_evidence": {
+    "path": "R451/C2_PRODUCT/E2E_C21/",
+    "method": "real engine server (python -m tocanini.server :8788) + production next start (:3100) + headless Chrome (agent-browser); fresh page loads per state; labeled PUBLIC fixture sessions with true origin, removed after capture; sessions.json restored byte-identical",
+    "five_states_dom": "see DOM_EVIDENCE.json: every directive sentence verified present per state; 'Not established on this run.' and '3D GEOMETRY UNAVAILABLE' verified ABSENT everywhere; State C shows PAUSED_INFRASTRUCTURE on the strip + the renderer-unavailable copy with NO gate copy; State D the inverse; State E shows the real viewer + gate badge with no blocked copy",
+    "mechanical_join_proof": "the State C fixture was AUTO-HEALED on first open: the live mechanical join re-ran the real renderer to COMPLETE_PASS (C2.7 doing exactly its job); the State C capture was then taken with the artifact-build endpoint route-blocked so the seeded typed infrastructure skip stayed authoritative \u2014 both facts recorded in DOM_EVIDENCE.json",
+    "screenshots": [
+      "stateA_blocked.png",
+      "stateB_noviz.png",
+      "stateC_renderer_unavailable.png",
+      "stateD_gate_fail.png"
+    ]
+  },
+  "disclosed_limitations": [
+    "the five-state proof runs against labeled PUBLIC fixture sessions in a local sandbox (real server code, real webapp production build, real browser) \u2014 not against the production Space, which serves a main-line commit without this branch; production visual success is NOT claimed",
+    "the strip's IN_PROGRESS frontier for a live run mirrors the stage ledger and the evidence ledger's PENDING state; a queued session with no run dir shows NOT_REACHED for every stage after Problem (the ledger's own typed state, mirrored \u2014 never upgraded)",
+    "State B's strip row reads NOT_REACHED for the visualization stage when the bridge outcome is NOT_VISUALIZABLE \u2014 the stage's render never executed; the detail line carries the recorded bridge reason verbatim",
+    "the two r419 pre-existing failures are environment-class in this sandbox (git-stash-verified identical at the pristine baseline 68488087); the earlier transient 6-failed/8-errors run of the combined visual battery did not reproduce on rerun (first-run environment noise after dependency reinstall, BS-020)"
+  ],
+  "production_deployment": {
+    "target_sha": "THIS COMMIT (branch r449-c2/visual-benchmark; the round rides the open stacked PRs #4/#5 per the standing lab-line delivery path)",
+    "deployed_sha": "317885af (canonical Space, unchanged by this round)",
+    "deploy_id": "hf: prateekm1/toscanini-prod-validation",
+    "health_check_result": "BLOCKED",
+    "drift": "DRIFT",
+    "blocked_by": "this branch reaches production only after the owner merges the stacked lab PRs (#4 then #5) and the Space is redeployed at the merged SHA \u2014 the same owner path recorded by the R451-C2 delivery closures; push to origin is AVAILABLE this session (operator PAT)",
+    "what_unblocks": "operator: merge the stacked lab PRs, redeploy the canonical Space at the merged SHA, confirm /api/version == pushed SHA (Art. LXXI Section 1)"
+  },
+  "constitutional_boundary_reaffirmation": "NO Coder-1 canonical state changed: run status, evidence state, invention state, package availability, and the discovery engine are untouched; the new states are PRESENTATION projections derived from records the backend already persisted (the CIO geometry block, the bridge outcome, the render record, the visual gate verdict); the Visual Quality Gate is untouched and fail-closed; no threshold changed; the browser performs no state inference from file existence; Blender not involved; the visual-model lab stays provisional",
+  "next_decisive_test": "one fresh production blocked run (the standing 402-credit billing state) must show the DISCOVERY PIPELINE strip with Problem RECEIVED and everything else NOT REACHED, plus the DISCOVERY PAUSED hero \u2014 on the deployed Space after the owner merges + redeploys",
+  "constitutional_articles_engaged": [
+    "LXI (infrastructure failure is never scientific rejection \u2014 the strip's PAUSED_INFRASTRUCTURE), XXV (NOT_REACHED != 0 on the strip), X (one canonical authority \u2014 the backend derives, the browser renders), XXI.3 (provider failure is not absence), XXIV (source pins: the components render backend truth verbatim), LXIV (superseded copy retired + the pin test re-pinned in the same change), LXXI (delivery tuple; branch push available this session)",
+    "LXXII (the gate verdict drives State D; COMPLETE_PASS drives State E; fail-closed unchanged)"
+  ],
+  "round_commit_sha": "0d1bcc16c3a954b663815372007f21bb6cf6f166"
+}

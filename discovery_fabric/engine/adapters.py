@@ -247,6 +247,65 @@ class A2RetrievalAdapter(BaseAdapter):
         items, report = fabric.retrieve(env.problem)
         stats = report.get("retrieval_stats", {})
         diversity = report.get("retrieval_diversity", {})
+        # R449: the EVIDENCE-FABRIC channel — ADDITIVE federated evidence
+        # from the HF-hosted production sources (patents / engineering
+        # cases / materials / chemistry), normalized into the canonical
+        # EvidenceRecord and merged into the SAME evidence pool the V2
+        # fabric filled (engine-compatible items; the V2 fabric itself
+        # is untouched). The channel is disabled with
+        # ENGINE_EVIDENCE_FABRIC=0 (the comparison experiment's Arm A).
+        ef_provenance = None
+        try:
+            from discovery_fabric import evidence_fabric as _ef
+            if _ef.enabled():
+                ef_items, ef_report = _ef.retrieve_evidence(env.problem)
+                if ef_items:
+                    # additive merge: evidence-fabric items carry the a2
+                    # schema + `evidence_fabric` fields; ids are
+                    # deterministic (ev:<hash>) so dedup with the V2 pool
+                    # is by id
+                    have = {i.get("id") for i in items}
+                    items = items + [i for i in ef_items
+                                     if i.get("id") not in have]
+                ef_provenance = {
+                    "version": ef_report.get("fabric_version"),
+                    "federated": True,
+                    "production_sources": sorted({
+                        c.get("source_id") for c in
+                        ef_report.get("channels", [])
+                        if c.get("state") in ("SUCCESS", "EMPTY_RESULT")}),
+                    "channels": len(ef_report.get("channels", [])),
+                    "unknown_channels": len(
+                        ef_report.get("source_failures", [])),
+                    "substitutions": ef_report.get("substitutions", []),
+                    "coverage_limitations": ef_report.get(
+                        "coverage_limitations", []),
+                    "pool_items": ef_report.get("pool", {}).get("items", 0),
+                    "records_in_custody": len(
+                        ef_report.get("records", [])),
+                    "report_persisted": "EVIDENCE_FABRIC_REPORT.json",
+                }
+        except Exception as _ef_exc:  # noqa: BLE001 — infra, not verdict
+            ef_provenance = {
+                "state": "CHANNEL_ERROR",
+                "reason": f"{type(_ef_exc).__name__}: {_ef_exc}"[:300],
+                "note": "the evidence-fabric channel failed; the V2 fabric "
+                        "pool is unchanged — an infrastructure state, "
+                        "never a scientific result (Art. LXI)",
+            }
+        if ef_provenance is not None:
+            # persist the full fabric report inside the run directory
+            # (custody: an independent auditor can reconstruct the
+            # federated retrieval event from it)
+            try:
+                import json as _json
+                _p = Path(run_ctx.get("out_dir") or ".")
+                _p.mkdir(parents=True, exist_ok=True)
+                (_p / "EVIDENCE_FABRIC_REPORT.json").write_text(
+                    _json.dumps(ef_report, indent=1, ensure_ascii=False,
+                                default=str))
+            except Exception:  # noqa: BLE001 — best-effort persistence
+                pass
         return _engine_result(
             {"evidence": items,
              "evidence_ids": [i.get("id", "") for i in items],
@@ -274,6 +333,7 @@ class A2RetrievalAdapter(BaseAdapter):
                                     "retrieval_blind_spots", []),
                                 "canonical_record_count": report.get(
                                     "canonical_record_count"),
+                                "evidence_fabric": ef_provenance,
                             }}},
             retrieved_count=len(items),
             retrieval_fabric_version="V2")
@@ -360,6 +420,34 @@ class SynthesizeAdapter(BaseAdapter):
                 "synthesis impossible: zero evidence items retrieved (explicit)")
         mod = _import_with_env("discovery_fabric.a2.synthesize")
         cand = mod.synthesize(env.problem, env.evidence)
+        # R453-LEAN-CORE capability fail-closed: the registry's own
+        # task-degradation record for the call that ACTUALLY served the
+        # synthesis. A STRONG request served by CHEAP_EMERGENCY_FALLBACK
+        # is CAPABILITY_INSUFFICIENT — NOT an ok synthesis. The
+        # candidate is not promoted (no pseudo-invention on the
+        # envelope), the degradation record IS (the downstream
+        # admission reads it; the mandate: degraded STRONG is a hard
+        # stop, never a cheap success).
+        _meta = getattr(mod, "_LAST_PROVIDER_META", {}) or {}
+        _deg = _meta.get("task_degradation") or {}
+        _degraded = (_deg.get("task_capability_match") is False
+                     and str(_deg.get("actual_task_capability")) ==
+                     "CHEAP_EMERGENCY_FALLBACK")
+        if cand is not None and _degraded:
+            return _engine_result(
+                {"provenance": {**env.provenance, "synthesis": {
+                    "model": _meta.get("model"),
+                    "provider": _meta.get("provider"),
+                    "transport_status": _meta.get("status"),
+                    "task_degradation": _deg,
+                    "capability_state": "CAPABILITY_INSUFFICIENT",
+                    "note": ("the degraded candidate is NOT promoted to "
+                             "the envelope (never a pseudo-invention); "
+                             "the record is retained for the audit "
+                             "trail only")}}},
+                state="CAPABILITY_INSUFFICIENT",
+                capability_insufficient=True,
+                degraded_candidate_rejected=True)
         if not cand:
             # E1 semantics: distinguish credential absence from mechanism
             # failure (Art. XXIX). PROVIDER_UNAVAILABLE is infrastructure,
@@ -390,6 +478,7 @@ class SynthesizeAdapter(BaseAdapter):
                  "model": cand.get("model"),
                  "provider": cand.get("provider"),
                  "transport_status": cand.get("transport_status"),
+                 "task_degradation": _deg or None,
                  "prompt_hash": cand.get("prompt_hash"),
                  "input_hash": cand.get("input_hash"),
                  "output_hash": cand.get("output_hash"),
@@ -435,6 +524,178 @@ class EvidenceVerifyAdapter(BaseAdapter):
             verified=res.get("verified"))
 
 
+def _lean_mechanism_space(env, entry_block: Dict[str, Any]) -> Dict[str, Any]:
+    """R453-LEAN-CORE: the lean mechanism-space construction (the
+    external auditor mandate — no extraction fan-out; reuse the
+    FREEZE/VERIFY structured facts; at most ONE operator generation
+    call, only after admission passed).
+
+    The structured items are built DETERMINISTICALLY from the frozen
+    evidence records the FREEZE stage custodied, joined to their
+    VERIFY-stage claim-level classification (the item's title is its
+    system descriptor for the operator's input contract; the record
+    text IS the evidence). ZERO LLM calls here. Then ONE
+    DIRECT_TRANSFER instantiation call on the top verified item, and
+    the deterministic validation/distinctness/verification tail reuses
+    the mechanism_space module's own instruments (same gates, no
+    second evaluator — Art. IV)."""
+    import hashlib as _h
+    from . import stage_entry
+    from discovery_fabric.engine import mechanism_space as _ms
+
+    problem = env.problem or {}
+    verified = stage_entry.verified_evidence_items(env)
+    by_id = {str(it.get("id")): it for it in (env.evidence or [])}
+    items: List[Dict[str, Any]] = []
+    for cls_item in verified:
+        rec = by_id.get(str(cls_item.get("source_id"))) or {}
+        if not rec:
+            # the classification's source no longer matches the frozen
+            # set — honestly skipped, never fabricated
+            continue
+        title = str(rec.get("title") or "")
+        abstract = str(rec.get("abstract") or "")
+        record_text = f"{title}. {abstract}".strip()
+        items.append({
+            "item_id": f"lean_{rec.get('id')}",
+            "structured_hash": _h.sha256(
+                record_text.encode("utf-8", "replace")).hexdigest(),
+            "fields": {"system": {"value": title}},
+            "source": rec.get("source") or rec.get("id"),
+            "provenance": {
+                "content_hash": rec.get("content_hash"),
+                "retrieval_timestamp": rec.get("retrieval_timestamp"),
+                "construction": "R453_LEAN_REUSE_FREEZE_VERIFY_FACTS",
+                "claim_classification": cls_item.get("classification"),
+            },
+            "_record_text": record_text,
+        })
+    space: Dict[str, Any] = {
+        "mechanism_space_version": _ms.MECHANISM_SPACE_VERSION,
+        "construction": "R453_LEAN (external auditor mandate: no "
+                        "extraction fan-out; FREEZE/VERIFY facts "
+                        "reused; at most one operator call)",
+        "built_at": utc_now(),
+        "problem_id": problem.get("problem_id", ""),
+        "operator_ids": ["DIRECT_TRANSFER"],
+        "n_structured_items": len(items),
+    }
+    if not items:
+        space.update({
+            "state": "NO_EVIDENCE", "candidates": [],
+            "n_candidates_generated": 0,
+            "n_candidates_retained": 0,
+            "metrics": _ms._metrics(space, [], [], [], 0),
+            "note": ("no frozen evidence record matched a verified "
+                     "classification item — nothing was fabricated "
+                     "(Art. XXV)"),
+        })
+        return space
+    space["structured_evidence"] = {
+        "state": "BUILT", "n_items": len(items),
+        "construction": "R453_LEAN_REUSE_FREEZE_VERIFY_FACTS",
+        "items": [{k: v for k, v in it.items()
+                   if not k.startswith("_")} for it in items],
+    }
+    # ---- the ONE operator generation call (DIRECT_TRANSFER, the top
+    #      verified item — deterministic selection; no corrective retry
+    #      on the lean path: one call is one call, the span/semantic
+    #      gates themselves are unchanged) --------------------------------
+    op = next((o for o in _ms.TRANSFORMATION_OPERATORS
+               if o["operator_id"] == "DIRECT_TRANSFER"), None)
+    item = items[0]
+    contract = op["input_contract"](item, problem) if op else {
+        "satisfied": False, "basis": "operator unavailable"}
+    operator_result: Dict[str, Any] = {
+        "operator": "DIRECT_TRANSFER",
+        "operator_version": op["version"] if op else "unknown",
+        "transformation_rule": op["transformation_rule"] if op else "",
+        "search_constraint": op["search_constraint"] if op else "",
+        "n_items_examined": len(items),
+        "n_items_selected": 1 if contract.get("satisfied") else 0,
+        "selected_item_ids": [item.get("item_id")]
+        if contract.get("satisfied") else [],
+        "input_contract": contract,
+        "lean_path": ("one instantiation call, no corrective retry "
+                      "(R453-LEAN; the span/semantic gates unchanged)"),
+        "candidates": [],
+    }
+    if not (op and contract.get("satisfied")):
+        operator_result.update({
+            "state": op["failure_state"] if op else "NO_APPLICABLE_EVIDENCE",
+            "note": ("the DIRECT_TRANSFER input contract was not "
+                     "satisfied by the top verified item — honest "
+                     "refusal, nothing fabricated (Art. XXV)"),
+        })
+    else:
+        item["_selection"] = {"selected_by": "DIRECT_TRANSFER",
+                              "contract": contract}
+        prompt = _ms._OPERATOR_INSTANTIATION_PROMPTS[
+            "DIRECT_TRANSFER"].format(
+            system=item["fields"].get("system") or "(unextracted)",
+            mechanism=_ms._field_val(item, "mechanism") or "(unextracted)",
+            observed_effect=_ms._field_val(item, "observed_effect")
+            or "(unextracted)",
+            evidence_intervention=_ms._field_val(item, "intervention")
+            or "(unextracted)",
+            boundary_conditions=_ms._field_val(item, "boundary_conditions")
+            or "(unextracted)",
+            constraints=_ms._field_val(item, "constraints") or "(unextracted)",
+            failure_mode=_ms._field_val(item, "failure_mode")
+            or "(unextracted)",
+            device=problem.get("device", ""),
+            failure=problem.get("failure", ""),
+            constraint=problem.get("constraint", ""),
+            record_text=_ms._item_abstract(item)[:2600]
+            or "(record text unavailable)")
+        meta = _ms.llm_generate(
+            prompt,
+            system="You are a rigorous mechanism engineer. Every "
+                   "claim must derive from the given evidence.",
+            purpose="operator_DIRECT_TRANSFER")
+        if not meta.get("ok"):
+            operator_result.update({
+                "state": "OPERATOR_INSTANTIATION_FAILED",
+                "llm_status": meta.get("status"),
+                "llm_error": (meta.get("error") or "")[:200],
+            })
+        else:
+            fields = _ms._parse_candidate_fields(meta["content"] or "")
+            cand = _ms.assemble_candidate(op, item, fields, problem, meta)
+            sem = _ms.operator_semantic_check(
+                "DIRECT_TRANSFER", item, cand, problem)
+            cand["operator_semantic_check"] = sem
+            operator_result["candidates"] = [cand]
+            operator_result["state"] = (
+                "OPERATED" if cand.get("candidate_state") == "CANDIDATE"
+                else "NO_VALID_CANDIDATE")
+    space["operator_results"] = [
+        {k: v for k, v in operator_result.items()
+         if k != "candidates"}]
+    space["operator_candidates_full"] = [operator_result]
+    # ---- the deterministic tail: the module's own instruments -------
+    all_candidates = [c for c in operator_result.get("candidates", [])
+                      if isinstance(c, dict)
+                      and c.get("candidate_state") == "CANDIDATE"]
+    space["cemetery_consumption"] = _ms._consult_cemetery(all_candidates)
+    dedup = _ms.deduplicate_candidates(all_candidates)
+    space["distinctness"] = dedup
+    retained = _ms._retained_candidates(all_candidates, dedup)
+    verifications = [_ms.verify_mechanism_support(c, items, problem)
+                     for c in retained]
+    for c, v in zip(retained, verifications):
+        c["mechanism_support"] = v
+    space["candidates"] = [_ms._public_candidate(c) for c in retained]
+    space["state"] = ("BUILT" if dedup.get("n_kept")
+                      else "NO_CANDIDATES")
+    space["n_candidates_generated"] = len(all_candidates)
+    space["n_candidates_retained"] = len(retained)
+    space["min_candidates_required"] = 1
+    space["metrics"] = _ms._metrics(space, all_candidates, retained,
+                                    verifications, len(items))
+    return space
+
+
 class MechanismSpaceAdapter(BaseAdapter):
     """R401: the structured mechanism space — a FIRST-CLASS stage
     between VERIFY and MULTI_SOURCE_DISCOVERY. Canonical:
@@ -454,7 +715,20 @@ class MechanismSpaceAdapter(BaseAdapter):
     entry-justification helper; zero verified items -> the honest
     skipped state (never silent, never fabricated). The stage is
     NON-FATAL: a skipped/failed mechanism space leaves the primary
-    discovery loop and the grid path untouched."""
+    discovery loop and the grid path untouched.
+
+    R453-LEAN-CORE (the external auditor mandate): the LEAN
+    construction — NO extraction fan-out (the R401 per-item
+    structured-evidence extraction calls are retired from the
+    production path); the structured items are the FREEZE/VERIFY facts
+    (the frozen evidence records + their claim-level classification —
+    deterministic, zero LLM calls), and AT MOST ONE operator
+    instantiation call (DIRECT_TRANSFER on the top verified item),
+    only after admission passed. The module's own
+    build_mechanism_space() remains the hermetic instrument its test
+    battery exercises; the production role moved here (Art. LXIV:
+    KEPT_BECAUSE test-covered instrument — the superseding production
+    path is this adapter, disclosed in the space record)."""
     capability_id = "MECHANISM_SPACE"
     module_path = "discovery_fabric/engine/mechanism_space.py"
     canonical_fn = "build_mechanism_space(problem, evidence)"
@@ -485,10 +759,7 @@ class MechanismSpaceAdapter(BaseAdapter):
                              "fabricated (Art. XXV)"),
                     "candidates": []}},
                 state="SKIPPED_EVIDENCE_VERIFICATION_FAILED")
-        from discovery_fabric.engine.mechanism_space import (
-            build_mechanism_space)
-        space = build_mechanism_space(env.problem, env.evidence or [])
-        space["entry"] = entry_block
+        space = _lean_mechanism_space(env, entry_block)
         return _engine_result(
             {"mechanism_space": space},
             state=space.get("state"),

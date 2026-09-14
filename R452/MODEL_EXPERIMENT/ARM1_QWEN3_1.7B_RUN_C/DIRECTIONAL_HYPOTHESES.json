@@ -1,0 +1,118 @@
+{
+ "artifact_type": "DIRECTIONAL_HYPOTHESES",
+ "schema_version": "hypotheses/1.0",
+ "created_at": "2026-09-13T19:39:08+00:00",
+ "hypotheses": [
+  {
+   "hypothesis_id": "dh:1e31284aa2cef636f3b2",
+   "candidate_id": "inv:7fab3d2d89:gen1",
+   "failure_id": "diag:1f8da71487b93d25",
+   "causal_diagnosis_id": "diag:1f8da71487b93d25",
+   "target_variable": "openfoam_cases",
+   "current_value": "unknown",
+   "proposed_value": "specific_openfoam_case",
+   "direction": "REPLACE",
+   "mechanism_affected": "flow_physics_analysis",
+   "causal_rationale": "the failure is due to incomplete inference failure, which is caused by missing evidence on flow physics analysis",
+   "predicted_effect": "complete_flow_physics_analysis",
+   "predicted_magnitude_or_range": "complete",
+   "competing_explanations": [],
+   "evidence_support": [
+    {
+     "evidence_id": "e1bc2505b0872b9216c5842c4",
+     "span": "openfoam_cases"
+    },
+    {
+     "evidence_id": "c2216a182b0029a30152ccb5",
+     "span": "openfoam_cases"
+    },
+    {
+     "evidence_id": "e845b9d66bfa2257599a5167",
+     "span": "openfoam_cases"
+    },
+    {
+     "evidence_id": "e47bde2a3658274041fed551",
+     "span": "openfoam_cases"
+    }
+   ],
+   "evidence_gaps": [
+    "none stated"
+   ],
+   "falsifier": "incomplete_flow_physics_analysis",
+   "measurement_required": "complete_flow_physics_analysis",
+   "intervention_type": "CONSTRAINT_RELAXATION",
+   "confidence": "MODERATE",
+   "provenance": {
+    "class": "AI_PROPOSED",
+    "purpose": "directional:hypothesis",
+    "note": "the LLM proposed this hypothesis; the mechanical ground gate adjudicates it (Art. XVIII) — an ungrounded proposal is REJECTED and its mutation never executes",
+    "proposed_at": "2026-09-13T19:40:25+00:00"
+   },
+   "status": "REJECTED",
+   "gate": {
+    "gate_version": "directional_ground_gate/2.0",
+    "checks": [
+     {
+      "check": "G1_STRUCTURE",
+      "verdict": "PASS",
+      "basis": "all required fields present"
+     },
+     {
+      "check": "G2_DIAGNOSIS_RESOLVES",
+      "verdict": "PASS",
+      "basis": "causal_diagnosis_id='diag:1f8da71487b93d25' resolves to a recorded diagnosis (cause=UNDETERMINED)"
+     },
+     {
+      "check": "G3_MECHANISM_GROUNDED",
+      "verdict": "FAIL",
+      "basis": "the mechanism_affected/rationale share NO distinctive terms with the recorded diagnosis or the failed candidate's mechanism — the direction speaks about nothing that failed"
+     },
+     {
+      "check": "G4_PREDICTION_FALSIFIABLE",
+      "verdict": "FAIL",
+      "basis": "predicted_effect=present; falsifier=present but not measurable — an unfalsifiable direction is a wish, not a hypothesis"
+     },
+     {
+      "check": "G5_EVIDENCE_CLASS",
+      "verdict": "PASS",
+      "basis": "class=EVIDENCE_MISSING: 0 verified support bindings (span-verified); 4 unresolved ids; 0 ids with failed/absent spans; gaps=1 (gaps are NEVER equated with support — R451 §4)"
+     },
+     {
+      "check": "G6_TARGET_IN_DESIGN_STATE",
+      "verdict": "FAIL",
+      "basis": "the target_variable shares NO distinctive terms with the design's declared state (the failed candidate's mechanism/intervention, the problem's declared quantities, or the diagnosis basis) — the direction moves a variable the machine does not control"
+     },
+     {
+      "check": "G7_PREDICTION_INTERVENTION_COHERENT",
+      "verdict": "PASS",
+      "basis": "predicted observable coupled to the intervention: analysis, flow, physics"
+     },
+     {
+      "check": "G8_FALSIFIER_BINDS_PREDICTION",
+      "verdict": "PASS",
+      "basis": "the falsifier measures the predicted observable: analysis, flow, physics"
+     },
+     {
+      "check": "G9_CAUSAL_MEMORY",
+      "verdict": "PASS",
+      "basis": "no prior FALSIFIED direction repeats (the causal memory is clean for this (target_variable, direction))"
+     }
+    ],
+    "grounded": false,
+    "verdict": "REJECTED",
+    "evidence_class": "EVIDENCE_MISSING",
+    "evidence_resolution": {
+     "verified_ids": [],
+     "unresolved_ids": [
+      "e1bc2505b0872b9216c5842c4",
+      "c2216a182b0029a30152ccb5",
+      "e845b9d66bfa2257599a5167",
+      "e47bde2a3658274041fed551"
+     ],
+     "span_failed_ids": []
+    },
+    "adjudicated_at": "2026-09-13T19:40:25+00:00"
+   }
+  }
+ ]
+}

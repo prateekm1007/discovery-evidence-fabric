@@ -1,0 +1,204 @@
+{
+ "candidate_id": "cand:R451:cad-bridge:dual-lumen-catheter",
+ "problem_id": "r451-dual-lumen-drainage-catheter",
+ "architecture": {
+  "mechanism": "a circular dual-lumen catheter wall carrying two parallel circular lumens separated by a solid septum; wall stiffness resists kinking and septum thickness resists suction collapse",
+  "intervention": "outer diameter 7 mm, two lumens 2.5 mm, septum 0.9 mm, length 400 mm",
+  "expected_effect": "lumens stay patent through a 15 mm bend radius at 40 kPa suction"
+ },
+ "technical_state": {
+  "value": {
+   "version": "1.0.0",
+   "objects": [
+    {
+     "object_id": "1",
+     "name": "dual-lumen chest drainage catheter",
+     "role": "the device to solve the problem"
+    }
+   ],
+   "parameters": [
+    {
+     "param_id": "1",
+     "name": "outer diameter",
+     "category": "GEOMETRY",
+     "unit": "mm",
+     "value": 7,
+     "value_class": "MODELLED",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": 6.0,
+     "range_max": 8.0,
+     "range_span": "outer diameter between 6 and 8 millimeters",
+     "range_evidence_id": "EVIDENCE_PROBLEM_STATEMENT",
+     "range_class": "EXTRACTED",
+     "role": "the catheter wall stiffness scales with outer diameter"
+    },
+    {
+     "param_id": "2",
+     "name": "lumen diameter",
+     "category": "GEOMETRY",
+     "unit": "mm",
+     "value": 2.5,
+     "value_class": "MODELLED",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": 2.2,
+     "range_max": 2.8,
+     "range_span": "circular lumens of 2.2 to 2.8 millimeters",
+     "range_evidence_id": "EVIDENCE_PROBLEM_STATEMENT",
+     "range_class": "EXTRACTED",
+     "role": "the lumen diameter determines the resistance to kinking"
+    },
+    {
+     "param_id": "3",
+     "name": "septum thickness",
+     "category": "GEOMETRY",
+     "unit": "mm",
+     "value": 0.9,
+     "value_class": "MODELLED",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": 0.6,
+     "range_max": 1.2,
+     "range_span": "septum thickness between 0.6 and 1.2 millimeters",
+     "range_evidence_id": "EVIDENCE_PROBLEM_STATEMENT",
+     "range_class": "EXTRACTED",
+     "role": "the septum thickness affects the resistance to suction collapse"
+    },
+    {
+     "param_id": "4",
+     "name": "working length",
+     "category": "GEOMETRY",
+     "unit": "mm",
+     "value": 400,
+     "value_class": "MODELLED",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": 300.0,
+     "range_max": 500.0,
+     "range_span": "working length of 300 to 500 millimeters",
+     "range_evidence_id": "EVIDENCE_PROBLEM_STATEMENT",
+     "range_class": "EXTRACTED",
+     "role": "the working length determines the operational range"
+    }
+   ],
+   "constraints": [],
+   "objectives": [
+    {
+     "objective_id": "1",
+     "target": "1",
+     "direction": "MAINTAIN_WITHIN",
+     "basis": "maintain outer diameter within 6-8 mm to ensure structural integrity"
+    },
+    {
+     "objective_id": "2",
+     "target": "2",
+     "direction": "MAINTAIN_WITHIN",
+     "basis": "maintain lumen diameter within 2.2-2.8 mm to ensure kink resistance"
+    },
+    {
+     "objective_id": "3",
+     "target": "3",
+     "direction": "MAINTAIN_WITHIN",
+     "basis": "maintain septum thickness within 0.6-1.2 mm to prevent suction collapse"
+    }
+   ],
+   "failure_modes": [
+    {
+     "mode_id": "1",
+     "name": "kinking under 15 mm bend radius",
+     "problem_link": "the outer diameter and lumen diameter determine kink resistance"
+    },
+    {
+     "mode_id": "2",
+     "name": "septum collapse under 40 kPa suction",
+     "problem_link": "the septum thickness determines suction resistance"
+    }
+   ],
+   "dependencies": [
+    {
+     "relation_id": "1",
+     "cause": "1",
+     "effect": "2",
+     "direction": "INCREASES",
+     "statement": "the outer diameter increases the resistance to kinking",
+     "relation_class": "EXTRACTED",
+     "span": "outer diameter between 6 and 8 millimeters",
+     "evidence_id": "EVIDENCE_PROBLEM_STATEMENT"
+    }
+   ],
+   "extraction": {
+    "proposal_id": "tsp:778b7731385a",
+    "provider": "localqwen",
+    "model": "qwen3-1.7b",
+    "prompt_hash": "09e0f5983837ada51cd38723218657efab8fe4d09fddf4219828a74e80f72c8b",
+    "output_hash": "1c74a1e9b34c07891dbe9086f8061fda10eb85f51f57be7a1c29068f29fdb656",
+    "llm_is_untrusted_proposer": true,
+    "validator": "technical_state_v1 (deterministic)",
+    "admitted_counts": {
+     "parameters": 4,
+     "parameters_with_value": 4,
+     "parameters_extracted": 0,
+     "parameters_modelled": 4,
+     "parameters_with_envelope": 4,
+     "constraints": 0,
+     "objectives": 3,
+     "dependencies": 1,
+     "objects": 1,
+     "failure_modes": 2
+    },
+    "dropped_pieces": [
+     {
+      "kind": "constraint",
+      "id": "1",
+      "gate": "C2",
+      "reason": "EXTRACTED limit number not in its span"
+     },
+     {
+      "kind": "constraint",
+      "id": "2",
+      "gate": "C2",
+      "reason": "EXTRACTED limit number not in its span"
+     },
+     {
+      "kind": "constraint",
+      "id": "3",
+      "gate": "C2",
+      "reason": "EXTRACTED limit number not in its span"
+     },
+     {
+      "kind": "constraint",
+      "id": "4",
+      "gate": "C2",
+      "reason": "EXTRACTED limit number not in its span"
+     },
+     {
+      "kind": "objective",
+      "id": "4",
+      "gate": "O1",
+      "reason": "basis not tied to this problem's device/failure vocabulary — an objective the problem does not have"
+     },
+     {
+      "kind": "dependency",
+      "id": "2",
+      "gate": "D2",
+      "reason": "the span does not name both endpoints — it is not evidence for THIS relationship"
+     },
+     {
+      "kind": "dependency",
+      "id": "3",
+      "gate": "D2",
+      "reason": "the span does not name both endpoints — it is not evidence for THIS relationship"
+     }
+    ],
+    "extracted_at": "2026-09-13T03:29:40+00:00Z"
+   }
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "TECHNICAL_STATE_EXTRACTION",
+  "evidence_ids": [
+   "EVIDENCE_PROBLEM_STATEMENT"
+  ],
+  "note": "structured technical state (R379): values are EXTRACTED (span-verified) / MODELLED (declared) / UNKNOWN (explicit); the analytical evaluator computes predictions from this state — predictions are model inferences, never measurements"
+ }
+}

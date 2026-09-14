@@ -23,6 +23,7 @@ from __future__ import annotations
 import re
 from typing import Any, Dict, List, Optional
 
+from ..domains import physical_site_vocabulary
 from .epistemics import (
     CONCEPTUAL_3D,
     ENGINEERING_3D,
@@ -37,12 +38,60 @@ from .epistemics import (
 
 _NON_NUMERIC = {"UNKNOWN", "NOT ESTABLISHED", "NOT_ESTABLISHED", "", "NONE", "TBD", "N/A"}
 
-_PHYSICAL_SITE_SIGNALS = re.compile(
-    r"\b(panel|catheter|valve|pump|device|module|cell|stack|battery|turbine|"
-    r"exchanger|reactor|sensor|implant|floor|lumen|coil|antenna|array|"
-    r"absorber|receiver|nozzle|duct|blade|wafer|electrode|membrane|engine)\b",
-    re.I,
-)
+# ---------------------------------------------------------------------------
+# R452 A4 — the physical-site vocabulary (one authority: the registry,
+# with an explicit canonical-noun floor)
+# ---------------------------------------------------------------------------
+# The pre-R452 check was a closed 27-noun regex and independently blocked
+# ENGINEERING_3D on 4/6 real physical inventions (no "vial", no
+# "lyophilizer", no "die", no "punch"). The vocabulary is DERIVED from
+# the engine's own canonical domain registry (one authority, Art. X) so
+# the site check can never be narrower than the registry, and is then
+# UNIONED with the canonical physical-noun floor (the merged-union of
+# the mainline's explicit widened vocabulary) so the check can never be
+# narrower than that floor either. The derivation, the floor, the
+# exclusion rules and the basis are recorded and travel in every
+# classification (the vocabulary is a threshold WITH provenance,
+# Art. XXVII).
+
+#: the canonical physical-noun floor (audit A4): every noun the domain
+#: families' own physical vocabulary is known to require, kept as an
+#: explicit floor under the registry-derived vocabulary
+_PHYSICAL_SITE_FLOOR_NOUNS = frozenset({
+    "panel", "catheter", "valve", "pump", "device", "module", "cell",
+    "stack", "battery", "turbine", "exchanger", "reactor", "sensor",
+    "implant", "floor", "lumen", "coil", "antenna", "array", "absorber",
+    "receiver", "nozzle", "duct", "blade", "wafer", "electrode",
+    "membrane", "engine", "gearbox", "gear", "bearing", "manifold",
+    "gallery", "branch", "pipe", "pipeline", "tube", "tubing",
+    "channel", "conduit", "orifice", "bore", "vial", "lyophilizer",
+    "freeze-dry", "freeze-drying", "freezedry", "shelf", "tray", "die",
+    "mold", "molding", "moulding", "punch", "housing", "chamber", "tank",
+    "vessel", "drum", "rotor", "stator", "winding", "casting", "forging",
+    "shaft", "seal",
+    "gasket", "spring", "fastener", "weld", "joint", "flange",
+    "fitting", "cannula", "sheath", "needle", "circuit", "inverter",
+    "heatsink", "radiator", "insulation", "cable", "busbar", "terminal",
+    "frame", "chassis", "bracket", "hinge", "actuator", "motor",
+    "generator", "compressor", "condenser", "boiler", "furnace", "kiln",
+    "crucible", "melter", "extruder", "emitter", "dripper", "filter",
+    "strainer",
+})
+
+
+def _build_physical_site_pattern() -> tuple:
+    words, basis = physical_site_vocabulary()
+    # the floor is unioned IN (never narrower than either authority)
+    union_words = set(words) | _PHYSICAL_SITE_FLOOR_NOUNS
+    ordered = sorted(union_words, key=len, reverse=True)
+    pattern = re.compile(
+        r"\b(" + "|".join(re.escape(w) for w in ordered) + r")\b",
+        re.I,
+    )
+    return pattern, basis
+
+
+_PHYSICAL_SITE_PATTERN, _PHYSICAL_SITE_BASIS = _build_physical_site_pattern()
 
 _PROCESS_SIGNALS = re.compile(
     r"\b(process|synthesis|annealing|deposition|etching|refining|fermentation|"
@@ -98,12 +147,27 @@ def _geometry_parameters(engineering_spec: Dict[str, Any]) -> List[Dict[str, Any
         value_status = str(p.get("value_status") or "").upper()
         val = _numeric(p.get("value"))
         if val is not None and "UNKNOWN" not in value_status and p.get("unit"):
+            # R452 A2 (external audit) — MERGED UNION: the param id
+            # carried into the build chain is the SEMANTIC name ("device
+            # outer diameter"), never the registry's positional id
+            # ("CP-001") — the measured defect: every CP-nnn key missed
+            # the FORM_LIBRARY builders' semantic lookups and every
+            # build fell through to hardcoded defaults, producing
+            # byte-identical geometry for specs differing 80x. The
+            # positional id rides along as provenance (never lost, never
+            # the join key), and the raw value_status travels explicitly.
             found.append({
-                "param_id": p.get("parameter_id") or p.get("parameter"),
+                "param_id": (p.get("parameter") or p.get("name")
+                             or p.get("parameter_id")),
+                "parameter_id": p.get("parameter_id"),
                 "unit": p.get("unit"),
                 "value": val,
                 "envelope": p.get("envelope"),
-                "value_class": p.get("basis") or "MODELLED",
+                "value_class": p.get("value_status") or p.get("basis")
+                or "MODELLED",
+                "value_status": value_status,
+                "source": p.get("source"),
+                "source_hash": p.get("source_hash"),
                 "origin": "engineering_core.critical_parameters",
             })
 
@@ -183,7 +247,7 @@ def classify(run_result: Dict[str, Any], cio: Optional[Dict[str, Any]] = None) -
     combined = " ".join([site, mechanism, intervention,
                          str(invention.get("mechanism") or "")])
 
-    physical_site = bool(_PHYSICAL_SITE_SIGNALS.search(combined))
+    physical_site = bool(_PHYSICAL_SITE_PATTERN.search(combined))
     process_signal = bool(_PROCESS_SIGNALS.search(combined))
     algorithm_signal = bool(_ALGORITHM_SIGNALS.search(combined))
 
@@ -221,6 +285,16 @@ def classify(run_result: Dict[str, Any], cio: Optional[Dict[str, Any]] = None) -
             "geometry_parameters_sourced": len(geo_params),
             "subsystems_recorded": len(subsystems),
             "physical_site_detected": physical_site,
+            # R452 A4: the vocabulary the site decision consumed — a
+            # threshold WITH provenance (Art. XXVII), recorded per
+            # classification
+            "physical_site_vocabulary": {
+                "n_words": _PHYSICAL_SITE_BASIS["n_words"],
+                "authority": _PHYSICAL_SITE_BASIS["authority"],
+                "registry_domains_excluded":
+                    _PHYSICAL_SITE_BASIS["registry_domains_excluded"],
+                "layers_used": _PHYSICAL_SITE_BASIS["layers_used"],
+            },
             "process_signal": process_signal,
             "algorithmic_signal": algorithm_signal,
             "intervention_site": site,

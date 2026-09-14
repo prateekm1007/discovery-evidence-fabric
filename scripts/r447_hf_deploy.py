@@ -279,3 +279,78 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
+
+# ---------------------------------------------------------------------------
+# R451-C1.3 — the self-hosted zero-paid local route on the Space
+# ---------------------------------------------------------------------------
+# The llama.cpp server is BUILT FROM THE PINNED TAG b10930 (the same
+# release lineage as the R451 sandbox proof; the b10930 GitHub release
+# ships Windows assets only — the Linux server is source-built from the
+# tag, GGML_NATIVE=OFF for portability across the builder's CPU). The
+# GGUF is acquired at BUILD time with sha256 verification (fail-closed:
+# a changed upstream artifact FAILS the build — the same pin discipline
+# as the Blender tarball above).
+HUNK_LLAMA_BUILDER = """
+# ---------- R451-C1.3: llama.cpp llama-server from the pinned tag ------
+FROM python:3.12-slim AS llama-builder
+RUN set -eux; \
+    apt-get update; \
+    apt-get install -y --no-install-recommends git ca-certificates cmake g++ make; \
+    rm -rf /var/lib/apt/lists/*
+ARG LLAMA_CPP_TAG=b10930
+# NOTE (the first deploy's measured BUILD_ERROR, fixed): at b10930 the
+# server lives in the TOOLS tree — -DLLAMA_BUILD_TOOLS=OFF removes the
+# llama-server target entirely ("gmake: No rule to make target
+# 'llama-server'"). TOOLS stays ON (default); --target llama-server
+# limits the build to the server and its dependencies anyway.
+RUN set -eux; \
+    git clone --depth 1 --branch "${LLAMA_CPP_TAG}" https://github.com/ggml-org/llama.cpp /src; \
+    cmake -S /src -B /build -DGGML_NATIVE=OFF -DLLAMA_BUILD_TESTS=OFF \
+      -DLLAMA_BUILD_EXAMPLES=OFF -DLLAMA_CURL=OFF -DBUILD_SHARED_LIBS=OFF; \
+    cmake --build /build --target llama-server -j"$(nproc)"; \
+    /build/bin/llama-server --version
+"""
+
+HUNK_LOCAL_QWEN = """
+# ---------- R451-C1.3: the pinned zero-paid model + the server --------
+# The sha-pinned Qwen/Qwen3-1.7B Q4_K_M GGUF (apache-2.0) — the SAME
+# weights the R451 sandbox proof measured (gguf sha256 72c5c3cb...).
+# Acquisition is verified fail-closed; a mismatched artifact ABORTS the
+# build (never a silently different model).
+ARG QWEN_GGUF_SHA256=72c5c3cb38fa32d5256e2fe30d03e7a64c6c79e668ad84057e3bd66e250b24fb
+RUN set -eux; \
+    apt-get update >/dev/null; \
+    apt-get install -y --no-install-recommends libstdc++6 libgomp1 >/dev/null; \
+    rm -rf /var/lib/apt/lists/*; \
+    mkdir -p /opt/llama /opt/models; \
+    curl -fsSL --retry 3 --max-time 900 \
+      -o /opt/models/Qwen3-1.7B-Q4_K_M.gguf \
+      https://huggingface.co/bartowski/Qwen_Qwen3-1.7B-GGUF/resolve/main/Qwen_Qwen3-1.7B-Q4_K_M.gguf; \
+    echo "${QWEN_GGUF_SHA256}  /opt/models/Qwen3-1.7B-Q4_K_M.gguf" | sha256sum -c -; \
+    cp /tmp/llama-server /opt/llama/llama-server; \
+    chmod +x /opt/llama/llama-server; \
+    /opt/llama/llama-server --version
+"""
+
+
+def _r451_c13_adapter_dockerfile(commit: str) -> str:
+    """The canonical adapter Dockerfile + the R451-C1.3 local-route
+    hunks: the llama-builder stage FIRST (it must precede the engine
+    stage so COPY --from can reference it), the pinned model + server
+    copy INSIDE the engine stage (after the apt set), and the binary
+    staged via a temp COPY so the engine stage can place it."""
+    df = _adapter_dockerfile(commit)
+    # 1. prepend the builder stage (before stage 1 — Docker allows any
+    #    order; referencing it later via COPY --from)
+    df = HUNK_LLAMA_BUILDER + "\n" + df
+    # 2. stage the built binary into the engine stage: insert the
+    #    local-qwen hunk right after the Blender ENV line (the engine
+    #    stage's dependency block end), with the binary COPY first
+    wire = ("ENV BLENDER_PATH=/opt/blender/blender\n")
+    assert wire in df
+    binary_copy = (
+        "# the built llama-server binary from the pinned-tag builder\n"
+        "COPY --from=llama-builder /build/bin/llama-server /tmp/llama-server\n")
+    df = df.replace(wire, wire + binary_copy + HUNK_LOCAL_QWEN, 1)
+    return df

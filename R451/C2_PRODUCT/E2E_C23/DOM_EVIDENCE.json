@@ -1,0 +1,48 @@
+{
+  "artifact_type": "FRESH_BROWSER_DOM_EVIDENCE",
+  "round": "R451-C2.3 (the geometry-to-visual identity chain — VISUAL_READY requires the release chain)",
+  "captured_at_utc": "2026-09-13T09:20:00Z",
+  "method": "real engine server (python -m toscanini.server, :8788, /api/version engine_commit 4358e8a6 == local baseline HEAD) + production next start (:3101) + headless Chrome (agent-browser), fresh page load per state; the one-off release-mismatch fixture was removed after capture and sessions.json restored",
+  "states": {
+    "state_E_strict_release_chain": {
+      "url": "/?run=tsr451c2successfixture",
+      "screenshot": "stateE_strict_release_chain.png",
+      "dom_present": [
+        "Technology ready",
+        "the interactive model viewer (canvas) in the hero viewport",
+        "strip: Problem RECEIVED / Invention RECEIVED / Engineering RECEIVED / 3D visualization RECEIVED"
+      ],
+      "dom_absent": [
+        "any render-blocked ribbon",
+        "any blocked_class on the visualization row"
+      ],
+      "note": "THE false-negative guard: the R451-C2.3 evaluator demands the FULL release chain (canonical GLB bytes -> receipt identity incl. geometry_spec_sha256 -> render record source -> COMPLETE_PASS -> the required ladder -> hero -> hero source identity) and the COMPLETE chain still reaches VISUAL_READY in the product — the strictness costs nothing that was honestly earned. The fixture's render record carries the real pipeline's views block (hero.glb provenance hash); the fixture tool now writes that recorded shape."
+    },
+    "stateC23_not_attempted": {
+      "url": "/?run=tsr451c22notattemptedfixture",
+      "screenshot": "stateC23_not_attempted_identity_chain.png",
+      "dom_present": [
+        "ENGINEERING MODEL READY (authority-aware title: the fixture records the ENGINEERING identity chain)",
+        "Engineering model ready. Presentation render not yet started.",
+        "Model ready — render not started",
+        "strip: 3D visualization STOPPED[JOIN_FAILURE]"
+      ],
+      "note": "regression with the new identity chain: the no-silent-gap failure stays visible — the seeded engineering identity (R451-C2.3 contract) drives the authority-aware title, and the no-invocation state remains the explicit JOIN_FAILURE"
+    },
+    "stateC23_release_unverified": {
+      "url": "/?run=tsr451c23releaseunverifiedfixture",
+      "screenshot": "stateC23_release_unverified.png",
+      "dom_present": [
+        "ENGINEERING MODEL READY",
+        "Engineering model ready. The presentation could not be verified against the canonical geometry.",
+        "strip: 3D visualization STOPPED[RELEASE_UNVERIFIED]"
+      ],
+      "dom_absent": [
+        "Technology ready",
+        "any VISUAL_READY reading"
+      ],
+      "note": "THE fail-closed proof in the live product: the render record's source_glb_sha256 was mutated to different bytes and the evaluator caught it INSIDE the join — the gate had passed, but the release chain fails closed, the visualization row stops with the typed RELEASE_UNVERIFIED class, and nothing reads as visual readiness (R451-C2.3 §5/§6: 'mismatch must fail closed. Do not merely report the mismatch later in the watchdog.')"
+    }
+  },
+  "related_battery": "tests/test_r451_c23_identity_chain.py (the fourteen directive attacks + identity-chain equations + one-evaluator coupling + clean-state replay) and scripts/r451_c2_ui_tests.mjs (60 checks incl. the two new typed causes and the authority-aware ribbon title)"
+}

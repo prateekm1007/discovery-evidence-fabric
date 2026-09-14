@@ -144,14 +144,46 @@ def _generation_note(session: Dict[str, Any]) -> str:
     return ""
 
 
+def _challenge_verdict(session: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    """R452: the challenge-aware terminal verdict for the positive
+    final statuses. Returns the terminal_outcome dict ONLY when the
+    lineage verdict DEMOTES the presentation (invention_found=False —
+    killed-by-challenge or an unverified promoted generation); None
+    when the run keeps its positive presentation (a verified survivor)
+    or no lineage exists (the legacy branches keep their behavior —
+    never fabricated)."""
+    try:
+        out = terminal_outcome(session, _run_dir(session))
+    except Exception:  # noqa: BLE001 — projection must never crash the view
+        return None
+    if out.get("invention_found") is False:
+        return out
+    return None
+
+
 def user_state(session: Dict[str, Any]) -> str:
-    """The user-facing state key for one session record."""
+    """The user-facing state key for one session record.
+
+    R452 (external audit B1): for the POSITIVE final statuses the
+    lineage's challenge verdict is authoritative — a lineage whose
+    generations were killed and never replaced by a VERIFIED survivor
+    can never surface as CANDIDATE FOUND / EVOLVED (the audit measured
+    the promotion 7/7 in production). Those records present as
+    UNDER_DEVELOPMENT at the key layer too; the outcome + decision line
+    carry the killed-by-challenge truth verbatim."""
     status = session.get("status") or ""
     final = (session.get("final_status") or "").upper()
     pkg = session.get("package") or {}
     if status in ("PENDING", "BUILDING_PROBLEM", "RUNNING"):
         return "RUNNING"
     if status == "COMPLETE":
+        if final in ("INVENTION_REQUIRES_EXPERIMENT",
+                     "EVOLVED_INVENTION_CANDIDATE",
+                     "AUTOMATED_INVENTION_CANDIDATE",
+                     "INVENTION_UNDER_DEVELOPMENT"):
+            verdict = _challenge_verdict(session)
+            if verdict is not None and not verdict.get("invention_found"):
+                return "COMPLETED_UNDER_DEVELOPMENT"
         if final == "INVENTION_REQUIRES_EXPERIMENT":
             # R443 / TSC-008: the surviving baseline fallback — the
             # idea is alive and requires its experiment (never EVOLVED,
@@ -221,15 +253,35 @@ def user_state_view(session: Dict[str, Any]) -> Dict[str, Any]:
         or key in ("INTERRUPTED", "BLOCKED_TRANSPORT")
     found = key in ("COMPLETED_PACKAGE", "COMPLETED_CANDIDATE",
                     "COMPLETED_EVOLVED")
-    rejected = False   # R416: the product surface never renders a bare
-    # reject dead-end; challenge losses live on the generation records
+    # R416: the product surface never renders a bare reject dead-end;
+    # challenge losses live on the generation records.
+    # R452 (external audit B1/AT-7): the lineage's challenge verdict is
+    # AUTHORITATIVE over final_status — a killed/unverified lineage is
+    # never "found something", and a GENUINE adversarial kill surfaces
+    # as rejected=true (typed outcome, never a bare dead-end sentence).
+    verdict = _challenge_verdict(session)
+    outcome_info = terminal_outcome(session, _run_dir(session))
+    if verdict is not None:
+        found = False
+        rejected = bool(verdict.get("invention_rejected"))
+    else:
+        rejected = False
 
     # the one-line decision: what did the engine decide?
     # R416: the decision line follows what ACTUALLY happened (honest
     # cause attribution — a mechanism-generation failure is never
     # described as an adversarial rejection)
     gen_note = _generation_note(session)
-    if found and pkg.get("maturity"):
+    if rejected:
+        decision = ("the machine's own adversarial challenge killed this "
+                    "invention and no verified survivor replaced it — "
+                    "the generation records show exactly what was killed "
+                    "and why")
+    elif verdict is not None and not found:
+        decision = (verdict.get("basis") or gen_note or
+                    "architectures were explored and challenged; none is "
+                    "presented as a verified candidate")
+    elif found and pkg.get("maturity"):
         decision = f"invention found — package at {pkg['maturity']} maturity"
         if gen_note:
             decision = f"{decision}; {gen_note}"
@@ -279,11 +331,9 @@ def user_state_view(session: Dict[str, Any]) -> Dict[str, Any]:
         # granular user_state above stays the sub-detail; the outcome is
         # the product-level terminal truth, derived by run_state from
         # recorded fields only.
-        "outcome": terminal_outcome(session, _run_dir(session)).get(
-            "outcome"),
+        "outcome": outcome_info.get("outcome"),
         "outcome_label": OUTCOME_LABELS.get(
-            terminal_outcome(session, _run_dir(session)).get("outcome"),
-            "Investigating"),
+            outcome_info.get("outcome"), "Investigating"),
     }
 
 

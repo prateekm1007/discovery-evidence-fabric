@@ -1,0 +1,41 @@
+{
+ "artifact_type": "R451_ZEROGPU_EXPERIMENT",
+ "directive": "R451-C1.9 — one tightly bounded ZeroGPU experiment (NOT a benchmark). The only question: can a small open-weight reasoning model run within the canonical Space's ZeroGPU allocation and satisfy the Toscanini transport contract?",
+ "executed_at": "2026-09-13T09:05:00+00:00Z",
+ "verdict": "FAILED_ZERO_GPU_NOT_ATTACHABLE_TO_DOCKER_SPACE",
+ "outcome": "The exact failure is recorded and the experiment STOPS here (the directive's own rule: 'If it fails, record the exact failure and stop. Do not turn one failure into a model leaderboard.')",
+ "the_measurement": {
+  "step": "request_space_hardware(repo_id='prateekm1/toscanini-prod-validation', hardware='zero-a10g')",
+  "api_error_verbatim": "huggingface_hub.errors.BadRequestError: Bad request: ZeroGPU Spaces only work with Gradio SDK",
+  "http_class": "400 BadRequest",
+  "space_sdk_at_request": "docker",
+  "hardware_before_and_after": "cpu-basic (unchanged — the request was rejected before any hardware change applied)",
+  "experiment_revision_uploaded_before_the_request": "5c0b852f8759952534137e9c347816b04d2679a1 (the minimal Docker experiment app; superseded by the production redeploy at the pinned engine commit)"
+ },
+ "account_facts_measured_live": {
+  "whoami": "prateekm1 (Prateek Misra)",
+  "isPro": true,
+  "billingMode": "prepaid",
+  "periodEnd": "2026-09-30",
+  "note": "The PRO subscription carries a ZeroGPU allocation — the 40-minute budget the operator stated EXISTS on the account. The allocation is NOT reachable from the canonical production Space."
+ },
+ "structural_analysis": {
+  "zero_gpu_constraint": "ZeroGPU hardware attaches ONLY to Gradio-SDK Spaces (measured: the hardware request on the Docker-SDK canonical Space returns HTTP 400).",
+  "canonical_space_constraint": "The canonical production Space is sdk: docker BY NECESSITY — the Toscanini engine image (Blender, CadQuery/OCCT, the full Python environment, the C1.3 llama.cpp llama-server + sha-pinned GGUF local route) is a Docker build. Switching the canonical Space to the Gradio SDK would be a redesign of the production deployment.",
+  "production_consequence": "Even if a small open-weight model ran successfully inside a ZeroGPU allocation, the ZeroGPU resource class could NOT become a runtime-admissible route for THIS production engine: the engine's Space cannot attach the hardware. A successful Gradio-side measurement would therefore not change any deployment decision — which is why the experiment stops at the structural failure instead of pursuing it.",
+  "why_not_a_second_space": "R447-SPACE-OWNER (2026-09-12, machine-verified): the canonical HF Space is the ONLY HF production target — no additional Space may be created. A temporary Gradio experiment Space would be a second Space; the standing operator decision forbids it (reopening it is an operator decision, not a coder one — Art. XIII).",
+  "why_not_an_sdk_flip": "Temporarily flipping the canonical Space's SDK to gradio to run the probe would perturb the production identity the R447 record pins, burn two additional full production rebuilds, and still could not make ZeroGPU usable by the Docker production engine afterwards."
+ },
+ "resource_class_state": {
+  "zero_gpu": "NOT_ACCESSIBLE_FROM_THE_CANONICAL_PRODUCTION_SPACE (typed, measured 2026-09-13: HTTP 400 'ZeroGPU Spaces only work with Gradio SDK')",
+  "cpu_self_hosted": "ACCESSIBLE AND DEPLOYED — the C1.3 adapter Dockerfile builds llama.cpp llama-server from the pinned tag b10930 + the sha-pinned Qwen/Qwen3-1.7B Q4_K_M GGUF on the canonical Space itself (C1.8: the production Space independently proves the zero-paid open-weight route; never a claim that the coding sandbox's compute transfers)",
+  "gpu_minutes_consumed_estimate": 0.0,
+  "model_leaderboard": "NONE (the directive's explicit prohibition held)"
+ },
+ "operator_unblock_paths_recorded_not_taken": [
+  "Revisit the R447 single-Space decision and allow a temporary Gradio-SDK experiment Space — then the bounded probe answers whether Qwen3-1.7B serves the FIELD contract inside the ZeroGPU allocation (the operator's 40-minute budget).",
+  "Re-architect the canonical production deployment to the Gradio SDK — a production redesign decision that belongs to the operator, not this round."
+ ],
+ "captured_by": "scripts/r451_c13_zerogpu.py phases upload+hardware (the R451-C1.3 session, through the authenticated HF API)",
+ "canonical_space": "prateekm1/toscanini-prod-validation"
+}

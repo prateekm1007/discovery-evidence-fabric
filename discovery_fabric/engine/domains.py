@@ -2366,6 +2366,163 @@ def get_domain_module(domain_id: str) -> Dict[str, Any]:
     }
 
 
+# ---------------------------------------------------------------------------
+# R452 A4 — the physical-site vocabulary (one authority: THIS registry)
+# ---------------------------------------------------------------------------
+#: abstract/software words that never denote a physical site even when
+#: they appear in registry text (the NOT_VISUALIZABLE discrimination
+#: must survive the widening — the negative control depends on it)
+_PHYSICAL_SITE_STOPLIST = {
+    "algorithm", "protocol", "policy", "software", "workflow",
+    "scheduler", "scheduling", "optimization", "optimisation", "pricing",
+    "model", "models", "modeling", "data", "pipeline", "layer",
+    "monitoring", "deployment", "constraint", "requirement",
+    "verification", "validation", "compliance", "pathway", "management",
+    "strategy", "signal", "analysis", "criterion", "estimation",
+    "reconstruction", "annotation", "labeling", "learning", "training",
+    "inference", "prediction", "classification", "regression",
+    "uncertainty", "quantification", "basis", "state", "stage",
+    "phase", "process", "procedure", "regimen", "schedule",
+    "accuracy", "precision", "recall", "latency", "throughput",
+    "interface", "inspection", "detection", "documentation", "review",
+    "regulatory", "standards", "standard", "certification",
+    "method", "methods", "parameter", "parameters",
+    # connectives / function words (tokenizer noise, never sites)
+    "and", "the", "for", "with", "plus", "via", "into", "from",
+    "all", "any", "each", "when", "then", "than", "this", "that",
+    "these", "those", "during", "after", "before", "between",
+    "through", "across", "per", "such", "also", "both", "over",
+    "under", "above", "below", "within", "onto", "upon", "out",
+    "off", "not", "none", "only", "same", "other", "another",
+    "application", "context", "specific", "closed", "loop", "target",
+    "matching", "following", "free", "space", "bound", "bounded",
+    "architecture", "anti", "boundaries", "boundary",
+    # concept/physics words measured in the widened vocabulary that are
+    # NOT artifact nouns (measured false positive: the pure-algorithm
+    # negative control hit "control"; a site word must denote a THING)
+    "acoustics", "actuation", "ambient", "biochemical", "biomedical",
+    "chain", "characterization", "chemistry", "contact", "containment",
+    "control", "convection", "conversion", "critical", "cycle", "cycles",
+    "design", "diffusion", "duty", "electrical", "electronics",
+    "element", "energy", "exposure", "external", "fatigue", "features",
+    "feedback", "field", "flow", "fluid", "fracture", "gradient",
+    "guidance", "heat", "hydraulics", "immobilization", "kill",
+    "kinetics", "limit", "limits", "link", "load", "loss", "magnetics",
+    "mass", "materials", "mechanical", "mechanics", "mechanism",
+    "medium", "microbiology", "optical", "optics", "path",
+    "pharmacodynamics", "physics", "power", "preservation", "pressure",
+    "reaction", "register", "regulation", "reject", "release", "safety",
+    "science", "sink", "source", "stability", "stoplist", "structural",
+    "structures", "termination", "thermal", "thermo", "time",
+    "transduction", "transfer", "transmit", "transport", "ultrasonics",
+}
+
+
+def physical_site_vocabulary() -> Dict[str, Any]:
+    """R452 A4 (external audit): the physical-site vocabulary, derived
+    from THIS module's canonical registry so the classifier's site check
+    can never be narrower than the domain registry (the measured defect:
+    a closed 27-noun regex failed 4/6 real physical inventions — no
+    'vial', no 'lyophilizer', no 'die', no 'punch').
+
+    Derivation, deterministic and recorded:
+      * every domain module EXCEPT ``ml_data`` (a software/ML domain's
+        vocabulary must never denote a physical site — the classifier's
+        algorithmic-invention discrimination and the PP-5 negative
+        control depend on that boundary);
+      * from each module: architecture-block labels, manufacturing
+        candidates/routes, materials, disciplines, domain label, and
+        failure-mode `mode` + `physical_mechanism` text (the PHYSICAL
+        layers of the registry — routing `signals` are excluded: they
+        route domains, they do not name sites);
+      * word tokens >= 3 chars, stoplist applied (abstract/software
+        words above), remaining tokens are candidate site nouns.
+
+    The original 27-noun floor is unioned in (it was correct, only too
+    narrow).  Returns (vocabulary, basis) — the basis travels into the
+    classifier's recorded decision (Art. XXVII: the vocabulary is a
+    threshold with provenance).
+    """
+    words: set = set()
+    excluded = {"ml_data"}
+    sources: Dict[str, int] = {}
+    floor = {
+        "panel", "catheter", "valve", "pump", "device", "module",
+        "cell", "stack", "battery", "turbine", "exchanger", "reactor",
+        "sensor", "implant", "floor", "lumen", "coil", "antenna",
+        "array", "absorber", "receiver", "nozzle", "duct", "blade",
+        "wafer", "electrode", "membrane", "engine",
+    }
+    for domain_id, template in DOMAIN_TEMPLATES.items():
+        if domain_id in excluded:
+            continue
+        mod = DOMAIN_MODULES.get(domain_id, {})
+        text_parts: List[str] = []
+        for block in (template.get("architecture_blocks") or []) + \
+                (template.get("architecture_blocks_medical") or []):
+            text_parts.append(str(block))
+        for key in ("manufacturing_candidates", "materials_candidates",
+                    "disciplines"):
+            for item in template.get(key) or []:
+                text_parts.append(str(
+                    item.get("name") if isinstance(item, dict)
+                    else item))
+        text_parts.append(str(template.get("label", "")))
+        # module-depth physical layers (failure modes + manufacturing)
+        for fm in (mod.get("failure_modes") or []):
+            if isinstance(fm, dict):
+                text_parts.append(str(fm.get("mode", "")))
+                text_parts.append(str(fm.get("physical_mechanism", "")))
+        for item in (mod.get("manufacturing_routes") or []):
+            text_parts.append(str(
+                item.get("route") if isinstance(item, dict) else item))
+        n_before = len(words)
+        for part in text_parts:
+            # hyphen-split ("anti-biofilm" -> "biofilm"), lowercase,
+            # drop adjective-forming suffixes ("catalytic", "optical"):
+            # the vocabulary is NOUN-shaped by construction
+            for w in re.findall(r"[a-z][a-z]{2,}", str(part).lower()):
+                if len(w) < 4 or w in _PHYSICAL_SITE_STOPLIST:
+                    continue
+                if re.search(r"(ic|ive|ous|ful|less|able|ible|ary|ing)$",
+                             w) and w not in floor:
+                    continue
+                words.add(w)
+        sources[domain_id] = len(words) - n_before
+    # the original 27-noun floor, unioned so the check is never NARROWER
+    # than before (Art. VII: the verifier is widened, never weakened)
+    words |= floor
+    basis = {
+        "artifact": "PHYSICAL_SITE_VOCABULARY",
+        "authority": "discovery_fabric/engine/domains.py "
+                     "(ENGINEERING_DOMAIN_REGISTRY, one authority)",
+        "registry_domains_used": sorted(set(DOMAIN_TEMPLATES) - excluded),
+        "registry_domains_excluded": sorted(excluded),
+        "exclusion_reason": (
+            "ml_data is a software/ML domain; its vocabulary must never "
+            "denote a physical site (the NOT_VISUALIZABLE discrimination "
+            "and the audit's PP-5 negative control depend on that "
+            "boundary)"),
+        "layers_used": [
+            "architecture_blocks", "architecture_blocks_medical",
+            "manufacturing_candidates", "materials_candidates",
+            "disciplines", "domain label", "failure_modes (mode + "
+            "physical_mechanism)", "manufacturing_routes"],
+        "layers_excluded": [
+            "routing signals (they route domains, they do not name "
+            "sites)"],
+        "stoplist_size": len(_PHYSICAL_SITE_STOPLIST),
+        "noun_shaping": ("hyphen-split; adjective suffixes dropped "
+                         "(ic/ive/ous/ful/less/able/ible/ary/ing); "
+                         "connectives stoplisted"),
+        "n_words": len(words),
+        "floor_27_nouns": "unioned (never narrower than the pre-R452 "
+                          "check)",
+        "per_domain_new_words": sources,
+    }
+    return words, basis
+
+
 def export_registry_json() -> Dict[str, Any]:
     """Canonical ENGINEERING_DOMAIN_REGISTRY.json content (Directive 4;
     R445: also publishes THE canonical domain-family vocabulary)."""

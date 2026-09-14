@@ -1,0 +1,248 @@
+{
+ "candidate_id": "cand:R451:cad-bridge:dual-lumen-catheter",
+ "problem_id": "r451-dual-lumen-drainage-catheter",
+ "architecture": {
+  "mechanism": "a circular dual-lumen catheter wall carrying two parallel circular lumens separated by a solid septum; wall stiffness resists kinking and septum thickness resists suction collapse",
+  "intervention": "outer diameter 7 mm, two lumens 2.5 mm, septum 0.9 mm, length 400 mm",
+  "expected_effect": "lumens stay patent through a 15 mm bend radius at 40 kPa suction"
+ },
+ "technical_state": {
+  "value": {
+   "version": "1.0.0",
+   "objects": [
+    {
+     "object_id": "1",
+     "name": "Dual-lumen chest drainage catheter",
+     "role": "Device"
+    }
+   ],
+   "parameters": [
+    {
+     "param_id": "1",
+     "name": "Outer diameter",
+     "category": "GEOMETRY",
+     "unit": "mm",
+     "value": null,
+     "value_class": "UNKNOWN",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": null,
+     "range_max": null,
+     "range_span": null,
+     "range_evidence_id": null,
+     "range_class": "UNKNOWN",
+     "role": "Outer diameter of the catheter"
+    },
+    {
+     "param_id": "2",
+     "name": "Lumen diameter",
+     "category": "GEOMETRY",
+     "unit": "mm",
+     "value": null,
+     "value_class": "UNKNOWN",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": null,
+     "range_max": null,
+     "range_span": null,
+     "range_evidence_id": null,
+     "range_class": "UNKNOWN",
+     "role": "Diameter of the inner lumen of the catheter"
+    },
+    {
+     "param_id": "3",
+     "name": "Septum thickness",
+     "category": "GEOMETRY",
+     "unit": "mm",
+     "value": null,
+     "value_class": "UNKNOWN",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": null,
+     "range_max": null,
+     "range_span": null,
+     "range_evidence_id": null,
+     "range_class": "UNKNOWN",
+     "role": "Thickness of the septum in the catheter"
+    },
+    {
+     "param_id": "4",
+     "name": "Working length",
+     "category": "GEOMETRY",
+     "unit": "mm",
+     "value": null,
+     "value_class": "UNKNOWN",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": null,
+     "range_max": null,
+     "range_span": null,
+     "range_evidence_id": null,
+     "range_class": "UNKNOWN",
+     "role": "Length of the catheter in the thoracic region"
+    },
+    {
+     "param_id": "5",
+     "name": "Material",
+     "category": "MATERIALS",
+     "unit": "N/A",
+     "value": null,
+     "value_class": "UNKNOWN",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": null,
+     "range_max": null,
+     "range_span": null,
+     "range_evidence_id": null,
+     "range_class": "UNKNOWN",
+     "role": "Material used in the catheter"
+    }
+   ],
+   "constraints": [],
+   "objectives": [
+    {
+     "objective_id": "1",
+     "target": "1",
+     "direction": "MAINTAIN_WITHIN",
+     "basis": "Maintain outer diameter within 14 mm to ensure proper placement and function"
+    },
+    {
+     "objective_id": "2",
+     "target": "2",
+     "direction": "MAINTAIN_WITHIN",
+     "basis": "Maintain lumen diameter within 1.5 mm to ensure adequate drainage"
+    },
+    {
+     "objective_id": "3",
+     "target": "3",
+     "direction": "MAINTAIN_WITHIN",
+     "basis": "Maintain septum thickness within 0.2 mm to prevent leakage"
+    }
+   ],
+   "failure_modes": [
+    {
+     "mode_id": "1",
+     "name": "Dual-lumen chest drainage catheter keeps two",
+     "problem_link": "Device: Thoracic surgery teams need"
+    }
+   ],
+   "dependencies": [
+    {
+     "relation_id": "1",
+     "cause": "1",
+     "effect": "2",
+     "direction": "INCREASES",
+     "statement": "The outer diameter of the catheter directly affects the lumen diameter",
+     "relation_class": "MODELLED",
+     "span": "Outer diameter of the catheter directly affects the lumen diameter",
+     "evidence_id": "1"
+    },
+    {
+     "relation_id": "2",
+     "cause": "2",
+     "effect": "3",
+     "direction": "INCREASES",
+     "statement": "The lumen diameter of the catheter directly affects the septum thickness",
+     "relation_class": "MODELLED",
+     "span": "Lumen diameter of the catheter directly affects the septum thickness",
+     "evidence_id": "2"
+    },
+    {
+     "relation_id": "3",
+     "cause": "3",
+     "effect": "4",
+     "direction": "INCREASES",
+     "statement": "The septum thickness of the catheter directly affects the working length",
+     "relation_class": "MODELLED",
+     "span": "Septum thickness of the catheter directly affects the working length",
+     "evidence_id": "3"
+    },
+    {
+     "relation_id": "4",
+     "cause": "4",
+     "effect": "5",
+     "direction": "INCREASES",
+     "statement": "The working length of the catheter directly affects the material used",
+     "relation_class": "MODELLED",
+     "span": "Working length of the catheter directly affects the material used",
+     "evidence_id": "4"
+    }
+   ],
+   "extraction": {
+    "proposal_id": "tsp:064c2f888aae",
+    "provider": "localqwen",
+    "model": "qwen3-1.7b",
+    "prompt_hash": "ac6e174a1b1f1e632cb4633b684e17c24354a2c2b9e11767feb0858176040334",
+    "output_hash": "3979a4cceb4770ee656f21170db374458c3341c70defe393d89f6de9f434a338",
+    "llm_is_untrusted_proposer": true,
+    "validator": "technical_state_v1 (deterministic)",
+    "admitted_counts": {
+     "parameters": 5,
+     "parameters_with_value": 0,
+     "parameters_extracted": 0,
+     "parameters_modelled": 0,
+     "parameters_with_envelope": 0,
+     "constraints": 0,
+     "objectives": 3,
+     "dependencies": 4,
+     "objects": 1,
+     "failure_modes": 1
+    },
+    "dropped_pieces": [
+     {
+      "kind": "constraint",
+      "id": "1",
+      "gate": "C2",
+      "reason": "EXTRACTED limit: evidence '1' not custodied"
+     },
+     {
+      "kind": "constraint",
+      "id": "2",
+      "gate": "C2",
+      "reason": "EXTRACTED limit: evidence '2' not custodied"
+     },
+     {
+      "kind": "constraint",
+      "id": "3",
+      "gate": "C2",
+      "reason": "EXTRACTED limit: evidence '3' not custodied"
+     },
+     {
+      "kind": "constraint",
+      "id": "4",
+      "gate": "C2",
+      "reason": "EXTRACTED limit: evidence '4' not custodied"
+     },
+     {
+      "kind": "constraint",
+      "id": "5",
+      "gate": "C1",
+      "reason": "limit is not a number"
+     },
+     {
+      "kind": "objective",
+      "id": "4",
+      "gate": "O1",
+      "reason": "basis not tied to this problem's device/failure vocabulary — an objective the problem does not have"
+     },
+     {
+      "kind": "objective",
+      "id": "5",
+      "gate": "O1",
+      "reason": "basis not tied to this problem's device/failure vocabulary — an objective the problem does not have"
+     }
+    ],
+    "extracted_at": "2026-09-13T02:06:39+00:00Z"
+   }
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "TECHNICAL_STATE_EXTRACTION",
+  "evidence_ids": [
+   "1",
+   "2",
+   "3",
+   "4"
+  ],
+  "note": "structured technical state (R379): values are EXTRACTED (span-verified) / MODELLED (declared) / UNKNOWN (explicit); the analytical evaluator computes predictions from this state — predictions are model inferences, never measurements"
+ }
+}
