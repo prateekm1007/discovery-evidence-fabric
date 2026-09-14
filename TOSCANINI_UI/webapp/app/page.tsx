@@ -1,38 +1,38 @@
 "use client";
 
-// R435 — THE PRODUCT EXPERIENCE RESET.
+// R453-C2 — THE CLAUDE-CLASS RECONSTRUCTION: one conversation → one
+// discovery.
 //
-//   ┌──────────────────────────────────────────────────────────────┐
-//   │ Toscanini · Designing: <the problem> · status      + New     │
-//   ├──────────────────────────────────────────────────────────────┤
-//   │                     THE TECHNOLOGY STAGE                      │
-//   │   ┌────────────────────────────────────────────────────┐     │
-//   │   │              THE 3D ARTIFACT (HERO)                │     │
-//   │   │   large · calm · interactive · the product itself  │     │
-//   │   └────────────────────────────────────────────────────┘     │
-//   │   What changed · Why it works · What supports it · What      │
-//   │   could kill it                                              │
-//   │   Test this · Compare generations · Technology package       │
-//   │   ── deep layer (progressive disclosure) ──                  │
-//   │   journal · summary · model · evidence · engineering ·       │
-//   │   experiment · package · ask                                 │
-//   └──────────────────────────────────────────────────────────────┘
+//   ┌────────────────────────────────────────────────────────────────┐
+//   │ Toscanini   ● Discovery ready                       + New      │
+//   ├──────────┬──────────────────────────────────┬──────────────────┤
+//   │ SIDEBAR  │  THE CONVERSATION                │  THE WORKSPACE   │
+//   │ New      │  you: the problem                │  (appears when   │
+//   │ Discoveries│ Toscanini: what it found,      │   there is a     │
+//   │ Packages │  what it believes, what attacked │   substantial    │
+//   │ Projects │  it, what remains uncertain,     │   output) model· │
+//   │ Settings │  the next decisive action        │  evidence·eng·   │
+//   │          │  [ composer ]                    │  experiment·pkg  │
+//   └──────────┴──────────────────────────────────┴──────────────────┘
 //
-// The reset directive: stop treating the Dossier as the primary UI.
-// The dossier stays the CANONICAL PROJECTION (Art. X) — the visible
-// experience is the technology workspace that projects it: the artifact
-// becomes the hero, complexity is progressively revealed, the result
-// becomes the product.
+// What changed from R435 (and why — Art. LXIV dispositions in the audit):
+//   * TechStage.tsx DELETED — the stage+report layout is superseded by
+//     the conversation (Conversation.tsx) and the contextual workspace
+//     (Workspace.tsx); the hero viewer moved INTO the workspace's model
+//     surface (the ONE-viewer invariant is preserved by construction).
+//   * HistoryRail.tsx DELETED — superseded by Sidebar.tsx (the new IA).
+//   * DeepDive stays as the canonical deep layer but renders INSIDE the
+//     workspace surfaces; nothing re-derived.
+//   * The pipeline appears as a story (present.ts), never as machinery.
 //
-// Section 12 (refresh recovery, R430.1): the workspace hydrates from
-// PERSISTED endpoints only — /result, /events, /dossier — then
-// reconnects the live event stream if the job is still running. No UI
-// state depends solely on transient React state. All polling/SSE
-// plumbing below is unchanged from R430.1/R433.
+// The frontend remains a PROJECTION of canonical state (Art. X): every
+// sentence flows through lib/present.ts; adversarial fixtures pin the
+// honesty contracts (tests/adversarial_present.test.mjs).
 
 import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
+  askRun,
   getCIO,
   getDossier,
   getEvents,
@@ -47,10 +47,10 @@ import {
   streamUrl,
 } from "@/lib/api";
 import type {
+  AskResponse,
   CIO,
   DossierBody,
   EventsBody,
-  GauntletCard,
   HealthSummary,
   RealityLoopRecord,
   ScienceEvent,
@@ -59,8 +59,10 @@ import type {
   ShowcaseDetail,
   ShowcaseRow,
 } from "@/lib/types";
-import HistoryRail from "@/components/HistoryRail";
-import TechStage from "@/components/TechStage";
+import type { NextAction, SurfaceId } from "@/lib/present";
+import Sidebar from "@/components/Sidebar";
+import Conversation from "@/components/Conversation";
+import Workspace from "@/components/Workspace";
 import InventionStage from "@/components/InventionStage";
 import { isTerminal } from "@/components/RunNarrative";
 
@@ -70,6 +72,15 @@ const EXAMPLES = [
   "Why do rails fracture in service under fatigue loading?",
   "How can we keep minimum drainage when a shunt's primary lumen obstructs?",
 ];
+
+const SUGGESTIONS = [
+  { label: "Explore a technical problem", example: EXAMPLES[1] },
+  { label: "Investigate an observation", example: EXAMPLES[0] },
+  { label: "Improve an existing design", example: EXAMPLES[2] },
+  { label: "Find an unmet need", example: EXAMPLES[3] },
+];
+
+const TEXT_EXT = /\.(txt|md|markdown|csv|json|log|tsv)$/i;
 
 function TransportDot({ health }: { health: HealthSummary | null }) {
   const r = health?.readiness;
@@ -104,29 +115,26 @@ function EngineStatusText({ health }: { health: HealthSummary | null }) {
     : "Discovery temporarily unavailable";
 }
 
-const STORY_STEPS = [
-  "DISCOVER",
-  "INVENT",
-  "INSPECT",
-  "CHALLENGE",
-  "REBUILD",
-  "EXPERIMENT",
-];
-
-function NewProblemPane({
+// ---------------------------------------------------------------------------
+// HOME — one dominant composer, a few lightweight suggestions. No
+// dashboard wall, no KPI cards, no pipeline diagram (brief §6).
+// ---------------------------------------------------------------------------
+function NewDiscoveryPane({
   onStarted,
 }: {
   onStarted: (id: string) => void;
 }) {
   const [text, setText] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [attachNote, setAttachNote] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
 
   async function submit() {
     const t = text.trim();
     if (t.length < 15) {
       setError(
-        "Please describe the problem in a bit more detail (at least 15 characters)."
+        "Describe the problem in a sentence or two — the engine infers the rest."
       );
       return;
     }
@@ -144,65 +152,109 @@ function NewProblemPane({
     }
   }
 
+  async function onFiles(files: FileList | null) {
+    if (!files || files.length === 0) return;
+    setAttachNote(null);
+    let appended = "";
+    let rejected: string[] = [];
+    for (const f of Array.from(files)) {
+      if (TEXT_EXT.test(f.name)) {
+        const body = (await f.text()).slice(0, 4000);
+        appended += `\n\n— attached file: ${f.name} —\n${body}`;
+      } else {
+        rejected.push(f.name);
+      }
+    }
+    if (appended) setText((prev) => prev + appended);
+    if (rejected.length > 0) {
+      setAttachNote(
+        `${rejected.join(", ")}: PDF, CAD, and image ingestion needs the ` +
+        `engine's file contract (not yet exposed). Paste a URL or the key ` +
+        `contents for now — the engine reads plain text in the problem.`
+      );
+    }
+  }
+
   return (
-    <section className="hero workspace-hero">
+    <section className="hero workspace-hero" data-new-discovery>
       <h1 className="brand-statement">DISCOVER. INVENT. ANYTHING.</h1>
-      <p className="brand-subline">
-        Give Toscanini a real problem. It will investigate the evidence,
-        challenge its own ideas, and develop the strongest invention it
-        can defend — while you watch the investigation unfold and the
-        technology take shape on stage.
-      </p>
-      <h2 className="ask-title">What problem should Toscanini investigate?</h2>
+      <h2 className="ask-title">What do you want to discover?</h2>
       <div className="ask">
         <textarea
-          placeholder="Describe a real technical problem…"
+          autoFocus
+          placeholder="Describe a problem, an observation, or a technology you want investigated — in your own words. Constraints, links, and specs are welcome."
           value={text}
           onChange={(e) => setText(e.target.value)}
           onKeyDown={(e) => {
-            if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) submit();
+            if (e.key === "Enter" && !e.shiftKey) {
+              e.preventDefault();
+              void submit();
+            }
           }}
         />
         <div className="ask-foot">
           <span className="hint">
-            ⌘↵ to start · runs take minutes; you can leave and come back
+            Enter to start · Shift+Enter for a new line · runs take minutes;
+            you can leave and come back
           </span>
-          <button className="btn" onClick={submit} type="button">
-            {submitting ? "Starting…" : "Start investigation"}
-          </button>
+          <div className="ask-actions">
+            <input
+              ref={fileRef}
+              type="file"
+              multiple
+              hidden
+              onChange={(e) => void onFiles(e.target.files)}
+            />
+            <button
+              type="button"
+              className="btn small ghost"
+              onClick={() => fileRef.current?.click()}
+              title="attach a text file — it joins the conversation"
+            >
+              + Attach
+            </button>
+            <button className="btn" onClick={submit} type="button">
+              {submitting ? "Starting…" : "Start the discovery"}
+            </button>
+          </div>
         </div>
       </div>
+      {attachNote && (
+        <div className="errbox" style={{ textAlign: "left" }} data-attach-note>
+          {attachNote}
+        </div>
+      )}
       {error && (
         <div className="errbox" style={{ textAlign: "left" }}>
           {error}
         </div>
       )}
-      <div className="story-strip" aria-label="how it works">
-        {STORY_STEPS.map((step, i) => (
-          <span className="story-step" key={step}>
-            <span className="story-word">{step}</span>
-            {i < STORY_STEPS.length - 1 && (
-              <span className="story-arrow" aria-hidden="true">↓</span>
-            )}
-          </span>
-        ))}
-      </div>
-      <div className="examples">
-        {EXAMPLES.map((ex) => (
+      <div className="suggestions" aria-label="where to start">
+        {SUGGESTIONS.map((s) => (
           <button
-            key={ex}
-            className="example"
-            onClick={() => setText(ex)}
+            key={s.label}
+            className="suggestion"
             type="button"
+            onClick={() => {
+              setText(s.example);
+            }}
+            title={s.example}
           >
-            {ex.length > 62 ? ex.slice(0, 60) + "…" : ex}
+            {s.label}
           </button>
         ))}
+      </div>
+      <div className="hero-privacy faint">
+        The engine infers domain, mechanism space, and evidence strategy from
+        your words — you are never asked to fill a form first.
       </div>
     </section>
   );
 }
 
+// ---------------------------------------------------------------------------
+// THE WORKSPACE SHELL
+// ---------------------------------------------------------------------------
 function WorkspaceInner() {
   const params = useSearchParams();
   const router = useRouter();
@@ -214,22 +266,26 @@ function WorkspaceInner() {
   const [health, setHealth] = useState<HealthSummary | null>(null);
   const [detail, setDetail] = useState<SessionDetail | null>(null);
   const [cio, setCio] = useState<CIO | null>(null);
-  // R422: a run id that 404s repeatedly must surface a VISIBLE state.
   const [runNotFound, setRunNotFound] = useState(false);
-  // R430.1: the investigation event history + the dossier projection —
-  // persisted endpoints; the refresh-recovery sources (section 12).
+  // R453-C2 (BS-018 class): the engine being unreachable is ITS OWN honest
+  // state — never a silent spinner, never a fake scientific conclusion.
+  const [connLost, setConnLost] = useState(false);
   const [events, setEvents] = useState<ScienceEvent[]>([]);
-  const [gauntlet, setGauntlet] = useState<GauntletCard[]>([]);
+  const [gauntlet, setGauntlet] = useState<EventsBody["gauntlet"]>([]);
   const [dossier, setDossier] = useState<DossierBody | null>(null);
   const [invention, setInvention] = useState<ShowcaseDetail | null>(null);
   const [reality, setReality] = useState<RealityLoopRecord | null>(null);
   const [railOpen, setRailOpen] = useState(false);
   const [starting, setStarting] = useState(false);
+  // the contextual workspace surface (brief §12) — null = closed
+  const [surface, setSurface] = useState<SurfaceId | null>(null);
+  const [asks, setAsks] = useState<{ question: string; response: AskResponse }[]>([]);
+  const autoOpened = useRef<string | null>(null);
   const timer = useRef<ReturnType<typeof setInterval> | null>(null);
   const evtTimer = useRef<ReturnType<typeof setInterval> | null>(null);
   const es = useRef<EventSource | null>(null);
 
-  // ---- load rails + health once ----
+  // ---- rails + health ----
   useEffect(() => {
     listSessions().then(setSessions).catch(() => setSessions([]));
     listShowcase().then(setShowcase).catch(() => setShowcase([]));
@@ -244,11 +300,16 @@ function WorkspaceInner() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // ---- load the focused run (and poll while it works) ----
+  // ---- the focused run ----
   useEffect(() => {
     setDetail(null);
     setRunNotFound(false);
+    setConnLost(false);
+    setAsks([]);
+    setSurface(null);
+    autoOpened.current = null;
     let misses = 0;
+    let connMisses = 0;
     if (timer.current) clearInterval(timer.current);
     const id = runId ?? "";
     if (!id) return;
@@ -258,7 +319,9 @@ function WorkspaceInner() {
         const d = await getRunResult(id);
         if (!alive) return;
         misses = 0;
+        connMisses = 0;
         setRunNotFound(false);
+        setConnLost(false);
         setDetail(d);
         if (isTerminal(d.status)) {
           if (timer.current) clearInterval(timer.current);
@@ -269,6 +332,11 @@ function WorkspaceInner() {
         if (e instanceof Error && e.message.startsWith("404")) {
           misses += 1;
           if (misses >= 4) setRunNotFound(true);
+        } else {
+          // transport-level failure (engine restarting, network down):
+          // say so after a short grace — the poll keeps trying either way
+          connMisses += 1;
+          if (connMisses >= 3 && connMisses % 3 === 0) setConnLost(true);
         }
       }
     }
@@ -280,8 +348,7 @@ function WorkspaceInner() {
     };
   }, [runId]);
 
-  // ---- R430.1 section 11/12: the event history poll (recovery +
-  //      long-interval truth) + the live SSE science stream ----
+  // ---- events + dossier + live stream ----
   useEffect(() => {
     setEvents([]);
     setGauntlet([]);
@@ -313,13 +380,7 @@ function WorkspaceInner() {
     refresh();
     evtTimer.current = setInterval(refresh, 5000);
 
-    // live hydration: append SSE 'science' events as they are recorded
-    // (only while the investigation is running; the terminal 'final'
-    // event closes the stream)
     try {
-      // R447: the stream URL carries the owner capability (EventSource
-      // cannot set headers; embedded-iframe contexts cannot rely on
-      // cookies) — see lib/api.ts
       const source = new EventSource(streamUrl(id));
       es.current = source;
       source.addEventListener("science", (m) => {
@@ -336,7 +397,6 @@ function WorkspaceInner() {
         }
       });
       source.addEventListener("final", () => {
-        // terminal: one last refresh of everything, then close
         refresh();
         source.close();
         es.current = null;
@@ -347,7 +407,7 @@ function WorkspaceInner() {
         es.current = null;
       });
       source.onerror = () => {
-        // the poll (5 s) carries recovery; SSE is an enhancement
+        /* the poll (5 s) carries recovery; SSE is an enhancement */
       };
     } catch {
       /* EventSource unavailable — polling remains the hydration path */
@@ -361,8 +421,6 @@ function WorkspaceInner() {
     };
   }, [runId]);
 
-  // stop the events/dossier polling once terminal (the last refresh
-  // already ran on 'final')
   useEffect(() => {
     if (detail && isTerminal(detail.status)) {
       if (evtTimer.current) clearInterval(evtTimer.current);
@@ -371,7 +429,7 @@ function WorkspaceInner() {
     }
   }, [detail?.status]);
 
-  // ---- R422: load the CIO once the run is terminal ----
+  // ---- CIO once terminal ----
   useEffect(() => {
     setCio(null);
     if (!detail || !isTerminal(detail.status)) return;
@@ -390,15 +448,14 @@ function WorkspaceInner() {
     };
   }, [detail?.session_id, detail?.status]);
 
-  // ---- the single source of truth for package availability ----
   const packageAvailable = Boolean(
     cio?.downloads?.package_zip ||
-    detail?.package?.zip_name ||
-    detail?.package?.complete ||
-    dossier?.tabs?.transfer?.download
+      detail?.package?.zip_name ||
+      detail?.package?.complete ||
+      dossier?.tabs?.transfer?.download
   );
 
-  // ---- load the focused invention ----
+  // ---- the invention (showcase) ----
   useEffect(() => {
     setInvention(null);
     setReality(null);
@@ -408,6 +465,27 @@ function WorkspaceInner() {
       .catch(() => setInvention(null));
     getRealityLoop(slot).then(setReality).catch(() => setReality(null));
   }, [slot]);
+
+  // ---- auto-open the workspace when a substantial output exists ----
+  // (desktop only; the conversation stays primary on mobile)
+  useEffect(() => {
+    if (!runId || !detail || !isTerminal(detail.status)) return;
+    if (autoOpened.current === runId) return;
+    if (!window.matchMedia("(min-width: 1181px)").matches) return;
+    const design = dossier?.tabs?.design as
+      | { availability?: string; hero_eligibility?: { eligible?: boolean } }
+      | undefined;
+    const heroEligible =
+      design?.availability === "AVAILABLE" &&
+      design?.hero_eligibility?.eligible !== false;
+    if (packageAvailable) {
+      autoOpened.current = runId;
+      setSurface(heroEligible ? "model" : "package");
+    } else if (heroEligible) {
+      autoOpened.current = runId;
+      setSurface("model");
+    }
+  }, [runId, detail?.status, dossier, packageAvailable]);
 
   const selectRun = useCallback(
     (id: string) => {
@@ -440,6 +518,48 @@ function WorkspaceInner() {
     }
   }
 
+  async function handleAsk(question: string) {
+    if (!detail) return;
+    try {
+      const response = await askRun(detail.session_id, question);
+      setAsks((prev) => [...prev, { question, response }]);
+    } catch (e) {
+      setAsks((prev) => [
+        ...prev,
+        {
+          question,
+          response: {
+            status: "TRANSPORT_ERROR",
+            reason: e instanceof Error ? e.message : "request failed",
+          },
+        },
+      ]);
+    }
+  }
+
+  function handleNext(next: NextAction) {
+    if (!detail) return;
+    if (next.kind === "retry") {
+      retryRun(detail.session_id).then(() => location.reload());
+      return;
+    }
+    if (next.kind === "package") {
+      const url = (dossier?.tabs?.transfer as { download?: string | null })
+        ?.download;
+      if (url) {
+        window.location.href = url;
+        return;
+      }
+      setSurface("package");
+      return;
+    }
+    if (next.kind === "new") {
+      newProblem();
+      return;
+    }
+    setSurface(next.surface ?? "overview");
+  }
+
   const activeMode = runId ? "run" : slot ? "invention" : "fresh";
 
   return (
@@ -449,7 +569,7 @@ function WorkspaceInner() {
           className="rail-toggle"
           onClick={() => setRailOpen(!railOpen)}
           type="button"
-          aria-label="toggle history"
+          aria-label="toggle navigation"
         >
           ☰
         </button>
@@ -464,13 +584,13 @@ function WorkspaceInner() {
         </span>
         <span className="ws-spacer" />
         <button className="btn small ghost" onClick={newProblem} type="button">
-          + New problem
+          + New Discovery
         </button>
       </header>
 
-      <div className="ws-body">
+      <div className={`ws-body ${surface && activeMode === "run" ? "ws-has-panel" : ""}`}>
         <div className={`ws-rail ${railOpen ? "open" : ""}`}>
-          <HistoryRail
+          <Sidebar
             sessions={sessions}
             showcase={showcase}
             activeRun={runId}
@@ -478,6 +598,7 @@ function WorkspaceInner() {
             onSelectRun={selectRun}
             onSelectInvention={selectInvention}
             onNewProblem={newProblem}
+            health={health}
           />
         </div>
         {railOpen && (
@@ -487,39 +608,45 @@ function WorkspaceInner() {
           />
         )}
 
-        {/* R435: ONE calm workspace column — the stage and its deep
-            layer; no split panes, no dossier panel beside a report */}
-        <main className="ws-main">
+        <main className="ws-main" data-ws-main>
           {activeMode === "fresh" &&
             (starting ? (
-              <div className="loading">Starting the investigation…</div>
+              <div className="loading">Starting the discovery…</div>
             ) : (
-              <NewProblemPane onStarted={onStarted} />
+              <NewDiscoveryPane onStarted={onStarted} />
             ))}
 
           {activeMode === "run" &&
             (detail ? (
-              <TechStage
+              <Conversation
                 detail={detail}
-                events={events}
-                gauntlet={gauntlet}
                 dossier={dossier}
+                events={events}
                 packageAvailable={packageAvailable}
-                onRetry={(id) =>
-                  retryRun(id).then(() => location.reload())
-                }
+                asks={asks}
+                onOpenSurface={(s) => setSurface(s)}
+                onAsk={handleAsk}
+                onTechnical={() => setSurface("journal")}
+                onNextAction={handleNext}
               />
             ) : runNotFound ? (
               <div className="errbox" style={{ marginTop: 24 }}>
                 <b>Run not found.</b> This run id does not exist, or it
                 belongs to a different visitor (runs are private to the
                 session that created them). If you just started this run,
-                use the history rail — if the rail is empty, the run did
-                not register and nothing was invented on it (an
-                infrastructure state, never a scientific result).
+                use Discoveries — if it is empty, the run did not register
+                and nothing was invented on it (an infrastructure state,
+                never a scientific result).
+              </div>
+            ) : connLost ? (
+              <div className="errbox" style={{ marginTop: 24 }} data-conn-lost>
+                <b>The discovery service is not responding right now.</b> Your
+                runs are persisted on the server and will reappear here when
+                the service is reachable again — nothing about any discovery
+                outcome is implied by this.
               </div>
             ) : (
-              <div className="loading">Loading investigation…</div>
+              <div className="loading">Opening the discovery…</div>
             ))}
 
           {activeMode === "invention" &&
@@ -530,9 +657,23 @@ function WorkspaceInner() {
                 slot={slot ?? ""}
               />
             ) : (
-              <div className="loading">Loading package…</div>
+              <div className="loading">Opening the technology…</div>
             ))}
         </main>
+
+        {activeMode === "run" && (
+          <div className={`ws-panel ${surface ? "open" : ""}`} data-ws-panel>
+            <Workspace
+              detail={detail!}
+              dossier={dossier}
+              events={events}
+              gauntlet={gauntlet}
+              packageAvailable={packageAvailable}
+              surface={surface}
+              onClose={() => setSurface(null)}
+            />
+          </div>
+        )}
       </div>
     </div>
   );

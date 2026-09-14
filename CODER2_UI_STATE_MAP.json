@@ -1,0 +1,115 @@
+{
+  "kind": "CODER2_UI_STATE_MAP",
+  "round": "R453-C2",
+  "generated_by": "Coder 2 (visual specialist / truth presentation)",
+  "authority": "Every mapping below is implemented in TOSCANINI_UI/webapp/lib/present.ts and pinned by TOSCANINI_UI/webapp/tests/adversarial_present.test.mjs (14/14). The frontend renders through this layer and never re-derives or upgrades canonical state (EPISTEMIC_CONSTITUTION Art. X, XXV, XXVIII, LXI). Vocabulary ground truth: toscanini/run_state.py, toscanini/user_state.py, CIO maturity ladder.",
+  "schema_version": "1.0.0",
+  "canonical_sources": [
+    "GET /api/run/{id}/result (SessionDetail + run_state + user_state_view)",
+    "GET /api/run/{id}/events (ScienceEvent[] + gauntlet)",
+    "GET /api/run/{id}/dossier (TECHNOLOGY_DOSSIER projection, 6 tabs)",
+    "GET /api/run/{id}/cio (Canonical Invention Object)",
+    "GET /api/health (readiness + providers)",
+    "GET /api/sessions, GET /api/showcase[...]"
+  ],
+  "maps": {
+    "session_status": {
+      "source": "SessionDetail.status",
+      "RUNNING|PENDING|BUILDING_PROBLEM": { "user": "Investigating (live conversation with progress line)", "tone": "live" },
+      "COMPLETE": { "user": "outcome tone decided by user_state/outcome below", "tone": "terminal" },
+      "INTERRUPTED": { "user": "Run interrupted — infrastructure state, never a scientific result; Resume", "tone": "blocked", "test": "B" },
+      "RUN_BLOCKED_TRANSPORT": { "user": "Current run blocked — infrastructure state, never a scientific result; stale positives suppressed; Resume", "tone": "blocked", "test": "B" },
+      "ERROR_*": { "user": "Run stopped by an infrastructure failure — never a scientific verdict", "tone": "blocked", "test": "B" }
+    },
+    "retrieval_state": {
+      "source": "run_state.evidence_state (run_state.py::_evidence_state) + dossier evidence tab",
+      "NOT_REACHED": { "user": "The evidence stage was not reached on this run — retrieval never began… not a finding about the problem.", "forbidden": ["no evidence exists", "zero results"], "test": "D" },
+      "PENDING": { "user": "Evidence retrieval is in progress — I'm searching the indexed sources now.", "forbidden": ["not found", "no evidence"], "test": "C" },
+      "RETRIEVED_ZERO": { "user": "The searches completed and returned no matching records. …not evidence that the concept is novel or that no relevant work exists.", "forbidden": ["novel", "no prior art"], "test": "D" },
+      "RETRIEVED_POSITIVE": { "user": "Evidence card: N relevant sources · M shaped the design + domains; View evidence → workspace", "test": "positive-control" },
+      "FAILED": { "user": "Evidence retrieval failed — infrastructure state, not evidence of absence…", "forbidden": ["no evidence exists"], "test": "D" }
+    },
+    "geometry_state": {
+      "source": "dossier design tab availability + conceptual/fallback_basis + hero_eligibility (R436 projection)",
+      "PENDING": { "user": "The technology model will appear here as the design solidifies." },
+      "UNKNOWN": { "user": "Engineering geometry is not established on this run. Nothing is rendered because nothing was established…", "forbidden": ["engineering unavailable"], "test": "E" },
+      "UNAVAILABLE": { "user": "Engineering geometry exists on this run; the visual rendering is unavailable right now — an infrastructure state…", "test": "E" },
+      "CONCEPTUAL": { "user": "A conceptual architecture model is shown… not validated engineering geometry, never implies a physical result.", "test": "E" },
+      "UNEARNED": { "user": "The system could not produce a faithful visual representation — no substitute model is shown. (R436 hero suppression)", "forbidden": ["generic fallback render on the primary surface"] },
+      "ENGINEERING": { "user": "The technology model is the run's canonical engineering geometry — not an illustration." }
+    },
+    "render_availability": {
+      "source": "CIO/design renders record (visual_compiler render_record.json; R443 typed statuses)",
+      "RENDER_SKIPPED_LOW_MEMORY": { "user": "Engineering geometry available; visual rendering unavailable at current deployment capacity.", "forbidden": ["rendering failed", "visualization complete"] },
+      "RENDER_SKIPPED_*": { "user": "…visual rendering unavailable in this deployment (renderer infrastructure unavailable)." },
+      "gate FAIL/NOT_RUN/suppressed": { "user": "…presentation renders are withheld — the visual quality gate did not certify them (fail-closed). (Art. LXXII)" },
+      "gate PASS/COMPLETE_PASS": { "user": "visual gate ✓ badge with verdict shown verbatim beside the model" }
+    },
+    "attack_state": {
+      "source": "run_state.attack_state.overall + generation challenge records (killed/survived/escalated_objection)",
+      "NOT_RUN": { "user": "The adversarial test has not been completed. Nothing is claimed either way — a candidate is never called 'survived' by default.", "test": "F" },
+      "IN_PROGRESS": { "user": "Now I'm trying to prove this wrong — the adversarial test is running." },
+      "SURVIVED": { "user": "…survived the specified adversarial tests, including: <strongest challenge>." },
+      "CONTESTED": { "user": "The adversarial instrument raised an objection it is not calibrated to decide… preserved and escalated — not a verdict, and not a pass either. (BS-011)", "test": "F" },
+      "FAILED": { "user": "The adversarial tests contradicted this candidate. Recorded cause: <kill_reason>." },
+      "UNRESOLVED": { "user": "The adversarial result is unresolved — the recorded state carries no verdict." }
+    },
+    "run_outcome": {
+      "source": "user_state (user_state.py) / RunOutcome (run_state.py)",
+      "COMPLETED_PACKAGE": { "user": "Outcome: 'Completed — package ready' + Technology package artifact card + next action 'Download the technology package'", "tone": "positive" },
+      "COMPLETED_CANDIDATE": { "user": "Positive outcome with the candidate presented at its honest maturity; package card only when the record carries one", "tone": "positive" },
+      "COMPLETED_EVOLVED": { "user": "Positive outcome; generations rendered as competing hypotheses with per-generation attack states", "tone": "positive" },
+      "COMPLETED_UNDER_DEVELOPMENT": { "user": "Development outcome — the current architecture is presented with its honest maturity; diagnosed causes on record", "tone": "development" },
+      "COMPLETED_GENERATION_FAILED": { "user": "Development outcome — honest generation failure, never a rejection of the problem", "tone": "development" },
+      "COMPLETED_FALSE_PREMISE": { "user": "Outcome: 'Rejected' — the evidence contradicted the problem's premise; next action 'Reformulate the problem and run again'", "tone": "rejected", "forbidden": ["successful invention", "new invention"], "test": "A" },
+      "COMPLETED_UNKNOWN": { "user": "Outcome carried verbatim as unknown — never re-labeled", "tone": "unknown" },
+      "BLOCKED_TRANSPORT|FAILED_TRANSPORT|FAILED_ENGINE|INTERRUPTED": { "user": "Blocked outcome — infrastructure state, never a scientific result; Resume the investigation", "tone": "blocked", "test": "B" },
+      "RUN_BLOCKED": { "user": "Same blocked handling; suppressStalePositives gates every positive surface", "test": "B" }
+    },
+    "loading_and_connection": {
+      "engine_unreachable": { "user": "The discovery service is not responding right now. Your runs are persisted… nothing about any discovery outcome is implied by this.", "forbidden": ["eternal silent spinner"] },
+      "run_404": { "user": "Run not found — private to its creator; if the rail is empty the run did not register (infrastructure state, never a scientific result)." },
+      "in_run_progress": { "user": "Live line from the run's own event record (active/paused summaries); infrastructure pauses render as their own state, never as active work." }
+    },
+    "ask_responses": {
+      "source": "AskResponse.status (R395)",
+      "ANSWERED": { "user": "answer + 'AI_INTERPRETATION · <basis>' meta line" },
+      "NOT_IN_RECORD": { "user": "'Not in this record.' — answers only from the subject's persisted artifacts" },
+      "REFUSED_OVERCLAIM": { "user": "'Refused by the reality guard.' (Art. XXXVIII boundary)" },
+      "TRANSPORT_ERROR": { "user": "'The model transport is not answering.' — no fabricated answer, retry when transport responds" },
+      "REFUSED": { "user": "rendered verbatim with the recorded reason (e.g., run not finished)" }
+    },
+    "epistemic_meta_labels": {
+      "source": "ScienceEvent.epistemic_class — the brief §10 vocabulary, derived never upgraded",
+      "RETRIEVED": "FOUND",
+      "INFERRED": "INFERRED",
+      "HYPOTHESIZED": "HYPOTHESIS",
+      "COMPUTED": "TESTED",
+      "SIMULATED": "TESTED",
+      "ENGINEERING_DEFINED": "TESTED",
+      "PHYSICALLY_OBSERVED": "FOUND",
+      "UNKNOWN": "UNKNOWN",
+      "unmapped_class": "rendered as-is (never promoted to a known label)"
+    },
+    "never_rendered_as": {
+      "candidate (any maturity)": "'New invention' — the word invented never precedes canonical classification (brief §26)",
+      "engineering representation": "'Engineered solution' unless engineering state is canonical",
+      "simulation/computation": "'Validated technology' — PHYSICAL_OBSERVATION requires the R370G door",
+      "infrastructure failure": "any scientific verdict (Art. LXI)",
+      "stale positives under a blocked run": "any present-tense positive claim (Test B)"
+    }
+  },
+  "presentation_layer": {
+    "module": "TOSCANINI_UI/webapp/lib/present.ts (+ present-types.ts)",
+    "pure_functions": [
+      "isTerminal", "isBlockedStatus", "suppressStalePositives", "isRejectedOutcome",
+      "deriveRetrievalState", "retrievalSentence",
+      "deriveGeometryState", "geometrySentence",
+      "deriveAttackState", "attackSentence",
+      "deriveCandidates", "deriveNextAction",
+      "deriveConversation", "epistemicMeta", "renderAvailabilitySentence"
+    ],
+    "consumers": ["components/Conversation.tsx", "components/Workspace.tsx", "components/DossierSections.tsx (delegating sentence)"],
+    "tests": "TOSCANINI_UI/webapp/tests/adversarial_present.test.mjs (npm run test:present) — 14/14"
+  }
+}

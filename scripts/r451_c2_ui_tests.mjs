@@ -7,8 +7,11 @@
 // same code the browser ships — with zero browser, zero network, zero
 // nondeterminism. These are assertions about what the UI WILL render
 // because every blocked-state surface renders FROM this mapping's
-// output (TechStage.tsx / InfrastructureBlockedHero.tsx are
-// source-pinned by tests/test_r451_c2_blocked_state.py).
+// output (since the R453-C2 merge the conversation/workspace surfaces
+// consume this mapping via lib/present.ts — the retired TechStage /
+// InfrastructureBlockedHero source pins were superseded by the
+// Workspace/Conversation pins below, Art. LXIV disposition recorded;
+// tests/adversarial_present.test.mjs pins the conversation layer).
 //
 // The single most important assertion (§12): the infrastructure rows
 // NEVER resolve to TECHNOLOGY_NOT_ESTABLISHED — the state whose hero
@@ -208,7 +211,8 @@ try {
     evidenceSubFor({ retrieval_state: "RETRIEVED", retrieved_count: 12, used_count: 4 })
       === normalSupport);
   function evidenceSubFor(ec) {
-    // mirrors TechStage's evidenceSub rule — kept in sync by this test
+    // mirrors the evidence-subset rule — owned by the presentation
+    // mapping (lib/present.ts) since the R453-C2 merge; kept in sync here
     return ec?.retrieval_state === "RETRIEVED" && ec.retrieved_count != null
       ? `${ec.retrieved_count} sources retrieved · ${ec.used_count ?? 0} shaped the design`
       : null;
@@ -646,23 +650,29 @@ try {
       r.infrastructurePaused === false);
   }
   {
-    // the source pin: the component's hero-viewport resolves the legacy
-    // state FIRST (before the viewerUrl branch), viewerUrl computes null
-    // under the legacy state, and the gate badge is legacy-guarded
-    const stage = fsRead("components", "TechStage.tsx");
-    const vp = stage.indexOf("data-hero-viewport");
-    const legacyFirst = stage.indexOf(
-      'view.state === "LEGACY_STATE_UNAVAILABLE" ?', vp);
-    const viewerBranch = stage.indexOf(") : viewerUrl ? (", vp);
-    check("TechStage rendering order: the legacy hero branch is FIRST",
-      legacyFirst !== -1 && viewerBranch !== -1 && legacyFirst < viewerBranch);
-    check("TechStage: viewerUrl computes null under LEGACY_STATE_UNAVAILABLE",
-      stage.includes("const legacyUnavailable = view.state === " +
-        '"LEGACY_STATE_UNAVAILABLE"') &&
-      stage.indexOf("!legacyUnavailable && heroEligible") <
-        stage.indexOf("const showingHistory"));
-    check("TechStage: the R441 gate badge is legacy-guarded",
-      stage.includes("gateVerdict && !legacyUnavailable"));
+    // R453-C2 MERGE DISPOSITION: the TechStage hero source pins retired
+    // with the superseded stage surface (Art. LXIV). The SAME semantics
+    // pinned on the surviving workspace model surface: the viewer branch
+    // is the URL-gated branch, the three honest hero states exist after
+    // it, the gate badge is verdict-gated, and the workspace renders
+    // EXACTLY ONE viewer (the ONE-viewer invariant by construction).
+    const ws = fsRead("components", "Workspace.tsx");
+    const vp = ws.indexOf("data-hero-viewport");
+    const viewerBranch = ws.indexOf("{viewerUrl ? (", vp);
+    const unearned = ws.indexOf("data-hero-unearned", vp);
+    const renderUnavailable = ws.indexOf("data-hero-render-unavailable", vp);
+    const notEstablished = ws.indexOf("data-hero-not-established", vp);
+    check("Workspace rendering order: the URL-gated viewer branch comes " +
+        "FIRST and the three honest hero states follow (no viewer is " +
+        "fabricated where an honest state applies)",
+      viewerBranch !== -1 && unearned !== -1 && renderUnavailable !== -1 &&
+        notEstablished !== -1 && viewerBranch < unearned);
+    check("Workspace: the gate badge is verdict-gated (no badge without " +
+        "a recorded gate verdict)",
+      ws.includes("{gateVerdict && ("));
+    check("Workspace: the ONE-viewer invariant — exactly one <ModelViewer " +
+        "element on the workspace model surface",
+      (ws.match(/<ModelViewer/g) || []).length === 1);
   }
 
   // ----------------------------------------------------------------
@@ -714,19 +724,24 @@ try {
       coupled.state !== "VISUAL_READY" &&
         coupled.state !== "SCIENTIFIC_REJECTION" &&
         coupled.state !== "TECHNOLOGY_NOT_ESTABLISHED");
-    // the source pin: the component's terminal verdict line is gated on
-    // the SAME blocked state the hero consumes — !blocked && done && usv
-    const stage = fsRead("components", "TechStage.tsx");
-    const verdictIdx = stage.indexOf("data-stage-verdict");
-    const guardIdx = stage.indexOf("{!blocked && done && usv && (");
-    check("Coupling (source pin): the terminal verdict line is guarded " +
-        "by !blocked && done && usv (INFRASTRUCTURE_PAUSED => no " +
-        "scientific terminal verdict surface)",
-      verdictIdx !== -1 && guardIdx !== -1 && guardIdx < verdictIdx &&
-        guardIdx > stage.indexOf("data-stage-journal-live"));
-    check("Coupling (source pin): the unguarded done && usv condition " +
-        "is gone",
-      !stage.includes("{done && usv && ("));
+    // R453-C2 MERGE DISPOSITION: the TechStage verdict-line source pins
+    // retired with the stage surface (Art. LXIV). The SAME coupling on
+    // the surviving surfaces: the conversation is derived ONLY through
+    // present.ts (suppressStalePositives gates every positive surface —
+    // pinned behaviorally by tests/adversarial_present.test.mjs Test B),
+    // and the conversation component never reads the user-state
+    // projection directly (the stale-label defect class the suite caught).
+    const presentSrc = fsRead("lib", "present.ts");
+    const convSrc = fsRead("components", "Conversation.tsx");
+    check("Coupling (source pin, new surface): present.ts owns " +
+        "suppressStalePositives + deriveConversation (the blocked gate " +
+        "precedes every positive conversation surface)",
+      presentSrc.includes("export function suppressStalePositives") &&
+        presentSrc.includes("export function deriveConversation"));
+    check("Coupling (source pin, new surface): Conversation.tsx never " +
+        "reads user_state_view directly (stale labels cannot ride the " +
+        "conversation)",
+      !convSrc.includes("user_state_view"));
   }
 
   // ----------------------------------------------------------------
@@ -915,30 +930,20 @@ try {
         "any scientific claim",
       (r.renderBlockDetail ?? "").includes("unrecognized") &&
         (r.renderBlockDetail ?? "").includes("No scientific claim"));
-    // source pins: the component locks the unrecognized state out of
-    // the viewer/history/gate-badge surfaces and renders its own hero
-    const stage = fsRead("components", "TechStage.tsx");
-    const vp = stage.indexOf("data-hero-viewport");
-    const legacyBranch = stage.indexOf(
-      'view.state === "LEGACY_STATE_UNAVAILABLE" ?', vp);
-    const unknownBranch = stage.indexOf(
-      'view.state === "PRESENTATION_STATE_UNAVAILABLE" ?', vp);
-    const viewerBranch = stage.indexOf(") : viewerUrl ? (", vp);
-    check("B: TechStage hero order — the unrecognized-state hero " +
-        "resolves BEFORE the viewerUrl branch (legacy first, unknown second)",
-      legacyBranch !== -1 && unknownBranch !== -1 &&
-        viewerBranch !== -1 && legacyBranch < unknownBranch &&
-        unknownBranch < viewerBranch);
-    check("B: TechStage computes viewerUrl null under the unrecognized " +
-        "state (heroGlb + showingHistory both gated)",
-      stage.includes("!legacyUnavailable && !unrecognizedState && heroEligible") &&
-        stage.includes("!legacyUnavailable && !unrecognizedState && heroEligible &&\n    Boolean(activeRow?.glb)"));
-    check("B: TechStage suppresses the gate badge under the " +
-        "unrecognized state",
-      stage.includes("gateVerdict && !legacyUnavailable && !unrecognizedState"));
-    check("B: TechStage has the fail-closed hero component " +
-        "(data-hero-unrecognized-state)",
-      stage.includes("data-hero-unrecognized-state"));
+    // R453-C2 MERGE DISPOSITION: the TechStage unrecognized-state pins
+    // retired with the stage surface (Art. LXIV). The SAME fail-closed
+    // semantics on the surviving surfaces: an unrecognized render status
+    // keeps its OWN honest sentence (typed, never folded into another
+    // state's wording) via lib/renderAvailability.ts, and the workspace
+    // model surface consumes that deriving function — never asserts.
+    const raSrc = fsRead("lib", "renderAvailability.ts");
+    const wsB = fsRead("components", "Workspace.tsx");
+    check("B (new surface): an unrecognized non-empty render status keeps " +
+        "its own honest sentence (typed, never folded into another state)",
+      raSrc.includes("did not complete on this run"));
+    check("B (new surface): the workspace model surface DERIVES the " +
+        "render sentence (renderAvailabilitySentence) — never asserts it",
+      wsB.includes("renderAvailabilitySentence"));
   }
 
   // ----------------------------------------------------------------
@@ -1046,13 +1051,18 @@ try {
   {
     // (a) structural absence of the forbidden state vocabulary
     const forbidden = /\b(VALIDATED|SURVIVOR|ENGINEERING_READY)\b/;
+    // R453-C2 merge disposition: the four retired presentation sources
+    // (TechStage, InfrastructureBlockedHero, DeepDive,
+    // DiscoveryPipelineStrip) were deleted with the superseded surfaces;
+    // the scan now covers every SURVIVING presentation surface.
     const presentationSources = [
       ["lib", "presentationState.ts"],
-      ["components", "TechStage.tsx"],
-      ["components", "InfrastructureBlockedHero.tsx"],
+      ["lib", "present.ts"],
+      ["lib", "present-types.ts"],
+      ["lib", "renderAvailability.ts"],
       ["components", "DossierSections.tsx"],
-      ["components", "DeepDive.tsx"],
-      ["components", "DiscoveryPipelineStrip.tsx"],
+      ["components", "Workspace.tsx"],
+      ["components", "Conversation.tsx"],
     ];
     for (const [dir, file] of presentationSources) {
       const src = fsRead(dir, file);
@@ -1129,6 +1139,21 @@ try {
     check("R452/AT-8: no UI string asserts 'Engineering geometry " +
         "available' (the authority claim is derived, never asserted)",
       !src.includes("Engineering geometry available"));
+    // R453-C2 merge: the conversation layer and the workspace surface
+    // under the same ban — present.ts now DELEGATES the notice to the
+    // derived implementation, so its old asserted-claim branches are gone
+    const presentUi = fsRead("lib", "present.ts");
+    const wsUi = fsRead("components", "Workspace.tsx");
+    const convUi = fsRead("components", "Conversation.tsx");
+    check("R452/AT-8: lib/present.ts carries no asserted availability " +
+        "claim (delegates to the derived notice)",
+      !presentUi.includes("Engineering geometry available"));
+    check("R452/AT-8: components/Workspace.tsx carries no asserted " +
+        "availability claim",
+      !wsUi.includes("Engineering geometry available"));
+    check("R452/AT-8: components/Conversation.tsx carries no asserted " +
+        "availability claim",
+      !convUi.includes("Engineering geometry available"));
     execFileSync(path.join(WEBAPP, "node_modules", ".bin", "tsc"), [
       path.join(WEBAPP, "lib", "renderAvailability.ts"),
       "--outDir", OUT,

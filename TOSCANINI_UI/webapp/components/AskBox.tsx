@@ -11,7 +11,10 @@ import type { AskResponse } from "@/lib/types";
 
 export type AskMode = "run" | "invention";
 
-function AnswerView({ a }: { a: AskResponse }) {
+// R453-C2: exported so the Conversation renders the SAME honest answer
+// vocabulary (ANSWERED / NOT_IN_RECORD / REFUSED_OVERCLAIM /
+// TRANSPORT_ERROR) — one answer renderer, never a second one.
+export function AnswerView({ a }: { a: AskResponse }) {
   if (a.status === "ANSWERED") {
     return (
       <div className="qa-answer">
