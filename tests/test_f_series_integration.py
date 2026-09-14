@@ -594,12 +594,13 @@ D6_SOURCE_FILES = [
     "discovery_fabric/engine/reasoning_chain.py",
     "discovery_fabric/engine/design_outputs.py",
     "discovery_fabric/engine/depth_contract.py",
-    "discovery_fabric/engine/benchmark_corpus.py",
     "discovery_fabric/engine/package_registry.py",
     # E15 authoritative-content modules (CEO E15-A/B/F/G) — same rule
     "discovery_fabric/engine/engineering_attack.py",
     "discovery_fabric/engine/dossier_quality.py",
-    "discovery_fabric/engine/benchmark_dossiers.py",
+    # R455: benchmark_corpus.py + benchmark_dossiers.py archived to
+    # archive/r455-lean/ (unreachable from production); removed from the
+    # authoritative-source list — archived modules are not authoritative.
 ]
 SLICE_RE = re.compile(r"\[:\d+\]")
 

@@ -1,0 +1,180 @@
+{
+  "round": "R455-LEAN-1-DELETIONS",
+  "date": "2026-09-14",
+  "directive": "Operator: 'delete the useless code' \u2014 execute the EXT-AUDIT-LEAN-R454 deadweight register (deletion scope); behavioral items \u00a7O.1-O.5 deferred",
+  "reviewer_provenance": "AI_REVIEW",
+  "baseline_identity": {
+    "head_at_round_start": "7ae2027bac67d889abcb7bbf6c223b7948955c0a",
+    "ls_remote_main": "7ae2027bac67d889abcb7bbf6c223b7948955c0a",
+    "checkout_state": "CURRENT (not stale)",
+    "constitution_version": "2.4.0",
+    "constitution_sha256": "b54a1be9bcbdd2465d0b034e1e1f472f80b87174209c0d534b7d9e1223e649b2",
+    "constitution_read_in_full": {
+      "round_start": true,
+      "before_final_commit": true
+    },
+    "governance_read": [
+      "GOVERNANCE/README.md",
+      "AUDITOR_SELF_GOVERNANCE_v1.md",
+      "AUDITOR_BLINDSPOT_REGISTER.md",
+      "AUDITOR_REMEMBERED_STATE.md",
+      "AUDIT_LOOP_PROTOCOL_v1.md",
+      "ACTIVE_PATH.md"
+    ]
+  },
+  "method": {
+    "verification_before_execution": [
+      "Independent AST import-closure re-measurement from the 3 production entrypoints (toscanini.server/worker/artifact_worker): every audit register item re-verified unreachable",
+      "Live entrypoint import test (empirical, not static): zero orchestrator modules load at import time; lazy-import semantics modeled for the orchestrator/__init__ hazard",
+      "Per-file isolated pytest baseline recorded BEFORE any move (26 focused files incl. all CI-invoked suites + every KEPT_BECAUSE consumer)",
+      "Audit defect found and disclosed (Art. XV): orchestrator/__init__.py imports coverage_engine + alternative_ledger unconditionally; the live engine lazily imports orchestrator submodules => both are runtime-loaded; the audit's 'all unreachable' is falsified for these two"
+    ],
+    "disposition": "git mv to archive/r455-lean/ (Art. LXIV.3 step 1: move-to-archive -> full battery; real deletion deferred until the archive proves quiet)",
+    "do_not_touch_verified": [
+      "epistemic_integrity/ (byte-identical; \u00a7N.1 determination open)",
+      "engine/{causal_learning,decisive_experiment,reality_calibration,reality_ingestion}.py (\u00a7N.2)",
+      "R453 adaptive admission logic",
+      "sealed experiment records (R452-A3, R451, r416, R412/CALIBRATION)",
+      "typed infrastructure-failure vocabulary"
+    ]
+  },
+  "deletion_accounting": {
+    "total_files": 378,
+    "total_py_loc": 134765,
+    "curated_tree_loc": {
+      "before": 267695,
+      "after": 151958,
+      "delta": -115737
+    },
+    "production_closure": {
+      "reachable_files": 168,
+      "reachable_loc": 90817,
+      "changed": false
+    },
+    "groups": [
+      {
+        "label": "premium_package_factory (superseded buyer-package factory)",
+        "files": 217,
+        "py_files": 158,
+        "py_loc": 72051
+      },
+      {
+        "label": "prior_art_v2 superseded version siblings",
+        "files": 20,
+        "py_files": 20,
+        "py_loc": 10873
+      },
+      {
+        "label": "orchestrator dead subsystems",
+        "files": 16,
+        "py_files": 15,
+        "py_loc": 4109
+      },
+      {
+        "label": "r411 + r412 campaign/gradient machinery",
+        "files": 23,
+        "py_files": 23,
+        "py_loc": 10623
+      },
+      {
+        "label": "benchmark unreachable instruments",
+        "files": 32,
+        "py_files": 32,
+        "py_loc": 12992
+      },
+      {
+        "label": "engine dead modules + r441_retired",
+        "files": 12,
+        "py_files": 11,
+        "py_loc": 3826
+      },
+      {
+        "label": "discovery_modes abandoned operators",
+        "files": 2,
+        "py_files": 2,
+        "py_loc": 1263
+      },
+      {
+        "label": "stale authority documents",
+        "files": 8,
+        "py_files": 0,
+        "py_loc": 0
+      },
+      {
+        "label": "dead-surface tests",
+        "files": 48,
+        "py_files": 48,
+        "py_loc": 19028
+      }
+    ],
+    "kept_because": {
+      "orchestrator/coverage_engine.py + orchestrator/alternative_ledger.py": "orchestrator/__init__ imports them unconditionally; orchestrator lazily imported by live engine => runtime-loaded (audit 'unreachable' falsified)",
+      "prior_art_v2/{calibration_v2,calibration_v3,novelty_v34,retrieval_v3}.py": "hard imports of retained calibration_v3_9 / elite_v3; retrieval_v4 archived in v3's place",
+      "engine/transport_capability.py": "active R451-C1.2 tooling (scripts/r451_route_probe_matrix.py + test)",
+      "engine/improvement_authority.py": "audit \u00a7B.2 merge/wire decision pending",
+      "engine/maturity.py": "live F-series D7 contract; CI-chained via test_r399_gates <- test_f_series_integration",
+      "engine/causal_correctness.py": "live e21 R8-gate test evaluator (tests/test_e21_series.py)",
+      "knowledge_graph/entities.py": "imported by retained graph.py/lifters.py",
+      "physics_stack/solver_registry.py": "imported by physics_stack/__init__ + retained physics_stack modules",
+      "benchmark/{numerical_provenance,equation_integrity}.py": "live test consumers (CI-invoked test_r380_cad_pipeline.py; e21 series)",
+      "premium_package_factory/r374/pathway.py + 2 empty __init__.py": "canonical cemetery-chain cross-verifier (tests/test_cemetery_chain_preservation.py)",
+      "epistemic_integrity/ (whole package)": "audit \u00a7N.1: requires an explicit determination, NOT deletion (\u00a7O.7 do-not-touch)",
+      "engine/{causal_learning,decisive_experiment,reality_calibration,reality_ingestion}.py": "audit \u00a7N.2 do-not-touch (causal-learning / reality-loop carve-out)"
+    },
+    "detail": "archive/r455-lean/README.md"
+  },
+  "verification": {
+    "entrypoint_imports": {
+      "toscanini.server": "OK",
+      "toscanini.worker": "OK",
+      "toscanini.artifact_worker": "OK"
+    },
+    "test_collection": {
+      "before": 4955,
+      "after": 3710,
+      "collection_errors_after": 0
+    },
+    "per_file_battery": "26 focused files, isolated per-file runs, before/after diff: ZERO new failures; pre-existing sets byte-identical (r424=17, e21=8, routing_states=1, r394=network-timeout env class)",
+    "expected_deltas": [
+      "test_r401_mechanism_space 45->40 passed: the 5 TestReleaseGateCaps tests retired with engine/release_gate.py",
+      "3,710 vs 4,955 collected: 1,245 test functions retired with their dead surfaces (48 files)"
+    ],
+    "repairs": [
+      "tests/test_r401_mechanism_space.py: TestReleaseGateCaps class removed (the only release_gate importer)",
+      "tests/test_f_series_integration.py: 2 archived modules removed from D6_SOURCE_FILES (archived != authoritative)",
+      "tests/test_r440_canonical_package_compiler.py: compile_package closed set narrowed to exactly the bridge gate (stricter invariant)",
+      ".github/workflows/epistemic_certification.yml: premium_package_factory/** path filter -> archive/r455-lean/premium_package_factory/**"
+    ],
+    "live_tree_straggler_scan": "0 files in toscanini/ discovery_fabric/ orchestrator/ epistemic_integrity/ import any archived module (corrected dotted-prefix AST scan)",
+    "pipeline_scripts": "all 19 standing deploy/verify scripts compile clean; 19 historical r411/r412-era scripts disclosed broken-until-checkout (evidence sealed, Art. XI)"
+  },
+  "honest_disclosures": [
+    "The audit's static closure missed lazy imports: coverage_engine/alternative_ledger are runtime-loaded via orchestrator/__init__ \u2014 KEPT_BECAUSE (the audit's own \u00a7M rule applied)",
+    "retrieval_v4 archived in retrieval_v3's place (v3 is the retained elite_v3 chain's hard dependency; audit said 'keep one' without specifying which)",
+    "calibration_v2/calibration_v3/novelty_v34 retained as hard deps of the retained calibration_v3_9 (audit counted 9 calibration deletions; 7 executed)",
+    "maturity.py, causal_correctness.py, benchmark/numerical_provenance.py, benchmark/equation_integrity.py retained: live test consumers incl. CI-chained suites (the audit admitted it did not run the test suite)",
+    "transport_capability.py + improvement_authority.py retained (active tooling; \u00a7B.2 pending decision)",
+    "48 dead-surface test files archived WITH their surfaces (audit's \u00a7O.8 'no test deletions' was scoped to its \u00a7O.6 round; every live-behavior test retained \u2014 enumerated in archive/r455-lean/README.md)",
+    "scripts/r385_root_docs_regeneration.py can no longer run (factory archived); R371-era rebuild-from-source requires git history; Art. XXXIX delivery verification unaffected",
+    "DEPLOYMENT_CONFIG.json archived (contradicted live state on every axis, zero functional readers)"
+  ],
+  "deferred_to_behavior_round": [
+    "\u00a7O.1 survivor gate on the artifact path",
+    "\u00a7O.2 capability check before retrieval spend",
+    "\u00a7O.3 stop writing 9 skip envelopes",
+    "\u00a7O.4 model_route tells the ledger truth",
+    "\u00a7O.5 mechanism GENERATED+null unrepresentable",
+    "\u00a7N.1 epistemic_integrity determination",
+    "\u00a7B.3 single CI-regenerated module inventory",
+    "\u00a7C.10 round trees out of the shipping image",
+    "\u00a7J Blender tarball removal"
+  ],
+  "production_deployment": {
+    "target_sha": "PENDING",
+    "deployed_sha": "PENDING",
+    "deploy_id": "PENDING",
+    "health_check_result": "PENDING",
+    "drift": "PENDING",
+    "what_unblocks": "Art. LXXI tuple closed after push+deploy below"
+  }
+}

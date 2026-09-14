@@ -787,51 +787,6 @@ class TestIndependentAttack:
 
 
 # ---------------------------------------------------------------------------
-# Release-gate honesty caps (Phase 4 ladder semantics)
-# ---------------------------------------------------------------------------
-class TestReleaseGateCaps:
-    def _caps(self, spec):
-        from discovery_fabric.engine.release_gate import (
-            _apply_candidate_honesty_caps, RELEASED,
-            HELD_FOR_HUMAN_REVIEW)
-        overall, verdicts, gates = _apply_candidate_honesty_caps(
-            "RELEASED", {}, {}, spec)
-        return overall, verdicts, gates
-
-    def test_mechanism_space_partial_support_holds_release(self):
-        overall, verdicts, _ = self._caps({
-            "_mechanism_space_candidate": {
-                "mechanism_support_state": "PARTIALLY_SUPPORTED"}})
-        assert overall == "HELD_FOR_HUMAN_REVIEW"
-        assert verdicts["DISCOVERY_VERIFICATION"] == "CONDITIONAL"
-
-    def test_mechanism_space_contested_holds_release(self):
-        overall, _, _ = self._caps({
-            "_mechanism_space_candidate": {
-                "mechanism_support_state": "CONTESTED"}})
-        assert overall == "HELD_FOR_HUMAN_REVIEW"
-
-    def test_mechanism_space_supported_records_affirmative_gate(self):
-        overall, verdicts, gates = self._caps({
-            "_mechanism_space_candidate": {
-                "mechanism_support_state": "SUPPORTED"}})
-        assert overall == "RELEASED"
-        assert verdicts["MECHANISM_SUPPORT"] == "PASS"
-        assert gates["MECHANISM_SUPPORT"]["verdict"] == "PASS"
-
-    def test_not_enough_evidence_holds_release(self):
-        overall, _, _ = self._caps({
-            "_mechanism_space_candidate": {
-                "mechanism_support_state": "NOT_ENOUGH_EVIDENCE"}})
-        assert overall == "HELD_FOR_HUMAN_REVIEW"
-
-    def test_exploration_marker_still_holds(self):
-        overall, _, _ = self._caps({"_exploration_candidate": {
-            "consequence": "held for human review"}})
-        assert overall == "HELD_FOR_HUMAN_REVIEW"
-
-
-# ---------------------------------------------------------------------------
 # The MECHANISM_SPACE stage entry gate + the orchestrator
 # ---------------------------------------------------------------------------
 class TestStageIntegration:

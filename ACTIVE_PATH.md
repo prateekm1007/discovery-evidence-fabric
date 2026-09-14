@@ -17,7 +17,7 @@
 > | Showcase (Phase 8) | `toscanini/showcase.py` | serves the REAL portfolio packages (Art. XXXIX authority) with interactive 3D |
 > | Interactive evaluator (Phase 5) | `toscanini/showcase.py::evaluate_parameter` → `cad_pipeline.rebuild_with_mutation` | parameter inside its DECLARED envelope → real sandbox rebuild → re-measured geometry + preview GLB; out-of-envelope/unbound → explicit refusal (never clamped) |
 > | Reality layer (Phase 2) | `discovery_fabric/engine/reality_provider.py` | provider-neutral REALITY_PROVIDER (World Labs/Marble first adapter, verified live); REALITY_MODEL (10 fields, origin-tagged); DESIGN_WORLD ↔ REALITY_COMPARISON ↔ REALITY_WORLD. Providers emit RECONSTRUCTED/COMPUTATIONAL only — MEASURED requires R370G-attested events; a reconstruction can never become PHYSICAL_VALIDATION (Art. XXXVIII, structurally enforced) |
-> | Phase 1 audit | `R389_PIPELINE_AUDIT.{md,json}` | final call-graph audit: 13 stages KEEP, 37/41 modules reachable, 4 tooling-only, zero dead code — measured, not assumed |
+> | Phase 1 audit | R389_PIPELINE_AUDIT.{md,json} (R455: both archived to `archive/r455-lean/docs/` — superseded; the R389-era "zero dead code" claim was scoped to 41 modules and is corrected by the R455 deadweight elimination: 418 modules measured unreachable from production at R454, 370 files archived this round) | superseded by the R455 measurement |
 >
 > Final audit verdict: the active path is already minimal for its epistemic
 > guarantees; the correct move was exactly what the CEO ordered — stop
@@ -78,10 +78,10 @@ Every stage carries a gate; no stage's pass credit transfers to the next
 | ATTACK | `discovery_fabric/a2/adversarial.py` + `discovery_fabric/prior_art_v2/` + `discovery_fabric/v4_corrections.py` firewalls | adversarial gate; prior-art firewall; boundary/invalid guards |
 | INVENTION DIAGNOSTIC + IMPROVE | `discovery_fabric/engine/improvement_engine.py` (R379 technical state), `engine/collision.py`, `engine/engineering_attack.py` | adversarial call graph (`PRODUCTION_ADVERSARIAL_CALL_GRAPH.md`) |
 | TECHNICAL EVALUATION | `discovery_fabric/engine/equations.py` (R383 analytical evaluator: 9 closed-form relations, deterministic binding, margins, bisection solve, K8 keep gate) | `ADR_R383_ANALYTICAL_EVALUATOR.md`; live demos `TOSCANINI/R383_LIVE_QUANTITATIVE/` |
-| 3D DESIGN | `discovery_fabric/engine/cad_pipeline.py` (R380: sandboxed AST-scanned build programs, G1–G8, trimesh as independent verifier) + `premium_package_factory/r381/` (14 parametric package templates, KEEP-KILL mutation loop) | `ADR_R380_CAD_PIPELINE.md`; `TOSCANINI/R380_LIVE_POSITIVE/` |
+| 3D DESIGN | `discovery_fabric/engine/cad_pipeline.py` (R380: sandboxed AST-scanned build programs, G1–G8, trimesh as independent verifier). R455: the historical `premium_package_factory/r381/` template set is ARCHIVED_TO `archive/r455-lean/` (unreachable from production); the live package path is `engine/package_compiler.py` + `invention_bridge/` | `ADR_R380_CAD_PIPELINE.md`; `TOSCANINI/R380_LIVE_POSITIVE/` |
 | DECISIVE EXPERIMENT | `discovery_fabric/engine/experiment_selector.py` (killer-experiment stage, engine stage order) | stage ledger `KILLER_EXPERIMENT` |
-| ENGINEERING DOSSIER | `premium_package_factory/` (gates + templates + `r371/builder.py`; frozen state in R332/R370-family trees) | gate certificates |
-| BUYER PACKAGE | `premium_package_factory/` r384 3D-evidence augment + `scripts/r385_root_docs_regeneration.py` (builder script pinned by the chain) + `scripts/r386_release_chain.py` (four-state verifier) | Article XXXIX chain: ENGINE RECORD ↔ CANONICAL MANIFEST ↔ PORTFOLIO TREE ↔ BUYER ZIP; 21 hermetic negative controls in `tests/test_r386_release_chain.py` |
+| ENGINEERING DOSSIER | `engine/package_compiler.py` (the live compiler) + `invention_bridge/package.py`; R455: the historical `premium_package_factory/` is ARCHIVED_TO `archive/r455-lean/` (the R374 `pathway.py` chain verifier retained for the cemetery cross-check) | gate certificates |
+| BUYER PACKAGE | `engine/package_compiler.py` + `invention_bridge/package.py` (the live path) + `scripts/r386_release_chain.py` (four-state verifier; R455: `scripts/r385_root_docs_regeneration.py`'s factory dependency is archived — rebuild-from-source of R371-era docs now requires git history; delivery verification unaffected) | Article XXXIX chain: ENGINE RECORD ↔ CANONICAL MANIFEST ↔ PORTFOLIO TREE ↔ BUYER ZIP; 21 hermetic negative controls in `tests/test_r386_release_chain.py` |
 
 Engine stage order (runtime): `RETRIEVE → FREEZE → SYNTHESIZE → VERIFY →
 MULTI_SOURCE_DISCOVERY → COLLISION → ATTACK → CONTRADICTION →
@@ -642,3 +642,24 @@ CODER1_ADAPTIVE_PIPELINE_BENCHMARK.json: 10/10 quality gates
 preserved, LLM calls −33%, compute ops −13%, planning latency −22%,
 verdict ADAPTIVE_SUCCESSFUL). Audit:
 CODER1_CONVERSATIONAL_ORCHESTRATOR_AUDIT.md.
+
+## R455 addendum (2026-09-14) — the deadweight elimination: subtraction, not architecture
+
+Operator directive ("delete the useless code"), executing the independent
+external audit EXT-AUDIT-LEAN-R454's deadweight register. **No stage, gate,
+or epistemic control was removed.** The 16-stage conductor, the R453
+adaptive admission, the R446 conversational layer, the visual compiler, and
+the entire §O.7/§N do-not-touch set are byte-identical.
+
+| Component | Disposition | Notes |
+|---|---|---|
+| THE archive | `archive/r455-lean/` | 370 files / 130,583 py LOC moved by `git mv` (Art. LXIV.3 step 1: move-to-archive; history preserved, Art. XI). Full per-group accounting + KEPT_BECAUSE dispositions: `archive/r455-lean/README.md` |
+| Curated Python tree | 267,695 → 151,958 LOC | **−115,737 LOC (−43%)**; the production import closure from the 3 entrypoints is UNCHANGED (168 files / 90,817 LOC before == after) |
+| `premium_package_factory/` | ARCHIVED_TO `archive/r455-lean/` | superseded by `engine/package_compiler.py` + `invention_bridge/package.py` (both reachable); the stage map above is corrected to the live path; `r374/pathway.py` retained as the cemetery-chain cross-verifier |
+| `prior_art_v2` version families | ARCHIVED_TO (20 siblings) | one canonical per family retained (calibration_v3_9, obviousness_v39, elite_v3, retrieval_v3) + their hard dependency keeps |
+| orchestrator dead subsystems | ARCHIVED_TO (16 files) | providers never constructed in production; **coverage_engine + alternative_ledger retained — the audit's "unreachable" claim is falsified by measurement** (orchestrator/__init__ imports them; the live engine lazily imports orchestrator) |
+| `r411/` + `r412/` + unreachable benchmark/engine modules | ARCHIVED_TO | 19 historical round scripts that import them no longer run without `git checkout archive/r455-lean -- …` (evidence trees sealed, Art. XI) |
+| Dead-surface tests | ARCHIVED_TO (48 files) | each retired test pins ONLY archived modules; every live-behavior test retained; zero new failures vs the recorded baseline (r424 17 / e21 8 / routing 1 pre-existing sets byte-identical) |
+| Stale authority docs | ARCHIVED_TO (8 files) | R389 audit, RUNTIME_MODULE_PARTICIPATION_AUDIT, RELEASE_CHAIN_VERIFICATION ×3, HANDOFF_TO_NEXT_CHAT.md, DEPLOYMENT_CONFIG.json (contradicted live state on every axis — BS-019/BS-002) |
+| Audit defect found (Art. XV) | disclosed | the audit's import-closure method missed lazy imports: `orchestrator/__init__.py` → coverage_engine/alternative_ledger are runtime-loaded despite being "unreachable" in a static closure. The audit's own §M rule ("removes unnecessary machinery, not necessary epistemic protection") was applied as the tie-breaker for every KEPT_BECAUSE deviation |
+| Deferred (not this round) | — | the audit's behavioral items (survivor gate §O.1, capability-before-retrieval §O.2, skip envelopes §O.3, model_route truth §O.4, mechanism invariant §O.5), the §N.1 epistemic_integrity determination, the module-inventory merge (§B.3), round-artifact trees out of the image (§C.10), Blender tarball removal (§J) |

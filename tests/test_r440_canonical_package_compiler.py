@@ -183,14 +183,12 @@ def test_r440_1_exactly_one_production_import_of_the_compiler():
     assert hits, "no production import of the canonical compiler?"
     files = {f for f, _ in hits}
     # the RUNTIME customer-package authority is the bridge gate (the
-    # ONE production call site). smoke_e2e is the E11 verification
-    # harness: it drives the SAME compiler entry to prove the link chain
-    # on rehearsal-labeled fixtures — it creates no customer package.
+    # ONE production call site). R455: the E11 verification harness
+    # (smoke_e2e.py) is archived with the unreachable benchmark set; the
+    # closed importer set is now EXACTLY the bridge gate.
     # The set is CLOSED: any new importer fails this test.
-    assert files == {"discovery_fabric/engine/invention_bridge/bridge.py",
-                     "discovery_fabric/engine/smoke_e2e.py"}, \
-        f"compile_package importers must be exactly the bridge gate + " \
-        f"the E11 verification harness: {files}"
+    assert files == {"discovery_fabric/engine/invention_bridge/bridge.py"}, \
+        f"compile_package importers must be exactly the bridge gate: {files}"
     # the engine RUN itself never imports the compiler (R440.2: the run
     # defers; packaging is post-run only)
     assert not any(f.endswith("engine/run.py") for f, _ in hits)
@@ -218,8 +216,7 @@ def test_r440_1_exactly_one_production_call_site_of_compile_package():
                     call_sites.append((str(py.relative_to(REPO)),
                                        node.lineno))
     files = {f for f, _ in call_sites}
-    assert files == {"discovery_fabric/engine/invention_bridge/bridge.py",
-                     "discovery_fabric/engine/smoke_e2e.py"}, \
+    assert files == {"discovery_fabric/engine/invention_bridge/bridge.py"}, \
         f"production compile_package call sites: {call_sites}"
     # the RUNTIME customer-package call site is EXACTLY ONE: bridge
     # gate step 3 — the only place a customer package is created. The
