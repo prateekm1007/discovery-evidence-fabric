@@ -1,0 +1,52 @@
+{
+ "stage": "INDEPENDENT_ATTACK",
+ "candidate_id": "cand:MS:FAILURE_PATH_INVERSION:021a8f4e76c6",
+ "escalation": {
+  "gate_version": "attacker_calibration/1.0.0",
+  "instrument": "independent_attack/1.0.0",
+  "calibration_state": "NOT_CALIBRATED",
+  "terminal_kill_admissible": false,
+  "measured": {
+   "coverage": 1.0,
+   "parse_completeness": 1.0,
+   "tpr_scoped": 1.0,
+   "fpr_known_good": 1.0,
+   "n_cases_attacked": 40
+  },
+  "sealed_thresholds": {
+   "note": "registered BEFORE measurement; never tuned to results (Art. XXVII)",
+   "coverage_min": 0.875,
+   "parse_completeness_min": 0.875,
+   "tpr_min": 0.75,
+   "fpr_max": 0.3,
+   "ensemble": "NONE (single-attacker calibration only; majority-vote ensembles are deferred by the R412 directive)"
+  },
+  "measurement_path": "R412/CALIBRATION/engine_independent_attack_measurement.json",
+  "measurement_sha256": "4e1718e7088564333b5e1ef9be47ca452133d051001628cd6eed91f44e60ef5f",
+  "reason": "measured FPR 1.0 > sealed bar 0.3 (Art. L: the attacker is measured non-selective; its KILL is inadmissible as a terminal verdict and is escalated with the objection preserved)",
+  "rule": "the instrument's KILL is measured non-selective (FPR above the sealed bar); the objection is preserved verbatim and ESCALATED for adjudication — the candidate is NOT killed by this attack alone (Art. L); the deterministic gates are unchanged",
+  "reviewer_provenance": "AI_REVIEW (Art. LXVII)"
+ },
+ "preserved_objections": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "basis": "The claimed force distribution mechanism fails to address the fundamental problem that peristaltic pumps inherently create localized stress points at occlusion zones regardless of cam lobe arrangement. The evidence [doi:10.1186/s13244-024-01750-4] demonstrates that even with multiple cam lobes, stress concentration remains a primary failure mode in peristaltic systems, contradicting the claim of evenly distributed forces."
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "basis": "The proposed design violates the boundary condition of operating within a 120mm × 80mm × 50mm envelope. Multiple cam lobes arranged at different angular positions would require significantly increased rotor diameter to maintain proper tube occlusion angles, making the device physically incompatible with the specified compact dimensions for a benchtop analyzer."
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "basis": "The evidence [doi:10.32786/2071-9485-2018-03-324-329] explicitly states that \"rotary dosing pump performance optimization is limited by the fundamental trade-off between tube occlusion force and tube service life,\" directly contradicting the candidate's claim that increased cam lobes can simultaneously improve force distribution and extend tubing life by 100x."
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "basis": "The predicted effect of increasing tubing service life from days to over 500 hours equals the baseline performance of existing compact peristaltic pumps as described in [doi:10.1016/s0262-1762(04)00163-4], which already achieve 500+ hour service life through optimized single-cam designs, making the claimed improvement nonexistent relative to the state of the art."
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "basis": "The testable prediction fails to define critical measurement parameters including what constitutes \"even force distribution,\" how force distribution will be quantified, and what specific failure metrics will be used to determine the 100x improvement. Without these concrete measurements, the prediction is untestable and therefore meaningless."
+  }
+ ]
+}

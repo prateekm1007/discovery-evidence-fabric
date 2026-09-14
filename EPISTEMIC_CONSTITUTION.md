@@ -1,6 +1,6 @@
 # Epistemic Constitution — Research & Coding
 
-**Version:** 2.3.0
+**Version:** 2.5.0
 **Ratified:** 2026-08-19
 **Amended:** 2026-08-20 (Articles XXIII–XXXIV — Anti-Gaming, Anti-Entropy, Anti-Hallucination Principles; Article XXXV — Closed-Loop Epistemic Control as the Completion Standard)
 **Amended:** 2026-08-25 (Article XXXVI — TECHNOLOGY_TRANSFER_READY as the Manufactured-Asset Completion Standard; see R309/constitution/ARTICLE_XXXVI_TECHNOLOGY_TRANSFER_READY.md)
@@ -11,6 +11,7 @@
 **Amended:** 2026-09-05 (Articles LXIV–LXIX — per external audit findings across six rounds of live review: superseded implementations left coexisting for months, an owner-gated decision left idle for four rounds without escalation, commercial figures drifting toward unsourced assertion in buyer dossiers, every review to date being AI-on-AI with no tracked independence field, and the standing risk — surfaced ahead of the R411 autonomous cross-domain discovery mission — that a fixed portfolio quota could pressure the bar down on a final candidate, or that broad discovery could quietly collapse back into the domain the system already knows best. These six articles are audit-derived, not aspirational: each responds to a specific, verified, repeated failure mode, not a hypothetical one.)
 **Amended:** 2026-09-07 (Article LXX — the Operational Language Rule (English Only), per the operator's CODER NEXT DIRECTIVE section 1; see `R419/constitution/ARTICLE_LXX_OPERATIONAL_LANGUAGE_RULE.md`)
 **Amended:** 2026-09-10 (Article LXXI is RESERVED; Article LXXII — No 3D Artifact Ships Without Passing the Visual Compiler, per the operator's R441 World-Class 3D Pipeline Constitution directive: the pipeline, not prompts, guarantees presentation quality; see `R441/constitution/ARTICLE_LXXII_VISUAL_COMPILER.md`)
+**Amended:** 2026-09-14 (R452, per the operator's constitutional verdict after the discovery→engineering external audit — keep ~85–90%, do not weaken the epistemic core, add the second layer of constitutional law: **THE DISCOVERY MISSION PRESERVATION PRINCIPLE** with five mandatory sub-principles (Global Reachability; Unknown-to-Known Path; Fail-Closed, Progress-Open; Capability Integrity; Causal Learning); **Article LXXI** filled (Capability Identity); **Articles LXXIII–LXXVIII** ratified (Global Constitutional Consistency; No Naked Numbers; Unknown Must Be Actionable; Fail Closed, Progress Open; Canonical State-Machine Integrity; The Constitution Must Test Itself); Articles XVI, XXV, XXVII, LIX, LX, LXI amended to interact with the new layer. The amendment record with the full operator directive is `R452/constitution/AMENDMENT_RECORD.md`.)
 **Authority:** Constitutional — supersedes all coding directives, gate results, and research priorities
 **Scope:** Governs both research output AND modifications to the epistemic machinery itself, AND — from v2.0.0 — what the machine may call a discovery or an invention
 
@@ -54,6 +55,44 @@ Package generation ≠ Commercial validation
 A candidate shall not be called an invention solely because an AI model generated it. A candidate becomes a **DISCOVERY CANDIDATE** only when it satisfies the machine-defined discovery contract (Articles XLI–LXIII).
 
 **Evidence honesty is necessary. It is not sufficient.** This Constitution governs both **epistemic integrity** (Articles I–XXXIX) and **discovery integrity** (Articles XL–LXIII).
+
+---
+
+# THE DISCOVERY MISSION PRESERVATION PRINCIPLE
+
+**Ratified:** 2026-09-14 (R452). This is the second layer of constitutional law. The first layer — the epistemic articles — answers "How do we prevent the machine from lying?" This layer answers, with equal force: **"How do we prevent the machine from becoming so constrained that it can no longer discover anything?"** The external audit of the discovery→engineering organ proved that locally correct rules can combine into a globally impossible system: Article XXVII (no invented numbers) was implemented as "never produce numbers," which made Article LX (engineering representability) unreachable, while Article LXXII depended on that unreachable capability. Every individual article could pass while the system as a whole could not perform its mission.
+
+> **The Constitution exists not only to prevent false discovery, but to preserve the system's ability to discover. No constitutional rule, gate, policy, safety mechanism, or implementation may reduce a required mission capability to permanent unreachability without explicitly declaring the capability unavailable and defining the smallest valid path to restore it.**
+
+> **A safe discovery machine that cannot discover is constitutionally incomplete.**
+
+Five sub-principles are MANDATORY and govern the interpretation of every other article:
+
+**1. Global Reachability.** The conjunction of all applicable rules must leave an executable path through every claimed capability. No article may be implemented in a manner that makes another required constitutional capability unreachable. Before acceptance, the system must demonstrate constitutional reachability across the complete mission path (Article LXXIII).
+
+**2. Unknown-to-Known Path.** Every important UNKNOWN must have a lawful route by which it can become known. UNKNOWN is a state of active investigation, not a terminal verdict (Article LXXV).
+
+**3. Fail-Closed, Progress-Open.** A blocked claim stops — the machine must still identify the next information-producing action. "Stop the invalid claim, but generate the smallest valid next action" (Article LXXVI).
+
+**4. Capability Integrity.** A model/provider/compute downgrade cannot silently preserve the same capability claim. A degraded configuration must be recorded as a capability downgrade and must trigger re-validation of mission claims (Article LXXI).
+
+**5. Causal Learning.** New evidence or experiment outcomes must be capable of changing the invention state and producing a separately evaluated successor (Articles LI, XXXVII–XXXVIII; the discovery loop of Article LV).
+
+The target constitutional architecture is:
+
+```text
+Epistemic Integrity → Global Reachability → Discovery Progress →
+Causal Learning → Engineering Realization → Reality Validation →
+Buyer-credible Survivor
+```
+
+The mission path every claimed capability must be reachable over:
+
+```text
+PROBLEM → EVIDENCE → MECHANISM → CANDIDATE → ATTACK → ADJUDICATION →
+PARAMETER SOURCING → ENGINEERING → SIMULATION/EXPERIMENT → REALITY UPDATE →
+MUTATION → RE-EVALUATION → SURVIVOR → PACKAGE
+```
 
 ---
 
@@ -425,6 +464,16 @@ doesn't prove the system fails closed.
 Every control must have an adversarial demonstration that attempts to defeat it.
 
 **Code is a hypothesis about enforcement. Tests are evidence of enforcement.**
+
+### Amendment (R452, Constitution v2.5.0) — tests must exercise the real chain
+
+The audit exposed the loophole this article now closes: a system can carry hundreds of test files while the mission-critical producer→classifier→normalizer→builder chain has zero coverage, because the tests exercised hand-written fixtures on a schema the production producer never emits.
+
+> **Tests must exercise canonical producers and real consumers. A fixture that bypasses the production producer cannot establish the behavior of the production system.**
+
+> **Every mission-critical transformation must have at least one producer-to-consumer contract test: the artifact actually emitted by the production producer is consumed by the production consumer, and the contract between them is asserted.**
+
+This is a constitutional requirement, not a testing preference. A green suite that never joins the real producer to the real consumer is not evidence about the production system, whatever its pass count (Article XIX).
 
 ---
 
@@ -823,6 +872,10 @@ Unknown is a legitimate epistemic state. `PROVENANCE_INCOMPLETE` is infinitely p
 
 This extends Article XXI (search count ≠ evidence) and Article VI (never manufacture provenance).
 
+### Amendment (R452, Constitution v2.5.0)
+
+Unknown must remain unknown — AND unknown must remain **actionable** (Article LXXV). "UNKNOWN stays UNKNOWN" was implemented as "UNKNOWN stays UNKNOWN forever"; that is not healthy epistemology, it is a dead end wearing an honest label. An UNKNOWN without a recorded next information-gathering action is an incomplete record of the UNKNOWN.
+
 ---
 
 ## Article XXVI — No self-certification
@@ -849,6 +902,18 @@ Every important threshold (kill criterion, pass/fail boundary, safety margin) ne
 A threshold that appears because "it seems reasonable" is forbidden. A MODEL_DERIVED threshold cannot silently become a CLINICAL fact. A threshold change (e.g., 0.05 → 0.35 mL/min) must be explicitly documented with rationale — never drifted silently.
 
 This extends Article VII (never weaken the verifier to rescue a claim) to cover threshold drift in both directions.
+
+### Amendment (R452, Constitution v2.5.0) — no threshold invention ≠ no numbers
+
+This article forbids **inventing** thresholds. It has never forbidden **sourcing** values from evidence with provenance — but it was repeatedly implemented as "never produce numbers," which made engineering representability (Article LX) unreachable and, through it, the 3D and package obligations (Article LXXII) unreachable: a local safety rule silently repealed a global mission capability (see THE DISCOVERY MISSION PRESERVATION PRINCIPLE). The forbidden/allowed distinction is now explicit:
+
+**Forbidden:** an invented number — a value with no provenance, no derivation, and no declared class.
+
+**Allowed:** `SOURCE_FACT`, `COMPUTED`, `MODELLED` (and `OBSERVED`/`DERIVED`) values — each with provenance, derivation, units, and uncertainty appropriate to its class (Article LXXIV).
+
+> **No naked numerical assertion. Numerical values may enter canonical state only as SOURCE_FACT, COMPUTED, or MODELLED values with provenance, derivation, units, and uncertainty appropriate to their class.**
+
+A MODELLED design proposal inside a declared, provenance-backed envelope is a lawful engineering design choice — labeled MODELLED, never cited as evidence for a factual claim, and never silently promoted (Article XXVIII). The evidence→parameter binding organ (Article LXXIV) is therefore constitutionally REQUIRED machinery, not a convenience.
 
 ---
 
@@ -1809,6 +1874,14 @@ DEVELOPMENT SET
 → EXTERNAL AUDIT
 ```
 
+### Amendment (R452, Constitution v2.5.0) — contamination, replay, and freshness discipline
+
+> **A benchmark cannot establish general capability if the system's training, routing rules, templates, prompts, or fixtures encode the benchmark's expected structure.**
+
+> **No mission capability may be declared proven from historical runs alone. Every major capability claim must periodically receive a fresh-production reproduction** (e.g., "engineering 3D proven" expires unless recently reproduced on the current deployed SHA — otherwise "we proved it three months ago" becomes permanent mythology).
+
+A benchmark result is further not a general-capability claim unless the problems span independent domain families (Article XLIX reports by domain; a repetition within one domain family — however many problems — cannot claim generality, Article LXIX). Fresh production means: fresh problem, current engine at the exact deployed/committed SHA, real chain end-to-end, not a replay of committed fixtures (Article XXXVII's synthetic/real distinction applies to benchmarks too).
+
 ---
 
 ## Article LX — Discovery Classification Ladder
@@ -1837,6 +1910,14 @@ TECHNOLOGY_TRANSFER_READY
 
 The system must never move upward simply because a report was generated. Each transition requires evidence.
 
+### Amendment (R452, Constitution v2.5.0) — engineering representability requires a path to realization
+
+The audit proved the engine had **no evidence→dimension binding stage at all**: engineering specifications carried named critical parameters with value `UNKNOWN (no sourced value)`, so the ladder's `ENGINEERINGALLY_REPRESENTED` rung was structurally unreachable — every locally honest gate green while the mission capability was dead. Therefore:
+
+> **Every physical invention candidate that reaches engineering evaluation must either (a) produce a provenance-backed parameterized representation — every geometry-driving number a SOURCE_FACT / COMPUTED / MODELLED value with provenance, derivation, units, and uncertainty (Article LXXIV) — or (b) produce a typed explanation of the missing evidence and the smallest action capable of supplying it (Article LXXV).**
+
+Option (b) is an honest typed record, never a silent `parameters: []`. Absence of the sourcing organ is a constitutional defect of the implementation, not an acceptable steady state.
+
 ---
 
 ## Article LXI — Infrastructure Failure Is Never Scientific Rejection
@@ -1856,6 +1937,16 @@ INCOMPLETE_INFERENCE_FAILURE
 ```
 
 A missing LLM transport, a skipped stage, a provider outage, or an unevaluated gate is an `INCOMPLETE_*` or `UNKNOWN` state. Converting it into `REJECTED` manufactures negative knowledge from infrastructure and contaminates scientific statistics (extends Articles XXI.3 and XXV to the terminal decision field).
+
+### Amendment (R452, Constitution v2.5.0) — the canonical state machine is ordered and typed
+
+The audit found a 7/7 contradiction: `INVENTION_REJECTED + killed=true` followed by `INVENTION_UNDER_DEVELOPMENT` followed by `INVENTION_EVOLVED`. That is not a presentation defect — it is a canonical state machine violation. Therefore:
+
+> **A rejected generation cannot transition directly to a positive successor state. A positive state must originate from a new, separately identified generation whose own evidence and adjudication support that state.**
+
+> **Canonical state is temporally ordered. A later authoritative negative or blocking event invalidates incompatible earlier positive interpretations unless an explicitly recorded subsequent state supersedes it.** (A stale `COMPLETED_CANDIDATE` cannot survive a later `RUN_BLOCKED_TRANSPORT`.)
+
+This is machine-enforced by the state-integrity invariants over the run's own recorded event sequence (Article X: one canonical, temporally ordered authority).
 
 ---
 
@@ -2005,6 +2096,88 @@ for the scope table, enforcement mechanics, and the verification trail
 
 ---
 
+## Article LXXI — Capability Identity and Model Provenance
+
+**Ratified:** 2026-09-14 (R452 — the slot reserved at R441 is now filled; full text: `R452/constitution/AMENDMENT_RECORD.md`)
+**Sponsor:** Operator constitutional verdict, items 8, 9, 21, 22 — after a transport repair silently reduced 11 nominal providers to 1 admissible provider (Qwen3-1.7B) while preserving the same product ambition.
+
+### The Central Rule
+
+> **A degraded model/provider configuration must not silently redefine the product's scientific capability. Any downgrade that materially affects reasoning, evidence handling, attack execution, or invention quality must be explicitly recorded as a capability downgrade and must trigger re-validation of mission claims.**
+
+A system running on a weak emergency model cannot continue advertising the same scientific capability. `CHEAP_EMERGENCY_FALLBACK` is a transport fact, not a capability statement.
+
+### Capability tiers are measured, not labeled
+
+Canonical state carries a `CAPABILITY_TIER`, measured (never asserted) from the live provider/model reality:
+
+```text
+TIER_1_TRANSPORT_ONLY      — text in/text out survives; no evidence discipline
+TIER_2_EVIDENCE_CAPABLE    — retrieves, cites, respects provenance
+TIER_3_REASONING_CAPABLE   — sustains causal chains and adjudication
+TIER_4_ADVERSARIAL_SCIENTIFIC — attack execution, calibration-grade verdicts
+TIER_5_ENGINEERING          — parameterized engineering synthesis
+TIER_6_EXPERIMENT_REALITY_LOOP — closed-loop causal learning
+```
+
+The system cannot claim a capability above its measured tier. A capability claim emitted under a tier below the claim's requirement is a false claim regardless of the artifact's apparent quality (Article XXVIII).
+
+### The experiment identity tuple
+
+Deployment identity (the R441-era rule, retained) extends to **capability identity** — an immutable tuple pinned with every scientific result:
+
+```text
+commit · constitution version · model id · model revision/hash · provider ·
+inference configuration · capability tier · prompt/policy version ·
+retrieval configuration · solver version · geometry builder ·
+visual compiler · portfolio commit
+```
+
+> **Model identity, model revision/hash, provider, inference configuration, and capability tier are part of the provenance of every model-derived scientific assertion.** A result generated by one model is not automatically equivalent to the same result from another revision — model revision is scientific provenance, exactly like reagent lot numbers.
+
+---
+
+## Article LXXI — Capability Identity and Model Provenance
+
+**Ratified:** 2026-09-14 (R452 — the slot reserved at R441 is now filled; full text: `R452/constitution/AMENDMENT_RECORD.md`)
+**Sponsor:** Operator constitutional verdict, items 8, 9, 21, 22 — after a transport repair silently reduced 11 nominal providers to 1 admissible provider (Qwen3-1.7B) while preserving the same product ambition.
+
+### The Central Rule
+
+> **A degraded model/provider configuration must not silently redefine the product's scientific capability. Any downgrade that materially affects reasoning, evidence handling, attack execution, or invention quality must be explicitly recorded as a capability downgrade and must trigger re-validation of mission claims.**
+
+A system running on a weak emergency model cannot continue advertising the same scientific capability. `CHEAP_EMERGENCY_FALLBACK` is a transport fact, not a capability statement.
+
+### Capability tiers are measured, not labeled
+
+Canonical state carries a `CAPABILITY_TIER`, measured (never asserted) from the live provider/model reality:
+
+```text
+TIER_1_TRANSPORT_ONLY      — text in/text out survives; no evidence discipline
+TIER_2_EVIDENCE_CAPABLE    — retrieves, cites, respects provenance
+TIER_3_REASONING_CAPABLE   — sustains causal chains and adjudication
+TIER_4_ADVERSARIAL_SCIENTIFIC — attack execution, calibration-grade verdicts
+TIER_5_ENGINEERING          — parameterized engineering synthesis
+TIER_6_EXPERIMENT_REALITY_LOOP — closed-loop causal learning
+```
+
+The system cannot claim a capability above its measured tier. A capability claim emitted under a tier below the claim's requirement is a false claim regardless of the artifact's apparent quality (Article XXVIII).
+
+### The experiment identity tuple
+
+Deployment identity (the R441-era rule, retained) extends to **capability identity** — an immutable tuple pinned with every scientific result:
+
+```text
+commit · constitution version · model id · model revision/hash · provider ·
+inference configuration · capability tier · prompt/policy version ·
+retrieval configuration · solver version · geometry builder ·
+visual compiler · portfolio commit
+```
+
+> **Model identity, model revision/hash, provider, inference configuration, and capability tier are part of the provenance of every model-derived scientific assertion.** A result generated by one model is not automatically equivalent to the same result from another revision — model revision is scientific provenance, exactly like reagent lot numbers.
+
+---
+
 ## Article LXXII — No 3D Artifact Ships Without Passing the Visual Compiler
 
 **Ratified:** 2026-09-10 (R441). Full text: `R441/constitution/ARTICLE_LXXII_VISUAL_COMPILER.md`.
@@ -2024,6 +2197,104 @@ the hero exactly like a failure — Art. V/XXV), and it never promotes the
 geometry's engineering status (a beautiful conceptual render is still
 conceptual — Art. XXVIII). CadQuery/OCCT remains the engineering geometry
 authority; the Visual Compiler is presentation-only (Art. LXI).
+
+---
+
+## Article LXXIII — Global Constitutional Consistency (Mission Reachability)
+
+**Ratified:** 2026-09-14 (R452, Constitution v2.5.0)
+
+> **Every constitutional obligation must be evaluated both locally and globally. No article may be implemented in a manner that makes another required constitutional capability unreachable. Before acceptance, the system must demonstrate constitutional reachability across the complete mission path.**
+
+The machine-checkable mission graph is constitutional law:
+
+```text
+PROBLEM → EVIDENCE → MECHANISM → CANDIDATE → ATTACK → ADJUDICATION →
+PARAMETER SOURCING → ENGINEERING → SIMULATION/EXPERIMENT → REALITY UPDATE →
+MUTATION → RE-EVALUATION → SURVIVOR → PACKAGE
+```
+
+**Every edge must have at least one executable proof** — a test, driver, or production run that actually traverses that edge with the canonical producer and canonical consumer (Article XVI). "Every article passes locally while the mission is globally dead" is the exact failure this article forbids: green gates are not truth when the path they gate leads nowhere.
+
+---
+
+## Article LXXIV — No Naked Numbers (Value Provenance Classes)
+
+**Ratified:** 2026-09-14 (R452, Constitution v2.5.0)
+
+> **A numerical value may enter canonical state only as a typed value: `SOURCE_FACT` (bound to an exact evidence span with custody: source id, span, content hash), `COMPUTED` (recorded derivation over typed inputs), or `MODELLED` (a design proposal inside a declared, provenance-backed envelope). Every value carries its class, provenance, derivation, units, and uncertainty appropriate to its class. A value carrying none of these is an invented number (Article XXVII) and is BLOCKED.**
+
+This is the organ the audit found missing entirely: the evidence→parameter binding stage. Its absence meant Article XXVII's local rule ("no invented numbers") silently became "no numbers," repealing Article LX globally. The organ operates in both directions:
+
+- **Extraction**: quantitative spans are extracted from frozen evidence into typed candidate facts with full custody (Article XXI.9's chain: query → provider → raw result → relevance → exact span → hash → class).
+- **Binding**: each engineering parameter binds to the best typed fact by unit family and recorded term match; class precedence is SOURCE_FACT > COMPUTED > MODELLED > UNKNOWN; unit conversion is explicit and recorded; a MODELLED value may never masquerade as SOURCE_FACT (machine-checked).
+- **Residuals**: parameters that remain UNKNOWN get Article LXXV's action record — never a silent `parameters: []`.
+
+A MODELLED value feeds geometry as an honest design proposal; it may never be cited as evidence for a factual claim (Articles XXVII/XXVIII) and its envelope basis is recorded provenance, never "seems reasonable."
+
+---
+
+## Article LXXV — Unknown Must Be Actionable
+
+**Ratified:** 2026-09-14 (R452, Constitution v2.5.0)
+
+Article XXV keeps UNKNOWN honest; this article keeps UNKNOWN **alive**:
+
+> **Unknown is not a terminal epistemic state unless no legal path exists to reduce the uncertainty. For every important UNKNOWN the system must record the next information-gathering action capable of changing it.**
+
+The canonical record for each unresolved engineering parameter:
+
+```text
+UNKNOWN → why unknown → what evidence would resolve it →
+query/experiment required → expected information gain → owner/stage
+```
+
+`UNKNOWN (no sourced value)` with no action record converts honesty into a dead end — the exact "forever UNKNOWN" pathology the audit exposed. Uncertainty is an active discovery problem the machine owns, not a wall it documents.
+
+---
+
+## Article LXXVI — Fail Closed, Progress Open
+
+**Ratified:** 2026-09-14 (R452, Constitution v2.5.0)
+
+The fail-closed philosophy is retained (Articles IV, XIV) and completed:
+
+> **FAIL CLOSED, PROGRESS OPEN. When a claim is blocked, the machine must still identify the smallest valid next information-producing action.**
+
+For every hard stop, the typed blocker record carries:
+
+```text
+blocker_class · why · what would resolve it · required evidence ·
+candidate action · expected information gain · estimated cost · expected time
+```
+
+A blocked claim stops; the machine does not. Otherwise the system is an excellent validator, not an invention machine — and "fail closed" decays into "stop forever," which THE DISCOVERY MISSION PRESERVATION PRINCIPLE forbids. Every next action must answer: **what uncertainty will this action reduce?** (Articles XXXIV, LVI). A failed candidate must produce a productive next action whenever a viable information path exists; the system must not stop merely because the preferred route failed when another admissible route exists to increase information, reduce uncertainty, or test the hypothesis.
+
+---
+
+## Article LXXVII — Canonical State-Machine Integrity
+
+**Ratified:** 2026-09-14 (R452, Constitution v2.5.0)
+
+Machine-enforced invariants over the run's own event sequence (extends Articles X, LXI):
+
+1. **No rejected generation may transition directly to a positive successor state.** A positive state must originate from a new, separately identified generation whose own evidence and adjudication support that state.
+2. **Temporal ordering.** A later authoritative negative or blocking event invalidates incompatible earlier positive interpretations unless an explicitly recorded subsequent state supersedes it.
+3. **Class separation.** Infrastructure failure is never scientific rejection (Article LXI); presentation failure is never run failure; capability downgrade is never capability stasis (Article LXXI).
+
+A state machine that can hold `REJECTED` and `EVOLVED` for the same generation is not "confused" — it is asserting two contradictory answers to the same question simultaneously, which Article IV forbids at the reasoning level and this article forbids at the state level.
+
+---
+
+## Article LXXVIII — The Constitution Must Test Itself
+
+**Ratified:** 2026-09-14 (R452, Constitution v2.5.0)
+
+> **At every major constitutional revision, run a constitutional satisfiability audit: identify all articles that govern each mission-critical stage, then prove that their joint conjunction leaves at least one executable path through the mission. In plain language — can the rules collectively still allow the machine to do its job?**
+
+The audit that produced this amendment found the Constitution could be internally contradictory while every article passed its own tests: Article XXVII ∧ Article LX ∧ Article LXXII had **no satisfying assignment** in the implementation. From v2.5.0, a revision that cannot demonstrate joint satisfiability over the mission graph (Article LXXIII) is not ratifiable — the amendment itself must carry the reachability proof or the typed disclosure of the newly-declared-unavailable capability (THE DISCOVERY MISSION PRESERVATION PRINCIPLE).
+
+---
 
 # THE FOUR CONSTITUTIONAL LAYERS
 
@@ -2074,6 +2345,11 @@ One immutable constitutional gate. It cannot become GREEN merely because code co
 ✓ tracked review independence                (Article LXVII)
 ✓ honest portfolio size                      (Article LXVIII)
 ✓ genuine cross-domain reach                 (Articles XLIII, LXIX)
+✓ global mission reachability                (Articles LXXIII, LXXVIII)
+✓ typed parameter values — no naked numbers  (Articles XXVII, LXXIV)
+✓ actionable unknowns                        (Article LXXV)
+✓ capability identity + measured tier        (Article LXXI)
+✓ canonical state-machine integrity          (Articles LXI, LXXVII)
 ```
 
 And the final question remains:

@@ -1,0 +1,223 @@
+{
+  "experiment": "R452_STRONGER_MODEL_EXPERIMENT",
+  "constitution": "v2.5.0 Article LXXI (capability identity and model provenance)",
+  "at": "2026-09-14T06:41:14Z",
+  "reviewer_provenance": "AI_REVIEW (deterministic mechanical scoring; no LLM judged another LLM's output)",
+  "design": {
+    "question": "does a materially stronger model raise the MEASURED capability tier of the engine's model-derived stages?",
+    "baseline": "sandbox zai gateway (glm-4-plus) \u2014 the engine's current operative transport",
+    "candidates": [
+      "Qwen/Qwen3-14B"
+    ],
+    "family_control": "the audit's degraded state was Qwen3-1.7B; the candidates are materially larger models of the same/control families",
+    "probes": [
+      "evidence_citation",
+      "causal_chain_completion",
+      "attack_execution",
+      "parameterized_engineering_synthesis",
+      "closed_loop_learning"
+    ],
+    "honesty": "transport failures are typed TRANSPORT_UNAVAILABLE records, never failed probes; unmeasured probes count as failed for tier purposes (fail-closed) and are disclosed"
+  },
+  "runs": [
+    {
+      "label": "BASELINE (current operative transport)",
+      "model_id": "glm-4-plus",
+      "model_revision": null,
+      "provider": "zai-sandbox-gateway",
+      "gateway_health": true,
+      "probe_results": {
+        "evidence_citation": true,
+        "causal_chain_completion": false,
+        "attack_execution": true,
+        "parameterized_engineering_synthesis": true,
+        "closed_loop_learning": true
+      },
+      "transcripts": {
+        "evidence_citation": {
+          "reply_head": "span=2.5 mm thick copper substrate | value=2.5 | unit=mm",
+          "elapsed_s": 0.5,
+          "verdict": "PASS"
+        },
+        "causal_chain_completion": {
+          "reply_head": "mechanism=Heat from sustained processor load accumulates within the sealed chassis due to lack of airflow.  \nintroduction=Adding a thermally conductive heat spreader to the processor casing.  \neffect=Heat is dissipated through the chassis walls to the external environment.  \nboundary=The sealed chassis walls must be made of thermally conductive material like aluminum.",
+          "elapsed_s": 1.2,
+          "verdict": "FAIL"
+        },
+        "attack_execution": {
+          "reply_head": "objection=The coating's passive cooling effect is negated by internal heat generation from electronics, preventing net cooling without active systems | class=CAUSAL_INVALIDITY | severity=HIGH  \nobjection=The coating's high solar reflectivity fails under soiling/dust accumulation in real-world environments, drastically reducing performance | class=IMPLEMENTATION_IMPOSSIBILITY | severity=MEDIUM",
+          "elapsed_s": 1.1,
+          "verdict": "PASS"
+        },
+        "parameterized_engineering_synthesis": {
+          "reply_head": "param=panel_width | value=200 | unit=mm\nparam=panel_length | value=300 | unit=mm\nparam=substrate_t | value=1.5 | unit=mm",
+          "elapsed_s": 0.8,
+          "verdict": "PASS"
+        },
+        "closed_loop_learning": {
+          "reply_head": "belief_update=<Prior hypothesis rejected: 3 mm substrate insufficient as base reached 71 C, exceeding 60 C limit.>  \nsuccessor_change=<Increase substrate thickness to 5 mm to improve thermal dissipation.>",
+          "elapsed_s": 0.9,
+          "verdict": "PASS"
+        }
+      },
+      "measured_tier": {
+        "organ": "CAPABILITY_TIER",
+        "module_version": "1.0.0",
+        "at": "2026-09-14T06:41:18Z",
+        "tier": "TIER_2_EVIDENCE_CAPABLE",
+        "basis": {
+          "probes_run": 5,
+          "probe_results": {
+            "evidence_citation": true,
+            "causal_chain_completion": false,
+            "attack_execution": true,
+            "parameterized_engineering_synthesis": true,
+            "closed_loop_learning": true
+          },
+          "measurement_rule": "highest contiguous tier with all lower-tier probes passed; a missing probe counts as failed (fail-closed)",
+          "reviewer_provenance": "AI_REVIEW"
+        },
+        "model_provenance": {
+          "model_id": "glm-4-plus",
+          "model_revision": null,
+          "provider": "zai-sandbox-gateway",
+          "inference_config": {}
+        },
+        "constitution": "v2.5.0 Art. LXXI (capability tiers are measured, not labeled)"
+      }
+    },
+    {
+      "label": "HF candidate Qwen/Qwen3-14B",
+      "model_id": "Qwen/Qwen3-14B",
+      "model_revision": "40c069824f4251a91eefaf281ebe4c544efd3e18",
+      "provider": "hf-router",
+      "revision_info": {
+        "sha": "40c069824f4251a91eefaf281ebe4c544efd3e18",
+        "pipeline_tag": "text-generation",
+        "downloads": 1614278,
+        "library": "transformers"
+      },
+      "probe_results": {
+        "evidence_citation": false,
+        "causal_chain_completion": false,
+        "attack_execution": false,
+        "parameterized_engineering_synthesis": false,
+        "closed_loop_learning": false
+      },
+      "transcripts": {
+        "evidence_citation": {
+          "error": "HTTPError: HTTP Error 402: Payment Required",
+          "elapsed_s": 0.2,
+          "verdict": "TRANSPORT_UNAVAILABLE"
+        },
+        "causal_chain_completion": {
+          "error": "HTTPError: HTTP Error 402: Payment Required",
+          "elapsed_s": 0.3,
+          "verdict": "TRANSPORT_UNAVAILABLE"
+        },
+        "attack_execution": {
+          "error": "HTTPError: HTTP Error 402: Payment Required",
+          "elapsed_s": 0.2,
+          "verdict": "TRANSPORT_UNAVAILABLE"
+        },
+        "parameterized_engineering_synthesis": {
+          "error": "HTTPError: HTTP Error 402: Payment Required",
+          "elapsed_s": 0.2,
+          "verdict": "TRANSPORT_UNAVAILABLE"
+        },
+        "closed_loop_learning": {
+          "error": "HTTPError: HTTP Error 402: Payment Required",
+          "elapsed_s": 0.2,
+          "verdict": "TRANSPORT_UNAVAILABLE"
+        }
+      },
+      "measured_tier": {
+        "organ": "CAPABILITY_TIER",
+        "module_version": "1.0.0",
+        "at": "2026-09-14T06:41:19Z",
+        "tier": "TIER_1_TRANSPORT_ONLY",
+        "basis": {
+          "probes_run": 5,
+          "probe_results": {
+            "evidence_citation": false,
+            "causal_chain_completion": false,
+            "attack_execution": false,
+            "parameterized_engineering_synthesis": false,
+            "closed_loop_learning": false
+          },
+          "measurement_rule": "highest contiguous tier with all lower-tier probes passed; a missing probe counts as failed (fail-closed)",
+          "reviewer_provenance": "AI_REVIEW"
+        },
+        "model_provenance": {
+          "model_id": "Qwen/Qwen3-14B",
+          "model_revision": "40c069824f4251a91eefaf281ebe4c544efd3e18",
+          "provider": "hf-router",
+          "inference_config": {}
+        },
+        "constitution": "v2.5.0 Art. LXXI (capability tiers are measured, not labeled)"
+      },
+      "capability_identity": {
+        "organ": "CAPABILITY_IDENTITY",
+        "module_version": "1.0.0",
+        "model_id": "Qwen/Qwen3-14B",
+        "model_revision": "40c069824f4251a91eefaf281ebe4c544efd3e18",
+        "provider": "hf-router",
+        "capability_tier": "TIER_1_TRANSPORT_ONLY",
+        "constitution_version": "2.5.0",
+        "commit": null,
+        "at": "2026-09-14T06:41:19Z",
+        "note": "model revision is scientific provenance, exactly like reagent lot numbers (Art. LXXI)"
+      }
+    }
+  ],
+  "hf_token_state": "present (from env / .env.keys)",
+  "conclusion": {
+    "runs_measured": 2,
+    "runs_transport_unavailable": 1,
+    "tiers": {
+      "glm-4-plus": "TIER_2_EVIDENCE_CAPABLE",
+      "Qwen/Qwen3-14B": "TIER_1_TRANSPORT_ONLY"
+    },
+    "capability_claims_allowed": [
+      {
+        "claim": "evidence-grounded synthesis",
+        "measured_tier": "TIER_2_EVIDENCE_CAPABLE",
+        "required_tier": "TIER_2_EVIDENCE_CAPABLE",
+        "allowed": true,
+        "constitution": "v2.5.0 Art. LXXI",
+        "at": "2026-09-14T06:41:19Z"
+      },
+      {
+        "claim": "causal mechanism reasoning",
+        "measured_tier": "TIER_2_EVIDENCE_CAPABLE",
+        "required_tier": "TIER_3_REASONING_CAPABLE",
+        "allowed": false,
+        "constitution": "v2.5.0 Art. LXXI",
+        "at": "2026-09-14T06:41:19Z",
+        "violation": "CAPABILITY_EXCEEDS_MEASURED_TIER",
+        "required_action": "record the claim as unavailable at the current tier; re-validate after a measured tier increase (capability integrity \u2014 the Discovery Mission Preservation Principle)"
+      },
+      {
+        "claim": "adversarial attack execution",
+        "measured_tier": "TIER_2_EVIDENCE_CAPABLE",
+        "required_tier": "TIER_4_ADVERSARIAL_SCIENTIFIC",
+        "allowed": false,
+        "constitution": "v2.5.0 Art. LXXI",
+        "at": "2026-09-14T06:41:19Z",
+        "violation": "CAPABILITY_EXCEEDS_MEASURED_TIER",
+        "required_action": "record the claim as unavailable at the current tier; re-validate after a measured tier increase (capability integrity \u2014 the Discovery Mission Preservation Principle)"
+      },
+      {
+        "claim": "parameterized engineering synthesis",
+        "measured_tier": "TIER_2_EVIDENCE_CAPABLE",
+        "required_tier": "TIER_5_ENGINEERING",
+        "allowed": false,
+        "constitution": "v2.5.0 Art. LXXI",
+        "at": "2026-09-14T06:41:19Z",
+        "violation": "CAPABILITY_EXCEEDS_MEASURED_TIER",
+        "required_action": "record the claim as unavailable at the current tier; re-validate after a measured tier increase (capability integrity \u2014 the Discovery Mission Preservation Principle)"
+      }
+    ],
+    "note": "the engine's OPERATIVE tier is bounded by its current transport configuration; this experiment measures candidate configurations for the operator's capacity decision \u2014 no claim above the measured tier is made anywhere in this record (Art. LXXI)"
+  }
+}

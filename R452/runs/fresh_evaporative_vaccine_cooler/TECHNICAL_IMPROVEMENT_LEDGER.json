@@ -1,0 +1,536 @@
+{
+ "ledger": "TECHNICAL_IMPROVEMENT_LEDGER (R379 V2 + R383 ANALYTICAL EQUATION LAYER)",
+ "version": "3.0.0",
+ "loop": "CANDIDATE -> TECHNICAL DIAGNOSIS (limiting variable + direction + R383 QUANTITATIVE margins/sensitivities) -> DETERMINISTIC SOLVE-OR-LLM MUTATION (actual design variable) -> CAD REBUILD -> INDEPENDENT TECHNICAL EVALUATION (monotone + quantitative on the child's OWN measured geometry) -> EVIDENCE/PRIOR-ART RECHECK -> KEEP/KILL (K1-K8) -> SECOND IMPROVEMENT",
+ "collision_mode": "REPLAY_CACHE",
+ "live_sources": null,
+ "thresholds": {
+  "MAX_ITERATIONS_DEFAULT": {
+   "value": 2,
+   "epistemic_class": "ENGINEERING",
+   "justification": "the CEO milestone is DIAGNOSE -> TECHNICAL MUTATION -> RE-EVALUATE -> SECOND IMPROVEMENT; two iterations demonstrate repeatability at bounded cost"
+  },
+  "MAX_PROPOSALS_PER_ITERATION": {
+   "value": 3,
+   "epistemic_class": "ENGINEERING",
+   "justification": "bounded proposal budget, identical to the R378 epistemic loop: three attempts, then the honest no-defensible-mutation verdict"
+  },
+  "VALUE_CLASS_STRICTNESS": {
+   "value": "HARD",
+   "epistemic_class": "ENGINEERING",
+   "justification": "EXTRACTED claims are span-verified or rejected (Art. II/VI); MODELLED values are admitted only when declared; an unbounded parameter is immutable (ADR_R379 anti-gaming)"
+  }
+ },
+ "mutation_kinds_live": [
+  "PARAMETER_CHANGE",
+  "GEOMETRY_CHANGE",
+  "MATERIAL_CHANGE",
+  "OPERATING_CONDITION_CHANGE",
+  "MECHANISM_CHANGE"
+ ],
+ "mutation_kinds_reserved": {
+  "ARCHITECTURE_CHANGE": "needs a structural/control search space at a higher fidelity tier (ADR_R379)",
+  "CONTROL_POLICY_CHANGE": "needs a structural/control search space at a higher fidelity tier (ADR_R379)"
+ },
+ "keep_criterion": "the child's OWN independent technical evaluation must confirm the objective improves in the mutation direction with constraints preserved — a score increase is NEVER sufficient (CEO R379 item 4/8)",
+ "started_at": "2026-09-14T06:31:05+00:00Z",
+ "iterations": [],
+ "outcome": "TECHNICAL_UNQUANTIFIED",
+ "outcome_reason": "the candidate's own custodied evidence yields no quantifiable technical objective+leverage (admitted: {\"parameters\": 10, \"parameters_with_value\": 0, \"parameters_extracted\": 0, \"parameters_modelled\": 0, \"parameters_with_envelope\": 0, \"constraints\": 0, \"objectives\": 4, \"dependencies\": 3, \"objects\": 4, \"failure_modes\": 1}); the technical layer cannot engage — an honest measured gap (the 🟡 state), not a kill and not a failure",
+ "extraction": {
+  "proposal_id": "tsp:3a9b4b088092",
+  "attempts": [
+   {
+    "attempt": 1,
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "status": "OK",
+    "prompt_hash": "6d3feae6ad206c3cc1925f315a7c5ab56aabe1d130cee90e9c6ee55c590e8f2d",
+    "output_hash": "dd29caa72bec40dd6cd2020a3f3c95091868a304f6199b53b981428302573044",
+    "latency_ms": 30660,
+    "error": null,
+    "raw_content_sha256": "cb3fb5f5815e221d3779b51477d811aa2cae016a01212d3056a2902708938b0e"
+   }
+  ],
+  "provider": "zai",
+  "model": "glm-4-plus",
+  "status": "OK",
+  "prompt_hash": "6d3feae6ad206c3cc1925f315a7c5ab56aabe1d130cee90e9c6ee55c590e8f2d",
+  "output_hash": "dd29caa72bec40dd6cd2020a3f3c95091868a304f6199b53b981428302573044",
+  "latency_ms": 30660,
+  "error": null,
+  "proposal": {
+   "objects": [
+    {
+     "object_id": "vessel",
+     "name": "evaporative-cooled vaccine storage vessel",
+     "role": "main device for passive vaccine storage"
+    },
+    {
+     "object_id": "coating",
+     "name": "radiative cooling coating",
+     "role": "outer surface treatment for enhanced heat rejection"
+    },
+    {
+     "object_id": "storage_tanks",
+     "name": "chemical storage tanks",
+     "role": "internal components for evaporative cooling"
+    },
+    {
+     "object_id": "payload",
+     "name": "vaccine payload",
+     "role": "content to be maintained at 2-8°C"
+    }
+   ],
+   "parameters": [
+    {
+     "param_id": "temp_interior",
+     "name": "interior temperature",
+     "category": "OPERATING_CONDITIONS",
+     "unit": "°C",
+     "value": null,
+     "value_class": "UNKNOWN",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": 2,
+     "range_max": 8,
+     "range_span": "2-8 C",
+     "range_evidence_id": "DEVICE FAILURE",
+     "role": "temperature range for vaccine storage"
+    },
+    {
+     "param_id": "duration",
+     "name": "cooling duration",
+     "category": "OPERATING_CONDITIONS",
+     "unit": "hours",
+     "value": null,
+     "value_class": "UNKNOWN",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": 48,
+     "range_max": 48,
+     "range_span": "at least 48 hours",
+     "range_evidence_id": "DEVICE FAILURE",
+     "role": "minimum time to maintain required temperature"
+    },
+    {
+     "param_id": "temp_ambient",
+     "name": "ambient temperature",
+     "category": "OPERATING_CONDITIONS",
+     "unit": "°C",
+     "value": null,
+     "value_class": "UNKNOWN",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": 40,
+     "range_max": 40,
+     "range_span": "40 C ambient",
+     "range_evidence_id": "DEVICE FAILURE",
+     "role": "maximum external temperature the cooler must withstand"
+    },
+    {
+     "param_id": "footprint",
+     "name": "footprint dimensions",
+     "category": "GEOMETRY",
+     "unit": "mm",
+     "value": null,
+     "value_class": "UNKNOWN",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": 250,
+     "range_max": 300,
+     "range_span": "300 mm length by 250 mm width footprint",
+     "range_evidence_id": "DEVICE FAILURE",
+     "role": "maximum base area of the cooler"
+    },
+    {
+     "param_id": "height",
+     "name": "cooler height",
+     "category": "GEOMETRY",
+     "unit": "mm",
+     "value": null,
+     "value_class": "UNKNOWN",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": 400,
+     "range_max": 400,
+     "range_span": "400 mm height",
+     "range_evidence_id": "DEVICE FAILURE",
+     "role": "maximum vertical dimension of the cooler"
+    },
+    {
+     "param_id": "payload_volume",
+     "name": "vaccine payload volume",
+     "category": "PARAMETERS",
+     "unit": "L",
+     "value": 5,
+     "value_class": "EXTRACTED",
+     "value_span": "carry a 5 L vaccine payload",
+     "value_evidence_id": "DEVICE FAILURE",
+     "range_min": null,
+     "range_max": null,
+     "range_span": null,
+     "range_evidence_id": null,
+     "role": "volume of vaccines the cooler must contain"
+    },
+    {
+     "param_id": "evaporative_loss",
+     "name": "evaporative loss rate",
+     "category": "PARAMETERS",
+     "unit": null,
+     "value": null,
+     "value_class": "UNKNOWN",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": null,
+     "range_max": null,
+     "range_span": null,
+     "range_evidence_id": null,
+     "role": "rate of water evaporation from cooling medium"
+    },
+    {
+     "param_id": "heat_rejection",
+     "name": "heat rejection rate",
+     "category": "PARAMETERS",
+     "unit": null,
+     "value": null,
+     "value_class": "UNKNOWN",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": null,
+     "range_max": null,
+     "range_span": null,
+     "range_evidence_id": null,
+     "role": "rate at which heat is radiated away from the cooler"
+    },
+    {
+     "param_id": "cooling_margin",
+     "name": "remaining cooling margin",
+     "category": "PARAMETERS",
+     "unit": null,
+     "value": null,
+     "value_class": "UNKNOWN",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": null,
+     "range_max": null,
+     "range_span": null,
+     "range_evidence_id": null,
+     "role": "indicator of how much cooling capacity remains"
+    },
+    {
+     "param_id": "power_source",
+     "name": "power source requirement",
+     "category": "PARAMETERS",
+     "unit": null,
+     "value": "none",
+     "value_class": "EXTRACTED",
+     "value_span": "use no electricity",
+     "value_evidence_id": "DEVICE FAILURE",
+     "range_min": null,
+     "range_max": null,
+     "range_span": null,
+     "range_evidence_id": null,
+     "role": "type of power source required for operation"
+    }
+   ],
+   "constraints": [
+    {
+     "constraint_id": "temp_constraint",
+     "target": "temp_interior",
+     "bound": "<=",
+     "limit": 8,
+     "unit": "°C",
+     "limit_class": "EXTRACTED",
+     "limit_span": "hold a 2-8 C interior",
+     "limit_evidence_id": "DEVICE FAILURE",
+     "justification": "vaccines must not exceed 8°C to maintain efficacy"
+    },
+    {
+     "constraint_id": "duration_constraint",
+     "target": "duration",
+     "bound": ">=",
+     "limit": 48,
+     "unit": "hours",
+     "limit_class": "EXTRACTED",
+     "limit_span": "at least 48 hours",
+     "limit_evidence_id": "DEVICE FAILURE",
+     "justification": "cooler must maintain temperature for minimum 48 hours without power"
+    },
+    {
+     "constraint_id": "ambient_constraint",
+     "target": "temp_ambient",
+     "bound": ">=",
+     "limit": 40,
+     "unit": "°C",
+     "limit_class": "EXTRACTED",
+     "limit_span": "in 40 C ambient",
+     "limit_evidence_id": "DEVICE FAILURE",
+     "justification": "cooler must function in maximum 40°C ambient temperature"
+    },
+    {
+     "constraint_id": "footprint_constraint",
+     "target": "footprint",
+     "bound": "<=",
+     "limit": 300,
+     "unit": "mm",
+     "limit_class": "EXTRACTED",
+     "limit_span": "fit a 300 mm length by 250 mm width footprint",
+     "limit_evidence_id": "DEVICE FAILURE",
+     "justification": "maximum footprint size for clinic space constraints"
+    },
+    {
+     "constraint_id": "height_constraint",
+     "target": "height",
+     "bound": "<=",
+     "limit": 400,
+     "unit": "mm",
+     "limit_class": "EXTRACTED",
+     "limit_span": "with 400 mm height",
+     "limit_evidence_id": "DEVICE FAILURE",
+     "justification": "maximum height for storage and transport"
+    },
+    {
+     "constraint_id": "payload_constraint",
+     "target": "payload_volume",
+     "bound": ">=",
+     "limit": 5,
+     "unit": "L",
+     "limit_class": "EXTRACTED",
+     "limit_span": "carry a 5 L vaccine payload",
+     "limit_evidence_id": "DEVICE FAILURE",
+     "justification": "minimum volume required for vaccine storage"
+    },
+    {
+     "constraint_id": "power_constraint",
+     "target": "power_source",
+     "bound": "=",
+     "limit": "none",
+     "unit": null,
+     "limit_class": "EXTRACTED",
+     "limit_span": "use no electricity",
+     "limit_evidence_id": "DEVICE FAILURE",
+     "justification": "passive cooling with no external power requirement"
+    }
+   ],
+   "objectives": [
+    {
+     "objective_id": "temp_objective",
+     "target": "temp_interior",
+     "direction": "MAINTAIN_WITHIN",
+     "basis": "prevent vaccine spoilage by maintaining cooling margin"
+    },
+    {
+     "objective_id": "duration_objective",
+     "target": "duration",
+     "direction": "MAXIMIZE",
+     "basis": "extend cooling duration to prevent cooling_margin_loss"
+    },
+    {
+     "objective_id": "margin_objective",
+     "target": "cooling_margin",
+     "direction": "MAXIMIZE",
+     "basis": "prevent cooling_margin_loss failure mode"
+    },
+    {
+     "objective_id": "signal_objective",
+     "target": "cooling_margin",
+     "direction": "MAXIMIZE",
+     "basis": "enable remaining cooling margin signaling without power"
+    }
+   ],
+   "failure_modes": [
+    {
+     "mode_id": "cooling_margin_loss",
+     "name": "cooling margin loss",
+     "problem_link": "Device failure mode: cooling_margin_loss - cooler cannot maintain required temperature for required duration"
+    }
+   ],
+   "dependencies": [
+    {
+     "relation_id": "dep1",
+     "cause": "heat_rejection",
+     "effect": "temp_interior",
+     "direction": "DECREASES",
+     "statement": "increased heat rejection from radiative cooling coating decreases interior temperature",
+     "relation_class": "EXTRACTED",
+     "span": "enhance passive heat rejection",
+     "evidence_id": "CURRENT CANDIDATE"
+    },
+    {
+     "relation_id": "dep2",
+     "cause": "heat_rejection",
+     "effect": "evaporative_loss",
+     "direction": "DECREASES",
+     "statement": "increased heat rejection reduces evaporative loss from storage tanks",
+     "relation_class": "EXTRACTED",
+     "span": "reduce evaporative loss from chemical storage tanks",
+     "evidence_id": "CURRENT CANDIDATE"
+    },
+    {
+     "relation_id": "dep3",
+     "cause": "evaporative_loss",
+     "effect": "duration",
+     "direction": "DECREASES",
+     "statement": "reduced evaporative loss extends cooling duration",
+     "relation_class": "MODELLED",
+     "span": null,
+     "evidence_id": null
+    },
+    {
+     "relation_id": "dep4",
+     "cause": "heat_rejection",
+     "effect": "cooling_margin",
+     "direction": "INCREASES",
+     "statement": "increased heat rejection increases remaining cooling margin",
+     "relation_class": "MODELLED",
+     "span": null,
+     "evidence_id": null
+    },
+    {
+     "relation_id": "dep5",
+     "cause": "evaporative_loss",
+     "effect": "cooling_margin",
+     "direction": "DECREASES",
+     "statement": "increased evaporative loss decreases remaining cooling margin",
+     "relation_class": "MODELLED",
+     "span": null,
+     "evidence_id": null
+    }
+   ]
+  },
+  "raw_content_sha256": "cb3fb5f5815e221d3779b51477d811aa2cae016a01212d3056a2902708938b0e"
+ },
+ "technical_state_counts": {
+  "parameters": 10,
+  "parameters_with_value": 0,
+  "parameters_extracted": 0,
+  "parameters_modelled": 0,
+  "parameters_with_envelope": 0,
+  "constraints": 0,
+  "objectives": 4,
+  "dependencies": 3,
+  "objects": 4,
+  "failure_modes": 1
+ },
+ "baseline": {
+  "technical": {
+   "status": "UNQUANTIFIED",
+   "objective": {
+    "target": "temp_interior",
+    "direction": "MAINTAIN_WITHIN",
+    "known": false,
+    "basis": "prevent vaccine spoilage by maintaining cooling margin"
+   },
+   "limiting_variable": null,
+   "constraint_results": [],
+   "uncertainty": {
+    "unknown_value_params": [
+     "cooling_margin",
+     "duration",
+     "evaporative_loss",
+     "footprint",
+     "heat_rejection",
+     "height",
+     "payload_volume",
+     "power_source",
+     "temp_ambient",
+     "temp_interior"
+    ],
+    "modelled_relations": 3,
+    "extracted_relations": 0,
+    "unverifiable_constraints": [],
+    "objective_known": false,
+    "note": "UNKNOWN values are never treated as zeros; unverifiable constraints are never treated as satisfied (Art. XXV / Art. IV)"
+   },
+   "computation_log": {
+    "evaluator_id": "analytical_monotone_v1",
+    "fidelity_tier": "STRUCTURED_CONSTRAINT",
+    "evidence_rank": 3,
+    "input_state_sha256": "b4942857c79baf7fd227acb007b1471a0b6119decb8d999d86ed379d9419fc81",
+    "conventions": [
+     {
+      "name": "ORDINAL_LEVERAGE_BY_PATH_LENGTH",
+      "epistemic_class": "ENGINEERING",
+      "justification": "with MONOTONE-only relations the evaluator cannot rank leverage by magnitude; it ranks by (1) fewest constraint blocks, (2) shortest causal path from the parameter to the objective target, (3) envelope provenance class (EXTRACTED beats MODELLED). This is a declared ordinal convention, not a measurement — recorded on every evaluation that uses it.",
+      "uncertainty": "ordinal only; magnitudes are UNKNOWN at this tier"
+     },
+     {
+      "name": "DIRECTIONAL_FAIL_CLOSED",
+      "epistemic_class": "ENGINEERING",
+      "justification": "a proposed change is constraint-BLOCKED when (a) the changed parameter's own numeric constraint would be violated at the proposed value, or (b) a relation-connected constraint target is already VIOLATED or value-UNKNOWN and the predicted direction moves it TOWARD its bound. Fail-closed on directional risk: an unknown-position target moving toward a bound is a blocked move, not an accepted one (Art. IV).",
+      "uncertainty": "direction-level only at this tier"
+     }
+    ],
+    "steps": [
+     "resolved objective temp_interior (MAINTAIN_WITHIN)",
+     "checked 0 constraint(s) numerically where values exist",
+     "propagated signs over 3 relation(s)",
+     "ranked 0 movable improving direction(s)"
+    ],
+    "computed_at": "2026-09-14T06:31:36+00:00Z",
+    "deterministic": true
+   }
+  },
+  "quantitative": {
+   "status": "UNQUANTIFIED",
+   "objective": {
+    "target": "temp_interior",
+    "direction": "MAINTAIN_WITHIN",
+    "computed": false,
+    "value": null,
+    "unit": null,
+    "equation_id": null,
+    "margin": null,
+    "margin_status": "UNCOMPUTED",
+    "statement": "no active computation binds the objective target"
+   },
+   "requirement_satisfied": null,
+   "limiting_variable": null,
+   "computed_equations": [],
+   "computation_log": [],
+   "evidence_rank": 4
+  },
+  "i_dimensions": {
+   "I1_MECHANISM_EVIDENCE_DERIVATION": {
+    "score": 0.529,
+    "state": "MEASURED"
+   },
+   "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_SURVIVORS"
+   },
+   "I3_RECOMBINATION_RISK": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_FAMILIES"
+   },
+   "I4_NEW_TECHNICAL_RELATIONSHIP": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+   },
+   "I5_EXPERIMENT_DISCRIMINATION": {
+    "score": 0.667,
+    "state": "MEASURED"
+   }
+  },
+  "i_flags": {
+   "underived_mechanism": false,
+   "recombination_only": false
+  },
+  "i_average": 0.598,
+  "q_average": 0.625,
+  "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE"
+ },
+ "fidelity_escalation": {
+  "current_tier": "STRUCTURED_CONSTRAINT (analytical_monotone_v1) + ANALYTICAL_EQUATION (analytical_equation_v1, R383)",
+  "deciding_question": "does a design-variable change improve the objective within constraints, and by how much?",
+  "resolved_at_current_tier": false,
+  "quantitative_tier_engaged": false,
+  "quantitative_objective_computed": false,
+  "escalation_needed": true,
+  "next_tier_available": false,
+  "note": "the R383 ANALYTICAL_EQUATION tier is LIVE (closed-form deterministic relations with computation logs); the higher tiers (NUMERICAL_SOLVER / SIMULATION / NEURAL_OPERATOR) remain contract-reserved and unregistered; escalation is recorded, never faked at the current tier"
+ },
+ "finished_at": "2026-09-14T06:31:36+00:00Z",
+ "status": "TECHNICAL_UNQUANTIFIED"
+}

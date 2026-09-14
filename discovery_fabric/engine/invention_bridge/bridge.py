@@ -32,6 +32,7 @@ from __future__ import annotations
 import json
 import os
 import time
+from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 from . import epistemics as ep
@@ -42,7 +43,7 @@ from . import geometry_quality_gate as quality_gate
 from . import artifact_identity as artifact_id
 from ..domains import resolve_canonical_family, resolve_run_canonical_family
 
-BRIDGE_VERSION = "2.0.0"
+BRIDGE_VERSION = "2.1.0"  # R452: + PARAMETER_SOURCING stage + OCP guard
 MAX_GEOMETRY_ATTEMPTS = 3
 
 
@@ -109,6 +110,40 @@ def bridge(run_result: Dict[str, Any], cio: Optional[Dict[str, Any]],
     # bridge's canonical-family ladder reads the SAME upstream decision
     # the package compiler reads (agreement by construction)
     run_result = _resolved_run_state(run_result, work_dir)
+
+    # ---------------------------------------------------------------- 0.5 source
+    # R452: THE VALUE SOURCING ORGAN (Constitution v2.5.0 Art. LXXIV) —
+    # the evidence→parameter binding stage the external audit found
+    # missing entirely. Fresh runs arrive with named critical parameters
+    # carrying value "UNKNOWN (no sourced value)"; without this stage
+    # ENGINEERING_3D is structurally unreachable (the Art. XXVII ∧ LX
+    # collision). The organ fills typed values (SOURCE_FACT / COMPUTED /
+    # MODELLED with provenance; UNKNOWN residuals carry Art. LXXV next
+    # actions), persists PARAMETER_SOURCE_RECORD.json in the run dir,
+    # and no-ops when parameters already exist (released chain).
+    from discovery_fabric.engine import value_sourcing as _vs
+    try:
+        run_result, sourcing_record = _vs.ensure_sourced_parameters(
+            run_result, work_dir=work_dir, run_id=run_id)
+        if sourcing_record:
+            _pipeline_step(steps, "PARAMETER_SOURCING",
+                           sourcing_record.get("status", "SOURCED"), {
+                               "value_class_counts":
+                                   sourcing_record.get(
+                                       "value_class_counts"),
+                               "physical_site":
+                                   sourcing_record.get("physical_site"),
+                               "record": "PARAMETER_SOURCE_RECORD.json",
+                               "constitution": "v2.5.0 Art. LXXIV/LXXV",
+                           })
+    except Exception as exc:  # noqa: BLE001 — typed, never silent
+        _pipeline_step(steps, "PARAMETER_SOURCING", "FAILED", {
+            "error": f"{type(exc).__name__}: {exc}",
+            "note": ("the sourcing organ failed — an engine defect, "
+                      "disclosed (Art. XV); classification proceeds on "
+                      "the unenriched spec exactly as before (fail "
+                      "closed, never a fabricated parameter)"),
+        })
 
     # ---------------------------------------------------------------- 1. classify
     vis = classifier.classify(run_result, cio)
@@ -625,30 +660,55 @@ def _build_engineering(vis: Dict[str, Any], run_result: Dict[str, Any],
 
     builder = engineering_geometry.FORM_LIBRARY[form]
 
-    def rebuild():
-        return builder(params)
-
-    solid = rebuild()
-
-    # MEASURE (engineering path: real mm measurements)
-    key_dims = engineering_geometry.measure(solid)
-    key_dims["measurement_basis"] = "CAD_MEASURED (CadQuery/OCCT solid, mm)"
-    key_dims["form"] = form
-    key_dims["build_attempt"] = attempt
-
-    # VALIDATE (deterministic gates) + EXPORT (GLB/STEP/STL)
     out_dir = os.path.join(work_dir, "MODEL")
     os.makedirs(out_dir, exist_ok=True)
     name = "engineering_model"
-    component_solids = [
-        (name, solid),
-    ]
-    exported = engineering_geometry.export(
-        solid, name, out_dir, component_solids=component_solids)
+
+    # R452: the OCP memory guard — the CadQuery/OCCT build+export runs in
+    # a SPAWNED clean subprocess (fork was measured unsafe after any
+    # parent OCCT build: deadlock) with an RLIMIT_AS ceiling and a wall
+    # clock; an OCCT blowup is a TYPED failure (OCP_MEMORY_GUARD_*) that
+    # demotes honestly through the failure ladder below, never a killed
+    # run worker (Constitution v2.5.0 Art. LXI class separation).
+    from . import ocp_guard
+
+    guard = ocp_guard.run_guarded_build(form, params, out_dir, name)
+    if guard["status"] != "OK":
+        raise ValueError(ocp_guard.typed_failure_message(guard))
+    key_dims = guard["result"]["key_dimensions"]
+    exported = dict(guard["result"]["exported"])
+    # re-bind the binary payload from the authoritative file on disk
+    exported["glb_bytes"] = Path(exported["glb_path"]).read_bytes()
+    expected_sha = exported.get("glb_sha256")
+    if expected_sha:
+        import hashlib as _hl
+        actual = _hl.sha256(exported["glb_bytes"]).hexdigest()
+        if actual != expected_sha:
+            raise ValueError(
+                "OCP guard boundary integrity: GLB sha256 mismatch "
+                f"across the child/parent boundary ({actual[:12]} != "
+                f"{expected_sha[:12]}) — the exported file was altered "
+                "or corrupted in transit (Art. X)")
+
+    # MEASURE (engineering path: real mm measurements)
+    key_dims["measurement_basis"] = "CAD_MEASURED (CadQuery/OCCT solid, mm)"
+    key_dims["form"] = form
+    key_dims["build_attempt"] = attempt
+    key_dims["ocp_guard"] = {
+        "guard": guard["guard"],
+        "status": guard["status"],
+        "memory_limit_mb": guard["memory_limit_mb"],
+        "timeout_s": guard["timeout_s"],
+    }
+
+    def rebuild():
+        return builder(params)
 
     import trimesh
     mesh = trimesh.load(exported["stl_path"])
-    validation = engineering_geometry.validate_gates(solid, mesh, rebuild_fn=rebuild)
+    solid_check = builder(params)
+    validation = engineering_geometry.validate_gates(
+        solid_check, mesh, rebuild_fn=rebuild)
     if not validation["passed"]:
         raise ValueError(f"geometry validation gates failed: {validation['gates']}")
 

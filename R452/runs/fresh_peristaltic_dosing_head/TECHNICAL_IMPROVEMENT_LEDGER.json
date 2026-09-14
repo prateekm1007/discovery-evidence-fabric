@@ -1,0 +1,1533 @@
+{
+ "ledger": "TECHNICAL_IMPROVEMENT_LEDGER (R379 V2 + R383 ANALYTICAL EQUATION LAYER)",
+ "version": "3.0.0",
+ "loop": "CANDIDATE -> TECHNICAL DIAGNOSIS (limiting variable + direction + R383 QUANTITATIVE margins/sensitivities) -> DETERMINISTIC SOLVE-OR-LLM MUTATION (actual design variable) -> CAD REBUILD -> INDEPENDENT TECHNICAL EVALUATION (monotone + quantitative on the child's OWN measured geometry) -> EVIDENCE/PRIOR-ART RECHECK -> KEEP/KILL (K1-K8) -> SECOND IMPROVEMENT",
+ "collision_mode": "REPLAY_CACHE",
+ "live_sources": null,
+ "thresholds": {
+  "MAX_ITERATIONS_DEFAULT": {
+   "value": 2,
+   "epistemic_class": "ENGINEERING",
+   "justification": "the CEO milestone is DIAGNOSE -> TECHNICAL MUTATION -> RE-EVALUATE -> SECOND IMPROVEMENT; two iterations demonstrate repeatability at bounded cost"
+  },
+  "MAX_PROPOSALS_PER_ITERATION": {
+   "value": 3,
+   "epistemic_class": "ENGINEERING",
+   "justification": "bounded proposal budget, identical to the R378 epistemic loop: three attempts, then the honest no-defensible-mutation verdict"
+  },
+  "VALUE_CLASS_STRICTNESS": {
+   "value": "HARD",
+   "epistemic_class": "ENGINEERING",
+   "justification": "EXTRACTED claims are span-verified or rejected (Art. II/VI); MODELLED values are admitted only when declared; an unbounded parameter is immutable (ADR_R379 anti-gaming)"
+  }
+ },
+ "mutation_kinds_live": [
+  "PARAMETER_CHANGE",
+  "GEOMETRY_CHANGE",
+  "MATERIAL_CHANGE",
+  "OPERATING_CONDITION_CHANGE",
+  "MECHANISM_CHANGE"
+ ],
+ "mutation_kinds_reserved": {
+  "ARCHITECTURE_CHANGE": "needs a structural/control search space at a higher fidelity tier (ADR_R379)",
+  "CONTROL_POLICY_CHANGE": "needs a structural/control search space at a higher fidelity tier (ADR_R379)"
+ },
+ "keep_criterion": "the child's OWN independent technical evaluation must confirm the objective improves in the mutation direction with constraints preserved — a score increase is NEVER sufficient (CEO R379 item 4/8)",
+ "started_at": "2026-09-14T06:11:50+00:00Z",
+ "iterations": [
+  {
+   "iteration": 1,
+   "diagnosis": {
+    "status": "QUANTIFIED",
+    "limiting_variable": {
+     "param_id": "occlusion_force",
+     "name": "occlusion force",
+     "improving_move": "INCREASE",
+     "objective_target": "tubing_service_life",
+     "objective_direction": "MAXIMIZE",
+     "envelope": [
+      1.0,
+      10.0
+     ],
+     "envelope_class": "MODELLED",
+     "causal_path_length": 2,
+     "statement": "The limiting variable is occlusion force. Changing it by increase is predicted to improve objective tubing_service_life (MAXIMIZE) while preserving all declared constraints that are checkable at this tier.",
+     "convention": {
+      "name": "ORDINAL_LEVERAGE_BY_PATH_LENGTH",
+      "epistemic_class": "ENGINEERING",
+      "justification": "with MONOTONE-only relations the evaluator cannot rank leverage by magnitude; it ranks by (1) fewest constraint blocks, (2) shortest causal path from the parameter to the objective target, (3) envelope provenance class (EXTRACTED beats MODELLED). This is a declared ordinal convention, not a measurement — recorded on every evaluation that uses it.",
+      "uncertainty": "ordinal only; magnitudes are UNKNOWN at this tier"
+     }
+    },
+    "improvement_directions_summary": [
+     {
+      "param_id": "tubing_service_life",
+      "improving_move": "INCREASE",
+      "mutable": false,
+      "blocked": false
+     },
+     {
+      "param_id": "occlusion_force",
+      "improving_move": "INCREASE",
+      "mutable": true,
+      "blocked": false
+     },
+     {
+      "param_id": "pressure_distribution",
+      "improving_move": "INCREASE",
+      "mutable": false,
+      "blocked": false
+     }
+    ],
+    "constraint_results": [],
+    "quantitative": {
+     "status": "UNQUANTIFIED",
+     "objective": {
+      "target": "tubing_service_life",
+      "direction": "MAXIMIZE",
+      "computed": false,
+      "value": null,
+      "unit": null,
+      "equation_id": null,
+      "margin": null,
+      "margin_status": "UNCOMPUTED",
+      "statement": "no active computation binds the objective target"
+     },
+     "requirement_satisfied": null,
+     "limiting_variable": null,
+     "computed_equations": [],
+     "computation_log": [],
+     "evidence_rank": 4
+    }
+   },
+   "proposals": [
+    {
+     "proposal_id": "tmp:40bdff2c7574",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "9e05202fe3f25008cafaa74e5dffe5a7215fb931c9d73c54d28c885463c17a68",
+     "output_hash": "1708f164592538a382c915faef957a881bcb05fc9f7df478911a0259718d8dd9",
+     "fields": {
+      "MUTATION_KIND": "PARAMETER_CHANGE",
+      "TARGET_PARAM": "occlusion_force",
+      "NEW_VALUE": "7.5",
+      "DIRECTION": "INCREASE",
+      "VALUE_CLASS": "MODELLED",
+      "VALUE_SPAN": "NONE",
+      "VALUE_EVIDENCE_ID": "NONE",
+      "RATIONALE": "Increasing occlusion force will improve pressure distribution across the tubing, reducing localized stress concentrations that lead to fatigue failure.",
+      "MECHANISM_DELTA": "The occlusion force is increased from its current unknown value to 7.5 N to improve pressure distribution and reduce localized stress concentrations.",
+      "INTERVENTION_DELTA": "The integrated miniaturized pressure transducer and flow monitoring system will now be calibrated to maintain the increased occlusion force of 7.5 N while continuously monitoring and redistributing pressure to prevent localized fatigue."
+     },
+     "validation": {
+      "valid": true,
+      "stage": "VALIDATION",
+      "mutation_kind": "PARAMETER_CHANGE",
+      "target_param": "occlusion_force",
+      "checks": {
+       "mutation_kind_valid": "PARAMETER_CHANGE",
+       "target_is_limiting_variable": "occlusion_force",
+       "target_exists": true,
+       "target_is_design_variable": true,
+       "kind_matches_category": true,
+       "envelope_declared": [
+        1.0,
+        10.0
+       ],
+       "direction_matches_evaluator": "INCREASE",
+       "new_value_numeric": 7.5,
+       "value_inside_envelope": "[1.0, 10.0]",
+       "mutation_changes_value": true,
+       "value_class_declared": "MODELLED",
+       "spec_text_sync": "The occlusion force is increased from its current unknown value to 7.5 N to impr | The integrated miniaturized pressure transducer and flow monitoring system will ",
+       "t10_geometry_gate": "no parametric model bound to this parameter — the state-level gates are decisive"
+      },
+      "reasons": [],
+      "validated_at": "2026-09-14T06:14:19+00:00Z"
+     }
+    }
+   ],
+   "mutation_attempts_extra": [],
+   "mutation_applied": {
+    "chain": "ORIGINAL CANDIDATE -> TECHNICAL DIAGNOSIS -> TECHNICAL MUTATION -> NEW CANDIDATE",
+    "mutation_id": "tmut:820bbdde92d1",
+    "mutation_kind": "PARAMETER_CHANGE",
+    "layer": "TECHNICAL (R379 V2) — an actual design variable was changed, not the wording",
+    "diagnostic_trigger": {
+     "evaluator": "analytical_monotone_v1 (deterministic)",
+     "limiting_variable": "occlusion_force",
+     "improving_direction": "INCREASE",
+     "evaluation_computation_log": {
+      "evaluator_id": "analytical_monotone_v1",
+      "fidelity_tier": "STRUCTURED_CONSTRAINT",
+      "evidence_rank": 3,
+      "input_state_sha256": "87a8a4a93d112b34388f32ed020ef33051a124a7ed4a279d1e4d17fc812e76e9",
+      "conventions": [
+       {
+        "name": "ORDINAL_LEVERAGE_BY_PATH_LENGTH",
+        "epistemic_class": "ENGINEERING",
+        "justification": "with MONOTONE-only relations the evaluator cannot rank leverage by magnitude; it ranks by (1) fewest constraint blocks, (2) shortest causal path from the parameter to the objective target, (3) envelope provenance class (EXTRACTED beats MODELLED). This is a declared ordinal convention, not a measurement — recorded on every evaluation that uses it.",
+        "uncertainty": "ordinal only; magnitudes are UNKNOWN at this tier"
+       },
+       {
+        "name": "DIRECTIONAL_FAIL_CLOSED",
+        "epistemic_class": "ENGINEERING",
+        "justification": "a proposed change is constraint-BLOCKED when (a) the changed parameter's own numeric constraint would be violated at the proposed value, or (b) a relation-connected constraint target is already VIOLATED or value-UNKNOWN and the predicted direction moves it TOWARD its bound. Fail-closed on directional risk: an unknown-position target moving toward a bound is a blocked move, not an accepted one (Art. IV).",
+        "uncertainty": "direction-level only at this tier"
+       }
+      ],
+      "steps": [
+       "resolved objective tubing_service_life (MAXIMIZE)",
+       "checked 0 constraint(s) numerically where values exist",
+       "propagated signs over 4 relation(s)",
+       "ranked 1 movable improving direction(s)"
+      ],
+      "computed_at": "2026-09-14T06:14:19+00:00Z",
+      "deterministic": true
+     }
+    },
+    "quantitative_diagnosis": {
+     "engaged": false,
+     "status": "UNQUANTIFIED",
+     "note": "no bound equation named a limiting variable"
+    },
+    "proposal_provenance": {
+     "proposal_id": "tmp:40bdff2c7574",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "9e05202fe3f25008cafaa74e5dffe5a7215fb931c9d73c54d28c885463c17a68",
+     "output_hash": "1708f164592538a382c915faef957a881bcb05fc9f7df478911a0259718d8dd9",
+     "origin": "UNTRUSTED_LLM_PROPOSER",
+     "llm_is_untrusted_proposer": true
+    },
+    "validation": {
+     "valid": true,
+     "stage": "VALIDATION",
+     "mutation_kind": "PARAMETER_CHANGE",
+     "target_param": "occlusion_force",
+     "checks": {
+      "mutation_kind_valid": "PARAMETER_CHANGE",
+      "target_is_limiting_variable": "occlusion_force",
+      "target_exists": true,
+      "target_is_design_variable": true,
+      "kind_matches_category": true,
+      "envelope_declared": [
+       1.0,
+       10.0
+      ],
+      "direction_matches_evaluator": "INCREASE",
+      "new_value_numeric": 7.5,
+      "value_inside_envelope": "[1.0, 10.0]",
+      "mutation_changes_value": true,
+      "value_class_declared": "MODELLED",
+      "spec_text_sync": "The occlusion force is increased from its current unknown value to 7.5 N to impr | The integrated miniaturized pressure transducer and flow monitoring system will ",
+      "t10_geometry_gate": "no parametric model bound to this parameter — the state-level gates are decisive"
+     },
+     "reasons": [],
+     "validated_at": "2026-09-14T06:14:19+00:00Z"
+    },
+    "changed_variable": {
+     "param_id": "occlusion_force",
+     "name": "occlusion force",
+     "from_value": null,
+     "to_value": 7.5,
+     "from_class": "UNKNOWN",
+     "to_class": "MODELLED",
+     "envelope": [
+      1.0,
+      10.0
+     ],
+     "envelope_class": "MODELLED"
+    },
+    "spec_text_delta": {
+     "mechanism": "The occlusion force is increased from its current unknown value to 7.5 N to improve pressure distribution and reduce localized stress concentrations.",
+     "intervention": "The integrated miniaturized pressure transducer and flow monitoring system will now be calibrated to maintain the increased occlusion force of 7.5 N while continuously monitoring and redistributing pressure to prevent localized fatigue."
+    },
+    "cad_rebuild": null,
+    "inherited_negatives": {
+     "uncertainty_ids": [
+      "con:attack:weak_transfer",
+      "benchtop compact peristaltic dosing quality analyzer",
+      "benchtop compact peristaltic dosing quality analyzer",
+      "benchtop engineering equipment coriolis flow pressure",
+      "benchtop engineering equipment coriolis flow pressure",
+      "integrate pressure transducer flow pump head occlusion fatigue",
+      "integrate pressure transducer flow pump head occlusion fatigue",
+      "benchtop monitoring adjustment prevention distribution occlusion",
+      "benchtop monitoring adjustment prevention distribution occlusion",
+      "flow distribution eliminating extending service maintaining",
+      "flow distribution eliminating extending service maintaining"
+     ],
+     "collision_family_ids": [],
+     "source_errors": []
+    },
+    "parent_spec_hash": "0f4710c1caa6ffd63f223cf63bdd3152fbdd33b06f9476baa045614aab8e403c",
+    "reason": "Increasing occlusion force will improve pressure distribution across the tubing, reducing localized stress concentrations that lead to fatigue failure.",
+    "applied_at": "2026-09-14T06:14:19+00:00Z"
+   },
+   "re_evaluation": {
+    "technical": {
+     "status": "QUANTIFIED",
+     "objective": {
+      "target": "tubing_service_life",
+      "direction": "MAXIMIZE",
+      "known": true,
+      "basis": "prevent tubing_fatigue_rupture failure mode"
+     },
+     "limiting_variable": {
+      "param_id": "occlusion_force",
+      "name": "occlusion force",
+      "improving_move": "INCREASE",
+      "objective_target": "tubing_service_life",
+      "objective_direction": "MAXIMIZE",
+      "envelope": [
+       1.0,
+       10.0
+      ],
+      "envelope_class": "MODELLED",
+      "causal_path_length": 2,
+      "statement": "The limiting variable is occlusion force. Changing it by increase is predicted to improve objective tubing_service_life (MAXIMIZE) while preserving all declared constraints that are checkable at this tier.",
+      "convention": {
+       "name": "ORDINAL_LEVERAGE_BY_PATH_LENGTH",
+       "epistemic_class": "ENGINEERING",
+       "justification": "with MONOTONE-only relations the evaluator cannot rank leverage by magnitude; it ranks by (1) fewest constraint blocks, (2) shortest causal path from the parameter to the objective target, (3) envelope provenance class (EXTRACTED beats MODELLED). This is a declared ordinal convention, not a measurement — recorded on every evaluation that uses it.",
+       "uncertainty": "ordinal only; magnitudes are UNKNOWN at this tier"
+      }
+     },
+     "constraint_results": [],
+     "uncertainty": {
+      "unknown_value_params": [
+       "dosing_accuracy",
+       "pressure_distribution",
+       "pump_envelope_height",
+       "pump_envelope_length",
+       "pump_envelope_width",
+       "target_flow_rate",
+       "tubing_bore_diameter",
+       "tubing_material",
+       "tubing_service_life"
+      ],
+      "modelled_relations": 4,
+      "extracted_relations": 0,
+      "unverifiable_constraints": [],
+      "objective_known": true,
+      "note": "UNKNOWN values are never treated as zeros; unverifiable constraints are never treated as satisfied (Art. XXV / Art. IV)"
+     },
+     "computation_log": {
+      "evaluator_id": "analytical_monotone_v1",
+      "fidelity_tier": "STRUCTURED_CONSTRAINT",
+      "evidence_rank": 3,
+      "input_state_sha256": "8596721d08e533af452e22e90b368d2ce32ef020b117c03c4b0dba3aca958ed0",
+      "conventions": [
+       {
+        "name": "ORDINAL_LEVERAGE_BY_PATH_LENGTH",
+        "epistemic_class": "ENGINEERING",
+        "justification": "with MONOTONE-only relations the evaluator cannot rank leverage by magnitude; it ranks by (1) fewest constraint blocks, (2) shortest causal path from the parameter to the objective target, (3) envelope provenance class (EXTRACTED beats MODELLED). This is a declared ordinal convention, not a measurement — recorded on every evaluation that uses it.",
+        "uncertainty": "ordinal only; magnitudes are UNKNOWN at this tier"
+       },
+       {
+        "name": "DIRECTIONAL_FAIL_CLOSED",
+        "epistemic_class": "ENGINEERING",
+        "justification": "a proposed change is constraint-BLOCKED when (a) the changed parameter's own numeric constraint would be violated at the proposed value, or (b) a relation-connected constraint target is already VIOLATED or value-UNKNOWN and the predicted direction moves it TOWARD its bound. Fail-closed on directional risk: an unknown-position target moving toward a bound is a blocked move, not an accepted one (Art. IV).",
+        "uncertainty": "direction-level only at this tier"
+       }
+      ],
+      "steps": [
+       "resolved objective tubing_service_life (MAXIMIZE)",
+       "checked 0 constraint(s) numerically where values exist",
+       "propagated signs over 4 relation(s)",
+       "ranked 1 movable improving direction(s)"
+      ],
+      "computed_at": "2026-09-14T06:14:19+00:00Z",
+      "deterministic": true
+     }
+    },
+    "quantitative": {
+     "status": "UNQUANTIFIED",
+     "objective": {
+      "target": "tubing_service_life",
+      "direction": "MAXIMIZE",
+      "computed": false,
+      "value": null,
+      "unit": null,
+      "equation_id": null,
+      "margin": null,
+      "margin_status": "UNCOMPUTED",
+      "statement": "no active computation binds the objective target"
+     },
+     "requirement_satisfied": null,
+     "limiting_variable": null,
+     "computed_equations": [],
+     "computation_log": [],
+     "evidence_rank": 4
+    },
+    "i_dimensions": {
+     "I1_MECHANISM_EVIDENCE_DERIVATION": {
+      "score": 0.531,
+      "state": "MEASURED"
+     },
+     "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_SURVIVORS"
+     },
+     "I3_RECOMBINATION_RISK": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_FAMILIES"
+     },
+     "I4_NEW_TECHNICAL_RELATIONSHIP": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+     },
+     "I5_EXPERIMENT_DISCRIMINATION": {
+      "score": 0.667,
+      "state": "MEASURED"
+     }
+    },
+    "i_flags": {
+     "underived_mechanism": false,
+     "recombination_only": false
+    },
+    "i_average": 0.599,
+    "q_average": 0.625,
+    "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE"
+   },
+   "decision": {
+    "action": "KEEP",
+    "checks": {
+     "technical_objective": "CONFIRMED on the child's independent evaluation: occlusion_force INCREASE improves objective tubing_service_life (MAXIMIZE) with constraints preserved",
+     "no_new_constraint_violation": true,
+     "no_constraint_laundering": true,
+     "negatives_preserved": true,
+     "no_new_structural_flags": true,
+     "i1_structural_floor": {
+      "parent": 0.68,
+      "child": 0.531,
+      "floor": 0.2,
+      "crossed_downward": false,
+      "note": "numeric I1 movement is recorded, never gated here (CEO R379 item 8); the floor crossing IS gated — a mutation may not flip a derived mechanism to underived"
+     },
+     "prior_art_position_not_degraded": true,
+     "value_class_provenance": "MODELLED design value — declared, never promoted (Art. XXVIII); the improvement attribution carries the class",
+     "geometry_valid_on_child": "no parametric model bound to the changed variable — the state-level gates are decisive",
+     "quantitative_margin": {
+      "engaged": false,
+      "parent_margin": null,
+      "child_margin": null,
+      "improvement": null,
+      "threshold": 0.005,
+      "verdict": "NOT_ENGAGED",
+      "parent_value": null,
+      "child_value": null,
+      "parent_unit": null,
+      "equation_id": null,
+      "reason": "quantitative objective not computed on both sides — the direction-level K1 criterion governs"
+     }
+    },
+    "reasons": [],
+    "decided_at": "2026-09-14T06:14:19+00:00Z"
+   },
+   "attribution": {
+    "artifact": "TECHNICAL_IMPROVEMENT_ATTRIBUTION",
+    "technical_mechanism": "occlusion_force --INCREASES--> pressure_distribution (MODELLED): higher occlusion force increases pressure distribution uniformity | pressure_distribution --INCREASES--> tubing_service_life (MODELLED): more even pressure distribution extends tubing service life | occlusion_force --INCREASES--> target_flow_rate (MODELLED): higher occlusion force increases flow rate",
+    "changed_variable": "occlusion_force",
+    "changed_variable_name": "occlusion force",
+    "direction": "INCREASE",
+    "from_value": null,
+    "to_value": 7.5,
+    "value_class": "MODELLED",
+    "envelope": [
+     1.0,
+     10.0
+    ],
+    "envelope_class": "MODELLED",
+    "predicted_effect": "occlusion_force 7.5 is predicted to move objective tubing_service_life (MAXIMIZE) in the improving sense",
+    "evaluated_result": "CONFIRMED on the child's independent evaluation: occlusion_force INCREASE improves objective tubing_service_life (MAXIMIZE) with constraints preserved",
+    "constraints_result": [],
+    "evidence_class": "AI_INFERENCE (rank 3) — a direction-level prediction of the declared analytical model over the structured technical state. NOT a measurement, NOT a physical observation (Art. XXVIII / XXXVIII). The value class of the changed variable is recorded above; MODELLED design values are invention content, never evidence.",
+    "mutation_id": "tmut:820bbdde92d1",
+    "recorded_at": "2026-09-14T06:14:19+00:00Z"
+   }
+  },
+  {
+   "iteration": 2,
+   "diagnosis": {
+    "status": "QUANTIFIED",
+    "limiting_variable": {
+     "param_id": "occlusion_force",
+     "name": "occlusion force",
+     "improving_move": "INCREASE",
+     "objective_target": "tubing_service_life",
+     "objective_direction": "MAXIMIZE",
+     "envelope": [
+      1.0,
+      10.0
+     ],
+     "envelope_class": "MODELLED",
+     "causal_path_length": 2,
+     "statement": "The limiting variable is occlusion force. Changing it by increase is predicted to improve objective tubing_service_life (MAXIMIZE) while preserving all declared constraints that are checkable at this tier.",
+     "convention": {
+      "name": "ORDINAL_LEVERAGE_BY_PATH_LENGTH",
+      "epistemic_class": "ENGINEERING",
+      "justification": "with MONOTONE-only relations the evaluator cannot rank leverage by magnitude; it ranks by (1) fewest constraint blocks, (2) shortest causal path from the parameter to the objective target, (3) envelope provenance class (EXTRACTED beats MODELLED). This is a declared ordinal convention, not a measurement — recorded on every evaluation that uses it.",
+      "uncertainty": "ordinal only; magnitudes are UNKNOWN at this tier"
+     }
+    },
+    "improvement_directions_summary": [
+     {
+      "param_id": "tubing_service_life",
+      "improving_move": "INCREASE",
+      "mutable": false,
+      "blocked": false
+     },
+     {
+      "param_id": "occlusion_force",
+      "improving_move": "INCREASE",
+      "mutable": true,
+      "blocked": false
+     },
+     {
+      "param_id": "pressure_distribution",
+      "improving_move": "INCREASE",
+      "mutable": false,
+      "blocked": false
+     }
+    ],
+    "constraint_results": [],
+    "quantitative": {
+     "status": "UNQUANTIFIED",
+     "objective": {
+      "target": "tubing_service_life",
+      "direction": "MAXIMIZE",
+      "computed": false,
+      "value": null,
+      "unit": null,
+      "equation_id": null,
+      "margin": null,
+      "margin_status": "UNCOMPUTED",
+      "statement": "no active computation binds the objective target"
+     },
+     "requirement_satisfied": null,
+     "limiting_variable": null,
+     "computed_equations": [],
+     "computation_log": [],
+     "evidence_rank": 4
+    }
+   },
+   "proposals": [
+    {
+     "proposal_id": "tmp:4585264579f5",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "5553d71ce50cab434206b1e45aadaa070d5fb25eab4cef18ac8a6691aacb5ec3",
+     "output_hash": "1aa14292b28d5cf67d2efd7b23a7deb48f417258a211ac6d85ddf7be8c81c9d9",
+     "fields": {
+      "MUTATION_KIND": "PARAMETER_CHANGE",
+      "TARGET_PARAM": "occlusion_force",
+      "NEW_VALUE": "8.5",
+      "DIRECTION": "INCREASE",
+      "VALUE_CLASS": "MODELLED",
+      "VALUE_SPAN": "NONE",
+      "VALUE_EVIDENCE_ID": "NONE",
+      "RATIONALE": "Increased occlusion force will improve pressure distribution, thereby reducing localized stress concentrations that cause tubing fatigue.",
+      "MECHANISM_DELTA": "The occlusion force is increased from 7.5 to 8.5 to enhance pressure distribution and reduce localized stress concentrations.",
+      "INTERVENTION_DELTA": "The integrated miniaturized pressure transducer and flow monitoring system will now be calibrated to maintain the increased occlusion force of 8.5 while ensuring uniform pressure distribution."
+     },
+     "validation": {
+      "valid": true,
+      "stage": "VALIDATION",
+      "mutation_kind": "PARAMETER_CHANGE",
+      "target_param": "occlusion_force",
+      "checks": {
+       "mutation_kind_valid": "PARAMETER_CHANGE",
+       "target_is_limiting_variable": "occlusion_force",
+       "target_exists": true,
+       "target_is_design_variable": true,
+       "kind_matches_category": true,
+       "envelope_declared": [
+        1.0,
+        10.0
+       ],
+       "direction_matches_evaluator": "INCREASE",
+       "new_value_numeric": 8.5,
+       "value_inside_envelope": "[1.0, 10.0]",
+       "mutation_changes_value": true,
+       "value_class_declared": "MODELLED",
+       "spec_text_sync": "The occlusion force is increased from 7.5 to 8.5 to enhance pressure distributio | The integrated miniaturized pressure transducer and flow monitoring system will ",
+       "t10_geometry_gate": "no parametric model bound to this parameter — the state-level gates are decisive"
+      },
+      "reasons": [],
+      "validated_at": "2026-09-14T06:14:21+00:00Z"
+     }
+    }
+   ],
+   "mutation_attempts_extra": [],
+   "mutation_applied": {
+    "chain": "ORIGINAL CANDIDATE -> TECHNICAL DIAGNOSIS -> TECHNICAL MUTATION -> NEW CANDIDATE",
+    "mutation_id": "tmut:706fdf78de6a",
+    "mutation_kind": "PARAMETER_CHANGE",
+    "layer": "TECHNICAL (R379 V2) — an actual design variable was changed, not the wording",
+    "diagnostic_trigger": {
+     "evaluator": "analytical_monotone_v1 (deterministic)",
+     "limiting_variable": "occlusion_force",
+     "improving_direction": "INCREASE",
+     "evaluation_computation_log": {
+      "evaluator_id": "analytical_monotone_v1",
+      "fidelity_tier": "STRUCTURED_CONSTRAINT",
+      "evidence_rank": 3,
+      "input_state_sha256": "8596721d08e533af452e22e90b368d2ce32ef020b117c03c4b0dba3aca958ed0",
+      "conventions": [
+       {
+        "name": "ORDINAL_LEVERAGE_BY_PATH_LENGTH",
+        "epistemic_class": "ENGINEERING",
+        "justification": "with MONOTONE-only relations the evaluator cannot rank leverage by magnitude; it ranks by (1) fewest constraint blocks, (2) shortest causal path from the parameter to the objective target, (3) envelope provenance class (EXTRACTED beats MODELLED). This is a declared ordinal convention, not a measurement — recorded on every evaluation that uses it.",
+        "uncertainty": "ordinal only; magnitudes are UNKNOWN at this tier"
+       },
+       {
+        "name": "DIRECTIONAL_FAIL_CLOSED",
+        "epistemic_class": "ENGINEERING",
+        "justification": "a proposed change is constraint-BLOCKED when (a) the changed parameter's own numeric constraint would be violated at the proposed value, or (b) a relation-connected constraint target is already VIOLATED or value-UNKNOWN and the predicted direction moves it TOWARD its bound. Fail-closed on directional risk: an unknown-position target moving toward a bound is a blocked move, not an accepted one (Art. IV).",
+        "uncertainty": "direction-level only at this tier"
+       }
+      ],
+      "steps": [
+       "resolved objective tubing_service_life (MAXIMIZE)",
+       "checked 0 constraint(s) numerically where values exist",
+       "propagated signs over 4 relation(s)",
+       "ranked 1 movable improving direction(s)"
+      ],
+      "computed_at": "2026-09-14T06:14:21+00:00Z",
+      "deterministic": true
+     }
+    },
+    "quantitative_diagnosis": {
+     "engaged": false,
+     "status": "UNQUANTIFIED",
+     "note": "no bound equation named a limiting variable"
+    },
+    "proposal_provenance": {
+     "proposal_id": "tmp:4585264579f5",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "5553d71ce50cab434206b1e45aadaa070d5fb25eab4cef18ac8a6691aacb5ec3",
+     "output_hash": "1aa14292b28d5cf67d2efd7b23a7deb48f417258a211ac6d85ddf7be8c81c9d9",
+     "origin": "UNTRUSTED_LLM_PROPOSER",
+     "llm_is_untrusted_proposer": true
+    },
+    "validation": {
+     "valid": true,
+     "stage": "VALIDATION",
+     "mutation_kind": "PARAMETER_CHANGE",
+     "target_param": "occlusion_force",
+     "checks": {
+      "mutation_kind_valid": "PARAMETER_CHANGE",
+      "target_is_limiting_variable": "occlusion_force",
+      "target_exists": true,
+      "target_is_design_variable": true,
+      "kind_matches_category": true,
+      "envelope_declared": [
+       1.0,
+       10.0
+      ],
+      "direction_matches_evaluator": "INCREASE",
+      "new_value_numeric": 8.5,
+      "value_inside_envelope": "[1.0, 10.0]",
+      "mutation_changes_value": true,
+      "value_class_declared": "MODELLED",
+      "spec_text_sync": "The occlusion force is increased from 7.5 to 8.5 to enhance pressure distributio | The integrated miniaturized pressure transducer and flow monitoring system will ",
+      "t10_geometry_gate": "no parametric model bound to this parameter — the state-level gates are decisive"
+     },
+     "reasons": [],
+     "validated_at": "2026-09-14T06:14:21+00:00Z"
+    },
+    "changed_variable": {
+     "param_id": "occlusion_force",
+     "name": "occlusion force",
+     "from_value": 7.5,
+     "to_value": 8.5,
+     "from_class": "MODELLED",
+     "to_class": "MODELLED",
+     "envelope": [
+      1.0,
+      10.0
+     ],
+     "envelope_class": "MODELLED"
+    },
+    "spec_text_delta": {
+     "mechanism": "The occlusion force is increased from 7.5 to 8.5 to enhance pressure distribution and reduce localized stress concentrations.",
+     "intervention": "The integrated miniaturized pressure transducer and flow monitoring system will now be calibrated to maintain the increased occlusion force of 8.5 while ensuring uniform pressure distribution."
+    },
+    "cad_rebuild": null,
+    "inherited_negatives": {
+     "uncertainty_ids": [
+      "con:attack:weak_transfer",
+      "benchtop compact peristaltic dosing quality analyzer",
+      "benchtop compact peristaltic dosing quality analyzer",
+      "benchtop engineering equipment coriolis flow pressure",
+      "benchtop engineering equipment coriolis flow pressure",
+      "integrate pressure transducer flow pump head occlusion fatigue",
+      "integrate pressure transducer flow pump head occlusion fatigue",
+      "benchtop monitoring adjustment prevention distribution occlusion",
+      "benchtop monitoring adjustment prevention distribution occlusion",
+      "flow distribution eliminating extending service maintaining",
+      "flow distribution eliminating extending service maintaining"
+     ],
+     "collision_family_ids": [],
+     "source_errors": []
+    },
+    "parent_spec_hash": "cd1877635c17860de5153ff190075185ec30e129f725043ed66ddf0295296b17",
+    "reason": "Increased occlusion force will improve pressure distribution, thereby reducing localized stress concentrations that cause tubing fatigue.",
+    "applied_at": "2026-09-14T06:14:21+00:00Z"
+   },
+   "re_evaluation": {
+    "technical": {
+     "status": "QUANTIFIED",
+     "objective": {
+      "target": "tubing_service_life",
+      "direction": "MAXIMIZE",
+      "known": true,
+      "basis": "prevent tubing_fatigue_rupture failure mode"
+     },
+     "limiting_variable": {
+      "param_id": "occlusion_force",
+      "name": "occlusion force",
+      "improving_move": "INCREASE",
+      "objective_target": "tubing_service_life",
+      "objective_direction": "MAXIMIZE",
+      "envelope": [
+       1.0,
+       10.0
+      ],
+      "envelope_class": "MODELLED",
+      "causal_path_length": 2,
+      "statement": "The limiting variable is occlusion force. Changing it by increase is predicted to improve objective tubing_service_life (MAXIMIZE) while preserving all declared constraints that are checkable at this tier.",
+      "convention": {
+       "name": "ORDINAL_LEVERAGE_BY_PATH_LENGTH",
+       "epistemic_class": "ENGINEERING",
+       "justification": "with MONOTONE-only relations the evaluator cannot rank leverage by magnitude; it ranks by (1) fewest constraint blocks, (2) shortest causal path from the parameter to the objective target, (3) envelope provenance class (EXTRACTED beats MODELLED). This is a declared ordinal convention, not a measurement — recorded on every evaluation that uses it.",
+       "uncertainty": "ordinal only; magnitudes are UNKNOWN at this tier"
+      }
+     },
+     "constraint_results": [],
+     "uncertainty": {
+      "unknown_value_params": [
+       "dosing_accuracy",
+       "pressure_distribution",
+       "pump_envelope_height",
+       "pump_envelope_length",
+       "pump_envelope_width",
+       "target_flow_rate",
+       "tubing_bore_diameter",
+       "tubing_material",
+       "tubing_service_life"
+      ],
+      "modelled_relations": 4,
+      "extracted_relations": 0,
+      "unverifiable_constraints": [],
+      "objective_known": true,
+      "note": "UNKNOWN values are never treated as zeros; unverifiable constraints are never treated as satisfied (Art. XXV / Art. IV)"
+     },
+     "computation_log": {
+      "evaluator_id": "analytical_monotone_v1",
+      "fidelity_tier": "STRUCTURED_CONSTRAINT",
+      "evidence_rank": 3,
+      "input_state_sha256": "bd966f85d2f86a44a25b219a0bb10b12e64992e1ef5765c9177346ef2c21c719",
+      "conventions": [
+       {
+        "name": "ORDINAL_LEVERAGE_BY_PATH_LENGTH",
+        "epistemic_class": "ENGINEERING",
+        "justification": "with MONOTONE-only relations the evaluator cannot rank leverage by magnitude; it ranks by (1) fewest constraint blocks, (2) shortest causal path from the parameter to the objective target, (3) envelope provenance class (EXTRACTED beats MODELLED). This is a declared ordinal convention, not a measurement — recorded on every evaluation that uses it.",
+        "uncertainty": "ordinal only; magnitudes are UNKNOWN at this tier"
+       },
+       {
+        "name": "DIRECTIONAL_FAIL_CLOSED",
+        "epistemic_class": "ENGINEERING",
+        "justification": "a proposed change is constraint-BLOCKED when (a) the changed parameter's own numeric constraint would be violated at the proposed value, or (b) a relation-connected constraint target is already VIOLATED or value-UNKNOWN and the predicted direction moves it TOWARD its bound. Fail-closed on directional risk: an unknown-position target moving toward a bound is a blocked move, not an accepted one (Art. IV).",
+        "uncertainty": "direction-level only at this tier"
+       }
+      ],
+      "steps": [
+       "resolved objective tubing_service_life (MAXIMIZE)",
+       "checked 0 constraint(s) numerically where values exist",
+       "propagated signs over 4 relation(s)",
+       "ranked 1 movable improving direction(s)"
+      ],
+      "computed_at": "2026-09-14T06:14:21+00:00Z",
+      "deterministic": true
+     }
+    },
+    "quantitative": {
+     "status": "UNQUANTIFIED",
+     "objective": {
+      "target": "tubing_service_life",
+      "direction": "MAXIMIZE",
+      "computed": false,
+      "value": null,
+      "unit": null,
+      "equation_id": null,
+      "margin": null,
+      "margin_status": "UNCOMPUTED",
+      "statement": "no active computation binds the objective target"
+     },
+     "requirement_satisfied": null,
+     "limiting_variable": null,
+     "computed_equations": [],
+     "computation_log": [],
+     "evidence_rank": 4
+    },
+    "i_dimensions": {
+     "I1_MECHANISM_EVIDENCE_DERIVATION": {
+      "score": 0.507,
+      "state": "MEASURED"
+     },
+     "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_SURVIVORS"
+     },
+     "I3_RECOMBINATION_RISK": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_FAMILIES"
+     },
+     "I4_NEW_TECHNICAL_RELATIONSHIP": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+     },
+     "I5_EXPERIMENT_DISCRIMINATION": {
+      "score": 0.667,
+      "state": "MEASURED"
+     }
+    },
+    "i_flags": {
+     "underived_mechanism": false,
+     "recombination_only": false
+    },
+    "i_average": 0.587,
+    "q_average": 0.625,
+    "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE"
+   },
+   "decision": {
+    "action": "KEEP",
+    "checks": {
+     "technical_objective": "CONFIRMED on the child's independent evaluation: occlusion_force INCREASE improves objective tubing_service_life (MAXIMIZE) with constraints preserved",
+     "no_new_constraint_violation": true,
+     "no_constraint_laundering": true,
+     "negatives_preserved": true,
+     "no_new_structural_flags": true,
+     "i1_structural_floor": {
+      "parent": 0.531,
+      "child": 0.507,
+      "floor": 0.2,
+      "crossed_downward": false,
+      "note": "numeric I1 movement is recorded, never gated here (CEO R379 item 8); the floor crossing IS gated — a mutation may not flip a derived mechanism to underived"
+     },
+     "prior_art_position_not_degraded": true,
+     "value_class_provenance": "MODELLED design value — declared, never promoted (Art. XXVIII); the improvement attribution carries the class",
+     "geometry_valid_on_child": "no parametric model bound to the changed variable — the state-level gates are decisive",
+     "quantitative_margin": {
+      "engaged": false,
+      "parent_margin": null,
+      "child_margin": null,
+      "improvement": null,
+      "threshold": 0.005,
+      "verdict": "NOT_ENGAGED",
+      "parent_value": null,
+      "child_value": null,
+      "parent_unit": null,
+      "equation_id": null,
+      "reason": "quantitative objective not computed on both sides — the direction-level K1 criterion governs"
+     }
+    },
+    "reasons": [],
+    "decided_at": "2026-09-14T06:14:21+00:00Z"
+   },
+   "attribution": {
+    "artifact": "TECHNICAL_IMPROVEMENT_ATTRIBUTION",
+    "technical_mechanism": "occlusion_force --INCREASES--> pressure_distribution (MODELLED): higher occlusion force increases pressure distribution uniformity | pressure_distribution --INCREASES--> tubing_service_life (MODELLED): more even pressure distribution extends tubing service life | occlusion_force --INCREASES--> target_flow_rate (MODELLED): higher occlusion force increases flow rate",
+    "changed_variable": "occlusion_force",
+    "changed_variable_name": "occlusion force",
+    "direction": "INCREASE",
+    "from_value": 7.5,
+    "to_value": 8.5,
+    "value_class": "MODELLED",
+    "envelope": [
+     1.0,
+     10.0
+    ],
+    "envelope_class": "MODELLED",
+    "predicted_effect": "occlusion_force 8.5 is predicted to move objective tubing_service_life (MAXIMIZE) in the improving sense",
+    "evaluated_result": "CONFIRMED on the child's independent evaluation: occlusion_force INCREASE improves objective tubing_service_life (MAXIMIZE) with constraints preserved",
+    "constraints_result": [],
+    "evidence_class": "AI_INFERENCE (rank 3) — a direction-level prediction of the declared analytical model over the structured technical state. NOT a measurement, NOT a physical observation (Art. XXVIII / XXXVIII). The value class of the changed variable is recorded above; MODELLED design values are invention content, never evidence.",
+    "mutation_id": "tmut:706fdf78de6a",
+    "recorded_at": "2026-09-14T06:14:21+00:00Z"
+   }
+  }
+ ],
+ "outcome": "TECHNICALLY_IMPROVED",
+ "outcome_reason": "2 iteration(s) ran within budget; keeps: 2 (the R379 convention: the budget, not a verdict, ended the loop)",
+ "extraction": {
+  "proposal_id": "tsp:ac1a20e3a89a",
+  "attempts": [
+   {
+    "attempt": 1,
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "status": "OK",
+    "prompt_hash": "864512c4abb5e0bc1f37400aa1d71f2472d2fbf387ef42f3ab33db3fe0964d7c",
+    "output_hash": "f7515c046b6026b9943b25cd860b067e1b37b32b7951c0ec28b04dd197637a90",
+    "latency_ms": 146685,
+    "error": null,
+    "raw_content_sha256": "7301fd43cdd9467d8342cd27a894330fe2c5d7e735a683ab02392f6e8cdd2a83"
+   }
+  ],
+  "provider": "zai",
+  "model": "glm-4-plus",
+  "status": "OK",
+  "prompt_hash": "864512c4abb5e0bc1f37400aa1d71f2472d2fbf387ef42f3ab33db3fe0964d7c",
+  "output_hash": "f7515c046b6026b9943b25cd860b067e1b37b32b7951c0ec28b04dd197637a90",
+  "latency_ms": 146685,
+  "error": null,
+  "proposal": {
+   "objects": [
+    {
+     "object_id": "pump_head",
+     "name": "peristaltic dosing pump head",
+     "role": "mechanical component that delivers precise fluid volumes"
+    },
+    {
+     "object_id": "pressure_transducer",
+     "name": "miniaturized pressure transducer",
+     "role": "monitors pressure distribution across tube lines"
+    },
+    {
+     "object_id": "flow_monitor",
+     "name": "flow monitoring system",
+     "role": "measures actual flow rate for dynamic adjustment"
+    },
+    {
+     "object_id": "dosing_tubing",
+     "name": "dosing tubing",
+     "role": "conveys fluid from pump to analyzer"
+    },
+    {
+     "object_id": "occlusion_rollers",
+     "name": "occlusion rollers",
+     "role": "compress tubing to create fluid movement"
+    }
+   ],
+   "parameters": [
+    {
+     "param_id": "pump_envelope_length",
+     "name": "pump head length",
+     "category": "GEOMETRY",
+     "unit": "mm",
+     "value": 120,
+     "value_class": "EXTRACTED",
+     "value_span": "120 mm length",
+     "value_evidence_id": "device_failure",
+     "range_min": null,
+     "range_max": null,
+     "range_span": null,
+     "range_evidence_id": null,
+     "role": "maximum length dimension of pump head"
+    },
+    {
+     "param_id": "pump_envelope_width",
+     "name": "pump head width",
+     "category": "GEOMETRY",
+     "unit": "mm",
+     "value": 80,
+     "value_class": "EXTRACTED",
+     "value_span": "80 mm width",
+     "value_evidence_id": "device_failure",
+     "range_min": null,
+     "range_max": null,
+     "range_span": null,
+     "range_evidence_id": null,
+     "role": "maximum width dimension of pump head"
+    },
+    {
+     "param_id": "pump_envelope_height",
+     "name": "pump head height",
+     "category": "GEOMETRY",
+     "unit": "mm",
+     "value": 50,
+     "value_class": "EXTRACTED",
+     "value_span": "50 mm height",
+     "value_evidence_id": "device_failure",
+     "range_min": null,
+     "range_max": null,
+     "range_span": null,
+     "range_evidence_id": null,
+     "role": "maximum height dimension of pump head"
+    },
+    {
+     "param_id": "tubing_bore_diameter",
+     "name": "dosing tubing bore diameter",
+     "category": "GEOMETRY",
+     "unit": "mm",
+     "value": 2.5,
+     "value_class": "EXTRACTED",
+     "value_span": "2.5 mm bore dosing tubing",
+     "value_evidence_id": "device_failure",
+     "range_min": null,
+     "range_max": null,
+     "range_span": null,
+     "range_evidence_id": null,
+     "role": "internal diameter of fluid-carrying tubing"
+    },
+    {
+     "param_id": "target_flow_rate",
+     "name": "target flow rate",
+     "category": "OPERATING_CONDITIONS",
+     "unit": "mL/min",
+     "value": 0.5,
+     "value_class": "EXTRACTED",
+     "value_span": "0.5 mL/min steady flow",
+     "value_evidence_id": "device_failure",
+     "range_min": null,
+     "range_max": null,
+     "range_span": null,
+     "range_evidence_id": null,
+     "role": "desired fluid delivery rate"
+    },
+    {
+     "param_id": "dosing_accuracy",
+     "name": "dosing accuracy",
+     "category": "PARAMETERS",
+     "unit": "percent",
+     "value": 2,
+     "value_class": "EXTRACTED",
+     "value_span": "better than 2 percent dosing accuracy",
+     "value_evidence_id": "device_failure",
+     "range_min": null,
+     "range_max": null,
+     "range_span": null,
+     "range_evidence_id": null,
+     "role": "maximum allowable deviation from target flow rate"
+    },
+    {
+     "param_id": "tubing_service_life",
+     "name": "tubing service life",
+     "category": "PARAMETERS",
+     "unit": "hours",
+     "value": 500,
+     "value_class": "EXTRACTED",
+     "value_span": "keep tubing service life above 500 hours",
+     "value_evidence_id": "device_failure",
+     "range_min": null,
+     "range_max": null,
+     "range_span": null,
+     "range_evidence_id": null,
+     "role": "minimum operational lifetime of tubing before fatigue failure"
+    },
+    {
+     "param_id": "occlusion_force",
+     "name": "occlusion force",
+     "category": "PARAMETERS",
+     "unit": "N",
+     "value": null,
+     "value_class": "UNKNOWN",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": 1,
+     "range_max": 10,
+     "range_span": null,
+     "range_evidence_id": null,
+     "role": "force applied by rollers to compress tubing"
+    },
+    {
+     "param_id": "pressure_distribution",
+     "name": "pressure distribution",
+     "category": "PARAMETERS",
+     "unit": "dimensionless",
+     "value": null,
+     "value_class": "UNKNOWN",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": null,
+     "range_max": null,
+     "range_span": null,
+     "range_evidence_id": null,
+     "role": "uniformity of pressure across tube lines"
+    },
+    {
+     "param_id": "tubing_material",
+     "name": "tubing material",
+     "category": "MATERIALS",
+     "unit": null,
+     "value": null,
+     "value_class": "UNKNOWN",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": null,
+     "range_max": null,
+     "range_span": null,
+     "range_evidence_id": null,
+     "role": "material composition of dosing tubing"
+    }
+   ],
+   "constraints": [
+    {
+     "constraint_id": "size_constraint_length",
+     "target": "pump_envelope_length",
+     "bound": "<=",
+     "limit": 120,
+     "unit": "mm",
+     "limit_class": "EXTRACTED",
+     "limit_span": "120 mm length",
+     "limit_evidence_id": "device_failure",
+     "justification": "physical envelope constraint for pump head dimensions"
+    },
+    {
+     "constraint_id": "size_constraint_width",
+     "target": "pump_envelope_width",
+     "bound": "<=",
+     "limit": 80,
+     "unit": "mm",
+     "limit_class": "EXTRACTED",
+     "limit_span": "80 mm width",
+     "limit_evidence_id": "device_failure",
+     "justification": "physical envelope constraint for pump head dimensions"
+    },
+    {
+     "constraint_id": "size_constraint_height",
+     "target": "pump_envelope_height",
+     "bound": "<=",
+     "limit": 50,
+     "unit": "mm",
+     "limit_class": "EXTRACTED",
+     "limit_span": "50 mm height",
+     "limit_evidence_id": "device_failure",
+     "justification": "physical envelope constraint for pump head dimensions"
+    },
+    {
+     "constraint_id": "flow_accuracy",
+     "target": "dosing_accuracy",
+     "bound": "<=",
+     "limit": 2,
+     "unit": "percent",
+     "limit_class": "EXTRACTED",
+     "limit_span": "better than 2 percent dosing accuracy",
+     "limit_evidence_id": "device_failure",
+     "justification": "required precision for fluid delivery in analyzer"
+    },
+    {
+     "constraint_id": "tubing_life",
+     "target": "tubing_service_life",
+     "bound": ">=",
+     "limit": 500,
+     "unit": "hours",
+     "limit_class": "EXTRACTED",
+     "limit_span": "keep tubing service life above 500 hours",
+     "limit_evidence_id": "device_failure",
+     "justification": "minimum operational lifetime before fatigue failure"
+    }
+   ],
+   "objectives": [
+    {
+     "objective_id": "extend_tubing_life",
+     "target": "tubing_service_life",
+     "direction": "MAXIMIZE",
+     "basis": "prevent tubing_fatigue_rupture failure mode"
+    },
+    {
+     "objective_id": "maintain_flow_accuracy",
+     "target": "dosing_accuracy",
+     "direction": "MAINTAIN_WITHIN",
+     "basis": "ensure required precision for water quality analysis"
+    }
+   ],
+   "failure_modes": [
+    {
+     "mode_id": "tubing_fatigue_rupture",
+     "name": "tubing fatigue rupture",
+     "problem_link": "primary failure mode for compact peristaltic dosing pump head"
+    }
+   ],
+   "dependencies": [
+    {
+     "relation_id": "occlusion_to_pressure",
+     "cause": "occlusion_force",
+     "effect": "pressure_distribution",
+     "direction": "INCREASES",
+     "statement": "higher occlusion force increases pressure distribution uniformity",
+     "relation_class": "MODELLED",
+     "span": null,
+     "evidence_id": null
+    },
+    {
+     "relation_id": "pressure_to_tubing_life",
+     "cause": "pressure_distribution",
+     "effect": "tubing_service_life",
+     "direction": "INCREASES",
+     "statement": "more even pressure distribution extends tubing service life",
+     "relation_class": "MODELLED",
+     "span": null,
+     "evidence_id": null
+    },
+    {
+     "relation_id": "occlusion_to_flow",
+     "cause": "occlusion_force",
+     "effect": "target_flow_rate",
+     "direction": "INCREASES",
+     "statement": "higher occlusion force increases flow rate",
+     "relation_class": "MODELLED",
+     "span": null,
+     "evidence_id": null
+    },
+    {
+     "relation_id": "flow_to_accuracy",
+     "cause": "target_flow_rate",
+     "effect": "dosing_accuracy",
+     "direction": "INCREASES",
+     "statement": "stable flow rate improves dosing accuracy",
+     "relation_class": "MODELLED",
+     "span": null,
+     "evidence_id": null
+    }
+   ]
+  },
+  "raw_content_sha256": "7301fd43cdd9467d8342cd27a894330fe2c5d7e735a683ab02392f6e8cdd2a83"
+ },
+ "technical_state_counts": {
+  "parameters": 10,
+  "parameters_with_value": 0,
+  "parameters_extracted": 0,
+  "parameters_modelled": 0,
+  "parameters_with_envelope": 1,
+  "constraints": 0,
+  "objectives": 2,
+  "dependencies": 4,
+  "objects": 5,
+  "failure_modes": 1
+ },
+ "baseline": {
+  "technical": {
+   "status": "QUANTIFIED",
+   "objective": {
+    "target": "tubing_service_life",
+    "direction": "MAXIMIZE",
+    "known": true,
+    "basis": "prevent tubing_fatigue_rupture failure mode"
+   },
+   "limiting_variable": {
+    "param_id": "occlusion_force",
+    "name": "occlusion force",
+    "improving_move": "INCREASE",
+    "objective_target": "tubing_service_life",
+    "objective_direction": "MAXIMIZE",
+    "envelope": [
+     1.0,
+     10.0
+    ],
+    "envelope_class": "MODELLED",
+    "causal_path_length": 2,
+    "statement": "The limiting variable is occlusion force. Changing it by increase is predicted to improve objective tubing_service_life (MAXIMIZE) while preserving all declared constraints that are checkable at this tier.",
+    "convention": {
+     "name": "ORDINAL_LEVERAGE_BY_PATH_LENGTH",
+     "epistemic_class": "ENGINEERING",
+     "justification": "with MONOTONE-only relations the evaluator cannot rank leverage by magnitude; it ranks by (1) fewest constraint blocks, (2) shortest causal path from the parameter to the objective target, (3) envelope provenance class (EXTRACTED beats MODELLED). This is a declared ordinal convention, not a measurement — recorded on every evaluation that uses it.",
+     "uncertainty": "ordinal only; magnitudes are UNKNOWN at this tier"
+    }
+   },
+   "constraint_results": [],
+   "uncertainty": {
+    "unknown_value_params": [
+     "dosing_accuracy",
+     "occlusion_force",
+     "pressure_distribution",
+     "pump_envelope_height",
+     "pump_envelope_length",
+     "pump_envelope_width",
+     "target_flow_rate",
+     "tubing_bore_diameter",
+     "tubing_material",
+     "tubing_service_life"
+    ],
+    "modelled_relations": 4,
+    "extracted_relations": 0,
+    "unverifiable_constraints": [],
+    "objective_known": true,
+    "note": "UNKNOWN values are never treated as zeros; unverifiable constraints are never treated as satisfied (Art. XXV / Art. IV)"
+   },
+   "computation_log": {
+    "evaluator_id": "analytical_monotone_v1",
+    "fidelity_tier": "STRUCTURED_CONSTRAINT",
+    "evidence_rank": 3,
+    "input_state_sha256": "87a8a4a93d112b34388f32ed020ef33051a124a7ed4a279d1e4d17fc812e76e9",
+    "conventions": [
+     {
+      "name": "ORDINAL_LEVERAGE_BY_PATH_LENGTH",
+      "epistemic_class": "ENGINEERING",
+      "justification": "with MONOTONE-only relations the evaluator cannot rank leverage by magnitude; it ranks by (1) fewest constraint blocks, (2) shortest causal path from the parameter to the objective target, (3) envelope provenance class (EXTRACTED beats MODELLED). This is a declared ordinal convention, not a measurement — recorded on every evaluation that uses it.",
+      "uncertainty": "ordinal only; magnitudes are UNKNOWN at this tier"
+     },
+     {
+      "name": "DIRECTIONAL_FAIL_CLOSED",
+      "epistemic_class": "ENGINEERING",
+      "justification": "a proposed change is constraint-BLOCKED when (a) the changed parameter's own numeric constraint would be violated at the proposed value, or (b) a relation-connected constraint target is already VIOLATED or value-UNKNOWN and the predicted direction moves it TOWARD its bound. Fail-closed on directional risk: an unknown-position target moving toward a bound is a blocked move, not an accepted one (Art. IV).",
+      "uncertainty": "direction-level only at this tier"
+     }
+    ],
+    "steps": [
+     "resolved objective tubing_service_life (MAXIMIZE)",
+     "checked 0 constraint(s) numerically where values exist",
+     "propagated signs over 4 relation(s)",
+     "ranked 1 movable improving direction(s)"
+    ],
+    "computed_at": "2026-09-14T06:14:17+00:00Z",
+    "deterministic": true
+   }
+  },
+  "quantitative": {
+   "status": "UNQUANTIFIED",
+   "objective": {
+    "target": "tubing_service_life",
+    "direction": "MAXIMIZE",
+    "computed": false,
+    "value": null,
+    "unit": null,
+    "equation_id": null,
+    "margin": null,
+    "margin_status": "UNCOMPUTED",
+    "statement": "no active computation binds the objective target"
+   },
+   "requirement_satisfied": null,
+   "limiting_variable": null,
+   "computed_equations": [],
+   "computation_log": [],
+   "evidence_rank": 4
+  },
+  "i_dimensions": {
+   "I1_MECHANISM_EVIDENCE_DERIVATION": {
+    "score": 0.68,
+    "state": "MEASURED"
+   },
+   "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_SURVIVORS"
+   },
+   "I3_RECOMBINATION_RISK": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_FAMILIES"
+   },
+   "I4_NEW_TECHNICAL_RELATIONSHIP": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+   },
+   "I5_EXPERIMENT_DISCRIMINATION": {
+    "score": 0.667,
+    "state": "MEASURED"
+   }
+  },
+  "i_flags": {
+   "underived_mechanism": false,
+   "recombination_only": false
+  },
+  "i_average": 0.673,
+  "q_average": 0.625,
+  "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE"
+ },
+ "fidelity_escalation": {
+  "current_tier": "STRUCTURED_CONSTRAINT (analytical_monotone_v1) + ANALYTICAL_EQUATION (analytical_equation_v1, R383)",
+  "deciding_question": "does a design-variable change improve the objective within constraints, and by how much?",
+  "resolved_at_current_tier": true,
+  "quantitative_tier_engaged": false,
+  "quantitative_objective_computed": false,
+  "escalation_needed": false,
+  "next_tier_available": false,
+  "note": "the R383 ANALYTICAL_EQUATION tier is LIVE (closed-form deterministic relations with computation logs); the higher tiers (NUMERICAL_SOLVER / SIMULATION / NEURAL_OPERATOR) remain contract-reserved and unregistered; escalation is recorded, never faked at the current tier"
+ },
+ "final": {
+  "technical": {
+   "status": "QUANTIFIED",
+   "objective": {
+    "target": "tubing_service_life",
+    "direction": "MAXIMIZE",
+    "known": true,
+    "basis": "prevent tubing_fatigue_rupture failure mode"
+   },
+   "limiting_variable": {
+    "param_id": "occlusion_force",
+    "name": "occlusion force",
+    "improving_move": "INCREASE",
+    "objective_target": "tubing_service_life",
+    "objective_direction": "MAXIMIZE",
+    "envelope": [
+     1.0,
+     10.0
+    ],
+    "envelope_class": "MODELLED",
+    "causal_path_length": 2,
+    "statement": "The limiting variable is occlusion force. Changing it by increase is predicted to improve objective tubing_service_life (MAXIMIZE) while preserving all declared constraints that are checkable at this tier.",
+    "convention": {
+     "name": "ORDINAL_LEVERAGE_BY_PATH_LENGTH",
+     "epistemic_class": "ENGINEERING",
+     "justification": "with MONOTONE-only relations the evaluator cannot rank leverage by magnitude; it ranks by (1) fewest constraint blocks, (2) shortest causal path from the parameter to the objective target, (3) envelope provenance class (EXTRACTED beats MODELLED). This is a declared ordinal convention, not a measurement — recorded on every evaluation that uses it.",
+     "uncertainty": "ordinal only; magnitudes are UNKNOWN at this tier"
+    }
+   },
+   "constraint_results": [],
+   "uncertainty": {
+    "unknown_value_params": [
+     "dosing_accuracy",
+     "pressure_distribution",
+     "pump_envelope_height",
+     "pump_envelope_length",
+     "pump_envelope_width",
+     "target_flow_rate",
+     "tubing_bore_diameter",
+     "tubing_material",
+     "tubing_service_life"
+    ],
+    "modelled_relations": 4,
+    "extracted_relations": 0,
+    "unverifiable_constraints": [],
+    "objective_known": true,
+    "note": "UNKNOWN values are never treated as zeros; unverifiable constraints are never treated as satisfied (Art. XXV / Art. IV)"
+   },
+   "computation_log": {
+    "evaluator_id": "analytical_monotone_v1",
+    "fidelity_tier": "STRUCTURED_CONSTRAINT",
+    "evidence_rank": 3,
+    "input_state_sha256": "bd966f85d2f86a44a25b219a0bb10b12e64992e1ef5765c9177346ef2c21c719",
+    "conventions": [
+     {
+      "name": "ORDINAL_LEVERAGE_BY_PATH_LENGTH",
+      "epistemic_class": "ENGINEERING",
+      "justification": "with MONOTONE-only relations the evaluator cannot rank leverage by magnitude; it ranks by (1) fewest constraint blocks, (2) shortest causal path from the parameter to the objective target, (3) envelope provenance class (EXTRACTED beats MODELLED). This is a declared ordinal convention, not a measurement — recorded on every evaluation that uses it.",
+      "uncertainty": "ordinal only; magnitudes are UNKNOWN at this tier"
+     },
+     {
+      "name": "DIRECTIONAL_FAIL_CLOSED",
+      "epistemic_class": "ENGINEERING",
+      "justification": "a proposed change is constraint-BLOCKED when (a) the changed parameter's own numeric constraint would be violated at the proposed value, or (b) a relation-connected constraint target is already VIOLATED or value-UNKNOWN and the predicted direction moves it TOWARD its bound. Fail-closed on directional risk: an unknown-position target moving toward a bound is a blocked move, not an accepted one (Art. IV).",
+      "uncertainty": "direction-level only at this tier"
+     }
+    ],
+    "steps": [
+     "resolved objective tubing_service_life (MAXIMIZE)",
+     "checked 0 constraint(s) numerically where values exist",
+     "propagated signs over 4 relation(s)",
+     "ranked 1 movable improving direction(s)"
+    ],
+    "computed_at": "2026-09-14T06:14:21+00:00Z",
+    "deterministic": true
+   }
+  },
+  "quantitative": {
+   "status": "UNQUANTIFIED",
+   "objective": {
+    "target": "tubing_service_life",
+    "direction": "MAXIMIZE",
+    "computed": false,
+    "value": null,
+    "unit": null,
+    "equation_id": null,
+    "margin": null,
+    "margin_status": "UNCOMPUTED",
+    "statement": "no active computation binds the objective target"
+   },
+   "requirement_satisfied": null,
+   "limiting_variable": null,
+   "computed_equations": [],
+   "computation_log": [],
+   "evidence_rank": 4
+  },
+  "i_dimensions": {
+   "I1_MECHANISM_EVIDENCE_DERIVATION": {
+    "score": 0.507,
+    "state": "MEASURED"
+   },
+   "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_SURVIVORS"
+   },
+   "I3_RECOMBINATION_RISK": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_FAMILIES"
+   },
+   "I4_NEW_TECHNICAL_RELATIONSHIP": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+   },
+   "I5_EXPERIMENT_DISCRIMINATION": {
+    "score": 0.667,
+    "state": "MEASURED"
+   }
+  },
+  "i_flags": {
+   "underived_mechanism": false,
+   "recombination_only": false
+  },
+  "i_average": 0.587,
+  "q_average": 0.625,
+  "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE"
+ },
+ "outcome_summary": {
+  "baseline_status": "QUANTIFIED",
+  "final_status": "QUANTIFIED",
+  "baseline_quantitative": "UNQUANTIFIED",
+  "final_quantitative": "UNQUANTIFIED",
+  "final_quantitative_objective": {
+   "target": "tubing_service_life",
+   "value": null,
+   "unit": null,
+   "margin": null,
+   "margin_status": "UNCOMPUTED",
+   "equation_id": null
+  },
+  "baseline_i_average": 0.673,
+  "final_i_average": 0.587,
+  "baseline_prior_art": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+  "final_prior_art": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+  "iterations_run": 2,
+  "keeps": 2,
+  "attributions": [
+   {
+    "artifact": "TECHNICAL_IMPROVEMENT_ATTRIBUTION",
+    "technical_mechanism": "occlusion_force --INCREASES--> pressure_distribution (MODELLED): higher occlusion force increases pressure distribution uniformity | pressure_distribution --INCREASES--> tubing_service_life (MODELLED): more even pressure distribution extends tubing service life | occlusion_force --INCREASES--> target_flow_rate (MODELLED): higher occlusion force increases flow rate",
+    "changed_variable": "occlusion_force",
+    "changed_variable_name": "occlusion force",
+    "direction": "INCREASE",
+    "from_value": null,
+    "to_value": 7.5,
+    "value_class": "MODELLED",
+    "envelope": [
+     1.0,
+     10.0
+    ],
+    "envelope_class": "MODELLED",
+    "predicted_effect": "occlusion_force 7.5 is predicted to move objective tubing_service_life (MAXIMIZE) in the improving sense",
+    "evaluated_result": "CONFIRMED on the child's independent evaluation: occlusion_force INCREASE improves objective tubing_service_life (MAXIMIZE) with constraints preserved",
+    "constraints_result": [],
+    "evidence_class": "AI_INFERENCE (rank 3) — a direction-level prediction of the declared analytical model over the structured technical state. NOT a measurement, NOT a physical observation (Art. XXVIII / XXXVIII). The value class of the changed variable is recorded above; MODELLED design values are invention content, never evidence.",
+    "mutation_id": "tmut:820bbdde92d1",
+    "recorded_at": "2026-09-14T06:14:19+00:00Z"
+   },
+   {
+    "artifact": "TECHNICAL_IMPROVEMENT_ATTRIBUTION",
+    "technical_mechanism": "occlusion_force --INCREASES--> pressure_distribution (MODELLED): higher occlusion force increases pressure distribution uniformity | pressure_distribution --INCREASES--> tubing_service_life (MODELLED): more even pressure distribution extends tubing service life | occlusion_force --INCREASES--> target_flow_rate (MODELLED): higher occlusion force increases flow rate",
+    "changed_variable": "occlusion_force",
+    "changed_variable_name": "occlusion force",
+    "direction": "INCREASE",
+    "from_value": 7.5,
+    "to_value": 8.5,
+    "value_class": "MODELLED",
+    "envelope": [
+     1.0,
+     10.0
+    ],
+    "envelope_class": "MODELLED",
+    "predicted_effect": "occlusion_force 8.5 is predicted to move objective tubing_service_life (MAXIMIZE) in the improving sense",
+    "evaluated_result": "CONFIRMED on the child's independent evaluation: occlusion_force INCREASE improves objective tubing_service_life (MAXIMIZE) with constraints preserved",
+    "constraints_result": [],
+    "evidence_class": "AI_INFERENCE (rank 3) — a direction-level prediction of the declared analytical model over the structured technical state. NOT a measurement, NOT a physical observation (Art. XXVIII / XXXVIII). The value class of the changed variable is recorded above; MODELLED design values are invention content, never evidence.",
+    "mutation_id": "tmut:706fdf78de6a",
+    "recorded_at": "2026-09-14T06:14:21+00:00Z"
+   }
+  ]
+ },
+ "finished_at": "2026-09-14T06:14:21+00:00Z",
+ "status": "TECHNICALLY_IMPROVED"
+}

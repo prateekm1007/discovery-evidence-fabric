@@ -13,7 +13,10 @@
 # provenance per a2/synthesize.py + a2/adversarial.py) -> stops the gateway.
 # Exit code: the command's exit code. Gateway log: ENGINE_RUNS/zai_gateway_*
 set -u
-REPO=/home/z/my-project/discovery-evidence-fabric
+# R452: resolve the repo from THIS script's location — the checkout
+# layout moved (repos/discovery-evidence-fabric); a hardcoded absolute
+# path started the gateway from the wrong tree (healthz never came up)
+REPO="$(cd "$(dirname "$0")/.." && pwd)"
 KEY=$(sed -n 's/^ZAI_GATEWAY_KEY=//p' /home/z/my-project/.zai_gateway_env)
 if [ -z "$KEY" ]; then echo "no gateway key" >&2; exit 2; fi
 

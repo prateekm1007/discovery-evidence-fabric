@@ -40,7 +40,12 @@ _NON_NUMERIC = {"UNKNOWN", "NOT ESTABLISHED", "NOT_ESTABLISHED", "", "NONE", "TB
 _PHYSICAL_SITE_SIGNALS = re.compile(
     r"\b(panel|catheter|valve|pump|device|module|cell|stack|battery|turbine|"
     r"exchanger|reactor|sensor|implant|floor|lumen|coil|antenna|array|"
-    r"absorber|receiver|nozzle|duct|blade|wafer|electrode|membrane|engine)\b",
+    r"absorber|receiver|nozzle|duct|blade|wafer|electrode|membrane|engine|"
+    # R452 (physical-site vocabulary completion — the audit's PHYSICAL
+    # SITE step): enclosure-class and structure-class physical nouns
+    r"chassis|enclosure|housing|cabinet|spreader|heatsink|radiator|fin|"
+    r"wearable|patch|splint|brace|frame|vessel|tank|pipe|tube|drone|"
+    r"robot|appliance|fixture|laptop|notebook|substrate)\b",
     re.I,
 )
 

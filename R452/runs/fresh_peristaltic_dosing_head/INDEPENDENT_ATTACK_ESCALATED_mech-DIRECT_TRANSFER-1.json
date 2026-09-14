@@ -1,0 +1,56 @@
+{
+ "stage": "INDEPENDENT_ATTACK",
+ "candidate_id": "cand:MS:DIRECT_TRANSFER:943b906d063f",
+ "escalation": {
+  "gate_version": "attacker_calibration/1.0.0",
+  "instrument": "independent_attack/1.0.0",
+  "calibration_state": "NOT_CALIBRATED",
+  "terminal_kill_admissible": false,
+  "measured": {
+   "coverage": 1.0,
+   "parse_completeness": 1.0,
+   "tpr_scoped": 1.0,
+   "fpr_known_good": 1.0,
+   "n_cases_attacked": 40
+  },
+  "sealed_thresholds": {
+   "note": "registered BEFORE measurement; never tuned to results (Art. XXVII)",
+   "coverage_min": 0.875,
+   "parse_completeness_min": 0.875,
+   "tpr_min": 0.75,
+   "fpr_max": 0.3,
+   "ensemble": "NONE (single-attacker calibration only; majority-vote ensembles are deferred by the R412 directive)"
+  },
+  "measurement_path": "R412/CALIBRATION/engine_independent_attack_measurement.json",
+  "measurement_sha256": "4e1718e7088564333b5e1ef9be47ca452133d051001628cd6eed91f44e60ef5f",
+  "reason": "measured FPR 1.0 > sealed bar 0.3 (Art. L: the attacker is measured non-selective; its KILL is inadmissible as a terminal verdict and is escalated with the objection preserved)",
+  "rule": "the instrument's KILL is measured non-selective (FPR above the sealed bar); the objection is preserved verbatim and ESCALATED for adjudication — the candidate is NOT killed by this attack alone (Art. L); the deterministic gates are unchanged",
+  "reviewer_provenance": "AI_REVIEW (Art. LXVII)"
+ },
+ "preserved_objections": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "basis": "The claimed \"evenly distributed occlusion forces\" cannot be achieved with a peristaltic mechanism, as peristaltic pumps inherently create localized pinch points by definition; the fundamental physics of peristaltic action requires localized occlusion to create the pumping effect, making even distribution impossible."
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "basis": "The compact design constraint (120 mm × 80 mm × 50 mm) cannot accommodate a 3D-printed peristaltic assembly with evenly distributed occlusion points while maintaining the required 2.5 mm bore tubing and 0.5 mL/min flow rate; the spatial requirements for even force distribution would necessitate a larger footprint than specified."
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "basis": "The provided evidence [doi:10.1016/s0262-1762(03)00715-6] explicitly states that peristaltic pump tubing failure is primarily due to \"repeated localized deformation\" which is inherent to the peristaltic principle, directly contradicting the claim that forces can be evenly distributed."
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "basis": "The predicted effect of increasing tubing service life from days to over 500 hours (100x improvement) cannot be achieved without fundamentally changing the peristaltic principle, which would make it no longer a peristaltic pump; the baseline failure mode is inherent to peristaltic action, so the claimed improvement equals baseline performance."
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "basis": "The 3D-printed material will degrade in high-humidity environments as acknowledged in the known failure modes, making the device unsuitable for a water-quality analyzer where humidity exposure is inevitable; this violates the operational requirements of the intended application."
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "basis": "The testable prediction of \"tubing service life increases by at least 100x under the same operating conditions\" fails to define what constitutes \"the same operating conditions\" regarding environmental factors, tubing material properties, and occlusion force magnitude, making the prediction impossible to validate."
+  }
+ ]
+}

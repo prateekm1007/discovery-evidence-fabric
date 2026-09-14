@@ -139,6 +139,11 @@ FORM_LIBRARY = {
 # Domain/intervention-site -> form routing (deterministic)
 FORM_ROUTING = [
     (("solar", "photovoltaic", "pv panel", "panel"), "layered_panel"),
+    # R452: layered thermal/electronic stacks (chassis-class enclosures
+    # are layered devices: substrate + spreader + skin) — routing only;
+    # the FORM_LIBRARY itself is frozen this round
+    (("chassis", "laptop", "notebook", "spreader", "cold plate",
+      "electronic stack"), "layered_panel"),
     (("catheter", "lumen", "shunt", "drainage"), "dual_lumen_catheter"),
     (("housing", "enclosure", "implant", "pump body", "device body"), "cylindrical_device"),
 ]
@@ -171,6 +176,19 @@ def _module_sha256() -> Optional[str]:
         return None
 
 
+def _repo_relative_module_path() -> str:
+    """R452: this module's path RELATIVE to the repo root (posix). The
+    package security gate classifies absolute local paths as LOCAL_PATH
+    leaks in buyer-facing artifacts — provenance pins the source by
+    repo-relative path + sha256, never by the build machine's FS."""
+    try:
+        p = Path(__file__).resolve()
+        root = p.parents[3]
+        return p.relative_to(root).as_posix()
+    except (IndexError, ValueError):
+        return Path(__file__).name
+
+
 def canonical_source_identity(form: str) -> Dict[str, Any]:
     """The identity tuple of a canonical FORM_LIBRARY builder.
 
@@ -185,12 +203,19 @@ def canonical_source_identity(form: str) -> Dict[str, Any]:
     builder_function=None) so callers can record the refusal honestly.
     """
     builder = FORM_LIBRARY.get(form)
+    # R452: module_path is REPO-RELATIVE — an absolute local path here
+    # leaked the build machine's filesystem into buyer-facing package
+    # provenance (MODEL/CAD_SOURCE_PROVENANCE.json + MODEL_MANIFEST.json)
+    # and the package security gate correctly blocked the release
+    # (T-SECRET-PRESENT / LOCAL_PATH). The identity is unchanged: the
+    # relative path + module sha256 still pin the canonical source.
+    module_path = _repo_relative_module_path()
     if builder is None:
         return {
             "form": form,
             "builder_function": None,
             "canonical_module": __name__,
-            "module_path": str(Path(__file__).resolve()),
+            "module_path": module_path,
             "module_sha256": _module_sha256(),
             "builder_source_sha256": None,
             "form_library_forms": sorted(FORM_LIBRARY),
@@ -203,7 +228,7 @@ def canonical_source_identity(form: str) -> Dict[str, Any]:
         "form": form,
         "builder_function": builder.__name__,
         "canonical_module": __name__,
-        "module_path": str(Path(__file__).resolve()),
+        "module_path": module_path,
         "module_sha256": _module_sha256(),
         "builder_source_sha256": hashlib.sha256(
             source_text.encode("utf-8")).hexdigest(),

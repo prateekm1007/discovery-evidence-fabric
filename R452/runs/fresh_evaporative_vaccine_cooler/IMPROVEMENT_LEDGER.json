@@ -1,0 +1,920 @@
+{
+ "ledger": "IMPROVEMENT_LEDGER (R378 TECHNICAL IMPROVEMENT ENGINE)",
+ "version": "1.0.0",
+ "loop": "CANDIDATE -> DIAGNOSE WEAKNESS -> IDENTIFY LIMITING FEATURE -> GENERATE CONTROLLED MUTATION -> RE-EVALUATE EVIDENCE/MECHANISM/PRIOR ART -> RE-SCORE -> KEEP OR KILL -> REPEAT",
+ "collision_mode": "REPLAY_CACHE",
+ "live_sources": null,
+ "evaluators_registered": [
+  {
+   "evaluator_id": "term_rule_v1",
+   "fidelity_tier": "TERM_RULE",
+   "evidence_rank": 3
+  }
+ ],
+ "q_instrument": "discovery_fabric/benchmark/candidate_quality.py (FROZEN, hash-pinned, imported read-only)",
+ "i_instrument": "discovery_fabric/benchmark/invention_quality.py (R377, imported read-only)",
+ "thresholds": {
+  "SPAN_DERIVATION_MIN": {
+   "value": 0.2,
+   "epistemic_class": "ENGINEERING",
+   "justification": "the engine's own span-derivation rule (candidate_diversity.span_derivation_check): ratio < 0.20 = SPAN_UNDERIVED. A MECHANISM_STRENGTHENING mutation must CLEAR this floor — the same rule that gates the grid, not a new one."
+  },
+  "EVIDENCE_SUPPORT_MIN": {
+   "value": 0.2,
+   "epistemic_class": "ENGINEERING",
+   "justification": "I1's underived flag fires below 0.20; an EVIDENCE_DERIVED_CONSTRAINT mutation must clear the same floor on evidence_support."
+  },
+  "DOMAIN_OVERLAP_MIN": {
+   "value": 1,
+   "epistemic_class": "ENGINEERING",
+   "justification": "REPLAY_CACHE re-adjudication is valid only while the mutated candidate stays in the domain the cached art was found FOR. Guard: >= 1 NON-generic technical term shared between the child's mechanism+intervention and the cached family corpus. ZERO overlap means the mutation abandoned the domain (measured attack: re-adjudicating a cement-curing intervention against battery art fabricates surviving differentiators — false novelty from stale art). The overlap count is RECORDED on every cache adjudication so thin-domain links are auditable. NOTE: entity-term retention vs the problem CANNOT catch this class — entity terms are problem-derived and unchanged by mutations (measured while writing the guard's tests); it is recorded for audit only."
+  },
+  "MAX_ITERATIONS_DEFAULT": {
+   "value": 2,
+   "epistemic_class": "ENGINEERING",
+   "justification": "the CEO minimum loop is DIAGNOSE -> IMPROVE -> RE-EVALUATE -> IMPROVE AGAIN; two iterations demonstrate repeatability at bounded cost"
+  },
+  "MAX_PROPOSALS_PER_ITERATION": {
+   "value": 3,
+   "epistemic_class": "ENGINEERING",
+   "justification": "bounded proposal budget: three attempts, then the honest no-defensible-mutation verdict"
+  }
+ },
+ "started_at": "2026-09-14T06:30:56+00:00Z",
+ "iterations": [
+  {
+   "iteration": 1,
+   "diagnosis": {
+    "limiting_features": [
+     {
+      "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "measured_value": 0.368,
+      "weakness_kind": "LOW_SCORE",
+      "why_weak": "measured 0.368 < STRONG floor 0.7",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT"
+     },
+     {
+      "dimension": "I5_EXPERIMENT_DISCRIMINATION",
+      "measured_value": 0.667,
+      "weakness_kind": "LOW_SCORE",
+      "why_weak": "measured 0.667 < STRONG floor 0.7",
+      "mutation_type": "EXPERIMENT_DISCRIMINATION"
+     }
+    ],
+    "evidence_gaps": [
+     {
+      "dimension": "I2_DIFFERENTIATOR_TECHNICAL_MEANING",
+      "state": "UNMEASURABLE_NO_SURVIVORS",
+      "what_is_missing": "no surviving differentiators recorded",
+      "consequence": "no mutation targets this dimension until the gap closes (Art. XXV)"
+     },
+     {
+      "dimension": "I3_RECOMBINATION_RISK",
+      "state": "UNMEASURABLE_NO_FAMILIES",
+      "what_is_missing": "no prior-art families adjudicated — residue vs found art is unmeasured; absence of found art is not novelty",
+      "consequence": "no mutation targets this dimension until the gap closes (Art. XXV)"
+     },
+     {
+      "dimension": "I4_NEW_TECHNICAL_RELATIONSHIP",
+      "state": "UNMEASURABLE_NO_FAMILY_TEXT",
+      "what_is_missing": "no adjudicated family text stored — pair novelty vs found art is unmeasured",
+      "consequence": "no mutation targets this dimension until the gap closes (Art. XXV)"
+     }
+    ],
+    "target": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT"
+    }
+   },
+   "proposals": [
+    {
+     "proposal_id": "prop:b99962134f84",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "490c54019916da79f8a703c5503769788ed02c322ac3f42f229f924e9b80e3de",
+     "output_hash": "b99962134f84a262e5810ccabb6a9b25afa3985a0db71b69cab1cbd60fa843fa",
+     "fields": {
+      "MUTATION_TYPE": "EVIDENCE_DERIVED_CONSTRAINT",
+      "MECHANISM": "radiative cooling coating for evaporative loss control",
+      "INTERVENTION": "apply a radiative cooling coating to the outer surface of the evaporative cooler to enhance passive heat rejection and reduce evaporative loss",
+      "EXPECTED_EFFECT": "reduced heat gain and evaporative loss from the environment, extending the cooling duration and maintaining interior temperature below 8°C for longer periods",
+      "FALSIFICATION_TEST": "falsification_test_from_candidate",
+      "MECHANISM_SOURCE_SPAN": "Study of a passive radiative cooling coating on chemical storage tanks for evaporative loss control",
+      "SOURCE_EVIDENCE_ID": "doi:10.1016/j.renene.2023.04.141",
+      "EXPERIMENT": "compare the cooling duration and temperature stability of the radiative cooling coated evaporative cooler against a standard evaporative cooler without the coating",
+      "EXPERIMENT_BASELINE": "standard evaporative cooler without the radiative cooling coating",
+      "EXPERIMENT_EIG": "0.75",
+      "CONSTRAINT_DERIVED": "the radiative cooling coating must specifically target evaporative loss control in addition to heat rejection",
+      "MUTATION_REASON": "repairs I1_MECHANISM_EVIDENCE_DERIVATION weakness by re-anchoring the mechanism in the actual technical vocabulary from the cited evidence about radiative cooling for evaporative loss control"
+     },
+     "validation": {
+      "valid": true,
+      "stage": "VALIDATION",
+      "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+      "checks": {
+       "mutation_type_matches_diagnosis": true,
+       "span_evidence_exists": "doi:10.1016/j.renene.2023.04.141",
+       "span_verbatim_in_evidence": true,
+       "evidence_support": 0.429,
+       "evidence_support_cleared": 0.429,
+       "constraint_traceable_to_evidence": "the radiative cooling coating must specifically target evaporative loss control in addition to heat rejection"
+      },
+      "reasons": [],
+      "validated_at": "2026-09-14T06:31:00+00:00Z"
+     }
+    }
+   ],
+   "mutation_attempts": [
+    {
+     "mutation_applied": {
+      "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+      "mutation_id": "mut:eb6c0910c926",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+      "diagnostic_trigger": {
+       "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+       "measured_before": 0.368,
+       "basis": "R378 evaluator-contract diagnosis (deterministic)"
+      },
+      "proposal_provenance": {
+       "proposal_id": "prop:b99962134f84",
+       "provider": "zai",
+       "model": "glm-4-plus",
+       "prompt_hash": "490c54019916da79f8a703c5503769788ed02c322ac3f42f229f924e9b80e3de",
+       "output_hash": "b99962134f84a262e5810ccabb6a9b25afa3985a0db71b69cab1cbd60fa843fa",
+       "llm_is_untrusted_proposer": true
+      },
+      "validation": {
+       "valid": true,
+       "stage": "VALIDATION",
+       "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+       "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+       "checks": {
+        "mutation_type_matches_diagnosis": true,
+        "span_evidence_exists": "doi:10.1016/j.renene.2023.04.141",
+        "span_verbatim_in_evidence": true,
+        "evidence_support": 0.429,
+        "evidence_support_cleared": 0.429,
+        "constraint_traceable_to_evidence": "the radiative cooling coating must specifically target evaporative loss control in addition to heat rejection"
+       },
+       "reasons": [],
+       "validated_at": "2026-09-14T06:31:00+00:00Z"
+      },
+      "fields_changed": {
+       "mechanism": {
+        "before": "radiative cooling coating that enhances heat dissipation to the cold of space through thermal radiation",
+        "after": "radiative cooling coating for evaporative loss control"
+       },
+       "intervention": {
+        "before": "apply a radiative cooling coating to the outer surface of the evaporative cooler to enhance passive heat rejection",
+        "after": "apply a radiative cooling coating to the outer surface of the evaporative cooler to enhance passive heat rejection and reduce evaporative loss"
+       },
+       "mechanism_source_span": {
+        "before": "radiative cooling coating that enhances heat dissipation to the cold of space through thermal radiation",
+        "after": "Study of a passive radiative cooling coating on chemical storage tanks for evaporative loss control"
+       }
+      },
+      "inherited_negatives": {
+       "uncertainty_ids": [
+        "con:verify:5fc42398",
+        "con:verify:fc690a03",
+        "cooling passive evaporative vaccine storage clinics",
+        "cooling passive evaporative vaccine storage clinics",
+        "cooling radiative coating enhances heat dissipation",
+        "cooling radiative coating enhances heat dissipation",
+        "surface cooling evaporative passive radiative coating heat cooler",
+        "surface cooling evaporative passive radiative coating heat cooler",
+        "cooling environment extending duration maintaining coating",
+        "cooling environment extending duration maintaining coating",
+        "heat reduced environment extending duration maintaining",
+        "heat reduced environment extending duration maintaining"
+       ],
+       "collision_family_ids": [],
+       "source_errors": []
+      },
+      "parent_spec_hash": "9d9827d052b94ece81d0bf345fda39cbe552b8fd41078052ada06975a9181b24",
+      "child_spec_hash": null,
+      "reason": "repairs I1_MECHANISM_EVIDENCE_DERIVATION weakness by re-anchoring the mechanism in the actual technical vocabulary from the cited evidence about radiative cooling for evaporative loss control",
+      "applied_at": "2026-09-14T06:31:00+00:00Z"
+     },
+     "re_evaluation": {
+      "collision_mode": "REPLAY_CACHE",
+      "re_evaluated_at": "2026-09-14T06:31:00+00:00Z",
+      "re_adjudication": {
+       "mode": "REPLAY_CACHE",
+       "valid": false,
+       "reason": "NO_CACHED_FAMILIES"
+      },
+      "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+      "re_adjudication_failure": "NO_CACHED_FAMILIES",
+      "i_dimensions": {
+       "I1_MECHANISM_EVIDENCE_DERIVATION": {
+        "score": 0.429,
+        "state": "MEASURED"
+       },
+       "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_SURVIVORS"
+       },
+       "I3_RECOMBINATION_RISK": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_FAMILIES"
+       },
+       "I4_NEW_TECHNICAL_RELATIONSHIP": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+       },
+       "I5_EXPERIMENT_DISCRIMINATION": {
+        "score": 0.667,
+        "state": "MEASURED"
+       }
+      },
+      "i_flags": {
+       "underived_mechanism": false,
+       "recombination_only": false
+      },
+      "i_average": 0.548,
+      "q_dimensions": {
+       "Q1_EVIDENCE_BINDING": {
+        "score": 0.5,
+        "state": "MEASURED"
+       },
+       "Q2_PRIOR_ART_SPECIFICITY": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_PRIOR_ART"
+       },
+       "Q3_PRIOR_ART_RESOLUTION": {
+        "score": 0.0,
+        "state": "MEASURED"
+       },
+       "Q4_EXPERIMENT_DECISIVENESS": {
+        "score": 1.0,
+        "state": "MEASURED"
+       },
+       "Q5_CHAIN_COMPLETENESS": {
+        "score": 1.0,
+        "state": "MEASURED"
+       }
+      },
+      "q_average": 0.625
+     },
+     "decision": {
+      "action": "KEEP",
+      "improved": true,
+      "checks": {
+       "targeted_dimension": "0.368 -> 0.429 (improved)",
+       "negatives_preserved": true,
+       "no_new_structural_flags": true,
+       "no_unknown_conversion_without_new_evidence": true,
+       "text_gap_conversions_recorded": [],
+       "prior_art_position_not_degraded": true
+      },
+      "reasons": [],
+      "decided_at": "2026-09-14T06:31:00+00:00Z"
+     }
+    }
+   ],
+   "mutation_applied": {
+    "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+    "mutation_id": "mut:eb6c0910c926",
+    "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+    "diagnostic_trigger": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "measured_before": 0.368,
+     "basis": "R378 evaluator-contract diagnosis (deterministic)"
+    },
+    "proposal_provenance": {
+     "proposal_id": "prop:b99962134f84",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "490c54019916da79f8a703c5503769788ed02c322ac3f42f229f924e9b80e3de",
+     "output_hash": "b99962134f84a262e5810ccabb6a9b25afa3985a0db71b69cab1cbd60fa843fa",
+     "llm_is_untrusted_proposer": true
+    },
+    "validation": {
+     "valid": true,
+     "stage": "VALIDATION",
+     "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+     "checks": {
+      "mutation_type_matches_diagnosis": true,
+      "span_evidence_exists": "doi:10.1016/j.renene.2023.04.141",
+      "span_verbatim_in_evidence": true,
+      "evidence_support": 0.429,
+      "evidence_support_cleared": 0.429,
+      "constraint_traceable_to_evidence": "the radiative cooling coating must specifically target evaporative loss control in addition to heat rejection"
+     },
+     "reasons": [],
+     "validated_at": "2026-09-14T06:31:00+00:00Z"
+    },
+    "fields_changed": {
+     "mechanism": {
+      "before": "radiative cooling coating that enhances heat dissipation to the cold of space through thermal radiation",
+      "after": "radiative cooling coating for evaporative loss control"
+     },
+     "intervention": {
+      "before": "apply a radiative cooling coating to the outer surface of the evaporative cooler to enhance passive heat rejection",
+      "after": "apply a radiative cooling coating to the outer surface of the evaporative cooler to enhance passive heat rejection and reduce evaporative loss"
+     },
+     "mechanism_source_span": {
+      "before": "radiative cooling coating that enhances heat dissipation to the cold of space through thermal radiation",
+      "after": "Study of a passive radiative cooling coating on chemical storage tanks for evaporative loss control"
+     }
+    },
+    "inherited_negatives": {
+     "uncertainty_ids": [
+      "con:verify:5fc42398",
+      "con:verify:fc690a03",
+      "cooling passive evaporative vaccine storage clinics",
+      "cooling passive evaporative vaccine storage clinics",
+      "cooling radiative coating enhances heat dissipation",
+      "cooling radiative coating enhances heat dissipation",
+      "surface cooling evaporative passive radiative coating heat cooler",
+      "surface cooling evaporative passive radiative coating heat cooler",
+      "cooling environment extending duration maintaining coating",
+      "cooling environment extending duration maintaining coating",
+      "heat reduced environment extending duration maintaining",
+      "heat reduced environment extending duration maintaining"
+     ],
+     "collision_family_ids": [],
+     "source_errors": []
+    },
+    "parent_spec_hash": "9d9827d052b94ece81d0bf345fda39cbe552b8fd41078052ada06975a9181b24",
+    "child_spec_hash": null,
+    "reason": "repairs I1_MECHANISM_EVIDENCE_DERIVATION weakness by re-anchoring the mechanism in the actual technical vocabulary from the cited evidence about radiative cooling for evaporative loss control",
+    "applied_at": "2026-09-14T06:31:00+00:00Z"
+   },
+   "re_evaluation": {
+    "collision_mode": "REPLAY_CACHE",
+    "re_evaluated_at": "2026-09-14T06:31:00+00:00Z",
+    "re_adjudication": {
+     "mode": "REPLAY_CACHE",
+     "valid": false,
+     "reason": "NO_CACHED_FAMILIES"
+    },
+    "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+    "re_adjudication_failure": "NO_CACHED_FAMILIES",
+    "i_dimensions": {
+     "I1_MECHANISM_EVIDENCE_DERIVATION": {
+      "score": 0.429,
+      "state": "MEASURED"
+     },
+     "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_SURVIVORS"
+     },
+     "I3_RECOMBINATION_RISK": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_FAMILIES"
+     },
+     "I4_NEW_TECHNICAL_RELATIONSHIP": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+     },
+     "I5_EXPERIMENT_DISCRIMINATION": {
+      "score": 0.667,
+      "state": "MEASURED"
+     }
+    },
+    "i_flags": {
+     "underived_mechanism": false,
+     "recombination_only": false
+    },
+    "i_average": 0.548,
+    "q_dimensions": {
+     "Q1_EVIDENCE_BINDING": {
+      "score": 0.5,
+      "state": "MEASURED"
+     },
+     "Q2_PRIOR_ART_SPECIFICITY": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_PRIOR_ART"
+     },
+     "Q3_PRIOR_ART_RESOLUTION": {
+      "score": 0.0,
+      "state": "MEASURED"
+     },
+     "Q4_EXPERIMENT_DECISIVENESS": {
+      "score": 1.0,
+      "state": "MEASURED"
+     },
+     "Q5_CHAIN_COMPLETENESS": {
+      "score": 1.0,
+      "state": "MEASURED"
+     }
+    },
+    "q_average": 0.625
+   },
+   "decision": {
+    "action": "KEEP",
+    "improved": true,
+    "checks": {
+     "targeted_dimension": "0.368 -> 0.429 (improved)",
+     "negatives_preserved": true,
+     "no_new_structural_flags": true,
+     "no_unknown_conversion_without_new_evidence": true,
+     "text_gap_conversions_recorded": [],
+     "prior_art_position_not_degraded": true
+    },
+    "reasons": [],
+    "decided_at": "2026-09-14T06:31:00+00:00Z"
+   }
+  },
+  {
+   "iteration": 2,
+   "diagnosis": {
+    "limiting_features": [
+     {
+      "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "measured_value": 0.429,
+      "weakness_kind": "LOW_SCORE",
+      "why_weak": "measured 0.429 < STRONG floor 0.7",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT"
+     },
+     {
+      "dimension": "I5_EXPERIMENT_DISCRIMINATION",
+      "measured_value": 0.667,
+      "weakness_kind": "LOW_SCORE",
+      "why_weak": "measured 0.667 < STRONG floor 0.7",
+      "mutation_type": "EXPERIMENT_DISCRIMINATION"
+     }
+    ],
+    "evidence_gaps": [
+     {
+      "dimension": "I2_DIFFERENTIATOR_TECHNICAL_MEANING",
+      "state": "UNMEASURABLE_NO_SURVIVORS",
+      "what_is_missing": "no surviving differentiators recorded",
+      "consequence": "no mutation targets this dimension until the gap closes (Art. XXV)"
+     },
+     {
+      "dimension": "I3_RECOMBINATION_RISK",
+      "state": "UNMEASURABLE_NO_FAMILIES",
+      "what_is_missing": "no prior-art families adjudicated — residue vs found art is unmeasured; absence of found art is not novelty",
+      "consequence": "no mutation targets this dimension until the gap closes (Art. XXV)"
+     },
+     {
+      "dimension": "I4_NEW_TECHNICAL_RELATIONSHIP",
+      "state": "UNMEASURABLE_NO_FAMILY_TEXT",
+      "what_is_missing": "no adjudicated family text stored — pair novelty vs found art is unmeasured",
+      "consequence": "no mutation targets this dimension until the gap closes (Art. XXV)"
+     }
+    ],
+    "target": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT"
+    }
+   },
+   "proposals": [
+    {
+     "proposal_id": "prop:ffe3fc02c71b",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "aa9486c0eb4cb6bb01fbb220cecd4659b7b274ea921ecf8257cc0614bc169654",
+     "output_hash": "ffe3fc02c71b51f26de7cd3c6232bdcea75ff3bcadfa527d27806f1c9f18c608",
+     "fields": {
+      "MUTATION_TYPE": "EVIDENCE_DERIVED_CONSTRAINT",
+      "MECHANISM": "passive radiative cooling coating for evaporative loss control",
+      "INTERVENTION": "apply a radiative cooling coating to the outer surface of the evaporative cooler to enhance passive heat rejection and reduce evaporative loss from chemical storage tanks",
+      "EXPECTED_EFFECT": "reduced heat gain and evaporative loss from the environment, extending the cooling duration and maintaining interior temperature below 8°C for longer periods in high humidity conditions",
+      "FALSIFICATION_TEST": "falsification_test_from_candidate",
+      "MECHANISM_SOURCE_SPAN": "Study of a passive radiative cooling coating on chemical storage tanks for evaporative loss control",
+      "SOURCE_EVIDENCE_ID": "doi:10.1016/j.renene.2023.04.141",
+      "EXPERIMENT": "compare the cooling duration of the modified evaporative cooler with radiative cooling coating against a standard evaporative cooler without the coating in 40°C ambient with 80% relative humidity",
+      "EXPERIMENT_BASELINE": "standard evaporative cooler without radiative cooling coating",
+      "EXPERIMENT_EIG": "0.75",
+      "CONSTRAINT_DERIVED": "the radiative cooling coating must be specifically designed for chemical storage tanks to prevent salt clogging in high humidity conditions",
+      "MUTATION_REASON": "repairs I1_MECHANISM_EVIDENCE_DERIVATION weakness by re-anchoring the mechanism's technical vocabulary in the evidence's actual text and deriving a constraint from the evidence span"
+     },
+     "validation": {
+      "valid": true,
+      "stage": "VALIDATION",
+      "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+      "checks": {
+       "mutation_type_matches_diagnosis": true,
+       "span_evidence_exists": "doi:10.1016/j.renene.2023.04.141",
+       "span_verbatim_in_evidence": true,
+       "evidence_support": 0.529,
+       "evidence_support_cleared": 0.529,
+       "constraint_traceable_to_evidence": "the radiative cooling coating must be specifically designed for chemical storage tanks to prevent salt clogging in high "
+      },
+      "reasons": [],
+      "validated_at": "2026-09-14T06:31:05+00:00Z"
+     }
+    }
+   ],
+   "mutation_attempts": [
+    {
+     "mutation_applied": {
+      "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+      "mutation_id": "mut:45a5539cd19a",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+      "diagnostic_trigger": {
+       "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+       "measured_before": 0.429,
+       "basis": "R378 evaluator-contract diagnosis (deterministic)"
+      },
+      "proposal_provenance": {
+       "proposal_id": "prop:ffe3fc02c71b",
+       "provider": "zai",
+       "model": "glm-4-plus",
+       "prompt_hash": "aa9486c0eb4cb6bb01fbb220cecd4659b7b274ea921ecf8257cc0614bc169654",
+       "output_hash": "ffe3fc02c71b51f26de7cd3c6232bdcea75ff3bcadfa527d27806f1c9f18c608",
+       "llm_is_untrusted_proposer": true
+      },
+      "validation": {
+       "valid": true,
+       "stage": "VALIDATION",
+       "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+       "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+       "checks": {
+        "mutation_type_matches_diagnosis": true,
+        "span_evidence_exists": "doi:10.1016/j.renene.2023.04.141",
+        "span_verbatim_in_evidence": true,
+        "evidence_support": 0.529,
+        "evidence_support_cleared": 0.529,
+        "constraint_traceable_to_evidence": "the radiative cooling coating must be specifically designed for chemical storage tanks to prevent salt clogging in high "
+       },
+       "reasons": [],
+       "validated_at": "2026-09-14T06:31:05+00:00Z"
+      },
+      "fields_changed": {
+       "mechanism": {
+        "before": "radiative cooling coating for evaporative loss control",
+        "after": "passive radiative cooling coating for evaporative loss control"
+       },
+       "intervention": {
+        "before": "apply a radiative cooling coating to the outer surface of the evaporative cooler to enhance passive heat rejection and reduce evaporative loss",
+        "after": "apply a radiative cooling coating to the outer surface of the evaporative cooler to enhance passive heat rejection and reduce evaporative loss from chemical storage tanks"
+       },
+       "mechanism_source_span": {
+        "before": "Study of a passive radiative cooling coating on chemical storage tanks for evaporative loss control",
+        "after": "Study of a passive radiative cooling coating on chemical storage tanks for evaporative loss control"
+       }
+      },
+      "inherited_negatives": {
+       "uncertainty_ids": [
+        "con:verify:5fc42398",
+        "con:verify:fc690a03",
+        "cooling passive evaporative vaccine storage clinics",
+        "cooling passive evaporative vaccine storage clinics",
+        "cooling radiative coating enhances heat dissipation",
+        "cooling radiative coating enhances heat dissipation",
+        "surface cooling evaporative passive radiative coating heat cooler",
+        "surface cooling evaporative passive radiative coating heat cooler",
+        "cooling environment extending duration maintaining coating",
+        "cooling environment extending duration maintaining coating",
+        "heat reduced environment extending duration maintaining",
+        "heat reduced environment extending duration maintaining"
+       ],
+       "collision_family_ids": [],
+       "source_errors": []
+      },
+      "parent_spec_hash": "e2ae35717723e35f2d4e6154bcca6c85e38c62e0ab19481a627bb062ce0aa79f",
+      "child_spec_hash": null,
+      "reason": "repairs I1_MECHANISM_EVIDENCE_DERIVATION weakness by re-anchoring the mechanism's technical vocabulary in the evidence's actual text and deriving a constraint from the evidence span",
+      "applied_at": "2026-09-14T06:31:05+00:00Z"
+     },
+     "re_evaluation": {
+      "collision_mode": "REPLAY_CACHE",
+      "re_evaluated_at": "2026-09-14T06:31:05+00:00Z",
+      "re_adjudication": {
+       "mode": "REPLAY_CACHE",
+       "valid": false,
+       "reason": "NO_CACHED_FAMILIES"
+      },
+      "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+      "re_adjudication_failure": "NO_CACHED_FAMILIES",
+      "i_dimensions": {
+       "I1_MECHANISM_EVIDENCE_DERIVATION": {
+        "score": 0.529,
+        "state": "MEASURED"
+       },
+       "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_SURVIVORS"
+       },
+       "I3_RECOMBINATION_RISK": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_FAMILIES"
+       },
+       "I4_NEW_TECHNICAL_RELATIONSHIP": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+       },
+       "I5_EXPERIMENT_DISCRIMINATION": {
+        "score": 0.667,
+        "state": "MEASURED"
+       }
+      },
+      "i_flags": {
+       "underived_mechanism": false,
+       "recombination_only": false
+      },
+      "i_average": 0.598,
+      "q_dimensions": {
+       "Q1_EVIDENCE_BINDING": {
+        "score": 0.5,
+        "state": "MEASURED"
+       },
+       "Q2_PRIOR_ART_SPECIFICITY": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_PRIOR_ART"
+       },
+       "Q3_PRIOR_ART_RESOLUTION": {
+        "score": 0.0,
+        "state": "MEASURED"
+       },
+       "Q4_EXPERIMENT_DECISIVENESS": {
+        "score": 1.0,
+        "state": "MEASURED"
+       },
+       "Q5_CHAIN_COMPLETENESS": {
+        "score": 1.0,
+        "state": "MEASURED"
+       }
+      },
+      "q_average": 0.625
+     },
+     "decision": {
+      "action": "KEEP",
+      "improved": true,
+      "checks": {
+       "targeted_dimension": "0.429 -> 0.529 (improved)",
+       "negatives_preserved": true,
+       "no_new_structural_flags": true,
+       "no_unknown_conversion_without_new_evidence": true,
+       "text_gap_conversions_recorded": [],
+       "prior_art_position_not_degraded": true
+      },
+      "reasons": [],
+      "decided_at": "2026-09-14T06:31:05+00:00Z"
+     }
+    }
+   ],
+   "mutation_applied": {
+    "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+    "mutation_id": "mut:45a5539cd19a",
+    "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+    "diagnostic_trigger": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "measured_before": 0.429,
+     "basis": "R378 evaluator-contract diagnosis (deterministic)"
+    },
+    "proposal_provenance": {
+     "proposal_id": "prop:ffe3fc02c71b",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "aa9486c0eb4cb6bb01fbb220cecd4659b7b274ea921ecf8257cc0614bc169654",
+     "output_hash": "ffe3fc02c71b51f26de7cd3c6232bdcea75ff3bcadfa527d27806f1c9f18c608",
+     "llm_is_untrusted_proposer": true
+    },
+    "validation": {
+     "valid": true,
+     "stage": "VALIDATION",
+     "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+     "checks": {
+      "mutation_type_matches_diagnosis": true,
+      "span_evidence_exists": "doi:10.1016/j.renene.2023.04.141",
+      "span_verbatim_in_evidence": true,
+      "evidence_support": 0.529,
+      "evidence_support_cleared": 0.529,
+      "constraint_traceable_to_evidence": "the radiative cooling coating must be specifically designed for chemical storage tanks to prevent salt clogging in high "
+     },
+     "reasons": [],
+     "validated_at": "2026-09-14T06:31:05+00:00Z"
+    },
+    "fields_changed": {
+     "mechanism": {
+      "before": "radiative cooling coating for evaporative loss control",
+      "after": "passive radiative cooling coating for evaporative loss control"
+     },
+     "intervention": {
+      "before": "apply a radiative cooling coating to the outer surface of the evaporative cooler to enhance passive heat rejection and reduce evaporative loss",
+      "after": "apply a radiative cooling coating to the outer surface of the evaporative cooler to enhance passive heat rejection and reduce evaporative loss from chemical storage tanks"
+     },
+     "mechanism_source_span": {
+      "before": "Study of a passive radiative cooling coating on chemical storage tanks for evaporative loss control",
+      "after": "Study of a passive radiative cooling coating on chemical storage tanks for evaporative loss control"
+     }
+    },
+    "inherited_negatives": {
+     "uncertainty_ids": [
+      "con:verify:5fc42398",
+      "con:verify:fc690a03",
+      "cooling passive evaporative vaccine storage clinics",
+      "cooling passive evaporative vaccine storage clinics",
+      "cooling radiative coating enhances heat dissipation",
+      "cooling radiative coating enhances heat dissipation",
+      "surface cooling evaporative passive radiative coating heat cooler",
+      "surface cooling evaporative passive radiative coating heat cooler",
+      "cooling environment extending duration maintaining coating",
+      "cooling environment extending duration maintaining coating",
+      "heat reduced environment extending duration maintaining",
+      "heat reduced environment extending duration maintaining"
+     ],
+     "collision_family_ids": [],
+     "source_errors": []
+    },
+    "parent_spec_hash": "e2ae35717723e35f2d4e6154bcca6c85e38c62e0ab19481a627bb062ce0aa79f",
+    "child_spec_hash": null,
+    "reason": "repairs I1_MECHANISM_EVIDENCE_DERIVATION weakness by re-anchoring the mechanism's technical vocabulary in the evidence's actual text and deriving a constraint from the evidence span",
+    "applied_at": "2026-09-14T06:31:05+00:00Z"
+   },
+   "re_evaluation": {
+    "collision_mode": "REPLAY_CACHE",
+    "re_evaluated_at": "2026-09-14T06:31:05+00:00Z",
+    "re_adjudication": {
+     "mode": "REPLAY_CACHE",
+     "valid": false,
+     "reason": "NO_CACHED_FAMILIES"
+    },
+    "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+    "re_adjudication_failure": "NO_CACHED_FAMILIES",
+    "i_dimensions": {
+     "I1_MECHANISM_EVIDENCE_DERIVATION": {
+      "score": 0.529,
+      "state": "MEASURED"
+     },
+     "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_SURVIVORS"
+     },
+     "I3_RECOMBINATION_RISK": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_FAMILIES"
+     },
+     "I4_NEW_TECHNICAL_RELATIONSHIP": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+     },
+     "I5_EXPERIMENT_DISCRIMINATION": {
+      "score": 0.667,
+      "state": "MEASURED"
+     }
+    },
+    "i_flags": {
+     "underived_mechanism": false,
+     "recombination_only": false
+    },
+    "i_average": 0.598,
+    "q_dimensions": {
+     "Q1_EVIDENCE_BINDING": {
+      "score": 0.5,
+      "state": "MEASURED"
+     },
+     "Q2_PRIOR_ART_SPECIFICITY": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_PRIOR_ART"
+     },
+     "Q3_PRIOR_ART_RESOLUTION": {
+      "score": 0.0,
+      "state": "MEASURED"
+     },
+     "Q4_EXPERIMENT_DECISIVENESS": {
+      "score": 1.0,
+      "state": "MEASURED"
+     },
+     "Q5_CHAIN_COMPLETENESS": {
+      "score": 1.0,
+      "state": "MEASURED"
+     }
+    },
+    "q_average": 0.625
+   },
+   "decision": {
+    "action": "KEEP",
+    "improved": true,
+    "checks": {
+     "targeted_dimension": "0.429 -> 0.529 (improved)",
+     "negatives_preserved": true,
+     "no_new_structural_flags": true,
+     "no_unknown_conversion_without_new_evidence": true,
+     "text_gap_conversions_recorded": [],
+     "prior_art_position_not_degraded": true
+    },
+    "reasons": [],
+    "decided_at": "2026-09-14T06:31:05+00:00Z"
+   }
+  }
+ ],
+ "outcome": "IMPROVED",
+ "outcome_reason": "",
+ "baseline": {
+  "i_dimensions": {
+   "I1_MECHANISM_EVIDENCE_DERIVATION": {
+    "score": 0.368,
+    "state": "MEASURED"
+   },
+   "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_SURVIVORS"
+   },
+   "I3_RECOMBINATION_RISK": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_FAMILIES"
+   },
+   "I4_NEW_TECHNICAL_RELATIONSHIP": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+   },
+   "I5_EXPERIMENT_DISCRIMINATION": {
+    "score": 0.667,
+    "state": "MEASURED"
+   }
+  },
+  "i_flags": {
+   "underived_mechanism": false,
+   "recombination_only": false
+  },
+  "i_average": 0.518,
+  "q_dimensions": {
+   "Q1_EVIDENCE_BINDING": {
+    "score": 0.5,
+    "state": "MEASURED"
+   },
+   "Q2_PRIOR_ART_SPECIFICITY": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_PRIOR_ART"
+   },
+   "Q3_PRIOR_ART_RESOLUTION": {
+    "score": 0.0,
+    "state": "MEASURED"
+   },
+   "Q4_EXPERIMENT_DECISIVENESS": {
+    "score": 1.0,
+    "state": "MEASURED"
+   },
+   "Q5_CHAIN_COMPLETENESS": {
+    "score": 1.0,
+    "state": "MEASURED"
+   }
+  },
+  "q_average": 0.625,
+  "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE"
+ },
+ "final": {
+  "i_dimensions": {
+   "I1_MECHANISM_EVIDENCE_DERIVATION": {
+    "score": 0.529,
+    "state": "MEASURED"
+   },
+   "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_SURVIVORS"
+   },
+   "I3_RECOMBINATION_RISK": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_FAMILIES"
+   },
+   "I4_NEW_TECHNICAL_RELATIONSHIP": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+   },
+   "I5_EXPERIMENT_DISCRIMINATION": {
+    "score": 0.667,
+    "state": "MEASURED"
+   }
+  },
+  "i_flags": {
+   "underived_mechanism": false,
+   "recombination_only": false
+  },
+  "i_average": 0.598,
+  "q_dimensions": {
+   "Q1_EVIDENCE_BINDING": {
+    "score": 0.5,
+    "state": "MEASURED"
+   },
+   "Q2_PRIOR_ART_SPECIFICITY": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_PRIOR_ART"
+   },
+   "Q3_PRIOR_ART_RESOLUTION": {
+    "score": 0.0,
+    "state": "MEASURED"
+   },
+   "Q4_EXPERIMENT_DECISIVENESS": {
+    "score": 1.0,
+    "state": "MEASURED"
+   },
+   "Q5_CHAIN_COMPLETENESS": {
+    "score": 1.0,
+    "state": "MEASURED"
+   }
+  },
+  "q_average": 0.625,
+  "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE"
+ },
+ "finished_at": "2026-09-14T06:31:05+00:00Z",
+ "outcome_summary": {
+  "baseline_i_average": 0.518,
+  "final_i_average": 0.598,
+  "baseline_q_average": 0.625,
+  "final_q_average": 0.625,
+  "iterations_run": 2,
+  "keeps": 2
+ },
+ "status": "IMPROVED"
+}

@@ -1,0 +1,56 @@
+{
+ "stage": "INDEPENDENT_ATTACK",
+ "candidate_id": "cand:DIV:mechanism_inversion:zai:9375537fda1c",
+ "escalation": {
+  "gate_version": "attacker_calibration/1.0.0",
+  "instrument": "independent_attack/1.0.0",
+  "calibration_state": "NOT_CALIBRATED",
+  "terminal_kill_admissible": false,
+  "measured": {
+   "coverage": 1.0,
+   "parse_completeness": 1.0,
+   "tpr_scoped": 1.0,
+   "fpr_known_good": 1.0,
+   "n_cases_attacked": 40
+  },
+  "sealed_thresholds": {
+   "note": "registered BEFORE measurement; never tuned to results (Art. XXVII)",
+   "coverage_min": 0.875,
+   "parse_completeness_min": 0.875,
+   "tpr_min": 0.75,
+   "fpr_max": 0.3,
+   "ensemble": "NONE (single-attacker calibration only; majority-vote ensembles are deferred by the R412 directive)"
+  },
+  "measurement_path": "R412/CALIBRATION/engine_independent_attack_measurement.json",
+  "measurement_sha256": "4e1718e7088564333b5e1ef9be47ca452133d051001628cd6eed91f44e60ef5f",
+  "reason": "measured FPR 1.0 > sealed bar 0.3 (Art. L: the attacker is measured non-selective; its KILL is inadmissible as a terminal verdict and is escalated with the objection preserved)",
+  "rule": "the instrument's KILL is measured non-selective (FPR above the sealed bar); the objection is preserved verbatim and ESCALATED for adjudication — the candidate is NOT killed by this attack alone (Art. L); the deterministic gates are unchanged",
+  "reviewer_provenance": "AI_REVIEW (Art. LXVII)"
+ },
+ "preserved_objections": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "basis": "The proposed pressure-balanced occlusion mechanism contradicts the fundamental operating principle of peristaltic pumps, which rely on precise localized occlusion to create the positive displacement necessary for accurate dosing. Distributing force across multiple points would eliminate the necessary pressure differential, rendering the pump incapable of maintaining consistent flow rates as evidenced by the basic peristaltic pump principles in doi:10.1016/s0262-1762(03)00715-6."
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "basis": "The candidate fails to address the critical boundary condition of compact pump head design required for benchtop analyzers. The proposed multi-point force distribution mechanism would necessarily increase the physical size of the pump head beyond practical limits for benchtop applications, violating the essential space constraints that define the problem space."
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "basis": "The candidate references evidence about contrast medium administration in CT (doi:10.1186/s13244-024-01750-4) which specifically addresses high-pressure injection systems, completely irrelevant to low-pressure peristaltic dosing in water quality analysis. This evidence mismatch demonstrates a fundamental misunderstanding of the application context and fluid dynamics involved."
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "basis": "The proposed solution fails to demonstrate any advantage over the baseline beyond the claimed tubing rupture prevention. The candidate provides no evidence that the pressure-balanced mechanism would maintain the dosing accuracy that is the primary function of the pump, suggesting it would likely perform worse than the baseline in its core function while only marginally improving the failure mode."
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "basis": "The proposed modification requires embedding pressure sensors along the tubing, which is technically impossible in the existing compact peristaltic pump design without completely redesigning the pump housing and tubing path. This would necessitate a complete re-architecture rather than a simple modification, making the proposed implementation approach infeasible."
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "basis": "The testable prediction fails to specify critical measurement parameters including sensor placement locations, sampling frequency, or pressure thresholds for determining \"force concentration patterns.\" Without these specifications, the measurement methodology is ambiguous and would yield inconclusive results about whether the modified design actually reduces stress concentrations."
+  }
+ ]
+}

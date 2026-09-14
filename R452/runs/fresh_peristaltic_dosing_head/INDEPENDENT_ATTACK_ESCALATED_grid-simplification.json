@@ -1,0 +1,56 @@
+{
+ "stage": "INDEPENDENT_ATTACK",
+ "candidate_id": "cand:DIV:simplification:zai:fdfcd31ec134",
+ "escalation": {
+  "gate_version": "attacker_calibration/1.0.0",
+  "instrument": "independent_attack/1.0.0",
+  "calibration_state": "NOT_CALIBRATED",
+  "terminal_kill_admissible": false,
+  "measured": {
+   "coverage": 1.0,
+   "parse_completeness": 1.0,
+   "tpr_scoped": 1.0,
+   "fpr_known_good": 1.0,
+   "n_cases_attacked": 40
+  },
+  "sealed_thresholds": {
+   "note": "registered BEFORE measurement; never tuned to results (Art. XXVII)",
+   "coverage_min": 0.875,
+   "parse_completeness_min": 0.875,
+   "tpr_min": 0.75,
+   "fpr_max": 0.3,
+   "ensemble": "NONE (single-attacker calibration only; majority-vote ensembles are deferred by the R412 directive)"
+  },
+  "measurement_path": "R412/CALIBRATION/engine_independent_attack_measurement.json",
+  "measurement_sha256": "4e1718e7088564333b5e1ef9be47ca452133d051001628cd6eed91f44e60ef5f",
+  "reason": "measured FPR 1.0 > sealed bar 0.3 (Art. L: the attacker is measured non-selective; its KILL is inadmissible as a terminal verdict and is escalated with the objection preserved)",
+  "rule": "the instrument's KILL is measured non-selective (FPR above the sealed bar); the objection is preserved verbatim and ESCALATED for adjudication — the candidate is NOT killed by this attack alone (Art. L); the deterministic gates are unchanged",
+  "reviewer_provenance": "AI_REVIEW (Art. LXVII)"
+ },
+ "preserved_objections": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "basis": "The candidate fails to address the fundamental physics of peristaltic pump occlusion, where force concentration is inherent to the design. The proposed pressure transducers and volumetric measurement cannot dynamically adjust occlusion force across multiple tube lines simultaneously without compromising the peristaltic action itself, as evidenced by the referenced paper on compact pump design for small dosing measurements."
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "basis": "The candidate completely neglects boundary conditions of real-world implementation: temperature variations affecting tubing elasticity, chemical compatibility with different fluids, and the constrained space of a benchtop analyzer. These factors would make the proposed dynamic adjustment system unreliable in actual operating conditions."
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "basis": "The candidate references evidence about CT contrast medium administration and tap water applications, neither of which addresses the specific failure mode of tubing fatigue in compact dosing pumps. The cited peristaltic pump optimization paper actually shows that force distribution is fundamentally limited by mechanical constraints, contradicting the candidate's core assumption."
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "basis": "The candidate provides no evidence that the proposed solution would maintain dosing accuracy while extending tubing life. The testable prediction compares tubing service life but fails to establish that dosing accuracy would be preserved, making the solution potentially worse if the dynamic adjustment introduces new sources of error."
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "basis": "Integrating pressure transducers and volumetric measurement into the pump head would require significant miniaturization beyond current manufacturing capabilities, increasing cost and complexity while reducing reliability. The compact nature of benchtop equipment makes this implementation physically impossible without redesigning the entire analyzer platform."
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "basis": "The candidate proposes monitoring pressure and volume but fails to specify how these measurements would translate to force adjustment across multiple tube lines. The relationship between measured parameters and occlusion force is non-linear and varies with tubing material, age, and temperature, making the proposed control system fundamentally ambiguous."
+  }
+ ]
+}

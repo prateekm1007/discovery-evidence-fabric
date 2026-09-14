@@ -1,0 +1,897 @@
+{
+ "ledger": "IMPROVEMENT_LEDGER (R378 TECHNICAL IMPROVEMENT ENGINE)",
+ "version": "1.0.0",
+ "loop": "CANDIDATE -> DIAGNOSE WEAKNESS -> IDENTIFY LIMITING FEATURE -> GENERATE CONTROLLED MUTATION -> RE-EVALUATE EVIDENCE/MECHANISM/PRIOR ART -> RE-SCORE -> KEEP OR KILL -> REPEAT",
+ "collision_mode": "REPLAY_CACHE",
+ "live_sources": null,
+ "evaluators_registered": [
+  {
+   "evaluator_id": "term_rule_v1",
+   "fidelity_tier": "TERM_RULE",
+   "evidence_rank": 3
+  }
+ ],
+ "q_instrument": "discovery_fabric/benchmark/candidate_quality.py (FROZEN, hash-pinned, imported read-only)",
+ "i_instrument": "discovery_fabric/benchmark/invention_quality.py (R377, imported read-only)",
+ "thresholds": {
+  "SPAN_DERIVATION_MIN": {
+   "value": 0.2,
+   "epistemic_class": "ENGINEERING",
+   "justification": "the engine's own span-derivation rule (candidate_diversity.span_derivation_check): ratio < 0.20 = SPAN_UNDERIVED. A MECHANISM_STRENGTHENING mutation must CLEAR this floor — the same rule that gates the grid, not a new one."
+  },
+  "EVIDENCE_SUPPORT_MIN": {
+   "value": 0.2,
+   "epistemic_class": "ENGINEERING",
+   "justification": "I1's underived flag fires below 0.20; an EVIDENCE_DERIVED_CONSTRAINT mutation must clear the same floor on evidence_support."
+  },
+  "DOMAIN_OVERLAP_MIN": {
+   "value": 1,
+   "epistemic_class": "ENGINEERING",
+   "justification": "REPLAY_CACHE re-adjudication is valid only while the mutated candidate stays in the domain the cached art was found FOR. Guard: >= 1 NON-generic technical term shared between the child's mechanism+intervention and the cached family corpus. ZERO overlap means the mutation abandoned the domain (measured attack: re-adjudicating a cement-curing intervention against battery art fabricates surviving differentiators — false novelty from stale art). The overlap count is RECORDED on every cache adjudication so thin-domain links are auditable. NOTE: entity-term retention vs the problem CANNOT catch this class — entity terms are problem-derived and unchanged by mutations (measured while writing the guard's tests); it is recorded for audit only."
+  },
+  "MAX_ITERATIONS_DEFAULT": {
+   "value": 2,
+   "epistemic_class": "ENGINEERING",
+   "justification": "the CEO minimum loop is DIAGNOSE -> IMPROVE -> RE-EVALUATE -> IMPROVE AGAIN; two iterations demonstrate repeatability at bounded cost"
+  },
+  "MAX_PROPOSALS_PER_ITERATION": {
+   "value": 3,
+   "epistemic_class": "ENGINEERING",
+   "justification": "bounded proposal budget: three attempts, then the honest no-defensible-mutation verdict"
+  }
+ },
+ "started_at": "2026-09-14T06:11:19+00:00Z",
+ "iterations": [
+  {
+   "iteration": 1,
+   "diagnosis": {
+    "limiting_features": [
+     {
+      "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "measured_value": 0.14,
+      "weakness_kind": "UNDERIVED",
+      "why_weak": "measured 0.14 < STRONG floor 0.7; underived_flag set (span_support=1.0, evidence_support=0.14) — the quoted span and/or evidence does not contain the mechanism's vocabulary",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT"
+     },
+     {
+      "dimension": "I5_EXPERIMENT_DISCRIMINATION",
+      "measured_value": 0.667,
+      "weakness_kind": "LOW_SCORE",
+      "why_weak": "measured 0.667 < STRONG floor 0.7",
+      "mutation_type": "EXPERIMENT_DISCRIMINATION"
+     }
+    ],
+    "evidence_gaps": [
+     {
+      "dimension": "I2_DIFFERENTIATOR_TECHNICAL_MEANING",
+      "state": "UNMEASURABLE_NO_SURVIVORS",
+      "what_is_missing": "no surviving differentiators recorded",
+      "consequence": "no mutation targets this dimension until the gap closes (Art. XXV)"
+     },
+     {
+      "dimension": "I3_RECOMBINATION_RISK",
+      "state": "UNMEASURABLE_NO_FAMILIES",
+      "what_is_missing": "no prior-art families adjudicated — residue vs found art is unmeasured; absence of found art is not novelty",
+      "consequence": "no mutation targets this dimension until the gap closes (Art. XXV)"
+     },
+     {
+      "dimension": "I4_NEW_TECHNICAL_RELATIONSHIP",
+      "state": "UNMEASURABLE_NO_FAMILY_TEXT",
+      "what_is_missing": "no adjudicated family text stored — pair novelty vs found art is unmeasured",
+      "consequence": "no mutation targets this dimension until the gap closes (Art. XXV)"
+     }
+    ],
+    "target": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT"
+    }
+   },
+   "proposals": [
+    {
+     "proposal_id": "prop:55268d971e40",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "bb13d00da54d35e60dd3cf91d9a74b728fd416d381823eea58c66b02c69235e6",
+     "output_hash": "55268d971e4083d55e30272f8c0b23e767e4f0ee6d13656db46f67222f77ddc8",
+     "fields": {
+      "MUTATION_TYPE": "EVIDENCE_DERIVED_CONSTRAINT",
+      "MECHANISM": "Engineering benchtop equipment such as Coriolis flow meters, pressure transducers, and volumetric measurement devices are combined with small, targeted systematic evaluations querying operators, equipment, and the physics and fluid dynamics that make a seemingly simple task of injecting fluid into a patient a complex and non-linear endeavor",
+      "INTERVENTION": "Integrate a miniaturized pressure transducer and flow monitoring system within the pump head to continuously monitor and adjust the occlusion force distribution across all tube lines, dynamically redistributing pressure to prevent localized fatigue",
+      "EXPECTED_EFFECT": "More even distribution of occlusion forces across all tube lines, eliminating single-point fatigue and extending tubing service life beyond 500 hours while maintaining 0.5 mL/min flow with better than 2% dosing accuracy",
+      "FALSIFICATION_TEST": "falsification_test_from_candidate",
+      "MECHANISM_SOURCE_SPAN": "Engineering benchtop equipment such as Coriolis flow meters, pressure transducers, and volumetric measurement devices are combined with small, targeted systematic evaluations querying operators, equipment, and the physics and fluid dynamics that make a seemingly simple task of injecting fluid into a patient a complex and non-linear endeavor",
+      "SOURCE_EVIDENCE_ID": "doi:10.1186/s13244-024-01750-4",
+      "EXPERIMENT": "Compare the modified peristaltic pump head with integrated pressure monitoring against a standard pump head without pressure monitoring to measure tubing service life and dosing accuracy over 500 hours of operation",
+      "EXPERIMENT_BASELINE": "standard pump head without pressure monitoring",
+      "EXPERIMENT_EIG": "0.85",
+      "CONSTRAINT_DERIVED": "The mechanism must directly reference the use of engineering benchtop equipment including Coriolis flow meters, pressure transducers, and volumetric measurement devices combined with systematic evaluations of operators, equipment, and fluid dynamics",
+      "MUTATION_REASON": "Repairs the underived mechanism vocabulary by anchoring it directly to the evidence text, ensuring technical terms match exactly"
+     },
+     "validation": {
+      "valid": true,
+      "stage": "VALIDATION",
+      "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+      "checks": {
+       "mutation_type_matches_diagnosis": true,
+       "span_evidence_exists": "doi:10.1186/s13244-024-01750-4",
+       "span_verbatim_in_evidence": true,
+       "evidence_support": 0.64,
+       "evidence_support_cleared": 0.64,
+       "constraint_traceable_to_evidence": "The mechanism must directly reference the use of engineering benchtop equipment including Coriolis flow meters, pressure"
+      },
+      "reasons": [],
+      "validated_at": "2026-09-14T06:11:45+00:00Z"
+     }
+    }
+   ],
+   "mutation_attempts": [
+    {
+     "mutation_applied": {
+      "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+      "mutation_id": "mut:731d9eeb0171",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+      "diagnostic_trigger": {
+       "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+       "measured_before": 0.14,
+       "basis": "R378 evaluator-contract diagnosis (deterministic)"
+      },
+      "proposal_provenance": {
+       "proposal_id": "prop:55268d971e40",
+       "provider": "zai",
+       "model": "glm-4-plus",
+       "prompt_hash": "bb13d00da54d35e60dd3cf91d9a74b728fd416d381823eea58c66b02c69235e6",
+       "output_hash": "55268d971e4083d55e30272f8c0b23e767e4f0ee6d13656db46f67222f77ddc8",
+       "llm_is_untrusted_proposer": true
+      },
+      "validation": {
+       "valid": true,
+       "stage": "VALIDATION",
+       "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+       "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+       "checks": {
+        "mutation_type_matches_diagnosis": true,
+        "span_evidence_exists": "doi:10.1186/s13244-024-01750-4",
+        "span_verbatim_in_evidence": true,
+        "evidence_support": 0.64,
+        "evidence_support_cleared": 0.64,
+        "constraint_traceable_to_evidence": "The mechanism must directly reference the use of engineering benchtop equipment including Coriolis flow meters, pressure"
+       },
+       "reasons": [],
+       "validated_at": "2026-09-14T06:11:45+00:00Z"
+      },
+      "fields_changed": {
+       "mechanism": {
+        "before": "Engineering benchtop equipment such as Coriolis flow meters, pressure transducers, and volumetric measurement devices are combined with small, targeted systematic evaluations querying operators, equipment, and the physics and fluid dynamics that make a seemingly simple task of injecting fluid into a",
+        "after": "Engineering benchtop equipment such as Coriolis flow meters, pressure transducers, and volumetric measurement devices are combined with small, targeted systematic evaluations querying operators, equipment, and the physics and fluid dynamics that make a seemingly simple task of injecting fluid into a"
+       },
+       "intervention": {
+        "before": "Integrate a miniaturized pressure transducer and flow monitoring system within the pump head to continuously monitor and adjust the occlusion force distribution across all tube lines, dynamically redistributing pressure to prevent localized fatigue",
+        "after": "Integrate a miniaturized pressure transducer and flow monitoring system within the pump head to continuously monitor and adjust the occlusion force distribution across all tube lines, dynamically redistributing pressure to prevent localized fatigue"
+       },
+       "mechanism_source_span": {
+        "before": "Engineering benchtop equipment such as Coriolis flow meters, pressure transducers, and volumetric measurement devices are combined with small, targeted systematic evaluations querying operators, equipment, and the physics and fluid dynamics that make a seemingly simple task of injecting fluid into a",
+        "after": "Engineering benchtop equipment such as Coriolis flow meters, pressure transducers, and volumetric measurement devices are combined with small, targeted systematic evaluations querying operators, equipment, and the physics and fluid dynamics that make a seemingly simple task of injecting fluid into a"
+       }
+      },
+      "inherited_negatives": {
+       "uncertainty_ids": [
+        "con:attack:weak_transfer",
+        "benchtop compact peristaltic dosing quality analyzer",
+        "benchtop compact peristaltic dosing quality analyzer",
+        "benchtop engineering equipment coriolis flow pressure",
+        "benchtop engineering equipment coriolis flow pressure",
+        "integrate pressure transducer flow pump head occlusion fatigue",
+        "integrate pressure transducer flow pump head occlusion fatigue",
+        "benchtop monitoring adjustment prevention distribution occlusion",
+        "benchtop monitoring adjustment prevention distribution occlusion",
+        "flow distribution eliminating extending service maintaining",
+        "flow distribution eliminating extending service maintaining"
+       ],
+       "collision_family_ids": [],
+       "source_errors": []
+      },
+      "parent_spec_hash": "9f64af22cd6164fd1d69b18b806e057c269ca02643eabf5ae7bac268b236f55f",
+      "child_spec_hash": null,
+      "reason": "Repairs the underived mechanism vocabulary by anchoring it directly to the evidence text, ensuring technical terms match exactly",
+      "applied_at": "2026-09-14T06:11:45+00:00Z"
+     },
+     "re_evaluation": {
+      "collision_mode": "REPLAY_CACHE",
+      "re_evaluated_at": "2026-09-14T06:11:45+00:00Z",
+      "re_adjudication": {
+       "mode": "REPLAY_CACHE",
+       "valid": false,
+       "reason": "NO_CACHED_FAMILIES"
+      },
+      "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+      "re_adjudication_failure": "NO_CACHED_FAMILIES",
+      "i_dimensions": {
+       "I1_MECHANISM_EVIDENCE_DERIVATION": {
+        "score": 0.68,
+        "state": "MEASURED"
+       },
+       "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_SURVIVORS"
+       },
+       "I3_RECOMBINATION_RISK": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_FAMILIES"
+       },
+       "I4_NEW_TECHNICAL_RELATIONSHIP": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+       },
+       "I5_EXPERIMENT_DISCRIMINATION": {
+        "score": 0.667,
+        "state": "MEASURED"
+       }
+      },
+      "i_flags": {
+       "underived_mechanism": false,
+       "recombination_only": false
+      },
+      "i_average": 0.673,
+      "q_dimensions": {
+       "Q1_EVIDENCE_BINDING": {
+        "score": 0.5,
+        "state": "MEASURED"
+       },
+       "Q2_PRIOR_ART_SPECIFICITY": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_PRIOR_ART"
+       },
+       "Q3_PRIOR_ART_RESOLUTION": {
+        "score": 0.0,
+        "state": "MEASURED"
+       },
+       "Q4_EXPERIMENT_DECISIVENESS": {
+        "score": 1.0,
+        "state": "MEASURED"
+       },
+       "Q5_CHAIN_COMPLETENESS": {
+        "score": 1.0,
+        "state": "MEASURED"
+       }
+      },
+      "q_average": 0.625
+     },
+     "decision": {
+      "action": "KEEP",
+      "improved": true,
+      "checks": {
+       "targeted_dimension": "0.14 -> 0.68 (improved)",
+       "negatives_preserved": true,
+       "no_new_structural_flags": true,
+       "no_unknown_conversion_without_new_evidence": true,
+       "text_gap_conversions_recorded": [],
+       "prior_art_position_not_degraded": true
+      },
+      "reasons": [],
+      "decided_at": "2026-09-14T06:11:45+00:00Z"
+     }
+    }
+   ],
+   "mutation_applied": {
+    "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+    "mutation_id": "mut:731d9eeb0171",
+    "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+    "diagnostic_trigger": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "measured_before": 0.14,
+     "basis": "R378 evaluator-contract diagnosis (deterministic)"
+    },
+    "proposal_provenance": {
+     "proposal_id": "prop:55268d971e40",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "bb13d00da54d35e60dd3cf91d9a74b728fd416d381823eea58c66b02c69235e6",
+     "output_hash": "55268d971e4083d55e30272f8c0b23e767e4f0ee6d13656db46f67222f77ddc8",
+     "llm_is_untrusted_proposer": true
+    },
+    "validation": {
+     "valid": true,
+     "stage": "VALIDATION",
+     "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+     "checks": {
+      "mutation_type_matches_diagnosis": true,
+      "span_evidence_exists": "doi:10.1186/s13244-024-01750-4",
+      "span_verbatim_in_evidence": true,
+      "evidence_support": 0.64,
+      "evidence_support_cleared": 0.64,
+      "constraint_traceable_to_evidence": "The mechanism must directly reference the use of engineering benchtop equipment including Coriolis flow meters, pressure"
+     },
+     "reasons": [],
+     "validated_at": "2026-09-14T06:11:45+00:00Z"
+    },
+    "fields_changed": {
+     "mechanism": {
+      "before": "Engineering benchtop equipment such as Coriolis flow meters, pressure transducers, and volumetric measurement devices are combined with small, targeted systematic evaluations querying operators, equipment, and the physics and fluid dynamics that make a seemingly simple task of injecting fluid into a",
+      "after": "Engineering benchtop equipment such as Coriolis flow meters, pressure transducers, and volumetric measurement devices are combined with small, targeted systematic evaluations querying operators, equipment, and the physics and fluid dynamics that make a seemingly simple task of injecting fluid into a"
+     },
+     "intervention": {
+      "before": "Integrate a miniaturized pressure transducer and flow monitoring system within the pump head to continuously monitor and adjust the occlusion force distribution across all tube lines, dynamically redistributing pressure to prevent localized fatigue",
+      "after": "Integrate a miniaturized pressure transducer and flow monitoring system within the pump head to continuously monitor and adjust the occlusion force distribution across all tube lines, dynamically redistributing pressure to prevent localized fatigue"
+     },
+     "mechanism_source_span": {
+      "before": "Engineering benchtop equipment such as Coriolis flow meters, pressure transducers, and volumetric measurement devices are combined with small, targeted systematic evaluations querying operators, equipment, and the physics and fluid dynamics that make a seemingly simple task of injecting fluid into a",
+      "after": "Engineering benchtop equipment such as Coriolis flow meters, pressure transducers, and volumetric measurement devices are combined with small, targeted systematic evaluations querying operators, equipment, and the physics and fluid dynamics that make a seemingly simple task of injecting fluid into a"
+     }
+    },
+    "inherited_negatives": {
+     "uncertainty_ids": [
+      "con:attack:weak_transfer",
+      "benchtop compact peristaltic dosing quality analyzer",
+      "benchtop compact peristaltic dosing quality analyzer",
+      "benchtop engineering equipment coriolis flow pressure",
+      "benchtop engineering equipment coriolis flow pressure",
+      "integrate pressure transducer flow pump head occlusion fatigue",
+      "integrate pressure transducer flow pump head occlusion fatigue",
+      "benchtop monitoring adjustment prevention distribution occlusion",
+      "benchtop monitoring adjustment prevention distribution occlusion",
+      "flow distribution eliminating extending service maintaining",
+      "flow distribution eliminating extending service maintaining"
+     ],
+     "collision_family_ids": [],
+     "source_errors": []
+    },
+    "parent_spec_hash": "9f64af22cd6164fd1d69b18b806e057c269ca02643eabf5ae7bac268b236f55f",
+    "child_spec_hash": null,
+    "reason": "Repairs the underived mechanism vocabulary by anchoring it directly to the evidence text, ensuring technical terms match exactly",
+    "applied_at": "2026-09-14T06:11:45+00:00Z"
+   },
+   "re_evaluation": {
+    "collision_mode": "REPLAY_CACHE",
+    "re_evaluated_at": "2026-09-14T06:11:45+00:00Z",
+    "re_adjudication": {
+     "mode": "REPLAY_CACHE",
+     "valid": false,
+     "reason": "NO_CACHED_FAMILIES"
+    },
+    "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+    "re_adjudication_failure": "NO_CACHED_FAMILIES",
+    "i_dimensions": {
+     "I1_MECHANISM_EVIDENCE_DERIVATION": {
+      "score": 0.68,
+      "state": "MEASURED"
+     },
+     "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_SURVIVORS"
+     },
+     "I3_RECOMBINATION_RISK": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_FAMILIES"
+     },
+     "I4_NEW_TECHNICAL_RELATIONSHIP": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+     },
+     "I5_EXPERIMENT_DISCRIMINATION": {
+      "score": 0.667,
+      "state": "MEASURED"
+     }
+    },
+    "i_flags": {
+     "underived_mechanism": false,
+     "recombination_only": false
+    },
+    "i_average": 0.673,
+    "q_dimensions": {
+     "Q1_EVIDENCE_BINDING": {
+      "score": 0.5,
+      "state": "MEASURED"
+     },
+     "Q2_PRIOR_ART_SPECIFICITY": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_PRIOR_ART"
+     },
+     "Q3_PRIOR_ART_RESOLUTION": {
+      "score": 0.0,
+      "state": "MEASURED"
+     },
+     "Q4_EXPERIMENT_DECISIVENESS": {
+      "score": 1.0,
+      "state": "MEASURED"
+     },
+     "Q5_CHAIN_COMPLETENESS": {
+      "score": 1.0,
+      "state": "MEASURED"
+     }
+    },
+    "q_average": 0.625
+   },
+   "decision": {
+    "action": "KEEP",
+    "improved": true,
+    "checks": {
+     "targeted_dimension": "0.14 -> 0.68 (improved)",
+     "negatives_preserved": true,
+     "no_new_structural_flags": true,
+     "no_unknown_conversion_without_new_evidence": true,
+     "text_gap_conversions_recorded": [],
+     "prior_art_position_not_degraded": true
+    },
+    "reasons": [],
+    "decided_at": "2026-09-14T06:11:45+00:00Z"
+   }
+  },
+  {
+   "iteration": 2,
+   "diagnosis": {
+    "limiting_features": [
+     {
+      "dimension": "I5_EXPERIMENT_DISCRIMINATION",
+      "measured_value": 0.667,
+      "weakness_kind": "LOW_SCORE",
+      "why_weak": "measured 0.667 < STRONG floor 0.7",
+      "mutation_type": "EXPERIMENT_DISCRIMINATION"
+     },
+     {
+      "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "measured_value": 0.68,
+      "weakness_kind": "LOW_SCORE",
+      "why_weak": "measured 0.68 < STRONG floor 0.7",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT"
+     }
+    ],
+    "evidence_gaps": [
+     {
+      "dimension": "I2_DIFFERENTIATOR_TECHNICAL_MEANING",
+      "state": "UNMEASURABLE_NO_SURVIVORS",
+      "what_is_missing": "no surviving differentiators recorded",
+      "consequence": "no mutation targets this dimension until the gap closes (Art. XXV)"
+     },
+     {
+      "dimension": "I3_RECOMBINATION_RISK",
+      "state": "UNMEASURABLE_NO_FAMILIES",
+      "what_is_missing": "no prior-art families adjudicated — residue vs found art is unmeasured; absence of found art is not novelty",
+      "consequence": "no mutation targets this dimension until the gap closes (Art. XXV)"
+     },
+     {
+      "dimension": "I4_NEW_TECHNICAL_RELATIONSHIP",
+      "state": "UNMEASURABLE_NO_FAMILY_TEXT",
+      "what_is_missing": "no adjudicated family text stored — pair novelty vs found art is unmeasured",
+      "consequence": "no mutation targets this dimension until the gap closes (Art. XXV)"
+     }
+    ],
+    "target": {
+     "dimension": "I5_EXPERIMENT_DISCRIMINATION",
+     "mutation_type": "EXPERIMENT_DISCRIMINATION"
+    }
+   },
+   "proposals": [
+    {
+     "proposal_id": "prop:f425c1452760",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "aeaf13bc2c3e50c71402a03fb779423c2e7ec5964c1d949c3f2aee5100d357b6",
+     "output_hash": "f425c145276087289c7f9e2c009455bcce4c29dadaf544967897a249fa298e04",
+     "fields": {
+      "MUTATION_TYPE": "EXPERIMENT_DISCRIMINATION",
+      "MECHANISM": "Engineering benchtop equipment such as Coriolis flow meters, pressure transducers, and volumetric measurement devices are combined with small, targeted systematic evaluations querying operators, equipment, and the physics and fluid dynamics that make a seemingly simple task of injecting fluid into a patient a complex and non-linear endeavor",
+      "INTERVENTION": "Integrate a miniaturized pressure transducer and flow monitoring system within the pump head to continuously monitor and adjust the occlusion force distribution across all tube lines, dynamically redistributing pressure to prevent localized fatigue",
+      "EXPECTED_EFFECT": "More even distribution of occlusion forces across all tube lines, eliminating single-point fatigue and extending tubing service life beyond 500 hours while maintaining 0.5 mL/min flow with better than 2% dosing accuracy",
+      "FALSIFICATION_TEST": "falsification_test_from_candidate",
+      "MECHANISM_SOURCE_SPAN": "Engineering benchtop equipment such as Coriolis flow meters, pressure transducers, and volumetric measurement devices are combined with small, targeted systematic evaluations querying operators, equipment, and the physics and fluid dynamics that make a seemingly simple task of injecting fluid into a patient a complex and non-linear endeavor",
+      "SOURCE_EVIDENCE_ID": "doi:10.1186/s13244-024-01750-4",
+      "EXPERIMENT": "Compare the candidate pump head against a conventional peristaltic pump head by measuring tubing wall stress distribution across multiple tube lines using strain gauges during 500 hours of continuous operation at 0.5 mL/min flow rate",
+      "EXPERIMENT_BASELINE": "conventional peristaltic pump head",
+      "EXPERIMENT_EIG": "0.85",
+      "CONSTRAINT_DERIVED": "NONE",
+      "MUTATION_REASON": "Repairs I5_EXPERIMENT_DISCRIMINATION weakness by redesigning the experiment to be physical, compare against existing approaches, and provide expected information gain"
+     },
+     "validation": {
+      "valid": true,
+      "stage": "VALIDATION",
+      "target_dimension": "I5_EXPERIMENT_DISCRIMINATION",
+      "mutation_type": "EXPERIMENT_DISCRIMINATION",
+      "checks": {
+       "mutation_type_matches_diagnosis": true,
+       "mutation_changes_candidate": true,
+       "experiment_is_physical": true,
+       "experiment_references_baseline": "conventional peristaltic pump head",
+       "experiment_eig_positive": 0.85
+      },
+      "reasons": [],
+      "validated_at": "2026-09-14T06:11:50+00:00Z"
+     }
+    }
+   ],
+   "mutation_attempts": [
+    {
+     "mutation_applied": {
+      "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+      "mutation_id": "mut:2f142efb0b16",
+      "mutation_type": "EXPERIMENT_DISCRIMINATION",
+      "diagnostic_trigger": {
+       "dimension": "I5_EXPERIMENT_DISCRIMINATION",
+       "measured_before": 0.667,
+       "basis": "R378 evaluator-contract diagnosis (deterministic)"
+      },
+      "proposal_provenance": {
+       "proposal_id": "prop:f425c1452760",
+       "provider": "zai",
+       "model": "glm-4-plus",
+       "prompt_hash": "aeaf13bc2c3e50c71402a03fb779423c2e7ec5964c1d949c3f2aee5100d357b6",
+       "output_hash": "f425c145276087289c7f9e2c009455bcce4c29dadaf544967897a249fa298e04",
+       "llm_is_untrusted_proposer": true
+      },
+      "validation": {
+       "valid": true,
+       "stage": "VALIDATION",
+       "target_dimension": "I5_EXPERIMENT_DISCRIMINATION",
+       "mutation_type": "EXPERIMENT_DISCRIMINATION",
+       "checks": {
+        "mutation_type_matches_diagnosis": true,
+        "mutation_changes_candidate": true,
+        "experiment_is_physical": true,
+        "experiment_references_baseline": "conventional peristaltic pump head",
+        "experiment_eig_positive": 0.85
+       },
+       "reasons": [],
+       "validated_at": "2026-09-14T06:11:50+00:00Z"
+      },
+      "fields_changed": {
+       "decisive_experiment": {
+        "before": "falsification_test_from_candidate",
+        "after": "Compare the candidate pump head against a conventional peristaltic pump head by measuring tubing wall stress distribution across multiple tube lines using strain gauges during 500 hours of continuous operation at 0.5 mL/min flow rate"
+       }
+      },
+      "inherited_negatives": {
+       "uncertainty_ids": [
+        "con:attack:weak_transfer",
+        "benchtop compact peristaltic dosing quality analyzer",
+        "benchtop compact peristaltic dosing quality analyzer",
+        "benchtop engineering equipment coriolis flow pressure",
+        "benchtop engineering equipment coriolis flow pressure",
+        "integrate pressure transducer flow pump head occlusion fatigue",
+        "integrate pressure transducer flow pump head occlusion fatigue",
+        "benchtop monitoring adjustment prevention distribution occlusion",
+        "benchtop monitoring adjustment prevention distribution occlusion",
+        "flow distribution eliminating extending service maintaining",
+        "flow distribution eliminating extending service maintaining"
+       ],
+       "collision_family_ids": [],
+       "source_errors": []
+      },
+      "parent_spec_hash": "4b14194782a82c1e002ee8433da04e72b552fd9fe5cfc5036a885efd2d29ab51",
+      "child_spec_hash": null,
+      "reason": "Repairs I5_EXPERIMENT_DISCRIMINATION weakness by redesigning the experiment to be physical, compare against existing approaches, and provide expected information gain",
+      "applied_at": "2026-09-14T06:11:50+00:00Z"
+     },
+     "re_evaluation": {
+      "collision_mode": "REPLAY_CACHE",
+      "re_evaluated_at": "2026-09-14T06:11:50+00:00Z",
+      "re_adjudication": {
+       "mode": "REPLAY_CACHE",
+       "valid": false,
+       "reason": "NO_CACHED_FAMILIES"
+      },
+      "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+      "re_adjudication_failure": "NO_CACHED_FAMILIES",
+      "i_dimensions": {
+       "I1_MECHANISM_EVIDENCE_DERIVATION": {
+        "score": 0.68,
+        "state": "MEASURED"
+       },
+       "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_SURVIVORS"
+       },
+       "I3_RECOMBINATION_RISK": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_FAMILIES"
+       },
+       "I4_NEW_TECHNICAL_RELATIONSHIP": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+       },
+       "I5_EXPERIMENT_DISCRIMINATION": {
+        "score": 1.0,
+        "state": "MEASURED"
+       }
+      },
+      "i_flags": {
+       "underived_mechanism": false,
+       "recombination_only": false
+      },
+      "i_average": 0.84,
+      "q_dimensions": {
+       "Q1_EVIDENCE_BINDING": {
+        "score": 0.5,
+        "state": "MEASURED"
+       },
+       "Q2_PRIOR_ART_SPECIFICITY": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_PRIOR_ART"
+       },
+       "Q3_PRIOR_ART_RESOLUTION": {
+        "score": 0.0,
+        "state": "MEASURED"
+       },
+       "Q4_EXPERIMENT_DECISIVENESS": {
+        "score": 1.0,
+        "state": "MEASURED"
+       },
+       "Q5_CHAIN_COMPLETENESS": {
+        "score": 1.0,
+        "state": "MEASURED"
+       }
+      },
+      "q_average": 0.625
+     },
+     "decision": {
+      "action": "KEEP",
+      "improved": true,
+      "checks": {
+       "targeted_dimension": "0.667 -> 1.0 (improved)",
+       "negatives_preserved": true,
+       "no_new_structural_flags": true,
+       "no_unknown_conversion_without_new_evidence": true,
+       "text_gap_conversions_recorded": [],
+       "prior_art_position_not_degraded": true
+      },
+      "reasons": [],
+      "decided_at": "2026-09-14T06:11:50+00:00Z"
+     }
+    }
+   ],
+   "mutation_applied": {
+    "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+    "mutation_id": "mut:2f142efb0b16",
+    "mutation_type": "EXPERIMENT_DISCRIMINATION",
+    "diagnostic_trigger": {
+     "dimension": "I5_EXPERIMENT_DISCRIMINATION",
+     "measured_before": 0.667,
+     "basis": "R378 evaluator-contract diagnosis (deterministic)"
+    },
+    "proposal_provenance": {
+     "proposal_id": "prop:f425c1452760",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "aeaf13bc2c3e50c71402a03fb779423c2e7ec5964c1d949c3f2aee5100d357b6",
+     "output_hash": "f425c145276087289c7f9e2c009455bcce4c29dadaf544967897a249fa298e04",
+     "llm_is_untrusted_proposer": true
+    },
+    "validation": {
+     "valid": true,
+     "stage": "VALIDATION",
+     "target_dimension": "I5_EXPERIMENT_DISCRIMINATION",
+     "mutation_type": "EXPERIMENT_DISCRIMINATION",
+     "checks": {
+      "mutation_type_matches_diagnosis": true,
+      "mutation_changes_candidate": true,
+      "experiment_is_physical": true,
+      "experiment_references_baseline": "conventional peristaltic pump head",
+      "experiment_eig_positive": 0.85
+     },
+     "reasons": [],
+     "validated_at": "2026-09-14T06:11:50+00:00Z"
+    },
+    "fields_changed": {
+     "decisive_experiment": {
+      "before": "falsification_test_from_candidate",
+      "after": "Compare the candidate pump head against a conventional peristaltic pump head by measuring tubing wall stress distribution across multiple tube lines using strain gauges during 500 hours of continuous operation at 0.5 mL/min flow rate"
+     }
+    },
+    "inherited_negatives": {
+     "uncertainty_ids": [
+      "con:attack:weak_transfer",
+      "benchtop compact peristaltic dosing quality analyzer",
+      "benchtop compact peristaltic dosing quality analyzer",
+      "benchtop engineering equipment coriolis flow pressure",
+      "benchtop engineering equipment coriolis flow pressure",
+      "integrate pressure transducer flow pump head occlusion fatigue",
+      "integrate pressure transducer flow pump head occlusion fatigue",
+      "benchtop monitoring adjustment prevention distribution occlusion",
+      "benchtop monitoring adjustment prevention distribution occlusion",
+      "flow distribution eliminating extending service maintaining",
+      "flow distribution eliminating extending service maintaining"
+     ],
+     "collision_family_ids": [],
+     "source_errors": []
+    },
+    "parent_spec_hash": "4b14194782a82c1e002ee8433da04e72b552fd9fe5cfc5036a885efd2d29ab51",
+    "child_spec_hash": null,
+    "reason": "Repairs I5_EXPERIMENT_DISCRIMINATION weakness by redesigning the experiment to be physical, compare against existing approaches, and provide expected information gain",
+    "applied_at": "2026-09-14T06:11:50+00:00Z"
+   },
+   "re_evaluation": {
+    "collision_mode": "REPLAY_CACHE",
+    "re_evaluated_at": "2026-09-14T06:11:50+00:00Z",
+    "re_adjudication": {
+     "mode": "REPLAY_CACHE",
+     "valid": false,
+     "reason": "NO_CACHED_FAMILIES"
+    },
+    "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+    "re_adjudication_failure": "NO_CACHED_FAMILIES",
+    "i_dimensions": {
+     "I1_MECHANISM_EVIDENCE_DERIVATION": {
+      "score": 0.68,
+      "state": "MEASURED"
+     },
+     "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_SURVIVORS"
+     },
+     "I3_RECOMBINATION_RISK": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_FAMILIES"
+     },
+     "I4_NEW_TECHNICAL_RELATIONSHIP": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+     },
+     "I5_EXPERIMENT_DISCRIMINATION": {
+      "score": 1.0,
+      "state": "MEASURED"
+     }
+    },
+    "i_flags": {
+     "underived_mechanism": false,
+     "recombination_only": false
+    },
+    "i_average": 0.84,
+    "q_dimensions": {
+     "Q1_EVIDENCE_BINDING": {
+      "score": 0.5,
+      "state": "MEASURED"
+     },
+     "Q2_PRIOR_ART_SPECIFICITY": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_PRIOR_ART"
+     },
+     "Q3_PRIOR_ART_RESOLUTION": {
+      "score": 0.0,
+      "state": "MEASURED"
+     },
+     "Q4_EXPERIMENT_DECISIVENESS": {
+      "score": 1.0,
+      "state": "MEASURED"
+     },
+     "Q5_CHAIN_COMPLETENESS": {
+      "score": 1.0,
+      "state": "MEASURED"
+     }
+    },
+    "q_average": 0.625
+   },
+   "decision": {
+    "action": "KEEP",
+    "improved": true,
+    "checks": {
+     "targeted_dimension": "0.667 -> 1.0 (improved)",
+     "negatives_preserved": true,
+     "no_new_structural_flags": true,
+     "no_unknown_conversion_without_new_evidence": true,
+     "text_gap_conversions_recorded": [],
+     "prior_art_position_not_degraded": true
+    },
+    "reasons": [],
+    "decided_at": "2026-09-14T06:11:50+00:00Z"
+   }
+  }
+ ],
+ "outcome": "IMPROVED",
+ "outcome_reason": "",
+ "baseline": {
+  "i_dimensions": {
+   "I1_MECHANISM_EVIDENCE_DERIVATION": {
+    "score": 0.14,
+    "state": "MEASURED"
+   },
+   "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_SURVIVORS"
+   },
+   "I3_RECOMBINATION_RISK": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_FAMILIES"
+   },
+   "I4_NEW_TECHNICAL_RELATIONSHIP": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+   },
+   "I5_EXPERIMENT_DISCRIMINATION": {
+    "score": 0.667,
+    "state": "MEASURED"
+   }
+  },
+  "i_flags": {
+   "underived_mechanism": true,
+   "recombination_only": false
+  },
+  "i_average": 0.404,
+  "q_dimensions": {
+   "Q1_EVIDENCE_BINDING": {
+    "score": 0.5,
+    "state": "MEASURED"
+   },
+   "Q2_PRIOR_ART_SPECIFICITY": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_PRIOR_ART"
+   },
+   "Q3_PRIOR_ART_RESOLUTION": {
+    "score": 0.0,
+    "state": "MEASURED"
+   },
+   "Q4_EXPERIMENT_DECISIVENESS": {
+    "score": 1.0,
+    "state": "MEASURED"
+   },
+   "Q5_CHAIN_COMPLETENESS": {
+    "score": 1.0,
+    "state": "MEASURED"
+   }
+  },
+  "q_average": 0.625,
+  "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE"
+ },
+ "final": {
+  "i_dimensions": {
+   "I1_MECHANISM_EVIDENCE_DERIVATION": {
+    "score": 0.68,
+    "state": "MEASURED"
+   },
+   "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_SURVIVORS"
+   },
+   "I3_RECOMBINATION_RISK": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_FAMILIES"
+   },
+   "I4_NEW_TECHNICAL_RELATIONSHIP": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+   },
+   "I5_EXPERIMENT_DISCRIMINATION": {
+    "score": 1.0,
+    "state": "MEASURED"
+   }
+  },
+  "i_flags": {
+   "underived_mechanism": false,
+   "recombination_only": false
+  },
+  "i_average": 0.84,
+  "q_dimensions": {
+   "Q1_EVIDENCE_BINDING": {
+    "score": 0.5,
+    "state": "MEASURED"
+   },
+   "Q2_PRIOR_ART_SPECIFICITY": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_PRIOR_ART"
+   },
+   "Q3_PRIOR_ART_RESOLUTION": {
+    "score": 0.0,
+    "state": "MEASURED"
+   },
+   "Q4_EXPERIMENT_DECISIVENESS": {
+    "score": 1.0,
+    "state": "MEASURED"
+   },
+   "Q5_CHAIN_COMPLETENESS": {
+    "score": 1.0,
+    "state": "MEASURED"
+   }
+  },
+  "q_average": 0.625,
+  "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE"
+ },
+ "finished_at": "2026-09-14T06:11:50+00:00Z",
+ "outcome_summary": {
+  "baseline_i_average": 0.404,
+  "final_i_average": 0.84,
+  "baseline_q_average": 0.625,
+  "final_q_average": 0.625,
+  "iterations_run": 2,
+  "keeps": 2
+ },
+ "status": "IMPROVED"
+}
