@@ -164,21 +164,32 @@ export function ScienceEventStream({
 
 // Section 12/13: the return-after-leaving banner — what the server
 // says is running, never a client-side guess.
+// R446-audit P0.2: stageCounts is derived from the SAME backend
+// gauntlet the cards render — a real count of completed stages, never
+// a fabricated percentage or a timer.
 export function InvestigationProgress({
   lastCompletedLabel,
   activeLabel,
   pausedLabel,
+  stageCounts,
 }: {
   lastCompletedLabel?: string | null;
   activeLabel?: string | null;
   pausedLabel?: string | null;
+  stageCounts?: { done: number; total: number } | null;
 }) {
   return (
     <div className="inv-progress">
-      <div className="inv-progress-h">
+      <h2 className="inv-progress-h">
         INVESTIGATION IN PROGRESS
         <span className="cursor" aria-hidden="true" />
-      </div>
+      </h2>
+      {stageCounts && stageCounts.total > 0 && (
+        <div className="inv-progress-count">
+          {stageCounts.done} of {stageCounts.total} investigation stages
+          complete
+        </div>
+      )}
       {lastCompletedLabel && (
         <div className="faint">Last completed: {lastCompletedLabel}</div>
       )}
@@ -190,9 +201,9 @@ export function InvestigationProgress({
           Paused — infrastructure: {pausedLabel}
         </div>
       )}
-      <div className="faint" style={{ fontSize: 12 }}>
-        the investigation is persisted on the server; you can leave and
-        return to it
+      <div className="inv-progress-note">
+        the investigation is persisted on the server — a full run
+        typically takes 15–30 minutes; you can leave and return to it
       </div>
     </div>
   );

@@ -181,7 +181,8 @@ export default function InventionArtifact({
 
       {/* ---------- downloads ---------- */}
       <div className="artifact-dls">
-        <div className="rail-h">Downloads</div>
+        {/* R462 port (audit P1.4): semantic heading — see Sidebar.tsx. */}
+        <h2 className="rail-h">Downloads</h2>
         <a className="btn download artifact-dl" href={detail.dossier.download}>
           Download technology package
         </a>
@@ -215,7 +216,7 @@ export default function InventionArtifact({
       {/* ---------- live parameters ---------- */}
       {detail.parameters.length > 0 && (
         <div className="artifact-params">
-          <div className="rail-h">Live parameters</div>
+          <h2 className="rail-h">Live parameters</h2>
           <div className="faint" style={{ fontSize: 12.5, marginBottom: 8 }}>
             change a value inside its declared envelope — the real
             parametric model rebuilds in the engine&apos;s CAD sandbox
@@ -234,7 +235,7 @@ export default function InventionArtifact({
       {/* ---------- key dimensions ---------- */}
       {Object.keys(detail.key_dimensions).length > 0 && (
         <div className="artifact-dims">
-          <div className="rail-h">Key dimensions</div>
+          <h2 className="rail-h">Key dimensions</h2>
           <div className="faint" style={{ fontSize: 12.5, marginBottom: 8 }}>
             independently re-measured from the geometry (computation log)
           </div>

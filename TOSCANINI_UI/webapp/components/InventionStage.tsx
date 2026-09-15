@@ -225,7 +225,9 @@ export default function InventionStage({
 
         <details className="dd-sec" data-dd-section="parameters" open={false}>
           <summary>
-            <span className="dd-title">Interactive parameters</span>
+            {/* R462 port (audit P1.4): semantic heading — screen-reader
+                users can jump between deep-layer sections by heading. */}
+            <h2 className="dd-title">Interactive parameters</h2>
             <span className="dd-sub faint">
               change a value inside its declared envelope — the real
               parametric model rebuilds in the CAD sandbox
@@ -245,7 +247,7 @@ export default function InventionStage({
 
         <details className="dd-sec" data-dd-section="story" open={false}>
           <summary>
-            <span className="dd-title">The technology story</span>
+            <h2 className="dd-title">The technology story</h2>
             <span className="dd-sub faint">
               from the released executive brief — the buyer chain&apos;s
               own words
@@ -258,7 +260,7 @@ export default function InventionStage({
 
         <details className="dd-sec" data-dd-section="reality" open={false}>
           <summary>
-            <span className="dd-title">Ask a question</span>
+            <h2 className="dd-title">Ask a question</h2>
             <span className="dd-sub faint">
               answered from this technology&apos;s own records — or an
               honest refusal

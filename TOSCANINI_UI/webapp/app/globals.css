@@ -5,7 +5,10 @@
   --paper-2: #f2f0e9;
   --ink: #1f1e1c;
   --ink-soft: #55524c;
-  --ink-faint: #8a867e;
+  /* R462 port (audit P0.4, WCAG AA): the previous faint ink #8a867e
+     computes 3.44:1 on paper — below the 4.5:1 small-text bar.
+     #6f6a5e computes 5.11:1 on paper, 5.39:1 on white. */
+  --ink-faint: #6f6a5e;
   --accent: #c15f3c;        /* terracotta — borders, fills, large type */
   --accent-text: #a34d2e;  /* AA text accent — 5.7:1 on white, 5.5:1 on paper */
   --accent-deep: #8f4220;  /* AA text on accent-soft tint — 5.3:1 */
@@ -1642,7 +1645,24 @@ details.tech li { font-size: 13.5px; color: var(--ink-soft); margin-bottom: 6px;
   gap: 4px;
   font-size: 13.5px;
 }
-.inv-progress-h { font-weight: 600; display: flex; align-items: center; gap: 8px; letter-spacing: 0.05em; font-size: 12px; color: var(--ink-soft); }
+.inv-progress-h { font-weight: 600; display: flex; align-items: center; gap: 8px; letter-spacing: 0.05em; font-size: 12px; color: var(--ink-soft); margin: 0; }
+/* R462 port (audit P0.2): the stage counter — real gauntlet state, never
+   a fabricated percentage; rendered only when the backend gauntlet has
+   arrived (total > 0). Carried by ScienceEvents' InvestigationProgress
+   (no live consumer on the R458+ surfaces yet — kept for the port). */
+.inv-progress-count {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink-soft);
+  letter-spacing: 0.02em;
+}
+/* R462 port (audit P0.2): the persistence + duration note as a
+   first-class line with readable weight. */
+.inv-progress-note {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--ink-faint);
+}
 
 
 /* ---- the gauntlet (section 9) ---- */
@@ -2019,6 +2039,7 @@ details.tech li { font-size: 13.5px; color: var(--ink-soft); margin-bottom: 6px;
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--ink-faint);
+  margin: 0; /* R462 port (audit P1.4): rendered as h2 — explicit reset, zero visual change */
 }
 .hero-honest-body {
   font-family: var(--serif);
@@ -2140,7 +2161,7 @@ details.tech li { font-size: 13.5px; color: var(--ink-soft); margin-bottom: 6px;
 }
 .dd-sec[open] summary::before { content: "–"; color: var(--accent-text); }
 .dd-sec summary:hover .dd-title { color: var(--accent-text); }
-.dd-title { font-size: 14px; font-weight: 600; }
+.dd-title { font-size: 14px; font-weight: 600; margin: 0; } /* R462 port (audit P1.4): h2 reset */
 .dd-sub { font-size: 12px; flex-basis: 100%; margin-left: 26px; }
 .dd-body {
   padding: 4px 18px 18px;
@@ -2861,4 +2882,19 @@ h2.wk-title {
   .conv-cand-int { font-size: 13.5px; }
   .conv-cand-maturity { font-size: 11.5px; }
   .conv-cand-actions { flex-wrap: wrap; }
+}
+
+/* ---- R462 port (audit P2.2): journal-surface density at ≤480px -----------
+   The block above covers the conversation's candidate cards; this
+   extends the same one-notch tightening to the journal surfaces
+   (science event cards, gauntlet cards, insight cards). Ported from
+   R462 onto the R458+ surface set — classes that no longer exist on
+   this tree are not carried. */
+@media (max-width: 480px) {
+  .scevt { padding: 4px 8px; font-size: 12.5px; }
+  .scevt-detail { font-size: 11px; }
+  .gcard { padding: 7px 10px; }
+  .gsummary { font-size: 12.5px; }
+  .insight { padding: 12px 12px 10px; }
+  .ic-body { font-size: 13px; }
 }

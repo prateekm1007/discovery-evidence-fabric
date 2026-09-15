@@ -189,7 +189,9 @@ export default function Sidebar({
       </button>
 
       <div className="rail-section">
-        <div className="rail-h">Discoveries</div>
+        {/* R462 port (audit P1.4): semantic heading — screen-reader users
+            can jump between rail sections; class kept, zero visual change. */}
+        <h2 className="rail-h">Discoveries</h2>
         {sessions.length === 0 && (
           <div className="rail-empty">
             You haven&apos;t started a discovery yet — describe a problem,
@@ -259,7 +261,7 @@ export default function Sidebar({
       </div>
 
       <div className="rail-section">
-        <div className="rail-h">Technology packages</div>
+        <h2 className="rail-h">Technology packages</h2>
         {showcase.length === 0 && (
           <div className="rail-empty">
             {/* R464 (audit P2-6): the empty state explains what a

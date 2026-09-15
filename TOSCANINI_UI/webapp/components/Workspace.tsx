@@ -170,7 +170,8 @@ function ModelSurface({
           </>
         ) : design && design.availability === "AVAILABLE" && !heroEligible ? (
           <div className="hero-honest hero-unearned" data-hero-unearned>
-            <div className="hero-honest-h">Technology visualization</div>
+            {/* R462 port (audit P1.4): semantic heading, class kept. */}
+            <h2 className="hero-honest-h">Technology visualization</h2>
             <div className="hero-honest-body">Not established yet.</div>
             <div className="hero-honest-note faint">
               {design.hero_eligibility?.reason ||
@@ -179,7 +180,7 @@ function ModelSurface({
           </div>
         ) : design && design.availability === "AVAILABLE" && renders?.status ? (
           <div className="hero-honest" data-hero-render-unavailable>
-            <div className="hero-honest-h">Technology model</div>
+            <h2 className="hero-honest-h">Technology model</h2>
             <div className="hero-honest-body">
               {renderAvailabilitySentence(renders, {
                 // R453-C2 merge: the geometry phrase is DERIVED from the
@@ -195,7 +196,7 @@ function ModelSurface({
           </div>
         ) : (
           <div className="hero-honest" data-hero-not-established>
-            <div className="hero-honest-h">Technology model</div>
+            <h2 className="hero-honest-h">Technology model</h2>
             <div className="hero-honest-body">Not established on this run.</div>
             <div className="hero-honest-note faint">
               {design?.note ||
