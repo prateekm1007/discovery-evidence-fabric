@@ -979,3 +979,20 @@ vocabulary registration, r458 29/30 stash-verified pristine — BS-020;
 frontend 115/115 + tsc + export 5/5 + verify-export); MODULE_INVENTORY
 123 files / 60228 LOC, drift GREEN. Round record:
 `R467/R467_ROUND_RECORD.json`.
+
+## R468 — the Operator Secrets Registry + the R467 deploy closure + the fresh production measurement
+
+| DELIVERABLE | WHERE | THE MEASURED FACT |
+|---|---|---|
+| THE VAULT | workspace-root `.secrets.env` (OUTSIDE every public repo; chmod 600; gitignored) | the readable canonical value store across resets: HF_TOKEN, ZAI_API_KEY (= the HF key, the R456 wiring), ATRIA_API_KEY, ATRIA_API_KEY_2, GITHUB_TOKEN (source: the operator's .gitcreds) |
+| KEY 2 PROBE | `R468/PROBE_ATRIA_KEY2.json` | the bogus-key differential (200 vs 401) proves key 2 VALID; sole model Atria-Dawn-Preview; tiny completion 200/5.1 s; key-1 fingerprint MATCHES R467 (same live credential re-supplied) |
+| THE SURFACE | `R468/HF_SPACE_SECRETS.json` + `R467/HF_SPACE_SECRETS.json` | the FULL 14-name Space secret surface verified BY NAME, zero absent; fingerprints only (BS-021, guard extended) |
+| ARTICLE LXXIII | `EPISTEMIC_CONSTITUTION.md` v2.5.0 + `R468/constitution/` | the lookup order is law: env -> vault -> Space surface (names only) -> operator LAST; AMENDMENT_RECORD b54a1be9 -> 9730567a; acknowledgment re-bound; compliance GREEN; ratified through the r419 formal chain |
+| THE DEPLOY | `scripts/r456_deploy_state.json` + `r456_verify_state.json` | Art. LXXI TUPLE GREEN at 1701eb96 (Space revision f215b976): engine_commit == origin/main; ok=true, drift=GREEN, identity_tamper=false; constitution 2.5.0 live; atria in the provider matrix (1 model) |
+| THE MEASUREMENT | `R468/PROD_RUN/EVALUATION.json` | fresh production run ts_a0c8e581ba07 (espresso thermoblock limescale): SYNTHESIZE emitted a structurally complete mechanism/intervention/falsification answer (the R466 synthesis degradation did NOT recur); final typing INCOMPLETE_INFERENCE_FAILURE / INFRASTRUCTURE_CAPABILITY — 'missing_source_span; mechanism_span_not_verbatim', promotion blocked, rerunnable on a capable route. The category is NARROWED, never claimed closed. First launch ts_337f100ef977: the cold-start BLOCKED_TRANSPORT transient (atria probe attempt=0) — disclosed, handled by the standing floor |
+
+Tests: `tests/test_r468_secrets_registry.py` 21/21 NEW; the standing
+keyless-posture regressions 305/305 + r414 50 + r446 20 + r467 23 +
+r419 4 (pin updated per precedent); r458 29/30 (standing BS-020);
+frontend untouched, tsc clean; MODULE_INVENTORY 123/60228 drift GREEN.
+Round record: `R468/R468_ROUND_RECORD.json`.
