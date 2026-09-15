@@ -311,3 +311,35 @@ def test_health_payload_declares_owner_scoped_diagnostics():
     assert "operator_key_configured" not in payload
     assert payload["worker_diagnostics"]["owner_scoped"] is True
     assert payload["worker_diagnostics"]["spawn_forensics"] is True
+
+
+def test_worker_pu_loader_call_signature_matches_def():
+    """R463 regression (measured live, run ts_fa75e009ed5e): the R461
+    loader takes the session_id alone, but the call site passed a
+    second argument — a TypeError fired on EVERY fresh run and the
+    disclosed fallback silently skipped problem understanding. The
+    defect stayed invisible while the worker log was operator-gated;
+    the R463 owner-scoped per-session log surfaced it on its first
+    production run. This contract pins the arity match structurally
+    (AST-level, Art. XVI: executable evidence)."""
+    import ast
+    tree = ast.parse((REPO / "toscanini" / "worker.py").read_text())
+    fn_def = None
+    call_args = None
+    for node in ast.walk(tree):
+        if isinstance(node, ast.FunctionDef) \
+                and node.name == "_load_problem_understanding":
+            fn_def = node
+        if isinstance(node, ast.Call) \
+                and isinstance(node.func, ast.Name) \
+                and node.func.id == "_load_problem_understanding":
+            n = len(node.args) + len(node.keywords)
+            call_args = (call_args or []) + [n]
+    assert fn_def is not None, "the loader definition is missing"
+    required = len(fn_def.args.args) - len(fn_def.args.defaults)
+    for n in call_args:
+        assert required <= n <= len(fn_def.args.args), \
+            f"call passes {n} args; the def accepts " \
+            f"{required}..{len(fn_def.args.args)}"
+    assert call_args == [1], \
+        "the call must pass exactly the session_id (the R463 fix)"

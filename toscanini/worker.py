@@ -272,7 +272,15 @@ def _run_inner(session_id: str, forensics) -> None:
         # answer, a steering directive) is lost and the engine re-asks
         # a question the user already answered. A persisted record is
         # loaded; only its ABSENCE rebuilds (the historical path).
-        pu = _load_problem_understanding(session_id, str(s["user_text"]))
+        # R463 (measured live on production, run ts_fa75e009ed5e): the
+        # call previously passed a second argument the R461 loader does
+        # not take — a TypeError fired on EVERY fresh run, the
+        # disclosed fallback skipped problem understanding entirely,
+        # and the defect was invisible until the R463 owner-scoped
+        # per-session worker log surfaced it. The record binding is the
+        # session_id filename (user_text is immutable per session);
+        # the loader takes the session_id alone.
+        pu = _load_problem_understanding(session_id)
         if pu is None:
             pu = _pu_mod.build_problem_understanding(
                 s["user_text"], session_id=session_id)
