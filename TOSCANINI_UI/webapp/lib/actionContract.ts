@@ -158,6 +158,38 @@ export type MessageRoute =
   | { kind: "ask" }
   | { kind: "action"; verb: Exclude<ActionVerb, "ASK"> };
 
+// ---------------------------------------------------------------------------
+// R461 (independent audit P0-2): the user's words ride the action.
+//
+// The audit measured the deployed UI passing `{}` to sendAction — the
+// engine forked a child round whose directive was only "[CHANGE_MECHANISM]",
+// the typed instruction discarded. The R458 contract defines exactly where
+// the words go: params.direction is "the user's own words" (verbatim),
+// FIND_EVIDENCE carries a mode, ATTACK may carry a target. This builder is
+// DETERMINISTIC presentation logic: it copies the user's text byte-for-byte
+// and derives NOTHING scientific (Art. X / §27 — no frontend epistemology).
+// ---------------------------------------------------------------------------
+
+export function findEvidenceMode(text: string): "contradictory" | "supporting" | "general" {
+  const t = String(text ?? "").toLowerCase();
+  if (/\bcontradict(ing|ory)\b/.test(t) || /\bdisprov/.test(t)) {
+    return "contradictory";
+  }
+  if (/\bsupporting\b/.test(t)) return "supporting";
+  return "general";
+}
+
+export function buildActionParams(
+  verb: Exclude<ActionVerb, "ASK">,
+  text: string
+): Record<string, unknown> {
+  const t = String(text ?? "").trim();
+  const params: Record<string, unknown> = {};
+  if (t) params.direction = t; // the user's exact words — never paraphrased
+  if (verb === "FIND_EVIDENCE") params.mode = findEvidenceMode(t);
+  return params;
+}
+
 /** Route one user message. ASK is the default — a message only becomes
  * an action when a pattern matches exactly. */
 export function classifyMessage(text: string): MessageRoute {

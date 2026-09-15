@@ -30,6 +30,7 @@ R415 (P0 directive §§1, 8, 9):
 """
 from __future__ import annotations
 
+import json
 import os
 import sys
 import time
@@ -97,6 +98,37 @@ def _route_detail(probe: dict) -> str:
             f"failure_class={hop.get('failure_type')} "
             f"timestamp={hop.get('timestamp')}")
     return " | ".join(parts)
+
+
+def _load_problem_understanding(session_id: str):
+    """R461 (independent audit P0-5): load this session's PERSISTED
+    Problem Understanding INPUT record, or return None when there is
+    none (first run) or it is unreadable (rebuild then — the historical
+    path, unchanged).
+
+    Why this exists — the measured failure (production, 2026-09-14,
+    run ts_1090d724ca33, boot 23:36:13Z): the worker rebuilds the PU
+    from user_text on every resume, and the session's clarification
+    answer field is cleared the moment the answer merges. A container
+    restart in the run's active window therefore resurrected the
+    pre-answer pause state and the engine re-asked a question the user
+    had already answered. The persisted record is the only durable
+    carrier of the merged USER_STATED fields between pauses; loading
+    it here makes the merge survive any restart (the file itself rides
+    the durable payload as of this round — durable.py).
+
+    The session_id in the filename is the binding: user_text is
+    immutable per session, so a record under this name belongs to this
+    problem — no content-matching heuristic is added (Art. X: one
+    authority, no second guessing of the record)."""
+    path = store.STORE_DIR / f"problem_understanding_{session_id}.json"
+    try:
+        raw = json.loads(path.read_text())
+    except (OSError, ValueError):
+        return None
+    if not isinstance(raw, dict) or not raw:
+        return None
+    return raw
 
 
 def run(session_id: str) -> None:
@@ -230,8 +262,17 @@ def _run_inner(session_id: str, forensics) -> None:
         from toscanini.conversational import problem_understanding as _pu_mod
         from toscanini.conversational import clarification as _cl_mod
         from toscanini.conversational import conversation_memory as _cm_mod
-        pu = _pu_mod.build_problem_understanding(
-            s["user_text"], session_id=session_id)
+        # R461 (independent audit P0-5, reproduced live): the persisted
+        # Problem Understanding INPUT record is the truth this run
+        # already earned — a restart must not silently rebuild it from
+        # user_text alone, or every USER_STATED merge (a clarification
+        # answer, a steering directive) is lost and the engine re-asks
+        # a question the user already answered. A persisted record is
+        # loaded; only its ABSENCE rebuilds (the historical path).
+        pu = _load_problem_understanding(session_id, str(s["user_text"]))
+        if pu is None:
+            pu = _pu_mod.build_problem_understanding(
+                s["user_text"], session_id=session_id)
         # conversation memory: the user's opening message is CONTEXT
         # (recorded, classified) — it can never mutate canonical
         # scientific state (directive §12; the guard is structural)
@@ -337,6 +378,14 @@ def _run_inner(session_id: str, forensics) -> None:
                                             ensure_ascii=False))
         except Exception:  # noqa: BLE001 — input record, fail-open
             pass
+        # R461 (audit P0-5): the EARLIEST durable checkpoint of real
+        # progress — the merged input record + the run's live state —
+        # pushed the moment it exists. Before this, every restart
+        # inside the run's active window resurrected the last
+        # pause/terminal snapshot (measured: the user's clarification
+        # answer silently discarded by a 23:36:13Z restart).
+        _snapshot(session_id,
+                  f"problem_understanding_merged:{session_id}")
         s = store.get_session(session_id) or s
     except Exception as exc:  # noqa: BLE001 — disclosed, never fatal:
         # the PU layer is an INPUT RECORD; a failure here degrades to

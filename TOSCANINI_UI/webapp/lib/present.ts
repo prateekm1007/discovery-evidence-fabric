@@ -463,6 +463,52 @@ export function epistemicMeta(cls: string | null | undefined): EpistemicMeta | n
   return EPI_META[cls] ?? null;
 }
 
+// R461 (independent audit P1-10): the maturity boundary is FIRST-LINE.
+// The canonical maturity value may be a machine label (e.g.
+// ENGINEERING_DEFINITION); rendered raw it can read as physical
+// validation when the record carries zero physical observations
+// (Art. XXVIII: a passing simulation is not a physical finding; the
+// promotion ladder LX/LIII is never narrated upward by the UI). Each
+// known label translates to a human sentence that carries the
+// modelled-vs-physical boundary IN the same line. An unknown label
+// falls back to the honest default — never invented semantics, and
+// never a raw enum as the headline (BS-009).
+export const MATURITY_BOUNDARY_DEFAULT =
+  "Modelled result — the record carries no physical observation yet";
+
+const MATURITY_PRESENTATION: Record<string, string> = {
+  ENGINEERING_DEFINITION:
+    "Engineering definition — a modelled design, not physically validated",
+  ENGINEERING_DEFINED:
+    "Engineering defined — a modelled design, not physically validated",
+  COMPUTATIONAL:
+    "Held up in computation — modelled, not physically validated",
+  SIMULATED: "Simulated — modelled, not physically validated",
+  MODELLED: "Modelled — not physically validated",
+  HYPOTHESIS: "Hypothesis — nothing has been tested yet",
+  HYPOTHESIZED: "Hypothesis — nothing has been tested yet",
+  PHYSICALLY_OBSERVED: "Physically observed — measured on the real artifact",
+};
+
+export function presentMaturity(
+  maturity: string | null | undefined
+): string | null {
+  const m = String(maturity ?? "").trim();
+  if (!m) return null;
+  const hit = MATURITY_PRESENTATION[m.toUpperCase()];
+  return hit ?? `${m.charAt(0).toUpperCase() + m.slice(1).toLowerCase()} — not physically validated unless the record carries a physical observation`;
+}
+
+// R461 (independent audit P0-2): the steering directive of an action-
+// opened round, rendered as the user's own words. The stored directive
+// is "[VERB] the user's words" (toscanini/actions.py::directive_text);
+// the conversation shows the user's words verbatim — the machine tag
+// stays in the record (BS-009: no raw enums on the primary surface).
+export function directiveDisplayText(directive: unknown): string | null {
+  if (typeof directive !== "string" || !directive.trim()) return null;
+  return directive.replace(/^\[[A-Z_]+\]\s*/, "").trim() || null;
+}
+
 export function deriveConversation(
   detail: SessionDetail,
   dossier: DossierBody | null | undefined,
@@ -481,6 +527,24 @@ export function deriveConversation(
     id: mid("u"),
     text: detail.user_text || detail.title || "Untitled problem",
   });
+
+  // R461 (independent audit P0-2): an action-opened round carries the
+  // user's steering words as the FIRST line of the conversation — the
+  // exact text the user typed, from the canonical user_directive the
+  // engine recorded (byte-for-byte in the record; the visible line
+  // strips only the machine verb tag). The user's words were previously
+  // invisible in the child round — the steering looked discarded.
+  const directiveLine = directiveDisplayText(
+    (detail as { user_directive?: { directive?: unknown } }).user_directive
+      ?.directive
+  );
+  if (directiveLine) {
+    msgs.push({
+      kind: "user",
+      id: mid("ud"),
+      text: directiveLine,
+    });
+  }
 
   // R458-C2 (§4) — THE CLARIFICATION PAUSE. The engine asked exactly ONE
   // material question (C1's R446 §4 rule: ask only when the answer
@@ -700,12 +764,33 @@ export function deriveConversation(
       id: mid("l"),
       live: true,
       text: live
-        ? "Still working — the latest recorded step is below; this conversation updates as the run records them."
-        : "Still working — I'm reading the problem and binding it to the evidence base.",
+        ? "Still working" + elapsedSuffix(detail.created_at) +
+          " — the latest recorded step is below; this conversation updates as the run records them."
+        : "Still working" + elapsedSuffix(detail.created_at) +
+          " — I'm reading the problem and binding it to the evidence base.",
     });
   }
 
   return msgs;
+}
+
+// R461 (independent audit, P0 observability): how long the run has
+// actually been going, in the user's language, derived from the
+// record's own created_at — never an invented ETA, never machinery
+// vocabulary. The audit's finding: "one progress sentence is good, but
+// add elapsed time … without exposing provider details."
+export function elapsedSuffix(
+  createdAt: string | undefined,
+  now: number = Date.now()
+): string {
+  const t = Date.parse(String(createdAt ?? ""));
+  if (Number.isNaN(t)) return "";
+  const mins = Math.max(0, Math.floor((now - t) / 60000));
+  if (mins < 1) return "";
+  if (mins < 60) return ` for ${mins} min`;
+  const h = Math.floor(mins / 60);
+  const m = mins % 60;
+  return m ? ` for ${h} h ${m} min` : ` for ${h} h`;
 }
 
 // ---------------------------------------------------------------------------

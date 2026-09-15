@@ -1650,6 +1650,19 @@ class Handler(BaseHTTPRequestHandler):
                            field=field)
             except Exception:  # noqa: BLE001 — fail-open, never blocks
                 pass
+            # R461 (independent audit P0-5, reproduced live): the
+            # answer is durable THE MOMENT it exists. Before this, the
+            # answered state lived only in the ephemeral sessions.json
+            # — the measured 23:36:13Z restart (run ts_1090d724ca33)
+            # restored the pre-answer pause snapshot and the engine
+            # re-asked a question the user had already answered. The
+            # action route has snapshotted at acceptance since R459
+            # (line-level precedent); the answer route now does too.
+            try:
+                from toscanini import durable as _durable
+                _durable.snapshot(f"clarification_answered:{sid}")
+            except Exception:  # noqa: BLE001 — fail-open, disclosed
+                pass
             self._spawn_worker(sid)
             return self._json(200, {
                 "session_id": sid,

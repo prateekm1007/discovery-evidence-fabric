@@ -104,6 +104,16 @@ export interface SessionDetail {
   // R459: the investigation thread — set on rounds opened by a
   // conversational action (the parent run's record stays untouched).
   parent_session_id?: string | null;
+  // R461 (audit P0-2): the steering directive of an action-opened
+  // round — recorded by the engine (toscanini/actions.py) and surfaced
+  // through public_session_view; the conversation renders the user's
+  // words from this record, never from a client-side guess.
+  user_directive?: {
+    action_id?: string;
+    verb?: string;
+    directive?: string;
+    parent_session_id?: string;
+  } | null;
   // R459 (audit P0-3): attachments bound to this run (engine-side
   // custody; the conversation references them, never absorbs them)
   attachment_ids?: string[];

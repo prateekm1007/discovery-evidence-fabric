@@ -370,6 +370,21 @@ function WorkspaceInner() {
   const [invention, setInvention] = useState<ShowcaseDetail | null>(null);
   const [reality, setReality] = useState<RealityLoopRecord | null>(null);
   const [railOpen, setRailOpen] = useState(false);
+  // R461 (independent audit P1-7): below the drawer breakpoint the rail
+  // is an OFFSCREEN fixed panel when closed — it must be INERT and
+  // aria-hidden then, or keyboard users tab into invisible controls.
+  // The breakpoint is matched client-side (CSS owns the layout truth:
+  // ≤1180px per globals.css); on desktop the rail is inline and never
+  // inert. React 19 renders `inert` as the native boolean attribute.
+  const [railInline, setRailInline] = useState(true);
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 1180px)");
+    const update = () => setRailInline(!mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
+  const railHidden = !railInline && !railOpen;
   const [starting, setStarting] = useState(false);
   // the contextual workspace surface (brief §12) — null = closed
   const [surface, setSurface] = useState<SurfaceId | null>(null);
@@ -726,6 +741,12 @@ function WorkspaceInner() {
           onClick={() => setRailOpen(!railOpen)}
           type="button"
           aria-label="toggle navigation"
+          aria-expanded={railOpen}
+          onKeyDown={(e) => {
+            // R461 (audit P1-7): Escape dismisses the drawer and the
+            // focus never lands inside the now-inert panel.
+            if (e.key === "Escape" && railOpen) setRailOpen(false);
+          }}
         >
           ☰
         </button>
@@ -770,7 +791,11 @@ function WorkspaceInner() {
       </header>
 
       <div className={`ws-body ${surface && activeMode === "run" ? "ws-has-panel" : ""}`}>
-        <div className={`ws-rail ${railOpen ? "open" : ""}`}>
+        <div
+          className={`ws-rail ${railOpen ? "open" : ""}`}
+          inert={railHidden || undefined}
+          aria-hidden={railHidden || undefined}
+        >
           <Sidebar
             sessions={sessions}
             showcase={showcase}

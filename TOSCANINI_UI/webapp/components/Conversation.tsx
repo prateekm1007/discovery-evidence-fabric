@@ -27,6 +27,7 @@ import { useMemo, useState } from "react";
 import type { ScienceEvent, SessionDetail, DossierBody, AskResponse } from "@/lib/present-types";
 import {
   deriveConversation,
+  presentMaturity,
   type Msg,
   type NextAction,
   type SurfaceId,
@@ -41,6 +42,7 @@ import {
 import {
   classifyMessage,
   sendAction,
+  buildActionParams,
   ACTION_LABEL,
   ACTION_NOT_AVAILABLE_COPY,
   type ActionVerb,
@@ -113,11 +115,19 @@ function Candidates({
         >
           <div className="conv-cand-head">
             <span className="conv-cand-label">{c.label}</span>
-            {c.maturity && <span className="conv-cand-mat faint">{c.maturity}</span>}
             <span className={`conv-attack atk-${c.attack.toLowerCase()}`}>
               {ATTACK_LABEL[c.attack] ?? c.attack}
             </span>
           </div>
+          {c.maturity && (
+            // R461 (independent audit P1-10): the maturity boundary is
+            // FIRST-LINE — a human sentence that can never read as
+            // physical validation when the record carries none. The raw
+            // machine label no longer headlines (BS-009).
+            <div className="conv-cand-maturity" data-conv-maturity>
+              {presentMaturity(c.maturity)}
+            </div>
+          )}
           {c.intervention && <div className="conv-cand-int">{c.intervention}</div>}
           {c.why && <div className="conv-cand-body"><b>Why it might work:</b> {c.why}</div>}
           {c.whatChanged && (
@@ -263,7 +273,16 @@ export default function Conversation({
       try {
         // R459: the invocation rides the owner-capability transport
         // (apiPost) — the same header every run-scoped call carries.
-        const result = await sendAction(detail.session_id, verb, {}, apiPost);
+        // R461 (independent audit P0-2): the user's typed words ride
+        // the action verbatim (buildActionParams → params.direction,
+        // the R458 contract's "the user's own words") — previously the
+        // payload was {} and the child round received only the verb.
+        const result = await sendAction(
+          detail.session_id,
+          verb,
+          buildActionParams(verb, text),
+          apiPost
+        );
         if (result.not_available) {
           setActionNote(ACTION_NOT_AVAILABLE_COPY);
         } else if (result.accepted && result.new_run_id) {

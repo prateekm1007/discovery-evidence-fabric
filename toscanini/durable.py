@@ -260,6 +260,17 @@ def _collect_payload() -> Dict[str, Path]:
         payload["shares.json"] = src_shares
     for ev in sorted(store.STORE_DIR.glob("evidence_*.json")):
         payload[f"evidence/{ev.name}"] = ev
+    # R461 (independent audit P0-5, reproduced live): the Problem
+    # Understanding INPUT record is the ONLY carrier of a merged
+    # clarification answer / user directive once the worker clears the
+    # session field (toscanini/worker.py phase 1.9). Without it in the
+    # durable payload, a container restart between the answer and the
+    # next terminal state resurrects the pre-answer pause and the
+    # engine re-asks the user a question they already answered —
+    # MEASURED on production 2026-09-14 (run ts_1090d724ca33, boot
+    # 23:36:13Z): the record regressed to the 23:29:51 pause state.
+    for puf in sorted(store.STORE_DIR.glob("problem_understanding_*.json")):
+        payload[f"problem_understanding/{puf.name}"] = puf
     # R422 (directive 2 — the a5a7 anomaly): the worker-forensics ledger
     # rides the SAME durable push as the store. Every WORKER_SPAWNED /
     # HEARTBEAT / WORKER_DEATH / ORPHANED_AT_RESTART event written since
@@ -464,6 +475,25 @@ def snapshot(reason: str) -> Dict[str, Any]:
         lock.close()
 
 
+def _restore_problem_understanding(repo: Path) -> int:
+    """R461 (independent audit P0-5): re-materialize the persisted
+    Problem Understanding INPUT records (copy-when-absent, the evidence
+    files' contract). Returns the count copied. The merged
+    clarification answer / steering directive lives in this record —
+    restoring it is what keeps a resumed run from re-asking a question
+    the user already answered after a container restart."""
+    pu_repo = repo / "problem_understanding"
+    restored = 0
+    if pu_repo.is_dir():
+        for f in pu_repo.glob("problem_understanding_*.json"):
+            dst = store.STORE_DIR / f.name
+            if not dst.exists():
+                dst.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(f, dst)
+                restored += 1
+    return restored
+
+
 def restore() -> Dict[str, Any]:
     """Pull the runtime-state branch and re-materialize local state after
     a restart. Sessions merge by session_id (latest update wins, both
@@ -571,6 +601,12 @@ def restore() -> Dict[str, Any]:
                         dst.parent.mkdir(parents=True, exist_ok=True)
                         shutil.copy2(f, dst)
                         _LAST_RESTORE["evidence"] += 1
+            # R461 (audit P0-5): the Problem Understanding INPUT records
+            # re-materialize with the same copy-when-absent contract —
+            # the merged clarification answer / directive survives a
+            # container restart, so a resumed run never re-asks a
+            # question the user already answered.
+            _restore_problem_understanding(repo)
             # R422: the worker-forensics ledger is restored BEFORE the
             # boot reconciliation runs — reconcile_at_boot() in server
             # main() must see the previous boot's tail to mark orphans.
