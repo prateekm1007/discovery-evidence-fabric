@@ -1,0 +1,99 @@
+{
+  "round": "R471",
+  "date": "2026-09-16",
+  "task": "Operator directive: 'read your constitution and read and fix the uploaded document' \u2014 the 2026-09-16 EXTERNAL PRODUCT AUDIT (weighted 6.1/10, checkout 3b229801), fixed under the CTO/engineer role model (Atria-Dawn-Preview = engineer, on the nine-key atria ring).",
+  "audit_summary": {
+    "weighted_overall": "6.1/10",
+    "nine_over_ten_blockers": [
+      "P0-1 fresh production run interrupted before a terminal result (worker disappeared)",
+      "P0-2 retry/recovery returned an ambiguous non-2xx and never stably resumed; frontend retryRun() treated non-2xx as an exception",
+      "P0-3 production identity not stably joined to the audited checkout (observed 67323d1e then e7397192 mid-audit)",
+      "P0-4 prompt-to-package journey proven only by showcase, not by a fresh user run",
+      "P0-5 clarification answer typed-field empty after reload",
+      "P0-6 URL input described but absent; multimodal files stored but not semantically consumed"
+    ]
+  },
+  "root_cause_found": {
+    "item": "P0-2 (both R471 lines independently)",
+    "defect": "the retry route checked `if 'error' in result` \u2014 but an ACCEPTED retry_session returns the updated SESSION dict whose 'error' field is None: KEY-present, value-None. EVERY accepted retry therefore answered 409 with the full PENDING session body (the auditor's exact words: 'a body that looked like a session in PENDING state') AND returned BEFORE the spawn \u2014 no worker was ever started, the run stayed interrupted, and the frontend threw on the non-2xx. The Resume path was dead for every retry.",
+    "fix": "refusal is judged by the TYPED shape (retryable=False + reason), never by key presence on a session record"
+  },
+  "parallel_line_reconciliation": {
+    "situation": "origin/main had advanced to the sibling session's own R471 (c9f695e5) before this line pushed \u2014 both lines closed the same audit's items independently; the R469/R470 precedent applied (unions where complementary, the stronger implementation where they overlap)",
+    "theirs_canonical": [
+      "P0-6 the URL FETCH implementation (SSRF guard: every resolved address public, redirects re-guarded per hop max 3, 10s timeout, 20MB cap; typed REJECTED_BLOCKED_URL / REJECTED_FETCH_FAILED / REJECTED_EMPTY_CONTENT / REJECTED_TOO_LARGE; the fetched reference lands in the SAME custody chain as an upload: sha256, media type, bounded extract, source_url/final_url/fetched_at; the composer's always-visible reference-URL row riding the one pending queue)",
+      "the retry HTTP shape: 202 + typed retry_id (rt_ prefix, retry_id field name, session_id in the body); refusal carries refusal=RETRY_NOT_PERMITTED + session_status + retryable=false",
+      "the answer born USER_STATED at the answer route",
+      "RetryOutcome frontend shape + the data-retry-note inline refusal note + the network-throw catch",
+      "P2-3 aria-labels on the home inputs",
+      "the canonical resumable production driver (scripts/r471_prod_e2e.py \u2014 survives foreground-invocation boundaries; this line's probe driver preserved as scripts/r471_prod_e2e_probes.py with the P1-2/P0-6/P0-2 live probes)"
+    ],
+    "this_line_canonical": [
+      "the typed-state retry machine: reconcile_stale_active (targeted single-session reconciliation at request time \u2014 verifiably-dead pid or unregistered-past-grace -> typed INTERRUPTED -> accepted; live worker and fresh spawns -> typed refusal; a death the evidence does not show is never guessed, Art. XXV) + the fine-grained refusal vocabulary (COMPLETE_APPEND_ONLY / WORKER_ALIVE / REGISTRATION_GRACE_OPEN / AWAITING_ANSWER / NOT_RETRYABLE) + cleared worker identity on acceptance (Art. XVII)",
+      "P1-2 the queued directive: a RUN_IN_PROGRESS-refused steering request is RECORDED durably (queued_directive + queued=true in the 409 body + snapshot); the terminal surface offers it as the FIRST next action through the same canonical action endpoint (run_queued in present.ts)",
+      "P2-1 run_duration_stats: MEASURED p50/p90 minutes from the deployment's own completed runs (n disclosed, null below minimum), served on /api/health and quoted in the hero note",
+      "P2-5 the model-state 'what this means' explainer (conceptual / engineering geometry / computational / physical) in the design tab",
+      "the merge_stored_clarification extraction with the union field vocabulary (applied_at + the full answer spread + consumed_at + merged_into)"
+    ],
+    "cto_corrections_on_the_record": [
+      "uuid.uuid4 in the engineer-drafted retry machine (Atria draft used uuid4 unqualified)",
+      "the AWAITING_ANSWER typed pointer for AWAITING_CLARIFICATION sessions",
+      "the _ssrf_guard never-raise coercion for non-string inputs (this line's hostile-input battery caught it in the sibling's fetch implementation)"
+    ]
+  },
+  "engineer_protocol": {
+    "engineer": "Atria-Dawn-Preview (https://api.atria-asi.ai, the operator's default-API directive, key ring slot 1)",
+    "session": "R471/ATRIA_ENGINEER_RETRY.json \u2014 the retry-contract state machine drafted under CTO spec (10437 completion tokens, finish=stop)",
+    "draft": "R471/atria_draft_sessions_retry.py.raw",
+    "verdict": "integrated with CTO corrections; the draft's state machine is the shipped sessions.py retry_session v2 skeleton"
+  },
+  "identity_stability_gate": {
+    "script": "scripts/r471_identity_stability.py (the sibling's canonical version)",
+    "run": "30 samples over 522s against production /api/version + /api/health, --expect df5951bd",
+    "verdict": "PASS \u2014 one stable identity df5951bd everywhere, zero failures, constitution 2.5.0 on all 30 samples",
+    "artifact": "R471/identity_stability_run.log (first detached attempt) + the foreground run output; the audit's mixed-replica class is mechanically refused by the gate"
+  },
+  "production_measurement": {
+    "deploy": "r456_space_deploy.py \u2014 Space revision 2571c340; Art. LXXI tuple VERIFIED GREEN: engine_commit == local HEAD == origin/main == df5951bd; ok=true, discovery_ready=true, showcase_ready=true, retrieval_ready=true, drift=GREEN",
+    "run_duration_stats_live": {
+      "n": 71,
+      "p50_minutes": 10,
+      "p90_minutes": 32,
+      "basis": "measured from this deployment's completed runs"
+    },
+    "e2e_run_1": {
+      "session": "ts_2669dc795ec5",
+      "what_it_proved": "P0-6 URL fetch LIVE (201 TEXT_EXTRACTED on a real PubMed page); P1-2 queued directive LIVE (409 RUN_IN_PROGRESS queued=True); the audit's EXACT interruption class reproduced (INTERRUPTED at 3.2 min) and the retry ACCEPTED (202 + retry_id) \u2014 the live interruption-resume proof",
+      "artifact": "R471/PROD_RUN/EVALUATION_RUN1.json",
+      "honest_note": "the driver's first version did not persist the owner capability (fixed in the second version), so run 1's terminal state was not re-readable after the retry; its live probes are recorded"
+    },
+    "e2e_run_2": {
+      "session": "ts_d2097e7ad3b4",
+      "what_it_proved": "the FULL ladder LIVE: URL reference in (TEXT_EXTRACTED) -> fresh run -> clarification (target_variable) answered honestly -> COMPLETE at 7.6 min -> outcome RUN_BLOCKED typed honestly (zero fabrication, package_available=false \u2014 the honest terminal refusal class); artifacts joined on ONE session id (events 11, dossier 200); P1-2 queued=True recorded on the session; P0-2 typed refusal LIVE on the COMPLETE session (409, reason=COMPLETE_APPEND_ONLY, retryable=false, session-shaped body ABSENT)",
+      "verdict": "ALL GREEN",
+      "artifact": "R471/PROD_RUN/EVALUATION.json"
+    },
+    "p0_1_status": "the interruption class STILL occurred on production this round (run 1, 3.2 min in) \u2014 the recovery path now WORKS end-to-end (202 + respawn measured), which closes the audit's 'working resume' demand at n=1; the >=95%-terminal 20-run campaign remains the 30-day roadmap item",
+    "e2e_run_sibling_line": {
+      "session": "ts_2edcb40f9f1d (drinking-water biofilm, deployed c9f695e5)",
+      "what_it_proved": "the FULL interruption-resume-COMPLETE cycle LIVE: INTERRUPTED at 11.8 min -> retry 202 (rt_f8efb544c42b) -> resumed -> COMPLETE at 19.2 min with the honest MECHANISM_GENERATION_FAILED verdict; the URL leg LIVE (TEXT_EXTRACTED + file:// typed REJECTED_BLOCKED_URL with the fetcher provably never running); the typed clarification_answer record surviving at terminal; the identity probe PASS (10 samples)",
+      "artifact": "R471/PROD_RUN/E2E_RECORD.json (the sibling line's record)"
+    }
+  },
+  "tests": {
+    "python_new": "54 R471 tests green on the union: the sibling's test_r471_audit_fixes.py 20/20 + this line's 34 (retry contract 14, clarification durability 5, URL reference 10 rewritten onto the fetch contract, queued directive 5)",
+    "python_standing": "405 passed this session across recovery/r446/r458/r461/r463/r465/r468/r469/r470/r392/r415/r419/r422; the FIVE standing pre-existing failures unchanged (r392 x3 transport-env, r458 BS-020, r419 blender \u2014 stash-differential verified)",
+    "webapp": "present 16/16, events 12/12, r458 21, r461 10, r463 7, r464 23, r466 13, r467 10, r470 7, r471 15 (the merged battery: the sibling's 8 + this line's 7), copy 1, math 12; tsc strict clean; production build green (100 kB shared first-load)",
+    "inventory": "MODULE_INVENTORY 124 production files / 62690 LOC regenerated; pre-commit constitution check PASS"
+  },
+  "open_items": [
+    "P0-1 the 20-run >=95%-terminal campaign (the interruption class still occurs; recovery now proven at n=1)",
+    "P1-1 real multimodal ingestion (image OCR/CAD summary/dataset schema \u2014 the audit's XL item, gated on the security review)",
+    "P1-4 real-device mobile/accessibility/performance acceptance on the current deployment",
+    "P1-5 projects/search/program features (the audit's 'only after the core run is green' ordering)",
+    "the standing science mission: candidate quality vs the obvious-combination kill class",
+    "key-8 re-supply (probe-typed invalid at R470; the ring stands at nine)"
+  ],
+  "constitution": "EPISTEMIC_CONSTITUTION.md v2.5.0 (9730567a) re-read at session start and before commit; Article LXXIII vault used for every credential (zero operator re-asks); zero secret values in any artifact (BS-021)",
+  "reviewer_provenance": "AI_REVIEW"
+}
