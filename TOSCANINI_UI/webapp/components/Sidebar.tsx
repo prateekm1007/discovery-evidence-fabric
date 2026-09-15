@@ -23,6 +23,7 @@
 
 import { useMemo, useState } from "react";
 import type { HealthSummary, SessionRow, ShowcaseRow, UserStateView } from "@/lib/types";
+import { groupRounds, type RoundRow } from "@/lib/rounds";
 
 // the three honest recency buckets, derived from the item's own date
 function timeBucket(iso: string | undefined): "today" | "week" | "earlier" {
@@ -99,6 +100,9 @@ export default function Sidebar({
   // client-side search over the already-loaded titles + honest time
   // grouping (both derived from data already in the browser)
   const [query, setQuery] = useState("");
+  // R464 (audit P1-8): the idle cap is now STATED — a "show all"
+  // affordance replaces the silent 14-row ceiling
+  const [showAll, setShowAll] = useState(false);
   const q = query.trim().toLowerCase();
   const searching = q.length > 0;
 
@@ -106,30 +110,45 @@ export default function Sidebar({
     () =>
       searching
         ? sessions.filter((s) => (s.title ?? "").toLowerCase().includes(q))
-        : sessions.slice(0, 14),
-    [searching, q, sessions]
+        : showAll
+          ? sessions
+          : sessions.slice(0, 14),
+    [searching, q, sessions, showAll]
   );
 
+  // R464 (audit P1-2): rounds group under the investigation they
+  // continue — the parent thread stays one visual unit, children
+  // indented with their round number (pure projection of the
+  // parent_session_id the engine already records per row).
+  const roundRows = useMemo(() => groupRounds(visible), [visible]);
+
   const grouped = useMemo(() => {
-    const g: Record<"today" | "week" | "earlier", SessionRow[]> = {
+    const g: Record<"today" | "week" | "earlier", RoundRow<SessionRow>[]> = {
       today: [], week: [], earlier: [],
     };
-    for (const s of visible) g[timeBucket(s.created_at)].push(s);
+    for (const r of roundRows) g[timeBucket(r.row.created_at)].push(r);
     return g;
-  }, [visible]);
+  }, [roundRows]);
 
-  const renderItem = (s: SessionRow) => {
+  const renderItem = (r: RoundRow<SessionRow>) => {
+    const s = r.row;
     const dot = stateDot(s.user_state_view);
     return (
       <button
         key={s.session_id}
-        className={`rail-item ${activeRun === s.session_id ? "active" : ""}`}
+        className={`rail-item ${r.grouped ? "child" : ""} ${activeRun === s.session_id ? "active" : ""}`}
         onClick={() => onSelectRun(s.session_id)}
         type="button"
         title={s.title}
       >
         <span className={`rail-dot rail-dot-${dot.cls}`} role="img" aria-label={dot.label} />
         <span className="rail-title">{s.title}</span>
+        {/* R464 (audit P1-2): a continued round names its position in
+            the thread — the history reads as one investigation, not
+            as unrelated entries */}
+        {r.round > 1 && (
+          <span className="rail-round" data-rail-round>Round {r.round}</span>
+        )}
         {/* R463 (audit P1-2): the parent row marks a thread that forked
             a steering round — the thread is visible from both ends */}
         {s.has_fork && (
@@ -176,7 +195,7 @@ export default function Sidebar({
             <div className="rail-group-h" aria-hidden="true">
               {visible.length} match{visible.length === 1 ? "" : "es"}
             </div>
-            {visible.map(renderItem)}
+            {roundRows.map(renderItem)}
           </>
         )}
         {!searching && (["today", "week", "earlier"] as const).map((b) => {
@@ -193,13 +212,42 @@ export default function Sidebar({
             </div>
           );
         })}
+        {/* R464 (audit P1-8): the capped idle view says how much history
+            exists and offers the rest in one tap — search already covers
+            everything; this is the honest count, not a silent ceiling */}
+        {!searching && !showAll && sessions.length > 14 && (
+          <button
+            type="button"
+            className="rail-count"
+            data-rail-see-all
+            onClick={() => setShowAll(true)}
+          >
+            Show all {sessions.length} discoveries
+          </button>
+        )}
+        {!searching && showAll && sessions.length > 14 && (
+          <button
+            type="button"
+            className="rail-count"
+            data-rail-collapse
+            onClick={() => setShowAll(false)}
+          >
+            Show recent only
+          </button>
+        )}
       </div>
 
       <div className="rail-section">
         <div className="rail-h">Technology packages</div>
         {showcase.length === 0 && (
           <div className="rail-empty">
-            Released packages appear here as the portfolio produces them.
+            {/* R464 (audit P2-6): the empty state explains what a
+                package IS before the visitor has one — the section
+                name alone was insider vocabulary */}
+            When a discovery survives its challenges, it can be released
+            as a technology package — the evidence, engineering, and
+            decisive experiment, ready to evaluate. Released packages
+            appear here as the portfolio produces them.
           </div>
         )}
         {focus.map((s) => (

@@ -6,10 +6,12 @@
   --ink: #1f1e1c;
   --ink-soft: #55524c;
   --ink-faint: #8a867e;
-  --accent: #c15f3c;        /* terracotta */
+  --accent: #c15f3c;        /* terracotta — borders, fills, large type */
+  --accent-text: #a34d2e;  /* AA text accent — 5.7:1 on white, 5.5:1 on paper */
+  --accent-deep: #8f4220;  /* AA text on accent-soft tint — 5.3:1 */
   --accent-soft: #e8ddd2;
   --ok: #3e6b4f;
-  --warn: #a86a2f;
+  --warn: #96601f;   /* AA on white/paper/tint — was #a86a2f (4.4:1) */
   --bad: #9c3a2e;
   --line: #e3e0d8;
   --mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
@@ -240,7 +242,7 @@ a { color: inherit; }
   font-size: 11px;
   letter-spacing: 0.6px;
   text-transform: uppercase;
-  color: var(--accent);
+  color: var(--accent-text);
   margin-bottom: 8px;
 }
 
@@ -254,9 +256,7 @@ a { color: inherit; }
 .card p { margin: 0; color: var(--ink-soft); font-size: 13.5px; }
 .card .foot { margin-top: 12px; color: var(--ink-faint); font-size: 12px; }
 
-@media (max-width: 780px) {  }
-
-/* ---------------- run page ---------------- */
+/* run page */
 .runpage .problem {
   background: #fff;
   border: 1px solid var(--line);
@@ -333,7 +333,7 @@ a { color: inherit; }
   font-size: 11.5px;
   letter-spacing: 0.7px;
   text-transform: uppercase;
-  color: var(--accent);
+  color: var(--accent-text);
   padding-top: 2px;
 }
 .arg .step .v { font-size: 14.5px; color: var(--ink); }
@@ -590,7 +590,7 @@ details.tech summary {
   list-style: none;
   user-select: none;
 }
-details.tech summary::before { content: "+ "; color: var(--accent); font-weight: 700; }
+details.tech summary::before { content: "+ "; color: var(--accent-text); font-weight: 700; }
 details.tech[open] summary::before { content: "− "; }
 details.tech summary:hover { color: var(--ink); }
 details.tech .techbody { padding: 4px 20px 22px; }
@@ -750,7 +750,7 @@ details.tech li { font-size: 13.5px; color: var(--ink-soft); margin-bottom: 6px;
   text-align: left;
   margin-bottom: 10px;
 }
-.rail-new:hover { border-color: var(--accent); color: var(--accent); }
+.rail-new:hover { border-color: var(--accent); color: var(--accent-text); }
 
 .rail-section { margin-top: 14px; }
 .rail-h {
@@ -815,7 +815,7 @@ details.tech li { font-size: 13.5px; color: var(--ink-soft); margin-bottom: 6px;
 .rail-item.inv .rail-inv-id {
   font-family: var(--mono);
   font-size: 10.5px;
-  color: var(--accent);
+  color: var(--accent-text);
   letter-spacing: 0.3px;
 }
 .rail-item .pill { font-size: 9.5px; padding: 2px 7px; align-self: flex-start; }
@@ -828,7 +828,7 @@ details.tech li { font-size: 13.5px; color: var(--ink-soft); margin-bottom: 6px;
   list-style: none;
   user-select: none;
 }
-.rail-more summary::before { content: "+ "; color: var(--accent); }
+.rail-more summary::before { content: "+ "; color: var(--accent-text); }
 .rail-more[open] summary::before { content: "− "; }
 .rail-more summary:hover { color: var(--ink); }
 
@@ -915,7 +915,7 @@ details.tech li { font-size: 13.5px; color: var(--ink-soft); margin-bottom: 6px;
   color: var(--ink-soft);
   text-decoration: none;
 }
-.dl-chip:hover { border-color: var(--accent); color: var(--accent); }
+.dl-chip:hover { border-color: var(--accent); color: var(--accent-text); }
 .dim-row {
   display: flex;
   justify-content: space-between;
@@ -1490,11 +1490,11 @@ details.tech li { font-size: 13.5px; color: var(--ink-soft); margin-bottom: 6px;
   cursor: pointer;
   font-family: inherit;
 }
-.chip:hover { border-color: var(--accent); color: var(--accent); }
+.chip:hover { border-color: var(--accent); color: var(--accent-text); }
 .chip.on {
   border-color: var(--accent);
   background: var(--accent-soft);
-  color: var(--accent);
+  color: var(--accent-deep);
   font-weight: 550;
 }
 .chip.nv {
@@ -1937,7 +1937,7 @@ details.tech li { font-size: 13.5px; color: var(--ink-soft); margin-bottom: 6px;
   box-shadow: 0 1px 3px rgba(31, 30, 28, 0.1);
 }
 .hero-clear { left: auto; right: 130px; }
-.hero-return:hover, .hero-clear:hover { border-color: var(--accent); color: var(--accent); }
+.hero-return:hover, .hero-clear:hover { border-color: var(--accent); color: var(--accent-text); }
 .hero-ab {
   position: absolute;
   top: 12px;
@@ -2051,7 +2051,7 @@ details.tech li { font-size: 13.5px; color: var(--ink-soft); margin-bottom: 6px;
   font-weight: 700;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--accent);
+  color: var(--accent-text);
 }
 .ic-pending .ic-title { color: var(--ink-faint); }
 .ic-body {
@@ -2118,8 +2118,8 @@ details.tech li { font-size: 13.5px; color: var(--ink-soft); margin-bottom: 6px;
   width: 1em;
   flex: none;
 }
-.dd-sec[open] summary::before { content: "–"; color: var(--accent); }
-.dd-sec summary:hover .dd-title { color: var(--accent); }
+.dd-sec[open] summary::before { content: "–"; color: var(--accent-text); }
+.dd-sec summary:hover .dd-title { color: var(--accent-text); }
 .dd-title { font-size: 14px; font-weight: 600; }
 .dd-sub { font-size: 12px; flex-basis: 100%; margin-left: 26px; }
 .dd-body {
@@ -2134,7 +2134,7 @@ details.tech li { font-size: 13.5px; color: var(--ink-soft); margin-bottom: 6px;
   appearance: none;
   border: none;
   background: none;
-  color: var(--accent);
+  color: var(--accent-text);
   cursor: pointer;
   font: inherit;
   padding: 0;
@@ -2227,7 +2227,7 @@ details.tech li { font-size: 13.5px; color: var(--ink-soft); margin-bottom: 6px;
 .conv-evidence-line { font-size: 15px; overflow-wrap: anywhere; }
 .conv-evidence-domains { font-size: 12px; margin-top: 3px; }
 .conv-open { margin-top: 8px; font-size: 12.5px; background: none; border: none; cursor: pointer; padding: 0; font: inherit; font-size: 12.5px; color: var(--ink-faint); }
-.conv-open:hover { color: var(--accent); }
+.conv-open:hover { color: var(--accent-text); }
 
 /* candidates — competing hypotheses (brief §16) */
 .conv-candidates { display: flex; flex-direction: column; gap: 10px; }
@@ -2281,7 +2281,7 @@ details.tech li { font-size: 13.5px; color: var(--ink-soft); margin-bottom: 6px;
 .conv-next { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-top: 4px; }
 .conv-next-k { font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.8px; }
 .conv-technical { background: none; border: none; cursor: pointer; padding: 0; font: inherit; font-size: 12.5px; color: var(--ink-faint); }
-.conv-technical:hover { color: var(--accent); }
+.conv-technical:hover { color: var(--accent-text); }
 
 /* the composer (brief §7 — the product) */
 .conv-composer {
@@ -2320,7 +2320,7 @@ details.tech li { font-size: 13.5px; color: var(--ink-soft); margin-bottom: 6px;
   font-size: 12.5px;
   cursor: pointer;
 }
-.suggestion:hover { border-color: var(--accent); color: var(--accent); }
+.suggestion:hover { border-color: var(--accent); color: var(--accent-text); }
 .ask-actions { display: flex; gap: 8px; align-items: center; }
 .hero-privacy { margin-top: 18px; font-size: 12.5px; text-align: center; }
 
@@ -2686,3 +2686,138 @@ details.tech li { font-size: 13.5px; color: var(--ink-soft); margin-bottom: 6px;
 
 /* ---- R463: the conversation empty state (P2-3) ------------------------- */
 .conv-empty .conv-note { border-left: 3px solid var(--line); padding-left: 10px; }
+
+/* ==========================================================================
+   R464 — EXTERNAL UX AUDIT EXECUTION (the 7.0/10 review)
+   (P0-2 time expectation · P0-3 first-use orientation · P0-4 AA accent
+   text tokens · P1-1 experiment CTA in-thread · P1-2 round grouping in
+   the rail · P1-3 mid-run steering note · P1-4 semantic headings ·
+   P1-6 upload guidance · P1-7 note dismissal · P1-8 history paging ·
+   P2-1 dead breakpoint removed · P2-2 candidate density · P2-6
+   packages empty state)
+   ========================================================================== */
+
+/* ---- P0-2: the duration is product-critical, not keyboard-hint-sized -- */
+.hero-note {
+  margin: 14px auto 0;
+  max-width: 60ch;
+  font-size: 14px;
+  line-height: 1.5;
+  text-align: center;
+  color: var(--ink-soft);
+}
+.hero-note b { color: var(--ink); font-weight: 600; }
+
+/* ---- P0-3: first-use orientation — one concrete example outcome ------- */
+.expect-card {
+  margin: 20px auto 0;
+  max-width: 640px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 16px 18px;
+  text-align: left;
+}
+.expect-card .expect-kicker {
+  font-size: 11px;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: var(--accent-text);
+  margin-bottom: 6px;
+}
+.expect-h {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: 16.5px;
+  margin: 0 0 6px;
+}
+.expect-body { font-size: 13.5px; color: var(--ink-soft); margin: 0 0 10px; }
+.expect-list { margin: 0; padding-left: 18px; font-size: 13px; color: var(--ink-soft); }
+.expect-list li { margin: 3px 0; }
+.expect-tag {
+  display: inline-block;
+  margin-top: 10px;
+  font-size: 11.5px;
+  color: var(--ink-faint);
+}
+
+/* ---- P1-6: upload guidance under the composer -------------------------- */
+.ask-files-hint {
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--ink-faint);
+  text-align: left;
+}
+
+/* ---- P1-2: rounds grouped under their parent in the rail --------------- */
+.rail-item.child { padding-left: 24px; }
+.rail-round {
+  font-size: 10px;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 1px 7px;
+  flex-shrink: 0;
+}
+.rail-count {
+  margin-top: 6px;
+  font-size: 11.5px;
+  color: var(--ink-faint);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px 2px;
+  font-family: inherit;
+  text-align: left;
+}
+.rail-count:hover { color: var(--ink); text-decoration: underline; }
+
+/* ---- P1-3: the mid-run steering note ------------------------------------ */
+.conv-steer-note {
+  text-align: center;
+  font-size: 12.5px;
+  color: var(--ink-faint);
+  padding: 2px 8px;
+}
+
+/* ---- P1-7: the action note carries its own dismissal -------------------- */
+.conv-action-note { position: relative; }
+.conv-action-dismiss {
+  position: absolute;
+  top: -4px;
+  right: 0;
+  appearance: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--ink-faint);
+  font-size: 13px;
+  padding: 4px 6px;
+  line-height: 1;
+}
+.conv-action-dismiss:hover { color: var(--ink); }
+
+/* ---- P1-4: the workspace title is a real heading ------------------------ */
+h2.wk-title {
+  margin: 0;
+  font-size: 12px;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  font-weight: inherit;
+}
+
+/* ---- P0-1: the forward continuation link -------------------------------- */
+.fork-row { display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline; }
+.fork-note.fwd { margin-left: 0; }
+
+/* ---- P2-2: candidate cards breathe on small phones ---------------------- */
+@media (max-width: 480px) {
+  .conv-cand { padding: 10px 12px; }
+  .conv-cand-body { font-size: 13px; }
+  .conv-cand-int { font-size: 13.5px; }
+  .conv-cand-maturity { font-size: 11.5px; }
+  .conv-cand-actions { flex-wrap: wrap; }
+}

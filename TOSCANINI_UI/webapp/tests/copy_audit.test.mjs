@@ -28,6 +28,9 @@ const FILES = [
   "lib/actionContract.ts",
   "lib/productEvents.ts",
   "lib/present.ts",
+  // R464: the rounds projection renders on the primary surface (the
+  // rail and the run header) — its strings join the audited set
+  "lib/rounds.ts",
 ];
 const EXTS = [".tsx", ".ts"];
 

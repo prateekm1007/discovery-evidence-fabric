@@ -349,7 +349,11 @@ export default function Workspace({
   return (
     <aside className="wk" data-workspace data-wk-surface={surface}>
       <div className="wk-head">
-        <span className="wk-title">{SURFACE_TITLES[surface] ?? surface}</span>
+        {/* R464 (audit P1-4): a real heading — screen readers navigate
+            the workspace surfaces by h2, not by a styled span. The
+            visual weight is unchanged (h2.wk-title resets its margins
+            and inherits the panel's own type). */}
+        <h2 className="wk-title">{SURFACE_TITLES[surface] ?? surface}</h2>
         <div className="wk-siblings" data-wk-siblings>
           {siblings.map((s) => (
             <button

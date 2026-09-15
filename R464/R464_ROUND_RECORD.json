@@ -1,0 +1,119 @@
+{
+ "schema": "R464_ROUND_RECORD/1.0.0",
+ "title": "R464 — THE EXTERNAL 7.0/10 UX AUDIT EXECUTION: the four 9/10 blockers closed at the layer they live in (P0-1 action continuity: rounds grouped + Round N named + forward navigation; P0-2 time expectation: full-weight duration note + recorded-event step position; P0-3 first-use orientation: the example-result card; P0-4 WCAG AA accent text tokens, computed not asserted) + P1-1/P1-2/P1-3/P1-4/P1-6/P1-7/P1-8 + the P2 quick wins — frontend-only, zero scientific-authority changes",
+ "date_utc": "2026-09-15",
+ "reviewer_provenance": "AI_REVIEW",
+ "baseline_identity": {
+  "checkout_synchronized_by": "fetch FIRST (the standard procedure): at round start origin/main was 1be90e29 and the checkout was already up to date (rev-list HEAD..origin/main == 0). MID-ROUND the parallel session pushed 3 commits (ddef8c62 R463-C2 PU-loader arity fix, 1bc9789c deploy state, 565efe6d R463-C2 records) — the push was rejected, the standing fetch + rebase executed, ONE conflict (worklog.md, both entries preserved in order), zero code conflicts (their commits touch toscanini/worker.py + tests; this round is frontend-only). Post-rebase batteries re-run GREEN on the merged tree",
+  "constitution": "v2.4.0 (sha256 b54a1be9bcbdd2465d0b034e1e1f472f80b87174209c0d534b7d9e1223e649b2, verified byte-identical before the commit); the round's governing articles read IN FULL (X, XVI, XXV, XXVIII, LXI, LXIV, LXX, LXXI)",
+  "governance_read": [
+   "GOVERNANCE/README.md (in full)",
+   "AUDITOR_BLINDSPOT_REGISTER.md BS-020 + BS-021 (the standing entries: env-dependent key files, secrets never in the repo)"
+  ],
+  "production_at_round_start": "1bc9789c (the parallel R463-C2 tuple: Space rev 5bc750ba, drift GREEN — superseded by this round's own delivery tuple below)"
+ },
+ "operator_directives": {
+  "the_instruction_verbatim": "fix",
+  "the_attachment": "the independent external UX audit (30 parts, 7.0/10 overall, 8,479 files / ~400K lines reviewed at commit granularity) — its P0/P1/P2 fix inventory executed this round",
+  "the_audit_scores": {
+   "overall_conservative": "7.0/10",
+   "claude_class_ux": "6.5/10",
+   "complexity_hiding": "7.0/10 (language layer 8.5; navigation layer 5.5)",
+   "trust_scientific_ux": "8.0/10",
+   "mobile": "6.0/10",
+   "accessibility": "6.0/10"
+  }
+ },
+ "the_work": {
+  "p0_1_action_continuity": {
+   "finding": "conversational steering creates a NEW session and navigates to it — the user believes they are continuing a conversation and instead lose the thread (the audit's most severe UX failure; its P0.1 and BLOCKER 1)",
+   "already_in_place_from_the_parallel_sessions": "the R461 directive line (the child conversation opens with the user's own steering words, byte-for-byte from the canonical user_directive) and the R463 fork-note (the child links back to its parent) + has_fork on the parent's rail row",
+   "what_this_round_adds": [
+     "lib/rounds.ts (NEW, zero-dependency, React-free): roundNumberOf / groupRounds / latestChildOf — the round STRUCTURE projected purely from the parent_session_id the engine already records on every /api/sessions row and on the run detail (Art. X: parentage is canonical state; the module only projects it — cycle-safe by construction, unknown parents count as one step so the number stays a lower bound, never a guess)",
+     "the rail groups rounds under their parent (children indented, chronological within the thread, 'Round N' chip; an orphan child whose parent is outside the capped view stays visible with its round number)",
+     "the run header names WHICH round you are in: 'Round 2 — continued from the earlier round of this investigation →' (data-round carries the number)",
+     "the FORWARD link: a parent that forked now links to its newest round ('This investigation continued in a new round →') — previously the thread was navigable backwards only",
+     "SessionRow.parent_session_id declared in the UI type (the wire row already carried it — the type now says so)"
+    ]
+  },
+  "p0_2_time_expectation": {
+   "finding": "'runs take minutes; you can leave and come back' lived in the 12.5px keyboard-hint grey — product-critical duration information whispered in a footer; a first-time user watches a blank conversation with no sense of progress (the audit's BLOCKER 3)",
+   "the_fix": [
+     "the landing carries the duration at FULL visual weight (hero-note, 14px, ink-soft, its own block): 'A discovery run takes minutes, not seconds. … you can leave this page and come back' — minutes as an honest CLASS, never a precise promise (the same discipline as the elapsed-time line)",
+     "the keyboard hint returns to being a keyboard hint",
+     "the RUNNING conversation's opening note states the duration class + the resume guarantee",
+     "the live sentence carries the run's POSITION: stageProgressSuffix (productEvents.ts) — distinct COMPLETED stages + the active one, from recorded events only. 'Stage 3 of 13' was REFUSED on Art. XXV/VI grounds: the pipeline's length varies by run and inventing a denominator would fabricate an expectation. The suffix reads '· step N' — position only, no total, no stage names"
+    ]
+  },
+  "p0_3_first_use_orientation": {
+   "finding": "a new user cannot answer 'what does this produce?' within 20 seconds of landing (the audit's BLOCKER 5 / Part §A)",
+   "the_fix": [
+     "the EXAMPLE RESULT card (expect-card) under the suggestions: what a finished discovery looks like — evidence found, competing candidates with kill conditions, the adversarial challenge, the engineering + 3D model, the decisive experiment, the downloadable package",
+     "labeled 'An illustrative example — every real result states its own evidence and its own limits, never more' (never a fake record; the card mirrors the REAL result vocabulary)",
+     "the duration note (P0-2) completes the 20-second answer: how long + what you receive + the suggestion chips' what-kind-of-problem"
+    ]
+  },
+  "p0_4_wcag_aa_accent": {
+   "finding": "--accent #c15f3c ≈ 4.2:1 on white / 4.0:1 on paper at 11-13px in .card .kicker, .arg .step .k, .ic-title, .rail-inv-id, .linklike, hover text, .chip.on on its tint — a measurable AA failure (the audit's BLOCKER 4)",
+   "the_fix": [
+     "THREE tokens, measured in tests (not asserted by eye): --accent #c15f3c (borders/fills/large type, unchanged), --accent-text #a34d2e (5.7:1 white / 5.5:1 paper / 5.0:1 paper-2), --accent-deep #8f4220 (5.3:1 on the accent-soft tint — .chip.on)",
+     "every small-text accent context switched to the AA token (kicker, step keys, ic-title, rail-inv-id, linklike, chip on/hover, all hover-text states); borders/backgrounds stay --accent",
+     "--warn darkened #a86a2f → #96601f (4.4:1 → 5.3:1 on white; 4.8:1 on its pill tint) — the same class of measurable failure, fixed in the same pass",
+     "the ratios are COMPUTED in tests/adversarial_r464.test.mjs (the luminance formula in the test) — the acceptance is arithmetic, not opinion"
+    ]
+  },
+  "p1_items": {
+   "p1_1_mobile_result": "THE DECISIVE EXPERIMENT now rides the conversation thread as an artifact card (present.ts) — the model and package cards already did; the experiment surface had NO in-thread affordance, and the workspace never auto-opens below 1181px. Terminal runs with an AVAILABLE experiment tab get the card on every viewport; the conversation is the index. A RUNNING run shows no card (the record decides)",
+   "p1_2_rounds_navigation": "covered with P0-1 above (groupRounds + the Round N chip in the rail)",
+   "p1_3_mid_run_composer": "the steer chips now render ONLY when the engine's own action gate accepts steering (isTerminal == the engine's _terminal, verified identical); a RUNNING run shows the calm line instead: 'Steering opens when this investigation completes — you can still ask about its record below.' Asking stays available throughout",
+   "p1_4_heading_hierarchy": "the workspace title is a real <h2 class=wk-title> (margin-reset, identical visual weight) — screen readers navigate the seven surfaces by heading",
+   "p1_5_keyboard_handlers": "verified ALREADY PRESENT from the parallel session (ScienceEvents.tsx role=button divs carry Enter/Space onKeyDown) — re-verified by source inspection this round, no change needed",
+   "p1_6_file_type_guidance": "the file input names its accept list (the backend's own extension vocabulary: text-like + pdf + docx + images + step/stl/glb + zip); a visible 12px hint states the 20 MB limit and the read-vs-stored distinction; the attachment CHIP now states the typed ingestion verdict — 'N characters read' vs 'stored on the record — not read as text' / '— no text could be read from it' (the audit's red-team row: a user attaching a JPG must never believe it was read)",
+   "p1_7_note_dismissal": "the action note carries its own × dismissal (aria-label) — a refusal no longer squats over the composer until navigation",
+   "p1_8_history_cap": "the capped idle rail STATES its count: 'Show all {N} discoveries' / 'Show recent only' — the 14-row ceiling becomes an honest, reversible affordance"
+  },
+  "p2_quick_wins": {
+   "p2_1": "the dead empty @media (max-width: 780px) {} rule DELETED",
+   "p2_2": "candidate cards breathe at ≤480px (padding/font reductions, wrap the quick actions)",
+   "p2_5": "verified already satisfied by the parallel session (SURFACE_TITLES.journal == 'The technical record') — no change needed",
+   "p2_6": "the Technology Packages empty state explains what a package IS before the visitor has one"
+  },
+  "deliberately_not_done": [
+   "the 'of N' stage total — refused on Art. XXV/VI (fabricated expectation); the position-only suffix is the honest version",
+   "conversation list semantics (ol/li roles) — the audit's Part 12 note; a structural markup change deferred with the P3 tier",
+   "skeleton loading for the 2500ms first poll (P2-4) and share-behavior copy on in-progress runs (P2-3) — deferred, disclosed",
+   "in-thread RENDERING of the child round inside the parent's conversation (the audit's option 1, L complexity) — the round header + rail grouping + forward link (options 2+3) shipped instead; the audit's own acceptance ('see Round 2 started, navigate back with one click, see Round 2 in the same thread layout') is met by the navigation approach"
+  ]
+ },
+ "tests": {
+  "frontend": {
+   "tsc": "clean (--noEmit --strict)",
+   "export_build": "NEXT_OUTPUT=export next build — 5/5 routes; verify-export.mjs GREEN (css 2 files, 15 js chunks, every page references a stylesheet)",
+   "adversarial_r464": "23/23 NEW (the shipped modules compiled by esbuild and executed: stage-position derivation incl. no-total/no-vocabulary guards; experiment-card presence/absence/running gates; rounds grouping/numbering/cycle-safety/orphans/forward-link; computed WCAG ratios for all three tokens; source-level acceptance for every P0/P1 fix + the dead-breakpoint removal)",
+   "regression_batteries": "present 16/16, events 12/12, r458 21/21, r461 10/10, r463 7/7, copy_audit 1/1 (now scanning lib/rounds.ts too), math 12/12",
+   "ux_proof": "the static export served and screenshotted at 1440px and 390px (R464/ux_landing_desktop_1440.png, R464/ux_landing_mobile_390.png): the duration note, the example card, and the files hint all render; zero console errors; VLM-verified for overlap/overflow at both widths"
+  },
+  "backend": {
+   "families": "r459_audit_execution + r461_durability + r461_bynara_router + r462_tokenharbor_region_gate + r463_aerolink_plan_gate + r463_hf_credential_path + r463_no_operator_key: 140/140",
+   "r458": "29/30 — the one failure (test_paid_env_vars_stripped_in_arm_env, the z-ai gateway key file missing) stash-verified IDENTICAL at the pristine 1be90e29 baseline (BS-020, env-dependent, untouched by this round's frontend-only diff)"
+  }
+ },
+ "honest_disclosures": [
+  "this round changes ZERO engine code (frontend + tests only); the backend batteries were run to prove the baseline, not because the diff touches them",
+  "MODULE_INVENTORY pre-existing drift found and repaired: the committed inventory (py_loc 59,721, the R463 record's number) was ALREADY STALE at pristine HEAD 1be90e29 — verified by restoring HEAD's copy and running the --check gate (STALE at a tree this round's diff did not touch, zero Python changes). Regenerated to the tree-matching 59,948 (same 123 files; the delta is the R463 session's recorded number lagging its own tree). The drift gate is GREEN on the regenerated artifact",
+  "the stage-position suffix deliberately has NO denominator (Art. XXV/VI); the audit's literal 'Stage 3 of 13' was adapted to the honest '· step N' — the audit's intent (progress sense during minutes of waiting) is met without a fabricated total",
+  "P1-5 (keyboard handlers) and P2-5 (journal title) were found ALREADY SATISFIED by the parallel sessions' work — recorded as verified, not re-implemented",
+  "deferred with reasons: conversation list semantics (structural), skeleton loading (P2-4), share-on-running copy (P2-3), in-thread child rendering (the L-complexity option)",
+  "the audit's 'NOT PROVEN' categories (performance, output quality) remain unmeasured here — they need live Lighthouse/engine runs, out of this round's scope"
+ ],
+ "production_deployment": {
+  "target_sha": "",
+  "deployed_sha": "",
+  "deploy_id": "",
+  "health_check_result": "PENDING_AT_RECORD_WRITE",
+  "drift": "UNKNOWN",
+  "blocked_by": "",
+  "what_unblocks": "",
+  "verification": "to be filled by the delivery step (commit → push → deploy → /api/version + /api/health) per Article LXXI; a failure to deploy will be declared DELIVERY_BLOCKED with the specific blocker, never silently omitted"
+ }
+}

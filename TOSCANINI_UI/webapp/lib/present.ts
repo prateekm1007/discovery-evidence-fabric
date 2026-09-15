@@ -612,7 +612,7 @@ export function deriveConversation(
     kind: "note",
     id: mid("n"),
     text: running
-      ? "I'm investigating this. I'll work through the evidence, form candidate mechanisms, and try to disprove the strongest one — you'll see each step here as the record is written."
+      ? "I'm investigating this. I'll work through the evidence, form candidate mechanisms, and try to disprove the strongest one — you'll see each step here as the record is written. A full run takes minutes rather than seconds; you can leave and come back, and this conversation resumes from the record."
       : "Here is what the investigation found, and how far it got.",
   });
 
@@ -674,6 +674,27 @@ export function deriveConversation(
       state: attack,
       challenge: strongestChallenge,
       body: attackSentence(attack, detail),
+    });
+  }
+
+  // R464 (external audit P1-1): THE DECISIVE TEST rides the conversation
+  // thread itself. The audit's mobile finding: the workspace never
+  // auto-opens below the desktop breakpoint, so surfaces that live only
+  // behind the panel are invisible without prior knowledge. The model and
+  // package already ride artifact cards; the experiment surface had NO
+  // in-thread affordance. Terminal runs with an AVAILABLE experiment tab
+  // now get one — on every viewport, the conversation is the index.
+  const experimentTab = dossier?.tabs?.experiment as
+    | { availability?: string }
+    | undefined;
+  if (!running && experimentTab?.availability === "AVAILABLE") {
+    msgs.push({
+      kind: "artifact",
+      id: mid("x"),
+      surface: "experiment",
+      title: "The decisive experiment",
+      body: "The one test that could settle the leading candidate — specified with what it would take to falsify it, from the run's own record.",
+      cta: "Open the experiment",
     });
   }
 

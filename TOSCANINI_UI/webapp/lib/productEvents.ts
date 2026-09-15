@@ -255,6 +255,39 @@ export function productEventSentence(evt: ProductEventInput | null | undefined):
 }
 
 // ---------------------------------------------------------------------------
+// R464 (external audit P0-2) — THE STAGE POSITION SUFFIX.
+//
+// The audit's finding: a run sitting in one phase for minutes shows
+// one sentence and a blinking cursor — "the user has no sense of how
+// far along the run is." The honest version of "Stage 3 of 13": the
+// POSITION is derived from the run's own recorded events (how many
+// distinct stages have COMPLETED, plus the one now ACTIVE); the TOTAL
+// is deliberately absent — the pipeline's length varies by run and
+// inventing a denominator would be a fabricated expectation (the same
+// discipline the elapsed-time line keeps: never an invented ETA).
+// Machine stage names never ride the suffix — position only.
+// ---------------------------------------------------------------------------
+
+export function stageProgressSuffix(
+  events: ProductEventInput[]
+): string {
+  const live = pickLiveEvent(events);
+  if (!live) return "";
+  const kind = String(live.kind ?? "");
+  if (!kind.startsWith("stage.")) return "";
+  if (String(live.status ?? "").toUpperCase() !== "ACTIVE") return "";
+  const completed = new Set<string>();
+  for (const e of events) {
+    const k = String(e?.kind ?? "");
+    if (k.startsWith("stage.") &&
+        String(e?.status ?? "").toUpperCase() === "COMPLETED") {
+      completed.add(k.slice("stage.".length).toUpperCase());
+    }
+  }
+  return ` · step ${completed.size + 1}`;
+}
+
+// ---------------------------------------------------------------------------
 // helpers for the conversation live line
 // ---------------------------------------------------------------------------
 

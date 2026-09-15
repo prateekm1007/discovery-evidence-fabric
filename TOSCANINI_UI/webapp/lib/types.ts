@@ -27,6 +27,11 @@ export interface SessionRow {
   // R463 (audit P1-2): steering continuity — the parent row marks a
   // thread that forked a new round
   has_fork?: boolean;
+  // R464 (audit P1-2): a round opened by a steering action carries its
+  // parent's id — the rail groups rounds under the investigation they
+  // continue (the field already rides every /api/sessions row; the type
+  // now says so).
+  parent_session_id?: string | null;
 }
 
 // R394/R395: the user-facing run state — derived backend-side from the

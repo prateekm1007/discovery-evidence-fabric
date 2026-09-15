@@ -29,7 +29,7 @@
 // sentence flows through lib/present.ts; adversarial fixtures pin the
 // honesty contracts (tests/adversarial_present.test.mjs).
 
-import { Suspense, useCallback, useEffect, useRef, useState } from "react";
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   answerClarification,
@@ -67,6 +67,7 @@ import type {
 } from "@/lib/types";
 import type { NextAction, SurfaceId } from "@/lib/present";
 import { suppressStalePositives } from "@/lib/present";
+import { latestChildOf, roundNumberOf } from "@/lib/rounds";
 import Sidebar from "@/components/Sidebar";
 import Conversation from "@/components/Conversation";
 import Workspace from "@/components/Workspace";
@@ -86,6 +87,17 @@ const SUGGESTIONS = [
   { label: "Improve an existing design", example: EXAMPLES[2] },
   { label: "Find an unmet need", example: EXAMPLES[3] },
 ];
+
+// R464 (audit P1-6): the file picker names what it takes — the
+// engine-side ingestion table is the authority (text-like files and
+// text PDFs are READ; images, CAD, and archives are stored on the
+// record with a content hash, not text-extracted). The accept list
+// mirrors the backend's own extension vocabulary; a visitor can still
+// override it in the picker (an off-list file uploads and meets the
+// honest ingestion verdict, never a silent pretense).
+const UPLOAD_ACCEPT =
+  ".txt,.md,.markdown,.csv,.tsv,.json,.log,.xml,.yaml,.yml,.html,.htm,.tex,.bib," +
+  ".pdf,.docx,.png,.jpg,.jpeg,.gif,.webp,.step,.stp,.stl,.glb,.zip";
 
 function TransportDot({ health }: { health: HealthSummary | null }) {
   const r = health?.readiness;
@@ -251,48 +263,64 @@ function NewDiscoveryPane({
         )}
         {pending.length > 0 && (
           <div className="ask-attachments" data-pending-attachments>
-            {pending.map((p, i) => (
-              <span
-                className={`ask-attachment ${p.state === "rejected" ? "bad" : ""}`}
-                key={`${p.file.name}-${i}`}
-                title={p.record?.ingestion?.note ?? (p.state === "uploading" ? "uploading…" : undefined)}
-              >
-                {p.file.name}
-                {p.state === "ingested" && p.record?.ingestion?.status === "TEXT_EXTRACTED" && (
-                  <span className="faint">
-                    {" · "}{p.record.ingestion.text_chars_total ?? 0} characters read
-                  </span>
-                )}
-                {p.state === "uploading" && <span className="faint"> · uploading…</span>}
-                {p.state === "rejected" && (
-                  <span className="faint">
-                    {" · "}{p.record?.ingestion?.note ?? "could not be read"}
-                  </span>
-                )}
-                <button
-                  type="button"
-                  className="ask-attachment-x"
-                  aria-label={`remove ${p.file.name}`}
-                  onClick={() =>
-                    setPending((prev) => prev.filter((_, j) => j !== i))
-                  }
+            {pending.map((p, i) => {
+              // R464 (audit P1-6 / red-team table): the chip states WHAT
+              // THE ENGINE DID with the file — text was read, or the file
+              // is stored on the record without text extraction. A user
+              // attaching a diagram must never believe it was read into
+              // the investigation when it was only stored.
+              const ing = p.record?.ingestion?.status;
+              const stored =
+                p.state === "ingested" &&
+                (ing === "STORED" || ing === "STORED_TEXT_UNREADABLE");
+              return (
+                <span
+                  className={`ask-attachment ${p.state === "rejected" ? "bad" : ""}`}
+                  key={`${p.file.name}-${i}`}
+                  title={p.record?.ingestion?.note ?? (p.state === "uploading" ? "uploading…" : undefined)}
                 >
-                  ×
-                </button>
-              </span>
-            ))}
+                  {p.file.name}
+                  {p.state === "ingested" && ing === "TEXT_EXTRACTED" && (
+                    <span className="faint">
+                      {" · "}{p.record?.ingestion?.text_chars_total ?? 0} characters read
+                    </span>
+                  )}
+                  {stored && (
+                    <span className="faint" data-attachment-stored>
+                      {" · "}stored on the record{ing === "STORED_TEXT_UNREADABLE" ? " — no text could be read from it" : " — not read as text"}
+                    </span>
+                  )}
+                  {p.state === "uploading" && <span className="faint"> · uploading…</span>}
+                  {p.state === "rejected" && (
+                    <span className="faint">
+                      {" · "}{p.record?.ingestion?.note ?? "could not be read"}
+                    </span>
+                  )}
+                  <button
+                    type="button"
+                    className="ask-attachment-x"
+                    aria-label={`remove ${p.file.name}`}
+                    onClick={() =>
+                      setPending((prev) => prev.filter((_, j) => j !== i))
+                    }
+                  >
+                    ×
+                  </button>
+                </span>
+              );
+            })}
           </div>
         )}
         <div className="ask-foot">
           <span className="hint">
-            Enter to start · Shift+Enter for a new line · runs take minutes;
-            you can leave and come back
+            Enter to start · Shift+Enter for a new line
           </span>
           <div className="ask-actions">
             <input
               ref={fileRef}
               type="file"
               multiple
+              accept={UPLOAD_ACCEPT}
               hidden
               onChange={(e) => {
                 void onFiles(e.target.files);
@@ -317,6 +345,14 @@ function NewDiscoveryPane({
             </button>
           </div>
         </div>
+        {/* R464 (audit P1-6): types and the size limit, said up front —
+            the ingestion verdict on each chip stays the authority */}
+        <div className="ask-files-hint faint">
+          Documents up to 20 MB. Text files and text PDFs are read
+          server-side; images, CAD, and archives are stored on the
+          record with a content hash — the chip under each attachment
+          says which happened.
+        </div>
       </div>
       {error && (
         <div className="errbox" style={{ textAlign: "left" }}>
@@ -337,6 +373,46 @@ function NewDiscoveryPane({
             {s.label}
           </button>
         ))}
+      </div>
+      {/* R464 (audit P0-2): the duration is product-critical information —
+          stated at full visual weight BEFORE the first run, not whispered
+          in keyboard-hint grey. The phrasing stays honest: minutes as a
+          class, never a precise promise the engine cannot keep. */}
+      <div className="hero-note" data-hero-note>
+        <b>A discovery run takes minutes, not seconds.</b> The engine
+        investigates evidence, competing mechanisms, and adversarial
+        tests before it answers — you can leave this page and come back;
+        everything is recorded on the server and the conversation
+        resumes from the record.
+      </div>
+      {/* R464 (audit P0-3): first-use orientation — one concrete example
+          of what a finished discovery looks like, so a first-time visitor
+          can answer "what do I receive?" within 20 seconds of landing.
+          Labeled as an example; every line mirrors the real result
+          vocabulary (outcome, candidates with honest maturity, package,
+          decisive experiment). */}
+      <div className="expect-card" data-expect-card>
+        <div className="expect-kicker">Example result</div>
+        <h3 className="expect-h">
+          What a finished discovery looks like
+        </h3>
+        <p className="expect-body">
+          You describe an engineering problem in your own words. The
+          engine investigates it and answers in one conversation —
+          exactly this shape:
+        </p>
+        <ul className="expect-list">
+          <li>the evidence it found, and where each source came from</li>
+          <li>competing candidate mechanisms, each with what would kill it</li>
+          <li>the adversarial challenge — which candidates survived</li>
+          <li>the engineering: geometry, parameters, and a 3D technology model</li>
+          <li>the decisive experiment that would settle the question</li>
+          <li>a downloadable technology package with all of it inside</li>
+        </ul>
+        <span className="expect-tag">
+          An illustrative example — every real result states its own
+          evidence and its own limits, never more.
+        </span>
       </div>
       <div className="hero-privacy faint">
         The engine infers domain, mechanism space, and evidence strategy from
@@ -754,6 +830,21 @@ function WorkspaceInner() {
 
   const activeMode = runId ? "run" : slot ? "invention" : "fresh";
 
+  // R464 (audit P0-1/P1-2): the focused run's ROUND STRUCTURE, derived
+  // from the parentage the engine already records (parent_session_id
+  // on the row/detail). The back-link names which round you are IN;
+  // the forward link exists on a parent that forked — previously the
+  // thread was only navigable backwards, and a user who steered could
+  // not return to their newest round without hunting the rail.
+  const byId = useMemo(
+    () => new Map(sessions.map((s) => [s.session_id, s] as const)),
+    [sessions]
+  );
+  const currentRound = detail ? roundNumberOf(detail, byId) : 1;
+  const childOfCurrent = detail
+    ? latestChildOf(detail.session_id, sessions)
+    : null;
+
   return (
     <div className="workspace">
       <header className="ws-top">
@@ -852,17 +943,35 @@ function WorkspaceInner() {
                     {detail.queue_state.reason}
                   </div>
                 )}
-                {/* R463 (audit P1-2): steering continuity — a forked
-                    round names the round it steered FROM, and the
-                    parent stays one click away in-thread */}
-                {detail.parent_session_id && (
-                  <a
-                    className="fork-note faint"
-                    data-fork-note
-                    href={`/?run=${encodeURIComponent(detail.parent_session_id)}`}
-                  >
-                    Continued from the earlier round of this investigation →
-                  </a>
+                {/* R463 (audit P1-2) + R464 (P0-1): steering continuity
+                    — a forked round names WHICH round of the thread it is
+                    and links back to the round it steered from; a parent
+                    that forked links forward to its newest round. The
+                    whole investigation stays one navigable unit. */}
+                {(detail.parent_session_id || childOfCurrent) && (
+                  <div className="fork-row" data-fork-row>
+                    {detail.parent_session_id && (
+                      <a
+                        className="fork-note faint"
+                        data-fork-note
+                        data-round={currentRound}
+                        href={`/?run=${encodeURIComponent(detail.parent_session_id)}`}
+                      >
+                        {currentRound > 1
+                          ? `Round ${currentRound} — continued from the earlier round`
+                          : "Continued from the earlier round"}{" of this investigation →"}
+                      </a>
+                    )}
+                    {childOfCurrent && isTerminal(detail.status) && (
+                      <a
+                        className="fork-note faint fwd"
+                        data-fork-fwd
+                        href={`/?run=${encodeURIComponent(childOfCurrent.session_id)}`}
+                      >
+                        This investigation continued in a new round →
+                      </a>
+                    )}
+                  </div>
                 )}
                 <Conversation
                   detail={detail}

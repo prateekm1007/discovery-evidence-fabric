@@ -27,6 +27,7 @@ import { useMemo, useState } from "react";
 import type { ScienceEvent, SessionDetail, DossierBody, AskResponse } from "@/lib/present-types";
 import {
   deriveConversation,
+  isTerminal,
   presentMaturity,
   type Msg,
   type NextAction,
@@ -38,6 +39,7 @@ import {
   pickLiveEvent,
   productEventSentence,
   deriveRotationNote,
+  stageProgressSuffix,
 } from "@/lib/productEvents";
 import {
   classifyMessage,
@@ -224,11 +226,24 @@ export default function Conversation({
   const [actionNote, setActionNote] = useState<string | null>(null);
   const msgs = deriveConversation(detail, dossier, packageAvailable);
 
+  // R464 (external audit P1-3): while the run is live the engine refuses
+  // every steering action (its typed mid-flight gate) — yet the composer
+  // sits open and the steer chips sit visible, both inviting input that
+  // will bounce. The chips now render only when steering is actually
+  // accepted (a terminal or paused run); a running run says, in one calm
+  // line, when steering opens. Asking about the record stays available
+  // throughout.
+  const steerOpen = isTerminal(detail.status);
+
   // R458-C2 (§7) — ONE progress sentence. The live line is the newest
   // ACTIVE event (or the honest pause) in product language; the full
   // event stream stays in the technical record, not under the composer.
+  // R464 (audit P0-2): the sentence carries the run's POSITION (how
+  // many distinct stages the record shows complete, plus the active
+  // one) — derived from recorded events only, never a total.
   const live = pickLiveEvent(events);
   const liveSentence = productEventSentence(live);
+  const liveStageSuffix = useMemo(() => stageProgressSuffix(events), [events]);
   const liveSummary =
     live && typeof live.summary === "string" ? live.summary : null;
   const paused = [...events].reverse().find((e) => e.status === "FAILED_INFRASTRUCTURE");
@@ -473,10 +488,22 @@ export default function Conversation({
 
       {/* the action delivery note — honest, one line, never a fake
           success (§4/§27: the engine's record is the only authority on
-          what actually changed) */}
+          what actually changed). R464 (audit P1-7): the note carries its
+          own dismissal — a refusal or delivery note no longer squats
+          over the composer until the next navigation. */}
       {actionNote && (
         <div className="conv-row" data-conv-action-note>
-          <div className="conv-note conv-action-note">{actionNote}</div>
+          <div className="conv-note conv-action-note">
+            {actionNote}
+            <button
+              type="button"
+              className="conv-action-dismiss"
+              aria-label="dismiss this note"
+              onClick={() => setActionNote(null)}
+            >
+              ×
+            </button>
+          </div>
         </div>
       )}
 
@@ -499,6 +526,7 @@ export default function Conversation({
             <div className="conv-live" data-conv-active title={liveSummary ?? undefined}>
               <span className="cursor" aria-hidden="true" />
               {liveSentence.text}
+              <span className="faint">{liveStageSuffix}</span>
             </div>
           )}
         </div>
@@ -506,22 +534,33 @@ export default function Conversation({
 
       {/* R463 (audit P1-4): the persistent steer affordance — visible
           whenever the conversation accepts steering (the composer's
-          Ask/Act routing still decides how each message is sent) */}
-      {!clarificationPending && (
-        <div className="conv-steer" data-conv-steer>
-          <span className="conv-steer-k faint">Steer this discovery:</span>
-          {STEER_CHIPS.map((c) => (
-            <button
-              key={c.verb}
-              type="button"
-              className="conv-quick faint"
-              onClick={() => quickAction(c.verb, c.label)}
-            >
-              {c.label}
-            </button>
-          ))}
-        </div>
-      )}
+          Ask/Act routing still decides how each message is sent).
+          R464 (audit P1-3): a RUNNING run shows the calm note instead —
+          the engine's own gate refuses mid-flight steering, so the
+          chips would invite a guaranteed refusal. */}
+      {!clarificationPending &&
+        (steerOpen ? (
+          <div className="conv-steer" data-conv-steer>
+            <span className="conv-steer-k faint">Steer this discovery:</span>
+            {STEER_CHIPS.map((c) => (
+              <button
+                key={c.verb}
+                type="button"
+                className="conv-quick faint"
+                onClick={() => quickAction(c.verb, c.label)}
+              >
+                {c.label}
+              </button>
+            ))}
+          </div>
+        ) : (
+          !done && (
+            <div className="conv-steer-note" data-conv-steer-locked>
+              Steering opens when this investigation completes — you can
+              still ask about its record below.
+            </div>
+          )
+        ))}
 
       {/* the composer — conversation-first (§4: it can ask, act, and
           answer the engine's question) */}

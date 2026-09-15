@@ -1374,4 +1374,25 @@ Work Log:
 
 Stage Summary:
 - The architecture now matches the product: the user gives Toscanini AI access and Toscanini does the rest — no second secret exists, workers are observable by their owners, spawn deaths leave durable attributable evidence, and the user's HF credential is a registered, honestly-typed production rung. OPEN: the attachment-merge journal event remains unobservable (fail-open swallow) — the named next fix; HF credits depleted (owner-side); P1-1/P1-3/P1-5/P1-6/P3 from the roadmap.
+Task ID: R464
+Agent: Coder 1 (main session)
+Task: the operator's one-word directive "fix" + the attached independent external UX audit (30 parts, 7.0/10) — execute its fix inventory
+
+Work Log:
+- Baseline identity: fetch first (origin/main at 1be90e29 — the checkout was ALREADY up to date, rev-list HEAD..origin/main == 0, no rebase needed); Constitution v2.4.0 verified byte-identical before the commit (sha b54a1be9…); the governing articles read IN FULL (X, XVI, XXV, XXVIII, LXI, LXIV, LXX, LXXI)
+- The audit mapped to the current code first (half its findings were already closed by the parallel sessions — R461's directive line + elapsed time, R463's fork-note + has_fork + steer chips + keyboard handlers + journal title): what remained was executed exactly as inventoried
+- P0-1 action continuity: lib/rounds.ts NEW (roundNumberOf/groupRounds/latestChildOf — pure projection of the recorded parent_session_id, cycle-safe, unknown-parent = lower bound); the rail groups rounds under their parent with a Round N chip; the run header names the round and links back; the FORWARD link (parent → newest child) added — the thread is navigable both directions now
+- P0-2 time expectation: the duration promoted to a full-weight hero-note on the landing (minutes as a CLASS, never a promise); the running note carries the duration + resume guarantee; the live sentence carries the recorded-event POSITION (stageProgressSuffix — '· step N', NO denominator: the audit's 'Stage 3 of 13' was refused on Art. XXV/VI grounds, a fabricated total)
+- P0-3 first-use orientation: the EXAMPLE RESULT card (evidence, candidates + kill conditions, adversarial challenge, engineering + 3D model, decisive experiment, package) — labeled illustrative, mirroring the real result vocabulary
+- P0-4 WCAG AA: three accent tokens (--accent unchanged for borders/fills; --accent-text #a34d2e 5.7:1/5.5:1; --accent-deep #8f4220 5.3:1 on the tint) + --warn darkened to #96601f; every small-text accent context switched; the ratios COMPUTED in the test battery (arithmetic, not opinion)
+- P1: the decisive-experiment artifact card rides the conversation thread (mobile parity: the conversation is the index); the steer chips mirror the engine's own terminal gate (isTerminal == _terminal verified) with the calm mid-run note; the workspace title is a real h2; the file input names its accept list + 20 MB limit + the read-vs-stored chip verdicts; the action note dismisses; the capped rail states its count with See all / Show recent
+- P2 quick wins: the dead 780px breakpoint deleted; candidate density at ≤480px; the Technology Packages empty state explains what a package IS
+- Tests: adversarial_r464 23/23 NEW (shipped modules executed via esbuild: stage-position guards incl. no-total/no-vocabulary, experiment-card gates, rounds grouping/cycle/orphan/forward-link, computed WCAG ratios, source acceptance per fix); regressions present 16/16, events 12/12, r458 21/21, r461 10/10, r463 7/7, copy 1/1 (lib/rounds.ts joins the scanned set), math 12/12; tsc --strict clean; NEXT_OUTPUT=export build 5/5 routes + verify-export GREEN
+- UX proof: the static export served + screenshotted at 1440px and 390px (R464/ux_landing_desktop_1440.png, R464/ux_landing_mobile_390.png) — the duration note, example card, files hint all render; zero console errors; VLM-verified no overlap/overflow at both widths
+- Backend batteries prove the untouched baseline: 140/140 across the r459/r461/r462/r463 families; r458 29/30 with the one failure stash-verified IDENTICAL at pristine 1be90e29 (BS-020, the z-ai gateway key file, env-dependent); TOSCANINI_UI/sessions.json test residue restored to HEAD
+- Zero scientific-authority changes; zero engine code changed; secret discipline CLEAN (no key values anywhere in the diff — BS-021)
+
+Stage Summary:
+- In flight: commit -> push -> deploy -> the Art. LXXI tuple (record carries the placeholder honestly until the delivery step fills it)
+- Deliverables: the four 9/10 blockers closed at their layer (P0-1..P0-4) + P1-1/2/3/4/6/7/8 + P2-1/2/6; R464/R464_ROUND_RECORD.json; R464 UX proof screenshots; tests/adversarial_r464.test.mjs (23/23)
 - reviewer_provenance=AI_REVIEW
