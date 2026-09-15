@@ -1,0 +1,284 @@
+{
+ "diversity": "CANDIDATE_DIVERSITY (E16-E)",
+ "version": "1.1.0",
+ "min_candidates": 10,
+ "available_providers": [
+  "zai"
+ ],
+ "operator_override": [
+  "zai"
+ ],
+ "angles": [
+  "cross_industry_transfer",
+  "mechanism_inversion",
+  "simplification",
+  "multi_physics_hybrid",
+  "constraint_first"
+ ],
+ "candidates": [
+  {
+   "angle": "cross_industry_transfer",
+   "provider_id": "zai",
+   "status": "OK",
+   "model": "minimax/minimax-m3:free",
+   "prompt_hash": "66013c52056cdaa9b25c44e7784b2d035a259796af53fbe0bf5850fc77f8a6e9",
+   "output_hash": "ddfc796d5e3d97748975c1dc4e4ac02a9d302ffcea46ac18d22ec43b02dca6a3",
+   "fields": {
+    "mechanism": "Continuous high-frequency temperature logging at 20-minute intervals across all cold-chain levels reveals excursion events (heat and freeze exposure) that intermittent spot-checks miss, with observed temperatures ranging from −13.6 °C to +28.6 °C indicating excursions occur at PHC sub-offices despite compliance at higher levels.",
+    "intervention": "Embed a battery-powered 20-minute-interval temperature data logger inside the passive cold-chain storage unit for the full 30-day deployment, storing internal readings in non-volatile memory so rural clinic staff can review a complete thermal history upon resupply rather than relying on a single max-min indicator.",
+    "expected_effect": "Identification of excursion events (both heat and freeze) that passive indicators conceal, enabling retrospective quarantine of affected doses, targeted retraining, and selection of which passive storage units/insulation configurations actually hold 2–8 °C for 30 days in zero-power conditions.",
+    "falsification_test": "Place matched passive 30-day storage units with and without the 20-min logger in three rural clinics without power for 30 days; if both report identical compliance via their max-min indicators but the logger reveals excursions exceeding 2–8 °C, the mechanism (that high-frequency logging detects excursions invisible to spot/indicator methods) is supported.",
+    "mechanism_source_span": "Vaccine shipments along randomly selected distribution routes were monitored using loggers, recording temperatures at 20 min intervals across all levels of the cold chain. The collected data were analysed to assess compliance with the recommended range and identify instances of heat and freeze exposure. RESULTS: A total of 72040.1 h were recorded from July 2024 to October 2024 across 48 distribution routes. The recorded temperature ranged from − 13.6 °C to + 28.4 °C. The level of compliance with the recommended temperature range varied by immunisation supply chain level and across facilities at a given level. The highest compliance (~ 100%) was observed at national and oblast stores and during transits between these levels. At the same time, the lowest compliance (88.8%) during storage was observed at primary healthcare centre (PHC) sub-offices, with three of such facilities failing to maintain the recommende",
+    "span_derivation": {
+     "n_shared": 19,
+     "shared_terms": [
+      "across",
+      "all",
+      "chain",
+      "cold",
+      "compliance",
+      "data",
+      "exposure",
+      "freeze",
+      "heat",
+      "interval",
+      "level",
+      "logger",
+      "min",
+      "observed",
+      "office",
+      "phc",
+      "storage",
+      "sub",
+      "temperature"
+     ],
+     "span_terms_n": 69,
+     "ratio": 0.275,
+     "underived": false,
+     "state": "MEASURED",
+     "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+    }
+   },
+   "span_underived": false,
+   "candidate_id": "cand:DIV:cross_industry_transfer:zai:ddfc796d5e3d"
+  },
+  {
+   "angle": "mechanism_inversion",
+   "provider_id": "zai",
+   "status": "OK",
+   "model": "minimax/minimax-m3:free",
+   "prompt_hash": "8d091afd15f412c461ef7641d414d6a44793f30810eb89fa0985a70647f89796",
+   "output_hash": "977a74409ffde47cab0cfe90faf0e08bd2eaa7ea5d7355f23a8fea6971a385e8",
+   "fields": {
+    "mechanism": "Non-uniform thermal compliance across cold-chain levels, with the lowest compliance (~88.8%) occurring at peripheral/primary healthcare facilities due to repeated thermal cycling during transfers and prolonged static storage at the chain's endpoint.",
+    "intervention": "Replace the single endpoint storage unit with a passively buffered multi-stage thermal reservoir that uses a high-enthalpy phase-change material (e.g., paraffin or salt hydrate tuned near 2–8 °C) to absorb each ingress heat pulse locally, mimicking the compliant behavior observed at higher-tier national/oblast stores where transit time is short and mass is large relative to load.",
+    "expected_effect": "Excursion frequency and magnitude at the rural endpoint are suppressed toward the ~100% compliance level seen at national/oblast stores, extending hold-over time to ≥30 days without electricity or resupply by flattening the temperature curve that the paper shows oscillates between −13.6 °C and +28.4 °C at the periphery.",
+    "falsification_test": "Instrument a prototype reservoir with loggers recording at ≤20 min intervals (per the WHO protocol cited) for 30 days in a rural-clinic surrogate (ambient 25–43 °C, door openings 6×/day, no grid power); compute the cumulative time–temperature integral versus the 2–8 °C band and compare against the paper's PHC sub-office compliance of 88.8%. Failure criterion: endpoint compliance <95% or any excursion >+8 °C lasting >1 h, or any freeze below 0 °C lasting >1 h.",
+    "mechanism_source_span": "\"The level of compliance with the recommended temperature range varied by immunisation supply chain level and across facilities at a given level. The highest compliance (~ 100%) was observed at national and oblast stores and during transits between these levels. At the same time, the lowest compliance (88.8%) during storage was observed at primary healthcare centre (PHC) sub-offices, with three of such facilities failing to maintain the recommende",
+    "span_derivation": {
+     "n_shared": 16,
+     "shared_terms": [
+      "across",
+      "chain",
+      "compliance",
+      "during",
+      "facility",
+      "healthcare",
+      "level",
+      "lowest",
+      "national",
+      "oblast",
+      "observed",
+      "primary",
+      "storage",
+      "store",
+      "time",
+      "transit"
+     ],
+     "span_terms_n": 37,
+     "ratio": 0.432,
+     "underived": false,
+     "state": "MEASURED",
+     "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+    }
+   },
+   "span_underived": false,
+   "candidate_id": "cand:DIV:mechanism_inversion:zai:977a74409ffd"
+  },
+  {
+   "angle": "simplification",
+   "provider_id": "zai",
+   "status": "OK",
+   "model": "minimax/minimax-m3:free",
+   "prompt_hash": "1ee5d04dad4b89edea3e13eeb36899b6281efeb9f314e41a3a66753293ee7d8e",
+   "output_hash": "613b6e4cc8b3dce4f771818e760ff2ce0b238bf0f044ac70253beb7500f4ab67",
+   "fields": {
+    "mechanism": "Temperature excursions occur when cold-chain facilities fail to maintain the recommended temperature range, with the lowest compliance observed at peripheral storage points (primary healthcare centre sub-offices) due to exposure to ambient heat and freeze conditions.",
+    "intervention": "Use only large thermal mass passive containers at the last-mile rural clinic endpoint, sized so that the vaccine payload is buried inside pre-conditioned phase-change material (water/ice) and the outer shell has no direct line-of-sight to ambient air — replicating the highest-compliance observation that insulated transit between controlled stores (≈100% compliance) outperforms peripheral storage points.",
+    "expected_effect": "Hold time inside the 2–8 °C band extended to 30 days at a passive endpoint, by shifting the operating paradigm from \"clinic storage\" (worst compliance per the paper) to \"transit between insulated stages\" (best compliance per the paper), while using thermal mass to absorb diurnal swings seen in the recorded −13.6 °C to +28.4 °C range.",
+    "falsification_test": "Instrument three vaccine payloads with loggers recording at 20-min intervals (per the paper's WHO protocol) and place them inside the passive container at a rural clinic proxy with no power; the container fails if any logger reading exceeds 2–8 °C before 30 days, or if freeze exposure (<0 °C) occurs analogous to the −13.6 °C excursions the paper documented.",
+    "mechanism_source_span": "The level of compliance with the recommended temperature range varied by immunisation supply chain level and across facilities at a given level.",
+    "span_derivation": {
+     "n_shared": 6,
+     "shared_terms": [
+      "chain",
+      "compliance",
+      "facility",
+      "range",
+      "recommended",
+      "temperature"
+     ],
+     "span_terms_n": 12,
+     "ratio": 0.5,
+     "underived": false,
+     "state": "MEASURED",
+     "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+    }
+   },
+   "span_underived": false,
+   "candidate_id": "cand:DIV:simplification:zai:613b6e4cc8b3"
+  },
+  {
+   "angle": "multi_physics_hybrid",
+   "provider_id": "zai",
+   "status": "OK",
+   "model": "minimax/minimax-m3:free",
+   "prompt_hash": "a9cc5271409084b92fe60229dd438ac0b148aeaa6306955e534cf9c73554dcd2",
+   "output_hash": "a3877a02f0dc477012c5e7012174b33e15f3461089e2b3882cbdc9fb06a0ba80",
+   "fields": {
+    "mechanism": "Differential temperature-excursion compliance across cold-chain tiers, with primary healthcare centre (PHC) sub-offices showing the lowest storage compliance (88.8%) due to localized thermal-control weakness, while higher-tier (national/oblast) facilities maintain ~100% compliance.",
+    "intervention": "Embed a passive, multi-tier thermal-buffering architecture into the storage device that mimics tiered cold-chain resilience by combining (1) a high-latent-heat phase-change material (PCM) core sized to absorb 30 days of parasitic heat load at the PHC tier and (2) an acoustic/vibration-driven internal micromixer that periodically redistributes PCM boundary-layer gradients, preventing localized melt-front stagnation observed at underperforming sub-offices.",
+    "expected_effect": "Maintains vaccine vial temperatures within 2–8 °C for ≥30 days with no electricity and no resupply, by raising the device's effective storage-tier compliance from PHC-level (~88.8%) toward national-store-level (~100%) compliance through dual-domain (thermal + acoustic) passive buffering.",
+    "falsification_test": "Place the device in an ambient profile matching the abstract's recorded Ukrainian range (−13.6 °C to +28.4 °C) for 30 days with no power or resupply; measure internal temperature at 20 min intervals. Compute the percentage of time within 2–8 °C. The device fails if storage-tier compliance is below 95% (i.e., does not significantly exceed the 88.8% PHC sub-office baseline reported in the abstract), or if acoustic activation produces no measurable homogenization of PCM temperature gradients in a bench thermocouple-array test.",
+    "mechanism_source_span": "At the same time, the lowest compliance (88.8%) during storage was observed at primary healthcare centre (PHC) sub-offices, with three of such facilities failing to maintain the recommende",
+    "span_derivation": {
+     "n_shared": 12,
+     "shared_terms": [
+      "centre",
+      "compliance",
+      "facility",
+      "healthcare",
+      "lowest",
+      "maintain",
+      "observed",
+      "office",
+      "phc",
+      "primary",
+      "storage",
+      "sub"
+     ],
+     "span_terms_n": 19,
+     "ratio": 0.632,
+     "underived": false,
+     "state": "MEASURED",
+     "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+    }
+   },
+   "span_underived": false,
+   "candidate_id": "cand:DIV:multi_physics_hybrid:zai:a3877a02f0dc"
+  },
+  {
+   "angle": "constraint_first",
+   "provider_id": "zai",
+   "status": "OK",
+   "model": "minimax/minimax-m3:free",
+   "prompt_hash": "9f57c2f0f1dcd187f052b1597d6f827dbb25f2c1e5dd7981b4452e708ca184ff",
+   "output_hash": "92d0e5e9a756e5811556f2e9e7622f679db6e886f9f5850711879912bbdf18a1",
+   "fields": {
+    "mechanism": "Lowest temperature compliance at primary healthcare centre (PHC) sub-offices, where ~11% of monitoring time falls outside the recommended range, is driven by heat exposure during prolonged static storage at the last-mile facility rather than during inter-facility transit.",
+    "intervention": "Equip passive 30-day cold-chain storage at rural PHC-equivalent last-mile sites with continuous 20-minute-interval temperature data logging and alarm thresholds set to the WHO recommended range, using the loggers to localize excursions to the static-storage phase so the thermal mass or phase-change payload of the passive device can be re-tuned to absorb the heat-load profile documented at sub-offices.",
+    "expected_effect": "Identification and mitigation of the static-storage heat-excursion regime that the paper shows dominates non-compliance at the last mile, reducing time-out-of-range below the observed ~11.2% at PHC sub-offices and keeping vaccines within 2–8 °C across a 30-day no-power, no-resupply hold.",
+    "falsification_test": "Deploy the instrumented passive device at ≥10 rural PHC-equivalent sites for 30 days each with no external power and no resupply; if the fraction of logger readings outside 2–8 °C is not reduced below the paper's 88.8%-compliance (i.e., 11.2% excursion) baseline at PHC sub-offices, the mechanism-driven intervention is falsified.",
+    "mechanism_source_span": "The lowest compliance (88.8%) during storage was observed at primary healthcare centre (PHC) sub-offices, with three of such facilities failing to maintain the recommende",
+    "span_derivation": {
+     "n_shared": 11,
+     "shared_terms": [
+      "centre",
+      "compliance",
+      "during",
+      "facility",
+      "healthcare",
+      "lowest",
+      "office",
+      "phc",
+      "primary",
+      "storage",
+      "sub"
+     ],
+     "span_terms_n": 17,
+     "ratio": 0.647,
+     "underived": false,
+     "state": "MEASURED",
+     "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+    }
+   },
+   "span_underived": false,
+   "candidate_id": "cand:DIV:constraint_first:zai:92d0e5e9a756"
+  }
+ ],
+ "built_at": "2026-09-15T17:54:02+00:00Z",
+ "usable_candidates": 5,
+ "status": "GRID_RUN",
+ "diversity_metrics": {
+  "candidates_measured": 5,
+  "mean_pairwise_token_distance": 0.809,
+  "distinct_mechanism_clusters": 5,
+  "cluster_sizes": [
+   1,
+   1,
+   1,
+   1,
+   1
+  ],
+  "rewrite_pairs_jaccard_ge_0_8": [],
+  "architecture_term_count": 139,
+  "architecture_terms_sample": [
+   "absorb",
+   "acoustic",
+   "alarm",
+   "ambient",
+   "architecture",
+   "battery",
+   "behavior",
+   "between",
+   "boundary",
+   "buffered",
+   "buffering",
+   "buried",
+   "chain",
+   "change",
+   "clinic",
+   "cold",
+   "combining",
+   "complete",
+   "compliance",
+   "compliant",
+   "conditioned",
+   "containers",
+   "continuous",
+   "controlled"
+  ],
+  "failure_mode_signal_count": 3,
+  "failure_modes_invoked_sample": [
+   "condensation at cold surfaces",
+   "hotspot exceeding material/safety limit",
+   "interface delamination raising resistance over life"
+  ],
+  "prior_art_query_set_count": 5,
+  "detected_domain": "thermal"
+ },
+ "entry": {
+  "entry_helper_version": "stage_entry/1.1.0",
+  "stage": "EXPLORATION_GRID",
+  "entry_status": "ALLOWED",
+  "prerequisite": "VERIFIED_EVIDENCE",
+  "prerequisite_evidence": {
+   "n_verified_evidence_items": 13,
+   "n_direct_support": 12,
+   "n_partial_support": 1,
+   "n_items_total": 16,
+   "span_binding_verified": true,
+   "basis": ">=1 evidence item classified DIRECT_SUPPORT/PARTIAL_SUPPORT, or the candidate's span binding verified (R394 s5 classification + a2/verify)"
+  }
+ }
+}
