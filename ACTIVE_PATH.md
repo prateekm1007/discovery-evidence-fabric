@@ -929,3 +929,31 @@ gate GREEN).
 Round record: `R463/R463_ROUND_RECORD.json` (the Art. LXXI tuple
 targeted GREEN — the HF_TOKEN re-provision unblocked both the
 Space-secret persistence and the deploy that R462 could not run).
+
+## R465-C2 addendum (2026-09-15) — the attachment merge outcome is typed and observable: the audit's P0-3 acceptance verified end-to-end on production
+
+Operator continuation ("fix"): close the R463-C2 open item — the
+attachment USER_EVIDENCE merge's journal event was not observable (the
+merge block fail-open and swallowing its own exceptions, a silent
+empty-merge indistinguishable from success). Closing it surfaced TWO
+more layers of the same defect: the journal's pre-run-dir writes landed
+in a CWD-relative file no reader ever served (the phase-1.9 events AND
+the whole phase-2 retrieval window via phase_callback's eager empty
+capture), and the journal itself is write-only in the serving path
+(merge_with_projection has zero callers — /events serves the
+artifact-derived projection). The fix landed at all three layers.
+
+| Piece | Surface | Notes |
+|---|---|---|
+| THE TYPED MERGE | `toscanini/worker.py::merge_attachments_typed` | every state distinguishable: merged (PU carries user_evidence + forensics ATTACHMENTS_MERGED), typed exception on ATTACHMENTS_MERGE_INCOMPLETE (the R463 arity class would now surface at occurrence time; the run is never killed), bound=0 with the reason (incl. the foreign-owner bypass attempt — no content leak), quiet when nothing staged |
+| THE JOURNAL PATH | `toscanini/event_journal.py` | empty run_dir is a typed no-op (the CWD-relative cross-run pollution retired at the source); phase_callback resolves the run_dir LAZILY at write time |
+| THE ACCEPTANCE SURFACE | `toscanini/investigation.py` | the persisted PU record's user_evidence derives `attachment.ingested` on /events — hashes + counts only, never content; staged-but-unmerged emits the typed gap; SOURCE_FACT joins the closed epistemic vocabulary (Art. XXXVIII rank-1, the lowest rank) |
+| THE PROOF | run ts_5364a9876bf2 on production | fresh owner + real PDF (sha256 74b0733a...) → 201 TEXT_EXTRACTED → run COMPLETE → /events carries `attachment.ingested` COMPLETED / SOURCE_FACT / "typed USER_EVIDENCE (content hashes: 74b0733acd33)"; worker-diagnostics ATTACHMENTS_MERGED; foreign owner 404 |
+
+Tests: `tests/test_r465_attachment_ledger.py` 15/15 NEW; regressions
+r430+r459+r463+r461 67, r458-family 159 (1 failure stash-verified
+IDENTICAL at pristine — BS-020), r414/r451/r462/r463 159;
+MODULE_INVENTORY regenerated (123 files / 60,135 LOC, drift GREEN).
+Art. LXXI tuple GREEN at 08fd1931 (Space revision 65b5dee3; the
+post-boot discovery_ready flap settled ~3 min). Round record:
+`R465/R465_ROUND_RECORD.json`.

@@ -1,0 +1,61 @@
+{
+ "kind": "round_record",
+ "round": "R465-C2",
+ "directive": "Continue the operator's P0 directive ('fix'): close the R463-C2 open item — the attachment USER_EVIDENCE merge's journal event is not observable (the merge block is fail-open and swallows its own exceptions, so a silent empty-merge cannot be distinguished from a success) — so the independent audit's P0-3 acceptance (upload a PDF and its hashed text appears on the /events evidence ledger with a USER_EVIDENCE tag) becomes verifiable end-to-end. Zero scientific-authority changes.",
+ "generated_by": "Coder 2 (main session)",
+ "reviewer_provenance": "AI_REVIEW",
+ "constitution": {
+  "version": "2.4.0",
+  "sha256_prefix": "b54a1be9",
+  "read_in_full_at_round_start": true,
+  "reread_before_commit": "hash verified byte-identical (b54a1be9bcbdd246...) immediately before the commit"
+ },
+ "root_cause_analysis": {
+  "the_open_item": "R463-C2 open_items[0]: the attachment merge's journal event is still not observable; the merge block is fail-open and swallows its own exceptions.",
+  "what_closing_it_surfaced": [
+   "LAYER 1 (the named defect): worker phase-1.9 wrapped resolve_bindings + apply_attachments + the journal write in a bare except — a merge exception (the R463 PU-loader-arity class) left NO trace in any durable surface.",
+   "LAYER 2 (surfaced): even the SUCCESS path's journal write was dead — event_journal.record with the session's run_dir, which is None until phase 2, wrote to a CWD-relative EVENT_JOURNAL.jsonl that no reader ever served; the same eager empty-string capture in phase_callback froze the WHOLE phase-2 retrieval window onto that file. Cross-run pollution on the engine's working directory; the journal is per-run by contract.",
+   "LAYER 3 (surfaced): the /events route serves investigation.investigation_events — the artifact-derived projection — and event_journal.merge_with_projection has ZERO callers anywhere: the journal is write-only in the serving path. Even a correctly-placed journal event would never reach the acceptance surface."
+  ],
+  "fix_layers": [
+   "worker.merge_attachments_typed (NEW, replaces the fail-open block): typed outcome in EVERY state — merged (PU carries user_evidence, forensics ATTACHMENTS_MERGED), merge exception (typed exception class on ATTACHMENTS_MERGE_INCOMPLETE, run NOT killed, never silent), staged-but-unresolvable incl. the foreign-owner bypass attempt (bound=0 reason, no content leak), nothing staged (quiet — the ledger never records noise). Journal write only when the run journal exists.",
+   "event_journal.record: an EMPTY run_dir is a typed no-op (returns None, writes nothing) — the CWD-relative pollution is retired at the source. phase_callback accepts a LAZY run_dir resolver (the worker resolves the session's run_dir at write time), so events after phase 2 land in the run's own journal.",
+   "investigation.investigation_events (the /events acceptance surface): the persisted Problem Understanding record's user_evidence entries derive the attachment.ingested event — 'N user document(s) joined the investigation's record as typed USER_EVIDENCE (content hashes: ...)' — hashes and counts only, never document content (Art. VI/XXI.9); run-dir copy preferred, per-session copy as fallback; staged-but-unmerged (checkpoint passed, no entries) emits the typed gap (status UNKNOWN) instead of silence; nothing staged stays quiet; no premature gap before the merge checkpoint exists. SOURCE_FACT joins the closed epistemic vocabulary — Article XXXVIII's rank-1 evidence layer, the LOWEST rank (nothing is promoted into it; Art. XXVIII holds), typing the user's OWN claimed material as distinct from RETRIEVED's external custody chain (Art. XXI.9)."
+  ]
+ },
+ "tests": {
+  "new": "tests/test_r465_attachment_ledger.py 15/15 — typed outcomes in every state (merged / typed-exception / bound=0 / nothing-staged / foreign-owner bypass attempt with no content leak); the empty-run_dir refusal with no CWD file created; the lazy resolver landing events in the run journal after the run dir appears; the projection events with content-hash traceability, the USER_EVIDENCE marker, and NO document content on the ledger; the typed-gap state; the no-premature-gap state; the SOURCE_FACT vocabulary pin",
+  "regressions": "r430 investigation + r459 + r463_no_operator_key + r461_durability 67 passed; r458+r419+r415+r446+r420 159 passed, 7 skipped, the ONE failure (r458 model-purity env-var arm) stash-verified IDENTICAL at the pristine baseline (BS-020, the z-ai gateway key file missing in this keyless environment); r414+r451_transport+r462+r463 families 159 passed; MODULE_INVENTORY regenerated (123 files / 60,135 LOC, drift gate GREEN); TOSCANINI_UI/sessions.json test residue restored to HEAD twice (the batteries touch the dev store)"
+ },
+ "production_deployment": {
+  "target_sha": "08fd193111d5bc1e63db2f319d98b3efe3785117",
+  "deployed_sha": "08fd193111d5bc1e63db2f319d98b3efe3785117",
+  "deploy_id": "space_revision:65b5dee3a44bb59f2b6161e4c7874357bcca0751 (the canonical Space prateekm1/toscanini-prod-validation, standing r456_space_deploy driver; upload 41 s)",
+  "health_check_result": "GREEN",
+  "drift": "GREEN",
+  "blocked_by": "",
+  "what_unblocks": "",
+  "verification": "ARTICLE LXXI TUPLE GREEN: ls-remote origin/main == HEAD == /api/version engine_commit == /api/health engine_commit == 08fd1931; /api/health ok=true discovery_ready=true showcase_ready=true (the post-boot discovery_ready flap settled within ~3 min — the disclosed class, milder than R461-C2's ~20 min); the seven router keys WARN-skipped at deploy typed-honestly (values environment-only, BS-021; the Space-side secrets persisted from R461/R463)"
+ },
+ "live_acceptance_proof": {
+  "acceptance": "the independent audit's P0-3: upload a PDF -> its hashed text appears on the /events evidence ledger with a USER_EVIDENCE tag",
+  "method": "fresh owner capability + real PDF (reportlab-built, 1503 bytes, sha256 74b0733acd338e3e...) -> POST /api/attachments (201, TEXT_EXTRACTED 150 chars) -> POST /api/run with attachment_ids -> the run walked the full canonical pipeline",
+  "run_id": "ts_5364a9876bf2",
+  "run_outcome": "COMPLETE (full pipeline, terminal)",
+  "events_ledger": "GET /api/run/{id}/events: 20 events; attachment.ingested seq=2 status=COMPLETED epistemic_class=SOURCE_FACT summary='1 user document(s) joined the investigation's record as typed USER_EVIDENCE (content hashes: 74b0733acd33)' basis_ref='run_dir/PROBLEM_UNDERSTANDING.json user_evidence' — the hash on the ledger IS the uploaded bytes' sha256 (traceable custody, Art. XII); no document content on the ledger",
+  "worker_diagnostics": "GET /api/run/{id}/worker-diagnostics (owner-scoped): ATTACHMENTS_MERGED present (staged=1 resolved=1)",
+  "isolation_control": "a foreign owner capability requesting the same run's /events gets the enumeration-safe 404 (Art. XVII attempted bypass)"
+ },
+ "disclosures": [
+  "The journal's per-source phase-2 retrieval events remain unfulfilled for the pre-run-dir window (typed-dropped by the empty-path guard now, invisible-in-practice since R431): the retrieval RESULTS are carried by the evidence pack artifact and the projection; making the projection derive per-source retrieval events is a separate follow-up, not silently claimed here.",
+  "The run-creation response in the E2E proof carries run_id: null (the route's session_id field is the canonical id; the R447 owner_key echo contract held).",
+  "The deploy driver's static upload commit message still names R461's router set (cosmetic; the actual wiring is unchanged).",
+  "HF account included credits remain depleted (owner-side wallet/credit reset — outside code reach); the standing five-router cascade served the acceptance run.",
+  "The E2E proof scripts live outside the repo (the operator's scripts dir): r465_e2e_attachment_proof.py + r465_e2e_resume.py — no credentials in them (the owner capability is generated per-run and is not a secret of the deployment)."
+ ],
+ "open_items": [
+  "P1-1 performance budget, P1-3 recovery-CTA audit, P1-5 package-guarantee audit, P1-6 screen-reader pass, P2-1 320px math-unit tests, P3 items — the standing audit roadmap.",
+  "The R464 records' NOT PROVEN categories (performance, output quality) still need live measurement.",
+  "The projection's per-source evidence-retrieval event derivation (the journal's phase-2 window, disclosed above)."
+ ]
+}

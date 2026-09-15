@@ -1412,3 +1412,24 @@ Work Log:
 Stage Summary:
 - R464 COMPLETE AND DELIVERED: the external 7.0/10 UX audit executed — the four 9/10 blockers closed (P0-1 action continuity both directions, P0-2 time expectation at full weight + the honest step position, P0-3 the example-result card, P0-4 WCAG AA computed not asserted) + P1-1/2/3/4/6/7/8 + the P2 quick wins, 23/23 new adversarial battery, the honest refusals disclosed (no fabricated 'of N' denominator), the Art. LXXI tuple GREEN at fd455e85
 - reviewer_provenance=AI_REVIEW
+
+---
+Task ID: R465-C2
+Agent: Coder 2 (main session)
+Task: the operator's "fix" continuation — close the R463-C2 open item (the attachment USER_EVIDENCE merge's journal event unobservable; the merge block fail-open) so the independent audit's P0-3 acceptance is verifiable end-to-end; push delivered with the operator-supplied PAT
+
+Work Log:
+- Baseline: the checkout was STALE (r449-c2/visual-benchmark at R451) — fetched with the freshly-provisioned GitHub credential (the operator's PAT via the x-access-token extraheader, BS-021: never in the repo), main fast-forwarded to d8a1a9eb; the R463-C2 operator-key retirement + R464 UX round were already on main — this round continues from them
+- Constitution v2.4.0 read IN FULL at round start (2,153 lines) + verified byte-identical before the commit (b54a1be9)
+- Root cause went three layers deep beyond the named open item: (1) the fail-open merge block; (2) event_journal.record with an empty run_dir wrote a CWD-relative EVENT_JOURNAL.jsonl no reader ever served (the phase-1.9 attachment + clarification events, AND the whole phase-2 retrieval window via phase_callback's eager empty-string capture); (3) merge_with_projection has ZERO callers — the /events route serves the artifact-derived projection only, so even a correctly-placed journal event never reached the acceptance surface
+- The fix landed at all three layers: worker.merge_attachments_typed (typed outcome in every state; forensics ATTACHMENTS_MERGED / ATTACHMENTS_MERGE_INCOMPLETE with the typed cause; the run never killed; quiet when nothing staged), the journal's empty-run_dir typed no-op + phase_callback's LAZY run_dir resolver, and the projection deriving attachment.ingested from the persisted PU record's user_evidence (hashes + counts only; the typed gap for staged-but-unmerged; SOURCE_FACT joins the closed epistemic vocabulary as Article XXXVIII's rank-1 layer)
+- Tests: tests/test_r465_attachment_ledger.py 15/15 NEW; regressions r430+r459+r463+r461 67, r458-family 159 (1 failure stash-verified IDENTICAL at pristine — BS-020), r414/r451/r462/r463 159; MODULE_INVENTORY regenerated (123 files / 60,135 LOC, drift GREEN); TOSCANINI_UI/sessions.json test residue restored to HEAD
+- Commit 08fd1931 pushed (ls-remote origin/main == HEAD, Art. LXXI §1 GREEN) and deployed via the standing r456_space_deploy driver (Space revision 65b5dee3; upload 41 s; the seven router keys WARN-skipped typed-honestly — the Space-side secrets persisted from R461/R463)
+- Tuple verified live: /api/version engine_commit == /api/health engine_commit == 08fd1931; ok=true discovery_ready=true showcase_ready=true (the post-boot flap settled ~3 min — the disclosed class)
+- THE ACCEPTANCE MEASURED ON PRODUCTION: fresh owner capability + a real PDF (1503 bytes, sha256 74b0733a...) -> 201 TEXT_EXTRACTED -> run ts_5364a9876bf2 bound at creation -> COMPLETE (full pipeline) -> /events carries attachment.ingested status=COMPLETED epistemic_class=SOURCE_FACT summary with the USER_EVIDENCE marker AND the document's exact content-hash fingerprint (74b0733acd33), basis_ref the persisted PU record; worker-diagnostics show ATTACHMENTS_MERGED; a foreign owner gets the enumeration-safe 404 (Art. XVII)
+
+Stage Summary:
+- The audit's P0-3 acceptance is now VERIFIED END-TO-END ON PRODUCTION — not just implemented: the user's document joins the record with custody, and the /events ledger shows it with the hash and the USER_EVIDENCE tag; a silent empty-merge is structurally impossible (every state typed, every failure disclosed)
+- Deliverables: R465/R465_ROUND_RECORD.json; tests/test_r465_attachment_ledger.py; the three-layer fix (worker.py / event_journal.py / investigation.py); the E2E proof scripts live outside the repo
+- Disclosures carried in the round record: the journal's phase-2 per-source window remains a follow-up (typed-dropped pre-run-dir, invisible-in-practice since R431 — the evidence pack + projection carry the results); HF credits depleted (owner-side); the standing roadmap P1-1/P1-3/P1-5/P1-6/P2-1/P3 + the R464 NOT-PROVEN categories remain open
+- reviewer_provenance=AI_REVIEW
