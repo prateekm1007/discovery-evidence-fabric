@@ -1,0 +1,92 @@
+{
+  "kind": "round_record",
+  "round": "R469",
+  "directive": "Operator instruction 2026-09-16 (verbatim, key bodies redacted BS-021): 'https://api.atria-asi.ai/console/keys: atr_6...Ku5f and atr_7...HJmm and atr_Q...ILrJ / From Now on atira is out default API for discovery engine. Keep going to a new key of atira if one is exhausted. Wire it in the discovery engine. 4 api keys is 400million tokens' \u2014 with the working-role framing 'You will become the CTO and atira will become code/engineer.' Executed as four deliverables: the third-key admission (probe-before-record), the KEY-RING rotation wiring (the keep-going directive), the DEFAULT-PROVIDER pin (the default-API directive), and the Space-secret persistence.",
+  "generated_by": "main (Super Z session)",
+  "reviewer_provenance": "AI_REVIEW",
+  "constitution": "v2.5.0 (unchanged this round \u2014 Article LXXIII already names the lookup order: session env -> the local vault (.secrets.env) -> the Space secret surface (names only) -> operator escalation last; the R469 credentials were retrieved from the vault with ZERO operator re-asks, the article working as ratified). No amendment required: provider ordering and credential rings are recorded policy inputs (Art. XXVII) carried in the ProviderSpec registration and policy notes, not constitutional law.",
+  "baseline": {
+    "head_at_start": "26f0eb0c",
+    "working_tree": "clean",
+    "unpushed": "none (origin/main == main)",
+    "standing_deployment": "GREEN at 1701eb96 (Space revision f215b976, the R468 verification)"
+  },
+  "deliverable_1_the_third_key_admission": {
+    "what": "ATRIA_API_KEY_3 (the operator's third atria key) validated BEFORE any persistence or registration (probe-before-record; the R463/R467/R468 method).",
+    "artifact": "R469/PROBE_ATRIA_KEY3.json",
+    "measured": [
+      "the bogus-key differential control: GET /v1/models -> 401 in 0.23 s (auth evaluates before any plan/gate logic)",
+      "catalog 200 on ALL THREE keys (0.17/0.20/0.16 s), each serving the SAME sole model Atria-Dawn-Preview",
+      "key-3 tiny completion: 200, non-empty content, 17.88 s (the reasoning-model latency variance the R467 registration recorded; the 4096 cap applied per the small-cap starvation lesson)",
+      "key-1 and key-2 IDENTITY: fingerprints MATCH the R467/R468 records \u2014 the operator re-supplied the same live credentials (continuity, not rotation)",
+      "all three keys DISTINCT (len({k1,k2,k3}) == 3) \u2014 the ring's third slot is additive"
+    ],
+    "operator_declarations_recorded": "the '4 api keys is 400million tokens' arithmetic is OPERATOR-DECLARED (three atria keys at the R467-declared 100M each plus the HF credential; no usage/balance endpoint is measurable \u2014 /v1/usage, /v1/balance, /v1/credits all 404/405 per R467) \u2014 recorded as declared, never converted into a measurement (Art. VI/XXV)."
+  },
+  "deliverable_2_the_key_ring": {
+    "what": "The operator's keep-going directive wired into the engine's single call path: an exhaustion-class failure (CREDIT_EXHAUSTED / AUTH_FAILURE / RATE_LIMITED) rotates to the NEXT PRESENT key on the SAME rung (same provider, same model) BEFORE any provider-level fallback. The ring is consumed key by key, exactly the directive's order.",
+    "files": [
+      "discovery_fabric/engine/llm_registry.py \u2014 ProviderSpec.key_env_vars (the ring; None degrades to [env_var] = the exact pre-R469 behavior for every other provider); key_ring_slots/active_key_slot/active_key_value/rotate_key (the single key-selection authority, Art. X); KEY_ROTATION_FAILURE_CLASSES (the closed triad); availability_matrix reports the ring + present slots + active slot; the generate() attempt budget EXTENDED by the ring size (a rotation is not a same-model retry: no backoff, no retry-budget consumption); every rotation a recorded route hop (status FAILED_KEY_EXHAUSTED + action KEY_ROTATED) and a routing-ledger event; the ring's provider NOT health-failure-marked by a slot exhaustion it survives; a fully exhausted ring falls through to the standing cascade typed (never a bill, never silent) and RESETS the sticky slot to the first present key (auto-recovery: exhaustion is never persisted as a fact)",
+      "discovery_fabric/engine/runtime_admission.py \u2014 the capability probe rides the ring (an exhausted head key rotates and retries the tiny completion instead of PROBE_FAILEDing the rung \u2014 without this the walk would never reach generate()'s rotation); the probe's small-cap starvation recovery: a reasoning model that spends the 16-token probe cap on hidden reasoning (EmptyContentWithFinish, the R467-measured specimen) escalates ONCE to max_tokens 2000 (the R467-measured recovery), recorded as cap_escalation",
+      "discovery_fabric/engine/model_routing.py \u2014 catalog discovery rides the ACTIVE ring key (a rotated-forward provider does not re-pay the exhausted head key's 401 on every fetch)"
+    ],
+    "registration": "atria ProviderSpec key_env_vars = [ATRIA_API_KEY, ATRIA_API_KEY_2, ATRIA_API_KEY_3] (operator-declared order; env_var stays ATRIA_API_KEY, the FIRST slot \u2014 the availability marker); the policy_note carries both directives verbatim.",
+    "live_proof": {
+      "artifact": "R469/ROTATION_SMOKE.json",
+      "method": "the bogus-key differential (the R463/R467/R468 method \u2014 a bogus key fails auth exactly like an exhausted/revoked one; NO real budget spent on failures), four arms, each a REAL llm_registry.generate() call through the production path (availability -> pinned chain -> ladder -> admission probe -> call loop):",
+      "arms": [
+        "control (all real keys): OK on slot 0 / ATRIA_API_KEY in 5.62 s, 3/3 FIELD lines, chain head atria",
+        "probe rotation (key 1 bogus, fresh probe): the PROBE rotated past the dead slot; OK on slot 1 / ATRIA_API_KEY_2 in 6.30 s, 3/3 FIELD lines",
+        "call-loop rotation (key 1 bogus, capability fresh): the CALL LOOP rotated \u2014 route hop FAILED_KEY_EXHAUSTED / AUTH_FAILURE / action KEY_ROTATED / 0->1; OK on slot 1 / ATRIA_API_KEY_2 in 4.05 s, 3/3 FIELD lines, the rotation named in retry_notes",
+        "two-hop walk (keys 1+2 bogus): rotated past BOTH dead slots; OK on slot 2 / ATRIA_API_KEY_3 in 10.52 s, 3/3 FIELD lines"
+      ],
+      "verdict": "ALL_GREEN \u2014 all arms served by atria, none fell off the ring, the structured protocol answered on every arm"
+    }
+  },
+  "deliverable_3_the_default_provider_pin": {
+    "what": "The operator's default-API directive wired as an explicit, recorded routing pin \u2014 NOT a quality-tier rewrite (atria's honest tier-2 basis stands, Art. XXVII).",
+    "file": "discovery_fabric/engine/provider_health.py \u2014 _DEFAULT_PROVIDER_PIN = 'atria' (the code-level default; the deployed engine pins atria with zero extra configuration); ENGINE_DEFAULT_PROVIDER (env) overrides or disables it ('' = no pin) \u2014 the ENGINE_* operator-override class (R391/R418/R445); applied AFTER the rank sort and BEFORE cooldown demotion.",
+    "precedence_preserved": [
+      "Art. XLV attack independence: in the attack role the avoid_provider stays demoted even when it IS the pinned default (the differential test proves it)",
+      "Art. V cooldown demotion: a rate-limited pinned provider still slides to the end (never removed, never refuses to run)",
+      "explicit caller pins (policy.preferred_providers) keep their standing semantics \u2014 the operator default governs the default path"
+    ],
+    "scope": "applied to every role's default order (the directive names the discovery engine as a whole, not one stage); the honest reading is recorded here \u2014 extraction/transform also pin atria, with the cooldown demotion as the standing protection against the latency-tier-3 cost"
+  },
+  "deliverable_4_the_space_secret_persistence": {
+    "what": "ATRIA_API_KEY_3 persisted as a Hugging Face Space secret on prateekm1/toscanini-prod-validation (the write-only surface), AFTER the probe validated it.",
+    "artifact": "R469/HF_SPACE_SECRETS.json",
+    "measured": "secret set (fingerprint atr_Q0...ILrJ len 36, value never logged); the FULL 15-name surface verified present BY NAME, zero absent (the R468 14-name surface + ATRIA_API_KEY_3)",
+    "vault": "the workspace-root .secrets.env (Article LXXIII's readable canonical store) extended with ATRIA_API_KEY_3 + the ring comment (never committed, never printed; chmod 600)"
+  },
+  "tests": {
+    "new": "tests/test_r469_atria_keyring.py \u2014 33 passed + 1 env-guard skip (post-rebase: the composed-budget test added; the escalation tests updated to the declared-budget feed) at the standing keyless posture: the ring registration (operator order, marker = first slot, every other provider degrades to single-key), the closed rotation triad (GONE/MODEL_NOT_FOUND/REGION_NOT_SERVED never rotate \u2014 a dead identifier or region gate answers identically on every key), the ring walk (skip-empty, wrap, sticky, exhaustion auto-reset), the availability surface, the probe rotation + full-exhaustion typing, the probe cap escalation (one-shot, bounded, typed), the generate() rotation (same-rung, recorded hops, serving slot named, no rotation on GONE), the full-ring-exhaustion fallthrough (typed CREDIT_EXHAUSTED, all three keys tried, auto-reset), the default-provider pin (pinned head, unpinned natural rank via the unorouter differential, env override, attack independence, unknown-pin no-op, honest tiers unchanged), catalog-on-active-key, the probe artifact, the rotation-smoke artifact, the secrets script + artifact, and the BS-021 key-marker guard (regex + env-value forms over the R469 targets)",
+    "standing": "all standing batteries green at the keyless posture, each run individually (the standing convention): r467 23, r468 21, r456 25, r461_bynara 27, r462 31, r463_aerolink 40, r463_hf 6, r463_no_operator_key 9, r414 50, r451_transport 32, r455_lean1 14, r451_zero_paid 37, r419 4, r415 35, r446 20, r459 20+8+6, r465 15 (the combined-battery invocation shows pre-existing order-dependent instability \u2014 measured at pristine HEAD too, where it is WORSE: 402 errors vs 3; the per-battery form is the verified convention)",
+    "full_suite_differential": "with-changes failures (8, all pre-existing test_e21_series) are a STRICT SUBSET of pristine-HEAD failures (24) on the same instrument \u2014 zero new failures introduced",
+    "frontend": "untouched; no tsc required (no frontend files changed)",
+    "module_inventory": "regenerated: 123 production files / 60524 LOC (was 60228 \u2014 the R469 engine additions), drift GREEN"
+  },
+  "disclosures": [
+    "the R468 production measurement's named remaining gap (the evidence-span citation contract: missing_source_span / mechanism_span_not_verbatim) is NOT addressed by this round \u2014 the ring extends atria's capacity and the pin makes it the default, but the span-citation capability question stays open as the Art. LXV owner-side item R468 recorded",
+    "the probe cap escalation changes the probe's cost shape on reasoning models: a starved probe now makes ONE additional 2000-cap attempt (the R467-measured recovery) \u2014 bounded, recorded, and only on EmptyContentWithFinish (never on transport failures)",
+    "the sticky ring slot is PROCESS state: a ring rotated forward stays forward until it exhausts (then resets to the head key); a process restart re-measures from the head key \u2014 one cheap typed round-trip, never a persisted exhaustion fact",
+    "RATE_LIMITED rotates: a 429 may be account-wide rather than per-key (unmeasured for atria \u2014 no 429 specimen observed this round); the rotation is bounded by the ring size and recorded, so the worst case is a few extra recorded hops before the standing cooldown ladder takes over",
+    "one transient combined-battery run showed 2 errors in the new test file + 143 errors across standing batteries immediately after the live smoke wrote fresh ENGINE_RUNS capability state; it did not reproduce across three re-runs of the identical command and the per-battery form stayed green throughout \u2014 classified as the pre-existing state/history sensitivity of combined invocations, not a code defect"
+  ],
+  "production_deployment": {
+    "status": "pending this record \u2014 the commit/push/deploy/verify sequence runs after the round record is written (the standing records convention)",
+    "plan": "commit the four engine files + tests + scripts + R469 artifacts -> push to origin/main (GITHUB_TOKEN from the vault) -> scripts/r456_space_deploy.py (HF_TOKEN + GITHUB_TOKEN from the vault; ATRIA_API_KEY_3 already set on the Space by scripts/r469_hf_secrets.py) -> scripts/r456_deploy_verify.py -> the Art. LXXI tuple"
+  },
+  "open_items": [
+    "the evidence-span citation contract (the R468 named gap; an Art. LXV owner-side capacity question)",
+    "aerolink wallet decision (owner-gated, standing)",
+    "tokenharbor Space-side measurement (R462 standing)",
+    "the 429-per-key-vs-per-account question for atria (unmeasured \u2014 no specimen observed; the bounded recorded rotation is the honest default)"
+  ],
+  "parallel_line_reconciliation": {
+    "what": "A sibling session's R469-C2 (origin/main d9522d28, pushed while this round was in flight) carried its own probe-starvation fix: ProviderSpec.probe_max_tokens (the rung's OWN declared probe budget; atria=256) consumed by probe_capability. This round rebased onto d9522d28 and the two mechanisms now COMPOSE: the probe spends the rung's declared budget first (R469-C2), and a still-starving EmptyContentWithFinish escalates once to 2000 (R469, the R467-measured recovery) \u2014 declared budget, then escalation, then the typed failure. Neither displaces the other; both are recorded.",
+    "conflicts_resolved": "llm_registry.py only (the ProviderSpec field region + the atria spec region \u2014 both unions: probe_max_tokens AND key_env_vars); runtime_admission.py merged cleanly (their budget override feeds this round's probe_cap); no other overlap \u2014 their P0-2/P0-5/P1-6/P0-4/P1-5 items (durable attachments, steering inheritance, interim evidence pack, vercel pin, contrast sweep) are untouched by this round and ride along.",
+    "tests_updated": "the two escalation tests now expect caps [256, 2000] (the declared budget feeds the escalation); a NEW test pins the composed contract (a rung that declares a budget serves it with NO escalation when content fits).",
+    "naming": "this round keeps its id R469; the sibling's R469-C2 stands as pushed \u2014 two parallel continuations of the R468 baseline, one canonical tree after this rebase."
+  }
+}

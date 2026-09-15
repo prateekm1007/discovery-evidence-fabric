@@ -114,6 +114,15 @@ class ProviderSpec:
     #: it here; every other rung keeps the 16-token probe. Consumed by
     #: runtime_admission.probe_capability (typed fallback to 16).
     probe_max_tokens: int = 16
+    #: R469: the provider's CREDENTIAL RING — the ordered env-var
+    #: names the transport rotates through on exhaustion-class
+    #: failures (the operator's keep-going directive: "Keep going to
+    #: a new key of atira if one is exhausted"). None/empty degrades
+    #: to [env_var] (single-key — every pre-R469 provider is exactly
+    #: this). The availability marker stays env_var (the FIRST ring
+    #: slot); every rotation is a recorded route hop, never silent
+    #: (Art. IV).
+    key_env_vars: Optional[List[str]] = None
 
     def url_for_call(self) -> str:
         """Effective endpoint for this call.
@@ -433,6 +442,22 @@ PROVIDER_SPECS: List[ProviderSpec] = [
                 "budget; no deposit authorized)",
         account_domain="OWNER_ATRIA_ACCOUNT",
         probe_max_tokens=256,
+        # R469 (2026-09-16): the THREE-KEY RING — the operator's
+        # keep-going directive, verbatim: "Keep going to a new key of
+        # atira if one is exhausted. Wire it in the discovery engine."
+        # Key 3 (ATRIA_API_KEY_3) was probe-validated before this
+        # registration (R469/PROBE_ATRIA_KEY3.json: the bogus-key 401
+        # differential control; catalog 200 on ALL THREE keys — the
+        # same sole model Atria-Dawn-Preview; a 200 non-empty tiny
+        # completion on key 3 in 17.9 s; keys 1/2 identity-confirmed
+        # against the R467/R468 records; all three keys DISTINCT). An
+        # exhaustion-class failure (CREDIT_EXHAUSTED / AUTH_FAILURE /
+        # RATE_LIMITED) rotates ATRIA_API_KEY -> ATRIA_API_KEY_2 ->
+        # ATRIA_API_KEY_3 on the SAME rung before any provider-level
+        # fallback; every rotation is a recorded route hop (never
+        # silent, Art. IV).
+        key_env_vars=["ATRIA_API_KEY", "ATRIA_API_KEY_2",
+                      "ATRIA_API_KEY_3"],
         model_revision="Atria-Dawn-Preview — the catalog's SOLE model id "
                        "(owned_by atria, 2026-09-15 catalog); no revision "
                        "pin exposed by the provider — recorded honest "
@@ -473,7 +498,19 @@ PROVIDER_SPECS: List[ProviderSpec] = [
             "/v1/balance, /v1/credits all 404/405) — depletion, when "
             "measured, stays a typed failure that advances the cascade, "
             "never a bill. FREE_TIER_API under the R456-A3 operator "
-            "amendment: eligible under ZERO_PAID_COST.")),
+            "amendment: eligible under ZERO_PAID_COST. R469 "
+            "(2026-09-16): the operator's DEFAULT-PROVIDER directive, "
+            "verbatim: 'From Now on atira is out default API for "
+            "discovery engine.' — atria is the HEAD of every role's "
+            "default order (ENGINE_DEFAULT_PROVIDER, the operator-"
+            "override class; provider_health.order_for_role) with the "
+            "Art. XLV attack-independence rule and the Art. V cooldown "
+            "demotion still taking precedence over the pin; the honest "
+            "tier-2 quality basis is UNCHANGED (a routing pin, never "
+            "a quality rewrite). The THREE-KEY ring (key_env_vars "
+            "above) rotates on exhaustion-class failures — the "
+            "keep-going directive: 'Keep going to a new key of atira "
+            "if one is exhausted.'")),
     # ------------------------------------------------------------------
     # R463 (2026-09-15): the USER's Hugging Face credential path — the
     # operator's P0 architectural ruling ("the user gives Toscanini AI
@@ -707,6 +744,105 @@ PROVIDER_SPECS: List[ProviderSpec] = [
 _SPEC_BY_ID = {p.provider_id: p for p in PROVIDER_SPECS}
 
 
+# --------------------------------------------------------------------------
+# R469: THE KEY RING — multi-credential rotation on one provider.
+#
+# Operator directive (2026-09-16, verbatim):
+#   "From Now on atira is out default API for discovery engine. Keep
+#    going to a new key of atira if one is exhausted. Wire it in the
+#    discovery engine."
+#
+# A provider whose operator holds MULTIPLE keys for the same account
+# surface registers them as an ordered ring. An EXHAUSTION-class
+# failure on one slot rotates to the next PRESENT slot on the SAME
+# rung (same provider, same model) BEFORE any provider-level fallback
+# — the ring is consumed key by key, exactly the directive's order.
+# Every rotation is a recorded route hop (status
+# FAILED_KEY_EXHAUSTED + action KEY_ROTATED) and a routing-ledger
+# event; a ring that exhausts entirely falls through to the standing
+# cascade (typed failure, never a bill, never silent). The sticky
+# slot is PROCESS state: a rotated-forward ring does not re-pay the
+# exhausted key's round-trip on every call, and a fully exhausted
+# ring RESETS to the first present slot so the next call re-measures
+# the head key (budgets reset; exhaustion is never persisted as a
+# fact — the cooldown discipline, Art. V).
+# --------------------------------------------------------------------------
+KEY_ROTATION_FAILURE_CLASSES = frozenset({
+    "CREDIT_EXHAUSTED",   # 402 / credit wording — THIS key's budget
+    "AUTH_FAILURE",       # 401 — THIS key revoked/invalid
+    "RATE_LIMITED",       # 429 — often per-key on free routers
+})
+
+_KEY_RING_SLOT: Dict[str, int] = {}
+
+
+def key_ring_slots(spec: ProviderSpec) -> List[str]:
+    """The provider's credential ring (env-var names, registration
+    order). Single-key providers degrade to [env_var] — the exact
+    pre-R469 behavior."""
+    return (list(spec.key_env_vars) if spec.key_env_vars
+            else [spec.env_var])
+
+
+def _ring_slot_present(spec: ProviderSpec, idx: int) -> bool:
+    names = key_ring_slots(spec)
+    return (0 <= idx < len(names)
+            and bool(os.environ.get(names[idx], "").strip()))
+
+
+def active_key_slot(spec: ProviderSpec) -> Optional[int]:
+    """The ring slot a call uses NOW: the sticky slot (skipping empty
+    slots forward, wrapping once) — the first present slot when no
+    rotation has happened. None when NO slot holds a credential."""
+    names = key_ring_slots(spec)
+    if not names:
+        return None
+    start = _KEY_RING_SLOT.get(spec.provider_id, 0) % len(names)
+    for off in range(len(names)):
+        idx = (start + off) % len(names)
+        if _ring_slot_present(spec, idx):
+            return idx
+    return None
+
+
+def active_key_value(spec: ProviderSpec) -> str:
+    """The credential VALUE the transport uses (the active ring slot;
+    '' when absent — callers keep the PROVIDER_UNAVAILABLE
+    semantics). The single key-selection authority for chat calls,
+    probes, and catalog fetches alike (Art. X)."""
+    idx = active_key_slot(spec)
+    if idx is None:
+        return os.environ.get(spec.env_var, "").strip()
+    return os.environ.get(key_ring_slots(spec)[idx], "").strip()
+
+
+def rotate_key(spec: ProviderSpec) -> Optional[int]:
+    """Advance the ring to the NEXT present slot (the operator's
+    keep-going directive). Returns the new slot index, or None when
+    the ring is exhausted — in which case the sticky slot RESETS to
+    the first present slot (auto-recovery: the next call re-measures
+    the head key; exhaustion is a per-call measurement, never a
+    persisted fact)."""
+    names = key_ring_slots(spec)
+    cur = _KEY_RING_SLOT.get(spec.provider_id, 0)
+    for nxt in range(cur + 1, len(names)):
+        if _ring_slot_present(spec, nxt):
+            _KEY_RING_SLOT[spec.provider_id] = nxt
+            return nxt
+    # ring exhausted from the sticky slot — reset to first present
+    _KEY_RING_SLOT[spec.provider_id] = 0
+    for idx in range(len(names)):
+        if _ring_slot_present(spec, idx):
+            _KEY_RING_SLOT[spec.provider_id] = idx
+            break
+    return None
+
+
+def _reset_key_ring(provider_id: str) -> None:
+    """Test/ops hook: drop the sticky slot (never on the hot path)."""
+    _KEY_RING_SLOT.pop(provider_id, None)
+
+
 @dataclass
 class SelectionPolicy:
     """Explicit provider-selection policy (CEO E1).
@@ -807,14 +943,23 @@ def availability_matrix() -> List[Dict[str, Any]]:
     policy = _cost_policy.active_policy()
     out = []
     for p in PROVIDER_SPECS:
-        key = os.environ.get(p.env_var, "")
+        # R469: availability is ANY ring slot present (the marker env_var
+        # stays the FIRST slot's name — the row reports the full ring)
+        _ring = key_ring_slots(p)
+        _present = [i for i, _n in enumerate(_ring)
+                    if os.environ.get(_n, "").strip()]
+        key = (os.environ.get(_ring[_present[0]], "")
+               if _present else os.environ.get(p.env_var, ""))
         eligible, elig_note = _cost_policy.provider_eligibility(p, policy)
         cap = _ra.capability_state(p.provider_id, p.model_for_call(),
                                    policy=policy)
         out.append({
             "provider_id": p.provider_id,
             "env_var": p.env_var,
-            "available": bool(key.strip()),
+            "available": bool(_present),
+            "key_ring_env_vars": _ring,
+            "key_slots_present": _present,
+            "key_slot_active": active_key_slot(p),
             "model": p.model_for_call(),
             "quality_tier": p.quality_tier,
             "cost_tier": p.cost_tier,
@@ -1068,7 +1213,9 @@ def _post_json(url: str, payload: dict, headers: Dict[str, str],
 def _call_openai_flavor(spec: ProviderSpec, messages: List[dict],
                         timeout: int, max_tokens: int,
                         model_override: Optional[str] = None) -> str:
-    key = os.environ.get(spec.env_var, "").strip()
+    # R469: the ACTIVE ring key (single-key providers: env_var, exactly
+    # the pre-R469 read — one key-selection authority, Art. X)
+    key = active_key_value(spec)
     model = model_override or spec.model_for_call()
     payload: Dict[str, Any] = {"model": model, "messages": messages,
                                "temperature": 0.0,
@@ -1115,7 +1262,8 @@ class EmptyContentWithFinish(RuntimeError):
 def _call_anthropic_flavor(spec: ProviderSpec, messages: List[dict],
                            timeout: int, max_tokens: int,
                            model_override: Optional[str] = None) -> str:
-    key = os.environ.get(spec.env_var, "").strip()
+    # R469: the ACTIVE ring key (see _call_openai_flavor)
+    key = active_key_value(spec)
     model = model_override or spec.model_for_call()
     system = ""
     msgs = []
@@ -1438,8 +1586,10 @@ def generate(prompt: str, system: str = "",
         # for rungs added beyond the keyed chain (last-resort bands,
         # stale pins) — never as a silent availability change.
         _spec_rung = _SPEC_BY_ID.get(provider_id)
-        if _spec_rung is not None and not os.environ.get(
-                _spec_rung.env_var, "").strip():
+        # R469: the credential check is ring-aware — a provider with ANY
+        # present slot is keyed (the single-key form is the exact
+        # pre-R469 check)
+        if _spec_rung is not None and active_key_slot(_spec_rung) is None:
             route.append({
                 "provider_attempted": provider_id,
                 "model": model_id,
@@ -1448,9 +1598,10 @@ def generate(prompt: str, system: str = "",
                 "timestamp": utc_now(),
                 "latency_ms": 0,
                 "error": (f"provider {provider_id} has no credential "
-                          f"in the environment ({_spec_rung.env_var} "
-                          "empty) — not probed, not called "
-                          "(R453-LEAN-CORE)"),
+                          f"in the environment (ring "
+                          f"{key_ring_slots(_spec_rung)} all empty) "
+                          "— not probed, not called "
+                          "(R453-LEAN-CORE; R469 ring form)"),
                 "fallback_provider": next_provider,
                 "fallback_model": next_model,
                 "cost_class": _spec_rung.cost_basis,
@@ -1513,8 +1664,18 @@ def generate(prompt: str, system: str = "",
         attempt_budget = max_tokens
         retry_notes: List[str] = []
         hop_t0 = time.time()
+        # R469: the attempt budget is EXTENDED by the credential ring —
+        # a KEY ROTATION is not a same-model retry (a different
+        # credential is a different request path: it neither consumes
+        # the same-model retry budget nor pays a backoff sleep). For
+        # every single-key provider ring_extra is 0 and the loop below
+        # is behavior-identical to the pre-R469 for-range.
+        ring_extra = max(0, len(key_ring_slots(spec)) - 1)
+        max_attempts = max_retries + 1 + ring_extra
+        retries_used = 0
+        key_rotations = 0
         attempt = 0
-        for attempt in range(max_retries + 1):
+        while attempt < max_attempts:
             t0 = time.time()
             try:
                 if spec.flavor == "anthropic":
@@ -1526,6 +1687,8 @@ def generate(prompt: str, system: str = "",
                         spec, messages, timeout, attempt_budget,
                         model_override=model_id)
                 latency_ms = int((time.time() - t0) * 1000)
+                # R469: the serving hop records WHICH ring slot answered
+                _ok_slot = active_key_slot(spec)
                 HEALTH.record_success(
                     spec.provider_id, latency_ms,
                     purpose=purpose_tag,
@@ -1551,8 +1714,12 @@ def generate(prompt: str, system: str = "",
                     "status": "OK",
                     "failure_type": None,
                     "timestamp": utc_now(),
-                    "retry_count": attempt,
+                    "retry_count": retries_used,
                     "attempts": attempt + 1,
+                    "key_slot": _ok_slot,
+                    "key_env_var": (key_ring_slots(spec)[_ok_slot]
+                                    if _ok_slot is not None else None),
+                    "key_rotations": key_rotations,
                     "latency_ms": latency_ms,
                     "error": None,
                     "fallback_provider": None,
@@ -1615,8 +1782,10 @@ def generate(prompt: str, system: str = "",
                         f"(finish_reason={exc.finish_reason}); same "
                         f"provider/model retried with max_tokens="
                         f"{attempt_budget}")
-                if attempt < max_retries:
-                    time.sleep(2 * (attempt + 1))
+                if retries_used < max_retries:
+                    retries_used += 1
+                    attempt += 1
+                    time.sleep(2 * retries_used)
                     continue
             except Exception as exc:  # noqa: BLE001 — recorded, retried
                 last_err = f"{type(exc).__name__}: {exc}"
@@ -1635,10 +1804,91 @@ def generate(prompt: str, system: str = "",
                 # 403 region_blocked pre-auth) answers IDENTICALLY on
                 # every same-model retry from this egress; the cascade
                 # advances instead (never retried within the walk).
+                # R469: OPERATOR KEY-RING ROTATION — "Keep going to a
+                # new key of atira if one is exhausted." An exhaustion-
+                # class failure on a multi-key provider rotates to the
+                # NEXT PRESENT key on the SAME rung (same provider,
+                # same model) BEFORE any provider-level fallback: the
+                # ring is consumed key by key. The rotation is a
+                # recorded route hop + ledger event (never silent,
+                # Art. IV); the PROVIDER's health is NOT failure-marked
+                # by a key-slot exhaustion the ring survives (the rung
+                # continues on the next credential). A ring that
+                # exhausts entirely falls through to the standing hop
+                # record below (typed failure, cascade advances).
+                if ftype in KEY_ROTATION_FAILURE_CLASSES:
+                    _slot_from = active_key_slot(spec)
+                    _slot_to = rotate_key(spec)
+                    if _slot_to is not None:
+                        key_rotations += 1
+                        retry_notes.append(
+                            f"attempt {attempt + 1}: ring slot "
+                            f"{_slot_from} answered {ftype} — rotated "
+                            f"to slot {_slot_to} "
+                            f"({key_ring_slots(spec)[_slot_to]}), same "
+                            "provider/model (R469 keep-going directive)")
+                        route.append({
+                            "provider_attempted": spec.provider_id,
+                            "model": model_id,
+                            "status": "FAILED_KEY_EXHAUSTED",
+                            "failure_type": ftype,
+                            "action": "KEY_ROTATED",
+                            "key_slot_exhausted": _slot_from,
+                            "key_slot": _slot_to,
+                            "key_env_var": key_ring_slots(spec)[_slot_to],
+                            "timestamp": utc_now(),
+                            "retry_count": retries_used,
+                            "attempts": attempt + 1,
+                            "latency_ms": int((time.time() - t0) * 1000),
+                            "error": str(last_err)[:300],
+                            "fallback_provider": spec.provider_id,
+                            "fallback_model": model_id,
+                            "fallback_reason": (
+                                f"{ftype} on ring slot {_slot_from} -> "
+                                f"KEY_ROTATED to slot {_slot_to} (same "
+                                "provider/model, next credential — the "
+                                "R469 keep-going directive)"),
+                            "cost_class": spec.cost_basis,
+                            "account_domain": spec.account_domain,
+                            "selected": False,
+                            "rung_band": rung_meta.get("band"),
+                            "task": task,
+                        })
+                        try:
+                            mr.record_call_outcome(
+                                provider_id, model_id, ok=False,
+                                latency_ms=int(
+                                    (time.time() - t0) * 1000),
+                                failure_type=ftype, task=task,
+                                stage=purpose_tag,
+                                run_id=call_prov["run_id"],
+                                attempt=attempt + 1,
+                                session_id=call_prov["session_id"],
+                                engine_stage=call_prov["engine_stage"],
+                                call_class=call_prov["call_class"],
+                                account_domain=spec.account_domain,
+                                task_degradation=degradation,
+                                capability_state="PROBE_OK",
+                                fallback_from=provider_id,
+                                fallback_to=provider_id,
+                                error=str(last_err),
+                                cost_class=spec.cost_basis,
+                                selected=False,
+                                fallback_reason=(
+                                    f"{ftype} on ring slot {_slot_from} "
+                                    f"-> KEY_ROTATED to slot {_slot_to} "
+                                    "(same provider/model, next "
+                                    "credential)"))
+                        except Exception:  # noqa: BLE001 — best-effort
+                            pass
+                        attempt += 1
+                        continue  # next key — no backoff (new credential)
                 if ftype not in ("GONE", "MODEL_NOT_FOUND",
                                  "REGION_NOT_SERVED") \
-                        and attempt < max_retries:
-                    time.sleep(2 * (attempt + 1))
+                        and retries_used < max_retries:
+                    retries_used += 1
+                    attempt += 1
+                    time.sleep(2 * retries_used)
                     continue
             # this attempt exhausted the same-model budget -> record
             # the hop honestly and move to the next rung
@@ -1681,8 +1931,9 @@ def generate(prompt: str, system: str = "",
                 "status": "FAILED",
                 "failure_type": ftype,
                 "timestamp": utc_now(),
-                "retry_count": attempt,
+                "retry_count": retries_used,
                 "attempts": attempt + 1,
+                "key_rotations": key_rotations,
                 "latency_ms": int((time.time() - hop_t0) * 1000),
                 "error": str(last_err)[:300],
                 "fallback_provider": next_provider,

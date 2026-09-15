@@ -996,3 +996,26 @@ keyless-posture regressions 305/305 + r414 50 + r446 20 + r467 23 +
 r419 4 (pin updated per precedent); r458 29/30 (standing BS-020);
 frontend untouched, tsc clean; MODULE_INVENTORY 123/60228 drift GREEN.
 Round record: `R468/R468_ROUND_RECORD.json`.
+
+## R469 — the atria DEFAULT-PROVIDER pin + the THREE-KEY ring (the keep-going directive)
+
+| DELIVERABLE | WHERE | THE MEASURED FACT |
+|---|---|---|
+| KEY 3 PROBE | `R469/PROBE_ATRIA_KEY3.json` | the bogus-key differential (401 vs 200) proves key 3 VALID; catalog 200 on ALL THREE keys (the sole model Atria-Dawn-Preview); tiny completion 200 non-empty in 17.9 s; keys 1/2 fingerprints MATCH R467/R468 (continuity); all three DISTINCT |
+| THE KEY RING | `discovery_fabric/engine/llm_registry.py` + `runtime_admission.py` + `model_routing.py` | exhaustion-class failures (CREDIT_EXHAUSTED / AUTH_FAILURE / RATE_LIMITED) rotate ATRIA_API_KEY -> _2 -> _3 on the SAME rung before any provider fallback; every rotation a recorded route hop + ledger event; a fully exhausted ring falls through typed and auto-resets; the probe rides the ring AND carries the R467-measured 16->2000 cap escalation (EmptyContentWithFinish); catalog fetches ride the active key |
+| THE DEFAULT PIN | `discovery_fabric/engine/provider_health.py` | _DEFAULT_PROVIDER_PIN = "atria" + ENGINE_DEFAULT_PROVIDER (env override; the ENGINE_* class); Art. XLV attack independence and Art. V cooldown demotion keep precedence (differential-proven); atria's honest tier-2 stands — a routing pin, never a quality rewrite |
+| THE LIVE PROOF | `R469/ROTATION_SMOKE.json` | four REAL generate() walks via the bogus-key differential (no real budget spent on failures): control OK on slot 0; probe-path rotation OK on slot 1; call-loop rotation OK on slot 1 (route hop FAILED_KEY_EXHAUSTED/AUTH_FAILURE/KEY_ROTATED); two-hop walk OK on slot 2/ATRIA_API_KEY_3. ALL_GREEN; 3/3 FIELD lines on every arm |
+| THE PERSISTENCE | `R469/HF_SPACE_SECRETS.json` + the Article LXXIII vault | ATRIA_API_KEY_3 set on the Space AFTER the probe; the FULL 15-name surface verified present BY NAME, zero absent; fingerprints only (BS-021) |
+
+Tests: `tests/test_r469_atria_keyring.py` 32+1 NEW; the standing
+keyless-posture batteries green individually (r467 23, r468 21, r456
+25, r461_bynara 27, r462 31, r463 40+6+9, r414 50, r451 32+37,
+r455 14, r419 4, r415 35, r446 20, r459 34, r465 15); full-suite
+stash differential: with-changes failures a STRICT SUBSET of pristine
+— zero new. MODULE_INVENTORY 123/60524 drift GREEN. Round record:
+`R469/R469_ROUND_RECORD.json`.
+Parallel-line note: R469-C2 (the sibling session, origin/main d9522d28)
+landed while this round was in flight; this round rebased onto it and
+the two probe mechanisms COMPOSE — the rung's declared budget
+(R469-C2's probe_max_tokens, atria=256) feeds R469's one-shot 2000-cap
+escalation. One canonical tree; both feature sets intact.

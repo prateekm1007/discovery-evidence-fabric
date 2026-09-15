@@ -370,8 +370,11 @@ def probe_capability(provider: str, model: str,
     call_class='CAPABILITY_PROBE' and run_id=None — provider
     capability probes are NOT run-owned discovery calls (the C1.3-3
     distinction; the invariant test separates the two classes)."""
-    from .llm_registry import (_SPEC_BY_ID, _call_anthropic_flavor,
-                               _call_openai_flavor)
+    from .llm_registry import (KEY_ROTATION_FAILURE_CLASSES,
+                               EmptyContentWithFinish,
+                               _SPEC_BY_ID, _call_anthropic_flavor,
+                               _call_openai_flavor, active_key_slot,
+                               key_ring_slots, rotate_key)
     spec = _SPEC_BY_ID.get(provider)
     out: Dict[str, Any] = {
         "probe_version": RUNTIME_ADMISSION_VERSION,
@@ -403,18 +406,65 @@ def probe_capability(provider: str, model: str,
     t0 = time.time()
     content = ""
     ftype: Optional[str] = None
-    try:
-        if spec.flavor == "anthropic":
-            content = _call_anthropic_flavor(
-                spec, messages, timeout_s, max_tokens,
-                model_override=model)
-        else:
-            content = _call_openai_flavor(
-                spec, messages, timeout_s, max_tokens,
-                model_override=model)
-    except Exception as exc:  # noqa: BLE001 — typed, recorded
-        from .provider_health import classify_failure
-        ftype = classify_failure(exc)
+    # R469: the probe rides the RING — an exhaustion-class failure on
+    # the active key rotates to the next PRESENT slot and retries the
+    # tiny completion (bounded by the ring size). Without this, a
+    # probe with an exhausted head key would PROBE_FAILED the rung and
+    # the walk would never reach generate()'s rotation — the admission
+    # authority must share the ring discipline (one key-selection
+    # authority, Art. X). Every rotation is recorded in the probe
+    # record (never silent, Art. IV); a fully exhausted ring records
+    # the typed failure exactly as before.
+    key_rotations: List[Dict[str, Any]] = []
+    cap_escalated = False
+    probe_cap = max_tokens
+    while True:
+        try:
+            if spec.flavor == "anthropic":
+                content = _call_anthropic_flavor(
+                    spec, messages, timeout_s, probe_cap,
+                    model_override=model)
+            else:
+                content = _call_openai_flavor(
+                    spec, messages, timeout_s, probe_cap,
+                    model_override=model)
+            ftype = None
+            break
+        except EmptyContentWithFinish as exc:
+            # R469: the small-cap starvation specimen (R467 measured on
+            # Atria-Dawn-Preview): a reasoning model can spend the
+            # probe's whole budget — the declared probe_max_tokens
+            # included — on hidden reasoning and return a 200 with
+            # EMPTY content: transport-capable, content-starved (NOT a
+            # key exhaustion: no ring rotation fires). The R467
+            # recovery measurement: the SAME rung at max_tokens 2000
+            # answers with clean content ("the small-cap starvation
+            # specimen recovered at the larger cap"). Escalate ONCE
+            # past the declared budget (recorded in the probe record,
+            # never silent); the probe's success criterion stays a
+            # NON-EMPTY completion.
+            if not cap_escalated and probe_cap < 512:
+                cap_escalated = True
+                probe_cap = 2000
+                continue
+            from .provider_health import classify_failure
+            ftype = classify_failure(exc)
+            break
+        except Exception as exc:  # noqa: BLE001 — typed, recorded
+            from .provider_health import classify_failure
+            ftype = classify_failure(exc)
+            if ftype in KEY_ROTATION_FAILURE_CLASSES:
+                _slot_from = active_key_slot(spec)
+                _slot_to = rotate_key(spec)
+                if _slot_to is not None:
+                    key_rotations.append({
+                        "from_slot": _slot_from,
+                        "to_slot": _slot_to,
+                        "failure_class": ftype,
+                        "key_env_var": key_ring_slots(spec)[_slot_to],
+                    })
+                    continue
+            break
     latency_ms = int((time.time() - t0) * 1000)
     ok = ftype is None and bool(content)
     fields_ok = None
@@ -433,7 +483,16 @@ def probe_capability(provider: str, model: str,
         note=(ftype or "completion ok")[:200])
     out.update({"ok": ok, "latency_ms": latency_ms,
                 "failure_class": ftype,
-                "fields_ok": fields_ok, "record": rec})
+                "fields_ok": fields_ok, "record": rec,
+                # R469: the ring view — which slot served, which slots
+                # were rotated past (recorded, never silent)
+                "key_slot": active_key_slot(spec),
+                "key_rotations": key_rotations,
+                "attempts": 1 + len(key_rotations),
+                # R469: the small-cap starvation recovery (R467
+                # measured) — the one-shot probe cap escalation
+                "cap_escalation": ({"from": max_tokens, "to": probe_cap}
+                                   if cap_escalated else None)})
     if persist_ledger:
         try:
             from .model_routing import record_call_outcome

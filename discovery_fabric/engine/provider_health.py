@@ -641,6 +641,14 @@ ROLE_EXTRACTION = "extraction"      # fast evidence extraction
 ROLE_ATTACK = "attack"              # adversarial review
 ROLE_TRANSFORM = "transform"        # simple JSON shaping (prefer no LLM)
 
+# R469 (2026-09-16): the operator's DEFAULT-PROVIDER pin, verbatim
+# directive: "From Now on atira is out default API for discovery
+# engine." The code-level default makes the deployed engine pin atria
+# WITHOUT extra configuration; ENGINE_DEFAULT_PROVIDER (env) overrides
+# or disables it ("" = no pin) — the ENGINE_* operator-override class.
+# A routing pin, never a quality-tier rewrite (Art. XXVII).
+_DEFAULT_PROVIDER_PIN = "atria"
+
 _PURPOSE_ROLE_HINTS = {
     # purposes in use across the engine (grep-verified) -> roles
     "structured_evidence_extraction": ROLE_EXTRACTION,
@@ -687,6 +695,21 @@ def order_for_role(matrix: List[Dict[str, Any]], role: str,
     Cooldown demotion (never removal) applies to every role: a
     rate-limited provider slides to the end so the cascade tries the
     healthy path first without ever refusing to run (Art. V).
+
+    R469: the operator's DEFAULT-PROVIDER pin. Directive (2026-09-16,
+    verbatim): "From Now on atira is out default API for discovery
+    engine." The pin moves the named provider to the HEAD of every
+    role's order — an explicit, recorded policy input (Art. XXVII),
+    NEVER a quality-tier rewrite (the pinned provider's honest tiers
+    stand). Two standing rules take precedence over the pin, both
+    unchanged:
+      * Art. XLV independence (attack role): the avoid_provider stays
+        demoted even when it IS the pinned default;
+      * Art. V cooldown demotion: a rate-limited pinned provider
+        still slides to the end (never removed, never refuses to run).
+    ENGINE_DEFAULT_PROVIDER overrides the code default (set "" to
+    disable, any registered provider id to re-pin) — the ENGINE_*
+    operator-override class (R391/R418/R445).
     """
     b = book or HEALTH
     avail = [m for m in matrix if m.get("available")]
@@ -704,6 +727,14 @@ def order_for_role(matrix: List[Dict[str, Any]], role: str,
 
     ranked = sorted(avail, key=_rank)
     order = [m["provider_id"] for m in ranked]
+    # R469: the default-provider pin (see docstring) — applied AFTER the
+    # rank sort (stable move-to-head) and BEFORE cooldown demotion (a
+    # cooled pinned provider still slides to the end — Art. V wins)
+    pin = os.environ.get("ENGINE_DEFAULT_PROVIDER",
+                         _DEFAULT_PROVIDER_PIN).strip()
+    if (pin and pin in order
+            and not (role == ROLE_ATTACK and pin == avoid_provider)):
+        order = [pin] + [p for p in order if p != pin]
     cooled = [p for p in order if b.in_cooldown(p)]
     if cooled and len(order) > 1:
         order = [p for p in order if p not in cooled] + cooled

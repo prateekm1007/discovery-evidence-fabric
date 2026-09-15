@@ -451,8 +451,22 @@ def discover_catalog(provider_id: str,
                 return data
         except Exception:  # noqa: BLE001 — stale cache falls through
             pass
-    key_var = _provider_env_key(provider_id)
-    key = (os.environ.get(key_var, "").strip()) if key_var else ""
+    # R469: catalog discovery rides the ACTIVE ring key (a rotated-
+    # forward provider must not re-pay the exhausted head key's 401 on
+    # every catalog fetch — one key-selection authority with the chat
+    # call path, Art. X). Single-key providers: exactly the pre-R469
+    # env_var read.
+    key = ""
+    try:
+        from .llm_registry import _SPEC_BY_ID, active_key_value
+        _kspec = _SPEC_BY_ID.get(provider_id)
+        if _kspec is not None:
+            key = active_key_value(_kspec)
+    except Exception:  # noqa: BLE001 — discovery stays best-effort
+        key = ""
+    if not key:
+        key_var = _provider_env_key(provider_id)
+        key = (os.environ.get(key_var, "").strip()) if key_var else ""
     url = base.rstrip("/") + "/models"
     # R456-A3: the spec's transport headers ride catalog discovery too
     # (the CF browser-UA requirement — ONE transport authority)
