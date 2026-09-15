@@ -1019,3 +1019,9 @@ landed while this round was in flight; this round rebased onto it and
 the two probe mechanisms COMPOSE — the rung's declared budget
 (R469-C2's probe_max_tokens, atria=256) feeds R469's one-shot 2000-cap
 escalation. One canonical tree; both feature sets intact.
+Deployment: pushed ca385e1f (rebased onto R469-C2's d9522d28) ->
+r456_space_deploy (Space revision 0b45894b) -> ART. LXXI TUPLE GREEN:
+engine_commit == ca385e1f == origin/main; ok=true, drift=GREEN,
+identity_tamper=false; constitution 2.5.0; atria HEALTHY (1 model) in
+the production provider matrix. Atria is now the DEFAULT head with the
+THREE-KEY ring live in production.

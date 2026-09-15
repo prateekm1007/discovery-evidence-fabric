@@ -74,8 +74,19 @@
     "one transient combined-battery run showed 2 errors in the new test file + 143 errors across standing batteries immediately after the live smoke wrote fresh ENGINE_RUNS capability state; it did not reproduce across three re-runs of the identical command and the per-battery form stayed green throughout \u2014 classified as the pre-existing state/history sensitivity of combined invocations, not a code defect"
   ],
   "production_deployment": {
-    "status": "pending this record \u2014 the commit/push/deploy/verify sequence runs after the round record is written (the standing records convention)",
-    "plan": "commit the four engine files + tests + scripts + R469 artifacts -> push to origin/main (GITHUB_TOKEN from the vault) -> scripts/r456_space_deploy.py (HF_TOKEN + GITHUB_TOKEN from the vault; ATRIA_API_KEY_3 already set on the Space by scripts/r469_hf_secrets.py) -> scripts/r456_deploy_verify.py -> the Art. LXXI tuple"
+    "status": "VERIFIED GREEN",
+    "pushed": "ca385e1f (rebased onto the sibling R469-C2's d9522d28; origin/main == HEAD == ca385e1f)",
+    "space_revision": "0b45894bf4f5ca30dfe448a4bf4487dbe1e87d64",
+    "deploy": "scripts/r456_space_deploy.py \u2014 upload 41 s; ATRIA_API_KEY wired from the deploy env (value never logged); the seven unset router keys typed-honestly skipped (the standing Space secrets persist \u2014 ATRIA_API_KEY_2/ATRIA_API_KEY_3 set by scripts/r469_hf_secrets.py BEFORE the deploy)",
+    "article_lxxi_tuple": {
+      "engine_commit": "ca385e1fafbbf8e8771424366a07484e2fdaadac",
+      "matches_origin_main": true,
+      "matches_local_head": true,
+      "health": "ok=true, drift=GREEN, identity_tamper=false",
+      "constitution_live": "2.5.0",
+      "provider_matrix": "atria HEALTHY with 1 model; 8 providers loaded (apinex, atria, bai, bynara, localqwen, unorouter, xkiro, zai); discovery_ready=true, showcase_ready=true",
+      "observed_transition": "the deployed engine_commit measured d9522d28 during the Space build window, then flipped to ca385e1f \u2014 the reconcile-and-deploy sequence observed live"
+    }
   },
   "open_items": [
     "the evidence-span citation contract (the R468 named gap; an Art. LXV owner-side capacity question)",
