@@ -165,3 +165,101 @@ test("R471: the Resume action states the refusal instead of swallowing it", () =
     /retryRun\([^\n]*\)\s*\.then\(\(\)\s*=>\s*location\.reload\(\)\)/,
   );
 });
+
+// ---------------------------------------------------------------------------
+// PARALLEL-LINE UNION additions (this line's unique closures):
+// P1-2 the queued directive, P2-1 the measured duration line, P2-5 the
+// model-state explainer, and the reason-vocabulary refusal copy.
+// ---------------------------------------------------------------------------
+
+// present.ts compiles for the next-action derivation
+import { execSync as _execSync } from "node:child_process";
+_execSync(
+  `npx --yes esbuild@0.25.5 lib/present.ts --bundle ` +
+    `--format=cjs --outfile=${outDir}/present.cjs --log-level=error`,
+  { cwd: webapp, stdio: "pipe" },
+);
+const present = require(path.join(outDir, "present.cjs"));
+
+function detailWithRunState(status, runState, extra = {}) {
+  return {
+    session_id: "s1",
+    status,
+    problem: "test problem",
+    created_at: "2026-09-16T00:00:00Z",
+    run_state: runState,
+    events: [],
+    ...extra,
+  };
+}
+
+function terminalDetail(extra = {}) {
+  return detailWithRunState("COMPLETE", {
+    outcome: "INVENTION_KILLED_BY_CHALLENGE",
+    generations: { generations: [] },
+    failed_stages: {},
+  }, extra);
+}
+
+test("R471: a queued directive becomes the first next action on terminal", () => {
+  const detail = terminalDetail({
+    queued_directive: {
+      verb: "RESEARCH",
+      params: { direction: "make it cheaper" },
+      directive: "research make it cheaper",
+      queued_at: "2026-09-16T01:00:00Z",
+    },
+  });
+  const next = present.deriveNextAction(detail, null, true);
+  assert.equal(next.kind, "run_queued");
+  assert.match(next.label, /make it cheaper/);
+});
+
+test("R471: the queued action outranks the package download", () => {
+  const detail = terminalDetail({
+    queued_directive: { directive: "use recycled materials" },
+  });
+  const next = present.deriveNextAction(detail, null, true);
+  assert.equal(next.kind, "run_queued");
+});
+
+test("R471: a long queued directive is truncated, not sprawling", () => {
+  const detail = terminalDetail({
+    queued_directive: { directive: "x".repeat(140) },
+  });
+  const next = present.deriveNextAction(detail, null, false);
+  assert.equal(next.kind, "run_queued");
+  assert.ok(next.label.length < 100);
+});
+
+test("R471: no queued directive -> the canonical terminal actions stand", () => {
+  const detail = terminalDetail();
+  const next = present.deriveNextAction(detail, null, true);
+  assert.equal(next.kind, "package");
+});
+
+test("R471: the retry refusal surfaces the reason vocabulary", () => {
+  const page = read("app/page.tsx");
+  assert.match(page, /COMPLETE_APPEND_ONLY/);
+  assert.match(page, /WORKER_ALIVE/);
+  assert.match(page, /AWAITING_ANSWER/);
+  // and the page refreshes state after a refusal (never a dead end)
+  assert.match(page, /getRunResult\(detail\.session_id\)/);
+});
+
+test("R471: the design tab carries the model-state explainer (P2-5)", () => {
+  const src = read("components/DossierSections.tsx");
+  assert.ok(src.includes("data-model-state-explainer"));
+  assert.match(src, /What the model states mean/);
+  assert.match(src, /conceptual/i);
+  assert.match(src, /Engineering geometry/);
+  assert.match(src, /Computational/);
+  assert.match(src, /Physical/);
+});
+
+test("R471: the hero note renders the measured p50/p90 when present (P2-1)", () => {
+  const src = read("app/page.tsx");
+  assert.match(src, /p50_minutes/);
+  assert.match(src, /p90_minutes/);
+  assert.match(src, /measured from/);
+});

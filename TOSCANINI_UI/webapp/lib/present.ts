@@ -419,6 +419,21 @@ export function deriveNextAction(
     return { label: "Resume the investigation", kind: "retry" };
   }
   if (isTerminal(detail.status)) {
+    // R471 (audit P1-2): a direction the user asked for while the run
+    // was live is the FIRST thing offered at the terminal state — the
+    // engine recorded it durably; running it opens the child round
+    // through the canonical action endpoint. Never lost, never applied
+    // mid-flight.
+    const queued = detail.queued_directive;
+    if (queued?.directive) {
+      const short = queued.directive.length > 60
+        ? `${queued.directive.slice(0, 57)}…`
+        : queued.directive;
+      return {
+        label: `Run your saved direction — “${short}”`,
+        kind: "run_queued",
+      };
+    }
     if (packageAvailable) {
       return { label: "Download the technology package", kind: "package" };
     }

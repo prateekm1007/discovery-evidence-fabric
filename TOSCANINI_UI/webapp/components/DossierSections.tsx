@@ -367,6 +367,21 @@ export function ModelDetailsSection({
 
   return (
     <div className="dtab design-tab">
+      {/* R471 (audit P2-5): one compact "what this means" disclosure for
+          the model-state vocabulary — the labels stay; the one-liners
+          explain them so a conceptual model is never mistaken for
+          buildable CAD or a physics result. */}
+      <div className="ov-block" data-model-state-explainer>
+        <div className="faint" style={{ fontSize: 13 }}>
+          <b>What the model states mean:</b> conceptual — an
+          illustrative architecture; dimensions are not claimed.
+          Engineering geometry — CAD built from the recorded engineering
+          definition. Computational — results from simulation or the
+          solver record, not a physical measurement. Physical — an
+          observed, real-world quantity. This run&apos;s stage label
+          below says which one you are looking at.
+        </div>
+      </div>
       {d.fallback_basis ? (
         <div className="conceptual-note" data-fallback-disclosure>
           Technology visualization

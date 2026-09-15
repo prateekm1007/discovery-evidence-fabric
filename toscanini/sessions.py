@@ -578,37 +578,238 @@ def run_capacity() -> Dict[str, int]:
     return {"slots": n, "free": free, "waiting": waiting}
 
 
-def retry_session(session_id: str) -> Optional[Dict[str, Any]]:
-    """Re-enqueue an errored session through the SAME worker path.
+# ---------------------------------------------------------------------------
+# R471 (audit P0-2) — RETRY CONTRACT v2: reconcile-then-retry.
+#
+# MEASURED FAILURE (2026-09-16 external audit, production): a worker died
+# during a deploy and left its session in a stale-active state; the retry
+# endpoint answered 409 "status 'PENDING' is not retryable" and the run
+# became unrecoverable from the product surface — the frontend helper
+# threw on the non-2xx and the advertised Resume path failed silently.
+# Retry now RECONCILES the one session first — safe at request time,
+# unlike the global sweeps — so the dead-worker classes (verifiably dead
+# pid, or unregistered past the grace window) are honestly typed
+# INTERRUPTED and the retry is ACCEPTED. The live and undecidable
+# classes get a TYPED refusal that says exactly why (Art. XXV: nothing
+# pretends a recovery that did not happen). Drafted by the engineer
+# (Atria-Dawn-Preview, R471/ATRIA_ENGINEER_RETRY.json), integrated with
+# CTO corrections (uuid.uuid4, the AWAITING_CLARIFICATION pointer).
+# ---------------------------------------------------------------------------
 
-    Allowed only from ERROR_* states (never from COMPLETE — a completed
-    verdict is a research outcome, not a transport artifact; re-running
-    it must be a NEW session so history stays append-only). Attempt
-    count is recorded; a session that keeps failing stays honestly
-    errored with its full history.
+_RETRY_REASONS = {
+    "COMPLETE_APPEND_ONLY": (
+        "completed verdicts are append-only history — start a new run "
+        "instead"),
+    "WORKER_ALIVE": (
+        "the investigation is currently running — retry opens when it "
+        "pauses, finishes, or fails"),
+    "REGISTRATION_GRACE_OPEN": (
+        "the worker is still starting — retry opens if it fails to "
+        "register within the grace window"),
+    "AWAITING_ANSWER": (
+        "the investigation is waiting for your answer to its one "
+        "question — answering it resumes the same run"),
+}
+
+
+def reconcile_stale_active(session_id: str) -> Optional[Dict[str, Any]]:
+    """Targeted, single-session reconciliation — safe at REQUEST time.
+
+    The global sweeps (boot-time, timer-based) must not touch a
+    just-spawned worker; this judges ONE session by the same evidence
+    rules and is designed to be called from the retry path:
+      - not active (terminal/errored already): returned unchanged
+      - active with a LIVE worker: returned unchanged
+      - active with a verifiably DEAD worker: marked INTERRUPTED with
+        the dead pid named (recoverable, never a scientific verdict)
+      - active with no pid and a marker past the registration grace:
+        marked INTERRUPTED with the typed spawn-cause evidence attached
+      - active with no pid and a fresh/missing marker: returned
+        unchanged — the worker may still be importing; a death the
+        evidence does not show is never guessed (Art. XXV)
+    Returns None when the session does not exist.
     """
     s = get_session(session_id)
     if not s:
         return None
-    if s.get("status") not in RETRYABLE_STATUSES:
-        return {"error": (f"session status {s.get('status')!r} is not "
-                          "retryable — only ERROR_*/INTERRUPTED sessions "
-                          "can re-enter the queue (completed verdicts are "
-                          "append-only)")}
-    attempts = int(s.get("retry_attempts") or 0) + 1
-    # R471 (external audit P0-2): an accepted retry is an explicit state
-    # transition with its own typed identity — the caller receives a
-    # retry_id it can quote, and the ledger records which retry took the
-    # session back to PENDING (the same provenance discipline as the
-    # action contract's action_id).
-    retry_id = f"rt_{uuid.uuid4().hex[:12]}"
+    if s.get("status") not in ACTIVE_STATUSES:
+        return s
+
+    if s.get("worker_pid"):
+        alive = worker_alive(s)
+        if alive is True:
+            return s
+        if alive is False:
+            return update_session(
+                session_id,
+                status="INTERRUPTED",
+                error=(f"worker process (pid {s.get('worker_pid')}) is no "
+                       "longer running — service restarted or worker "
+                       "crashed; retry to resume"),
+                last_error=s.get("error"))
+        # pid recorded but identity undecidable: never guessed either way
+        return s
+
+    # no pid recorded — judge the registration grace window the same way
+    # mark_unregistered_pending() does
+    import datetime as _dt
+    cutoff = (_dt.datetime.utcnow()
+              - _dt.timedelta(minutes=PENDING_REGISTER_GRACE_MINUTES)
+              ).strftime("%Y-%m-%dT%H:%M:%SZ")
+    marker = s.get("updated_at") or s.get("created_at") or ""
+    if not marker or marker >= cutoff:
+        return s  # fresh — the worker may still be starting
+
+    diag = _worker_spawn_cause(session_id) or {}
+    cause = diag.get("cause")
+    cause_line = (f" Log evidence: {cause}." if cause
+                  else (" The death cause was not captured — the run's "
+                        "own diagnostics carry the recorded evidence."))
     return update_session(
         session_id,
-        status="PENDING",
-        error=None,
-        retry_attempts=attempts,
-        retry_id=retry_id,
+        status="INTERRUPTED",
+        error=(f"the worker process never registered (no progress for "
+               f">{PENDING_REGISTER_GRACE_MINUTES} min since {marker}) — "
+               "the run can be retried; nothing was concluded about the "
+               f"problem.{cause_line}"),
+        spawn_diagnostics=diag,
         last_error=s.get("error"))
+
+
+def run_duration_stats(minimum_n: int = 3) -> Optional[Dict[str, Any]]:
+    """R471 (external audit P2-1): MEASURED run durations, from the
+    session store's own records — created_at to the terminal update of
+    every COMPLETE session. Honest by construction: n is disclosed,
+    sub-minimum samples return None (no invented estimate), and the
+    numbers are minutes rounded to the integer the product can keep.
+    The audit's complaint was the unmeasured 'takes minutes' promise;
+    this is the measured p50/p90 the landing line can quote."""
+    import datetime as _dt
+
+    def _parse(ts: str):
+        try:
+            return _dt.datetime.strptime(ts, "%Y-%m-%dT%H:%M:%SZ")
+        except (TypeError, ValueError):
+            return None
+
+    durations: List[float] = []
+    for s in list_sessions():
+        if s.get("status") != "COMPLETE":
+            continue
+        start = _parse(s.get("created_at") or "")
+        end = _parse(s.get("updated_at") or "")
+        if not start or not end or end <= start:
+            continue
+        minutes = (end - start).total_seconds() / 60.0
+        if 0 < minutes < 24 * 60:  # a sane day-bound (anything longer
+            # is a stuck artifact, not a duration the product quotes)
+            durations.append(minutes)
+    if len(durations) < minimum_n:
+        return None
+    durations.sort()
+
+    def _pct(p: float) -> int:
+        idx = min(int(round(p * (len(durations) - 1))),
+                  len(durations) - 1)
+        return int(round(durations[idx]))
+
+    return {
+        "n": len(durations),
+        "p50_minutes": _pct(0.50),
+        "p90_minutes": _pct(0.90),
+        "basis": "measured from this deployment's completed runs",
+    }
+
+
+def retry_session(session_id: str) -> Optional[Dict[str, Any]]:
+    """Re-enqueue a session through the SAME worker path (retry v2).
+
+    WHY v2: the 2026-09-16 external audit measured a 409 "status
+    'PENDING' is not retryable" refusal on a session whose worker had
+    died during a deploy — the run was unrecoverable from the product
+    surface. Retry is now self-healing for the dead-worker classes
+    (reconcile first, then accept) and typed-refusing for the
+    live/undecidable classes.
+
+    A completed verdict stays append-only history: re-running a finished
+    investigation must be a NEW session. Every refusal is typed
+    (retryable=False + machine-readable reason); acceptance returns the
+    updated session — PENDING again, attempts incremented, prior error
+    preserved as last_error, worker identity cleared so a stale pid can
+    never masquerade as the new worker (Art. XVII).
+    """
+    s = get_session(session_id)
+    if not s:
+        return None
+
+    # Reconcile FIRST: a stale-active session whose worker is verifiably
+    # gone becomes INTERRUPTED (retryable) instead of 409-refusing.
+    reconcile_stale_active(session_id)
+    s = get_session(session_id)
+    status = s.get("status")
+
+    if status == "COMPLETE":
+        return {"error": _RETRY_REASONS["COMPLETE_APPEND_ONLY"],
+                "refusal": "RETRY_NOT_PERMITTED",
+                "session_status": "COMPLETE",
+                "retryable": False,
+                "reason": "COMPLETE_APPEND_ONLY"}
+
+    if status in RETRYABLE_STATUSES:
+        # reconciled INTERRUPTED and every ERROR_*/RUN_BLOCKED state land
+        # here — the run re-enters the same worker path
+        # R471 PARALLEL-LINE UNION: the retry_id keeps the sibling
+        # line's naming (rt_ prefix, the retry_id field name — their
+        # tests pin it; the same provenance discipline as the action
+        # contract's action_id)
+        retry_id = f"rt_{uuid.uuid4().hex[:12]}"
+        attempts = int(s.get("retry_attempts") or 0) + 1
+        pre_error = s.get("error")
+        return update_session(
+            session_id,
+            status="PENDING",
+            error=None,
+            retry_attempts=attempts,
+            last_error=pre_error,
+            worker_pid=None,
+            worker_starttime=None,
+            retry_id=retry_id)
+
+    if status == "AWAITING_CLARIFICATION":
+        # the one-question pause is a USER pause, not a worker death —
+        # the answer path is the resume; retry would fork the semantics
+        return {"error": _RETRY_REASONS["AWAITING_ANSWER"],
+                "refusal": "RETRY_NOT_PERMITTED",
+                "session_status": status,
+                "retryable": False,
+                "reason": "AWAITING_ANSWER"}
+
+    if status in ACTIVE_STATUSES:
+        if worker_alive(s) is True:
+            return {"error": _RETRY_REASONS["WORKER_ALIVE"],
+                    "refusal": "RETRY_NOT_PERMITTED",
+                    "session_status": status,
+                    "retryable": False,
+                    "reason": "WORKER_ALIVE"}
+        # no pid (the reconcile pass leaves fresh-grace sessions alone) —
+        # the grace window is the honest gate either way; a death the
+        # evidence does not show is never guessed (Art. XXV)
+        return {"error": _RETRY_REASONS["REGISTRATION_GRACE_OPEN"],
+                "refusal": "RETRY_NOT_PERMITTED",
+                "session_status": status,
+                "retryable": False,
+                "reason": "REGISTRATION_GRACE_OPEN",
+                "grace_minutes": PENDING_REGISTER_GRACE_MINUTES}
+
+    # No such status exists in the model today; refuse honestly rather
+    # than guess a recovery path for an unknown state.
+    return {"error": (f"session status {status!r} is not retryable — "
+                      "only errored or interrupted sessions can re-enter "
+                      "the queue"),
+            "refusal": "RETRY_NOT_PERMITTED",
+            "session_status": status,
+            "retryable": False,
+            "reason": "NOT_RETRYABLE"}
 
 
 def create_session(title: str, user_text: str, domain_hint: str = "",

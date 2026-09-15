@@ -232,7 +232,12 @@ def list_attachments(owner_key: str) -> List[Dict[str, Any]]:
 def resolve_bindings(session: Dict[str, Any], owner_key: str) -> List[Dict[str, Any]]:
     """Resolve a session's bound attachments to their records (owner
     verified). Used by the worker — a binding whose record is missing
-    or owner-mismatched surfaces as an honest gap, never as content."""
+    or owner-mismatched surfaces as an honest gap, never as content.
+
+    R471 (audit P0-6, parallel-line union): a URL fetched via
+    save_url_attachment lands here as a REGULAR attachment (blob +
+    bounded extract + provenance); the record-only url_reference
+    branch was dropped as dead under the fetch path."""
     out: List[Dict[str, Any]] = []
     for aid in (session.get("attachment_ids") or []):
         rec = get_attachment(str(aid), owner_key)
@@ -289,7 +294,9 @@ def _ssrf_guard(url: str) -> tuple[Optional[str], Optional[Dict[str, str]]]:
     from urllib.parse import urlparse
     import ipaddress
     import socket
-    raw = (url or "").strip()
+    # R471 CTO correction (this line's never-raise battery): the caller
+    # may hand anything through the module boundary; coerce before use
+    raw = str(url or "").strip()
     if not raw:
         return None, {"status": "REJECTED_BLOCKED_URL",
                       "reason": "no URL was provided"}
@@ -428,8 +435,8 @@ def save_url_attachment(owner_key: str, url: str,
     attachment_id = f"att_{uuid.uuid4().hex[:16]}"
     guarded, err = _ssrf_guard(url)
     if err is not None:
-        return {"attachment_id": attachment_id, "name": (url or "")[:200],
-                "source_url": (url or "")[:2000],
+        return {"attachment_id": attachment_id, "name": str(url or "")[:200],
+                "source_url": str(url or "")[:2000],
                 "ingestion": {"status": err["status"],
                               "note": err["reason"]},
                 "rejected": True}

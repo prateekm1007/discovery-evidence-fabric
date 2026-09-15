@@ -60,6 +60,7 @@ import type {
   EventsBody,
   HealthSummary,
   RealityLoopRecord,
+  RunDurationStats,
   ScienceEvent,
   SessionDetail,
   SessionRow,
@@ -162,8 +163,14 @@ function EngineStatusText({ health }: { health: HealthSummary | null }) {
 // ---------------------------------------------------------------------------
 function NewDiscoveryPane({
   onStarted,
+  durationStats,
 }: {
   onStarted: (id: string) => void;
+  // R471 (audit P2-1): the MEASURED p50/p90 block from /api/health —
+  // when the deployment has enough completed runs, the hero note
+  // quotes the measured range with n disclosed; otherwise the honest
+  // class-level sentence stands (never an invented number)
+  durationStats?: RunDurationStats | null;
 }) {
   const [text, setText] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -388,6 +395,8 @@ function NewDiscoveryPane({
               accept={UPLOAD_ACCEPT}
               hidden
               aria-label="Attach documents"
+              aria-hidden="true"
+              tabIndex={-1}
               onChange={(e) => {
                 void onFiles(e.target.files);
                 e.target.value = "";
@@ -398,6 +407,7 @@ function NewDiscoveryPane({
               className="btn small ghost"
               onClick={() => fileRef.current?.click()}
               title="attach a document — it is read server-side, hashed, and joins the investigation's record"
+              aria-label="Attach a document — it is read server-side, hashed, and joins the investigation's record"
             >
               + Attach
             </button>
@@ -439,7 +449,8 @@ function NewDiscoveryPane({
           </button>
         </div>
         {/* R464 (audit P1-6): types and the size limit, said up front —
-            the ingestion verdict on each chip stays the authority */}
+            the ingestion verdict on each chip stays the authority.
+            R471 (audit P0-6): links join the honest input description. */}
         <div className="ask-files-hint faint">
           Documents up to 20 MB, plus web references by URL. Text files,
           text PDFs, and web pages are read server-side; images, CAD, and
@@ -469,14 +480,17 @@ function NewDiscoveryPane({
       </div>
       {/* R464 (audit P0-2): the duration is product-critical information —
           stated at full visual weight BEFORE the first run, not whispered
-          in keyboard-hint grey. The phrasing stays honest: minutes as a
-          class, never a precise promise the engine cannot keep. */}
+          in keyboard-hint grey. R471 (audit P2-1): when this deployment
+          has enough COMPLETED runs, the sentence quotes the MEASURED
+          p50/p90 with n disclosed — never an invented estimate; below
+          the minimum the honest class-level sentence stands. */}
       <div className="hero-note" data-hero-note>
-        <b>A discovery run takes minutes, not seconds.</b> The engine
-        investigates evidence, competing mechanisms, and adversarial
-        tests before it answers — you can leave this page and come back;
-        everything is recorded on the server and the conversation
-        resumes from the record.
+        <b>A discovery run takes minutes, not seconds.</b>{" "}
+        {durationStats
+          ? `Typically about ${durationStats.p50_minutes} minutes on this deployment (${durationStats.p90_minutes} minutes for 9 in 10 runs, measured from ${durationStats.n} completed runs).`
+          : "The engine investigates evidence, competing mechanisms, and adversarial tests before it answers."}{" "}
+        You can leave this page and come back; everything is recorded on
+        the server and the conversation resumes from the record.
       </div>
       {/* R464 (audit P0-3): first-use orientation — one concrete example
           of what a finished discovery looks like, so a first-time visitor
@@ -1006,21 +1020,42 @@ function WorkspaceInner() {
   function handleNext(next: NextAction) {
     if (!detail) return;
     if (next.kind === "retry") {
+      // R471 (external audit P0-2, PARALLEL-LINE UNION): an accepted
+      // retry reloads into PENDING/RUNNING (the audit's acceptance: the
+      // UI refreshes and shows the resumed state); a TYPED refusal is
+      // stated in an honest inline note with REASON-SPECIFIC copy
+      // (this line's vocabulary — COMPLETE_APPEND_ONLY / WORKER_ALIVE /
+      // AWAITING_ANSWER), never swallowed; a network-level delivery
+      // failure says so and refreshes with the truth (the sibling's
+      // catch). The old bare then(() => reload) swallowed every
+      // refusal — dead, and pinned dead by the adversarial suite.
       setRetryNote(null);
       retryRun(detail.session_id)
         .then((outcome) => {
           if (outcome.ok) {
-            // the audit's acceptance: the UI refreshes and shows
-            // PENDING/RUNNING — the reload renders the new state.
             location.reload();
             return;
           }
-          // a typed refusal is shown, never swallowed
-          setRetryNote(
-            outcome.refusal === "RETRY_NOT_PERMITTED"
+          const reason =
+            outcome.reason === "COMPLETE_APPEND_ONLY"
+              ? "This investigation already reached its verdict — completed runs are history; start a new one instead."
+              : outcome.reason === "WORKER_ALIVE"
+              ? "This investigation is still running — retry opens when it pauses, finishes, or fails."
+              : outcome.reason === "AWAITING_ANSWER"
+              ? "This investigation is waiting for your answer to its question — answering resumes the same run."
+              : outcome.reason === "REGISTRATION_GRACE_OPEN"
+              ? "The worker is still starting — retry opens if it fails to register within the grace window."
+              : outcome.refusal === "RETRY_NOT_PERMITTED"
               ? `This run can't be resumed right now (its state is ${outcome.sessionStatus ?? "unknown"}). ${outcome.error ?? ""}`.trim()
-              : outcome.error ?? "The resume request was refused."
-          );
+              : outcome.error ?? "The resume request was refused.";
+          setRetryNote(reason);
+          // refresh the session view so the status line reflects the
+          // engine's truth, not the pre-click snapshot
+          void getRunResult(detail.session_id)
+            .then((d) => setDetail(d))
+            .catch(() => {
+              /* the typed refusal note above already carries the truth */
+            });
         })
         .catch(() => {
           setRetryNote(
@@ -1156,7 +1191,7 @@ function WorkspaceInner() {
             (starting ? (
               <div className="loading">Starting the discovery…</div>
             ) : (
-              <NewDiscoveryPane onStarted={onStarted} />
+              <NewDiscoveryPane onStarted={onStarted} durationStats={health?.run_duration_stats ?? null} />
             ))}
 
           {activeMode === "run" &&

@@ -331,6 +331,42 @@ def record_directive_outcome(session_id: str, run_dir) -> None:
               f"{session_id}", file=sys.stderr)
 
 
+def merge_stored_clarification(session: dict, session_id: str, pu: dict):
+    """R471 (external audit P0-5, PARALLEL-LINE UNION): merge the
+    session's stored clarification answer into the Problem
+    Understanding INPUT record as USER_STATED — and NEVER clear it from
+    the session.
+
+    The OLD path wrote clarification_answer={} after the merge, so the
+    result payload exposed an EMPTY typed field after reload, and a
+    worker death between the clear and the PU persist could re-ask a
+    question the user had already answered. Both R471 lines fixed this
+    independently; the union keeps BOTH field vocabularies so either
+    line's tests read their marks: the sibling's consumed_at +
+    merged_into (consumption marked in place) and this line's applied_at
+    + the full answer spread (every prior field, e.g. the answer
+    route's provenance/answered_at, survives the merge untouched). The
+    merge itself is IDEMPOTENT (problem_understanding.
+    apply_clarification_answer dedupes on field+answer), so a retried
+    run re-executes this block without duplicating the record."""
+    answer = session.get("clarification_answer") or {}
+    if not (isinstance(answer, dict) and answer.get("field")
+            and answer.get("answer")):
+        return pu
+    from toscanini.conversational import problem_understanding as _pu_mod
+    pu = _pu_mod.apply_clarification_answer(
+        pu, answer["field"], answer["answer"])
+    now = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+    store.update_session(session_id, clarification_answer={
+        **answer,
+        "provenance": "USER_STATED",
+        "applied_at": answer.get("applied_at") or now,
+        "consumed_at": answer.get("consumed_at") or now,
+        "merged_into": "problem_understanding_input",
+    })
+    return pu
+
+
 def merge_attachments_typed(session: dict, session_id: str, pu: dict,
                             forensics=None):
     """R459 (audit P0-3): the session's staged attachments merge into
@@ -594,30 +630,9 @@ def _run_inner(session_id: str, forensics) -> None:
                                  {"conversation": _ctx["conversation"]}
                              )["allowed"])
         # a stored clarification answer (from a prior pause) merges as
-        # USER_STATED before the need is re-evaluated
-        _answer = s.get("clarification_answer") or {}
-        if isinstance(_answer, dict) and _answer.get("field") \
-                and _answer.get("answer"):
-            pu = _pu_mod.apply_clarification_answer(
-                pu, _answer["field"], _answer["answer"])
-            # R471 (external audit P0-5, measured live): the typed answer
-            # record is NEVER emptied. The old one-shot write
-            # (clarification_answer={}) consumed the record, so every
-            # reload/restart/retry afterwards exposed an empty object —
-            # exactly what the auditor measured. Consumption is now
-            # MARKED IN PLACE (provenance + consumed_at + merge target),
-            # so the USER_STATED record survives the whole run lifecycle.
-            # The merge itself is idempotent (problem_understanding.py
-            # dedupes on field+answer), so a retry that re-enters this
-            # block cannot double-apply.
-            store.update_session(session_id, clarification_answer={
-                "field": _answer["field"],
-                "answer": _answer["answer"],
-                "provenance": "USER_STATED",
-                "consumed_at": time.strftime("%Y-%m-%dT%H:%M:%SZ",
-                                             time.gmtime()),
-                "merged_into": "problem_understanding_input",
-            })
+        # USER_STATED before the need is re-evaluated (R471 audit P0-5:
+        # NEVER cleared — see merge_stored_clarification).
+        pu = merge_stored_clarification(s, session_id, pu)
         # R459 (audit P0-2): a conversational steering directive (from
         # the action contract) merges as USER_STATED context on the NEW
         # round's input record — the engine decides what it means

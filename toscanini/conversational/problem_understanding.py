@@ -463,8 +463,12 @@ def apply_clarification_answer(pu: Dict[str, Any],
                        "user clarification answer (conversation)")
     pu["unknowns"] = [u for u in pu.get("unknowns", [])
                       if u.get("field") != field]
-    pu.setdefault("clarification_history", []).append({
-        "field": field, "answer": answer, "applied_at": _now()})
+    history = pu.setdefault("clarification_history", [])
+    already = any(h.get("field") == field and h.get("answer") == answer
+                  for h in history)
+    if not already:
+        history.append({
+            "field": field, "answer": answer, "applied_at": _now()})
     return pu
 
 

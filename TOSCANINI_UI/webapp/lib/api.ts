@@ -249,19 +249,28 @@ export async function getRunResult(id: string): Promise<SessionDetail> {
   return json<SessionDetail>(await apiFetch(`/api/run/${id}/result`));
 }
 
-// R471 (external audit P0-2): the retry contract is now outcome-typed.
-// The engine returns 202 with a typed retry_id on acceptance and a
-// TYPED 409 refusal (no session-shaped body); a non-2xx is therefore a
-// RESULT here, not an exception — the old json() throw made the Resume
-// action a silent no-op on every refusal (the audit measured exactly
-// that: "retryRun() treats non-2xx as an exception"). Only a transport
-// failure (network) still throws, for the caller to catch.
+// R471 (external audit P0-2, PARALLEL-LINE UNION): the retry contract
+// is outcome-typed. The engine returns 202 with a typed retry_id on
+// acceptance and a TYPED 409 refusal (no session-shaped body); a
+// non-2xx is therefore a RESULT here, not an exception — the old
+// json() throw made the Resume action a silent no-op on every refusal
+// (the audit measured exactly that: "retryRun() treats non-2xx as an
+// exception"). Only a transport failure (network) still throws, for
+// the caller to catch. The union carries BOTH vocabularies: the
+// sibling line's coarse refusal token + sessionStatus, and this line's
+// fine-grained reason vocabulary (COMPLETE_APPEND_ONLY / WORKER_ALIVE /
+// REGISTRATION_GRACE_OPEN / AWAITING_ANSWER) the page renders
+// reason-specific copy from.
 export interface RetryOutcome {
   ok: boolean;
   httpStatus: number;
   retryId?: string;
+  retryAttempts?: number;
   sessionStatus?: string | null;
   refusal?: string;
+  reason?: string;
+  retryable?: boolean;
+  graceMinutes?: number;
   error?: string;
 }
 
@@ -277,6 +286,8 @@ export async function retryRun(id: string): Promise<RetryOutcome> {
     ok: res.ok,
     httpStatus: res.status,
     retryId: typeof body.retry_id === "string" ? body.retry_id : undefined,
+    retryAttempts:
+      typeof body.retry_attempts === "number" ? body.retry_attempts : undefined,
     sessionStatus:
       typeof body.session_status === "string"
         ? body.session_status
@@ -284,6 +295,10 @@ export async function retryRun(id: string): Promise<RetryOutcome> {
           ? body.status
           : null,
     refusal: typeof body.refusal === "string" ? body.refusal : undefined,
+    reason: typeof body.reason === "string" ? body.reason : undefined,
+    retryable: typeof body.retryable === "boolean" ? body.retryable : undefined,
+    graceMinutes:
+      typeof body.grace_minutes === "number" ? body.grace_minutes : undefined,
     error: typeof body.error === "string" ? body.error : undefined,
   };
 }

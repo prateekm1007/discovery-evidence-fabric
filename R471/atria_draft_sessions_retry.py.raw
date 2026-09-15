@@ -1,0 +1,177 @@
+```python
+# ---------------------------------------------------------------------------
+# R471 (audit P0-2) — RETRY CONTRACT v2: reconcile-then-retry.
+#
+# MEASURED FAILURE (production deploy): a worker died during a deploy and
+# left its session PENDING; the retry endpoint answered 409 "status
+# 'PENDING' is not retryable" and the run became unrecoverable from the
+# product surface. Retry now RECONCILES the one session first — safe at
+# request time, unlike the global sweeps — so the dead-worker classes
+# (verifiably dead pid, or unregistered past the grace window) are
+# honestly typed INTERRUPTED and the retry is ACCEPTED. The live and
+# undecidable classes get a TYPED refusal that says exactly why
+# (Art. XXV: nothing pretends a recovery that did not happen).
+# ---------------------------------------------------------------------------
+
+_RETRY_REASONS = {
+    "COMPLETE_APPEND_ONLY": (
+        "completed verdicts are append-only history - start a new run "
+        "instead"),
+    "WORKER_ALIVE": (
+        "the investigation is currently running - retry opens when it "
+        "pauses, finishes, or fails"),
+    "REGISTRATION_GRACE_OPEN": (
+        "the worker is still starting - retry opens if it fails to "
+        "register within the grace window"),
+}
+
+
+def reconcile_stale_active(session_id: str) -> Optional[Dict[str, Any]]:
+    """Targeted, single-session reconciliation — safe at REQUEST time.
+
+    The global sweeps (boot-time, timer-based) must not touch a
+    just-spawned worker; this judges ONE session by the same evidence
+    rules and is designed to be called from the retry path:
+      - not active (terminal/errored already): returned unchanged
+      - active with a LIVE worker: returned unchanged
+      - active with a verifiably DEAD worker: marked INTERRUPTED with
+        the dead pid named (recoverable, never a scientific verdict)
+      - active with no pid and a marker past the registration grace:
+        marked INTERRUPTED with the typed spawn-cause evidence attached
+      - active with no pid and a fresh/missing marker: returned
+        unchanged — the worker may still be importing; a death the
+        evidence does not show is never guessed (Art. XXV)
+    Returns None when the session does not exist.
+    """
+    s = get_session(session_id)
+    if not s:
+        return None
+    if s.get("status") not in ACTIVE_STATUSES:
+        return s
+
+    if s.get("worker_pid"):
+        alive = worker_alive(s)
+        if alive is True:
+            return s
+        if alive is False:
+            return update_session(
+                session_id,
+                status="INTERRUPTED",
+                error=(f"worker process (pid {s.get('worker_pid')}) is no "
+                       "longer running — service restarted or worker "
+                       "crashed; retry to resume"),
+                last_error=s.get("error"))
+        # pid recorded but identity undecidable: never guessed either way
+        return s
+
+    # no pid recorded — judge the registration grace window the same way
+    # mark_unregistered_pending() does
+    import datetime as _dt
+    cutoff = (_dt.datetime.utcnow()
+              - _dt.timedelta(minutes=PENDING_REGISTER_GRACE_MINUTES)
+              ).strftime("%Y-%m-%dT%H:%M:%SZ")
+    marker = s.get("updated_at") or s.get("created_at") or ""
+    if not marker or marker >= cutoff:
+        return s  # fresh — the worker may still be starting
+
+    diag = _worker_spawn_cause(session_id) or {}
+    cause = diag.get("cause")
+    cause_line = (f" Log evidence: {cause}." if cause
+                  else (" The death cause was not captured — the run's "
+                        "own diagnostics carry the recorded evidence."))
+    return update_session(
+        session_id,
+        status="INTERRUPTED",
+        error=(f"the worker process never registered (no progress for "
+               f">{PENDING_REGISTER_GRACE_MINUTES} min since {marker}) — "
+               "the run can be retried; nothing was concluded about the "
+               f"problem.{cause_line}"),
+        spawn_diagnostics=diag,
+        last_error=s.get("error"))
+
+
+def retry_session(session_id: str) -> Optional[Dict[str, Any]]:
+    """Re-enqueue a session through the SAME worker path (retry v2).
+
+    WHY v2: the R471 audit measured a 409 "status 'PENDING' is not
+    retryable" refusal on a session whose worker had died during a
+    deploy — the run was unrecoverable from the product surface. Retry
+    is now self-healing for the dead-worker classes (reconcile first,
+    then accept) and typed-refusing for the live/undecidable classes.
+
+    A completed verdict stays append-only history: re-running a finished
+    investigation must be a NEW session. Every refusal is typed
+    (retryable=False + machine-readable reason); acceptance returns the
+    updated session — PENDING again, attempts incremented, prior error
+    preserved as last_error, worker identity cleared so a stale pid can
+    never masquerade as the new worker (Art. XVII).
+    """
+    s = get_session(session_id)
+    if not s:
+        return None
+
+    # Reconcile FIRST: a stale-active session whose worker is verifiably
+    # gone becomes INTERRUPTED (retryable) instead of 409-refusing.
+    reconcile_stale_active(session_id)
+    s = get_session(session_id)
+    status = s.get("status")
+
+    if status == "COMPLETE":
+        return {"error": _RETRY_REASONS["COMPLETE_APPEND_ONLY"],
+                "status": "COMPLETE",
+                "retryable": False,
+                "reason": "COMPLETE_APPEND_ONLY"}
+
+    if status in RETRYABLE_STATUSES:
+        # reconciled INTERRUPTED and every ERROR_*/RUN_BLOCKED state land
+        # here — the run re-enters the same worker path
+        retry_id = "retry_" + uuid4().hex[:8]
+        attempts = int(s.get("retry_attempts") or 0) + 1
+        pre_error = s.get("error")
+        return update_session(
+            session_id,
+            status="PENDING",
+            error=None,
+            retry_attempts=attempts,
+            last_error=pre_error,
+            worker_pid=None,
+            worker_starttime=None,
+            last_retry_id=retry_id)
+
+    if status in ACTIVE_STATUSES:
+        if worker_alive(s) is True:
+            return {"error": _RETRY_REASONS["WORKER_ALIVE"],
+                    "status": status,
+                    "retryable": False,
+                    "reason": "WORKER_ALIVE"}
+        if not s.get("worker_pid"):
+            import datetime as _dt
+            cutoff = (_dt.datetime.utcnow()
+                      - _dt.timedelta(minutes=PENDING_REGISTER_GRACE_MINUTES)
+                      ).strftime("%Y-%m-%dT%H:%M:%SZ")
+            marker = s.get("updated_at") or s.get("created_at") or ""
+            if not marker or marker >= cutoff:
+                # fresh marker — the worker is still starting
+                return {"error": _RETRY_REASONS["REGISTRATION_GRACE_OPEN"],
+                        "status": status,
+                        "retryable": False,
+                        "reason": "REGISTRATION_GRACE_OPEN",
+                        "grace_minutes": PENDING_REGISTER_GRACE_MINUTES}
+            # marker missing / otherwise undecidable — never guess a
+            # death the evidence does not show; the grace window is the
+            # honest gate either way
+            return {"error": _RETRY_REASONS["REGISTRATION_GRACE_OPEN"],
+                    "status": status,
+                    "retryable": False,
+                    "reason": "REGISTRATION_GRACE_OPEN",
+                    "grace_minutes": PENDING_REGISTER_GRACE_MINUTES}
+
+    # No such status exists in the model today; refuse honestly rather
+    # than guess a recovery path for an unknown state.
+    return {"error": (f"session status {status!r} is not retryable — "
+                      "only errored or interrupted sessions can re-enter "
+                      "the queue"),
+            "status": status,
+            "retryable": False,
+            "reason": "NOT_RETRYABLE"}
+```

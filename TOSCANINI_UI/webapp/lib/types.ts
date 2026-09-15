@@ -172,6 +172,38 @@ export interface SessionDetail {
     computed_at?: string;
     method?: string;
   } | null;
+  // R471 (audit P1-2): the direction the user asked for while the run
+  // was live — the engine refused the mid-flight mutation (typed 409,
+  // never a false application) but RECORDED the words durably; the
+  // terminal surface offers it as the next action through the same
+  // canonical action endpoint.
+  queued_directive?: {
+    verb?: string;
+    params?: Record<string, string>;
+    directive?: string;
+    queued_at?: string;
+    queued_from_status?: string;
+  } | null;
+  // R471 (audit P0-5): the durable clarification answer — present
+  // after reload, restart, and retry (field/answer + USER_STATED
+  // provenance; the question is never repeated once answered).
+  clarification_answer?: {
+    field?: string;
+    answer?: string;
+    answered_at?: string;
+    applied_at?: string;
+    provenance?: string;
+  } | null;
+}
+
+// R471 (audit P2-1): the MEASURED duration block — p50/p90 minutes
+// from the deployment's own completed runs (n disclosed; null until
+// enough completed runs exist — never an invented estimate).
+export interface RunDurationStats {
+  n: number;
+  p50_minutes: number;
+  p90_minutes: number;
+  basis: string;
 }
 
 // R395: conversational Q&A over a run's / invention's own artifacts.
@@ -212,6 +244,9 @@ export interface HealthSummary {
     string,
     { status?: string; available_models?: number }
   >;
+  // R471 (audit P2-1): the measured p50/p90 duration block (null until
+  // enough completed runs exist on this deployment)
+  run_duration_stats?: RunDurationStats | null;
   durable?: { last_snapshot?: { at?: string; pushed?: boolean } };
   readiness?: {
     discovery_ready?: boolean;

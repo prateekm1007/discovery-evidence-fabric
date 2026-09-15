@@ -290,6 +290,11 @@ export interface ActionResult {
   /** R459: a typed engine refusal (e.g. the run is still running) —
    * rendered verbatim, never guessed. */
   refusal?: string;
+  /** R471 (audit P1-2): the run was live, so the engine refused — but
+   * the direction was RECORDED as the session's queued directive; it
+   * is surfaced on the terminal state as a one-click action. */
+  queued?: boolean;
+  queued_note?: string;
   action_id?: string;
   detail?: string;
 }
@@ -328,15 +333,23 @@ export async function sendAction(
     return { accepted: false, not_available: true };
   }
   if (res.status === 409) {
-    // a typed engine refusal — render the engine's own words
+    // a typed engine refusal — render the engine's own words.
+    // R471 (audit P1-2): the RUN_IN_PROGRESS refusal may carry
+    // queued=true — the direction was saved as the session's queued
+    // directive and will surface when the run reaches a terminal state
     let reason = "";
+    let queued = false;
+    let queued_note: string | undefined;
     try {
       const b = (await res.json()) as Record<string, unknown>;
       reason = typeof b.reason === "string" ? b.reason : "";
+      queued = b.queued === true;
+      if (typeof b.note === "string") queued_note = b.note;
     } catch {
       /* non-json error body */
     }
-    return { accepted: false, not_available: false, refusal: reason };
+    return { accepted: false, not_available: false, refusal: reason,
+             queued, queued_note };
   }
   if (res.ok) {
     let body: Record<string, unknown> = {};

@@ -108,7 +108,7 @@ export interface CandidateView {
 
 export interface NextAction {
   label: string;
-  kind: "package" | "retry" | "new" | "surface" | "diagnostic";
+  kind: "package" | "retry" | "new" | "surface" | "diagnostic" | "run_queued";
   surface?: SurfaceId;
 }
 

@@ -407,6 +407,11 @@ def _health_payload() -> dict:
             "spawn_forensics": True,
             "owner_scoped": True,
         },
+        # R471 (external audit P2-1): the MEASURED duration line —
+        # p50/p90 minutes from this deployment's own completed runs
+        # (n disclosed; null until enough completed runs exist — never
+        # an invented estimate)
+        "run_duration_stats": store.run_duration_stats(),
         # R394 s1: the deployment identity assertion
         "deployment_identity": deployment_identity,
         # R392 readiness split (directive 2)
@@ -1521,11 +1526,47 @@ class Handler(BaseHTTPRequestHandler):
             from toscanini import actions as _actions
             verdict = _actions.accept_action(s, verb, params)
             if not verdict.get("accepted"):
-                return self._json(409, {
+                # R471 (external audit P1-2): a steering request refused
+                # because the run is live is RECORDED as the session's
+                # queued directive — the user's direction is never lost
+                # ("make it cheaper" survives the wait). The refusal
+                # itself is unchanged and typed (no action is falsely
+                # applied mid-stage); the body gains queued=true so the
+                # UI can say the direction was saved. On the terminal
+                # surface the saved direction is one click away through
+                # this SAME canonical action endpoint.
+                queued = False
+                if verdict.get("code") == "RUN_IN_PROGRESS":
+                    try:
+                        directive = _actions.directive_text(verb, params)
+                        if directive:
+                            store.update_session(sid, queued_directive={
+                                "verb": verb,
+                                "params": {k: str(v)[:200]
+                                           for k, v in params.items()},
+                                "directive": directive[:2000],
+                                "queued_at": time.strftime(
+                                    "%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+                                "queued_from_status": s.get("status")})
+                            queued = True
+                            try:
+                                from toscanini import durable as _durable
+                                _durable.snapshot(f"directive_queued:{sid}")
+                            except Exception:  # noqa: BLE001 — fail-open
+                                pass
+                    except Exception:  # noqa: BLE001 — queueing best-effort
+                        queued = False
+                body409 = {
                     "accepted": False,
                     "code": verdict.get("code"),
                     "reason": verdict.get("message"),
-                })
+                }
+                if queued:
+                    body409["queued"] = True
+                    body409["note"] = ("your direction is saved — it will "
+                                       "be ready to run the moment this "
+                                       "investigation finishes")
+                return self._json(409, body409)
             action_id = f"act_{uuid.uuid4().hex[:12]}"
             directive = _actions.directive_text(verb, params)
             entry = {
@@ -1802,52 +1843,34 @@ class Handler(BaseHTTPRequestHandler):
         # failure recovery (CEO #8): re-enqueue an ERROR_* session through
         # the SAME serialized worker path. COMPLETE verdicts are NOT
         # retryable (append-only history — re-running is a new session).
-        # R471 (external audit P0-1/P0-2, measured live): two contract
-        # defects closed here.
-        # (a) THE RACE — the dead-worker sweeps ran only on /api/sessions
-        #     reads, so a retry arriving while the ledger still said
-        #     RUNNING (worker freshly dead, sweep not yet run) was
-        #     refused 409 against a stale row; the sweep later marked
-        #     INTERRUPTED and nobody retried. The audit measured exactly
-        #     this sequence. The same honest reconciliation now runs for
-        #     THIS session BEFORE the retryability decision.
-        # (b) THE BODY — an accepted retry now returns 202 with a typed
-        #     retry_id (an explicit state transition, never a bare
-        #     session view), and a refusal is a TYPED refusal — no
-        #     session-shaped body the client could mistake for the
-        #     retry result.
+        # R471 (external audit P0-1/P0-2, measured live) — PARALLEL-LINE
+        # UNION of the two R471 lines: the sibling's route shape (202 +
+        # typed retry_id rt_, no ambiguous session body) composed with
+        # this line's TYPED-STATE retry_session v2 (reconcile_stale_active
+        # reconciles the ONE addressed session — verifiably-dead pid or
+        # unregistered-past-grace -> typed INTERRUPTED -> accepted; live
+        # worker and fresh spawns -> typed refusal with the reason
+        # vocabulary) and the typed-shape refusal detection. The root
+        # cause both lines found independently: the old check was
+        # `if "error" in result`, but an ACCEPTED retry returns the
+        # updated session whose `error` field is None — KEY-present,
+        # value-None — so EVERY accepted retry answered 409 with the
+        # PENDING session body (the audit's exact measured observation)
+        # and returned BEFORE the spawn: no worker ever started, the
+        # run stayed interrupted, and the frontend threw on the 409.
         if len(parts) == 4 and parts[0] == "api" and parts[1] == "sessions" \
                 and parts[3] == "retry":
             sid = parts[2]
             if self._access(sid) == "DENY":
                 return self._denied()
-            try:
-                store.mark_interrupted_sessions()
-                store.mark_stuck_sessions()
-                store.mark_unregistered_pending()
-            except Exception:  # noqa: BLE001 — reconcile is best-effort
-                pass
             result = store.retry_session(sid)
             if result is None:
                 return self._json(404, {"error": "session not found"})
-            # R471: THE AUDIT'S MEASURED ROOT CAUSE — the old check was
-            # `if "error" in result`, but a SUCCESSFUL retry_session
-            # returns the updated session dict whose own `error` field
-            # is None: key-present, value-None. Every accepted retry
-            # therefore answered 409 with the PENDING session body (the
-            # audit's "409 that looked like a pending session") AND
-            # returned before the spawn — no worker was ever started,
-            # so the run stayed interrupted. A refusal is a refusal
-            # only when it carries a real message.
-            if result.get("error"):
-                s_cur = store.get_session(sid) or {}
-                return self._json(409, {
-                    "refusal": "RETRY_NOT_PERMITTED",
-                    "error": result["error"],
-                    "session_id": sid,
-                    "session_status": s_cur.get("status"),
-                    "retryable": False,
-                })
+            # refusal is a refusal only when the TYPED shape says so
+            # (retryable=False + reason) — never by key presence on a
+            # session record (the audit's root-cause defect)
+            if result.get("retryable") is False:
+                return self._json(409, result)
             # R422 (directive 2 — the a5a7 retry path): the RETRY_REQUESTED
             # event is durably appended BEFORE the spawn. If the spawned
             # retry worker dies instantly (the observed a5a7 class: pid 3256,
@@ -1858,19 +1881,24 @@ class Handler(BaseHTTPRequestHandler):
                 _fxq = _wfx.attach_session(
                     sid, durable_root=_wfx.durable_root())
                 _fxq.event("RETRY_REQUESTED", origin="api",
-                           retry_id=result.get("retry_id"),
-                           retry_attempts=result.get("retry_attempts"))
+                           retry_attempts=result.get("retry_attempts"),
+                           retry_id=result.get("retry_id"))
             except Exception:  # noqa: BLE001 — fail-open, never blocks
                 pass
             self._spawn_worker(sid)
             from toscanini.user_state import public_session_view
+            # 202 Accepted — the retry is an asynchronous re-entry into
+            # the worker path, not a completed recovery; the typed
+            # retry_id lets any client (and the release-gate smoke)
+            # join the retry to the ledger event and the respawned
+            # worker.
             return self._json(202, {
+                "accepted": True,
                 "retry_id": result.get("retry_id"),
                 "session_id": sid,
-                "status": result.get("status"),
                 "retry_attempts": result.get("retry_attempts"),
-                "session": public_session_view(result),
-            })
+                "status": "PENDING",
+                "session": public_session_view(result)})
 
         # R446-C1 directive §4: the clarification ANSWER path —
         # POST /api/run/{id}/answer {answer}. Only valid while the
