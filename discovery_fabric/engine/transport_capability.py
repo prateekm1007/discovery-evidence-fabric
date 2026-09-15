@@ -116,6 +116,12 @@ ACCOUNT_DOMAIN_VOCAB = (
     # allowance is separate from the quartet's, so its depletion
     # advances the cascade without touching the others.
     "OWNER_BYNARA_ACCOUNT",
+    # R467: the EIGHTH router — atria (api.atria-asi.ai). A DISTINCT
+    # economic account behind the operator-declared 100M-token budget
+    # (the token-surplus directive; no usage endpoint exposes the
+    # balance, so depletion — when measured — is a typed cascade
+    # advance, never a bill and never a guess at the remainder).
+    "OWNER_ATRIA_ACCOUNT",
     "UNDECLARED",                 # honest unknown — never guessed
 )
 

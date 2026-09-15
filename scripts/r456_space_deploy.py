@@ -130,9 +130,9 @@ def main() -> int:
                 f"Toscanini engine deploy at {commit[:12]} — the standing "
                 f"R456+ tree shape (round trees pruned from the Space "
                 f"tree, keep set R412/R413/R449 live-read; the R451-C1.3 "
-                f"adapter Dockerfile, NO Blender) + the R461 fifth "
-                f"free-tier router (bynara; FIVE router secrets wired — "
-                f"see R461/ records)"),
+                f"adapter Dockerfile, NO Blender) + the R467 eighth "
+                f"free-tier router (atria — the token-surplus STRONG "
+                f"rung; ATRIA_API_KEY wired — see R467/ records)"),
         )
         _log(f"upload DONE in {time.time()-t0:.0f}s — Space revision: {rev}")
 
@@ -180,13 +180,20 @@ def main() -> int:
     # the Space-side admission probe path stays unblocked (R462's
     # what_unblocks). Unset keys are skipped typed-honestly (the standing
     # five remain persisted from R461 if unset here).
+    # R467: ATRIA (the EIGHTH router — REGISTERED this round, not inert:
+    # the ProviderSpec reads exactly this name; the token-surplus rung
+    # the R466 reaudit's MECHANISM-stage constraint asked for). Same
+    # BS-021 discipline: env-injected at deploy time when present,
+    # skipped typed-honestly when unset (the standing secret persists
+    # from scripts/r467_hf_secrets.py otherwise).
     for env_name, var in (("UNOROUTER_API_KEY", "UNOROUTER_API_KEY"),
                           ("XKIRO_API_KEY", "XKIRO_API_KEY"),
                           ("APINEX_API_KEY", "APINEX_API_KEY"),
                           ("BAI_API_KEY", "BAI_API_KEY"),
                           ("BYNARA_API_KEY", "BYNARA_API_KEY"),
                           ("TOKENHARBOR_API_KEY", "TOKENHARBOR_API_KEY"),
-                          ("AEROLINK_API_KEY", "AEROLINK_API_KEY")):
+                          ("AEROLINK_API_KEY", "AEROLINK_API_KEY"),
+                          ("ATRIA_API_KEY", "ATRIA_API_KEY")):
         val = os.environ.get(var, "")
         if val:
             api.add_space_secret(repo_id=SPACE, key=env_name, value=val)

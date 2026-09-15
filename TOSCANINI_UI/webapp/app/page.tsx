@@ -543,6 +543,17 @@ function WorkspaceInner() {
   const timer = useRef<ReturnType<typeof setInterval> | null>(null);
   const evtTimer = useRef<ReturnType<typeof setInterval> | null>(null);
   const es = useRef<EventSource | null>(null);
+  // R467 (the R466 disclosed P2: the store cold-start 404 window): the
+  // engine-proven-healthy marker for THIS browser session. A 404 on
+  // /api/run/{id}/result is only evidence the run is absent when the
+  // engine has answered /api/health ok at least once around it — during
+  // a freshly (re)started process the first polls can hit an
+  // enumeration-safe 404 before the store finishes hydrating (observed
+  // live twice in R466), and the Art. XXI §3 discipline applies verbatim:
+  // a provider/store failure is not absence. Reset to false whenever a
+  // health poll FAILS, so a mid-session restart gets the same honest
+  // grading as a cold start.
+  const engineSeenUp = useRef(false);
 
   // R463 (audit P2-4): Alt+W opens/closes the contextual workspace
   // panel, Escape closes it — a keyboard path to the same toggle the
@@ -569,12 +580,27 @@ function WorkspaceInner() {
   useEffect(() => {
     listSessions().then(setSessions).catch(() => setSessions([]));
     listShowcase().then(setShowcase).catch(() => setShowcase([]));
-    getHealth().then(setHealth).catch(() => setHealth(null));
+    getHealth()
+      .then((h) => {
+        engineSeenUp.current = !!h?.ok;
+        setHealth(h);
+      })
+      .catch(() => {
+        engineSeenUp.current = false;
+        setHealth(null);
+      });
     const h = setInterval(() => {
       // R458-C2 (§21): a hidden tab needs no engine traffic — polling
       // resumes on return; SSE and the poll keep the same truth
       if (typeof document !== "undefined" && document.hidden) return;
-      getHealth().then(setHealth).catch(() => {});
+      getHealth()
+        .then((hh) => {
+          engineSeenUp.current = !!hh?.ok;
+          setHealth(hh);
+        })
+        .catch(() => {
+          engineSeenUp.current = false;
+        });
       if (!runId) {
         listSessions().then(setSessions).catch(() => {});
       }
@@ -616,8 +642,21 @@ function WorkspaceInner() {
       } catch (e) {
         if (!alive) return;
         if (e instanceof Error && e.message.startsWith("404")) {
-          misses += 1;
-          if (misses >= 4) setRunNotFound(true);
+          // R467 (the R466 P2 fix): grade a 404 toward "run not found"
+          // ONLY when the engine has proven healthy this session —
+          // before that, a 404 is the cold-start/hydration window (or
+          // the host edge answering for a starting process), and the
+          // honest state is the connection-lost copy (persisted,
+          // recovering, no verdict). The standing 4-miss rule applies
+          // unchanged once the engine is up.
+          if (engineSeenUp.current) {
+            misses += 1;
+            if (misses >= 4) setRunNotFound(true);
+          } else {
+            connMisses += 1;
+            if (connMisses >= 3 && connMisses % 3 === 0)
+              setConnLost(true);
+          }
         } else {
           // transport-level failure (engine restarting, network down):
           // say so after a short grace — the poll keeps trying either way

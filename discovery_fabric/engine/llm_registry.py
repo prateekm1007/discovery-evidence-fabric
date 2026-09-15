@@ -401,6 +401,69 @@ PROVIDER_SPECS: List[ProviderSpec] = [
             "never today's availability — Art. XXVII). Tiers are "
             "recorded policy inputs (Art. XXVII).")),
     # ------------------------------------------------------------------
+    # R467 (2026-09-15): the EIGHTH router — atria. The operator
+    # supplied the key with the declarations "it gives 100million tokens
+    # of new model which is as good as glm5.3" and "we should be token
+    # surplus now" (the token-surplus directive — the R466 reaudit's
+    # named binding constraint was the free-router cascade's MECHANISM-
+    # stage inference quality, an Art. LXV owner-side capacity question;
+    # this key is the owner's answer). Probe-before-admit held
+    # (R467/PROBE_CATALOG.json + R467/PROBE_COMPLETIONS.json): every
+    # fact below is measured, the operator's quality/budget claims are
+    # recorded as OPERATOR-DECLARED where no provider surface exposes
+    # them (Art. VI/XXV).
+    # ------------------------------------------------------------------
+    ProviderSpec(
+        "atria", "ATRIA_API_KEY",
+        "https://api.atria-asi.ai/v1/chat/completions",
+        "Atria-Dawn-Preview", "openai", 128_000,
+        quality_tier=2, cost_tier=1, latency_tier=3,
+        cost_basis="FREE_TIER_API", locality="REMOTE",
+        license="provider serving terms (operator-declared free token "
+                "budget; no deposit authorized)",
+        account_domain="OWNER_ATRIA_ACCOUNT",
+        model_revision="Atria-Dawn-Preview — the catalog's SOLE model id "
+                       "(owned_by atria, 2026-09-15 catalog); no revision "
+                       "pin exposed by the provider — recorded honest "
+                       "(Art. VI)",
+        policy_note=(
+            "R467 operator-supplied router #8 (atria, api.atria-asi.ai — "
+            "the operator's own citation api.atria-asi.ai/console/keys "
+            "names the API host itself; no external provider table "
+            "needed). LIVE-MEASURED at registration (Art. III): GET "
+            "/v1/models -> 200 with exactly ONE model (Atria-Dawn-"
+            "Preview, owned_by atria); the format-identical bogus-key "
+            "differential -> 401 vs 200 proves the delivered key VALID "
+            "(auth evaluates before any gate; the R463 method); "
+            "dialect OpenAI /v1/chat/completions (the Anthropic "
+            "/v1/messages control answers 400); default urllib "
+            "User-Agent passes (no CF block). Tiny completions -> 200 "
+            "READY x3 (0.93-7.65 s). THE MECHANISM-STAGE INSTRUMENT "
+            "(the R466 open item this rung answers): the FIELD-line "
+            "protocol test — small caps (max_tokens 300) starve content "
+            "to empty while reasoning_content carries the chain-of-"
+            "thought (the EmptyContentWithFinish class; the engine's "
+            "documented larger-cap retry on the SAME rung is not a "
+            "downgrade); the retry at max_tokens 2000 -> 200 with "
+            "3/3 clean FIELD_MECHANISM/FIELD_KEY_VARIABLE/"
+            "FIELD_FALSIFIER lines in content (8.4 s) — FORMAT-"
+            "COMPLIANT on the engine's structured protocol, the "
+            "measurement bynara's rung honestly lacked. HONEST TIERS: "
+            "quality_tier 2 — the basis is the OPERATOR'S declaration "
+            "verbatim ('new model which is as good as glm5.3', the "
+            "glm-5.3-class tier the other free routers carry) PLUS the "
+            "measured FIELD-protocol compliance above (recorded policy "
+            "input, Art. XXVII); latency_tier 3 — the reasoning path "
+            "measured 0.55-8.71 s variance, honestly slower than the "
+            "flash rungs. Context capacity NOT exposed by the catalog — "
+            "128_000 is the router-family default, recorded honest "
+            "(Art. VI). The 100M-token budget claim is OPERATOR-"
+            "DECLARED (no usage/balance endpoint measurable: /v1/usage, "
+            "/v1/balance, /v1/credits all 404/405) — depletion, when "
+            "measured, stays a typed failure that advances the cascade, "
+            "never a bill. FREE_TIER_API under the R456-A3 operator "
+            "amendment: eligible under ZERO_PAID_COST.")),
+    # ------------------------------------------------------------------
     # R463 (2026-09-15): the USER's Hugging Face credential path — the
     # operator's P0 architectural ruling ("the user gives Toscanini AI
     # access, and Toscanini does the rest; one legitimate user/

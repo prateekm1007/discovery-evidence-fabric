@@ -204,6 +204,15 @@ PINNED_MODEL_FAMILIES: Dict[str, List[str]] = {
         r"^mimo-v2\.5-free$",
         r"^muse-spark-1\.3-contributor-free$",
     ],
+    # R467: the EIGHTH router — atria. The catalog's SOLE model id,
+    # admitted by exhaustion + measurement (the FIELD-protocol test in
+    # the registration probe: 3/3 clean FIELD lines at the retry cap).
+    # No free-suffix convention on this provider: the whole catalog IS
+    # the operator-declared free budget (100M tokens, operator-declared
+    # — no usage endpoint exposes it), so the exact id is the allowlist.
+    "atria": [
+        r"^Atria-Dawn-Preview$",
+    ],
 }
 
 # Pinned DEFAULT models (the standing fallback set when the live catalog
@@ -339,6 +348,23 @@ PINNED_DEFAULT_MODELS: Dict[str, List[Dict[str, Any]]] = {
         {"model": "tencent-hy3-free",
          "task_capabilities": [TASK_FAST, TASK_CHEAP],
          "cost_class": 1, "latency_class": 2, "context_limit": 128000},
+    ],
+    # R467: the EIGHTH router — the token-surplus rung the R466
+    # reaudit's binding constraint asked for (a STRONG rung so
+    # MECHANISM-stage synthesis does not degrade to
+    # CHEAP_EMERGENCY_FALLBACK, the class that typed 2 of 3 fresh
+    # production runs INCOMPLETE_INFERENCE_FAILURE). The STRONG
+    # declaration's basis is TWOFOLD and recorded: the operator's
+    # verbatim declaration ("new model which is as good as glm5.3")
+    # AND the measured FIELD-line protocol compliance (3/3 clean
+    # FIELD lines through the reasoning_content/content split at the
+    # retry cap — the engine's own MECHANISM-stage instrument, the
+    # measurement bynara's rung honestly lacked). latency_class 3 is
+    # the honest reasoning variance (0.55-8.71 s measured).
+    "atria": [
+        {"model": "Atria-Dawn-Preview",
+         "task_capabilities": [TASK_STRONG, TASK_FAST, TASK_CHEAP],
+         "cost_class": 1, "latency_class": 3, "context_limit": 128000},
     ],
 }
 

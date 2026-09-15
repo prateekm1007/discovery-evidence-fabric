@@ -66,8 +66,12 @@ TECHNICAL_RECORD_NOTE = (
 #: the product surface either).
 #: R463: aerolink joins it (the seventh probe candidate — same rule:
 #: the probe candidate's name rides technical records only).
+#: R467: atria joins it (the EIGHTH router, REGISTERED this round —
+#: a registered provider's id is exactly the class this vocabulary
+#: exists for; the R462 bynara lesson applied at registration time,
+#: not after an audit finds the gap).
 _PROVIDER_ID_RE = re.compile(
-    r"\b(unorouter|xkiro|apinex|bai|bynara|tokenharbor|aerolink|"
+    r"\b(unorouter|xkiro|apinex|bai|bynara|tokenharbor|aerolink|atria|"
     r"localqwen|"
     r"openrouter|nvidia|tokenrouter|anthropic|gemini|mistral|zai)\b",
     re.I)

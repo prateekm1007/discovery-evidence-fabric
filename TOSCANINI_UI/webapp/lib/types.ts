@@ -167,6 +167,11 @@ export interface AskResponse {
 // UI reduces this to something calm ("Discovery ready" / "one
 // provider degraded"), never technical panic.
 export interface HealthSummary {
+  // R467 (the R466 P2 cold-start item): the server's top-level ok —
+  // the warm marker the run-not-found grading reads (a 404 from an
+  // engine never proven healthy this session is a cold-start window,
+  // never evidence the run is absent).
+  ok?: boolean;
   llm_transport_ready?: boolean;
   portfolio_ready?: boolean;
   engine_commit?: string;
