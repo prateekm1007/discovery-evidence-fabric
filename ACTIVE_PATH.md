@@ -850,7 +850,7 @@ escalation-record contracts; the scrub-guard extensions; secret
 discipline with the full-value marker). Re-pins disclosed in-place
 (Art. XXXI): `test_r414_product_integration` FAILURE_TYPES set +
 `test_r451_transport_capability` no-retry source contract.
-Families: r461 25/25; r414 50/50; r458 30/30; r451_transport 32/32;
+Families: r461 27/27; r414 50/50; r458 30/30; r451_transport 32/32;
 r451_zero_paid 37/37; r455_lean1 14/14; r419_english_only 4/4;
 r415_discovery_availability 35/35; r446_attacker_calibration 20/20;
 r459_audit_execution 20/20; r456_free_tier_routers 25/25 in this
