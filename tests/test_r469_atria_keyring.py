@@ -67,7 +67,12 @@ SMOKE = REPO / "R469" / "ROTATION_SMOKE.json"
 PROBE_SCRIPT = REPO / "scripts" / "r469_probe_atria_key3.py"
 SECRETS_SCRIPT = REPO / "scripts" / "r469_hf_secrets.py"
 
-RING = ["ATRIA_API_KEY", "ATRIA_API_KEY_2", "ATRIA_API_KEY_3"]
+# R469 reconciliation: the operator's LATEST directive supplies SEVEN
+# atria keys ("keep going to a new key ... 4 api keys is 400million
+# tokens" — seven keys total); the ring is the declared order.
+RING = ["ATRIA_API_KEY", "ATRIA_API_KEY_2", "ATRIA_API_KEY_3",
+        "ATRIA_API_KEY_4", "ATRIA_API_KEY_5", "ATRIA_API_KEY_6",
+        "ATRIA_API_KEY_7"]
 
 # fake credential bodies — deliberately SHORT and non-matching to the
 # BS-021 key-marker regex (atr_[A-Za-z0-9_-]{20,}); no real value here
@@ -641,3 +646,26 @@ def test_artifacts_carry_no_env_key_values():
 def test_test_fixtures_do_not_match_key_marker_regex():
     for val in (K1, K2, K3):
         assert re.search(r"atr_[A-Za-z0-9_-]{20,}", val) is None
+
+
+# ---------------------------------------------------------------------------
+# R469 reconciliation: the operator's LATEST directive supplies SEVEN
+# atria keys. The declared ring carries all seven names; only the
+# PRESENT slots participate; a slot that appears later joins in order.
+# ---------------------------------------------------------------------------
+
+def test_seven_slot_ring_declared_and_present_behavior(monkeypatch):
+    spec = lr._SPEC_BY_ID["atria"]
+    # the declared ring is the seven-name operator order
+    assert lr.key_ring_slots(spec) == RING
+    # only PRESENT slots participate (slots 4-7 absent from this env)
+    for name in RING[:3]:
+        monkeypatch.setenv(name, f"k-{name}")
+    for name in RING[3:]:
+        monkeypatch.delenv(name, raising=False)
+    present = [n for n in RING
+               if os.environ.get(n, "").strip()]
+    assert present == RING[:3]
+    # an absent slot never yields a value
+    for name in RING[3:]:
+        monkeypatch.delenv(name, raising=False)
