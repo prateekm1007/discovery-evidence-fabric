@@ -72,7 +72,13 @@ test("P0-2: distinct completed stages + the active one", () => {
     { kind: "stage.FREEZE", status: "COMPLETED" },
     { kind: "stage.SYNTHESIZE", status: "ACTIVE" },
   ];
-  assert.equal(productEvents.stageProgressSuffix(events), " · step 3");
+  // R470 (audit P1-1): the suffix now carries the last completed stage
+  // in HUMAN language and the evidence count — derived from recorded
+  // events only, never a total (the standing R464 rule).
+  assert.equal(
+    productEvents.stageProgressSuffix(events),
+    " · step 3 — last completed: evidence freeze"
+  );
 });
 
 test("P0-2: no ACTIVE stage event -> no suffix (never invented)", () => {

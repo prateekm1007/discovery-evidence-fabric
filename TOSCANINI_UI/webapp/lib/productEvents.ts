@@ -276,15 +276,67 @@ export function stageProgressSuffix(
   const kind = String(live.kind ?? "");
   if (!kind.startsWith("stage.")) return "";
   if (String(live.status ?? "").toUpperCase() !== "ACTIVE") return "";
-  const completed = new Set<string>();
+  const completed: string[] = [];
+  const seen = new Set<string>();
   for (const e of events) {
     const k = String(e?.kind ?? "");
     if (k.startsWith("stage.") &&
         String(e?.status ?? "").toUpperCase() === "COMPLETED") {
-      completed.add(k.slice("stage.".length).toUpperCase());
+      const stage = k.slice("stage.".length).toUpperCase();
+      if (!seen.has(stage)) {
+        seen.add(stage);
+        completed.push(stage);
+      }
     }
   }
-  return ` · step ${completed.size + 1}`;
+  // R470 (audit P1-1 — mid-run feedback density): a waiting user can
+  // state the current phase, the LAST COMPLETED stage, and the evidence
+  // count without leaving the conversation. Everything here is derived
+  // from recorded events only — never a ladder total (the R464 rule).
+  let evidenceCount = 0;
+  let sawEvidence = false;
+  for (const e of events) {
+    if (String(e?.kind ?? "") === "evidence.retrieved" &&
+        typeof e?.count === "number") {
+      sawEvidence = true;
+      evidenceCount += e.count;
+    }
+  }
+  let suffix = ` · step ${completed.length + 1}`;
+  const last = completed[completed.length - 1];
+  if (last) {
+    suffix += ` — last completed: ${stageShortName(last).toLowerCase()}`;
+  }
+  if (sawEvidence) {
+    suffix += ` · ${evidenceCount} source${evidenceCount === 1 ? "" : "s"} in evidence`;
+  }
+  return suffix;
+}
+
+/** R470 (audit P1-1): the stage's short human name for the live
+ * sub-line — machine ids never render raw (the complexity-hiding
+ * contract); unknown ids fall back to a neutral phrase. */
+function stageShortName(stageId: string): string {
+  const names: Record<string, string> = {
+    RETRIEVE: "evidence search",
+    RANK: "source ranking",
+    FREEZE: "evidence freeze",
+    CLASSIFY: "claim classification",
+    SYNTHESIZE: "mechanism synthesis",
+    VERIFY: "evidence verification",
+    MECHANISM_SPACE: "mechanism search",
+    CONTRADICTION: "contradiction check",
+    COLLISION: "novelty collision search",
+    PHYSICS: "physics gate",
+    ATTACK: "adversarial challenge",
+    KILLER_EXPERIMENT: "decisive-experiment design",
+    ADJUDICATION: "adjudication",
+    PREMISE_GATE: "premise check",
+    NEXT_BEST_ACTION: "next-step ranking",
+    RANK_EVIDENCE: "evidence ranking",
+    MULTI_SOURCE_DISCOVERY: "multi-source discovery",
+  };
+  return names[stageId] ?? "the previous step";
 }
 
 // ---------------------------------------------------------------------------

@@ -58,7 +58,11 @@ const ATTACK_LABEL: Record<string, string> = {
   IN_PROGRESS: "testing",
   SURVIVED: "survived attack",
   CONTESTED: "contested",
-  FAILED: "failed",
+  // R470 (audit §2C/P1-3): a killed candidate's chip reads "rejected" —
+  // one frame. The old "failed" next to the maturity chip
+  // ("INVENTION 01 failed Evidence_supported") read as a
+  // self-contradiction; the evidence basis lives in the card body.
+  FAILED: "rejected",
   UNRESOLVED: "unresolved",
 };
 

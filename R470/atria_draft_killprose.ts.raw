@@ -1,0 +1,101 @@
+```ts
+// R470: kill-cause prose. The engine states its own taxonomy twice inside a
+// single kill_reason string; this module collapses that to one plain
+// sentence. It reads tokens only — scores, weights and verdicts other than
+// KILLED are not interpreted here.
+
+export const KILL_DIMENSION_PROSE: Record<string, string> = {
+  unsupported_mechanism: "the evidence didn't support the mechanism",
+  weak_transfer: "the effect didn't transfer to the problem's constraints",
+  contradiction: "it contradicted itself",
+  regulatory_incompatibility: "regulators wouldn't accept it",
+  prior_art: "prior art already disclosed it",
+  physics: "the physics didn't hold up",
+  feasibility: "it wasn't feasible to build",
+  cost: "it couldn't meet the cost constraints",
+};
+
+const KILL_PROSE_NOTE =
+  "The machine's own dimension taxonomy is in the technical record.";
+
+// R470: raw reasons are only surfaced when they are short; anything longer
+// stays in the technical record rather than becoming a wall of machine text.
+const MAX_RAW_REASON_CHARS = 160;
+
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+// R470: prior_art is the one token the engine may cite without a KILLED
+// verdict, so it is only counted when that verdict actually accompanies it.
+function dimensionTokensInOrder(reason: string): string[] {
+  const found: Array<{ token: string; index: number }> = [];
+
+  for (const token of Object.keys(KILL_DIMENSION_PROSE)) {
+    const pattern =
+      token === "prior_art"
+        ? new RegExp(escapeRegExp(token) + "\\s*:\\s*KILLED", "i")
+        : new RegExp("\\b" + escapeRegExp(token) + "\\b", "i");
+    const match = reason.match(pattern);
+    if (match) {
+      found.push({ token, index: match.index ?? 0 });
+    }
+  }
+
+  // R470: the raw string lists each dimension twice; each is counted once,
+  // in the order it first appears.
+  found.sort((a, b) => a.index - b.index);
+  return found.map((entry) => entry.token);
+}
+
+function joinClauses(clauses: string[]): string {
+  if (clauses.length === 1) {
+    return clauses[0];
+  }
+  if (clauses.length === 2) {
+    return `${clauses[0]} and ${clauses[1]}`;
+  }
+  return `${clauses.slice(0, -1).join(", ")}, and ${clauses[clauses.length - 1]}`;
+}
+
+export function killCauseProse(
+  killReason: string | null | undefined
+): string | null {
+  if (killReason === null || killReason === undefined) {
+    return null;
+  }
+
+  const trimmed = killReason.trim();
+  if (trimmed === "") {
+    return null;
+  }
+
+  const tokens = dimensionTokensInOrder(trimmed);
+
+  // R470: no recognised token means the reason is not in the taxonomy; the
+  // trimmed text is passed through only while it stays brief.
+  if (tokens.length === 0) {
+    return trimmed.length <= MAX_RAW_REASON_CHARS ? trimmed : null;
+  }
+
+  const clauses = tokens.map((token) => KILL_DIMENSION_PROSE[token]);
+  const noun = tokens.length === 1 ? "front" : "fronts";
+
+  return `The challenge rejected it on ${tokens.length} ${noun}: ${joinClauses(
+    clauses
+  )}.`;
+}
+
+// R470: the chip previously read "failed Evidence_supported", which read as a
+// self-contradiction. The chip now carries one frame only; the evidence
+// basis is carried by the card body, not the chip.
+export function rejectedCandidateChipLabel(
+  _evidenceClass?: string | null
+): string {
+  return "rejected";
+}
+
+export function killProseNote(): string {
+  return KILL_PROSE_NOTE;
+}
+```

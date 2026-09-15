@@ -647,11 +647,23 @@ function WorkspaceInner() {
           // before that, a 404 is the cold-start/hydration window (or
           // the host edge answering for a starting process), and the
           // honest state is the connection-lost copy (persisted,
-          // recovering, no verdict). The standing 4-miss rule applies
-          // unchanged once the engine is up.
+          // recovering, no verdict).
+          // R470 (the re-audit's P2: "fast-fail run not found < 2 s"):
+          // once the engine is up, the first 404 schedules ONE 750 ms
+          // confirmation re-check; two independent 404s render the
+          // verdict in ~1-1.8 s (the old 4-miss rule at a 2.5 s
+          // interval held the ambiguity window at ~10 s). A
+          // single-sample verdict is never rendered — the confirmation
+          // poll is a real second request, and the standing interval
+          // remains the backstop.
           if (engineSeenUp.current) {
             misses += 1;
-            if (misses >= 4) setRunNotFound(true);
+            if (misses === 1) {
+              setTimeout(() => {
+                if (alive) poll();
+              }, 750);
+            }
+            if (misses >= 2) setRunNotFound(true);
           } else {
             connMisses += 1;
             if (connMisses >= 3 && connMisses % 3 === 0)

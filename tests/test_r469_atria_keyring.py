@@ -67,15 +67,15 @@ SMOKE = REPO / "R469" / "ROTATION_SMOKE.json"
 PROBE_SCRIPT = REPO / "scripts" / "r469_probe_atria_key3.py"
 SECRETS_SCRIPT = REPO / "scripts" / "r469_hf_secrets.py"
 
-# R469 reconciliation: the operator's LATEST directive supplies SEVEN
-# atria keys ("keep going to a new key ... 4 api keys is 400million
-# tokens" — seven keys total); the ring is the declared order.
-# R470: the operator's LATEST message lists TEN keys — seven already on
-# the surface, three new (slots 8-10); the ring extends 7 -> 10 slots.
+# R470 (2026-09-16): the ring grew 3 -> 9 slots — the operator supplied
+# seven more keys; ATRIA_API_KEY_8 is NOT registered (its catalog probe
+# answered a DETERMINISTIC 401 x3 — typed invalid, excluded, operator
+# re-supply invited; R470/PROBE_ATRIA_KEYS4TO10.json). Slot numbering is
+# NOT compressed: _9/_10 keep their operator-given names so future keys
+# append unambiguously.
 RING = ["ATRIA_API_KEY", "ATRIA_API_KEY_2", "ATRIA_API_KEY_3",
         "ATRIA_API_KEY_4", "ATRIA_API_KEY_5", "ATRIA_API_KEY_6",
-        "ATRIA_API_KEY_7", "ATRIA_API_KEY_8", "ATRIA_API_KEY_9",
-        "ATRIA_API_KEY_10"]
+        "ATRIA_API_KEY_7", "ATRIA_API_KEY_9", "ATRIA_API_KEY_10"]
 
 # fake credential bodies — deliberately SHORT and non-matching to the
 # BS-021 key-marker regex (atr_[A-Za-z0-9_-]{20,}); no real value here
@@ -133,6 +133,7 @@ def test_atria_ring_registered_in_operator_order():
     spec = lr._SPEC_BY_ID["atria"]
     assert lr.key_ring_slots(spec) == RING
     assert spec.env_var == "ATRIA_API_KEY"   # the marker stays slot 1
+    assert "ATRIA_API_KEY_8" not in lr.key_ring_slots(spec)  # R470: 401x3
 
 
 def test_every_other_provider_degrades_to_single_key():

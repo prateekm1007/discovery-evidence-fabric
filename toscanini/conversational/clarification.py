@@ -182,19 +182,30 @@ def _question_sentence(q: Dict[str, Any], pu: Dict[str, Any]
     # UNKNOWN readings get failure/outcome-anchored questions (the two
     # plausible readings are REAL alternatives from the record, never
     # invented ones)
+    # R470 (audit P2): every clarification question carries ONE worked
+    # example of the expected answer shape — the audit's friction point
+    # was "the only moment a first-time user must stop and think about
+    # what kind of answer is expected (a sentence worked, but nothing
+    # says so)".
     if field == "desired_outcome" and not current:
         if failure_v:
             return (f"You mentioned {failure_v} — what outcome do you "
                     f"want: reduce the {failure_v} itself, or manage "
-                    f"its cost/consequence?".replace("the our ", "the "))
+                    f"its cost/consequence (a one-sentence answer "
+                    "works, e.g. 'cut the failure rate below 1% "
+                    "without adding cost')?".replace("the our ", "the "))
         return ("What outcome do you want from this investigation "
-                "(what should improve)?")
+                "(what should improve — one sentence, e.g. 'cut "
+                "arsenic below 10 µg/L at under $30/year')?")
     if field == "target_variable" and not current:
         if outcome_v:
             return (f"You asked to {outcome_v} — which quantity should "
-                    f"the engine treat as the target variable?")
+                    f"the engine treat as the target variable (e.g. "
+                    "'the arsenic concentration in the treated water, "
+                    "in µg/L')?")
         return ("Which quantity should the engine optimize as the "
-                "target of this problem?")
+                "target of this problem (e.g. 'energy per liter of "
+                "water treated, in watt-hours')?")
     if field == "observed_failure" and not current:
         return ("Is there a specific failure you have observed, or is "
                 "this an opportunity-shaped problem (a capability you "

@@ -328,13 +328,10 @@ export function attackSentence(state: AttackState, detail: SessionDetail): strin
   const genChallenge = [
     ...(detail.run_state?.generations?.generations ?? []),
   ].reverse().find((g) => g.challenge)?.challenge;
-  const strongest =
-    (detail.stages ?? []).find((s) => s.stage === "ATTACK")?.challenges?.[0]
-      ?.challenge ?? null;
   switch (state) {
     case "SURVIVED":
       return "I tried to prove the leading candidate wrong — it survived the specified adversarial tests" +
-        (strongest ? `, including: "${strongest}"` : "") +
+        (strongestChallengeSentence(detail) ? `, including: "${strongestChallengeSentence(detail)}"` : "") +
         ".";
     case "CONTESTED":
       return "The adversarial instrument raised an objection it is not calibrated to decide, so the objection is preserved and escalated for adjudication — it is not treated as a verdict, and not treated as a pass either.";
@@ -362,6 +359,22 @@ export function attackSentence(state: AttackState, detail: SessionDetail): strin
       return "The adversarial result is unresolved — the recorded state carries no verdict.";
   }
 }
+
+function strongestChallengeSentence(detail: SessionDetail): string | null {
+  return (
+    (detail.stages ?? []).find((s) => s.stage === "ATTACK")?.challenges?.[0]
+      ?.challenge ?? null
+  );
+}
+
+// ---------------------------------------------------------------------------
+// R470 parallel-line reconciliation (P1-3): the sibling R470-C2 line's
+// KILL_CAUSE_PROSE + killCauseSentence (above) is the ONE kill-prose
+// authority — this line's equivalent helper set (drafted by the
+// delegated engineer under CTO spec) was dropped here as the duplicate;
+// the record-layer dedupe in a2/classify.py handles the double-listed
+// taxonomy upstream, and the raw cause stays in the technical record.
+// ---------------------------------------------------------------------------
 
 // ---------------------------------------------------------------------------
 // candidates — competing hypotheses (brief §16), from the canonical

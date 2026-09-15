@@ -722,6 +722,23 @@ def _run_inner(session_id: str, forensics) -> None:
         _snapshot(session_id, f"terminal:ERROR_BUILD:{session_id}")
         return
     problem = built["problem"]
+    # R470 (audit P0-5, the POWER leg): a steered child whose directive
+    # rejects the parent's mechanism carries that mechanism into the
+    # engine problem as an EXPLICIT EXCLUSION — the synthesis prompt and
+    # the mechanism-space operators are instructed to derive a DIFFERENT
+    # mechanism. Provenance rides on the problem record (never a silent
+    # constraint); the field is absent for unsteered runs (the prompt is
+    # byte-identical to the pre-R470 shape).
+    _rej = s.get("rejected_mechanism")
+    if isinstance(_rej, dict) and str(_rej.get("mechanism") or "").strip():
+        problem["rejected_mechanism"] = str(_rej["mechanism"])[:400]
+        problem["rejected_mechanism_provenance"] = {
+            k: _rej.get(k) for k in (
+                "parent_session_id", "parent_final_status", "directive")
+            if _rej.get(k) is not None}
+        forensics.event("MECHANISM_EXCLUSION_ACTIVE",
+                        parent=_rej.get("parent_session_id"),
+                        directive=str(_rej.get("directive") or "")[:120])
     store.save_evidence_pack(session_id, built["evidence_pack"])
     run_dir = store.ENGINE_RUNS / f"toscanini_ui_{problem['problem_id']}"
     store.update_session(session_id,

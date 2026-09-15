@@ -330,8 +330,12 @@ def test_p2_404_grading_gated():
     assert "if (engineSeenUp.current) {" in src
     # the gated else grades as connection misses (the no-verdict copy)
     assert "connMisses += 1;" in src
-    # the standing 4-miss rule survives for a healthy engine
-    assert "if (misses >= 4) setRunNotFound(true);" in src
+    # R470 (the re-audit's P2: fast-fail < 2 s): the 4-miss rule is
+    # replaced by the 750 ms confirmation re-check — two independent
+    # 404s render the verdict in ~1-1.8 s; a single-sample verdict is
+    # never rendered, and the standing interval remains the backstop.
+    assert "if (misses >= 2) setRunNotFound(true);" in src
+    assert "}, 750);" in src
 
 
 def test_p2_health_latch_set_and_reset():

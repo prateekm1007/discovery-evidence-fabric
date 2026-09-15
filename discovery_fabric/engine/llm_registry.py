@@ -442,31 +442,48 @@ PROVIDER_SPECS: List[ProviderSpec] = [
                 "budget; no deposit authorized)",
         account_domain="OWNER_ATRIA_ACCOUNT",
         probe_max_tokens=256,
-        # R469 (2026-09-16): the THREE-KEY RING — the operator's
-        # keep-going directive, verbatim: "Keep going to a new key of
-        # atira if one is exhausted. Wire it in the discovery engine."
-        # Key 3 (ATRIA_API_KEY_3) was probe-validated before this
-        # registration (R469/PROBE_ATRIA_KEY3.json: the bogus-key 401
-        # differential control; catalog 200 on ALL THREE keys — the
-        # same sole model Atria-Dawn-Preview; a 200 non-empty tiny
-        # completion on key 3 in 17.9 s; keys 1/2 identity-confirmed
-        # against the R467/R468 records; all three keys DISTINCT). An
-        # exhaustion-class failure (CREDIT_EXHAUSTED / AUTH_FAILURE /
-        # RATE_LIMITED) rotates ATRIA_API_KEY -> ATRIA_API_KEY_2 ->
-        # ATRIA_API_KEY_3 on the SAME rung before any provider-level
-        # fallback; every rotation is a recorded route hop (never
-        # silent, Art. IV).
-        # R470 (2026-09-16): the operator's LATEST delivery lists TEN
-        # keys in one message — seven were already on the surface, three
-        # are new (slots 8-10; R470/HF_SPACE_SECRETS_ATRIA_RING10.json,
-        # 10/10 PRESENT by name, fingerprints only). The ring extends
-        # 7 -> 10 slots (~1B tokens operator-declared). Same classes,
-        # same order, same recorded-hop discipline.
+        # R469 (2026-09-16): the key RING — the operator's keep-going
+        # directive, verbatim: "Keep going to a new key of atira if one
+        # is exhausted. Wire it in the discovery engine." Key 3
+        # (ATRIA_API_KEY_3) was probe-validated before this registration
+        # (R469/PROBE_ATRIA_KEY3.json: the bogus-key 401 differential
+        # control; catalog 200 on ALL THREE keys — the same sole model
+        # Atria-Dawn-Preview; a 200 non-empty tiny completion on key 3
+        # in 17.9 s; keys 1/2 identity-confirmed against the R467/R468
+        # records; all three keys DISTINCT). An exhaustion-class
+        # failure (CREDIT_EXHAUSTED / AUTH_FAILURE / RATE_LIMITED)
+        # rotates through the ring on the SAME rung before any
+        # provider-level fallback; every rotation is a recorded route
+        # hop (never silent, Art. IV).
+        #
+        # R470 (2026-09-16): the operator supplied seven more keys. The
+        # PARALLEL-LINE RECONCILIATION (this commit, rebased onto the
+        # sibling R470-C2's ten-slot registration): the sibling set
+        # 10/10 keys on the Space surface BY NAME (write-only API —
+        # presence, not validity; R470/HF_SPACE_SECRETS_ATRIA_RING10.json)
+        # and registered all ten; THIS line's probe-before-record
+        # measured every key's VALIDITY (R470/PROBE_ATRIA_KEYS4TO10.json:
+        # keys 1-3 identity-confirmed vs the R467/R468/R469 records; all
+        # ten pairwise DISTINCT; catalog 200 on keys 4,5,6,7,9,10 with
+        # the sole model Atria-Dawn-Preview; one 200 non-empty tiny
+        # completion on key 4 in 1.02 s after one disclosed transient
+        # 502). ATRIA_API_KEY_8 is NOT REGISTERED: its catalog probe
+        # answered a DETERMINISTIC 401 x3 (re-probed twice, 8 s apart)
+        # — the bogus-key differential class — so it is typed INVALID
+        # and EXCLUDED from the ring (the measured verdict outranks the
+        # name-present surface, Art. III); the vault keeps the value
+        # for the operator's re-supply/reference, the Space surface may
+        # carry it inertly (the ring is the selection authority), and
+        # the slot number is NOT reused (ATRIA_API_KEY_9/_10 keep their
+        # operator-given names so future keys append unambiguously).
+        # 9 VALID slots x operator-declared 100M = the ~900M-token
+        # surplus (OPERATOR-DECLARED; no usage endpoint is measurable —
+        # Art. VI/XXV).
         key_env_vars=["ATRIA_API_KEY", "ATRIA_API_KEY_2",
                       "ATRIA_API_KEY_3", "ATRIA_API_KEY_4",
                       "ATRIA_API_KEY_5", "ATRIA_API_KEY_6",
-                      "ATRIA_API_KEY_7", "ATRIA_API_KEY_8",
-                      "ATRIA_API_KEY_9", "ATRIA_API_KEY_10"],
+                      "ATRIA_API_KEY_7", "ATRIA_API_KEY_9",
+                      "ATRIA_API_KEY_10"],
         model_revision="Atria-Dawn-Preview — the catalog's SOLE model id "
                        "(owned_by atria, 2026-09-15 catalog); no revision "
                        "pin exposed by the provider — recorded honest "
@@ -831,14 +848,24 @@ def rotate_key(spec: ProviderSpec) -> Optional[int]:
     the ring is exhausted — in which case the sticky slot RESETS to
     the first present slot (auto-recovery: the next call re-measures
     the head key; exhaustion is a per-call measurement, never a
-    persisted fact)."""
+    persisted fact).
+
+    R470: the walk starts from the slot the failing call ACTUALLY
+    served on (active_key_slot — sticky when set, first-present
+    otherwise). The pre-R470 code started from the sticky DEFAULT 0,
+    which re-returned the just-failed slot whenever the first present
+    slot was not slot 0 (a middle-only ring double-spent its head key
+    before advancing). Starting from the active slot is correct in
+    every configuration."""
     names = key_ring_slots(spec)
-    cur = _KEY_RING_SLOT.get(spec.provider_id, 0)
+    cur = active_key_slot(spec)
+    if cur is None:
+        return None
     for nxt in range(cur + 1, len(names)):
         if _ring_slot_present(spec, nxt):
             _KEY_RING_SLOT[spec.provider_id] = nxt
             return nxt
-    # ring exhausted from the sticky slot — reset to first present
+    # ring exhausted from the active slot — reset to first present
     _KEY_RING_SLOT[spec.provider_id] = 0
     for idx in range(len(names)):
         if _ring_slot_present(spec, idx):

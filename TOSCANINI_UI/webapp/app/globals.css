@@ -2942,3 +2942,64 @@ h2.wk-title {
   .insight { padding: 12px 12px 10px; }
   .ic-body { font-size: 13px; }
 }
+
+/* ==========================================================================
+   R470 — EXTERNAL RE-AUDIT EXECUTION (P1-5 touch targets · P2 16px inputs
+   · P0-5 compliance card states)
+   The 2026-09-15 re-audit measured: .dl-chip 77×32, .canvas-hud buttons
+   49×24–75×24 (below the 44px floor); the ask textarea at 15px and the
+   composer input at 14.5px (iOS zooms on focus below 16px).
+   ========================================================================== */
+
+/* ---- P1-5: the 44px touch-target floor on COARSE pointers ----------------
+   Touch devices get the floor; fine pointers keep the compact density
+   (the audit's desktop measurements were not flagged for size). */
+@media (pointer: coarse) {
+  .dl-chip {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 14px;
+  }
+  .canvas-hud { gap: 8px; }
+  .canvas-hud button {
+    min-height: 44px;
+    min-width: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 12px;
+  }
+}
+
+/* ---- P2: 16px inputs on mobile — iOS never zooms on focus ---------------- */
+@media (max-width: 880px) {
+  .ask textarea { font-size: 16px; }
+  .conv-input { font-size: 16px; }
+}
+
+/* ---- P0-5 (R470): the directive-compliance card states -------------------
+   The "what changed because of your direction" card carries the typed
+   compliance state (data-directive-compliance): VIOLATED and PARTIAL
+   get the honest warm tint — a violation is never styled like a
+   success; NOT_ASSESSABLE stays neutral. */
+.conv-row[data-directive-compliance="VIOLATED"] .conv-continued,
+.conv-row[data-directive-compliance="PARTIAL"] .conv-continued {
+  border-left: 3px solid var(--accent);
+  padding-left: 10px;
+}
+.conv-row[data-directive-compliance="COMPLIANT"] .conv-continued {
+  border-left: 3px solid var(--ok, #4a7c59);
+  padding-left: 10px;
+}
+
+/* ---- P1-7 (R470): the exemplar note under the packages section header --- */
+.rail-section-note {
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: var(--ink-faint);
+  margin: 4px 0 10px;
+  padding: 6px 8px;
+  border-left: 2px solid var(--line);
+}

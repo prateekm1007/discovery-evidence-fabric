@@ -289,7 +289,7 @@ export default function Sidebar({
         <ol className="rail-list">{focus.map(renderPackage)}</ol>
         {others.length > 0 && (
           <details className="rail-more">
-            <summary>all {showcase.length} packages</summary>
+            <summary>all {showcase.length} example packages</summary>
             <ol className="rail-list">{others.map(renderPackage)}</ol>
           </details>
         )}
