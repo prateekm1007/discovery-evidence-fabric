@@ -96,7 +96,8 @@ def main() -> int:
     elif not distinct:
         verdict = "FAIL"
         reasons.append("no engine_commit was ever observed")
-    elif args.expect and distinct[0] != args.expect:
+    elif args.expect and not (distinct[0].startswith(args.expect)
+                              or args.expect.startswith(distinct[0])):
         verdict = "FAIL"
         reasons.append(f"identity {distinct[0][:12]} != expected "
                        f"{args.expect[:12]}")
