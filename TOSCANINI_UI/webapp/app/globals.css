@@ -167,7 +167,14 @@ a { color: inherit; }
   appearance: none;
   border: none;
   border-radius: 10px;
-  background: var(--accent);
+  /* R466 (audit a11y measurement): the CTA's white 15px label on the
+     decorative accent fill measured 4.22:1 — a real WCAG AA failure
+     caught by the production Lighthouse run (the audit's acceptance is
+     ZERO contrast failures). The fill moves to --accent-text (#a34d2e,
+     5.7:1 with white — the token R464 already computed for accent
+     text); the decorative accent stays on borders/fills without text
+     (the R464 split, extended to the last text-bearing fill). */
+  background: var(--accent-text);
   color: #fff;
   font-size: 15px;
   font-weight: 600;

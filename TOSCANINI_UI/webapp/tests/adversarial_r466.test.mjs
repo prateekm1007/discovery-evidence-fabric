@@ -180,3 +180,25 @@ test("R466: the packages list is semantic too", () => {
   assert.ok(src.includes("renderPackage"), "the shared package renderer");
   assert.ok(src.includes("<ol className=\"rail-list\">{focus.map(renderPackage)}</ol>"));
 });
+
+// ---------------------------------------------------------------------------
+// Part 3 — the production-measured contrast failure, pinned by arithmetic
+// ---------------------------------------------------------------------------
+
+test("R466: the CTA fill passes WCAG AA with its white label (computed, not asserted)", () => {
+  const css = read("app/globals.css");
+  // the .btn fill must be the AA text token, never the decorative accent
+  const btnBlock = css.slice(css.indexOf(".btn {"), css.indexOf(".btn:hover"));
+  assert.ok(/--accent-text/.test(btnBlock), "the fill is --accent-text");
+  assert.ok(!/--accent;/.test(btnBlock), "the decorative accent (#c15f3c, 4.22:1) is not a text-bearing fill");
+  // the arithmetic, computed here (R464's method): relative luminance
+  const lum = (hex) => {
+    const c = hex.match(/[0-9a-f]{2}/gi).map((x) => parseInt(x, 16) / 255)
+      .map((v) => (v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4)));
+    return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
+  };
+  const ratio = (a, b) => (Math.max(lum(a), lum(b)) + 0.05) / (Math.min(lum(a), lum(b)) + 0.05);
+  const fill = css.match(/--accent-text:\s*(#[0-9a-f]{6})/)[1];
+  const r = ratio("#ffffff", fill);
+  assert.ok(r >= 4.5, `white on ${fill} = ${r.toFixed(2)}:1 — must be >= 4.5:1`);
+});
