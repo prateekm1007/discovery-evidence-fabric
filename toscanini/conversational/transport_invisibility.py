@@ -58,18 +58,30 @@ TECHNICAL_RECORD_NOTE = (
     "ledger and can be opened from the technical record view.")
 
 #: transport plumbing vocabulary that must NEVER appear in
-#: product-surface text (the §5 attack surface, made mechanical)
+#: product-surface text (the §5 attack surface, made mechanical).
+#: R462 (Art. XXXI correction, disclosed): bynara — a REGISTERED
+#: provider since R461 — was missing from this vocabulary (its id
+#: could leak undetected); tokenharbor joins it (the R462 probe
+#: candidate; its name rides technical records and must never reach
+#: the product surface either).
 _PROVIDER_ID_RE = re.compile(
-    r"\b(unorouter|xkiro|apinex|bai|localqwen|openrouter|nvidia|"
-    r"tokenrouter|anthropic|gemini|mistral|zai)\b", re.I)
+    r"\b(unorouter|xkiro|apinex|bai|bynara|tokenharbor|localqwen|"
+    r"openrouter|nvidia|tokenrouter|anthropic|gemini|mistral|zai)\b",
+    re.I)
 _HTTP_ERROR_RE = re.compile(r"\bHTTP\s*(40[0-9]|41[0-9]|42[0-9]|5\d\d)"
                             r"\b|\b(40[0-9]|429|50[0-9])\s+from\b",
                             re.I)
 _ENDPOINT_HOST_RE = re.compile(
     r"https?://[a-z0-9.-]+\.[a-z]{2,}", re.I)
+#: R462: REGION_NOT_SERVED joins the class vocabulary (the measured
+#: tokenharbor region-gate specimen — its name is technical-record
+#: vocabulary, never product text); AUTH_FAILURE added alongside the
+#: R458 typo AUTH_FAILED (the actual class name leaked undetected —
+#: Art. XXXI correction, disclosed; assertIn-style tests unaffected).
 _FAILURE_CLASS_RE = re.compile(
-    r"\b(RATE_LIMITED|CREDIT_EXHAUSTED|AUTH_FAILED|PROBE_FAILED|"
-    r"NETWORK_FAILURE|INVALID_RESPONSE|MODEL_NOT_FOUND)\b")
+    r"\b(RATE_LIMITED|CREDIT_EXHAUSTED|AUTH_FAILURE|AUTH_FAILED|"
+    r"PROBE_FAILED|NETWORK_FAILURE|INVALID_RESPONSE|MODEL_NOT_FOUND|"
+    r"REGION_NOT_SERVED)\b")
 
 
 def _read_json(p: Path) -> Optional[Dict[str, Any]]:

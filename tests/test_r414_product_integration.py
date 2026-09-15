@@ -94,10 +94,15 @@ class TestFailureTaxonomy:
         # R456 reconciliation (same rule): R451-C1.2 added MODEL_NOT_FOUND
         # (a distinct known-dead class — 404 + provider error bodies;
         # marks the RUNG dead, the provider stays eligible).
+        # R462 reconciliation (same rule): R462 added REGION_NOT_SERVED
+        # (the measured tokenharbor region-gate specimen — 403
+        # region_blocked, pre-auth; the egress region is refused, never
+        # the key — cascade-advancing, never AUTH_FAILURE).
         assert set(ph.FAILURE_TYPES) == {
             "RATE_LIMITED", "TIMEOUT", "AUTH_FAILURE", "NETWORK_FAILURE",
             "INVALID_RESPONSE", "MODEL_FAILURE", "PARSER_FAILURE", "GONE",
-            "CREDIT_EXHAUSTED", "MODEL_NOT_FOUND", "UNKNOWN"}
+            "CREDIT_EXHAUSTED", "MODEL_NOT_FOUND", "REGION_NOT_SERVED",
+            "UNKNOWN"}
 
     def test_410_gone_is_distinct(self):
         """R415 (P0 directive section 1): 410 must not collapse into

@@ -1,0 +1,102 @@
+{
+  "round": "R462",
+  "measured_at": "2026-09-15T00:40:00Z",
+  "provider": "tokenharbor",
+  "reviewer_provenance": "AI_REVIEW",
+  "key": {
+    "present": true,
+    "len": 73,
+    "fingerprint": "thk_li...sEVu",
+    "value": "<never recorded>"
+  },
+  "probes": [
+    {
+      "base": "https://tokenharbor.ai/v1",
+      "endpoint": "/models",
+      "ua": "chrome",
+      "key": "real",
+      "status": 403,
+      "latency_s": 0.66,
+      "typed_gate": {
+        "error_type": "region_blocked",
+        "error_code": "region_blocked",
+        "message": "API access from your region is not available. Token Harbor cannot serve requests from regions under US sanctions or export controls, Mainland China, Hong Kong and Macau, or regions our AI provider (Anthropic) does not support. If you are using a VPN or proxy, please turn it off and try again \u2014 we can only see the country your connection exits from, not where you are. If you believe this is in error, contact support@tokenharbor.ai."
+      },
+      "models": 0
+    },
+    {
+      "base": "https://tokenharbor.ai/v1",
+      "endpoint": "/models",
+      "ua": "plain",
+      "key": "real",
+      "status": 403,
+      "latency_s": 0.36,
+      "typed_gate": {
+        "error_type": "region_blocked",
+        "error_code": "region_blocked",
+        "message": "API access from your region is not available. Token Harbor cannot serve requests from regions under US sanctions or export controls, Mainland China, Hong Kong and Macau, or regions our AI provider (Anthropic) does not support. If you are using a VPN or proxy, please turn it off and try again \u2014 we can only see the country your connection exits from, not where you are. If you believe this is in error, contact support@tokenharbor.ai."
+      },
+      "models": 0
+    },
+    {
+      "base": "https://tokenharbor.ai/v1",
+      "endpoint": "/models",
+      "ua": "chrome",
+      "key": "format-identical bogus control (same length, zero body)",
+      "status": 403,
+      "latency_s": 0.37,
+      "typed_gate": {
+        "error_type": "region_blocked",
+        "error_code": "region_blocked",
+        "message": "API access from your region is not available. Token Harbor cannot serve requests from regions under US sanctions or export controls, Mainland China, Hong Kong and Macau, or regions our AI provider (Anthropic) does not support. If you are using a VPN or proxy, please turn it off and try again \u2014 we can only see the country your connection exits from, not where you are. If you believe this is in error, contact support@tokenharbor.ai."
+      },
+      "models": 0
+    },
+    {
+      "base": "https://tokenharbor.ai/v1",
+      "endpoint": "/chat/completions",
+      "ua": "chrome",
+      "key": "real",
+      "status": 403,
+      "latency_s": 0.35,
+      "typed_gate": {
+        "error_type": "region_blocked",
+        "error_code": "region_blocked",
+        "message": "API access from your region is not available. Token Harbor cannot serve requests from regions under US sanctions or export controls, Mainland China, Hong Kong and Macau, or regions our AI provider (Anthropic) does not support. If you are using a VPN or proxy, please turn it off and try again \u2014 we can only see the country your connection exits from, not where you are. If you believe this is in error, contact support@tokenharbor.ai."
+      }
+    },
+    {
+      "base": "https://api.tokenharbor.ai/v1",
+      "endpoint": "/models",
+      "ua": "chrome",
+      "key": "real",
+      "status": 404,
+      "latency_s": 0.11,
+      "typed_gate": {
+        "error_type": null,
+        "error_code": null,
+        "message": null
+      },
+      "models": 0
+    }
+  ],
+  "the_typed_gate": {
+    "class": "REGION_NOT_SERVED",
+    "measured_on": [
+      "https://tokenharbor.ai/v1/models",
+      "https://tokenharbor.ai/v1/models",
+      "https://tokenharbor.ai/v1/models",
+      "https://tokenharbor.ai/v1/chat/completions"
+    ],
+    "specimen_verbatim": "API access from your region is not available. Token Harbor cannot serve requests from regions under US sanctions or export controls, Mainland China, Hong Kong and Macau, or regions our AI provider (Anthropic) does not support. If you are using a VPN or proxy, please turn it off and try again \u2014 we can only see the country your connection exits from, not where you are. If you believe this is in error, contact support@tokenharbor.ai.",
+    "ua_independent": true,
+    "auth_ordering": "PRE-AUTH \u2014 the format-identical bogus key answers the SAME typed 403 region_blocked, so the delivered key's validity is UNMEASURABLE from this egress (never AUTH_FAILURE; Art. XXV: unknown stays unknown)",
+    "endpoints_blocked": [
+      "/chat/completions",
+      "/models"
+    ],
+    "note": "the provider's own words: it sees only the country the CONNECTION exits from \u2014 the runtime's egress region is refused, not the key, not the account; the machine cannot choose its egress (Art. XXXIII: no owner decision taken by the machine)"
+  },
+  "admission_decision": "NOT ADMITTED \u2014 probe-before-admit (R451-C1.2 / Art. III) holds: a tiny completion through the real endpoint is the ONLY admission evidence, and zero completions are measurable from this egress (the catalog itself is gated, so not even one served model id is measurable \u2014 a guessed default rung would manufacture knowledge, Art. VI / XXVII). No ProviderSpec is registered; the Art. LXV escalation is opened instead (R462/TOKENHARBOR_OWNER_ESCALATION.json). The measured specimen still registers the provider-agnostic REGION_NOT_SERVED class in provider_health so ANY provider answering this 403 class classifies honestly (never AUTH_FAILURE).",
+  "escalation_artifact": "R462/TOKENHARBOR_OWNER_ESCALATION.json"
+}

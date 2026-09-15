@@ -1499,7 +1499,13 @@ def generate(prompt: str, system: str = "",
                 # RECORDING and the next rung); the hop must still be
                 # recorded — a dead id that is silently skipped would be
                 # exactly the unrecorded-failover the directive forbids.
-                if ftype not in ("GONE", "MODEL_NOT_FOUND") \
+                # R462: REGION_NOT_SERVED joins the same reasoning — a
+                # region-gated endpoint (the tokenharbor specimen,
+                # 403 region_blocked pre-auth) answers IDENTICALLY on
+                # every same-model retry from this egress; the cascade
+                # advances instead (never retried within the walk).
+                if ftype not in ("GONE", "MODEL_NOT_FOUND",
+                                 "REGION_NOT_SERVED") \
                         and attempt < max_retries:
                     time.sleep(2 * (attempt + 1))
                     continue

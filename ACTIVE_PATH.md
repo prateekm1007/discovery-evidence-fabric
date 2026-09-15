@@ -819,3 +819,48 @@ test_r446_completion_authority 2; collection 3,937/45 errors vs
 baseline 3,910/45.
 
 Round record: `R461/R461_ROUND_RECORD.json`.
+
+## R462 addendum (2026-09-15) — the sixth router CANDIDATE met the REGION GATE: refused at admission, escalated, honestly typed
+
+Operator delivery: the tokenharbor.ai key (the sixth free-tier router
+candidate, "https://tokenharbor.ai/dashboard/api-keys"). Probe-before-
+admit (R451-C1.2 / Art. III) measured a gate the quartet and bynara
+never showed: EVERY endpoint on tokenharbor.ai answers HTTP 403
+`region_blocked` from this runtime's egress — BEFORE authentication
+(the format-identical bogus-key control answers the same 403), UA-
+independent, on the catalog AND the serving endpoint. The refused thing
+is the CONNECTION's exit region — not the key, not the account. No
+completion, no catalog, not even one model id is measurable: NO
+registration (a guessed default rung would manufacture knowledge,
+Art. VI / XXVII). The Art. LXV escalation is OPEN instead.
+
+| Component | Module / artifact | Notes |
+|---|---|---|
+| THE measured gate | `scripts/r462_probe_tokenharbor.py` → `R462/PROBE_CATALOG.json` | five probes (real key ×2 UAs, bogus-key differential, chat endpoint, api.-subdomain control) — all primary endpoints 403 `region_blocked`; key fingerprint only (BS-021) |
+| THE Art. LXV escalation, OPEN | `R462/TOKENHARBOR_OWNER_ESCALATION.json` | count 1; the owner delivery quoted with the key body redacted to its fingerprint; what unblocks: owner verification from a served region, HF_TOKEN re-provision (wiped by the environment reset — the R436 precedent), the Space-side admission probe (the deployed Space's egress differs from the sandbox's); recurrence protocol at count 2 |
+| THE REGION_NOT_SERVED class | `provider_health.py` | the measured specimen classifies honestly for ANY provider (was: fell through to AUTH_FAILURE — a possibly-valid key marked failed); cascade-advancing, never the cooldown ladder, never retried within a walk |
+| THE rotation rule, extended | `llm_registry.py` + `runtime_admission.py` | REGION_NOT_SERVED joins GONE / MODEL_NOT_FOUND in the no-same-model-retry set (a region gate answers identically on every retry from the same egress); permanent, never a transient probe class |
+| THE §5 scrub guard, extended | `toscanini/conversational/transport_invisibility.py` | REGION_NOT_SERVED + AUTH_FAILURE (the R458 typo: the real class name leaked undetected) join the failure-class vocabulary; bynara (a REGISTERED provider missing since R461) + tokenharbor join the provider-id vocabulary — Art. XXXI corrections, disclosed |
+| NO registration | `llm_registry.py` (unchanged spec set) | tokenharbor is NOT in `_SPEC_BY_ID`; no OWNER_TOKENHARBOR_ACCOUNT; the five-router registration and its Space secrets stand untouched |
+
+Tests: `tests/test_r462_tokenharbor_region_gate.py` 31/31 NEW (the
+probe-artifact contracts incl. the pre-auth differential; the
+classification contracts; the no-registration contracts; the OPEN
+escalation-record contracts; the scrub-guard extensions; secret
+discipline with the full-value marker). Re-pins disclosed in-place
+(Art. XXXI): `test_r414_product_integration` FAILURE_TYPES set +
+`test_r451_transport_capability` no-retry source contract.
+Families: r461 25/25; r414 50/50; r458 30/30; r451_transport 32/32;
+r451_zero_paid 37/37; r455_lean1 14/14; r419_english_only 4/4;
+r415_discovery_availability 35/35; r446_attacker_calibration 20/20;
+r459_audit_execution 20/20; r456_free_tier_routers 25/25 in this
+session's keyless environment (identical at the pristine baseline —
+the R461 "27/27" was that session's keyed environment).
+Pre-existing failures disclosed (BS-020, stash-verified IDENTICAL at
+the pristine cc792979 baseline): test_r446_completion_authority 2.
+MODULE_INVENTORY regenerated (123 files / 59,647 LOC, drift GREEN).
+
+Round record: `R462/R462_ROUND_RECORD.json` (DELIVERY_BLOCKED —
+Art. LXXI §4: the HF_TOKEN credential was wiped by the environment
+reset; the push landed, the deploy could not).
+

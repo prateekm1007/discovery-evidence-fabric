@@ -127,8 +127,10 @@ PROBE_FAILURE_FLOOR_S = 30.0
 #: vocabulary): a probe failing with one of these may be RETRIED within
 #: the SAME bounded walk (the old cascade's transient absorption,
 #: applied to the admission authority). The permanent classes
-#: (AUTH_FAILURE, GONE, MODEL_NOT_FOUND, CREDIT_EXHAUSTED) are never
-#: retried — never retry a permanently invalid route.
+#: (AUTH_FAILURE, GONE, MODEL_NOT_FOUND, CREDIT_EXHAUSTED, and R462's
+#: REGION_NOT_SERVED — a region-gated endpoint answers identically on
+#: every retry from the same egress) are never retried — never retry a
+#: permanently invalid route.
 TRANSIENT_PROBE_CLASSES = ("NETWORK_FAILURE", "TIMEOUT", "RATE_LIMITED")
 
 _STATE_LOCK = threading.Lock()

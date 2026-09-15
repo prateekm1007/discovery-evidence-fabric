@@ -95,11 +95,31 @@ CREDIT_EXHAUSTED = "CREDIT_EXHAUSTED"
 # (provider, model) rung dead in the routing state — the provider's
 # OTHER models stay eligible (Art. V).
 MODEL_NOT_FOUND = "MODEL_NOT_FOUND"
+# R462 (2026-09-15): tokenharbor's REGION GATE specimen (measured live,
+# R462/PROBE_CATALOG.json): 403 {"error": {"message": "API access from
+# your region is not available. Token Harbor cannot serve requests from
+# regions under US sanctions or export controls, ...", "type":
+# "region_blocked", "code": "region_blocked"}}. The provider refuses the
+# CONNECTION's exit region — BEFORE auth (a format-identical bogus key
+# answers the SAME 403, so the delivered key's validity is unmeasurable
+# from a blocked egress), UA-independent, and on the catalog AND the
+# serving endpoint alike. The refused thing is the runtime's egress
+# region — not the key, not the account, not the balance. This EXTENDS
+# the vocabulary the same way R415 extended it for GONE, R436 for
+# CREDIT_EXHAUSTED, and R451-C1.2 for MODEL_NOT_FOUND; it never
+# reclassifies an existing member. Action-bearing honesty (Art. XV):
+# an operator reading failure_class=REGION_NOT_SERVED knows retrying,
+# waiting, and topping up cannot fix it — only a served egress can (a
+# different runtime, e.g. the deployed Space's egress region), and the
+# machine cannot choose its own egress (Art. XXXIII). Never
+# AUTH_FAILURE: the key is not measured failed (Art. XXV).
+REGION_NOT_SERVED = "REGION_NOT_SERVED"
 UNKNOWN = "UNKNOWN"
 
 FAILURE_TYPES = (RATE_LIMITED, TIMEOUT, AUTH_FAILURE, NETWORK_FAILURE,
                  INVALID_RESPONSE, MODEL_FAILURE, PARSER_FAILURE, GONE,
-                 CREDIT_EXHAUSTED, MODEL_NOT_FOUND, UNKNOWN)
+                 CREDIT_EXHAUSTED, MODEL_NOT_FOUND, REGION_NOT_SERVED,
+                 UNKNOWN)
 
 # Cooldown ladder for rate limits (seconds). A rate-limited provider is
 # demoted (not removed) for this long; repeated consecutive rate limits
@@ -168,6 +188,23 @@ _FREE_TIER_CREDIT_HINTS = ("insufficient balance", "deposit required",
 # cascade advances and the escalation record tells the operator the
 # exact relink action. Never AUTH_FAILURE: the key is valid.
 _ACCOUNT_ENTRY_GATE_HINTS = ("telegram_required", "relink at")
+# R462: tokenharbor's region-gate specimen (measured 2026-09-15,
+# R462/PROBE_CATALOG.json): 403 {"type": "region_blocked", "code":
+# "region_blocked", "message": "API access from your region is not
+# available. Token Harbor cannot serve requests from regions under US
+# sanctions or export controls, ... we can only see the country your
+# connection exits from, not where you are."} The CONNECTION's exit
+# region is refused — measured PRE-AUTH (the format-identical bogus
+# key control answers the same typed 403), UA-independent, every
+# endpoint. REGION_NOT_SERVED: cascade-advancing (the run moves to the
+# next rung), never the cooldown ladder (waiting cannot change the
+# egress region), never retried within a walk, never AUTH_FAILURE (the
+# key is not measured failed — the unmeasurable key stays unmeasured,
+# Art. XXV). Checked FIRST in the 403 branch: the provider's own
+# region_blocked code is unambiguous before any account/credit
+# reading of the body.
+_REGION_GATE_HINTS = ("region is not available", "region_blocked",
+                      "us sanctions", "export controls")
 # R456-A3: unorouter's free-pool congestion wording (403 body — the
 # provider's own remedy is 'switch to another model'):
 #   "This model is busy right now (free providers hit their rate
@@ -228,6 +265,13 @@ def classify_failure(exc: BaseException, http_status: Optional[int] = None,
         # R461: the bynara account-entry-gate specimen (telegram /
         # relink) classifies the same way — an account that must take
         # the provider's entry action is not a failed key.
+        # R462: the tokenharbor region-gate specimen (region_blocked /
+        # "region is not available") classifies FIRST — the refused
+        # thing is the connection's exit region (pre-auth, measured
+        # with the bogus-key differential), so neither the key nor the
+        # account is implicated; REGION_NOT_SERVED, never AUTH_FAILURE.
+        if status == 403 and _hints(_REGION_GATE_HINTS):
+            return REGION_NOT_SERVED
         if status == 403 and _hints(_ACCOUNT_ENTRY_GATE_HINTS):
             return CREDIT_EXHAUSTED
         if status == 403 and _hints(_FREE_TIER_CREDIT_HINTS):

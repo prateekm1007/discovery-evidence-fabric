@@ -40,6 +40,7 @@ never a verdict).
 """
 from __future__ import annotations
 
+import re
 import sys
 import urllib.error
 from pathlib import Path
@@ -310,9 +311,15 @@ class TestNeverRetryDeadIdentifier:
 
     def test_same_model_retry_is_not_spent_on_dead_ids(self):
         """The retry policy: GONE and MODEL_NOT_FOUND fall straight
-        through to the next rung (never burn retries on a dead id)."""
+        through to the next rung (never burn retries on a dead id).
+        R462 re-pin (Art. XXXI, disclosed in-place): REGION_NOT_SERVED
+        joins the set — a region-gated endpoint answers identically on
+        every same-model retry from the same egress (the measured
+        tokenharbor specimen, R462/PROBE_CATALOG.json)."""
         src = Path(reg.__file__).read_text()
-        assert 'ftype not in ("GONE", "MODEL_NOT_FOUND")' in src
+        assert re.search(
+            r'ftype not in \(\s*"GONE",\s*"MODEL_NOT_FOUND",\s*'
+            r'"REGION_NOT_SERVED"\s*\)', src)
 
 
 # ---------------------------------------------------------------------------
