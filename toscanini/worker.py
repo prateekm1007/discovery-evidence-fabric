@@ -516,6 +516,68 @@ def _phase4_terminal_state(run_dir, final, manifest):
             None)
 
 
+def _apply_directive_constraint(s, problem, run_dir, forensics) -> None:
+    """R470 P0-5 POWER leg; R472 ORDER FIX (external audit third pass,
+    Addendum 2A). Arm the typed directive constraint onto the problem
+    the engine will consume, and persist its durable run-dir copy.
+
+    The auditor's root cause (reproduced deterministically on
+    production): the R470 code wrote DIRECTIVE_CONSTRAINT.json BEFORE
+    anything created run_dir (EngineRun.__init__ creates it ~60 lines
+    later), so the write raised FileNotFoundError and the attach line —
+    the one that arms the SYNTHESIZE exclusion — sat AFTER the failing
+    write in the same try: every steered child ran UNCONSTRAINED while
+    a grep-shaped test claimed coverage.
+
+    The R472 contract:
+      1. the in-memory attach happens FIRST — problem IS the engine's
+         input; the exclusion must never depend on a filesystem side
+         effect;
+      2. the durable copy is guarded: mkdir(parents=True, exist_ok=True)
+         before the write (idempotent — EngineRun.__init__ uses the
+         same flags); ANY durable-copy failure (OSError or otherwise)
+         degrades the DURABLE COPY only, typed WRITE_FAILED — the
+         armed exclusion stays armed and APPLIED still fires with
+         durable_record=False (the engineer's pass: monitors keying on
+         APPLIED must never go blind to an armed exclusion because the
+         copy failed);
+      3. the durable write is ATOMIC (tmp + os.replace) — a crash
+         mid-write can never leave a truncated-but-parseable
+         constraint record for the outcome layer's fallback loader;
+      4. a failure of the ARM itself is typed ARM_FAILED — never
+         misreported as a write failure (the event names state which
+         half actually failed);
+      5. fail-open unchanged: no valid constraint in the session copy
+         means no arm, no file, no event (pre-R470 behavior, honest).
+    """
+    try:
+        _dc = (s.get("directive_constraint")
+               if isinstance(s, dict) else None)
+        if isinstance(_dc, dict) and _dc.get("forbidden_mechanism"):
+            import json as _json
+            import os as _os
+            problem["directive_constraint"] = _dc
+            _durable = False
+            try:
+                run_dir.mkdir(parents=True, exist_ok=True)
+                _tmp = run_dir / "DIRECTIVE_CONSTRAINT.json.tmp"
+                _tmp.write_text(
+                    _json.dumps(_dc, indent=1, ensure_ascii=False))
+                _os.replace(_tmp, run_dir / "DIRECTIVE_CONSTRAINT.json")
+                _durable = True
+            except Exception as exc:  # noqa: BLE001 — copy degradation
+                forensics.event("DIRECTIVE_CONSTRAINT_WRITE_FAILED",
+                                error_class=type(exc).__name__)
+            forensics.event("DIRECTIVE_CONSTRAINT_APPLIED",
+                            verb=str(_dc.get("verb") or ""),
+                            forbidden_terms=len(
+                                _dc.get("forbidden_terms") or []),
+                            durable_record=_durable)
+    except Exception as exc:  # noqa: BLE001 — the ARM itself failed
+        forensics.event("DIRECTIVE_CONSTRAINT_ARM_FAILED",
+                        error_class=type(exc).__name__)
+
+
 def _run_inner(session_id: str, forensics) -> None:
     forensics.event("PHASE_STARTED", stage="SESSION_LOOKUP", phase=0)
     s = store.get_session(session_id)
@@ -786,21 +848,7 @@ def _run_inner(session_id: str, forensics) -> None:
     # the durable input record (next to the persisted PU); the session
     # copy stays untouched. Fail-open: the constraint is an input
     # record — its absence degrades to the pre-R470 behavior honestly.
-    try:
-        _dc = (s.get("directive_constraint")
-               if isinstance(s, dict) else None)
-        if isinstance(_dc, dict) and _dc.get("forbidden_mechanism"):
-            import json as _json
-            (run_dir / "DIRECTIVE_CONSTRAINT.json").write_text(
-                _json.dumps(_dc, indent=1, ensure_ascii=False))
-            problem["directive_constraint"] = _dc
-            forensics.event("DIRECTIVE_CONSTRAINT_APPLIED",
-                            verb=str(_dc.get("verb") or ""),
-                            forbidden_terms=len(
-                                _dc.get("forbidden_terms") or []))
-    except Exception as exc:  # noqa: BLE001 — input record, fail-open
-        forensics.event("DIRECTIVE_CONSTRAINT_WRITE_FAILED",
-                        error_class=type(exc).__name__)
+    _apply_directive_constraint(s, problem, run_dir, forensics)
 
     # --- phase 2.1: enrich + persist the PU into the run dir (R446-C1) --
     # The MODEL_DERIVED LLM extraction merges into the PU contract with

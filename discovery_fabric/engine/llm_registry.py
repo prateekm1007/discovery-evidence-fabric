@@ -479,11 +479,26 @@ PROVIDER_SPECS: List[ProviderSpec] = [
         # 9 VALID slots x operator-declared 100M = the ~900M-token
         # surplus (OPERATOR-DECLARED; no usage endpoint is measurable —
         # Art. VI/XXV).
+        #
+        # R472 (2026-09-16, third audit pass): the operator RE-SUPPLIED
+        # key 8 (same string) and added keys 11-13. The probe-before-
+        # record re-measurement (R472/PROBE_ATRIA_KEYS11TO13.json):
+        # key 8's catalog answered 200 x3 (0.16-0.22 s) where R470
+        # measured a DETERMINISTIC 401 x3 — the account-side exclusion
+        # CLEARED, so key 8 is REINSTATED (the measured verdict outranks
+        # the name-present surface in BOTH directions, Art. III);
+        # keys 11/12/13 catalog 200 each (sole model Atria-Dawn-Preview,
+        # bogus-key differential 401) and one 200 non-empty tiny
+        # completion on key 11 (1.79 s, reasoning_effort low).
+        # THIRTEEN VALID slots x operator-declared 100M = the ~1.3B-token
+        # surplus (OPERATOR-DECLARED; Art. VI/XXV).
         key_env_vars=["ATRIA_API_KEY", "ATRIA_API_KEY_2",
                       "ATRIA_API_KEY_3", "ATRIA_API_KEY_4",
                       "ATRIA_API_KEY_5", "ATRIA_API_KEY_6",
-                      "ATRIA_API_KEY_7", "ATRIA_API_KEY_9",
-                      "ATRIA_API_KEY_10"],
+                      "ATRIA_API_KEY_7", "ATRIA_API_KEY_8",
+                      "ATRIA_API_KEY_9", "ATRIA_API_KEY_10",
+                      "ATRIA_API_KEY_11", "ATRIA_API_KEY_12",
+                      "ATRIA_API_KEY_13"],
         model_revision="Atria-Dawn-Preview — the catalog's SOLE model id "
                        "(owned_by atria, 2026-09-15 catalog); no revision "
                        "pin exposed by the provider — recorded honest "

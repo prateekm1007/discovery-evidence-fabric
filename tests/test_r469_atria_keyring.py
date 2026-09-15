@@ -67,15 +67,18 @@ SMOKE = REPO / "R469" / "ROTATION_SMOKE.json"
 PROBE_SCRIPT = REPO / "scripts" / "r469_probe_atria_key3.py"
 SECRETS_SCRIPT = REPO / "scripts" / "r469_hf_secrets.py"
 
-# R470 (2026-09-16): the ring grew 3 -> 9 slots — the operator supplied
-# seven more keys; ATRIA_API_KEY_8 is NOT registered (its catalog probe
-# answered a DETERMINISTIC 401 x3 — typed invalid, excluded, operator
-# re-supply invited; R470/PROBE_ATRIA_KEYS4TO10.json). Slot numbering is
-# NOT compressed: _9/_10 keep their operator-given names so future keys
-# append unambiguously.
-RING = ["ATRIA_API_KEY", "ATRIA_API_KEY_2", "ATRIA_API_KEY_3",
-        "ATRIA_API_KEY_4", "ATRIA_API_KEY_5", "ATRIA_API_KEY_6",
-        "ATRIA_API_KEY_7", "ATRIA_API_KEY_9", "ATRIA_API_KEY_10"]
+# R470 (2026-09-16): the ring grew 3 -> 9 valid slots — the operator
+# supplied seven more keys; ATRIA_API_KEY_8 was NOT registered then (its
+# catalog probe answered a DETERMINISTIC 401 x3 — typed invalid,
+# excluded, operator re-supply invited; R470/PROBE_ATRIA_KEYS4TO10.json).
+# Slot numbering is NOT compressed: names keep their operator-given
+# numbers so future keys append unambiguously.
+# R472 (2026-09-16, third audit pass): the operator RE-SUPPLIED key 8
+# (same string) and added keys 11-13; the R472 probe measured key 8
+# catalog 200 x3 — the exclusion CLEARED, key 8 REINSTATED — and keys
+# 11/12/13 VALID. The ring is THIRTEEN operator-ordered slots
+# (R472/PROBE_ATRIA_KEYS11TO13.json).
+RING = ["ATRIA_API_KEY"] + [f"ATRIA_API_KEY_{i}" for i in range(2, 14)]
 
 # fake credential bodies — deliberately SHORT and non-matching to the
 # BS-021 key-marker regex (atr_[A-Za-z0-9_-]{20,}); no real value here
@@ -133,7 +136,10 @@ def test_atria_ring_registered_in_operator_order():
     spec = lr._SPEC_BY_ID["atria"]
     assert lr.key_ring_slots(spec) == RING
     assert spec.env_var == "ATRIA_API_KEY"   # the marker stays slot 1
-    assert "ATRIA_API_KEY_8" not in lr.key_ring_slots(spec)  # R470: 401x3
+    # R470: 401x3 excluded key 8; R472: the re-measurement (200 x3)
+    # REINSTATED it — the measured verdict outranks the surface in
+    # BOTH directions (Art. III)
+    assert "ATRIA_API_KEY_8" in lr.key_ring_slots(spec)
 
 
 def test_every_other_provider_degrades_to_single_key():

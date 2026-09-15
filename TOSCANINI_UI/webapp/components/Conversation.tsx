@@ -66,6 +66,20 @@ const ATTACK_LABEL: Record<string, string> = {
   UNRESOLVED: "unresolved",
 };
 
+// R472 (external audit third pass, Addendum 2C — the P2 dead-code
+// defect): the compliance state the card STYLES. The R470 CSS targets
+// [data-directive-compliance="VIOLATED"|"PARTIAL"|"COMPLIANT"] while
+// the component emitted only the raw typed verdict under a DIFFERENT
+// attribute name — the visual state could never fire (measured: neutral
+// border on every verdict). The presentation vocabulary is derived HERE
+// from the ONE shared compliance instrument's typed verdicts; the raw
+// verdict stays on the card as data. Untyped verdicts stay neutral.
+const COMPLIANCE_STATE: Record<string, string> = {
+  COMPLIED_CHANGED: "COMPLIANT",
+  MOVED_BUT_IN_TERRITORY: "PARTIAL",
+  NOT_COMPLIED_SAME_AS_PARENT: "VIOLATED",
+};
+
 function MetaChip({ epi }: { epi: string }) {
   return <span className="conv-meta">{epi}</span>;
 }
@@ -435,6 +449,11 @@ export default function Conversation({
           data-directive-outcome-card
           data-mechanism-changed={detail.directive_outcome.mechanism_changed ? "true" : "false"}
           data-compliance-verdict={detail.directive_outcome.compliance_verdict ?? undefined}
+          data-directive-compliance={
+            detail.directive_outcome.compliance_verdict
+              ? COMPLIANCE_STATE[detail.directive_outcome.compliance_verdict] ?? undefined
+              : undefined
+          }
         >
           <div className="conv-continued">
             <span className="conv-continued-round">What changed because of your direction</span>

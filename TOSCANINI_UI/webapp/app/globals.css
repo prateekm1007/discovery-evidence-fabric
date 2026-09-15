@@ -3029,11 +3029,17 @@ h2.wk-title {
   .conv-input { font-size: 16px; }
 }
 
-/* ---- P0-5 (R470): the directive-compliance card states -------------------
+/* ---- P0-5 (R470/R472): the directive-compliance card states --------------
    The "what changed because of your direction" card carries the typed
-   compliance state (data-directive-compliance): VIOLATED and PARTIAL
-   get the honest warm tint — a violation is never styled like a
-   success; NOT_ASSESSABLE stays neutral. */
+   compliance state (data-directive-compliance), derived in
+   Conversation.tsx from the ONE shared compliance instrument's verdicts:
+   COMPLIED_CHANGED -> COMPLIANT, MOVED_BUT_IN_TERRITORY -> PARTIAL,
+   NOT_COMPLIED_SAME_AS_PARENT -> VIOLATED. VIOLATED and PARTIAL get the
+   honest warm tint — a violation is never styled like a success;
+   every other verdict (NO_BASELINE, NO_CHILD_MECHANISM,
+   NOT_APPLICABLE, CONSTRAINT_DERIVATION_FAILED) stays neutral. R472:
+   the component now EMITS this attribute (the R470 attribute/vocabulary
+   mismatch was dead code — the auditor's P2 finding). */
 .conv-row[data-directive-compliance="VIOLATED"] .conv-continued,
 .conv-row[data-directive-compliance="PARTIAL"] .conv-continued {
   border-left: 3px solid var(--accent);

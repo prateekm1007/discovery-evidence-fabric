@@ -1,0 +1,56 @@
+{
+  "round": "R472",
+  "protocol": "CTO/engineer — pass 1 REVIEW of the implemented audit fixes; engineer = Atria-Dawn-Preview (transcript: ATRIA_ENGINEER_REVIEW.json, three per-file passes, 14.0-87.1 s, all ok)",
+  "dispositions": [
+    {
+      "file": "toscanini/worker.py",
+      "finding": "MINOR: forensic events can misreport the arm/write split — (b) an ARM failure would fire WRITE_FAILED (a lie about which half failed), (c) a non-OSError write failure after a successful arm would fire no APPLIED at all (monitors go blind to an armed exclusion).",
+      "disposition": "ACCEPTED",
+      "action": "Inner except broadened to Exception (any durable-copy degradation is typed WRITE_FAILED; APPLIED always follows with durable_record=false); the outer except re-typed as DIRECTIVE_CONSTRAINT_ARM_FAILED. Pinned by test_non_oserror_write_failure_still_reports_applied + test_arm_failure_is_typed_arm_failed_not_write_failed."
+    },
+    {
+      "file": "toscanini/worker.py",
+      "finding": "MINOR: the durable copy is written non-atomically (write_text truncates in place; a crash mid-write leaves a truncated-but-parseable constraint record for the outcome layer's fallback loader).",
+      "disposition": "ACCEPTED",
+      "action": "Atomic tmp + os.replace. Pinned by test_durable_write_is_atomic."
+    },
+    {
+      "file": "toscanini/worker.py",
+      "finding": "MINOR: no regression test accompanies the fix (the suggested test: run_dir absent/unwritable, assert armed + durable_record).",
+      "disposition": "REJECTED (stale premise)",
+      "reason": "The executing battery exists in this same round but was untracked when the engineer read the diff: tests/test_r472_audit_power_leg.py TestDirectiveConstraintArms contains exactly the suggested tests (run-dir-absent reproduction, unwritable-path durable_record=false, no-constraint fail-open, arm-before-write ordering). 18/18 green at disposition time."
+    },
+    {
+      "file": "toscanini/user_state.py",
+      "finding": "MAJOR: the terminal fork is an exact-string equality on the outcome literal, load-bearing and unverifiable in-module; if the constant drifts, the audited collision returns silently. Share one source of truth.",
+      "disposition": "ACCEPTED",
+      "action": "user_state.py now imports OUTCOME_KILLED_BY_CHALLENGE from run_state (the same module the workspace banner's vocabulary derives from) and the fork compares the constant, never a literal. Pinned by test_headline_and_banner_share_one_outcome_truth (fork uses the constant, no literal remains, RunNarrative still keys the same typed outcome, both surfaces carry the no-survivor phrase)."
+    },
+    {
+      "file": "toscanini/user_state.py",
+      "finding": "MAJOR: test gap — no coverage for (a) genuine-kill fork, (b) capability-class demotion that must NOT flip, (c) verdict-None passthrough.",
+      "disposition": "REJECTED (stale premise)",
+      "reason": "Same untracked-battery premise: TestCompletedKilledFrame covers all three (test_genuine_kill_surfaces_one_frame; test_capability_demotion_keeps_under_development; test_positive_run_without_verdict_untouched) plus the R452 unverified-survivor and legacy-REJECTED compat cases."
+    },
+    {
+      "file": "toscanini/user_state.py",
+      "finding": "MINOR: the COMPLETED_KILLED explanation promises specific on-record inventory (kill reasons, the decisive experiment, next steps) that is not guaranteed present for every killed run.",
+      "disposition": "ACCEPTED",
+      "action": "Explanation softened to the banner's proven-safe scope: 'every cause and every generation's lesson is on the record below' — no inventory promises beyond what the record layer guarantees."
+    },
+    {
+      "file": "TOSCANINI_UI/webapp/components/Conversation.tsx",
+      "finding": "MINOR: COMPLIANCE_STATE is a closed literal; future instrument verdicts would silently render neutral with no signal — derive the mapping from the instrument's typed definition or annotate with satisfies so incompleteness fails to compile.",
+      "disposition": "REJECTED (would create a worse drift surface)",
+      "reason": "The webapp cannot import the Python instrument's type; a TS mirror of the Python vocabulary would be a SECOND source of truth (Art. X violation) with its own drift risk. Neutral-degrade IS the honest default (an unmapped verdict is never styled as a compliance outcome). The R472 battery pins the mapping and the CSS agreement in both directions; a new instrument verdict requires touching this mapping by design, and the Python-side pin (test_css_targets_and_component_attribute_agree) fails if the two vocabularies diverge."
+    },
+    {
+      "file": "TOSCANINI_UI/webapp/components/Conversation.tsx",
+      "finding": "MINOR: no test locks the mapping (the measurement that motivated the fix is uncited by a test); suggested a unit test for COMPLIANT/PARTIAL/VIOLATED emission and a guard that every data-compliance-verdict site also carries data-directive-compliance.",
+      "disposition": "ACCEPTED",
+      "action": "TOSCANINI_UI/webapp/tests/adversarial_r472.test.mjs (node --test, house src-pin style): mapping present, the single card site carries BOTH attributes, CSS/component vocabulary agreement, untyped verdicts stay neutral. 4/4 green."
+    }
+  ],
+  "summary": "5 ACCEPTED + implemented + pinned; 3 REJECTED with recorded reasons (2 stale premises — the executing battery exists in-round; 1 architecture — a TS type mirror would violate the one-source-of-truth rule). The re-run batteries after the accepted fixes: python R472 18/18 + adjacent suites green; webapp adversarial_r472 4/4.",
+  "reviewer_provenance": "AI_REVIEW"
+}

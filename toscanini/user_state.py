@@ -18,6 +18,10 @@ and the terminal always presents the current invention):
                               current invention is presented with its
                               honest maturity — never "candidate
                               rejected" as a dead end)
+  COMPLETED — NO SURVIVOR            (R472: the challenge verdict is
+                              AUTHENTICATED-kill — the machine's own
+                              gauntlet killed the candidate; ONE frame,
+                              the same words the workspace banner uses)
   COMPLETED — OUTCOME UNKNOWN        (terminal, no recorded verdict)
   INTERRUPTED — RECOVERABLE          (worker died; retryable)
   FAILED — TRANSPORT
@@ -34,7 +38,8 @@ from __future__ import annotations
 
 from typing import Any, Dict, Optional
 
-from .run_state import (OUTCOME_LABELS, OUTCOME_NO_DEFENSIBLE,
+from .run_state import (OUTCOME_KILLED_BY_CHALLENGE,
+                        OUTCOME_LABELS, OUTCOME_NO_DEFENSIBLE,
                         OUTCOME_REQUIRES_EXPERIMENT, OUTCOME_RUN_BLOCKED,
                         OUTCOME_SURVIVED, terminal_outcome)
 
@@ -52,6 +57,14 @@ _USER_STATE_LABELS = {
         "Completed — architecture generation failed",
     "COMPLETED_UNDER_DEVELOPMENT":
         "Completed — invention in development",
+    # R472 (external audit third pass, §2C terminal de-collision):
+    # the killed frame in ONE sentence — the same words the R470
+    # workspace banner uses. The old headline ("Completed — invention
+    # in development") next to that banner asked the user to reconcile
+    # two frames for one state; the auditor measured the collision on
+    # a fresh killed run.
+    "COMPLETED_KILLED":
+        "Run finished — no candidate survived the challenge gauntlet",
     "COMPLETED_FALSE_PREMISE": "Completed — false premise",
     "COMPLETED_UNKNOWN": "Completed — outcome unknown",
     "AWAITING_CLARIFICATION": "Action needed — answer Toscanini's question below",
@@ -94,6 +107,11 @@ _USER_STATE_EXPLANATIONS = {
                           "nothing is softened, and the machine keeps "
                           "the diagnosed causes on record so the next "
                           "generation can build on them."),
+    "COMPLETED_KILLED": ("The run finished and the machine's own "
+                          "adversarial challenge killed the candidate — "
+                          "every cause and every generation's lesson is "
+                          "on the record below. Nothing was fabricated "
+                          "to fill its place."),
     "COMPLETED_FALSE_PREMISE": ("The engine checked the problem's premises "
                                 "BEFORE inventing and found them "
                                 "physically/scientifically incoherent — no "
@@ -193,6 +211,17 @@ def user_state(session: Dict[str, Any]) -> str:
                      "INVENTION_UNDER_DEVELOPMENT"):
             verdict = _challenge_verdict(session)
             if verdict is not None and not verdict.get("invention_found"):
+                # R472 (terminal de-collision): when the demotion IS a
+                # genuine adversarial kill (the SAME typed outcome
+                # constant the workspace banner keys on — one source of
+                # truth in run_state, never a string literal here), the
+                # headline says the kill in ONE frame — never
+                # "invention in development" next to a no-survivor
+                # banner. Capability-class demotions (the attack never
+                # rendered a verdict; promotion was blocked) keep the
+                # under-development frame honestly.
+                if verdict.get("outcome") == OUTCOME_KILLED_BY_CHALLENGE:
+                    return "COMPLETED_KILLED"
                 return "COMPLETED_UNDER_DEVELOPMENT"
         if final == "INVENTION_REQUIRES_EXPERIMENT":
             # R443 / TSC-008: the surviving baseline fallback — the
