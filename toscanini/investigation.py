@@ -63,6 +63,12 @@ EVENT_STATUSES = (
 
 # Directive section 8: the closed epistemic vocabulary. Frontend wording
 # may never upgrade a class (Art. XXVIII).
+# R465: SOURCE_FACT joins the vocabulary — Article XXXVIII's rank-1
+# evidence layer (the lowest rank; nothing is promoted INTO it, so the
+# never-upgraded rule holds). It types the user's OWN material entering
+# the record (uploaded documents, content-hashed, claimed by the user,
+# never verified by retrieval) — distinct from RETRIEVED, which carries
+# an external custody chain (Art. XXI.9).
 EPISTEMIC_CLASSES = (
     "RETRIEVED",
     "INFERRED",
@@ -71,6 +77,7 @@ EPISTEMIC_CLASSES = (
     "SIMULATED",
     "ENGINEERING_DEFINED",
     "PHYSICALLY_OBSERVED",
+    "SOURCE_FACT",
     "UNKNOWN",
 )
 
@@ -289,6 +296,63 @@ def investigation_events(session: Dict[str, Any]) -> List[Dict[str, Any]]:
          epistemic_class="UNKNOWN",
          basis_ref="sessions.json",
          timestamp=session.get("created_at"))
+
+    # 1.5 user attachments on the record — R465 (the audit's P0-3
+    # acceptance, made verifiable): the user's uploaded documents join
+    # the investigation as typed USER_EVIDENCE, and the /events ledger
+    # shows it. Derived ONLY from persisted artifacts: the Problem
+    # Understanding INPUT record (run-dir copy preferred, per-session
+    # copy as fallback) carries the user_evidence entries the worker's
+    # merge wrote, each with its content hash — never fabricated, never
+    # content-bearing (hash fingerprints and counts only, Art. VI).
+    # When documents are staged but the persisted record shows no
+    # user_evidence, the ledger carries the typed gap (the merge did
+    # not complete) instead of silence — a staged-but-unmerged state
+    # must be distinguishable from both success and nothing-staged.
+    _pu_doc = None
+    _pu_src = None
+    _pu_path: Optional[Path] = None
+    if run_dir:
+        _p = run_dir / "PROBLEM_UNDERSTANDING.json"
+        _pu_doc = _read_json(_p)
+        if _pu_doc:
+            _pu_src = "run_dir/PROBLEM_UNDERSTANDING.json"
+            _pu_path = _p
+    if not _pu_doc:
+        _p = store.STORE_DIR / f"problem_understanding_{sid}.json"
+        _pu_doc = _read_json(_p)
+        if _pu_doc:
+            _pu_src = "session problem_understanding record"
+            _pu_path = _p
+    _staged = len(list(session.get("attachment_ids") or []))
+    _ue = (_pu_doc or {}).get("user_evidence") or {}
+    _ue_entries = _ue.get("value") if isinstance(_ue, dict) else None
+    _ue_entries = _ue_entries if isinstance(_ue_entries, list) else []
+    if _ue_entries:
+        _hashes = ", ".join(str(e.get("sha256") or "")[:12]
+                            for e in _ue_entries
+                            if isinstance(e, dict))
+        emit(kind="attachment.ingested", stage="PROBLEM",
+             status="COMPLETED",
+             summary=(f"{len(_ue_entries)} user document(s) joined the "
+                      "investigation's record as typed USER_EVIDENCE "
+                      f"(content hashes: {_hashes})"),
+             epistemic_class="SOURCE_FACT",
+             basis_ref=f"{_pu_src} user_evidence",
+             timestamp=str(_pu_path.stat().st_mtime) if _pu_path
+             else None)
+    elif _staged and _pu_doc:
+        # documents staged, merge point passed, nothing on the record:
+        # the typed gap — never silent (Art. XV)
+        emit(kind="attachment.ingested", stage="PROBLEM",
+             status="UNKNOWN",
+             summary=(f"{_staged} staged user document(s) have not "
+                      "joined the investigation's record (the merge "
+                      "did not complete — typed cause in the run's "
+                      "worker diagnostics); the run continues on the "
+                      "user's own words"),
+             epistemic_class="SOURCE_FACT",
+             basis_ref=f"session record attachment_ids + {_pu_src}")
 
     # 2. problem normalized — problem_builder's persisted output
     problem_built = bool(run_dir and (run_dir / "problem.json").exists())

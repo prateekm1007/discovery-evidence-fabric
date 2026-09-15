@@ -131,6 +131,106 @@ def _load_problem_understanding(session_id: str):
     return raw
 
 
+def merge_attachments_typed(session: dict, session_id: str, pu: dict,
+                            forensics=None):
+    """R459 (audit P0-3): the session's staged attachments merge into
+    the Problem Understanding INPUT record as typed USER_EVIDENCE
+    (server-side extraction, content hash on record).
+
+    R465 (the R463-C2 open item, closed): the merge outcome is TYPED
+    and OBSERVABLE in every state. The previous block was fail-open and
+    swallowed its own exceptions, so a silent empty-merge was
+    indistinguishable from a success — the exact reason the audit's
+    P0-3 acceptance could not be verified end-to-end. Now:
+
+      merged          -> the PU record carries user_evidence (the
+                         /events projection derives the ledger event
+                         from that persisted artifact) and the
+                         owner-scoped forensics record ATTACHMENTS_MERGED
+      merge failed    -> forensics ATTACHMENTS_MERGE_INCOMPLETE with the
+                         typed exception class; the run continues on
+                         the user's own words — disclosed, never silent
+      staged, none
+      resolved        -> forensics ATTACHMENTS_MERGE_INCOMPLETE with the
+                         bound=0 reason (owner-scoped resolution found
+                         no readable record)
+      nothing staged  -> no events (nothing was staged — no outcome to
+                         disclose; the ledger never records noise)
+
+    The events-ledger journal write happens only when a run journal
+    already exists (run_dir set): a pre-run-dir write would land in a
+    CWD-relative path — the R431-era defect this round retires (the
+    journal is per-run by contract). Attachments never kill a run; a
+    failure is disclosed, never silent (Art. XV/LXI). Summaries carry
+    counts, hashes, and typed reasons — never document content."""
+    staged = list(session.get("attachment_ids") or [])
+    outcome = {"staged": len(staged), "resolved": 0, "merged": False,
+               "reason": None}
+    if not staged:
+        return pu, outcome
+    bound: list = []
+    run_dir = str(session.get("run_dir") or "")
+    try:
+        from toscanini import attachments as _att_mod
+        bound = _att_mod.resolve_bindings(session,
+                                          session.get("owner_key") or "")
+        outcome["resolved"] = len(bound)
+        if bound:
+            from toscanini.conversational import problem_understanding \
+                as _pu_mod
+            pu = _pu_mod.apply_attachments(pu, bound)
+            outcome["merged"] = True
+    except Exception as exc:  # noqa: BLE001 — attachments must never
+        # kill a run; the failure is TYPED here, never silent
+        outcome["reason"] = type(exc).__name__
+    if not outcome["merged"] and outcome["reason"] is None:
+        outcome["reason"] = ("staged attachment id(s) resolved to no "
+                             "readable record")
+    if run_dir:
+        # the run journal exists — the outcome belongs on it too
+        try:
+            from toscanini import event_journal as _journal
+            if outcome["merged"]:
+                hashes = ", ".join(str(a.get("sha256") or "")[:12]
+                                   for a in bound)
+                _journal.record(run_dir, session_id,
+                                kind="attachment.ingested",
+                                stage="PROBLEM", status="COMPLETED",
+                                summary=(f"{len(bound)} user document(s) "
+                                         "joined the investigation's "
+                                         "record as typed USER_EVIDENCE "
+                                         "(content hashes: "
+                                         f"{hashes})"),
+                                epistemic_class="SOURCE_FACT",
+                                basis_ref="attachments ledger")
+            else:
+                _journal.record(run_dir, session_id,
+                                kind="attachment.ingested",
+                                stage="PROBLEM", status="UNKNOWN",
+                                summary=("the user-evidence merge did "
+                                         f"not complete "
+                                         f"({outcome['reason']}); the "
+                                         "run continues on the user's "
+                                         "own words — the staged "
+                                         "documents stay on record "
+                                         "with their content hashes"),
+                                epistemic_class="SOURCE_FACT",
+                                basis_ref="attachments ledger")
+        except Exception:  # noqa: BLE001 — journaling is fail-open
+            pass
+    if forensics is not None:
+        try:
+            forensics.event(
+                "ATTACHMENTS_MERGED" if outcome["merged"]
+                else "ATTACHMENTS_MERGE_INCOMPLETE",
+                staged=outcome["staged"], resolved=outcome["resolved"],
+                typed=(outcome["reason"] or "merged"),
+                stage="UNDERSTANDING_PROBLEM")
+        except Exception:  # noqa: BLE001 — forensics is fail-open
+            pass
+    return pu, outcome
+
+
 def run(session_id: str) -> None:
     # R419c heartbeat: the FIRST line in the worker log for every run —
     # R463: the log is the run's OWN per-session file
@@ -312,27 +412,13 @@ def _run_inner(session_id: str, forensics) -> None:
                 str(_directive.get("verb") or ""))
             store.update_session(session_id, user_directive={})
         # R459 (audit P0-3): bound attachments merge as typed
-        # USER_EVIDENCE (server-side extraction, content hash on record)
-        try:
-            from toscanini import attachments as _att_mod
-            _bound = _att_mod.resolve_bindings(s, s.get("owner_key") or "")
-            if _bound:
-                pu = _pu_mod.apply_attachments(pu, _bound)
-                try:
-                    from toscanini import event_journal as _journal
-                    _journal.record(
-                        str(s.get("run_dir") or ""), session_id,
-                        kind="attachment.ingested", stage="PROBLEM",
-                        status="COMPLETED",
-                        summary=(f"{len(_bound)} user document(s) joined "
-                                 "the investigation's record (content "
-                                 "hashes on file)"),
-                        epistemic_class="SOURCE_FACT",
-                        basis_ref="attachments ledger")
-                except Exception:  # noqa: BLE001 — journaling is fail-open
-                    pass
-        except Exception:  # noqa: BLE001 — attachments must never kill a run
-            pass
+        # USER_EVIDENCE — R465: the outcome is TYPED and OBSERVABLE in
+        # every state (merged / failed-with-reason / bound=0 reason);
+        # the fail-open block that swallowed its own exceptions is
+        # retired (a silent empty-merge was indistinguishable from a
+        # success — the class that kept the audit's P0-3 unverifiable)
+        pu, _att_outcome = merge_attachments_typed(
+            s, session_id, pu, forensics=forensics)
         need = _cl_mod.evaluate_clarification_need(pu)
         if need["needed"] and not s.get("clarification_answer"):
             # directive §4: ONE useful clarification, then pause. The
@@ -414,7 +500,15 @@ def _run_inner(session_id: str, forensics) -> None:
         # persisted the moment it occurs (per-source retrieval events
         # included; the journal is the SSE/refresh-recovery source)
         from toscanini import event_journal as _journal
-        _phase_cb = _journal.phase_callback(str(s.get("run_dir") or ""),
+        # R465: the run_dir does not exist until phase 2 completes (the
+        # problem id names it) — the callback resolves it LAZILY at
+        # write time. The eager string capture journaled the whole
+        # phase-2 retrieval window into a CWD-relative path that no
+        # reader ever served (typed-dropped by the journal now).
+        def _run_dir_resolver() -> str:
+            _cur = store.get_session(session_id) or {}
+            return str(_cur.get("run_dir") or "")
+        _phase_cb = _journal.phase_callback(_run_dir_resolver,
                                             session_id)
         # run_dir is created below; the journal writer mkdirs lazily
         built = problem_builder.build_problem(s["user_text"],

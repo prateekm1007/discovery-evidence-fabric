@@ -75,7 +75,16 @@ def record(run_dir: str, run_id: str, kind: str, stage: str, status: str,
            timestamp: Optional[str] = None) -> Optional[Dict[str, Any]]:
     """Append ONE event (fsync). Returns the event, or None on a
     write failure (the journal is fail-open: a journaling failure
-    NEVER blocks the run — Art. LXI)."""
+    NEVER blocks the run — Art. LXI).
+
+    R465: an EMPTY run_dir is a typed no-op (returns None, writes
+    nothing). The journal is PER-RUN by contract; a pre-run-dir write
+    used to land in a CWD-relative EVENT_JOURNAL.jsonl that no reader
+    ever served — cross-run pollution on the engine's working
+    directory (retired; pre-run events ride their own persisted
+    artifacts and the owner-scoped forensics instead)."""
+    if not run_dir:
+        return None
     try:
         p = journal_path(run_dir)
         p.parent.mkdir(parents=True, exist_ok=True)
@@ -133,14 +142,26 @@ def read(run_dir: str) -> List[Dict[str, Any]]:
 # Callback adapters: real operations -> journal events
 # ---------------------------------------------------------------------------
 
-def phase_callback(run_dir: str, run_id: str) -> Callable[[Dict], None]:
+def phase_callback(run_dir, run_id: str) -> Callable[[Dict], None]:
     """The on_event adapter for problem_builder.build_problem — every
     emitted phase event is a REAL step in progress; the per-source
     completion events land in the journal the moment each source
     finishes (R431 section 3: SOURCE 1, SOURCE 2, ... visible live,
-    without waiting for the whole retrieval stage)."""
+    without waiting for the whole retrieval stage).
+
+    R465: `run_dir` may be a callable (a resolver) — it is evaluated
+    LAZILY at each event. The retrieval window runs BEFORE the run
+    directory exists (the problem id names it); the eager string
+    capture froze an empty path for the whole window, so every
+    phase-2 event was journaled to a CWD-relative file no reader ever
+    served. With the resolver, events written after the session's
+    run_dir is recorded land in the run's own journal; events before
+    that moment are typed-dropped by record() (the empty-path guard)."""
     # map of source -> last querying event seq (for summary continuity)
     seen_sources: Dict[str, int] = {}
+
+    def _path() -> str:
+        return str(run_dir()) if callable(run_dir) else str(run_dir or "")
 
     def cb(ev: Dict[str, Any]) -> None:
         phase = str(ev.get("phase") or "")
@@ -151,7 +172,7 @@ def phase_callback(run_dir: str, run_id: str) -> Callable[[Dict], None]:
             count = ev.get("count")
             ok = status == "OK"
             record(
-                run_dir, run_id,
+                _path(), run_id,
                 kind="evidence.retrieved" if ok else
                      "evidence.retrieval_failed",
                 stage="EVIDENCE",
@@ -171,7 +192,7 @@ def phase_callback(run_dir: str, run_id: str) -> Callable[[Dict], None]:
             kind = {"EXTRACT": "problem.extract",
                     "RETRIEVE_EVIDENCE": "evidence.retrieval_started",
                     "EVIDENCE_BOUND": "evidence.bound"}[phase]
-            record(run_dir, run_id, kind=kind,
+            record(_path(), run_id, kind=kind,
                    stage="PROBLEM" if phase == "EXTRACT" else "EVIDENCE",
                    status="ACTIVE" if phase == "RETRIEVE_EVIDENCE"
                           else "COMPLETED",
