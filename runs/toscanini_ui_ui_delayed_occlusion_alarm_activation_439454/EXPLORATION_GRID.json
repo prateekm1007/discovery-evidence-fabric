@@ -1,0 +1,264 @@
+{
+ "diversity": "CANDIDATE_DIVERSITY (E16-E)",
+ "version": "1.1.0",
+ "min_candidates": 10,
+ "available_providers": [
+  "zai"
+ ],
+ "operator_override": [
+  "zai"
+ ],
+ "angles": [
+  "cross_industry_transfer",
+  "mechanism_inversion",
+  "simplification",
+  "multi_physics_hybrid",
+  "constraint_first"
+ ],
+ "candidates": [
+  {
+   "angle": "cross_industry_transfer",
+   "provider_id": "zai",
+   "status": "OK",
+   "model": "qwen/qwen3.5-plus:free",
+   "prompt_hash": "1646bbf4db23e8da3d5ef592ec9f31f938fb2c6ad9e632cb1c59cea9917d6513",
+   "output_hash": "9ac0fcd284f1d2aab3f13d0ef129ac1cd40274fb614d7140f09c9247c97c2e11",
+   "fields": {
+    "mechanism": "Infrared-based sensing to detect changes in tubing content (air vs. fluid) triggering automatic mechanical occlusion.",
+    "intervention": "Retrofit an infrared emitter-detector pair onto the existing disposable tubing path of the infusion pump to monitor refractive index changes indicative of flow stagnation or pressure-induced tubing deformation, coupled with a low-cost solenoid pinch valve to mechanically occlude the line upon signal threshold breach.",
+    "expected_effect": "Detection of flow anomalies leading to occlusion conditions at least ten minutes prior to pressure-based alarm activation by sensing fluid state changes before significant pressure buildup, while maintaining the sterile disposable path and reducing false alarms via continuous optical verification.",
+    "falsification_test": "Operate the retrofitted system with a controlled downstream occlusion simulated by a precision valve; verify that the infrared sensor triggers the mechanical occluder more than ten minutes before the original pump's pressure alarm activates across 50 trials with varying fluid viscosities and tubing materials.",
+    "mechanism_source_span": "The device employs an infrared-based sensing approach to continuously monitor tubing for the presence of air and for conditions consistent with end of infusion, such as depletion of the fluid source.",
+    "span_derivation": {
+     "n_shared": 8,
+     "shared_terms": [
+      "air",
+      "based",
+      "fluid",
+      "infrared",
+      "infusion",
+      "monitor",
+      "sensing",
+      "tubing"
+     ],
+     "span_terms_n": 18,
+     "ratio": 0.444,
+     "underived": false,
+     "state": "MEASURED",
+     "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+    }
+   },
+   "span_underived": false,
+   "candidate_id": "cand:DIV:cross_industry_transfer:zai:9ac0fcd284f1"
+  },
+  {
+   "angle": "mechanism_inversion",
+   "provider_id": "zai",
+   "status": "OK",
+   "model": "qwen/qwen3.5-plus:free",
+   "prompt_hash": "012386d0504608dd942b4922b3dee6dfd32497abf65021a29979e08d1629c76d",
+   "output_hash": "bcc37f176d2ea0cfd1c3258793f3f112a2a83b0eda1295b7b6912f095c5b31c5",
+   "fields": {
+    "mechanism": "Infrared-based sensing to detect the change in optical transmission between fluid-filled and air-filled tubing conditions.",
+    "intervention": "Retrofit an infrared emitter-detector pair onto the existing disposable tubing path of the infusion pump to continuously monitor for the specific optical signature of flow cessation (transition to static fluid column or micro-bubble accumulation) preceding full occlusion pressure buildup, triggering an early alarm without modifying the disposable set.",
+    "expected_effect": "Detection of flow stagnation or air entry at least ten minutes before pressure-based occlusion alarms activate, preserving the disposable flow path and reducing false alarms by distinguishing between transient pressure spikes and actual flow stoppage via optical continuity.",
+    "falsification_test": "Install the retrofit sensor on a test rig with a controlled downstream occlusion; verify that the infrared signal change occurs >10 minutes prior to the standard pressure alarm trigger under varying flow rates and tubing materials, and confirm no false alarms during rapid bolus delivery or patient movement.",
+    "mechanism_source_span": "The device employs an infrared-based sensing approach to continuously monitor tubing for the presence of air and for conditions consistent with end of infusion, such as depletion of the fluid source.",
+    "span_derivation": {
+     "n_shared": 10,
+     "shared_terms": [
+      "air",
+      "based",
+      "condition",
+      "continuously",
+      "fluid",
+      "infrared",
+      "infusion",
+      "monitor",
+      "sensing",
+      "tubing"
+     ],
+     "span_terms_n": 18,
+     "ratio": 0.556,
+     "underived": false,
+     "state": "MEASURED",
+     "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+    }
+   },
+   "span_underived": false,
+   "candidate_id": "cand:DIV:mechanism_inversion:zai:bcc37f176d2e"
+  },
+  {
+   "angle": "simplification",
+   "provider_id": "zai",
+   "status": "OK",
+   "model": "qwen/qwen3.5-plus:free",
+   "prompt_hash": "e77d7b184d665da48780e0691a6c835e1c111dcc40944ca702def84c0c68137a",
+   "output_hash": "9b9f0b99bbb8ff7c918e16e08ebb74ba2f513ac878e753bcf93ecd712b62c387",
+   "fields": {
+    "mechanism": "Infrared-based sensing to detect the presence of air within tubing as a proxy for flow cessation or source depletion.",
+    "intervention": "Retrofit an infrared emitter-detector pair onto the existing disposable tubing segment of the infusion pump to monitor fluid continuity, triggering an early alarm upon detecting air ingress that precedes full downstream occlusion pressure buildup.",
+    "expected_effect": "Detection of flow interruption conditions at least ten minutes prior to pressure-based occlusion alarms by identifying the initial entry of air into the line rather than waiting for back-pressure accumulation.",
+    "falsification_test": "Operate the retrofitted sensor on a test rig with controlled air bubble injection rates; if the sensor fails to trigger an alarm before the standard pressure sensor reaches its occlusion threshold under slow-leak conditions, the mechanism is insufficient.",
+    "mechanism_source_span": "The device employs an infrared-based sensing approach to continuously monitor tubing for the presence of air and for conditions consistent with end of infusion, such as depletion of the fluid source.",
+    "span_derivation": {
+     "n_shared": 11,
+     "shared_terms": [
+      "air",
+      "based",
+      "depletion",
+      "fluid",
+      "infrared",
+      "infusion",
+      "monitor",
+      "presence",
+      "sensing",
+      "source",
+      "tubing"
+     ],
+     "span_terms_n": 18,
+     "ratio": 0.611,
+     "underived": false,
+     "state": "MEASURED",
+     "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+    }
+   },
+   "span_underived": false,
+   "candidate_id": "cand:DIV:simplification:zai:9b9f0b99bbb8"
+  },
+  {
+   "angle": "multi_physics_hybrid",
+   "provider_id": "zai",
+   "status": "OK",
+   "model": "qwen/qwen3.5-plus:free",
+   "prompt_hash": "6287588fbf01d85f17113faf0e7d0be4a3ec6229d32c8f371c58d7b5f9769b8e",
+   "output_hash": "70a062509b616009b8f9ea6c3406d1e5790d1cabd46a952c9169851345a7a9cb",
+   "fields": {
+    "mechanism": "Infrared-based sensing to detect changes in tubing content (air vs. fluid) triggering automatic mechanical occlusion",
+    "intervention": "Retrofit an infrared emitter-detector pair onto the existing disposable tubing path of the infusion pump to monitor refractive index changes indicative of flow stagnation or micro-bubble accumulation prior to full occlusion, coupled with a low-force solenoid pinch valve that actuates automatically upon signal threshold breach to halt flow and trigger an early alarm.",
+    "expected_effect": "Detection of flow anomalies at least ten minutes before pressure-based systems register a full occlusion, preserving the disposable flow path via external clamping and reducing false alarms through continuous optical verification rather than transient pressure spikes.",
+    "falsification_test": "Operate the retrofitted pump with a gradually increasing downstream resistance simulating partial kinking; if the infrared sensor fails to trigger the mechanical occlusion and alarm before the standard pressure sensor activates, or if it triggers during normal pulsatile flow without resistance, the mechanism is falsified.",
+    "mechanism_source_span": "The device employs an infrared-based sensing approach to continuously monitor tubing for the presence of air and for conditions consistent with end of infusion, such as depletion of the fluid source.",
+    "span_derivation": {
+     "n_shared": 8,
+     "shared_terms": [
+      "air",
+      "based",
+      "fluid",
+      "infrared",
+      "infusion",
+      "monitor",
+      "sensing",
+      "tubing"
+     ],
+     "span_terms_n": 18,
+     "ratio": 0.444,
+     "underived": false,
+     "state": "MEASURED",
+     "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+    }
+   },
+   "span_underived": false,
+   "candidate_id": "cand:DIV:multi_physics_hybrid:zai:70a062509b61"
+  },
+  {
+   "angle": "constraint_first",
+   "provider_id": "zai",
+   "status": "OK",
+   "model": "qwen/qwen3.5-plus:free",
+   "prompt_hash": "7b5110fb92e9be55c4978ef2407a72ce6b25e7f9df0367ad08b3846122e6ab9e",
+   "output_hash": "1ffc0497b9dce6584d79059feb3f1e48f1f08bf20e1f095495b94ca897541933",
+   "fields": {
+    "mechanism": "Infrared-based sensing to detect changes in tubing content (air vs. fluid) triggering automatic mechanical occlusion.",
+    "intervention": "Retrofit an infrared sensor array onto the existing disposable tubing path of the infusion pump to monitor for flow cessation signatures (analogous to air/fluid transitions) and couple it to a low-cost solenoid pinch valve that mechanically occludes the line upstream of the patient upon detection, bypassing the pump's internal pressure-delay logic.",
+    "expected_effect": "Detection of flow stoppage conditions within seconds of occurrence rather than waiting for pressure buildup, providing alarm activation at least ten minutes earlier than current pressure-based systems while maintaining a sterile disposable path and reducing false alarms caused by transient pressure spikes.",
+    "falsification_test": "Install the retrofit on a test rig with a controlled downstream occlusion; measure the time delta between physical occlusion and alarm activation compared to the baseline pump, verifying the retrofit triggers <60 seconds post-occlusion while the baseline takes >10 minutes, and run 1000 cycles with intentional pressure pulses to quantify false positive rates.",
+    "mechanism_source_span": "The device employs an infrared-based sensing approach to continuously monitor tubing for the presence of air and for conditions consistent with end of infusion, such as depletion of the fluid source.",
+    "span_derivation": {
+     "n_shared": 8,
+     "shared_terms": [
+      "air",
+      "based",
+      "fluid",
+      "infrared",
+      "infusion",
+      "monitor",
+      "sensing",
+      "tubing"
+     ],
+     "span_terms_n": 18,
+     "ratio": 0.444,
+     "underived": false,
+     "state": "MEASURED",
+     "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+    }
+   },
+   "span_underived": false,
+   "candidate_id": "cand:DIV:constraint_first:zai:1ffc0497b9dc"
+  }
+ ],
+ "built_at": "2026-09-15T02:37:07+00:00Z",
+ "usable_candidates": 5,
+ "status": "GRID_RUN",
+ "diversity_metrics": {
+  "candidates_measured": 5,
+  "mean_pairwise_token_distance": 0.611,
+  "distinct_mechanism_clusters": 4,
+  "cluster_sizes": [
+   2,
+   1,
+   1,
+   1
+  ],
+  "rewrite_pairs_jaccard_ge_0_8": [],
+  "architecture_term_count": 80,
+  "architecture_terms_sample": [
+   "accumulation",
+   "actuates",
+   "alarm",
+   "analogous",
+   "array",
+   "automatically",
+   "breach",
+   "bubble",
+   "buildup",
+   "bypassing",
+   "cessation",
+   "changes",
+   "column",
+   "continuity",
+   "continuously",
+   "cost",
+   "couple",
+   "coupled",
+   "deformation",
+   "delay",
+   "detecting",
+   "detection",
+   "detector",
+   "disposable"
+  ],
+  "failure_mode_signal_count": 3,
+  "failure_modes_invoked_sample": [
+   "check-valve seat wear opening reverse leakage",
+   "encrustation / mineral deposition",
+   "proximal occlusion by tissue ingrowth"
+  ],
+  "prior_art_query_set_count": 5,
+  "detected_domain": "fluidics_hydraulic"
+ },
+ "entry": {
+  "entry_helper_version": "stage_entry/1.1.0",
+  "stage": "EXPLORATION_GRID",
+  "entry_status": "ALLOWED",
+  "prerequisite": "VERIFIED_EVIDENCE",
+  "prerequisite_evidence": {
+   "n_verified_evidence_items": 13,
+   "n_direct_support": 4,
+   "n_partial_support": 9,
+   "n_items_total": 14,
+   "span_binding_verified": true,
+   "basis": ">=1 evidence item classified DIRECT_SUPPORT/PARTIAL_SUPPORT, or the candidate's span binding verified (R394 s5 classification + a2/verify)"
+  }
+ }
+}
