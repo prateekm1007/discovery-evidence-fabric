@@ -864,3 +864,26 @@ Round record: `R462/R462_ROUND_RECORD.json` (DELIVERY_BLOCKED —
 Art. LXXI §4: the HF_TOKEN credential was wiped by the environment
 reset; the push landed, the deploy could not).
 
+## R461-C2 addendum (2026-09-15) — the independent 5.5/10 audit executed: the product contracts closed
+
+Operator directive: execute the independent product audit (verdict NO,
+5.5/10, measured against 8827e2a). All in-scope P0/P1 blockers closed
+with live-measured production proof; zero scientific-authority changes.
+
+| Blocker | Fix | Measured |
+|---|---|---|
+| P0-1 no terminal fresh run | (already fixed upstream; re-proven) | API-path ts_a9d9c4389d2f COMPLETE 15/15; real-browser-path ts_a33eeb276dc2 COMPLETE 15/15 — the terminal snapshot survived two redeploys |
+| P0-2 action intent dropped | `buildActionParams` — the user's words ride as `params.direction`; the child conversation renders them from the canonical `user_directive` | act_859708979e4f: byte-for-byte in the child directive, verbatim on screen, survived interrupt→retry→two redeploys |
+| P0-3 share crashes client-side | the page rendered an ASSUMED shape (problem as a string) while the endpoint serves an OBJECT → React #31; now renders the real contract with `asText` guards, canonical outcome words, maturity first-line, "Read-only snapshot" lead | browser: 2,543 chars rendered, zero console/page errors |
+| P0-4 deploy parity | re-verified + 3× Art. LXXI GREEN deploys (1b91d737 / cc792979 / 3642d42e) | /api/version == ls-remote == HEAD each time; drift GREEN |
+| P0-5 recovery durability | REPRODUCED live (answered pause resurrected by a boot): PU records ride the durable payload; the worker LOADS the persisted record; snapshot at the answer moment + at the PU-merge checkpoint; `mark_unregistered_pending()` types the never-registered PENDING class within a 10-min grace | the measured-failure replay test green; the sweep MEASURED firing live (frozen 00:53:25 → typed 01:07:14) |
+| P1-6 mobile overflow | phone-width header compaction + 44px targets, no overflow-hiding | 390px: scrollWidth 390 == viewport; toggle 44×44 in-viewport |
+| P1-7 closed drawer focusable | React 19 `inert` + `aria-hidden` below 1180px (matchMedia-gated), Escape dismiss | closed: focus BLOCKED across 15 controls; open: interactive; both settled states measured |
+| P1-10 maturity raw enum | `presentMaturity()` — the boundary sentence is first-line, unknown labels fall back honest | browser: "Simulated — modelled, not physically validated" as the card's first line |
+
+Round record: `R461_C2/R461_C2_ROUND_RECORD.json` (Art. LXXI tuple GREEN
+at 3642d42e). Disclosures: worker-spawn flakiness (a5a7 class, 4/6
+pre-registration deaths) root-cause-blocked on the unconfigured
+ENGINE_OPERATOR_KEY (worker log operator-gated) — Art. LXV escalation;
+transport probe flapped honestly for ~20 min post-boot; retry-vs-create
+spawn asymmetry recorded.
