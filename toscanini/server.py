@@ -1457,6 +1457,46 @@ class Handler(BaseHTTPRequestHandler):
                 "bound_run": bound_run,
             })
 
+        # R471 (external audit P0-6): the URL/reference leg of the input
+        # model — POST /api/attachments/url {url, role} (before a run
+        # exists) and POST /api/run/{id}/attachments/url (in
+        # conversation). The engine fetches SSRF-guarded server-side and
+        # returns the SAME typed attachment custody as an upload; every
+        # failure is a typed record (blocked URL / fetch failure / empty
+        # content), never a fabricated success and never a 500.
+        if p.path == "/api/attachments/url" or (
+                len(parts) == 5 and parts[0] == "api"
+                and parts[1] == "run" and parts[3] == "attachments"
+                and parts[4] == "url"):
+            body = self._body_json()
+            url = str(body.get("url") or "").strip()
+            if not url:
+                return self._json(400, {"error": "url required"})
+            role = str(body.get("role") or "evidence")
+            bound_run = None
+            if len(parts) == 5 and parts[1] == "run":
+                if self._access(parts[2]) not in ("OWNER", "PUBLIC"):
+                    return self._denied()
+                if not store.get_session(parts[2]):
+                    return self._json(404, {"error": "run not found"})
+                bound_run = parts[2]
+            from toscanini import attachments as _att
+            rec = _att.save_url_attachment(self._owner_key_cached, url, role)
+            # the owner capability never echoes back (R459 discipline)
+            rec.pop("owner_key", None)
+            saved = [rec]
+            if bound_run and not rec.get("rejected"):
+                s = store.get_session(bound_run)
+                cur = list(s.get("attachment_ids") or [])
+                cur += [rec["attachment_id"]]
+                store.update_session(bound_run, attachment_ids=cur[:10])
+            return self._json(201, {
+                "attachments": saved,
+                "rejected": [r["attachment_id"] for r in saved
+                             if r.get("rejected")],
+                "bound_run": bound_run,
+            })
+
         # ---- R459 (audit P0-2): the conversational action endpoint ----
         # POST /api/run/{id}/actions {action, params} — the engine side
         # of the R458 contract (toscanini/actions.py). Accepted actions
@@ -1762,16 +1802,52 @@ class Handler(BaseHTTPRequestHandler):
         # failure recovery (CEO #8): re-enqueue an ERROR_* session through
         # the SAME serialized worker path. COMPLETE verdicts are NOT
         # retryable (append-only history — re-running is a new session).
+        # R471 (external audit P0-1/P0-2, measured live): two contract
+        # defects closed here.
+        # (a) THE RACE — the dead-worker sweeps ran only on /api/sessions
+        #     reads, so a retry arriving while the ledger still said
+        #     RUNNING (worker freshly dead, sweep not yet run) was
+        #     refused 409 against a stale row; the sweep later marked
+        #     INTERRUPTED and nobody retried. The audit measured exactly
+        #     this sequence. The same honest reconciliation now runs for
+        #     THIS session BEFORE the retryability decision.
+        # (b) THE BODY — an accepted retry now returns 202 with a typed
+        #     retry_id (an explicit state transition, never a bare
+        #     session view), and a refusal is a TYPED refusal — no
+        #     session-shaped body the client could mistake for the
+        #     retry result.
         if len(parts) == 4 and parts[0] == "api" and parts[1] == "sessions" \
                 and parts[3] == "retry":
             sid = parts[2]
             if self._access(sid) == "DENY":
                 return self._denied()
+            try:
+                store.mark_interrupted_sessions()
+                store.mark_stuck_sessions()
+                store.mark_unregistered_pending()
+            except Exception:  # noqa: BLE001 — reconcile is best-effort
+                pass
             result = store.retry_session(sid)
             if result is None:
                 return self._json(404, {"error": "session not found"})
-            if "error" in result:
-                return self._json(409, result)
+            # R471: THE AUDIT'S MEASURED ROOT CAUSE — the old check was
+            # `if "error" in result`, but a SUCCESSFUL retry_session
+            # returns the updated session dict whose own `error` field
+            # is None: key-present, value-None. Every accepted retry
+            # therefore answered 409 with the PENDING session body (the
+            # audit's "409 that looked like a pending session") AND
+            # returned before the spawn — no worker was ever started,
+            # so the run stayed interrupted. A refusal is a refusal
+            # only when it carries a real message.
+            if result.get("error"):
+                s_cur = store.get_session(sid) or {}
+                return self._json(409, {
+                    "refusal": "RETRY_NOT_PERMITTED",
+                    "error": result["error"],
+                    "session_id": sid,
+                    "session_status": s_cur.get("status"),
+                    "retryable": False,
+                })
             # R422 (directive 2 — the a5a7 retry path): the RETRY_REQUESTED
             # event is durably appended BEFORE the spawn. If the spawned
             # retry worker dies instantly (the observed a5a7 class: pid 3256,
@@ -1782,12 +1858,19 @@ class Handler(BaseHTTPRequestHandler):
                 _fxq = _wfx.attach_session(
                     sid, durable_root=_wfx.durable_root())
                 _fxq.event("RETRY_REQUESTED", origin="api",
+                           retry_id=result.get("retry_id"),
                            retry_attempts=result.get("retry_attempts"))
             except Exception:  # noqa: BLE001 — fail-open, never blocks
                 pass
             self._spawn_worker(sid)
             from toscanini.user_state import public_session_view
-            return self._json(200, public_session_view(result))
+            return self._json(202, {
+                "retry_id": result.get("retry_id"),
+                "session_id": sid,
+                "status": result.get("status"),
+                "retry_attempts": result.get("retry_attempts"),
+                "session": public_session_view(result),
+            })
 
         # R446-C1 directive §4: the clarification ANSWER path —
         # POST /api/run/{id}/answer {answer}. Only valid while the
@@ -1826,8 +1909,14 @@ class Handler(BaseHTTPRequestHandler):
             _ctx = _cm.record_conversation_context(s, answer, _cls)
             _guarded = _cm.guard_session_update({
                 "conversation": _ctx["conversation"],
+                # R471 (audit P0-5): the typed record is born with its
+                # provenance and is never emptied afterwards — the
+                # worker marks consumption in place (consumed_at), so
+                # the answer stays inspectable across reload/restart/
+                # retry.
                 "clarification_answer": {
-                    "field": field, "answer": answer[:2000]},
+                    "field": field, "answer": answer[:2000],
+                    "provenance": "USER_STATED"},
                 "clarification": {**q, "answered_at":
                                   time.strftime("%Y-%m-%dT%H:%M:%Z",
                                                 time.gmtime())},

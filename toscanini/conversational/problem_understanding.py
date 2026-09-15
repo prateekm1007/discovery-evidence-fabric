@@ -441,9 +441,24 @@ def apply_clarification_answer(pu: Dict[str, Any],
     conversation, so it is USER_STATED for that field — this is the
     ONLY conversation-derived path that may touch a PU field, and the
     PU is an input record, not canonical scientific state (the
-    distinction is enforced by conversation_memory.py)."""
+    distinction is enforced by conversation_memory.py).
+
+    R471 (external audit P0-5): the merge is IDEMPOTENT by content —
+    an identical (field, answer) already present in the PU's own
+    clarification_history is not re-applied. A retry re-enters the
+    worker's merge block (the session record keeps its typed answer
+    forever now), and a rebuild-without-record edge must be able to
+    re-apply; the history check is what keeps the record exact in both
+    worlds — no duplicate history entries, no double side effects."""
     if field not in DIRECTIVE_FIELDS:
         raise ValueError(f"not a Problem Understanding field: {field}")
+    _history = pu.get("clarification_history")
+    if isinstance(_history, list):
+        for _h in _history:
+            if isinstance(_h, dict) \
+                    and _h.get("field") == field \
+                    and _h.get("answer") == answer:
+                return pu  # already merged — idempotent no-op
     pu[field] = _field(answer, ORIGIN_USER_STATED,
                        "user clarification answer (conversation)")
     pu["unknowns"] = [u for u in pu.get("unknowns", [])

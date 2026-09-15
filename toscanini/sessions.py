@@ -596,11 +596,18 @@ def retry_session(session_id: str) -> Optional[Dict[str, Any]]:
                           "can re-enter the queue (completed verdicts are "
                           "append-only)")}
     attempts = int(s.get("retry_attempts") or 0) + 1
+    # R471 (external audit P0-2): an accepted retry is an explicit state
+    # transition with its own typed identity — the caller receives a
+    # retry_id it can quote, and the ledger records which retry took the
+    # session back to PENDING (the same provenance discipline as the
+    # action contract's action_id).
+    retry_id = f"rt_{uuid.uuid4().hex[:12]}"
     return update_session(
         session_id,
         status="PENDING",
         error=None,
         retry_attempts=attempts,
+        retry_id=retry_id,
         last_error=s.get("error"))
 
 

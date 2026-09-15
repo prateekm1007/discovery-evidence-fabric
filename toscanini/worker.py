@@ -600,7 +600,24 @@ def _run_inner(session_id: str, forensics) -> None:
                 and _answer.get("answer"):
             pu = _pu_mod.apply_clarification_answer(
                 pu, _answer["field"], _answer["answer"])
-            store.update_session(session_id, clarification_answer={})
+            # R471 (external audit P0-5, measured live): the typed answer
+            # record is NEVER emptied. The old one-shot write
+            # (clarification_answer={}) consumed the record, so every
+            # reload/restart/retry afterwards exposed an empty object —
+            # exactly what the auditor measured. Consumption is now
+            # MARKED IN PLACE (provenance + consumed_at + merge target),
+            # so the USER_STATED record survives the whole run lifecycle.
+            # The merge itself is idempotent (problem_understanding.py
+            # dedupes on field+answer), so a retry that re-enters this
+            # block cannot double-apply.
+            store.update_session(session_id, clarification_answer={
+                "field": _answer["field"],
+                "answer": _answer["answer"],
+                "provenance": "USER_STATED",
+                "consumed_at": time.strftime("%Y-%m-%dT%H:%M:%SZ",
+                                             time.gmtime()),
+                "merged_into": "problem_understanding_input",
+            })
         # R459 (audit P0-2): a conversational steering directive (from
         # the action contract) merges as USER_STATED context on the NEW
         # round's input record — the engine decides what it means

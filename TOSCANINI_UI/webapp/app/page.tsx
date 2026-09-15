@@ -37,6 +37,7 @@ import {
   askRun,
   createShare,
   diagnosticPackageUrl,
+  attachUrl,
   getCIO,
   getDossier,
   getEvents,
@@ -169,9 +170,12 @@ function NewDiscoveryPane({
   // R459 (audit P0-3): files upload the moment they are selected —
   // server-side extraction + content hash happen up front, so submit
   // can never hit a missing-capability wall.
+  // R471 (audit P0-6): a pasted URL reference rides the SAME pending
+  // queue — one canonical ingestion path, one honest chip per input.
   const [pending, setPending] = useState<
-    { file: File; state: "uploading" | "ingested" | "rejected"; record?: AttachmentUploadResult }[]
+    { key: string; label: string; file?: File; state: "uploading" | "ingested" | "rejected"; record?: AttachmentUploadResult }[]
   >([]);
+  const [urlValue, setUrlValue] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
   // drag-and-drop: a dropped file is the same as a selected file — it
@@ -207,6 +211,8 @@ function NewDiscoveryPane({
   async function onFiles(files: FileList | null) {
     if (!files || files.length === 0) return;
     const incoming = Array.from(files).map((file) => ({
+      key: `file-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      label: file.name,
       file,
       state: "uploading" as const,
     }));
@@ -216,7 +222,7 @@ function NewDiscoveryPane({
         const rec = await uploadAttachment(item.file);
         setPending((prev) =>
           prev.map((p) =>
-            p.file === item.file
+            p.key === item.key
               ? { ...p, state: rec.rejected ? "rejected" : "ingested", record: rec }
               : p
           )
@@ -224,7 +230,7 @@ function NewDiscoveryPane({
       } catch {
         setPending((prev) =>
           prev.map((p) =>
-            p.file === item.file
+            p.key === item.key
               ? {
                   ...p,
                   state: "rejected",
@@ -236,6 +242,46 @@ function NewDiscoveryPane({
           )
         );
       }
+    }
+  }
+
+  // R471 (audit P0-6): the URL leg — a pasted reference is fetched
+  // server-side (SSRF-guarded) and lands in the same pending queue;
+  // the chip states the typed verdict (read / stored / blocked+reason).
+  async function addUrl() {
+    const u = urlValue.trim();
+    if (!u) return;
+    setError(null);
+    setUrlValue("");
+    const item = {
+      key: `url-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      label: u,
+      state: "uploading" as const,
+    };
+    setPending((prev) => [...prev, item]);
+    try {
+      const rec = await attachUrl(u);
+      setPending((prev) =>
+        prev.map((p) =>
+          p.key === item.key
+            ? { ...p, state: rec.rejected ? "rejected" : "ingested", record: rec }
+            : p
+        )
+      );
+    } catch {
+      setPending((prev) =>
+        prev.map((p) =>
+          p.key === item.key
+            ? {
+                ...p,
+                state: "rejected",
+                record: { name: u, rejected: true,
+                          ingestion: { status: "FETCH_FAILED",
+                                       note: "the reference could not be delivered" } },
+              }
+            : p
+        )
+      );
     }
   }
 
@@ -262,6 +308,9 @@ function NewDiscoveryPane({
         <textarea
           autoFocus
           placeholder="What problem do you want to solve or invent?"
+          // R471 (audit P2-3): the placeholder is not an accessible name
+          // — the primary input gets an explicit label.
+          aria-label="Describe the problem you want to solve or invent"
           value={text}
           onChange={(e) => setText(e.target.value)}
           onKeyDown={(e) => {
@@ -292,10 +341,10 @@ function NewDiscoveryPane({
               return (
                 <span
                   className={`ask-attachment ${p.state === "rejected" ? "bad" : ""}`}
-                  key={`${p.file.name}-${i}`}
+                  key={p.key}
                   title={p.record?.ingestion?.note ?? (p.state === "uploading" ? "uploading…" : undefined)}
                 >
-                  {p.file.name}
+                  {p.label}
                   {p.state === "ingested" && ing === "TEXT_EXTRACTED" && (
                     <span className="faint">
                       {" · "}{p.record?.ingestion?.text_chars_total ?? 0} characters read
@@ -306,7 +355,7 @@ function NewDiscoveryPane({
                       {" · "}stored on the record{ing === "STORED_TEXT_UNREADABLE" ? " — no text could be read from it" : " — not read as text"}
                     </span>
                   )}
-                  {p.state === "uploading" && <span className="faint"> · uploading…</span>}
+                  {p.state === "uploading" && <span className="faint"> · fetching…</span>}
                   {p.state === "rejected" && (
                     <span className="faint">
                       {" · "}{p.record?.ingestion?.note ?? "could not be read"}
@@ -315,7 +364,7 @@ function NewDiscoveryPane({
                   <button
                     type="button"
                     className="ask-attachment-x"
-                    aria-label={`remove ${p.file.name}`}
+                    aria-label={`remove ${p.label}`}
                     onClick={() =>
                       setPending((prev) => prev.filter((_, j) => j !== i))
                     }
@@ -338,6 +387,7 @@ function NewDiscoveryPane({
               multiple
               accept={UPLOAD_ACCEPT}
               hidden
+              aria-label="Attach documents"
               onChange={(e) => {
                 void onFiles(e.target.files);
                 e.target.value = "";
@@ -361,13 +411,40 @@ function NewDiscoveryPane({
             </button>
           </div>
         </div>
+        {/* R471 (audit P0-6): the URL/reference leg of the input model —
+            fetched server-side, SSRF-guarded; the chip carries the typed
+            verdict. Enter here adds the reference instead of starting. */}
+        <div className="ask-urlrow">
+          <input
+            type="url"
+            className="ask-url"
+            placeholder="Paste a reference URL (optional) — fetched and read server-side"
+            aria-label="Reference URL"
+            value={urlValue}
+            onChange={(e) => setUrlValue(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                void addUrl();
+              }
+            }}
+          />
+          <button
+            type="button"
+            className="btn small ghost"
+            onClick={() => void addUrl()}
+            disabled={!urlValue.trim()}
+          >
+            + Add reference
+          </button>
+        </div>
         {/* R464 (audit P1-6): types and the size limit, said up front —
             the ingestion verdict on each chip stays the authority */}
         <div className="ask-files-hint faint">
-          Documents up to 20 MB. Text files and text PDFs are read
-          server-side; images, CAD, and archives are stored on the
-          record with a content hash — the chip under each attachment
-          says which happened.
+          Documents up to 20 MB, plus web references by URL. Text files,
+          text PDFs, and web pages are read server-side; images, CAD, and
+          archives are stored on the record with a content hash — the
+          chip under each input says which happened.
         </div>
       </div>
       {error && (
@@ -535,6 +612,12 @@ function WorkspaceInner() {
   // the contextual workspace surface (brief §12) — null = closed
   const [surface, setSurface] = useState<SurfaceId | null>(null);
   const [asks, setAsks] = useState<{ question: string; response: AskResponse }[]>([]);
+  // R471 (audit P0-2): the Resume action's honest outcome line — an
+  // accepted retry reloads into PENDING/RUNNING; a typed refusal is
+  // STATED here instead of silently doing nothing (the measured
+  // defect: the thrown error swallowed the reload and the UI froze on
+  // the interrupted card).
+  const [retryNote, setRetryNote] = useState<string | null>(null);
   // R459 (audit P1-3): the share flow — the backend endpoint existed;
   // the product surface now offers it.
   const [shareUrl, setShareUrl] = useState<string | null>(null);
@@ -923,7 +1006,28 @@ function WorkspaceInner() {
   function handleNext(next: NextAction) {
     if (!detail) return;
     if (next.kind === "retry") {
-      retryRun(detail.session_id).then(() => location.reload());
+      setRetryNote(null);
+      retryRun(detail.session_id)
+        .then((outcome) => {
+          if (outcome.ok) {
+            // the audit's acceptance: the UI refreshes and shows
+            // PENDING/RUNNING — the reload renders the new state.
+            location.reload();
+            return;
+          }
+          // a typed refusal is shown, never swallowed
+          setRetryNote(
+            outcome.refusal === "RETRY_NOT_PERMITTED"
+              ? `This run can't be resumed right now (its state is ${outcome.sessionStatus ?? "unknown"}). ${outcome.error ?? ""}`.trim()
+              : outcome.error ?? "The resume request was refused."
+          );
+        })
+        .catch(() => {
+          setRetryNote(
+            "The resume request could not be delivered — the run's state on the page will refresh with the truth."
+          );
+          location.reload();
+        });
       return;
     }
     if (next.kind === "package") {
@@ -1092,6 +1196,15 @@ function WorkspaceInner() {
                         This investigation continued in a new round →
                       </a>
                     )}
+                  </div>
+                )}
+                {/* R471 (audit P0-2): the Resume action's outcome is
+                    stated, never swallowed — an accepted retry reloads
+                    into the new state; a typed refusal or a delivery
+                    failure says exactly what happened. */}
+                {retryNote && (
+                  <div className="errbox" style={{ marginTop: 16 }} data-retry-note>
+                    {retryNote}
                   </div>
                 )}
                 <Conversation

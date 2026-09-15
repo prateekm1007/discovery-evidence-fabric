@@ -211,6 +211,26 @@ export async function uploadAttachment(
   return payload.attachments?.[0] ?? { rejected: true, name: file.name };
 }
 
+// R471 (external audit P0-6): the URL/reference leg of the input model.
+// A pasted web reference is fetched SERVER-SIDE (SSRF-guarded) and
+// returns the same typed attachment record as a file upload — the chip
+// states what the engine actually did (read N characters / stored /
+// blocked, with the reason).
+export async function attachUrl(url: string): Promise<AttachmentUploadResult> {
+  const res = await apiFetch("/api/attachments/url", {
+    method: "POST",
+    headers: JSON_HEADERS,
+    body: JSON.stringify({ url }),
+  });
+  if (res.status === 404 || res.status === 501) {
+    return { rejected: true, name: url,
+             ingestion: { status: "NOT_AVAILABLE",
+                          note: "the engine does not accept URL references yet" } };
+  }
+  const payload = await json<{ attachments?: AttachmentUploadResult[] }>(res);
+  return payload.attachments?.[0] ?? { rejected: true, name: url };
+}
+
 // R459 (audit P1-3): the share flow — the backend endpoints existed;
 // the product surface now uses them.
 export async function createShare(id: string): Promise<string | null> {
@@ -229,8 +249,43 @@ export async function getRunResult(id: string): Promise<SessionDetail> {
   return json<SessionDetail>(await apiFetch(`/api/run/${id}/result`));
 }
 
-export async function retryRun(id: string): Promise<unknown> {
-  return json(await apiFetch(`/api/sessions/${id}/retry`, { method: "POST" }));
+// R471 (external audit P0-2): the retry contract is now outcome-typed.
+// The engine returns 202 with a typed retry_id on acceptance and a
+// TYPED 409 refusal (no session-shaped body); a non-2xx is therefore a
+// RESULT here, not an exception — the old json() throw made the Resume
+// action a silent no-op on every refusal (the audit measured exactly
+// that: "retryRun() treats non-2xx as an exception"). Only a transport
+// failure (network) still throws, for the caller to catch.
+export interface RetryOutcome {
+  ok: boolean;
+  httpStatus: number;
+  retryId?: string;
+  sessionStatus?: string | null;
+  refusal?: string;
+  error?: string;
+}
+
+export async function retryRun(id: string): Promise<RetryOutcome> {
+  const res = await apiFetch(`/api/sessions/${id}/retry`, { method: "POST" });
+  let body: Record<string, unknown> = {};
+  try {
+    body = (await res.json()) as Record<string, unknown>;
+  } catch {
+    /* non-json body — the status code carries the contract */
+  }
+  return {
+    ok: res.ok,
+    httpStatus: res.status,
+    retryId: typeof body.retry_id === "string" ? body.retry_id : undefined,
+    sessionStatus:
+      typeof body.session_status === "string"
+        ? body.session_status
+        : typeof body.status === "string"
+          ? body.status
+          : null,
+    refusal: typeof body.refusal === "string" ? body.refusal : undefined,
+    error: typeof body.error === "string" ? body.error : undefined,
+  };
 }
 
 // R458-C2 (§4): the one-question clarification pause — the engine asked
