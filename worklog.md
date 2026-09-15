@@ -1538,3 +1538,25 @@ Stage Summary:
 - The R468-narrowed output-quality gap (the evidence-span citation contract) is CLOSED and measured on a fresh production run: the honest full-ladder kill is the design working, not a transport failure.
 - Open: candidate quality (the standing scientific mission); the account-level CI quota block (P0-3, operator-side); Task B (repo slimming) deferred; the sibling session remains active in this workspace — fetch+rebase before every push.
 - reviewer_provenance=AI_REVIEW
+
+---
+Task ID: R470 (reconciled line)
+Agent: main (Super Z session — CTO per the operator's division-of-labor directive; Atria-Dawn-Preview = code/engineer)
+
+Task: Operator directive 2026-09-16 — "read your constition and read and fix the uploaded document" (the 2026-09-15 external re-audit, 7.0/10 at re-audit) + ten atria keys supplied (keys 4-10 new).
+
+Work Log:
+- Read the constitution (v2.5.0, Article LXXIII vault intact — all credentials retrieved with ZERO operator re-asks) and the full 602-line re-audit; extracted the remaining blockers (P0-1 citation contract, P0-5 steering power+semantics, P1-1/3/5/7, the P2 items).
+- KEYS: probe-before-record on all seven new keys (R470/PROBE_ATRIA_KEYS4TO10.json): keys 4,5,6,7,9,10 catalog-200 VALID; ATRIA_API_KEY_8 a DETERMINISTIC 401 x3 on models AND 401 'Invalid API key.' on completions — typed INVALID, ring-excluded. Vault extended; Space surface re-asserted with vault values (22 names, zero absent).
+- THE RING: 9 valid slots registered; rotate_key fixed to start from the actually-active slot (the stale-default double-spend bug). 16 NEW keyring tests.
+- P0-1 THE VERIFIER-ASSIST (this line's unique deliverable): a2/verify.py rewritten — cited-source-only verification (the misattribution pure gate), deterministic longest-verbatim-overlap assist (>= 80 chars, rebind recorded), LLM-quote assist hard-checked verbatim, terminal-punctuation tolerance, full provenance. 19 NEW adversarial contracts. Atria engineered the first draft under CTO spec (14091 tokens); CTO corrections on the record.
+- P0-5: implemented power (spawn exclusion + prompt block) + semantics (typed directive_compliance) on this line; the P1/P2 UI items (kill prose, touch targets, exemplar note, live suffix, fast-fail, 16px inputs, clarification examples).
+- PARALLEL-LINE RECONCILIATION: the sibling R470-C2 had pushed the same round's items; rebased onto 590b71bb with the R469 precedent — their steering chain + shared compliance instrument + kill-prose authority taken canonical (this line's duplicates dropped per Art. X); this line's ring-validity verdict, verifier-assist, and unique P2 items kept. The sibling's ten-slot registration corrected to nine (the measured 401 outranks name-presence, Art. III).
+- Tests on the reconciled tree: 45 NEW (this line) + the sibling's suites green + standing batteries 190 passed zero new failures + webapp 132/132 + tsc + build + inventory 124/62058 no drift + pre-commit PASS.
+- Pushed the union (3b229801 code + records); deployed; ART. LXXI TUPLE GREEN at the final head e7397192 (ok=true, drift=GREEN, identity_tamper=false, Constitution 2.5.0, atria HEALTHY post-run).
+- FRESH PRODUCTION MEASUREMENT (ts_09467bdfe6cd, grid-battery calendar-life): full 15-stage ladder; the CITATION CONTRACT DID NOT BLOCK (envelope_VERIFY.json: verified=true, SUPPORTED, span_extraction=PROPOSER_CITED — the mechanical prompt rules closed it at the claimant layer, the assist stood ready); the run died at the SCIENCE (obvious_combination: KILLED) — the audit's desired shape. 0 packages on the round's fresh runs; the yield acceptance now gated by candidate quality, not citation format.
+
+Stage Summary:
+- DELIVERED: the re-audit's open items closed on a reconciled tree (both parallel lines' work united), the nine-key probe-validated ring live on production, the Art. LXXI tuple GREEN at e7397192, and the fresh production measurement proving the citation contract closed end-to-end.
+- The P0-5 semantics leg carries the sibling's live n=1 proof (MOVED_BUT_IN_TERRITORY at 0.931 overlap — the string-inequality false-success is dead).
+- OPEN: the yield acceptance (candidate quality vs the challenge's obvious-combination kill), key-8 re-supply, CI (account-side), ask latency.
