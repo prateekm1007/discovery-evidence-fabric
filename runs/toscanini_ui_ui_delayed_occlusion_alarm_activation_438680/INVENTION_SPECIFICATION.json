@@ -30,8 +30,8 @@
  },
  "mechanism": {
   "value": {
-   "mechanism": "Continuous monitoring to detect when the actual variation in the pressure exceeded a threshold of 2 standard deviations (SD) above the baseline pressure, constrained by correlating the pressures of multiple pumps to detect the presence of a shared occlusion.",
-   "intervention": "Implement a firmware algorithm in the retrofit module that continuously monitored whether the actual variation in the pressure exceeded a threshold of 2 standard deviations (SD) above the baseline pressure, and when a pump detected an occlusion using the SD algorithm, a third algorithm correlated the pressures of multiple pumps to detect the presence of a shared occlusion, replacing static threshold logic.",
+   "mechanism": "Continuous monitoring to detect when the actual variation in the pressure exceeded a threshold of 2 standard deviations (SD) above the baseline pressure, constrained by correlating the pressures of multiple pumps to detect the presence of a shared occlusion. [TECHNICAL MUTATION: The co-occlusion detection logic now initiates correlation analysis using pressure trends from exactly two pumps instead of a higher unspecified number.] [TECHNICAL MUTATION: The co-occlusion detection logic now initiates correlation analysis using pressure trends from exactly three pumps instead of two to improve signal-to-noise ratio.]",
+   "intervention": "Implement a firmware algorithm in the retrofit module that continuously monitored whether the actual variation in the pressure exceeded a threshold of 2 standard deviations (SD) above the baseline pressure, and when a pump detected an occlusion using the SD algorithm, a third algorithm correlated the pressures of multiple pumps to detect the presence of a shared occlusion, replacing static threshold logic. [TECHNICAL MUTATION: The firmware algorithm is updated to trigger the shared occlusion correlation routine immediately when any pair of pumps exhibits synchronized pressure deviations, reducing the sample collection window.] [TECHNICAL MUTATION: The firmware algorithm is updated to require concurrent pressure trend correlation across three pumps before triggering the shared occlusion alarm, replacing the previous two-pump requirement.]",
    "expected_effect": "Detection of downstream occlusions at least ten minutes prior to conventional 400 mmHg threshold alarms, particularly at low flow rates, while minimizing false alarms caused by transient pressure spikes that do not exhibit sustained statistical deviation or shared correlation across multiple pumps.",
    "mechanism_source_span": "The second algorithm continuously monitored whether the actual variation in the pressure exceeded a threshold of 2 standard deviations (SD) above the baseline pressure. When a pump detected an occlusion using the SD algorithm, a third algorithm correlated the pressures of multiple pumps to detect the presence of a shared occlusion.",
    "span_derivation": {
@@ -269,7 +269,7 @@
  },
  "distinguishing_features": {
   "value": {
-   "intervention": "Implement a firmware algorithm in the retrofit module that continuously monitored whether the actual variation in the pressure exceeded a threshold of 2 standard deviations (SD) above the baseline pressure, and when a pump detected an occlusion using the SD algorithm, a third algorithm correlated the pressures of multiple pumps to detect the presence of a shared occlusion, replacing static threshold logic.",
+   "intervention": "Implement a firmware algorithm in the retrofit module that continuously monitored whether the actual variation in the pressure exceeded a threshold of 2 standard deviations (SD) above the baseline pressure, and when a pump detected an occlusion using the SD algorithm, a third algorithm correlated the pressures of multiple pumps to detect the presence of a shared occlusion, replacing static threshold logic. [TECHNICAL MUTATION: The firmware algorithm is updated to trigger the shared occlusion correlation routine immediately when any pair of pumps exhibits synchronized pressure deviations, reducing the sample collection window.] [TECHNICAL MUTATION: The firmware algorithm is updated to require concurrent pressure trend correlation across three pumps before triggering the shared occlusion alarm, replacing the previous two-pump requirement.]",
    "vs_nearest_prior_art": [],
    "surviving_differentiators": null,
    "note": "R376: nearest entries are mechanism-relevant family representatives with per-family coverage and evidence tier; differences below the term-overlap thresholds are recorded, not claim-charted (Art. XXVIII)"
@@ -1732,5 +1732,618 @@
    }
   ]
  },
- "_spec_hash": "5e11853b00757de6ed7350e7c2c58bc077600726b532d028458feb5c03a83508"
+ "technical_state": {
+  "value": {
+   "version": "1.0.0",
+   "objects": [
+    {
+     "object_id": "OBJ1",
+     "name": "Retrofit Module",
+     "role": "Houses firmware algorithm for pressure monitoring and occlusion detection"
+    },
+    {
+     "object_id": "OBJ2",
+     "name": "Pressure Sensor",
+     "role": "Measures pressure in the IV line for each pump"
+    },
+    {
+     "object_id": "OBJ3",
+     "name": "Firmware Algorithm",
+     "role": "Implements SD-based occlusion detection and multi-pump correlation logic"
+    },
+    {
+     "object_id": "OBJ4",
+     "name": "Disposable Flow Path",
+     "role": "IV tubing and connectors that must be preserved unchanged"
+    }
+   ],
+   "parameters": [
+    {
+     "param_id": "P1",
+     "name": "Baseline Pressure",
+     "category": "OPERATING_CONDITIONS",
+     "unit": "mmHg",
+     "value": null,
+     "value_class": "UNKNOWN",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": null,
+     "range_max": null,
+     "range_span": null,
+     "range_evidence_id": null,
+     "range_class": "UNKNOWN",
+     "role": "Reference pressure for calculating deviation",
+     "is_design_variable": true
+    },
+    {
+     "param_id": "P2",
+     "name": "Pressure Variation Threshold",
+     "category": "PARAMETERS",
+     "unit": "SD",
+     "value": null,
+     "value_class": "UNKNOWN",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": null,
+     "range_max": null,
+     "range_span": null,
+     "range_evidence_id": null,
+     "range_class": "UNKNOWN",
+     "role": "Statistical threshold for triggering occlusion detection",
+     "is_design_variable": false
+    },
+    {
+     "param_id": "P3",
+     "name": "Flow Rate",
+     "category": "OPERATING_CONDITIONS",
+     "unit": "ml/h",
+     "value": null,
+     "value_class": "UNKNOWN",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": null,
+     "range_max": null,
+     "range_span": "rates of 1, 2, 4, 8, 16, and 32 ml/h",
+     "range_evidence_id": "10.1186/s12911-021-01668-7",
+     "range_class": "UNKNOWN",
+     "role": "Infusion rate affecting pressure dynamics and alarm delay",
+     "is_design_variable": true
+    },
+    {
+     "param_id": "P4",
+     "name": "Conventional Occlusion Alarm Threshold",
+     "category": "PARAMETERS",
+     "unit": "mmHg",
+     "value": null,
+     "value_class": "UNKNOWN",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": null,
+     "range_max": null,
+     "range_span": null,
+     "range_evidence_id": null,
+     "range_class": "UNKNOWN",
+     "role": "Static pressure threshold for comparison",
+     "is_design_variable": true
+    },
+    {
+     "param_id": "P5",
+     "name": "Alarm Delay",
+     "category": "PARAMETERS",
+     "unit": "minutes",
+     "value": null,
+     "value_class": "UNKNOWN",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": null,
+     "range_max": null,
+     "range_span": null,
+     "range_evidence_id": null,
+     "range_class": "UNKNOWN",
+     "role": "Time from occlusion onset to alarm activation",
+     "is_design_variable": false
+    },
+    {
+     "param_id": "P6",
+     "name": "Number of Pumps",
+     "category": "PARAMETERS",
+     "unit": null,
+     "value": 3.0,
+     "value_class": "MODELLED",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": 2.0,
+     "range_max": null,
+     "range_span": null,
+     "range_evidence_id": null,
+     "range_class": "MODELLED",
+     "role": "Multiple pumps for correlation-based shared occlusion detection",
+     "is_design_variable": true,
+     "mutation_history": [
+      {
+       "from": null,
+       "to": 2.0,
+       "from_class": "UNKNOWN",
+       "to_class": "MODELLED",
+       "mutation_id": "tmut:451f23e86df4"
+      },
+      {
+       "from": 2.0,
+       "to": 3.0,
+       "from_class": "MODELLED",
+       "to_class": "MODELLED",
+       "mutation_id": "tmut:f521b42d65a4"
+      }
+     ]
+    }
+   ],
+   "constraints": [],
+   "objectives": [
+    {
+     "objective_id": "O1",
+     "target": "P5",
+     "direction": "MINIMIZE",
+     "basis": "Reduce alarm delay to detect downstream occlusions earlier than conventional 400 mmHg threshold alarms"
+    },
+    {
+     "objective_id": "O2",
+     "target": "P2",
+     "direction": "MAINTAIN_WITHIN",
+     "basis": "Minimize false alarms by using statistical deviation threshold instead of static pressure threshold"
+    }
+   ],
+   "failure_modes": [
+    {
+     "mode_id": "FM1",
+     "name": "Delayed Occlusion Alarm Activation",
+     "problem_link": "Conventional static threshold alarms activate too slowly at low flow rates, allowing prolonged occlusion"
+    },
+    {
+     "mode_id": "FM2",
+     "name": "False Alarm from Transient Pressure Spikes",
+     "problem_link": "Static thresholds may trigger on non-sustained pressure variations not indicative of true occlusion"
+    }
+   ],
+   "dependencies": [
+    {
+     "relation_id": "D1",
+     "cause": "P2",
+     "effect": "P5",
+     "direction": "DECREASES",
+     "statement": "Lower statistical deviation threshold enables earlier detection of pressure rise, reducing alarm delay",
+     "relation_class": "MODELLED",
+     "span": null,
+     "evidence_id": null
+    },
+    {
+     "relation_id": "D3",
+     "cause": "P6",
+     "effect": "P2",
+     "direction": "DECREASES",
+     "statement": "Correlation across multiple pumps reduces false alarms by confirming shared occlusion pattern, allowing tighter statistical threshold",
+     "relation_class": "MODELLED",
+     "span": null,
+     "evidence_id": null
+    }
+   ],
+   "extraction": {
+    "proposal_id": "tsp:a9f30d22a80d",
+    "provider": "bai",
+    "model": "mimo-v2.5",
+    "prompt_hash": "b6c92537be6876560d2b18f6d944e8a40152ded9ae225525c349faa1074386c1",
+    "output_hash": "8149c4aec3e00a4e21d434d52cf4de2c7c0b8ef641a21d8f1de69d6be9d9de68",
+    "llm_is_untrusted_proposer": true,
+    "validator": "technical_state_v1 (deterministic)",
+    "admitted_counts": {
+     "parameters": 6,
+     "parameters_with_value": 0,
+     "parameters_extracted": 0,
+     "parameters_modelled": 0,
+     "parameters_with_envelope": 1,
+     "constraints": 0,
+     "objectives": 2,
+     "dependencies": 2,
+     "objects": 4,
+     "failure_modes": 2
+    },
+    "dropped_pieces": [
+     {
+      "kind": "parameter_value",
+      "id": "P2",
+      "gate": "P3",
+      "reason": "EXTRACTED value not proven by its span (evidence '10.1186/s12911-021-01668-7' not custodied) — value demoted to UNKNOWN, parameter kept"
+     },
+     {
+      "kind": "parameter_value",
+      "id": "P4",
+      "gate": "P3",
+      "reason": "EXTRACTED value not proven by its span (evidence '10.1186/s12911-021-01668-7' not custodied) — value demoted to UNKNOWN, parameter kept"
+     },
+     {
+      "kind": "constraint",
+      "id": "C1",
+      "gate": "C2",
+      "reason": "EXTRACTED limit: evidence '10.1186/s12911-021-01668-7' not custodied"
+     },
+     {
+      "kind": "constraint",
+      "id": "C2",
+      "gate": "C2",
+      "reason": "EXTRACTED limit: evidence '10.1186/s12911-021-01668-7' not custodied"
+     },
+     {
+      "kind": "dependency",
+      "id": "D2",
+      "gate": "D2",
+      "reason": "EXTRACTED relation: evidence '10.1186/s12911-021-01668-7' not custodied"
+     }
+    ],
+    "extracted_at": "2026-09-15T02:42:58+00:00Z"
+   }
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "TECHNICAL_STATE_EXTRACTION",
+  "evidence_ids": [],
+  "note": "structured technical state (R379): mutated design variables carry their value class; predictions are model inferences, never measurements"
+ },
+ "_technical_improvement": {
+  "parent_spec_hash": "fc8c58bd72c9683e9dd036e2521c3bdb420d2cd873252e82e2860d9cba26d324",
+  "mutation": {
+   "chain": "ORIGINAL CANDIDATE -> TECHNICAL DIAGNOSIS -> TECHNICAL MUTATION -> NEW CANDIDATE",
+   "mutation_id": "tmut:f521b42d65a4",
+   "mutation_kind": "PARAMETER_CHANGE",
+   "layer": "TECHNICAL (R379 V2) — an actual design variable was changed, not the wording",
+   "diagnostic_trigger": {
+    "evaluator": "analytical_monotone_v1 (deterministic)",
+    "limiting_variable": "P6",
+    "improving_direction": "DECREASE",
+    "evaluation_computation_log": {
+     "evaluator_id": "analytical_monotone_v1",
+     "fidelity_tier": "STRUCTURED_CONSTRAINT",
+     "evidence_rank": 3,
+     "input_state_sha256": "abf225e06a5e80d32192f4e9bdacc43605e146439a2e4e7939e8cce3b586e1d9",
+     "conventions": [
+      {
+       "name": "ORDINAL_LEVERAGE_BY_PATH_LENGTH",
+       "epistemic_class": "ENGINEERING",
+       "justification": "with MONOTONE-only relations the evaluator cannot rank leverage by magnitude; it ranks by (1) fewest constraint blocks, (2) shortest causal path from the parameter to the objective target, (3) envelope provenance class (EXTRACTED beats MODELLED). This is a declared ordinal convention, not a measurement — recorded on every evaluation that uses it.",
+       "uncertainty": "ordinal only; magnitudes are UNKNOWN at this tier"
+      },
+      {
+       "name": "DIRECTIONAL_FAIL_CLOSED",
+       "epistemic_class": "ENGINEERING",
+       "justification": "a proposed change is constraint-BLOCKED when (a) the changed parameter's own numeric constraint would be violated at the proposed value, or (b) a relation-connected constraint target is already VIOLATED or value-UNKNOWN and the predicted direction moves it TOWARD its bound. Fail-closed on directional risk: an unknown-position target moving toward a bound is a blocked move, not an accepted one (Art. IV).",
+       "uncertainty": "direction-level only at this tier"
+      }
+     ],
+     "steps": [
+      "resolved objective P5 (MINIMIZE)",
+      "checked 0 constraint(s) numerically where values exist",
+      "propagated signs over 2 relation(s)",
+      "ranked 1 movable improving direction(s)"
+     ],
+     "computed_at": "2026-09-15T02:43:30+00:00Z",
+     "deterministic": true
+    }
+   },
+   "quantitative_diagnosis": {
+    "engaged": false,
+    "status": "UNQUANTIFIED",
+    "note": "no bound equation named a limiting variable"
+   },
+   "proposal_provenance": {
+    "proposal_id": "tmp:24b683d24a5d",
+    "provider": "xkiro",
+    "model": "qwen/qwen3.5-plus:free",
+    "prompt_hash": "03f3b18baa437d48ddd3219621871195045fcee076ac9c1ce4c8d8f43f794fe5",
+    "output_hash": "690eac9df4145a85734a19e4a6276f97973e7dd151ced7831b40721a601e6343",
+    "origin": "UNTRUSTED_LLM_PROPOSER",
+    "llm_is_untrusted_proposer": true
+   },
+   "validation": {
+    "valid": true,
+    "stage": "VALIDATION",
+    "mutation_kind": "PARAMETER_CHANGE",
+    "target_param": "P6",
+    "checks": {
+     "mutation_kind_valid": "PARAMETER_CHANGE",
+     "target_is_limiting_variable": "P6",
+     "target_exists": true,
+     "target_is_design_variable": true,
+     "kind_matches_category": true,
+     "envelope_declared": [
+      2.0,
+      null
+     ],
+     "direction_matches_evaluator": "DECREASE",
+     "new_value_numeric": 3.0,
+     "value_inside_envelope": "[2.0, None]",
+     "mutation_changes_value": true,
+     "value_class_declared": "MODELLED",
+     "spec_text_sync": "The co-occlusion detection logic now initiates correlation analysis using pressu | The firmware algorithm is updated to require concurrent pressure trend correlati",
+     "t10_geometry_gate": "no parametric model bound to this parameter — the state-level gates are decisive"
+    },
+    "reasons": [],
+    "validated_at": "2026-09-15T02:43:30+00:00Z"
+   },
+   "changed_variable": {
+    "param_id": "P6",
+    "name": "Number of Pumps",
+    "from_value": 2.0,
+    "to_value": 3.0,
+    "from_class": "MODELLED",
+    "to_class": "MODELLED",
+    "envelope": [
+     2.0,
+     null
+    ],
+    "envelope_class": "MODELLED"
+   },
+   "spec_text_delta": {
+    "mechanism": "The co-occlusion detection logic now initiates correlation analysis using pressure trends from exactly three pumps instead of two to improve signal-to-noise ratio.",
+    "intervention": "The firmware algorithm is updated to require concurrent pressure trend correlation across three pumps before triggering the shared occlusion alarm, replacing the previous two-pump requirement."
+   },
+   "cad_rebuild": null,
+   "inherited_negatives": {
+    "uncertainty_ids": [
+     "con:attack:weak_transfer",
+     "con:attack:obvious_combination",
+     "downstream occlusion detection infusion retrofit pump",
+     "downstream occlusion detection infusion retrofit pump",
+     "pressure statistical threshold continuous monitoring variation",
+     "pressure statistical threshold continuous monitoring variation",
+     "retrofit pressure threshold variation baseline alarm above deviation",
+     "retrofit pressure threshold variation baseline alarm above deviation",
+     "downstream detection minimizing deviation variation replacing",
+     "downstream detection minimizing deviation variation replacing",
+     "downstream occlusion detection occlusions infusion retrofit",
+     "downstream occlusion detection occlusions infusion retrofit"
+    ],
+    "collision_family_ids": [],
+    "source_errors": []
+   },
+   "parent_spec_hash": "fc8c58bd72c9683e9dd036e2521c3bdb420d2cd873252e82e2860d9cba26d324",
+   "reason": "Increasing the pump count from 2 to 3 enhances the statistical robustness of the correlation analysis, allowing for a lower detection threshold that reduces alarm delay (P5) without increasing false alarms.",
+   "applied_at": "2026-09-15T02:43:30+00:00Z"
+  },
+  "history": [
+   {
+    "chain": "ORIGINAL CANDIDATE -> TECHNICAL DIAGNOSIS -> TECHNICAL MUTATION -> NEW CANDIDATE",
+    "mutation_id": "tmut:451f23e86df4",
+    "mutation_kind": "PARAMETER_CHANGE",
+    "layer": "TECHNICAL (R379 V2) — an actual design variable was changed, not the wording",
+    "diagnostic_trigger": {
+     "evaluator": "analytical_monotone_v1 (deterministic)",
+     "limiting_variable": "P6",
+     "improving_direction": "DECREASE",
+     "evaluation_computation_log": {
+      "evaluator_id": "analytical_monotone_v1",
+      "fidelity_tier": "STRUCTURED_CONSTRAINT",
+      "evidence_rank": 3,
+      "input_state_sha256": "a26ccaa23f3c7696cd560b42993cb00d1f523bc84205bf1b2f0d5bcb7f05216f",
+      "conventions": [
+       {
+        "name": "ORDINAL_LEVERAGE_BY_PATH_LENGTH",
+        "epistemic_class": "ENGINEERING",
+        "justification": "with MONOTONE-only relations the evaluator cannot rank leverage by magnitude; it ranks by (1) fewest constraint blocks, (2) shortest causal path from the parameter to the objective target, (3) envelope provenance class (EXTRACTED beats MODELLED). This is a declared ordinal convention, not a measurement — recorded on every evaluation that uses it.",
+        "uncertainty": "ordinal only; magnitudes are UNKNOWN at this tier"
+       },
+       {
+        "name": "DIRECTIONAL_FAIL_CLOSED",
+        "epistemic_class": "ENGINEERING",
+        "justification": "a proposed change is constraint-BLOCKED when (a) the changed parameter's own numeric constraint would be violated at the proposed value, or (b) a relation-connected constraint target is already VIOLATED or value-UNKNOWN and the predicted direction moves it TOWARD its bound. Fail-closed on directional risk: an unknown-position target moving toward a bound is a blocked move, not an accepted one (Art. IV).",
+        "uncertainty": "direction-level only at this tier"
+       }
+      ],
+      "steps": [
+       "resolved objective P5 (MINIMIZE)",
+       "checked 0 constraint(s) numerically where values exist",
+       "propagated signs over 2 relation(s)",
+       "ranked 1 movable improving direction(s)"
+      ],
+      "computed_at": "2026-09-15T02:43:11+00:00Z",
+      "deterministic": true
+     }
+    },
+    "quantitative_diagnosis": {
+     "engaged": false,
+     "status": "UNQUANTIFIED",
+     "note": "no bound equation named a limiting variable"
+    },
+    "proposal_provenance": {
+     "proposal_id": "tmp:674c9fadb453",
+     "provider": "xkiro",
+     "model": "qwen/qwen3.5-plus:free",
+     "prompt_hash": "72a6391956801bebbcce22d2be53cc3a7121caed751c4df882136eb02c92199e",
+     "output_hash": "2b42526569456234368c0ce609a64fe2779f1e20b8b2b50c3ad71b692a134bb8",
+     "origin": "UNTRUSTED_LLM_PROPOSER",
+     "llm_is_untrusted_proposer": true
+    },
+    "validation": {
+     "valid": true,
+     "stage": "VALIDATION",
+     "mutation_kind": "PARAMETER_CHANGE",
+     "target_param": "P6",
+     "checks": {
+      "mutation_kind_valid": "PARAMETER_CHANGE",
+      "target_is_limiting_variable": "P6",
+      "target_exists": true,
+      "target_is_design_variable": true,
+      "kind_matches_category": true,
+      "envelope_declared": [
+       2.0,
+       null
+      ],
+      "direction_matches_evaluator": "DECREASE",
+      "new_value_numeric": 2.0,
+      "value_inside_envelope": "[2.0, None]",
+      "mutation_changes_value": true,
+      "value_class_declared": "MODELLED",
+      "spec_text_sync": "The co-occlusion detection logic now initiates correlation analysis using pressu | The firmware algorithm is updated to trigger the shared occlusion correlation ro",
+      "t10_geometry_gate": "no parametric model bound to this parameter — the state-level gates are decisive"
+     },
+     "reasons": [],
+     "validated_at": "2026-09-15T02:43:11+00:00Z"
+    },
+    "changed_variable": {
+     "param_id": "P6",
+     "name": "Number of Pumps",
+     "from_value": null,
+     "to_value": 2.0,
+     "from_class": "UNKNOWN",
+     "to_class": "MODELLED",
+     "envelope": [
+      2.0,
+      null
+     ],
+     "envelope_class": "MODELLED"
+    },
+    "spec_text_delta": {
+     "mechanism": "The co-occlusion detection logic now initiates correlation analysis using pressure trends from exactly two pumps instead of a higher unspecified number.",
+     "intervention": "The firmware algorithm is updated to trigger the shared occlusion correlation routine immediately when any pair of pumps exhibits synchronized pressure deviations, reducing the sample collection window."
+    },
+    "cad_rebuild": null,
+    "inherited_negatives": {
+     "uncertainty_ids": [
+      "con:attack:weak_transfer",
+      "con:attack:obvious_combination",
+      "downstream occlusion detection infusion retrofit pump",
+      "downstream occlusion detection infusion retrofit pump",
+      "pressure statistical threshold continuous monitoring variation",
+      "pressure statistical threshold continuous monitoring variation",
+      "retrofit pressure threshold variation baseline alarm above deviation",
+      "retrofit pressure threshold variation baseline alarm above deviation",
+      "downstream detection minimizing deviation variation replacing",
+      "downstream detection minimizing deviation variation replacing",
+      "downstream occlusion detection occlusions infusion retrofit",
+      "downstream occlusion detection occlusions infusion retrofit"
+     ],
+     "collision_family_ids": [],
+     "source_errors": []
+    },
+    "parent_spec_hash": "1f65b5496b1f7a4aeac8191bfdbb986283ab93159fb25d6cb30b64201b45b1d4",
+    "reason": "Reducing the number of pumps required for correlation to the minimum envelope bound of 2.0 minimizes the data acquisition latency, thereby directly decreasing the time from occlusion onset to alarm activation (P5).",
+    "applied_at": "2026-09-15T02:43:11+00:00Z"
+   },
+   {
+    "chain": "ORIGINAL CANDIDATE -> TECHNICAL DIAGNOSIS -> TECHNICAL MUTATION -> NEW CANDIDATE",
+    "mutation_id": "tmut:f521b42d65a4",
+    "mutation_kind": "PARAMETER_CHANGE",
+    "layer": "TECHNICAL (R379 V2) — an actual design variable was changed, not the wording",
+    "diagnostic_trigger": {
+     "evaluator": "analytical_monotone_v1 (deterministic)",
+     "limiting_variable": "P6",
+     "improving_direction": "DECREASE",
+     "evaluation_computation_log": {
+      "evaluator_id": "analytical_monotone_v1",
+      "fidelity_tier": "STRUCTURED_CONSTRAINT",
+      "evidence_rank": 3,
+      "input_state_sha256": "abf225e06a5e80d32192f4e9bdacc43605e146439a2e4e7939e8cce3b586e1d9",
+      "conventions": [
+       {
+        "name": "ORDINAL_LEVERAGE_BY_PATH_LENGTH",
+        "epistemic_class": "ENGINEERING",
+        "justification": "with MONOTONE-only relations the evaluator cannot rank leverage by magnitude; it ranks by (1) fewest constraint blocks, (2) shortest causal path from the parameter to the objective target, (3) envelope provenance class (EXTRACTED beats MODELLED). This is a declared ordinal convention, not a measurement — recorded on every evaluation that uses it.",
+        "uncertainty": "ordinal only; magnitudes are UNKNOWN at this tier"
+       },
+       {
+        "name": "DIRECTIONAL_FAIL_CLOSED",
+        "epistemic_class": "ENGINEERING",
+        "justification": "a proposed change is constraint-BLOCKED when (a) the changed parameter's own numeric constraint would be violated at the proposed value, or (b) a relation-connected constraint target is already VIOLATED or value-UNKNOWN and the predicted direction moves it TOWARD its bound. Fail-closed on directional risk: an unknown-position target moving toward a bound is a blocked move, not an accepted one (Art. IV).",
+        "uncertainty": "direction-level only at this tier"
+       }
+      ],
+      "steps": [
+       "resolved objective P5 (MINIMIZE)",
+       "checked 0 constraint(s) numerically where values exist",
+       "propagated signs over 2 relation(s)",
+       "ranked 1 movable improving direction(s)"
+      ],
+      "computed_at": "2026-09-15T02:43:30+00:00Z",
+      "deterministic": true
+     }
+    },
+    "quantitative_diagnosis": {
+     "engaged": false,
+     "status": "UNQUANTIFIED",
+     "note": "no bound equation named a limiting variable"
+    },
+    "proposal_provenance": {
+     "proposal_id": "tmp:24b683d24a5d",
+     "provider": "xkiro",
+     "model": "qwen/qwen3.5-plus:free",
+     "prompt_hash": "03f3b18baa437d48ddd3219621871195045fcee076ac9c1ce4c8d8f43f794fe5",
+     "output_hash": "690eac9df4145a85734a19e4a6276f97973e7dd151ced7831b40721a601e6343",
+     "origin": "UNTRUSTED_LLM_PROPOSER",
+     "llm_is_untrusted_proposer": true
+    },
+    "validation": {
+     "valid": true,
+     "stage": "VALIDATION",
+     "mutation_kind": "PARAMETER_CHANGE",
+     "target_param": "P6",
+     "checks": {
+      "mutation_kind_valid": "PARAMETER_CHANGE",
+      "target_is_limiting_variable": "P6",
+      "target_exists": true,
+      "target_is_design_variable": true,
+      "kind_matches_category": true,
+      "envelope_declared": [
+       2.0,
+       null
+      ],
+      "direction_matches_evaluator": "DECREASE",
+      "new_value_numeric": 3.0,
+      "value_inside_envelope": "[2.0, None]",
+      "mutation_changes_value": true,
+      "value_class_declared": "MODELLED",
+      "spec_text_sync": "The co-occlusion detection logic now initiates correlation analysis using pressu | The firmware algorithm is updated to require concurrent pressure trend correlati",
+      "t10_geometry_gate": "no parametric model bound to this parameter — the state-level gates are decisive"
+     },
+     "reasons": [],
+     "validated_at": "2026-09-15T02:43:30+00:00Z"
+    },
+    "changed_variable": {
+     "param_id": "P6",
+     "name": "Number of Pumps",
+     "from_value": 2.0,
+     "to_value": 3.0,
+     "from_class": "MODELLED",
+     "to_class": "MODELLED",
+     "envelope": [
+      2.0,
+      null
+     ],
+     "envelope_class": "MODELLED"
+    },
+    "spec_text_delta": {
+     "mechanism": "The co-occlusion detection logic now initiates correlation analysis using pressure trends from exactly three pumps instead of two to improve signal-to-noise ratio.",
+     "intervention": "The firmware algorithm is updated to require concurrent pressure trend correlation across three pumps before triggering the shared occlusion alarm, replacing the previous two-pump requirement."
+    },
+    "cad_rebuild": null,
+    "inherited_negatives": {
+     "uncertainty_ids": [
+      "con:attack:weak_transfer",
+      "con:attack:obvious_combination",
+      "downstream occlusion detection infusion retrofit pump",
+      "downstream occlusion detection infusion retrofit pump",
+      "pressure statistical threshold continuous monitoring variation",
+      "pressure statistical threshold continuous monitoring variation",
+      "retrofit pressure threshold variation baseline alarm above deviation",
+      "retrofit pressure threshold variation baseline alarm above deviation",
+      "downstream detection minimizing deviation variation replacing",
+      "downstream detection minimizing deviation variation replacing",
+      "downstream occlusion detection occlusions infusion retrofit",
+      "downstream occlusion detection occlusions infusion retrofit"
+     ],
+     "collision_family_ids": [],
+     "source_errors": []
+    },
+    "parent_spec_hash": "fc8c58bd72c9683e9dd036e2521c3bdb420d2cd873252e82e2860d9cba26d324",
+    "reason": "Increasing the pump count from 2 to 3 enhances the statistical robustness of the correlation analysis, allowing for a lower detection threshold that reduces alarm delay (P5) without increasing false alarms.",
+    "applied_at": "2026-09-15T02:43:30+00:00Z"
+   }
+  ]
+ },
+ "_spec_hash": "ecd940b7443a82507e9b6ce69a63226713fcaa185e1bc3f2b1a00515452b63e5"
 }

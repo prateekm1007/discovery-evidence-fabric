@@ -12,6 +12,9 @@
   "phenomena_layer": {
    "fluidics_hydraulic": [
     "flow rate"
+   ],
+   "rf_wireless": [
+    "signal-to-noise"
    ]
   },
   "routing_layer": {
@@ -33,7 +36,7 @@
     ]
    }
   },
-  "why_selected": "domain fluidics_hydraulic selected by PHYSICAL PHENOMENA the invention's own text states: flow rate (1 phenomena anchor(s) vs 0 for the runner-up); routing keywords confirm but do not decide (CEO item 2: keywords route, never justify)",
+  "why_selected": "domain fluidics_hydraulic selected by PHYSICAL PHENOMENA the invention's own text states: flow rate (1 phenomena anchor(s) vs 1 for the runner-up); routing keywords confirm but do not decide (CEO item 2: keywords route, never justify)",
   "applicable_models": [
    "Poiseuille pressure-flow relation for laminar lumen flow",
    "orifice/restriction pressure drop",
@@ -58,7 +61,7 @@
   "canonical_family_basis": {
    "canonical_family": "biomedical",
    "label": "Biomedical & life-science systems",
-   "score": 48,
+   "score": 54,
    "min_form_score": 3,
    "score_table": [
     {
@@ -73,12 +76,12 @@
     },
     {
      "family": "fluid",
-     "score": 48,
+     "score": 54,
      "hits": [
       {
        "keyword": "pump",
        "weight": 6,
-       "count": 8
+       "count": 9
       }
      ]
     },
@@ -142,15 +145,15 @@
   ],
   "matched_in_text": true,
   "runner_up": {
-   "domain": "ml_data",
-   "phenomena_hits": 0,
-   "routing_hits": 2
+   "domain": "rf_wireless",
+   "phenomena_hits": 1,
+   "routing_hits": 0
   },
   "basis": "domain selected by the PHENOMENA layer (physical quantities/effects the domain's governing equations model) matched against THIS invention's own mechanism/problem text, with keyword routing as fallback/tiebreak — CEO item 2: keywords route, never justify; the layered evidence is recorded in domain_detection",
   "epistemic_class": "MODEL_DERIVED",
   "note": "1 phenomena anchor(s) + 2 routing signal(s); selection basis: PHENOMENA_DOMINANT",
   "selection_basis": "PHENOMENA_DOMINANT",
-  "why_selected": "domain fluidics_hydraulic selected by PHYSICAL PHENOMENA the invention's own text states: flow rate (1 phenomena anchor(s) vs 0 for the runner-up); routing keywords confirm but do not decide (CEO item 2: keywords route, never justify)",
+  "why_selected": "domain fluidics_hydraulic selected by PHYSICAL PHENOMENA the invention's own text states: flow rate (1 phenomena anchor(s) vs 1 for the runner-up); routing keywords confirm but do not decide (CEO item 2: keywords route, never justify)",
   "applicable_models": [
    "Poiseuille pressure-flow relation for laminar lumen flow",
    "orifice/restriction pressure drop",
@@ -203,11 +206,10 @@
   "equation_applicability_summary": {
    "applicable": [
     "FLUID-001",
+    "FLUID-002",
     "FLUID-003"
    ],
-   "conditional": [
-    "FLUID-002"
-   ],
+   "conditional": [],
    "rejected": []
   }
  },
@@ -349,7 +351,7 @@
   "materials science"
  ],
  "system_architecture": {
-  "description": "PROPOSED architecture (no physical system exists): flow path / lumen architecture; pressure regulation element; sensing / feedback element (if closed-loop); termination interfaces (application-context-specific: source and sink boundaries) — realizing: Implement a firmware algorithm in the retrofit module that continuously monitored whether the actual variation in the pressure exceeded a threshold of 2 standard deviations (SD) above the baseline pressure, and when a pump detected an occlusion using the SD algorithm, a third algorithm correlated the pressures of multiple pumps to detect the presence of a shared occlusion, replacing static threshold logic.",
+  "description": "PROPOSED architecture (no physical system exists): flow path / lumen architecture; pressure regulation element; sensing / feedback element (if closed-loop); termination interfaces (application-context-specific: source and sink boundaries) — realizing: Implement a firmware algorithm in the retrofit module that continuously monitored whether the actual variation in the pressure exceeded a threshold of 2 standard deviations (SD) above the baseline pressure, and when a pump detected an occlusion using the SD algorithm, a third algorithm correlated the pressures of multiple pumps to detect the presence of a shared occlusion, replacing static threshold logic. [TECHNICAL MUTATION: The firmware algorithm is updated to trigger the shared occlusion correlation routine immediately when any pair of pumps exhibits synchronized pressure deviations, reducing the sample collection window.] [TECHNICAL MUTATION: The firmware algorithm is updated to require concurrent pressure trend correlation across three pumps before triggering the shared occlusion alarm, replacing the previous two-pump requirement.]",
   "subsystems": [
    {
     "name": "flow path / lumen architecture",
@@ -359,19 +361,30 @@
      "invention_tied": true,
      "matched_tokens": [
       "above",
+      "across",
       "actual",
+      "alarm",
       "algorithm",
       "baseline",
+      "before",
+      "collection",
+      "concurrent",
       "continuous",
       "continuously",
       "correlated",
+      "correlation",
+      "current",
       "detect",
       "detected",
       "deviation",
       "deviations",
       "exceeded",
+      "exhibit",
+      "exhibits",
       "firmware",
+      "immediately",
       "implement",
+      "logic",
       "module",
       "monitored",
       "multiple",
@@ -379,14 +392,25 @@
       "presence",
       "pressure",
       "pressures",
+      "previous",
       "pumps",
+      "reducing",
       "replacing",
+      "require",
       "retrofit",
+      "routine",
+      "sample",
       "shared",
       "standard",
       "static",
+      "synchronized",
       "third",
+      "three",
       "threshold",
+      "trend",
+      "trigger",
+      "triggering",
+      "updated",
       "using",
       "variation",
       "whether"
@@ -401,19 +425,30 @@
      "invention_tied": true,
      "matched_tokens": [
       "above",
+      "across",
       "actual",
+      "alarm",
       "algorithm",
       "baseline",
+      "before",
+      "collection",
+      "concurrent",
       "continuous",
       "continuously",
       "correlated",
+      "correlation",
+      "current",
       "detect",
       "detected",
       "deviation",
       "deviations",
       "exceeded",
+      "exhibit",
+      "exhibits",
       "firmware",
+      "immediately",
       "implement",
+      "logic",
       "module",
       "monitored",
       "multiple",
@@ -421,14 +456,25 @@
       "presence",
       "pressure",
       "pressures",
+      "previous",
       "pumps",
+      "reducing",
       "replacing",
+      "require",
       "retrofit",
+      "routine",
+      "sample",
       "shared",
       "standard",
       "static",
+      "synchronized",
       "third",
+      "three",
       "threshold",
+      "trend",
+      "trigger",
+      "triggering",
+      "updated",
       "using",
       "variation",
       "whether"
@@ -443,19 +489,30 @@
      "invention_tied": true,
      "matched_tokens": [
       "above",
+      "across",
       "actual",
+      "alarm",
       "algorithm",
       "baseline",
+      "before",
+      "collection",
+      "concurrent",
       "continuous",
       "continuously",
       "correlated",
+      "correlation",
+      "current",
       "detect",
       "detected",
       "deviation",
       "deviations",
       "exceeded",
+      "exhibit",
+      "exhibits",
       "firmware",
+      "immediately",
       "implement",
+      "logic",
       "module",
       "monitored",
       "multiple",
@@ -463,14 +520,25 @@
       "presence",
       "pressure",
       "pressures",
+      "previous",
       "pumps",
+      "reducing",
       "replacing",
+      "require",
       "retrofit",
+      "routine",
+      "sample",
       "shared",
       "standard",
       "static",
+      "synchronized",
       "third",
+      "three",
       "threshold",
+      "trend",
+      "trigger",
+      "triggering",
+      "updated",
       "using",
       "variation",
       "whether"
@@ -485,20 +553,31 @@
      "invention_tied": true,
      "matched_tokens": [
       "above",
+      "across",
       "actual",
+      "alarm",
       "algorithm",
       "baseline",
+      "before",
+      "collection",
+      "concurrent",
       "context",
       "continuous",
       "continuously",
       "correlated",
+      "correlation",
+      "current",
       "detect",
       "detected",
       "deviation",
       "deviations",
       "exceeded",
+      "exhibit",
+      "exhibits",
       "firmware",
+      "immediately",
       "implement",
+      "logic",
       "module",
       "monitored",
       "multiple",
@@ -506,14 +585,25 @@
       "presence",
       "pressure",
       "pressures",
+      "previous",
       "pumps",
+      "reducing",
       "replacing",
+      "require",
       "retrofit",
+      "routine",
+      "sample",
       "shared",
       "standard",
       "static",
+      "synchronized",
       "third",
+      "three",
       "threshold",
+      "trend",
+      "trigger",
+      "triggering",
+      "updated",
       "using",
       "variation",
       "whether"
@@ -523,7 +613,7 @@
   ]
  },
  "mechanism_architecture": {
-  "physical_changes": "PROPOSED: Implement a firmware algorithm in the retrofit module that continuously monitored whether the actual variation in the pressure exceeded a threshold of 2 standard deviations (SD) above the baseline pressure, and when a pump detected an occlusion using the SD algorithm, a third algorithm correlated the pressures of multiple pumps to detect the presence of a shared occlusion, replacing static threshold logic.",
+  "physical_changes": "PROPOSED: Implement a firmware algorithm in the retrofit module that continuously monitored whether the actual variation in the pressure exceeded a threshold of 2 standard deviations (SD) above the baseline pressure, and when a pump detected an occlusion using the SD algorithm, a third algorithm correlated the pressures of multiple pumps to detect the presence of a shared occlusion, replacing static threshold logic. [TECHNICAL MUTATION: The firmware algorithm is updated to trigger the shared occlusion correlation routine immediately when any pair of pumps exhibits synchronized pressure deviations, reducing the sample collection window.] [TECHNICAL MUTATION: The firmware algorithm is updated to require concurrent pressure trend correlation across three pumps before triggering the shared occlusion alarm, replacing the previous two-pump requirement.]",
   "key_physics": "Fluid mechanics / hydraulics governing relations proposed for this invention; SYMBOLIC ONLY until inputs are sourced",
   "status": "MODELLED",
   "source_refs": [
@@ -548,7 +638,7 @@
   {
    "id": "DI-002",
    "input": "Mechanism driver (proposed)",
-   "value": "Continuous monitoring to detect when the actual variation in the pressure exceeded a threshold of 2 standard deviations (SD) above the baseline pressure, constrained by correlating the pressures of multiple pumps to detect the presence of a shared occlusion.",
+   "value": "Continuous monitoring to detect when the actual variation in the pressure exceeded a threshold of 2 standard deviations (SD) above the baseline pressure, constrained by correlating the pressures of multiple pumps to detect the presence of a shared occlusion. [TECHNICAL MUTATION: The co-occlusion detection logic now initiates correlation analysis using pressure trends from exactly two pumps instead of a higher unspecified number.] [TECHNICAL MUTATION: The co-occlusion detection logic now initiates correlation analysis using pressure trends from exactly three pumps instead of two to improve signal-to-noise ratio.]",
    "source": "MODELLED (LLM synthesis)",
    "evidence_class": "MODELLED",
    "parent_ids": [
@@ -573,7 +663,7 @@
   {
    "id": "DI-004",
    "input": "Domain design input pattern: required flow window at available pressure head",
-   "value": "invention applicability: TIED via tokens ['pressure']",
+   "value": "invention applicability: TIED via tokens ['pressure', 'require']",
    "source": "ENGINEERING_PROPOSED (domain registry pattern)",
    "evidence_class": "ENGINEERING_PROPOSED",
    "parent_ids": [
@@ -852,7 +942,7 @@
    "parent_ids": [
     "DI-002"
    ],
-   "description": "flow path / lumen architecture realizing Implement a firmware algorithm in the retrofit module that continuously monitored whether the actual variation in the pressure exceeded a threshold of 2 standard deviations (SD) above the baseline pressure, and when a pump detected an occlusion using the SD algorithm, a third algorithm correlated the pressures of multiple pumps to detect the presence of a shared occlusion, replacing static threshold logic.",
+   "description": "flow path / lumen architecture realizing Implement a firmware algorithm in the retrofit module that continuously monitored whether the actual variation in the pressure exceeded a threshold of 2 standard deviations (SD) above the baseline pressure, and when a pump detected an occlusion using the SD algorithm, a third algorithm correlated the pressures of multiple pumps to detect the presence of a shared occlusion, replacing static threshold logic. [TECHNICAL MUTATION: The firmware algorithm is updated to trigger the shared occlusion correlation routine immediately when any pair of pumps exhibits synchronized pressure deviations, reducing the sample collection window.] [TECHNICAL MUTATION: The firmware algorithm is updated to require concurrent pressure trend correlation across three pumps before triggering the shared occlusion alarm, replacing the previous two-pump requirement.]",
    "status": "CONCEPTUAL",
    "missing_inputs": [
     "detailed architecture definition"
@@ -863,21 +953,29 @@
     "invention_tied": true,
     "matched_tokens": [
      "above",
+     "across",
      "actual",
+     "alarm",
      "algorithm",
      "baseline",
+     "before",
+     "collection",
+     "concurrent",
      "continuous",
      "continuously",
      "correlated",
+     "correlation",
+     "current",
      "detect",
      "detected",
      "deviation",
      "deviations",
      "exceeded",
+     "exhibit",
+     "exhibits",
      "firmware",
-     "implement",
-     "module",
-     "monitored"
+     "immediately",
+     "implement"
     ]
    }
   },
@@ -888,7 +986,7 @@
     "DI-002",
     "DI-008"
    ],
-   "description": "pressure regulation element realizing Implement a firmware algorithm in the retrofit module that continuously monitored whether the actual variation in the pressure exceeded a threshold of 2 standard deviations (SD) above the baseline pressure, and when a pump detected an occlusion using the SD algorithm, a third algorithm correlated the pressures of multiple pumps to detect the presence of a shared occlusion, replacing static threshold logic.",
+   "description": "pressure regulation element realizing Implement a firmware algorithm in the retrofit module that continuously monitored whether the actual variation in the pressure exceeded a threshold of 2 standard deviations (SD) above the baseline pressure, and when a pump detected an occlusion using the SD algorithm, a third algorithm correlated the pressures of multiple pumps to detect the presence of a shared occlusion, replacing static threshold logic. [TECHNICAL MUTATION: The firmware algorithm is updated to trigger the shared occlusion correlation routine immediately when any pair of pumps exhibits synchronized pressure deviations, reducing the sample collection window.] [TECHNICAL MUTATION: The firmware algorithm is updated to require concurrent pressure trend correlation across three pumps before triggering the shared occlusion alarm, replacing the previous two-pump requirement.]",
    "status": "CONCEPTUAL",
    "missing_inputs": [
     "detailed architecture definition"
@@ -899,21 +997,29 @@
     "invention_tied": true,
     "matched_tokens": [
      "above",
+     "across",
      "actual",
+     "alarm",
      "algorithm",
      "baseline",
+     "before",
+     "collection",
+     "concurrent",
      "continuous",
      "continuously",
      "correlated",
+     "correlation",
+     "current",
      "detect",
      "detected",
      "deviation",
      "deviations",
      "exceeded",
+     "exhibit",
+     "exhibits",
      "firmware",
-     "implement",
-     "module",
-     "monitored"
+     "immediately",
+     "implement"
     ]
    }
   },
@@ -923,7 +1029,7 @@
    "parent_ids": [
     "DI-002"
    ],
-   "description": "sensing / feedback element (if closed-loop) realizing Implement a firmware algorithm in the retrofit module that continuously monitored whether the actual variation in the pressure exceeded a threshold of 2 standard deviations (SD) above the baseline pressure, and when a pump detected an occlusion using the SD algorithm, a third algorithm correlated the pressures of multiple pumps to detect the presence of a shared occlusion, replacing static threshold logic.",
+   "description": "sensing / feedback element (if closed-loop) realizing Implement a firmware algorithm in the retrofit module that continuously monitored whether the actual variation in the pressure exceeded a threshold of 2 standard deviations (SD) above the baseline pressure, and when a pump detected an occlusion using the SD algorithm, a third algorithm correlated the pressures of multiple pumps to detect the presence of a shared occlusion, replacing static threshold logic. [TECHNICAL MUTATION: The firmware algorithm is updated to trigger the shared occlusion correlation routine immediately when any pair of pumps exhibits synchronized pressure deviations, reducing the sample collection window.] [TECHNICAL MUTATION: The firmware algorithm is updated to require concurrent pressure trend correlation across three pumps before triggering the shared occlusion alarm, replacing the previous two-pump requirement.]",
    "status": "CONCEPTUAL",
    "missing_inputs": [
     "detailed architecture definition"
@@ -934,21 +1040,29 @@
     "invention_tied": true,
     "matched_tokens": [
      "above",
+     "across",
      "actual",
+     "alarm",
      "algorithm",
      "baseline",
+     "before",
+     "collection",
+     "concurrent",
      "continuous",
      "continuously",
      "correlated",
+     "correlation",
+     "current",
      "detect",
      "detected",
      "deviation",
      "deviations",
      "exceeded",
+     "exhibit",
+     "exhibits",
      "firmware",
-     "implement",
-     "module",
-     "monitored"
+     "immediately",
+     "implement"
     ]
    }
   },
@@ -958,7 +1072,7 @@
    "parent_ids": [
     "DI-002"
    ],
-   "description": "termination interfaces (application-context-specific: source and sink boundaries) realizing Implement a firmware algorithm in the retrofit module that continuously monitored whether the actual variation in the pressure exceeded a threshold of 2 standard deviations (SD) above the baseline pressure, and when a pump detected an occlusion using the SD algorithm, a third algorithm correlated the pressures of multiple pumps to detect the presence of a shared occlusion, replacing static threshold logic.",
+   "description": "termination interfaces (application-context-specific: source and sink boundaries) realizing Implement a firmware algorithm in the retrofit module that continuously monitored whether the actual variation in the pressure exceeded a threshold of 2 standard deviations (SD) above the baseline pressure, and when a pump detected an occlusion using the SD algorithm, a third algorithm correlated the pressures of multiple pumps to detect the presence of a shared occlusion, replacing static threshold logic. [TECHNICAL MUTATION: The firmware algorithm is updated to trigger the shared occlusion correlation routine immediately when any pair of pumps exhibits synchronized pressure deviations, reducing the sample collection window.] [TECHNICAL MUTATION: The firmware algorithm is updated to require concurrent pressure trend correlation across three pumps before triggering the shared occlusion alarm, replacing the previous two-pump requirement.]",
    "status": "CONCEPTUAL",
    "missing_inputs": [
     "detailed architecture definition"
@@ -969,22 +1083,30 @@
     "invention_tied": true,
     "matched_tokens": [
      "above",
+     "across",
      "actual",
+     "alarm",
      "algorithm",
      "baseline",
+     "before",
+     "collection",
+     "concurrent",
      "context",
      "continuous",
      "continuously",
      "correlated",
+     "correlation",
+     "current",
      "detect",
      "detected",
      "deviation",
      "deviations",
      "exceeded",
+     "exhibit",
+     "exhibits",
      "firmware",
-     "implement",
-     "module",
-     "monitored"
+     "immediately",
+     "implement"
     ]
    }
   },
@@ -997,7 +1119,7 @@
     "DI-002",
     "DI-008"
    ],
-   "description": "flow path / lumen architecture interfaces with pressure regulation element: signal/energy/material hand-off for Implement a firmware algorithm in the retrofit module that continuously monitored whether the actual variation in the pressure exceeded a threshold of 2 standard deviations (SD) above the baseline pressure, and when a pump detected an occlusion using the SD algorithm, a third algorithm correlated the pressures of multiple pumps to detect the presence of a shared occlusion, replacing static threshold logic.",
+   "description": "flow path / lumen architecture interfaces with pressure regulation element: signal/energy/material hand-off for Implement a firmware algorithm in the retrofit module that continuously monitored whether the actual variation in the pressure exceeded a threshold of 2 standard deviations (SD) above the baseline pressure, and when a pump detected an occlusion using the SD algorithm, a third algorithm correlated the pressures of multiple pumps to detect the presence of a shared occlusion, replacing static threshold logic. [TECHNICAL MUTATION: The firmware algorithm is updated to trigger the shared occlusion correlation routine immediately when any pair of pumps exhibits synchronized pressure deviations, reducing the sample collection window.] [TECHNICAL MUTATION: The firmware algorithm is updated to require concurrent pressure trend correlation across three pumps before triggering the shared occlusion alarm, replacing the previous two-pump requirement.]",
    "status": "CONCEPTUAL",
    "missing_inputs": [
     "interface quantification (dimensions, tolerances)"
@@ -1017,7 +1139,7 @@
     "DI-002",
     "DI-008"
    ],
-   "description": "pressure regulation element interfaces with sensing / feedback element (if closed-loop): signal/energy/material hand-off for Implement a firmware algorithm in the retrofit module that continuously monitored whether the actual variation in the pressure exceeded a threshold of 2 standard deviations (SD) above the baseline pressure, and when a pump detected an occlusion using the SD algorithm, a third algorithm correlated the pressures of multiple pumps to detect the presence of a shared occlusion, replacing static threshold logic.",
+   "description": "pressure regulation element interfaces with sensing / feedback element (if closed-loop): signal/energy/material hand-off for Implement a firmware algorithm in the retrofit module that continuously monitored whether the actual variation in the pressure exceeded a threshold of 2 standard deviations (SD) above the baseline pressure, and when a pump detected an occlusion using the SD algorithm, a third algorithm correlated the pressures of multiple pumps to detect the presence of a shared occlusion, replacing static threshold logic. [TECHNICAL MUTATION: The firmware algorithm is updated to trigger the shared occlusion correlation routine immediately when any pair of pumps exhibits synchronized pressure deviations, reducing the sample collection window.] [TECHNICAL MUTATION: The firmware algorithm is updated to require concurrent pressure trend correlation across three pumps before triggering the shared occlusion alarm, replacing the previous two-pump requirement.]",
    "status": "CONCEPTUAL",
    "missing_inputs": [
     "interface quantification (dimensions, tolerances)"
@@ -1036,7 +1158,7 @@
     "DO-004",
     "DI-002"
    ],
-   "description": "sensing / feedback element (if closed-loop) interfaces with termination interfaces (application-context-specific: source and sink boundaries): signal/energy/material hand-off for Implement a firmware algorithm in the retrofit module that continuously monitored whether the actual variation in the pressure exceeded a threshold of 2 standard deviations (SD) above the baseline pressure, and when a pump detected an occlusion using the SD algorithm, a third algorithm correlated the pressures of multiple pumps to detect the presence of a shared occlusion, replacing static threshold logic.",
+   "description": "sensing / feedback element (if closed-loop) interfaces with termination interfaces (application-context-specific: source and sink boundaries): signal/energy/material hand-off for Implement a firmware algorithm in the retrofit module that continuously monitored whether the actual variation in the pressure exceeded a threshold of 2 standard deviations (SD) above the baseline pressure, and when a pump detected an occlusion using the SD algorithm, a third algorithm correlated the pressures of multiple pumps to detect the presence of a shared occlusion, replacing static threshold logic. [TECHNICAL MUTATION: The firmware algorithm is updated to trigger the shared occlusion correlation routine immediately when any pair of pumps exhibits synchronized pressure deviations, reducing the sample collection window.] [TECHNICAL MUTATION: The firmware algorithm is updated to require concurrent pressure trend correlation across three pumps before triggering the shared occlusion alarm, replacing the previous two-pump requirement.]",
    "status": "CONCEPTUAL",
    "missing_inputs": [
     "interface quantification (dimensions, tolerances)"
@@ -1054,7 +1176,7 @@
     "DO-001",
     "DI-002"
    ],
-   "description": "Device boundaries: patient/fluid inlet and outlet terminations, external control/data port as required by Implement a firmware algorithm in the retrofit module that continuously monitored whether the actual variation in the pressure exceeded a threshold of 2 standard deviations (SD) above the baseline pressure, and when a pump detected an occlusion using the SD algorithm, a third algorithm correlated the pressures of multiple pumps to detect the presence of a shared occlusion, replacing static threshold logic.",
+   "description": "Device boundaries: patient/fluid inlet and outlet terminations, external control/data port as required by Implement a firmware algorithm in the retrofit module that continuously monitored whether the actual variation in the pressure exceeded a threshold of 2 standard deviations (SD) above the baseline pressure, and when a pump detected an occlusion using the SD algorithm, a third algorithm correlated the pressures of multiple pumps to detect the presence of a shared occlusion, replacing static threshold logic. [TECHNICAL MUTATION: The firmware algorithm is updated to trigger the shared occlusion correlation routine immediately when any pair of pumps exhibits synchronized pressure deviations, reducing the sample collection window.] [TECHNICAL MUTATION: The firmware algorithm is updated to require concurrent pressure trend correlation across three pumps before triggering the shared occlusion alarm, replacing the previous two-pump requirement.]",
    "status": "CONCEPTUAL",
    "missing_inputs": [
     "connector standards selection",
@@ -1080,7 +1202,7 @@
     "DI-002",
     "DI-004"
    ],
-   "description": "Flow/force/signal path geometry realizing the mechanism (Implement a firmware algorithm in the retrofit module that continuously monitored whether the actual variation in the pressure exceeded a threshold of 2 standard deviations (SD) above the baseline pressure, and when a pump detected an occlusion using the SD algorithm, a third algorithm correlated the pressures of multiple pumps to detect the presence of a shared occlusion, replacing static threshold logic.); every dimension is a named design decision with UNKNOWN value",
+   "description": "Flow/force/signal path geometry realizing the mechanism (Implement a firmware algorithm in the retrofit module that continuously monitored whether the actual variation in the pressure exceeded a threshold of 2 standard deviations (SD) above the baseline pressure, and when a pump detected an occlusion using the SD algorithm, a third algorithm correlated the pressures of multiple pumps to detect the presence of a shared occlusion, replacing static threshold logic. [TECHNICAL MUTATION: The firmware algorithm is updated to trigger the shared occlusion correlation routine immediately when any pair of pumps exhibits synchronized pressure deviations, reducing the sample collection window.] [TECHNICAL MUTATION: The firmware algorithm is updated to require concurrent pressure trend correlation across three pumps before triggering the shared occlusion alarm, replacing the previous two-pump requirement.]); every dimension is a named design decision with UNKNOWN value",
    "status": "UNKNOWN",
    "missing_inputs": [
     "all dimensions",
@@ -1355,14 +1477,17 @@
     "alarm",
     "alarms",
     "algorithm",
+    "analysis",
     "baseline",
     "before",
     "black",
     "causality",
     "caused",
     "circulatory",
+    "collection",
     "computational",
     "concerning",
+    "concurrent",
     "constrained",
     "context",
     "continuous",
@@ -1386,29 +1511,26 @@
     "engineering",
     "establishes",
     "event",
+    "exactly",
     "exceeded",
     "exhibit",
+    "exhibits",
     "false",
     "firmware",
     "framework",
+    "higher",
     "illustrative",
+    "immediately",
     "implement",
+    "improve",
     "incidence",
+    "initiates",
     "injury",
+    "instead",
     "insulin",
     "least",
     "liberation",
-    "limits",
-    "literature",
-    "malfunction",
-    "mechanistic",
-    "minimize",
-    "minimizing",
-    "minutes",
-    "modeling",
-    "module",
-    "monitored",
-    "monitoring"
+    "limits"
    ]
   },
   "contract": "CEO A7: CONCEPTUAL/PROPOSED/UNKNOWN vocabulary; no geometry invented"
@@ -1475,9 +1597,12 @@
      "alarm",
      "alarms",
      "algorithm",
+     "analysis",
      "baseline",
      "before",
      "caused",
+     "collection",
+     "concurrent",
      "constrained",
      "continuous",
      "continuously",
@@ -1485,6 +1610,7 @@
      "correlated",
      "correlating",
      "correlation",
+     "current",
      "detect",
      "detected",
      "detection",
@@ -1492,12 +1618,20 @@
      "deviations",
      "downstream",
      "engineering",
+     "exactly",
      "exceeded",
      "exhibit",
+     "exhibits",
      "false",
      "firmware",
+     "higher",
+     "immediately",
      "implement",
+     "improve",
+     "initiates",
+     "instead",
      "least",
+     "logic",
      "minimizing",
      "minutes",
      "module",
@@ -1510,19 +1644,32 @@
      "presence",
      "pressure",
      "pressures",
+     "previous",
      "prior",
      "pumps",
+     "reducing",
      "replacing",
+     "require",
      "retrofit",
+     "routine",
+     "sample",
      "shared",
      "spikes",
      "standard",
      "static",
      "statistical",
      "sustained",
+     "synchronized",
      "third",
+     "three",
      "threshold",
      "transient",
+     "trend",
+     "trends",
+     "trigger",
+     "triggering",
+     "unspecified",
+     "updated",
      "using",
      "variation",
      "whether"
@@ -1547,9 +1694,12 @@
      "alarm",
      "alarms",
      "algorithm",
+     "analysis",
      "baseline",
      "before",
      "caused",
+     "collection",
+     "concurrent",
      "constrained",
      "continuous",
      "continuously",
@@ -1557,18 +1707,27 @@
      "correlated",
      "correlating",
      "correlation",
+     "current",
      "detect",
      "detected",
      "detection",
      "deviation",
      "deviations",
      "downstream",
+     "exactly",
      "exceeded",
      "exhibit",
+     "exhibits",
      "false",
      "firmware",
+     "higher",
+     "immediately",
      "implement",
+     "improve",
+     "initiates",
+     "instead",
      "least",
+     "logic",
      "minimizing",
      "minutes",
      "module",
@@ -1581,19 +1740,32 @@
      "presence",
      "pressure",
      "pressures",
+     "previous",
      "prior",
      "pumps",
+     "reducing",
      "replacing",
+     "require",
      "retrofit",
+     "routine",
+     "sample",
      "shared",
      "spikes",
      "standard",
      "static",
      "statistical",
      "sustained",
+     "synchronized",
      "third",
+     "three",
      "threshold",
      "transient",
+     "trend",
+     "trends",
+     "trigger",
+     "triggering",
+     "unspecified",
+     "updated",
      "using",
      "variation",
      "whether"
@@ -1617,9 +1789,12 @@
       "alarm",
       "alarms",
       "algorithm",
+      "analysis",
       "baseline",
       "before",
       "caused",
+      "collection",
+      "concurrent",
       "constrained",
       "continuous",
       "continuously",
@@ -1627,18 +1802,27 @@
       "correlated",
       "correlating",
       "correlation",
+      "current",
       "detect",
       "detected",
       "detection",
       "deviation",
       "deviations",
       "downstream",
+      "exactly",
       "exceeded",
       "exhibit",
+      "exhibits",
       "false",
       "firmware",
+      "higher",
+      "immediately",
       "implement",
+      "improve",
+      "initiates",
+      "instead",
       "least",
+      "logic",
       "minimizing",
       "minutes",
       "module",
@@ -1651,19 +1835,32 @@
       "presence",
       "pressure",
       "pressures",
+      "previous",
       "prior",
       "pumps",
+      "reducing",
       "replacing",
+      "require",
       "retrofit",
+      "routine",
+      "sample",
       "shared",
       "spikes",
       "standard",
       "static",
       "statistical",
       "sustained",
+      "synchronized",
       "third",
+      "three",
       "threshold",
       "transient",
+      "trend",
+      "trends",
+      "trigger",
+      "triggering",
+      "unspecified",
+      "updated",
       "using",
       "variation",
       "whether"
@@ -1684,9 +1881,12 @@
       "alarm",
       "alarms",
       "algorithm",
+      "analysis",
       "baseline",
       "before",
       "caused",
+      "collection",
+      "concurrent",
       "constrained",
       "continuous",
       "continuously",
@@ -1694,18 +1894,27 @@
       "correlated",
       "correlating",
       "correlation",
+      "current",
       "detect",
       "detected",
       "detection",
       "deviation",
       "deviations",
       "downstream",
+      "exactly",
       "exceeded",
       "exhibit",
+      "exhibits",
       "false",
       "firmware",
+      "higher",
+      "immediately",
       "implement",
+      "improve",
+      "initiates",
+      "instead",
       "least",
+      "logic",
       "minimizing",
       "minutes",
       "module",
@@ -1718,19 +1927,32 @@
       "presence",
       "pressure",
       "pressures",
+      "previous",
       "prior",
       "pumps",
+      "reducing",
       "replacing",
+      "require",
       "retrofit",
+      "routine",
+      "sample",
       "shared",
       "spikes",
       "standard",
       "static",
       "statistical",
       "sustained",
+      "synchronized",
       "third",
+      "three",
       "threshold",
       "transient",
+      "trend",
+      "trends",
+      "trigger",
+      "triggering",
+      "unspecified",
+      "updated",
       "using",
       "variation",
       "whether"
@@ -1751,9 +1973,12 @@
       "alarm",
       "alarms",
       "algorithm",
+      "analysis",
       "baseline",
       "before",
       "caused",
+      "collection",
+      "concurrent",
       "constrained",
       "continuous",
       "continuously",
@@ -1761,18 +1986,27 @@
       "correlated",
       "correlating",
       "correlation",
+      "current",
       "detect",
       "detected",
       "detection",
       "deviation",
       "deviations",
       "downstream",
+      "exactly",
       "exceeded",
       "exhibit",
+      "exhibits",
       "false",
       "firmware",
+      "higher",
+      "immediately",
       "implement",
+      "improve",
+      "initiates",
+      "instead",
       "least",
+      "logic",
       "minimizing",
       "minutes",
       "module",
@@ -1785,19 +2019,32 @@
       "presence",
       "pressure",
       "pressures",
+      "previous",
       "prior",
       "pumps",
+      "reducing",
       "replacing",
+      "require",
       "retrofit",
+      "routine",
+      "sample",
       "shared",
       "spikes",
       "standard",
       "static",
       "statistical",
       "sustained",
+      "synchronized",
       "third",
+      "three",
       "threshold",
       "transient",
+      "trend",
+      "trends",
+      "trigger",
+      "triggering",
+      "unspecified",
+      "updated",
       "using",
       "variation",
       "whether"
@@ -1833,7 +2080,7 @@
   "interfaces": [
    {
     "id": "DO-008",
-    "description": "Device boundaries: patient/fluid inlet and outlet terminations, external control/data port as required by Implement a firmware algorithm in the retrofit module that continuously monitored whether the actual variation in the pressure exceeded a threshold of 2 standard deviations (SD) above the baseline pressure, and when a pump detected an occlusion using the SD algorithm, a third algorithm correlated the pressures of multiple pumps to detect the presence of a shared occlusion, replacing static threshold logic.",
+    "description": "Device boundaries: patient/fluid inlet and outlet terminations, external control/data port as required by Implement a firmware algorithm in the retrofit module that continuously monitored whether the actual variation in the pressure exceeded a threshold of 2 standard deviations (SD) above the baseline pressure, and when a pump detected an occlusion using the SD algorithm, a third algorithm correlated the pressures of multiple pumps to detect the presence of a shared occlusion, replacing static threshold logic. [TECHNICAL MUTATION: The firmware algorithm is updated to trigger the shared occlusion correlation routine immediately when any pair of pumps exhibits synchronized pressure deviations, reducing the sample collection window.] [TECHNICAL MUTATION: The firmware algorithm is updated to require concurrent pressure trend correlation across three pumps before triggering the shared occlusion alarm, replacing the previous two-pump requirement.]",
     "status": "CONCEPTUAL",
     "detail": [
      {
@@ -2155,11 +2402,13 @@
         "algorithm"
        ],
        "training_data": [
+        "sample",
         "baseline"
        ],
        "decision_rule": [
         "threshold",
-        "alarm"
+        "alarm",
+        "trigger"
        ],
        "posterior_probability": [
         "prior"
@@ -2215,20 +2464,33 @@
      ],
      "selection_rationale": {
       "epistemic_class": "MODEL_DERIVED",
-      "verdict": "CONDITIONAL",
-      "reason": "domain template justifies this relation for the domain, but the invention text does not yet engage its variables; applicability must be confirmed by the first characterization",
-      "engaged_variables": [],
-      "engagement_evidence": [],
+      "verdict": "APPLICABLE",
+      "reason": "invention mechanism engages the model variables: Re",
+      "engaged_variables": [
+       "Re"
+      ],
+      "engagement_evidence": [
+       {
+        "symbol": "Re",
+        "shared_concepts": [],
+        "matched_description_words": [
+         "number"
+        ],
+        "grounding": "legacy description-word match (no declared concepts on this variable)"
+       }
+      ],
       "mechanism_asserted_concepts": {
        "learned_model": [
         "algorithm"
        ],
        "training_data": [
+        "sample",
         "baseline"
        ],
        "decision_rule": [
         "threshold",
-        "alarm"
+        "alarm",
+        "trigger"
        ],
        "posterior_probability": [
         "prior"
@@ -2249,8 +2511,10 @@
      ],
      "invention_tie": {
       "linkage_kind": "applicability_judgment",
-      "verdict": "CONDITIONAL",
-      "engaged_variables": [],
+      "verdict": "APPLICABLE",
+      "engaged_variables": [
+       "Re"
+      ],
       "mechanism_mention_count": 0
      }
     },
@@ -2293,11 +2557,13 @@
         "algorithm"
        ],
        "training_data": [
+        "sample",
         "baseline"
        ],
        "decision_rule": [
         "threshold",
-        "alarm"
+        "alarm",
+        "trigger"
        ],
        "posterior_probability": [
         "prior"
@@ -2342,7 +2608,7 @@
     "canonical_family_basis": {
      "canonical_family": "biomedical",
      "label": "Biomedical & life-science systems",
-     "score": 48,
+     "score": 54,
      "min_form_score": 3,
      "score_table": [
       {
@@ -2357,12 +2623,12 @@
       },
       {
        "family": "fluid",
-       "score": 48,
+       "score": 54,
        "hits": [
         {
          "keyword": "pump",
          "weight": 6,
-         "count": 8
+         "count": 9
         }
        ]
       },
@@ -2426,15 +2692,15 @@
     ],
     "matched_in_text": true,
     "runner_up": {
-     "domain": "ml_data",
-     "phenomena_hits": 0,
-     "routing_hits": 2
+     "domain": "rf_wireless",
+     "phenomena_hits": 1,
+     "routing_hits": 0
     },
     "basis": "domain selected by the PHENOMENA layer (physical quantities/effects the domain's governing equations model) matched against THIS invention's own mechanism/problem text, with keyword routing as fallback/tiebreak — CEO item 2: keywords route, never justify; the layered evidence is recorded in domain_detection",
     "epistemic_class": "MODEL_DERIVED",
     "note": "1 phenomena anchor(s) + 2 routing signal(s); selection basis: PHENOMENA_DOMINANT",
     "selection_basis": "PHENOMENA_DOMINANT",
-    "why_selected": "domain fluidics_hydraulic selected by PHYSICAL PHENOMENA the invention's own text states: flow rate (1 phenomena anchor(s) vs 0 for the runner-up); routing keywords confirm but do not decide (CEO item 2: keywords route, never justify)",
+    "why_selected": "domain fluidics_hydraulic selected by PHYSICAL PHENOMENA the invention's own text states: flow rate (1 phenomena anchor(s) vs 1 for the runner-up); routing keywords confirm but do not decide (CEO item 2: keywords route, never justify)",
     "applicable_models": [
      "Poiseuille pressure-flow relation for laminar lumen flow",
      "orifice/restriction pressure drop",
@@ -2487,11 +2753,10 @@
     "equation_applicability_summary": {
      "applicable": [
       "FLUID-001",
+      "FLUID-002",
       "FLUID-003"
      ],
-     "conditional": [
-      "FLUID-002"
-     ],
+     "conditional": [],
      "rejected": []
     }
    },
@@ -2751,7 +3016,7 @@
     "unit": "mmHg",
     "value": 400.0,
     "value_status": "SOURCE_FACT",
-    "source": "problem statement span [2348, 2356]: '400 mmHg' ()",
+    "source": "problem statement span [3149, 3157]: '400 mmHg' ()",
     "source_hash": "d0823732f831961f9725129ae3f48a7264b6a0d26596f42ea61b994de592e9df",
     "derivation": "value read verbatim from the operator's own problem statement (the custodied SOURCE_FACT authority; exact span + sha256 — Art. II/XII)",
     "assumptions": [
@@ -2995,7 +3260,7 @@
   "external_precedent": "domain module Fluid mechanics / hydraulics; standards listed as candidates requiring applicability verification",
   "proposed_design": {
    "input": "preserve disposable flow path and minimize false alarms",
-   "mechanism": "Continuous monitoring to detect when the actual variation in the pressure exceeded a threshold of 2 standard deviations (SD) above the baseline pressure, constrained by correlating the pressures of multiple pumps to detect the presence of a shared occlusion.",
+   "mechanism": "Continuous monitoring to detect when the actual variation in the pressure exceeded a threshold of 2 standard deviations (SD) above the baseline pressure, constrained by correlating the pressures of multiple pumps to detect the presence of a shared occlusion. [TECHNICAL MUTATION: The co-occlusion detection logic now initiates correlation analysis using pressure trends from exactly two pumps instead of a higher unspecified number.] [TECHNICAL MUTATION: The co-occlusion detection logic now initiates correlation analysis using pressure trends from exactly three pumps instead of two to improve signal-to-noise ratio.]",
    "transformation": "Detection of downstream occlusions at least ten minutes prior to conventional 400 mmHg threshold alarms, particularly at low flow rates, while minimizing false alarms caused by transient pressure spikes that do not exhibit sustained statistical deviation or shared correlation across multiple pumps.",
    "output": "NOT ESTABLISHED (no measured output exists)",
    "component_architecture": "flow path / lumen architecture; pressure regulation element; sensing / feedback element (if closed-loop); termination interfaces (application-context-specific: source and sink boundaries)",
@@ -4027,7 +4292,7 @@
   "integrity": {
    "passed": true,
    "problems": [],
-   "checked_at": "2026-09-15T02:28:12+00:00Z"
+   "checked_at": "2026-09-15T02:43:30+00:00Z"
   },
   "gaps": [
    {
@@ -4297,47 +4562,47 @@
    {
     "id": "DO-001",
     "kind": "DESIGN_OUTPUT",
-    "label": "flow path / lumen architecture realizing Implement a firmware algorithm in the retrofit module that continuously monitored whether the actual variation in the pressure exceeded a threshold of 2 standard deviations (SD) above the baseline pressure, and when a pump detected an occlusion using the SD algorithm, a third algorithm correlated the pressures of multiple pumps to detect the presence of a shared occlusion, replacing static threshold logic."
+    "label": "flow path / lumen architecture realizing Implement a firmware algorithm in the retrofit module that continuously monitored whether the actual variation in the pressure exceeded a threshold of 2 standard deviations (SD) above the baseline pressure, and when a pump detected an occlusion using the SD algorithm, a third algorithm correlated the pressures of multiple pumps to detect the presence of a shared occlusion, replacing static threshold logic. [TECHNICAL MUTATION: The firmware algorithm is updated to trigger the shared occlusion correlation routine immediately when any pair of pumps exhibits synchronized pressure deviations, reducing the sample collection window.] [TECHNICAL MUTATION: The firmware algorithm is updated to require concurrent pressure trend correlation across three pumps before triggering the shared occlusion alarm, replacing the previous two-pump requirement.]"
    },
    {
     "id": "DO-002",
     "kind": "DESIGN_OUTPUT",
-    "label": "pressure regulation element realizing Implement a firmware algorithm in the retrofit module that continuously monitored whether the actual variation in the pressure exceeded a threshold of 2 standard deviations (SD) above the baseline pressure, and when a pump detected an occlusion using the SD algorithm, a third algorithm correlated the pressures of multiple pumps to detect the presence of a shared occlusion, replacing static threshold logic."
+    "label": "pressure regulation element realizing Implement a firmware algorithm in the retrofit module that continuously monitored whether the actual variation in the pressure exceeded a threshold of 2 standard deviations (SD) above the baseline pressure, and when a pump detected an occlusion using the SD algorithm, a third algorithm correlated the pressures of multiple pumps to detect the presence of a shared occlusion, replacing static threshold logic. [TECHNICAL MUTATION: The firmware algorithm is updated to trigger the shared occlusion correlation routine immediately when any pair of pumps exhibits synchronized pressure deviations, reducing the sample collection window.] [TECHNICAL MUTATION: The firmware algorithm is updated to require concurrent pressure trend correlation across three pumps before triggering the shared occlusion alarm, replacing the previous two-pump requirement.]"
    },
    {
     "id": "DO-003",
     "kind": "DESIGN_OUTPUT",
-    "label": "sensing / feedback element (if closed-loop) realizing Implement a firmware algorithm in the retrofit module that continuously monitored whether the actual variation in the pressure exceeded a threshold of 2 standard deviations (SD) above the baseline pressure, and when a pump detected an occlusion using the SD algorithm, a third algorithm correlated the pressures of multiple pumps to detect the presence of a shared occlusion, replacing static threshold logic."
+    "label": "sensing / feedback element (if closed-loop) realizing Implement a firmware algorithm in the retrofit module that continuously monitored whether the actual variation in the pressure exceeded a threshold of 2 standard deviations (SD) above the baseline pressure, and when a pump detected an occlusion using the SD algorithm, a third algorithm correlated the pressures of multiple pumps to detect the presence of a shared occlusion, replacing static threshold logic. [TECHNICAL MUTATION: The firmware algorithm is updated to trigger the shared occlusion correlation routine immediately when any pair of pumps exhibits synchronized pressure deviations, reducing the sample collection window.] [TECHNICAL MUTATION: The firmware algorithm is updated to require concurrent pressure trend correlation across three pumps before triggering the shared occlusion alarm, replacing the previous two-pump requirement.]"
    },
    {
     "id": "DO-004",
     "kind": "DESIGN_OUTPUT",
-    "label": "termination interfaces (application-context-specific: source and sink boundaries) realizing Implement a firmware algorithm in the retrofit module that continuously monitored whether the actual variation in the pressure exceeded a threshold of 2 standard deviations (SD) above the baseline pressure, and when a pump detected an occlusion using the SD algorithm, a third algorithm correlated the pressures of multiple pumps to detect the presence of a shared occlusion, replacing static threshold logic."
+    "label": "termination interfaces (application-context-specific: source and sink boundaries) realizing Implement a firmware algorithm in the retrofit module that continuously monitored whether the actual variation in the pressure exceeded a threshold of 2 standard deviations (SD) above the baseline pressure, and when a pump detected an occlusion using the SD algorithm, a third algorithm correlated the pressures of multiple pumps to detect the presence of a shared occlusion, replacing static threshold logic. [TECHNICAL MUTATION: The firmware algorithm is updated to trigger the shared occlusion correlation routine immediately when any pair of pumps exhibits synchronized pressure deviations, reducing the sample collection window.] [TECHNICAL MUTATION: The firmware algorithm is updated to require concurrent pressure trend correlation across three pumps before triggering the shared occlusion alarm, replacing the previous two-pump requirement.]"
    },
    {
     "id": "DO-005",
     "kind": "DESIGN_OUTPUT",
-    "label": "flow path / lumen architecture interfaces with pressure regulation element: signal/energy/material hand-off for Implement a firmware algorithm in the retrofit module that continuously monitored whether the actual variation in the pressure exceeded a threshold of 2 standard deviations (SD) above the baseline pressure, and when a pump detected an occlusion using the SD algorithm, a third algorithm correlated the pressures of multiple pumps to detect the presence of a shared occlusion, replacing static threshold logic."
+    "label": "flow path / lumen architecture interfaces with pressure regulation element: signal/energy/material hand-off for Implement a firmware algorithm in the retrofit module that continuously monitored whether the actual variation in the pressure exceeded a threshold of 2 standard deviations (SD) above the baseline pressure, and when a pump detected an occlusion using the SD algorithm, a third algorithm correlated the pressures of multiple pumps to detect the presence of a shared occlusion, replacing static threshold logic. [TECHNICAL MUTATION: The firmware algorithm is updated to trigger the shared occlusion correlation routine immediately when any pair of pumps exhibits synchronized pressure deviations, reducing the sample collection window.] [TECHNICAL MUTATION: The firmware algorithm is updated to require concurrent pressure trend correlation across three pumps before triggering the shared occlusion alarm, replacing the previous two-pump requirement.]"
    },
    {
     "id": "DO-006",
     "kind": "DESIGN_OUTPUT",
-    "label": "pressure regulation element interfaces with sensing / feedback element (if closed-loop): signal/energy/material hand-off for Implement a firmware algorithm in the retrofit module that continuously monitored whether the actual variation in the pressure exceeded a threshold of 2 standard deviations (SD) above the baseline pressure, and when a pump detected an occlusion using the SD algorithm, a third algorithm correlated the pressures of multiple pumps to detect the presence of a shared occlusion, replacing static threshold logic."
+    "label": "pressure regulation element interfaces with sensing / feedback element (if closed-loop): signal/energy/material hand-off for Implement a firmware algorithm in the retrofit module that continuously monitored whether the actual variation in the pressure exceeded a threshold of 2 standard deviations (SD) above the baseline pressure, and when a pump detected an occlusion using the SD algorithm, a third algorithm correlated the pressures of multiple pumps to detect the presence of a shared occlusion, replacing static threshold logic. [TECHNICAL MUTATION: The firmware algorithm is updated to trigger the shared occlusion correlation routine immediately when any pair of pumps exhibits synchronized pressure deviations, reducing the sample collection window.] [TECHNICAL MUTATION: The firmware algorithm is updated to require concurrent pressure trend correlation across three pumps before triggering the shared occlusion alarm, replacing the previous two-pump requirement.]"
    },
    {
     "id": "DO-007",
     "kind": "DESIGN_OUTPUT",
-    "label": "sensing / feedback element (if closed-loop) interfaces with termination interfaces (application-context-specific: source and sink boundaries): signal/energy/material hand-off for Implement a firmware algorithm in the retrofit module that continuously monitored whether the actual variation in the pressure exceeded a threshold of 2 standard deviations (SD) above the baseline pressure, and when a pump detected an occlusion using the SD algorithm, a third algorithm correlated the pressures of multiple pumps to detect the presence of a shared occlusion, replacing static threshold logic."
+    "label": "sensing / feedback element (if closed-loop) interfaces with termination interfaces (application-context-specific: source and sink boundaries): signal/energy/material hand-off for Implement a firmware algorithm in the retrofit module that continuously monitored whether the actual variation in the pressure exceeded a threshold of 2 standard deviations (SD) above the baseline pressure, and when a pump detected an occlusion using the SD algorithm, a third algorithm correlated the pressures of multiple pumps to detect the presence of a shared occlusion, replacing static threshold logic. [TECHNICAL MUTATION: The firmware algorithm is updated to trigger the shared occlusion correlation routine immediately when any pair of pumps exhibits synchronized pressure deviations, reducing the sample collection window.] [TECHNICAL MUTATION: The firmware algorithm is updated to require concurrent pressure trend correlation across three pumps before triggering the shared occlusion alarm, replacing the previous two-pump requirement.]"
    },
    {
     "id": "DO-008",
     "kind": "DESIGN_OUTPUT",
-    "label": "Device boundaries: patient/fluid inlet and outlet terminations, external control/data port as required by Implement a firmware algorithm in the retrofit module that continuously monitored whether the actual variation in the pressure exceeded a threshold of 2 standard deviations (SD) above the baseline pressure, and when a pump detected an occlusion using the SD algorithm, a third algorithm correlated the pressures of multiple pumps to detect the presence of a shared occlusion, replacing static threshold logic."
+    "label": "Device boundaries: patient/fluid inlet and outlet terminations, external control/data port as required by Implement a firmware algorithm in the retrofit module that continuously monitored whether the actual variation in the pressure exceeded a threshold of 2 standard deviations (SD) above the baseline pressure, and when a pump detected an occlusion using the SD algorithm, a third algorithm correlated the pressures of multiple pumps to detect the presence of a shared occlusion, replacing static threshold logic. [TECHNICAL MUTATION: The firmware algorithm is updated to trigger the shared occlusion correlation routine immediately when any pair of pumps exhibits synchronized pressure deviations, reducing the sample collection window.] [TECHNICAL MUTATION: The firmware algorithm is updated to require concurrent pressure trend correlation across three pumps before triggering the shared occlusion alarm, replacing the previous two-pump requirement.]"
    },
    {
     "id": "DO-009",
     "kind": "DESIGN_OUTPUT",
-    "label": "Flow/force/signal path geometry realizing the mechanism (Implement a firmware algorithm in the retrofit module that continuously monitored whether the actual variation in the pressure exceeded a threshold of 2 standard deviations (SD) above the baseline pressure, and when a pump detected an occlusion using the SD algorithm, a third algorithm correlated the pressures of multiple pumps to detect the presence of a shared occlusion, replacing static threshold logic.); every dimension is a named design decision with UNKNOWN value"
+    "label": "Flow/force/signal path geometry realizing the mechanism (Implement a firmware algorithm in the retrofit module that continuously monitored whether the actual variation in the pressure exceeded a threshold of 2 standard deviations (SD) above the baseline pressure, and when a pump detected an occlusion using the SD algorithm, a third algorithm correlated the pressures of multiple pumps to detect the presence of a shared occlusion, replacing static threshold logic. [TECHNICAL MUTATION: The firmware algorithm is updated to trigger the shared occlusion correlation routine immediately when any pair of pumps exhibits synchronized pressure deviations, reducing the sample collection window.] [TECHNICAL MUTATION: The firmware algorithm is updated to require concurrent pressure trend correlation across three pumps before triggering the shared occlusion alarm, replacing the previous two-pump requirement.]); every dimension is a named design decision with UNKNOWN value"
    },
    {
     "id": "DO-010",
@@ -4518,10 +4783,10 @@
  },
  "_spec_ref": {
   "invention_id": "inv:ui_delayed_occlusion_alarm_activation_438680:63271b4667e6",
-  "spec_hash": "5e11853b00757de6ed7350e7c2c58bc077600726b532d028458feb5c03a83508",
+  "spec_hash": "ecd940b7443a82507e9b6ce69a63226713fcaa185e1bc3f2b1a00515452b63e5",
   "final_envelope_hash": "63271b4667e65bf41d12328d920f4c334ea26d647c157ccaa8b3c3faa688d03e",
   "run_id": "engrun:ui_delayed_occlusion_alarm_activation_438680:2026-09-15T02:18:00",
-  "built_at": "2026-09-15T02:28:12+00:00Z"
+  "built_at": "2026-09-15T02:43:30+00:00Z"
  },
  "_epistemic_summary": {
   "SOURCE_FACT_fields": [
@@ -4733,7 +4998,7 @@
        "evidence_ids": [],
        "refs": {
         "equation_id": "FLUID-002",
-        "verdict": "CONDITIONAL"
+        "verdict": "APPLICABLE"
        }
       }
      },
@@ -4766,8 +5031,8 @@
        "evidence_ids": [],
        "refs": {
         "applicability": "circular section; single-phase flow",
-        "applicability_verdict": "CONDITIONAL",
-        "applicability_reason": "domain template justifies this relation for the domain, but the invention text does not yet engage its variables; applicability must be confirmed by the first characterization"
+        "applicability_verdict": "APPLICABLE",
+        "applicability_reason": "invention mechanism engages the model variables: Re"
        }
       }
      },
@@ -5461,7 +5726,7 @@
        "origin_stage": "ENGINEERING_SPEC",
        "evidence_ids": [],
        "refs": {
-        "source": "problem statement span [2348, 2356]: '400 mmHg' ()",
+        "source": "problem statement span [3149, 3157]: '400 mmHg' ()",
         "source_hash": "d0823732f831961f9725129ae3f48a7264b6a0d26596f42ea61b994de592e9df"
        }
       }
@@ -6689,8 +6954,8 @@
     ]
    }
   ],
-  "built_at": "2026-09-15T02:28:12+00:00Z",
-  "hash": "5fc9a1e0737bb526c9a4b04a5e340e084d2a8681a50241295a7cd54662763f03"
+  "built_at": "2026-09-15T02:43:30+00:00Z",
+  "hash": "e75b125430b5dc4d6f2c709d93fada3ad249381a70e4baf6d91cdbfa7a389814"
  },
  "chain_enforcement": {
   "rule": "CEO E15-C: every critical engineering claim carries the 8-role causal chain with provenance-carrying nodes; parameters with value_status UNKNOWN are excluded (an unknown has no engineering reasoning to bind — it is recorded as a gap instead)",
@@ -6701,7 +6966,7 @@
   "enforced": true
  },
  "engineering_attack_summary": {
-  "attack": "ENGINEERING_ATTACK (E15-F, re-run on the improved candidate R378)",
+  "attack": "ENGINEERING_ATTACK (E15-F, re-run on the technically improved candidate R379)",
   "overall": "SURVIVED_WITH_UNCERTAINTIES",
   "counts": {
    "KILL": 0,
@@ -6710,6 +6975,6 @@
    "SURVIVE": 7
   },
   "repaired_to_v2": false,
-  "improvement_mutation_id": "mut:78706eb59032"
+  "technical_mutation_id": "tmut:f521b42d65a4"
  }
 }
