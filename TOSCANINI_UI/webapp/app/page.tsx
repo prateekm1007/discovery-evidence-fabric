@@ -30,7 +30,7 @@
 // honesty contracts (tests/adversarial_present.test.mjs).
 
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import {
   answerClarification,
   apiPost,
@@ -66,13 +66,29 @@ import type {
   ShowcaseRow,
 } from "@/lib/types";
 import type { NextAction, SurfaceId } from "@/lib/present";
-import { suppressStalePositives } from "@/lib/present";
+import { suppressStalePositives, isTerminal } from "@/lib/present";
 import { latestChildOf, roundNumberOf } from "@/lib/rounds";
 import Sidebar from "@/components/Sidebar";
-import Conversation from "@/components/Conversation";
-import Workspace from "@/components/Workspace";
-import InventionStage from "@/components/InventionStage";
-import { isTerminal } from "@/components/RunNarrative";
+// R466 (audit performance measurement, LCP acceptance): the landing is
+// the cold-start surface and the LCP acceptance lives there ("<2.5s on
+// mobile"). The run-mode and invention-mode component graphs (the
+// conversation, the workspace panel, the invention stage, and their
+// import subtrees — dossier sections, narrative, math rendering) were
+// statically imported by this page chunk, so a first-time visitor
+// parsed ~230KB of code the landing never executes. They are now
+// route-mode-split chunks (next/dynamic — default exports unchanged,
+// markup unchanged, contracts unchanged); the landing chunk carries
+// only the hero/composer graph. ModelViewer's three.js stays in its
+// own lazy chunk (unchanged — it was already split and loads only when
+// a real geometry exists).
+import dynamic from "next/dynamic";
+const Conversation = dynamic(() => import("@/components/Conversation"));
+const Workspace = dynamic(() => import("@/components/Workspace"));
+const InventionStage = dynamic(() => import("@/components/InventionStage"));
+// R466: isTerminal now comes from lib/present (the one definition it
+// always re-exported) — importing it from RunNarrative kept the whole
+// narrative component graph (and MathText's KaTeX CSS chunk) on the
+// landing's render-blocking critical path for one boolean helper.
 
 const EXAMPLES = [
   "Why do infusion pumps fail to detect downstream occlusion before patient harm?",
@@ -425,11 +441,65 @@ function NewDiscoveryPane({
 // ---------------------------------------------------------------------------
 // THE WORKSPACE SHELL
 // ---------------------------------------------------------------------------
+// R466 (performance measurement, LCP acceptance): the shell's mode used to
+// come from useSearchParams, whose server snapshot bails the static
+// export's prerender to the Suspense fallback ("Loading…") — the
+// prerendered landing HTML was EMPTY and every first paint waited for
+// full React hydration (~3s of render delay at mobile-class CPU; the
+// Lighthouse LCP element was a text node that only existed after
+// hydration). The location search is now read through a
+// hydration-gated store: the server snapshot AND the first client
+// render both say "landing" (byte-identical HTML → no hydration
+// mismatch), and the real query (?run=… / ?invention=…) applies in the
+// post-hydration effect — the same moment the previous design fetched
+// its data anyway. Navigations notify through patched
+// history.pushState/replaceState (router.push's transport) + popstate
+// (back/forward/direct edits) — every entry point useSearchParams
+// served, with the landing now statically prerendered.
+const searchNotify = new Set<() => void>();
+function notifySearch() {
+  for (const fn of searchNotify) fn();
+}
+function subscribeSearch(fn: () => void): () => void {
+  searchNotify.add(fn);
+  return () => searchNotify.delete(fn);
+}
+function useWindowSearch(): string {
+  const [hydrated, setHydrated] = useState(false);
+  const [search, setSearch] = useState("");
+  useEffect(() => {
+    const apply = () => setSearch(window.location.search);
+    for (const kind of ["pushState", "replaceState"] as const) {
+      const orig = history[kind].bind(history);
+      history[kind] = (...args: Parameters<typeof history.pushState>) => {
+        const r = orig(...args);
+        notifySearch();
+        return r;
+      };
+    }
+    window.addEventListener("popstate", onPop);
+    function onPop() {
+      apply();
+      for (const fn of searchNotify) fn();
+    }
+    apply();
+    setHydrated(true);
+    return () => {
+      window.removeEventListener("popstate", onPop);
+    };
+  }, []);
+  useEffect(() => subscribeSearch(() => setSearch(window.location.search)), []);
+  return hydrated ? search : "";
+}
+
 function WorkspaceInner() {
-  const params = useSearchParams();
+  const search = useWindowSearch();
   const router = useRouter();
-  const runId = params.get("run");
-  const slot = params.get("invention");
+  const runId = useMemo(() => new URLSearchParams(search).get("run"), [search]);
+  const slot = useMemo(
+    () => new URLSearchParams(search).get("invention"),
+    [search]
+  );
 
   const [sessions, setSessions] = useState<SessionRow[]>([]);
   const [showcase, setShowcase] = useState<ShowcaseRow[]>([]);
