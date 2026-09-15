@@ -131,6 +131,100 @@ def _load_problem_understanding(session_id: str):
     return raw
 
 
+def _mechanism_identity(run_dir) -> dict:
+    """R467 (audit P0-5): the run's recorded mechanism identity — the
+    SAME fields the canonical projection reads
+    (run_state._mechanism_state <- envelope_SYNTHESIZE.mechanism_map:
+    mechanism / intervention / expected_effect). This is an identity
+    COMPARISON between a parent and a child round, never a new state
+    derivation — no second authority is created (Art. X)."""
+    import json as _json
+    try:
+        p = Path(str(run_dir)) / "envelope_SYNTHESIZE.json"
+        if not p.exists():
+            return {}
+        mm = (_json.loads(p.read_text()) or {}).get("mechanism_map") or {}
+        out = {}
+        for k in ("mechanism", "intervention", "expected_effect"):
+            v = mm.get(k)
+            if isinstance(v, str) and v.strip():
+                out[k] = v.strip()[:300]
+        return out
+    except (OSError, ValueError):
+        return {}
+
+
+def record_directive_outcome(session_id: str, run_dir) -> None:
+    """R467 (audit P0-5): "a 'what changed because of your direction'
+    card in the UI" — computed FROM THE RUNS' OWN RECORDS, never
+    asserted. When this session is a steered child (parent_session_id
+    set), compare the child's recorded mechanism identity with the
+    parent's and persist a typed directive_outcome on the session.
+    No-change is recorded honestly as no-change (the audit's measured
+    complaint was an UNDISCLOSED same-mechanism re-derivation — the
+    answer is the typed comparison, not a flattering one)."""
+    try:
+        s = store.get_session(session_id) or {}
+        parent_id = s.get("parent_session_id")
+        if not parent_id:
+            return
+        parent = store.get_session(str(parent_id)) or {}
+        p_id = _mechanism_identity(parent.get("run_dir"))
+        c_id = _mechanism_identity(run_dir)
+        directive_words = ""
+        for e in (s.get("conversation") or []):
+            t = str((e or {}).get("text") or "")
+            if t.startswith("["):
+                directive_words = t.split("] ", 1)[-1].strip()
+                break
+        changed = bool(
+            p_id.get("mechanism") and c_id.get("mechanism")
+            and p_id["mechanism"].lower() != c_id["mechanism"].lower())
+        if not directive_words:
+            directive_words = str((s.get("user_text") or "").rsplit(
+                "Direction for this round: ", 1)[-1]).strip()
+        if changed:
+            summary = ("Your direction changed the mechanism: the "
+                       f"parent round recorded '{p_id.get('mechanism')}'"
+                       f"; this round recorded "
+                       f"'{c_id.get('mechanism')}'.")
+        elif p_id.get("mechanism") and c_id.get("mechanism"):
+            summary = ("This round re-derived the same mechanism "
+                       "family as the parent ('"
+                       + str(c_id.get("mechanism")) + "') — your "
+                       "direction is on the record, but it did not "
+                       "move the dominant mechanism.")
+        elif c_id.get("mechanism"):
+            summary = ("The parent round recorded no mechanism to "
+                       "compare against; this round recorded "
+                       f"'{c_id.get('mechanism')}'.")
+        else:
+            summary = ("This round did not reach a recorded mechanism "
+                       "— there is nothing to compare yet (the "
+                       "directive and the inherited answers are on "
+                       "the record).")
+        store.update_session(
+            session_id,
+            directive_outcome={
+                "parent_session_id": str(parent_id),
+                "directive": directive_words or None,
+                "parent_mechanism": p_id.get("mechanism"),
+                "child_mechanism": c_id.get("mechanism"),
+                "child_intervention": c_id.get("intervention"),
+                "mechanism_changed": changed,
+                "summary": summary,
+                "computed_at": time.strftime("%Y-%m-%dT%H:%M:%SZ",
+                                             time.gmtime()),
+                "method": ("envelope_SYNTHESIZE.mechanism_map identity "
+                           "comparison (the run_state projection's "
+                           "own fields); computed from the runs' "
+                           "records, never asserted"),
+            })
+    except Exception:  # noqa: BLE001 — typed, never fatal to terminal
+        print(f"  [worker] directive_outcome computation failed: "
+              f"{session_id}", file=sys.stderr)
+
+
 def merge_attachments_typed(session: dict, session_id: str, pu: dict,
                             forensics=None):
     """R459 (audit P0-3): the session's staged attachments merge into
@@ -744,11 +838,16 @@ def _run_inner(session_id: str, forensics) -> None:
                    "exists). Your problem is saved and ready to resume "
                    "on a capable route — this is an infrastructure "
                    "state, not a verdict about your problem."))
+        record_directive_outcome(session_id, run_dir)
         _snapshot(session_id, f"terminal:RUN_BLOCKED_CAPABILITY:{session_id}")
         return
     store.update_session(
         session_id, status="COMPLETE",
         final_status=final_status)
+    # R467 (audit P0-5): the "what changed because of your direction"
+    # record — typed comparison of the child's mechanism identity with
+    # the parent's, from the runs' own records (never asserted)
+    record_directive_outcome(session_id, run_dir)
     # R431: the terminal event (infra vs scientific never collapsed)
     try:
         from toscanini import event_journal as _journal

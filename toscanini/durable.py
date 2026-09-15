@@ -91,13 +91,18 @@ def reset_payload_cache() -> None:
 _LAST: Dict[str, Any] = {"ok": None, "at": None, "reason": None,
                          "error": None, "files": 0, "commit": None,
                          "pushed": None, "manifest_sha256": None,
-                         "engine_commit": None}
+                         "engine_commit": None,
+                         "skipped_oversize": {"journals": 0,
+                                              "attachments": 0}}
 _LAST_RESTORE: Dict[str, Any] = {"at": None, "sessions": 0, "runs": 0,
                                  "evidence": 0, "interrupted": 0,
                                  "error": None, "branch_sessions": None,
                                  "integrity_mismatches": None,
                                  "integrity_verified": None,
                                  "manifest_sha256": None}
+# R467 engineer-review finding: over-cap files are skipped, never
+# silently — the counts ride the snapshot report (typed observable).
+_SKIPPED_OVERSIZE: Dict[str, int] = {}
 
 
 def enabled() -> bool:
@@ -310,6 +315,47 @@ def _collect_payload() -> Dict[str, Path]:
             continue
         for f in _run_dir_files(run_dir):
             payload[f"runs/{run_dir.name}/{f.relative_to(run_dir)}"] = f
+        # R467 (audit P0-2, S–M: "persistent session storage"): the
+        # run's append-only event journal rides the payload too — the
+        # typed observable record the events surface merges from (the
+        # R465 attachment-merge outcome lives HERE, not in an
+        # envelope); without it a rebuild loses the journal while the
+        # restored projection claims events the journal no longer
+        # backs. One .jsonl per run dir, size-capped like everything
+        # else.
+        _journal = run_dir / "EVENT_JOURNAL.jsonl"
+        if _journal.exists():
+            if _journal.stat().st_size <= FILE_CAP_BYTES:
+                payload[f"runs/{run_dir.name}/EVENT_JOURNAL.jsonl"] = \
+                    _journal
+            else:
+                # R467 engineer-review finding: an over-cap journal is
+                # not silently dropped — the skip is COUNTED and the
+                # count rides the snapshot report (typed observable,
+                # never a silent vanish).
+                _SKIPPED_OVERSIZE["journals"] = \
+                    _SKIPPED_OVERSIZE.get("journals", 0) + 1
+    # R467 (audit P0-2): the user's UPLOADED attachments — the
+    # server-side custody copies of documents the investigation was
+    # pointed at (R463/R465's USER_EVIDENCE path). A rebuild without
+    # them loses the user's own files while the session still says
+    # they are bound. Persisted under their owner-scoped layout;
+    # the per-file cap filters oversized uploads — and the skips are
+    # counted (the same cap every durable file rides; nothing is
+    # dropped silently).
+    try:
+        from toscanini.attachments import ATTACHMENTS_DIR as _att
+    except Exception:  # noqa: BLE001 — layout constant, never fatal
+        _att = None
+    if _att and Path(_att).is_dir():
+        for f in sorted(Path(_att).rglob("*")):
+            if not f.is_file():
+                continue
+            if f.stat().st_size <= FILE_CAP_BYTES:
+                payload[f"attachments/{f.relative_to(_att)}"] = f
+            else:
+                _SKIPPED_OVERSIZE["attachments"] = \
+                    _SKIPPED_OVERSIZE.get("attachments", 0) + 1
     return payload
 
 
@@ -356,12 +402,17 @@ def snapshot(reason: str) -> Dict[str, Any]:
     (per-file sha256 + tree digest) committed alongside the payload, so
     a restore can PROVE state equality instead of asserting it."""
     ident_commit, ident_source = artifact_identity.resolve_engine_commit()
+    # R467 engineer-review finding: reset the per-snapshot skip counts
+    # (the numbers the payload collector is about to re-derive).
+    _SKIPPED_OVERSIZE.clear()
+    _SKIPPED_OVERSIZE.update({"journals": 0, "attachments": 0})
     _LAST.update({"ok": None, "at": time.strftime("%Y-%m-%dT%H:%M:%SZ",
                                                   time.gmtime()),
                   "reason": reason, "error": None, "files": 0,
                   "commit": None, "pushed": None,
                   "manifest_sha256": None,
-                  "engine_commit": ident_commit or None})
+                  "engine_commit": ident_commit or None,
+                  "skipped_oversize": dict(_SKIPPED_OVERSIZE)})
     if not enabled():
         _LAST["ok"] = False  # explicit refusal, not an unattempted null
         _LAST["error"] = ("durable persistence not enabled "
@@ -667,6 +718,39 @@ def restore() -> Dict[str, Any]:
                             had_any = True
                     if had_any:
                         _LAST_RESTORE["runs"] += 1
+            # R467 (audit P0-2): the user's uploaded attachments
+            # re-materialize under the same copy-when-absent contract —
+            # the session keeps saying the documents are bound, so the
+            # documents come back with it (owner-scoped layout
+            # preserved byte-for-byte).
+            att_dir = repo / "attachments"
+            if att_dir.is_dir():
+                try:
+                    from toscanini.attachments import \
+                        ATTACHMENTS_DIR as _att_dst
+                except Exception:  # noqa: BLE001 — same guard as the
+                    _att_dst = None  # collect side (asymmetry fixed,
+                                     # engineer review R467)
+                if _att_dst:
+                    _dst_root = Path(_att_dst).resolve()
+                    for f in sorted(att_dir.rglob("*")):
+                        if not f.is_file():
+                            continue
+                        dst = _dst_root / f.relative_to(att_dir)
+                        # R467 engineer-review finding: the restored
+                        # path must be CONFINED to the attachments
+                        # tree — resolve and verify containment before
+                        # any copy (fail closed, Art. V).
+                        if _dst_root not in dst.resolve().parents:
+                            _LAST_RESTORE["attachments_rejected"] = \
+                                _LAST_RESTORE.get(
+                                    "attachments_rejected", 0) + 1
+                            continue
+                        if not dst.exists():
+                            dst.parent.mkdir(parents=True, exist_ok=True)
+                            shutil.copy2(f, dst)
+                            _LAST_RESTORE["attachments"] = \
+                                _LAST_RESTORE.get("attachments", 0) + 1
             # --- honest interruption of dead jobs (directive 7) ---
             _LAST_RESTORE["interrupted"] = len(
                 store.mark_interrupted_sessions())

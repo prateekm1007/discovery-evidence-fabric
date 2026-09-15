@@ -384,6 +384,16 @@ def probe_capability(provider: str, model: str,
     if spec is None:
         out.update({"ok": False, "failure_class": "UNKNOWN_PROVIDER"})
         return out
+    # R467: a reasoning model spends the whole probe budget on hidden
+    # reasoning at 16 tokens and returns content=null — the probe must
+    # spend the rung's OWN declared budget (default stays 16; atria
+    # declares 256). The probe stays one tiny completion; this only
+    # sizes it so a live rung is never refused for thinking. The `or
+    # 16` guards a spec that ever leaves the field falsy — the probe
+    # then keeps the standing default instead of raising past the typed
+    # failure states (engineer review R467).
+    max_tokens = max(int(max_tokens or 16),
+                     int(getattr(spec, "probe_max_tokens", 16) or 16))
     messages = [
         {"role": "system", "content":
             "RESPOND IN ENGLISH ONLY. Follow the requested output "

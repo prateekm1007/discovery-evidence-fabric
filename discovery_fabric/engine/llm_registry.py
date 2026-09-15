@@ -104,6 +104,16 @@ class ProviderSpec:
     #: 1010 with urllib UA, 200 with a Chrome UA). Transport plumbing
     #: only — never evidence, never semantics.
     extra_headers: Optional[Dict[str, str]] = None
+    #: R469 (the six-item minimum path): the capability probe's token
+    #: budget for THIS rung. The shared probe spends 16 tokens — enough
+    #: for a plain completion, but a REASONING model spends its whole
+    #: budget on hidden reasoning at 16 and returns content=null, which
+    #: would fail the probe for a rung that is in fact alive (the
+    #: measured EmptyContentWithFinish class — atria's FIELD test
+    #: starves content at max_tokens 300). Rungs that need more declare
+    #: it here; every other rung keeps the 16-token probe. Consumed by
+    #: runtime_admission.probe_capability (typed fallback to 16).
+    probe_max_tokens: int = 16
 
     def url_for_call(self) -> str:
         """Effective endpoint for this call.
@@ -422,6 +432,7 @@ PROVIDER_SPECS: List[ProviderSpec] = [
         license="provider serving terms (operator-declared free token "
                 "budget; no deposit authorized)",
         account_domain="OWNER_ATRIA_ACCOUNT",
+        probe_max_tokens=256,
         model_revision="Atria-Dawn-Preview — the catalog's SOLE model id "
                        "(owned_by atria, 2026-09-15 catalog); no revision "
                        "pin exposed by the provider — recorded honest "

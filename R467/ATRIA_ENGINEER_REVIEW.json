@@ -1,0 +1,86 @@
+{
+  "round": "R467",
+  "protocol": "CTO (main session) / ENGINEER (Atria-Dawn-Preview), per-file review (single-shot 30K-char diff exhausts the reasoning budget \u2014 measured, 3 attempts)",
+  "measured_at": "2026-09-15T16:49:58Z",
+  "key_fingerprint": "atr_63...IxbA",
+  "per_file": {
+    "discovery_fabric/engine/llm_registry.py": {
+      "finish_reason": "stop",
+      "content": "VERDICT: FIX_FIRST\nFINDINGS:\n- discovery_fabric/engine/llm_registry.py:412-460 \u2014 probe_max_tokens is declared on ProviderSpec and set to 256 for the atria rung, but this diff contains no consumer (the shared capability probe is elsewhere); if that probe still hard-codes 16, the atria probe returns content=null with finish_reason=length and a genuinely live rung is failed at registration \u2014 verify the probe reads spec.probe_max_tokens before commit \u2014 MAJOR \u2014 the entire rationale for adding the rung silently inverts into an honest-but-wrong DEAD verdict.",
+      "completion_tokens": 1985
+    },
+    "discovery_fabric/engine/model_routing.py": {
+      "finish_reason": "stop",
+      "content": "VERDICT: SHIP\nFINDINGS:\n- discovery_fabric/engine/model_routing.py:209 \u2014 the new pin `^Atria-Dawn-Preview$` is mixed-case while every sibling pin (mimo, muse-spark) is lowercase; if the family-match path normalizes model ids to lowercase before regex matching, this pin silently never matches and the \"nothing else on the grant becomes a rung\" guarantee is a silent no-op \u2014 MAJOR \u2014 verify the matcher's case handling before commit (an honest UNKNOWN, not a confirmed bug).\n- discovery_fabric/engine/model_routing.py:358 \u2014 \"atria\" is a brand-new family key in both PINNED_MODEL_FAMILIES and PINNED_DEFAULT_MODELS; confirm a family\u2192provider resolution entry exists elsewhere (provider registry / cost tables) so the pin resolves to a real provider instead of being inert or raising at route time \u2014 MINOR \u2014 unverifiable from this diff alone.",
+      "completion_tokens": 1815
+    },
+    "discovery_fabric/engine/runtime_admission.py": {
+      "finish_reason": "stop",
+      "content": "VERDICT: FIX_FIRST\nFINDINGS:\n- discovery_fabric/engine/runtime_admission.py:389 \u2014 `int(spec.probe_max_tokens)` will raise TypeError if the rung spec leaves `probe_max_tokens` unset/None \u2014 MAJOR \u2014 an uncaught exception here escapes the probe path instead of producing a typed failure state (ok:false/failure_class); use `int(spec.probe_max_tokens or 0)` so only declared budgets lift the probe.\n- discovery_fabric/engine/runtime_admission.py:389 \u2014 `int(max_tokens or 16)` collapses an explicit caller budget of 0 into 16 \u2014 MINOR \u2014 0 is a legal \"no completion budget\" value and silently becomes 16; use `16 if max_tokens is None else int(max_tokens)` if 0 must be honored.",
+      "completion_tokens": 1612
+    },
+    "discovery_fabric/engine/transport_capability.py": {
+      "finish_reason": "stop",
+      "content": "VERDICT: SHIP\nFINDINGS:",
+      "completion_tokens": 458
+    },
+    "toscanini/conversational/transport_invisibility.py": {
+      "finish_reason": "stop",
+      "content": "VERDICT: SHIP\nFINDINGS:\n- transport_invisibility.py:69 \u2014 \"atria\" is also ordinary English/Latin (plural of \"atrium\", heart/architecture) \u2014 MINOR \u2014 with `re.I` + `\\b\u2026\\b`, the scrubber will now redact legitimate occurrences of the word in user/model text; fail-safe against leakage but risks cosmetic over-masking on the product surface.",
+      "completion_tokens": 1046
+    },
+    "toscanini/durable.py": {
+      "finish_reason": "stop",
+      "content": "VERDICT: FIX_FIRST\nFINDINGS:\n- durable.py:_collect_payload (~322) \u2014 `rglob(\"*\")` sweeps the ENTIRE attachments dir into every snapshot; if ATTACHMENTS_DIR is global/owner-scoped (the comment says \"owner-scoped\"), every session snapshot now carries ALL owners' uploaded documents \u2014 cross-user leakage into a session-scoped payload \u2014 MAJOR \u2014 filter to the current session/owner subtree, don't ship the world.\n- durable.py:_collect_payload (~318/336) \u2014 journals and attachments larger than FILE_CAP_BYTES are silently dropped while session metadata still claims them bound; the journal comment describes exactly this failure mode yet adds no warning/manifest accounting \u2014 MAJOR \u2014 oversized-but-bound files vanish from the snapshot with no honest signal.\n- durable.py:restore (~706) \u2014 `from toscanini.attachments import ATTACHMENTS_DIR` is unguarded; an ImportError here aborts the ENTIRE restore (runs already restored, attachments then dead jobs), whereas _collect_payload tolerates the missing module \u2014 asymmetric failure \u2014 MINOR \u2014 wrap in the same try/except or fail soft.\n- durable.py:restore (~712) \u2014 `dst = Path(_att_dst)/f.relative_to(att_dir)` does not confine the result under _att_dst; a snapshot archive containing `attachments/../../...` writes outside the attachments tree on restore \u2014 MINOR \u2014 resolve and verify `dst` is inside _att_dst before copy2.",
+      "completion_tokens": 2762
+    },
+    "toscanini/worker.py": {
+      "finish_reason": "stop",
+      "content": "VERDICT: SHIP\nFINDINGS:\n- worker.py:~155 \u2014 `directive_words` extraction is fragile: takes the first bracketed conversation entry (could be a `[SYSTEM]` tag, not a directive) and the `rsplit(\"Direction for this round: \", 1)[-1]` fallback stores the entire `user_text` when the marker is absent \u2014 MINOR \u2014 the recorded \"directive\" can be semantically wrong, though mechanism comparison (the audit's core) is unaffected.\n- worker.py:~215 \u2014 broad `except Exception` with only a stderr print; the computation failure is not typed/journaled anywhere queryable \u2014 MINOR \u2014 degrades honestly (card is simply absent, no faked success), but falls short of the typed-failure-state convention.\n- worker.py:~140 \u2014 `(e or {}).get(\"text\")` will raise `AttributeError` (caught by the outer except, aborting the whole computation) if any conversation entry is a bare string rather than a dict \u2014 MINOR \u2014 latent crash path; schema-dependent, low probability.\n- worker.py:~195 \u2014 parent/child mechanism strings are surfaced verbatim into the UI summary (only truncated to 300 chars, no sanitization) \u2014 MINOR \u2014 no evidence of provider ids in `mechanism_map` fields, but if a synthesizer envelope ever names a provider/model, it would reach the product surface.",
+      "completion_tokens": 4688
+    },
+    "toscanini/server.py": {
+      "finish_reason": "stop",
+      "content": "VERDICT: FIX_FIRST\nFINDINGS:\n- toscanini/server.py:~2160 \u2014 evidence pack zips raw `envelope_*.json`, `final_state.json`, and the problem-understanding record \"unmodified\" into a user-facing download \u2014 MAJOR \u2014 these internal records typically embed provider ids, model names, endpoint/token metadata (and any key material captured in tool calls); with no scrub step, provider-id/secret leakage reaches the product surface. Add a redaction pass (or an allowlisted projection) before `zf.writestr`.\n- toscanini/server.py:~1490 \u2014 `_dir_words` joins *all* `entry[\"params\"]` values into the child's `user_text`, which is rendered on the run page and echoed into the evidence README \u2014 MAJOR \u2014 params may carry provider/model configuration rather than user-facing direction; only whitelisted, user-scoped fields should be carried into the problem statement.\n- toscanini/server.py:~2200 \u2014 `included[name] = _rd(name) is not None`, then `_rd(name)` is re-read for the payload \u2014 MINOR \u2014 double parse of every record plus a TOCTOU seam (a file can vanish/change between the existence check and the read, turning `present=True` into a silently omitted entry); read each record once into a dict and drive both the manifest and the zip from it.\n- toscanini/server.py:~2210 \u2014 README interpolates `pkg_blocked.get(\"stage\")` unguarded \u2014 MINOR \u2014 a missing stage renders as literal \"None\" in a human-facing artifact; use `str(pkg_blocked.get(\"stage\") or \"unrecorded\")` as the neighboring fields already do.",
+      "completion_tokens": 3788
+    }
+  },
+  "verdict_lines": [
+    [
+      "discovery_fabric/engine/llm_registry.py",
+      "VERDICT: FIX_FIRST"
+    ],
+    [
+      "discovery_fabric/engine/model_routing.py",
+      "VERDICT: SHIP"
+    ],
+    [
+      "discovery_fabric/engine/runtime_admission.py",
+      "VERDICT: FIX_FIRST"
+    ],
+    [
+      "discovery_fabric/engine/transport_capability.py",
+      "VERDICT: SHIP"
+    ],
+    [
+      "toscanini/conversational/transport_invisibility.py",
+      "VERDICT: SHIP"
+    ],
+    [
+      "toscanini/durable.py",
+      "VERDICT: FIX_FIRST"
+    ],
+    [
+      "toscanini/worker.py",
+      "VERDICT: SHIP"
+    ],
+    [
+      "toscanini/server.py",
+      "VERDICT: FIX_FIRST"
+    ]
+  ],
+  "note": "review is evidence weighed by the CTO against the green test suite; recorded verbatim",
+  "notes": [
+    "server.py reviewed on a third dispatch (two transient 502 upstream errors; typed RATE_LIMITED/UPSTREAM class, retried with backoff)"
+  ]
+}

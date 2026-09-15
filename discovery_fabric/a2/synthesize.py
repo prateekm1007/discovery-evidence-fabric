@@ -72,8 +72,9 @@ def llm_chat(prompt, system="", max_retries=2, timeout=240,
             purpose="synthesis")
     else:
         policy = reg.SelectionPolicy(
-            preferred_providers=["openrouter", "deepseek", "anthropic",
-                                 "openai", "gemini", "qwen", "nvidia"],
+            preferred_providers=["atria", "openrouter", "deepseek",
+                                 "anthropic", "openai", "gemini",
+                                 "qwen", "nvidia"],
             purpose="synthesis")
     # max_tokens=512: the FIELD-line protocol needs ~150-250 tokens; wall
     # time on the deepseek reasoning endpoint scales with the cap (measured

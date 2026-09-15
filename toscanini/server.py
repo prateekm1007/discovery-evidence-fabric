@@ -38,10 +38,30 @@ sys.path.insert(0, str(REPO_ROOT))
 
 from toscanini import artifact_identity  # noqa: E402  R396 A.3-A.7
 from toscanini import gateway as gw  # noqa: E402
+# R467 engineer-review finding: the evidence pack and the steering
+# composition are product surfaces — the transport-invisibility
+# vocabulary is applied to them MECHANICALLY (scrub), not by
+# architectural expectation.
+from toscanini.conversational.transport_invisibility import (  # noqa: E402
+    _PROVIDER_ID_RE as _TRANSPORT_PROVIDER_RE,
+    _ENDPOINT_HOST_RE as _TRANSPORT_HOST_RE,
+)
 from toscanini import sessions as store  # noqa: E402
 from toscanini import showcase as show  # noqa: E402
 
 PORT = int(os.environ.get("PORT") or 8788)
+
+
+def _scrub_transport_text(text: str) -> str:
+    """R467 (engineer review): mechanically remove transport-plumbing
+    vocabulary from text about to enter a product surface (the evidence
+    pack's records, the steering composition). Records' semantics are
+    untouched — only provider ids and endpoint hosts are replaced."""
+    if not text:
+        return text
+    text = _TRANSPORT_PROVIDER_RE.sub("[model]", text)
+    text = _TRANSPORT_HOST_RE.sub("[endpoint]", text)
+    return text
 # R391 (deployment): hosted engines (Render) set PORT and expect a
 # 0.0.0.0 bind; local dev keeps the loopback default.
 HOST = os.environ.get("ENGINE_HOST") or ("0.0.0.0" if os.environ.get("PORT") else "127.0.0.1")
@@ -1058,6 +1078,16 @@ class Handler(BaseHTTPRequestHandler):
                 if self._access(rid) == "DENY":
                     return self._denied()
                 return self._package(rid)
+            # R467 (audit P1-6): the interim evidence pack — every
+            # terminal run leaves something in the user's hands, stated
+            # in one frame. Assembled ON REQUEST from the run's own
+            # records (nothing is authored, nothing is persisted twice);
+            # the human README carries the outcome and the kill causes
+            # in plain language, stated once.
+            if len(parts) == 4 and parts[3] == "evidence-pack":
+                if self._access(rid) == "DENY":
+                    return self._denied()
+                return self._evidence_pack(rid)
             # R419 section 11: the technical essay as structured JSON —
             # the SAME 8 sections the package PDF renders, built from
             # the SAME canonical state (run record + CIO), deterministic
@@ -1471,10 +1501,73 @@ class Handler(BaseHTTPRequestHandler):
 
             # a NEW session in the same investigation thread — the
             # original run's record stays untouched (append-only)
+            # R467 (audit P0-5, the directive-EFFECT layer above R466's
+            # visibility layer): the child's problem statement CARRIES
+            # the operator's direction — the directive becomes part of
+            # the text every downstream stage actually consumes
+            # (retrieval queries, mechanism space, synthesis), not just
+            # a context note. The parent's words are never altered; the
+            # direction is appended verbatim under a plain marker.
+            parent_text = s.get("user_text") or ""
+            # R467 engineer-review finding: the carried words are the
+            # action contract's user-facing fields ONLY (the same
+            # whitelist directive_text rides) — never a blind dump of
+            # every params value — and the result is scrubbed of
+            # transport vocabulary before it enters the child's
+            # problem statement (a product surface).
+            _p = entry.get("params") or {}
+            _allowed = ("direction", "focus", "topic", "target",
+                        "preserve", "mode")
+            _dir_words = _scrub_transport_text(" ".join(
+                str(_p[k]) for k in _allowed if _p.get(k)
+            ).strip()) or directive
+            child_text = (parent_text.rstrip() +
+                          "\n\nDirection for this round: " +
+                          _dir_words).strip()
             new_s = store.create_session(
                 title=s.get("title") or (s.get("user_text") or "")[:120],
-                user_text=s.get("user_text") or "",
+                user_text=child_text,
                 owner_key=self._owner_key_cached)
+            # R467 (audit P0-5: "child rounds inherit parent answers —
+            # 0 re-asks"): the parent's Problem Understanding INPUT
+            # record — the durable carrier of every USER_STATED field
+            # and clarification answer — is copied under the child's
+            # session id, re-bound and stamped with its provenance. The
+            # child's worker loads it (the R461 loader), and the
+            # clarification gate skips fields whose origin is already
+            # USER_STATED — the parent's answers arrive AS ANSWERED.
+            try:
+                import json as _json
+                _src_pu = store.STORE_DIR / \
+                    f"problem_understanding_{sid}.json"
+                if _src_pu.exists():
+                    _pu_rec = _json.loads(_src_pu.read_text())
+                    if isinstance(_pu_rec, dict) and _pu_rec:
+                        _pu_rec["session_id"] = new_s["session_id"]
+                        _pu_rec["inherited_from"] = {
+                            "parent_session_id": sid,
+                            "action_id": action_id,
+                            "copied_at": time.strftime(
+                                "%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+                            "note": ("the parent round's Problem "
+                                     "Understanding record — its "
+                                     "USER_STATED fields (including "
+                                     "answered clarifications) are "
+                                     "inherited, never re-asked"),
+                        }
+                        (store.STORE_DIR / f"problem_understanding_"
+                         f"{new_s['session_id']}.json").write_text(
+                             _json.dumps(_pu_rec, indent=1,
+                                         ensure_ascii=False))
+            except Exception:  # noqa: BLE001 — typed, never fatal
+                try:
+                    from toscanini import worker_forensics as _wfx0
+                    _wfx0.attach_session(
+                        new_s["session_id"],
+                        durable_root=_wfx0.durable_root()).event(
+                            "PU_INHERITANCE_FAILED", parent=sid)
+                except Exception:  # noqa: BLE001
+                    pass
             from toscanini.conversational import conversation_memory as _cm
             cls = _cm.classify_user_message(directive)
             _ctx = _cm.record_conversation_context(new_s, directive, cls)
@@ -2042,6 +2135,158 @@ class Handler(BaseHTTPRequestHandler):
         return None
 
     # ------------------------------------------------------------- package
+    def _evidence_pack(self, rid: str):
+        """R467 (audit P1-6): the interim evidence pack — the terminal
+        artifact for runs that end WITHOUT a technology package (a
+        killed candidate, a blocked run, a run that still needs its
+        decisive experiment). Assembled on request from the run's OWN
+        records (envelopes, lineage, gate records, the input record):
+        a self-contained ZIP whose README states the outcome and the
+        kill causes in plain language, once. Nothing here is a package
+        substitute and nothing is authored — it is the record the run
+        already wrote, made keepable."""
+        s = store.get_session(rid)
+        if not s:
+            return self._json(404, {"error": "not found"})
+        status = str(s.get("status") or "").upper()
+        _running = ("PENDING", "BUILDING_PROBLEM", "RUNNING", "")
+        if status in _running or status == "AWAITING_CLARIFICATION":
+            return self._json(409, {
+                "error": "the run has not reached a terminal state yet",
+                "note": ("the evidence pack is served when the run "
+                         "finishes, blocks, or is interrupted — the "
+                         "live record is on the run page"),
+                "status": s.get("status"),
+            })
+        run_dir = Path(s["run_dir"]) if s.get("run_dir") else None
+        if not run_dir or not run_dir.exists():
+            return self._json(404, {"error": "the run's records are not "
+                                    "on disk (nothing to pack)"})
+        import json as _json
+        import tempfile as _tempfile
+        import zipfile as _zipfile
+
+        def _rd(name):
+            p = run_dir / name
+            if not p.exists():
+                return None
+            try:
+                return _json.loads(p.read_text())
+            except (OSError, ValueError):
+                return None
+
+        lineage = _rd("INVENTION_LINEAGE.json") or {}
+        kill_lines = []
+        for g in (lineage.get("generations") or []):
+            ch = (g or {}).get("challenge") or {}
+            if ch.get("killed"):
+                gen = g.get("gen") if g.get("gen") is not None else "?"
+                stage = str(ch.get("kill_stage") or "the gauntlet")
+                reason = str(ch.get("kill_reason") or "the recorded "
+                             "challenge outcome")
+                kill_lines.append(
+                    f"- Generation {gen}'s candidate was killed at "
+                    f"{stage}: {reason}")
+        blocked = _rd("CAPABILITY_GATE.json")
+        pkg_blocked = _rd("PACKAGE_BUILD_BLOCKED.json")
+        final = _rd("final_state.json") or {}
+        outcome_basis = str(final.get("final_status")
+                            or s.get("final_status") or "UNKNOWN")
+        lines = [
+            "TOSCANINI EVIDENCE PACK",
+            f"Run: {rid}",
+            f"Generated: {time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())}",
+            "",
+            "WHAT THIS IS",
+            ("The complete record of one discovery round that ended "
+             "without a technology package. The round is finished; "
+             "nothing here is a pending promise. Everything the "
+             "investigation learned is inside — the evidence it "
+             "gathered, the mechanisms it explored, what was challenged "
+             "and why nothing survived, and what the next round should "
+             "test."),
+            "",
+            "OUTCOME",
+            f"- Terminal state: {outcome_basis}",
+            f"- Problem: {str(s.get('user_text') or '')[:400]}",
+            "",
+        ]
+        if kill_lines:
+            lines += ["WHAT THE CHALLENGES FOUND (stated once, plainly)"] + kill_lines + [""]
+        if blocked and blocked.get("blocked"):
+            lines += [
+                "WHY THIS RUN BLOCKED",
+                f"- {str(blocked.get('reason') or blocked.get('detail') or 'recorded infrastructure gate')[:400]}",
+                "- An infrastructure block is never a verdict about the problem.", "",
+            ]
+        if pkg_blocked:
+            lines += [
+                "WHY NO PACKAGE WAS BUILT",
+                f"- stage: {str(pkg_blocked.get('stage') or 'unrecorded')}",
+                f"- {str(pkg_blocked.get('detail') or '')[:400]}", "",
+            ]
+        lines += [
+            "INSIDE THIS PACK (the run's own records; transport "
+            "metadata — provider identifiers, endpoints — is scrubbed "
+            "per the product's transport-invisibility rule, everything "
+            "else is byte-faithful)",
+            "- final_state.json — the engine's terminal record",
+            "- INVENTION_LINEAGE.json — every architecture generation, its challenge history, and the stop reason",
+            "- envelope_*.json — the per-stage records (mechanisms, attacks, synthesis)",
+            "- DECISIVE_EXPERIMENT.json — the experiment that would settle the open question (when specified)",
+            "- problem_understanding record — what the engine understood the problem to be",
+            "",
+            "HONESTY NOTE",
+            ("No failure in this pack is softened into a success and "
+             "no success is claimed beyond its evidence. The typed "
+             "records are the authority; this README only narrates "
+             "them."),
+        ]
+        # R467 engineer-review finding: each record is read ONCE (the
+        # manifest and the zip are driven by the same in-memory copy —
+        # no TOCTOU seam between an existence check and a re-read).
+        included = {}
+        for name in ("final_state.json", "INVENTION_LINEAGE.json",
+                     "DECISIVE_EXPERIMENT.json", "CAPABILITY_GATE.json",
+                     "PACKAGE_BUILD_BLOCKED.json"):
+            rec = _rd(name)
+            if rec is not None:
+                included[name] = rec
+        pu_path = store.STORE_DIR / f"problem_understanding_{rid}.json"
+        tmp = None
+        try:
+            tmp = _tempfile.NamedTemporaryFile(
+                prefix=f"evidence_pack_{rid}_", suffix=".zip", delete=False)
+            tmp.close()
+            with _zipfile.ZipFile(tmp.name, "w",
+                                  compression=_zipfile.ZIP_DEFLATED) as zf:
+                zf.writestr("README.txt",
+                            _scrub_transport_text("\n".join(lines)))
+                for name, rec in included.items():
+                    zf.writestr(name, _scrub_transport_text(
+                        _json.dumps(rec, indent=1, ensure_ascii=False)))
+                for p in sorted(run_dir.glob("envelope_*.json")):
+                    try:
+                        zf.writestr(p.name, _scrub_transport_text(
+                            p.read_text()))
+                    except OSError:
+                        continue
+                if pu_path.exists():
+                    try:
+                        zf.writestr(pu_path.name, _scrub_transport_text(
+                            pu_path.read_text()))
+                    except OSError:
+                        pass
+            self._serve_file(
+                tmp.name, "application/zip",
+                download_name=f"evidence_pack_{rid}.zip")
+        finally:
+            if tmp:
+                try:
+                    Path(tmp.name).unlink()
+                except OSError:
+                    pass
+
     def _package(self, sid: str):
         s = store.get_session(sid)
         if not s:

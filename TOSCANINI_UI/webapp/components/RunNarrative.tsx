@@ -290,6 +290,24 @@ export function OutcomeBanner({
     outcome === "NO_DEFENSIBLE_INVENTION";
   const isBlocked = outcome === "RUN_BLOCKED";
   const isPremise = outcome === "FALSE_PREMISE_INCOHERENT";
+  // R467 (audit P1-2, terminal-state de-collision): when the run is
+  // TERMINAL and its own records say the last challenged generation
+  // was killed with no survivor, the banner says that in one frame —
+  // "finished, nothing survived" — in a settled visual class. The
+  // R458-C2 in-development presentation stays for everything the
+  // records do not settle (a live run, a lineage still developing).
+  const settledNoSurvivor =
+    isTerminal(detail.status) &&
+    !generations?.survivor_reached &&
+    (outcome === "INVENTION_KILLED_BY_CHALLENGE" ||
+      (isDev && (() => {
+        const recs = generations?.generations ?? [];
+        const last = recs[recs.length - 1];
+        return Boolean(last?.challenge?.killed);
+      })()));
+  const bannerClass = settledNoSurvivor
+    ? "ob-SETTLED"
+    : `ob-${OUTCOME_CLASS[outcome]}`;
   const nextAction = (() => {
     const stage = (detail.stages ?? []).find(
       (s) => s.stage === "NEXT_BEST_ACTION"
@@ -298,9 +316,11 @@ export function OutcomeBanner({
     return (a?.action as string | undefined) ?? (a?.summary as string | undefined);
   })();
   return (
-    <div className={`outcome-banner ob-${OUTCOME_CLASS[outcome]}`}>
+    <div className={`outcome-banner ${bannerClass}`}>
       <div className="outcome-line">
-        {isDev
+        {settledNoSurvivor
+          ? "Run finished — no candidate survived the machine's own challenge gauntlet. Every cause and every generation's lesson is on the record below."
+          : isDev
           ? `Invention ${generations?.n_generations ?? 1} generation${(generations?.n_generations ?? 1) > 1 ? "s" : ""} explored — the current architecture (GEN ${current?.gen ?? 1}) is presented with its honest maturity.`
           : isPremise
             ? "The problem's premise is physically incoherent — reformulate it and run again."
@@ -308,6 +328,20 @@ export function OutcomeBanner({
               ? "Discovery temporarily blocked by infrastructure. Your problem is saved and ready to resume."
               : label}
       </div>
+      {/* R467 (audit P1-6): every terminal run leaves something in the
+          user's hands — the interim evidence pack, offered exactly
+          where the outcome is stated. The technology package keeps
+          its own place when one exists; this offer renders only when
+          none does. */}
+      {isTerminal(detail.status) && !packageAvailable && (
+        <a
+          className="btn download"
+          data-evidence-pack
+          href={`/api/run/${encodeURIComponent(detail.session_id)}/evidence-pack`}
+        >
+          Download the evidence pack — the run's complete record
+        </a>
+      )}
       {isDev && (
         <div className="outcome-detail">
           {current?.maturity && (

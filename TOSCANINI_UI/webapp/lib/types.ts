@@ -147,6 +147,22 @@ export interface SessionDetail {
     score?: number;
     asked_at?: string;
   } | null;
+  // R467 (audit P0-5): the typed "what changed because of your
+  // direction" record — computed by the worker from the PARENT and
+  // CHILD runs' own records (envelope_SYNTHESIZE.mechanism_map
+  // identity comparison), never asserted. No-change is recorded
+  // honestly as no-change.
+  directive_outcome?: {
+    parent_session_id?: string;
+    directive?: string | null;
+    parent_mechanism?: string | null;
+    child_mechanism?: string | null;
+    child_intervention?: string | null;
+    mechanism_changed?: boolean;
+    summary?: string;
+    computed_at?: string;
+    method?: string;
+  } | null;
 }
 
 // R395: conversational Q&A over a run's / invention's own artifacts.

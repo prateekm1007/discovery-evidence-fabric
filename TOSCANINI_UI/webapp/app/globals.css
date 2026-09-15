@@ -57,7 +57,7 @@ a { color: inherit; }
   flex-shrink: 0;
 }
 
-.brand em { color: var(--accent); font-style: normal; }
+.brand em { color: var(--accent-text); font-style: normal; }
 
 .topbar .meta {
   color: var(--ink-faint);
@@ -417,7 +417,7 @@ a { color: inherit; }
 }
 
 .param .pid { font-family: var(--mono); font-size: 13px; }
-.param .val { font-family: var(--mono); font-size: 13px; color: var(--accent); }
+.param .val { font-family: var(--mono); font-size: 13px; color: var(--accent-text); }
 
 .param input[type="range"] { width: 100%; margin: 10px 0 4px; accent-color: var(--accent); }
 
@@ -511,7 +511,10 @@ a { color: inherit; }
 
 
 .btn.download {
-  background: var(--accent);
+  /* R467 (audit P1-5): this override had regressed the CTA to the
+     decorative accent (#c15f3c - 4.22:1 under the white 15.5px/600
+     label, the audit's measured sample); the AA base fill returns */
+  background: var(--accent-text);
   font-size: 15.5px;
   padding: 13px 28px;
 }
@@ -677,8 +680,8 @@ details.tech li { font-size: 13.5px; color: var(--ink-soft); margin-bottom: 6px;
   letter-spacing: 0.2px;
 }
 
-.ws-top .brand:hover em { color: var(--accent); }
-.ws-top .brand em { color: var(--accent); font-style: normal; }
+.ws-top .brand:hover em { color: var(--accent-deep); }
+.ws-top .brand em { color: var(--accent-text); font-style: normal; }
 
 .ws-spacer { flex: 1; }
 
@@ -989,7 +992,7 @@ details.tech li { font-size: 13.5px; color: var(--ink-soft); margin-bottom: 6px;
   cursor: pointer;
   color: var(--ink-soft);
 }
-.ab-toggle button.on { background: var(--accent); color: #fff; }
+.ab-toggle button.on { background: var(--accent-text); color: #fff; }
 .ab-clear {
   appearance: none;
   border: none;
@@ -1143,6 +1146,11 @@ details.tech li { font-size: 13.5px; color: var(--ink-soft); margin-bottom: 6px;
 .outcome-banner .outcome-line { font-weight: 650; font-size: 14.5px; }
 .ob-COMPLETE { background: #f0f6f1; border-color: #c9dbd0; }
 .ob-COMPLETE .outcome-line { color: #234d34; }
+/* R467 (audit P1-2): the SETTLED terminal class — a run that finished
+   with nothing surviving is neither green-complete nor red-error and
+   never visually in-flight: warm neutral paper, quiet ink. */
+.ob-SETTLED { background: #f5f1ea; border-color: #ddd2c2; }
+.ob-SETTLED .outcome-line { color: #4a3f2e; }
 .ob-REJECTED { background: #f9f2ec; border-color: #e3d5c3; }
 .ob-REJECTED .outcome-line { color: #5c4326; }
 .ob-ERROR { background: #f9eeec; border-color: #e6c9c3; }

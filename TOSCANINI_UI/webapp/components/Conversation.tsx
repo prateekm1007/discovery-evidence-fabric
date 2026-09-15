@@ -403,6 +403,23 @@ export default function Conversation({
           </div>
         </div>
       )}
+      {/* R467 (audit P0-5): "a 'what changed because of your direction'
+          card in the UI" — rendered ONLY from the worker's typed
+          directive_outcome record (computed from the parent and child
+          runs' own records). No-change states render honestly as
+          no-change; when the record is absent the card is absent. */}
+      {detail.directive_outcome?.summary && (
+        <div
+          className="conv-row"
+          data-directive-outcome-card
+          data-mechanism-changed={detail.directive_outcome.mechanism_changed ? "true" : "false"}
+        >
+          <div className="conv-continued">
+            <span className="conv-continued-round">What changed because of your direction</span>
+            <span>{detail.directive_outcome.summary}</span>
+          </div>
+        </div>
+      )}
       {emptyState && (
         <div className="conv-row" data-conv-empty>
           <div className="conv-note faint">
