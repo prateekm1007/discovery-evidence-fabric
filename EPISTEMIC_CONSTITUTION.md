@@ -1,6 +1,6 @@
 # Epistemic Constitution — Research & Coding
 
-**Version:** 2.4.0
+**Version:** 2.5.0
 **Ratified:** 2026-08-19
 **Amended:** 2026-08-20 (Articles XXIII–XXXIV — Anti-Gaming, Anti-Entropy, Anti-Hallucination Principles; Article XXXV — Closed-Loop Epistemic Control as the Completion Standard)
 **Amended:** 2026-08-25 (Article XXXVI — TECHNOLOGY_TRANSFER_READY as the Manufactured-Asset Completion Standard; see R309/constitution/ARTICLE_XXXVI_TECHNOLOGY_TRANSFER_READY.md)
@@ -12,6 +12,7 @@
 **Amended:** 2026-09-07 (Article LXX — the Operational Language Rule (English Only), per the operator's CODER NEXT DIRECTIVE section 1; see `R419/constitution/ARTICLE_LXX_OPERATIONAL_LANGUAGE_RULE.md`)
 **Amended:** 2026-09-10 (Article LXXI is RESERVED; Article LXXII — No 3D Artifact Ships Without Passing the Visual Compiler, per the operator's R441 World-Class 3D Pipeline Constitution directive: the pipeline, not prompts, guarantees presentation quality; see `R441/constitution/ARTICLE_LXXII_VISUAL_COMPILER.md`)
 **Amended:** 2026-09-12 (Article LXXI — The Deployed Production URL Is the Delivery Standard, filling the slot reserved on 2026-09-10, per operator directive: a coder round is complete only when its work is at origin/main, the operator-specified production URL serves that exact commit, and a health check confirms deployment identity == pushed SHA; closes the R439 "patch bundle" failure mode)
+**Amended:** 2026-09-16 (Article LXXIII — The Operator Secrets Registry: credentials live in the local vault + the HF Space secret surface; sessions look them up there before asking the operator, per the operator's 2026-09-16 directive "write in your constitution to look it up in huggingface secret, so you dont keep asking me again"; see `R468/constitution/ARTICLE_LXXIII_OPERATOR_SECRETS_REGISTRY.md`)
 **Authority:** Constitutional — supersedes all coding directives, gate results, and research priorities
 **Scope:** Governs both research output AND modifications to the epistemic machinery itself, AND — from v2.0.0 — what the machine may call a discovery or an invention
 
@@ -2093,6 +2094,48 @@ the hero exactly like a failure — Art. V/XXV), and it never promotes the
 geometry's engineering status (a beautiful conceptual render is still
 conceptual — Art. XXVIII). CadQuery/OCCT remains the engineering geometry
 authority; the Visual Compiler is presentation-only (Art. LXI).
+
+## Article LXXIII — The Operator Secrets Registry (Look It Up, Never Re-Ask)
+
+**Ratified:** 2026-09-16 (R468). Full text: `R468/constitution/ARTICLE_LXXIII_OPERATOR_SECRETS_REGISTRY.md`.
+
+> Operator credentials are registered assets, not session favors. Every
+> credential the machine needs — router keys, gateway keys, the Hugging
+> Face token, the GitHub PAT — is persisted in the canonical stores and
+> looked up there before the operator is ever asked. A session that needs
+> a credential MUST consult, in order: (1) its session environment;
+> (2) the operator's local vault (the session workspace root file
+> `.secrets.env` — outside every public repository); (3) the Hugging Face
+> Space secret surface of the canonical production Space (names only —
+> the API is write-only for values; a name present there means the
+> deployed runtime already holds the value). Only when a credential is
+> absent from all three may the session ask the operator — and the ask
+> must name exactly which registered names were absent. Asking the
+> operator for a credential already in the registry is an anti-entropy
+> violation of the Articles XXIII–XXXIV family: it burns operator time
+> and asserts state that does not exist. Secret VALUES never enter the
+> repository, any artifact, log, or commit (BS-021) — fingerprints only.
+
+The registry's operational consequences:
+
+- **The vault is infrastructure, not a convenience.** The local vault
+  (`.secrets.env` at the session workspace root — the same directory
+  that carries the operator's `.gitcreds`) is the readable canonical
+  value store across environment resets; it is never committed, never
+  printed, and never shipped.
+- **The Space secret surface is the runtime injection path.** The
+  canonical production Space's secrets are write-only from outside; the
+  deployed runtime reads them at boot. A deploy re-wires any credential
+  present in the deploy environment and leaves the standing secrets
+  untouched otherwise (the r456 typed-honest pattern).
+- **The live inventory of registered NAMES lives in the round records**
+  (`R468/HF_SPACE_SECRETS.json` and successors), never in this article —
+  operational state does not harden into constitutional law (the Four
+  Layers rule).
+- **Rotation is an operator act, recorded as such.** When the operator
+  supplies a replacement credential, the old fingerprint, the new
+  fingerprint, and the operator directive are recorded in the round
+  record (Art. VI/XXV — declared, never fabricated as measured).
 
 # THE FOUR CONSTITUTIONAL LAYERS
 
