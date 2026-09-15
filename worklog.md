@@ -1338,3 +1338,18 @@ Stage Summary:
 - In flight: commit -> push -> deploy -> the Art. LXXI tuple verification (the HF_TOKEN unblock makes this round's tuple targetable GREEN, unlike R462's DELIVERY_BLOCKED)
 - Deliverables: R463/PROBE_CATALOG.json, R463/AEROLINK_OWNER_ESCALATION.json (OPEN count 1), R463/HF_SPACE_SECRETS.json (2/2 set), the provider_health classification extension, the scrub-guard + deploy-driver extensions, tests/test_r463_aerolink_plan_gate.py (40/40)
 - reviewer_provenance=AI_REVIEW
+
+---
+Task ID: R463 (delivery)
+Agent: Coder 1 (main session)
+Task: R463 final delivery tuple
+
+Work Log:
+- Work commit e4849163 pushed (ls-remote origin/main == local HEAD == e4849163, the Art. LXXI section 1 PUSH condition GREEN)
+- Deployed e4849163 via the standing r456_space_deploy driver (Space revision d94a2e18; upload 49 s; the two new secrets wired: TOKENHARBOR_API_KEY + AEROLINK_API_KEY; the standing five WARN-skipped typed-honestly — their values were wiped locally by the environment reset, the secrets remain set on the Space from R461)
+- Tuple verified: /api/version engine_commit == e4849163 == ls-remote == HEAD (engine_commit_source build_artifact, constitution 2.4.0); /api/health ok=true discovery_ready=true showcase_ready=true (the ~1-minute post-boot discovery_ready flap disclosed in the round record); the deployed provider surface carries the five-router set (bynara 5, unorouter 5, apinex 6, bai 2, xkiro HEALTHY 5)
+- Round record R463/R463_ROUND_RECORD.json assembled with the GREEN tuple (records-only follow-up commit — the standing protocol; the tuple pins the deployed code commit e4849163)
+
+Stage Summary:
+- R463 COMPLETE AND DELIVERED: the seventh candidate honestly refused at the measured account-plan gate (probe-before-admit), the delivered key PROVEN valid by the serving-endpoint differential, the account-plan-gate wording registered in the failure taxonomy (never AUTH_FAILURE for a valid key), the Art. LXV escalation OPEN with the pay-or-park-or-wait unblock path, the R462 HF_TOKEN unblock consumed (both new keys persisted as Space secrets 2/2), and the Art. LXXI delivery tuple GREEN at e4849163
+- reviewer_provenance=AI_REVIEW
