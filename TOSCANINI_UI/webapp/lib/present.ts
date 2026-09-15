@@ -534,10 +534,37 @@ export function deriveConversation(
   // engine recorded (byte-for-byte in the record; the visible line
   // strips only the machine verb tag). The user's words were previously
   // invisible in the child round — the steering looked discarded.
-  const directiveLine = directiveDisplayText(
-    (detail as { user_directive?: { directive?: unknown } }).user_directive
-      ?.directive
-  );
+  //
+  // R466 (reaudit residual friction, root cause): the worker CONSUMES
+  // and CLEARS user_directive when the round starts (worker.py applies
+  // it to the problem understanding, then writes user_directive={}) —
+  // so the steering words vanished from the thread the moment the run
+  // actually began. The DURABLE record of the directive is the child's
+  // own conversation context: the engine appends the directive there
+  // at round creation (conversation_memory.record_conversation_context,
+  // an append-only guarded field that is never cleared). Read order:
+  // the durable conversation record FIRST, the transient
+  // user_directive second (it covers rounds whose conversation entry
+  // predates nothing — both exist for R459+ rounds; for any round one
+  // of the two carries the words). A directive with no record anywhere
+  // renders nothing (Art. VI: nothing is invented).
+  const recordedDirective = detail.parent_session_id
+    ? (Array.isArray(detail.conversation)
+        ? detail.conversation.find(
+            (c) =>
+              c &&
+              c.role === "user" &&
+              typeof c.text === "string" &&
+              c.text.trim().length > 0
+          )?.text
+        : undefined)
+    : undefined;
+  const directiveLine =
+    directiveDisplayText(recordedDirective) ??
+    directiveDisplayText(
+      (detail as { user_directive?: { directive?: unknown } })
+        .user_directive?.directive
+    );
   if (directiveLine) {
     msgs.push({
       kind: "user",

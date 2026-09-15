@@ -122,6 +122,17 @@ export interface SessionDetail {
     directive?: string;
     parent_session_id?: string;
   } | null;
+  // R466 (reaudit residual friction): the round's DURABLE conversation
+  // context — the engine appends the steering directive here at round
+  // creation (an append-only guarded field, never cleared), while
+  // user_directive is consumed and emptied by the worker at spawn.
+  // The directive's words outlive the run start from THIS record.
+  conversation?: {
+    role?: string;
+    text?: string;
+    classification?: string;
+    affects_canonical_state?: boolean;
+  }[];
   // R459 (audit P0-3): attachments bound to this run (engine-side
   // custody; the conversation references them, never absorbs them)
   attachment_ids?: string[];

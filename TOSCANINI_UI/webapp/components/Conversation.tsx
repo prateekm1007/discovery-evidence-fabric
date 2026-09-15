@@ -204,6 +204,7 @@ export default function Conversation({
   onTechnical,
   onNextAction,
   onActionRound,
+  roundNumber,
   askEnabledNote,
 }: {
   detail: SessionDetail;
@@ -218,6 +219,10 @@ export default function Conversation({
   /** R459: an accepted steering action opens a NEW round of the same
    * investigation — the shell navigates to it. */
   onActionRound?: (newRunId: string) => void;
+  /** R466 (reaudit residual friction): WHICH round of the thread this
+      is (derived by page.tsx from the recorded parentage) — the
+      continuation card names it inside the conversation surface. */
+  roundNumber?: number;
   askEnabledNote?: string | null;
 }) {
   const [q, setQ] = useState("");
@@ -371,6 +376,33 @@ export default function Conversation({
 
   return (
     <div className="conv" data-conversation>
+      {/* R466 (reaudit residual friction): the thread continuation is
+          visible WITHIN the conversation surface — not only as the thin
+          page-level fork row above it. A round opened by steering says
+          which round it is and keeps the parent one tap away, right
+          where the thread begins (the audit's acceptance lives here:
+          the new round, the link back, and — as the first user bubble
+          below — the instruction that carried, all in one surface).
+          The round number comes from the recorded parentage chain
+          (lib/rounds.ts); the card renders only what the record
+          supports and nothing when there is no parent. */}
+      {detail.parent_session_id && (
+        <div className="conv-row" data-continued-card data-round={roundNumber ?? 1}>
+          <div className="conv-continued">
+            <span className="conv-continued-round">
+              {roundNumber && roundNumber > 1
+                ? `Round ${roundNumber} of this investigation`
+                : "A continued round of this investigation"}
+            </span>
+            <a
+              className="conv-continued-link faint"
+              href={`/?run=${encodeURIComponent(detail.parent_session_id)}`}
+            >
+              Continue from the earlier round →
+            </a>
+          </div>
+        </div>
+      )}
       {emptyState && (
         <div className="conv-row" data-conv-empty>
           <div className="conv-note faint">

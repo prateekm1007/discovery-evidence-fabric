@@ -984,6 +984,7 @@ function WorkspaceInner() {
                   onTechnical={() => setSurface("journal")}
                   onNextAction={handleNext}
                   onActionRound={(newId) => selectRun(newId)}
+                  roundNumber={currentRound}
                 />
               </>
             ) : runNotFound ? (

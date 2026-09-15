@@ -130,36 +130,57 @@ export default function Sidebar({
     return g;
   }, [roundRows]);
 
+  // R466 (reaudit): the history is a LIST — an <ol> of <li> items, not
+  // loose divs, so assistive tech announces "list, N items" and the
+  // chronological order is semantic, not visual. The styling reset
+  // lives in CSS (.rail-list); the item markup is unchanged.
   const renderItem = (r: RoundRow<SessionRow>) => {
     const s = r.row;
     const dot = stateDot(s.user_state_view);
     return (
-      <button
-        key={s.session_id}
-        className={`rail-item ${r.grouped ? "child" : ""} ${activeRun === s.session_id ? "active" : ""}`}
-        onClick={() => onSelectRun(s.session_id)}
-        type="button"
-        title={s.title}
-      >
-        <span className={`rail-dot rail-dot-${dot.cls}`} role="img" aria-label={dot.label} />
-        <span className="rail-title">{s.title}</span>
-        {/* R464 (audit P1-2): a continued round names its position in
-            the thread — the history reads as one investigation, not
-            as unrelated entries */}
-        {r.round > 1 && (
-          <span className="rail-round" data-rail-round>Round {r.round}</span>
-        )}
-        {/* R463 (audit P1-2): the parent row marks a thread that forked
-            a steering round — the thread is visible from both ends */}
-        {s.has_fork && (
-          <span className="rail-fork faint" data-rail-fork title="This discovery has a continued round">
-            continued
-          </span>
-        )}
-        <span className="rail-when">{s.created_at?.slice(0, 10)}</span>
-      </button>
+      <li key={s.session_id} className={r.grouped ? "child" : undefined}>
+        <button
+          className={`rail-item ${r.grouped ? "child" : ""} ${activeRun === s.session_id ? "active" : ""}`}
+          onClick={() => onSelectRun(s.session_id)}
+          type="button"
+          title={s.title}
+        >
+          <span className={`rail-dot rail-dot-${dot.cls}`} role="img" aria-label={dot.label} />
+          <span className="rail-title">{s.title}</span>
+          {/* R464 (audit P1-2): a continued round names its position in
+              the thread — the history reads as one investigation, not
+              as unrelated entries */}
+          {r.round > 1 && (
+            <span className="rail-round" data-rail-round>Round {r.round}</span>
+          )}
+          {/* R463 (audit P1-2): the parent row marks a thread that forked
+              a steering round — the thread is visible from both ends */}
+          {s.has_fork && (
+            <span className="rail-fork faint" data-rail-fork title="This discovery has a continued round">
+              continued
+            </span>
+          )}
+          <span className="rail-when">{s.created_at?.slice(0, 10)}</span>
+        </button>
+      </li>
     );
   };
+
+  // R466: the released packages are a list too (same semantics, same
+  // reset) — the rail's two sections stay structurally consistent.
+  const renderPackage = (s: ShowcaseRow) => (
+    <li key={s.slot}>
+      <button
+        className={`rail-item inv ${activeInvention === s.slot ? "active" : ""}`}
+        onClick={() => onSelectInvention(s.slot)}
+        type="button"
+        title={s.blurb}
+      >
+        <span className="rail-title">{s.title}</span>
+        <span className="rail-when">{s.domain}</span>
+      </button>
+    </li>
+  );
 
   return (
     <nav className="rail" aria-label="navigation">
@@ -195,7 +216,7 @@ export default function Sidebar({
             <div className="rail-group-h" aria-hidden="true">
               {visible.length} match{visible.length === 1 ? "" : "es"}
             </div>
-            {roundRows.map(renderItem)}
+            <ol className="rail-list">{roundRows.map(renderItem)}</ol>
           </>
         )}
         {!searching && (["today", "week", "earlier"] as const).map((b) => {
@@ -208,7 +229,7 @@ export default function Sidebar({
                   {BUCKET_LABELS[b]}
                 </div>
               ) : null}
-              {items.map(renderItem)}
+              <ol className="rail-list">{items.map(renderItem)}</ol>
             </div>
           );
         })}
@@ -250,33 +271,11 @@ export default function Sidebar({
             appear here as the portfolio produces them.
           </div>
         )}
-        {focus.map((s) => (
-          <button
-            key={s.slot}
-            className={`rail-item inv ${activeInvention === s.slot ? "active" : ""}`}
-            onClick={() => onSelectInvention(s.slot)}
-            type="button"
-            title={s.blurb}
-          >
-            <span className="rail-title">{s.title}</span>
-            <span className="rail-when">{s.domain}</span>
-          </button>
-        ))}
+        <ol className="rail-list">{focus.map(renderPackage)}</ol>
         {others.length > 0 && (
           <details className="rail-more">
             <summary>all {showcase.length} packages</summary>
-            {others.map((s) => (
-              <button
-                key={s.slot}
-                className={`rail-item inv ${activeInvention === s.slot ? "active" : ""}`}
-                onClick={() => onSelectInvention(s.slot)}
-                type="button"
-                title={s.blurb}
-              >
-                <span className="rail-title">{s.title}</span>
-                <span className="rail-when">{s.domain}</span>
-              </button>
-            ))}
+            <ol className="rail-list">{others.map(renderPackage)}</ol>
           </details>
         )}
       </div>
