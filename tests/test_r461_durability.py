@@ -161,3 +161,53 @@ def test_restore_never_overwrites_a_live_record(tmp_path, monkeypatch):
     copied = durable._restore_problem_understanding(repo)
     assert copied == 0
     assert json.loads(live.read_text())["generation"] == "new"
+
+
+# ---------------------------------------------------------------------------
+# fix 4 — the never-registered PENDING class reaches the typed
+# recovery state inside the grace window (not 3 hours)
+# ---------------------------------------------------------------------------
+
+def _seed(path: Path, sessions):
+    path.write_text(json.dumps({"sessions": sessions}))
+
+
+def test_unregistered_pending_sweep_marks_stale(tmp_path, monkeypatch):
+    import time as t
+    monkeypatch.setattr(store, "STORE_DIR", tmp_path)
+    store.SESSIONS_PATH.parent.mkdir(parents=True, exist_ok=True)
+    old = "2026-09-14T00:00:00Z"  # far past the 10-minute grace
+    fresh = t.strftime("%Y-%m-%dT%H:%M:%SZ", t.gmtime())
+    _seed(store.SESSIONS_PATH, [
+        {"session_id": "ts_old_pending", "status": "PENDING",
+         "updated_at": old},                      # never registered, stale
+        {"session_id": "ts_fresh_pending", "status": "PENDING",
+         "updated_at": fresh},                    # fresh — inside grace
+        {"session_id": "ts_registered", "status": "PENDING",
+         "worker_pid": 12345, "updated_at": old},  # registered: liveness sweep's
+        {"session_id": "ts_running", "status": "RUNNING",
+         "updated_at": old},                      # not PENDING: not this sweep's
+    ])
+    marked = store.mark_unregistered_pending()
+    assert marked == ["ts_old_pending"]
+    rec = {s["session_id"]: s for s in store.list_sessions()}
+    assert rec["ts_old_pending"]["status"] == "INTERRUPTED"
+    assert "retried" in rec["ts_old_pending"]["error"]
+    assert rec["ts_fresh_pending"]["status"] == "PENDING"
+    assert rec["ts_registered"]["status"] == "PENDING"
+    assert rec["ts_running"]["status"] == "RUNNING"
+
+
+def test_unregistered_pending_sweep_never_fabricates_verdicts(tmp_path, monkeypatch):
+    """The typed state is INTERRUPTED (recoverable, infrastructure) —
+    never a scientific verdict (Art. LXI)."""
+    monkeypatch.setattr(store, "STORE_DIR", tmp_path)
+    _seed(store.SESSIONS_PATH, [
+        {"session_id": "ts_x", "status": "PENDING",
+         "updated_at": "2026-09-14T00:00:00Z"}])
+    store.mark_unregistered_pending()
+    rec = store.get_session("ts_x")
+    assert rec["status"] == "INTERRUPTED"
+    forbidden = ("REJECT", "KILL", "FAILED", "COMPLETE")
+    for word in forbidden:
+        assert word not in rec["error"].upper()

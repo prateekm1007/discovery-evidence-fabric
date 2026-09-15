@@ -240,6 +240,49 @@ def mark_stuck_sessions(max_age_hours: float = STUCK_AFTER_HOURS) -> List[str]:
     return stuck
 
 
+# R461 (independent audit P0-5): a worker that dies BEFORE phase-0
+# registration leaves the session PENDING with NO pid — the pid-liveness
+# sweep cannot judge it (no pid), and the time-based stuck detector
+# needs 3 hours. MEASURED on production 2026-09-15: a retried session
+# sat PENDING for 12+ minutes with a frozen updated_at and free run
+# capacity, while a session created minutes later registered instantly
+# — the a5a7 instant-death class (R422 ledger note: "cause lost with
+# the container"), invisible to every existing sweep. A healthy worker
+# registers in seconds; PENDING beyond the grace below is an honest
+# typed recovery state, never a scientific verdict (Art. LXI).
+PENDING_REGISTER_GRACE_MINUTES = 10  # MODEL_DERIVED, disclosed per use
+
+
+def mark_unregistered_pending() -> List[str]:
+    """PENDING sessions whose worker never registered (no pid recorded)
+    and whose last update is older than the grace period become
+    INTERRUPTED — recoverable through the documented retry path. A
+    session with a recorded pid is left to the pid-liveness sweep (it
+    can be judged); a FRESH session (within grace) is left alone (its
+    worker may still be importing)."""
+    import datetime as _dt
+    cutoff = (_dt.datetime.utcnow()
+              - _dt.timedelta(minutes=PENDING_REGISTER_GRACE_MINUTES)
+              ).strftime("%Y-%m-%dT%H:%M:%SZ")
+    marked = []
+    for s in list_sessions():
+        if s.get("status") != "PENDING":
+            continue
+        if s.get("worker_pid"):
+            continue  # registered — the liveness sweep owns this record
+        marker = s.get("updated_at") or s.get("created_at") or ""
+        if not marker or marker >= cutoff:
+            continue  # fresh — inside the registration grace window
+        update_session(
+            s["session_id"], status="INTERRUPTED",
+            error=(f"the worker process never registered (no progress "
+                   f"for >{PENDING_REGISTER_GRACE_MINUTES} min since "
+                   f"{marker}) — the run can be retried; nothing was "
+                   "concluded about the problem"))
+        marked.append(s["session_id"])
+    return marked
+
+
 def mark_boot_pending_interrupted() -> List[str]:
     """R419c: BOOT-ONLY sweep — PENDING/BUILDING_PROBLEM sessions at boot
     had their worker die with the previous container and can never resume

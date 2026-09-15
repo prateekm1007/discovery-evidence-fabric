@@ -796,6 +796,11 @@ class Handler(BaseHTTPRequestHandler):
             # eternal spinners, never as success
             interrupted = store.mark_interrupted_sessions()
             stuck = store.mark_stuck_sessions()
+            # R461 (audit P0-5): the never-registered class — a PENDING
+            # session whose worker died before phase-0 (no pid) used to
+            # be invisible to every sweep for 3 hours; it now reaches
+            # the typed retryable state inside the 10-minute grace.
+            unregistered = store.mark_unregistered_pending()
             # R394 s15: OWNERSHIP — a caller sees ONLY their own sessions
             # plus explicitly public demo content. Measured defect this
             # closes (consultant claim 3, CONFIRMED_CURRENT): anonymous
@@ -811,6 +816,7 @@ class Handler(BaseHTTPRequestHandler):
                 "sessions": [public_session_view(s) for s in sessions],
                 "marked_stuck": stuck,
                 "marked_interrupted": interrupted,
+                "marked_unregistered": unregistered,
                 # R447: the caller's OWN capability — lets a browser that
                 # DID receive the cookie capture the equivalent header
                 # token once, then keep working where cookies are blocked
