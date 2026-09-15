@@ -118,9 +118,9 @@ def llm_chat(prompt, system="", max_retries=1, timeout=420):
             purpose="attack")
     else:
         policy = reg.SelectionPolicy(
-            preferred_providers=["nvidia", "openrouter", "deepseek",
-                                 "gemini", "qwen", "openai", "anthropic",
-                                 "mistral"],
+            preferred_providers=["atria", "nvidia", "openrouter",
+                                 "deepseek", "gemini", "qwen", "openai",
+                                 "anthropic", "mistral"],
             purpose="attack")
     res = reg.generate(prompt, system=system, timeout=timeout,
                        max_retries=max_retries, policy=policy)

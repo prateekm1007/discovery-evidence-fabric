@@ -40,10 +40,132 @@ MECHANISM: <mechanism from the paper>
 INTERVENTION: <specific intervention transferring mechanism to device>
 EXPECTED_EFFECT: <expected effect>
 FALSIFICATION_TEST: <concrete test>
-MECHANISM_SOURCE_SPAN: <verbatim substring from abstract supporting MECHANISM>
+{span_instruction}
 """
 
+# R469 (the evidence-span citation contract — the R468 measured gap:
+# 'mechanism_span_not_verbatim; the proposer model did not emit a
+# verbatim evidence-bound span'): the span instruction becomes a
+# mechanical rule block. The verifier (a2/verify.py) stays byte-exact —
+# the fix is claimant-side only (Art. II/III: the verifier is never
+# loosened; exact evidence beats semantic plausibility).
+SPAN_INSTRUCTION = (
+    "MECHANISM_SOURCE_SPAN: <verbatim substring from THIS abstract "
+    "supporting MECHANISM>\n\n"
+    "Mechanical rules for MECHANISM_SOURCE_SPAN (the verifier checks "
+    "this byte-for-byte against the abstract; a paraphrase is a hard "
+    "failure that blocks the whole run):\n"
+    "- Open THIS abstract and COPY at least 8 consecutive words "
+    "character-for-character, including punctuation, capitalization "
+    "and numbers, exactly as written.\n"
+    "- Do NOT paraphrase, re-order, shorten, lengthen, fix grammar, "
+    "or join words that are not adjacent in the abstract.\n"
+    "- Example of RIGHT (abstract says 'Platelets adhere to the "
+    "injured endothelium within seconds'): Platelets adhere to the "
+    "injured endothelium within seconds.\n"
+    "- Example of WRONG: platelet adhesion to damaged vessel lining "
+    "(that is a paraphrase — it fails the byte check).\n"
+    "- If you cannot find 8 consecutive words that support the "
+    "MECHANISM, copy the longest exact phrase that does (10+ words "
+    "preferred; 8 minimum).")
+
 def _hash(s): return hashlib.sha256(s.encode()).hexdigest()[:16]
+
+
+# ---------------------------------------------------------------------------
+# R469 — the mechanical evidence-span repair (the engineer's design,
+# CTO-reviewed). Claimant-side only: a2/verify.py is UNTOUCHED and stays
+# byte-exact. The promoted span is SLICED FROM THE ABSTRACT'S OWN
+# CHARACTERS, so it is a byte-exact substring of the abstract by
+# construction; the verifier then re-checks it with the identical gate.
+# A repair that cannot find >=8 consecutive verbatim words leaves the
+# candidate unchanged — the typed failure stands (Art. XXV honesty).
+# ---------------------------------------------------------------------------
+SPAN_MIN_WORDS = 8
+
+
+def _strip_quotes(text):
+    """Byte-identical to the stripping step in a2/verify.py (the CTO
+    correction to the engineer's draft: no extra quote characters — the
+    'already verbatim' early-exit must agree with the verifier)."""
+    return text.strip().strip('"').strip("'").strip()
+
+
+def _token_offsets(text):
+    """Tokens with character offsets (\\S+ splits like str.split())."""
+    return [(m.group(0), m.start(), m.end())
+            for m in re.finditer(r"\S+", text)]
+
+
+def _longest_common_token_run(emit, abstract, case_insensitive):
+    """Longest run of tokens contiguous in BOTH strings. Exact token
+    comparison, or case-insensitive when case_insensitive=True. NO other
+    normalization (no stemming, no punctuation stripping, no whitespace
+    collapsing) — the repair must never become the fuzzy matcher the
+    Constitution forbids. Ties break by first occurrence in `emit`
+    (strict >), so the result is deterministic."""
+    e = _token_offsets(emit)
+    a = _token_offsets(abstract)
+    e_tok = [t[0].lower() if case_insensitive else t[0] for t in e]
+    a_tok = [t[0].lower() if case_insensitive else t[0] for t in a]
+    n, m = len(e_tok), len(a_tok)
+    if n == 0 or m == 0:
+        return None
+    prev = [0] * (m + 1)
+    best_len, best_e, best_a = 0, 0, 0
+    for i in range(1, n + 1):
+        cur = [0] * (m + 1)
+        ei = e_tok[i - 1]
+        for j in range(1, m + 1):
+            if ei == a_tok[j - 1]:
+                v = prev[j - 1] + 1
+                cur[j] = v
+                if v > best_len:
+                    best_len, best_e, best_a = v, i - v, j - v
+        prev = cur
+    if best_len == 0:
+        return None
+    return best_len, best_e, best_a
+
+
+def _promote_window(abstract, run):
+    """The abstract's OWN text for the run, or None below the floor.
+    Sliced from `abstract` — byte-exact substring by construction."""
+    if run is None:
+        return None
+    length, _e_start, a_start = run
+    if length < SPAN_MIN_WORDS:
+        return None
+    a = _token_offsets(abstract)
+    return abstract[a[a_start][1]:a[a_start + length - 1][2]]
+
+
+def repair_mechanism_span(candidate, abstract):
+    """Mechanical, provenance-recorded repair of a non-verbatim span.
+    In-place; if no >=8-word verbatim contiguous window exists, the
+    candidate is returned UNCHANGED and the typed failure stands."""
+    raw = candidate.get("mechanism_source_span")
+    if not raw:
+        return candidate
+    span = _strip_quotes(raw)
+    # Already passes the gate exactly as emitted -> never touch, never mark.
+    if span in abstract or span.lower() in abstract.lower():
+        return candidate
+    # Mirror verify.py's documented fallback order: exact, then case fold.
+    for case_insensitive in (False, True):
+        promoted = _promote_window(
+            abstract, _longest_common_token_run(span, abstract,
+                                                case_insensitive))
+        if promoted is not None:
+            candidate["mechanism_source_span"] = promoted
+            candidate["span_repair"] = {
+                "original": span,
+                "promoted": promoted,
+                "method": "verbatim-subwindow",
+                "case_insensitive": case_insensitive,
+            }
+            return candidate
+    return candidate
 
 def llm_chat(prompt, system="", max_retries=2, timeout=240,
              max_tokens=512):
@@ -142,7 +264,8 @@ def synthesize(problem: dict, evidence: list[dict]) -> dict | None:
         papers_tried.append(paper.get("id"))
         prompt = SYNTHESIS_PROMPT.format(
             device=problem["device"], failure=problem["failure"], constraint=problem["constraint"],
-            title=paper["title"], abstract=paper["abstract"][:1200])
+            title=paper["title"], abstract=paper["abstract"][:1200],
+            span_instruction=SPAN_INSTRUCTION)
         print(f"  [synthesize] calling LLM (paper {attempt + 1}: "
               f"{str(paper.get('title'))[:60]})...")
         resp = llm_chat(prompt, system="You are a medical device engineer.")
@@ -207,6 +330,12 @@ def synthesize(problem: dict, evidence: list[dict]) -> dict | None:
                 "synthesis_timestamp": datetime.now(timezone.utc).isoformat(),
             }
         candidate = _candidate_from(resp, parsed)
+        # R469 evidence-span contract: the mechanical claimant-side
+        # repair — the promoted span is the abstract's own characters
+        # and verify.py re-checks it byte-exactly (the gate is never
+        # loosened; the repair never fires on an already-verbatim span,
+        # and provenance records every repair).
+        repair_mechanism_span(candidate, paper["abstract"])
         if retry_note:
             candidate["synthesis_retry_note"] = retry_note
         if attempt > 0 or len(papers_tried) > 1:

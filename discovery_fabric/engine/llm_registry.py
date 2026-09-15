@@ -457,7 +457,9 @@ PROVIDER_SPECS: List[ProviderSpec] = [
         # fallback; every rotation is a recorded route hop (never
         # silent, Art. IV).
         key_env_vars=["ATRIA_API_KEY", "ATRIA_API_KEY_2",
-                      "ATRIA_API_KEY_3"],
+                      "ATRIA_API_KEY_3", "ATRIA_API_KEY_4",
+                      "ATRIA_API_KEY_5", "ATRIA_API_KEY_6",
+                      "ATRIA_API_KEY_7"],
         model_revision="Atria-Dawn-Preview — the catalog's SOLE model id "
                        "(owned_by atria, 2026-09-15 catalog); no revision "
                        "pin exposed by the provider — recorded honest "
@@ -507,7 +509,7 @@ PROVIDER_SPECS: List[ProviderSpec] = [
             "Art. XLV attack-independence rule and the Art. V cooldown "
             "demotion still taking precedence over the pin; the honest "
             "tier-2 quality basis is UNCHANGED (a routing pin, never "
-            "a quality rewrite). The THREE-KEY ring (key_env_vars "
+            "a quality rewrite). The SEVEN-KEY ring (key_env_vars "
             "above) rotates on exhaustion-class failures — the "
             "keep-going directive: 'Keep going to a new key of atira "
             "if one is exhausted.'")),

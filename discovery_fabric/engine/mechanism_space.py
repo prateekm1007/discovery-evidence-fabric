@@ -153,9 +153,10 @@ def llm_generate(prompt: str, system: str = "", timeout: int = 240,
         else:
             pin_status = f"requested_but_unavailable ({pin})"
     policy = SelectionPolicy(
-        preferred_providers=preferred or ["zai", "openrouter", "nvidia",
-                                           "anthropic", "openai", "gemini",
-                                           "qwen", "deepseek", "mistral"],
+        preferred_providers=preferred or ["atria", "zai", "openrouter",
+                                           "nvidia", "anthropic", "openai",
+                                           "gemini", "qwen", "deepseek",
+                                           "mistral"],
         purpose=purpose)
     res = generate(prompt, system=system, timeout=timeout,
                    max_retries=2, policy=policy, max_tokens=max_tokens,
