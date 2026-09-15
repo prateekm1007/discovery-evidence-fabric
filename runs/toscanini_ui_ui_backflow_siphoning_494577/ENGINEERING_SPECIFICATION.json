@@ -3,12 +3,13 @@
  "domain_detection": {
   "epistemic_class": "MODEL_DERIVED",
   "matched_signals": [
+   "cerebrospinal",
    "fluid",
    "pump",
    "shunt",
    "valve"
   ],
-  "note": "0 phenomena anchor(s) + 4 routing signal(s); selection basis: ROUTING_ONLY",
+  "note": "0 phenomena anchor(s) + 5 routing signal(s); selection basis: ROUTING_ONLY",
   "label": "Fluid mechanics / hydraulics",
   "selection_basis": "ROUTING_ONLY",
   "phenomena_layer": {},
@@ -18,6 +19,7 @@
      "fluid",
      "shunt",
      "valve",
+     "cerebrospinal",
      "pump"
     ]
    },
@@ -31,7 +33,7 @@
     ]
    }
   },
-  "why_selected": "domain fluidics_hydraulic selected by KEYWORD ROUTING ONLY — no phenomena anchor matched (fluid, pump, shunt, valve); the routing keywords are the entire evidence base and are recorded as such (weaker justification, disclosed)",
+  "why_selected": "domain fluidics_hydraulic selected by KEYWORD ROUTING ONLY — no phenomena anchor matched (cerebrospinal, fluid, pump, shunt, valve); the routing keywords are the entire evidence base and are recorded as such (weaker justification, disclosed)",
   "applicable_models": [
    "Poiseuille pressure-flow relation for laminar lumen flow",
    "orifice/restriction pressure drop",
@@ -56,16 +58,21 @@
   "canonical_family_basis": {
    "canonical_family": "biomedical",
    "label": "Biomedical & life-science systems",
-   "score": 69,
+   "score": 81,
    "min_form_score": 3,
    "score_table": [
     {
      "family": "biomedical",
-     "score": 5,
+     "score": 29,
      "hits": [
       {
        "keyword": "shunt",
        "weight": 5,
+       "count": 5
+      },
+      {
+       "keyword": "implant",
+       "weight": 4,
        "count": 1
       }
      ]
@@ -77,27 +84,22 @@
     },
     {
      "family": "fluid",
-     "score": 69,
+     "score": 81,
      "hits": [
       {
        "keyword": "pump",
        "weight": 6,
-       "count": 4
+       "count": 5
       },
       {
        "keyword": "valve",
        "weight": 5,
-       "count": 8
+       "count": 9
       },
       {
        "keyword": "fluid",
        "weight": 2,
-       "count": 1
-      },
-      {
-       "keyword": "diaphragm",
-       "weight": 3,
-       "count": 1
+       "count": 3
       }
      ]
     },
@@ -139,6 +141,8 @@
    ],
    "whole_form_basis": {
     "matched_form_signals": [
+     "implant",
+     "implanted",
      "shunt"
     ],
     "rule": "whole-form device identity: the problem's own device/site statement declares an implantable or medical-device form — the application family is biomedical and dominates component-mention keyword scores (the bridge whole-form precedent; deployment words are deliberately excluded: a hospital dashboard stays software_ml)",
@@ -156,6 +160,7 @@
    }
   },
   "matched_signals": [
+   "cerebrospinal",
    "fluid",
    "pump",
    "shunt",
@@ -169,9 +174,9 @@
   },
   "basis": "domain selected by the PHENOMENA layer (physical quantities/effects the domain's governing equations model) matched against THIS invention's own mechanism/problem text, with keyword routing as fallback/tiebreak — CEO item 2: keywords route, never justify; the layered evidence is recorded in domain_detection",
   "epistemic_class": "MODEL_DERIVED",
-  "note": "0 phenomena anchor(s) + 4 routing signal(s); selection basis: ROUTING_ONLY",
+  "note": "0 phenomena anchor(s) + 5 routing signal(s); selection basis: ROUTING_ONLY",
   "selection_basis": "ROUTING_ONLY",
-  "why_selected": "domain fluidics_hydraulic selected by KEYWORD ROUTING ONLY — no phenomena anchor matched (fluid, pump, shunt, valve); the routing keywords are the entire evidence base and are recorded as such (weaker justification, disclosed)",
+  "why_selected": "domain fluidics_hydraulic selected by KEYWORD ROUTING ONLY — no phenomena anchor matched (cerebrospinal, fluid, pump, shunt, valve); the routing keywords are the entire evidence base and are recorded as such (weaker justification, disclosed)",
   "applicable_models": [
    "Poiseuille pressure-flow relation for laminar lumen flow",
    "orifice/restriction pressure drop",
@@ -235,16 +240,24 @@
  "applicability": {
   "artifact": "PROBLEM_CONTEXT_APPLICABILITY",
   "context_class": "MEDICAL_IN_VIVO",
-  "score": 6,
+  "score": 19,
   "min_context_score": 4,
   "score_table": [
    {
     "context_class": "MEDICAL_IN_VIVO",
-    "score": 6,
+    "score": 19,
     "hits": [
+     {
+      "signal": "implant",
+      "weight": 6
+     },
      {
       "signal": "shunt",
       "weight": 6
+     },
+     {
+      "signal": "cerebrospinal",
+      "weight": 7
      }
     ]
    },
@@ -255,8 +268,13 @@
    },
    {
     "context_class": "INDUSTRIAL_PROCESS",
-    "score": 0,
-    "hits": []
+    "score": 5,
+    "hits": [
+     {
+      "signal": "plant",
+      "weight": 5
+     }
+    ]
    },
    {
     "context_class": "LABORATORY_BENCH",
@@ -271,8 +289,16 @@
   ],
   "matched_signals": [
    {
+    "signal": "implant",
+    "weight": 6
+   },
+   {
     "signal": "shunt",
     "weight": 6
+   },
+   {
+    "signal": "cerebrospinal",
+    "weight": 7
    }
   ],
   "basis": "context class selected by deterministic signal score over the canonical problem text (user problem + recorded problem statement + invention mechanism/intervention site); ties resolve by fixed registry order; below the minimum score the honest UNKNOWN class is selected — every downstream requirement becomes UNKNOWN, never a default guess",
@@ -343,7 +369,7 @@
   "materials science"
  ],
  "system_architecture": {
-  "description": "PROPOSED architecture (no physical system exists): flow path / lumen architecture; pressure regulation element; sensing / feedback element (if closed-loop); termination interfaces (application-context-specific: source and sink boundaries); termination interfaces (patient / reservoir) — realizing: transfer a passive, no-moving-parts valve class mechanism (e.g., a diaphragm- or slit-type passive pressure/flow-regulation principle referenced in shunt valve design evolution) into the anti-siphon check valve as a static cracking-pressure element that closes the drip line purely by hydrostatic pressure differential when the pump stops",
+  "description": "PROPOSED architecture (no physical system exists): flow path / lumen architecture; pressure regulation element; sensing / feedback element (if closed-loop); termination interfaces (application-context-specific: source and sink boundaries); termination interfaces (patient / reservoir) — realizing: import into the anti-siphon check valve the static cracking-pressure differential principle from the ventriculoperitoneal shunt valve engineering evolution (doi:10.1016/j.wneu.2024.123593), fix the cracking pressure above the worst-case static siphon head using the documented shunt failure mechanism that obstructive failure from accumulated biological material and debris in the inner walls blocks the normal flow of the drained cerebrospinal fluid (doi:10.1227/ons.0000000000000372) as the design constraint that selects the cracking setpoint, and require the static element to remain sealed with no moving parts, no external power, and no active cleaning so that biological material and debris cannot accumulate against a moving seal.",
   "subsystems": [
    {
     "name": "flow path / lumen architecture",
@@ -352,27 +378,52 @@
     "invention_tie": {
      "invention_tied": true,
      "matched_tokens": [
+      "above",
+      "accumulate",
+      "accumulated",
+      "active",
+      "against",
+      "biological",
+      "block",
+      "blocks",
+      "cannot",
+      "cerebrospinal",
       "check",
-      "class",
-      "closes",
+      "cleaning",
+      "constraint",
+      "cracking",
+      "debris",
       "design",
       "differential",
+      "documented",
+      "drained",
       "element",
+      "engineering",
       "evolution",
-      "hydrostatic",
+      "external",
+      "failure",
+      "fluid",
+      "import",
+      "inner",
+      "material",
       "mechanism",
       "moving",
+      "normal",
+      "obstructive",
       "parts",
-      "passive",
       "pressure",
       "principle",
-      "purely",
-      "referenced",
+      "remain",
+      "require",
+      "sealed",
+      "selects",
       "shunt",
+      "siphon",
       "static",
-      "stops",
-      "transfer",
-      "valve"
+      "using",
+      "valve",
+      "ventriculoperitoneal",
+      "walls"
      ]
     }
    },
@@ -383,27 +434,52 @@
     "invention_tie": {
      "invention_tied": true,
      "matched_tokens": [
+      "above",
+      "accumulate",
+      "accumulated",
+      "active",
+      "against",
+      "biological",
+      "block",
+      "blocks",
+      "cannot",
+      "cerebrospinal",
       "check",
-      "class",
-      "closes",
+      "cleaning",
+      "constraint",
+      "cracking",
+      "debris",
       "design",
       "differential",
+      "documented",
+      "drained",
       "element",
+      "engineering",
       "evolution",
-      "hydrostatic",
+      "external",
+      "failure",
+      "fluid",
+      "import",
+      "inner",
+      "material",
       "mechanism",
       "moving",
+      "normal",
+      "obstructive",
       "parts",
-      "passive",
       "pressure",
       "principle",
-      "purely",
-      "referenced",
+      "remain",
+      "require",
+      "sealed",
+      "selects",
       "shunt",
+      "siphon",
       "static",
-      "stops",
-      "transfer",
-      "valve"
+      "using",
+      "valve",
+      "ventriculoperitoneal",
+      "walls"
      ]
     }
    },
@@ -414,27 +490,53 @@
     "invention_tie": {
      "invention_tied": true,
      "matched_tokens": [
+      "above",
+      "accumulate",
+      "accumulated",
+      "active",
+      "against",
+      "biological",
+      "block",
+      "blocks",
+      "cannot",
+      "cerebrospinal",
       "check",
-      "class",
-      "closes",
+      "cleaning",
+      "closed",
+      "constraint",
+      "cracking",
+      "debris",
       "design",
       "differential",
+      "documented",
+      "drained",
       "element",
+      "engineering",
       "evolution",
-      "hydrostatic",
+      "external",
+      "failure",
+      "fluid",
+      "import",
+      "inner",
+      "material",
       "mechanism",
       "moving",
+      "normal",
+      "obstructive",
       "parts",
-      "passive",
       "pressure",
       "principle",
-      "purely",
-      "referenced",
+      "remain",
+      "require",
+      "sealed",
+      "selects",
       "shunt",
+      "siphon",
       "static",
-      "stops",
-      "transfer",
-      "valve"
+      "using",
+      "valve",
+      "ventriculoperitoneal",
+      "walls"
      ]
     }
    },
@@ -445,28 +547,53 @@
     "invention_tie": {
      "invention_tied": true,
      "matched_tokens": [
+      "above",
+      "accumulate",
+      "accumulated",
+      "active",
+      "against",
+      "biological",
+      "block",
+      "blocks",
+      "cannot",
+      "cerebrospinal",
       "check",
-      "class",
-      "closes",
+      "cleaning",
+      "constraint",
+      "cracking",
+      "debris",
       "design",
       "differential",
+      "documented",
+      "drained",
       "element",
+      "engineering",
       "evolution",
-      "hydrostatic",
+      "external",
+      "failure",
+      "fluid",
+      "import",
+      "inner",
+      "material",
       "mechanism",
       "moving",
+      "normal",
+      "obstructive",
       "parts",
-      "passive",
       "pressure",
       "principle",
-      "purely",
-      "referenced",
+      "remain",
+      "require",
+      "sealed",
+      "selects",
       "shunt",
+      "siphon",
       "source",
       "static",
-      "stops",
-      "transfer",
-      "valve"
+      "using",
+      "valve",
+      "ventriculoperitoneal",
+      "walls"
      ]
     }
    },
@@ -477,34 +604,59 @@
     "invention_tie": {
      "invention_tied": true,
      "matched_tokens": [
+      "above",
+      "accumulate",
+      "accumulated",
+      "active",
+      "against",
+      "biological",
+      "block",
+      "blocks",
+      "cannot",
+      "cerebrospinal",
       "check",
-      "class",
-      "closes",
+      "cleaning",
+      "constraint",
+      "cracking",
+      "debris",
       "design",
       "differential",
+      "documented",
+      "drained",
       "element",
+      "engineering",
       "evolution",
-      "hydrostatic",
+      "external",
+      "failure",
+      "fluid",
+      "import",
+      "inner",
+      "material",
       "mechanism",
       "moving",
+      "normal",
+      "obstructive",
       "parts",
-      "passive",
       "pressure",
       "principle",
-      "purely",
-      "referenced",
+      "remain",
+      "require",
+      "sealed",
+      "selects",
       "shunt",
+      "siphon",
       "static",
-      "stops",
-      "transfer",
-      "valve"
+      "using",
+      "valve",
+      "ventriculoperitoneal",
+      "walls"
      ]
     }
    }
   ]
  },
  "mechanism_architecture": {
-  "physical_changes": "PROPOSED: transfer a passive, no-moving-parts valve class mechanism (e.g., a diaphragm- or slit-type passive pressure/flow-regulation principle referenced in shunt valve design evolution) into the anti-siphon check valve as a static cracking-pressure element that closes the drip line purely by hydrostatic pressure differential when the pump stops",
+  "physical_changes": "PROPOSED: import into the anti-siphon check valve the static cracking-pressure differential principle from the ventriculoperitoneal shunt valve engineering evolution (doi:10.1016/j.wneu.2024.123593), fix the cracking pressure above the worst-case static siphon head using the documented shunt failure mechanism that obstructive failure from accumulated biological material and debris in the inner walls blocks the normal flow of the drained cerebrospinal fluid (doi:10.1227/ons.0000000000000372) as the design constraint that selects the cracking setpoint, and require the static element to remain sealed with no moving parts, no external power, and no active cleaning so that biological material and debris cannot accumulate against a moving seal.",
   "key_physics": "Fluid mechanics / hydraulics governing relations proposed for this invention; SYMBOLIC ONLY until inputs are sourced",
   "status": "MODELLED",
   "source_refs": [
@@ -529,7 +681,7 @@
   {
    "id": "DI-002",
    "input": "Mechanism driver (proposed)",
-   "value": "historical engineering evolution of valve designs and their failure mechanisms, including valve classes with distinct advantages and shortcomings used to control fluid direction and pressure",
+   "value": "passive prevention of backflow siphoning in the drip irrigation line via a static, non-moving cracking-pressure closure element, wherein a fixed hydrostatic pressure differential across the static valve element exceeds a predetermined cracking threshold and holds the valve closed against the downstream siphon column once the pump stops, so that obstructive failure from accumulated biological material and debris in the inner walls, which blocks the normal flow of the drained cerebrospinal fluid in implanted shunts, cannot occur in the irrigation line because the cracking pressure is set above the maximum static siphon head using the same fixed differential principle reported in the shunt valve engineering evolution.",
    "source": "MODELLED (LLM synthesis)",
    "evidence_class": "MODELLED",
    "parent_ids": [
@@ -541,7 +693,7 @@
   {
    "id": "DI-003",
    "input": "Expected effect target",
-   "value": "passive prevention of backflow siphoning upon pump shutdown without moving parts, external power, or significant cost increase",
+   "value": "passive prevention of backflow siphoning upon pump shutdown without moving parts, external power, or significant cost increase, with the cracking pressure fixed above the worst-case static siphon head to eliminate the obstructive-failure mode reported for shunts in which biological material and debris accumulate in the inner walls and block the normal flow of the drained cerebrospinal fluid.",
    "source": "MODELLED (LLM synthesis)",
    "evidence_class": "MODELLED",
    "parent_ids": [
@@ -554,7 +706,7 @@
   {
    "id": "DI-004",
    "input": "Domain design input pattern: required flow window at available pressure head",
-   "value": "invention applicability: TIED via tokens ['pressure']",
+   "value": "invention applicability: TIED via tokens ['pressure', 'require']",
    "source": "ENGINEERING_PROPOSED (domain registry pattern)",
    "evidence_class": "ENGINEERING_PROPOSED",
    "parent_ids": [
@@ -864,7 +1016,7 @@
     "DI-002",
     "DI-008"
    ],
-   "description": "flow path / lumen architecture realizing transfer a passive, no-moving-parts valve class mechanism (e.g., a diaphragm- or slit-type passive pressure/flow-regulation principle referenced in shunt valve design evolution) into the anti-siphon check valve as a static cracking-pressure element that closes the drip line purely by hydrostatic pressure differential when the pump stops",
+   "description": "flow path / lumen architecture realizing import into the anti-siphon check valve the static cracking-pressure differential principle from the ventriculoperitoneal shunt valve engineering evolution (doi:10.1016/j.wneu.2024.123593), fix the cracking pressure above the worst-case static siphon head using the documented shunt failure mechanism that obstructive failure from accumulated biological material and debris in the inner walls blocks the normal flow of the drained cerebrospinal fluid (doi:10.1227/ons.0000000000000372) as the design constraint that selects the cracking setpoint, and require the static element to remain sealed with no moving parts, no external power, and no active cleaning so that biological material and debris cannot accumulate against a moving seal.",
    "status": "CONCEPTUAL",
    "missing_inputs": [
     "detailed architecture definition"
@@ -874,21 +1026,34 @@
    "role_in_invention": {
     "invention_tied": true,
     "matched_tokens": [
+     "above",
+     "accumulate",
+     "accumulated",
+     "active",
+     "against",
+     "biological",
+     "block",
+     "blocks",
+     "cannot",
+     "cerebrospinal",
      "check",
-     "class",
-     "closes",
+     "cleaning",
+     "constraint",
+     "cracking",
+     "debris",
      "design",
      "differential",
+     "documented",
+     "drained",
      "element",
+     "engineering",
      "evolution",
-     "hydrostatic",
-     "mechanism",
-     "moving",
-     "parts",
-     "passive",
-     "pressure",
-     "principle",
-     "purely"
+     "external",
+     "failure",
+     "fluid",
+     "import",
+     "inner",
+     "material"
     ]
    }
   },
@@ -899,7 +1064,7 @@
     "DI-002",
     "DI-008"
    ],
-   "description": "pressure regulation element realizing transfer a passive, no-moving-parts valve class mechanism (e.g., a diaphragm- or slit-type passive pressure/flow-regulation principle referenced in shunt valve design evolution) into the anti-siphon check valve as a static cracking-pressure element that closes the drip line purely by hydrostatic pressure differential when the pump stops",
+   "description": "pressure regulation element realizing import into the anti-siphon check valve the static cracking-pressure differential principle from the ventriculoperitoneal shunt valve engineering evolution (doi:10.1016/j.wneu.2024.123593), fix the cracking pressure above the worst-case static siphon head using the documented shunt failure mechanism that obstructive failure from accumulated biological material and debris in the inner walls blocks the normal flow of the drained cerebrospinal fluid (doi:10.1227/ons.0000000000000372) as the design constraint that selects the cracking setpoint, and require the static element to remain sealed with no moving parts, no external power, and no active cleaning so that biological material and debris cannot accumulate against a moving seal.",
    "status": "CONCEPTUAL",
    "missing_inputs": [
     "detailed architecture definition"
@@ -909,21 +1074,34 @@
    "role_in_invention": {
     "invention_tied": true,
     "matched_tokens": [
+     "above",
+     "accumulate",
+     "accumulated",
+     "active",
+     "against",
+     "biological",
+     "block",
+     "blocks",
+     "cannot",
+     "cerebrospinal",
      "check",
-     "class",
-     "closes",
+     "cleaning",
+     "constraint",
+     "cracking",
+     "debris",
      "design",
      "differential",
+     "documented",
+     "drained",
      "element",
+     "engineering",
      "evolution",
-     "hydrostatic",
-     "mechanism",
-     "moving",
-     "parts",
-     "passive",
-     "pressure",
-     "principle",
-     "purely"
+     "external",
+     "failure",
+     "fluid",
+     "import",
+     "inner",
+     "material"
     ]
    }
   },
@@ -934,7 +1112,7 @@
     "DI-002",
     "DI-008"
    ],
-   "description": "sensing / feedback element (if closed-loop) realizing transfer a passive, no-moving-parts valve class mechanism (e.g., a diaphragm- or slit-type passive pressure/flow-regulation principle referenced in shunt valve design evolution) into the anti-siphon check valve as a static cracking-pressure element that closes the drip line purely by hydrostatic pressure differential when the pump stops",
+   "description": "sensing / feedback element (if closed-loop) realizing import into the anti-siphon check valve the static cracking-pressure differential principle from the ventriculoperitoneal shunt valve engineering evolution (doi:10.1016/j.wneu.2024.123593), fix the cracking pressure above the worst-case static siphon head using the documented shunt failure mechanism that obstructive failure from accumulated biological material and debris in the inner walls blocks the normal flow of the drained cerebrospinal fluid (doi:10.1227/ons.0000000000000372) as the design constraint that selects the cracking setpoint, and require the static element to remain sealed with no moving parts, no external power, and no active cleaning so that biological material and debris cannot accumulate against a moving seal.",
    "status": "CONCEPTUAL",
    "missing_inputs": [
     "detailed architecture definition"
@@ -944,21 +1122,35 @@
    "role_in_invention": {
     "invention_tied": true,
     "matched_tokens": [
+     "above",
+     "accumulate",
+     "accumulated",
+     "active",
+     "against",
+     "biological",
+     "block",
+     "blocks",
+     "cannot",
+     "cerebrospinal",
      "check",
-     "class",
-     "closes",
+     "cleaning",
+     "closed",
+     "constraint",
+     "cracking",
+     "debris",
      "design",
      "differential",
+     "documented",
+     "drained",
      "element",
+     "engineering",
      "evolution",
-     "hydrostatic",
-     "mechanism",
-     "moving",
-     "parts",
-     "passive",
-     "pressure",
-     "principle",
-     "purely"
+     "external",
+     "failure",
+     "fluid",
+     "import",
+     "inner",
+     "material"
     ]
    }
   },
@@ -969,7 +1161,7 @@
     "DI-002",
     "DI-008"
    ],
-   "description": "termination interfaces (application-context-specific: source and sink boundaries) realizing transfer a passive, no-moving-parts valve class mechanism (e.g., a diaphragm- or slit-type passive pressure/flow-regulation principle referenced in shunt valve design evolution) into the anti-siphon check valve as a static cracking-pressure element that closes the drip line purely by hydrostatic pressure differential when the pump stops",
+   "description": "termination interfaces (application-context-specific: source and sink boundaries) realizing import into the anti-siphon check valve the static cracking-pressure differential principle from the ventriculoperitoneal shunt valve engineering evolution (doi:10.1016/j.wneu.2024.123593), fix the cracking pressure above the worst-case static siphon head using the documented shunt failure mechanism that obstructive failure from accumulated biological material and debris in the inner walls blocks the normal flow of the drained cerebrospinal fluid (doi:10.1227/ons.0000000000000372) as the design constraint that selects the cracking setpoint, and require the static element to remain sealed with no moving parts, no external power, and no active cleaning so that biological material and debris cannot accumulate against a moving seal.",
    "status": "CONCEPTUAL",
    "missing_inputs": [
     "detailed architecture definition"
@@ -979,21 +1171,34 @@
    "role_in_invention": {
     "invention_tied": true,
     "matched_tokens": [
+     "above",
+     "accumulate",
+     "accumulated",
+     "active",
+     "against",
+     "biological",
+     "block",
+     "blocks",
+     "cannot",
+     "cerebrospinal",
      "check",
-     "class",
-     "closes",
+     "cleaning",
+     "constraint",
+     "cracking",
+     "debris",
      "design",
      "differential",
+     "documented",
+     "drained",
      "element",
+     "engineering",
      "evolution",
-     "hydrostatic",
-     "mechanism",
-     "moving",
-     "parts",
-     "passive",
-     "pressure",
-     "principle",
-     "purely"
+     "external",
+     "failure",
+     "fluid",
+     "import",
+     "inner",
+     "material"
     ]
    }
   },
@@ -1004,7 +1209,7 @@
     "DI-002",
     "DI-008"
    ],
-   "description": "termination interfaces (patient / reservoir) realizing transfer a passive, no-moving-parts valve class mechanism (e.g., a diaphragm- or slit-type passive pressure/flow-regulation principle referenced in shunt valve design evolution) into the anti-siphon check valve as a static cracking-pressure element that closes the drip line purely by hydrostatic pressure differential when the pump stops",
+   "description": "termination interfaces (patient / reservoir) realizing import into the anti-siphon check valve the static cracking-pressure differential principle from the ventriculoperitoneal shunt valve engineering evolution (doi:10.1016/j.wneu.2024.123593), fix the cracking pressure above the worst-case static siphon head using the documented shunt failure mechanism that obstructive failure from accumulated biological material and debris in the inner walls blocks the normal flow of the drained cerebrospinal fluid (doi:10.1227/ons.0000000000000372) as the design constraint that selects the cracking setpoint, and require the static element to remain sealed with no moving parts, no external power, and no active cleaning so that biological material and debris cannot accumulate against a moving seal.",
    "status": "CONCEPTUAL",
    "missing_inputs": [
     "detailed architecture definition"
@@ -1014,21 +1219,34 @@
    "role_in_invention": {
     "invention_tied": true,
     "matched_tokens": [
+     "above",
+     "accumulate",
+     "accumulated",
+     "active",
+     "against",
+     "biological",
+     "block",
+     "blocks",
+     "cannot",
+     "cerebrospinal",
      "check",
-     "class",
-     "closes",
+     "cleaning",
+     "constraint",
+     "cracking",
+     "debris",
      "design",
      "differential",
+     "documented",
+     "drained",
      "element",
+     "engineering",
      "evolution",
-     "hydrostatic",
-     "mechanism",
-     "moving",
-     "parts",
-     "passive",
-     "pressure",
-     "principle",
-     "purely"
+     "external",
+     "failure",
+     "fluid",
+     "import",
+     "inner",
+     "material"
     ]
    }
   },
@@ -1041,7 +1259,7 @@
     "DI-002",
     "DI-008"
    ],
-   "description": "flow path / lumen architecture interfaces with pressure regulation element: signal/energy/material hand-off for transfer a passive, no-moving-parts valve class mechanism (e.g., a diaphragm- or slit-type passive pressure/flow-regulation principle referenced in shunt valve design evolution) into the anti-siphon check valve as a static cracking-pressure element that closes the drip line purely by hydrostatic pressure differential when the pump stops",
+   "description": "flow path / lumen architecture interfaces with pressure regulation element: signal/energy/material hand-off for import into the anti-siphon check valve the static cracking-pressure differential principle from the ventriculoperitoneal shunt valve engineering evolution (doi:10.1016/j.wneu.2024.123593), fix the cracking pressure above the worst-case static siphon head using the documented shunt failure mechanism that obstructive failure from accumulated biological material and debris in the inner walls blocks the normal flow of the drained cerebrospinal fluid (doi:10.1227/ons.0000000000000372) as the design constraint that selects the cracking setpoint, and require the static element to remain sealed with no moving parts, no external power, and no active cleaning so that biological material and debris cannot accumulate against a moving seal.",
    "status": "CONCEPTUAL",
    "missing_inputs": [
     "interface quantification (dimensions, tolerances)"
@@ -1061,7 +1279,7 @@
     "DI-002",
     "DI-008"
    ],
-   "description": "pressure regulation element interfaces with sensing / feedback element (if closed-loop): signal/energy/material hand-off for transfer a passive, no-moving-parts valve class mechanism (e.g., a diaphragm- or slit-type passive pressure/flow-regulation principle referenced in shunt valve design evolution) into the anti-siphon check valve as a static cracking-pressure element that closes the drip line purely by hydrostatic pressure differential when the pump stops",
+   "description": "pressure regulation element interfaces with sensing / feedback element (if closed-loop): signal/energy/material hand-off for import into the anti-siphon check valve the static cracking-pressure differential principle from the ventriculoperitoneal shunt valve engineering evolution (doi:10.1016/j.wneu.2024.123593), fix the cracking pressure above the worst-case static siphon head using the documented shunt failure mechanism that obstructive failure from accumulated biological material and debris in the inner walls blocks the normal flow of the drained cerebrospinal fluid (doi:10.1227/ons.0000000000000372) as the design constraint that selects the cracking setpoint, and require the static element to remain sealed with no moving parts, no external power, and no active cleaning so that biological material and debris cannot accumulate against a moving seal.",
    "status": "CONCEPTUAL",
    "missing_inputs": [
     "interface quantification (dimensions, tolerances)"
@@ -1081,7 +1299,7 @@
     "DI-002",
     "DI-008"
    ],
-   "description": "sensing / feedback element (if closed-loop) interfaces with termination interfaces (application-context-specific: source and sink boundaries): signal/energy/material hand-off for transfer a passive, no-moving-parts valve class mechanism (e.g., a diaphragm- or slit-type passive pressure/flow-regulation principle referenced in shunt valve design evolution) into the anti-siphon check valve as a static cracking-pressure element that closes the drip line purely by hydrostatic pressure differential when the pump stops",
+   "description": "sensing / feedback element (if closed-loop) interfaces with termination interfaces (application-context-specific: source and sink boundaries): signal/energy/material hand-off for import into the anti-siphon check valve the static cracking-pressure differential principle from the ventriculoperitoneal shunt valve engineering evolution (doi:10.1016/j.wneu.2024.123593), fix the cracking pressure above the worst-case static siphon head using the documented shunt failure mechanism that obstructive failure from accumulated biological material and debris in the inner walls blocks the normal flow of the drained cerebrospinal fluid (doi:10.1227/ons.0000000000000372) as the design constraint that selects the cracking setpoint, and require the static element to remain sealed with no moving parts, no external power, and no active cleaning so that biological material and debris cannot accumulate against a moving seal.",
    "status": "CONCEPTUAL",
    "missing_inputs": [
     "interface quantification (dimensions, tolerances)"
@@ -1101,7 +1319,7 @@
     "DI-002",
     "DI-008"
    ],
-   "description": "termination interfaces (application-context-specific: source and sink boundaries) interfaces with termination interfaces (patient / reservoir): signal/energy/material hand-off for transfer a passive, no-moving-parts valve class mechanism (e.g., a diaphragm- or slit-type passive pressure/flow-regulation principle referenced in shunt valve design evolution) into the anti-siphon check valve as a static cracking-pressure element that closes the drip line purely by hydrostatic pressure differential when the pump stops",
+   "description": "termination interfaces (application-context-specific: source and sink boundaries) interfaces with termination interfaces (patient / reservoir): signal/energy/material hand-off for import into the anti-siphon check valve the static cracking-pressure differential principle from the ventriculoperitoneal shunt valve engineering evolution (doi:10.1016/j.wneu.2024.123593), fix the cracking pressure above the worst-case static siphon head using the documented shunt failure mechanism that obstructive failure from accumulated biological material and debris in the inner walls blocks the normal flow of the drained cerebrospinal fluid (doi:10.1227/ons.0000000000000372) as the design constraint that selects the cracking setpoint, and require the static element to remain sealed with no moving parts, no external power, and no active cleaning so that biological material and debris cannot accumulate against a moving seal.",
    "status": "CONCEPTUAL",
    "missing_inputs": [
     "interface quantification (dimensions, tolerances)"
@@ -1121,7 +1339,7 @@
     "DI-004",
     "DI-008"
    ],
-   "description": "Device boundaries: patient/fluid inlet and outlet terminations, external control/data port as required by transfer a passive, no-moving-parts valve class mechanism (e.g., a diaphragm- or slit-type passive pressure/flow-regulation principle referenced in shunt valve design evolution) into the anti-siphon check valve as a static cracking-pressure element that closes the drip line purely by hydrostatic pressure differential when the pump stops",
+   "description": "Device boundaries: patient/fluid inlet and outlet terminations, external control/data port as required by import into the anti-siphon check valve the static cracking-pressure differential principle from the ventriculoperitoneal shunt valve engineering evolution (doi:10.1016/j.wneu.2024.123593), fix the cracking pressure above the worst-case static siphon head using the documented shunt failure mechanism that obstructive failure from accumulated biological material and debris in the inner walls blocks the normal flow of the drained cerebrospinal fluid (doi:10.1227/ons.0000000000000372) as the design constraint that selects the cracking setpoint, and require the static element to remain sealed with no moving parts, no external power, and no active cleaning so that biological material and debris cannot accumulate against a moving seal.",
    "status": "CONCEPTUAL",
    "missing_inputs": [
     "connector standards selection",
@@ -1147,7 +1365,7 @@
     "DI-002",
     "DI-008"
    ],
-   "description": "Flow/force/signal path geometry realizing the mechanism (transfer a passive, no-moving-parts valve class mechanism (e.g., a diaphragm- or slit-type passive pressure/flow-regulation principle referenced in shunt valve design evolution) into the anti-siphon check valve as a static cracking-pressure element that closes the drip line purely by hydrostatic pressure differential when the pump stops); every dimension is a named design decision with UNKNOWN value",
+   "description": "Flow/force/signal path geometry realizing the mechanism (import into the anti-siphon check valve the static cracking-pressure differential principle from the ventriculoperitoneal shunt valve engineering evolution (doi:10.1016/j.wneu.2024.123593), fix the cracking pressure above the worst-case static siphon head using the documented shunt failure mechanism that obstructive failure from accumulated biological material and debris in the inner walls blocks the normal flow of the drained cerebrospinal fluid (doi:10.1227/ons.0000000000000372) as the design constraint that selects the cracking setpoint, and require the static element to remain sealed with no moving parts, no external power, and no active cleaning so that biological material and debris cannot accumulate against a moving seal.); every dimension is a named design decision with UNKNOWN value",
    "status": "UNKNOWN",
    "missing_inputs": [
     "all dimensions",
@@ -1301,7 +1519,7 @@
     "DI-002",
     "DI-008"
    ],
-   "description": "Sensing -> decision -> actuation loop maintaining the mechanism's operating point for transfer a passive, no-moving-parts valve class mechanism (e.g., a diaphragm- or slit-type passive pressure/flow-regulation principle referenced in shunt valve design evolution) into the anti-siphon check valve as a static cracking-pressure element that closes the drip line purely by hydrostatic pressure differential when the pump stops",
+   "description": "Sensing -> decision -> actuation loop maintaining the mechanism's operating point for import into the anti-siphon check valve the static cracking-pressure differential principle from the ventriculoperitoneal shunt valve engineering evolution (doi:10.1016/j.wneu.2024.123593), fix the cracking pressure above the worst-case static siphon head using the documented shunt failure mechanism that obstructive failure from accumulated biological material and debris in the inner walls blocks the normal flow of the drained cerebrospinal fluid (doi:10.1227/ons.0000000000000372) as the design constraint that selects the cracking setpoint, and require the static element to remain sealed with no moving parts, no external power, and no active cleaning so that biological material and debris cannot accumulate against a moving seal.",
    "status": "PROPOSED",
    "missing_inputs": [
     "sensing modality selection",
@@ -1424,66 +1642,66 @@
    "tied_items": 21,
    "total_items": 23,
    "tokens_used": [
+    "above",
     "absence",
+    "accumulate",
+    "accumulated",
+    "across",
     "active",
     "adjudication",
-    "advantages",
+    "against",
     "answers",
     "backflow",
+    "because",
+    "biological",
+    "block",
+    "blocks",
+    "cannot",
+    "cerebrospinal",
     "cheap",
     "check",
     "clamp",
-    "class",
-    "classes",
-    "closes",
+    "cleaning",
+    "closed",
+    "closure",
+    "column",
     "concerning",
-    "control",
+    "constraint",
+    "cracking",
+    "debris",
     "decision",
     "design",
-    "designs",
     "differential",
-    "direction",
-    "distinct",
     "documented",
+    "downstream",
+    "drained",
     "element",
+    "eliminate",
     "engineering",
     "evidence",
     "evolution",
+    "exceeds",
     "existence",
     "external",
     "failure",
+    "fixed",
     "flagged",
     "floor",
     "fluid",
     "fusion",
     "grammar",
-    "historical",
+    "holds",
     "hydrostatic",
-    "including",
-    "increase",
+    "implanted",
+    "import",
+    "inner",
     "instability",
     "irrigation",
     "keeps",
     "lands",
     "lexical",
-    "measured",
-    "mechanical",
-    "mechanism",
-    "moving",
-    "outcome",
-    "papers",
-    "parts",
-    "passive",
-    "phase",
-    "poison",
-    "pooled",
-    "pressure",
-    "prevention",
-    "principle",
-    "problem",
-    "production",
-    "provider",
-    "purely"
+    "material",
+    "maximum"
    ]
   },
   "contract": "CEO A7: CONCEPTUAL/PROPOSED/UNKNOWN vocabulary; no geometry invented"
@@ -1581,46 +1799,79 @@
    "invention_tie": {
     "invention_tied": true,
     "matched_tokens": [
-     "advantages",
+     "above",
+     "accumulate",
+     "accumulated",
+     "across",
+     "active",
+     "against",
      "backflow",
+     "because",
+     "biological",
+     "block",
+     "blocks",
+     "cannot",
+     "cerebrospinal",
      "check",
-     "class",
-     "classes",
-     "closes",
-     "control",
+     "clamp",
+     "cleaning",
+     "closed",
+     "closure",
+     "column",
+     "constraint",
+     "cracking",
+     "debris",
      "design",
-     "designs",
      "differential",
-     "direction",
-     "distinct",
+     "documented",
+     "downstream",
+     "drained",
      "element",
+     "eliminate",
      "engineering",
      "evolution",
+     "exceeds",
      "external",
      "failure",
+     "fixed",
      "fluid",
-     "historical",
+     "holds",
      "hydrostatic",
-     "including",
-     "increase",
+     "implanted",
+     "import",
+     "inner",
+     "irrigation",
+     "material",
+     "maximum",
      "mechanism",
      "moving",
+     "normal",
+     "obstructive",
+     "occur",
      "parts",
      "passive",
+     "predetermined",
      "pressure",
      "prevention",
      "principle",
-     "purely",
-     "referenced",
-     "shortcomings",
+     "remain",
+     "reported",
+     "require",
+     "sealed",
+     "selects",
      "shunt",
+     "shunts",
      "shutdown",
      "significant",
+     "siphon",
      "siphoning",
      "static",
-     "stops",
-     "transfer",
+     "threshold",
+     "using",
      "valve",
+     "ventriculoperitoneal",
+     "walls",
+     "wherein",
      "without"
     ]
    }
@@ -1637,46 +1888,79 @@
    "invention_tie": {
     "invention_tied": true,
     "matched_tokens": [
-     "advantages",
+     "above",
+     "accumulate",
+     "accumulated",
+     "across",
+     "active",
+     "against",
      "backflow",
+     "because",
+     "biological",
+     "block",
+     "blocks",
+     "cannot",
+     "cerebrospinal",
      "check",
-     "class",
-     "classes",
-     "closes",
-     "control",
+     "clamp",
+     "cleaning",
+     "closed",
+     "closure",
+     "column",
+     "constraint",
+     "cracking",
+     "debris",
      "design",
-     "designs",
      "differential",
-     "direction",
-     "distinct",
+     "documented",
+     "downstream",
+     "drained",
      "element",
+     "eliminate",
      "engineering",
      "evolution",
+     "exceeds",
      "external",
      "failure",
+     "fixed",
      "fluid",
-     "historical",
+     "holds",
      "hydrostatic",
-     "including",
-     "increase",
+     "implanted",
+     "import",
+     "inner",
+     "irrigation",
+     "material",
+     "maximum",
      "mechanism",
      "moving",
+     "normal",
+     "obstructive",
+     "occur",
      "parts",
      "passive",
+     "predetermined",
      "pressure",
      "prevention",
      "principle",
-     "purely",
-     "referenced",
-     "shortcomings",
+     "remain",
+     "reported",
+     "require",
+     "sealed",
+     "selects",
      "shunt",
+     "shunts",
      "shutdown",
      "significant",
+     "siphon",
      "siphoning",
      "static",
-     "stops",
-     "transfer",
+     "threshold",
+     "using",
      "valve",
+     "ventriculoperitoneal",
+     "walls",
+     "wherein",
      "without"
     ]
    }
@@ -1693,46 +1977,79 @@
    "invention_tie": {
     "invention_tied": true,
     "matched_tokens": [
-     "advantages",
+     "above",
+     "accumulate",
+     "accumulated",
+     "across",
+     "active",
+     "against",
      "backflow",
+     "because",
+     "biological",
+     "block",
+     "blocks",
+     "cannot",
+     "cerebrospinal",
      "check",
-     "class",
-     "classes",
-     "closes",
-     "control",
+     "clamp",
+     "cleaning",
+     "closed",
+     "closure",
+     "column",
+     "constraint",
+     "cracking",
+     "debris",
      "design",
-     "designs",
      "differential",
-     "direction",
-     "distinct",
+     "documented",
+     "downstream",
+     "drained",
      "element",
+     "eliminate",
      "engineering",
      "evolution",
+     "exceeds",
      "external",
      "failure",
+     "fixed",
      "fluid",
-     "historical",
+     "holds",
      "hydrostatic",
-     "including",
-     "increase",
+     "implanted",
+     "import",
+     "inner",
+     "irrigation",
+     "material",
+     "maximum",
      "mechanism",
      "moving",
+     "normal",
+     "obstructive",
+     "occur",
      "parts",
      "passive",
+     "predetermined",
      "pressure",
      "prevention",
      "principle",
-     "purely",
-     "referenced",
-     "shortcomings",
+     "remain",
+     "reported",
+     "require",
+     "sealed",
+     "selects",
      "shunt",
+     "shunts",
      "shutdown",
      "significant",
+     "siphon",
      "siphoning",
      "static",
-     "stops",
-     "transfer",
+     "threshold",
+     "using",
      "valve",
+     "ventriculoperitoneal",
+     "walls",
+     "wherein",
      "without"
     ]
    }
@@ -1749,46 +2066,79 @@
    "invention_tie": {
     "invention_tied": true,
     "matched_tokens": [
-     "advantages",
+     "above",
+     "accumulate",
+     "accumulated",
+     "across",
+     "active",
+     "against",
      "backflow",
+     "because",
+     "biological",
+     "block",
+     "blocks",
+     "cannot",
+     "cerebrospinal",
      "check",
-     "class",
-     "classes",
-     "closes",
-     "control",
+     "clamp",
+     "cleaning",
+     "closed",
+     "closure",
+     "column",
+     "constraint",
+     "cracking",
+     "debris",
      "design",
-     "designs",
      "differential",
-     "direction",
-     "distinct",
+     "documented",
+     "downstream",
+     "drained",
      "element",
+     "eliminate",
      "engineering",
      "evolution",
+     "exceeds",
      "external",
      "failure",
+     "fixed",
      "fluid",
-     "historical",
+     "holds",
      "hydrostatic",
-     "including",
-     "increase",
+     "implanted",
+     "import",
+     "inner",
+     "irrigation",
+     "material",
+     "maximum",
      "mechanism",
      "moving",
+     "normal",
+     "obstructive",
+     "occur",
      "parts",
      "passive",
+     "predetermined",
      "pressure",
      "prevention",
      "principle",
-     "purely",
-     "referenced",
-     "shortcomings",
+     "remain",
+     "reported",
+     "require",
+     "sealed",
+     "selects",
      "shunt",
+     "shunts",
      "shutdown",
      "significant",
+     "siphon",
      "siphoning",
      "static",
-     "stops",
-     "transfer",
+     "threshold",
+     "using",
      "valve",
+     "ventriculoperitoneal",
+     "walls",
+     "wherein",
      "without"
     ]
    }
@@ -1804,46 +2154,79 @@
     "invention_tie": {
      "invention_tied": true,
      "matched_tokens": [
-      "advantages",
+      "above",
+      "accumulate",
+      "accumulated",
+      "across",
+      "active",
+      "against",
       "backflow",
+      "because",
+      "biological",
+      "block",
+      "blocks",
+      "cannot",
+      "cerebrospinal",
       "check",
-      "class",
-      "classes",
-      "closes",
-      "control",
+      "clamp",
+      "cleaning",
+      "closed",
+      "closure",
+      "column",
+      "constraint",
+      "cracking",
+      "debris",
       "design",
-      "designs",
       "differential",
-      "direction",
-      "distinct",
+      "documented",
+      "downstream",
+      "drained",
       "element",
+      "eliminate",
       "engineering",
       "evolution",
+      "exceeds",
       "external",
       "failure",
+      "fixed",
       "fluid",
-      "historical",
+      "holds",
       "hydrostatic",
-      "including",
-      "increase",
+      "implanted",
+      "import",
+      "inner",
+      "irrigation",
+      "material",
+      "maximum",
       "mechanism",
       "moving",
+      "normal",
+      "obstructive",
+      "occur",
       "parts",
       "passive",
+      "predetermined",
       "pressure",
       "prevention",
       "principle",
-      "purely",
-      "referenced",
-      "shortcomings",
+      "remain",
+      "reported",
+      "require",
+      "sealed",
+      "selects",
       "shunt",
+      "shunts",
       "shutdown",
       "significant",
+      "siphon",
       "siphoning",
       "static",
-      "stops",
-      "transfer",
+      "threshold",
+      "using",
       "valve",
+      "ventriculoperitoneal",
+      "walls",
+      "wherein",
       "without"
      ]
     }
@@ -1856,46 +2239,79 @@
     "invention_tie": {
      "invention_tied": true,
      "matched_tokens": [
-      "advantages",
+      "above",
+      "accumulate",
+      "accumulated",
+      "across",
+      "active",
+      "against",
       "backflow",
+      "because",
+      "biological",
+      "block",
+      "blocks",
+      "cannot",
+      "cerebrospinal",
       "check",
-      "class",
-      "classes",
-      "closes",
-      "control",
+      "clamp",
+      "cleaning",
+      "closed",
+      "closure",
+      "column",
+      "constraint",
+      "cracking",
+      "debris",
       "design",
-      "designs",
       "differential",
-      "direction",
-      "distinct",
+      "documented",
+      "downstream",
+      "drained",
       "element",
+      "eliminate",
       "engineering",
       "evolution",
+      "exceeds",
       "external",
       "failure",
+      "fixed",
       "fluid",
-      "historical",
+      "holds",
       "hydrostatic",
-      "including",
-      "increase",
+      "implanted",
+      "import",
+      "inner",
+      "irrigation",
+      "material",
+      "maximum",
       "mechanism",
       "moving",
+      "normal",
+      "obstructive",
+      "occur",
       "parts",
       "passive",
+      "predetermined",
       "pressure",
       "prevention",
       "principle",
-      "purely",
-      "referenced",
-      "shortcomings",
+      "remain",
+      "reported",
+      "require",
+      "sealed",
+      "selects",
       "shunt",
+      "shunts",
       "shutdown",
       "significant",
+      "siphon",
       "siphoning",
       "static",
-      "stops",
-      "transfer",
+      "threshold",
+      "using",
       "valve",
+      "ventriculoperitoneal",
+      "walls",
+      "wherein",
       "without"
      ]
     }
@@ -1908,46 +2324,79 @@
     "invention_tie": {
      "invention_tied": true,
      "matched_tokens": [
-      "advantages",
+      "above",
+      "accumulate",
+      "accumulated",
+      "across",
+      "active",
+      "against",
       "backflow",
+      "because",
+      "biological",
+      "block",
+      "blocks",
+      "cannot",
+      "cerebrospinal",
       "check",
-      "class",
-      "classes",
-      "closes",
-      "control",
+      "clamp",
+      "cleaning",
+      "closed",
+      "closure",
+      "column",
+      "constraint",
+      "cracking",
+      "debris",
       "design",
-      "designs",
       "differential",
-      "direction",
-      "distinct",
+      "documented",
+      "downstream",
+      "drained",
       "element",
+      "eliminate",
       "engineering",
       "evolution",
+      "exceeds",
       "external",
       "failure",
+      "fixed",
       "fluid",
-      "historical",
+      "holds",
       "hydrostatic",
-      "including",
-      "increase",
+      "implanted",
+      "import",
+      "inner",
+      "irrigation",
+      "material",
+      "maximum",
       "mechanism",
       "moving",
+      "normal",
+      "obstructive",
+      "occur",
       "parts",
       "passive",
+      "predetermined",
       "pressure",
       "prevention",
       "principle",
-      "purely",
-      "referenced",
-      "shortcomings",
+      "remain",
+      "reported",
+      "require",
+      "sealed",
+      "selects",
       "shunt",
+      "shunts",
       "shutdown",
       "significant",
+      "siphon",
       "siphoning",
       "static",
-      "stops",
-      "transfer",
+      "threshold",
+      "using",
       "valve",
+      "ventriculoperitoneal",
+      "walls",
+      "wherein",
       "without"
      ]
     }
@@ -1996,7 +2445,7 @@
   "interfaces": [
    {
     "id": "DO-010",
-    "description": "Device boundaries: patient/fluid inlet and outlet terminations, external control/data port as required by transfer a passive, no-moving-parts valve class mechanism (e.g., a diaphragm- or slit-type passive pressure/flow-regulation principle referenced in shunt valve design evolution) into the anti-siphon check valve as a static cracking-pressure element that closes the drip line purely by hydrostatic pressure differential when the pump stops",
+    "description": "Device boundaries: patient/fluid inlet and outlet terminations, external control/data port as required by import into the anti-siphon check valve the static cracking-pressure differential principle from the ventriculoperitoneal shunt valve engineering evolution (doi:10.1016/j.wneu.2024.123593), fix the cracking pressure above the worst-case static siphon head using the documented shunt failure mechanism that obstructive failure from accumulated biological material and debris in the inner walls blocks the normal flow of the drained cerebrospinal fluid (doi:10.1227/ons.0000000000000372) as the design constraint that selects the cracking setpoint, and require the static element to remain sealed with no moving parts, no external power, and no active cleaning so that biological material and debris cannot accumulate against a moving seal.",
     "status": "CONCEPTUAL",
     "detail": [
      {
@@ -2326,6 +2775,9 @@
        }
       ],
       "mechanism_asserted_concepts": {
+       "decision_rule": [
+        "threshold"
+       ],
        "utility_preference": [
         "cost"
        ]
@@ -2385,6 +2837,9 @@
       "engaged_variables": [],
       "engagement_evidence": [],
       "mechanism_asserted_concepts": {
+       "decision_rule": [
+        "threshold"
+       ],
        "utility_preference": [
         "cost"
        ]
@@ -2444,6 +2899,9 @@
        }
       ],
       "mechanism_asserted_concepts": {
+       "decision_rule": [
+        "threshold"
+       ],
        "utility_preference": [
         "cost"
        ]
@@ -2487,16 +2945,21 @@
     "canonical_family_basis": {
      "canonical_family": "biomedical",
      "label": "Biomedical & life-science systems",
-     "score": 69,
+     "score": 81,
      "min_form_score": 3,
      "score_table": [
       {
        "family": "biomedical",
-       "score": 5,
+       "score": 29,
        "hits": [
         {
          "keyword": "shunt",
          "weight": 5,
+         "count": 5
+        },
+        {
+         "keyword": "implant",
+         "weight": 4,
          "count": 1
         }
        ]
@@ -2508,27 +2971,22 @@
       },
       {
        "family": "fluid",
-       "score": 69,
+       "score": 81,
        "hits": [
         {
          "keyword": "pump",
          "weight": 6,
-         "count": 4
+         "count": 5
         },
         {
          "keyword": "valve",
          "weight": 5,
-         "count": 8
+         "count": 9
         },
         {
          "keyword": "fluid",
          "weight": 2,
-         "count": 1
-        },
-        {
-         "keyword": "diaphragm",
-         "weight": 3,
-         "count": 1
+         "count": 3
         }
        ]
       },
@@ -2570,6 +3028,8 @@
      ],
      "whole_form_basis": {
       "matched_form_signals": [
+       "implant",
+       "implanted",
        "shunt"
       ],
       "rule": "whole-form device identity: the problem's own device/site statement declares an implantable or medical-device form — the application family is biomedical and dominates component-mention keyword scores (the bridge whole-form precedent; deployment words are deliberately excluded: a hospital dashboard stays software_ml)",
@@ -2587,6 +3047,7 @@
      }
     },
     "matched_signals": [
+     "cerebrospinal",
      "fluid",
      "pump",
      "shunt",
@@ -2600,9 +3061,9 @@
     },
     "basis": "domain selected by the PHENOMENA layer (physical quantities/effects the domain's governing equations model) matched against THIS invention's own mechanism/problem text, with keyword routing as fallback/tiebreak — CEO item 2: keywords route, never justify; the layered evidence is recorded in domain_detection",
     "epistemic_class": "MODEL_DERIVED",
-    "note": "0 phenomena anchor(s) + 4 routing signal(s); selection basis: ROUTING_ONLY",
+    "note": "0 phenomena anchor(s) + 5 routing signal(s); selection basis: ROUTING_ONLY",
     "selection_basis": "ROUTING_ONLY",
-    "why_selected": "domain fluidics_hydraulic selected by KEYWORD ROUTING ONLY — no phenomena anchor matched (fluid, pump, shunt, valve); the routing keywords are the entire evidence base and are recorded as such (weaker justification, disclosed)",
+    "why_selected": "domain fluidics_hydraulic selected by KEYWORD ROUTING ONLY — no phenomena anchor matched (cerebrospinal, fluid, pump, shunt, valve); the routing keywords are the entire evidence base and are recorded as such (weaker justification, disclosed)",
     "applicable_models": [
      "Poiseuille pressure-flow relation for laminar lumen flow",
      "orifice/restriction pressure drop",
@@ -3162,8 +3623,8 @@
   "external_precedent": "domain module Fluid mechanics / hydraulics; standards listed as candidates requiring applicability verification",
   "proposed_design": {
    "input": "no moving parts, no external power, low cost, mechanical only",
-   "mechanism": "historical engineering evolution of valve designs and their failure mechanisms, including valve classes with distinct advantages and shortcomings used to control fluid direction and pressure",
-   "transformation": "passive prevention of backflow siphoning upon pump shutdown without moving parts, external power, or significant cost increase",
+   "mechanism": "passive prevention of backflow siphoning in the drip irrigation line via a static, non-moving cracking-pressure closure element, wherein a fixed hydrostatic pressure differential across the static valve element exceeds a predetermined cracking threshold and holds the valve closed against the downstream siphon column once the pump stops, so that obstructive failure from accumulated biological material and debris in the inner walls, which blocks the normal flow of the drained cerebrospinal fluid in implanted shunts, cannot occur in the irrigation line because the cracking pressure is set above the maximum static siphon head using the same fixed differential principle reported in the shunt valve engineering evolution.",
+   "transformation": "passive prevention of backflow siphoning upon pump shutdown without moving parts, external power, or significant cost increase, with the cracking pressure fixed above the worst-case static siphon head to eliminate the obstructive-failure mode reported for shunts in which biological material and debris accumulate in the inner walls and block the normal flow of the drained cerebrospinal fluid.",
    "output": "NOT ESTABLISHED (no measured output exists)",
    "component_architecture": "flow path / lumen architecture; pressure regulation element; sensing / feedback element (if closed-loop); termination interfaces (application-context-specific: source and sink boundaries); termination interfaces (patient / reservoir)",
    "status": "MODELLED / ENGINEERING_PROPOSED"
@@ -3218,6 +3679,7 @@
       "flow"
      ],
      "matched_invention_tokens": [
+      "across",
       "pressure"
      ],
      "evaluation": "mechanical token match (exact substring); MODEL_DERIVED, recorded for audit"
@@ -3248,9 +3710,9 @@
      "verdict": "TIED",
      "matched_applicability_signals": [],
      "matched_invention_tokens": [
+      "exceeds",
       "external",
-      "pressure",
-      "stops"
+      "pressure"
      ],
      "evaluation": "mechanical token match (exact substring); MODEL_DERIVED, recorded for audit"
     }
@@ -3322,6 +3784,7 @@
      "verdict": "TIED",
      "matched_applicability_signals": [],
      "matched_invention_tokens": [
+      "above",
       "element",
       "parts",
       "pressure"
@@ -3359,6 +3822,7 @@
      "matched_invention_tokens": [
       "backflow",
       "check",
+      "occur",
       "pressure",
       "valve"
      ],
@@ -3576,6 +4040,7 @@
      "flow"
     ],
     "matched_invention_tokens": [
+     "across",
      "pressure"
     ],
     "evaluation": "mechanical token match (exact substring); MODEL_DERIVED, recorded for audit"
@@ -3606,9 +4071,9 @@
     "verdict": "TIED",
     "matched_applicability_signals": [],
     "matched_invention_tokens": [
+     "exceeds",
      "external",
-     "pressure",
-     "stops"
+     "pressure"
     ],
     "evaluation": "mechanical token match (exact substring); MODEL_DERIVED, recorded for audit"
    }
@@ -3680,6 +4145,7 @@
     "verdict": "TIED",
     "matched_applicability_signals": [],
     "matched_invention_tokens": [
+     "above",
      "element",
      "parts",
      "pressure"
@@ -3717,6 +4183,7 @@
     "matched_invention_tokens": [
      "backflow",
      "check",
+     "occur",
      "pressure",
      "valve"
     ],
@@ -4238,7 +4705,7 @@
   "integrity": {
    "passed": true,
    "problems": [],
-   "checked_at": "2026-09-15T17:54:46+00:00Z"
+   "checked_at": "2026-09-15T17:57:40+00:00Z"
   },
   "gaps": [
    {
@@ -4535,57 +5002,57 @@
    {
     "id": "DO-001",
     "kind": "DESIGN_OUTPUT",
-    "label": "flow path / lumen architecture realizing transfer a passive, no-moving-parts valve class mechanism (e.g., a diaphragm- or slit-type passive pressure/flow-regulation principle referenced in shunt valve design evolution) into the anti-siphon check valve as a static cracking-pressure element that closes the drip line purely by hydrostatic pressure differential when the pump stops"
+    "label": "flow path / lumen architecture realizing import into the anti-siphon check valve the static cracking-pressure differential principle from the ventriculoperitoneal shunt valve engineering evolution (doi:10.1016/j.wneu.2024.123593), fix the cracking pressure above the worst-case static siphon head using the documented shunt failure mechanism that obstructive failure from accumulated biological material and debris in the inner walls blocks the normal flow of the drained cerebrospinal fluid (doi:10.1227/ons.0000000000000372) as the design constraint that selects the cracking setpoint, and require the static element to remain sealed with no moving parts, no external power, and no active cleaning so that biological material and debris cannot accumulate against a moving seal."
    },
    {
     "id": "DO-002",
     "kind": "DESIGN_OUTPUT",
-    "label": "pressure regulation element realizing transfer a passive, no-moving-parts valve class mechanism (e.g., a diaphragm- or slit-type passive pressure/flow-regulation principle referenced in shunt valve design evolution) into the anti-siphon check valve as a static cracking-pressure element that closes the drip line purely by hydrostatic pressure differential when the pump stops"
+    "label": "pressure regulation element realizing import into the anti-siphon check valve the static cracking-pressure differential principle from the ventriculoperitoneal shunt valve engineering evolution (doi:10.1016/j.wneu.2024.123593), fix the cracking pressure above the worst-case static siphon head using the documented shunt failure mechanism that obstructive failure from accumulated biological material and debris in the inner walls blocks the normal flow of the drained cerebrospinal fluid (doi:10.1227/ons.0000000000000372) as the design constraint that selects the cracking setpoint, and require the static element to remain sealed with no moving parts, no external power, and no active cleaning so that biological material and debris cannot accumulate against a moving seal."
    },
    {
     "id": "DO-003",
     "kind": "DESIGN_OUTPUT",
-    "label": "sensing / feedback element (if closed-loop) realizing transfer a passive, no-moving-parts valve class mechanism (e.g., a diaphragm- or slit-type passive pressure/flow-regulation principle referenced in shunt valve design evolution) into the anti-siphon check valve as a static cracking-pressure element that closes the drip line purely by hydrostatic pressure differential when the pump stops"
+    "label": "sensing / feedback element (if closed-loop) realizing import into the anti-siphon check valve the static cracking-pressure differential principle from the ventriculoperitoneal shunt valve engineering evolution (doi:10.1016/j.wneu.2024.123593), fix the cracking pressure above the worst-case static siphon head using the documented shunt failure mechanism that obstructive failure from accumulated biological material and debris in the inner walls blocks the normal flow of the drained cerebrospinal fluid (doi:10.1227/ons.0000000000000372) as the design constraint that selects the cracking setpoint, and require the static element to remain sealed with no moving parts, no external power, and no active cleaning so that biological material and debris cannot accumulate against a moving seal."
    },
    {
     "id": "DO-004",
     "kind": "DESIGN_OUTPUT",
-    "label": "termination interfaces (application-context-specific: source and sink boundaries) realizing transfer a passive, no-moving-parts valve class mechanism (e.g., a diaphragm- or slit-type passive pressure/flow-regulation principle referenced in shunt valve design evolution) into the anti-siphon check valve as a static cracking-pressure element that closes the drip line purely by hydrostatic pressure differential when the pump stops"
+    "label": "termination interfaces (application-context-specific: source and sink boundaries) realizing import into the anti-siphon check valve the static cracking-pressure differential principle from the ventriculoperitoneal shunt valve engineering evolution (doi:10.1016/j.wneu.2024.123593), fix the cracking pressure above the worst-case static siphon head using the documented shunt failure mechanism that obstructive failure from accumulated biological material and debris in the inner walls blocks the normal flow of the drained cerebrospinal fluid (doi:10.1227/ons.0000000000000372) as the design constraint that selects the cracking setpoint, and require the static element to remain sealed with no moving parts, no external power, and no active cleaning so that biological material and debris cannot accumulate against a moving seal."
    },
    {
     "id": "DO-005",
     "kind": "DESIGN_OUTPUT",
-    "label": "termination interfaces (patient / reservoir) realizing transfer a passive, no-moving-parts valve class mechanism (e.g., a diaphragm- or slit-type passive pressure/flow-regulation principle referenced in shunt valve design evolution) into the anti-siphon check valve as a static cracking-pressure element that closes the drip line purely by hydrostatic pressure differential when the pump stops"
+    "label": "termination interfaces (patient / reservoir) realizing import into the anti-siphon check valve the static cracking-pressure differential principle from the ventriculoperitoneal shunt valve engineering evolution (doi:10.1016/j.wneu.2024.123593), fix the cracking pressure above the worst-case static siphon head using the documented shunt failure mechanism that obstructive failure from accumulated biological material and debris in the inner walls blocks the normal flow of the drained cerebrospinal fluid (doi:10.1227/ons.0000000000000372) as the design constraint that selects the cracking setpoint, and require the static element to remain sealed with no moving parts, no external power, and no active cleaning so that biological material and debris cannot accumulate against a moving seal."
    },
    {
     "id": "DO-006",
     "kind": "DESIGN_OUTPUT",
-    "label": "flow path / lumen architecture interfaces with pressure regulation element: signal/energy/material hand-off for transfer a passive, no-moving-parts valve class mechanism (e.g., a diaphragm- or slit-type passive pressure/flow-regulation principle referenced in shunt valve design evolution) into the anti-siphon check valve as a static cracking-pressure element that closes the drip line purely by hydrostatic pressure differential when the pump stops"
+    "label": "flow path / lumen architecture interfaces with pressure regulation element: signal/energy/material hand-off for import into the anti-siphon check valve the static cracking-pressure differential principle from the ventriculoperitoneal shunt valve engineering evolution (doi:10.1016/j.wneu.2024.123593), fix the cracking pressure above the worst-case static siphon head using the documented shunt failure mechanism that obstructive failure from accumulated biological material and debris in the inner walls blocks the normal flow of the drained cerebrospinal fluid (doi:10.1227/ons.0000000000000372) as the design constraint that selects the cracking setpoint, and require the static element to remain sealed with no moving parts, no external power, and no active cleaning so that biological material and debris cannot accumulate against a moving seal."
    },
    {
     "id": "DO-007",
     "kind": "DESIGN_OUTPUT",
-    "label": "pressure regulation element interfaces with sensing / feedback element (if closed-loop): signal/energy/material hand-off for transfer a passive, no-moving-parts valve class mechanism (e.g., a diaphragm- or slit-type passive pressure/flow-regulation principle referenced in shunt valve design evolution) into the anti-siphon check valve as a static cracking-pressure element that closes the drip line purely by hydrostatic pressure differential when the pump stops"
+    "label": "pressure regulation element interfaces with sensing / feedback element (if closed-loop): signal/energy/material hand-off for import into the anti-siphon check valve the static cracking-pressure differential principle from the ventriculoperitoneal shunt valve engineering evolution (doi:10.1016/j.wneu.2024.123593), fix the cracking pressure above the worst-case static siphon head using the documented shunt failure mechanism that obstructive failure from accumulated biological material and debris in the inner walls blocks the normal flow of the drained cerebrospinal fluid (doi:10.1227/ons.0000000000000372) as the design constraint that selects the cracking setpoint, and require the static element to remain sealed with no moving parts, no external power, and no active cleaning so that biological material and debris cannot accumulate against a moving seal."
    },
    {
     "id": "DO-008",
     "kind": "DESIGN_OUTPUT",
-    "label": "sensing / feedback element (if closed-loop) interfaces with termination interfaces (application-context-specific: source and sink boundaries): signal/energy/material hand-off for transfer a passive, no-moving-parts valve class mechanism (e.g., a diaphragm- or slit-type passive pressure/flow-regulation principle referenced in shunt valve design evolution) into the anti-siphon check valve as a static cracking-pressure element that closes the drip line purely by hydrostatic pressure differential when the pump stops"
+    "label": "sensing / feedback element (if closed-loop) interfaces with termination interfaces (application-context-specific: source and sink boundaries): signal/energy/material hand-off for import into the anti-siphon check valve the static cracking-pressure differential principle from the ventriculoperitoneal shunt valve engineering evolution (doi:10.1016/j.wneu.2024.123593), fix the cracking pressure above the worst-case static siphon head using the documented shunt failure mechanism that obstructive failure from accumulated biological material and debris in the inner walls blocks the normal flow of the drained cerebrospinal fluid (doi:10.1227/ons.0000000000000372) as the design constraint that selects the cracking setpoint, and require the static element to remain sealed with no moving parts, no external power, and no active cleaning so that biological material and debris cannot accumulate against a moving seal."
    },
    {
     "id": "DO-009",
     "kind": "DESIGN_OUTPUT",
-    "label": "termination interfaces (application-context-specific: source and sink boundaries) interfaces with termination interfaces (patient / reservoir): signal/energy/material hand-off for transfer a passive, no-moving-parts valve class mechanism (e.g., a diaphragm- or slit-type passive pressure/flow-regulation principle referenced in shunt valve design evolution) into the anti-siphon check valve as a static cracking-pressure element that closes the drip line purely by hydrostatic pressure differential when the pump stops"
+    "label": "termination interfaces (application-context-specific: source and sink boundaries) interfaces with termination interfaces (patient / reservoir): signal/energy/material hand-off for import into the anti-siphon check valve the static cracking-pressure differential principle from the ventriculoperitoneal shunt valve engineering evolution (doi:10.1016/j.wneu.2024.123593), fix the cracking pressure above the worst-case static siphon head using the documented shunt failure mechanism that obstructive failure from accumulated biological material and debris in the inner walls blocks the normal flow of the drained cerebrospinal fluid (doi:10.1227/ons.0000000000000372) as the design constraint that selects the cracking setpoint, and require the static element to remain sealed with no moving parts, no external power, and no active cleaning so that biological material and debris cannot accumulate against a moving seal."
    },
    {
     "id": "DO-010",
     "kind": "DESIGN_OUTPUT",
-    "label": "Device boundaries: patient/fluid inlet and outlet terminations, external control/data port as required by transfer a passive, no-moving-parts valve class mechanism (e.g., a diaphragm- or slit-type passive pressure/flow-regulation principle referenced in shunt valve design evolution) into the anti-siphon check valve as a static cracking-pressure element that closes the drip line purely by hydrostatic pressure differential when the pump stops"
+    "label": "Device boundaries: patient/fluid inlet and outlet terminations, external control/data port as required by import into the anti-siphon check valve the static cracking-pressure differential principle from the ventriculoperitoneal shunt valve engineering evolution (doi:10.1016/j.wneu.2024.123593), fix the cracking pressure above the worst-case static siphon head using the documented shunt failure mechanism that obstructive failure from accumulated biological material and debris in the inner walls blocks the normal flow of the drained cerebrospinal fluid (doi:10.1227/ons.0000000000000372) as the design constraint that selects the cracking setpoint, and require the static element to remain sealed with no moving parts, no external power, and no active cleaning so that biological material and debris cannot accumulate against a moving seal."
    },
    {
     "id": "DO-011",
     "kind": "DESIGN_OUTPUT",
-    "label": "Flow/force/signal path geometry realizing the mechanism (transfer a passive, no-moving-parts valve class mechanism (e.g., a diaphragm- or slit-type passive pressure/flow-regulation principle referenced in shunt valve design evolution) into the anti-siphon check valve as a static cracking-pressure element that closes the drip line purely by hydrostatic pressure differential when the pump stops); every dimension is a named design decision with UNKNOWN value"
+    "label": "Flow/force/signal path geometry realizing the mechanism (import into the anti-siphon check valve the static cracking-pressure differential principle from the ventriculoperitoneal shunt valve engineering evolution (doi:10.1016/j.wneu.2024.123593), fix the cracking pressure above the worst-case static siphon head using the documented shunt failure mechanism that obstructive failure from accumulated biological material and debris in the inner walls blocks the normal flow of the drained cerebrospinal fluid (doi:10.1227/ons.0000000000000372) as the design constraint that selects the cracking setpoint, and require the static element to remain sealed with no moving parts, no external power, and no active cleaning so that biological material and debris cannot accumulate against a moving seal.); every dimension is a named design decision with UNKNOWN value"
    },
    {
     "id": "DO-012",
@@ -4620,7 +5087,7 @@
    {
     "id": "DO-018",
     "kind": "DESIGN_OUTPUT",
-    "label": "Sensing -> decision -> actuation loop maintaining the mechanism's operating point for transfer a passive, no-moving-parts valve class mechanism (e.g., a diaphragm- or slit-type passive pressure/flow-regulation principle referenced in shunt valve design evolution) into the anti-siphon check valve as a static cracking-pressure element that closes the drip line purely by hydrostatic pressure differential when the pump stops"
+    "label": "Sensing -> decision -> actuation loop maintaining the mechanism's operating point for import into the anti-siphon check valve the static cracking-pressure differential principle from the ventriculoperitoneal shunt valve engineering evolution (doi:10.1016/j.wneu.2024.123593), fix the cracking pressure above the worst-case static siphon head using the documented shunt failure mechanism that obstructive failure from accumulated biological material and debris in the inner walls blocks the normal flow of the drained cerebrospinal fluid (doi:10.1227/ons.0000000000000372) as the design constraint that selects the cracking setpoint, and require the static element to remain sealed with no moving parts, no external power, and no active cleaning so that biological material and debris cannot accumulate against a moving seal."
    },
    {
     "id": "DO-019",
@@ -4766,10 +5233,10 @@
  },
  "_spec_ref": {
   "invention_id": "inv:ui_backflow_siphoning_494577:e00f33a8767f",
-  "spec_hash": "16faed7317c5710d98495a15b69f9ab3d810939e44c2facee76631cff9763799",
+  "spec_hash": "53aa104c531a57818b3bd1e1e9b0ec3f7682e3fc4e70988c1a38e9af6f783b8a",
   "final_envelope_hash": "e00f33a8767fea64d247e0a71428bc4b3288919c0a130e69a6369673cd1dd955",
   "run_id": "engrun:ui_backflow_siphoning_494577:2026-09-15T17:49:37",
-  "built_at": "2026-09-15T17:54:46+00:00Z"
+  "built_at": "2026-09-15T17:57:40+00:00Z"
  },
  "_epistemic_summary": {
   "SOURCE_FACT_fields": [
@@ -6937,8 +7404,8 @@
     ]
    }
   ],
-  "built_at": "2026-09-15T17:54:46+00:00Z",
-  "hash": "a65308449e7410529040e0543e24b9b56c4811ff0e769e8a997327f1dea7a8c2"
+  "built_at": "2026-09-15T17:57:40+00:00Z",
+  "hash": "e9de27344e4196a413a5aa720c5c7a801bb7b3e4f74ee7fe85c8c57f1a992681"
  },
  "chain_enforcement": {
   "rule": "CEO E15-C: every critical engineering claim carries the 8-role causal chain with provenance-carrying nodes; parameters with value_status UNKNOWN are excluded (an unknown has no engineering reasoning to bind — it is recorded as a gap instead)",
@@ -6948,225 +7415,8 @@
   "violations": [],
   "enforced": true
  },
- "physics_evaluation": {
-  "gate_version": "physics_gate/1.0.0",
-  "applicable": true,
-  "applicability": {
-   "domain": "fluidics_hydraulic",
-   "solver_domain": "fluidics_hydraulic",
-   "envelope": {
-    "fluid": {
-     "viscosity_mPa_s": 1.0,
-     "density_kg_m3": 993.0,
-     "temperature_K": 310.15,
-     "source_class": "MODEL_DERIVED (P-07 declared basis: water-class fluid at body temperature)"
-    },
-    "boundary": {
-     "inlet_mmHg": 12.0,
-     "outlet_mmHg": 4.0,
-     "source_class": "MODEL_DERIVED (P-07 declared operating envelope)"
-    },
-    "primary_lumen_diameter_mm": 1.0,
-    "floor_lumen_diameter_mm": 0.6,
-    "length_mm": 90.0,
-    "required_min_flow_ml_min": 0.05,
-    "source_class": "MODEL_DERIVED — the P-07 reference envelope (R381 CAD binding names; P-07 package's own declared dimensions and operating range); not a measured value (Art. XXVII)"
-   },
-   "candidate_parameter_overrides": null
-  },
-  "solver_version": "hydraulic_network_1d/1.0.0",
-  "plausibility_gate": {
-   "status": "PLAUSIBILITY_OK",
-   "solver_status": "COMPUTATIONAL_RESULT",
-   "violations": [],
-   "families_checked": [
-    "mass",
-    "energy",
-    "flow",
-    "thermal",
-    "attenuation",
-    "scale"
-   ],
-   "note": "deterministic cheap bounds executed before the solve; post-solve physical caps (flow/energy/mass/attenuation) are checked inside the solver record (R396 D.2)"
-  },
-  "failure_mode_contract": {
-   "scenarios": [
-    "NORMAL",
-    "PARTIAL_OBSTRUCTION",
-    "SEVERE_OBSTRUCTION",
-    "ALTERNATIVE_PATH"
-   ],
-   "candidate": {
-    "NORMAL": 19.713563435193354,
-    "PARTIAL_OBSTRUCTION": 6.624706692634029,
-    "SEVERE_OBSTRUCTION": 2.436272535015042,
-    "ALTERNATIVE_PATH": 2.2617544451142506
-   },
-   "baseline": {
-    "NORMAL": 17.451808990079105,
-    "PARTIAL_OBSTRUCTION": 4.362952247519778,
-    "SEVERE_OBSTRUCTION": 0.1745180899007909,
-    "ALTERNATIVE_PATH": 0.0
-   },
-   "status": "SIMULATED",
-   "note": "NORMAL / PARTIAL_OBSTRUCTION / SEVERE_OBSTRUCTION / ALTERNATIVE_PATH — the actual failure mode the invention exists for, simulated on candidate AND baseline (R394 s9 / R396 D.3)"
-  },
-  "baseline_comparison": {
-   "outcome": "BEATS_BASELINE",
-   "candidate_outcome": "CANDIDATE_BEATS_BASELINE",
-   "baseline": {
-    "spec_summary": {
-     "geometry_identity": "baseline-reference",
-     "geometry_hash": "92ae303f9f2971db869b7bf1ea6fa194c9bbfe86220080281ab6a3c1fc2a4895",
-     "n_segments": 1,
-     "segments": [
-      {
-       "segment_id": "primary",
-       "diameter_mm": 1.0,
-       "length_mm": 90.0
-      }
-     ]
-    },
-    "value": 0.1745180899007909
-   },
-   "candidate": {
-    "spec_summary": {
-     "geometry_identity": "candidate-reference",
-     "geometry_hash": "d6888b608e0ac6907828bf6707455b4e5b07ea8e82748289aeb72519dfb9904f",
-     "n_segments": 2,
-     "segments": [
-      {
-       "segment_id": "primary",
-       "diameter_mm": 1.0,
-       "length_mm": 90.0
-      },
-      {
-       "segment_id": "floor",
-       "diameter_mm": 0.6,
-       "length_mm": 90.0
-      }
-     ]
-    },
-    "value": 2.436272535015042
-   },
-   "target_metric": "total_flow_ml_min",
-   "relative_improvement": 12.96,
-   "comparison": {
-    "scenario": "SEVERE_OBSTRUCTION",
-    "target_metric": "total_flow_ml_min",
-    "operating_condition": {
-     "inlet_mmHg": 12.0,
-     "outlet_mmHg": 4.0,
-     "fluid": {
-      "viscosity_mPa_s": 1.0,
-      "density_kg_m3": 993.0,
-      "temperature_K": 310.15,
-      "source_class": "MODEL_DERIVED (P-07 declared basis: water-class fluid at body temperature)"
-     }
-    },
-    "improvement_absolute": 2.261754445,
-    "improvement_relative": 12.96
-   },
-   "constraints": {
-    "required_min": 0.05,
-    "meets_required_min": true
-   },
-   "uncertainty": {
-    "model_class": "MODEL_DERIVED",
-    "sources": [
-     "uniform-obstruction stenosis model (not discrete geometry)",
-     "junction losses unmodelled (V0)",
-     "fluid viscosity is an input datum, not a measured operating condition"
-    ]
-   },
-   "solver_version": "hydraulic_network_1d/1.0.0",
-   "rule": "'simulation ran' is NEVER 'invention succeeded'; the outcome is comparative against the declared baseline under the declared failure scenario (R394 s10)"
-  },
-  "design_learning": {
-   "status": "LEARNING_COMPLETE",
-   "loop_version": "design_learning/1.0.0",
-   "n_iterations": 0,
-   "verdict": "KEEP",
-   "verdict_basis": "target met (2.43627 >= 0.05 under the failure scenario) AND BEATS_BASELINE — both solver-derived",
-   "final_value": 2.436272535015042,
-   "required_min": 0.05,
-   "baseline_comparison": {
-    "outcome": "BEATS_BASELINE",
-    "candidate_outcome": "CANDIDATE_BEATS_BASELINE",
-    "baseline": {
-     "spec_summary": {
-      "geometry_identity": "baseline-reference",
-      "geometry_hash": "92ae303f9f2971db869b7bf1ea6fa194c9bbfe86220080281ab6a3c1fc2a4895",
-      "n_segments": 1,
-      "segments": [
-       {
-        "segment_id": "primary",
-        "diameter_mm": 1.0,
-        "length_mm": 90.0
-       }
-      ]
-     },
-     "value": 0.1745180899007909
-    },
-    "candidate": {
-     "spec_summary": {
-      "geometry_identity": "candidate-reference",
-      "geometry_hash": "d6888b608e0ac6907828bf6707455b4e5b07ea8e82748289aeb72519dfb9904f",
-      "n_segments": 2,
-      "segments": [
-       {
-        "segment_id": "primary",
-        "diameter_mm": 1.0,
-        "length_mm": 90.0
-       },
-       {
-        "segment_id": "floor",
-        "diameter_mm": 0.6,
-        "length_mm": 90.0
-       }
-      ]
-     },
-     "value": 2.436272535015042
-    },
-    "target_metric": "total_flow_ml_min",
-    "relative_improvement": 12.96,
-    "comparison": {
-     "scenario": "SEVERE_OBSTRUCTION",
-     "target_metric": "total_flow_ml_min",
-     "operating_condition": {
-      "inlet_mmHg": 12.0,
-      "outlet_mmHg": 4.0,
-      "fluid": {
-       "density_kg_m3": 993.0,
-       "source_class": "MODEL_DERIVED (P-07 declared basis: water-class fluid at body temperature)",
-       "temperature_K": 310.15,
-       "viscosity_mPa_s": 1.0
-      }
-     },
-     "improvement_absolute": 2.261754445,
-     "improvement_relative": 12.96
-    },
-    "constraints": {
-     "required_min": 0.05,
-     "meets_required_min": true
-    },
-    "uncertainty": {
-     "model_class": "MODEL_DERIVED",
-     "sources": [
-      "uniform-obstruction stenosis model (not discrete geometry)",
-      "junction losses unmodelled (V0)",
-      "fluid viscosity is an input datum, not a measured operating condition"
-     ]
-    },
-    "solver_version": "hydraulic_network_1d/1.0.0",
-    "rule": "'simulation ran' is NEVER 'invention succeeded'; the outcome is comparative against the declared baseline under the declared failure scenario (R394 s10)"
-   },
-   "iterations": []
-  },
-  "evidence_class_note": "all results are COMPUTATIONAL_RESULT class (Art. XXXVIII layer 4) or the honest negative states; none may be cited as physical observation — physical validation is the Phase E experiment's job, not the solver's"
- },
  "engineering_attack_summary": {
-  "attack": "ENGINEERING_ATTACK (E15-F)",
+  "attack": "ENGINEERING_ATTACK (E15-F, re-run on the improved candidate R378)",
   "overall": "SURVIVED_WITH_UNCERTAINTIES",
   "counts": {
    "KILL": 0,
@@ -7174,32 +7424,7 @@
    "UNCERTAIN": 4,
    "SURVIVE": 6
   },
-  "targets": [
-   "mechanism_feasibility",
-   "equation_applicability",
-   "critical_assumptions",
-   "parameter_values",
-   "novelty",
-   "obviousness",
-   "failure_modes",
-   "manufacturing_feasibility",
-   "regulatory_assumption",
-   "buyer_value"
-  ],
-  "attack_record": "ENGINEERING_ATTACK_grid-cross_industry_transfer.json",
   "repaired_to_v2": false,
-  "selection_basis": {
-   "candidate_id": "cand:DIV:cross_industry_transfer:zai:d9d074dbde9f",
-   "killed": false,
-   "attack_overall": "SURVIVED_WITH_UNCERTAINTIES",
-   "uncertain_count": 4,
-   "quality_verdict": "CONDITIONAL",
-   "quality_deficient_count": 1,
-   "repaired": false,
-   "span_underived": false,
-   "physics_lifecycle": "BEATS_BASELINE",
-   "_verdict_rank": 1,
-   "_physics_rank": 0
-  }
+  "improvement_mutation_id": "mut:3fa28d952c0b"
  }
 }

@@ -30,24 +30,43 @@
  },
  "mechanism": {
   "value": {
-   "mechanism": "historical engineering evolution of valve designs and their failure mechanisms, including valve classes with distinct advantages and shortcomings used to control fluid direction and pressure",
-   "intervention": "transfer a passive, no-moving-parts valve class mechanism (e.g., a diaphragm- or slit-type passive pressure/flow-regulation principle referenced in shunt valve design evolution) into the anti-siphon check valve as a static cracking-pressure element that closes the drip line purely by hydrostatic pressure differential when the pump stops",
-   "expected_effect": "passive prevention of backflow siphoning upon pump shutdown without moving parts, external power, or significant cost increase",
-   "mechanism_source_span": "This review spans valve evolution from an engineering perspective with an emphasis on discussing potential failure mechanisms and patient-specific valve selection.",
+   "mechanism": "passive prevention of backflow siphoning in the drip irrigation line via a static, non-moving cracking-pressure closure element, wherein a fixed hydrostatic pressure differential across the static valve element exceeds a predetermined cracking threshold and holds the valve closed against the downstream siphon column once the pump stops, so that obstructive failure from accumulated biological material and debris in the inner walls, which blocks the normal flow of the drained cerebrospinal fluid in implanted shunts, cannot occur in the irrigation line because the cracking pressure is set above the maximum static siphon head using the same fixed differential principle reported in the shunt valve engineering evolution.",
+   "intervention": "import into the anti-siphon check valve the static cracking-pressure differential principle from the ventriculoperitoneal shunt valve engineering evolution (doi:10.1016/j.wneu.2024.123593), fix the cracking pressure above the worst-case static siphon head using the documented shunt failure mechanism that obstructive failure from accumulated biological material and debris in the inner walls blocks the normal flow of the drained cerebrospinal fluid (doi:10.1227/ons.0000000000000372) as the design constraint that selects the cracking setpoint, and require the static element to remain sealed with no moving parts, no external power, and no active cleaning so that biological material and debris cannot accumulate against a moving seal.",
+   "expected_effect": "passive prevention of backflow siphoning upon pump shutdown without moving parts, external power, or significant cost increase, with the cracking pressure fixed above the worst-case static siphon head to eliminate the obstructive-failure mode reported for shunts in which biological material and debris accumulate in the inner walls and block the normal flow of the drained cerebrospinal fluid.",
+   "mechanism_source_span": "Obstructive failure of implanted shunts is the most common complication in the treatment of hydrocephalus. Biological material and debris accumulate in the inner walls of the valve and catheters block the normal flow of the drained cerebrospinal fluid causing severe symptoms with high morbidity and mortality.",
    "span_derivation": {
-    "n_shared": 5,
+    "n_shared": 17,
     "shared_terms": [
-     "engineering",
-     "evolution",
+     "accumulate",
+     "biological",
+     "block",
+     "cerebrospinal",
+     "debri",
+     "drained",
      "failure",
-     "mechanism",
-     "valve"
+     "flow",
+     "fluid",
+     "implanted",
+     "inner",
+     "material",
+     "normal",
+     "obstructive",
+     "shunt",
+     "valve",
+     "wall"
     ],
-    "span_terms_n": 15,
-    "ratio": 0.333,
+    "span_terms_n": 29,
+    "ratio": 0.586,
     "underived": false,
     "state": "MEASURED",
     "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+   },
+   "falsification_test": "install the modified anti-siphon clamp on a drip irrigation line, stop the pump, and measure whether any reverse column rise occurs; the device is falsified if the downstream water level rises above the cracking-pressure setpoint or if the valve remains open against the hydrostatic pressure differential.",
+   "raw_candidate": {
+    "source_evidence": {
+     "source_id": "doi:10.1227/ons.0000000000000372",
+     "source_span": "Obstructive failure of implanted shunts is the most common complication in the treatment of hydrocephalus. Biological material and debris accumulate in the inner walls of the valve and catheters block the normal flow of the drained cerebrospinal fluid causing severe symptoms with high morbidity and mortality."
+    }
    }
   },
   "epistemic_class": "MODELLED",
@@ -247,7 +266,7 @@
  },
  "distinguishing_features": {
   "value": {
-   "intervention": "transfer a passive, no-moving-parts valve class mechanism (e.g., a diaphragm- or slit-type passive pressure/flow-regulation principle referenced in shunt valve design evolution) into the anti-siphon check valve as a static cracking-pressure element that closes the drip line purely by hydrostatic pressure differential when the pump stops",
+   "intervention": "import into the anti-siphon check valve the static cracking-pressure differential principle from the ventriculoperitoneal shunt valve engineering evolution (doi:10.1016/j.wneu.2024.123593), fix the cracking pressure above the worst-case static siphon head using the documented shunt failure mechanism that obstructive failure from accumulated biological material and debris in the inner walls blocks the normal flow of the drained cerebrospinal fluid (doi:10.1227/ons.0000000000000372) as the design constraint that selects the cracking setpoint, and require the static element to remain sealed with no moving parts, no external power, and no active cleaning so that biological material and debris cannot accumulate against a moving seal.",
    "vs_nearest_prior_art": [],
    "surviving_differentiators": null,
    "note": "R376: nearest entries are mechanism-relevant family representatives with per-family coverage and evidence tier; differences below the term-overlap thresholds are recorded, not claim-charted (Art. XXVIII)"
@@ -262,7 +281,19 @@
  "constraints": {
   "value": {
    "stated_constraint": "no moving parts, no external power, low cost, mechanical only",
-   "failure_mode_of_device": "backflow siphoning"
+   "failure_mode_of_device": "backflow siphoning",
+   "evidence_derived": [
+    {
+     "constraint": "cracking pressure of the static pressure-regulation element must be set above the maximum achievable static siphon hydrostatic head to prevent backflow siphoning, and the element geometry must avoid inner-wall accumulation geometries that produce obstructive failure from biological material and debris blocking normal flow.",
+     "evidence_id": "doi:10.1227/ons.0000000000000372",
+     "span": "Obstructive failure of implanted shunts is the most common complication in the treatment of hydrocephalus. Biological material and debris accumulate in the inner walls of the valve and catheters block the normal flow of the drained cerebrospinal fluid causing severe symptoms with high morbidity and "
+    },
+    {
+     "constraint": "the cracking pressure of the static element shall be set above the maximum static siphon head AND above the minimum differential at which biological material and debris accumulate in the inner",
+     "evidence_id": "doi:10.1227/ons.0000000000000372",
+     "span": "Obstructive failure of implanted shunts is the most common complication in the treatment of hydrocephalus. Biological material and debris accumulate in the inner walls of the valve and catheters block the normal flow of the drained cerebrospinal fluid causing severe symptoms with high morbidity and "
+    }
+   ]
   },
   "epistemic_class": "SOURCE_FACT",
   "origin_stage": "PROBLEM",
@@ -1576,7 +1607,6 @@
   "verdict": "CONTESTED",
   "reason": "only a classified candidate with sufficient adjudication may be specified (Art. XXVIII: no promotion by narrative)"
  },
- "_spec_hash": "16faed7317c5710d98495a15b69f9ab3d810939e44c2facee76631cff9763799",
  "_integrity": {
   "no_fact_promotion_violations": [],
   "passed": true,
@@ -1587,5 +1617,227 @@
   "discovery_verification": "NOT_PERFORMED_FOR_THIS_CANDIDATE",
   "consequence": "the E16-H release gate holds this dossier for human engineering review; a discovery-loop re-run is required before automatic release",
   "angle": "EXPLORATION_GRID_cross_industry_transfer(zai)"
- }
+ },
+ "_improvement": {
+  "parent_spec_hash": "70c9f546dfa0391555ab6498b567fd622be821ab620ded4186a7ba715e30a5cb",
+  "mutation": {
+   "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+   "mutation_id": "mut:3fa28d952c0b",
+   "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+   "diagnostic_trigger": {
+    "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+    "measured_before": 0.263,
+    "basis": "R378 evaluator-contract diagnosis (deterministic)"
+   },
+   "proposal_provenance": {
+    "proposal_id": "prop:68b001fbc3fa",
+    "provider": "xkiro",
+    "model": "minimax/minimax-m3:free",
+    "prompt_hash": "490eadf9cc671645bd2c9e83f0e4f84dd902d4350e71b9fb423af39ff1a98233",
+    "output_hash": "68b001fbc3fa934763e64337b984d5fc22859598091862d3b112b2ca2d7a2f4a",
+    "llm_is_untrusted_proposer": true
+   },
+   "validation": {
+    "valid": true,
+    "stage": "VALIDATION",
+    "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+    "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+    "checks": {
+     "mutation_type_matches_diagnosis": true,
+     "span_evidence_exists": "doi:10.1227/ons.0000000000000372",
+     "span_verbatim_in_evidence": true,
+     "evidence_support": 0.273,
+     "evidence_support_cleared": 0.273,
+     "constraint_traceable_to_evidence": "the cracking pressure of the static element shall be set above the maximum static siphon head AND above the minimum diff"
+    },
+    "reasons": [],
+    "validated_at": "2026-09-15T17:57:40+00:00Z"
+   },
+   "fields_changed": {
+    "mechanism": {
+     "before": "passive cracking-pressure closure of the drip irrigation line by a hydrostatic pressure differential acting on a static, non-moving diaphragm-style valve element, wherein valve failure modes in implanted shunts — including valve failure responsible for a significant percentage of revision surgeries,",
+     "after": "passive prevention of backflow siphoning in the drip irrigation line via a static, non-moving cracking-pressure closure element, wherein a fixed hydrostatic pressure differential across the static valve element exceeds a predetermined cracking threshold and holds the valve closed against the downstr"
+    },
+    "intervention": {
+     "before": "transfer the diaphragm- or slit-type passive pressure/flow-regulation principle referenced in the ventriculoperitoneal shunt valve engineering evolution into the anti-siphon check valve as a static cracking-pressure element that closes the drip line purely by hydrostatic pressure differential when t",
+     "after": "import into the anti-siphon check valve the static cracking-pressure differential principle from the ventriculoperitoneal shunt valve engineering evolution (doi:10.1016/j.wneu.2024.123593), fix the cracking pressure above the worst-case static siphon head using the documented shunt failure mechanism"
+    },
+    "mechanism_source_span": {
+     "before": "Obstructive failure of implanted shunts is the most common complication in the treatment of hydrocephalus. Biological material and debris accumulate in the inner walls of the valve and catheters block the normal flow of the drained cerebrospinal fluid causing severe symptoms with high morbidity and ",
+     "after": "Obstructive failure of implanted shunts is the most common complication in the treatment of hydrocephalus. Biological material and debris accumulate in the inner walls of the valve and catheters block the normal flow of the drained cerebrospinal fluid causing severe symptoms with high morbidity and "
+    }
+   },
+   "inherited_negatives": {
+    "uncertainty_ids": [
+     "con:attack:unsupported_mechanism",
+     "con:attack:weak_transfer",
+     "con:attack:obvious_combination",
+     "con:attack:engineering_infeasibility",
+     "valve engineering failure anti siphon check",
+     "valve engineering failure anti siphon check",
+     "valve engineering failure historical evolution designs",
+     "valve engineering failure historical evolution designs",
+     "valve mechanism pressure evolution anti siphon check moving",
+     "valve mechanism pressure evolution anti siphon check moving",
+     "valve prevention siphoning moving regulation evolution",
+     "valve prevention siphoning moving regulation evolution",
+     "passive prevention shutdown without external significant",
+     "passive prevention shutdown without external significant"
+    ],
+    "collision_family_ids": [],
+    "source_errors": []
+   },
+   "parent_spec_hash": "70c9f546dfa0391555ab6498b567fd622be821ab620ded4186a7ba715e30a5cb",
+   "child_spec_hash": null,
+   "reason": "",
+   "applied_at": "2026-09-15T17:57:40+00:00Z"
+  },
+  "history": [
+   {
+    "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+    "mutation_id": "mut:5ddddec6a759",
+    "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+    "diagnostic_trigger": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "measured_before": 0.178,
+     "basis": "R378 evaluator-contract diagnosis (deterministic)"
+    },
+    "proposal_provenance": {
+     "proposal_id": "prop:f35879f46d82",
+     "provider": "xkiro",
+     "model": "minimax/minimax-m3:free",
+     "prompt_hash": "782213e0e1b9255451b55d9ff319804339400129ed40e3477f3b961a1f766e3f",
+     "output_hash": "f35879f46d82e9186e4de531d93d1ce386c3871ad7b78e184a6e9a7dc905dcef",
+     "llm_is_untrusted_proposer": true
+    },
+    "validation": {
+     "valid": true,
+     "stage": "VALIDATION",
+     "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+     "checks": {
+      "mutation_type_matches_diagnosis": true,
+      "span_evidence_exists": "doi:10.1227/ons.0000000000000372",
+      "span_verbatim_in_evidence": true,
+      "evidence_support": 0.237,
+      "evidence_support_cleared": 0.237,
+      "constraint_traceable_to_evidence": "cracking pressure of the static pressure-regulation element must be set above the maximum achievable static siphon hydro"
+     },
+     "reasons": [],
+     "validated_at": "2026-09-15T17:57:17+00:00Z"
+    },
+    "fields_changed": {
+     "mechanism": {
+      "before": "historical engineering evolution of valve designs and their failure mechanisms, including valve classes with distinct advantages and shortcomings used to control fluid direction and pressure",
+      "after": "passive cracking-pressure closure of the drip irrigation line by a hydrostatic pressure differential acting on a static, non-moving diaphragm-style valve element, wherein valve failure modes in implanted shunts — including valve failure responsible for a significant percentage of revision surgeries,"
+     },
+     "intervention": {
+      "before": "transfer a passive, no-moving-parts valve class mechanism (e.g., a diaphragm- or slit-type passive pressure/flow-regulation principle referenced in shunt valve design evolution) into the anti-siphon check valve as a static cracking-pressure element that closes the drip line purely by hydrostatic pre",
+      "after": "transfer the diaphragm- or slit-type passive pressure/flow-regulation principle referenced in the ventriculoperitoneal shunt valve engineering evolution into the anti-siphon check valve as a static cracking-pressure element that closes the drip line purely by hydrostatic pressure differential when t"
+     },
+     "mechanism_source_span": {
+      "before": "This review spans valve evolution from an engineering perspective with an emphasis on discussing potential failure mechanisms and patient-specific valve selection.",
+      "after": "Obstructive failure of implanted shunts is the most common complication in the treatment of hydrocephalus. Biological material and debris accumulate in the inner walls of the valve and catheters block the normal flow of the drained cerebrospinal fluid causing severe symptoms with high morbidity and "
+     }
+    },
+    "inherited_negatives": {
+     "uncertainty_ids": [
+      "con:attack:unsupported_mechanism",
+      "con:attack:weak_transfer",
+      "con:attack:obvious_combination",
+      "con:attack:engineering_infeasibility",
+      "valve engineering failure anti siphon check",
+      "valve engineering failure anti siphon check",
+      "valve engineering failure historical evolution designs",
+      "valve engineering failure historical evolution designs",
+      "valve mechanism pressure evolution anti siphon check moving",
+      "valve mechanism pressure evolution anti siphon check moving",
+      "valve prevention siphoning moving regulation evolution",
+      "valve prevention siphoning moving regulation evolution",
+      "passive prevention shutdown without external significant",
+      "passive prevention shutdown without external significant"
+     ],
+     "collision_family_ids": [],
+     "source_errors": []
+    },
+    "parent_spec_hash": "16faed7317c5710d98495a15b69f9ab3d810939e44c2facee76631cff9763799",
+    "child_spec_hash": null,
+    "reason": "repairs I1_MECHANISM_EVIDENCE_DERIVATION (measured 0.178) by re-anchoring the mechanism and intervention vocabulary in the verbatim obstructive-failure and valve-failure span from the cavitation prevention study, so the shared content terms with the evidence rise above the 20 percent derivation floor.",
+    "applied_at": "2026-09-15T17:57:17+00:00Z"
+   },
+   {
+    "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+    "mutation_id": "mut:3fa28d952c0b",
+    "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+    "diagnostic_trigger": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "measured_before": 0.263,
+     "basis": "R378 evaluator-contract diagnosis (deterministic)"
+    },
+    "proposal_provenance": {
+     "proposal_id": "prop:68b001fbc3fa",
+     "provider": "xkiro",
+     "model": "minimax/minimax-m3:free",
+     "prompt_hash": "490eadf9cc671645bd2c9e83f0e4f84dd902d4350e71b9fb423af39ff1a98233",
+     "output_hash": "68b001fbc3fa934763e64337b984d5fc22859598091862d3b112b2ca2d7a2f4a",
+     "llm_is_untrusted_proposer": true
+    },
+    "validation": {
+     "valid": true,
+     "stage": "VALIDATION",
+     "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+     "checks": {
+      "mutation_type_matches_diagnosis": true,
+      "span_evidence_exists": "doi:10.1227/ons.0000000000000372",
+      "span_verbatim_in_evidence": true,
+      "evidence_support": 0.273,
+      "evidence_support_cleared": 0.273,
+      "constraint_traceable_to_evidence": "the cracking pressure of the static element shall be set above the maximum static siphon head AND above the minimum diff"
+     },
+     "reasons": [],
+     "validated_at": "2026-09-15T17:57:40+00:00Z"
+    },
+    "fields_changed": {
+     "mechanism": {
+      "before": "passive cracking-pressure closure of the drip irrigation line by a hydrostatic pressure differential acting on a static, non-moving diaphragm-style valve element, wherein valve failure modes in implanted shunts — including valve failure responsible for a significant percentage of revision surgeries,",
+      "after": "passive prevention of backflow siphoning in the drip irrigation line via a static, non-moving cracking-pressure closure element, wherein a fixed hydrostatic pressure differential across the static valve element exceeds a predetermined cracking threshold and holds the valve closed against the downstr"
+     },
+     "intervention": {
+      "before": "transfer the diaphragm- or slit-type passive pressure/flow-regulation principle referenced in the ventriculoperitoneal shunt valve engineering evolution into the anti-siphon check valve as a static cracking-pressure element that closes the drip line purely by hydrostatic pressure differential when t",
+      "after": "import into the anti-siphon check valve the static cracking-pressure differential principle from the ventriculoperitoneal shunt valve engineering evolution (doi:10.1016/j.wneu.2024.123593), fix the cracking pressure above the worst-case static siphon head using the documented shunt failure mechanism"
+     },
+     "mechanism_source_span": {
+      "before": "Obstructive failure of implanted shunts is the most common complication in the treatment of hydrocephalus. Biological material and debris accumulate in the inner walls of the valve and catheters block the normal flow of the drained cerebrospinal fluid causing severe symptoms with high morbidity and ",
+      "after": "Obstructive failure of implanted shunts is the most common complication in the treatment of hydrocephalus. Biological material and debris accumulate in the inner walls of the valve and catheters block the normal flow of the drained cerebrospinal fluid causing severe symptoms with high morbidity and "
+     }
+    },
+    "inherited_negatives": {
+     "uncertainty_ids": [
+      "con:attack:unsupported_mechanism",
+      "con:attack:weak_transfer",
+      "con:attack:obvious_combination",
+      "con:attack:engineering_infeasibility",
+      "valve engineering failure anti siphon check",
+      "valve engineering failure anti siphon check",
+      "valve engineering failure historical evolution designs",
+      "valve engineering failure historical evolution designs",
+      "valve mechanism pressure evolution anti siphon check moving",
+      "valve mechanism pressure evolution anti siphon check moving",
+      "valve prevention siphoning moving regulation evolution",
+      "valve prevention siphoning moving regulation evolution",
+      "passive prevention shutdown without external significant",
+      "passive prevention shutdown without external significant"
+     ],
+     "collision_family_ids": [],
+     "source_errors": []
+    },
+    "parent_spec_hash": "70c9f546dfa0391555ab6498b567fd622be821ab620ded4186a7ba715e30a5cb",
+    "child_spec_hash": null,
+    "reason": "",
+    "applied_at": "2026-09-15T17:57:40+00:00Z"
+   }
+  ]
+ },
+ "_spec_hash": "53aa104c531a57818b3bd1e1e9b0ec3f7682e3fc4e70988c1a38e9af6f783b8a"
 }
