@@ -133,10 +133,13 @@ def _load_problem_understanding(session_id: str):
 
 def run(session_id: str) -> None:
     # R419c heartbeat: the FIRST line in the worker log for every run —
-    # the operator-scoped /api/ops/worker-log route serves this file's
-    # tail, so a worker that dies before phase 0 is VISIBLE, not silent
-    # (observed live: sessions stuck PENDING with an empty log tail gave
-    # no evidence of even attempting the import chain)
+    # R463: the log is the run's OWN per-session file
+    # (ENGINE_RUNS/worker_logs/{sid}.log) and its tail is served to the
+    # session's owner via /api/run/{id}/worker-diagnostics (no operator
+    # key — the owner capability is the authority), so a worker that
+    # dies before phase 0 is VISIBLE to the person who owns the run,
+    # not silent (observed live: sessions stuck PENDING with an empty
+    # log tail gave no evidence of even attempting the import chain)
     print(f"[worker] start sid={session_id} pid={os.getpid()} "
           f"blender={os.environ.get('BLENDER_PATH', '') or 'unset'}",
           file=sys.stderr, flush=True)

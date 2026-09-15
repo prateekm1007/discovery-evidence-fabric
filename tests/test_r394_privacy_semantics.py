@@ -75,9 +75,12 @@ def test_legacy_ownerless_sessions_invisible_to_cookies():
     with _SessionStoreHarness() as store:
         legacy = store.create_session("t", "legacy problem", owner_key="")
         assert store._session_access(legacy, "any-cookie") == "DENY"
-        # operator key still sees it
-        assert store._session_access(legacy, "op-key",
-                                     operator_key="op-key") == "OWNER"
+        # R463: NO credential reaches legacy/ownerless sessions anymore —
+        # the operator-key override is retired (TypeError is the
+        # executable proof the parameter no longer exists)
+        import pytest as _pytest
+        with _pytest.raises(TypeError):
+            store._session_access(legacy, "op-key", operator_key="op-key")
 
 
 def test_public_demo_sessions_visible_to_all():
@@ -98,14 +101,23 @@ def test_session_access_denied_for_other_owner():
         assert store.session_access("nonexistent", "A") is None
 
 
-def test_operator_key_grants_full_visibility():
+def test_operator_key_override_is_retired():
+    """R463 (operator architectural ruling): there is NO operator key —
+    no second secret may grant full visibility over other users'
+    sessions. The access model accepts ONLY an owner capability, and
+    presenting any other credential yields DENY, not OWNER."""
     with _SessionStoreHarness() as store:
         a = store.create_session("t", "A's problem", owner_key="A")
         b = store.create_session("t2", "ownerless legacy", owner_key="")
-        assert store.session_access(a["session_id"], "OP",
-                                    operator_key="OP") == "OWNER"
-        assert store.session_access(b["session_id"], "OP",
-                                    operator_key="OP") == "OWNER"
+        # the retired parameter no longer exists on either entry point
+        import pytest as _pytest
+        with _pytest.raises(TypeError):
+            store.session_access(a["session_id"], "OP", operator_key="OP")
+        with _pytest.raises(TypeError):
+            store.list_sessions_visible_to("OP", "OP")
+        # and no owner key can converge onto another user's session
+        assert store.session_access(a["session_id"], "OP") == "DENY"
+        assert store.session_access(b["session_id"], "OP") == "DENY"
 
 
 # ---------------------------------------------------------------------------
@@ -192,6 +204,28 @@ def test_engine_failure_is_not_a_research_verdict():
     v = us.user_state_view(s)
     assert v["user_state"] == "FAILED_ENGINE"
     assert v["rejected"] is False
+
+
+def test_spawn_failure_is_recoverable_never_engine_failure():
+    """R463: the worker never started — the discovery pipeline never
+    ran, so the projection must NOT read 'the engine failed'. It lands
+    in the recoverable family with the spawn cause on the error line
+    (Art. LXI: distinct infrastructure classes stay distinct)."""
+    s = {"status": "ERROR_SPAWN", "final_status": None,
+         "error": ("The worker process could not be started (OSError). "
+                   "Nothing ran; nothing was changed. Retry re-attempts "
+                   "the run."), "package": None}
+    v = us.user_state_view(s)
+    assert v["user_state"] == "INTERRUPTED"
+    assert v["finished"] is True
+    assert v["found_something"] is False
+    assert v["rejected"] is False
+    assert "machine_status" in v and v["machine_status"] == "ERROR_SPAWN"
+    # retryable: ERROR_SPAWN is in the retry family (the typed recovery
+    # path accepts it)
+    from toscanini import sessions as _store
+    assert "ERROR_SPAWN" in _store.ERROR_STATUSES
+    assert "ERROR_SPAWN" in _store.RETRYABLE_STATUSES
 
 
 @pytest.mark.parametrize("final_status,readable", [

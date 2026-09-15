@@ -336,8 +336,35 @@ export default function Conversation({
     ? `Send as: ${ACTION_LABEL[(route as { verb: Exclude<ActionVerb, "ASK"> }).verb]}`
     : "Send as a question";
 
+  // R463 (audit P2-3): the empty state — zero derivable messages, zero
+  // attachments, zero results: the conversation never renders as a
+  // blank wall, and never pretends progress (one honest sentence).
+  const meaningful = msgs.filter((m) => m.kind !== "user");
+  const emptyState = meaningful.length === 0 && asks.length === 0;
+
+  // R463 (audit P1-4): the PERSISTENT steer affordance — steering must
+  // not depend on discovering a chip inside a candidate card. One calm
+  // row, always above the composer, opening the same canonical actions
+  // the conversation accepts in plain language.
+  const STEER_CHIPS: { verb: Exclude<ActionVerb, "ASK">; label: string }[] = [
+    { verb: "CHANGE_MECHANISM", label: "Try another mechanism" },
+    { verb: "ATTACK", label: "Challenge this candidate" },
+    { verb: "FIND_EVIDENCE", label: "Look for contradictory evidence" },
+    { verb: "COMPARE_MECHANISMS", label: "Compare the mechanisms" },
+    { verb: "REQUEST_EXPERIMENT", label: "Design the decisive experiment" },
+  ];
+
   return (
     <div className="conv" data-conversation>
+      {emptyState && (
+        <div className="conv-row" data-conv-empty>
+          <div className="conv-note faint">
+            Nothing has been retrieved, generated, or concluded yet — the
+            investigation is working from your problem statement alone.
+            You can steer it below, or just ask about the record.
+          </div>
+        </div>
+      )}
       {msgs.map((m) => {
         switch (m.kind) {
           case "user":
@@ -474,6 +501,25 @@ export default function Conversation({
               {liveSentence.text}
             </div>
           )}
+        </div>
+      )}
+
+      {/* R463 (audit P1-4): the persistent steer affordance — visible
+          whenever the conversation accepts steering (the composer's
+          Ask/Act routing still decides how each message is sent) */}
+      {!clarificationPending && (
+        <div className="conv-steer" data-conv-steer>
+          <span className="conv-steer-k faint">Steer this discovery:</span>
+          {STEER_CHIPS.map((c) => (
+            <button
+              key={c.verb}
+              type="button"
+              className="conv-quick faint"
+              onClick={() => quickAction(c.verb, c.label)}
+            >
+              {c.label}
+            </button>
+          ))}
         </div>
       )}
 

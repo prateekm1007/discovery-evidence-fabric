@@ -24,6 +24,9 @@ export interface SessionRow {
   final_status: string | null;
   origin: string;
   user_state_view?: UserStateView;
+  // R463 (audit P1-2): steering continuity — the parent row marks a
+  // thread that forked a new round
+  has_fork?: boolean;
 }
 
 // R394/R395: the user-facing run state — derived backend-side from the

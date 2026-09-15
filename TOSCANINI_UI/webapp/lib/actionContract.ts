@@ -72,7 +72,23 @@ export const ACTION_NOT_AVAILABLE_COPY =
   "is preserved here; asking about the record still works.";
 
 // ---------------------------------------------------------------------------
-// the deterministic phrase router (presentation-level, no semantics)
+// the deterministic steering router (presentation-level, no semantics)
+//
+// R463 (independent audit P0-1, "roadmap to 9/10"): the FIRST router's
+// ~9 rigid phrasings were a measured product defect — any natural-
+// language paraphrase of a steering intent ("make it cheaper", "use a
+// different material", "optimize for manufacturability") silently
+// demoted to a read-only question, and a demanding user concluded the
+// conversation does not change the discovery. The table below keeps
+// the SAME contract shape (ordered pattern rules → canonical verbs,
+// ASK as the fallback) with a real steering lexicon: objective/
+// constraint steering, alternative-material/mechanism shapes,
+// politeness-prefixed imperatives, and per-verb paraphrase families.
+// Deliberately still DETERMINISTIC and MODEL-FREE: it can only route
+// to the engine's action endpoint or leave the message as a question
+// (Ask ≠ Act is untouched; the settled R458 route-table guarantees —
+// including "questions about the record stay ASK" — are pinned by
+// adversarial_r458 and adversarial_r463 suites).
 // ---------------------------------------------------------------------------
 
 interface PhraseRule {
@@ -80,47 +96,60 @@ interface PhraseRule {
   patterns: RegExp[];
 }
 
-/** Ordered — the FIRST match wins. Deliberately narrow: ambiguity
- * routes to ASK (a question is always safe; a wrong action is not). */
+/** Ordered — the FIRST match wins. */
 const PHRASE_RULES: PhraseRule[] = [
   {
-    verb: "CHANGE_MECHANISM",
+    // explicit document references — most specific first
+    verb: "UPLOAD_EVIDENCE",
     patterns: [
-      /\btry (another|a different|an alternative) (mechanism|approach|explanation|hypothesis)\b/i,
-      /\bchange the mechanism\b/i,
-      /\bkeep the .*(constraint|requirement).* (but|and) change\b/i,
-      /\bwhat else could (cause|explain) (this|it)\b/i,
+      /\buse (this|that|the) (manufacturer'?s?|supplier'?s?|vendor'?s?)?\s?(paper|pdf|document|file|datasheet|data sheet|spec|specification|publication|drawing|report)\b/i,
+      /\b(add|attach|include) (this|that|the|my) (paper|pdf|document|file|datasheet|data sheet|spec|specification|publication|drawing|report)\b/i,
+      /\bbased on (this|that|the) (attached )?(paper|pdf|document|datasheet|data sheet|spec)\b/i,
+      /\b(consult|consider) (this|that|the) (attached |uploaded )?(paper|pdf|document|datasheet|spec|publication)\b/i,
     ],
   },
   {
     verb: "ATTACK",
     patterns: [
-      /\bchallenge (candidate|invention|architecture|this)\b/i,
+      /\bchallenge (candidate|invention|architecture|this|the)\b/i,
       /\btry to disprove\b/i,
-      /\battack (candidate|invention|architecture|this)\b/i,
-      /\b(disprove|falsify) (candidate|invention|this|it)\b/i,
-    ],
-  },
-  {
-    verb: "FIND_EVIDENCE",
-    patterns: [
-      /\blook for (contradicting|contradictory|supporting|more) evidence\b/i,
-      /\bfind (contradicting|contradictory|supporting|more) evidence\b/i,
-      /\bsearch for (contradicting|contradictory|supporting|more) (evidence|sources)\b/i,
-    ],
-  },
-  {
-    verb: "UPLOAD_EVIDENCE",
-    patterns: [
-      /\buse (this|that|the) (paper|pdf|document|file|datasheet|spec|publication)\b/i,
-      /\b(add|attach|include) (this|that|the) (paper|pdf|document|file|datasheet|spec)\b/i,
+      /\battack (candidate|invention|architecture|this|the)\b/i,
+      /\b(disprove|falsify) (candidate|invention|this|it|the)\b/i,
+      /\bi'?m not convinced\b/i,
+      /\b(i (doubt|question|disagree with)) (this|it|that|the)\b/i,
+      /\b(look|poke) (for weaknesses|holes)\b/i,
+      /\bfind (the|a) (flaw|weakness|hole|failure mode) (in|of)\b/i,
+      /\bweakness(es)? (in|of) (this|it|the candidate|the design)\b/i,
+      /\bstress[- ]?test (this|it|the)\b/i,
+      /\b(red[- ]team|adversarially (review|test)) (this|it|the)\b/i,
+      /\b(poke|punch) holes in\b/i,
+      /\bplay( the)? devil'?s advocate\b/i,
     ],
   },
   {
     verb: "COMPARE_MECHANISMS",
     patterns: [
-      /\bcompare (the |the two |all )?(mechanisms|candidates|hypotheses|explanations)\b/i,
-      /\bwhich (mechanism|candidate|explanation) is (stronger|better|more likely)\b/i,
+      /\bcompare (the |the two |all )?(mechanisms|candidates|hypotheses|explanations|designs|options|approaches)\b/i,
+      /\bwhich (mechanism|candidate|explanation|design|option) is (stronger|better|more likely|best|strongest)\b/i,
+      /\bstack(ed)? up against\b/i,
+      /\btrade[- ]?offs? (between|of|among)\b/i,
+      /\b(what|which) (are the )?trade[- ]?offs?\b/i,
+      /\bhead[- ]to[- ]head\b/i,
+      /\bside[- ]by[- ]side (comparison|of)\b/i,
+      /\brank (the )?(candidates|mechanisms|options|designs)\b/i,
+      /\b(candidate|mechanism|design) [12ab] (vs\.?|versus) (candidate|mechanism|design) [12ab]\b/i,
+    ],
+  },
+  {
+    verb: "FIND_EVIDENCE",
+    patterns: [
+      /\b(look|find|search) for (contradicting|contradictory|supporting|more|additional) (evidence|sources|data)\b/i,
+      /\bsearch for (contradicting|contradictory|supporting|more) (evidence|sources)\b/i,
+      /\b(find|look for|search for|pull|gather|check|get) (the )?(prior art|literature|publications|related work|state of the art|standards|clinical data|adverse[- ]event (data|reports)|patents?)\b/i,
+      /\bany (evidence|sources|data|publications) (for|against|on|about)\b/i,
+      /\b(evidence|sources) (against|contradicting|supporting) (this|it|that|the candidate|the mechanism)\b/i,
+      /\bis there (evidence|literature|any study|any source)\b/i,
+      /\bvalidate (this|it|the claim) against (the )?(literature|evidence|data|sources)\b/i,
     ],
   },
   {
@@ -128,6 +157,11 @@ const PHRASE_RULES: PhraseRule[] = [
     patterns: [
       /\bdesign (a|an|the) (decisive )?(experiment|test)\b/i,
       /\bpropose (a|an|the) (decisive )?(experiment|test)\b/i,
+      /\b(a|an|the) (decisive|killer) (experiment|test)\b/i,
+      /\bdesign (a|an|the)? ?(bench|benchtop|physical|validation|verification) (test|experiment|trial|protocol)\b/i,
+      /\bpropose (a|an|the)? ?(physical|bench|validation) (test|protocol|trial)\b/i,
+      /\b(test|experiment) (plan|protocol) (for|to verify|to validate)\b/i,
+      /\bhow (would|do) we (test|verify|validate) (this|it|that)\b/i,
     ],
   },
   {
@@ -136,6 +170,21 @@ const PHRASE_RULES: PhraseRule[] = [
       /\bwork out the engineering\b/i,
       /\bestablish the (engineering|geometry|dimensions)\b/i,
       /\bbuild (a|the) (3d|three[- ]dimensional|cad) (model|design)\b/i,
+      /\boptimi[sz]e (it|this|that|the design|the candidate)? ?for\b/i,
+      /\b(manufacturing|production|fabrication) (approach|process|route|method|plan|steps?)\b/i,
+      /\bwork (out|up) (the )?(manufacturing|production|fabrication)\b/i,
+      /\bwork out how to (actually |best )?(manufacture|produce|fabricate|build|make) (this|it|that|them)\b/i,
+      /\b(engineering|dimensional) (specification|realization|package)\b/i,
+      /\bspec(ify| out) (the )?(geometry|dimensions|materials|tolerances?)\b/i,
+    ],
+  },
+  {
+    verb: "REVIEW_PACKAGE",
+    patterns: [
+      /\b(review|open|show|see) (me )?(the )?(technology )?package\b/i,
+      /\b(download|export|generate|get|build|produce) (the )?(package|zip|dossier|bundle|deliverable)\b/i,
+      /\bi(’|')?d (like|want) (the|a) (technology )?package\b/i,
+      /\bshow (me )?the deliverable\b/i,
     ],
   },
   {
@@ -143,13 +192,35 @@ const PHRASE_RULES: PhraseRule[] = [
     patterns: [
       /\bresearch (this|it|that|further)\b/i,
       /\binvestigate (this|it|that) further\b/i,
-      /\bkeep (investigating|looking)\b/i,
+      /\bkeep (investigating|looking|going|digging|pushing|exploring)\b/i,
+      /\b(dig|dive|go) deeper\b/i,
+      /\bgo (further|broader|wider)\b/i,
+      /\bmore (detail|depth|analysis|investigation)\b/i,
+      /\bcontinue (the )?(investigation|research|search|exploration)\b/i,
+      /\bexpand (the )?(search|investigation|evidence|scope)\b/i,
+      /\belaborate on (this|it|that)\b/i,
     ],
   },
   {
-    verb: "REVIEW_PACKAGE",
+    // the broadest family LAST: alternative/destination steering and
+    // objective/constraint steering ("make it cheaper", "use a
+    // different material", "reduce the pressure loss")
+    verb: "CHANGE_MECHANISM",
     patterns: [
-      /\b(review|open|show) (the )?(technology )?package\b/i,
+      /\btry (another|a different|an alternative|a second|one more) (mechanism|approach|explanation|hypothesis|concept|route|principle|configuration|material|design)\b/i,
+      /\bchange the mechanism\b/i,
+      /\b(keep|hold|preserve) (the|that) .*(constraint|requirement).* (but|and) change\b/i,
+      /\bwhat else could (cause|explain) (this|it)\b/i,
+      /\b(use|try|switch to|go with|move to|swap (to|for)) (a different|another|an alternative|some other) (material|polymer|elastomer|mechanism|approach|geometry|configuration|concept|actuator|design|coating|adhesive|spring|valve)\b/i,
+      /\b(make|get|design|build|redesign|rework|turn) (it|this|them|the design|the candidate|the concept|the invention|the mechanism) (cheaper|smaller|lighter|safer|stronger|faster|simpler|stiffer|thinner|longer|shorter|more (compact|durable|efficient|affordable|reliable|biocompatible|manufacturable|robust|flexible|rigid))\b/i,
+      /\b(reduce|lower|minimi[sz]e|cut|shrink|bring down|decrease) (the |its |their )?(cost|pressure (loss|drop)|weight|size|profile|complexity|friction|leakage|risk)\b/i,
+      /\b(improve|increase|boost|maximi[sz]e) (the |its |their )?(reliability|efficiency|flow|durability|strength|safety margin)\b/i,
+      /\b(cheaper|less expensive|more affordable) (design|approach|mechanism|solution|way|version|option)\b/i,
+      /\b(avoid|eliminate|get rid of|prevent|design out) (the )?(kink|kinking|fatigue|leak|leakage|failure|obstruction|debris)\b/i,
+      /\bwhat if (we|you) (used|tried|changed|made|replaced|swapped)\b/i,
+      /\b(different|other|alternative) (way|route|path) (to|of|for)\b/i,
+      /\binstead of (this|that|the current)\b/i,
+      /\btake (a|another) (different|new) (direction|angle|approach)\b/i,
     ],
   },
 ];

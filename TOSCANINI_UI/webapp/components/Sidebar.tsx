@@ -130,6 +130,13 @@ export default function Sidebar({
       >
         <span className={`rail-dot rail-dot-${dot.cls}`} role="img" aria-label={dot.label} />
         <span className="rail-title">{s.title}</span>
+        {/* R463 (audit P1-2): the parent row marks a thread that forked
+            a steering round — the thread is visible from both ends */}
+        {s.has_fork && (
+          <span className="rail-fork faint" data-rail-fork title="This discovery has a continued round">
+            continued
+          </span>
+        )}
         <span className="rail-when">{s.created_at?.slice(0, 10)}</span>
       </button>
     );

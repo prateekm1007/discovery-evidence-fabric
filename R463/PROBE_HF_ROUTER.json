@@ -1,0 +1,64 @@
+{
+ "probe_utc": "2026-09-15T03:12:23Z",
+ "credential": "HF_TOKEN (user-provided Hugging Face API credential, fine-grained)",
+ "key_fingerprint": "sha256:33bc7af22c628bc1",
+ "probe_before_admit": true,
+ "measurements": [
+  {
+   "step": "whoami",
+   "http": 200,
+   "latency_s": 0.23,
+   "identity": {
+    "name": "prateekm1",
+    "type": "user",
+    "role": "fineGrained",
+    "inference_scope": "inference.serverless.write present"
+   }
+  },
+  {
+   "step": "catalog",
+   "http": 200,
+   "latency_s": 0.47,
+   "model_count": 142,
+   "flagship_examples": {
+    "gpt-oss-120b": [
+     "openai/gpt-oss-120b"
+    ],
+    "GLM-5.3": [
+     "zai-org/GLM-5.3-Flash",
+     "zai-org/GLM-5.3",
+     "zai-org/GLM-5.3-Flash-BF16"
+    ],
+    "DeepSeek-V3.2": [
+     "deepseek-ai/DeepSeek-V3.2",
+     "deepseek-ai/DeepSeek-V3.2-Exp"
+    ],
+    "Qwen3-235B": [
+     "Qwen/Qwen3-235B-A22B-Instruct-2507",
+     "Qwen/Qwen3-235B-A22B",
+     "Qwen/Qwen3-235B-A22B-Thinking-2507"
+    ],
+    "Llama-3.3-70B": [
+     "meta-llama/Llama-3.3-70B-Instruct"
+    ]
+   }
+  },
+  {
+   "step": "tiny_completion",
+   "model": "openai/gpt-oss-120b",
+   "http": 402,
+   "latency_s": 0.24,
+   "failure_class": "CREDIT_EXHAUSTED",
+   "provider_words": "You have depleted your monthly included credits. Purchase pre-paid credits to continue using Inference Providers."
+  },
+  {
+   "step": "tiny_completion",
+   "model": "zai-org/GLM-5.3",
+   "http": 402,
+   "latency_s": 0.28,
+   "failure_class": "CREDIT_EXHAUSTED",
+   "provider_words": "You have depleted your monthly included credits. Purchase pre-paid credits to continue using Inference Providers."
+  }
+ ],
+ "honest_conclusion": "The credential is VALID and authorized for Inference Providers; the catalog serves (200). Every completion returns HTTP 402: the account's monthly included Inference Providers credits are DEPLETED (CREDIT_EXHAUSTED \u2014 the provider's own words recorded verbatim). The route is registered as CAPABLE-NOT-CURRENTLY-SERVABLE: it enters the cascade, is typed honestly when probed, and serves automatically when the account's credits reset or are topped up. No failure was converted into success (Art. XV/XXV/LXI)."
+}

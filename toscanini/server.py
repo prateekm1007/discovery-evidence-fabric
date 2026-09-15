@@ -22,6 +22,7 @@ from __future__ import annotations
 import json
 import hashlib
 import os
+import re
 import subprocess
 import sys
 import time
@@ -68,9 +69,14 @@ ENGINE_COMMIT, ENGINE_COMMIT_SOURCE = \
     artifact_identity.resolve_engine_commit()
 OPERATOR_DECLARED_COMMIT = artifact_identity.operator_declared_commit()
 PORTFOLIO_COMMIT_PINNED = (os.environ.get("PORTFOLIO_COMMIT") or "").strip()
-# R394 s15: the operator key — callers presenting it see every session
-# (enterprise operator path; set ENGINE_OPERATOR_KEY on the service).
-OPERATOR_KEY = (os.environ.get("ENGINE_OPERATOR_KEY") or "").strip()
+# R463 (operator architectural ruling): there is NO operator key and
+# NO second service secret. ENGINE_OPERATOR_KEY was an accepted-
+# dependency smell — the run diagnostics it gated are now served to the
+# session's OWN owner capability (the same opaque token that owns the
+# run), and every worker spawn leaves durable spawn-side forensics.
+# One legitimate credential path exists: the provider credentials the
+# deployment is given (HF_TOKEN etc.) — nothing else is required to
+# make the engine run or observable.
 OWNER_COOKIE = "tosca_owner"
 # R447 (run-not-found fix): the owner capability's SECOND transport.
 # HuggingFace Spaces serve this app inside a third-party iframe on
@@ -89,7 +95,7 @@ OWNER_COOKIE = "tosca_owner"
 OWNER_HEADER = "X-Tosca-Owner"
 # uuid4().hex shape (the only keys this service ever mints); anything
 # else presented in the header is ignored — a forged token can never
-# converge the cookie or escalate to the operator key.
+# converge the cookie or reach another owner's diagnostics.
 _VALID_OWNER_KEY = __import__("re").compile(r"^[0-9a-f]{8,64}$")
 
 # R391 (deployment): same-origin static webapp. When the Docker image
@@ -363,11 +369,15 @@ def _health_payload() -> dict:
             "by design); transport readiness = llm_transport_ready"
             if ext_mode else
             "local sandbox gateway liveness (127.0.0.1:8787)"),
-        # R396 A.2: operator-key configuration is DISCLOSED (a bool,
-        # never the key). Sessions isolation enforcement is independent
-        # of this flag — the operator key only ADDS a visibility
-        # capability; it never weakens owner scoping.
-        "operator_key_configured": bool(OPERATOR_KEY),
+        # R463: the operator-key flag is RETIRED (there is no second
+        # secret). Worker observability is per-session and owner-scoped:
+        # spawn forensics + the run's own worker log ride the session's
+        # owner capability, not a service-wide credential.
+        "worker_diagnostics": {
+            "per_session_worker_logs": True,
+            "spawn_forensics": True,
+            "owner_scoped": True,
+        },
         # R394 s1: the deployment identity assertion
         "deployment_identity": deployment_identity,
         # R392 readiness split (directive 2)
@@ -573,15 +583,16 @@ class Handler(BaseHTTPRequestHandler):
     # R394 s15: opaque cookie-scoped ownership. The key is NOT an identity
     # — it is a capability token issued on first visit (httpOnly, no
     # personal data). Sessions created by a caller are owned by that
-    # key; reads are scoped to owned + explicitly-public sessions. The
-    # operator key (env, also acceptable via X-Operator-Key header)
-    # grants full visibility for operations.
+    # key; reads are scoped to owned + explicitly-public sessions.
+    # R463: the operator-key escape hatch is RETIRED — the owner
+    # capability is the ONLY visibility path, and run diagnostics are
+    # owner-scoped with it.
     def _owner_key(self) -> str:
         """Resolve the caller's owner key: cookie, else the X-Tosca-Owner
         header (the R447 embedded-context transport — same opaque
         capability, carried where third-party cookie policy cannot strip
-        it), else X-Operator-Key, else a fresh key (recorded so the
-        response can set the cookie)."""
+        it), else a fresh key (recorded so the response can set the
+        cookie)."""
         cookie = self.headers.get("Cookie") or ""
         for part in cookie.split(";"):
             k, _, v = part.strip().partition("=")
@@ -594,9 +605,6 @@ class Handler(BaseHTTPRequestHandler):
             # sync with the client-persisted one
             self._pending_owner_cookie = hdr.strip()
             return hdr.strip()
-        hdr = self.headers.get("X-Operator-Key") or ""
-        if hdr and OPERATOR_KEY and hdr == OPERATOR_KEY:
-            return OPERATOR_KEY
         new_key = uuid.uuid4().hex
         self._pending_owner_cookie = new_key
         return new_key
@@ -618,8 +626,7 @@ class Handler(BaseHTTPRequestHandler):
         return f"{OWNER_COOKIE}={value}; {attrs}; Path=/; Max-Age=31536000"
 
     def _access(self, session_id: str) -> Optional[str]:
-        return store.session_access(session_id, self._owner_key_cached,
-                                    OPERATOR_KEY)
+        return store.session_access(session_id, self._owner_key_cached)
 
     def _denied(self):
         # 404 (not 403): a denied caller learns nothing about whether
@@ -737,58 +744,70 @@ class Handler(BaseHTTPRequestHandler):
         # dashboard screenshot claim (operator directive).
         if p.path == "/api/version":
             return self._json(200, _version_payload())
-        # R419c: operator-scoped worker-log tail — the operator-visibility
-        # capability (R394 s15 pattern) applied to the run worker's own
-        # stderr. Owner-scoped sessions never leak through it: the route
-        # requires the ENGINE_OPERATOR_KEY (header match), 404 otherwise
-        # (enumeration-safe). Serves the LAST N lines only; the file is
-        # operational diagnostics, never user content.
-        if p.path == "/api/ops/worker-log":
-            hdr = self.headers.get("X-Operator-Key") or ""
-            if not (OPERATOR_KEY and hdr and hdr == OPERATOR_KEY):
+        # R463: the R419c operator-key-gated shared worker-log endpoints
+        # are RETIRED (Art. LXIV disposition: DELETED — the operator key
+        # was a second-secret dependency the product must not have, and a
+        # shared multi-session log behind it was the wrong authority
+        # boundary anyway). The replacement is the OWNER-SCOPED
+        # per-session diagnostics route below: it serves ONLY that
+        # session's own worker log tail, its spawn-forensics events, and
+        # its render-job lines, to the caller whose owner capability owns
+        # the session (same _access gate as every other run route;
+        # enumeration-safe 404). The run's failure classification
+        # (ERROR_*/INTERRUPTED reasons) carries the typed cause for the
+        # product surface; this route is the deeper "why did my run's
+        # worker die" view for the same owner, with NO second secret and
+        # NO cross-owner leakage.
+        m = re.match(r"^/api/(?:run|sessions)/([A-Za-z0-9_:\-]{4,80})"
+                     r"/worker-diagnostics$", p.path)
+        if m:
+            sid = m.group(1)
+            if self._access(sid) not in ("OWNER", "PUBLIC"):
                 return self._denied()
-            try:
-                n = min(int(self.headers.get("X-Tail-Lines") or 60), 400)
-            except ValueError:
-                n = 60
-            log_path = store.ENGINE_RUNS / "toscanini_worker.log"
+            s = store.get_session(sid)
+            if not s:
+                return self._denied()
+            log_path = (store.ENGINE_RUNS / "worker_logs"
+                        / f"{sid}.log")
             try:
                 text = log_path.read_text(errors="replace")
-                tail = "\n".join(text.splitlines()[-n:])
+                tail = "\n".join(text.splitlines()[-60:])
+                log_bytes = log_path.stat().st_size
             except FileNotFoundError:
-                tail = "(no worker log yet)"
+                tail, log_bytes = "(no worker log for this run yet)", 0
             except OSError as exc:
-                tail = f"(worker log unreadable: {exc})"
-            return self._json(200, {
-                "path": "ENGINE_RUNS/toscanini_worker.log",
-                "lines_served": len(tail.splitlines()),
-                "tail": tail})
-        # R420: the ASYNC render job's own log tail — the deterministic,
-        # observable recovery path for RENDER_JOB.json (operator §3).
-        # Same operator-key scoping and enumeration-safe 404 as the
-        # worker log; serves the artifact worker's stderr (enqueue,
-        # ladder attempts, recovery re-enqueues) — operational
-        # diagnostics, never user content.
-        if p.path == "/api/ops/artifact-log":
-            hdr = self.headers.get("X-Operator-Key") or ""
-            if not (OPERATOR_KEY and hdr and hdr == OPERATOR_KEY):
-                return self._denied()
+                tail, log_bytes = f"(worker log unreadable: {exc})", 0
             try:
-                n = min(int(self.headers.get("X-Tail-Lines") or 60), 400)
-            except ValueError:
-                n = 60
-            log_path = store.ENGINE_RUNS / "artifact_worker.log"
+                from toscanini import worker_forensics as _wfx
+                events = [e for e in _wfx.read_tail(_wfx.durable_root())
+                          if e.get("session_id") == sid][-40:]
+            except Exception:  # noqa: BLE001 — diagnostics never blocks
+                events = []
+            # R463: the async render job's own lines for THIS session
+            # (the R420 §3 observability contract, owner-scoped — the
+            # retired operator-key ops route served every job's
+            # lines behind the operator key; the owner now sees their
+            # job's lines through their own capability).
+            artifact_lines: list = []
             try:
-                text = log_path.read_text(errors="replace")
-                tail = "\n".join(text.splitlines()[-n:])
-            except FileNotFoundError:
-                tail = "(no artifact job log yet)"
-            except OSError as exc:
-                tail = f"(artifact job log unreadable: {exc})"
+                alog = store.ENGINE_RUNS / "artifact_worker.log"
+                if alog.exists():
+                    marker = f"{sid}:"
+                    artifact_lines = [
+                        ln for ln in alog.read_text(
+                            errors="replace").splitlines()[-400:]
+                        if marker in ln][-20:]
+            except OSError:
+                pass
             return self._json(200, {
-                "path": "ENGINE_RUNS/artifact_worker.log",
-                "lines_served": len(tail.splitlines()),
-                "tail": tail})
+                "session_id": sid,
+                "worker_log_tail": tail.splitlines()[-60:],
+                "worker_log_bytes": log_bytes,
+                "spawn_forensics": events,
+                "artifact_job_lines": artifact_lines,
+                "note": ("own-run operational diagnostics — why the "
+                         "worker started, stalled, or died; never user "
+                         "content, never another run's output")})
         if p.path == "/api/sessions":
             # failure recovery (CEO #8 + R392 directive 7): honest dead-
             # worker detection runs on every history read — interrupted/
@@ -807,7 +826,18 @@ class Handler(BaseHTTPRequestHandler):
             # /api/sessions returned all 32 users' problems with worker
             # pids and /app filesystem paths.
             sessions = store.list_sessions_visible_to(
-                self._owner_key_cached, OPERATOR_KEY)
+                self._owner_key_cached)
+            # R463 (audit P1-2): steering continuity — every row that has
+            # forked a child round carries has_fork, so the thread is
+            # visible from the parent's history row too (the child side
+            # carries parent_session_id on its own detail).
+            forked_parents = {
+                s.get("parent_session_id")
+                for s in sessions
+                if s.get("parent_session_id")
+            }
+            for s in sessions:
+                s["has_fork"] = s.get("session_id") in forked_parents
             # R394 (CEO directive 2/16): every history row carries the
             # user-facing state projection AND carries NO operational
             # internals (strip_operational_fields)
@@ -1711,6 +1741,29 @@ class Handler(BaseHTTPRequestHandler):
     def _spawn_worker(self, session_id: str) -> None:
         """Start the serialized discovery worker (detached).
 
+        R463 (operator architectural ruling — no second secret, no
+        operator key): the spawn path is now the primary forensic
+        witness for the a5a7 pre-registration death class. The OLD path
+        opened ONE shared append-mode log inside the parent for every
+        worker (interleaved lines, a parent-held fd that was never
+        closed, and zero durable record at spawn time) so a worker that
+        died before its own forensics attach left NO attributable
+        evidence anywhere the product could read — the exact gap the
+        ENGINE_OPERATOR_KEY escalation pretended a second secret would
+        fill. The redesign:
+
+          1. PER-SESSION stderr: ENGINE_RUNS/worker_logs/{sid}.log —
+             attributable, owner-readable, no interleaving, and the
+             parent closes its fd immediately after Popen.
+          2. SPAWN-SIDE forensics: SPAWN_REQUESTED (before Popen) and
+             SPAWNED/SPAWN_FAILED events in the durable forensics
+             ledger — a death before the worker's first heartbeat is
+             still bracketed by durable evidence from the spawner.
+          3. TYPED failure: a Popen failure is classified on the
+             session (ERROR_SPAWN + honest reason + retry path) instead
+             of surfacing as an untyped 500 (Art. LXI vocabulary —
+             infrastructure state, never a verdict).
+
         Transport pinning (EXPLICIT operator overrides, logged by the
         engine and recorded in candidate provenance). The zai pin — the
         measured-healthy sandbox transport — is only the DEFAULT when the
@@ -1732,13 +1785,56 @@ class Handler(BaseHTTPRequestHandler):
             env.setdefault("ENGINE_ATTACK_PROVIDER", "zai")
             env.setdefault("ENGINE_ENSEMBLE_PROVIDERS", "zai")
             env.setdefault("ENGINE_GRID_PROVIDERS", "zai")
-        subprocess.Popen(
-            [sys.executable, "-m", "toscanini.worker", session_id],
-            cwd=str(REPO_ROOT), env=env,
-            stdout=open(REPO_ROOT / "ENGINE_RUNS" / "toscanini_worker.log",
-                        "ab"),
-            stderr=subprocess.STDOUT,
-            start_new_session=True)
+        # 2a. spawn-side forensics BEFORE the process exists
+        try:
+            from toscanini import worker_forensics as _wfx
+            fx = _wfx.attach_session(session_id,
+                                     durable_root=_wfx.durable_root())
+            fx.event("SPAWN_REQUESTED",
+                     stage="SPAWN",
+                     provider_pins={k: v for k, v in env.items()
+                                    if k.startswith("ENGINE_")
+                                    and "PROVIDER" in k},
+                     log_path=f"ENGINE_RUNS/worker_logs/{session_id}.log")
+        except Exception:  # noqa: BLE001 — forensics never blocks a run
+            fx = None
+        log_dir = store.ENGINE_RUNS / "worker_logs"
+        try:
+            log_dir.mkdir(parents=True, exist_ok=True)
+            log_fh = open(log_dir / f"{session_id}.log", "ab")
+            proc = subprocess.Popen(
+                [sys.executable, "-m", "toscanini.worker", session_id],
+                cwd=str(REPO_ROOT), env=env,
+                stdout=log_fh,
+                stderr=subprocess.STDOUT,
+                start_new_session=True)
+            log_fh.close()  # parent's copy — the child holds its own
+            # R463: the pid is recorded AT SPAWN TIME — the pre-registration
+            # window (worker alive but before phase-0) is now judgeable by
+            # the pid-liveness sweep instead of invisible to every sweep
+            try:
+                store.update_session(session_id, worker_pid=proc.pid)
+            except Exception:  # noqa: BLE001 — best-effort, forensics has it
+                pass
+            if fx is not None:
+                fx.event("SPAWNED", stage="SPAWN", worker_pid=proc.pid)
+        except OSError as exc:
+            # 3. typed classification — never an untyped 500, never a
+            # fabricated run (Art. VI/LXI)
+            if fx is not None:
+                fx.event("SPAWN_FAILED", stage="SPAWN",
+                         error_class=type(exc).__name__,
+                         error_message=str(exc)[:500])
+            try:
+                store.update_session(
+                    session_id,
+                    status="ERROR_SPAWN",
+                    error=("The worker process could not be started "
+                           f"({type(exc).__name__}). Nothing ran; nothing "
+                           "was changed. Retry re-attempts the run."),
+                    worker_pid=None)
+            except Exception:  # noqa: BLE001 — session store best-effort
+                pass
 
     # ------------------------------------------------------------- file
     # R423A Phase 5: streaming artifact delivery. The OLD handler did a

@@ -254,15 +254,26 @@ class TestHealthSemantics:
         assert "BUILD_ARTIFACT_SHA == RUNNING_ARTIFACT_SHA" in di["rule"]
         assert h["readiness"]["engine_commit_source"] == "build_artifact"
 
-    def test_operator_key_configured_flag_without_secret(self, payload,
+    def test_operator_key_flag_is_retired_without_secret(self, payload,
                                                          monkeypatch):
+        """R463: there is NO operator key and NO operator_key_configured
+        flag — no second secret exists to configure or disclose. The
+        health payload carries the owner-scoped worker-diagnostics
+        contract instead, and no credential material appears anywhere."""
         srv, health = payload
-        monkeypatch.setattr(srv, "OPERATOR_KEY", "")
-        assert health()["operator_key_configured"] is False
-        monkeypatch.setattr(srv, "OPERATOR_KEY", "op-secret-value")
         h = health()
-        assert h["operator_key_configured"] is True
-        assert "op-secret-value" not in json.dumps(h)
+        assert "operator_key_configured" not in h
+        assert h["worker_diagnostics"] == {
+            "per_session_worker_logs": True,
+            "spawn_forensics": True,
+            "owner_scoped": True,
+        }
+        # even with the legacy env var present, nothing reads it into
+        # the payload (the variable is dead — Art. LXIV retirement)
+        monkeypatch.setenv("ENGINE_OPERATOR_KEY", "op-secret-value")
+        h2 = health()
+        assert "op-secret-value" not in json.dumps(h2)
+        assert "operator_key_configured" not in h2
 
 
 # ---------------------------------------------------------------------------

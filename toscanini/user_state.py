@@ -110,9 +110,12 @@ _USER_STATE_EXPLANATIONS = {
                                "Nothing is running while the question is "
                                "open — type your answer below and the "
                                "same investigation resumes instantly."),
-    "INTERRUPTED": ("The worker died before reaching a verdict (restart "
-                    "or crash). The run is recoverable through the same "
-                    "worker path — retry from the run page."),
+    "INTERRUPTED": ("The worker process could not start, or died before "
+                    "reaching a verdict (restart, crash, or a failed "
+                    "spawn). The run is recoverable through the same "
+                    "worker path — retry from the run page. Nothing was "
+                    "concluded about the problem, and its cause is "
+                    "recorded on the run's own diagnostics."),
     "BLOCKED_TRANSPORT": ("Discovery temporarily blocked by "
                           "infrastructure. Your problem is saved and "
                           "ready to resume. No conclusion was reached — "
@@ -224,6 +227,12 @@ def user_state(session: Dict[str, Any]) -> str:
             return "COMPLETED_GENERATION_FAILED"
         return "COMPLETED_UNKNOWN"
     if status == "INTERRUPTED":
+        return "INTERRUPTED"
+    if status == "ERROR_SPAWN":
+        # R463: a spawn failure is NOT an engine failure — the discovery
+        # pipeline never ran (Art. LXI: distinct infrastructure classes
+        # stay distinct). It lands in the recoverable family with the
+        # spawn cause carried on the session's error line.
         return "INTERRUPTED"
     if status == "AWAITING_CLARIFICATION":
         # R459 (external product audit P0-1, measured live on production:
@@ -372,7 +381,7 @@ def with_user_state(session: Dict[str, Any]) -> Dict[str, Any]:
 # (the operator's durable record keeps them for liveness checks), only
 # from every API projection.
 OPERATIONAL_FIELDS = ("worker_pid", "worker_starttime", "run_dir",
-                      "problem_id", "owner_key")
+                      "problem_id", "owner_key", "spawn_diagnostics")
 
 
 def strip_operational_fields(session: Dict[str, Any]) -> Dict[str, Any]:

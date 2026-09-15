@@ -695,10 +695,14 @@ class TestRestartContract(unittest.TestCase):
         self.assertIn("boot_render_recovery", src)
 
     def test_artifact_log_route_wired(self):
-        """The recovery path is OBSERVABLE: the async job's own log is
-        operator-served (enumeration-safe, key-scoped)."""
+        """The recovery path is OBSERVABLE: R463 retired the operator-
+        key-gated /api/ops/artifact-log route (no second secret) and the
+        render job's diagnostics ride the OWNER-SCOPED per-session
+        route — the same enumeration-safe discipline, one authority
+        (the owner capability) instead of a service-wide credential."""
         src = inspect.getsource(srv.Handler.do_GET)
-        self.assertIn("/api/ops/artifact-log", src)
+        self.assertNotIn("/api/ops/artifact-log", src)
+        self.assertIn("/worker-diagnostics", src)
 
     def test_job_docstring_states_implemented_contract(self):
         """§3 (the documentation-correction clause): the module claims
@@ -1016,7 +1020,7 @@ class TestDurableRenderPersistence(unittest.TestCase):
             "run_dir": str(rd), "origin": "toscanini_ui",
             "final_status": "EVOLVED_INVENTION_CANDIDATE",
             "created_at": "2026-09-08T00:00:00Z",
-            "owner_key": "testowner",
+            "owner_key": "aaaaaaaaaaaaaaaa",
         }]}))
         orig = (store_mod.STORE_DIR, store_mod.SESSIONS_PATH,
                 store_mod.ENGINE_RUNS)
@@ -1024,8 +1028,8 @@ class TestDurableRenderPersistence(unittest.TestCase):
         store_mod.SESSIONS_PATH = store / "sessions.json"
         store_mod.SHARES_PATH = store / "shares.json"
         store_mod.ENGINE_RUNS = Path(tmp) / "ENGINE_RUNS"
-        orig_key = srv_mod.OPERATOR_KEY
-        srv_mod.OPERATOR_KEY = "testoperator"
+        # R463: access rides the OWNER capability (X-Tosca-Owner) — the
+        # operator-key header is retired and grants nothing.
         with socket.socket() as s:
             s.bind(("127.0.0.1", 0))
             port = s.getsockname()[1]
@@ -1042,7 +1046,7 @@ class TestDurableRenderPersistence(unittest.TestCase):
                     ("/api/run/ts_modeltest/cio", 200)):
                 req = urlreq.Request(
                     f"http://127.0.0.1:{port}{path}",
-                    headers={"X-Operator-Key": "testoperator"})
+                    headers={"X-Tosca-Owner": "aaaaaaaaaaaaaaaa"})
                 try:
                     with urlreq.urlopen(req, timeout=20) as r:
                         code, body = r.status, r.read()
@@ -1052,7 +1056,6 @@ class TestDurableRenderPersistence(unittest.TestCase):
                 if expect == 200 and path.endswith("model"):
                     self.assertGreater(len(body), 1000)
         finally:
-            srv_mod.OPERATOR_KEY = orig_key
             (store_mod.STORE_DIR, store_mod.SESSIONS_PATH,
              store_mod.ENGINE_RUNS) = orig
 

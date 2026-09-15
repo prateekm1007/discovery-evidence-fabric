@@ -400,6 +400,63 @@ PROVIDER_SPECS: List[ProviderSpec] = [
             "rung the account's credit state admits (family policy, "
             "never today's availability — Art. XXVII). Tiers are "
             "recorded policy inputs (Art. XXVII).")),
+    # ------------------------------------------------------------------
+    # R463 (2026-09-15): the USER's Hugging Face credential path — the
+    # operator's P0 architectural ruling ("the user gives Toscanini AI
+    # access, and Toscanini does the rest; one legitimate user/
+    # application AI credential path"). The credential is HF_TOKEN (the
+    # account owner's own fine-grained key, deployed as a Space secret).
+    # Probe-before-admit held: catalog 200 (142 models incl. the
+    # flagship classes); EVERY completion 402 — the account's monthly
+    # included Inference Providers credits are DEPLETED (the provider's
+    # own words, verbatim in R463/PROBE_HF_ROUTER.json). Registered
+    # HONESTLY as capable-not-currently-servable: the rung enters the
+    # cascade, classifies typed CREDIT_EXHAUSTED on probe (the R436
+    # class), and serves automatically when the credits reset or are
+    # topped up. No failure was converted into success (Art. XV/XXV/
+    # LXI).
+    # ------------------------------------------------------------------
+    ProviderSpec(
+        "hf", "HF_TOKEN",
+        "https://router.huggingface.co/v1/chat/completions",
+        "openai/gpt-oss-120b", "openai", 128_000,
+        quality_tier=2, cost_tier=1, latency_tier=2,
+        cost_basis="FREE_TIER_API", locality="REMOTE",
+        license="provider serving terms (monthly included credits; "
+                "pre-paid top-up available)",
+        account_domain="HF_ACCOUNT_CREDITS",
+        model_revision="served-by-provider; openai/gpt-oss-120b and "
+                       "zai-org/GLM-5.3 are the catalog-verified strong "
+                       "rungs (2026-09-15 catalog); no per-model revision "
+                       "pin exposed by the router — recorded honest "
+                       "(Art. VI)",
+        policy_note=(
+            "R463 the user's OWN Hugging Face credential (HF_TOKEN) on "
+            "the Inference Providers router — the P0 architectural "
+            "ruling's one legitimate credential path. LIVE-MEASURED at "
+            "registration (R463/PROBE_HF_ROUTER.json): whoami-v2 -> 200 "
+            "(fine-grained token, inference.serverless.write present); "
+            "GET /v1/models -> 200 with 142 models incl. openai/"
+            "gpt-oss-120b, zai-org/GLM-5.3, deepseek-ai/DeepSeek-V3.2, "
+            "Qwen/Qwen3-235B-A22B-Instruct-2507, meta-llama/"
+            "Llama-3.3-70B-Instruct; tiny completions on BOTH strong "
+            "rungs -> HTTP 402 'You have depleted your monthly included "
+            "credits. Purchase pre-paid credits to continue using "
+            "Inference Providers.' — the R436 CREDIT_EXHAUSTED class on "
+            "the WHOLE account domain (R450 measured precedent: every "
+            "model behind one HF account bills the same included "
+            "credits). The account domain is HF_ACCOUNT_CREDITS — NOT "
+            "redundant with any other router (one budget kills every "
+            "rung behind it), which is exactly why the cascade keeps "
+            "the independent account domains. Default urllib "
+            "User-Agent passes (no CF block on router.huggingface.co). "
+            "HONEST TIERS: quality_tier 2 (the STRONG rung is the "
+            "gpt-oss-120b flagship class — the claim is about the "
+            "catalog-class model, unmeasured on the engine's protocol "
+            "while credits are depleted; the tier claim is the "
+            "recorded policy input, Art. XXVII). The rung serves "
+            "automatically when the account's credits reset or are "
+            "topped up — no code change, no new secret.")),
     ProviderSpec(
         "tokenrouter", "TOKEN_ROUTER_API_KEY",
         "https://api.tokenrouter.com/v1/chat/completions",

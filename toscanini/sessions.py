@@ -77,46 +77,50 @@ def list_sessions() -> List[Dict[str, Any]]:
 #   - every session stores an opaque owner_key (issued as a cookie by
 #     the server; never a user identity, never a login — privacy
 #     scoping without identity infrastructure)
-#   - a caller sees a session iff owner_key matches, the session is
-#     explicitly public (curated demo content, labeled origin), or the
-#     caller holds the operator key (env ENGINE_OPERATOR_KEY)
+#   - a caller sees a session iff owner_key matches or the session is
+#     explicitly public (curated demo content, labeled origin).
+#     R463: the operator-key override is RETIRED per the operator's
+#     architectural ruling — there is no second service secret and no
+#     full-visibility credential; run diagnostics are owner-scoped.
 #   - public sharing of a specific run stays the EXPLICIT deliberate
 #     path (create_share) — unchanged
 #   - legacy sessions with no owner_key belong to NO cookie holder
-#     (fail-closed: visible only to the operator key)
+#     (fail-closed: invisible to every caller — R463 retired the
+#     operator-key override that was the sole exception)
 # ---------------------------------------------------------------------------
 
-def list_sessions_visible_to(owner_key: str,
-                             operator_key: str = "") -> List[Dict[str, Any]]:
+def list_sessions_visible_to(owner_key: str) -> List[Dict[str, Any]]:
     """Sessions the given owner may see: their own + explicitly public.
-    Legacy ownerless sessions are NOT visible to cookie holders."""
+    Legacy ownerless sessions are NOT visible to cookie holders.
+    R463: the operator-key argument is RETIRED — there is no second
+    secret and no full-visibility credential (owner directive)."""
     out = []
     for s in list_sessions():
-        if _session_access(s, owner_key, operator_key) != "DENY":
+        if _session_access(s, owner_key) != "DENY":
             out.append(s)
     return sorted(out, key=lambda s: s.get("created_at", ""), reverse=True)
 
 
-def _session_access(session: Dict[str, Any], owner_key: str,
-                    operator_key: str = "") -> str:
-    if operator_key and owner_key == operator_key:
-        return "OWNER"  # the operator key grants full visibility
+def _session_access(session: Dict[str, Any], owner_key: str) -> str:
+    # R463: the operator-key branch is RETIRED. The owner capability is
+    # the ONLY visibility path; legacy ownerless sessions stay fail-
+    # closed invisible to everyone (their content is reachable only by
+    # the run-id-capable diagnostics the run dir itself holds).
     if session.get("public"):
         return "PUBLIC"
     if owner_key and session.get("owner_key") == owner_key:
         return "OWNER"
     # legacy ownerless session: pre-scoping history — invisible to every
-    # cookie holder (fail-closed); only the operator key reaches it above
+    # cookie holder (fail-closed)
     return "DENY"
 
 
-def session_access(session_id: str, owner_key: str,
-                   operator_key: str = "") -> Optional[str]:
-    """OWNER | PUBLIC | OPERATOR_ONLY | DENY | None (no such session)."""
+def session_access(session_id: str, owner_key: str) -> Optional[str]:
+    """OWNER | PUBLIC | DENY | None (no such session)."""
     s = get_session(session_id)
     if not s:
         return None
-    return _session_access(s, owner_key, operator_key)
+    return _session_access(s, owner_key)
 
 
 def get_session(session_id: str) -> Optional[Dict[str, Any]]:
@@ -145,7 +149,7 @@ def update_session(session_id: str, **fields) -> Optional[Dict[str, Any]]:
 STUCK_AFTER_HOURS = 3  # MODEL_DERIVED operational bound, disclosed per use
 
 ERROR_STATUSES = ("ERROR_TRANSPORT", "ERROR_BUILD", "ERROR_RUN",
-                  "ERROR_STUCK")
+                  "ERROR_STUCK", "ERROR_SPAWN")
 
 # R392 (directive 7): the explicit durable job lifecycle. A run is
 # PENDING (created, queued) -> RUNNING (worker alive, any phase) ->
@@ -253,6 +257,57 @@ def mark_stuck_sessions(max_age_hours: float = STUCK_AFTER_HOURS) -> List[str]:
 PENDING_REGISTER_GRACE_MINUTES = 10  # MODEL_DERIVED, disclosed per use
 
 
+# R463: the spawn path records the death evidence per run — the
+# per-session worker log (ENGINE_RUNS/worker_logs/{sid}.log) and the
+# spawn-forensics ledger events. When a sweep types an unregistered
+# death, it attaches the READABLE cause from that evidence. Known-
+# pattern extraction only: a cause the evidence does not show stays
+# "not captured" — never guessed (Art. XXV).
+_SPAWN_DEATH_PATTERNS = (
+    ("MemoryError", "the worker process ran out of memory"),
+    ("Killed", "the worker process was killed by the OS (memory pressure)"),
+    ("ImportError", "a worker module failed to import"),
+    ("ModuleNotFoundError", "a worker module failed to import"),
+    ("SyntaxError", "the worker code failed to load"),
+    ("Traceback", "a worker error was logged at startup"),
+)
+
+
+def _worker_spawn_cause(session_id: str) -> Optional[Dict[str, Any]]:
+    """Read the per-run worker evidence and extract a TYPED cause for a
+    pre-registration death. Returns {cause, evidence_lines, forensics}
+    or None. Honest absence: an unreadable/empty log yields cause=None
+    with the forensics events attached (the spawn bracket), never an
+    invented reason (Art. VI/XXV)."""
+    cause = None
+    lines: List[str] = []
+    # STORE_DIR is TOSCANINI_UI/ inside the repo; ENGINE_RUNS is the
+    # repo-root sibling (the same resolution the spawner uses).
+    log_path = (STORE_DIR.parent / "ENGINE_RUNS" / "worker_logs"
+                / f"{session_id}.log")
+    try:
+        if log_path.exists():
+            lines = log_path.read_text(errors="replace").splitlines()[-15:]
+            blob = "\n".join(lines)
+            for pat, label in _SPAWN_DEATH_PATTERNS:
+                if pat in blob:
+                    cause = label
+                    break
+    except OSError:
+        pass
+    forensics: List[Dict[str, Any]] = []
+    try:
+        from toscanini import worker_forensics as _wfx
+        forensics = [e for e in _wfx.read_tail(_wfx.durable_root())
+                     if e.get("session_id") == session_id][-10:]
+    except Exception:  # noqa: BLE001 — evidence attach is best-effort
+        pass
+    if cause is None and not lines and not forensics:
+        return None
+    return {"cause": cause, "evidence_lines": lines[-8:],
+            "forensics": forensics}
+
+
 def mark_unregistered_pending() -> List[str]:
     """PENDING sessions whose worker never registered (no pid recorded)
     and whose last update is older than the grace period become
@@ -273,12 +328,19 @@ def mark_unregistered_pending() -> List[str]:
         marker = s.get("updated_at") or s.get("created_at") or ""
         if not marker or marker >= cutoff:
             continue  # fresh — inside the registration grace window
+        diag = _worker_spawn_cause(s["session_id"]) or {}
+        cause = diag.get("cause")
+        cause_line = (f" Log evidence: {cause}." if cause
+                      else " The death cause was not captured — the "
+                           "run's own diagnostics carry the recorded "
+                           "evidence.")
         update_session(
             s["session_id"], status="INTERRUPTED",
             error=(f"the worker process never registered (no progress "
                    f"for >{PENDING_REGISTER_GRACE_MINUTES} min since "
                    f"{marker}) — the run can be retried; nothing was "
-                   "concluded about the problem"))
+                   f"concluded about the problem.{cause_line}"),
+            spawn_diagnostics=diag)
         marked.append(s["session_id"])
     return marked
 

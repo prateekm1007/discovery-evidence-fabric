@@ -398,6 +398,27 @@ function WorkspaceInner() {
   const evtTimer = useRef<ReturnType<typeof setInterval> | null>(null);
   const es = useRef<EventSource | null>(null);
 
+  // R463 (audit P2-4): Alt+W opens/closes the contextual workspace
+  // panel, Escape closes it — a keyboard path to the same toggle the
+  // workspace tabs offer (works at every viewport width; the surface
+  // toggle buttons remain the primary affordance). Ignored while the
+  // user is typing in an input, textarea, or contenteditable field.
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      const t = e.target as HTMLElement | null;
+      const typing = !!t && (t.tagName === "INPUT"
+        || t.tagName === "TEXTAREA" || t.isContentEditable);
+      if (e.key === "w" && e.altKey && !typing) {
+        e.preventDefault();
+        setSurface((s) => (s ? null : "overview"));
+      } else if (e.key === "Escape" && !typing) {
+        setSurface((s) => (s ? null : s));
+      }
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
   // ---- rails + health ----
   useEffect(() => {
     listSessions().then(setSessions).catch(() => setSessions([]));
@@ -830,6 +851,18 @@ function WorkspaceInner() {
                   <div className="queue-note faint" data-queue-note>
                     {detail.queue_state.reason}
                   </div>
+                )}
+                {/* R463 (audit P1-2): steering continuity — a forked
+                    round names the round it steered FROM, and the
+                    parent stays one click away in-thread */}
+                {detail.parent_session_id && (
+                  <a
+                    className="fork-note faint"
+                    data-fork-note
+                    href={`/?run=${encodeURIComponent(detail.parent_session_id)}`}
+                  >
+                    Continued from the earlier round of this investigation →
+                  </a>
                 )}
                 <Conversation
                   detail={detail}

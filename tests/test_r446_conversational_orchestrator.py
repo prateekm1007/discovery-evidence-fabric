@@ -1003,7 +1003,7 @@ class TestHttpRouting(unittest.TestCase):
                 return self.sessions.get(sid)
 
             @staticmethod
-            def session_access(sid, owner_key=None, operator_key=None):
+            def session_access(sid, owner_key=None):
                 return "OWNER"
 
         mem = _MemStore()
