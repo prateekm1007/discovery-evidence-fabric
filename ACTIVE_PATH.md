@@ -887,3 +887,45 @@ pre-registration deaths) root-cause-blocked on the unconfigured
 ENGINE_OPERATOR_KEY (worker log operator-gated) — Art. LXV escalation;
 transport probe flapped honestly for ~20 min post-boot; retry-vs-create
 spawn asymmetry recorded.
+
+## R463 addendum (2026-09-15) — the seventh router CANDIDATE (aerolink) met the ACCOUNT-PLAN GATE: refused at admission, escalated, the HF_TOKEN unblock executed, both new keys persisted as Space secrets
+
+Operator delivery (verbatim, redacted — BS-021): "huggingface API :
+hf_Mr...kNM" (the R462 unblock action 2 — the re-provisioned HF_TOKEN)
++ "https://aerolink.lat/dashboard/api-keys: aero_l...lon0" (the
+seventh free-tier router candidate). The standing six-step pattern
+applied to the extent the measurements permitted, honestly typed where
+they did not.
+
+| Component | Module / artifact | Notes |
+|---|---|---|
+| THE measured gate | `scripts/r463_probe_aerolink.py` → `R463/PROBE_CATALOG.json` | nine probes on the DISCOVERED API host `capi.aerolink.lat` (externally sourced from the claude-code-free provider table, provenance recorded — Art. VI): catalog 200 with 4 Claude models; the bogus-key 401 differential ON THE SERVING ENDPOINT proves the delivered key VALID (auth evaluates before the plan gate — richer than tokenharbor's unmeasurable key); ALL 4 models answer the SAME typed 403 permission_error "Free Starter access is currently unavailable. Please upgrade your plan or add paid balance to continue using the service."; Anthropic Messages dialect ONLY (`/v1/chat/completions` → 404); the Python-urllib UA banned at the CF edge (error 1010 — the xkiro/apinex extra_headers remedy applies); the region NOT gated; the dashboard domain 404 control; the api. subdomain dead-host control |
+| THE Art. LXV escalation, OPEN | `R463/AEROLINK_OWNER_ESCALATION.json` | count 1; the provider's own remedy is PAYMENT — an owner-gated wallet decision under ZERO_PAID_COST (the machine never deposits, Art. XXXIII); unblock: pay-or-park or wait-and-re-prove ("currently unavailable" may be transient); NOT delivery-blocking (unlike R462) |
+| THE account-plan-gate wording | `provider_health.py` | the measured specimen classifies CREDIT_EXHAUSTED (the newly-registered hints: 'free starter access' / 'upgrade your plan' / 'add paid balance') — previously fell through to AUTH_FAILURE, a PROVEN-valid key marked failed (the R462 defect class, closed again); 401 stays strictly AUTH; the region class still checks FIRST; the standing specimens unchanged |
+| NO registration | `llm_registry.py` (unchanged spec set) | aerolink NOT in `_SPEC_BY_ID`; no OWNER_AEROLINK_ACCOUNT; tokenharbor remains unregistered (the R462 state); the five-router registration and its Space secrets stand untouched |
+| THE §5 scrub guard, extended | `toscanini/conversational/transport_invisibility.py` | aerolink joins the provider-id vocabulary (the probe candidate's name rides technical records only) |
+| THE Space secrets, EXTENDED | `scripts/r463_hf_secrets.py` → `R463/HF_SPACE_SECRETS.json` | the R462 unblock resolved: TOKENHARBOR_API_KEY (sixth, admission deferred) + AEROLINK_API_KEY (seventh) persisted 2/2 — the r461_hf_secrets.py pattern extended; the standing five remain from R461; both new secrets are INERT on the deployed app (no ProviderSpec reads them) |
+| THE deploy driver, extended | `scripts/r456_space_deploy.py` | the wiring set gains TOKENHARBOR_API_KEY + AEROLINK_API_KEY (env-injected when present; unset keys skipped typed-honestly — the standing five remain persisted from R461) |
+| THE live rotation proof | NOT APPLICABLE this round | no admitted aerolink rung exists to rotate onto; `R461/ROTATION_PROOF.json` (all three arms TRUE) remains the standing live rotation measurement |
+
+Tests: `tests/test_r463_aerolink_plan_gate.py` 40/40 NEW (the
+probe-artifact contracts incl. the serving-endpoint differential, the
+public-catalog control, the UA gate, the dialect control, the
+API-base provenance; the classification contracts incl. 401-stays-AUTH
+and region-beats-plan-wording and the standing specimens unchanged;
+the no-registration contracts incl. tokenharbor-still-unregistered;
+the OPEN escalation-record contracts; the scrub-guard extensions; the
+secrets-artifact contracts; secret discipline with both keys' middle
+markers). Families: r462 31/31; r461_bynara 27/27; r414 50/50;
+r451_transport 32/32; r456_free_tier_routers 25/25; r455_lean1 14/14;
+r419_english_only 4/4; r415 35/35; r446_attacker_calibration 20/20;
+r451_zero_paid 37/37; r458 121/122 (the one failure —
+test_paid_env_vars_stripped_in_arm_env — stash-verified IDENTICAL at
+the pristine f2ca84b5 baseline: the z-ai gateway key file is missing
+in this keyless environment, the disclosed environment-dependence,
+BS-020). MODULE_INVENTORY regenerated (123 files / 59,721 LOC, drift
+gate GREEN).
+
+Round record: `R463/R463_ROUND_RECORD.json` (the Art. LXXI tuple
+targeted GREEN — the HF_TOKEN re-provision unblocked both the
+Space-secret persistence and the deploy that R462 could not run).

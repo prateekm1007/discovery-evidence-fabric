@@ -64,8 +64,11 @@ TECHNICAL_RECORD_NOTE = (
 #: could leak undetected); tokenharbor joins it (the R462 probe
 #: candidate; its name rides technical records and must never reach
 #: the product surface either).
+#: R463: aerolink joins it (the seventh probe candidate — same rule:
+#: the probe candidate's name rides technical records only).
 _PROVIDER_ID_RE = re.compile(
-    r"\b(unorouter|xkiro|apinex|bai|bynara|tokenharbor|localqwen|"
+    r"\b(unorouter|xkiro|apinex|bai|bynara|tokenharbor|aerolink|"
+    r"localqwen|"
     r"openrouter|nvidia|tokenrouter|anthropic|gemini|mistral|zai)\b",
     re.I)
 _HTTP_ERROR_RE = re.compile(r"\bHTTP\s*(40[0-9]|41[0-9]|42[0-9]|5\d\d)"

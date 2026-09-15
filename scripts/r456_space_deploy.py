@@ -171,11 +171,22 @@ def main() -> int:
     # repo, the commit, or any artifact (BS-021). R461 adds BYNARA (the
     # fifth router, its account-entry gate resolved by the owner's
     # telegram join 2026-09-15).
+    # R463: TOKENHARBOR (the sixth candidate, admission DEFERRED to a
+    # Space-side measurement per R462) and AEROLINK (the seventh
+    # candidate, admission refused at the account-plan gate this round)
+    # join the wiring set — their secrets are INERT on the deployed app
+    # (no ProviderSpec reads them: neither is in _SPEC_BY_ID); they are
+    # wired so the operator's "never insert again" persistence holds and
+    # the Space-side admission probe path stays unblocked (R462's
+    # what_unblocks). Unset keys are skipped typed-honestly (the standing
+    # five remain persisted from R461 if unset here).
     for env_name, var in (("UNOROUTER_API_KEY", "UNOROUTER_API_KEY"),
                           ("XKIRO_API_KEY", "XKIRO_API_KEY"),
                           ("APINEX_API_KEY", "APINEX_API_KEY"),
                           ("BAI_API_KEY", "BAI_API_KEY"),
-                          ("BYNARA_API_KEY", "BYNARA_API_KEY")):
+                          ("BYNARA_API_KEY", "BYNARA_API_KEY"),
+                          ("TOKENHARBOR_API_KEY", "TOKENHARBOR_API_KEY"),
+                          ("AEROLINK_API_KEY", "AEROLINK_API_KEY")):
         val = os.environ.get(var, "")
         if val:
             api.add_space_secret(repo_id=SPACE, key=env_name, value=val)

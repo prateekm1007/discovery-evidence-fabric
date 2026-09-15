@@ -157,7 +157,23 @@ _CREDIT_HINTS = ("depleted your monthly included credits",
                  "insufficient balance", "deposit required",
                  "deposited balance",
                  # R461 bynara per-model plan-gate specimen
-                 "plan does not include")
+                 "plan does not include",
+                 # R463 aerolink account-plan-gate specimens (measured
+                 # 2026-09-15, R463/PROBE_CATALOG.json): 403
+                 # permission_error "Free Starter access is currently
+                 # unavailable. Please upgrade your plan or add paid
+                 # balance to continue using the service." — an
+                 # ACCOUNT-level plan gate (all 4 catalog models answer
+                 # identically), NOT per-model, NOT regional. The key is
+                 # PROVEN valid (bogus -> 401 authentication_error on
+                 # the serving endpoint; real -> this 403), so the
+                 # honest class is the CREDIT_EXHAUSTED family: the
+                 # account cannot serve on the free tier and the
+                 # provider's own remedy is payment — cascade-advancing,
+                 # provider stays eligible, never AUTH_FAILURE.
+                 "free starter access",
+                 "upgrade your plan",
+                 "add paid balance")
 # R456-A3: the free-tier routers' own words for "this model needs a
 # deposit / the account cannot pay" — MEASURED specimens (2026-09-14):
 #   xkiro 403: "requires real deposited balance — it is billed from
@@ -175,7 +191,13 @@ _CREDIT_HINTS = ("depleted your monthly included credits",
 # eligible — the gate is per-model, not per-key)
 _FREE_TIER_CREDIT_HINTS = ("insufficient balance", "deposit required",
                             "deposited balance",
-                            "plan does not include")
+                            "plan does not include",
+                            # R463 aerolink measured specimens (the
+                            # account-plan gate wording — see the
+                            # _CREDIT_HINTS comment above)
+                            "free starter access",
+                            "upgrade your plan",
+                            "add paid balance")
 # R461: bynara's ACCOUNT-ENTRY GATE specimen (measured 2026-09-14,
 # pre-owner-action): 403 "telegram_required: Join the required
 # Telegram group/channel and relink at /settings to continue." The
