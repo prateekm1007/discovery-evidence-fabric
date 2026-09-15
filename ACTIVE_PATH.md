@@ -957,3 +957,25 @@ MODULE_INVENTORY regenerated (123 files / 60,135 LOC, drift GREEN).
 Art. LXXI tuple GREEN at 08fd1931 (Space revision 65b5dee3; the
 post-boot discovery_ready flap settled ~3 min). Round record:
 `R465/R465_ROUND_RECORD.json`.
+
+## R467 addendum (2026-09-15) — the token-surplus STRONG rung (atria) + the R466 P2/P3 closures
+
+Operator directive: add the atria key (api.atria-asi.ai) to the HF
+Space secret set — "it gives 100million tokens of new model which is
+as good as glm5.3 ... we should be token surplus now."
+
+| Piece | Surface | Notes |
+|---|---|---|
+| THE ADMISSION | `scripts/r467_probe_atria.py` -> `R467/PROBE_*.json` | catalog 200 with ONE model (Atria-Dawn-Preview); bogus-key 401 differential (key valid); OpenAI dialect; urllib UA passes; FIELD-protocol compliance measured (reasoning_content + clean FIELD content; the small-cap starvation recovers at the larger cap — EmptyContentWithFinish). The 100M budget is OPERATOR-DECLARED (no usage endpoint measurable) |
+| THE REGISTRATION | `llm_registry.py` + `model_routing.py` + `transport_capability.py` + `transport_invisibility.py` | provider atria / ATRIA_API_KEY, quality 2 (operator declaration + measured FIELD compliance, Art. XXVII), latency 3 (0.55-8.71 s reasoning variance), FREE_TIER_API, OWNER_ATRIA_ACCOUNT (the EIGHTH distinct account domain); exact-id allowlist; the pinned rung declares TASK_STRONG |
+| THE R466 CONSTRAINT | `R467/REGISTRY_SMOKE.json` | the STRONG synthesis walk served by atria with task_degradation {requested: STRONG, actual: STRONG, match: true} under ZERO_PAID_COST — the MECHANISM-stage degradation class (2 of 3 R466 runs) has its rung |
+| P2 COLD-START | `TOSCANINI_UI/webapp/app/page.tsx` + `lib/types.ts` | a 404 grades toward "Run not found" only when the engine answered health ok around it (engineSeenUp, reset on health failure); the cold window shows the connection-lost copy. Behavioral proof `scripts/r467_p2_coldstart_proof.mjs`: no false verdict in 16 s of cold 404s, recovery on warm, the control arm still fires; zero page errors |
+| P3 FAVICON | `TOSCANINI_UI/webapp/app/icon.svg` | the design system's tokens; the export emits /icon.svg + the link tag |
+| THE SECRETS PATH | `scripts/r467_hf_secrets.py` + the r456 wiring | the eighth key persists as a Space secret when HF_TOKEN is present (BLOCKED this round: HF_TOKEN wiped by the reset — Art. LXXI §4 DELIVERY_BLOCKED, escalation 1; one re-provision closes the secret-set AND the deploy) |
+
+Tests: `tests/test_r467_atria_admission.py` 23/23 NEW; all standing
+batteries green (backend incl. r451_transport 32 after the closed-
+vocabulary registration, r458 29/30 stash-verified pristine — BS-020;
+frontend 115/115 + tsc + export 5/5 + verify-export); MODULE_INVENTORY
+123 files / 60228 LOC, drift GREEN. Round record:
+`R467/R467_ROUND_RECORD.json`.

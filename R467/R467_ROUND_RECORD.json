@@ -1,0 +1,65 @@
+{
+  "kind": "round_record",
+  "round": "R467",
+  "directive": "Operator instruction 2026-09-15: '.https://api.atria-asi.ai/console/keys: <key> add this to the API's keys we are using to hugging face, its gives 100million tokens of new model which is as good as glm5.3 and finish the remaining issues. we should be token surplus now' \u2014 executed as three deliverables: the atria admission (probe-before-admit -> registration -> the STRONG rung), the R466 remaining issues (P2 cold-start, P3 favicon), and the secrets persistence path.",
+  "generated_by": "main (Super Z session)",
+  "reviewer_provenance": "AI_REVIEW",
+  "constitution": {
+    "version": "2.4.0",
+    "sha256_prefix": "b54a1be9",
+    "read_in_full_at_round_start": true,
+    "reread_before_commit": "hash verified byte-identical (b54a1be9bcbdd246...) before the commit"
+  },
+  "deliverable_1_atria_admission": {
+    "operator_claims_recorded_as_declared": {
+      "budget": "100 million tokens \u2014 OPERATOR-DECLARED (no provider usage/balance endpoint is measurable: /v1/usage, /v1/balance, /v1/credits all 404/405; Art. VI/XXV \u2014 recorded, never converted into a measurement)",
+      "quality": "as good as glm5.3 \u2014 OPERATOR-DECLARED as the quality_tier-2 basis, PLUS the measured FIELD-protocol compliance (recorded policy input, Art. XXVII)"
+    },
+    "probe": "scripts/r467_probe_atria.py -> R467/PROBE_CATALOG.json + R467/PROBE_COMPLETIONS.json. MEASURED: api.atria-asi.ai IS the API host (the operator's own /console/keys citation); GET /v1/models -> 200 with exactly ONE model (Atria-Dawn-Preview, owned_by atria); the format-identical bogus-key differential 401-vs-200 proves the delivered key VALID (the R463 method); dialect OpenAI /v1/chat/completions only (Anthropic control 400); default urllib UA passes (no CF block); tiny completions 200 READY x3 (0.55-7.65 s); the FIELD-line protocol test \u2014 the reasoning model carries chain-of-thought in reasoning_content and clean FIELD lines in content (measured specimens: small-cap starvation -> EmptyContentWithFinish class with recovery at the larger cap in one specimen, direct 3/3 compliance at the small cap in another); key fingerprint only, value never recorded (BS-021)",
+    "registration": "llm_registry PROVIDER_SPECS: provider_id atria, env_var ATRIA_API_KEY, url https://api.atria-asi.ai/v1/chat/completions, default Atria-Dawn-Preview, quality_tier 2, cost_tier 1, latency_tier 3 (the honest reasoning variance 0.55-8.71 s), cost_basis FREE_TIER_API, locality REMOTE, account_domain OWNER_ATRIA_ACCOUNT (the EIGHTH distinct economic account \u2014 closed vocabulary extended in transport_capability); model_routing: exact-id family allowlist ^Atria-Dawn-Preview$ + the pinned rung declaring TASK_STRONG+FAST+CHEAP (latency_class 3)",
+    "the_strong_rung_answers_the_r466_binding_constraint": "R466 open item [1] named the free-router cascade's MECHANISM-stage inference quality (2 of 3 fresh runs typed INCOMPLETE_INFERENCE_FAILURE after synthesis degraded). The atria rung declares STRONG; the smoke proves the end-to-end path: scripts/r467_registry_smoke.py -> R467/REGISTRY_SMOKE.json \u2014 the default walk OK via atria/Atria-Dawn-Preview (601 ms); the STRONG synthesis walk (role=synthesis, the MECHANISM_SPACE request class) OK via atria (5871 ms) with 3/3 FIELD lines and task_degradation = {requested_task: STRONG, actual_task_capability: STRONG, task_capability_match: true, degraded_reason: 'the serving model declares the requested task capability'} \u2014 under MODEL_COST_POLICY=ZERO_PAID_COST",
+    "disclosure_probe_transient": "the first smoke walk hit a transient fast-fail (277 ms, classified MODEL_FAILURE) that left a fresh PROBE_FAILED record and refused admission on the immediate retry; the re-probe through the engine's own instrument passed (ok=true, fields_ok=true, 2696 ms) and the smoke then passed. The probe's 5xx/empty-content handling is the standing architecture (30 s failure floor, cascade advance) \u2014 disclosed, not changed this round",
+    "wiring": "transport_invisibility._PROVIDER_ID_RE carries atria (the R462 bynara lesson applied at registration time); r456_space_deploy wiring set + commit message extended; scripts/r467_hf_secrets.py (the r461/r463 pattern) persists ATRIA_API_KEY on the Space when HF_TOKEN is present"
+  },
+  "deliverable_2_the_remaining_issues": {
+    "p2_store_cold_start_404_window": {
+      "fix": "a 404 on /api/run/{id}/result grades toward 'Run not found' ONLY when the engine has answered /api/health ok around it (the engineSeenUp session marker, reset on every health failure \u2014 mid-session restarts get the same honest grading). Before that, a 404 is the cold-start/hydration window and surfaces the standing connection-lost copy (persisted, recovering, no verdict). The Art. XXI \u00a73 discipline applied verbatim: a provider/store failure is not absence. HealthSummary.ok surfaced in the UI type (the server already sends it)",
+      "behavioral_proof": "scripts/r467_p2_coldstart_proof.mjs (the local export served with a stub API reproducing the observed cold-start sequence): 16 s of 404s while health fails -> NO false 'Run not found', the connection-lost copy shown; health flips ok -> the run renders (recovery); the CONTROL ARM \u2014 a genuinely absent run with the engine healthy -> 'Run not found' still fires (the fix narrows the cold-start window only, never weakens the real verdict); zero page errors. Screenshot R467/ux_p2_coldstart_recovery_1280.png"
+    },
+    "p3_favicon_404": {
+      "fix": "TOSCANINI_UI/webapp/app/icon.svg \u2014 the Next.js app-router file convention; the design system's own tokens only (--accent-deep #8f4220, --paper #faf9f5). The static export emits /icon.svg and every page's <link rel=icon> \u2014 the standing /favicon.ico 404 in the production traces closes",
+      "build_evidence": "NEXT_OUTPUT=export build: /icon.svg in the route table; out/icon.svg present; out/index.html carries rel=\"icon\" href=\"/icon.svg?...\""
+    },
+    "l_complexity_in_thread_child_rendering": "REMAINS DEFERRED by the standing R466 choice (the navigation+card approach meets the audit's own acceptance) \u2014 not an operator-directed item this round",
+    "task_b_repo_slimming": "REMAINS DEFERRED by prior operator direction, not cancelled"
+  },
+  "tests": {
+    "new": "tests/test_r467_atria_admission.py 23/23 (probe-artifact contracts incl. the validity differential + sole-model selection basis + FIELD compliance + secret discipline; registration contracts incl. distinct account domain + honest tiers + operator-verbatim policy note; routing contracts incl. exact-id allowlist + STRONG ladder + strong_route_capability mirror; transport-invisibility vocabulary; deploy wiring; the P2 source contracts; the P3 favicon tokens)",
+    "backend_regressions": "r456_free_tier_routers 25, r461_bynara 27, r462_tokenharbor 31, r463_aerolink 40, r463_hf_credential_path 6, r463_no_operator_key 9+1w, r414_product_integration 50, r451_transport_capability 32 (the ONE failure at the pristine baseline \u2014 OWNER_ATRIA_ACCOUNT missing from the closed vocabulary \u2014 fixed by registering it, the exact contract the test enforces), r455_lean1 14, r451_zero_paid 37, r419_english_only 4, r415_discovery_availability 35, r446_attacker_calibration 20, r459_audit_execution 20, r459b_run_capacity 8, r459b_share_route 6, r465_attachment_ledger 15, r458 29/30 (the one failure stash-verified IDENTICAL at pristine f225c082 \u2014 BS-020, the z-ai gateway key file missing in this keyless environment)",
+    "frontend": "tsc --noEmit clean; NEXT_OUTPUT=export build 5 routes + verify-export PASS; batteries present 16, events 12, copy 1, math 12, r458 21, r461 10, r464 23, r463 7, r466 13 \u2014 all green",
+    "module_inventory": "regenerated 123 files / 60228 LOC (was 59948), drift gate GREEN"
+  },
+  "disclosures": [
+    "the atria key VALUE is never in the repo, the artifacts, or any log (BS-021; the r463 key-marker guard extended and green)",
+    "the first smoke walk's transient fast-fail (277 ms MODEL_FAILURE) is disclosed above; the capability store's 30 s failure floor + cascade advance is the standing architecture and was NOT changed this round",
+    "HF_TOKEN is NOT in this session's environment (wiped by the environment reset \u2014 the R462 class): the Space-secret persistence (scripts/r467_hf_secrets.py) and the deploy could NOT run. GITHUB_TOKEN (the PAT) survived and the push ran",
+    "the standing Space deployment remains GREEN at f225c082 (verified live this round: ok=true, discovery_ready=true, showcase_ready=true, engine_commit f225c082 == origin/main before this push); the atria rung is NOT yet live on production \u2014 it goes live at the next deploy"
+  ],
+  "production_deployment": {
+    "target_sha": "4a8b193f (this round's code commit; the records commit that carries this record changes no engine code)",
+    "deployed_sha": "f225c082 (the standing deployment \u2014 NOT this round's target)",
+    "deploy_id": "r456_space_deploy (NOT RUN this round)",
+    "health_check_result": "BLOCKED",
+    "drift": "the standing deployment is GREEN at f225c082; this round's target is UNDEPLOYED",
+    "blocked_by": "HF_TOKEN missing in this session's environment (the environment reset wiped it; the standing Space secret is write-only and cannot be read back). Art. LXXI section 4: DELIVERY_BLOCKED",
+    "what_unblocks": "re-provision HF_TOKEN into a session env, then: (1) ATRIA_API_KEY=<key> HF_TOKEN=<token> python3 scripts/r467_hf_secrets.py (persists the eighth router key as a Space secret); (2) HF_TOKEN=<token> GITHUB_TOKEN=<pat> python3 scripts/r456_space_deploy.py (deploys this round's tree with the ATRIA_API_KEY wiring); (3) verify with scripts/r456_deploy_verify.py. The atria rung then serves production MECHANISM-stage synthesis automatically \u2014 no further code change",
+    "escalation_count": 1
+  },
+  "open_items": [
+    "the deploy + secret-set legs named above (HF_TOKEN-gated; the one operator action closes both)",
+    "the aerolink account-plan escalation stays OPEN from R463 (owner-gated wallet decision; ZERO_PAID_COST holds \u2014 no deposit authorized by the machine)",
+    "tokenharbor admission stays DEFERRED pending a Space-side measurement (R462's standing state)",
+    "the R464 NOT-PROVEN output-quality category needs fresh production runs once the deploy lands (the atria rung is the instrument for exactly that measurement)",
+    "Task B repo slimming (five items) remains deferred by prior operator direction, not cancelled"
+  ]
+}
