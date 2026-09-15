@@ -1,0 +1,47 @@
+{
+ "round": "R463-C2",
+ "date": "2026-09-15",
+ "directive": "Operator P0 architectural ruling: NO ENGINE_OPERATOR_KEY \u2014 one legitimate user/application AI credential path; the user provides the HF API credential and Toscanini does the rest. Plus the audit roadmap-to-9/10 P0-1/P0-2/P0-3 + P1/P2 batch.",
+ "reviewer_provenance": "AI_REVIEW",
+ "production_deployment": {
+  "target_sha": "1bc9789caac6c6da47cceb71432f0d32c048cdaf",
+  "deployed_sha": "1bc9789caac6c6da47cceb71432f0d32c048cdaf",
+  "deploy_id": "Space revision 5bc750ba1b00d17da65278c2c499635a8c16a009",
+  "health_check_result": "GREEN",
+  "drift": "GREEN",
+  "blocked_by": null,
+  "what_unblocks": null
+ },
+ "closed": [
+  "P0 operator-key elimination: ENGINE_OPERATOR_KEY read nowhere (source-scan test); ops routes, access-model operator path, health flag RETIRED (Art. LXIV: DELETED). Owner-scoped /api/run/{id}/worker-diagnostics serves the run's own log tail + spawn forensics + render-job lines; forged/foreign/absent capabilities stay enumeration-safe 404 (attack-tested).",
+  "P0 spawn root cause (a5a7 class): the old spawn opened ONE shared append log with a parent-held fd and recorded nothing durable \u2014 a second secret would have patched visibility, not the cause. Redesign: per-session stderr logs, SPAWN_REQUESTED/SPAWNED/SPAWN_FAILED forensics, spawn-time pid, typed ERROR_SPAWN (retryable), sweep cause-capture with typed log patterns (or honest 'not captured').",
+  "P0 HF credential path: 'hf' provider registered on the user's HF_TOKEN (probe-before-admit, R463/PROBE_HF_ROUTER.json): whoami 200 + inference.serverless.write; catalog 200/142 models; completions 402 CREDIT_EXHAUSTED (account included credits depleted, provider's words verbatim). HF_ACCOUNT_CREDITS domain, not redundant with any router. Live in the deployed registry (credential CONFIGURED); serves automatically on credit reset/top-up.",
+  "P0-1 steering battery: 10/10 paraphrased steering prompts route as actions (0 demoted to ASK); settled R458 route table + question guards pinned unchanged (frontend 79/79).",
+  "P0-2 live verification: ROOT CAUSE of the audit's unreachable site FOUND \u2014 the Space was PRIVATE (anonymous visitors got HF's branded 404). Set public; the production URL now serves anonymously (measured 200). Full pipeline click-through via API path measured end-to-end (see below).",
+  "P1-2 fork lineage live-verified from both ends: child carries parent_session_id (fork-note link), parent row has_fork=True (sidebar 'continued' marker).",
+  "P1-4 persistent 'Steer this discovery' affordance above the composer; P2-3 honest empty state; P2-4 Alt+W/Escape workspace keyboard path.",
+  "MEASURED-LIVE DEFECT FIXED (found BY the new forensics on its first production run, ts_fa75e009ed5e): the R461 PU loader arity bug fired a TypeError on EVERY fresh run, silently skipping problem understanding AND the attachment USER_EVIDENCE merge; fixed + AST-pinned."
+ ],
+ "acceptance_run": {
+  "fresh_request": "reduce pressure loss in multi-lumen tubing without increasing profile",
+  "result": "COMPLETE 15-stage chain in ~4.5 min; truthful outcome INVENTION_KILLED_BY_CHALLENGE (the machine's own adversarial challenge killed it; no survivor replaced it) \u2014 presented honestly with the generation record; artifact policy refused engineering for the dead candidate (dead compute); the degraded PU path disclosed in the log",
+  "steering_forks": [
+   "ts_ccd82d4acc8e",
+   "ts_bf5163978909 (on the fixed deployment: PU builds, 13 evidence records, premise gate PREMISE_COHERENT, candidate synthesized, claims verified)"
+  ]
+ },
+ "open_items": [
+  "Attachment USER_EVIDENCE merge: server-side custody VERIFIED (sha256 + TEXT_EXTRACTED + binding + carry-forward); the merge's journal event is still not observable \u2014 the merge block is fail-open and swallows its own exceptions, so a silent empty-merge cannot be distinguished from a success. NEXT: add a typed disclosure line on the merge outcome (bound>0 / bound=0 reason) so the audit's P0-3 acceptance ('hashed text appears in the evidence ledger') is fully observable.",
+  "HF account included credits depleted (402, owner-side wallet/credit reset \u2014 outside code reach).",
+  "P1-1 performance budget, P1-3 recovery-CTA audit, P1-5 package-guarantee audit, P1-6 screen-reader pass, P3 items remain open from the audit roadmap."
+ ],
+ "tests": {
+  "backend": "test_r463_no_operator_key 9/9 + test_r463_hf_credential_path 6/6 NEW; touched families 208+275 green; pre-existing e21a + r458 model-purity failures stash-verified IDENTICAL (BS-020)",
+  "frontend": "79/79 across seven suites (adversarial_r463 7/7 NEW); tsc clean; export build + verify-export GREEN"
+ },
+ "disclosures": [
+  "Space visibility set private->public this round (the audit's P0-2 root cause; reversible one-call revert if the operator prefers private)",
+  "router keys WARN-skipped at deploy (env wiped by reset; secrets persist on the Space from R461 \u2014 measured present via the live provider surface)",
+  "parallel session's R463 work (aerolink probe, records at e4849163/1be90e29) rebased cleanly; this session's deploys superseded theirs mid-round twice (Space revisions 51efda15 -> f53ba079 -> 5bc750ba); final tuple GREEN on 1bc9789c"
+ ]
+}

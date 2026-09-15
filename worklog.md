@@ -1353,3 +1353,25 @@ Work Log:
 Stage Summary:
 - R463 COMPLETE AND DELIVERED: the seventh candidate honestly refused at the measured account-plan gate (probe-before-admit), the delivered key PROVEN valid by the serving-endpoint differential, the account-plan-gate wording registered in the failure taxonomy (never AUTH_FAILURE for a valid key), the Art. LXV escalation OPEN with the pay-or-park-or-wait unblock path, the R462 HF_TOKEN unblock consumed (both new keys persisted as Space secrets 2/2), and the Art. LXXI delivery tuple GREEN at e4849163
 - reviewer_provenance=AI_REVIEW
+
+---
+Task ID: R463-C2
+Agent: Super Z (main session — Coder 2)
+Task: the operator's P0 architectural ruling — NO ENGINE_OPERATOR_KEY, one legitimate user/application AI credential path (the user's HF credential); plus the audit roadmap P0-1/P0-2/P0-3 + P1/P2 batch.
+
+Work Log:
+- Mandated chain read (Constitution v2.4.0 IN FULL, 2,153 lines, hash b54a1be9 verified at round start and byte-identical before every commit; governance; ACTIVE_PATH; C1/C2 contracts).
+- THE OPERATOR-KEY ELIMINATION: source-scan test proves the env var is read nowhere; the ops routes, the access-model operator path, and health.operator_key_configured are RETIRED (Art. LXIV DELETED, TypeError-pinned). Replaced by the owner-scoped per-session worker-diagnostics route (log tail + spawn forensics + render-job lines, same owner capability as every run route; forged/foreign capabilities attack-tested to enumeration-safe 404s).
+- THE SPAWN ROOT CAUSE (a5a7, re-diagnosed honestly): the old path opened one shared append log per spawn with a parent-held fd and recorded nothing durable — the second secret would have patched visibility, not the cause. Redesigned: per-session stderr logs (fd closed), SPAWN_REQUESTED/SPAWNED/SPAWN_FAILED forensics, spawn-time worker_pid, typed ERROR_SPAWN, sweep cause-capture (typed log patterns or honest "not captured").
+- THE HF CREDENTIAL PATH: 'hf' provider registered on the user's HF_TOKEN with committed probe evidence (whoami 200 + inference.serverless.write; catalog 200/142; completions 402 CREDIT_EXHAUSTED — included credits depleted, verbatim); HF_ACCOUNT_CREDITS domain; live in the deployed registry (credential CONFIGURED), self-servable on credit reset. HF_TOKEN+HF_API_KEY persisted as Space secrets.
+- AUDIT P0-2 ROOT CAUSE: the Space was PRIVATE — anonymous visitors (the audit!) got HF's branded 404. Set public (disclosed); the URL now serves anonymously.
+- P0-1: the steering router widened (paraphrase families per verb); 10/10 audit battery routes as actions, 0 demoted; settled R458 table pinned (79/79 frontend).
+- P1/P2: fork lineage both directions (live-verified), persistent steer affordance, honest empty state, Alt+W workspace shortcut.
+- THE FORENSICS LOOP'S FIRST CATCH: run ts_fa75e009ed5e's owner-scoped log exposed the R461 PU loader arity bug (TypeError on EVERY fresh run, silently skipping problem understanding AND the attachment USER_EVIDENCE merge); fixed + AST-pinned; measured fixed on the child round (PU builds, 13 evidence records, premise gate, candidate synthesized).
+- Acceptance run: fresh request → COMPLETE 15-stage chain ~4.5 min → truthful INVENTION_KILLED_BY_CHALLENGE presented honestly; steering forks carried the directive verbatim and the attachments forward.
+- Tests: backend r463 suites 15/15 NEW + touched families green (BS-020 failures stash-verified identical); frontend 79/79; tsc clean; export verified.
+- Art. LXXI FINAL TUPLE: origin/main == deployed == health == 1bc9789c (Space rev 5bc750ba), drift GREEN, tamper false, discovery_ready TRUE (probe OK via the cascade: xkiro rung 260 ms after unorouter's typed rate-limit), portfolio pin match. Three deploys this round (51efda15/f53ba079/5bc750ba) across the parallel session's rebases.
+
+Stage Summary:
+- The architecture now matches the product: the user gives Toscanini AI access and Toscanini does the rest — no second secret exists, workers are observable by their owners, spawn deaths leave durable attributable evidence, and the user's HF credential is a registered, honestly-typed production rung. OPEN: the attachment-merge journal event remains unobservable (fail-open swallow) — the named next fix; HF credits depleted (owner-side); P1-1/P1-3/P1-5/P1-6/P3 from the roadmap.
+- reviewer_provenance=AI_REVIEW
