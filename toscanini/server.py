@@ -38,6 +38,15 @@ sys.path.insert(0, str(REPO_ROOT))
 
 from toscanini import artifact_identity  # noqa: E402  R396 A.3-A.7
 from toscanini import gateway as gw  # noqa: E402
+# R470 (audit P0-5): the exclusion-class steering verbs — the spawn
+# site derives a typed directive constraint from the parent's recorded
+# mechanism identity for exactly these (the compliance module is the
+# one authority for the class and the check; Art. X). The constraint
+# builder imports at STARTUP (the engineer's review F6: import health
+# checked at boot, never deferred into a runtime except-path).
+from discovery_fabric.engine.directive_compliance import (  # noqa: E402
+    EXCLUSION_VERBS as _EXCLUSION_VERBS,
+    build_constraint as _build_constraint)
 # R467 engineer-review finding: the evidence pack and the steering
 # composition are product surfaces — the transport-invisibility
 # vocabulary is applied to them MECHANICALLY (scrub), not by
@@ -1584,9 +1593,64 @@ class Handler(BaseHTTPRequestHandler):
             # carry the parent run's attachments forward: the same
             # documents remain in the investigation's custody
             carried = list(s.get("attachment_ids") or [])
+            # R470 (external re-audit P0-5, the POWER leg): an
+            # exclusion-class directive (CHANGE_MECHANISM / RESEARCH)
+            # carries a typed DIRECTIVE CONSTRAINT derived from the
+            # parent's RECORDED mechanism identity — the machine-
+            # checkable form of "away from that mechanism". The worker
+            # persists it into the run dir (DIRECTIVE_CONSTRAINT.json),
+            # the SYNTHESIZE stage excludes it from the search (one
+            # recorded repair retry on violation), and the outcome card
+            # judges COMPLIANCE with it (not mere change). The record —
+            # never free-text parsing — is the referent (Art. X: one
+            # authority; the R467 identity reader, reused verbatim).
+            _constraint = None
+            if verb in _EXCLUSION_VERBS:
+                try:
+                    from toscanini.worker import (
+                        mechanism_identity as _mech_identity)
+                    _pid = _mech_identity(s.get("run_dir") or "")
+                    if _pid.get("mechanism"):
+                        # F4 (engineer review): the constraint rides
+                        # product surfaces (the run-dir record, the
+                        # evidence pack) — the SAME mechanical
+                        # transport scrub as the steering composition.
+                        _constraint = _build_constraint(
+                            verb, _dir_words or directive,
+                            _pid["mechanism"])
+                        _constraint["forbidden_mechanism"] = \
+                            _scrub_transport_text(
+                                _constraint["forbidden_mechanism"])
+                        _constraint["directive_verbatim"] = \
+                            _scrub_transport_text(
+                                _constraint["directive_verbatim"])
+                except Exception:  # noqa: BLE001 — typed, never silent:
+                    # F1 (engineer review): a derivation failure must
+                    # not SILENTLY downgrade the child to an
+                    # unconstrained search (honest typing). The typed
+                    # derivation-failed record persists so the outcome
+                    # card can state it; the spawn itself proceeds.
+                    _constraint = {
+                        "version": "directive_compliance/1.0.0",
+                        "status": "derivation_failed",
+                        "verb": verb,
+                        "error_class": type(exc).__name__,
+                    }
+                    try:
+                        from toscanini import worker_forensics as _wfx1
+                        _wfx1.attach_session(
+                            new_s["session_id"],
+                            durable_root=_wfx1.durable_root()).event(
+                                "DIRECTIVE_CONSTRAINT_DERIVATION_FAILED",
+                                parent=sid, verb=verb,
+                                error_class=type(exc).__name__)
+                    except Exception:  # noqa: BLE001
+                        pass
             store.update_session(new_s["session_id"],
                                  parent_session_id=sid,
                                  attachment_ids=carried,
+                                 **({"directive_constraint": _constraint}
+                                    if _constraint is not None else {}),
                                  **_guarded["allowed"])
             new_s = store.get_session(new_s["session_id"])
             try:

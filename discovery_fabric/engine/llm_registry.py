@@ -456,10 +456,17 @@ PROVIDER_SPECS: List[ProviderSpec] = [
         # ATRIA_API_KEY_3 on the SAME rung before any provider-level
         # fallback; every rotation is a recorded route hop (never
         # silent, Art. IV).
+        # R470 (2026-09-16): the operator's LATEST delivery lists TEN
+        # keys in one message — seven were already on the surface, three
+        # are new (slots 8-10; R470/HF_SPACE_SECRETS_ATRIA_RING10.json,
+        # 10/10 PRESENT by name, fingerprints only). The ring extends
+        # 7 -> 10 slots (~1B tokens operator-declared). Same classes,
+        # same order, same recorded-hop discipline.
         key_env_vars=["ATRIA_API_KEY", "ATRIA_API_KEY_2",
                       "ATRIA_API_KEY_3", "ATRIA_API_KEY_4",
                       "ATRIA_API_KEY_5", "ATRIA_API_KEY_6",
-                      "ATRIA_API_KEY_7"],
+                      "ATRIA_API_KEY_7", "ATRIA_API_KEY_8",
+                      "ATRIA_API_KEY_9", "ATRIA_API_KEY_10"],
         model_revision="Atria-Dawn-Preview — the catalog's SOLE model id "
                        "(owned_by atria, 2026-09-15 catalog); no revision "
                        "pin exposed by the provider — recorded honest "
@@ -509,7 +516,7 @@ PROVIDER_SPECS: List[ProviderSpec] = [
             "Art. XLV attack-independence rule and the Art. V cooldown "
             "demotion still taking precedence over the pin; the honest "
             "tier-2 quality basis is UNCHANGED (a routing pin, never "
-            "a quality rewrite). The SEVEN-KEY ring (key_env_vars "
+            "a quality rewrite). The TEN-KEY ring (key_env_vars "
             "above) rotates on exhaustion-class failures — the "
             "keep-going directive: 'Keep going to a new key of atira "
             "if one is exhausted.'")),

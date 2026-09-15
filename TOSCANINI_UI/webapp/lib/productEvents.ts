@@ -307,6 +307,65 @@ export function pickLiveEvent(events: ProductEventInput[]): ProductEventInput | 
 }
 
 // ---------------------------------------------------------------------------
+// R470 (external re-audit P1-1) — THE PROGRESS CONTEXT LINE.
+//
+// The audit's measured complaint: "between evidence-gathered and
+// candidate-emerged (many minutes), a user cannot tell progress from
+// hang" — the live surface showed one sentence while the record carried
+// far more. The acceptance: a waiting user can state the CURRENT PHASE
+// (the live sentence, already shipped), the LAST COMPLETED STEP, and
+// the EVIDENCE COUNT without leaving the conversation. All three facts
+// derive from the run's own recorded events (the stageProgressSuffix
+// discipline: derived, never asserted; no invented totals, no machine
+// vocabulary on the surface).
+// ---------------------------------------------------------------------------
+
+export interface ProgressContext {
+  /** Product sentence for the newest COMPLETED stage event ('' if none). */
+  lastCompleted: string;
+  /** Evidence records on the record (canonical count, or the recorded
+   * per-source sum fallback; null when nothing is recorded yet). */
+  evidenceCount: number | null;
+}
+
+export function progressContext(
+  events: ProductEventInput[],
+  recordsFound?: number | null
+): ProgressContext {
+  let lastCompleted = "";
+  let counted = 0;
+  // two facts, one backward pass, no early break: evidence events sit
+  // EARLIER in the list than the newest completed stage, so breaking on
+  // the first completed stage would drop them from the tally
+  for (let i = events.length - 1; i >= 0; i--) {
+    const e = events[i];
+    if (!e) continue;
+    const kind = String(e?.kind ?? "");
+    const status = String(e?.status ?? "").toUpperCase();
+    if (!lastCompleted && kind.startsWith("stage.") &&
+        status === "COMPLETED") {
+      const stage = kind.slice("stage.".length).toUpperCase();
+      const s = STAGE_SENTENCES[stage];
+      lastCompleted = s
+        ? s.completed
+        : "A step of the investigation is recorded.";
+    }
+    // fallback tally: each evidence.retrieved event reports ONE source's
+    // record count (the conversation renders them individually), so the
+    // event-derived total is the SUM — used only when the run-state's
+    // canonical records_found is absent
+    if (kind === "evidence.retrieved" &&
+        typeof e?.count === "number" && e.count > 0) {
+      counted += e.count;
+    }
+  }
+  const evidenceCount = (typeof recordsFound === "number" && recordsFound > 0)
+    ? recordsFound
+    : (counted > 0 ? counted : null);
+  return { lastCompleted, evidenceCount };
+}
+
+// ---------------------------------------------------------------------------
 // R458-C2 (§26) — THE PROVIDER-ABSTRACTION SENTENCE.
 //
 // The frontend must not know — and must never name — which provider or

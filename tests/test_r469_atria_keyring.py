@@ -70,9 +70,12 @@ SECRETS_SCRIPT = REPO / "scripts" / "r469_hf_secrets.py"
 # R469 reconciliation: the operator's LATEST directive supplies SEVEN
 # atria keys ("keep going to a new key ... 4 api keys is 400million
 # tokens" — seven keys total); the ring is the declared order.
+# R470: the operator's LATEST message lists TEN keys — seven already on
+# the surface, three new (slots 8-10); the ring extends 7 -> 10 slots.
 RING = ["ATRIA_API_KEY", "ATRIA_API_KEY_2", "ATRIA_API_KEY_3",
         "ATRIA_API_KEY_4", "ATRIA_API_KEY_5", "ATRIA_API_KEY_6",
-        "ATRIA_API_KEY_7"]
+        "ATRIA_API_KEY_7", "ATRIA_API_KEY_8", "ATRIA_API_KEY_9",
+        "ATRIA_API_KEY_10"]
 
 # fake credential bodies — deliberately SHORT and non-matching to the
 # BS-021 key-marker regex (atr_[A-Za-z0-9_-]{20,}); no real value here

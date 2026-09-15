@@ -399,6 +399,25 @@ a { color: inherit; }
   color: var(--ink);
 }
 
+/* R470 (external re-audit P1-5): the viewer controls measured 24px tall
+   on the audit's touch-target pass — below the 44px floor. The visible
+   composition is preserved (the controls float over the canvas; bigger
+   blocks would occlude the model); the HIT AREA is what grows: an
+   invisible ::before extends each button's pointer/touch surface by
+   8px on every side on coarse pointers, and small/medium viewports get
+   explicit 44px rows (the audit-matrix precedent at the 480px block). */
+.viewer .controls button { position: relative; }
+@media (pointer: coarse) {
+  .viewer .controls button::before {
+    content: "";
+    position: absolute;
+    inset: -8px;
+  }
+}
+@media (max-width: 880px) {
+  .viewer .controls button { min-height: 44px; }
+}
+
 /* ---------------- parameters ---------------- */
 .params { display: flex; flex-direction: column; gap: 12px; }
 
@@ -942,6 +961,23 @@ details.tech li { font-size: 13.5px; color: var(--ink-soft); margin-bottom: 6px;
   text-decoration: none;
 }
 .dl-chip:hover { border-color: var(--accent); color: var(--accent-text); }
+
+/* R470 (external re-audit P1-5): the GLB/STEP/STL download chips
+   measured 77x32 — height under the 44px touch-target floor. Same
+   treatment as the viewer controls: invisible hit-area expansion on
+   coarse pointers (no desktop layout shift), explicit 44px rows on
+   narrow viewports. */
+.dl-chip { position: relative; }
+@media (pointer: coarse) {
+  .dl-chip::before {
+    content: "";
+    position: absolute;
+    inset: -7px;
+  }
+}
+@media (max-width: 880px) {
+  .dl-chip { min-height: 44px; display: inline-flex; align-items: center; }
+}
 .dim-row {
   display: flex;
   justify-content: space-between;

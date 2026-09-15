@@ -1,0 +1,89 @@
+{
+ "round": "R470",
+ "protocol": "CTO (this session) / engineer (Atria-Dawn-Preview)",
+ "subject": "steering directive-compliance implementation review (P0-5 remainder) + P1-3 record-layer dedupe",
+ "requested_at": "2026-09-15T19:49:51Z",
+ "key_fingerprint": "atr_63...IxbA",
+ "reviews": [
+  {
+   "file": "discovery_fabric/engine/directive_compliance.py",
+   "model": "Atria-Dawn-Preview",
+   "usage": {
+    "prompt_tokens": 2040,
+    "total_tokens": 7040,
+    "completion_tokens": 5000,
+    "prompt_tokens_details": {
+     "cached_tokens": 0,
+     "created_cache_tokens": 1984,
+     "multimodal_tokens": null
+    }
+   },
+   "finish_reason": "length",
+   "review_verbatim": ""
+  },
+  {
+   "file": "discovery_fabric/a2/synthesize.py",
+   "model": "Atria-Dawn-Preview",
+   "usage": {
+    "prompt_tokens": 2083,
+    "total_tokens": 7083,
+    "completion_tokens": 5000,
+    "prompt_tokens_details": {
+     "cached_tokens": 0,
+     "created_cache_tokens": 2048,
+     "multimodal_tokens": null
+    }
+   },
+   "finish_reason": "length",
+   "review_verbatim": ""
+  },
+  {
+   "file": "toscanini/worker.py",
+   "model": "Atria-Dawn-Preview",
+   "usage": {
+    "prompt_tokens": 2511,
+    "total_tokens": 7511,
+    "completion_tokens": 5000,
+    "prompt_tokens_details": {
+     "cached_tokens": 0,
+     "created_cache_tokens": 2496,
+     "multimodal_tokens": null
+    }
+   },
+   "finish_reason": "length",
+   "review_verbatim": ""
+  },
+  {
+   "file": "toscanini/server.py",
+   "model": "Atria-Dawn-Preview",
+   "usage": {
+    "prompt_tokens": 945,
+    "total_tokens": 4660,
+    "completion_tokens": 3715,
+    "prompt_tokens_details": {
+     "cached_tokens": 0,
+     "created_cache_tokens": 896,
+     "multimodal_tokens": null
+    }
+   },
+   "finish_reason": "stop",
+   "review_verbatim": "FINDINGS:\n1. MAJOR | `Handler` spawn block, `except Exception: _constraint = None` | A blanket swallow on the P0-5 power leg means any failure in `_mechanism_identity`/`build_constraint` silently downgrades the child to an unconstrained search. A candidate that would have violated the exclusion is then never judged non-compliant — the violation disappears by construction, which collides with the honest-typing rule (never hidden). Fail-open is the wrong polarity for a constraint. | Narrow the except to the specific readers (FileNotFoundError/KeyError/ValueError), log the derivation failure with the parent run id, and fail closed: either abort the spawn with an explicit error, or persist a constraint record whose status is \"derivation_failed\" so the outcome card can report it instead of silently passing.\n2. MAJOR | `**({\"directive_constraint\": _constraint} if _constraint else {})` | Truthiness gate conflates \"no constraint derived\" with \"constraint derived but falsy\" (e.g. an empty-but-valid constraint object from `build_constraint`). An empty constraint is dropped identically to the exception path. | Gate on identity, not truthiness: `if _constraint is not None`.\n3. MAJOR | `store.update_session(... directive_constraint ...)` | The diff does not show the session store accepting or round-tripping `directive_constraint`; the worker is then expected to persist it as DIRECTIVE_CONSTRAINT.json. If the store's schema/whitelist drops the field, the whole power leg is a no-op with no error. | Add/verify the store field (schema + serialization + `get_session` rehydration) and a unit test that asserts the value survives a spawn→get_session round trip before the worker reads it.\n4. MAJOR | constraint derivation → run dir / product surfaces | The constraint is built from the parent's recorded mechanism identity and flows into the child session and run dir. If the mechanism record carries secret or transport-vocabulary material (keys, tokens, transport phrasing), it propagates into DIRECTIVE_CONSTRAINT.json and potentially into the R467 evidence pack / steering composition. | Route the derived constraint through the same classification/scrub pipeline as other persisted artifacts before it is written to the run dir or included in any pack; add an assertion that the persisted constraint carries no transport vocabulary and no secret-class content.\n5. MINOR | `from toscanini.worker import _mechanism_identity` | Cross-module import of a private (underscore) symbol; the comment claims verbatim reuse of the R467 identity reader, but private imports couple the spawn site to worker internals and break under refactor. | Promote the identity reader to a public entry point (public name on `worker`, or a shared identity module) and import that.\n6. MINOR | function-local `from discovery_fabric.engine.directive_compliance import build_constraint` | The same module is already imported at top level for `EXCLUSION_VERBS`; deferring `build_constraint` hides import/circular errors until spawn time, where they land in the blanket except (finding 1) and become silent. | Import `build_constraint` at module top alongside `EXCLUSION_VERBS` so import health is checked at startup; keep `_mechanism_identity` deferred only if a real cycle exists, and document it.\n7. NOTE | `toscanini/server.py` top import vs. layering rule | The visible direction is toscanini → discovery_fabric.engine, which is the allowed direction. However the new module `discovery_fabric/engine/directive_compliance.py` was not included in this diff, so its own imports cannot be verified here. | Confirm in the module review that it imports nothing from `toscanini/` (layering), contains no fuzzy/substring matching on the compliance check, and never mutates a verdict; the check must return violated candidates with `violation_final=true`.\n8. NOTE | `verb in _EXCLUSION_VERBS` gate | Class membership is delegated to the compliance module (single authority) — correct. Residual risk: a verb that is exclusion-class in intent but absent from the set silently skips constraint derivation with no signal. | Add a debug-level metric/log when an exclusion-looking directive misses the set, or have the module expose the class predicate as a single function used by both the gate and the check.\n\nVERDICT: APPROVE_WITH_FIXES"
+  },
+  {
+   "file": "discovery_fabric/a2/classify.py",
+   "model": "Atria-Dawn-Preview",
+   "usage": {
+    "prompt_tokens": 668,
+    "total_tokens": 5668,
+    "completion_tokens": 5000,
+    "prompt_tokens_details": {
+     "cached_tokens": 0,
+     "created_cache_tokens": 640,
+     "multimodal_tokens": null
+    }
+   },
+   "finish_reason": "length",
+   "review_verbatim": ""
+  }
+ ]
+}

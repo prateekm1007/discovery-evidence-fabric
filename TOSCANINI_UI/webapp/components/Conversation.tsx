@@ -39,6 +39,7 @@ import {
   pickLiveEvent,
   productEventSentence,
   deriveRotationNote,
+  progressContext,
   stageProgressSuffix,
 } from "@/lib/productEvents";
 import {
@@ -249,6 +250,22 @@ export default function Conversation({
   const live = pickLiveEvent(events);
   const liveSentence = productEventSentence(live);
   const liveStageSuffix = useMemo(() => stageProgressSuffix(events), [events]);
+  // R470 (audit P1-1): the progress context line — the waiting user can
+  // state the current phase (the live sentence), the LAST COMPLETED step,
+  // and the EVIDENCE COUNT, all derived from the run's own record.
+  const recordsFound = detail.run_state?.evidence_state?.records_found;
+  const progress = useMemo(
+    () => progressContext(events, recordsFound),
+    [events, recordsFound]
+  );
+  const progressLine = useMemo(() => {
+    const parts: string[] = [];
+    if (progress.lastCompleted) parts.push(progress.lastCompleted);
+    if (progress.evidenceCount != null) {
+      parts.push(`${progress.evidenceCount} evidence record${progress.evidenceCount === 1 ? "" : "s"} on the record`);
+    }
+    return parts.join(" · ");
+  }, [progress]);
   const liveSummary =
     live && typeof live.summary === "string" ? live.summary : null;
   const paused = [...events].reverse().find((e) => e.status === "FAILED_INFRASTRUCTURE");
@@ -413,6 +430,7 @@ export default function Conversation({
           className="conv-row"
           data-directive-outcome-card
           data-mechanism-changed={detail.directive_outcome.mechanism_changed ? "true" : "false"}
+          data-compliance-verdict={detail.directive_outcome.compliance_verdict ?? undefined}
         >
           <div className="conv-continued">
             <span className="conv-continued-round">What changed because of your direction</span>
@@ -576,6 +594,11 @@ export default function Conversation({
               <span className="cursor" aria-hidden="true" />
               {liveSentence.text}
               <span className="faint">{liveStageSuffix}</span>
+            </div>
+          )}
+          {liveSentence.loading && progressLine && (
+            <div className="conv-note faint" data-conv-progress>
+              {progressLine}
             </div>
           )}
         </div>

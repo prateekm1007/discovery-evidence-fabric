@@ -159,6 +159,15 @@ export interface SessionDetail {
     child_mechanism?: string | null;
     child_intervention?: string | null;
     mechanism_changed?: boolean;
+    // R470 (audit P0-5): the typed compliance verdict — the card's
+    // prose carries the honest semantics; the token rides as data.
+    compliance_verdict?: string;
+    territory?: {
+      violation?: boolean;
+      overlap_ratio?: number;
+      overlapping_terms?: string[];
+      checked_terms?: number;
+    } | null;
     summary?: string;
     computed_at?: string;
     method?: string;

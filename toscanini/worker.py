@@ -154,6 +154,14 @@ def _mechanism_identity(run_dir) -> dict:
         return {}
 
 
+# R470 (the engineer's review F5): the PUBLIC entry point — the spawn
+# site imports this name, not the private underscore symbol (private
+# cross-module imports couple callers to internals and break under
+# refactor). One implementation, two names (the private callers keep
+# working; Art. X — no second authority).
+mechanism_identity = _mechanism_identity
+
+
 def record_directive_outcome(session_id: str, run_dir) -> None:
     """R467 (audit P0-5): "a 'what changed because of your direction'
     card in the UI" — computed FROM THE RUNS' OWN RECORDS, never
@@ -162,7 +170,20 @@ def record_directive_outcome(session_id: str, run_dir) -> None:
     parent's and persist a typed directive_outcome on the session.
     No-change is recorded honestly as no-change (the audit's measured
     complaint was an UNDISCLOSED same-mechanism re-derivation — the
-    answer is the typed comparison, not a flattering one)."""
+    answer is the typed comparison, not a flattering one).
+
+    R470 (external re-audit P0-5, the SEMANTICS leg): the card now
+    judges COMPLIANCE WITH THE DIRECTIVE, not mere change — the
+    re-audit's measured case was a card that said "changed" while the
+    child's mechanism stayed inside the explicitly forbidden territory.
+    When an exclusion-class constraint is on the record (the spawn
+    site's typed derivation from the parent's recorded identity), the
+    typed verdict comes from the ONE shared compliance instrument
+    (directive_compliance.compliance_verdict — the same function the
+    SYNTHESIZE stage's mechanical check uses, Art. X): COMPLIED_CHANGED
+    / MOVED_BUT_IN_TERRITORY / NOT_COMPLIED_SAME_AS_PARENT / NO_BASELINE
+    / NO_CHILD_MECHANISM / NOT_APPLICABLE. Every outcome is stated as
+    recorded — no verdict is softened."""
     try:
         s = store.get_session(session_id) or {}
         parent_id = s.get("parent_session_id")
@@ -177,32 +198,114 @@ def record_directive_outcome(session_id: str, run_dir) -> None:
             if t.startswith("["):
                 directive_words = t.split("] ", 1)[-1].strip()
                 break
-        changed = bool(
-            p_id.get("mechanism") and c_id.get("mechanism")
-            and p_id["mechanism"].lower() != c_id["mechanism"].lower())
         if not directive_words:
             directive_words = str((s.get("user_text") or "").rsplit(
                 "Direction for this round: ", 1)[-1]).strip()
-        if changed:
-            summary = ("Your direction changed the mechanism: the "
-                       f"parent round recorded '{p_id.get('mechanism')}'"
-                       f"; this round recorded "
-                       f"'{c_id.get('mechanism')}'.")
-        elif p_id.get("mechanism") and c_id.get("mechanism"):
+        # the constraint: the session copy first, else the run-dir
+        # record (the durable input record the worker wrote at spawn)
+        constraint = s.get("directive_constraint")
+        if not (isinstance(constraint, dict)
+                and constraint.get("forbidden_mechanism")):
+            try:
+                import json as _json
+                _cp = Path(str(run_dir)) / "DIRECTIVE_CONSTRAINT.json"
+                if _cp.exists():
+                    _loaded = _json.loads(_cp.read_text())
+                    # the engineer's pass-2 F3/F4: only a valid dict
+                    # record overrides the session copy — a corrupt
+                    # file never NULLS a typed derivation-failure
+                    # record the session already holds
+                    if isinstance(_loaded, dict):
+                        constraint = _loaded
+            except (OSError, ValueError):
+                constraint = None
+        from discovery_fabric.engine.directive_compliance import (
+            compliance_verdict as _compliance_verdict)
+        _cv = _compliance_verdict(constraint, p_id.get("mechanism"),
+                                  c_id.get("mechanism"))
+        verdict = _cv["verdict"]
+        territory = _cv.get("territory") or {}
+        changed = _cv.get("mechanism_changed")
+        if verdict == "COMPLIED_CHANGED":
+            summary = ("Your direction moved the mechanism, and out of "
+                       "the territory it excluded: the parent round "
+                       f"recorded '{p_id.get('mechanism')}'; this round "
+                       f"recorded '{c_id.get('mechanism')}'.")
+        elif verdict == "MOVED_BUT_IN_TERRITORY":
+            summary = ("The mechanism moved, but it still restates the "
+                       "mechanism your direction excluded ('"
+                       + str((constraint or {}).get(
+                           "forbidden_mechanism")) + "'). Your "
+                       "direction is on the record — and so is this "
+                       "shortfall, stated exactly as measured.")
+        elif verdict == "NOT_COMPLIED_SAME_AS_PARENT":
             summary = ("This round re-derived the same mechanism "
                        "family as the parent ('"
                        + str(c_id.get("mechanism")) + "') — your "
-                       "direction is on the record, but it did not "
-                       "move the dominant mechanism.")
-        elif c_id.get("mechanism"):
+                       "direction explicitly asked away from it, and "
+                       "the round did not comply.")
+        elif verdict == "CONSTRAINT_DERIVATION_FAILED":
+            summary = ("The engine could not derive the machine-checkable "
+                       "form of your direction from the parent round's "
+                       "record (the constraint record is on file with "
+                       "the failure typed) — your direction is on the "
+                       "record and rode the round's problem text; this "
+                       "card just cannot claim compliance either way.")
+        elif verdict == "NO_BASELINE":
             summary = ("The parent round recorded no mechanism to "
                        "compare against; this round recorded "
                        f"'{c_id.get('mechanism')}'.")
-        else:
+        elif verdict == "NO_CHILD_MECHANISM":
             summary = ("This round did not reach a recorded mechanism "
                        "— there is nothing to compare yet (the "
                        "directive and the inherited answers are on "
                        "the record).")
+        elif verdict == "NOT_APPLICABLE":
+            # no exclusion-class constraint — the change comparison
+            # still stands (an honest visibility record without a
+            # compliance claim)
+            changed = bool(
+                p_id.get("mechanism") and c_id.get("mechanism")
+                and p_id["mechanism"].lower() != c_id["mechanism"].lower())
+            if changed:
+                summary = ("Your direction changed the mechanism: the "
+                           "parent round recorded '"
+                           + str(p_id.get('mechanism')) + "'; this "
+                           "round recorded '"
+                           + str(c_id.get('mechanism')) + "'.")
+            elif p_id.get("mechanism") and c_id.get("mechanism"):
+                summary = ("This round re-derived the same mechanism "
+                           "family as the parent ('"
+                           + str(c_id.get("mechanism")) + "') — your "
+                           "direction is on the record, but it did not "
+                           "move the dominant mechanism.")
+            elif c_id.get("mechanism"):
+                summary = ("The parent round recorded no mechanism to "
+                           "compare against; this round recorded "
+                           f"'{c_id.get('mechanism')}'.")
+            else:
+                summary = ("This round did not reach a recorded "
+                           "mechanism — there is nothing to compare "
+                           "yet (the directive and the inherited "
+                           "answers are on the record).")
+        else:
+            # the engineer's pass-2 F1: verdict-enum drift fails LOUD —
+            # an unrecognized verdict is recorded as uninterpretable,
+            # never silently degraded into the flattering change
+            # comparison (the exact undisclosed-territory class the
+            # re-audit measured)
+            summary = ("The engine recorded a compliance verdict this "
+                       "card does not recognize ('" + str(verdict) +
+                       "') — stated as measured, not softened.")
+            try:
+                from toscanini import worker_forensics as _wfx_v
+                _wfx_v.attach_session(
+                    session_id,
+                    durable_root=_wfx_v.durable_root()).event(
+                        "DIRECTIVE_VERDICT_UNINTERPRETED",
+                        verdict=str(verdict))
+            except Exception:  # noqa: BLE001 — fail-open, never fatal
+                pass
         store.update_session(
             session_id,
             directive_outcome={
@@ -212,13 +315,16 @@ def record_directive_outcome(session_id: str, run_dir) -> None:
                 "child_mechanism": c_id.get("mechanism"),
                 "child_intervention": c_id.get("intervention"),
                 "mechanism_changed": changed,
+                "compliance_verdict": verdict,
+                "territory": territory or None,
                 "summary": summary,
                 "computed_at": time.strftime("%Y-%m-%dT%H:%M:%SZ",
                                              time.gmtime()),
-                "method": ("envelope_SYNTHESIZE.mechanism_map identity "
-                           "comparison (the run_state projection's "
-                           "own fields); computed from the runs' "
-                           "records, never asserted"),
+                "method": ("R470: directive_compliance.compliance_verdict "
+                           "over envelope_SYNTHESIZE.mechanism_map "
+                           "identities — compliance with the typed "
+                           "directive constraint, computed from the "
+                           "runs' records, never asserted"),
             })
     except Exception:  # noqa: BLE001 — typed, never fatal to terminal
         print(f"  [worker] directive_outcome computation failed: "
@@ -622,6 +728,30 @@ def _run_inner(session_id: str, forensics) -> None:
                          problem_id=problem["problem_id"],
                          run_dir=str(run_dir),
                          domain=built["domain"])
+    # R470 (external re-audit P0-5, the POWER leg): a typed directive
+    # constraint (built at the spawn site from the parent's RECORDED
+    # mechanism identity) rides the problem into the engine — the
+    # SYNTHESIZE stage excludes the forbidden identity from the search
+    # (one recorded repair retry on violation), and the outcome layer
+    # judges COMPLIANCE against the same record. The run-dir copy is
+    # the durable input record (next to the persisted PU); the session
+    # copy stays untouched. Fail-open: the constraint is an input
+    # record — its absence degrades to the pre-R470 behavior honestly.
+    try:
+        _dc = (s.get("directive_constraint")
+               if isinstance(s, dict) else None)
+        if isinstance(_dc, dict) and _dc.get("forbidden_mechanism"):
+            import json as _json
+            (run_dir / "DIRECTIVE_CONSTRAINT.json").write_text(
+                _json.dumps(_dc, indent=1, ensure_ascii=False))
+            problem["directive_constraint"] = _dc
+            forensics.event("DIRECTIVE_CONSTRAINT_APPLIED",
+                            verb=str(_dc.get("verb") or ""),
+                            forbidden_terms=len(
+                                _dc.get("forbidden_terms") or []))
+    except Exception as exc:  # noqa: BLE001 — input record, fail-open
+        forensics.event("DIRECTIVE_CONSTRAINT_WRITE_FAILED",
+                        error_class=type(exc).__name__)
 
     # --- phase 2.1: enrich + persist the PU into the run dir (R446-C1) --
     # The MODEL_DERIVED LLM extraction merges into the PU contract with

@@ -69,6 +69,30 @@ SPAN_INSTRUCTION = (
     "MECHANISM, copy the longest exact phrase that does (10+ words "
     "preferred; 8 minimum).")
 
+# R470 (external re-audit P0-5, the POWER leg): the steering directive
+# constraint — when the round was opened under an exclusion-class
+# directive (CHANGE_MECHANISM / RESEARCH), the spawn site derives a
+# typed constraint from the PARENT'S RECORDED mechanism identity and
+# the problem carries it here. The block is appended to the prompt
+# (after the span rules) and a mechanical post-parse check runs the
+# SAME shared compliance function the outcome card uses (one
+# instrument, Art. X). A violation gets ONE recorded repair retry; a
+# still-violating candidate is returned with violation_final: true —
+# honest either way (the ladder's own gates still run; nothing is
+# hidden, nothing is fabricated).
+CONSTRAINT_INSTRUCTION = (
+    "\n\nOPERATOR DIRECTIVE — MECHANICAL COMPLIANCE CHECK (a checker "
+    "runs on your answer):\n"
+    "The operator's direction for this round explicitly excludes a "
+    "recorded mechanism. The EXCLUDED mechanism is:\n"
+    "\"{forbidden}\"\n"
+    "- Do NOT restate it, minimally rephrase it, or re-derive it under "
+    "new wording.\n"
+    "- A MECHANISM whose identity repeats the excluded one is a "
+    "compliance violation: it will be REJECTED and you will be asked "
+    "again.\n"
+    "- Propose a genuinely different mechanism from THIS abstract.")
+
 def _hash(s): return hashlib.sha256(s.encode()).hexdigest()[:16]
 
 
@@ -245,6 +269,36 @@ def synthesize(problem: dict, evidence: list[dict]) -> dict | None:
     #  the measured flap window is ~1-4 min; 0/8/20 s spreads three real
     #  attempts across it without stretching a run's wall time
 
+    # R470 (audit P0-5 POWER): the directive constraint from the problem
+    # (built at the spawn site from the parent's recorded mechanism
+    # identity; the worker persists it and attaches it to the problem).
+    # NAMED _dir_* deliberately — problem["constraint"] is the device's
+    # engineering constraint and must never be shadowed.
+    _dir_constraint = (problem.get("directive_constraint")
+                       if isinstance(problem, dict) else None)
+    _dir_block = ""
+    _dir_record = {"applied": False}
+    if (isinstance(_dir_constraint, dict)
+            and _dir_constraint.get("forbidden_mechanism")):
+        from discovery_fabric.engine.directive_compliance import (
+            territory_violation as _territory_violation)
+        _dir_block = CONSTRAINT_INSTRUCTION.format(
+            forbidden=str(_dir_constraint.get("forbidden_mechanism")))
+        _dir_record = {
+            "applied": True,
+            "version": _dir_constraint.get("version"),
+            "verb": _dir_constraint.get("verb"),
+            "forbidden_mechanism": _dir_constraint.get(
+                "forbidden_mechanism"),
+            "violation_detected": False,
+            "repair_attempted": False,
+            "repair_succeeded": None,
+            "violation_final": False,
+        }
+        print("  [synthesize] directive constraint active (verb "
+              f"{_dir_record['verb']}; mechanical compliance check "
+              "armed)")
+
     def _parse_fields(text):
         parsed = {f.lower(): "" for f in fields}
         pattern = re.compile(rf'^({"|".join(fields)})\s*:\s*(.*)$', re.MULTILINE)
@@ -262,10 +316,17 @@ def synthesize(problem: dict, evidence: list[dict]) -> dict | None:
                   f"{min(len(evidence), _ROTATION_PAPERS)})")
             time.sleep(backoff)
         papers_tried.append(paper.get("id"))
+        # the engineer's pass-2 F1: the verdict fields reset EVERY
+        # candidate iteration — a stale violation from an earlier paper
+        # can never ride a later, clean candidate (honest typing)
+        _dir_record.update({"violation_detected": False,
+                            "repair_attempted": False,
+                            "repair_succeeded": None,
+                            "violation_final": False})
         prompt = SYNTHESIS_PROMPT.format(
             device=problem["device"], failure=problem["failure"], constraint=problem["constraint"],
             title=paper["title"], abstract=paper["abstract"][:1200],
-            span_instruction=SPAN_INSTRUCTION)
+            span_instruction=SPAN_INSTRUCTION + _dir_block)
         print(f"  [synthesize] calling LLM (paper {attempt + 1}: "
               f"{str(paper.get('title'))[:60]})...")
         resp = llm_chat(prompt, system="You are a medical device engineer.")
@@ -336,6 +397,81 @@ def synthesize(problem: dict, evidence: list[dict]) -> dict | None:
         # loosened; the repair never fires on an already-verbatim span,
         # and provenance records every repair).
         repair_mechanism_span(candidate, paper["abstract"])
+        # R470 (audit P0-5 POWER): the mechanical compliance check — the
+        # SAME shared instrument the outcome card uses. On violation: ONE
+        # recorded repair retry (the constraint restated, the violating
+        # mechanism shown as rejected); a still-violating candidate is
+        # returned with violation_final: true — the honest typed state
+        # (never hidden, never a fabricated compliance; the ladder's own
+        # adversarial gates still judge the candidate independently).
+        if _dir_record.get("applied"):
+            _terms = _dir_constraint.get("forbidden_terms") or []
+            if not _terms:
+                # the engineer's pass-2 F2: armed with no terms would be
+                # silent false assurance — stated loudly, never silent
+                _dir_record["check_skipped"] = "no_forbidden_terms"
+                print("  [synthesize] WARNING: directive constraint "
+                      "active with ZERO forbidden terms — the "
+                      "mechanical check cannot fire (record states it)")
+            _tv = _territory_violation(
+                candidate.get("mechanism", ""), _terms,
+                _dir_constraint.get("threshold")
+                if isinstance(_dir_constraint.get("threshold"),
+                              (int, float)) else 0.5)
+            _dir_record["overlap_ratio"] = _tv["overlap_ratio"]
+            _dir_record["overlapping_terms"] = _tv["overlapping_terms"]
+            if _tv["violation"]:
+                _dir_record["violation_detected"] = True
+                _dir_record["repair_attempted"] = True
+                print("  [synthesize] directive violation (overlap "
+                      f"{_tv['overlap_ratio']}) — one recorded repair "
+                      "retry")
+                _rej = (
+                    prompt + "\n\nCOMPLIANCE REJECTION: your MECHANISM "
+                    "restated the explicitly excluded mechanism (\""
+                    + str(candidate.get("mechanism", ""))[:300]
+                    + "\") — that identity is forbidden this round. "
+                    "Answer again in the SAME format; the MECHANISM line "
+                    "must be a genuinely different mechanism from THIS "
+                    "abstract.")
+                _resp2 = llm_chat(_rej,
+                                  system="You are a medical device engineer.")
+                _parsed2 = _parse_fields(_resp2) if _resp2 else {}
+                if _parsed2.get("mechanism"):
+                    # the engineer's pass-2 F3: the compliance judgment
+                    # gates on the MECHANISM (the thing the directive
+                    # excludes), not the intervention line — a retry
+                    # with a different mechanism is judged on it
+                    _tv2 = _territory_violation(
+                        _parsed2.get("mechanism", ""),
+                        _dir_constraint.get("forbidden_terms") or [],
+                        _dir_constraint.get("threshold")
+                        if isinstance(_dir_constraint.get("threshold"),
+                                      (int, float)) else 0.5)
+                    _dir_record["repaired_overlap_ratio"] = _tv2[
+                        "overlap_ratio"]
+                    if not _tv2["violation"]:
+                        if _parsed2.get("intervention"):
+                            _dir_record["repair_succeeded"] = True
+                            candidate = _candidate_from(_resp2, _parsed2)
+                            repair_mechanism_span(candidate,
+                                                  paper["abstract"])
+                        else:
+                            # a compliant mechanism in an unusable
+                            # answer: the ORIGINAL (violating)
+                            # candidate returns — stated, not softened
+                            _dir_record["repair_succeeded"] = False
+                            _dir_record["violation_final"] = True
+                            _dir_record["retry_mechanism_compliant"] = True
+                    else:
+                        _dir_record["repair_succeeded"] = False
+                        _dir_record["violation_final"] = True
+                else:
+                    _dir_record["repair_succeeded"] = False
+                    _dir_record["violation_final"] = True
+            candidate["directive_constraint"] = _dir_record
+            _LAST_PROVIDER_META["directive_constraint"] = dict(
+                _dir_record)
         if retry_note:
             candidate["synthesis_retry_note"] = retry_note
         if attempt > 0 or len(papers_tried) > 1:

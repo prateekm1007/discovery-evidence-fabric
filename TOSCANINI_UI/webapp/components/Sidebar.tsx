@@ -262,6 +262,19 @@ export default function Sidebar({
 
       <div className="rail-section">
         <h2 className="rail-h">Technology packages</h2>
+        {/* R470 (external re-audit P1-7): exemplar distinction — the
+            first-visit rail mixes pre-baked portfolio items with the
+            visitor's empty Discoveries list, and nothing said these are
+            examples of finished discoveries, not the visitor's own work.
+            One line, in the rail's own voice, directly under the header;
+            the packages remain one tap away as before. */}
+        {showcase.length > 0 && (
+          <div className="rail-empty" data-rail-exemplar-note>
+            Portfolio exemplars — finished discoveries published by the
+            machine&apos;s own research program, not yours. Yours live
+            under Discoveries above.
+          </div>
+        )}
         {showcase.length === 0 && (
           <div className="rail-empty">
             {/* R464 (audit P2-6): the empty state explains what a

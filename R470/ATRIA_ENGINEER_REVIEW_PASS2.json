@@ -1,0 +1,73 @@
+{
+ "round": "R470",
+ "protocol": "CTO (this session) / engineer (Atria-Dawn-Preview)",
+ "subject": "steering directive-compliance implementation review (P0-5 remainder) + P1-3 record-layer dedupe",
+ "requested_at": "2026-09-15T19:59:41Z",
+ "key_fingerprint": "atr_63...IxbA",
+ "reviews": [
+  {
+   "file": "discovery_fabric/engine/directive_compliance.py",
+   "model": "Atria-Dawn-Preview",
+   "usage": {
+    "prompt_tokens": 2184,
+    "total_tokens": 11184,
+    "completion_tokens": 9000,
+    "prompt_tokens_details": {
+     "cached_tokens": 0,
+     "created_cache_tokens": 2176,
+     "multimodal_tokens": null
+    }
+   },
+   "finish_reason": "length",
+   "review_verbatim": "FINDINGS:\n1. BLOCKER | `_TOKEN_RE` / `meaningful_terms` | The token class includes `\\-`, so a hyphenated identity is ONE token: parent \"retrieval augmented generation\" → {retrieval, augmented, generation}, child \"retrieval-augmented-generation\" → {retrieval-augmented-generation}. Overlap = 0, ratio 0 < 0.5, strings differ → verdict `COMPLIED_CHANGED` while the child blatantly re-derives the forbidden identity. This is the re-audit's P0-5 failure mode (violation reported as success), and hyphenated mechanism names are the norm in this domain, so the floor is defeated by orthography, not semantics. | Drop `\\-` from the class: `_TOKEN_RE = re.compile(r\"[a-z][a-z0-9]{2,}\")` so hyphens split tokens; keep the rest of the pipeline unchanged. Re-run the re-audit's measured case through `territory_violation` before merge.\n2. MAJOR | `compliance_verdict` → `territory_violation(child_mechanism, constraint.get(\"forbidden_terms\") or [])` | The constraint record's stored `threshold` is never passed to the check — the declared threshold field is dead code, correct only because it happens to equal the module default. The docstring claims the declared threshold is \"the honest alternative to a hidden fudge,\" but a per-record threshold (or a future tuning change) would silently not apply, and the"
+  },
+  {
+   "file": "discovery_fabric/a2/synthesize.py",
+   "model": "Atria-Dawn-Preview",
+   "usage": {
+    "prompt_tokens": 2083,
+    "total_tokens": 9062,
+    "completion_tokens": 6979,
+    "prompt_tokens_details": {
+     "cached_tokens": 192,
+     "created_cache_tokens": 1856,
+     "multimodal_tokens": null
+    }
+   },
+   "finish_reason": "stop",
+   "review_verbatim": "FINDINGS:\n1. MAJOR | `synthesize.py`, `_dir_record` construction vs. the per-paper candidate loop | The record is built once **outside** the loop and its verdict fields (`violation_detected`, `repair_attempted`, `repair_succeeded`, `violation_final`) are only ever set inside the `if _tv[\"violation\"]` branch — never reset per candidate. If paper 1 violates and the repair fails, and a later paper yields a clean candidate, that clean candidate is returned carrying a stale `violation_final: true` / `repair_succeeded: false` — a *false* violation record, i.e. the exact inverse of honest typing, and the outcome card would judge compliance from stale state. | Rebuild `_dir_record` (all fields) at the top of each candidate iteration, or reset every verdict field right before each check; attach the record only to the candidate actually returned.\n2. MAJOR | `synthesize.py`, the `_territory_violation(...)` call using `_dir_constraint.get(\"forbidden_terms\") or []` | The prompt shows `forbidden_mechanism` (a string), but the mechanical check consumes `forbidden_terms` (a list). If the spawn site records only the string, the check is reported as \"armed\" (`applied: true`) yet can never fire — silent false assurance of enforcement. | Make `forbidden_terms` mandatory when the constraint is active: derive it at the spawn site from the mechanism identity, or here fail loudly (raise / log \"constraint active with no terms\") instead of defaulting to an empty list.\n3. MAJOR | `synthesize.py`, repair branch `if _parsed2.get(\"intervention\"):` | Retry success is gated on the presence of an `intervention:` line rather than on the mechanism. A retry that gives a genuinely different mechanism but slips the format is recorded `repair_succeeded: false, violation_final: true` — a false final violation. | Gate on the mechanism: whenever `_parsed2.get(\"mechanism\")` is non-empty, run the compliance check on it; treat the retry as unanswered only when both mechanism and intervention are absent.\n4. MINOR | `synthesize.py`, `_dir_constraint.get(\"threshold\") or 0.5` | `or` masks an explicit threshold of `0` and passes non-numeric values (e.g. `\"0.5\"`) straight into the shared instrument. | Normalize once: `_thr = _dir_constraint.get(\"threshold\"); _thr = float(_thr) if _thr is not None else 0.5`, letting a bad type raise rather than silently mis-compare.\n5. NOTE | `synthesize.py`, function-level `from discovery_fabric.engine.directive_compliance import territory_violation` inside the candidate loop; and the new module itself | Re-imported per candidate; more importantly **`directive_compliance.py` was not included in this review**, so its purity (the check never mutates a verdict), threshold semantics, and its separation from `verify.py` (no fuzzy matching may enter `verify.py`) cannot be confirmed from what was provided. | Hoist the import to module scope if there is no cycle, and attach `directive_compliance.py` plus the outcome-card call site for review before merge.\n6. NOTE | `synthesize.py`, `candidate[\"directive_constraint\"]` / `_LAST_PROVIDER_META[\"directive_constraint\"]` | The record carries raw transport vocabulary (`overlap_ratio`, `overlapping_terms`, `repair_succeeded`, `violation_final`) on a candidate artifact; if the outcome card or any UI surface echoes these keys, that violates \"product surfaces carry no transport vocabulary.\" | Keep the typed record internal; have the outcome card *map* it to human wording (\"does not comply with the operator's direction for this round\") rather than display the keys.\n7. NOTE | `synthesize.py`, repair path `candidate = _candidate_from(_resp2, _parsed2)` | The repaired candidate substitutes the original before the ladder's gates run, so the gates judge the repaired mechanism and never the original violating one. This matches the code's own claim (\"the ladder's own gates still run; nothing is hidden\"), but it is a Constitution-adjacent reading that should be stated explicitly rather than inferred. | Add the explicit Constitution note: the compliance repair may substitute candidate text pre-gate, the gates' verdicts apply to the final post-repair candidate, and the compliance check itself never alters a gate verdict.\n\nVERDICT: APPROVE_WITH_FIXES"
+  },
+  {
+   "file": "toscanini/worker.py",
+   "model": "Atria-Dawn-Preview",
+   "usage": {
+    "prompt_tokens": 2771,
+    "total_tokens": 8625,
+    "completion_tokens": 5854,
+    "prompt_tokens_details": {
+     "cached_tokens": 192,
+     "created_cache_tokens": 2560,
+     "multimodal_tokens": null
+    }
+   },
+   "finish_reason": "stop",
+   "review_verbatim": "FINDINGS:\n1. MAJOR | `record_directive_outcome`, the verdict dispatch chain | The terminal `else` is documented as NOT_APPLICABLE, but it also silently catches ANY unrecognized verdict from `compliance_verdict`. If the new module's enum drifts (or returns e.g. `COMPLIED` vs `COMPLIED_CHANGED`), a real compliance verdict degrades invisibly into the pre-R470 plain-change comparison — precisely the undisclosed-same-territory failure the re-audit measured. | Replace the catch-all with an explicit `elif verdict == \"NOT_APPLICABLE\":` and a final `else` that records the verdict as uninterpretable (\"the engine recorded a verdict this card does not recognize — stated as measured, not softened\") and emits a forensics event, so drift fails loud instead of silently flattering.\n2. MAJOR | `discovery_fabric/engine/directive_compliance.py` (not in this review packet) | The instrument's contract is unverifiable here: its handling of `constraint=None`, of a failed-derivation record (no `forbidden_mechanism`), of non-dict JSON, its exact enum set, and whether it imports from `toscanini/` (layering rule). The `CONSTRAINT_DERIVATION_FAILED` branch's reachability depends entirely on that contract. | Supply the module for review and add a contract test asserting the enum set the worker dispatches on; confirm zero `toscanini.*` imports inside it.\n3. MINOR | `record_directive_outcome`, file fallback `except (OSError, ValueError): constraint = None` | A JSON parse error on `DIRECTIVE_CONSTRAINT.json` nulls the constraint even when the session holds a typed derivation-failure record, so the card can render a plain change comparison while a typed failure exists on file — an honesty regression. | Preserve the session record as fallback: only override when the file yields a dict (`if isinstance(_loaded, dict): constraint = _loaded`), and keep the session's failed-derivation record otherwise.\n4. MINOR | `record_directive_outcome`, `_json.loads(_cp.read_text())` | The loaded JSON is not type-guarded; a non-dict file (list/string) is passed straight to the instrument. | Guard with `isinstance(..., dict)` before assignment.\n5. MINOR | `record_directive_outcome`, `\"mechanism_changed\": changed` | For verdict-driven branches `changed = _cv.get(\"mechanism_changed\")` can be `None` (missing key) or can contradict the summary on `NO_BASELINE`/`NO_CHILD_MECHANISM` (e.g. True while the card says \"nothing to compare\"). | Coerce explicitly per verdict: `False` for `NO_BASELINE`/`NO_CHILD_MECHANISM`/`NOT_APPLICABLE`-same, `bool(...)` elsewhere, so the stored boolean can never contradict the prose.\n6. MINOR | `record_directive_outcome`, persisted `directive_outcome` keys `compliance_verdict` / `territory` | Engine enum names (\"MOVED_BUT_IN_TERRITORY\") and the engine's `territory` blob are persisted on the session record; if the product card renders them raw, transport vocabulary reaches a product surface (Constitution). | Keep the typed fields internal to the engine/session contract and render only `summary` (prose) on the outcome card; if the UI needs the state, map it to product-side copy in the presentation layer, never the enum string.\n7. NOTE | `toscanini/worker.py` → `discovery_fabric.engine.directive_compliance` | Import direction is correct (toscanini → engine, not the reverse), but the in-function lazy import hides the dependency. Acceptable if cycle-avoiding; the layering guarantee lives in the module, not here. | Prefer a module-level import unless a cycle is proven; either way, keep the instrument free of `toscanini.*` imports.\n8. NOTE | this diff | The P1-3 record-layer fix (\"kill causes stated once\") is not present in this diff, so it cannot be confirmed landed or correct. | Provide that file's diff for review before the merge claim is closed.\n\nVERDICT: APPROVE_WITH_FIXES."
+  },
+  {
+   "file": "discovery_fabric/a2/classify.py",
+   "model": "Atria-Dawn-Preview",
+   "usage": {
+    "prompt_tokens": 668,
+    "total_tokens": 4656,
+    "completion_tokens": 3988,
+    "prompt_tokens_details": {
+     "cached_tokens": 0,
+     "created_cache_tokens": 640,
+     "multimodal_tokens": null
+    }
+   },
+   "finish_reason": "stop",
+   "review_verbatim": "FINDINGS:\n1. BLOCKER | `classify()`, new condition references `killed_dims` | The hunk uses `killed_dims` but nothing in the visible context defines it; if it isn't assigned earlier in `classify()`, every rejection now raises `NameError` — a crash on the exact path that must return a clean verdict. | Confirm/define it explicitly from structured data, e.g. `killed_dims = [d[\"dimension\"] for d in adversarial[\"attacks\"] if d.get(\"verdict\") == \"KILLED\"]` (or whatever the record layer's canonical key is), — never by re-parsing `dim_detail` prose.\n2. MAJOR | same condition, `adv_reason` falsy path | `detail = adv_reason or dim_detail or \"…\"`; when `adv_reason` is empty/None and `dim_detail` is set, `reason` already *contains* `dim_detail`, the `all(...)` test fails, and the code appends `; killed dimensions: {dim_detail}` — reproducing the duplicate enumeration this fix exists to kill. | Test containment against the assembled string, not the raw field: `if dim_detail and not all(k.lower() in reason.lower() for k in killed_dims):`.\n3. MAJOR | redundancy test overall | The \"stated once\" decision rests on substring matching against prose (`k.lower() in adv_reason.lower()`). Any formatting drift (underscore vs space, abbreviation, truncation) silently re-triggers the duplicate append — the measured defect returns. | Make it structural: have the adversarial result carry `enumerated_dims` and compare sets (`set(killed_dims) <= set(enumerated_dims)`); keep string shape out of the decision.\n4. MAJOR | `reason` string vocabulary | The comment itself calls `reason` a buyer surface, yet it carries engine/transport vocabulary: \"killed dimensions:\", \"no kill basis recorded\", \"adversarial challenge failed\". | Translate once at the boundary into product language (e.g. \"requirements not met: …\"); keep \"kill\"/\"KILLED\" tokens inside `adversarial[\"attacks\"]` (the record layer).\n5. MINOR | `all(...)` over empty `killed_dims` | `all([])` is `True`, so if `killed_dims` is empty while `dim_detail` is non-empty, the enumeration is suppressed with no signal — an upstream regression becomes invisible. | `if dim_detail and (not killed_dims or not all(...))`, or log/assert on the inconsistent state.\n6. MINOR | `adv_reason.lower()` when `adv_reason is None` | Pre-existing AttributeError risk retained by the new condition. | Use `(adv_reason or \"\")` in the containment test.\n7. NOTE | material provided | The \"new module in full\" was not included — the compliance-judging outcome card and the record-layer module are unreviewable (correctness, Constitution compliance, `violation_final=true` honest typing, no `toscanini/` imports). | Supply the module.\n8. NOTE | return dict in view | The visible return shows `epistemic_state`/`final_status`/`reason` only; cannot confirm a violated candidate is returned with `violation_final=true` (never hidden). | Confirm in the full file. No imports appear in this hunk, so layering is unverified; no secret-handling surface exists in this diff.\n\nVERDICT: REQUEST_CHANGES"
+  }
+ ]
+}

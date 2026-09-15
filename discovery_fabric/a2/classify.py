@@ -234,7 +234,27 @@ def classify(candidate: dict, evidence_verification: dict, prior_art: dict, adve
         else:
             detail = adv_reason or dim_detail or "no kill basis recorded"
             reason = (f"adversarial challenge failed: {detail}")
-            if dim_detail and dim_detail.lower() not in adv_reason.lower():
+            # R470 (external re-audit P1-3): the kill causes are stated
+            # ONCE. The measured defect: the adversarial reason already
+            # enumerated the killed dimensions ("unsupported_mechanism:
+            # KILLED, ...") and the old whole-string containment check
+            # missed the match (each dim_detail entry carries truncated
+            # verdict text), so the reason appended "killed dimensions:
+            # [same list again]" — machine-shaped redundancy on a buyer
+            # surface. Now: when the REASON AS ASSEMBLED already names
+            # every killed dimension, it stands alone; otherwise the
+            # complete enumeration is appended exactly once. (The
+            # engineer's pass-2 F2: containment is tested against the
+            # assembled `reason` — which already contains `detail` —
+            # not the raw adv_reason, so the adv_reason-empty path
+            # cannot re-append the same enumeration.) The per-dimension
+            # verdict text remains in adversarial["attacks"] — the
+            # technical record layer (nothing is hidden; Art. XXV).
+            # Note: killed_dims is non-empty whenever dim_detail is
+            # (dim_detail is the join OVER killed_dims), so the
+            # all([])-on-empty edge cannot silently suppress here.
+            if dim_detail and not all(
+                    k.lower() in reason.lower() for k in killed_dims):
                 reason = (f"{reason}; killed dimensions: {dim_detail}")
             return {"epistemic_state": "CANDIDATE_CONNECTION", "final_status": "REJECTED",
                     "reason": reason,

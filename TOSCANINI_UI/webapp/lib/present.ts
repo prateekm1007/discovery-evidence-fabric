@@ -291,6 +291,39 @@ export function deriveAttackState(
   return "NOT_RUN";
 }
 
+// ---------------------------------------------------------------------------
+// R470 (external re-audit P1-3): kill causes in plain language, stated
+// once. The eight canonical adversarial dimensions (a2/adversarial.py)
+// are translated here — the single translation authority — instead of
+// repeating the machine taxonomy on the buyer surface. The raw recorded
+// cause stays in the technical record (run record / evidence pack).
+// ---------------------------------------------------------------------------
+const KILL_CAUSE_PROSE: Record<string, string> = {
+  unsupported_mechanism: "the recorded evidence did not support the mechanism",
+  weak_transfer: "the effect did not transfer convincingly from its source domain",
+  obvious_combination: "it was an obvious combination of known techniques",
+  prior_art: "prior work already covers the idea",
+  contradiction: "it contradicted the recorded evidence",
+  boundary_failure: "its boundary conditions were missing or violated",
+  engineering_infeasibility: "it was not engineering-feasible as specified",
+  regulatory_incompatibility: "it would face regulatory barriers",
+};
+
+export function killCauseSentence(
+  killReason: string | null | undefined
+): string {
+  const raw = String(killReason ?? "").toLowerCase();
+  const hits = Object.keys(KILL_CAUSE_PROSE).filter((k) => raw.includes(k));
+  if (hits.length === 0) return "";
+  const clauses = hits.map((k) => KILL_CAUSE_PROSE[k]);
+  const list =
+    clauses.length === 1
+      ? clauses[0]
+      : clauses.slice(0, -1).join("; ") + "; and " + clauses[clauses.length - 1];
+  return ` The challenge rejected it on ${clauses.length} ` +
+    `${clauses.length === 1 ? "front" : "fronts"}: ${list}.`;
+}
+
 export function attackSentence(state: AttackState, detail: SessionDetail): string {
   const genChallenge = [
     ...(detail.run_state?.generations?.generations ?? []),
@@ -305,12 +338,22 @@ export function attackSentence(state: AttackState, detail: SessionDetail): strin
         ".";
     case "CONTESTED":
       return "The adversarial instrument raised an objection it is not calibrated to decide, so the objection is preserved and escalated for adjudication — it is not treated as a verdict, and not treated as a pass either.";
-    case "FAILED":
+    case "FAILED": {
+      // R470 (P1-3): recognizable dimension taxonomies become one
+      // plain-language enumeration (stated once, no "killed dimensions:
+      // [same list]" repetition); a short non-taxonomy recorded cause
+      // (e.g. "failure mode not documented") is quoted as-is; no cause
+      // at all points to the technical record rather than inventing one.
+      const causes = killCauseSentence(genChallenge?.kill_reason);
+      if (causes) {
+        return "The adversarial tests contradicted this candidate." + causes;
+      }
       return "The adversarial tests contradicted this candidate." +
         (genChallenge?.kill_reason
           ? ` Recorded cause: ${genChallenge.kill_reason}`
           : "") +
         ".";
+    }
     case "IN_PROGRESS":
       return "Now I'm trying to prove this wrong — the adversarial test is running.";
     case "NOT_RUN":
