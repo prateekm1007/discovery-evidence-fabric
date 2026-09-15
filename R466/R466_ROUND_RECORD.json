@@ -1,0 +1,90 @@
+{
+ "kind": "round_record",
+ "round": "R466-C2",
+ "directive": "Operator instruction 2026-09-15: \"put all api's in huggingface secret ( including PAT,API's )\" + the reaudit's closing path (7.9/10): two measurement tasks (Lighthouse on production; three real discovery runs evaluated as deliverables) and two small code changes (conversation list semantics ol/li; the action-continuity residual friction). Zero scientific-authority changes.",
+ "generated_by": "Coder 2 (main session)",
+ "reviewer_provenance": "AI_REVIEW",
+ "constitution": {
+  "version": "2.4.0",
+  "sha256_prefix": "b54a1be9",
+  "read_in_full_at_round_start": true,
+  "reread_before_commit": "hash verified byte-identical (b54a1be9bcbdd246...) before every commit this round"
+ },
+ "deliverable_1_all_credentials_as_hf_secrets": {
+  "directive_verbatim": "put all api's in huggingface secret ( including PAT,API's )",
+  "executed_by": "scripts/r466_hf_secrets_all.py",
+  "reset_this_round": ["GITHUB_TOKEN (the operator's GitHub PAT — drives the Space's durable-state push)", "ZAI_API_KEY (the LLM gateway credential)", "HF_TOKEN (the R463 P0 ruling's ONE legitimate user/application AI credential path — the `hf` provider rung reads exactly this name)"],
+  "verified_surface": "12 secret names present on prateekm1/toscanini-prod-validation (write-only API — names only; values never readable, never logged, never committed; artifact R466/HF_SPACE_SECRETS_ALL.json carries fingerprints only)",
+  "router_keys": "the five live router keys (UNOROUTER/XKIRO/APINEX/BAI/BYNARA) stay persisted from R461/R463 (values session-env-only per BS-021, not held this session — untouched); the live provider matrix on /api/health is the evidence they are loaded (5-6 models each; the preflight probe produced a REAL completion through the ladder)",
+  "no_new_secret_invented": "the round adds no key material to the repo and no second service secret (Art. VI; the R463 ruling's single credential path stands)"
+ },
+ "deliverable_2_conversation_list_semantics": {
+  "the_named_item": "the reaudit's one open structural item: the Discoveries rail rendered as loose divs/buttons",
+  "fix": "the history renders as semantic <ol>/<li> in BOTH views (search + time buckets) and the packages list joins it; .rail-list resets the list chrome so the visual design is pixel-identical",
+  "evidence": "RAIL_AUDIT on the served export: 4 ols, list-style none, 0 margins, buttons inside li; R466/ux_workspace_rail_1440.png; production screenshot R466/ux_prod_child_continuation_1440.png (3 ols live)"
+ },
+ "deliverable_3_action_continuity_root_cause": {
+  "the_residual_friction": "the reaudit: 'one click to recover the thread' — and acceptance clause (c) ('what directive carried from their instruction') failed for every finished round",
+  "root_cause": "the steering directive rode the TRANSIENT user_directive field, which the worker consumes and CLEARS at spawn (worker.py writes user_directive={} after applying it) — the user's words vanished from the child thread the moment the run began",
+  "fix_layers": [
+   "present.ts reads the directive from the DURABLE record first: the child's own conversation context (the engine appends the directive there at round creation via record_conversation_context — an append-only guarded field, never cleared), falling back to the transient user_directive, fenced to action-opened rounds (a clarification answer on a plain run can never render as a directive); the machine [VERB] tag is stripped for display — the user's own words are not",
+   "the in-thread continuation card (data-continued-card): 'Round N of this investigation · Continue from the earlier round' INSIDE the conversation surface — the reaudit's acceptance (a)(b)(c) all live in one view"
+  ],
+  "live_production_proof": {
+   "method": "steered the REAL completed irrigation run via the canonical action endpoint (CHANGE_MECHANISM, 'try a different material for the emitter geometry'); child ts_1b7267b8a24f opened with parent_session_id set",
+   "record_state": "child user_directive = {} (the worker ALREADY cleared it — the exact failure condition of the old code) while conversation[0] carries the directive verbatim",
+   "rendered": "the card ('Round 2 of this investigation · Continue from the earlier round') AND the user bubble 'try a different material for the emitter geometry' — screenshot R466/ux_prod_child_continuation_1440.png"
+  }
+ },
+ "measurement_A_performance": {
+  "instrument": "Lighthouse 12.8.2, mobile emulation (Moto G-class, 4x CPU, slow 4G), the deployed production URL — the audit's own test",
+  "before_fix_same_instrument_same_session": {"engine_commit": "1931a7a3", "performance": 88, "accessibility": 96, "fcp_s": 1.2, "lcp_s": 3.7, "tbt_ms": 110},
+  "after_fix": {"engine_commit": "a0cad5fe", "runs": [{"performance": 100, "accessibility": 100, "fcp_s": 1.2, "lcp_s": 1.3, "tbt_ms": 70, "cls": 0}, {"performance": 100, "accessibility": 100, "fcp_s": 1.2, "lcp_s": 1.3, "tbt_ms": 60, "cls": 0}]},
+  "the_lcp_root_cause": "the static export prerendered only the Suspense fallback ('Loading…') because useSearchParams bails static rendering — the ENTIRE landing painted after full React hydration (the LCP element was the hero-note text node with 3.0s of render delay; FCP 1.1s vs LCP 3.7s split)",
+  "fixes": [
+   "the location query is read through a hydration-gated store (server snapshot AND first client render = landing; the real ?run=/?invention= applies post-hydration; navigations notify via patched history.pushState/replaceState + popstate) — the landing now prerenders fully (out/index.html 5.4KB -> 10.2KB with the duration note and example card in the served HTML)",
+   "the run-mode/invention-mode component graphs (Conversation, Workspace, InventionStage + dossier/narrative subtrees) are next/dynamic route-mode chunks — the landing no longer parses ~230KB of code it never executes (First Load JS 236KB -> 121KB)",
+   "isTerminal imports from lib/present (its one definition) instead of RunNarrative — that static import kept the narrative graph AND MathText's KaTeX CSS chunk (24KB of @font-face) on the landing's render-blocking path; the landing blocks on ONE stylesheet now"
+  ],
+  "accessibility_closure": "the production run caught the LAST WCAG AA failure — the primary CTA's white 15px label on the decorative accent fill measured 4.22:1; the fill moved to --accent-text (#a34d2e, 5.7:1 — the R464 token), pinned by computed arithmetic in the battery (adversarial_r466); a11y 96 -> 100",
+  "acceptance": "LCP < 2.5s on mobile cold start: MET at 1.3s (2x margin); zero contrast failures: MET (a11y 100)"
+ },
+ "measurement_B_three_real_runs": {
+  "method": "three FRESH production runs (never run anywhere before) launched through the user path (POST /api/run, fresh owner capabilities), three domains; artifacts R466/RUNS_EVALUATION.json + R466/RUNS/driver_state.json",
+  "runs": [
+   {"key": "vacuum", "session": "ts_d1c68dd5f39d", "domain": "consumer/industrial", "result": "evidence 13 records custody-frozen; premise PREMISE_COHERENT; MECHANISM extraction fell short on the free-router cascade; typed terminal INCOMPLETE_INFERENCE_FAILURE (Art. LXI: infrastructure, never a scientific rejection); surfaced honestly as 'Run blocked — infrastructure, not a verdict'"},
+   {"key": "irrigation", "session": "ts_69e5b44a8bd7", "domain": "agriculture", "result": "the FULL 15-stage ladder completed: 15 evidence records frozen; premise coherent; mechanism proposed; prior-art collision across 15 universes; physics BEATS_BASELINE; the 8-dimension adversarial challenge KILLED the candidate (weak_transfer, obvious prior art); decisive falsification experiment designed; surviving architecture CONTESTED; epistemic class CANDIDATE_CONNECTION; typed terminal INVENTION_UNDER_DEVELOPMENT with the kill reason on the record — the machine attacked its own candidate and reported the kill"},
+   {"key": "infusion", "session": "ts_a9abb570ed34", "domain": "medical device", "result": "same honest block as vacuum: typed INCOMPLETE_INFERENCE_FAILURE at MECHANISM; no fabricated mechanism, no fake completion"}
+  ],
+  "deliverable_assessment": "the ladder RUNS on production through the user path and the honesty architecture holds on first-contact problems — every terminal state carries its typed cause, zero fabricated successes; the binding constraint is the free-router LLM cascade's inference quality at MECHANISM (2 of 3 runs), a resource constraint (Art. LXI class), not an engine defect; the one full ladder produced a correctly-killed weak transfer (the adversarial stage's own verdict) — professional process evidence, not yet a buyer-ready invention",
+  "bonus_finding": "the steering-action path was exercised LIVE on the completed run (the production proof above), so the round also verified the R463 single-credential action path end-to-end on a fresh owner"
+ },
+ "tests": {
+  "new": "adversarial_r466 13/13 (durable directive read incl. cleared/fallback/absent/non-fork/non-user-entry attacks; ol/li structure in both views + packages; card gating + plain-language; the CTA ratio COMPUTED from the token) — the shipped present.ts executed via esbuild",
+  "regressions": "present 16, events 12, r458 21, copy 1, math 12, r461 10, r464 23 — all green; tsc --strict clean; NEXT_OUTPUT=export build + verify-export PASS on every build this round",
+  "backend": "zero engine code changed this round; MODULE_INVENTORY drift gate GREEN; english-only guard 4/4"
+ },
+ "disclosures": [
+  "the HF Space's store shows a brief cold-start window on a freshly (re)started process: the first /result+ /dossier poll of a new browser session can hit an enumeration-safe 404 before the store finishes hydrating; the app's misses-grading (4 misses before 'run not found') absorbs it and the poll recovers — observed live twice, captured in the round traces; pre-existing behavior, not an R466 regression; recorded as a candidate P2 item (a retry-friendly first poll or a warm hydration marker)",
+  "the lantern-simulation LCP variance seen on the LOCAL pre-deploy builds (2.6-3.5s) vanished on production after the prerender fix — recorded for instrument honesty: the local numbers were simulation artifacts of the pre-fix load graph, and the acceptance is claimed ONLY on the production measurement",
+  "the /favicon.ico 404 (cosmetic, pre-existing) is visible in the production traces — a P3 polish item",
+  "the router keys' VALUES are not held in this session (BS-021 env-only); the R466 secrets script re-set only the three operator-supplied credentials and left the persisted router keys untouched",
+  "the deployment's durable-state branch received the standing snapshot traffic (runtime-state-hf); no other Space or branch was touched"
+ ],
+ "production_deployment": {
+  "target_sha": "a0cad5fe (code: 1931a7a3 + 23aead52 + 8a96523b; measurements ecf17cca + a0cad5fe)",
+  "deployed_sha": "a0cad5fe (Space revision a886bfdf, then re-verified live through the round's final proofs)",
+  "deploy_id": "r456_space_deploy",
+  "health_check_result": "GREEN",
+  "drift": "GREEN",
+  "blocked_by": null,
+  "what_unblocks": null
+ },
+ "open_items": [
+  "the reaudit's deferred L-complexity option (full in-thread child rendering) remains deferred — the navigation+card approach meets the audit's own acceptance",
+  "the free-router cascade's MECHANISM-stage inference quality (2 of 3 fresh runs blocked) — an owner-side capacity/credit question (Art. LXV escalation: every fresh-user run on the current cascade has this exposure until the account domain is topped up or a stronger rung is admitted)",
+  "the store cold-start 404 window (disclosed above) — candidate P2",
+  "favicon 404 — candidate P3",
+  "Task B (repo slimming, five items) remains deferred by prior operator direction, not cancelled"
+ ]
+}
