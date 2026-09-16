@@ -1072,3 +1072,10 @@ The operator repointed ZAI to the credited provider (atria, api.atria-asi.ai) wi
 | POST-RESTART | flip verified | transport snapshot = api.atria-asi.ai; zai catalog 21 -> 1 (atria's); atria HEALTHY; health ok:true |
 
 The audit's 402 class is answered: the strong-model chain rides the credited atria leg; the HF-router leg stays a measured-degraded OPTION (R479 record stands). Slot 8 remains inert per its measured INVALID verdict. Now unblocked: the P0-1 IMPROVE-stage live proof + the R458 re-run (own rounds).
+
+## R481 ADDENDUM — the union delivery + the third race disclosed (2026-09-16)
+
+- BOTH R478 lines united on origin/main at 2a312a02 (merge c5bdb5dd): the pushed P0 line (P0-2/P0-3/P0-4/P0-5 closed) + the PAT-blocked P1-12 line (the survivor authority + ring 15/15). Production serves the union (Space rev cc1080e4; tuple GREEN; the R480 repoint holds; atria HEALTHY; durable branch alive).
+- RACE INSTANCE 3: a third line's unpushed IMPROVE-stage deploy (d75aaf99, 18:44:12Z) was overwritten by the verified union deploy (18:46:45Z); preserved verbatim in R481/ORPHAN_RECOVERY/ (18 files: improve_stage.py, its battery, the registry regeneration, the run.py/adapters.py wiring). The R482 queue: (1) the ORPHAN_RECOVERY union WITH the live-proof exit criterion (P0-1's own round); (2) P0-6 re-benchmark; (3) the R458 re-run on the measured-live transport.
+- The ring: 15/15 measured twice consecutively (slot 8 CLEAR — the flap history preserved); the 15-slot registry is live.
+- RACE INSTANCE 3 RESOLVED IN-FLIGHT: the third line rebased onto the union and landed P0-1 itself (e258d1ea: the IMPROVE stage, STAGE_ORDER 16->17) + its records (a3ed0216) + its deploy (Space rev 64661605, live a3ed0216) — production serves the FULL union; its live-proof exit criterion executes on that round. R481/ORPHAN_RECOVERY/ stands as the pre-record snapshot, superseded.
