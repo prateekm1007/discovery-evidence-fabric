@@ -43,7 +43,6 @@ Mechanics (Art. VI, IX, X):
 """
 from __future__ import annotations
 
-import fcntl
 import json
 import os
 import tempfile
@@ -51,6 +50,10 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 from .candidate import utc_now
+
+# R482 (external audit P2 portability): same collection class
+# as quota_breaker — the shim, never a bare fcntl.
+from ..portable_flock import LOCK_EX, LOCK_UN, flock
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 CANONICAL_REGISTRY = REPO_ROOT / "PACKAGE_ID_REGISTRY.json"
@@ -147,12 +150,12 @@ def ensure_registry(path: Optional[str] = None) -> Path:
         lock = p.with_suffix(p.suffix + ".lock")
         lock.parent.mkdir(parents=True, exist_ok=True)
         with open(lock, "w") as lf:
-            fcntl.flock(lf, fcntl.LOCK_EX)
+            flock(lf, LOCK_EX)
             try:
                 if not p.exists():
                     _atomic_write(p, _new_registry())
             finally:
-                fcntl.flock(lf, fcntl.LOCK_UN)
+                flock(lf, LOCK_UN)
     return p
 
 
@@ -170,7 +173,7 @@ def allocate(invention_id: str, run_id: str,
     p = ensure_registry(registry_path)
     lock = p.with_suffix(p.suffix + ".lock")
     with open(lock, "w") as lf:
-        fcntl.flock(lf, fcntl.LOCK_EX)
+        flock(lf, LOCK_EX)
         try:
             d = _load(p)
             packages = d["packages"]
@@ -206,7 +209,7 @@ def allocate(invention_id: str, run_id: str,
             _atomic_write(p, d)
             return dict(row)
         finally:
-            fcntl.flock(lf, fcntl.LOCK_UN)
+            flock(lf, LOCK_UN)
 
 
 def mark_released(invention_id: str, registry_path: Optional[str] = None,
@@ -221,7 +224,7 @@ def mark_released(invention_id: str, registry_path: Optional[str] = None,
     p = ensure_registry(registry_path)
     lock = p.with_suffix(p.suffix + ".lock")
     with open(lock, "w") as lf:
-        fcntl.flock(lf, fcntl.LOCK_EX)
+        flock(lf, LOCK_EX)
         try:
             d = _load(p)
             for r in d["packages"]:
@@ -231,7 +234,7 @@ def mark_released(invention_id: str, registry_path: Optional[str] = None,
                     r["released_at"] = utc_now()
             _atomic_write(p, d)
         finally:
-            fcntl.flock(lf, fcntl.LOCK_UN)
+            flock(lf, LOCK_UN)
 
 
 def lookup(invention_id: str, registry_path: Optional[str] = None

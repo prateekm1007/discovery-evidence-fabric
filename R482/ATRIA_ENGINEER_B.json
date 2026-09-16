@@ -1,0 +1,10 @@
+{
+ "task": "TASK_B",
+ "model": "Atria-Dawn-Preview",
+ "served_by_key": "ATRIA_API_KEY",
+ "attempts": 3,
+ "completion_tokens": 2377,
+ "finish_reason": "stop",
+ "rotations": [],
+ "draft": "```python\n# ===== FILE: discovery_fabric/prior_art_v2/quota_breaker.py =====\nimport hashlib\nimport json\nimport os\nimport time\nfrom pathlib import Path\n# R482 (external audit P2 portability): the Windows\n# collection class \u2014 conftest imports this module at\n# collection time, so the lock goes through the shim.\nfrom ..portable_flock import LOCK_EX, LOCK_UN, flock\n\n\ndef _hold(self):\n    lf = open(self._lock, \"w\")\n    try:\n        flock(lf, LOCK_EX)\n        yield lf\n    finally:\n        flock(lf, LOCK_UN)\n        lf.close()\n\n# ===== FILE: discovery_fabric/engine/package_registry.py =====\nfrom .candidate import utc_now\n# R482 (external audit P2 portability): same collection class\n# as quota_breaker \u2014 the shim, never a bare fcntl.\nfrom ..portable_flock import LOCK_EX, LOCK_UN, flock\n\n\ndef register(self, pkg):\n    lf = open(self._lock, \"w\")\n    try:\n        flock(lf, LOCK_EX)\n        self._write_index(pkg)\n    finally:\n        flock(lf, LOCK_UN)\n        lf.close()\n\n\ndef unregister(self, pkg):\n    lf = open(self._lock, \"w\")\n    try:\n        flock(lf, LOCK_EX)\n        self._remove_index(pkg)\n    finally:\n        flock(lf, LOCK_UN)\n        lf.close()\n\n\ndef snapshot(self):\n    lf = open(self._lock, \"r\")\n    try:\n        flock(lf, LOCK_EX)\n        return dict(self._index)\n    finally:\n        flock(lf, LOCK_UN)\n        lf.close()\n```"
+}

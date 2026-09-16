@@ -30,13 +30,17 @@ QUOTA_BREAKER_PATH env (the conftest guard class).
 """
 from __future__ import annotations
 
-import fcntl
 import json
 import os
 import re
 import time
 from pathlib import Path
 from typing import Any, Dict, Optional
+
+# R482 (external audit P2 portability): the Windows
+# collection class — conftest imports this module at
+# collection time, so the lock goes through the shim.
+from ..portable_flock import LOCK_EX, LOCK_UN, flock
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 BREAKER_PATH = Path(
@@ -73,12 +77,12 @@ def _write(doc: Dict[str, Any]) -> None:
     BREAKER_PATH.parent.mkdir(parents=True, exist_ok=True)
     lock = BREAKER_PATH.with_suffix(".lock")
     with open(lock, "w") as lf:
-        fcntl.flock(lf, fcntl.LOCK_EX)
+        flock(lf, LOCK_EX)
         try:
             BREAKER_PATH.write_text(json.dumps(doc, indent=1,
                                                sort_keys=True))
         finally:
-            fcntl.flock(lf, fcntl.LOCK_UN)
+            flock(lf, LOCK_UN)
 
 
 def is_quota_exhaustion(error_text: str) -> bool:
