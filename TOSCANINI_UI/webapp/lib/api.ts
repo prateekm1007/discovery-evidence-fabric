@@ -69,13 +69,25 @@ export function streamUrl(id: string): string {
 
 async function json<T>(res: Response): Promise<T> {
   if (!res.ok) {
+    // R476 (UI audit, error UX): the raw response body never leaks into
+    // the error message — a JSON blob interpolated into UI copy is wire
+    // format, not human language. If the engine sent a typed `detail`
+    // (FastAPI error shape), that IS the readable reason; otherwise the
+    // status line alone. The status stays the FIRST token (transport
+    // handling keys on it, e.g. the 404 branch in page.tsx).
     let detail = "";
     try {
-      detail = JSON.stringify(await res.json());
+      const body: unknown = await res.json();
+      if (body && typeof body === "object" && "detail" in body) {
+        const d = (body as Record<string, unknown>).detail;
+        if (typeof d === "string") detail = d;
+      }
     } catch {
       /* body was not json — leave detail empty */
     }
-    throw new Error(`${res.status} ${res.statusText} ${detail}`.trim());
+    throw new Error(
+      `${res.status} ${res.statusText}${detail ? `: ${detail}` : ""}`.trim()
+    );
   }
   return res.json() as Promise<T>;
 }

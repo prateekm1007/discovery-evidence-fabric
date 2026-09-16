@@ -507,9 +507,13 @@ export default function Conversation({
             // §7 — ONE progress sentence: when the live event line (or
             // the honest pause) is rendering below, the derived "still
             // working" line is redundant — exactly one line, ever.
+            // R476 (UI audit, a11y): when THIS line is the one on screen
+            // (early run, stalled stream — the SSE block below is then
+            // empty), it must still be a live region, or the waiting
+            // user's screen reader never hears the update.
             if (liveSentence.text || pausedSentence.text) return null;
             return (
-              <div className="conv-row" key={m.id}>
+              <div className="conv-row" key={m.id} aria-live="polite">
                 <div className="conv-live" data-conv-live>
                   <span className="cursor" aria-hidden="true" />
                   {m.text}

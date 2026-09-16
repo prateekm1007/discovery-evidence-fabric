@@ -570,6 +570,26 @@ export function presentMaturity(
   return hit ?? `${m.charAt(0).toUpperCase() + m.slice(1).toLowerCase()} — not physically validated unless the record carries a physical observation`;
 }
 
+// R476 (UI audit, complexity hiding): the visual quality gate's raw
+// verdict vocabulary (PASS / COMPLETE_PASS / …) is machine language —
+// BS-009: it never renders as badge text on the primary surface. The
+// badge shows product language; the raw verdict rides the title
+// tooltip (deep layer), exactly like the model kind badge
+// (ModelViewer's badge/badgeTitle pair). Anything outside the
+// certified set reads "not certified" — the ABSENCE of a certification
+// is stated honestly, never softened into a specific failure verdict
+// the record does not carry, and never passed through as raw enum.
+const GATE_BADGE_PRESENTATION: Record<string, string> = {
+  PASS: "certified",
+  COMPLETE_PASS: "fully certified",
+};
+
+export function presentGateVerdict(verdict: string): string {
+  const v = String(verdict ?? "").trim();
+  if (!v) return "not certified";
+  return GATE_BADGE_PRESENTATION[v.toUpperCase()] ?? "not certified";
+}
+
 // R461 (independent audit P0-2): the steering directive of an action-
 // opened round, rendered as the user's own words. The stored directive
 // is "[VERB] the user's words" (toscanini/actions.py::directive_text);

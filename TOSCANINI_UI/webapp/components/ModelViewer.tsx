@@ -271,6 +271,11 @@ export default function ModelViewer({
          viewers that happen to display the same GLB are still a
          violation; the count is a machine-checked product invariant. */
       data-model-viewer={label}
+      /* R476 (UI audit, a11y): the viewer is a named interactive group —
+         screen readers announce what this canvas region is instead of
+         an anonymous div. The buttons inside carry their own names. */
+      role="group"
+      aria-label={`${label} — interactive 3D viewer, drag to rotate`}
       style={compact && !hero ? { maxWidth: 480 } : undefined}
     >
       <div
@@ -306,7 +311,10 @@ export default function ModelViewer({
               scale={Math.max(layout.radius * 3.2, 8)}
               blur={2.1}
               far={layout.radius * 2}
-              resolution={1024}
+              /* R476 (UI audit, perf): 1024 was 2x drei's default for a
+                 soft ground shadow — visually indistinguishable at this
+                 blur, half the render cost on the hero canvas. */
+              resolution={512}
               color="#3a332b"
             />
           )}
@@ -328,10 +336,10 @@ export default function ModelViewer({
               exploring
             </span>
           )}
-          <button type="button" onClick={resetView} title="reset view">
+          <button type="button" onClick={resetView} title="reset view" aria-label="reset view">
             reset
           </button>
-          <button type="button" onClick={toggleFullscreen} title="fullscreen">
+          <button type="button" onClick={toggleFullscreen} title="fullscreen" aria-label="fullscreen">
             fullscreen
           </button>
         </div>
@@ -356,10 +364,13 @@ export default function ModelViewer({
         ) : null}
       </div>
       <div className="controls">
-        <button onClick={() => setWire(!wire)} type="button">
+        {/* R476 (UI audit, a11y): these are real toggles — aria-pressed
+           exposes the on/off state to assistive tech. The visible text
+           stays the accessible name (an aria-label would override it). */}
+        <button onClick={() => setWire(!wire)} type="button" aria-pressed={wire}>
           {wire ? "shaded" : "wireframe"}
         </button>
-        <button onClick={() => setClip(!clip)} type="button">
+        <button onClick={() => setClip(!clip)} type="button" aria-pressed={clip}>
           {clip ? "solid view" : "clip view"}
         </button>
         {clip && (

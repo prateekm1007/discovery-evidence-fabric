@@ -14,7 +14,7 @@
 // The ONE-viewer invariant (R432/R433/R435): the 3D viewer mounts ONLY
 // inside the model surface, so exactly one [data-model-viewer] exists.
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import type {
   DossierBody,
@@ -24,7 +24,7 @@ import type {
   SessionDetail,
 } from "@/lib/present-types";
 import type { DesignTabShape, SurfaceId } from "@/lib/present";
-import { renderAvailabilitySentence } from "@/lib/present";
+import { presentGateVerdict, renderAvailabilitySentence } from "@/lib/present";
 import RunNarrative from "./RunNarrative";
 import { EngineeringArgument, NoveltyAndCemetery } from "./EngineeringArgument";
 import InventionEssay from "./InventionEssay";
@@ -210,12 +210,17 @@ function ModelSurface({
           visual gate{" "}
           <span
             className="gate-badge"
+            /* R476 (UI audit): product language on the surface — the raw
+               machine verdict (PASS / COMPLETE_PASS / …) rides the title
+               deep layer, never the badge text (BS-009, same discipline
+               as MATURITY_PRESENTATION and the model kind badge). */
+            title={`visual quality gate verdict: ${gateVerdict}`}
             style={{
               borderColor: gateOk ? "#3d7a4d" : "#a05a3d",
               color: gateOk ? "#3d7a4d" : "#a05a3d",
             }}
           >
-            {gateOk ? "✓" : "✕"} {gateVerdict}
+            {gateOk ? "✓" : "✕"} {presentGateVerdict(gateVerdict)}
           </span>
           — the presentation is exactly what the visual quality gate certified, no more
         </div>
@@ -329,6 +334,18 @@ export default function Workspace({
     return () => window.removeEventListener("keydown", onKey);
   }, [surface, onClose]);
 
+  // R476 (UI audit, a11y): the workspace is a NAMED non-modal panel —
+  // keyboard users land inside it when it opens (and when the surface
+  // switches), instead of focus staying behind in the conversation.
+  // Deliberately NOT a focus-trap: the panel coexists with the
+  // conversation (non-modal), so trapping would break the contract;
+  // initial focus + Escape-close is the correct pattern here.
+  const panelRef = useRef<HTMLElement | null>(null);
+  useEffect(() => {
+    if (!surface) return;
+    panelRef.current?.focus();
+  }, [surface]);
+
   if (!surface) return null;
   const tabs = dossier?.tabs;
 
@@ -348,7 +365,14 @@ export default function Workspace({
        package: "Package", journal: "Journal" }[s] ?? SURFACE_TITLES[s]);
 
   return (
-    <aside className="wk" data-workspace data-wk-surface={surface}>
+    <aside
+      ref={panelRef}
+      className="wk"
+      data-workspace
+      data-wk-surface={surface}
+      aria-label={SURFACE_TITLES[surface] ?? surface}
+      tabIndex={-1}
+    >
       <div className="wk-head">
         {/* R464 (audit P1-4): a real heading — screen readers navigate
             the workspace surfaces by h2, not by a styled span. The
