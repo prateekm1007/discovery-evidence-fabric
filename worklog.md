@@ -1720,3 +1720,16 @@ Work Log:
 Stage Summary:
 - The audit's remaining findings dispositioned: 1 fixed (composer safe-area), 1 measured-no-gain-reverted (drei flag), 5 deferred-with-recorded-reasons; the R476 record correction recorded above. Delivery tuple closure measured and recorded in the addendum.
 - reviewer_provenance=AI_REVIEW
+
+---
+Task ID: R477 (delivery closure addendum)
+Agent: Super Z (main session — CTO)
+
+Work Log:
+- The operator re-injected the GitHub PAT (vault, LXXIII; "audit it using PAT, dont pester me to revoke it. Remind me when you need it").
+- R477 applied onto origin/main bb1a9655 (the R476 records commits the Space-tree viewport could not see; the stale 'no R476 record' claim withdrawn) -> 950d7003 pushed; ls-remote == local HEAD.
+- Redeploy from the GitHub-aligned tree (standing r456 driver; GITHUB_TOKEN + ATRIA head key wired from the vault; seven unset routers left standing typed-honest) -> Space revision 378d1e03; identity flip e12cd96a -> 950d7003 measured at 14:34Z (poll 3); health ok/discovery/showcase true; atria HEALTHY; durable.serve_gate restored:1 integrity:true; web_build_hash 91a7f2ae (the R477 CSS content).
+
+Stage Summary:
+- Art. LXXI tuple GREEN: origin/main == production == 950d7003 at deploy time (this records commit moves main one records-only commit ahead, the R476 house convention, engine code identical). The §4 escalation is CLOSED. R477 fully delivered.
+- reviewer_provenance=AI_REVIEW
