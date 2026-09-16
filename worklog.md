@@ -1658,3 +1658,16 @@ Work Log:
 Stage Summary:
 - The card fires on its exact target class again, quoting the real killed architectures and never contradicting the recorded evidence verdicts; the prohibition hole is closed at detection, typing, observation, and presentation (enforcement declared next-step); CI red is measured to the job-timestamp layer and stays the operator's account-side action. The fourth instance of non-executing evidence is answered with fixtures that are verbatim production bytes.
 - reviewer_provenance=AI_REVIEW
+
+---
+Task ID: R475 (delivery tuple addendum)
+Agent: Super Z (main session — CTO)
+
+Work Log:
+- Deploy: r456_space_deploy.py (vault env; the first attempt failed on a sandbox disk-full — 7.9 GB pytest temp debris purged, retried clean, exit=0). Identity flip verified by polling: production /api/version engine_commit 11f3639e (the R475 code commit) — the Art. LXXI tuple GREEN: production == origin/main == local.
+- Live health on the new identity: ok=true discovery_ready=true showcase_ready=true; atria HEALTHY; durable.serve_gate = restored:true attempts:1 integrity_verified:true — the R473 restore-before-serve gate executed on the fresh container and opened, the R475 code riding the verified-restore engine.
+- CI note: this push's Actions runs failed in 2 seconds again (the account-side billing state, unchanged — the round record carries the job-level evidence).
+
+Stage Summary:
+- Delivery tuple: push 11f3639e + Space deploy verified + identity flip measured + health green. R475 closed.
+- reviewer_provenance=AI_REVIEW
