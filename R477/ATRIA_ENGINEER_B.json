@@ -1,0 +1,10 @@
+{
+ "task": "TASK_B",
+ "model": "Atria-Dawn-Preview",
+ "served_by_key": "ATRIA_API_KEY",
+ "attempts": 1,
+ "completion_tokens": 773,
+ "finish_reason": "stop",
+ "rotations": [],
+ "draft": "```js\n// TOSCANINI_UI/webapp/next.config.mjs\n/**\n * TOSCANINI discovery engine \u2014 Next.js configuration.\n *\n * Static-export mode is selected by NEXT_OUTPUT=export; otherwise the dev\n * server proxies API traffic to the engine via rewrites().\n */\n\nconst ENGINE_API = process.env.ENGINE_API || \"http://localhost:8000\";\nconst EXPORT = process.env.NEXT_OUTPUT === \"export\";\n\n/** @type {import('next').NextConfig} */\nconst nextConfig = {\n  output: EXPORT ? \"export\" : undefined,\n\n  /* R477 (audit bundle weight): three.js helpers in drei are barrel-exported;\n     tree-shake the imports so only the pieces ModelViewer uses ship. */\n  experimental: {\n    optimizePackageImports: [\"@react-three/drei\"],\n  },\n\n  async rewrites() {\n    return [\n      {\n        source: \"/api/:path*\",\n        destination: `${ENGINE_API}/api/:path*`,\n      },\n    ];\n  },\n};\n\nexport default nextConfig;\n```"
+}

@@ -2501,13 +2501,19 @@ details.tech li { font-size: 13.5px; color: var(--ink-soft); margin-bottom: 6px;
     background: var(--line);
     margin: 8px auto 0;
   }
-  .conv { padding-bottom: 20px; }
+  /* R477 (audit mobile): clearance for the sticky composer over the
+     last conversation row + the iOS home indicator */
+  .conv { padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px)); }
 }
 
 @media (max-width: 880px) {
   .conv-user-bubble { max-width: 94%; }
   .conv-card, .conv-cand, .conv-outcome { max-width: 100%; }
-  .conv-composer { bottom: 8px; }
+  /* R477 (audit mobile): lift the pill off the home indicator */
+  .conv-composer { bottom: calc(8px + env(safe-area-inset-bottom, 0px)); }
+  /* R477 (audit mobile): the note row sits below the pill — the same
+     inset keeps the stack clear of the home indicator */
+  .conv-composer-note { padding: 0 6px calc(2px + env(safe-area-inset-bottom, 0px)); }
   .stage-actions { flex-direction: column; }
 }
 

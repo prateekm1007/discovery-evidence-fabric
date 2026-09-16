@@ -1688,3 +1688,35 @@ Work Log:
 Stage Summary:
 - R476 records committed: the true number is 214 sessions (97 COMPLETE) on the durable branch, measured live from the append-only authority; the deploy verified and the Art. LXXI tuple GREEN at efe91481; the audit's hiding/a11y/error-UX/CSS/perf defects closed in code with executing batteries. Records delta only beyond the already-pushed code commit.
 - reviewer_provenance=AI_REVIEW
+
+---
+Task ID: R476 (record correction, written at R477 on the GitHub-aligned tree)
+Agent: Super Z (main session — CTO)
+Task: Art. XV/XXXI correction — withdraw a stale-viewport claim made in the R477 session's Space-tree worklog.
+
+Work Log:
+- The R477 session (working from the Space-tree clone, which prunes round dirs at deploy and was pushed at 13:27Z) recorded that R476's session "ended BEFORE any worklog entry or round record was written." That claim was a STALE_VIEWPORT error (Art. XXII): origin/main bb1a9655 (13:55Z, after the Space push) carries the complete R476 records — R476/R476_ROUND_RECORD.json with the true durable-branch numbers (214 sessions / 97 COMPLETE), the Art. LXXI tuple GREEN at efe91481, and the honest-scope disclosure (no live 390px pass; no fresh E2E run).
+- The claim is WITHDRAWN. The facts that survive unchanged on both trees: the five R476 audit fixes (presentGateVerdict, named non-modal aside, aria-pressed/role=group, derived-line aria-live, json() typed-detail) and their 16-test battery.
+
+Stage Summary:
+- No history rewritten; the correction is recorded here and in the R477 round record's r476_closure field. Lesson re-confirmed: the Space tree is a pruned projection, never the records authority (Art. X).
+
+---
+Task ID: R477 (GitHub-aligned application)
+Agent: Super Z (main session — CTO; Atria-Dawn-Preview = delegated engineer)
+Task: The operator's 9-file UI audit — finish the remaining findings ("Finish the tasks here using atria. You will become the CTO and atria will code/engineer"). This entry is the GitHub-tree application of the round first executed on the Space lineage (e12cd96/2019d75); the operator's PAT delivery unblocked the origin/main leg.
+
+Work Log:
+- STATE: the sandbox's stale R445 checkout re-aligned onto the deployed production tree (Space 13e7ba74 == engine_commit efe91481); constitution v2.5.0 read IN FULL before coding; vault re-mirrored per LXXIII (HF_TOKEN + 15 atria keys; GITHUB_TOKEN arrived mid-round — see the delivery-closure addendum).
+- THE ENGINEER SESSION (r472 pattern): Atria-Dawn-Preview drafted both fixes (803+773 tokens, head key, zero rotations); CTO review found hallucinated scaffold in both drafts (invented :root/.sheet skeleton; dropped trailingSlash + changed ENGINE_API default) and integrated ONLY the spec-conformant hunks — drafts preserved verbatim in R477/ATRIA_ENGINEER_{A,B}.json (Art. III/XVIII; the battery was CTO-authored, not engineer-authored).
+- FIX (audit mobile -3, composer overlap risk): globals.css — the mobile composer lifts off the iOS home indicator (bottom: calc(8px + env(safe-area-inset-bottom, 0px))), the note row carries the same inset, the 1180px conversation clearance is safe-area aware (calc(24px + env(...))); every env() carries the 0px fallback; the bottom-sheet mechanics byte-untouched.
+- MEASURED NO-GAIN, REVERTED (audit perf -4): the drei optimizePackageImports attempt — baseline 2115.2 KB chunks vs 2115.4 KB with the flag (top chunks byte-identical; Next 15.4.5 already handles the barrel) — reverted per Art. XVI/LXIV. The honest perf record: three core is the floor, async-chunked behind next/dynamic at both mounts, First Load JS 100 kB.
+- DEFERRED-WITH-REASON: cache no-store BY DESIGN (run state never stale); no virtualization (no measured jank); regex router keeps honest ASK fallback (R471 P0-3 acknowledges router v2); hero stays at R459 clamp; panel stays NON-MODAL per the tested R476 decision.
+- ATRIA RING: live-probed slots 1/8/15 — all HTTP 200 (slot 8's R470 401-exclusion is STALE; the ring registration remains the selection authority; zero engine change this round). Production: atria HEALTHY as the default provider.
+- BATTERY: adversarial_r477.test.mjs 12/12 + webapp regression present 16 / events 12 / r458 21 / copy 1 / math 12 / r461 10 / r464 23 / r476 16 = 123 passed, 0 failed; export build green (run twice for the measurement).
+- FIRST DEPLOY (Space lineage, pre-PAT): the r477 delta driver (r456 flow by import; standing GITHUB_TOKEN secret NOT re-wired) — upload 4a0970d; identity flip measured efe91481 -> e12cd96a; web_build_hash rotated 3001ace1 -> 91a7f2ae (101 files); health green; durable.serve_gate restored:1 integrity:true.
+- DELIVERY CLOSURE (the Art. LXXI §4 escalation resolved): the operator re-injected the GitHub PAT (vault, LXXIII). This branch applies the round onto origin/main bb1a9655; push + redeploy from the GitHub-aligned tree follow immediately — see R477/DELIVERY_CLOSURE.json for the measured tuple.
+
+Stage Summary:
+- The audit's remaining findings dispositioned: 1 fixed (composer safe-area), 1 measured-no-gain-reverted (drei flag), 5 deferred-with-recorded-reasons; the R476 record correction recorded above. Delivery tuple closure measured and recorded in the addendum.
+- reviewer_provenance=AI_REVIEW
