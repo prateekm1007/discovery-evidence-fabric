@@ -1048,3 +1048,15 @@ pristine stash differential (17 pre-existing environmental; the 4 legitimate pin
 DISCLOSED in the test bodies and strengthened); r477/r471/r475/r467-9 191 passed;
 MODULE_INVENTORY regenerated (124 files / 63,874 LOC, drift GREEN). Art. LXXI tuple: filled
 at delivery. Round record: `R478/R478_ROUND_RECORD.json`.
+
+## R479 ADDENDUM — the tuple closure (2026-09-16)
+
+Operator credentials arrived; the R478 `what_unblocks` executed the same day. Measured:
+
+| LEG | OUTCOME | THE MEASURED FACT |
+|---|---|---|
+| DEPLOY | GREEN (attempt 2) | identity flip `6f1e87c4 -> fbc73b8` on live /api/version; health ok:true; web hash unchanged (engine+infra round). Attempt 1 CONFIG_ERROR = the README-frontmatter lineage lesson (r477's skip was tree-conditional) — fixed with the idempotent r456 prepend, evidence kept |
+| GITHUB ROTATION | CLOSED | the R451 rotation escalation closed by WIRING the operator-fresh PAT (Space GITHUB_TOKEN re-wired; the r477 no-valid-PAT rationale void); durable branch runtime-state-hf alive at d53da8a |
+| P0-5 TRANSPORT | TRANSPORT_DEGRADED | HTTP_402 measured NOW with the fresh token: "depleted your monthly included credits" — the wall is ACCOUNT BILLING, not the token; the chain's other legs measure HEALTHY (xkiro 6 / bai 2 / atria 1), so the audit's "no strong-model chain live" narrows to the HF-router leg only |
+
+Records: `R479/` (deploy + identity-verify + probe + attempt-1 evidence + round record). One operator action remains: HF billing top-up, then `python3 scripts/r479_hf_router_probe.py` flips the ledger line GREEN.

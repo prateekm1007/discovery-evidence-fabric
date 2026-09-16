@@ -1767,3 +1767,19 @@ Work Log:
 Stage Summary:
 - The audit's structural claims survived verification and three of its P0s are now code+tests; the honest ledger (which claims were fixed, which are accepted with sequencing and why) is R478/PHASE0_TRUTH_RECONCILIATION.json. Transport (P0-5) and the live proofs (P0-1 IMPROVE stage, the R458 re-run) are one operator action away from being measurable.
 - reviewer_provenance=AI_REVIEW.
+---
+Task ID: R479
+Agent: Super Z (main session — CTO line)
+Task: R479 — the R478 delivery-tuple closure: operator credentials arrived (GitHub PAT + HF token); execute the three named commands (deploy + identity-verify + the P0-5 transport probe) and push with the PAT.
+
+Work Log:
+- Round start: origin/main verified 185c103 == local via the FRESH PAT (read scope); the R478 tuple re-read (escalation 1, opened 2026-09-16). Vault restored at the workspace root (.secrets.env, 0600).
+- Code commit 5e23afc (amended to fbc73b8): r479_space_deploy.py — the r477 delta driver with GITHUB_TOKEN re-wiring deliberately INVERTED (the r477 "no valid PAT in session" rationale is void; the R451 rotation escalation closes by wiring the operator-fresh PAT); r479_hf_router_probe.py — the P0-5 PRODUCTION-leg probe (router.huggingface.co, ZAI_MODEL zai-org/GLM-5.3 — the audit's actual 402 class), same typed contract as the committed r478 atria-ring probe.
+- Deploy attempt 1 (baked 5e23afc, Space rev 5491e3d3): CONFIG_ERROR — "Missing configuration in README". Root cause MEASURED: this checkout's lineage carries README.md WITHOUT the HF frontmatter; the r477 driver's skip was conditioned on its Space-cloned tree. Fix: the r456 README-frontmatter prepend restored with an idempotence guard (commit fbc73b8); attempt-1 evidence preserved at R479/ATTEMPT1_CONFIG_ERROR_RECORD.json.
+- Deploy attempt 2 (baked fbc73b8, Space rev 756c854c): RUNNING. IDENTITY FLIP MEASURED on live /api/version: 6f1e87c4 -> fbc73b8; web_build_hash UNCHANGED (c0c934b4 — correct: R478/R479 are engine+infra rounds); constitution 2.5.0; /api/health ok:true, showcase_ready:true, discovery_ready:true. Providers measured: xkiro HEALTHY (6), bai HEALTHY (2), atria HEALTHY (1) — the strong-model chain is NOT dead; the HF-router leg is.
+- P0-5 probe measured NOW: HTTP_402 — "You have depleted your monthly included credits. Purchase pre-paid credits to continue using Inference Providers." -> TRANSPORT_DEGRADED typed. Diagnosis: the token is VALID (this round's deploy used it) — the wall is ACCOUNT BILLING. what_unblocks: purchase pre-paid credits (or repoint ZAI), then re-run scripts/r479_hf_router_probe.py.
+- Secrets wired: GITHUB_TOKEN (rotated), ZAI_API_KEY (= HF token, the r456 contract), PORTFOLIO_COMMIT (standing default); the 8 router keys left standing. Durable branch runtime-state-hf alive at d53da8a; runtime pushes resume on the rotated PAT.
+
+Stage Summary:
+- The R478 DELIVERY_BLOCKED_CREDENTIALS tuple is CLOSED; production serves the R478 P0 tranche (fbc73b8) with identity verified. P0-5 remains TRANSPORT_DEGRADED on billing (one operator action); P0-1 IMPROVE-stage live proof + the R458 re-run sequence behind it (unchanged from R478). Records: R479/ (deploy, identity-verify, probe, attempt-1 evidence, round record).
+- reviewer_provenance=AI_REVIEW.
