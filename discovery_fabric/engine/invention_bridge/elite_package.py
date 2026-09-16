@@ -31,6 +31,7 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import re
 import time
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
@@ -768,6 +769,10 @@ def build_equation_registry(proj: Dict, package_id: str) -> Dict:
 
 _RECORD_ID_RE = None  # compiled lazily to keep import time minimal
 
+# R478 P0-3: the numeric-band detector for the pre-registered decision
+# rule (a rule without a number no longer grants EXPERIMENT_READY).
+_NUMBER_RE = re.compile(r"\d+(?:\.\d+)?")
+
 
 def _source_record_ids(u: Dict) -> List[str]:
     """Record ids cited by the unknown's own statement/reason/binding —
@@ -1385,10 +1390,19 @@ def experiment_contract_assessment(proj: Dict,
     arms = [h for h in hyps
             if isinstance(h.get("prior_probability"), (int, float))]
     rule = None
+    rule_numeric = False
     for v in (proj.get("verification") or []):
         if _informative(v.get("acceptance")):
+            _acc = str(v.get("acceptance"))
             rule = {"source": f"verification_matrix {v.get('id')}",
-                    "acceptance": str(v.get("acceptance"))[:200]}
+                    "acceptance": _acc[:200]}
+            # R478 P0-3 (external audit): a decision rule without a
+            # number is a preference, not a pre-registered threshold
+            # (Art. LII: ACCEPTANCE/FALSIFICATION THRESHOLD; Art. XXVII:
+            # nothing quantified by inference). The rule still records
+            # prose-only rules honestly — they just no longer grant
+            # EXPERIMENT_READY.
+            rule_numeric = bool(_NUMBER_RE.search(_acc))
             break
     if rule is None:
         # an explicit acceptance/decision field on the killer-experiment
@@ -1397,8 +1411,10 @@ def experiment_contract_assessment(proj: Dict,
         ke_rule = ke.get("acceptance") or ke.get("decision_rule") or \
             ke.get("acceptance_rule")
         if _informative(ke_rule):
+            _acc = str(ke_rule)
             rule = {"source": "killer_experiment.acceptance",
-                    "acceptance": str(ke_rule)[:200]}
+                    "acceptance": _acc[:200]}
+            rule_numeric = bool(_NUMBER_RE.search(_acc))
     measurable = None
     for v in (proj.get("verification") or []):
         if _informative(v.get("method")) or _informative(
@@ -1418,6 +1434,7 @@ def experiment_contract_assessment(proj: Dict,
     requirements = {
         "at_least_two_hypothesis_arms_with_priors": len(arms) >= 2,
         "pre_registered_decision_rule": rule is not None,
+        "decision_rule_numeric": rule_numeric,
         "measurable_outcome_path": measurable is not None,
         "target_resolves_in_record": bool(resolved_targets),
         "experiment_selected_by_loop": bool(
@@ -1434,9 +1451,10 @@ def experiment_contract_assessment(proj: Dict,
         "measurable_outcome": measurable,
         "targets_resolved": resolved_targets,
         "basis": ("EXPERIMENT_READY requires the full discriminating "
-                  "contract (R425 §3); each failed requirement is "
-                  "named above — the hypotheses array alone never "
-                  "grants the tier"),
+                  "contract (R425 §3; R478 P0-3 adds the numeric-band "
+                  "requirement on the decision rule); each failed "
+                  "requirement is named above — the hypotheses array "
+                  "alone never grants the tier"),
     }
 
 

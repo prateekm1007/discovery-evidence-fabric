@@ -35,9 +35,10 @@ engine's standing formula, it does not invent a second one).
 """
 from __future__ import annotations
 
+from datetime import datetime
 from typing import Any, Dict, List, Optional
 
-NBA_CONTROLLER_VERSION = "conversational/nba_controller/1.0.0"
+NBA_CONTROLLER_VERSION = "conversational/nba_controller/1.1.0"
 
 # Action vocabulary (closed). Each action maps to a concrete execution
 # path in the engine/pipeline — an action that cannot determine an
@@ -72,14 +73,20 @@ def controller_action(action: str, target_uncertainty: str,
                       decision_impact: float, estimated_cost: float,
                       estimated_latency_s: float,
                       required_capability: str, risk: str, reason: str,
-                      redundancy_penalty: float = 0.0
+                      redundancy_penalty: float = 0.0,
+                      input_basis: Optional[Dict[str, Any]] = None
                       ) -> Dict[str, Any]:
-    """One scored action — the directive §8 field list, exactly."""
+    """One scored action — the directive §8 field list, exactly.
+
+    R478 P0-4: when input_basis is provided it travels with the action
+    (formula + inputs + provenance class), so no scored number is a
+    bare literal anymore (Art. XXVII: the derivation travels with the
+    value it produced)."""
     cost = max(estimated_cost, 0.01)
     score = (expected_information_gain *
              probability_of_decision_change *
              decision_impact) / cost - redundancy_penalty
-    return {
+    out = {
         "action": action,
         "target_uncertainty": target_uncertainty,
         "expected_information_gain": round(
@@ -95,6 +102,38 @@ def controller_action(action: str, target_uncertainty: str,
         "redundancy_penalty": round(redundancy_penalty, 3),
         "score": round(score, 4),
     }
+    if input_basis:
+        out["input_basis"] = input_basis
+    return out
+
+
+# ---------------------------------------------------------------------------
+# R478 P0-4 — state-derived inputs + measured-latency lookup
+# ---------------------------------------------------------------------------
+
+def _measured_stage_seconds(env_state: Dict[str, Any],
+                            stage: str) -> Optional[float]:
+    """The run's OWN measured wall time for a stage that already ran,
+    from the envelope's stage_log (started_at/finished_at). Returns
+    None when the stage has not run — the caller then falls back to a
+    DECLARED prior, labeled as such (Art. VI/XXV: measured and
+    declared are never conflated)."""
+    for entry in reversed(env_state.get("stage_log") or []):
+        if not isinstance(entry, dict) or entry.get("stage") != stage:
+            continue
+        if entry.get("status") != "OK":
+            continue
+        try:
+            t0 = datetime.fromisoformat(
+                str(entry.get("started_at")).replace("Z", "+00:00"))
+            t1 = datetime.fromisoformat(
+                str(entry.get("finished_at")).replace("Z", "+00:00"))
+            seconds = (t1 - t0).total_seconds()
+            if seconds >= 0:
+                return seconds
+        except (ValueError, TypeError):
+            continue
+    return None
 
 
 # ---------------------------------------------------------------------------
@@ -109,13 +148,26 @@ def controller_action(action: str, target_uncertainty: str,
 #   for the controller's COST axis only — they rank actions, they
 #   never become scientific claims, and each carries this provenance
 #   note in the emitted record.
+# R478 P0-4 (external audit): the EIG half is NO LONGER constant —
+# the audit measured the R458 trace as 48× identical
+# (EIG 0.85 / cost 2.0 / score 0.2826) because every action's inputs
+# were literals. EIGs are now computed from the recorded envelope
+# state (formula + inputs travel in each action's input_basis), and
+# estimated_latency_s prefers the run's OWN measured stage duration
+# from stage_log when the comparable stage already ran
+# (MEASURED_IN_RUN), falling back to the declared planning constant
+# (DECLARED_PRIOR) — measured and declared are never conflated.
 _COST_PROVENANCE = (
     "MODEL_DERIVED — order-of-magnitude planning constants derived "
     "from the engine's call-site structure (adapters.py static LLM "
     "call-sites per stage) and the recorded routing ledger "
     "latency_ms distribution (ENGINE_RUNS/model_routing/ledger.jsonl); "
     "used ONLY to rank controller actions by cost, never quoted as "
-    "a measured result"
+    "a measured result. R478 P0-4: latency additionally prefers the "
+    "run's own measured stage durations (cost_basis MEASURED_IN_RUN) "
+    "when stage_log carries them; EIG is state-derived (eig_basis "
+    "records the formula and inputs) — the R458 constant-trace class "
+    "is dead by construction"
 )
 
 _LLM_CALLS_PER_STAGE = {
@@ -169,6 +221,21 @@ def decide(env_state: Dict[str, Any],
 
     actions: List[Dict[str, Any]] = []
 
+    # R478 P0-4: state-derived inputs (formula + inputs recorded per
+    # action in input_basis). The contradiction pressure reads the
+    # claim-level classification's CONTRADICTORY count (available at
+    # VERIFY — before the attack is proposed) and the queue's own
+    # unresolved count (when the CONTRADICTION stage has already run);
+    # the larger of the two is the honest "how much is unresolved"
+    # measure at THIS decision point.
+    _contra = (env_state.get("contradictions") or {})
+    _n_contra = max(
+        int((ec.get("counts") or {}).get("CONTRADICTORY") or 0),
+        int(_contra.get("unresolved_count", 0) or 0))
+    _n_direct = int((ec.get("counts") or {}).get("DIRECT_SUPPORT") or 0)
+    _synth_s = _measured_stage_seconds(env_state, "SYNTHESIZE")
+    _retrieve_s = _measured_stage_seconds(env_state, "RETRIEVE")
+
     # --- clarification (§4): only when the PU says it is material ------
     if clarification_needed:
         actions.append(controller_action(
@@ -183,57 +250,123 @@ def decide(env_state: Dict[str, Any],
             risk="user latency; run deferred",
             reason="the Problem Understanding contract flags a field "
                    "whose answer materially changes the search space "
-                   "(clarification.evaluate_clarification_need)"))
+                   "(clarification.evaluate_clarification_need)",
+            input_basis={
+                "eig": "DECLARED_PRIOR (0.9; material-binding "
+                       "round-trip has no recorded base rate — Art. XXV)",
+                "cost": "DECLARED_PRIOR (0.05; one user round-trip)",
+            }))
 
     # --- evidence sufficiency (§14) -------------------------------------
     if n_evidence and len(verified) < 3 and n_evidence < ADEQUATE_EVIDENCE_BASE:
+        _deficit = 1.0 - min(1.0, len(verified) / 3.0)
+        _eig_retrieve = round(0.4 + 0.5 * _deficit, 3)
         actions.append(controller_action(
             A_RETRIEVE_MORE,
             target_uncertainty="problem existence and mechanism support",
-            expected_information_gain=0.7,
+            expected_information_gain=_eig_retrieve,
             probability_of_decision_change=0.6,
             decision_impact=0.9,
             estimated_cost=1.0,
-            estimated_latency_s=45.0,
+            estimated_latency_s=(_retrieve_s if _retrieve_s is not None
+                                 else 45.0),
             required_capability="source_connectors",
             risk="provider failure recorded honestly (Art. XXI.3)",
             reason=f"only {len(verified)} verified evidence items "
                    f"recorded (<3) and the frozen base is small "
                    f"({n_evidence} < {ADEQUATE_EVIDENCE_BASE}) — more "
                    f"retrieval materially reduces uncertainty (§14 "
-                   f"stopping condition not met)"))
+                   f"stopping condition not met)",
+            input_basis={
+                "eig": {"formula": "0.4 + 0.5 x (1 - min(1, "
+                                       "n_verified / 3)) — the verified-"
+                                       "item deficit scales the gain",
+                        "inputs": {"n_verified": len(verified)},
+                        "provenance": "MODEL_DERIVED (declared linear "
+                                      "map, Art. XXVII)"},
+                "cost": "DECLARED_PRIOR (1.0; connector fan-out "
+                        "planning constant)",
+                "latency": ("MEASURED_IN_RUN (stage_log RETRIEVE)"
+                            if _retrieve_s is not None
+                            else "DECLARED_PRIOR (45 s; no RETRIEVE "
+                                 "duration in this run's stage_log)")},
+            ))
     elif len(verified) >= 3 and not has_mechanism:
+        _eig_compete = round(0.5 + 0.06 * min(len(verified), 5), 3)
         actions.append(controller_action(
             A_COMPETING_MECHANISM,
             target_uncertainty="causal mechanism for the stated failure",
-            expected_information_gain=0.8,
+            expected_information_gain=_eig_compete,
             probability_of_decision_change=0.7,
             decision_impact=0.8,
             estimated_cost=2.0,
-            estimated_latency_s=90.0,
+            estimated_latency_s=(_synth_s if _synth_s is not None
+                                 else 90.0),
             required_capability="synthesis (STRONG)",
             risk="generator untrusted (Art. XVIII); verification "
                  "downstream",
             reason=f"evidence sufficient ({len(verified)} verified "
                    f"items) and no mechanism yet — synthesize and keep "
-                   f"H1/H2/H3 competing (§15)"))
+                   f"H1/H2/H3 competing (§15)",
+            input_basis={
+                "eig": {"formula": "0.5 + 0.06 x min(n_verified, 5) "
+                                       "— synthesis gain scales with the "
+                                       "verified base it can draw on",
+                        "inputs": {"n_verified": len(verified)},
+                        "provenance": "MODEL_DERIVED (declared linear "
+                                      "map, Art. XXVII)"},
+                "cost": "DECLARED_PRIOR (2.0; STRONG-class synthesis "
+                        "planning constant)",
+                "latency": ("MEASURED_IN_RUN (stage_log SYNTHESIZE)"
+                            if _synth_s is not None
+                            else "DECLARED_PRIOR (90 s; no SYNTHESIZE "
+                                 "duration in this run's stage_log)")},
+            ))
 
     # --- attack (§16/§17) ------------------------------------------------
     if has_mechanism and not attack_ran:
+        # R478 P0-4: THE constant the audit measured (0.85) is now a
+        # function of the recorded state — more verified support and
+        # more unresolved contradictions make the attack more
+        # informative; the value varies across runs BY CONSTRUCTION.
+        _eig_attack = round(min(0.95, 0.5 + 0.05 * min(_n_direct, 6)
+                                + 0.05 * min(_n_contra, 4)), 3)
         actions.append(controller_action(
             A_ATTACK_CANDIDATE,
             target_uncertainty="mechanism validity under adversarial "
                                "challenge",
-            expected_information_gain=0.85,
+            expected_information_gain=_eig_attack,
             probability_of_decision_change=0.7,
             decision_impact=0.95,
             estimated_cost=2.0,
-            estimated_latency_s=120.0,
+            estimated_latency_s=(_synth_s if _synth_s is not None
+                                 else 120.0),
             required_capability="adversarial (independent)",
             risk="attacker calibration state applies (BS-011)",
             reason="a candidate remains a hypothesis until attacked "
                    "(§16); the gauntlet is the highest-impact "
-                   "uncertainty reducer available now"))
+                   "uncertainty reducer available now",
+            input_basis={
+                "eig": {"formula": "min(0.95, 0.5 + 0.05 x "
+                                       "min(n_direct_support, 6) + "
+                                       "0.05 x min(n_contradictory, "
+                                       "4)) — the gauntlet is more "
+                                       "informative when more is at "
+                                       "stake (support) and more is "
+                                       "unresolved (contradictions)",
+                        "inputs": {"n_direct_support": _n_direct,
+                                   "n_contradictory": _n_contra},
+                        "provenance": "MODEL_DERIVED (declared linear "
+                                      "map, Art. XXVII)"},
+                "cost": "DECLARED_PRIOR (2.0; independent-attacker "
+                        "planning constant)",
+                "latency": ("MEASURED_IN_RUN (stage_log SYNTHESIZE, "
+                            "the same STRONG-class LLM workload)"
+                            if _synth_s is not None
+                            else "DECLARED_PRIOR (120 s)"),
+                "replaces": "the 0.85 literal measured as the R458 "
+                            "constant EIG trace (R478 P0-4)"},
+            ))
 
     # --- engineering escalation (§5/§23) ---------------------------------
     if has_mechanism and attack_ran and attack_pass:
@@ -326,6 +459,10 @@ def decide(env_state: Dict[str, Any],
         "decided_from": {
             "n_evidence": n_evidence,
             "n_verified_items": len(verified),
+            "n_direct_support": _n_direct,
+            "n_contradictory": _n_contra,
+            "measured_synth_seconds": _synth_s,
+            "measured_retrieve_seconds": _retrieve_s,
             "mechanism_recorded": has_mechanism,
             "attack_ran": attack_ran,
             "attack_pass": attack_pass,

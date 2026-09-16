@@ -1027,7 +1027,20 @@ class AttackEngineAdapter(BaseAdapter):
 
 
 class ContradictionQueueAdapter(BaseAdapter):
-    """Canonical: orchestrator/contradiction_queue.py (6-field register)."""
+    """Canonical: orchestrator/contradiction_queue.py (6-field register).
+
+    R478 P0-2 (external audit): the queue previously ingested only
+    attack-KILL, verify-issue and collision-adjacent contradictions —
+    a user-evidence source classified CONTRADICTORY by the claim-level
+    classifier changed VISIBILITY only (the audit's measured inertness:
+    'B changes visibility only'). It now enters the queue as a typed
+    contradiction with a DERIVED (formula-recorded, Art. XXVII)
+    severity, and the queue payload carries the recorded belief update
+    (support ratio + confidence delta) the rest of the chain consumes:
+    the existing ADJUDICATION check no_blocking_contradictions then
+    blocks promotion while the contradiction is unresolved — no new
+    state machine, the queue's own is_blocking semantics are reused.
+    """
     capability_id = "CONTRADICTION_QUEUE"
     module_path = "orchestrator/contradiction_queue.py"
     canonical_fn = "ContradictionQueue.add / to_dict"
@@ -1070,7 +1083,65 @@ class ContradictionQueueAdapter(BaseAdapter):
                 evidence_quality="WEAK", decision_impact=0.4,
                 currently_unresolved=True))
             n += 1
+        # R478 P0-2: user-evidence contradictions enter the queue.
+        # Severity derivation (declared, revisable — Art. XXVII): a
+        # CONTRADICTORY source co-existing with DIRECT_SUPPORT threatens
+        # a promotable state -> HIGH (the audit's blocking requirement);
+        # with zero direct support the mechanism is already unsupported
+        # -> MEDIUM, visible without changing the outcome. probability
+        # 0.6 / quality MODERATE: the classifier is a transparent
+        # lexical proxy, not a claim chart (its own words) — MODERATE
+        # keeps is_blocking honest without overclaiming STRONG.
+        ec = env.evidence_classification or {}
+        ec_counts = ec.get("counts") or {}
+        support = ec.get("mechanism_support") or {}
+        n_direct = int(support.get("n_direct_support") or
+                       ec_counts.get("DIRECT_SUPPORT") or 0)
+        contra_items = [it for it in (ec.get("items") or [])
+                        if isinstance(it, dict)
+                        and it.get("classification") == "CONTRADICTORY"]
+        n_contra = int(support.get("n_contradictory") or len(contra_items))
+        for it in contra_items:
+            basis = ((it.get("classification_basis") or {})
+                     .get("contradiction_basis")) or ""
+            q.add(Contradiction(
+                contradiction_id=(f"con:evidence:"
+                                  f"{it.get('source_id') or sha256_obj(it)[:8]}"),
+                description=("user evidence contradicts the mechanism: "
+                             + str(it.get("buyer_statement") or "")[:120]
+                             + (f" [{basis[:160]}]" if basis else "")),
+                claim_or_limitation_affected="mechanism",
+                severity="HIGH" if n_direct > 0 else "MEDIUM",
+                probability=0.6,
+                evidence_quality="MODERATE", decision_impact=0.8,
+                currently_unresolved=True))
+            n += 1
         d = q.to_dict()
+        # R478 P0-2: the recorded belief movement (Art. LI: learning/
+        # contradiction must change future behavior — here it changes
+        # the recorded confidence AND the promotion gate).
+        denom = n_contra + n_direct
+        belief = {
+            "n_direct_support": n_direct,
+            "n_contradictory": n_contra,
+            "support_ratio": (round(n_direct / denom, 3)
+                              if denom else None),
+            "confidence_delta": (round(-0.4 * (n_contra / denom), 3)
+                                 if denom else None),
+            "basis": ("confidence_delta = -0.4 x n_contradictory / "
+                      "(n_contradictory + n_direct_support); declared "
+                      "linear penalty (max -0.4 at all-contradicting), "
+                      "MODEL_DERIVED, revisable, never a silent number "
+                      "(Art. XXVII); None typed ABSENT when the "
+                      "classification produced no support items"),
+        }
+        d["belief_update"] = belief
+        d["belief_update_note"] = (
+            "R478 P0-2: contradictory user evidence now enters the "
+            "queue (derived severity) and the recorded confidence "
+            "moves; an unresolved HIGH/MODERATE contradiction keeps "
+            "the ADJUDICATION no_blocking_contradictions check RED — "
+            "promotion stays blocked until it is attacked and resolved")
         return _engine_result({"contradictions": d}, added=n)
 
 
@@ -1114,15 +1185,43 @@ class KillerExperimentAdapter(BaseAdapter):
                 name=name, description=desc, likelihoods=like, provenance=prov)
 
         options = []
+        # R478 P0-4 (external audit): the outcome likelihoods were
+        # literals (0.85/0.15 — the same constants the audit measured
+        # as the constant R458 trace). They are now state-derived:
+        # unresolved-contradiction pressure widens the spread (more
+        # unresolved contradictions -> a less confident reproduction
+        # likelihood), with the formula and inputs recorded here.
+        # Declared, revisable, MODEL_DERIVED — never measured (Art.
+        # XXVII: the label travels with the number).
+        _unresolved_c = int((env.contradictions or {}).get(
+            "unresolved_count", 0) or 0)
+        _ec_counts = (env.evidence_classification or {}).get("counts") or {}
+        _n_direct_c = int(_ec_counts.get("DIRECT_SUPPORT") or 0)
+        _pressure_c = round(_unresolved_c / max(
+            _unresolved_c + _n_direct_c, 1), 3)
+        _p_repro = round(0.85 - 0.20 * _pressure_c, 3)
+        _likelihood_basis = {
+            "formula": ("p_reproduces(H_effect_holds|effect_reproduces) "
+                        "= 0.85 - 0.20 x pressure; pressure = "
+                        "unresolved_contradictions / (unresolved + "
+                        "n_direct_support)"),
+            "inputs": {"unresolved_contradictions": _unresolved_c,
+                       "n_direct_support": _n_direct_c},
+            "pressure": _pressure_c,
+            "provenance": "MODEL_DERIVED (declared linear map; no "
+                          "measured base rate exists — Art. XXV)",
+        }
         if mm.get("falsification_test"):
             options.append({
                 "name": "falsification_test_from_candidate",
                 "outcomes": [
                     _outcome("effect_reproduces", "candidate effect observed in bench rep",
-                             {"H_effect_holds": 0.85, "H_effect_fails": 0.15}),
+                             {"H_effect_holds": _p_repro,
+                              "H_effect_fails": round(1.0 - _p_repro, 3)}),
                     _outcome("effect_fails", "candidate effect not observed",
                              {"H_effect_holds": 0.10, "H_effect_fails": 0.90})],
-                "cost": 1.0, "risk": 1.0, "feasibility": 1.0})
+                "cost": 1.0, "risk": 1.0, "feasibility": 1.0,
+                "likelihood_basis": _likelihood_basis})
         unresolved = (env.contradictions or {}).get("unresolved_count", 0)
         if unresolved:
             options.append({
@@ -1161,6 +1260,7 @@ class KillerExperimentAdapter(BaseAdapter):
                 "rationale": "highest eig_per_cost (cheapest decisive experiment)",
                 "definition": "physical bench/clinical experiment — NOT simulation",
             },
+            "likelihood_basis": _likelihood_basis,
             "epistemic_note": ("all priors MODEL_DERIVED; no EXPERIMENTALLY_ESTIMATED "
                                "inputs exist at this stage (Art. XXVIII/XXXVIII: no "
                                "synthetic shortcut to physical observation)"),
@@ -1270,14 +1370,26 @@ class NextBestActionAdapter(BaseAdapter):
     def execute(self, env, run_ctx):
         from orchestrator.next_best_action import Action, NextBestAction
         actions: List[Action] = []
+        # R478 P0-4: contradiction-action EIG now derives from the
+        # queue's own recorded priority fields (severity weight x
+        # probability x quality weight x decision impact — the
+        # Contradiction.priority_score formula, orchestrator/
+        # evidence_graph.py) instead of the 0.5ximpact+0.2 literal.
+        _PRIORITY_W = {"HIGH": 1.0, "MEDIUM": 0.5, "LOW": 0.2}
+        _QUALITY_W = {"STRONG": 1.0, "MODERATE": 0.7, "WEAK": 0.3,
+                      "NONE": 0.1}
         for c in (env.contradictions or {}).get("contradictions", []):
             if c.get("currently_unresolved"):
+                _prio = (_PRIORITY_W.get(str(c.get("severity", "")).upper(), 0.2)
+                         * float(c.get("probability", 0.5) or 0.5)
+                         * _QUALITY_W.get(str(c.get("evidence_quality", "")).upper(), 0.1)
+                         * float(c.get("decision_impact", 0.5) or 0.5))
                 actions.append(Action(
                     action_id=c["contradiction_id"],
                     description=f"attack contradiction: {c['description'][:120]}",
                     evidence_question_id=c["contradiction_id"],
                     provider="internal_attack",
-                    expected_information_gain=0.5 * c.get("decision_impact", 0.5) + 0.2,
+                    expected_information_gain=round(0.2 + 0.6 * _prio, 3),
                     probability_of_decision_change=c.get("probability", 0.5),
                     decision_impact=c.get("decision_impact", 0.5),
                     cost=1.0))
