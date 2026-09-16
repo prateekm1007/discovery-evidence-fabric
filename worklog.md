@@ -1783,3 +1783,18 @@ Work Log:
 Stage Summary:
 - The R478 DELIVERY_BLOCKED_CREDENTIALS tuple is CLOSED; production serves the R478 P0 tranche (fbc73b8) with identity verified. P0-5 remains TRANSPORT_DEGRADED on billing (one operator action); P0-1 IMPROVE-stage live proof + the R458 re-run sequence behind it (unchanged from R478). Records: R479/ (deploy, identity-verify, probe, attempt-1 evidence, round record).
 - reviewer_provenance=AI_REVIEW.
+---
+Task ID: R480
+Agent: Super Z (main session — CTO line)
+Task: R480 — P0-5 closure via the operator's repoint directive: ZAI -> atria (api.atria-asi.ai) with the re-supplied 15-key ring; probe-before-wire, variables+secrets+restart (no rebuild), post-restart verification, push.
+
+Work Log:
+- Vault restored with the operator's 15 atria keys (0600; fingerprints only in records). Key 8's value matches the recorded R472 fingerprint (atr_DH...1QzF) — the SAME ring re-supplied; slot 8 stays EXCLUDED per its measured INVALID verdict.
+- Probe-before-wire (scripts/r480_p05_atria_probe.py, the R467/R470 method + the committed r478 P0-5 contract verbatim): catalog 200 (0.16s, sole model Atria-Dawn-Preview), bogus-key control 401, tiny completion 200 (0.67s) -> LEDGER_LINE_GREEN, artifact sha256-bound (R480/ATRIA_LEDGER_LINE.json). THE AUDIT'S P0-5 ACCEPTANCE IS MEASURED.
+- Space repoint (scripts/r480_atria_repoint.py): ZAI_BASE_URL -> https://api.atria-asi.ai/v1/chat/completions, ZAI_MODEL -> Atria-Dawn-Preview (the R391 operator override + per-call model override — runtime surface only); ZAI_API_KEY = atria key 1; all 15 ring names re-wired; restart only — identity UNCHANGED fbc73b8 (no rebuild).
+- Post-restart verification (live): engine_commit fbc73b8 unchanged; health ok:true showcase/discovery ready; transport snapshot = api.atria-asi.ai (was router.huggingface.co); zai available_models 21 -> 1 (atria's catalog); atria HEALTHY (1).
+- Records: R480/ (ledger line, repoint record, round record) + ACTIVE_PATH addendum + worklog; pushed with the operator PAT.
+
+Stage Summary:
+- Art. LXXI tuple GREEN across all legs: deploy + identity-verify (R479) + P0-5 ledger line (R480). The audit's "no strong-model provenance chain live" is answered by REPOINT: the credited atria leg carries the chain; the HF-router 402 record stands as a degraded OPTION, no longer the authority. P0-1 IMPROVE-stage live proof + the R458 re-run now have their measured-live transport (own rounds, own exit criteria).
+- reviewer_provenance=AI_REVIEW.

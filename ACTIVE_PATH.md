@@ -1060,3 +1060,15 @@ Operator credentials arrived; the R478 `what_unblocks` executed the same day. Me
 | P0-5 TRANSPORT | TRANSPORT_DEGRADED | HTTP_402 measured NOW with the fresh token: "depleted your monthly included credits" — the wall is ACCOUNT BILLING, not the token; the chain's other legs measure HEALTHY (xkiro 6 / bai 2 / atria 1), so the audit's "no strong-model chain live" narrows to the HF-router leg only |
 
 Records: `R479/` (deploy + identity-verify + probe + attempt-1 evidence + round record). One operator action remains: HF billing top-up, then `python3 scripts/r479_hf_router_probe.py` flips the ledger line GREEN.
+
+## R480 ADDENDUM — P0-5 closed by REPOINT (2026-09-16)
+
+The operator repointed ZAI to the credited provider (atria, api.atria-asi.ai) with the re-supplied 15-key ring. Measured, in order:
+
+| STEP | OUTCOME | THE MEASURED FACT |
+|---|---|---|
+| PROBE-BEFORE-WIRE | GREEN | catalog 200 (0.16s — sole model Atria-Dawn-Preview), bogus-key 401 control, tiny completion 200 (0.67s) — the r478 P0-5 contract verbatim, artifact sha-bound (`R480/ATRIA_LEDGER_LINE.json`) |
+| THE WIRE | no rebuild | ZAI_BASE_URL/ZAI_MODEL variables (the R391 override) + ZAI_API_KEY + the 15-name ring; restart only — identity UNCHANGED fbc73b8 |
+| POST-RESTART | flip verified | transport snapshot = api.atria-asi.ai; zai catalog 21 -> 1 (atria's); atria HEALTHY; health ok:true |
+
+The audit's 402 class is answered: the strong-model chain rides the credited atria leg; the HF-router leg stays a measured-degraded OPTION (R479 record stands). Slot 8 remains inert per its measured INVALID verdict. Now unblocked: the P0-1 IMPROVE-stage live proof + the R458 re-run (own rounds).

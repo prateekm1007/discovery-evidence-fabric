@@ -1,0 +1,38 @@
+{
+ "round": "R480",
+ "title": "P0-5 closed GREEN — the operator repointed ZAI to the credited provider (atria); the ledger line measured GREEN before the wire, the production transport flip measured after the restart",
+ "measured_at_utc": "2026-09-16T18:20:00Z",
+ "operator_directive": "repointing ZAI to a credited provider https://api.atria-asi.ai/console/keys — 15 atria keys supplied (the R470/R472 ring, re-supplied for this fresh workspace; key 8's value matches the recorded R472 fingerprint atr_DH...1QzF)",
+ "probe_before_wire": {
+  "record": "R480/ATRIA_LEDGER_LINE.json",
+  "method": "the R467/R470/R472 registration method, reused: catalog 200 + format-identical bogus-key 401 control + the committed r478 P0-5 probe contract verbatim",
+  "measured": {
+   "catalog": "200 in 0.16s — the sole model Atria-Dawn-Preview (matches the R467 registration exactly)",
+   "bogus_key_control": "401 in 0.20s — auth evaluates; the 200 is not a gate artifact",
+   "inference": "200 in 0.67s, served Atria-Dawn-Preview, usage recorded (15 prompt / 16 completion tokens), artifact sha256 059b33aff0e398de60edb34eaad6515f4c8f6e48e7b94e8c08ad89801122d9c9",
+   "outcome": "LEDGER_LINE_GREEN"
+  }
+ },
+ "space_repoint": {
+  "record": "R480/SPACE_REPOINT_RECORD.json",
+  "mechanism": "NO rebuild — the R391 ZAI_BASE_URL operator override (gateway.py external_base_url / llm_registry.url_for_call) + ZAI_MODEL per-call override + secrets; restart only",
+  "variables": {"ZAI_BASE_URL": "https://api.atria-asi.ai/v1/chat/completions", "ZAI_MODEL": "Atria-Dawn-Preview"},
+  "secrets_wired": "ZAI_API_KEY (= atria key 1, fp_9a89731ad93f_len36) + the 15-name atria ring (slot 8 carried INERTLY per its measured INVALID verdict — the ring's selection authority excludes it until a future probe measures CLEAR)",
+  "identity_unchanged": "fbc73b859c68d18d407fbff7dbd6f015b3576f21"
+ },
+ "post_restart_verification": {
+  "engine_commit": "fbc73b859c68d18d407fbff7dbd6f015b3576f21 (unchanged — correct: runtime-surface-only change)",
+  "health": "ok:true, showcase_ready:true, discovery_ready:true",
+  "transport_snapshot": "https://api.atria-asi.ai/v1/chat/completions (was https://router.huggingface.co/...)",
+  "zai_provider": "available_models 21 -> 1 (the catalog is now atria's; status UNKNOWN = the honest pre-first-call state, flips on first use)",
+  "atria_provider": "HEALTHY (1)"
+ },
+ "art_lxxi_tuple": {
+  "state": "GREEN — deploy + identity-verify (R479) + P0-5 ledger line (this round) all measured",
+  "p05_resolution": "the audit's 'HF inference dead (402): no strong-model provenance chain live until top-up' is answered by REPOINT, not top-up: the credited atria leg is the strong-model transport, measured credential->inference->artifact GREEN; the HF-router leg remains a measured-degraded OPTION (its 402 record stands, R479/HF_ROUTER_PROBE.json) — it is no longer the chain's authority",
+  "closes_also": "the R479 what_unblocks (billing top-up OR repoint — the operator chose repoint, same day)",
+  "now_unblocked": "the P0-1 IMPROVE-stage live proof and the R458 re-run have a measured-live strong-model transport (sequencing unchanged; they are their own rounds with their own exit criteria)"
+ },
+ "art_lxi_note": "all states typed from live measurement; no availability inferred from history",
+ "reviewer_provenance": "AI_REVIEW"
+}
