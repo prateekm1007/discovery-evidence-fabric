@@ -46,13 +46,6 @@ SCRIPTS = REPO / "scripts"
 sys.path.insert(0, str(REPO))
 sys.path.insert(0, str(SCRIPTS))
 
-import r456_space_deploy as r456  # noqa: E402
-import r447_hf_deploy as driver  # noqa: E402
-import r447_deploy_upload as uploader  # noqa: E402
-
-SPACE = driver.SPACE
-OUT = REPO / "R484" / "SPACE_DEPLOY_RECORD.json"
-
 
 def _load_vault() -> dict:
     vault = {}
@@ -64,6 +57,27 @@ def _load_vault() -> dict:
                 k, v = line.split("=", 1)
                 vault[k.strip()] = v.strip()
     return vault
+
+
+# the import-time credential contract (R451-C2): r447_hf_deploy
+# demands GITHUB_TOKEN in the ENVIRONMENT — inject from the vault
+# BEFORE the imports (the r481 pattern). Never persisted anywhere.
+_vault0 = _load_vault()
+_pat0 = (_vault0.get("GITHUB_TOKEN") or _vault0.get("GITHUB_PAT")
+         or os.environ.get("GITHUB_TOKEN")
+         or os.environ.get("GITHUB_PAT", ""))
+if _pat0 and not os.environ.get("GITHUB_TOKEN"):
+    os.environ["GITHUB_TOKEN"] = _pat0
+_hf0 = _vault0.get("HF_TOKEN") or os.environ.get("HF_TOKEN", "")
+if _hf0 and not os.environ.get("HF_TOKEN"):
+    os.environ["HF_TOKEN"] = _hf0
+
+import r456_space_deploy as r456  # noqa: E402
+import r447_hf_deploy as driver  # noqa: E402
+import r447_deploy_upload as uploader  # noqa: E402
+
+SPACE = driver.SPACE
+OUT = REPO / "R484" / "SPACE_DEPLOY_RECORD.json"
 
 
 def fp(value: str) -> str:
