@@ -38,9 +38,9 @@ SURFACE = REPO / "R472" / "HF_SPACE_SECRETS_ATRIA_RING15.json"
 
 RING = ["ATRIA_API_KEY", "ATRIA_API_KEY_2", "ATRIA_API_KEY_3",
         "ATRIA_API_KEY_4", "ATRIA_API_KEY_5", "ATRIA_API_KEY_6",
-        "ATRIA_API_KEY_7", "ATRIA_API_KEY_9", "ATRIA_API_KEY_10",
-        "ATRIA_API_KEY_11", "ATRIA_API_KEY_12", "ATRIA_API_KEY_13",
-        "ATRIA_API_KEY_14", "ATRIA_API_KEY_15"]
+        "ATRIA_API_KEY_7", "ATRIA_API_KEY_8", "ATRIA_API_KEY_9",
+        "ATRIA_API_KEY_10", "ATRIA_API_KEY_11", "ATRIA_API_KEY_12",
+        "ATRIA_API_KEY_13", "ATRIA_API_KEY_14", "ATRIA_API_KEY_15"]
 NEW_SLOTS = ["ATRIA_API_KEY_11", "ATRIA_API_KEY_12", "ATRIA_API_KEY_13",
              "ATRIA_API_KEY_14", "ATRIA_API_KEY_15"]
 
@@ -121,19 +121,19 @@ def test_probe_bogus_differential_control():
 
 
 # ---------------------------------------------------------------------------
-# 2. the fourteen-slot registration
+# 2. the fifteen-slot registration (R478: key 8 reinstated)
 # ---------------------------------------------------------------------------
 
-def test_ring_is_fourteen_slots_in_operator_order():
+def test_ring_is_fifteen_slots_in_operator_order():
     spec = lr._SPEC_BY_ID["atria"]
     slots = lr.key_ring_slots(spec)
     assert slots == RING
-    assert len(slots) == 14
+    assert len(slots) == 15
 
 
-def test_key8_still_not_registered_and_no_values_in_repo():
+def test_key8_reinstated_by_the_r478_remeasure_and_no_values_in_repo():
     spec = lr._SPEC_BY_ID["atria"]
-    assert "ATRIA_API_KEY_8" not in lr.key_ring_slots(spec)
+    assert "ATRIA_API_KEY_8" in lr.key_ring_slots(spec)
     # the vault discipline: no key VALUE appears in any in-repo target
     marker = re.compile(r"atr_[A-Za-z0-9_-]{20,}")
     for target in BS021_TARGETS:
@@ -146,6 +146,8 @@ def test_registry_comment_records_the_r472_growth():
     # disclosure, and the latest-verdict exclusion
     assert "R472 (2026-09-16, the PARALLEL-LINE RECONCILIATION" in src
     assert "FLAPPED" in src
+    # the R478 reinstatement record (the latest measurement)
+    assert "key 8 REINSTATED" in src
     assert "CLEARED and REINSTATED" in src
     assert "current typed verdict is" in src
     assert "FOURTEEN-KEY ring" in src
@@ -162,25 +164,26 @@ def _clear_all(monkeypatch):
 
 
 def test_rotation_walks_the_new_tail(monkeypatch):
-    """_10 (idx 8) -> _11 (idx 9) -> _13 (idx 11, _12 unset) -> _15
-    (idx 13, _14 unset) -> exhausted -> reset to the first present."""
+    """R478 indices: _10 (idx 9) -> _11 (idx 10) -> _13 (idx 12, _12
+    unset) -> _15 (idx 14, _14 unset) -> exhausted -> reset to the
+    first present."""
     _clear_all(monkeypatch)
     spec = lr._SPEC_BY_ID["atria"]
     monkeypatch.setenv("ATRIA_API_KEY_10", K10)
     monkeypatch.setenv("ATRIA_API_KEY_11", K11)
     monkeypatch.setenv("ATRIA_API_KEY_13", K13)
     monkeypatch.setenv("ATRIA_API_KEY_15", K15)
-    assert lr.active_key_slot(spec) == 8
+    assert lr.active_key_slot(spec) == 9
     assert lr.active_key_value(spec) == K10
-    assert lr.rotate_key(spec) == 9               # -> _11
+    assert lr.rotate_key(spec) == 10              # -> _11
     assert lr.active_key_value(spec) == K11
-    assert lr.rotate_key(spec) == 11              # skips _12 (unset)
+    assert lr.rotate_key(spec) == 12              # skips _12 (unset)
     assert lr.active_key_value(spec) == K13
-    assert lr.rotate_key(spec) == 13              # skips _14 (unset)
+    assert lr.rotate_key(spec) == 14              # skips _14 (unset)
     assert lr.active_key_value(spec) == K15
     # exhausted from the tail: reset to first present, typed None
     assert lr.rotate_key(spec) is None
-    assert lr.active_key_slot(spec) == 8
+    assert lr.active_key_slot(spec) == 9
 
 
 def test_new_tail_only_ring_walks_and_resets(monkeypatch):
@@ -189,16 +192,16 @@ def test_new_tail_only_ring_walks_and_resets(monkeypatch):
     spec = lr._SPEC_BY_ID["atria"]
     monkeypatch.setenv("ATRIA_API_KEY_11", K11)
     monkeypatch.setenv("ATRIA_API_KEY_15", K15)
-    assert lr.active_key_slot(spec) == 9
-    assert lr.rotate_key(spec) == 13
+    assert lr.active_key_slot(spec) == 10
+    assert lr.rotate_key(spec) == 14
     assert lr.rotate_key(spec) is None            # exhausted -> reset
-    assert lr.active_key_slot(spec) == 9          # first PRESENT slot
+    assert lr.active_key_slot(spec) == 10         # first PRESENT slot
 
 
-def test_attempt_budget_extends_by_thirteen():
+def test_attempt_budget_extends_by_fourteen():
     spec = lr._SPEC_BY_ID["atria"]
     ring_extra = max(0, len(lr.key_ring_slots(spec)) - 1)
-    assert ring_extra == 13
+    assert ring_extra == 14
 
 
 # ---------------------------------------------------------------------------

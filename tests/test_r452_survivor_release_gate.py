@@ -1,21 +1,30 @@
-"""R452 — the survivor-release gate (external audit B4 / AT-10).
+"""R452 — the survivor-release gate (external audit B4 / AT-10);
+R478 — the single-authority contract change (external audit P1-12).
 
-The audit measured: 3 production runs carried downloadable
+The R452 audit measured: 3 production runs carried downloadable
 technology-transfer ZIPs against RELEASE_PROOF.status = NOT_A_SURVIVOR,
 and on the same runs DISCOVERY_RELEASE said HELD_FOR_HUMAN_REVIEW — two
 release artifacts disagreeing about the same run. Article XXXIX makes
 the buyer-distribution repository the final authority; a NOT_A_SURVIVOR
 package reaching a download route inverts that authority.
 
+R478 (external audit P1-12) — DOCUMENTED CONTRACT CHANGE: the gate is
+now ONE authority consumed by the server AND the bridge
+(toscanini/bridge_gate.py::survivor_attested). DISCOVERY_RELEASE.json
+attests (closed non-survivor vocabulary + invention_id + spec-hash/
+selection evidence); a legacy RELEASE_PROOF no longer co-gates.
+Disagreement WITHOUT rejection never blocks (disclosed on the served
+bytes instead); the R452 corruption shape (legacy NOT_A_SURVIVOR
+against an attesting authority record) blocks DECISIVELY with a named
+conflict class and a re-adjudication path — never the old dead-end
+"reconcile the records" state.
+
 Under test:
-  * the PURE gate function (toscanini/server.py::survivor_release_gate):
-    a NOT_A_SURVIVOR verdict (from EITHER record) blocks every route,
-    zero ZIPs reachable (no draft escape); disagreeing records block
-    until reconciled, with the disagreement surfaced (Art. XV);
+  * the PURE gate function (toscanini/server.py::survivor_release_gate)
+    across the authority matrix;
   * the WRITER half (package_compiler._update_discovery_release): the
     compiler binds hashes and never softens a survivor-gate verdict
-    (the measured disagreement mechanism — the compiler overwrote
-    NOT_A_SURVIVOR with HELD_FOR_HUMAN_REVIEW).
+    (the measured disagreement mechanism — unchanged by R478).
 """
 from __future__ import annotations
 
@@ -30,6 +39,13 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from toscanini.server import survivor_release_gate  # noqa: E402
 
 
+def _attested(status="HELD_FOR_HUMAN_REVIEW"):
+    """A DISCOVERY_RELEASE record the authority attests (all three legs
+    present: non-survivor-free status, invention_id, spec hash)."""
+    return {"status": status, "invention_id": "inv-r478",
+            "invention_spec_hash": "a" * 64}
+
+
 class TestSurvivorReleaseGate:
 
     def test_not_a_survivor_blocks_every_route(self):
@@ -38,39 +54,60 @@ class TestSurvivorReleaseGate:
             {"status": "NOT_A_SURVIVOR"})
         assert out is not None
         assert out["package_state"] == "SURVIVOR_RELEASE_BLOCKED"
+        assert out["authority"] == "DISCOVERY_RELEASE.json"
         assert out["records_agree"] is True
 
-    def test_survivor_verdict_from_either_record_blocks(self):
-        # the audit's exact production shape: PROOF says rejected,
-        # RELEASE says held — the conservative reading still blocks
+    def test_corruption_shape_blocks_decisively(self):
+        # the R452 production shape: legacy PROOF says rejected while
+        # the authority record attests — a NAMED conflict with a real
+        # re-adjudication path, never the old dead-end block
+        out = survivor_release_gate(
+            {"status": "NOT_A_SURVIVOR"}, _attested())
+        assert out is not None
+        assert out["package_state"] == "SURVIVOR_RELEASE_BLOCKED"
+        assert out["conflict_class"] == (
+            "LEGACY_PROOF_REJECTION_VS_ATTESTED_RELEASE")
+        assert "re-adjudicate" in out["reconciliation"]
+        assert out["records_agree"] is False
+        assert out["release_proof_status"] == "NOT_A_SURVIVOR"
+        assert out["discovery_release_status"] == "HELD_FOR_HUMAN_REVIEW"
+
+    def test_softened_status_without_evidence_blocks(self):
+        # a HELD wording with NO survivor evidence does not attest —
+        # the softened-verdict guard (the R452 corruption mechanism
+        # cannot smuggle a rejection back into a download)
         out = survivor_release_gate(
             {"status": "NOT_A_SURVIVOR"},
             {"status": "HELD_FOR_HUMAN_REVIEW"})
         assert out is not None
         assert out["package_state"] == "SURVIVOR_RELEASE_BLOCKED"
-        # the disagreement is surfaced, never hidden (Art. XV)
-        assert out["records_agree"] is False
-        assert out["release_proof_status"] == "NOT_A_SURVIVOR"
-        assert out["discovery_release_status"] == "HELD_FOR_HUMAN_REVIEW"
+        assert out["authority"] == "DISCOVERY_RELEASE.json"
+        assert out["authority_evidence"]["invention_id"] is None
 
-    def test_disagreement_without_rejection_blocks_until_reconciled(self):
-        out = survivor_release_gate(
-            {"status": "RELEASED"},
-            {"status": "HELD_FOR_HUMAN_REVIEW"})
-        assert out is not None
-        assert out["package_state"] == "RELEASE_RECORDS_DISAGREE"
+    def test_disagreement_without_rejection_never_blocks(self):
+        # R478: the RELEASE_RECORDS_DISAGREE dead-end class is DELETED —
+        # same-source artifacts on current runs; stale wording on old
+        # ones is disclosed, never gating
+        assert survivor_release_gate(
+            {"status": "RELEASED"}, _attested()) is None
 
     def test_agreeing_non_terminal_records_do_not_block(self):
-        out = survivor_release_gate(
-            {"status": "HELD_FOR_HUMAN_REVIEW"},
-            {"status": "HELD_FOR_HUMAN_REVIEW"})
-        assert out is None
+        assert survivor_release_gate(
+            {"status": "HELD_FOR_HUMAN_REVIEW"}, _attested()) is None
 
     def test_absent_records_do_not_block(self):
         """No release records: the gate stays silent (never fabricated
         from absence, Art. XXV) — the visual-gate decision below still
         applies at the consumer."""
         assert survivor_release_gate(None, None) is None
+
+    def test_legacy_rejection_with_no_authority_record_blocks(self):
+        # pre-release-era shape: a recorded legacy rejection is never
+        # silently served when no authority record exists to attest
+        out = survivor_release_gate({"status": "NOT_A_SURVIVOR"}, None)
+        assert out is not None
+        assert out["package_state"] == "SURVIVOR_RELEASE_BLOCKED"
+        assert "legacy" in out["authority"].lower()
 
 
 class TestCompilerNeverSoftensSurvivorVerdict:

@@ -77,7 +77,7 @@ from . import sessions as store
 # — the machine asserted a technology that does not exist (Art.
 # XXV/XXVIII: a placeholder object is not honest absence; artifact
 # generation is not evidence of invention).
-BRIDGE_GATE_VERSION = "1.2.0"
+BRIDGE_GATE_VERSION = "1.3.0"  # R478: survivor_attested exported (one gate, server+bridge)
 
 # The release-record statuses that attest NO promoted candidate
 # (discovery_fabric/engine/release.py's closed vocabulary). Everything
@@ -176,6 +176,42 @@ def _read_json(path: Path) -> Optional[Dict[str, Any]]:
     return None
 
 
+def survivor_attested(discovery_release, survivor_selection):
+    """R478 (external audit P1-12) — the ONE survivor attestation,
+    shared by the bridge gate and the server download gate (Art. X).
+    PURE: no filesystem, no clock — callers pass the parsed
+    DISCOVERY_RELEASE.json and SURVIVOR_SELECTION.json records (None
+    when absent). Semantics are EXACTLY _survivor_recorded's, unchanged:
+    a run attests a surviving, promoted candidate only when
+      1. discovery_release is not None AND its status is not None AND
+         status not in _NON_SURVIVOR_RELEASE_STATUSES;
+      2. invention_id is non-null;
+      3. invention_spec_hash is truthy OR a SURVIVOR_SELECTION record
+         was passed.
+    Returns (attested, evidence) — the evidence carries the fields the
+    bridge persists verbatim on refusal (Art. XV), plus
+    "survivor_selection_passed" for leg 3."""
+    status = (discovery_release or {}).get("status")
+    inv_id = (discovery_release or {}).get("invention_id")
+    spec_hash = (discovery_release or {}).get("invention_spec_hash")
+    non_survivor = (status in _NON_SURVIVOR_RELEASE_STATUSES
+                    or status is None)
+    survivor_selection_passed = bool(
+        spec_hash or survivor_selection is not None)
+    attested = (discovery_release is not None and not non_survivor
+                and bool(inv_id) and survivor_selection_passed)
+    evidence = {
+        "authority": "DISCOVERY_RELEASE.json",
+        "status": status,
+        "invention_id": inv_id,
+        "invention_spec_hash_present": bool(spec_hash),
+        "survivor_selection_present": survivor_selection is not None,
+        "non_survivor_statuses": list(_NON_SURVIVOR_RELEASE_STATUSES),
+        "survivor_selection_passed": survivor_selection_passed,
+    }
+    return attested, evidence
+
+
 def _survivor_recorded(run_dir: Path) -> Dict[str, Any]:
     """R455-LEAN-1 §1 — the survivor test, derived from canonical state.
 
@@ -203,26 +239,12 @@ def _survivor_recorded(run_dir: Path) -> Dict[str, Any]:
     """
     rel = _read_json(run_dir / "DISCOVERY_RELEASE.json")
     if rel is not None:
-        status = rel.get("status")
-        inv_id = rel.get("invention_id")
-        spec_hash = rel.get("invention_spec_hash")
+        # R478 (external audit P1-12): the attestation is the ONE gate
+        # the server download route also consumes (Art. X) — same
+        # semantics, single implementation.
         surv = _read_json(run_dir / "SURVIVOR_SELECTION.json")
-        non_survivor = status in _NON_SURVIVOR_RELEASE_STATUSES or \
-            status is None
-        recorded = (not non_survivor) and bool(inv_id) and \
-            bool(spec_hash or surv)
-        return {
-            "recorded": bool(recorded),
-            "evidence": {
-                "authority": "DISCOVERY_RELEASE.json",
-                "status": status,
-                "invention_id": inv_id,
-                "invention_spec_hash_present": bool(spec_hash),
-                "survivor_selection_present": bool(surv),
-                "non_survivor_statuses": list(
-                    _NON_SURVIVOR_RELEASE_STATUSES),
-            },
-        }
+        attested, evidence = survivor_attested(rel, surv)
+        return {"recorded": bool(attested), "evidence": evidence}
     return {
         "recorded": True,  # no release record -> legacy path decides
         "evidence": {

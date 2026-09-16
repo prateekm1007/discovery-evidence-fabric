@@ -83,11 +83,14 @@ SECRETS_SCRIPT = REPO / "scripts" / "r469_hf_secrets.py"
 # answered 401 x3 again — key 8's provider state FLAPPED; the LATEST
 # typed verdict is INVALID, so the registration excludes it. The ring
 # is FOURTEEN operator-ordered valid slots (1-7, 9-15).
+# R478 (2026-09-17): key 8 REINSTATED per the LATEST typed measurement
+# (R478/RING_VALIDATION.json: catalog 200 x3 + one 200 tiny completion;
+# the flap history recorded in the registry comment) — FIFTEEN slots.
 RING = ["ATRIA_API_KEY", "ATRIA_API_KEY_2", "ATRIA_API_KEY_3",
         "ATRIA_API_KEY_4", "ATRIA_API_KEY_5", "ATRIA_API_KEY_6",
-        "ATRIA_API_KEY_7", "ATRIA_API_KEY_9", "ATRIA_API_KEY_10",
-        "ATRIA_API_KEY_11", "ATRIA_API_KEY_12", "ATRIA_API_KEY_13",
-        "ATRIA_API_KEY_14", "ATRIA_API_KEY_15"]
+        "ATRIA_API_KEY_7", "ATRIA_API_KEY_8", "ATRIA_API_KEY_9",
+        "ATRIA_API_KEY_10", "ATRIA_API_KEY_11", "ATRIA_API_KEY_12",
+        "ATRIA_API_KEY_13", "ATRIA_API_KEY_14", "ATRIA_API_KEY_15"]
 # (R472 reconciliation end) (R472 — the 2026-09-16 audit's Top-10 #9 + P0-4, and the ring grows to the FIFTEEN-key delivery (probe-validated 14 valid slots). (1) TOP-10 #9 (the 30-day roadmap's driver item): the E2E driver's Leg-D retry observation is now committed into the record BEFORE the save and BEFORE the multi-minute resume poll (record[legs][D_retry] = d immediately; on_terminal assigned in every branch pre-save; the prior-202 branch keeps BOTH halves) — a kill during the poll can no longer lose the 202+retry_id body (the R471 disclosed reconstruction class is dead; tests/test_r472_driver_persistence.py 5/5: source-order pins + the real _save round-trip with OUT redirected). Engineer-drafted by Atria-Dawn-Preview (R472/ATRIA_ENGINEER_A.json, key 11, 6402 tokens, 57.6s, finish=stop), CTO-integrated verbatim. (2) P0-4 (the no-survivor learning card): toscanini/run_state.py learning_card() — the terminal no-mechanism/killed-lineage surface that TEACHES: what_was_tested, strongest_failed_hypothesis, key_missing_evidence, 2-3 ranked typed next actions (ADD_EVIDENCE/REFINE_PROBLEM/NEW_TERRITORY), basis line; fires ONLY for terminal scientific no-survivor (never premise/blocked/survivor/package); recorded fields only, absent facts labeled absent (Art. VI/XXV; genuine kills per the Art. LXI capability-signature rule). Wired into user_state_view (after outcome_label, pre-strip per the R414 discipline), the run-state object, the webapp types (LearningCard/LearningCardAction) and RunNarrative's settled-no-survivor banner (data-learning-card marker; the four audit-named sections; the verdict sentence unchanged — the card adds, never softens). CTO-completed per spec after the engineer's B-session hit the provider's measured cap limits (12k truncation x2, 32k+ 502s x4 — disclosed in R472/ATRIA_ENGINEER_B.json; the A-session pattern held). Tests: test_r472_learning_card 14/14 + webapp adversarial_r472 8/8. (3) THE RING: probe-before-record on the five new keys (R472/PROBE_ATRIA_KEYS11TO15.json): keys 11-15 ALL VALID (catalog 200, sole model Atria-Dawn-Preview; tiny completion 200 on key 11, 4.06s); all fifteen pairwise distinct; keys 1-10 identity-confirmed vs R470. ATRIA_API_KEY_8 re-probed per the operator's re-supply: DETERMINISTIC 401 x3 — the exclusion STANDS (re-measured, never assumed). Space surface extended: 15/15 ring names PRESENT (R472/HF_SPACE_SECRETS_ATRIA_RING15.json; the R470 direct-endpoint verification method). key_env_vars = the FOURTEEN valid operator-ordered slots (1-7, 9-15; key 8 excluded, slot numbers never compressed). keyring batteries moved forward (test_r469/test_r470 registration pins to the 14-slot contract) + test_r472_keyring14 (15 new). Batteries: r471 54, r470 78, r469 34+1skip, r468 20+1skip, r467 23, r465 15, r469_span 11 all green; webapp 13 files 155/155; tsc strict clean; production build green (/ first-load 119 kB, unchanged); MODULE_INVENTORY regenerated, zero drift; pre-commit constitution check PASS; BS-021 sweep: 18 credential values, zero occurrences in the tree. reviewer_provenance=AI_REVIEW)
 
 # fake credential bodies — deliberately SHORT and non-matching to the
@@ -146,13 +149,12 @@ def test_atria_ring_registered_in_operator_order():
     spec = lr._SPEC_BY_ID["atria"]
     assert lr.key_ring_slots(spec) == RING
     assert spec.env_var == "ATRIA_API_KEY"   # the marker stays slot 1
-    # R470: 401x3 excluded key 8; the sibling's R472 probe (22:40Z)
-    # measured 200 x3 and reinstated it on their line; THIS line's
-    # re-measures (22:57Z and post-rebase) answered 401 x3 — the
-    # LATEST typed verdict rules (Art. III in BOTH directions,
-    # timestamps deciding): key 8 is EXCLUDED from the reconciled
-    # registration, both probe records standing as history
-    assert "ATRIA_API_KEY_8" not in lr.key_ring_slots(spec)
+    # R470: 401x3 excluded key 8; R472 re-measured 401 x3 again; R478
+    # (2026-09-17) measured catalog 200 x3 + a 200 tiny completion
+    # (R478/RING_VALIDATION.json) — the LATEST typed verdict rules
+    # (Art. III in BOTH directions, timestamps deciding): key 8 is
+    # REINSTATED, every earlier probe record standing as history
+    assert "ATRIA_API_KEY_8" in lr.key_ring_slots(spec)
     assert "ATRIA_API_KEY_15" in lr.key_ring_slots(spec)
 
 

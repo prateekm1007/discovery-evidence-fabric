@@ -1,0 +1,15 @@
+{
+ "task": "TASK_A",
+ "model": "Atria-Dawn-Preview",
+ "served_by_key": "ATRIA_API_KEY_2",
+ "attempts": 3,
+ "completion_tokens": 2048,
+ "finish_reason": "stop",
+ "rotations": [
+  {
+   "key": "ATRIA_API_KEY",
+   "error": "ValueError('empty content')"
+  }
+ ],
+ "draft": "```python\ndef survivor_attested(discovery_release, survivor_selection):\n    \"\"\"R478 (external audit P1-12) \u2014 the ONE survivor attestation,\n    shared by the bridge gate and the server download gate (Art. X).\n    PURE: no filesystem, no clock \u2014 callers pass the parsed\n    DISCOVERY_RELEASE.json and SURVIVOR_SELECTION.json records (None\n    when absent). Semantics are EXACTLY _survivor_recorded's, unchanged:\n    a run attests a surviving, promoted candidate only when\n      1. discovery_release is not None AND its status is not None AND\n         status not in _NON_SURVIVOR_RELEASE_STATUSES;\n      2. invention_id is non-null;\n      3. invention_spec_hash is truthy OR survivor_selection is not\n         None.\n    Returns (attested: bool, evidence: dict). The evidence dict carries\n    the same fields the bridge persists on refusal, plus\n    \"survivor_selection_passed\": bool for leg 3.\"\"\"\n    status = discovery_release.get(\"status\")\n    inv_id = discovery_release.get(\"invention_id\")\n    spec_hash = discovery_release.get(\"invention_spec_hash\")\n    non_survivor = (status in _NON_SURVIVOR_RELEASE_STATUSES) or (status is None)\n    survivor_selection_passed = bool(spec_hash or survivor_selection is not None)\n    attested = (not non_survivor) and bool(inv_id) and survivor_selection_passed\n    evidence = {\n        \"authority\": discovery_release.get(\"authority\"),\n        \"status\": status,\n        \"invention_id\": inv_id,\n        \"invention_spec_hash_present\": bool(spec_hash),\n        \"survivor_selection_present\": survivor_selection is not None,\n        \"non_survivor_statuses\": list(_NON_SURVIVOR_RELEASE_STATUSES),\n        \"survivor_selection_passed\": survivor_selection_passed,\n    }\n    return attested, evidence\n\n\ndef _survivor_recorded(run_dir):\n    rel = _read_json(run_dir / \"DISCOVERY_RELEASE.json\")\n    if rel is not None:\n        surv = _read_json(run_dir / \"SURVIVOR_SELECTION.json\")\n        attested, evidence = survivor_attested(rel, surv)\n        return {\"recorded\": bool(attested), \"evidence\": evidence}\n    return {\n        \"recorded\": False,\n        \"evidence\": {\n            \"authority\": None,\n            \"status\": None,\n            \"invention_id\": None,\n            \"invention_spec_hash_present\": False,\n            \"survivor_selection_present\": False,\n            \"non_survivor_statuses\": list(_NON_SURVIVOR_RELEASE_STATUSES),\n        },\n    }\n```"
+}

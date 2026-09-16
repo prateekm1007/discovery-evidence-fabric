@@ -1,0 +1,49 @@
+{
+  "round": "R478",
+  "kind": "external_audit_phase0_ratification__p1_12_single_authority__ring15",
+  "created_at_utc": "2026-09-16T17:55:00Z",
+  "operator_input": "The external auditor's full engine audit (their own clone of origin/main @ 17504061): 25 capability verdicts and scores, OVERALL 3/10, nine 9/10-blockers, roadmap P0-1..P2-15 with 30/60/90-day phasing. PAT note recorded: the auditor used the PAT once for their clone, did not revoke/rotate/publish; their next PAT needs are push / private-portfolio read / HF Space probes.",
+  "phase0_ratification": {
+    "scores": "ACCEPTED AS MEASURED (OVERALL 3/10; no relitigation — the records' honesty is the asset, the gaps are now an engineering backlog)",
+    "baseline_identity": {
+      "origin_main": "17504061",
+      "local_sync": "one-shot PAT fetch from the vault (.gitcreds, LXXIII) — ff-only onto the r477-github branch; tree clean",
+      "stage_order_16_verified": "discovery_fabric/engine/adapters.py:1440-44 verbatim (the 13-vs-16 doc drift claim confirmed on this tree)"
+    },
+    "cto_rulings": [
+      "P0-5 re-scoped and effectively CLOSED as a blocker: the atria ring measured 15/15 catalog-200 this round (R478/RING_VALIDATION.json) — the live strong-model transport exists; P0-1/P0-4/P0-6 verification runs are unblocked",
+      "The Toscanini UI audit was fully dispositioned at R476/R477 (7 closed, 1 fixed, 1 measured-no-gain-reverted, 5 deferred-with-reason) — not reopened",
+      "Windows case-collision accepted as a real P1 portability defect (audit roadmap P2-14), not a production break"
+    ]
+  },
+  "p1_12_single_survivor_authority": {
+    "measured_history": "R452 B4: the package compiler softened NOT_A_SURVIVOR into HELD_FOR_HUMAN_REVIEW in DISCOVERY_RELEASE while RELEASE_PROOF preserved the verdict (3 production runs still carry that shape). Since the R452 fix, run.py:701-718 writes BOTH artifacts from the same release object — current runs cannot disagree; the stranded disagreement is historical corruption plus a gate with no exit.",
+    "changes": [
+      "toscanini/bridge_gate.py: survivor_attested(discovery_release, survivor_selection) — the ONE pure attestation (closed non-survivor vocabulary + invention_id + spec-hash/selection evidence), consumed by _survivor_recorded; BRIDGE_GATE_VERSION 1.2.0 -> 1.3.0",
+      "toscanini/server.py: survivor_release_gate(release_proof, discovery_release, survivor_selection) — single-authority consumer; the RELEASE_RECORDS_DISAGREE dead-end class is DELETED (disagreement without rejection never blocks); the R452 corruption shape (legacy NOT_A_SURVIVOR against an attesting authority record) blocks DECISIVELY with conflict_class LEGACY_PROOF_REJECTION_VS_ATTESTED_RELEASE and a named re-adjudication path; the no-authority-record + legacy-rejection branch stays conservative",
+      "toscanini/server.py: _legacy_release_disclosure — Art. XV disclosure riding the served bytes (X-Release-Authority / X-Legacy-Release-Proof-Status) on both the plain and engineering-draft ZIP serves"
+    ],
+    "acceptance_note": "The audit's '3 blocked runs unblock' is EVIDENCE-DEPENDENT by design: runs whose DISCOVERY_RELEASE attests (status + invention_id + spec-hash/selection) unblock; the R452 corruption specimens (softened status over a true rejection, no survivor evidence) stay blocked DECISIVELY — re-serving killed-invention ZIPs would re-open the exact B4/AT-7 defect the R452 audit closed. Each stranded run now gets a typed verdict naming its own reconciliation path (re-adjudication from its SURVIVOR_SELECTION.json and challenge records, an operator decision per Art. VI).",
+    "engineer_provenance": "Atria-Dawn-Preview, the r472/r477 pattern (CTO spec -> engineer drafts -> CTO reviews, integrates, tests). TASK_A: 2048 tokens, finish=stop, served by ATRIA_API_KEY_2 after the head key answered empty-content x3 (a LIVE ring rotation, recorded); integrated with two CTO fixes (the authority evidence literal; the absent-record branch restored verbatim — the draft had wrongly flipped it to recorded=False). TASK_B: 3000 tokens, finish=length (truncated mid-payload) — conformant hunks integrated, CTO completed the remainder; the R472 session's measured provider caps (12k workable, 32k+ 502s) recorded for future dispatch sizing. Drafts preserved verbatim: R478/ATRIA_ENGINEER_A.json, R478/ATRIA_ENGINEER_B.json.",
+    "tests": "tests/test_r478_survivor_authority.py (22 tests, CTO-authored per Art. III — the verifier's battery is independent of the implementer); tests/test_r452_survivor_release_gate.py contract change (documented, R394/R397 pattern); battery: 129 passed / 1 skipped / 0 failed across test_r469 + test_r470 + test_r472 + test_r478 + test_r452 + test_r396; test_r418's 5 solar-fixture failures verified IDENTICAL to the pre-change baseline via stash (the known stale-fixture class, not R478)"
+  },
+  "ring15": {
+    "measurement": "R478/RING_VALIDATION.json (2026-09-16T17:4xZ): 15/15 slots catalog 200, sole model Atria-Dawn-Preview; head-key tiny completion 200 in 1.77 s; slot 8 REINSTATED per the LATEST typed measurement — catalog 200 x3 (re-probed) + one 200 non-empty tiny completion in 14.9 s; fingerprint atr_DH...1QzF identity-confirmed vs the R470/R472 records; the full flap history preserved verbatim in the registry comment",
+    "changes": "discovery_fabric/engine/llm_registry.py key_env_vars 14 -> 15 slots (1-15, operator order); test_r469_atria_keyring / test_r470_keyring9 / test_r472_keyring14 registration and walk pins moved forward to the 15-slot contract (documented contract change, the R472 precedent)"
+  },
+  "governance": {
+    "constitution": "v2.5.0 verified on the synced tree; Article LXXIII (Operator Secrets Registry — look it up, never re-ask) governs key custody and was followed for the PAT fetch (one-shot URL, nothing persisted, output sanitized); no amendment needed this round — provider selection is versioned policy, not constitutional law (the Four Layers rule)",
+    "bs021": "sweep of every changed/added file: zero credential values, fingerprints only"
+  },
+  "delivery": {
+    "commit": "this commit",
+    "push": "PENDING — pushing is a listed PAT event per the operator's note; the vault PAT is present and was used read-only this round",
+    "deploy": "follows push (the standing r456 driver)"
+  },
+  "known_follow_ups": [
+    "R479+: the ratified 30-day roadmap — P0-4 (measured cost/latency ledgers feeding EIG; R458 re-run must show non-constant trace), P0-2 (contradiction -> belief/state mapping with the A-supports/B-contradicts fixture), P0-3 spec (numeric kill contract: apparatus/sample/band/cost or INVENTION_REQUIRES_EXPERIMENT), P0-1 (IMPROVE stage pre-ADJUDICATION with ledger-gated killed-lineage re-entry)",
+    "the 3 R452-corruption production runs: per-run re-adjudication from their own SURVIVOR_SELECTION.json and challenge records (operator decision per Art. VI) — the typed 409 payload now names this path",
+    "P0-6 (frozen DEV/HOLDOUT per family with sourced-spec rate), P0-7 (clean-clone rebuild-from-source proof), P1-8..P1-11, P2-13..P2-15 per the audit's roadmap"
+  ],
+  "reviewer_provenance": "AI_REVIEW"
+}
