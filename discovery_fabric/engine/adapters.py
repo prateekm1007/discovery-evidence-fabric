@@ -497,6 +497,32 @@ class EvidenceVerifyAdapter(BaseAdapter):
         mod = importlib.import_module("discovery_fabric.a2.verify")
         raw = env.mechanism_map.get("raw_candidate") or {}
         res = mod.verify_evidence(raw, env.evidence)
+        # R483 span-outcome telemetry (the span-capable rung
+        # preference): report the span contract's outcome for the rung
+        # that actually served this candidate, so the routing ladder can
+        # demote recently span-failing rungs for synthesis (ordering-
+        # only, Art. V). Reporting rules (Art. LXI-safe): verified=True
+        # -> span-ok; a NON-VERIFIED result whose issues are ALL in
+        # a2/verify's SPAN_ISSUES (the R452 MODEL-CAPABILITY class) ->
+        # span-fail; any MIXED issue set (scientific + capability) or an
+        # unattributable candidate -> NOT reported (the routing layer
+        # never records a scientific verdict — classify.py owns that).
+        try:
+            from discovery_fabric.a2.verify import SPAN_ISSUES as _SI
+            from . import model_routing as _mr
+            _prov = raw.get("provider") if isinstance(raw, dict) else None
+            _model = raw.get("model") if isinstance(raw, dict) else None
+            if _prov and _model:
+                _issues = [str(i) for i in (res.get("issues") or [])]
+                if res.get("verified") and not _issues:
+                    _mr.record_span_outcome(_prov, _model, ok=True,
+                                            run_id=run_ctx.get("run_id"))
+                elif _issues and all(i in _SI for i in _issues):
+                    _mr.record_span_outcome(_prov, _model, ok=False,
+                                            run_id=run_ctx.get("run_id"))
+                # else: mixed or non-span issues — not routing telemetry
+        except Exception:  # noqa: BLE001 — telemetry best-effort, recorded
+            pass
         # R394 section 5: claim-level evidence classification rides the
         # VERIFY stage (domain/failure-mode/mechanism/material/regime
         # relevance per item; DIRECT_SUPPORT..IRRELEVANT). It records —

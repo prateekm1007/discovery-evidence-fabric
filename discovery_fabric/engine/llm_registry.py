@@ -1010,6 +1010,114 @@ class LLMCallResult:
 
 
 # --------------------------------------------------------------------------
+#: R483 — the sandbox-era classification of the re-pointable zai slot
+#: (recorded policy constants: the values the spec ships with, restored
+#: whenever the slot is NOT externally re-pointed).
+_ZAI_SANDBOX_CLASSIFICATION = {
+    "cost_basis": "ENVIRONMENT_GRANT",
+    "locality": "LOCAL",
+    "account_domain": "SANDBOX_ENVIRONMENT_GRANT",
+}
+#: R483 — the credited-remote classification applied when the slot IS
+#: externally re-pointed. The R480 repoint (recorded in
+#: R480/SPACE_REPOINT_RECORD.json) placed the credited atria ring key 1
+#: into ZAI_API_KEY (fingerprint fp_9a89731ad93f == key 1's) and
+#: ZAI_BASE_URL at the credited endpoint, so the slot's RUNTIME reality
+#: is the operator-declared credited-provider class (the R467 atria
+#: admission's declared class), never the sandbox grant. Art. XXV: a
+#: recorded classification that no longer matches measured reality is
+#: corrected to the measured state — this reconciliation is that
+#: correction, applied at every selection surface (Art. XXVII: an
+#: operator action recorded, never a coder's silent reclassification).
+_ZAI_CREDITED_REMOTE_CLASSIFICATION = {
+    "cost_basis": "FREE_TIER_API",
+    "locality": "REMOTE",
+    "account_domain": "OWNER_ATRIA_ACCOUNT",
+}
+_ZAI_RECONCILE_NOTE = (
+    "R483 runtime reconciliation: the slot is externally re-pointed "
+    "(ZAI_BASE_URL non-loopback, the R480 operator repoint to the "
+    "credited provider with ring key 1 in ZAI_API_KEY) — the sandbox "
+    "ENVIRONMENT_GRANT/LOCAL classification no longer matches measured "
+    "reality and would have the ZERO_PAID_COST policy refuse the "
+    "operator-pinned synthesis head, silently walking the decisive "
+    "stage onto weaker rungs (measured 3x in production, "
+    "R481/R482/R483 durable ledger). Classified credited-remote "
+    "(FREE_TIER_API/REMOTE/OWNER_ATRIA_ACCOUNT) per the operator's "
+    "R467 atria admission class and R480 repoint record.")
+
+
+def _install_zai_spec(cost_basis: str, locality: str, account_domain: str,
+                      policy_note: str) -> None:
+    """Atomically replace the frozen zai spec with the reconciled one in
+    BOTH surfaces that read it (the by-id map and the ordered list) —
+    ProviderSpec is frozen (recorded policy, never mutated in place).
+    """
+    import dataclasses as _dc
+    old = _SPEC_BY_ID["zai"]
+    new = _dc.replace(old, cost_basis=cost_basis, locality=locality,
+                      account_domain=account_domain,
+                      policy_note=policy_note)
+    _SPEC_BY_ID["zai"] = new
+    for _i, _p in enumerate(PROVIDER_SPECS):
+        if _p.provider_id == "zai":
+            PROVIDER_SPECS[_i] = new
+            break
+
+
+def reconcile_runtime_classifications() -> Dict[str, Any]:
+    """R483: align the re-pointable zai slot's recorded classification
+    with its measured runtime state (the R480 repoint completion).
+
+    Mechanism: when ZAI_BASE_URL resolves to a non-loopback endpoint,
+    the slot rides an operator-supplied credential at an operator-
+    supplied endpoint — the sandbox ENVIRONMENT_GRANT/LOCAL
+    classification is factually false and the ZERO_PAID_COST policy
+    (correctly reading the declared basis) refuses the very slot the
+    deployment pins as the synthesis head; the R451-C1.1 chain
+    extension then replaces the emptied chain with every available
+    provider and the decisive stage routes to whichever free router
+    scores best that minute (the measured production defect). This
+    function flips the slot's declared basis/locality/account to the
+    credited-remote class while the re-point is live, and restores the
+    sandbox class when it is not. Idempotent, env-driven, no I/O;
+    called at every selection surface (availability_matrix,
+    select_provider, generate) so no path can read a stale class.
+
+    The verifier is untouched; this is transport classification only
+    (the {PROVIDER}_BASE_URL override class, Art. XXVII)."""
+    spec = _SPEC_BY_ID.get("zai")
+    if spec is None:
+        return {"reconciled": False, "reason": "zai spec absent"}
+    url = spec.url_for_call()
+    host = ""
+    try:
+        from urllib.parse import urlparse as _up
+        host = (_up(url).hostname or "").lower()
+    except Exception:  # noqa: BLE001 — classification degrades honestly
+        host = ""
+    external = bool(url) and host not in ("127.0.0.1", "localhost", "::1", "")
+    target = (_ZAI_CREDITED_REMOTE_CLASSIFICATION if external
+              else _ZAI_SANDBOX_CLASSIFICATION)
+    changed = []
+    for field, value in target.items():
+        if getattr(spec, field, None) != value:
+            changed.append(f"{field}: {getattr(spec, field, None)} -> {value}")
+    note = getattr(spec, "policy_note", "") or ""
+    if external and "R483 runtime reconciliation" not in note:
+        note = note + " | " + _ZAI_RECONCILE_NOTE
+        changed.append("policy_note: +R483 reconciliation record")
+    elif not external and "R483 runtime reconciliation" in note:
+        note = note.replace(" | " + _ZAI_RECONCILE_NOTE, "")
+        changed.append("policy_note: -R483 reconciliation record")
+    if changed:
+        _install_zai_spec(target["cost_basis"], target["locality"],
+                          target["account_domain"], note)
+    return {"reconciled": True, "external_repoint": external,
+            "classification": dict(target),
+            "changed": changed, "url_host": host or None}
+
+
 def availability_matrix() -> List[Dict[str, Any]]:
     """Key presence per provider, evaluated at call time.
 
@@ -1023,6 +1131,7 @@ def availability_matrix() -> List[Dict[str, Any]]:
     capability evidence (the C1.3-1 rule). Read-only derivation: this
     function performs NO probes."""
     from . import runtime_admission as _ra
+    reconcile_runtime_classifications()  # R483: the re-point class authority
     policy = _cost_policy.active_policy()
     out = []
     for p in PROVIDER_SPECS:
@@ -1455,13 +1564,13 @@ def generate(prompt: str, system: str = "",
     from . import runtime_admission as _ra
     call_prov = _cctx.effective(run_id)
 
+    reconcile_runtime_classifications()  # R483: the re-point class authority
     matrix = availability_matrix()
     avail_ids = [m["provider_id"] for m in matrix
                  if m["available"] and m["cost_policy_eligible"]]
     policy_refusals = [
         {"provider": m["provider_id"], "reason": m["cost_policy_note"]}
         for m in matrix if m["available"] and not m["cost_policy_eligible"]]
-
     # -- the provider chain (policy order, then role ordering) -------------
     if policy and policy.preferred_providers:
         chain = [pid for pid in policy.preferred_providers
@@ -1530,7 +1639,8 @@ def generate(prompt: str, system: str = "",
     ladder = mr.build_ladder(
         task, role=eff_role, avoid_provider=avoid_provider,
         preferred_providers=list(chain),
-        available_providers=avail_ids)
+        available_providers=avail_ids,
+        purpose=purpose_tag)
     rungs = [(r["provider"], r["model"], r) for r in ladder["rungs"]]
     # R451: policy-filter the rungs (the ladder's LAST_RESORT band may
     # add providers the policy chain never asked for — paid models are

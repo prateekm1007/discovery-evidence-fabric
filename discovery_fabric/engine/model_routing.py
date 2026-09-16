@@ -669,6 +669,80 @@ def is_model_gone(provider: str, model: str) -> bool:
                                       or {})
 
 
+# ---------------------------------------------------------------------------
+# R483 — the span-outcome telemetry (the span-capable rung preference).
+#
+# The measured production class (three consecutive runs, the durable
+# ledger + run envelopes): a transport-OK synthesis call whose output
+# failed the verbatim evidence-span contract — the VERIFY stage then
+# honestly typed INCOMPLETE_INFERENCE_FAILURE and the loop closure
+# stayed blocked. The transport layer's ok/failure classification never
+# sees that failure (the call succeeded), so the router kept ranking
+# the failing rung. The seam: the VERIFY adapter reports the span
+# contract's outcome for the rung that actually served the candidate;
+# the ladder DEMOTES recently span-failing rungs for synthesis-purpose
+# builds (ordering-only demotion, Art. V — never removal; every other
+# ladder purpose is untouched). A span failure is ROUTING telemetry —
+# never a scientific verdict (Art. LXI: the typed epistemic state is
+# classify.py's authority and is unchanged).
+# ---------------------------------------------------------------------------
+SPAN_OUTCOME_TAIL = 200          # bounded outcome tail (state file)
+SPAN_FAIL_DEMOTE_WINDOW_S = 6 * 3600   # declared operational bound
+
+
+def record_span_outcome(provider: str, model: str, ok: bool,
+                        stage: str = "synthesis",
+                        run_id: Optional[str] = None) -> None:
+    """Record the verbatim-span contract outcome for a serving rung
+    (best-effort telemetry: never raises, never blocks the verify
+    stage). ok=True = the candidate's span contract held; ok=False =
+    the SPAN_ISSUES capability class fired for this rung's output."""
+    try:
+        state = _load_state()
+        tail = state.get("span_outcomes")
+        if not isinstance(tail, list):
+            tail = []
+        tail.append({
+            "provider": provider, "model": model, "ok": bool(ok),
+            "stage": stage, "run_id": run_id,
+            "ts": time.time(),
+        })
+        state["span_outcomes"] = tail[-SPAN_OUTCOME_TAIL:]
+        STATE_PATH.parent.mkdir(parents=True, exist_ok=True)
+        STATE_PATH.write_text(json.dumps(state, indent=1, sort_keys=True))
+    except Exception:  # noqa: BLE001 — telemetry best-effort, never blocks
+        pass
+
+
+def span_failed_recently(provider: str, model: str,
+                         now: Optional[float] = None) -> bool:
+    """True when THIS rung's most recent span outcome within the
+    demotion window is a FAILURE (the honest reading: one recent
+    measured failure demotes; a later success on the same rung restores
+    it — the tail's newest entry for the rung decides)."""
+    now = now if now is not None else time.time()
+    for e in reversed((_load_state().get("span_outcomes") or [])):
+        if not isinstance(e, dict):
+            continue
+        if e.get("provider") != provider or e.get("model") != model:
+            continue
+        if now - float(e.get("ts") or 0) > SPAN_FAIL_DEMOTE_WINDOW_S:
+            return False  # the rung's newest outcome is stale either way
+        return not bool(e.get("ok"))
+    return False
+
+
+def clear_span_outcomes() -> None:
+    """Test/operator reset (the state file is runtime telemetry, not
+    evidence — Art. X: the records, not this file, are the history)."""
+    try:
+        state = _load_state()
+        state.pop("span_outcomes", None)
+        STATE_PATH.write_text(json.dumps(state, indent=1, sort_keys=True))
+    except Exception:  # noqa: BLE001
+        pass
+
+
 def clear_model_gone(provider: str, model: str) -> None:
     state = _load_state()
     gone = state.setdefault("gone_models", {})
@@ -1037,7 +1111,8 @@ def build_ladder(task: str, role: Optional[str] = None,
                  preferred_providers: Optional[List[str]] = None,
                  available_providers: Optional[List[str]] = None,
                  max_rungs: int = 8,
-                 now: Optional[float] = None) -> Dict[str, Any]:
+                 now: Optional[float] = None,
+                 purpose: Optional[str] = None) -> Dict[str, Any]:
     """Build the ordered (provider, model) rung list for a task.
 
     Ladder shape (directive section 5):
@@ -1093,8 +1168,18 @@ def build_ladder(task: str, role: Optional[str] = None,
             provs = [p for p in provs if p not in cooled] + cooled
 
     def _rank(r: ModelRecord) -> tuple:
-        return (-r.score(task, avoid_provider, now), r.cost_class,
-                r.latency_class)
+        # R483 span-capable rung preference (SYNTHESIS purpose only):
+        # a rung whose most recent measured span-contract outcome within
+        # the declared window is a FAILURE demotes below every clean
+        # rung (ordering-only, Art. V — the rung stays on the ladder;
+        # LAST_RESORT can still reach it). Non-synthesis purposes are
+        # untouched (the span contract is the synthesis stage's).
+        span_pen = 0
+        if purpose == "synthesis" and span_failed_recently(
+                r.provider, r.model, now=now):
+            span_pen = 1
+        return (span_pen, -r.score(task, avoid_provider, now),
+                r.cost_class, r.latency_class)
 
     # per-provider eligible lists, score-ranked
     per_provider: List[Tuple[str, List[ModelRecord]]] = []
@@ -1171,6 +1256,13 @@ def build_ladder(task: str, role: Optional[str] = None,
             _emit(r, "LAST_RESORT")
 
     rungs = rungs[:max_rungs]
+    # R483: the demotion is RECORDED, never silent (Art. IV/XXVII) —
+    # which rungs carried the span-failure penalty in this build
+    span_demoted = sorted({(r["provider"], r["model"])
+                           for r in rungs
+                           if purpose == "synthesis"
+                           and span_failed_recently(r["provider"],
+                                                    r["model"], now=now)})
     return {
         "task": task,
         "role": role,
@@ -1180,10 +1272,21 @@ def build_ladder(task: str, role: Optional[str] = None,
         "decision_inputs": {
             "available_providers": provs,
             "preferred_providers": preferred_providers or None,
-            "score_formula": ("recent_success_rate × health_recency × "
+            "score_formula": ("span-outcome demotion (synthesis) → "
+                              "recent_success_rate × health_recency × "
                               "provider_health × task_compatibility × "
                               "latency_suitability (× separation bonus "
                               "for attack routing)"),
+            "span_outcome_demotion": {
+                "applied": purpose == "synthesis",
+                "window_s": SPAN_FAIL_DEMOTE_WINDOW_S,
+                "demoted_rungs": [list(p) for p in span_demoted],
+                "note": ("R483 span-capable rung preference: a rung "
+                         "whose newest measured span outcome in the "
+                         "window is a failure orders below clean "
+                         "rungs (ordering-only, never removal — "
+                         "Art. V)"),
+            } if purpose == "synthesis" else None,
             "decay_half_life_s": DECAY_HALF_LIFE_S,
             "prior_strength": PRIOR_STRENGTH,
             "rung_order": ("round-robin across providers: every "
