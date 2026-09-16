@@ -1362,6 +1362,25 @@ class Handler(BaseHTTPRequestHandler):
         # exact contract — 202 + run_id. Same canonical path (ONE worker,
         # ONE session store; never a second run pipeline).
         if p.path in ("/api/discoveries", "/api/run", "/api/discovery"):
+            # R473 (restore-before-serve): run creation is the fork
+            # point where new durable state branches off the restored
+            # history. While the restore gate is CLOSED (a restore
+            # attempt failed in this process), a new run could never be
+            # reconciled with the branch and its first snapshot would
+            # push un-restored state — refused, typed, until the gate
+            # opens (background retry) or the container restarts.
+            try:
+                from toscanini import durable as _dgate
+            except Exception:  # noqa: BLE001 — no durable module, no gate
+                _dgate = None
+            if _dgate is not None and _dgate.enabled() \
+                    and _dgate.serve_gate().get("restored") is False:
+                return self._json(503, {
+                    "error": "the service is still restoring its durable "
+                             "state — run creation is refused until the "
+                             "restore completes (restore-before-serve); "
+                             "retry shortly",
+                    "code": "RESTORE_GATE_CLOSED"})
             body = self._body_json()
             text = (body.get("text") or "").strip()
             if len(text) < 15:
@@ -2777,12 +2796,62 @@ def main():
     # died with the previous process are marked INTERRUPTED — never
     # COMPLETE, never silently still-RUNNING. Both outcomes are honest
     # and disclosed through /api/health.
+    #
+    # R473 (audit-named defense 1 — RESTORE-BEFORE-SERVE): when durable
+    # persistence is enabled, the process does not merely ATTEMPT the
+    # restore — it gates on it. The bare `restore()` + swallowed
+    # exception here was the exact 176->34 incident mechanism: a boot
+    # whose restore failed went on serving AND snapshotting, pushing
+    # the un-restored (smaller) local store over the durable branch.
+    # Now: bounded retries inside the boot window; if the gate still
+    # closes, the server binds the port anyway (the health check must
+    # stay observable — the R420b lesson) but in DEGRADED mode: run
+    # creation refuses (503 RESTORE_GATE_CLOSED), every snapshot
+    # refuses (typed), and a background retry thread keeps attempting
+    # the restore so a long network outage heals without a restart.
+    # The gate state rides /api/health (durable.serve_gate).
+    _durable_enabled = False
     try:
         from toscanini import durable
-        durable.restore()
+        _durable_enabled = durable.enabled()
+        if _durable_enabled:
+            _report = durable.restore_for_serve(max_attempts=3,
+                                                delay_seconds=5.0)
+            _gate = durable.serve_gate()
+            if not _gate.get("restored"):
+                _why = _report.get("error") \
+                    or "durable integrity verification failed"
+                print(f"DURABLE RESTORE GATE CLOSED after "
+                      f"{_gate.get('attempts')} attempt(s): {_why}",
+                      file=sys.stderr, flush=True)
+                print("serving DEGRADED: run creation + snapshots "
+                      "refused until restore succeeds (the durable "
+                      "branch cannot be overwritten by un-restored "
+                      "state); background retry active",
+                      file=sys.stderr, flush=True)
     except Exception as exc:  # noqa: BLE001 — disclosed, never fatal
         print(f"durable restore failed: {type(exc).__name__}: {exc}",
               file=sys.stderr)
+    # R473: the self-healing retry — only while the gate is closed.
+    # On success the gate opens in-process (no container restart
+    # needed) and normal serving resumes.
+    if _durable_enabled:
+        def _restore_gate_retry() -> None:
+            import time as _time
+            from toscanini import durable
+            while True:
+                if durable.serve_gate().get("restored"):
+                    return
+                report = durable.restore_for_serve(max_attempts=1,
+                                                   delay_seconds=0.0)
+                if durable.serve_gate().get("restored"):
+                    print("durable restore gate OPENED on retry — "
+                          "normal serving resumed", file=sys.stderr,
+                          flush=True)
+                    return
+                _time.sleep(60)
+        threading.Thread(target=_restore_gate_retry,
+                         daemon=True).start()
     # R422 (directive 2 — the a5a7 anomaly): boot-time forensic
     # reconciliation, AFTER the durable restore (the ledger itself is
     # restored with the store). Any worker with a WORKER_SPAWNED/

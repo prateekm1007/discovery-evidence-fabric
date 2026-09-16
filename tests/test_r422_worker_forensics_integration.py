@@ -95,12 +95,17 @@ class TestRetryAndHealthWiring(unittest.TestCase):
         self.assertIn("forensics_degraded", helper)
 
     def test_boot_reconciles_after_restore(self):
-        """main() runs reconcile_at_boot AFTER durable.restore() — the
-        restored previous-boot tail is what orphans are computed from."""
+        """main() runs reconcile_at_boot AFTER the durable restore — the
+        restored previous-boot tail is what orphans are computed from.
+        R473: the restore call is now the GATED restore_for_serve() (the
+        audit-named restore-before-serve defense) — the pin follows the
+        strengthened contract: the restore STILL happens (gated, retried)
+        before the reconciliation, and the gate-closed disclosure exists."""
         src = inspect.getsource(server_mod.main)
         self.assertIn("reconcile_at_boot", src)
+        self.assertIn("restore_for_serve", src)
         self.assertLess(
-            src.index("durable.restore()"),
+            src.index("restore_for_serve("),
             src.index("reconcile_at_boot"))
 
 

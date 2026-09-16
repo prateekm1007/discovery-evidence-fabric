@@ -88,6 +88,83 @@ def reset_payload_cache() -> None:
     _PAYLOAD_CACHE.clear()
     _HASH_CACHE.clear()
 
+# R473 (audit-named defense 1 — RESTORE-BEFORE-SERVE) -------------------
+# The 2026-09-16 audit named the missing defense after the measured
+# 176->34 session-index incident: a boot whose restore() failed (or was
+# never attempted) went on SERVING and SNAPSHOTTING, pushing the
+# un-restored — necessarily smaller — local store over the durable
+# branch. The incident's exact mechanism: server main() swallowed the
+# restore failure ("disclosed, never fatal") and the boot snapshot
+# (`boot:<commit>:after_restore`) then overwrote the branch index with
+# the shrunken local one. The gate is the machine-enforced rule: while
+# a restore attempt has FAILED in this process (restored is False), the
+# process serves in DEGRADED mode — snapshots refuse (typed), and run
+# creation refuses (503, server side) — so state that never reconciled
+# with the branch can never overwrite the branch. `restored` is None
+# when no restore was attempted (library/test use, direct CLI calls):
+# snapshots proceed under the previous semantics; only an EXPLICIT
+# failed restore closes the gate. A successful restore opens it.
+_SERVE_GATE: Dict[str, Any] = {"restored": None, "at": None,
+                               "error": None, "attempts": 0,
+                               "integrity_verified": None}
+
+
+def serve_gate() -> Dict[str, Any]:
+    """The restore-before-serve gate, as last evaluated in this
+    process. Surfaced verbatim through /api/health (durable.serve_gate)."""
+    return dict(_SERVE_GATE)
+
+
+def _restore_report_ok(report: Dict[str, Any]) -> bool:
+    """The restore success predicate. A restore SUCCEEDED when it
+    completed without error AND the integrity manifest verified (a
+    manifest mismatch means the branch bytes are not the snapshot of
+    record — serving on top of them could compound the corruption;
+    Art. XV/XXV: disclosed, fail closed). `integrity_verified` is None
+    on branches with no manifest (legacy/fresh) — that is not a
+    failure."""
+    if report.get("error") is not None:
+        return False
+    if report.get("integrity_verified") is False:
+        return False
+    return True
+
+
+def restore_for_serve(max_attempts: int = 3,
+                      delay_seconds: float = 5.0) -> Dict[str, Any]:
+    """restore() with the serve gate applied: retry a bounded number of
+    times (transient git/network failures self-heal within the boot
+    window), then set the gate — True on success, False on exhaustion.
+    Returns the LAST restore report. The server calls this BEFORE
+    serve_forever and refuses run creation while the gate is closed; a
+    background retry thread re-attempts restore() so a gate closed by a
+    long network outage opens without a container restart."""
+    last: Dict[str, Any] = {}
+    for attempt in range(1, max(1, max_attempts) + 1):
+        try:
+            last = restore()
+        except Exception as exc:  # noqa: BLE001 — restore() guards its
+            # own body; this catches surprises ABOVE it (import, lock)
+            last = {"error": f"{type(exc).__name__}: {exc}"[:300]}
+        if _restore_report_ok(last):
+            _SERVE_GATE.update({"restored": True, "at": _now_iso(),
+                                "error": None, "attempts": attempt,
+                                "integrity_verified":
+                                last.get("integrity_verified")})
+            return last
+        _SERVE_GATE.update({"restored": False, "at": _now_iso(),
+                            "error": last.get("error"),
+                            "attempts": attempt,
+                            "integrity_verified":
+                            last.get("integrity_verified")})
+        if attempt < max_attempts and delay_seconds > 0:
+            time.sleep(delay_seconds)
+    return last
+
+
+def _now_iso() -> str:
+    return time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+
 _LAST: Dict[str, Any] = {"ok": None, "at": None, "reason": None,
                          "error": None, "files": 0, "commit": None,
                          "pushed": None, "manifest_sha256": None,
@@ -99,7 +176,8 @@ _LAST_RESTORE: Dict[str, Any] = {"at": None, "sessions": 0, "runs": 0,
                                  "error": None, "branch_sessions": None,
                                  "integrity_mismatches": None,
                                  "integrity_verified": None,
-                                 "manifest_sha256": None}
+                                 "manifest_sha256": None,
+                                 "model_routing_lines": 0}
 # R467 engineer-review finding: over-cap files are skipped, never
 # silently — the counts ride the snapshot report (typed observable).
 _SKIPPED_OVERSIZE: Dict[str, int] = {}
@@ -120,6 +198,7 @@ def state() -> Dict[str, Any]:
     return {
         "enabled": enabled(),
         "branch": branch() if enabled() else None,
+        "serve_gate": dict(_SERVE_GATE),
         "last_snapshot": dict(_LAST),
         "last_restore": dict(_LAST_RESTORE),
         "store": "private engine repo runtime-state branch (git)",
@@ -392,6 +471,111 @@ def _ensure_state_repo_hot() -> Path:
     return STATE_REPO
 
 
+def _shrink_violations(repo: Path, payload: Dict[str, Path]) -> List[str]:
+    """R473 (audit-named defense 2 — shrink guard). Compare the payload
+    this snapshot is about to push against the durable branch state
+    (HEAD of the state repo). The branch is the DURABLE record; a
+    snapshot is legitimate only if everything it would replace is a
+    superset of what the branch holds:
+
+      * sessions.json — the branch's session_id set must survive (the
+        176->34 incident class: a fresh/un-restored container pushed a
+        34-session index over a 176-session branch index);
+      * shares.json — same superset rule over share ids;
+      * append-only ledgers (worker_forensics/*.jsonl,
+        model_routing/ledger.jsonl) — every branch line must survive
+        verbatim (append-only history, merged by replay on restore).
+
+    A payload file ABSENT from the map is not a violation — the branch
+    copy simply stays in the state-repo working tree and is never
+    deleted by `git add -A`. Only REPLACEMENT by smaller content is the
+    hazard. Returns a list of typed violation strings (empty = safe).
+    """
+    violations: List[str] = []
+
+    def _head_json(rel: str) -> Optional[dict]:
+        r = _git(repo, "show", f"HEAD:{rel}", check=False)
+        if r.returncode != 0 or not r.stdout.strip():
+            return None
+        try:
+            return json.loads(r.stdout)
+        except ValueError:
+            return None
+
+    def _payload_json(rel: str) -> Optional[dict]:
+        src = payload.get(rel)
+        if not src or not Path(src).exists():
+            return None
+        try:
+            return json.loads(Path(src).read_text())
+        except (ValueError, OSError):
+            return None
+
+    # --- sessions.json: branch session ids must survive ---------------
+    head_s = _head_json("sessions.json")
+    if isinstance(head_s, dict):
+        branch_ids = {s.get("session_id")
+                      for s in (head_s.get("sessions") or [])
+                      if isinstance(s, dict) and s.get("session_id")}
+        if branch_ids:
+            new_s = _payload_json("sessions.json")
+            if new_s is None:
+                violations.append(
+                    "sessions.json: payload missing or unreadable while "
+                    f"the branch holds {len(branch_ids)} session(s)")
+            else:
+                new_ids = {s.get("session_id")
+                           for s in (new_s.get("sessions") or [])
+                           if isinstance(s, dict) and s.get("session_id")}
+                lost = sorted(branch_ids - new_ids)
+                if lost:
+                    shown = ", ".join(lost[:5])
+                    more = f" (+{len(lost) - 5} more)" if len(lost) > 5 else ""
+                    violations.append(
+                        f"sessions.json: {len(lost)} session(s) present "
+                        f"on the branch would vanish ({shown}{more})")
+
+    # --- shares.json: branch share ids must survive --------------------
+    head_sh = _head_json("shares.json")
+    if isinstance(head_sh, dict) and head_sh:
+        new_sh = _payload_json("shares.json")
+        if new_sh is None:
+            violations.append(
+                "shares.json: payload missing or unreadable while the "
+                f"branch holds {len(head_sh)} share(s)")
+        elif isinstance(new_sh, dict):
+            lost = sorted(set(head_sh) - set(new_sh))
+            if lost:
+                violations.append(
+                    f"shares.json: {len(lost)} share(s) present on the "
+                    f"branch would vanish ({', '.join(lost[:5])})")
+
+    # --- append-only ledgers: every branch line must survive -----------
+    ls = _git(repo, "ls-tree", "-r", "--name-only", "HEAD", check=False)
+    if ls.returncode == 0:
+        for rel in ls.stdout.splitlines():
+            if not rel.endswith(".jsonl"):
+                continue
+            if not (rel.startswith("worker_forensics/")
+                    or rel == "model_routing/ledger.jsonl"):
+                continue  # snapshot_log.jsonl is the log itself, excluded
+            old = _git(repo, "show", f"HEAD:{rel}", check=False)
+            if old.returncode != 0 or not old.stdout.strip():
+                continue
+            src = payload.get(rel)
+            if not src or not Path(src).exists():
+                continue  # not pushed this round: branch copy survives
+            new_lines = {l.strip() for l in Path(src).read_text().splitlines()
+                         if l.strip()}
+            lost = [l for l in old.stdout.splitlines()
+                    if l.strip() and l.strip() not in new_lines]
+            if lost:
+                violations.append(
+                    f"{rel}: {len(lost)} append-only line(s) present on "
+                    "the branch would vanish")
+    return violations
+
+
 def snapshot(reason: str) -> Dict[str, Any]:
     """Commit the current durable state and push it. Returns an honest
     outcome dict (also cached for /api/health).
@@ -412,11 +596,25 @@ def snapshot(reason: str) -> Dict[str, Any]:
                   "commit": None, "pushed": None,
                   "manifest_sha256": None,
                   "engine_commit": ident_commit or None,
-                  "skipped_oversize": dict(_SKIPPED_OVERSIZE)})
+                  "skipped_oversize": dict(_SKIPPED_OVERSIZE),
+                  "shrink_guard": None})
     if not enabled():
         _LAST["ok"] = False  # explicit refusal, not an unattempted null
         _LAST["error"] = ("durable persistence not enabled "
                           "(DURABLE_STATE_ENABLED != 1)")
+        return dict(_LAST)
+    if _SERVE_GATE["restored"] is False:
+        # R473 restore-before-serve: a restore attempt FAILED in this
+        # process — the local store never reconciled with the branch —
+        # so ANY snapshot from this state could push a shrunken index
+        # over the branch (the measured 176->34 mechanism). Refuse,
+        # typed, before touching git. (None = no restore attempted —
+        # library/test/CLI use keeps the previous semantics.)
+        _LAST["ok"] = False
+        _LAST["error"] = ("restore gate closed — the durable branch was "
+                          "never successfully restored in this process; "
+                          "refusing to snapshot (restore-before-serve, "
+                          "R473)")
         return dict(_LAST)
     if not os.environ.get("GITHUB_TOKEN", "").strip():
         _LAST["ok"] = False  # explicit refusal, not an unattempted null
@@ -432,6 +630,30 @@ def snapshot(reason: str) -> Dict[str, Any]:
         # failure disclosure if that assumption is ever violated).
         repo = _ensure_state_repo_hot()
         payload = _collect_payload()
+        # R473 (audit-named defense 2 — SHRINK GUARD): before anything
+        # is copied or committed, compare the payload this snapshot
+        # would push against the durable branch (HEAD of the state
+        # repo): the branch's session ids / share ids / append-only
+        # ledger lines must all SURVIVE. A smaller-or-empty snapshot
+        # over a larger durable state is the exact 176->34 incident
+        # class; it is refused unless the operator sets
+        # DURABLE_ALLOW_SHRINK=1 — and even then the override is
+        # RECORDED in the snapshot report, the snapshot log, and the
+        # commit message (never a silent shrink, Art. XV/XXV).
+        violations = _shrink_violations(repo, payload)
+        _override = (os.environ.get("DURABLE_ALLOW_SHRINK", "").strip()
+                     == "1")
+        if violations and not _override:
+            _LAST["ok"] = False
+            _LAST["error"] = ("shrink guard blocked snapshot: "
+                              + "; ".join(violations))[:300]
+            _LAST["shrink_guard"] = {"ok": False,
+                                     "violations": violations,
+                                     "override": False}
+            return dict(_LAST)
+        _LAST["shrink_guard"] = {"ok": not violations,
+                                 "violations": violations,
+                                 "override": bool(violations and _override)}
         copied = 0
         skipped = 0
         file_hashes: Dict[str, str] = {}
@@ -480,7 +702,10 @@ def snapshot(reason: str) -> Dict[str, Any]:
         (repo / MANIFEST_NAME).write_bytes(manifest_bytes)
         _LAST["manifest_sha256"] = _tree_sha256(file_hashes)
         # append-only snapshot log — same record shape as the manifest
-        # summary + the state-repo commit it becomes (R396 B.3)
+        # summary + the state-repo commit it becomes (R396 B.3). R473:
+        # a shrink-guard override is RECORDED here — never a silent
+        # shrink (Art. XV/XXV).
+        _sg = _LAST.get("shrink_guard") or {}
         log = repo / SNAPSHOT_LOG_NAME
         with open(log, "a") as lf:
             lf.write(json.dumps({
@@ -490,11 +715,14 @@ def snapshot(reason: str) -> Dict[str, Any]:
                 "files_copied": copied,
                 "files_skipped_unchanged": skipped,
                 "engine_commit": ident_commit or None,
-                "tree_sha256": _LAST["manifest_sha256"]}) + "\n")
+                "tree_sha256": _LAST["manifest_sha256"],
+                "shrink_override": bool(_sg.get("override")),
+                "shrink_violations": _sg.get("violations") or [],}) + "\n")
         _git(repo, "add", "-A")
+        _sg_suffix = " [shrink-override]" if _sg.get("override") else ""
         commit = _git(repo, "-c", "user.name=toscanini-runtime",
                       "-c", "user.email=runtime@toscanini.local",
-                      "commit", "-m", f"runtime-state: {reason}",
+                      "commit", "-m", f"runtime-state: {reason}{_sg_suffix}",
                       "--quiet", check=False)
         pushed = None
         if commit.returncode == 0:
@@ -564,7 +792,8 @@ def restore() -> Dict[str, Any]:
                           "branch_sessions": None,
                           "integrity_mismatches": None,
                           "integrity_verified": None,
-                          "manifest_sha256": None})
+                          "manifest_sha256": None,
+                          "model_routing_lines": 0})
     if not enabled():
         _LAST_RESTORE["error"] = "not enabled"
         return dict(_LAST_RESTORE)
@@ -700,6 +929,76 @@ def restore() -> Dict[str, Any]:
                         except Exception:  # noqa: BLE001 — ledger restore
                             # is best-effort; the local ledger stays
                             pass
+            # R473 (restore symmetry — the shrink guard's counterpart):
+            # model_routing/ledger.jsonl has been a durable PAYLOAD since
+            # R451-C1.3, but restore() never re-materialized it — a
+            # fresh container's first snapshot then pushed a SHORTER
+            # ledger over the branch and erased history (measured: the
+            # 19 earliest records of e245bbe vanished from
+            # runtime-state-hf between e245bbe and 828be9b4 — the exact
+            # incident the graft v4 data repair just restored). The
+            # shrink guard is only sound if restore brings the branch
+            # history BACK so the next snapshot is a superset. Same
+            # append-only merge contract as worker_forensics: by
+            # request_id, local lines never rewritten.
+            mr_dir = repo / "model_routing"
+            if mr_dir.is_dir():
+                _mr_dst = REPO_ROOT / "ENGINE_RUNS" / "model_routing"
+                _mr_dst.mkdir(parents=True, exist_ok=True)
+                ledger = mr_dir / "ledger.jsonl"
+                if ledger.is_file():
+                    dst = _mr_dst / "ledger.jsonl"
+                    appended = 0
+                    if not dst.exists():
+                        _mr_dst.mkdir(parents=True, exist_ok=True)
+                        shutil.copy2(ledger, dst)
+                        appended = sum(1 for l in
+                                       dst.read_text().splitlines()
+                                       if l.strip())
+                    else:
+                        try:
+                            local_ids = set()
+                            for line in dst.read_text().splitlines():
+                                line = line.strip()
+                                if not line:
+                                    continue
+                                try:
+                                    local_ids.add(
+                                        json.loads(line).get("request_id"))
+                                except json.JSONDecodeError:
+                                    continue
+                            with open(dst, "a", encoding="utf-8") as out:
+                                for line in ledger.read_text().splitlines():
+                                    line = line.strip()
+                                    if not line:
+                                        continue
+                                    try:
+                                        rid = json.loads(line).get(
+                                            "request_id")
+                                    except json.JSONDecodeError:
+                                        continue
+                                    if rid not in local_ids:
+                                        out.write(line + "\n")
+                                        appended += 1
+                        except Exception:  # noqa: BLE001 — best-effort
+                            pass
+                    _LAST_RESTORE["model_routing_lines"] = appended
+                # the routing state + capability store: copy-when-absent
+                # (the conservative additive contract — local, when it
+                # exists, is the live authority and is never regressed
+                # by the branch copy)
+                for rel in ("model_routing/state.json",):
+                    srcf = repo / rel
+                    dstf = _mr_dst / Path(rel).name
+                    if srcf.is_file() and not dstf.exists():
+                        shutil.copy2(srcf, dstf)
+            _cap_src = repo / "transport_capability" / "capability_state.json"
+            if _cap_src.is_file():
+                _cap_dst = (REPO_ROOT / "ENGINE_RUNS" / "transport_capability"
+                            / "capability_state.json")
+                if not _cap_dst.exists():
+                    _cap_dst.parent.mkdir(parents=True, exist_ok=True)
+                    shutil.copy2(_cap_src, _cap_dst)
             runs_dir = repo / "runs"
             if runs_dir.is_dir():
                 for rd in runs_dir.iterdir():
