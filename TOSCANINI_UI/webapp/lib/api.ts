@@ -420,3 +420,92 @@ export async function getDossier(id: string): Promise<DossierBody | null> {
     return null; // honest absence — the investigation pane still works
   }
 }
+
+// ---------------------------------------------------------------------------
+// R477 (audit P0-5): the package 200-probe — "zero dead package clicks".
+//
+// The audit measured the loop: `packageAvailable` flipped true from the
+// CIO/dossier records while the download route 409'd (the survivor gate
+// or the Article-LXXII visual gate) — the button promised what the gate
+// refused. The probe asks the ACTUAL download route before the UI claims
+// availability: 200 -> pass; 409 -> blocked WITH the engine's typed gate
+// payload (rendered as the gate sentence + the diagnostic fallback); any
+// probe failure is "unverified" — the UI does not claim availability from
+// a broken probe either. The body stream is cancelled so the probe never
+// downloads the ZIP.
+// ---------------------------------------------------------------------------
+
+export type PackageProbe =
+  | { result: "pass" }
+  | { result: "blocked"; gate: Record<string, unknown> }
+  | { result: "unverified" };
+
+export async function probePackage(
+  id: string,
+  get: (path: string) => Promise<Response> = (p) =>
+    fetch(p, { cache: "no-store" })
+): Promise<PackageProbe> {
+  const key = storedOwnerKey();
+  const path = `/api/run/${id}/package${
+    key ? `?owner=${encodeURIComponent(key)}` : ""
+  }`;
+  let res: Response;
+  try {
+    res = await get(path);
+  } catch {
+    return { result: "unverified" };
+  }
+  if (res.status === 200) {
+    try {
+      await res.body?.cancel();
+    } catch {
+      /* the body may already be consumed — the status is what matters */
+    }
+    return { result: "pass" };
+  }
+  if (res.status === 409) {
+    try {
+      const gate = (await res.json()) as Record<string, unknown>;
+      return { result: "blocked", gate };
+    } catch {
+      return { result: "blocked", gate: {} };
+    }
+  }
+  try {
+    await res.body?.cancel();
+  } catch {
+    /* ignore */
+  }
+  return { result: "unverified" };
+}
+
+// ---------------------------------------------------------------------------
+// R477 (audit P0-4): the run contract — the ONE next-action authority.
+// The endpoint existed since R446-C1 (GET /api/run/{id}/contract); the
+// UI never read it, leaving the next action to a purely frontend
+// derivation (the audit's "dual NBA"). At terminal state the shell now
+// reads the contract and deriveNextAction renders the engine's recorded
+// next step when one exists (source: "engine-record"), falling back to
+// the presentation derivation only when the record carries none.
+// Fail-open: a contract that cannot be fetched degrades to the
+// presentation derivation — the button never disappears for it.
+// ---------------------------------------------------------------------------
+
+export interface RunContractBody {
+  schema?: string;
+  run_id?: string;
+  next_action?: Record<string, unknown> | null;
+  [k: string]: unknown;
+}
+
+export async function getRunContract(
+  id: string
+): Promise<RunContractBody | null> {
+  try {
+    return json<RunContractBody>(
+      await apiFetch(`/api/run/${id}/contract`)
+    );
+  } catch {
+    return null; // honest absence — the presentation derivation stands
+  }
+}

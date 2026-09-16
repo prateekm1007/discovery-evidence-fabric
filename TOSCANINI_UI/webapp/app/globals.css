@@ -3070,3 +3070,81 @@ h2.wk-title {
   padding: 6px 8px;
   border-left: 2px solid var(--line);
 }
+
+/* ==========================================================================
+   R477 — the UI audit's P0 batch, surface styles.
+   ========================================================================== */
+
+/* P0-3: the confirm row — a typed steering message stops here until the
+   user picks Do it (act) or Ask (read-only). Calm, explicit, one row. */
+.conv-confirm {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 6px 0;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--paper-raise, rgba(0, 0, 0, 0.02));
+}
+.conv-confirm-q { font-size: 13px; }
+
+/* P0-1: the queued receipt — a SAVED direction is not a failure; it
+   renders in the same note region but with the saved register. */
+.conv-action-note.queued {
+  border-left-color: var(--accent);
+}
+
+/* P0-1: the directive-outcome card — the conversation carries the
+   verbatim saved direction as a first-class receipt. */
+.conv-queued {
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--accent);
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+.conv-queued-k {
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-bottom: 4px;
+}
+.conv-queued-text { font-size: 14px; }
+
+/* P0-2: the STORED attachment chip — unmissable, never a faint
+   footnote. A bordered badge with a not-read marker; the custody hash
+   rides the tooltip. */
+.ask-stored-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 6px;
+  padding: 1px 7px;
+  border: 1px solid var(--accent);
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--ink);
+  background: transparent;
+  white-space: nowrap;
+}
+.ask-stored-badge.hard { border-style: dashed; }
+.ask-stored-mark {
+  font-weight: 700;
+  color: var(--accent);
+  line-height: 1;
+}
+
+/* P0-5: the package gate note — the typed 409 as a stated state with
+   the diagnostic fallback. */
+.pkg-gate-note {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 14px 16px;
+  display: grid;
+  gap: 8px;
+  justify-items: start;
+}
+.pkg-gate-title { font-weight: 600; }

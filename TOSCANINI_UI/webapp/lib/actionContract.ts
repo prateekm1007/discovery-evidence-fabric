@@ -274,6 +274,58 @@ export function classifyMessage(text: string): MessageRoute {
 }
 
 // ---------------------------------------------------------------------------
+// R477 (audit P0-3, "intent router v2") — the CONFIRM layer.
+//
+// The audit's red-team row measured the silent no-op end to end: a typed
+// steering phrase ("make it cheaper") matched the table, but the send
+// path only acted when the composer was explicitly armed via a steer
+// chip — otherwise the SAME words went to the read-only ask endpoint and
+// nothing changed. The fix is not a bigger regex: it is making the
+// decision EXPLICIT. classifyMessage stays the deterministic verb
+// DETECTOR (its pins hold); directionConfirmVerb decides when the
+// composer must stop and ask "Send as: <label>? — Do it / Ask" with the
+// user's verbatim words as the direction. Two ways to need the confirm:
+//
+//   1. the table matched (route.kind === "action") but the composer was
+//      not armed — the user typed steering, so show the choice;
+//   2. no table match, but the message is direction-SHAPED (an
+//      imperative cue, not a question) — it lifts to the generic steer
+//      verb CHANGE_MECHANISM with the user's words riding verbatim in
+//      params.direction (R461), which is exactly where the R475
+//      constraint vocabulary finds them downstream.
+//
+// A QUESTION stays a question silently — leading wh-/auxiliary words or
+// a question mark mark it as a question, and hijacking a question into
+// an action would be a worse defect than the one this closes.
+// Deterministic and model-free, like everything in this module.
+// ---------------------------------------------------------------------------
+
+const QUESTION_SHAPE =
+  /(^|\W)(what|why|how|is|are|was|were|do|does|did|can|could|would|should|where|when|who|whom|whose|which)\b|\?/i;
+
+const DIRECTION_CUES =
+  /\b(make|get|design|build|redesign|rework|turn|use|try|switch|go|move|swap|add|remove|avoid|eliminate|exclude|focus|limit|restrict|keep|hold|preserve|reduce|lower|minimi[sz]e|cut|shrink|decrease|improve|increase|boost|maximi[sz]e|stop|search|prioriti[sz]e|no|without|instead|cheaper|faster|smaller|lighter|stronger|safer|simpler)\b/i;
+
+/** The verb to CONFIRM for this message, or null when it should flow as
+ * a plain question. `route` is classifyMessage(text)'s result. */
+export function directionConfirmVerb(
+  text: string,
+  route: MessageRoute
+): Exclude<ActionVerb, "ASK"> | null {
+  if (route.kind === "action") return route.verb;
+  const t = String(text ?? "").trim();
+  if (!t || QUESTION_SHAPE.test(t)) return null;
+  return DIRECTION_CUES.test(t) ? "CHANGE_MECHANISM" : null;
+}
+
+/** The honest receipt when the engine saved a mid-run direction (P0-1).
+ * Used when the engine's own note is missing (old engines) — the words
+ * mirror server.py's 409 note so the two never disagree in meaning. */
+export const QUEUED_RECEIPT_COPY =
+  "Noted — your direction is saved. It will be ready to run the " +
+  "moment this investigation finishes.";
+
+// ---------------------------------------------------------------------------
 // the invocation path (Coder 2 owns THIS; Coder 1 owns the engine side)
 // ---------------------------------------------------------------------------
 

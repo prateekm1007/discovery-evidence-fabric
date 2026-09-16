@@ -108,8 +108,41 @@ export interface CandidateView {
 
 export interface NextAction {
   label: string;
-  kind: "package" | "retry" | "new" | "surface" | "diagnostic" | "run_queued";
+  kind:
+    | "package"
+    | "retry"
+    | "new"
+    | "surface"
+    | "diagnostic"
+    | "run_queued"
+    // R477 (audit P0-4): the engine-recorded next action executed
+    // through the ONE canonical action endpoint (the same path the
+    // conversation's steering uses).
+    | "act";
   surface?: SurfaceId;
+  verb?: string;
+  /** R477 (audit P0-4): ONE decision trace — "engine-record" means the
+   * label came from the run contract's next_action (the NBA controller
+   * record / the NEXT_BEST_ACTION stage output, read via
+   * GET /api/run/{id}/contract); "presentation" means the UI derived it
+   * from canonical state because no engine record existed. Never two
+   * authorities displayed at once. */
+  source?: "engine-record" | "presentation";
+  /** the engine record's own reason, when the label is engine-derived. */
+  basis?: string | null;
+}
+
+// R477 (audit P0-4): the shape of GET /api/run/{id}/contract's
+// next_action — the runtime NBA controller's preferred_action or the
+// persisted NEXT_BEST_ACTION stage record (run_contract._next_action).
+// Deliberately loose: the UI maps the closed action vocabulary and
+// invents nothing for an unknown action (it falls back honestly).
+export interface EngineNextAction {
+  action?: string;
+  reason?: string | null;
+  target_uncertainty?: string | null;
+  authority?: string;
+  [k: string]: unknown;
 }
 
 // one conversation message. `epi` carries the brief-§10 meta label.
@@ -152,6 +185,11 @@ export type Msg =
       body: string | null;
       cta: string;
     }
+  // R477 (audit P0-1): the directive-outcome card — a direction the
+  // user asked for while the run was live, saved by the engine and
+  // never applied mid-flight. The conversation carries the receipt
+  // verbatim; the one-click execution rides the run_queued next action.
+  | { kind: "queued"; id: string; text: string }
   | {
       kind: "outcome";
       id: string;

@@ -43,15 +43,18 @@ import {
   getEvents,
   getHealth,
   getRealityLoop,
+  getRunContract,
   getRunResult,
   getShowcase,
   listSessions,
   listShowcase,
+  probePackage,
   retryRun,
   startRun,
   streamUrl,
   uploadAttachment,
   type AttachmentUploadResult,
+  type PackageProbe,
 } from "@/lib/api";
 import type {
   AskResponse,
@@ -67,7 +70,7 @@ import type {
   ShowcaseDetail,
   ShowcaseRow,
 } from "@/lib/types";
-import type { NextAction, SurfaceId } from "@/lib/present";
+import type { EngineNextAction, NextAction, SurfaceId } from "@/lib/present";
 import { suppressStalePositives, isTerminal } from "@/lib/present";
 import { latestChildOf, roundNumberOf } from "@/lib/rounds";
 import Sidebar from "@/components/Sidebar";
@@ -358,8 +361,31 @@ function NewDiscoveryPane({
                     </span>
                   )}
                   {stored && (
-                    <span className="faint" data-attachment-stored>
-                      {" · "}stored on the record{ing === "STORED_TEXT_UNREADABLE" ? " — no text could be read from it" : " — not read as text"}
+                    // R477 (audit P0-2): the STORED state is an
+                    // UNMISSABLE badge, not a faint footnote — a bordered
+                    // "stored, not read" chip with a not-read marker and
+                    // the custody hash in the tooltip. The acceptance:
+                    // a user attaching a diagram states, before sending,
+                    // that its image was not read into the investigation.
+                    <span
+                      className={`ask-stored-badge${ing === "STORED_TEXT_UNREADABLE" ? " hard" : ""}`}
+                      data-attachment-stored
+                      title={
+                        p.record?.sha256
+                          ? `content hash ${p.record.sha256} — the file is custody-frozen on the record, but its content was not read as text`
+                          : "the file is on the record, but its content was not read as text"
+                      }
+                    >
+                      <span
+                        className="ask-stored-mark"
+                        aria-hidden="true"
+                      >
+                        ×
+                      </span>
+                      stored, not read
+                      {ing === "STORED_TEXT_UNREADABLE"
+                        ? " — no text could be extracted"
+                        : " — text not extracted"}
                     </span>
                   )}
                   {p.state === "uploading" && <span className="faint"> · fetching…</span>}
@@ -632,6 +658,19 @@ function WorkspaceInner() {
   // defect: the thrown error swallowed the reload and the UI froze on
   // the interrupted card).
   const [retryNote, setRetryNote] = useState<string | null>(null);
+  // R477 (audit P0-4): the run contract's next_action — the ONE NBA
+  // authority when present (the audit's "dual NBA" closed: the UI now
+  // READS the contract instead of deriving alone).
+  const [contractNext, setContractNext] = useState<EngineNextAction | null>(
+    null
+  );
+  // R477 (audit P0-4): the engine-NBA receipt line (an executed engine
+  // next action renders its outcome here, same register as retryNote).
+  const [nbaNote, setNbaNote] = useState<string | null>(null);
+  // R477 (audit P0-5): the package 200-probe result — the download
+  // button is claimed available only while the ACTUAL download route
+  // has not answered 409 ("zero dead package clicks").
+  const [pkgProbe, setPkgProbe] = useState<PackageProbe | null>(null);
   // R459 (audit P1-3): the share flow — the backend endpoint existed;
   // the product surface now offers it.
   const [shareUrl, setShareUrl] = useState<string | null>(null);
@@ -883,12 +922,69 @@ function WorkspaceInner() {
     };
   }, [detail?.session_id, detail?.status]);
 
-  const packageAvailable = Boolean(
+  // ---- R477 (audit P0-4): the run contract once terminal — the
+  // engine's recorded next action becomes the NBA authority when the
+  // record carries one. Fail-open: no contract -> presentation
+  // derivation (the button never disappears for a missing record). ----
+  useEffect(() => {
+    setContractNext(null);
+    if (!detail || !isTerminal(detail.status)) return;
+    let alive = true;
+    getRunContract(detail.session_id)
+      .then((c) => {
+        if (!alive) return;
+        const na = c?.next_action;
+        setContractNext(
+          na && typeof na === "object" ? (na as EngineNextAction) : null
+        );
+      })
+      .catch(() => {
+        if (!alive) return;
+        setContractNext(null);
+      });
+    return () => {
+      alive = false;
+    };
+  }, [detail?.session_id, detail?.status]);
+
+  // ---- R477 (audit P0-5): the package 200-probe. Runs when the
+  // records CLAIM a package on a terminal run; the claim only becomes
+  // an available button while the download route has not answered 409. ----
+  useEffect(() => {
+    setPkgProbe(null);
+    if (!detail || !isTerminal(detail.status)) return;
+    const claimed = Boolean(
+      cio?.downloads?.package_zip ||
+        detail?.package?.zip_name ||
+        detail?.package?.complete ||
+        dossier?.tabs?.transfer?.download
+    );
+    if (!claimed) return;
+    let alive = true;
+    probePackage(detail.session_id).then((p) => {
+      if (alive) setPkgProbe(p);
+    });
+    return () => {
+      alive = false;
+    };
+  }, [detail?.session_id, detail?.status, cio?.downloads?.package_zip,
+      detail?.package?.zip_name, detail?.package?.complete,
+      dossier?.tabs?.transfer?.download]);
+
+  const packageClaimed = Boolean(
     cio?.downloads?.package_zip ||
       detail?.package?.zip_name ||
       detail?.package?.complete ||
       dossier?.tabs?.transfer?.download
   );
+  // R477 (audit P0-5): available UNTIL PROVEN BLOCKED — the gate's 409
+  // is the authority; a failed probe keeps the button but the click
+  // path renders the typed gate copy (never a dead click).
+  const packageAvailable = packageClaimed && pkgProbe?.result !== "blocked";
+  const packageGate =
+    pkgProbe?.result === "blocked"
+      ? pkgProbe.gate
+      : null;
 
   // ---- the invention (showcase) ----
   useEffect(() => {
@@ -1017,7 +1113,7 @@ function WorkspaceInner() {
     }
   }
 
-  function handleNext(next: NextAction) {
+  async function handleNext(next: NextAction) {
     if (!detail) return;
     if (next.kind === "retry") {
       // R471 (external audit P0-2, PARALLEL-LINE UNION): an accepted
@@ -1073,6 +1169,45 @@ function WorkspaceInner() {
         return;
       }
       setSurface("package");
+      return;
+    }
+    // R477 (audit P0-4): the ENGINE-recorded next action — executed
+    // through the ONE canonical action endpoint the conversation steers
+    // with. The receipt renders in the same register as the retry note;
+    // a queued receipt (live run) states the save, never a failure.
+    if (next.kind === "act" && next.verb) {
+      setNbaNote(null);
+      // R477: the invocation rides the ONE canonical action contract
+      // (sendAction). Dynamically imported so the landing's render-
+      // blocking graph stays clean (the R466 LCP contract): the module
+      // loads on the first engine-NBA execution, a terminal-only event.
+      const { sendAction } = await import("@/lib/actionContract");
+      sendAction(detail.session_id, next.verb as Parameters<typeof sendAction>[1], {}, apiPost)
+        .then((result) => {
+          if (result.accepted && result.new_run_id) {
+            selectRun(result.new_run_id);
+          } else if (result.queued) {
+            setNbaNote(
+              result.queued_note ??
+                "Noted — your direction is saved. It will be ready to run the moment this investigation finishes."
+            );
+          } else if (result.accepted) {
+            setNbaNote(
+              "Done — that next step is with the engine. The conversation will show what actually changed, from the record, when it happens."
+            );
+          } else if (result.refusal) {
+            setNbaNote(result.refusal);
+          } else {
+            setNbaNote(
+              "The action could not be delivered — an infrastructure state, not a verdict about the idea."
+            );
+          }
+        })
+        .catch(() => {
+          setNbaNote(
+            "The action could not be delivered — the run's state on the page will refresh with the truth."
+          );
+        });
       return;
     }
     // R459 (audit P0-4): the always-available deliverable — a direct,
@@ -1242,6 +1377,13 @@ function WorkspaceInner() {
                     {retryNote}
                   </div>
                 )}
+                {/* R477 (audit P0-4): the engine-recorded next action's
+                    receipt — same honest register as the retry note. */}
+                {nbaNote && (
+                  <div className="errbox" style={{ marginTop: 16 }} data-nba-note>
+                    {nbaNote}
+                  </div>
+                )}
                 <Conversation
                   detail={detail}
                   dossier={dossier}
@@ -1254,6 +1396,7 @@ function WorkspaceInner() {
                   onNextAction={handleNext}
                   onActionRound={(newId) => selectRun(newId)}
                   roundNumber={currentRound}
+                  engineNextAction={contractNext}
                 />
               </>
             ) : runNotFound ? (
@@ -1296,6 +1439,7 @@ function WorkspaceInner() {
               events={events}
               gauntlet={gauntlet}
               packageAvailable={packageAvailable}
+              packageGate={packageGate}
               surface={surface}
               onClose={() => setSurface(null)}
               onSwitch={(s) => setSurface(s)}

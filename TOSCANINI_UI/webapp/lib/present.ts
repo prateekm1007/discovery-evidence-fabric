@@ -44,6 +44,7 @@ import type {
   SurfaceId,
   SessionDetail,
   UserStateView,
+  EngineNextAction,
 } from "./present-types";
 // R453-C2 merge: the canonical single definitions live in the two pure
 // sibling libs — isTerminal in lib/presentationState.ts (one definition,
@@ -64,6 +65,7 @@ export type {
   CandidateView,
   NextAction,
   SurfaceId,
+  EngineNextAction,
 };
 
 // ---------------------------------------------------------------------------
@@ -413,10 +415,12 @@ export function deriveCandidates(detail: SessionDetail): CandidateView[] {
 export function deriveNextAction(
   detail: SessionDetail,
   dossier: DossierBody | null | undefined,
-  packageAvailable: boolean
+  packageAvailable: boolean,
+  engineNextAction?: EngineNextAction | null
 ): NextAction | null {
   if (suppressStalePositives(detail)) {
-    return { label: "Resume the investigation", kind: "retry" };
+    return { label: "Resume the investigation", kind: "retry",
+             source: "presentation" };
   }
   if (isTerminal(detail.status)) {
     // R471 (audit P1-2): a direction the user asked for while the run
@@ -432,19 +436,35 @@ export function deriveNextAction(
       return {
         label: `Run your saved direction — “${short}”`,
         kind: "run_queued",
+        source: "presentation",
       };
     }
+    // R477 (audit P0-4): the ENGINE's own recorded next step is the one
+    // authority when it exists — read from GET /api/run/{id}/contract
+    // (the NBA controller's live record, else the persisted
+    // NEXT_BEST_ACTION stage output). Mapped to product language and
+    // executed through the SAME canonical action endpoint the
+    // conversation steers with; unknown engine actions fall through to
+    // the presentation derivation rather than being invented into
+    // buttons (Art. VI).
+    const mapped = engineNextAction
+      ? mapEngineNextAction(engineNextAction)
+      : null;
+    if (mapped) return mapped;
     if (packageAvailable) {
-      return { label: "Download the technology package", kind: "package" };
+      return { label: "Download the technology package", kind: "package",
+               source: "presentation" };
     }
     if (isKilledByChallenge(detail)) {
       return {
         label: "Reformulate the problem and run again",
         kind: "new",
+        source: "presentation",
       };
     }
     if (isRejectedOutcome(detail)) {
-      return { label: "Reformulate the problem and run again", kind: "new" };
+      return { label: "Reformulate the problem and run again", kind: "new",
+               source: "presentation" };
     }
     const unknowns =
       (dossier?.tabs?.overview?.key_unknowns as
@@ -455,6 +475,7 @@ export function deriveNextAction(
         label: "Resolve what remains uncertain",
         kind: "surface",
         surface: "overview",
+        source: "presentation",
       };
     }
     const experiment = dossier?.tabs?.experiment;
@@ -463,6 +484,7 @@ export function deriveNextAction(
         label: "Review the decisive experiment",
         kind: "surface",
         surface: "experiment",
+        source: "presentation",
       };
     }
     const design = dossier?.tabs?.design as DesignTabShape | undefined;
@@ -471,16 +493,58 @@ export function deriveNextAction(
         label: "Inspect the technology model",
         kind: "surface",
         surface: "model",
+        source: "presentation",
       };
     }
     // R459 (audit P0-4): the always-available deliverable — every
     // terminal run carries a diagnostic record (executive brief,
     // evidence summary, what was killed and why). No run ends with
     // nothing to take away.
-    return { label: "Download the diagnostic record", kind: "diagnostic" };
+    return { label: "Download the diagnostic record", kind: "diagnostic",
+             source: "presentation" };
   }
   // running: the investigation is the action — no button theater
   return null;
+}
+
+// ---------------------------------------------------------------------------
+// R477 (audit P0-4): the engine action vocabulary → the product's next
+// action. The vocabulary is the NBA controller's CLOSED set
+// (toscanini/conversational/nba_controller.py). ASK_CLARIFICATION and
+// STOP_HONEST are deliberately unmapped: the answer box and the outcome
+// banner are their surfaces, and mapping them to a button would invent
+// an action the record does not carry.
+// ---------------------------------------------------------------------------
+
+function mapEngineNextAction(ena: EngineNextAction): NextAction | null {
+  const action = String(ena.action ?? "").toUpperCase();
+  if (!action) return null;
+  const basis =
+    typeof ena.reason === "string" && ena.reason.trim()
+      ? ena.reason
+      : null;
+  switch (action) {
+    case "RETRIEVE_MORE_EVIDENCE":
+      return { label: "Look for more evidence", kind: "act",
+               verb: "FIND_EVIDENCE", basis, source: "engine-record" };
+    case "ATTACK_CANDIDATE":
+      return { label: "Challenge the strongest candidate", kind: "act",
+               verb: "ATTACK", basis, source: "engine-record" };
+    case "GENERATE_COMPETING_MECHANISM":
+      return { label: "Try another mechanism", kind: "act",
+               verb: "CHANGE_MECHANISM", basis, source: "engine-record" };
+    case "ENGINEERING_ESCALATION":
+      return { label: "Work out the engineering", kind: "act",
+               verb: "REQUEST_ENGINEERING", basis, source: "engine-record" };
+    case "PROPOSE_DECISIVE_EXPERIMENT":
+      return { label: "Design the decisive experiment", kind: "act",
+               verb: "REQUEST_EXPERIMENT", basis, source: "engine-record" };
+    case "PACKAGE_READY":
+      return { label: "Download the technology package", kind: "package",
+               basis, source: "engine-record" };
+    default:
+      return null;
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -603,7 +667,8 @@ export function directiveDisplayText(directive: unknown): string | null {
 export function deriveConversation(
   detail: SessionDetail,
   dossier: DossierBody | null | undefined,
-  packageAvailable: boolean
+  packageAvailable: boolean,
+  engineNextAction?: EngineNextAction | null
 ): Msg[] {
   const msgs: Msg[] = [];
   const running = !isTerminal(detail.status);
@@ -720,7 +785,8 @@ export function deriveConversation(
         (failed ? ` Recorded failure: ${failed}.` : "") +
         " Anything on the record from before the interruption stays in the " +
         "technical view; the conversation does not read it as a present-tense result.",
-      next: deriveNextAction(detail, dossier, packageAvailable),
+      next: deriveNextAction(detail, dossier, packageAvailable,
+                             engineNextAction),
     });
     return msgs;
   }
@@ -848,8 +914,25 @@ export function deriveConversation(
 
   // 7 — the outcome (terminal) or the live progress line
   if (!running) {
+    // R477 (audit P0-1): the directive-outcome card — a direction the
+    // user asked for while the run was live rides the thread BEFORE the
+    // outcome, so the receipt is unmissable: the words are the user's
+    // (verbatim from the engine record), and the statement is exact —
+    // saved, never applied mid-flight, one tap away via the run_queued
+    // next action below.
+    const savedDirective = directiveDisplayText(
+      detail.queued_directive?.directive
+    );
+    if (savedDirective) {
+      msgs.push({
+        kind: "queued",
+        id: mid("q"),
+        text: savedDirective,
+      });
+    }
     const tone = outcomeTone(detail);
-    const next = deriveNextAction(detail, dossier, packageAvailable);
+    const next = deriveNextAction(detail, dossier, packageAvailable,
+                                  engineNextAction);
     if (tone === "positive") {
       msgs.push({
         kind: "outcome",

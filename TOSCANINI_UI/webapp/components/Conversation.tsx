@@ -24,7 +24,7 @@
 //     route identity stays in the technical record.
 
 import { useMemo, useState } from "react";
-import type { ScienceEvent, SessionDetail, DossierBody, AskResponse } from "@/lib/present-types";
+import type { ScienceEvent, SessionDetail, DossierBody, AskResponse, EngineNextAction } from "@/lib/present-types";
 import {
   deriveConversation,
   isTerminal,
@@ -44,10 +44,12 @@ import {
 } from "@/lib/productEvents";
 import {
   classifyMessage,
+  directionConfirmVerb,
   sendAction,
   buildActionParams,
   ACTION_LABEL,
   ACTION_NOT_AVAILABLE_COPY,
+  QUEUED_RECEIPT_COPY,
   type ActionVerb,
 } from "@/lib/actionContract";
 import { apiPost } from "@/lib/api";
@@ -228,6 +230,7 @@ export default function Conversation({
   onActionRound,
   roundNumber,
   askEnabledNote,
+  engineNextAction,
 }: {
   detail: SessionDetail;
   dossier: DossierBody | null;
@@ -246,21 +249,37 @@ export default function Conversation({
       continuation card names it inside the conversation surface. */
   roundNumber?: number;
   askEnabledNote?: string | null;
+  /** R477 (audit P0-4): the engine's own recorded next action from the
+   * run contract — the one NBA authority when present. */
+  engineNextAction?: EngineNextAction | null;
 }) {
   const [q, setQ] = useState("");
   const [busy, setBusy] = useState(false);
   const [sendAsAction, setSendAsAction] = useState(false);
   const [actionNote, setActionNote] = useState<string | null>(null);
-  const msgs = deriveConversation(detail, dossier, packageAvailable);
+  // R477 (audit P0-3): the confirm state — a typed steering message
+  // stops here until the user picks Do it / Ask. The silent no-op
+  // (steering words sent to the read-only ask endpoint) is dead.
+  const [pendingConfirm, setPendingConfirm] = useState<Exclude<
+    ActionVerb,
+    "ASK"
+  > | null>(null);
+  // R477 (audit P0-1): the queued receipt marker — the note region
+  // announces a SAVED direction, not a failure.
+  const [queuedNote, setQueuedNote] = useState(false);
+  const msgs = deriveConversation(detail, dossier, packageAvailable,
+                                  engineNextAction);
 
-  // R464 (external audit P1-3): while the run is live the engine refuses
-  // every steering action (its typed mid-flight gate) — yet the composer
-  // sits open and the steer chips sit visible, both inviting input that
-  // will bounce. The chips now render only when steering is actually
-  // accepted (a terminal or paused run); a running run says, in one calm
-  // line, when steering opens. Asking about the record stays available
-  // throughout.
+  // R477 (audit P0-1): steering is AVAILABLE at every stage now. The
+  // engine queues a mid-run direction durably (the typed 409 carries
+  // queued=true — the R471 contract), so the chips no longer hide while
+  // the run is live; the row says exactly what mid-run steering does.
+  // The old terminal-only gate measured as a product defect: "steering
+  // doesn't change live runs" felt like "steering is impossible".
   const steerOpen = isTerminal(detail.status);
+  const steerLead = steerOpen
+    ? "Steer this discovery:"
+    : "While it runs, your direction is saved and offered the moment this finishes — steer away:";
 
   // R458-C2 (§7) — ONE progress sentence. The live line is the newest
   // ACTIVE event (or the honest pause) in product language; the full
@@ -307,6 +326,11 @@ export default function Conversation({
   const route = useMemo(() => classifyMessage(q), [q]);
   const routeIsAction = route.kind === "action";
 
+  // R477 (audit P0-3): the send path is SPLIT so the confirm row and
+  // the steer chips drive the same two honest paths. submit() only
+  // ORCHESTRATES: clarify -> confirm-intercept -> ask/act. A steering-
+  // shaped message can no longer slip to the read-only ask endpoint
+  // unconfirmed — the audit's measured silent no-op.
   async function submit() {
     const text = q.trim();
     if (!text || busy) return;
@@ -323,53 +347,80 @@ export default function Conversation({
       return;
     }
 
-    // — an action: send the canonical action request to the engine —
-    if (sendAsAction && route.kind === "action") {
-      setBusy(true);
-      setQ("");
-      const verb = route.verb;
-      try {
-        // R459: the invocation rides the owner-capability transport
-        // (apiPost) — the same header every run-scoped call carries.
-        // R461 (independent audit P0-2): the user's typed words ride
-        // the action verbatim (buildActionParams → params.direction,
-        // the R458 contract's "the user's own words") — previously the
-        // payload was {} and the child round received only the verb.
-        const result = await sendAction(
-          detail.session_id,
-          verb,
-          buildActionParams(verb, text),
-          apiPost
-        );
-        if (result.not_available) {
-          setActionNote(ACTION_NOT_AVAILABLE_COPY);
-        } else if (result.accepted && result.new_run_id) {
-          // the engine opened a NEW round of this investigation with the
-          // user's direction recorded — navigate to it
-          onActionRound?.(result.new_run_id);
-        } else if (result.accepted) {
-          setActionNote(
-            `Done — "${ACTION_LABEL[verb]}" is with the engine. ` +
-              `The conversation will show what actually changed, ` +
-              `from the record, when it happens.`
-          );
-        } else if (result.refusal) {
-          setActionNote(result.refusal);
-        } else {
-          setActionNote(
-            "The action could not be delivered — an infrastructure " +
-              "state, not a verdict about the idea. " +
-              (result.detail ?? "")
-          );
-        }
-      } finally {
-        setBusy(false);
-        setSendAsAction(false);
-      }
+    // — the confirm intercept: a message that looks like steering, not
+    // armed via a steer chip, stops and asks the user which way —
+    const confirmVerb = directionConfirmVerb(text, route);
+    if (confirmVerb && !(sendAsAction && route.kind === "action")) {
+      setPendingConfirm(confirmVerb);
       return;
     }
 
-    // — a question: the live read-only path over the run's record —
+    if (sendAsAction && route.kind === "action") {
+      await submitAsAction(route.verb);
+      return;
+    }
+    await submitAsAsk();
+  }
+
+  /** the ACT path — the canonical action endpoint, the user's words
+   * riding verbatim (R461), the queued receipt on a live run (R477
+   * P0-1). Shared by the composer and the confirm row's "Do it". */
+  async function submitAsAction(verb: Exclude<ActionVerb, "ASK">) {
+    const text = q.trim();
+    if (!text || busy) return;
+    setPendingConfirm(null);
+    setBusy(true);
+    setQ("");
+    try {
+      const result = await sendAction(
+        detail.session_id,
+        verb,
+        buildActionParams(verb, text),
+        apiPost
+      );
+      if (result.not_available) {
+        setQueuedNote(false);
+        setActionNote(ACTION_NOT_AVAILABLE_COPY);
+      } else if (result.accepted && result.new_run_id) {
+        // the engine opened a NEW round of this investigation with the
+        // user's direction recorded — navigate to it
+        onActionRound?.(result.new_run_id);
+      } else if (result.accepted) {
+        setQueuedNote(false);
+        setActionNote(
+          `Done — "${ACTION_LABEL[verb]}" is with the engine. ` +
+            `The conversation will show what actually changed, ` +
+            `from the record, when it happens.`
+        );
+      } else if (result.queued) {
+        // R477 (audit P0-1): THE RECEIPT — the run is live, the engine
+        // refused the mid-flight mutation AND saved the direction
+        // durably. Rendered as a receipt ("Noted — saved"), never as a
+        // bare refusal; the engine's own note is the words of record.
+        setQueuedNote(true);
+        setActionNote(result.queued_note ?? QUEUED_RECEIPT_COPY);
+      } else if (result.refusal) {
+        setQueuedNote(false);
+        setActionNote(result.refusal);
+      } else {
+        setQueuedNote(false);
+        setActionNote(
+          "The action could not be delivered — an infrastructure " +
+            "state, not a verdict about the idea. " +
+            (result.detail ?? "")
+        );
+      }
+    } finally {
+      setBusy(false);
+      setSendAsAction(false);
+    }
+  }
+
+  /** the ASK path — the read-only question over the run's record. */
+  async function submitAsAsk() {
+    const text = q.trim();
+    if (!text || busy) return;
+    setPendingConfirm(null);
     setBusy(true);
     setQ("");
     try {
@@ -566,6 +617,19 @@ export default function Conversation({
                 <Outcome m={m} onNext={onNextAction} onTechnical={onTechnical} />
               </div>
             );
+          case "queued":
+            return (
+              <div className="conv-row" key={m.id}>
+                <div className="conv-queued" data-conv-queued>
+                  <div className="conv-queued-k">Saved while this was running</div>
+                  <div className="conv-queued-text">“{m.text}”</div>
+                  <div className="faint">
+                    Nothing was applied mid-flight — the engine saved it,
+                    and it is one tap away below.
+                  </div>
+                </div>
+              </div>
+            );
           case "ask":
             return null;
         }
@@ -587,10 +651,17 @@ export default function Conversation({
           success (§4/§27: the engine's record is the only authority on
           what actually changed). R464 (audit P1-7): the note carries its
           own dismissal — a refusal or delivery note no longer squats
-          over the composer until the next navigation. */}
+          over the composer until the next navigation.
+          R477 (audit P0-1): a SAVED direction is a receipt, not a
+          failure — role=status live region + data-queued so the saved
+          direction never renders in the failure register. */}
       {actionNote && (
         <div className="conv-row" data-conv-action-note>
-          <div className="conv-note conv-action-note">
+          <div
+            className={`conv-note conv-action-note${queuedNote ? " queued" : ""}`}
+            role="status"
+            data-queued={queuedNote || undefined}
+          >
             {actionNote}
             <button
               type="button"
@@ -634,35 +705,54 @@ export default function Conversation({
         </div>
       )}
 
-      {/* R463 (audit P1-4): the persistent steer affordance — visible
-          whenever the conversation accepts steering (the composer's
-          Ask/Act routing still decides how each message is sent).
-          R464 (audit P1-3): a RUNNING run shows the calm note instead —
-          the engine's own gate refuses mid-flight steering, so the
-          chips would invite a guaranteed refusal. */}
-      {!clarificationPending &&
-        (steerOpen ? (
-          <div className="conv-steer" data-conv-steer>
-            <span className="conv-steer-k faint">Steer this discovery:</span>
-            {STEER_CHIPS.map((c) => (
-              <button
-                key={c.verb}
-                type="button"
-                className="conv-quick faint"
-                onClick={() => quickAction(c.verb, c.label)}
-              >
-                {c.label}
-              </button>
-            ))}
-          </div>
-        ) : (
-          !done && (
-            <div className="conv-steer-note" data-conv-steer-locked>
-              Steering opens when this investigation completes — you can
-              still ask about its record below.
-            </div>
-          )
-        ))}
+      {/* R463 (audit P1-4): the persistent steer affordance.
+          R477 (audit P0-1): the chips NO LONGER hide while the run is
+          live — the engine queues a mid-run direction durably, so the
+          row states exactly what mid-run steering does instead of
+          pretending steering is impossible. */}
+      {!clarificationPending && (
+        <div className="conv-steer" data-conv-steer>
+          <span className="conv-steer-k faint">{steerLead}</span>
+          {STEER_CHIPS.map((c) => (
+            <button
+              key={c.verb}
+              type="button"
+              className="conv-quick faint"
+              onClick={() => quickAction(c.verb, c.label)}
+            >
+              {c.label}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* R477 (audit P0-3): the confirm row — a typed steering message
+          stops here until the user picks. The user's words are quoted
+          verbatim (they ride the action as params.direction); nothing
+          is sent until one of the two honest paths is chosen. */}
+      {pendingConfirm && !busy && (
+        <div className="conv-confirm" data-confirm-send>
+          <span className="conv-confirm-q">
+            Send as: <b>{ACTION_LABEL[pendingConfirm]}</b>?
+          </span>
+          <button
+            type="button"
+            className="btn small primary"
+            data-confirm-act
+            onClick={() => void submitAsAction(pendingConfirm)}
+          >
+            Do it
+          </button>
+          <button
+            type="button"
+            className="btn small"
+            data-confirm-ask
+            onClick={() => void submitAsAsk()}
+          >
+            Ask
+          </button>
+        </div>
+      )}
 
       {/* the composer — conversation-first (§4: it can ask, act, and
           answer the engine's question) */}

@@ -165,11 +165,20 @@ test("P0-4: the dead 780px breakpoint is gone (CSS hygiene)", () => {
   assert.ok(!/@media\s*\(max-width:\s*780px\)\s*\{\s*\}/.test(css));
 });
 
-test("P1-3: a running run shows the calm steering note, not the chips", () => {
+test("P1-3: steering is offered at every stage — R477 replaced the locked note", () => {
+  // LEGITIMATE PIN BREAK (R477, disclosed): the R464 pin asserted the
+  // R464-era contract — chips hidden while running, because the engine
+  // refused mid-flight steering. R471 made the engine QUEUE the
+  // direction durably, and R477 (the audit's P0-1 blocker: "mid-run
+  // directive queue + UI receipt") made the UI say so: the chips stay
+  // visible on a live run with the honest "saved while it runs" lead-in,
+  // and the locked note is gone. The strengthened contract pins BOTH
+  // halves: the receipt sentence exists and the locked marker does not.
   const src = read("components/Conversation.tsx");
-  assert.ok(/steerOpen = isTerminal\(detail\.status\)/.test(src), "chip visibility mirrors the engine's action gate");
-  assert.ok(/data-conv-steer-locked/.test(src), "the locked state is observable in the DOM");
-  assert.ok(/Steering opens when this investigation completes/.test(src), "the calm sentence exists");
+  assert.ok(/data-conv-steer/.test(src), "the steer row is observable in the DOM");
+  assert.ok(/While it runs, your direction is saved/.test(src), "the mid-run receipt lead-in exists");
+  assert.ok(!/data-conv-steer-locked/.test(src), "the locked state is dead");
+  assert.ok(!/Steering opens when this investigation completes/.test(src), "the old deferral sentence is gone");
 });
 
 test("P1-4: the workspace title is a real heading", () => {

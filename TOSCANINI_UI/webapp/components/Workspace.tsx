@@ -304,6 +304,7 @@ export default function Workspace({
   events,
   gauntlet,
   packageAvailable,
+  packageGate,
   surface,
   onClose,
   onSwitch,
@@ -313,6 +314,11 @@ export default function Workspace({
   events: ScienceEvent[];
   gauntlet: GauntletCard[];
   packageAvailable: boolean;
+  /** R477 (audit P0-5): the typed 409 payload from the package
+   * 200-probe — rendered as the gate sentence + the diagnostic
+   * fallback, so a gated package is a stated state, never a dead
+   * click. */
+  packageGate?: Record<string, unknown> | null;
   surface: string | null;
   onClose: () => void;
   /** §13: contextual switching between sibling surfaces (one artifact,
@@ -446,9 +452,40 @@ export default function Workspace({
               challenges.
             </div>
           ))}
-        {surface === "package" && (
-          <>
-            {tabs ? (
+        {surface === "package" &&
+          (packageGate ? (
+            // R477 (audit P0-5): the gate's own typed words + the
+            // always-available diagnostic fallback — the click that
+            // would have 409'd becomes a stated state with a working
+            // alternative.
+            <div className="pkg-gate-note" data-package-gate>
+              <div className="pkg-gate-title">
+                The package download is blocked by this run's release
+                gate
+              </div>
+              {typeof packageGate.package_state === "string" && (
+                <div className="faint">state: {packageGate.package_state}</div>
+              )}
+              {typeof packageGate.reason === "string" && (
+                <div className="tab-reason">{packageGate.reason}</div>
+              )}
+              {Array.isArray(packageGate.reasons) &&
+                packageGate.reasons.length > 0 && (
+                  <div className="tab-reason">
+                    {(packageGate.reasons as string[]).join(" ")}
+                  </div>
+                )}
+              {typeof packageGate.note === "string" && (
+                <div className="faint tab-reason">{packageGate.note}</div>
+              )}
+              <a
+                className="btn download"
+                href={`/api/run/${encodeURIComponent(detail.session_id)}/diagnostic-package`}
+              >
+                Download the diagnostic record instead
+              </a>
+            </div>
+          ) : tabs ? (
               <>
                 <PackageSection tab={tabs.transfer as DossierTab} />
                 {dossier?.falsification && (
@@ -462,9 +499,7 @@ export default function Workspace({
               <div className="tab-note tn-pending">
                 Package details appear when a package exists on this run.
               </div>
-            )}
-          </>
-        )}
+            ))}
         {surface === "journal" && (
           <JournalSurface
             detail={detail}
