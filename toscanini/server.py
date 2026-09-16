@@ -2155,11 +2155,40 @@ class Handler(BaseHTTPRequestHandler):
         always wins (setdefault no-ops).
         """
         env = dict(os.environ)
+        # R483 (the stale spawn pin): the R392 zai pin named the
+        # measured-healthy SANDBOX transport. Since the R480 repoint
+        # the check below is always true on the deployed Space (the
+        # ZAI_* env now carries an atria key), but the zai spec's
+        # cost basis ENVIRONMENT_GRANT is INELIGIBLE under the active
+        # ZERO_PAID_COST policy — the pin then names a rung the
+        # engine's own cost policy refuses, the preferred chain
+        # empties, and the extension rescue routes synthesis down the
+        # free routers in matrix order (measured twice: campaign runs
+        # ts_50aa7fd75e35 + ts_6bb09ceae659). A pin must name a rung
+        # the ACTIVE POLICY admits — the same authority the chain
+        # uses. When it does not, the pin stays unset and every call
+        # site's own selection policy decides (the R469 default:
+        # atria first). An explicit ENGINE_*_PROVIDER set by the
+        # deployment still wins (setdefault no-ops, unchanged).
+        def _pin_target_eligible(provider_id: str) -> bool:
+            try:
+                from discovery_fabric.engine import (
+                    llm_registry as _reg,
+                    model_cost_policy as _mcp,
+                )
+                spec = _reg._SPEC_BY_ID.get(provider_id)
+                if spec is None:
+                    return False
+                ok, _note = _mcp.provider_eligibility(spec)
+                return bool(ok)
+            except Exception:  # noqa: BLE001 — pin gating degrades open
+                return True
+
         zai_usable = bool(
             os.environ.get("ZAI_API_KEY")
             or gw._load_env_keys().get("ZAI_API_KEY")
             or gw.gateway_up()
-            or gw.external_base_url())
+            or gw.external_base_url()) and _pin_target_eligible("zai")
         if zai_usable:
             env.setdefault("ENGINE_SYNTHESIS_PROVIDER", "zai")
             env.setdefault("ENGINE_ATTACK_PROVIDER", "zai")

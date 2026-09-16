@@ -482,7 +482,30 @@ class SynthesizeAdapter(BaseAdapter):
                  "prompt_hash": cand.get("prompt_hash"),
                  "input_hash": cand.get("input_hash"),
                  "output_hash": cand.get("output_hash"),
-                 "synthesis_timestamp": cand.get("synthesis_timestamp")}}},
+                 "synthesis_timestamp": cand.get("synthesis_timestamp"),
+                 # R483 (the dropped-ledger observability defect): the
+                 # routing TRUTH rides the committed record — the walk
+                 # (every hop incl. SKIPPED_NOT_ADMITTED with its
+                 # capability_state), the retry notes (reasoning-cap
+                 # escalations), the cost-policy refusals, and the
+                 # ladder's head. The R483 diagnosis of the two campaign
+                 # runs was blocked exactly here: the adapter kept the
+                 # serving model and dropped WHY the walk reached it.
+                 # Bounded: the availability matrix is NOT embedded.
+                 "routing": {
+                     "provider_route": _meta.get("provider_route") or [],
+                     "retry_notes": _meta.get("retry_notes") or [],
+                     "cost_policy_refusals": (
+                         (_meta.get("selection_ledger") or {}).get(
+                             "cost_policy_refusals") or []),
+                     "ladder_head": [
+                         {"provider": r.get("provider"),
+                          "model": r.get("model"),
+                          "band": r.get("band")}
+                         for r in (((_meta.get("selection_ledger")
+                                     or {}).get("ladder")
+                                    or {}).get("rungs") or [])[:10]],
+                 }}}},
         model=cand.get("model"), provider=cand.get("provider"))
 
 

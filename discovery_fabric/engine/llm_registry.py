@@ -114,6 +114,15 @@ class ProviderSpec:
     #: it here; every other rung keeps the 16-token probe. Consumed by
     #: runtime_admission.probe_capability (typed fallback to 16).
     probe_max_tokens: int = 16
+
+    #: R483 (the EmptyContentWithFinish class): the SAME-model retry
+    #: ceiling for reasoning-token exhaustion — the x4 bump ladder's
+    #: cap. The standing default 2048 is unchanged for every existing
+    #: provider; a reasoning model whose measured failures terminate
+    #: at 2048 with finish_reason=length declares a larger ceiling
+    #: (the class docstring's own rule: a larger cap on the SAME
+    #: provider/model is not a downgrade).
+    reasoning_retry_ceiling: int = 2048
     #: R469: the provider's CREDENTIAL RING — the ordered env-var
     #: names the transport rotates through on exhaustion-class
     #: failures (the operator's keep-going directive: "Keep going to
@@ -442,6 +451,14 @@ PROVIDER_SPECS: List[ProviderSpec] = [
                 "budget; no deposit authorized)",
         account_domain="OWNER_ATRIA_ACCOUNT",
         probe_max_tokens=256,
+        reasoning_retry_ceiling=8192,
+        # R483: 8 measured run-owned failures
+        # EmptyContentWithFinish (finish_reason=length) at caps
+        # <=2048 (2026-09-15..16 routing ledger); the 90s
+        # DIRECT_TRANSFER success at 2048 measured content
+        # arriving when reasoning fits. One more x4 rung
+        # (2048*4=8192), far under the spec's declared 128k
+        # context. Recorded policy input (Art. XXVII).
         # R469 (2026-09-16): the key RING — the operator's keep-going
         # directive, verbatim: "Keep going to a new key of atira if one
         # is exhausted. Wire it in the discovery engine." Key 3
@@ -1002,6 +1019,13 @@ class LLMCallResult:
             "provider_route": [
                 {"provider": h.get("provider_attempted"),
                  "failure_type": h.get("failure_type"),
+                 # R483 (the dropped-ledger observability defect): the
+                 # walk's skip/refuse states travel on the route — a
+                 # SKIPPED_NOT_ADMITTED hop is answerable from committed
+                 # bytes (status + capability_state), never only from a
+                 # sandbox session's memory.
+                 "status": h.get("status"),
+                 "capability_state": h.get("capability_state"),
                  "fallback_provider": h.get("fallback_provider")}
                 for h in (self.route or [])
             ] if self.route else [],
@@ -1858,8 +1882,10 @@ def generate(prompt: str, system: str = "",
                 ftype = classify_failure(exc)
                 # reasoning-token exhaustion: SAME provider/model, larger
                 # cap (recorded in retry_notes — never a silent change)
-                if attempt_budget < 2048:
-                    attempt_budget = min(2048, attempt_budget * 4)
+                _ceiling = int(getattr(spec, "reasoning_retry_ceiling",
+                                       2048) or 2048)
+                if attempt_budget < _ceiling:
+                    attempt_budget = min(_ceiling, attempt_budget * 4)
                     retry_notes.append(
                         f"attempt {attempt + 1}: empty content "
                         f"(finish_reason={exc.finish_reason}); same "
