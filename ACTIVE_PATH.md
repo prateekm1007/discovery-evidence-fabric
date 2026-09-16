@@ -1084,3 +1084,13 @@ The audit's 402 class is answered: the strong-model chain rides the credited atr
 
 - The Windows collection class is dead in the reachable tree: discovery_fabric/portable_flock.py (posix/msvcrt/noop, BACKEND recorded) + quota_breaker and package_registry rewired; test_r482_portable_flock 8/8 (the Windows class simulated on Linux — both modules import with fcntl AND msvcrt blocked); standing battery 602/2/3 with the 3 failures the thrice-verified pre-existing class; zero regressions; the toscanini/ sites untouched (case-collision + Linux-only, minimal-diff discipline).
 - The decisive geothermal run (ts_50aa7fd75e35, observed from the durable branch): TERMINAL INCOMPLETE_INFERENCE_FAILURE — the xkiro free-leg proposer failed the verbatim-span citation contract (a model capability failure, Art. LXI; NOT_A_SURVIVOR; rerunnable); the IMPROVE stage EXECUTED LIVE (DEFERRED_TO_KILL_POINT at chain time; NO_KILL_EVIDENCE children [] at the kill point — nothing died, never a fake child). The auditor's score-forcing event (CHILDREN_ADMITTED / NO_CHILD_ADMITTED) awaits a run where candidates enter the gauntlet and die — first needs a synthesis route that meets the citation contract. R483: the live-proof campaign on a capable route.
+## R481 ADDENDUM — the IMPROVE stage (P0-1) + the registry regeneration (2026-09-16)
+
+| ITEM | STATE | THE MEASURED FACT |
+|---|---|---|
+| IMPROVE first-class | DELIVERED | STAGE_ORDER 17; registry 13 -> 17 == executable arithmetic (the audit's A1 drift dead); test_r481 14/14; the pins amended disclosed |
+| LIVE EXECUTION | PROVEN | two production runs: the loop deferral + the kill-point execution typed in the durable state (envelope_IMPROVE.json stage_log) — the stage runs on every ordinary user run |
+| THE LOOP CLOSURE | BLOCKED (named) | both runs INCOMPLETE_INFERENCE_FAILURE — the R452 span-capability class on the credited proposer blocks the runs before the gauntlet can kill; the stage answered NO_KILL_EVIDENCE twice (Art. XXXVII held: no synthetic children) |
+| THE RACE | RECONCILED | the sibling's union superseded my deploy in ~5 min; rebased per R472/R477, union tip a3ed021 live (Space rev 64661605) |
+
+Unblocks the exit criterion: a span-capable synthesis rung / span-format hardening / a campaign run with kills. Then CHILDREN_ADMITTED fires live and the audit's P0-1 is met end-to-end.
