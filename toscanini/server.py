@@ -2145,55 +2145,33 @@ class Handler(BaseHTTPRequestHandler):
              infrastructure state, never a verdict).
 
         Transport pinning (EXPLICIT operator overrides, logged by the
-        engine and recorded in candidate provenance). The zai pin — the
-        measured-healthy sandbox transport — is only the DEFAULT when the
-        zai path is actually usable (key present or local gateway up);
-        otherwise the pins stay unset and every call site's own selection
-        policy decides (R392: the hosted engine resolves its public
-        provider through the registry — recorded in each ledger, never
-        silent). An explicit ENGINE_*_PROVIDER set by the deployment
-        always wins (setdefault no-ops).
+        engine and recorded in candidate provenance).
+
+        R483 RETIREMENT (Art. LXIV — the superseded default is removed
+        in the change that supersedes it): the R392-era zai pin
+        DEFAULTS (ENGINE_SYNTHESIS_PROVIDER=zai and siblings, set when
+        the zai path was usable) are DELETED. Measured reason: after
+        the R469 operator default-provider pin (atria,
+        provider_health._DEFAULT_PROVIDER_PIN) and the R480 re-point,
+        the injected zai pin named a slot whose sandbox
+        ENVIRONMENT_GRANT classification the ZERO_PAID_COST policy
+        correctly refuses — the emptied preferred chain triggered the
+        R451-C1.1 extension and the decisive synthesis stage rode
+        whichever free router scored best that minute (three
+        consecutive production runs measured on the durable ledger).
+        The engine's own defaults now decide, exactly as this block's
+        original contract stated for the unset case (R392: "every call
+        site's own selection policy decides — recorded in each ledger,
+        never silent"): the R469 atria default pin heads synthesis.
+        KEPT_BECAUSE: the zai SLOT stays registered (the explicit
+        {PROVIDER}_BASE_URL / ENGINE_*_PROVIDER operator-override
+        surface is untouched; an operator who SETS the variable
+        explicitly still gets it — setdefault no-ops are irrelevant
+        now that no default is injected). The zai slot's runtime
+        classification is reconciled to its re-pointed reality in
+        llm_registry.reconcile_runtime_classifications (R483).
         """
         env = dict(os.environ)
-        # R483 (the stale spawn pin): the R392 zai pin named the
-        # measured-healthy SANDBOX transport. Since the R480 repoint
-        # the check below is always true on the deployed Space (the
-        # ZAI_* env now carries an atria key), but the zai spec's
-        # cost basis ENVIRONMENT_GRANT is INELIGIBLE under the active
-        # ZERO_PAID_COST policy — the pin then names a rung the
-        # engine's own cost policy refuses, the preferred chain
-        # empties, and the extension rescue routes synthesis down the
-        # free routers in matrix order (measured twice: campaign runs
-        # ts_50aa7fd75e35 + ts_6bb09ceae659). A pin must name a rung
-        # the ACTIVE POLICY admits — the same authority the chain
-        # uses. When it does not, the pin stays unset and every call
-        # site's own selection policy decides (the R469 default:
-        # atria first). An explicit ENGINE_*_PROVIDER set by the
-        # deployment still wins (setdefault no-ops, unchanged).
-        def _pin_target_eligible(provider_id: str) -> bool:
-            try:
-                from discovery_fabric.engine import (
-                    llm_registry as _reg,
-                    model_cost_policy as _mcp,
-                )
-                spec = _reg._SPEC_BY_ID.get(provider_id)
-                if spec is None:
-                    return False
-                ok, _note = _mcp.provider_eligibility(spec)
-                return bool(ok)
-            except Exception:  # noqa: BLE001 — pin gating degrades open
-                return True
-
-        zai_usable = bool(
-            os.environ.get("ZAI_API_KEY")
-            or gw._load_env_keys().get("ZAI_API_KEY")
-            or gw.gateway_up()
-            or gw.external_base_url()) and _pin_target_eligible("zai")
-        if zai_usable:
-            env.setdefault("ENGINE_SYNTHESIS_PROVIDER", "zai")
-            env.setdefault("ENGINE_ATTACK_PROVIDER", "zai")
-            env.setdefault("ENGINE_ENSEMBLE_PROVIDERS", "zai")
-            env.setdefault("ENGINE_GRID_PROVIDERS", "zai")
         # 2a. spawn-side forensics BEFORE the process exists
         try:
             from toscanini import worker_forensics as _wfx

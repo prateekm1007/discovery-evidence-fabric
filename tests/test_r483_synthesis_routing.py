@@ -74,13 +74,40 @@ class TestD1StaleSpawnPin(unittest.TestCase):
     """the pin must name a rung the ACTIVE cost policy admits."""
 
     def test_zai_ineligible_under_zero_paid_cost(self):
-        """the R480 repoint state: zai = ENVIRONMENT_GRANT, refused by
-        the deployed policy — the pin's target is inadmissible."""
-        spec = reg._SPEC_BY_ID["zai"]
-        with mock.patch.dict(os.environ, {"ENGINE_MODEL_COST_POLICY": ""}):
+        """the sandbox (un-repointed) class: zai = ENVIRONMENT_GRANT,
+        refused by the deployed policy. R483-union: reconcile FIRST with
+        a clean env so a prior test's repoint-env reconciliation (the
+        third line's classification flip is env-driven but the spec
+        replacement is global) cannot leak the credited class in."""
+        with mock.patch.dict(os.environ, {"ZAI_BASE_URL": "",
+                                          "ENGINE_MODEL_COST_POLICY": ""}):
+            reg.reconcile_runtime_classifications()
+            spec = reg._SPEC_BY_ID["zai"]
             ok, note = mcp.provider_eligibility(spec)
         self.assertFalse(ok, note)
         self.assertIn("ENVIRONMENT_GRANT", note)
+
+    def test_zai_repointed_class_is_credited_eligible(self):
+        """the third line's reconciliation (union-adjudicated CANONICAL
+        for the repointed state): with ZAI_BASE_URL external, the slot
+        classifies credited-remote (FREE_TIER_API) and the policy
+        admits it — the misclassification half of the campaign defect,
+        fixed at the classification layer. Restores the sandbox class
+        afterward (the spec replacement is GLOBAL — a leaked credited
+        state breaks any later test that reads the shipped class)."""
+        try:
+            with mock.patch.dict(os.environ, {**REPOINT,
+                                              "ENGINE_MODEL_COST_POLICY":
+                                              ""}):
+                rec = reg.reconcile_runtime_classifications()
+                spec = reg._SPEC_BY_ID["zai"]
+                ok, _ = mcp.provider_eligibility(spec)
+            self.assertTrue(rec["reconciled"])
+            self.assertTrue(rec["external_repoint"])
+            self.assertTrue(ok)
+        finally:
+            with mock.patch.dict(os.environ, {"ZAI_BASE_URL": ""}):
+                reg.reconcile_runtime_classifications()
 
     def test_zai_eligible_under_unrestricted(self):
         """the sandbox semantics preserved: under UNRESTRICTED the pin
@@ -97,24 +124,22 @@ class TestD1StaleSpawnPin(unittest.TestCase):
             ok, _ = mcp.provider_eligibility(spec)
         self.assertTrue(ok)
 
-    def test_spawn_gate_exists_and_gates_all_four_pins(self):
-        """source-shape (the r453 discipline): the eligibility gate is
-        ANDed into zai_usable; the four setdefaults stay behind it; the
-        degrade-open except returns True (import failure never blocks a
-        spawn — Art. V)."""
-        self.assertIn("def _pin_target_eligible(provider_id: str) -> bool:",
-                      SERVER_SRC)
-        self.assertIn('and _pin_target_eligible("zai")', SERVER_SRC)
-        gate_pos = SERVER_SRC.index('and _pin_target_eligible("zai")')
-        for pin in ("ENGINE_SYNTHESIS_PROVIDER",
-                    "ENGINE_ATTACK_PROVIDER",
-                    "ENGINE_ENSEMBLE_PROVIDERS",
-                    "ENGINE_GRID_PROVIDERS"):
-            self.assertGreater(SERVER_SRC.index(f'setdefault("{pin}"'),
-                               gate_pos,
-                               f"{pin} must be set only AFTER the gate")
-        self.assertIn("except Exception:  # noqa: BLE001 — pin gating "
-                      "degrades open", SERVER_SRC)
+    def test_spawn_pins_retired(self):
+        """the union adjudication (Art. LXIV): the R392 zai pin DEFAULTS
+        are RETIRED — no ENGINE_*_PROVIDER setdefault remains in the
+        spawn path (the third line's retirement, canonical over this
+        line's eligibility gate: a gate on a pin that must never fire
+        is dead code). The engine's own R469 default routes synthesis
+        atria-first; an explicit deployment env still wins (the env
+        surface is the operator's, never the spawn's)."""
+        for pin in ('setdefault("ENGINE_SYNTHESIS_PROVIDER"',
+                    'setdefault("ENGINE_ATTACK_PROVIDER"',
+                    'setdefault("ENGINE_ENSEMBLE_PROVIDERS"',
+                    'setdefault("ENGINE_GRID_PROVIDERS"'):
+            self.assertNotIn(pin, SERVER_SRC,
+                             f"the {pin.split(chr(34))[1]} spawn default "
+                             "must stay retired (Art. LXIV)")
+        self.assertNotIn("zai_usable", SERVER_SRC)
 
 
 class TestD2ChainRestored(unittest.TestCase):
@@ -124,22 +149,29 @@ class TestD2ChainRestored(unittest.TestCase):
     def _chain(self, env_overrides, policy_preferred=None):
         env = {**{k: "placeholder" for k in RING + ROUTERS}, **REPOINT,
                **env_overrides}
-        with mock.patch.dict(os.environ, env, clear=False), \
-             mock.patch.object(mr, "discover_catalog",
-                               side_effect=_fake_catalog):
-            matrix = reg.availability_matrix()
-            avail = [m["provider_id"] for m in matrix
-                     if m["available"] and m["cost_policy_eligible"]]
-            preferred = policy_preferred or [
-                "atria", "openrouter", "deepseek", "anthropic", "openai",
-                "gemini", "qwen", "nvidia"]
-            chain = [pid for pid in preferred if pid in avail]
-            if not chain:
-                chain = [p for p in avail if p not in chain]
-            ladder = mr.build_ladder(
-                mr.TASK_STRONG, role="synthesis",
-                preferred_providers=chain, available_providers=avail)
-        return chain, ladder
+        try:
+            with mock.patch.dict(os.environ, env, clear=False), \
+                 mock.patch.object(mr, "discover_catalog",
+                                   side_effect=_fake_catalog):
+                matrix = reg.availability_matrix()
+                avail = [m["provider_id"] for m in matrix
+                         if m["available"] and m["cost_policy_eligible"]]
+                preferred = policy_preferred or [
+                    "atria", "openrouter", "deepseek", "anthropic", "openai",
+                    "gemini", "qwen", "nvidia"]
+                chain = [pid for pid in preferred if pid in avail]
+                if not chain:
+                    chain = [p for p in avail if p not in chain]
+                ladder = mr.build_ladder(
+                    mr.TASK_STRONG, role="synthesis",
+                    preferred_providers=chain, available_providers=avail)
+            return chain, ladder
+        finally:
+            # the reconciliation the matrix triggers is GLOBAL (the
+            # frozen spec is replaced in-place surfaces) — restore the
+            # shipped sandbox class so no later reader sees the leak
+            with mock.patch.dict(os.environ, {"ZAI_BASE_URL": ""}):
+                reg.reconcile_runtime_classifications()
 
     def test_repoint_state_synthesis_head_is_atria(self):
         """THE campaign regression: no ENGINE_SYNTHESIS_PROVIDER, the

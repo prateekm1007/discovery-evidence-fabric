@@ -60,6 +60,10 @@ SPAN_INSTRUCTION = (
     "and numbers, exactly as written.\n"
     "- Do NOT paraphrase, re-order, shorten, lengthen, fix grammar, "
     "or join words that are not adjacent in the abstract.\n"
+    "- The span MUST come from the ABSTRACT text below — never from "
+    "the Title line and never from your own words (a span quoted from "
+    "the title fails the byte check: the verifier checks against the "
+    "abstract only).\n"
     "- Example of RIGHT (abstract says 'Platelets adhere to the "
     "injured endothelium within seconds'): Platelets adhere to the "
     "injured endothelium within seconds.\n"
@@ -106,6 +110,14 @@ def _hash(s): return hashlib.sha256(s.encode()).hexdigest()[:16]
 # candidate unchanged — the typed failure stands (Art. XXV honesty).
 # ---------------------------------------------------------------------------
 SPAN_MIN_WORDS = 8
+
+#: R483 — the abstract-bearing paper floor (the synthesis rotation's
+#: gate): a record carrying fewer abstract characters cannot satisfy
+#: the verbatim span contract (8+ consecutive words to quote) or feed
+#: the LLM-quote assist (sentence context). DECLARED, never tuned
+#: (Art. XXVII). The geothermal specimen (doi:10.1186/s40517-019-0138-3,
+#: abstract "") is the canonical excluded record.
+SPAN_ABSTRACT_MIN_CHARS = 200
 
 
 def _strip_quotes(text):
@@ -269,6 +281,47 @@ def synthesize(problem: dict, evidence: list[dict]) -> dict | None:
     #  the measured flap window is ~1-4 min; 0/8/20 s spreads three real
     #  attempts across it without stretching a run's wall time
 
+    # R483 (the measured production blocker — THREE consecutive runs
+    # ended honestly typed INCOMPLETE_INFERENCE_FAILURE but were
+    # structurally caused by this): a retrieved record with an EMPTY/short abstract
+    # (the geothermal run's doi:10.1186/s40517-019-0138-3 is the
+    # canonical specimen: title-only, abstract "") makes the span
+    # contract STRUCTURALLY unsatisfiable — there is no abstract text
+    # to quote, so the proposer can only cite the title, verify
+    # correctly refuses, and the assist has nothing to quote. The
+    # claimant-side repair (Art. VII: fix the claimant, never the
+    # verifier): the rotation serves only ABSTRACT-BEARING papers; each
+    # skipped record is typed and recorded; if NO paper carries a
+    # quotable abstract the honest None stands (the run types
+    # INCOMPLETE — infrastructure, never a scientific rejection).
+    # The floor is the module's DECLARED bound SPAN_ABSTRACT_MIN_CHARS.
+    _SPAN_ABSTRACT_MIN_CHARS = SPAN_ABSTRACT_MIN_CHARS
+
+    def _paper_abstract_ok(paper):
+        return len(str(paper.get("abstract") or "").strip()) >= \
+            _SPAN_ABSTRACT_MIN_CHARS
+
+    _papers_skipped = [
+        {"id": p.get("id"), "title": str(p.get("title"))[:120],
+         "abstract_chars": len(str(p.get("abstract") or "").strip()),
+         "reason": ("SYNTHESIS_PAPER_SKIPPED_NO_ABSTRACT — the record "
+                    f"carries < {_SPAN_ABSTRACT_MIN_CHARS} abstract "
+                    "chars; the verbatim span contract is structurally "
+                    "unsatisfiable against it (R483 gate)")}
+        for p in (evidence or []) if not _paper_abstract_ok(p)]
+    if _papers_skipped:
+        print(f"  [synthesize] R483 abstract gate: {len(_papers_skipped)} "
+              f"record(s) skipped (no quotable abstract) of "
+              f"{len(evidence)} retrieved")
+    _rotation_set = [p for p in evidence if _paper_abstract_ok(p)
+                     ][:_ROTATION_PAPERS]
+    if not _rotation_set:
+        print("  [synthesize] no abstract-bearing paper in the frozen "
+              "evidence — the span contract cannot be served by ANY "
+              "record (typed skip, never a silent degraded serve; "
+              "Art. XXV)")
+        return None
+
     # R470 (audit P0-5 POWER): the directive constraint from the problem
     # (built at the spawn site from the parent's recorded mechanism
     # identity; the worker persists it and attaches it to the problem).
@@ -307,7 +360,7 @@ def synthesize(problem: dict, evidence: list[dict]) -> dict | None:
         return parsed
 
     papers_tried = []
-    for attempt, paper in enumerate(evidence[:_ROTATION_PAPERS]):
+    for attempt, paper in enumerate(_rotation_set):
         backoff = _ROTATION_BACKOFF_S[attempt] if attempt < len(
             _ROTATION_BACKOFF_S) else 0
         if backoff:
@@ -397,6 +450,79 @@ def synthesize(problem: dict, evidence: list[dict]) -> dict | None:
         # loosened; the repair never fires on an already-verbatim span,
         # and provenance records every repair).
         repair_mechanism_span(candidate, paper["abstract"])
+
+        # R483 span-format hardening (the second measured failure
+        # class, distinct from the empty-abstract gate): the proposer
+        # emitted a span line but it is neither verbatim in the served
+        # paper's abstract nor mechanically promotable by
+        # repair_mechanism_span (no >=8-word verbatim window). The
+        # R401 corrective-retry pattern (mechanism_space.py — ONE
+        # recorded same-provider retry, defect-specific: the model is
+        # shown its own span and the exact defect), claimant-side only
+        # (Art. VII: correct the claim, never weaken the verifier —
+        # verify.py is untouched). The check uses the SAME two-step
+        # ladder a2/verify.py uses (verbatim, then whitespace-normalized
+        # case-insensitive) — one contract, Art. X.
+        def _span_in_abstract(span, abstract):
+            s = str(span or "").strip().strip("\"'").strip()
+            if not s:
+                return False
+            if s in abstract:
+                return True
+            _n = (lambda t: " ".join(str(t or "").split()).lower())
+            return _n(s) in _n(abstract)
+
+        _span_corr_record = None
+        if parsed.get("mechanism_source_span") and \
+                not _span_in_abstract(candidate.get("mechanism_source_span"),
+                                      paper["abstract"]):
+            _corr_note = (
+                "R483 span corrective retry: the emitted "
+                "MECHANISM_SOURCE_SPAN was not a verbatim substring of "
+                "the served paper's abstract (and no >=8-word verbatim "
+                "window was promotable); one recorded same-provider "
+                "retry with the defect stated")
+            print("  [synthesize] " + _corr_note)
+            _corr_prompt = (
+                prompt + "\n\nCORRECT YOUR PREVIOUS ATTEMPT — its "
+                "MECHANISM_SOURCE_SPAN (\"" +
+                str(candidate.get("mechanism_source_span"))[:200] +
+                "\") is NOT a verbatim substring of THIS abstract; it "
+                "was paraphrased or quoted from the wrong part of the "
+                "record. Answer again in the SAME format with "
+                "MECHANISM_SOURCE_SPAN copied character-for-character "
+                "from the ABSTRACT text above (8+ consecutive words "
+                "exactly as written; never from the Title line).")
+            _corr_resp = llm_chat(
+                _corr_prompt, system="You are a medical device engineer.",
+                max_tokens=1024)
+            _corr_parsed = _parse_fields(_corr_resp) if _corr_resp else {}
+            _corr_ok = bool(
+                _corr_parsed.get("intervention")
+                and _corr_parsed.get("mechanism_source_span"))
+            if _corr_ok:
+                _cand2 = _candidate_from(_corr_resp, _corr_parsed)
+                repair_mechanism_span(_cand2, paper["abstract"])
+                if _span_in_abstract(_cand2.get("mechanism_source_span"),
+                                     paper["abstract"]):
+                    _cand2["span_corrective_retry"] = {
+                        "attempted": True, "succeeded": True,
+                        "note": _corr_note,
+                        "original_span": str(
+                            candidate.get("mechanism_source_span"))[:200],
+                    }
+                    _span_corr_record = True
+                    candidate = _cand2
+            if _span_corr_record is None:
+                # the retry did not produce a verbatim span: the
+                # ORIGINAL candidate returns unchanged and the typed
+                # failure stands downstream (verify + classify — the
+                # honest path; the retry is recorded on the candidate)
+                candidate["span_corrective_retry"] = {
+                    "attempted": True, "succeeded": False,
+                    "note": _corr_note,
+                    "retry_had_intervention": _corr_ok,
+                }
         # R470 (audit P0-5 POWER): the mechanical compliance check — the
         # SAME shared instrument the outcome card uses. On violation: ONE
         # recorded repair retry (the constraint restated, the violating
@@ -481,9 +607,22 @@ def synthesize(problem: dict, evidence: list[dict]) -> dict | None:
                 "attempt_index": attempt,
                 "papers_tried": papers_tried,
                 "evidence_available": len(evidence),
+                **({"papers_skipped_no_abstract": _papers_skipped}
+                   if _papers_skipped else {}),
                 "note": ("candidate produced on a rotated evidence paper "
                          "after earlier synthesis attempts failed — "
                          "recorded, never silent"),
+            }
+        elif _papers_skipped:
+            # R483: the gate's skip record rides even a first-attempt
+            # candidate — the skipped records are provenance, not noise
+            candidate["synthesis_rotation"] = {
+                "attempt_index": attempt,
+                "papers_tried": papers_tried,
+                "evidence_available": len(evidence),
+                "papers_skipped_no_abstract": _papers_skipped,
+                "note": ("first eligible paper served; abstract-less "
+                         "records skipped by the R483 gate"),
             }
         print(f"  [synthesize] intervention: {candidate['intervention'][:60]}")
         return candidate
