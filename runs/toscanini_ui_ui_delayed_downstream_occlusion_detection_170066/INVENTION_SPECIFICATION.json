@@ -1,0 +1,657 @@
+{
+ "invention_id": {
+  "value": "inv:ui_delayed_downstream_occlusion_detection_170066:9e2be8b8ea68",
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "deterministic id inv:<problem_id>:<final envelope hash, first 12 chars>"
+ },
+ "problem": {
+  "value": {
+   "problem_id": "ui_delayed_downstream_occlusion_detection_170066",
+   "device": "infusion pump",
+   "failure": "Documented problem 'delayed downstream occlusion detection' concerning infusion pump. User-submitted engineering problem (session input): \"Why do infusion pumps fail to detect downstream occlusion before patient harm?\".  [fda_maude] 100 records retrieved live (1997-2076). Illustrative records: 'MAUDE report 100000: Injury [VITAL SIGNS]'; 'MAUDE report 10000000: Malfunction [630G INSULIN PUMP MMT-1715K 630G BLACK MG]'. LIMITS STAMPED INLINE: voluntary/regulatory reports; counts are NOT incidence rates; causality UNVERIFIED (Art. XXI.5). [europepmc] 10 records retrieved live (2025-2026). Illustrative records: 'Presentation of preload and afterload to isolated heart preparations.'; 'Skin-like micropumps transform human motion into fluidic flow via morphing valves.'. LIMITS STAMPED INLINE: literature context establishes the problem class, not event rates. Problem-existence basis: live records retrieved.",
+   "failure_mode": "delayed downstream occlusion detection",
+   "constraint": "occlusion alarm must trigger before harmful medication or fluid delivery deviation reaches the patient"
+  },
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "PROBLEM",
+  "evidence_ids": [
+   "problem:e3721d3f"
+  ],
+  "note": "operator-supplied problem statement, custodied as the run's content-hashed problem.json artifact"
+ },
+ "user_need": {
+  "value": "reliable operation of infusion pump",
+  "epistemic_class": "ENGINEERING_PROPOSED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "derived from problem statement; not independently documented"
+ },
+ "mechanism": {
+  "value": {
+   "mechanism": "Active hydraulic system identification: the pump superimposes small, clinically negligible flow perturbations (e.g., ±2% of commanded rate, 0.5 Hz) on the nominal delivery and measures the pressure/flow response at the existing in-line sensor plus motor torque signature; a recursive estimator (e.g., extended Kalman filter) continuously fits downstream resistance and compliance parameters; occlusion is declared when identified downstream resistance exhibits sustained exponential-growth drift exceeding a statistically validated bound (sequential probability ratio test), not when absolute pressure crosses 20 Psi.",
+   "intervention": "Retrofit firmware plus a high-resolution motor current/encoder tap on the existing peristaltic mechanism: (1) inject periodic micro flow perturbations during normal delivery; (2) run recursive",
+   "expected_effect": "",
+   "mechanism_source_span": "The research employs a water pressure sensor to detect occlusions and a solenoid valve to simulate pressure conditions. Upon pressure detection, the sensor transmits data to an Arduino for processing.",
+   "span_derivation": null
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "europepmc:41247769"
+  ],
+  "note": "LLM-proposed transfer mechanism from custodied evidence; proposal, not fact (Art. XVIII); evidence_ids cite the custodied observation the proposal was synthesized from; span_derivation measures whether the quoted span actually contains the mechanism's vocabulary (R377 — SPAN_UNDERIVED is an honest state, never silently dropped)"
+ },
+ "causal_chain": {
+  "value": {
+   "source_observation": "UNKNOWN",
+   "mechanism": "Active hydraulic system identification: the pump superimposes small, clinically negligible flow perturbations (e.g., ±2% of commanded rate, 0.5 Hz) on the nominal delivery and measures the pressure/flow response at the existing in-line sensor plus motor torque signature; a recursive estimator (e.g., extended Kalman filter) continuously fits downstream resistance and compliance parameters; occlusion is declared when identified downstream resistance exhibits sustained exponential-growth drift exceeding a statistically validated bound (sequential probability ratio test), not when absolute pressure crosses 20 Psi.",
+   "intervention_site": "infusion pump",
+   "expected_effect": "",
+   "falsification_test": ""
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "europepmc:41247769"
+  ],
+  "note": "source -> mechanism -> intervention -> effect chain; links are proposals until physically observed"
+ },
+ "novelty_hypothesis": {
+  "value": {
+   "collision_novelty_risk": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+   "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+   "multi_source_directions": {
+    "discovery": {
+     "sources_recorded": 0,
+     "sources_errored": 0
+    },
+    "destruction": {
+     "sources_recorded": 0,
+     "sources_errored": 0
+    },
+    "transfer": {
+     "sources_recorded": 0,
+     "sources_errored": 0
+    },
+    "reality": {
+     "sources_recorded": 0,
+     "sources_errored": 0
+    }
+   }
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "COLLISION",
+  "evidence_ids": [],
+  "note": "novelty is a HYPOTHESIS bounded by searched sources; zero hits is not proof of novelty (Art. XXI.2)"
+ },
+ "prior_art": {
+  "value": {
+   "status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+   "legacy_status": "",
+   "differentiation_resolution": {
+    "state": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+    "epistemic_class": "SEARCH_RESULT",
+    "constitutional_limitation": "a search-derived prior-art POSITION, not a novelty determination (Art. XXVIII); coverage measured by declared term-overlap thresholds, not a claim chart",
+    "evidence_tier_summary": "NO_FAMILIES",
+    "per_family": [],
+    "n_families": 0,
+    "n_search_errors": 8,
+    "search_errors": [
+     {
+      "query": "pump pumps downstream occlusion infusion rates",
+      "source": "google_patents",
+      "error": "HTTP 503",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     },
+     {
+      "query": "pump pumps downstream occlusion infusion rates",
+      "source": "lens_patent",
+      "error": "LENS_API_TOKEN not configured",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     },
+     {
+      "query": "pump downstream occlusion flow rate hydraulic",
+      "source": "google_patents",
+      "error": "HTTP 503",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     },
+     {
+      "query": "pump downstream occlusion flow rate hydraulic",
+      "source": "lens_patent",
+      "error": "LENS_API_TOKEN not configured",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     },
+     {
+      "query": "flow existing perturbations delivery recursive plus motor retrofit",
+      "source": "google_patents",
+      "error": "HTTP 503",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     },
+     {
+      "query": "flow existing perturbations delivery recursive plus motor retrofit",
+      "source": "lens_patent",
+      "error": "LENS_API_TOKEN not configured",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     },
+     {
+      "query": "pump detection resolution existing during occlusion",
+      "source": "google_patents",
+      "error": "HTTP 503",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     },
+     {
+      "query": "pump detection resolution existing during occlusion",
+      "source": "lens_patent",
+      "error": "LENS_API_TOKEN not configured",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     }
+    ],
+    "search_execution": {
+     "mandatory_complete": false,
+     "n_errors": 8,
+     "rule": "RESOLVED_DIFFERENTIATED requires every mandatory (query_class x source) search to have completed successfully (R394 s2); provider failure never becomes absence (Art. XXI.3)"
+    },
+    "relevance_model_version": "collision_resolution/2.0.0",
+    "determinism_contract": {
+     "inputs": "problem + candidate profile + query ladder + source results (per-family adjudicated text, hash-custodied) + thresholds + relevance model version",
+     "check": "identical inputs must yield identical coverage decisions and state; divergence on replay is FLAG_INCONSISTENT_RETRIEVAL (R394 s3)"
+    },
+    "thresholds": {
+     "CROSS_DOMAIN_MIN_NONGENERIC_OVERLAP": {
+      "value": 3,
+      "epistemic_class": "ENGINEERING",
+      "justification": "R377 patent-text ground truth (TOSCANINI/R377_PATENT_TEXT_FETCH.json + R377_PATENT_TEXT_GROUND_TRUTH.json): 12/30 family representatives (40%) were substantively irrelevant cross-domain term collisions (CWDM optical link for a battery-thermal candidate; dental-condition monitoring for rolling stock; bone fracture forceps for rail steel...). A hit sharing NO entity term with the candidate now needs >= 3 NON-generic mechanism terms to be mechanism art: the measured true cross-domain analog (line-pipe steel with hydrogen fracture toughness for a rail-steel candidate) shares 3 non-generic terms and survives; every measured false positive shares <= 2 and is demoted. This RAISES the cross-domain bar (was the same >= 2 as same-domain) — stricter, not weaker (Art. VII).",
+      "uncertainty": "term overlap remains a proxy; entity word-sense collisions ('gear': steering vs draft) can still pass — disclosed limitation, not a solved problem"
+     },
+     "MIN_MECHANISM_OVERLAP": {
+      "value": 2,
+      "epistemic_class": "ENGINEERING",
+      "justification": "same term-overlap rule family as the pipeline relevance adjudicator and the Q2 instrument (>= 2 shared content terms = domain-specific rather than accidental collision); NOT weakened relative to any prior gate",
+      "uncertainty": "term overlap is a proxy for mechanism identity"
+     },
+     "ANTICIPATION_COVERAGE_RATIO": {
+      "value": 0.8,
+      "epistemic_class": "ENGINEERING",
+      "justification": "a family ANTICIPATES only when nearly ALL elements of the candidate's FULL distinguishing set (uncapped — the claim elements, not the 6-term query core) appear in the family's claim/abstract text; 0.8 leaves a >= 20% element margin — anything lower would convert partial art into a kill (Art. XXVIII forbids). Measured adversarial case: a domain-only patent reached 0.857 against a capped denominator whose true differentiators (acoustic, multi-modal) had been ranked out",
+      "uncertainty": "claim coverage measured by term overlap, not a claim chart; recorded per family with evidence tier"
+     },
+     "MAX_QUERY_TERMS": {
+      "value": 6,
+      "epistemic_class": "ENGINEERING",
+      "justification": "provider-measured sweet spot for keyword patent queries (longer queries dilute ranking)"
+     },
+     "ABSTRACT_TIER_MIN_CHARS": {
+      "value": 80,
+      "epistemic_class": "ENGINEERING",
+      "justification": "below ~80 chars a snippet carries title echoes, not mechanism description; it cannot support an abstract-tier coverage decision"
+     }
+    }
+   },
+   "nearest": [],
+   "queries": [
+    {
+     "query_class": "ENTITY",
+     "query": "pump pumps downstream occlusion infusion rates"
+    },
+    {
+     "query_class": "MECHANISM",
+     "query": "pump downstream occlusion flow rate hydraulic"
+    },
+    {
+     "query_class": "DISTINGUISHING",
+     "query": "flow existing perturbations delivery recursive plus motor retrofit"
+    },
+    {
+     "query_class": "FUNCTION",
+     "query": "pump detection resolution existing during occlusion"
+    }
+   ],
+   "scientific": []
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "COLLISION",
+  "evidence_ids": [],
+  "note": "search RESULTS with source errors preserved as UNRESOLVED, never converted to absence (Art. XXV); FULL result list preserved (no truncation, Directive 6); resolution states are SEARCH_RESULT class positions, not novelty determinations (Art. XXVIII)"
+ },
+ "distinguishing_features": {
+  "value": {
+   "intervention": "Retrofit firmware plus a high-resolution motor current/encoder tap on the existing peristaltic mechanism: (1) inject periodic micro flow perturbations during normal delivery; (2) run recursive",
+   "vs_nearest_prior_art": [],
+   "surviving_differentiators": null,
+   "note": "R376: nearest entries are mechanism-relevant family representatives with per-family coverage and evidence tier; differences below the term-overlap thresholds are recorded, not claim-charted (Art. XXVIII)"
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "europepmc:41247769"
+  ],
+  "note": "claim-level differentiation requires the inspection action recorded in next_best_action"
+ },
+ "constraints": {
+  "value": {
+   "stated_constraint": "occlusion alarm must trigger before harmful medication or fluid delivery deviation reaches the patient",
+   "failure_mode_of_device": "delayed downstream occlusion detection"
+  },
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "PROBLEM",
+  "evidence_ids": [
+   "problem:e3721d3f"
+  ],
+  "note": "operator-stated constraints, custodied with the problem.json artifact"
+ },
+ "failure_modes": {
+  "value": [
+   {
+    "dimension": "unsupported_mechanism",
+    "attack_verdict": "PASS",
+    "epistemic_class": "COMPUTED",
+    "origin_stage": "ATTACK"
+   },
+   {
+    "dimension": "weak_transfer",
+    "attack_verdict": "PASS",
+    "epistemic_class": "COMPUTED",
+    "origin_stage": "ATTACK"
+   },
+   {
+    "dimension": "obvious_combination",
+    "attack_verdict": "KILLED",
+    "epistemic_class": "COMPUTED",
+    "origin_stage": "ATTACK"
+   },
+   {
+    "dimension": "prior_art",
+    "attack_verdict": "SURVIVE (firewall: prior_art_state=UNRESOLVED_INSUFFICIENT_EVIDENCE is a non-kill state; adversarial PRIOR_ART=KILL is forbidden)",
+    "epistemic_class": "COMPUTED",
+    "origin_stage": "ATTACK"
+   },
+   {
+    "dimension": "contradiction",
+    "attack_verdict": "PASS",
+    "epistemic_class": "COMPUTED",
+    "origin_stage": "ATTACK"
+   },
+   {
+    "dimension": "boundary_failure",
+    "attack_verdict": "INSUFFICIENT_EVIDENCE (INSUFFICIENT_EVIDENCE)",
+    "epistemic_class": "COMPUTED",
+    "origin_stage": "ATTACK"
+   },
+   {
+    "dimension": "engineering_infeasibility",
+    "attack_verdict": "PASS",
+    "epistemic_class": "COMPUTED",
+    "origin_stage": "ATTACK"
+   },
+   {
+    "dimension": "regulatory_incompatibility",
+    "attack_verdict": "PASS",
+    "epistemic_class": "COMPUTED",
+    "origin_stage": "ATTACK"
+   }
+  ],
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "ATTACK",
+  "evidence_ids": [],
+  "note": "adversarial dimensions recorded by the attack engine"
+ },
+ "killer_experiment": {
+  "value": {
+   "selected": "falsification_test_from_candidate",
+   "eig": 0.44573539382492045,
+   "eig_per_cost": 0.44573539382492045,
+   "definition": "physical bench/clinical experiment — NOT simulation",
+   "hypotheses": [
+    {
+     "name": "H_effect_holds",
+     "description": "expected effect holds: Occlusion-induced pressure rise is detected at the sensor before the delivered volume/pressure deviation propagates to the patient, enabling alarm and pump stoppage prior to harmful medication or flui",
+     "prior_probability": 0.6,
+     "provenance": {
+      "source": "adjudication.evidence_verification + candidate text",
+      "epistemic_class": "MODEL_DERIVED",
+      "uncertainty": "priors/likelihoods derived from text analysis, not measurement",
+      "created_at": "2026-09-11T23:45:39.731429+00:00"
+     }
+    },
+    {
+     "name": "H_effect_fails",
+     "description": "expected effect does not reproduce outside source context",
+     "prior_probability": 0.4,
+     "provenance": {
+      "source": "adjudication.evidence_verification + candidate text",
+      "epistemic_class": "MODEL_DERIVED",
+      "uncertainty": "priors/likelihoods derived from text analysis, not measurement",
+      "created_at": "2026-09-11T23:45:39.731429+00:00"
+     }
+    }
+   ],
+   "options_ranked": [
+    {
+     "name": "falsification_test_from_candidate",
+     "eig": 0.44573539382492045,
+     "eig_per_cost": 0.44573539382492045,
+     "minimum_epistemic_class": "EIGEpistemicClass.MODEL_DERIVED",
+     "can_influence_real_experiment": true
+    },
+    {
+     "name": "contradiction_attacking_experiment",
+     "eig": 0.34249274537077934,
+     "eig_per_cost": 0.1712463726853897,
+     "minimum_epistemic_class": "EIGEpistemicClass.MODEL_DERIVED",
+     "can_influence_real_experiment": true
+    }
+   ],
+   "epistemic_note": "all priors MODEL_DERIVED; no EXPERIMENTALLY_ESTIMATED inputs exist at this stage (Art. XXVIII/XXXVIII: no synthetic shortcut to physical observation)"
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "KILLER_EXPERIMENT",
+  "evidence_ids": [],
+  "note": "Bayesian EIG over MODEL_DERIVED priors; no physical claim"
+ },
+ "engineering_parameters": {
+  "value": {},
+  "epistemic_class": "UNKNOWN",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "no engineering parameters exist yet; physical geometry, materials and setpoints are ENGINEERING_PROPOSED at best and are produced by the engineering specification stage, never invented here"
+ },
+ "evidence": {
+  "value": [
+   {
+    "id": "europepmc:42498455",
+    "title": "Clinical utility of the twiist Automated Insulin Delivery System: first study with twiist.",
+    "source_uri": "https://europepmc.org/article/42498455",
+    "doi": "10.1136/bmjdrc-2026-006307",
+    "content_hash": "eb3306fd58b7f77f4276cd37e89e8acb59bfeb42795ad854aa3c5dc8d1b33b79",
+    "frozen": false
+   },
+   {
+    "id": "europepmc:41977964",
+    "title": "Monitoring Inputs, Control Architectures, and Failure Modes in Closed-Loop Vasopressor Systems: A Comprehensive Review.",
+    "source_uri": "https://europepmc.org/article/41977964",
+    "doi": "10.3390/s26072180",
+    "content_hash": "a2c704d3ba08bb0dc41f1ba0bdf46aac5f0925d2748f241c4532d175cc4fd727",
+    "frozen": false
+   },
+   {
+    "id": "europepmc:42525762",
+    "title": "IoT-enabled wireless neural implant for chronic, programmable neuropharmacology and optogenetics.",
+    "source_uri": "https://europepmc.org/article/42525762",
+    "doi": "10.1126/sciadv.aee8648",
+    "content_hash": "bf88b2a41bb92657e044a844831919218bcba0a7337e6df425b9d2484b6513f9",
+    "frozen": false
+   },
+   {
+    "id": "europepmc:41853098",
+    "title": "Closed-loop Control of Steerable Balloon Endoscopes for Robot-assisted Transcatheter Intracardiac Procedures.",
+    "source_uri": "https://europepmc.org/article/41853098",
+    "doi": "10.1109/lra.2026.3664592",
+    "content_hash": "4811ed757e9d703b0aeb5887c2dad5161a27f4d7126cdce6f89e52e898c5909b",
+    "frozen": false
+   },
+   {
+    "id": "europepmc:41247769",
+    "title": "Sex differences in central salt sensing in the human brain.",
+    "source_uri": "https://europepmc.org/article/41247769",
+    "doi": "10.1152/ajpregu.00211.2025",
+    "content_hash": "2e6f743cfbf3737435c9e7b06ed35e11e7b001d0ad3e2ac739e9684f99f7ac32",
+    "frozen": false
+   }
+  ],
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "RETRIEVE+FREEZE",
+  "evidence_ids": [
+   "europepmc:41247769",
+   "europepmc:41853098",
+   "europepmc:41977964",
+   "europepmc:42498455",
+   "europepmc:42525762"
+  ],
+  "note": "custodied evidence with content hashes"
+ },
+ "uncertainties": {
+  "value": [
+   {
+    "contradiction_id": "con:attack:obvious_combination",
+    "description": "attack dimension obvious_combination returned KILL",
+    "severity": "HIGH"
+   },
+   {
+    "unresolved_source": "pump pumps downstream occlusion infusion rates",
+    "error": "HTTP 503"
+   },
+   {
+    "unresolved_source": "pump pumps downstream occlusion infusion rates",
+    "error": "LENS_API_TOKEN not configured"
+   },
+   {
+    "unresolved_source": "pump downstream occlusion flow rate hydraulic",
+    "error": "HTTP 503"
+   },
+   {
+    "unresolved_source": "pump downstream occlusion flow rate hydraulic",
+    "error": "LENS_API_TOKEN not configured"
+   },
+   {
+    "unresolved_source": "flow existing perturbations delivery recursive plus motor retrofit",
+    "error": "HTTP 503"
+   },
+   {
+    "unresolved_source": "flow existing perturbations delivery recursive plus motor retrofit",
+    "error": "LENS_API_TOKEN not configured"
+   },
+   {
+    "unresolved_source": "pump detection resolution existing during occlusion",
+    "error": "HTTP 503"
+   },
+   {
+    "unresolved_source": "pump detection resolution existing during occlusion",
+    "error": "LENS_API_TOKEN not configured"
+   }
+  ],
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "CONTRADICTION",
+  "evidence_ids": [],
+  "note": "unresolved contradictions and source failures preserved as unknowns (Art. XXV)"
+ },
+ "assumptions": {
+  "value": [
+   {
+    "assumption": "mechanism transfers across domain context",
+    "basis": "MODELLED",
+    "test": ""
+   },
+   {
+    "assumption": "searched sources approximate the prior-art universe",
+    "basis": "MODELLED",
+    "test": "expand sources (see next_best_action)"
+   }
+  ],
+  "epistemic_class": "MODELLED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "explicit assumptions each carrying its own falsification path"
+ },
+ "provenance": {
+  "value": {
+   "run_id": "engrun:ui_delayed_downstream_occlusion_detection_170066:2026-09-11T23:41:06",
+   "final_envelope_hash": "9e2be8b8ea68eccda3c4e708f527df394b0e9205267f1009429ea8b3860f74a9",
+   "final_status": "REJECTED",
+   "adjudication_verdict": "CONTESTED",
+   "ranking": {
+    "formula": "score = 0.35*adjudication_w + 0.25*attack_pass + 0.20*novelty_w + 0.20*min(eig_per_cost,1)",
+    "formula_version": "engine-ranking-v1",
+    "components": {
+     "adjudication": 0.4,
+     "attack_pass": 0.0,
+     "novelty": 0.2,
+     "eig_per_cost_capped": 0.44573539382492045
+    },
+    "score": 0.2691,
+    "portfolio_context": {
+     "target_invention_count": 10,
+     "survivors": 0,
+     "active": 0
+    },
+    "is_allocation_policy_not_truth": true,
+    "timestamp": "2026-09-11T23:45:39+00:00Z"
+   },
+   "survivor_gate": {
+    "survivor": false,
+    "final_status": "REJECTED",
+    "verdict": "CONTESTED",
+    "reason": "only a classified candidate with sufficient adjudication may be specified (Art. XXVIII: no promotion by narrative)"
+   },
+   "code_commit": null,
+   "built_at": "2026-09-11T23:48:25+00:00Z"
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "every value above traces to a stage output in the envelope"
+ },
+ "_evidence_index": {
+  "europepmc:42498455": {
+   "id": "europepmc:42498455",
+   "source_type": "scientific_paper",
+   "source": "EuropePMC",
+   "source_id": "europepmc:42498455",
+   "source_uri": "https://europepmc.org/article/42498455",
+   "title": "Clinical utility of the twiist Automated Insulin Delivery System: first study with twiist.",
+   "abstract": "Introduction Randomized controlled trials and real-world studies have demonstrated that automated insulin delivery (AID) systems enhance glycemic control and mitigate hypoglycemia risk in individuals with type 1 diabetes. This study evaluated the safety, effectiveness, and usability of the twiist AID System on glycemic outcomes in adults with type 1 diabetes. Research design and methods This 8-week, prospective, single-center, single-arm study included 20 adults with type 1 diabetes. The primary outcome measures were the percent of time spent in established continuous glucose monitoring (CGM) glycemic target ranges at 8 weeks. The primary efficacy outcome was percent time in range (%TIR; 70-180 mg/dL) at 8 weeks. Secondary outcomes were the change in glucose pre-occlusion detection; the effects of total daily insulin delivery (TDD) on glucose pre- and post-occlusion detection; the effect of Max basal ratio on %TIR; the effect of users' correction range on %TIR; and change in glycated haemoglobin (HbA1c). Changes in TDD and body weight were also assessed. Results 19 participants completed the study. At 8 weeks, the mean %TIR was 70.3±15.5%. Participants achieved or maintained glycemic targets for all CGM metrics except time above >250 mg/dL. A total of 67 occlusion events occurred in 15 participants. These events were detected within 30 min of rising glucose. Higher max basal ratio settings were associated with higher %TIR. The %TIR for participants with a correction range 100 mg/dL. HbA1c levels decreased (-0.4%±0.5%) in participants with baseline HbA1c >7%. A slight increase in TDD (1.3±16.2 U) and a decrease in body weight (-0.09±2.9 kg) were observed. No serious adverse events were reported. Conclusions Eight-week use of twiist enabled participants to achieve or maintain established glycemic targets and suggests the system's ability to detect occlusions before clinically significant glucose rise regardless of TDD. Larger and longer term studies are needed.",
+   "doi": "10.1136/bmjdrc-2026-006307",
+   "publication_date": "2026-07-24",
+   "retrieval_timestamp": "2026-09-11T23:48:10.790723+00:00",
+   "retrieval_method": "europepmc_api",
+   "content_hash": "eb3306fd58b7f77f4276cd37e89e8acb59bfeb42795ad854aa3c5dc8d1b33b79",
+   "tls_verified": true,
+   "provenance": {
+    "provider": "EuropePMC",
+    "retrieved_at": "2026-09-11T23:48:10.790723+00:00",
+    "query_or_method": "infusion pump Direct in-line pressure sensing infusion set",
+    "api_version": "rest",
+    "tls_verified": true
+   },
+   "epistemic_state": "OBSERVED"
+  },
+  "europepmc:41977964": {
+   "id": "europepmc:41977964",
+   "source_type": "scientific_paper",
+   "source": "EuropePMC",
+   "source_id": "europepmc:41977964",
+   "source_uri": "https://europepmc.org/article/41977964",
+   "title": "Monitoring Inputs, Control Architectures, and Failure Modes in Closed-Loop Vasopressor Systems: A Comprehensive Review.",
+   "abstract": "Closed-loop vasopressor systems integrate real-time blood pressure monitoring with automated decision logic to support hemodynamic stability in perioperative and critical care environments. These technologies sit at the intersection of biomedical sensing, signal processing, and clinician-supervised automation: the quality, latency, and failure behavior of the monitoring input can directly shape controller performance, safety margins, and clinical usability. In this comprehensive review, we synthesize the major closed-loop vasopressor architectures reported in the literature, examine how sensor modality and signal integrity influence algorithm behavior, and summarize recurrent reliability vulnerabilities spanning sensors, control logic, and device integration. We organize the field through an end-to-end information pipeline-monitoring input, signal conditioning and quality assessment, decision and control strategy, actuation via infusion technology, and supervisory safety layers-highlighting common performance metrics used to benchmark control quality. We then discuss clinical validation patterns across settings, emphasizing practical considerations for deployment and the evidence gaps that remain most relevant to high-risk populations. Finally, we propose reporting and validation priorities for future studies, with a focus on sensor robustness, transparency of algorithm design, integration safeguards, and standardized documentation of failures and overrides.",
+   "doi": "10.3390/s26072180",
+   "publication_date": "2026-04-01",
+   "retrieval_timestamp": "2026-09-11T23:48:10.790723+00:00",
+   "retrieval_method": "europepmc_api",
+   "content_hash": "a2c704d3ba08bb0dc41f1ba0bdf46aac5f0925d2748f241c4532d175cc4fd727",
+   "tls_verified": true,
+   "provenance": {
+    "provider": "EuropePMC",
+    "retrieved_at": "2026-09-11T23:48:10.790723+00:00",
+    "query_or_method": "infusion pump Direct in-line pressure sensing infusion set",
+    "api_version": "rest",
+    "tls_verified": true
+   },
+   "epistemic_state": "OBSERVED"
+  },
+  "europepmc:42525762": {
+   "id": "europepmc:42525762",
+   "source_type": "scientific_paper",
+   "source": "EuropePMC",
+   "source_id": "europepmc:42525762",
+   "source_uri": "https://europepmc.org/article/42525762",
+   "title": "IoT-enabled wireless neural implant for chronic, programmable neuropharmacology and optogenetics.",
+   "abstract": "Wireless in vivo neuropharmacology and optogenetics offer a powerful way to link molecular signaling, defined neural populations, and behavior in freely moving animals. However, existing implantable wireless systems developed for this purpose often suffer from imprecise dosing, backflow contamination, and nonrefillable reservoirs, and their reliance on experimenter presence can itself alter neural activity and behavior. Here, we introduce a remotely actuated and programmable implant for drug delivery and optical stimulation (RAPIDO), which integrates a refillable, replaceable, and backflow-free fluidic module with a microscale inorganic light-emitting diode probe in a single miniaturized implant. A replaceable cartridge with an integrated unidirectional valve enables rapid refilling with contamination-free dosing, while a programmable electrochemical pump provides multilevel flow-rate control and linear dose modulation. Dual wireless modes combine smartphone control for on-site interactive experiments with internet connectivity for remotely scheduled, observer-free operation. In freely behaving rodents, RAPIDO enabled repeated wireless pharmacological modulation of locomotor behavior and independent optogenetic manipulation of intracellular signaling during cocaine conditioning. This platform establishes a foundation for chronic multimodal neuromodulation, supporting long-term circuit studies across distributed laboratories.",
+   "doi": "10.1126/sciadv.aee8648",
+   "publication_date": "2026-07-29",
+   "retrieval_timestamp": "2026-09-11T23:48:10.790723+00:00",
+   "retrieval_method": "europepmc_api",
+   "content_hash": "bf88b2a41bb92657e044a844831919218bcba0a7337e6df425b9d2484b6513f9",
+   "tls_verified": true,
+   "provenance": {
+    "provider": "EuropePMC",
+    "retrieved_at": "2026-09-11T23:48:10.790723+00:00",
+    "query_or_method": "infusion pump Direct in-line pressure sensing infusion set",
+    "api_version": "rest",
+    "tls_verified": true
+   },
+   "epistemic_state": "OBSERVED"
+  },
+  "europepmc:41853098": {
+   "id": "europepmc:41853098",
+   "source_type": "scientific_paper",
+   "source": "EuropePMC",
+   "source_id": "europepmc:41853098",
+   "source_uri": "https://europepmc.org/article/41853098",
+   "title": "Closed-loop Control of Steerable Balloon Endoscopes for Robot-assisted Transcatheter Intracardiac Procedures.",
+   "abstract": "To move away from open-heart surgery towards safer transcatheter procedures, there is a growing need for improved imaging techniques and robotic solutions to enable simple, accurate tool navigation. Common imaging modalities, such as fluoroscopy and ultrasound, have limitations that can be overcome using cardioscopy, i.e., direct optical visualization inside the beating heart. We present a cardioscope designed as a steerable balloon. As a balloon, it can be collapsed to pass through the vasculature and subsequently inflated inside the heart for visualization and tool delivery through an integrated working channel. Through careful design of balloon wall thickness, a single input, balloon inflation pressure, is used to sequentially independently control two outputs, balloon diameter (corresponding to field of view diameter) and balloon bending angle (enabling precise working channel positioning). This balloon technology can be tuned to produce cardioscopes designed for a range of intracardiac tasks. To illustrate this approach, a balloon design is presented for the specific task of aortic leaflet laceration. Image-based closed-loop control of bending angle is also demonstrated as a means of enabling stable orientation control during tool insertion and removal.",
+   "doi": "10.1109/lra.2026.3664592",
+   "publication_date": "2026-02-13",
+   "retrieval_timestamp": "2026-09-11T23:48:10.790723+00:00",
+   "retrieval_method": "europepmc_api",
+   "content_hash": "4811ed757e9d703b0aeb5887c2dad5161a27f4d7126cdce6f89e52e898c5909b",
+   "tls_verified": true,
+   "provenance": {
+    "provider": "EuropePMC",
+    "retrieved_at": "2026-09-11T23:48:10.790723+00:00",
+    "query_or_method": "infusion pump Direct in-line pressure sensing infusion set",
+    "api_version": "rest",
+    "tls_verified": true
+   },
+   "epistemic_state": "OBSERVED"
+  },
+  "europepmc:41247769": {
+   "id": "europepmc:41247769",
+   "source_type": "scientific_paper",
+   "source": "EuropePMC",
+   "source_id": "europepmc:41247769",
+   "source_uri": "https://europepmc.org/article/41247769",
+   "title": "Sex differences in central salt sensing in the human brain.",
+   "abstract": "In preclinical models, the organum vasculosum of the lamina terminalis (OVLT) and subfornical organ (SFO) sense changes in serum sodium chloride (NaCl) concentration and mediate NaCl-induced changes in sympathetic nerve activity, vasopressin (AVP), thirst, and blood pressure (BP). In humans, brain imaging studies have shown that acute hypernatremia alters the activity or functional connectivity of the SFO and OVLT. However, no studies have investigated whether there are sex differences in central NaCl sensing in humans, which could underlie sex differences in neurohumoral responses to hypernatremia. Therefore, the purpose of this study was to test the hypothesis that acute relative hypernatremia would increase resting-state functional connectivity between NaCl-sensing brain regions and that these responses would be greater in men. Thirty-two young adults (17 men/15 women) underwent resting-state functional magnetic resonance imaging (fMRI) at baseline and during a 30-min intravenous hypertonic saline infusion. We performed a seed-to-seed functional connectivity analysis. Despite similar increases in serum sodium, thirst, systolic BP, and plasma AVP between the sexes, there was a time × sex interaction ( P z -scores: baseline = 0.21 ± 0.20, late phase = 0.29 ± 0.21; P = 0.04), but decreased in women ( z -scores: baseline = 0.27 ± 0.17, late phase = 0.15 ± 0.18; P = 0.004). Collectively, these results suggest that the functional coupling of the SFO and OVLT, which regulate sympathoexcitation and BP during acute hypernatremia, may be modulated by sex. NEW & NOTEWORTHY We used resting-state fMRI to assess whether there are sex differences in the functional connectivity of salt sensing brain regions during acute hypernatremia in young healthy adults. Despite having similar increases in serum sodium, thirst, systolic BP, and plasma AVP, functional connectivity between the SFO and OVLT increased with acute hypernatremia in men but decreased in women. This suggests there ma",
+   "doi": "10.1152/ajpregu.00211.2025",
+   "publication_date": "2025-11-17",
+   "retrieval_timestamp": "2026-09-11T23:48:10.790723+00:00",
+   "retrieval_method": "europepmc_api",
+   "content_hash": "2e6f743cfbf3737435c9e7b06ed35e11e7b001d0ad3e2ac739e9684f99f7ac32",
+   "tls_verified": true,
+   "provenance": {
+    "provider": "EuropePMC",
+    "retrieved_at": "2026-09-11T23:48:10.790723+00:00",
+    "query_or_method": "infusion pump Direct in-line pressure sensing infusion set",
+    "api_version": "rest",
+    "tls_verified": true
+   },
+   "epistemic_state": "OBSERVED"
+  },
+  "problem:e3721d3f": {
+   "id": "problem:e3721d3f",
+   "title": "operator problem statement (problem.json)",
+   "content_hash": "e3721d3fa04035dc8b10320175370a8b98b90fb99b1778dfbc31894e6b0f6f76",
+   "custody": "engine run problem.json artifact"
+  }
+ },
+ "_survivor_gate": {
+  "survivor": false,
+  "final_status": "REJECTED",
+  "verdict": "CONTESTED",
+  "reason": "only a classified candidate with sufficient adjudication may be specified (Art. XXVIII: no promotion by narrative)"
+ },
+ "_spec_hash": "d1901f9019cf29f131d2f36f2a8b029c8f13f4a926616b9933a28511a6cc1533",
+ "_integrity": {
+  "no_fact_promotion_violations": [],
+  "passed": true,
+  "checked_at": "2026-09-11T23:48:25+00:00Z"
+ },
+ "_evolution_candidate": {
+  "marker": "EVOLUTION_CAUSAL_DELTA_CANDIDATE",
+  "generation": 2,
+  "parent_invention_id": "inv:1fb03efe68:gen1",
+  "causal_delta_present": true,
+  "discovery_verification": "RE-EVALUATED through the standard gauntlet (collision/spec/physics/attack) for this generation; nothing inherited from the parent"
+ }
+}

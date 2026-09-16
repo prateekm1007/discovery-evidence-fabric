@@ -1,0 +1,282 @@
+{
+ "schema": "INVENTION_LINEAGE/1.0.0",
+ "run_id": "engrun:ui_delayed_downstream_occlusion_detection_170066:2026-09-11T23:41:06",
+ "generations": [
+  {
+   "gen": 1,
+   "invention_id": "inv:1fb03efe68:gen1",
+   "parent_id": null,
+   "lineage": [
+    "inv:1fb03efe68:gen1"
+   ],
+   "origin": "BASELINE_SYNTHESIS",
+   "architecture": {
+    "mechanism": "Direct in-line pressure sensing of the infusion set against a calibrated occlusion threshold (20 Psi per ECRI), where a water pressure sensor detects rising upstream pressure caused by a downstream blockage and transmits the signal to a processor for real-time evaluation, with calibration accuracy quantified per device (error margins 2.84%–71.26%).",
+    "intervention": "Integrate a periodically recalibrated (annual, per ECRI 20 Psi benchmark) in-line pressure sensor upstream of the patient connection whose output is continuously compared against a calibrated occlusion threshold by the pump's processor; on threshold crossing, immediately halt the pumping mechanism and trigger the occlusion alarm, with per-unit sensor error verified during calibration so the effective alarm threshold is derated by the measured sensor error margin.",
+    "expected_effect": "Occlusion-induced pressure rise is detected at the sensor before the delivered volume/pressure deviation propagates to the patient, enabling alarm and pump stoppage prior to harmful medication or fluid delivery deviation; routine calibration against a dual-channel analyzer keeps sensor drift (up to ~71% error observed in uncalibrated devices) from delaying or masking detection.",
+    "falsification_test": "Bench test with a syringe pump infusing water at clinical rates (e.g., 5–100 mL/h) through a test set with a programmable downstream resistance (solenoid valve or clamp) creating gradual occlusion; measure time from occlusion onset to alarm and delivered-volume deviation at alarm, before and after sensor calibration. The mechanism is falsified if any calibrated unit alarms only after pressure/volume deviation exceeds the harmful threshold, or if post-calibration sensor error exceeds the derating allowance (e.g., >5%)."
+   },
+   "state": "INVENTION_EVOLVED",
+   "maturity": "SIMULATED",
+   "challenge": {
+    "physics_lifecycle": "BEATS_BASELINE",
+    "attack_overall": "KILLED",
+    "evidence_verified": true,
+    "killed": true,
+    "kill_reason": "adversarial challenge failed: obvious_combination: KILLED; killed dimensions: obvious_combination: KILLED",
+    "final_status": "REJECTED"
+   },
+   "causal_delta": null,
+   "change_delta": null,
+   "reason_for_change": null,
+   "fresh_evidence": null,
+   "model": null,
+   "artifacts": {},
+   "evidence_verified": true,
+   "diagnosis": {
+    "cause": "ADVERSARIAL_KILL",
+    "basis": [
+     "generation challenge.attack_overall=KILLED",
+     "adversarial challenge failed: obvious_combination: KILLED; killed dimensions: obvious_combination: KILLED"
+    ],
+    "infrastructure_class": false,
+    "diagnosed_by": "evolution.diagnose_from_generation/1.0.0 (per-generation challenge record)"
+   }
+  },
+  {
+   "gen": 2,
+   "invention_id": "inv:1fb03efe68:gen2",
+   "parent_id": "inv:1fb03efe68:gen1",
+   "lineage": [
+    "inv:1fb03efe68:gen1",
+    "inv:1fb03efe68:gen2"
+   ],
+   "origin": "EVOLUTION_CAUSAL_DELTA",
+   "architecture": {
+    "mechanism": "Active hydraulic system identification: the pump superimposes small, clinically negligible flow perturbations (e.g., ±2% of commanded rate, 0.5 Hz) on the nominal delivery and measures the pressure/flow response at the existing in-line sensor plus motor torque signature; a recursive estimator (e.g., extended Kalman filter) continuously fits downstream resistance and compliance parameters; occlusion is declared when identified downstream resistance exhibits sustained exponential-growth drift exceeding a statistically validated bound (sequential probability ratio test), not when absolute pressure crosses 20 Psi.",
+    "intervention": "Retrofit firmware plus a high-resolution motor current/encoder tap on the existing peristaltic mechanism: (1) inject periodic micro flow perturbations during normal delivery; (2) run recursive",
+    "expected_effect": "",
+    "falsification_test": ""
+   },
+   "state": "INVENTION_REQUIRES_EXPERIMENT",
+   "maturity": "SIMULATED",
+   "causal_delta": {
+    "failure_or_challenge": "adversarial challenge failed: obvious_combination: KILLED; killed dimensions: obvious_combination: KILLED",
+    "diagnosed_cause": "ADVERSARIAL_KILL",
+    "causal_change": "",
+    "new_capability": "",
+    "new_interaction": "",
+    "new_operating_regime": "",
+    "predicted_effect": "",
+    "frontier_capability": "",
+    "thirty_year_engine": {
+     "current": "Passive, threshold-based in-line pressure sensing — a single static occlusion threshold (20 Psi) compared against a periodically calibrated sensor, with alarm only after pressure has already risen past the derated threshold; the pump is an open-loop deliverer with a passive watchdog.",
+     "evolution_2055": "By 2055 infusion delivery is fully closed-loop: pumps continuously identify the patient-line hydraulic plant (resistance, compliance) via active micro-perturbations, predict occlusion onset from parameter drift rather than absolute pressure, and autonomously re-regulate flow to hold delivered-dose fidelity — the vasopressor closed-loop and automated insulin delivery pattern generalized to fluid/medication infusion.",
+     "required_capability": "The diagnosis (obvious_combination kill) shows the parent lacks any non-obvious causal capability: it cannot detect occlusion before pressure crosses a threshold, cannot distinguish true downstream blockage from benign compliance changes, and cannot actuate anything other than stop-and-alarm. What is missing is predictive, model-based detection and active regulation — not better calibration of the same passive sensor.",
+     "capability_backcast": "2055: fully predictive closed-loop infusion with self-identifying hydraulic models. 2040: embedded micro-perturbation flow probes with on-pump system identification; occlusion predicted minutes ahead. 2030: motor-current/torque signatures fused with pressure for early occlusion inference (already nascent in peristaltic pump literature). 2025: closed-loop vasopressor and AID systems demonstrate embedded plant identification and failure-mode-aware control in clinical software; cheap high-resolution motor encoders and current sensing on pumps.",
+     "todays_frontier": "Closed-loop control architectures from clinical automation — specifically closed-loop vasopressor systems and automated insulin delivery (twiist), where the controller continuously identifies the controlled plant's response characteristics and detects actuator/sensor failure modes from model residual drift rather than from fixed alarm thresholds.",
+     "transfer": "Import the closed-loop \"identify-then-predict\" regime from vasopressor/AID control into the infusion pump: instead of passively watching one pressure number, the pump actively probes the line with sub-clinical flow micro-perturbations, fits a hydraulic resistance/compliance model, and detects occlusion as a statistically significant drift in identified plant parameters — hours-to-minutes before any static pressure threshold would trip."
+    },
+    "provenance": "AI_PROPOSED (the 30-year walk and the frontier transfer are generated reasoning, not retrieved evidence — they must survive the re-evaluation gauntlet like every other generated claim)"
+   },
+   "change_delta": "",
+   "reason_for_change": "diagnosed cause ADVERSARIAL_KILL; frontier transfer",
+   "fresh_evidence": {
+    "snapshot_version": 2,
+    "query": "infusion pump Direct in-line pressure sensing infusion set",
+    "n_items": 5,
+    "status": "OK",
+    "snapshot_hash": "3146702f00357952",
+    "boundary": "NEW retrieval for this generation (Art. XLIV: new evidence -> new snapshot -> new freeze; never silently merged into the GEN-1 frozen set)",
+    "retrieved_at": "2026-09-11T23:48:10+00:00"
+   },
+   "generated_by": {
+    "provider": "zai",
+    "model": "zai-org/GLM-5.3",
+    "status": "OK",
+    "prompt_hash": "aea7414fb7323871",
+    "output_hash": "2a77c98bef276514",
+    "template_echo_rejected": [],
+    "provenance": "AI_PROPOSED",
+    "maturity_at_generation": "GENERATED"
+   },
+   "challenge": {
+    "physics_lifecycle": "BEATS_BASELINE",
+    "attack_overall": "SURVIVED_WITH_UNCERTAINTIES",
+    "independent_attack": "ESCALATED_OBJECTION",
+    "escalated_objection": {
+     "preserved_objections": [
+      {
+       "attack_class": "MECHANISM_FAILURE",
+       "basis": "The candidate's own detection variable is \"identified downstream resistance,\" but the sensing architecture it specifies (one upstream in-line pressure sensor plus motor torque) cannot identify downstream resistance: resistance R = (P_upstream − P_distal)/Q requires the distal (venous/patient-side) pressure, which is never measured, and the motor-torque channel is redundant with the upstream pressure channel (both observe the same pump head), so the estimator has 1 independent observation channel for 3 unknowns (R, C, P_distal). The parameter the alarm threshold is built on is structurally unid",
+       "grounding": {
+        "grounded": true,
+        "bindings": [
+         {
+          "binding": "evidence",
+          "ground": "bundle item 'Clinical utility of the twiist Automated Insulin Delivery System: first study with twiist.' (strong overlap: detection, measures, occlusion, with)",
+          "verified": true
+         },
+         {
+          "binding": "computation",
+          "ground": "numeric relation over ['1', '3', '3', '1', '3', '1']",
+          "verified": true
+         },
+         {
+          "binding": "record",
+          "ground": "verbatim span 'signature recursive estimator extended' (field: mechanism)",
+          "verified": true
+         }
+        ],
+        "claimed_ground": "RECORD \"measures the pressure/flow response at the existing in-line sensor plus motor torque signature; a recursive estimator (e.g., extended Kalman filter) continuously fits downstream resistance and",
+        "absence_ground": false
+       }
+      },
+      {
+       "attack_class": "BOUNDARY_CONDITION_FAILURE",
+       "basis": "The candidate explicitly claims zero known failure modes (\"(none claimed)\") while its core intervention deliberately superimposes ±2% flow perturbations at 0.5 Hz onto commanded drug delivery, and asserts these are \"clinically negligible\" with no stated boundary condition on drug class, patient population, or delivery rate for which ±2% is safe; the problem record itself includes potent-drug contexts (insulin pump MMT-1715K, closed-loop vasopressor systems) where the candidate offers no boundary separating safe from unsafe perturbation regimes. GROUNDED_IN: RECORD \"Known failure modes (claimed",
+       "grounding": {
+        "grounded": true,
+        "bindings": [
+         {
+          "binding": "evidence",
+          "ground": "bundle item 'Clinical utility of the twiist Automated Insulin Delivery System: first study with twiist.' (strong overlap: clinically, delivery, insulin, systems)",
+          "verified": true
+         },
+         {
+          "binding": "computation",
+          "ground": "numeric relation over ['2', '0.5', '2', '1715']",
+          "verified": true
+         },
+         {
+          "binding": "record",
+          "ground": "verbatim span 'small clinically negligible flow' (field: mechanism)",
+          "verified": true
+         }
+        ],
+        "claimed_ground": "RECORD \"Known failure modes (claimed by the generator): (none claimed)\" + RECORD \"small, clinically negligible flow perturbations (e",
+        "absence_ground": false
+       }
+      }
+     ],
+     "calibration_state": "NOT_CALIBRATED",
+     "measured": {
+      "coverage": 1.0,
+      "parse_completeness": 1.0,
+      "tpr_scoped": 1.0,
+      "fpr_known_good": 1.0,
+      "n_cases_attacked": 22
+     },
+     "note": "the independent attack KILLED this architecture, but the instrument is measured NOT_CALIBRATED (FPR 1.0 on sealed known-good mechanisms): the objection is preserved and escalated, not executed (Art. L)"
+    },
+    "killed": false,
+    "survived": true
+   },
+   "model": null,
+   "artifacts": {
+    "invention_spec": "INVENTION_SPECIFICATION_gen-2.json",
+    "engineering_spec": "ENGINEERING_SPECIFICATION_gen-2.json"
+   },
+   "evidence_verified": true
+  }
+ ],
+ "n_generations": 2,
+ "n_evolution_generations": 1,
+ "survivor_reached": true,
+ "survivor_gen": 2,
+ "current_invention": {
+  "gen": 2,
+  "invention_id": "inv:1fb03efe68:gen2",
+  "state": "INVENTION_REQUIRES_EXPERIMENT",
+  "maturity": "SIMULATED"
+ },
+ "stop_reason": "SURVIVOR_REACHED",
+ "budget": {
+  "max_evolution_generations": 3,
+  "engine_evolution_env": "1"
+ },
+ "honesty_contract": "every generation's maturity label is derived from its own verification events (Art. LX); generated content carries AI_PROPOSED provenance and never claims evidence; infrastructure failures are typed and never converted into scientific verdicts (Art. LXI); the current invention is always presented with its true maturity, never softened (Art. LXVIII)",
+ "resumed": false,
+ "final_state": {
+  "run_id": "engrun:ui_delayed_downstream_occlusion_detection_170066:2026-09-11T23:41:06",
+  "problem_id": "ui_delayed_downstream_occlusion_detection_170066",
+  "device": "infusion pump",
+  "final_status": "EVOLVED_INVENTION_CANDIDATE",
+  "epistemic_state": "CANDIDATE_CONNECTION",
+  "reason": "an evolved architecture generation survived the re-evaluation gauntlet (2 generations, causal delta recorded); the decisive physical experiment is specified, not executed",
+  "premise_verdict": "PREMISE_COHERENT",
+  "premise_explanation": "no definitional contradiction matched; the gate cannot prove physical truth — only rule-table incoherence is checkable (disclosed limit)",
+  "evidence_verified": true,
+  "evidence_classification_counts": {
+   "DIRECT_SUPPORT": 9,
+   "PARTIAL_SUPPORT": 3,
+   "BACKGROUND": 0,
+   "ANALOGY": 3,
+   "CONTRADICTORY": 1,
+   "IRRELEVANT": 0
+  },
+  "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+  "collision_novelty_risk": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+  "collision_search_execution": {
+   "mandatory_complete": false,
+   "n_errors": 10,
+   "rule": "RESOLVED_DIFFERENTIATED requires every mandatory (query_class x source) search to have completed successfully (R394 s2); provider failure never becomes absence (Art. XXI.3)"
+  },
+  "adversarial_overall": "KILLED",
+  "adjudication_verdict": "CONTESTED",
+  "ranking_score": 0.2691,
+  "next_best_action": "run killer experiment: falsification_test_from_candidate",
+  "failed_stages": {},
+  "final_envelope_hash": "0acbc3329a0af778a1754d0da276176df3afb874c7de8313f4eaddc6e47dc2fa",
+  "code_commit": "48cbba34a491fa2dafc61f0421de37d929c5be20",
+  "timestamp": "2026-09-11T23:45:39+00:00Z",
+  "evolution": {
+   "n_generations": 2,
+   "stop_reason": "SURVIVOR_REACHED",
+   "current_invention": {
+    "gen": 2,
+    "invention_id": "inv:1fb03efe68:gen2",
+    "state": "INVENTION_REQUIRES_EXPERIMENT",
+    "maturity": "SIMULATED"
+   },
+   "survivor_reached": true
+  },
+  "experiment_contract": {
+   "contract": {
+    "HYPOTHESIS": "expected effect holds: Occlusion-induced pressure rise is detected at the sensor before the delivered volume/pressure deviation propagates to the patient, enabling alarm and pump stoppage prior to harmful medication or flui (recorded prior 0.6, epistemic class MODEL_DERIVED per the killer-experiment provenance)",
+    "TREATMENT": "Retrofit firmware plus a high-resolution motor current/encoder tap on the existing peristaltic mechanism: (1) inject periodic micro flow perturbations during normal delivery; (2) run recursive",
+    "CONTROL": "the physics stage's executed BASELINE_COMPARISON arm (lifecycle verdict BEATS_BASELINE) — the baseline the candidate was measured against in the same evaluation",
+    "MEASUREMENT": "Bench test with a syringe pump infusing water at clinical rates (e.g., 5–100 mL/h) through a test set with a programmable downstream resistance (solenoid valve or clamp) creating gradual occlusion; measure time from occlusion onset to alarm and delivered-volume deviation at alarm, before and after sensor calibration. The mechanism is falsified if any calibrated unit alarms only after pressure/volume deviation exceeds the harmful threshold, or if post-calibration sensor error exceeds the derating allowance (e.g., >5%).",
+    "APPARATUS": "the falsification test's own recorded instrumentation (stated within MEASUREMENT; not split out — no separate apparatus record exists)",
+    "SAMPLE_BLOCKER": "no sample-size / n= record exists in any engine stage (honest UNKNOWN — Art. XXV)",
+    "ACCEPTANCE_THRESHOLD": "Occlusion-induced pressure rise is detected at the sensor before the delivered volume/pressure deviation propagates to the patient, enabling alarm and pump stoppage prior to harmful medication or fluid delivery deviation; routine calibration against a dual-channel analyzer keeps sensor drift (up to ~71% error observed in uncalibrated devices) from delaying or masking detection.",
+    "FALSIFICATION_THRESHOLD": "the recorded falsification test ('Bench test with a syringe pump infusing water at clinical rates (e.g., 5–100 mL/h) through a test set with a programmable downstream resistance (solenoid valve or clamp) creating gradual occlusion; me') fails to show the recorded expected effect ('Occlusion-induced pressure rise is detected at the sensor before the delivered volume/pressure deviation propagates to the patient, enabling alarm and pump stoppage prior to harmful medication or flui') — the mechanism is killed by its own test's negative outcome; the recorded failing hypothesis is 'expected effect does not reproduce outside source context'",
+    "UNCERTAINTY": "all priors MODEL_DERIVED; no EXPERIMENTALLY_ESTIMATED inputs exist at this stage (Art. XXVIII/XXXVIII: no synthetic shortcut to physical observation)",
+    "COST": "UNKNOWN absolute cost (options ranked on a relative-1.0 scale per bayesian_eig; no sourced dollar/time estimate exists — Art. XXV)",
+    "TIME": "UNKNOWN (no stage recorded a time estimate)",
+    "SAFETY_BLOCKER": "no safety-analysis stage output exists in the engine (honest UNKNOWN — Art. XXV; the engineering failure_modes record is a failure-mode list, not a safety case)"
+   },
+   "status": {
+    "answered_fields": [
+     "HYPOTHESIS",
+     "TREATMENT",
+     "CONTROL",
+     "MEASUREMENT",
+     "APPARATUS",
+     "ACCEPTANCE_THRESHOLD",
+     "FALSIFICATION_THRESHOLD",
+     "UNCERTAINTY"
+    ],
+    "unknown_fields": {
+     "SAMPLE": "no sample-size / n= record exists in any engine stage (honest UNKNOWN — Art. XXV)",
+     "COST": "UNKNOWN absolute cost (options ranked on a relative-1.0 scale per bayesian_eig; no sourced dollar/time estimate exists — Art. XXV)",
+     "TIME": "UNKNOWN (no stage recorded a time estimate)",
+     "SAFETY": "no safety-analysis stage output exists in the engine (honest UNKNOWN — Art. XXV; the engineering failure_modes record is a failure-mode list, not a safety case)"
+    },
+    "falsification_threshold_answered": true,
+    "contract_complete": true,
+    "basis": "Art. LII: the contract is complete only when an experimental outcome that kills the mechanism is stated; UNKNOWN fields are honest states (Art. XXV) and are listed with their blockers — they limit maturity, not existence"
+   }
+  }
+ }
+}

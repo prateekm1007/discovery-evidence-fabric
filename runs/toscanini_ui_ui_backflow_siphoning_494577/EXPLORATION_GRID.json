@@ -1,0 +1,228 @@
+{
+ "diversity": "CANDIDATE_DIVERSITY (E16-E)",
+ "version": "1.1.0",
+ "min_candidates": 10,
+ "available_providers": [
+  "zai"
+ ],
+ "operator_override": [
+  "zai"
+ ],
+ "angles": [
+  "cross_industry_transfer",
+  "mechanism_inversion",
+  "simplification",
+  "multi_physics_hybrid",
+  "constraint_first"
+ ],
+ "candidates": [
+  {
+   "angle": "cross_industry_transfer",
+   "provider_id": "zai",
+   "status": "OK",
+   "model": "minimax/minimax-m3:free",
+   "prompt_hash": "f4643bd2a0f21ef3768b0816d372043eb00269e37929b1cff6a470f788e9f076",
+   "output_hash": "d9d074dbde9fcb9243d37d6837c1e852aee237b7a28c1740859317bc8cde535d",
+   "fields": {
+    "mechanism": "historical engineering evolution of valve designs and their failure mechanisms, including valve classes with distinct advantages and shortcomings used to control fluid direction and pressure",
+    "intervention": "transfer a passive, no-moving-parts valve class mechanism (e.g., a diaphragm- or slit-type passive pressure/flow-regulation principle referenced in shunt valve design evolution) into the anti-siphon check valve as a static cracking-pressure element that closes the drip line purely by hydrostatic pressure differential when the pump stops",
+    "expected_effect": "passive prevention of backflow siphoning upon pump shutdown without moving parts, external power, or significant cost increase",
+    "falsification_test": "install the modified valve on a drip line, fill the line, stop the pump, and raise the downstream outlet above the upstream header by 1 m, 2 m, and 3 m for 30 minutes each; record any reverse flow at the inlet with a graduated cylinder; the valve passes if measured backflow is <1% of line volume at all three heads, and fails if backflow scales with static head",
+    "mechanism_source_span": "This review spans valve evolution from an engineering perspective with an emphasis on discussing potential failure mechanisms and patient-specific valve selection.",
+    "span_derivation": {
+     "n_shared": 5,
+     "shared_terms": [
+      "engineering",
+      "evolution",
+      "failure",
+      "mechanism",
+      "valve"
+     ],
+     "span_terms_n": 15,
+     "ratio": 0.333,
+     "underived": false,
+     "state": "MEASURED",
+     "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+    }
+   },
+   "span_underived": false,
+   "candidate_id": "cand:DIV:cross_industry_transfer:zai:d9d074dbde9f"
+  },
+  {
+   "angle": "mechanism_inversion",
+   "provider_id": "zai",
+   "status": "OK",
+   "model": "minimax/minimax-m3:free",
+   "prompt_hash": "f939d51341f3a3fe9564482ef851aa1e20151fe5396905580e788df6ef3c94a0",
+   "output_hash": "2435c9f21cfacc88ff9780a5eca05c6b87754e080a1c22015a6265b39c7ed8eb",
+   "fields": {
+    "mechanism": "Remove the active moving element and rely on passive structural hydrodynamics: use a fixed-geometry static head/loop (a passive siphon-break loop) that elevates the outlet above the highest water level to create a static hydrostatic head that passively prevents siphoning at pump stop",
+    "intervention": "Replace the anti-siphon check valve with a passive siphon-break loop (an inverted U elevated above the highest emitter) so that when the pump stops, gravity-induced static head in the raised loop passively breaks the siphon, requiring no moving parts and no power; draw on the shunt valve design evolution concept of passive structural control to inform geometry/material selection.",
+    "expected_effect": "Passive, mechanical-only prevention of backflow siphoning at pump shutoff, achieved by elevating a static loop above the source so that hydrostatic head passively collapses the siphon on pump stop.",
+    "falsification_test": "Build a drip irrigation test bed with the siphon-break loop installed at a height above the pump intake; run the pump, stop it, and measure any reverse column drop/flow over 24 h; if reverse siphoning occurs comparable to an unprotected line, the mechanism fails.",
+    "mechanism_source_span": "Substantial development over decades has significantly improved valve functionality, and ongoing research continues to provide more robust valves and shunt systems for hydrocephalus management.",
+    "span_derivation": {
+     "n_shared": 2,
+     "shared_terms": [
+      "shunt",
+      "valve"
+     ],
+     "span_terms_n": 19,
+     "ratio": 0.105,
+     "underived": true,
+     "state": "MEASURED",
+     "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+    }
+   },
+   "span_underived": true,
+   "candidate_id": "cand:DIV:mechanism_inversion:zai:2435c9f21cfa"
+  },
+  {
+   "angle": "simplification",
+   "provider_id": "zai",
+   "status": "OK",
+   "model": "minimax/minimax-m3:free",
+   "prompt_hash": "7eacf7ede7ed865428bfa8add89559a934c232df1fc655a82ca5dc509ee9bd06",
+   "output_hash": "bfefd6ac2f058941bd3ed7589819119b51b46e19e9e754acf8f8d61575a37e6c",
+   "fields": {
+    "mechanism": "Historical evolution of shunt valve designs, including differential-pressure and anti-siphon mechanisms, as engineering solutions to prevent undesirable backflow along a fluid column when driving pressure is removed.",
+    "intervention": "Apply a passive, fixed-resistance (or fixed-orifice) anti-siphon element—modeled on the historical low-cost, no-moving-parts valve classes reviewed in the paper—inserted in series with the drip irrigation line to break the siphon column when pump pressure drops, replacing the failing moving-part anti-siphon check valve.",
+    "expected_effect": "When the pump stops, the inserted element imposes a fixed head loss that collapses the siphon-driving pressure differential, halting backflow without any moving part or power.",
+    "falsification_test": "Build a prototype drip line with the element installed at the highest point between pump and emitters; stop the pump and measure downstream-to-source backflow volume versus a control line without the element; success criterion is backflow volume reduced to ≤ a small fraction of the uncontrolled siphon volume across multiple stop-start cycles.",
+    "mechanism_source_span": "This review spans valve evolution from an engineering perspective with an emphasis on discussing potential failure mechanisms and patient-specific valve selection.",
+    "span_derivation": {
+     "n_shared": 4,
+     "shared_terms": [
+      "engineering",
+      "evolution",
+      "mechanism",
+      "valve"
+     ],
+     "span_terms_n": 15,
+     "ratio": 0.267,
+     "underived": false,
+     "state": "MEASURED",
+     "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+    }
+   },
+   "span_underived": false,
+   "candidate_id": "cand:DIV:simplification:zai:bfefd6ac2f05"
+  },
+  {
+   "angle": "multi_physics_hybrid",
+   "provider_id": "zai",
+   "status": "OK",
+   "model": "minimax/minimax-m3:free",
+   "prompt_hash": "83f0e0521d7f5fffa6406c35be1a91b17cbd56d26d2f3fa14861ecddb086c1b9",
+   "output_hash": "96af9f91f1469418c6367a9f73c4cb63abdc45ff00b9727124fcba1edc52f588",
+   "fields": {
+    "mechanism": "Differential-pressure-regulated one-way flow gating in valve mechanisms that prevents reverse flow when upstream driving pressure is lost (derived from the paper's discussion of valve functionality and failure mechanisms in shunt systems, where valves act as pressure-actuated flow regulators that open under forward pressure gradients and close when the gradient reverses, thereby blocking backflow and siphoning).",
+    "intervention": "Replace the anti-siphon check valve's spring/poppet with a passive, fixed-orifice diaphragm element whose geometry is dimensioned so that the hydrostatic pressure head in the drip line cannot generate the threshold opening pressure in the reverse direction (i.e., the device behaves as a pressure-threshold check that is closed whenever pump-driven forward pressure is absent and only opens when forward line pressure exceeds the siphoning head). Because the paper emphasizes that valve failure is responsible for a significant percentage of revisions and that valve selection must account for patient-specific pressure environments, the analogous transfer is to select the threshold pressure based on the maximum expected siphon head in the irrigation installation; this combines fluidic domain (pressure-thresholded flow regulation) with mechanical/elastic domain (elastomeric diaphragm deflection under differential pressure), satisfying the multi-physics hybrid requirement.",
+    "expected_effect": "When the pump stops and the forward driving pressure collapses, the drip line's hydrostatic siphon head is below the diaphragm's reverse-opening threshold, so the valve remains closed and backflow/siphoning is prevented without any moving rigid parts (only an elastomeric flexure), without power, and at low cost.",
+    "falsification_test": "Install the device on a drip irrigation line elevated so that the downstream emitter is positioned above the pump inlet by a known siphon head H (e.g., 1 m, 2 m, 3 m water column). With the pump off, verify that no water drains from the elevated emitter and that a manometer at the valve inlet reads a static head equal to H but no flow occurs. Then incrementally reduce H until reverse flow initiates; record the critical H and confirm it is non-zero and reproducible across at least 10 cycles. Repeat with the pump on at nominal pressure to confirm normal forward flow rate is preserved (within ±10% of unobstructed line flow). If reverse flow occurs at any H > 0 with the pump off, or if forward flow is reduced by more than 10%, the mechanism is falsified for this application.",
+    "mechanism_source_span": "\"this review spans valve evolution from an engineering perspective with an emphasis",
+    "span_derivation": {
+     "n_shared": 2,
+     "shared_terms": [
+      "thi",
+      "valve"
+     ],
+     "span_terms_n": 8,
+     "ratio": 0.25,
+     "underived": false,
+     "state": "MEASURED",
+     "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+    }
+   },
+   "span_underived": false,
+   "candidate_id": "cand:DIV:multi_physics_hybrid:zai:96af9f91f146"
+  },
+  {
+   "angle": "constraint_first",
+   "provider_id": "zai",
+   "status": "OK",
+   "model": "minimax/minimax-m3:free",
+   "prompt_hash": "2203cb654342b566a095fed6e56e847af24963e1cacf85bf2fd3d890eceff953",
+   "output_hash": "a14425f2b7e3a3132af7475798594acaa3b7489b8742776dad4b0c4684329dee",
+   "fields": {
+    "mechanism": "Valve failure mechanisms reviewed across valve classes, with evolution of valve functionality aimed at improving robustness — the paper documents that valves fail and that ongoing development targets more robust valve and shunt systems through engineering design of valve classes and their failure modes.",
+    "intervention": "Apply a documented shunt-valve failure-mode taxonomy (e.g., obstruction, valve degradation, suboptimal opening/closing dynamics) to redesign the anti-siphon clamp as a fixed-geometry, no-moving-parts flow-restricting element whose geometry is selected to fail safe (remain closed) under the siphoning pressure differential, mirroring how shunt valves are engineered for specific pressure/flow conditions.",
+    "expected_effect": "Reduced backflow siphoning by eliminating moving-parts failure modes (sticking, wear, fatigue) and by enforcing a single passive geometric threshold that passively blocks reverse flow when pump pressure is lost.",
+    "falsification_test": "Bench-test the clamp on a drip irrigation line: (1) run forward flow at rated pressure and verify negligible head loss vs. baseline; (2) stop the pump and verify zero backflow over 24 h with the downstream line held below source elevation; (3) cycle 10,000 on/off events and repeat (2) — pass if backflow remains at or below the no-clamp check-valve baseline, and no deformation, cracking, or permanent set is observed in the clamp.",
+    "span_derivation": {
+     "n_shared": 0,
+     "ratio": null,
+     "underived": true,
+     "state": "NO_SPAN"
+    }
+   },
+   "span_underived": true,
+   "candidate_id": "cand:DIV:constraint_first:zai:a14425f2b7e3"
+  }
+ ],
+ "built_at": "2026-09-15T17:53:35+00:00Z",
+ "usable_candidates": 5,
+ "status": "GRID_RUN",
+ "diversity_metrics": {
+  "candidates_measured": 5,
+  "mean_pairwise_token_distance": 0.82,
+  "distinct_mechanism_clusters": 5,
+  "cluster_sizes": [
+   1,
+   1,
+   1,
+   1,
+   1
+  ],
+  "rewrite_pairs_jaccard_ge_0_8": [],
+  "architecture_term_count": 143,
+  "architecture_terms_sample": [
+   "above",
+   "absent",
+   "account",
+   "analogous",
+   "anti",
+   "apply",
+   "because",
+   "behaves",
+   "break",
+   "breaks",
+   "cannot",
+   "check",
+   "clamp",
+   "class",
+   "classes",
+   "closed",
+   "closes",
+   "closing",
+   "column",
+   "combines",
+   "concept",
+   "conditions",
+   "control",
+   "cost"
+  ],
+  "failure_mode_signal_count": 3,
+  "failure_modes_invoked_sample": [
+   "check-valve seat wear opening reverse leakage",
+   "encrustation / mineral deposition",
+   "proximal occlusion by tissue ingrowth"
+  ],
+  "prior_art_query_set_count": 5,
+  "detected_domain": "fluidics_hydraulic"
+ },
+ "entry": {
+  "entry_helper_version": "stage_entry/1.1.0",
+  "stage": "EXPLORATION_GRID",
+  "entry_status": "ALLOWED",
+  "prerequisite": "VERIFIED_EVIDENCE",
+  "prerequisite_evidence": {
+   "n_verified_evidence_items": 6,
+   "n_direct_support": 4,
+   "n_partial_support": 2,
+   "n_items_total": 16,
+   "span_binding_verified": true,
+   "basis": ">=1 evidence item classified DIRECT_SUPPORT/PARTIAL_SUPPORT, or the candidate's span binding verified (R394 s5 classification + a2/verify)"
+  }
+ }
+}
