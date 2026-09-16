@@ -1025,3 +1025,26 @@ engine_commit == ca385e1f == origin/main; ok=true, drift=GREEN,
 identity_tamper=false; constitution 2.5.0; atria HEALTHY (1 model) in
 the production provider matrix. Atria is now the DEFAULT head with the
 THREE-KEY ring live in production.
+
+## R478 — the external engine audit answered: Phase-0 truth reconciliation + the first executable P0 tranche
+
+The TOSCANINI EXTERNAL AUDIT (delivered at HEAD 17504061) is answered the way this repo
+answers an audit: every structural claim re-measured, typed, file:line pinned
+(`R478/PHASE0_TRUTH_RECONCILIATION.json`), and the code-executable P0s landed in the same
+round — no new registries, state machines, or provenance systems; the standing queue, gate,
+ledger, and maturity ladder absorbed everything.
+
+| DELIVERABLE | WHERE | THE MEASURED FACT |
+|---|---|---|
+| P0-2 CONTRADICTION MOVES BELIEF | `discovery_fabric/engine/adapters.py` (ContradictionQueueAdapter) | contradictory user evidence now enters the queue as typed `con:evidence:*` entries with DERIVED severity (HIGH when direct support exists — it threatens a promotable state; MEDIUM when not — Art. V), the payload carries the recorded `belief_update` (support_ratio + confidence_delta = −0.4 × n_contra/(n_contra+n_direct), formula + inputs traveling), and the EXISTING ADJUDICATION `no_blocking_contradictions` check holds RED while unresolved — the audit's "B changes visibility only" class is dead; pinned with the A-supports/B-contradicts fixture the audit named |
+| P0-3 NUMERIC KILL CONTRACT | `discovery_fabric/engine/experiment_selector.py` + `invention_bridge/elite_package.py` | `FALSIFICATION_THRESHOLD` is answered ONLY from a numeric-band record (`FALSIFICATION_BANDS` carries the verbatim numbers — extracted, never computed); the prose composite can no longer answer the decisive field; `decision_rule_numeric` added to the R425 maturity gate — a pre-registered rule without a number no longer grants EXPERIMENT_READY (the audit's exact acceptance, pinned negative AND positive) |
+| P0-4 STATE-DERIVED EIG / NBA | `toscanini/conversational/nba_controller.py` v1.1.0 + engine Killer/NBA adapters | the R458 constant trace (48× identical EIG 0.85 / cost 2.0 / score 0.2826) is dead BY CONSTRUCTION: attack EIG = min(0.95, 0.5 + 0.05·min(n_direct,6) + 0.05·min(n_contra,4)) — three states → three distinct values, pinned; EVERY action carries `input_basis` (formula + inputs + provenance class); latency prefers the run's OWN measured stage_log duration (MEASURED_IN_RUN) over the declared prior (DECLARED_PRIOR) — never conflated; killer outcome likelihoods derive from recorded contradiction pressure; engine NBA contradiction-EIG derives from the queue's own priority fields |
+| P0-5 TRANSPORT PROBE | `scripts/r478_hf_transport_probe.py` + `R478/HF_TRANSPORT_PROBE.json` | the fresh credential→inference→artifact ledger line is one command away; measured NOW: CREDENTIAL_ABSENT typed (the LXXIII vault is not present in this session's workspace; no key in env; the Space surface holds names only) — Art. LXV escalation with what_unblocks named; Art. LXI: an INCOMPLETE_INFRASTRUCTURE state, never a scientific verdict |
+| THE HONEST LEDGER | `R478/PHASE0_TRUTH_RECONCILIATION.json` | stage-drift VERIFIED (registry regeneration → R479), post-rank-only improvement VERIFIED (P0-1 accepted with its live-proof exit criterion — landing the code without transport would manufacture the Art. XXXVII synthetic-loop class), span-rewrite VERIFIED (P1-8), release-disagreement VERIFIED-as-designed (P1-12, own round), case-collision VERIFIED (P2-14) — where the audit said the machine was honest about being incomplete, it was; where it said a loop was inert, it was |
+
+Tests: `tests/test_r478_engine_p0.py` 13/13 NEW; test_r446 50/50 (zero breaks — the stage
+gate consumes action identity, not scores); the r425/r444/r424 failure set IDENTICAL to the
+pristine stash differential (17 pre-existing environmental; the 4 legitimate pin breaks are
+DISCLOSED in the test bodies and strengthened); r477/r471/r475/r467-9 191 passed;
+MODULE_INVENTORY regenerated (124 files / 63,874 LOC, drift GREEN). Art. LXXI tuple: filled
+at delivery. Round record: `R478/R478_ROUND_RECORD.json`.

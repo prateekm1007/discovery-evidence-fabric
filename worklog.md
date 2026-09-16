@@ -1748,3 +1748,22 @@ Work Log:
 Stage Summary:
 - The audit's five P0 blockers are closed with executing batteries on the union tree; both R477 lines' work survives byte-intact on origin/main; the race this line created is disclosed and the tuple repaired. Deferred-with-reason items the operator may still order: SUPPORTS/CONFLICTS split, OCR/CAD extraction, mobile live pass, three chunking, Lighthouse proof.
 - reviewer_provenance=AI_REVIEW
+
+---
+Task ID: R478
+Agent: Super Z (main session — CTO line)
+Task: R478 — answer the external engine audit: Phase-0 truth reconciliation (every structural claim re-measured at 17504061) + the first executable P0 tranche (P0-2 contradiction→belief, P0-3 numeric falsification contract, P0-4 state-derived EIG/NBA, P0-5 transport probe).
+
+Work Log:
+- Baseline restored: fetched origin (stale local clone was 28 rounds behind), ff'd to 1750406; verified the R477 UI P0 list CLOSED on origin/main before treating the engine audit as the live input; Constitution v2.5.0 read IN FULL (hash 9730567a unchanged).
+- Phase-0: re-measured the audit's ten structural claim classes with file:line evidence -> R478/PHASE0_TRUTH_RECONCILIATION.json (A1 stage-drift 13-vs-16 VERIFIED; A2 post-rank-only improvement VERIFIED; A3/A4/A5 VERIFIED-then-FIXED; A6 span-rewrite VERIFIED; A7 release-disagreement VERIFIED-as-designed; A8 credential-absent PARTIAL; A9 case-collision VERIFIED; A10 accepted-as-measured).
+- P0-2: ContradictionQueueAdapter ingests CONTRADICTORY user-evidence items (derived severity: HIGH-with-support / MEDIUM-without, Art. V); belief_update (support_ratio + confidence_delta, formula-recorded) travels in the queue payload; the existing ADJUDICATION no_blocking_contradictions gate holds RED on user-evidence contradictions.
+- P0-3: article_lii_contract answers FALSIFICATION_THRESHOLD only from numeric-band records (FALSIFICATION_BANDS verbatim; prose composite retired as an answer); elite_package adds decision_rule_numeric to the R425 gate — prose rules no longer grant EXPERIMENT_READY.
+- P0-4: nba_controller v1.1.0 — state-derived EIGs (attack = min(0.95, 0.5+0.05·min(n_direct,6)+0.05·min(n_contra,4))), input_basis on every action, measured-latency-first (MEASURED_IN_RUN vs DECLARED_PRIOR); KillerExperimentAdapter likelihoods derive from contradiction pressure; engine NBA contradiction-EIG derives from queue priority fields.
+- P0-5: r478_hf_transport_probe.py committed (credential→inference→artifact, typed outcomes); measured NOW: CREDENTIAL_ABSENT (LXXIII vault absent from this session's workspace) — escalated with what_unblocks.
+- Tests: test_r478_engine_p0.py 13/13 NEW; r446 50/50 zero breaks; pristine stash differentials on every shifted failure (4 legitimate P0-3 pin breaks disclosed IN the test bodies; the 17-failure environmental class reproduced identically at pristine; r458 29/30 standing BS-020); MODULE_INVENTORY regenerated (124 files / 63,874 LOC, drift GREEN).
+- Delivered: pushed to origin/main + r456_space_deploy -> Art. LXXI tuple filled in R478/R478_ROUND_RECORD.json at delivery.
+
+Stage Summary:
+- The audit's structural claims survived verification and three of its P0s are now code+tests; the honest ledger (which claims were fixed, which are accepted with sequencing and why) is R478/PHASE0_TRUTH_RECONCILIATION.json. Transport (P0-5) and the live proofs (P0-1 IMPROVE stage, the R458 re-run) are one operator action away from being measurable.
+- reviewer_provenance=AI_REVIEW.
