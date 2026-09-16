@@ -174,7 +174,15 @@ def build_child_ms_candidate(parent: Dict[str, Any],
     honest-unknown (its mechanism text is new) and its scores do not
     exist until the gauntlet re-creates them."""
     parent_id = dead.get("candidate_id") or "parent"
-    ms = dict(parent.get("mechanism_space_candidate") or {})
+    # R483 wiring fix (measured latent slip — unmeasurable until the
+    # first real kill evidence reached the loop): the inheritance
+    # contract (this docstring's own "same corpus, same spans") reads
+    # the parent's mechanism-space record. The pipeline's dead entries
+    # (run.py) carry it on the DEAD entry ("mechanism_space_candidate"),
+    # not on parent_fields — read dead first, parent_fields as the
+    # fallback, so the child's span/evidence basis actually inherits.
+    ms = dict(dead.get("mechanism_space_candidate")
+              or parent.get("mechanism_space_candidate") or {})
     child_id = f"{parent_id}+improve-g{generation}"
     support = ms.get("mechanism_support")
     return {
@@ -459,6 +467,11 @@ def run_improve(payload: Dict[str, Any]) -> Dict[str, Any]:
             continue
         child_ms = build_child_ms_candidate(parent, dead_e, mutation, gen)
         child_ms["mutation_provider"] = provider
+        # R483: the serving rung's identity rides the derivation trace
+        # (Art. LXII reproducibility: the mutation's model identifier is
+        # part of the child's provenance chain, not a side key)
+        child_ms.setdefault("derivation_trace", {})[
+            "llm_provider"] = provider
         result = run_child_gauntlet(child_ms, payload)
         attempts.append({
             "parent_id": dead_e.get("candidate_id"),

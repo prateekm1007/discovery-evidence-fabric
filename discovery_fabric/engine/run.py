@@ -1672,6 +1672,66 @@ class EngineRun:
                                     "testable_prediction", "")
                                 or _mm.get("falsification_test", "")},
                             "mechanism_space_candidate": p_ms})
+                # R483: THE LAYER JOIN — the run's PRIMARY candidate dies
+                # in the SAME gauntlet (the ATTACK layer's typed verdict
+                # on the invention itself), and its death is kill
+                # evidence exactly like a pool candidate's. The measured
+                # defect class (the union run at 2026-09-16T21:31, run
+                # dir ..._separators_a_594319): the candidate DIED
+                # (attack_results.overall == "KILLED", 4 dimensions) and
+                # the IMPROVE stage 30 seconds later answered
+                # NO_KILL_EVIDENCE children [] — the two records
+                # contradicted each other because the harvest below
+                # scanned only the mechanism-space pool's `evaluated`
+                # entries. The audit's score-forcing event
+                # (CHILDREN_ADMITTED / NO_CHILD_ADMITTED) reads children
+                # from ANY gauntlet death. Art. XXXVII unaffected: the
+                # kill evidence here is the machine's own recorded
+                # verdict (never fabricated — the join only feeds what
+                # the gauntlet already recorded).
+                _prim_attack = (getattr(self.env, "attack_results", None)
+                                or {})
+                if str(_prim_attack.get("overall", "")).upper().startswith(
+                        "KILL") and not any(
+                            d.get("key") == "primary" for d in dead):
+                    _prim_mm = (getattr(self.env, "mechanism_map", None)
+                                or {})
+                    _prim_raw = (_prim_mm.get("raw_candidate") or {})
+                    _killed_dims = [
+                        {"dimension": _k, "verdict": _v}
+                        for _k, _v in (_prim_attack.get("attacks")
+                                       or {}).items()
+                        if str(_v).upper().startswith("KILL")]
+                    dead.append({
+                        "candidate_id": (_prim_raw.get("candidate_id")
+                                         or getattr(self.env,
+                                                    "candidate_id", None)
+                                         or f"primary:{self.run_id}"),
+                        "key": "primary",
+                        "kill_class": "ATTACK_GAUNTLET",
+                        "kill_basis": (_killed_dims
+                                       or [{"dimension": "attack",
+                                            "verdict": str(
+                                                _prim_attack.get(
+                                                    "overall"))}]),
+                        "parent_fields": {
+                            "mechanism": _prim_mm.get("mechanism", ""),
+                            "intervention": _prim_mm.get("intervention",
+                                                         ""),
+                            "expected_effect": _prim_mm.get(
+                                "expected_effect", ""),
+                            "falsification_test": _prim_mm.get(
+                                "falsification_test", "")},
+                        # the child's EVIDENCE basis (the span the
+                        # primary candidate verified under) travels on
+                        # the dead entry — build_child_ms_candidate's
+                        # inheritance contract (R483 wiring fix)
+                        "mechanism_space_candidate": {
+                            "mechanism_source_span": _prim_raw.get(
+                                "mechanism_source_span", ""),
+                            "evidence_bundle": _prim_raw.get(
+                                "evidence_bundle")},
+                    })
                 _improve_payload = {
                     "dead": dead,
                     "problem_text": json.dumps(self.problem,
