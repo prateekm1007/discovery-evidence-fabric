@@ -1671,3 +1671,20 @@ Work Log:
 Stage Summary:
 - Delivery tuple: push 11f3639e + Space deploy verified + identity flip measured + health green. R475 closed.
 - reviewer_provenance=AI_REVIEW
+
+---
+Task ID: R476
+Agent: Super Z (main session — CTO)
+Task: "finish the R476 records commit" — report the true number, whatever it is. All governance and anti-entropy files read first (GOVERNANCE/ README + self-governance + blindspot register + loop protocol + remembered state; Constitution 2.5.0 binding articles re-checked; ACTIVE_PATH re-read).
+
+Work Log:
+- The R476 code commit (0f1482c2) had already landed the operator's UI audit as code: the raw gate-verdict leak closed (presentGateVerdict — one mapping, product language on the surface, honest "not certified" outside the certified set, raw verdict only on the title deep layer); the workspace aside is a named focused panel (deliberately not a focus-trap — non-modal); ModelViewer carries role=group + aria-pressed toggles; the "Still working" line is a polite live region; api.ts json() no longer leaks the raw response body (typed detail verbatim, status stays the first token); the dead .wk-siblings display:none mobile contradiction removed; ContactShadows 1024->512. Webapp suite 13 suites / 168 tests / 0 failures including the 16 new r476 behavior+byte pins; tsc strict clean; build green 119 kB.
+- THE TRUE NUMBER, MEASURED NOT ASSUMED: the durable branch (origin/runtime-state-hf tip 236e9216) carries 214 sessions — COMPLETE 97, AWAITING_CLARIFICATION 74, INTERRUPTED 25, ERROR_TRANSPORT 5, RUN_BLOCKED_TRANSPORT 5, RUN_BLOCKED_CAPABILITY 4, ERROR_RUN 3, ERROR_BUILD 1. Lineage: 209 (R473 graft, 9/9 union-verified) -> 211 (R475 measurement) -> 214 now; the growth is append-only and legitimate — the five newest sessions are today's runs (ts_5939557458fd COMPLETE 12:03:56Z among them). Ledgers: model_routing 227 lines, worker_forensics 6261 lines, snapshot_log 605 entries; the latest snapshot is the R476 boot (boot:efe9148119e5:after_restore, 13:33:16Z, 2670 files, shrink_violations=[] — the shrink guard held on the fresh container).
+- Art. LXXI tuple GREEN at efe91481: production /api/version engine_commit == origin/main == local HEAD; HF Space revision 13e7ba74 == the deploy state file (Space RUNNING); ok/discovery/showcase/retrieval all true; atria HEALTHY; durable.serve_gate restored:true attempts:1 integrity_verified:true. Engine-code note kept precise: the deployed ENGINE code equals the 11f3639e engine tree (the 0f1482c2->efe91481 delta is records-only); the build artifact stamps the deployed TREE commit efe91481. Both facts stated, no conflation.
+- Deploy state recorded verbatim from the driver: 8681->3553 files staged (exactly one file more than R475 on each side — the R476 webapp test file), 678.1 MB tar.
+- CI: Epistemic Certification failed on BOTH of this round's pushes (0f1482c2, efe91481) — the account-side billing class R475 measured to the job-timestamp layer; the operator action is unchanged; the compensating control (round batteries on the pushed tree) stands.
+- Honest scope: the changed UI is verified by the executing battery + deployed identity, but a live 390px/screenshot pass was NOT performed (the audit's NOT-PROVEN class is inherited, not closed); no fresh E2E run launched this round (records-only; today's runs already exercised the deployed path). Audit items still open are enumerated in R476/R476_ROUND_RECORD.json (queued-steer-for-all-verbs, STORED chip, router v2, single NBA, package 200-probe lead the P0 list).
+
+Stage Summary:
+- R476 records committed: the true number is 214 sessions (97 COMPLETE) on the durable branch, measured live from the append-only authority; the deploy verified and the Art. LXXI tuple GREEN at efe91481; the audit's hiding/a11y/error-UX/CSS/perf defects closed in code with executing batteries. Records delta only beyond the already-pushed code commit.
+- reviewer_provenance=AI_REVIEW

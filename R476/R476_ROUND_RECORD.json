@@ -1,0 +1,97 @@
+{
+  "round": "R476",
+  "created_at_utc": "2026-09-16T13:55:00Z",
+  "reviewer_provenance": "AI_REVIEW",
+  "directive": "Finish the R476 records commit; report the true number, whatever it is. Read all governance and anti-entropy files first.",
+  "governance_read": {
+    "EPISTEMIC_CONSTITUTION.md": {"version": "2.5.0", "sha256_16": "9730567afe1d29a9", "articles_rechecked": ["III", "VI", "XXV", "LXXI", "LXXIII"]},
+    "GOVERNANCE/README.md": "read in full",
+    "GOVERNANCE/AUDITOR_SELF_GOVERNANCE_v1.md": "read in full (31 principles; live-state-beats-narrative, BS-034 self-reported-completion guard applied below)",
+    "GOVERNANCE/AUDITOR_BLINDSPOT_REGISTER.md": "read in full (BS-001..BS-037; BS-001 remote drift, BS-002 deployment tuple, BS-026 no unearned accumulation, BS-037 anti-entropy re-checked)",
+    "GOVERNANCE/AUDIT_LOOP_PROTOCOL_v1.md": "read in full",
+    "GOVERNANCE/AUDITOR_REMEMBERED_STATE.md": "read in full (memory is a navigation aid, never proof; live state wins)",
+    "ACTIVE_PATH.md": "canonical loop + product layer re-read"
+  },
+  "code_commit": {
+    "sha": "0f1482c2fe50385f54335238718bb29b167a74ed",
+    "subject": "R476: the UI audit executed as code — the gate-verdict leak closed and the verified a11y/error-UX/CSS/perf defects landed.",
+    "scope": "TOSCANINI_UI/webapp only (9 files, +349/-14); engine tree unchanged vs 11f3639e",
+    "audit_items_closed": [
+      "complexity-hiding P1: raw gateVerdict (PASS/COMPLETE_PASS) leak at Workspace.tsx:218 -> presentGateVerdict() single mapping (present.ts), raw verdict kept on the title deep layer; anything outside the certified set renders honest 'not certified', never a fabricated specific failure (Art. VI)",
+      "a11y: workspace <aside> named panel (aria-label, tabIndex=-1, focus on open/surface-switch, Escape-close; deliberately NOT a focus-trap — non-modal panel)",
+      "a11y: ModelViewer named role=group region; wireframe/clip toggles carry aria-pressed (visible text stays the accessible name)",
+      "a11y: the derived 'Still working' line is now a polite aria-live region",
+      "error-UX: api.ts json() no longer interpolates the raw response body into Error messages; typed FastAPI detail verbatim, else status line alone; status stays first token (page.tsx 404 branch pinned); behavior-tested in Node with stubbed fetch (typed detail / non-string detail / non-JSON body / 404 prefix / success passthrough)",
+      "mobile/CSS: dead '.wk-siblings display:none' rule removed (contradicted the R459 restore block at equal specificity; R459 decision stands alone)",
+      "perf: hero ContactShadows 1024 -> 512 (2x drei default, half the render cost at this blur)"
+    ],
+    "batteries": {
+      "webapp_suite": "13 suites, 168 tests, 0 failures (present 16, events 12, r458 21, copy 1, math 12, r461 10, r464 23, r466 13, r467 10, r470 7, r471 15, r472 12, NEW r476 16)",
+      "tsc": "strict clean",
+      "build": "green, / first-load 119 kB unchanged"
+    }
+  },
+  "deploy": {
+    "driver": "scripts/r456_space_deploy.py (r451_c13+round-tree-prune adapter)",
+    "github_sha": "efe9148119e57ef38dba7b74a918924ebff77ad1",
+    "hf_revision": "https://huggingface.co/spaces/prateekm1/toscanini-prod-validation/commit/13e7ba740cf420dc6d1a91b83edfae7102368d34",
+    "hf_revision_short": "13e7ba74",
+    "hf_runtime_stage_at_record": "RUNNING",
+    "full_tar_mb": 678.1,
+    "staged_files_before_prune": 8681,
+    "staged_files_after_prune": 3553,
+    "created_at_utc": "2026-09-16T13:28:32Z",
+    "note": "8680->3552 grew by exactly one file each side vs the R475 deploy: the R476 webapp test file is the +1 staged; the pruned delta carries it too. Numbers measured by the driver, recorded verbatim."
+  },
+  "art_lxxi_tuple": {
+    "status": "GREEN",
+    "production_engine_commit": "efe9148119e57ef38dba7b74a918924ebff77ad1",
+    "origin_main": "efe9148119e57ef38dba7b74a918924ebff77ad1",
+    "local_head": "efe9148119e57ef38dba7b74a918924ebff77ad1",
+    "engine_code_equality_note": "the 0f1482c2->efe91481 delta is records-only, so the deployed ENGINE code equals the 11f3639e engine tree as the R476 code commit stated; the build artifact stamps the deployed TREE commit efe91481 (both facts stated, no conflation)",
+    "health": {"ok": true, "discovery_ready": true, "showcase_ready": true, "retrieval_ready": true, "constitution_version": "2.5.0", "providers_atria": {"status": "HEALTHY", "available_models": 1}},
+    "durable_serve_gate": {"restored": true, "at": "2026-09-16T13:33:16Z", "attempts": 1, "integrity_verified": true, "error": null, "note": "the R473 restore-before-serve gate executed on the fresh container and opened first-try; the boot snapshot pushed with shrink_violations=[] (the shrink guard held)"}
+  },
+  "the_true_numbers": {
+    "measured_at_utc": "2026-09-16T13:50:00Z",
+    "method": "read from origin/runtime-state-hf tip 236e9216 (the durable branch is the append-only authority; the count is what the branch carries, not what any report claims) + live /api/health + /api/version",
+    "sessions_total": 214,
+    "sessions_by_status": {"COMPLETE": 97, "AWAITING_CLARIFICATION": 74, "INTERRUPTED": 25, "ERROR_TRANSPORT": 5, "RUN_BLOCKED_TRANSPORT": 5, "RUN_BLOCKED_CAPABILITY": 4, "ERROR_RUN": 3, "ERROR_BUILD": 1},
+    "session_count_lineage": [
+      {"when": "R473 graft verification", "count": 209, "reference": "tip 8663b860 = exact union of e245bbe 176 + pre-graft 34, 9/9 ALL GREEN"},
+      {"when": "R475 measurement", "count": 211, "reference": "R475 round record: origin/runtime-state-hf sessions.json (211 sessions, 95 COMPLETE)"},
+      {"when": "R476 records (this measurement)", "count": 214, "note": "append-only growth is legitimate: the five newest sessions are 2026-09-16 runs — ts_5939557458fd COMPLETE 12:03:56Z, ts_b9d6c655c9f1 COMPLETE 12:01:01Z, ts_ccb426719134 AWAITING_CLARIFICATION 11:48:06Z, ts_bf6b7f501a53 COMPLETE 11:16:24Z, ts_099df04be8f7 COMPLETE 11:02:42Z"}
+    ],
+    "complete_runs": 97,
+    "run_duration_stats_live": {"n": 83, "p50_minutes": 10, "p90_minutes": 31, "basis": "measured from this deployment's completed runs"},
+    "model_routing_ledger_lines": 227,
+    "worker_forensics_ledger_lines": 6261,
+    "snapshot_log_entries": 605,
+    "snapshot_latest": {"reason": "boot:efe9148119e5:after_restore", "at": "2026-09-16T13:33:16Z", "files": 2670, "shrink_override": false, "shrink_violations": []},
+    "physics_ready": false,
+    "ci_state": "Epistemic Certification failed again on BOTH 0f1482c2 and efe91481 pushes — the account-side Actions billing/quota class R475 measured to the job-timestamp layer (2-second jobs, runner never executes); the operator action is unchanged; the compensating control stands (round batteries on the pushed tree)"
+  },
+  "audit_scorecard_items_closed_this_round": ["Hiding 8->9 path (gate string purge)", "A11y viewer labels + live-region + named panel", "Errors typed json() (9->10 path)", "Mobile CSS sibling contradiction", "Perf ContactShadows halved"],
+  "audit_items_still_open": [
+    "P0-1 queued mid-run steer execution for ALL verbs (R471 landed queued directive for the measured verb class; the audit requires the receipt for every verb)",
+    "P0-2 STORED-explicit chip (icon + 'stored, not read' + hash tooltip)",
+    "P0-3 intent router v2 (verbatim-direction + confirm; regex PHRASE_RULES retired)",
+    "P0-4 single NBA authority (UI reads GET .../contract or backend removes it)",
+    "P0-5 package 200-probe + typed 409 copy (packageAvailable true while download 409s)",
+    "P1: SUPPORTS/CONFLICTS/UNRESOLVED evidence relationship split; per-candidate challenge events; reality-loop conversation events",
+    "P1: OCR/vision/CAD text extraction or explicit not-supported-yet",
+    "P1: mobile 390px live pass + sheet focus management; three.js chunking; list virtualization; Lighthouse LCP proof",
+    "P1: keyboard file-input path; manual render-retry wiring (retryPresentation unwired)"
+  ],
+  "standing_defects_unchanged": [
+    "CI red on every push — account-side, operator action named (R475 record carries job-level evidence)",
+    "fresh-run scientific yield 0-for-7 (kills are genuine science, typing correct; the survivor-rate mission stands)"
+  ],
+  "honest_scope": [
+    "The R476 webapp changes are verified on the pushed tree by the executing battery (168 webapp tests incl. the 16 new r476 behavior/byte pins) and by the deployed identity serving the same tree; a live 390px/screenshot pass of the changed UI was NOT performed this round (the audit's own NOT-PROVEN class is inherited, not closed)",
+    "No fresh E2E discovery run was launched this round (records-only round; the R475-era runs ts_5939557458fd/ts_b9d6c655c9f1 already exercised the deployed path today)",
+    "physics_ready=false and the 10-31min measured duration remain the honest expectation set on /api/health"
+  ],
+  "bs021_check": "no credential values in this record or the records diff; fingerprints/timestamps only",
+  "worklog": "in-repo worklog.md entry appended; outer worklog updated"
+}
