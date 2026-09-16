@@ -43,18 +43,24 @@ elif BACKEND == "msvcrt":
     def flock(fileobj, op):
         """msvcrt: 1-byte range lock at offset 0 (msvcrt.locking
         locks from the CURRENT position; seek(0) first, then lock or
-        unlock exactly 1 byte). LK_LOCK blocks (10 x 1s retries);
-        LK_UNLCK releases. The seek must be restored? NO — the call
+        unlock exactly 1 byte AT THE FILE DESCRIPTOR). LK_LOCK blocks
+        (10 x 1s retries); LK_UNLCK releases. R484 (the auditor's
+        live-proven fix): msvcrt.locking takes a DESCRIPTOR, not a
+        file object — the R482 shape omitted it and raised TypeError
+        on every Windows call; the fd is fileobj.fileno(), pinned
+        statically AND by execution with a simulated msvcrt in
+        test_r482. The seek must be restored? NO — the call
         sites re-position before reading/writing; do NOT restore the
         position (matching flock's position-independence is NOT
         possible and the sites do not rely on it)."""
         fileobj.seek(0)
+        fd = fileobj.fileno()
         if op & LOCK_UN:
-            _msvcrt.locking(_msvcrt.LK_UNLCK, 1)
+            _msvcrt.locking(fd, _msvcrt.LK_UNLCK, 1)
         elif op & LOCK_EX:
-            _msvcrt.locking(_msvcrt.LK_LOCK, 1)
+            _msvcrt.locking(fd, _msvcrt.LK_LOCK, 1)
         elif op & LOCK_SH:
-            _msvcrt.locking(_msvcrt.LK_LOCK, 1)
+            _msvcrt.locking(fd, _msvcrt.LK_LOCK, 1)
         else:
             raise ValueError(f"unsupported flock op {op!r}")
 else:

@@ -19,10 +19,15 @@ This battery pins:
      reachable modules import cleanly — collection survives
   5. the honest degradation contract (noop flock returns None)
   6. the static negative: no bare fcntl remains in either file
+  7. R484 (the auditor's live-proven fix, EXECUTED here): a simulated
+     msvcrt module makes the msvcrt branch RUN on Linux — every
+     msvcrt.locking call must carry the file object's fileno() (the
+     R482 shape omitted the fd and raised TypeError on Windows).
 
-The msvcrt branch cannot execute on Linux (no module) — code-verified
-here, execution awaits the auditor's Windows checkout (the same honest
-label they apply)."""
+The Linux-only assertions skip cleanly off-Linux (the auditor's
+"2 flock tests are Linux-assuming" finding); the msvcrt branch is
+now EXECUTION-verified with the simulated module — the code-verified
+label narrows to the real msvcrt's blocking semantics only."""
 from __future__ import annotations
 
 import io
@@ -47,12 +52,25 @@ PR_SRC = (REPO_ROOT / "discovery_fabric" / "engine"
 
 
 def test_backend_closed_vocabulary():
-    """R482: BACKEND is one of the three recorded backends; on this
-    Linux machine it must be the real posix one."""
+    """R482: BACKEND is one of the three recorded backends (universal
+    — holds on every platform)."""
     assert BACKEND in ("posix", "msvcrt", "noop")
+
+
+@pytest.mark.skipif(
+    not sys.platform.startswith("linux"),
+    reason="the posix identity is a Linux-machine assertion "
+           "(the auditor's portability finding R484: this test and "
+           "the fcntl-constants twin were Linux-assuming)")
+def test_backend_is_posix_on_linux():
+    """R482/R484: on this Linux machine the shim must resolve the
+    real posix backend."""
     assert BACKEND == "posix"
 
 
+@pytest.mark.skipif(
+    not sys.platform.startswith("linux"),
+    reason="imports fcntl directly — Linux-only by construction")
 def test_constants_match_fcntl_on_posix():
     """R482: on posix the shim's constants ARE fcntl's (identity, not
     a re-derivation)."""
@@ -175,14 +193,67 @@ def test_no_bare_fcntl_remains_in_the_reachable_tree():
 
 
 def test_msvcrt_branch_present_and_translates():
-    """R482: the msvcrt code path cannot execute on Linux (no module)
-    — pinned STATICALLY here: the branch exists, translates LOCK_EX
-    to a 1-byte LK_LOCK at offset 0 and LOCK_UN to LK_UNLCK. Its
-    EXECUTION evidence belongs to the auditor's Windows checkout
-    (the same code-verified label they apply, honestly)."""
+    """R482/R484: the msvcrt branch pinned STATICALLY — the branch
+    exists, translates LOCK_EX to a 1-byte LK_LOCK at offset 0 and
+    LOCK_UN to LK_UNLCK, AND (the auditor's live-proven fix) every
+    msvcrt.locking call carries the file descriptor. The R482 shape
+    — msvcrt.locking(mode, nbytes) with the fd OMITTED — raised
+    TypeError on every Windows call; their checkout measured it."""
     src = (REPO_ROOT / "discovery_fabric" / "portable_flock.py").read_text()
     assert 'import msvcrt as _msvcrt' in src
-    assert "_msvcrt.locking(_msvcrt.LK_UNLCK, 1)" in src
-    assert "_msvcrt.locking(_msvcrt.LK_LOCK, 1)" in src
+    assert "fd = fileobj.fileno()" in src
+    assert "_msvcrt.locking(fd, _msvcrt.LK_UNLCK, 1)" in src
+    assert "_msvcrt.locking(fd, _msvcrt.LK_LOCK, 1)" in src
+    # the class-level negative: the fd-omitting call shape is dead
+    assert "_msvcrt.locking(_msvcrt." not in src, (
+        "msvcrt.locking called without the fd — the R482 TypeError "
+        "class (the auditor's P2)"
+    )
     assert 'BACKEND = "noop"' in src
     assert 'return None' in src
+
+
+def test_msvcrt_branch_executes_and_passes_the_fd(tmp_path, monkeypatch):
+    """R484 — the auditor's fix pinned by EXECUTION on Linux: a fake
+    msvcrt module (recording every locking(fd, mode, nbytes) call)
+    makes the msvcrt branch RUN here. The fd MUST be the file
+    object's fileno() — the R482 shim omitted it (TypeError on
+    Windows, measured live on the auditor's checkout; their fix
+    proven there, EXECUTED here). This narrows the honest
+    code-verified label to the real msvcrt's blocking semantics."""
+    import importlib
+    calls: list = []
+
+    class _FakeMsvcrt:
+        LK_LOCK = 0
+        LK_UNLCK = 1
+
+        @staticmethod
+        def locking(fd, mode, nbytes):
+            calls.append((fd, mode, nbytes))
+
+    sys.modules.pop("discovery_fabric.portable_flock", None)
+    monkeypatch.setitem(sys.modules, "fcntl", None)
+    monkeypatch.setitem(sys.modules, "msvcrt", _FakeMsvcrt)
+    try:
+        pf = importlib.import_module("discovery_fabric.portable_flock")
+        assert pf.BACKEND == "msvcrt"
+        lockfile = tmp_path / "ms.lock"
+        with open(lockfile, "w") as lf:
+            expected_fd = lf.fileno()
+            pf.flock(lf, pf.LOCK_EX)
+            pf.flock(lf, pf.LOCK_SH)
+            pf.flock(lf, pf.LOCK_UN)
+        assert calls == [
+            (expected_fd, _FakeMsvcrt.LK_LOCK, 1),
+            (expected_fd, _FakeMsvcrt.LK_LOCK, 1),
+            (expected_fd, _FakeMsvcrt.LK_UNLCK, 1),
+        ], (
+            f"msvcrt.locking must receive (fileobj.fileno(), mode, 1) "
+            f"on every call; got {calls} — the fd-omission TypeError "
+            f"class is back"
+        )
+    finally:
+        sys.modules.pop("discovery_fabric.portable_flock", None)
+        monkeypatch.undo()
+        importlib.import_module("discovery_fabric.portable_flock")
