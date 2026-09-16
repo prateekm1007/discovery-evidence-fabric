@@ -162,6 +162,46 @@ def _mechanism_identity(run_dir) -> dict:
 mechanism_identity = _mechanism_identity
 
 
+def _observed_directive_actions(session: dict, run_dir) -> dict:
+    """R475: the OBSERVATION half of the prohibited-action leg — the
+    run's OWN records, counted, never asserted. Counts what the
+    compliance instrument's closed vocabulary can measure:
+      RETRIEVAL — the run's retrieval records (the session's evidence
+                  pack + the RETRIEVE envelope; the same sources
+                  run_state._evidence_state reads, so the card's count
+                  and the evidence surface can never disagree);
+      URL_FETCH — the session's bound URL-reference attachments (the
+                  R471 custody records: source_url present, rejected
+                  refusals excluded — a blocked fetch is the OPPOSITE
+                  of the action running).
+    An action with no readable source counts as None (UNOBSERVED) —
+    never silently as 0. Never raises (the outcome card must survive
+    any record corruption to state what it measured)."""
+    observed: dict = {}
+    try:
+        from toscanini.run_state import _evidence_state as _ev_state
+        observed["RETRIEVAL"] = int(
+            (_ev_state(session, Path(run_dir) if run_dir else None)
+             or {}).get("records_found") or 0)
+    except Exception:  # noqa: BLE001 — typed unobservable, never a fake 0
+        observed["RETRIEVAL"] = None
+    try:
+        n_url = 0
+        ids = list(session.get("attachment_ids") or [])
+        if ids:
+            from toscanini import attachments as _att_mod
+            bound = _att_mod.resolve_bindings(
+                session, session.get("owner_key") or "") or []
+            for b in bound:
+                if isinstance(b, dict) and b.get("source_url") \
+                        and not b.get("rejected"):
+                    n_url += 1
+        observed["URL_FETCH"] = n_url
+    except Exception:  # noqa: BLE001
+        observed["URL_FETCH"] = None
+    return observed
+
+
 def record_directive_outcome(session_id: str, run_dir) -> None:
     """R467 (audit P0-5): "a 'what changed because of your direction'
     card in the UI" — computed FROM THE RUNS' OWN RECORDS, never
@@ -221,12 +261,46 @@ def record_directive_outcome(session_id: str, run_dir) -> None:
                 constraint = None
         from discovery_fabric.engine.directive_compliance import (
             compliance_verdict as _compliance_verdict)
+        _observed = _observed_directive_actions(s, run_dir)
         _cv = _compliance_verdict(constraint, p_id.get("mechanism"),
-                                  c_id.get("mechanism"))
+                                  c_id.get("mechanism"),
+                                  observed_actions=_observed)
         verdict = _cv["verdict"]
         territory = _cv.get("territory") or {}
         changed = _cv.get("mechanism_changed")
-        if verdict == "COMPLIED_CHANGED":
+        if verdict == "VIOLATED_PROHIBITED_ACTION":
+            _violated = _cv.get("prohibitions_violated") or []
+            _names = "; ".join(
+                f"{v['action']} (matched '{v['prohibited_phrase']}', "
+                f"observed {v['observed_count']} record(s) in this "
+                "round's own evidence)" for v in _violated) or \
+                str(_cv.get("prohibited_actions"))
+            summary = ("Your direction prohibited an action, and this "
+                       "round's own records show the action ran: "
+                       + _names + ". The mechanism-movement comparison "
+                       "is on the record below the prohibition — the "
+                       "prohibition verdict is stated exactly as "
+                       "measured, never softened.")
+        elif verdict == "PROHIBITION_UNOBSERVED":
+            _unobs = _cv.get("prohibitions_unobserved") or []
+            _names = ", ".join(
+                str(u.get("action")) for u in _unobs) \
+                or "the declared prohibition"
+            summary = ("Your direction prohibited an action ("
+                       + _names + "), and this card cannot measure "
+                       "whether the round obeyed — the run's records "
+                       "carry no observable count for it. Compliance is "
+                       "NOT claimed for the unmeasured dimension; the "
+                       "mechanism comparison below is stated as "
+                       "recorded.")
+        elif verdict == "COMPLIED_PROHIBITIONS":
+            summary = ("Every action your direction prohibited was "
+                       "checked against this round's own records and "
+                       "none ran: " + "; ".join(
+                           f"{v['action']} (0 records)" for v in
+                           (_cv.get("prohibitions_satisfied") or []))
+                       + ".")
+        elif verdict == "COMPLIED_CHANGED":
             summary = ("Your direction moved the mechanism, and out of "
                        "the territory it excluded: the parent round "
                        f"recorded '{p_id.get('mechanism')}'; this round "

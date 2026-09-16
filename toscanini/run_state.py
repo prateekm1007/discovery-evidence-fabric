@@ -973,7 +973,18 @@ def learning_card(session: Dict,
     if (session.get("status") or "") != "COMPLETE":
         return None
     final = (session.get("final_status") or "").upper()
-    if final not in _NO_SURVIVOR_FINAL_STATUSES:
+    # R475: the killed class carries final_status=INVENTION_UNDER_DEVELOPMENT
+    # (a positive-class status); the outcome name INVENTION_KILLED_BY_CHALLENGE
+    # is terminal_outcome's vocabulary and was NEVER a final_status production
+    # writes — the R472 set-membership gate was structurally dead on its own
+    # target (the operator measured it live, function-level, and
+    # population-level: 42/95 COMPLETE sessions in the class, 0 cards). The
+    # gate now also consults the R452 AUTHORITY: terminal_outcome's lineage
+    # challenge verdict. Capability-kill-only and never-challenged lineages
+    # never type KILLED (Art. LXI) and stay card-less; no lineage -> no card.
+    if (final not in _NO_SURVIVOR_FINAL_STATUSES
+            and terminal_outcome(session, run_dir).get("outcome")
+            != OUTCOME_KILLED_BY_CHALLENGE):
         return None
     if (session.get("package") or {}).get("complete"):
         return None
@@ -1014,8 +1025,17 @@ def learning_card(session: Dict,
     # ---- the strongest failed hypothesis ------------------------------
     if genuine_kills:
         g = genuine_kills[-1]
-        mech = str(g.get("mechanism") or
-                   "the last challenged architecture").strip()
+        # R475: production lineages record the killed design as
+        # generation["architecture"] — a dict whose "mechanism" key holds
+        # the mechanism statement (measured on the real branch payloads;
+        # the R472 synthetic fixtures flattened it, so the card's
+        # recorded-field read never matched the real shape and fell back
+        # to the anonymous "last challenged architecture" every time).
+        arch = g.get("architecture")
+        arch_mech = arch.get("mechanism") if isinstance(arch, dict) else None
+        arch_str = arch if isinstance(arch, str) else None
+        mech = str(g.get("mechanism") or arch_mech or arch_str
+                   or "the last challenged architecture").strip()
         kill = str((g.get("challenge") or {}).get("kill_reason")
                    or "").strip()
         sfh = (f"the strongest hypothesis — {mech} — was killed by the "
@@ -1035,7 +1055,15 @@ def learning_card(session: Dict,
         gens[-1] if gens else None)
     evidence_unverified = (
         last is not None and last.get("evidence_verified") is False)
-    no_evidence = ev.get("records_found") == 0
+    # R475: a records_found==0 read means THE READER sees no evidence
+    # files — it must never out-shout the lineage's own recorded verdict.
+    # The real killed payloads carry generation evidence_verified=true
+    # (EVIDENCE_SUPPORTED); claiming "the run worked without a verified
+    # evidence base" against that recorded verdict was an Art. VI
+    # violation the synthetic fixtures could never catch.
+    no_evidence = (ev.get("records_found") == 0
+                   and last is not None
+                   and last.get("evidence_verified") is not True)
     if evidence_unverified:
         mev = ("the evidence behind the strongest hypothesis was never "
                "independently verified — the challenge ran ahead of the "
@@ -1045,11 +1073,17 @@ def learning_card(session: Dict,
                "the run worked without a verified evidence base.")
     else:
         reason = str(session.get("reason") or "").strip()
+        diag = ""
+        d = (last or {}).get("diagnosis")
+        if isinstance(d, dict) and d.get("basis"):
+            diag = str(d["basis"][0]).strip()
         mev = (f"the run's terminal record names: {reason[:240]}."
                if reason else
-               "the run's records do not name a specific missing "
-               "input — each generation's diagnosed cause is on its "
-               "own record.")
+               (f"the run's own diagnosis names: {diag[:240]}."
+                if diag else
+                "the run's records do not name a specific missing "
+                "input — each generation's diagnosed cause is on its "
+                "own record."))
 
     # ---- the ranked next actions (typed, affordance-mapped) -----------
     def _action(rank: int, kind: str, action: str, why: str) -> Dict:

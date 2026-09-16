@@ -1,0 +1,1 @@
+Verbatim durable-branch payloads (origin/runtime-state-hf), extracted by scripts/r475_fixtures.py — the REAL killed-class shapes production writes. Session records carry owner_key FINGERPRINTS only (BS-021): owner capability is never a fixture.

@@ -76,8 +76,11 @@ const ATTACK_LABEL: Record<string, string> = {
 // verdict stays on the card as data. Untyped verdicts stay neutral.
 const COMPLIANCE_STATE: Record<string, string> = {
   COMPLIED_CHANGED: "COMPLIANT",
+  COMPLIED_PROHIBITIONS: "COMPLIANT",
   MOVED_BUT_IN_TERRITORY: "PARTIAL",
+  PROHIBITION_UNOBSERVED: "PARTIAL",
   NOT_COMPLIED_SAME_AS_PARENT: "VIOLATED",
+  VIOLATED_PROHIBITED_ACTION: "VIOLATED",
 };
 
 function MetaChip({ epi }: { epi: string }) {

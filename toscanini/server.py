@@ -46,7 +46,8 @@ from toscanini import gateway as gw  # noqa: E402
 # checked at boot, never deferred into a runtime except-path).
 from discovery_fabric.engine.directive_compliance import (  # noqa: E402
     EXCLUSION_VERBS as _EXCLUSION_VERBS,
-    build_constraint as _build_constraint)
+    build_constraint as _build_constraint,
+    detect_prohibited_actions as _detect_prohibitions)
 # R467 engineer-review finding: the evidence pack and the steering
 # composition are product surfaces — the transport-invisibility
 # vocabulary is applied to them MECHANICALLY (scrub), not by
@@ -1705,47 +1706,67 @@ class Handler(BaseHTTPRequestHandler):
             # never free-text parsing — is the referent (Art. X: one
             # authority; the R467 identity reader, reused verbatim).
             _constraint = None
-            if verb in _EXCLUSION_VERBS:
+            # R475: a constraint is built when the verb is exclusion-
+            # class (the mechanism referent) OR the directive NEGATES an
+            # observable action (the prohibition leg). Before this
+            # round a prohibition directive ("no external literature
+            # search at all") built NO constraint on a non-exclusion
+            # verb, so the verdict layer never saw it — the child ran
+            # full retrieval and the card typed COMPLIED_CHANGED (the
+            # operator's live measurement).
+            _prohibitions = _detect_prohibitions(
+                _dir_words or directive)
+            if verb in _EXCLUSION_VERBS or _prohibitions:
+                _pid = {}
+                _identity_read_failed = False
                 try:
                     from toscanini.worker import (
                         mechanism_identity as _mech_identity)
                     _pid = _mech_identity(s.get("run_dir") or "")
-                    if _pid.get("mechanism"):
-                        # F4 (engineer review): the constraint rides
-                        # product surfaces (the run-dir record, the
-                        # evidence pack) — the SAME mechanical
-                        # transport scrub as the steering composition.
-                        _constraint = _build_constraint(
-                            verb, _dir_words or directive,
-                            _pid["mechanism"])
-                        _constraint["forbidden_mechanism"] = \
-                            _scrub_transport_text(
-                                _constraint["forbidden_mechanism"])
-                        _constraint["directive_verbatim"] = \
-                            _scrub_transport_text(
-                                _constraint["directive_verbatim"])
-                except Exception:  # noqa: BLE001 — typed, never silent:
-                    # F1 (engineer review): a derivation failure must
-                    # not SILENTLY downgrade the child to an
-                    # unconstrained search (honest typing). The typed
-                    # derivation-failed record persists so the outcome
-                    # card can state it; the spawn itself proceeds.
-                    _constraint = {
-                        "version": "directive_compliance/1.0.0",
-                        "status": "derivation_failed",
-                        "verb": verb,
-                        "error_class": type(exc).__name__,
-                    }
-                    try:
-                        from toscanini import worker_forensics as _wfx1
-                        _wfx1.attach_session(
-                            new_s["session_id"],
-                            durable_root=_wfx1.durable_root()).event(
-                                "DIRECTIVE_CONSTRAINT_DERIVATION_FAILED",
-                                parent=sid, verb=verb,
-                                error_class=type(exc).__name__)
-                    except Exception:  # noqa: BLE001
-                        pass
+                except Exception as _exc:  # noqa: BLE001
+                    _pid = {}
+                    _identity_read_failed = True
+                    if verb in _EXCLUSION_VERBS and not _prohibitions:
+                        # F1 (engineer review, the R470 contract
+                        # unchanged): the exclusion verb's REQUIRED
+                        # referent could not be derived — a typed
+                        # derivation failure, never a silent
+                        # unconstrained search.
+                        _constraint = {
+                            "version": "directive_compliance/1.0.0",
+                            "status": "derivation_failed",
+                            "verb": verb,
+                            "error_class": type(_exc).__name__,
+                        }
+                        try:
+                            from toscanini import worker_forensics as _wfx1
+                            _wfx1.attach_session(
+                                new_s["session_id"],
+                                durable_root=_wfx1.durable_root()).event(
+                                    "DIRECTIVE_CONSTRAINT_DERIVATION_FAILED",
+                                    parent=sid, verb=verb,
+                                    error_class=type(_exc).__name__)
+                        except Exception:  # noqa: BLE001
+                            pass
+                if _constraint is None and (_prohibitions or _pid.get(
+                        "mechanism")):
+                    # R475: the prohibitions derive from the DIRECTIVE
+                    # TEXT alone (never from the parent record) — a
+                    # prohibition-only constraint is derivable even when
+                    # the parent records no mechanism identity. The
+                    # mechanism referent rides when the parent has one.
+                    # F4 (engineer review): the constraint rides product
+                    # surfaces — the SAME mechanical transport scrub as
+                    # the steering composition.
+                    _constraint = _build_constraint(
+                        verb, _dir_words or directive,
+                        str(_pid.get("mechanism") or ""))
+                    _constraint["forbidden_mechanism"] = \
+                        _scrub_transport_text(
+                            _constraint["forbidden_mechanism"])
+                    _constraint["directive_verbatim"] = \
+                        _scrub_transport_text(
+                            _constraint["directive_verbatim"])
             store.update_session(new_s["session_id"],
                                  parent_session_id=sid,
                                  attachment_ids=carried,
