@@ -14,7 +14,7 @@
 // structurally impossible to render here.
 
 import type { RunPhase, RunStateObject, SessionDetail, StageDigest } from "@/lib/types";
-import type { GenerationRecord, RunOutcome } from "@/lib/types";
+import type { GenerationRecord, LearningCard, RunOutcome } from "@/lib/types";
 import { isTerminal } from "@/lib/presentationState";
 import { isBlockedStatus } from "@/lib/present";
 
@@ -315,6 +315,12 @@ export function OutcomeBanner({
     const a = stage?.action as Record<string, unknown> | undefined;
     return (a?.action as string | undefined) ?? (a?.summary as string | undefined);
   })();
+  // R472 (audit P0-4): the no-survivor learning card — the refusal
+  // that TEACHES. Backend-derived (recorded fields only); rendered
+  // exactly where the settled no-survivor verdict is stated, never
+  // for any other outcome class.
+  const learningCard: LearningCard | null | undefined =
+    runState?.learning_card ?? detail.user_state_view?.learning_card;
   return (
     <div className={`outcome-banner ${bannerClass}`}>
       <div className="outcome-line">
@@ -328,6 +334,29 @@ export function OutcomeBanner({
               ? "Discovery temporarily blocked by infrastructure. Your problem is saved and ready to resume."
               : label}
       </div>
+      {settledNoSurvivor && learningCard && (
+        <div className="outcome-detail" data-learning-card>
+          <div>
+            <b>What was tested:</b> {learningCard.what_was_tested}
+          </div>
+          <div>
+            <b>Strongest failed hypothesis:</b>{" "}
+            {learningCard.strongest_failed_hypothesis}
+          </div>
+          <div>
+            <b>Key missing evidence:</b> {learningCard.key_missing_evidence}
+          </div>
+          <div className="learning-actions">
+            {learningCard.ranked_next_actions.map((a) => (
+              <div className="learning-action" key={a.rank}>
+                <b>{a.rank}. {a.action}</b>
+                <span className="faint"> — {a.why}</span>
+              </div>
+            ))}
+          </div>
+          <div className="faint">{learningCard.basis}</div>
+        </div>
+      )}
       {/* R467 (audit P1-6): every terminal run leaves something in the
           user's hands — the interim evidence pack, offered exactly
           where the outcome is stated. The technology package keeps

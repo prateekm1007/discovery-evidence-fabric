@@ -480,25 +480,47 @@ PROVIDER_SPECS: List[ProviderSpec] = [
         # surplus (OPERATOR-DECLARED; no usage endpoint is measurable —
         # Art. VI/XXV).
         #
-        # R472 (2026-09-16, third audit pass): the operator RE-SUPPLIED
-        # key 8 (same string) and added keys 11-13. The probe-before-
-        # record re-measurement (R472/PROBE_ATRIA_KEYS11TO13.json):
-        # key 8's catalog answered 200 x3 (0.16-0.22 s) where R470
-        # measured a DETERMINISTIC 401 x3 — the account-side exclusion
-        # CLEARED, so key 8 is REINSTATED (the measured verdict outranks
-        # the name-present surface in BOTH directions, Art. III);
-        # keys 11/12/13 catalog 200 each (sole model Atria-Dawn-Preview,
-        # bogus-key differential 401) and one 200 non-empty tiny
-        # completion on key 11 (1.79 s, reasoning_effort low).
-        # THIRTEEN VALID slots x operator-declared 100M = the ~1.3B-token
-        # surplus (OPERATOR-DECLARED; Art. VI/XXV).
+        # R472 (2026-09-16, the PARALLEL-LINE RECONCILIATION of two
+        # probe lines on the SAME operator delivery): the operator
+        # re-supplied key 8 (same string) and delivered keys 11-15
+        # (the sibling line's message carried 11-13; this line's
+        # carried 11-15 — the union is five new keys).
+        #
+        # KEY 8, BOTH MEASUREMENTS RECORDED (Art. III — the measured
+        # verdict outranks the surface in BOTH directions, and the
+        # LATEST typed measurement decides): the sibling's probe
+        # (R472/PROBE_ATRIA_KEYS11TO13.json, 22:40:28Z) measured the
+        # re-supplied key 8 catalog 200 x3 — CLEARED and REINSTATED on
+        # their line. THIS line's probe (R472/PROBE_ATRIA_KEYS11TO15
+        # .json, 22:57Z) measured the SAME value (fingerprint
+        # atr_DH...1QzF, identical) DETERMINISTIC 401 x3 (re-probed
+        # twice, 8 s apart), and the post-rebase decisive re-measure
+        # (this commit, ~00:05Z) answered 401 x3 AGAIN — key 8's
+        # provider-side state FLAPPED (200-window at 22:40, 401
+        # deterministic after 22:57). The current typed verdict is
+        # INVALID: key 8 is EXCLUDED from the ring (the latest
+        # measurement rules; the flapping is disclosed, never hidden);
+        # the vault keeps the value, the Space surface carries it
+        # inertly, the slot number is NOT reused.
+        #
+        # THE FIVE NEW KEYS (both lines' probes agree): keys 11-15
+        # catalog 200 each (sole model Atria-Dawn-Preview, bogus-key
+        # differential 401); one 200 non-empty tiny completion on key
+        # 11 (this line: 4.06 s; the sibling: 1.79 s — independent
+        # confirmations); all fifteen pairwise DISTINCT; keys 1-10
+        # identity-confirmed vs the R470 record. 14 VALID slots x
+        # operator-declared 100M = the ~1.4B-token surplus
+        # (OPERATOR-DECLARED; no usage endpoint is measurable —
+        # Art. VI/XXV). The Space surface carries all fifteen names
+        # (R472/HF_SPACE_SECRETS_ATRIA_RING15.json: 15/15 PRESENT;
+        # the sibling's RING13 record superseded by the union).
         key_env_vars=["ATRIA_API_KEY", "ATRIA_API_KEY_2",
                       "ATRIA_API_KEY_3", "ATRIA_API_KEY_4",
                       "ATRIA_API_KEY_5", "ATRIA_API_KEY_6",
-                      "ATRIA_API_KEY_7", "ATRIA_API_KEY_8",
-                      "ATRIA_API_KEY_9", "ATRIA_API_KEY_10",
-                      "ATRIA_API_KEY_11", "ATRIA_API_KEY_12",
-                      "ATRIA_API_KEY_13"],
+                      "ATRIA_API_KEY_7", "ATRIA_API_KEY_9",
+                      "ATRIA_API_KEY_10", "ATRIA_API_KEY_11",
+                      "ATRIA_API_KEY_12", "ATRIA_API_KEY_13",
+                      "ATRIA_API_KEY_14", "ATRIA_API_KEY_15"],
         model_revision="Atria-Dawn-Preview — the catalog's SOLE model id "
                        "(owned_by atria, 2026-09-15 catalog); no revision "
                        "pin exposed by the provider — recorded honest "
@@ -548,10 +570,11 @@ PROVIDER_SPECS: List[ProviderSpec] = [
             "Art. XLV attack-independence rule and the Art. V cooldown "
             "demotion still taking precedence over the pin; the honest "
             "tier-2 quality basis is UNCHANGED (a routing pin, never "
-            "a quality rewrite). The TEN-KEY ring (key_env_vars "
-            "above) rotates on exhaustion-class failures — the "
-            "keep-going directive: 'Keep going to a new key of atira "
-            "if one is exhausted.'")),
+            "a quality rewrite). The FOURTEEN-KEY ring (key_env_vars "
+            "above; R472: keys 11-15 probe-validated, key 8 re-probed "
+            "invalid and excluded) rotates on exhaustion-class "
+            "failures — the keep-going directive: 'Keep going to a "
+            "new key of atira if one is exhausted.'")),
     # ------------------------------------------------------------------
     # R463 (2026-09-15): the USER's Hugging Face credential path — the
     # operator's P0 architectural ruling ("the user gives Toscanini AI

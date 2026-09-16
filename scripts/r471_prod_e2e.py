@@ -228,10 +228,16 @@ def main() -> int:
     #   D2 — after the resumed run reaches a verdict terminal, a retry
     #        is a TYPED 409 refusal (no session-shaped body).
     _log("LEG D: retry contract, live")
-    d: dict = {}
+    # R472 (audit Top-10 #9, engineer-drafted by Atria-Dawn-Preview,
+    # CTO-integrated): the retry observation is committed into the
+    # record BEFORE the save and BEFORE the multi-minute resume poll —
+    # a kill during the poll can no longer lose the 202+retry_id body
+    # (the R471 disclosed reconstruction class is dead)
     # D1 may already have been measured by a prior (killed) invocation —
     # the state file carried the observation; never lose it
     prior_d = record["legs"].get("D_retry") or {}
+    d: dict = {}
+    record["legs"]["D_retry"] = d  # every later mutation is save-visible
     prior_on_terminal = prior_d.get("on_terminal") or (
         {"http": prior_d.get("http"), "body": prior_d.get("body")}
         if prior_d.get("http") else None)
@@ -242,10 +248,20 @@ def main() -> int:
                                   "retryable") if k in retry}}
     _log(f"  retry on {terminal} -> HTTP {st} "
          f"retry_id={retry.get('retry_id')} refusal={retry.get('refusal')}")
+    if st == 202:
+        d["on_terminal"] = this_obs
+    elif prior_on_terminal and prior_on_terminal.get("http") == 202:
+        # D1 was measured in the prior invocation (its retry resumed the
+        # run — this invocation's main loop just polled it to the NEW
+        # terminal); this observation is the D2 refusal half
+        d["on_terminal"] = prior_on_terminal
+        d["refusal_after_verdict"] = this_obs
+        d["resumed_terminal"] = terminal
+    else:
+        d["on_terminal"] = this_obs
     _save(record, state_path, sid, owner_key)
 
     if st == 202:
-        d["on_terminal"] = this_obs
         # D1 measured — the resume is real: poll the SAME run to its
         # next terminal (the recovery path, end to end)
         _log("  accepted — the resumed run is polled to its next terminal")
@@ -284,7 +300,8 @@ def main() -> int:
         d["resumed_terminal"] = terminal
     else:
         d["on_terminal"] = this_obs
-    record["legs"]["D_retry"] = d
+    # R472: no late re-assignment — the record has carried the live d
+    # reference since before the save (the persistence fix)
     verdict_legs = {
         "A_url_fetched": record["legs"]["A_url"]["public"]["ingestion"]
         .get("status") in ("TEXT_EXTRACTED", "STORED"),

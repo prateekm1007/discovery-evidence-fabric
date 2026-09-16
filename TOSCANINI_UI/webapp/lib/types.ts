@@ -37,6 +37,27 @@ export interface SessionRow {
 // R394/R395: the user-facing run state — derived backend-side from the
 // session record's own fields. The UI renders THIS, never raw
 // machine-state combinations (COMPLETE + REJECTED etc.).
+// R472 (audit P0-4): the no-survivor learning card — the terminal
+// refusal that TEACHES: what was tested, the strongest failed
+// hypothesis, the key missing evidence, and ranked next actions.
+// Backend-derived from recorded fields only (toscanini/run_state.py
+// learning_card); None for every non-no-survivor terminal.
+export interface LearningCardAction {
+  rank: number;
+  action_kind: "ADD_EVIDENCE" | "REFINE_PROBLEM" | "NEW_TERRITORY";
+  action: string;
+  why: string;
+}
+
+export interface LearningCard {
+  kind: "no_survivor_learning_card";
+  what_was_tested: string;
+  strongest_failed_hypothesis: string;
+  key_missing_evidence: string;
+  ranked_next_actions: LearningCardAction[];
+  basis: string;
+}
+
 export interface UserStateView {
   user_state: string;
   label: string;
@@ -50,6 +71,8 @@ export interface UserStateView {
   // R414 (directive §18): the four terminal outcome states
   outcome?: RunOutcome;
   outcome_label?: string;
+  // R472 (audit P0-4): the no-survivor learning card
+  learning_card?: LearningCard | null;
 }
 
 export interface StageDigest {
@@ -526,6 +549,10 @@ export interface RunStateObject {
   outcome: RunOutcome;
   outcome_label: string;
   outcome_basis: string;
+  // R472 (audit P0-4): the no-survivor learning card rides the run
+  // state object too (the backend projection attaches it wherever the
+  // user_state_view is served)
+  learning_card?: LearningCard | null;
   phase_progression?: RunPhase[];
   // R416: the invention generations (INVENTION 01, 02, ...) with
   // lineage, causal deltas, maturity labels and per-generation

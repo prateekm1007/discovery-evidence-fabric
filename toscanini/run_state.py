@@ -941,6 +941,177 @@ def _lineage_challenge_verdict(run_dir: Optional[Path]) -> Optional[Dict[str, An
     }
 
 
+# R472 (audit P0-4 / Top-10 #4): the no-survivor learning card. The
+# honest-refusal terminal is PRODUCT-CORRECT (zero fabricated packages
+# — the standing mission); the 2026-09-16 external audit's demand is
+# that it also TEACH: "A terminal no-mechanism card shows searched
+# territory, strongest failed hypothesis, key missing evidence, and
+# 2-3 ranked next actions" / "what was tested; what failed or remained
+# unknown; the smallest next action that could change the result."
+# A PROJECTION over recorded fields only (Art. X) — never a mutation.
+_NO_SURVIVOR_FINAL_STATUSES = frozenset({
+    "MECHANISM_GENERATION_FAILED",
+    "INVENTION_KILLED_BY_CHALLENGE",
+    "EVOLVED_BUT_KILLED",
+    "COMPLETED_UNDER_DEVELOPMENT",
+    "UNKNOWN",
+})
+
+
+def learning_card(session: Dict,
+                  run_dir: Optional[Path] = None) -> Optional[Dict[str, Any]]:
+    """The no-survivor terminal's learning surface (R472, audit P0-4).
+
+    Fires ONLY for terminal scientific no-survivor runs: status
+    COMPLETE, a no-survivor final_status, no package, and (when a
+    lineage exists) no survivor reached. NEVER for premise-incoherent
+    (nothing was searched), never for RUN_BLOCKED_* (infrastructure,
+    not science — Art. LXI), never when a survivor or package exists.
+    Every field derives from RECORDED data; absent facts are labeled
+    absent, never fabricated (Art. VI/XXV).
+    """
+    if (session.get("status") or "") != "COMPLETE":
+        return None
+    final = (session.get("final_status") or "").upper()
+    if final not in _NO_SURVIVOR_FINAL_STATUSES:
+        return None
+    if (session.get("package") or {}).get("complete"):
+        return None
+    lineage = _read_json(Path(run_dir) / "INVENTION_LINEAGE.json") \
+        if run_dir else None
+    gens = [g for g in ((lineage or {}).get("generations") or [])
+            if isinstance(g, dict)]
+    if lineage is not None:
+        if lineage.get("survivor_reached"):
+            return None
+    else:
+        # no lineage recorded: only the generation-failure class
+        # qualifies (a killed lineage always records INVENTION_LINEAGE)
+        if final != "MECHANISM_GENERATION_FAILED":
+            return None
+
+    # the genuine kills (Art. LXI: a capability-failure kill is not a
+    # scientific verdict — it never becomes the "strongest failure")
+    genuine_kills = [
+        g for g in gens
+        if (g.get("challenge") or {}).get("killed")
+        and _CAPABILITY_KILL_SIGNATURE not in
+        str((g.get("challenge") or {}).get("kill_reason") or "")]
+
+    # ---- what was tested (the searched territory) --------------------
+    if gens:
+        n = len(gens)
+        what = (f"{n} candidate mechanism{'s' if n != 1 else ''} "
+                f"{'were' if n != 1 else 'was'} generated and put "
+                "through the machine's own adversarial challenge "
+                "gauntlet; none survived.")
+    else:
+        what = ("the search reached evidence gathering and mechanism "
+                "synthesis, but no candidate mechanism was produced — "
+                "no adversarial challenge ran, because no candidate "
+                "existed to challenge.")
+
+    # ---- the strongest failed hypothesis ------------------------------
+    if genuine_kills:
+        g = genuine_kills[-1]
+        mech = str(g.get("mechanism") or
+                   "the last challenged architecture").strip()
+        kill = str((g.get("challenge") or {}).get("kill_reason")
+                   or "").strip()
+        sfh = (f"the strongest hypothesis — {mech} — was killed by the "
+               "machine's own challenge"
+               + (f": {kill}" if kill else "."))
+    else:
+        syn = str((session.get("failed_stages") or {})
+                  .get("SYNTHESIZE")
+                  or session.get("reason") or "").strip()
+        sfh = ("no hypothesis reached the challenge — the mechanism "
+               "synthesis failed before any candidate existed"
+               + (f": {syn}" if syn else "."))
+
+    # ---- the key missing evidence (honestly derived) ------------------
+    ev = _evidence_state(session, Path(run_dir) if run_dir else None)
+    last = genuine_kills[-1] if genuine_kills else (
+        gens[-1] if gens else None)
+    evidence_unverified = (
+        last is not None and last.get("evidence_verified") is False)
+    no_evidence = ev.get("records_found") == 0
+    if evidence_unverified:
+        mev = ("the evidence behind the strongest hypothesis was never "
+               "independently verified — the challenge ran ahead of the "
+               "evidence base.")
+    elif no_evidence:
+        mev = ("no external evidence was retrieved for this problem — "
+               "the run worked without a verified evidence base.")
+    else:
+        reason = str(session.get("reason") or "").strip()
+        mev = (f"the run's terminal record names: {reason[:240]}."
+               if reason else
+               "the run's records do not name a specific missing "
+               "input — each generation's diagnosed cause is on its "
+               "own record.")
+
+    # ---- the ranked next actions (typed, affordance-mapped) -----------
+    def _action(rank: int, kind: str, action: str, why: str) -> Dict:
+        return {"rank": rank, "action_kind": kind, "action": action,
+                "why": why}
+
+    ranked: List[Dict[str, Any]] = []
+    if genuine_kills:
+        if evidence_unverified or no_evidence:
+            ranked.append(_action(
+                1, "ADD_EVIDENCE",
+                "Attach a reference (URL or document) carrying the "
+                "class of evidence the run lacked, then run the "
+                "investigation again.",
+                "the recorded failure is an evidence gap — the next "
+                "candidate would be born with the verification this "
+                "one never had."))
+        ranked.append(_action(
+            len(ranked) + 1, "NEW_TERRITORY",
+            "Start a new run asking for an adjacent mechanism family "
+            "or a different search territory.",
+            "every recorded candidate in this territory was killed — "
+            "the recorded kills say where NOT to dig next."))
+        if not (evidence_unverified or no_evidence):
+            ranked.append(_action(
+                len(ranked) + 1, "ADD_EVIDENCE",
+                "Attach deeper evidence of the mechanism's "
+                "differentiation (a paper, dataset, or spec the run "
+                "could not reach), then run again.",
+                "the kills recorded were defensibility kills — "
+                "stronger differentiation evidence arms the next "
+                "candidate against them."))
+    else:
+        ranked.append(_action(
+            1, "REFINE_PROBLEM",
+            "Narrow the target variable or state the binding "
+            "constraint in the problem text, then run again.",
+            "the synthesis failure recorded an open variable the "
+            "problem left undecided — a sharper problem gives the "
+            "synthesis a target it can hold."))
+        ranked.append(_action(
+            2, "ADD_EVIDENCE",
+            "Attach a reference (URL or document) that documents the "
+            "mechanism space you suspect, then run again.",
+            "the synthesis worked without a rich evidence base — "
+            "recorded references become the raw material for "
+            "candidate mechanisms."))
+
+    return {
+        "kind": "no_survivor_learning_card",
+        "what_was_tested": what,
+        "strongest_failed_hypothesis": sfh,
+        "key_missing_evidence": mev,
+        "ranked_next_actions": ranked,
+        "basis": ("derived from the run's own records — "
+                  + ("the invention lineage and the session's terminal "
+                     "fields" if gens else
+                     "the session's failed_stages and terminal fields")
+                  + "; recorded facts only, never inferred beyond them"),
+    }
+
+
 def terminal_outcome(session: Dict, run_dir: Optional[Path] = None) -> Dict:
     """The directive §18 four-state outcome + the recorded BASIS for it.
     PENDING while the run is live. Derived from recorded fields only.
@@ -1340,6 +1511,11 @@ def canonical_run_state(session: Dict) -> Dict[str, Any]:
         "outcome": outcome["outcome"],
         "outcome_label": OUTCOME_LABELS[outcome["outcome"]],
         "outcome_basis": outcome["basis"],
+        # R472 (audit P0-4): the no-survivor learning card — what was
+        # tested, the strongest failed hypothesis, the key missing
+        # evidence, and 2-3 ranked next actions (None for every
+        # non-no-survivor terminal; recorded fields only)
+        "learning_card": learning_card(reconciled, run_dir),
         "phase_progression": phase_progression(session, run_dir,
                                                stage_status),
         # R416: the invention generations (INVENTION 01, 02, ...) with

@@ -41,7 +41,7 @@ from typing import Any, Dict, Optional
 from .run_state import (OUTCOME_KILLED_BY_CHALLENGE,
                         OUTCOME_LABELS, OUTCOME_NO_DEFENSIBLE,
                         OUTCOME_REQUIRES_EXPERIMENT, OUTCOME_RUN_BLOCKED,
-                        OUTCOME_SURVIVED, terminal_outcome)
+                        OUTCOME_SURVIVED, learning_card, terminal_outcome)
 
 # Machine -> user translation (CEO directive 2). The machine taxonomy
 # stays intact internally; this is the product-surface projection.
@@ -390,6 +390,12 @@ def user_state_view(session: Dict[str, Any]) -> Dict[str, Any]:
         "outcome": outcome_info.get("outcome"),
         "outcome_label": OUTCOME_LABELS.get(
             outcome_info.get("outcome"), "Investigating"),
+        # R472 (audit P0-4): the no-survivor learning card — what was
+        # tested, the strongest failed hypothesis, the key missing
+        # evidence, and 2-3 ranked next actions; None for every
+        # non-no-survivor terminal (the projection decides, the surface
+        # renders)
+        "learning_card": learning_card(session, _run_dir(session)),
     }
 
 

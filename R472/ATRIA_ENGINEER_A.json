@@ -1,0 +1,18 @@
+{
+ "round": "R472",
+ "session": "engineer-A",
+ "task": "TASK A: scripts/r471_prod_e2e.py Leg D observation",
+ "spec_chars": 2336,
+ "prompt_chars": 7147,
+ "seconds": 57.6,
+ "response": {
+  "finish_reason": "stop",
+  "content": "```python\n    _log(\"LEG D: retry contract, live\")\n    # D1 may already have been measured by a prior (killed) invocation \u2014\n    # the state file carried the observation; never lose it\n    prior_d = record[\"legs\"].get(\"D_retry\") or {}\n    d: dict = {}\n    record[\"legs\"][\"D_retry\"] = d  # every later mutation is save-visible\n    prior_on_terminal = prior_d.get(\"on_terminal\") or (\n        {\"http\": prior_d.get(\"http\"), \"body\": prior_d.get(\"body\")}\n        if prior_d.get(\"http\") else None)\n    st, retry = _req(\"POST\", f\"/api/sessions/{sid}/retry\")\n    this_obs = {\"http\": st, \"body\": {\n        k: retry.get(k) for k in (\"retry_id\", \"status\", \"retry_attempts\",\n                                  \"refusal\", \"session_status\",\n                                  \"retryable\") if k in retry}}\n    _log(f\"  retry on {terminal} -> HTTP {st} \"\n         f\"retry_id={retry.get('retry_id')} refusal={retry.get('refusal')}\")\n    if st == 202:\n        d[\"on_terminal\"] = this_obs\n    elif prior_on_terminal and prior_on_terminal.get(\"http\") == 202:\n        # D1 was measured in the prior invocation (its retry resumed the\n        # run \u2014 this invocation's main loop just polled it to the NEW\n        # terminal); this observation is the D2 refusal half\n        d[\"on_terminal\"] = prior_on_terminal\n        d[\"refusal_after_verdict\"] = this_obs\n        d[\"resumed_terminal\"] = terminal\n    else:\n        d[\"on_terminal\"] = this_obs\n    _save(record, state_path, sid, owner_key)\n\n    if st == 202:\n        # D1 measured \u2014 the resume is real: poll the SAME run to its\n        # next terminal (the recovery path, end to end)\n        _log(\"  accepted \u2014 the resumed run is polled to its next terminal\")\n        start2 = time.time()\n        terminal2 = None\n        last2 = None\n        while time.time() - start2 < RESUME_BOUND_MIN * 60:\n            st2, res2 = _req(\"GET\", f\"/api/run/{sid}/result\")\n            status2 = res2.get(\"status\")\n            if status2 != last2:\n                _log(f\"  resumed status -> {status2}\")\n                last2 = status2\n            if status2 in TERMINAL_STATES:\n                terminal2 = status2\n                break\n            time.sleep(POLL_S)\n        d[\"resumed_terminal\"] = terminal2\n        d[\"resumed_elapsed_min\"] = round((time.time() - start2) / 60, 1)\n        _log(f\"  resumed terminal={terminal2}\")\n        if terminal2 in (\"COMPLETE\", \"COMPLETED_UNDER_DEVELOPMENT\",\n                         \"INVENTION_UNDER_DEVELOPMENT\"):\n            # D2: a verdict is append-only \u2014 the retry must refuse, typed\n            st3, retry3 = _req(\"POST\", f\"/api/sessions/{sid}/retry\")\n            d[\"refusal_after_verdict\"] = {\"http\": st3, \"body\": {\n                k: retry3.get(k) for k in (\"refusal\", \"session_status\",\n                                           \"retryable\") if k in retry3}}\n            _log(f\"  retry on {terminal2} -> HTTP {st3} \"\n                 f\"refusal={retry3.get('refusal')}\")\n        _save(record, state_path, sid, owner_key)\n    record[\"legs\"][\"D_retry\"] = d\n```",
+  "completion_tokens": 6402,
+  "attempts": 1,
+  "served_by_key": "ATRIA_API_KEY_11",
+  "rotations": []
+ },
+ "draft_saved": "/home/z/my-project/repos/discovery-evidence-fabric/R472/atria_draft_a.py.raw",
+ "measured_at": "2026-09-15T23:40:41Z"
+}
