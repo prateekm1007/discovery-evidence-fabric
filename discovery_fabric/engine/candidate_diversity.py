@@ -193,7 +193,15 @@ def _run_grid(problem: Dict[str, Any], evidence: List[Dict[str, Any]],
         constraint=problem.get("constraint", ""),
         title=(evidence[0] or {}).get("title", "") if evidence else "",
         abstract=((evidence[0] or {}).get("abstract") or "")[:1200]
-        if evidence else "")
+        if evidence else "",
+        # R483 (the campaign run ts_54b91d454cf8's measured GRID_ERROR):
+        # the span-format hardening added {span_instruction} to the
+        # frozen template; THIS call site was missed — the grid died
+        # KeyError and the E15 pool stayed empty (the kill-point then
+        # honestly typed NO_KILL_EVIDENCE with a cemetery kill on the
+        # conductor surface it cannot see). The grid carries the SAME
+        # span instruction as the primary path — one prompt authority.
+        span_instruction=getattr(a2syn, "SPAN_INSTRUCTION", ""))
     candidates = []
     for angle in EXPLORATION_ANGLES:
         for pid in providers:

@@ -372,3 +372,46 @@ class TestD4Observability(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestD5GridCallSite(unittest.TestCase):
+    """the campaign run ts_54b91d454cf8's measured GRID_ERROR:
+    KeyError 'span_instruction' at candidate_diversity._run_grid —
+    the span-format hardening's missed call site. The fix carries the
+    SAME span instruction as the primary path (one prompt authority),
+    and the negative control attacks the regression class itself."""
+
+    def test_grid_prompt_formats_with_the_span_instruction(self):
+        from discovery_fabric.engine import candidate_diversity as cd
+        import discovery_fabric.a2.synthesize as a2syn
+        problem = {"device": "d", "failure": "f", "constraint": "c"}
+        evidence = [{"title": "t", "abstract": "a" * 50}]
+        # the exact call-shape _run_grid uses (the R483 fix): the
+        # template formats WITHOUT KeyError
+        try:
+            a2syn.SYNTHESIS_PROMPT.format(
+                device=problem["device"], failure=problem["failure"],
+                constraint=problem["constraint"],
+                title=evidence[0]["title"],
+                abstract=evidence[0]["abstract"][:1200],
+                span_instruction=getattr(a2syn, "SPAN_INSTRUCTION", ""))
+        except KeyError as exc:
+            self.fail(f"the grid call-site class regressed: {exc}")
+        src = (REPO_ROOT / "discovery_fabric" / "engine" /
+               "candidate_diversity.py").read_text()
+        self.assertIn('span_instruction=getattr(a2syn, "SPAN_INSTRUCTION"',
+                      src, "the grid must pass the span instruction")
+
+    def test_every_template_placeholder_has_a_grid_kwarg(self):
+        """the class-level negative control: EVERY placeholder in the
+        frozen synthesis template is supplied by the grid's format
+        call (no future hardening can miss the site silently)."""
+        import re
+        import discovery_fabric.a2.synthesize as a2syn
+        src = (REPO_ROOT / "discovery_fabric" / "engine" /
+               "candidate_diversity.py").read_text()
+        grid_call = src[src.index("a2syn.SYNTHESIS_PROMPT.format("):
+                        src.index("candidates = []")]
+        for ph in re.findall(r"\{([a-z_]+)\}", a2syn.SYNTHESIS_PROMPT):
+            self.assertIn(f"{ph}=", grid_call,
+                          f"the grid format must supply {{{ph}}}")
