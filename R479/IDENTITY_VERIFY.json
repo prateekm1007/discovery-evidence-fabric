@@ -1,0 +1,57 @@
+{
+ "round": "R479",
+ "verify": "the deploy + identity-verify legs of the R478 Art. LXXI §4 what_unblocks (escalation 1, opened 2026-09-16, R467 precedent), executed with the operator-supplied credentials",
+ "measured_at_utc": "2026-09-16T17:52:00Z",
+ "identity_flip": {
+  "before": {
+   "engine_commit": "6f1e87c44f887b1f619b2f788a6d0336f6cca9eb",
+   "state": "the R477 union delivery — the LAST VERIFIED GREEN state production held through the R478 window",
+   "measured_at_utc": "2026-09-16T17:31:00Z"
+  },
+  "after": {
+   "engine_commit": "fbc73b859c68d18d407fbff7dbd6f015b3576f21",
+   "engine_commit_source": "build_artifact",
+   "web_build_hash": "c0c934b4974a6b0eb16ac7e70b641251667a6baa9c874e37d2ee635269cb145d",
+   "web_build_hash_unchanged_vs_before": true,
+   "web_build_source": "content hash over TOSCANINI_UI/webapp-export/",
+   "constitution_version": "2.5.0",
+   "measured_at_utc": "2026-09-16T17:54:00Z"
+  },
+  "note": "the web hash unchanged is CORRECT: R478/R479 were engine+infra rounds (no webapp delta); the engine tree advances 6f1e87c4 -> fbc73b8 (R478 P0-2/3/4 code ba8fce1 + the R478/R479 rounds' records and scripts)"
+ },
+ "health_after": {
+  "ok": true,
+  "status": "ok",
+  "showcase_ready": true,
+  "discovery_ready": true,
+  "providers_healthy": ["xkiro (6 models)", "bai (2)", "atria (1)"],
+  "providers_degraded_or_unknown": ["unorouter DEGRADED (5)", "zai UNKNOWN (21 listed — fresh token wired this round, first use pending)", "hf UNKNOWN (0 — the 402 leg, see HF_ROUTER_PROBE.json)"]
+ },
+ "deploy_attempts": [
+  {
+   "attempt": 1,
+   "baked_commit": "5e23afca111eb9901c75a3c9ecb96ae69daefd9e",
+   "space_revision": "5491e3d366dd2c5252450484965712ff74bb04fb",
+   "outcome": "CONFIG_ERROR — 'Missing configuration in README'",
+   "root_cause": "this checkout's lineage carries the README WITHOUT the HF frontmatter; the r477 driver's skip ('already carries the HF frontmatter') was conditioned on ITS Space-cloned tree and does not hold here",
+   "evidence": "R479/ATTEMPT1_CONFIG_ERROR_RECORD.json",
+   "fix": "the r456 README-frontmatter prepend restored with an idempotence guard (commit fbc73b8)"
+  },
+  {
+   "attempt": 2,
+   "baked_commit": "fbc73b859c68d18d407fbff7dbd6f015b3576f21",
+   "space_revision": "756c854cf25aea2dda67aeae6911c6898dd5470c",
+   "outcome": "RUNNING — identity flip verified (see identity_flip.after)"
+  }
+ ],
+ "secrets": {
+  "wired_this_round": ["GITHUB_TOKEN (the operator-fresh PAT — the R451 rotation escalation CLOSES here; fingerprint sha256 f1ebca5f9b62 recorded, value never)", "ZAI_API_KEY (= the operator HF token, the r456 'zai rides the HF token' contract)", "PORTFOLIO_COMMIT (standing default)"],
+  "left_standing": ["UNOROUTER_API_KEY", "XKIRO_API_KEY", "APINEX_API_KEY", "BAI_API_KEY", "BYNARA_API_KEY", "TOKENHARBOR_API_KEY", "AEROLINK_API_KEY", "ATRIA_API_KEY"]
+ },
+ "durable_state": {
+  "branch": "runtime-state-hf",
+  "tip_at_verify": "d53da8a398340e0a3fea0d62ade7844691b1f501",
+  "note": "the runtime's durable pushes (toscanini/durable.py through GITHUB_TOKEN) resume on the rotated PAT"
+ },
+ "reviewer_provenance": "AI_REVIEW"
+}

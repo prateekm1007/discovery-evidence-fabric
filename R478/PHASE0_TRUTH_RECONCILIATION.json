@@ -1,0 +1,82 @@
+{
+  "artifact": "PHASE0_TRUTH_RECONCILIATION",
+  "round": "R478",
+  "created_at_utc": "2026-09-16T17:20:00Z",
+  "reviewer_provenance": "AI_REVIEW",
+  "purpose": "The external audit (TOSCANINI EXTERNAL AUDIT — Internal Plumbing + Discovery/Invention Engine, delivered at HEAD 17504061) is answered the only way this repo answers an audit: each structural claim re-measured against the live tree at 17504061, file:line pinned, typed VERIFIED / PARTIALLY_VERIFIED / REFUTED. This is the audit's own Phase-0 (truth reconstruction) executed by the engine's maintainers, plus the first executable P0 tranche landed in the same round.",
+  "audited_head": "1750406162381500107f91b6601096185b4dfbf9",
+  "claims": [
+    {
+      "id": "A1",
+      "claim": "Stage-order drift: docs/registry say 13 stages, the code conductor runs 16 (PREMISE_GATE, MECHANISM_SPACE, PHYSICS missing from the registry's stage_order_exact_per_D8).",
+      "verdict": "VERIFIED",
+      "evidence": "discovery_fabric/engine/adapters.py STAGE_ORDER (16 entries incl. PREMISE_GATE/MECHANISM_SPACE/PHYSICS, R394/R397/R401 contract changes) vs RUNTIME_CAPABILITY_REGISTRY.json conductor.stage_order_exact_per_D8 (13 entries); the adapters' own comment block records 'The chain is 16 stages. Deliberate, documented contract change' — the registry predates R401 and was never re-generated.",
+      "disposition": "ACCEPTED. Fix scheduled R479 (registry regeneration + the R433-style failing-test doc binding, audit P2-13/P2-14 class). Not fixed in R478 because the registry regeneration is a standalone artifact write with its own drift audit."
+    },
+    {
+      "id": "A2",
+      "claim": "Closed loop not live: no IMPROVE stage in the conductor; improvement is post-rank survivor polish (_improvement_pass runs after the dossier decision).",
+      "verdict": "VERIFIED",
+      "evidence": "discovery_fabric/engine/run.py:1626 _improvement_pass invoked after INVENTION_SPECIFICATION/ENGINEERING_SPECIFICATION/DECISIVE_EXPERIMENT persist (post-RANK path); STAGE_ORDER has no IMPROVE; improve_candidate + technical_improvement_engine are real ledgers wired only at the survivor.",
+      "disposition": "ACCEPTED as the audit's P0-1 (60-day item). NOT landed in R478: wiring a conductor stage changes the 16-stage contract arithmetic, every downstream artifact consumer, and requires a fresh-problem live proof (V1 KILLED -> V2 child) that needs working strong-model transport — landing the code without the live proof would manufacture the exact synthetic-loop class Art. XXXVII forbids. Recorded as the next round's largest item after the registry/doc tranche."
+    },
+    {
+      "id": "A3",
+      "claim": "Contradiction inert: queue + CONTESTED labels exist but nothing maps them to confidence/state/kill; severities hardcoded; B (contradicting user evidence) changes visibility only.",
+      "verdict": "VERIFIED (now FIXED in R478)",
+      "evidence": "adapters.py ContradictionQueueAdapter ingested only attack-KILL, verify-issue and collision-adjacent sources with literal severity/probability constants; classify_evidence_set counted n_contradictory for visibility; no consumer moved a number or blocked promotion on user-evidence contradiction.",
+      "disposition": "LANDED (R478 P0-2). Contradictory user evidence now enters the queue as typed con:evidence:* entries with DERIVED severity (HIGH when direct support exists — it threatens a promotable state; MEDIUM when not — Art. V non-universal-rejector), the queue payload carries the recorded belief_update (support_ratio + confidence_delta = -0.4 x n_contra/(n_contra+n_direct), formula + inputs traveling), and the EXISTING ADJUDICATION no_blocking_contradictions check now holds RED while it is unresolved — promotion blocked through the standing gate, no new state machine. Pinned: tests/test_r478_engine_p0.py TestP0_2 (4 tests)."
+    },
+    {
+      "id": "A4",
+      "claim": "EIG/NBA synthetic: invented inputs, constant trace (R458 ADAPT_RUN_B1 DECISION_TRAIL repeats EIG 0.85 / cost 2.0 / score 0.2826), measured regression.",
+      "verdict": "VERIFIED (now FIXED in R478)",
+      "evidence": "toscanini/conversational/nba_controller.py carried expected_information_gain=0.85 / estimated_cost=2.0 literals on A_ATTACK_CANDIDATE; R458/ADAPTIVE_RUNS/ADAPT_RUN_B1/DECISION_TRAIL.json repeats those exact values; the engine-side NextBestActionAdapter used 0.5*impact+0.2 and KillerExperimentAdapter used literal outcome likelihoods {0.85, 0.15}.",
+      "disposition": "LANDED (R478 P0-4, tranche 1). Attack EIG is now a recorded function of state (min(0.95, 0.5 + 0.05*min(n_direct,6) + 0.05*min(n_contra,4)) — three states produce three distinct values, pinned); every action carries input_basis (formula + inputs + provenance class); estimated_latency_s prefers the run's OWN measured stage_log duration (MEASURED_IN_RUN) over the declared prior (DECLARED_PRIOR) — the two are never conflated; the killer-experiment outcome likelihoods derive from recorded contradiction pressure with the basis traveling; the engine NBA adapter's contradiction-action EIG derives from the queue's own priority fields. The audit's cost-scaling acceptance is pinned (10x cost scaling flips the ranking on the ONE scoring authority). NOT yet landed: per-provider measured cost ledgers feeding the COST axis (needs live transport to measure — same transport blocker as P0-5); the R458 re-run itself needs the same. Honest: the constant-trace class is dead by construction; the measured-ledger half waits on transport."
+    },
+    {
+      "id": "A5",
+      "claim": "Falsification non-numeric: the kill outcome was a prose composite ('the test fails to show the expected effect'), EXPERIMENT_READY could be granted on a prose-only decision rule, costs UNKNOWN prose.",
+      "verdict": "VERIFIED (now FIXED in R478)",
+      "evidence": "experiment_selector.py article_lii_contract answered FALSIFICATION_THRESHOLD with the composite prose sentence whenever both records existed, numeric or not; elite_package experiment_contract_assessment required only an informative (non-blank) acceptance rule.",
+      "disposition": "LANDED (R478 P0-3). The projection answers the kill outcome ONLY from a numeric-band record (FALSIFICATION_BANDS carries the verbatim numbers; Art. VI — extracted, never computed); prose-only candidates now carry FALSIFICATION_THRESHOLD_BLOCKER and state_integrity.falsification_contract_status reports contract_complete=false -> the INVENTION_REQUIRES_EXPERIMENT presentation; the R425 maturity gate adds decision_rule_numeric — a prose-only rule no longer grants EXPERIMENT_READY (named in the requirements list, disclosed in the test body). The audit's exact acceptance (non-numeric threshold must block EXPERIMENT_READY) is pinned both negative and positive."
+    },
+    {
+      "id": "A6",
+      "claim": "Evidence binding: the verifier rewrites claimant spans (repair_mechanism_span: verbatim-subwindow promotion + rebinding), masking proposer failure.",
+      "verdict": "VERIFIED",
+      "evidence": "discovery_fabric/a2/synthesize.py:167 repair_mechanism_span promotes the longest common token run and records span_repair; verify.py consumes the repaired span (the 80-char assist class).",
+      "disposition": "ACCEPTED as the audit's P1-8. NOT landed in R478: the repair path is load-bearing for the REPAIR ledger lineage (R44x runs record span_repair events) and the fix (proposer must emit verbatim or REJECT) changes the synthesis prompt contract + the binding statistics — it needs the R458-family battery re-run on live transport to measure the new REJECT rate honestly. Sequenced behind P0-1."
+    },
+    {
+      "id": "A7",
+      "claim": "Release-state disagreement blocks downloads: DISCOVERY_RELEASE vs RELEASE_PROOF disagreement on 3 prod runs; the conservative gate serves nothing while they disagree.",
+      "verdict": "VERIFIED (as designed — R452 B4; the audit's P1-12 asks for the ONE-WRITER fix)",
+      "evidence": "toscanini/server.py survivor_release_gate: NOT_A_SURVIVOR blocks every route; rp != dr -> RELEASE_RECORDS_DISAGREE (Art. X: while two authorities exist, nothing ships). The 3 blocked runs are the R452-era production runs the docstring itself names.",
+      "disposition": "ACCEPTED as the audit's P1-12. NOT landed in R478: the single-writer refactor (one survivor gate consumed by server + bridge, the 3 runs' records reconciled) touches the buyer-facing download contract and Art. XXXIX chain — it gets its own round with the reconciliation records, not a tail-end slot. Recorded as next-tranche."
+    },
+    {
+      "id": "A8",
+      "claim": "HF inference dead (402 depleted): no strong-model provenance chain live until top-up.",
+      "verdict": "PARTIALLY_VERIFIED — the 402 class is the audit's R458-era measurement; THIS session cannot re-measure it (CREDENTIAL_ABSENT)",
+      "evidence": "R478/HF_TRANSPORT_PROBE.json outcome CREDENTIAL_ABSENT (typed): the Article-LXXIII vault (.secrets.env) is not present in this session's workspace, no key in env, the Space surface holds names only by design. The last MEASURED states on record: the audit's 402-across-HF_ACCOUNT_CREDITS and the R477 sibling's all-slots-200 re-probe finding.",
+      "disposition": "BLOCKED on operator (Art. LXV escalation 1). The probe script (scripts/r478_hf_transport_probe.py) is committed and produces the fresh credential->inference->artifact ledger line in one command the moment a key is injected. No scientific claim is made either way (Art. LXI)."
+    },
+    {
+      "id": "A9",
+      "claim": "Windows checkout broken: toscanini/ vs TOSCANINI/ case collision — P1, not production-blocking.",
+      "verdict": "VERIFIED (by the audit's method description; consistent with the tree: both dirs tracked as distinct on Linux)",
+      "evidence": "git tracks toscanini/ (service) and TOSCANINI/ (replay/data) as distinct paths; case-insensitive filesystems collide (the audit could not import or collect tests on Windows).",
+      "disposition": "ACCEPTED as P2-14 (rename TOSCANINI/ data dir + CI case-conflict job). NOT landed in R478: a 248-file directory rename invalidates replay-record path references across records — it is a mechanical but repo-wide migration with its own verification battery."
+    },
+    {
+      "id": "A10",
+      "claim": "Adversarial attack WEAK-FAKE (single LLM opinion, V4 kill-downgrades, no calibration corpus); mechanism FAKE-WEAK (term overlap); benchmarks 0.0 grounded quality; transfer rebuild disclaimed.",
+      "verdict": "NOT_RE_MEASURED (accepted as the audit's measured state — no counter-evidence exists in this round's scope)",
+      "evidence": "These are the audit's calibration/benchmark/rebuild classes (P0-6, P0-7, P1-9, P1-10). R478 lands no counter-evidence and asserts no improvement.",
+      "disposition": "ACCEPTED. Sequenced per the audit's own 30/60/90-day roadmap (calibration corpus, frozen holdouts, clean-clone rebuild). Each requires live transport or physical-world inputs before an honest number can exist."
+    }
+  ],
+  "the_honest_summary": "The audit's structural claims survived verification: where it said the machine was honest about being incomplete, it was; where it said a loop was inert, it was. R478 lands the three P0s that were code-executable without strong-model transport (P0-2 belief movement, P0-3 numeric kill contract, P0-4 state-derived EIG) and the transport probe for P0-5; P0-1 (the conductor IMPROVE stage), P1-12 (release single authority), P1-8 (binding rewrite) are accepted with named sequencing and their live-proof dependencies stated — none is claimed done, none is quietly deferred without a reason (Art. LXV).",
+  "bs021_check": "no credential values in this record; fingerprints and typed states only"
+}

@@ -1,0 +1,18 @@
+{
+ "probe": "R479 P0-5 production-leg fresh ledger line (credential -> inference -> artifact; the audit's 402 class measured NOW)",
+ "endpoint": "https://router.huggingface.co/v1/chat/completions",
+ "model_requested": "zai-org/GLM-5.3",
+ "measured_at_utc": "2026-09-16T17:45:25+00:00Z",
+ "audit_baseline": "the audit's measured 402 class (HF_ACCOUNT_CREDITS depleted); NOT re-asserted \u2014 measured fresh here",
+ "credential": {
+  "source": "vault:HF_TOKEN",
+  "fingerprint": "fp_33bc7af22c62_len37"
+ },
+ "inference": {
+  "status": "HTTP_402",
+  "detail": "Payment Required | {\"error\":\"You have depleted your monthly included credits. Purchase pre-paid credits to continue using Inference Providers.\"}",
+  "latency_s": 0.26
+ },
+ "outcome": "TRANSPORT_DEGRADED",
+ "what_unblocks": "inspect inference.status/detail (402 = credits still depleted; 401 = token lacks the inference scope; 429 = rate)"
+}

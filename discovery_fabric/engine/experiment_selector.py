@@ -177,9 +177,12 @@ def article_lii_contract(env, survivor_architecture: Optional[Dict] = None
     experimental outcome would kill this mechanism?' — which is
     answered ONLY when the records state both a falsification
     procedure (the candidate's own falsification test) and the effect
-    it must show (the recorded expected effect); the kill outcome is
-    then the test failing to show that effect, stated as a
-    derived-from-records composite, never a fabricated number. A
+    it must show (the recorded expected effect) AND BOTH carry numeric
+    bands — the kill outcome is then the test failing to show that
+    effect, with the recorded bands traveling verbatim
+    (FALSIFICATION_BANDS). R478 P0-3: a prose-only kill sentence is no
+    longer an answer — the audit measured the composite prose
+    answering the decisive field with no number in it. A
     contract without the falsification answer is INCOMPLETE and the
     package presenting it must read INVENTION_REQUIRES_EXPERIMENT
     (state_integrity.falsification_contract_status enforces this).
@@ -286,19 +289,39 @@ def article_lii_contract(env, survivor_architecture: Optional[Dict] = None
         "(honest UNKNOWN — Art. XXV)")
 
     # ACCEPTANCE_THRESHOLD — the recorded predicted effect
+    # R478 P0-3 (external audit): an acceptance threshold without a
+    # number is not a threshold. The prose-with-note fallback is
+    # RETIRED — a numeric band is required, else the field stays
+    # honestly unanswered and the maturity gate blocks EXPERIMENT_READY
+    # (Art. LII: a falsification contract is a measured contract;
+    # Art. XXVII: nothing quantified by inference).
     if expected_effect and _NUMBER_RE.search(expected_effect):
         contract["ACCEPTANCE_THRESHOLD"] = expected_effect
     elif expected_effect:
-        contract["ACCEPTANCE_THRESHOLD"] = expected_effect
-        contract["ACCEPTANCE_THRESHOLD_NOTE"] = (
-            "the recorded expected effect carries no explicit numeric "
-            "band — stated verbatim, never quantified by inference")
+        contract["ACCEPTANCE_THRESHOLD_BLOCKER"] = (
+            "the recorded expected effect carries no numeric band "
+            "('" + expected_effect[:160] + "') — a prose expectation is "
+            "not an acceptance threshold (Art. LII/XXVII: the band is "
+            "not invented by inference); the candidate must state the "
+            "measurable quantity and its band")
     else:
         contract["ACCEPTANCE_THRESHOLD_BLOCKER"] = (
             "no expected effect recorded by the candidate")
 
     # FALSIFICATION_THRESHOLD — THE KILL OUTCOME (the decisive field)
-    if falsification_test and expected_effect:
+    # R478 P0-3 (external audit): the prose composite ('the test fails
+    # to show the expected effect') answered the kill outcome with no
+    # number in it — a ranking-shaped sentence, not a threshold. The
+    # kill outcome is answered only when the recorded expected effect
+    # carries a NUMERIC band (the quantity the kill condition speaks
+    # about); the recorded numbers travel verbatim (FALSIFICATION_BANDS)
+    # so the kill condition is checkable, not assertable (Art. LII).
+    # The falsification test itself names the PROCEDURE and may stay
+    # prose (the threshold lives in the effect's band, not the
+    # procedure's wording — measured against the R446-era run shapes).
+    _eff_nums = _NUMBER_RE.findall(expected_effect) if expected_effect else []
+    _test_nums = _NUMBER_RE.findall(falsification_test) if falsification_test else []
+    if falsification_test and expected_effect and _eff_nums:
         kill_outcome = (
             f"the recorded falsification test ('{falsification_test[:200]}') "
             f"fails to show the recorded expected effect "
@@ -307,14 +330,26 @@ def article_lii_contract(env, survivor_architecture: Optional[Dict] = None
             + (f"; the recorded failing hypothesis is '{h_fail['description']}'"
                if h_fail and h_fail.get("description") else ""))
         contract["FALSIFICATION_THRESHOLD"] = kill_outcome
+        contract["FALSIFICATION_BANDS"] = {
+            "expected_effect_numbers": _eff_nums,
+            "falsification_test_numbers": _test_nums,
+            "basis": "verbatim numbers extracted from the candidate's own "
+                     "records (never computed, never inferred — Art. VI)",
+        }
     else:
+        _missing = []
+        if not falsification_test:
+            _missing.append("no falsification test recorded")
+        if not expected_effect:
+            _missing.append("no expected effect recorded")
+        elif not _eff_nums:
+            _missing.append("the recorded expected effect carries no "
+                            "numeric band")
         contract["FALSIFICATION_THRESHOLD_BLOCKER"] = (
-            "the kill outcome cannot be stated from records: "
-            + ("no falsification test recorded; "
-               if not falsification_test else "")
-            + ("no expected effect recorded"
-               if not expected_effect else "")
-            + " — a threshold would have to be invented (Art. XXVII)")
+            "the kill outcome cannot be stated NUMERICALLY from records: "
+            + "; ".join(_missing)
+            + " — a prose kill sentence is not a threshold (R478 P0-3; "
+              "Art. LII/XXVII: the band is not invented)")
 
     # UNCERTAINTY — the recorded epistemic note
     note = ke.get("epistemic_note")

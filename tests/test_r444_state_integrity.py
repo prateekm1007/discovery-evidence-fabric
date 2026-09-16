@@ -175,16 +175,38 @@ class TestArticleLIIContractProjection(unittest.TestCase):
 
     def test_no_threshold_numbers_are_invented(self):
         """Art. XXVII adversarial: the projection never fabricates a
-        numeric kill band — the kill outcome quotes the records
-        verbatim or is absent."""
+        numeric kill band. R478 P0-3 (external audit): a prose-only
+        candidate no longer gets a prose composite AS the answer — the
+        decisive field stays honestly unanswered with its blocker.
+        (Legitimate pin break: pre-R478 the composite prose
+        'fails to show the expected effect' answered the field for a
+        candidate whose records carried no number at all.)"""
         env = self._env(
             mm={"expected_effect": "improves things qualitatively",
                 "falsification_test": "the standard way"})
         c = article_lii_contract(env)
-        ft = c.get("FALSIFICATION_THRESHOLD") or ""
-        self.assertNotIn("0.05", ft)      # no invented default band
-        self.assertNotIn("95 percent", ft)  # no invented confidence
-        self.assertIn("the standard way", ft)  # the record, verbatim
+        self.assertNotIn("FALSIFICATION_THRESHOLD", c)
+        self.assertIn("FALSIFICATION_THRESHOLD_BLOCKER", c)
+        self.assertIn("numeric band",
+                      c["FALSIFICATION_THRESHOLD_BLOCKER"])
+        # and no number is invented anywhere in the answer fields
+        for f in ("ACCEPTANCE_THRESHOLD", "FALSIFICATION_THRESHOLD"):
+            if f in c:
+                self.assertNotIn("0.05", str(c[f]))
+                self.assertNotIn("95 percent", str(c[f]))
+
+    def test_numeric_effect_answers_the_kill_outcome_with_bands(self):
+        """R478 P0-3 positive control: the recorded band travels
+        verbatim into FALSIFICATION_BANDS — checkable, not assertable."""
+        env = self._env(
+            mm={"expected_effect": "reduces deposit mass by 35 percent",
+                "falsification_test": "bench test of deposit mass"})
+        c = article_lii_contract(env)
+        self.assertIn("FALSIFICATION_THRESHOLD", c)
+        self.assertIn("35", c["FALSIFICATION_THRESHOLD"])
+        bands = c["FALSIFICATION_BANDS"]
+        self.assertEqual(bands["expected_effect_numbers"], ["35"])
+        self.assertIn("verbatim", bands["basis"])
 
     def test_every_field_or_blocker_present(self):
         env = self._env()
@@ -196,17 +218,22 @@ class TestArticleLIIContractProjection(unittest.TestCase):
 
     def test_survivor_architecture_overrides_mechanism_map(self):
         """The evolution survivor's architecture is the authority when
-        provided (the packaged generation, not the dead baseline)."""
+        provided (the packaged generation, not the dead baseline).
+        R478 P0-3: the evolved effect carries its numeric band so the
+        kill outcome is answerable from the evolved records."""
         env = self._env(
             mm={"intervention": "dead baseline intervention",
                 "expected_effect": "baseline effect",
                 "falsification_test": "baseline test"})
         arch = {"intervention": "EVOLVED intervention",
-                "expected_effect": "evolved effect",
+                "expected_effect": "evolved effect: 30 percent reduction",
                 "falsification_test": "evolved test"}
         c = article_lii_contract(env, survivor_architecture=arch)
         self.assertEqual(c["TREATMENT"], "EVOLVED intervention")
         self.assertIn("evolved test", c["FALSIFICATION_THRESHOLD"])
+        self.assertEqual(
+            c["FALSIFICATION_BANDS"]["expected_effect_numbers"],
+            ["30"])
 
     def test_control_requires_executed_baseline_comparison(self):
         """CONTROL is not invented from the problem statement — only an

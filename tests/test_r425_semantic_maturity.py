@@ -140,8 +140,9 @@ class TestExperimentContract:
             "id": "VF-001", "requirement": "req",
             "method": "compare against baseline",
             "result": "NOT_TESTED",
-            "acceptance": ("pre-registered margin from the measured "
-                           "baseline") if vf_acceptance else None,
+            "acceptance": ("pre-registered margin: delta <= 0.5 bar "
+                           "from the measured baseline")
+            if vf_acceptance else None,
             "invention_tie": {"linkage_kind": "falsification_test",
                               "targets": ["FM-001"]}}]
         ke = {"selected": "falsification_test",
@@ -163,6 +164,28 @@ class TestExperimentContract:
         proj, run = self._contract_proj()
         assert _elite.build_maturity(proj, True, run) == \
             "EXPERIMENT_READY"
+
+    def test_prose_rule_no_longer_grants_ready(self):
+        """R478 P0-3 (external audit): a decision rule without a
+        number is a preference, not a threshold — the rule is still
+        recorded honestly but no longer grants EXPERIMENT_READY.
+        (Legitimate pin break: the pre-R478 fixture's prose-only
+        acceptance text granted the tier.)"""
+        proj, run = self._contract_proj()
+        # swap the numeric rule for a prose-only one, same shape
+        for v in ((run.get("engineering_specification") or {})
+                  .get("verification_matrix") or []):
+            if v.get("id") == "VF-001":
+                v["acceptance"] = ("pre-registered margin from the "
+                                   "measured baseline")
+        proj = _elite.derive_engineering_projection(run)
+        level = _elite.build_maturity(proj, True, run)
+        assert level == _ep.PACKAGE_MATURITY_ENGINEERING
+        contract = _elite.experiment_contract_assessment(proj, run)
+        assert contract["requirements"]["pre_registered_decision_rule"] \
+            is True
+        assert contract["requirements"]["decision_rule_numeric"] is False
+        assert contract["discriminating"] is False
 
     def test_hypotheses_array_alone_does_not_grant_ready(self):
         """R425 §3: EXPERIMENT_READY requires an actual discriminating
@@ -212,8 +235,10 @@ class TestMaturityBasisCarriesSemantics:
             "id": "VF-001", "requirement": "req",
             "method": "compare against baseline",
             "result": "NOT_TESTED",
-            "acceptance": "pre-registered margin from the measured "
-                          "baseline",
+            # R478 P0-3: the rule carries its numeric band (a prose-only
+            # rule no longer grants EXPERIMENT_READY)
+            "acceptance": "pre-registered margin: delta <= 0.5 bar "
+                          "from the measured baseline",
             "invention_tie": {"linkage_kind": "falsification_test",
                               "targets": ["FM-001"]}}]
         ke = {"selected": "falsification_test",
