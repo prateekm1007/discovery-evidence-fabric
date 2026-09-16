@@ -1620,3 +1620,21 @@ Work Log:
 Stage Summary:
 - The durable incident is CLOSED on both axes: the DATA is restored (209-session index verified as the exact union + the 19 earliest routing records back, integrity manifest regenerated, pushed and ls-remote-verified) and the MECHANISM is dead (restore-before-serve gate + shrink guard + restore symmetry, 22-test battery, real-server 503 measured). The next fresh container that cannot restore CANNOT overwrite the branch; the next fresh container that CAN restore now heals the routing ledger automatically.
 - reviewer_provenance=AI_REVIEW
+
+---
+Task ID: R474
+Agent: Super Z (main session — CTO)
+Task: Operator directive — "lift keys 3–13 into the HF surface (they're now mirrored in the local vault, so the loss risk is closed) and land the R469 span-contract fix."
+
+Work Log:
+- Session inherited the SAME stale sandbox R473 disclosed (outer worklog + vault reset to the R451-C2 era; no credentials in env). Re-aligned first: env-injected PAT fetch (no credential on disk/tree) moved origin/main 3bf8bd0 -> ae0dda6; local main hard-reset onto it; R469/R472/R473 artifacts inventoried on the tree.
+- THE CONTRADICTION NAMED: R472's ring-15 record (15/15 names PRESENT, set-time probes 200) vs R473's honest_scope ("11 Atria keys (3-13) remain conversation-only"). Could not both describe the present. Settled by MEASUREMENT, not argument (Art. III; the surface is the credential authority per LXXIII).
+- THE VAULT RE-MIRRORED (made the operator's premise true here): /home/z/my-project/.secrets.env recreated chmod 600 OUTSIDE the repo — HF_TOKEN, GITHUB_TOKEN, and the operator's 13 raw key values (slots 1-7, 9-13; slot 8 the excluded R472 401 x3 slot; 14-15 raw not in this context — on the surface, fingerprints in the R472 record).
+- LIVE MEASUREMENT (scripts/r474_surface_span_verify.py -> R474/SURFACE_SPAN_VERIFICATION.json, fingerprints only): (1) surface names: 15/15 ring names PRESENT on the direct secrets endpoint; (2) value validity keys 3-13: 10/10 held keys VALID — GET api.atria-asi.ai/v1/models catalog 200 on the FIRST attempt for every key (the R470 non-200 re-probe discipline armed, never needed); (3) vault fingerprints 11-13 byte-match the R472 set-time record [true, true, true]; (4) span pins all TRUE: SPAN_INSTRUCTION hardened + mechanical verbatim-subwindow span_repair with provenance in synthesize.py; verify.py iterates ALL evidence with the evidence[0] mis-alignment documented-fixed; both battery files present; (5) production /api/version engine_commit = ae0dda60... == origin/main == local — Art. LXXI tuple GREEN, atria HEALTHY on /api/health.
+- VERDICT: keys 3-13 were ALREADY lifted and live-valid (the parallel R472 line did it; R473's honest-scope line described its stale vault, not the surface). The R469 span-contract fix is ALREADY landed AND deployed (production serves the ae0dda60 tree whose engine code carries it). This round's delivery = the closing verification + the record correction + the vault re-mirror.
+- Batteries IN THE RESTORED SANDBOX: test_r469_span_contract + test_r469_atria_keyring + test_r473_durable_defenses = 67 passed, 1 skipped (the standing live-probe skip) — fresh executing evidence that the span contract and both durable defenses hold on the re-aligned tree.
+- R473's queued sandbox-state duty (LXXIII) is hereby CLOSED: vault re-mirrored, worklog re-read, records committed forward.
+
+Stage Summary:
+- The key-pool task the R473 record queued is verified COMPLETE (surface 15/15, values live-valid, vault mirrored); the R469 span contract is verified LANDED (source pins + battery green in this sandbox + deployed identity match). Zero engine-code change this round (records delta only, R462/R467 convention); production stays at ae0dda60 = origin/main = local.
+- reviewer_provenance=AI_REVIEW
