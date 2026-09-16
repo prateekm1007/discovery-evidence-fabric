@@ -423,7 +423,25 @@ def run_improve(payload: Dict[str, Any]) -> Dict[str, Any]:
     transport_block: Optional[Dict[str, Any]] = None
     ms_updates: List[Dict[str, Any]] = []
 
-    for dead_e in targets:
+    def _progress(dead_consumed: int) -> None:
+        # R484 (the measured attempt-4 class): the worker died INSIDE
+        # this loop and the typed outcome existed nowhere. The per-child
+        # gate records already land per attempt (run_child_gauntlet);
+        # this incremental ledger adds the one-file attempt trail so a
+        # hard death leaves the typed-so-far state on the run dir. The
+        # final typed write at the end of run_improve overwrites this
+        # file on every clean exit path.
+        persist("IMPROVE_LEDGER.json", {
+            "stage": "IMPROVE", "stage_version": STAGE_VERSION,
+            "status": "IN_FLIGHT",
+            "attempts_so_far": list(attempts),
+            "dead_consumed_so_far": dead_consumed,
+            "dead_total": len(targets),
+            "note": ("mid-loop incremental snapshot (R484): the final "
+                     "typed IMPROVE_LEDGER write at the end of "
+                     "run_improve overwrites this file")})
+
+    for _dead_idx, dead_e in enumerate(targets, 1):
         parent = dead_e.get("parent_fields") or {}
         prompt = MUTATION_PROMPT.format(
             problem_text=problem_text,
@@ -464,6 +482,7 @@ def run_improve(payload: Dict[str, Any]) -> Dict[str, Any]:
                 "note": "the mutation output failed the fail-closed "
                         "field-line parse (or was a COPY of the parent "
                         "— Art. XXXVII) — never salvaged"})
+            _progress(_dead_idx)
             continue
         child_ms = build_child_ms_candidate(parent, dead_e, mutation, gen)
         child_ms["mutation_provider"] = provider
@@ -479,6 +498,7 @@ def run_improve(payload: Dict[str, Any]) -> Dict[str, Any]:
             "outcome": ("CHILD_ADMITTED" if result.get("admitted")
                         else f"REKILLED_{result.get('rekilled_by')}"),
             "provider": provider, "at": t0})
+        _progress(_dead_idx)
         if result.get("admitted"):
             admitted.append(result["evaluated_entry"])
             ms_updates.append(result["child_ms"])

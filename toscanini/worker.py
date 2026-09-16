@@ -68,6 +68,28 @@ def _register_running(session_id: str) -> None:
                          worker_starttime=starttime)
 
 
+def _checkpoint_interval() -> int:
+    """R484: the durable checkpoint cadence for the engine phase —
+    env-tunable (ENGINE_DURABLE_CHECKPOINT_S), default 600 s, floored
+    at 60 s: a bounded number of pushes per run, never a spin."""
+    return max(60, int(os.environ.get("ENGINE_DURABLE_CHECKPOINT_S",
+                                      "600")))
+
+
+def _engine_checkpoint_loop(session_id: str, stop, interval: int) -> None:
+    """R484 (the measured attempt-4 class, ts_64a5200a581a): the worker
+    died INSIDE engine.run() (the kill-point tail) and the run dir
+    never reached the durable branch — the loop-closure evidence died
+    with the container recycle. This loop snapshots the durable tree
+    DURING the engine phase; the run() phase stops it on every exit
+    path and fires one deterministic engine:returned snapshot after a
+    clean engine return. Best-effort (the _snapshot helper is
+    fail-open); durable.snapshot is flock-serialized so this timer and
+    the main thread cannot interleave a push."""
+    while not stop.wait(interval):
+        _snapshot(session_id, f"engine_checkpoint:{session_id}")
+
+
 def _snapshot(session_id: str, reason: str) -> None:
     """Best-effort durable snapshot (R392 directive 5). Failures are
     disclosed through the health endpoint (durable.last_error), never
@@ -945,6 +967,25 @@ def _run_inner(session_id: str, forensics) -> None:
     forensics.event("PHASE_STARTED", stage="ENGINE_RUN", phase=3,
                     problem_id=problem["problem_id"])
     from discovery_fabric.engine.run import EngineRun
+    # R484 (the measured attempt-4 class, ts_64a5200a581a): the worker
+    # died INSIDE engine.run() (the kill-point tail) and the run dir
+    # never reached the durable branch — the loop-closure evidence died
+    # with the container recycle. A bounded checkpoint timer snapshots
+    # the durable tree DURING the engine phase (best-effort, the
+    # _snapshot helper is fail-open; durable.snapshot is flock-
+    # serialized so the timer and the main thread cannot interleave a
+    # push), and one deterministic engine:returned snapshot fires the
+    # moment the engine completes — before the bridge/terminal tail
+    # can die. ENGINE_DURABLE_CHECKPOINT_S tunes the interval
+    # (default 600 s, floored at 60 s — a bounded number of pushes,
+    # never a spin).
+    import threading as _threading
+    _ckpt_stop = _threading.Event()
+    _ckpt_thread = _threading.Thread(
+        target=_engine_checkpoint_loop,
+        args=(session_id, _ckpt_stop, _checkpoint_interval()),
+        daemon=True)
+    _ckpt_thread.start()
     try:
         # R431: the engine journals each stage the moment its envelope
         # is persisted (the event_callback contract)
@@ -984,6 +1025,17 @@ def _run_inner(session_id: str, forensics) -> None:
                              traceback=traceback.format_exc()[-2000:])
         _snapshot(session_id, f"terminal:ERROR_RUN:{session_id}")
         return
+    finally:
+        # every exit path — success and the ERROR_RUN return above —
+        # stops the checkpoint timer (never a leaked thread)
+        _ckpt_stop.set()
+
+    # R484: the deterministic engine:returned checkpoint — the FULL run
+    # dir (envelopes, stage_IMPROVE.json, the IMPROVE ledger, the
+    # per-child gate records) reaches the durable branch the moment the
+    # engine completes; a post-engine death can no longer erase the
+    # loop-closure evidence (the attempt-4 class).
+    _snapshot(session_id, f"engine:returned:{session_id}")
 
     # --- phase 3.5: the automatic artifact contract (R418) -----------------
     # Operator P0 product correction: every completed run with an

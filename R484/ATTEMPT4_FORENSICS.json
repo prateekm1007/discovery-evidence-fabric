@@ -1,0 +1,55 @@
+{
+ "record": "R484 — the attempt-4 forensics: the loop-closure attempt's worker death, measured",
+ "round": "R484",
+ "attempt_4_session": {
+  "run_id": "ts_64a5200a581a",
+  "problem": "the SAME geothermal calcite/silica problem text as R481/R482/R483 (the decisive comparison class)",
+  "submitted_at_utc": "2026-09-16T22:13:46Z",
+  "identity_served": "1eb049c67e6e9644de281e8c0c9162624e92aec3 (the layer-join build, Space rev 57a7e4f1)",
+  "worker_spawns": [
+   {"pid": 236, "at": "22:13:46Z", "role": "probe/understanding -> AWAITING_CLARIFICATION (durable commits cf311d98, 0e7389cf)"},
+   {"pid": 738, "at": "~22:20:33Z", "role": "clarification answered (ee4c4318) -> problem_understanding_merged (a2c31dc1, 22:20:38Z) -> EngineRun"}
+  ],
+  "timeline_utc": {
+   "22:20:56": "EngineRun starts (engrun:ui_calcite_and_silica_scaling_of_cyclone_sepa_597256)",
+   "22:36:20": "final_state.json written (the conductor's main chain complete; the engine's tail continues: post-RANK -> E15 pool evaluation -> the IMPROVE kill-point with the R483 layer join armed -> DISCOVERY_RELEASE -> cemetery)",
+   "22:31:03-22:50:33": "forensics HEARTBEATs every 30s (40-event tail, all ENGINE_RUN, no phase transitions journaled after 22:31)",
+   "22:50:33": "LAST heartbeat — the worker process DIES here (hard death)",
+   "22:58:42": "the pid-liveness sweep marks the session INTERRUPTED (worker_alive(738) == False)",
+   "22:58:44": "the sibling line's R484 deploy reboots the Space (boot:a500bfaa1c3c) — the container recycle DESTROYS the container-local run dir (the engine-run envelopes, any completed per-child kill-point records)"
+  },
+  "the_measured_science_from_the_captured_result": {
+   "capture": "scripts/r484_attempt4_result.json (the /api/run/{sid}/result body, 113,324 bytes, captured 2026-09-17 ~08:47 UTC from the live session BEFORE the identity switch was noticed — the only surviving record of the engine's terminal state)",
+   "final_status": "REJECTED",
+   "reason": "adversarial challenge failed: unsupported_mechanism: KILLED, weak_transfer: KILLED, contradiction: KILLED",
+   "evidence_verified": true,
+   "verifier_note": "the span contract PASSED on the credited atria route — the R483 unblock class held for a second consecutive credited-leg run",
+   "adversarial_overall": "KILLED",
+   "adjudication_verdict": "CONTESTED",
+   "premise_verdict": "PREMISE_COHERENT",
+   "ranking_score": 0.2362,
+   "evidence_classification_counts": {"DIRECT_SUPPORT": 0, "PARTIAL_SUPPORT": 5, "BACKGROUND": 0, "ANALOGY": 9, "CONTRADICTORY": 0, "IRRELEVANT": 2},
+   "stages_ok": ["RETRIEVE", "FREEZE", "PREMISE_GATE", "SYNTHESIZE", "VERIFY", "MULTI_SOURCE_DISCOVERY", "COLLISION", "PHYSICS", "ATTACK", "CONTRADICTION", "KILLER_EXPERIMENT", "ADJUDICATION", "CLASSIFY", "NEXT_BEST_ACTION", "RANK"],
+   "final_envelope_hash": "31980ea9776ee20e620a70f0053f3f902998c80d"
+  },
+  "the_typed_loss": {
+   "what_died": "the IMPROVE kill-point was IN FLIGHT (the R483 layer join fed the primary's ATTACK death into the dead list — the join's first live-armed fire) when the worker died at 22:50:33",
+   "why_unrecoverable": "stage_IMPROVE.json / IMPROVE_LEDGER.json persist only after the whole kill-point returns (pre-R484 code); the per-child gate records (persisted per attempt by run_child_gauntlet) died with the container recycle at 22:58:44 — the durable branch never received the run dir (last durable commit: problem_understanding_merged)",
+   "typed_as": "WORKER_DEATH_PRE_TERMINAL — the hard-kill class (no Python traceback: the worker log holds only the two spawn lines, 114 bytes; the pid-liveness sweep's verdict + the heartbeat cutoff at 22:50:33 are the death evidence; Art. XXV: the cause is not captured, never guessed — the OOM/kill hypothesis is the leading one and stays a hypothesis)",
+   "the_honest_outcome_vocabulary": "the audit's decisive event (CHILDREN_ADMITTED / NO_CHILD_ADMITTED) did NOT get recorded for attempt 4 — an honest unknown, not a NO_KILL_EVIDENCE and not a closure"
+  },
+  "race_disclosure": {
+   "instance": 5,
+   "event": "the sibling line delivered R484 while this session was dark (commits f2b5f1b0 the auditor's flock fd fix + 9c353f18 the deploy driver + a500bfaa the import-order fixup; deployed, boot 52b29a1d at 22:58:44Z) and went dark pre-record (the R481 died-pre-record class) — no R484 records or worklog entry from that line on origin/main",
+   "disjointness": "their delta (portable_flock.py + its test + the deploy driver) is disjoint from this line's (run.py + improve_stage.py + worker.py + the R484 records); the worklog union resolves chronologically",
+   "identity_effect": "production now serves a500bfaa (their build: the layer join + the flock fix); this round's work rebases on it"
+  }
+ },
+ "the_fixes_this_round": [
+  "F1 discovery_fabric/engine/run.py _persist: atomic tmp+os.replace — a concurrent durable snapshot can never read a torn file (the checkpoint timer reads the run dir concurrently by design now)",
+  "F2 toscanini/worker.py: the bounded checkpoint timer (_engine_checkpoint_loop, ENGINE_DURABLE_CHECKPOINT_S default 600s floored at 60s) snapshots the durable tree DURING the engine phase + one deterministic engine:returned snapshot the moment the engine completes — a mid-engine or post-engine death can no longer erase completed work (the attempt-4 class)",
+  "F3 discovery_fabric/engine/improve_stage.py run_improve: an INCREMENTAL IN_FLIGHT IMPROVE_LEDGER.json after EVERY consumed dead entry (attempts_so_far, dead_consumed_so_far) — the per-attempt typed-so-far trail survives any death; the final typed write still overwrites on every clean exit path"
+ ],
+ "tests": "tests/test_r484_evidence_durability.py 7/7 (the atomicity pins, the interval clamp, the tick/stop contract, the IN_FLIGHT-before-next-spend pin, the final-overwrite order); adjacent R481/R483 39/39; worker-adjacent (r461 durability, r471, r422 forensics, r415, r420, r472) 132 passed / 7 skipped; the curated standing battery 429 passed / 5 failed — ALL 5 verified pre-existing-or-mid-round by the pristine stash differential (the 3 r470 synthesize + the r453 cost-policy failures reproduce at pristine a500bfaa; the deletion-accounting failure is the working-tree-vs-HEAD artifact that resolves at this commit). The full-suite run (4,390 collected) is DISK-BOUND on this 9.9G container (the benchmark/generated tmp-tree class fills the disk to 100% mid-run and cascades setup errors — the BS-020 environmental class, disclosed; /tmp reclaimed after each attempt)",
+ "reviewer_provenance": "AI_REVIEW"
+}

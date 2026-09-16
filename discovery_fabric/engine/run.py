@@ -191,8 +191,17 @@ class EngineRun:
             (self.out / f"PACKAGE_SKIPPED_TOPN_{key}.json").exists()
 
     def _persist(self, name: str, obj: Any):
+        # R484 (the measured attempt-4 class): the run dir is now read
+        # CONCURRENTLY by the worker's durable checkpoint snapshots —
+        # a plain write_text leaves a torn file visible to a snapshot
+        # that lands mid-write. Stage into a .tmp sibling and
+        # os.replace (atomic within one filesystem) so every reader —
+        # snapshot, resume, evidence pack — sees whole files only.
         p = self.out / name
-        p.write_text(json.dumps(obj, indent=1, ensure_ascii=False, default=str))
+        tmp = p.parent / (p.name + ".tmp")
+        tmp.write_text(json.dumps(obj, indent=1, ensure_ascii=False,
+                                  default=str))
+        os.replace(tmp, p)
 
     def _persist_envelope(self, stage: str):
         self._persist(f"envelope_{stage}.json", self.env.to_dict())

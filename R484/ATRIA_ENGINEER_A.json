@@ -1,0 +1,18 @@
+{
+ "task": "R484 evidence-durability hunks (CHANGE 1/2/3)",
+ "dispatched_at": "2026-09-16T23:06:26Z",
+ "provider": "atria",
+ "model": "Atria-Dawn-Preview",
+ "latency_s": 59.2,
+ "usage": {
+  "prompt_tokens": 641,
+  "total_tokens": 4893,
+  "completion_tokens": 4252,
+  "prompt_tokens_details": {
+   "cached_tokens": 0,
+   "created_cache_tokens": 640,
+   "multimodal_tokens": null
+  }
+ },
+ "draft_verbatim": "```python\n# CHANGE 1 — discovery_fabric/engine/run.py  (method _persist)\nimport os  # R472: os.replace is atomic within one filesystem\n\n    def _persist(self, name: str, obj: Any):\n        p = self.out / name\n        # R472/R484: stage into a .tmp sibling, then os.replace onto the target\n        # so a concurrent durable snapshot can never read a torn JSON file.\n        tmp = p.parent / (p.name + \".tmp\")\n        tmp.write_text(json.dumps(obj, indent=1, ensure_ascii=False, default=str))\n        os.replace(tmp, p)\n```\n\n```python\n# CHANGE 2 — discovery_fabric/engine/improve_stage.py  (run_improve, per-iteration tail)\n        for idx, entry in enumerate(dead):\n            key = entry[\"key\"]\n            if outcome == \"CHILD_ADMITTED\":\n                attempts.append({\"key\": key, \"outcome\": outcome, \"child\": child_id})\n            elif outcome.startswith(\"REKILLED_\"):\n                attempts.append({\"key\": key, \"outcome\": outcome, \"cause\": cause})\n            elif outcome == \"SKIPPED_UNPARSABLE\":\n                persist(f\"IMPROVE_MUTATION_{key}.json\", {\"key\": key, \"reason\": \"unparsable\"})\n            # R484: incremental durable truth written before the next iteration;\n            # a hard worker death (kill-point tail) still leaves countable\n            # progress behind. The final typed ledger write at the end of\n            # run_improve overwrites this file on the clean exit path.\n            persist(\"IMPROVE_LEDGER.json\", {\n                \"stage\": \"improve\",\n                \"stage_version\": STAGE_VERSION,\n                \"status\": \"IN_FLIGHT\",\n                \"attempts_so_far\": attempts,\n                \"dead_consumed_so_far\": idx + 1,\n                \"note\": (\n                    \"mid-loop incremental snapshot; the final typed IMPROVE_LEDGER \"\n                    \"write at the end of run_improve overwrites this file\"\n                ),\n            })\n```\n\n```python\n# CHANGE 3 — toscanini/worker.py  (EngineRun phase)\nimport os\nimport threading  # R472: no new imports beyond threading and os\n\n        engine = self._build_engine(session_id)\n        # R484: the attempt-4 worker died mid-engine-run and the run dir never\n        # reached the durable branch — loop-closure evidence died with the\n        # container. Bounded checkpoint timer keeps the branch observable.\n        interval = max(60, int(os.environ.get(\"ENGINE_DURABLE_CHECKPOINT_S\", \"600\")))\n        _ckpt_stop = threading.Event()\n\n        def _checkpoint_loop() -> None:\n            while not _ckpt_stop.wait(interval):\n                _snapshot(session_id, f\"engine_checkpoint:{session_id}\")\n\n        threading.Thread(target=_checkpoint_loop, daemon=True).start()\n        _engine_error: BaseException | None = None\n        try:\n            engine.run()\n        except BaseException as exc:\n            _engine_error = exc\n            _snapshot(session_id, f\"engine_run_error:{session_id}\")  # existing ERROR_RUN path\n        finally:\n            _ckpt_stop.set()  # every exit path — return or exception — stops the timer\n        if _engine_error is None:\n            _snapshot(session_id, f\"engine:returned:{session_id}\")\n```"
+}
