@@ -115,6 +115,21 @@ def main() -> int:
               f"round dirs ({accounting['mb_freed']} MB freed; kept: "
               f"{accounting['kept_round_dirs']}) — {n_pruned} files remain")
 
+        # the README frontmatter (the r456 CONFIG_ERROR fix, pinned;
+        # idempotence-guarded: prepend ONLY when absent — a double
+        # prepend corrupts the card, the exact r477 skip-reason)
+        readme_path = stage / "README.md"
+        readme_text = readme_path.read_text(errors="replace") \
+            if readme_path.exists() else ""
+        if not readme_text.lstrip().startswith("---"):
+            readme_path.write_text(
+                uploader.README_FRONTMATTER + readme_text)
+            print("[r479-deploy] README frontmatter PREPENDED "
+                  "(absent on this tree)")
+        else:
+            print("[r479-deploy] README frontmatter already present — "
+                  "not prepended")
+
         df_path = stage / "Dockerfile"
         df_text = df_path.read_text()
         import re as _re
