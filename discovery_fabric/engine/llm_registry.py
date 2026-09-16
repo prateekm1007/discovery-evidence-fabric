@@ -514,13 +514,22 @@ PROVIDER_SPECS: List[ProviderSpec] = [
         # Art. VI/XXV). The Space surface carries all fifteen names
         # (R472/HF_SPACE_SECRETS_ATRIA_RING15.json: 15/15 PRESENT;
         # the sibling's RING13 record superseded by the union).
+        # R478 (2026-09-17): key 8 REINSTATED — the LATEST typed
+        # measurement rules (R472's own discipline, the flap disclosed
+        # above): catalog 200 x3 (re-probed) + one 200 non-empty tiny
+        # completion in 14.9 s (R478/RING_VALIDATION.json; fingerprint
+        # atr_DH...1QzF — identity-confirmed vs the R470/R472 records).
+        # All fifteen slots measured catalog-200 the same morning;
+        # 15 VALID slots x operator-declared 100M (OPERATOR-DECLARED,
+        # Art. VI/XXV — no usage endpoint is measurable).
         key_env_vars=["ATRIA_API_KEY", "ATRIA_API_KEY_2",
                       "ATRIA_API_KEY_3", "ATRIA_API_KEY_4",
                       "ATRIA_API_KEY_5", "ATRIA_API_KEY_6",
-                      "ATRIA_API_KEY_7", "ATRIA_API_KEY_9",
-                      "ATRIA_API_KEY_10", "ATRIA_API_KEY_11",
-                      "ATRIA_API_KEY_12", "ATRIA_API_KEY_13",
-                      "ATRIA_API_KEY_14", "ATRIA_API_KEY_15"],
+                      "ATRIA_API_KEY_7", "ATRIA_API_KEY_8",
+                      "ATRIA_API_KEY_9", "ATRIA_API_KEY_10",
+                      "ATRIA_API_KEY_11", "ATRIA_API_KEY_12",
+                      "ATRIA_API_KEY_13", "ATRIA_API_KEY_14",
+                      "ATRIA_API_KEY_15"],
         model_revision="Atria-Dawn-Preview — the catalog's SOLE model id "
                        "(owned_by atria, 2026-09-15 catalog); no revision "
                        "pin exposed by the provider — recorded honest "

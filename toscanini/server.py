@@ -507,57 +507,123 @@ def _worker_forensics_state() -> dict:
                 "last_write_error": f"{type(exc).__name__}: {exc}"[:200]}
 
 
-def survivor_release_gate(release_proof, discovery_release) -> Optional[
+def survivor_release_gate(release_proof, discovery_release,
+                          survivor_selection=None) -> Optional[
         Dict[str, Any]]:
-    """R452 B4 (external audit / AT-10) — the survivor-release gate
-    (PURE FUNCTION, testable without a socket).
+    """R478 (external audit P1-12) — ONE survivor authority, consumed
+    by the server AND the bridge (Art. X).
 
-    Article XXXIX makes the buyer-distribution repository the final
-    authority; a NOT_A_SURVIVOR package reaching a download route
-    inverts that authority. The measured defect: 3 production runs
-    carried downloadable ZIPs against RELEASE_PROOF.status =
-    NOT_A_SURVIVOR, and on the same runs DISCOVERY_RELEASE said
-    HELD_FOR_HUMAN_REVIEW (two release artifacts disagreeing).
+    DISCOVERY_RELEASE.json is the single survivor authority — the same
+    attestation the bridge gate consumes (R455-LEAN-1 §1: closed
+    non-survivor vocabulary + invention_id + spec-hash/selection
+    evidence). The measured history: the R452 audit found the package
+    compiler softening NOT_A_SURVIVOR into HELD_FOR_HUMAN_REVIEW while
+    RELEASE_PROOF preserved the verdict (3 production runs still carry
+    that shape); the R452-era gate then blocked every disagreement
+    with a dead-end payload. Since R452, run.py writes BOTH artifacts
+    from the same release object — current runs cannot disagree.
 
-    Returns None when the survivor state permits a normal download;
-    otherwise a TYPED_STATE payload (409) naming the exact recorded
-    verdicts — including their DISAGREEMENT (surfaced, never hidden,
-    Art. XV). A NOT_A_SURVIVOR verdict blocks EVERY route: zero ZIPs
-    are reachable while the survivor gate has rejected the invention
-    (the engineering-draft escape hatch is itself withheld — the
-    audit's rule is zero reachable ZIPs)."""
+    Returns None when the authority permits a normal download;
+    otherwise a TYPED_STATE payload (409). Blocking semantics
+    (fail-closed where the authority rejects, decisive where
+    corruption is suspected, honest everywhere):
+      - DISCOVERY_RELEASE present and NOT attesting a surviving
+        promoted candidate -> SURVIVOR_RELEASE_BLOCKED (zero reachable
+        ZIPs, no draft escape — the R452 rule, unchanged);
+      - DISCOVERY_RELEASE attesting BUT a legacy RELEASE_PROOF records
+        NOT_A_SURVIVOR -> the R452 corruption shape: a DECISIVE block
+        naming the mechanism and the re-adjudication path (never the
+        old dead-end "reconcile the records");
+      - no DISCOVERY_RELEASE record + a legacy NOT_A_SURVIVOR
+        RELEASE_PROOF -> blocked (a recorded legacy rejection is never
+        silently served);
+      - otherwise None — disagreement WITHOUT rejection never blocks
+        (stale legacy wording is disclosed on the served bytes by
+        _legacy_release_disclosure, Art. XV — surfaced, never gating)."""
     rp = str((release_proof or {}).get("status") or "").upper()
     dr = str((discovery_release or {}).get("status") or "").upper()
-    if rp == "NOT_A_SURVIVOR" or dr == "NOT_A_SURVIVOR":
+    if discovery_release is not None:
+        # R478: lazy import — server.py carries no module-level
+        # bridge_gate dependency; the attestation is the ONE authority.
+        from toscanini.bridge_gate import survivor_attested
+        attested, evidence = survivor_attested(
+            discovery_release, survivor_selection)
+        if not attested:
+            return {
+                "error": "package release blocked",
+                "package_state": "SURVIVOR_RELEASE_BLOCKED",
+                "articles": ["XXXIX", "LXXII"],
+                "authority": "DISCOVERY_RELEASE.json",
+                "authority_evidence": evidence,
+                "release_proof_status": rp or "ABSENT",
+                "discovery_release_status": dr or "ABSENT",
+                "records_agree": rp == dr,
+                "reason": ("the single survivor authority "
+                           "(DISCOVERY_RELEASE.json — the same gate the "
+                           "bridge consumes) does not attest a surviving "
+                           "promoted candidate: no ZIP is reachable from "
+                           "any download route"),
+            }
+        if rp == "NOT_A_SURVIVOR":
+            # R478: the R452-measured corruption shape — the pre-fix
+            # compiler softened NOT_A_SURVIVOR into HELD_FOR_HUMAN_REVIEW
+            # while RELEASE_PROOF preserved the verdict. Decisive and
+            # actionable, never a dead-end.
+            return {
+                "error": "package release blocked",
+                "package_state": "SURVIVOR_RELEASE_BLOCKED",
+                "articles": ["XXXIX", "LXXII"],
+                "authority": "DISCOVERY_RELEASE.json",
+                "conflict_class": (
+                    "LEGACY_PROOF_REJECTION_VS_ATTESTED_RELEASE"),
+                "reconciliation": (
+                    "the R452-measured corruption shape: the pre-fix "
+                    "compiler softened NOT_A_SURVIVOR into "
+                    "HELD_FOR_HUMAN_REVIEW while RELEASE_PROOF "
+                    "preserved the verdict — re-adjudicate from the "
+                    "run's own SURVIVOR_SELECTION.json and challenge "
+                    "records; an operator decision recorded per "
+                    "Art. VI closes it"),
+                "authority_evidence": evidence,
+                "release_proof_status": rp,
+                "discovery_release_status": dr or "ABSENT",
+                "records_agree": rp == dr,
+                "reason": ("a legacy RELEASE_PROOF records NOT_A_SURVIVOR "
+                           "against the authority's attestation — the "
+                           "measured R452 softening shape; no ZIP is "
+                           "reachable until the run is re-adjudicated on "
+                           "its own survivor and challenge records"),
+            }
+        return None
+    if rp == "NOT_A_SURVIVOR":
         return {
             "error": "package release blocked",
             "package_state": "SURVIVOR_RELEASE_BLOCKED",
             "articles": ["XXXIX", "LXXII"],
-            "release_proof_status": rp or "ABSENT",
-            "discovery_release_status": dr or "ABSENT",
-            "records_agree": rp == dr,
-            "reason": ("the survivor gate rejected this invention "
-                       "(NOT_A_SURVIVOR): no ZIP is reachable from any "
-                       "download route — not even an engineering draft "
-                       "(the audit rule: zero reachable ZIPs)"),
-        }
-    if rp and dr and rp != dr:
-        # the two release artifacts disagree: the CONSERVATIVE reading
-        # governs the download route until the records are reconciled
-        # (Art. X: one authority — while two exist, nothing ships)
-        return {
-            "error": "package release blocked",
-            "package_state": "RELEASE_RECORDS_DISAGREE",
-            "articles": ["X", "XXXIX"],
+            "authority": ("RELEASE_PROOF.json (legacy, no "
+                          "DISCOVERY_RELEASE record)"),
             "release_proof_status": rp,
-            "discovery_release_status": dr,
+            "discovery_release_status": "ABSENT",
             "records_agree": False,
-            "reason": ("RELEASE_PROOF and DISCOVERY_RELEASE disagree on "
-                       "this run's release state — the download route "
-                       "serves nothing until they agree; reconcile the "
-                       "records and re-verify"),
+            "reason": ("a recorded legacy release rejection is never "
+                       "silently served — no DISCOVERY_RELEASE record "
+                       "exists to attest this run"),
         }
     return None
+
+
+def _legacy_release_disclosure(release_proof, discovery_release):
+    """R478 (external audit P1-12) — Art. XV disclosure: a legacy
+    RELEASE_PROOF whose status differs from the authority's is
+    surfaced on the served bytes, never hidden, never gating. Returns
+    a list of (name, value) header pairs; empty when the records agree
+    or the legacy record is absent."""
+    rp = str((release_proof or {}).get("status") or "").upper()
+    dr = str((discovery_release or {}).get("status") or "").upper()
+    if not rp or not dr or rp == dr:
+        return []
+    return [("X-Release-Authority", "DISCOVERY_RELEASE"),
+            ("X-Legacy-Release-Proof-Status", rp)]
 
 
 def package_release_decision(release_state, request_path,
@@ -2544,11 +2610,19 @@ class Handler(BaseHTTPRequestHandler):
                 return _json.loads((Path(run_dir) / name).read_text())
             except Exception:  # noqa: BLE001 — absent = unknown
                 return None
+        rp_json = _read_status("RELEASE_PROOF.json")
+        dr_json = _read_status("DISCOVERY_RELEASE.json")
+        # R478 (external audit P1-12): the gate consumes the SAME
+        # attestation the bridge consumes — SURVIVOR_SELECTION.json is
+        # leg 3 of the authority's evidence.
         gate = survivor_release_gate(
-            _read_status("RELEASE_PROOF.json"),
-            _read_status("DISCOVERY_RELEASE.json"))
+            rp_json, dr_json, _read_status("SURVIVOR_SELECTION.json"))
         if gate is not None:
             return self._json(409, gate)
+        # R478 (external audit P1-12): Art. XV disclosure — a legacy
+        # RELEASE_PROOF disagreeing with the authority rides the served
+        # bytes as headers (surfaced, never gating).
+        disclosure = _legacy_release_disclosure(rp_json, dr_json) or None
         # R443 package-release authority (Article LXXII, enforced at the
         # ACTUAL package consumer): the endpoint consults the run's
         # visual release state before serving. VISUAL_GATE = NOT_RUN or
@@ -2567,12 +2641,16 @@ class Handler(BaseHTTPRequestHandler):
         if decision["action"] == "TYPED_STATE":
             return self._json(409, decision["payload"])
         if decision["action"] == "SERVE_DRAFT":
+            draft_headers = list(decision["headers"] or [])
+            if disclosure:
+                draft_headers += disclosure
             return self._serve_file(
-                zp, "application/zip", extra_headers=decision["headers"])
+                zp, "application/zip", extra_headers=draft_headers)
         # R423A Phase 5: streamed, ETag-revalidated (the ZIP may be
         # legitimately refreshed by a later bridge pass — a fresh ETag
         # delivers fresh bytes; an unchanged one saves the transfer).
-        return self._serve_file(zp, "application/zip")
+        return self._serve_file(zp, "application/zip",
+                                extra_headers=disclosure)
 
     def _visual_release_state(self, run_dir):
         """The run's Article-LXXII visual release state (R443). Read

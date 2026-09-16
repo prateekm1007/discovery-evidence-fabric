@@ -61,9 +61,13 @@ RING9 = ["ATRIA_API_KEY", "ATRIA_API_KEY_2", "ATRIA_API_KEY_3",
 # re-measures on this line — the flapping disclosed in the registry
 # comment). Historical name RING9 kept for the walk tests below (their
 # slot indices live in the first nine positions and are unchanged).
-RING = RING9 + ["ATRIA_API_KEY_11", "ATRIA_API_KEY_12",
-                "ATRIA_API_KEY_13", "ATRIA_API_KEY_14",
-                "ATRIA_API_KEY_15"]
+# R478 (2026-09-17): key 8 REINSTATED per the LATEST typed measurement
+# (R478/RING_VALIDATION.json) — FIFTEEN slots, operator order.
+RING = ["ATRIA_API_KEY", "ATRIA_API_KEY_2", "ATRIA_API_KEY_3",
+        "ATRIA_API_KEY_4", "ATRIA_API_KEY_5", "ATRIA_API_KEY_6",
+        "ATRIA_API_KEY_7", "ATRIA_API_KEY_8", "ATRIA_API_KEY_9",
+        "ATRIA_API_KEY_10", "ATRIA_API_KEY_11", "ATRIA_API_KEY_12",
+        "ATRIA_API_KEY_13", "ATRIA_API_KEY_14", "ATRIA_API_KEY_15"]
 
 # fake credential bodies — SHORT, non-matching to the BS-021 marker regex
 K1 = "atr_local_k1"
@@ -164,24 +168,26 @@ def test_r472_sibling_probe_records_the_clearance_window():
 
 
 # ---------------------------------------------------------------------------
-# 3. the current reconciled registration (14 slots, key 8 excluded)
+# 3. the current registration (R478: 15 slots, key 8 reinstated)
 # ---------------------------------------------------------------------------
 
 def test_ring_registration_current_operator_order():
-    """R472 reconciled: the LATEST typed measurement rules — key 8's
-    401 x3 (twice, 8 s apart, two sessions) excludes it; keys 11-15
-    (validated by BOTH lines) append. Slot numbers never compressed."""
+    """R478: the LATEST typed measurement rules — key 8's catalog
+    200 x3 + 200 tiny completion (R478/RING_VALIDATION.json) reinstates
+    it; keys 11-15 (validated by BOTH R472 lines) stay appended. Slot
+    numbers never compressed."""
     spec = lr._SPEC_BY_ID["atria"]
     assert lr.key_ring_slots(spec) == RING
-    assert len(RING) == 14
+    assert len(RING) == 15
 
 
-def test_key8_excluded_after_the_reconciled_remeasure():
-    """Both measurements are on the record; the registration follows
-    the LATEST (401 x3 at 22:57Z and again post-rebase) — the sibling
-    line's 22:40Z 200-window is superseded, never deleted."""
+def test_key8_reinstated_after_the_r478_remeasure():
+    """Every measurement is on the record; the registration follows
+    the LATEST (R478: 200 x3 + a 200 completion, 2026-09-17) — the
+    R472 401 x3 re-measures stand as superseded history, never
+    deleted."""
     spec = lr._SPEC_BY_ID["atria"]
-    assert "ATRIA_API_KEY_8" not in lr.key_ring_slots(spec)
+    assert "ATRIA_API_KEY_8" in lr.key_ring_slots(spec)
     # the BS-021 marker discipline holds: no real key body in any target
     import re
     marker = re.compile(r"atr_[A-Za-z0-9_-]{20,}")
@@ -223,9 +229,10 @@ def test_active_slot_finds_first_present_in_middle(monkeypatch):
 
 
 def test_rotation_skips_unset_and_unregistered(monkeypatch):
-    """0 -> 3 (1,2 unset) -> 7 (4,5,6 unset; slot 7 is _9 — the ring
-    does not carry an ATRIA_API_KEY_8 name at all) -> 8. The walk
-    never touches a key-8 env name (it is not registered)."""
+    """0 -> 3 (1,2 unset) -> 8 (4,5,6,7 unset; slot 7 is _8 —
+    registered since R478, unset here, skipped like any unset slot;
+    slot 8 is _9) -> 9 (_10). The walk skips unset names whatever
+    their registration state."""
     _clear_all(monkeypatch)
     spec = lr._SPEC_BY_ID["atria"]
     monkeypatch.setenv("ATRIA_API_KEY", K1)
@@ -235,9 +242,9 @@ def test_rotation_skips_unset_and_unregistered(monkeypatch):
     assert lr.active_key_slot(spec) == 0
     assert lr.rotate_key(spec) == 3               # skips 1,2 (unset)
     assert lr.active_key_value(spec) == K4
-    assert lr.rotate_key(spec) == 7               # skips 4,5,6 (unset)
+    assert lr.rotate_key(spec) == 8               # skips 4,5,6,7 (unset)
     assert lr.active_key_value(spec) == K9
-    assert lr.rotate_key(spec) == 8
+    assert lr.rotate_key(spec) == 9
     assert lr.active_key_value(spec) == K10
     # exhausted from the tail: reset to first present, typed None
     assert lr.rotate_key(spec) is None
@@ -245,17 +252,17 @@ def test_rotation_skips_unset_and_unregistered(monkeypatch):
 
 
 def test_rotation_walks_the_new_tail(monkeypatch):
-    """The R472 append: _10 (idx 8) -> _11 (idx 9) -> exhausted ->
-    reset to the first present."""
+    """The R472 append (R478 indices): _10 (idx 9) -> _11 (idx 10)
+    -> exhausted -> reset to the first present."""
     _clear_all(monkeypatch)
     spec = lr._SPEC_BY_ID["atria"]
     monkeypatch.setenv("ATRIA_API_KEY_10", K10)
     monkeypatch.setenv("ATRIA_API_KEY_11", K11)
-    assert lr.active_key_slot(spec) == 8
-    assert lr.rotate_key(spec) == 9               # -> _11
+    assert lr.active_key_slot(spec) == 9
+    assert lr.rotate_key(spec) == 10              # -> _11
     assert lr.active_key_value(spec) == K11
     assert lr.rotate_key(spec) is None            # exhausted -> reset
-    assert lr.active_key_slot(spec) == 8
+    assert lr.active_key_slot(spec) == 9
 
 
 def test_exhaustion_typed_when_middle_keys_only(monkeypatch):
@@ -265,20 +272,20 @@ def test_exhaustion_typed_when_middle_keys_only(monkeypatch):
     spec = lr._SPEC_BY_ID["atria"]
     monkeypatch.setenv("ATRIA_API_KEY_9", K9)
     monkeypatch.setenv("ATRIA_API_KEY_10", K10)
-    assert lr.active_key_slot(spec) == 7
-    assert lr.rotate_key(spec) == 8
+    assert lr.active_key_slot(spec) == 8
+    assert lr.rotate_key(spec) == 9
     assert lr.rotate_key(spec) is None            # exhausted -> reset
-    assert lr.active_key_slot(spec) == 7          # first PRESENT slot
+    assert lr.active_key_slot(spec) == 8          # first PRESENT slot
 
 
 # ---------------------------------------------------------------------------
-# 5. the attempt budget at the current ring size (R472: 14 slots)
+# 5. the attempt budget at the current ring size (R478: 15 slots)
 # ---------------------------------------------------------------------------
 
 def test_attempt_budget_extends_by_ring_minus_one():
     spec = lr._SPEC_BY_ID["atria"]
     ring_extra = max(0, len(lr.key_ring_slots(spec)) - 1)
-    assert ring_extra == 13
+    assert ring_extra == 14
 
 
 def test_budget_comment_pins_the_extension_rule():
@@ -315,5 +322,5 @@ def test_availability_row_lists_current_ring_vars(monkeypatch):
     matrix = lr.availability_matrix()
     row = next(r for r in matrix if r["provider_id"] == "atria")
     assert row["key_ring_env_vars"] == RING
-    assert row["key_slots_present"] == [0, 8]
-    assert row["key_slot_active"] in (0, 8)
+    assert row["key_slots_present"] == [0, 9]
+    assert row["key_slot_active"] in (0, 9)

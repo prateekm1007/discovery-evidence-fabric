@@ -1784,6 +1784,22 @@ Stage Summary:
 - The R478 DELIVERY_BLOCKED_CREDENTIALS tuple is CLOSED; production serves the R478 P0 tranche (fbc73b8) with identity verified. P0-5 remains TRANSPORT_DEGRADED on billing (one operator action); P0-1 IMPROVE-stage live proof + the R458 re-run sequence behind it (unchanged from R478). Records: R479/ (deploy, identity-verify, probe, attempt-1 evidence, round record).
 - reviewer_provenance=AI_REVIEW.
 ---
+Task ID: R478 (the parallel P1-12 line — raced the CTO line's R478->R480 from the same 17504061 base; united at R481, see R481/LINEAGE_RECONCILIATION.json)
+Agent: Super Z (main session — CTO; Atria-Dawn-Preview = delegated engineer)
+Task: The external engine audit's Phase-0 ratification + P1-12 (single survivor authority) + the ring-15 reinstatement
+
+Work Log:
+- AUDIT RATIFIED AS THE PHASE-0 BASELINE: the external auditor's 25 scores / OVERALL 3/10 accepted as measured, no relitigation. Baseline synced: one-shot PAT fetch from the vault (LXXIII; .gitcreds, nothing persisted, output sanitized) -> ff-only onto r477-github at 17504061 (the auditor's exact HEAD; the d1e48102..17504061 delta is the R477 parallel-line reconciliation + webapp P0 closures, engine untouched). The 16-stage order verified verbatim at adapters.py:1440-44.
+- P1-12 CLOSED — ONE survivor authority consumed by server AND bridge: bridge_gate.survivor_attested() (pure; closed vocabulary + invention_id + spec-hash/selection) extracted from _survivor_recorded (BRIDGE_GATE_VERSION 1.3.0); server.survivor_release_gate consumes it (3-arg, SURVIVOR_SELECTION as leg-3 evidence); the R452 RELEASE_RECORDS_DISAGREE dead-end class DELETED (disagreement without rejection never blocks); the R452 corruption shape (legacy NOT_A_SURVIVOR vs an attesting authority record) blocks DECISIVELY with conflict_class + the re-adjudication path; _legacy_release_disclosure rides the served ZIP bytes (X-Release-Authority / X-Legacy-Release-Proof-Status) on both serve paths. ACCEPTANCE DISCLOSED: "3 blocked runs unblock" is evidence-dependent — attesting runs unblock; the corruption specimens (softened status, no survivor evidence) stay blocked decisively, because re-serving killed-invention ZIPs would re-open the exact R452 B4/AT-7 defect.
+- ENGINEER SESSION (r472 pattern): TASK_A 2048 tok finish=stop on ATRIA_API_KEY_2 after the head key's empty-content x3 (a live rotation, recorded); integrated with two CTO fixes (authority literal; absent-record branch restored verbatim). TASK_B 3000 tok finish=length — conformant hunks integrated, CTO completed the remainder (the r477 discipline). Drafts verbatim: R478/ATRIA_ENGINEER_{A,B}.json. Tests authored by the CTO, not the implementer (Art. III).
+- RING 15: R478/RING_VALIDATION.json — 15/15 slots catalog 200 (2026-09-16T17:4xZ); slot 8 REINSTATED per the LATEST typed measurement (200 x3 + a 200 tiny completion, 14.9 s; fingerprint atr_DH...1QzF identity-confirmed; flap history preserved in the registry comment); llm_registry key_env_vars 14 -> 15; test_r469/r470/r472 registration + walk pins moved forward (documented contract change).
+- BATTERY: 129 passed / 1 skipped / 0 failed (r469 + r470 + r472 + r478_survivor_authority 22 new + r452 contract-change + r396); test_r418's 5 solar-fixture failures verified IDENTICAL to the pre-change baseline via stash (the known stale-fixture class). BS-021 sweep of all changed files: zero values, fingerprints only. Constitution v2.5.0 + LXXIII verified — no amendment needed (providers are policy, not law, per the Four Layers rule).
+- DELIVERY: local commit on r477-github; PUSH PENDING the operator's PAT engagement (pushing is a listed PAT event per the auditor's note); deploy follows push via the standing r456 driver.
+
+Stage Summary:
+- Phase 0 closed: the audit's scores are the agreed baseline and the roadmap is the ratified backlog (30-day: P0-4, P0-2, P0-3 spec, P0-1; 60-day: P0-1 live, P0-6 re-benchmark; 90-day: P0-7 rebuild + hardening). P0-5 is no longer a blocker: the atria ring is the live transport, 15/15 measured. P1-12 landed with one authority and zero regressions. The three R452-corruption runs now have a named, actionable reconciliation path instead of a dead-end 409.
+- reviewer_provenance=AI_REVIEW
+---
 Task ID: R480
 Agent: Super Z (main session — CTO line)
 Task: R480 — P0-5 closure via the operator's repoint directive: ZAI -> atria (api.atria-asi.ai) with the re-supplied 15-key ring; probe-before-wire, variables+secrets+restart (no rebuild), post-restart verification, push.
