@@ -1,0 +1,45 @@
+{
+  "round": "R473",
+  "record_class": "DURABLE RECOVERY + THE TWO AUDIT-NAMED DEFENSES",
+  "measured_at": "2026-09-16T02:30:00Z",
+  "operator_directive": "graft the 176-session index back from e245bbe and merge with the current 34, then land the two missing defenses the audit named (restore-before-serve + shrink guard)",
+  "the_graft": {
+    "discovery": "this session inherited a stale sandbox (worklog + vault reset to the R451-C2 era); the durable branch runtime-state-hf ALREADY carried a graft chain built by the parallel line — 8c9a70a3 (v2: the 176-session index of e245bbe merged with the 34-session tip -> 209 sessions, union latest-wins) and 828be9b4 (v3: the payload tree reconciled). CTO decision: verify the union instead of redoing it, then repair what the chain provably missed.",
+    "verification": "scripts/r473_verify_graft.py + scripts/r473_graft_verification_json.py: tip == EXACT union of the 176 (e245bbe) and 34 (6a60b6f7) id sets = 209 sessions; zero invented; zero missing; no duplicate ids; the single overlap (ts_x) resolved latest-wins; chronology preserved for BOTH source orderings; every e245bbe payload path present at tip. 9/9 checks ALL GREEN (R473/GRAFT_VERIFICATION.json).",
+    "residual_loss_found_and_repaired": "graft v3 restored payloads from the 34-lineage: model_routing/ledger.jsonl came back as 143 records whose window STARTS after e245bbe's window ENDS — the 19 earliest routing records (epochs 1789513186-1789513547) were absent (0 verbatim matches). Root cause of the loss class measured in code: restore() never re-materialized model_routing/, so a fresh container's first snapshot pushed a SHORTER ledger over the branch. Repair: graft v4 (commit 8663b860 on runtime-state-hf) restores the 19 records (chronology monotone, no duplicate request_ids), regenerates the integrity manifest over the repaired tree (2537 files, tree 50edc1a5...), pushes verified via ls-remote.",
+    "final_state": {
+      "branch": "runtime-state-hf",
+      "head": "8663b860",
+      "sessions": 209,
+      "model_routing_ledger_lines": 162
+    }
+  },
+  "the_two_defenses": {
+    "restore_before_serve": "durable.restore_for_serve() (bounded retries, default 3 x 5s) evaluates the gate BEFORE the server serves; the success predicate is error==None AND integrity_verified!=False. On exhaustion the gate CLOSES (durable.serve_gate().restored False, surfaced verbatim at /api/health durable.serve_gate) and the process serves DEGRADED: the boot snapshot and EVERY snapshot refuse (typed 'restore gate closed') and run creation refuses 503 RESTORE_GATE_CLOSED. The port still binds (the R420b health-check lesson) and a background retry thread re-attempts restore every 60s so a long outage heals without a container restart. The swallow-and-serve boot path (restore failure printed, serve anyway, boot snapshot pushed) was the EXACT 176->34 mechanism — now machine-blocked.",
+    "shrink_guard": "durable._shrink_violations() compares the payload a snapshot would push against the durable branch HEAD before ANY copy/commit: the branch's session_id set (sessions.json), share-id set (shares.json) and every append-only ledger line (worker_forensics/*.jsonl, model_routing/ledger.jsonl) must SURVIVE. A smaller-or-empty snapshot over a larger durable state is refused, typed 'shrink guard blocked snapshot: ...' with per-file violation details riding durable.last_snapshot.shrink_guard. Escape hatch DURABLE_ALLOW_SHRINK=1 exists for operator-mandated resyncs and is RECORDED at every layer (snapshot report, snapshot_log.jsonl line fields shrink_override/shrink_violations, commit message suffix [shrink-override]) — never a silent shrink (Art. XV/XXV).",
+    "restore_symmetry": "the guard's counterpart, same round: restore() now re-materializes model_routing/ledger.jsonl (append-only merge by request_id — the EXACT file the incident erased) and copies model_routing/state.json + transport_capability/capability_state.json copy-when-absent (local stays the live authority; never regressed by the branch copy). Without this the guard would deadlock production (branch ⊄ local forever) and the graft-v4 repair would be re-erased by the next fresh-container snapshot. The end-to-end healing loop is measured in-test: restore -> gate opens -> first post-restore snapshot is a superset and pushes the union."
+  },
+  "batteries": {
+    "test_r473_durable_defenses": "22/22 GREEN (shrink guard: session-index loss blocked / superset passes / ledger line loss blocked / forensics loss blocked / override recorded at every layer / absent-file-not-a-violation; gate: failed restore closes + blocks snapshots, integrity mismatch closes, retry opens, gate rides health state, gate-None keeps library semantics; restore symmetry: ledger restored append-only + idempotent, healed-loop end-to-end, state files copy-when-absent; server wiring: real ThreadingHTTPServer 503 RESTORE_GATE_CLOSED while closed / proceeds once open / disabled when durable off; 5 source pins)",
+    "regressions": "r422 (33 incl. the updated boot pin) + r423 + r447 + r396: 58+33 GREEN. Recent-rounds sweep (r465-r472, r419, r414): 369 passed, 3 failed — all 3 (r419 blender/render env) reproduce on PRISTINE origin/main 5686bc14 (environment-state, not introduced; disclosed). r392 (2) + r446 (2) failures also reproduce on pristine (environment-state).",
+    "one_legitimate_pin_break": "test_r422 test_boot_reconciles_after_restore pinned the literal durable.restore() inside main() — the pin follows the strengthened contract (restore_for_serve before reconcile_at_boot) with disclosure, the R447 precedent.",
+    "pre_commit_constitution_check": "PASS",
+    "module_inventory": "regenerated, zero drift"
+  },
+  "honest_scope": [
+    "the graft union itself was already on the branch (parallel line's v2/v3) — this round VERIFIED it 9/9 and repaired the one residual loss the chain could not see",
+    "the shrink guard cannot undo the historical incident — it makes its CLASS machine-impossible going forward",
+    "gate-None semantics preserved deliberately: library/test/CLI snapshot calls keep the previous behavior; only the serving process (which runs restore_for_serve) is gated",
+    "11 Atria keys (3-13) remain conversation-only; the key-pool HF-secrets task stays queued behind this directive"
+  ],
+  "artifacts": [
+    "toscanini/durable.py",
+    "toscanini/server.py",
+    "tests/test_r473_durable_defenses.py",
+    "scripts/r473_verify_graft.py",
+    "scripts/r473_graft_ledger.py",
+    "scripts/r473_graft_verification_json.py",
+    "R473/GRAFT_VERIFICATION.json"
+  ],
+  "reviewer_provenance": "AI_REVIEW"
+}
