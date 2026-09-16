@@ -50,12 +50,14 @@ DOWNSTREAM_BLOCKERS = {
     "PREMISE_GATE": {"SYNTHESIZE", "VERIFY", "MECHANISM_SPACE",
                      "MULTI_SOURCE_DISCOVERY",
                      "COLLISION", "PHYSICS", "ATTACK", "CONTRADICTION",
-                     "KILLER_EXPERIMENT", "ADJUDICATION", "CLASSIFY",
+                     "KILLER_EXPERIMENT", "IMPROVE", "ADJUDICATION",
+                     "CLASSIFY",
                      "NEXT_BEST_ACTION", "RANK"},
     "SYNTHESIZE": {"VERIFY", "MECHANISM_SPACE",
                    "MULTI_SOURCE_DISCOVERY", "COLLISION",
                    "PHYSICS", "ATTACK",
-                   "CONTRADICTION", "KILLER_EXPERIMENT", "ADJUDICATION",
+                   "CONTRADICTION", "KILLER_EXPERIMENT", "IMPROVE",
+                   "ADJUDICATION",
                    "CLASSIFY", "NEXT_BEST_ACTION", "RANK"},
     # R401: MECHANISM_SPACE consumes the frozen evidence — a retrieval
     # failure leaves it nothing to structure (SKIPPED_UPSTREAM_FAILURE,
@@ -1567,6 +1569,149 @@ class EngineRun:
                     "killed": False,
                     "physics_lifecycle": physics_lifecycle,
                     "span_underived": bool(c.get("span_underived"))})
+
+            # ---------- R481 P0-1: the IMPROVE stage (kill point) ------
+            # The loop-closure stage executes HERE — the only point
+            # where the gauntlet's kill evidence exists. Dead candidates
+            # are mutated FROM THEIR RECORDED KILL BASIS; the children
+            # re-run the SAME gates (inside the stage, the same
+            # functions); admitted children join `evaluated` and
+            # compete at selection with fresh scores (nothing
+            # inherited). Typed outcomes: CHILDREN_ADMITTED /
+            # NO_CHILD_ADMITTED / NO_KILL_EVIDENCE /
+            # IMPROVEMENT_BLOCKED_TRANSPORT / DISABLED_BY_OPERATOR.
+            _improve_stage_file = self.out / "stage_IMPROVE.json"
+            _improve_done = False
+            if _improve_stage_file.exists():
+                try:
+                    _improve_prev = json.loads(
+                        _improve_stage_file.read_text())
+                    _improve_done = _improve_prev.get("status") in (
+                        "CHILDREN_ADMITTED", "NO_CHILD_ADMITTED",
+                        "NO_KILL_EVIDENCE",
+                        "IMPROVEMENT_BLOCKED_TRANSPORT",
+                        "DISABLED_BY_OPERATOR")
+                except Exception:  # noqa: BLE001 — corrupt record
+                    _improve_done = False
+            if _improve_done:
+                # resume: the stage already executed this run — the
+                # record on disk is the authority (Art. X); the
+                # children re-derive from env.mechanism_space (the
+                # front door) under the normal pool discipline
+                self._persist("IMPROVE_LEDGER.json", {
+                    "stage": "IMPROVE", "status": "RESUMED_ALREADY_DONE",
+                    "note": ("stage_IMPROVE.json holds an executed "
+                             "outcome; the mutation spend is never "
+                             "re-burned (R401 resume discipline)")})
+            else:
+                pool_by_key = {c["key"]: c for c in pool}
+                dead = []
+                for e in evaluated:
+                    if e.get("killed"):
+                        _kill_file = self.out / (
+                            f"PACKAGE_FAILED_{e['key']}.json")
+                        _basis, _kclass = [], (e.get("kill_stage")
+                                               or "RECORDED_KILL")
+                        if _kill_file.exists():
+                            try:
+                                _kf = json.loads(_kill_file.read_text())
+                                _kclass = _kf.get("stage") or _kclass
+                                _basis = (_kf.get("kill_basis")
+                                          or [_kf.get("reason", "")])
+                            except Exception:  # noqa: BLE001
+                                _basis = ["kill record unreadable"]
+                        if e.get("killed_by") == "CHEAP_SCREEN":
+                            _kclass = "CHEAP_SCREEN"
+                            _basis = [(e.get("cheap_screen") or {})
+                                      .get("reasons", [])]
+                        parent = pool_by_key.get(e.get("key")) or {}
+                        p_ms = parent.get("mechanism_space_candidate") \
+                            or {}
+                        _mm = getattr(parent.get("env_view"),
+                                      "mechanism_map", None) or {}
+                        dead.append({
+                            "candidate_id": e.get("candidate_id"),
+                            "key": e.get("key"),
+                            "kill_class": _kclass,
+                            "kill_basis": _basis,
+                            "parent_fields": {
+                                "mechanism": p_ms.get("mechanism")
+                                or _mm.get("mechanism", ""),
+                                "intervention": p_ms.get("intervention")
+                                or _mm.get("intervention", ""),
+                                "expected_effect": p_ms.get(
+                                    "predicted_effect",
+                                    p_ms.get("expected_effect", ""))
+                                or _mm.get("expected_effect", ""),
+                                "falsification_test": p_ms.get(
+                                    "testable_prediction", "")
+                                or _mm.get("falsification_test", "")},
+                            "mechanism_space_candidate": p_ms})
+                    elif (e.get("quality") or {}).get("verdict") == "FAIL":
+                        parent = pool_by_key.get(e.get("key")) or {}
+                        p_ms = parent.get("mechanism_space_candidate") \
+                            or {}
+                        _mm = getattr(parent.get("env_view"),
+                                      "mechanism_map", None) or {}
+                        dead.append({
+                            "candidate_id": e.get("candidate_id"),
+                            "key": e.get("key"),
+                            "kill_class": "DOSSIER_QUALITY",
+                            "kill_basis": (e.get("quality") or {})
+                            .get("deficient_areas", [])[:10],
+                            "parent_fields": {
+                                "mechanism": p_ms.get("mechanism")
+                                or _mm.get("mechanism", ""),
+                                "intervention": p_ms.get("intervention")
+                                or _mm.get("intervention", ""),
+                                "expected_effect": p_ms.get(
+                                    "predicted_effect",
+                                    p_ms.get("expected_effect", ""))
+                                or _mm.get("expected_effect", ""),
+                                "falsification_test": p_ms.get(
+                                    "testable_prediction", "")
+                                or _mm.get("falsification_test", "")},
+                            "mechanism_space_candidate": p_ms})
+                _improve_payload = {
+                    "dead": dead,
+                    "problem_text": json.dumps(self.problem,
+                                               ensure_ascii=False,
+                                               default=str)[:1500],
+                    "problem": self.problem,
+                    "env": self.env,
+                    "env_builder": _env_with_candidate,
+                    "persist": self._persist,
+                    "run_ctx": {"run_id": self.run_id,
+                                "problem_id": self.problem_id,
+                                "out_dir": str(self.out)},
+                    "generation": 1,
+                    "max_children": int(os.environ.get(
+                        "ENGINE_IMPROVE_MAX_CHILDREN", "3"))}
+                try:
+                    from .adapters import ADAPTERS as _AD
+                    _imp_entry = self.env.run_stage(
+                        "IMPROVE",
+                        _AD["IMPROVE"].capability_id,
+                        _AD["IMPROVE"].module_path,
+                        _AD["IMPROVE"].canonical_fn,
+                        _AD["IMPROVE"].execute, self.env,
+                        {"run_id": self.run_id,
+                         "problem_id": self.problem_id,
+                         "out_dir": str(self.out),
+                         "improve_payload": _improve_payload})
+                    self._persist("stage_IMPROVE.json",
+                                  _imp_entry.get("result_meta", {}))
+                    self._persist_envelope("IMPROVE")
+                    for _ch in (_imp_entry.get("result_meta") or {}) \
+                            .get("children", []) or []:
+                        evaluated.append(_ch)
+                except StageFailure as _sf:
+                    # the stage failed explicitly — recorded by run_stage,
+                    # the pipeline proceeds with the dead staying dead
+                    # (an engine defect never kills research, Art. V)
+                    self._persist("stage_IMPROVE_FAILURE.json",
+                                  {"stage": "IMPROVE",
+                                   "error": _sf.error})
 
             # ---------- E15-H: select the strongest survivor ---------------
             selection = select_survivors(evaluated)

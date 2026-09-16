@@ -523,15 +523,27 @@ class TestDeletionAccounting(unittest.TestCase):
                 f, ("discovery_fabric/engine/run.py",
                     "discovery_fabric/engine/stage_entry.py",
                     "discovery_fabric/engine/adapters.py",
-                    "discovery_fabric/engine/llm_registry.py"),
+                    "discovery_fabric/engine/llm_registry.py",
+                    # R481 AMENDMENT (disclosed): the IMPROVE stage's
+                    # cost class lives in cheap_screen.py (the
+                    # every-stage-coverage pin demands it) and the
+                    # stage module itself is new (improve_stage.py is
+                    # exercised through its own battery, not this
+                    # mandate's accounting)
+                    "discovery_fabric/engine/cheap_screen.py"),
                 f"the mandate's file list is exhaustive: {f} is outside "
                 "run.py/stage_entry.py/adapters.py/llm_registry.py")
 
     def test_stage_order_unchanged(self):
-        """No new stages, no removals — 16 stages, same order."""
+        """R481 AMENDMENT (disclosed): IMPROVE joined between
+        KILLER_EXPERIMENT and ADJUDICATION (the external audit's P0-1
+        loop closure — the R453 freeze was 16 stages; the deliberate,
+        documented contract change follows the R394/R397/R401
+        pattern). 17 stages, same relative order otherwise."""
         from discovery_fabric.engine.adapters import STAGE_ORDER
-        self.assertEqual(len(STAGE_ORDER), 16)
+        self.assertEqual(len(STAGE_ORDER), 17)
         self.assertEqual(STAGE_ORDER[5], "MECHANISM_SPACE")
+        self.assertEqual(STAGE_ORDER[12], "IMPROVE")
         self.assertEqual(STAGE_ORDER[-1], "RANK")
 
     def test_entry_helper_version_bumped(self):

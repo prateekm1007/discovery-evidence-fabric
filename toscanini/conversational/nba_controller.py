@@ -177,6 +177,10 @@ _LLM_CALLS_PER_STAGE = {
     "SYNTHESIZE": 1, "VERIFY": 0, "MECHANISM_SPACE": 5,
     "MULTI_SOURCE_DISCOVERY": 0, "COLLISION": 0, "PHYSICS": 0,
     "ATTACK": 1, "CONTRADICTION": 0, "KILLER_EXPERIMENT": 0,
+    # R481: the IMPROVE stage's mutation call rides llm_registry
+    # (one bounded generate() per dead candidate, capped by
+    # ENGINE_IMPROVE_MAX_CHILDREN)
+    "IMPROVE": 1,
     "ADJUDICATION": 0, "CLASSIFY": 0, "NEXT_BEST_ACTION": 0,
     "RANK": 1,
 }

@@ -1051,8 +1051,13 @@ def test_d1_resume_continues_killed_run_without_rerunning_stages():
         # out-of-domain verdict completes OK without fabricating a
         # comparison). R401: the MECHANISM_SPACE stage also executes
         # (or honestly skips with zero verified evidence) on the resume
-        # path — the chain is 16 stages since R401.
-        assert len(run2.env.stage_log) == done_before + 9
+        # path — the chain is 17 stages since R481. IMPROVE contributes
+        # TWO entries on this path: the loop position's typed
+        # DEFERRED_TO_KILL_POINT deferral (+1) AND the Directive-1
+        # pipeline's kill-point execution (NO_KILL_EVIDENCE in this
+        # fixture — nothing died; +1) — the total is +11 vs the R401
+        # count of +9.
+        assert len(run2.env.stage_log) == done_before + 11
         # the automatic survivor -> package pipeline ran in phase 2
         assert (td / "INVENTION_SPECIFICATION.json").exists()
         assert (td / "ENGINEERING_SPECIFICATION.json").exists()

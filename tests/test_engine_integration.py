@@ -149,12 +149,15 @@ def test_stage_order_is_exact_d8_chain():
     # ATTACK — the physics solver is part of the LIVE RUN CHAIN for
     # every ordinary user run (consultant finding: "validated code but
     # not part of the live run chain"). R401: MECHANISM_SPACE between
-    # VERIFY and MULTI_SOURCE_DISCOVERY — the D8 chain is 16 stages.
+    # VERIFY and MULTI_SOURCE_DISCOVERY. R481: IMPROVE between
+    # KILLER_EXPERIMENT and ADJUDICATION (the audit's P0-1 loop
+    # closure) — the D8 chain is 17 stages.
     assert STAGE_ORDER == [
         "RETRIEVE", "FREEZE", "PREMISE_GATE", "SYNTHESIZE", "VERIFY",
         "MECHANISM_SPACE", "MULTI_SOURCE_DISCOVERY", "COLLISION",
         "PHYSICS", "ATTACK",
-        "CONTRADICTION", "KILLER_EXPERIMENT", "ADJUDICATION", "CLASSIFY",
+        "CONTRADICTION", "KILLER_EXPERIMENT", "IMPROVE", "ADJUDICATION",
+        "CLASSIFY",
         "NEXT_BEST_ACTION", "RANK"]
 
 

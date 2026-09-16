@@ -54,6 +54,10 @@ _STAGE_META = {
     "ATTACK": ("CHALLENGE", "COMPUTED"),
     "CONTRADICTION": ("EVIDENCE", "RETRIEVED"),
     "KILLER_EXPERIMENT": ("EXPERIMENT", "COMPUTED"),
+    # R481: the IMPROVE stage — the loop closure. The child mechanism
+    # is MODEL-proposed from the kill basis: the same epistemic class
+    # as SYNTHESIZE (a hypothesis, never computed evidence).
+    "IMPROVE": ("MECHANISM", "HYPOTHESIZED"),
     "ADJUDICATION": ("CHALLENGE", "COMPUTED"),
     "CLASSIFY": ("EPISTEMICS", "COMPUTED"),
     "NEXT_BEST_ACTION": ("EPISTEMICS", "COMPUTED"),

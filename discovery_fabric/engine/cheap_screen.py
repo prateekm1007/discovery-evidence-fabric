@@ -60,6 +60,13 @@ STAGE_COST_CLASSES: Dict[str, str] = {
     "ATTACK": "CHEAP_DETERMINISTIC",
     "CONTRADICTION": "CHEAP_DETERMINISTIC",
     "KILLER_EXPERIMENT": "CHEAP_DETERMINISTIC",
+    # R481: the IMPROVE stage — one bounded LLM mutation per dead
+    # candidate plus the child's gauntlet re-run (spec + attack +
+    # independent attack + quality): the EXPENSIVE_LLM class, and the
+    # stage is admission-gated like the other expensive stages (it
+    # runs ONLY when kill evidence exists — the NO_KILL_EVIDENCE skip
+    # is the R453 admission discipline applied to the loop closure)
+    "IMPROVE": "EXPENSIVE_LLM",
     "ADJUDICATION": "CHEAP_DETERMINISTIC",
     "CLASSIFY": "CHEAP_DETERMINISTIC",
     "NEXT_BEST_ACTION": "CHEAP_DETERMINISTIC",

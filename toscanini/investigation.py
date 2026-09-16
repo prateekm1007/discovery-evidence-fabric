@@ -111,6 +111,9 @@ _STAGE_META = {
     "ATTACK": ("CHALLENGE", "COMPUTED"),
     "CONTRADICTION": ("EVIDENCE", "RETRIEVED"),
     "KILLER_EXPERIMENT": ("EXPERIMENT", "COMPUTED"),
+    # R481: the IMPROVE stage (the loop closure) — same class as
+    # SYNTHESIZE: a MODEL-proposed mechanism, never computed evidence
+    "IMPROVE": ("MECHANISM", "HYPOTHESIZED"),
     "ADJUDICATION": ("CHALLENGE", "COMPUTED"),
     "CLASSIFY": ("EPISTEMICS", "COMPUTED"),
     "NEXT_BEST_ACTION": ("EPISTEMICS", "COMPUTED"),
@@ -129,6 +132,7 @@ _STAGE_SUMMARY = {
     "ATTACK": "adversarial challenges executed against the candidate",
     "CONTRADICTION": "evidence contradictions resolved",
     "KILLER_EXPERIMENT": "decisive (falsification) experiment designed",
+    "IMPROVE": "dead candidates mutated from their recorded kill basis; children re-judged by the same gauntlet",
     "ADJUDICATION": "surviving architecture adjudicated",
     "CLASSIFY": "epistemic state classified from recorded evidence",
     "NEXT_BEST_ACTION": "next actions ranked by information value",

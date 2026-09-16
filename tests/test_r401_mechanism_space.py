@@ -815,7 +815,9 @@ class TestStageIntegration:
         from discovery_fabric.engine.adapters import STAGE_ORDER
         assert STAGE_ORDER.index("MECHANISM_SPACE") == \
             STAGE_ORDER.index("VERIFY") + 1
-        assert len(STAGE_ORDER) == 16
+        # R481: the chain is 17 stages (IMPROVE joined at the audit's
+        # P0-1; documented change)
+        assert len(STAGE_ORDER) == 17
 
     def test_adapter_skips_honestly_when_gate_fails(self):
         from discovery_fabric.engine.adapters import MechanismSpaceAdapter

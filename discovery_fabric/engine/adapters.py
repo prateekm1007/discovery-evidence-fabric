@@ -1270,6 +1270,52 @@ class KillerExperimentAdapter(BaseAdapter):
                               selected=best_name)
 
 
+class ImproveAdapter(BaseAdapter):
+    """R481 (external-audit P0-1): the IMPROVE stage — the loop
+    closure. Dead candidates are mutated FROM THEIR RECORDED KILL
+    BASIS and the children RE-RUN the same gauntlet gates; a child
+    that passes every gate re-enters the competition with fresh
+    scores, one that fails dies again with a typed record.
+
+    Execution point (the cemetery precedent): the Directive-1
+    pipeline's kill-evidence point — the stage chain itself holds no
+    per-candidate kill verdicts until the gauntlet has run, so the
+    LOOP-position execution records the typed
+    DEFERRED_TO_KILL_POINT and the pipeline executes the real stage
+    through the same env.run_stage first-class protocol. The contract
+    arithmetic (STAGE_ORDER, the registry, the resume ledger) treats
+    IMPROVE exactly like every other stage.
+
+    Art. XXXVII guard: the loop is real or it does not exist — no
+    kill evidence -> NO_KILL_EVIDENCE (never a synthetic child);
+    transport failure -> IMPROVEMENT_BLOCKED_TRANSPORT (the dead stay
+    dead, the run continues); every admitted child carries its
+    lineage and fresh scores (nothing inherited).
+    """
+    capability_id = "IMPROVE"
+    module_path = "discovery_fabric/engine/improve_stage.py"
+    canonical_fn = "improve_stage.run_improve"
+    depends_on = ["KILLER_EXPERIMENT", "CONTRADICTION"]
+    needs_network = True
+
+    def execute(self, env, run_ctx):
+        payload = (run_ctx or {}).get("improve_payload")
+        if not payload:
+            # the loop-position execution (fresh run): the gauntlet has
+            # not run yet — the typed deferral, never a fake no-op
+            return {"_engine_result": True, "apply_to": {},
+                    "status": "DEFERRED_TO_KILL_POINT",
+                    "stage_version": "improve_stage/1.0.0 (R481 P0-1)",
+                    "note": ("the IMPROVE stage executes at the "
+                             "Directive-1 pipeline's kill-evidence "
+                             "point (the cemetery-update precedent); "
+                             "at stage-chain time no candidate has "
+                             "died yet — the deferral is the recorded "
+                             "design")}
+        from .improve_stage import run_improve
+        return run_improve(payload)
+
+
 class AdjudicationAdapter(BaseAdapter):
     """Deterministic, hash-bound adjudication council. Canonical building
     blocks: a2/verify output, attack verdicts, contradiction register,
@@ -1518,6 +1564,7 @@ ADAPTERS = {
     "ATTACK": AttackEngineAdapter(),
     "CONTRADICTION": ContradictionQueueAdapter(),
     "KILLER_EXPERIMENT": KillerExperimentAdapter(),
+    "IMPROVE": ImproveAdapter(),
     "ADJUDICATION": AdjudicationAdapter(),
     "CLASSIFY": EpistemicClassificationAdapter(),
     "NEXT_BEST_ACTION": NextBestActionAdapter(),
@@ -1549,8 +1596,17 @@ ADAPTERS = {
 # mechanism-level verification). The chain is 16 stages. Deliberate,
 # documented contract change (same pattern as R394 PREMISE_GATE and
 # R397 PHYSICS); pinned tests updated with the new arithmetic.
+# R481 (external-audit P0-1): IMPROVE is a FIRST-CLASS stage between
+# KILLER_EXPERIMENT and ADJUDICATION — the loop closure (dead ->
+# mutated child -> the same gauntlet -> re-entry or typed re-kill).
+# The chain is 17 stages. Deliberate, documented contract change (the
+# same pattern as R394/R397/R401); the execution point is the
+# Directive-1 pipeline's kill-evidence point (the cemetery-update
+# precedent) and the loop position records the typed deferral;
+# pinned tests updated with the new arithmetic.
 STAGE_ORDER = ["RETRIEVE", "FREEZE", "PREMISE_GATE", "SYNTHESIZE",
                "VERIFY", "MECHANISM_SPACE", "MULTI_SOURCE_DISCOVERY",
                "COLLISION", "PHYSICS",
-               "ATTACK", "CONTRADICTION", "KILLER_EXPERIMENT", "ADJUDICATION",
+               "ATTACK", "CONTRADICTION", "KILLER_EXPERIMENT", "IMPROVE",
+               "ADJUDICATION",
                "CLASSIFY", "NEXT_BEST_ACTION", "RANK"]
