@@ -1,0 +1,59 @@
+{
+  "round": "R477 (the CTO P0 line, reconciled)",
+  "created_at_utc": "2026-09-16T15:05:00Z",
+  "reviewer_provenance": "AI_REVIEW",
+  "directive": "The audit's open P0 list — queued-steer-for-all-verbs, the STORED chip, router v2, single NBA, the package 200-probe.",
+  "parallel_line_reconciliation": {
+    "discovery": "While deploying this line, production was observed serving 950d7003 — a commit absent from the local clone. The Space revision history showed TWO deploys by the sibling R477 line (e12cd96a 14:08Z Space-lineage pre-PAT; 950d7003 14:32Z the origin/main application) that superseded this line's verified R476 delivery (efe91481) between 13:45Z and 14:30Z.",
+    "the_race_disclosed": "THIS line's deploy of its (then-unpushed) R477 commit e8ba0c56 landed at 14:36Z, overwriting the sibling's verified 950d7003 delivery before this session fetched origin. Production then served an ORPHAN commit (e8ba0c56, on no pushed ref) — an Art. LXXI RED tuple created by this line, disclosed here, and repaired by the union redeploy below.",
+    "the_two_lines": {
+      "sibling_line": "950d7003 (code) + d1e48102 (records): the composer safe-area fix (Atria-engineered), the measured no-gain optimizePackageImports revert, the R476 record correction (stale-viewport claim withdrawn), deferred-with-reason pins for the remaining audit deductions (including 'regex router keeps the honest ASK fallback'), adversarial_r477 12/12.",
+      "this_line": "the operator's five P0 blockers as code: the queued-steer UI half (receipt + always-visible steer row + directive-outcome card), intent router v2 (verbatim-direction + confirm; the sibling's deferral is superseded by the operator's explicit P0 directive — the new evidence the anti-entropy rule requires), single NBA (the UI reads the run contract), package 200-probe + typed gate copy, STORED-explicit chip; adversarial_r477_p0 26/26 + test_r477_steering_contract 12/12."
+    },
+    "reconciliation": "R472 precedent: the lines are UNITED, never history-edited. Rebased this line's R477 onto origin/main d1e48102; conflicts resolved as unions: package.json carries BOTH suites (their test:r477 + this line's test:r477p0), their adversarial_r477.test.mjs is BYTE-IDENTICAL to origin/main (verified by diff), their globals.css lines all survive (zero deletions), their R477/ artifacts untouched; this line's suite renamed adversarial_r477_p0.test.mjs. One resolution error during the rebase (the R477.test.mjs conflict was initially resolved to the WRONG side — a rebase --theirs/--ours inversion) was caught by the byte-diff check and repaired in the amended commit 6f1e87c4; the sibling artifact is byte-identical in the pushed tree.",
+    "deployment_order_repaired": "pushed union tip 6f1e87c4 -> origin/main; redeployed via r456_space_deploy.py (HF revision 5dc86efb); production identity flipped e8ba0c56 -> 6f1e87c4 (measured, 9 samples); the Art. LXXI tuple is GREEN again: production == origin/main == local."
+  },
+  "art_lxxi_tuple": {
+    "status": "GREEN",
+    "production_engine_commit": "6f1e87c4",
+    "origin_main": "6f1e87c4",
+    "local_head": "6f1e87c4",
+    "hf_revision": "5dc86efb",
+    "health": {"ok": true, "discovery_ready": true, "showcase_ready": true, "retrieval_ready": true, "constitution_version": "2.5.0", "providers_atria": {"status": "HEALTHY", "available_models": 1}},
+    "durable_serve_gate": {"restored": true, "at": "2026-09-16T14:50:34Z", "attempts": 1, "integrity_verified": true},
+    "run_duration_stats_live": {"n": 84, "p50_minutes": 10, "p90_minutes": 31},
+    "engine_code_note": "engine tree unchanged on BOTH R477 lines (webapp + tests only); the deployed engine code still equals the 11f3639e tree"
+  },
+  "deploy": {
+    "github_sha": "6f1e87c4",
+    "hf_revision": "5dc86efb",
+    "staged_files": "8689 -> 3557",
+    "full_tar_mb": 678.1,
+    "driver": "scripts/r456_space_deploy.py"
+  },
+  "the_p0_items_landed": {
+    "P0_1_queued_steer_ui": "the steer chips no longer hide while the run is live; the 409 queued=true body renders as a RECEIPT (role=status, data-queued, the engine's own note), never a bare refusal; the terminal thread carries the directive-outcome card with the user's verbatim words and the run_queued NBA one tap away; Python battery pins EVERY verb (9 computation + REVIEW_PACKAGE) refused->queued durably on a live run",
+    "P0_2_stored_chip": "the stored-not-read state is a bordered badge ('stored, not read — text not extracted', not-read marker, custody sha256 in the tooltip) — never a faint footnote",
+    "P0_3_router_v2": "directionConfirmVerb(): table-matched AND direction-shaped messages stop at an explicit confirm row ('Send as: <label>? Do it / Ask'); questions (wh/aux leading or '?') are never hijacked; a table-matched question gets the explicit choice instead of a silent demotion; classifyMessage's deterministic pins all hold; the 20-follow-up battery routes 20/20 (acceptance >= 18/20)",
+    "P0_4_single_nba": "the UI reads GET /api/run/{id}/contract; the engine's recorded next action (NBA controller preferred_action else NEXT_BEST_ACTION stage output) IS the one next action when it exists (source:'engine-record', executed through the ONE canonical action endpoint via dynamic import — the landing graph stays clean); STOP_HONEST/ASK_CLARIFICATION/unknown are never invented into buttons; the queued direction still outranks everything; the sibling's deferral is superseded with reasons recorded",
+    "P0_5_package_probe": "probePackage(): packageAvailable survives only while the actual download route has not answered 409 (200 pass with the body cancelled; 409 blocked WITH the typed gate payload; anything else unverified — nothing is claimed); the gate renders its own typed words + the diagnostic fallback (data-package-gate): zero dead package clicks"
+  },
+  "batteries": {
+    "webapp_full": "15 suites, 206 tests, 0 failures (present 16, events 12, r458 21, copy 1, math 12, r461 10, r464 23, r466 13, r467 10, r470 7, r471 15, r472 12, r476 16, SIBLING r477 12, THIS LINE r477_p0 26)",
+    "python": "test_r477_steering_contract 12/12 (all-verbs queue pins + contract NBA projection pins); adjacent r471/r475 batteries green (29 passed in the reconciliation run)",
+    "tsc": "strict clean",
+    "build": "green; / first-load 120 kB (+1 kB the contract-fetch/200-probe wiring; the action-contract module is dynamically imported so the R466 landing graph holds)",
+    "module_inventory": "regenerated — the staleness PRE-DATES this round (reproduces on pristine bb1a9655; the 935-LOC delta is R475's engine additions the last regeneration predated)"
+  },
+  "pin_breaks": [
+    "R464 P1-3 (the mid-run steering lock) — legitimate break, disclosed in the test body: R471 queued the direction, R477 makes the UI say so; the strengthened contract pins the receipt sentence AND the absence of the locked marker"
+  ],
+  "honest_scope": [
+    "no fresh E2E discovery run was launched this round (the P0 batch is webapp + tests; the deployed path was exercised by the identity flip + health + serve gate; the sibling's same-day runs already joined the measured set)",
+    "a live 390px/screenshot pass of the changed UI was NOT performed (the audit's NOT-PROVEN class inherited)",
+    "the sibling's slot-8 re-inclusion finding (all probed slots 200) is RECORDED on their line, not re-measured here; the ring registration remains the selection authority",
+    "CI remains account-side red on every push (the R475-measured class, unchanged)"
+  ],
+  "bs021_check": "no credential values in this record or the diff; fingerprints and timestamps only",
+  "worklog": "in-repo worklog.md entry appended after the sibling's R477 entries; outer worklog updated"
+}

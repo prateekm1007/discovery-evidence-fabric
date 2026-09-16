@@ -1733,3 +1733,18 @@ Work Log:
 Stage Summary:
 - Art. LXXI tuple GREEN: origin/main == production == 950d7003 at deploy time (this records commit moves main one records-only commit ahead, the R476 house convention, engine code identical). The §4 escalation is CLOSED. R477 fully delivered.
 - reviewer_provenance=AI_REVIEW
+
+---
+Task ID: R477 (the CTO P0 line, reconciled)
+Agent: Super Z (main session — CTO)
+Task: The audit's open P0 list — queued-steer-for-all-verbs, the STORED chip, router v2, single NBA, the package 200-probe.
+
+Work Log:
+- THIS LINE'S FIVE P0 CLOSURES: (1) the queued-steer UI half — steer chips visible at every stage, the 409 queued=true body rendered as a receipt (role=status, data-queued, the engine's note), the terminal directive-outcome card with the user's verbatim words + the run_queued NBA; the Python battery pins EVERY verb refused->queued durably on a live run. (2) the STORED chip is a bordered badge with the custody sha256, never a footnote. (3) router v2 — directionConfirmVerb + the confirm row ("Send as: <label>? Do it / Ask"); questions never hijacked; the 20-follow-up battery routes 20/20; classifyMessage's settled pins hold. (4) single NBA — the UI reads GET /api/run/{id}/contract; the engine's recorded next action is THE next action when it exists (source:'engine-record', executed through the ONE canonical endpoint, dynamic import off the landing graph); unknown/STOP/CLARIFY actions never invented into buttons. (5) probePackage — availability survives only while the download route has not answered 409; the gate's typed payload + diagnostic fallback render in the package surface.
+- THE PARALLEL-LINE RACE, DISCLOSED AND REPAIRED: this line's deploy of its then-unpushed commit (e8ba0c56, 14:36Z) overwrote the sibling R477 line's verified delivery (950d7003, 14:32Z) before this session fetched origin — production briefly served an orphan commit and the tuple went RED by this line's hand. Repaired by the R472 reconciliation precedent: rebased onto origin/main d1e48102, conflicts resolved as UNIONS (their adversarial_r477.test.mjs byte-identical, verified by diff; their globals.css lines zero-deleted; both suites named and both kept), pushed 6f1e87c4, REDEPLOYED (HF 5dc86efb), production identity flip e8ba0c56 -> 6f1e87c4 measured — the tuple is GREEN again. One rebase resolution inversion (the R477.test.mjs conflict initially taken from the wrong side) was caught by the byte-diff check and repaired before the push.
+- BATTERIES: webapp 15 suites / 206 tests / 0 failures (the sibling's 12 + this line's 26 riding the same tree); test_r477_steering_contract 12/12; tsc strict clean; build green (/ first-load 120 kB, +1 kB disclosed); the R464 mid-run-lock pin is the round's one legitimate break, updated with disclosure in the test body; MODULE_INVENTORY regenerated (the staleness pre-dates the round — reproduces on pristine bb1a9655).
+- Art. LXXI tuple GREEN: production == origin/main == local at 6f1e87c4; health ok/discovery/showcase/retrieval true; atria HEALTHY; serve_gate restored:1 integrity:true; durations n=84 p50=10 p90=31.
+
+Stage Summary:
+- The audit's five P0 blockers are closed with executing batteries on the union tree; both R477 lines' work survives byte-intact on origin/main; the race this line created is disclosed and the tuple repaired. Deferred-with-reason items the operator may still order: SUPPORTS/CONFLICTS split, OCR/CAD extraction, mobile live pass, three chunking, Lighthouse proof.
+- reviewer_provenance=AI_REVIEW
