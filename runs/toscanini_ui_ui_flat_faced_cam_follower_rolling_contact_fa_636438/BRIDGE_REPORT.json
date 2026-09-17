@@ -1,0 +1,791 @@
+{
+  "stage": "BRIDGE_GATE",
+  "bridge_gate_version": "1.3.0",
+  "outcome": "COMPLETED",
+  "at": "2026-09-17T11:05:59Z",
+  "reviewer_provenance": "AI_REVIEW",
+  "case": "B",
+  "visualizability_class": "SYSTEM_3D",
+  "conceptual": true,
+  "visualizability": {
+    "visualizability_class": "SYSTEM_3D",
+    "classification_basis": {
+      "geometry_parameters_sourced": 0,
+      "subsystems_recorded": 4,
+      "physical_site_detected": true,
+      "physical_site_vocabulary": {
+        "n_words": 53,
+        "authority": "discovery_fabric/engine/domains.py (ENGINEERING_DOMAIN_REGISTRY, one authority)",
+        "registry_domains_excluded": [
+          "ml_data"
+        ],
+        "layers_used": [
+          "architecture_blocks",
+          "architecture_blocks_medical",
+          "manufacturing_candidates",
+          "materials_candidates",
+          "disciplines",
+          "domain label",
+          "failure_modes (mode + physical_mechanism)",
+          "manufacturing_routes"
+        ]
+      },
+      "process_signal": false,
+      "algorithmic_signal": false,
+      "intervention_site": "rotary cam-driven folding station",
+      "engineering_min_params": 3,
+      "reason": "4 recorded subsystems and only 0 sourced geometry parameters \u2014 conceptual system-architecture visualization (topology, not dimensions)",
+      "measured_from": [
+        "engineering_specification.parameters",
+        "engineering_specification.engineering_core.critical_parameters",
+        "engineering_specification.system_architecture.subsystems",
+        "final_state.causal_chain"
+      ]
+    },
+    "subsystems": [
+      "load path / structural backbone",
+      "actuation or compliance element",
+      "guidance / bearing interfaces",
+      "fatigue-critical features register"
+    ],
+    "geometry_parameters": [],
+    "intervention_site": "rotary cam-driven folding station"
+  },
+  "geometry": {
+    "model_glbs": [
+      "model-001.glb",
+      "model-002.glb"
+    ],
+    "glb_sha256": "22de99c085caada7a06fa9ee78237a6fe86155017f3639a77496654544f350d1",
+    "components": [
+      {
+        "name": "housing",
+        "label": "component housing",
+        "type": "structural",
+        "material_class": "body_metal",
+        "role": "component housing (structural presentation element)",
+        "mapped_from": null
+      },
+      {
+        "name": "load_path",
+        "label": "load path member",
+        "type": "structural",
+        "material_class": "body_metal",
+        "role": "primary load path (structural presentation element)",
+        "mapped_from": "load path / structural backbone"
+      },
+      {
+        "name": "bearing",
+        "label": "bearing seats",
+        "type": "subsystem",
+        "material_class": "machined_metal",
+        "role": "recorded subsystem 'guidance / bearing interfaces' mapped onto the bearing seats slot",
+        "mapped_from": "guidance / bearing interfaces"
+      },
+      {
+        "name": "spring",
+        "label": "compliance spring",
+        "type": "subsystem",
+        "material_class": "machined_metal",
+        "role": "recorded subsystem 'actuation or compliance element' mapped onto the compliance spring slot",
+        "mapped_from": "actuation or compliance element"
+      },
+      {
+        "name": "module_01",
+        "label": "module: fatigue-critical features register",
+        "type": "subsystem",
+        "material_class": "polymer",
+        "role": "recorded subsystem 'fatigue-critical features register' (no canonical slot in the mechanical component architecture; mounted as a labeled module)",
+        "mapped_from": "fatigue-critical features register"
+      },
+      {
+        "name": "link_spring__housing",
+        "label": "preload link: spring -> housing",
+        "type": "interface",
+        "material_class": "conduit_data",
+        "role": "preload coupling (topology only)",
+        "interface_id": "mec_spring_housing"
+      }
+    ],
+    "key_dimensions": {
+      "measurement_basis": "TOPOLOGY_ONLY",
+      "note": "domain conceptual artifact \u2014 component identity, count and adjacency only; sizes are abstract presentation units, not engineering dimensions",
+      "component_count": 6,
+      "structural_form_components": 2,
+      "mapped_subsystem_components": 3,
+      "interface_count": 1,
+      "adjacency": [
+        {
+          "from": "spring",
+          "to": "housing",
+          "kind": "preload"
+        }
+      ],
+      "domain_family": "mechanical",
+      "technology_class": "MECHANICAL_COMPONENT"
+    },
+    "generation_models": [
+      {
+        "generation": 1,
+        "glb": "MODEL/model-001.glb",
+        "current": false
+      },
+      {
+        "generation": 2,
+        "glb": "MODEL/model-002.glb",
+        "current": true
+      }
+    ],
+    "domain_family": "mechanical",
+    "quality_gates": {
+      "artifact": "R432_QUALITY_GATES",
+      "version": "1.0.0",
+      "geometry_gate": {
+        "artifact": "GEOMETRY_QUALITY_GATE",
+        "version": "1.0.0",
+        "domain_family": "mechanical",
+        "technology_class": "MECHANICAL_COMPONENT",
+        "technology_class_role": "bridge geometry archetype (presentation routing, R445)",
+        "checks": [
+          {
+            "check": "valid_glb",
+            "passed": true
+          },
+          {
+            "check": "non_empty_scene",
+            "passed": true,
+            "measured": {
+              "node_count": 6,
+              "mesh_count": 6
+            }
+          },
+          {
+            "check": "component_ids_match_spec",
+            "passed": true,
+            "measured": {
+              "spec_components": 5,
+              "scene_nodes": 6,
+              "missing": [],
+              "unexpected": [],
+              "link_nodes_drawn": [
+                "link_spring__housing"
+              ]
+            }
+          },
+          {
+            "check": "named_components",
+            "passed": true,
+            "measured": {
+              "sample": [
+                "bearing",
+                "housing",
+                "link_spring__housing",
+                "load_path",
+                "module_01",
+                "spring"
+              ]
+            }
+          },
+          {
+            "check": "bounding_box_sane",
+            "passed": true,
+            "measured": {
+              "extent": [
+                5.125,
+                4.5,
+                3.4
+              ]
+            }
+          },
+          {
+            "check": "no_nan_inf_coordinates",
+            "passed": true
+          },
+          {
+            "check": "no_microscopic_geometry",
+            "passed": true,
+            "measured": {
+              "min_component_extent": 0.129874
+            }
+          },
+          {
+            "check": "no_duplicate_model",
+            "passed": true,
+            "measured": {
+              "duplicates": []
+            }
+          },
+          {
+            "check": "normals_valid",
+            "passed": true
+          },
+          {
+            "check": "component_interference",
+            "passed": true,
+            "measured": {
+              "pairs_checked": 10,
+              "same_cell_unmated": [],
+              "nested_disclosed": [
+                {
+                  "pair": "bearing==housing",
+                  "overlap_fraction_min_part": 1.0,
+                  "overlap_fraction_max_part": 0.079,
+                  "mating_declared": false,
+                  "relation": "nested (conceptual containment \u2014 engineering realization must open access or declare mating)"
+                },
+                {
+                  "pair": "bearing==load_path",
+                  "overlap_fraction_min_part": 1.0,
+                  "overlap_fraction_max_part": 0.034,
+                  "mating_declared": false,
+                  "relation": "nested (conceptual containment \u2014 engineering realization must open access or declare mating)"
+                },
+                {
+                  "pair": "bearing==spring",
+                  "overlap_fraction_min_part": 0.623,
+                  "overlap_fraction_max_part": 0.5,
+                  "mating_declared": false,
+                  "relation": "nested (conceptual containment \u2014 engineering realization must open access or declare mating)"
+                },
+                {
+                  "pair": "housing==load_path",
+                  "overlap_fraction_min_part": 1.0,
+                  "overlap_fraction_max_part": 0.426,
+                  "mating_declared": false,
+                  "relation": "nested (conceptual containment \u2014 engineering realization must open access or declare mating)"
+                },
+                {
+                  "pair": "housing==spring",
+                  "overlap_fraction_min_part": 1.0,
+                  "overlap_fraction_max_part": 0.063,
+                  "mating_declared": true,
+                  "relation": "nested (conceptual containment \u2014 engineering realization must open access or declare mating)"
+                },
+                {
+                  "pair": "load_path==spring",
+                  "overlap_fraction_min_part": 1.0,
+                  "overlap_fraction_max_part": 0.027,
+                  "mating_declared": false,
+                  "relation": "nested (conceptual containment \u2014 engineering realization must open access or declare mating)"
+                }
+              ],
+              "rule": "two distinct parts at the same cell (mutual overlap > 0.9 of the smaller and > 0.6 of the larger bbox) without a declared mating interface is an engineering-realization failure; nested parts are disclosed for the engineering boundary"
+            }
+          },
+          {
+            "check": "no_isolated_outlier_geometry",
+            "passed": true,
+            "measured": {
+              "islands": [],
+              "note": "components beyond 1.6x the assembly radius"
+            }
+          },
+          {
+            "check": "no_single_blob_domination",
+            "passed": true,
+            "measured": {
+              "largest_component_volume_fraction": 0.5841
+            }
+          },
+          {
+            "check": "interfaces_resolve",
+            "passed": true,
+            "measured": {
+              "unresolved": []
+            }
+          },
+          {
+            "check": "canonical_topology_preserved",
+            "passed": true,
+            "measured": {
+              "component_count": 5,
+              "interface_count": 1
+            }
+          }
+        ],
+        "failures": [],
+        "passed": true
+      },
+      "visual_gate": {
+        "artifact": "VISUAL_QUALITY_GATE",
+        "version": "1.0.0",
+        "domain_family": "mechanical",
+        "technology_class": "MECHANICAL_COMPONENT",
+        "technology_class_role": "bridge geometry archetype (presentation routing, R445)",
+        "checks": [
+          {
+            "check": "not_flat_slab",
+            "passed": true,
+            "measured": {
+              "height_over_length": 0.878,
+              "component_count": 6
+            }
+          },
+          {
+            "check": "not_generic_box_pile",
+            "passed": true,
+            "measured": {
+              "component_count": 6,
+              "pure_box_components": 0,
+              "box_ratio": 0.0
+            }
+          },
+          {
+            "check": "family_component_count",
+            "passed": true,
+            "measured": {
+              "family": "MECHANICAL_COMPONENT",
+              "components": 6,
+              "required": 4
+            }
+          },
+          {
+            "check": "family_feature_housing",
+            "passed": true,
+            "measured": {
+              "family": "MECHANICAL_COMPONENT",
+              "found": 1,
+              "required": 1
+            }
+          }
+        ],
+        "failures": [],
+        "passed": true,
+        "note": "presentation audit \u2014 structural metrics only; NOT scientific validation and NOT a vision model (R432 section 17 disclosure)"
+      },
+      "engineering_gate": null,
+      "passed": true,
+      "failures": []
+    },
+    "artifact_identity": {
+      "artifact": "ARTIFACT_IDENTITY",
+      "blender_scene_hash": null,
+      "cad_source": null,
+      "derivation": "assembled from persisted run artifacts only \u2014 every hash from a real file at build time (Art. VI); blender_scene_hash fills when the render stage records its scene",
+      "derived_at": "2026-09-17T11:05:57Z",
+      "domain_family": "mechanical",
+      "generation_id": "gen-2",
+      "geometry_hash": "22de99c085caada7a06fa9ee78237a6fe86155017f3639a77496654544f350d1",
+      "glb_disk_sha256": "22de99c085caada7a06fa9ee78237a6fe86155017f3639a77496654544f350d1",
+      "glb_matches_geometry_hash": true,
+      "glb_path": "/app/ENGINE_RUNS/toscanini_ui_ui_flat_faced_cam_follower_rolling_contact_fa_636438/MODEL/model-002.glb",
+      "identity_version": "1.0.0",
+      "run_id": "ts_f0880e025e60",
+      "source_geometry_hash": "f7150c9df8de5b1d3d4fad5431a87043344cff7a21cb6b1b71b30b53257b45ec",
+      "technology_id": "ui_flat_faced_cam_follower_rolling_contact_fa_636438",
+      "visualizability_class": "SYSTEM_3D"
+    },
+    "fallback_basis": null,
+    "scores": {
+      "artifact": "R433_MODEL_SCORES",
+      "version": "1.0.0",
+      "semantic_identity": {
+        "score": "PASS",
+        "passed": true,
+        "failures": [],
+        "not_visualized": [],
+        "checks": [
+          {
+            "check": "model_loads",
+            "passed": true,
+            "measured": {
+              "node_count": 6
+            }
+          },
+          {
+            "check": "family_selected",
+            "passed": true,
+            "measured": {
+              "family": "MECHANICAL_COMPONENT"
+            }
+          },
+          {
+            "check": "spec_components_visualized",
+            "passed": true,
+            "measured": {
+              "spec_components": 5,
+              "not_visualized": []
+            }
+          },
+          {
+            "check": "domain_architecture_present",
+            "passed": true,
+            "measured": {
+              "family": "MECHANICAL_COMPONENT",
+              "required": 2,
+              "not_visualized": []
+            }
+          },
+          {
+            "check": "major_interfaces_represented",
+            "passed": true,
+            "measured": {
+              "interfaces": 1,
+              "resolvable_in_scene": 1,
+              "note": "conduit links may run inside the body by design"
+            }
+          }
+        ]
+      },
+      "engineering_coherence": {
+        "score": "PASS",
+        "passed": true,
+        "failures": [],
+        "checks": [
+          {
+            "check": "valid_glb",
+            "passed": true
+          },
+          {
+            "check": "non_empty_scene",
+            "passed": true,
+            "measured": {
+              "node_count": 6,
+              "mesh_count": 6
+            }
+          },
+          {
+            "check": "component_ids_match_spec",
+            "passed": true,
+            "measured": {
+              "spec_components": 5,
+              "scene_nodes": 6,
+              "missing": [],
+              "unexpected": [],
+              "link_nodes_drawn": [
+                "link_spring__housing"
+              ]
+            }
+          },
+          {
+            "check": "named_components",
+            "passed": true,
+            "measured": {
+              "sample": [
+                "bearing",
+                "housing",
+                "link_spring__housing",
+                "load_path",
+                "module_01",
+                "spring"
+              ]
+            }
+          },
+          {
+            "check": "bounding_box_sane",
+            "passed": true,
+            "measured": {
+              "extent": [
+                5.125,
+                4.5,
+                3.4
+              ]
+            }
+          },
+          {
+            "check": "no_nan_inf_coordinates",
+            "passed": true
+          },
+          {
+            "check": "no_microscopic_geometry",
+            "passed": true,
+            "measured": {
+              "min_component_extent": 0.129874
+            }
+          },
+          {
+            "check": "no_duplicate_model",
+            "passed": true,
+            "measured": {
+              "duplicates": []
+            }
+          },
+          {
+            "check": "normals_valid",
+            "passed": true
+          },
+          {
+            "check": "component_interference",
+            "passed": true,
+            "measured": {
+              "pairs_checked": 10,
+              "same_cell_unmated": [],
+              "nested_disclosed": [
+                {
+                  "pair": "bearing==housing",
+                  "overlap_fraction_min_part": 1.0,
+                  "overlap_fraction_max_part": 0.079,
+                  "mating_declared": false,
+                  "relation": "nested (conceptual containment \u2014 engineering realization must open access or declare mating)"
+                },
+                {
+                  "pair": "bearing==load_path",
+                  "overlap_fraction_min_part": 1.0,
+                  "overlap_fraction_max_part": 0.034,
+                  "mating_declared": false,
+                  "relation": "nested (conceptual containment \u2014 engineering realization must open access or declare mating)"
+                },
+                {
+                  "pair": "bearing==spring",
+                  "overlap_fraction_min_part": 0.623,
+                  "overlap_fraction_max_part": 0.5,
+                  "mating_declared": false,
+                  "relation": "nested (conceptual containment \u2014 engineering realization must open access or declare mating)"
+                },
+                {
+                  "pair": "housing==load_path",
+                  "overlap_fraction_min_part": 1.0,
+                  "overlap_fraction_max_part": 0.426,
+                  "mating_declared": false,
+                  "relation": "nested (conceptual containment \u2014 engineering realization must open access or declare mating)"
+                },
+                {
+                  "pair": "housing==spring",
+                  "overlap_fraction_min_part": 1.0,
+                  "overlap_fraction_max_part": 0.063,
+                  "mating_declared": true,
+                  "relation": "nested (conceptual containment \u2014 engineering realization must open access or declare mating)"
+                },
+                {
+                  "pair": "load_path==spring",
+                  "overlap_fraction_min_part": 1.0,
+                  "overlap_fraction_max_part": 0.027,
+                  "mating_declared": false,
+                  "relation": "nested (conceptual containment \u2014 engineering realization must open access or declare mating)"
+                }
+              ],
+              "rule": "two distinct parts at the same cell (mutual overlap > 0.9 of the smaller and > 0.6 of the larger bbox) without a declared mating interface is an engineering-realization failure; nested parts are disclosed for the engineering boundary"
+            }
+          },
+          {
+            "check": "no_isolated_outlier_geometry",
+            "passed": true,
+            "measured": {
+              "islands": [],
+              "note": "components beyond 1.6x the assembly radius"
+            }
+          },
+          {
+            "check": "no_single_blob_domination",
+            "passed": true,
+            "measured": {
+              "largest_component_volume_fraction": 0.5841
+            }
+          },
+          {
+            "check": "interfaces_resolve",
+            "passed": true,
+            "measured": {
+              "unresolved": []
+            }
+          },
+          {
+            "check": "canonical_topology_preserved",
+            "passed": true,
+            "measured": {
+              "component_count": 5,
+              "interface_count": 1
+            }
+          },
+          {
+            "check": "artifact_identity_chain",
+            "passed": true,
+            "measured": {
+              "generation_id": "gen-1",
+              "geometry_hash": "22de99c085caada7"
+            }
+          }
+        ]
+      },
+      "presentation_quality": {
+        "score": "PASS",
+        "passed": true,
+        "failures": [],
+        "checks": [
+          {
+            "check": "not_flat_slab",
+            "passed": true,
+            "measured": {
+              "height_over_length": 0.878,
+              "component_count": 6
+            }
+          },
+          {
+            "check": "not_generic_box_pile",
+            "passed": true,
+            "measured": {
+              "component_count": 6,
+              "pure_box_components": 0,
+              "box_ratio": 0.0
+            }
+          },
+          {
+            "check": "family_component_count",
+            "passed": true,
+            "measured": {
+              "family": "MECHANICAL_COMPONENT",
+              "components": 6,
+              "required": 4
+            }
+          },
+          {
+            "check": "family_feature_housing",
+            "passed": true,
+            "measured": {
+              "family": "MECHANICAL_COMPONENT",
+              "found": 1,
+              "required": 1
+            }
+          }
+        ]
+      },
+      "note": "three separated dimensions \u2014 never combined into one score (R433 section 13); presentation PASS with semantic FAIL is a disclosed failure, never a pass"
+    },
+    "evolution": [
+      {
+        "generation": 1,
+        "invention_id": "inv:f0640e8984:gen1",
+        "status": "SUPERSEDED",
+        "status_basis": "state INVENTION_EVOLVED",
+        "why": "Replace static clearance minimization with real-time, closed-loop modulation of interface impedance \u2014 a new control capability and new physical field\u2013structure interaction, not a tolerance change.",
+        "domain_family": "mechanical",
+        "component_count": 4,
+        "glb": "/api/run/ts_f0880e025e60/model?gen=1",
+        "glb_sha256": "3c7e55c9281b19c594db67a6e8a0b008c979465ab2adeb2b2a408f26fdf0fed1",
+        "current": false
+      },
+      {
+        "generation": 2,
+        "invention_id": "inv:f0640e8984:gen2",
+        "status": "CURRENT",
+        "status_basis": "state INVENTION_CHALLENGED \u00b7 maturity GENERATED",
+        "why": "Replace static clearance minimization with real-time, closed-loop modulation of interface impedance \u2014 a new control capability and new physical field\u2013structure interaction, not a tolerance change.",
+        "domain_family": "mechanical",
+        "component_count": 6,
+        "glb": "/api/run/ts_f0880e025e60/model?gen=2",
+        "glb_sha256": "22de99c085caada7a06fa9ee78237a6fe86155017f3639a77496654544f350d1",
+        "current": true
+      }
+    ],
+    "generation_id": "gen-2",
+    "generation_count": 2
+  },
+  "renders": {
+    "stage": "RENDER",
+    "status": "RENDER_REQUESTED",
+    "job": {
+      "status": "RUNNING",
+      "enqueued_at": "2026-09-17T11:05:59Z",
+      "worker_pid": 31259,
+      "readback": null
+    },
+    "execution": "async artifact job (waits for the run worker to exit, then renders through the quality ladder; poll the CIO visualization.renders)",
+    "note": "DISCOVERY COMPLETE does not mean PRESENTATION RENDER COMPLETE \u2014 the render runs asynchronously after the run's terminal state"
+  },
+  "package_out": {
+    "zip_name": "TECHNOLOGY_TRANSFER_PACKAGE_invui_flat_faced_cam_follower_rolling_contact_fa_636438af62fefaec33.zip",
+    "zip_sha256": "431c2d98e8c51c750722a46c02700bd22fe92c89708433e52c29528df616f2da",
+    "zip_bytes": 217739,
+    "package_maturity": "EARLY_TECHNICAL_EVALUATION",
+    "visualizability_class": "SYSTEM_3D",
+    "manifest_files": 32,
+    "package_kind": "TECHNOLOGY_TRANSFER_PACKAGE (bridge) \u2014 the ONE canonical technology-transfer artifact for this run, honestly maturity-labeled; distinct from the buyer release chain (Art. IV: no weakened gates)"
+  },
+  "report": {
+    "bridge_version": "2.0.0",
+    "steps": [
+      {
+        "step": "CLASSIFY",
+        "status": "OK",
+        "detail": {
+          "visualizability_class": "SYSTEM_3D",
+          "basis": {
+            "geometry_parameters_sourced": 0,
+            "subsystems_recorded": 4,
+            "physical_site_detected": true,
+            "physical_site_vocabulary": {
+              "n_words": 53,
+              "authority": "discovery_fabric/engine/domains.py (ENGINEERING_DOMAIN_REGISTRY, one authority)",
+              "registry_domains_excluded": [
+                "ml_data"
+              ],
+              "layers_used": [
+                "architecture_blocks",
+                "architecture_blocks_medical",
+                "manufacturing_candidates",
+                "materials_candidates",
+                "disciplines",
+                "domain label",
+                "failure_modes (mode + physical_mechanism)",
+                "manufacturing_routes"
+              ]
+            },
+            "process_signal": false,
+            "algorithmic_signal": false,
+            "intervention_site": "rotary cam-driven folding station",
+            "engineering_min_params": 3,
+            "reason": "4 recorded subsystems and only 0 sourced geometry parameters \u2014 conceptual system-architecture visualization (topology, not dimensions)",
+            "measured_from": [
+              "engineering_specification.parameters",
+              "engineering_specification.engineering_core.critical_parameters",
+              "engineering_specification.system_architecture.subsystems",
+              "final_state.causal_chain"
+            ]
+          }
+        },
+        "at": "2026-09-17T11:05:56Z"
+      },
+      {
+        "step": "GEOMETRY",
+        "status": "OK",
+        "detail": {
+          "visualizability_class": "SYSTEM_3D",
+          "domain_family": "mechanical",
+          "glb_sha256": "22de99c085caada7a06fa9ee78237a6fe86155017f3639a77496654544f350d1",
+          "components": 6,
+          "quality_gates": true,
+          "attempts": [
+            {
+              "attempt": 1,
+              "status": "OK",
+              "domain_family": "mechanical"
+            }
+          ]
+        },
+        "at": "2026-09-17T11:05:57Z"
+      },
+      {
+        "step": "GENERATION_MODELS",
+        "status": "OK",
+        "detail": {
+          "count": 2,
+          "domain_family": "mechanical"
+        },
+        "at": "2026-09-17T11:05:58Z"
+      },
+      {
+        "step": "PACKAGE",
+        "status": "OK",
+        "detail": {
+          "zip_path": "/app/ENGINE_RUNS/toscanini_ui_ui_flat_faced_cam_follower_rolling_contact_fa_636438/TECHNOLOGY_TRANSFER_PACKAGE_invui_flat_faced_cam_follower_rolling_contact_fa_636438af62fefaec33.zip",
+          "zip_sha256": "431c2d98e8c51c750722a46c02700bd22fe92c89708433e52c29528df616f2da",
+          "package_maturity": "EARLY_TECHNICAL_EVALUATION",
+          "files": 32,
+          "compiler": "R440_CANONICAL_PACKAGE_COMPILER/1.1"
+        },
+        "at": "2026-09-17T11:05:59Z"
+      },
+      {
+        "step": "CIO_UPDATE",
+        "status": "OK",
+        "detail": {
+          "geometry_present": true,
+          "package_zip": "/api/run/ts_f0880e025e60/package"
+        },
+        "at": "2026-09-17T11:05:59Z"
+      }
+    ],
+    "outcome": "COMPLETED",
+    "visualizability_class": "SYSTEM_3D"
+  }
+}
