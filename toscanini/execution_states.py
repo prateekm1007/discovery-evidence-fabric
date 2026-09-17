@@ -143,3 +143,54 @@ def lifecycle_record(observer: Any = None, job: Any = None,
         "domain_canonical_run": canonical,
         **extra,
     }
+
+
+# ---------------------------------------------------------------------------
+# R485 union delta (the second line's reconciliation, Art. LXIV): the
+# recovery ORDER as a typed decision — the operator's principle M made
+# executable. "Toscanini MUST NOT restart an expensive AI computation
+# solely because the observer lost contact with it. First: LOOK UP
+# DURABLE RUN -> IS IT RUNNING? -> IS IT COMPLETE? -> IS IT FAILED? ->
+# ONLY THEN CONSIDER RETRY."
+# ---------------------------------------------------------------------------
+
+OBSERVE_WAIT = "OBSERVE_WAIT"                # live: keep observing, never restart
+RECOVER_ARTIFACTS = "RECOVER_ARTIFACTS"      # complete: harvest, never re-run
+RECOVERY_REQUIRED = "RECOVERY_REQUIRED"      # unknown/interrupted: recover
+                                             # observation (progress-open)
+CONSIDER_RETRY = "CONSIDER_RETRY"            # measured job failure: retry is
+                                             # now on the table
+
+
+def recovery_decision(status: Optional[str]) -> str:
+    """The Article LXXIV §M recovery order, as a function. The caller
+    MUST run this against the DURABLE session state (the server-side
+    store / the durable branch — §B), never against a local
+    observer's memory of it (Art. XXIII: never infer state from the
+    local viewport).
+
+    The four decisions, in the article's mandatory order:
+      live states          -> OBSERVE_WAIT       (never restart)
+      COMPLETED            -> RECOVER_ARTIFACTS  (never re-run)
+      UNKNOWN (interrupted/
+      stalled, no verdict) -> RECOVERY_REQUIRED  (fail closed on
+                                                  truth, open on
+                                                  progress — §the
+                                                  prominent doctrine)
+      FAILED/CANCELLED/
+      EXPIRED              -> CONSIDER_RETRY     (the only gate)
+
+    An UNKNOWN outcome is NEVER a retry gate: retrying a possibly-
+    completed expensive computation would risk the silent duplication
+    §L forbids — observation is recovered first."""
+    state = mapping(status)
+    if state in (ExecutionState.QUEUED, ExecutionState.STARTING,
+                 ExecutionState.RUNNING,
+                 ExecutionState.WAITING_EXTERNAL):
+        return OBSERVE_WAIT
+    if state is ExecutionState.COMPLETED:
+        return RECOVER_ARTIFACTS
+    if state is ExecutionState.UNKNOWN:
+        return RECOVERY_REQUIRED
+    # FAILED / CANCELLED / EXPIRED — the measured terminal verdicts
+    return CONSIDER_RETRY
