@@ -90,7 +90,10 @@ def test_amendment_hashes_bind(amendment):
 
 
 def test_constitution_carries_lxxv_once_with_clauses():
-    body = open(CONST).read()
+    # encoding pinned (Art. VII harness fix, no expectation changed): the
+    # constitution body is UTF-8 (em-dashes); a locale-default open()
+    # mojibakes it on cp1252 Windows and fails the clause matches there.
+    body = open(CONST, encoding="utf-8").read()
     assert len(re.findall(r"^## Article LXXV ", body, re.M)) == 1
     for clause in ("Clause 1 — Patent records are evidence objects",
                    "Clause 2 — Coverage is measured, never inferred from counts",
