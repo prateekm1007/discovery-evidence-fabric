@@ -47,7 +47,7 @@ CANDIDATE = {
 KILL_RESPONSE = """
 UNSUPPORTED_MECHANISM: PASS
 WEAK_TRANSFER: PASS
-OBVIOUS_COMBINATION: KILLED
+OBVIOUS_COMBINATION: KILLED - the bolt-on ring converting point contact into a hydrostatic pad is the standard cam-follower retrofit (R493 v4: grounding per the kill standard)
 PRIOR_ART: PASS
 CONTRADICTION: PASS
 BOUNDARY_FAILURE: PASS

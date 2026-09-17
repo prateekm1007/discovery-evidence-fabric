@@ -375,7 +375,12 @@ def score() -> Dict[str, Any]:
     return results
 
 
-def run(provider: str, pace: int, limit: int, resume: bool) -> int:
+def run(provider: str, pace: int, limit: int, resume: bool,
+        out_name: str = "A2_BASELINE") -> int:
+    global OUT_DIR, RAW_DIR, RESULTS_PATH
+    OUT_DIR = REPO / "R493" / out_name
+    RAW_DIR = OUT_DIR / "RAW"
+    RESULTS_PATH = OUT_DIR / "MEASUREMENT_RESULTS.json"
     sha = _freeze_check()
     _log(f"frozen corpus verified: {sha[:16]}...")
     _identity_gate()
@@ -430,9 +435,10 @@ def main() -> int:
     ap.add_argument("--provider", default="atria")
     ap.add_argument("--pace", type=int, default=20)
     ap.add_argument("--limit", type=int, default=0)
+    ap.add_argument("--out", default="A2_BASELINE")
     a = ap.parse_args()
     if a.run:
-        return run(a.provider, a.pace, a.limit, a.resume)
+        return run(a.provider, a.pace, a.limit, a.resume, a.out)
     if a.score:
         r = score()
         print(json.dumps(r["headline"], indent=1))

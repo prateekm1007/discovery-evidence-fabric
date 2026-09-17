@@ -275,3 +275,159 @@ class TestUnionGatePins(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
+
+
+class TestV4Floors(unittest.TestCase):
+    """The a2_gauntlet/1.1.0 deterministic floors — every rule WARRANTED
+    by a measured R493/A2_BASELINE failure class (Art. LIX tuning on
+    the DEV corpus only). The floors demote kills to PRESERVED
+    objections; they never create a kill and never touch the
+    deterministic gates."""
+
+    @staticmethod
+    def _parsed(attacks_text: str, candidate: dict,
+                prior_art_state: str = "TOPICAL_RELATED"):
+        from unittest import mock as _m
+        with _m.patch.object(a2, "llm_chat", return_value=attacks_text):
+            return a2.adversarial_challenge(candidate, True, prior_art_state)
+
+    def test_version_travels_on_the_record(self):
+        self.assertEqual(a2.A2_GAUNTLET_VERSION, "a2_gauntlet/1.1.0")
+
+    def test_contradiction_absence_floor(self):
+        # the measured a2dev-20 class: CONTRADICTION killed with an
+        # EMPTY evidence packet -> absence is not contradiction
+        cand = _full_candidate()
+        resp = ("UNSUPPORTED_MECHANISM: PASS\n"
+                "WEAK_TRANSFER: PASS\n"
+                "OBVIOUS_COMBINATION: PASS\n"
+                "PRIOR_ART: PASS\n"
+                "CONTRADICTION: KILLED - the claim is not supported by "
+                "any data\n"
+                "BOUNDARY_FAILURE: PASS\n"
+                "ENGINEERING_INFEASIBILITY: PASS\n"
+                "REGULATORY_INCOMPATIBILITY: PASS\n"
+                "OVERALL: KILLED\n"
+                "REASON: x")
+        res = self._parsed(resp, cand)
+        self.assertNotIn("KILLED", res["attacks"]["contradiction"])
+        self.assertIn("absence-as-contradiction floor",
+                      res["attacks"]["contradiction"])
+        self.assertIn("a2_v4_floors:contradiction_absence",
+                      res["v4_corrections_applied"])
+        # the objection is PRESERVED verbatim in the demotion text
+        self.assertIn("not supported by any data",
+                      res["attacks"]["contradiction"])
+        # and the candidate is no longer killed on that dimension
+        self.assertEqual(res["overall"], "PASS")
+
+    def test_contradiction_kill_with_evidence_survives_the_floor(self):
+        cand = _full_candidate()
+        cand["evidence_items"] = [{"id": "ev:1", "title":
+                                   "type-approval report"}]
+        resp = ("UNSUPPORTED_MECHANISM: PASS\n"
+                "WEAK_TRANSFER: PASS\n"
+                "OBVIOUS_COMBINATION: PASS\n"
+                "PRIOR_ART: PASS\n"
+                "CONTRADICTION: KILLED - the type-approval report "
+                "measures 3.8-log against the claimed 5.5-log\n"
+                "BOUNDARY_FAILURE: PASS\n"
+                "ENGINEERING_INFEASIBILITY: PASS\n"
+                "REGULATORY_INCOMPATIBILITY: PASS\n"
+                "OVERALL: KILLED\n"
+                "REASON: x")
+        res = self._parsed(resp, cand)
+        self.assertIn("KILLED", res["attacks"]["contradiction"])
+        self.assertNotIn("a2_v4_floors:contradiction_absence",
+                         res["v4_corrections_applied"])
+
+    def test_ungrounded_kill_floor(self):
+        # the baseline's dominant class: a kill with no number, no
+        # named standard, no candidate-grounded content
+        cand = _full_candidate()
+        resp = ("UNSUPPORTED_MECHANISM: KILLED - the approach seems "
+                "questionable overall\n"
+                "WEAK_TRANSFER: PASS\n"
+                "OBVIOUS_COMBINATION: PASS\n"
+                "PRIOR_ART: PASS\n"
+                "CONTRADICTION: PASS\n"
+                "BOUNDARY_FAILURE: PASS\n"
+                "ENGINEERING_INFEASIBILITY: PASS\n"
+                "REGULATORY_INCOMPATIBILITY: PASS\n"
+                "OVERALL: KILLED\n"
+                "REASON: x")
+        res = self._parsed(resp, cand)
+        self.assertIn("ungrounded-kill floor",
+                      res["attacks"]["unsupported_mechanism"])
+        self.assertIn("a2_v4_floors:ungrounded_kill",
+                      res["v4_corrections_applied"])
+        self.assertIn("questionable overall",
+                      res["attacks"]["unsupported_mechanism"])
+        self.assertEqual(res["overall"], "PASS")
+
+    def test_grounded_kills_pass_the_floor(self):
+        cand = _full_candidate()
+        cand["evidence_items"] = [{"id": "ev:1", "title": "x"}]
+        resp = ("UNSUPPORTED_MECHANISM: KILLED - claimed 3.5-log "
+                "inactivation at 8 Wh/m3 specific energy is 1000x "
+                "below the measurable radical regime\n"
+                "WEAK_TRANSFER: PASS\n"
+                "OBVIOUS_COMBINATION: KILLED - the named techniques "
+                "(rotor-stator cavitation + UV) are standard IMO D-2 "
+                "practice\n"
+                "PRIOR_ART: PASS\n"
+                "CONTRADICTION: PASS\n"
+                "BOUNDARY_FAILURE: PASS\n"
+                "ENGINEERING_INFEASIBILITY: PASS\n"
+                "REGULATORY_INCOMPATIBILITY: PASS\n"
+                "OVERALL: KILLED\n"
+                "REASON: x")
+        res = self._parsed(resp, cand)
+        self.assertIn("KILLED", res["attacks"]["unsupported_mechanism"])
+        self.assertIn("KILLED", res["attacks"]["obvious_combination"])
+        self.assertNotIn("a2_v4_floors:ungrounded_kill",
+                         res["v4_corrections_applied"])
+        self.assertEqual(res["overall"], "KILLED")
+
+    def test_floor_never_creates_a_kill_and_preserves_the_reason(self):
+        # a PASS record passes through the floors untouched
+        cand = _full_candidate()
+        resp = ("UNSUPPORTED_MECHANISM: PASS\n"
+                "WEAK_TRANSFER: PASS\n"
+                "OBVIOUS_COMBINATION: PASS\n"
+                "PRIOR_ART: PASS\n"
+                "CONTRADICTION: PASS\n"
+                "BOUNDARY_FAILURE: PASS\n"
+                "ENGINEERING_INFEASIBILITY: PASS\n"
+                "REGULATORY_INCOMPATIBILITY: PASS\n"
+                "OVERALL: PASS\n"
+                "REASON: clean")
+        res = self._parsed(resp, cand)
+        self.assertEqual(res["overall"], "PASS")
+        self.assertNotIn("a2_v4_floors:contradiction_absence",
+                         res["v4_corrections_applied"])
+        self.assertNotIn("a2_v4_floors:ungrounded_kill",
+                         res["v4_corrections_applied"])
+
+    def test_kill_grounded_helper(self):
+        g = a2._kill_grounded
+        cand = _full_candidate()
+        # number -> grounded
+        self.assertTrue(g("KILLED - 3.5-log claim fails", cand))
+        # named standard -> grounded
+        self.assertTrue(g("KILLED - violates IMO D-2", cand))
+        # 4-word verbatim echo of the candidate's own claims
+        self.assertTrue(g("KILLED - staged hydrodynamic cascade "
+                          "conditions cannot hold", cand))
+        # generic boilerplate -> ungrounded
+        self.assertFalse(g("KILLED - seems weak and unclear", cand))
+
+    def test_objection_text_strips_the_verdict_token(self):
+        # the demotion text must not re-enter the kill-scan: the
+        # quoted objection never carries the literal KILLED token
+        t = a2._objection_text("KILLED - the claim is unsupported")
+        self.assertNotIn("KILLED", t)
+        self.assertIn("the claim is unsupported", t)
+        t2 = a2._objection_text("KILLED: bogus (KILLED twice)")
+        self.assertNotIn("KILLED", t2)
+        self.assertIn("kill-claim", t2)

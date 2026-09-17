@@ -47,40 +47,131 @@ OPENROUTER_API_KEY = os.environ.get("OPENROUTER_API_KEY", "")
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 FROZEN_MODEL = "deepseek/deepseek-v4-flash-0731"  # OpenRouter fallback model
 
+# R493: the gauntlet's instrument version. 1.0.0 = the UNTUNED baseline
+# measured on the frozen DEV corpus (R493/A2_BASELINE: TPR 0.0909,
+# FPR 1.0 — the universal-killer class, kills unbound to defect
+# content). 1.1.0 = the DEV-corpus calibration tuning (the operator's
+# "v4 tuning against DEV only", Art. LIX): domain-neutral framing +
+# the per-dimension grounding contract in the kill standard + the
+# deterministic absence/ungrounded floors. The version travels on
+# every record so a future seal binds to exactly one iteration.
+A2_GAUNTLET_VERSION = "a2_gauntlet/1.1.0"
+
 _SSL = ssl.create_default_context()
 _SSL.check_hostname = False
 _SSL.verify_mode = ssl.CERT_NONE
 
-ATTACK_PROMPT = """You are an adversarial reviewer for medical device invention candidates.
+# R493 v4 (a2_gauntlet/1.1.0): the prompt rewritten from the measured
+# DEV-corpus baseline failures (R493/A2_BASELINE, every change below
+# is WARRANTED BY A MEASURED FAILURE CLASS — Art. LIX tuning on the
+# development corpus only; the sealed corpora are untouched):
+#   MEASURED -> CHANGE
+#   - regulatory_incompatibility boilerplate kills on a marine
+#     candidate (7/11 defect + 1 control) -> the prompt is
+#     DOMAIN-NEUTRAL (it said "medical device"; production domains
+#     are general engineering) and the regulatory dimension requires
+#     a NAMED regime/clause.
+#   - contradiction killed 8/11 defect cases with NO evidence
+#     conflict + the malformed cohort's empty-evidence case -> the
+#     contradiction dimension REQUIRES the provided evidence to
+#     actually conflict, with the conflicting value cited; no
+#     evidence packet -> contradiction cannot kill (absence is not
+#     contradiction, Art. XXI.3).
+#   - obvious_combination killed 4/4 clean controls (the R417
+#     universal-killer class) -> the obviousness dimension requires
+#     the specific known techniques NAMED and the combination
+#     shown obvious FROM THEM; a bare assertion is not a kill.
+#   - kills unbound to defect content (TPR 1/11 with binding) ->
+#     THE KILL STANDARD: every KILLED line must carry the specific
+#     grounding (the candidate's own number, quantity, named
+#     technique, or the quoted claim it fails); a kill that cannot
+#     name its specifics is recorded PASS-with-objection, not KILLED.
+ATTACK_PROMPT = """You are an adversarial reviewer for engineering invention candidates (any domain: marine, mechanical, electrical, chemical, medical, process, ...).
 
-Attack this candidate on the following dimensions. For each, respond PASS (survives) or KILLED (fails):
+Attack this candidate on the following dimensions. For each, respond PASS (survives) or KILLED (fails).
 
-1. UNSUPPORTED_MECHANISM: Is the mechanism unsupported by evidence?
-2. WEAK_TRANSFER: Is the transfer from source to device weak or superficial?
-3. OBVIOUS_COMBINATION: Is this an obvious combination of known techniques?
-4. PRIOR_ART: Does this appear to be already known?
-5. CONTRADICTION: Does the evidence contradict the claim?
-6. BOUNDARY_FAILURE: Are boundary conditions missing or violated?
-7. ENGINEERING_INFEASIBILITY: Is this engineering-infeasible?
-8. REGULATORY_INCOMPATIBILITY: Would this face regulatory barriers?
+THE KILL STANDARD (applies to every dimension): a KILLED verdict must NAME its specific grounding — the exact quantity, number, regime, clause, standard, or named technique from the candidate (or from the provided evidence) that fails. Grounded example: "KILLED - claimed 3.5-log at 8 Wh/m3 specific energy, but cavitational radical chemistry requires tens of kJ/LITER, 1000x higher". An objection you cannot ground in a specific is NOT a kill: record PASS (the objection still stands in your reason line, but it does not kill).
 
-Candidate (arm hidden):
+Dimensions:
+1. UNSUPPORTED_MECHANISM: the causal chain is physically/chemically invalid — name the specific claimed effect and the specific physical reason it cannot hold.
+2. WEAK_TRANSFER: the source-to-application transfer is superficial — name the specific mechanism element that fails to transfer and why.
+3. OBVIOUS_COMBINATION: this is an obvious combination of known techniques — NAME the specific known techniques and show the combination is obvious FROM THEM (a novel integration with a new design variable is not obvious).
+4. PRIOR_ART: this is already known — name the specific prior disclosure you have in view (without one, PASS).
+5. CONTRADICTION: the PROVIDED evidence contradicts the claim — cite the evidence's specific conflicting value(s). If no evidence items are provided, or the evidence does not actually conflict with a claimed number, this dimension is PASS (absence of evidence is not a contradiction).
+6. BOUNDARY_FAILURE: a boundary condition is missing or violated — name the specific boundary/operating point and the specific violation.
+7. ENGINEERING_INFEASIBILITY: infeasible as specified — name the specific component/parameter and the specific engineering limit it violates.
+8. REGULATORY_INCOMPATIBILITY: a specific regulatory requirement is violated — NAME the specific regime/clause/standard (e.g. "IMO D-2 discharge standard", "ISO 14726", "USCG 33 CFR"); a generic "regulatory hurdles" assertion is PASS.
+
+Candidate (arm hidden; any evidence_items provided are part of the record):
 {candidate_json}
 
-Respond (each on ONE line):
-UNSUPPORTED_MECHANISM: PASS | KILLED
-WEAK_TRANSFER: PASS | KILLED
-OBVIOUS_COMBINATION: PASS | KILLED
-PRIOR_ART: PASS | KILLED
-CONTRADICTION: PASS | KILLED
-BOUNDARY_FAILURE: PASS | KILLED
-ENGINEERING_INFEASIBILITY: PASS | KILLED
-REGULATORY_INCOMPATIBILITY: PASS | KILLED
+Respond (each on ONE line, KILLED lines must carry their specific grounding):
+UNSUPPORTED_MECHANISM: PASS | KILLED - <specific grounding>
+WEAK_TRANSFER: PASS | KILLED - <specific grounding>
+OBVIOUS_COMBINATION: PASS | KILLED - <named techniques>
+PRIOR_ART: PASS | KILLED - <named disclosure>
+CONTRADICTION: PASS | KILLED - <cited conflicting value>
+BOUNDARY_FAILURE: PASS | KILLED - <named boundary + violation>
+ENGINEERING_INFEASIBILITY: PASS | KILLED - <named limit>
+REGULATORY_INCOMPATIBILITY: PASS | KILLED - <named regime/clause>
 OVERALL: PASS | KILLED
 REASON: <one sentence>
 """
 
 def _hash(s): return hashlib.sha256(s.encode()).hexdigest()[:16]
+
+# ===== R493 v4: the deterministic floor helpers (a2_gauntlet/1.1.0) ====
+_STANDARD_RE = re.compile(
+    r"\b(imo|iso|uscg|astm|dnv|abs|cfr|ieee|api\s|iec|en\s|class|"
+    r"marpol|solas|epa|fda|ce\s|med\s)\b", re.IGNORECASE)
+_DIGIT_RE = re.compile(r"\d")
+_WORD_RE = re.compile(r"[a-z0-9]+")
+
+
+def _packet_evidence(candidate: dict) -> list:
+    """The evidence items the instrument's own packet carries (the
+    transport merges the corpus case's pinned evidence_items into the
+    candidate packet — the gauntlet's only evidence channel)."""
+    ev = candidate.get("evidence_items") or []
+    return [e for e in ev if isinstance(e, dict)] if isinstance(ev, list) else []
+
+
+def _kill_grounded(kill_text: str, candidate: dict) -> bool:
+    """True when the kill line names a specific: a number, a named
+    regime/standard, or a >=4-word verbatim overlap with the
+    candidate's own claims (the grounding must come FROM the record,
+    not from generic reviewer boilerplate)."""
+    text = str(kill_text or "")
+    if _DIGIT_RE.search(text) or _STANDARD_RE.search(text):
+        return True
+    # 4-gram overlap against the candidate's own claim text
+    claim_text = " ".join(str(candidate.get(k) or "") for k in (
+        "mechanism", "intervention", "predicted_effect",
+        "testable_prediction", "novel_design_variable",
+        "constraint_set")).lower()
+    claim_words = _WORD_RE.findall(claim_text)
+    if len(claim_words) < 4:
+        return False
+    grams = {" ".join(claim_words[i:i + 4])
+             for i in range(len(claim_words) - 3)}
+    kill_words = _WORD_RE.findall(text.lower())
+    for i in range(len(kill_words) - 3):
+        if " ".join(kill_words[i:i + 4]) in grams:
+            return True
+    return False
+
+
+def _objection_text(verdict: str) -> str:
+    """The objection WITHOUT its verdict token. The demotion text
+    quotes the original objection verbatim EXCEPT the KILLED token —
+    a quoted verdict keyword would re-enter the kill-scan (every
+    downstream consumer keys on the KILLED token) and the demotion
+    would not demote. The verdict SEMANTICS travel on the record as
+    the demotion rule name; the objection CONTENT travels verbatim."""
+    t = str(verdict or "")
+    t = re.sub(r"^\s*KILLED\b\s*[-—:]?\s*", "", t, flags=re.IGNORECASE)
+    t = t.replace("KILLED", "kill-claim")
+    return t.strip()
 
 # ===== R490: the Article L calibration-scope annotation (owner ruling) =====
 # Art. L ("The Attacker Must Be Calibrated") by its plain text covers EVERY
@@ -333,6 +424,43 @@ def adversarial_challenge(candidate: dict, evidence_verified: bool = True,
             # ADVERSARIAL_INVALID → not KILL, not SURVIVE, requires re-evaluation
             raw_verdict = f"ADVERSARIAL_INVALID ({invalid_check['invalid_reason'][:50]})"
 
+        # ===== R493 v4 DETERMINISTIC FLOORS (a2_gauntlet/1.1.0) ======
+        # Both floors are WARRANTED by measured DEV-corpus baseline
+        # failures (R493/A2_BASELINE) and demote the kill to a
+        # preserved objection — they NEVER create a kill and never
+        # touch the deterministic gates (Art. VII discipline).
+        if is_killed:
+            # FLOOR 1 (contradiction-absence): a CONTRADICTION kill
+            # with NO evidence items in the instrument's packet is the
+            # typed false-kill class ABSENCE_AS_CONTRADICTION (Art.
+            # XXI.3/XXV; measured on the malformed cohort a2dev-20 and
+            # 6 no-evidence defect cases: the dimension killed on
+            # boilerplate with nothing provided to contradict).
+            if dim_name == "contradiction" and not _packet_evidence(candidate):
+                is_killed = False
+                raw_verdict = ("SURVIVE (objection preserved - "
+                               "absence-as-contradiction floor: no "
+                               "evidence provided to contradict; "
+                               "objection was: "
+                               f"{_objection_text(reason)[:120]})")
+                v4_corrections_applied.append(
+                    "a2_v4_floors:contradiction_absence")
+            # FLOOR 2 (ungrounded kill): a kill line that cannot name
+            # its specifics (no number, no named regime/standard, no
+            # >=4-word overlap with the candidate's own claims) is
+            # boilerplate, not a verdict (the baseline's dominant
+            # failure: TPR 1/11 WITH binding, kills unbound to defect
+            # content). The objection is preserved verbatim in the
+            # demotion text — nothing is hidden (Art. XXV).
+            elif not _kill_grounded(raw_verdict, candidate):
+                is_killed = False
+                raw_verdict = ("SURVIVE (objection preserved - "
+                               "ungrounded-kill floor: no specific "
+                               "grounding named; objection was: "
+                               f"{_objection_text(raw_verdict)[:120]})")
+                v4_corrections_applied.append(
+                    "a2_v4_floors:ungrounded_kill")
+
         corrected_attacks[dim_name] = raw_verdict
 
     # ===== Compute corrected overall =====
@@ -361,6 +489,7 @@ def adversarial_challenge(candidate: dict, evidence_verified: bool = True,
         "v4_corrections_applied": v4_corrections_applied,
         "prior_art_state": prior_art_state,
         "evidence_verified": evidence_verified,
+        "gauntlet_version": A2_GAUNTLET_VERSION,
         "prompt_hash": _hash(ATTACK_PROMPT),
         "output_hash": _hash(resp),
         "timestamp": datetime.now(timezone.utc).isoformat(),
