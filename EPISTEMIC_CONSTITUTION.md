@@ -1,6 +1,6 @@
 # Epistemic Constitution — Research & Coding
 
-**Version:** 2.6.0
+**Version:** 2.7.0
 **Ratified:** 2026-08-19
 **Amended:** 2026-08-20 (Articles XXIII–XXXIV — Anti-Gaming, Anti-Entropy, Anti-Hallucination Principles; Article XXXV — Closed-Loop Epistemic Control as the Completion Standard)
 **Amended:** 2026-08-25 (Article XXXVI — TECHNOLOGY_TRANSFER_READY as the Manufactured-Asset Completion Standard; see R309/constitution/ARTICLE_XXXVI_TECHNOLOGY_TRANSFER_READY.md)
@@ -14,6 +14,7 @@
 **Amended:** 2026-09-12 (Article LXXI — The Deployed Production URL Is the Delivery Standard, filling the slot reserved on 2026-09-10, per operator directive: a coder round is complete only when its work is at origin/main, the operator-specified production URL serves that exact commit, and a health check confirms deployment identity == pushed SHA; closes the R439 "patch bundle" failure mode)
 **Amended:** 2026-09-16 (Article LXXIII — The Operator Secrets Registry: credentials live in the local vault + the HF Space secret surface; sessions look them up there before asking the operator, per the operator's 2026-09-16 directive "write in your constitution to look it up in huggingface secret, so you dont keep asking me again"; see `R468/constitution/ARTICLE_LXXIII_OPERATOR_SECRETS_REGISTRY.md`)
 **Amended:** 2026-09-17 (Article LXXIV — Observer-Independent Durable Execution, the SANDBOX / EXECUTION DURABILITY PRINCIPLES: execution is not observation, remote work is durable, observation failure is not execution failure, UNKNOWN stays distinct from FAILED, polling observes but never keeps computation alive, reconnection is normal, timeout semantics are typed, retry is idempotent, FAIL CLOSED PROGRESS OPEN — per the operator's 2026-09-17 directive after the measured attempt-5 lifecycle proof; see `R484/constitution/ARTICLE_LXXIV_OBSERVER_INDEPENDENT_DURABLE_EXECUTION.md`)
+**Amended:** 2026-09-18 (Article LXXV — Patent Evidence Is Not Patent Truth: a patent match is evidence, never truth; patent records are evidence objects with five custody fields (provenance, publication identity, family relationship, temporal status, source); coverage is measured, never inferred from counts; secondary indexes discover, primary patent-office records verify consequential assertions; six tracked source properties (FREE / ACCESSIBLE / AUTOMATABLE / LICENSE-COMPATIBLE / RATE-LIMITED / AUTHENTICATED) never collapsed — per the operator's 2026-09-18 directive after the free-patent-source research sweep; see `R498/constitution/ARTICLE_LXXV_PATENT_EVIDENCE_IS_NOT_PATENT_TRUTH.md`)
 **Authority:** Constitutional — supersedes all coding directives, gate results, and research priorities
 **Scope:** Governs both research output AND modifications to the epistemic machinery itself, AND — from v2.0.0 — what the machine may call a discovery or an invention
 
@@ -2166,6 +2167,61 @@ The canonical machine: `QUEUED → STARTING → RUNNING → WAITING_EXTERNAL →
 Before any retry of an externally meaningful operation, the machine consults the durable run identity (the L. identity fields: run_id, operation_id, attempt_id, provider, model, model_revision, request_hash) and answers "did this operation actually execute?" — the R401 resume discipline (the persisted artifact is the authority; the mutation spend is never re-burned) is this principle's standing implementation at the engine layer.
 
 See the full text at `R484/constitution/ARTICLE_LXXIV_OBSERVER_INDEPENDENT_DURABLE_EXECUTION.md` for the operator's directive verbatim, the coders' marching orders, and the implementation obligations.
+
+---
+
+## Article LXXV — Patent Evidence Is Not Patent Truth
+
+**Ratified:** 2026-09-18 (Round R498)
+**Amends:** Constitution v2.6.0 → v2.7.0
+**Full text:** `R498/constitution/ARTICLE_LXXV_PATENT_EVIDENCE_IS_NOT_PATENT_TRUTH.md`
+**Sponsor:** Operator directive (verbatim in the amendment document — the free-patent-source research sweep's concluding principle)
+
+> **A PATENT MATCH IS EVIDENCE, NEVER TRUTH.**
+>
+> The machine may retrieve patents. It may not treat retrieval as
+> authority. Every patent-derived assertion carries the same evidentiary
+> burden as every other claim in this constitution: exact binding,
+> independent verification, provenance custody, and typed failure states.
+
+### Clause 1 — Patent records are evidence objects
+
+No patent database, search engine, dataset, embedding, classifier, or LLM output is authoritative merely because it returned a patent match. A patent record entering the evidence pipeline is an **evidence object** carrying five custody fields, preserved end to end: **PROVENANCE** (which source, which endpoint, which query, when), **PUBLICATION IDENTITY** (publication number, kind code, application reference), **FAMILY RELATIONSHIP** (simple patent family / INPADOC membership as known), **TEMPORAL STATUS** (publication/grant/lapse dates and legal-status basis), and **SOURCE** (the specific provider that returned the record). A patent-derived assertion missing any of these fields is `PROVENANCE_INCOMPLETE` (Article VI) and may not support a consequential decision. This extends Article XVIII and Article XXI to the patent layer: the patent provider is exactly as untrusted as the model, and for the same reason — it returns matches, not truths.
+
+### Clause 2 — Coverage is measured, never inferred from counts
+
+Search coverage must be measured independently from search-result count. `num_hits` is a count signal only (Article XXI.1). Failure to retrieve a patent from one source MUST NOT be interpreted as evidence that no relevant patent exists — a per-source retrieval failure is typed (`SEARCH_FAILED` / `AUTH_FAILED` / `TOKEN_OUT_OF_SCOPE` / `KEY_RECOGNIZED_AUTH_NOT_OPENED` / `UNCONFIGURED`), never aggregated into absence (Articles XXI.3, XXV), and absence from ALL configured sources is still only `NO_COLLISION_FOUND` — never a novelty verdict (Article XLVI).
+
+### Clause 3 — Secondary indexes discover; primary records verify
+
+Secondary indexes (aggregators, discovery engines, commercial search surfaces) MAY discover evidence. Primary patent-office records (USPTO, EPO, WIPO and their official data services) SHOULD verify consequential assertions whenever available. A consequential patent assertion — one that feeds a release/reject/collision adjudication — is verified against primary-record text when a primary source is reachable; when it is not, the assertion is typed `SECONDARY_ONLY_VERIFICATION` with the limitation disclosed, never silently promoted (Article XXVIII). The already-sealed Retrieval-Backed Gate pattern is this clause's standing local implementation: the search hit's title and abstract are byte-verified against the INDEPENDENTLY fetched record text (R495 seal 3/3; R498 patent-leg seal 3/3) — the claimant's text is never the verifier's text (Article III).
+
+### The source-property vocabulary (six tracked properties, never collapsed)
+
+Every patent source the machine consults is tracked with SIX SEPARATE properties, because none implies another:
+
+```text
+FREE                 does the source claim to cost nothing?
+ACCESSIBLE           can this machine actually reach it right now?
+AUTOMATABLE          is there a programmatic path (API/bulk), vs web-only?
+LICENSE-COMPATIBLE   are the terms compatible with this machine's use?
+RATE-LIMITED         what call/quota budget applies, and is it metered?
+AUTHENTICATED        what credential does it require, and is one held?
+```
+
+"Free" does not imply anonymous, accessible, automatable, or unlimited (USPTO bulk data is free but account-gated; Espacenet is free but explicitly not for bulk automated retrieval; PatentBear's free tier is free but metered at 20 external calls/month — measured, R497/R498). A source's properties are MEASURED states with provenance, never assumed from the source's self-description (Article VI); operator research alone types a property `OPERATOR_RESEARCH_UNVERIFIED` until measured. The per-source instance data lives in the versioned source registry (the operational layer — the Four Layers rule), not in this article.
+
+### Machine-enforcement points
+
+1. Every patent-derived evidence object entering the pipeline carries the five custody fields; a missing field types `PROVENANCE_INCOMPLETE`.
+2. No surface may report a patent "not found" as a consequence of a typed provider failure.
+3. No coverage or novelty conclusion may derive from `num_hits` or from any single source's zero-result state.
+4. Consequential patent assertions require record-level byte binding (Art. II/III) and primary-record verification when reachable; otherwise the typed `SECONDARY_ONLY_VERIFICATION` limitation.
+5. Source-property claims carry measurement provenance; the registry's per-source states are typed (LIVE_MEASURED / UNMEASURED_THIS_ROUND / REQUIRES_REGISTRATION / REQUIRES_KEY / REQUIRES_ACCOUNT / OPERATOR_RESEARCH_UNVERIFIED), never binary.
+
+This article does not ratify any specific provider, dataset, or architecture — those live in the versioned source registry and the fabric policy document (the Four Layers rule). It does not authorize treating any free source's coverage as sufficient: coverage sufficiency is a measured property, and today no configured source's coverage is measured sufficient for a novelty claim (which is why no novelty verdict exists, Article XLVI).
+
+---
 
 # THE FOUR CONSTITUTIONAL LAYERS
 

@@ -1,0 +1,80 @@
+{
+  "probe_set": "R498_SOURCE_PROBES",
+  "design": "public endpoints only; registration-gated sources are typed by access requirement, never probed around their boundaries",
+  "probes": [
+    {
+      "probe": "hf_common_pile_uspto",
+      "url": "https://huggingface.co/api/datasets/common-pile/uspto",
+      "at_utc": "2026-09-17T19:28:31Z",
+      "http_status": 200,
+      "seconds": 0.24,
+      "body_len": 4632,
+      "payload_excerpt": {
+        "id": "common-pile/uspto",
+        "downloads": 2543,
+        "likes": 1,
+        "tags": [
+          "task_categories:text-generation",
+          "language:en",
+          "size_categories:10M<n<100M",
+          "format:parquet",
+          "modality:text",
+          "library:datasets",
+          "library:dask",
+          "library:mlcroissant"
+        ],
+        "gated": false,
+        "private": false,
+        "cardData_keys": [
+          "language",
+          "pretty_name",
+          "task_categories"
+        ]
+      },
+      "parse": "OK"
+    },
+    {
+      "probe": "hf_patent_index",
+      "url": "https://huggingface.co/api/datasets?search=patent&limit=50",
+      "at_utc": "2026-09-17T19:28:31Z",
+      "http_status": 200,
+      "seconds": 0.24,
+      "body_len": 31503,
+      "payload_excerpt": {
+        "index_len_first_page": 50,
+        "first_ids": [
+          "justicedao/patent-legal-ir-graphrag",
+          "kltobias/patent_corpus_demo",
+          "NortheasternUniversity/big_patent",
+          "Pyke/patent_abstract",
+          "Renukswamy/Patent_sentiment_analysis",
+          "ccdv/patent-classification",
+          "rubrix/big_patent_a_test_100",
+          "kennbyee25/trundle_patents-poc",
+          "kennbyee25/distilroberta-base_tokenized_english_patents",
+          "kennbyee25/distilroberta-base_tokenized_english-patents_2",
+          "kennbyee25/distilroberta-base_tokenized_trundle-patents",
+          "kennbyee25/english-patents_titles"
+        ]
+      },
+      "parse": "OK"
+    },
+    {
+      "probe": "github_patents_public_data",
+      "url": "https://api.github.com/repos/google/patents-public-data",
+      "at_utc": "2026-09-17T19:28:32Z",
+      "http_status": null,
+      "seconds": 0.11,
+      "error": "HTTPError: HTTP Error 403: rate limit exceeded"
+    },
+    {
+      "probe": "epo_lod_sparql",
+      "url": "https://data.epo.org/linked-data/data/sparql?query=SELECT+?s+WHERE+{+?s+?p+?o+}+LIMIT+1&output=json",
+      "at_utc": "2026-09-17T19:28:32Z",
+      "http_status": null,
+      "seconds": 1.31,
+      "error": "HTTPError: HTTP Error 406: Not Acceptable"
+    }
+  ],
+  "reviewer_provenance": "AI_REVIEW"
+}

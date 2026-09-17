@@ -41,8 +41,22 @@ REUSED by F10 -- no second search) and ONE record fetch. F9's garbage-key
 call is measured 401 and does not debit (measured). Every usage object
 is ledgered in the repetition record.
 
-Run:  ELSEVIER_API_KEY=... PATENTBEAR_API_KEY=... python3 rbg_battery.py <repetition_id> <out_json>
+Run:  ELSEVIER_API_KEY=... PATENTBEAR_API_KEY=... python3 rbg_battery.py <repetition_id> <out_json> [--patent-leg-only]
 Credentials via env injection only; never printed.
+
+MODE (v3.1, R498 -- disclosed instrument MODE extension, Art. VII: no
+fixture is re-authored, no expectation is changed; only the run scope):
+  --patent-leg-only  run ONLY the patent-leg fixtures (F6, F9, F10, F11)
+    when the Scopus credential is absent from every LXXIII store. The
+    Scopus fixtures are recorded as SKIPPED_UNCONFIGURED_THIS_RUN with
+    pass=null -- a skip is never a pass and never a fail -- and are
+    excluded from the verdict sequence. The record explicitly references
+    the R495 full-battery seal for the Scopus side and never re-claims
+    it. This mode exists because quota windows and credential
+    availability are per-leg constraints (R497: the seal was typed
+    SEAL_NOT_CLAIMED_QUOTA_INFEASIBLE while the Scopus side stood sealed
+    3/3 from R495); a mode that cannot measure a leg must not silently
+    fail it (Art. LXI) nor silently pass it (Art. IV).
 """
 
 import json
@@ -98,19 +112,39 @@ def resolve_anchor_record(transport):
     })
 
 
-def run_battery(repetition_id):
+# Scopus-side fixture registry for the patent-leg-only mode (the SAME
+# ids/descriptions/expected verdicts as the full battery -- a single
+# source of truth; the mode records skips against this registry).
+SCOPUS_FIXTURE_DEFS = [
+    ("F1", "positive byte verification of the real record title", g.V_VERIFIED),
+    ("F2", "hallucinated passage must fail byte verification", g.V_REFUTED),
+    ("F3", "one-word metamorphic mutation must fail byte verification", g.V_REFUTED),
+    ("F4", "real passage attributed to a different real record must fail", g.V_REFUTED),
+    ("F5", "injected auth failure must yield typed INCOMPLETE, never absence", g.V_INCOMPLETE),
+    ("F7", "verified zero results must be NO_COLLISION_FOUND with not-novelty annotation", g.V_NO_COLLISION),
+    ("F8", "real prior-art collision detected with byte-verified passage", g.V_COLLISION),
+]
+
+
+def run_battery(repetition_id, patent_leg_only=False):
     rep = {"repetition_id": repetition_id,
            "started_utc": g._now(),
            "fixtures": [],
            "engine": "rbg_gate.py",
-           "battery_version": "3",
-           "battery_version_note": "v3 (R497): PatentBear measured LIVE -> disclosed "
-                                   "fixture update (Art. VII): F6 re-authored to assert "
-                                   "PATENT_COVERAGE_LIVE_THIS_RUN, F9 re-anchored to the "
-                                   "measured-401 garbage pb_live_ key, F10/F11 patent-leg "
-                                   "fixtures added; v2 (R496) = multi-provider layer + F9 "
-                                   "under the no-openable-provider reality; v1 (R495) = "
-                                   "single Lens class, 8 fixtures",
+           "battery_version": "3.1",
+           "battery_mode": ("patent_leg_only" if patent_leg_only else "full"),
+           "battery_version_note": "v3.1 (R498): MODE extension only -- --patent-leg-only "
+                                   "runs the patent-leg fixtures (F6, F9, F10, F11) with the "
+                                   "Scopus fixtures typed SKIPPED_UNCONFIGURED_THIS_RUN "
+                                   "(pass=null; never a pass, never a fail) when the Scopus "
+                                   "credential is absent; NO fixture re-authored, NO "
+                                   "expectation changed (Art. VII disclosed). v3 (R497): "
+                                   "PatentBear measured LIVE -> disclosed fixture update: "
+                                   "F6 re-authored to assert PATENT_COVERAGE_LIVE_THIS_RUN, "
+                                   "F9 re-anchored to the measured-401 garbage pb_live_ key, "
+                                   "F10/F11 patent-leg fixtures added; v2 (R496) = "
+                                   "multi-provider layer + F9 under the no-openable-provider "
+                                   "reality; v1 (R495) = single Lens class, 8 fixtures",
            "verdict_vocabulary": "no novelty verdict exists (Art. XLVI)",
            "patentbear_quota_ledger": []}
     t = g.ScopusTransport()
@@ -125,86 +159,118 @@ def run_battery(repetition_id):
             "details": details,
         })
 
-    # ---- shared live evidence resolution ----
-    astate, hit_a, text_a, cust_a = resolve_anchor_record(t)
-    rep["anchor_record_custody"] = cust_a
+    def skipped(fid, description, expected):
+        rep["fixtures"].append({
+            "fixture_id": fid,
+            "description": description,
+            "expected_verdict": expected,
+            "observed_verdict": "SKIPPED_UNCONFIGURED_THIS_RUN",
+            "pass": None,          # a skip is neither pass nor fail
+            "skipped": True,
+            "details": {
+                "skip_reason": "scopus transport unconfigured this run "
+                                "(ELSEVIER_API_KEY absent from every LXXIII "
+                                "store: session env, local vault, Space secret "
+                                "surface names)",
+                "standing_seal_reference": "R495/R495_RBG_SEAL_RECORD.json -- "
+                                "the Scopus side stands sealed 3/3 from R495; "
+                                "NOT re-measured this run and NEVER re-claimed "
+                                "by a patent-leg-only record",
+            },
+        })
 
-    # F1 positive byte verification: claimant quotes the record's REAL title
-    # (search-path field); the verifier binds it against the gate-fetched
-    # text (abstract-path) -- a live cross-path byte consistency measurement.
-    if astate == g.T_LIVE and hit_a and text_a:
-        verdict, detail = g.verify_exact_passage(text_a, hit_a["title"])
-        fixture("F1", "positive byte verification of the real record title",
-                g.V_VERIFIED, verdict, verdict == g.V_VERIFIED,
-                {"custody": cust_a, "verification": detail})
+    # ---- shared live evidence resolution (full mode only) ----
+    if patent_leg_only:
+        for fid, desc, expected in SCOPUS_FIXTURE_DEFS:
+            skipped(fid, desc, expected)
+        rep["anchor_record_custody"] = {
+            "state": "SKIPPED_UNCONFIGURED_THIS_RUN",
+            "note": "patent-leg-only mode: no Scopus call attempted; the "
+                    "Scopus-side fixtures are skips, not failures (Art. LXI "
+                    "-- a credential absence is never a scientific verdict)",
+        }
+        astate, hit_a, text_a, cust_a = None, None, None, None
     else:
-        fixture("F1", "positive byte verification of the real record title",
-                g.V_VERIFIED, g.V_INCOMPLETE, False,
-                {"reason": "anchor record unavailable", "custody": cust_a})
+        astate, hit_a, text_a, cust_a = resolve_anchor_record(t)
+        rep["anchor_record_custody"] = cust_a
 
-    # F2 hallucinated passage attributed to the same real record
-    if astate == g.T_LIVE and text_a:
-        verdict, detail = g.verify_exact_passage(text_a, HALLUCINATED_PASSAGE)
-        fixture("F2", "hallucinated passage must fail byte verification",
-                g.V_REFUTED, verdict, verdict == g.V_REFUTED,
-                {"hallucinated_passage_sha256": g.sha256(HALLUCINATED_PASSAGE),
-                 "verification": detail})
-    else:
-        fixture("F2", "hallucinated passage must fail byte verification",
-                g.V_REFUTED, g.V_INCOMPLETE, False, {"reason": "anchor record unavailable"})
+    if not patent_leg_only:
+        # F1 positive byte verification: claimant quotes the record's REAL title
+        # (search-path field); the verifier binds it against the gate-fetched
+        # text (abstract-path) -- a live cross-path byte consistency measurement.
+        if astate == g.T_LIVE and hit_a and text_a:
+            verdict, detail = g.verify_exact_passage(text_a, hit_a["title"])
+            fixture("F1", "positive byte verification of the real record title",
+                    g.V_VERIFIED, verdict, verdict == g.V_VERIFIED,
+                    {"custody": cust_a, "verification": detail})
+        else:
+            fixture("F1", "positive byte verification of the real record title",
+                    g.V_VERIFIED, g.V_INCOMPLETE, False,
+                    {"reason": "anchor record unavailable", "custody": cust_a})
 
-    # F3 metamorphic one-word mutation of the real title
-    if astate == g.T_LIVE and hit_a and text_a:
-        title = hit_a["title"]
-        if MUTATION_FROM in title:
-            mutated = title.replace(MUTATION_FROM, MUTATION_TO, 1)
-            verdict, detail = g.verify_exact_passage(text_a, mutated)
-            fixture("F3", "one-word metamorphic mutation must fail byte verification",
+        # F2 hallucinated passage attributed to the same real record
+        if astate == g.T_LIVE and text_a:
+            verdict, detail = g.verify_exact_passage(text_a, HALLUCINATED_PASSAGE)
+            fixture("F2", "hallucinated passage must fail byte verification",
                     g.V_REFUTED, verdict, verdict == g.V_REFUTED,
-                    {"mutation": {"from": MUTATION_FROM, "to": MUTATION_TO},
-                     "mutated_sha256": g.sha256(mutated), "verification": detail})
+                    {"hallucinated_passage_sha256": g.sha256(HALLUCINATED_PASSAGE),
+                     "verification": detail})
+        else:
+            fixture("F2", "hallucinated passage must fail byte verification",
+                    g.V_REFUTED, g.V_INCOMPLETE, False, {"reason": "anchor record unavailable"})
+
+        # F3 metamorphic one-word mutation of the real title
+        if astate == g.T_LIVE and hit_a and text_a:
+            title = hit_a["title"]
+            if MUTATION_FROM in title:
+                mutated = title.replace(MUTATION_FROM, MUTATION_TO, 1)
+                verdict, detail = g.verify_exact_passage(text_a, mutated)
+                fixture("F3", "one-word metamorphic mutation must fail byte verification",
+                        g.V_REFUTED, verdict, verdict == g.V_REFUTED,
+                        {"mutation": {"from": MUTATION_FROM, "to": MUTATION_TO},
+                         "mutated_sha256": g.sha256(mutated), "verification": detail})
+            else:
+                fixture("F3", "one-word metamorphic mutation must fail byte verification",
+                        g.V_REFUTED, g.V_INDETERMINATE, False,
+                        {"reason": "mutation anchor word absent from real title",
+                         "title": title})
         else:
             fixture("F3", "one-word metamorphic mutation must fail byte verification",
-                    g.V_REFUTED, g.V_INDETERMINATE, False,
-                    {"reason": "mutation anchor word absent from real title",
-                     "title": title})
-    else:
-        fixture("F3", "one-word metamorphic mutation must fail byte verification",
-                g.V_REFUTED, g.V_INCOMPLETE, False, {"reason": "anchor record unavailable"})
+                    g.V_REFUTED, g.V_INCOMPLETE, False, {"reason": "anchor record unavailable"})
 
-    # F4 wrong-source attribution: record A's title bound to record B's text
-    if astate == g.T_LIVE and hit_a and text_a:
-        state_b, hits_b = t.search(SEARCH_QUERY, count=3)
-        hit_b = next((h for h in (hits_b or []) if h["scopus_id"] != hit_a["scopus_id"]), None)
-        if state_b == g.T_LIVE and hit_b:
-            fstate_b, text_b, meta_b = t.fetch_record_text(hit_b["scopus_id"])
-            if fstate_b == g.T_LIVE and text_b:
-                verdict, detail = g.verify_exact_passage(text_b, hit_a["title"])
-                fixture("F4", "real passage attributed to a different real record must fail",
-                        g.V_REFUTED, verdict, verdict == g.V_REFUTED,
-                        {"claimed_record_id": hit_a["scopus_id"],
-                         "verified_against_record_id": hit_b["scopus_id"],
-                         "verification": detail})
+        # F4 wrong-source attribution: record A's title bound to record B's text
+        if astate == g.T_LIVE and hit_a and text_a:
+            state_b, hits_b = t.search(SEARCH_QUERY, count=3)
+            hit_b = next((h for h in (hits_b or []) if h["scopus_id"] != hit_a["scopus_id"]), None)
+            if state_b == g.T_LIVE and hit_b:
+                fstate_b, text_b, meta_b = t.fetch_record_text(hit_b["scopus_id"])
+                if fstate_b == g.T_LIVE and text_b:
+                    verdict, detail = g.verify_exact_passage(text_b, hit_a["title"])
+                    fixture("F4", "real passage attributed to a different real record must fail",
+                            g.V_REFUTED, verdict, verdict == g.V_REFUTED,
+                            {"claimed_record_id": hit_a["scopus_id"],
+                             "verified_against_record_id": hit_b["scopus_id"],
+                             "verification": detail})
+                else:
+                    fixture("F4", "real passage attributed to a different real record must fail",
+                            g.V_REFUTED, g.V_INCOMPLETE, False,
+                            {"reason": "second record unavailable", "fetch_state": fstate_b})
             else:
                 fixture("F4", "real passage attributed to a different real record must fail",
                         g.V_REFUTED, g.V_INCOMPLETE, False,
-                        {"reason": "second record unavailable", "fetch_state": fstate_b})
+                        {"reason": "second hit unavailable", "search_state": state_b})
         else:
             fixture("F4", "real passage attributed to a different real record must fail",
-                    g.V_REFUTED, g.V_INCOMPLETE, False,
-                    {"reason": "second hit unavailable", "search_state": state_b})
-    else:
-        fixture("F4", "real passage attributed to a different real record must fail",
-                g.V_REFUTED, g.V_INCOMPLETE, False, {"reason": "anchor record unavailable"})
+                    g.V_REFUTED, g.V_INCOMPLETE, False, {"reason": "anchor record unavailable"})
 
-    # F5 injected auth failure -> typed INCOMPLETE, never absence (Art. IV/XXI.3)
-    bad = g.ScopusTransport(api_key="RBG_INVALID_KEY_INJECTED_FOR_FIXTURE_F5")
-    bad_state, _ = bad.search(SEARCH_QUERY, count=1)
-    cv = g.collision_verdict(bad_state, any_relevant_hit=True, any_verified_hit=False)
-    fixture("F5", "injected auth failure must yield typed INCOMPLETE, never absence",
-            g.V_INCOMPLETE, cv,
-            bad_state in (g.T_AUTH_FAILED, g.T_SEARCH_FAILED) and cv == g.V_INCOMPLETE,
-            {"injected_transport_state": bad_state, "collision_verdict": cv})
+        # F5 injected auth failure -> typed INCOMPLETE, never absence (Art. IV/XXI.3)
+        bad = g.ScopusTransport(api_key="RBG_INVALID_KEY_INJECTED_FOR_FIXTURE_F5")
+        bad_state, _ = bad.search(SEARCH_QUERY, count=1)
+        cv = g.collision_verdict(bad_state, any_relevant_hit=True, any_verified_hit=False)
+        fixture("F5", "injected auth failure must yield typed INCOMPLETE, never absence",
+                g.V_INCOMPLETE, cv,
+                bad_state in (g.T_AUTH_FAILED, g.T_SEARCH_FAILED) and cv == g.V_INCOMPLETE,
+                {"injected_transport_state": bad_state, "collision_verdict": cv})
 
     # F6 per-run coverage declaration (v3, Art. VII disclosed update): the
     # layer self-measures ALL registered providers; PatentBear now measures
@@ -253,43 +319,44 @@ def run_battery(repetition_id):
                                    "silently drops the blindness declaration; v3 attack "
                                    "surface: the measured-401 garbage pb_live_ key"})
 
-    # F7 honest zero results: typed NO_RESULTS, verdict NO_COLLISION_FOUND,
-    # with the explicit not-novelty annotation (Art. XXI.2 / XLVI / XXVIII)
-    zstate, _ = t.search(ZERO_QUERY, count=1)
-    zcv = g.collision_verdict(zstate, any_relevant_hit=False, any_verified_hit=False)
-    fixture("F7", "verified zero results must be NO_COLLISION_FOUND with not-novelty annotation",
-            g.V_NO_COLLISION, zcv,
-            zstate in (g.T_NO_RESULTS, g.T_SEARCH_FAILED) and zcv == g.V_NO_COLLISION,
-            {"query": ZERO_QUERY, "transport_state": zstate, "collision_verdict": zcv,
-             "annotation": "NO_COLLISION_FOUND is not novelty; it states only that "
-                           "this query matched zero records in this provider"})
+    if not patent_leg_only:
+        # F7 honest zero results: typed NO_RESULTS, verdict NO_COLLISION_FOUND,
+        # with the explicit not-novelty annotation (Art. XXI.2 / XLVI / XXVIII)
+        zstate, _ = t.search(ZERO_QUERY, count=1)
+        zcv = g.collision_verdict(zstate, any_relevant_hit=False, any_verified_hit=False)
+        fixture("F7", "verified zero results must be NO_COLLISION_FOUND with not-novelty annotation",
+                g.V_NO_COLLISION, zcv,
+                zstate in (g.T_NO_RESULTS, g.T_SEARCH_FAILED) and zcv == g.V_NO_COLLISION,
+                {"query": ZERO_QUERY, "transport_state": zstate, "collision_verdict": zcv,
+                 "annotation": "NO_COLLISION_FOUND is not novelty; it states only that "
+                               "this query matched zero records in this provider"})
 
-    # F8 positive collision adjudication with byte-verified passage
-    if astate == g.T_LIVE and hit_a and text_a:
-        cstate, chits = t.search(COLLISION_QUERY, count=3)
-        rel, verified = [], []
-        per_hit = []
-        if cstate == g.T_LIVE:
-            for h in (chits or [])[:3]:
-                relevance = g.adjudicate_relevance(h["title"], ANCHOR_TERMS)
-                st, txt, meta = t.fetch_record_text(h["scopus_id"])
-                v, d = g.verify_exact_passage(txt, h["title"]) if st == g.T_LIVE else (g.V_INCOMPLETE, {})
-                entry = {"record_id": h["scopus_id"], "relevance": relevance,
-                         "fetch_state": st, "byte_verdict": v,
-                         "fetch_response_sha256": meta.get("response_sha256")}
-                per_hit.append(entry)
-                if relevance["relevant"]:
-                    rel.append(h)
-                if v == g.V_VERIFIED:
-                    verified.append(h)
-        cv = g.collision_verdict(cstate, bool(rel), bool(verified))
-        fixture("F8", "real prior-art collision detected with byte-verified passage",
-                g.V_COLLISION, cv, cv == g.V_COLLISION,
-                {"query": COLLISION_QUERY, "transport_state": cstate,
-                 "hits_adjudicated": per_hit})
-    else:
-        fixture("F8", "real prior-art collision detected with byte-verified passage",
-                g.V_COLLISION, g.V_INCOMPLETE, False, {"reason": "anchor record unavailable"})
+        # F8 positive collision adjudication with byte-verified passage
+        if astate == g.T_LIVE and hit_a and text_a:
+            cstate, chits = t.search(COLLISION_QUERY, count=3)
+            rel, verified = [], []
+            per_hit = []
+            if cstate == g.T_LIVE:
+                for h in (chits or [])[:3]:
+                    relevance = g.adjudicate_relevance(h["title"], ANCHOR_TERMS)
+                    st, txt, meta = t.fetch_record_text(h["scopus_id"])
+                    v, d = g.verify_exact_passage(txt, h["title"]) if st == g.T_LIVE else (g.V_INCOMPLETE, {})
+                    entry = {"record_id": h["scopus_id"], "relevance": relevance,
+                             "fetch_state": st, "byte_verdict": v,
+                             "fetch_response_sha256": meta.get("response_sha256")}
+                    per_hit.append(entry)
+                    if relevance["relevant"]:
+                        rel.append(h)
+                    if v == g.V_VERIFIED:
+                        verified.append(h)
+            cv = g.collision_verdict(cstate, bool(rel), bool(verified))
+            fixture("F8", "real prior-art collision detected with byte-verified passage",
+                    g.V_COLLISION, cv, cv == g.V_COLLISION,
+                    {"query": COLLISION_QUERY, "transport_state": cstate,
+                     "hits_adjudicated": per_hit})
+        else:
+            fixture("F8", "real prior-art collision detected with byte-verified passage",
+                    g.V_COLLISION, g.V_INCOMPLETE, False, {"reason": "anchor record unavailable"})
 
     # ---- patent-leg fixtures (v3, R497): the patent side is now LIVE, so
     # it carries the same standard of proof as the literature side: record-
@@ -384,10 +451,17 @@ def run_battery(repetition_id):
                 {"reason": "patent record text unavailable for verification"})
 
     rep["ended_utc"] = g._now()
-    verdict_seq = [f["observed_verdict"] for f in rep["fixtures"]]
+    # The verdict sequence covers MEASURED fixtures only -- skipped
+    # fixtures carry no verdict and contribute nothing to the sequence
+    # hash (a skip is not a verdict; Art. XXV/LXI).
+    measured = [f for f in rep["fixtures"] if not f.get("skipped")]
+    verdict_seq = [f["observed_verdict"] for f in measured]
+    rep["skipped_fixture_ids"] = [f["fixture_id"] for f in rep["fixtures"]
+                                  if f.get("skipped")]
     rep["observed_verdict_sequence"] = verdict_seq
     rep["verdict_sequence_sha256"] = g.sha256("|".join(verdict_seq))
-    rep["all_fixtures_pass"] = all(f["pass"] for f in rep["fixtures"])
+    rep["all_fixtures_pass"] = (bool(measured)
+                                 and all(f["pass"] for f in measured))
     rep["reviewer_provenance"] = "AI_REVIEW"
     return rep
 
@@ -395,7 +469,8 @@ def run_battery(repetition_id):
 if __name__ == "__main__":
     rep_id = sys.argv[1] if len(sys.argv) > 1 else "R1"
     out_path = sys.argv[2] if len(sys.argv) > 2 else None
-    record = run_battery(rep_id)
+    patent_leg_only = "--patent-leg-only" in sys.argv
+    record = run_battery(rep_id, patent_leg_only=patent_leg_only)
     blob = json.dumps(record, indent=2)
     if out_path:
         with open(out_path, "w") as fh:
