@@ -1997,3 +1997,18 @@ Stage Summary:
 - Deliverable: R487/LIVE_PROOF_CROSSDOMAIN.json — proof_outcome LOOP_CLOSED_ADMITTED, cross_domain_comparison.verdict CROSS_DOMAIN_REPEATED, the full chain in durable bytes, the honest boundary disclosed
 - The path-to-7 ledger: (1) cross-domain repetition ACHIEVED; (2) attacker calibration MEASURED FAIL (FPR 1.0, NOT_CALIBRATED, fail-closed, two-line replicated); (3) survivor to buyer ZIP still open (both closures hold at HELD_FOR_HUMAN_REVIEW)
 - reviewer_provenance=AI_REVIEW
+
+---
+Task ID: R487/R489 reconciliation (race instance 9)
+Agent: Coder 1 (main session, CTO line)
+Task: The terminal-typing divergence on ts_f0880e025e60 resolved by the underlying bytes
+
+Work Log:
+- THE DIVERGENCE: R489 (parallel line, durable-branch harvest without the owner key — lost with their container, BS-021 by design) typed the run STAGE_DEFERRED_TO_KILL_POINT / NOT_CROSS_DOMAIN_CLOSURE from the 09:44-09:54Z checkpoints, where final_state.json read REJECTED (the post-gauntlet intermediate) and no manifest existed; this line (owner-gated API polling) carried it to the true terminal 11:05:59Z: LOOP_CLOSED_ADMITTED / CROSS_DOMAIN_REPEATED.
+- THE BYTES: the checkpoint timeline (created 09:03 -> kill-point IMPROVE 10:30:00->10:37:23Z CHILDREN_ADMITTED delta_real true -> engine:returned 11:05:54 -> terminal:COMPLETE 11:05:59, commit 34d81fb9) and the terminal-commit reads (manifest + final_state INVENTION_UNDER_DEVELOPMENT; the IMPROVE envelope's TWO entries). R489's typing was accurate for the bytes they read; the run continued past their harvest — Art. LXXIV applied to their own observation.
+- THE RULING: R487's terminal record stands (the manifest + terminal marker are the authority); every non-terminal R489 fact stands byte-true (their A2 composition finding, the ring substitution finding, their attempt-2 record — ts_577191649731 genuinely did not close); the lesson recorded: future harvests pin the TERMINAL COMMIT, never the branch tip at observation time.
+- THE RECONCILIATION ARTIFACT: R487/R489_TERMINAL_DIVERGENCE_RECONCILIATION.json (byte-sourced, both lines' boundaries honored).
+
+Stage Summary:
+- The cross-domain closure stands: LOOP_CLOSED_ADMITTED / CROSS_DOMAIN_REPEATED on ts_f0880e025e60 (n=1 cross-domain; closure count n=3 total; package still null — HELD_FOR_HUMAN_REVIEW)
+- reviewer_provenance=AI_REVIEW

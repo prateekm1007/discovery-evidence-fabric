@@ -1,0 +1,37 @@
+{
+  "artifact_type": "R487_R489_TERMINAL_DIVERGENCE_RECONCILIATION",
+  "round": "R487/R489 (race instance 9)",
+  "reviewer_provenance": "AI_REVIEW",
+  "the_divergence": "two records typed the SAME run (ts_f0880e025e60, R458-M1 cross-domain attempt) differently: the parallel R489 line recorded STAGE_DEFERRED_TO_KILL_POINT / NOT_CROSS_DOMAIN_CLOSURE / final REJECTED; this line's R487 record carries LOOP_CLOSED_ADMITTED / CROSS_DOMAIN_REPEATED / terminal COMPLETE",
+  "why_it_happened": {
+    "r489_side": "their session lost the launch capability with its container (the owner key is unrecoverable BY DESIGN, BS-021) — their observation was a durable-branch harvest with no API view. Their harvest window read the branch at the 09:44-09:54Z checkpoints, where final_state.json legitimately read REJECTED (the post-gauntlet, pre-improvement intermediate state) and run_manifest.json did not exist yet (it lands only at the terminal). Their typing was accurate FOR THE BYTES THEY READ",
+    "r487_side": "this line launched the run (owner key held) and polled the owner-gated result API across slices to the true terminal — the API never showed a terminal before 11:05Z, so the harvest waited and read the terminal commit"
+  },
+  "the_byte_evidence": {
+    "checkpoint_timeline_on_the_durable_branch": [
+      "09:03:01Z created:ts_f0880e025e60",
+      "09:05:35Z awaiting_clarification",
+      "09:10:04Z clarification_answered",
+      "09:11:04Z problem_understanding_merged",
+      "09:23:59Z / 09:34:01Z / 09:44:03Z / 09:54:05Z engine_checkpoint (the 17-stage chain completes 09:36:32Z; final_state.json at this stage reads REJECTED — the mid-flight value)",
+      "10:30:00Z -> 10:37:23Z the kill-point IMPROVE EXECUTES (the envelope gains its second entry: CHILDREN_ADMITTED, delta_real true, hash 2964211e -> 5c4616c6)",
+      "11:05:54Z engine:returned",
+      "11:05:59Z terminal:COMPLETE (34d81fb9 — run_manifest.json lands)"
+    ],
+    "at_the_terminal_commit_34d81fb9": {
+      "run_manifest.final_status": "INVENTION_UNDER_DEVELOPMENT (finished 2026-09-17T11:05:53Z)",
+      "final_state.final_status": "INVENTION_UNDER_DEVELOPMENT (epistemic CANDIDATE_CONNECTION — the REJECTED value at 09:44Z was rewritten as the run progressed past the gauntlet)",
+      "envelope_IMPROVE.stage_log": "TWO entries: the chain-time DEFERRED_TO_KILL_POINT (09:36:32Z) AND the kill-point CHILDREN_ADMITTED (10:30:00 -> 10:37:23Z, delta_real true)",
+      "cemetery": "cem:engrun:99f65e4232 (the 178th, append-only)",
+      "survivor_selection": "11 ranked, selected cand:DIV:cross_industry_transfer:unorouter:0be7bab36ad3",
+      "discovery_release": "HELD_FOR_HUMAN_REVIEW (the selected survivor died at the TIE wall: KILLED_NO_DEFENSIBLE_MUTATION, I1_MECHANISM_EVIDENCE_DERIVATION); package_zip null; real_loop_verified false"
+    }
+  },
+  "the_ruling": {
+    "which_record_stands": "R487's LOOP_CLOSED_ADMITTED / CROSS_DOMAIN_REPEATED — the terminal commit is the execution's end (Art. LXXIV's durable state machine: only the terminal commit carries the manifest); a mid-flight file state is an observation, not a terminal",
+    "what_r489_gets_right_and_keeps": "every non-terminal fact they recorded stands byte-true: the 17-stage completion at 09:36:32Z, the gauntlet kill (obvious_combination) with the V4 prior-art firewall holding, evidence_verified true (doi:10.1115/imece2017-71399, 884-char verbatim span), premise PREMISE_COHERENT, their composition finding (the A2 adversarial gauntlet as the terminal rejection authority — a different attacker from the sealed-bar-calibrated engine independent_attack), and their ring finding (the xkiro substitution)",
+    "the_constitutional_lesson": "Art. LXXIV cuts both ways and this divergence is its own proof case: the same observer-independence that let the run complete 34+ minutes past every observer's death also means a durable-branch harvest WITHOUT the terminal commit is not a terminal observation. The mid-flight final_state.json is a legitimate intermediate; the manifest + the terminal marker are the authority. Future harvests must pin the terminal commit, not the branch tip at observation time",
+    "their_attempt_2_stands_as_recorded": "R490's ts_577191649731 (their own cross-domain attempt with the family declared in the submission) genuinely did NOT close (DEFERRED, mechanism_space NO_CANDIDATES, the degraded ring) — their record of it is unaffected by this correction. The cross-domain closure stands on ts_f0880e025e60 alone (n=1 cross-domain, within the closure-count n=3 total)"
+  },
+  "the_correction_is_respectful_and_byte_sourced": "both lines acted within their observation boundaries; neither record fabricated anything; the divergence is resolved by the underlying artifacts (Art. XXIV) — the terminal commit 34d81fb9 — and both lines' records now coexist on main with this reconciliation pointing at the bytes"
+}
