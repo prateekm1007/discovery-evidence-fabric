@@ -91,6 +91,73 @@ MEASUREMENT_PATH = (REPO / "R412" / "CALIBRATION" /
                     "engine_independent_attack_measurement.json")
 SEAL_PATH = REPO / "R412" / "CALIBRATION" / "r412_calibration_seal.json"
 
+# R486: the calibration records are SHIPPED inside the engine tree.
+# The production Space image prunes round directories for size (the
+# R485 deploy removed 64, R447 among them), which erased the v2
+# measurement at runtime and degraded the gate's recorded state to
+# UNKNOWN_NOT_CALIBRATED / measured:null while the repository held a
+# committed NOT_CALIBRATED measurement (FPR 1.0). The in-tree copies
+# below are byte-identical shipment duplicates, tamper-evident via
+# DIGESTS.json; the canonical round-dir records remain the repository
+# authority (Art. X). Digest mismatch fails closed.
+SHIPPED_DIR = Path(__file__).resolve().parent / "calibration_records"
+SHIPPED_DIGESTS = SHIPPED_DIR / "DIGESTS.json"
+
+SHIPPED_FILES = {
+    "r412_engine_independent_attack_measurement.json": MEASUREMENT_PATH,
+    "r412_calibration_seal.json": SEAL_PATH,
+    "r447_attacker_v2_measurement.json": (REPO / "R447" /
+                                          "ATTACKER_V2_RECALIBRATION" /
+                                          "MEASUREMENT.json"),
+    "r447_attacker_v2_seal.json": (REPO / "R447" /
+                                   "ATTACKER_V2_RECALIBRATION" /
+                                   "SEAL.json"),
+}
+
+
+def _digest_ok(path: Path) -> bool:
+    """Re-verify a shipped record's pinned digest AT READ TIME.
+
+    The import-time pin catches image-build-time mutation; this check
+    catches mid-process mutation of any file under the shipment
+    directory before its bytes reach the state derivation (Art. IX:
+    the derivation input must be the committed record, provably
+    unmutated, at every evaluation). Files outside the shipment are
+    read as-is (their integrity is the repository's git custody).
+    """
+    try:
+        path.relative_to(SHIPPED_DIR)
+    except ValueError:
+        return True
+    return _pinned_path(path.name) == path
+
+
+def _pinned_path(shipped_name: str) -> Optional[Path]:
+    """Return the shipped record path after digest verification.
+
+    The shipped copy is trusted only while its bytes match the pinned
+    digest (Art. IX/X discipline: the derivation input must be the
+    committed record, provably unmutated). Any mismatch or missing pin
+    returns None — the caller fails closed.
+    """
+    shipped = SHIPPED_DIR / shipped_name
+    if not shipped.exists():
+        return None
+    try:
+        pins = json.loads(SHIPPED_DIGESTS.read_text())
+    except (OSError, json.JSONDecodeError):
+        return None
+    expected = (pins.get("sha256") or {}).get(shipped_name)
+    if not expected:
+        return None
+    try:
+        actual = hashlib.sha256(shipped.read_bytes()).hexdigest()
+    except OSError:
+        return None
+    if actual != expected:
+        return None
+    return shipped
+
 ESCALATED = "ESCALATED_OBJECTION"
 GATE_VERSION = "attacker_calibration/1.1.0"
 
@@ -108,14 +175,13 @@ GATED_INSTRUMENT_VERSION = "independent_attack/1.0.0"
 # closed (an unmeasured instrument has no measured authority).
 INSTRUMENT_MEASUREMENTS = {
     "independent_attack/1.0.0": {
-        "measurement": MEASUREMENT_PATH,
-        "seal": SEAL_PATH,
+        "measurement": _pinned_path(
+            "r412_engine_independent_attack_measurement.json"),
+        "seal": _pinned_path("r412_calibration_seal.json"),
     },
     "independent_attack/2.0.0": {
-        "measurement": (REPO / "R447" / "ATTACKER_V2_RECALIBRATION" /
-                        "MEASUREMENT.json"),
-        "seal": (REPO / "R447" / "ATTACKER_V2_RECALIBRATION" /
-                 "SEAL.json"),
+        "measurement": _pinned_path("r447_attacker_v2_measurement.json"),
+        "seal": _pinned_path("r447_attacker_v2_seal.json"),
     },
     # R450 §10: v2.1.0 adds the INTERVENTION suggestion output — an
     # ADDITIVE, NON-VERDICT field. The KILL/RISK/SURVIVE/ABSTAIN
@@ -131,10 +197,8 @@ INSTRUMENT_MEASUREMENTS = {
     # calibration discipline is NOT weakened to produce improvement
     # suggestions (the directive's explicit constraint).
     "independent_attack/2.1.0": {
-        "measurement": (REPO / "R447" / "ATTACKER_V2_RECALIBRATION" /
-                        "MEASUREMENT.json"),
-        "seal": (REPO / "R447" / "ATTACKER_V2_RECALIBRATION" /
-                 "SEAL.json"),
+        "measurement": _pinned_path("r447_attacker_v2_measurement.json"),
+        "seal": _pinned_path("r447_attacker_v2_seal.json"),
         "inherited_from": "independent_attack/2.0.0",
         "inheritance_basis": (
             "verdict logic byte-identical; additive non-verdict output "
@@ -176,6 +240,24 @@ def resolve_state(measurement_path: Optional[Path] = None,
         if entry:
             measurement_path = entry["measurement"]
             seal_path = entry["seal"]
+            if not measurement_path or not seal_path:
+                # R486: the shipped record failed its digest pin or is
+                # absent — fail closed WITHOUT falling back to another
+                # instrument's record (a v2 state derived from the v1
+                # measurement would be a silent semantic substitution,
+                # Art. IV/XXVIII).
+                return {
+                    "gate_version": GATE_VERSION,
+                    "instrument": instrument_version,
+                    "reviewer_provenance": "AI_REVIEW",
+                    "state": "UNKNOWN_NOT_CALIBRATED",
+                    "terminal_kill_admissible": False,
+                    "reason": ("the shipped calibration record for this "
+                               "instrument version is absent or failed "
+                               "its pinned-digest verification — no "
+                               "measured terminal authority (Art. L; "
+                               "fail-closed)"),
+                }
         else:
             return {
                 "gate_version": GATE_VERSION,
@@ -201,6 +283,12 @@ def resolve_state(measurement_path: Optional[Path] = None,
                 "reason": (f"no committed measurement at {m_path.name} "
                            "— an unmeasured instrument has no measured "
                            "terminal authority (Art. L; fail-closed)")}
+    if not _digest_ok(m_path):
+        return {**base, "state": "UNREADABLE_NOT_CALIBRATED",
+                "terminal_kill_admissible": False,
+                "reason": ("the shipped measurement failed its "
+                           "pinned-digest re-verification at read "
+                           "time — fail-closed (Art. IX/L)")}
     try:
         record = json.loads(m_path.read_text())
     except (OSError, json.JSONDecodeError):
