@@ -129,7 +129,7 @@ def _check_google_patents() -> SourceStatus:
 def _check_lens_patent() -> SourceStatus:
     """Check Lens Patent API (not scholarly)."""
     from pathlib import Path
-    keys_file = Path("/home/z/my-project/discovery-evidence-fabric/.env.keys")
+    keys_file = Path(__file__).resolve().parents[2] / ".env.keys"
     token = ""
     if keys_file.exists():
         for line in keys_file.read_text().splitlines():
@@ -180,7 +180,7 @@ def _check_lens_patent() -> SourceStatus:
 def _check_patsnap() -> SourceStatus:
     """Check PatSnap search-count endpoint."""
     from pathlib import Path
-    keys_file = Path("/home/z/my-project/discovery-evidence-fabric/.env.keys")
+    keys_file = Path(__file__).resolve().parents[2] / ".env.keys"
     key = ""
     if keys_file.exists():
         for line in keys_file.read_text().splitlines():
@@ -231,7 +231,7 @@ def _check_patsnap() -> SourceStatus:
 def _check_patent_bear() -> SourceStatus:
     """Check Patent Bear MCP quota."""
     from pathlib import Path
-    keys_file = Path("/home/z/my-project/discovery-evidence-fabric/.env.keys")
+    keys_file = Path(__file__).resolve().parents[2] / ".env.keys"
     key = ""
     if keys_file.exists():
         for line in keys_file.read_text().splitlines():
@@ -266,7 +266,7 @@ def _check_patent_bear() -> SourceStatus:
 def patsnap_search_count(query: str) -> Optional[int]:
     """Search PatSnap for patent count (works with current key tier)."""
     from pathlib import Path
-    keys_file = Path("/home/z/my-project/discovery-evidence-fabric/.env.keys")
+    keys_file = Path(__file__).resolve().parents[2] / ".env.keys"
     key = ""
     if keys_file.exists():
         for line in keys_file.read_text().splitlines():

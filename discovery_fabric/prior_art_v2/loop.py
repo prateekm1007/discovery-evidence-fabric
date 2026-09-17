@@ -901,6 +901,6 @@ if __name__ == "__main__":
         initial_claim=test_claim,
     )
 
-    out = Path("/home/z/my-project/discovery-evidence-fabric/patent_sources/v2/loop_smoke_test.json")
+    out = Path(__file__).resolve().parents[2] / "patent_sources" / "v2" / "loop_smoke_test.json"
     out.write_text(json.dumps(asdict(result), indent=2))
     print(f"\nSmoke test result: {out}")

@@ -115,7 +115,7 @@ def _load_uspto_key() -> str:
 
     Accepts USPTO_ODP_API_KEY or PATENTSVIEW_API_KEY (either unlocks the
     new PatentsView search API; absent -> callers fail AUTH_FAILED)."""
-    keys_file = Path("/home/z/my-project/discovery-evidence-fabric/.env.keys")
+    keys_file = Path(__file__).resolve().parents[2] / ".env.keys"
     if keys_file.exists():
         for line in keys_file.read_text().splitlines():
             for name in ("USPTO_ODP_API_KEY", "PATENTSVIEW_API_KEY"):

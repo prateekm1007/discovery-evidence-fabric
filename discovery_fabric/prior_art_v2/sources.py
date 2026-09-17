@@ -1106,7 +1106,7 @@ if __name__ == "__main__":
             print(f"      snippet: {h.snippet[:200]}")
 
     # Save self-test output
-    out = Path("/home/z/my-project/discovery-evidence-fabric/patent_sources/v2/adapter_self_test.json")
+    out = Path(__file__).resolve().parents[2] / "patent_sources" / "v2" / "adapter_self_test.json"
     out.write_text(json.dumps({
         "test_query": test_query,
         "timestamp": _now_utc(),

@@ -43,7 +43,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 # Load keys
-KEYS_FILE = Path("/home/z/my-project/discovery-evidence-fabric/.env.keys")
+KEYS_FILE = Path(__file__).resolve().parents[2] / ".env.keys"
 def _load_keys() -> Dict[str, str]:
     if not KEYS_FILE.exists(): return {}
     out = {}
@@ -643,7 +643,7 @@ if __name__ == "__main__":
             print(f"    {a.method}: success={a.success}, claims={a.claim_count}, error={a.error}")
 
     # Save self-test
-    out = Path("/home/z/my-project/discovery-evidence-fabric/patent_sources/v3/retrieval_self_test.json")
+    out = Path(__file__).resolve().parents[2] / "patent_sources" / "v3" / "retrieval_self_test.json"
     out.parent.mkdir(parents=True, exist_ok=True)
     results = []
     for pid in test_patents:

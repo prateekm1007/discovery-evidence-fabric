@@ -106,7 +106,7 @@ class LLMClient:
         self._failed_calls = 0
         # Load NVIDIA API key
         from pathlib import Path as _P
-        _keys_file = _P("/home/z/my-project/discovery-evidence-fabric/.env.keys")
+        _keys_file = _P(__file__).resolve().parents[2] / ".env.keys"
         self._api_key = ""
         if _keys_file.exists():
             for line in _keys_file.read_text().splitlines():

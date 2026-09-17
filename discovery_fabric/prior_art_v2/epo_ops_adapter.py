@@ -67,7 +67,7 @@ FAMILY_TYPES = ["INPADOC", "DOCDB", "EXTEND"]
 # ----------------------- AUTH -----------------------
 def _load_epo_credentials() -> Tuple[str, str]:
     """Load EPO OPS OAuth credentials from .env.keys or env vars."""
-    keys_file = Path("/home/z/my-project/discovery-evidence-fabric/.env.keys")
+    keys_file = Path(__file__).resolve().parents[2] / ".env.keys"
     if keys_file.exists():
         for line in keys_file.read_text().splitlines():
             if line.startswith("EPO_OPS_CONSUMER_KEY="):

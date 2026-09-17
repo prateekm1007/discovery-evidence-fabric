@@ -139,7 +139,7 @@ def _get_client():
     project_id = os.environ.get("BIGQUERY_PROJECT", "")
 
     # Also check .env.keys
-    keys_file = Path("/home/z/my-project/discovery-evidence-fabric/.env.keys")
+    keys_file = Path(__file__).resolve().parents[2] / ".env.keys"
     if keys_file.exists():
         for line in keys_file.read_text().splitlines():
             if line.startswith("BIGQUERY_PROJECT="):

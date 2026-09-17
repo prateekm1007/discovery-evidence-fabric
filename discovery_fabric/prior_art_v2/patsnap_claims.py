@@ -66,7 +66,7 @@ def fetch_patsnap_claims(patent_number: str) -> Optional[PatSnapClaimRecord]:
 
     Returns PatSnapClaimRecord with actual claim text, or None if failed.
     """
-    keys_file = Path("/home/z/my-project/discovery-evidence-fabric/.env.keys")
+    keys_file = Path(__file__).resolve().parents[2] / ".env.keys"
     api_key = ""
     if keys_file.exists():
         for line in keys_file.read_text().splitlines():
@@ -239,6 +239,6 @@ if __name__ == "__main__":
     print(json.dumps(matrix, indent=2))
 
     # Save
-    out = Path("/home/z/my-project/discovery-evidence-fabric/patent_sources/PATENT_SOURCE_CAPABILITY_MATRIX.json")
+    out = Path(__file__).resolve().parents[2] / "patent_sources" / "PATENT_SOURCE_CAPABILITY_MATRIX.json"
     out.write_text(json.dumps(matrix, indent=2))
     print(f"\nSaved: {out}")

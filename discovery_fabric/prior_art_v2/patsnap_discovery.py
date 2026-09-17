@@ -149,7 +149,7 @@ class ClaimRetrievalAttempt:
 
 # ----------------------- API CLIENT -----------------------
 def _load_api_key() -> str:
-    keys_file = Path("/home/z/my-project/discovery-evidence-fabric/.env.keys")
+    keys_file = Path(__file__).resolve().parents[2] / ".env.keys"
     if not keys_file.exists():
         return ""
     for line in keys_file.read_text().splitlines():
