@@ -1,6 +1,6 @@
 {
  "invention_id": {
-  "value": "inv:ui_flat_faced_cam_follower_rolling_contact_fa_636438:af62fefaec33",
+  "value": "inv:ui_flat_faced_cam_follower_surface_fatigue_sp_640895:c06492bc892a",
   "epistemic_class": "COMPUTED",
   "origin_stage": "INVENTION_SPEC",
   "evidence_ids": [],
@@ -8,16 +8,16 @@
  },
  "problem": {
   "value": {
-   "problem_id": "ui_flat_faced_cam_follower_rolling_contact_fa_636438",
+   "problem_id": "ui_flat_faced_cam_follower_surface_fatigue_sp_640895",
    "device": "rotary cam-driven folding station",
-   "failure": "Documented problem 'flat-faced cam follower rolling-contact fatigue spalling' concerning rotary cam-driven folding station. User-submitted engineering problem (session input): \"A packaging line runs a rotary cam-driven folding station at 420 cycles per minute, 20 hours a day. The flat-faced cam followers, 16 millimetres in diameter on fixed studs, develop surface fatigue spalls within 6 to 9 weeks of service, and metal debris from the spalling contaminates the food-contact\".  ROUTING: fra_rail_accidents: not queried — the failure query is free text and this source answers date-floor questions only (grammar: YYYY-MM-DD date floor ($where date >= X)). ROUTING: doe_osti: routing state SUSPENDED_RELEVANCE — measured relevance instability (R375: same fusion papers relevant 3 -> 0; pooled relevant-rate 0.175 pre-fix; DETERMINISM_GAP flagged in the R394 production audit) — records poison synthesis-feeding retrieval more than they feed it until relevance is semantically adjudicated; reinstatement: the Phase P1 semantic reranker lands (semantic relevance adjudication between query and record, replacing lexical overlap); flip to ACTIVE + a measured relevance re-run + worklog entry. [fra_rail_accidents] retrieval status NOT_QUERIED_GRAMMAR (planned query is free text; source grammar is a YYYY-MM-DD date floor (R443 routing decision, not absence)) — provider outcome recorded, not treated as absence (Art. XXI.3). [doe_osti] retrieval status NOT_QUERIED_SUSPENDED_RELEVANCE (engine routing decision (R399 W3): SUSPENDED_RELEVANCE — not a provider failure and not absence) — provider outcome recorded, not treated as absence (Art. XXI.3). Problem-existence basis: NO SOURCE RETURNED RECORDS — problem existence UNVERIFIED by live evidence (Art. XX); treat as hypothesis.",
-   "failure_mode": "flat-faced cam follower rolling-contact fatigue spalling",
-   "constraint": "maintain 420 cycles per minute on the same cam mechanism with no cam profile change, no change to the 16 mm follower diameter class, and no maintenance step more than once per week."
+   "failure": "Documented problem 'flat-faced cam follower surface fatigue spalling' concerning rotary cam-driven folding station. User-submitted engineering problem (session input): \"A packaging line runs a rotary cam-driven folding station at 420 cycles per minute, 20 hours a day. The flat-faced cam followers, 16 millimetres in diameter on fixed studs, develop surface fatigue spalls within 6 to 9 weeks of service, and metal debris from the spalling contaminates the food-contact\".  ROUTING: fra_rail_accidents: not queried — the failure query is free text and this source answers date-floor questions only (grammar: YYYY-MM-DD date floor ($where date >= X)). ROUTING: doe_osti: routing state SUSPENDED_RELEVANCE — measured relevance instability (R375: same fusion papers relevant 3 -> 0; pooled relevant-rate 0.175 pre-fix; DETERMINISM_GAP flagged in the R394 production audit) — records poison synthesis-feeding retrieval more than they feed it until relevance is semantically adjudicated; reinstatement: the Phase P1 semantic reranker lands (semantic relevance adjudication between query and record, replacing lexical overlap); flip to ACTIVE + a measured relevance re-run + worklog entry. [fra_rail_accidents] retrieval status NOT_QUERIED_GRAMMAR (planned query is free text; source grammar is a YYYY-MM-DD date floor (R443 routing decision, not absence)) — provider outcome recorded, not treated as absence (Art. XXI.3). [doe_osti] retrieval status NOT_QUERIED_SUSPENDED_RELEVANCE (engine routing decision (R399 W3): SUSPENDED_RELEVANCE — not a provider failure and not absence) — provider outcome recorded, not treated as absence (Art. XXI.3). Problem-existence basis: NO SOURCE RETURNED RECORDS — problem existence UNVERIFIED by live evidence (Art. XX); treat as hypothesis.",
+   "failure_mode": "flat-faced cam follower surface fatigue spalling",
+   "constraint": "fixed certified cam profile, fixed 16 mm follower diameter, retained 420 cycles per minute, and no maintenance more than once per week"
   },
   "epistemic_class": "SOURCE_FACT",
   "origin_stage": "PROBLEM",
   "evidence_ids": [
-   "problem:d18a5fce"
+   "problem:d51f0d46"
   ],
   "note": "operator-supplied problem statement, custodied as the run's content-hashed problem.json artifact"
  },
@@ -30,26 +30,11 @@
  },
  "mechanism": {
   "value": {
-   "mechanism": "Guide clearance in the flat-faced follower linkage induces impact and friction forces that drive non-linear dynamic motion of the follower stem.",
-   "intervention": "Reduce or eliminate the clearance between the 16 mm flat-faced cam follower stem and its guide bore on the fixed stud to the minimum value identified by the paper's non-linear dynamic analysis as suppressing chaotic response, thereby eliminating the impact loads that initiate rolling-contact fatigue spalling without altering the cam profile, follower diameter class, cycle rate, or maintenance interval.",
-   "expected_effect": "Elimination of clearance-induced impact forces stabilizes the follower kinematics, preventing the transient contact stress peaks that cause surface fatigue spalling within 6 to 9 weeks, maintaining continuous operation at 420 cycles per minute without food-contact metal debris contamination.",
+   "mechanism": "The paper identifies clearance between the flat-faced follower and its guides as a source of impact and friction during follower motion, and shows that non-linear dynamic analysis (validated against experiment via the largest Lyapunov exponent) can quantify how this clearance-driven impact and friction governs follower motion — i.e., excessive guide clearance converts steady cam-driven displacement into impact-loaded, non-linear follower behavior that raises cyclic contact stress on the follower face, promoting surface fatigue spalling.",
+   "intervention": "Because the cam profile, 16 mm follower diameter, and 420 cycles/min are fixed, intervene on the guide-to-follower-stud clearance instead: build the paper's non-linear dynamic model of the folding-station cam-follower linkage (including clearance, impact, and friction), use it to identify the clearance value that minimizes impact severity, and re-specify the follower studs with close-fitting guide bushings/sleeves to hold that reduced clearance — with the certified cam geometry and follower diameter unchanged and no added maintenance beyond the weekly window.",
+   "expected_effect": "Lower impact and friction forces at the cam-follower interface reduce cyclic Hertzian contact stress on the 16 mm flat-faced follower, extending surface fatigue life well beyond the current 6–9 weeks and cutting the metal debris that contaminates the food-contact zone.",
    "mechanism_source_span": "The system has clearances between the flat-faced follower and the guides and the effect of clearance is analyzed.",
-   "span_derivation": {
-    "n_shared": 6,
-    "shared_terms": [
-     "between",
-     "clearance",
-     "faced",
-     "flat",
-     "follower",
-     "guide"
-    ],
-    "span_terms_n": 10,
-    "ratio": 0.6,
-    "underived": false,
-    "state": "MEASURED",
-    "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
-   }
+   "span_derivation": null
   },
   "epistemic_class": "MODELLED",
   "origin_stage": "SYNTHESIZE",
@@ -61,10 +46,10 @@
  "causal_chain": {
   "value": {
    "source_observation": "Non-Linear Dynamic Analysis of a Cam With Flat-Faced Follower Linkage Mechanism",
-   "mechanism": "Guide clearance in the flat-faced follower linkage induces impact and friction forces that drive non-linear dynamic motion of the follower stem.",
+   "mechanism": "The paper identifies clearance between the flat-faced follower and its guides as a source of impact and friction during follower motion, and shows that non-linear dynamic analysis (validated against experiment via the largest Lyapunov exponent) can quantify how this clearance-driven impact and friction governs follower motion — i.e., excessive guide clearance converts steady cam-driven displacement into impact-loaded, non-linear follower behavior that raises cyclic contact stress on the follower face, promoting surface fatigue spalling.",
    "intervention_site": "rotary cam-driven folding station",
-   "expected_effect": "Elimination of clearance-induced impact forces stabilizes the follower kinematics, preventing the transient contact stress peaks that cause surface fatigue spalling within 6 to 9 weeks, maintaining continuous operation at 420 cycles per minute without food-contact metal debris contamination.",
-   "falsification_test": "Operate the folding station at 420 cycles per minute with the guide clearance reduced to the simulation-optimized value; inspect the 16 mm flat-faced follower contact face for spalling after 10 weeks of 20-hour-per-day service — if spalling or metal debris is present, the intervention fails."
+   "expected_effect": "Lower impact and friction forces at the cam-follower interface reduce cyclic Hertzian contact stress on the 16 mm flat-faced follower, extending surface fatigue life well beyond the current 6–9 weeks and cutting the metal debris that contaminates the food-contact zone.",
+   "falsification_test": "Replicate the paper's optical-marker method on the running line: mount a high-resolution optical marker on a follower stem to capture y-direction motion at 420 cycles/min, extract the largest Lyapunov exponent and impact severity for the current clearance, then repeat with progressively reduced guide clearance; if reducing clearance does not measurably decrease impact severity/Lyapunov exponent and does not extend follower spalling life in a side-by-side trial, the mechanism is falsified."
   },
   "epistemic_class": "MODELLED",
   "origin_stage": "SYNTHESIZE",
@@ -104,7 +89,7 @@
  "prior_art": {
   "value": {
    "status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
-   "legacy_status": "",
+   "legacy_status": "LIKELY_PRIOR_ART_EXISTS",
    "differentiation_resolution": {
     "state": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
     "epistemic_class": "SEARCH_RESULT",
@@ -115,61 +100,61 @@
     "n_search_errors": 10,
     "search_errors": [
      {
-      "query": "follower followers folding station flat faced",
+      "query": "cam driven follower surface fatigue followers",
       "source": "google_patents",
       "error": "HTTP 503",
       "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
      },
      {
-      "query": "follower followers folding station flat faced",
+      "query": "cam driven follower surface fatigue followers",
       "source": "lens_patent",
       "error": "LENS_API_TOKEN not configured",
       "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
      },
      {
-      "query": "follower clearance flat faced linkage induces",
+      "query": "cam follower driven contact surface fatigue",
       "source": "google_patents",
       "error": "HTTP 503",
       "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
      },
      {
-      "query": "follower clearance flat faced linkage induces",
+      "query": "cam follower driven contact surface fatigue",
       "source": "lens_patent",
       "error": "LENS_API_TOKEN not configured",
       "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
      },
      {
-      "query": "eliminate follower clearance flat faced cam dynamic impact",
+      "query": "cam follower paper folding station friction clearance dynamic",
       "source": "google_patents",
       "error": "HTTP 503",
       "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
      },
      {
-      "query": "eliminate follower clearance flat faced cam dynamic impact",
+      "query": "cam follower paper folding station friction clearance dynamic",
       "source": "lens_patent",
       "error": "LENS_API_TOKEN not configured",
       "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
      },
      {
-      "query": "follower prevention suppression elimination clearance preventing",
+      "query": "cam friction extending cutting clearance folding",
       "source": "google_patents",
       "error": "HTTP 503",
       "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
      },
      {
-      "query": "follower prevention suppression elimination clearance preventing",
+      "query": "cam friction extending cutting clearance folding",
       "source": "lens_patent",
       "error": "LENS_API_TOKEN not configured",
       "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
      },
      {
-      "query": "clearance impact forces elimination induced stabilizes",
+      "query": "cam driven follower contact surface fatigue",
       "source": "google_patents",
       "error": "HTTP 503",
       "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
      },
      {
-      "query": "clearance impact forces elimination induced stabilizes",
+      "query": "cam driven follower contact surface fatigue",
       "source": "lens_patent",
       "error": "LENS_API_TOKEN not configured",
       "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
@@ -220,26 +205,52 @@
    "queries": [
     {
      "query_class": "ENTITY",
-     "query": "follower followers folding station flat faced"
+     "query": "cam driven follower surface fatigue followers"
     },
     {
      "query_class": "MECHANISM",
-     "query": "follower clearance flat faced linkage induces"
+     "query": "cam follower driven contact surface fatigue"
     },
     {
      "query_class": "DISTINGUISHING",
-     "query": "eliminate follower clearance flat faced cam dynamic impact"
+     "query": "cam follower paper folding station friction clearance dynamic"
     },
     {
      "query_class": "FUNCTION",
-     "query": "follower prevention suppression elimination clearance preventing"
+     "query": "cam friction extending cutting clearance folding"
     },
     {
      "query_class": "ADJACENT",
-     "query": "clearance impact forces elimination induced stabilizes"
+     "query": "cam driven follower contact surface fatigue"
     }
    ],
-   "scientific": []
+   "scientific": [
+    {
+     "title": "Case Studies of Robots and Automation as Health/Safety Interventions in Small Manufacturing Enterprises.",
+     "id": "37206917",
+     "query": "rotary cam-driven folding station Documented problem"
+    },
+    {
+     "title": "Full GSA 2025 Abstract Book PDF",
+     "id": "PMC12755232",
+     "query": "rotary cam-driven folding station Documented problem"
+    },
+    {
+     "title": "Special Collection: Abstracts from IUNS-ICN Paris 2025",
+     "id": "PMC13439031",
+     "query": "rotary cam-driven folding station Documented problem"
+    },
+    {
+     "title": "A dynamic lightweight blockchain sharding protocol for autonomous collaborative combat of UAV swarms in denied environments.",
+     "id": "41107377",
+     "query": "paper identifies clearance between flat-faced follower"
+    },
+    {
+     "title": "Special Collection: Abstracts from IUNS-ICN Paris 2025",
+     "id": "PMC13439031",
+     "query": "paper identifies clearance between flat-faced follower"
+    }
+   ]
   },
   "epistemic_class": "COMPUTED",
   "origin_stage": "COLLISION",
@@ -248,7 +259,7 @@
  },
  "distinguishing_features": {
   "value": {
-   "intervention": "Reduce or eliminate the clearance between the 16 mm flat-faced cam follower stem and its guide bore on the fixed stud to the minimum value identified by the paper's non-linear dynamic analysis as suppressing chaotic response, thereby eliminating the impact loads that initiate rolling-contact fatigue spalling without altering the cam profile, follower diameter class, cycle rate, or maintenance interval.",
+   "intervention": "Because the cam profile, 16 mm follower diameter, and 420 cycles/min are fixed, intervene on the guide-to-follower-stud clearance instead: build the paper's non-linear dynamic model of the folding-station cam-follower linkage (including clearance, impact, and friction), use it to identify the clearance value that minimizes impact severity, and re-specify the follower studs with close-fitting guide bushings/sleeves to hold that reduced clearance — with the certified cam geometry and follower diameter unchanged and no added maintenance beyond the weekly window.",
    "vs_nearest_prior_art": [],
    "surviving_differentiators": null,
    "note": "R376: nearest entries are mechanism-relevant family representatives with per-family coverage and evidence tier; differences below the term-overlap thresholds are recorded, not claim-charted (Art. XXVIII)"
@@ -262,13 +273,13 @@
  },
  "constraints": {
   "value": {
-   "stated_constraint": "maintain 420 cycles per minute on the same cam mechanism with no cam profile change, no change to the 16 mm follower diameter class, and no maintenance step more than once per week.",
-   "failure_mode_of_device": "flat-faced cam follower rolling-contact fatigue spalling"
+   "stated_constraint": "fixed certified cam profile, fixed 16 mm follower diameter, retained 420 cycles per minute, and no maintenance more than once per week",
+   "failure_mode_of_device": "flat-faced cam follower surface fatigue spalling"
   },
   "epistemic_class": "SOURCE_FACT",
   "origin_stage": "PROBLEM",
   "evidence_ids": [
-   "problem:d18a5fce"
+   "problem:d51f0d46"
   ],
   "note": "operator-stated constraints, custodied with the problem.json artifact"
  },
@@ -276,13 +287,13 @@
   "value": [
    {
     "dimension": "unsupported_mechanism",
-    "attack_verdict": "PASS",
+    "attack_verdict": "KILLED",
     "epistemic_class": "COMPUTED",
     "origin_stage": "ATTACK"
    },
    {
     "dimension": "weak_transfer",
-    "attack_verdict": "PASS",
+    "attack_verdict": "KILLED",
     "epistemic_class": "COMPUTED",
     "origin_stage": "ATTACK"
    },
@@ -306,13 +317,13 @@
    },
    {
     "dimension": "boundary_failure",
-    "attack_verdict": "PASS",
+    "attack_verdict": "INSUFFICIENT_EVIDENCE (INSUFFICIENT_EVIDENCE)",
     "epistemic_class": "COMPUTED",
     "origin_stage": "ATTACK"
    },
    {
     "dimension": "engineering_infeasibility",
-    "attack_verdict": "PASS",
+    "attack_verdict": "KILLED",
     "epistemic_class": "COMPUTED",
     "origin_stage": "ATTACK"
    },
@@ -331,19 +342,19 @@
  "killer_experiment": {
   "value": {
    "selected": "falsification_test_from_candidate",
-   "eig": 0.32128008174183986,
-   "eig_per_cost": 0.32128008174183986,
+   "eig": 0.30342521928732036,
+   "eig_per_cost": 0.30342521928732036,
    "definition": "physical bench/clinical experiment — NOT simulation",
    "hypotheses": [
     {
      "name": "H_effect_holds",
-     "description": "expected effect holds: Reducing guide clearance suppresses non-linear impact forces transmitted through the follower stem to the flat face, lowering peak cyclic contact stress below the rolling-contact fatigue threshold of ",
+     "description": "expected effect holds: Lower impact and friction forces at the cam-follower interface reduce cyclic Hertzian contact stress on the 16 mm flat-faced follower, extending surface fatigue life well beyond the current 6–9 weeks ",
      "prior_probability": 0.6,
      "provenance": {
       "source": "adjudication.evidence_verification + candidate text",
       "epistemic_class": "MODEL_DERIVED",
       "uncertainty": "priors/likelihoods derived from text analysis, not measurement",
-      "created_at": "2026-09-17T09:36:32.254971+00:00"
+      "created_at": "2026-09-17T10:38:04.296343+00:00"
      }
     },
     {
@@ -354,15 +365,15 @@
       "source": "adjudication.evidence_verification + candidate text",
       "epistemic_class": "MODEL_DERIVED",
       "uncertainty": "priors/likelihoods derived from text analysis, not measurement",
-      "created_at": "2026-09-17T09:36:32.254971+00:00"
+      "created_at": "2026-09-17T10:38:04.296343+00:00"
      }
     }
    ],
    "options_ranked": [
     {
      "name": "falsification_test_from_candidate",
-     "eig": 0.32128008174183986,
-     "eig_per_cost": 0.32128008174183986,
+     "eig": 0.30342521928732036,
+     "eig_per_cost": 0.30342521928732036,
      "minimum_epistemic_class": "EIGEpistemicClass.MODEL_DERIVED",
      "can_influence_real_experiment": true
     },
@@ -399,6 +410,14 @@
     "frozen": false
    },
    {
+    "id": "doi:10.3390/lubricants7040031",
+    "title": "Lubrication Analyses of Cam and Flat-Faced Follower",
+    "source_uri": "https://doi.org/10.3390/lubricants7040031",
+    "doi": "10.3390/lubricants7040031",
+    "content_hash": "bbfca9fc3a7e87b1f19c0760168590986a8875dcf801e815b5259c3e6b5fb76a",
+    "frozen": false
+   },
+   {
     "id": "doi:10.4236/mme.2024.142005",
     "title": "FEA-Based Fatigue Life Assessment of Cycloidal Displacement Cam and Flat-Faced Follower Mechanism",
     "source_uri": "https://doi.org/10.4236/mme.2024.142005",
@@ -431,14 +450,6 @@
     "frozen": false
    },
    {
-    "id": "title:c386f06429a1f97b",
-    "title": "Special Collection: Abstracts from IUNS-ICN Paris 2025",
-    "source_uri": "",
-    "doi": null,
-    "content_hash": "3c93cae35fb26d7b629171100fb5ae0d22a737bc6bcaf77cbe7b2521b0697b19",
-    "frozen": false
-   },
-   {
     "id": "doi:10.31274/rtd-180813-8830",
     "title": "Fatigue life investigation for cams with translating roller-follower and translating flat-face follower systems",
     "source_uri": "https://doi.org/10.31274/rtd-180813-8830",
@@ -447,19 +458,19 @@
     "frozen": false
    },
    {
-    "id": "doi:10.3990/1.9789036561112",
-    "title": "Rolling-sliding dynamics and optimization of large-scale cam-roller contacts : introducing rolling pairs with shifting contact geometry",
-    "source_uri": "https://doi.org/10.3990/1.9789036561112",
-    "doi": "10.3990/1.9789036561112",
-    "content_hash": "6f45fad7ee17edf88769d29d9383d22b177216b200be4a9048dbde550f414a58",
-    "frozen": false
-   },
-   {
     "id": "doi:10.3990/1.9789036546669",
     "title": "Towards a fundamental understanding of the tribological behavior of cam-roller follower contacts",
     "source_uri": "https://doi.org/10.3990/1.9789036546669",
     "doi": "10.3990/1.9789036546669",
     "content_hash": "c1894d6c005b7657c256d61ca9d5895ef38b6f6ec38565c9f24032adc5f624ef",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.33915/etd.8553",
+    "title": "Comparison of a Pin Cam and an Inverted Pin Cam design based on the parameters used for the axial vane rotary engine (beta version).",
+    "source_uri": "https://doi.org/10.33915/etd.8553",
+    "doi": "10.33915/etd.8553",
+    "content_hash": "1abcc5eae6f71a608cbe6d8e8bd64ca20ccecf5ee510c6458c5b81a769854f76",
     "frozen": false
    },
    {
@@ -487,19 +498,27 @@
     "frozen": false
    },
    {
-    "id": "doi:10.3390/lubricants7040031",
-    "title": "Lubrication Analyses of Cam and Flat-Faced Follower",
-    "source_uri": "https://doi.org/10.3390/lubricants7040031",
-    "doi": "10.3390/lubricants7040031",
-    "content_hash": "a77a3dbbb01d650f9f68b245071d4046cc906b99c4df647ac0f9b9ddbd17d0c3",
+    "id": "doi:10.1139/tcsme-2017-1015",
+    "title": "DESIGN AND ANALYSIS OF CONSTANT-BREADTH CAM MECHANISM WITH OSCILLATING FLAT-FACED FOLLOWER",
+    "source_uri": "https://doi.org/10.1139/tcsme-2017-1015",
+    "doi": "10.1139/tcsme-2017-1015",
+    "content_hash": "684b100ec79ee4fd509a9d264fa31e82b1a61c0a3ba2d204c736fe4cd5719753",
     "frozen": false
    },
    {
-    "id": "doi:10.1007/978-3-030-60076-1_30",
-    "title": "Contact Stress of the Contact Region of a Cam Mechanism with a Flat-Faced and Spherical-Faced Follower",
-    "source_uri": "https://doi.org/10.1007/978-3-030-60076-1_30",
-    "doi": "10.1007/978-3-030-60076-1_30",
-    "content_hash": "db4757b459c4fbf3377000299af1bb9ce33831049afe1dac4fcd7efd44fe57f7",
+    "id": "doi:10.1139/tcsme-2009-0032",
+    "title": "A COMPUTERIZED APPROACH FOR TOLERANCE ANALYSIS OF DISK CAM MECHANISMS WITH A FLAT-FACED FOLLOWER",
+    "source_uri": "https://doi.org/10.1139/tcsme-2009-0032",
+    "doi": "10.1139/tcsme-2009-0032",
+    "content_hash": "9268ca49f151ba107e2aae05abace4ed10b3e2a2d1b801ae7a48869ae23f8beb",
+    "frozen": false
+   },
+   {
+    "id": "title:42bb3dc66a3db4d1",
+    "title": "A COMPUTERIZED APPROACH FOR TOLERANCE ANALYSIS OF DISK CAM MECHANISMS WITH A FLAT-FACED FOLLOWER",
+    "source_uri": "",
+    "doi": null,
+    "content_hash": "6b4609c49dd21b3b23653feaf5e31a8e25e278942363a4cca6914f8e2ea98966",
     "frozen": false
    },
    {
@@ -509,88 +528,90 @@
     "doi": "10.5772/intechopen.106179",
     "content_hash": "541b8507503388048b6a079d993c8656129948d0968b4db34087897833862e76",
     "frozen": false
-   },
-   {
-    "id": "title:196b3fe9c12ba986",
-    "title": "Rolling contact fatigue of silicon nitride.",
-    "source_uri": "",
-    "doi": null,
-    "content_hash": "5234ca92c5fa6190f7a3e7a487cd1da5b094023e8125021cb8856dbc8c5f662f",
-    "frozen": false
    }
   ],
   "epistemic_class": "SOURCE_FACT",
   "origin_stage": "RETRIEVE+FREEZE",
   "evidence_ids": [
-   "doi:10.1007/978-3-030-60076-1_30",
    "doi:10.1115/imece2017-71399",
+   "doi:10.1139/tcsme-2009-0032",
+   "doi:10.1139/tcsme-2017-1015",
    "doi:10.31274/rtd-180813-8830",
    "doi:10.3390/lubricants7040031",
    "doi:10.3390/molecules24050862",
+   "doi:10.33915/etd.8553",
    "doi:10.3990/1.9789036546669",
-   "doi:10.3990/1.9789036561112",
    "doi:10.4236/mme.2024.142005",
    "doi:10.48550/arxiv.1811.02045",
    "doi:10.48550/arxiv.2109.14447",
    "doi:10.48550/arxiv.2211.08305",
    "doi:10.5194/ms-10-497-2019",
    "doi:10.5772/intechopen.106179",
-   "title:196b3fe9c12ba986",
-   "title:aaa10a49ee0a3e21",
-   "title:c386f06429a1f97b"
+   "title:42bb3dc66a3db4d1",
+   "title:aaa10a49ee0a3e21"
   ],
   "note": "custodied evidence with content hashes"
  },
  "uncertainties": {
   "value": [
    {
+    "contradiction_id": "con:attack:unsupported_mechanism",
+    "description": "attack dimension unsupported_mechanism returned KILL",
+    "severity": "HIGH"
+   },
+   {
+    "contradiction_id": "con:attack:weak_transfer",
+    "description": "attack dimension weak_transfer returned KILL",
+    "severity": "HIGH"
+   },
+   {
     "contradiction_id": "con:attack:obvious_combination",
     "description": "attack dimension obvious_combination returned KILL",
     "severity": "HIGH"
    },
    {
-    "contradiction_id": "con:evidence:title:196b3fe9c12ba986",
-    "description": "user evidence contradicts the mechanism: This source contains a negated claim co-located with the candidate's mechanism/effect terms — treated as potential contr [negation marker co-located with claim terms ['impact', 'rate', 'thi'] in: 'The eccentricity had no significant impact on finishing rate as concluded in this stu]",
+    "contradiction_id": "con:attack:engineering_infeasibility",
+    "description": "attack dimension engineering_infeasibility returned KILL",
     "severity": "HIGH"
    },
    {
-    "unresolved_source": "follower followers folding station flat faced",
+    "unresolved_source": "cam driven follower surface fatigue followers",
     "error": "HTTP 503"
    },
    {
-    "unresolved_source": "follower followers folding station flat faced",
+    "unresolved_source": "cam driven follower surface fatigue followers",
     "error": "LENS_API_TOKEN not configured"
    },
    {
-    "unresolved_source": "follower clearance flat faced linkage induces",
+    "unresolved_source": "cam follower driven contact surface fatigue",
     "error": "HTTP 503"
    },
    {
-    "unresolved_source": "follower clearance flat faced linkage induces",
+    "unresolved_source": "cam follower driven contact surface fatigue",
     "error": "LENS_API_TOKEN not configured"
    },
    {
-    "unresolved_source": "eliminate follower clearance flat faced cam dynamic impact",
+    "unresolved_source": "cam follower paper folding station friction clearance dynamic",
     "error": "HTTP 503"
    },
    {
-    "unresolved_source": "eliminate follower clearance flat faced cam dynamic impact",
+    "unresolved_source": "cam follower paper folding station friction clearance dynamic",
     "error": "LENS_API_TOKEN not configured"
    },
    {
-    "unresolved_source": "follower prevention suppression elimination clearance preventing",
+    "unresolved_source": "cam friction extending cutting clearance folding",
     "error": "HTTP 503"
    },
    {
-    "unresolved_source": "follower prevention suppression elimination clearance preventing",
+    "unresolved_source": "cam friction extending cutting clearance folding",
     "error": "LENS_API_TOKEN not configured"
    },
    {
-    "unresolved_source": "clearance impact forces elimination induced stabilizes",
+    "unresolved_source": "cam driven follower contact surface fatigue",
     "error": "HTTP 503"
    },
    {
-    "unresolved_source": "clearance impact forces elimination induced stabilizes",
+    "unresolved_source": "cam driven follower contact surface fatigue",
     "error": "LENS_API_TOKEN not configured"
    }
   ],
@@ -604,7 +625,7 @@
    {
     "assumption": "mechanism transfers across domain context",
     "basis": "MODELLED",
-    "test": "Operate the folding station at 420 cycles per minute with the guide clearance reduced to the simulation-optimized value; inspect the 16 mm flat-faced follower contact face for spalling after 10 weeks of 20-hour-per-day service — if spalling or metal debris is present, the intervention fails."
+    "test": "Replicate the paper's optical-marker method on the running line: mount a high-resolution optical marker on a follower stem to capture y-direction motion at 420 cycles/min, extract the largest Lyapunov exponent and impact severity for the current clearance, then repeat with progressively reduced guide clearance; if reducing clearance does not measurably decrease impact severity/Lyapunov exponent and does not extend follower spalling life in a side-by-side trial, the mechanism is falsified."
    },
    {
     "assumption": "searched sources approximate the prior-art universe",
@@ -619,8 +640,8 @@
  },
  "provenance": {
   "value": {
-   "run_id": "engrun:ui_flat_faced_cam_follower_rolling_contact_fa_636438:2026-09-17T09:13:58",
-   "final_envelope_hash": "af62fefaec3333e514695c951c839a8c445537de4bccc18aa954d7485c04237f",
+   "run_id": "engrun:ui_flat_faced_cam_follower_surface_fatigue_sp_640895:2026-09-17T10:28:15",
+   "final_envelope_hash": "c06492bc892a1df7553e7726064b143f55f63b39b7073324114964a598ee601f",
    "final_status": "REJECTED",
    "adjudication_verdict": "CONTESTED",
    "ranking": {
@@ -630,16 +651,16 @@
      "adjudication": 0.4,
      "attack_pass": 0.0,
      "novelty": 0.2,
-     "eig_per_cost_capped": 0.32128008174183986
+     "eig_per_cost_capped": 0.30342521928732036
     },
-    "score": 0.2443,
+    "score": 0.2407,
     "portfolio_context": {
      "target_invention_count": 10,
      "survivors": 0,
      "active": 0
     },
     "is_allocation_policy_not_truth": true,
-    "timestamp": "2026-09-17T09:36:32+00:00Z"
+    "timestamp": "2026-09-17T10:38:04+00:00Z"
    },
    "survivor_gate": {
     "survivor": false,
@@ -648,7 +669,7 @@
     "reason": "only a classified candidate with sufficient adjudication may be specified (Art. XXVIII: no promotion by narrative)"
    },
    "code_commit": null,
-   "built_at": "2026-09-17T09:38:43+00:00Z"
+   "built_at": "2026-09-17T10:38:04+00:00Z"
   },
   "epistemic_class": "COMPUTED",
   "origin_stage": "INVENTION_SPEC",
@@ -668,7 +689,7 @@
    "patent_number": null,
    "publication_number": null,
    "publication_date": "2017",
-   "retrieval_timestamp": "2026-09-17T09:14:59.039442+00:00",
+   "retrieval_timestamp": "2026-09-17T10:29:03.290800+00:00",
    "retrieval_method": "retrieval_fabric_v2",
    "content_hash": "8d3dcf90c9c0946e47ba83a2973a0345b3d114a50e53290f21cd550bd25285c2",
    "provenance": {
@@ -683,7 +704,7 @@
      "core": "core:277694686"
     },
     "queries_by_source": {
-     "crossref": "rotary cam-driven folding station flat-faced cam follower rolling-contact fatigue spalling",
+     "crossref": "rotary cam-driven folding station flat-faced cam follower surface fatigue spalling",
      "core": "rotary cam-driven folding station flat-faced cam experimental comparison"
     },
     "query_variant_derivation": "COMPARISON_TARGETED",
@@ -695,7 +716,7 @@
     ],
     "oa_resolution": {
      "provider": "unpaywall",
-     "resolved_at": "2026-09-17T09:14:58.942720+00:00",
+     "resolved_at": "2026-09-17T10:29:03.248934+00:00",
      "is_oa": false,
      "oa_status": "closed",
      "host_type": null,
@@ -709,12 +730,90 @@
    "source_family": "doi_registrant_crossref",
    "canonical_id": "doi:10.1115/imece2017-71399",
    "retrieval_status": "SUCCESS",
-   "query_variant": "rotary cam-driven folding station flat-faced cam follower rolling-contact fatigue spalling",
+   "query_variant": "rotary cam-driven folding station flat-faced cam follower surface fatigue spalling",
    "source_rank": 0,
    "fulltext_url": null,
    "authors": [
     "Louay S. Yousuf",
     "Dan B. Marghitu"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records",
+    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
+    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
+   ]
+  },
+  "doi:10.3390/lubricants7040031": {
+   "id": "doi:10.3390/lubricants7040031",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.3390/lubricants7040031",
+   "source_uri": "https://doi.org/10.3390/lubricants7040031",
+   "title": "Lubrication Analyses of Cam and Flat-Faced Follower",
+   "abstract": "The principal factors that affect the characteristics of contact problem between cam and follower vary enormously during the operating cycle of this mechanism. This includes radius of curvature, surface velocities and applied load. It has been found over the last decades that the mechanism operates under an extremely thin film of lubricant. Any practical improvement in the level of film thickness that separates the contacted surfaces represents an essential step towards a satisfactory design of the system. In this paper a detailed numerical study is presented for the cam and follower (flat-faced) lubrication including the effect of introducing an axial modification (parabolic shape) of the cam depth on the levels of film thickness and pressure distribution. This is achieved based on a point contact model for a cam and flat-faced follower system. The results reveal that the cam form of modification has considerable consequences on the level of predicted film thickness and pressure distribution as well as surface deformation",
+   "doi": "10.3390/lubricants7040031",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2019",
+   "retrieval_timestamp": "2026-09-17T10:29:03.290865+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "bbfca9fc3a7e87b1f19c0760168590986a8875dcf801e815b5259c3e6b5fb76a",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "core",
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.3390/lubricants7040031",
+     "core": "core:10890463"
+    },
+    "queries_by_source": {
+     "crossref": "rotary cam-driven folding station flat-faced cam follower surface fatigue spalling",
+     "core": "rotary cam-driven folding station flat-faced cam experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=journal-article"
+    ],
+    "oa_resolution": {
+     "provider": "unpaywall",
+     "resolved_at": "2026-09-17T10:29:03.196065+00:00",
+     "is_oa": true,
+     "oa_status": "gold",
+     "host_type": "publisher",
+     "repository_institution": null
+    }
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.3390/lubricants7040031",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "rotary cam-driven folding station flat-faced cam follower surface fatigue spalling",
+   "source_rank": 1,
+   "fulltext_url": "https://www.mdpi.com/2075-4442/7/4/31/pdf?version=1555582107",
+   "authors": [
+    "Josef Schlattmann",
+    "Hazim  U. Jamali",
+    "Abdullah, Oday I.",
+    "Amjad Al-Hamood",
+    "Oday  I. Abdullah",
+    "Abdullah, Oday Ibraheem",
+    "Adolfo Senatore",
+    "Schlattmann, Josef",
+    "Oday I. Abdullah",
+    "Al-Hamood, Amjad",
+    "Senatore, Adolfo",
+    "Hazim U. Jamali",
+    "Jamali, Hazim U."
    ],
    "raw_record_hash": "",
    "limitations": [
@@ -735,7 +834,7 @@
    "patent_number": null,
    "publication_number": null,
    "publication_date": "2024",
-   "retrieval_timestamp": "2026-09-17T09:14:59.039556+00:00",
+   "retrieval_timestamp": "2026-09-17T10:29:03.290901+00:00",
    "retrieval_method": "retrieval_fabric_v2",
    "content_hash": "32d0cea177cd2a916dca618601a131b675de70223808827fb59e0f0234215f6e",
    "provenance": {
@@ -748,7 +847,7 @@
      "crossref": "doi:10.4236/mme.2024.142005"
     },
     "queries_by_source": {
-     "crossref": "rotary cam-driven folding station flat-faced cam follower rolling-contact fatigue spalling"
+     "crossref": "rotary cam-driven folding station flat-faced cam follower surface fatigue spalling"
     },
     "query_variant_derivation": "PRIMARY",
     "source_family": "doi_registrant_crossref",
@@ -766,8 +865,8 @@
    "source_family": "doi_registrant_crossref",
    "canonical_id": "doi:10.4236/mme.2024.142005",
    "retrieval_status": "SUCCESS",
-   "query_variant": "rotary cam-driven folding station flat-faced cam follower rolling-contact fatigue spalling",
-   "source_rank": 1,
+   "query_variant": "rotary cam-driven folding station flat-faced cam follower surface fatigue spalling",
+   "source_rank": 2,
    "fulltext_url": null,
    "authors": [],
    "raw_record_hash": "",
@@ -787,7 +886,7 @@
    "patent_number": null,
    "publication_number": null,
    "publication_date": "2019",
-   "retrieval_timestamp": "2026-09-17T09:14:59.039603+00:00",
+   "retrieval_timestamp": "2026-09-17T10:29:03.290929+00:00",
    "retrieval_method": "retrieval_fabric_v2",
    "content_hash": "a88b816c88490b218160a8472bcd1126a9bf7a1a572b5d8e2f339da802473637",
    "provenance": {
@@ -800,7 +899,7 @@
      "crossref": "doi:10.5194/ms-10-497-2019"
     },
     "queries_by_source": {
-     "crossref": "rotary cam-driven folding station flat-faced cam follower rolling-contact fatigue spalling"
+     "crossref": "rotary cam-driven folding station flat-faced cam follower surface fatigue spalling"
     },
     "query_variant_derivation": "PRIMARY",
     "source_family": "doi_registrant_crossref",
@@ -818,8 +917,8 @@
    "source_family": "doi_registrant_crossref",
    "canonical_id": "doi:10.5194/ms-10-497-2019",
    "retrieval_status": "SUCCESS",
-   "query_variant": "rotary cam-driven folding station flat-faced cam follower rolling-contact fatigue spalling",
-   "source_rank": 2,
+   "query_variant": "rotary cam-driven folding station flat-faced cam follower surface fatigue spalling",
+   "source_rank": 3,
    "fulltext_url": null,
    "authors": [],
    "raw_record_hash": "",
@@ -839,7 +938,7 @@
    "patent_number": null,
    "publication_number": null,
    "publication_date": "2019",
-   "retrieval_timestamp": "2026-09-17T09:14:59.039636+00:00",
+   "retrieval_timestamp": "2026-09-17T10:29:03.290956+00:00",
    "retrieval_method": "retrieval_fabric_v2",
    "content_hash": "9dbd92c5e7407c037b6be2b77916b5c4d04af76bfd7b6a4e9e7376dee51c1939",
    "provenance": {
@@ -871,7 +970,7 @@
    "canonical_id": "doi:10.3390/molecules24050862",
    "retrieval_status": "SUCCESS",
    "query_variant": "DOI:10.1007/s00249-013-0917-x",
-   "source_rank": 3,
+   "source_rank": 4,
    "fulltext_url": null,
    "authors": [
     "A. Lásiková",
@@ -898,7 +997,7 @@
    "patent_number": null,
    "publication_number": null,
    "publication_date": "2025-12-01",
-   "retrieval_timestamp": "2026-09-17T09:14:59.039666+00:00",
+   "retrieval_timestamp": "2026-09-17T10:29:03.290978+00:00",
    "retrieval_method": "retrieval_fabric_v2",
    "content_hash": "f1e09e1080ac61aeae6b3f55d4be6354e6ae3aa28bb047719d69d066da35ca47",
    "provenance": {
@@ -928,58 +1027,6 @@
    "canonical_id": "title:aaa10a49ee0a3e21",
    "retrieval_status": "SUCCESS",
    "query_variant": "rotary cam-driven folding station flat-faced cam experimental comparison",
-   "source_rank": 4,
-   "fulltext_url": null,
-   "authors": [],
-   "raw_record_hash": "",
-   "limitations": [
-    "Abstract-level evidence: full text may contain methods and constraints not present in the abstract",
-    "Publication existence is not clinical evidence of safety or effectiveness",
-    "Citation counts are bibliometric signals, not validity measures"
-   ]
-  },
-  "title:c386f06429a1f97b": {
-   "id": "title:c386f06429a1f97b",
-   "source_type": "scientific_paper",
-   "source": "europepmc",
-   "source_id": "europepmc:europepmc:PMC13439031",
-   "source_uri": "",
-   "title": "Special Collection: Abstracts from IUNS-ICN Paris 2025",
-   "abstract": "",
-   "doi": null,
-   "patent_number": null,
-   "publication_number": null,
-   "publication_date": "2026-09-04",
-   "retrieval_timestamp": "2026-09-17T09:14:59.039693+00:00",
-   "retrieval_method": "retrieval_fabric_v2",
-   "content_hash": "3c93cae35fb26d7b629171100fb5ae0d22a737bc6bcaf77cbe7b2521b0697b19",
-   "provenance": {
-    "fabric_version": "V2",
-    "origin_source": "europepmc",
-    "indexing_sources": [
-     "europepmc"
-    ],
-    "record_ids_by_source": {
-     "europepmc": "europepmc:PMC13439031"
-    },
-    "queries_by_source": {
-     "europepmc": "rotary cam-driven folding station flat-faced cam experimental comparison"
-    },
-    "query_variant_derivation": "COMPARISON_TARGETED",
-    "source_family": "biomedical_pubmed_line",
-    "identity_basis": "TITLE_FINGERPRINT",
-    "raw_payload_sha256": "",
-    "publication_status_evidence": [],
-    "oa_resolution": null
-   },
-   "epistemic_state": "OBSERVED",
-   "publication_status": "PEER_REVIEWED",
-   "document_type": "",
-   "evidence_lane": "SCHOLARLY",
-   "source_family": "biomedical_pubmed_line",
-   "canonical_id": "title:c386f06429a1f97b",
-   "retrieval_status": "SUCCESS",
-   "query_variant": "rotary cam-driven folding station flat-faced cam experimental comparison",
    "source_rank": 5,
    "fulltext_url": null,
    "authors": [],
@@ -1002,7 +1049,7 @@
    "patent_number": null,
    "publication_number": null,
    "publication_date": null,
-   "retrieval_timestamp": "2026-09-17T09:14:59.039719+00:00",
+   "retrieval_timestamp": "2026-09-17T10:29:03.290997+00:00",
    "retrieval_method": "retrieval_fabric_v2",
    "content_hash": "10d7cc9649526b5f770a89767d5bdf2feb5f5233c9845f25e5f45900f61a27c1",
    "provenance": {
@@ -1015,7 +1062,7 @@
      "crossref": "doi:10.31274/rtd-180813-8830"
     },
     "queries_by_source": {
-     "crossref": "rotary cam-driven folding station flat-faced cam follower rolling-contact fatigue spalling"
+     "crossref": "rotary cam-driven folding station flat-faced cam follower surface fatigue spalling"
     },
     "query_variant_derivation": "PRIMARY",
     "source_family": "doi_registrant_crossref",
@@ -1033,60 +1080,8 @@
    "source_family": "doi_registrant_crossref",
    "canonical_id": "doi:10.31274/rtd-180813-8830",
    "retrieval_status": "SUCCESS",
-   "query_variant": "rotary cam-driven folding station flat-faced cam follower rolling-contact fatigue spalling",
+   "query_variant": "rotary cam-driven folding station flat-faced cam follower surface fatigue spalling",
    "source_rank": 0,
-   "fulltext_url": null,
-   "authors": [],
-   "raw_record_hash": "",
-   "limitations": [
-    "Metadata-only; no abstracts for many records"
-   ]
-  },
-  "doi:10.3990/1.9789036561112": {
-   "id": "doi:10.3990/1.9789036561112",
-   "source_type": "scientific_paper",
-   "source": "crossref",
-   "source_id": "crossref:doi:10.3990/1.9789036561112",
-   "source_uri": "https://doi.org/10.3990/1.9789036561112",
-   "title": "Rolling-sliding dynamics and optimization of large-scale cam-roller contacts : introducing rolling pairs with shifting contact geometry",
-   "abstract": "",
-   "doi": "10.3990/1.9789036561112",
-   "patent_number": null,
-   "publication_number": null,
-   "publication_date": null,
-   "retrieval_timestamp": "2026-09-17T09:14:59.039742+00:00",
-   "retrieval_method": "retrieval_fabric_v2",
-   "content_hash": "6f45fad7ee17edf88769d29d9383d22b177216b200be4a9048dbde550f414a58",
-   "provenance": {
-    "fabric_version": "V2",
-    "origin_source": "crossref",
-    "indexing_sources": [
-     "crossref"
-    ],
-    "record_ids_by_source": {
-     "crossref": "doi:10.3990/1.9789036561112"
-    },
-    "queries_by_source": {
-     "crossref": "rotary cam-driven folding station flat-faced cam follower rolling-contact fatigue spalling"
-    },
-    "query_variant_derivation": "PRIMARY",
-    "source_family": "doi_registrant_crossref",
-    "identity_basis": "DOI",
-    "raw_payload_sha256": "",
-    "publication_status_evidence": [
-     "type=dissertation"
-    ],
-    "oa_resolution": null
-   },
-   "epistemic_state": "OBSERVED",
-   "publication_status": "THESIS",
-   "document_type": "",
-   "evidence_lane": "THESIS",
-   "source_family": "doi_registrant_crossref",
-   "canonical_id": "doi:10.3990/1.9789036561112",
-   "retrieval_status": "SUCCESS",
-   "query_variant": "rotary cam-driven folding station flat-faced cam follower rolling-contact fatigue spalling",
-   "source_rank": 1,
    "fulltext_url": null,
    "authors": [],
    "raw_record_hash": "",
@@ -1106,7 +1101,7 @@
    "patent_number": null,
    "publication_number": null,
    "publication_date": null,
-   "retrieval_timestamp": "2026-09-17T09:14:59.039766+00:00",
+   "retrieval_timestamp": "2026-09-17T10:29:03.291012+00:00",
    "retrieval_method": "retrieval_fabric_v2",
    "content_hash": "c1894d6c005b7657c256d61ca9d5895ef38b6f6ec38565c9f24032adc5f624ef",
    "provenance": {
@@ -1119,7 +1114,7 @@
      "crossref": "doi:10.3990/1.9789036546669"
     },
     "queries_by_source": {
-     "crossref": "rotary cam-driven folding station flat-faced cam follower rolling-contact fatigue spalling"
+     "crossref": "rotary cam-driven folding station flat-faced cam follower surface fatigue spalling"
     },
     "query_variant_derivation": "PRIMARY",
     "source_family": "doi_registrant_crossref",
@@ -1137,7 +1132,59 @@
    "source_family": "doi_registrant_crossref",
    "canonical_id": "doi:10.3990/1.9789036546669",
    "retrieval_status": "SUCCESS",
-   "query_variant": "rotary cam-driven folding station flat-faced cam follower rolling-contact fatigue spalling",
+   "query_variant": "rotary cam-driven folding station flat-faced cam follower surface fatigue spalling",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.33915/etd.8553": {
+   "id": "doi:10.33915/etd.8553",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.33915/etd.8553",
+   "source_uri": "https://doi.org/10.33915/etd.8553",
+   "title": "Comparison of a Pin Cam and an Inverted Pin Cam design based on the parameters used for the axial vane rotary engine (beta version).",
+   "abstract": "",
+   "doi": "10.33915/etd.8553",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-17T10:29:03.291029+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "1abcc5eae6f71a608cbe6d8e8bd64ca20ccecf5ee510c6458c5b81a769854f76",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.33915/etd.8553"
+    },
+    "queries_by_source": {
+     "crossref": "rotary cam-driven folding station flat-faced cam follower surface fatigue spalling"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.33915/etd.8553",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "rotary cam-driven folding station flat-faced cam follower surface fatigue spalling",
    "source_rank": 2,
    "fulltext_url": null,
    "authors": [],
@@ -1158,7 +1205,7 @@
    "patent_number": null,
    "publication_number": null,
    "publication_date": null,
-   "retrieval_timestamp": "2026-09-17T09:14:59.039794+00:00",
+   "retrieval_timestamp": "2026-09-17T10:29:03.291050+00:00",
    "retrieval_method": "retrieval_fabric_v2",
    "content_hash": "572a4bf2f5aa87ff26dfb4f61c353b4d25f526da0a358a23ef6234835cd37bf5",
    "provenance": {
@@ -1171,7 +1218,7 @@
      "arxiv": "arxiv:1811.02045v1"
     },
     "queries_by_source": {
-     "arxiv": "rotary cam-driven folding station flat-faced cam follower rolling-contact fatigue spalling"
+     "arxiv": "rotary cam-driven folding station flat-faced cam follower surface fatigue spalling"
     },
     "query_variant_derivation": "PRIMARY",
     "source_family": "preprint_origin",
@@ -1187,7 +1234,7 @@
    "source_family": "preprint_origin",
    "canonical_id": "doi:10.48550/arxiv.1811.02045",
    "retrieval_status": "SUCCESS",
-   "query_variant": "rotary cam-driven folding station flat-faced cam follower rolling-contact fatigue spalling",
+   "query_variant": "rotary cam-driven folding station flat-faced cam follower surface fatigue spalling",
    "source_rank": 0,
    "fulltext_url": "http://arxiv.org/abs/1811.02045v1",
    "authors": [
@@ -1220,7 +1267,7 @@
    "patent_number": null,
    "publication_number": null,
    "publication_date": null,
-   "retrieval_timestamp": "2026-09-17T09:14:59.039823+00:00",
+   "retrieval_timestamp": "2026-09-17T10:29:03.291068+00:00",
    "retrieval_method": "retrieval_fabric_v2",
    "content_hash": "1b51399da28b884f3640a8c153e2cce59a2787b16fc46010c8792fc06d6b2129",
    "provenance": {
@@ -1233,7 +1280,7 @@
      "arxiv": "arxiv:2109.14447v1"
     },
     "queries_by_source": {
-     "arxiv": "rotary cam-driven folding station flat-faced cam follower rolling-contact fatigue spalling"
+     "arxiv": "rotary cam-driven folding station flat-faced cam follower surface fatigue spalling"
     },
     "query_variant_derivation": "PRIMARY",
     "source_family": "preprint_origin",
@@ -1249,7 +1296,7 @@
    "source_family": "preprint_origin",
    "canonical_id": "doi:10.48550/arxiv.2109.14447",
    "retrieval_status": "SUCCESS",
-   "query_variant": "rotary cam-driven folding station flat-faced cam follower rolling-contact fatigue spalling",
+   "query_variant": "rotary cam-driven folding station flat-faced cam follower surface fatigue spalling",
    "source_rank": 1,
    "fulltext_url": "http://arxiv.org/abs/2109.14447v1",
    "authors": [
@@ -1276,7 +1323,7 @@
    "patent_number": null,
    "publication_number": null,
    "publication_date": null,
-   "retrieval_timestamp": "2026-09-17T09:14:59.039850+00:00",
+   "retrieval_timestamp": "2026-09-17T10:29:03.291083+00:00",
    "retrieval_method": "retrieval_fabric_v2",
    "content_hash": "9875d266a528e03a4d94ece67328e2be46bf656f0656e961339c002f229a8c17",
    "provenance": {
@@ -1289,7 +1336,7 @@
      "arxiv": "arxiv:2211.08305v1"
     },
     "queries_by_source": {
-     "arxiv": "rotary cam-driven folding station flat-faced cam follower rolling-contact fatigue spalling"
+     "arxiv": "rotary cam-driven folding station flat-faced cam follower surface fatigue spalling"
     },
     "query_variant_derivation": "PRIMARY",
     "source_family": "preprint_origin",
@@ -1305,7 +1352,7 @@
    "source_family": "preprint_origin",
    "canonical_id": "doi:10.48550/arxiv.2211.08305",
    "retrieval_status": "SUCCESS",
-   "query_variant": "rotary cam-driven folding station flat-faced cam follower rolling-contact fatigue spalling",
+   "query_variant": "rotary cam-driven folding station flat-faced cam follower surface fatigue spalling",
    "source_rank": 2,
    "fulltext_url": "http://arxiv.org/abs/2211.08305v1",
    "authors": [
@@ -1319,21 +1366,21 @@
     "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed — absence of an arXiv record is not absence of the science"
    ]
   },
-  "doi:10.3390/lubricants7040031": {
-   "id": "doi:10.3390/lubricants7040031",
+  "doi:10.1139/tcsme-2017-1015": {
+   "id": "doi:10.1139/tcsme-2017-1015",
    "source_type": "scientific_paper",
    "source": "core",
-   "source_id": "core:core:10890463",
-   "source_uri": "https://doi.org/10.3390/lubricants7040031",
-   "title": "Lubrication Analyses of Cam and Flat-Faced Follower",
-   "abstract": "The principal factors that affect the characteristics of contact problem between cam and follower vary enormously during the operating cycle of this mechanism. This includes radius of curvature, surface velocities and applied load. It has been found over the last decades that the mechanism operates under an extremely thin film of lubricant. Any practical improvement in the level of film thickness that separates the contacted surfaces represents an essential step towards a satisfactory design of the system. In this paper a detailed numerical study is presented for the cam and follower (flat-faced) lubrication including the effect of introducing an axial modification (parabolic shape) of the cam depth on the levels of film thickness and pressure distribution. This is achieved based on a point contact model for a cam and flat-faced follower system. The results reveal that the cam form of modification has considerable consequences on the level of predicted film thickness and pressure distribution as well as surface deformation",
-   "doi": "10.3390/lubricants7040031",
+   "source_id": "core:core:253437401",
+   "source_uri": "https://doi.org/10.1139/tcsme-2017-1015",
+   "title": "DESIGN AND ANALYSIS OF CONSTANT-BREADTH CAM MECHANISM WITH OSCILLATING FLAT-FACED FOLLOWER",
+   "abstract": " A simple yet comprehensive method is presented for the design and analysis of a constant-breadth cam mechanism with an oscillating flat-faced follower. In the proposed approach, the kinematic characteristics of the cam mechanism are first derived. The cam profile is then designed using homogenous coordinate transformation and conjugate surface theory. Moreover, the sliding velocity at the cam-follower contact points is determined. Finally, the pressure angle of the constant-breadth cam mechanism and the principal curvatures of the cam are analyzed. The validity of the proposed design methodology is verified by means of motion simulations performed using CAD software. </jats:p",
+   "doi": "10.1139/tcsme-2017-1015",
    "patent_number": null,
    "publication_number": null,
    "publication_date": null,
-   "retrieval_timestamp": "2026-09-17T09:14:59.039880+00:00",
+   "retrieval_timestamp": "2026-09-17T10:29:03.291099+00:00",
    "retrieval_method": "retrieval_fabric_v2",
-   "content_hash": "a77a3dbbb01d650f9f68b245071d4046cc906b99c4df647ac0f9b9ddbd17d0c3",
+   "content_hash": "684b100ec79ee4fd509a9d264fa31e82b1a61c0a3ba2d204c736fe4cd5719753",
    "provenance": {
     "fabric_version": "V2",
     "origin_source": "core",
@@ -1341,22 +1388,75 @@
      "core"
     ],
     "record_ids_by_source": {
-     "core": "core:10890463"
+     "core": "core:253437401"
     },
     "queries_by_source": {
-     "core": "rotary cam-driven folding station flat-faced cam experimental comparison"
+     "core": "rotary cam-driven folding station flat-faced cam follower surface fatigue spalling"
     },
-    "query_variant_derivation": "COMPARISON_TARGETED",
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "repository_aggregator_core",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "repository_aggregator_core",
+   "canonical_id": "doi:10.1139/tcsme-2017-1015",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "rotary cam-driven folding station flat-faced cam follower surface fatigue spalling",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [
+    "Jung-Fa Hsieh"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
+    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
+   ]
+  },
+  "doi:10.1139/tcsme-2009-0032": {
+   "id": "doi:10.1139/tcsme-2009-0032",
+   "source_type": "scientific_paper",
+   "source": "core",
+   "source_id": "core:core:253437041",
+   "source_uri": "https://doi.org/10.1139/tcsme-2009-0032",
+   "title": "A COMPUTERIZED APPROACH FOR TOLERANCE ANALYSIS OF DISK CAM MECHANISMS WITH A FLAT-FACED FOLLOWER",
+   "abstract": " A computerized approach for analyzing the tolerances in disk cam mechanisms with a flat-faced follower is presented in this paper. Based on the simulated higher-pair contact analysis, the kinematic deviation of the follower motion caused by the tolerance amount of each design parameter can be determined numerically. The method is validated by means of analyzing the case of an eccentric circular cam mechanism; such a case has an exact solution of the follower motion error. Compared with the exact solutions, the presented computerized approach is demonstrated to be able to provide excellent accuracy and sufficient efficiency no matter how large the level of the tolerance is. Then, both the offset translating oblique flat-faced follower and the oscillating flat-faced follower cases are given to illustrate the presented method. The presented computerized approach and the obtained results can be helpful for tolerance allocation tasks of disk cam mechanisms with a flat-faced follower. </jats:p",
+   "doi": "10.1139/tcsme-2009-0032",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-17T10:29:03.291120+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "9268ca49f151ba107e2aae05abace4ed10b3e2a2d1b801ae7a48869ae23f8beb",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "core",
+    "indexing_sources": [
+     "core"
+    ],
+    "record_ids_by_source": {
+     "core": "core:253437041"
+    },
+    "queries_by_source": {
+     "core": "rotary cam-driven folding station flat-faced cam follower surface fatigue spalling"
+    },
+    "query_variant_derivation": "PRIMARY",
     "source_family": "repository_aggregator_core",
     "identity_basis": "DOI",
     "raw_payload_sha256": "",
     "publication_status_evidence": [],
     "oa_resolution": {
      "provider": "unpaywall",
-     "resolved_at": "2026-09-17T09:14:58.914958+00:00",
-     "is_oa": true,
-     "oa_status": "gold",
-     "host_type": "publisher",
+     "resolved_at": "2026-09-17T10:29:03.222213+00:00",
+     "is_oa": false,
+     "oa_status": "closed",
+     "host_type": null,
      "repository_institution": null
     }
    },
@@ -1365,25 +1465,14 @@
    "document_type": "",
    "evidence_lane": "REPOSITORY",
    "source_family": "repository_aggregator_core",
-   "canonical_id": "doi:10.3390/lubricants7040031",
+   "canonical_id": "doi:10.1139/tcsme-2009-0032",
    "retrieval_status": "SUCCESS",
-   "query_variant": "rotary cam-driven folding station flat-faced cam experimental comparison",
-   "source_rank": 0,
-   "fulltext_url": "https://www.mdpi.com/2075-4442/7/4/31/pdf?version=1555582107",
+   "query_variant": "rotary cam-driven folding station flat-faced cam follower surface fatigue spalling",
+   "source_rank": 1,
+   "fulltext_url": null,
    "authors": [
-    "Josef Schlattmann",
-    "Hazim  U. Jamali",
-    "Abdullah, Oday I.",
-    "Amjad Al-Hamood",
-    "Oday  I. Abdullah",
-    "Abdullah, Oday Ibraheem",
-    "Adolfo Senatore",
-    "Schlattmann, Josef",
-    "Oday I. Abdullah",
-    "Al-Hamood, Amjad",
-    "Senatore, Adolfo",
-    "Hazim U. Jamali",
-    "Jamali, Hazim U."
+    "Wen-Tung Chang",
+    "Long-long Wu"
    ],
    "raw_record_hash": "",
    "limitations": [
@@ -1391,56 +1480,57 @@
     "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
    ]
   },
-  "doi:10.1007/978-3-030-60076-1_30": {
-   "id": "doi:10.1007/978-3-030-60076-1_30",
+  "title:42bb3dc66a3db4d1": {
+   "id": "title:42bb3dc66a3db4d1",
    "source_type": "scientific_paper",
-   "source": "crossref",
-   "source_id": "crossref:doi:10.1007/978-3-030-60076-1_30",
-   "source_uri": "https://doi.org/10.1007/978-3-030-60076-1_30",
-   "title": "Contact Stress of the Contact Region of a Cam Mechanism with a Flat-Faced and Spherical-Faced Follower",
-   "abstract": "",
-   "doi": "10.1007/978-3-030-60076-1_30",
+   "source": "core",
+   "source_id": "core:core:33989305",
+   "source_uri": "",
+   "title": "A COMPUTERIZED APPROACH FOR TOLERANCE ANALYSIS OF DISK CAM MECHANISMS WITH A FLAT-FACED FOLLOWER",
+   "abstract": "[[abstract]]A computerized approach for analyzing the tolerances in disk cam. mechanisms with. a flat-faced follower is presented in this paper. Based on the simulated higher-pair contact analysis, the kinematic deviation of the follower motion caused by the tolerance amount of each design parameter can be determined numerically. The method is validated by means of analyzing the case of an eccentric circular cam mechanism; such a case has an exact solution of the follower motion error. Compared with the exact solutions, the presented computerized approach is demonstrated to be able to provide excellent accuracy and sufficient efficiency no matter how large the level of the tolerance is. Then, both the offset translating oblique flat-faced follower and the oscillating flat-faced follower cases are given to illustrate the presented method. The presented computerized approach and the obtained results can be helpful for tolerance allocation tasks of disk cam mechanisms with a flat-faced follower[[fileno]]2020209010023[[department]]動機",
+   "doi": null,
    "patent_number": null,
    "publication_number": null,
-   "publication_date": "2020",
-   "retrieval_timestamp": "2026-09-17T09:14:59.039905+00:00",
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-17T10:29:03.291136+00:00",
    "retrieval_method": "retrieval_fabric_v2",
-   "content_hash": "db4757b459c4fbf3377000299af1bb9ce33831049afe1dac4fcd7efd44fe57f7",
+   "content_hash": "6b4609c49dd21b3b23653feaf5e31a8e25e278942363a4cca6914f8e2ea98966",
    "provenance": {
     "fabric_version": "V2",
-    "origin_source": "crossref",
+    "origin_source": "core",
     "indexing_sources": [
-     "crossref"
+     "core"
     ],
     "record_ids_by_source": {
-     "crossref": "doi:10.1007/978-3-030-60076-1_30"
+     "core": "core:33989305"
     },
     "queries_by_source": {
-     "crossref": "rotary cam-driven folding station flat-faced cam follower rolling-contact fatigue spalling"
+     "core": "rotary cam-driven folding station flat-faced cam follower surface fatigue spalling"
     },
     "query_variant_derivation": "PRIMARY",
-    "source_family": "doi_registrant_crossref",
-    "identity_basis": "DOI",
+    "source_family": "repository_aggregator_core",
+    "identity_basis": "TITLE_FINGERPRINT",
     "raw_payload_sha256": "",
-    "publication_status_evidence": [
-     "type=book-chapter"
-    ],
+    "publication_status_evidence": [],
     "oa_resolution": null
    },
    "epistemic_state": "OBSERVED",
    "publication_status": "UNKNOWN",
    "document_type": "",
    "evidence_lane": "REPOSITORY",
-   "source_family": "doi_registrant_crossref",
-   "canonical_id": "doi:10.1007/978-3-030-60076-1_30",
+   "source_family": "repository_aggregator_core",
+   "canonical_id": "title:42bb3dc66a3db4d1",
    "retrieval_status": "SUCCESS",
-   "query_variant": "rotary cam-driven folding station flat-faced cam follower rolling-contact fatigue spalling",
-   "source_rank": 1,
+   "query_variant": "rotary cam-driven folding station flat-faced cam follower surface fatigue spalling",
+   "source_rank": 2,
    "fulltext_url": null,
-   "authors": [],
+   "authors": [
+    "Chang, Wen-Tung;Wu, Long-Iong"
+   ],
    "raw_record_hash": "",
    "limitations": [
-    "Metadata-only; no abstracts for many records"
+    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
+    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
    ]
   },
   "doi:10.5772/intechopen.106179": {
@@ -1455,7 +1545,7 @@
    "patent_number": null,
    "publication_number": null,
    "publication_date": "2023",
-   "retrieval_timestamp": "2026-09-17T09:14:59.039923+00:00",
+   "retrieval_timestamp": "2026-09-17T10:29:03.291151+00:00",
    "retrieval_method": "retrieval_fabric_v2",
    "content_hash": "541b8507503388048b6a079d993c8656129948d0968b4db34087897833862e76",
    "provenance": {
@@ -1468,7 +1558,7 @@
      "crossref": "doi:10.5772/intechopen.106179"
     },
     "queries_by_source": {
-     "crossref": "rotary cam-driven folding station flat-faced cam follower rolling-contact fatigue spalling"
+     "crossref": "rotary cam-driven folding station flat-faced cam follower surface fatigue spalling"
     },
     "query_variant_derivation": "PRIMARY",
     "source_family": "doi_registrant_crossref",
@@ -1486,8 +1576,8 @@
    "source_family": "doi_registrant_crossref",
    "canonical_id": "doi:10.5772/intechopen.106179",
    "retrieval_status": "SUCCESS",
-   "query_variant": "rotary cam-driven folding station flat-faced cam follower rolling-contact fatigue spalling",
-   "source_rank": 2,
+   "query_variant": "rotary cam-driven folding station flat-faced cam follower surface fatigue spalling",
+   "source_rank": 3,
    "fulltext_url": null,
    "authors": [],
    "raw_record_hash": "",
@@ -1495,63 +1585,10 @@
     "Metadata-only; no abstracts for many records"
    ]
   },
-  "title:196b3fe9c12ba986": {
-   "id": "title:196b3fe9c12ba986",
-   "source_type": "scientific_paper",
-   "source": "core",
-   "source_id": "core:core:378080377",
-   "source_uri": "",
-   "title": "Rolling contact fatigue of silicon nitride.",
-   "abstract": "Silicon Nitride has traditionally been used as rolling contact bearing material owing to its superior performance compared to bearing steels. Its successful application as a bearing element has led to the development of Silicon Nitride in other rolling contact applications in the automotive industry and the power industry. However, a major limitation of its wider application is its high material and machining cost, especially the cost associated with the finishing process. In the present study, a low cost sintered and reaction-bonded Silicon Nitride is used to study the surface machining effects on its rolling contact fatigue performance. Studies have been carried out to link the surface strengths of Silicon Nitride derived from half-rod and C-Sphere flexure strength specimens to the rolling contact lives of Silicon Nitride rod and ball specimens. The rolling contact fatigue tests were carried out on ball-on-rod and modified four-ball machines. Three types of surface with coarse, fine and RCF-conventional finishing conditions were examined. Flexure strength tests on half-rod and C-Sphere showed an increasing surface strength from specimens with coarse, fine to RCF-conventionally machined conditions. During rolling contact fatigue tests of as-machined specimens, no failures were observed on either ball-on-rod or four-ball tests after 100 million stress cycles. However, a trend of decreasing wear volumes was measured on the contact path of rods and balls with coarse, fine and RCF-conventional conditions. In four-ball tests, spall failures were observed on pre-cracked specimens. There was a trend of increasing rolling contact fatigue lifetime from pre-cracked specimens with coarse, fine to RCF-conventional machining conditions. The study of Silicon Nitride machining was also carried out using an eccentric lapping machine to investigate the effect of eccentricity on the finishing rate of hot isostatically-pressed and sintered and reaction-bonded Silicon Nitride. The eccentricity had no significant impact on finishing rate as concluded in this study. The effect of lubricant viscosity and chemistry on the rolling contact fatigue performance of Silicon Nitride was also studied. The result is inconclusive",
-   "doi": null,
-   "patent_number": null,
-   "publication_number": null,
-   "publication_date": null,
-   "retrieval_timestamp": "2026-09-17T09:14:59.039940+00:00",
-   "retrieval_method": "retrieval_fabric_v2",
-   "content_hash": "5234ca92c5fa6190f7a3e7a487cd1da5b094023e8125021cb8856dbc8c5f662f",
-   "provenance": {
-    "fabric_version": "V2",
-    "origin_source": "core",
-    "indexing_sources": [
-     "core"
-    ],
-    "record_ids_by_source": {
-     "core": "core:378080377"
-    },
-    "queries_by_source": {
-     "core": "rotary cam-driven folding station flat-faced cam follower rolling-contact fatigue spalling"
-    },
-    "query_variant_derivation": "PRIMARY",
-    "source_family": "repository_aggregator_core",
-    "identity_basis": "TITLE_FINGERPRINT",
-    "raw_payload_sha256": "",
-    "publication_status_evidence": [],
-    "oa_resolution": null
-   },
-   "epistemic_state": "OBSERVED",
-   "publication_status": "UNKNOWN",
-   "document_type": "",
-   "evidence_lane": "REPOSITORY",
-   "source_family": "repository_aggregator_core",
-   "canonical_id": "title:196b3fe9c12ba986",
-   "retrieval_status": "SUCCESS",
-   "query_variant": "rotary cam-driven folding station flat-faced cam follower rolling-contact fatigue spalling",
-   "source_rank": 3,
-   "fulltext_url": null,
-   "authors": [
-    "Wang, W."
-   ],
-   "raw_record_hash": "",
-   "limitations": [
-    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
-    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
-   ]
-  },
-  "problem:d18a5fce": {
-   "id": "problem:d18a5fce",
+  "problem:d51f0d46": {
+   "id": "problem:d51f0d46",
    "title": "operator problem statement (problem.json)",
-   "content_hash": "d18a5fcea06d24305ed6eef050063ad2d4744ab5db6a29ea03830cea46a28212",
+   "content_hash": "d51f0d46d77559e5ff5cf4efc4a763f308712093d9dd0a608601222ce922be72",
    "custody": "engine run problem.json artifact"
   }
  },
@@ -1561,16 +1598,10 @@
   "verdict": "CONTESTED",
   "reason": "only a classified candidate with sufficient adjudication may be specified (Art. XXVIII: no promotion by narrative)"
  },
- "_spec_hash": "f4dbf52e5b2ecbee3a998e5da0455e6e2b148acbaa9534fd959f709336baa22c",
+ "_spec_hash": "292659386adaa1444c84f506a85588ab1a2985a3a362d2ec14b68e255ad8ba0c",
  "_integrity": {
   "no_fact_promotion_violations": [],
   "passed": true,
-  "checked_at": "2026-09-17T09:38:43+00:00Z"
- },
- "_exploration_candidate": {
-  "marker": "EXPLORATION_GRID_CANDIDATE",
-  "discovery_verification": "NOT_PERFORMED_FOR_THIS_CANDIDATE",
-  "consequence": "the E16-H release gate holds this dossier for human engineering review; a discovery-loop re-run is required before automatic release",
-  "angle": "EXPLORATION_GRID_cross_industry_transfer(unorouter)"
+  "checked_at": "2026-09-17T10:38:04+00:00Z"
  }
 }
