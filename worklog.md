@@ -1901,3 +1901,5 @@ Work Log:
 Stage Summary:
 - The constitution is v2.6.0 with ONE canonical Article LXXIV (the operator's full principle set, certified); the execution-durability surface is typed, test-pinned (29/29), and measured live on TWO production specimens; the audit's decisive question (CHILDREN_ADMITTED) is answered in committed bytes on the durable branch. The R486 queue: the credited-leg benchmark arms (the parallel line's B1 complete, E1 mid-run), the Space redeploy verification of the union tree, and the structured typed-cause fields on the sweep records (the refinement beyond the error-string wording).
 - reviewer_provenance=AI_REVIEW
+
+R485 DEPLOY CLOSURE (the same round, appended): the union tree deployed and verified — Space rev 0c85272f serving ead3b4f5, constitution 2.6.0 LIVE in production, drift GREEN, tamper false, atria HEALTHY, the repoint + the deployed ring persisting (R485/IDENTITY_VERIFY.json). The deploy driver's no-double-deploy gate measured: the second invocation REFUSED on the dirty tree (the first's record). The records-only commit 13601387 rides the next behavior-bearing deploy (the R482 discipline). reviewer_provenance=AI_REVIEW
