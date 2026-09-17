@@ -991,7 +991,52 @@ def named_specific_grounded(kill_text: str, candidate: dict) -> bool:
 _NUMBER_RE = re.compile(r"\d+(?:\.\d+)?")
 _WORD_RE = re.compile(r"[a-z0-9]+")
 
-BURDEN_OF_PROOF_VERSION = "burden_of_proof/1.0.0"
+# R495 v4.2 (DEV): the ATTACKER-COMPUTES kill standard. The 2.0.0
+# repetition measurement (two runs on xkiro + the zai cross-ring
+# replication) typed the instrument's failure: the evaluator hedges
+# derivable-but-uncomputed defects into RISK ("asserts X but provides
+# no derivation" — the objection correct, the burden never attempted;
+# TPR 0.27/0.22 vs the 0.75 bar, FPR 0.0 on every ring). v4.2's ONE
+# change: a computed derivation — a magnitude relation (ratio,
+# multiple, unit conversion, scaling comparison) whose anchor binds to
+# a record NUMBER — MEETS the burden. The arithmetic is shown in the
+# basis; the anchor is the record's own value. The physics of the
+# requirement side stays evaluator-supplied (the named_specific_
+# grounded class: the attacker's expertise supplies the specific; the
+# machine verifies the FORM and the ANCHOR) — the honest limit,
+# disclosed. The packet-anchored dimensions (obviousness) keep their
+# stricter floor — rule ORDER enforces it (rule 4 fires before 4.5).
+BURDEN_OF_PROOF_VERSION = "burden_of_proof/1.1.0"
+
+ATTACKER_COMPUTED_RELATION_PATTERNS = [
+    r"\b\d+(?:\.\d+)?\s*(?:x|×|fold|times)\b",
+    r"\b(?:order|orders)\s+of\s+magnitude\b",
+    r"\b\d+(?:\.\d+)?\s*(?:%|percent)\s*(?:higher|lower|greater|"
+    r"less|short|more|fewer)\b",
+    r"\b\d+(?:\.\d+)?\s*(?:to|vs\.?|versus)\s*\d+(?:\.\d+)?\b",
+    r"\b(?:ratio|multiple|scaling)\s+(?:of|is|by|factor)\s+"
+    r"\d+(?:\.\d+)?",
+    r"\b\d+(?:\.\d+)?\s*(?:kJ|kWh|Wh|J/L|W/\w+)\b[^.]{0,40}"
+    r"\b(?:required|requirement|needed|demand)\b",
+]
+ATTACKER_COMPUTED_RELATION_REGEX = re.compile(
+    '|'.join(ATTACKER_COMPUTED_RELATION_PATTERNS), re.IGNORECASE)
+
+
+def attacker_computed_derivation(kill_text: str, candidate: dict,
+                                 evidence_items: Optional[list] = None) -> bool:
+    """v4.2 (R495): True when the kill basis SHOWS a computed magnitude
+    relation anchored to a record NUMBER — the attacker-computes
+    standard's machine-verifiable form. A relation without a record
+    anchor is not a derivation over the record (it is the unbound
+    class); an anchor without a relation is a citation, not a
+    computation."""
+    text = str(kill_text or "")
+    if not ATTACKER_COMPUTED_RELATION_REGEX.search(text):
+        return False
+    record_text = _record_text(candidate, evidence_items)
+    binding = _record_binding(text, record_text)
+    return bool(binding and binding.get("binding") == "numbers")
 
 
 def _candidate_text(candidate: dict) -> str:
@@ -1238,6 +1283,28 @@ def enforce_burden_of_proof(dimension: str, verdict_text: str,
                                  "cannot verify; the burden of proof "
                                  "requires a record in view (the v4.1 "
                                  "measured class)")}}
+        # R495 v4.2 rule 4.5 — the ATTACKER-COMPUTES kill standard: a
+        # computed magnitude relation anchored to a record NUMBER meets
+        # the burden (the 2.0.0 repetition's named lever; placement
+        # AFTER the packet-anchor rule keeps obviousness strict — a
+        # computation cannot establish obviousness, only the packet
+        # can; placement BEFORE the absence rule lets the attacker
+        # compute what the record lacked — the entire point of v4.2)
+        if binding and binding.get("binding") == "numbers" \
+                and ATTACKER_COMPUTED_RELATION_REGEX.search(text):
+            return {**out, "verdict": "KILLED", "demoted": False,
+                    "disposition": "attacker_computed_derivation",
+                    "evidence": {
+                        "binding": binding,
+                        "rule": ("the basis shows a computed magnitude "
+                                 "relation anchored to a record number "
+                                 "— the attacker COMPUTED the "
+                                 "derivation the record lacked (v4.2); "
+                                 "the shown arithmetic is the "
+                                 "grounding; the requirement side stays "
+                                 "evaluator-supplied — the disclosed "
+                                 "honest limit, measured by the DEV "
+                                 "run's FPR)")}}
         if absence:
             return {**out, "verdict": "RISK", "demoted": True,
                     "demotion_class": "lacks_derivation",

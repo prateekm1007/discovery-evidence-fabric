@@ -1,0 +1,130 @@
+{
+ "http": 200,
+ "attack": {
+  "overall": "KILLED",
+  "instrument_version": "a2_adversarial_gauntlet/2.0.0",
+  "gauntlet_version": "a2_adversarial_gauntlet/2.0.0",
+  "killed_count": 1,
+  "reason": "",
+  "attacks": {
+   "unsupported_mechanism": "PASS - the causal chain of filtration plus UV inactivation is physically valid and supported by the cited G8 test data.",
+   "weak_transfer": "PASS - the transfer from land-based G8 test to fleet application is asserted with specific flow and room constraints, lacking only operational validation data which constitutes a risk not a kill.",
+   "obvious_combination": "PASS - while filter and UV are known techniques, the record asserts a novel design variable regarding UV dose ceiling utilization that prevents an obviousness kill based solely on provided text.",
+   "prior_art": "PASS - no specific prior disclosure naming this exact configuration with the raised dose ceiling variable is present in the record or my training data to warrant a kill.",
+   "contradiction": "KILLED - the claimed \"2.9-log mean inactivation\" contradicts the evidence item \"ev:seasonal-abundance\" which states the D-2 limit requires \">= 3.0-log equivalent reduction,\" meaning the measured effect fails the stated regulatory requirement within the confidence interval (2.9 + 0.3 overlaps the failure zone below 3.0, and the mean itself is < 3.0).",
+   "boundary_failure": "RISK - the record declares seasonal abundance up to 3,000 ind/m3 but does not provide derivation showing the 2.9-log reduction consistently meets the 10 ind/m3 discharge limit at the upper bound of the abundance confidence interval (3,100 / 10^2.9 \u2248 3.9 ind/m3, which passes, but the variance and lower efficacy at peaks are not derived).",
+   "engineering_infeasibility": "PASS - the 120 kW margin and 350 m3/h flow rate do not inherently violate known engineering limits for medium-pressure UV systems in the provided record.",
+   "regulatory_incompatibility": "RISK - the record cites the IMO D-2 standard requiring <10 viable ind/m3, and while the mean 2.9-log reduction yields ~3.9 ind/m3 at peak load, the lack of statistical assurance that the upper confidence bound of the output remains below 10 ind/m3 is a missing derivation rather than a proven violation."
+  },
+  "risk_flags": [
+   {
+    "dimension": "boundary_failure",
+    "verdict": "RISK",
+    "basis": "the record declares seasonal abundance up to 3,000 ind/m3 but does not provide derivation showing the 2.9-log reduction consistently meets the 10 ind/m3 discharge limit at the upper bound of the abundance confidence interval (3,100 / 10^2.9 \u2248 3.9 ind/m3, which passes, but the variance and lower efficacy at peaks are not derived).",
+    "source": "evaluator_risk"
+   },
+   {
+    "dimension": "regulatory_incompatibility",
+    "verdict": "RISK",
+    "basis": "the record cites the IMO D-2 standard requiring <10 viable ind/m3, and while the mean 2.9-log reduction yields ~3.9 ind/m3 at peak load, the lack of statistical assurance that the upper confidence bound of the output remains below 10 ind/m3 is a missing derivation rather than a proven violation.",
+    "source": "evaluator_risk"
+   }
+  ],
+  "invalid_dimensions": [],
+  "v4_corrections_applied": [
+   "burden_of_proof:burden_met",
+   "burden_of_proof:risk_flag:boundary_failure",
+   "burden_of_proof:risk_flag:regulatory_incompatibility"
+  ],
+  "burden_of_proof": {
+   "rules_version": "burden_of_proof/1.0.0",
+   "kills_adjudicated": 1,
+   "kills_kept": 1,
+   "kills_demoted_to_risk": 0,
+   "demotion_classes": [],
+   "ledger": [
+    {
+     "rules_version": "burden_of_proof/1.0.0",
+     "dimension": "contradiction",
+     "verdict": "KILLED",
+     "demoted": false,
+     "disposition": "burden_met",
+     "evidence": {
+      "binding": {
+       "binding": "numbers",
+       "bound": [
+        "0.3",
+        "2.9",
+        "3.0"
+       ]
+      }
+     }
+    }
+   ]
+  },
+  "prior_art_state": "TOPICAL_RELATED",
+  "evidence_verified": true,
+  "prompt_hash": "7f79552199b8380d",
+  "output_hash": "f49ae127c43c0301",
+  "timestamp": "2026-09-17T17:59:44.528911+00:00",
+  "transport": {
+   "provider": "xkiro",
+   "model": "qwen/qwen3.5-plus:free",
+   "prompt_hash": "a29b71a9e8a017c8e06af77d7c88d25f359585b43e01723999f8d9b6400eead2",
+   "output_hash": "f49ae127c43c03018d752aa395ca010e014fd4244eca694ed7218c74b15cae6c",
+   "latency_ms": 10924,
+   "substituted_from": null,
+   "status": "OK",
+   "cost_provenance": {
+    "model_id": "qwen/qwen3.5-plus:free",
+    "model_revision": "router free tier; qwen/qwen3.8-max:free and minimax/minimax-m3:free measured live 2026-09-14 (tiny completions 3.2 s / 3.4 s); no per-model revision pin exposed by the router \u2014 recorded honest (Art. VI)",
+    "transport": "https://xkiro.com/v1/chat/completions",
+    "local_or_remote": "REMOTE",
+    "license": "provider serving terms (free tier, no deposit)",
+    "cost_basis": "FREE_TIER_API",
+    "account_domain": "OWNER_XKIRO_ACCOUNT",
+    "policy": "ZERO_PAID_COST",
+    "policy_version": "model_cost_policy/1.1.0"
+   },
+   "call_provenance": {
+    "run_id": null,
+    "session_id": null,
+    "engine_stage": null,
+    "call_class": "STANDALONE"
+   },
+   "task_degradation": {
+    "requested_task": "FAST",
+    "actual_task_capability": "FAST",
+    "task_capability_match": true,
+    "degraded_reason": "the serving model declares the requested task capability"
+   },
+   "retry_notes": [],
+   "provider_route": [
+    {
+     "provider": "xkiro",
+     "failure_type": null,
+     "status": "OK",
+     "capability_state": "PROBE_OK",
+     "fallback_provider": null
+    }
+   ],
+   "failure_type": null,
+   "ring_pin": {
+    "requested": "xkiro",
+    "mode": "HARD_PIN_NO_FALLBACK",
+    "served_provider": "xkiro",
+    "served_model": "qwen/qwen3.5-plus:free",
+    "pin_violation": null
+   }
+  },
+  "calibration_scope": {
+   "instrument": "a2/adversarial.py::adversarial_challenge (the 8-dimension adversarial gauntlet, v4 burden-of-proof rules)",
+   "instrument_version": "a2_adversarial_gauntlet/2.0.0",
+   "article_l_state": "UNCALIBRATED_NO_MEASUREMENT_SHIPPED",
+   "ruling": "R490/A2_CALIBRATION_SCOPE.json option (a): own DEV-corpus calibration (Art. LIX) before the KILL regains terminal authority; the consumption-side escalation (the R417 treatment) LANDED in R491 (a2/classify.py consults the canonical measurement registry entry \u2014 the record's own instrument_version selects it; the gauntlet's KILL escalates while uncalibrated)",
+   "v4_rules": "R494: the burden-of-proof standard (lacks-derivation -> RISK, never KILL) \u2014 the three-verdict vocabulary + the machine-side enforce_burden_of_proof (v4_corrections.py, the ONE authoritative implementation); the untuned 1.0.0 baseline measured TPR 0.0909 / FPR 1.0 on the frozen R492 DEV corpus (the before-number this tuning is judged against)",
+   "sealed_bar_coverage": "NONE until the v4 DEV-corpus measurement ships under the registry's pinned names \u2014 the R412/R447/R487 sealed-bar records cover independent_attack/* only"
+  }
+ },
+ "latency_s": 14.3
+}

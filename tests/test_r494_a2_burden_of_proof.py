@@ -52,6 +52,12 @@ from discovery_fabric.v4_corrections import (  # noqa: E402
 
 V4 = "a2_adversarial_gauntlet/2.0.0"
 V1 = "a2_adversarial_gauntlet/1.0.0"
+# R495 v4.2 (DEV): the instrument in THIS tree is 2.1.0 (the
+# attacker-computes standard); the REGISTRY's deployed entry — and
+# every consumption-gate pin below — stays 2.0.0 until the v4.2 line
+# deploys and measures on the deployed instrument (the R492 freeze
+# discipline: a seal may only ride a DEPLOYED-instrument measurement)
+V42 = "a2_adversarial_gauntlet/2.1.0"
 
 _VERIFICATION_OK = {"verified": True, "issues": []}
 _PRIOR_ART_PASS = {"prior_art_status": "TOPICAL_RELATED"}
@@ -221,7 +227,12 @@ class TestGauntletV4Parsing(unittest.TestCase):
                          "unsupported_mechanism")
         self.assertEqual(rec["risk_flags"][0]["source"],
                          "evaluator_risk")
-        self.assertEqual(rec["instrument_version"], V4)
+        # R495 v4.2 amendment (ruling cited): the record carries the
+        # instrument_version of the instrument THAT PRODUCED IT — in
+        # this tree that is 2.1.0 (the attacker-computes standard);
+        # the intent (the version travels on every record) is
+        # unchanged, the literal re-pinned
+        self.assertEqual(rec["instrument_version"], V42)
 
     def test_v3_bare_shape_parses_but_bare_kills_demote(self):
         resp = self._resp([

@@ -1,0 +1,149 @@
+{
+ "http": 200,
+ "attack": {
+  "overall": "KILLED",
+  "instrument_version": "a2_adversarial_gauntlet/2.0.0",
+  "gauntlet_version": "a2_adversarial_gauntlet/2.0.0",
+  "killed_count": 2,
+  "reason": "",
+  "attacks": {
+   "unsupported_mechanism": "PASS - the causal chain linking 265 nm peak emission to reduced fluence requirements is physically valid and consistent with germicidal action spectra.",
+   "weak_transfer": "PASS - the transfer of LED intensity modulation to UVT variations is a direct control loop application without identified mechanistic gaps.",
+   "obvious_combination": "RISK - while UV-C LEDs and UVT sensing are known, the record does not explicitly disclose their specific integration for per-module intensity modulation in this configuration.",
+   "prior_art": "PASS - no specific prior disclosure naming this exact modular LED array with real-time UVT-keyed control is provided in the record.",
+   "contradiction": "KILLED - the candidate claims \"120 kW margin\" in constraints, but evidence item ev:led-lifetime-derate states the system draws \"25-35 kW continuous,\" which fits within the margin, yet the same evidence cites a lifetime of 3,000-5,000 hours against a required \"~8,000 h/year flow operation,\" proving the component cannot survive the stated operational regime.",
+   "boundary_failure": "INSUFFICIENT_EVIDENCE (INSUFFICIENT_EVIDENCE)",
+   "engineering_infeasibility": "KILLED - the evidence item ev:led-lifetime-derate demonstrates that at the specified 55 C ambient and required drive current, the LED bank's 3,000-5,000 hour lifespan is engineeringly infeasible for a system requiring ~8,000 hours of annual operation without frequent replacement.",
+   "regulatory_incompatibility": "RISK - the record asserts D-2 compliance but lacks the derivation or test data proving the reduced lifetime or potential intensity fluctuations maintain the required log-reduction throughout the degraded lifespan."
+  },
+  "risk_flags": [
+   {
+    "dimension": "obvious_combination",
+    "verdict": "RISK",
+    "basis": "while UV-C LEDs and UVT sensing are known, the record does not explicitly disclose their specific integration for per-module intensity modulation in this configuration.",
+    "source": "evaluator_risk"
+   },
+   {
+    "dimension": "regulatory_incompatibility",
+    "verdict": "RISK",
+    "basis": "the record asserts D-2 compliance but lacks the derivation or test data proving the reduced lifetime or potential intensity fluctuations maintain the required log-reduction throughout the degraded lifespan.",
+    "source": "evaluator_risk"
+   }
+  ],
+  "invalid_dimensions": [],
+  "v4_corrections_applied": [
+   "burden_of_proof:risk_flag:obvious_combination",
+   "burden_of_proof:burden_met",
+   "boundary_evidence:INSUFFICIENT_EVIDENCE",
+   "burden_of_proof:burden_met",
+   "burden_of_proof:risk_flag:regulatory_incompatibility"
+  ],
+  "burden_of_proof": {
+   "rules_version": "burden_of_proof/1.0.0",
+   "kills_adjudicated": 2,
+   "kills_kept": 2,
+   "kills_demoted_to_risk": 0,
+   "demotion_classes": [],
+   "ledger": [
+    {
+     "rules_version": "burden_of_proof/1.0.0",
+     "dimension": "contradiction",
+     "verdict": "KILLED",
+     "demoted": false,
+     "disposition": "burden_met",
+     "evidence": {
+      "binding": {
+       "binding": "numbers",
+       "bound": [
+        "000",
+        "120",
+        "25",
+        "35"
+       ]
+      }
+     }
+    },
+    {
+     "rules_version": "burden_of_proof/1.0.0",
+     "dimension": "engineering_infeasibility",
+     "verdict": "KILLED",
+     "demoted": false,
+     "disposition": "burden_met",
+     "evidence": {
+      "binding": {
+       "binding": "numbers",
+       "bound": [
+        "000",
+        "55"
+       ]
+      }
+     }
+    }
+   ]
+  },
+  "prior_art_state": "TOPICAL_RELATED",
+  "evidence_verified": true,
+  "prompt_hash": "7f79552199b8380d",
+  "output_hash": "d4c915e55d87db44",
+  "timestamp": "2026-09-17T17:59:26.615222+00:00",
+  "transport": {
+   "provider": "xkiro",
+   "model": "qwen/qwen3.5-plus:free",
+   "prompt_hash": "9ae643ca6f37f8101b74086df4c7a44a51bd9a69a7ec3c07d045caacc735d863",
+   "output_hash": "d4c915e55d87db44f87b7f18adf594ca412098a6679c29207803b0fd1e177204",
+   "latency_ms": 10761,
+   "substituted_from": null,
+   "status": "OK",
+   "cost_provenance": {
+    "model_id": "qwen/qwen3.5-plus:free",
+    "model_revision": "router free tier; qwen/qwen3.8-max:free and minimax/minimax-m3:free measured live 2026-09-14 (tiny completions 3.2 s / 3.4 s); no per-model revision pin exposed by the router \u2014 recorded honest (Art. VI)",
+    "transport": "https://xkiro.com/v1/chat/completions",
+    "local_or_remote": "REMOTE",
+    "license": "provider serving terms (free tier, no deposit)",
+    "cost_basis": "FREE_TIER_API",
+    "account_domain": "OWNER_XKIRO_ACCOUNT",
+    "policy": "ZERO_PAID_COST",
+    "policy_version": "model_cost_policy/1.1.0"
+   },
+   "call_provenance": {
+    "run_id": null,
+    "session_id": null,
+    "engine_stage": null,
+    "call_class": "STANDALONE"
+   },
+   "task_degradation": {
+    "requested_task": "FAST",
+    "actual_task_capability": "FAST",
+    "task_capability_match": true,
+    "degraded_reason": "the serving model declares the requested task capability"
+   },
+   "retry_notes": [],
+   "provider_route": [
+    {
+     "provider": "xkiro",
+     "failure_type": null,
+     "status": "OK",
+     "capability_state": "PROBE_OK",
+     "fallback_provider": null
+    }
+   ],
+   "failure_type": null,
+   "ring_pin": {
+    "requested": "xkiro",
+    "mode": "HARD_PIN_NO_FALLBACK",
+    "served_provider": "xkiro",
+    "served_model": "qwen/qwen3.5-plus:free",
+    "pin_violation": null
+   }
+  },
+  "calibration_scope": {
+   "instrument": "a2/adversarial.py::adversarial_challenge (the 8-dimension adversarial gauntlet, v4 burden-of-proof rules)",
+   "instrument_version": "a2_adversarial_gauntlet/2.0.0",
+   "article_l_state": "UNCALIBRATED_NO_MEASUREMENT_SHIPPED",
+   "ruling": "R490/A2_CALIBRATION_SCOPE.json option (a): own DEV-corpus calibration (Art. LIX) before the KILL regains terminal authority; the consumption-side escalation (the R417 treatment) LANDED in R491 (a2/classify.py consults the canonical measurement registry entry \u2014 the record's own instrument_version selects it; the gauntlet's KILL escalates while uncalibrated)",
+   "v4_rules": "R494: the burden-of-proof standard (lacks-derivation -> RISK, never KILL) \u2014 the three-verdict vocabulary + the machine-side enforce_burden_of_proof (v4_corrections.py, the ONE authoritative implementation); the untuned 1.0.0 baseline measured TPR 0.0909 / FPR 1.0 on the frozen R492 DEV corpus (the before-number this tuning is judged against)",
+   "sealed_bar_coverage": "NONE until the v4 DEV-corpus measurement ships under the registry's pinned names \u2014 the R412/R447/R487 sealed-bar records cover independent_attack/* only"
+  }
+ },
+ "latency_s": 13.9
+}

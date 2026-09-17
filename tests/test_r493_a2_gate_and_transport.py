@@ -380,9 +380,14 @@ class TestV4Floors(unittest.TestCase):
         # R494 union: 1.1.0 (the sibling line's floors) + the burden-
         # of-proof rules (this line) -> 2.0.0 in the REGISTRY's id
         # scheme; the record carries BOTH keys (gauntlet_version —
-        # the 1.1.0 line's; instrument_version — the registry's)
+        # the 1.1.0 line's; instrument_version — the registry's).
+        # R495 v4.2 amendment (ruling cited): the instrument in this
+        # tree is 2.1.0 (the attacker-computes standard — DEV, not
+        # yet deployed; the registry's deployed entry stays 2.0.0 and
+        # its consumption-gate pins are unchanged); the intent (the
+        # version travels on every record) is unchanged
         self.assertEqual(a2.A2_GAUNTLET_VERSION,
-                         "a2_adversarial_gauntlet/2.0.0")
+                         "a2_adversarial_gauntlet/2.1.0")
 
     def test_contradiction_absence_floor(self):
         # the measured a2dev-20 class: CONTRADICTION killed with an

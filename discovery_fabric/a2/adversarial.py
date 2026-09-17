@@ -58,7 +58,24 @@ FROZEN_MODEL = "deepseek/deepseek-v4-flash-0731"  # OpenRouter fallback model
 # version travels on every record (gauntlet_version AND
 # instrument_version — the union's two accepted keys) so a future
 # seal binds to exactly one iteration.
-A2_GAUNTLET_VERSION = "a2_adversarial_gauntlet/2.0.0"
+# R495 (v4.2 — DEV, not yet deployed): the ATTACKER-COMPUTES kill
+# standard. The 2.0.0 repetition measurement (two runs, xkiro, plus
+# the zai cross-ring replication) proved the typed failure class the
+# shipped record named: the evaluator hedges DERIVABLE-but-uncomputed
+# defects into RISK ("asserts X but provides no derivation" — the
+# objection correct, the burden never attempted), TPR 0.27/0.22 vs the
+# 0.75 bar while FPR stays 0.0 on every ring. v4.2 changes ONE thing:
+# the attacker may now MEET the burden by COMPUTING the derivation
+# from the record's own numbers (show the arithmetic — a magnitude
+# relation one side of which binds to a record value). The machine
+# side recognizes the computed-relation form (CORRECTION 12, rule
+# 4.5 — v4_corrections.py) and still demotes absence-demands,
+# memory-claims, one-sided contradictions, and unbound assertions.
+# The version is 2.1.0 in the registry's id scheme (a DEV iteration of
+# the 2.0.0 rules; the deployed instrument stays 2.0.0 until this
+# line's deploy — the seal may only ride a DEPLOYED-instrument
+# measurement, the R492 freeze discipline).
+A2_GAUNTLET_VERSION = "a2_adversarial_gauntlet/2.1.0"
 GAUNTLET_VERSION = A2_GAUNTLET_VERSION   # the registry-entry alias
 
 _SSL = ssl.create_default_context()
@@ -89,11 +106,11 @@ ATTACK_PROMPT = """You are an adversarial reviewer for engineering invention can
 
 For each dimension, respond with exactly one verdict:
 
-- KILLED — only when the record ITSELF proves the defect. Name the specific grounding — the exact quantity, number, regime, clause, standard, or named technique from the candidate (or from the provided evidence) that fails — and state the relation that proves the defect: a contradiction between two record values (name both); a magnitude fatal by the record's own numbers; a boundary the record itself declares violated; or a load-bearing claim with zero supporting evidence when the record carries no evidence at all. Grounded example: "KILLED - claimed 3.5-log at 8 Wh/m3 specific energy, but cavitational radical chemistry requires tens of kJ/LITER, 1000x higher".
-- RISK — your objection is real but the burden for a KILL is not met: the record asserts a claim but lacks the derivation, calculation, data, or evidence that would support it; the objection needs an assumption or a scope the record never stated; or the defect is plausible but not derivable from the record's own bytes.
+- KILLED — only when the record ITSELF proves the defect, or when YOU can COMPUTE the defect from the record's own numbers. Name the specific grounding — the exact quantity, number, regime, clause, standard, or named technique from the candidate (or from the provided evidence) that fails — and state the relation that proves the defect: a contradiction between two record values (name both); a magnitude fatal by the record's own numbers — either stated in the record or DERIVED BY YOU: compute it, show the arithmetic (a ratio, a multiple, a unit conversion, a scaling relation), and name the record value your derivation starts from; a boundary the record itself declares violated; or a load-bearing claim with zero supporting evidence when the record carries no evidence at all. Grounded example: "KILLED - claimed 3.5-log at 8 Wh/m3 specific energy, but cavitational radical chemistry requires tens of kJ/LITER — 1000x higher than the record's own 8 Wh/m3". Computed example: "KILLED - the record claims 2.5-log removal by density separation at a 10 um d50, but marine organisms near the specific gravity of water (SG ~1.0, the record's own operating assumption) cannot be separated by density at that cut: the density driving force is near zero, so the claimed 2.5-log at the record's own 10 um d50 and 700 m3/h is not derivable from any density gradient the record contains".
+- RISK — your objection is real but the burden for a KILL is not met: the record asserts a claim, you could NOT compute the defect from the record's own numbers, and the record carries no derivation either; the objection needs an assumption or a scope the record never stated; or the defect is plausible but not derivable from the record's own bytes. If the record's own numbers DO let you derive the defect, compute it and KILL — a missing calculation you could have performed is not a RISK.
 - PASS — no objection on this dimension.
 
-A claim that lacks derivation is the NORMAL state of a young candidate: it is a RISK (a demand for evidence), never a terminal kill. NEVER kill a candidate merely for lacking a calculation, data, or evidence you wish it had. An objection you cannot ground in a specific from the record is a RISK, not a kill.
+A claim that lacks derivation is the NORMAL state of a young candidate — but a missing derivation has TWO honest dispositions, not one: if the record's own values let you COMPUTE the defect, compute it and KILL (the arithmetic is your grounding); if neither the record nor your own arithmetic over its values can settle the objection, it is a RISK (a demand for evidence), never a terminal kill. NEVER kill a candidate merely for lacking data or evidence you wish it had — and NEVER hide behind the record's missing derivation when its own numbers already prove the defect. An objection you cannot ground in a specific from the record — by citation or by computation — is a RISK, not a kill.
 nsions:
 1. UNSUPPORTED_MECHANISM: the causal chain is physically/chemically invalid — name the specific claimed effect and the specific physical reason it cannot hold.
 2. WEAK_TRANSFER: the source-to-application transfer is superficial — name the specific mechanism element that fails to transfer and why.

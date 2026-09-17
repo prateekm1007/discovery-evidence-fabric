@@ -530,7 +530,17 @@ class TestDeletionAccounting(unittest.TestCase):
                     # stage module itself is new (improve_stage.py is
                     # exercised through its own battery, not this
                     # mandate's accounting)
-                    "discovery_fabric/engine/cheap_screen.py"),
+                    "discovery_fabric/engine/cheap_screen.py",
+                    # R495 AMENDMENT (disclosed): the A2 burden-of-
+                    # proof instrument is the R490-owned calibration
+                    # surface — v4.2 (the attacker-computes standard)
+                    # edits v4_corrections.py (rule 4.5) and
+                    # a2/adversarial.py (the prompt standard + the
+                    # 2.1.0 version), the same surface the R493/R494
+                    # rounds tuned under the R490 plan; the R481
+                    # mandate's own files remain untouched
+                    "discovery_fabric/v4_corrections.py",
+                    "discovery_fabric/a2/adversarial.py"),
                 f"the mandate's file list is exhaustive: {f} is outside "
                 "run.py/stage_entry.py/adapters.py/llm_registry.py")
 
