@@ -33,6 +33,22 @@ expectations are preserved in the R496 records and in git history):
         record text)
   F11 patent-leg hallucinated passage  -> EVIDENCE_REFUTED
        (a fabricated passage verified against the patent record text)
+  F12 free-source substrate honesty    -> CORPUS_COVERAGE_LIVE_THIS_RUN
+       (FULL-MODE ONLY, v4 R499: the keyless free-source layer self-
+        measures live -- HF Hub catalog (a LISTING, count signal only),
+        content-bearing HF datasets-server rows for the brief's flagship
+        corpus, the Google patents-public-data GitHub substrate; the
+        account-gated / unreachable / non-API free sources (EPO OPS,
+        USPTO portal, PatentsView) must stay TYPED and never LIVE;
+        coverage derives ONLY from the content-bearing measurement; the
+        operator brief's 16.2M-row claim is recorded against the keyless
+        served-view measurement as EXTERNAL_CLAIM_UNVERIFIED; the
+        --patent-leg-only mode's contract is UNCHANGED -- it runs only
+        F6/F9/F10/F11 as defined at R498)
+  F13 corpus hallucination attack      -> CORPUS_ATTACK_REFUSED
+       (FULL-MODE ONLY: a plausible-but-nonexistent dataset id must NOT
+        type live and must not move the coverage statement -- Art. VIII
+        attack, F11's discipline generalized to the corpus substrate)
 
 QUOTA DISCIPLINE (R497, Art. LXXIII): the provider meters every
 successful call (free plan 20/month). Per repetition the PatentBear leg
@@ -88,6 +104,17 @@ MUTATION_TO = "valve (mutated)"
 PB_HALLUCINATED_PASSAGE = ("The patented shunt assembly was validated in a "
                            "multicenter trial of 2,304 patients and reduced "
                            "occlusion events to zero across all sites.")
+# F13 corpus hallucination (fixed constant, authored before any run;
+# Art. VIII): a syntactically plausible but NONEXISTENT dataset id in the
+# toscanini namespace. Measured reality (R499 smoke): datasets-server
+# answers 403 (AUTH_FAILED) for nonexistent ids, not 404 -- the fixture
+# accepts ANY typed non-live state, and the measured state is recorded.
+HALLUCINATED_DATASET = "toscanini-rbg/nonexistent-patent-corpus-f13"
+# The typed-state vocabulary of the free-source layer (F12 honesty set).
+TYPED_STATE_VOCABULARY = frozenset({
+    "LIVE_200", "AUTH_FAILED", "SEARCH_FAILED", "RETRIEVAL_UNCONFIGURED",
+    "NO_RESULTS", "NOT_FOUND", "DNS_UNRESOLVED_THIS_ENVIRONMENT",
+    "WEB_SHELL_NOT_JSON_API", "CREDENTIAL_REQUIRED"})
 
 
 def custody(query, provider, state, extra=None):
@@ -131,22 +158,29 @@ def run_battery(repetition_id, patent_leg_only=False):
            "started_utc": g._now(),
            "fixtures": [],
            "engine": "rbg_gate.py",
-           "battery_version": "3.1",
+           "battery_version": "4",
            "battery_mode": ("patent_leg_only" if patent_leg_only else "full"),
-           "battery_version_note": "v3.1 (R498): MODE extension only -- --patent-leg-only "
-                                   "runs the patent-leg fixtures (F6, F9, F10, F11) with the "
-                                   "Scopus fixtures typed SKIPPED_UNCONFIGURED_THIS_RUN "
-                                   "(pass=null; never a pass, never a fail) when the Scopus "
-                                   "credential is absent; NO fixture re-authored, NO "
-                                   "expectation changed (Art. VII disclosed). v3 (R497): "
-                                   "PatentBear measured LIVE -> disclosed fixture update: "
-                                   "F6 re-authored to assert PATENT_COVERAGE_LIVE_THIS_RUN, "
-                                   "F9 re-anchored to the measured-401 garbage pb_live_ key, "
-                                   "F10/F11 patent-leg fixtures added; v2 (R496) = "
-                                   "multi-provider layer + F9 under the no-openable-provider "
-                                   "reality; v1 (R495) = single Lens class, 8 fixtures",
+           "battery_version_note": "v4 (R499): operator directive 'use huggingface and "
+                                   "other free sources' -> disclosed fixture update "
+                                   "(Art. VII): FreePatentSourceLayer installed (keyless "
+                                   "HF Hub catalog + content-bearing HF datasets-server "
+                                   "rows + Google substrate + typed boundaries for EPO "
+                                   "OPS / USPTO portal / PatentsView), F12/F13 added as "
+                                   "FULL-MODE fixtures (keyless, zero debits); the "
+                                   "--patent-leg-only mode contract is unchanged from "
+                                   "v3.1. v3.1 (R498) = MODE extension only "
+                                   "(--patent-leg-only, SKIPPED_UNCONFIGURED_THIS_RUN "
+                                   "semantics, no fixture re-authored); v3 (R497) = "
+                                   "PatentBear LIVE, F6 coverage assert + F9 measured-401 "
+                                   "re-anchor + F10/F11 patent-leg fixtures; v2 (R496) = "
+                                   "multi-provider layer + F9; v1 (R495) = single Lens "
+                                   "class, 8 fixtures",
            "verdict_vocabulary": "no novelty verdict exists (Art. XLVI)",
-           "patentbear_quota_ledger": []}
+           "patentbear_quota_ledger": [],
+           "free_source_quota_note": "KEYLESS: the free-source layer spends zero "
+                                     "metered debits (HF Hub + datasets-server are "
+                                     "rate-limited but free; 429 handled by bounded "
+                                     "backoff, transport robustness only)"}
     t = g.ScopusTransport()
 
     def fixture(fid, description, expected, observed_verdict, passed, details):
@@ -449,6 +483,81 @@ def run_battery(repetition_id, patent_leg_only=False):
         fixture("F11", "hallucinated patent passage must fail byte verification",
                 g.V_REFUTED, g.V_INCOMPLETE, False,
                 {"reason": "patent record text unavailable for verification"})
+
+    # ---- free-source substrate fixtures (v4, R499): the operator directive
+    # "use huggingface and other free sources" installs the keyless free
+    # sources as instrument surface. QUOTA DISCIPLINE: every call here is
+    # keyless and spends ZERO PatentBear debits. FULL-MODE ONLY: the
+    # --patent-leg-only mode contract (R498) is unchanged.
+    if not patent_leg_only:
+        # F12 free-source substrate honesty: the layer self-measures live; the
+        # content-bearing HF rows measurement (real text, not a listing) must
+        # be LIVE, the listing + substrate may corroborate, every state must be
+        # TYPED, and the keyless boundaries must NEVER measure LIVE (F9's
+        # invariant generalized: present-but-gated/unreachable/non-API stays
+        # non-live on every surface).
+        free_layer = g.FreePatentSourceLayer()
+        free_m = free_layer.self_measure()
+        free_decl = free_layer.coverage_declaration()
+        rep["free_source_coverage_declaration"] = free_decl
+        rep["free_source_measurements"] = free_m
+        all_typed = all(v.get("state") in TYPED_STATE_VOCABULARY
+                        for v in free_m.values())
+        rows_m = free_m.get("hf_corpus_rows", {})
+        catalog_m = free_m.get("hf_hub_catalog", {})
+        substrate_m = free_m.get("google_github_substrate", {})
+        content_live = (rows_m.get("state") == g.T_LIVE
+                        and bool(rows_m.get("rows_returned"))
+                        and rows_m.get("has_long_text_field") is True)
+        catalog_live = (catalog_m.get("state") == g.T_LIVE
+                        and (catalog_m.get("dataset_count_returned") or 0) >= 1)
+        substrate_live = substrate_m.get("state") == g.T_LIVE
+        keyless_never_live = all(
+            v.get("state") != g.T_LIVE for k, v in free_m.items()
+            if v.get("role") in ("KEYLESS_BOUNDARY_MEASUREMENT",
+                                 "KEYLESS_SHAPE_MEASUREMENT",
+                                 "ENVIRONMENT_REACHABILITY_MEASUREMENT"))
+        f12_ok = (all_typed and content_live and catalog_live and substrate_live
+                  and keyless_never_live
+                  and free_decl["coverage_statement"] == g.CORPUS_COVERED)
+        fixture("F12", "free-source substrate: content-bearing keyless coverage "
+                      "measured LIVE, every state typed, gated sources never live",
+                g.CORPUS_COVERED, free_decl["coverage_statement"], f12_ok,
+                {"per_source_states": free_decl["per_source_states"],
+                 "content_live": content_live, "catalog_live": catalog_live,
+                 "substrate_live": substrate_live,
+                 "keyless_never_live": keyless_never_live,
+                 "all_typed": all_typed,
+                 "coverage_rule": "coverage derives ONLY from the content-bearing "
+                                  "row measurement; the catalog listing is a count "
+                                  "signal, never coverage (Art. XXI.1 / LXXV.2)",
+                 "brief_claim_verification": free_decl["brief_claim_verification"],
+                 "measured_num_rows_served": free_decl["measured_num_rows_served"]})
+
+        # F13 corpus hallucination attack: a plausible-but-nonexistent dataset
+        # id must NOT type live and must NOT move the coverage statement (the
+        # statement derives from the real measurement, never from the attack).
+        h_state, _h_obj = free_layer.fetch_dataset_rows(
+            HALLUCINATED_DATASET, "default", "train", length=1)
+        decl_after = free_layer.coverage_declaration()
+        attack_refused = (h_state != g.T_LIVE
+                          and h_state in TYPED_STATE_VOCABULARY
+                          and decl_after["coverage_statement"] == free_decl["coverage_statement"])
+        fixture("F13", "hallucinated dataset id must not type live nor move the "
+                      "coverage statement",
+                "CORPUS_ATTACK_REFUSED",
+                "CORPUS_ATTACK_REFUSED" if attack_refused else (
+                    "HALLUCINATED_DATASET_MEASURED_LIVE" if h_state == g.T_LIVE
+                    else "COVERAGE_STATEMENT_MOVED_BY_ATTACK"),
+                attack_refused,
+                {"hallucinated_dataset": HALLUCINATED_DATASET,
+                 "measured_state": h_state,
+                 "coverage_statement_before": free_decl["coverage_statement"],
+                 "coverage_statement_after": decl_after["coverage_statement"],
+                 "attack_description": "coder trusts a plausible dataset id because it "
+                                       "looks well-formed; the layer must measure and "
+                                       "type it, never assume (Art. LXXV.1: a patent "
+                                       "match is evidence, never truth)"})
 
     rep["ended_utc"] = g._now()
     # The verdict sequence covers MEASURED fixtures only -- skipped

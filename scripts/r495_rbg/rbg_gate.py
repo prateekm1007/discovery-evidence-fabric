@@ -572,3 +572,235 @@ def collision_verdict(transport_state, any_relevant_hit, any_verified_hit):
     if any_relevant_hit and not any_verified_hit:
         return V_INDETERMINATE
     return V_NO_COLLISION
+
+
+# ---- free-source substrate states (R499) --------------------------------
+# The operator directive "use huggingface and other free sources" installs
+# the keyless free-source substrate as instrument surface. Its states obey
+# the same law as every transport state: MEASURED, TYPED, never inferred.
+T_NOT_FOUND = "NOT_FOUND"                       # 404: the requested object does not exist
+T_DNS_UNRESOLVED = "DNS_UNRESOLVED_THIS_ENVIRONMENT"  # cannot even reach the host HERE
+T_NON_JSON = "WEB_SHELL_NOT_JSON_API"           # 200 but HTML shell, not an API answer
+T_CREDENTIAL_REQUIRED = "CREDENTIAL_REQUIRED"   # measured 401/403 credential wall
+
+CORPUS_COVERED = "CORPUS_COVERAGE_LIVE_THIS_RUN"
+CORPUS_BLIND = "PATENT_CORPUS_BLIND_FOR_THIS_RUN"
+
+# R499 probe-measured constants (Art. VIII: authored from provider reality,
+# probe ledger R499/R499_FREE_SOURCES_PROBE.json):
+HF_CATALOG_URL = ("https://huggingface.co/api/datasets?other=patents"
+                  "&limit=100&full=false")
+HF_CORPUS_DATASET = "common-pile/uspto"     # the operator brief's flagship corpus
+HF_CORPUS_CONFIG = "default"                # measured via datasets-server /splits
+HF_CORPUS_SPLIT = "train"                   # measured via datasets-server /splits
+BRIEF_CLAIM_ROWS_COMMON_PILE = 16200000     # operator-brief external claim (~16.2M)
+EPO_OPS_PROBE_URL = ("https://ops.epo.org/3.2/rest-services/published-data/"
+                     "search?q=ti%3D%22shunt%20valve%22")
+USPTO_PORTAL_PROBE_URL = "https://data.uspto.gov/api/1/datasets?q=patent"
+GITHUB_SUBSTRATE_URL = ("https://raw.githubusercontent.com/google/"
+                        "patents-public-data/master/README.md")
+
+
+class FreePatentSourceLayer:
+    """Keyless free patent-source substrate (R499): Hugging Face Hub catalog,
+    Hugging Face datasets-server row access (content-bearing), the Google
+    patents-public-data GitHub substrate, and TYPED boundary measurements of
+    the account-gated free sources (EPO OPS, USPTO portal, PatentsView).
+
+    Constitutional law for this layer:
+      - every state is MEASURED, never inferred from presence or reputation;
+      - a keyless boundary that answers 401/403 types CREDENTIAL_REQUIRED --
+        the named missing piece is the free registration, never a verdict;
+      - an unreachable host types DNS_UNRESOLVED_THIS_ENVIRONMENT (Art.
+        XXIII: cannot-verify-here is said, not papered over);
+      - a 200 that returns an HTML shell types WEB_SHELL_NOT_JSON_API --
+        a marketing page is not an API (presentational success is not
+        retrieval success);
+      - coverage statements derive ONLY from content-bearing LIVE
+        measurements (a row fetch with real text), never from catalog
+        listings alone (a listing is a count signal, Art. XXI.1).
+    """
+
+    name = "free_sources"
+
+    def __init__(self):
+        self.measured = {}
+
+    # -- generic dataset-server row fetch (also serves F13's attack path) --
+    def fetch_dataset_rows(self, dataset, config, split, length=2):
+        url = ("https://datasets-server.huggingface.co/rows?dataset=%s"
+               "&config=%s&split=%s&offset=0&length=%d"
+               % (urllib.parse.quote(dataset), urllib.parse.quote(config),
+                  urllib.parse.quote(split), int(length)))
+        code, raw = _http_get(url, {"Accept": "application/json",
+                                    "User-Agent": "toscanini-rbg/1.0"})
+        if code is None:
+            return T_SEARCH_FAILED, None
+        if code == 404:
+            return T_NOT_FOUND, None
+        if code in (401, 403):
+            return T_AUTH_FAILED, None
+        if code != 200:
+            return T_SEARCH_FAILED, None
+        try:
+            obj = json.loads(raw.decode("utf-8", "replace"))
+        except Exception:  # noqa: BLE001
+            return T_SEARCH_FAILED, None
+        return T_LIVE, obj
+
+    def self_measure(self):
+        """Measure every registered free source live. Returns the per-source
+        map; every state is typed."""
+        m = self.measured = {}
+
+        # 1. HF Hub catalog (a LISTING -- count signal, never coverage)
+        code, raw = _http_get(HF_CATALOG_URL, {"Accept": "application/json",
+                                               "User-Agent": "toscanini-rbg/1.0"})
+        st, obj = T_SEARCH_FAILED, None
+        if code == 200:
+            try:
+                obj = json.loads(raw.decode("utf-8", "replace"))
+                st = T_LIVE if isinstance(obj, list) else T_SEARCH_FAILED
+            except Exception:  # noqa: BLE001
+                st = T_SEARCH_FAILED
+        elif code == 404:
+            st = T_NOT_FOUND
+        elif code in (401, 403):
+            st = T_AUTH_FAILED
+        m["hf_hub_catalog"] = {
+            "state": st, "http": code,
+            "dataset_count_returned": len(obj) if isinstance(obj, list) else None,
+            "role": "DISCOVERY_LISTING_COUNT_SIGNAL_ONLY"}
+
+        # 2. HF datasets-server rows for the flagship corpus (CONTENT-BEARING)
+        st_r, obj_r = self.fetch_dataset_rows(HF_CORPUS_DATASET, HF_CORPUS_CONFIG,
+                                              HF_CORPUS_SPLIT, length=2)
+        rows = (obj_r or {}).get("rows") if isinstance(obj_r, dict) else None
+        long_text = False
+        longest = 0
+        if isinstance(rows, list) and rows:
+            r0 = rows[0].get("row") or {}
+            textish = [v for v in r0.values() if isinstance(v, str) and len(v) > 80]
+            long_text = bool(textish)
+            longest = max((len(v) for v in textish), default=0)
+        m["hf_corpus_rows"] = {
+            "state": st_r, "dataset": HF_CORPUS_DATASET,
+            "config": HF_CORPUS_CONFIG, "split": HF_CORPUS_SPLIT,
+            "rows_returned": len(rows) if isinstance(rows, list) else None,
+            "has_long_text_field": long_text,
+            "longest_text_field_len": longest,
+            "role": "CONTENT_BEARING_COVERAGE_SOURCE"}
+
+        # 3. HF datasets-server size (served-view row count; claim check)
+        st_s, obj_s = self.fetch_dataset_size()
+        m["hf_corpus_size_served_view"] = {
+            "state": st_s,
+            "measured_num_rows_served": obj_s,
+            "brief_claim_num_rows": BRIEF_CLAIM_ROWS_COMMON_PILE,
+            "claim_verification": (
+                "EXTERNAL_CLAIM_UNVERIFIED_AT_SERVED_VIEW: the keyless "
+                "datasets-server serves %s rows for the default config; the "
+                "brief's full-dataset figure is neither confirmed nor "
+                "refuted by this measurement" % obj_s
+                if isinstance(obj_s, int) else "EXTERNAL_CLAIM_UNVERIFIED"),
+            "role": "CLAIM_VERIFICATION_EVIDENCE"}
+
+        # 4. Google patents-public-data GitHub substrate (tooling/docs)
+        code4, raw4 = _http_get(GITHUB_SUBSTRATE_URL, {"Accept": "text/plain",
+                                                       "User-Agent": "toscanini-rbg/1.0"})
+        st4 = T_LIVE if (code4 == 200 and isinstance(raw4, bytes)
+                         and b"patent" in raw4[:65536].lower()) else T_SEARCH_FAILED
+        if code4 == 404:
+            st4 = T_NOT_FOUND
+        m["google_github_substrate"] = {
+            "state": st4, "http": code4,
+            "role": "TOOLING_DOCS_SUBSTRATE"}
+
+        # 5. EPO OPS keyless boundary (account-gated free source)
+        code5, _raw5 = _http_get(EPO_OPS_PROBE_URL, {"Accept": "application/json",
+                                                     "User-Agent": "toscanini-rbg/1.0"})
+        m["epo_ops_boundary"] = {
+            "state": T_CREDENTIAL_REQUIRED if code5 in (401, 403) else
+                     (T_SEARCH_FAILED if code5 is None else T_SEARCH_FAILED),
+            "http": code5,
+            "missing_piece": "free EPO OPS registration (auth key)",
+            "role": "KEYLESS_BOUNDARY_MEASUREMENT"}
+
+        # 6. USPTO Open Data Portal shape (keyless)
+        code6, raw6 = _http_get(USPTO_PORTAL_PROBE_URL, {"Accept": "application/json",
+                                                         "User-Agent": "toscanini-rbg/1.0"})
+        if code6 == 200 and isinstance(raw6, bytes):
+            head = raw6[:512].lstrip().lower()
+            st6 = T_NON_JSON if head.startswith(b"<!doctype") or head.startswith(b"<html") \
+                else T_LIVE
+        elif code6 == 404:
+            st6 = T_NOT_FOUND
+        else:
+            st6 = T_SEARCH_FAILED
+        m["uspto_portal_shape"] = {
+            "state": st6, "http": code6,
+            "note": "the portal answers its SPA shell, not a JSON API, at "
+                    "the probed path",
+            "role": "KEYLESS_SHAPE_MEASUREMENT"}
+
+        # 7. PatentsView reachability (MEASURED LIVE each repetition, not
+        #    hard-typed from the R499 probe: the probe measured DNS
+        #    unresolvable HERE (gaierror -2); if egress ever opens, the
+        #    measured state must change with it, never stay pinned)
+        import socket
+        pv_state, pv_http, pv_missing = T_SEARCH_FAILED, None, None
+        try:
+            socket.gethostbyname("search.patentsview.org")
+            pv_dns_ok = True
+        except socket.gaierror:
+            pv_dns_ok = False
+        if not pv_dns_ok:
+            pv_state = T_DNS_UNRESOLVED
+            pv_missing = "egress route for search.patentsview.org"
+        else:
+            code7, _raw7 = _http_get(
+                "https://search.patentsview.org/api/v1/patent/",
+                {"Accept": "application/json", "User-Agent": "toscanini-rbg/1.0"})
+            pv_http = code7
+            if code7 in (401, 403):
+                pv_state = T_CREDENTIAL_REQUIRED
+                pv_missing = "free PatentsView API key (keyless registration)"
+        m["patentsview_reachability"] = {
+            "state": pv_state, "http": pv_http,
+            "missing_piece": pv_missing,
+            "probe_precedent": "R499 probe measured DNS unresolvable here",
+            "role": "ENVIRONMENT_REACHABILITY_MEASUREMENT"}
+        return m
+
+    def fetch_dataset_size(self):
+        url = ("https://datasets-server.huggingface.co/size?dataset="
+               + urllib.parse.quote(HF_CORPUS_DATASET))
+        code, raw = _http_get(url, {"Accept": "application/json",
+                                    "User-Agent": "toscanini-rbg/1.0"})
+        if code != 200:
+            return (T_NOT_FOUND if code == 404 else T_SEARCH_FAILED), None
+        try:
+            obj = json.loads(raw.decode("utf-8", "replace"))
+            n = ((obj.get("size") or {}).get("dataset") or {}).get("num_rows")
+            return T_LIVE, (n if isinstance(n, int) else None)
+        except Exception:  # noqa: BLE001
+            return T_SEARCH_FAILED, None
+
+    def coverage_declaration(self):
+        """Coverage derives ONLY from content-bearing LIVE measurements."""
+        m = self.measured or self.self_measure()
+        rows_m = m.get("hf_corpus_rows", {})
+        live_content_sources = [k for k, v in m.items()
+                                if v.get("state") == T_LIVE
+                                and v.get("role") == "CONTENT_BEARING_COVERAGE_SOURCE"]
+        covered = bool(rows_m.get("state") == T_LIVE
+                       and rows_m.get("rows_returned")
+                       and rows_m.get("has_long_text_field"))
+        return {
+            "coverage_statement": CORPUS_COVERED if covered else CORPUS_BLIND,
+            "live_content_sources": live_content_sources,
+            "per_source_states": {k: v.get("state") for k, v in m.items()},
+            "measured_num_rows_served": m.get("hf_corpus_size_served_view", {}).get("measured_num_rows_served"),
+            "brief_claim_verification": m.get("hf_corpus_size_served_view", {}).get("claim_verification"),
+            "not_a_novelty_verdict": True,
+        }
