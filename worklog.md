@@ -1981,4 +1981,19 @@ Work Log:
 
 Stage Summary:
 - The cross-domain lever is ANSWERED for this attempt: negative, fully provenanced — the mechanical-family run terminated pre-loop on a degraded ring (the free leg served synthesis AND attack; atria substituted out; collision degraded), and the loop never existed to close. The (rules x ring) finding now spans calibration AND the run-level reject path. Remaining 7->9 gap: cross-domain repetition (next attempt: family in the submission, healthy ring), any package, rebuild proof, baseline-win ruling.
+
+Task ID: R487 (the cross-domain closure — terminal)
+Agent: Coder 1 (main session, CTO line)
+Task: The cross-domain live proof to terminal + the final records
+
+Work Log:
+- THE RUN: ts_f0880e025e60 (R458-M1, mechanical) executed server-side through every poll slice (Art. LXXIV — observation is not execution): 15 gauntlet stages OK by 09:36:32Z, the kill-point IMPROVE executed 10:30:00->10:37:23Z, the terminal checkpoint landed 11:05:59Z (terminal:COMPLETE), the harvest completed on the re-invoke after the terminal commit.
+- THE MEASURED CLOSURE: gauntlet kill (obvious_combination) -> cemetery cem:engrun:99f65e4232 (178th) -> kill-point mutation (gen-2 child inv:f0640e8984:gen2) -> CHILDREN_ADMITTED (delta_real true, hash 2964211e -> 5c4616c6) -> survivor selection 11 ranked, selected cand:DIV:cross_industry_transfer:unorouter:0be7bab36ad3; synthesis xkiro/qwen3.8-max:free with doi:10.1115/imece2017-71399 (884-char span), evidence_verified TRUE.
+- CROSS_DOMAIN_REPEATED: corpus-declared mechanical == run-declared mechanical (BRIDGE_REPORT geometry/artifact domain_family) != both prior closures' thermal/fluid. The loop-closure mechanism now exists on a second domain family.
+- THE HONEST BOUNDARY (surfaced explicitly, the R486 lesson): DISCOVERY_RELEASE status HELD_FOR_HUMAN_REVIEW — the selected survivor died at the technical-improvement wall (KILLED_NO_DEFENSIBLE_MUTATION, I1_MECHANISM_EVIDENCE_DERIVATION, iteration 2); real_loop_verified false; package_zip null; buyer_package_hash null. Same boundary shape as attempt-5, replicated cross-domain: the mechanism repeats, the package does not exist. The attacker was NOT_CALIBRATED during the run (FPR 1.0 measured the same day) — the closure rode the R417 escalation path, admission-despite-escalated-objection.
+- Driver harvest completed: the release-outcome harvest + the BRIDGE_REPORT run-declared-family harvest added (no hand-edited record fields); the record regenerated from the durable bytes.
+
+Stage Summary:
+- Deliverable: R487/LIVE_PROOF_CROSSDOMAIN.json — proof_outcome LOOP_CLOSED_ADMITTED, cross_domain_comparison.verdict CROSS_DOMAIN_REPEATED, the full chain in durable bytes, the honest boundary disclosed
+- The path-to-7 ledger: (1) cross-domain repetition ACHIEVED; (2) attacker calibration MEASURED FAIL (FPR 1.0, NOT_CALIBRATED, fail-closed, two-line replicated); (3) survivor to buyer ZIP still open (both closures hold at HELD_FOR_HUMAN_REVIEW)
 - reviewer_provenance=AI_REVIEW

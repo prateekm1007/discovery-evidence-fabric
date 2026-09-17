@@ -242,6 +242,21 @@ def _durable_harvest(session_id: str) -> Dict[str, Any]:
                    or (pj.get("domain") or {}))
             out["problem_declared_family"] = fam if isinstance(
                 fam, str) else json.dumps(fam)[:120]
+        # the run's OWN canonical family declaration lives in the
+        # bridge report's geometry/artifact identity (the R445
+        # canonical routing) — the authoritative run-side declaration
+        raw = _git_show(f"runs/{rdir}/BRIDGE_REPORT.json")
+        if raw:
+            br = json.loads(raw)
+            geo = (br.get("geometry") or {})
+            fams = {geo.get("domain_family")}
+            for sub in ("artifact_identity", "key_dimensions"):
+                fams.add((geo.get(sub) or {}).get("domain_family"))
+            fams.discard(None)
+            if fams:
+                out["run_declared_domain_family"] = (
+                    sorted(fams)[0] if len(fams) == 1
+                    else sorted(str(f) for f in fams))
         # INVENTION_LINEAGE — generations, kills, mutation bases
         raw = _git_show(f"runs/{rdir}/INVENTION_LINEAGE.json")
         if raw:
@@ -274,6 +289,18 @@ def _durable_harvest(session_id: str) -> Dict[str, Any]:
                       "quality_verdict", "repaired")}
                     for r in (ss.get("ranked") or [])],
             }
+        # DISCOVERY_RELEASE — the terminal release outcome, surfaced
+        # EXPLICITLY (the R486 disclosure lesson: the closure record
+        # must never leave the auditor to find the held/no-package
+        # terminal themselves)
+        raw = _git_show(f"runs/{rdir}/DISCOVERY_RELEASE.json")
+        if raw:
+            dr = json.loads(raw)
+            out["discovery_release"] = {
+                k: dr.get(k) for k in
+                ("status", "failure_reason", "candidate_id",
+                 "real_loop_verified", "package_zip",
+                 "buyer_package_hash")}
         # cemetery — the parent death that fed the kill point
         raw = _git_show(f"runs/{rdir}/cemetery_update.json")
         if raw:
@@ -419,7 +446,8 @@ def main() -> int:
         code = 3
 
     # the cross-domain comparison, REPORTED not asserted
-    run_family = durable.get("problem_declared_family")
+    run_family = (durable.get("run_declared_domain_family")
+                  or durable.get("problem_declared_family"))
     record["cross_domain_comparison"] = {
         "corpus_declared_family": problem["domain_family"],
         "run_declared_family": run_family,
@@ -427,7 +455,8 @@ def main() -> int:
         "verdict": (
             "CROSS_DOMAIN_REPEATED" if (
                 record["proof_outcome"] == "LOOP_CLOSED_ADMITTED"
-                and run_family == "mechanical")
+                and run_family == problem["domain_family"]
+                and problem["domain_family"] == "mechanical")
             else "NOT_CROSS_DOMAIN_CLOSURE — the typed outcome above "
                  "and the run's own declared family are the record"),
     }
