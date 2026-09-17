@@ -234,9 +234,19 @@ class TestGateRegistry(unittest.TestCase):
         self.assertFalse(st["terminal_kill_admissible"])
         if st["state"] == "NOT_CALIBRATED":
             # the measured path: the shipped record's numbers re-derived
+            # (the R419 ratified-state precedent, extended R491: the
+            # invariant is the fail-closed DISCIPLINE, never a
+            # particular measured number — the operative record is the
+            # NEWEST committed measurement; R488's unpinned-ring run
+            # measured FPR 1.0, R491's ring-pinned run on the GLM-class
+            # gateway measured 0.75 — both above the 0.30 bar, both
+            # fail-closed)
             m = st["measured"] or {}
             self.assertEqual(m.get("n_cases_attacked"), 22)
-            self.assertEqual(m.get("fpr_known_good"), 1.0)
+            self.assertGreater(m.get("fpr_known_good"), 0.30)
+            self.assertIsNotNone(m.get("attacker_ring"),
+                                 "the R491 operative record carries "
+                                 "the measured ring block")
 
     def test_v3_unknown_path_still_fail_closed(self):
         # the pre-shipment semantics stay reachable and fail-closed:

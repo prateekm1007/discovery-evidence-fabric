@@ -1,0 +1,369 @@
+{
+ "attack": {
+  "attack_version": "independent_attack/3.0.0",
+  "candidate_id": "cal-02-ultrasonic-header",
+  "generator_provider": null,
+  "attacker_provider": "zai",
+  "attacker_model": "zai-org/GLM-5.3",
+  "independence_mode": "SEPARATE_CONTEXT",
+  "independence_note": "the attacker ran in an independent reasoning context (fresh adversarial conversation, generator reasoning never shown; no alternative provider credentialed \u2014 disclosed, never claimed as provider separation)",
+  "prompt_hash": "2d350fa08c50167f7949a97d51214a8ac7bc4a1acd8d6d5165a975656096c493",
+  "output_hash": "9df0e68ee866f2092b5fbe6eec261a61a871e62cd7ea90efbf6c0e274f24db23",
+  "llm_status": "OK",
+  "ring_pin": {
+   "requested": "zai",
+   "mode": "HARD_PIN_NO_FALLBACK",
+   "served_provider": "zai",
+   "served_model": "zai-org/GLM-5.3",
+   "pin_status": "HARD_PINNED_NO_FALLBACK",
+   "note": "the sealed-corpus measurement pins the attacker ring so the instrument is measured on the ring it declares (rules x ring); production attacks keep the availability cascade"
+  },
+  "attacked_at": "2026-09-17T15:19:16+00:00Z",
+  "items": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "verdict": "KILL",
+    "basis": "acoustic cavitation micro-jetting cannot effectively scour 3 mm nozzle throats against 14 bar static pressure flow, as the pressure differential overwhelms the localized cavitation effects GROUNDED_IN: COMPUTATION <14 bar static pressure (1400 kPa) versus typical cavitation micro-jet pressures of 100-500 kPa>; SCOPE <boundary condition of 14 bar static pressure in the header>",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['3', '14', '14', '1400', '100', '500']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'acoustic cavitation micro jetting' (field: mechanism)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['differential', 'header', 'pressure', 'static']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "COMPUTATION <14 bar static pressure (1400 kPa) versus typical cavitation micro-jet pressures of 100-500 kPa>; SCOPE <boundary condition of 14 bar static pressure in the header>",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "verdict": "KILL",
+    "basis": "transducers are rated to only 10 bar differential pressure, but the header operates at 14 bar static pressure, creating an immediate violation of the pressure rating GROUNDED_IN: SCOPE <boundary condition stating transducers rated to 10 bar differential>; RECORD <\"transducers rated to 70 C and 10 bar differential\">",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['10', '14', '10', '70', '10']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'transducers rated to 70' (field: boundary_conditions)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['differential', 'header', 'pressure', 'rated']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "SCOPE <boundary condition stating transducers rated to 10 bar differential>; RECORD <\"transducers rated to 70 C and 10 bar differential\">",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "verdict": "ABSTAIN",
+    "basis": "the candidate claims zero clogging events but provides no evidence bundle to support this extraordinary claim, making the prediction impossible to verify GROUNDED_IN: RECORD <\"EVIDENCE HELD (the candidate's own evidence bundle): (none held)\">; SCOPE <the candidate's own evidence bundle is empty>",
+    "grounding": {
+     "grounded": false,
+     "bindings": [],
+     "claimed_ground": "RECORD <\"EVIDENCE HELD (the candidate's own evidence bundle): (none held)\">; SCOPE <the candidate's own evidence bundle is empty>",
+     "absence_ground": true,
+     "demotion_reason": "the asserted ground is an ABSENCE of evidence/support \u2014 absence is uncertainty, not failure (Art. XXI.3/XXV); the objection is preserved and escalated, never executed as a kill"
+    },
+    "demoted_from": "KILL",
+    "demotion_layer": "v2_grounding"
+   },
+   {
+    "attack_class": "BASELINE_EQUIVALENCE",
+    "verdict": "ABSTAIN",
+    "basis": "the candidate claims to eliminate clogging (0 events per campaign) but provides no comparative data against the baseline performance to establish superiority GROUNDED_IN: RECORD <\"Predicted effect: in-service nozzle clogging eliminated (0 events per campaign)\">; EVIDENCE <no baseline performance data provided>",
+    "grounding": {
+     "grounded": false,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['0', '0']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'nozzle clogging eliminated events' (field: predicted_effect)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD <\"Predicted effect: in-service nozzle clogging eliminated (0 events per campaign)\">; EVIDENCE <no baseline performance data provided>",
+     "absence_ground": true,
+     "demotion_reason": "the asserted ground is an ABSENCE of evidence/support \u2014 absence is uncertainty, not failure (Art. XXI.3/XXV); the objection is preserved and escalated, never executed as a kill"
+    },
+    "demoted_from": "KILL",
+    "demotion_layer": "v2_grounding"
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "verdict": "KILL",
+    "basis": "six 600 W transducers require 3.6 kW of continuous power, which would create significant heat load and potential thermal management issues in the mill environment GROUNDED_IN: COMPUTATION <6 transducers \u00d7 600 W = 3600 kW continuous power>; SCOPE <boundary condition of water temperature 32-38 C>",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['transducers', 'water']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "COMPUTATION <6 transducers \u00d7 600 W = 3600 kW continuous power>; SCOPE <boundary condition of water temperature 32-38 C>",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "verdict": "ABSTAIN",
+    "basis": "the testable prediction uses a \"split-header mill trial\" but provides no methodology for isolating variables or measuring clogging events with sufficient precision GROUNDED_IN: RECORD <\"Testable prediction: a header segment with transducers active versus inactive shows zero versus 4.1 clogging events per 120-hour campaign in a split-header mill trial\">; EVIDENCE <no measurement methodology provided>",
+    "grounding": {
+     "grounded": false,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['4.1', '120']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'clogging events per 120' (field: testable_prediction)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['header', 'transducers']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD <\"Testable prediction: a header segment with transducers active versus inactive shows zero versus 4.1 clogging events per 120-hour campaign in a split-header mill trial\">; EVIDENCE <no measurem",
+     "absence_ground": true,
+     "demotion_reason": "the asserted ground is an ABSENCE of evidence/support \u2014 absence is uncertainty, not failure (Art. XXI.3/XXV); the objection is preserved and escalated, never executed as a kill"
+    },
+    "demoted_from": "KILL",
+    "demotion_layer": "v2_grounding"
+   }
+  ],
+  "intervention_suggestions": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "suggestion": "increase transducer power output to at least 2 kW per unit to generate micro-jet pressures exceeding 1400 kPa, or redesign the nozzle throats to larger diameters where cavitation effects can compete with system pressure GROUNDED_IN: COMPUTATION <14 bar static pressure (1400 kPa) requires micro-jet pressures exceeding this to effectively scour throats>",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['2', '1400', '14', '1400']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span '14 bar static pressure' (field: boundary_conditions)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['pressure', 'static']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "COMPUTATION <14 bar static pressure (1400 kPa) requires micro-jet pressures exceeding this to effectively scour throats>",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "suggestion": "specify transducers rated to at least 20 bar differential pressure to operate safely within the 14 bar header environment GROUNDED_IN: SCOPE <boundary condition of 14 bar static pressure in the header>; RECORD <\"transducers rated to 70 C and 10 bar differential\">",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['20', '14', '14', '70', '10']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'transducers rated to 70' (field: boundary_conditions)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['differential', 'header', 'pressure', 'rated']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "SCOPE <boundary condition of 14 bar static pressure in the header>; RECORD <\"transducers rated to 70 C and 10 bar differential\">",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "suggestion": "provide a comprehensive evidence bundle including laboratory test data showing cavitation effectiveness at 14 bar, mill trial protocols, and comparative performance metrics against baseline GROUNDED_IN: RECORD <\"EVIDENCE HELD (the candidate's own evidence bundle): (none held)\">",
+    "grounding": {
+     "grounded": false,
+     "bindings": [],
+     "claimed_ground": "RECORD <\"EVIDENCE HELD (the candidate's own evidence bundle): (none held)\">",
+     "absence_ground": false,
+     "demotion_reason": "no evidence / computation / record / declared-scope binding found in the kill basis \u2014 a bare assertion carries no verdict authority (Art. XVIII); the objection is preserved and escalated"
+    },
+    "class": "UNGROUND_SUGGESTION",
+    "authority": "NONE \u2014 an ungrounded suggestion is preserved for human/escalation review and NEVER enters the hypothesis space (R450 \u00a710: the attacker does not get authority to invent causal explanations)"
+   },
+   {
+    "attack_class": "BASELINE_EQUIVALENCE",
+    "suggestion": "establish baseline performance metrics including current clogging frequency, thermal crown variation, and roll wear rates before claiming improvement GROUNDED_IN: RECORD <\"Baseline (the un-invented standard): steel hot-rolling mill work-roll cooling spray system... as currently implemented, doing nothing new\">",
+    "grounding": {
+     "grounded": false,
+     "bindings": [],
+     "claimed_ground": "RECORD <\"Baseline (the un-invented standard): steel hot-rolling mill work-roll cooling spray system... as currently implemented, doing nothing new\">",
+     "absence_ground": false,
+     "demotion_reason": "no evidence / computation / record / declared-scope binding found in the kill basis \u2014 a bare assertion carries no verdict authority (Art. XVIII); the objection is preserved and escalated"
+    },
+    "class": "UNGROUND_SUGGESTION",
+    "authority": "NONE \u2014 an ungrounded suggestion is preserved for human/escalation review and NEVER enters the hypothesis space (R450 \u00a710: the attacker does not get authority to invent causal explanations)"
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "suggestion": "implement power cycling of transducers during mill non-production periods to reduce continuous power consumption and heat generation while maintaining cavitation effectiveness GROUNDED_IN: COMPUTATION <3.6 kW continuous power creates significant thermal load>",
+    "grounding": {
+     "grounded": false,
+     "bindings": [],
+     "claimed_ground": "COMPUTATION <3.6 kW continuous power creates significant thermal load>",
+     "absence_ground": false,
+     "demotion_reason": "no evidence / computation / record / declared-scope binding found in the kill basis \u2014 a bare assertion carries no verdict authority (Art. XVIII); the objection is preserved and escalated"
+    },
+    "class": "UNGROUND_SUGGESTION",
+    "authority": "NONE \u2014 an ungrounded suggestion is preserved for human/escalation review and NEVER enters the hypothesis space (R450 \u00a710: the attacker does not get authority to invent causal explanations)"
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "suggestion": "define precise measurement methodology including nozzle inspection protocols, clogging event definition, and thermal crown measurement techniques for the split-header trial GROUNDED_IN: RECORD <\"Testable prediction: a header segment with transducers active versus inactive shows zero versus 4.1 clogging events per 120-hour campaign in a split-header mill trial\">",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['4.1', '120']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'clogging events per 120' (field: testable_prediction)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['header', 'transducers']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD <\"Testable prediction: a header segment with transducers active versus inactive shows zero versus 4.1 clogging events per 120-hour campaign in a split-header mill trial\">",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   }
+  ],
+  "state": "ATTACK_RUN",
+  "overall": "KILLED",
+  "kill_basis": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "basis": "acoustic cavitation micro-jetting cannot effectively scour 3 mm nozzle throats against 14 bar static pressure flow, as the pressure differential overwhelms the localized cavitation effects GROUNDED_IN: COMPUTATION <14 bar static pressure (1400 kPa) versus typical cavitation micro-jet pressures of 100-500 kPa>; SCOPE <boundary condition of 14 bar static pressure in the header>",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['3', '14', '14', '1400', '100', '500']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'acoustic cavitation micro jetting' (field: mechanism)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['differential', 'header', 'pressure', 'static']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "COMPUTATION <14 bar static pressure (1400 kPa) versus typical cavitation micro-jet pressures of 100-500 kPa>; SCOPE <boundary condition of 14 bar static pressure in the header>",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "basis": "transducers are rated to only 10 bar differential pressure, but the header operates at 14 bar static pressure, creating an immediate violation of the pressure rating GROUNDED_IN: SCOPE <boundary condition stating transducers rated to 10 bar differential>; RECORD <\"transducers rated to 70 C and 10 bar differential\">",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['10', '14', '10', '70', '10']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'transducers rated to 70' (field: boundary_conditions)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['differential', 'header', 'pressure', 'rated']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "SCOPE <boundary condition stating transducers rated to 10 bar differential>; RECORD <\"transducers rated to 70 C and 10 bar differential\">",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "basis": "six 600 W transducers require 3.6 kW of continuous power, which would create significant heat load and potential thermal management issues in the mill environment GROUNDED_IN: COMPUTATION <6 transducers \u00d7 600 W = 3600 kW continuous power>; SCOPE <boundary condition of water temperature 32-38 C>",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['transducers', 'water']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "COMPUTATION <6 transducers \u00d7 600 W = 3600 kW continuous power>; SCOPE <boundary condition of water temperature 32-38 C>",
+     "absence_ground": false
+    }
+   }
+  ],
+  "counts": {
+   "KILL": 3,
+   "RISK": 0,
+   "SURVIVE": 0,
+   "ABSTAIN_DEMOTED": 3,
+   "INVALID": 0
+  }
+ }
+}

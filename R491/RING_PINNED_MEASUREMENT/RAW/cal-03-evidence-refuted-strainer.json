@@ -1,0 +1,423 @@
+{
+ "attack": {
+  "attack_version": "independent_attack/3.0.0",
+  "candidate_id": "cal-03-150um-strainer",
+  "generator_provider": null,
+  "attacker_provider": "zai",
+  "attacker_model": "zai-org/GLM-5.3",
+  "independence_mode": "SEPARATE_CONTEXT",
+  "independence_note": "the attacker ran in an independent reasoning context (fresh adversarial conversation, generator reasoning never shown; no alternative provider credentialed \u2014 disclosed, never claimed as provider separation)",
+  "prompt_hash": "70a31cfeb2ecc935b858d8fa58d1a5f3899b4002c911315d2bd933f71eee1ebc",
+  "output_hash": "b7a916e5c14e3164fe5e38bc5bfe84f73cf070d0a71241b4ce973782a06abacd",
+  "llm_status": "OK",
+  "ring_pin": {
+   "requested": "zai",
+   "mode": "HARD_PIN_NO_FALLBACK",
+   "served_provider": "zai",
+   "served_model": "zai-org/GLM-5.3",
+   "pin_status": "HARD_PINNED_NO_FALLBACK",
+   "note": "the sealed-corpus measurement pins the attacker ring so the instrument is measured on the ring it declares (rules x ring); production attacks keep the availability cascade"
+  },
+  "attacked_at": "2026-09-17T15:19:42+00:00Z",
+  "items": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "verdict": "KILL",
+    "basis": "The candidate claims clogging is dominated by mill-scale particles above 200 microns bridging 3 mm nozzle throats, but evidence shows 70% of blockages are biofilm-slime AGG, not scale particles GROUNDED_IN: EVIDENCE ev:metanalysis-40 | RECORD \"70 percent of blockages are biofilm-slime AGG\" | COMPUTATION 70% vs. claimed scale dominance | SCOPE the entire failure mechanism premise",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "evidence",
+       "ground": "record id ev:metanalysis-40",
+       "verified": true
+      },
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['200', '3', '70', '40', '70', '70']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'particles above 200 microns' (field: mechanism)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['particles', 'scale']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "EVIDENCE ev:metanalysis-40 | RECORD \"70 percent of blockages are biofilm-slime AGG\" | COMPUTATION 70% vs. claimed scale dominance | SCOPE the entire failure mechanism premise",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "verdict": "KILL",
+    "basis": "The candidate assumes a 150-micron strainer can prevent bridging of particles above 200 microns, which is physically impossible as smaller particles cannot remove larger bridging particles GROUNDED_IN: COMPUTATION 150-micron strainer cannot remove >200-micron particles | SCOPE the stated nozzle bridging mechanism",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "evidence",
+       "ground": "bundle item 'Metallurgical analysis of 40 clogged nozzles across 6 campaigns: 70 percent of blockages are biofilm-slime AGGREGATES of 20-80 micron particles (mixed scale fines embedded in extracellular polymer), 18 percent are friable slime sheets, only 12 percent are pure scale particles above 200 microns' (strong overlap: above, micron, microns, particles)",
+       "verified": true
+      },
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['150', '200', '150', '200']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'particles above 200 microns' (field: mechanism)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "COMPUTATION 150-micron strainer cannot remove >200-micron particles | SCOPE the stated nozzle bridging mechanism",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "verdict": "KILL",
+    "basis": "Candidate claims strainer will eliminate bridging particles, but microbiological evidence shows 10^6 CFU biofilm coverage on header walls, which will continuously generate new biofilm-slime AGG that the strainer cannot prevent GROUNDED_IN: EVIDENCE ev:biofilm-load | RECORD \"sessile biofilm coverage on header walls at 10^6 CFU per square cen\" | COMPUTATION biofilm generation rate vs. strainer capacity | SCOPE the recirculated water system",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "evidence",
+       "ground": "bundle item 'Metallurgical analysis of 40 clogged nozzles across 6 campaigns: 70 percent of blockages are biofilm-slime AGGREGATES of 20-80 micron particles (mixed scale fines embedded in extracellular polymer), 18 percent are friable slime sheets, only 12 percent are pure scale particles above 200 microns' (strong overlap: biofilm, particles, slime)",
+       "verified": true
+      },
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['10', '6', '10', '6']",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['header', 'particles', 'recirculated', 'water']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "EVIDENCE ev:biofilm-load | RECORD \"sessile biofilm coverage on header walls at 10^6 CFU per square cen\" | COMPUTATION biofilm generation rate vs. strainer capacity | SCOPE the recirculated water syste",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "BASELINE_EQUIVALENCE",
+    "verdict": "KILL",
+    "basis": "Candidate claims clogging events will fall 8x, but since 70% of blockages are biofilm-slime AGG not scale particles, the strainer targeting scale particles cannot address the primary failure mode GROUNDED_IN: EVIDENCE ev:metanalysis-40 | RECORD \"70 percent of blockages are biofilm-slime AGG\" | COMPUTATION 70% of failures unaffected by strainer | SCOPE the claimed 8x reduction",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "evidence",
+       "ground": "record id ev:metanalysis-40",
+       "verified": true
+      },
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['8', '70', '40', '70', '70', '8']",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['particles', 'scale']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "EVIDENCE ev:metanalysis-40 | RECORD \"70 percent of blockages are biofilm-slime AGG\" | COMPUTATION 70% of failures unaffected by strainer | SCOPE the claimed 8x reduction",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "verdict": "RISK",
+    "basis": "The strainer may blind during backflush failures, but candidate claims to have addressed this known failure mode GROUNDED_IN: RECORD \"Known failure modes (claimed by the generator): strainer blinding during backflush failures\" | SCOPE the disclosed risk"
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "verdict": "RISK",
+    "basis": "Candidate proposes measuring removed-nozzle metallurgical analysis, but doesn't specify sampling methodology or statistical significance for 120 nozzles GROUNDED_IN: RECORD \"removed-nozzle metallurgical analysis shows no particle bridging above 150 microns\" | SCOPE the measurement protocol"
+   }
+  ],
+  "intervention_suggestions": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "suggestion": "Change strainer design to include biocide injection system to address the 70% biofilm-slime AGG blockages instead of targeting scale particles GROUNDED_IN: EVIDENCE ev:metanalysis-40 | RECORD \"70 percent of blockages are biofilm-slime AGG\" | SCOPE the primary failure mechanism",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "evidence",
+       "ground": "record id ev:metanalysis-40",
+       "verified": true
+      },
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['70', '40', '70']",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['particles', 'scale']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "EVIDENCE ev:metanalysis-40 | RECORD \"70 percent of blockages are biofilm-slime AGG\" | SCOPE the primary failure mechanism",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "suggestion": "Increase strainer micron rating to at least 200 microns to match the claimed bridging particle size, though this would still not address biofilm issues GROUNDED_IN: COMPUTATION 150-micron strainer cannot remove >200-micron particles | SCOPE the nozzle bridging mechanism",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "evidence",
+       "ground": "bundle item 'Metallurgical analysis of 40 clogged nozzles across 6 campaigns: 70 percent of blockages are biofilm-slime AGGREGATES of 20-80 micron particles (mixed scale fines embedded in extracellular polymer), 18 percent are friable slime sheets, only 12 percent are pure scale particles above 200 microns' (strong overlap: biofilm, micron, microns, particles)",
+       "verified": true
+      },
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['200', '150', '200']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "COMPUTATION 150-micron strainer cannot remove >200-micron particles | SCOPE the nozzle bridging mechanism",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "suggestion": "Add biofilm monitoring and control system to address the 10^6 CFU biofilm coverage on header walls that generates continuous contamination GROUNDED_IN: EVIDENCE ev:biofilm-load | RECORD \"sessile biofilm coverage on header walls at 10^6 CFU per square cen\" | SCOPE the recirculated water system",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "evidence",
+       "ground": "record id ev:biofilm-load",
+       "verified": true
+      },
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['10', '6', '10', '6']",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['header', 'recirculated', 'water']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "EVIDENCE ev:biofilm-load | RECORD \"sessile biofilm coverage on header walls at 10^6 CFU per square cen\" | SCOPE the recirculated water system",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "BASELINE_EQUIVALENCE",
+    "suggestion": "Redesign intervention to target both scale particles and biofilm, potentially with a dual-stage filtration system plus biocide injection to address the full 100% of blockages GROUNDED_IN: EVIDENCE ev:metanalysis-40 | RECORD \"70 percent of blockages are biofilm-slime AGG\" | SCOPE the claimed 8x reduction",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "evidence",
+       "ground": "record id ev:metanalysis-40",
+       "verified": true
+      },
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['100', '40', '70', '8']",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['full', 'particles', 'scale', 'with']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "EVIDENCE ev:metanalysis-40 | RECORD \"70 percent of blockages are biofilm-slime AGG\" | SCOPE the claimed 8x reduction",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "suggestion": "Implement redundant backflush system with automatic failover to prevent strainer blinding during backflush failures GROUNDED_IN: RECORD \"Known failure modes (claimed by the generator): strainer blinding during backflush failures\" | SCOPE the disclosed risk",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'strainer blinding during backflush' (field: known_failure_modes)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"Known failure modes (claimed by the generator): strainer blinding during backflush failures\" | SCOPE the disclosed risk",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "suggestion": "Develop statistically robust sampling protocol for metallurgical analysis across all 120 nozzles with defined confidence intervals GROUNDED_IN: RECORD \"removed-nozzle metallurgical analysis shows no particle bridging above 150 microns\" | SCOPE the measurement protocol",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "evidence",
+       "ground": "bundle item 'Metallurgical analysis of 40 clogged nozzles across 6 campaigns: 70 percent of blockages are biofilm-slime AGGREGATES of 20-80 micron particles (mixed scale fines embedded in extracellular polymer), 18 percent are friable slime sheets, only 12 percent are pure scale particles above 200 microns' (strong overlap: above, across, metallurgical, microns)",
+       "verified": true
+      },
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['120', '150']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'shows no particle bridging' (field: testable_prediction)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"removed-nozzle metallurgical analysis shows no particle bridging above 150 microns\" | SCOPE the measurement protocol",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   }
+  ],
+  "state": "ATTACK_RUN",
+  "overall": "KILLED",
+  "kill_basis": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "basis": "The candidate claims clogging is dominated by mill-scale particles above 200 microns bridging 3 mm nozzle throats, but evidence shows 70% of blockages are biofilm-slime AGG, not scale particles GROUNDED_IN: EVIDENCE ev:metanalysis-40 | RECORD \"70 percent of blockages are biofilm-slime AGG\" | COMPUTATION 70% vs. claimed scale dominance | SCOPE the entire failure mechanism premise",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "evidence",
+       "ground": "record id ev:metanalysis-40",
+       "verified": true
+      },
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['200', '3', '70', '40', '70', '70']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'particles above 200 microns' (field: mechanism)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['particles', 'scale']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "EVIDENCE ev:metanalysis-40 | RECORD \"70 percent of blockages are biofilm-slime AGG\" | COMPUTATION 70% vs. claimed scale dominance | SCOPE the entire failure mechanism premise",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "basis": "The candidate assumes a 150-micron strainer can prevent bridging of particles above 200 microns, which is physically impossible as smaller particles cannot remove larger bridging particles GROUNDED_IN: COMPUTATION 150-micron strainer cannot remove >200-micron particles | SCOPE the stated nozzle bridging mechanism",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "evidence",
+       "ground": "bundle item 'Metallurgical analysis of 40 clogged nozzles across 6 campaigns: 70 percent of blockages are biofilm-slime AGGREGATES of 20-80 micron particles (mixed scale fines embedded in extracellular polymer), 18 percent are friable slime sheets, only 12 percent are pure scale particles above 200 microns' (strong overlap: above, micron, microns, particles)",
+       "verified": true
+      },
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['150', '200', '150', '200']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'particles above 200 microns' (field: mechanism)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "COMPUTATION 150-micron strainer cannot remove >200-micron particles | SCOPE the stated nozzle bridging mechanism",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "basis": "Candidate claims strainer will eliminate bridging particles, but microbiological evidence shows 10^6 CFU biofilm coverage on header walls, which will continuously generate new biofilm-slime AGG that the strainer cannot prevent GROUNDED_IN: EVIDENCE ev:biofilm-load | RECORD \"sessile biofilm coverage on header walls at 10^6 CFU per square cen\" | COMPUTATION biofilm generation rate vs. strainer capacity | SCOPE the recirculated water system",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "evidence",
+       "ground": "bundle item 'Metallurgical analysis of 40 clogged nozzles across 6 campaigns: 70 percent of blockages are biofilm-slime AGGREGATES of 20-80 micron particles (mixed scale fines embedded in extracellular polymer), 18 percent are friable slime sheets, only 12 percent are pure scale particles above 200 microns' (strong overlap: biofilm, particles, slime)",
+       "verified": true
+      },
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['10', '6', '10', '6']",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['header', 'particles', 'recirculated', 'water']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "EVIDENCE ev:biofilm-load | RECORD \"sessile biofilm coverage on header walls at 10^6 CFU per square cen\" | COMPUTATION biofilm generation rate vs. strainer capacity | SCOPE the recirculated water syste",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "BASELINE_EQUIVALENCE",
+    "basis": "Candidate claims clogging events will fall 8x, but since 70% of blockages are biofilm-slime AGG not scale particles, the strainer targeting scale particles cannot address the primary failure mode GROUNDED_IN: EVIDENCE ev:metanalysis-40 | RECORD \"70 percent of blockages are biofilm-slime AGG\" | COMPUTATION 70% of failures unaffected by strainer | SCOPE the claimed 8x reduction",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "evidence",
+       "ground": "record id ev:metanalysis-40",
+       "verified": true
+      },
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['8', '70', '40', '70', '70', '8']",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['particles', 'scale']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "EVIDENCE ev:metanalysis-40 | RECORD \"70 percent of blockages are biofilm-slime AGG\" | COMPUTATION 70% of failures unaffected by strainer | SCOPE the claimed 8x reduction",
+     "absence_ground": false
+    }
+   }
+  ],
+  "counts": {
+   "KILL": 4,
+   "RISK": 2,
+   "SURVIVE": 0,
+   "ABSTAIN_DEMOTED": 0,
+   "INVALID": 0
+  }
+ }
+}

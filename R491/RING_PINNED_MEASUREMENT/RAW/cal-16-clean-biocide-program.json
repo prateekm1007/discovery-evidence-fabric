@@ -1,0 +1,279 @@
+{
+ "attack": {
+  "attack_version": "independent_attack/3.0.0",
+  "candidate_id": "cal-16-biofilm-dispersant-program",
+  "generator_provider": null,
+  "attacker_provider": "zai",
+  "attacker_model": "zai-org/GLM-5.3",
+  "independence_mode": "SEPARATE_CONTEXT",
+  "independence_note": "the attacker ran in an independent reasoning context (fresh adversarial conversation, generator reasoning never shown; no alternative provider credentialed \u2014 disclosed, never claimed as provider separation)",
+  "prompt_hash": "c0592b59a82da3ba0e1c7c4b6c3a83887557b186146b848f5b33e619c2a4a1f7",
+  "output_hash": "3d44d26cdbaf21aa04e019a06c79884fd2ab2ec19fd4c510f8263205f255bd5a",
+  "llm_status": "OK",
+  "ring_pin": {
+   "requested": "zai",
+   "mode": "HARD_PIN_NO_FALLBACK",
+   "served_provider": "zai",
+   "served_model": "zai-org/GLM-5.3",
+   "pin_status": "HARD_PINNED_NO_FALLBACK",
+   "note": "the sealed-corpus measurement pins the attacker ring so the instrument is measured on the ring it declares (rules x ring); production attacks keep the availability cascade"
+  },
+  "attacked_at": "2026-09-17T15:24:29+00:00Z",
+  "items": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "verdict": "ABSTAIN",
+    "basis": "The claimed 88% biofilm-slime share of blockages is unsubstantiated and the proposed chemistry cannot guarantee oxidation of sessile biofilm at the claimed efficacy without evidence of biocide penetration into established biofilm matrices GROUNDED_IN: SCOPE <the candidate claims \"oxidizes sessile biofilm\" but provides no evidence of biocide penetration depth or contact time efficacy in established biofilm matrices>",
+    "grounding": {
+     "grounded": false,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'slime share of blockages' (field: mechanism)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['biocide', 'efficacy']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "SCOPE <the candidate claims \"oxidizes sessile biofilm\" but provides no evidence of biocide penetration depth or contact time efficacy in established biofilm matrices>",
+     "absence_ground": true,
+     "demotion_reason": "the asserted ground is an ABSENCE of evidence/support \u2014 absence is uncertainty, not failure (Art. XXI.3/XXV); the objection is preserved and escalated, never executed as a kill"
+    },
+    "demoted_from": "KILL",
+    "demotion_layer": "v2_grounding"
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "verdict": "RISK",
+    "basis": "The temperature range of 32-38 C is at the upper limit of the vendor-verified biocide efficacy band, potentially reducing biocide performance during peak mill operation GROUNDED_IN: SCOPE <the boundary condition states \"recirculated water 32-38 C (biocide efficacy band verified by vendor at this temperature)\" which implies the efficacy is at the margin of the verified range>"
+   },
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "verdict": "ABSTAIN",
+    "basis": "The candidate provides no evidence bundle to support the claimed 2-order CFU reduction or the predicted reduction in clogging events, making these predictions completely unsubstantiated GROUNDED_IN: EVIDENCE <none held> | RECORD \"Predicted effect: sessile biofilm coverage falls from 10^6 to below 10^4 CFU per square centimeter within three weeks\" | COMPUTATION <no data provided to support the claimed 99% reduction in CFU count>",
+    "grounding": {
+     "grounded": false,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['2', '10', '6', '10', '4', '99']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span '10 to below 10' (field: predicted_effect)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "EVIDENCE <none held> | RECORD \"Predicted effect: sessile biofilm coverage falls from 10^6 to below 10^4 CFU per square centimeter within three weeks\" | COMPUTATION <no data provided to support the cla",
+     "absence_ground": true,
+     "demotion_reason": "the asserted ground is an ABSENCE of evidence/support \u2014 absence is uncertainty, not failure (Art. XXI.3/XXV); the objection is preserved and escalated, never executed as a kill"
+    },
+    "demoted_from": "KILL",
+    "demotion_layer": "v2_grounding"
+   },
+   {
+    "attack_class": "BASELINE_EQUIVALENCE",
+    "verdict": "ABSTAIN",
+    "basis": "The candidate fails to demonstrate that the proposed intervention will reduce clogging events from 4.1 to 1.4, which is still above zero and thus still causes thermal-crown variation beyond the 12 micron band GROUNDED_IN: COMPUTATION <baseline failure is \"thermal-crown variation beyond the 12 micron band\" but predicted effect is \"total campaign clogging events fall from 4.1 to approximately 1.4\" which still exceeds zero>",
+    "grounding": {
+     "grounded": false,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['4.1', '1.4', '12', '12', '4.1', '1.4']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'campaign clogging events fall' (field: predicted_effect)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "COMPUTATION <baseline failure is \"thermal-crown variation beyond the 12 micron band\" but predicted effect is \"total campaign clogging events fall from 4.1 to approximately 1.4\" which still exceeds zer",
+     "absence_ground": true,
+     "demotion_reason": "the asserted ground is an ABSENCE of evidence/support \u2014 absence is uncertainty, not failure (Art. XXI.3/XXV); the objection is preserved and escalated, never executed as a kill"
+    },
+    "demoted_from": "KILL",
+    "demotion_layer": "v2_grounding"
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "verdict": "RISK",
+    "basis": "The claimed \"automatic rinse-down\" after dispersant slug is not specified and may not be compatible with existing recirculation system plumbing GROUNDED_IN: SCOPE <the intervention claims \"weekly 15-minute dispersant slug at 8 ppm with automatic rinse-down\" but provides no details on how this rinse-down is implemented or if it's compatible with existing infrastructure>"
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "verdict": "KILL",
+    "basis": "The candidate proposes measuring \"monthly header-wall swab cultures\" but provides no methodology for sampling location, technique, or handling that would ensure consistent measurements of biofilm coverage GROUNDED_IN: SCOPE <the testable prediction claims \"monthly header-wall swab cultures show the 2-order CFU reduction\" but provides no sampling methodology or control procedures>",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'swab cultures show the' (field: testable_prediction)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "SCOPE <the testable prediction claims \"monthly header-wall swab cultures show the 2-order CFU reduction\" but provides no sampling methodology or control procedures>",
+     "absence_ground": false
+    }
+   }
+  ],
+  "intervention_suggestions": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "suggestion": "Increase biocide concentration to 0.5 ppm and extend contact time by reducing flow rate during biocide dosing to improve penetration into established biofilm matrices GROUNDED_IN: SCOPE <the boundary condition states \"dosing rates inside the mill's existing discharge permit\" which may allow for higher concentration if flow is adjusted>",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'rates inside the mill' (field: intervention)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['biocide', 'discharge', 'dosing', 'existing']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "SCOPE <the boundary condition states \"dosing rates inside the mill's existing discharge permit\" which may allow for higher concentration if flow is adjusted>",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "suggestion": "Install temperature monitoring with automatic biocide concentration adjustment to maintain consistent efficacy at the upper temperature range GROUNDED_IN: SCOPE <the boundary condition states \"recirculated water 32-38 C (biocide efficacy band verified by vendor at this temperature)\" which allows for concentration adjustment>",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['32', '38']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'water 32 38 biocide' (field: boundary_conditions)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['band', 'biocide', 'efficacy', 'recirculated']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "SCOPE <the boundary condition states \"recirculated water 32-38 C (biocide efficacy band verified by vendor at this temperature)\" which allows for concentration adjustment>",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "suggestion": "Provide a pilot study with measured baseline and post-intervention biofilm CFU counts and clogging event documentation to support the claimed 2-order reduction GROUNDED_IN: RECORD \"Predicted effect: sessile biofilm coverage falls from 10^6 to below 10^4 CFU per square centimeter within three weeks\" | COMPUTATION <requires actual measurement data>",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['2', '10', '6', '10', '4']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span '10 to below 10' (field: predicted_effect)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"Predicted effect: sessile biofilm coverage falls from 10^6 to below 10^4 CFU per square centimeter within three weeks\" | COMPUTATION <requires actual measurement data>",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "BASELINE_EQUIVALENCE",
+    "suggestion": "Modify the intervention to achieve zero clogging events by combining biocide with mechanical filtration to capture all remaining particles GROUNDED_IN: COMPUTATION <baseline failure is \"thermal-crown variation beyond the 12 micron band\" which requires zero clogging events>",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['band', 'biocide']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "COMPUTATION <baseline failure is \"thermal-crown variation beyond the 12 micron band\" which requires zero clogging events>",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "suggestion": "Specify the rinse-down mechanism in detail, including required pressure, duration, and integration points with existing recirculation system GROUNDED_IN: SCOPE <the intervention claims \"automatic rinse-down\" but provides no implementation details>",
+    "grounding": {
+     "grounded": false,
+     "bindings": [],
+     "claimed_ground": "SCOPE <the intervention claims \"automatic rinse-down\" but provides no implementation details>",
+     "absence_ground": false,
+     "demotion_reason": "no evidence / computation / record / declared-scope binding found in the kill basis \u2014 a bare assertion carries no verdict authority (Art. XVIII); the objection is preserved and escalated"
+    },
+    "class": "UNGROUND_SUGGESTION",
+    "authority": "NONE \u2014 an ungrounded suggestion is preserved for human/escalation review and NEVER enters the hypothesis space (R450 \u00a710: the attacker does not get authority to invent causal explanations)"
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "suggestion": "Standardize the swab methodology with defined sampling locations, consistent pressure during swabbing, immediate sample preservation, and laboratory analysis protocols GROUNDED_IN: RECORD \"monthly header-wall swab cultures show the 2-order CFU reduction\" | SCOPE <requires standardized methodology>",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'swab cultures show the' (field: testable_prediction)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"monthly header-wall swab cultures show the 2-order CFU reduction\" | SCOPE <requires standardized methodology>",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   }
+  ],
+  "state": "ATTACK_RUN",
+  "overall": "KILLED",
+  "kill_basis": [
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "basis": "The candidate proposes measuring \"monthly header-wall swab cultures\" but provides no methodology for sampling location, technique, or handling that would ensure consistent measurements of biofilm coverage GROUNDED_IN: SCOPE <the testable prediction claims \"monthly header-wall swab cultures show the 2-order CFU reduction\" but provides no sampling methodology or control procedures>",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'swab cultures show the' (field: testable_prediction)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "SCOPE <the testable prediction claims \"monthly header-wall swab cultures show the 2-order CFU reduction\" but provides no sampling methodology or control procedures>",
+     "absence_ground": false
+    }
+   }
+  ],
+  "counts": {
+   "KILL": 1,
+   "RISK": 2,
+   "SURVIVE": 0,
+   "ABSTAIN_DEMOTED": 3,
+   "INVALID": 0
+  }
+ }
+}

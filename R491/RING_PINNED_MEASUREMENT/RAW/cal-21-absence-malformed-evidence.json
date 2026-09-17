@@ -1,0 +1,354 @@
+{
+ "attack": {
+  "attack_version": "independent_attack/3.0.0",
+  "candidate_id": "cal-21-corrupt-evidence-bundle",
+  "generator_provider": null,
+  "attacker_provider": "zai",
+  "attacker_model": "zai-org/GLM-5.3",
+  "independence_mode": "SEPARATE_CONTEXT",
+  "independence_note": "the attacker ran in an independent reasoning context (fresh adversarial conversation, generator reasoning never shown; no alternative provider credentialed \u2014 disclosed, never claimed as provider separation)",
+  "prompt_hash": "9ad29229b54fbb8c7f9a69e4064ba5a772cf76d7cb2d88b8e66365b052cbebb7",
+  "output_hash": "7fb5ca3187ab06fca0fe25dc1c66390ae3396cd99d60610d57d62a63a62062fa",
+  "llm_status": "OK",
+  "ring_pin": {
+   "requested": "zai",
+   "mode": "HARD_PIN_NO_FALLBACK",
+   "served_provider": "zai",
+   "served_model": "zai-org/GLM-5.3",
+   "pin_status": "HARD_PINNED_NO_FALLBACK",
+   "note": "the sealed-corpus measurement pins the attacker ring so the instrument is measured on the ring it declares (rules x ring); production attacks keep the availability cascade"
+  },
+  "attacked_at": "2026-09-17T15:26:36+00:00Z",
+  "items": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "verdict": "ABSTAIN",
+    "basis": "The cyclone mechanism cannot achieve 85% removal of particles above 100 microns in a recirculation system with continuous operation and only one hydrocyclone, as the efficiency claims exceed typical single-stage hydrocyclone performance by a factor of 3-4. GROUNDED_IN: COMPUTATION <typical single-stage hydrocyclone efficiency is 40-60% for particles >100 microns; candidate claims 85% removal without providing evidence of enhanced design>",
+    "grounding": {
+     "grounded": false,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['85', '100', '3', '4', '40', '60']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'particles above 100 microns' (field: mechanism)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "COMPUTATION <typical single-stage hydrocyclone efficiency is 40-60% for particles >100 microns; candidate claims 85% removal without providing evidence of enhanced design>",
+     "absence_ground": true,
+     "demotion_reason": "the asserted ground is an ABSENCE of evidence/support \u2014 absence is uncertainty, not failure (Art. XXI.3/XXV); the objection is preserved and escalated, never executed as a kill"
+    },
+    "demoted_from": "KILL",
+    "demotion_layer": "v2_grounding"
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "verdict": "KILL",
+    "basis": "The candidate claims \"return-line installation only; supply untouched\" but the mechanism requires installation on the recirculation return line which necessitates integration with the existing system, violating the boundary condition of supply being untouched. GROUNDED_IN: SCOPE <the boundary condition clause \"supply untouched\" is violated by the requirement to install on the return line which is part of the supply system>",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'the recirculation return line' (field: mechanism)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['installation', 'line', 'only', 'return']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "SCOPE <the boundary condition clause \"supply untouched\" is violated by the requirement to install on the return line which is part of the supply system>",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "verdict": "KILL",
+    "basis": "The candidate's evidence bundle is explicitly stated as \"MALFORMED \u2014 the items carry identifier fragments and truncated titles only, no usable content\" making it impossible to verify any of the claims or predictions. GROUNDED_IN: EVIDENCE <the candidate's own description of the evidence bundle as \"MALFORMED\" with \"no usable content\">",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'fragments and truncated titles' (field: mechanism)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "EVIDENCE <the candidate's own description of the evidence bundle as \"MALFORMED\" with \"no usable content\">",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "BASELINE_EQUIVALENCE",
+    "verdict": "ABSTAIN",
+    "basis": "The candidate claims to reduce clogging events from 4.1 to approximately 2.6 but provides no evidence that this improvement addresses the root failure of \"thermal-crown variation beyond the 12 micron band\" which is the actual performance metric that matters. GROUNDED_IN: RECORD <the problem statement: \"Failure: progressive nozzle clogging... causing non-uniform work-roll temperature, thermal-crown variation beyond the 12 micron band\">",
+    "grounding": {
+     "grounded": false,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['4.1', '2.6', '12', '12']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD <the problem statement: \"Failure: progressive nozzle clogging... causing non-uniform work-roll temperature, thermal-crown variation beyond the 12 micron band\">",
+     "absence_ground": true,
+     "demotion_reason": "the asserted ground is an ABSENCE of evidence/support \u2014 absence is uncertainty, not failure (Art. XXI.3/XXV); the objection is preserved and escalated, never executed as a kill"
+    },
+    "demoted_from": "KILL",
+    "demotion_layer": "v2_grounding"
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "verdict": "KILL",
+    "basis": "The proposed installation of a 150 mm hydrocyclone on the return line with automated underflow collection and backflushing at each roll change cannot be implemented without significant system modifications that would disrupt production during installation and maintenance. GROUNDED_IN: SCOPE <boundary condition \"return-line installation only\" is violated by the requirement for automated underflow collection and backflushing system>",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'at each roll change' (field: intervention)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['installation', 'line', 'only', 'return']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "SCOPE <boundary condition \"return-line installation only\" is violated by the requirement for automated underflow collection and backflushing system>",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "verdict": "ABSTAIN",
+    "basis": "The testable prediction requires \"isokinetic particle counts on return and basin-outlet lines\" but no methodology is provided for achieving isokinetic conditions in a high-pressure recirculation system with varying flow rates. GROUNDED_IN: RECORD <candidate's testable prediction: \"isokinetic particle counts on return and basin-outlet lines show 85 percent plus or minus 5 percent removal above 100 microns\">",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['85', '5', '100']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'counts on return and' (field: testable_prediction)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['basin', 'return']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD <candidate's testable prediction: \"isokinetic particle counts on return and basin-outlet lines show 85 percent plus or minus 5 percent removal above 100 microns\">",
+     "absence_ground": false
+    },
+    "demoted_from": "KILL",
+    "demotion_layer": "v3_accommodation",
+    "accommodation": {
+     "rule": "UNSTATED_ELEMENT",
+     "match": "no methodology is provided",
+     "reason": "the failure assertion rests on the record NOT stating an element \u2014 record silence is incompleteness, not failure (Art. XXI.3 extended to specification); the objection is preserved and escalated"
+    }
+   }
+  ],
+  "intervention_suggestions": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "suggestion": "Increase the number of hydrocyclones in parallel to 3-4 units to achieve the claimed 85% removal efficiency, as single-stage hydrocyclones cannot achieve this level of separation for particles >100 microns. GROUNDED_IN: COMPUTATION <typical single-stage hydrocyclone efficiency is 40-60% for particles >100 microns>",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['3', '4', '85', '100', '40', '60']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "COMPUTATION <typical single-stage hydrocyclone efficiency is 40-60% for particles >100 microns>",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "suggestion": "Redesign the intervention to be a bypass system that treats only a portion of the recirculated flow rather than requiring integration with the main return line, thus keeping the supply untouched. GROUNDED_IN: SCOPE <the boundary condition clause \"supply untouched\" is violated by the requirement to install on the return line>",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'on the return line' (field: intervention)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['line', 'only', 'return', 'supply']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "SCOPE <the boundary condition clause \"supply untouched\" is violated by the requirement to install on the return line>",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "suggestion": "Provide a complete evidence bundle with full documentation of test results, hydrocyclone specifications, and performance data rather than malformed fragments. GROUNDED_IN: EVIDENCE <the candidate's own description of the evidence bundle as \"MALFORMED\" with \"no usable content\">",
+    "grounding": {
+     "grounded": false,
+     "bindings": [],
+     "claimed_ground": "EVIDENCE <the candidate's own description of the evidence bundle as \"MALFORMED\" with \"no usable content\">",
+     "absence_ground": false,
+     "demotion_reason": "no evidence / computation / record / declared-scope binding found in the kill basis \u2014 a bare assertion carries no verdict authority (Art. XVIII); the objection is preserved and escalated"
+    },
+    "class": "UNGROUND_SUGGESTION",
+    "authority": "NONE \u2014 an ungrounded suggestion is preserved for human/escalation review and NEVER enters the hypothesis space (R450 \u00a710: the attacker does not get authority to invent causal explanations)"
+   },
+   {
+    "attack_class": "BASELINE_EQUIVALENCE",
+    "suggestion": "Focus the intervention on directly measuring and reducing thermal-crown variation rather than just clogging events, as that is the actual failure metric. GROUNDED_IN: RECORD <the problem statement: \"Failure: progressive nozzle clogging... causing non-uniform work-roll temperature, thermal-crown variation beyond the 12 micron band\">",
+    "grounding": {
+     "grounded": false,
+     "bindings": [],
+     "claimed_ground": "RECORD <the problem statement: \"Failure: progressive nozzle clogging... causing non-uniform work-roll temperature, thermal-crown variation beyond the 12 micron band\">",
+     "absence_ground": false,
+     "demotion_reason": "no evidence / computation / record / declared-scope binding found in the kill basis \u2014 a bare assertion carries no verdict authority (Art. XVIII); the objection is preserved and escalated"
+    },
+    "class": "UNGROUND_SUGGESTION",
+    "authority": "NONE \u2014 an ungrounded suggestion is preserved for human/escalation review and NEVER enters the hypothesis space (R450 \u00a710: the attacker does not get authority to invent causal explanations)"
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "suggestion": "Design the system for modular installation during scheduled maintenance periods rather than requiring continuous operation during production. GROUNDED_IN: SCOPE <boundary condition \"return-line installation only\" is violated by the requirement for automated underflow collection and backflushing system>",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'return line installation only' (field: boundary_conditions)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['installation', 'line', 'only', 'return']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "SCOPE <boundary condition \"return-line installation only\" is violated by the requirement for automated underflow collection and backflushing system>",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "suggestion": "Specify the exact methodology for achieving isokinetic sampling conditions in the high-pressure recirculation system, including flow rate control and sampling duration. GROUNDED_IN: RECORD <candidate's testable prediction: \"isokinetic particle counts on return and basin-outlet lines show 85 percent plus or minus 5 percent removal above 100 microns\">",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['85', '5', '100']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'counts on return and' (field: testable_prediction)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['basin', 'return']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD <candidate's testable prediction: \"isokinetic particle counts on return and basin-outlet lines show 85 percent plus or minus 5 percent removal above 100 microns\">",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   }
+  ],
+  "state": "ATTACK_RUN",
+  "overall": "KILLED",
+  "kill_basis": [
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "basis": "The candidate claims \"return-line installation only; supply untouched\" but the mechanism requires installation on the recirculation return line which necessitates integration with the existing system, violating the boundary condition of supply being untouched. GROUNDED_IN: SCOPE <the boundary condition clause \"supply untouched\" is violated by the requirement to install on the return line which is part of the supply system>",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'the recirculation return line' (field: mechanism)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['installation', 'line', 'only', 'return']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "SCOPE <the boundary condition clause \"supply untouched\" is violated by the requirement to install on the return line which is part of the supply system>",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "basis": "The candidate's evidence bundle is explicitly stated as \"MALFORMED \u2014 the items carry identifier fragments and truncated titles only, no usable content\" making it impossible to verify any of the claims or predictions. GROUNDED_IN: EVIDENCE <the candidate's own description of the evidence bundle as \"MALFORMED\" with \"no usable content\">",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'fragments and truncated titles' (field: mechanism)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "EVIDENCE <the candidate's own description of the evidence bundle as \"MALFORMED\" with \"no usable content\">",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "basis": "The proposed installation of a 150 mm hydrocyclone on the return line with automated underflow collection and backflushing at each roll change cannot be implemented without significant system modifications that would disrupt production during installation and maintenance. GROUNDED_IN: SCOPE <boundary condition \"return-line installation only\" is violated by the requirement for automated underflow collection and backflushing system>",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'at each roll change' (field: intervention)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['installation', 'line', 'only', 'return']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "SCOPE <boundary condition \"return-line installation only\" is violated by the requirement for automated underflow collection and backflushing system>",
+     "absence_ground": false
+    }
+   }
+  ],
+  "counts": {
+   "KILL": 3,
+   "RISK": 0,
+   "SURVIVE": 0,
+   "ABSTAIN_DEMOTED": 3,
+   "INVALID": 0
+  }
+ }
+}

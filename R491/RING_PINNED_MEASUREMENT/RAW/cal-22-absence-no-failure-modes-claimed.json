@@ -1,0 +1,336 @@
+{
+ "attack": {
+  "attack_version": "independent_attack/3.0.0",
+  "candidate_id": "cal-22-thin-record-biocide",
+  "generator_provider": null,
+  "attacker_provider": "zai",
+  "attacker_model": "zai-org/GLM-5.3",
+  "independence_mode": "SEPARATE_CONTEXT",
+  "independence_note": "the attacker ran in an independent reasoning context (fresh adversarial conversation, generator reasoning never shown; no alternative provider credentialed \u2014 disclosed, never claimed as provider separation)",
+  "prompt_hash": "3565a7442eeac9064c3a23ede84882c34e6a8b08549ae05b0f8271cd1372acfc",
+  "output_hash": "9d08a60c923e46a1f3ae19ee95309f09e4a94a4f5a08c43739c1e8e808a940ce",
+  "llm_status": "OK",
+  "ring_pin": {
+   "requested": "zai",
+   "mode": "HARD_PIN_NO_FALLBACK",
+   "served_provider": "zai",
+   "served_model": "zai-org/GLM-5.3",
+   "pin_status": "HARD_PINNED_NO_FALLBACK",
+   "note": "the sealed-corpus measurement pins the attacker ring so the instrument is measured on the ring it declares (rules x ring); production attacks keep the availability cascade"
+  },
+  "attacked_at": "2026-09-17T15:26:57+00:00Z",
+  "items": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "verdict": "ABSTAIN",
+    "basis": "The mechanism claims to control biofilm share of nozzle clogging but provides no failure mode analysis for the biocide-dispersant combination, ignoring potential incompatibility or antagonistic effects between continuous oxidizing biocide and periodic dispersant dosing. GROUNDED_IN: RECORD \"no failure modes are claimed\" | SCOPE \"no mill stop\"",
+    "grounding": {
+     "grounded": false,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'biofilm share of nozzle' (field: mechanism)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['dosing', 'mill', 'stop']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"no failure modes are claimed\" | SCOPE \"no mill stop\"",
+     "absence_ground": true,
+     "demotion_reason": "the asserted ground is an ABSENCE of evidence/support \u2014 absence is uncertainty, not failure (Art. XXI.3/XXV); the objection is preserved and escalated, never executed as a kill"
+    },
+    "demoted_from": "KILL",
+    "demotion_layer": "v2_grounding"
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "verdict": "KILL",
+    "basis": "The intervention violates the boundary condition of \"dosing inside the existing discharge permit\" by introducing both continuous biocide and periodic dispersant without demonstrating compliance with permit limits for either chemical. GROUNDED_IN: RECORD \"dosing inside the existing discharge permit\" | EVIDENCE <none held>",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'inside the existing discharge' (field: boundary_conditions)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['discharge', 'dosing', 'existing', 'inside']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"dosing inside the existing discharge permit\" | EVIDENCE <none held>",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "verdict": "ABSTAIN",
+    "basis": "The candidate makes a specific prediction of \"biofilm-share clogging events fall from 2.9 to below 0.6 per campaign\" but provides no evidence bundle to support this quantitative claim, making the prediction unsubstantiated. GROUNDED_IN: RECORD \"this record is THIN: no failure modes are claimed, no evidence bundle\" | EVIDENCE <none held>",
+    "grounding": {
+     "grounded": false,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['2.9', '0.6']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'failure modes are claimed' (field: mechanism)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"this record is THIN: no failure modes are claimed, no evidence bundle\" | EVIDENCE <none held>",
+     "absence_ground": true,
+     "demotion_reason": "the asserted ground is an ABSENCE of evidence/support \u2014 absence is uncertainty, not failure (Art. XXI.3/XXV); the objection is preserved and escalated, never executed as a kill"
+    },
+    "demoted_from": "KILL",
+    "demotion_layer": "v2_grounding"
+   },
+   {
+    "attack_class": "BASELINE_EQUIVALENCE",
+    "verdict": "ABSTAIN",
+    "basis": "The candidate claims to reduce total clogging events to \"approximately 1.4\" but doesn't explain how this improves upon the baseline, which may already have effective mitigation measures not addressed in the proposal. GROUNDEDINED_IN: RECORD \"total events to approximately 1.4 with routine screening\" | SCOPE \"the status quo the candidate must beat\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['1.4', '1.4']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'events to approximately with' (field: predicted_effect)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": null,
+     "absence_ground": false
+    },
+    "demoted_from": "KILL",
+    "demotion_layer": "v3_accommodation",
+    "accommodation": {
+     "rule": "HEDGED_TARGET",
+     "match": "approximately 1.4\" but doesn't explain h",
+     "reason": "the contradicted target is a quantity the record itself hedges; an alternative derivation disputing a hedged value is an interpretive objection, not a demonstrable falsehood \u2014 the objection is preserved and escalated, the kill authority withdrawn"
+    }
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "verdict": "ABSTAIN",
+    "basis": "The intervention requires precise ORP control for continuous biocide dosing in a recirculated system with varying organic loads, but no control system design is provided to handle this dynamic environment. GROUNDED_IN: RECORD \"continuous 0.3 ppm actinic biocide with ORP control\" | EVIDENCE <none held>",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'continuous ppm actinic biocide' (field: intervention)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"continuous 0.3 ppm actinic biocide with ORP control\" | EVIDENCE <none held>",
+     "absence_ground": false
+    },
+    "demoted_from": "KILL",
+    "demotion_layer": "v3_accommodation",
+    "accommodation": {
+     "rule": "UNSTATED_ELEMENT",
+     "match": "no control system design is provided",
+     "reason": "the failure assertion rests on the record NOT stating an element \u2014 record silence is incompleteness, not failure (Art. XXI.3 extended to specification); the objection is preserved and escalated"
+    }
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "verdict": "KILL",
+    "basis": "The testable prediction claims \"monthly header-wall swab cultures show a 2-order CFU reduction\" but doesn't specify the sampling protocol, culture media, or incubation conditions, making the measurement unrepeatable. GROUNDED_IN: RECORD \"monthly header-wall swab cultures show a 2-order CFU reduction\" | EVIDENCE <none held>",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['2', '2']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'cultures show order cfu' (field: testable_prediction)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"monthly header-wall swab cultures show a 2-order CFU reduction\" | EVIDENCE <none held>",
+     "absence_ground": false
+    }
+   }
+  ],
+  "intervention_suggestions": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "suggestion": "Change dispersant chemistry to non-ionic type compatible with oxidizing biocides and provide compatibility testing data GROUNDED_IN: RECORD \"continuous low-dose oxidizing biocide with weekly dispersant slugs\" | EVIDENCE <none held>",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'continuous low dose oxidizing' (field: mechanism)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"continuous low-dose oxidizing biocide with weekly dispersant slugs\" | EVIDENCE <none held>",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "suggestion": "Conduct permit compliance testing for both biocide and dispersant at maximum dosing rates before implementation GROUNDED_IN: RECORD \"dosing inside the existing discharge permit\" | EVIDENCE <none held>",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'inside the existing discharge' (field: boundary_conditions)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['discharge', 'dosing', 'existing', 'inside']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"dosing inside the existing discharge permit\" | EVIDENCE <none held>",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "suggestion": "Provide laboratory data showing biocide-dispersant efficacy against biofilm organisms specific to the mill's water chemistry GROUNDED_IN: RECORD \"this record is THIN: no failure modes are claimed, no evidence bundle\" | EVIDENCE <none held>",
+    "grounding": {
+     "grounded": false,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'failure modes are claimed' (field: mechanism)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"this record is THIN: no failure modes are claimed, no evidence bundle\" | EVIDENCE <none held>",
+     "absence_ground": true,
+     "demotion_reason": "the asserted ground is an ABSENCE of evidence/support \u2014 absence is uncertainty, not failure (Art. XXI.3/XXV); the objection is preserved and escalated, never executed as a kill"
+    },
+    "class": "UNGROUND_SUGGESTION",
+    "authority": "NONE \u2014 an ungrounded suggestion is preserved for human/escalation review and NEVER enters the hypothesis space (R450 \u00a710: the attacker does not get authority to invent causal explanations)"
+   },
+   {
+    "attack_class": "BASELINE_EQUIVALENCE",
+    "suggestion": "Conduct baseline measurement of current clogging rates and biofilm levels before implementing intervention GROUNDED_IN: RECORD \"the status quo the candidate must beat\" | EVIDENCE <none held>",
+    "grounding": {
+     "grounded": false,
+     "bindings": [],
+     "claimed_ground": "RECORD \"the status quo the candidate must beat\" | EVIDENCE <none held>",
+     "absence_ground": false,
+     "demotion_reason": "no evidence / computation / record / declared-scope binding found in the kill basis \u2014 a bare assertion carries no verdict authority (Art. XVIII); the objection is preserved and escalated"
+    },
+    "class": "UNGROUND_SUGGESTION",
+    "authority": "NONE \u2014 an ungrounded suggestion is preserved for human/escalation review and NEVER enters the hypothesis space (R450 \u00a710: the attacker does not get authority to invent causal explanations)"
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "suggestion": "Design and include detailed ORP control system with automatic shut-off and alarm capabilities for the biocide dosing GROUNDED_IN: RECORD \"continuous 0.3 ppm actinic biocide with ORP control\" | EVIDENCE <none held>",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'continuous ppm actinic biocide' (field: intervention)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"continuous 0.3 ppm actinic biocide with ORP control\" | EVIDENCE <none held>",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "suggestion": "Specify exact swab sampling protocol, culture media, incubation conditions, and CFU counting methodology for the testable prediction GROUNDED_IN: RECORD \"monthly header-wall swab cultures show a 2-order CFU reduction\" | EVIDENCE <none held>",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'cultures show order cfu' (field: testable_prediction)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"monthly header-wall swab cultures show a 2-order CFU reduction\" | EVIDENCE <none held>",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   }
+  ],
+  "state": "ATTACK_RUN",
+  "overall": "KILLED",
+  "kill_basis": [
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "basis": "The intervention violates the boundary condition of \"dosing inside the existing discharge permit\" by introducing both continuous biocide and periodic dispersant without demonstrating compliance with permit limits for either chemical. GROUNDED_IN: RECORD \"dosing inside the existing discharge permit\" | EVIDENCE <none held>",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'inside the existing discharge' (field: boundary_conditions)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['discharge', 'dosing', 'existing', 'inside']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"dosing inside the existing discharge permit\" | EVIDENCE <none held>",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "basis": "The testable prediction claims \"monthly header-wall swab cultures show a 2-order CFU reduction\" but doesn't specify the sampling protocol, culture media, or incubation conditions, making the measurement unrepeatable. GROUNDED_IN: RECORD \"monthly header-wall swab cultures show a 2-order CFU reduction\" | EVIDENCE <none held>",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['2', '2']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'cultures show order cfu' (field: testable_prediction)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"monthly header-wall swab cultures show a 2-order CFU reduction\" | EVIDENCE <none held>",
+     "absence_ground": false
+    }
+   }
+  ],
+  "counts": {
+   "KILL": 2,
+   "RISK": 0,
+   "SURVIVE": 0,
+   "ABSTAIN_DEMOTED": 4,
+   "INVALID": 0
+  }
+ }
+}

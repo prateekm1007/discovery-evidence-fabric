@@ -1,0 +1,392 @@
+{
+ "attack": {
+  "attack_version": "independent_attack/3.0.0",
+  "candidate_id": "cal-19-tail-sized-sidestream-filter",
+  "generator_provider": null,
+  "attacker_provider": "zai",
+  "attacker_model": "zai-org/GLM-5.3",
+  "independence_mode": "SEPARATE_CONTEXT",
+  "independence_note": "the attacker ran in an independent reasoning context (fresh adversarial conversation, generator reasoning never shown; no alternative provider credentialed \u2014 disclosed, never claimed as provider separation)",
+  "prompt_hash": "fbae9897e234c2db068d3fcfddeeae9106b8f29b680165a139f21933eacf12be",
+  "output_hash": "70b66788bb1f1638e473e453c3addc3f83b1e73fbf161fbcf1ec33283c7df55b",
+  "llm_status": "OK",
+  "ring_pin": {
+   "requested": "zai",
+   "mode": "HARD_PIN_NO_FALLBACK",
+   "served_provider": "zai",
+   "served_model": "zai-org/GLM-5.3",
+   "pin_status": "HARD_PINNED_NO_FALLBACK",
+   "note": "the sealed-corpus measurement pins the attacker ring so the instrument is measured on the ring it declares (rules x ring); production attacks keep the availability cascade"
+  },
+  "attacked_at": "2026-09-17T15:25:47+00:00Z",
+  "items": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "verdict": "ABSTAIN",
+    "basis": "The mechanism fails to address the root cause of biological growth, which contributes to clogging but is unaffected by turbidity-triggered filtration. GROUNDED_IN: EVIDENCE [ev:episode-clog] | RECORD \"61 percent of all campaign\" clogging events are attributed to dump episodes, but the candidate provides no evidence that these episodes are exclusively particulate-driven rather than biological in nature | SCOPE the boundary condition \"no mill stop\" implies continuous operation where biological growth would persist",
+    "grounding": {
+     "grounded": false,
+     "bindings": [
+      {
+       "binding": "evidence",
+       "ground": "bundle item '18-month suspended-solids load study: the load is HEAVY-TAILED \u2014 median 0.6 kg/h but P95 = 3.6 kg/h and P99 = 6.1 kg/h (episodic descaling-line failures dump 6x the median for 2-6 hours, 14 events recorded); average-sized filters blind and bypass during exactly these episodes' (strong overlap: dump, episodes, events, these)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['mill', 'stop']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "EVIDENCE [ev:episode-clog] | RECORD \"61 percent of all campaign\" clogging events are attributed to dump episodes, but the candidate provides no evidence that these episodes are exclusively particulate",
+     "absence_ground": true,
+     "demotion_reason": "the asserted ground is an ABSENCE of evidence/support \u2014 absence is uncertainty, not failure (Art. XXI.3/XXV); the objection is preserved and escalated, never executed as a kill"
+    },
+    "demoted_from": "KILL",
+    "demotion_layer": "v2_grounding"
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "verdict": "KILL",
+    "basis": "The candidate violates the boundary condition \"side-stream only\" by requiring installation \"off-line during a roll change,\" which necessitates system shutdown that affects the main supply. GROUNDED_IN: EVIDENCE [intervention] | RECORD \"installed off-line during a roll change\" | SCOPE the boundary condition \"side-stream only (supply pressure untouched)\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "evidence",
+       "ground": "bundle item '18-month suspended-solids load study: the load is HEAVY-TAILED \u2014 median 0.6 kg/h but P95 = 3.6 kg/h and P99 = 6.1 kg/h (episodic descaling-line failures dump 6x the median for 2-6 hours, 14 events recorded); average-sized filters blind and bypass during exactly these episodes' (strong overlap: during, line)",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'installed off line during' (field: intervention)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['only', 'pressure', 'side', 'stream']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "EVIDENCE [intervention] | RECORD \"installed off-line during a roll change\" | SCOPE the boundary condition \"side-stream only (supply pressure untouched)\"",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "verdict": "ABSTAIN",
+    "basis": "The candidate's predicted effect claims a 5x reduction in the 61% share of clogging, but the evidence bundle contains no data supporting the efficacy of turbidity-triggered filtration in reducing clogging by this magnitude. GROUNDED_IN: EVIDENCE [ev:episode-clog] | RECORD \"61 percent of all campaign\" clogging events are attributed to dump episodes, but no evidence is provided showing that filtration reduces these events by 5x | COMPUTATION 5x reduction of 61% would require 12.2% of events to be eliminated, but no evidence supports this specific efficacy",
+    "grounding": {
+     "grounded": false,
+     "bindings": [
+      {
+       "binding": "evidence",
+       "ground": "bundle item '18-month suspended-solids load study: the load is HEAVY-TAILED \u2014 median 0.6 kg/h but P95 = 3.6 kg/h and P99 = 6.1 kg/h (episodic descaling-line failures dump 6x the median for 2-6 hours, 14 events recorded); average-sized filters blind and bypass during exactly these episodes' (strong overlap: dump, episodes, events, these)",
+       "verified": true
+      },
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['5', '61', '61', '5', '5', '61']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "EVIDENCE [ev:episode-clog] | RECORD \"61 percent of all campaign\" clogging events are attributed to dump episodes, but no evidence is provided showing that filtration reduces these events by 5x | COMPU",
+     "absence_ground": true,
+     "demotion_reason": "the asserted ground is an ABSENCE of evidence/support \u2014 absence is uncertainty, not failure (Art. XXI.3/XXV); the objection is preserved and escalated, never executed as a kill"
+    },
+    "demoted_from": "KILL",
+    "demotion_layer": "v2_grounding"
+   },
+   {
+    "attack_class": "BASELINE_EQUIVALENCE",
+    "verdict": "ABSTAIN",
+    "basis": "The candidate fails to demonstrate improvement over the baseline because it doesn't address continuous biological growth between dump episodes, which the baseline would experience similarly. GROUNDED_IN: EVIDENCE [ev:load-distribution] | RECORD \"median 0.6 kg/h\" load with heavy tail distribution | SCOPE the boundary condition \"no mill stop\" implies continuous operation where biological growth would occur between dump episodes",
+    "grounding": {
+     "grounded": false,
+     "bindings": [
+      {
+       "binding": "evidence",
+       "ground": "record id ev:load-distribution",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['mill', 'stop', 'with']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "EVIDENCE [ev:load-distribution] | RECORD \"median 0.6 kg/h\" load with heavy tail distribution | SCOPE the boundary condition \"no mill stop\" implies continuous operation where biological growth would oc",
+     "absence_ground": true,
+     "demotion_reason": "the asserted ground is an ABSENCE of evidence/support \u2014 absence is uncertainty, not failure (Art. XXI.3/XXV); the objection is preserved and escalated, never executed as a kill"
+    },
+    "demoted_from": "KILL",
+    "demotion_layer": "v2_grounding"
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "verdict": "KILL",
+    "basis": "The candidate claims installation during a roll change, but the evidence bundle shows the system operates continuously with no mill stops, making installation windows impossible. GROUNDED_IN: EVIDENCE [boundary conditions] | RECORD \"no mill stop\" | SCOPE the boundary condition \"no mill stop\" contradicts the installation requirement \"off-line during a roll change\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "evidence",
+       "ground": "bundle item '18-month suspended-solids load study: the load is HEAVY-TAILED \u2014 median 0.6 kg/h but P95 = 3.6 kg/h and P99 = 6.1 kg/h (episodic descaling-line failures dump 6x the median for 2-6 hours, 14 events recorded); average-sized filters blind and bypass during exactly these episodes' (strong overlap: during, line)",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'line during roll change' (field: intervention)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['mill', 'stop', 'with']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "EVIDENCE [boundary conditions] | RECORD \"no mill stop\" | SCOPE the boundary condition \"no mill stop\" contradicts the installation requirement \"off-line during a roll change\"",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "verdict": "ABSTAIN",
+    "basis": "The candidate's testable prediction uses \"plus or minus 0.6\" for clog counts, but this range (1.0-2.2) includes the baseline performance of 4.1 events, making the measurement indistinguishable from no improvement. GROUNDED_IN: EVIDENCE [predicted effect] | RECORD \"campaign clog counts measure 1.6 plus or minus 0.6\" | COMPUTATION the range 1.0-2.2 events is below the baseline of 4.1, but the margin of error overlaps with values that would indicate no improvement if measurement variance isn't properly quantified",
+    "grounding": {
+     "grounded": false,
+     "bindings": [
+      {
+       "binding": "evidence",
+       "ground": "bundle item 'Cross-reference of the 14 recorded high-load episodes with the nozzle clogging log: 61 percent of all campaign clogging events occur within 48 hours of a recorded descaling-dump episode' (strong overlap: campaign, events, with)",
+       "verified": true
+      },
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['0.6', '1.0', '2.2', '4.1', '1.6', '0.6']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'campaign clog counts measure' (field: testable_prediction)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "EVIDENCE [predicted effect] | RECORD \"campaign clog counts measure 1.6 plus or minus 0.6\" | COMPUTATION the range 1.0-2.2 events is below the baseline of 4.1, but the margin of error overlaps with val",
+     "absence_ground": true,
+     "demotion_reason": "the asserted ground is an ABSENCE of evidence/support \u2014 absence is uncertainty, not failure (Art. XXI.3/XXV); the objection is preserved and escalated, never executed as a kill"
+    },
+    "demoted_from": "KILL",
+    "demotion_layer": "v2_grounding"
+   }
+  ],
+  "intervention_suggestions": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "suggestion": "Increase side-stream filtration to 100% continuous operation rather than episodic to address both particulate and biological growth between dump episodes. GROUNDED_IN: EVIDENCE [ev:load-distribution] | RECORD \"median 0.6 kg/h\" load indicates continuous contamination requiring continuous filtration",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "evidence",
+       "ground": "record id ev:load-distribution",
+       "verified": true
+      },
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['100', '0.6']",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['side', 'stream']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "EVIDENCE [ev:load-distribution] | RECORD \"median 0.6 kg/h\" load indicates continuous contamination requiring continuous filtration",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "suggestion": "Redesign installation to be online without requiring mill stops, possibly implementing modular components that can be installed during normal operation. GROUNDED_IN: EVIDENCE [boundary conditions] | RECORD \"no mill stop\" | SCOPE the boundary condition \"no mill stop\" contradicts the installation requirement",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['mill', 'stop']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "EVIDENCE [boundary conditions] | RECORD \"no mill stop\" | SCOPE the boundary condition \"no mill stop\" contradicts the installation requirement",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "suggestion": "Provide pilot test data demonstrating the actual reduction in clogging events from turbidity-triggered filtration rather than relying on theoretical predictions. GROUNDED_IN: EVIDENCE [predicted effect] | RECORD \"campaign clog counts measure 1.6 plus or minus 0.6\" | COMPUTATION the predicted reduction from 4.1 to 1.6 events requires empirical validation",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "evidence",
+       "ground": "bundle item 'Cross-reference of the 14 recorded high-load episodes with the nozzle clogging log: 61 percent of all campaign clogging events occur within 48 hours of a recorded descaling-dump episode' (strong overlap: campaign, clogging, events)",
+       "verified": true
+      },
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['1.6', '0.6', '4.1', '1.6']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'campaign clog counts measure' (field: testable_prediction)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "EVIDENCE [predicted effect] | RECORD \"campaign clog counts measure 1.6 plus or minus 0.6\" | COMPUTATION the predicted reduction from 4.1 to 1.6 events requires empirical validation",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "BASELINE_EQUIVALENCE",
+    "suggestion": "Add continuous biocide treatment to the side-stream filtration to address biological growth that isn't captured by turbidity-triggered particulate filtration. GROUNDED_IN: EVIDENCE [ev:load-distribution] | RECORD \"median 0.6 kg/h\" load indicates continuous contamination requiring continuous treatment",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "evidence",
+       "ground": "record id ev:load-distribution",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['side', 'stream']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "EVIDENCE [ev:load-distribution] | RECORD \"median 0.6 kg/h\" load indicates continuous contamination requiring continuous treatment",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "suggestion": "Design the filtration system with prefabricated skids that can be installed incrementally during normal operation without requiring complete system shutdown. GROUNDED_IN: EVIDENCE [boundary conditions] | RECORD \"no mill stop\" | SCOPE the boundary condition \"no mill stop\" contradicts the installation requirement",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['mill', 'stop', 'with']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "EVIDENCE [boundary conditions] | RECORD \"no mill stop\" | SCOPE the boundary condition \"no mill stop\" contradicts the installation requirement",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "suggestion": "Narrow the measurement range for clog count reduction to exclude baseline performance, using statistical significance testing rather than arbitrary margins. GROUNDED_IN: EVIDENCE [predicted effect] | RECORD \"campaign clog counts measure 1.6 plus or minus 0.6\" | COMPUTATION the range must be tightened to exclude values above the baseline 4.1 events",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "evidence",
+       "ground": "bundle item 'Cross-reference of the 14 recorded high-load episodes with the nozzle clogging log: 61 percent of all campaign clogging events occur within 48 hours of a recorded descaling-dump episode' (strong overlap: campaign, events)",
+       "verified": true
+      },
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['1.6', '0.6', '4.1']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'campaign clog counts measure' (field: testable_prediction)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "EVIDENCE [predicted effect] | RECORD \"campaign clog counts measure 1.6 plus or minus 0.6\" | COMPUTATION the range must be tightened to exclude values above the baseline 4.1 events",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   }
+  ],
+  "state": "ATTACK_RUN",
+  "overall": "KILLED",
+  "kill_basis": [
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "basis": "The candidate violates the boundary condition \"side-stream only\" by requiring installation \"off-line during a roll change,\" which necessitates system shutdown that affects the main supply. GROUNDED_IN: EVIDENCE [intervention] | RECORD \"installed off-line during a roll change\" | SCOPE the boundary condition \"side-stream only (supply pressure untouched)\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "evidence",
+       "ground": "bundle item '18-month suspended-solids load study: the load is HEAVY-TAILED \u2014 median 0.6 kg/h but P95 = 3.6 kg/h and P99 = 6.1 kg/h (episodic descaling-line failures dump 6x the median for 2-6 hours, 14 events recorded); average-sized filters blind and bypass during exactly these episodes' (strong overlap: during, line)",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'installed off line during' (field: intervention)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['only', 'pressure', 'side', 'stream']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "EVIDENCE [intervention] | RECORD \"installed off-line during a roll change\" | SCOPE the boundary condition \"side-stream only (supply pressure untouched)\"",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "basis": "The candidate claims installation during a roll change, but the evidence bundle shows the system operates continuously with no mill stops, making installation windows impossible. GROUNDED_IN: EVIDENCE [boundary conditions] | RECORD \"no mill stop\" | SCOPE the boundary condition \"no mill stop\" contradicts the installation requirement \"off-line during a roll change\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "evidence",
+       "ground": "bundle item '18-month suspended-solids load study: the load is HEAVY-TAILED \u2014 median 0.6 kg/h but P95 = 3.6 kg/h and P99 = 6.1 kg/h (episodic descaling-line failures dump 6x the median for 2-6 hours, 14 events recorded); average-sized filters blind and bypass during exactly these episodes' (strong overlap: during, line)",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'line during roll change' (field: intervention)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['mill', 'stop', 'with']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "EVIDENCE [boundary conditions] | RECORD \"no mill stop\" | SCOPE the boundary condition \"no mill stop\" contradicts the installation requirement \"off-line during a roll change\"",
+     "absence_ground": false
+    }
+   }
+  ],
+  "counts": {
+   "KILL": 2,
+   "RISK": 0,
+   "SURVIVE": 0,
+   "ABSTAIN_DEMOTED": 4,
+   "INVALID": 0
+  }
+ }
+}

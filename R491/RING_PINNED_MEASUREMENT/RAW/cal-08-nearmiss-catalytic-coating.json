@@ -1,0 +1,342 @@
+{
+ "attack": {
+  "attack_version": "independent_attack/3.0.0",
+  "candidate_id": "cal-08-catalytic-throat-coating",
+  "generator_provider": null,
+  "attacker_provider": "zai",
+  "attacker_model": "zai-org/GLM-5.3",
+  "independence_mode": "SEPARATE_CONTEXT",
+  "independence_note": "the attacker ran in an independent reasoning context (fresh adversarial conversation, generator reasoning never shown; no alternative provider credentialed \u2014 disclosed, never claimed as provider separation)",
+  "prompt_hash": "8b5014ad190f460c7a466dd54e74c315fec645f1bfdd4104a13b5f4c08796b03",
+  "output_hash": "7e71180b535f840cf51e5f03fc780fa63b7bbbde11879d5155f37217521b78ff",
+  "llm_status": "OK",
+  "ring_pin": {
+   "requested": "zai",
+   "mode": "HARD_PIN_NO_FALLBACK",
+   "served_provider": "zai",
+   "served_model": "zai-org/GLM-5.3",
+   "pin_status": "HARD_PINNED_NO_FALLBACK",
+   "note": "the sealed-corpus measurement pins the attacker ring so the instrument is measured on the ring it declares (rules x ring); production attacks keep the availability cascade"
+  },
+  "attacked_at": "2026-09-17T15:21:33+00:00Z",
+  "items": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "verdict": "ABSTAIN",
+    "basis": "The mechanism claims interference with calcium carbonate nucleation but provides no evidence that phosphonate-embedded polymer can maintain inhibitory function at the claimed residence time of 1-2 ms in high-velocity flow. GROUNDED_IN: COMPUTATION <residence time of 1-2 ms is insufficient for inhibitor chemistry to exert nucleation suppression effect which typically requires minutes of contact time>",
+    "grounding": {
+     "grounded": false,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['1', '2', '1', '2']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'with calcium carbonate nucleation' (field: mechanism)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['flow', 'residence']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "COMPUTATION <residence time of 1-2 ms is insufficient for inhibitor chemistry to exert nucleation suppression effect which typically requires minutes of contact time>",
+     "absence_ground": true,
+     "demotion_reason": "the asserted ground is an ABSENCE of evidence/support \u2014 absence is uncertainty, not failure (Art. XXI.3/XXV); the objection is preserved and escalated, never executed as a kill"
+    },
+    "demoted_from": "KILL",
+    "demotion_layer": "v2_grounding"
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "verdict": "KILL",
+    "basis": "The coating is claimed to be applied at 40 microns but fails to address the known failure mode of coating abrasion by scale fines in a 14 bar pressure system. GROUNDED_IN: SCOPE <boundary condition of throat flow at 14 bar not compatible with maintaining a 40 micron polymer coating>",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['40', '14', '14', '40']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'flow at 14 bar' (field: boundary_conditions)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['flow', 'throat']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "SCOPE <boundary condition of throat flow at 14 bar not compatible with maintaining a 40 micron polymer coating>",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "verdict": "ABSTAIN",
+    "basis": "The candidate claims a 90% reduction in adherent scale mass but provides no evidence bundle to support this quantitative claim. GROUNDED_IN: EVIDENCE <no evidence bundle provided to support the 90% reduction claim>",
+    "grounding": {
+     "grounded": false,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['90', '90']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'in adherent scale mass' (field: testable_prediction)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "EVIDENCE <no evidence bundle provided to support the 90% reduction claim>",
+     "absence_ground": true,
+     "demotion_reason": "the asserted ground is an ABSENCE of evidence/support \u2014 absence is uncertainty, not failure (Art. XXI.3/XXV); the objection is preserved and escalated, never executed as a kill"
+    },
+    "demoted_from": "KILL",
+    "demotion_layer": "v2_grounding"
+   },
+   {
+    "attack_class": "BASELINE_EQUIVALENCE",
+    "verdict": "ABSTAIN",
+    "basis": "The candidate claims clogging events per campaign will fall from 4.1 to below 0.6 but provides no data showing this reduction would maintain thermal-crown within the 12 micron band specification. GROUNDED_IN: COMPUTATION <4.1 to 0.6 clogging events still represents potential thermal-crown variation beyond the 12 micron band>",
+    "grounding": {
+     "grounded": false,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['4.1', '0.6', '12', '4.1', '0.6', '12']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'clogging events per campaign' (field: predicted_effect)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "COMPUTATION <4.1 to 0.6 clogging events still represents potential thermal-crown variation beyond the 12 micron band>",
+     "absence_ground": true,
+     "demotion_reason": "the asserted ground is an ABSENCE of evidence/support \u2014 absence is uncertainty, not failure (Art. XXI.3/XXV); the objection is preserved and escalated, never executed as a kill"
+    },
+    "demoted_from": "KILL",
+    "demotion_layer": "v2_grounding"
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "verdict": "ABSTAIN",
+    "basis": "The intervention requires electrostatic application to 120 nozzle throats at each scheduled cleaning, but provides no evidence that this can be accomplished within production downtime constraints. GROUNDED_IN: SCOPE <boundary condition of scheduled cleaning not addressed for 120 nozzle application>",
+    "grounding": {
+     "grounded": false,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['120', '120']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'throats at each scheduled' (field: intervention)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "SCOPE <boundary condition of scheduled cleaning not addressed for 120 nozzle application>",
+     "absence_ground": true,
+     "demotion_reason": "the asserted ground is an ABSENCE of evidence/support \u2014 absence is uncertainty, not failure (Art. XXI.3/XXV); the objection is preserved and escalated, never executed as a kill"
+    },
+    "demoted_from": "KILL",
+    "demotion_layer": "v2_grounding"
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "verdict": "KILL",
+    "basis": "The testable prediction uses coupon exposure in recirculated water but fails to specify how coupon geometry and flow conditions match actual nozzle throat conditions. GROUNDED_IN: SCOPE <coupon test conditions do not match boundary conditions of 14 bar flow and 1-2 ms residence time>",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['14', '1', '2']",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['flow', 'residence', 'throat', 'water']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "SCOPE <coupon test conditions do not match boundary conditions of 14 bar flow and 1-2 ms residence time>",
+     "absence_ground": false
+    }
+   }
+  ],
+  "intervention_suggestions": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "suggestion": "Reduce coating thickness to 5-10 microns and increase phosphonate loading by 300% to ensure faster inhibitor release kinetics at the reduced residence time. GROUNDED_IN: COMPUTATION <reduced thickness allows faster inhibitor diffusion, increased concentration compensates for shorter contact time>",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['5', '10', '300']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "COMPUTATION <reduced thickness allows faster inhibitor diffusion, increased concentration compensates for shorter contact time>",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "suggestion": "Incorporate ceramic nanoparticles into the polymer matrix to improve abrasion resistance at 14 bar flow conditions while maintaining inhibitor functionality. GROUNDED_IN: SCOPE <ceramic reinforcement addresses the 14 bar boundary condition>",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['14', '14']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "SCOPE <ceramic reinforcement addresses the 14 bar boundary condition>",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "suggestion": "Provide evidence bundle with lab-scale testing showing inhibitor release kinetics and calcium carbonate nucleation suppression at 1-2 ms residence times. GROUNDED_IN: EVIDENCE <required evidence bundle missing>",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['1', '2']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "EVIDENCE <required evidence bundle missing>",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "BASELINE_EQUIVALENCE",
+    "suggestion": "Conduct thermal modeling to demonstrate that even with 0.6 clogging events, thermal-crown variation remains within 12 micron band. GROUNDED_IN: COMPUTATION <thermal modeling required to verify specification compliance>",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['0.6', '12']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "COMPUTATION <thermal modeling required to verify specification compliance>",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "suggestion": "Develop automated robotic application system to coat 120 nozzles in under 30 minutes to fit within production downtime constraints. GROUNDED_IN: SCOPE <application time not addressed>",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['120', '30']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "SCOPE <application time not addressed>",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "suggestion": "Test coupons with identical geometry to nozzle throats and at identical flow velocities and pressures to validate the 90% reduction claim. GROUNDED_IN: SCOPE <boundary conditions not matched in testing>",
+    "grounding": {
+     "grounded": false,
+     "bindings": [],
+     "claimed_ground": "SCOPE <boundary conditions not matched in testing>",
+     "absence_ground": false,
+     "demotion_reason": "no evidence / computation / record / declared-scope binding found in the kill basis \u2014 a bare assertion carries no verdict authority (Art. XVIII); the objection is preserved and escalated"
+    },
+    "class": "UNGROUND_SUGGESTION",
+    "authority": "NONE \u2014 an ungrounded suggestion is preserved for human/escalation review and NEVER enters the hypothesis space (R450 \u00a710: the attacker does not get authority to invent causal explanations)"
+   }
+  ],
+  "state": "ATTACK_RUN",
+  "overall": "KILLED",
+  "kill_basis": [
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "basis": "The coating is claimed to be applied at 40 microns but fails to address the known failure mode of coating abrasion by scale fines in a 14 bar pressure system. GROUNDED_IN: SCOPE <boundary condition of throat flow at 14 bar not compatible with maintaining a 40 micron polymer coating>",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['40', '14', '14', '40']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'flow at 14 bar' (field: boundary_conditions)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['flow', 'throat']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "SCOPE <boundary condition of throat flow at 14 bar not compatible with maintaining a 40 micron polymer coating>",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "basis": "The testable prediction uses coupon exposure in recirculated water but fails to specify how coupon geometry and flow conditions match actual nozzle throat conditions. GROUNDED_IN: SCOPE <coupon test conditions do not match boundary conditions of 14 bar flow and 1-2 ms residence time>",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['14', '1', '2']",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['flow', 'residence', 'throat', 'water']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "SCOPE <coupon test conditions do not match boundary conditions of 14 bar flow and 1-2 ms residence time>",
+     "absence_ground": false
+    }
+   }
+  ],
+  "counts": {
+   "KILL": 2,
+   "RISK": 0,
+   "SURVIVE": 0,
+   "ABSTAIN_DEMOTED": 4,
+   "INVALID": 0
+  }
+ }
+}

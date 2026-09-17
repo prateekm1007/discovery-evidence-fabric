@@ -1,0 +1,356 @@
+{
+ "attack": {
+  "attack_version": "independent_attack/3.0.0",
+  "candidate_id": "cal-04-ai-monitoring-program",
+  "generator_provider": null,
+  "attacker_provider": "zai",
+  "attacker_model": "zai-org/GLM-5.3",
+  "independence_mode": "SEPARATE_CONTEXT",
+  "independence_note": "the attacker ran in an independent reasoning context (fresh adversarial conversation, generator reasoning never shown; no alternative provider credentialed \u2014 disclosed, never claimed as provider separation)",
+  "prompt_hash": "d81f7faa53e063086ee2aee9a46bd50abab624e3da35eb3f66bf53920ba1e2c0",
+  "output_hash": "e1a9ea84f14c48200a4410da39848587ed88caeb7a9b96be500bbe1ec142112f",
+  "llm_status": "OK",
+  "ring_pin": {
+   "requested": "zai",
+   "mode": "HARD_PIN_NO_FALLBACK",
+   "served_provider": "zai",
+   "served_model": "zai-org/GLM-5.3",
+   "pin_status": "HARD_PINNED_NO_FALLBACK",
+   "note": "the sealed-corpus measurement pins the attacker ring so the instrument is measured on the ring it declares (rules x ring); production attacks keep the availability cascade"
+  },
+  "attacked_at": "2026-09-17T15:20:07+00:00Z",
+  "items": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "verdict": "ABSTAIN",
+    "basis": "The claimed mechanism cannot distinguish between pressure drops caused by clogging and those caused by legitimate operational variations in a high-pressure spray system GROUNDED_IN: COMPUTATION The system operates at 14 bar with 120 nozzles; pressure variations of less than 1% (0.14 bar) would be indistinguishable from clogging but could occur during normal operation",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['14', '120', '1', '0.14']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "COMPUTATION The system operates at 14 bar with 120 nozzles; pressure variations of less than 1% (0.14 bar) would be indistinguishable from clogging but could occur during normal operation",
+     "absence_ground": false
+    },
+    "demoted_from": "KILL",
+    "demotion_layer": "v3_anchor",
+    "anchor": {
+     "rule": "NO_ANCHOR_BINDING",
+     "reason": "the only binding is a numeric relation (computation) \u2014 the weakest binding class, exactly what a false kill constructs (cross-field unit confusion, external constants, reinterpretation); the objection is preserved and escalated, the kill authority withdrawn"
+    }
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "verdict": "KILL",
+    "basis": "The candidate violates its own boundary condition of \"no hardware change to nozzles\" by requiring per-segment pressure sensors which constitute a hardware modification to the existing spray system GROUNDED_IN: SCOPE \"no hardware change to nozzles\" boundary condition clause",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'per segment pressure sensors' (field: intervention)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['change', 'hardware', 'nozzles']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "SCOPE \"no hardware change to nozzles\" boundary condition clause",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "verdict": "ABSTAIN",
+    "basis": "The candidate claims to predict clogs but provides no evidence that its analytics model can distinguish between pressure drops from clogging versus other causes in the complex recirculated water system GROUNDED_IN: EVIDENCE none held | RECORD \"the platform flags 85 percent of clogs at least one shift before the operator would notice them\"",
+    "grounding": {
+     "grounded": false,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'before the operator would' (field: testable_prediction)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "EVIDENCE none held | RECORD \"the platform flags 85 percent of clogs at least one shift before the operator would notice them\"",
+     "absence_ground": true,
+     "demotion_reason": "the asserted ground is an ABSENCE of evidence/support \u2014 absence is uncertainty, not failure (Art. XXI.3/XXV); the objection is preserved and escalated, never executed as a kill"
+    },
+    "demoted_from": "KILL",
+    "demotion_layer": "v2_grounding"
+   },
+   {
+    "attack_class": "BASELINE_EQUIVALENCE",
+    "verdict": "KILL",
+    "basis": "The candidate claims thermal-crown variation stays at 28 microns late-campaign, which exceeds the 12 micron failure band defined in the problem statement, meaning the system still fails to meet quality requirements GROUNDED_IN: COMPUTATION 28 microns > 12 micron failure band | RECORD \"thermal-crown variation stays at 28 microns late-campaign (same as today)\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['28', '12', '28', '12', '28']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'stays at 28 microns' (field: predicted_effect)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "COMPUTATION 28 microns > 12 micron failure band | RECORD \"thermal-crown variation stays at 28 microns late-campaign (same as today)\"",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "verdict": "KILL",
+    "basis": "The claimed prediction horizon cannot be achieved in a system where clogs develop rapidly from scale particles and biological growth, making reliable prediction more than one shift in advance impossible GROUNDED_IN: RECORD \"progressive nozzle clogging from scale particles and biological growth\" | RECORD \"flags 85 percent of clogs at least one shift before the operator would notice them\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'before the operator would' (field: testable_prediction)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"progressive nozzle clogging from scale particles and biological growth\" | RECORD \"flags 85 percent of clogs at least one shift before the operator would notice them\"",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "verdict": "KILL",
+    "basis": "The candidate provides no method to calibrate pressure sensors in the harsh header environment where sensor drift is explicitly acknowledged as a failure mode, making measurements unreliable GROUNDED_IN: RECORD \"sensor drift in the header environment\" | RECORD \"per-segment pressure sensors\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'per segment pressure sensors' (field: intervention)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"sensor drift in the header environment\" | RECORD \"per-segment pressure sensors\"",
+     "absence_ground": false
+    }
+   }
+  ],
+  "intervention_suggestions": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "suggestion": "Add direct nozzle flow verification sensors instead of pressure-only measurements to distinguish between clogging and pressure fluctuations GROUNDED_IN: COMPUTATION Pressure variations of less than 0.14 bar would be indistinguishable from clogging",
+    "grounding": {
+     "grounded": false,
+     "bindings": [],
+     "claimed_ground": "COMPUTATION Pressure variations of less than 0.14 bar would be indistinguishable from clogging",
+     "absence_ground": false,
+     "demotion_reason": "no evidence / computation / record / declared-scope binding found in the kill basis \u2014 a bare assertion carries no verdict authority (Art. XVIII); the objection is preserved and escalated"
+    },
+    "class": "UNGROUND_SUGGESTION",
+    "authority": "NONE \u2014 an ungrounded suggestion is preserved for human/escalation review and NEVER enters the hypothesis space (R450 \u00a710: the attacker does not get authority to invent causal explanations)"
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "suggestion": "Redesign the sensing approach to clamp onto existing nozzle connections without requiring permanent hardware modifications to maintain \"no hardware change\" boundary condition GROUNDED_IN: SCOPE \"no hardware change to nozzles\" boundary condition clause",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'hardware change to nozzles' (field: boundary_conditions)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['change', 'hardware', 'nozzles']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "SCOPE \"no hardware change to nozzles\" boundary condition clause",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "suggestion": "Conduct validation tests demonstrating the analytics model's ability to distinguish clogging pressure signatures from legitimate operational variations in the specific 14-bar system GROUNDED_IN: EVIDENCE none held | RECORD \"the platform flags 85 percent of clogs at least one shift before the operator would notice them\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['14', '85']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'before the operator would' (field: testable_prediction)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "EVIDENCE none held | RECORD \"the platform flags 85 percent of clogs at least one shift before the operator would notice them\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "BASELINE_EQUIVALENCE",
+    "suggestion": "Modify the intervention to include automated cleaning or flow adjustment capabilities rather than just inspection scheduling to actually reduce thermal-crown variation below the 12 micron threshold GROUNDED_IN: COMPUTATION 28 microns > 12 micron failure band | RECORD \"thermal-crown variation stays at 28 microns late-campaign (same as today)\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['12', '28', '12', '28']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'stays at 28 microns' (field: predicted_effect)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['cleaning', 'same']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "COMPUTATION 28 microns > 12 micron failure band | RECORD \"thermal-crown variation stays at 28 microns late-campaign (same as today)\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "suggestion": "Implement continuous sensor calibration routines specifically designed for the header environment to mitigate the acknowledged sensor drift failure mode GROUNDED_IN: RECORD \"sensor drift in the header environment\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'drift in the header' (field: known_failure_modes)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"sensor drift in the header environment\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "suggestion": "Develop a multi-sensor approach combining pressure, temperature, and flow measurements with machine learning to distinguish between different failure modes and environmental factors GROUNDED_IN: RECORD \"sensor drift in the header environment\" | RECORD \"progressive nozzle clogging from scale particles and biological growth\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'drift in the header' (field: known_failure_modes)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"sensor drift in the header environment\" | RECORD \"progressive nozzle clogging from scale particles and biological growth\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   }
+  ],
+  "state": "ATTACK_RUN",
+  "overall": "KILLED",
+  "kill_basis": [
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "basis": "The candidate violates its own boundary condition of \"no hardware change to nozzles\" by requiring per-segment pressure sensors which constitute a hardware modification to the existing spray system GROUNDED_IN: SCOPE \"no hardware change to nozzles\" boundary condition clause",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'per segment pressure sensors' (field: intervention)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['change', 'hardware', 'nozzles']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "SCOPE \"no hardware change to nozzles\" boundary condition clause",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "BASELINE_EQUIVALENCE",
+    "basis": "The candidate claims thermal-crown variation stays at 28 microns late-campaign, which exceeds the 12 micron failure band defined in the problem statement, meaning the system still fails to meet quality requirements GROUNDED_IN: COMPUTATION 28 microns > 12 micron failure band | RECORD \"thermal-crown variation stays at 28 microns late-campaign (same as today)\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['28', '12', '28', '12', '28']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'stays at 28 microns' (field: predicted_effect)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "COMPUTATION 28 microns > 12 micron failure band | RECORD \"thermal-crown variation stays at 28 microns late-campaign (same as today)\"",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "basis": "The claimed prediction horizon cannot be achieved in a system where clogs develop rapidly from scale particles and biological growth, making reliable prediction more than one shift in advance impossible GROUNDED_IN: RECORD \"progressive nozzle clogging from scale particles and biological growth\" | RECORD \"flags 85 percent of clogs at least one shift before the operator would notice them\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'before the operator would' (field: testable_prediction)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"progressive nozzle clogging from scale particles and biological growth\" | RECORD \"flags 85 percent of clogs at least one shift before the operator would notice them\"",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "basis": "The candidate provides no method to calibrate pressure sensors in the harsh header environment where sensor drift is explicitly acknowledged as a failure mode, making measurements unreliable GROUNDED_IN: RECORD \"sensor drift in the header environment\" | RECORD \"per-segment pressure sensors\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'per segment pressure sensors' (field: intervention)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"sensor drift in the header environment\" | RECORD \"per-segment pressure sensors\"",
+     "absence_ground": false
+    }
+   }
+  ],
+  "counts": {
+   "KILL": 4,
+   "RISK": 0,
+   "SURVIVE": 0,
+   "ABSTAIN_DEMOTED": 2,
+   "INVALID": 0
+  }
+ }
+}

@@ -1,0 +1,395 @@
+{
+ "attack": {
+  "attack_version": "independent_attack/3.0.0",
+  "candidate_id": "cal-10-scale-scoped-cascade",
+  "generator_provider": null,
+  "attacker_provider": "zai",
+  "attacker_model": "zai-org/GLM-5.3",
+  "independence_mode": "SEPARATE_CONTEXT",
+  "independence_note": "the attacker ran in an independent reasoning context (fresh adversarial conversation, generator reasoning never shown; no alternative provider credentialed \u2014 disclosed, never claimed as provider separation)",
+  "prompt_hash": "00bedae09416862a65aae0914a811d55c467ea8c2102c95fc6d63ebb3405e40d",
+  "output_hash": "0366972690b2a0b15d353a9edbac01221920ff32cdbdd107e1c30d3c6bf8f738",
+  "llm_status": "OK",
+  "ring_pin": {
+   "requested": "zai",
+   "mode": "HARD_PIN_NO_FALLBACK",
+   "served_provider": "zai",
+   "served_model": "zai-org/GLM-5.3",
+   "pin_status": "HARD_PINNED_NO_FALLBACK",
+   "note": "the sealed-corpus measurement pins the attacker ring so the instrument is measured on the ring it declares (rules x ring); production attacks keep the availability cascade"
+  },
+  "attacked_at": "2026-09-17T15:22:19+00:00Z",
+  "items": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "verdict": "KILL",
+    "basis": "The two-stage wedge-wire cascade cannot effectively remove scale particles below 120 microns that contribute to bridging nuclei, yet the mechanism claims to target these bridging nuclei which are explicitly smaller than the 120-micron second-stage rating. GROUNDED_IN: SCOPE \"the intervention explicitly targets SCALE-PARTICLE clogging only \u2014 biofilm clogging is declared OUT OF SCOPE and remains handled by the mill's existing biocide program\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['120', '120']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'out of scope and' (field: mechanism)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['biocide', 'biofilm', 'clogging', 'existing']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "SCOPE \"the intervention explicitly targets SCALE-PARTICLE clogging only \u2014 biofilm clogging is declared OUT OF SCOPE and remains handled by the mill's existing biocide program\"",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "verdict": "ABSTAIN",
+    "basis": "The candidate declares biofilm clogging \"OUT OF SCOPE\" but provides no evidence that the existing biocide program can maintain efficacy in the presence of the proposed cascade, which may alter flow dynamics and chemical distribution. GROUNDED_IN: EVIDENCE <none held> | RECORD \"biofilm clogging is declared OUT OF SCOPE and remains handled by the mill's existing biocide program\"",
+    "grounding": {
+     "grounded": false,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'out of scope and' (field: mechanism)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['biocide', 'biofilm', 'clogging', 'existing']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "EVIDENCE <none held> | RECORD \"biofilm clogging is declared OUT OF SCOPE and remains handled by the mill's existing biocide program\"",
+     "absence_ground": true,
+     "demotion_reason": "the asserted ground is an ABSENCE of evidence/support \u2014 absence is uncertainty, not failure (Art. XXI.3/XXV); the objection is preserved and escalated, never executed as a kill"
+    },
+    "demoted_from": "KILL",
+    "demotion_layer": "v2_grounding"
+   },
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "verdict": "ABSTAIN",
+    "basis": "The candidate predicts an 8x reduction in scale-particle-driven clogging events but provides no computational model or test data to support this specific quantitative claim, making the prediction unverifiable. GROUNDED_IN: EVIDENCE <none held> | RECORD \"scale-particle-driven clogging events (the 12 percent of measured blockages that are pure scale above 200 microns, plus bridging nuclei) reduced 8x\"",
+    "grounding": {
+     "grounded": false,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['8', '12', '200', '8']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'microns plus bridging nuclei' (field: predicted_effect)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['above', 'clogging', 'microns', 'particle']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "EVIDENCE <none held> | RECORD \"scale-particle-driven clogging events (the 12 percent of measured blockages that are pure scale above 200 microns, plus bridging nuclei) reduced 8x\"",
+     "absence_ground": true,
+     "demotion_reason": "the asserted ground is an ABSENCE of evidence/support \u2014 absence is uncertainty, not failure (Art. XXI.3/XXV); the objection is preserved and escalated, never executed as a kill"
+    },
+    "demoted_from": "KILL",
+    "demotion_layer": "v2_grounding"
+   },
+   {
+    "attack_class": "BASELINE_EQUIVALENCE",
+    "verdict": "KILL",
+    "basis": "The candidate claims the intervention will reduce total campaign clogging events from 4.1 to approximately 3.3, but this calculation appears to ignore the compounding effects of partial clogging events that may still cause thermal crown variation beyond the 12 micron band. GROUNDED_IN: COMPUTATION <4.1 to 3.3 reduction doesn't account for partial clog impacts> | SCOPE \"causing non-uniform work-roll temperature, thermal-crown variation beyond the 12 micron band\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['4.1', '3.3', '12', '4.1', '3.3', '12']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'total campaign clogging events' (field: predicted_effect)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['clogging', 'roll', 'scope']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "COMPUTATION <4.1 to 3.3 reduction doesn't account for partial clog impacts> | SCOPE \"causing non-uniform work-roll temperature, thermal-crown variation beyond the 12 micron band\"",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "verdict": "RISK",
+    "basis": "The flanged spool swap during planned roll change is feasible but carries significant risk of misalignment or leaks during installation under pressure, with no contingency plan provided. GROUNDED_IN: SCOPE \"no mill stop for installation (flanged spool swap during planned roll change)\""
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "verdict": "KILL",
+    "basis": "The testable prediction relies on \"removed-nozzle analysis\" but provides no methodology for distinguishing between scale-particle and biofilm blockages when they may be co-located or when scale particles are coated with biological material. GROUNDED_IN: SCOPE \"biofilm clogging is declared OUT OF SCOPE\" | RECORD \"removed-nozzle analysis over two campaigns shows scale-particle blockages reduced 8x while biofilm blockage counts are statistically unchanged\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'clogging is declared out' (field: mechanism)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['biofilm', 'clogging', 'particle', 'scale']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "SCOPE \"biofilm clogging is declared OUT OF SCOPE\" | RECORD \"removed-nozzle analysis over two campaigns shows scale-particle blockages reduced 8x while biofilm blockage counts are statistically unchang",
+     "absence_ground": false
+    }
+   }
+  ],
+  "intervention_suggestions": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "suggestion": "Change the second-stage micron rating from 120 to 50 microns to capture bridging nuclei while maintaining flow capacity, addressing the fundamental disconnect between the claimed target and actual particle removal capability. GROUNDED_IN: SCOPE \"the intervention explicitly targets SCALE-PARTICLE clogging only \u2014 biofilm clogging is declared OUT OF SCOPE and remains handled by the mill's existing bi",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['120', '50']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'out of scope and' (field: mechanism)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['biocide', 'biofilm', 'change', 'clogging']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "SCOPE \"the intervention explicitly targets SCALE-PARTICLE clogging only \u2014 biofilm clogging is declared OUT OF SCOPE and remains handled by the mill's existing biocide program\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "suggestion": "Add a validation clause requiring testing of the existing biocide program's efficacy in the presence of the cascade before full implementation, addressing the unsupported assumption that boundary conditions remain unchanged. GROUNDED_IN: SCOPE \"biofilm clogging is declared OUT OF SCOPE and remains handled by the mill's existing biocide program\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'out of scope and' (field: mechanism)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['biocide', 'biofilm', 'clogging', 'existing']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "SCOPE \"biofilm clogging is declared OUT OF SCOPE and remains handled by the mill's existing biocide program\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "suggestion": "Provide computational fluid dynamics modeling data demonstrating the 8x reduction claim, with specific particle size distribution inputs and pressure drop calculations across both stages. GROUNDED_IN: EVIDENCE <none held> | RECORD \"scale-particle-driven clogging events (the 12 percent of measured blockages that are pure scale above 200 microns, plus bridging nuclei) reduced 8x\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['8', '12', '200', '8']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'microns plus bridging nuclei' (field: predicted_effect)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['above', 'clogging', 'microns', 'particle']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "EVIDENCE <none held> | RECORD \"scale-particle-driven clogging events (the 12 percent of measured blockages that are pure scale above 200 microns, plus bridging nuclei) reduced 8x\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "BASELINE_EQUIVALENCE",
+    "suggestion": "Include a partial clogging impact assessment in the total campaign clogging calculation, showing how smaller partial clogs affect thermal crown variation beyond the 12 micron band. GROUNDED_IN: COMPUTATION <4.1 to 3.3 reduction doesn't account for partial clog impacts> | SCOPE \"causing non-uniform work-roll temperature, thermal-crown variation beyond the 12 micron band\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['12', '4.1', '3.3', '12']",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['clogging', 'roll', 'scope']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "COMPUTATION <4.1 to 3.3 reduction doesn't account for partial clog impacts> | SCOPE \"causing non-uniform work-roll temperature, thermal-crown variation beyond the 12 micron band\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "suggestion": "Develop a detailed installation procedure with pressure isolation verification and leak testing protocols before and after spool swap, addressing the significant risk of misalignment under pressure. GROUNDED_IN: SCOPE \"no mill stop for installation (flanged spool swap during planned roll change)\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'mill stop for installation' (field: boundary_conditions)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['change', 'during', 'flanged', 'installation']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "SCOPE \"no mill stop for installation (flanged spool swap during planned roll change)\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "suggestion": "Specify a standardized analytical protocol for distinguishing scale-particle from biofilm blockages, potentially using microscopic examination with staining or chemical analysis, addressing the unverifiable test prediction. GROUNDED_IN: SCOPE \"biofilm clogging is declared OUT OF SCOPE\" | RECORD \"removed-nozzle analysis over two campaigns shows scale-particle blockages reduced 8x while biofilm bloc",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'clogging is declared out' (field: mechanism)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['biofilm', 'clogging', 'particle', 'scale']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "SCOPE \"biofilm clogging is declared OUT OF SCOPE\" | RECORD \"removed-nozzle analysis over two campaigns shows scale-particle blockages reduced 8x while biofilm blockage counts are statistically unchang",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   }
+  ],
+  "state": "ATTACK_RUN",
+  "overall": "KILLED",
+  "kill_basis": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "basis": "The two-stage wedge-wire cascade cannot effectively remove scale particles below 120 microns that contribute to bridging nuclei, yet the mechanism claims to target these bridging nuclei which are explicitly smaller than the 120-micron second-stage rating. GROUNDED_IN: SCOPE \"the intervention explicitly targets SCALE-PARTICLE clogging only \u2014 biofilm clogging is declared OUT OF SCOPE and remains handled by the mill's existing biocide program\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['120', '120']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'out of scope and' (field: mechanism)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['biocide', 'biofilm', 'clogging', 'existing']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "SCOPE \"the intervention explicitly targets SCALE-PARTICLE clogging only \u2014 biofilm clogging is declared OUT OF SCOPE and remains handled by the mill's existing biocide program\"",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "BASELINE_EQUIVALENCE",
+    "basis": "The candidate claims the intervention will reduce total campaign clogging events from 4.1 to approximately 3.3, but this calculation appears to ignore the compounding effects of partial clogging events that may still cause thermal crown variation beyond the 12 micron band. GROUNDED_IN: COMPUTATION <4.1 to 3.3 reduction doesn't account for partial clog impacts> | SCOPE \"causing non-uniform work-roll temperature, thermal-crown variation beyond the 12 micron band\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['4.1', '3.3', '12', '4.1', '3.3', '12']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'total campaign clogging events' (field: predicted_effect)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['clogging', 'roll', 'scope']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "COMPUTATION <4.1 to 3.3 reduction doesn't account for partial clog impacts> | SCOPE \"causing non-uniform work-roll temperature, thermal-crown variation beyond the 12 micron band\"",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "basis": "The testable prediction relies on \"removed-nozzle analysis\" but provides no methodology for distinguishing between scale-particle and biofilm blockages when they may be co-located or when scale particles are coated with biological material. GROUNDED_IN: SCOPE \"biofilm clogging is declared OUT OF SCOPE\" | RECORD \"removed-nozzle analysis over two campaigns shows scale-particle blockages reduced 8x while biofilm blockage counts are statistically unchanged\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'clogging is declared out' (field: mechanism)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['biofilm', 'clogging', 'particle', 'scale']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "SCOPE \"biofilm clogging is declared OUT OF SCOPE\" | RECORD \"removed-nozzle analysis over two campaigns shows scale-particle blockages reduced 8x while biofilm blockage counts are statistically unchang",
+     "absence_ground": false
+    }
+   }
+  ],
+  "counts": {
+   "KILL": 3,
+   "RISK": 1,
+   "SURVIVE": 0,
+   "ABSTAIN_DEMOTED": 2,
+   "INVALID": 0
+  }
+ }
+}

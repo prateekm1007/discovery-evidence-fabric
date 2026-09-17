@@ -1,0 +1,312 @@
+{
+ "attack": {
+  "attack_version": "independent_attack/3.0.0",
+  "candidate_id": "cal-14-cyclonic-preseparator",
+  "generator_provider": null,
+  "attacker_provider": "zai",
+  "attacker_model": "zai-org/GLM-5.3",
+  "independence_mode": "SEPARATE_CONTEXT",
+  "independence_note": "the attacker ran in an independent reasoning context (fresh adversarial conversation, generator reasoning never shown; no alternative provider credentialed \u2014 disclosed, never claimed as provider separation)",
+  "prompt_hash": "c18f6307713a0cc390ea2bf30a6e2355a6d44443dc2496d76988ea27223039d1",
+  "output_hash": "57aeb2297131f2496e43eb8546d3c0dc923cb6c73dcfdc7ee6e0d53858a1cc79",
+  "llm_status": "OK",
+  "ring_pin": {
+   "requested": "zai",
+   "mode": "HARD_PIN_NO_FALLBACK",
+   "served_provider": "zai",
+   "served_model": "zai-org/GLM-5.3",
+   "pin_status": "HARD_PINNED_NO_FALLBACK",
+   "note": "the sealed-corpus measurement pins the attacker ring so the instrument is measured on the ring it declares (rules x ring); production attacks keep the availability cascade"
+  },
+  "attacked_at": "2026-09-17T15:23:52+00:00Z",
+  "items": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "verdict": "KILL",
+    "basis": "The hydrocyclone cannot achieve the claimed 85% removal efficiency for particles above 100 microns at the specified return flow rate without providing cyclone geometry calculations or pressure drop data that would confirm separation efficiency at operating conditions GROUNDED_IN: COMPUTATION <the candidate claims 85% removal but provides no cyclone geometry, cut size calculation, or pressure drop verification at 13-15 bar return flow>",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['85', '100', '85', '13', '15']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'particles above 100 microns' (field: mechanism)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "COMPUTATION <the candidate claims 85% removal but provides no cyclone geometry, cut size calculation, or pressure drop verification at 13-15 bar return flow>",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "verdict": "RISK",
+    "basis": "The candidate admits apex plugging during descaling dumps but claims a bypass protects supply, yet doesn't specify how this bypass would function or how it would maintain separation efficiency during such events GROUNDED_IN: RECORD \"Known failure modes (claimed by the generator): apex plugging during episodic descaling dumps (bypass protects supply)\""
+   },
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "verdict": "ABSTAIN",
+    "basis": "The candidate provides no evidence bundle to support any of its claims, including the predicted 85% removal efficiency, the reduction in clogging events from 4.1 to 2.6, or any performance data GROUNDED_IN: EVIDENCE <none held>",
+    "grounding": {
+     "grounded": false,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['85', '4.1', '2.6']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "EVIDENCE <none held>",
+     "absence_ground": true,
+     "demotion_reason": "the asserted ground is an ABSENCE of evidence/support \u2014 absence is uncertainty, not failure (Art. XXI.3/XXV); the objection is preserved and escalated, never executed as a kill"
+    },
+    "demoted_from": "KILL",
+    "demotion_layer": "v2_grounding"
+   },
+   {
+    "attack_class": "BASELINE_EQUIVALENCE",
+    "verdict": "ABSTAIN",
+    "basis": "The candidate claims no pressure-drop penalty on the supply side but provides no evidence that the hydrocyclone installation won't create backpressure that affects the entire recirculation system's flow balance GROUNDED_IN: RECORD \"no pressure-drop penalty on the supply side (the cyclone sits on the return)\"",
+    "grounding": {
+     "grounded": false,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'the cyclone sits on' (field: predicted_effect)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['installation', 'return', 'supply']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"no pressure-drop penalty on the supply side (the cyclone sits on the return)\"",
+     "absence_ground": true,
+     "demotion_reason": "the asserted ground is an ABSENCE of evidence/support \u2014 absence is uncertainty, not failure (Art. XXI.3/XXV); the objection is preserved and escalated, never executed as a kill"
+    },
+    "demoted_from": "KILL",
+    "demotion_layer": "v2_grounding"
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "verdict": "RISK",
+    "basis": "The candidate specifies a single 150mm hydrocyclone but doesn't provide calculations showing this size can handle the full return flow while maintaining the required separation efficiency GROUNDED_IN: SCOPE <boundary conditions: return-line installation only; 13-15 bar supply untouched>"
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "verdict": "KILL",
+    "basis": "The candidate's testable prediction relies on \"isokinetic particle counts\" but provides no methodology for achieving isokinetic sampling in a high-pressure return line, nor specifies sampling frequency or duration GROUNDED_IN: RECORD \"isokinetic particle counts on return and basin-outlet lines show 85 percent plus or minus 5 percent removal above 100 microns at design flow\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['85', '5', '100']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'particle counts on return' (field: testable_prediction)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['basin', 'line', 'return']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"isokinetic particle counts on return and basin-outlet lines show 85 percent plus or minus 5 percent removal above 100 microns at design flow\"",
+     "absence_ground": false
+    }
+   }
+  ],
+  "intervention_suggestions": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "suggestion": "Increase cyclone diameter to 200mm or provide parallel cyclones with verified cut size calculation at operating pressure to achieve the claimed 85% removal efficiency GROUNDED_IN: COMPUTATION <the candidate claims 85% removal but provides no cyclone geometry, cut size calculation, or pressure drop verification at 13-15 bar return flow>",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['200', '85', '85', '13', '15']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "COMPUTATION <the candidate claims 85% removal but provides no cyclone geometry, cut size calculation, or pressure drop verification at 13-15 bar return flow>",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "suggestion": "Design and specify the bypass mechanism with documented activation pressure and flow characteristics to maintain separation during descaling events GROUNDED_IN: RECORD \"Known failure modes (claimed by the generator): apex plugging during episodic descaling dumps (bypass protects supply)\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'episodic descaling dumps bypass' (field: known_failure_modes)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"Known failure modes (claimed by the generator): apex plugging during episodic descaling dumps (bypass protects supply)\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "suggestion": "Provide a complete evidence bundle including cyclone manufacturer's performance curves at operating conditions, pilot test data, and particle size distribution analysis GROUNDED_IN: EVIDENCE <none held>",
+    "grounding": {
+     "grounded": false,
+     "bindings": [],
+     "claimed_ground": "EVIDENCE <none held>",
+     "absence_ground": false,
+     "demotion_reason": "no evidence / computation / record / declared-scope binding found in the kill basis \u2014 a bare assertion carries no verdict authority (Art. XVIII); the objection is preserved and escalated"
+    },
+    "class": "UNGROUND_SUGGESTION",
+    "authority": "NONE \u2014 an ungrounded suggestion is preserved for human/escalation review and NEVER enters the hypothesis space (R450 \u00a710: the attacker does not get authority to invent causal explanations)"
+   },
+   {
+    "attack_class": "BASELINE_EQUIVALENCE",
+    "suggestion": "Provide pressure drop calculations across the entire recirculation system with and without the hydrocyclone to verify no impact on flow balance GROUNDED_IN: RECORD \"no pressure-drop penalty on the supply side (the cyclone sits on the return)\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'the cyclone sits on' (field: predicted_effect)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['return', 'supply']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"no pressure-drop penalty on the supply side (the cyclone sits on the return)\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "suggestion": "Provide hydraulic calculations showing the 150mm cyclone can handle the full return flow while maintaining the required separation efficiency GROUNDED_IN: SCOPE <boundary conditions: return-line installation only; 13-15 bar supply untouched>",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span '13 15 bar supply' (field: boundary_conditions)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['installation', 'line', 'only', 'return']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "SCOPE <boundary conditions: return-line installation only; 13-15 bar supply untouched>",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "suggestion": "Specify the exact sampling methodology, including probe design, sampling rate, duration, and location to achieve verifiable isokinetic conditions in the high-pressure return line GROUNDED_IN: RECORD \"isokinetic particle counts on return and basin-outlet lines show 85 percent plus or minus 5 percent removal above 100 microns at design flow\">",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['85', '5', '100']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'particle counts on return' (field: testable_prediction)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['basin', 'line', 'return']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"isokinetic particle counts on return and basin-outlet lines show 85 percent plus or minus 5 percent removal above 100 microns at design flow\">",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   }
+  ],
+  "state": "ATTACK_RUN",
+  "overall": "KILLED",
+  "kill_basis": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "basis": "The hydrocyclone cannot achieve the claimed 85% removal efficiency for particles above 100 microns at the specified return flow rate without providing cyclone geometry calculations or pressure drop data that would confirm separation efficiency at operating conditions GROUNDED_IN: COMPUTATION <the candidate claims 85% removal but provides no cyclone geometry, cut size calculation, or pressure drop verification at 13-15 bar return flow>",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['85', '100', '85', '13', '15']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'particles above 100 microns' (field: mechanism)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "COMPUTATION <the candidate claims 85% removal but provides no cyclone geometry, cut size calculation, or pressure drop verification at 13-15 bar return flow>",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "basis": "The candidate's testable prediction relies on \"isokinetic particle counts\" but provides no methodology for achieving isokinetic sampling in a high-pressure return line, nor specifies sampling frequency or duration GROUNDED_IN: RECORD \"isokinetic particle counts on return and basin-outlet lines show 85 percent plus or minus 5 percent removal above 100 microns at design flow\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['85', '5', '100']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'particle counts on return' (field: testable_prediction)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['basin', 'line', 'return']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"isokinetic particle counts on return and basin-outlet lines show 85 percent plus or minus 5 percent removal above 100 microns at design flow\"",
+     "absence_ground": false
+    }
+   }
+  ],
+  "counts": {
+   "KILL": 2,
+   "RISK": 2,
+   "SURVIVE": 0,
+   "ABSTAIN_DEMOTED": 2,
+   "INVALID": 0
+  }
+ }
+}

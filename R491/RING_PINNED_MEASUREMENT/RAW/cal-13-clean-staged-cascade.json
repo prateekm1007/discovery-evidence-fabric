@@ -1,0 +1,307 @@
+{
+ "attack": {
+  "attack_version": "independent_attack/3.0.0",
+  "candidate_id": "cal-13-staged-cascade-backflush",
+  "generator_provider": null,
+  "attacker_provider": "zai",
+  "attacker_model": "zai-org/GLM-5.3",
+  "independence_mode": "SEPARATE_CONTEXT",
+  "independence_note": "the attacker ran in an independent reasoning context (fresh adversarial conversation, generator reasoning never shown; no alternative provider credentialed \u2014 disclosed, never claimed as provider separation)",
+  "prompt_hash": "65fbab06735aacf2bbe69a8ea0fb720eb8cdab3834aac853802296ced48b7c0f",
+  "output_hash": "62726c3eabc40f62ab332eca5597673a311da137d0a9349a0cfdbe98fb932ee5",
+  "llm_status": "OK",
+  "ring_pin": {
+   "requested": "zai",
+   "mode": "HARD_PIN_NO_FALLBACK",
+   "served_provider": "zai",
+   "served_model": "zai-org/GLM-5.3",
+   "pin_status": "HARD_PINNED_NO_FALLBACK",
+   "note": "the sealed-corpus measurement pins the attacker ring so the instrument is measured on the ring it declares (rules x ring); production attacks keep the availability cascade"
+  },
+  "attacked_at": "2026-09-17T15:23:30+00:00Z",
+  "items": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "verdict": "KILL",
+    "basis": "The claimed 8x suppression of scale-nucleus share is mathematically impossible given the cascade design. A 300-micron stage followed by a 120-micron stage cannot capture particles below 120 microns, yet the candidate claims to address \"aggregate nuclei above 120 microns\" while implying comprehensive suppression of scale particles. GROUNDED_IN: COMPUTATION <scale particles below 120 microns would pass through both stages unchanged, contradicting the 8x suppression claim> | SCOPE <boundary condition \"recirculated water with scale particles present\" includes particles below 120 microns>",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['8', '300', '120', '120', '120', '120']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'nuclei above 120 microns' (field: mechanism)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['particles', 'present', 'recirculated', 'scale']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "COMPUTATION <scale particles below 120 microns would pass through both stages unchanged, contradicting the 8x suppression claim> | SCOPE <boundary condition \"recirculated water with scale particles pr",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "verdict": "RISK",
+    "basis": "The candidate claims \"no mill stop for installation\" but requires installation during a \"planned roll change,\" which is a mill stop, albeit a scheduled one. GROUNDED_IN: RECORD \"installed as a flanged spool swap during a planned roll change\" | SCOPE <boundary condition \"no mill stop for installation or operation\">"
+   },
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "verdict": "ABSTAIN",
+    "basis": "The candidate provides no evidence bundle to support any of its claims, including the predicted reduction in clogging events from 4.1 to below 1.5, the crown excursion reduction, or the backflush effectiveness. Without evidence, the entire invention is unsubstantiated. GROUNDED_IN: EVIDENCE <none held> | RECORD \"(none held)\"",
+    "grounding": {
+     "grounded": false,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['4.1', '1.5']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "EVIDENCE <none held> | RECORD \"(none held)\"",
+     "absence_ground": true,
+     "demotion_reason": "the asserted ground is an ABSENCE of evidence/support \u2014 absence is uncertainty, not failure (Art. XXI.3/XXV); the objection is preserved and escalated, never executed as a kill"
+    },
+    "demoted_from": "KILL",
+    "demotion_layer": "v2_grounding"
+   },
+   {
+    "attack_class": "BASELINE_EQUIVALENCE",
+    "verdict": "RISK",
+    "basis": "The candidate doesn't explicitly demonstrate how it beats the status quo beyond the predicted numbers, which lack evidence. The baseline equivalence isn't directly addressed but is implied through the predicted improvements. GROUNDED_IN: RECORD \"the status quo the candidate must beat\" | EVIDENCE <none held>"
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "verdict": "KILL",
+    "basis": "The claimed \"automatic backflush (reverse-flow + mechanical brush)\" would require complex valving and actuation within the 150mm supply header, which would create significant pressure drops and potential leak points in a 14-bar system. The candidate doesn't address how to maintain system pressure during backflush cycles. GROUNDED_IN: SCOPE <boundary condition \"13-15 bar supply\"> | RECORD \"automatic backflush (reverse-flow + mechanical brush)\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['150', '14', '13', '15']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'reverse flow mechanical brush' (field: mechanism)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['flow', 'supply']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "SCOPE <boundary condition \"13-15 bar supply\"> | RECORD \"automatic backflush (reverse-flow + mechanical brush)\"",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "verdict": "RISK",
+    "basis": "The candidate proposes measuring crown variation with the mill's existing roll-thermography system, but doesn't specify how this system can detect the claimed reduction from 28 to below 16 microns or its resolution capability. GROUNDED_IN: RECORD \"crown variation measured by the mill's existing roll-thermography system\""
+   }
+  ],
+  "intervention_suggestions": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "suggestion": "Increase the second-stage micron rating to 50 microns and add a third-stage 20-micron filter to capture smaller scale particles, addressing the mathematical impossibility of comprehensive scale suppression with only two stages above 120 microns. GROUNDED_IN: COMPUTATION <scale particles below 120 microns would pass through both stages unchanged> | SCOPE <boundary condition \"recirculated water with",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['50', '20', '120', '120']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'second stage micron rating' (field: novel_design_variable)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['particles', 'present', 'recirculated', 'scale']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "COMPUTATION <scale particles below 120 microns would pass through both stages unchanged> | SCOPE <boundary condition \"recirculated water with scale particles present\">",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "suggestion": "Clarify that installation requires a planned mill stop (roll change) rather than claiming \"no mill stop for installation,\" which is directly contradicted by the implementation method. GROUNDED_IN: RECORD \"installed as a flanged spool swap during a planned roll change\" | SCOPE <boundary condition \"no mill stop for installation or operation\">",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'spool swap during planned' (field: intervention)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['installation', 'mill', 'operation', 'stop']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"installed as a flanged spool swap during a planned roll change\" | SCOPE <boundary condition \"no mill stop for installation or operation\">",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "suggestion": "Provide a comprehensive evidence bundle including lab test results of the wedge-wire cascade efficiency, historical clogging event data, backflush cycle validation tests, and roll-thermography system resolution specifications. GROUNDED_IN: EVIDENCE <none held> | RECORD \"(none held)\"",
+    "grounding": {
+     "grounded": false,
+     "bindings": [],
+     "claimed_ground": "EVIDENCE <none held> | RECORD \"(none held)\"",
+     "absence_ground": false,
+     "demotion_reason": "no evidence / computation / record / declared-scope binding found in the kill basis \u2014 a bare assertion carries no verdict authority (Art. XVIII); the objection is preserved and escalated"
+    },
+    "class": "UNGROUND_SUGGESTION",
+    "authority": "NONE \u2014 an ungrounded suggestion is preserved for human/escalation review and NEVER enters the hypothesis space (R450 \u00a710: the attacker does not get authority to invent causal explanations)"
+   },
+   {
+    "attack_class": "BASELINE_EQUIVALENCE",
+    "suggestion": "Include a comparative analysis showing how each component of the intervention specifically addresses the dual failure modes (scale particles and biological growth) better than the current baseline system. GROUNDED_IN: RECORD \"the status quo the candidate must beat\" | EVIDENCE <none held>",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['particles', 'scale']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"the status quo the candidate must beat\" | EVIDENCE <none held>",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "suggestion": "Redesign the backflush mechanism to use a parallel loop with isolation valves rather than reverse-flow through the main header, maintaining system pressure during cleaning cycles. GROUNDED_IN: SCOPE <boundary condition \"13-15 bar supply\"> | RECORD \"automatic backflush (reverse-flow + mechanical brush)\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['13', '15']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'reverse flow mechanical brush' (field: mechanism)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['flow', 'supply', 'with']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "SCOPE <boundary condition \"13-15 bar supply\"> | RECORD \"automatic backflush (reverse-flow + mechanical brush)\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "suggestion": "Specify the resolution capability of the existing roll-thermography system and validate it can detect the claimed crown excursion reduction, or propose an additional measurement method. GROUNDED_IN: RECORD \"crown variation measured by the mill's existing roll-thermography system\">",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'measured by the mill' (field: testable_prediction)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"crown variation measured by the mill's existing roll-thermography system\">",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   }
+  ],
+  "state": "ATTACK_RUN",
+  "overall": "KILLED",
+  "kill_basis": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "basis": "The claimed 8x suppression of scale-nucleus share is mathematically impossible given the cascade design. A 300-micron stage followed by a 120-micron stage cannot capture particles below 120 microns, yet the candidate claims to address \"aggregate nuclei above 120 microns\" while implying comprehensive suppression of scale particles. GROUNDED_IN: COMPUTATION <scale particles below 120 microns would pass through both stages unchanged, contradicting the 8x suppression claim> | SCOPE <boundary condition \"recirculated water with scale particles present\" includes particles below 120 microns>",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['8', '300', '120', '120', '120', '120']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'nuclei above 120 microns' (field: mechanism)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['particles', 'present', 'recirculated', 'scale']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "COMPUTATION <scale particles below 120 microns would pass through both stages unchanged, contradicting the 8x suppression claim> | SCOPE <boundary condition \"recirculated water with scale particles pr",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "basis": "The claimed \"automatic backflush (reverse-flow + mechanical brush)\" would require complex valving and actuation within the 150mm supply header, which would create significant pressure drops and potential leak points in a 14-bar system. The candidate doesn't address how to maintain system pressure during backflush cycles. GROUNDED_IN: SCOPE <boundary condition \"13-15 bar supply\"> | RECORD \"automatic backflush (reverse-flow + mechanical brush)\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['150', '14', '13', '15']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'reverse flow mechanical brush' (field: mechanism)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['flow', 'supply']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "SCOPE <boundary condition \"13-15 bar supply\"> | RECORD \"automatic backflush (reverse-flow + mechanical brush)\"",
+     "absence_ground": false
+    }
+   }
+  ],
+  "counts": {
+   "KILL": 2,
+   "RISK": 3,
+   "SURVIVE": 0,
+   "ABSTAIN_DEMOTED": 1,
+   "INVALID": 0
+  }
+ }
+}

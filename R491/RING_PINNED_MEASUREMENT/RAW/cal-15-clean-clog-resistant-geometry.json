@@ -1,0 +1,339 @@
+{
+ "attack": {
+  "attack_version": "independent_attack/3.0.0",
+  "candidate_id": "cal-15-large-throat-swirl-nozzle",
+  "generator_provider": null,
+  "attacker_provider": "zai",
+  "attacker_model": "zai-org/GLM-5.3",
+  "independence_mode": "SEPARATE_CONTEXT",
+  "independence_note": "the attacker ran in an independent reasoning context (fresh adversarial conversation, generator reasoning never shown; no alternative provider credentialed \u2014 disclosed, never claimed as provider separation)",
+  "prompt_hash": "336f482c47cb53b72bef0a2949a569e77d73f2dee191d9a105e0831e617a013d",
+  "output_hash": "256b4bbd3fff157cb4c050991689b6d0d418d6ba0a3297ac463d1fde5d358dbf",
+  "llm_status": "OK",
+  "ring_pin": {
+   "requested": "zai",
+   "mode": "HARD_PIN_NO_FALLBACK",
+   "served_provider": "zai",
+   "served_model": "zai-org/GLM-5.3",
+   "pin_status": "HARD_PINNED_NO_FALLBACK",
+   "note": "the sealed-corpus measurement pins the attacker ring so the instrument is measured on the ring it declares (rules x ring); production attacks keep the availability cascade"
+  },
+  "attacked_at": "2026-09-17T15:24:07+00:00Z",
+  "items": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "verdict": "ABSTAIN",
+    "basis": "The claimed 4x bridging threshold increase from doubling the throat diameter is mathematically inconsistent with the stated bridging mechanism. Bridging typically scales with the square root of the throat-to-particle ratio, not linearly, making the claimed 4x improvement impossible. GROUNDED_IN: COMPUTATION <bridging scales with throat-to-particle ratio; if bridging scales with square root of ratio, doubling throat diameter would only increase threshold by sqrt(2) \u2248 1.4x, not 4x>",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['4', '4', '2', '1.4', '4']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'bridging scales with throat' (field: mechanism)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "COMPUTATION <bridging scales with throat-to-particle ratio; if bridging scales with square root of ratio, doubling throat diameter would only increase threshold by sqrt(2) \u2248 1.4x, not 4x>",
+     "absence_ground": false
+    },
+    "demoted_from": "KILL",
+    "demotion_layer": "v3_accommodation",
+    "accommodation": {
+     "rule": "TYPICAL_VALUE_PREMISE",
+     "match": "typically",
+     "reason": "the kill premises an explicitly typical external value \u2014 a world-generalization presented as a ground is an asserted problem, not a found one; the objection is preserved and escalated"
+    }
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "verdict": "RISK",
+    "basis": "The candidate claims maintaining spray pattern uniformity within 5% of current nozzles, but provides no evidence that the swirl ramp design can achieve this with the increased flow and modified geometry. GROUNDED_IN: SCOPE <boundary condition requires spray pattern uniformity within 5 percent of current>"
+   },
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "verdict": "ABSTAIN",
+    "basis": "The candidate claims \"vendor wear-life certificate for abrasive service\" for the swirl ramp, but no such evidence is included in the evidence bundle, making this claim impossible to verify and therefore cannot be considered true as stated. GROUNDED_IN: EVIDENCE <none held> | RECORD \"vendor wear-life certificate for abrasive service\"",
+    "grounding": {
+     "grounded": false,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'wear life certificate for' (field: known_failure_modes)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "EVIDENCE <none held> | RECORD \"vendor wear-life certificate for abrasive service\"",
+     "absence_ground": true,
+     "demotion_reason": "the asserted ground is an ABSENCE of evidence/support \u2014 absence is uncertainty, not failure (Art. XXI.3/XXV); the objection is preserved and escalated, never executed as a kill"
+    },
+    "demoted_from": "KILL",
+    "demotion_layer": "v2_grounding"
+   },
+   {
+    "attack_class": "BASELINE_EQUIVALENCE",
+    "verdict": "RISK",
+    "basis": "The candidate claims maintaining crown variation inside 12 microns, but provides no comparative data showing this equivalence under the same operating conditions and clogging propensity as the baseline system. GROUNDED_IN: SCOPE <boundary condition requires same nominal flow class>"
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "verdict": "ABSTAIN",
+    "basis": "The candidate claims installation can be done within \"roll-change-window\" but provides no evidence or calculation showing that replacing 120 nozzles with a different design can be completed within this time constraint, which is typically very short in steel mill operations. GROUNDED_IN: SCOPE <boundary condition requires roll-change-window installation>",
+    "grounding": {
+     "grounded": false,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'roll change window installation' (field: boundary_conditions)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['change', 'installation', 'roll', 'window']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "SCOPE <boundary condition requires roll-change-window installation>",
+     "absence_ground": true,
+     "demotion_reason": "the asserted ground is an ABSENCE of evidence/support \u2014 absence is uncertainty, not failure (Art. XXI.3/XXV); the objection is preserved and escalated, never executed as a kill"
+    },
+    "demoted_from": "KILL",
+    "demotion_layer": "v2_grounding"
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "verdict": "RISK",
+    "basis": "The predicted effect of \"droplet coarsening of approximately 8 percent\" and \"5 percent flow increase\" are stated as approximations without specific measurement methodology or confidence intervals, making verification difficult. GROUNDED_IN: RECORD \"droplet coarsening of approximately 8 percent is measured and offset by a 5 percent flow increase\""
+   }
+  ],
+  "intervention_suggestions": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "suggestion": "Modify the throat diameter increase calculation to accurately reflect the square root relationship between throat diameter and bridging threshold, reducing the claimed improvement from 4x to approximately 1.4x and adjusting the predicted clogging reduction accordingly. GROUNDED_IN: COMPUTATION <bridging scales with square root of throat-to-particle ratio>",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['4', '1.4']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'throat to particle ratio' (field: mechanism)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "COMPUTATION <bridging scales with square root of throat-to-particle ratio>",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "suggestion": "Include vendor pattern test data demonstrating that the swirl ramp design maintains spray pattern uniformity within 5% of current nozzles at 14 bar supply pressure. GROUNDED_IN: SCOPE <boundary condition requires spray pattern uniformity within 5 percent of current>",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['5', '14', '5']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'uniformity within percent of' (field: testable_prediction)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['current', 'pattern', 'percent', 'spray']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "SCOPE <boundary condition requires spray pattern uniformity within 5 percent of current>",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "suggestion": "Include the actual vendor wear-life certificate in the evidence bundle to verify the swirl ramp's durability in abrasive service conditions. GROUNDED_IN: RECORD \"vendor wear-life certificate for abrasive service\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'wear life certificate for' (field: known_failure_modes)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"vendor wear-life certificate for abrasive service\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "BASELINE_EQUIVALENCE",
+    "suggestion": "Provide comparative crown variation data from both the current system and the new system under identical operating conditions to demonstrate equivalence within the 12 micron band. GROUNDED_IN: SCOPE <boundary condition requires maintaining crown variation inside 12 microns>",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['12', '12']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'variation inside 12 microns' (field: predicted_effect)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['current', 'within']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "SCOPE <boundary condition requires maintaining crown variation inside 12 microns>",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "suggestion": "Provide a detailed installation plan with time studies showing how 120 nozzle replacements can be completed within the roll-change window, potentially including pre-installation preparation or specialized installation tools. GROUNDED_IN: SCOPE <boundary condition requires roll-change-window installation>",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'roll change window installation' (field: boundary_conditions)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['change', 'installation', 'roll', 'window']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "SCOPE <boundary condition requires roll-change-window installation>",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "suggestion": "Specify exact measurement methods, instruments, and confidence intervals for both droplet size distribution and flow rate measurements to eliminate ambiguity in the reported 8% coarsening and 5% flow increase figures. GROUNDED_IN: RECORD \"droplet coarsening of approximately 8 percent is measured\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['8', '5', '8']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'of approximately percent is' (field: predicted_effect)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['flow', 'percent']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"droplet coarsening of approximately 8 percent is measured\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   }
+  ],
+  "state": "ATTACK_RUN",
+  "overall": "ESCALATED_OBJECTION",
+  "preserved_objections": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "basis": "The claimed 4x bridging threshold increase from doubling the throat diameter is mathematically inconsistent with the stated bridging mechanism. Bridging typically scales with the square root of the throat-to-particle ratio, not linearly, making the claimed 4x improvement impossible. GROUNDED_IN: COMPUTATION <bridging scales with throat-to-particle ratio; if bridging scales with square root of ratio, doubling throat diameter would only increase threshold by sqrt(2) \u2248 1.4x, not 4x>",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['4', '4', '2', '1.4', '4']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'bridging scales with throat' (field: mechanism)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "COMPUTATION <bridging scales with throat-to-particle ratio; if bridging scales with square root of ratio, doubling throat diameter would only increase threshold by sqrt(2) \u2248 1.4x, not 4x>",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "basis": "The candidate claims \"vendor wear-life certificate for abrasive service\" for the swirl ramp, but no such evidence is included in the evidence bundle, making this claim impossible to verify and therefore cannot be considered true as stated. GROUNDED_IN: EVIDENCE <none held> | RECORD \"vendor wear-life certificate for abrasive service\"",
+    "grounding": {
+     "grounded": false,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'wear life certificate for' (field: known_failure_modes)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "EVIDENCE <none held> | RECORD \"vendor wear-life certificate for abrasive service\"",
+     "absence_ground": true,
+     "demotion_reason": "the asserted ground is an ABSENCE of evidence/support \u2014 absence is uncertainty, not failure (Art. XXI.3/XXV); the objection is preserved and escalated, never executed as a kill"
+    }
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "basis": "The candidate claims installation can be done within \"roll-change-window\" but provides no evidence or calculation showing that replacing 120 nozzles with a different design can be completed within this time constraint, which is typically very short in steel mill operations. GROUNDED_IN: SCOPE <boundary condition requires roll-change-window installation>",
+    "grounding": {
+     "grounded": false,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'roll change window installation' (field: boundary_conditions)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['change', 'installation', 'roll', 'window']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "SCOPE <boundary condition requires roll-change-window installation>",
+     "absence_ground": true,
+     "demotion_reason": "the asserted ground is an ABSENCE of evidence/support \u2014 absence is uncertainty, not failure (Art. XXI.3/XXV); the objection is preserved and escalated, never executed as a kill"
+    }
+   }
+  ],
+  "escalation": {
+   "rule": "every KILL failed the grounding check (no evidence/computation/record/declared-scope binding, or an absence ground); the objections are preserved verbatim and escalated for adjudication \u2014 the candidate is not killed by them",
+   "instrument": "independent_attack/3.0.0"
+  },
+  "counts": {
+   "KILL": 0,
+   "RISK": 3,
+   "SURVIVE": 0,
+   "ABSTAIN_DEMOTED": 3,
+   "INVALID": 0
+  }
+ }
+}

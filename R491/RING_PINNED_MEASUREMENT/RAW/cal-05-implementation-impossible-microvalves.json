@@ -1,0 +1,306 @@
+{
+ "attack": {
+  "attack_version": "independent_attack/3.0.0",
+  "candidate_id": "cal-05-per-nozzle-microvalves",
+  "generator_provider": null,
+  "attacker_provider": "zai",
+  "attacker_model": "zai-org/GLM-5.3",
+  "independence_mode": "SEPARATE_CONTEXT",
+  "independence_note": "the attacker ran in an independent reasoning context (fresh adversarial conversation, generator reasoning never shown; no alternative provider credentialed \u2014 disclosed, never claimed as provider separation)",
+  "prompt_hash": "c9b83438f77aaa03ec8cb2aeb9057b17f5c29fd37e50bcfa109ab457a4c91a2a",
+  "output_hash": "97371e10e6948fa80d8a9ec62abd94ef1b0940be525a13dc3a7159a995f3f7ae",
+  "llm_status": "OK",
+  "ring_pin": {
+   "requested": "zai",
+   "mode": "HARD_PIN_NO_FALLBACK",
+   "served_provider": "zai",
+   "served_model": "zai-org/GLM-5.3",
+   "pin_status": "HARD_PINNED_NO_FALLBACK",
+   "note": "the sealed-corpus measurement pins the attacker ring so the instrument is measured on the ring it declares (rules x ring); production attacks keep the availability cascade"
+  },
+  "attacked_at": "2026-09-17T15:20:32+00:00Z",
+  "items": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "verdict": "KILL",
+    "basis": "The micro-valve response time cannot possibly be faster than particle transit time through a 3mm throat at 14 bar, making the claimed zero clogging physically impossible GROUNDED_IN: COMPUTATION <particle transit time through 3mm throat at 14 bar is approximately 0.0002 seconds, while fastest known micro-valve response times are 0.01 seconds, making the claimed mechanism operationally impossible> | SCOPE <3 mm throat geometry, 14 bar boundary condition>",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['3', '14', '3', '14', '0.0002', '0.01']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'throat geometry 14 bar' (field: boundary_conditions)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['geometry', 'throat']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "COMPUTATION <particle transit time through 3mm throat at 14 bar is approximately 0.0002 seconds, while fastest known micro-valve response times are 0.01 seconds, making the claimed mechanism operation",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "verdict": "ABSTAIN",
+    "basis": "The claimed optical particle sensor cannot function reliably in a mill vibration environment with 32-38\u00b0C water as the optical window fouling is acknowledged but no solution is provided GROUNDED_IN: RECORD \"Known failure modes (claimed by the generator): optical window fouling\" | SCOPE <mill vibration environment boundary condition>",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['environment', 'mill', 'vibration', 'water']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"Known failure modes (claimed by the generator): optical window fouling\" | SCOPE <mill vibration environment boundary condition>",
+     "absence_ground": false
+    },
+    "demoted_from": "KILL",
+    "demotion_layer": "v3_accommodation",
+    "accommodation": {
+     "rule": "UNSTATED_ELEMENT",
+     "match": "no solution is provided",
+     "reason": "the failure assertion rests on the record NOT stating an element \u2014 record silence is incompleteness, not failure (Art. XXI.3 extended to specification); the objection is preserved and escalated"
+    }
+   },
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "verdict": "ABSTAIN",
+    "basis": "The candidate provides no evidence bundle to support any of its claims, making the entire invention unverifiable and therefore non-demonstrated GROUNDED_IN: EVIDENCE <none held> | RECORD \"(none held)\"",
+    "grounding": {
+     "grounded": false,
+     "bindings": [],
+     "claimed_ground": "EVIDENCE <none held> | RECORD \"(none held)\"",
+     "absence_ground": true,
+     "demotion_reason": "the asserted ground is an ABSENCE of evidence/support \u2014 absence is uncertainty, not failure (Art. XXI.3/XXV); the objection is preserved and escalated, never executed as a kill"
+    },
+    "demoted_from": "KILL",
+    "demotion_layer": "v2_grounding"
+   },
+   {
+    "attack_class": "BASELINE_EQUIVALENCE",
+    "verdict": "ABSTAIN",
+    "basis": "The candidate claims zero clogging events per campaign but provides no comparative data showing this improvement over the baseline status quo, making the claimed benefit unverified GROUNDED_IN: RECORD \"Predicted effect: zero clogging events per campaign at full spray uniformity\" | SCOPE <the un-invented standard boundary condition>",
+    "grounding": {
+     "grounded": false,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'campaign at full spray' (field: predicted_effect)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"Predicted effect: zero clogging events per campaign at full spray uniformity\" | SCOPE <the un-invented standard boundary condition>",
+     "absence_ground": true,
+     "demotion_reason": "the asserted ground is an ABSENCE of evidence/support \u2014 absence is uncertainty, not failure (Art. XXI.3/XXV); the objection is preserved and escalated, never executed as a kill"
+    },
+    "demoted_from": "KILL",
+    "demotion_layer": "v2_grounding"
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "verdict": "KILL",
+    "basis": "Integrating 120 complex micro-valve assemblies with optical sensors and micro-ejectors in a high-vibration, high-temperature steel mill environment is mechanically infeasible given the extreme conditions GROUNDED_IN: SCOPE <mill vibration environment, 32-38 C water boundary conditions>",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['environment', 'mill', 'vibration', 'water']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "SCOPE <mill vibration environment, 32-38 C water boundary conditions>",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "verdict": "INVALID",
+    "basis": "",
+    "invalid_reason": "class absent from response"
+   }
+  ],
+  "intervention_suggestions": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "suggestion": "Increase throat diameter to 5mm to slow particle transit time below micro-valve response time, making the diversion mechanism physically possible GROUNDED_IN: COMPUTATION <particle transit time through 5mm throat at 14 bar is approximately 0.0003 seconds, still below micro-valve response times>",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['5', '5', '14', '0.0003']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "COMPUTATION <particle transit time through 5mm throat at 14 bar is approximately 0.0003 seconds, still below micro-valve response times>",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "suggestion": "Implement a multi-stage optical protection system with air purge and mechanical wiper to prevent window fouling in the vibration environment GROUNDED_IN: RECORD \"Known failure modes (claimed by the generator): optical window fouling\" | SCOPE <mill vibration environment boundary condition>",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['environment', 'mill', 'vibration', 'with']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"Known failure modes (claimed by the generator): optical window fouling\" | SCOPE <mill vibration environment boundary condition>",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "suggestion": "Provide a comprehensive evidence bundle including lab test data, computational fluid dynamics modeling, and prototype validation results GROUNDED_IN: EVIDENCE <none held> | RECORD \"(none held)\"",
+    "grounding": {
+     "grounded": false,
+     "bindings": [],
+     "claimed_ground": "EVIDENCE <none held> | RECORD \"(none held)\"",
+     "absence_ground": false,
+     "demotion_reason": "no evidence / computation / record / declared-scope binding found in the kill basis \u2014 a bare assertion carries no verdict authority (Art. XVIII); the objection is preserved and escalated"
+    },
+    "class": "UNGROUND_SUGGESTION",
+    "authority": "NONE \u2014 an ungrounded suggestion is preserved for human/escalation review and NEVER enters the hypothesis space (R450 \u00a710: the attacker does not get authority to invent causal explanations)"
+   },
+   {
+    "attack_class": "BASELINE_EQUIVALENCE",
+    "suggestion": "Conduct comparative testing against baseline system under identical conditions with documented clogging event counts and spray uniformity metrics GROUNDED_IN: RECORD \"Predicted effect: zero clogging events per campaign at full spray uniformity\" | SCOPE <the un-invented standard boundary condition>",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'campaign at full spray' (field: predicted_effect)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"Predicted effect: zero clogging events per campaign at full spray uniformity\" | SCOPE <the un-invented standard boundary condition>",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "suggestion": "Redesign the assembly with hardened materials, vibration isolation mounts, and redundant sealing to withstand mill environment conditions GROUNDED_IN: SCOPE <mill vibration environment, 32-38 C water boundary conditions>",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['32', '38']",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['environment', 'mill', 'vibration', 'water']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "SCOPE <mill vibration environment, 32-38 C water boundary conditions>",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "suggestion": "Specify exact measurement methodology including sensor type, sampling rate, location, and statistical analysis method for the 2% flow stability claim GROUNDED_IN: RECORD \"Testable prediction: a single instrumented nozzle assembly passes a 500-hour abrasive-scale slurry challenge with zero throat blockages and flow stability within 2 percent\" | SCOPE <boundary conditions>",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['2', '500', '2']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'hour abrasive scale slurry' (field: testable_prediction)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['abrasive', 'scale', 'throat', 'with']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"Testable prediction: a single instrumented nozzle assembly passes a 500-hour abrasive-scale slurry challenge with zero throat blockages and flow stability within 2 percent\" | SCOPE <boundary c",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   }
+  ],
+  "state": "ATTACK_RUN",
+  "overall": "KILLED",
+  "kill_basis": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "basis": "The micro-valve response time cannot possibly be faster than particle transit time through a 3mm throat at 14 bar, making the claimed zero clogging physically impossible GROUNDED_IN: COMPUTATION <particle transit time through 3mm throat at 14 bar is approximately 0.0002 seconds, while fastest known micro-valve response times are 0.01 seconds, making the claimed mechanism operationally impossible> | SCOPE <3 mm throat geometry, 14 bar boundary condition>",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['3', '14', '3', '14', '0.0002', '0.01']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'throat geometry 14 bar' (field: boundary_conditions)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['geometry', 'throat']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "COMPUTATION <particle transit time through 3mm throat at 14 bar is approximately 0.0002 seconds, while fastest known micro-valve response times are 0.01 seconds, making the claimed mechanism operation",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "basis": "Integrating 120 complex micro-valve assemblies with optical sensors and micro-ejectors in a high-vibration, high-temperature steel mill environment is mechanically infeasible given the extreme conditions GROUNDED_IN: SCOPE <mill vibration environment, 32-38 C water boundary conditions>",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['environment', 'mill', 'vibration', 'water']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "SCOPE <mill vibration environment, 32-38 C water boundary conditions>",
+     "absence_ground": false
+    }
+   }
+  ],
+  "counts": {
+   "KILL": 2,
+   "RISK": 0,
+   "SURVIVE": 0,
+   "ABSTAIN_DEMOTED": 3,
+   "INVALID": 1
+  }
+ }
+}

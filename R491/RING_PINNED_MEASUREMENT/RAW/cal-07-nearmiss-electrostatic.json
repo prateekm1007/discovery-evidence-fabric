@@ -1,0 +1,414 @@
+{
+ "attack": {
+  "attack_version": "independent_attack/3.0.0",
+  "candidate_id": "cal-07-electrostatic-precipitator",
+  "generator_provider": null,
+  "attacker_provider": "zai",
+  "attacker_model": "zai-org/GLM-5.3",
+  "independence_mode": "SEPARATE_CONTEXT",
+  "independence_note": "the attacker ran in an independent reasoning context (fresh adversarial conversation, generator reasoning never shown; no alternative provider credentialed \u2014 disclosed, never claimed as provider separation)",
+  "prompt_hash": "fb6097beb74fd1a39fe6723e64798c8ef8040ef3c5c61ec094cfead836af0fc2",
+  "output_hash": "b64ab361d811461cd7594a64e5bf04a4fc7a95fe9a3d2f1a0f8678abf7e5882f",
+  "llm_status": "OK",
+  "ring_pin": {
+   "requested": "zai",
+   "mode": "HARD_PIN_NO_FALLBACK",
+   "served_provider": "zai",
+   "served_model": "zai-org/GLM-5.3",
+   "pin_status": "HARD_PINNED_NO_FALLBACK",
+   "note": "the sealed-corpus measurement pins the attacker ring so the instrument is measured on the ring it declares (rules x ring); production attacks keep the availability cascade"
+  },
+  "attacked_at": "2026-09-17T15:21:12+00:00Z",
+  "items": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "verdict": "ABSTAIN",
+    "basis": "The claimed electrostatic precipitator mechanism fails to account for the biological growth component of the clogging problem, which is not electrically charged and thus unaffected by the electrostatic field. GROUNDED_IN: SCOPE \"biological growth in the recirculated water\" | RECORD \"Known failure modes (claimed by the generator): plate fouling with slime\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'plate fouling with slime' (field: known_failure_modes)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['recirculated', 'water']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "SCOPE \"biological growth in the recirculated water\" | RECORD \"Known failure modes (claimed by the generator): plate fouling with slime\"",
+     "absence_ground": false
+    },
+    "demoted_from": "KILL",
+    "demotion_layer": "v3_accommodation",
+    "accommodation": {
+     "rule": "CONCESSION_DISPOSAL",
+     "match": "plate fouling with slime",
+     "reason": "the kill's own record binding cites the candidate's declared known_failure_modes \u2014 a disclosed limitation re-described is not a discovered defect; the adequacy of the disposal is the adjudication council's question, not the instrument's \u2014 the objection is preserved and escalated"
+    }
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "verdict": "KILL",
+    "basis": "The candidate violates the boundary condition of \"water conductivity typical of recirculated mill cooling water\" by applying 50 kV to a conductive aqueous environment, which would cause electrical arcing and system failure. GROUNDED_IN: SCOPE \"water conductivity typical of recirculated mill cooling water\" | COMPUTATION 50 kV in conductive water exceeds safe operating parameters by several orders of magnitude",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['50', '50']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'typical of recirculated mill' (field: boundary_conditions)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['conductivity', 'cooling', 'mill', 'recirculated']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "SCOPE \"water conductivity typical of recirculated mill cooling water\" | COMPUTATION 50 kV in conductive water exceeds safe operating parameters by several orders of magnitude",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "verdict": "ABSTAIN",
+    "basis": "The candidate claims 95% particle removal efficiency but provides no evidence or calculation to support this specific performance claim for this particular application. GROUNDED_IN: EVIDENCE <none held> | RECORD \"Predicted effect: scale-particle load to the nozzles cut 95 percent\"",
+    "grounding": {
+     "grounded": false,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['95', '95']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'particle load to the' (field: predicted_effect)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "EVIDENCE <none held> | RECORD \"Predicted effect: scale-particle load to the nozzles cut 95 percent\"",
+     "absence_ground": true,
+     "demotion_reason": "the asserted ground is an ABSENCE of evidence/support \u2014 absence is uncertainty, not failure (Art. XXI.3/XXV); the objection is preserved and escalated, never executed as a kill"
+    },
+    "demoted_from": "KILL",
+    "demotion_layer": "v2_grounding"
+   },
+   {
+    "attack_class": "BASELINE_EQUIVALENCE",
+    "verdict": "ABSTAIN",
+    "basis": "The candidate fails to demonstrate how the electrostatic precipitator addresses the baseline failure mode of \"thermal-crown variation beyond the 12 micron band\" beyond just reducing clogging frequency. GROUNDED_IN: SCOPE \"thermal-crown variation beyond the 12 micron band\" | RECORD \"Failure: progressive nozzle clogging from scale particles and biological growth in the recirculated water degrades spray uniformity, causing non-uniform work-roll temperature, thermal-crown variation beyond the 12 micron band\"",
+    "grounding": {
+     "grounded": false,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['12', '12', '12']",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['recirculated', 'water']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "SCOPE \"thermal-crown variation beyond the 12 micron band\" | RECORD \"Failure: progressive nozzle clogging from scale particles and biological growth in the recirculated water degrades spray uniformity,",
+     "absence_ground": true,
+     "demotion_reason": "the asserted ground is an ABSENCE of evidence/support \u2014 absence is uncertainty, not failure (Art. XXI.3/XXV); the objection is preserved and escalated, never executed as a kill"
+    },
+    "demoted_from": "KILL",
+    "demotion_layer": "v2_grounding"
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "verdict": "KILL",
+    "basis": "The proposed 150 mm spool with 50 kV corona field cannot be implemented in a 14 bar water supply line without creating an extreme explosion hazard due to water vaporization and electrical arcing. GROUNDED_IN: SCOPE \"supply header at 14 bar\" | COMPUTATION 50 kV at 14 bar pressure exceeds safe operating limits for electrical equipment in pressurized water systems by approximately 400%",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['150', '50', '14', '14', '50', '14']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span '50 kv corona field' (field: intervention)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['header', 'water']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "SCOPE \"supply header at 14 bar\" | COMPUTATION 50 kV at 14 bar pressure exceeds safe operating limits for electrical equipment in pressurized water systems by approximately 400%",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "verdict": "KILL",
+    "basis": "The testable prediction relies on \"isokinetic particle counts\" but fails to specify the sampling methodology, frequency, or statistical significance required to validate the 95% removal claim. GROUNDED_IN: RECORD \"Testable prediction: isokinetic particle counts upstream and downstream of the spool show 95 percent removal of particles above 20 microns at design flow\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['95', '95', '20']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'isokinetic particle counts upstream' (field: testable_prediction)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"Testable prediction: isokinetic particle counts upstream and downstream of the spool show 95 percent removal of particles above 20 microns at design flow\"",
+     "absence_ground": false
+    }
+   }
+  ],
+  "intervention_suggestions": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "suggestion": "Incorporate a secondary biological treatment stage (ultraviolet or ozone) to address the biological growth component that the electrostatic stage cannot remove, as the candidate only addresses scale particles. GROUNDED_IN: RECORD \"Known failure modes (claimed by the generator): plate fouling with slime\" | SCOPE \"biological growth in the recirculated water\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'plate fouling with slime' (field: known_failure_modes)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['recirculated', 'water']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"Known failure modes (claimed by the generator): plate fouling with slime\" | SCOPE \"biological growth in the recirculated water\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "suggestion": "Reduce the operating voltage to a safe level below 5 kV while maintaining collection efficiency through increased plate surface area or improved dielectric materials to accommodate the conductive water boundary condition. GROUNDED_IN: SCOPE \"water conductivity typical of recirculated mill cooling water\" | COMPUTATION 50 kV exceeds safe operating parameters by several orders of magnitude",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['5', '50']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'typical of recirculated mill' (field: boundary_conditions)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['conductivity', 'cooling', 'mill', 'recirculated']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "SCOPE \"water conductivity typical of recirculated mill cooling water\" | COMPUTATION 50 kV exceeds safe operating parameters by several orders of magnitude",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "suggestion": "Provide pilot test data with actual recirculated mill water showing particle size distribution analysis before and after treatment to validate the 95% removal claim for particles above 20 microns. GROUNDED_IN: RECORD \"Predicted effect: scale-particle load to the nozzles cut 95 percent\" | EVIDENCE <none held>",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['95', '20', '95']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'particle load to the' (field: predicted_effect)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['mill', 'recirculated', 'water']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"Predicted effect: scale-particle load to the nozzles cut 95 percent\" | EVIDENCE <none held>",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "BASELINE_EQUIVALENCE",
+    "suggestion": "Conduct thermal mapping studies to demonstrate that the improved spray uniformity from reduced clogging actually maintains work-roll temperature within the 12 micron thermal-crown band under production conditions. GROUNDED_IN: SCOPE \"thermal-crown variation beyond the 12 micron band\" | RECORD \"Failure: progressive nozzle clogging from scale particles and biological growth in the recirculated water",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['12', '12', '12']",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['recirculated', 'water']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "SCOPE \"thermal-crown variation beyond the 12 micron band\" | RECORD \"Failure: progressive nozzle clogging from scale particles and biological growth in the recirculated water degrades spray uniformity,",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "suggestion": "Redesign the spool as a pressure-rated vessel with proper electrical isolation, pressure relief mechanisms, and explosion-proof housing to safely accommodate 50 kV operation in a 14 bar water system. GROUNDED_IN: SCOPE \"supply header at 14 bar\" | COMPUTATION 50 kV at 14 bar pressure exceeds safe operating limits for electrical equipment in pressurized water systems by approximately 400%",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['50', '14', '14', '50', '14', '400']",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['header', 'water']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "SCOPE \"supply header at 14 bar\" | COMPUTATION 50 kV at 14 bar pressure exceeds safe operating limits for electrical equipment in pressurized water systems by approximately 400%",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "suggestion": "Specify a detailed sampling protocol including number of sampling points, duration of sampling, statistical analysis method, and minimum sample size required to validate the 95% removal claim with statistical significance. GROUNDED_IN: RECORD \"Testable prediction: isokinetic particle counts upstream and downstream of the spool show 95 percent removal of particles above 20 microns at design flow\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['95', '95', '20']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'isokinetic particle counts upstream' (field: testable_prediction)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"Testable prediction: isokinetic particle counts upstream and downstream of the spool show 95 percent removal of particles above 20 microns at design flow\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   }
+  ],
+  "state": "ATTACK_RUN",
+  "overall": "KILLED",
+  "kill_basis": [
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "basis": "The candidate violates the boundary condition of \"water conductivity typical of recirculated mill cooling water\" by applying 50 kV to a conductive aqueous environment, which would cause electrical arcing and system failure. GROUNDED_IN: SCOPE \"water conductivity typical of recirculated mill cooling water\" | COMPUTATION 50 kV in conductive water exceeds safe operating parameters by several orders of magnitude",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['50', '50']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'typical of recirculated mill' (field: boundary_conditions)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['conductivity', 'cooling', 'mill', 'recirculated']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "SCOPE \"water conductivity typical of recirculated mill cooling water\" | COMPUTATION 50 kV in conductive water exceeds safe operating parameters by several orders of magnitude",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "basis": "The proposed 150 mm spool with 50 kV corona field cannot be implemented in a 14 bar water supply line without creating an extreme explosion hazard due to water vaporization and electrical arcing. GROUNDED_IN: SCOPE \"supply header at 14 bar\" | COMPUTATION 50 kV at 14 bar pressure exceeds safe operating limits for electrical equipment in pressurized water systems by approximately 400%",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['150', '50', '14', '14', '50', '14']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span '50 kv corona field' (field: intervention)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['header', 'water']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "SCOPE \"supply header at 14 bar\" | COMPUTATION 50 kV at 14 bar pressure exceeds safe operating limits for electrical equipment in pressurized water systems by approximately 400%",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "basis": "The testable prediction relies on \"isokinetic particle counts\" but fails to specify the sampling methodology, frequency, or statistical significance required to validate the 95% removal claim. GROUNDED_IN: RECORD \"Testable prediction: isokinetic particle counts upstream and downstream of the spool show 95 percent removal of particles above 20 microns at design flow\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['95', '95', '20']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'isokinetic particle counts upstream' (field: testable_prediction)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"Testable prediction: isokinetic particle counts upstream and downstream of the spool show 95 percent removal of particles above 20 microns at design flow\"",
+     "absence_ground": false
+    }
+   }
+  ],
+  "counts": {
+   "KILL": 3,
+   "RISK": 0,
+   "SURVIVE": 0,
+   "ABSTAIN_DEMOTED": 3,
+   "INVALID": 0
+  }
+ }
+}

@@ -1,0 +1,297 @@
+{
+ "attack": {
+  "attack_version": "independent_attack/3.0.0",
+  "candidate_id": "cal-17-seasonal-algae-bloom-control",
+  "generator_provider": null,
+  "attacker_provider": "zai",
+  "attacker_model": "zai-org/GLM-5.3",
+  "independence_mode": "SEPARATE_CONTEXT",
+  "independence_note": "the attacker ran in an independent reasoning context (fresh adversarial conversation, generator reasoning never shown; no alternative provider credentialed \u2014 disclosed, never claimed as provider separation)",
+  "prompt_hash": "30786cbccdfcbdf50db2b90ce29efe40527e10adb5dcc889ea2076c35f96dde7",
+  "output_hash": "f6e470bfc99e432b81e4df7145314d3f64031075a6daf66bca8c216d206ca0b2",
+  "llm_status": "OK",
+  "ring_pin": {
+   "requested": "zai",
+   "mode": "HARD_PIN_NO_FALLBACK",
+   "served_provider": "zai",
+   "served_model": "zai-org/GLM-5.3",
+   "pin_status": "HARD_PINNED_NO_FALLBACK",
+   "note": "the sealed-corpus measurement pins the attacker ring so the instrument is measured on the ring it declares (rules x ring); production attacks keep the availability cascade"
+  },
+  "attacked_at": "2026-09-17T15:24:55+00:00Z",
+  "items": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "verdict": "ABSTAIN",
+    "basis": "The candidate claims clogging is a warm-season phenomenon driven by algae blooms, but the evidence shows clogging is UNIFORM year-round (4.0-4.3 events per campaign), directly contradicting the seasonal driver premise. GROUNDED_IN: EVIDENCE ev:cloglog-24mo | RECORD \"clog rate is UNIFORM year-round (4.0-4.3 events per campaign\" | COMPUTATION No seasonal variation exists to support the bloom-driven mechanism | SCOPE Boundary condition that the candidate must explain the baseline failure pattern",
+    "grounding": {
+     "grounded": false,
+     "bindings": [
+      {
+       "binding": "evidence",
+       "ground": "record id ev:cloglog-24mo",
+       "verified": true
+      },
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['4.0', '4.3', '24', '4.0', '4.3']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'clogging is warm season' (field: mechanism)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "EVIDENCE ev:cloglog-24mo | RECORD \"clog rate is UNIFORM year-round (4.0-4.3 events per campaign\" | COMPUTATION No seasonal variation exists to support the bloom-driven mechanism | SCOPE Boundary condi",
+     "absence_ground": true,
+     "demotion_reason": "the asserted ground is an ABSENCE of evidence/support \u2014 absence is uncertainty, not failure (Art. XXI.3/XXV); the objection is preserved and escalated, never executed as a kill"
+    },
+    "demoted_from": "KILL",
+    "demotion_layer": "v2_grounding"
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "verdict": "RISK",
+    "basis": "The candidate discloses wind damage as a known failure mode but doesn't provide mitigation, creating a risk that could disrupt operations. GROUNDED_IN: EVIDENCE Known failure modes (claimed by the generator): cover wind damage | RECORD \"Known failure modes (claimed by the generator): cover wind damage\" | COMPUTATION No mitigation strategy provided for the disclosed risk | SCOPE Boundary condition that the intervention must not introduce new unmitigated risks"
+   },
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "verdict": "KILL",
+    "basis": "The candidate predicts clogging events will fall from 4.1 to 1.6, but the evidence shows the current rate is already 4.0-4.3 events per campaign, making the predicted improvement impossible without explaining why the current rate differs from the stated baseline. GROUNDED_IN: EVIDENCE ev:cloglog-24mo | RECORD \"clog rate is UNIFORM year-round (4.0-4.3 events per campaign\" | COMPUTATION The current rate (4.0-4.3) already matches the stated baseline (4.1), making the predicted reduction to 1.6 mathematically impossible | SCOPE Boundary condition that the candidate must demonstrate improvement ove",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "evidence",
+       "ground": "record id ev:cloglog-24mo",
+       "verified": true
+      },
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['4.1', '1.6', '4.0', '4.3', '24', '4.0']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "EVIDENCE ev:cloglog-24mo | RECORD \"clog rate is UNIFORM year-round (4.0-4.3 events per campaign\" | COMPUTATION The current rate (4.0-4.3) already matches the stated baseline (4.1), making the predicte",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "BASELINE_EQUIVALENCE",
+    "verdict": "KILL",
+    "basis": "The candidate claims to reduce clogging from 4.1 to 1.6 events, but the evidence shows the current rate is 4.0-4.3 events, meaning there's no actual improvement being demonstrated over the existing performance. GROUNDED_IN: EVIDENCE ev:cloglog-24mo | RECORD \"clog rate is UNIFORM year-round (4.0-4.3 events per campaign\" | COMPUTATION The current performance (4.0-4.3) is essentially identical to the stated baseline (4.1), showing no measurable gap to close | SCOPE Boundary condition that the candidate must demonstrate improvement over the actual baseline",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "evidence",
+       "ground": "record id ev:cloglog-24mo",
+       "verified": true
+      },
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['4.1', '1.6', '4.0', '4.3', '24', '4.0']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "EVIDENCE ev:cloglog-24mo | RECORD \"clog rate is UNIFORM year-round (4.0-4.3 events per campaign\" | COMPUTATION The current performance (4.0-4.3) is essentially identical to the stated baseline (4.1), ",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "verdict": "RISK",
+    "basis": "The candidate proposes a floating cover but doesn't address how it will be installed without mill stoppage, violating the boundary condition of \"basin-cover installation only\" and \"no mill stop.\" GROUNDED_IN: BOUNDARY_CONDITIONS | RECORD \"basin-cover installation only; dosing inside permit; no mill stop\" | COMPUTATION Installation of a floating cover on an operational basin would require mill downtime not permitted | SCOPE Boundary condition \"no mill stop\""
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "verdict": "RISK",
+    "basis": "The candidate predicts chlorophyll counts will stay below 5 micrograms per liter but doesn't specify the sampling methodology, frequency, or location, creating ambiguity in how the measurement will be validated. GROUNDED_IN: Testable prediction | RECORD \"basin chlorophyll counts stay below 5 micrograms per liter through summer\" | COMPUTATION No measurement protocol specified for validation | SCOPE Boundary condition that the candidate must provide testable predictions"
+   }
+  ],
+  "intervention_suggestions": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "suggestion": "Change the mechanism from seasonal bloom-driven to constant particulate filtration, since the evidence shows clogging occurs uniformly year-round regardless of temperature. GROUNDED_IN: EVIDENCE ev:cloglog-24mo | RECORD \"clog rate is UNIFORM year-round (4.0-4.3 events per campaign\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "evidence",
+       "ground": "record id ev:cloglog-24mo",
+       "verified": true
+      },
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['24', '4.0', '4.3']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "EVIDENCE ev:cloglog-24mo | RECORD \"clog rate is UNIFORM year-round (4.0-4.3 events per campaign\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "suggestion": "Develop a wind-resistant cover design or anchoring system to address the disclosed wind damage failure mode. GROUNDED_IN: Known failure modes (claimed by the generator): cover wind damage | RECORD \"Known failure modes (claimed by the generator): cover wind damage\"",
+    "grounding": {
+     "grounded": false,
+     "bindings": [],
+     "claimed_ground": "Known failure modes (claimed by the generator): cover wind damage | RECORD \"Known failure modes (claimed by the generator): cover wind damage\"",
+     "absence_ground": false,
+     "demotion_reason": "no evidence / computation / record / declared-scope binding found in the kill basis \u2014 a bare assertion carries no verdict authority (Art. XVIII); the objection is preserved and escalated"
+    },
+    "class": "UNGROUND_SUGGESTION",
+    "authority": "NONE \u2014 an ungrounded suggestion is preserved for human/escalation review and NEVER enters the hypothesis space (R450 \u00a710: the attacker does not get authority to invent causal explanations)"
+   },
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "suggestion": "Rebaseline the current clogging rate as 4.0-4.3 events per campaign and adjust the prediction to a realistic reduction target. GROUNDED_IN: EVIDENCE ev:cloglog-24mo | RECORD \"clog rate is UNIFORM year-round (4.0-4.3 events per campaign\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "evidence",
+       "ground": "record id ev:cloglog-24mo",
+       "verified": true
+      },
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['4.0', '4.3', '24', '4.0', '4.3']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "EVIDENCE ev:cloglog-24mo | RECORD \"clog rate is UNIFORM year-round (4.0-4.3 events per campaign\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "BASELINE_EQUIVALENCE",
+    "suggestion": "Conduct a detailed audit of the current system to identify why the actual clogging rate (4.0-4.3) differs from the stated baseline (4.1) before proposing improvements. GROUNDED_IN: EVIDENCE ev:cloglog-24mo | RECORD \"clog rate is UNIFORM year-round (4.0-4.3 events per campaign\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "evidence",
+       "ground": "record id ev:cloglog-24mo",
+       "verified": true
+      },
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['4.0', '4.3', '4.1', '24', '4.0', '4.3']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "EVIDENCE ev:cloglog-24mo | RECORD \"clog rate is UNIFORM year-round (4.0-4.3 events per campaign\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "suggestion": "Design a modular cover system that can be installed in sections during scheduled maintenance periods without requiring mill stoppage. GROUNDED_IN: BOUNDARY_CONDITIONS | RECORD \"basin-cover installation only; dosing inside permit; no mill stop\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'only dosing inside permit' (field: boundary_conditions)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['basin', 'cover', 'dosing', 'inside']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "BOUNDARY_CONDITIONS | RECORD \"basin-cover installation only; dosing inside permit; no mill stop\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "suggestion": "Specify a detailed chlorophyll monitoring protocol including sampling location, frequency, method, and validation procedure. GROUNDED_IN: Testable prediction | RECORD \"basin chlorophyll counts stay below 5 micrograms per liter through summer\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "evidence",
+       "ground": "bundle item 'Basin water-temperature record: loop runs 32-38 C year-round (temperature-controlled by the strip schedule, not by season); chlorophyll counts below 3 micrograms per liter in all months (the basin is indoors)' (strong overlap: basin, below, chlorophyll, counts)",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'stay below micrograms per' (field: testable_prediction)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "Testable prediction | RECORD \"basin chlorophyll counts stay below 5 micrograms per liter through summer\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   }
+  ],
+  "state": "ATTACK_RUN",
+  "overall": "KILLED",
+  "kill_basis": [
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "basis": "The candidate predicts clogging events will fall from 4.1 to 1.6, but the evidence shows the current rate is already 4.0-4.3 events per campaign, making the predicted improvement impossible without explaining why the current rate differs from the stated baseline. GROUNDED_IN: EVIDENCE ev:cloglog-24mo | RECORD \"clog rate is UNIFORM year-round (4.0-4.3 events per campaign\" | COMPUTATION The current rate (4.0-4.3) already matches the stated baseline (4.1), making the predicted reduction to 1.6 mathematically impossible | SCOPE Boundary condition that the candidate must demonstrate improvement ove",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "evidence",
+       "ground": "record id ev:cloglog-24mo",
+       "verified": true
+      },
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['4.1', '1.6', '4.0', '4.3', '24', '4.0']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "EVIDENCE ev:cloglog-24mo | RECORD \"clog rate is UNIFORM year-round (4.0-4.3 events per campaign\" | COMPUTATION The current rate (4.0-4.3) already matches the stated baseline (4.1), making the predicte",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "BASELINE_EQUIVALENCE",
+    "basis": "The candidate claims to reduce clogging from 4.1 to 1.6 events, but the evidence shows the current rate is 4.0-4.3 events, meaning there's no actual improvement being demonstrated over the existing performance. GROUNDED_IN: EVIDENCE ev:cloglog-24mo | RECORD \"clog rate is UNIFORM year-round (4.0-4.3 events per campaign\" | COMPUTATION The current performance (4.0-4.3) is essentially identical to the stated baseline (4.1), showing no measurable gap to close | SCOPE Boundary condition that the candidate must demonstrate improvement over the actual baseline",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "evidence",
+       "ground": "record id ev:cloglog-24mo",
+       "verified": true
+      },
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['4.1', '1.6', '4.0', '4.3', '24', '4.0']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "EVIDENCE ev:cloglog-24mo | RECORD \"clog rate is UNIFORM year-round (4.0-4.3 events per campaign\" | COMPUTATION The current performance (4.0-4.3) is essentially identical to the stated baseline (4.1), ",
+     "absence_ground": false
+    }
+   }
+  ],
+  "counts": {
+   "KILL": 2,
+   "RISK": 3,
+   "SURVIVE": 0,
+   "ABSTAIN_DEMOTED": 1,
+   "INVALID": 0
+  }
+ }
+}

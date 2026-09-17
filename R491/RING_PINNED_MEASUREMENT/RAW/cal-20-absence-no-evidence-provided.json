@@ -1,0 +1,369 @@
+{
+ "attack": {
+  "attack_version": "independent_attack/3.0.0",
+  "candidate_id": "cal-20-unevidenced-staged-cascade",
+  "generator_provider": null,
+  "attacker_provider": "zai",
+  "attacker_model": "zai-org/GLM-5.3",
+  "independence_mode": "SEPARATE_CONTEXT",
+  "independence_note": "the attacker ran in an independent reasoning context (fresh adversarial conversation, generator reasoning never shown; no alternative provider credentialed \u2014 disclosed, never claimed as provider separation)",
+  "prompt_hash": "845bd758ed3afef849dacf871e14f231d608acac9422a40808db255f55517ad6",
+  "output_hash": "8f5137ad190381351c0fa1914fb2f39fd5678ebf9ae74f4bab06c1f152b84b74",
+  "llm_status": "OK",
+  "ring_pin": {
+   "requested": "zai",
+   "mode": "HARD_PIN_NO_FALLBACK",
+   "served_provider": "zai",
+   "served_model": "zai-org/GLM-5.3",
+   "pin_status": "HARD_PINNED_NO_FALLBACK",
+   "note": "the sealed-corpus measurement pins the attacker ring so the instrument is measured on the ring it declares (rules x ring); production attacks keep the availability cascade"
+  },
+  "attacked_at": "2026-09-17T15:26:13+00:00Z",
+  "items": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "verdict": "KILL",
+    "basis": "The claimed two-stage wedge-wire cascade cannot possibly remove particles above 120 microns while maintaining 14 bar pressure across 120 nozzles, as the smaller 120-micron stage would create excessive pressure drop that would violate the boundary condition of no mill stops. GROUNDED_IN: COMPUTATION <The cascade would create significant flow restriction; at full design flow with 120 nozzles, the 120-micron stage alone would likely exceed the 13-15 bar operating range, causing mill stops which violates the boundary condition of \"no mill stop\">",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['120', '14', '120', '120', '120', '120']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'two stage wedge wire' (field: mechanism)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['flow', 'full', 'mill', 'stop']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "COMPUTATION <The cascade would create significant flow restriction; at full design flow with 120 nozzles, the 120-micron stage alone would likely exceed the 13-15 bar operating range, causing mill sto",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "verdict": "KILL",
+    "basis": "The candidate claims the system operates at \"13-15 bar; full design flow; no mill stop\" but a wedge-wire cascade with automatic backflush inevitably creates pressure fluctuations that would destabilize the spray system during backflush cycles, violating the boundary condition of maintaining steady pressure. GROUNDED_IN: RECORD \"boundary conditions: 13-15 bar; full design flow; no mill stop\" | SCOPE <the boundary condition of \"no mill stop\" is violated by pressure fluctuations during backflush>",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'wedge wire cascade with' (field: intervention)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['flow', 'full', 'mill', 'stop']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"boundary conditions: 13-15 bar; full design flow; no mill stop\" | SCOPE <the boundary condition of \"no mill stop\" is violated by pressure fluctuations during backflush>",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "verdict": "ABSTAIN",
+    "basis": "The candidate claims \"NO evidence bundle is provided with this record\" yet requires validation through \"two-campaign split trial measures clogging events 1.5 or below (95 percent band 1.0-2.0) versus baseline 4.1 plus or minus 0.6\" without providing any evidence that such measurements are feasible or have been validated. GROUNDED_IN: RECORD \"Testable prediction: two-campaign split trial measures clogging events 1.5 or below (95 percent band 1.0-2.0) versus baseline 4.1 plus or minus 0.6, by the mill's clog log and roll thermography\" | EVIDENCE <no evidence bundle provided to support measuremen",
+    "grounding": {
+     "grounded": false,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['1.5', '95', '1.0', '2.0', '4.1', '0.6']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'provided with this record' (field: mechanism)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"Testable prediction: two-campaign split trial measures clogging events 1.5 or below (95 percent band 1.0-2.0) versus baseline 4.1 plus or minus 0.6, by the mill's clog log and roll thermograph",
+     "absence_ground": true,
+     "demotion_reason": "the asserted ground is an ABSENCE of evidence/support \u2014 absence is uncertainty, not failure (Art. XXI.3/XXV); the objection is preserved and escalated, never executed as a kill"
+    },
+    "demoted_from": "KILL",
+    "demotion_layer": "v2_grounding"
+   },
+   {
+    "attack_class": "BASELINE_EQUIVALENCE",
+    "verdict": "ABSTAIN",
+    "basis": "The candidate claims the intervention has \"same intervention class as the sound control\" but provides no evidence that the sound control system exists or has been implemented, creating an invalid comparison baseline. GROUNDED_IN: RECORD \"same intervention class as the sound control, but NO evidence bundle is provided with this record\" | EVIDENCE <no evidence of sound control system provided>",
+    "grounding": {
+     "grounded": false,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'the sound control but' (field: mechanism)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"same intervention class as the sound control, but NO evidence bundle is provided with this record\" | EVIDENCE <no evidence of sound control system provided>",
+     "absence_ground": true,
+     "demotion_reason": "the asserted ground is an ABSENCE of evidence/support \u2014 absence is uncertainty, not failure (Art. XXI.3/XXV); the objection is preserved and escalated, never executed as a kill"
+    },
+    "demoted_from": "KILL",
+    "demotion_layer": "v2_grounding"
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "verdict": "ABSTAIN",
+    "basis": "The claimed \"flanged spool swap at a planned roll change\" is impossible because the wedge-wire cascade would require complete flow isolation during installation, which cannot be achieved without mill stops or bypass systems that violate the boundary conditions. GROUNDED_IN: RECORD \"flanged spool swap at a planned roll change\" | SCOPE <the boundary condition of \"no mill stop\" is violated by the requirement to isolate flow for installation>",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'spool swap at planned' (field: intervention)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['flow', 'mill', 'stop']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"flanged spool swap at a planned roll change\" | SCOPE <the boundary condition of \"no mill stop\" is violated by the requirement to isolate flow for installation>",
+     "absence_ground": false
+    },
+    "demoted_from": "KILL",
+    "demotion_layer": "v3_accommodation",
+    "accommodation": {
+     "rule": "UNSTATED_ELEMENT",
+     "match": "without mill stops or bypass",
+     "reason": "the failure assertion rests on the record NOT stating an element \u2014 record silence is incompleteness, not failure (Art. XXI.3 extended to specification); the objection is preserved and escalated"
+    }
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "verdict": "ABSTAIN",
+    "basis": "The candidate proposes measuring \"clogging events 1.5 or below\" using \"the mill's clog log and roll thermography\" but provides no evidence that these measurement methods can detect or quantify clogging events with the claimed precision of 1.5 events versus a baseline of 4.1\u00b10.6. GROUNDED_IN: RECORD \"Testable prediction: two-campaign split trial measures clogging events 1.5 or below (95 percent band 1.0-2.0) versus baseline 4.1 plus or minus 0.6, by the mill's clog log and roll thermography\" | EVIDENCE <no evidence provided that these measurement methods can achieve the claimed precision>",
+    "grounding": {
+     "grounded": false,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['1.5', '1.5', '4.1', '0.6', '1.5', '95']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'two campaign split trial' (field: testable_prediction)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"Testable prediction: two-campaign split trial measures clogging events 1.5 or below (95 percent band 1.0-2.0) versus baseline 4.1 plus or minus 0.6, by the mill's clog log and roll thermograph",
+     "absence_ground": true,
+     "demotion_reason": "the asserted ground is an ABSENCE of evidence/support \u2014 absence is uncertainty, not failure (Art. XXI.3/XXV); the objection is preserved and escalated, never executed as a kill"
+    },
+    "demoted_from": "KILL",
+    "demotion_layer": "v2_grounding"
+   }
+  ],
+  "intervention_suggestions": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "suggestion": "Increase the first-stage micron rating to 500 microns and the second-stage to 200 microns to reduce pressure drop while still protecting the nozzles from catastrophic clogging, addressing the excessive pressure drop issue. GROUNDED_IN: COMPUTATION <Larger micron ratings would reduce pressure drop while still capturing the majority of problematic scale particles>",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['500', '200']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "COMPUTATION <Larger micron ratings would reduce pressure drop while still capturing the majority of problematic scale particles>",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "suggestion": "Implement a pressure-compensated backflush system with accumulators to maintain steady header pressure during backflush cycles, ensuring the 13-15 bar boundary condition is maintained. GROUNDED_IN: RECORD \"boundary conditions: 13-15 bar; full design flow; no mill stop\" | SCOPE <the boundary condition of maintaining steady pressure>",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['13', '15', '13', '15']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span '13 15 bar full' (field: boundary_conditions)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['flow', 'full', 'mill', 'stop']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"boundary conditions: 13-15 bar; full design flow; no mill stop\" | SCOPE <the boundary condition of maintaining steady pressure>",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "suggestion": "Provide a comprehensive evidence bundle including validation data from similar installations, measurement system calibration records, and baseline performance metrics to support the testable predictions. GROUNDED_IN: RECORD \"Testable prediction: two-campaign split trial measures clogging events 1.5 or below (95 percent band 1.0-2.0) versus baseline 4.1 plus or minus 0.6\" | EVIDENCE <currently no e",
+    "grounding": {
+     "grounded": false,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['1.5', '95', '1.0', '2.0', '4.1', '0.6']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'below 95 percent band' (field: testable_prediction)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"Testable prediction: two-campaign split trial measures clogging events 1.5 or below (95 percent band 1.0-2.0) versus baseline 4.1 plus or minus 0.6\" | EVIDENCE <currently no evidence bundle pr",
+     "absence_ground": true,
+     "demotion_reason": "the asserted ground is an ABSENCE of evidence/support \u2014 absence is uncertainty, not failure (Art. XXI.3/XXV); the objection is preserved and escalated, never executed as a kill"
+    },
+    "class": "UNGROUND_SUGGESTION",
+    "authority": "NONE \u2014 an ungrounded suggestion is preserved for human/escalation review and NEVER enters the hypothesis space (R450 \u00a710: the attacker does not get authority to invent causal explanations)"
+   },
+   {
+    "attack_class": "BASELINE_EQUIVALENCE",
+    "suggestion": "Document the existing sound control system performance as a true baseline comparison point, providing measurable performance metrics that can be directly compared to the proposed wedge-wire cascade. GROUNDED_IN: RECORD \"same intervention class as the sound control\" | EVIDENCE <no evidence of sound control system provided>",
+    "grounding": {
+     "grounded": false,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'class as the sound' (field: mechanism)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"same intervention class as the sound control\" | EVIDENCE <no evidence of sound control system provided>",
+     "absence_ground": true,
+     "demotion_reason": "the asserted ground is an ABSENCE of evidence/support \u2014 absence is uncertainty, not failure (Art. XXI.3/XXV); the objection is preserved and escalated, never executed as a kill"
+    },
+    "class": "UNGROUND_SUGGESTION",
+    "authority": "NONE \u2014 an ungrounded suggestion is preserved for human/escalation review and NEVER enters the hypothesis space (R450 \u00a710: the attacker does not get authority to invent causal explanations)"
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "suggestion": "Design a hot-swap installation system with integrated isolation valves that can be installed during planned roll changes without requiring complete flow isolation or mill stops. GROUNDED_IN: RECORD \"flanged spool swap at a planned roll change\" | SCOPE <the boundary condition of \"no mill stop\">",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'spool swap at planned' (field: intervention)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['flow', 'mill', 'stop']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"flanged spool swap at a planned roll change\" | SCOPE <the boundary condition of \"no mill stop\">",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "suggestion": "Provide a detailed methodology for clogging event measurement including sensor calibration data, detection threshold validation, and statistical analysis procedures to support the claimed precision of 1.5 events versus 4.1\u00b10.6 baseline. GROUNDED_IN: RECORD \"Testable prediction: two-campaign split trial measures clogging events 1.5 or below (95 percent band 1.0-2.0) versus baseline 4.1 plus or minu",
+    "grounding": {
+     "grounded": false,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['1.5', '4.1', '0.6', '1.5', '95', '1.0']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'below 95 percent band' (field: testable_prediction)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"Testable prediction: two-campaign split trial measures clogging events 1.5 or below (95 percent band 1.0-2.0) versus baseline 4.1 plus or minus 0.6\" | EVIDENCE <no evidence provided that these",
+     "absence_ground": true,
+     "demotion_reason": "the asserted ground is an ABSENCE of evidence/support \u2014 absence is uncertainty, not failure (Art. XXI.3/XXV); the objection is preserved and escalated, never executed as a kill"
+    },
+    "class": "UNGROUND_SUGGESTION",
+    "authority": "NONE \u2014 an ungrounded suggestion is preserved for human/escalation review and NEVER enters the hypothesis space (R450 \u00a710: the attacker does not get authority to invent causal explanations)"
+   }
+  ],
+  "state": "ATTACK_RUN",
+  "overall": "KILLED",
+  "kill_basis": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "basis": "The claimed two-stage wedge-wire cascade cannot possibly remove particles above 120 microns while maintaining 14 bar pressure across 120 nozzles, as the smaller 120-micron stage would create excessive pressure drop that would violate the boundary condition of no mill stops. GROUNDED_IN: COMPUTATION <The cascade would create significant flow restriction; at full design flow with 120 nozzles, the 120-micron stage alone would likely exceed the 13-15 bar operating range, causing mill stops which violates the boundary condition of \"no mill stop\">",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['120', '14', '120', '120', '120', '120']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'two stage wedge wire' (field: mechanism)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['flow', 'full', 'mill', 'stop']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "COMPUTATION <The cascade would create significant flow restriction; at full design flow with 120 nozzles, the 120-micron stage alone would likely exceed the 13-15 bar operating range, causing mill sto",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "basis": "The candidate claims the system operates at \"13-15 bar; full design flow; no mill stop\" but a wedge-wire cascade with automatic backflush inevitably creates pressure fluctuations that would destabilize the spray system during backflush cycles, violating the boundary condition of maintaining steady pressure. GROUNDED_IN: RECORD \"boundary conditions: 13-15 bar; full design flow; no mill stop\" | SCOPE <the boundary condition of \"no mill stop\" is violated by pressure fluctuations during backflush>",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'wedge wire cascade with' (field: intervention)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['flow', 'full', 'mill', 'stop']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"boundary conditions: 13-15 bar; full design flow; no mill stop\" | SCOPE <the boundary condition of \"no mill stop\" is violated by pressure fluctuations during backflush>",
+     "absence_ground": false
+    }
+   }
+  ],
+  "counts": {
+   "KILL": 2,
+   "RISK": 0,
+   "SURVIVE": 0,
+   "ABSTAIN_DEMOTED": 4,
+   "INVALID": 0
+  }
+ }
+}

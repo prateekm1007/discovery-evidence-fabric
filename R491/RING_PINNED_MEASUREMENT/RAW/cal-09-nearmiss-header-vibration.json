@@ -1,0 +1,324 @@
+{
+ "attack": {
+  "attack_version": "independent_attack/3.0.0",
+  "candidate_id": "cal-09-piezo-header-vibration",
+  "generator_provider": null,
+  "attacker_provider": "zai",
+  "attacker_model": "zai-org/GLM-5.3",
+  "independence_mode": "SEPARATE_CONTEXT",
+  "independence_note": "the attacker ran in an independent reasoning context (fresh adversarial conversation, generator reasoning never shown; no alternative provider credentialed \u2014 disclosed, never claimed as provider separation)",
+  "prompt_hash": "f0f10d53155a127188bee8ae50bbdc6aa5de1731183fa7244132100d5e94eb27",
+  "output_hash": "d022420a901dcd4ec2261cab970d42827dce51b45ae38347584a8c46c064055b",
+  "llm_status": "OK",
+  "ring_pin": {
+   "requested": "zai",
+   "mode": "HARD_PIN_NO_FALLBACK",
+   "served_provider": "zai",
+   "served_model": "zai-org/GLM-5.3",
+   "pin_status": "HARD_PINNED_NO_FALLBACK",
+   "note": "the sealed-corpus measurement pins the attacker ring so the instrument is measured on the ring it declares (rules x ring); production attacks keep the availability cascade"
+  },
+  "attacked_at": "2026-09-17T15:21:53+00:00Z",
+  "items": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "verdict": "ABSTAIN",
+    "basis": "The claimed mechanism that vibration prevents particle settling contradicts basic fluid dynamics principles where particles in suspension will still settle under gravity regardless of vibration, especially with the density difference between scale particles and water GROUNDED_IN: COMPUTATION <scale particles density ~7.8 g/cm\u00b3 vs water density 1 g/cm\u00b3 results in significant settling force unaffected by 200 Hz vibration>",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['7.8', '1', '200']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "COMPUTATION <scale particles density ~7.8 g/cm\u00b3 vs water density 1 g/cm\u00b3 results in significant settling force unaffected by 200 Hz vibration>",
+     "absence_ground": false
+    },
+    "demoted_from": "KILL",
+    "demotion_layer": "v3_anchor",
+    "anchor": {
+     "rule": "NO_ANCHOR_BINDING",
+     "reason": "the only binding is a numeric relation (computation) \u2014 the weakest binding class, exactly what a false kill constructs (cross-field unit confusion, external constants, reinterpretation); the objection is preserved and escalated, the kill authority withdrawn"
+    }
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "verdict": "KILL",
+    "basis": "The rigid connection to the mill frame at the roll-cooling interface directly conflicts with the need for tuned isolation mounts for vibration effectiveness, creating an impossible mechanical contradiction GROUNDED_IN: SCOPE <boundary condition: header rigidly connected to mill frame at the roll-cooling interface> and SCOPE <intervention requires header supported on tuned isolation mounts>",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'supported on tuned isolation' (field: intervention)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['connected', 'cooling', 'frame', 'header']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "SCOPE <boundary condition: header rigidly connected to mill frame at the roll-cooling interface> and SCOPE <intervention requires header supported on tuned isolation mounts>",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "verdict": "ABSTAIN",
+    "basis": "The candidate claims no evidence is held, yet makes specific testable predictions that cannot be verified without supporting data, creating an evidentiary contradiction GROUNDED_IN: EVIDENCE <none held> and RECORD <\"Testable prediction: a bench header section vibrated at 200 Hz versus static shows no deposit consolidation after a 120-hour slurry exposure\">",
+    "grounding": {
+     "grounded": false,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['200', '120']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'no deposit consolidation after' (field: testable_prediction)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "EVIDENCE <none held> and RECORD <\"Testable prediction: a bench header section vibrated at 200 Hz versus static shows no deposit consolidation after a 120-hour slurry exposure\">",
+     "absence_ground": true,
+     "demotion_reason": "the asserted ground is an ABSENCE of evidence/support \u2014 absence is uncertainty, not failure (Art. XXI.3/XXV); the objection is preserved and escalated, never executed as a kill"
+    },
+    "demoted_from": "KILL",
+    "demotion_layer": "v2_grounding"
+   },
+   {
+    "attack_class": "BASELINE_EQUIVALENCE",
+    "verdict": "ABSTAIN",
+    "basis": "The claimed reduction in clogging events from 4.1 to below 0.3 per campaign is unsubstantiated with no comparative data against the baseline, making the claimed improvement impossible to verify GROUNDED_IN: COMPUTATION <claimed reduction from 4.1 to below 0.3 events per campaign without baseline comparison data>",
+    "grounding": {
+     "grounded": false,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['4.1', '0.3', '4.1', '0.3']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "COMPUTATION <claimed reduction from 4.1 to below 0.3 events per campaign without baseline comparison data>",
+     "absence_ground": true,
+     "demotion_reason": "the asserted ground is an ABSENCE of evidence/support \u2014 absence is uncertainty, not failure (Art. XXI.3/XXV); the objection is preserved and escalated, never executed as a kill"
+    },
+    "demoted_from": "KILL",
+    "demotion_layer": "v2_grounding"
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "verdict": "KILL",
+    "basis": "The 12 kW continuous drive requirement for two shakers creates an enormous energy demand that would require significant infrastructure changes not mentioned in the boundary conditions GROUNDED_IN: SCOPE <boundary conditions don't address power requirements> and COMPUTATION <12 kW continuous power demand>",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span '12 kw continuous drive' (field: intervention)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "SCOPE <boundary conditions don't address power requirements> and COMPUTATION <12 kW continuous power demand>",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "verdict": "ABSTAIN",
+    "basis": "The claim that vibration amplitude at nozzle inlets is the novel design variable is meaningless without specifying the required amplitude range for effectiveness GROUNDED_IN: RECORD <\"Novel design variable: vibration amplitude at the nozzle inlets\"> and SCOPE <no amplitude specification provided>",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'amplitude at the nozzle' (field: novel_design_variable)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD <\"Novel design variable: vibration amplitude at the nozzle inlets\"> and SCOPE <no amplitude specification provided>",
+     "absence_ground": false
+    },
+    "demoted_from": "KILL",
+    "demotion_layer": "v3_accommodation",
+    "accommodation": {
+     "rule": "UNSTATED_ELEMENT",
+     "match": "no amplitude specification provided",
+     "reason": "the failure assertion rests on the record NOT stating an element \u2014 record silence is incompleteness, not failure (Art. XXI.3 extended to specification); the objection is preserved and escalated"
+    }
+   }
+  ],
+  "intervention_suggestions": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "suggestion": "Increase vibration frequency to 2000-3000 Hz range to create acoustic streaming effects that actively disrupt particle settling GROUNDED_IN: COMPUTATION <higher frequencies create greater acoustic streaming forces counteracting settling>",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['2000', '3000']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "COMPUTATION <higher frequencies create greater acoustic streaming forces counteracting settling>",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "suggestion": "Implement flexible coupling between rigid frame connection and isolation mounts to allow vibration transmission while maintaining structural integrity GROUNDED_IN: SCOPE <boundary condition: header rigidly connected to mill frame> and RECORD <\"header supported on tuned isolation mounts\">",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'supported on tuned isolation' (field: intervention)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['connected', 'frame', 'header', 'mill']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "SCOPE <boundary condition: header rigidly connected to mill frame> and RECORD <\"header supported on tuned isolation mounts\">",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "suggestion": "Provide test data from bench-scale validation showing deposit prevention at 200 Hz with specified amplitude parameters GROUNDED_IN: RECORD <\"Testable prediction: a bench header section vibrated at 200 Hz versus static shows no deposit consolidation after a 120-hour slurry exposure\">",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['200', '200', '120']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'no deposit consolidation after' (field: testable_prediction)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD <\"Testable prediction: a bench header section vibrated at 200 Hz versus static shows no deposit consolidation after a 120-hour slurry exposure\">",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "BASELINE_EQUIVALENCE",
+    "suggestion": "Conduct side-by-side comparison testing between current and vibrated systems using identical operating conditions and measurement protocols GROUNDED_IN: COMPUTATION <claimed reduction from 4.1 to below 0.3 events per campaign>",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['4.1', '0.3']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "COMPUTATION <claimed reduction from 4.1 to below 0.3 events per campaign>",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "suggestion": "Reduce power consumption by implementing resonant frequency operation and energy recovery systems instead of continuous 12 kW drive GROUNDED_IN: COMPUTATION <12 kW continuous power demand>",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['12', '12']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "COMPUTATION <12 kW continuous power demand>",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "suggestion": "Specify exact vibration amplitude range (in micrometers) required at nozzle inlets to prevent deposit consolidation GROUNDED_IN: RECORD <\"Novel design variable: vibration amplitude at the nozzle inlets\">",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'amplitude at the nozzle' (field: novel_design_variable)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD <\"Novel design variable: vibration amplitude at the nozzle inlets\">",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   }
+  ],
+  "state": "ATTACK_RUN",
+  "overall": "KILLED",
+  "kill_basis": [
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "basis": "The rigid connection to the mill frame at the roll-cooling interface directly conflicts with the need for tuned isolation mounts for vibration effectiveness, creating an impossible mechanical contradiction GROUNDED_IN: SCOPE <boundary condition: header rigidly connected to mill frame at the roll-cooling interface> and SCOPE <intervention requires header supported on tuned isolation mounts>",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'supported on tuned isolation' (field: intervention)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['connected', 'cooling', 'frame', 'header']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "SCOPE <boundary condition: header rigidly connected to mill frame at the roll-cooling interface> and SCOPE <intervention requires header supported on tuned isolation mounts>",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "basis": "The 12 kW continuous drive requirement for two shakers creates an enormous energy demand that would require significant infrastructure changes not mentioned in the boundary conditions GROUNDED_IN: SCOPE <boundary conditions don't address power requirements> and COMPUTATION <12 kW continuous power demand>",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span '12 kw continuous drive' (field: intervention)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "SCOPE <boundary conditions don't address power requirements> and COMPUTATION <12 kW continuous power demand>",
+     "absence_ground": false
+    }
+   }
+  ],
+  "counts": {
+   "KILL": 2,
+   "RISK": 0,
+   "SURVIVE": 0,
+   "ABSTAIN_DEMOTED": 4,
+   "INVALID": 0
+  }
+ }
+}

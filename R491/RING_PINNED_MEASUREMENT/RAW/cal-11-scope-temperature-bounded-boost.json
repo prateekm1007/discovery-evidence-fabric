@@ -1,0 +1,283 @@
+{
+ "attack": {
+  "attack_version": "independent_attack/3.0.0",
+  "candidate_id": "cal-11-bounded-flow-boost",
+  "generator_provider": null,
+  "attacker_provider": "zai",
+  "attacker_model": "zai-org/GLM-5.3",
+  "independence_mode": "SEPARATE_CONTEXT",
+  "independence_note": "the attacker ran in an independent reasoning context (fresh adversarial conversation, generator reasoning never shown; no alternative provider credentialed \u2014 disclosed, never claimed as provider separation)",
+  "prompt_hash": "065abe47eee0c011812d967182a500bbf9b85ebd38540e362d7c41bbf04db975",
+  "output_hash": "b99e657f4f1fcf240ccf0d6a2f804c7a3b8541d7f57d7bc0b0322288006b31dc",
+  "llm_status": "OK",
+  "ring_pin": {
+   "requested": "zai",
+   "mode": "HARD_PIN_NO_FALLBACK",
+   "served_provider": "zai",
+   "served_model": "zai-org/GLM-5.3",
+   "pin_status": "HARD_PINNED_NO_FALLBACK",
+   "note": "the sealed-corpus measurement pins the attacker ring so the instrument is measured on the ring it declares (rules x ring); production attacks keep the availability cascade"
+  },
+  "attacked_at": "2026-09-17T15:22:41+00:00Z",
+  "items": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "verdict": "KILL",
+    "basis": "The claimed 20% flow boost fails to account for the relationship between increased velocity and particle transport through nozzles, as the candidate provides no fluid dynamics calculations showing how increased velocity specifically addresses particle settling at the claimed scale GROUNDED_IN: COMPUTATION <the candidate states \"raising convective flushing velocity through each nozzle throat, raising the particle size that can be transported through without settling\" but provides no calculations showing the velocity increase (20%) is sufficient to transport the specific particle sizes causing c",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['20', '20']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'that can be transported' (field: mechanism)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "COMPUTATION <the candidate states \"raising convective flushing velocity through each nozzle throat, raising the particle size that can be transported through without settling\" but provides no calculat",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "verdict": "ABSTAIN",
+    "basis": "The 85\u00b0C boundary condition is arbitrarily defined without justification from pump curves or thermal balance calculations, and the candidate fails to demonstrate why the intervention would fail above this temperature despite claiming the pump curve and thermal balance exceed the declared envelope GROUNDED_IN: SCOPE <the boundary condition claims \"the pump curve and thermal balance at higher entry temperatures exceed the declared envelope\" but provides no evidence of these curves or calculations>",
+    "grounding": {
+     "grounded": false,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'the pump curve and' (field: mechanism)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['curve', 'entry', 'envelope', 'pump']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "SCOPE <the boundary condition claims \"the pump curve and thermal balance at higher entry temperatures exceed the declared envelope\" but provides no evidence of these curves or calculations>",
+     "absence_ground": true,
+     "demotion_reason": "the asserted ground is an ABSENCE of evidence/support \u2014 absence is uncertainty, not failure (Art. XXI.3/XXV); the objection is preserved and escalated, never executed as a kill"
+    },
+    "demoted_from": "KILL",
+    "demotion_layer": "v2_grounding"
+   },
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "verdict": "ABSTAIN",
+    "basis": "The candidate claims no evidence is held, yet makes specific quantitative predictions (clogging events falling from 4.1 to 2.8, 95% confidence band 2.4-3.2) without providing any experimental data or modeling to support these numbers GROUNDED_IN: EVIDENCE <the candidate explicitly states \"(none held)\" yet makes quantitative predictions that would require evidence>",
+    "grounding": {
+     "grounded": false,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['4.1', '2.8', '95', '2.4', '3.2']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "EVIDENCE <the candidate explicitly states \"(none held)\" yet makes quantitative predictions that would require evidence>",
+     "absence_ground": true,
+     "demotion_reason": "the asserted ground is an ABSENCE of evidence/support \u2014 absence is uncertainty, not failure (Art. XXI.3/XXV); the objection is preserved and escalated, never executed as a kill"
+    },
+    "demoted_from": "KILL",
+    "demotion_layer": "v2_grounding"
+   },
+   {
+    "attack_class": "BASELINE_EQUIVALENCE",
+    "verdict": "ABSTAIN",
+    "basis": "The candidate fails to demonstrate that the intervention improves upon the baseline beyond the claimed clogging reduction, as it doesn't address whether the increased flow causes other cooling system performance degradations that might offset the clogging reduction GROUNDED_IN: COMPUTATION <the candidate predicts clogging reduction but provides no comparison of overall system performance metrics between baseline and intervention states>",
+    "grounding": {
+     "grounded": false,
+     "bindings": [],
+     "claimed_ground": "COMPUTATION <the candidate predicts clogging reduction but provides no comparison of overall system performance metrics between baseline and intervention states>",
+     "absence_ground": true,
+     "demotion_reason": "the asserted ground is an ABSENCE of evidence/support \u2014 absence is uncertainty, not failure (Art. XXI.3/XXV); the objection is preserved and escalated, never executed as a kill"
+    },
+    "demoted_from": "KILL",
+    "demotion_layer": "v2_grounding"
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "verdict": "ABSTAIN",
+    "basis": "The valve setpoint change and temperature interlock implementation would require precise control system modifications that the candidate doesn't address, including potential control loop instability during transitions between normal and boosted flow states GROUNDED_IN: SCOPE <the intervention requires \"supply valve setpoint change plus a strip-entry-temperature interlock\" but provides no control system design or stability analysis>",
+    "grounding": {
+     "grounded": false,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'plus strip entry temperature' (field: intervention)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['entry', 'strip', 'temperature']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "SCOPE <the intervention requires \"supply valve setpoint change plus a strip-entry-temperature interlock\" but provides no control system design or stability analysis>",
+     "absence_ground": true,
+     "demotion_reason": "the asserted ground is an ABSENCE of evidence/support \u2014 absence is uncertainty, not failure (Art. XXI.3/XXV); the objection is preserved and escalated, never executed as a kill"
+    },
+    "demoted_from": "KILL",
+    "demotion_layer": "v2_grounding"
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "verdict": "ABSTAIN",
+    "basis": "The candidate's testable prediction measures clogging events but doesn't define how clogging events are quantified or distinguished from other causes of spray non-uniformity, making the measurement methodology ambiguous GROUNDED_IN: SCOPE <the prediction measures \"clogging-event reduction to approximately 2.8\" but provides no definition of how clogging events are identified or counted>",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'clogging event reduction to' (field: testable_prediction)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "SCOPE <the prediction measures \"clogging-event reduction to approximately 2.8\" but provides no definition of how clogging events are identified or counted>",
+     "absence_ground": false
+    },
+    "demoted_from": "KILL",
+    "demotion_layer": "v3_accommodation",
+    "accommodation": {
+     "rule": "HEDGED_TARGET",
+     "match": "approximately 2.8\" but provides no defin",
+     "reason": "the contradicted target is a quantity the record itself hedges; an alternative derivation disputing a hedged value is an interpretive objection, not a demonstrable falsehood \u2014 the objection is preserved and escalated, the kill authority withdrawn"
+    }
+   }
+  ],
+  "intervention_suggestions": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "suggestion": "Increase the flow boost fraction to 30% and provide computational fluid dynamics modeling showing the relationship between increased velocity and particle transport thresholds for the specific particle sizes in the recirculated water GROUNDED_IN: COMPUTATION <the current 20% boost lacks calculation showing sufficient velocity increase>",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['30', '20']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "COMPUTATION <the current 20% boost lacks calculation showing sufficient velocity increase>",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "suggestion": "Provide pump curve data and thermal balance calculations demonstrating the precise temperature threshold where the intervention becomes invalid, replacing the arbitrary 85\u00b0C limit with a scientifically justified boundary GROUNDED_IN: SCOPE <the 85\u00b0C limit lacks justification from pump curves or thermal calculations>",
+    "grounding": {
+     "grounded": false,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['85', '85']",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['curve', 'pump', 'temperature']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "SCOPE <the 85\u00b0C limit lacks justification from pump curves or thermal calculations>",
+     "absence_ground": true,
+     "demotion_reason": "the asserted ground is an ABSENCE of evidence/support \u2014 absence is uncertainty, not failure (Art. XXI.3/XXV); the objection is preserved and escalated, never executed as a kill"
+    },
+    "class": "UNGROUND_SUGGESTION",
+    "authority": "NONE \u2014 an ungrounded suggestion is preserved for human/escalation review and NEVER enters the hypothesis space (R450 \u00a710: the attacker does not get authority to invent causal explanations)"
+   },
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "suggestion": "Conduct preliminary experiments or simulations to generate the evidence bundle supporting the quantitative predictions of clogging reduction and confidence bands GROUNDED_IN: EVIDENCE <the candidate makes quantitative predictions without evidence>",
+    "grounding": {
+     "grounded": false,
+     "bindings": [],
+     "claimed_ground": "EVIDENCE <the candidate makes quantitative predictions without evidence>",
+     "absence_ground": true,
+     "demotion_reason": "the asserted ground is an ABSENCE of evidence/support \u2014 absence is uncertainty, not failure (Art. XXI.3/XXV); the objection is preserved and escalated, never executed as a kill"
+    },
+    "class": "UNGROUND_SUGGESTION",
+    "authority": "NONE \u2014 an ungrounded suggestion is preserved for human/escalation review and NEVER enters the hypothesis space (R450 \u00a710: the attacker does not get authority to invent causal explanations)"
+   },
+   {
+    "attack_class": "BASELINE_EQUIVALENCE",
+    "suggestion": "Measure and compare additional performance metrics beyond clogging events, such as spray uniformity, thermal crown variation, and roll wear rates between baseline and intervention states GROUNDED_IN: COMPUTATION <the candidate doesn't compare overall system performance>",
+    "grounding": {
+     "grounded": false,
+     "bindings": [],
+     "claimed_ground": "COMPUTATION <the candidate doesn't compare overall system performance>",
+     "absence_ground": false,
+     "demotion_reason": "no evidence / computation / record / declared-scope binding found in the kill basis \u2014 a bare assertion carries no verdict authority (Art. XVIII); the objection is preserved and escalated"
+    },
+    "class": "UNGROUND_SUGGESTION",
+    "authority": "NONE \u2014 an ungrounded suggestion is preserved for human/escalation review and NEVER enters the hypothesis space (R450 \u00a710: the attacker does not get authority to invent causal explanations)"
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "suggestion": "Provide detailed control system design specifications including transition logic between normal and boosted flow states and stability analysis for the control loop modifications GROUNDED_IN: SCOPE <the intervention requires control system modifications not addressed>",
+    "grounding": {
+     "grounded": false,
+     "bindings": [],
+     "claimed_ground": "SCOPE <the intervention requires control system modifications not addressed>",
+     "absence_ground": false,
+     "demotion_reason": "no evidence / computation / record / declared-scope binding found in the kill basis \u2014 a bare assertion carries no verdict authority (Art. XVIII); the objection is preserved and escalated"
+    },
+    "class": "UNGROUND_SUGGESTION",
+    "authority": "NONE \u2014 an ungrounded suggestion is preserved for human/escalation review and NEVER enters the hypothesis space (R450 \u00a710: the attacker does not get authority to invent causal explanations)"
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "suggestion": "Define and validate a specific methodology for quantifying clogging events that distinguishes them from other causes of spray non-uniformity, with clear measurement protocols GROUNDED_IN: SCOPE <the prediction lacks defined measurement methodology>",
+    "grounding": {
+     "grounded": false,
+     "bindings": [],
+     "claimed_ground": "SCOPE <the prediction lacks defined measurement methodology>",
+     "absence_ground": true,
+     "demotion_reason": "the asserted ground is an ABSENCE of evidence/support \u2014 absence is uncertainty, not failure (Art. XXI.3/XXV); the objection is preserved and escalated, never executed as a kill"
+    },
+    "class": "UNGROUND_SUGGESTION",
+    "authority": "NONE \u2014 an ungrounded suggestion is preserved for human/escalation review and NEVER enters the hypothesis space (R450 \u00a710: the attacker does not get authority to invent causal explanations)"
+   }
+  ],
+  "state": "ATTACK_RUN",
+  "overall": "KILLED",
+  "kill_basis": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "basis": "The claimed 20% flow boost fails to account for the relationship between increased velocity and particle transport through nozzles, as the candidate provides no fluid dynamics calculations showing how increased velocity specifically addresses particle settling at the claimed scale GROUNDED_IN: COMPUTATION <the candidate states \"raising convective flushing velocity through each nozzle throat, raising the particle size that can be transported through without settling\" but provides no calculations showing the velocity increase (20%) is sufficient to transport the specific particle sizes causing c",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['20', '20']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'that can be transported' (field: mechanism)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "COMPUTATION <the candidate states \"raising convective flushing velocity through each nozzle throat, raising the particle size that can be transported through without settling\" but provides no calculat",
+     "absence_ground": false
+    }
+   }
+  ],
+  "counts": {
+   "KILL": 1,
+   "RISK": 0,
+   "SURVIVE": 0,
+   "ABSTAIN_DEMOTED": 5,
+   "INVALID": 0
+  }
+ }
+}

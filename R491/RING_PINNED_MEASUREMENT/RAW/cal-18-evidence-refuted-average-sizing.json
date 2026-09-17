@@ -1,0 +1,335 @@
+{
+ "attack": {
+  "attack_version": "independent_attack/3.0.0",
+  "candidate_id": "cal-18-average-load-dual-media-filter",
+  "generator_provider": null,
+  "attacker_provider": "zai",
+  "attacker_model": "zai-org/GLM-5.3",
+  "independence_mode": "SEPARATE_CONTEXT",
+  "independence_note": "the attacker ran in an independent reasoning context (fresh adversarial conversation, generator reasoning never shown; no alternative provider credentialed \u2014 disclosed, never claimed as provider separation)",
+  "prompt_hash": "f7cb8accfeb33ce452be7daa0f341bb4d7715d14b4a7d169018630042936218e",
+  "output_hash": "4c96c87f07d27cf3b63724321a4b272a2e65cdaf23da014cd6439a21e6f27c3f",
+  "llm_status": "OK",
+  "ring_pin": {
+   "requested": "zai",
+   "mode": "HARD_PIN_NO_FALLBACK",
+   "served_provider": "zai",
+   "served_model": "zai-org/GLM-5.3",
+   "pin_status": "HARD_PINNED_NO_FALLBACK",
+   "note": "the sealed-corpus measurement pins the attacker ring so the instrument is measured on the ring it declares (rules x ring); production attacks keep the availability cascade"
+  },
+  "attacked_at": "2026-09-17T15:25:22+00:00Z",
+  "items": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "verdict": "KILL",
+    "basis": "The dual-media filter sized on average load (0.6 kg/h) cannot handle the heavy-tailed distribution where P95 = 3.6 kg/h, as it will be overwhelmed during high-load episodes, causing breakthrough and clogging. GROUNDED_IN: EVIDENCE [ev:load-distribution] | RECORD \"the load is HEAVY-TAILED \u2014 median 0.6 kg/h but P95 = 3.6 kg/h and P99 = \" | COMPUTATION P95 (3.6 kg/h) is 6x the average design capacity (0.6 kg/h), meaning filter will be exceeded 5% of the time | SCOPE \"average-load sizing is the standard design basis for side-stream filtration\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "evidence",
+       "ground": "record id ev:load-distribution",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'load sizing is the' (field: mechanism)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "EVIDENCE [ev:load-distribution] | RECORD \"the load is HEAVY-TAILED \u2014 median 0.6 kg/h but P95 = 3.6 kg/h and P99 = \" | COMPUTATION P95 (3.6 kg/h) is 6x the average design capacity (0.6 kg/h), meaning f",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "verdict": "ABSTAIN",
+    "basis": "The filter cannot be backwashed without a mill stop, as specified in boundary conditions (\"no mill stop for backwash\"), making automatic backwash impossible during operation. GROUNDED_IN: EVIDENCE [boundary conditions] | RECORD \"no mill stop for backwash\" | COMPUTATION The intervention requires automatic backwash on differential pressure, but boundary conditions explicitly prohibit mill stops for backwash | SCOPE \"Boundary conditions: supply-side installation at full design flow; 13-15 bar; no mill stop for backwash\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'automatic backwash on differential' (field: intervention)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['backwash', 'flow', 'full', 'installation']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "EVIDENCE [boundary conditions] | RECORD \"no mill stop for backwash\" | COMPUTATION The intervention requires automatic backwash on differential pressure, but boundary conditions explicitly prohibit mil",
+     "absence_ground": false
+    },
+    "demoted_from": "KILL",
+    "demotion_layer": "v3_accommodation",
+    "accommodation": {
+     "rule": "UNSTATED_ELEMENT",
+     "match": "without a mill stop, as specified",
+     "reason": "the failure assertion rests on the record NOT stating an element \u2014 record silence is incompleteness, not failure (Art. XXI.3 extended to specification); the objection is preserved and escalated"
+    }
+   },
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "verdict": "KILL",
+    "basis": "The candidate claims 61% of clogging events occur during high-load episodes, yet predicts clogging events will fall from 4.1 to below 1.0, which is mathematically impossible given that high-load episodes alone cause more than half of current clogs. GROUNDED_IN: EVIDENCE [ev:episode-clog] | RECORD \"61 percent of all campaign\" | COMPUTATION 61% of 4.1 clogs = 2.5 clogs from high-load episodes alone, making a reduction to below 1.0 total clogs impossible | SCOPE The candidate's own evidence contradicts its predicted effect",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "evidence",
+       "ground": "bundle item '18-month suspended-solids load study: the load is HEAVY-TAILED \u2014 median 0.6 kg/h but P95 = 3.6 kg/h and P99 = 6.1 kg/h (episodic descaling-line failures dump 6x the median for 2-6 hours, 14 events recorded); average-sized filters blind and bypass during exactly these episodes' (strong overlap: during, episodes, events, load)",
+       "verified": true
+      },
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['61', '4.1', '1.0', '61', '61', '4.1']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'fall from to below' (field: predicted_effect)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "EVIDENCE [ev:episode-clog] | RECORD \"61 percent of all campaign\" | COMPUTATION 61% of 4.1 clogs = 2.5 clogs from high-load episodes alone, making a reduction to below 1.0 total clogs impossible | SCOP",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "BASELINE_EQUIVALENCE",
+    "verdict": "RISK",
+    "basis": "The candidate claims improvement over baseline but provides no comparative data showing how the filter performs differently than the current status quo system. GROUNDED_IN: EVIDENCE [absence of comparative data] | RECORD \"the status quo the candidate must beat\" | COMPUTATION No direct comparison between filtered and unfiltered performance provided | SCOPE \"Baseline (the un-invented standard): steel hot-rolling mill work-roll cooling spray system... as currently implemented\""
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "verdict": "ABSTAIN",
+    "basis": "The filter requires installation at full design flow (14 bar) but cannot handle pressure surges or variations in a steel mill environment, which typically experiences pressure fluctuations that would compromise filter integrity and performance. GROUNDED_IN: EVIDENCE [boundary conditions] | RECORD \"supply-side installation at full design flow; 13-15 bar\" | COMPUTATION Steel mill environments experience pressure surges beyond nominal ranges, but filter design only specifies 13-15 bar range without surge protection | SCOPE \"Boundary conditions: supply-side installation at full design flow; 13-15 ",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'flow 13 15 bar' (field: boundary_conditions)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['flow', 'full', 'installation', 'mill']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "EVIDENCE [boundary conditions] | RECORD \"supply-side installation at full design flow; 13-15 bar\" | COMPUTATION Steel mill environments experience pressure surges beyond nominal ranges, but filter des",
+     "absence_ground": false
+    },
+    "demoted_from": "KILL",
+    "demotion_layer": "v3_accommodation",
+    "accommodation": {
+     "rule": "TYPICAL_VALUE_PREMISE",
+     "match": "typically",
+     "reason": "the kill premises an explicitly typical external value \u2014 a world-generalization presented as a ground is an asserted problem, not a found one; the objection is preserved and escalated"
+    }
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "verdict": "RISK",
+    "basis": "The candidate predicts continuous turbidity logging will show TSS at or below 0.6 kg/h, but doesn't specify the logging frequency or methodology, making it impossible to verify if brief spikes between measurements are being missed. GROUNDED_IN: EVIDENCE [absence of logging specification] | RECORD \"continuous turbidity logging shows loop TSS at or below the 0.6 kg/h average design point\" | COMPUTATION \"Continuous\" is undefined - without specified sampling rate, brief high-concentration episodes could be undetected | SCOPE \"Testable prediction: continuous turbidity logging shows loop TSS at or b"
+   }
+  ],
+  "intervention_suggestions": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "suggestion": "Increase filter capacity to handle P99 load (though value is redacted, it's clearly >3.6 kg/h) by either using a larger vessel or higher-capacity media to handle peak loads, not just average. GROUNDED_IN: EVIDENCE [ev:load-distribution] | RECORD \"the load is HEAVY-TAILED \u2014 median 0.6 kg/h but P95 = 3.6 kg/h and P99 = \"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "evidence",
+       "ground": "record id ev:load-distribution",
+       "verified": true
+      },
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['99', '3.6', '0.6', '95', '3.6', '99']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "EVIDENCE [ev:load-distribution] | RECORD \"the load is HEAVY-TAILED \u2014 median 0.6 kg/h but P95 = 3.6 kg/h and P99 = \"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "suggestion": "Implement a redundant filter system that can be isolated and backwashed during mill operation, or design a backwash system that can operate without mill stoppage. GROUNDED_IN: EVIDENCE [boundary conditions] | RECORD \"no mill stop for backwash\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'mill stop for backwash' (field: boundary_conditions)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['backwash', 'mill', 'stop']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "EVIDENCE [boundary conditions] | RECORD \"no mill stop for backwash\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "suggestion": "Redesign the prediction to account for the 61% of clogs occurring during high-load episodes, either by targeting only those episodes or by acknowledging a higher minimum clog rate. GROUNDED_IN: EVIDENCE [ev:episode-clog] | RECORD \"61 percent of all campaign\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "evidence",
+       "ground": "bundle item '18-month suspended-solids load study: the load is HEAVY-TAILED \u2014 median 0.6 kg/h but P95 = 3.6 kg/h and P99 = 6.1 kg/h (episodic descaling-line failures dump 6x the median for 2-6 hours, 14 events recorded); average-sized filters blind and bypass during exactly these episodes' (strong overlap: during, episodes, load)",
+       "verified": true
+      },
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['61', '61']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "EVIDENCE [ev:episode-clog] | RECORD \"61 percent of all campaign\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "BASELINE_EQUIVALENCE",
+    "suggestion": "Provide comparative data showing performance difference between filtered and unfiltered systems under identical operating conditions. GROUNDED_IN: EVIDENCE [Baseline (the un-invented standard)] | RECORD \"the status quo the candidate must beat\"",
+    "grounding": {
+     "grounded": false,
+     "bindings": [],
+     "claimed_ground": "EVIDENCE [Baseline (the un-invented standard)] | RECORD \"the status quo the candidate must beat\"",
+     "absence_ground": false,
+     "demotion_reason": "no evidence / computation / record / declared-scope binding found in the kill basis \u2014 a bare assertion carries no verdict authority (Art. XVIII); the objection is preserved and escalated"
+    },
+    "class": "UNGROUND_SUGGESTION",
+    "authority": "NONE \u2014 an ungrounded suggestion is preserved for human/escalation review and NEVER enters the hypothesis space (R450 \u00a710: the attacker does not get authority to invent causal explanations)"
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "suggestion": "Incorporate pressure surge protection and specify operational pressure range beyond nominal 13-15 bar to accommodate mill environment fluctuations. GROUNDED_IN: EVIDENCE [boundary conditions] | RECORD \"supply-side installation at full design flow; 13-15 bar\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['13', '15', '13', '15']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'flow 13 15 bar' (field: boundary_conditions)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['flow', 'full', 'installation', 'mill']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "EVIDENCE [boundary conditions] | RECORD \"supply-side installation at full design flow; 13-15 bar\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "suggestion": "Specify turbidity logging methodology including sampling frequency, duration, and data analysis protocol to ensure detection of brief high-concentration episodes. GROUNDED_IN: EVIDENCE [Testable prediction] | RECORD \"continuous turbidity logging shows loop TSS at or below the 0.6 kg/h average design point\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "evidence",
+       "ground": "bundle item '18-month suspended-solids load study: the load is HEAVY-TAILED \u2014 median 0.6 kg/h but P95 = 3.6 kg/h and P99 = 6.1 kg/h (episodic descaling-line failures dump 6x the median for 2-6 hours, 14 events recorded); average-sized filters blind and bypass during exactly these episodes' (strong overlap: average, episodes)",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'the kg average design' (field: testable_prediction)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "EVIDENCE [Testable prediction] | RECORD \"continuous turbidity logging shows loop TSS at or below the 0.6 kg/h average design point\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   }
+  ],
+  "state": "ATTACK_RUN",
+  "overall": "KILLED",
+  "kill_basis": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "basis": "The dual-media filter sized on average load (0.6 kg/h) cannot handle the heavy-tailed distribution where P95 = 3.6 kg/h, as it will be overwhelmed during high-load episodes, causing breakthrough and clogging. GROUNDED_IN: EVIDENCE [ev:load-distribution] | RECORD \"the load is HEAVY-TAILED \u2014 median 0.6 kg/h but P95 = 3.6 kg/h and P99 = \" | COMPUTATION P95 (3.6 kg/h) is 6x the average design capacity (0.6 kg/h), meaning filter will be exceeded 5% of the time | SCOPE \"average-load sizing is the standard design basis for side-stream filtration\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "evidence",
+       "ground": "record id ev:load-distribution",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'load sizing is the' (field: mechanism)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "EVIDENCE [ev:load-distribution] | RECORD \"the load is HEAVY-TAILED \u2014 median 0.6 kg/h but P95 = 3.6 kg/h and P99 = \" | COMPUTATION P95 (3.6 kg/h) is 6x the average design capacity (0.6 kg/h), meaning f",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "basis": "The candidate claims 61% of clogging events occur during high-load episodes, yet predicts clogging events will fall from 4.1 to below 1.0, which is mathematically impossible given that high-load episodes alone cause more than half of current clogs. GROUNDED_IN: EVIDENCE [ev:episode-clog] | RECORD \"61 percent of all campaign\" | COMPUTATION 61% of 4.1 clogs = 2.5 clogs from high-load episodes alone, making a reduction to below 1.0 total clogs impossible | SCOPE The candidate's own evidence contradicts its predicted effect",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "evidence",
+       "ground": "bundle item '18-month suspended-solids load study: the load is HEAVY-TAILED \u2014 median 0.6 kg/h but P95 = 3.6 kg/h and P99 = 6.1 kg/h (episodic descaling-line failures dump 6x the median for 2-6 hours, 14 events recorded); average-sized filters blind and bypass during exactly these episodes' (strong overlap: during, episodes, events, load)",
+       "verified": true
+      },
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['61', '4.1', '1.0', '61', '61', '4.1']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'fall from to below' (field: predicted_effect)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "EVIDENCE [ev:episode-clog] | RECORD \"61 percent of all campaign\" | COMPUTATION 61% of 4.1 clogs = 2.5 clogs from high-load episodes alone, making a reduction to below 1.0 total clogs impossible | SCOP",
+     "absence_ground": false
+    }
+   }
+  ],
+  "counts": {
+   "KILL": 2,
+   "RISK": 2,
+   "SURVIVE": 0,
+   "ABSTAIN_DEMOTED": 2,
+   "INVALID": 0
+  }
+ }
+}

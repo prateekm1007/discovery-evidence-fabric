@@ -1,0 +1,364 @@
+{
+ "attack": {
+  "attack_version": "independent_attack/3.0.0",
+  "candidate_id": "cal-12-standby-nozzle-manifold",
+  "generator_provider": null,
+  "attacker_provider": "zai",
+  "attacker_model": "zai-org/GLM-5.3",
+  "independence_mode": "SEPARATE_CONTEXT",
+  "independence_note": "the attacker ran in an independent reasoning context (fresh adversarial conversation, generator reasoning never shown; no alternative provider credentialed \u2014 disclosed, never claimed as provider separation)",
+  "prompt_hash": "b4e8e5ff4ac2de4c0c28f048ccd489cd34f3ab147e2e485d8e0e305a2e112c94",
+  "output_hash": "76fef2c6c69363832b53bd3dd3d5ddcf80f9cb443816b617550fd328ccc9f2d7",
+  "llm_status": "OK",
+  "ring_pin": {
+   "requested": "zai",
+   "mode": "HARD_PIN_NO_FALLBACK",
+   "served_provider": "zai",
+   "served_model": "zai-org/GLM-5.3",
+   "pin_status": "HARD_PINNED_NO_FALLBACK",
+   "note": "the sealed-corpus measurement pins the attacker ring so the instrument is measured on the ring it declares (rules x ring); production attacks keep the availability cascade"
+  },
+  "attacked_at": "2026-09-17T15:23:06+00:00Z",
+  "items": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "verdict": "ABSTAIN",
+    "basis": "The claimed 0.4 second switchover time is impossible given the physical constraints of hydraulic systems and valve actuation in a 14-bar environment GROUNDED_IN: COMPUTATION <14-bar pressure differential requires significant force to overcome; typical industrial three-way valve actuation times are 0.8-1.2 seconds under such conditions, making 0.4s physically unattainable without violating fluid dynamics principles>",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['0.4', '14', '14', '0.8', '1.2', '0.4']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "COMPUTATION <14-bar pressure differential requires significant force to overcome; typical industrial three-way valve actuation times are 0.8-1.2 seconds under such conditions, making 0.4s physically u",
+     "absence_ground": false
+    },
+    "demoted_from": "KILL",
+    "demotion_layer": "v3_anchor",
+    "anchor": {
+     "rule": "NO_ANCHOR_BINDING",
+     "reason": "the only binding is a numeric relation (computation) \u2014 the weakest binding class, exactly what a false kill constructs (cross-field unit confusion, external constants, reinterpretation); the objection is preserved and escalated, the kill authority withdrawn"
+    }
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "verdict": "KILL",
+    "basis": "The candidate claims \"one standby per position (a simultaneous double failure is out of scope)\" but the boundary condition requires handling all failure modes within the 12 micron crown variation band GROUNDED_IN: SCOPE <the boundary condition clause \"the 0.4 s transient budget is inside the measured roll thermal-inertia limit\" is violated when considering that a simultaneous double failure at adjacent nozzles would cause a crown perturbation exceeding the thermal inertia buffer>",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'position simultaneous double failure' (field: boundary_conditions)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['budget', 'double', 'inertia', 'inside']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "SCOPE <the boundary condition clause \"the 0.4 s transient budget is inside the measured roll thermal-inertia limit\" is violated when considering that a simultaneous double failure at adjacent nozzles ",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "verdict": "ABSTAIN",
+    "basis": "The candidate provides no evidence to support the claim that \"roll's measured thermal inertia carries the flow through the 0.4 s switchover transient with a computed crown perturbation of 1.1 microns\" GROUDNDED_IN: EVIDENCE <none held> | RECORD <\"the roll's measured thermal inertia carries the flow through the 0.4 s switchover transient with a computed crown perturbation of 1.1 microns (inside the 12 micron band with margin)\"> | COMPUTATION <no thermal inertia measurements or calculations provided to verify the 1.1 micron claim>",
+    "grounding": {
+     "grounded": false,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['0.4', '1.1', '0.4', '1.1', '12', '1.1']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'carries the flow through' (field: mechanism)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['inertia', 'inside', 'measured', 'roll']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": null,
+     "absence_ground": true,
+     "demotion_reason": "the asserted ground is an ABSENCE of evidence/support \u2014 absence is uncertainty, not failure (Art. XXI.3/XXV); the objection is preserved and escalated, never executed as a kill"
+    },
+    "demoted_from": "KILL",
+    "demotion_layer": "v2_grounding"
+   },
+   {
+    "attack_class": "BASELINE_EQUIVALENCE",
+    "verdict": "ABSTAIN",
+    "basis": "The candidate claims \"clogging events reaching the strip fall to zero\" but provides no evidence that the standby system can handle all types of clogging mechanisms that affect the baseline system GROUNDED_IN: RECORD <\"clogging events reaching the strip fall to zero (every bridge is bypassed in-service)\"> | COMPUTATION <no comparative data showing elimination of all clogging failure modes that cause the baseline's non-uniform spray>",
+    "grounding": {
+     "grounded": false,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'every bridge is bypassed' (field: predicted_effect)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD <\"clogging events reaching the strip fall to zero (every bridge is bypassed in-service)\"> | COMPUTATION <no comparative data showing elimination of all clogging failure modes that cause the bas",
+     "absence_ground": true,
+     "demotion_reason": "the asserted ground is an ABSENCE of evidence/support \u2014 absence is uncertainty, not failure (Art. XXI.3/XXV); the objection is preserved and escalated, never executed as a kill"
+    },
+    "demoted_from": "KILL",
+    "demotion_layer": "v2_grounding"
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "verdict": "KILL",
+    "basis": "The dual-manifold block design with per-position dP sensing would require 120 additional nozzles plus associated plumbing, valves, and sensors in an already space-constrained mill environment GROUNDED_IN: SCOPE <the boundary condition \"phased in over three planned roll changes (no mill stop)\" is violated as implementing 120 additional nozzles with associated infrastructure cannot be accomplished without mill downtime>",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'phased in over three' (field: intervention)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['position', 'roll', 'scope']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "SCOPE <the boundary condition \"phased in over three planned roll changes (no mill stop)\" is violated as implementing 120 additional nozzles with associated infrastructure cannot be accomplished withou",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "verdict": "ABSTAIN",
+    "basis": "The testable prediction \"measured crown perturbation below 2 microns per event and cumulative below 4 microns per campaign\" doesn't specify measurement methodology, sampling rate, or sensor placement to detect these micron-level variations GROUNDED_IN: RECORD <\"measured crown perturbation below 2 microns per event and cumulative below 4 microns per campaign\"> | COMPUTATION <crown measurement systems typically have resolution limits of 5-10 microns, making 2 micron perturbation detection practically impossible with standard mill equipment>",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['2', '4', '2', '4', '5', '10']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'below microns per event' (field: testable_prediction)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD <\"measured crown perturbation below 2 microns per event and cumulative below 4 microns per campaign\"> | COMPUTATION <crown measurement systems typically have resolution limits of 5-10 microns, ",
+     "absence_ground": false
+    },
+    "demoted_from": "KILL",
+    "demotion_layer": "v3_accommodation",
+    "accommodation": {
+     "rule": "TYPICAL_VALUE_PREMISE",
+     "match": "typically",
+     "reason": "the kill premises an explicitly typical external value \u2014 a world-generalization presented as a ground is an asserted problem, not a found one; the objection is preserved and escalated"
+    }
+   }
+  ],
+  "intervention_suggestions": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "suggestion": "Increase valve actuation time budget to 0.8 seconds and adjust thermal inertia calculations accordingly to account for realistic fluid dynamics at 14-bar pressure GROUNDED_IN: COMPUTATION <14-bar pressure differential requires significant force to overcome; typical industrial three-way valve actuation times are 0.8-1.2 seconds under such conditions>",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['0.8', '14', '14', '0.8', '1.2']",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['budget', 'inertia', 'thermal']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "COMPUTATION <14-bar pressure differential requires significant force to overcome; typical industrial three-way valve actuation times are 0.8-1.2 seconds under such conditions>",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "suggestion": "Implement a redundant standby system for adjacent nozzles to handle simultaneous double failures while maintaining crown variation within the 12 micron band GROUNDED_IN: SCOPE <the boundary condition requires handling all failure modes within the 12 micron crown variation band>",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['12', '12']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'the 12 micron band' (field: mechanism)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['double', 'scope', 'simultaneous', 'standby']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "SCOPE <the boundary condition requires handling all failure modes within the 12 micron crown variation band>",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "suggestion": "Provide thermal inertia measurement data and computational model showing how roll thermal properties maintain crown variation within specifications during switchover events GROUNDED_IN: RECORD <\"the roll's measured thermal inertia carries the flow through the 0.4 s switchover transient with a computed crown perturbation of 1.1 microns\">",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'inertia carries the flow' (field: mechanism)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['inertia', 'measured', 'roll', 'thermal']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD <\"the roll's measured thermal inertia carries the flow through the 0.4 s switchover transient with a computed crown perturbation of 1.1 microns\">",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "BASELINE_EQUIVALENCE",
+    "suggestion": "Conduct comprehensive testing of all clogging mechanisms to demonstrate that the standby system can indeed eliminate all failure modes that cause non-uniform spray in the baseline GROUNDED_IN: RECORD <\"clogging events reaching the strip fall to zero (every bridge is bypassed in-service)\">",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'every bridge is bypassed' (field: predicted_effect)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD <\"clogging events reaching the strip fall to zero (every bridge is bypassed in-service)\">",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "suggestion": "Redesign the dual-manifold system as a modular retrofit that can be installed during scheduled maintenance periods rather than attempting to implement during roll changes GROUNDED_IN: SCOPE <the boundary condition \"phased in over three planned roll changes (no mill stop)\">",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'phased in over three' (field: intervention)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['roll', 'scheduled', 'scope']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "SCOPE <the boundary condition \"phased in over three planned roll changes (no mill stop)\">",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "suggestion": "Specify the measurement methodology, sensor specifications, and calibration procedures for detecting micron-level crown variations during testing GROUNDED_IN: RECORD <\"measured crown perturbation below 2 microns per event and cumulative below 4 microns per campaign\">",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['2', '4']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'below microns per event' (field: testable_prediction)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD <\"measured crown perturbation below 2 microns per event and cumulative below 4 microns per campaign\">",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   }
+  ],
+  "state": "ATTACK_RUN",
+  "overall": "KILLED",
+  "kill_basis": [
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "basis": "The candidate claims \"one standby per position (a simultaneous double failure is out of scope)\" but the boundary condition requires handling all failure modes within the 12 micron crown variation band GROUNDED_IN: SCOPE <the boundary condition clause \"the 0.4 s transient budget is inside the measured roll thermal-inertia limit\" is violated when considering that a simultaneous double failure at adjacent nozzles would cause a crown perturbation exceeding the thermal inertia buffer>",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'position simultaneous double failure' (field: boundary_conditions)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['budget', 'double', 'inertia', 'inside']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "SCOPE <the boundary condition clause \"the 0.4 s transient budget is inside the measured roll thermal-inertia limit\" is violated when considering that a simultaneous double failure at adjacent nozzles ",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "basis": "The dual-manifold block design with per-position dP sensing would require 120 additional nozzles plus associated plumbing, valves, and sensors in an already space-constrained mill environment GROUNDED_IN: SCOPE <the boundary condition \"phased in over three planned roll changes (no mill stop)\" is violated as implementing 120 additional nozzles with associated infrastructure cannot be accomplished without mill downtime>",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'phased in over three' (field: intervention)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['position', 'roll', 'scope']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "SCOPE <the boundary condition \"phased in over three planned roll changes (no mill stop)\" is violated as implementing 120 additional nozzles with associated infrastructure cannot be accomplished withou",
+     "absence_ground": false
+    }
+   }
+  ],
+  "counts": {
+   "KILL": 2,
+   "RISK": 0,
+   "SURVIVE": 0,
+   "ABSTAIN_DEMOTED": 4,
+   "INVALID": 0
+  }
+ }
+}
