@@ -1,0 +1,218 @@
+{
+  "repetition_id": "R1",
+  "started_utc": "2026-09-17T17:49:50Z",
+  "fixtures": [
+    {
+      "fixture_id": "F1",
+      "description": "positive byte verification of the real record title",
+      "expected_verdict": "EVIDENCE_VERIFIED",
+      "observed_verdict": "EVIDENCE_VERIFIED",
+      "pass": true,
+      "details": {
+        "custody": {
+          "query": "TITLE(\"shunt valve\")",
+          "provider": "scopus",
+          "transport_state": "LIVE_200",
+          "at_utc": "2026-09-17T17:49:54Z",
+          "record_id": "105028999493",
+          "fetch_response_sha256": "3563b6cf96871a0c41b72d61f2062d702157859d19c9d8dca9f38a8ee3339ee1",
+          "fetched_text_sha256": "66b3e8db7153159ce4ff670eda9ed8add47c43c69dc5179e5427a9769bdb6888"
+        },
+        "verification": {
+          "claimed_passage_sha256": "87503ed5c2b06d5c08494b02be2574d5056d983aeca3004b30ecdbfc79024ea5",
+          "gate_fetched_text_sha256": "66b3e8db7153159ce4ff670eda9ed8add47c43c69dc5179e5427a9769bdb6888",
+          "claimed_passage_len": 49,
+          "gate_fetched_text_len": 50,
+          "byte_exact_substring": true
+        }
+      }
+    },
+    {
+      "fixture_id": "F2",
+      "description": "hallucinated passage must fail byte verification",
+      "expected_verdict": "EVIDENCE_REFUTED",
+      "observed_verdict": "EVIDENCE_REFUTED",
+      "pass": true,
+      "details": {
+        "hallucinated_passage_sha256": "c0bdcfae824be2bf1b20be886a8051f7fe697312fbee7c697967ac3e92bf9f73",
+        "verification": {
+          "claimed_passage_sha256": "c0bdcfae824be2bf1b20be886a8051f7fe697312fbee7c697967ac3e92bf9f73",
+          "gate_fetched_text_sha256": "66b3e8db7153159ce4ff670eda9ed8add47c43c69dc5179e5427a9769bdb6888",
+          "claimed_passage_len": 156,
+          "gate_fetched_text_len": 50,
+          "byte_exact_substring": false
+        }
+      }
+    },
+    {
+      "fixture_id": "F3",
+      "description": "one-word metamorphic mutation must fail byte verification",
+      "expected_verdict": "EVIDENCE_REFUTED",
+      "observed_verdict": "EVIDENCE_REFUTED",
+      "pass": true,
+      "details": {
+        "mutation": {
+          "from": "valve",
+          "to": "valve (mutated)"
+        },
+        "mutated_sha256": "af7d5647f06014f97b89d25715498c2882b064096a8bf4b0485f4ad9db8fc666",
+        "verification": {
+          "claimed_passage_sha256": "af7d5647f06014f97b89d25715498c2882b064096a8bf4b0485f4ad9db8fc666",
+          "gate_fetched_text_sha256": "66b3e8db7153159ce4ff670eda9ed8add47c43c69dc5179e5427a9769bdb6888",
+          "claimed_passage_len": 59,
+          "gate_fetched_text_len": 50,
+          "byte_exact_substring": false
+        }
+      }
+    },
+    {
+      "fixture_id": "F4",
+      "description": "real passage attributed to a different real record must fail",
+      "expected_verdict": "EVIDENCE_REFUTED",
+      "observed_verdict": "EVIDENCE_REFUTED",
+      "pass": true,
+      "details": {
+        "claimed_record_id": "105028999493",
+        "verified_against_record_id": "105034336633",
+        "verification": {
+          "claimed_passage_sha256": "87503ed5c2b06d5c08494b02be2574d5056d983aeca3004b30ecdbfc79024ea5",
+          "gate_fetched_text_sha256": "5d09ecb2ba811b0abddd9268e040401cf974668377d50b36e5e2057df8b75540",
+          "claimed_passage_len": 49,
+          "gate_fetched_text_len": 67,
+          "byte_exact_substring": false
+        }
+      }
+    },
+    {
+      "fixture_id": "F5",
+      "description": "injected auth failure must yield typed INCOMPLETE, never absence",
+      "expected_verdict": "RETRIEVAL_INCOMPLETE",
+      "observed_verdict": "RETRIEVAL_INCOMPLETE",
+      "pass": true,
+      "details": {
+        "injected_transport_state": "AUTH_FAILED",
+        "collision_verdict": "RETRIEVAL_INCOMPLETE"
+      }
+    },
+    {
+      "fixture_id": "F6",
+      "description": "unscoped patent transport must declare PATENT_BLIND for the run",
+      "expected_verdict": "PATENT_BLIND",
+      "observed_verdict": "PATENT_BLIND_FOR_THIS_RUN",
+      "pass": true,
+      "details": {
+        "declaration": {
+          "transport": "lens_patents",
+          "status": "TOKEN_OUT_OF_SCOPE",
+          "declaration": "PATENT_BLIND_FOR_THIS_RUN",
+          "consequence": "patent-side collision coverage for this run is UNKNOWN; no novelty or collision verdict may rely on patent coverage",
+          "measured_evidence": "R495_TRANSPORT_PROBE.json attempt2 lens 500 'No product in scope' / attempt3 scholarly 401",
+          "probed_at_utc": "2026-09-17T17:49:59Z"
+        }
+      }
+    },
+    {
+      "fixture_id": "F7",
+      "description": "verified zero results must be NO_COLLISION_FOUND with not-novelty annotation",
+      "expected_verdict": "NO_COLLISION_FOUND",
+      "observed_verdict": "NO_COLLISION_FOUND",
+      "pass": true,
+      "details": {
+        "query": "TITLE(\"qqzzxxwbar9\")",
+        "transport_state": "NO_RESULTS",
+        "collision_verdict": "NO_COLLISION_FOUND",
+        "annotation": "NO_COLLISION_FOUND is not novelty; it states only that this query matched zero records in this provider"
+      }
+    },
+    {
+      "fixture_id": "F8",
+      "description": "real prior-art collision detected with byte-verified passage",
+      "expected_verdict": "COLLISION_DETECTED",
+      "observed_verdict": "COLLISION_DETECTED",
+      "pass": true,
+      "details": {
+        "query": "TITLE(\"programmable shunt valve\")",
+        "transport_state": "LIVE_200",
+        "hits_adjudicated": [
+          {
+            "record_id": "105047451570",
+            "relevance": {
+              "relevance_class": "STRING_LEVEL_RELEVANCE",
+              "matched_anchor_terms": [
+                "hydrocephalus",
+                "shunt",
+                "valve"
+              ],
+              "relevant": true
+            },
+            "fetch_state": "LIVE_200",
+            "byte_verdict": "EVIDENCE_VERIFIED",
+            "fetch_response_sha256": "e2e8c6e7f57a4ebfc77333d6f4e53d0fb7c49413f478be50d63aab6934c21cd1"
+          },
+          {
+            "record_id": "105038409104",
+            "relevance": {
+              "relevance_class": "STRING_LEVEL_RELEVANCE",
+              "matched_anchor_terms": [
+                "hydrocephalus",
+                "shunt",
+                "valve"
+              ],
+              "relevant": true
+            },
+            "fetch_state": "LIVE_200",
+            "byte_verdict": "EVIDENCE_VERIFIED",
+            "fetch_response_sha256": "377ffb57581f341b8ddcbbe2d7bc5c9d931a3b77d57cf591b375495454fcb441"
+          },
+          {
+            "record_id": "105046685237",
+            "relevance": {
+              "relevance_class": "STRING_LEVEL_RELEVANCE",
+              "matched_anchor_terms": [
+                "shunt",
+                "valve"
+              ],
+              "relevant": true
+            },
+            "fetch_state": "LIVE_200",
+            "byte_verdict": "EVIDENCE_VERIFIED",
+            "fetch_response_sha256": "2e72896efd61e3f683723421e0ebbb190be0410a79a156ee74ea32a5af3e818b"
+          }
+        ]
+      }
+    }
+  ],
+  "engine": "rbg_gate.py",
+  "verdict_vocabulary": "no novelty verdict exists (Art. XLVI)",
+  "anchor_record_custody": {
+    "query": "TITLE(\"shunt valve\")",
+    "provider": "scopus",
+    "transport_state": "LIVE_200",
+    "at_utc": "2026-09-17T17:49:54Z",
+    "record_id": "105028999493",
+    "fetch_response_sha256": "3563b6cf96871a0c41b72d61f2062d702157859d19c9d8dca9f38a8ee3339ee1",
+    "fetched_text_sha256": "66b3e8db7153159ce4ff670eda9ed8add47c43c69dc5179e5427a9769bdb6888"
+  },
+  "patent_blindness_declaration": {
+    "transport": "lens_patents",
+    "status": "TOKEN_OUT_OF_SCOPE",
+    "declaration": "PATENT_BLIND_FOR_THIS_RUN",
+    "consequence": "patent-side collision coverage for this run is UNKNOWN; no novelty or collision verdict may rely on patent coverage",
+    "measured_evidence": "R495_TRANSPORT_PROBE.json attempt2 lens 500 'No product in scope' / attempt3 scholarly 401",
+    "probed_at_utc": "2026-09-17T17:49:59Z"
+  },
+  "ended_utc": "2026-09-17T17:50:07Z",
+  "observed_verdict_sequence": [
+    "EVIDENCE_VERIFIED",
+    "EVIDENCE_REFUTED",
+    "EVIDENCE_REFUTED",
+    "EVIDENCE_REFUTED",
+    "RETRIEVAL_INCOMPLETE",
+    "PATENT_BLIND_FOR_THIS_RUN",
+    "NO_COLLISION_FOUND",
+    "COLLISION_DETECTED"
+  ],
+  "verdict_sequence_sha256": "db336e97c8c42b06b5fffec6ff1872e6bf625cc5773439bd24b100d6aa684cd8",
+  "all_fixtures_pass": true,
+  "reviewer_provenance": "AI_REVIEW"
+}
