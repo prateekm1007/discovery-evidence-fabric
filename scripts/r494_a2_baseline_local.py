@@ -54,13 +54,13 @@ sys.path.insert(0, str(REPO))
 import r493_a2_baseline as baseline  # noqa: E402
 
 CORPUS_PATH = REPO / "R492" / "A2_DEV_CORPUS" / "CORPUS.json"
-RAW_DIR = REPO / "R493" / "A2_BASELINE" / "RAW"
+RAW_DIR = REPO / "R493" / "A2_BASELINE_ZAI_GATEWAY" / "RAW"
 GATEWAY = REPO / "scripts" / "zai_gateway.mjs"
 PINNED_PROVIDER = "zai"          # the registry slot whose default URL is
 #                                 the local gateway (127.0.0.1:8787)
 DEPLOYED_IDENTITY = "dedca4468fcc00b004993fc729762cd6e8cf02f2"
-MEASUREMENT_RESULTS = REPO / "R493" / "A2_BASELINE" / \
-    "MEASUREMENT_RESULTS_LOCAL_RING.json"
+MEASUREMENT_RESULTS = REPO / "R493" / "A2_BASELINE_ZAI_GATEWAY" / \
+    "MEASUREMENT_RESULTS.json"
 
 
 def _log(msg: str) -> None:
@@ -90,7 +90,7 @@ def _start_gateway(port: int, key: str) -> subprocess.Popen:
     time.sleep(1)
     env = dict(os.environ)
     env["ZAI_GATEWAY_KEY"] = key
-    log_path = REPO / "R493" / "A2_BASELINE" / "gateway.log"
+    log_path = REPO / "R493" / "A2_BASELINE_ZAI_GATEWAY" / "gateway.log"
     log_path.parent.mkdir(parents=True, exist_ok=True)
     log = open(log_path, "w")
     proc = subprocess.Popen(
@@ -209,6 +209,7 @@ def run(pace: int, limit: int, resume: bool, port: int) -> int:
 def score() -> int:
     # the sibling's scoring, imported verbatim — pointed at the same
     # RAW dir it already reads (R493/A2_BASELINE/RAW)
+    baseline.RAW_DIR = RAW_DIR   # the ring-separated RAW (the union)
     results = baseline.score()
     results["report_version"] = "r494-a2-baseline-local/1.0.0"
     results["instrument"] = (
@@ -233,10 +234,16 @@ def score() -> int:
         "cost_policy": "ENGINE_MODEL_COST_POLICY=UNRESTRICTED (the R451 "
                        "vocabulary's recorded override for the "
                        "environment grant)",
+        "ring_independence_note": (
+            "the sibling line's baseline (R493/A2_BASELINE, the deployed "
+            "transport, ring-pinned xkiro) measured the SAME true number "
+            "on a different ring — the before-number is RING-INDEPENDENT"),
         "union_note": (
-            "RAW markers live in the sibling's own R493/A2_BASELINE/RAW/ "
-            "— the sibling's --resume treats them as done; the scoring "
-            "is the sibling's score() imported verbatim (Art. XXVII)"),
+            "RAW markers live in the ring-separated R493/"
+            "A2_BASELINE_ZAI_GATEWAY/RAW/ (the union reconciliation of "
+            "race instance 12: the sibling's xkiro records hold R493/"
+            "A2_BASELINE/RAW/; the scoring is the sibling's score() "
+            "imported verbatim — Art. XXVII)"),
     }
     MEASUREMENT_RESULTS.write_text(json.dumps(results, indent=1,
                                               default=str))
