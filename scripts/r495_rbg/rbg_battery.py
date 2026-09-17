@@ -74,6 +74,10 @@ def run_battery(repetition_id):
            "started_utc": g._now(),
            "fixtures": [],
            "engine": "rbg_gate.py",
+           "battery_version": "2",
+           "battery_version_note": "v2 adds the R496 patent transport layer (Lens + PatSnap, "
+                                   "self-measuring) and fixture F9 (key presence != transport "
+                                   "liveness); v1 (R495 seal) used the single Lens class",
            "verdict_vocabulary": "no novelty verdict exists (Art. XLVI)"}
     t = g.ScopusTransport()
 
@@ -168,17 +172,36 @@ def run_battery(repetition_id):
             bad_state in (g.T_AUTH_FAILED, g.T_SEARCH_FAILED) and cv == g.V_INCOMPLETE,
             {"injected_transport_state": bad_state, "collision_verdict": cv})
 
-    # F6 patent-blindness declaration per run (operator's stated alternative).
-    # Both honest blindness states are accepted: RETRIEVAL_UNCONFIGURED (no
-    # key injected) and TOKEN_OUT_OF_SCOPE (key present, measured 500/401 --
-    # see R495_TRANSPORT_PROBE.json). Either way the run is patent-blind.
-    lens = g.LensPatentTransport()
-    decl = lens.blind_declaration()
-    blind_ok = decl["status"] in ("TOKEN_OUT_OF_SCOPE", g.T_UNCONFIGURED)
-    fixture("F6", "unscoped patent transport must declare PATENT_BLIND for the run",
+    # F6 patent-blindness invariant with BOTH registered keys present: the
+    # layer self-measures both providers; since neither opens (Lens
+    # out-of-scope measured R495; PatSnap recognized-but-unopenable measured
+    # R496), the declaration MUST fire. When a provider someday measures
+    # LIVE, this fixture honestly fails and prompts a disclosed fixture
+    # update (Art. VII: reality changed, never silently).
+    layer = g.PatentTransportLayer()  # re-measures both providers live
+    decl = layer.blind_declaration()
+    blind_ok = (decl["declaration"] == "PATENT_BLIND_FOR_THIS_RUN"
+                and not decl["live_providers"]
+                and decl["consequence"] is not None)
+    fixture("F6", "no openable patent transport (both keys present) must declare PATENT_BLIND",
             g.V_BLIND, decl["declaration"], blind_ok,
             {"declaration": decl})
     rep["patent_blindness_declaration"] = decl
+
+    # F9 adversarial (R496): KEY PRESENCE IS NOT TRANSPORT LIVENESS. A
+    # present-but-unopenable credential must NOT unblind the run and must
+    # NOT be reported as a live transport by any surface.
+    unblind_attempt = (layer.status() != g.T_LIVE
+                       and layer.live_providers() == []
+                       and all(v["status"] != g.T_LIVE
+                               for v in decl["provider_measurements"].values()))
+    fixture("F9", "present-but-unopenable credential must not unblind the run",
+            "BLINDNESS_RETAINED", "BLINDNESS_RETAINED" if unblind_attempt else "UNBLINDED_ILLEGITIMATELY",
+            unblind_attempt,
+            {"aggregate_status": layer.status(),
+             "provider_measurements": dict(layer.measured),
+             "attack_description": "coder treats key presence as transport liveness and "
+                                   "silently drops the blindness declaration"})
 
     # F7 honest zero results: typed NO_RESULTS, verdict NO_COLLISION_FOUND,
     # with the explicit not-novelty annotation (Art. XXI.2 / XLVI / XXVIII)

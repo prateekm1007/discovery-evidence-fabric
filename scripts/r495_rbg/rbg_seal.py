@@ -54,10 +54,10 @@ def run_repetitions(out_dir, n_reps):
     return reps
 
 
-def compute_seal(reps, n_reps):
+def compute_seal(reps, n_reps, round_label="R495"):
     complete = [r for r in reps if not r.get("process_failed")]
     seal = {
-        "seal_id": "R495_RBG_SEAL",
+        "seal_id": "%s_RBG_SEAL" % round_label,
         "seal_path": "repetition_based_measurement",
         "unanimity_rule": "all fixtures pass in all repetitions AND identical "
                           "verdict sequences across every repetition",
@@ -86,16 +86,23 @@ if __name__ == "__main__":
     n_reps = 3
     if "--reps" in sys.argv:
         n_reps = int(sys.argv[sys.argv.index("--reps") + 1])
+    round_label = "R495"
+    if "--round" in sys.argv:
+        round_label = sys.argv[sys.argv.index("--round") + 1]
     reps = run_repetitions(out_dir, n_reps)
-    seal = compute_seal(reps, n_reps)
+    seal = compute_seal(reps, n_reps, round_label)
     record = {"seal_record": seal, "repetitions": reps,
+              "battery_version_note": "battery_version recorded per repetition (v1 = R495 "
+                                      "8-fixture corpus; v2 = R496 9-fixture corpus with the "
+                                      "multi-provider patent layer + F9)",
               "seal_statement": (
                   "Sealed by repetition-based measurement: %d independent fresh-process "
                   "repetitions of the live-retrieval battery, unanimous verdict sequences, "
                   "per-repetition sequence hashes recorded." % n_reps) if seal["sealed"]
               else "NOT SEALED: the unanimity rule was not met; recorded honestly.",
               "directive_anchor": "repetition-based measurement is the only honest seal path"}
-    path = os.path.join("/home/z/my-project/download/R495", "R495_RBG_SEAL_RECORD.json")
+    path = os.path.join("/home/z/my-project/download", round_label,
+                        "%s_RBG_SEAL_RECORD.json" % round_label)
     with open(path, "w") as fh:
         json.dump(record, fh, indent=2)
     print(json.dumps({"sealed": seal["sealed"],

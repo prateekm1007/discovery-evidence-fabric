@@ -210,37 +210,142 @@ class ScopusTransport:
         return T_LIVE, title + "\n" + abstract, meta
 
 
-class LensPatentTransport:
-    """Lens.org patent transport. Measured live at R495: the operator token
-    carries no product scope (patents endpoint -> HTTP 500 'No product in
-    scope'; scholarly endpoint -> HTTP 401). With no scoped patent transport,
-    the patent side declares PATENT_BLIND per run -- the operator's stated
-    alternative (configure Lens OR declare patent-blindness per run)."""
+PATSNAP_COUNT_URL = "https://connect.patsnap.com/search/patent/query-search-count"
+LENS_PATENT_SEARCH_URL = "https://api.lens.org/patents/search"
 
-    name = "lens_patents"
-    scoped = False  # measured 2026-09-18; see R495_TRANSPORT_PROBE.json attempt2/attempt3
 
-    def configured(self):
-        return bool(os.environ.get("LENS_API_KEY", ""))
+class PatentTransportLayer:
+    """Multi-provider patent transport (Lens + PatSnap), SELF-MEASURING at
+    runtime -- provider statuses are never hardcoded claims, they are
+    re-measured per run (repetition-based measurement discipline; Art. VI:
+    no manufactured provenance).
 
+    Measured history:
+      Lens (R495): the operator token carries NO product scope -- patents
+        endpoint HTTP 500 'No product in scope', scholarly 401.
+      PatSnap (R496): the operator's sk- apikey is RECOGNIZED by the gateway
+        (body error 67200202 'apikey auth error' vs 67200008 'apikey not
+        Pass' for a garbage key) but completes NO auth exchange reachable
+        from the session: /auth is gone (67200101 'Path Not Found'),
+        /oauth/token rejects every standard grant (67200015 'Grant type
+        error'), and the Space secret surface (names-only, Art. LXXIII)
+        registers no companion app_id. KEY PRESENCE IS NOT TRANSPORT
+        LIVENESS -- a present-but-unopenable credential must NOT unblind
+        the run.
+
+    The operator's directive branch is 'configure Lens OR declare
+    patent-blindness per run'; the layer declares PATENT_BLIND unless a
+    provider measures LIVE. A LIVE PatSnap count endpoint yields a typed
+    COUNT SIGNAL ONLY (Art. XXI.1: a count is not relevance and not
+    novelty; record-level byte verification needs the record-list endpoint,
+    which is not configured)."""
+
+    name = "patent_layer"
+    PATSNAP_RECOGNIZED = "KEY_RECOGNIZED_AUTH_NOT_OPENED"
+
+    def __init__(self, lens_key=None, patsnap_key=None, measure=True):
+        self.lens_key = lens_key if lens_key is not None else os.environ.get("LENS_API_KEY", "")
+        self.patsnap_key = patsnap_key if patsnap_key is not None else os.environ.get("PATSNAP_API_KEY", "")
+        self.measured = {}
+        if measure:
+            self.measure()
+
+    # ---- runtime measurement (cheap: <=2 calls, paced) ----
+    def measure(self):
+        self.measured = {}
+        self.measured["lens"] = self._measure_lens()
+        self.measured["patsnap"] = self._measure_patsnap()
+        return self.measured
+
+    def _measure_lens(self):
+        if not self.lens_key:
+            return {"status": T_UNCONFIGURED, "evidence": "LENS_API_KEY absent"}
+        body = json.dumps({"query": {"match": "shunt valve"}, "size": 1, "from": 0}).encode()
+        code, raw = _http_post(LENS_PATENT_SEARCH_URL, body,
+                               {"Content-Type": "application/json",
+                                "Authorization": "Bearer " + self.lens_key})
+        if code == 200:
+            return {"status": T_LIVE, "evidence": "lens patents/search HTTP 200"}
+        detail = raw.decode(errors="replace")[:140] if raw else ""
+        if "No product in scope" in detail:
+            return {"status": "TOKEN_OUT_OF_SCOPE",
+                    "evidence": "lens patents/search HTTP %d 'No product in scope'" % code}
+        if code in (401, 403):
+            return {"status": T_AUTH_FAILED, "evidence": "lens HTTP %d" % code}
+        return {"status": T_SEARCH_FAILED, "evidence": "lens HTTP %s %s" % (code, detail)}
+
+    def _measure_patsnap(self):
+        if not self.patsnap_key:
+            return {"status": T_UNCONFIGURED, "evidence": "PATSNAP_API_KEY absent"}
+        time.sleep(POLITE_PACE_S)
+        body = json.dumps({"collapse_order": "LATEST", "collapse_by": "PBD",
+                           "collapse_type": "DOCDB",
+                           "query_text": "TACD: shunt valve"}).encode()
+        code, raw = _http_post(PATSNAP_COUNT_URL, body,
+                               {"Authorization": "Bearer " + self.patsnap_key,
+                                "Content-Type": "application/json"})
+        try:
+            payload = json.loads(raw) if raw else {}
+        except Exception:  # noqa: BLE001
+            payload = {}
+        err = payload.get("error_code")
+        if payload.get("status") is True and code == 200:
+            count = (payload.get("data") or {}).get("count")
+            return {"status": T_LIVE, "count_signal": count,
+                    "evidence": "patsnap query-search-count HTTP 200 status=true count=%s" % count}
+        if err == 67200202:
+            return {"status": self.PATSNAP_RECOGNIZED,
+                    "evidence": "patsnap HTTP %d 67200202 'apikey auth error' -- key "
+                                "recognized, no reachable exchange (R496 probe)" % code}
+        if err == 67200008:
+            return {"status": T_AUTH_FAILED,
+                    "evidence": "patsnap HTTP %d 67200008 'apikey not Pass'" % code}
+        return {"status": T_SEARCH_FAILED,
+                "evidence": "patsnap HTTP %s err=%s" % (code, err)}
+
+    # ---- typed aggregate state (Art. XXV: unknowns stay typed) ----
     def status(self):
-        if not self.configured():
+        if not self.measured:
+            self.measure()
+        states = [v["status"] for v in self.measured.values()]
+        if T_LIVE in states:
+            return T_LIVE
+        if any(s in (T_UNCONFIGURED,) for s in states) and \
+           all(s in (T_UNCONFIGURED,) for s in states):
             return T_UNCONFIGURED
-        if not self.scoped:
-            return "TOKEN_OUT_OF_SCOPE"
-        return T_LIVE
+        if any(s in (self.PATSNAP_RECOGNIZED, T_AUTH_FAILED, T_SEARCH_FAILED,
+                     "TOKEN_OUT_OF_SCOPE") for s in states):
+            return "AUTH_INCOMPLETE"
+        return "AUTH_INCOMPLETE"
+
+    def live_providers(self):
+        if not self.measured:
+            self.measure()
+        return [k for k, v in self.measured.items() if v["status"] == T_LIVE]
 
     def blind_declaration(self):
-        """The per-run patent-blindness declaration (Art. XXV: unknown stays
-        unknown; Art. XLVI: blindness is never folded into a novelty claim)."""
+        """The per-run patent-blindness declaration (Art. XXV/XXVIII/XLVI).
+        FIRES whenever no provider measures LIVE -- including the adversarial
+        case where credentials are present but no transport opens."""
+        live = self.live_providers()
         return {
             "transport": self.name,
             "status": self.status(),
-            "declaration": "PATENT_BLIND_FOR_THIS_RUN",
-            "consequence": "patent-side collision coverage for this run is UNKNOWN; "
-                           "no novelty or collision verdict may rely on patent coverage",
-            "measured_evidence": "R495_TRANSPORT_PROBE.json attempt2 lens 500 "
-                                 "'No product in scope' / attempt3 scholarly 401",
+            "live_providers": live,
+            "provider_measurements": dict(self.measured),
+            "declaration": "PATENT_BLIND_FOR_THIS_RUN" if not live else None,
+            "consequence": (None if live else
+                            "patent-side collision coverage for this run is UNKNOWN; "
+                            "no novelty or collision verdict may rely on patent coverage"),
+            "measured_evidence": ("R495_TRANSPORT_PROBE.json lens 500 'No product in "
+                                  "scope'/scholarly 401; R496_PATSNAP_PROBE.json patsnap "
+                                  "67200202 recognized-but-unopenable, /auth 67200101, "
+                                  "/oauth/token 67200015, Space secret surface names-only []"),
+            "missing_for_unblinding": "a PatSnap companion app_id/client_id (or a "
+                                      "bearer-capable token) paired with the registered "
+                                      "app_key -- the single registered key completes no "
+                                      "documented exchange (Art. LXXIII escalation names "
+                                      "exactly this gap)",
             "probed_at_utc": _now(),
         }
 

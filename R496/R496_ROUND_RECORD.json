@@ -1,0 +1,72 @@
+{
+  "round_id": "R496",
+  "round_record": "R496_ROUND_RECORD.json",
+  "created_utc": "2026-09-18T00:00:00Z",
+  "operator_directive_summary": "PAT supplied ('push it using PAT, don't pester me to revoke it; remind me when you need it'); 'Read your constitution'; PatSnap open platform apikey supplied with the query-search-count curl (the 'configure' branch of the patent-transport rule); the parallel line's re-audit at 08cabf27 received (overall 5/10, FPR 1.0->0.0, TPR now binds, next items named).",
+  "constitution_read": {
+    "version": "2.6.0",
+    "sha256_8": "17464afd",
+    "lines": 2225,
+    "method": "v2.4.0 read IN FULL at R495 (b54a1be9); the 2.4.0->2.6.0 delta verified MECHANICALLY this round (diff against the R451-era bytes: exactly 1 version line + 74 added lines) and the delta read in full: Article LXXIII (Operator Secrets Registry — look up env, then the local vault .secrets.env, then the Space secret surface NAMES ONLY, before ever asking the operator; ask must name exactly which registered names were absent) and Article LXXIV (Observer-Independent Durable Execution — UNKNOWN never collapsed into FAILED; typed observation states)."
+  },
+  "baseline_record": {
+    "realign": "STALE_LOCAL_CHECKOUT (09b44c50, R451-era) REALIGNED per Art. XXII: fetched with the operator PAT, reset to origin/main == 08cabf27 (== the re-audit's HEAD), 1 untracked sandbox residue quarantined to r496_quarantine/ (outside the repo)",
+    "head_after_realign": "08cabf27"
+  },
+  "lxxiii_vault": {
+    "created": "/home/z/my-project/.secrets.env (0600, outside every repository, never committed/printed/shipped)",
+    "registered": ["GITHUB_TOKEN", "PATSNAP_API_KEY", "LENS_API_KEY", "ELSEVIER_API_KEY"],
+    "fingerprints_only": true
+  },
+  "delivery_of_r495": {
+    "status": "PUSHED_AND_LS_REMOTE_VERIFIED",
+    "commit": "54800a4",
+    "content": "scripts/r495_rbg/ (gate + battery + seal driver) + R495/ records (round record, transport probe, seal record, 3 repetitions), exactly as sealed at R495 — the lift-in of the previously DELIVERY_BLOCKED round (escalation 2 closed on the push leg)",
+    "credential_scan": "staged set scanned for token material: CLEAN (BS-021)"
+  },
+  "patsnap_transport": {
+    "probe_ledger": "R496/R496_PATSNAP_PROBE.json (attempt 1 + attempt 2 + auth-shape matrix, all typed)",
+    "measured_findings": [
+      "the operator's sk- apikey is RECOGNIZED by the PatSnap gateway: query-search-count returns HTTP 200 with body error 67200202 'apikey auth error!', DISTINCT from the 67200008 'apikey not Pass and call failed!' a garbage key draws (injected control)",
+      "no auth exchange reachable from this session completes with the single registered key: /auth (GET+POST) -> 67200101 'Path Not Found'; /api/auth -> 67200008; /oauth/token with grant_type client_credentials (both client_id/client_secret and app_id/app_key shapes) and an apikey grant -> 67200015 'Grant type error!'",
+      "Space secret surface (names only, Art. LXXIII step 3): [] — no companion app_id/client_id registered on the canonical production Space",
+      "vault (Art. LXXIII step 2): only the single sk- key is registered — no companion value exists to consult"
+    ],
+    "classification": "PATSNAP KEY_RECOGNIZED_AUTH_NOT_OPENED — key presence is NOT transport liveness; the patent side REMAINS PATENT_BLIND for this run, with the missing piece named exactly (Art. LXXIII): a companion app_id/client_id (or a bearer-capable token) paired with the registered app_key, or the working auth curl for this key class",
+    "operator_reminder_owed": true
+  },
+  "instrument_upgrade": {
+    "what": "LensPatentTransport REPLACED by PatentTransportLayer (Art. LXIV: superseded implementation retired in the same change; zero remaining references) — a multi-provider patent layer (Lens + PatSnap) that SELF-MEASURES both providers at runtime and derives the aggregate state: LIVE if any provider opens; AUTH_INCOMPLETE if credentials present but none opens; RETRIEVAL_UNCONFIGURED if none present",
+    "battery_version": "2",
+    "new_fixture_F9": "adversarial: present-but-unopenable credentials must NOT unblind the run — key presence must never be reported as transport liveness by any surface; attack described in-record ('coder treats key presence as liveness and silently drops the declaration')",
+    "F6_reanchored": "the blindness invariant is asserted against live re-measurement of both providers per repetition; if a provider someday measures LIVE, F6 honestly fails and prompts a disclosed fixture update (Art. VII)"
+  },
+  "seal_record": {
+    "path": "R496/R496_RBG_SEAL_RECORD.json",
+    "sealed": true,
+    "battery_version": "2",
+    "repetitions": 3,
+    "unanimity": true,
+    "agreed_verdict_sequence": ["EVIDENCE_VERIFIED", "EVIDENCE_REFUTED", "EVIDENCE_REFUTED", "EVIDENCE_REFUTED", "RETRIEVAL_INCOMPLETE", "PATENT_BLIND_FOR_THIS_RUN", "BLINDNESS_RETAINED", "NO_COLLISION_FOUND", "COLLISION_DETECTED"],
+    "statement": "Sealed by repetition-based measurement: 3 independent fresh-process repetitions of battery v2 (live re-measurement of BOTH patent providers inside every repetition), unanimous verdict sequences, all 9 fixtures pass 3/3 — including the new adversarial fixture F9."
+  },
+  "production_deployment": {
+    "target_sha": "R496 commit (this round's records ride the next behavior deploy, R482 records-ride-next-deploy convention — the same accepted shape the re-audit found GREEN at 08cabf27/562c4ff0)",
+    "deployed_sha": "562c4ff00a1bdbee778d5d30e340b96181c06abb",
+    "health_check_result": "GREEN (measured live this round: /api/health ok=true discovery_ready=true; xkiro HEALTHY 5 models, unorouter DEGRADED, apinex UNKNOWN, localqwen UNAVAILABLE — matches the re-audit ring picture; /api/version constitution_version 2.6.0)",
+    "drift": "RECORDS_RIDE_NEXT_DEPLOY (behavior-current by design; not DRIFT under the R482 convention)",
+    "blocked_by": null,
+    "what_unblocks": "the next behavior deploy of the parallel line carries this records commit"
+  },
+  "relation_to_the_r494_reaudit": {
+    "p0_item_touched": "collisions incomplete (Lens 401) — this round measured the patent-transport boundary to the exact error code and proved the gate cannot be silently unblinded by an unopenable key; the collision instrument's patent leg is now a measured, typed, adversarially-pinned surface awaiting ONE credential piece",
+    "not_touched_on_purpose": "v4.2 attacker-computes, ring funding, REAL packet, ZIP, inventory regen — the parallel line's / owner's lanes; no overlap, no duplicate work",
+    "score_deltas_claimed_this_round": "none claimed — the RBG is instrument-side; dimension movement requires the calibration runs the re-audit already scoped"
+  },
+  "reviewer_provenance": "AI_REVIEW",
+  "unknowns_remaining": [
+    "the correct PatSnap auth flow for the registered key class (owner reminder issued once, with the exact missing names)",
+    "patent-side record-level byte verification: the count endpoint alone cannot bind passages (typed COUNT_SIGNAL_ONLY, Art. XXI.1) — needs the record-list endpoint once auth opens",
+    "everything the re-audit already prices: TPR calibration, second strong ring, REAL loop, fresh ZIP, independent scoring"
+  ]
+}
