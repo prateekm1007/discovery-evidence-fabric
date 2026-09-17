@@ -1963,3 +1963,22 @@ Stage Summary:
 - Deliverables: R487/ATTACKER_V3_CALIBRATION/ (MEASUREMENT_RESULTS + MEASUREMENT + SEAL + 21 RAW records), the shipped calibration records + DIGESTS pins, scripts/r487_live_proof_crossdomain.py, .gitattributes, R487/R487_ROUND_RECORD.json.
 - DELIVERY: pushed (PAT survived, fingerprint-gated); the REDEPLOY is DELIVERY_BLOCKED on HF_TOKEN (escalation 1; what_unblocks: operator re-supplies HF_TOKEN -> scripts/r487_space_deploy.py). The deployed instrument (7d38eb4e) is already the measured v3 build.
 - The cross-domain proof (ts_f0880e025e60, mechanical M1) is the decisive open item — durable, harvestable, observer-independent.
+
+---
+Task ID: R489
+Agent: Super Z (main session — Coder line)
+Task: R489 — observe the in-flight cross-domain run ts_f0880e025e60 to its TERMINAL outcome and record it honestly (the auditor's discipline: no premature scoring, no interference).
+
+Work Log:
+- Synced to 483af92 (the R487/R488 union, race instance 8; the parallel line's own 21/22 replication preserved + their durable cross-domain launch).
+- The launch session's capability file was lost with its container (BS-021: no recoverable copy by design; the run API is owner-gated) — observation switched to the DURABLE BRANCH (the R481 authority), git-authenticated via the PAT.
+- scripts/r489_crossdomain_durable_harvest.py: SESSION-ID-VERIFIED durable harvest (17/17 journal rows carry ts_f0880e025e60 — never a slug heuristic), reading the same fields the committed _durable_harvest reads, then applying the COMMITTED outcome-typing conditions verbatim. Poll cadence: durable checkpoints at 09:34Z (through PHYSICS) and 09:44Z (the full gauntlet + terminal facts).
+- TERMINAL OUTCOME (all 17 stages COMPLETED 09:21:42 -> 09:36:32Z): final_status REJECTED — "adversarial challenge failed: obvious_combination: KILLED"; epistemic_state CANDIDATE_CONNECTION; premise PREMISE_COHERENT; evidence_verified true (doi:10.1115/imece2017-71399, span-verbatim, 884 chars); prior_art UNRESOLVED_INSUFFICIENT_EVIDENCE with the V4 firewall override holding (OVERRIDE_KILL_TO_SURVIVE — a non-kill prior-art state cannot become a kill, recorded).
+- WHY NO LOOP: mechanism_space NO_CANDIDATES (0); one candidate synthesized on xkiro/qwen3.8-max:free (substituted_from atria); the 8-dimension gauntlet killed on obvious_combination (same substituted free leg, latency 5179ms); killer_experiment falsification_test_from_candidate; IMPROVE DEFERRED_TO_KILL_POINT (delta_real false) — the run terminated before any improve execution. Collision searches: mandatory_complete false, 10 provider errors — novelty honestly UNRESOLVED_INSUFFICIENT_EVIDENCE (provider failure never becomes absence, Art. XXI.3).
+- TYPED OUTCOME (committed logic, verbatim): STAGE_DEFERRED_TO_KILL_POINT -> NOT_CROSS_DOMAIN_CLOSURE. The run's own problem.json declares NO canonical family (the POST /api/run text-only submission path gap) — the comparison is REPORTED, never asserted.
+- COMPOSITION FINDING (byte-sourced): the terminal rejection authority in the conductor's ATTACK->CLASSIFY path is the A2 adversarial gauntlet (a2/adversarial.py 8 dimensions + V4 corrections; a2/classify.py:231-236 builds the exact reason string) — a DIFFERENT attacker from the sealed-bar-calibrated engine independent_attack (gate wired at run.py:1512/3132, improve_stage.py:323). The R417 calibration does NOT gate the attacker that terminally rejects runs pre-loop. Two named options recorded for the owner (A2 earns its own DEV-corpus calibration per Art. LIX, or the calibration scope is constitutionally recorded as engine-instrument-scoped); NOT fixed unilaterally (Art. XXVII/L).
+- Records: R487/LIVE_PROOF_CROSSDOMAIN.json (the committed driver's canonical OUT path) + R489/R489_ROUND_RECORD.json + R489/CROSSDOMAIN_DURABLE_HARVEST.json. No engine behavior changed; no threshold touched; the run was never interfered with.
+
+Stage Summary:
+- The cross-domain lever is ANSWERED for this attempt: negative, fully provenanced — the mechanical-family run terminated pre-loop on a degraded ring (the free leg served synthesis AND attack; atria substituted out; collision degraded), and the loop never existed to close. The (rules x ring) finding now spans calibration AND the run-level reject path. Remaining 7->9 gap: cross-domain repetition (next attempt: family in the submission, healthy ring), any package, rebuild proof, baseline-win ruling.
+- reviewer_provenance=AI_REVIEW
