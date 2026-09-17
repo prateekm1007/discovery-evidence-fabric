@@ -46,7 +46,7 @@ from .run_state import (OUTCOME_KILLED_BY_CHALLENGE,
 # Machine -> user translation (CEO directive 2). The machine taxonomy
 # stays intact internally; this is the product-surface projection.
 _TRANSPORT_ERRORS = ("ERROR_TRANSPORT", "RUN_BLOCKED_TRANSPORT")
-_ENGINE_ERRORS = ("ERROR_BUILD", "ERROR_RUN", "ERROR_STUCK")
+_ENGINE_ERRORS = ("ERROR_BUILD", "ERROR_RUN")
 
 _USER_STATE_LABELS = {
     "RUNNING": "Running",
@@ -69,6 +69,10 @@ _USER_STATE_LABELS = {
     "COMPLETED_UNKNOWN": "Completed — outcome unknown",
     "AWAITING_CLARIFICATION": "Action needed — answer Toscanini's question below",
     "INTERRUPTED": "Interrupted — recoverable",
+    # Article LXXIV (Constitution v2.6.0): UNKNOWN is first-class,
+    # never rendered as a failure (observation failure ≠ execution
+    # failure).
+    "UNKNOWN_STALLED": "Stalled — outcome unknown, not a failure",
     "BLOCKED_TRANSPORT": "Blocked by infrastructure — saved and resumable",
     "FAILED_TRANSPORT": "Failed — transport",
     "FAILED_ENGINE": "Failed — engine",
@@ -147,6 +151,14 @@ _USER_STATE_EXPLANATIONS = {
     "FAILED_ENGINE": ("The engine itself failed during the run (build or "
                       "pipeline stage). The failure is recorded in the "
                       "run's artifacts; retryable."),
+    # Article LXXIV (Constitution v2.6.0): a stalled feed is not a
+    # verdict — UNKNOWN is first-class and distinct from FAILED.
+    "UNKNOWN_STALLED": ("The worker stopped reporting progress, so the "
+                        "run's outcome is genuinely unknown — it is not "
+                        "recorded as failed (observation failure is not "
+                        "execution failure). The run is saved and "
+                        "resumable; reconnecting or retrying recovers "
+                        "its durable state."),
 }
 
 
@@ -263,6 +275,13 @@ def user_state(session: Dict[str, Any]) -> str:
         # stay distinct). It lands in the recoverable family with the
         # spawn cause carried on the session's error line.
         return "INTERRUPTED"
+    if status == "ERROR_STUCK":
+        # Article LXXIV (Constitution v2.6.0, the amendment's exact
+        # case): no worker progress for >3h with the cause not captured
+        # is an OBSERVATION fact — the run's outcome is UNKNOWN, never
+        # FAILED. The canonical machine (execution_states.mapping)
+        # pins the same semantics; the product surface must agree.
+        return "UNKNOWN_STALLED"
     if status == "AWAITING_CLARIFICATION":
         # R459 (external product audit P0-1, measured live on production:
         # session ts_7fdb31b19012): the one-question pause is an ACTIVE
@@ -276,7 +295,8 @@ def user_state(session: Dict[str, Any]) -> str:
         # blocked ≠ discovery failure — distinct projection, never a kill
     if status in _TRANSPORT_ERRORS:
         return "FAILED_TRANSPORT"
-    if status in _ENGINE_ERRORS or status.startswith("ERROR"):
+    if status in _ENGINE_ERRORS or (status.startswith("ERROR")
+                                    and status != "ERROR_STUCK"):
         return "FAILED_ENGINE"
     return "RUNNING" if status in ("", None) else "COMPLETED_UNKNOWN"
 
@@ -303,7 +323,7 @@ def user_state_view(session: Dict[str, Any]) -> Dict[str, Any]:
     final = (session.get("final_status") or "") or ""
     pkg = session.get("package") or {}
     finished = key.startswith("COMPLETED") or key.startswith("FAILED") \
-        or key in ("INTERRUPTED", "BLOCKED_TRANSPORT")
+        or key in ("INTERRUPTED", "BLOCKED_TRANSPORT", "UNKNOWN_STALLED")
     found = key in ("COMPLETED_PACKAGE", "COMPLETED_CANDIDATE",
                     "COMPLETED_EVOLVED")
     # R416: the product surface never renders a bare reject dead-end;

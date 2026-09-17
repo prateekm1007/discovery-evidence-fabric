@@ -208,7 +208,20 @@ class TestBlockedProjectionSource:
         for status in ("INTERRUPTED", "ERROR_TRANSPORT", "ERROR_STUCK"):
             view = user_state_mod.user_state_view(_session(status=status))
             assert view["user_state"] in (
-                "INTERRUPTED", "FAILED_TRANSPORT", "FAILED_ENGINE"), status
+                "INTERRUPTED", "FAILED_TRANSPORT", "FAILED_ENGINE",
+                "UNKNOWN_STALLED"), status
+
+    def test_stuck_is_unknown_never_failed_art_lxxiv(self):
+        """Article LXXIV (Constitution v2.6.0, the disclosed contract
+        change): ERROR_STUCK — no worker progress, cause not captured —
+        projects as UNKNOWN_STALLED, never as a FAILED class. A stalled
+        feed is an observation fact; the run's outcome is unknown and
+        the run stays recoverable."""
+        view = user_state_mod.user_state_view(_session(status="ERROR_STUCK"))
+        assert view["user_state"] == "UNKNOWN_STALLED"
+        assert "unknown" in str(view.get("meaning", "")).lower()
+        assert view.get("finished") is True  # polling loops may stop
+        assert not view.get("rejected")
 
 
 # ---------------------------------------------------------------------------

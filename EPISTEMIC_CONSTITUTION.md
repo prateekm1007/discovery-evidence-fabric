@@ -1,6 +1,6 @@
 # Epistemic Constitution — Research & Coding
 
-**Version:** 2.5.0
+**Version:** 2.6.0
 **Ratified:** 2026-08-19
 **Amended:** 2026-08-20 (Articles XXIII–XXXIV — Anti-Gaming, Anti-Entropy, Anti-Hallucination Principles; Article XXXV — Closed-Loop Epistemic Control as the Completion Standard)
 **Amended:** 2026-08-25 (Article XXXVI — TECHNOLOGY_TRANSFER_READY as the Manufactured-Asset Completion Standard; see R309/constitution/ARTICLE_XXXVI_TECHNOLOGY_TRANSFER_READY.md)
@@ -13,6 +13,7 @@
 **Amended:** 2026-09-10 (Article LXXI is RESERVED; Article LXXII — No 3D Artifact Ships Without Passing the Visual Compiler, per the operator's R441 World-Class 3D Pipeline Constitution directive: the pipeline, not prompts, guarantees presentation quality; see `R441/constitution/ARTICLE_LXXII_VISUAL_COMPILER.md`)
 **Amended:** 2026-09-12 (Article LXXI — The Deployed Production URL Is the Delivery Standard, filling the slot reserved on 2026-09-10, per operator directive: a coder round is complete only when its work is at origin/main, the operator-specified production URL serves that exact commit, and a health check confirms deployment identity == pushed SHA; closes the R439 "patch bundle" failure mode)
 **Amended:** 2026-09-16 (Article LXXIII — The Operator Secrets Registry: credentials live in the local vault + the HF Space secret surface; sessions look them up there before asking the operator, per the operator's 2026-09-16 directive "write in your constitution to look it up in huggingface secret, so you dont keep asking me again"; see `R468/constitution/ARTICLE_LXXIII_OPERATOR_SECRETS_REGISTRY.md`)
+**Amended:** 2026-09-17 (Article LXXIV — Observer-Independent Durable Execution, the SANDBOX / EXECUTION DURABILITY PRINCIPLES: execution is not observation, remote work is durable, observation failure is not execution failure, UNKNOWN stays distinct from FAILED, polling observes but never keeps computation alive, reconnection is normal, timeout semantics are typed, retry is idempotent, FAIL CLOSED PROGRESS OPEN — per the operator's 2026-09-17 directive after the measured attempt-5 lifecycle proof; see `R484/constitution/ARTICLE_LXXIV_OBSERVER_INDEPENDENT_DURABLE_EXECUTION.md`)
 **Authority:** Constitutional — supersedes all coding directives, gate results, and research priorities
 **Scope:** Governs both research output AND modifications to the epistemic machinery itself, AND — from v2.0.0 — what the machine may call a discovery or an invention
 
@@ -2136,6 +2137,35 @@ The registry's operational consequences:
   supplies a replacement credential, the old fingerprint, the new
   fingerprint, and the operator directive are recorded in the round
   record (Art. VI/XXV — declared, never fabricated as measured).
+
+---
+
+## Article LXXIV — Observer-Independent Durable Execution
+
+**Ratified:** 2026-09-17 (operator directive — the SANDBOX / EXECUTION DURABILITY PRINCIPLES, issued after the measured attempt-5 lifecycle proof: the loop-closure run completed server-side 34 minutes after every local observer process was reaped, and the R484 checkpoint contract carried the evidence to the durable branch)
+**Amends:** Constitution v2.5.0 → v2.6.0
+**Sponsor:** Operator directive (verbatim in `R484/constitution/ARTICLE_LXXIV_OBSERVER_INDEPENDENT_DURABLE_EXECUTION.md`)
+
+Execution is not observation. The lifetime of a caller, tool invocation, terminal session, polling process, or sandbox MUST NOT define the lifetime of an AI run: a caller disappearing does not mean the run failed, a polling process disappearing does not mean the run failed, and a sandbox being reaped does not mean the remote computation failed. Remote work must be durable: any operation capable of exceeding the execution environment's foreground or tool-call lifetime MUST be represented as a durable server-side job with a stable run identity that survives polling termination, browser refresh, worker restart, sandbox destruction, network interruption, and tool timeout; canonical state belongs server-side, and a local background process MAY assist observation, diagnostics, or development but MUST NOT be the sole authority for execution state, completion, artifacts, or provenance. Observation failure is not execution failure: failure to observe a running operation MUST NOT be classified as failure of the operation itself — POLL_TIMEOUT is not RUN_FAILED, SANDBOX_REAPED is not REMOTE_JOB_FAILED, and NO_LOCAL_PROCESS is not NO_SERVER_WORK. Every long-running operation has a durable state machine — at minimum QUEUED, STARTING, RUNNING, WAITING_EXTERNAL, COMPLETED, FAILED, CANCELLED, EXPIRED, UNKNOWN — and UNKNOWN must remain distinct from FAILED (Article XXV: unknown remains unknown). Polling is an observation mechanism, not an execution mechanism: polling MUST only observe durable state and MUST NOT be required to keep computation alive. Reconnection is normal: any client must be able to disconnect and later reconnect to the same run without loss of canonical execution state, and completion must be independently observable — a completed run MUST be recoverable from durable server-side state without relying on the process that initiated or polled the run. Provider execution and sandbox execution are separate boundaries: LOCAL_SANDBOX = REAPED with REMOTE_PROVIDER = RUNNING is a valid state, and the two domains must never be collapsed into one failed boolean. Timeout semantics must be typed — TOOL_TIMEOUT, SANDBOX_TIMEOUT, LOCAL_PROCESS_REAPED, REMOTE_PROVIDER_TIMEOUT, REMOTE_PROVIDER_UNAVAILABLE, POLL_TIMEOUT, POLL_INTERRUPTED, JOB_EXPIRED, JOB_FAILED, JOB_UNKNOWN — distinct categories, never one generic timeout. Long-running work is background-first: if expected runtime exceeds the reliable foreground execution budget, the machine MUST launch durable asynchronous work and return a run or job identity rather than holding a foreground invocation open. Retry must be idempotent: a retry after timeout, disconnect, or lost observation MUST NOT silently duplicate an externally meaningful operation or corrupt canonical state, and every such operation carries an identity — run_id, operation_id, attempt_id, provider, model, model_revision, request_hash — sufficient to answer "did this operation actually execute?" before launching another one. The machine MUST NOT restart an expensive AI computation solely because the observer lost contact with it: first look up the durable run (is it running? complete? failed?) and only then consider retry. FAIL CLOSED, PROGRESS OPEN: the system fails closed with respect to truth but remains open with respect to recoverable execution — if the machine cannot determine whether a remote computation completed, it MUST NOT claim completion, and it MUST NOT throw the run away: the state stays UNKNOWN and observation remains recoverable. The permanent acceptance criterion for this article is observer-independent execution, demonstrated by the standing E2E contract: start a run, intentionally lose the local observer, the remote work continues, a client reconnects, recovers the run, and the canonical artifacts are available.
+
+### Section 1 — The two execution domains
+
+The machine maintains TWO independent execution domains and never collapses them:
+
+1. **The execution domain** — the durable run: the session store, the durable state branch, the worker's pid-liveness record, the provider's own ledger. Its states are the durable state machine below.
+2. **The observation domain** — whatever process, browser, tool call, or sandbox is CURRENTLY watching. Its states (POLL_TIMEOUT, POLL_INTERRUPTED, SANDBOX_REAPED, NO_LOCAL_PROCESS, OBSERVER_DETACHED) are observation facts about the watcher, never predicates about the watched run.
+
+Every record that reports a run's state MUST name which domain it speaks from (the R484 four-domain lifecycle record is the model: local observer state → remote job state → provider state → canonical run state).
+
+### Section 2 — The durable state machine
+
+The canonical machine: `QUEUED → STARTING → RUNNING → WAITING_EXTERNAL → COMPLETED | FAILED | CANCELLED | EXPIRED | UNKNOWN`. `UNKNOWN` is a FIRST-CLASS state — the honest answer when the machine cannot decide — and is never collapsed into `FAILED` (Art. XXV/LXI: infrastructure and observation states are never scientific verdicts). `toscanini/execution_states.py` is the mapping's single authority: the store's operational statuses (PENDING/RUNNING/BUILDING_PROBLEM/AWAITING_CLARIFICATION/COMPLETE/ERROR_RUN/ERROR_STUCK/INTERRUPTED/RUN_BLOCKED_*) map into this machine by a tested pure function, and any surface answering "is it failed?" MUST consult the mapping rather than guess.
+
+### Section 3 — The retry discipline
+
+Before any retry of an externally meaningful operation, the machine consults the durable run identity (the L. identity fields: run_id, operation_id, attempt_id, provider, model, model_revision, request_hash) and answers "did this operation actually execute?" — the R401 resume discipline (the persisted artifact is the authority; the mutation spend is never re-burned) is this principle's standing implementation at the engine layer.
+
+See the full text at `R484/constitution/ARTICLE_LXXIV_OBSERVER_INDEPENDENT_DURABLE_EXECUTION.md` for the operator's directive verbatim, the coders' marching orders, and the implementation obligations.
 
 # THE FOUR CONSTITUTIONAL LAYERS
 
