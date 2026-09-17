@@ -1,0 +1,117 @@
+{
+ "probe": "R500_FREE_SOURCE_PROBE_PASS2",
+ "started_utc": "2026-09-17T20:27:02Z",
+ "debits_spent": 0,
+ "rounds": [
+  {
+   "name": "P2_locate_publication_literal",
+   "method": "GET",
+   "url": "https://data.epo.org/linked-data/query",
+   "params": {
+    "query": "SELECT ?pub WHERE { ?pub ?p \"US8968233B2\" } LIMIT 5"
+   },
+   "request_headers": {
+    "User-Agent": "toscanini-rbg-probe/1.0 (keyless epistemic measurement; operator-directed)",
+    "Accept": "application/sparql-results+json"
+   },
+   "notes": "pass-1 measured this 200 but hashed the body; now capturing the bindings",
+   "utc": "20:27:02Z",
+   "url_full": "https://data.epo.org/linked-data/query?query=SELECT+%3Fpub+WHERE+%7B+%3Fpub+%3Fp+%22US8968233B2%22+%7D+LIMIT+5",
+   "http": 200,
+   "response_headers": {
+    "date": "Thu, 17 Sep 2026 20:27:03 GMT",
+    "content-type": "application/sparql-results+json; charset=utf-8",
+    "vary": "Accept,Accept-Encoding,Accept-Charset,User-Agent"
+   },
+   "body_len": 94,
+   "body_sha256_12": "2fbf96fc1904",
+   "body_excerpt": "{\n  \"head\": {\n    \"vars\": [ \"pub\" ]\n  } ,\n  \"results\": {\n    \"bindings\": [\n      \n    ]\n  }\n}\n"
+  },
+  {
+   "name": "P2_located_fetch_ld+json",
+   "method": "GET",
+   "url": "https://data.epo.org/linked-data/data/publication/US/8968233B2",
+   "params": null,
+   "request_headers": {
+    "User-Agent": "toscanini-rbg-probe/1.0 (keyless epistemic measurement; operator-directed)",
+    "Accept": "application/ld+json"
+   },
+   "notes": "negotiation ladder on the located publication URI",
+   "utc": "20:27:03Z",
+   "http": 406,
+   "error": "HTTPError",
+   "response_headers": {
+    "Content-Length": "0"
+   },
+   "body_len": 0,
+   "body_sha256_12": null,
+   "body_excerpt": ""
+  },
+  {
+   "name": "P2_located_fetch_turtle",
+   "method": "GET",
+   "url": "https://data.epo.org/linked-data/data/publication/US/8968233B2",
+   "params": null,
+   "request_headers": {
+    "User-Agent": "toscanini-rbg-probe/1.0 (keyless epistemic measurement; operator-directed)",
+    "Accept": "text/turtle"
+   },
+   "notes": "negotiation ladder on the located publication URI",
+   "utc": "20:27:03Z",
+   "http": 200,
+   "response_headers": {
+    "date": "Thu, 17 Sep 2026 20:27:05 GMT",
+    "content-type": "text/turtle;charset=utf-8",
+    "vary": "Accept"
+   },
+   "body_len": 1666,
+   "body_sha256_12": "4c0e2fc8b5f9",
+   "body_excerpt": "@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .\n@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .\n@prefix dcterms: <http://purl.org/dc/terms/> .\n@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .\n@prefix elda:  <http://www.epimorphics.com/vocabularies/lda#> .\n@prefix api:   <"
+  },
+  {
+   "name": "P2_hf_search_retry_90s",
+   "method": "GET",
+   "url": "https://datasets-server.huggingface.co/search",
+   "params": {
+    "dataset": "common-pile/uspto",
+    "config": "default",
+    "split": "train",
+    "query": "shunt valve",
+    "offset": 0,
+    "length": 3
+   },
+   "request_headers": {
+    "User-Agent": "toscanini-rbg-probe/1.0 (keyless epistemic measurement; operator-directed)"
+   },
+   "notes": "pass-1 read timed out at 45s; retry with a 90s window",
+   "utc": "20:27:05Z",
+   "url_full": "https://datasets-server.huggingface.co/search?dataset=common-pile%2Fuspto&config=default&split=train&query=shunt+valve&offset=0&length=3",
+   "http": 500,
+   "error": "HTTPError",
+   "response_headers": {
+    "Content-Type": "application/json",
+    "Content-Length": "73",
+    "vary": "Accept-Encoding"
+   },
+   "body_len": 73,
+   "body_sha256_12": "68771397aeef",
+   "body_excerpt": "{\"error\":\"the dataset index is loading, this may take longer than usual\"}"
+  }
+ ],
+ "finished_utc": "2026-09-17T20:27:25Z",
+ "summary": {
+  "located_pub_uris": [],
+  "negotiation_winner": "HTTP_406_BODY_other",
+  "identity": {
+   "status": "PUBLICATION_BODY_NOT_PARSED_AS_JSONLD",
+   "negotiation_final": "HTTP_406_BODY_other"
+  },
+  "hf_search_state": "TRANSIENT_HTTPError_500",
+  "hf_search_evidence": null,
+  "sealed_f10_reference": {
+   "record_id": "US8968233B2",
+   "title_sha256_12": "3712021fb352",
+   "abstract_len": 718
+  }
+ }
+}

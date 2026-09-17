@@ -1,0 +1,78 @@
+{
+  "record_type": "ROUND_RECORD",
+  "round": "R500",
+  "line": "Coder 2",
+  "directive": "Operator probe-driver session received: measure every free source before any integration (never research-typing). Operator leads: EPO LOD protocol endpoint https://data.epo.org/linked-data/query (the R498 406 was wrong-endpoint); sealed-case US8968233B2 identity in the Tier-1 graph; family membership + document fetch; a server-side index-warming transient state on the discovery endpoint.",
+  "round_naming_note": "The R499 record reserved the name R500 for the pure seal re-run (rbg_seal.py --round R500, needs 6+ quiet debits). The operator's probe-driver directive took the R500 slot with a keyless round; the seal re-run is renamed to the next quota-feasible round (R501). 1 debit remains preserved — untouched.",
+  "baseline": {
+    "local_head": "797f8007 (== origin/main, ls-remote verified via askpass)",
+    "constitution": "2.7.0",
+    "registry": "1.0.0 at round start -> 1.1.0 this round"
+  },
+  "debits_spent": 0,
+  "auth": "NONE — keyless by design (shared PatentBear bucket 19/20 untouched)",
+  "measurements": {
+    "EPO_LOD_SPARQL_PROTOCOL": {
+      "result": "LIVE_PROTOCOL_SPARQL_JSON",
+      "evidence": "GET and POST-form both measured 200 application/sparql-results+json with results.bindings at https://data.epo.org/linked-data/query (passes 1-2, scripts/r500_free_source_probe.py, scripts/r500_free_source_probe_pass2.py)",
+      "correction": "R498's ENDPOINT_RESPONSIVE_NEGOTIATION_REJECTED_406 re-typed: wrong-endpoint (the /data/sparql shape), NOT a dead service — exactly the operator's UI-config archaeology"
+    },
+    "PUBLICATION_ITEM_LOOKUP": {
+      "result": "UNRESOLVED_THIS_ENVIRONMENT",
+      "attempts_typed": [
+        "/data/publication/US/8968233B2 with Accept: application/ld+json -> 406 (pass 1)",
+        "same URI with Accept: text/turtle -> 200 — an Elda ListEndpoint Page wrapper (13 triples), vocab#items = rdf:nil — a soft-empty page is NOT existence and NOT absence (Art. XXI.3)",
+        "number-without-kind and kind-split and dashed and trailing-slash key shapes -> same empty wrapper shape",
+        "exact-IRI /resource/ lookups (3 host shapes, via the LIVE protocol) -> 0 bindings each",
+        "lod.apps.epo.org (the wrapper's own routing targets incl. ?_metadata=all) -> 403 direct (internal host; data.epo.org is the front door)",
+        "search endpoint /data/search?q= -> 406 both Accept variants (json, turtle)"
+      ],
+      "operator_claim_stance": "OPERATOR_MEASURED_UNREPRODUCED_THIS_ENVIRONMENT — the operator's full-identity-model claim (titles/abstract/citations/family/representations) is neither confirmed nor refuted here (Art. XXIV); the protocol-level liveness IS reproduced"
+    },
+    "HF_DATASETS_SERVER_SEARCH": {
+      "result": "TRANSIENT_INDEX_WARMING_MEASURED_VERBATIM",
+      "evidence": "datasets-server /search on common-pile/uspto: 45s read-timeout (pass 1), then HTTP 500 with the provider's literal body 'the dataset index is loading, this may take longer than usual' (pass 2) — the operator's index-warming lead confirmed as transient provider state, never absence (Art. XXI)"
+    },
+    "LICENSE_ARTIFACT": {
+      "result": "MEASURED_NOTICE",
+      "evidence": "the Elda lda#notice literal 'Provided by the European Patent Office.' measured in the wrapper graph; the brief's CC BY 4.0 declaration remains OPERATOR_RESEARCH (ORUV), never upgraded by a narrative"
+    },
+    "CROSS_PROVIDER_FINGERPRINT_CHECK": {
+      "result": "DEFERRED_NO_DEBITS",
+      "detail": "the R498 PatentBear measurement (title_sha256_12=3712021fb352, abstract_len=718, US8968233B2) awaits an EPO-side title to fingerprint; the identity node never resolved from this environment; byte-level adjudication folds into the R501 seal window where F10 fetches the record anyway"
+    }
+  },
+  "instrument": "NO instrument integration this round (operator: measure BEFORE integration). rbg_gate.py untouched; battery untouched; no fixture re-authored.",
+  "registry_update": {
+    "version": "1.0.0 -> 1.1.0",
+    "authority": "scripts/r500_update_registry.py (Art. VII disclosed, data-level)",
+    "changes": "epo_linked_open_data re-typed (LIVE_MEASURED; protocol LIVE; item lookup OPEN; keyless measured; notice artifact) + huggingface_patent_datasets /search transient evidence + provenance_classes.MEASURED_R500",
+    "pin_extension": "tests/test_r498_patent_source_registry.py MEASURED_MARKERS += 'MEASURED_R50' (substring-containment vocabulary; mirrors the new provenance class; disclosed)"
+  },
+  "tests": "41/41 hermetic (test_r498_patent_source_registry + test_r498_rbg_patent_leg_mode + test_r497_patentbear_scope_order + test_r495_v42_attacker_computes) post-update",
+  "probes_published": [
+    "scripts/r500_free_source_probe.py (pass 1)",
+    "scripts/r500_free_source_probe_pass2.py",
+    "scripts/r500_free_source_probe_pass3.py",
+    "scripts/r500_free_source_probe_pass4.py",
+    "scripts/r500_free_source_probe_pass5.py",
+    "scripts/r500_diag_wrapper.py (routing diagnostic)",
+    "scripts/r500_update_registry.py"
+  ],
+  "ledgers": [
+    "R500/R500_FREE_SOURCE_PROBE.json",
+    "R500/R500_FREE_SOURCE_PROBE_PASS2.json",
+    "R500/R500_FREE_SOURCE_PROBE_PASS3.json",
+    "R500/R500_FREE_SOURCE_PROBE_PASS4.json",
+    "R500/R500_FREE_SOURCE_PROBE_PASS5.json"
+  ],
+  "what_unblocks_next": {
+    "R501_seal_rerun": "6+ quiet debits: per-line key coordination / fresh key (the operator's standing 'more keys' commitment; request ACTIVE at 19/20) / R378 upgrade",
+    "publication_lookup": "the operator's working shape (their session reached the full identity model) — one working request example closes the gap; else EPO OPS registration (Tier-1 ledger) is the documented automated path",
+    "hf_search": "the provider's own warming message names the wait; a later retry is free",
+    "deploy_2.7.0": "HF_TOKEN not held this session (records ride the next deploy)"
+  },
+  "no_novelty_verdict": "Art. XLVI/LXXV",
+  "provenance": "AI_REVIEW",
+  "constitution_version": "2.7.0"
+}

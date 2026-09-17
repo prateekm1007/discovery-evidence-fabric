@@ -31,7 +31,8 @@ AMEND = os.path.join(REPO, "R498", "constitution",
 SIX = ["FREE", "ACCESSIBLE", "AUTOMATABLE", "LICENSE-COMPATIBLE",
        "RATE-LIMITED", "AUTHENTICATED"]
 
-MEASURED_MARKERS = ("MEASURED_R49", "MEASURED_R4", "ORUV",
+MEASURED_MARKERS = ("MEASURED_R49", "MEASURED_R4", "MEASURED_R50",
+                    "ORUV",
                     "OPERATOR_RESEARCH", "UNREVIEWED", "UNMEASURED",
                     "REQUIRES_", "YES", "NO", "PARTIAL", "WITHIN-LIMITS",
                     "LIKELY", "VARIES", "OFTEN")

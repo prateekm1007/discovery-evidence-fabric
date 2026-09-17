@@ -1,0 +1,161 @@
+{
+ "probe": "R500_FREE_SOURCE_PROBE",
+ "started_utc": "2026-09-17T20:24:24Z",
+ "debits_spent": 0,
+ "auth": "NONE (keyless by design; the shared PatentBear bucket at 19/20 is untouched)",
+ "rounds": [
+  {
+   "name": "L1_epo_lod_sparql_protocol_GET",
+   "method": "GET",
+   "url": "https://data.epo.org/linked-data/query",
+   "params": {
+    "query": "SELECT ?s ?p ?o WHERE { ?s ?p ?o } LIMIT 3"
+   },
+   "request_headers": {
+    "User-Agent": "toscanini-rbg-probe/1.0 (keyless epistemic measurement; operator-directed)",
+    "Accept": "application/sparql-results+json"
+   },
+   "notes": "R498 measured 406 at a DIFFERENT url shape; operator UI-config lead names /linked-data/query as the SPARQL protocol endpoint",
+   "utc": "20:24:24Z",
+   "url_full": "https://data.epo.org/linked-data/query?query=SELECT+%3Fs+%3Fp+%3Fo+WHERE+%7B+%3Fs+%3Fp+%3Fo+%7D+LIMIT+3",
+   "http": 200,
+   "response_headers": {
+    "date": "Thu, 17 Sep 2026 20:24:24 GMT",
+    "content-type": "application/sparql-results+json; charset=utf-8",
+    "vary": "Accept,Accept-Encoding,Accept-Charset,User-Agent"
+   },
+   "body_len": 1091,
+   "body_sha256_12": "44a5b876d49a"
+  },
+  {
+   "name": "L1_epo_lod_sparql_protocol_POST_form",
+   "method": "POST",
+   "url": "https://data.epo.org/linked-data/query",
+   "params": null,
+   "request_headers": {
+    "User-Agent": "toscanini-rbg-probe/1.0 (keyless epistemic measurement; operator-directed)",
+    "Accept": "application/sparql-results+json",
+    "Content-Type": "application/x-www-form-urlencoded"
+   },
+   "notes": "SPARQL 1.1 protocol POST form-encoding variant",
+   "utc": "20:24:25Z",
+   "http": 200,
+   "response_headers": {
+    "date": "Thu, 17 Sep 2026 20:24:26 GMT",
+    "content-type": "application/sparql-results+json; charset=utf-8"
+   },
+   "body_len": 1091,
+   "body_sha256_12": "44a5b876d49a"
+  },
+  {
+   "name": "L2_publication_uri_P1_bare",
+   "method": "GET",
+   "url": "https://data.epo.org/linked-data/data/publication/US/8968233B2",
+   "params": null,
+   "request_headers": {
+    "User-Agent": "toscanini-rbg-probe/1.0 (keyless epistemic measurement; operator-directed)",
+    "Accept": "application/ld+json"
+   },
+   "notes": "direct publication-URI pattern probe (operator lead: 'the URI pattern needs the suffix')",
+   "utc": "20:24:26Z",
+   "http": 406,
+   "error": "HTTPError",
+   "body_len": 0,
+   "body_sha256_12": null
+  },
+  {
+   "name": "L2_publication_uri_P2_trailing_slash",
+   "method": "GET",
+   "url": "https://data.epo.org/linked-data/data/publication/US/8968233B2/",
+   "params": null,
+   "request_headers": {
+    "User-Agent": "toscanini-rbg-probe/1.0 (keyless epistemic measurement; operator-directed)",
+    "Accept": "application/ld+json"
+   },
+   "notes": "direct publication-URI pattern probe (operator lead: 'the URI pattern needs the suffix')",
+   "utc": "20:24:28Z",
+   "http": 406,
+   "error": "HTTPError",
+   "body_len": 0,
+   "body_sha256_12": null
+  },
+  {
+   "name": "L2_publication_uri_P3_dashed",
+   "method": "GET",
+   "url": "https://data.epo.org/linked-data/data/publication/US/8968233-B2",
+   "params": null,
+   "request_headers": {
+    "User-Agent": "toscanini-rbg-probe/1.0 (keyless epistemic measurement; operator-directed)",
+    "Accept": "application/ld+json"
+   },
+   "notes": "direct publication-URI pattern probe (operator lead: 'the URI pattern needs the suffix')",
+   "utc": "20:24:29Z",
+   "http": 406,
+   "error": "HTTPError",
+   "body_len": 0,
+   "body_sha256_12": null
+  },
+  {
+   "name": "L2_sparql_fallback_locate_publication",
+   "method": "GET",
+   "url": "https://data.epo.org/linked-data/query",
+   "params": {
+    "query": "SELECT ?pub WHERE { ?pub ?p \"US8968233B2\" } LIMIT 5"
+   },
+   "request_headers": {
+    "User-Agent": "toscanini-rbg-probe/1.0 (keyless epistemic measurement; operator-directed)",
+    "Accept": "application/sparql-results+json"
+   },
+   "notes": "fallback: find the publication node by literal",
+   "utc": "20:24:31Z",
+   "url_full": "https://data.epo.org/linked-data/query?query=SELECT+%3Fpub+WHERE+%7B+%3Fpub+%3Fp+%22US8968233B2%22+%7D+LIMIT+5",
+   "http": 200,
+   "response_headers": {
+    "date": "Thu, 17 Sep 2026 20:24:33 GMT",
+    "content-type": "application/sparql-results+json; charset=utf-8",
+    "vary": "Accept,Accept-Encoding,Accept-Charset,User-Agent"
+   },
+   "body_len": 94,
+   "body_sha256_12": "2fbf96fc1904"
+  },
+  {
+   "name": "L4_hf_datasets_server_search_retry",
+   "method": "GET",
+   "url": "https://datasets-server.huggingface.co/search",
+   "params": {
+    "dataset": "common-pile/uspto",
+    "config": "default",
+    "split": "train",
+    "query": "shunt valve",
+    "offset": 0,
+    "length": 3
+   },
+   "request_headers": {
+    "User-Agent": "toscanini-rbg-probe/1.0 (keyless epistemic measurement; operator-directed)"
+   },
+   "notes": "operator lead: search index warming server-side -- typed transient state, never absence",
+   "utc": "20:24:33Z",
+   "url_full": "https://datasets-server.huggingface.co/search?dataset=common-pile%2Fuspto&config=default&split=train&query=shunt+valve&offset=0&length=3",
+   "http": null,
+   "error": "TimeoutError",
+   "error_detail": "The read operation timed out"
+  }
+ ],
+ "finished_utc": "2026-09-17T20:25:18Z",
+ "summary": {
+  "epo_lod_protocol": "LIVE_PROTOCOL_SPARQL_JSON",
+  "epo_lod_protocol_post": "LIVE_PROTOCOL_SPARQL_JSON",
+  "publication_uri_resolved": "UNRESOLVED",
+  "publication_state": "HTTP_406",
+  "title_fingerprints": [],
+  "abstract_lengths_by_lang": {},
+  "sealed_f10_reference": {
+   "record_id": "US8968233B2",
+   "title_sha256_12": "3712021fb352",
+   "abstract_len": 718,
+   "source": "R498/R498_PATENTBEAR_ROTATION_PROBE.json first_hit_fingerprint"
+  },
+  "cross_provider_verdict": "PUBLICATION_UNRESOLVED",
+  "hf_search_state": "TRANSIENT_INDEX_WARMING_OR_UNAVAILABLE_None"
+ }
+}
