@@ -1582,6 +1582,130 @@ class Handler(BaseHTTPRequestHandler):
                     "detail": str(type(exc).__name__)})
             return self._json(200, {"attack": record})
 
+        # ---- R493: the A2 gauntlet measurement transport ----
+        # POST /api/ops/a2-attack {candidate, prior_art_state?,
+        #                           evidence_items?, evidence_verified?}
+        # Runs the A2 adversarial gauntlet (a2/adversarial.py::
+        # adversarial_challenge — the conductor ATTACK stage's canonical
+        # implementation) on ONE submitted corpus case and returns the
+        # attack record. Mirrors the R487 /api/ops/calibration-attack
+        # pattern exactly (R490 A2_CALIBRATION_SCOPE owned plan step 2):
+        # the frozen DEV-corpus calibration measurement must run on the
+        # DEPLOYED instrument with the production provider ring, and the
+        # local driver holds no provider keys — the Space is the only
+        # place the instrument runs as deployed.
+        # Surface class: identical to /api/run (an LLM-call endpoint);
+        # bounded to ONE attack per request, payload-capped, every
+        # failure typed (never a 500). The endpoint carries no verdict
+        # authority the instrument does not already have: it returns
+        # the raw instrument record (with its R490 calibration_scope
+        # annotation) plus the transport provenance of the actual
+        # provider call — the consumption gate (a2/calibration.py)
+        # stays in force wherever the record is consumed.
+        # Input mapping (disclosed): the gauntlet's only input channel
+        # is the candidate packet (its prompt embeds the blinded
+        # candidate JSON), so evidence_items are merged into the
+        # candidate packet under "evidence_items" and prior_art_state
+        # is passed as the instrument's own parameter — the corpus's
+        # pinned per-case inputs (R492/A2_DEV_CORPUS per_case_inputs).
+        if p.path == "/api/ops/a2-attack":
+            body = self._body_json()
+            candidate = body.get("candidate")
+            if not isinstance(candidate, dict):
+                return self._json(400, {
+                    "error": "candidate (object) required"})
+            # R493: the measurement ring pin (fail-closed) — the same
+            # discipline as the R491 calibration-attack pin: a pinned
+            # provider that is unknown or unavailable yields a typed
+            # transport failure, NEVER a silent cascade to a different
+            # ring (the R488 lesson: attacker calibration is
+            # (rules x ring)).
+            require_provider = str(body.get("require_provider")
+                                   or "").strip()
+            if require_provider:
+                try:
+                    from discovery_fabric.engine import llm_registry as _reg
+                    known = [s.provider_id for s in _reg.PROVIDER_SPECS]
+                except Exception:  # noqa: BLE001 — typed, never 500
+                    known = []
+                if require_provider not in known:
+                    return self._json(400, {
+                        "error": "require_provider names no registered "
+                                 "provider id",
+                        "code": "UNKNOWN_RING_PIN",
+                        "detail": require_provider[:60]})
+            prior_art_state = str(body.get("prior_art_state")
+                                  or "UNKNOWN").strip()
+            _PA_STATES = {
+                "UNKNOWN", "NO_MATCH_FOUND", "TOPICAL_RELATED",
+                "POSSIBLE_RELEVANCE", "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+                "SPECIFIC_DISCLOSURE",
+                "IDENTICAL_OR_NEAR_IDENTICAL_DISCLOSURE",
+                "RESOLVED_DIFFERENTIATED", "RESOLVED_ANTICIPATED",
+                "UNRESOLVED_PARTIAL_EVIDENCE", "UNRESOLVED_NO_RELEVANT_ART",
+                "UNRESOLVED_SEARCH_INCOMPLETE", "SEARCH_FAILED",
+                "SEARCH_PARTIAL", "PARTIAL_PRIOR_ART",
+                "LIKELY_PRIOR_ART_EXISTS",
+            }
+            if prior_art_state not in _PA_STATES:
+                return self._json(400, {
+                    "error": "prior_art_state not in the instrument's "
+                             "documented vocabulary",
+                    "code": "UNKNOWN_PRIOR_ART_STATE",
+                    "received": prior_art_state[:80]})
+            evidence_items = body.get("evidence_items") or []
+            if not isinstance(evidence_items, list):
+                return self._json(400, {
+                    "error": "evidence_items must be a list"})
+            evidence_items = [e for e in evidence_items
+                              if isinstance(e, dict)][:5]
+            evidence_verified = bool(body.get("evidence_verified", True))
+            try:
+                c_len = len(json.dumps(candidate).encode())
+                e_len = len(json.dumps(evidence_items).encode())
+            except (TypeError, ValueError):
+                return self._json(400, {"error": "unserializable payload"})
+            if c_len > 12_000 or e_len > 10_000:
+                return self._json(413, {
+                    "error": "payload too large for the A2 measurement "
+                             "transport (candidate 12KB / evidence 10KB "
+                             "caps)"})
+            packet = dict(candidate)
+            if evidence_items:
+                packet["evidence_items"] = evidence_items
+            try:
+                from discovery_fabric.a2.adversarial import \
+                    adversarial_challenge as _a2_attack
+            except Exception as exc:  # noqa: BLE001 — typed, never 500
+                return self._json(503, {
+                    "error": "the A2 gauntlet is unavailable in this "
+                             "build",
+                    "code": "INSTRUMENT_IMPORT_FAILURE",
+                    "detail": str(type(exc).__name__)})
+            try:
+                record = _a2_attack(packet,
+                                    evidence_verified=evidence_verified,
+                                    prior_art_state=prior_art_state,
+                                    require_provider=require_provider
+                                    or None)
+            except Exception as exc:  # noqa: BLE001 — typed, never 500
+                return self._json(503, {
+                    "error": "the A2 gauntlet failed to execute",
+                    "code": "INSTRUMENT_EXECUTION_FAILURE",
+                    "detail": str(type(exc).__name__)})
+            record = dict(record or {})
+            # E1: transport provenance of the provider call that
+            # actually executed (Art. VI — real registry metadata only;
+            # the same field the production AttackEngineAdapter stamps).
+            try:
+                from discovery_fabric.a2 import adversarial as _adv_mod
+                record["transport"] = dict(
+                    getattr(_adv_mod, "_LAST_ATTACK_PROVIDER_META",
+                            {}) or {})
+            except Exception:  # noqa: BLE001 — provenance never blocks
+                record["transport"] = {"status": "UNAVAILABLE"}
+            return self._json(200, {"attack": record})
+
         # ---- R459 (audit P0-3): the attachment ingestion endpoints ----
         # POST /api/attachments (multipart) — upload BEFORE a run exists
         # (the composer's attach flow). POST /api/run/{id}/attachments —

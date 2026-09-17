@@ -135,7 +135,8 @@ def _with_calibration_scope(result: dict) -> dict:
 # Art. VI: populated only from real registry call results.
 _LAST_ATTACK_PROVIDER_META: dict = {"status": "NEVER_CALLED"}
 
-def llm_chat(prompt, system="", max_retries=1, timeout=420):
+def llm_chat(prompt, system="", max_retries=1, timeout=420,
+             require_provider: str | None = None):
     """E1: transport delegated to the provider registry. The legacy preference
     (NVIDIA primary, OpenRouter fallback) is preserved as an explicit
     preferred_providers policy — substitution stays recorded in the result
@@ -150,7 +151,15 @@ def llm_chat(prompt, system="", max_retries=1, timeout=420):
     transport parameter with a recorded measurement basis (Art. XXVII), not
     a verification-semantics change; transport failure still yields
     EVALUATOR_CALL_FAILED and classify() maps that to UNKNOWN, never
-    REJECTED (Art. XXV)."""
+    REJECTED (Art. XXV).
+    R493: require_provider HARD-PINS the gauntlet's ring for the DEV-corpus
+    calibration measurement (the R488 lesson: attacker calibration is
+    (rules x ring) — the same rules measured differently on different
+    rings). No fallback: a pinned provider that is unavailable yields a
+    typed transport failure, NEVER a silent cascade; the pin and its
+    outcome travel in _LAST_ATTACK_PROVIDER_META (hard_pin block) and on
+    the record's ring_pin. Production attacks keep the availability
+    cascade (pin absent -> byte-identical behavior)."""
     global _LAST_ATTACK_PROVIDER_META
     try:
         from discovery_fabric.engine import llm_registry as reg
@@ -159,11 +168,12 @@ def llm_chat(prompt, system="", max_retries=1, timeout=420):
                                       "error": f"registry import failed: {exc}"}
         return None
     override = os.environ.get("ENGINE_ATTACK_PROVIDER", "").strip()
-    if override:
-        print(f"  [adversarial] OPERATOR OVERRIDE: attack evaluator pinned "
-              f"to '{override}' (fallback forbidden; recorded in meta)")
+    pin = (require_provider or "").strip() or override
+    if pin:
+        print(f"  [adversarial] RING PIN: attack evaluator pinned "
+              f"to '{pin}' (fallback forbidden; recorded in meta)")
         policy = reg.SelectionPolicy(
-            preferred_providers=[override], max_preference_fallback=0,
+            preferred_providers=[pin], max_preference_fallback=0,
             purpose="attack")
     else:
         policy = reg.SelectionPolicy(
@@ -174,6 +184,19 @@ def llm_chat(prompt, system="", max_retries=1, timeout=420):
     res = reg.generate(prompt, system=system, timeout=timeout,
                        max_retries=max_retries, policy=policy)
     _LAST_ATTACK_PROVIDER_META = res.to_meta()
+    if pin:
+        _LAST_ATTACK_PROVIDER_META["ring_pin"] = {
+            "requested": pin,
+            "mode": "HARD_PIN_NO_FALLBACK",
+            "served_provider": _LAST_ATTACK_PROVIDER_META.get("provider"),
+            "served_model": _LAST_ATTACK_PROVIDER_META.get("model"),
+            "pin_violation": (
+                "PINNED ring not served — treat this attack as "
+                "transport-invalid for measurement purposes"
+                if _LAST_ATTACK_PROVIDER_META.get("ok")
+                and _LAST_ATTACK_PROVIDER_META.get("provider") != pin
+                else None),
+        }
     if res.ok:
         return res.content
     print(f"  [adversarial] LLM transport status: {res.status}"
@@ -182,7 +205,8 @@ def llm_chat(prompt, system="", max_retries=1, timeout=420):
 
 
 def adversarial_challenge(candidate: dict, evidence_verified: bool = True,
-                          prior_art_state: str = "UNKNOWN") -> dict:
+                          prior_art_state: str = "UNKNOWN",
+                          require_provider: str | None = None) -> dict:
     """Step 6: Adversarial challenge with V4 corrections.
 
     PRODUCTION PATH:
@@ -202,6 +226,10 @@ def adversarial_challenge(candidate: dict, evidence_verified: bool = True,
             Must be one of: NO_MATCH_FOUND, TOPICAL_RELATED, POSSIBLE_RELEVANCE,
             UNRESOLVED_INSUFFICIENT_EVIDENCE, SPECIFIC_DISCLOSURE,
             IDENTICAL_OR_NEAR_IDENTICAL_DISCLOSURE.
+        require_provider: R493 — HARD-PINS the evaluator ring for the
+            DEV-corpus calibration measurement (no fallback, typed failure,
+            ring_pin block on the record; production callers omit it and
+            keep the availability cascade — byte-identical behavior).
     """
     # ===== V4 CORRECTION 11: Evidence gate =====
     # If evidence fails, adversarial MUST NOT run.
@@ -222,7 +250,8 @@ def adversarial_challenge(candidate: dict, evidence_verified: bool = True,
     blinded = {k: v for k, v in candidate.items() if k not in STRIP}
     prompt = ATTACK_PROMPT.format(candidate_json=json.dumps(blinded, indent=2, default=str))
     print(f"  [adversarial] challenging candidate...")
-    resp = llm_chat(prompt, system="You are a strict adversarial reviewer.")
+    resp = llm_chat(prompt, system="You are a strict adversarial reviewer.",
+                    require_provider=require_provider)
     if not resp:
         # DEFECT FIX: LLM failure must NEVER become KILL.
         # This is an operational failure, not a scientific verdict.

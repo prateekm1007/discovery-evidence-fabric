@@ -1,0 +1,274 @@
+"""tests/test_r493_a2_gate_and_transport.py — R493: the A2 measurement
+transport (/api/ops/a2-attack, R490 owned plan step 2) + the ring-pin
+plumbing for the gauntlet + the union pins that bind the transport to
+the R491 consumption gate (R490 owned plan step 5, already deployed by
+the R491 union line).
+
+Pinned behaviors:
+  1. The A2 transport route: exists in do_POST, mirrors the R487/R491
+     calibration-attack discipline (payload caps, typed failures, one
+     attack per request, prior_art_state vocabulary gate, disclosed
+     evidence_items input mapping, require_provider ring pin validated
+     against the registered provider ids).
+  2. The gauntlet's ring pin: adversarial_challenge/llm_chat accept
+     require_provider; with a pin, the selection policy pins EXACTLY
+     that provider with max_preference_fallback=0 (no cascade) and the
+     ring_pin block travels on the transport meta (requested / mode /
+     served / violation); WITHOUT a pin the policy is the production
+     availability cascade (byte-identical behavior).
+  3. Union gate pins (the R491 line's classify + registry, verified
+     against the DEPLOYED dc90b510 design): the registry entry
+     a2_adversarial_gauntlet/1.0.0 exists and resolves fail-closed
+     (no shipped A2 measurement -> UNKNOWN_NOT_CALIBRATED, kills not
+     admissible); an uncalibrated KILL never terminates REJECTED on
+     the gauntlet alone — the classification continues through the
+     deterministic gates with the escalation riding the record; the
+     unknown verdict vocabulary fails closed to UNKNOWN.
+  4. The registered-record path: with a temporarily-registered
+     measurement + seal meeting the sealed bars, the gauntlet's KILL
+     regains full terminal authority (the calibrated future takes
+     exactly this path).
+
+reviewer_provenance=AI_REVIEW
+"""
+from __future__ import annotations
+
+import json
+import sys
+import tempfile
+import unittest
+from pathlib import Path
+from unittest import mock
+
+REPO = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(REPO))
+
+from discovery_fabric.a2 import adversarial as a2  # noqa: E402
+from discovery_fabric.a2 import classify as a2classify  # noqa: E402
+from discovery_fabric.engine import attacker_calibration as gate  # noqa: E402
+
+A2_INSTRUMENT = "a2_adversarial_gauntlet/1.0.0"
+
+
+def _full_candidate():
+    return {
+        "mechanism": "a staged hydrodynamic cascade conditions the "
+                     "ballast stream",
+        "intervention": "inline rotor-stator conditioner on the main",
+        "predicted_effect": "3.5-log inactivation at rated flow",
+        "testable_prediction": "bench loop shows the reduction over "
+                               "three water qualities",
+        "falsification_test": "bench loop at 5 m3/h with natural "
+                              "seawater shows the log reduction or the "
+                              "claim is dead",
+    }
+
+
+_VERIFICATION_OK = {"verified": True, "issues": []}
+_PRIOR_ART_PASS = {"prior_art_status": "TOPICAL_RELATED"}
+
+
+class TestA2TransportRoute(unittest.TestCase):
+    @staticmethod
+    def _route_source():
+        src = (REPO / "toscanini" / "server.py").read_text()
+        start = src.index('if p.path == "/api/ops/a2-attack":')
+        return src[start:start + 5200]
+
+    def test_route_exists_in_do_post(self):
+        src = (REPO / "toscanini" / "server.py").read_text()
+        self.assertIn('p.path == "/api/ops/a2-attack"', src)
+        self.assertIn("adversarial_challenge as _a2_attack", src)
+
+    def test_route_mirrors_the_calibration_transport_discipline(self):
+        src = self._route_source()
+        self.assertIn("413", src)                                  # caps typed
+        self.assertIn("12_000", src)                               # candidate cap
+        self.assertIn("INSTRUMENT_IMPORT_FAILURE", src)
+        self.assertIn("INSTRUMENT_EXECUTION_FAILURE", src)
+        self.assertIn("UNKNOWN_PRIOR_ART_STATE", src)              # vocabulary gate
+        self.assertIn("evidence_items", src)                       # the disclosed input mapping
+        self.assertIn("require_provider", src)                     # the R491 ring-pin discipline
+        self.assertIn("UNKNOWN_RING_PIN", src)
+        self.assertIn("_LAST_ATTACK_PROVIDER_META", src)           # transport provenance
+        # one attack per request — no loop over cases in the route
+        self.assertNotIn("for case in", src)
+
+
+class TestGauntletRingPin(unittest.TestCase):
+    def test_signatures_accept_the_pin(self):
+        import inspect
+        self.assertIn("require_provider",
+                      inspect.signature(a2.adversarial_challenge).parameters)
+        self.assertIn("require_provider",
+                      inspect.signature(a2.llm_chat).parameters)
+
+    def test_pinned_policy_pins_exactly_one_provider(self):
+        """With require_provider, the selection policy is the pin and
+        nothing else — max_preference_fallback=0 (the engine's
+        hard-pin semantics, mirrored for the gauntlet)."""
+        captured = {}
+
+        class _Res:
+            ok = True
+            content = "UNSUPPORTED_MECHANISM: PASS\nOVERALL: PASS"
+
+            def to_meta(self):
+                return {"ok": True, "provider": "atria",
+                        "model": "m", "hard_pin": {"status": "OK"}}
+
+        class _FakeReg:
+            @staticmethod
+            def generate(prompt, system="", timeout=0, max_retries=0,
+                         policy=None):
+                captured["policy"] = policy
+                return _Res()
+
+        fake = mock.patch("discovery_fabric.engine.llm_registry.generate",
+                          new=_FakeReg.generate)
+        # the module imports llm_registry inside llm_chat; patch the
+        # real registry module's generate
+        import discovery_fabric.engine.llm_registry as real_reg
+        with mock.patch.object(real_reg, "generate", _FakeReg.generate):
+            out = a2.llm_chat("p", require_provider="atria")
+        self.assertTrue(out)
+        pol = captured["policy"]
+        self.assertEqual(pol.preferred_providers, ["atria"])
+        self.assertEqual(pol.max_preference_fallback, 0)
+        meta = a2._LAST_ATTACK_PROVIDER_META
+        self.assertEqual(meta["ring_pin"]["requested"], "atria")
+        self.assertEqual(meta["ring_pin"]["mode"], "HARD_PIN_NO_FALLBACK")
+        self.assertEqual(meta["ring_pin"]["served_provider"], "atria")
+        self.assertIsNone(meta["ring_pin"]["pin_violation"])
+
+    def test_pin_violation_is_typed_not_silent(self):
+        captured = {}
+
+        class _Res:
+            ok = True
+            content = "OVERALL: PASS"
+
+            def to_meta(self):
+                return {"ok": True, "provider": "xkiro", "model": "m"}
+
+        class _FakeReg:
+            @staticmethod
+            def generate(prompt, system="", timeout=0, max_retries=0,
+                         policy=None):
+                captured["policy"] = policy
+                return _Res()
+
+        import discovery_fabric.engine.llm_registry as real_reg
+        with mock.patch.object(real_reg, "generate", _FakeReg.generate):
+            a2.llm_chat("p", require_provider="atria")
+        meta = a2._LAST_ATTACK_PROVIDER_META
+        self.assertIn("PINNED ring not served",
+                      meta["ring_pin"]["pin_violation"])
+
+    def test_no_pin_keeps_the_production_cascade(self):
+        captured = {}
+
+        class _Res:
+            ok = True
+            content = "OVERALL: PASS"
+
+            def to_meta(self):
+                return {"ok": True, "provider": "atria", "model": "m"}
+
+        class _FakeReg:
+            @staticmethod
+            def generate(prompt, system="", timeout=0, max_retries=0,
+                         policy=None):
+                captured["policy"] = policy
+                return _Res()
+
+        import discovery_fabric.engine.llm_registry as real_reg
+        with mock.patch.object(real_reg, "generate", _FakeReg.generate):
+            a2.llm_chat("p")
+        pol = captured["policy"]
+        self.assertIn("atria", pol.preferred_providers)
+        self.assertGreater(len(pol.preferred_providers), 1)
+        self.assertNotIn("ring_pin", a2._LAST_ATTACK_PROVIDER_META)
+
+
+class TestUnionGatePins(unittest.TestCase):
+    """The R491 line's consumption gate + registry — pinned here
+    against the DEPLOYED design so the transport round cannot drift
+    from the consumption semantics it measures."""
+
+    def test_registry_entry_exists_and_fails_closed(self):
+        self.assertIn(A2_INSTRUMENT, gate.INSTRUMENT_MEASUREMENTS)
+        st = gate.resolve_state(instrument_version=A2_INSTRUMENT)
+        self.assertEqual(st["state"], "UNKNOWN_NOT_CALIBRATED")
+        self.assertFalse(st["terminal_kill_admissible"])
+        self.assertIn("Art. L", st["reason"])
+
+    def test_uncalibrated_kill_escalates_never_rejects_on_the_gauntlet(self):
+        adv = {"overall": "KILLED", "killed_count": 2,
+               "reason": "mechanism unsupported by any evidence",
+               "attacks": {"unsupported_mechanism": "KILLED",
+                           "engineering_infeasibility": "KILLED"}}
+        res = a2classify.classify(
+            _full_candidate(), _VERIFICATION_OK, _PRIOR_ART_PASS, adv)
+        # the gauntlet's kill alone does NOT terminate REJECTED
+        self.assertNotEqual(res["final_status"], "REJECTED")
+        # the objections ride the record verbatim (preserved, not lost)
+        esc = res.get("adversarial_escalation") or {}
+        obj = (esc.get("escalated_objection") or {})
+        self.assertEqual(
+            obj.get("objections_verbatim", {}).get("unsupported_mechanism"),
+            "KILLED")
+        self.assertEqual(esc["gate"]["instrument"], A2_INSTRUMENT)
+        self.assertFalse(esc["gate"]["terminal_kill_admissible"])
+
+    def test_unknown_verdict_vocabulary_fails_closed(self):
+        adv = {"overall": "SOME_NOVEL_STATE", "attacks": {}}
+        res = a2classify.classify(
+            _full_candidate(), _VERIFICATION_OK, _PRIOR_ART_PASS, adv)
+        self.assertEqual(res["final_status"], "UNKNOWN")
+        self.assertTrue(res["adjudication_blocked"])
+
+    def test_registered_calibration_restores_kill_authority(self):
+        """The destination state machine end-to-end: committed records
+        meeting the sealed bars -> CALIBRATED -> the gauntlet's KILL
+        terminates REJECTED again. The exact path the A2 seal takes
+        when (and only when) its own measurement earns it."""
+        with tempfile.TemporaryDirectory() as td:
+            td = Path(td)
+            meas = {
+                # the ENGINE registry schema (resolve_state reads these
+                # keys): metrics.{false_kill_rate_on_known_good,
+                # coverage, parse_completeness} + scoped_tpr_diagnostic.
+                # tpr — the A2 measurement record must ship in THIS
+                # schema for the registry to derive its state.
+                "metrics": {"false_kill_rate_on_known_good": 0.1,
+                            "coverage": 1.0, "parse_completeness": 1.0},
+                "scoped_tpr_diagnostic": {"tpr": 0.9},
+                "threshold_verdict": {"calibrated": True},
+                "n_cases": 21}
+            seal = {"pre_registered_thresholds": {
+                "tpr_min": 0.75, "fpr_max": 0.30,
+                "coverage_min": 0.875,
+                "parse_completeness_min": 0.875}}
+            (td / "m.json").write_text(json.dumps(meas))
+            (td / "s.json").write_text(json.dumps(seal))
+            with mock.patch.dict(
+                    gate.INSTRUMENT_MEASUREMENTS,
+                    {A2_INSTRUMENT: {
+                        "measurement": td / "m.json",
+                        "seal": td / "s.json"}}):
+                st = gate.resolve_state(instrument_version=A2_INSTRUMENT)
+                self.assertEqual(st["state"], "CALIBRATED")
+                self.assertTrue(st["terminal_kill_admissible"])
+                adv = {"overall": "KILLED", "killed_count": 1,
+                       "reason": "mechanism unsupported",
+                       "attacks": {"unsupported_mechanism": "KILLED"}}
+                res = a2classify.classify(
+                    _full_candidate(), _VERIFICATION_OK,
+                    _PRIOR_ART_PASS, adv)
+        self.assertEqual(res["final_status"], "REJECTED")
+        self.assertIn("adversarial challenge failed", res["reason"])
+
+
+if __name__ == "__main__":
+    unittest.main(verbosity=2)
