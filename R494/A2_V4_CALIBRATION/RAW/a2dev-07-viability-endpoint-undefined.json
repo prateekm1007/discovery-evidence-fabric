@@ -1,0 +1,132 @@
+{
+ "http": 200,
+ "attack": {
+  "overall": "PASS",
+  "instrument_version": "a2_adversarial_gauntlet/2.0.0",
+  "gauntlet_version": "a2_adversarial_gauntlet/2.0.0",
+  "killed_count": 0,
+  "reason": "",
+  "attacks": {
+   "unsupported_mechanism": "RISK - PEF treatment is a known technology for cell membrane permeabilization, but the record lacks specific data supporting its effectiveness against all ballast organism size fractions.",
+   "weak_transfer": "RISK - The record doesn't specify how the PEF treatment transfers effectively from the chamber to the entire ballast tank volume during the 30 min hold.",
+   "obvious_combination": "RISK - The combination of PEF treatment with a holding period is not explicitly shown as a known technique in the record.",
+   "prior_art": "PASS - No specific prior disclosure is identified in the record.",
+   "contradiction": "PASS - No contradictory values are provided in the record.",
+   "boundary_failure": "RISK - The record acknowledges conductivity variation with salinity changes but doesn't demonstrate how this is compensated for in the design.",
+   "engineering_infeasibility": "RISK - The 90 kW pulsed supply with 120 kW margin seems plausible but lacks detailed engineering calculations to confirm feasibility.",
+   "regulatory_incompatibility": "PASS - No specific regulatory requirements are mentioned in the record."
+  },
+  "risk_flags": [
+   {
+    "dimension": "unsupported_mechanism",
+    "verdict": "RISK",
+    "basis": "PEF treatment is a known technology for cell membrane permeabilization, but the record lacks specific data supporting its effectiveness against all ballast organism size fractions.",
+    "source": "evaluator_risk"
+   },
+   {
+    "dimension": "weak_transfer",
+    "verdict": "RISK",
+    "basis": "The record doesn't specify how the PEF treatment transfers effectively from the chamber to the entire ballast tank volume during the 30 min hold.",
+    "source": "evaluator_risk"
+   },
+   {
+    "dimension": "obvious_combination",
+    "verdict": "RISK",
+    "basis": "The combination of PEF treatment with a holding period is not explicitly shown as a known technique in the record.",
+    "source": "evaluator_risk"
+   },
+   {
+    "dimension": "boundary_failure",
+    "verdict": "RISK",
+    "basis": "The record acknowledges conductivity variation with salinity changes but doesn't demonstrate how this is compensated for in the design.",
+    "source": "evaluator_risk"
+   },
+   {
+    "dimension": "engineering_infeasibility",
+    "verdict": "RISK",
+    "basis": "The 90 kW pulsed supply with 120 kW margin seems plausible but lacks detailed engineering calculations to confirm feasibility.",
+    "source": "evaluator_risk"
+   }
+  ],
+  "invalid_dimensions": [],
+  "v4_corrections_applied": [
+   "burden_of_proof:risk_flag:unsupported_mechanism",
+   "burden_of_proof:risk_flag:weak_transfer",
+   "burden_of_proof:risk_flag:obvious_combination",
+   "burden_of_proof:risk_flag:boundary_failure",
+   "burden_of_proof:risk_flag:engineering_infeasibility"
+  ],
+  "burden_of_proof": {
+   "rules_version": "burden_of_proof/1.0.0",
+   "kills_adjudicated": 0,
+   "kills_kept": 0,
+   "kills_demoted_to_risk": 0,
+   "demotion_classes": [],
+   "ledger": []
+  },
+  "prior_art_state": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+  "evidence_verified": true,
+  "prompt_hash": "7f79552199b8380d",
+  "output_hash": "efef7a0dc1917071",
+  "timestamp": "2026-09-17T16:42:13.660757+00:00",
+  "transport": {
+   "provider": "zai",
+   "model": "zai-org/GLM-5.3",
+   "prompt_hash": "ac7d805dae49559c267cba451b767e2faa26e825bbcd322746233f1b14288e03",
+   "output_hash": "efef7a0dc1917071a20526f2bc10ff97267a149187b0814c261f1f9aea8c945a",
+   "latency_ms": 2764,
+   "substituted_from": null,
+   "status": "OK",
+   "cost_provenance": {
+    "model_id": "zai-org/GLM-5.3",
+    "model_revision": "UNDECLARED",
+    "transport": "http://127.0.0.1:8787/v1/chat/completions",
+    "local_or_remote": "LOCAL",
+    "license": "UNDECLARED",
+    "cost_basis": "ENVIRONMENT_GRANT",
+    "account_domain": "SANDBOX_ENVIRONMENT_GRANT",
+    "policy": "UNRESTRICTED",
+    "policy_version": "model_cost_policy/1.1.0"
+   },
+   "call_provenance": {
+    "run_id": null,
+    "session_id": null,
+    "engine_stage": null,
+    "call_class": "STANDALONE"
+   },
+   "task_degradation": {
+    "requested_task": "FAST",
+    "actual_task_capability": "FAST",
+    "task_capability_match": true,
+    "degraded_reason": "the serving model declares the requested task capability"
+   },
+   "retry_notes": [],
+   "provider_route": [
+    {
+     "provider": "zai",
+     "failure_type": null,
+     "status": "OK",
+     "capability_state": "PROBE_OK",
+     "fallback_provider": null
+    }
+   ],
+   "failure_type": null,
+   "ring_pin": {
+    "requested": "zai",
+    "mode": "HARD_PIN_NO_FALLBACK",
+    "served_provider": "zai",
+    "served_model": "zai-org/GLM-5.3",
+    "pin_violation": null
+   }
+  },
+  "calibration_scope": {
+   "instrument": "a2/adversarial.py::adversarial_challenge (the 8-dimension adversarial gauntlet, v4 burden-of-proof rules)",
+   "instrument_version": "a2_adversarial_gauntlet/2.0.0",
+   "article_l_state": "UNCALIBRATED_NO_MEASUREMENT_SHIPPED",
+   "ruling": "R490/A2_CALIBRATION_SCOPE.json option (a): own DEV-corpus calibration (Art. LIX) before the KILL regains terminal authority; the consumption-side escalation (the R417 treatment) LANDED in R491 (a2/classify.py consults the canonical measurement registry entry \u2014 the record's own instrument_version selects it; the gauntlet's KILL escalates while uncalibrated)",
+   "v4_rules": "R494: the burden-of-proof standard (lacks-derivation -> RISK, never KILL) \u2014 the three-verdict vocabulary + the machine-side enforce_burden_of_proof (v4_corrections.py, the ONE authoritative implementation); the untuned 1.0.0 baseline measured TPR 0.0909 / FPR 1.0 on the frozen R492 DEV corpus (the before-number this tuning is judged against)",
+   "sealed_bar_coverage": "NONE until the v4 DEV-corpus measurement ships under the registry's pinned names \u2014 the R412/R447/R487 sealed-bar records cover independent_attack/* only"
+  }
+ },
+ "latency_s": 2.8
+}
