@@ -1,0 +1,61 @@
+{
+ "artifact_type": "ATRIA_RECOVERY_WATCH",
+ "round": "R494",
+ "reviewer_provenance": "AI_REVIEW",
+ "the_question": "the directive's watch item: the atria endpoint's recovery \u2014 R488 proves it CAN serve attack prompts (cal-17/18, 117-123s); R491 measured it typed-broken (empty content at the 8192 reasoning ceiling); does it recover?",
+ "n_probe_attempts": 4,
+ "probes": [
+  {
+   "label": "attempt-1",
+   "http": 200,
+   "latency_s": 167.1,
+   "overall": "EVALUATOR_CALL_FAILED",
+   "status": "CALL_FAILED",
+   "served_provider": "atria",
+   "served_model": "Atria-Dawn-Preview",
+   "pin_violation": null,
+   "timestamp": "2026-09-17T15:49:08.976483+00:00",
+   "era": "dedca446 (the pre-union build, the R493-part-2 line)"
+  },
+  {
+   "label": "attempt-2",
+   "http": 200,
+   "latency_s": 75.0,
+   "overall": "EVALUATOR_CALL_FAILED",
+   "status": "CALL_FAILED",
+   "served_provider": "atria",
+   "served_model": "Atria-Dawn-Preview",
+   "pin_violation": null,
+   "timestamp": "2026-09-17T15:50:34.026567+00:00",
+   "era": "dedca446 (the pre-union build, the R493-part-2 line)"
+  },
+  {
+   "label": "attempt-1",
+   "http": 200,
+   "latency_s": 28.6,
+   "overall": "EVALUATOR_CALL_FAILED",
+   "status": "CALL_FAILED",
+   "served_provider": "atria",
+   "served_model": "Atria-Dawn-Preview",
+   "pin_violation": null,
+   "error": null,
+   "timestamp": "2026-09-17T16:45:52.376903+00:00",
+   "era": "8e38e2c2 (the union build)"
+  },
+  {
+   "label": "attempt-2",
+   "http": 200,
+   "latency_s": 116.3,
+   "overall": "EVALUATOR_CALL_FAILED",
+   "status": "CALL_FAILED",
+   "served_provider": "atria",
+   "served_model": "Atria-Dawn-Preview",
+   "pin_violation": null,
+   "error": null,
+   "timestamp": "2026-09-17T16:47:58.671204+00:00",
+   "era": "8e38e2c2 (the union build)"
+  }
+ ],
+ "finding": "NO RECOVERY: 4 pinned attempts across two build eras (dedca446 pre-union + 8e38e2c2 the union build), ALL CALL_FAILED with the pin HELD (served Atria-Dawn-Preview, empty content \u2014 the same R491 class; latencies 75-167s). Typed, evidenced, never a verdict (Art. LXI) \u2014 the deployment's strong-ring option remains dark for attack prompts",
+ "consequence": "the deployed transport's production-reachable rings are xkiro (free, measured this round) and atria (dark); the second STRONG ring the ring-binding makes valuable is the HF inference router \u2014 see OWNER_LEVER_MEMO.md"
+}

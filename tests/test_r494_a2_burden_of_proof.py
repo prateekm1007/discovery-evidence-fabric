@@ -392,8 +392,15 @@ class TestConsumptionGateV4(unittest.TestCase):
     def test_registry_entry_v4_exists_and_fails_closed(self):
         self.assertIn(V4, gate.INSTRUMENT_MEASUREMENTS)
         st = gate.resolve_state(instrument_version=V4)
-        self.assertEqual(st["state"], "UNKNOWN_NOT_CALIBRATED")
+        # the measured-NOT_CALIBRATED state (the R487 precedent: the
+        # failing measurement SHIPS; the state derives from real
+        # numbers — the union's TPR 0.2727 fails the 0.75 bar)
+        self.assertEqual(st["state"], "NOT_CALIBRATED")
         self.assertFalse(st["terminal_kill_admissible"])
+        self.assertEqual(st["measured"]["tpr_scoped"], 0.2727)
+        self.assertEqual(st["measured"]["fpr_known_good"], 0.0)
+        self.assertEqual(st["measured"]["attacker_ring"]["provider"],
+                         "xkiro")
 
     def test_v4_uncalibrated_kill_escalates(self):
         res = a2classify.classify(
