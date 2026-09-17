@@ -24,7 +24,17 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 # ----------------------- KEYS / CONFIG -----------------------
-KEYS_FILE = Path("/home/z/my-project/discovery-evidence-fabric/.env.keys")
+# R491: REPO_ROOT-derived — the SAME single rule as
+# discovery_fabric/source_registry/keys.py (credentials live in
+# .env.keys at the repo root, gitignored, mode 600). The previous
+# sandbox-era hardcoded path (/home/z/my-project/discovery-evidence-
+# fabric/.env.keys) can never exist in a deployed container, which made
+# the file-layer credentials permanently unresolvable in production even
+# when present on the secret surface (the measured R490 collision-leg
+# failure). The canonical Space boot materializes the file from the
+# environment (toscanini/materialize_env_keys.sh); absent file stays an
+# empty dict — unknown stays unknown (Art. XXV).
+KEYS_FILE = Path(__file__).resolve().parents[2] / ".env.keys"
 
 def _load_keys() -> Dict[str, str]:
     if not KEYS_FILE.exists():

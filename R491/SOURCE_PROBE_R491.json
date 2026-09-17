@@ -1,0 +1,53 @@
+{
+  "artifact_type": "R491_SOURCE_PROBE",
+  "round": "R491",
+  "method": "engine connectors via a temporary .env.keys file + the real loader (the production consumption path, rehearsed)",
+  "credentials": {
+    "LENS_API_TOKEN": {
+      "fingerprint": "3aVb...IKG9 (len 52)",
+      "registered_in": "vault + Space secret surface (R491)"
+    },
+    "ELSEVIER_API_KEY": {
+      "fingerprint": "15db...ecc7 (len 32)",
+      "registered_in": "vault + Space secret surface (R491)"
+    }
+  },
+  "probes": [
+    {
+      "probe": "lens_patent/real-token",
+      "source_id": "lens_patent",
+      "status": "AUTH_FAILED",
+      "ok": false,
+      "latency_ms": 780,
+      "record_count": null,
+      "error": "HTTP 401: {\"reference\":\"e310ac97-cc6a-4e37-a93a-ea0b7cc5e482\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}"
+    },
+    {
+      "probe": "lens_patent/bogus-control",
+      "source_id": "lens_patent",
+      "status": "AUTH_FAILED",
+      "ok": false,
+      "latency_ms": 567,
+      "record_count": null,
+      "error": "HTTP 401: {\"reference\":\"4ba375cb-6fb5-4cbb-a0c1-59406b4ad04f\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}"
+    },
+    {
+      "probe": "elsevier_scopus/real-key",
+      "source_id": "elsevier_scopus",
+      "status": "OK",
+      "ok": true,
+      "latency_ms": 708,
+      "record_count": null,
+      "error": null
+    },
+    {
+      "probe": "elsevier_scopus/bogus-control",
+      "source_id": "elsevier_scopus",
+      "status": "AUTH_FAILED",
+      "ok": false,
+      "latency_ms": 527,
+      "record_count": null,
+      "error": "HTTP 401: {\"error-response\":{\"error-code\":\"APIKEY_INVALID\",\"error-message\":\"The provided apiKey is invalid.\"}}"
+    }
+  ]
+}

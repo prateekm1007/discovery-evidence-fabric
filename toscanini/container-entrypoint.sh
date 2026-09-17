@@ -126,4 +126,19 @@ if [ "$LOCAL_EMBED_ENABLE" = "1" ] \
   export LOCAL_EMBED_URL=http://127.0.0.1:8791
 fi
 
+# ---------------------------------------------------------------------------
+# R491: the file-layer credential materialization. The source-registry
+# layer (source_registry/keys.py, prior_art_v2/sources.py, gateway.py)
+# reads the .env.keys FILE — excluded from the image by .dockerignore by
+# construction, so file-layer credentials could never resolve in the
+# container (the measured R490 collision-leg failure: 5 x lens_patent
+# LENS_API_TOKEN not configured while the env-layer atria leg served).
+# Materialize /app/.env.keys from the LXXIII-registered names present in
+# the environment. Values never logged (BS-021); honest absence is not
+# an error (exit 3) and never blocks the boot.
+# ---------------------------------------------------------------------------
+if [ -f /app/toscanini/materialize_env_keys.sh ]; then
+  sh /app/toscanini/materialize_env_keys.sh /app/.env.keys || true
+fi
+
 exec python3 -m toscanini.server
