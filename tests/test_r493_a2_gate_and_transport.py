@@ -306,7 +306,9 @@ class TestMemoryClaimFloor(unittest.TestCase):
                 "OVERALL: KILLED\n"
                 "REASON: x")
         res = self._parsed(resp, cand)
-        self.assertIn("memory-claim floor",
+        # R494 union: the demotion is the burden-of-proof RISK flag
+        # (memory_claim); the 1.1.0 floor name rides as the alias
+        self.assertIn("RISK (burden-of-proof: memory_claim)",
                       res["attacks"]["obvious_combination"])
         self.assertIn("a2_v4_floors:memory_claim",
                       res["v4_corrections_applied"])
@@ -375,7 +377,12 @@ class TestV4Floors(unittest.TestCase):
             return a2.adversarial_challenge(candidate, True, prior_art_state)
 
     def test_version_travels_on_the_record(self):
-        self.assertEqual(a2.A2_GAUNTLET_VERSION, "a2_gauntlet/1.1.0")
+        # R494 union: 1.1.0 (the sibling line's floors) + the burden-
+        # of-proof rules (this line) -> 2.0.0 in the REGISTRY's id
+        # scheme; the record carries BOTH keys (gauntlet_version —
+        # the 1.1.0 line's; instrument_version — the registry's)
+        self.assertEqual(a2.A2_GAUNTLET_VERSION,
+                         "a2_adversarial_gauntlet/2.0.0")
 
     def test_contradiction_absence_floor(self):
         # the measured a2dev-20 class: CONTRADICTION killed with an
@@ -394,9 +401,13 @@ class TestV4Floors(unittest.TestCase):
                 "REASON: x")
         res = self._parsed(resp, cand)
         self.assertNotIn("KILLED", res["attacks"]["contradiction"])
-        self.assertIn("absence-as-contradiction floor",
+        # R494 union: the demotion is the burden-of-proof RISK flag;
+        # the 1.1.0 floor name rides as the lineage alias
+        self.assertIn("RISK (burden-of-proof: absence_as_contradiction)",
                       res["attacks"]["contradiction"])
         self.assertIn("a2_v4_floors:contradiction_absence",
+                      res["v4_corrections_applied"])
+        self.assertIn("burden_of_proof:absence_as_contradiction",
                       res["v4_corrections_applied"])
         # the objection is PRESERVED verbatim in the demotion text
         self.assertIn("not supported by any data",
@@ -406,8 +417,13 @@ class TestV4Floors(unittest.TestCase):
 
     def test_contradiction_kill_with_evidence_survives_the_floor(self):
         cand = _full_candidate()
-        cand["evidence_items"] = [{"id": "ev:1", "title":
-                                   "type-approval report"}]
+        # R494 union: the evidence must actually CARRY the conflicting
+        # value (the two-sided standard) — an empty-shell evidence
+        # item (id+title only) binds nothing and the kill demotes
+        cand["predicted_effect"] = "5.5-log inactivation at rated flow"
+        cand["evidence_items"] = [{"id": "ev:1",
+                                   "title": "type-approval report",
+                                   "finding": "3.8-log mean inactivation"}]
         resp = ("UNSUPPORTED_MECHANISM: PASS\n"
                 "WEAK_TRANSFER: PASS\n"
                 "OBVIOUS_COMBINATION: PASS\n"
@@ -423,6 +439,8 @@ class TestV4Floors(unittest.TestCase):
         self.assertIn("KILLED", res["attacks"]["contradiction"])
         self.assertNotIn("a2_v4_floors:contradiction_absence",
                          res["v4_corrections_applied"])
+        self.assertIn("burden_of_proof:burden_met",
+                      res["v4_corrections_applied"])
 
     def test_ungrounded_kill_floor(self):
         # the baseline's dominant class: a kill with no number, no
@@ -440,9 +458,13 @@ class TestV4Floors(unittest.TestCase):
                 "OVERALL: KILLED\n"
                 "REASON: x")
         res = self._parsed(resp, cand)
-        self.assertIn("ungrounded-kill floor",
+        # R494 union: the demotion is the burden-of-proof RISK flag;
+        # the 1.1.0 floor name rides as the lineage alias
+        self.assertIn("RISK (burden-of-proof: unbound_derivation)",
                       res["attacks"]["unsupported_mechanism"])
         self.assertIn("a2_v4_floors:ungrounded_kill",
+                      res["v4_corrections_applied"])
+        self.assertIn("burden_of_proof:unbound_derivation",
                       res["v4_corrections_applied"])
         self.assertIn("questionable overall",
                       res["attacks"]["unsupported_mechanism"])
@@ -474,6 +496,23 @@ class TestV4Floors(unittest.TestCase):
         self.assertNotIn("a2_v4_floors:ungrounded_kill",
                          res["v4_corrections_applied"])
         self.assertEqual(res["overall"], "KILLED")
+
+    def test_obviousness_memory_claim_demotes(self):
+        # R493 v4.1 (race instance 13, MEASURED): the union's earlier
+        # named-specific grounding for obviousness is RETIRED BY
+        # MEASUREMENT — the v4 run found memory-cited obviousness
+        # kills false-killing clean controls; an obviousness kill must
+        # be PACKET-ANCHORED (Art. XIX: the measurement beats the
+        # design)
+        from discovery_fabric.v4_corrections import (
+            enforce_burden_of_proof)
+        r = enforce_burden_of_proof(
+            "obvious_combination",
+            "KILLED - the named techniques (rotor-stator cavitation "
+            "+ UV) are standard IMO D-2 practice",
+            _full_candidate(), [])
+        self.assertEqual(r["verdict"], "RISK")
+        self.assertEqual(r["demotion_class"], "memory_claim")
 
     def test_floor_never_creates_a_kill_and_preserves_the_reason(self):
         # a PASS record passes through the floors untouched

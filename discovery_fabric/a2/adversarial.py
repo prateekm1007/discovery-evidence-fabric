@@ -29,6 +29,7 @@ from discovery_fabric.v4_corrections import (
     enforce_prior_art_firewall,
     check_adversarial_invalid,
     resolve_boundary_evidence,
+    enforce_burden_of_proof,
     NON_KILL_PRIOR_ART_STATES,
     KILL_PRIOR_ART_STATES,
 )
@@ -47,55 +48,56 @@ OPENROUTER_API_KEY = os.environ.get("OPENROUTER_API_KEY", "")
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 FROZEN_MODEL = "deepseek/deepseek-v4-flash-0731"  # OpenRouter fallback model
 
-# R493: the gauntlet's instrument version. 1.0.0 = the UNTUNED baseline
-# measured on the frozen DEV corpus (R493/A2_BASELINE: TPR 0.0909,
-# FPR 1.0 — the universal-killer class, kills unbound to defect
-# content). 1.1.0 = the DEV-corpus calibration tuning (the operator's
-# "v4 tuning against DEV only", Art. LIX): domain-neutral framing +
-# the per-dimension grounding contract in the kill standard + the
-# deterministic absence/ungrounded floors. The version travels on
-# every record so a future seal binds to exactly one iteration.
-A2_GAUNTLET_VERSION = "a2_gauntlet/1.1.0"
+# R493/R494: the gauntlet's instrument version. 1.0.0 = the UNTUNED
+# baseline measured on the frozen DEV corpus (R493/A2_BASELINE:
+# TPR 0.0909, FPR 1.0 — the universal-killer class, kills unbound
+# to defect content; confirmed on TWO rings). 2.0.0 = the R493+R494
+# UNION tuning (the operator's "v4 tuning against DEV only",
+# Art. LIX): the sibling line's grounded kill standard + this
+# line's burden-of-proof rules (see the prompt block below). The
+# version travels on every record (gauntlet_version AND
+# instrument_version — the union's two accepted keys) so a future
+# seal binds to exactly one iteration.
+A2_GAUNTLET_VERSION = "a2_adversarial_gauntlet/2.0.0"
+GAUNTLET_VERSION = A2_GAUNTLET_VERSION   # the registry-entry alias
 
 _SSL = ssl.create_default_context()
 _SSL.check_hostname = False
 _SSL.verify_mode = ssl.CERT_NONE
 
-# R493 v4 (a2_gauntlet/1.1.0): the prompt rewritten from the measured
-# DEV-corpus baseline failures (R493/A2_BASELINE, every change below
-# is WARRANTED BY A MEASURED FAILURE CLASS — Art. LIX tuning on the
-# development corpus only; the sealed corpora are untouched):
-#   MEASURED -> CHANGE
-#   - regulatory_incompatibility boilerplate kills on a marine
-#     candidate (7/11 defect + 1 control) -> the prompt is
-#     DOMAIN-NEUTRAL (it said "medical device"; production domains
-#     are general engineering) and the regulatory dimension requires
-#     a NAMED regime/clause.
-#   - contradiction killed 8/11 defect cases with NO evidence
-#     conflict + the malformed cohort's empty-evidence case -> the
-#     contradiction dimension REQUIRES the provided evidence to
-#     actually conflict, with the conflicting value cited; no
-#     evidence packet -> contradiction cannot kill (absence is not
-#     contradiction, Art. XXI.3).
-#   - obvious_combination killed 4/4 clean controls (the R417
-#     universal-killer class) -> the obviousness dimension requires
-#     the specific known techniques NAMED and the combination
-#     shown obvious FROM THEM; a bare assertion is not a kill.
-#   - kills unbound to defect content (TPR 1/11 with binding) ->
-#     THE KILL STANDARD: every KILLED line must carry the specific
-#     grounding (the candidate's own number, quantity, named
-#     technique, or the quoted claim it fails); a kill that cannot
-#     name its specifics is recorded PASS-with-objection, not KILLED.
-ATTACK_PROMPT = """You are an adversarial reviewer for engineering invention candidates (any domain: marine, mechanical, electrical, chemical, medical, process, ...).
+# R493 v4 + R494 (race instance 12 — the UNION): the sibling line's
+# grounded kill standard (1.1.0: domain-neutral framing, per-dimension
+# grounding contracts, the absence/ungrounded floors) and this line's
+# burden-of-proof rules UNION: the three-verdict vocabulary
+# (PASS | RISK | KILLED) + the machine-side enforce_burden_of_proof
+# (v4_corrections.py CORRECTION 12), which SUBSUMES both 1.1.0 floors
+# (contradiction_absence -> absence_as_contradiction; ungrounded_kill
+# -> unbound_derivation) and adds lacks_derivation /
+# attacker_imported_scope / the evidence-bare honest kill / the
+# prior-art-state binding. The verdict vocabulary CHANGED (RISK
+# added), so the version is 2.0.0 in the REGISTRY's id scheme
+# (a2_adversarial_gauntlet/* — the R491 consumption gate and
+# INSTRUMENT_MEASUREMENTS keys; the sibling's gauntlet_version record
+# key stays accepted as the alias). 2.0.0 earns its calibration state
+# from ITS OWN measurement on the frozen R492 DEV corpus (Art. LIX) —
+# never inherited (the registry's v2.0->v3.0 precedent). The untuned
+# baseline the tuning is judged against: TPR 0.0909 / FPR 1.0,
+# measured on TWO rings (xkiro via the deployed transport — the
+# sibling line; the local z-ai gateway — this line) — the before-
+# number is ring-independent.
+ATTACK_PROMPT = """You are an adversarial reviewer for engineering invention candidates (any domain: marine, mechanical, electrical, chemical, medical, process, ...). You operate under a strict BURDEN OF PROOF: the burden for a KILL is on YOU, the attacker.
 
-Attack this candidate on the following dimensions. For each, respond PASS (survives) or KILLED (fails).
+For each dimension, respond with exactly one verdict:
 
-THE KILL STANDARD (applies to every dimension): a KILLED verdict must NAME its specific grounding — the exact quantity, number, regime, clause, standard, or named technique from the candidate (or from the provided evidence) that fails. Grounded example: "KILLED - claimed 3.5-log at 8 Wh/m3 specific energy, but cavitational radical chemistry requires tens of kJ/LITER, 1000x higher". An objection you cannot ground in a specific is NOT a kill: record PASS (the objection still stands in your reason line, but it does not kill).
+- KILLED — only when the record ITSELF proves the defect. Name the specific grounding — the exact quantity, number, regime, clause, standard, or named technique from the candidate (or from the provided evidence) that fails — and state the relation that proves the defect: a contradiction between two record values (name both); a magnitude fatal by the record's own numbers; a boundary the record itself declares violated; or a load-bearing claim with zero supporting evidence when the record carries no evidence at all. Grounded example: "KILLED - claimed 3.5-log at 8 Wh/m3 specific energy, but cavitational radical chemistry requires tens of kJ/LITER, 1000x higher".
+- RISK — your objection is real but the burden for a KILL is not met: the record asserts a claim but lacks the derivation, calculation, data, or evidence that would support it; the objection needs an assumption or a scope the record never stated; or the defect is plausible but not derivable from the record's own bytes.
+- PASS — no objection on this dimension.
 
-Dimensions:
+A claim that lacks derivation is the NORMAL state of a young candidate: it is a RISK (a demand for evidence), never a terminal kill. NEVER kill a candidate merely for lacking a calculation, data, or evidence you wish it had. An objection you cannot ground in a specific from the record is a RISK, not a kill.
+nsions:
 1. UNSUPPORTED_MECHANISM: the causal chain is physically/chemically invalid — name the specific claimed effect and the specific physical reason it cannot hold.
 2. WEAK_TRANSFER: the source-to-application transfer is superficial — name the specific mechanism element that fails to transfer and why.
-3. OBVIOUS_COMBINATION: this is an obvious combination of known techniques — NAME the specific known techniques and show the combination is obvious FROM THEM (a novel integration with a new design variable is not obvious). The known techniques must come from the PROVIDED record (the evidence_items): a combination you know from memory, literature, or commercial systems you cannot cite from the packet is an OBJECTION, not a kill — record PASS and name it in your reason.
+3. OBVIOUS_COMBINATION: this is an obvious combination of known techniques — the known techniques must be IN THE PROVIDED RECORD (cite the evidence item or echo its words); remembered literature, trials, or commercial systems the record does not contain are a RISK (record them in your basis), never a kill (a novel integration with a new design variable is not obvious).
 4. PRIOR_ART: this is already known — name the specific prior disclosure you have in view (without one, PASS).
 5. CONTRADICTION: the PROVIDED evidence contradicts the claim — cite the evidence's specific conflicting value(s). If no evidence items are provided, or the evidence does not actually conflict with a claimed number, this dimension is PASS (absence of evidence is not a contradiction).
 6. BOUNDARY_FAILURE: a boundary condition is missing or violated — name the specific boundary/operating point and the specific violation.
@@ -105,18 +107,60 @@ Dimensions:
 Candidate (arm hidden; any evidence_items provided are part of the record):
 {candidate_json}
 
-Respond (each on ONE line, KILLED lines must carry their specific grounding). You MUST respond with ALL NINE lines — every dimension line, then OVERALL, then REASON; a dimension you cannot object to is PASS:
-UNSUPPORTED_MECHANISM: PASS | KILLED - <specific grounding>
-WEAK_TRANSFER: PASS | KILLED - <specific grounding>
-OBVIOUS_COMBINATION: PASS | KILLED - <named techniques>
-PRIOR_ART: PASS | KILLED - <named disclosure>
-CONTRADICTION: PASS | KILLED - <cited conflicting value>
-BOUNDARY_FAILURE: PASS | KILLED - <named boundary + violation>
-ENGINEERING_INFEASIBILITY: PASS | KILLED - <named limit>
-REGULATORY_INCOMPATIBILITY: PASS | KILLED - <named regime/clause>
-OVERALL: PASS | KILLED
+Respond (each on ONE line: verdict first, then a one-sentence basis; every KILLED line MUST name its specific grounding from the record). You MUST respond with ALL NINE lines — every dimension line, then OVERALL, then REASON; a dimension you cannot object to is PASS:
+UNSUPPORTED_MECHANISM: PASS | RISK | KILLED - <basis / the specific grounding>
+WEAK_TRANSFER: PASS | RISK | KILLED - <basis / the specific element that fails to transfer>
+OBVIOUS_COMBINATION: PASS | RISK | KILLED - <basis / the named techniques>
+PRIOR_ART: PASS | RISK | KILLED - <basis / the named disclosure>
+CONTRADICTION: PASS | RISK | KILLED - <basis / the cited conflicting value>
+BOUNDARY_FAILURE: PASS | RISK | KILLED - <basis / the named boundary + violation>
+ENGINEERING_INFEASIBILITY: PASS | RISK | KILLED - <basis / the named limit>
+REGULATORY_INCOMPATIBILITY: PASS | RISK | KILLED - <basis / the named regime/clause>
+LL: PASS | KILLED
 REASON: <one sentence>
 """
+
+# R494: anchored verdict extraction — the verdict word must LEAD the
+# line ("KILLED - basis..."); a bare v3-style "KILLED" line also
+# parses (both response shapes accepted, the containment fallback
+# preserved for malformed-but-recoverable lines).
+_VERDICT_ANCHOR = re.compile(r"^\s*(PASS|RISK|KILLED)\b",
+                              re.IGNORECASE)
+
+
+def _verdict_of(raw_verdict: str) -> str:
+    """Extract the dimension verdict: the anchored token if the line
+    leads with one; else the containment fallback (KILLED > RISK >
+    PASS); else UNKNOWN (the line stays recorded verbatim — parse
+    completeness counts it, the verdict never invents itself)."""
+    text = str(raw_verdict or "")
+    m = _VERDICT_ANCHOR.match(text)
+    if m:
+        return m.group(1).upper()
+    up = text.upper()
+    if "KILLED" in up:
+        return "KILLED"
+    if "RISK" in up:
+        return "RISK"
+    if "PASS" in up:
+        return "PASS"
+    return "UNKNOWN"
+
+
+def _basis_body(raw_verdict: str) -> str:
+    """The basis text under a verdict line (the leading verdict token
+    and separator stripped; the body itself is preserved verbatim —
+    Art. XV)."""
+    text = str(raw_verdict or "").strip()
+    m = _VERDICT_ANCHOR.match(text)
+    if not m:
+        return text
+    rest = text[m.end():].strip()
+    for sep in ("\u2014", "\u2013", "-", ":"):
+        if rest.startswith(sep):
+            rest = rest[len(sep):].strip()
+            break
+    return rest
 
 def _hash(s): return hashlib.sha256(s.encode()).hexdigest()[:16]
 
@@ -138,53 +182,16 @@ def _packet_evidence(candidate: dict) -> list:
 
 def _kill_grounded(kill_text: str, candidate: dict) -> bool:
     """True when the kill line names a specific: a number, a named
-    regime/standard, a >=4-word verbatim overlap with the candidate's
-    own claims, or a packet-evidence citation (the grounding must
-    come FROM the record, not from generic reviewer boilerplate)."""
-    text = str(kill_text or "")
-    if _DIGIT_RE.search(text) or _STANDARD_RE.search(text):
-        return True
-    if _packet_anchored(text, candidate):
-        return True
-    # 4-gram overlap against the candidate's own claim text
-    claim_text = " ".join(str(candidate.get(k) or "") for k in (
-        "mechanism", "intervention", "predicted_effect",
-        "testable_prediction", "novel_design_variable",
-        "constraint_set")).lower()
-    claim_words = _WORD_RE.findall(claim_text)
-    if len(claim_words) < 4:
-        return False
-    grams = {" ".join(claim_words[i:i + 4])
-             for i in range(len(claim_words) - 3)}
-    kill_words = _WORD_RE.findall(text.lower())
-    for i in range(len(kill_words) - 3):
-        if " ".join(kill_words[i:i + 4]) in grams:
-            return True
-    return False
+    regime/standard, or a >=4-word verbatim overlap with the
+    candidate's own claims (the grounding must come FROM the record,
+    not from generic reviewer boilerplate).
 
-
-def _packet_anchored(kill_text: str, candidate: dict) -> bool:
-    """True when the kill's citation is IN the provided packet: it
-    names an evidence-item id (ev:...) or echoes >=4 consecutive words
-    of an evidence item's text. Memory/literature citations that the
-    instrument cannot verify from the packet do not anchor."""
-    text = str(kill_text or "").lower()
-    if "ev:" in text:
-        return True
-    evs = _packet_evidence(candidate)
-    for e in evs:
-        ev_text = " ".join(str(e.get(k) or "") for k in
-                           ("id", "title", "text", "content")).lower()
-        words = _WORD_RE.findall(ev_text)
-        if len(words) < 4:
-            continue
-        grams = {" ".join(words[i:i + 4])
-                 for i in range(len(words) - 3)}
-        kill_words = _WORD_RE.findall(text)
-        for i in range(len(kill_words) - 3):
-            if " ".join(kill_words[i:i + 4]) in grams:
-                return True
-    return False
+    R494 union: DELEGATES to v4_corrections.named_specific_grounded —
+    the ONE authoritative implementation (the union's dimension-
+    scoped grounding for the external-knowledge dimensions); this
+    helper remains as the 1.1.0-line's tested entry point."""
+    from discovery_fabric.v4_corrections import named_specific_grounded
+    return named_specific_grounded(kill_text, candidate)
 
 
 def _objection_text(verdict: str) -> str:
@@ -222,18 +229,29 @@ def _objection_text(verdict: str) -> str:
 # never by editing this constant alone.
 A2_CALIBRATION_SCOPE = {
     "instrument": "a2/adversarial.py::adversarial_challenge "
-                  "(the 8-dimension adversarial gauntlet)",
+                  "(the 8-dimension adversarial gauntlet, v4 "
+                  "burden-of-proof rules)",
+    "instrument_version": GAUNTLET_VERSION,
     "article_l_state": "UNCALIBRATED_NO_MEASUREMENT_SHIPPED",
     "ruling": "R490/A2_CALIBRATION_SCOPE.json option (a): own "
               "DEV-corpus calibration (Art. LIX) before the KILL "
               "regains terminal authority; the consumption-side "
               "escalation (the R417 treatment) LANDED in R491 "
               "(a2/classify.py consults the canonical measurement "
-              "registry entry a2_adversarial_gauntlet/1.0.0 — the "
-              "gauntlet's KILL escalates while uncalibrated)",
-    "sealed_bar_coverage": "NONE — the R412/R447/R487 sealed-bar "
-                           "calibration records cover independent_attack/* "
-                           "only, never this gauntlet",
+              "registry entry — the record's own instrument_version "
+              "selects it; the gauntlet's KILL escalates while "
+              "uncalibrated)",
+    "v4_rules": "R494: the burden-of-proof standard (lacks-derivation "
+                "-> RISK, never KILL) — the three-verdict vocabulary "
+                "+ the machine-side enforce_burden_of_proof "
+                "(v4_corrections.py, the ONE authoritative "
+                "implementation); the untuned 1.0.0 baseline measured "
+                "TPR 0.0909 / FPR 1.0 on the frozen R492 DEV corpus "
+                "(the before-number this tuning is judged against)",
+    "sealed_bar_coverage": "NONE until the v4 DEV-corpus measurement "
+                           "ships under the registry's pinned names — "
+                           "the R412/R447/R487 sealed-bar records "
+                           "cover independent_attack/* only",
 }
 
 
@@ -405,11 +423,19 @@ def adversarial_challenge(candidate: dict, evidence_verified: bool = True,
     v4_corrections_applied = []
     corrected_attacks = {}
     invalid_dimensions = []
+    risk_flags = []               # R494: the RISK ledger (never terminal)
+    burden_of_proof_ledger = []   # R494: per-kill burden dispositions
+
+    # R494: the record the evaluator SAW (the blinded packet with its
+    # evidence items) — the binding surface for the burden check
+    ev_items = blinded.get("evidence_items") or []
 
     for field in fields[:-1]:  # skip OVERALL
         dim_name = field.lower()
         raw_verdict = parsed.get(dim_name, "UNKNOWN")
-        is_killed = "KILLED" in raw_verdict.upper()
+        verdict = _verdict_of(raw_verdict)
+        is_killed = verdict == "KILLED"
+        is_risk = verdict == "RISK"
         reason = raw_verdict
 
         # Map A2 dimension names to V4 correction dimension names
@@ -439,7 +465,10 @@ def adversarial_challenge(candidate: dict, evidence_verified: bool = True,
                 v4_corrections_applied.append(f"boundary_evidence:{bc['disposition']}")
 
         # V4 CORRECTION 6: Adversarial invalid check
-        verdict_str = "KILL" if is_killed else "SURVIVE"
+        # (R494: RISK is a flag, not a verdict — it carries no verdict
+        # authority to conflict; the check's vocabulary is KILL/SURVIVE
+        # and RISK matches neither branch)
+        verdict_str = "KILL" if is_killed else ("RISK" if is_risk else "SURVIVE")
         invalid_check = check_adversarial_invalid(verdict_str, reason, True, prior_art_state)
         if invalid_check["disposition"] == "ADVERSARIAL_INVALID":
             invalid_dimensions.append({
@@ -449,74 +478,83 @@ def adversarial_challenge(candidate: dict, evidence_verified: bool = True,
             v4_corrections_applied.append(f"adversarial_invalid:{dim_name}")
             # ADVERSARIAL_INVALID → not KILL, not SURVIVE, requires re-evaluation
             raw_verdict = f"ADVERSARIAL_INVALID ({invalid_check['invalid_reason'][:50]})"
+            is_killed = False
+            is_risk = False
 
-        # ===== R493 v4 DETERMINISTIC FLOORS (a2_gauntlet/1.1.0) ======
-        # Both floors are WARRANTED by measured DEV-corpus baseline
-        # failures (R493/A2_BASELINE) and demote the kill to a
-        # preserved objection — they NEVER create a kill and never
-        # touch the deterministic gates (Art. VII discipline). A
-        # dimension already typed ADVERSARIAL_INVALID keeps its own
-        # disposition (EVALUATION_FAILED) — the floors never
-        # re-process it.
-        if is_killed and "ADVERSARIAL_INVALID" not in raw_verdict.upper():
-            # FLOOR 1 (contradiction-absence): a CONTRADICTION kill
-            # with NO evidence items in the instrument's packet is the
-            # typed false-kill class ABSENCE_AS_CONTRADICTION (Art.
-            # XXI.3/XXV; measured on the malformed cohort a2dev-20 and
-            # 6 no-evidence defect cases: the dimension killed on
-            # boilerplate with nothing provided to contradict).
-            if dim_name == "contradiction" and not _packet_evidence(candidate):
-                is_killed = False
-                raw_verdict = ("SURVIVE (objection preserved - "
-                               "absence-as-contradiction floor: no "
-                               "evidence provided to contradict; "
-                               "objection was: "
-                               f"{_objection_text(reason)[:120]})")
+        # ===== V4 CORRECTION 12 (R494, the R493+R494 union): the =====
+        # ===== burden-of-proof standard — SUBSUMES the 1.1.0 floors ==
+        # A KILL that survived the standing corrections must still
+        # carry a derivation bound to the record's own bytes; an
+        # objection that the record LACKS a derivation demotes to RISK
+        # (never KILL). Deterministic, machine-side (Art. III/XVIII).
+        # The 1.1.0 floors live on inside it: contradiction_absence ==
+        # absence_as_contradiction on an empty evidence packet;
+        # ungrounded_kill == unbound_derivation (the union correction
+        # is STRICTER: single-digit numbers and record-absent values
+        # do not ground; the named-standards grounding is adopted in
+        # the binding test). The 1.1.0 correction names are emitted as
+        # ALIASES when the classes coincide — the lineage is visible.
+        if is_killed:
+            bop = enforce_burden_of_proof(dim_name, raw_verdict,
+                                          blinded, ev_items,
+                                          prior_art_state=prior_art_state)
+            burden_of_proof_ledger.append(bop)
+            if bop["demoted"]:
+                # the sibling line's kill-scan lesson (their
+                # _objection_text): a preserved objection that still
+                # carries the KILLED token would re-enter every
+                # downstream kill-scan — the verdict SEMANTICS travel
+                # as the demotion rule name; the objection CONTENT
+                # travels verbatim with the token neutralized
+                body = _objection_text(_basis_body(raw_verdict))
+                raw_verdict = (f"RISK (burden-of-proof: "
+                               f"{bop['demotion_class']}) — {body}")
+                risk_flags.append({
+                    "dimension": dim_name,
+                    "verdict": "RISK",
+                    "basis": body,
+                    "source": "demoted_kill",
+                    "demotion_class": bop["demotion_class"],
+                    "rule_evidence": bop.get("evidence"),
+                })
                 v4_corrections_applied.append(
-                    "a2_v4_floors:contradiction_absence")
-            # FLOOR 2 (ungrounded kill): a kill line that cannot name
-            # its specifics (no number, no named regime/standard, no
-            # >=4-word overlap with the candidate's own claims) is
-            # boilerplate, not a verdict (the baseline's dominant
-            # failure: TPR 1/11 WITH binding, kills unbound to defect
-            # content). The objection is preserved verbatim in the
-            # demotion text — nothing is hidden (Art. XXV).
-            elif not _kill_grounded(raw_verdict, candidate):
-                is_killed = False
-                raw_verdict = ("SURVIVE (objection preserved - "
-                               "ungrounded-kill floor: no specific "
-                               "grounding named; objection was: "
-                               f"{_objection_text(raw_verdict)[:120]})")
+                    f"burden_of_proof:{bop['demotion_class']}")
+                if (bop["demotion_class"] == "absence_as_contradiction"
+                        and not ev_items):
+                    v4_corrections_applied.append(
+                        "a2_v4_floors:contradiction_absence")
+                elif bop["demotion_class"] == "unbound_derivation":
+                    v4_corrections_applied.append(
+                        "a2_v4_floors:ungrounded_kill")
+                elif bop["demotion_class"] == "memory_claim":
+                    v4_corrections_applied.append(
+                        "a2_v4_floors:memory_claim")
+            else:
                 v4_corrections_applied.append(
-                    "a2_v4_floors:ungrounded_kill")
-            # FLOOR 3 (R493 v4.1, memory-claim): an OBVIOUS_COMBINATION
-            # kill whose known-techniques citation is NOT in the packet
-            # is a remembered-claim — the instrument has no retrieval,
-            # so literature/commercial-system memory is unverifiable
-            # and can never execute as a kill (the engine v4's measured
-            # direction — burden-of-proof: a kill requires a record in
-            # view — applied to the A2; measured on a2dev-04/12/14:
-            # three memory-cited obviousness kills, two on clean
-            # controls). The kill survives only when it cites the
-            # packet's evidence (an ev: id or a >=4-word verbatim echo
-            # of an evidence item).
-            elif dim_name == "obvious_combination" and \
-                    not _packet_anchored(raw_verdict, candidate):
-                is_killed = False
-                raw_verdict = ("SURVIVE (objection preserved - "
-                               "memory-claim floor: the known techniques "
-                               "are not in the provided record; objection "
-                               "was: "
-                               f"{_objection_text(raw_verdict)[:120]})")
-                v4_corrections_applied.append(
-                    "a2_v4_floors:memory_claim")
+                    f"burden_of_proof:{bop.get('disposition')}")
+        elif is_risk:
+            body = _objection_text(_basis_body(raw_verdict))
+            risk_flags.append({
+                "dimension": dim_name,
+                "verdict": "RISK",
+                "basis": body,
+                "source": "evaluator_risk",
+            })
+            v4_corrections_applied.append(
+                f"burden_of_proof:risk_flag:{dim_name}")
 
         corrected_attacks[dim_name] = raw_verdict
 
     # ===== Compute corrected overall =====
     # If any dimension is still KILLED (after corrections), overall is KILLED
     # If any dimension is ADVERSARIAL_INVALID, overall is EVALUATION_FAILED
-    any_killed = any("KILLED" in v.upper() and "ADVERSARIAL_INVALID" not in v.upper()
+    # R494: a kill is a dimension whose corrected text LEADS with
+    # KILLED (demoted kills lead with "RISK (burden-of-proof: ...)" and
+    # are never kills); RISK-only records are PASS — the risk_flags
+    # ride the record, never terminal (the scoring contract's
+    # vocabulary is KILLED|PASS)
+    any_killed = any(v.upper().startswith("KILLED")
+                     and "ADVERSARIAL_INVALID" not in v.upper()
                      for v in corrected_attacks.values())
     any_invalid = len(invalid_dimensions) > 0
 
@@ -528,21 +566,43 @@ def adversarial_challenge(candidate: dict, evidence_verified: bool = True,
         overall = "PASS"
 
     killed_count = sum(1 for v in corrected_attacks.values()
-                       if "KILLED" in v.upper() and "ADVERSARIAL_INVALID" not in v.upper())
+                       if v.upper().startswith("KILLED")
+                       and "ADVERSARIAL_INVALID" not in v.upper())
 
     result = {
         "overall": overall,
+        "instrument_version": GAUNTLET_VERSION,
+        "gauntlet_version": A2_GAUNTLET_VERSION,  # the 1.1.0-line's key
         "killed_count": killed_count,
         "reason": parsed.get("reason", ""),
         "attacks": corrected_attacks,
+        "risk_flags": risk_flags,
         "invalid_dimensions": invalid_dimensions,
         "v4_corrections_applied": v4_corrections_applied,
+        "burden_of_proof": {
+            "rules_version": "burden_of_proof/1.0.0",
+            "kills_adjudicated": len(burden_of_proof_ledger),
+            "kills_kept": sum(1 for b in burden_of_proof_ledger
+                               if not b.get("demoted")),
+            "kills_demoted_to_risk": sum(1 for b in burden_of_proof_ledger
+                                          if b.get("demoted")),
+            "demotion_classes": sorted({
+                b["demotion_class"] for b in burden_of_proof_ledger
+                if b.get("demotion_class")}),
+            "ledger": burden_of_proof_ledger,
+        },
         "prior_art_state": prior_art_state,
         "evidence_verified": evidence_verified,
         "gauntlet_version": A2_GAUNTLET_VERSION,
         "prompt_hash": _hash(ATTACK_PROMPT),
         "output_hash": _hash(resp),
         "timestamp": datetime.now(timezone.utc).isoformat(),
+        # R494: the instrument's OWN transport provenance (self-
+        # describing records — the ops endpoint's stamp carries the
+        # same bytes; Art. VI, populated only from real registry
+        # results, never fabricated)
+        "transport": dict(_LAST_ATTACK_PROVIDER_META or {}),
     }
-    print(f"  [adversarial] overall={overall} killed={killed_count} corrections={len(v4_corrections_applied)}")
+    print(f"  [adversarial] overall={overall} killed={killed_count} "
+          f"risks={len(risk_flags)} corrections={len(v4_corrections_applied)}")
     return _with_calibration_scope(result)

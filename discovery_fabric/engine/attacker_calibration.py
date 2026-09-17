@@ -239,6 +239,27 @@ INSTRUMENT_MEASUREMENTS = {
         "measurement": _pinned_path("a2_gauntlet_measurement.json"),
         "seal": _pinned_path("a2_gauntlet_seal.json"),
     },
+    # R494: the gauntlet's v4 rules (a2_adversarial_gauntlet/2.0.0) —
+    # the BURDEN-OF-PROOF standard (lacks-derivation -> RISK, never
+    # KILL; the three-verdict vocabulary + the machine-side
+    # enforce_burden_of_proof). The verdict logic CHANGED from 1.0.0,
+    # so NO inheritance (the independent_attack v2.0->v3.0 precedent):
+    # 2.0.0 earns its calibration state from ITS OWN measurement on
+    # the frozen R492 DEV corpus (Art. LIX — the DEV corpus is the
+    # tuning surface; the sealed benchmark is never touched). The
+    # untuned 1.0.0 baseline measured TPR 0.0909 / FPR 1.0 on that
+    # corpus (R493/A2_BASELINE) — the before-number the v4 tuning is
+    # judged against. Until the v4 measurement + seal ship under these
+    # pinned names, this entry resolves fail-closed exactly like an
+    # unmeasured instrument: UNKNOWN_NOT_CALIBRATED, no terminal kill
+    # authority (Art. L). The flip, when it comes, is DERIVED by
+    # resolve_state from the record's numbers against the seal's
+    # pre-registered thresholds (the R412 bars reused verbatim) —
+    # never asserted here.
+    "a2_adversarial_gauntlet/2.0.0": {
+        "measurement": _pinned_path("a2_gauntlet_v4_measurement.json"),
+        "seal": _pinned_path("a2_gauntlet_v4_seal.json"),
+    },
 }
 
 
@@ -393,6 +414,10 @@ def resolve_state(measurement_path: Optional[Path] = None,
         "measurement_path": _rel(m_path),
         "measurement_sha256": _sha(m_path),
         "measured_verdict_note": (
+            # R494: an instrument-specific note travels on the record;
+            # the v3-engine prose below remains the default for the
+            # independent_attack records that predate the field
+            record.get("measured_verdict_note") or
             "TPR 1.00 / FPR 1.00 on the sealed 40-case corpus: the KILL "
             "verdict carries zero discriminative information (PPV equals "
             "the corpus base rate); kills cite real defect content and "

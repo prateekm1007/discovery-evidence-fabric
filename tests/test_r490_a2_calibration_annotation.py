@@ -90,6 +90,12 @@ class TestR490A2CalibrationAnnotation(unittest.TestCase):
             res = a2.adversarial_challenge(
                 dict(CANDIDATE), evidence_verified=True,
                 prior_art_state="NO_MATCH_FOUND")
+        # R493/R494 union: the fixture is the sibling line's GROUNDED
+        # kill (the 4-gram overlap with the candidate's own mechanism
+        # text binds it) — under the union's burden-of-proof rules the
+        # grounding carries the burden and the kill SURVIVES (their
+        # amended intent). The bare-kill-demotes contract is pinned in
+        # test_r494_a2_burden_of_proof (the R445-B class).
         self.assertEqual(res["overall"], "KILLED")
         self.assertIn("KILLED", res["attacks"]["obvious_combination"])
         # the annotation rides the record
@@ -97,6 +103,8 @@ class TestR490A2CalibrationAnnotation(unittest.TestCase):
         self.assertEqual(cs["article_l_state"],
                          "UNCALIBRATED_NO_MEASUREMENT_SHIPPED")
         # metadata only: no demotion, no escalation, verdict untouched
+        # BY THE ANNOTATION (the surviving kill above is the RULES'
+        # doing, not the annotation's)
         self.assertNotIn("attack_outcome", res)
         self.assertNotIn("escalated", res)
 

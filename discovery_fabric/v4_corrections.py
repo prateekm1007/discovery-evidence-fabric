@@ -806,3 +806,490 @@ def skip_if_evidence_failed(evidence_verified: bool) -> dict:
     Returns adversarial_status = NOT_RUN, adversarial_not_run_reason = EVIDENCE_GATE_FAILED.
     """
     return check_evidence_gate_before_adversarial(evidence_verified)
+
+
+# ===== CORRECTION 12 (R494): THE BURDEN-OF-PROOF STANDARD =====
+# The A2 gauntlet's v4 rules (a2_adversarial_gauntlet/2.0.0). The
+# measured basis (R493/A2_BASELINE, the untuned baseline on the frozen
+# R492 DEV corpus): the untuned gauntlet's verdict lines are BARE
+# ("KILLED" with no basis text at all) — TPR 0.0909 / FPR 1.0; a kill
+# that carries no derivation cannot bind to the defect it claims and
+# cannot be verified by any consumer (the R445-B class: 100% bare
+# assertions). The R491 diagnosis named the deeper class on the engine
+# corpus: every clean-cohort false kill was a grounded-but-wrong
+# RECORD-LACKS-DERIVATION objection — the attacker demanded a
+# derivation the record never owed ("provides no cyclone geometry
+# calculation that would confirm 85%") and killed on the absence.
+#
+# THE RULE (the burden of proof for a KILL is on the ATTACKER):
+#   - KILLED is admissible ONLY when the defect is derivable from the
+#     record's own bytes — the kill basis cites the record's spans or
+#     numbers and the relation between them (a contradiction pair, a
+#     fatal magnitude from the record's own values, a boundary the
+#     record itself declares violated, or an evidence-bare
+#     load-bearing claim).
+#   - An objection that the record LACKS a derivation is a RISK — a
+#     demand for evidence that blocks promotion and feeds the
+#     improvement loop — NEVER a terminal KILL. "Lacks derivation" is
+#     the NORMAL state of a young candidate (the Art. LX ladder exists
+#     for exactly that); a verifier that kills on absence is a
+#     universal rejector (Art. V).
+#   - Absence never becomes contradiction (Art. XXI.3): a CONTRADICTION
+#     kill requires BOTH sides from the record — the claim value AND
+#     the divergent evidence value.
+#
+# This module is THE ONE authoritative implementation (the a2 gauntlet
+# imports and delegates; no duplicated logic).
+
+# Derivation-support absence markers. These target the SUPPORT layer
+# specifically (evidence / calculation / data / citation / derivation
+# missing) — NEVER invalidity assertions ("no physically valid causal
+# chain" is an inference about the mechanism, not a claim that the
+# record lacks support, and keeps its kill authority when bound).
+ABSENCE_OF_DERIVATION_PATTERNS = [
+    r"\bno\s+(?:supporting\s+)?evidence\b",
+    r"\bwithout\s+(?:any\s+)?(?:supporting\s+)?evidence\b",
+    r"\bnot\s+supported\s+by\s+(?:any\s+)?(?:evidence|data|record)\b",
+    r"\bzero\s+evidence\b",
+    r"\b(?:provides?|offers?|presents?|contains?|includes?)\s+no\b",
+    r"\bwithout\s+providing\b",
+    r"\bno\s+(?:calculation|calculations|computation|computations|"
+    r"derivation|derivations|geometry\s+calculation)\b",
+    r"\bwithout\s+(?:a\s+|any\s+)?(?:calculation|computation|derivation)\b",
+    r"\bno\s+(?:data|measurement|measurements|experimental\s+data|"
+    r"citation|citations|reference|references|test\s+data)\b",
+    r"\b(?:lacks?|lacking|missing|absent)\s+(?:any\s+)?"
+    r"(?:evidence|data|derivation|calculation|measurement|citation|"
+    r"support|justification|validation)\b",
+    r"\bnothing\s+in\s+the\s+record\b",
+    r"\bthe\s+record\s+(?:does\s+not|doesn't|fails\s+to)\s+"
+    r"(?:show|contain|provide|demonstrate|include|establish)\b",
+    r"\bnot\s+(?:shown|demonstrated|supported|justified|established)\s+"
+    r"(?:in|by|anywhere)\b",
+    r"\buncited\b",
+    r"\bunverified\s+by\s+(?:any|the)\b",
+    r"\bno\s+support\s+whatsoever\b",
+]
+ABSENCE_OF_DERIVATION_REGEX = re.compile(
+    '|'.join(ABSENCE_OF_DERIVATION_PATTERNS), re.IGNORECASE)
+
+# Attacker-imported scope markers: attributing to the record a claim it
+# never made (the cal-13 class: "while implying comprehensive
+# suppression of scale particles" — the record never claimed
+# comprehensiveness). The attacker may attack what the record STATES,
+# never what it "implies" in the attacker's own reading.
+ATTACKER_IMPORTED_SCOPE_PATTERNS = [
+    r"\bimpl(?:y|ies|ying|ied)\b[^.]{0,60}\b"
+    r"(?:comprehensive|complete|total|unbounded|unrestricted|all\s|"
+    r"every)\b",
+    r"\bimplicitly\s+claims?\b",
+    r"\bin\s+effect\s+claims?\b",
+    r"\beffectively\s+claims?\b",
+    r"\bthe\s+candidate\s+(?:should|must)\s+(?:also\s+)?"
+    r"(?:provide|include|address|claim|show)\b",
+    r"\bwould\s+need\s+to\s+(?:show|prove|demonstrate|provide)\b",
+    r"\breads?\s+as\s+claiming\b",
+]
+ATTACKER_IMPORTED_SCOPE_REGEX = re.compile(
+    '|'.join(ATTACKER_IMPORTED_SCOPE_PATTERNS), re.IGNORECASE)
+
+# Divergence language for the two-sided contradiction test
+DIVERGENCE_MARKERS = (
+    "while", "versus", " vs ", "but", "only", "despite", "however",
+    "yet", "contradict", "cannot both", "exceeds", "below", "above",
+    "differs", "mismatch", "inconsistent", "fails to meet", "short of",
+    "less than", "greater than", "against", "compared to",
+)
+
+# R493 (the 1.1.0 line's named-standards grounding, adopted by the
+# union): named regimes/standards in a kill line. For the EXTERNAL-
+# knowledge dimensions (obvious_combination, regulatory_
+# incompatibility) the burden is met by NAMING the external specific
+# (the named technique / the named regime) — the record rarely
+# contains the regime; the attacker's expertise legitimately supplies
+# it and the prompt's per-dimension grounding contract demands it.
+NAMED_STANDARD_RE = re.compile(
+    r"\b(imo|iso|uscg|astm|dnv|abs|cfr|ieee|api\s|iec|en\s|class|"
+    r"marpol|solas|epa|fda|ce\s|med\s)\b", re.IGNORECASE)
+_ANY_DIGIT_RE = re.compile(r"\d")
+
+# The dimensions whose grounding is the NAMED EXTERNAL SPECIFIC (the
+# 1.1.0 floor semantics, dimension-scoped by the union) rather than a
+# record binding. R493 v4.1 (race instance 13, MEASURED): obviousness
+# LEFT this set — the sibling's v4 measurement found memory-cited
+# obviousness kills false-killing clean controls (the named specific
+# "IMO GloBallast / BIO-SEA" grounds nothing the instrument can
+# verify); obviousness now requires the PACKET ANCHOR (their floor 3).
+EXTERNAL_KNOWLEDGE_DIMS = {"regulatory_incompatibility"}
+
+# R493 v4.1: the memory-claim class — the dimensions whose kills must
+# be PACKET-ANCHORED (an ev: citation or a >=4-word echo of an
+# evidence item); remembered literature/trials/commercial systems a
+# no-retrieval instrument cannot verify never execute as kills
+PACKET_ANCHORED_DIMS = {"obvious_combination"}
+
+
+def packet_anchored(kill_text: str, candidate: dict) -> bool:
+    """R493 v4.1 (the ONE implementation): True when the kill's
+    citation is IN the provided packet — it names an evidence-item id
+    (ev:...) or echoes >=4 consecutive words of an evidence item's
+    text. Memory/literature citations that the instrument cannot
+    verify from the packet do not anchor (the measured basis: three
+    memory-cited obviousness kills, two on clean controls)."""
+    text = str(kill_text or "").lower()
+    if "ev:" in text:
+        return True
+    evs = candidate.get("evidence_items") or []
+    if not isinstance(evs, list):
+        return False
+    for e in evs:
+        if not isinstance(e, dict):
+            continue
+        ev_text = " ".join(str(e.get(k) or "") for k in
+                           ("id", "title", "text", "content",
+                            "finding")).lower()
+        words = _WORD_RE.findall(ev_text)
+        if len(words) < 4:
+            continue
+        grams = {" ".join(words[i:i + 4])
+                 for i in range(len(words) - 3)}
+        kill_words = _WORD_RE.findall(text)
+        for i in range(len(kill_words) - 3):
+            if " ".join(kill_words[i:i + 4]) in grams:
+                return True
+    return False
+
+
+def named_specific_grounded(kill_text: str, candidate: dict) -> bool:
+    """The 1.1.0 line's grounding test (the ONE implementation, moved
+    here by the union; v4.1-extended): True when the kill line names a
+    specific — a number, a named regime/standard, a packet-evidence
+    citation, or a >=4-word verbatim overlap with the candidate's own
+    claims. Used for the external-knowledge dimensions and exported
+    for the gauntlet's helper (the sibling line's _kill_grounded
+    delegates here — one implementation)."""
+    text = str(kill_text or "")
+    if _ANY_DIGIT_RE.search(text) or NAMED_STANDARD_RE.search(text):
+        return True
+    if packet_anchored(text, candidate):
+        return True
+    claim_text = " ".join(str(candidate.get(k) or "") for k in (
+        "mechanism", "intervention", "predicted_effect",
+        "testable_prediction", "novel_design_variable",
+        "constraint_set")).lower()
+    claim_words = _WORD_RE.findall(claim_text)
+    if len(claim_words) < 4:
+        return False
+    grams = {" ".join(claim_words[i:i + 4])
+             for i in range(len(claim_words) - 3)}
+    kill_words = _WORD_RE.findall(text.lower())
+    for i in range(len(kill_words) - 3):
+        if " ".join(kill_words[i:i + 4]) in grams:
+            return True
+    return False
+
+_NUMBER_RE = re.compile(r"\d+(?:\.\d+)?")
+_WORD_RE = re.compile(r"[a-z0-9]+")
+
+BURDEN_OF_PROOF_VERSION = "burden_of_proof/1.0.0"
+
+
+def _candidate_text(candidate: dict) -> str:
+    """The candidate packet's own bytes (the CLAIM side of the record)."""
+    return json.dumps(candidate, default=str, ensure_ascii=False).lower()
+
+
+def _evidence_text(evidence_items: Optional[list]) -> str:
+    """The evidence items' own bytes (the EVIDENCE side of the record)."""
+    parts = []
+    for ev in (evidence_items or []):
+        try:
+            parts.append(json.dumps(ev, default=str, ensure_ascii=False))
+        except (TypeError, ValueError):
+            parts.append(str(ev))
+    return " ".join(parts).lower()
+
+
+def _record_text(candidate: dict, evidence_items: Optional[list]) -> str:
+    """The record's own bytes as one searchable text: the candidate
+    packet (mechanism, predictions, constraints...) plus the evidence
+    items. Lowercased; used ONLY for binding tests."""
+    return " ".join([_candidate_text(candidate),
+                      _evidence_text(evidence_items)]).strip()
+
+
+def _basis_numbers(text: str) -> set:
+    """Numeric tokens in a basis (>= 2 significant chars: '10', '38',
+    '5.5', '3.8' bind; single digits '8', '2' are too generic to carry
+    a binding alone)."""
+    return {n for n in _NUMBER_RE.findall(text) if len(n.replace(".", "")) >= 2}
+
+
+def _word_ngrams(text: str, n: int) -> set:
+    words = _WORD_RE.findall(text.lower())
+    return {" ".join(words[i:i + n]) for i in range(len(words) - n + 1)}
+
+
+def _record_binding(basis: str, record_text: str) -> Optional[dict]:
+    """Does the kill basis BIND to the record's own bytes? A binding is
+    a multi-char number that appears in the record, or a 4+-word
+    verbatim span quoted from it. Returns the binding evidence or None.
+    """
+    basis_nums = _basis_numbers(basis)
+    record_nums = _basis_numbers(record_text)
+    bound_numbers = sorted(basis_nums & record_nums)
+    if bound_numbers:
+        return {"binding": "numbers",
+                "bound": bound_numbers[:8]}
+    basis_grams = _word_ngrams(basis, 4)
+    record_grams = _word_ngrams(record_text, 4)
+    bound_spans = sorted(basis_grams & record_grams)
+    if bound_spans:
+        return {"binding": "verbatim_span",
+                "bound": bound_spans[:3]}
+    return None
+
+
+def _claim_vs_evidence_pair(basis: str, candidate_text: str,
+                            evidence_text: str) -> bool:
+    """The STRONG two-sided form: a bound number from the CLAIM side
+    and a bound number from the EVIDENCE side, joined by divergence
+    language — a divergence the record itself contains."""
+    if not evidence_text.strip():
+        return False
+    basis_nums = _basis_numbers(basis)
+    if not (basis_nums & _basis_numbers(candidate_text)):
+        return False
+    if not (basis_nums & _basis_numbers(evidence_text)):
+        return False
+    lowered = basis.lower()
+    return any(m in lowered for m in DIVERGENCE_MARKERS)
+
+
+def _contradiction_two_sided(basis: str, candidate_text: str,
+                             evidence_text: str) -> bool:
+    """A CONTRADICTION kill requires a divergence the RECORD itself
+    contains (Art. XXI.3 — absence never becomes contradiction):
+      (a) claim-vs-evidence: a bound number from the candidate side AND
+          a bound number from the evidence side, joined by divergence
+          language; OR
+      (b) intra-candidate: >= 2 distinct bound numbers from the
+          candidate's own text joined by divergence language (the
+          candidate's own fields diverge).
+    A divergence between a record value and an ATTACKER-ATTRIBUTED
+    claim is NOT two-sided (that is the attacker_imported_scope class)."""
+    if _claim_vs_evidence_pair(basis, candidate_text, evidence_text):
+        return True
+    basis_nums = _basis_numbers(basis)
+    cand_bound = basis_nums & _basis_numbers(candidate_text)
+    if len(cand_bound) < 2:
+        return False
+    lowered = basis.lower()
+    return any(m in lowered for m in DIVERGENCE_MARKERS)
+
+
+def _record_evidence_bare(candidate: dict,
+                          evidence_items: Optional[list]) -> bool:
+    """Is the record EVIDENCE-BARE for its claimed effect? True when
+    there are no evidence items, or none that BINDS to the candidate's
+    load-bearing claim text (mechanism + predicted effect + testable
+    prediction) — a garbled or non-responsive evidence item does not
+    make the record evidenced (the a2dev-21 discipline)."""
+    claim_fields = []
+    for k in ("mechanism", "predicted_effect", "testable_prediction",
+              "intervention"):
+        v = candidate.get(k)
+        if isinstance(v, str):
+            claim_fields.append(v)
+        elif v is not None:
+            claim_fields.append(json.dumps(v, default=str))
+    claim_text = " ".join(claim_fields).lower()
+    if not claim_text.strip():
+        return not evidence_items
+    claim_nums = _basis_numbers(claim_text)
+    claim_grams = _word_ngrams(claim_text, 3)
+    for ev in (evidence_items or []):
+        try:
+            ev_text = json.dumps(ev, default=str, ensure_ascii=False).lower()
+        except (TypeError, ValueError):
+            ev_text = str(ev).lower()
+        if _basis_numbers(ev_text) & claim_nums:
+            return False
+        if _word_ngrams(ev_text, 3) & claim_grams:
+            return False
+    return True
+
+
+def enforce_burden_of_proof(dimension: str, verdict_text: str,
+                            candidate: dict,
+                            evidence_items: Optional[list] = None,
+                            prior_art_state: Optional[str] = None) -> dict:
+    """CORRECTION 12 (R494): the burden-of-proof standard for a KILL.
+
+    Called by the A2 gauntlet (a2/adversarial.py) on every dimension
+    the LLM marks KILLED, AFTER the standing v3 corrections (prior-art
+    firewall, boundary-evidence standard). Deterministic, no LLM, no
+    network (Art. III/XVIII — the LLM's self-classification is never
+    trusted; the burden is enforced machine-side).
+
+    Precedence (first match wins):
+      1. contradiction dimension, not two-sided
+           -> DEMOTE absence_as_contradiction (Art. XXI.3 — an
+              evidence-bare record has nothing to contradict; a
+              one-sided basis is an assertion, not a contradiction)
+      2. prior_art dimension on a KILL-state prior-art state
+           -> KEEP (prior_art_state_binding — the frozen prior-art
+              state IS the machine-verifiable derivation, recorded on
+              every record; the firewall (correction 10) already
+              gated which states may kill — the LLM's phrasing adds
+              nothing the state does not already prove)
+      3. unsupported_mechanism + evidence-bare record + the basis
+         asserts the evidence absence
+           -> KEEP (evidence_bare_honest_kill — the corpus's own
+              honest-kill ruling: when the record carries NO evidence
+              for its load-bearing claim, "unsupported by evidence" is
+              a fact about the record, derivable from it)
+      4. absence-of-derivation markers in the basis
+           -> DEMOTE lacks_derivation (the R491 false-kill class: the
+              attacker demands a derivation the record never owed)
+      5. attacker-imported scope markers, no two-sided pair
+           -> DEMOTE attacker_imported_scope (the attacker attributes
+              a claim the record never made)
+      6. no record binding (no in-record number, no verbatim span)
+           -> DEMOTE unbound_derivation (a bare assertion — the
+              R445-B class, now machine-enforced)
+      7. else -> KEEP (burden met: the derivation is bound to the
+           record's own bytes)
+
+    Returns {verdict: "KILLED"|"RISK", demoted: bool,
+            demotion_class|disposition, evidence} — never raises; a
+    malformed input demotes (fail toward RISK, never toward KILL).
+    """
+    dim = (dimension or "").lower()
+    text = str(verdict_text or "")
+    out = {
+        "rules_version": BURDEN_OF_PROOF_VERSION,
+        "dimension": dim,
+    }
+    try:
+        cand_text = _candidate_text(candidate)
+        ev_text = _evidence_text(evidence_items)
+        record_text = " ".join([cand_text, ev_text]).strip()
+        lowered = text.lower()
+        absence = bool(ABSENCE_OF_DERIVATION_REGEX.search(text))
+        scope_import = bool(ATTACKER_IMPORTED_SCOPE_REGEX.search(text))
+        binding = _record_binding(text, record_text)
+        two_sided = _contradiction_two_sided(text, cand_text, ev_text)
+        claim_vs_evidence = _claim_vs_evidence_pair(
+            text, cand_text, ev_text)
+
+        if dim == "contradiction" and not two_sided:
+            return {**out, "verdict": "RISK", "demoted": True,
+                    "demotion_class": "absence_as_contradiction",
+                    "evidence": {
+                        "two_sided": two_sided, "binding": binding,
+                        "absence_markers": absence,
+                        "rule": ("a CONTRADICTION kill requires BOTH "
+                                 "sides from the record — the claim "
+                                 "value AND the divergent evidence "
+                                 "value (Art. XXI.3)")}}
+        if (dim == "prior_art" and prior_art_state
+                and prior_art_state in KILL_PRIOR_ART_STATES):
+            return {**out, "verdict": "KILLED", "demoted": False,
+                    "disposition": "prior_art_state_binding",
+                    "evidence": {
+                        "binding": "prior_art_state",
+                        "bound": [prior_art_state],
+                        "rule": ("the frozen prior-art state is the "
+                                 "machine-verifiable derivation — "
+                                 "recorded on the record and gated by "
+                                 "the correction-10 firewall; the "
+                                 "kill state itself carries the "
+                                 "burden")}}
+        if (dim == "unsupported_mechanism"
+                and _record_evidence_bare(candidate, evidence_items)
+                and absence):
+            return {**out, "verdict": "KILLED", "demoted": False,
+                    "disposition": "evidence_bare_honest_kill",
+                    "evidence": {
+                        "record_evidence_bare": True,
+                        "absence_markers": absence,
+                        "rule": ("the record carries no evidence for "
+                                 "its load-bearing claim — the "
+                                 "unsupported-mechanism kill is "
+                                 "honest (the corpus's own ruling)")}}
+        # R493 v4.1 (race instance 13): the MEMORY-CLAIM class — an
+        # obviousness kill must be PACKET-ANCHORED; remembered
+        # literature/trials/commercial systems the no-retrieval
+        # instrument cannot verify never execute as kills (the
+        # measured basis: three memory-cited obviousness kills, two on
+        # clean controls — the union's earlier named-specific rule for
+        # this dimension is RETIRED BY MEASUREMENT, Art. XIX)
+        if (dim in PACKET_ANCHORED_DIMS
+                and not packet_anchored(text, candidate)):
+            return {**out, "verdict": "RISK", "demoted": True,
+                    "demotion_class": "memory_claim",
+                    "evidence": {
+                        "packet_anchored": False,
+                        "binding": binding,
+                        "rule": ("the known-techniques citation is "
+                                 "not in the provided record — a "
+                                 "remembered claim the instrument "
+                                 "cannot verify; the burden of proof "
+                                 "requires a record in view (the v4.1 "
+                                 "measured class)")}}
+        if absence:
+            return {**out, "verdict": "RISK", "demoted": True,
+                    "demotion_class": "lacks_derivation",
+                    "evidence": {
+                        "binding": binding,
+                        "rule": ("the objection is that the record "
+                                 "LACKS a derivation — a demand for "
+                                 "evidence, never a terminal kill "
+                                 "(Art. V)")}}
+        if scope_import and not claim_vs_evidence:
+            return {**out, "verdict": "RISK", "demoted": True,
+                    "demotion_class": "attacker_imported_scope",
+                    "evidence": {
+                        "binding": binding,
+                        "claim_vs_evidence_pair": claim_vs_evidence,
+                        "rule": ("the kill rests on a scope the record "
+                                 "never stated — the attacker may "
+                                 "attack what the record says, never "
+                                 "what it 'implies'; only a measured "
+                                 "claim-vs-evidence divergence "
+                                 "overrides")}}
+        anchored = packet_anchored(text, candidate)
+        if not binding and not anchored:
+            # R494 union: the EXTERNAL-knowledge dimensions ground on
+            # the NAMED EXTERNAL SPECIFIC (the 1.1.0 semantics,
+            # dimension-scoped): the named technique/regime the
+            # attacker's expertise supplies, verified NAMED rather
+            # than record-bound (obviousness LEFT this set in v4.1 —
+            # measured; it requires the packet anchor above)
+            if dim in EXTERNAL_KNOWLEDGE_DIMS \
+                    and named_specific_grounded(text, candidate):
+                return {**out, "verdict": "KILLED", "demoted": False,
+                        "disposition": "named_specific_grounding",
+                        "evidence": {
+                            "binding": "named_external_specific",
+                            "rule": ("the external-knowledge dimension "
+                                     "grounds on the NAMED specific "
+                                     "(technique/regime) — the 1.1.0 "
+                                     "grounding contract, "
+                                     "dimension-scoped by the union")}}
+            return {**out, "verdict": "RISK", "demoted": True,
+                    "demotion_class": "unbound_derivation",
+                    "evidence": {
+                        "absence_markers": absence,
+                        "rule": ("the kill basis binds to nothing in "
+                                 "the record — a bare assertion "
+                                 "carries no burden-of-proof (the "
+                                 "R445-B class, machine-enforced)")}}
+        return {**out, "verdict": "KILLED", "demoted": False,
+                "disposition": "burden_met",
+                "evidence": {"binding": binding}}
+    except Exception as exc:  # noqa: BLE001 — fail toward RISK, never KILL
+        return {**out, "verdict": "RISK", "demoted": True,
+                "demotion_class": "burden_check_error",
+                "evidence": {"error": f"{type(exc).__name__}: {exc}"}}

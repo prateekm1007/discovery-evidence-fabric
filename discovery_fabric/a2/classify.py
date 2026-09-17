@@ -260,8 +260,13 @@ def classify(candidate: dict, evidence_verification: dict, prior_art: dict, adve
         try:
             from discovery_fabric.engine.attacker_calibration \
                 import resolve_state as _resolve_a2_state
+            # R494: the RECORD's own instrument_version selects the
+            # registry entry (Art. X — the record says which instrument
+            # produced it; legacy records default to the 1.0.0 gauntlet)
+            _a2_inst = str(adversarial.get("instrument_version")
+                           or "a2_adversarial_gauntlet/1.0.0")
             _a2_state = _resolve_a2_state(
-                instrument_version="a2_adversarial_gauntlet/1.0.0")
+                instrument_version=_a2_inst)
         except Exception:  # noqa: BLE001 — fail closed, never silent
             _a2_state = {"state": "UNKNOWN_NOT_CALIBRATED",
                          "terminal_kill_admissible": False,
@@ -288,7 +293,7 @@ def classify(candidate: dict, evidence_verification: dict, prior_art: dict, adve
                 },
                 "gate": {
                     "gate_version": "attacker_calibration/1.1.0",
-                    "instrument": "a2_adversarial_gauntlet/1.0.0",
+                    "instrument": _a2_inst,
                     "calibration_state": _a2_state.get("state"),
                     "terminal_kill_admissible": False,
                     "reason": _a2_state.get("reason"),
@@ -307,12 +312,78 @@ def classify(candidate: dict, evidence_verification: dict, prior_art: dict, adve
             }
             # fall through: state advances past CANDIDATE_CONNECTION
         else:
-            # calibrated gauntlet: full terminal authority restored —
-            # the pre-R491 kill semantics apply unchanged
+            # calibrated gauntlet: terminal authority restored — RING-
+            # BOUND (the R491 binding, ported to the A2 surface): a
+            # kill served by a DIFFERENT provider/model than the
+            # measured ring never inherits the calibrated authority
+            # (the R488 lesson: calibration is (rules x ring)); it
+            # escalates with a typed ring_mismatch instead
             adversarial_escalation = None
-
-            # If prior_art state is non-kill, adversarial cannot use prior art to kill
-            if pa_status in NON_KILL_STATES and "KILLED" in prior_art_attack.upper():
+            _a2_ring = ((_a2_state.get("measured") or {})
+                        .get("attacker_ring") or {})
+            _rec_transport = adversarial.get("transport") or {}
+            _rec_pin = _rec_transport.get("ring_pin") or {}
+            _served_p = _rec_pin.get("served_provider") \
+                or _rec_transport.get("provider")
+            _served_m = _rec_pin.get("served_model") \
+                or _rec_transport.get("model")
+            _ring_mismatch = None
+            if _a2_ring.get("provider") and _served_p \
+                    and _served_p != _a2_ring["provider"]:
+                _ring_mismatch = {
+                    "kind": "RING_MISMATCH_PROVIDER",
+                    "measured_ring": _a2_ring,
+                    "attack_ring": {"provider": _served_p,
+                                    "model": _served_m},
+                    "reason": (
+                        f"the gauntlet's calibration was measured on "
+                        f"provider '{_a2_ring['provider']}' — this kill "
+                        f"ran on '{_served_p}'; the (rules x ring) "
+                        f"authority does not transfer (R488 basis)")}
+            elif _a2_ring.get("model") and _served_m \
+                    and _served_m != _a2_ring["model"]:
+                _ring_mismatch = {
+                    "kind": "RING_MISMATCH_MODEL",
+                    "measured_ring": _a2_ring,
+                    "attack_ring": {"provider": _served_p,
+                                    "model": _served_m},
+                    "reason": (
+                        f"the gauntlet's calibration was measured on "
+                        f"model '{_a2_ring['model']}' — this kill ran "
+                        f"on '{_served_m}'; the (rules x ring) "
+                        f"authority does not transfer (R488 basis)")}
+            if _ring_mismatch is not None:
+                _rm_reason = (adv_reason or dim_detail
+                              or "no kill basis recorded")
+                adversarial_escalation = {
+                    "escalated_objection": {
+                        "gauntlet_killed_dimensions": killed_dims,
+                        "objections_verbatim": {
+                            k: attacks[k] for k in killed_dims},
+                        "gauntlet_reason": adv_reason,
+                    },
+                    "gate": {
+                        "gate_version": "attacker_calibration/1.2.0",
+                        "instrument": _a2_inst,
+                        "calibration_state": _a2_state.get("state"),
+                        "terminal_kill_admissible": False,
+                        "ring_mismatch": _ring_mismatch,
+                        "reason": ("the gauntlet is CALIBRATED but this "
+                                   "kill was served by a different "
+                                   "ring — the calibrated authority "
+                                   "is ring-bound and does not "
+                                   "transfer (R488/R491)"),
+                        "reviewer_provenance": "AI_REVIEW (Art. LXVII)",
+                    },
+                    "escalation_reason": (
+                        "adversarial objections escalated (ring "
+                        f"mismatch {_ring_mismatch['kind']}): "
+                        f"{_rm_reason}"),
+                }
+                # fall through: the ring-mismatched kill ESCALATES —
+                # the calibrated authority is ring-bound and this
+                # record's ring never earned it
+            elif pa_status in NON_KILL_STATES and "KILLED" in prior_art_attack.upper():
                 # Adversarial tried to convert non-kill prior art into kill — BLOCK this
                 # Check other dimensions independently
                 other_kills = [k for k, v in attacks.items() if k != "prior_art" and "KILLED" in v.upper()]
