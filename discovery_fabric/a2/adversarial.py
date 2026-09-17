@@ -82,6 +82,52 @@ REASON: <one sentence>
 
 def _hash(s): return hashlib.sha256(s.encode()).hexdigest()[:16]
 
+# ===== R490: the Article L calibration-scope annotation (owner ruling) =====
+# Art. L ("The Attacker Must Be Calibrated") by its plain text covers EVERY
+# attacker whose results influence classification — not one instrument.
+# The R489 composition finding (byte-sourced): the terminal rejection
+# authority in the conductor's ATTACK->CLASSIFY path is THIS gauntlet
+# (classify.py assembles the terminal REJECTED reason), while the
+# sealed-bar calibration + the R417 escalation gate cover the ENGINE
+# independent_attack instrument only (run.py:1512/3132,
+# improve_stage.py:323, attacker_calibration.py,
+# calibration_records/). This gauntlet therefore carries:
+#   no calibration corpus, no sealed bars, no shipped measurement.
+# Owner ruling R490 (R490/A2_CALIBRATION_SCOPE.json, option (a)): this
+# gauntlet earns its own DEV-corpus calibration (Art. LIX — no tuning
+# against the sealed benchmark); the destination state is the R417
+# treatment at consumption (kill -> ESCALATED_OBJECTION while
+# uncalibrated), which rides the next behavior deploy. Until that
+# measurement ships and meets the sealed bars (reused verbatim per
+# Art. XXVII, the v3 pattern), EVERY result carries this annotation
+# (provenance custody, Art. XII) and article_l_state flips ONLY with a
+# shipped measurement + seal in the calibration_records registry —
+# never by editing this constant alone.
+A2_CALIBRATION_SCOPE = {
+    "instrument": "a2/adversarial.py::adversarial_challenge "
+                  "(the 8-dimension adversarial gauntlet)",
+    "article_l_state": "UNCALIBRATED_NO_MEASUREMENT_SHIPPED",
+    "ruling": "R490/A2_CALIBRATION_SCOPE.json option (a): own "
+              "DEV-corpus calibration (Art. LIX) before the KILL "
+              "regains terminal authority; consumption-side escalation "
+              "(the R417 treatment) rides the next behavior deploy",
+    "sealed_bar_coverage": "NONE — the R412/R447/R487 sealed-bar "
+                           "calibration records cover independent_attack/* "
+                           "only, never this gauntlet",
+}
+
+
+def _with_calibration_scope(result: dict) -> dict:
+    """Stamp the Article L scope annotation onto an attack record.
+    Metadata only — never alters any verdict (Art. L gate semantics are
+    unchanged until the behavior deploy lands the consumption gate)."""
+    try:
+        out = dict(result)
+        out["calibration_scope"] = dict(A2_CALIBRATION_SCOPE)
+        return out
+    except Exception:  # noqa: BLE001 — the annotation never blocks the attack
+        return result
+
 # E1: transport provenance of the most recent adversarial LLM call.
 # Art. VI: populated only from real registry call results.
 _LAST_ATTACK_PROVIDER_META: dict = {"status": "NEVER_CALLED"}
@@ -158,7 +204,7 @@ def adversarial_challenge(candidate: dict, evidence_verified: bool = True,
     # If evidence fails, adversarial MUST NOT run.
     evidence_gate = skip_if_evidence_failed(evidence_verified)
     if not evidence_gate["adversarial_should_run"]:
-        return {
+        return _with_calibration_scope({
             "overall": "NOT_RUN",
             "adversarial_status": "NOT_RUN",
             "adversarial_not_run_reason": evidence_gate["adversarial_not_run_reason"],
@@ -166,7 +212,7 @@ def adversarial_challenge(candidate: dict, evidence_verified: bool = True,
             "killed_count": 0,
             "v4_corrections_applied": ["evidence_gate_skip"],
             "timestamp": datetime.now(timezone.utc).isoformat(),
-        }
+        })
 
     # ===== LLM adversarial challenge =====
     STRIP = {"candidate_id", "model", "prompt_hash", "input_hash", "output_hash", "synthesis_timestamp"}
@@ -177,7 +223,7 @@ def adversarial_challenge(candidate: dict, evidence_verified: bool = True,
     if not resp:
         # DEFECT FIX: LLM failure must NEVER become KILL.
         # This is an operational failure, not a scientific verdict.
-        return {
+        return _with_calibration_scope({
             "overall": "EVALUATOR_CALL_FAILED",
             "adversarial_status": "EVALUATOR_CALL_FAILED",
             "reason": "LLM call failed (timeout, rate limit, or error)",
@@ -186,7 +232,7 @@ def adversarial_challenge(candidate: dict, evidence_verified: bool = True,
             "v4_corrections_applied": [],
             "is_scientific_verdict": False,
             "timestamp": datetime.now(timezone.utc).isoformat(),
-        }
+        })
 
     fields = ["UNSUPPORTED_MECHANISM", "WEAK_TRANSFER", "OBVIOUS_COMBINATION", "PRIOR_ART",
               "CONTRADICTION", "BOUNDARY_FAILURE", "ENGINEERING_INFEASIBILITY",
@@ -278,4 +324,4 @@ def adversarial_challenge(candidate: dict, evidence_verified: bool = True,
         "timestamp": datetime.now(timezone.utc).isoformat(),
     }
     print(f"  [adversarial] overall={overall} killed={killed_count} corrections={len(v4_corrections_applied)}")
-    return result
+    return _with_calibration_scope(result)

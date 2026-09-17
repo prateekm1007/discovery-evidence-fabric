@@ -1,0 +1,57 @@
+{
+  "artifact_type": "A2_CALIBRATION_SCOPE_DECISION",
+  "round": "R490",
+  "reviewer_provenance": "AI_REVIEW",
+  "decision_authority": "owner-level (the R489 record typed the two options as owner/next-round work; the R490 operator directive named this decision as a round deliverable)",
+  "decision": "OPTION (a) — the A2 adversarial gauntlet earns its own calibration; the calibration scope is NOT recorded as engine-instrument-scoped.",
+  "ruling_text": "Article L binds every attacker whose results influence classification, not one instrument. The A2 gauntlet (a2/adversarial.py::adversarial_challenge — the conductor ATTACK stage's canonical implementation, adapters.py AttackEngineAdapter) influences classification terminally: its KILL is the run's final REJECTED (classify.py assembles the terminal reason). It has no calibration corpus, no sealed bars, and no shipped measurement. Until it earns its own calibration, its kills are recorded with the uncalibrated annotation, and the destination state is the R417 treatment at consumption: a KILL from an uncalibrated attacker is reclassified at consumption to ESCALATED_OBJECTION (objection + basis preserved verbatim; deterministic gates untouched).",
+  "why_option_a": [
+    "Article L's plain text is general: 'Before attack results are allowed to influence world-class classification, a calibration corpus of known-defect + known-good mechanisms must exist... This makes the attacker a scientific instrument rather than a second LLM opinion.' Nothing in the article scopes it to the engine independent_attack instrument; the scoping would have to be authored by amendment.",
+    "Option (b) would exempt the exact attacker that terminally rejected the R489 cross-domain run (ts_f0880e025e60, 'obvious_combination: KILLED', served by the substituted free leg) — an exemption authored after the fact for the benefit of an unmeasured kill authority. That is the verifier-weakening direction (Art. VII's spirit; Art. XXXII's strongest-alternative-explanation test reads as self-serving), and it would grant authority that was never measured — the precise defect the R417 ruling removed from the engine instrument.",
+    "The R417 precedent already answered this shape of question for the engine instrument: measured non-selectivity (TPR 1.0 AND FPR 1.0, PPV == base rate) stripped the kill of terminal authority. The A2 gauntlet has no measurement at all — strictly less epistemic standing than the measured-not-calibrated engine instrument. Symmetric logic, stronger case.",
+    "The R488 live measurement additionally showed the attacker class is (rules x ring): the A2 gauntlet's transport selects from the same provider ring (adversarial.py llm_chat preferred_providers policy), so an uncalibrated A2 kill inherits the full ring-substitution exposure on top of the missing calibration."
+  ],
+  "named_attacker_inventory": [
+    {
+      "instrument": "independent_attack/3.0.0 (discovery_fabric/engine/independent_attack.py)",
+      "role": "per-candidate kill gate (run.py:1512) and improve-child kill gate (improve_stage.py:323); engineering attack (run.py:3132)",
+      "calibration_state": "NOT_CALIBRATED, MEASURED (R488 live sealed-corpus run: TPR 1.0, coverage 1.0, parse 1.0, FPR 1.0 vs the 0.30 bar — 22/22 through the deployed /api/ops/calibration-attack transport)",
+      "gate": "attacker_calibration.apply_at_consumption active at the consumption sites; KILL reclassified to ESCALATED_OBJECTION while NOT_CALIBRATED (the R417 treatment)",
+      "records": "calibration_records/ r412/r447/r487 measurement+seal pairs, DIGESTS-pinned (6 pins)"
+    },
+    {
+      "instrument": "a2/adversarial.py::adversarial_challenge (the 8-dimension gauntlet + V4 corrections)",
+      "role": "conductor ATTACK stage; terminal rejection authority via classify.py (the R489 composition finding)",
+      "calibration_state": "UNCALIBRATED_NO_MEASUREMENT_SHIPPED — no calibration corpus, no sealed bars, no measurement, no gate",
+      "gate": "NONE this round (metadata annotation shipped; consumption-side escalation rides the next behavior deploy — declared, not silently implemented)",
+      "records": "this decision + the A2_CALIBRATION_SCOPE annotation on every adversarial_challenge result (shipped R490, tests/test_r490_a2_calibration_annotation.py)"
+    }
+  ],
+  "destination_state": {
+    "what": "the A2 gauntlet's KILL is reclassified at consumption to ESCALATED_OBJECTION while its article_l_state is not CALIBRATED; when its own measurement record + seal ship and meet the sealed bars, the KILL passes through with full terminal authority",
+    "bars": "REUSED verbatim from the R412 sealed bars (tpr_min 0.75, fpr_max 0.30, coverage_min 0.875, parse_completeness_min 0.875) — NO new threshold invented (Art. XXVII), exactly the v3 seal pattern (r487_attacker_v3_seal.json)",
+    "deploy_note": "the consumption gate is a behavior change and rides the next behavior deploy (the same discipline as the R488 deployed gate flip, which the R490 operator directive again deferred); nothing in this round changes deployed behavior",
+    "fail_closed_note": "until the destination state deploys, every A2 kill record carries the annotation; the record layer is already honest even while the behavior layer awaits its deploy"
+  },
+  "owned_work_plan": [
+    "1. construct the A2 DEV calibration corpus (known-defect + known-good mechanisms per Art. L's minimum class list: causal-invalidity, boundary-condition failure, evidence contradiction, baseline equivalence, implementation impossibility, manufacturing failure, measurement ambiguity, scaling failure, safety failure, hidden dependency) — frozen BEFORE any tuning (Art. LIX: all tuning happens on a separate development set; the sealed benchmark is never touched)",
+    "2. ship the A2 measurement transport (an /api/ops surface for the gauntlet, mirroring the R487 independent-attack transport pattern) — rides the next behavior deploy",
+    "3. run the measurement on the deployed instrument with the production ring (the R488 discipline: live numbers on the deployed build, foreground waves, client timeouts sized to the observed tail)",
+    "4. ship measurement + seal into calibration_records/ with DIGESTS pins; flip article_l_state only then (never by editing the constant alone)",
+    "5. wire the consumption gate (the destination state above) in the same behavior deploy that carries the transport"
+  ],
+  "what_shipped_this_round": {
+    "annotation": "discovery_fabric/a2/adversarial.py — A2_CALIBRATION_SCOPE + _with_calibration_scope stamped on every adversarial_challenge result (NOT_RUN, EVALUATOR_CALL_FAILED, and the parsed verdict path); metadata only, fail-open, no verdict semantics touched",
+    "tests": "tests/test_r490_a2_calibration_annotation.py — 6 tests: the annotation rides KILL/PASS/EVALUATOR_CALL_FAILED/NOT_RUN; the kill verdict passes through unchanged; the stamp is a copy (consumer mutation cannot corrupt the constant)",
+    "batteries": "r487+r486+r481 45 green + 6 new = 51 green at commit time"
+  },
+  "byte_sites": {
+    "article_L": "EPISTEMIC_CONSTITUTION.md v2.6.0, '## Article L — The Attacker Must Be Calibrated'",
+    "article_LIX": "EPISTEMIC_CONSTITUTION.md v2.6.0, '## Article LIX — No Benchmark Gaming'",
+    "article_XXVII": "EPISTEMIC_CONSTITUTION.md v2.6.0, '## Article XXVII — No threshold invention'",
+    "r489_composition_finding": "R489/R489_ROUND_RECORD.json composition_finding (byte-sourced call sites a2/adversarial.py, a2/classify.py:231-236, run.py:1512/3132, improve_stage.py:323)",
+    "r417_gate": "discovery_fabric/engine/attacker_calibration.py (the ABSTAIN/ESCALATE gate derived from measured calibration)",
+    "adapter": "discovery_fabric/engine/adapters.py AttackEngineAdapter (the canonical A2 import + transport provenance)"
+  },
+  "scope_note": "this decision decides the SCOPE question only; it invents no threshold, changes no deployed behavior, and leaves the R489 run's typed outcome (NOT_CROSS_DOMAIN_CLOSURE) untouched — the R489 record already carried the honest typing under either option"
+}
