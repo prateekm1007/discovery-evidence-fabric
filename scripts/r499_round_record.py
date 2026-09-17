@@ -1,0 +1,109 @@
+#!/usr/bin/env python3
+"""R499 round record writer — assembles the measured artifacts into the record."""
+import hashlib
+import json
+import os
+import subprocess
+
+REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+R = os.path.join(REPO, "R499")
+
+
+def sha(path):
+    return hashlib.sha256(open(path, "rb").read()).hexdigest()[:16]
+
+
+def git(*a):
+    return subprocess.run(["git", "-C", REPO] + list(a), capture_output=True, text=True).stdout.strip()
+
+
+probes = json.load(open(os.path.join(R, "R499_FREE_SOURCE_PROBES.json")))
+proof = json.load(open(os.path.join(R, "R499_FREE_LEGS_LIVE_PROOF.json")))
+
+record = {
+    "round": "R499",
+    "operator_directive": "use huggingface and other free sources (2026-09-18 continuation)",
+    "constitution_version": "2.7.0 (Article LXXV — Patent Evidence Is Not Patent Truth; read in full this round)",
+    "baseline": {"head_at_start": "8e27eb4d (R498)", "origin_main": "8e27eb4d (ls-remote verified at session start)"},
+    "what_was_directed": (
+        "The operator's answer to the R498 escalation ledger: build the Patent Evidence Fabric's first "
+        "legs on the free ecosystem (HuggingFace first, then the other free sources) instead of waiting "
+        "on Tier-1 registrations or the PatentBear account upgrade."
+    ),
+    "probe_set": {
+        "design": probes["design"],
+        "probes_run": len(probes["probes"]),
+        "headline_measurements": {
+            "hf_datasets_server_rows": "200 — the Tier-3 retrieval path measured live for the first time (common-pile/uspto: 131,755 full-text US patent documents, structured ids US-71623224-A, per-record CC BY 4.0)",
+            "hf_datasets_server_search": "500 INDEX_WARMING_TRANSIENT + 502s across ~10 minutes of retries on the large text corpora — typed transient/unstable, never promoted to a coverage claim",
+            "epo_lod_sparql": "LIVE — the R498 406 root-caused: the probed URL (/linked-data/data/sparql) is the query UI; the SPARQL 1.1 protocol endpoint is https://data.epo.org/linked-data/query (discovered from the platform's own runtime config + UI bundle)",
+            "epo_ops_anonymous": "403 — the registration gate measured, not assumed",
+            "uspto_odp_anonymous": "403 — the key gate measured ('free does not imply anonymous', LXXV)",
+            "patentsview": "DNS-unresolvable from this sandbox — typed as a sandbox network property, never a source-availability claim",
+            "zenodo": "403 this run — client-side block state, retryable",
+            "github": "200 — the R498 per-IP rate-limit state recovered",
+            "google_patents_xhr": "200 — the live discovery provider stable",
+        },
+    },
+    "built": {
+        "leg_a_hf_uspto_corpus": {
+            "file": "discovery_fabric/prior_art_v2/free_evidence_sources.py",
+            "functions": ["search_hf_uspto (typed discovery; INDEX_WARMING_TRANSIENT/RATE_LIMITED/SCHEMA_MISMATCH)",
+                          "fetch_hf_uspto_rows (deterministic retrieval — the measured-reliable path)",
+                          "hf_uspto_corpus_status"],
+            "wiring": "HF_USPTO_CORPUS joins search_all_sources (the 5-provider discovery ladder)",
+            "lxxv": "every hit carries the five custody fields; family measured NOWHERE on this leg -> hits typed PROVENANCE_INCOMPLETE on family: a Tier-3 corpus hit may DISCOVER, never verify (clause 3)",
+        },
+        "leg_b_epo_linked_open_data": {
+            "file": "discovery_fabric/prior_art_v2/free_evidence_sources.py",
+            "functions": ["epo_lod_identity (publication identity + custody; NOT_IN_GRAPH = typed coverage state, never absence)",
+                          "epo_lod_family_for_publication (application -> simple-family -> member applications -> publications)",
+                          "epo_lod_fetch_document (Tier-1 primary document fetch, EPO-origin gated, sha256 byte binding)"],
+            "wiring": "deliberately NOT a keyword-search provider: it is the LXXV clause-3 VERIFICATION path",
+            "lxxv": "identity custody declares family_basis=NOT_MEASURED_THIS_CALL explicitly (never silently complete); the family call measures it",
+        },
+        "registry": "PATENT_SOURCE_REGISTRY.json v1.0.0 -> v1.1.0 (every updated property carries MEASURED_R499 provenance; no absence claims)",
+        "policy": "PATENT_EVIDENCE_FABRIC.md v1.1.0 (§5 build state: items 1 UNBLOCKED+INSTALLED, 2 PARTIALLY INSTALLED, 3 SUBSTRATE INSTALLED)",
+    },
+    "live_proof": {
+        "hf_uspto_corpus_status": "OK",
+        "hf_uspto_rows_reliable_path": "OK, 3 hits (deterministic retrieval live)",
+        "hf_search": "INDEX_WARMING_TRANSIENT at every attempt (typed; the /rows path carries Tier-3 retrieval)",
+        "epo_identity_EP0084638A1": "OK — label/kind/authority/date/titles/abstract/application/priorities/citations/representations, custody COMPLETE (family explicitly NOT_MEASURED_THIS_CALL)",
+        "epo_identity_US8968233B2": "NOT_IN_GRAPH — the sealed RBG patent is outside THIS dataset's coverage: typed as a coverage state with the never-absence note (US coverage measured partial: US 3268123 A IS in-graph)",
+        "epo_family_EP0084638A1": "OK — simple-family/25798930, 2 member applications (EP/82111372 + US/45644983), 3 member publications (EP0084638A1, EP0084638B1, US4511068A)",
+        "epo_primary_document_xml": "OK — 36,488 bytes, sha256 e653979191f72112..., official ep-patent-document XML, anonymous fetch",
+    },
+    "defects_found_and_fixed_this_round": [
+        "custody_completeness auto-typed an empty family field to UNKNOWN (a silent completion — exactly what LXXV forbids). Caught by the round's own hermetic test BEFORE any live use; fixed: the knowledge boundary must be explicitly declared by the transport (family_uri / members / explicit basis), otherwise PROVENANCE_INCOMPLETE. The identity transport now declares family_basis=NOT_MEASURED_THIS_CALL.",
+    ],
+    "test_evidence": {
+        "new": "tests/test_r499_free_evidence_sources.py — 22 hermetic tests (custody typing; HF mapping/transient/rate-limit/schema; EPO URI-shape/identity/NOT_IN_GRAPH/timeout/family/document+origin-gate; wiring; registry v1.1.0)",
+        "regression": "141 run across the transport-affected suites (r491/r492/r397/r399/r376/commercial/key_unlock/r498/r499): 140 PASS, 1 pre-existing failure verified IDENTICAL on the clean tree (the R497-disclosed environment-naming artifact: the sandbox clone path contains 'discovery-evidence-fabric', which the R491 test forbids — an environment property, not a code regression; disclosed per Art. XI/LXI)",
+    },
+    "vault": {
+        "rotation": "PATENT_BEAR_API_KEY rotated old fp 561b6e70f5b5ea7f -> new fp 50fe7b3d569bb1fa (the operator-supplied key, matching the R498-recorded rotation; this environment's vault had been left on the old key; Art. LXXIII)",
+        "no_spends": "0 PatentBear debits this round — the free legs were built and measured without touching the metered key (the round's purpose)",
+    },
+    "standing_items_unchanged": [
+        "both kill authorities still NOT_CALIBRATED (TPR binds; v4.2 + a strong second ring remain the levers — Art. L)",
+        "HF credits decision for the second strong ring unchanged (the operator's free-source directive addressed the PATENT fabric, not the ring; the ring question stands)",
+        "PatentBear key budget: ~6/20 remaining on the rotated key (floor 2) — next seal-scale spend needs the next rotated key (the operator's committed path) or the R378 upgrade",
+        "legacy Render surface still STALE (R446-era) — owner update-or-retire decision standing",
+        "production HF Space: the 2.7.0 constitution + v3.1 instrument + this round's fabric legs ride the next deploy (HF_TOKEN not held this session)",
+    ],
+    "artifacts": {
+        "R499/R499_FREE_SOURCE_PROBES.json": sha(os.path.join(R, "R499_FREE_SOURCE_PROBES.json")),
+        "R499/R499_FREE_LEGS_LIVE_PROOF.json": sha(os.path.join(R, "R499_FREE_LEGS_LIVE_PROOF.json")),
+        "discovery_fabric/prior_art_v2/free_evidence_sources.py": sha(os.path.join(REPO, "discovery_fabric/prior_art_v2/free_evidence_sources.py")),
+        "tests/test_r499_free_evidence_sources.py": sha(os.path.join(REPO, "tests/test_r499_free_evidence_sources.py")),
+        "PATENT_SOURCE_REGISTRY.json": sha(os.path.join(REPO, "PATENT_SOURCE_REGISTRY.json")),
+    },
+    "no_novelty_verdict": "No novelty or coverage-sufficiency claim is made or implied this round (Art. XLVI, LXXV). NOT_IN_GRAPH is a coverage state; num_hits is a count signal; a single green run seals nothing.",
+    "reviewer_provenance": "AI_REVIEW",
+}
+
+out = os.path.join(R, "R499_ROUND_RECORD.json")
+json.dump(record, open(out, "w"), indent=1)
+print("wrote", out)
+print("head:", git("log", "--oneline", "-1"))

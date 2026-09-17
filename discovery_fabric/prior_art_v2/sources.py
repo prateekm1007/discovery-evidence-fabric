@@ -1060,13 +1060,22 @@ def search_all_sources(query: str, num_per_source: int = 8) -> Dict[str, SourceQ
     """
     Query ALL prior-art sources in parallel.
     Returns a dict mapping source_id -> SourceQueryResult.
+
+    R499: HF_USPTO_CORPUS joins the ladder (Tier-3 discovery corpus, free,
+    anonymous, per-record CC BY 4.0 — measured LIVE R499). Its zero-hit and
+    transient states are typed per call and never aggregated into absence
+    (Art. XXI.3 / LXXV clause 2). The EPO LOD identity/family transport is a
+    VERIFICATION path (LXXV clause 3), not a keyword-search provider — it is
+    consumed by the identity stage, deliberately not wired here.
     """
-    with ThreadPoolExecutor(max_workers=4) as ex:
+    from .free_evidence_sources import search_hf_uspto  # one-schema import, no cycle
+    with ThreadPoolExecutor(max_workers=5) as ex:
         futures = {
             ex.submit(search_google_patents, query, num_per_source): "GOOGLE_PATENTS",
             ex.submit(search_lens_scholarly, query, num_per_source): "LENS_SCHOLARLY",
             ex.submit(search_patsnap_eureka, query, num_per_source): "PATSNAP_EUREKA",
             ex.submit(search_patent_bear, query, num_per_source): "PATENT_BEAR",
+            ex.submit(search_hf_uspto, query, num_per_source): "HF_USPTO_CORPUS",
         }
         results: Dict[str, SourceQueryResult] = {}
         for f in as_completed(futures):
@@ -1118,6 +1127,22 @@ def get_source_status() -> Dict[str, Dict[str, Any]]:
             "protocol": "MCP 2025-06-18",
             "tools": ["search_patents", "get_patent_record"],
             "rate_limit": "20 searches/month on this key tier",
+            "verified_at": _now_utc(),
+        },
+        "HF_USPTO_CORPUS": {
+            "endpoint": "https://datasets-server.huggingface.co/search (common-pile/uspto)",
+            "auth": "none (anonymous, free, unmetered)",
+            "status": "LIVE",
+            "tier": 3,
+            "license": "per-record CC BY 4.0 (measured R499)",
+            "verified_at": _now_utc(),
+        },
+        "EPO_LINKED_OPEN_DATA": {
+            "endpoint": "https://data.epo.org/linked-data/query (SPARQL 1.1)",
+            "auth": "none (anonymous, free, unmetered)",
+            "status": "LIVE",
+            "role": "identity/family/primary-document VERIFICATION (LXXV clause 3) — not a keyword-search provider",
+            "coverage": "EP-centric; US/worldwide partial — NOT_IN_GRAPH is a coverage state, never absence",
             "verified_at": _now_utc(),
         },
     }

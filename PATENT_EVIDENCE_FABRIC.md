@@ -1,6 +1,6 @@
 # The Patent Evidence Fabric — Technical Policy
 
-**Version:** 1.0.0 (R498)
+**Version:** 1.1.0 (R499 — the free-source legs installed; §5 build state measured)
 **Governing article:** LXXV — Patent Evidence Is Not Patent Truth (Constitution 2.7.0)
 **Source registry:** `PATENT_SOURCE_REGISTRY.json` (the per-source measured instance data)
 **Provenance:** architecture per the operator's 2026-09-18 free/open patent-source
@@ -91,21 +91,45 @@ object (Art. XII/XXI.9).
   with provenance; operator research typed `OPERATOR_RESEARCH_UNVERIFIED`
   until measured.
 
-## 5. What is deliberately NOT built yet (and the order it should be)
+## 5. Build state after R499 (the operator's free-source directive)
 
-1. **Family-aware identity layer** (publication identity, simple family/
-   INPADOC collapse, dedup by entity — Art. XXI.6). Blocked primarily on a
-   Tier-1 registration (EPO OPS or PatentsView). Build order: FIRST.
-2. **Tier-1 primary verification path** (LXXV clause 3's verifier). Same
-   registration gate. Build order: WITH (1).
-3. **Claim-level attack** (claim extraction + breadth analysis on Tier-3
-   corpora). Depends on (1)+(2) for verification; Tier-3 corpora are already
-   LIVE_MEASURED (HF datasets API). Build order: THIRD.
+The operator directive "use huggingface and other free sources" (2026-09-18)
+changed the measured state of build order items 1–3:
+
+1. **Family-aware identity layer** — **UNBLOCKED AND INSTALLED (R499)**. The
+   R498 blocker ("Tier-1 registration") was superseded by measurement: EPO
+   Linked Open Data is LIVE, anonymous, free at the discovered SPARQL 1.1
+   endpoint (`https://data.epo.org/linked-data/query`; the R498 406 was an
+   endpoint-URL error, not a dead service). Installed: publication identity,
+   application/priority references, SIMPLE-FAMILY collapse
+   (application → family → member applications → their publications),
+   citation graph — `free_evidence_sources.py::epo_lod_identity /
+   epo_lod_family_for_publication`. Measured coverage: EP-centric; US/
+   worldwide PARTIAL — `NOT_IN_GRAPH` is a typed coverage state, never
+   absence.
+2. **Tier-1 primary verification path** — **PARTIALLY INSTALLED (R499)**:
+   primary document representations (official EPO XML with ep-patent-document
+   DTD + PDF) fetch 200 anonymously with sha256 byte binding
+   (`epo_lod_fetch_document`). What remains for full primary verification:
+   USPTO-side primary text (USPTO ODP measured 403 anonymous — key-gated)
+   and EPO OPS breadth (measured 403 anonymous — registration-gated); both
+   stay in the Tier-1 registration ledger.
+3. **Claim-level attack (Tier-3 corpora)** — **SUBSTRATE INSTALLED (R499)**:
+   HF datasets-server retrieval live (`/splits`, `/rows`: 131,755 full-text
+   USPTO documents, per-record CC BY 4.0, structured publication ids);
+   `HF_USPTO_CORPUS` wired into the discovery ladder. The `/search`
+   full-text path measured INDEX_WARMING_TRANSIENT/502 across the round —
+   typed, retriable, never promoted to a coverage claim. Claim extraction +
+   breadth analysis on this substrate: NEXT.
 4. **Corpus-scale collision measurement** (the 105-search, 21-case × 5-class
    ladder): blocked on PatentBear budget (account upgrade ≈ 6 fresh keys) —
-   an owner-gated economic decision, escalated per Art. LXV.
+   an owner-gated economic decision, escalated per Art. LXV. NOTE (R499):
+   the HF corpus + Google Patents + EPO LOD legs now provide a FREE
+   measurement path for corpus-scale discovery-stage coverage that does not
+   spend the metered key — the PatentBear dependency for the ladder's
+   discovery leg is re-scoped to adjudication-grade record fetch.
 
-The order is evidence-first: identity and verification before retrieval
+The order remains evidence-first: identity and verification before retrieval
 sophistication — a retrieval stack without primary verification would
 manufacture exactly the false confidence LXXV exists to prevent.
 

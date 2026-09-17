@@ -1,0 +1,156 @@
+{
+ "probe_set": "R499_FREE_SOURCE_PROBES",
+ "design": "public endpoints only; registration-gated sources typed by their measured anonymous boundary, never probed around it; the R498 EPO LOD 406 retried with SPARQL 1.1 content negotiation (Accept: application/sparql-results+json); HF datasets-server (splits/rows/search) measured for the first time \u2014 it is the actual retrieval path behind the R498 dataset-API 200",
+ "operator_directive": "use huggingface and other free sources (2026-09-18)",
+ "probes": [
+  {
+   "probe": "hf_datasets_index_stability",
+   "url": "https://huggingface.co/api/datasets?search=patent&limit=5",
+   "at_utc": "2026-09-17T20:03:13Z",
+   "http_status": 200,
+   "seconds": 0.24,
+   "body_len": 5603,
+   "parse": "OK",
+   "payload_excerpt": {
+    "first_ids": [
+     "justicedao/patent-legal-ir-graphrag",
+     "kltobias/patent_corpus_demo",
+     "NortheasternUniversity/big_patent",
+     "Pyke/patent_abstract",
+     "Renukswamy/Patent_sentiment_analysis"
+    ],
+    "len": 5
+   }
+  },
+  {
+   "probe": "hf_dser_splits_common_pile_uspto",
+   "url": "https://datasets-server.huggingface.co/splits?dataset=common-pile/uspto",
+   "at_utc": "2026-09-17T20:03:13Z",
+   "http_status": 200,
+   "seconds": 0.27,
+   "body_len": 104,
+   "parse": "OK",
+   "payload_excerpt": {
+    "splits": [
+     {
+      "config": "default",
+      "split": "train"
+     }
+    ]
+   }
+  },
+  {
+   "probe": "hf_dser_rows_common_pile_uspto",
+   "url": "https://datasets-server.huggingface.co/rows?dataset=common-pile/uspto&config=default&split=train&offset=0&length=2",
+   "at_utc": "2026-09-17T20:03:15Z",
+   "http_status": 200,
+   "seconds": 1.24,
+   "body_len": 11305,
+   "parse": "OK"
+  },
+  {
+   "probe": "hf_dser_splits_hupd",
+   "url": "https://datasets-server.huggingface.co/splits?dataset=HUPD/hupd",
+   "at_utc": "2026-09-17T20:03:15Z",
+   "http_status": 501,
+   "seconds": 0.25,
+   "body_len": 205,
+   "parse": "OK",
+   "payload_excerpt": {
+    "splits": []
+   }
+  },
+  {
+   "probe": "epo_lod_sparql_json_negotiation",
+   "url": "https://data.epo.org/linked-data/data/sparql?query=SELECT%20%3Fs%20%3Fp%20%3Fo%20WHERE%20%7B%20%3Fs%20%3Fp%20%3Fo%20.%20%7D%20LIMIT%201",
+   "at_utc": "2026-09-17T20:03:16Z",
+   "http_status": 406,
+   "seconds": 0.72,
+   "body_len": 5,
+   "parse": "NOT_JSON (Expecting value: line 1 column 1 (char 0))",
+   "body_excerpt": "Error"
+  },
+  {
+   "probe": "epo_lod_sparql_post_form",
+   "url": "https://data.epo.org/linked-data/data/sparql",
+   "at_utc": "2026-09-17T20:03:17Z",
+   "http_status": 405,
+   "seconds": 1.86,
+   "body_len": 0,
+   "parse": "EMPTY_BODY"
+  },
+  {
+   "probe": "epo_ops_anonymous_boundary",
+   "url": "https://ops.epo.org/3.2/rest-services/published-data/search?q=ti%3D%22ballast%20water%22&Range=1-2",
+   "at_utc": "2026-09-17T20:03:18Z",
+   "http_status": 403,
+   "seconds": 0.43,
+   "body_len": 208,
+   "parse": "NOT_JSON (Expecting value: line 1 column 1 (char 0))",
+   "body_excerpt": "<error><code>403</code><message>This request has been rejected due to the violation of Fair Use policy</message><moreInfo>https://www.epo.org/service-support/ordering/fair-use.html</moreInfo>\n\t\t\t\t</error>\n\t\t\t"
+  },
+  {
+   "probe": "patentsview_anonymous_boundary",
+   "url": "https://search.patentsview.org/api/v1/patent/?q=%7B%22_text_any%22%3A%7B%22patent_title%22%3A%22ballast%22%7D%7D&f[]=patent_id",
+   "at_utc": "2026-09-17T20:03:18Z",
+   "http_status": null,
+   "seconds": 0.04,
+   "body_len": 0,
+   "error": "URLError: <urlopen error [Errno -2] Name or service not known>"
+  },
+  {
+   "probe": "uspto_odp_anonymous_boundary",
+   "url": "https://api.uspto.gov/v1/patent/applications/search?queryText=ballast",
+   "at_utc": "2026-09-17T20:03:19Z",
+   "http_status": 403,
+   "seconds": 0.74,
+   "body_len": 42,
+   "parse": "OK"
+  },
+  {
+   "probe": "uspto_patft_public_boundary",
+   "url": "https://ppubs.uspto.gov/pubwebapp/static/pages/ppubsbasic.html",
+   "at_utc": "2026-09-17T20:04:09Z",
+   "http_status": null,
+   "seconds": 50.68,
+   "body_len": 0,
+   "error": "URLError: <urlopen error timed out>"
+  },
+  {
+   "probe": "zenodo_patent_records",
+   "url": "https://zenodo.org/api/records?q=patent%20corpus&size=3",
+   "at_utc": "2026-09-17T20:04:10Z",
+   "http_status": 403,
+   "seconds": 0.61,
+   "body_len": 763,
+   "parse": "NOT_JSON (Expecting value: line 2 column 11 (char 11))",
+   "body_excerpt": "\n          <html>\n          <head><title>403 Forbidden</title></head>\n          <body style=\"max-width: 600px; margin: 40px auto; padding: 0 20px; line-height: 1.6;\">\n          <h1>403 Forbidden</h1>\n          <hr>\n          <p>Access to this resource has been restricted due to unusual traffic from your network.</p>\n          <p>If you believe this is a mistake, please <a href=\"/support?ref=30532c"
+  },
+  {
+   "probe": "github_patents_public_data_retry",
+   "url": "https://api.github.com/repos/google/patents-public-data",
+   "at_utc": "2026-09-17T20:04:10Z",
+   "http_status": 200,
+   "seconds": 0.43,
+   "body_len": 7488,
+   "parse": "OK",
+   "payload_excerpt": {
+    "full_name": "google/patents-public-data",
+    "default_branch": "master"
+   }
+  },
+  {
+   "probe": "google_patents_xhr_stability",
+   "url": "https://patents.google.com/xhr/query?url=q%3Dballast%2Bwater%2Btreatment%26num%3D3&exp=",
+   "at_utc": "2026-09-17T20:04:11Z",
+   "http_status": 200,
+   "seconds": 0.81,
+   "body_len": 25166,
+   "parse": "OK",
+   "payload_excerpt": {
+    "cluster_len": 1
+   }
+  }
+ ],
+ "reviewer_provenance": "AI_REVIEW"
+}
