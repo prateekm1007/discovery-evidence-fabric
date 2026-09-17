@@ -105,7 +105,10 @@ def _req(path: str, body: Optional[Dict[str, Any]] = None,
         data = json.dumps(body).encode()
         headers["Content-Type"] = "application/json"
     if owner_key:
-        headers["X-Owner-Key"] = owner_key
+        # the server's owner-capability header is X-Tosca-Owner (the
+        # R490 driver's X-Owner-Key measured 404 on every poll this
+        # round — fixed here; the answer endpoint disambiguated it)
+        headers["X-Tosca-Owner"] = owner_key
     if HF_TOKEN:
         headers["Authorization"] = f"Bearer {HF_TOKEN}"
     req = urllib.request.Request(url, data=data, headers=headers,
@@ -318,7 +321,7 @@ def _durable_harvest(session_id: str) -> Dict[str, Any]:
             out["attack_deployed"] = {
                 "overall": res.get("overall"),
                 "killed_count": res.get("killed_count"),
-                "calibration_annotation": res.get("A2_CALIBRATION_SCOPE"),
+                "calibration_scope": res.get("calibration_scope"),
                 "transport_provider": tr.get("provider"),
                 "transport_model": tr.get("model"),
                 "substituted_from": tr.get("substituted_from"),
