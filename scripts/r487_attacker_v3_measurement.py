@@ -105,14 +105,17 @@ def _freeze_check() -> Dict[str, Any]:
 
 
 def _req(path: str, body: Dict[str, Any] = None, timeout: int = 900):
-    # R488 delta: 240 -> 900s. The committed 240s ceiling was set before
-    # any live v3 measurement existed; the R488 single-case latency probe
-    # against the deployed instrument measured 440s for ONE attack (the
-    # production ring's current attacker latency) — every committed-
-    # timeout request would have died mid-attack and the sealed-bar run
-    # could never complete. This raises ONLY the client-side read
-    # ceiling; no threshold, corpus byte, scoring rule, or verdict path
-    # is touched. Disclosed in R488/R488_ROUND_RECORD.json.
+    # client read ceiling (observation-side only): 240 -> 900s. The
+    # parallel R488 line's single-case latency probe measured 440s for
+    # ONE attack on the deployed production ring, and this line's
+    # foreground-batch run measured 118-551s with cal-12 landing at
+    # 542s only on the 5th attempt and cal-18 never landing under a
+    # 560s ceiling (5 consecutive read-timeouts) — the R488 union takes
+    # the measured-safe 900s. A client POLL_TIMEOUT here is a
+    # TRANSPORT_INCOMPLETE observation, never a run verdict (Art.
+    # LXXIV), and the case simply re-runs on --resume (no marker
+    # written). No threshold, corpus byte, scoring rule, or verdict
+    # path is touched. Disclosed in R487/R488_ROUND_RECORD.json.
     import urllib.error
     import urllib.request
     HF_TOKEN = os.environ.get("HF_TOKEN", "").strip()
@@ -228,6 +231,12 @@ def main() -> int:
     ap.add_argument("--resume", action="store_true")
     ap.add_argument("--score", action="store_true")
     ap.add_argument("--limit", type=int, default=0)
+    ap.add_argument("--skip", default="",
+                    help="comma-separated case_ids to NOT attempt this "
+                         "invocation (batching control only — the "
+                         "marker discipline is untouched; skipped "
+                         "cases simply stay NOT_RUN for this pass "
+                         "and are honestly typed)")
     args = ap.parse_args()
 
     corpus = json.loads(CORPUS_PATH.read_text())
@@ -247,9 +256,13 @@ def main() -> int:
                  f"{EXPECTED_IDENTITY[:12]}")
             return 2
         RAW_DIR.mkdir(parents=True, exist_ok=True)
+        skip_ids = {s.strip() for s in args.skip.split(",") if s.strip()}
         cases = corpus["cases"]
         if args.limit:
             cases = cases[:args.limit]
+        if skip_ids:
+            _log(f"batching skip (this pass only): {sorted(skip_ids)}")
+            cases = [c for c in cases if c["case_id"] not in skip_ids]
         for case in cases:
             marker = RAW_DIR / f"{case['case_id']}.json"
             if args.resume and marker.exists():
