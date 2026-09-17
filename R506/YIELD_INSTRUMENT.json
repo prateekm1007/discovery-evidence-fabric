@@ -1,0 +1,107 @@
+{
+  "artifact_type": "DISCOVERY_YIELD_INSTRUMENT_SPEC",
+  "instrument_id": "r506_discovery_yield",
+  "instrument_version": "1.0.0",
+  "frozen_at_round": "R506",
+  "frozen_by_directive": "CEO directive 'Review of the external feedback + directive to coder' (2026-09-18), section 2: 'Build the DISCOVERY YIELD instrument (the cycle's main build)'",
+  "script_path": "scripts/r506_discovery_yield.py",
+  "script_sha256": "831f1a0e075cb9dd370c18325bf2b19fac9f7fa69d1218b980d8c4b22946a2ac",
+  "freeze_rule": "This hash is pre-registered before first measurement use. ANY instrument edit produces a new version string; old measurements stand unchanged (the directive: 'Freeze hash pre-registered; any instrument edit = new version, old measurements stand').",
+
+  "what_it_measures": "Whether the machine DISCOVERS, not whether it completes. Funnel rows are computed from each run's own durable bytes only — never self-reported values, never narratives, never summaries (Art. XXIV). The instrument is observational and never writes to the run directory it reads (Art. IX).",
+
+  "funnel_transitions": [
+    {"index": 1, "name": "fresh_submitted",
+     "byte_source": "problem.json + run_manifest.json/final_state.json",
+     "counter": "1 per run directory"},
+    {"index": 2, "name": "premise_coherent",
+     "byte_source": "stage_log PREMISE_GATE result_meta.premise_verdict / envelope premise_gate.verdict",
+     "drop_typed": ["PREMISE_INCOHERENT", "STAGE_INCOMPLETE"]},
+    {"index": 3, "name": "evidence_verified",
+     "byte_source": "attack_results.evidence_verified / adjudication.evidence_verification.verified / stage_log VERIFY result_meta.verified",
+     "drop_typed": ["EVIDENCE_UNVERIFIED", "STAGE_INCOMPLETE"],
+     "note": "the run's own typed verification issues (e.g. missing_source_span, mechanism_span_not_verbatim) are carried in verification_issues"},
+    {"index": 4, "name": "mechanisms_found",
+     "byte_source": "envelope_MECHANISM_SPACE mechanism_space.n_candidates_generated + state / stage_log MECHANISM_SPACE",
+     "drop_typed": ["NO_CANDIDATES", "STAGE_INCOMPLETE"]},
+    {"index": 5, "name": "candidates_generated_distinct",
+     "byte_source": "mechanism_space.distinctness.n_distinct (three-verdict instrument, Art. XLII)",
+     "count_rule": "DISTINCT only; INDETERMINATE counted separately and never as invention (Art. XLII: INDETERMINATE is a legitimate verdict, not DISTINCT); grid-advanced counts never counted (LXXVIII)",
+     "drop_typed": ["NO_DISTINCT_CANDIDATES", "ALL_DISTINCTNESS_INDETERMINATE"]},
+    {"index": 6, "name": "attack_survivors",
+     "byte_source": "attack_results.overall + attacks{} per-dimension verdicts",
+     "count_rule": "the primary candidate's gauntlet outcome; SURVIVOR_SELECTION.ranked non-killed entries are recorded as grid_advanced_not_counted, NEVER as survivors (the SURVIVOR_GATE resolution records that discovery-level verification is not re-run per grid candidate)",
+     "honesty_pin": "attacker_provenance is always RUN_LEVEL_A2_GAUNTLET_NOT_SEALED_BAR_CALIBRATED (the R489 composition finding: the run-level A2 adversarial gauntlet is a different attacker from the sealed-bar-calibrated engine independent_attack instrument)",
+     "drop_typed": ["ATTACK_KILLED", "STAGE_INCOMPLETE"]},
+    {"index": 7, "name": "contradiction_survivors",
+     "byte_source": "contradictions.blocking_count (the engine's own ADJUDICATION no_blocking_contradictions definition)",
+     "count_rule": "survivor iff blocking_count == 0",
+     "drop_typed": ["BLOCKING_CONTRADICTIONS", "STAGE_INCOMPLETE"]},
+    {"index": 8, "name": "experimentally_discriminated",
+     "byte_source": "killer_experiment.selected + DECISIVE_EXPERIMENT.falsification_contract + DISCOVERY_RELEASE.real_loop_verified",
+     "count_rule": "SELECTED is not EXECUTED; v1.0.0 counts EXECUTED only via the Art. XXXVIII REAL_LOOP_VERIFIED byte state; synthetic executions never count (Art. XXXVII)",
+     "drop_typed": ["NO_NON_VACUOUS_EXPERIMENT"]},
+    {"index": 9, "name": "mutated_survivors",
+     "byte_source": "stage_log IMPROVE entries: status==CHILDREN_ADMITTED + entry-level delta_real + ledger{children_admitted, children_rekilled, loop_closure} + EVOLUTION_GEN_1.json",
+     "count_rule": "children admitted AND delta_real true AND re-evaluated (re_evaluated_fields from the child record: attack, independent_attack, quality, killed, physics_lifecycle — nothing inherited)",
+     "drop_typed": ["NO_MUTATED_SURVIVOR"]},
+    {"index": 10, "name": "buyer_ready",
+     "byte_source": "DISCOVERY_RELEASE.json status + package_zip + loop_verification_state + real_loop_verified + INVENTION_LINEAGE.survivor_reached",
+     "count_rule": "ZIP emitted AND release in RELEASED/SHIPPED/TECHNOLOGY_TRANSFER_READY; HELD_FOR_HUMAN_REVIEW is a typed drop carrying failure_reason",
+     "drop_typed": ["RELEASE_NOT_EMITTED", "RELEASE_HELD", "PACKAGE_NOT_EMITTED"]}
+  ],
+
+  "mid_flight_rule": "A run directory without run_manifest.json is MID_FLIGHT_OR_PARTIAL_PER_LXXIV — an observation, never a terminal (the R487/R489 terminal-divergence ruling). Terminal and mid-flight rows are never collapsed in aggregates.",
+
+  "reason_vocabulary_frozen": ["PREMISE_INCOHERENT", "EVIDENCE_UNVERIFIED", "NO_CANDIDATES", "NO_DISTINCT_CANDIDATES", "ALL_DISTINCTNESS_INDETERMINATE", "ATTACK_KILLED", "BLOCKING_CONTRADICTIONS", "NO_NON_VACUOUS_EXPERIMENT", "NO_MUTATED_SURVIVOR", "RELEASE_NOT_EMITTED", "RELEASE_HELD", "PACKAGE_NOT_EMITTED", "STAGE_INCOMPLETE", "MID_FLIGHT_PER_LXXIV"],
+
+  "honesty_pins": [
+    "NOVELTY_LEFT_UNRESOLVED_BY_RING_FAILURES: collision mandatory_searches.complete=false is carried on every row; novelty is never resolved from failed searches (Art. XXI.3, LXXV.2)",
+    "cost/debits typed UNKNOWN_PER_ART_XXV when no metered cost bytes exist in the run records — never invented",
+    "attacker_provenance typed on every attack_survivors transition",
+    "declared_family ABSENT_IN_DURABLE_RECORD when problem.json carries no canonical_family (the R489 submission-path gap, disclosed)"
+  ],
+
+  "hermetic_acceptance": {
+    "requirement": "the instrument, run on bytes alone, reproduces the three known sealed terminals (the directive, section 2 acceptance)",
+    "case_1": {
+      "name": "R489 REJECTED pre-loop",
+      "bytes": "durable branch checkpoint 96965e28 (engine_checkpoint:ts_f0880e025e60, 2026-09-17T09:44:03Z), run toscanini_ui_ui_flat_faced_cam_follower_rolling_contact_fa_636438",
+      "expected": "MID_FLIGHT typed per LXXIV (no manifest at checkpoint — the exact bytes the R489 line read); funnel first loss mechanisms_found::NO_CANDIDATES; attack KILLED with killed_dimensions [obvious_combination] (R489: '7 PASS, obvious_combination KILLED'); DEFERRED_TO_KILL_POINT recorded; no children; no release",
+      "reproduced": true,
+      "record": "R506/HERMETIC_CASE1_R489_CHECKPOINT_96965e28.json"
+    },
+    "case_2": {
+      "name": "R484 child-admitted",
+      "bytes": "terminal run dir toscanini_ui_ui_calcite_and_silica_gel_deposition_on_separ_602181 (durable branch tip)",
+      "expected": "TERMINAL; primary killed by exactly [engineering_infeasibility, obvious_combination, unsupported_mechanism, weak_transfer] (the R484 LOOP_CLOSURE kill dimensions); mutated_survivors count 1 with delta_real true (CHILDREN_ADMITTED — the R484 headline); release HELD, package_zip null",
+      "reproduced": true,
+      "record": "R506/HERMETIC_CASE2_R484_TERMINAL.json"
+    },
+    "case_3": {
+      "name": "R487 terminal closure (the ruled terminal)",
+      "bytes": "durable branch terminal commit 34d81fb9 (terminal:COMPLETE:ts_f0880e025e60), same run as case 1",
+      "expected": "TERMINAL (INVENTION_UNDER_DEVELOPMENT — the ruled R487 terminal); mutated_survivors 1 with delta_real true and the hash transition (2964211e->5c4616c6) plus ledger loop_closure 'died -> mutated from the kill basis -> re-entered the SAME gauntlet -> 1 admitted, 0 re-killed'; release HELD_FOR_HUMAN_REVIEW (TIE wall); real_loop_verified false; grid_advanced_not_counted=11 recorded but never counted",
+      "reproduced": true,
+      "record": "R506/HERMETIC_CASE3_R487_TERMINAL_34d81fb9.json",
+      "note": "cases 1 and 3 are the SAME session at two byte-states — reading them reproduces the R487/R489 terminal-divergence reconciliation from bytes alone: only the terminal commit carries run_manifest.json"
+    },
+    "verdict": "HERMETIC ACCEPTANCE MET"
+  },
+
+  "determinism": "byte-identical output verified across two invocations on the same run bytes",
+
+  "durable_population_baseline": {
+    "record": "R506/DURABLE_POPULATION_BASELINE.json",
+    "scope": "all 97 run directories on runtime-state-hf at f0ef989b (86 terminal, 11 mid-flight, never collapsed)",
+    "purpose": "pre-battery baseline of the HISTORICAL population; the battery measurement itself is a separate record (R506/YIELD_MEASUREMENT.json) over fresh blind problems",
+    "headline": "buyer_ready 0/86 terminal runs; experimentally_discriminated 0/86; mutated_survivors 2/86; largest drops: evidence_verified (43x EVIDENCE_UNVERIFIED + 3x typed), mechanisms_found (27x NO_CANDIDATES), attack (11x KILLED)"
+  },
+
+  "battery_requirements_from_directive": {
+    "problems": "6-10 blind fresh problems, >=3 families, corpus-disjoint against R446/R412/R458/R492-DEV/sealed corpora (test-enforced), family-declared at submission",
+    "rules": "pinned healthy ring, committed driver only, zero human bytes, freeze gates + instrument for the battery duration, NO mid-battery fixes, all attempts published incl. zeros",
+    "void_rule": "a battery with re-tuned gates mid-run is void",
+    "reproducibility": "a second container re-runs the yield computation from the same durable bytes and must reproduce the funnel exactly"
+  }
+}
