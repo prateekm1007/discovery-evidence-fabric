@@ -1,0 +1,78 @@
+{
+  "round": "R498",
+  "line": "Coder 2 (main session)",
+  "reviewer_provenance": "AI_REVIEW",
+  "round_type": "SEAL_CLOSURE_OF_NAMED_UNBLOCK",
+  "baseline_art_XXII_XXIII": {
+    "local_head": "0b09167f4f53452007e1681e2e826b650d419bc3",
+    "remote_head_at_round_start": "0b09167f4f53452007e1681e2e826b650d419bc3",
+    "ls_remote_verified": true,
+    "working_tree": "clean",
+    "constitution": "v2.6.0 unchanged since R497 (clean checkout of the R497-verified tip; no new delta to read)",
+    "classification": "ALIGNED"
+  },
+  "trigger": {
+    "operator_statement": "more keys will be supplied when you run out",
+    "operator_supplied": "a fresh pb_live_ PatentBear key",
+    "unblock_target": "R497 typed SEAL_NOT_CLAIMED_QUOTA_INFEASIBLE and named the unblock: 6 debits of headroom on a PatentBear account (R378 account upgrade / dedicated instrument key / month-reset window). Key rotation is a fourth, operator-driven path now measured."
+  },
+  "credential_rotation_art_LXXIII": {
+    "old_key_fingerprint_sha256_12": "561b6e70f5b5",
+    "new_key_fingerprint_sha256_12": "50fe7b3d569b",
+    "vault": "/home/z/my-project/.secrets.env (0600, outside every repository)",
+    "key_material_in_records": false,
+    "measured_rotation_property": "each pb_live_ key carries its OWN 20/month quota bucket: the old account closed R497 at remaining=4 while the new key measures monthly_used=1/20 on first call. Operator key rotation is therefore a renewable seal-economics path, independent of the R378 account-upgrade escalation."
+  },
+  "headroom_probe": {
+    "record": "R498_PB_HEADROOM_PROBE.json",
+    "script": "/home/z/my-project/scripts/r498_pb_headroom_probe.py",
+    "debits_spent": 1,
+    "result": "LIVE_200 isError=false usage={allowed:true, monthly_limit:20, monthly_used:1, monthly_remaining:19} hits=10 for the R497 reference query",
+    "seal_feasibility": "TRUE (19 >= 6 required)"
+  },
+  "seal": {
+    "seal_id": "R498_RBG_SEAL",
+    "seal_path": "repetition_based_measurement (the operator's standing seal rule)",
+    "driver": "scripts/r495_rbg/rbg_seal.py --round R498 (repo copy: early-stop + quota stewardship, R497 version)",
+    "repetitions": 3,
+    "fresh_process_per_repetition": true,
+    "all_fixtures_pass_all_repetitions": true,
+    "unanimous": true,
+    "verdict_sequence_agreed": ["EVIDENCE_VERIFIED", "EVIDENCE_REFUTED", "EVIDENCE_REFUTED", "EVIDENCE_REFUTED", "RETRIEVAL_INCOMPLETE", "PATENT_COVERAGE_LIVE_THIS_RUN", "BLINDNESS_RETAINED", "NO_COLLISION_FOUND", "COLLISION_DETECTED", "COLLISION_DETECTED", "EVIDENCE_REFUTED"],
+    "verdict_sequence_sha256": "8b23e3dfbf49e1eaca7b3ea11250b553b95573e0acea50ec1f927144968055ab",
+    "cross_round_reproducibility": "the agreed sequence hash is byte-identical to the R497 SMOKE run's hash (8b23e3df...): the single green run predicted the seal and 3 fresh repetitions on a fresh key reproduced it exactly",
+    "battery_version": "3 (11 fixtures, unchanged from R497 — no fixture edits this round)",
+    "records": ["R498_RBG_SEAL_RECORD.json", "repetitions/R498_RBG_REP_R1.json", "repetitions/R498_RBG_REP_R2.json", "repetitions/R498_RBG_REP_R3.json"]
+  },
+  "quota_economics": {
+    "debits_before_round": 0,
+    "headroom_probe_debits": 1,
+    "seal_debits": 6,
+    "measured_final_meter": {"monthly_used": 7, "monthly_limit": 20, "monthly_remaining": 13},
+    "prediction_vs_measurement": "predicted 1 + 2/repetition = 7; measured 7 — the R497 seal economics model is now repetition-measured itself",
+    "floor_respected": "stewardship floor never approached; F10 would have typed INCOMPLETE at remaining<2"
+  },
+  "coverage_statement_this_run": {
+    "patent_layer": "PATENT_COVERAGE_LIVE_THIS_RUN (patentbear LIVE_200)",
+    "other_providers": {
+      "lens": "TOKEN_OUT_OF_SCOPE (R495 measured; unchanged)",
+      "patsnap": "KEY_RECOGNIZED_AUTH_NOT_OPENED (R496 measured; unchanged)"
+    },
+    "no_novelty_verdict_issued": true
+  },
+  "operator_design_input_received_not_verified": {
+    "what": "the operator relayed a third-party research brief on the free/open patent-source universe (Google Patents, USPTO Public Search + Open Data bulk, PatentsView, Espacenet/EPO OPS/EPO full-text/Linked Open Data, WIPO PATENTSCOPE, The Lens, Hugging Face patent corpora incl. common-pile/uspto ~16.2M rows, GitHub tooling, Zenodo, prosecution/legal corpora) proposing a 4-tier Patent Evidence Fabric (primary offices -> discovery/index -> ML corpora -> knowledge graph) with the principle PATENT EVIDENCE IS NOT PATENT TRUTH (search coverage must be measured independently from result count; secondary indexes discover, primary office records verify; absence in one source is never evidence of nonexistence)",
+    "constitutional_mapping": "the brief's core principles are ALREADY TYPED in the installed instrument: coverage-vs-count = F6 / Art. XXI.1 (COUNT_SIGNAL_ONLY) / PATENT_COVERAGE_LIVE_THIS_RUN; discovery-vs-verification = F10 record-level byte binding against the primary provider record; absence-typing = Art. XXI.2/XXI.3 (NO_RESULTS vs SEARCH_FAILED vs PROVIDER_INCONSISTENT) and the R497 C1 false-absence fix; provenance preservation = the evidence-object discipline of Art. II/III",
+    "verification_status": "EXTERNAL_CLAIMS_UNVERIFIED: the brief's specific figures (Espacenet 150M+ documents, Common Pile 16.2M rows/~1TB, OPS 4GB/week) are quoted from provider marketing pages via a third-party assistant; they are recorded as operator-supplied design input, NOT as verified measurements, and no debits were spent on them",
+    "registry_candidates_not_installed": "USPTO/EPO/WIPO/PatentsView transports and the HF/ML corpus tier are named as future transport-layer candidates; installing any of them is a future round's measured work, not asserted here"
+  },
+  "relation_to_parallel_line": {
+    "R497_C1": "their production-side false-absence fix (scope patents-first) and collision-ladder re-measurement are untouched by this round; zero changes to their files",
+    "shared_escalation": "the R378 PatentBear account upgrade remains the binding constraint for CORPUS-SCALE measurement (105 searches for the 21-case corpus x 5 classes, Art. LXV); key rotation closes the PER-ROUND SEAL economics but not the corpus-scale economics — the owner reminder stands"
+  },
+  "delivery": {
+    "records_to_push": "R498/ (this record + seal record + 3 repetitions + headroom probe ledger)",
+    "push_method": "askpass PAT helper (scripts/.gh_pat), PAT never entered .git/config (BS-021)",
+    "push_status": "PENDING_AT_WRITE_TIME"
+  }
+}
