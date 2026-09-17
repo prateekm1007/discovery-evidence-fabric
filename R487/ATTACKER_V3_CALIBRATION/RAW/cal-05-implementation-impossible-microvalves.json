@@ -1,0 +1,287 @@
+{
+ "attack": {
+  "attack_version": "independent_attack/3.0.0",
+  "candidate_id": "cal-05-per-nozzle-microvalves",
+  "generator_provider": null,
+  "attacker_provider": "xkiro",
+  "attacker_model": "qwen/qwen3.8-max:free",
+  "independence_mode": "SEPARATE_CONTEXT",
+  "independence_note": "the attacker ran in an independent reasoning context (fresh adversarial conversation, generator reasoning never shown; no alternative provider credentialed \u2014 disclosed, never claimed as provider separation)",
+  "prompt_hash": "c9b83438f77aaa03ec8cb2aeb9057b17f5c29fd37e50bcfa109ab457a4c91a2a",
+  "output_hash": "910e8437582673fe26f5de2a41818802b9684969f6a2aa0b072daca514709010",
+  "llm_status": "OK",
+  "attacked_at": "2026-09-17T04:41:08+00:00Z",
+  "items": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "verdict": "ABSTAIN",
+    "basis": "The candidate claims the micro-ejector blows the particle back into the header, but at 14 bar supply pressure the ejector must generate a localized counter-pressure exceeding 14 bar inside a 3 mm throat to reverse flow against the main header; no energy source or pressure multiplier is specified to achieve this reversal. GROUNDED_IN: RECORD \"integrated micro-ejector blows the particle back into the header\" combined with SCOPE \"supply header at 14 bar\" and COMPUTATION reversing bulk flow in a 3 mm passage fed by 14 bar requires local stagnation pressure > 14 bar, which an unspecified integrated",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['14', '14', '3', '14', '3', '14']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'back into the header' (field: mechanism)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['throat', 'with']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"integrated micro-ejector blows the particle back into the header\" combined with SCOPE \"supply header at 14 bar\" and COMPUTATION reversing bulk flow in a 3 mm passage fed by 14 bar requires loc",
+     "absence_ground": false
+    },
+    "demoted_from": "KILL",
+    "demotion_layer": "v3_accommodation",
+    "accommodation": {
+     "rule": "UNSTATED_ELEMENT",
+     "match": "no energy source or pressure multiplier is specified",
+     "reason": "the failure assertion rests on the record NOT stating an element \u2014 record silence is incompleteness, not failure (Art. XXI.3 extended to specification); the objection is preserved and escalated"
+    }
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "verdict": "KILL",
+    "basis": "The candidate specifies shared 24 V rails along the header for 120 servo-controlled assemblies, but the boundary condition explicitly includes a mill vibration environment; rigid electrical bus rails carrying 120 servo loads cannot maintain continuous contact under industrial rolling-mill vibration without defined flexure or isolation, making the power distribution architecture incompatible with the stated boundary. GROUNDED_IN: RECORD \"shared 24 V rails along the header\" and SCOPE \"mill vibration environment\" and COMPUTATION 120 servo nodes on a single rigid rail subject to continuous high-am",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['24', '120', '120', '24', '120']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'per nozzle servo control' (field: intervention)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['environment', 'mill', 'vibration', 'with']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"shared 24 V rails along the header\" and SCOPE \"mill vibration environment\" and COMPUTATION 120 servo nodes on a single rigid rail subject to continuous high-amplitude mechanical shock will exp",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "verdict": "SURVIVE",
+    "basis": "No evidence bundle was provided to contradict. GROUNDED_IN: EVIDENCE none held"
+   },
+   {
+    "attack_class": "BASELINE_EQUIVALENCE",
+    "verdict": "SURVIVE",
+    "basis": "The baseline performs no active clogging prevention; the candidate introduces active diversion and ejection, which is structurally distinct from doing nothing. GROUNDED_IN: RECORD \"doing nothing new \u2014 the status quo the candidate must beat\" versus RECORD \"micro-valve diverts flow to a standby throat while an integrated micro-ejector blows the particle back into the header\""
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "verdict": "KILL",
+    "basis": "The candidate packs a micro-valve, an optical particle sensor, a standby throat, a micro-ejector, and per-nozzle servo control into a 3 mm throat geometry; a standby throat alone requires a parallel fluid passage of comparable cross-section, meaning the physical envelope exceeds the 3 mm boundary before accounting for the actuator, sensor, and ejector hardware. GROUNDED_IN: RECORD \"3 mm in-line micro-valve + optical sorter + micro-ejector assemblies\" and RECORD \"diverts flow to a standby throat\" and SCOPE \"3 mm throat geometry\" and COMPUTATION two parallel throats plus valve bodies, optics, an",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['3', '3', '3', '3', '3']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'flow to standby throat' (field: mechanism)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['geometry', 'throat']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"3 mm in-line micro-valve + optical sorter + micro-ejector assemblies\" and RECORD \"diverts flow to a standby throat\" and SCOPE \"3 mm throat geometry\" and COMPUTATION two parallel throats plus v",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "verdict": "RISK",
+    "basis": "The testable prediction measures flow stability within 2 percent over 500 hours using abrasive-scale slurry, but it does not specify whether this tolerance applies to instantaneous flow rate, time-averaged flow, or spatial uniformity across the diverted/active throat switching events, leaving the acceptance criterion undefined. GROUNDED_IN: RECORD \"flow stability within 2 percent\" and COMPUTATION 2 percent of nominal flow (unspecified metric) during transient diversion events cannot be evaluated without defining the integration window"
+   }
+  ],
+  "intervention_suggestions": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "suggestion": "Replace the reverse-flow micro-ejector with a forward-flush bypass that directs the particle out through the standby throat rather than fighting 14 bar header pressure backward, eliminating the impossible pressure-reversal requirement. GROUNDED_IN: RECORD \"integrated micro-ejector blows the particle back into the header\" and SCOPE \"supply header at 14 bar\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'back into the header' (field: mechanism)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['throat', 'with']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"integrated micro-ejector blows the particle back into the header\" and SCOPE \"supply header at 14 bar\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "suggestion": "Replace the shared 24 V rigid rails with individually isolated, flexible potted harness segments per nozzle group to survive the mill vibration environment without contact arcing. GROUNDED_IN: RECORD \"shared 24 V rails along the header\" and SCOPE \"mill vibration environment\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['24', '24']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'shared 24 rails along' (field: intervention)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['environment', 'mill', 'vibration', 'with']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"shared 24 V rails along the header\" and SCOPE \"mill vibration environment\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "suggestion": "Increase the throat geometry boundary from 3 mm to a dimensioned manifold block (e.g., 15 mm envelope) that can physically house the dual-throat, valve, sensor, and ejector stack, or eliminate the standby throat in favor of a single-path purge cycle. GROUNDED_IN: RECORD \"3 mm in-line micro-valve + optical sorter + micro-ejector assemblies\" and SCOPE \"3 mm throat geometry\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['3', '15', '3', '3']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'in line micro valve' (field: mechanism)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['geometry', 'throat']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"3 mm in-line micro-valve + optical sorter + micro-ejector assemblies\" and SCOPE \"3 mm throat geometry\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "suggestion": "Define the 2 percent flow stability metric as the maximum instantaneous deviation from nominal volumetric flow rate sampled at >= 1 kHz during valve actuation transients, removing ambiguity from the 500-hour test. GROUNDED_IN: RECORD \"flow stability within 2 percent\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['2', '1', '500', '2']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'flow stability within percent' (field: testable_prediction)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"flow stability within 2 percent\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   }
+  ],
+  "state": "ATTACK_RUN",
+  "overall": "KILLED",
+  "kill_basis": [
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "basis": "The candidate specifies shared 24 V rails along the header for 120 servo-controlled assemblies, but the boundary condition explicitly includes a mill vibration environment; rigid electrical bus rails carrying 120 servo loads cannot maintain continuous contact under industrial rolling-mill vibration without defined flexure or isolation, making the power distribution architecture incompatible with the stated boundary. GROUNDED_IN: RECORD \"shared 24 V rails along the header\" and SCOPE \"mill vibration environment\" and COMPUTATION 120 servo nodes on a single rigid rail subject to continuous high-am",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['24', '120', '120', '24', '120']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'per nozzle servo control' (field: intervention)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['environment', 'mill', 'vibration', 'with']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"shared 24 V rails along the header\" and SCOPE \"mill vibration environment\" and COMPUTATION 120 servo nodes on a single rigid rail subject to continuous high-amplitude mechanical shock will exp",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "basis": "The candidate packs a micro-valve, an optical particle sensor, a standby throat, a micro-ejector, and per-nozzle servo control into a 3 mm throat geometry; a standby throat alone requires a parallel fluid passage of comparable cross-section, meaning the physical envelope exceeds the 3 mm boundary before accounting for the actuator, sensor, and ejector hardware. GROUNDED_IN: RECORD \"3 mm in-line micro-valve + optical sorter + micro-ejector assemblies\" and RECORD \"diverts flow to a standby throat\" and SCOPE \"3 mm throat geometry\" and COMPUTATION two parallel throats plus valve bodies, optics, an",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['3', '3', '3', '3', '3']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'flow to standby throat' (field: mechanism)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['geometry', 'throat']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"3 mm in-line micro-valve + optical sorter + micro-ejector assemblies\" and RECORD \"diverts flow to a standby throat\" and SCOPE \"3 mm throat geometry\" and COMPUTATION two parallel throats plus v",
+     "absence_ground": false
+    }
+   }
+  ],
+  "counts": {
+   "KILL": 2,
+   "RISK": 1,
+   "SURVIVE": 2,
+   "ABSTAIN_DEMOTED": 1,
+   "INVALID": 0
+  }
+ }
+}

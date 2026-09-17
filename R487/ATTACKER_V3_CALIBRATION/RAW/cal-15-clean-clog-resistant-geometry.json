@@ -1,0 +1,137 @@
+{
+ "attack": {
+  "attack_version": "independent_attack/3.0.0",
+  "candidate_id": "cal-15-large-throat-swirl-nozzle",
+  "generator_provider": null,
+  "attacker_provider": "xkiro",
+  "attacker_model": "qwen/qwen3.8-max:free",
+  "independence_mode": "SEPARATE_CONTEXT",
+  "independence_note": "the attacker ran in an independent reasoning context (fresh adversarial conversation, generator reasoning never shown; no alternative provider credentialed \u2014 disclosed, never claimed as provider separation)",
+  "prompt_hash": "336f482c47cb53b72bef0a2949a569e77d73f2dee191d9a105e0831e617a013d",
+  "output_hash": "655dee985d4b4c62091d7758e8c07301833fe4daff4d7cbf3a7b1d2b6dbf6d82",
+  "llm_status": "OK",
+  "attacked_at": "2026-09-17T05:07:26+00:00Z",
+  "items": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "verdict": "RISK",
+    "basis": "The candidate claims an 8 percent flow increase offsets droplet coarsening while staying inside pump headroom, but provides no hydraulic computation binding the 6 mm throat area increase to the 14 bar supply pressure and the specific pump curve; a 6 mm throat has 4x the cross-sectional area of a 3 mm throat, so maintaining equivalent flow class at fixed pressure requires internal restriction that contradicts the anti-clogging geometry. GROUNDED_IN: COMPUTATION (6 mm / 3 mm)^2 = 4x area ratio versus claimed 8% flow increase versus stated boundary \"same nominal flow class\" at \"14 bar supply\""
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "verdict": "KILL",
+    "basis": "The candidate declares \"same nominal flow class\" as a boundary condition while simultaneously claiming a \"5 percent flow increase\"; these two statements are arithmetically contradictory for a fixed 120-nozzle header at fixed 14 bar supply. GROUNDED_IN: RECORD \"5 percent flow increase that stays inside the pump's headroom\" contradicts SCOPE \"same nominal flow class\" at \"14 bar supply\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['5', '120', '14', '5', '14']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'stays inside the pump' (field: predicted_effect)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['class', 'flow', 'nominal', 'percent']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"5 percent flow increase that stays inside the pump's headroom\" contradicts SCOPE \"same nominal flow class\" at \"14 bar supply\"",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "verdict": "RISK",
+    "basis": "The candidate predicts clogging events fall from 4.1 to 1.8 based on a 4x bridging threshold shift, but biological growth nucleation is a surface-adhesion mechanism independent of throat-to-particle geometric bridging; the predicted reduction conflates particulate bridging with biofouling without separating the failure modes. GROUNDED_IN: RECORD \"progressive nozzle clogging from scale particles and biological growth\" versus RECORD \"bridging threshold shift\" as sole basis for \"clogging events fall from 4.1 to approximately 1.8\""
+   },
+   {
+    "attack_class": "BASELINE_EQUIVALENCE",
+    "verdict": "RISK",
+    "basis": "The candidate asserts crown variation remains inside 12 microns via re-patterned distribution verified by vendor patternator, but vendor patternators measure cold-water spatial flux distribution, not in-situ thermal crown response under rolling loads; equivalence to baseline thermal performance is unproven by the stated test method. GROUNDED_IN: RECORD \"vendor patternator shows distribution uniformity within 5 percent\" versus RECORD \"crown variation inside 12 microns maintained by the re-patterned distribution\""
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "verdict": "RISK",
+    "basis": "The candidate specifies installation during roll-change-window but provides no dimensional envelope data proving a 6 mm throat swirl-ramp nozzle fits the existing header mounting footprint designed for 3 mm throat nozzles across 120 positions. GROUNDED_IN: RECORD \"roll-change-window installation\" versus RECORD \"nozzle replacement with 6 mm-throat swirl-ramp flat-fan nozzles\" without dimensional compatibility statement"
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "verdict": "INVALID",
+    "basis": "",
+    "invalid_reason": "class absent from response"
+   }
+  ],
+  "intervention_suggestions": [
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "suggestion": "Reconcile the flow contradiction by specifying the exact internal restriction geometry that yields precisely 5 percent net flow increase through a 6 mm throat at 14 bar, or drop the \"same nominal flow class\" boundary and compute the new total header flow against the documented pump curve. GROUNDED_IN: RECORD \"5 percent flow increase\" versus SCOPE \"same nominal flow class\" at \"14 bar supply\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['5', '6', '14', '5', '14']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'same nominal flow class' (field: boundary_conditions)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['class', 'flow', 'nominal', 'percent']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"5 percent flow increase\" versus SCOPE \"same nominal flow class\" at \"14 bar supply\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   }
+  ],
+  "state": "ATTACK_RUN",
+  "overall": "KILLED",
+  "kill_basis": [
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "basis": "The candidate declares \"same nominal flow class\" as a boundary condition while simultaneously claiming a \"5 percent flow increase\"; these two statements are arithmetically contradictory for a fixed 120-nozzle header at fixed 14 bar supply. GROUNDED_IN: RECORD \"5 percent flow increase that stays inside the pump's headroom\" contradicts SCOPE \"same nominal flow class\" at \"14 bar supply\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['5', '120', '14', '5', '14']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'stays inside the pump' (field: predicted_effect)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['class', 'flow', 'nominal', 'percent']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"5 percent flow increase that stays inside the pump's headroom\" contradicts SCOPE \"same nominal flow class\" at \"14 bar supply\"",
+     "absence_ground": false
+    }
+   }
+  ],
+  "counts": {
+   "KILL": 1,
+   "RISK": 4,
+   "SURVIVE": 0,
+   "ABSTAIN_DEMOTED": 0,
+   "INVALID": 1
+  }
+ }
+}

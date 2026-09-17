@@ -217,10 +217,37 @@ class TestValidateParsedV3(unittest.TestCase):
 
 
 class TestGateRegistry(unittest.TestCase):
-    def test_v3_fail_closed_until_measured(self):
+    # R488: the live sealed-corpus v3 measurement RAN (22/22 cases on the
+    # deployed instrument, the production ring) and SHIPPED — the gate's
+    # state advanced from UNKNOWN_NOT_CALIBRATED (pre-measurement, the
+    # R487 pin) to the MEASURED negative NOT_CALIBRATED (FPR 1.0 vs the
+    # 0.30 bar). The INVARIANT this test guards is the fail-closed
+    # DISCIPLINE — a not-calibrated instrument holds NO terminal kill
+    # authority, whether the state is unknown or measured-negative —
+    # never a particular state string (the R419 ratified-state
+    # precedent).
+    def test_v3_fail_closed(self):
         st = gate.resolve_state(
             instrument_version="independent_attack/3.0.0")
-        self.assertEqual(st["state"], "UNKNOWN_NOT_CALIBRATED")
+        self.assertIn(st["state"],
+                      ("UNKNOWN_NOT_CALIBRATED", "NOT_CALIBRATED"))
+        self.assertFalse(st["terminal_kill_admissible"])
+        if st["state"] == "NOT_CALIBRATED":
+            # the measured path: the shipped record's numbers re-derived
+            m = st["measured"] or {}
+            self.assertEqual(m.get("n_cases_attacked"), 22)
+            self.assertEqual(m.get("fpr_known_good"), 1.0)
+
+    def test_v3_unknown_path_still_fail_closed(self):
+        # the pre-shipment semantics stay reachable and fail-closed:
+        # an explicit unreadable measurement path -> UNREADABLE, no
+        # terminal authority, never a silent pass-through
+        st = gate.resolve_state(
+            measurement_path=Path("definitely-absent-measurement.json"),
+            instrument_version="independent_attack/3.0.0")
+        self.assertIn(st["state"],
+                      ("UNKNOWN_NOT_CALIBRATED",
+                       "UNREADABLE_NOT_CALIBRATED"))
         self.assertFalse(st["terminal_kill_admissible"])
 
     def test_v2_states_unchanged(self):
@@ -240,8 +267,12 @@ class TestGateRegistry(unittest.TestCase):
         self.assertEqual(gated["overall"], "ESCALATED_OBJECTION")
         esc = gated["escalation"]
         self.assertEqual(esc["instrument"], "independent_attack/3.0.0")
-        self.assertEqual(esc["calibration_state"],
-                         "UNKNOWN_NOT_CALIBRATED")
+        # R488: the state string advanced to the measured negative
+        # (the live measurement shipped); the consumption DISCIPLINE —
+        # a KILLED record escalates while the instrument is not
+        # calibrated — is the invariant and is unchanged
+        self.assertIn(esc["calibration_state"],
+                      ("UNKNOWN_NOT_CALIBRATED", "NOT_CALIBRATED"))
 
 
 class _Handler:

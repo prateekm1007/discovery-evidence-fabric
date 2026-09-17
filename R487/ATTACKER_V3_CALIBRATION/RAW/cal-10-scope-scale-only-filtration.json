@@ -1,0 +1,191 @@
+{
+ "attack": {
+  "attack_version": "independent_attack/3.0.0",
+  "candidate_id": "cal-10-scale-scoped-cascade",
+  "generator_provider": null,
+  "attacker_provider": "xkiro",
+  "attacker_model": "qwen/qwen3.8-max:free",
+  "independence_mode": "SEPARATE_CONTEXT",
+  "independence_note": "the attacker ran in an independent reasoning context (fresh adversarial conversation, generator reasoning never shown; no alternative provider credentialed \u2014 disclosed, never claimed as provider separation)",
+  "prompt_hash": "00bedae09416862a65aae0914a811d55c467ea8c2102c95fc6d63ebb3405e40d",
+  "output_hash": "b3830a4e3071a93301eb3d173a905b60a06eb44057d7cf6719726557a117c01f",
+  "llm_status": "OK",
+  "attacked_at": "2026-09-17T04:49:59+00:00Z",
+  "items": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "verdict": "RISK",
+    "basis": "The candidate claims removal of \"scale particles above 120 microns\" and an 8x reduction in blockages from particles \"above 200 microns,\" but wedge-wire screens have a nominal slot rating that does not guarantee absolute retention at that dimension; elongated scale slivers below 120 microns in thickness but exceeding 200 microns in length will pass the second stage and bridge nozzle orifices, undermining the stated mechanism. GROUNDED_IN: RECORD \"a two-stage wedge-wire cascade (300 then 120 micron) on the header supply removes scale particles above 120 microns before they reach the nozzles\""
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "verdict": "SURVIVE",
+    "basis": "The candidate explicitly bounds the intervention to scale-particle clogging only, declares biofilm out of scope, and constrains pressure to 13-15 bar, all of which are internally consistent with the stated problem boundary conditions. GROUNDED_IN: RECORD \"the intervention explicitly targets SCALE-PARTICLE clogging only \u2014 biofilm clogging is declared OUT OF SCOPE\""
+   },
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "verdict": "ABSTAIN",
+    "basis": "The candidate asserts \"removed-nozzle analysis over two campaigns shows scale-particle blockages reduced 8x\" as a testable prediction while simultaneously holding an evidence bundle of \"(none held)\"; stating that an analysis \"shows\" a specific quantitative outcome requires data, making this a direct contradiction between the claimed evidentiary result and the empty evidence record. GROUNDED_IN: EVIDENCE (none held) | RECORD \"removed-nozzle analysis over two campaigns shows scale-particle blockages reduced 8x while biofilm blockage counts are statistically unchanged\"",
+    "grounding": {
+     "grounded": false,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['8', '8']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'reduced 8x while biofilm' (field: testable_prediction)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['biofilm', 'particle', 'scale']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "EVIDENCE (none held) | RECORD \"removed-nozzle analysis over two campaigns shows scale-particle blockages reduced 8x while biofilm blockage counts are statistically unchanged\"",
+     "absence_ground": true,
+     "demotion_reason": "the asserted ground is an ABSENCE of evidence/support \u2014 absence is uncertainty, not failure (Art. XXI.3/XXV); the objection is preserved and escalated, never executed as a kill"
+    },
+    "demoted_from": "KILL",
+    "demotion_layer": "v2_grounding"
+   },
+   {
+    "attack_class": "BASELINE_EQUIVALENCE",
+    "verdict": "SURVIVE",
+    "basis": "The candidate computes a reduction in total campaign clogging events from 4.1 to approximately 3.3, demonstrating a quantified departure from the status quo baseline rather than equivalence to it. GROUNDED_IN: COMPUTATION 4.1 baseline events minus 3.3 predicted events equals 0.8 events removed per campaign"
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "verdict": "RISK",
+    "basis": "The candidate specifies installation via \"flanged spool swap during planned roll change\" for a device \"sized for full design flow\" on a \"150 mm header supply\" without providing dimensions or weight; a full-flow two-stage cascade with automatic backflush valves on a 150 mm line may exceed the spatial envelope available between existing flanges during a standard roll change window. GROUNDED_IN: RECORD \"no mill stop for installation (flanged spool swap during planned roll change)\" | RECORD \"sized for full design flow\""
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "verdict": "RISK",
+    "basis": "The testable prediction relies on \"removed-nozzle analysis\" to distinguish \"scale-particle blockages\" from \"biofilm blockage counts,\" but provides no analytical protocol (e.g., microscopy, chemical dissolution) to definitively classify mixed deposits where scale nuclei are embedded within biological matrices. GROUNDED_IN: RECORD \"removed-nozzle analysis over two campaigns shows scale-particle blockages reduced 8x while biofilm blockage counts are statistically unchanged\""
+   }
+  ],
+  "intervention_suggestions": [
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "suggestion": "Change the verb \"shows\" to \"is predicted to show\" or \"will be tested by\" in the testable prediction clause to align the statement with the empty evidence bundle, converting a false claim of existing data into a valid forward-looking hypothesis. GROUNDED_IN: EVIDENCE (none held) | RECORD \"removed-nozzle analysis over two campaigns shows scale-particle blockages reduced 8x while biofilm blockage cou",
+    "grounding": {
+     "grounded": false,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'reduced 8x while biofilm' (field: testable_prediction)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['biofilm', 'change', 'existing', 'particle']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "EVIDENCE (none held) | RECORD \"removed-nozzle analysis over two campaigns shows scale-particle blockages reduced 8x while biofilm blockage counts are statistically unchanged\"",
+     "absence_ground": true,
+     "demotion_reason": "the asserted ground is an ABSENCE of evidence/support \u2014 absence is uncertainty, not failure (Art. XXI.3/XXV); the objection is preserved and escalated, never executed as a kill"
+    },
+    "class": "UNGROUND_SUGGESTION",
+    "authority": "NONE \u2014 an ungrounded suggestion is preserved for human/escalation review and NEVER enters the hypothesis space (R450 \u00a710: the attacker does not get authority to invent causal explanations)"
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "suggestion": "Add maximum outer dimensions and dry/wet mass limits for the flanged spool assembly to verify physical fit within the existing 150 mm header flange-to-flange gap during the time-bounded planned roll change. GROUNDED_IN: RECORD \"no mill stop for installation (flanged spool swap during planned roll change)\" | RECORD \"on the 150 mm header supply, sized for full design flow\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['150', '150']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span '150 mm header supply' (field: intervention)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['change', 'during', 'existing', 'flanged']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"no mill stop for installation (flanged spool swap during planned roll change)\" | RECORD \"on the 150 mm header supply, sized for full design flow\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "suggestion": "Specify the exact classification method (e.g., SEM-EDS for elemental composition or acid-solubility testing) used in the removed-nozzle analysis to unambiguously separate pure scale particles from biofilm-bound scale, eliminating the diagnostic overlap. GROUNDED_IN: RECORD \"removed-nozzle analysis over two campaigns shows scale-particle blockages reduced 8x while biofilm blockage counts are statis",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'reduced 8x while biofilm' (field: testable_prediction)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['biofilm', 'particle', 'scale']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"removed-nozzle analysis over two campaigns shows scale-particle blockages reduced 8x while biofilm blockage counts are statistically unchanged\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   }
+  ],
+  "state": "ATTACK_RUN",
+  "overall": "ESCALATED_OBJECTION",
+  "preserved_objections": [
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "basis": "The candidate asserts \"removed-nozzle analysis over two campaigns shows scale-particle blockages reduced 8x\" as a testable prediction while simultaneously holding an evidence bundle of \"(none held)\"; stating that an analysis \"shows\" a specific quantitative outcome requires data, making this a direct contradiction between the claimed evidentiary result and the empty evidence record. GROUNDED_IN: EVIDENCE (none held) | RECORD \"removed-nozzle analysis over two campaigns shows scale-particle blockages reduced 8x while biofilm blockage counts are statistically unchanged\"",
+    "grounding": {
+     "grounded": false,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['8', '8']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'reduced 8x while biofilm' (field: testable_prediction)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['biofilm', 'particle', 'scale']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "EVIDENCE (none held) | RECORD \"removed-nozzle analysis over two campaigns shows scale-particle blockages reduced 8x while biofilm blockage counts are statistically unchanged\"",
+     "absence_ground": true,
+     "demotion_reason": "the asserted ground is an ABSENCE of evidence/support \u2014 absence is uncertainty, not failure (Art. XXI.3/XXV); the objection is preserved and escalated, never executed as a kill"
+    }
+   }
+  ],
+  "escalation": {
+   "rule": "every KILL failed the grounding check (no evidence/computation/record/declared-scope binding, or an absence ground); the objections are preserved verbatim and escalated for adjudication \u2014 the candidate is not killed by them",
+   "instrument": "independent_attack/3.0.0"
+  },
+  "counts": {
+   "KILL": 0,
+   "RISK": 3,
+   "SURVIVE": 2,
+   "ABSTAIN_DEMOTED": 1,
+   "INVALID": 0
+  }
+ }
+}

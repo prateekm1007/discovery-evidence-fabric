@@ -1,0 +1,387 @@
+{
+ "attack": {
+  "attack_version": "independent_attack/3.0.0",
+  "candidate_id": "cal-03-150um-strainer",
+  "generator_provider": null,
+  "attacker_provider": "xkiro",
+  "attacker_model": "qwen/qwen3.8-max:free",
+  "independence_mode": "SEPARATE_CONTEXT",
+  "independence_note": "the attacker ran in an independent reasoning context (fresh adversarial conversation, generator reasoning never shown; no alternative provider credentialed \u2014 disclosed, never claimed as provider separation)",
+  "prompt_hash": "70a31cfeb2ecc935b858d8fa58d1a5f3899b4002c911315d2bd933f71eee1ebc",
+  "output_hash": "814b9f1bb55aa02fd4890143ac2a4a32bd3e6f8d8ebb4c9b0c3343496c7bdedd",
+  "llm_status": "OK",
+  "attacked_at": "2026-09-17T04:33:08+00:00Z",
+  "items": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "verdict": "KILL",
+    "basis": "The candidate asserts clogging is dominated by mill-scale particles above 200 microns bridging the nozzle throats, but its own metallurgical evidence proves 70 percent of blockages are biofilm-slime aggregates, a mechanism a 150-micron mechanical screen cannot remove. GROUNDED_IN: EVIDENCE ev:metanalysis-40 | RECORD \"clogging is dominated by mill-scale (iron oxide) particles above 200 microns bridging the 3 mm nozzle throats; a 150-micron automatic backflush strainer on the header supply removes the bridging particles at the source\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "evidence",
+       "ground": "record id ev:metanalysis-40",
+       "verified": true
+      },
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['200', '70', '150', '40', '200', '3']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'clogging is dominated by' (field: mechanism)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['header', 'particles', 'scale']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "EVIDENCE ev:metanalysis-40 | RECORD \"clogging is dominated by mill-scale (iron oxide) particles above 200 microns bridging the 3 mm nozzle throats; a 150-micron automatic backflush strainer on the hea",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "verdict": "SURVIVE",
+    "basis": "The stated boundary conditions include recirculated water with scale particles present and full header flow at 14 bar, which the strainer is explicitly sized to handle; no internal contradiction exists between the declared boundaries and the proposed hardware. GROUNDED_IN: SCOPE Boundary conditions: full header flow at 14 bar; recirculated water with scale particles present"
+   },
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "verdict": "KILL",
+    "basis": "The predicted effect claims campaign clogging counts will fall 8x because the strainer removes bridging particles at the source, directly contradicting the held evidence that 70 percent of the 40 analyzed clogged nozzles were blocked by biofilm-slime aggregates which pass freely through a 150-micron screen. GROUNDED_IN: EVIDENCE ev:metanalysis-40 | RECORD \"Predicted effect: clogging events per campaign reduced from 4.1 to below 0.5... campaign clogging counts fall 8x\" | COMPUTATION 70% of 40 nozzles = 28 nozzles clogged by biofilm; 150-micron screen retention efficiency for biological slime ag",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "evidence",
+       "ground": "record id ev:metanalysis-40",
+       "verified": true
+      },
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['8', '70', '40', '150', '40', '4.1']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'particles at the source' (field: mechanism)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['particles', 'scale']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "EVIDENCE ev:metanalysis-40 | RECORD \"Predicted effect: clogging events per campaign reduced from 4.1 to below 0.5... campaign clogging counts fall 8x\" | COMPUTATION 70% of 40 nozzles = 28 nozzles clog",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "BASELINE_EQUIVALENCE",
+    "verdict": "KILL",
+    "basis": "Because the intervention leaves the dominant failure mode entirely unaddressed, the system remains functionally equivalent to the baseline status quo for 70 percent of all clogging events, failing to beat the un-invented standard. GROUNDED_IN: EVIDENCE ev:metanalysis-40 | RECORD \"single-stage 150-micron automatic backflush strainer (motorized brush screen) on the 150 mm header supply line\" | COMPUTATION 70% biofilm blockage rate unchanged by 150-micron mechanical filtration yields identical thermal-crown variation and off-gauge strip as the baseline",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "evidence",
+       "ground": "record id ev:metanalysis-40",
+       "verified": true
+      },
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['70', '40', '150', '150', '70', '150']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span '150 micron automatic backflush' (field: mechanism)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "EVIDENCE ev:metanalysis-40 | RECORD \"single-stage 150-micron automatic backflush strainer (motorized brush screen) on the 150 mm header supply line\" | COMPUTATION 70% biofilm blockage rate unchanged b",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "verdict": "RISK",
+    "basis": "A motorized brush screen operating in water with sessile biofilm coverage at 10^6 CFU per square centimeter faces severe fouling of the brush mechanism itself, though the candidate partially discloses strainer blinding as a known failure mode. GROUNDED_IN: EVIDENCE ev:biofilm-load | RECORD \"Known failure modes (claimed by the generator): strainer blinding during backflush failures\""
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "verdict": "KILL",
+    "basis": "The testable prediction states removed-nozzle metallurgical analysis will show no particle bridging above 150 microns, but this metric deliberately excludes the 70 percent biofilm-slime aggregate blockages, rendering the measurement incapable of validating the claimed 8x overall clogging reduction. GROUNDED_IN: EVIDENCE ev:metanalysis-40 | RECORD \"Testable prediction: with the strainer in service, removed-nozzle metallurgical analysis shows no particle bridging above 150 microns and campaign clogging counts fall 8x\" | COMPUTATION Measuring only >150 micron particle bridging ignores 70% of the ",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "evidence",
+       "ground": "record id ev:metanalysis-40",
+       "verified": true
+      },
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['150', '70', '8', '40', '150', '8']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'in service removed nozzle' (field: testable_prediction)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "EVIDENCE ev:metanalysis-40 | RECORD \"Testable prediction: with the strainer in service, removed-nozzle metallurgical analysis shows no particle bridging above 150 microns and campaign clogging counts ",
+     "absence_ground": false
+    }
+   }
+  ],
+  "intervention_suggestions": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "suggestion": "Replace the single-stage 150-micron mechanical strainer with a combined biocide dosing and mechanical filtration stage, because ev:metanalysis-40 proves 70% of blockages are biofilm-slime AGG requiring chemical or UV eradication rather than size exclusion. GROUNDED_IN: EVIDENCE ev:metanalysis-40",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "evidence",
+       "ground": "record id ev:metanalysis-40",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'single stage 150 micron' (field: intervention)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "EVIDENCE ev:metanalysis-40",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "suggestion": "Revise the predicted effect ceiling to a maximum 3.3x reduction (eliminating only the 30% mill-scale fraction), because the 8x claim mathematically contradicts the 70% biofilm dominance established in ev:metanalysis-40. GROUNDED_IN: EVIDENCE ev:metanalysis-40 | COMPUTATION 1 / 0.30 = 3.33x maximum theoretical improvement if 100% of scale is removed and 0% of biofilm is removed",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "evidence",
+       "ground": "record id ev:metanalysis-40",
+       "verified": true
+      },
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['3.3', '30', '8', '70', '40', '40']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "EVIDENCE ev:metanalysis-40 | COMPUTATION 1 / 0.30 = 3.33x maximum theoretical improvement if 100% of scale is removed and 0% of biofilm is removed",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "BASELINE_EQUIVALENCE",
+    "suggestion": "Integrate a continuous biocidal treatment loop upstream of the header to attack the 70% biofilm failure mode, because without it the proposed strainer achieves baseline equivalence for the majority of clogging events per ev:metanalysis-40. GROUNDED_IN: EVIDENCE ev:metanalysis-40",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "evidence",
+       "ground": "record id ev:metanalysis-40",
+       "verified": true
+      },
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['70', '40', '40']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "EVIDENCE ev:metanalysis-40",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "suggestion": "Specify a non-contact self-cleaning screen technology or mandate continuous biocide injection upstream of the strainer to prevent brush fouling, because ev:biofilm-load establishes 10^6 CFU/cm2 sessile loading that will rapidly blind a motorized brush. GROUNDED_IN: EVIDENCE ev:biofilm-load",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "evidence",
+       "ground": "record id ev:biofilm-load",
+       "verified": true
+      },
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['10', '6', '2']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "EVIDENCE ev:biofilm-load",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "suggestion": "Change the testable prediction to require both metallurgical particle sizing AND microbiological swabbing/ATP testing of removed nozzles, because restricting validation to >150 micron particle bridging systematically excludes the 70% biofilm failure mode proven in ev:metanalysis-40. GROUNDED_IN: EVIDENCE ev:metanalysis-40",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "evidence",
+       "ground": "record id ev:metanalysis-40",
+       "verified": true
+      },
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['150', '70', '40', '40']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "EVIDENCE ev:metanalysis-40",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   }
+  ],
+  "state": "ATTACK_RUN",
+  "overall": "KILLED",
+  "kill_basis": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "basis": "The candidate asserts clogging is dominated by mill-scale particles above 200 microns bridging the nozzle throats, but its own metallurgical evidence proves 70 percent of blockages are biofilm-slime aggregates, a mechanism a 150-micron mechanical screen cannot remove. GROUNDED_IN: EVIDENCE ev:metanalysis-40 | RECORD \"clogging is dominated by mill-scale (iron oxide) particles above 200 microns bridging the 3 mm nozzle throats; a 150-micron automatic backflush strainer on the header supply removes the bridging particles at the source\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "evidence",
+       "ground": "record id ev:metanalysis-40",
+       "verified": true
+      },
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['200', '70', '150', '40', '200', '3']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'clogging is dominated by' (field: mechanism)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['header', 'particles', 'scale']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "EVIDENCE ev:metanalysis-40 | RECORD \"clogging is dominated by mill-scale (iron oxide) particles above 200 microns bridging the 3 mm nozzle throats; a 150-micron automatic backflush strainer on the hea",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "basis": "The predicted effect claims campaign clogging counts will fall 8x because the strainer removes bridging particles at the source, directly contradicting the held evidence that 70 percent of the 40 analyzed clogged nozzles were blocked by biofilm-slime aggregates which pass freely through a 150-micron screen. GROUNDED_IN: EVIDENCE ev:metanalysis-40 | RECORD \"Predicted effect: clogging events per campaign reduced from 4.1 to below 0.5... campaign clogging counts fall 8x\" | COMPUTATION 70% of 40 nozzles = 28 nozzles clogged by biofilm; 150-micron screen retention efficiency for biological slime ag",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "evidence",
+       "ground": "record id ev:metanalysis-40",
+       "verified": true
+      },
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['8', '70', '40', '150', '40', '4.1']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'particles at the source' (field: mechanism)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['particles', 'scale']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "EVIDENCE ev:metanalysis-40 | RECORD \"Predicted effect: clogging events per campaign reduced from 4.1 to below 0.5... campaign clogging counts fall 8x\" | COMPUTATION 70% of 40 nozzles = 28 nozzles clog",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "BASELINE_EQUIVALENCE",
+    "basis": "Because the intervention leaves the dominant failure mode entirely unaddressed, the system remains functionally equivalent to the baseline status quo for 70 percent of all clogging events, failing to beat the un-invented standard. GROUNDED_IN: EVIDENCE ev:metanalysis-40 | RECORD \"single-stage 150-micron automatic backflush strainer (motorized brush screen) on the 150 mm header supply line\" | COMPUTATION 70% biofilm blockage rate unchanged by 150-micron mechanical filtration yields identical thermal-crown variation and off-gauge strip as the baseline",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "evidence",
+       "ground": "record id ev:metanalysis-40",
+       "verified": true
+      },
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['70', '40', '150', '150', '70', '150']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span '150 micron automatic backflush' (field: mechanism)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "EVIDENCE ev:metanalysis-40 | RECORD \"single-stage 150-micron automatic backflush strainer (motorized brush screen) on the 150 mm header supply line\" | COMPUTATION 70% biofilm blockage rate unchanged b",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "basis": "The testable prediction states removed-nozzle metallurgical analysis will show no particle bridging above 150 microns, but this metric deliberately excludes the 70 percent biofilm-slime aggregate blockages, rendering the measurement incapable of validating the claimed 8x overall clogging reduction. GROUNDED_IN: EVIDENCE ev:metanalysis-40 | RECORD \"Testable prediction: with the strainer in service, removed-nozzle metallurgical analysis shows no particle bridging above 150 microns and campaign clogging counts fall 8x\" | COMPUTATION Measuring only >150 micron particle bridging ignores 70% of the ",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "evidence",
+       "ground": "record id ev:metanalysis-40",
+       "verified": true
+      },
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['150', '70', '8', '40', '150', '8']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'in service removed nozzle' (field: testable_prediction)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "EVIDENCE ev:metanalysis-40 | RECORD \"Testable prediction: with the strainer in service, removed-nozzle metallurgical analysis shows no particle bridging above 150 microns and campaign clogging counts ",
+     "absence_ground": false
+    }
+   }
+  ],
+  "counts": {
+   "KILL": 4,
+   "RISK": 1,
+   "SURVIVE": 1,
+   "ABSTAIN_DEMOTED": 0,
+   "INVALID": 0
+  }
+ }
+}

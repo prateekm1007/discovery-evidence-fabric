@@ -1,0 +1,198 @@
+{
+ "attack": {
+  "attack_version": "independent_attack/3.0.0",
+  "candidate_id": "cal-06-swirl-vortex-nozzles",
+  "generator_provider": null,
+  "attacker_provider": "xkiro",
+  "attacker_model": "qwen/qwen3.8-max:free",
+  "independence_mode": "SEPARATE_CONTEXT",
+  "independence_note": "the attacker ran in an independent reasoning context (fresh adversarial conversation, generator reasoning never shown; no alternative provider credentialed \u2014 disclosed, never claimed as provider separation)",
+  "prompt_hash": "85310895e5706e6ad0c8584b0175046c4a771d3ea100106b13e2e0ecb19e407d",
+  "output_hash": "9b16b493a80481e99fc529e39ce589fda2690d1ade7d43960c1916da332afda9",
+  "llm_status": "OK",
+  "attacked_at": "2026-09-17T04:40:38+00:00Z",
+  "items": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "verdict": "RISK",
+    "basis": "The candidate claims swirling flow centrifuges particles away from the throat wall, but scale particles in hot-rolling recirculated water are denser than water; centrifugal force in a swirl chamber drives dense particles radially outward into the throat wall rather than away from it, promoting impingement clogging instead of self-cleaning. GROUNDED_IN: RECORD \"swirling flow centrifuges particles away from the throat wall\""
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "verdict": "RISK",
+    "basis": "The candidate constrains the intervention to the same header supply at 14 bar and same nominal flow per nozzle, but replacing flat-fan nozzles with swirl-vortex nozzles introduces a helical flow path that inherently increases hydraulic resistance; maintaining identical flow at identical pressure across 120 nozzles requires a lower discharge coefficient that contradicts the geometric constraints of adding a swirl chamber helix angle. GROUNDED_IN: RECORD \"same header supply at 14 bar; same nominal flow per nozzle\" | RECORD \"novel design variable: swirl chamber helix angle\""
+   },
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "verdict": "SURVIVE",
+    "basis": "No evidence bundle is held and the candidate's internal numerical claims do not contradict each other. GROUNDED_IN: EVIDENCE none held"
+   },
+   {
+    "attack_class": "BASELINE_EQUIVALENCE",
+    "verdict": "RISK",
+    "basis": "The candidate claims roll-cooling health improves by 60 percent, but the problem defines failure as thermal-crown variation beyond the 12 micron band causing off-gauge strip; the record provides no mapping between the undefined metric cooling wellness and the baseline's quantified 12 micron thermal-crown tolerance, leaving equivalence to the un-invented standard unresolved. GROUNDED_IN: RECORD \"roll-cooling health improves by 60 percent; spray quality feels noticeably better to the mill crew\" | COMPUTATION 60 percent improvement versus 12 micron thermal-crown band limit without a transfer func"
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "verdict": "RISK",
+    "basis": "Replacing all 120 flat-fan nozzles with swirl-vortex nozzles alters the spray footprint geometry from a flat fan to a conical or full-cone pattern; the record does not address whether the existing header spacing designed for overlapping flat fans can accommodate the changed impact geometry without creating dry bands on the work-roll faces. GROUNDED_IN: RECORD \"replace all 120 flat-fan nozzles with swirl-vortex nozzles\""
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "verdict": "KILL",
+    "basis": "The testable prediction relies on subjective human perception rather than an instrumented physical measurement, making it impossible to deterministically verify the claimed 60 percent improvement against the baseline. GROUNDED_IN: RECORD \"spray quality feels noticeably better to the mill crew\" | RECORD \"post-retrofit inspection shows the nozzles look cleaner and the crew reports better cooling\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'better to the mill' (field: predicted_effect)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"spray quality feels noticeably better to the mill crew\" | RECORD \"post-retrofit inspection shows the nozzles look cleaner and the crew reports better cooling\"",
+     "absence_ground": false
+    }
+   }
+  ],
+  "intervention_suggestions": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "suggestion": "Reverse the radial density gradient assumption by sizing the swirl chamber helix angle to generate a low-pressure axial core that entrains dense scale particles inward away from the wall, rather than relying on outward centrifugal separation which drives dense particles into the wall. GROUNDED_IN: RECORD \"swirling flow centrifuges particles away from the throat wall\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'particles away from the' (field: mechanism)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"swirling flow centrifuges particles away from the throat wall\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "suggestion": "Specify the required discharge coefficient of the swirl-vortex nozzle as a function of the helix angle and demonstrate mathematically that Q = Cd * A * sqrt(2 * deltaP / rho) yields the same nominal flow at exactly 14 bar as the baseline flat-fan nozzle. GROUNDED_IN: RECORD \"same header supply at 14 bar; same nominal flow per nozzle\" | RECORD \"swirl chamber helix angle\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'swirl chamber helix angle' (field: novel_design_variable)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['flow', 'header', 'nominal', 'nozzle']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"same header supply at 14 bar; same nominal flow per nozzle\" | RECORD \"swirl chamber helix angle\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "BASELINE_EQUIVALENCE",
+    "suggestion": "Define cooling wellness as a quantified reduction in thermal-crown variation measured in microns, and provide the transfer function proving that a 60 percent improvement in this metric guarantees operation within the 12 micron band specified in the problem. GROUNDED_IN: RECORD \"roll-cooling health improves by 60 percent\" | COMPUTATION 60 percent versus 12 micron band",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['60', '12', '60', '60', '12']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'roll cooling health improves' (field: predicted_effect)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"roll-cooling health improves by 60 percent\" | COMPUTATION 60 percent versus 12 micron band",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "suggestion": "Calculate the new spray impact width and overlap ratio for the swirl-vortex cone angle at the fixed header-to-roll distance, and adjust the 120-nozzle pitch to guarantee continuous coverage without dry bands. GROUNDED_IN: RECORD \"replace all 120 flat-fan nozzles with swirl-vortex nozzles\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['120', '120']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'with swirl vortex nozzles' (field: intervention)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['header', 'nozzle']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"replace all 120 flat-fan nozzles with swirl-vortex nozzles\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "suggestion": "Replace the crew report testable prediction with an instrumented post-retrofit measurement of particle mass accumulation per nozzle in milligrams and a pyrometric scan of the work-roll surface temperature profile to quantify crown variation in microns against the 12 micron boundary. GROUNDED_IN: RECORD \"the crew reports better cooling\" | RECORD \"nozzles look cleaner\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'crew reports better cooling' (field: testable_prediction)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"the crew reports better cooling\" | RECORD \"nozzles look cleaner\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   }
+  ],
+  "state": "ATTACK_RUN",
+  "overall": "KILLED",
+  "kill_basis": [
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "basis": "The testable prediction relies on subjective human perception rather than an instrumented physical measurement, making it impossible to deterministically verify the claimed 60 percent improvement against the baseline. GROUNDED_IN: RECORD \"spray quality feels noticeably better to the mill crew\" | RECORD \"post-retrofit inspection shows the nozzles look cleaner and the crew reports better cooling\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'better to the mill' (field: predicted_effect)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"spray quality feels noticeably better to the mill crew\" | RECORD \"post-retrofit inspection shows the nozzles look cleaner and the crew reports better cooling\"",
+     "absence_ground": false
+    }
+   }
+  ],
+  "counts": {
+   "KILL": 1,
+   "RISK": 4,
+   "SURVIVE": 1,
+   "ABSTAIN_DEMOTED": 0,
+   "INVALID": 0
+  }
+ }
+}

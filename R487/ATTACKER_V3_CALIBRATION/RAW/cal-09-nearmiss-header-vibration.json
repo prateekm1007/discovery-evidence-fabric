@@ -1,0 +1,324 @@
+{
+ "attack": {
+  "attack_version": "independent_attack/3.0.0",
+  "candidate_id": "cal-09-piezo-header-vibration",
+  "generator_provider": null,
+  "attacker_provider": "xkiro",
+  "attacker_model": "qwen/qwen3.8-max:free",
+  "independence_mode": "SEPARATE_CONTEXT",
+  "independence_note": "the attacker ran in an independent reasoning context (fresh adversarial conversation, generator reasoning never shown; no alternative provider credentialed \u2014 disclosed, never claimed as provider separation)",
+  "prompt_hash": "f0f10d53155a127188bee8ae50bbdc6aa5de1731183fa7244132100d5e94eb27",
+  "output_hash": "1f77745dc6985668ab89cbfda43a9553ab412ae8d0cd625a9bf1738d99634fb8",
+  "llm_status": "OK",
+  "attacked_at": "2026-09-17T04:48:05+00:00Z",
+  "items": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "verdict": "KILL",
+    "basis": "The mechanism claims vibration prevents biological growth consolidation, but 200 Hz mechanical vibration of a steel header does not inhibit microbial attachment or biofilm formation in recirculated water at 32-38 C; the stated cause of clogging includes biology which vibration cannot address. GROUNDED_IN: RECORD \"progressive nozzle clogging from scale particles and biological growth\" combined with RECORD \"continuous low-amplitude vibration of the spray header at 200 Hz prevents particle settling and early deposit consolidation\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['200', '32', '38', '200']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'low amplitude vibration of' (field: mechanism)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"progressive nozzle clogging from scale particles and biological growth\" combined with RECORD \"continuous low-amplitude vibration of the spray header at 200 Hz prevents particle settling and ea",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "verdict": "KILL",
+    "basis": "The candidate specifies tuned isolation mounts for the header while simultaneously requiring the header to be rigidly connected to the mill frame at the roll-cooling interface under 14 bar service pressure; these two mounting conditions are mechanically contradictory because a rigid connection bypasses any isolation mount, transmitting the full 12 kW vibratory load directly into the mill frame and violating the thermal-crown boundary. GROUNDED_IN: RECORD \"header supported on tuned isolation mounts\" combined with SCOPE \"header rigidly connected to mill frame at the roll-cooling interface; therm",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['14', '12', '12', '14']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'header supported on tuned' (field: intervention)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['connected', 'cooling', 'crown', 'frame']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"header supported on tuned isolation mounts\" combined with SCOPE \"header rigidly connected to mill frame at the roll-cooling interface; thermal-crown variation must stay inside 12 microns; 14 b",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "verdict": "SURVIVE",
+    "basis": "No evidence bundle was provided to contradict. GROUNDED_IN: EVIDENCE (none held)"
+   },
+   {
+    "attack_class": "BASELINE_EQUIVALENCE",
+    "verdict": "SURVIVE",
+    "basis": "The candidate introduces active vibration hardware not present in the baseline status quo. GROUNDED_IN: RECORD \"two 200 Hz electro-mechanical shakers mounted on the header ends, 12 kW continuous drive\""
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "verdict": "KILL",
+    "basis": "Delivering 12 kW of continuous vibratory power into a water-filled steel header at 200 Hz will dissipate as heat within the fluid and structure; this parasitic thermal load directly contradicts the precision cooling function required to maintain work-roll thermal crown within the specified tolerance. GROUNDED_IN: COMPUTATION 12 kW continuous dissipation into recirculated cooling water at 32-38 C versus SCOPE \"thermal-crown variation must stay inside 12 microns\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['12', '200', '12', '32', '38', '12']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'header at 200 hz' (field: mechanism)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['cooling', 'crown', 'header', 'inside']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "COMPUTATION 12 kW continuous dissipation into recirculated cooling water at 32-38 C versus SCOPE \"thermal-crown variation must stay inside 12 microns\"",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "verdict": "KILL",
+    "basis": "The testable prediction evaluates only deposit consolidation after slurry exposure, entirely omitting the biological growth failure mode identified in the problem statement, meaning the proposed test cannot validate the claimed reduction in total clogging events. GROUNDED_IN: RECORD \"a bench header section vibrated at 200 Hz versus static shows no deposit consolidation after a 120-hour slurry exposure\" compared against RECORD \"progressive nozzle clogging from scale particles and biological growth\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['200', '120']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'bench header section vibrated' (field: testable_prediction)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"a bench header section vibrated at 200 Hz versus static shows no deposit consolidation after a 120-hour slurry exposure\" compared against RECORD \"progressive nozzle clogging from scale particl",
+     "absence_ground": false
+    }
+   }
+  ],
+  "intervention_suggestions": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "suggestion": "Add UV-C irradiation or biocide dosing to the recirculation loop to address the biological growth component that 200 Hz vibration cannot prevent. GROUNDED_IN: RECORD \"progressive nozzle clogging from scale particles and biological growth\"",
+    "grounding": {
+     "grounded": false,
+     "bindings": [],
+     "claimed_ground": "RECORD \"progressive nozzle clogging from scale particles and biological growth\"",
+     "absence_ground": false,
+     "demotion_reason": "no evidence / computation / record / declared-scope binding found in the kill basis \u2014 a bare assertion carries no verdict authority (Art. XVIII); the objection is preserved and escalated"
+    },
+    "class": "UNGROUND_SUGGESTION",
+    "authority": "NONE \u2014 an ungrounded suggestion is preserved for human/escalation review and NEVER enters the hypothesis space (R450 \u00a710: the attacker does not get authority to invent causal explanations)"
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "suggestion": "Replace the tuned isolation mounts with a flexure-based decoupling joint at the roll-cooling interface that maintains positional rigidity for 14 bar service while allowing 200 Hz axial displacement without transmitting force to the mill frame. GROUNDED_IN: RECORD \"header supported on tuned isolation mounts\" and SCOPE \"header rigidly connected to mill frame at the roll-cooling interface; 14 bar ser",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['14', '200', '14']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'header supported on tuned' (field: intervention)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['connected', 'cooling', 'frame', 'header']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"header supported on tuned isolation mounts\" and SCOPE \"header rigidly connected to mill frame at the roll-cooling interface; 14 bar service\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "suggestion": "Reduce the shaker drive power from 12 kW to the minimum amplitude threshold required to prevent particle settling, computed via Stokes drag at 200 Hz, to eliminate parasitic heating that violates the thermal-crown constraint. GROUNDED_IN: COMPUTATION 12 kW continuous dissipation versus SCOPE \"thermal-crown variation must stay inside 12 microns\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['12', '200', '12', '12']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'must stay inside 12' (field: boundary_conditions)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['crown', 'inside', 'microns', 'must']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "COMPUTATION 12 kW continuous dissipation versus SCOPE \"thermal-crown variation must stay inside 12 microns\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "suggestion": "Replace the slurry-only bench test with a dual-exposure test using both scale slurry and inoculated recirculated water at 32-38 C for 120 hours to validate the mechanism against both stated clogging causes. GROUNDED_IN: RECORD \"a bench header section vibrated at 200 Hz versus static shows no deposit consolidation after a 120-hour slurry exposure\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['32', '38', '120', '200', '120']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'bench header section vibrated' (field: testable_prediction)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"a bench header section vibrated at 200 Hz versus static shows no deposit consolidation after a 120-hour slurry exposure\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   }
+  ],
+  "state": "ATTACK_RUN",
+  "overall": "KILLED",
+  "kill_basis": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "basis": "The mechanism claims vibration prevents biological growth consolidation, but 200 Hz mechanical vibration of a steel header does not inhibit microbial attachment or biofilm formation in recirculated water at 32-38 C; the stated cause of clogging includes biology which vibration cannot address. GROUNDED_IN: RECORD \"progressive nozzle clogging from scale particles and biological growth\" combined with RECORD \"continuous low-amplitude vibration of the spray header at 200 Hz prevents particle settling and early deposit consolidation\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['200', '32', '38', '200']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'low amplitude vibration of' (field: mechanism)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"progressive nozzle clogging from scale particles and biological growth\" combined with RECORD \"continuous low-amplitude vibration of the spray header at 200 Hz prevents particle settling and ea",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "basis": "The candidate specifies tuned isolation mounts for the header while simultaneously requiring the header to be rigidly connected to the mill frame at the roll-cooling interface under 14 bar service pressure; these two mounting conditions are mechanically contradictory because a rigid connection bypasses any isolation mount, transmitting the full 12 kW vibratory load directly into the mill frame and violating the thermal-crown boundary. GROUNDED_IN: RECORD \"header supported on tuned isolation mounts\" combined with SCOPE \"header rigidly connected to mill frame at the roll-cooling interface; therm",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['14', '12', '12', '14']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'header supported on tuned' (field: intervention)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['connected', 'cooling', 'crown', 'frame']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"header supported on tuned isolation mounts\" combined with SCOPE \"header rigidly connected to mill frame at the roll-cooling interface; thermal-crown variation must stay inside 12 microns; 14 b",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "basis": "Delivering 12 kW of continuous vibratory power into a water-filled steel header at 200 Hz will dissipate as heat within the fluid and structure; this parasitic thermal load directly contradicts the precision cooling function required to maintain work-roll thermal crown within the specified tolerance. GROUNDED_IN: COMPUTATION 12 kW continuous dissipation into recirculated cooling water at 32-38 C versus SCOPE \"thermal-crown variation must stay inside 12 microns\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['12', '200', '12', '32', '38', '12']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'header at 200 hz' (field: mechanism)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['cooling', 'crown', 'header', 'inside']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "COMPUTATION 12 kW continuous dissipation into recirculated cooling water at 32-38 C versus SCOPE \"thermal-crown variation must stay inside 12 microns\"",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "basis": "The testable prediction evaluates only deposit consolidation after slurry exposure, entirely omitting the biological growth failure mode identified in the problem statement, meaning the proposed test cannot validate the claimed reduction in total clogging events. GROUNDED_IN: RECORD \"a bench header section vibrated at 200 Hz versus static shows no deposit consolidation after a 120-hour slurry exposure\" compared against RECORD \"progressive nozzle clogging from scale particles and biological growth\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['200', '120']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'bench header section vibrated' (field: testable_prediction)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"a bench header section vibrated at 200 Hz versus static shows no deposit consolidation after a 120-hour slurry exposure\" compared against RECORD \"progressive nozzle clogging from scale particl",
+     "absence_ground": false
+    }
+   }
+  ],
+  "counts": {
+   "KILL": 4,
+   "RISK": 0,
+   "SURVIVE": 2,
+   "ABSTAIN_DEMOTED": 0,
+   "INVALID": 0
+  }
+ }
+}

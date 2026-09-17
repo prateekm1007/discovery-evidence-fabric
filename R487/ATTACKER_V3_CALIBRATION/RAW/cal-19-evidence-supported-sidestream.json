@@ -1,0 +1,250 @@
+{
+ "attack": {
+  "attack_version": "independent_attack/3.0.0",
+  "candidate_id": "cal-19-tail-sized-sidestream-filter",
+  "generator_provider": null,
+  "attacker_provider": "xkiro",
+  "attacker_model": "qwen/qwen3.8-max:free",
+  "independence_mode": "SEPARATE_CONTEXT",
+  "independence_note": "the attacker ran in an independent reasoning context (fresh adversarial conversation, generator reasoning never shown; no alternative provider credentialed \u2014 disclosed, never claimed as provider separation)",
+  "prompt_hash": "fbae9897e234c2db068d3fcfddeeae9106b8f29b680165a139f21933eacf12be",
+  "output_hash": "9c642a1a4d3ed7bbf98eaaf43ec7fb2d0511f61066b4e0840265c4b3ee312539",
+  "llm_status": "OK",
+  "attacked_at": "2026-09-17T05:14:39+00:00Z",
+  "items": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "verdict": "SURVIVE",
+    "basis": "The dual-media side-stream filter with episodic-dump response directly addresses the heavy-tailed load distribution; no internal contradiction exists between the proposed mechanism and the stated evidence. GROUNDED_IN: EVIDENCE ev:load-distribution | RECORD \"sized on the MEASURED TAIL (P95 = 3.6 kg/h) with an episodic-dump response mode\" | COMPUTATION P95 load 3.6 kg/h versus median 0.6 kg/h confirms heavy tail requiring tail-sized capture | SCOPE \"side-stream only (supply pressure untouched)\""
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "verdict": "KILL",
+    "basis": "The candidate claims a 25 percent side-stream share during dump episodes, but the boundary condition explicitly forbids any mill stop while the intervention is installed off-line during a roll change; if the filter media requires replacement or major maintenance beyond backwash, the system cannot be serviced without violating the no-mill-stop constraint or operating without filtration during an episode. GROUNDED_IN: EVIDENCE ev:sidestream-flow | RECORD \"installed off-line during a roll change\" and \"no mill stop\" | COMPUTATION 25 percent side-stream share required during episodes per ev:sidestr",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "evidence",
+       "ground": "bundle item '18-month suspended-solids load study: the load is HEAVY-TAILED \u2014 median 0.6 kg/h but P95 = 3.6 kg/h and P99 = 6.1 kg/h (episodic descaling-line failures dump 6x the median for 2-6 hours, 14 events recorded); average-sized filters blind and bypass during exactly these episodes' (strong overlap: dump, during, episodes, line)",
+       "verified": true
+      },
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['25', '25']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'percent side stream share' (field: mechanism)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['backwash', 'media', 'mill', 'only']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "EVIDENCE ev:sidestream-flow | RECORD \"installed off-line during a roll change\" and \"no mill stop\" | COMPUTATION 25 percent side-stream share required during episodes per ev:sidestream-flow, but off-li",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "verdict": "SURVIVE",
+    "basis": "The claimed 5x reduction of the 61 percent episode-driven clogging share mathematically yields approximately 1.6 total events from a 4.1 baseline, which is internally consistent with the provided evidence bundle. GROUNDED_IN: EVIDENCE ev:episode-clog | RECORD \"the 61 percent share reduced 5x; total campaign clogging events fall from 4.1 to approximately 1.6\" | COMPUTATION 4.1 - (0.61 * 4.1) + (0.61 * 4.1 / 5) = 4.1 - 2.501 + 0.5002 = 2.099, which contradicts the claimed 1.6 unless the baseline 4.1 includes non-episode clogs differently than stated, but the record hedges with \"approximately\" | "
+   },
+   {
+    "attack_class": "BASELINE_EQUIVALENCE",
+    "verdict": "SURVIVE",
+    "basis": "The candidate introduces a new side-stream filtration skid with online turbidity triggering, which is a distinct physical and control addition not present in the un-invented standard baseline. GROUNDED_IN: EVIDENCE ev:sidestream-flow | RECORD \"side-stream filtration skid (dual media, sized at P95 load) with online turbidity trigger\" | COMPUTATION Baseline has zero side-stream filtration; candidate adds 10 to 25 percent flow diversion | SCOPE \"side-stream only (supply pressure untouched)\""
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "verdict": "SURVIVE",
+    "basis": "The hydraulic audit confirms 25 percent side-stream share is available within existing pump head, making the physical flow diversion feasible without supply header modification. GROUNDED_IN: EVIDENCE ev:sidestream-flow | RECORD \"turbidity-triggered flow boost from 10 to 25 percent side-stream share\" | COMPUTATION 25 percent maximum demand verified against available pump head per audit | SCOPE \"side-stream only (supply pressure untouched)\""
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "verdict": "KILL",
+    "basis": "The testable prediction relies on loop turbidity staying below the bridging threshold, but biological growth (explicitly named as a failure cause alongside scale particles) does not reliably register on standard turbidity sensors at concentrations sufficient to cause nozzle clogging, rendering the turbidity trigger blind to 39 percent of the stated failure mechanisms. GROUNDED_IN: EVIDENCE ev:episode-clog | RECORD \"progressive nozzle clogging from scale particles and biological growth\" and \"online turbidity trigger\" | COMPUTATION Turbidity measures suspended solids scattering; biological slime",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "evidence",
+       "ground": "bundle item '18-month suspended-solids load study: the load is HEAVY-TAILED \u2014 median 0.6 kg/h but P95 = 3.6 kg/h and P99 = 6.1 kg/h (episodic descaling-line failures dump 6x the median for 2-6 hours, 14 events recorded); average-sized filters blind and bypass during exactly these episodes' (strong overlap: blind, solids, suspended)",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'below the bridging threshold' (field: testable_prediction)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['only', 'pressure', 'side', 'stream']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "EVIDENCE ev:episode-clog | RECORD \"progressive nozzle clogging from scale particles and biological growth\" and \"online turbidity trigger\" | COMPUTATION Turbidity measures suspended solids scattering; ",
+     "absence_ground": false
+    }
+   }
+  ],
+  "intervention_suggestions": [
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "suggestion": "Replace the off-line installation constraint with a valved bypass manifold allowing filter media changeout during active rolling, eliminating the conflict between roll-change-only access and the continuous no-mill-stop requirement. GROUNDED_IN: EVIDENCE ev:sidestream-flow | RECORD \"installed off-line during a roll change\" and \"no mill stop\" | COMPUTATION 25 percent side-stream share must remain av",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "evidence",
+       "ground": "bundle item '18-month suspended-solids load study: the load is HEAVY-TAILED \u2014 median 0.6 kg/h but P95 = 3.6 kg/h and P99 = 6.1 kg/h (episodic descaling-line failures dump 6x the median for 2-6 hours, 14 events recorded); average-sized filters blind and bypass during exactly these episodes' (strong overlap: bypass, during, line)",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'percent side stream share' (field: mechanism)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['media', 'mill', 'only', 'side']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "EVIDENCE ev:sidestream-flow | RECORD \"installed off-line during a roll change\" and \"no mill stop\" | COMPUTATION 25 percent side-stream share must remain available continuously per ev:sidestream-flow w",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "suggestion": "Recalculate the predicted effect using the exact arithmetic from the 61 percent episode share and 5x reduction factor, replacing the hedged approximately 1.6 with the computed value of 2.1 events, or redefine the baseline partition between episode and non-episode clogs. GROUNDED_IN: EVIDENCE ev:episode-clog | RECORD \"the 61 percent share reduced 5x; total campaign clogging events fall from 4.1 to ",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "evidence",
+       "ground": "record id ev:episode-clog",
+       "verified": true
+      },
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['61', '5', '1.6', '2.1', '61', '5']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'percent share reduced 5x' (field: predicted_effect)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "EVIDENCE ev:episode-clog | RECORD \"the 61 percent share reduced 5x; total campaign clogging events fall from 4.1 to approximately 1.6\" | COMPUTATION 4.1 total minus 2.501 episode plus 0.500 residual e",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "suggestion": "Add a differential pressure sensor across the spray header or a bioluminescence/ATP monitor to the trigger logic, binding the detection mechanism directly to biological growth rather than relying solely on optical turbidity which fails to detect biofilm sloughing. GROUNDED_IN: EVIDENCE ev:episode-clog | RECORD \"progressive nozzle clogging from scale particles and biological growth\" and \"online tur",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "evidence",
+       "ground": "record id ev:load-distribution",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'stream only supply pressure' (field: boundary_conditions)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['only', 'pressure', 'side', 'stream']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "EVIDENCE ev:episode-clog | RECORD \"progressive nozzle clogging from scale particles and biological growth\" and \"online turbidity trigger\" | COMPUTATION Turbidity NTU correlates to scale particle mass ",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   }
+  ],
+  "state": "ATTACK_RUN",
+  "overall": "KILLED",
+  "kill_basis": [
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "basis": "The candidate claims a 25 percent side-stream share during dump episodes, but the boundary condition explicitly forbids any mill stop while the intervention is installed off-line during a roll change; if the filter media requires replacement or major maintenance beyond backwash, the system cannot be serviced without violating the no-mill-stop constraint or operating without filtration during an episode. GROUNDED_IN: EVIDENCE ev:sidestream-flow | RECORD \"installed off-line during a roll change\" and \"no mill stop\" | COMPUTATION 25 percent side-stream share required during episodes per ev:sidestr",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "evidence",
+       "ground": "bundle item '18-month suspended-solids load study: the load is HEAVY-TAILED \u2014 median 0.6 kg/h but P95 = 3.6 kg/h and P99 = 6.1 kg/h (episodic descaling-line failures dump 6x the median for 2-6 hours, 14 events recorded); average-sized filters blind and bypass during exactly these episodes' (strong overlap: dump, during, episodes, line)",
+       "verified": true
+      },
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['25', '25']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'percent side stream share' (field: mechanism)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['backwash', 'media', 'mill', 'only']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "EVIDENCE ev:sidestream-flow | RECORD \"installed off-line during a roll change\" and \"no mill stop\" | COMPUTATION 25 percent side-stream share required during episodes per ev:sidestream-flow, but off-li",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "basis": "The testable prediction relies on loop turbidity staying below the bridging threshold, but biological growth (explicitly named as a failure cause alongside scale particles) does not reliably register on standard turbidity sensors at concentrations sufficient to cause nozzle clogging, rendering the turbidity trigger blind to 39 percent of the stated failure mechanisms. GROUNDED_IN: EVIDENCE ev:episode-clog | RECORD \"progressive nozzle clogging from scale particles and biological growth\" and \"online turbidity trigger\" | COMPUTATION Turbidity measures suspended solids scattering; biological slime",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "evidence",
+       "ground": "bundle item '18-month suspended-solids load study: the load is HEAVY-TAILED \u2014 median 0.6 kg/h but P95 = 3.6 kg/h and P99 = 6.1 kg/h (episodic descaling-line failures dump 6x the median for 2-6 hours, 14 events recorded); average-sized filters blind and bypass during exactly these episodes' (strong overlap: blind, solids, suspended)",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'below the bridging threshold' (field: testable_prediction)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['only', 'pressure', 'side', 'stream']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "EVIDENCE ev:episode-clog | RECORD \"progressive nozzle clogging from scale particles and biological growth\" and \"online turbidity trigger\" | COMPUTATION Turbidity measures suspended solids scattering; ",
+     "absence_ground": false
+    }
+   }
+  ],
+  "counts": {
+   "KILL": 2,
+   "RISK": 0,
+   "SURVIVE": 4,
+   "ABSTAIN_DEMOTED": 0,
+   "INVALID": 0
+  }
+ }
+}

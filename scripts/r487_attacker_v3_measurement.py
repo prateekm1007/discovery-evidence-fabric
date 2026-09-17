@@ -104,7 +104,15 @@ def _freeze_check() -> Dict[str, Any]:
     }
 
 
-def _req(path: str, body: Dict[str, Any] = None, timeout: int = 240):
+def _req(path: str, body: Dict[str, Any] = None, timeout: int = 900):
+    # R488 delta: 240 -> 900s. The committed 240s ceiling was set before
+    # any live v3 measurement existed; the R488 single-case latency probe
+    # against the deployed instrument measured 440s for ONE attack (the
+    # production ring's current attacker latency) — every committed-
+    # timeout request would have died mid-attack and the sealed-bar run
+    # could never complete. This raises ONLY the client-side read
+    # ceiling; no threshold, corpus byte, scoring rule, or verdict path
+    # is touched. Disclosed in R488/R488_ROUND_RECORD.json.
     import urllib.error
     import urllib.request
     HF_TOKEN = os.environ.get("HF_TOKEN", "").strip()

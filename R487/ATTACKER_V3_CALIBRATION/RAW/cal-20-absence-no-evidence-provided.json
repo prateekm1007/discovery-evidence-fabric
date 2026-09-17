@@ -1,0 +1,135 @@
+{
+ "attack": {
+  "attack_version": "independent_attack/3.0.0",
+  "candidate_id": "cal-20-unevidenced-staged-cascade",
+  "generator_provider": null,
+  "attacker_provider": "xkiro",
+  "attacker_model": "qwen/qwen3.8-max:free",
+  "independence_mode": "SEPARATE_CONTEXT",
+  "independence_note": "the attacker ran in an independent reasoning context (fresh adversarial conversation, generator reasoning never shown; no alternative provider credentialed \u2014 disclosed, never claimed as provider separation)",
+  "prompt_hash": "845bd758ed3afef849dacf871e14f231d608acac9422a40808db255f55517ad6",
+  "output_hash": "1d3e8964a5b7a899ab588f829e26aeeb735958e9ac9adaaf1ad3bf547755052e",
+  "llm_status": "OK",
+  "attacked_at": "2026-09-17T05:15:27+00:00Z",
+  "items": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "verdict": "RISK",
+    "basis": "The candidate proposes a 120-micron second-stage wedge-wire screen to arrest scale particles causing clogging, but the problem record explicitly identifies \"biological growth\" as a co-equal clogging mechanism; biological slime and biofilm are soft, deformable, and pass through rigid mechanical screens or blind them without being removed by particle-size exclusion, leaving the mechanism fundamentally incomplete against half the stated failure cause. GROUNDED_IN: RECORD \"progressive nozzle clogging from scale particles and biological growth in the recirculated water\""
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "verdict": "RISK",
+    "basis": "The candidate claims automatic backflush keeps the cascade in service with \"no mill stop,\" but during the backflush cycle on a single 150 mm supply header feeding 120 nozzles, flow is either diverted or pressure drops below the required operating band; if the backflush requires even a momentary flow interruption or dP sag below 13 bar, the boundary condition \"13-15 bar; full design flow; no mill stop\" is physically violated during every trigger event. GROUNDED_IN: RECORD \"Boundary conditions: 13-15 bar; full design flow; no mill stop\""
+   },
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "verdict": "SURVIVE",
+    "basis": "No evidence bundle is held, therefore no internal contradiction between evidence and claims can be demonstrated from the record. GROUNDED_IN: EVIDENCE (none held)"
+   },
+   {
+    "attack_class": "BASELINE_EQUIVALENCE",
+    "verdict": "SURVIVE",
+    "basis": "The baseline does nothing; adding a two-stage wedge-wire cascade with dP-triggered backflush is a physical addition that alters the fluid conditioning upstream of the nozzles, making it demonstrably non-equivalent to the status quo. GROUNDED_IN: RECORD \"doing nothing new \u2014 the status quo the candidate must beat\""
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "verdict": "RISK",
+    "basis": "The candidate specifies installation via \"flanged spool swap at a planned roll change\" on the \"150 mm supply,\" but a two-stage wedge-wire cascade with automatic backflush valving, dP transmitters, and control logic requires significant physical envelope and piping bypasses that cannot deterministically fit within a standard flanged spool piece without violating spatial constraints of existing mill header plumbing. GROUNDED_IN: RECORD \"flanged spool swap at a planned roll change\""
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "verdict": "RISK",
+    "basis": "The testable prediction relies on \"the mill's clog log and roll thermography\" to measure clogging events, but a clog log is an operator-maintained administrative record subject to inconsistent threshold definitions for what constitutes an \"event,\" introducing unquantified subjective variance into the claimed 95 percent band of 1.0-2.0 versus baseline 4.1 plus or minus 0.6. GROUNDED_IN: RECORD \"by the mill's clog log and roll thermography\""
+   }
+  ],
+  "intervention_suggestions": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "suggestion": "Add a biocide dosing station or UV treatment upstream of the wedge-wire cascade to neutralize the \"biological growth\" mechanism, because mechanical screening alone cannot remove deformable biological matter identified in the problem statement. GROUNDED_IN: RECORD \"progressive nozzle clogging from scale particles and biological growth in the recirculated water\"",
+    "grounding": {
+     "grounded": false,
+     "bindings": [],
+     "claimed_ground": "RECORD \"progressive nozzle clogging from scale particles and biological growth in the recirculated water\"",
+     "absence_ground": false,
+     "demotion_reason": "no evidence / computation / record / declared-scope binding found in the kill basis \u2014 a bare assertion carries no verdict authority (Art. XVIII); the objection is preserved and escalated"
+    },
+    "class": "UNGROUND_SUGGESTION",
+    "authority": "NONE \u2014 an ungrounded suggestion is preserved for human/escalation review and NEVER enters the hypothesis space (R450 \u00a710: the attacker does not get authority to invent causal explanations)"
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "suggestion": "Change the single-header intervention to a duplex parallel-filter arrangement with alternating backflush, ensuring one stage remains fully online at \"13-15 bar; full design flow\" while the other cleans, eliminating the transient dP drop that threatens the \"no mill stop\" boundary. GROUNDED_IN: RECORD \"Boundary conditions: 13-15 bar; full design flow; no mill stop\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['13', '15', '13', '15']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'bar full design flow' (field: boundary_conditions)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['flow', 'full', 'mill', 'stop']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"Boundary conditions: 13-15 bar; full design flow; no mill stop\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "suggestion": "Replace the \"flanged spool swap\" claim with a detailed dimensional CAD envelope analysis proving the two-stage cascade and backflush valve assembly fits within the existing 150 mm header clearance at the planned roll change location. GROUNDED_IN: RECORD \"flanged spool swap at a planned roll change\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'flanged spool swap at' (field: intervention)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"flanged spool swap at a planned roll change\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "suggestion": "Define the \"clog log\" event quantitatively by binding it directly to the \"roll thermography\" data\u2014specifically, define a clogging event as any thermal excursion beyond the 12 micron crown band mapped to a specific nozzle zone\u2014to remove operator subjectivity from the trial metric. GROUNDED_IN: RECORD \"by the mill's clog log and roll thermography\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'by the mill clog' (field: testable_prediction)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"by the mill's clog log and roll thermography\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   }
+  ],
+  "state": "ATTACK_RUN",
+  "overall": "UNCERTAIN",
+  "counts": {
+   "KILL": 0,
+   "RISK": 4,
+   "SURVIVE": 2,
+   "ABSTAIN_DEMOTED": 0,
+   "INVALID": 0
+  }
+ }
+}

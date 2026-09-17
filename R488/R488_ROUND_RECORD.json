@@ -1,0 +1,159 @@
+{
+ "artifact_type": "R488_ROUND_RECORD",
+ "round": "R488",
+ "created_at_utc": "2026-09-17T05:30:35Z",
+ "reviewer_provenance": "AI_REVIEW",
+ "round_question": "The RE-AUDIT's question (1): live calibration numbers vs the sealed bars for independent_attack/3.0.0 \u2014 the committed-but-unrun POST /api/ops/calibration-attack transport executes its designed sealed-corpus measurement on the deployed instrument",
+ "headline": {
+  "verdict": "NOT_CALIBRATED",
+  "terminal_kill_admissible": false,
+  "one_line": "the live v3 instrument kills every seeded defect (TPR 1.0) AND every clean candidate (FPR 1.0 vs the 0.30 bar) \u2014 the sealed bars fail, the gate refuses terminal kill authority, and the refusal is now MEASURED, not unknown"
+ },
+ "reaudit_response": {
+  "score_concurred": "6 -> 7, NO \u2014 concurred at R486, unchanged",
+  "corrections_accepted": [
+   "constraint-wall identity: the improve child was ranked 11/11, killed:false, attack NEEDS_REPAIR \u2014 the wall killed the SELECTED DIV candidate; admission-despite-objection followed by selection-level demotion is two-layer discipline",
+   "the 34-minute claim holds for the terminal, not the mutation; substance (zero live observers at completion) unaffected"
+  ],
+  "lever_ordering_honored": "attacker calibration to the sealed bars was lever (1) \u2014 it is now MEASURED; the answer is negative and fail-closed",
+  "audit_question_1_live_calibration": "ANSWERED this round (see live_measurement)",
+  "audit_question_2_r458_rerun": "OPEN \u2014 next rounds",
+  "audit_question_3_any_package": "OPEN \u2014 next rounds"
+ },
+ "live_measurement": {
+  "instrument": "independent_attack/3.0.0 (the ANCHOR + ACCOMMODATION discipline) AS DEPLOYED",
+  "identity_verified": "production /api/version engine_commit == 7d38eb4e69794f92d860ca83319ee826a1e7d06f (probed live before the run; /api/health ok:true discovery_ready:true) \u2014 the measurement ran on the deployed instrument with the production provider ring, per the R487 design",
+  "transport": "POST /api/ops/calibration-attack \u2014 the committed R487 transport, FIRST live use; one attack per request; typed failures only",
+  "driver": "scripts/r487_attacker_v3_measurement.py (the committed R487 driver; one disclosed delta below)",
+  "corpus": {
+   "path": "R446/ATTACKER_CALIBRATION/CORPUS.json",
+   "frozen": true,
+   "sha256_prefix": "34804d2fafca",
+   "sha_matches_r446_freeze_record": true,
+   "n_cases": 22,
+   "n_attacked": 22,
+   "corpus_unchanged_after_run": true
+  },
+  "bars": {
+   "provenance": "REUSED verbatim from the frozen corpus header (the R412 sealed bars, pre-registered 2026-09-05) \u2014 NO new threshold invented (Art. XXVII)",
+   "tpr_min": 0.75,
+   "fpr_max": 0.3,
+   "coverage_min": 0.875,
+   "parse_completeness_min": 0.875
+  },
+  "results": {
+   "tpr": 1.0,
+   "tpr_detail": "8/8 seeded defects killed",
+   "fpr": 1.0,
+   "fpr_detail": "0/4 clean candidates survived (TNR 0.0)",
+   "coverage": 1.0,
+   "parse_completeness": 1.0,
+   "bars_met": {
+    "tpr": true,
+    "fpr": false,
+    "coverage": true,
+    "parse": true
+   },
+   "false_kills": [
+    "cal-13-clean-staged-cascade",
+    "cal-14-clean-cyclonic-return",
+    "cal-15-clean-clog-resistant-geometry",
+    "cal-16-clean-biocide-program"
+   ],
+   "false_kills_beyond_clean_cohort": [
+    "cal-11-scope-temperature-bounded-boost",
+    "cal-12-scope-redundancy-manifold",
+    "cal-19-evidence-supported-sidestream"
+   ],
+   "honest_disciplines_held": [
+    "cal-10-scope-scale-only-filtration ESCALATED_NOT_KILLED",
+    "cal-20-absence-no-evidence-provided UNCERTAIN_HONEST (the attacker refused to fake a kill)",
+    "cal-21-absence-malformed-evidence ESCALATED_NOT_KILLED",
+    "cal-17/cal-18 evidence-refuted defects killed EVIDENCE_BOUND (the anchor floor working on true defects)"
+   ]
+  },
+  "attacker_ring_observed": {
+   "note": "the production ring routes the attacker leg per availability; the measurement records what actually attacked, per case",
+   "qwen/qwen3.8-max:free": 20,
+   "Atria-Dawn-Preview": 2,
+   "latency_observed_s": "qwen leg ~396-561s under concurrency; Atria leg ~117-123s"
+  },
+  "false_kill_mechanism_example": {
+   "case": "cal-13-clean-staged-cascade",
+   "objection": "the candidate asserts automatic backflush restores full flow without a mill stop, but lists backflush-valve jam as a known failure mode; if the valve jams, full flow is not restored \u2014 anchored to the candidate's own record",
+   "why_it_matters": "the objection is ANCHORED (passes the v3 anchor floor \u2014 it cites the record) and survives the four record-answer checks, but it misreads a failure-mode DISCLOSURE as a guarantee contradiction: a good candidate that lists its own failure modes is not contradicted by them. Anchored is not sound \u2014 the FPR bar exists precisely to price this gap, and the live ring (a free-tier qwen leg, 20/22 cases) prices it at 1.0"
+  },
+  "dryrun_vs_live": {
+   "r487_dryrun": "on FROZEN v2 raw outputs: TPR 1.0 / FPR 0.25 / TNR 0.75 \u2014 all bars met (rule DIRECTION validated)",
+   "r488_live": "the LIVE instrument on the LIVE ring: FPR 1.0 \u2014 the dry-run's optimism is measured wrong for the deployed configuration",
+   "resolution": "the dry-run validated the demotion rules against v2-shaped objections; the live ring produces STRONGER anchored objections that pass the anchor floor and the record-answer checks. The live measurement is the authority (Art. X/L); the gate derives NOT_CALIBRATED from it \u2014 never from the dry-run"
+  },
+  "gate_flip": {
+   "before": "UNKNOWN_NOT_CALIBRATED (fail-closed, unmeasured) \u2014 the R487 registry entry until its own measurement shipped",
+   "shipment": "scripts/r487_ship_v3_records.py copied MEASUREMENT.json + SEAL.json byte-identically into discovery_fabric/engine/calibration_records/ and pinned their sha256 in DIGESTS.json (prune-proof, the R486 pattern)",
+   "after": "NOT_CALIBRATED (measured) \u2014 resolve_state re-derives from the shipped record: terminal_kill_admissible=false; fail-closed direction UNCHANGED, the state is now measured negative knowledge instead of unknown",
+   "consumption_behavior": "unchanged in effect: every v3 KILLED record still escalates at consumption (apply_at_consumption) \u2014 now with measured justification (the attacker over-kills: FPR 1.0) instead of unknown justification"
+  }
+ },
+ "execution_disclosures": {
+  "sandbox_background_kills": "two detached background attempts died silently when the execution sandbox reaped them between shell calls (nohup pid 1275, setsid pid 1773 \u2014 the run log ends mid-attack, no traceback; the sandbox kills the process group on call exit). Foreground execution inside a single tool call survives",
+  "latency_probe": "one manual single-case probe (cal-01) BEFORE the run measured 440s for one attack and returned KILLED (a true-positive case) \u2014 typed as a transport probe, NOT folded into any metric; the driver's own cal-01 marker is the measurement evidence",
+  "timeout_delta": "the committed driver's 240s client read ceiling is BELOW the observed live latency (440s single-case) \u2014 every committed-ceiling request would die mid-attack and the sealed-bar run could never complete. Raised 240 -> 900s, client-side only; no threshold, corpus byte, scoring rule, or verdict path touched (in-code disclosure at scripts/r487_attacker_v3_measurement.py)",
+  "parallel_orchestration": "scripts/r488_parallel_measurement.py \u2014 waves of concurrent attacks because sequential foreground would need ~22 tool calls / ~2.75h. It reuses the committed R487 module's request, freeze, identity, scoring, and measurement-writing functions UNMODIFIED (zero fork of any metric or verdict rule); the only delta is orchestration (threads + atomic temp+os.replace marker writes, resume-aware, same RAW marker names and response bodies)",
+  "wave_ceiling_breach": "one wave (4 workers) exceeded the 590s tool ceiling mid-flight and was killed; atomic writes mean zero torn markers \u2014 the affected cases re-ran cleanly on resume (double-attacked on the ring: 3 extra LLM calls, honestly paid)",
+  "wave_ledger": [
+   "probe: cal-01 (440s, KILLED) \u2014 transport probe, outside metrics",
+   "wave 1 (4w): cal-01..04 \u2014 473-561s",
+   "wave 2 (4w): cal-05..08 \u2014 408-469s",
+   "wave 3 (4w): cal-09..12 \u2014 396-519s",
+   "wave 4 (4w): CEILING BREACH at 590s; cal-13/14/16 markers landed pre-kill",
+   "wave 4' (3w): cal-15, 17, 18 \u2014 117-439s (the ring's Atria leg appeared)",
+   "wave 5 (3w): cal-19, 20, 21 \u2014 407-462s",
+   "wave 6 (1w): cal-22 \u2014 507s; final scoring pass 22/22"
+  ]
+ },
+ "windows_green": {
+  "auditor_finding": "hash-pinned tamper-evidence (DIGESTS) cannot survive a default Windows checkout (core.autocrlf=true converts LF->CRLF; every pinned sha256 mismatches); recommendation: .gitattributes (*.json text eol=lf)",
+  "reproduction": "a core.autocrlf=true clone of main: 0/4 pins match, every shipped calibration record CRLF on disk (scripts/r488_crlf_verify.py)",
+  "fix": "commit 327e9c7 adds .gitattributes (*.json text eol=lf) \u2014 blob-neutral: zero CRLF blobs existed at HEAD (git grep over the tree), so no recorded content changes, no re-sealing",
+  "after_proof": "a fresh core.autocrlf=true clone WITH the fix: all pins match, LF on disk (4/4 pre-shipment; the 6-pin proof incl. the two v3 shipments verified post-commit)",
+  "test_suites": "the auditor's r486 + r487 suites (30/30 once CRLF-neutralized) run green natively here; with the .gitattributes they hold on Windows checkouts too"
+ },
+ "tests": {
+  "r487_attacker_v3": "20 passed (test_v3_fail_closed_until_measured split into test_v3_fail_closed + test_v3_unknown_path_still_fail_closed per the R419 ratified-state precedent: the fail-closed DISCIPLINE is the invariant, the state string advanced to the measured negative; the consumption-escalation invariant re-asserted against both state strings)",
+  "r486_shipped_records": "10 passed (the new pins verified)",
+  "r484_durability + r485_recovery": "21 passed, 1 skipped",
+  "attacker_lineage + improve + flock": "69 passed",
+  "geometry_join + observer_e2e": "31 passed, 1 skipped",
+  "total": "151 green, 0 failures"
+ },
+ "delivery_tuple_art_lxxi": {
+  "push": "327e9c7 (.gitattributes) pushed to origin/main this session, ls-remote verified; this round's records commit rides the same push",
+  "space_identity": "the canonical Space serves 7d38eb4e (verified live /api/version + /api/health this session) \u2014 the measurement's deployed-instrument precondition was ALREADY satisfied; no deploy was required for the run",
+  "deployed_gate_state": "the deployed gate still holds the pre-shipment entry (UNKNOWN_NOT_CALIBRATED, fail-closed); the measured-negative flip rides the NEXT behavior deploy per the R482 records-ride-next-deploy discipline",
+  "pending_credential": "the redeploy needs an HF token with write scope \u2014 the local vault was recycled (.secrets.env/.hf_token absent this session); the PAT sufficed for all git operations; operator reminded once, per the standing discipline (remind when needed, never pester)"
+ },
+ "what_this_round_changes": [
+  "the R417 decisive question is ANSWERED with live numbers: the v3 attacker as deployed is NOT calibrated to the sealed bars \u2014 FPR 1.0 vs 0.30",
+  "terminal kills remain inadmissible \u2014 now on MEASURED grounds; the attacker cannot terminally kill any candidate until it re-meets the bars",
+  "improve-path admission semantics are now honest-by-measurement: attacker objections are advisory (escalated) because the attacker demonstrably over-kills known-good candidates",
+  "the model-family variable is exposed: 20/22 live attacks ran on a free-tier qwen leg \u2014 attacker calibration is a property of (rules x ring), not rules alone",
+  "Windows-green DIGESTS: closed (0/4 -> all pins match on autocrlf checkouts)",
+  "the remaining 7->9 gap: cross-domain repetition (R458 re-run), a survivor reaching buyer ZIP, clean-clone rebuild proof"
+ ],
+ "artifacts": {
+  "measurement_results": "R487/ATTACKER_V3_CALIBRATION/MEASUREMENT_RESULTS.json",
+  "measurement_record": "R487/ATTACKER_V3_CALIBRATION/MEASUREMENT.json",
+  "seal": "R487/ATTACKER_V3_CALIBRATION/SEAL.json",
+  "raw_attacks": "R487/ATTACKER_V3_CALIBRATION/RAW/ (22 markers, byte-exact endpoint responses)",
+  "shipped_records": "discovery_fabric/engine/calibration_records/{r487_attacker_v3_measurement,r487_attacker_v3_seal}.json + DIGESTS.json pins",
+  "round_record": "R488/R488_ROUND_RECORD.json",
+  "parallel_runner": "scripts/r488_parallel_measurement.py",
+  "crlf_verifier": "scripts/r488_crlf_verify.py (session-side; the in-repo proof lives in the .gitattributes commit message + this record)"
+ },
+ "credentials": {
+  "bs_021": "no credential value enters this record or any artifact \u2014 fingerprints only",
+  "pat_fingerprint": "sha256:f1ebca5f9b62 (the standing wiring, fingerprint-gated)",
+  "hf_token": "absent this session (vault recycle); named as the pending credential for the redeploy; never recorded as a value"
+ }
+}

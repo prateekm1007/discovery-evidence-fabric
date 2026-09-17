@@ -1,0 +1,330 @@
+{
+ "attack": {
+  "attack_version": "independent_attack/3.0.0",
+  "candidate_id": "cal-08-catalytic-throat-coating",
+  "generator_provider": null,
+  "attacker_provider": "xkiro",
+  "attacker_model": "qwen/qwen3.8-max:free",
+  "independence_mode": "SEPARATE_CONTEXT",
+  "independence_note": "the attacker ran in an independent reasoning context (fresh adversarial conversation, generator reasoning never shown; no alternative provider credentialed \u2014 disclosed, never claimed as provider separation)",
+  "prompt_hash": "8b5014ad190f460c7a466dd54e74c315fec645f1bfdd4104a13b5f4c08796b03",
+  "output_hash": "5434ab2baa83bfa64f342b4f46ff7605c3c24c451a8befae41a74d7636739d14",
+  "llm_status": "OK",
+  "attacked_at": "2026-09-17T04:40:21+00:00Z",
+  "items": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "verdict": "KILL",
+    "basis": "The candidate targets calcium carbonate nucleation but the stated problem is clogging from scale particles and biological growth; phosphonate threshold inhibitors do not prevent deposition of pre-formed iron oxide mill scale or biofouling. GROUNDED_IN: RECORD \"progressive nozzle clogging from scale particles and biological growth\" versus RECORD \"interferes with calcium carbonate nucleation on the wall surface, so adherent scale cannot form; threshold inhibitors (phosphonate-class chemistry)\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'cannot form threshold inhibitors' (field: mechanism)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"progressive nozzle clogging from scale particles and biological growth\" versus RECORD \"interferes with calcium carbonate nucleation on the wall surface, so adherent scale cannot form; threshol",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "verdict": "KILL",
+    "basis": "A 40 micron coating applied to all 120 nozzle throats necessarily reduces the hydraulic throat diameter, altering the flat-fan spray geometry and flow distribution that governs the 12 micron thermal-crown band, which the candidate does not account for. GROUNDED_IN: RECORD \"electrostatically applied phosphonate-embedded polymer coating (40 micron layer) on all 120 nozzle throats\" versus RECORD \"thermal-crown variation beyond the 12 micron band\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['40', '120', '12', '40', '120', '12']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span '40 micron layer on' (field: intervention)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['flow', 'throat']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"electrostatically applied phosphonate-embedded polymer coating (40 micron layer) on all 120 nozzle throats\" versus RECORD \"thermal-crown variation beyond the 12 micron band\"",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "verdict": "SURVIVE",
+    "basis": "No evidence bundle was provided to contradict the candidate's claims. GROUNDED_IN: EVIDENCE (none held)"
+   },
+   {
+    "attack_class": "BASELINE_EQUIVALENCE",
+    "verdict": "KILL",
+    "basis": "The baseline failure explicitly includes biological growth clogging, and the proposed phosphonate mechanism has no biocidal action, meaning the intervention leaves a primary root cause entirely unaddressed relative to the status quo. GROUNDED_IN: RECORD \"progressive nozzle clogging from scale particles and biological growth in the recirculated water degrades spray uniformity\" versus RECORD \"threshold inhibitors (phosphonate-class chemistry) demonstrably slow nucleation\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'inhibitors phosphonate class chemistry' (field: mechanism)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"progressive nozzle clogging from scale particles and biological growth in the recirculated water degrades spray uniformity\" versus RECORD \"threshold inhibitors (phosphonate-class chemistry) de",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "verdict": "KILL",
+    "basis": "Electrostatic powder or liquid coating application requires an electric field between the applicator and a grounded target; applying this inside the narrow internal throats of 120 assembled steel nozzles creates a Faraday cage effect preventing uniform 40 micron deposition on the interior walls. GROUNDED_IN: RECORD \"electrostatically applied phosphonate-embedded polymer coating (40 micron layer) on all 120 nozzle throats\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span '40 micron layer on' (field: intervention)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"electrostatically applied phosphonate-embedded polymer coating (40 micron layer) on all 120 nozzle throats\"",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "verdict": "KILL",
+    "basis": "The testable prediction measures only adherent scale mass reduction on coupons, which cannot validate the claimed reduction in clogging events caused by suspended particle accumulation and biological growth in the actual nozzle throats. GROUNDED_IN: RECORD \"coated versus uncoated coupon exposure in the recirculated water shows a 90 percent reduction in adherent scale mass after 120 hours\" versus RECORD \"clogging events per campaign fall from 4.1 to below 0.6\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['90', '120', '4.1', '0.6']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'campaign fall from to' (field: predicted_effect)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"coated versus uncoated coupon exposure in the recirculated water shows a 90 percent reduction in adherent scale mass after 120 hours\" versus RECORD \"clogging events per campaign fall from 4.1 ",
+     "absence_ground": false
+    }
+   }
+  ],
+  "intervention_suggestions": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "suggestion": "Change the inhibitor chemistry from phosphonate-class nucleation suppression to a combined dispersant-biocide matrix, because the failure basis is physical deposition of pre-formed mill scale particles and biological growth, not dissolved calcium carbonate precipitation. GROUNDED_IN: RECORD \"progressive nozzle clogging from scale particles and biological growth\"",
+    "grounding": {
+     "grounded": false,
+     "bindings": [],
+     "claimed_ground": "RECORD \"progressive nozzle clogging from scale particles and biological growth\"",
+     "absence_ground": false,
+     "demotion_reason": "no evidence / computation / record / declared-scope binding found in the kill basis \u2014 a bare assertion carries no verdict authority (Art. XVIII); the objection is preserved and escalated"
+    },
+    "class": "UNGROUND_SUGGESTION",
+    "authority": "NONE \u2014 an ungrounded suggestion is preserved for human/escalation review and NEVER enters the hypothesis space (R450 \u00a710: the attacker does not get authority to invent causal explanations)"
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "suggestion": "Replace the internal 40 micron throat coating with an upstream header liner or restrict coating to the supply manifold, because adding 80 microns total diametral reduction to the nozzle throats directly violates the geometric boundary conditions required to maintain the 12 micron thermal-crown band. GROUNDED_IN: RECORD \"electrostatically applied phosphonate-embedded polymer coating (40 micron laye",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['40', '80', '12', '40', '120', '12']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span '40 micron layer on' (field: intervention)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"electrostatically applied phosphonate-embedded polymer coating (40 micron layer) on all 120 nozzle throats\" versus RECORD \"thermal-crown variation beyond the 12 micron band\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "BASELINE_EQUIVALENCE",
+    "suggestion": "Integrate a non-leaching antimicrobial agent into the polymer matrix alongside the dispersant, because the baseline failure explicitly identifies biological growth as a co-equal clogging mechanism that the current phosphonate-only design ignores. GROUNDED_IN: RECORD \"progressive nozzle clogging from scale particles and biological growth\"",
+    "grounding": {
+     "grounded": false,
+     "bindings": [],
+     "claimed_ground": "RECORD \"progressive nozzle clogging from scale particles and biological growth\"",
+     "absence_ground": false,
+     "demotion_reason": "no evidence / computation / record / declared-scope binding found in the kill basis \u2014 a bare assertion carries no verdict authority (Art. XVIII); the objection is preserved and escalated"
+    },
+    "class": "UNGROUND_SUGGESTION",
+    "authority": "NONE \u2014 an ungrounded suggestion is preserved for human/escalation review and NEVER enters the hypothesis space (R450 \u00a710: the attacker does not get authority to invent causal explanations)"
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "suggestion": "Replace electrostatic application with dip-coating or flow-through chemical vapor deposition, because electrostatic fields cannot uniformly penetrate the enclosed internal bore geometry of 120 small-diameter nozzle throats due to Faraday shielding. GROUNDED_IN: RECORD \"electrostatically applied phosphonate-embedded polymer coating (40 micron layer) on all 120 nozzle throats\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['120', '40', '120']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span '40 micron layer on' (field: intervention)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"electrostatically applied phosphonate-embedded polymer coating (40 micron layer) on all 120 nozzle throats\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "suggestion": "Change the testable prediction from static coupon adherent mass measurement to dynamic flow-decay testing through coated nozzle replicas at 14 bar over 120 hours, because coupon mass loss does not capture the particulate bridging and biofilm accumulation that define the 4.1 clogging events per campaign. GROUNDED_IN: RECORD \"coated versus uncoated coupon exposure in the recirculated water shows a 9",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['14', '120', '4.1', '90', '120', '4.1']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'campaign fall from to' (field: predicted_effect)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['flow', 'water']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"coated versus uncoated coupon exposure in the recirculated water shows a 90 percent reduction in adherent scale mass after 120 hours\" versus RECORD \"clogging events per campaign fall from 4.1 ",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   }
+  ],
+  "state": "ATTACK_RUN",
+  "overall": "KILLED",
+  "kill_basis": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "basis": "The candidate targets calcium carbonate nucleation but the stated problem is clogging from scale particles and biological growth; phosphonate threshold inhibitors do not prevent deposition of pre-formed iron oxide mill scale or biofouling. GROUNDED_IN: RECORD \"progressive nozzle clogging from scale particles and biological growth\" versus RECORD \"interferes with calcium carbonate nucleation on the wall surface, so adherent scale cannot form; threshold inhibitors (phosphonate-class chemistry)\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'cannot form threshold inhibitors' (field: mechanism)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"progressive nozzle clogging from scale particles and biological growth\" versus RECORD \"interferes with calcium carbonate nucleation on the wall surface, so adherent scale cannot form; threshol",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "basis": "A 40 micron coating applied to all 120 nozzle throats necessarily reduces the hydraulic throat diameter, altering the flat-fan spray geometry and flow distribution that governs the 12 micron thermal-crown band, which the candidate does not account for. GROUNDED_IN: RECORD \"electrostatically applied phosphonate-embedded polymer coating (40 micron layer) on all 120 nozzle throats\" versus RECORD \"thermal-crown variation beyond the 12 micron band\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['40', '120', '12', '40', '120', '12']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span '40 micron layer on' (field: intervention)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['flow', 'throat']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"electrostatically applied phosphonate-embedded polymer coating (40 micron layer) on all 120 nozzle throats\" versus RECORD \"thermal-crown variation beyond the 12 micron band\"",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "BASELINE_EQUIVALENCE",
+    "basis": "The baseline failure explicitly includes biological growth clogging, and the proposed phosphonate mechanism has no biocidal action, meaning the intervention leaves a primary root cause entirely unaddressed relative to the status quo. GROUNDED_IN: RECORD \"progressive nozzle clogging from scale particles and biological growth in the recirculated water degrades spray uniformity\" versus RECORD \"threshold inhibitors (phosphonate-class chemistry) demonstrably slow nucleation\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'inhibitors phosphonate class chemistry' (field: mechanism)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"progressive nozzle clogging from scale particles and biological growth in the recirculated water degrades spray uniformity\" versus RECORD \"threshold inhibitors (phosphonate-class chemistry) de",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "basis": "Electrostatic powder or liquid coating application requires an electric field between the applicator and a grounded target; applying this inside the narrow internal throats of 120 assembled steel nozzles creates a Faraday cage effect preventing uniform 40 micron deposition on the interior walls. GROUNDED_IN: RECORD \"electrostatically applied phosphonate-embedded polymer coating (40 micron layer) on all 120 nozzle throats\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span '40 micron layer on' (field: intervention)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"electrostatically applied phosphonate-embedded polymer coating (40 micron layer) on all 120 nozzle throats\"",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "basis": "The testable prediction measures only adherent scale mass reduction on coupons, which cannot validate the claimed reduction in clogging events caused by suspended particle accumulation and biological growth in the actual nozzle throats. GROUNDED_IN: RECORD \"coated versus uncoated coupon exposure in the recirculated water shows a 90 percent reduction in adherent scale mass after 120 hours\" versus RECORD \"clogging events per campaign fall from 4.1 to below 0.6\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['90', '120', '4.1', '0.6']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'campaign fall from to' (field: predicted_effect)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"coated versus uncoated coupon exposure in the recirculated water shows a 90 percent reduction in adherent scale mass after 120 hours\" versus RECORD \"clogging events per campaign fall from 4.1 ",
+     "absence_ground": false
+    }
+   }
+  ],
+  "counts": {
+   "KILL": 5,
+   "RISK": 0,
+   "SURVIVE": 1,
+   "ABSTAIN_DEMOTED": 0,
+   "INVALID": 0
+  }
+ }
+}

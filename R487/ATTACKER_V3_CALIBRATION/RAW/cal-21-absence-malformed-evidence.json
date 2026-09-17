@@ -1,0 +1,228 @@
+{
+ "attack": {
+  "attack_version": "independent_attack/3.0.0",
+  "candidate_id": "cal-21-corrupt-evidence-bundle",
+  "generator_provider": null,
+  "attacker_provider": "xkiro",
+  "attacker_model": "qwen/qwen3.8-max:free",
+  "independence_mode": "SEPARATE_CONTEXT",
+  "independence_note": "the attacker ran in an independent reasoning context (fresh adversarial conversation, generator reasoning never shown; no alternative provider credentialed \u2014 disclosed, never claimed as provider separation)",
+  "prompt_hash": "9ad29229b54fbb8c7f9a69e4064ba5a772cf76d7cb2d88b8e66365b052cbebb7",
+  "output_hash": "4dc3d763c8b6b3ca1060f3c0da2dfdb539002ebed99724bfe6683e6090e79d6b",
+  "llm_status": "OK",
+  "attacked_at": "2026-09-17T05:15:34+00:00Z",
+  "items": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "verdict": "SURVIVE",
+    "basis": "The candidate explicitly discloses apex plugging and disposes of it via a bypass protecting supply, so the known failure mode is accommodated within its own claims. GROUNDED_IN: RECORD \"Known failure modes (claimed by the generator): apex plugging during dumps (bypass protects supply)\""
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "verdict": "RISK",
+    "basis": "The intervention places a 150 mm hydrocyclone on the return line while the boundary condition states basin settling is available; a cyclone's separation efficiency depends on feed pressure, but the record provides no return-line pressure value to confirm the 100-micron cut size is achievable without violating the return-line-only constraint by requiring a booster pump. GROUNDED_IN: SCOPE \"Boundary conditions: return-line installation only; supply untouched; basin settling available\" | RECORD \"one 150 mm hydrocyclone on the return line\""
+   },
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "verdict": "ABSTAIN",
+    "basis": "The candidate asserts a specific predicted effect of 85 percent removal and clog reduction from 4.1 to 2.6, yet simultaneously declares its own evidence bundle MALFORMED with no usable content, making the quantitative prediction internally contradictory to the admitted absence of extractable supporting data. GROUNDED_IN: RECORD \"the record's evidence bundle is MALFORMED \u2014 the items carry identifier fragments and truncated titles only, no usable content\" | COMPUTATION 85 percent removal and 4.1 to 2.6 clog reduction claimed against zero usable extracted figures in ev:frag-01, ev:frag-02, ev:fra",
+    "grounding": {
+     "grounded": false,
+     "bindings": [
+      {
+       "binding": "evidence",
+       "ground": "record id ev:frag-01",
+       "verified": true
+      },
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['85', '4.1', '2.6', '85', '4.1', '2.6']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'record evidence bundle is' (field: mechanism)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"the record's evidence bundle is MALFORMED \u2014 the items carry identifier fragments and truncated titles only, no usable content\" | COMPUTATION 85 percent removal and 4.1 to 2.6 clog reduction cl",
+     "absence_ground": true,
+     "demotion_reason": "the asserted ground is an ABSENCE of evidence/support \u2014 absence is uncertainty, not failure (Art. XXI.3/XXV); the objection is preserved and escalated, never executed as a kill"
+    },
+    "demoted_from": "KILL",
+    "demotion_layer": "v2_grounding"
+   },
+   {
+    "attack_class": "BASELINE_EQUIVALENCE",
+    "verdict": "SURVIVE",
+    "basis": "The baseline performs no continuous centrifugal separation of particles above 100 microns; the candidate introduces a distinct physical mechanism not present in the status quo. GROUNDED_IN: RECORD \"Baseline ... as currently implemented, doing nothing new\" | RECORD \"a cyclonic pre-separator on the recirculation return line centrifuges scale particles above 100 microns out of the loop continuously\""
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "verdict": "RISK",
+    "basis": "A single 150 mm hydrocyclone must process the entire return flow of a 14 bar, 120-nozzle system; the record omits total volumetric flow rate, making it impossible to verify whether one 150 mm unit can handle the throughput without exceeding its capacity or requiring parallel units outside the stated intervention. GROUNDED_IN: RECORD \"one 150 mm hydrocyclone on the return line\" | COMPUTATION 14 bar supply header feeding 120 flat-fan spray nozzles implies high aggregate flow, but no flow rate is provided to validate single-unit capacity"
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "verdict": "RISK",
+    "basis": "The testable prediction specifies isokinetic particle counts showing 85 percent plus or minus 5 percent removal above 100 microns, but fails to define the sampling duration relative to roll changes or backflush cycles, leaving the measurement window ambiguous for transient underflow events. GROUNDED_IN: RECORD \"isokinetic particle counts on return and basin-outlet lines show 85 percent plus or minus 5 percent removal above 100 microns\" | RECORD \"backflushed at each roll change\""
+   }
+  ],
+  "intervention_suggestions": [
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "suggestion": "Specify the return-line static pressure at the cyclone inlet and compute the resulting d50 cut size for the 150 mm geometry to prove the 100-micron threshold is met without adding a pump that would violate the return-line-only boundary. GROUNDED_IN: SCOPE \"Boundary conditions: return-line installation only; supply untouched; basin settling available\" | RECORD \"one 150 mm hydrocyclone on the return",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['50', '150', '100', '150']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'hydrocyclone on the return' (field: intervention)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['available', 'basin', 'installation', 'line']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "SCOPE \"Boundary conditions: return-line installation only; supply untouched; basin settling available\" | RECORD \"one 150 mm hydrocyclone on the return line\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "suggestion": "Replace the malformed evidence references with complete extraction records containing actual particle count datasets and clog event logs that mathematically support the 85 percent removal and 4.1-to-2.6 reduction claims, resolving the contradiction between asserted precision and admitted unusable content. GROUNDED_IN: RECORD \"the record's evidence bundle is MALFORMED \u2014 the items carry identifier f",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "evidence",
+       "ground": "bundle item ' Hydraulic audit summary (no figures; extraction failed)' (strong overlap: extraction, figures)",
+       "verified": true
+      },
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['85', '4.1', '2.6', '85', '4.1', '2.6']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'record evidence bundle is' (field: mechanism)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"the record's evidence bundle is MALFORMED \u2014 the items carry identifier fragments and truncated titles only, no usable content\" | COMPUTATION 85 percent and 4.1 to 2.6 versus zero usable figure",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "suggestion": "Provide the total return-line volumetric flow rate derived from the 120-nozzle, 14-bar supply parameters and calculate the required number of 150 mm hydrocyclones in parallel to maintain the target cut size, replacing the single-unit claim if the flow exceeds one unit's capacity. GROUNDED_IN: RECORD \"one 150 mm hydrocyclone on the return line\" | COMPUTATION 14 bar supply header feeding 120 flat-fa",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['120', '14', '150', '150', '14', '120']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'hydrocyclone on the return' (field: intervention)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['line', 'return', 'supply']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"one 150 mm hydrocyclone on the return line\" | COMPUTATION 14 bar supply header feeding 120 flat-fan spray nozzles requires aggregate flow validation",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "suggestion": "Define the exact sampling interval for isokinetic particle counts relative to the backflush cycle at each roll change, specifying whether measurements are time-averaged over a full campaign or taken at steady-state between backflushes, to eliminate transient ambiguity. GROUNDED_IN: RECORD \"isokinetic particle counts on return and basin-outlet lines show 85 percent plus or minus 5 percent removal a",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['85', '5', '100']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'backflushed at each roll' (field: intervention)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['basin', 'return']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"isokinetic particle counts on return and basin-outlet lines show 85 percent plus or minus 5 percent removal above 100 microns\" | RECORD \"backflushed at each roll change\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   }
+  ],
+  "state": "ATTACK_RUN",
+  "overall": "ESCALATED_OBJECTION",
+  "preserved_objections": [
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "basis": "The candidate asserts a specific predicted effect of 85 percent removal and clog reduction from 4.1 to 2.6, yet simultaneously declares its own evidence bundle MALFORMED with no usable content, making the quantitative prediction internally contradictory to the admitted absence of extractable supporting data. GROUNDED_IN: RECORD \"the record's evidence bundle is MALFORMED \u2014 the items carry identifier fragments and truncated titles only, no usable content\" | COMPUTATION 85 percent removal and 4.1 to 2.6 clog reduction claimed against zero usable extracted figures in ev:frag-01, ev:frag-02, ev:fra",
+    "grounding": {
+     "grounded": false,
+     "bindings": [
+      {
+       "binding": "evidence",
+       "ground": "record id ev:frag-01",
+       "verified": true
+      },
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['85', '4.1', '2.6', '85', '4.1', '2.6']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'record evidence bundle is' (field: mechanism)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"the record's evidence bundle is MALFORMED \u2014 the items carry identifier fragments and truncated titles only, no usable content\" | COMPUTATION 85 percent removal and 4.1 to 2.6 clog reduction cl",
+     "absence_ground": true,
+     "demotion_reason": "the asserted ground is an ABSENCE of evidence/support \u2014 absence is uncertainty, not failure (Art. XXI.3/XXV); the objection is preserved and escalated, never executed as a kill"
+    }
+   }
+  ],
+  "escalation": {
+   "rule": "every KILL failed the grounding check (no evidence/computation/record/declared-scope binding, or an absence ground); the objections are preserved verbatim and escalated for adjudication \u2014 the candidate is not killed by them",
+   "instrument": "independent_attack/3.0.0"
+  },
+  "counts": {
+   "KILL": 0,
+   "RISK": 3,
+   "SURVIVE": 2,
+   "ABSTAIN_DEMOTED": 1,
+   "INVALID": 0
+  }
+ }
+}

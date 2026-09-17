@@ -1,0 +1,172 @@
+{
+ "attack": {
+  "attack_version": "independent_attack/3.0.0",
+  "candidate_id": "cal-12-standby-nozzle-manifold",
+  "generator_provider": null,
+  "attacker_provider": "xkiro",
+  "attacker_model": "qwen/qwen3.8-max:free",
+  "independence_mode": "SEPARATE_CONTEXT",
+  "independence_note": "the attacker ran in an independent reasoning context (fresh adversarial conversation, generator reasoning never shown; no alternative provider credentialed \u2014 disclosed, never claimed as provider separation)",
+  "prompt_hash": "b4e8e5ff4ac2de4c0c28f048ccd489cd34f3ab147e2e485d8e0e305a2e112c94",
+  "output_hash": "81fa1996629c75ae4e2bc62d0c3128142bb41b7966dff600feb90a9813435932",
+  "llm_status": "OK",
+  "attacked_at": "2026-09-17T04:48:10+00:00Z",
+  "items": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "verdict": "RISK",
+    "basis": "The candidate claims \"clogging events reaching the strip fall to zero\" based on a 0.4 s switchover, but the dP sensor detection latency plus three-way valve mechanical stroke time in recirculated water carrying scale particles and biological growth is not bounded below 0.4 s; if combined latency exceeds the roll thermal inertia budget, cooling interruption exceeds the computed 1.1 micron perturbation. GROUNDED_IN: RECORD \"a per-position dP sensor detects throat bridging and a fast three-way valve shifts that position to the standby twin within 0.4 seconds\""
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "verdict": "KILL",
+    "basis": "The candidate declares boundary conditions of \"32-38 C water\" while simultaneously claiming \"biological growth in the recirculated water degrades spray uniformity\"; significant biofilm proliferation capable of clogging industrial nozzles does not occur at 32-38 C (optimal thermophilic biofilm growth requires >45 C), making the stated failure mode physically impossible within the declared operating envelope. GROUNDED_IN: SCOPE \"32-38 C water\" contradicts RECORD \"progressive nozzle clogging from scale particles and biological growth in the recirculated water\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['32', '38', '32', '38', '45', '32']",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['scope', 'water']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "SCOPE \"32-38 C water\" contradicts RECORD \"progressive nozzle clogging from scale particles and biological growth in the recirculated water\"",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "verdict": "SURVIVE",
+    "basis": "No evidence bundle was provided; absence of evidence constitutes uncertainty, not a demonstrable contradiction under the kill standard. GROUNDED_IN: EVIDENCE none held"
+   },
+   {
+    "attack_class": "BASELINE_EQUIVALENCE",
+    "verdict": "SURVIVE",
+    "basis": "The dual-manifold architecture with per-position dP sensing and fast-redundancy valves fundamentally alters the baseline single-nozzle-per-position passive spray header topology. GROUNDED_IN: RECORD \"dual-manifold nozzle blocks with per-position dP sensing and fast-redundancy valves\" versus baseline \"supply header at 14 bar feeding 120 flat-fan spray nozzles\""
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "verdict": "RISK",
+    "basis": "Phasing 120 dual-manifold nozzle blocks with individual dP sensors and fast three-way valves over \"three planned roll changes (no mill stop)\" demands complete mechanical replacement of the spray headers while maintaining active rolling operations, which imposes severe spatial and hydraulic integration constraints not addressed by the record. GROUNDED_IN: RECORD \"phased in over three planned roll changes (no mill stop)\""
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "verdict": "RISK",
+    "basis": "The testable prediction specifies \"measured crown perturbation below 2 microns per event\" during \"injected partial blockages,\" but provides no measurement methodology or bandwidth specification to isolate a transient thermal crown signal of <2 microns from background mill vibration and strip tension noise during live production. GROUNDED_IN: RECORD \"injected partial blockages during a production campaign are bypassed within 0.4 s each, with measured crown perturbation below 2 microns per event\""
+   }
+  ],
+  "intervention_suggestions": [
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "suggestion": "Revise the boundary condition temperature range upward to >45 C to align with the claimed biological growth failure mechanism, or remove biological growth as a root cause and restrict the clogging mechanism solely to scale particles, ensuring the failure mode is physically consistent with the declared 32-38 C water envelope. GROUNDED_IN: SCOPE \"32-38 C water\" and RECORD \"biological growth in the r",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['45', '32', '38', '32', '38']",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['scope', 'water']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "SCOPE \"32-38 C water\" and RECORD \"biological growth in the recirculated water\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "suggestion": "Change the phasing variable from \"three planned roll changes\" to scheduled maintenance windows or reduce the scope to a pilot subset of nozzles (e.g., edge zones where crown sensitivity is highest) to validate manifold integration without requiring full-header swap during active rolling. GROUNDED_IN: RECORD \"phased in over three planned roll changes (no mill stop)\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'three planned roll changes' (field: intervention)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['roll', 'scheduled', 'scope']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"phased in over three planned roll changes (no mill stop)\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "suggestion": "Define the specific instrumentation (e.g., laser profilometry sampling rate, filtering bandwidth) and reference frame for measuring the <2 micron crown perturbation, binding the measurement method to the 0.4 s transient window to ensure the signal is separable from mill noise. GROUNDED_IN: RECORD \"measured crown perturbation below 2 microns per event\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['2', '0.4', '2']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'measured crown perturbation below' (field: testable_prediction)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['measured', 'transient']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"measured crown perturbation below 2 microns per event\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   }
+  ],
+  "state": "ATTACK_RUN",
+  "overall": "KILLED",
+  "kill_basis": [
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "basis": "The candidate declares boundary conditions of \"32-38 C water\" while simultaneously claiming \"biological growth in the recirculated water degrades spray uniformity\"; significant biofilm proliferation capable of clogging industrial nozzles does not occur at 32-38 C (optimal thermophilic biofilm growth requires >45 C), making the stated failure mode physically impossible within the declared operating envelope. GROUNDED_IN: SCOPE \"32-38 C water\" contradicts RECORD \"progressive nozzle clogging from scale particles and biological growth in the recirculated water\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['32', '38', '32', '38', '45', '32']",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['scope', 'water']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "SCOPE \"32-38 C water\" contradicts RECORD \"progressive nozzle clogging from scale particles and biological growth in the recirculated water\"",
+     "absence_ground": false
+    }
+   }
+  ],
+  "counts": {
+   "KILL": 1,
+   "RISK": 3,
+   "SURVIVE": 2,
+   "ABSTAIN_DEMOTED": 0,
+   "INVALID": 0
+  }
+ }
+}

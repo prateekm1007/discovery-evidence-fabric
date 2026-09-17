@@ -1,0 +1,144 @@
+{
+ "attack": {
+  "attack_version": "independent_attack/3.0.0",
+  "candidate_id": "cal-13-staged-cascade-backflush",
+  "generator_provider": null,
+  "attacker_provider": "xkiro",
+  "attacker_model": "qwen/qwen3.8-max:free",
+  "independence_mode": "SEPARATE_CONTEXT",
+  "independence_note": "the attacker ran in an independent reasoning context (fresh adversarial conversation, generator reasoning never shown; no alternative provider credentialed \u2014 disclosed, never claimed as provider separation)",
+  "prompt_hash": "65fbab06735aacf2bbe69a8ea0fb720eb8cdab3834aac853802296ced48b7c0f",
+  "output_hash": "edbc16b97920a371b80aef3059256ff68422773f6b6cca6d63979b61c35ed2b8",
+  "llm_status": "OK",
+  "attacked_at": "2026-09-17T04:56:52+00:00Z",
+  "items": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "verdict": "RISK",
+    "basis": "The candidate claims the existing biocide program carries the biofilm share, but simultaneously admits fine-passive slimes cross both stages as a known failure mode; relying on an unchanged biocide program to handle slimes that physically bypass the new filtration introduces unquantified interaction risk between slime loading and biocide efficacy. GROUNDED_IN: RECORD \"fine-passive slimes crossing both stages (addressed by the biocide program, measured share 18 percent)\""
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "verdict": "KILL",
+    "basis": "The candidate asserts automatic backflush restores full flow without mill stop, but simultaneously lists backflush valve jam as a known failure mode; if the valve jams during operation, full flow is not restored and a mill stop becomes mandatory, directly contradicting the declared boundary condition of no mill stop for operation. GROUNDED_IN: RECORD \"restores full flow without mill stop\" AND RECORD \"backflush valve jam (maintained spare held at the mill)\" AND SCOPE \"no mill stop for installation or operation\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'restores full flow without' (field: mechanism)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['flow', 'full', 'installation', 'mill']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"restores full flow without mill stop\" AND RECORD \"backflush valve jam (maintained spare held at the mill)\" AND SCOPE \"no mill stop for installation or operation\"",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "verdict": "SURVIVE",
+    "basis": "No evidence bundle was provided to contradict; internal numerical claims are consistent within their own stated confidence bands. GROUNDED_IN: RECORD \"(none held)\""
+   },
+   {
+    "attack_class": "BASELINE_EQUIVALENCE",
+    "verdict": "SURVIVE",
+    "basis": "The candidate explicitly adds a two-stage wedge-wire cascade, dP monitoring, and automatic backflush valves to the 150 mm supply, which are physical additions absent from the status quo baseline. GROUNDED_IN: RECORD \"two-stage wedge-wire cascade + dP monitoring + automatic backflush valves on the 150 mm supply\""
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "verdict": "SURVIVE",
+    "basis": "A flanged spool swap during a planned roll change is a standard mechanical intervention compatible with the 13-15 bar supply boundary and does not violate the no-mill-stop installation constraint since roll changes are planned downtime. GROUNDED_IN: RECORD \"installed as a flanged spool swap during a planned roll change\" AND SCOPE \"13-15 bar supply\""
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "verdict": "RISK",
+    "basis": "The testable prediction relies on the mill's existing roll-thermography system to measure crown variation, but thermography measures surface temperature, not geometric crown directly; inferring micron-level crown excursions from temperature data introduces unquantified translation ambiguity against the 12 micron band requirement. GROUNDED_IN: RECORD \"crown variation measured by the mill's existing roll-thermography system\""
+   }
+  ],
+  "intervention_suggestions": [
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "suggestion": "Change the backflush architecture from single-valve dependency to a parallel redundant valve manifold so that a single valve jam does not interrupt flow or force a mill stop, directly resolving the contradiction between the claimed continuous operation and the disclosed jam failure mode. GROUNDED_IN: RECORD \"backflush valve jam (maintained spare held at the mill)\" AND SCOPE \"no mill stop for insta",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'mill stop for installation' (field: boundary_conditions)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['flow', 'installation', 'mill', 'operation']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"backflush valve jam (maintained spare held at the mill)\" AND SCOPE \"no mill stop for installation or operation\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "suggestion": "Replace roll-thermography with direct mechanical or laser profilometry for the split-trial crown measurement to eliminate the thermal-to-geometric inference gap and provide deterministic micron-resolution data binding directly to the 16 micron predicted effect claim. GROUNDED_IN: RECORD \"crown variation measured by the mill's existing roll-thermography system\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'variation measured by the' (field: testable_prediction)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['mill', 'with']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"crown variation measured by the mill's existing roll-thermography system\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   }
+  ],
+  "state": "ATTACK_RUN",
+  "overall": "KILLED",
+  "kill_basis": [
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "basis": "The candidate asserts automatic backflush restores full flow without mill stop, but simultaneously lists backflush valve jam as a known failure mode; if the valve jams during operation, full flow is not restored and a mill stop becomes mandatory, directly contradicting the declared boundary condition of no mill stop for operation. GROUNDED_IN: RECORD \"restores full flow without mill stop\" AND RECORD \"backflush valve jam (maintained spare held at the mill)\" AND SCOPE \"no mill stop for installation or operation\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'restores full flow without' (field: mechanism)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['flow', 'full', 'installation', 'mill']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"restores full flow without mill stop\" AND RECORD \"backflush valve jam (maintained spare held at the mill)\" AND SCOPE \"no mill stop for installation or operation\"",
+     "absence_ground": false
+    }
+   }
+  ],
+  "counts": {
+   "KILL": 1,
+   "RISK": 2,
+   "SURVIVE": 3,
+   "ABSTAIN_DEMOTED": 0,
+   "INVALID": 0
+  }
+ }
+}

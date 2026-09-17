@@ -1,0 +1,102 @@
+{
+ "attack": {
+  "attack_version": "independent_attack/3.0.0",
+  "candidate_id": "cal-18-average-load-dual-media-filter",
+  "generator_provider": null,
+  "attacker_provider": "atria",
+  "attacker_model": "Atria-Dawn-Preview",
+  "independence_mode": "SEPARATE_CONTEXT",
+  "independence_note": "the attacker ran in an independent reasoning context (fresh adversarial conversation, generator reasoning never shown; no alternative provider credentialed \u2014 disclosed, never claimed as provider separation)",
+  "prompt_hash": "f7cb8accfeb33ce452be7daa0f341bb4d7715d14b4a7d169018630042936218e",
+  "output_hash": "9845dacf0683ab892ecda6c03d7d22e2674de9e36a6461fc150e3ffe39cb17f4",
+  "llm_status": "OK",
+  "attacked_at": "2026-09-17T05:02:03+00:00Z",
+  "items": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "verdict": "KILL",
+    "basis": "The filter's capture capacity is sized to the campaign-average/median load (0.6 kg/h), but the candidate's own 18-month study shows the load is heavy-tailed with P95 = 3.6 kg/h (and P99 \u2265 3.6 by distribution ordering), i.e. 3.6/0.6 = 6.0\u00d7 the design point; mass balance forbids the claimed result \u2014 at 6\u00d7 design influent the bed either breaks through (effluent above the design point, so loop solids are NOT held below the bridging threshold) or loads at 6\u00d7 the design capture rate. The",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "evidence",
+       "ground": "bundle item '18-month suspended-solids load study: the load is HEAVY-TAILED \u2014 median 0.6 kg/h but P95 = 3.6 kg/h and P99 = 6.1 kg/h (episodic descaling-line failures dump 6x the median for 2-6 hours, 14 events recorded); average-sized filters blind and bypass during exactly these episodes' (strong overlap: average, heavy, load, median)",
+       "verified": true
+      },
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['0.6', '18', '95', '3.6', '99', '3.6']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": null,
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "verdict": "INVALID",
+    "basis": "",
+    "invalid_reason": "class absent from response"
+   },
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "verdict": "INVALID",
+    "basis": "",
+    "invalid_reason": "class absent from response"
+   },
+   {
+    "attack_class": "BASELINE_EQUIVALENCE",
+    "verdict": "INVALID",
+    "basis": "",
+    "invalid_reason": "class absent from response"
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "verdict": "INVALID",
+    "basis": "",
+    "invalid_reason": "class absent from response"
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "verdict": "INVALID",
+    "basis": "",
+    "invalid_reason": "class absent from response"
+   }
+  ],
+  "intervention_suggestions": [],
+  "state": "ATTACK_RUN",
+  "overall": "KILLED",
+  "kill_basis": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "basis": "The filter's capture capacity is sized to the campaign-average/median load (0.6 kg/h), but the candidate's own 18-month study shows the load is heavy-tailed with P95 = 3.6 kg/h (and P99 \u2265 3.6 by distribution ordering), i.e. 3.6/0.6 = 6.0\u00d7 the design point; mass balance forbids the claimed result \u2014 at 6\u00d7 design influent the bed either breaks through (effluent above the design point, so loop solids are NOT held below the bridging threshold) or loads at 6\u00d7 the design capture rate. The",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "evidence",
+       "ground": "bundle item '18-month suspended-solids load study: the load is HEAVY-TAILED \u2014 median 0.6 kg/h but P95 = 3.6 kg/h and P99 = 6.1 kg/h (episodic descaling-line failures dump 6x the median for 2-6 hours, 14 events recorded); average-sized filters blind and bypass during exactly these episodes' (strong overlap: average, heavy, load, median)",
+       "verified": true
+      },
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['0.6', '18', '95', '3.6', '99', '3.6']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": null,
+     "absence_ground": false
+    }
+   }
+  ],
+  "counts": {
+   "KILL": 1,
+   "RISK": 0,
+   "SURVIVE": 0,
+   "ABSTAIN_DEMOTED": 0,
+   "INVALID": 5
+  }
+ }
+}

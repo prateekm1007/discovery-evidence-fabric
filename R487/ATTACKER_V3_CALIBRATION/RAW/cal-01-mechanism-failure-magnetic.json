@@ -1,0 +1,309 @@
+{
+ "attack": {
+  "attack_version": "independent_attack/3.0.0",
+  "candidate_id": "cal-01-magnetic-conditioner",
+  "generator_provider": null,
+  "attacker_provider": "xkiro",
+  "attacker_model": "qwen/qwen3.8-max:free",
+  "independence_mode": "SEPARATE_CONTEXT",
+  "independence_note": "the attacker ran in an independent reasoning context (fresh adversarial conversation, generator reasoning never shown; no alternative provider credentialed \u2014 disclosed, never claimed as provider separation)",
+  "prompt_hash": "a338c132021cc07e8798e7a395d84ebee325d4673852bf22cf3db08a7585a344",
+  "output_hash": "53c925c94bdce6497e7b966bdd71553638005cd1b613c6bbebd925af0d3158c1",
+  "llm_status": "OK",
+  "attacked_at": "2026-09-17T04:32:07+00:00Z",
+  "items": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "verdict": "KILL",
+    "basis": "The candidate claims the mechanism \"alters the crystallization kinetics of dissolved calcium carbonate so scale cannot nucleate\" yet simultaneously states \"precipitation is redirected to suspended non-adhering particles carried through the sprays\"; redirected precipitation requires nucleation to occur, directly contradicting the claim that scale cannot nucleate. GROUNDED_IN: RECORD \"alters the crystallization kinetics of dissolved calcium carbonate so scale cannot nucleate and deposit in the nozzle throats; precipitation is redirected to suspended non-adhering particles carried through the spr",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'in the nozzle throats' (field: mechanism)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"alters the crystallization kinetics of dissolved calcium carbonate so scale cannot nucleate and deposit in the nozzle throats; precipitation is redirected to suspended non-adhering particles c",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "verdict": "KILL",
+    "basis": "The problem statement explicitly identifies \"biological growth in the recirculated water\" as a co-equal clogging cause alongside scale particles, but the boundary condition forbids chemical dosing (\"no chemical dosing permitted\") and the candidate's mechanism exclusively addresses \"dissolved calcium carbonate\", leaving the biological clogging vector entirely untreated while claiming total system resolution. GROUNDED_IN: RECORD \"progressive nozzle clogging from scale particles and biological growth in the recirculated water degrades spray uniformity\" combined with SCOPE \"no chemical dosing perm",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'no chemical dosing permitted' (field: boundary_conditions)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['chemical', 'dosing', 'permitted', 'recirculated']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"progressive nozzle clogging from scale particles and biological growth in the recirculated water degrades spray uniformity\" combined with SCOPE \"no chemical dosing permitted\"",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "verdict": "SURVIVE",
+    "basis": "No evidence bundle is held to contradict; absence of evidence is uncertainty, not failure. GROUNDED_IN: EVIDENCE (none held)"
+   },
+   {
+    "attack_class": "BASELINE_EQUIVALENCE",
+    "verdict": "SURVIVE",
+    "basis": "The candidate proposes a specific physical intervention (0.9 T clamp-on magnet array) distinct from the status quo baseline of doing nothing new. GROUNDED_IN: RECORD \"clamp-on permanent magnet array (0.9 T nominal field, 6 pairs) on the 150 mm cooling-water supply line\""
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "verdict": "KILL",
+    "basis": "A static external magnetic field cannot penetrate a ferromagnetic steel pipe wall to reach the internal water volume; the candidate specifies a \"clamp-on\" array on a \"150 mm cooling-water supply line\" at \"14 bar supply\", which dictates standard Schedule 40 or heavier carbon steel, whose high magnetic permeability provides a low-reluctance shunt path that absorbs the flux, preventing the claimed 0.9 T field from reaching the water. GROUNDED_IN: COMPUTATION 150 mm nominal pipe at 14 bar requires minimum Schedule 40 carbon steel (wall thickness 7.11 mm, relative permeability ~200-1000), which act",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['150', '14', '40', '0.9', '150', '14']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span '150 mm cooling water' (field: intervention)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['supply', 'water']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "COMPUTATION 150 mm nominal pipe at 14 bar requires minimum Schedule 40 carbon steel (wall thickness 7.11 mm, relative permeability ~200-1000), which acts as a magnetic shield reducing internal flux de",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "verdict": "KILL",
+    "basis": "The testable prediction measures only \"calcium carbonate deposition mass\" over 120 hours, but the operational failure definition includes \"biological growth\" as a clogging agent; a coupon test measuring only CaCO3 mass cannot validate the predicted reduction of total \"scale-bound clogging events per campaign\" from 4.1 to below 0.4 because it omits the biological fraction. GROUNDED_IN: RECORD \"coupon-based scaling-rate test on conditioned versus unconditioned recirculated water shows a 90 percent reduction in calcium carbonate deposition mass\" versus RECORD \"scale-bound clogging events per camp",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['120', '3', '4.1', '0.4', '90', '90']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'campaign reduced by 90' (field: predicted_effect)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['recirculated', 'water']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"coupon-based scaling-rate test on conditioned versus unconditioned recirculated water shows a 90 percent reduction in calcium carbonate deposition mass\" versus RECORD \"scale-bound clogging eve",
+     "absence_ground": false
+    }
+   }
+  ],
+  "intervention_suggestions": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "suggestion": "Change the mechanistic description from \"scale cannot nucleate\" to \"nucleation occurs preferentially in bulk flow rather than at surfaces\" to resolve the logical contradiction between preventing nucleation and redirecting precipitation. GROUNDED_IN: RECORD \"alters the crystallization kinetics of dissolved calcium carbonate so scale cannot nucleate and deposit in the nozzle throats; precipitation i",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'in the nozzle throats' (field: mechanism)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"alters the crystallization kinetics of dissolved calcium carbonate so scale cannot nucleate and deposit in the nozzle throats; precipitation is redirected to suspended non-adhering particles c",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "suggestion": "Add a non-chemical biological control mechanism (e.g., UV irradiation inline or mechanical filtration upstream of the header) to address the biological growth component of clogging within the \"no chemical dosing permitted\" constraint. GROUNDED_IN: RECORD \"progressive nozzle clogging from scale particles and biological growth in the recirculated water\" combined with SCOPE \"no chemical dosing permit",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'no chemical dosing permitted' (field: boundary_conditions)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['chemical', 'dosing', 'permitted', 'recirculated']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"progressive nozzle clogging from scale particles and biological growth in the recirculated water\" combined with SCOPE \"no chemical dosing permitted\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "suggestion": "Replace the ferromagnetic steel pipe section at the magnet array location with a non-magnetic, pressure-rated spool piece (e.g., 316L austenitic stainless steel or FRP rated to 14 bar) to allow the 0.9 T external field to penetrate into the water volume. GROUNDED_IN: COMPUTATION 150 mm nominal pipe at 14 bar requires minimum Schedule 40 carbon steel (wall thickness 7.11 mm, relative permeability ~",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['316', '14', '0.9', '150', '14', '40']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "COMPUTATION 150 mm nominal pipe at 14 bar requires minimum Schedule 40 carbon steel (wall thickness 7.11 mm, relative permeability ~200-1000), which acts as a magnetic shield reducing internal flux de",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "suggestion": "Expand the coupon test protocol to quantify both calcium carbonate deposition mass and biological film mass (via ATP assay or dry-weight biofilm measurement) so the 90 percent reduction claim covers all stated clogging agents. GROUNDED_IN: RECORD \"coupon-based scaling-rate test on conditioned versus unconditioned recirculated water shows a 90 percent reduction in calcium carbonate deposition mass\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['90', '90', '90', '4.1', '0.4']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'campaign reduced by 90' (field: predicted_effect)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['recirculated', 'water']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"coupon-based scaling-rate test on conditioned versus unconditioned recirculated water shows a 90 percent reduction in calcium carbonate deposition mass\" versus RECORD \"scale-bound clogging eve",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   }
+  ],
+  "state": "ATTACK_RUN",
+  "overall": "KILLED",
+  "kill_basis": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "basis": "The candidate claims the mechanism \"alters the crystallization kinetics of dissolved calcium carbonate so scale cannot nucleate\" yet simultaneously states \"precipitation is redirected to suspended non-adhering particles carried through the sprays\"; redirected precipitation requires nucleation to occur, directly contradicting the claim that scale cannot nucleate. GROUNDED_IN: RECORD \"alters the crystallization kinetics of dissolved calcium carbonate so scale cannot nucleate and deposit in the nozzle throats; precipitation is redirected to suspended non-adhering particles carried through the spr",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'in the nozzle throats' (field: mechanism)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"alters the crystallization kinetics of dissolved calcium carbonate so scale cannot nucleate and deposit in the nozzle throats; precipitation is redirected to suspended non-adhering particles c",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "basis": "The problem statement explicitly identifies \"biological growth in the recirculated water\" as a co-equal clogging cause alongside scale particles, but the boundary condition forbids chemical dosing (\"no chemical dosing permitted\") and the candidate's mechanism exclusively addresses \"dissolved calcium carbonate\", leaving the biological clogging vector entirely untreated while claiming total system resolution. GROUNDED_IN: RECORD \"progressive nozzle clogging from scale particles and biological growth in the recirculated water degrades spray uniformity\" combined with SCOPE \"no chemical dosing perm",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'no chemical dosing permitted' (field: boundary_conditions)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['chemical', 'dosing', 'permitted', 'recirculated']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"progressive nozzle clogging from scale particles and biological growth in the recirculated water degrades spray uniformity\" combined with SCOPE \"no chemical dosing permitted\"",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "basis": "A static external magnetic field cannot penetrate a ferromagnetic steel pipe wall to reach the internal water volume; the candidate specifies a \"clamp-on\" array on a \"150 mm cooling-water supply line\" at \"14 bar supply\", which dictates standard Schedule 40 or heavier carbon steel, whose high magnetic permeability provides a low-reluctance shunt path that absorbs the flux, preventing the claimed 0.9 T field from reaching the water. GROUNDED_IN: COMPUTATION 150 mm nominal pipe at 14 bar requires minimum Schedule 40 carbon steel (wall thickness 7.11 mm, relative permeability ~200-1000), which act",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['150', '14', '40', '0.9', '150', '14']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span '150 mm cooling water' (field: intervention)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['supply', 'water']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "COMPUTATION 150 mm nominal pipe at 14 bar requires minimum Schedule 40 carbon steel (wall thickness 7.11 mm, relative permeability ~200-1000), which acts as a magnetic shield reducing internal flux de",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "basis": "The testable prediction measures only \"calcium carbonate deposition mass\" over 120 hours, but the operational failure definition includes \"biological growth\" as a clogging agent; a coupon test measuring only CaCO3 mass cannot validate the predicted reduction of total \"scale-bound clogging events per campaign\" from 4.1 to below 0.4 because it omits the biological fraction. GROUNDED_IN: RECORD \"coupon-based scaling-rate test on conditioned versus unconditioned recirculated water shows a 90 percent reduction in calcium carbonate deposition mass\" versus RECORD \"scale-bound clogging events per camp",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['120', '3', '4.1', '0.4', '90', '90']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'campaign reduced by 90' (field: predicted_effect)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['recirculated', 'water']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"coupon-based scaling-rate test on conditioned versus unconditioned recirculated water shows a 90 percent reduction in calcium carbonate deposition mass\" versus RECORD \"scale-bound clogging eve",
+     "absence_ground": false
+    }
+   }
+  ],
+  "counts": {
+   "KILL": 4,
+   "RISK": 0,
+   "SURVIVE": 2,
+   "ABSTAIN_DEMOTED": 0,
+   "INVALID": 0
+  }
+ }
+}

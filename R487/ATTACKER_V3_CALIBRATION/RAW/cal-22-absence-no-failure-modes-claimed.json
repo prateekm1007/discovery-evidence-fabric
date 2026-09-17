@@ -1,0 +1,193 @@
+{
+ "attack": {
+  "attack_version": "independent_attack/3.0.0",
+  "candidate_id": "cal-22-thin-record-biocide",
+  "generator_provider": null,
+  "attacker_provider": "xkiro",
+  "attacker_model": "qwen/qwen3.8-max:free",
+  "independence_mode": "SEPARATE_CONTEXT",
+  "independence_note": "the attacker ran in an independent reasoning context (fresh adversarial conversation, generator reasoning never shown; no alternative provider credentialed \u2014 disclosed, never claimed as provider separation)",
+  "prompt_hash": "3565a7442eeac9064c3a23ede84882c34e6a8b08549ae05b0f8271cd1372acfc",
+  "output_hash": "4ad4ba42756612c7255f76815bc520c5048ea8cba9fe943eaef0ac30afc4c5fc",
+  "llm_status": "OK",
+  "attacked_at": "2026-09-17T05:24:06+00:00Z",
+  "items": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "verdict": "RISK",
+    "basis": "The candidate claims zero failure modes while proposing an oxidizing biocide in a 32-38 C recirculated steel mill cooling loop, where dissolved iron and suspended scale particles will consume the oxidant before it reaches biofilm, yet the record asserts control without accounting for this demand. GROUNDED_IN: RECORD \"Known failure modes (claimed by the generator): (none claimed)\""
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "verdict": "RISK",
+    "basis": "The boundary condition requires dosing inside the existing discharge permit, but continuous 0.3 ppm oxidizing biocide plus weekly 8 ppm dispersant slugs introduces persistent halogenated or oxidative residuals into the blowdown stream that may exceed permit limits depending on the specific chemistry class, which is left unspecified. GROUNDED_IN: RECORD \"Boundary conditions: dosing inside the existing discharge permit\""
+   },
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "verdict": "SURVIVE",
+    "basis": "No evidence bundle is held, so no internal contradiction between data points can be demonstrated from the candidate's own record. GROUNDED_IN: EVIDENCE (none held)"
+   },
+   {
+    "attack_class": "BASELINE_EQUIVALENCE",
+    "verdict": "RISK",
+    "basis": "The predicted total clogging rate of 1.4 events per campaign relies on routine screening to handle the scale-particle share, but the baseline problem definition explicitly identifies scale particles as a co-driver of progressive nozzle clogging alongside biological growth, meaning the candidate only addresses half the stated failure mechanism. GROUNDED_IN: RECORD \"progressive nozzle clogging from scale particles and biological growth\""
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "verdict": "RISK",
+    "basis": "ORP control of a 0.3 ppm oxidizing biocide in a recirculated hot-rolling cooling loop with high suspended solids and variable makeup water conductivity is notoriously unstable, yet the candidate specifies ORP control as the regulation method without defining probe placement or maintenance intervals. GROUNDED_IN: RECORD \"continuous 0.3 ppm actinic biocide with ORP control\""
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "verdict": "KILL",
+    "basis": "The testable prediction requires monthly header-wall swab cultures to show a 2-order CFU reduction, but the record provides no baseline CFU count from which to compute a 2-order reduction, rendering the metric mathematically undefined against its own claims. GROUNDED_IN: RECORD \"monthly header-wall swab cultures show a 2-order CFU reduction\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['2', '2', '2']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'show order cfu reduction' (field: testable_prediction)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"monthly header-wall swab cultures show a 2-order CFU reduction\"",
+     "absence_ground": false
+    }
+   }
+  ],
+  "intervention_suggestions": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "suggestion": "Specify the maximum oxidant demand from dissolved iron and suspended solids in mg/L and increase the biocide dose or add a non-oxidizing secondary biocide to ensure residual reaches the biofilm, because the current zero-failure-mode claim ignores scale-driven oxidant consumption. GROUNDED_IN: RECORD \"Known failure modes (claimed by the generator): (none claimed)\"",
+    "grounding": {
+     "grounded": false,
+     "bindings": [],
+     "claimed_ground": "RECORD \"Known failure modes (claimed by the generator): (none claimed)\"",
+     "absence_ground": false,
+     "demotion_reason": "no evidence / computation / record / declared-scope binding found in the kill basis \u2014 a bare assertion carries no verdict authority (Art. XVIII); the objection is preserved and escalated"
+    },
+    "class": "UNGROUND_SUGGESTION",
+    "authority": "NONE \u2014 an ungrounded suggestion is preserved for human/escalation review and NEVER enters the hypothesis space (R450 \u00a710: the attacker does not get authority to invent causal explanations)"
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "suggestion": "Identify the exact chemical species of the actinic biocide and dispersant, then calculate the blowdown concentration against the specific numerical limits in the existing discharge permit to prove compliance rather than asserting it as a boundary condition. GROUNDED_IN: RECORD \"dosing inside the existing discharge permit\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'the existing discharge permit' (field: boundary_conditions)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['discharge', 'dosing', 'existing', 'inside']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"dosing inside the existing discharge permit\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "BASELINE_EQUIVALENCE",
+    "suggestion": "Add a mechanical or hydrodynamic scale-particle removal step to the intervention so that the predicted total event rate of 1.4 accounts for both drivers named in the baseline problem statement, rather than relying solely on unquantified routine screening. GROUNDED_IN: RECORD \"progressive nozzle clogging from scale particles and biological growth\"",
+    "grounding": {
+     "grounded": false,
+     "bindings": [],
+     "claimed_ground": "RECORD \"progressive nozzle clogging from scale particles and biological growth\"",
+     "absence_ground": false,
+     "demotion_reason": "no evidence / computation / record / declared-scope binding found in the kill basis \u2014 a bare assertion carries no verdict authority (Art. XVIII); the objection is preserved and escalated"
+    },
+    "class": "UNGROUND_SUGGESTION",
+    "authority": "NONE \u2014 an ungrounded suggestion is preserved for human/escalation review and NEVER enters the hypothesis space (R450 \u00a710: the attacker does not get authority to invent causal explanations)"
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "suggestion": "Define the ORP probe location relative to the dosing point and specify the target ORP setpoint in mV along with the acceptable deadband, because controlling 0.3 ppm oxidant via ORP in high-solids recirculated water requires explicit tuning parameters to avoid oscillation. GROUNDED_IN: RECORD \"continuous 0.3 ppm actinic biocide with ORP control\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['0.3', '0.3']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'actinic biocide with orp' (field: intervention)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"continuous 0.3 ppm actinic biocide with ORP control\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "suggestion": "State the baseline CFU count per square centimeter from header-wall swabs prior to intervention so that the predicted 2-order reduction has a defined mathematical origin, binding the testable prediction to a computable starting value. GROUNDED_IN: RECORD \"monthly header-wall swab cultures show a 2-order CFU reduction\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['2', '2']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'show order cfu reduction' (field: testable_prediction)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"monthly header-wall swab cultures show a 2-order CFU reduction\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   }
+  ],
+  "state": "ATTACK_RUN",
+  "overall": "KILLED",
+  "kill_basis": [
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "basis": "The testable prediction requires monthly header-wall swab cultures to show a 2-order CFU reduction, but the record provides no baseline CFU count from which to compute a 2-order reduction, rendering the metric mathematically undefined against its own claims. GROUNDED_IN: RECORD \"monthly header-wall swab cultures show a 2-order CFU reduction\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['2', '2', '2']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'show order cfu reduction' (field: testable_prediction)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"monthly header-wall swab cultures show a 2-order CFU reduction\"",
+     "absence_ground": false
+    }
+   }
+  ],
+  "counts": {
+   "KILL": 1,
+   "RISK": 4,
+   "SURVIVE": 1,
+   "ABSTAIN_DEMOTED": 0,
+   "INVALID": 0
+  }
+ }
+}

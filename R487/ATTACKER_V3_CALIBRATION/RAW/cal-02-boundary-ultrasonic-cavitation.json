@@ -1,0 +1,264 @@
+{
+ "attack": {
+  "attack_version": "independent_attack/3.0.0",
+  "candidate_id": "cal-02-ultrasonic-header",
+  "generator_provider": null,
+  "attacker_provider": "xkiro",
+  "attacker_model": "qwen/qwen3.8-max:free",
+  "independence_mode": "SEPARATE_CONTEXT",
+  "independence_note": "the attacker ran in an independent reasoning context (fresh adversarial conversation, generator reasoning never shown; no alternative provider credentialed \u2014 disclosed, never claimed as provider separation)",
+  "prompt_hash": "2d350fa08c50167f7949a97d51214a8ac7bc4a1acd8d6d5165a975656096c493",
+  "output_hash": "bcdd80f409949471ccf6b631fa97f313fd5f1322c598e78745356172be1133ad",
+  "llm_status": "OK",
+  "attacked_at": "2026-09-17T04:31:40+00:00Z",
+  "items": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "verdict": "KILL",
+    "basis": "Cavitation micro-jetting requires bubble collapse in a liquid medium; the transducers are bonded to the external header body, so cavitation occurs in the bulk water column, not inside the 3 mm nozzle throats where scale bridges form, making localized throat scouring physically impossible as described. GROUNDED_IN: RECORD \"piezoelectric transducers bonded to the spray header continuously scours the 3 mm nozzle throats\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['3', '3']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'the spray header continuously' (field: mechanism)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['header', 'transducers', 'water']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"piezoelectric transducers bonded to the spray header continuously scours the 3 mm nozzle throats\"",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "verdict": "KILL",
+    "basis": "The candidate specifies six 600 W transducers powered continuously while simultaneously rating them to a 10 bar differential, but the system operates at 14 bar static pressure, meaning continuous operation exceeds the stated differential pressure boundary by 4 bar. GROUNDED_IN: COMPUTATION 14 bar operating static pressure minus 10 bar rated differential equals 4 bar exceedance of the declared boundary condition",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['600', '10', '14', '4', '14', '10']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span '14 bar static pressure' (field: boundary_conditions)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['differential', 'pressure', 'rated', 'static']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "COMPUTATION 14 bar operating static pressure minus 10 bar rated differential equals 4 bar exceedance of the declared boundary condition",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "verdict": "SURVIVE",
+    "basis": "No evidence bundle was provided; absence of evidence is uncertainty, not a demonstrable contradiction within the candidate's own record. GROUNDED_IN: EVIDENCE none held"
+   },
+   {
+    "attack_class": "BASELINE_EQUIVALENCE",
+    "verdict": "SURVIVE",
+    "basis": "The candidate introduces active piezoelectric acoustic cavitation, which is structurally and functionally distinct from the passive baseline doing nothing new. GROUNDED_IN: RECORD \"acoustic cavitation micro-jetting from piezoelectric transducers bonded to the spray header\""
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "verdict": "ABSTAIN",
+    "basis": "The candidate claims piezoelectric transducers are welded to the header body, but piezoelectric ceramics such as PZT depolarize above their Curie temperature (typically 150-350 C) and cannot survive welding processes exceeding 1000 C, making the stated joining method physically destructive to the component. GROUNDED_IN: RECORD \"six 40 kHz 600 W piezoelectric transducers welded to the header body\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['150', '350', '1000', '40', '600']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'welded to the header' (field: intervention)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['header', 'transducers']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"six 40 kHz 600 W piezoelectric transducers welded to the header body\"",
+     "absence_ground": false
+    },
+    "demoted_from": "KILL",
+    "demotion_layer": "v3_accommodation",
+    "accommodation": {
+     "rule": "TYPICAL_VALUE_PREMISE",
+     "match": "typically",
+     "reason": "the kill premises an explicitly typical external value \u2014 a world-generalization presented as a ground is an asserted problem, not a found one; the objection is preserved and escalated"
+    }
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "verdict": "SURVIVE",
+    "basis": "The testable prediction defines a concrete split-header trial comparing active versus inactive segments with specific event counts (zero versus 4.1 clogging events per 120-hour campaign), leaving no ambiguity in the measurement protocol. GROUNDED_IN: RECORD \"a header segment with transducers active versus inactive shows zero versus 4.1 clogging events per 120-hour campaign in a split-header mill trial\""
+   }
+  ],
+  "intervention_suggestions": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "suggestion": "Relocate the transducers from the external header body to direct immersion mounts inside the header plenum immediately upstream of each 20-nozzle segment to ensure cavitation bubble collapse occurs directly within the fluid volume feeding the throats. GROUNDED_IN: RECORD \"piezoelectric transducers bonded to the spray header continuously scours the 3 mm nozzle throats\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['20', '3']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'the spray header continuously' (field: mechanism)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['header', 'transducers']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"piezoelectric transducers bonded to the spray header continuously scours the 3 mm nozzle throats\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "suggestion": "Replace the 10 bar differential-rated transducers with units rated to at least 16 bar differential to provide a safety margin over the 14 bar static operating pressure during continuous power application. GROUNDED_IN: COMPUTATION 14 bar operating static pressure exceeds 10 bar rated differential by 4 bar",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['10', '16', '14', '14', '10', '4']",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['differential', 'pressure', 'rated', 'static']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "COMPUTATION 14 bar operating static pressure exceeds 10 bar rated differential by 4 bar",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "suggestion": "Replace the welding specification with high-temperature epoxy bonding or mechanical clamping fixtures to attach the piezoelectric transducers without exposing the ceramic elements to temperatures that cause irreversible depolarization. GROUNDED_IN: RECORD \"six 40 kHz 600 W piezoelectric transducers welded to the header body\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['40', '600']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'welded to the header' (field: intervention)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['header', 'transducers']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"six 40 kHz 600 W piezoelectric transducers welded to the header body\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   }
+  ],
+  "state": "ATTACK_RUN",
+  "overall": "KILLED",
+  "kill_basis": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "basis": "Cavitation micro-jetting requires bubble collapse in a liquid medium; the transducers are bonded to the external header body, so cavitation occurs in the bulk water column, not inside the 3 mm nozzle throats where scale bridges form, making localized throat scouring physically impossible as described. GROUNDED_IN: RECORD \"piezoelectric transducers bonded to the spray header continuously scours the 3 mm nozzle throats\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['3', '3']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'the spray header continuously' (field: mechanism)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['header', 'transducers', 'water']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"piezoelectric transducers bonded to the spray header continuously scours the 3 mm nozzle throats\"",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "basis": "The candidate specifies six 600 W transducers powered continuously while simultaneously rating them to a 10 bar differential, but the system operates at 14 bar static pressure, meaning continuous operation exceeds the stated differential pressure boundary by 4 bar. GROUNDED_IN: COMPUTATION 14 bar operating static pressure minus 10 bar rated differential equals 4 bar exceedance of the declared boundary condition",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['600', '10', '14', '4', '14', '10']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span '14 bar static pressure' (field: boundary_conditions)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['differential', 'pressure', 'rated', 'static']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "COMPUTATION 14 bar operating static pressure minus 10 bar rated differential equals 4 bar exceedance of the declared boundary condition",
+     "absence_ground": false
+    }
+   }
+  ],
+  "counts": {
+   "KILL": 2,
+   "RISK": 0,
+   "SURVIVE": 3,
+   "ABSTAIN_DEMOTED": 1,
+   "INVALID": 0
+  }
+ }
+}

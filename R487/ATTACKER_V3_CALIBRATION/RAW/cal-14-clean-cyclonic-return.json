@@ -1,0 +1,218 @@
+{
+ "attack": {
+  "attack_version": "independent_attack/3.0.0",
+  "candidate_id": "cal-14-cyclonic-preseparator",
+  "generator_provider": null,
+  "attacker_provider": "xkiro",
+  "attacker_model": "qwen/qwen3.8-max:free",
+  "independence_mode": "SEPARATE_CONTEXT",
+  "independence_note": "the attacker ran in an independent reasoning context (fresh adversarial conversation, generator reasoning never shown; no alternative provider credentialed \u2014 disclosed, never claimed as provider separation)",
+  "prompt_hash": "c18f6307713a0cc390ea2bf30a6e2355a6d44443dc2496d76988ea27223039d1",
+  "output_hash": "aa0004cfcd42b1bc829f9da07fcffbab3476c91778c47762cbb423f218f1db81",
+  "llm_status": "OK",
+  "attacked_at": "2026-09-17T04:57:35+00:00Z",
+  "items": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "verdict": "RISK",
+    "basis": "The candidate claims the basin's existing settling volume finishes separation of particles above 100 microns, but biological growth (explicitly cited as a root cause) is not a dense mineral scale particle and cannot be centrifuged or settled by gravity; the mechanism addresses only one of the two stated failure drivers. GROUNDED_IN: RECORD \"progressive nozzle clogging from scale particles and biological growth in the recirculated water\" versus RECORD \"centrifuges scale particles above 100 microns out of the loop continuously\""
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "verdict": "RISK",
+    "basis": "The candidate declares \"13-15 bar supply untouched\" as a boundary condition, yet installing a hydrocyclone with an underflow collection pot on the return line introduces a permanent pressure drop that reduces the net head available to the recirculation pump, indirectly altering supply hydraulics unless pump curves are re-matched. GROUNDED_IN: SCOPE \"13-15 bar supply untouched\" versus RECORD \"one 150 mm hydrocyclone on the return line\""
+   },
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "verdict": "SURVIVE",
+    "basis": "No internal numerical or logical contradiction exists within the candidate's own claims. GROUNDED_IN: RECORD \"loop particle concentration above 100 microns falls 85 percent\" is internally consistent with RECORD \"scale-driven clogging events fall from 4.1 to approximately 2.6\""
+   },
+   {
+    "attack_class": "BASELINE_EQUIVALENCE",
+    "verdict": "RISK",
+    "basis": "Because the mechanism exclusively targets scale particles above 100 microns and ignores biological growth, the residual clogging rate may remain equivalent to baseline for bio-fouling events, preventing the system from reliably beating the un-invented standard across all failure modes. GROUNDED_IN: RECORD \"progressive nozzle clogging from scale particles and biological growth\" versus RECORD \"centrifuges scale particles above 100 microns\""
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "verdict": "RISK",
+    "basis": "Backflushing the automated underflow collection pot to a scale skip at each roll change requires interrupting the continuous return-line flow or valving around the cyclone during operation, which is not specified and threatens the claim of continuous decay. GROUNDED_IN: RECORD \"backflushed to a scale skip at each roll change\" versus RECORD \"centrifuges scale particles above 100 microns out of the loop continuously\""
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "verdict": "KILL",
+    "basis": "The testable prediction specifies isokinetic counts on the return and basin-outlet lines to prove 85 percent removal, but the basin-outlet is upstream of the supply header and downstream of the return line; measuring there conflates the cyclone's performance with the basin's pre-existing settling, making it physically impossible to isolate the cyclone's specific 85 percent removal claim using the stated measurement points. GROUNDED_IN: RECORD \"isokinetic particle counts on return and basin-outlet lines show 85 percent plus or minus 5 percent removal above 100 microns\" versus RECORD \"the basin'",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['85', '85', '85', '5', '100']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'volume finishes the separation' (field: mechanism)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['basin', 'line', 'return', 'settling']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"isokinetic particle counts on return and basin-outlet lines show 85 percent plus or minus 5 percent removal above 100 microns\" versus RECORD \"the basin's existing settling volume finishes the ",
+     "absence_ground": false
+    }
+   }
+  ],
+  "intervention_suggestions": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "suggestion": "Add a secondary biocide dosing point or UV treatment loop upstream of the basin to address the biological growth fraction explicitly named in the problem statement, because the hydrocyclone mechanism is physically incapable of separating low-density biofilm. GROUNDED_IN: RECORD \"progressive nozzle clogging from scale particles and biological growth\"",
+    "grounding": {
+     "grounded": false,
+     "bindings": [],
+     "claimed_ground": "RECORD \"progressive nozzle clogging from scale particles and biological growth\"",
+     "absence_ground": false,
+     "demotion_reason": "no evidence / computation / record / declared-scope binding found in the kill basis \u2014 a bare assertion carries no verdict authority (Art. XVIII); the objection is preserved and escalated"
+    },
+    "class": "UNGROUND_SUGGESTION",
+    "authority": "NONE \u2014 an ungrounded suggestion is preserved for human/escalation review and NEVER enters the hypothesis space (R450 \u00a710: the attacker does not get authority to invent causal explanations)"
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "suggestion": "Specify the exact allowable return-line pressure drop (in bar) and the required recirculation pump head margin to mathematically prove the 13-15 bar supply boundary remains untouched under loaded cyclone conditions. GROUNDED_IN: SCOPE \"13-15 bar supply untouched\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['13', '15', '13', '15']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span '15 bar supply untouched' (field: boundary_conditions)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['line', 'return', 'supply', 'untouched']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "SCOPE \"13-15 bar supply untouched\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "BASELINE_EQUIVALENCE",
+    "suggestion": "Quantify the historical ratio of scale-driven versus bio-driven clogging events in the baseline to demonstrate that eliminating 85 percent of scale particles mathematically guarantees a total clogging reduction below the 4.1 baseline rate. GROUNDED_IN: RECORD \"scale-driven clogging events fall from 4.1 to approximately 2.6\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['85', '4.1', '4.1', '2.6']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'events fall from to' (field: predicted_effect)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"scale-driven clogging events fall from 4.1 to approximately 2.6\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "suggestion": "Define a parallel valving arrangement or continuous bleed-backflush architecture so that the underflow pot can be emptied at roll change without violating the claim of continuous centrifugal separation. GROUNDED_IN: RECORD \"backflushed to a scale skip at each roll change\" versus RECORD \"continuously\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'skip at each roll' (field: intervention)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"backflushed to a scale skip at each roll change\" versus RECORD \"continuously\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "suggestion": "Relocate the downstream isokinetic sampling point to the cyclone overflow line immediately before the basin inlet, so the 85 percent removal metric isolates the cyclone's contribution from the basin's existing settling volume. GROUNDED_IN: RECORD \"isokinetic particle counts on return and basin-outlet lines show 85 percent plus or minus 5 percent removal\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['85', '85', '5']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'basin existing settling volume' (field: mechanism)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['basin', 'line', 'return', 'settling']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"isokinetic particle counts on return and basin-outlet lines show 85 percent plus or minus 5 percent removal\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   }
+  ],
+  "state": "ATTACK_RUN",
+  "overall": "KILLED",
+  "kill_basis": [
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "basis": "The testable prediction specifies isokinetic counts on the return and basin-outlet lines to prove 85 percent removal, but the basin-outlet is upstream of the supply header and downstream of the return line; measuring there conflates the cyclone's performance with the basin's pre-existing settling, making it physically impossible to isolate the cyclone's specific 85 percent removal claim using the stated measurement points. GROUNDED_IN: RECORD \"isokinetic particle counts on return and basin-outlet lines show 85 percent plus or minus 5 percent removal above 100 microns\" versus RECORD \"the basin'",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['85', '85', '85', '5', '100']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'volume finishes the separation' (field: mechanism)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['basin', 'line', 'return', 'settling']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"isokinetic particle counts on return and basin-outlet lines show 85 percent plus or minus 5 percent removal above 100 microns\" versus RECORD \"the basin's existing settling volume finishes the ",
+     "absence_ground": false
+    }
+   }
+  ],
+  "counts": {
+   "KILL": 1,
+   "RISK": 4,
+   "SURVIVE": 1,
+   "ABSTAIN_DEMOTED": 0,
+   "INVALID": 0
+  }
+ }
+}
