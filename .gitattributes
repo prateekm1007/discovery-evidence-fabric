@@ -1,0 +1,12 @@
+# R488 — platform-neutral checkout for the hash-pinned tamper-evidence
+# layer. The DIGESTS.json pins (discovery_fabric/engine/
+# calibration_records/) are sha256 digests of the LF byte-content of
+# the shipped JSON records. Without this file, a default Windows
+# checkout (core.autocrlf=true) materializes every JSON file with CRLF
+# line endings and every pin mismatches (the R488 re-audit finding,
+# reproduced before this fix: 0/4 pins match on an autocrlf clone).
+# `text eol=lf` forces LF on checkout on every platform, so the
+# tamper-evidence semantics hold everywhere. Blob-neutral: every
+# committed blob is already LF (verified by git grep before this
+# commit) — no recorded content changes, no re-sealing required.
+*.json text eol=lf
