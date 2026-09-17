@@ -179,7 +179,32 @@ def llm_generate(prompt: str, system: str = "", timeout: int = 240,
             max_preference_fallback=0, purpose=purpose)
         res = generate(prompt, system=system, timeout=timeout,
                        max_retries=2, policy=policy, max_tokens=max_tokens,
-                       max_provider_fallbacks=0)
+                       max_provider_fallbacks=0,
+                       hard_pin_provider=hard_pin_provider)
+        # defense in depth: a pinned call that somehow reports a
+        # different provider is NEVER returned as content (the registry
+        # rung filter makes this structurally impossible; if it ever
+        # fires, the record says so loudly)
+        if res.ok and res.provider_id != hard_pin_provider:
+            return {
+                "ok": False, "status": "CALL_FAILED",
+                "content": None, "provider": res.provider_id,
+                "model": res.model,
+                "prompt_hash": res.prompt_hash,
+                "output_hash": res.output_hash,
+                "error": ("hard-pin VIOLATION: requested "
+                          f"'{hard_pin_provider}', served "
+                          f"'{res.provider_id}' — the content is "
+                          f"discarded, never a silent ring change"),
+                "hard_pin": {"requested": hard_pin_provider,
+                             "status": "PIN_VIOLATION_DISCARDED"},
+                "engine_llm_provider_pin": "not_set (hard_pin active)",
+                "call_provenance": res.call_provenance,
+                "task_degradation": res.task_degradation,
+                "cost_provenance": res.cost_provenance,
+                "excluded_providers": list(exclude_providers or []),
+                "fallback_to_excluded": False,
+            }
         return {
             "ok": res.ok, "status": res.status, "content": res.content,
             "provider": res.provider_id, "model": res.model,

@@ -336,6 +336,16 @@ def main() -> int:
             attack = (r.get("body") or {}).get("attack") or {}
             rp = attack.get("ring_pin") or {}
             served_p = attack.get("attacker_provider")
+            if attack.get("overall") == "ATTACK_INCOMPLETE" \
+                    or attack.get("llm_status") not in (None, "OK"):
+                # the pinned ring failed the CALL (rate limit etc.) —
+                # an infrastructure state, never a verdict; NO marker,
+                # the case re-runs on --resume (Art. LXXIV)
+                _log(f"{case['case_id']}: ATTACK_INCOMPLETE on the "
+                     f"pinned ring (llm_status="
+                     f"{attack.get('llm_status')}) — no marker, "
+                     f"retriable")
+                continue
             if rp.get("pin_violation") or (
                     served_p and served_p != args.provider):
                 _log(f"{case['case_id']}: RING DEVIATION (served "

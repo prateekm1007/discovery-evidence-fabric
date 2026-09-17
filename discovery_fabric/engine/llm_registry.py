@@ -1528,7 +1528,8 @@ def generate(prompt: str, system: str = "",
              max_provider_fallbacks: int = 2,
              role: Optional[str] = None,
              avoid_provider: Optional[str] = None,
-             run_id: Optional[str] = None) -> LLMCallResult:
+             run_id: Optional[str] = None,
+             hard_pin_provider: Optional[str] = None) -> LLMCallResult:
     """CEO E1 single entry point:
     generate(prompt, evidence, schema) -> structured candidate.
     `evidence` items (already-custodied evidence dicts) are appended to the
@@ -1554,7 +1555,18 @@ def generate(prompt: str, system: str = "",
     (Art. XXI.3: a provider failure is never absence, never a verdict).
     Cooldown demotion: providers the health book holds in rate-limit
     cooldown are demoted to the END of the cascade, never removed — the
-    engine never refuses to run on a heuristic (Art. V)."""
+    engine never refuses to run on a heuristic (Art. V).
+
+    R491 hard_pin_provider: the measurement ring pin. When set, the
+    walk is restricted to rungs of EXACTLY this provider — the R415
+    ladder's LAST_RESORT band and the rung-count floor cannot extend
+    it, a failing pinned call is CALL_FAILED (never a silent cascade
+    to a different ring). Purpose: the sealed-corpus calibration
+    measurement must measure the instrument on the ring it declares
+    (the R488 lesson: attacker calibration is (rules x ring); the
+    cascade under load served the free-tier ring and the same rules
+    measured FPR 1.0 live vs 0.25 on the strong ring's outputs).
+    Production paths never set it (Art. V stands for them)."""
     from .provider_health import (ROLE_SYNTHESIS, HEALTH, classify_failure,
                                   order_for_role, role_for_purpose)
     from . import model_routing as mr
@@ -1688,6 +1700,27 @@ def generate(prompt: str, system: str = "",
     # (the directive's LAST-RESORT rung); bound the walk:
     # 1 + max_provider_fallbacks + 2 model hops
     rungs = rungs[:max(3, 1 + max(0, max_provider_fallbacks) + 2)]
+    # R491: the measurement ring pin — applied AFTER the floor so the
+    # LAST_RESORT band and the max(3, ...) minimum can never widen a
+    # pinned walk. A pin with no admissible rung fails closed here.
+    if hard_pin_provider:
+        _pinned_rungs = [r for r in rungs
+                         if r[0] == hard_pin_provider]
+        if not _pinned_rungs:
+            return LLMCallResult(
+                status=ST_PROVIDER_UNAVAILABLE,
+                error=(f"hard-pinned provider '{hard_pin_provider}' "
+                       f"has no admissible routing rung in this "
+                       f"deployment (credential, cost policy, or "
+                       f"capability state) — fail-closed, never a "
+                       f"silent ring change"),
+                prompt_hash=_sha(prompt),
+                selection_ledger={
+                    "chain": list(chain), "ladder": ladder,
+                    "hard_pin": {"requested": hard_pin_provider,
+                                 "status": "NO_ADMISSIBLE_RUNG"}},
+                call_provenance=call_prov)
+        rungs = _pinned_rungs
     if not rungs:
         return LLMCallResult(
             status=ST_PROVIDER_UNAVAILABLE,

@@ -90,9 +90,11 @@ class TestHardPinProvider(unittest.TestCase):
 
         def fake_generate(prompt, system="", timeout=240, max_retries=2,
                           policy=None, max_tokens=700,
-                          max_provider_fallbacks=2):
+                          max_provider_fallbacks=2,
+                          hard_pin_provider=None):
             captured["policy"] = policy
             captured["fallbacks"] = max_provider_fallbacks
+            captured["hard_pin"] = hard_pin_provider
             return _fake_result()
 
         with mock.patch.object(reg, "generate", fake_generate), \
@@ -100,6 +102,7 @@ class TestHardPinProvider(unittest.TestCase):
                                self._matrix):
             meta = ms.llm_generate("p", purpose="independent_attack",
                                    hard_pin_provider="atria")
+        self.assertEqual(captured["hard_pin"], "atria")
         self.assertEqual(captured["policy"].preferred_providers,
                          ["atria"])
         self.assertEqual(captured["policy"].max_preference_fallback, 0)
@@ -139,6 +142,42 @@ class TestHardPinProvider(unittest.TestCase):
         self.assertFalse(meta["ok"])
         self.assertIn("pinned_provider_unavailable",
                       meta["hard_pin"]["status"])
+
+    def test_pin_violation_result_is_discarded(self):
+        # defense in depth: a pinned call that somehow reports a
+        # different provider is NEVER returned as content
+        import discovery_fabric.engine.llm_registry as reg
+
+        def fake_generate(*a, **k):
+            return _fake_result(provider="xkiro",
+                                model="qwen/qwen3.8-max:free")
+
+        with mock.patch.object(reg, "generate", fake_generate), \
+             mock.patch.object(reg, "availability_matrix",
+                               self._matrix):
+            meta = ms.llm_generate("p", purpose="independent_attack",
+                                   hard_pin_provider="atria")
+        self.assertFalse(meta["ok"])
+        self.assertEqual(meta["hard_pin"]["status"],
+                         "PIN_VIOLATION_DISCARDED")
+        self.assertIn("VIOLATION", meta["error"])
+
+    def test_generate_rung_filter_is_pinned_after_the_floor(self):
+        # source-pin: the registry's walk restricts to the pinned
+        # provider AFTER the rung-count floor, so the LAST_RESORT band
+        # and the max(3, ...) minimum can never widen a pinned walk
+        src = (REPO / "discovery_fabric" / "engine" /
+               "llm_registry.py").read_text()
+        self.assertIn("hard_pin_provider: Optional[str] = None",
+                      src)
+        floor = src.index(
+            "rungs = rungs[:max(3, 1 + max(0, max_provider_fallbacks)"
+            " + 2)]")
+        pin = src.index("if hard_pin_provider:", floor)
+        self.assertLess(floor, pin)
+        self.assertIn("_pinned_rungs = [r for r in rungs", src)
+        self.assertIn("r[0] == hard_pin_provider]", src)
+        self.assertIn("NO_ADMISSIBLE_RUNG", src)
 
     def test_no_pin_is_cascade(self):
         import discovery_fabric.engine.llm_registry as reg
