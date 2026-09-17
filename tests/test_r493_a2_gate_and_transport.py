@@ -105,8 +105,10 @@ class TestGauntletRingPin(unittest.TestCase):
 
     def test_pinned_policy_pins_exactly_one_provider(self):
         """With require_provider, the selection policy is the pin and
-        nothing else — max_preference_fallback=0 (the engine's
-        hard-pin semantics, mirrored for the gauntlet)."""
+        nothing else — max_preference_fallback=0 — AND the pin rides
+        the registry's OWN hard_pin_provider mechanism (the only pin
+        the deployed registry enforces; the R493 smoke case measured
+        the preference-only pin falling through to another ring)."""
         captured = {}
 
         class _Res:
@@ -120,14 +122,11 @@ class TestGauntletRingPin(unittest.TestCase):
         class _FakeReg:
             @staticmethod
             def generate(prompt, system="", timeout=0, max_retries=0,
-                         policy=None):
+                         policy=None, hard_pin_provider=None):
                 captured["policy"] = policy
+                captured["hard_pin_provider"] = hard_pin_provider
                 return _Res()
 
-        fake = mock.patch("discovery_fabric.engine.llm_registry.generate",
-                          new=_FakeReg.generate)
-        # the module imports llm_registry inside llm_chat; patch the
-        # real registry module's generate
         import discovery_fabric.engine.llm_registry as real_reg
         with mock.patch.object(real_reg, "generate", _FakeReg.generate):
             out = a2.llm_chat("p", require_provider="atria")
@@ -135,35 +134,12 @@ class TestGauntletRingPin(unittest.TestCase):
         pol = captured["policy"]
         self.assertEqual(pol.preferred_providers, ["atria"])
         self.assertEqual(pol.max_preference_fallback, 0)
+        self.assertEqual(captured["hard_pin_provider"], "atria")
         meta = a2._LAST_ATTACK_PROVIDER_META
         self.assertEqual(meta["ring_pin"]["requested"], "atria")
         self.assertEqual(meta["ring_pin"]["mode"], "HARD_PIN_NO_FALLBACK")
         self.assertEqual(meta["ring_pin"]["served_provider"], "atria")
         self.assertIsNone(meta["ring_pin"]["pin_violation"])
-
-    def test_pin_violation_is_typed_not_silent(self):
-        captured = {}
-
-        class _Res:
-            ok = True
-            content = "OVERALL: PASS"
-
-            def to_meta(self):
-                return {"ok": True, "provider": "xkiro", "model": "m"}
-
-        class _FakeReg:
-            @staticmethod
-            def generate(prompt, system="", timeout=0, max_retries=0,
-                         policy=None):
-                captured["policy"] = policy
-                return _Res()
-
-        import discovery_fabric.engine.llm_registry as real_reg
-        with mock.patch.object(real_reg, "generate", _FakeReg.generate):
-            a2.llm_chat("p", require_provider="atria")
-        meta = a2._LAST_ATTACK_PROVIDER_META
-        self.assertIn("PINNED ring not served",
-                      meta["ring_pin"]["pin_violation"])
 
     def test_no_pin_keeps_the_production_cascade(self):
         captured = {}
@@ -178,8 +154,9 @@ class TestGauntletRingPin(unittest.TestCase):
         class _FakeReg:
             @staticmethod
             def generate(prompt, system="", timeout=0, max_retries=0,
-                         policy=None):
+                         policy=None, hard_pin_provider=None):
                 captured["policy"] = policy
+                captured["hard_pin_provider"] = hard_pin_provider
                 return _Res()
 
         import discovery_fabric.engine.llm_registry as real_reg
@@ -188,7 +165,33 @@ class TestGauntletRingPin(unittest.TestCase):
         pol = captured["policy"]
         self.assertIn("atria", pol.preferred_providers)
         self.assertGreater(len(pol.preferred_providers), 1)
+        self.assertIsNone(captured["hard_pin_provider"])
         self.assertNotIn("ring_pin", a2._LAST_ATTACK_PROVIDER_META)
+
+    def test_pin_violation_is_typed_not_silent(self):
+        captured = {}
+
+        class _Res:
+            ok = True
+            content = "OVERALL: PASS"
+
+            def to_meta(self):
+                return {"ok": True, "provider": "xkiro", "model": "m"}
+
+        class _FakeReg:
+            @staticmethod
+            def generate(prompt, system="", timeout=0, max_retries=0,
+                         policy=None, hard_pin_provider=None):
+                captured["policy"] = policy
+                captured["hard_pin_provider"] = hard_pin_provider
+                return _Res()
+
+        import discovery_fabric.engine.llm_registry as real_reg
+        with mock.patch.object(real_reg, "generate", _FakeReg.generate):
+            a2.llm_chat("p", require_provider="atria")
+        meta = a2._LAST_ATTACK_PROVIDER_META
+        self.assertIn("PINNED ring not served",
+                      meta["ring_pin"]["pin_violation"])
 
 
 class TestUnionGatePins(unittest.TestCase):

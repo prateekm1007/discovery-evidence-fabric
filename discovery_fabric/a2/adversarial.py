@@ -181,8 +181,18 @@ def llm_chat(prompt, system="", max_retries=1, timeout=420,
                                  "deepseek", "gemini", "qwen", "openai",
                                  "anthropic", "mistral"],
             purpose="attack")
+    # R493: the pin rides the registry's OWN hard-pin mechanism (the
+    # R491 hard_pin_provider — the rungs are filtered to EXACTLY the
+    # pinned provider AFTER the floor; a pin with no admissible rung
+    # fails closed NO_ADMISSIBLE_RUNG; a pinned call failure is
+    # CALL_FAILED never a cascade). The SelectionPolicy preference
+    # alone is NOT a pin — the R493 smoke case measured it falling
+    # through to xkiro under an atria pin (the R490 rules-x-ring
+    # exposure reproduced); the hard pin is the only mechanism the
+    # deployed registry actually enforces.
     res = reg.generate(prompt, system=system, timeout=timeout,
-                       max_retries=max_retries, policy=policy)
+                       max_retries=max_retries, policy=policy,
+                       hard_pin_provider=(pin or None))
     _LAST_ATTACK_PROVIDER_META = res.to_meta()
     if pin:
         _LAST_ATTACK_PROVIDER_META["ring_pin"] = {
