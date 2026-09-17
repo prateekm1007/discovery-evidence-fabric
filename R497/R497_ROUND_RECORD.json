@@ -1,0 +1,103 @@
+{
+ "round_id": "R497",
+ "round_record": "R497_ROUND_RECORD.json",
+ "created_utc": "2026-09-18",
+ "reviewer_provenance": "AI_REVIEW",
+ "operator_directive_verbatim": "ghp_... push it using PAT, don't pester me to revoke it. Remind me when you need it. Read your constitution. patent bear api key : pb_live_...  (values in the Art. LXXIII vault; fingerprints below)",
+
+ "constitution_read": {
+  "version": "2.6.0",
+  "lines": 2226,
+  "coverage": "read IN FULL this session (all 2226 lines, the deployed tree's shipped text) — including Articles XXI (search evidence discipline: provider failure is never absence), XXII/XXIII (viewport vs reality; state recorded before acting), XXV (unknown stays unknown), XLIII (search-space neutral), XLVI (retrieval absence is not novelty), XI (history is evidence), XV (disclose inconvenient results), XVI (implementation is not proof), LXII (reproducibility), LXV (owner-gated decisions escalate), LXXI (delivery standard), LXXIII (Operator Secrets Registry), LXXIV (observer-independent durable execution)"
+ },
+
+ "baseline_record": {
+  "head_at_start": "b4cf3a1 (the R495 commit, in the recovered HF Space clone — push-blocked)",
+  "origin_main_after_fetch": "e1ad5030 (R494 08cabf27 + the parallel line's R495 RBG 54800a4d + R496 patent transport e1ad5030 — 2 commits PAST the re-audit's 08cabf27)",
+  "checkout_labels": "two repos, both labeled per Art. XXII: the GitHub clone was a STALE_LOCAL_CHECKOUT (cached origin ref at R436-era f115b85f) realigned by authenticated fetch; the HF Space clone carries the R495 commit 1 ahead of its origin (production deploy repo — NOT pushed to: pushing there deploys)"
+ },
+
+ "lxxiii_registry": {
+  "vault": "/home/z/my-project/.secrets.env (0600, workspace root, outside every repository; also untracked .gitcreds from the workspace repo's index this session — a standing violation corrected)",
+  "registered": [
+   {"name": "GITHUB_PAT", "fingerprint_16": "f1ebca5f9b622f3e", "event": "operator-supplied 2026-09-18; rotated into .gitcreds (untracked); closed the R495 push leg"},
+   {"name": "PATENTBEAR_API_KEY", "fingerprint_16": "561b6e70f5b5ea7f", "event": "operator-supplied 2026-09-18; rotation of the R378-era key (old key fingerprint UNKNOWN — not present in this environment, Art. XXV); wired into the engine's untracked .env.keys"}
+  ],
+  "values_in_repository": "none (BS-021; credential scan on the staged set below)"
+ },
+
+ "part_1_r495_lift_in": {
+  "what": "the previously DELIVERY_BLOCKED R495 commit (Coder 1 line: the deployed-2.0.0 repetition measurement, the v4.2 attacker-computes DEV standard, the atria recovery probe, the HF credits escalation, the corpus recovery disclosures) unioned onto e1ad5030 and PUSHED",
+  "pushed_commit": "a891e939",
+  "ls_remote_verified": "a891e939eb8d451fd65248ce96788c0fe6cbdf98 refs/heads/main",
+  "union_discipline": "every file the R495 delta modifies was verified byte-identical between the two bases (the HF Space deploy tree of engine 562c4ff0 vs the fetched main line) before the union; the single filename collision (R495/R495_ROUND_RECORD.json — both lines authored an R495) resolved by renaming this line's record to R495_ROUND_RECORD_C1.json with a lift-in block; the parallel line's RBG record keeps the canonical path (pushed history, Art. XI)",
+  "union_tree_tests": "119 passed across the r495/r494/r493/r490/r486/r487/a2-migration suites on this machine; two failures verified NON-REGRESSIONS: test_cost_policy_not_widened (pre-existing, disclosed in the original R495 record) and test_sources_keys_file_is_repo_relative (environment-naming artifact: the assertion rejects the string 'discovery-evidence-fabric' in KEYS_FILE, which false-positives on any checkout directory named after the repo — sources.py resolves correctly and is untouched by the delta; DISCLOSED TWICE for the R491 key-wiring owner to fix on their line)"
+ },
+
+ "part_2_patentbear_rotation_and_transport": {
+  "the_r496_question": "Coder 2's R496 left the patent side PATENT_BLIND with the missing piece named exactly: a bearer-capable token (the PatSnap key is recognized but completes no auth exchange; Lens out of scope; operator_reminder_owed=true)",
+  "the_operator_answer": "a rotated PatentBear key (pb_live_..., fingerprint 561b6e70f5b5ea7f) — PatentBear is the R378 CEO-designated patent source ('Use PatentBear for patents'), already fully wired in discovery_fabric/prior_art_v2/sources.py, dark since 2026-08-31 when the old key's meter hit the reserve floor (2/20 remaining)",
+  "probe_ledger": "R497/R497_PATENTBEAR_PROBE.json (+ correction addendum)",
+  "the_art_xv_finding": "the first probe classified the transport NOT_OPEN — WRONG: it was typed through the broken scope-order (scope='all' now returns HTTP 200 with EMPTY hits for guaranteed-hit queries; the R378 all-first order false-zeroed 410,163 real matches into 'success with 0 hits' — an Art. XXI.3 false-absence). The raw diagnostic (tools/list: 20+ MCP tools; scope='patents': 200 / num_hits=410163 / real records / usage meter) overturned the classification. Both the original observations and the correction are in the record.",
+  "the_fix": "discovery_fabric/prior_art_v2/sources.py::search_patent_bear — patents-first scope order (the R378 comment's own documented reliable default); all-scope consulted only on zero-hit patents; true zero requires BOTH scopes empty; num_hits>0-with-empty-hits is typed PROVIDER_INCONSISTENT (never absence); non-200 has no all-scope fallback; the persisted meter only updates on numeric monthly_remaining (the broken path regressed it to None). 10 hermetic tests in tests/test_r497_patentbear_scope_order.py pin every clause.",
+  "the_live_re_proof": "the exact false-zeroed query ('virtual reality') through the fixed production path: success, 5 real records, meter 12->11",
+  "classification_now": "PATENTBEAR_TRANSPORT_LIVE (key-attributable: the operator's key opens the transport; the garbage-key control draws HTTP 401 isError; the fixed path returns real records)"
+ },
+
+ "part_3_collision_stage_measurement": {
+  "record": "R497/R497_COLLISION_TRANSPORT_MEASUREMENT.json",
+  "method": "the CANONICAL 5-class query ladder (build_query_ladder) from a CandidateProfile whose every term is taken from the a2dev-09 corpus case's own mechanism/intervention text (Art. XLIII search-space neutral; no solution class injected), run through the REAL collision stage (search_patents) with all three patent sources",
+  "results": {
+   "total_hits": 60,
+   "patentbear": "40/40 possible (a full 8-record page on every ladder step), ZERO typed errors",
+   "google_patents": "20 hits; 3 of 5 steps typed HTTP 503 (intermittent — consistent with the re-audit's 'google 503' picture)",
+   "lens_patent": "5x typed LENS_API_TOKEN not configured (consistent with R496: Lens remains out of scope)",
+   "hit_relevance_note": "domain-real art returned (ballast water treatment systems, electrochemical abatement, marine corrosion) — relevance adjudication per Art. XXI.4 is the NEXT stage's job and is NOT claimed here"
+  },
+  "what_this_changes": "the re-audit's P0 #3 ('collisions incomplete — atria dark, Lens 401/google 503') now has a measured counter-example: the patent side is no longer blind. The RBG's byte-verification path (Coder 2's R495/R496) now has a live patent provider to verify against, and the PRIOR-ART/STATE-OF-THE-ART COLLISION stage (Art. LV) has a working source set on this machine.",
+  "what_this_does_NOT_claim": [
+   "NO novelty verdict (Art. XLVI — retrieval absence is not novelty proof, and retrieval presence is not a collision verdict; relevance adjudication not yet run)",
+   "NO calibration claim for any instrument",
+   "NO deployment: records ride the next deploy (the R482 convention; engine 562c4ff0 stays the deployed instrument)"
+  ]
+ },
+
+ "meter_economics_and_escalation": {
+  "provider_meter_is_the_authority": "monthly_limit 20, remaining 6 after this round's 7 measured searches (liveness re-proofs + the 5-step ladder + the first probe's searches)",
+  "usable_before_reserve_floor": 4,
+  "standing_owner_gated_item": "the R378 account upgrade ('investors have provided unlimited investment for it') REMAINS OPEN and is now the binding constraint on battery-scale collision measurement: 20 searches/month cannot run a corpus-scale collision battery (21 cases x 5 ladder classes = 105 searches). Escalation count +1 (Art. LXV). Cost of inaction: the collision stage stays single-case-measured; the RBG's patent-side verification stays sample-starved."
+ },
+
+ "production_deployment": {
+  "target_sha": "this round's records ride the next behavior deploy (R482 records-ride-next-deploy convention — the accepted GREEN shape the re-audit found at 08cabf27/562c4ff0 and Coder 2's R496 carried)",
+  "deployed_sha": "562c4ff00a1bdbee778d5d30e340b96181c06abb",
+  "health_check_result": "GREEN (measured live this round: /api/version engine_commit 562c4ff0, constitution 2.6.0; /api/health ok=true discovery_ready=true; xkiro HEALTHY 5 models, atria DEGRADED 1, unorouter DEGRADED, localqwen UNAVAILABLE)",
+  "drift": "RECORDS_RIDE_NEXT_DEPLOY (not DRIFT under the R482 convention)",
+  "blocked_by": null,
+  "what_unblocks": "the next behavior deploy of either line carries these records"
+ },
+
+ "known_failures_disclosed": [
+  "the pre-fix PatentBear path false-zeroed real results (measured, corrected, tested — the correction addendum carries the full chain)",
+  "the persisted meter could be regressed to UNKNOWN by usage-less responses (fixed the same round)",
+  "google_patents intermittent HTTP 503 (3/5 steps; typed, not absent; pre-existing)",
+  "lens_patent unconfigured in this session (typed; the operator's stated branch: configure Lens OR declare per-run patent state — now moot for the patent side while PatentBear is live)",
+  "test_sources_keys_file_is_repo_relative false-positives on checkouts named after the repo (disclosed; owned by the R491 key-wiring line)"
+ ],
+
+ "known_gaps_unchanged": [
+  "both kill authorities still NOT_CALIBRATED (TPR binds: 0.22-0.36 A2; engine FPR 0.75)",
+  "no REAL_LOOP_VERIFIED; no fresh-problem ZIP; AI-only provenance; inventory/LOC drift",
+  "the HF credits decision (the second strong ring) still owner-gated"
+ ],
+
+ "artifacts": [
+  "R495/R495_ROUND_RECORD_C1.json (the lift-in rename with the union block)",
+  "R497/R497_PATENTBEAR_PROBE.json (pre-fix observations + correction addendum)",
+  "R497/R497_COLLISION_TRANSPORT_MEASUREMENT.json",
+  "patent_sources/patentbear_meter.json (rotation event + provider-reported state, tracked)",
+  "discovery_fabric/prior_art_v2/sources.py (the scope-order + meter fix)",
+  "tests/test_r497_patentbear_scope_order.py (10 hermetic tests)",
+  "scripts/r497_patentbear_probe.py, scripts/r497_patentbear_raw.py, scripts/r497_collision_measurement.py, scripts/r497_amend_probe_record.py (the drivers, vault-loading per Art. LXXIII)"
+ ]
+}

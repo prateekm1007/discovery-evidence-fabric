@@ -773,8 +773,20 @@ def search_patent_bear(query: str, num_results: int = 8) -> SourceQueryResult:
     # Patent Bear has query length limits — truncate to 200 chars to avoid HTTP 502
     truncated_query = query[:200]
 
-    # Patent Bear's "scope=all" sometimes returns HTTP 502 (upstream NPL index issue).
-    # Default to "patents" which is more reliable; NPL is already covered by LENS_SCHOLARLY.
+    # R497 (2026-09-18, measured live): scope="all" NOW returns HTTP 200 with
+    # EMPTY hits for guaranteed-hit queries — the upstream NPL-index issue the
+    # R378 comment documented as an in-body 502 now manifests as a silent
+    # empty, so the old all-first order false-zeroed real results into
+    # NO_RESULTS (Art. XXI.3: a provider-side empty is NEVER absence).
+    # Measured on the operator's rotated pb_live_ key: "virtual reality" ->
+    # scope="all" 200 / 0 hits vs scope="patents" 200 / num_hits=410163 / 5
+    # records. New order: "patents" first (the R378 comment's own reliable
+    # default; NPL is already covered by LENS_SCHOLARLY); "all" is consulted
+    # ONLY when "patents" measures zero hits (the NPL coverage attempt); true
+    # zero requires BOTH scopes empty; num_hits>0 with an empty hits list is a
+    # typed PROVIDER_INCONSISTENT failure, never absence; a non-200 on
+    # "patents" is a typed failure with NO all-scope fallback (the broken
+    # scope must never mask a provider failure as zero).
     def _do_search(scope_value: str) -> Tuple[int, bytes, int]:
         payload = json.dumps({
             "jsonrpc": "2.0",
@@ -799,18 +811,51 @@ def search_patent_bear(query: str, num_results: int = 8) -> SourceQueryResult:
         "MCP-Protocol-Version": "2025-06-18",
     }
 
-    # Try "all" first, fall back to "patents" on 502
-    status, body, latency = _do_search("all")
-    used_fallback = False
-    if status == 200:
+    def _parse_inner(body_bytes: bytes) -> Optional[Dict[str, Any]]:
+        """Best-effort parse of the MCP text content into the inner search
+        dict. Returns None on any parse failure; returns {"__mcp_error__"}
+        when the MCP envelope itself errored."""
         try:
-            data_check = json.loads(body)
-            if "error" in data_check and "502" in str(data_check.get("error", {}).get("message", "")):
-                # Fallback to patents-only
-                status, body, latency = _do_search("patents")
-                used_fallback = True
-        except Exception:
-            pass
+            data = json.loads(body_bytes)
+        except Exception:  # noqa: BLE001
+            return None
+        if isinstance(data, dict) and "error" in data:
+            return {"__mcp_error__": data["error"]}
+        content = (data.get("result", {}) or {}).get("content", [])
+        for c in content:
+            if c.get("type") == "text":
+                try:
+                    return json.loads(c.get("text", ""))
+                except Exception:  # noqa: BLE001
+                    return None
+        return None
+
+    # "patents" first (reliable scope — see the R497 measurement above)
+    status, body, latency = _do_search("patents")
+    if status == 200:
+        inner = _parse_inner(body)
+        if isinstance(inner, dict) and "__mcp_error__" not in inner:
+            num_hits = inner.get("num_hits")
+            if isinstance(num_hits, (int, float)) and num_hits > 0 and not inner.get("hits"):
+                return SourceQueryResult(
+                    source_id="PATENT_BEAR",
+                    success=False,
+                    latency_ms=latency,
+                    error=(f"PROVIDER_INCONSISTENT: provider num_hits={int(num_hits)} "
+                           "but hits list is empty (index/provider disagreement "
+                           "is never absence, Art. XXI.3)"),
+                    error_code=502,
+                )
+            if not inner.get("hits"):
+                # zero on the reliable scope: consult the NPL-broader scope
+                # ONCE; true zero requires BOTH scopes empty
+                status2, body2, lat2 = _do_search("all")
+                if status2 == 200:
+                    inner2 = _parse_inner(body2)
+                    if (isinstance(inner2, dict)
+                            and "__mcp_error__" not in inner2
+                            and inner2.get("hits")):
+                        status, body, latency = status2, body2, lat2
 
     if status != 200:
         return SourceQueryResult(
@@ -941,8 +986,13 @@ def search_patent_bear(query: str, num_results: int = 8) -> SourceQueryResult:
     # Track usage in error field if rate limit hit (informational)
     usage = search_data.get("usage", {})
     # R378: persist the provider-reported meter after every response —
-    # the guard on the next call reads it (never burns the reserve floor)
-    _patentbear_update_meter(usage.get("monthly_remaining"))
+    # the guard on the next call reads it (never burns the reserve floor).
+    # R497: a usage-less response must never overwrite a numeric meter with
+    # UNKNOWN (measured live: the broken scope="all" responses carry no
+    # monthly_remaining and regressed the persisted meter to None)
+    remaining = usage.get("monthly_remaining")
+    if isinstance(remaining, (int, float)):
+        _patentbear_update_meter(remaining)
 
     return SourceQueryResult(
         source_id="PATENT_BEAR",

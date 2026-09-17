@@ -1,0 +1,117 @@
+{
+ "probe_id": "R497_PATENTBEAR_PROBE",
+ "probed_at_utc": "2026-09-17T18:42:01Z",
+ "operator_directive": "patent bear api key supplied by the operator (2026-09-18, rotation of the R378-era key whose meter hit the reserve floor 2026-08-31); Coder 2's R496 named the bearer-capable token as the exact missing piece for the PATENT_BLIND patent side",
+ "key_fingerprint_vault": "561b6e70f5b5ea7f",
+ "old_key_fingerprint": "UNKNOWN (the R378-era key is not present in this environment; unprovable stays unproven, Art. XXV)",
+ "reviewer_provenance": "AI_REVIEW",
+ "probes": {
+  "A_liveness": {
+   "state": "OK",
+   "success": true,
+   "latency_ms": 843,
+   "hits": 0,
+   "error": null,
+   "error_code": null,
+   "rate_limit_remaining": null,
+   "hit_ids": [],
+   "wall_s": 0.84
+  },
+  "B_bad_key_control": {
+   "state": "AUTH_FAILED_AS_EXPECTED",
+   "http": 401,
+   "body_head": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"isError\":true,\"content\":[{\"type\":\"text\",\"text\":\"Authentication required. Connect or reconnect your Patent Bear account.\"}],\"_meta\":{\"mcp/www_authenticate\":[\"Bearer resource_metadata=\\\"https://www.patentbear.com/.well-known/oauth-protected-resource/mcp\\\", error=\\\"in",
+   "latency_ms": 306
+  },
+  "C_true_zero": {
+   "state": "OK",
+   "success": true,
+   "latency_ms": 519,
+   "hits": 0,
+   "error": null,
+   "error_code": null,
+   "rate_limit_remaining": null,
+   "hit_ids": [],
+   "wall_s": 0.52
+  },
+  "D_domain": {
+   "state": "OK",
+   "success": true,
+   "latency_ms": 534,
+   "hits": 0,
+   "error": null,
+   "error_code": null,
+   "rate_limit_remaining": null,
+   "hit_ids": [],
+   "wall_s": 0.54
+  }
+ },
+ "envkeys": {
+  "path": ".env.keys (untracked, gitignored, local-only)",
+  "names": [
+   "ZAI_API_KEY",
+   "PATENT_BEAR_API_KEY"
+  ],
+  "values_committed": false
+ },
+ "meter_rotation": {
+  "before": {
+   "monthly_remaining": 2,
+   "updated_at": "2026-08-31T04:13:35.627535+00:00",
+   "reserve_floor": 2
+  },
+  "after_state": "UNKNOWN (rotation; provider report pending)"
+ },
+ "meter_after": {
+  "monthly_remaining": null,
+  "updated_at": "2026-09-17T18:42:03.732904+00:00",
+  "reserve_floor": 2
+ },
+ "classification": "PATENTBEAR_TRANSPORT_NOT_OPEN (typed: None)",
+ "probe_wall_s_total": 2.3,
+ "correction_addendum": {
+  "date": "2026-09-18",
+  "art_xv_disclosure": "the classification below ('PATENTBEAR_TRANSPORT_NOT_OPEN') was WRONG. It was typed from the pre-fix production path whose scope='all'-first order false-zeroed real results (probes A/C/D measured 'success with 0 hits' while the provider actually held 410,163 matches for the same query). The transport was LIVE; the instrument was the defect. The original probe observations are preserved unchanged as measurements of the broken path.",
+  "raw_diagnostic": {
+   "tools_list": "20+ MCP tools on this key (search_patents, get_patent_record, find_in_patent, get_citations, get_family, get_legal_activity, get_file_history, get_term_definitions, run_research, search_litigation, get_opinion, library/matter tools, find_similar_patents, search_office_actions, ...) \u2014 a far richer surface than the R378-era code assumed",
+   "raw_search_patents_scope_patents": {
+    "query": "virtual reality",
+    "http": 200,
+    "num_hits": 410163,
+    "example_hit": "US5774878A 'Virtual reality generator for use with financial information' (1998-06-30)",
+    "usage": {
+     "allowed": true,
+     "monthly_limit": 20,
+     "monthly_used": 7,
+     "monthly_remaining": 13
+    },
+    "facets_present": true
+   },
+   "root_cause": "scope='all' (tried FIRST by the R378 code) now returns HTTP 200 with an EMPTY hits list \u2014 the upstream NPL-index issue the R378 comment documented as an in-body 502 now manifests as a silent empty; the all->patents fallback only fired on the 502 shape, so real results were typed as zero-hit successes (a false-absence, Art. XXI.3 violation class)",
+   "meter_regression": "the broken-path responses carried no usable monthly_remaining, and the R378 meter update overwrote the persisted numeric meter with None (UNKNOWN) \u2014 a second instrument defect, fixed the same round"
+  },
+  "the_fix": {
+   "file": "discovery_fabric/prior_art_v2/sources.py::search_patent_bear",
+   "contract": [
+    "scope='patents' queried FIRST (the reliable scope; NPL covered by LENS_SCHOLARLY)",
+    "scope='all' consulted only when 'patents' measures zero hits (the NPL coverage attempt); true zero requires BOTH scopes empty",
+    "num_hits>0 with an empty hits list -> typed PROVIDER_INCONSISTENT failure (never absence)",
+    "non-200 on 'patents' -> typed failure with NO all-scope fallback",
+    "meter updated only on numeric monthly_remaining (never regressed to UNKNOWN by usage-less responses)"
+   ],
+   "tests": "tests/test_r497_patentbear_scope_order.py \u2014 10 hermetic tests (order, no-all-on-hits, true-zero shape, NPL fallback, inconsistency guard, no-fallback-on-failure, meter guards, reserve-floor preserved, missing-key typed)"
+  },
+  "re_proof_live": {
+   "same_query_fixed_path": "virtual reality -> success, 5 real records (US5774878A ...), meter 12->11",
+   "collision_stage_measurement": "R497/R497_COLLISION_TRANSPORT_MEASUREMENT.json \u2014 the canonical 5-class ladder (profile derived from the a2dev-09 corpus case's own text, Art. XLIII) through the REAL search_patents stage: 60 hits (patentbear 40/40 possible with ZERO errors, google 20 with 3 typed intermittent 503s, lens 5x typed not-configured)"
+  },
+  "superseding_classification": "PATENTBEAR_TRANSPORT_LIVE (key-attributable: the operator's pb_live_ key opens the transport, the garbage-key control draws HTTP 401 isError, and the fixed production path returns real records \u2014 the R496 PATENT_BLIND patent side now has a measured live provider)",
+  "meter_economics_disclosed": {
+   "spent_this_round": 7,
+   "remaining_after": 6,
+   "reserve_floor": 2,
+   "usable_before_floor": 4,
+   "standing_escalation": "the R378 account-upgrade escalation (investors fund unlimited usage) REMAINS OPEN: 20 searches/month cannot support battery-scale collision runs; the owner-gated upgrade is the path (Art. LXV)"
+  }
+ }
+}
