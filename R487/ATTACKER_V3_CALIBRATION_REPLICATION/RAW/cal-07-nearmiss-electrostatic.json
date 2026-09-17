@@ -1,0 +1,278 @@
+{
+ "attack": {
+  "attack_version": "independent_attack/3.0.0",
+  "candidate_id": "cal-07-electrostatic-precipitator",
+  "generator_provider": null,
+  "attacker_provider": "xkiro",
+  "attacker_model": "qwen/qwen3.8-max:free",
+  "independence_mode": "SEPARATE_CONTEXT",
+  "independence_note": "the attacker ran in an independent reasoning context (fresh adversarial conversation, generator reasoning never shown; no alternative provider credentialed \u2014 disclosed, never claimed as provider separation)",
+  "prompt_hash": "fb6097beb74fd1a39fe6723e64798c8ef8040ef3c5c61ec094cfead836af0fc2",
+  "output_hash": "340004d01cd806113e7e70889b96f0927fc3b523b1c73ac23a3998deb3a71d95",
+  "llm_status": "OK",
+  "attacked_at": "2026-09-17T04:58:42+00:00Z",
+  "items": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "verdict": "KILL",
+    "basis": "Electrostatic precipitators operate by applying high voltage to create a corona discharge in a gaseous dielectric medium; water is electrically conductive and cannot sustain a corona field, making the stated mechanism physically impossible in the declared fluid. GROUNDED_IN: RECORD \"electrostatic precipitator spool in the 150 mm supply line (50 kV corona field, 300 mm collection length)\" combined with SCOPE \"water conductivity typical of recirculated mill cooling water\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['150', '50', '300']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'supply line 50 kv' (field: intervention)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['conductivity', 'cooling', 'mill', 'recirculated']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"electrostatic precipitator spool in the 150 mm supply line (50 kV corona field, 300 mm collection length)\" combined with SCOPE \"water conductivity typical of recirculated mill cooling water\"",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "verdict": "KILL",
+    "basis": "The boundary condition \"water conductivity typical of recirculated mill cooling water\" directly violates the physical requirement for an electrostatic precipitator, which demands a non-conductive gas medium to prevent immediate short-circuiting of the 50 kV field across the parallel plates. GROUNDED_IN: RECORD \"50 kV corona field\" combined with SCOPE \"water conductivity typical of recirculated mill cooling water\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['50', '50']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span '50 kv corona field' (field: intervention)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['conductivity', 'cooling', 'mill', 'recirculated']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"50 kV corona field\" combined with SCOPE \"water conductivity typical of recirculated mill cooling water\"",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "verdict": "SURVIVE",
+    "basis": "No held evidence exists to contradict the claims. GROUNDED_IN: EVIDENCE none held"
+   },
+   {
+    "attack_class": "BASELINE_EQUIVALENCE",
+    "verdict": "SURVIVE",
+    "basis": "The candidate proposes an active intervention that differs structurally from the status quo baseline. GROUNDED_IN: RECORD \"plate-type electrostatic precipitator spool in the 150 mm supply line\""
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "verdict": "KILL",
+    "basis": "A 50 kV potential applied across parallel plates submerged in conductive water will result in massive electrical arcing and short-circuiting rather than particle precipitation, rendering the spool inoperable and hazardous at full header flow. GROUNDED_IN: COMPUTATION 50 kV applied across a conductive aqueous medium yields current flow limited only by solution resistance rather than forming a stable corona discharge as required by the design, violating the physics of the RECORD \"50 kV corona field\" under SCOPE \"full header flow\" of conductive water",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['50', '50', '50']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span '50 kv corona field' (field: intervention)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['flow', 'full', 'header', 'water']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "COMPUTATION 50 kV applied across a conductive aqueous medium yields current flow limited only by solution resistance rather than forming a stable corona discharge as required by the design, violating ",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "verdict": "SURVIVE",
+    "basis": "Isokinetic particle counting is a defined measurement technique and the prediction specifies the target size threshold. GROUNDED_IN: RECORD \"isokinetic particle counts upstream and downstream of the spool show 95 percent removal of particles above 20 microns at design flow\""
+   }
+  ],
+  "intervention_suggestions": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "suggestion": "Replace the electrostatic precipitator mechanism with a hydrocyclone or sintered-metal filtration spool, because mechanical separation does not require a non-conductive dielectric medium and functions correctly in conductive water. GROUNDED_IN: RECORD \"electrostatic precipitator spool in the 150 mm supply line (50 kV corona field, 300 mm collection length)\" combined with SCOPE \"water conductivity ",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'supply line 50 kv' (field: intervention)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['conductivity', 'cooling', 'mill', 'recirculated']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"electrostatic precipitator spool in the 150 mm supply line (50 kV corona field, 300 mm collection length)\" combined with SCOPE \"water conductivity typical of recirculated mill cooling water\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "suggestion": "Change the operating medium from liquid water to a gas stream, or abandon the ESP boundary entirely, because the stated boundary condition of conductive cooling water fundamentally prohibits corona discharge operation. GROUNDED_IN: RECORD \"50 kV corona field\" combined with SCOPE \"water conductivity typical of recirculated mill cooling water\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span '50 kv corona field' (field: intervention)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['conductivity', 'cooling', 'mill', 'recirculated']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"50 kV corona field\" combined with SCOPE \"water conductivity typical of recirculated mill cooling water\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "suggestion": "Reduce the voltage to zero and substitute a purely mechanical separation geometry, because any non-zero voltage applied across parallel plates in conductive water guarantees a short circuit rather than particle collection. GROUNDED_IN: COMPUTATION 50 kV applied across a conductive aqueous medium yields current flow limited only by solution resistance rather than forming a stable corona discharge a",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['50', '50']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span '50 kv corona field' (field: intervention)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['flow', 'full', 'header', 'water']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "COMPUTATION 50 kV applied across a conductive aqueous medium yields current flow limited only by solution resistance rather than forming a stable corona discharge as required by the design, violating ",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   }
+  ],
+  "state": "ATTACK_RUN",
+  "overall": "KILLED",
+  "kill_basis": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "basis": "Electrostatic precipitators operate by applying high voltage to create a corona discharge in a gaseous dielectric medium; water is electrically conductive and cannot sustain a corona field, making the stated mechanism physically impossible in the declared fluid. GROUNDED_IN: RECORD \"electrostatic precipitator spool in the 150 mm supply line (50 kV corona field, 300 mm collection length)\" combined with SCOPE \"water conductivity typical of recirculated mill cooling water\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['150', '50', '300']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'supply line 50 kv' (field: intervention)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['conductivity', 'cooling', 'mill', 'recirculated']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"electrostatic precipitator spool in the 150 mm supply line (50 kV corona field, 300 mm collection length)\" combined with SCOPE \"water conductivity typical of recirculated mill cooling water\"",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "basis": "The boundary condition \"water conductivity typical of recirculated mill cooling water\" directly violates the physical requirement for an electrostatic precipitator, which demands a non-conductive gas medium to prevent immediate short-circuiting of the 50 kV field across the parallel plates. GROUNDED_IN: RECORD \"50 kV corona field\" combined with SCOPE \"water conductivity typical of recirculated mill cooling water\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['50', '50']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span '50 kv corona field' (field: intervention)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['conductivity', 'cooling', 'mill', 'recirculated']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"50 kV corona field\" combined with SCOPE \"water conductivity typical of recirculated mill cooling water\"",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "basis": "A 50 kV potential applied across parallel plates submerged in conductive water will result in massive electrical arcing and short-circuiting rather than particle precipitation, rendering the spool inoperable and hazardous at full header flow. GROUNDED_IN: COMPUTATION 50 kV applied across a conductive aqueous medium yields current flow limited only by solution resistance rather than forming a stable corona discharge as required by the design, violating the physics of the RECORD \"50 kV corona field\" under SCOPE \"full header flow\" of conductive water",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['50', '50', '50']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span '50 kv corona field' (field: intervention)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['flow', 'full', 'header', 'water']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "COMPUTATION 50 kV applied across a conductive aqueous medium yields current flow limited only by solution resistance rather than forming a stable corona discharge as required by the design, violating ",
+     "absence_ground": false
+    }
+   }
+  ],
+  "counts": {
+   "KILL": 3,
+   "RISK": 0,
+   "SURVIVE": 3,
+   "ABSTAIN_DEMOTED": 0,
+   "INVALID": 0
+  }
+ }
+}

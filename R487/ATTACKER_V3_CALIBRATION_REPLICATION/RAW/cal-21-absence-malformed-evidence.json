@@ -1,0 +1,173 @@
+{
+ "attack": {
+  "attack_version": "independent_attack/3.0.0",
+  "candidate_id": "cal-21-corrupt-evidence-bundle",
+  "generator_provider": null,
+  "attacker_provider": "xkiro",
+  "attacker_model": "qwen/qwen3.8-max:free",
+  "independence_mode": "SEPARATE_CONTEXT",
+  "independence_note": "the attacker ran in an independent reasoning context (fresh adversarial conversation, generator reasoning never shown; no alternative provider credentialed \u2014 disclosed, never claimed as provider separation)",
+  "prompt_hash": "9ad29229b54fbb8c7f9a69e4064ba5a772cf76d7cb2d88b8e66365b052cbebb7",
+  "output_hash": "1a351908e5381a313f466d2967aa41ebbcb57b6c840198eb8be8013ca5121829",
+  "llm_status": "OK",
+  "attacked_at": "2026-09-17T08:10:49+00:00Z",
+  "items": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "verdict": "RISK",
+    "basis": "The candidate discloses apex plugging during dumps, which interrupts continuous centrifugation; the bypass protects supply but allows unseparated scale to recirculate during the plug event, degrading the claimed 85 percent removal. GROUNDED_IN: RECORD \"Known failure modes (claimed by the generator): apex plugging during dumps (bypass protects supply)\""
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "verdict": "SURVIVE",
+    "basis": "The intervention installs on the return line and leaves the supply untouched, satisfying the declared boundary. GROUNDED_IN: RECORD \"Boundary conditions: return-line installation only; supply untouched; basin settling available\""
+   },
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "verdict": "KILL",
+    "basis": "The candidate's mechanism claim asserts a continuous decay of recirculated concentration campaign-over-campaign predicated on an evidence bundle, but simultaneously declares that same evidence bundle unusable, making the causal chain internally false as stated. GROUNDED_IN: RECORD \"the record's evidence bundle is MALFORMED \u2014 the items carry identifier fragments and truncated titles only, no usable content\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'record evidence bundle is' (field: mechanism)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"the record's evidence bundle is MALFORMED \u2014 the items carry identifier fragments and truncated titles only, no usable content\"",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "BASELINE_EQUIVALENCE",
+    "verdict": "SURVIVE",
+    "basis": "The baseline performs no separation; the candidate adds a 150 mm hydrocyclone, so it is not equivalent. GROUNDED_IN: RECORD \"Intervention: one 150 mm hydrocyclone on the return line with automated underflow collection, backflushed at each roll change\""
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "verdict": "SURVIVE",
+    "basis": "A 150 mm hydrocyclone on a return line is physically realizable within the stated boundary conditions. GROUNDED_IN: RECORD \"Boundary conditions: return-line installation only; supply untouched; basin settling available\""
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "verdict": "ABSTAIN",
+    "basis": "The testable prediction specifies isokinetic particle counts on the return line, but the boundary condition explicitly constrains the intervention to the return line and forbids supply modification, leaving the basin-outlet measurement point undefined relative to the permitted instrumentation scope. GROUNDED_IN: RECORD \"Testable prediction: isokinetic particle counts on return and basin-outlet lines show 85 percent plus or minus 5 percent removal above 100 microns\" combined with RECORD \"Boundary conditions: return-line installation only; supply untouched; basin settling available\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['85', '5', '100']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'on the return line' (field: intervention)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['available', 'basin', 'installation', 'line']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"Testable prediction: isokinetic particle counts on return and basin-outlet lines show 85 percent plus or minus 5 percent removal above 100 microns\" combined with RECORD \"Boundary conditions: r",
+     "absence_ground": false
+    },
+    "demoted_from": "KILL",
+    "demotion_layer": "v3_accommodation",
+    "accommodation": {
+     "rule": "HEDGED_TARGET",
+     "match": "plus or minus 5 percent removal above 10",
+     "reason": "the contradicted target is a quantity the record itself hedges; an alternative derivation disputing a hedged value is an interpretive objection, not a demonstrable falsehood \u2014 the objection is preserved and escalated, the kill authority withdrawn"
+    }
+   }
+  ],
+  "intervention_suggestions": [
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "suggestion": "Replace the malformed evidence references [ev:frag-01] and [ev:frag-03] with complete hydraulic audit data containing actual figures to substantiate the campaign-over-campaign decay claim, because the current bundle is self-declared unusable. GROUNDED_IN: RECORD \"the record's evidence bundle is MALFORMED \u2014 the items carry identifier fragments and truncated titles only, no usable content\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "evidence",
+       "ground": "record id ev:frag-01",
+       "verified": true
+      },
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['01', '03']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'record evidence bundle is' (field: mechanism)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"the record's evidence bundle is MALFORMED \u2014 the items carry identifier fragments and truncated titles only, no usable content\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "suggestion": "Remove the basin-outlet line from the testable prediction or explicitly add basin-outlet instrumentation to the boundary conditions, because measuring there violates the return-line-only constraint as currently written. GROUNDED_IN: RECORD \"Testable prediction: isokinetic particle counts on return and basin-outlet lines show 85 percent plus or minus 5 percent removal above 100 microns\" and RECORD ",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['85', '5', '100']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'percent plus or minus' (field: testable_prediction)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['available', 'basin', 'installation', 'line']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"Testable prediction: isokinetic particle counts on return and basin-outlet lines show 85 percent plus or minus 5 percent removal above 100 microns\" and RECORD \"Boundary conditions: return-line",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   }
+  ],
+  "state": "ATTACK_RUN",
+  "overall": "KILLED",
+  "kill_basis": [
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "basis": "The candidate's mechanism claim asserts a continuous decay of recirculated concentration campaign-over-campaign predicated on an evidence bundle, but simultaneously declares that same evidence bundle unusable, making the causal chain internally false as stated. GROUNDED_IN: RECORD \"the record's evidence bundle is MALFORMED \u2014 the items carry identifier fragments and truncated titles only, no usable content\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'record evidence bundle is' (field: mechanism)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"the record's evidence bundle is MALFORMED \u2014 the items carry identifier fragments and truncated titles only, no usable content\"",
+     "absence_ground": false
+    }
+   }
+  ],
+  "counts": {
+   "KILL": 1,
+   "RISK": 1,
+   "SURVIVE": 3,
+   "ABSTAIN_DEMOTED": 1,
+   "INVALID": 0
+  }
+ }
+}

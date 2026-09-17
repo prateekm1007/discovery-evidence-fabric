@@ -1,0 +1,207 @@
+{
+ "attack": {
+  "attack_version": "independent_attack/3.0.0",
+  "candidate_id": "cal-19-tail-sized-sidestream-filter",
+  "generator_provider": null,
+  "attacker_provider": "xkiro",
+  "attacker_model": "qwen/qwen3.8-max:free",
+  "independence_mode": "SEPARATE_CONTEXT",
+  "independence_note": "the attacker ran in an independent reasoning context (fresh adversarial conversation, generator reasoning never shown; no alternative provider credentialed \u2014 disclosed, never claimed as provider separation)",
+  "prompt_hash": "fbae9897e234c2db068d3fcfddeeae9106b8f29b680165a139f21933eacf12be",
+  "output_hash": "d856378806146c244a1e9ea098bc23c74aa081d7838e48d82a907db8a39e200d",
+  "llm_status": "OK",
+  "attacked_at": "2026-09-17T07:50:05+00:00Z",
+  "items": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "verdict": "RISK",
+    "basis": "The candidate claims a 5x reduction in the 61 percent episode-driven clogging share but provides no mass-balance computation proving that boosting side-stream share from 10 to 25 percent yields sufficient capture velocity and residence time to achieve that factor; however, this is an unsupported performance claim rather than a demonstrable impossibility. GROUNDED_IN: RECORD \"episode-driven clogging suppressed (the 61 percent share reduced 5x)\" | COMPUTATION 25 percent side-stream flow divided by 10 percent baseline flow equals 2.5x hydraulic capacity increase, which does not deterministically "
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "verdict": "KILL",
+    "basis": "The candidate boundary condition explicitly forbids touching supply pressure, yet the intervention requires boosting side-stream share from 10 to 25 percent during episodes; drawing an additional 15 percent of total recirculation flow through the side-stream skid alters the system head-loss curve and necessarily changes the pressure distribution at the 14 bar supply header unless active compensation is applied, directly violating the stated boundary. GROUNDED_IN: SCOPE \"side-stream only (supply pressure untouched)\" | RECORD \"turbidity-triggered flow boost from 10 to 25 percent side-stream shar",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "evidence",
+       "ground": "bundle item '18-month suspended-solids load study: the load is HEAVY-TAILED \u2014 median 0.6 kg/h but P95 = 3.6 kg/h and P99 = 6.1 kg/h (episodic descaling-line failures dump 6x the median for 2-6 hours, 14 events recorded); average-sized filters blind and bypass during exactly these episodes' (strong overlap: during, episodes)",
+       "verified": true
+      },
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['10', '25', '15', '14', '10', '25']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'boost from 10 to' (field: mechanism)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['only', 'pressure', 'side', 'stream']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "SCOPE \"side-stream only (supply pressure untouched)\" | RECORD \"turbidity-triggered flow boost from 10 to 25 percent side-stream share\" | EVIDENCE [ev:sidestream-flow] \"Hydraulic audit of the recircula",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "verdict": "SURVIVE",
+    "basis": "The evidence bundle confirms the heavy-tailed load, the 61 percent episode contribution, and the 25 percent hydraulic availability; no internal contradiction exists between the held records and the candidate's sizing claims. GROUNDED_IN: EVIDENCE [ev:load-distribution], [ev:episode-clog], [ev:sidestream-flow] | RECORD \"sized on the MEASURED TAIL (P95 = 3.6 kg/h)\""
+   },
+   {
+    "attack_class": "BASELINE_EQUIVALENCE",
+    "verdict": "SURVIVE",
+    "basis": "The candidate introduces a turbidity-triggered variable-flow dual-media filtration skid, which is mechanically distinct from the un-invented standard status quo doing nothing new. GROUNDED_IN: RECORD \"side-stream filtration skid (dual media, sized at P95 load) with online turbidity trigger and a dump-response valve schedule\""
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "verdict": "SURVIVE",
+    "basis": "Installing the skid off-line during a roll change is a standard maintenance window procedure in hot-rolling mills and does not violate physical or operational constraints. GROUNDED_IN: RECORD \"installed off-line during a roll change\""
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "verdict": "KILL",
+    "basis": "The testable prediction requires logging loop turbidity below the \"bridging threshold,\" but the candidate never defines the numerical value, units, or measurement method for this threshold anywhere in its claims or evidence, making the prediction physically unverifiable as stated. GROUNDED_IN: RECORD \"loop turbidity at the header stays below the bridging threshold (logged)\" | COMPUTATION zero definitions of bridging threshold exist in the candidate text or evidence bundle",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'the bridging threshold logged' (field: testable_prediction)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"loop turbidity at the header stays below the bridging threshold (logged)\" | COMPUTATION zero definitions of bridging threshold exist in the candidate text or evidence bundle",
+     "absence_ground": false
+    }
+   }
+  ],
+  "intervention_suggestions": [
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "suggestion": "Replace the passive dump-response valve schedule with a closed-loop variable-frequency drive control on the side-stream booster pump that actively regulates extraction rate to maintain constant differential pressure across the main supply header, thereby satisfying the untouched-pressure boundary while achieving the 25 percent flow target. GROUNDED_IN: SCOPE \"side-stream only (supply pressure unto",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "evidence",
+       "ground": "bundle item 'Cross-reference of the 14 recorded high-load episodes with the nozzle clogging log: 61 percent of all campaign clogging events occur within 48 hours of a recorded descaling-dump episode' (strong overlap: dump, percent, with, within)",
+       "verified": true
+      },
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['25', '10', '25', '25']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'boost from 10 to' (field: mechanism)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['only', 'pressure', 'side', 'stream']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "SCOPE \"side-stream only (supply pressure untouched)\" | RECORD \"turbidity-triggered flow boost from 10 to 25 percent side-stream share\" | EVIDENCE [ev:sidestream-flow] \"Hydraulic audit of the recircula",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "suggestion": "Define the bridging threshold as a specific NTU value derived from the nozzle geometry and scale particle size distribution documented in the 18-month load study, and specify the sensor location relative to the header inlet so the logged data can be evaluated against a fixed numeric limit. GROUNDED_IN: RECORD \"loop turbidity at the header stays below the bridging threshold (logged)\" | EVIDENCE [ev",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "evidence",
+       "ground": "record id ev:load-distribution",
+       "verified": true
+      },
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['18', '18']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'the bridging threshold logged' (field: testable_prediction)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"loop turbidity at the header stays below the bridging threshold (logged)\" | EVIDENCE [ev:load-distribution] \"18-month suspended-solids load study\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   }
+  ],
+  "state": "ATTACK_RUN",
+  "overall": "KILLED",
+  "kill_basis": [
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "basis": "The candidate boundary condition explicitly forbids touching supply pressure, yet the intervention requires boosting side-stream share from 10 to 25 percent during episodes; drawing an additional 15 percent of total recirculation flow through the side-stream skid alters the system head-loss curve and necessarily changes the pressure distribution at the 14 bar supply header unless active compensation is applied, directly violating the stated boundary. GROUNDED_IN: SCOPE \"side-stream only (supply pressure untouched)\" | RECORD \"turbidity-triggered flow boost from 10 to 25 percent side-stream shar",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "evidence",
+       "ground": "bundle item '18-month suspended-solids load study: the load is HEAVY-TAILED \u2014 median 0.6 kg/h but P95 = 3.6 kg/h and P99 = 6.1 kg/h (episodic descaling-line failures dump 6x the median for 2-6 hours, 14 events recorded); average-sized filters blind and bypass during exactly these episodes' (strong overlap: during, episodes)",
+       "verified": true
+      },
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['10', '25', '15', '14', '10', '25']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'boost from 10 to' (field: mechanism)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['only', 'pressure', 'side', 'stream']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "SCOPE \"side-stream only (supply pressure untouched)\" | RECORD \"turbidity-triggered flow boost from 10 to 25 percent side-stream share\" | EVIDENCE [ev:sidestream-flow] \"Hydraulic audit of the recircula",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "basis": "The testable prediction requires logging loop turbidity below the \"bridging threshold,\" but the candidate never defines the numerical value, units, or measurement method for this threshold anywhere in its claims or evidence, making the prediction physically unverifiable as stated. GROUNDED_IN: RECORD \"loop turbidity at the header stays below the bridging threshold (logged)\" | COMPUTATION zero definitions of bridging threshold exist in the candidate text or evidence bundle",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'the bridging threshold logged' (field: testable_prediction)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"loop turbidity at the header stays below the bridging threshold (logged)\" | COMPUTATION zero definitions of bridging threshold exist in the candidate text or evidence bundle",
+     "absence_ground": false
+    }
+   }
+  ],
+  "counts": {
+   "KILL": 2,
+   "RISK": 1,
+   "SURVIVE": 3,
+   "ABSTAIN_DEMOTED": 0,
+   "INVALID": 0
+  }
+ }
+}

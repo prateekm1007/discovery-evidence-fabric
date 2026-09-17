@@ -1,0 +1,288 @@
+{
+ "attack": {
+  "attack_version": "independent_attack/3.0.0",
+  "candidate_id": "cal-02-ultrasonic-header",
+  "generator_provider": null,
+  "attacker_provider": "xkiro",
+  "attacker_model": "qwen/qwen3.8-max:free",
+  "independence_mode": "SEPARATE_CONTEXT",
+  "independence_note": "the attacker ran in an independent reasoning context (fresh adversarial conversation, generator reasoning never shown; no alternative provider credentialed \u2014 disclosed, never claimed as provider separation)",
+  "prompt_hash": "2d350fa08c50167f7949a97d51214a8ac7bc4a1acd8d6d5165a975656096c493",
+  "output_hash": "b4056532cf7a97661dd791f882185c4648a18c82a3709a641a0943ace1db5821",
+  "llm_status": "OK",
+  "attacked_at": "2026-09-17T04:27:56+00:00Z",
+  "items": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "verdict": "KILL",
+    "basis": "Acoustic cavitation micro-jetting requires the liquid static pressure to be at or below the vapor pressure for bubble formation and violent collapse; the candidate specifies 14 bar static pressure, which suppresses cavitation entirely, making the stated cleaning mechanism physically impossible. GROUNDED_IN: RECORD \"cavitation bubbles collapse at 40 kHz\" versus RECORD \"14 bar static pressure in the header\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['14', '40', '14']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'acoustic cavitation micro jetting' (field: mechanism)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['header', 'pressure', 'static']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"cavitation bubbles collapse at 40 kHz\" versus RECORD \"14 bar static pressure in the header\"",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "verdict": "KILL",
+    "basis": "The candidate specifies transducers rated to 10 bar differential while simultaneously declaring a 14 bar static pressure boundary condition inside the header, meaning the operating environment exceeds the component's declared rating by 4 bar. GROUNDED_IN: SCOPE \"transducers rated to 70 C and 10 bar differential\" violated by RECORD \"14 bar static pressure in the header\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['10', '14', '4', '70', '10', '14']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span '14 bar static pressure' (field: boundary_conditions)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['differential', 'header', 'pressure', 'rated']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "SCOPE \"transducers rated to 70 C and 10 bar differential\" violated by RECORD \"14 bar static pressure in the header\"",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "verdict": "SURVIVE",
+    "basis": "No evidence bundle is held; absence of evidence constitutes uncertainty, not a demonstrable contradiction within the candidate's own record. GROUNDED_IN: EVIDENCE (none held)"
+   },
+   {
+    "attack_class": "BASELINE_EQUIVALENCE",
+    "verdict": "SURVIVE",
+    "basis": "The candidate introduces six piezoelectric transducers and continuous 40 kHz acoustic excitation, which are structurally and operationally distinct from the un-invented standard baseline doing nothing new. GROUNDED_IN: RECORD \"six 40 kHz 600 W piezoelectric transducers welded to the header body\""
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "verdict": "KILL",
+    "basis": "The candidate claims piezoelectric transducers are \"welded to the header body\"; piezoelectric ceramics depolarize and fracture at welding temperatures exceeding their Curie point, making direct welding of the active element physically impossible without destroying the transducer. GROUNDED_IN: RECORD \"six 40 kHz 600 W piezoelectric transducers welded to the header body\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['40', '600']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'welded to the header' (field: intervention)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['header', 'transducers']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"six 40 kHz 600 W piezoelectric transducers welded to the header body\"",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "verdict": "RISK",
+    "basis": "The predicted effect of \"thermal-crown variation inside 6 microns\" lacks a defined measurement protocol, spatial resolution, or temporal averaging window, but this is an underspecification rather than a demonstrable falsehood in the record. GROUNDED_IN: RECORD \"thermal-crown variation inside 6 microns\""
+   }
+  ],
+  "intervention_suggestions": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "suggestion": "Reduce the local static pressure at the nozzle throat via a venturi constriction upstream of the transducer to drop the local pressure below the cavitation threshold, enabling bubble formation and collapse that the current 14 bar environment suppresses. GROUNDED_IN: RECORD \"cavitation bubbles collapse at 40 kHz\" versus RECORD \"14 bar static pressure in the header\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['14', '40', '14']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'cavitation bubbles collapse at' (field: mechanism)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['header', 'pressure', 'static']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"cavitation bubbles collapse at 40 kHz\" versus RECORD \"14 bar static pressure in the header\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "suggestion": "Replace the 10 bar differential-rated transducers with units rated to a minimum of 20 bar differential to provide adequate margin above the declared 14 bar static pressure boundary condition. GROUNDED_IN: SCOPE \"transducers rated to 70 C and 10 bar differential\" violated by RECORD \"14 bar static pressure in the header\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['10', '20', '14', '70', '10', '14']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span '14 bar static pressure' (field: boundary_conditions)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['differential', 'header', 'pressure', 'rated']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "SCOPE \"transducers rated to 70 C and 10 bar differential\" violated by RECORD \"14 bar static pressure in the header\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "suggestion": "Change the attachment method from welding to mechanical clamping or high-temperature epoxy bonding to preserve the piezoelectric crystal structure that welding destroys. GROUNDED_IN: RECORD \"six 40 kHz 600 W piezoelectric transducers welded to the header body\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['40', '600']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'welded to the header' (field: intervention)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['header', 'transducers']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"six 40 kHz 600 W piezoelectric transducers welded to the header body\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   }
+  ],
+  "state": "ATTACK_RUN",
+  "overall": "KILLED",
+  "kill_basis": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "basis": "Acoustic cavitation micro-jetting requires the liquid static pressure to be at or below the vapor pressure for bubble formation and violent collapse; the candidate specifies 14 bar static pressure, which suppresses cavitation entirely, making the stated cleaning mechanism physically impossible. GROUNDED_IN: RECORD \"cavitation bubbles collapse at 40 kHz\" versus RECORD \"14 bar static pressure in the header\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['14', '40', '14']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'acoustic cavitation micro jetting' (field: mechanism)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['header', 'pressure', 'static']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"cavitation bubbles collapse at 40 kHz\" versus RECORD \"14 bar static pressure in the header\"",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "basis": "The candidate specifies transducers rated to 10 bar differential while simultaneously declaring a 14 bar static pressure boundary condition inside the header, meaning the operating environment exceeds the component's declared rating by 4 bar. GROUNDED_IN: SCOPE \"transducers rated to 70 C and 10 bar differential\" violated by RECORD \"14 bar static pressure in the header\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['10', '14', '4', '70', '10', '14']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span '14 bar static pressure' (field: boundary_conditions)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['differential', 'header', 'pressure', 'rated']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "SCOPE \"transducers rated to 70 C and 10 bar differential\" violated by RECORD \"14 bar static pressure in the header\"",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "basis": "The candidate claims piezoelectric transducers are \"welded to the header body\"; piezoelectric ceramics depolarize and fracture at welding temperatures exceeding their Curie point, making direct welding of the active element physically impossible without destroying the transducer. GROUNDED_IN: RECORD \"six 40 kHz 600 W piezoelectric transducers welded to the header body\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['40', '600']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'welded to the header' (field: intervention)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['header', 'transducers']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"six 40 kHz 600 W piezoelectric transducers welded to the header body\"",
+     "absence_ground": false
+    }
+   }
+  ],
+  "counts": {
+   "KILL": 3,
+   "RISK": 1,
+   "SURVIVE": 2,
+   "ABSTAIN_DEMOTED": 0,
+   "INVALID": 0
+  }
+ }
+}

@@ -1,0 +1,289 @@
+{
+ "attack": {
+  "attack_version": "independent_attack/3.0.0",
+  "candidate_id": "cal-04-ai-monitoring-program",
+  "generator_provider": null,
+  "attacker_provider": "xkiro",
+  "attacker_model": "qwen/qwen3.8-max:free",
+  "independence_mode": "SEPARATE_CONTEXT",
+  "independence_note": "the attacker ran in an independent reasoning context (fresh adversarial conversation, generator reasoning never shown; no alternative provider credentialed \u2014 disclosed, never claimed as provider separation)",
+  "prompt_hash": "d81f7faa53e063086ee2aee9a46bd50abab624e3da35eb3f66bf53920ba1e2c0",
+  "output_hash": "09b25bddf1658c3d5e9d589045f666ab52abf9600d0d5ce12fcb80c168781817",
+  "llm_status": "OK",
+  "attacked_at": "2026-09-17T04:40:44+00:00Z",
+  "items": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "verdict": "KILL",
+    "basis": "The candidate claims to eliminate late-campaign crown excursions but explicitly predicts thermal-crown variation stays at 28 microns late-campaign, which exceeds the problem's required 12 micron band; prediction without actuation change cannot alter the physical outcome. GROUNDED_IN: RECORD \"thermal-crown variation stays at 28 microns late-campaign (same as today)\" compared against COMPUTATION 28 microns > 12 micron band",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['28', '12', '28', '28', '12']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'late campaign crown excursions' (field: mechanism)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['change', 'same']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"thermal-crown variation stays at 28 microns late-campaign (same as today)\" compared against COMPUTATION 28 microns > 12 micron band",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "verdict": "SURVIVE",
+    "basis": "The candidate explicitly constrains itself to the same cleaning schedule, no water-treatment change, and no hardware change to nozzles, remaining within declared scope. GROUNDED_IN: RECORD \"same cleaning schedule as the baseline; no water-treatment change; no hardware change to nozzles\""
+   },
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "verdict": "ABSTAIN",
+    "basis": "The mechanism claims to eliminate late-campaign crown excursions while the predicted effect states clogging events per campaign stay at approximately 4 and thermal-crown variation stays at 28 microns, a direct internal contradiction between claimed capability and claimed outcome. GROUNDED_IN: RECORD \"eliminating unnecessary cleaning and the late-campaign crown excursions\" contradicts RECORD \"clogging events per campaign stay at approximately 4... thermal-crown variation stays at 28 microns late-campaign (same as today)\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['4', '28', '4', '28']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'eliminating unnecessary cleaning and' (field: mechanism)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['cleaning', 'same']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"eliminating unnecessary cleaning and the late-campaign crown excursions\" contradicts RECORD \"clogging events per campaign stay at approximately 4... thermal-crown variation stays at 28 microns",
+     "absence_ground": false
+    },
+    "demoted_from": "KILL",
+    "demotion_layer": "v3_accommodation",
+    "accommodation": {
+     "rule": "HEDGED_TARGET",
+     "match": "approximately 4 and thermal-crown variat",
+     "reason": "the contradicted target is a quantity the record itself hedges; an alternative derivation disputing a hedged value is an interpretive objection, not a demonstrable falsehood \u2014 the objection is preserved and escalated, the kill authority withdrawn"
+    }
+   },
+   {
+    "attack_class": "BASELINE_EQUIVALENCE",
+    "verdict": "ABSTAIN",
+    "basis": "The candidate predicts identical performance to the status quo on every problem metric: 4 clogs per campaign, 28 microns thermal-crown variation, and 45 minutes roll-change downtime, meaning it fails to beat the un-invented standard it must improve upon. GROUNDED_IN: RECORD \"clogging events per campaign stay at approximately 4... thermal-crown variation stays at 28 microns late-campaign (same as today); roll-change downtime unchanged at 45 minutes\" compared against COMPUTATION delta = 0 across all three failure metrics",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['4', '28', '45', '4', '28', '45']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'roll change downtime unchanged' (field: predicted_effect)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['change', 'same']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"clogging events per campaign stay at approximately 4... thermal-crown variation stays at 28 microns late-campaign (same as today); roll-change downtime unchanged at 45 minutes\" compared agains",
+     "absence_ground": false
+    },
+    "demoted_from": "KILL",
+    "demotion_layer": "v3_accommodation",
+    "accommodation": {
+     "rule": "HEDGED_TARGET",
+     "match": "approximately 4... thermal-crown variati",
+     "reason": "the contradicted target is a quantity the record itself hedges; an alternative derivation disputing a hedged value is an interpretive objection, not a demonstrable falsehood \u2014 the objection is preserved and escalated, the kill authority withdrawn"
+    }
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "verdict": "RISK",
+    "basis": "Per-segment pressure sensors in a 32-38 C recirculated scale-laden water header face severe fouling, but the candidate discloses sensor drift as a known failure mode rather than claiming impossibility. GROUNDED_IN: RECORD \"sensor drift in the header environment\""
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "verdict": "ABSTAIN",
+    "basis": "The testable prediction requires measuring whether the platform flags clogs \"at least one shift before the operator would notice them,\" but the operator-notice time is an undefined counterfactual with no measurement protocol specified. GROUNDED_IN: RECORD \"the platform flags 85 percent of clogs at least one shift before the operator would notice them\"",
+    "grounding": {
+     "grounded": false,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'one shift before the' (field: testable_prediction)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"the platform flags 85 percent of clogs at least one shift before the operator would notice them\"",
+     "absence_ground": true,
+     "demotion_reason": "the asserted ground is an ABSENCE of evidence/support \u2014 absence is uncertainty, not failure (Art. XXI.3/XXV); the objection is preserved and escalated, never executed as a kill"
+    },
+    "demoted_from": "KILL",
+    "demotion_layer": "v2_grounding"
+   }
+  ],
+  "intervention_suggestions": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "suggestion": "Change the intervention from dashboard-only ranking to automated solenoid-valve flushing triggered by the prediction horizon variable, because ranking inspection priority at a fixed 120-hour cadence cannot physically prevent the 28-micron crown excursion that the mechanism falsely claims to eliminate. GROUNDED_IN: RECORD \"thermal-crown variation stays at 28 microns late-campaign (same as today)\" a",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['120', '28', '28', '120']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'cleaning continues at the' (field: intervention)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['change', 'cleaning', 'same']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"thermal-crown variation stays at 28 microns late-campaign (same as today)\" and RECORD \"cleaning continues at the same planned roll-change cadence (~120 hours)\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "suggestion": "Remove the claim \"eliminating... the late-campaign crown excursions\" or change the predicted effect to show thermal-crown variation dropping below 12 microns, because the current record simultaneously asserts elimination of excursions and persistence of 28-micron variation. GROUNDED_IN: RECORD \"eliminating unnecessary cleaning and the late-campaign crown excursions\" contradicts RECORD \"thermal-cro",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['12', '28', '28']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'eliminating unnecessary cleaning and' (field: mechanism)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['change', 'cleaning', 'same']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"eliminating unnecessary cleaning and the late-campaign crown excursions\" contradicts RECORD \"thermal-crown variation stays at 28 microns late-campaign (same as today)\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "BASELINE_EQUIVALENCE",
+    "suggestion": "Change the boundary condition \"same cleaning schedule as the baseline\" to allow predictive early cleaning of flagged segments between roll changes, because maintaining identical clog counts, crown variation, and downtime yields zero improvement over the un-invented standard. GROUNDED_IN: RECORD \"clogging events per campaign stay at approximately 4... thermal-crown variation stays at 28 microns lat",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['4', '28', '45']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'roll change downtime unchanged' (field: predicted_effect)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['baseline', 'change', 'cleaning', 'same']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"clogging events per campaign stay at approximately 4... thermal-crown variation stays at 28 microns late-campaign (same as today); roll-change downtime unchanged at 45 minutes\" and SCOPE \"same",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "suggestion": "Replace the subjective counterfactual \"before the operator would notice them\" with a deterministic physical threshold such as \"before segment flow deviation exceeds 5 percent,\" because operator-notice latency has no defined measurement basis in the record. GROUNDED_IN: RECORD \"the platform flags 85 percent of clogs at least one shift before the operator would notice them\"",
+    "grounding": {
+     "grounded": false,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['5', '85']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'one shift before the' (field: testable_prediction)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"the platform flags 85 percent of clogs at least one shift before the operator would notice them\"",
+     "absence_ground": true,
+     "demotion_reason": "the asserted ground is an ABSENCE of evidence/support \u2014 absence is uncertainty, not failure (Art. XXI.3/XXV); the objection is preserved and escalated, never executed as a kill"
+    },
+    "class": "UNGROUND_SUGGESTION",
+    "authority": "NONE \u2014 an ungrounded suggestion is preserved for human/escalation review and NEVER enters the hypothesis space (R450 \u00a710: the attacker does not get authority to invent causal explanations)"
+   }
+  ],
+  "state": "ATTACK_RUN",
+  "overall": "KILLED",
+  "kill_basis": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "basis": "The candidate claims to eliminate late-campaign crown excursions but explicitly predicts thermal-crown variation stays at 28 microns late-campaign, which exceeds the problem's required 12 micron band; prediction without actuation change cannot alter the physical outcome. GROUNDED_IN: RECORD \"thermal-crown variation stays at 28 microns late-campaign (same as today)\" compared against COMPUTATION 28 microns > 12 micron band",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['28', '12', '28', '28', '12']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'late campaign crown excursions' (field: mechanism)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['change', 'same']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"thermal-crown variation stays at 28 microns late-campaign (same as today)\" compared against COMPUTATION 28 microns > 12 micron band",
+     "absence_ground": false
+    }
+   }
+  ],
+  "counts": {
+   "KILL": 1,
+   "RISK": 1,
+   "SURVIVE": 1,
+   "ABSTAIN_DEMOTED": 3,
+   "INVALID": 0
+  }
+ }
+}

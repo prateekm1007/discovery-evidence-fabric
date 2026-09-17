@@ -1,0 +1,284 @@
+{
+ "attack": {
+  "attack_version": "independent_attack/3.0.0",
+  "candidate_id": "cal-12-standby-nozzle-manifold",
+  "generator_provider": null,
+  "attacker_provider": "xkiro",
+  "attacker_model": "qwen/qwen3.8-max:free",
+  "independence_mode": "SEPARATE_CONTEXT",
+  "independence_note": "the attacker ran in an independent reasoning context (fresh adversarial conversation, generator reasoning never shown; no alternative provider credentialed \u2014 disclosed, never claimed as provider separation)",
+  "prompt_hash": "b4e8e5ff4ac2de4c0c28f048ccd489cd34f3ab147e2e485d8e0e305a2e112c94",
+  "output_hash": "af3dbc8a0383f093e4d5c8f2b64bc28b2094f058b12620646702ddac1707ef0d",
+  "llm_status": "OK",
+  "attacked_at": "2026-09-17T08:30:42+00:00Z",
+  "items": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "verdict": "KILL",
+    "basis": "The candidate claims clogging events reaching the strip fall to zero because every bridge is bypassed in-service, but its own boundary condition explicitly states one standby per position and a simultaneous double failure is out of scope; progressive scale accumulation in 14 bar recirculated water will inevitably saturate both primary and single standby at a given position, producing an un-bypassable clog that reaches the strip, directly falsifying the zero-claim. GROUNDED_IN: RECORD \"clogging events reaching the strip fall to zero (every bridge is bypassed in-service)\" contradicted by RECORD ",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'fall to zero every' (field: predicted_effect)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['cleaning', 'double', 'floor', 'handled']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"clogging events reaching the strip fall to zero (every bridge is bypassed in-service)\" contradicted by RECORD \"one standby per position (a simultaneous double failure is out of scope, handled ",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "verdict": "KILL",
+    "basis": "The candidate's absolute claim that clogging events reaching the strip fall to zero is logically incompatible with its own declared boundary condition that a simultaneous double failure is out of scope; if double failures are out of scope they are not prevented by the mechanism, therefore clogging events from double failures reach the strip, making the zero-claim false within the candidate's own stated boundaries. GROUNDED_IN: RECORD \"clogging events reaching the strip fall to zero\" violates SCOPE \"one standby per position (a simultaneous double failure is out of scope, handled by the schedule",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'strip fall to zero' (field: predicted_effect)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['cleaning', 'double', 'floor', 'handled']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"clogging events reaching the strip fall to zero\" violates SCOPE \"one standby per position (a simultaneous double failure is out of scope, handled by the scheduled cleaning floor)\"",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "verdict": "KILL",
+    "basis": "The predicted effect asserts clogging events reaching the strip fall to zero while simultaneously asserting cleaning consolidates into the annual overhaul, but the boundary conditions explicitly state a simultaneous double failure is handled by the scheduled cleaning floor; relying on periodic cleaning to resolve double failures means clogging events are not reduced to zero between those scheduled cleanings, creating an internal contradiction in the candidate's own record. GROUNDED_IN: RECORD \"clogging events reaching the strip fall to zero\" contradicted by RECORD \"one standby per position (a ",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'strip fall to zero' (field: predicted_effect)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['cleaning', 'double', 'floor', 'handled']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"clogging events reaching the strip fall to zero\" contradicted by RECORD \"one standby per position (a simultaneous double failure is out of scope, handled by the scheduled cleaning floor)\"",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "BASELINE_EQUIVALENCE",
+    "verdict": "SURVIVE",
+    "basis": "The dual-manifold block with per-position dP sensing and fast three-way valve switching introduces active redundancy absent from the status quo 120 flat-fan spray nozzle baseline. GROUNDED_IN: RECORD \"dual-manifold nozzle blocks with per-position dP sensing and fast-redundancy valves\""
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "verdict": "RISK",
+    "basis": "Phasing dual-manifold blocks over three planned roll changes requires physically replacing the existing supply header feeding 120 nozzles without a mill stop; while the candidate claims no mill stop is required, the mechanical integration of 120 new dP sensors and fast three-way valves during live rolling operations presents severe spatial and hydraulic interference risks that are not resolved in the record. GROUNDED_IN: RECORD \"phased in over three planned roll changes (no mill stop)\""
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "verdict": "RISK",
+    "basis": "The testable prediction specifies injected partial blockages are bypassed within 0.4 s each with measured crown perturbation below 2 microns per event, but does not define the injection method, the percentage of throat area blocked, or the sensor resolution required to isolate a 2 micron transient from the baseline 12 micron band noise during live production. GROUNDED_IN: RECORD \"injected partial blockages during a production campaign are bypassed within 0.4 s each, with measured crown perturbation below 2 microns per event\""
+   }
+  ],
+  "intervention_suggestions": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "suggestion": "Change the variable from one standby per position to N standbys per position where N is calculated from the scale particle loading rate such that the probability of exhausting all twins before the annual overhaul is bounded below the acceptable defect rate, eliminating the contradiction between the zero-clog claim and the out-of-scope double failure. GROUNDED_IN: RECORD \"one standby per position (",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'by the scheduled cleaning' (field: boundary_conditions)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['cleaning', 'double', 'floor', 'handled']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"one standby per position (a simultaneous double failure is out of scope, handled by the scheduled cleaning floor)\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "suggestion": "Revise the predicted effect from clogging events reaching the strip fall to zero to a probabilistic reduction bounded by the mean time between double failures, aligning the performance claim with the declared boundary condition that simultaneous double failures remain out of scope. GROUNDED_IN: RECORD \"clogging events reaching the strip fall to zero\" and SCOPE \"one standby per position (a simultan",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'strip fall to zero' (field: predicted_effect)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['double', 'position', 'scope', 'simultaneous']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"clogging events reaching the strip fall to zero\" and SCOPE \"one standby per position (a simultaneous double failure is out of scope)\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "suggestion": "Reconcile the cleaning consolidation claim by defining the maximum allowable interval between scheduled cleanings as a function of the measured scale accumulation rate, ensuring the interval is short enough that double failures do not occur, thereby preserving the zero-clog claim without contradicting the reliance on the cleaning floor. GROUNDED_IN: RECORD \"cleaning consolidates into the annual ov",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'into the annual overhaul' (field: predicted_effect)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['cleaning', 'double', 'floor', 'handled']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"cleaning consolidates into the annual overhaul\" contradicted by RECORD \"handled by the scheduled cleaning floor\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "suggestion": "Define the exact manifold footprint envelope and hydraulic decoupling sequence per roll change, proving that the physical swap of 40 nozzle positions per phase fits within the spatial constraints of the existing header geometry without requiring a mill stop. GROUNDED_IN: RECORD \"phased in over three planned roll changes (no mill stop)\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'three planned roll changes' (field: intervention)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"phased in over three planned roll changes (no mill stop)\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "suggestion": "Specify the injected partial blockage as a defined percentage of throat area reduction and mandate a crown measurement sensor resolution below 0.5 microns with a defined signal-to-noise ratio against the 12 micron band to make the sub-2 micron testable prediction verifiable. GROUNDED_IN: RECORD \"measured crown perturbation below 2 microns per event\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['0.5', '12', '2', '2']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'the 12 micron band' (field: mechanism)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"measured crown perturbation below 2 microns per event\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   }
+  ],
+  "state": "ATTACK_RUN",
+  "overall": "KILLED",
+  "kill_basis": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "basis": "The candidate claims clogging events reaching the strip fall to zero because every bridge is bypassed in-service, but its own boundary condition explicitly states one standby per position and a simultaneous double failure is out of scope; progressive scale accumulation in 14 bar recirculated water will inevitably saturate both primary and single standby at a given position, producing an un-bypassable clog that reaches the strip, directly falsifying the zero-claim. GROUNDED_IN: RECORD \"clogging events reaching the strip fall to zero (every bridge is bypassed in-service)\" contradicted by RECORD ",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'fall to zero every' (field: predicted_effect)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['cleaning', 'double', 'floor', 'handled']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"clogging events reaching the strip fall to zero (every bridge is bypassed in-service)\" contradicted by RECORD \"one standby per position (a simultaneous double failure is out of scope, handled ",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "basis": "The candidate's absolute claim that clogging events reaching the strip fall to zero is logically incompatible with its own declared boundary condition that a simultaneous double failure is out of scope; if double failures are out of scope they are not prevented by the mechanism, therefore clogging events from double failures reach the strip, making the zero-claim false within the candidate's own stated boundaries. GROUNDED_IN: RECORD \"clogging events reaching the strip fall to zero\" violates SCOPE \"one standby per position (a simultaneous double failure is out of scope, handled by the schedule",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'strip fall to zero' (field: predicted_effect)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['cleaning', 'double', 'floor', 'handled']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"clogging events reaching the strip fall to zero\" violates SCOPE \"one standby per position (a simultaneous double failure is out of scope, handled by the scheduled cleaning floor)\"",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "basis": "The predicted effect asserts clogging events reaching the strip fall to zero while simultaneously asserting cleaning consolidates into the annual overhaul, but the boundary conditions explicitly state a simultaneous double failure is handled by the scheduled cleaning floor; relying on periodic cleaning to resolve double failures means clogging events are not reduced to zero between those scheduled cleanings, creating an internal contradiction in the candidate's own record. GROUNDED_IN: RECORD \"clogging events reaching the strip fall to zero\" contradicted by RECORD \"one standby per position (a ",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'strip fall to zero' (field: predicted_effect)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['cleaning', 'double', 'floor', 'handled']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"clogging events reaching the strip fall to zero\" contradicted by RECORD \"one standby per position (a simultaneous double failure is out of scope, handled by the scheduled cleaning floor)\"",
+     "absence_ground": false
+    }
+   }
+  ],
+  "counts": {
+   "KILL": 3,
+   "RISK": 2,
+   "SURVIVE": 1,
+   "ABSTAIN_DEMOTED": 0,
+   "INVALID": 0
+  }
+ }
+}

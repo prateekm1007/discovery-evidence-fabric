@@ -1,0 +1,122 @@
+{
+ "attack": {
+  "attack_version": "independent_attack/3.0.0",
+  "candidate_id": "cal-22-thin-record-biocide",
+  "generator_provider": null,
+  "attacker_provider": "xkiro",
+  "attacker_model": "qwen/qwen3.8-max:free",
+  "independence_mode": "SEPARATE_CONTEXT",
+  "independence_note": "the attacker ran in an independent reasoning context (fresh adversarial conversation, generator reasoning never shown; no alternative provider credentialed \u2014 disclosed, never claimed as provider separation)",
+  "prompt_hash": "3565a7442eeac9064c3a23ede84882c34e6a8b08549ae05b0f8271cd1372acfc",
+  "output_hash": "681ee7c0458788c5e7f2b9d230e4bd6caefae430f3b4247bbafdea547d8c1691",
+  "llm_status": "OK",
+  "attacked_at": "2026-09-17T08:20:45+00:00Z",
+  "items": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "verdict": "RISK",
+    "basis": "The candidate proposes a biological intervention (biocide and dispersant) to control the biofilm share of clogging but explicitly fails to claim any failure modes for this chemistry class operating in a 32-38 C recirculated loop carrying steel scale particles, leaving the interaction between oxidized organics and particulate unaddressed. GROUNDED_IN: RECORD \"Known failure modes (claimed by the generator): (none claimed)\""
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "verdict": "RISK",
+    "basis": "The boundary condition requires dosing inside the existing discharge permit, but continuous 0.3 ppm actinic biocide with weekly 8 ppm dispersant slugs introduces persistent oxidizing residuals into the recirculation blowdown stream without demonstrating that these specific concentrations satisfy the existing permit limits. GROUNDED_IN: RECORD \"dosing inside the existing discharge permit\""
+   },
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "verdict": "SURVIVE",
+    "basis": "No evidence bundle is held, therefore no internal contradiction between evidence records can be demonstrated. GROUNDED_IN: EVIDENCE (none held)"
+   },
+   {
+    "attack_class": "BASELINE_EQUIVALENCE",
+    "verdict": "SURVIVE",
+    "basis": "The candidate predicts total clogging events falling from 2.9 to approximately 1.4 per campaign, which is a quantified reduction against the baseline status quo doing nothing new. GROUNDED_IN: COMPUTATION 2.9 baseline events versus 1.4 predicted events"
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "verdict": "SURVIVE",
+    "basis": "Installing a dosing skid on an existing recirculation loop with ORP control does not contradict the stated boundary condition of no mill stop, as tie-ins can be executed during scheduled downtime or via hot-tap methods consistent with the constraint. GROUNDED_IN: RECORD \"no mill stop\""
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "verdict": "RISK",
+    "basis": "The testable prediction relies on monthly header-wall swab cultures showing a 2-order CFU reduction, but header-wall swabs sample the supply pipe surface rather than the internal geometry of the 120 flat-fan spray nozzles where the actual clogging failure occurs, creating a spatial mismatch between the measurement proxy and the failure site. GROUNDED_IN: RECORD \"monthly header-wall swab cultures show a 2-order CFU reduction\" compared to RECORD \"progressive nozzle clogging from scale particles and biological growth\""
+   }
+  ],
+  "intervention_suggestions": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "suggestion": "Add a defined failure mode analysis addressing the co-precipitation of oxidized biological matter with iron oxide scale particles at 32-38 C, because the current record claims zero failure modes for a dual-contaminant system. GROUNDED_IN: RECORD \"Known failure modes (claimed by the generator): (none claimed)\"",
+    "grounding": {
+     "grounded": false,
+     "bindings": [],
+     "claimed_ground": "RECORD \"Known failure modes (claimed by the generator): (none claimed)\"",
+     "absence_ground": false,
+     "demotion_reason": "no evidence / computation / record / declared-scope binding found in the kill basis \u2014 a bare assertion carries no verdict authority (Art. XVIII); the objection is preserved and escalated"
+    },
+    "class": "UNGROUND_SUGGESTION",
+    "authority": "NONE \u2014 an ungrounded suggestion is preserved for human/escalation review and NEVER enters the hypothesis space (R450 \u00a710: the attacker does not get authority to invent causal explanations)"
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "suggestion": "Specify the exact maximum allowable oxidizer residual concentration dictated by the existing discharge permit and demonstrate mathematically that the continuous 0.3 ppm plus 8 ppm slug profile remains below that threshold during blowdown events. GROUNDED_IN: RECORD \"dosing inside the existing discharge permit\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['0.3', '8']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'the existing discharge permit' (field: boundary_conditions)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['discharge', 'dosing', 'existing', 'inside']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"dosing inside the existing discharge permit\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "suggestion": "Replace or supplement header-wall swab cultures with direct nozzle coupon sampling or inline particle counters positioned immediately upstream of the 120 flat-fan nozzles, because header-wall measurements do not bound the biological load entering the nozzle orifices. GROUNDED_IN: RECORD \"monthly header-wall swab cultures show a 2-order CFU reduction\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['120', '2']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'show order cfu reduction' (field: testable_prediction)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"monthly header-wall swab cultures show a 2-order CFU reduction\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   }
+  ],
+  "state": "ATTACK_RUN",
+  "overall": "UNCERTAIN",
+  "counts": {
+   "KILL": 0,
+   "RISK": 3,
+   "SURVIVE": 3,
+   "ABSTAIN_DEMOTED": 0,
+   "INVALID": 0
+  }
+ }
+}

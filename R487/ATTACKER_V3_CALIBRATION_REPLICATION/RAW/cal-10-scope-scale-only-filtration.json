@@ -1,0 +1,182 @@
+{
+ "attack": {
+  "attack_version": "independent_attack/3.0.0",
+  "candidate_id": "cal-10-scale-scoped-cascade",
+  "generator_provider": null,
+  "attacker_provider": "xkiro",
+  "attacker_model": "qwen/qwen3.8-max:free",
+  "independence_mode": "SEPARATE_CONTEXT",
+  "independence_note": "the attacker ran in an independent reasoning context (fresh adversarial conversation, generator reasoning never shown; no alternative provider credentialed \u2014 disclosed, never claimed as provider separation)",
+  "prompt_hash": "00bedae09416862a65aae0914a811d55c467ea8c2102c95fc6d63ebb3405e40d",
+  "output_hash": "59cf8f0bdc70e5a62af494cd0222d1b2853f0e88628f500111e5da9686804d42",
+  "llm_status": "OK",
+  "attacked_at": "2026-09-17T05:42:05+00:00Z",
+  "items": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "verdict": "RISK",
+    "basis": "The candidate claims removal of \"scale particles above 120 microns\" and an \"8x\" reduction in scale-particle-driven clogging, but flat-fan spray nozzles on hot-rolling mills typically have internal slot dimensions smaller than 120 microns; particles between the nozzle slot width and 120 microns pass the cascade unfiltered and cause blockage, meaning the 120-micron second stage does not physically bound the mechanism to the stated effect. GROUNDED_IN: RECORD \"a two-stage wedge-wire cascade (300 then 120 micron) on the header supply removes scale particles above 120 microns before they reach the "
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "verdict": "SURVIVE",
+    "basis": "The candidate explicitly declares biofilm clogging out of scope and confines the intervention boundary to scale-particle clogging above 120 microns at 13-15 bar supply, which is internally consistent with its own stated limits. GROUNDED_IN: RECORD \"the intervention explicitly targets SCALE-PARTICLE clogging only \u2014 biofilm clogging is declared OUT OF SCOPE\""
+   },
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "verdict": "KILL",
+    "basis": "The predicted effect states total campaign clogging events fall from 4.1 to approximately 3.3, a delta of 0.8 events, while simultaneously claiming that the scale-particle share constituting 12 percent of measured blockages is reduced 8x; if scale blockages are 12 percent of 4.1 total events (0.492 events), an 8x reduction eliminates 0.4305 events, leaving 3.6695 total events, not 3.3\u2014the arithmetic of the candidate's own numbers is false as stated. GROUNDED_IN: COMPUTATION 4.1 - (0.12 * 4.1 * (7/8)) = 3.6695 versus claimed 3.3",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['4.1', '3.3', '0.8', '12', '8', '12']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'events fall from to' (field: predicted_effect)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['clogging', 'particle', 'scale']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "COMPUTATION 4.1 - (0.12 * 4.1 * (7/8)) = 3.6695 versus claimed 3.3",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "BASELINE_EQUIVALENCE",
+    "verdict": "SURVIVE",
+    "basis": "The candidate modifies the baseline by inserting a two-stage wedge-wire cascade with dP-triggered backflush into the 150 mm header supply, which is a distinct physical addition to the status quo system doing nothing new. GROUNDED_IN: RECORD \"two-stage wedge-wire cascade with dP transmitters and automatic backflush valves on the 150 mm header supply\""
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "verdict": "RISK",
+    "basis": "The candidate asserts \"no mill stop for installation (flanged spool swap during planned roll change)\" but provides no dimensional confirmation that a two-stage wedge-wire cascade sized for full design flow of 120 nozzles at 14 bar fits within the existing spatial envelope of the 150 mm header supply for a direct flanged spool swap. GROUNDED_IN: RECORD \"sized for full design flow\" and RECORD \"no mill stop for installation (flanged spool swap during planned roll change)\""
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "verdict": "RISK",
+    "basis": "The testable prediction relies on \"removed-nozzle analysis over two campaigns\" to separate scale-particle blockages from biofilm blockages, but defines no analytical protocol or threshold to distinguish a pure scale particle from a bridging nucleus embedded in biological matrix once extracted from the nozzle. GROUNDED_IN: RECORD \"removed-nozzle analysis over two campaigns shows scale-particle blockages reduced 8x while biofilm blockage counts are statistically unchanged\""
+   }
+  ],
+  "intervention_suggestions": [
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "suggestion": "Correct the arithmetic by either revising the total event reduction target from 3.3 to 3.67 to match the 8x reduction of the 12 percent scale share, or increase the claimed scale-particle baseline share so that an 8x reduction mathematically yields the 0.8-event delta required to reach 3.3 total events. GROUNDED_IN: COMPUTATION 4.1 - (0.12 * 4.1 * (7/8)) = 3.6695 versus claimed 3.3",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['3.3', '3.67', '8', '12', '8', '0.8']",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['particle', 'scale']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "COMPUTATION 4.1 - (0.12 * 4.1 * (7/8)) = 3.6695 versus claimed 3.3",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "suggestion": "Specify the maximum outer diameter and axial length of the assembled two-stage cascade spool piece and bind it against the measured clearance envelope between existing flanges on the 150 mm header to prove the swap is physically executable during a roll change. GROUNDED_IN: RECORD \"no mill stop for installation (flanged spool swap during planned roll change)\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'the 150 mm header' (field: intervention)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['change', 'during', 'existing', 'flanged']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"no mill stop for installation (flanged spool swap during planned roll change)\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "suggestion": "Define a specific analytical method such as SEM-EDS or optical microscopy with a stated particle-size threshold to classify each removed-nozzle blockage as scale or biofilm, binding the measurement protocol to the same 120-micron boundary used in the mechanism. GROUNDED_IN: RECORD \"removed-nozzle analysis over two campaigns shows scale-particle blockages reduced 8x while biofilm blockage counts ar",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['120', '8']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'reduced 8x while biofilm' (field: testable_prediction)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['biofilm', 'particle', 'scale']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"removed-nozzle analysis over two campaigns shows scale-particle blockages reduced 8x while biofilm blockage counts are statistically unchanged\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   }
+  ],
+  "state": "ATTACK_RUN",
+  "overall": "KILLED",
+  "kill_basis": [
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "basis": "The predicted effect states total campaign clogging events fall from 4.1 to approximately 3.3, a delta of 0.8 events, while simultaneously claiming that the scale-particle share constituting 12 percent of measured blockages is reduced 8x; if scale blockages are 12 percent of 4.1 total events (0.492 events), an 8x reduction eliminates 0.4305 events, leaving 3.6695 total events, not 3.3\u2014the arithmetic of the candidate's own numbers is false as stated. GROUNDED_IN: COMPUTATION 4.1 - (0.12 * 4.1 * (7/8)) = 3.6695 versus claimed 3.3",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['4.1', '3.3', '0.8', '12', '8', '12']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'events fall from to' (field: predicted_effect)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['clogging', 'particle', 'scale']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "COMPUTATION 4.1 - (0.12 * 4.1 * (7/8)) = 3.6695 versus claimed 3.3",
+     "absence_ground": false
+    }
+   }
+  ],
+  "counts": {
+   "KILL": 1,
+   "RISK": 3,
+   "SURVIVE": 2,
+   "ABSTAIN_DEMOTED": 0,
+   "INVALID": 0
+  }
+ }
+}

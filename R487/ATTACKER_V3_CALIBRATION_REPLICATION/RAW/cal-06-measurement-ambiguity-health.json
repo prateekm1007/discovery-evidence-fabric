@@ -1,0 +1,336 @@
+{
+ "attack": {
+  "attack_version": "independent_attack/3.0.0",
+  "candidate_id": "cal-06-swirl-vortex-nozzles",
+  "generator_provider": null,
+  "attacker_provider": "atria",
+  "attacker_model": "Atria-Dawn-Preview",
+  "independence_mode": "SEPARATE_CONTEXT",
+  "independence_note": "the attacker ran in an independent reasoning context (fresh adversarial conversation, generator reasoning never shown; no alternative provider credentialed \u2014 disclosed, never claimed as provider separation)",
+  "prompt_hash": "85310895e5706e6ad0c8584b0175046c4a771d3ea100106b13e2e0ecb19e407d",
+  "output_hash": "71fa062a00edd3b61b330aef4a4e98a41e783d6fe229495f1019853fc7b50240",
+  "llm_status": "OK",
+  "attacked_at": "2026-09-17T04:50:51+00:00Z",
+  "items": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "verdict": "KILL",
+    "basis": "the stated physics is inverted: in a rotating vortex flow, centrifugal force acts on denser scale particles radially OUTWARD, i.e. toward the swirl-chamber/throat wall, which is exactly where clogging deposits form; the record asserts the opposite (\"centrifuges particles away from the throat wall\"), so as described the mechanism would concentrate foulant at the wall, not clear it. A hollow-cone swirl nozzle in fact puts the liquid film (and entrained solids) on the wall with an air core at the center. GROUNDED_IN: RECORD \"the swirling flow centrifuges particles away from the throat wall and en",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'particles away from the' (field: mechanism)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['flow', 'nozzle']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"the swirling flow centrifuges particles away from the throat wall and enriches the spray's cooling wellness\" | SCOPE failure driven by \"scale particles and biological growth in the recirculate",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "verdict": "KILL",
+    "basis": "the boundary conditions fix every variable that sets heat-removal capacity: same header 14 bar, same nominal flow per nozzle, same 120 nozzles, same water at 32-38 C. With total water flow and supply temperature unchanged, roll heat removal is bounded by mass flow and temperature rise; a \"60 percent\" improvement in cooling cannot be produced inside those fixed bounds. The boundary conditions can support a clogging/uniformity gain, but not a cooling-capacity gain. GROUNDED_IN: SCOPE \"same header supply at 14 bar; same nominal flow per nozzle\" | COMPUTATION 120 nozzles x same flow = same total f",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['14', '120', '32', '38', '60', '14']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'same nominal flow per' (field: boundary_conditions)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['flow', 'header', 'nominal', 'nozzle']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "SCOPE \"same header supply at 14 bar; same nominal flow per nozzle\" | COMPUTATION 120 nozzles x same flow = same total flow; same dP, same Tin => same Q_max, so +60% cooling is unavailable",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "verdict": "RISK",
+    "basis": "the evidence bundle is empty, so no held item contradicts the claims; absence of evidence is uncertainty, not failure. However the headline \"60 percent\" is asserted twice with no derivation, no baseline metric, and no denominator anywhere in the record. GROUNDED_IN: EVIDENCE (none held) | RECORD \"improves overall roll-cooling health by 60 percent\""
+   },
+   {
+    "attack_class": "BASELINE_EQUIVALENCE",
+    "verdict": "ABSTAIN",
+    "basis": "the baseline's root cause is the recirculated water itself (scale particles plus biological growth at 32-38 C). The intervention changes only the endpoint nozzle geometry while the boundary conditions hold water quality and temperature fixed, so the foulant load arriving at every nozzle is unchanged; and the offered mechanism (centrifuging particles) has no action whatsoever on attached biological growth, which the record itself names as a cause. The claim \"clogging becomes rare\" therefore cannot be true for the biological pathway. GROUNDED_IN: RECORD \"clogging becomes rare\" | SCOPE \"recircula",
+    "grounding": {
+     "grounded": false,
+     "bindings": [],
+     "claimed_ground": "RECORD \"clogging becomes rare\" | SCOPE \"recirculated cooling water at 32-38 C\" clogged by \"scale particles and biological growth\"",
+     "absence_ground": false,
+     "demotion_reason": "no evidence / computation / record / declared-scope binding found in the kill basis \u2014 a bare assertion carries no verdict authority (Art. XVIII); the objection is preserved and escalated"
+    },
+    "demoted_from": "KILL",
+    "demotion_layer": "v2_grounding"
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "verdict": "RISK",
+    "basis": "the retrofit is physically installable (a swirl-vortex nozzle of some flow class exists at 14 bar), so it is not impossible; but the one claimed novel design variable is given no value or range, and the record itself lists its known failure modes as \"undefined,\" so the artifact is under-specified rather than unbuildable. A real incompatibility also sits unaddressed: a flat-fan layout depends on fan overlap across the roll face, while swirl nozzles produce cones, so preserving coverage uniformity (the 12 micron thermal-crown requirement) is not established by \"same flow class.\" GROUNDED_IN: REC"
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "verdict": "KILL",
+    "basis": "\"roll-cooling health\" and \"the spray's cooling wellness\" are not physical quantities and have no units, no baseline value, and no instrument; the record's own testable prediction is that nozzles \"look cleaner\" and the crew \"reports better cooling,\" which is subjective and cannot verify or falsify a numeric 60 percent. The prediction as stated has no truth conditions, and the verification plan does not measure the claimed effect. GROUNDED_IN: RECORD \"roll-cooling health improves by 60 percent\" and \"the nozzles look cleaner and the crew reports better cooling\" | RECORD \"enriches the spray's cool",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['60', '60']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'the spray cooling wellness' (field: mechanism)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"roll-cooling health improves by 60 percent\" and \"the nozzles look cleaner and the crew reports better cooling\" | RECORD \"enriches the spray's cooling wellness\"",
+     "absence_ground": false
+    }
+   }
+  ],
+  "intervention_suggestions": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "suggestion": "abandon the swirl-centrifugation premise and invert the design intent \u2014 replace the small-passage swirl chamber (high shear, wall film, deposition-prone) with a large-free-area, low-turbulence straight-through or deflector nozzle whose passage has no throat wall for solids to centrifuge onto, and move solids control upstream of the nozzle; this directly removes the inverted-physics basis. GROUNDED",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'away from the throat' (field: mechanism)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"centrifuges particles away from the throat wall\" | SCOPE \"scale particles and biological growth\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "suggestion": "either relax the fixed-flow constraint (raise header pressure or flow class) to create headroom for more cooling, or re-target the claim from cooling capacity to clogging/uniformity \u2014 e.g. \"60 percent reduction in nozzle-cleaning events\" or \"60 percent improvement in spray-uniformity index\" \u2014 both of which are achievable at identical flow and 14 bar, whereas +60 percent heat removal is not. GROUND",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['60', '60', '14', '60', '14']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'same nominal flow per' (field: boundary_conditions)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['flow', 'header', 'nominal', 'nozzle']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "SCOPE \"same header supply at 14 bar; same nominal flow per nozzle\" | COMPUTATION same flow and same Tin bound Q, so the metric must move off heat removal",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "suggestion": "instrument the baseline first \u2014 log per-nozzle flow and spray pattern, thermal-crown excursions beyond the 12 micron band, strip off-gauge events, and nozzle-cleaning interval over a fixed campaign, so the asserted 60 percent acquires a measured denominator and a before/after comparison on the same metric. GROUNDED_IN: EVIDENCE (none held) | RECORD \"improves overall roll-cooling health by 60 perce",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['12', '60', '60']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'cooling health by 60' (field: mechanism)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['flow', 'nozzle', 'same']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "EVIDENCE (none held) | RECORD \"improves overall roll-cooling health by 60 percent\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "BASELINE_EQUIVALENCE",
+    "suggestion": "intervene on the recirculated water loop, not only the nozzle \u2014 add side-stream filtration sized to the scale particle distribution and a biocide/UV or copper-ion stage, since 32-38 C recirculated water is the incubation source the record itself names; this attacks both listed foulants at their origin instead of relying on nozzle geometry that cannot touch biofilm. GROUNDED_IN: SCOPE \"recirculated",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['32', '38', '32', '38']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "SCOPE \"recirculated cooling water at 32-38 C\" with \"scale particles and biological growth\" | RECORD \"clogging becomes rare\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "suggestion": "specify the design variable and the failure analysis \u2014 give the helix angle a value or range plus its mapped effect on droplet size, cone angle, and footprint overlap at the existing 120 positions, and replace \"Known failure modes: undefined\" with a disclosed FMEA covering striping, thermal-crown excursion, and orifice shear; this converts an under-specified part list into an implementable design ",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['120', '12']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'swirl chamber helix angle' (field: novel_design_variable)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"swirl chamber helix angle\" and \"Known failure modes (claimed by the generator): undefined\" | SCOPE \"thermal-crown variation beyond the 12 micron band\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "suggestion": "replace wellness language with instrumented metrics \u2014 spray-uniformity coefficient across the roll face, inter-nozzle flow deviation, work-roll temperature differential, count of thermal-crown excursions beyond 12 microns, and nozzle-cleaning interval \u2014 and make the testable prediction a comparison of those numbers pre/post retrofit instead of crew opinion and visual cleanliness. GROUNDED_IN: RECO",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['12', '60', '12']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'roll cooling health improves' (field: predicted_effect)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['flow', 'nozzle']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"roll-cooling health improves by 60 percent\" / \"nozzles look cleaner and the crew reports better cooling\" | COMPUTATION 12 micron band is the checkable acceptance limit already in the problem s",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   }
+  ],
+  "state": "ATTACK_RUN",
+  "overall": "KILLED",
+  "kill_basis": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "basis": "the stated physics is inverted: in a rotating vortex flow, centrifugal force acts on denser scale particles radially OUTWARD, i.e. toward the swirl-chamber/throat wall, which is exactly where clogging deposits form; the record asserts the opposite (\"centrifuges particles away from the throat wall\"), so as described the mechanism would concentrate foulant at the wall, not clear it. A hollow-cone swirl nozzle in fact puts the liquid film (and entrained solids) on the wall with an air core at the center. GROUNDED_IN: RECORD \"the swirling flow centrifuges particles away from the throat wall and en",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'particles away from the' (field: mechanism)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['flow', 'nozzle']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"the swirling flow centrifuges particles away from the throat wall and enriches the spray's cooling wellness\" | SCOPE failure driven by \"scale particles and biological growth in the recirculate",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "basis": "the boundary conditions fix every variable that sets heat-removal capacity: same header 14 bar, same nominal flow per nozzle, same 120 nozzles, same water at 32-38 C. With total water flow and supply temperature unchanged, roll heat removal is bounded by mass flow and temperature rise; a \"60 percent\" improvement in cooling cannot be produced inside those fixed bounds. The boundary conditions can support a clogging/uniformity gain, but not a cooling-capacity gain. GROUNDED_IN: SCOPE \"same header supply at 14 bar; same nominal flow per nozzle\" | COMPUTATION 120 nozzles x same flow = same total f",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['14', '120', '32', '38', '60', '14']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'same nominal flow per' (field: boundary_conditions)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['flow', 'header', 'nominal', 'nozzle']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "SCOPE \"same header supply at 14 bar; same nominal flow per nozzle\" | COMPUTATION 120 nozzles x same flow = same total flow; same dP, same Tin => same Q_max, so +60% cooling is unavailable",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "basis": "\"roll-cooling health\" and \"the spray's cooling wellness\" are not physical quantities and have no units, no baseline value, and no instrument; the record's own testable prediction is that nozzles \"look cleaner\" and the crew \"reports better cooling,\" which is subjective and cannot verify or falsify a numeric 60 percent. The prediction as stated has no truth conditions, and the verification plan does not measure the claimed effect. GROUNDED_IN: RECORD \"roll-cooling health improves by 60 percent\" and \"the nozzles look cleaner and the crew reports better cooling\" | RECORD \"enriches the spray's cool",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['60', '60']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'the spray cooling wellness' (field: mechanism)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"roll-cooling health improves by 60 percent\" and \"the nozzles look cleaner and the crew reports better cooling\" | RECORD \"enriches the spray's cooling wellness\"",
+     "absence_ground": false
+    }
+   }
+  ],
+  "counts": {
+   "KILL": 3,
+   "RISK": 2,
+   "SURVIVE": 0,
+   "ABSTAIN_DEMOTED": 1,
+   "INVALID": 0
+  }
+ }
+}

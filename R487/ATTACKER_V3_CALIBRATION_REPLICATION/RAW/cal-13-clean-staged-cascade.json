@@ -1,0 +1,205 @@
+{
+ "attack": {
+  "attack_version": "independent_attack/3.0.0",
+  "candidate_id": "cal-13-staged-cascade-backflush",
+  "generator_provider": null,
+  "attacker_provider": "xkiro",
+  "attacker_model": "qwen/qwen3.8-max:free",
+  "independence_mode": "SEPARATE_CONTEXT",
+  "independence_note": "the attacker ran in an independent reasoning context (fresh adversarial conversation, generator reasoning never shown; no alternative provider credentialed \u2014 disclosed, never claimed as provider separation)",
+  "prompt_hash": "65fbab06735aacf2bbe69a8ea0fb720eb8cdab3834aac853802296ced48b7c0f",
+  "output_hash": "32da07fb7cfc7d722a1df5847d67a8ecaa6f161d1bc7398ea450e0a4127c8978",
+  "llm_status": "OK",
+  "attacked_at": "2026-09-17T06:48:36+00:00Z",
+  "items": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "verdict": "RISK",
+    "basis": "The candidate claims the 120-micron second stage removes aggregate nuclei above 120 microns, but flat-fan spray nozzles in hot-rolling mills typically have internal passages and orifices smaller than 120 microns; particles passing the 120-micron wedge wire will still clog the nozzles, leaving the mechanism physically incomplete for its stated purpose. GROUNDED_IN: RECORD \"a two-stage inertial wedge-wire cascade (300 then 120 micron) on the header supply removes scale particles and aggregate nuclei above 120 microns\""
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "verdict": "KILL",
+    "basis": "The candidate claims automatic backflush restores full flow without mill stop, but reverse-flow backflushing a supply header feeding 120 active spray nozzles requires isolating the header from the nozzles to prevent contaminated flush water from being forced backward through the nozzle orifices into the roll bite; this isolation interrupts cooling, constituting a mill stop or a direct violation of the continuous operation boundary during rolling. GROUNDED_IN: RECORD \"restores full flow without mill stop\" | SCOPE \"no mill stop for installation or operation\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'restores full flow without' (field: mechanism)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['flow', 'full', 'installation', 'mill']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"restores full flow without mill stop\" | SCOPE \"no mill stop for installation or operation\"",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "verdict": "SURVIVE",
+    "basis": "No evidence bundle was provided by the candidate, therefore no internal contradiction between claimed data points can be demonstrated. GROUNDED_IN: EVIDENCE <none held>"
+   },
+   {
+    "attack_class": "BASELINE_EQUIVALENCE",
+    "verdict": "SURVIVE",
+    "basis": "The candidate introduces a two-stage wedge-wire cascade, dP transmitters, and automatic backflush valves, which are distinct physical additions not present in the un-invented standard baseline doing nothing new. GROUNDED_IN: RECORD \"two-stage wedge-wire cascade + dP monitoring + automatic backflush valves on the 150 mm supply, installed as a flanged spool swap\""
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "verdict": "RISK",
+    "basis": "Installing a two-stage cascade with dP transmitters and backflush valves as a single flanged spool swap on a 150 mm supply line during a planned roll change is geometrically suspect; multi-stage filtration assemblies with actuated valves and instrumentation exceed the axial length of a standard spool piece, making the proposed installation method highly constrained by existing piping envelopes. GROUNDED_IN: RECORD \"installed as a flanged spool swap during a planned roll change\" | SCOPE \"150 mm supply\""
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "verdict": "RISK",
+    "basis": "The candidate relies on the mill's existing roll-thermography system to measure crown variation falling below 16 microns, but infrared thermography measures surface temperature gradients, not direct geometric crown profile; converting thermal data to micron-level geometric crown assumes a fixed, linear thermal-expansion coefficient that varies with roll wear, coolant film thickness, and strip contact, introducing ambiguity into the measurement claim. GROUNDED_IN: RECORD \"crown variation measured by the mill's existing roll-thermography system\" | COMPUTATION late-campaign crown excursions fall "
+   }
+  ],
+  "intervention_suggestions": [
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "suggestion": "Change the backflush sequence to operate only during non-rolling intervals (e.g., tail-out or between coils) rather than claiming uninterrupted operation, or add a parallel redundant header so one filters while the other backflushes, eliminating the conflict between reverse-flow flushing and the no-mill-stop boundary. GROUNDED_IN: RECORD \"restores full flow without mill stop\" | SCOPE \"no mill stop",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'restores full flow without' (field: mechanism)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['flow', 'full', 'installation', 'mill']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"restores full flow without mill stop\" | SCOPE \"no mill stop for installation or operation\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "suggestion": "Reduce the second-stage micron rating from 120 microns to match the minimum internal passage dimension of the specific 120 flat-fan nozzles used, ensuring the physical cutoff actually prevents nozzle clogging rather than merely removing particles larger than an arbitrary threshold. GROUNDED_IN: RECORD \"a two-stage inertial wedge-wire cascade (300 then 120 micron) on the header supply removes scale",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['120', '120', '300', '120', '120']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'the header supply removes' (field: mechanism)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['particles', 'scale', 'supply']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"a two-stage inertial wedge-wire cascade (300 then 120 micron) on the header supply removes scale particles and aggregate nuclei above 120 microns\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "suggestion": "Replace the single flanged spool swap claim with a modular skid-mounted bypass arrangement or specify exact axial dimensions of the assembly to prove it fits within the existing 150 mm header envelope during a roll change window. GROUNDED_IN: RECORD \"installed as a flanged spool swap during a planned roll change\" | SCOPE \"150 mm supply\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['150', '150']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'swap during planned roll' (field: intervention)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['supply', 'with']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"installed as a flanged spool swap during a planned roll change\" | SCOPE \"150 mm supply\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "suggestion": "Specify the calibration curve or transfer function used to convert roll-thermography temperature differentials into geometric crown microns, or supplement thermography with direct mechanical profilometry during roll changes to validate the sub-16-micron prediction. GROUNDED_IN: RECORD \"crown variation measured by the mill's existing roll-thermography system\" | COMPUTATION late-campaign crown excur",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['16', '28', '16']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span '28 to below 16' (field: predicted_effect)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['mill', 'with']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"crown variation measured by the mill's existing roll-thermography system\" | COMPUTATION late-campaign crown excursions fall from 28 to below 16 microns",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   }
+  ],
+  "state": "ATTACK_RUN",
+  "overall": "KILLED",
+  "kill_basis": [
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "basis": "The candidate claims automatic backflush restores full flow without mill stop, but reverse-flow backflushing a supply header feeding 120 active spray nozzles requires isolating the header from the nozzles to prevent contaminated flush water from being forced backward through the nozzle orifices into the roll bite; this isolation interrupts cooling, constituting a mill stop or a direct violation of the continuous operation boundary during rolling. GROUNDED_IN: RECORD \"restores full flow without mill stop\" | SCOPE \"no mill stop for installation or operation\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'restores full flow without' (field: mechanism)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['flow', 'full', 'installation', 'mill']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"restores full flow without mill stop\" | SCOPE \"no mill stop for installation or operation\"",
+     "absence_ground": false
+    }
+   }
+  ],
+  "counts": {
+   "KILL": 1,
+   "RISK": 3,
+   "SURVIVE": 2,
+   "ABSTAIN_DEMOTED": 0,
+   "INVALID": 0
+  }
+ }
+}

@@ -1,0 +1,139 @@
+{
+ "attack": {
+  "attack_version": "independent_attack/3.0.0",
+  "candidate_id": "cal-20-unevidenced-staged-cascade",
+  "generator_provider": null,
+  "attacker_provider": "xkiro",
+  "attacker_model": "qwen/qwen3.8-max:free",
+  "independence_mode": "SEPARATE_CONTEXT",
+  "independence_note": "the attacker ran in an independent reasoning context (fresh adversarial conversation, generator reasoning never shown; no alternative provider credentialed \u2014 disclosed, never claimed as provider separation)",
+  "prompt_hash": "845bd758ed3afef849dacf871e14f231d608acac9422a40808db255f55517ad6",
+  "output_hash": "ce96ee81d20e2a3ae1a2e08c32f1b03bab884daabe08cbe2c54ce001defb3a3c",
+  "llm_status": "OK",
+  "attacked_at": "2026-09-17T08:00:01+00:00Z",
+  "items": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "verdict": "RISK",
+    "basis": "The candidate claims removal of scale particles above 120 microns, but the problem record explicitly identifies \"biological growth\" as a co-equal clogging agent; biological slime and biofilm pass through 120-micron wedge-wire screens unimpeded because they are soft, deformable, and not discrete hard particles, so the mechanism cannot address the full stated failure mode. GROUNDED_IN: RECORD \"progressive nozzle clogging from scale particles and biological growth in the recirculated water\" versus RECORD \"removes scale particles above 120 microns\""
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "verdict": "SURVIVE",
+    "basis": "The candidate declares operation at 13-15 bar, full design flow, and no mill stop, which is consistent with the problem's 14 bar supply header baseline; no internal contradiction or violated clause exists within the candidate's own record. GROUNDED_IN: RECORD \"Boundary conditions: 13-15 bar; full design flow; no mill stop\""
+   },
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "verdict": "SURVIVE",
+    "basis": "No evidence bundle is held, therefore no internal contradiction between evidence and claims can be demonstrated from the candidate's own record. GROUNDED_IN: RECORD \"(none held)\""
+   },
+   {
+    "attack_class": "BASELINE_EQUIVALENCE",
+    "verdict": "SURVIVE",
+    "basis": "The candidate introduces a two-stage wedge-wire cascade with dP-triggered automatic backflush, which is a distinct physical intervention compared to the status quo of doing nothing new; it is not equivalent to the baseline. GROUNDED_IN: RECORD \"two-stage wedge-wire cascade with dP monitoring and automatic backflush on the 150 mm supply\" versus RECORD \"doing nothing new \u2014 the status quo\""
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "verdict": "SURVIVE",
+    "basis": "A flanged spool swap at a planned roll change on a 150 mm supply line is a standard mechanical procedure; the candidate's own record does not contain mutually exclusive installation constraints that render it physically impossible. GROUNDED_IN: RECORD \"flanged spool swap at a planned roll change\""
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "verdict": "KILL",
+    "basis": "The testable prediction relies on \"roll thermography\" to measure \"clogging events,\" but roll thermography measures surface temperature distribution (thermal crown), not discrete hydraulic clogging events per campaign; using a continuous thermal measurement to count discrete event frequencies is a category error that makes the prediction untestable as stated. GROUNDED_IN: RECORD \"two-campaign split trial measures clogging events 1.5 or below... by the mill's clog log and roll thermography\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'split trial measures clogging' (field: testable_prediction)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"two-campaign split trial measures clogging events 1.5 or below... by the mill's clog log and roll thermography\"",
+     "absence_ground": false
+    }
+   }
+  ],
+  "intervention_suggestions": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "suggestion": "Add a biocide dosing station or UV treatment upstream of the second-stage filter to address the biological growth fraction that 120-micron wedge wire cannot mechanically intercept. GROUNDED_IN: RECORD \"progressive nozzle clogging from scale particles and biological growth in the recirculated water\" versus RECORD \"removes scale particles above 120 microns\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['120', '120']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'particles above 120 microns' (field: mechanism)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"progressive nozzle clogging from scale particles and biological growth in the recirculated water\" versus RECORD \"removes scale particles above 120 microns\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "suggestion": "Remove \"roll thermography\" from the clogging-event counting protocol and restrict the event metric exclusively to the \"mill's clog log\" (dP spikes or flow-loss triggers), reserving thermography solely for the separate crown-excursion verification. GROUNDED_IN: RECORD \"measures clogging events 1.5 or below (95 percent band 1.0-2.0) versus baseline 4.1 plus or minus 0.6, by the mill's clog log and r",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['1.5', '95', '1.0', '2.0', '4.1', '0.6']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'by the mill clog' (field: testable_prediction)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['flow', 'mill']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"measures clogging events 1.5 or below (95 percent band 1.0-2.0) versus baseline 4.1 plus or minus 0.6, by the mill's clog log and roll thermography\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   }
+  ],
+  "state": "ATTACK_RUN",
+  "overall": "KILLED",
+  "kill_basis": [
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "basis": "The testable prediction relies on \"roll thermography\" to measure \"clogging events,\" but roll thermography measures surface temperature distribution (thermal crown), not discrete hydraulic clogging events per campaign; using a continuous thermal measurement to count discrete event frequencies is a category error that makes the prediction untestable as stated. GROUNDED_IN: RECORD \"two-campaign split trial measures clogging events 1.5 or below... by the mill's clog log and roll thermography\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'split trial measures clogging' (field: testable_prediction)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"two-campaign split trial measures clogging events 1.5 or below... by the mill's clog log and roll thermography\"",
+     "absence_ground": false
+    }
+   }
+  ],
+  "counts": {
+   "KILL": 1,
+   "RISK": 1,
+   "SURVIVE": 4,
+   "ABSTAIN_DEMOTED": 0,
+   "INVALID": 0
+  }
+ }
+}

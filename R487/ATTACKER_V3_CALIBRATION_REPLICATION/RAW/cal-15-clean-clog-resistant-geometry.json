@@ -1,0 +1,164 @@
+{
+ "attack": {
+  "attack_version": "independent_attack/3.0.0",
+  "candidate_id": "cal-15-large-throat-swirl-nozzle",
+  "generator_provider": null,
+  "attacker_provider": "xkiro",
+  "attacker_model": "qwen/qwen3.8-max:free",
+  "independence_mode": "SEPARATE_CONTEXT",
+  "independence_note": "the attacker ran in an independent reasoning context (fresh adversarial conversation, generator reasoning never shown; no alternative provider credentialed \u2014 disclosed, never claimed as provider separation)",
+  "prompt_hash": "336f482c47cb53b72bef0a2949a569e77d73f2dee191d9a105e0831e617a013d",
+  "output_hash": "4025927e20368d045177cd9d0fc1a0d2325aa55d6749af343d5d65e1acff8719",
+  "llm_status": "OK",
+  "attacked_at": "2026-09-17T07:10:37+00:00Z",
+  "items": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "verdict": "RISK",
+    "basis": "The candidate claims a 5 percent flow increase offsets 8 percent droplet coarsening, but cooling capacity scales with total wetted surface area (proportional to flow divided by mean droplet diameter), yielding a net 2.8 percent cooling deficit that the record does not address GROUNDED_IN: COMPUTATION \"1.05 / 1.08 = 0.972, representing a 2.8 percent reduction in total droplet surface area compared to baseline\""
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "verdict": "KILL",
+    "basis": "Doubling the throat from 3 mm to 6 mm quadruples the orifice area per nozzle; maintaining 14 bar supply pressure across an area 4x larger requires approximately 4x the volumetric flow per nozzle, which directly contradicts the stated boundary condition of remaining in the same nominal flow class GROUNDED_IN: COMPUTATION \"Area ratio = (6/3)^2 = 4.0; flow at constant pressure scales with area; 4x flow violates same nominal flow class\" | SCOPE \"same nominal flow class\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['3', '6', '14', '4', '4', '6']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'same nominal flow class' (field: boundary_conditions)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['class', 'flow', 'nominal', 'same']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "COMPUTATION \"Area ratio = (6/3)^2 = 4.0; flow at constant pressure scales with area; 4x flow violates same nominal flow class\" | SCOPE \"same nominal flow class\"",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "verdict": "RISK",
+    "basis": "The predicted clogging reduction from 4.1 to 1.8 events relies on bridging scaling with throat-to-particle ratio while simultaneously introducing a swirl ramp passage whose internal geometry creates new deposition surfaces, yet the record provides no reconciliation between these competing mechanisms GROUNDED_IN: RECORD \"the doubled throat raises the bridging particle size threshold by roughly 4x (bridging scales with throat-to-particle ratio) and the swirl passage prevents low-velocity dead zones at the wall where deposits nucleate\""
+   },
+   {
+    "attack_class": "BASELINE_EQUIVALENCE",
+    "verdict": "RISK",
+    "basis": "The candidate claims crown variation inside 12 microns is maintained by re-patterned distribution, but the baseline achieves this with sharp-entry 3 mm throats while the intervention uses a fundamentally different converging spiral fluid dynamic profile, making direct equivalence unverified GROUNDED_IN: RECORD \"crown variation inside 12 microns maintained by the re-patterned distribution\""
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "verdict": "RISK",
+    "basis": "Replacing 120 nozzles with a geometry requiring 4x the flow per nozzle to maintain 14 bar demands header and pump modifications that exceed a standard roll-change-window installation scope GROUNDED_IN: COMPUTATION \"120 nozzles x 4x flow = 480x single-nozzle baseline flow demand versus existing header capacity\" | SCOPE \"roll-change-window installation\""
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "verdict": "RISK",
+    "basis": "The testable prediction specifies mill thermography for crown variation measurement over two campaigns but fails to define the spatial resolution, emissivity correction protocol, or sampling frequency required to resolve a 12 micron thermal crown band GROUNDED_IN: RECORD \"crown variation from the mill's thermography\""
+   }
+  ],
+  "intervention_suggestions": [
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "suggestion": "Reduce the throat diameter from 6 mm toward 3 mm or incorporate a flow-restricting insert upstream of the swirl ramp so that the total volumetric flow per nozzle remains within the same nominal flow class while preserving the anti-deposition swirl geometry GROUNDED_IN: COMPUTATION \"Area ratio = (6/3)^2 = 4.0; flow at constant pressure scales with area; 4x flow violates same nominal flow class\" | S",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['6', '3', '6', '3', '2', '4.0']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'same nominal flow class' (field: boundary_conditions)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['class', 'flow', 'nominal', 'same']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "COMPUTATION \"Area ratio = (6/3)^2 = 4.0; flow at constant pressure scales with area; 4x flow violates same nominal flow class\" | SCOPE \"same nominal flow class\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "suggestion": "Redesign the swirl-ramp nozzle body to include an internal flow restrictor that limits throughput to the baseline nominal flow class, ensuring the 120-nozzle replacement fits within the existing header capacity and roll-change-window installation time GROUNDED_IN: COMPUTATION \"120 nozzles x 4x flow = 480x single-nozzle baseline flow demand versus existing header capacity\" | SCOPE \"roll-change-wind",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['120', '120', '4', '480']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'roll change window installation' (field: boundary_conditions)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['change', 'class', 'flow', 'installation']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "COMPUTATION \"120 nozzles x 4x flow = 480x single-nozzle baseline flow demand versus existing header capacity\" | SCOPE \"roll-change-window installation\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   }
+  ],
+  "state": "ATTACK_RUN",
+  "overall": "KILLED",
+  "kill_basis": [
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "basis": "Doubling the throat from 3 mm to 6 mm quadruples the orifice area per nozzle; maintaining 14 bar supply pressure across an area 4x larger requires approximately 4x the volumetric flow per nozzle, which directly contradicts the stated boundary condition of remaining in the same nominal flow class GROUNDED_IN: COMPUTATION \"Area ratio = (6/3)^2 = 4.0; flow at constant pressure scales with area; 4x flow violates same nominal flow class\" | SCOPE \"same nominal flow class\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['3', '6', '14', '4', '4', '6']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'same nominal flow class' (field: boundary_conditions)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['class', 'flow', 'nominal', 'same']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "COMPUTATION \"Area ratio = (6/3)^2 = 4.0; flow at constant pressure scales with area; 4x flow violates same nominal flow class\" | SCOPE \"same nominal flow class\"",
+     "absence_ground": false
+    }
+   }
+  ],
+  "counts": {
+   "KILL": 1,
+   "RISK": 5,
+   "SURVIVE": 0,
+   "ABSTAIN_DEMOTED": 0,
+   "INVALID": 0
+  }
+ }
+}

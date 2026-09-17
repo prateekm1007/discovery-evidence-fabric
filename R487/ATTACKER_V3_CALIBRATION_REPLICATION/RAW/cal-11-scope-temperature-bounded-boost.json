@@ -1,0 +1,136 @@
+{
+ "attack": {
+  "attack_version": "independent_attack/3.0.0",
+  "candidate_id": "cal-11-bounded-flow-boost",
+  "generator_provider": null,
+  "attacker_provider": "xkiro",
+  "attacker_model": "qwen/qwen3.8-max:free",
+  "independence_mode": "SEPARATE_CONTEXT",
+  "independence_note": "the attacker ran in an independent reasoning context (fresh adversarial conversation, generator reasoning never shown; no alternative provider credentialed \u2014 disclosed, never claimed as provider separation)",
+  "prompt_hash": "065abe47eee0c011812d967182a500bbf9b85ebd38540e362d7c41bbf04db975",
+  "output_hash": "ef8567a451bebc7ab735e7a5cf62706caf3cafde0c1d0d138a58fc5bcc31f146",
+  "llm_status": "OK",
+  "attacked_at": "2026-09-17T06:00:15+00:00Z",
+  "items": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "verdict": "RISK",
+    "basis": "The candidate claims the 20 percent flow boost increases convective flushing velocity through each nozzle throat to transport larger particles, but for fixed-geometry flat-fan nozzles volumetric flow scales with the square of velocity; a 20 percent flow increase yields only approximately 9.5 percent velocity increase while raising supply pressure from 14 bar toward 20 bar, which exceeds the declared 13-15 bar boundary. The record hedges this by declaring the intervention valid only within its envelope and acknowledging abrasive wear as a known failure mode, so it is not demonstrably false from"
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "verdict": "KILL",
+    "basis": "A 20 percent flow increase through fixed-orifice spray nozzles requires a proportional pressure increase governed by Q \u221d \u221aP; starting at the nominal 14 bar supply, achieving 1.20\u00d7 flow demands P_new = 14 \u00d7 (1.20)\u00b2 = 20.16 bar, which directly violates the candidate's own hard constraint that header pressure stays 13-15 bar. The candidate's own record cannot be true as stated because the required operating point falls outside the declared pressure boundary. GROUNDED_IN: RECORD \"raising header flow 20 percent\" | RECORD \"header pressure stays 13-15 bar\" | COMPUTATION 14 bar \u00d7 (1.20)\u00b2 = 20.16 bar, ",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['20', '14', '1.20', '14', '1.20', '20.16']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'raising header flow 20' (field: mechanism)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['envelope', 'header', 'percent', 'pressure']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"raising header flow 20 percent\" | RECORD \"header pressure stays 13-15 bar\" | COMPUTATION 14 bar \u00d7 (1.20)\u00b2 = 20.16 bar, which is strictly greater than the 15 bar upper bound of the declared 13-",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "verdict": "SURVIVE",
+    "basis": "No evidence bundle was provided; absence of evidence is uncertainty, not a demonstrable contradiction within the candidate's own record. GROUNDED_IN: EVIDENCE none held"
+   },
+   {
+    "attack_class": "BASELINE_EQUIVALENCE",
+    "verdict": "SURVIVE",
+    "basis": "The candidate explicitly differentiates itself from the baseline by introducing a 20 percent flow boost and a strip-entry-temperature interlock reverting to nominal above 85 C, predicting a measurable reduction in clogging events from 4.1 to 2.8 for in-envelope campaigns, so it does not collapse into doing nothing new. GROUNDED_IN: RECORD \"clogging events fall from 4.1 to approximately 2.8\" | RECORD \"supply valve setpoint change plus a strip-entry-temperature interlock that reverts flow to nominal above 85 C\""
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "verdict": "SURVIVE",
+    "basis": "The candidate specifies a software-only intervention via supply valve setpoint change and an interlock with automatic out-of-envelope reversion, requiring no hardware change; nothing in the candidate's own record makes this physically impossible to execute on a standard mill control system. GROUNDED_IN: RECORD \"supply valve setpoint change plus a strip-entry-temperature interlock that reverts flow to nominal above 85 C; no hardware change\""
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "verdict": "SURVIVE",
+    "basis": "The testable prediction defines a specific metric (clogging events), a quantitative target (2.8), a confidence band (2.4-3.2 at 95 percent), and a control condition (out-of-envelope campaigns measuring no significant change from 4.1); the measurement criteria are determinate within the candidate's own record. GROUNDED_IN: RECORD \"in-envelope campaigns measure a clogging-event reduction to approximately 2.8 with 95 percent confidence band 2.4-3.2; out-of-envelope campaigns measure no significant change from 4.1\""
+   }
+  ],
+  "intervention_suggestions": [
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "suggestion": "Reduce the flow boost fraction from 20 percent to no more than 8.4 percent so that the resulting pressure rise calculated as 14 bar \u00d7 (1.084)\u00b2 = 16.45 bar remains achievable within the available 22 percent pump headroom without exceeding the 15 bar absolute ceiling if the nominal baseline is adjusted downward, or explicitly widen the declared pressure boundary to 13-21 bar to match the physics of ",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['20', '8.4', '14', '1.084', '16.45', '22']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'header pressure stays 13' (field: boundary_conditions)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['header', 'headroom', 'percent', 'pressure']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "COMPUTATION 14 bar \u00d7 (1.20)\u00b2 = 20.16 bar vs 15 bar limit | SCOPE \"header pressure stays 13-15 bar\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   }
+  ],
+  "state": "ATTACK_RUN",
+  "overall": "KILLED",
+  "kill_basis": [
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "basis": "A 20 percent flow increase through fixed-orifice spray nozzles requires a proportional pressure increase governed by Q \u221d \u221aP; starting at the nominal 14 bar supply, achieving 1.20\u00d7 flow demands P_new = 14 \u00d7 (1.20)\u00b2 = 20.16 bar, which directly violates the candidate's own hard constraint that header pressure stays 13-15 bar. The candidate's own record cannot be true as stated because the required operating point falls outside the declared pressure boundary. GROUNDED_IN: RECORD \"raising header flow 20 percent\" | RECORD \"header pressure stays 13-15 bar\" | COMPUTATION 14 bar \u00d7 (1.20)\u00b2 = 20.16 bar, ",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['20', '14', '1.20', '14', '1.20', '20.16']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'raising header flow 20' (field: mechanism)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['envelope', 'header', 'percent', 'pressure']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"raising header flow 20 percent\" | RECORD \"header pressure stays 13-15 bar\" | COMPUTATION 14 bar \u00d7 (1.20)\u00b2 = 20.16 bar, which is strictly greater than the 15 bar upper bound of the declared 13-",
+     "absence_ground": false
+    }
+   }
+  ],
+  "counts": {
+   "KILL": 1,
+   "RISK": 1,
+   "SURVIVE": 4,
+   "ABSTAIN_DEMOTED": 0,
+   "INVALID": 0
+  }
+ }
+}

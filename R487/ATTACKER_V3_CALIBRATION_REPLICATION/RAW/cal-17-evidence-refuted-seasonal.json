@@ -1,0 +1,301 @@
+{
+ "attack": {
+  "attack_version": "independent_attack/3.0.0",
+  "candidate_id": "cal-17-seasonal-algae-bloom-control",
+  "generator_provider": null,
+  "attacker_provider": "atria",
+  "attacker_model": "Atria-Dawn-Preview",
+  "independence_mode": "SEPARATE_CONTEXT",
+  "independence_note": "the attacker ran in an independent reasoning context (fresh adversarial conversation, generator reasoning never shown; no alternative provider credentialed \u2014 disclosed, never claimed as provider separation)",
+  "prompt_hash": "30786cbccdfcbdf50db2b90ce29efe40527e10adb5dcc889ea2076c35f96dde7",
+  "output_hash": "06773a65bcf6827bb4b5cb08d2b9e1a072ca48489faf6d36d5038dd5b77770d8",
+  "llm_status": "OK",
+  "attacked_at": "2026-09-17T07:21:32+00:00Z",
+  "items": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "verdict": "KILL",
+    "basis": "The claimed seasonal causal driver is contradicted by the candidate's own held log: it asserts clogging is warm-season and driven by summer blooms, but the 24-month/12-campaign log reports a uniform year-round clog rate, so there is no bloom-season excess for a shade cover plus pre-summer shock to remove. GROUNDED_IN: EVIDENCE ev:cloglog-24mo (\"clog rate is UNIFORM year-round (4.0-4.3 events per campaign\") vs RECORD \"clogging is a warm-season phenomenon\" / \"winter-baseline 1.6\"; COMPUTATION claimed seasonal drop 4.1 to 1.6 = 2.5 events/campaign, but the record's own year-round spread is only 4",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "evidence",
+       "ground": "record id ev:cloglog-24mo",
+       "verified": true
+      },
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['24', '12', '24', '4.0', '4.3', '1.6']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'clogging is warm season' (field: mechanism)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['cover', 'only']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "EVIDENCE ev:cloglog-24mo (\"clog rate is UNIFORM year-round (4.0-4.3 events per campaign\") vs RECORD \"clogging is a warm-season phenomenon\" / \"winter-baseline 1.6\"; COMPUTATION claimed seasonal drop 4.",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "verdict": "RISK",
+    "basis": "The 40 ppm biocide shock with rinse-down is permitted only if inside the permit, but no permit ceiling or rinse-down discharge authorization is stated, so the intervention is not yet demonstrably within its own boundary. GROUNDED_IN: RECORD \"one pre-summer biocide shock dosing at 40 ppm with rinse-down\"; SCOPE \"dosing inside permit\"."
+   },
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "verdict": "KILL",
+    "basis": "The predicted effect and testable prediction are falsified by the held evidence: there is no summer peak to eliminate, and the asserted winter baseline of 1.6 appears nowhere in the 4.0-4.3 year-round record. GROUNDED_IN: EVIDENCE ev:cloglog-24mo (\"clog rate is UNIFORM year-round (4.0-4.3 events per campaign\") vs RECORD \"the bloom-season peak disappears\" / \"clogging events per campaign fall from 4.1 to the winter-baseline 1.6\"; COMPUTATION target 1.6 lies 2.4-2.7 events/campaign below the record's own observed floor of 4.0.",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "evidence",
+       "ground": "record id ev:cloglog-24mo",
+       "verified": true
+      },
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['1.6', '4.0', '4.3', '24', '4.0', '4.3']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'from to the winter' (field: predicted_effect)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "EVIDENCE ev:cloglog-24mo (\"clog rate is UNIFORM year-round (4.0-4.3 events per campaign\") vs RECORD \"the bloom-season peak disappears\" / \"clogging events per campaign fall from 4.1 to the winter-basel",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "BASELINE_EQUIVALENCE",
+    "verdict": "SURVIVE",
+    "basis": "The candidate is not the status quo: it adds a floating basin shade cover and a pre-summer 40 ppm biocide shock to the otherwise unchanged 14 bar / 120-nozzle recirculating loop, so it is a distinct intervention even though its claimed benefit is unsupported. GROUNDED_IN: RECORD \"floating shade cover on the cooling basin plus one pre-summer biocide shock dosing at 40 ppm with rinse-down\" vs baseline \"as currently implemented, doing nothing new\"."
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "verdict": "RISK",
+    "basis": "Not impossible as installed, but the sole disclosed failure mode, cover wind damage, has no mitigation or load rating, and a floating cover on a 32-38 C basin also risks reduced evaporative cooling on a loop whose temperature is set by the strip schedule. GROUNDED_IN: RECORD \"Known failure modes (claimed by the generator): cover wind damage\"; EVIDENCE ev:basin-temp (\"loop runs 32-38 C year-round (temperature-controlled by the strip schedule\")."
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "verdict": "RISK",
+    "basis": "The acceptance metrics do not match the held record: the prediction requires monthly clog-rate plots and a chlorophyll criterion, while the evidence reports per-campaign events over 12 campaigns and provides no chlorophyll baseline or scale-versus-biofilm split. GROUNDED_IN: RECORD \"monthly clog-rate plots across two years\" / \"basin chlorophyll counts stay below 5 micrograms per liter through summer\" vs EVIDENCE ev:cloglog-24mo (\"24-month nozzle clogging log across 12 campaigns\")."
+   }
+  ],
+  "intervention_suggestions": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "suggestion": "Change the causal target from seasonal bloom suppression to the year-round drivers consistent with the record \u2014 scale-particle loading plus warm-water biofilm at 32-38 C \u2014 using sidestream filtration/flushing and continuous or periodic biocide dosing sized to the observed uniform 4.0-4.3 event rate instead of a single pre-summer shock; this removes the nonexistent seasonal premise. GROUNDED_IN: EV",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "evidence",
+       "ground": "record id ev:cloglog-24mo",
+       "verified": true
+      },
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['32', '38', '4.0', '4.3', '24', '4.0']",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['basin', 'dosing']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "EVIDENCE ev:cloglog-24mo (\"clog rate is UNIFORM year-round (4.0-4.3 events per campaign\") and ev:basin-temp (\"loop runs 32-38 C year-round\").",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "suggestion": "Add an explicit permit-compatibility gate before dosing: verify the 40 ppm dose and rinse-down discharge against the applicable water-discharge permit, or convert to closed-loop rinse reuse / lower-dose continuous treatment so the dosing remains demonstrably inside the permit. GROUNDED_IN: RECORD \"40 ppm with rinse-down\"; SCOPE \"dosing inside permit\".",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "evidence",
+       "ground": "bundle item 'Basin water-temperature record: loop runs 32-38 C year-round (temperature-controlled by the strip schedule, not by season); chlorophyll counts below 3 micrograms per liter in all months (the basin is indoors)' (strong overlap: loop, water)",
+       "verified": true
+      },
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['40', '40']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span '40 ppm with rinse' (field: intervention)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['dosing', 'inside', 'permit']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"40 ppm with rinse-down\"; SCOPE \"dosing inside permit\".",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "suggestion": "Replace the falsified 4.1 to 1.6 target with one anchored to the held log \u2014 a stated fractional reduction of the observed year-round 4.0-4.3 events/campaign \u2014 and restate the prediction as \"no residual seasonality\" rather than \"summer peak eliminated,\" because neither the 1.6 winter baseline nor the summer peak exists in the record. GROUNDED_IN: EVIDENCE ev:cloglog-24mo; COMPUTATION 1.6 is 2.4-2.7",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "evidence",
+       "ground": "record id ev:cloglog-24mo",
+       "verified": true
+      },
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['4.1', '1.6', '4.0', '4.3', '1.6', '24']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "EVIDENCE ev:cloglog-24mo; COMPUTATION 1.6 is 2.4-2.7 events/campaign below the record's own observed floor of 4.0.",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "suggestion": "Convert the disclosed but undisposed cover failure into a bounded design requirement: use an anchored/vented or perforated cover with a wind-load rating, plus a basin-temperature interlock that rolls back or removes cover operation if the loop exits 32-38 C; this addresses both cited implementation risks. GROUNDED_IN: RECORD \"cover wind damage\"; EVIDENCE ev:basin-temp (\"loop runs 32-38 C year-roun",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "evidence",
+       "ground": "bundle item '24-month nozzle clogging log across 12 campaigns: clog rate is UNIFORM year-round (4.0-4.3 events per campaign in every quarter, no summer peak or winter baseline; the winter campaigns 2025-Q1 and 2026-Q1 measured 4.2 and 4.0); clog rate correlates ONLY with campaign length between roll changes' (strong overlap: round, with, year)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['basin', 'cover']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"cover wind damage\"; EVIDENCE ev:basin-temp (\"loop runs 32-38 C year-round\").",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "suggestion": "Define the measurement to match both the log and the failure physics: report events per campaign and a normalized monthly rate, per-nozzle cleaned/clogged counts, an explicit scale-versus-biofilm split, and a pre-installation chlorophyll baseline before enforcing any summer criterion below 5 micrograms per liter. GROUNDED_IN: RECORD \"monthly clog-rate plots\" / \"chlorophyll counts stay below 5 micr",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "evidence",
+       "ground": "record id ev:cloglog-24mo",
+       "verified": true
+      },
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['5', '5', '24', '12']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'counts stay below micrograms' (field: testable_prediction)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"monthly clog-rate plots\" / \"chlorophyll counts stay below 5 micrograms per liter\"; EVIDENCE ev:cloglog-24mo (\"12 campaigns\").",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   }
+  ],
+  "state": "ATTACK_RUN",
+  "overall": "KILLED",
+  "kill_basis": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "basis": "The claimed seasonal causal driver is contradicted by the candidate's own held log: it asserts clogging is warm-season and driven by summer blooms, but the 24-month/12-campaign log reports a uniform year-round clog rate, so there is no bloom-season excess for a shade cover plus pre-summer shock to remove. GROUNDED_IN: EVIDENCE ev:cloglog-24mo (\"clog rate is UNIFORM year-round (4.0-4.3 events per campaign\") vs RECORD \"clogging is a warm-season phenomenon\" / \"winter-baseline 1.6\"; COMPUTATION claimed seasonal drop 4.1 to 1.6 = 2.5 events/campaign, but the record's own year-round spread is only 4",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "evidence",
+       "ground": "record id ev:cloglog-24mo",
+       "verified": true
+      },
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['24', '12', '24', '4.0', '4.3', '1.6']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'clogging is warm season' (field: mechanism)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['cover', 'only']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "EVIDENCE ev:cloglog-24mo (\"clog rate is UNIFORM year-round (4.0-4.3 events per campaign\") vs RECORD \"clogging is a warm-season phenomenon\" / \"winter-baseline 1.6\"; COMPUTATION claimed seasonal drop 4.",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "basis": "The predicted effect and testable prediction are falsified by the held evidence: there is no summer peak to eliminate, and the asserted winter baseline of 1.6 appears nowhere in the 4.0-4.3 year-round record. GROUNDED_IN: EVIDENCE ev:cloglog-24mo (\"clog rate is UNIFORM year-round (4.0-4.3 events per campaign\") vs RECORD \"the bloom-season peak disappears\" / \"clogging events per campaign fall from 4.1 to the winter-baseline 1.6\"; COMPUTATION target 1.6 lies 2.4-2.7 events/campaign below the record's own observed floor of 4.0.",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "evidence",
+       "ground": "record id ev:cloglog-24mo",
+       "verified": true
+      },
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['1.6', '4.0', '4.3', '24', '4.0', '4.3']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'from to the winter' (field: predicted_effect)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "EVIDENCE ev:cloglog-24mo (\"clog rate is UNIFORM year-round (4.0-4.3 events per campaign\") vs RECORD \"the bloom-season peak disappears\" / \"clogging events per campaign fall from 4.1 to the winter-basel",
+     "absence_ground": false
+    }
+   }
+  ],
+  "counts": {
+   "KILL": 2,
+   "RISK": 3,
+   "SURVIVE": 1,
+   "ABSTAIN_DEMOTED": 0,
+   "INVALID": 0
+  }
+ }
+}

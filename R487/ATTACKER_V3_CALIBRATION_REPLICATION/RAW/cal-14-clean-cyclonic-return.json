@@ -1,0 +1,210 @@
+{
+ "attack": {
+  "attack_version": "independent_attack/3.0.0",
+  "candidate_id": "cal-14-cyclonic-preseparator",
+  "generator_provider": null,
+  "attacker_provider": "xkiro",
+  "attacker_model": "qwen/qwen3.8-max:free",
+  "independence_mode": "SEPARATE_CONTEXT",
+  "independence_note": "the attacker ran in an independent reasoning context (fresh adversarial conversation, generator reasoning never shown; no alternative provider credentialed \u2014 disclosed, never claimed as provider separation)",
+  "prompt_hash": "c18f6307713a0cc390ea2bf30a6e2355a6d44443dc2496d76988ea27223039d1",
+  "output_hash": "c30058d3bfb6c228ffdea172b104e8099e1ee76b3c20c561a58e7d8608b37148",
+  "llm_status": "OK",
+  "attacked_at": "2026-09-17T06:58:52+00:00Z",
+  "items": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "verdict": "RISK",
+    "basis": "The candidate targets removal of particles above 100 microns, but the stated problem is progressive nozzle clogging in 120 flat-fan spray nozzles; typical flat-fan nozzles at 14 bar have throat dimensions on the order of 1-3 mm and fail from accumulation of fines well below 100 microns, meaning the mechanism does not address the dominant clogging vector. GROUNDED_IN: RECORD \"scale particles above 100 microns\" | COMPUTATION 100 micron cut size versus 1000-3000 micron typical flat-fan nozzle throat leaves sub-100 micron particles unaddressed"
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "verdict": "SURVIVE",
+    "basis": "The return-line-only installation respects the stated boundary condition that the 13-15 bar supply remains untouched. GROUNDED_IN: SCOPE \"return-line installation only; 13-15 bar supply untouched\""
+   },
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "verdict": "SURVIVE",
+    "basis": "No evidence bundle was provided, therefore no internal contradiction between evidence and claims can be demonstrated. GROUNDED_IN: EVIDENCE (none held)"
+   },
+   {
+    "attack_class": "BASELINE_EQUIVALENCE",
+    "verdict": "RISK",
+    "basis": "The candidate claims the cyclone removes particles above 100 microns and the basin's existing settling volume finishes the separation, but standard mill basins already settle particles above 100 microns effectively due to high settling velocities per Stokes' law; adding a hydrocyclone for a size fraction the baseline already handles yields negligible marginal improvement over doing nothing new. GROUNDED_IN: RECORD \"the basin's existing settling volume finishes the separation\" | COMPUTATION 100 micron steel scale density ~5000 kg/m3 in water settles at >5 mm/s, exceeding typical basin overflow "
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "verdict": "KILL",
+    "basis": "The candidate specifies backflushing the underflow collection pot to a scale skip at each roll change, but a roll change requires immediate resumption of 14 bar cooling flow through the return line; interrupting or diverting the return line flow to backflush a pot on the active return loop during a roll change violates the continuous recirculation requirement implicit in the boundary condition that the supply remains untouched while the system operates. GROUNDED_IN: RECORD \"backflushed to a scale skip at each roll change\" | SCOPE \"return-line installation only; 13-15 bar supply untouched\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['14', '13', '15']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'skip at each roll' (field: intervention)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['installation', 'line', 'only', 'return']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"backflushed to a scale skip at each roll change\" | SCOPE \"return-line installation only; 13-15 bar supply untouched\"",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "verdict": "RISK",
+    "basis": "The testable prediction relies on isokinetic particle counts showing 85 percent plus or minus 5 percent removal above 100 microns, but isokinetic sampling of dense steel scale particles at 100 microns in high-velocity return lines is subject to severe inertial bias where sampling error bands routinely exceed the claimed plus or minus 5 percent precision, rendering the measurement specification internally contradictory with the physics of the target particle class. GROUNDED_IN: RECORD \"isokinetic particle counts... show 85 percent plus or minus 5 percent removal above 100 microns\" | COMPUTATION"
+   }
+  ],
+  "intervention_suggestions": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "suggestion": "Shift the cyclone cut size variable from 100 microns down to 20-40 microns by reducing the apex diameter and increasing inlet velocity, because the actual clogging mechanism in flat-fan nozzles is driven by fine particle accumulation, not coarse scale. GROUNDED_IN: RECORD \"scale particles above 100 microns\" | COMPUTATION 100 micron cut size versus 1000-3000 micron typical flat-fan nozzle throat",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['100', '20', '40', '100', '100', '1000']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'particles above 100 microns' (field: mechanism)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"scale particles above 100 microns\" | COMPUTATION 100 micron cut size versus 1000-3000 micron typical flat-fan nozzle throat",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "BASELINE_EQUIVALENCE",
+    "suggestion": "Redefine the novel design variable to target the 10-50 micron range where the existing basin settling volume is ineffective due to low settling velocities, thereby establishing a measurable delta over the status quo. GROUNDED_IN: RECORD \"the basin's existing settling volume finishes the separation\" | COMPUTATION 100 micron steel scale density ~5000 kg/m3 in water settles at >5 mm/s",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['10', '50', '100', '5000', '3', '5']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'volume finishes the separation' (field: mechanism)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['basin', 'settling', 'volume']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"the basin's existing settling volume finishes the separation\" | COMPUTATION 100 micron steel scale density ~5000 kg/m3 in water settles at >5 mm/s",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "suggestion": "Replace the batch backflush at roll change with a continuous pinch-valve underflow discharge to the scale skip, eliminating the need to interrupt return-line flow during critical operational transitions. GROUNDED_IN: RECORD \"backflushed to a scale skip at each roll change\" | SCOPE \"return-line installation only; 13-15 bar supply untouched\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['13', '15']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'skip at each roll' (field: intervention)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['installation', 'line', 'only', 'return']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"backflushed to a scale skip at each roll change\" | SCOPE \"return-line installation only; 13-15 bar supply untouched\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "suggestion": "Replace the isokinetic sampling requirement with inline laser diffraction or automated optical particle counters calibrated for dense slurries, which eliminate inertial sampling bias and can reliably resolve the plus or minus 5 percent band. GROUNDED_IN: RECORD \"isokinetic particle counts... show 85 percent plus or minus 5 percent removal above 100 microns\" | COMPUTATION 100 micron dense scale ine",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['5', '85', '5', '100', '100', '5']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'percent plus or minus' (field: testable_prediction)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"isokinetic particle counts... show 85 percent plus or minus 5 percent removal above 100 microns\" | COMPUTATION 100 micron dense scale inertial sampling error exceeds the stated 5 percent toler",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   }
+  ],
+  "state": "ATTACK_RUN",
+  "overall": "KILLED",
+  "kill_basis": [
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "basis": "The candidate specifies backflushing the underflow collection pot to a scale skip at each roll change, but a roll change requires immediate resumption of 14 bar cooling flow through the return line; interrupting or diverting the return line flow to backflush a pot on the active return loop during a roll change violates the continuous recirculation requirement implicit in the boundary condition that the supply remains untouched while the system operates. GROUNDED_IN: RECORD \"backflushed to a scale skip at each roll change\" | SCOPE \"return-line installation only; 13-15 bar supply untouched\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['14', '13', '15']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'skip at each roll' (field: intervention)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['installation', 'line', 'only', 'return']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"backflushed to a scale skip at each roll change\" | SCOPE \"return-line installation only; 13-15 bar supply untouched\"",
+     "absence_ground": false
+    }
+   }
+  ],
+  "counts": {
+   "KILL": 1,
+   "RISK": 3,
+   "SURVIVE": 2,
+   "ABSTAIN_DEMOTED": 0,
+   "INVALID": 0
+  }
+ }
+}

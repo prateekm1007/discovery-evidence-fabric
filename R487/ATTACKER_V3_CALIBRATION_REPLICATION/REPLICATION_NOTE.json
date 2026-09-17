@@ -1,0 +1,26 @@
+{
+  "artifact_type": "ATTACKER_V3_MEASUREMENT_REPLICATION_NOTE",
+  "round": "R487/R488 (race instance 8 reconciliation)",
+  "reviewer_provenance": "AI_REVIEW",
+  "the_fact": "the v3 sealed-bar measurement was executed TWICE, independently, by the two parallel lines against the same deployed instrument (engine_commit 7d38eb4e, identity-verified by both), the same frozen corpus (R446/ATTACKER_CALIBRATION/CORPUS.json, sha256 34804d2fafcaccb5..., byte-identical, asserted by both), and the same R412 sealed bars — and both runs measured the SAME headline verdict",
+  "canonical_run": {
+    "line": "the parallel R488 line (origin/main a6a21be5)",
+    "artifact": "R487/ATTACKER_V3_CALIBRATION/ (the canonical path; 22/22 cases attacked; the shipped records discovery_fabric/engine/calibration_records/r487_attacker_v3_*.json derive from this run)",
+    "measured_at": "2026-09-17T05:24:06Z",
+    "numbers": {"TPR": 1.0, "tpr_detail": "8/8", "FPR": 1.0, "TNR": 0.0, "coverage": 1.0, "parse": 1.0, "threshold_verdict": "NOT_CALIBRATED (fpr bar fails)"},
+    "client_timeout": "900s (their measured-safe ceiling; cal-18 landed)"
+  },
+  "replication_run": {
+    "line": "this line (the CTO session recovering from the container recycle)",
+    "artifact": "R487/ATTACKER_V3_CALIBRATION_REPLICATION/ (this directory; 21/22 cases attacked; cal-18 TRANSPORT_INCOMPLETE after 5 consecutive >560s client read-timeouts — an infrastructure state, never a scientific verdict, Art. LXI/LXXIV)",
+    "measured_at": "2026-09-17T08:59:25Z",
+    "numbers": {"TPR": 1.0, "tpr_detail": "7/7 over the attacked TP cohort", "FPR": 1.0, "TNR": 0.0, "coverage": 0.9545, "parse": 1.0, "threshold_verdict": "NOT_CALIBRATED (fpr bar fails)"},
+    "client_timeout": "560s (this line's ceiling; cal-18 never landed under it)"
+  },
+  "what_the_replication_adds": [
+    "the negative result is not a single-run artifact: two independent client sessions, ~3.5 hours apart, fresh LLM attack instances on the production ring, same FPR 1.0 / TNR 0.0 / NOT_CALIBRATED",
+    "per-case outcome variance is real and recorded: this line's run killed cal-10 (scope) and cal-20/cal-21 (absence cohort) where the canonical run recorded escalated-not-killed / UNCERTAIN_HONEST — the attack layer is stochastic at the case level while the clean-cohort false-kill (cal-13/14/15/16, all four, both runs) and the headline verdict are stable",
+    "both lines independently shipped the same-record-shaped derivation inputs and independently added the same .gitattributes hardening (the re-audit's Windows-checkout finding) — the rebase union keeps the parallel line's canonical measurement, this line's superset attribute list, and the 900s client ceiling"
+  ],
+  "the_honest_boundary": "both runs share the same instrument version, the same ring, and the same corpus — this is a same-instrument replication (client-side independence only), NOT an independent-instrument replication; the attacker remains NOT_CALIBRATED and the R417 escalation gate stays in force"
+}

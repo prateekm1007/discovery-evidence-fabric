@@ -1,0 +1,294 @@
+{
+ "attack": {
+  "attack_version": "independent_attack/3.0.0",
+  "candidate_id": "cal-09-piezo-header-vibration",
+  "generator_provider": null,
+  "attacker_provider": "xkiro",
+  "attacker_model": "qwen/qwen3.8-max:free",
+  "independence_mode": "SEPARATE_CONTEXT",
+  "independence_note": "the attacker ran in an independent reasoning context (fresh adversarial conversation, generator reasoning never shown; no alternative provider credentialed \u2014 disclosed, never claimed as provider separation)",
+  "prompt_hash": "f0f10d53155a127188bee8ae50bbdc6aa5de1731183fa7244132100d5e94eb27",
+  "output_hash": "3422f62cc627374fc68d35b6ec4e8f50842f4693e8f09353bae8924a34abaa1a",
+  "llm_status": "OK",
+  "attacked_at": "2026-09-17T05:34:21+00:00Z",
+  "items": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "verdict": "KILL",
+    "basis": "The candidate claims vibration-assisted transport prevents particle settling in hoppers and chutes, but hopper/chute vibration acts on dry granular solids resting on a surface under gravity; the spray header contains water pressurized at 14 bar flowing through nozzles where particles are entrained in bulk fluid motion, not resting on a surface, making the cited mechanism physically inapplicable to the stated problem. GROUNDED_IN: RECORD \"vibration-assisted transport is proven in industrial hoppers and chutes\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'assisted transport is proven' (field: mechanism)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"vibration-assisted transport is proven in industrial hoppers and chutes\"",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "verdict": "KILL",
+    "basis": "The candidate specifies \"header supported on tuned isolation mounts\" to enable 200 Hz vibration while simultaneously claiming the system operates with the \"header rigidly connected to mill frame at the roll-cooling interface\"; tuned isolation mounts require mechanical decoupling from the rigid frame to function, making these two boundary conditions mutually exclusive as stated. GROUNDED_IN: SCOPE \"header rigidly connected to mill frame at the roll-cooling interface\" violated by RECORD \"header supported on tuned isolation mounts\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'header supported on tuned' (field: intervention)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['connected', 'cooling', 'frame', 'header']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "SCOPE \"header rigidly connected to mill frame at the roll-cooling interface\" violated by RECORD \"header supported on tuned isolation mounts\"",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "EVIDENCE_CONTRADICTION",
+    "verdict": "SURVIVE",
+    "basis": "No held evidence bundle exists to contradict the candidate's claims. GROUNDED_IN: EVIDENCE (none held)"
+   },
+   {
+    "attack_class": "BASELINE_EQUIVALENCE",
+    "verdict": "SURVIVE",
+    "basis": "The candidate introduces 200 Hz electro-mechanical shakers and isolation mounts, which are not present in the status quo baseline. GROUNDED_IN: RECORD \"two 200 Hz electro-mechanical shakers mounted on the header ends, 12 kW continuous drive, header supported on tuned isolation mounts\""
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "verdict": "KILL",
+    "basis": "The candidate proposes driving a steel spray header spanning 120 flat-fan nozzles across two work-roll faces at 200 Hz using only 12 kW continuous drive; a structural steel pipe of that length has a mass on the order of hundreds of kilograms, and sustaining 200 Hz oscillation against the hydraulic stiffness of 14 bar internal pressure requires power orders of magnitude higher than 12 kW, rendering the specified drive physically insufficient for the claimed frequency and scale. GROUNDED_IN: COMPUTATION 12 kW drive vs 200 Hz frequency applied to a header feeding 120 nozzles across two work-roll ",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['120', '200', '12', '200', '14', '12']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span '12 kw continuous drive' (field: intervention)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['header', 'roll', 'service']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "COMPUTATION 12 kW drive vs 200 Hz frequency applied to a header feeding 120 nozzles across two work-roll faces at 14 bar service pressure",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "verdict": "KILL",
+    "basis": "The testable prediction measures \"no deposit consolidation after a 120-hour slurry exposure\" on a bench header section, but the actual failure mode includes \"biological growth in the recirculated water at 32-38 C\"; biological adhesion mechanisms differ fundamentally from particulate slurry deposition, so the proposed test does not measure the biological failure component it claims to eliminate. GROUNDED_IN: RECORD \"progressive nozzle clogging from scale particles and biological growth in the recirculated water at 32-38 C\" vs RECORD \"a bench header section vibrated at 200 Hz versus static shows",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['120', '32', '38', '32', '38', '200']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'bench header section vibrated' (field: testable_prediction)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"progressive nozzle clogging from scale particles and biological growth in the recirculated water at 32-38 C\" vs RECORD \"a bench header section vibrated at 200 Hz versus static shows no deposit",
+     "absence_ground": false
+    }
+   }
+  ],
+  "intervention_suggestions": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "suggestion": "Change the mechanism basis from dry hopper/chute vibration to acoustic or ultrasonic cavitation within the pressurized fluid stream, because cavitation directly disrupts particle and biofilm adhesion in liquid flow rather than relying on granular solid transport physics. GROUNDED_IN: RECORD \"vibration-assisted transport is proven in industrial hoppers and chutes\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'assisted transport is proven' (field: mechanism)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"vibration-assisted transport is proven in industrial hoppers and chutes\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "suggestion": "Replace the tuned isolation mounts with localized piezoelectric actuators bonded directly to the nozzle inlet bodies, eliminating the need to decouple the entire header from the mill frame while still delivering high-frequency energy to the deposit sites. GROUNDED_IN: SCOPE \"header rigidly connected to mill frame at the roll-cooling interface\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'mill frame at the' (field: boundary_conditions)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['connected', 'cooling', 'frame', 'header']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "SCOPE \"header rigidly connected to mill frame at the roll-cooling interface\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "suggestion": "Reduce the target frequency from 200 Hz to match the first natural bending mode of the specific header geometry, or increase the drive power specification by calculating the exact kinetic energy required to accelerate the header mass plus the 14 bar hydraulic reaction force at 200 Hz. GROUNDED_IN: COMPUTATION 12 kW drive vs 200 Hz frequency applied to a header feeding 120 nozzles across two work-r",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['200', '14', '200', '12', '200', '120']",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['header', 'roll', 'service']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "COMPUTATION 12 kW drive vs 200 Hz frequency applied to a header feeding 120 nozzles across two work-roll faces at 14 bar service pressure",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "suggestion": "Add a parallel 120-hour bench test using live recirculated cooling water inoculated with the specific biological species at 32-38 C to validate that 200 Hz vibration also prevents biofilm adhesion, not just slurry particle consolidation. GROUNDED_IN: RECORD \"progressive nozzle clogging from scale particles and biological growth in the recirculated water at 32-38 C\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['120', '32', '38', '200', '32', '38']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"progressive nozzle clogging from scale particles and biological growth in the recirculated water at 32-38 C\"",
+     "absence_ground": false
+    },
+    "class": "GROUNDED_INTERVENTION",
+    "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+   }
+  ],
+  "state": "ATTACK_RUN",
+  "overall": "KILLED",
+  "kill_basis": [
+   {
+    "attack_class": "MECHANISM_FAILURE",
+    "basis": "The candidate claims vibration-assisted transport prevents particle settling in hoppers and chutes, but hopper/chute vibration acts on dry granular solids resting on a surface under gravity; the spray header contains water pressurized at 14 bar flowing through nozzles where particles are entrained in bulk fluid motion, not resting on a surface, making the cited mechanism physically inapplicable to the stated problem. GROUNDED_IN: RECORD \"vibration-assisted transport is proven in industrial hoppers and chutes\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'assisted transport is proven' (field: mechanism)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"vibration-assisted transport is proven in industrial hoppers and chutes\"",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "BOUNDARY_CONDITION_FAILURE",
+    "basis": "The candidate specifies \"header supported on tuned isolation mounts\" to enable 200 Hz vibration while simultaneously claiming the system operates with the \"header rigidly connected to mill frame at the roll-cooling interface\"; tuned isolation mounts require mechanical decoupling from the rigid frame to function, making these two boundary conditions mutually exclusive as stated. GROUNDED_IN: SCOPE \"header rigidly connected to mill frame at the roll-cooling interface\" violated by RECORD \"header supported on tuned isolation mounts\"",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "record",
+       "ground": "verbatim span 'header supported on tuned' (field: intervention)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['connected', 'cooling', 'frame', 'header']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "SCOPE \"header rigidly connected to mill frame at the roll-cooling interface\" violated by RECORD \"header supported on tuned isolation mounts\"",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+    "basis": "The candidate proposes driving a steel spray header spanning 120 flat-fan nozzles across two work-roll faces at 200 Hz using only 12 kW continuous drive; a structural steel pipe of that length has a mass on the order of hundreds of kilograms, and sustaining 200 Hz oscillation against the hydraulic stiffness of 14 bar internal pressure requires power orders of magnitude higher than 12 kW, rendering the specified drive physically insufficient for the claimed frequency and scale. GROUNDED_IN: COMPUTATION 12 kW drive vs 200 Hz frequency applied to a header feeding 120 nozzles across two work-roll ",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['120', '200', '12', '200', '14', '12']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span '12 kw continuous drive' (field: intervention)",
+       "verified": true
+      },
+      {
+       "binding": "declared_scope",
+       "ground": "boundary overlap ['header', 'roll', 'service']",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "COMPUTATION 12 kW drive vs 200 Hz frequency applied to a header feeding 120 nozzles across two work-roll faces at 14 bar service pressure",
+     "absence_ground": false
+    }
+   },
+   {
+    "attack_class": "MEASUREMENT_AMBIGUITY",
+    "basis": "The testable prediction measures \"no deposit consolidation after a 120-hour slurry exposure\" on a bench header section, but the actual failure mode includes \"biological growth in the recirculated water at 32-38 C\"; biological adhesion mechanisms differ fundamentally from particulate slurry deposition, so the proposed test does not measure the biological failure component it claims to eliminate. GROUNDED_IN: RECORD \"progressive nozzle clogging from scale particles and biological growth in the recirculated water at 32-38 C\" vs RECORD \"a bench header section vibrated at 200 Hz versus static shows",
+    "grounding": {
+     "grounded": true,
+     "bindings": [
+      {
+       "binding": "computation",
+       "ground": "numeric relation over ['120', '32', '38', '32', '38', '200']",
+       "verified": true
+      },
+      {
+       "binding": "record",
+       "ground": "verbatim span 'bench header section vibrated' (field: testable_prediction)",
+       "verified": true
+      }
+     ],
+     "claimed_ground": "RECORD \"progressive nozzle clogging from scale particles and biological growth in the recirculated water at 32-38 C\" vs RECORD \"a bench header section vibrated at 200 Hz versus static shows no deposit",
+     "absence_ground": false
+    }
+   }
+  ],
+  "counts": {
+   "KILL": 4,
+   "RISK": 0,
+   "SURVIVE": 2,
+   "ABSTAIN_DEMOTED": 0,
+   "INVALID": 0
+  }
+ }
+}
