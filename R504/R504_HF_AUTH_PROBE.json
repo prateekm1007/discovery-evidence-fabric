@@ -1,0 +1,143 @@
+{
+ "record_id": "R504_HF_AUTH_PROBE",
+ "purpose": "measure-before-integration for HF_TOKEN authenticated quota on the free evidence legs (operator directive 2026-09-18); both modes measured per endpoint; includes the R500-deferred /search warming-window retry",
+ "token_fingerprint": "len=37 sha256:12=33bc7af22c62",
+ "measured_at_utc": "2026-09-17T22:36:30Z",
+ "dataset": "common-pile/uspto",
+ "pass1_whoami": {
+  "state": "LIVE",
+  "name": "prateekm1",
+  "type": "user",
+  "auth_type": "access_token"
+ },
+ "pass2_splits": {
+  "keyless": {
+   "url": "https://datasets-server.huggingface.co/splits?dataset=common-pile/uspto",
+   "authenticated": false,
+   "http_status": 200,
+   "headers_of_record": {
+    "Content-Type": "application/json"
+   },
+   "body_keys": [
+    "failed",
+    "pending",
+    "splits"
+   ],
+   "latency_ms": 244,
+   "body_sha256_12": "6f49cdbd80e1"
+  },
+  "authenticated": {
+   "url": "https://datasets-server.huggingface.co/splits?dataset=common-pile/uspto",
+   "authenticated": true,
+   "http_status": 200,
+   "headers_of_record": {
+    "Content-Type": "application/json"
+   },
+   "body_keys": [
+    "failed",
+    "pending",
+    "splits"
+   ],
+   "latency_ms": 255,
+   "body_sha256_12": "6f49cdbd80e1"
+  }
+ },
+ "pass3_rows": {
+  "keyless": {
+   "url": "https://datasets-server.huggingface.co/rows?dataset=common-pile/uspto&config=default&split=train&offset=0&length=2",
+   "authenticated": false,
+   "http_status": 200,
+   "headers_of_record": {
+    "Content-Type": "application/json"
+   },
+   "body_keys": [
+    "features",
+    "num_rows_per_page",
+    "num_rows_total",
+    "partial",
+    "rows"
+   ],
+   "num_rows_total": 131755,
+   "rows_returned": 2,
+   "latency_ms": 1204,
+   "body_sha256_12": "d4735e3a265e"
+  },
+  "authenticated": {
+   "url": "https://datasets-server.huggingface.co/rows?dataset=common-pile/uspto&config=default&split=train&offset=0&length=2",
+   "authenticated": true,
+   "http_status": 200,
+   "headers_of_record": {
+    "Content-Type": "application/json"
+   },
+   "body_keys": [
+    "features",
+    "num_rows_per_page",
+    "num_rows_total",
+    "partial",
+    "rows"
+   ],
+   "num_rows_total": 131755,
+   "rows_returned": 2,
+   "latency_ms": 1242,
+   "body_sha256_12": "d4735e3a265e"
+  }
+ },
+ "pass4_search": {
+  "keyless": {
+   "url": "https://datasets-server.huggingface.co/search?dataset=common-pile/uspto&config=default&split=train&query=shunt%20valve&offset=0&length=3",
+   "authenticated": false,
+   "http_status": 500,
+   "provider_error": "the dataset index is loading, this can take a minute",
+   "headers_of_record": {},
+   "latency_ms": 20448,
+   "body_sha256_12": "6f49cdbd80e1"
+  },
+  "authenticated": {
+   "url": "https://datasets-server.huggingface.co/search?dataset=common-pile/uspto&config=default&split=train&query=shunt%20valve&offset=0&length=3",
+   "authenticated": true,
+   "http_status": 500,
+   "provider_error": "the dataset index is loading, this can take a minute",
+   "headers_of_record": {},
+   "latency_ms": 20370,
+   "body_sha256_12": "6f49cdbd80e1"
+  }
+ },
+ "pass5_catalog": {
+  "keyless": {
+   "url": "https://huggingface.co/api/datasets?other=patents&limit=5&full=false",
+   "authenticated": false,
+   "http_status": 200,
+   "headers_of_record": {
+    "Content-Type": "application/json; charset=utf-8",
+    "X-Request-Id": "Root=1-6aac6b9b-4dc8a1ff0eb424d138f80376",
+    "RateLimit": "\"api\";r=481;t=173",
+    "RateLimit-Policy": "\"fixed window\";\"api\";q=500;w=300"
+   },
+   "body_list_len": 5,
+   "latency_ms": 245,
+   "body_sha256_12": "6f49cdbd80e1"
+  },
+  "authenticated": {
+   "url": "https://huggingface.co/api/datasets?other=patents&limit=5&full=false",
+   "authenticated": true,
+   "http_status": 200,
+   "headers_of_record": {
+    "Content-Type": "application/json; charset=utf-8",
+    "X-Request-Id": "Root=1-6aac6b9b-1c5e0cde5db9171658e59ab3",
+    "RateLimit": "\"api\";r=2498;t=151",
+    "RateLimit-Policy": "\"fixed window\";\"api\";q=2500;w=300"
+   },
+   "body_list_len": 5,
+   "latency_ms": 262,
+   "body_sha256_12": "6f49cdbd80e1"
+  }
+ },
+ "typed_verdicts": {
+  "pass2_splits": "BOTH_MODES_LIVE",
+  "pass3_rows": "BOTH_MODES_LIVE",
+  "pass4_search": "BOTH_MODES_NON_LIVE",
+  "pass5_catalog": "BOTH_MODES_LIVE"
+ },
+ "integration_ruling": "authenticated header MAY be wired only where the authenticated mode measured >= the keyless mode (never degrades); the header is attached from the HF_TOKEN environment when present, and the per-call custody provenance records the mode actually used (LXXV clause 1: provenance = which source, which endpoint, which query, when \u2014 and now, under which credential mode)",
+ "reviewer_provenance": "AI_REVIEW"
+}

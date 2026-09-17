@@ -125,18 +125,45 @@ class TestTheUnionRecord:
     as law."""
 
     def test_constitution_is_the_landed_v260(self):
+        # Art. VII disclosed update (R504, the R503 cited precedent): this
+        # pin bound the CURRENT file to the R485-era landed version —
+        # superseded by every later RATIFIED amendment by design (R498
+        # 2.7.0 LXXV, R503 2.8.0 LXXVI). The intent is preserved and
+        # strengthened: the version is asserted against the loader's own
+        # atomic parse (single authority, Art. X) at the R485-era floor,
+        # and the retired second-line proposal is excluded by TITLE (the
+        # stronger form — the ratified R498/R503 LXXV/LXXVI carry DIFFERENT
+        # titles and ARE law; the retired proposal's articles are not).
+        from epistemic_integrity import constitution_loader as cl
         body = (REPO / "EPISTEMIC_CONSTITUTION.md").read_text()
-        assert "**Version:** 2.6.0" in body
+        v = cl._parse_constitution_version()
+        assert v != "UNKNOWN"
+        assert v >= "2.6.0", (
+            f"constitution {v} below the R485-era landed floor")
         # the canonical structure: ONE LXXIV, titled as landed
         assert body.count("## Article LXXIV —") == 1
         assert ("## Article LXXIV — Observer-Independent Durable "
                 "Execution") in body
         # the second line's six-article structure is NOT in the body
-        # (retired per Art. LXIV; preserved in R485/constitution/)
-        for art in ("LXXV", "LXXVI", "LXXVII", "LXXVIII", "LXXIX"):
-            assert f"## Article {art} —" not in body, (
-                f"Article {art} in the body — the retired six-article "
-                f"proposal leaked into law")
+        # (retired per Art. LXIV; preserved in R485/constitution/) —
+        # pinned by the retired proposal's TITLES, so later ratified
+        # amendments reusing a number with a different title stay law
+        for retired_title in (
+                "## Article LXXV — Remote Work Must Be Durable",
+                "## Article LXXVI — The Durable State Machine and Typed "
+                "Timeouts",
+                "## Article LXXVII — Provider Execution and Sandbox "
+                "Execution Are Separate Boundaries",
+                "## Article LXXVIII — Retry Must Be Idempotent",
+                "## Article LXXIX —",
+        ):
+            assert retired_title not in body, (
+                f"retired proposal article in the body: {retired_title!r} "
+                f"— the second line's proposal leaked into law")
+        # the RATIFIED later amendments are law (chain: R498 -> R503)
+        assert ("## Article LXXV — Patent Evidence Is Not Patent "
+                "Truth") in body
+        assert ("## Article LXXVI — Credential Custody") in body
 
     def test_the_retired_proposal_is_preserved_as_history(self):
         amd = (REPO / "R485" / "constitution"

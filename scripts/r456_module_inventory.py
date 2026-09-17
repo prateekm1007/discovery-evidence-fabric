@@ -96,9 +96,30 @@ def _module_to_path(mod: str) -> Path | None:
     return None
 
 
+def _relative_package_of(path: Path) -> Optional[str]:
+    """Dotted package of the importing file's directory (for relative
+    import resolution); '' for repo-root files (no package context)."""
+    try:
+        rel = path.resolve().parent.relative_to(REPO.resolve())
+    except ValueError:
+        return None
+    if not rel.parts:
+        return ""
+    # walk up while __init__.py marks the package root
+    parts = list(rel.parts)
+    while parts and not (REPO.joinpath(*parts) / "__init__.py").is_file():
+        parts.pop()
+    return ".".join(parts) if parts else None
+
+
 def _imports_of(path: Path) -> set[str]:
     """All repo-internal imports of a file, INCLUDING lazy (function
-    level) imports, importlib literal loads, AND imports inside
+    level) imports, RELATIVE imports (the R504 lesson: `from .mod import
+    name` — the prior_art_v2 free-evidence ladder hook — was invisible
+    to the level==0-only walk, so a production module could sit outside
+    the closure; Art. VII disclosed instrument fix: the walk now resolves
+    relative levels against the importing file's package, catching MORE,
+    never fewer), importlib literal loads, AND imports inside
     subprocess-embedded code strings (the R456 lesson: the
     research_authorization_gate runs preflight/gauntlet-v1/v2 via
     code-string subprocess scripts — a plain AST import walk calls them
@@ -108,6 +129,7 @@ def _imports_of(path: Path) -> set[str]:
         tree = ast.parse(path.read_text(errors="replace"))
     except SyntaxError:
         return out
+    rel_pkg = _relative_package_of(path)
     for node in ast.walk(tree):
         if isinstance(node, ast.Import):
             for a in node.names:
@@ -118,6 +140,21 @@ def _imports_of(path: Path) -> set[str]:
                 # from pkg.mod import name -> name may be a submodule
                 for a in node.names:
                     out.add(f"{node.module}.{a.name}")
+            elif node.level > 0 and rel_pkg:
+                # relative import: resolve against the importing file's
+                # package (level 1 = the file's package, 2 = its parent, …)
+                base_parts = rel_pkg.split(".")
+                if node.level > 1:
+                    base_parts = base_parts[:-(node.level - 1)]
+                base = ".".join(base_parts)
+                if node.module:
+                    out.add(f"{base}.{node.module}")
+                    for a in node.names:
+                        out.add(f"{base}.{node.module}.{a.name}")
+                else:
+                    out.add(base)
+                    for a in node.names:
+                        out.add(f"{base}.{a.name}")
         elif isinstance(node, ast.Call):
             f = node.func
             if (isinstance(f, ast.Attribute) and f.attr ==

@@ -16,13 +16,21 @@ seal path." Operationalized:
 Run: ELSEVIER_API_KEY=... python3 rbg_seal.py <out_dir> [--reps N] [--round R495] [--patent-leg-only]
 Credentials via env injection only; never printed.
 
-SCOPE (R498): --patent-leg-only seals ONLY the patent-leg fixtures
+SCOPE (R498/R502): --patent-leg-only seals ONLY the patent-leg fixtures
   (F6, F9, F10, F11; battery v3.1 mode). The seal record is scope-typed
   and explicitly does NOT claim the full battery: the Scopus side stands
   sealed 3/3 at R495 (R495/R495_RBG_SEAL_RECORD.json) and is neither
   re-measured nor re-claimed by a patent-leg-only seal. Exists because
   quota windows and credential availability are per-leg constraints
   (R497: SEAL_NOT_CLAIMED_QUOTA_INFEASIBLE with the Scopus side sealed).
+  --corpus-leg-only (R502, battery v4.1 mode) seals ONLY the free-source
+  corpus fixtures (F12, F13) -- the Scopus AND patent legs are
+  out-of-scope skips, zero PatentBear debits are spent, and BOTH standing
+  leg seals (R495 Scopus 3/3, R498 patent-leg 3/3) are referenced, never
+  re-claimed. The HF legs attach the HF_TOKEN authenticated header when
+  the environment holds it (measured R504: both-modes-live on /splits,
+  /rows, the Hub catalog; the /search warming transient is identical in
+  both modes).
 """
 
 import hashlib
@@ -37,7 +45,7 @@ BATTERY = os.path.join(HERE, "rbg_battery.py")
 
 
 def run_repetitions(out_dir, n_reps, round_label="R495",
-                    patent_leg_only=False):
+                    patent_leg_only=False, corpus_leg_only=False):
     os.makedirs(out_dir, exist_ok=True)
     reps = []
     for i in range(1, n_reps + 1):
@@ -60,11 +68,14 @@ def run_repetitions(out_dir, n_reps, round_label="R495",
         out_json = os.path.join(
             out_dir, "%s_RBG_REP_%s%s.json"
             % (round_label, rep_id,
-               "_PATENT_LEG" if patent_leg_only else ""))
+               "_PATENT_LEG" if patent_leg_only else
+               ("_CORPUS_LEG" if corpus_leg_only else "")))
         # fresh process per repetition (loop step 11 discipline)
         argv = [sys.executable, BATTERY, rep_id, out_json]
         if patent_leg_only:
             argv.append("--patent-leg-only")
+        if corpus_leg_only:
+            argv.append("--corpus-leg-only")
         proc = subprocess.run(
             argv,
             capture_output=True, text=True,
@@ -85,7 +96,7 @@ def run_repetitions(out_dir, n_reps, round_label="R495",
 
 
 def compute_seal(reps, n_reps, round_label="R495",
-                 patent_leg_only=False):
+                 patent_leg_only=False, corpus_leg_only=False):
     # a repetition counts as COMPLETE only if its process ran, produced a
     # verdict sequence, and passed all fixtures; early-stopped slots are
     # neither complete nor failures-to-agree -- they are recorded as such
@@ -94,11 +105,15 @@ def compute_seal(reps, n_reps, round_label="R495",
                 and r.get("verdict_sequence_sha256")]
     seal = {
         "seal_id": "%s_RBG_%sSEAL" % (round_label,
-                                       "PATENT_LEG_" if patent_leg_only else ""),
+                                       ("PATENT_LEG_" if patent_leg_only else
+                                        ("CORPUS_LEG_" if corpus_leg_only
+                                         else ""))),
         "seal_path": "repetition_based_measurement",
-        "scope": ("PATENT_LEG_ONLY (fixtures F6, F9, F10, F11; battery v3.1 "
-                  "mode)" if patent_leg_only else
-                  "FULL_BATTERY (11 fixtures)"),
+        "scope": ("CORPUS_LEG_ONLY (fixtures F12, F13; battery v4.1 mode; "
+                  "zero PatentBear debits spent)" if corpus_leg_only else
+                  ("PATENT_LEG_ONLY (fixtures F6, F9, F10, F11; battery v3.1 "
+                   "mode)" if patent_leg_only else
+                   "FULL_BATTERY (11 fixtures)")),
         "unanimity_rule": "all fixtures pass in all repetitions AND identical "
                           "verdict sequences across every repetition",
         "repetitions_requested": n_reps,
@@ -106,7 +121,41 @@ def compute_seal(reps, n_reps, round_label="R495",
         "early_stopped_slots": [r["repetition_id"] for r in reps
                                 if r.get("not_run_early_stop")],
     }
-    if patent_leg_only:
+    if corpus_leg_only:
+        seal["explicitly_not_claimed"] = [
+            "the FULL battery is NOT sealed by this record -- the free-source "
+            "corpus fixtures only (F12, F13)",
+            "the Scopus side is NOT re-measured here and its R495 seal "
+            "(R495/R495_RBG_SEAL_RECORD.json, 3/3, unanimous, hash "
+            "db336e97...) is referenced, never re-claimed",
+            "the patent leg is NOT re-measured here and its R498 patent-leg "
+            "seal (R498/R498_RBG_PATENT_LEG_SEAL_RECORD.json, 3/3, hash "
+            "2e0545a3...) is referenced, never re-claimed",
+            "no novelty verdict exists in any scope (Art. XLVI)",
+        ]
+        seal["other_legs_status"] = {
+            "state": "NOT_MEASURED_THIS_RUN",
+            "reason": ("scoped corpus-leg seal: the Scopus value is held on "
+                       "the Space secret surface (write-only from this "
+                       "session) and PATENTBEAR_API_KEY remains a typed "
+                       "custody gap (value not held; bucket 19/20, the "
+                       "6+ quiet debits unblock stands)"),
+            "standing_seals": [
+                "R495/R495_RBG_SEAL_RECORD.json (Scopus 3/3, hash db336e97...)",
+                "R498/R498_RBG_PATENT_LEG_SEAL_RECORD.json (patent leg 3/3, "
+                "hash 2e0545a3...)",
+            ],
+        }
+        seal["credential_mode"] = {
+            "hf_leg": ("AUTHENTICATED_HF_TOKEN when HF_TOKEN is present in "
+                       "the environment (Space secret standing), else the "
+                       "measured keyless mode; the per-repetition record "
+                       "carries the credential mode actually used"),
+            "measured_r504": ("R504/R504_HF_AUTH_PROBE.json -- /splits, "
+                              "/rows, Hub catalog both-modes-live; /search "
+                              "warming transient identical in both modes"),
+        }
+    elif patent_leg_only:
         seal["explicitly_not_claimed"] = [
             "the FULL battery is NOT sealed by this record -- the patent-leg "
             "fixtures only (F6, F9, F10, F11)",
@@ -148,10 +197,17 @@ if __name__ == "__main__":
     if "--round" in sys.argv:
         round_label = sys.argv[sys.argv.index("--round") + 1]
     patent_leg_only = "--patent-leg-only" in sys.argv
+    corpus_leg_only = "--corpus-leg-only" in sys.argv
+    if patent_leg_only and corpus_leg_only:
+        print(json.dumps({"error": "--patent-leg-only and --corpus-leg-only "
+                                    "are mutually exclusive modes"}))
+        sys.exit(2)
     reps = run_repetitions(out_dir, n_reps, round_label,
-                           patent_leg_only=patent_leg_only)
+                           patent_leg_only=patent_leg_only,
+                           corpus_leg_only=corpus_leg_only)
     seal = compute_seal(reps, n_reps, round_label,
-                        patent_leg_only=patent_leg_only)
+                        patent_leg_only=patent_leg_only,
+                        corpus_leg_only=corpus_leg_only)
     record = {"seal_record": seal, "repetitions": reps,
               "battery_version_note": "battery_version recorded per repetition (v1 = R495 "
                                       "8-fixture corpus; v2 = R496 9-fixture corpus with the "
@@ -160,7 +216,11 @@ if __name__ == "__main__":
                                       "measured-401 garbage key, F10/F11 patent-leg byte "
                                       "binding; Art. VII disclosed fixture update; v3.1 = "
                                       "R498 --patent-leg-only MODE extension, invariants "
-                                      "unchanged)",
+                                      "unchanged; v4 = R499 13-fixture corpus with the "
+                                      "FreePatentSourceLayer F12/F13; v4.1 = R502 "
+                                      "--corpus-leg-only MODE extension, invariants "
+                                      "unchanged, HF_TOKEN attach-when-present measured "
+                                      "R504)",
               "seal_statement": (
                   "Sealed by repetition-based measurement: %d independent fresh-process "
                   "repetitions of the live-retrieval battery, unanimous verdict sequences, "
@@ -171,7 +231,8 @@ if __name__ == "__main__":
     path = os.path.join("/home/z/my-project/download", round_label,
                         "%s_RBG_%sSEAL_RECORD.json"
                         % (round_label,
-                           "PATENT_LEG_" if patent_leg_only else ""))
+                           ("PATENT_LEG_" if patent_leg_only else
+                            ("CORPUS_LEG_" if corpus_leg_only else ""))))
     with open(path, "w") as fh:
         json.dump(record, fh, indent=2)
     print(json.dumps({"sealed": seal["sealed"],

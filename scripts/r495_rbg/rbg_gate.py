@@ -586,6 +586,29 @@ T_CREDENTIAL_REQUIRED = "CREDENTIAL_REQUIRED"   # measured 401/403 credential wa
 CORPUS_COVERED = "CORPUS_COVERAGE_LIVE_THIS_RUN"
 CORPUS_BLIND = "PATENT_CORPUS_BLIND_FOR_THIS_RUN"
 
+# R504 -- HF_TOKEN authenticated quota (attach-when-present). Measured
+# BEFORE integration (R504/R504_HF_AUTH_PROBE.json, both modes per
+# endpoint): /splits, /rows and the Hub catalog answer 200 in BOTH modes
+# (the authenticated mode never degrades a measured endpoint), and the
+# /search 500 warming transient is server-side index state, identical in
+# both modes -- the credential is not a /search lever. The header is
+# attached whenever the HF_TOKEN environment variable is present (the
+# canonical Space carries it as a standing secret, so the DEPLOYED legs
+# run authenticated), and the per-measurement provenance records the
+# credential mode actually used (LXXV clause 1: provenance = which
+# source, which endpoint, which query, when -- and under which
+# credential mode). A missing token degrades to the measured keyless
+# mode; it is never a failure.
+HF_AUTH_ENV = "HF_TOKEN"
+
+
+def _hf_auth_header():
+    """(headers, credential_mode) for the HF surfaces -- attach-when-present."""
+    tok = os.environ.get(HF_AUTH_ENV, "")
+    if tok:
+        return {"Authorization": "Bearer %s" % tok}, "AUTHENTICATED_HF_TOKEN"
+    return {}, "ANONYMOUS"
+
 # R499 probe-measured constants (Art. VIII: authored from provider reality,
 # probe ledger R499/R499_FREE_SOURCES_PROBE.json):
 HF_CATALOG_URL = ("https://huggingface.co/api/datasets?other=patents"
@@ -632,8 +655,10 @@ class FreePatentSourceLayer:
                "&config=%s&split=%s&offset=0&length=%d"
                % (urllib.parse.quote(dataset), urllib.parse.quote(config),
                   urllib.parse.quote(split), int(length)))
+        auth_h, self.last_credential_mode = _hf_auth_header()
         code, raw = _http_get(url, {"Accept": "application/json",
-                                    "User-Agent": "toscanini-rbg/1.0"})
+                                    "User-Agent": "toscanini-rbg/1.0",
+                                    **auth_h})
         if code is None:
             return T_SEARCH_FAILED, None
         if code == 404:
@@ -654,8 +679,10 @@ class FreePatentSourceLayer:
         m = self.measured = {}
 
         # 1. HF Hub catalog (a LISTING -- count signal, never coverage)
+        cat_auth, cat_mode = _hf_auth_header()
         code, raw = _http_get(HF_CATALOG_URL, {"Accept": "application/json",
-                                               "User-Agent": "toscanini-rbg/1.0"})
+                                               "User-Agent": "toscanini-rbg/1.0",
+                                               **cat_auth})
         st, obj = T_SEARCH_FAILED, None
         if code == 200:
             try:
@@ -669,6 +696,7 @@ class FreePatentSourceLayer:
             st = T_AUTH_FAILED
         m["hf_hub_catalog"] = {
             "state": st, "http": code,
+            "credential_mode": cat_mode,
             "dataset_count_returned": len(obj) if isinstance(obj, list) else None,
             "role": "DISCOVERY_LISTING_COUNT_SIGNAL_ONLY"}
 
@@ -686,6 +714,8 @@ class FreePatentSourceLayer:
         m["hf_corpus_rows"] = {
             "state": st_r, "dataset": HF_CORPUS_DATASET,
             "config": HF_CORPUS_CONFIG, "split": HF_CORPUS_SPLIT,
+            "credential_mode": getattr(self, "last_credential_mode",
+                                       "ANONYMOUS"),
             "rows_returned": len(rows) if isinstance(rows, list) else None,
             "has_long_text_field": long_text,
             "longest_text_field_len": longest,
@@ -695,6 +725,7 @@ class FreePatentSourceLayer:
         st_s, obj_s = self.fetch_dataset_size()
         m["hf_corpus_size_served_view"] = {
             "state": st_s,
+            "credential_mode": _hf_auth_header()[1],
             "measured_num_rows_served": obj_s,
             "brief_claim_num_rows": BRIEF_CLAIM_ROWS_COMMON_PILE,
             "claim_verification": (
@@ -775,8 +806,10 @@ class FreePatentSourceLayer:
     def fetch_dataset_size(self):
         url = ("https://datasets-server.huggingface.co/size?dataset="
                + urllib.parse.quote(HF_CORPUS_DATASET))
+        auth_h, _mode = _hf_auth_header()
         code, raw = _http_get(url, {"Accept": "application/json",
-                                    "User-Agent": "toscanini-rbg/1.0"})
+                                    "User-Agent": "toscanini-rbg/1.0",
+                                    **auth_h})
         if code != 200:
             return (T_NOT_FOUND if code == 404 else T_SEARCH_FAILED), None
         try:

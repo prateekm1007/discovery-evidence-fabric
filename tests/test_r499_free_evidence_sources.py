@@ -192,6 +192,71 @@ def test_hf_corpus_status_ok(monkeypatch):
     assert "never coverage statements" in st["note"]
 
 
+# ----------------------- 2b. R504: HF_TOKEN authenticated quota -----------------------
+
+def test_hf_auth_header_attach_when_present(monkeypatch):
+    monkeypatch.setenv("HF_TOKEN", "hf_test_token_for_hermetic_pin")
+    h, mode = fes.hf_auth_header()
+    assert h == {"Authorization": "Bearer hf_test_token_for_hermetic_pin"}
+    assert mode == "AUTHENTICATED_HF_TOKEN"
+    monkeypatch.delenv("HF_TOKEN", raising=False)
+    h2, mode2 = fes.hf_auth_header()
+    assert h2 == {} and mode2 == "ANONYMOUS"   # measured keyless fallback
+
+
+def test_hf_rows_attach_bearer_and_record_mode(monkeypatch):
+    body = {"rows": [{"row": HF_ROW}], "num_rows_total": 131755}
+    captured = {}
+
+    def fake_get(url, headers=None, timeout=30, max_bytes=0):
+        captured["headers"] = dict(headers or {})
+        return 200, json.dumps(body).encode(), 12
+
+    monkeypatch.setattr(fes, "_http_get", fake_get)
+    monkeypatch.setenv("HF_TOKEN", "hf_test_token_for_hermetic_pin")
+    r = fes.fetch_hf_uspto_rows(offset=0, length=1)
+    assert r.success
+    assert captured["headers"].get("Authorization") == \
+        "Bearer hf_test_token_for_hermetic_pin"
+    # LXXV clause 1 provenance extension: the credential mode actually used
+    cu = r.hits[0].raw_metadata["custody_lxxv"]
+    assert cu["provenance"]["credential_mode"] == "AUTHENTICATED_HF_TOKEN"
+    # the five custody fields are untouched by the auth extension
+    assert fes.custody_completeness(cu)["state"] == "PROVENANCE_INCOMPLETE"
+    assert "family_relationship" in fes.custody_completeness(cu)["missing"]
+
+
+def test_hf_rows_anonymous_fallback_never_fails(monkeypatch):
+    body = {"rows": [{"row": HF_ROW}], "num_rows_total": 131755}
+    captured = {}
+
+    def fake_get(url, headers=None, timeout=30, max_bytes=0):
+        captured["headers"] = dict(headers or {})
+        return 200, json.dumps(body).encode(), 12
+
+    monkeypatch.setattr(fes, "_http_get", fake_get)
+    monkeypatch.delenv("HF_TOKEN", raising=False)
+    r = fes.fetch_hf_uspto_rows(offset=0, length=1)
+    assert r.success                                   # a missing token is never a failure
+    assert "Authorization" not in captured["headers"]
+    assert r.hits[0].raw_metadata["custody_lxxv"]["provenance"]["credential_mode"] == "ANONYMOUS"
+
+
+def test_free_source_status_types_authenticated_capability():
+    st = fes.get_free_source_status()
+    hf = st["HF_USPTO_CORPUS"]
+    assert hf["authenticated"] is True                # the R504 attach-when-present capability
+    assert hf["auth_env"] == "HF_TOKEN"
+    assert hf["anonymous_fallback"] is True           # measured keyless mode preserved
+    assert hf["free"] is True                          # FREE never collapsed into AUTHENTICATED (LXXV)
+    assert st["EPO_LINKED_OPEN_DATA"]["authenticated"] is False  # EPO LOD stays anonymous
+
+
+def test_hf_transport_version_bumped_disclosed():
+    # 1.1.0 = the R504 attach-when-present transport change (disclosed)
+    assert fes.TRANSPORT_VERSION == "1.1.0"
+
+
 # ----------------------- 3. Leg B: EPO LOD -----------------------
 
 def test_epo_publication_uri_shape_trailing_dash():
@@ -315,8 +380,10 @@ def test_epo_lod_is_verification_not_search_provider():
 
 def test_registry_union_v1_2_0_carries_r499_measurements():
     reg = json.load(open(REG))
-    # v1.2.0 = the two-line union (Coder 2's R500 v1.1.0 + Coder 1's R499 v1.1.0)
-    assert reg["version"] == "1.2.0"
+    # v1.3.0 (R504): the v1.2.0 two-line union + the R504 both-mode auth
+    # re-typing — a data-level Art. VII disclosed update; every v1.2.0
+    # marker survives (values are extended, never replaced)
+    assert reg["version"] == "1.3.0"
     s = reg["sources"]
     # EPO LOD: the 406 is superseded by the discovered live endpoint (BOTH lines)
     assert "MEASURED_R499" in s["epo_linked_open_data"]["properties"]["ACCESSIBLE"]
@@ -332,6 +399,22 @@ def test_registry_union_v1_2_0_carries_r499_measurements():
     assert "MEASURED_R499" in s["epo_ops"]["properties"]["ACCESSIBLE"]
     assert "MEASURED_R499" in s["uspto_open_data_bulk"]["properties"]["ACCESSIBLE"] or \
            "MEASURED_R499" in s["uspto_patent_public_search"]["properties"]["ACCESSIBLE"]
+
+
+def test_registry_v1_3_0_carries_r504_auth_measurement():
+    reg = json.load(open(REG))
+    s = reg["sources"]
+    auth = s["huggingface_patent_datasets"]["properties"]["AUTHENTICATED"]
+    # the R504 re-typing: attach-when-present, both modes measured, never a failure
+    assert "ATTACH-WHEN-PRESENT" in auth
+    assert "MEASURED_R504" in auth
+    assert "BOTH" in auth                            # both modes measured live
+    # the historical v1.2.0 value is preserved inside the extended value
+    assert "MEASURED_R498" in auth
+    # the new provenance class is registered
+    assert "MEASURED_R504" in reg["provenance_classes"]
+    # the six-property vocabulary is never collapsed: FREE stays its own value
+    assert "MEASURED_R498" in s["huggingface_patent_datasets"]["properties"]["FREE"]
 
 
 def test_registry_no_absence_claims_introduced():

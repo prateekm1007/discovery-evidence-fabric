@@ -40,6 +40,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import re
 import ssl
 import time
@@ -60,8 +61,32 @@ _SSL.verify_mode = ssl.CERT_NONE
 
 _UA = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
 
-TRANSPORT_VERSION = "1.0.0"
+TRANSPORT_VERSION = "1.1.0"  # 1.1.0 (R504): HF_TOKEN attach-when-present (disclosed, transport-level)
 REGISTERED_SOURCES = ("HF_USPTO_CORPUS", "EPO_LINKED_OPEN_DATA")
+
+# R504 — HF_TOKEN authenticated quota (attach-when-present), measured
+# BEFORE integration in BOTH modes per endpoint
+# (R504/R504_HF_AUTH_PROBE.json): /splits, /rows and the Hub catalog
+# answer 200 in BOTH modes — the authenticated mode never degrades a
+# measured endpoint — and the /search 500 warming transient is
+# server-side index state, identical in both modes (the credential is
+# not a /search lever). The header is attached whenever the HF_TOKEN
+# environment variable is present — the canonical Space carries it as a
+# standing secret, so the DEPLOYED legs run authenticated — and the
+# per-call custody provenance records the credential mode actually used
+# (LXXV clause 1). A missing token degrades to the measured keyless
+# mode; it is never a failure.
+HF_AUTH_ENV = "HF_TOKEN"
+HF_MODE_AUTHENTICATED = "AUTHENTICATED_HF_TOKEN"
+HF_MODE_ANONYMOUS = "ANONYMOUS"
+
+
+def hf_auth_header() -> Tuple[Dict[str, str], str]:
+    """(headers, credential_mode) for the HF surfaces — attach-when-present."""
+    tok = os.environ.get(HF_AUTH_ENV, "")
+    if tok:
+        return {"Authorization": f"Bearer {tok}"}, HF_MODE_AUTHENTICATED
+    return {}, HF_MODE_ANONYMOUS
 
 
 def _now_utc() -> str:
@@ -189,21 +214,26 @@ HF_STATE_SCHEMA_MISMATCH = "SCHEMA_MISMATCH"
 def hf_uspto_corpus_status() -> Dict[str, Any]:
     """Measure the corpus (splits + row count). A count signal, never coverage (LXXV.2)."""
     url = f"{HF_DSER_BASE}/splits?dataset={urllib.parse.quote(HF_USPTO_DATASET)}"
-    status, body, latency = _http_get(url)
+    auth_h, cred_mode = hf_auth_header()
+    status, body, latency = _http_get(url, headers=auth_h)
     if status != 200:
         return {"source_id": "HF_USPTO_CORPUS", "state": HF_STATE_HTTP_ERROR if status > 0 else HF_STATE_TRANSPORT_ERROR,
-                "http_status": status, "latency_ms": latency}
+                "http_status": status, "latency_ms": latency,
+                "credential_mode": cred_mode}
     try:
         js = json.loads(body)
     except Exception as e:
-        return {"source_id": "HF_USPTO_CORPUS", "state": HF_STATE_PARSE_ERROR, "error": str(e)}
+        return {"source_id": "HF_USPTO_CORPUS", "state": HF_STATE_PARSE_ERROR, "error": str(e),
+                "credential_mode": cred_mode}
     splits = js.get("splits", [])
     return {"source_id": "HF_USPTO_CORPUS", "state": HF_STATE_OK,
             "dataset": HF_USPTO_DATASET, "splits": splits,
+            "credential_mode": cred_mode,
             "note": "row counts are count signals, never coverage statements (LXXV clause 2)"}
 
 
-def _hf_row_to_hit(row: Dict[str, Any], query: str, payload_sha: str) -> PriorArtHit:
+def _hf_row_to_hit(row: Dict[str, Any], query: str, payload_sha: str,
+                   credential_mode: str = HF_MODE_ANONYMOUS) -> PriorArtHit:
     """Map one datasets-server row to the unified PriorArtHit with LXXV custody."""
     rid = str(row.get("id") or "")
     text = str(row.get("text") or "")
@@ -224,6 +254,10 @@ def _hf_row_to_hit(row: Dict[str, Any], query: str, payload_sha: str) -> PriorAr
         kind_code=(m.group(3) if m else None),
         publication_date=str(pub_date) if pub_date else None,
     )
+    # LXXV clause 1 provenance extension (R504): the credential mode the
+    # record was actually fetched under — AUTHENTICATED_HF_TOKEN or the
+    # measured keyless fallback.
+    custody["provenance"]["credential_mode"] = credential_mode
     custody["license"] = meta.get("license")  # measured per-record (CC BY 4.0 seen R499)
     return PriorArtHit(
         source_id="HF_USPTO_CORPUS",
@@ -257,7 +291,8 @@ def search_hf_uspto(query: str, num_results: int = 8) -> SourceQueryResult:
     base = (f"{HF_DSER_BASE}/search?dataset={urllib.parse.quote(HF_USPTO_DATASET)}"
             f"&config={HF_USPTO_CONFIG}&split={HF_USPTO_SPLIT}"
             f"&query={urllib.parse.quote(query)}&offset=0&length={min(num_results, HF_ROWS_PAGE_MAX)}")
-    status, body, latency = _http_get(base, timeout=45)
+    auth_h, cred_mode = hf_auth_header()
+    status, body, latency = _http_get(base, headers=auth_h, timeout=45)
     if status == 500:
         try:
             err = json.loads(body).get("error", "")
@@ -285,7 +320,7 @@ def search_hf_uspto(query: str, num_results: int = 8) -> SourceQueryResult:
         return SourceQueryResult(source_id="HF_USPTO_CORPUS", success=False,
                                  latency_ms=latency, error="SCHEMA_MISMATCH: rows[].row not an object")
     payload_sha = _sha256(body)
-    hits = [_hf_row_to_hit(r.get("row", {}), query, payload_sha) for r in rows]
+    hits = [_hf_row_to_hit(r.get("row", {}), query, payload_sha, cred_mode) for r in rows]
     return SourceQueryResult(source_id="HF_USPTO_CORPUS", success=True,
                              latency_ms=latency, hits=hits)
 
@@ -302,7 +337,8 @@ def fetch_hf_uspto_rows(offset: int = 0, length: int = 10) -> SourceQueryResult:
     length = max(1, min(length, HF_ROWS_PAGE_MAX))
     url = (f"{HF_DSER_BASE}/rows?dataset={urllib.parse.quote(HF_USPTO_DATASET)}"
            f"&config={HF_USPTO_CONFIG}&split={HF_USPTO_SPLIT}&offset={offset}&length={length}")
-    status, body, latency = _http_get(url, timeout=45)
+    auth_h, cred_mode = hf_auth_header()
+    status, body, latency = _http_get(url, headers=auth_h, timeout=45)
     if status != 200:
         return SourceQueryResult(source_id="HF_USPTO_CORPUS", success=False, latency_ms=latency,
                                  error=(f"HTTP {status}" if status > 0 else "TRANSPORT_ERROR"),
@@ -314,7 +350,7 @@ def fetch_hf_uspto_rows(offset: int = 0, length: int = 10) -> SourceQueryResult:
                                  error=f"PARSE_ERROR: {e}")
     rows = js.get("rows") or []
     payload_sha = _sha256(body)
-    hits = [_hf_row_to_hit(r.get("row", {}), f"rows:{offset}+{length}", payload_sha) for r in rows]
+    hits = [_hf_row_to_hit(r.get("row", {}), f"rows:{offset}+{length}", payload_sha, cred_mode) for r in rows]
     res = SourceQueryResult(source_id="HF_USPTO_CORPUS", success=True, latency_ms=latency, hits=hits)
     res.rate_limit_remaining = js.get("num_rows_total")  # carry the total as a count signal
     return res
@@ -547,8 +583,19 @@ def get_free_source_status() -> Dict[str, Dict[str, Any]]:
             "transport_version": TRANSPORT_VERSION,
             "dataset": HF_USPTO_DATASET,
             "tier": 3,
-            "free": True, "authenticated": False, "metered": False,
-            "measured_round": "R499",
+            "free": True,
+            # LXXV AUTHENTICATED property (re-typed MEASURED at R504): the
+            # transport attaches the HF_TOKEN Bearer header whenever the
+            # environment holds it (the Space carries it as a standing
+            # secret) and degrades to the measured keyless mode otherwise;
+            # never a failure. Both modes measured live on /splits, /rows
+            # and the Hub catalog (R504/R504_HF_AUTH_PROBE.json).
+            "authenticated": True,
+            "auth_env": HF_AUTH_ENV,
+            "auth_mode": "attach-when-present (degrades to measured keyless; never fails on a missing token)",
+            "anonymous_fallback": True,
+            "metered": False,
+            "measured_round": "R499 (keyless) + R504 (both modes)",
         },
         "EPO_LINKED_OPEN_DATA": {
             "transport_version": TRANSPORT_VERSION,

@@ -1,343 +1,346 @@
 {
- "registry": "PATENT_SOURCE_REGISTRY",
- "version": "1.2.0",
- "created_round": "R498",
- "governing_article": "LXXV (Patent Evidence Is Not Patent Truth)",
- "constitution_version_at_creation": "2.7.0",
- "purpose": "The operational-layer instance of Article LXXV's source-property vocabulary: every patent source the machine may consult, tracked with six SEPARATE properties (never collapsed) and typed measured states with provenance. This registry is versioned operational state, not constitutional law (the Four Layers rule).",
- "property_vocabulary": {
-  "FREE": "does the source claim to cost nothing? (self-declared; billing surfaces can change without notice)",
-  "ACCESSIBLE": "can this machine actually reach it right now? (a MEASURED property, re-measured per use)",
-  "AUTOMATABLE": "is there a programmatic path (API / bulk / SPARQL), vs interactive web only?",
-  "LICENSE-COMPATIBLE": "are the terms compatible with this machine's use? (needs per-source term review; UNREVIEWED is a typed state, never an assumed yes)",
-  "RATE-LIMITED": "what call/quota budget applies, and is it metered?",
-  "AUTHENTICATED": "what credential does it require, and is one held in an LXXIII store?"
- },
- "state_vocabulary": [
-  "LIVE_MEASURED",
-  "LIVE_MEASURED_WITH_INTERMITTENT_503",
-  "LIVE_ENDPOINT_RATE_LIMITED_THIS_RUN",
-  "ENDPOINT_RESPONSIVE_NEGOTIATION_REJECTED_406",
-  "TOKEN_OUT_OF_SCOPE",
-  "KEY_RECOGNIZED_AUTH_NOT_OPENED",
-  "REQUIRES_REGISTRATION",
-  "REQUIRES_KEY",
-  "REQUIRES_ACCOUNT",
-  "UNMEASURED_THIS_ROUND",
-  "OPERATOR_RESEARCH_UNVERIFIED"
- ],
- "provenance_classes": {
-  "MEASURED_R498": "measured live by the R498 source probes / rotation probe / patent-leg seal",
-  "MEASURED_R497": "measured live in R497 (probe ledgers, collision ladder)",
-  "MEASURED_R496": "measured live in R496 (PatSnap probe ledger)",
-  "MEASURED_R495": "measured live in R495 (transport probe, sealed battery)",
-  "OPERATOR_RESEARCH_2026-09-18": "the operator's free-patent-source research sweep, quoted per-source; research, not machine measurement -- typed UNVERIFIED until measured (Art. XXIV: a summary is not the artifact)",
-  "MEASURED_R500": "measured live by the R500 keyless free-source probe driver (zero PatentBear debits; shared bucket 19/20 untouched)",
-  "MEASURED_R499": "measured live by this line's R499 free-source probes + free-legs live proof (zero PatentBear debits; the Coder-1 parallel execution of the same operator directive)"
- },
- "six_property_legend": "each source carries the six properties; values cite a provenance class. ORUV = OPERATOR_RESEARCH_UNVERIFIED.",
- "sources": {
-  "patentbear": {
-   "tier": "integrated-live-provider (commercial MCP search surface; the operator's funded free tier)",
-   "role": "live patent discovery + independent record fetch (byte-verification leg)",
-   "properties": {
-    "FREE": "PARTIAL (free tier 20 external calls/month, metered per call) [MEASURED_R497/R498: usage object rides every response]",
-    "ACCESSIBLE": "YES [MEASURED_R498: rotation probe LIVE_200, 10 hits]",
-    "AUTOMATABLE": "YES (MCP JSON-RPC tools/call; stateless; 33 tools) [MEASURED_R497]",
-    "LICENSE-COMPATIBLE": "UNREVIEWED_TERMS (provider ToS not yet reviewed for corpus-scale use)",
-    "RATE-LIMITED": "YES-METERED (20/month free; 401s and unauthenticated calls debit nothing; quota account-shared with the operator's interactive connectors -- 7 pre-probe debits measured R498) [MEASURED_R497/R498]",
-    "AUTHENTICATED": "YES-HELD (pb_live_ bearer key, fingerprint 50fe7b3d569bb1fa in the LXXIII vault; rotated R498 from 561b6e70f5b5ea7f)"
-   },
-   "measured_state": "LIVE_MEASURED",
-   "evidence": [
-    "R498/R498_PATENTBEAR_ROTATION_PROBE.json",
-    "R498/R498_RBG_PATENT_LEG_SEAL_RECORD.json (3/3 unanimous; F10 record US8968233B2 title+abstract byte-verified)",
-    "R497/R497_PATENTBEAR_PROBE{,2,3}.json"
-   ],
-   "notes": "the quota ledger discipline (never spend the last 2 debits; early-stop when unanimity impossible) is the standing stewardship guard"
+  "registry": "PATENT_SOURCE_REGISTRY",
+  "version": "1.3.0",
+  "created_round": "R498",
+  "governing_article": "LXXV (Patent Evidence Is Not Patent Truth)",
+  "constitution_version_at_creation": "2.7.0",
+  "purpose": "The operational-layer instance of Article LXXV's source-property vocabulary: every patent source the machine may consult, tracked with six SEPARATE properties (never collapsed) and typed measured states with provenance. This registry is versioned operational state, not constitutional law (the Four Layers rule).",
+  "property_vocabulary": {
+    "FREE": "does the source claim to cost nothing? (self-declared; billing surfaces can change without notice)",
+    "ACCESSIBLE": "can this machine actually reach it right now? (a MEASURED property, re-measured per use)",
+    "AUTOMATABLE": "is there a programmatic path (API / bulk / SPARQL), vs interactive web only?",
+    "LICENSE-COMPATIBLE": "are the terms compatible with this machine's use? (needs per-source term review; UNREVIEWED is a typed state, never an assumed yes)",
+    "RATE-LIMITED": "what call/quota budget applies, and is it metered?",
+    "AUTHENTICATED": "what credential does it require, and is one held in an LXXIII store?"
   },
-  "google_patents": {
-   "tier": "tier-2 discovery/index (operator research); also PRIMARY for Google-hosted public datasets",
-   "role": "core discovery + cross-linking",
-   "properties": {
-    "FREE": "YES [OPERATOR_RESEARCH_2026-09-18 | ORUV for billing-surface stability]",
-    "ACCESSIBLE": "YES-WITH-INSTABILITY (measured live through the production transport; intermittent HTTP 503 -- 3 of 20 calls in the R497 ladder) [MEASURED_R497]",
-    "AUTOMATABLE": "PARTIAL (the production sources.py transport uses a programmatic path; official public API surface is the BigQuery datasets path, not a free search API) [MEASURED_R497 for the transport path | ORUV for BigQuery]",
-    "LICENSE-COMPATIBLE": "UNREVIEWED_TERMS",
-    "RATE-LIMITED": "UNMEASURED_THIS_ROUND (intermittent 503s observed suggest throttling; budget not measured)",
-    "AUTHENTICATED": "NO-HELD (search transport anonymous; BigQuery datasets path requires a Google cloud project -- none held)"
-   },
-   "measured_state": "LIVE_MEASURED_WITH_INTERMITTENT_503",
-   "evidence": [
-    "R497/R497_COLLISION_TRANSPORT_MEASUREMENT.json (20 hits, 3x typed 503)"
-   ],
-   "notes": "hits carry verbatim text used by the production collision ladder; count is a count signal only (Art. XXI.1)"
+  "state_vocabulary": [
+    "LIVE_MEASURED",
+    "LIVE_MEASURED_WITH_INTERMITTENT_503",
+    "LIVE_ENDPOINT_RATE_LIMITED_THIS_RUN",
+    "ENDPOINT_RESPONSIVE_NEGOTIATION_REJECTED_406",
+    "TOKEN_OUT_OF_SCOPE",
+    "KEY_RECOGNIZED_AUTH_NOT_OPENED",
+    "REQUIRES_REGISTRATION",
+    "REQUIRES_KEY",
+    "REQUIRES_ACCOUNT",
+    "UNMEASURED_THIS_ROUND",
+    "OPERATOR_RESEARCH_UNVERIFIED"
+  ],
+  "provenance_classes": {
+    "MEASURED_R498": "measured live by the R498 source probes / rotation probe / patent-leg seal",
+    "MEASURED_R497": "measured live in R497 (probe ledgers, collision ladder)",
+    "MEASURED_R496": "measured live in R496 (PatSnap probe ledger)",
+    "MEASURED_R495": "measured live in R495 (transport probe, sealed battery)",
+    "OPERATOR_RESEARCH_2026-09-18": "the operator's free-patent-source research sweep, quoted per-source; research, not machine measurement -- typed UNVERIFIED until measured (Art. XXIV: a summary is not the artifact)",
+    "MEASURED_R500": "measured live by the R500 keyless free-source probe driver (zero PatentBear debits; shared bucket 19/20 untouched)",
+    "MEASURED_R499": "measured live by this line's R499 free-source probes + free-legs live proof (zero PatentBear debits; the Coder-1 parallel execution of the same operator directive)",
+    "MEASURED_R504": "measured live by the R504 both-mode auth probes (R504/R504_HF_AUTH_PROBE.json: keyless AND authenticated per endpoint) and the authenticated transport smoke"
   },
-  "the_lens": {
-   "tier": "tier-2 discovery/index + patent-scholar bridge (operator research)",
-   "role": "cross-patent/scholar graph, discovery",
-   "properties": {
-    "FREE": "PARTIAL (trial/free access subject to terms) [OPERATOR_RESEARCH_2026-09-18 | ORUV]",
-    "ACCESSIBLE": "ENDPOINT_REACHABLE_BUT_SCOPE_CLOSED (patents endpoint HTTP 500 'No product in scope'; scholarly 401) [MEASURED_R495, re-measured R497/R498]",
-    "AUTOMATABLE": "YES (documented API) [OPERATOR_RESEARCH_2026-09-18 + endpoint measured responsive]",
-    "LICENSE-COMPATIBLE": "UNREVIEWED_TERMS",
-    "RATE-LIMITED": "UNMEASURED_THIS_ROUND",
-    "AUTHENTICATED": "YES-HELD-BUT-OUT-OF-SCOPE (operator token carries no product scope; per-run PATENT_BLIND discipline applies)"
-   },
-   "measured_state": "TOKEN_OUT_OF_SCOPE",
-   "evidence": [
-    "R495/R495_TRANSPORT_PROBE.json",
-    "R498/R498_RBG_PATENT_LEG_SEAL_RECORD.json (re-measured in every repetition)"
-   ],
-   "notes": "not a hard dependency (operator research's own caveat); the RBG F9-class invariant covers its key-presence class"
+  "six_property_legend": "each source carries the six properties; values cite a provenance class. ORUV = OPERATOR_RESEARCH_UNVERIFIED.",
+  "sources": {
+    "patentbear": {
+      "tier": "integrated-live-provider (commercial MCP search surface; the operator's funded free tier)",
+      "role": "live patent discovery + independent record fetch (byte-verification leg)",
+      "properties": {
+        "FREE": "PARTIAL (free tier 20 external calls/month, metered per call) [MEASURED_R497/R498: usage object rides every response]",
+        "ACCESSIBLE": "YES [MEASURED_R498: rotation probe LIVE_200, 10 hits]",
+        "AUTOMATABLE": "YES (MCP JSON-RPC tools/call; stateless; 33 tools) [MEASURED_R497]",
+        "LICENSE-COMPATIBLE": "UNREVIEWED_TERMS (provider ToS not yet reviewed for corpus-scale use)",
+        "RATE-LIMITED": "YES-METERED (20/month free; 401s and unauthenticated calls debit nothing; quota account-shared with the operator's interactive connectors -- 7 pre-probe debits measured R498) [MEASURED_R497/R498]",
+        "AUTHENTICATED": "YES-HELD (pb_live_ bearer key, fingerprint 50fe7b3d569bb1fa in the LXXIII vault; rotated R498 from 561b6e70f5b5ea7f)"
+      },
+      "measured_state": "LIVE_MEASURED",
+      "evidence": [
+        "R498/R498_PATENTBEAR_ROTATION_PROBE.json",
+        "R498/R498_RBG_PATENT_LEG_SEAL_RECORD.json (3/3 unanimous; F10 record US8968233B2 title+abstract byte-verified)",
+        "R497/R497_PATENTBEAR_PROBE{,2,3}.json"
+      ],
+      "notes": "the quota ledger discipline (never spend the last 2 debits; early-stop when unanimity impossible) is the standing stewardship guard"
+    },
+    "google_patents": {
+      "tier": "tier-2 discovery/index (operator research); also PRIMARY for Google-hosted public datasets",
+      "role": "core discovery + cross-linking",
+      "properties": {
+        "FREE": "YES [OPERATOR_RESEARCH_2026-09-18 | ORUV for billing-surface stability]",
+        "ACCESSIBLE": "YES-WITH-INSTABILITY (measured live through the production transport; intermittent HTTP 503 -- 3 of 20 calls in the R497 ladder) [MEASURED_R497]",
+        "AUTOMATABLE": "PARTIAL (the production sources.py transport uses a programmatic path; official public API surface is the BigQuery datasets path, not a free search API) [MEASURED_R497 for the transport path | ORUV for BigQuery]",
+        "LICENSE-COMPATIBLE": "UNREVIEWED_TERMS",
+        "RATE-LIMITED": "UNMEASURED_THIS_ROUND (intermittent 503s observed suggest throttling; budget not measured)",
+        "AUTHENTICATED": "NO-HELD (search transport anonymous; BigQuery datasets path requires a Google cloud project -- none held)"
+      },
+      "measured_state": "LIVE_MEASURED_WITH_INTERMITTENT_503",
+      "evidence": [
+        "R497/R497_COLLISION_TRANSPORT_MEASUREMENT.json (20 hits, 3x typed 503)"
+      ],
+      "notes": "hits carry verbatim text used by the production collision ladder; count is a count signal only (Art. XXI.1)"
+    },
+    "the_lens": {
+      "tier": "tier-2 discovery/index + patent-scholar bridge (operator research)",
+      "role": "cross-patent/scholar graph, discovery",
+      "properties": {
+        "FREE": "PARTIAL (trial/free access subject to terms) [OPERATOR_RESEARCH_2026-09-18 | ORUV]",
+        "ACCESSIBLE": "ENDPOINT_REACHABLE_BUT_SCOPE_CLOSED (patents endpoint HTTP 500 'No product in scope'; scholarly 401) [MEASURED_R495, re-measured R497/R498]",
+        "AUTOMATABLE": "YES (documented API) [OPERATOR_RESEARCH_2026-09-18 + endpoint measured responsive]",
+        "LICENSE-COMPATIBLE": "UNREVIEWED_TERMS",
+        "RATE-LIMITED": "UNMEASURED_THIS_ROUND",
+        "AUTHENTICATED": "YES-HELD-BUT-OUT-OF-SCOPE (operator token carries no product scope; per-run PATENT_BLIND discipline applies)"
+      },
+      "measured_state": "TOKEN_OUT_OF_SCOPE",
+      "evidence": [
+        "R495/R495_TRANSPORT_PROBE.json",
+        "R498/R498_RBG_PATENT_LEG_SEAL_RECORD.json (re-measured in every repetition)"
+      ],
+      "notes": "not a hard dependency (operator research's own caveat); the RBG F9-class invariant covers its key-presence class"
+    },
+    "patsnap": {
+      "tier": "commercial (not in the operator's free sweep; registered provider)",
+      "role": "commercial patent analytics (count endpoint only, if opened)",
+      "properties": {
+        "FREE": "NO",
+        "ACCESSIBLE": "ENDPOINT_REACHABLE_AUTH_NOT_OPENED [MEASURED_R496]",
+        "AUTOMATABLE": "YES (gateway API) [MEASURED_R496: /auth 67200101, /oauth/token 67200015]",
+        "LICENSE-COMPATIBLE": "UNREVIEWED_TERMS",
+        "RATE-LIMITED": "UNMEASURED_THIS_ROUND",
+        "AUTHENTICATED": "YES-HELD-BUT-UNOPENABLE (sk- key recognized 67200202 vs garbage 67200008 -- the distinction measured; no companion app_id held)"
+      },
+      "measured_state": "KEY_RECOGNIZED_AUTH_NOT_OPENED",
+      "evidence": [
+        "R496/R496_PATSNAP_PROBE.json"
+      ],
+      "notes": "KEY PRESENCE IS NOT TRANSPORT LIVENESS (the sealed F9 invariant)"
+    },
+    "uspto_patent_public_search": {
+      "tier": "tier-1 primary authoritative (operator research)",
+      "role": "US primary verification",
+      "properties": {
+        "FREE": "YES [OPERATOR_RESEARCH_2026-09-18 | ORUV]",
+        "ACCESSIBLE": "UNMEASURED_THIS_ROUND",
+        "AUTOMATABLE": "PARTIAL (web-first; no free official search API on this surface) [OPERATOR_RESEARCH_2026-09-18 | ORUV]",
+        "LICENSE-COMPATIBLE": "UNREVIEWED_TERMS",
+        "RATE-LIMITED": "UNMEASURED_THIS_ROUND",
+        "AUTHENTICATED": "NO (anonymous web use) [OPERATOR_RESEARCH_2026-09-18 | ORUV]"
+      },
+      "measured_state": "UNMEASURED_THIS_ROUND",
+      "evidence": [],
+      "notes": "primary-source verification target under LXXV clause 3; automation path requires either the USPTO Open Data API or the PatentsView mirror"
+    },
+    "uspto_open_data_bulk": {
+      "tier": "tier-1 primary authoritative (operator research)",
+      "role": "US ingestion (bulk)",
+      "properties": {
+        "FREE": "YES-WITH-ACCOUNT ('free =/= anonymous' -- the operator's own constitutional point) [OPERATOR_RESEARCH_2026-09-18 | ORUV]",
+        "ACCESSIBLE": "REQUIRES_KEY [MEASURED_R499: anonymous GET to api.uspto.gov ODP search returns HTTP 403 -- the key gate is measured; free does not imply anonymous (LXXV)]",
+        "AUTOMATABLE": "YES (API/bulk) [OPERATOR_RESEARCH_2026-09-18 | ORUV]",
+        "LICENSE-COMPATIBLE": "UNREVIEWED_TERMS",
+        "RATE-LIMITED": "UNMEASURED_THIS_ROUND",
+        "AUTHENTICATED": "REQUIRES_ACCOUNT (USPTO.gov account; none held in any LXXIII store)"
+      },
+      "measured_state": "REQUIRES_ACCOUNT",
+      "evidence": [
+        "R499/R499_FREE_SOURCE_PROBES.json (uspto_odp_anonymous_boundary 403)"
+      ],
+      "notes": "the operator decision 'register a USPTO.gov account for bulk/API access' is an LXXIII-registry action, not yet taken"
+    },
+    "patentsview": {
+      "tier": "tier-1-adjacent structured US graph (operator research: 'extremely useful')",
+      "role": "structured US patent graph (inventors, assignees, CPC, citations, claim text; API + bulk)",
+      "properties": {
+        "FREE": "YES [OPERATOR_RESEARCH_2026-09-18 | ORUV]",
+        "ACCESSIBLE": "UNRESOLVABLE_FROM_THIS_SANDBOX [MEASURED_R499: search.patentsview.org DNS resolution fails from this environment -- a sandbox network property, NOT a source availability claim; the REQUIRES_KEY registration state stands from research typing]",
+        "AUTOMATABLE": "YES (PatentSearch API + bulk downloads; claim-text endpoints) [OPERATOR_RESEARCH_2026-09-18 | ORUV]",
+        "LICENSE-COMPATIBLE": "UNREVIEWED_TERMS (US government works / provider terms to review)",
+        "RATE-LIMITED": "UNMEASURED_THIS_ROUND",
+        "AUTHENTICATED": "REQUIRES_KEY (free API key registration; none held)"
+      },
+      "measured_state": "REQUIRES_KEY",
+      "evidence": [
+        "R499/R499_FREE_SOURCE_PROBES.json (patentsview_anonymous_boundary DNS failure)"
+      ],
+      "notes": "strongest candidate for the next integrated primary-side provider: free registration, claim text, citation graph -- fits the Observation Graph philosophy (operator research)"
+    },
+    "epo_espacenet": {
+      "tier": "tier-2 worldwide discovery (operator research)",
+      "role": "worldwide interactive search (>150M documents per EPO)",
+      "properties": {
+        "FREE": "YES [OPERATOR_RESEARCH_2026-09-18 | ORUV]",
+        "ACCESSIBLE": "UNMEASURED_THIS_ROUND",
+        "AUTOMATABLE": "NO-BY-PROVIDER-POLICY (EPO states Espacenet is not intended for bulk automated retrieval -- the operator's research's own caveat; automation belongs on EPO APIs) [OPERATOR_RESEARCH_2026-09-18 | ORUV]",
+        "LICENSE-COMPATIBLE": "UNREVIEWED_TERMS",
+        "RATE-LIMITED": "UNMEASURED_THIS_ROUND",
+        "AUTHENTICATED": "NO (anonymous web use) [OPERATOR_RESEARCH_2026-09-18 | ORUV]"
+      },
+      "measured_state": "UNMEASURED_THIS_ROUND",
+      "evidence": [],
+      "notes": "interactive-only by policy; never a fabric transport"
+    },
+    "epo_ops": {
+      "tier": "tier-1 automated worldwide retrieval (operator research)",
+      "role": "automated EPO/worldwide retrieval (bibliographic, legal status, full text, images)",
+      "properties": {
+        "FREE": "WITHIN-LIMITS (free up to 4 GB/week, fair-use, per EPO) [OPERATOR_RESEARCH_2026-09-18 | ORUV]",
+        "ACCESSIBLE": "REQUIRES_REGISTRATION [MEASURED_R499: anonymous GET to the OPS rest-services search endpoint returns HTTP 403 -- the registration gate is real and measured, not assumed]",
+        "AUTOMATABLE": "YES (standardized XML API) [OPERATOR_RESEARCH_2026-09-18 | ORUV]",
+        "LICENSE-COMPATIBLE": "UNREVIEWED_TERMS",
+        "RATE-LIMITED": "YES (4 GB/week fair-use envelope) [OPERATOR_RESEARCH_2026-09-18 | ORUV]",
+        "AUTHENTICATED": "REQUIRES_REGISTRATION (OAuth app credentials; none held)"
+      },
+      "measured_state": "REQUIRES_REGISTRATION",
+      "evidence": [
+        "R499/R499_FREE_SOURCE_PROBES.json (epo_ops_anonymous_boundary 403)"
+      ],
+      "notes": "the recommended automated EPO path (operator research); registration is an LXXIII-registry action, not yet taken"
+    },
+    "epo_publication_server": {
+      "tier": "tier-1 EP document retrieval (operator research)",
+      "role": "EP full-text document retrieval (EP-A 1978-, EP-B 1980-)",
+      "properties": {
+        "FREE": "YES [OPERATOR_RESEARCH_2026-09-18 | ORUV]",
+        "ACCESSIBLE": "UNMEASURED_THIS_ROUND",
+        "AUTOMATABLE": "YES (REST) [OPERATOR_RESEARCH_2026-09-18 | ORUV]",
+        "LICENSE-COMPATIBLE": "UNREVIEWED_TERMS",
+        "RATE-LIMITED": "UNMEASURED_THIS_ROUND",
+        "AUTHENTICATED": "UNMEASURED_THIS_ROUND (possibly anonymous; not probed)"
+      },
+      "measured_state": "UNMEASURED_THIS_ROUND",
+      "evidence": [],
+      "notes": "candidate for a cheap next probe (possibly no registration needed)"
+    },
+    "epo_linked_open_data": {
+      "tier": "tier-4-enabler primary graph (operator research)",
+      "role": "patent knowledge graph (RDF/SPARQL; CC BY 4.0)",
+      "properties": {
+        "FREE": "YES [MEASURED_R499: full SPARQL query path + primary document fetches served with no credential and no meter]. The provider notice reads 'Provided by the European Patent Office.' [MEASURED_R500]; the CC BY 4.0 license claim stays OPERATOR_RESEARCH (ORUV) pending terms review",
+        "ACCESSIBLE": "YES-LIVE [MEASURED_R500 + MEASURED_R499 (two independent lines, same endpoint)]: the SPARQL 1.1 protocol endpoint https://data.epo.org/linked-data/query measures LIVE (GET and POST, application/sparql-results+json). The R500 ld+json item path on the data URIs stays UNRESOLVED_THIS_ENVIRONMENT (soft-empty Elda wrapper, items=rdf:nil across five passes) \u2014 the R500 OPEN item is CLOSED ON THE SPARQL PATH by R499: the full identity model binds real data there (EP/0084638/A1 identity + simple-family/25798930 chain + Tier-1 primary documents XML/PDF 200, sha256-evidenced in R499/R499_FREE_LEGS_LIVE_PROOF.json). Historical: the R498 406 was the query-UI URL, not the protocol endpoint",
+        "AUTOMATABLE": "YES [MEASURED_R500 + MEASURED_R499]: SPARQL 1.1 protocol; subject-anchored identity/family/citation queries return in seconds with full bindings",
+        "LICENSE-COMPATIBLE": "LIKELY (attribution mechanics unreviewed) [MEASURED_R500 artifact: the Elda lda#notice literal 'Provided by the European Patent Office.'; the brief's CC BY 4.0 declaration remains OPERATOR_RESEARCH_2026-09-18 | ORUV, never a measurement]",
+        "RATE-LIMITED": "QUERY-COST-BOUND [MEASURED_R499]: full-graph scans (unbounded FILTER / GROUP BY COUNT) time out at the endpoint while subject-anchored queries return in seconds \u2014 the installed transport issues subject-anchored queries only, by construction; no quota/meter signal observed on keyless use [MEASURED_R500]",
+        "AUTHENTICATED": "NO KEY REQUIRED [MEASURED_R499 + MEASURED_R500: anonymous query + document fetch both served]"
+      },
+      "measured_state": "LIVE_MEASURED",
+      "evidence": [
+        "R498/R498_SOURCE_PROBES.json",
+        "R498/R498_SOURCE_PROBES.json (the historical 406, preserved)",
+        "R500/R500_FREE_SOURCE_PROBE.json (pass 1: protocol GET LIVE)",
+        "R500/R500_FREE_SOURCE_PROBE_PASS2.json (protocol POST LIVE; turtle 200 on the publication endpoint; HF warming verbatim)",
+        "R500/R500_FREE_SOURCE_PROBE_PASS3.json (Elda wrapper shape, .ttl self-URI, lda#notice)",
+        "R500/R500_FREE_SOURCE_PROBE_PASS4.json (items=rdf-nil; /resource candidates)",
+        "R500/R500_FREE_SOURCE_PROBE_PASS5.json (exact-IRI lookups zero bindings; key-shape matrix)",
+        "R499/R499_FREE_SOURCE_PROBES.json",
+        "R499/R499_FREE_LEGS_LIVE_PROOF.json (identity EP/0084638/A1 OK; family collapse 2 apps/3 pubs; US/8968233B2 NOT_IN_GRAPH typed as coverage state, never absence; primary XML doc sha256 e6539791...)"
+      ],
+      "notes": "TWO-LINE UNION: SPARQL protocol live (both lines); the R500 ld+json item path unresolved-this-env; the R499 SPARQL chain closes the R500 open item (full identity model reproduced: identity, family collapse, citation graph, Tier-1 primary documents). Coverage measured EP-centric: US/worldwide partial \u2014 US 3268123 A in-graph, US 8968233B2 NOT_IN_GRAPH via SPARQL (zero bindings) \u2014 a coverage state of THIS dataset, never evidence of absence. Installed transport: free_evidence_sources.py (Coder-1 line) \u2014 identity/family/document VERIFICATION path per LXXV clause 3; the sibling line's FreePatentSourceLayer (rbg_gate.py) is the instrument-side coverage layer. COMPLEMENTARY, not duplicate."
+    },
+    "wipo_patentscope": {
+      "tier": "tier-1 PCT/international (operator research)",
+      "role": "PCT/international search + family perspective (US/EP/WO/JP/CN/KR/IN/GB...)",
+      "properties": {
+        "FREE": "YES (web search) [OPERATOR_RESEARCH_2026-09-18 | ORUV]",
+        "ACCESSIBLE": "UNMEASURED_THIS_ROUND",
+        "AUTOMATABLE": "PARTIAL (web UI; a WS API exists behind registration) [OPERATOR_RESEARCH_2026-09-18 | ORUV]",
+        "LICENSE-COMPATIBLE": "UNREVIEWED_TERMS",
+        "RATE-LIMITED": "UNMEASURED_THIS_ROUND",
+        "AUTHENTICATED": "REQUIRES_REGISTRATION (for the API path; none held)"
+      },
+      "measured_state": "UNMEASURED_THIS_ROUND",
+      "evidence": [],
+      "notes": "needed for family-aware worldwide coverage (the operator's architecture)"
+    },
+    "huggingface_patent_datasets": {
+      "tier": "tier-3 ML/RAG corpora (operator research)",
+      "role": "offline retrieval / embedding / classification / benchmark substrate (common-pile/uspto ~16.2M rows ~1TB; filtered ~17M docs 661GB; dozens of specialized corpora)",
+      "properties": {
+        "FREE": "YES [MEASURED_R498: public API, no auth, dataset metadata served] + [OPERATOR_RESEARCH_2026-09-18 for corpus sizes | ORUV]",
+        "ACCESSIBLE": "YES-LIVE [MEASURED_R499 (Coder 1) + MEASURED_R500 (Coder 2), independent]: datasets API + datasets-server /splits + /rows all 200 on common-pile/uspto (served view 131,755 full-text documents, content-bearing text field, structured ids US-71623224-A shape); /search measured the provider's verbatim warming transient ('the dataset index is loading, this can take longer than usual', 500) by BOTH lines across the round \u2014 typed transient/unstable, never a coverage claim | R504 both-mode re-measurement: /splits + /rows + Hub catalog 200 keyless AND authenticated (whoami prateekm1 verified live); /search still the verbatim warming transient (500 'the dataset index is loading') in BOTH modes \u2014 the R500-deferred warming-window retry is now measured and typed, still never a coverage claim [MEASURED_R504]",
+        "AUTOMATABLE": "YES [MEASURED_R499 + MEASURED_R500]: datasets-server /splits + /rows deterministic; /search typed-pending",
+        "LICENSE-COMPATIBLE": "PER-DATASET, MEASURED FOR common-pile/uspto [MEASURED_R499: per-record license field reads 'Creative Commons - Attribution' (CC BY 4.0) \u2014 attribution mechanics to record on ingestion]; other corpora remain UNREVIEWED_PER-DATASET",
+        "RATE-LIMITED": "UNMETERED-ANONYMOUS [MEASURED_R499: no quota signal surfaced on any call; no account, no meter] | R504: no explicit quota headers surfaced in either mode on the measured endpoints; the authenticated mode's higher provider-side rate limits are the provider's documented quota model \u2014 the headroom delta is NOT externally meterable from here and is NOT claimed [MEASURED_R504]",
+        "AUTHENTICATED": "ATTACH-WHEN-PRESENT, MEASURED BOTH MODES [MEASURED_R504]: the HF_TOKEN Bearer header is attached whenever the environment holds it (the canonical Space carries HF_TOKEN as a standing secret, so the DEPLOYED legs run authenticated) and the transport degrades to the measured keyless mode otherwise \u2014 a missing token is never a failure [MEASURED_R504: /splits, /rows and the Hub catalog answer 200 in BOTH modes; the /search 500 warming transient is identical in both modes \u2014 server-side index state, the credential is not a /search lever; evidence R504/R504_HF_AUTH_PROBE.json]. Historical: NO for public metadata/datasets [MEASURED_R498]; gated datasets exist and would need an HF token"
+      },
+      "measured_state": "LIVE_MEASURED",
+      "evidence": [
+        "R498/R498_SOURCE_PROBES.json (hf_common_pile_uspto 200 + hf_patent_index 200: 50+ patent datasets on the first index page)",
+        "R500/R500_FREE_SOURCE_PROBE_PASS2.json (datasets-server /search on common-pile/uspto: 45s read-timeout, then HTTP 500 with the provider's verbatim 'the dataset index is loading, this may take longer than usual' \u2014 TRANSIENT state, never absence, Art. XXI)",
+        "R498/R498_SOURCE_PROBES.json (dataset API 200; index 50+ patent datasets)",
+        "R499/R499_FREE_SOURCE_PROBES.json",
+        "R499/R499_FREE_LEGS_LIVE_PROOF.json (corpus status OK; rows retrieval live)",
+        "R504/R504_HF_AUTH_PROBE.json (whoami LIVE prateekm1; /splits, /rows, /search, Hub catalog measured keyless AND authenticated per endpoint; both-mode verdicts: /splits BOTH_MODES_LIVE, /rows BOTH_MODES_LIVE, /search BOTH_MODES_NON_LIVE (warming transient both modes), catalog BOTH_MODES_LIVE)"
+      ],
+      "notes": "The served-view row count 131,755 is MEASURED by both lines; the operator brief's ~16.2M-row figure for the full upstream remains EXTERNAL_CLAIM_UNVERIFIED_AT_SERVED_VIEW (Coder-2 typing) \u2014 measured wins for the served surface. Coder-1 line installed the corpus transport (discovery ladder + deterministic rows); Coder-2 line installed the instrument coverage layer (FreePatentSourceLayer, battery v4 F12/F13)."
+    },
+    "github_patent_infra": {
+      "tier": "tier-3 engineering/research tooling (operator research)",
+      "role": "parsers, ETL, embeddings, benchmarks (google/patents-public-data as the canonical example: landscaping, claim extraction, claim-breadth analysis)",
+      "properties": {
+        "FREE": "YES [OPERATOR_RESEARCH_2026-09-18 | ORUV]",
+        "ACCESSIBLE": "YES-LIVE [MEASURED_R499 (Coder 1: repo metadata 200 from this sandbox) + MEASURED_R500 (Coder 2: google/patents-public-data substrate 200)]: the R498 per-IP rate-limit state recovered; per-IP budget states remain transient by nature, typed per call",
+        "AUTOMATABLE": "YES (git + API) [OPERATOR_RESEARCH_2026-09-18 | ORUV]",
+        "LICENSE-COMPATIBLE": "PER-REPO (VARIES; UNREVIEWED until recorded per-repo on ingestion)",
+        "RATE-LIMITED": "YES-ANONYMOUS (measured 403 at the anonymous budget boundary this run; authenticated budget higher)",
+        "AUTHENTICATED": "YES-HELD (a GitHub PAT is held in the LXXIII vault; NOT SPENT on this probe -- stewardship; the probe's purpose was the anonymous surface)"
+      },
+      "measured_state": "LIVE_ENDPOINT_RATE_LIMITED_THIS_RUN",
+      "evidence": [
+        "R498/R498_SOURCE_PROBES.json (github_patents_public_data 403 rate-limit)",
+        "R499/R499_FREE_SOURCE_PROBES.json (github_patents_public_data_retry 200)"
+      ],
+      "notes": "the 403 is a typed budget state of the probing client, never a property of the source's existence"
+    },
+    "zenodo_patent_datasets": {
+      "tier": "tier-3 research corpus (operator research)",
+      "role": "research corpora (varies per dataset)",
+      "properties": {
+        "FREE": "YES [OPERATOR_RESEARCH_2026-09-18 | ORUV]",
+        "ACCESSIBLE": "HTTP_403_THIS_RUN [MEASURED_R499: zenodo.org/api/records answered 403 to this sandbox -- a client-side block/budget state, never a source-availability claim; retryable in a later round]",
+        "AUTOMATABLE": "YES (downloads/API) [OPERATOR_RESEARCH_2026-09-18 | ORUV]",
+        "LICENSE-COMPATIBLE": "PER-DOI (VARIES; UNREVIEWED until recorded per-DOI on ingestion)",
+        "RATE-LIMITED": "UNMEASURED_THIS_ROUND",
+        "AUTHENTICATED": "NO (declared open) [OPERATOR_RESEARCH_2026-09-18 | ORUV]"
+      },
+      "measured_state": "UNMEASURED_THIS_ROUND",
+      "evidence": [
+        "R499/R499_FREE_SOURCE_PROBES.json (zenodo_patent_records 403)"
+      ],
+      "notes": ""
+    },
+    "academic_patent_datasets": {
+      "tier": "tier-3 specialized (operator research; a CLASS, not a single source)",
+      "role": "specialized models/benchmarks",
+      "properties": {
+        "FREE": "OFTEN [OPERATOR_RESEARCH_2026-09-18 | ORUV]",
+        "ACCESSIBLE": "UNMEASURED_THIS_ROUND",
+        "AUTOMATABLE": "VARIES",
+        "LICENSE-COMPATIBLE": "VARIES (per-dataset review on ingestion)",
+        "RATE-LIMITED": "VARIES",
+        "AUTHENTICATED": "VARIES"
+      },
+      "measured_state": "UNMEASURED_THIS_ROUND",
+      "evidence": [],
+      "notes": "each concrete dataset adopted must be registered individually with its own six properties"
+    }
   },
-  "patsnap": {
-   "tier": "commercial (not in the operator's free sweep; registered provider)",
-   "role": "commercial patent analytics (count endpoint only, if opened)",
-   "properties": {
-    "FREE": "NO",
-    "ACCESSIBLE": "ENDPOINT_REACHABLE_AUTH_NOT_OPENED [MEASURED_R496]",
-    "AUTOMATABLE": "YES (gateway API) [MEASURED_R496: /auth 67200101, /oauth/token 67200015]",
-    "LICENSE-COMPATIBLE": "UNREVIEWED_TERMS",
-    "RATE-LIMITED": "UNMEASURED_THIS_ROUND",
-    "AUTHENTICATED": "YES-HELD-BUT-UNOPENABLE (sk- key recognized 67200202 vs garbage 67200008 -- the distinction measured; no companion app_id held)"
-   },
-   "measured_state": "KEY_RECOGNIZED_AUTH_NOT_OPENED",
-   "evidence": [
-    "R496/R496_PATSNAP_PROBE.json"
-   ],
-   "notes": "KEY PRESENCE IS NOT TRANSPORT LIVENESS (the sealed F9 invariant)"
+  "coverage_statement": {
+    "statement": "NO source in this registry has coverage measured sufficient for a novelty verdict; no novelty verdict exists in the machine's vocabulary (Art. XLVI/LXXV)",
+    "basis": "coverage sufficiency is a MEASURED property (LXXV clause 2); today only patentbear measures LIVE for search+record-fetch, with a 20-calls/month metered budget and unreviewed corpus coverage; every other patent source is typed out-of-scope, unopened, registration-gated, or unmeasured",
+    "consequence": "the collision stage's honest outputs remain: COLLISION_DETECTED (byte-bound), NO_COLLISION_FOUND (never novelty), typed transport states, and PATENT_COVERAGE_LIVE_THIS_RUN (coverage statement, not a verdict)"
   },
-  "uspto_patent_public_search": {
-   "tier": "tier-1 primary authoritative (operator research)",
-   "role": "US primary verification",
-   "properties": {
-    "FREE": "YES [OPERATOR_RESEARCH_2026-09-18 | ORUV]",
-    "ACCESSIBLE": "UNMEASURED_THIS_ROUND",
-    "AUTOMATABLE": "PARTIAL (web-first; no free official search API on this surface) [OPERATOR_RESEARCH_2026-09-18 | ORUV]",
-    "LICENSE-COMPATIBLE": "UNREVIEWED_TERMS",
-    "RATE-LIMITED": "UNMEASURED_THIS_ROUND",
-    "AUTHENTICATED": "NO (anonymous web use) [OPERATOR_RESEARCH_2026-09-18 | ORUV]"
-   },
-   "measured_state": "UNMEASURED_THIS_ROUND",
-   "evidence": [],
-   "notes": "primary-source verification target under LXXV clause 3; automation path requires either the USPTO Open Data API or the PatentsView mirror"
+  "fabric_integration": {
+    "document": "PATENT_EVIDENCE_FABRIC.md",
+    "mapping_summary": "Tier 1 -> primary verification targets (LXXV clause 3); Tier 2 + integrated providers -> discovery; Tier 3 -> offline ML substrate; Tier 4 -> the machine's own normalized evidence graph (never an external source)",
+    "installed_legs_r499_union": {
+      "HF_USPTO_CORPUS (Coder 1)": "discovery-ladder provider + deterministic rows transport (free_evidence_sources.py)",
+      "EPO_LINKED_OPEN_DATA (Coder 1)": "identity/family/primary-document VERIFICATION transport (LXXV clause 3 path)",
+      "FreePatentSourceLayer (Coder 2)": "instrument-side coverage layer in rbg_gate.py; battery v4 F12/F13 (substrate honesty + corpus hallucination attack)"
+    }
   },
-  "uspto_open_data_bulk": {
-   "tier": "tier-1 primary authoritative (operator research)",
-   "role": "US ingestion (bulk)",
-   "properties": {
-    "FREE": "YES-WITH-ACCOUNT ('free =/= anonymous' -- the operator's own constitutional point) [OPERATOR_RESEARCH_2026-09-18 | ORUV]",
-    "ACCESSIBLE": "REQUIRES_KEY [MEASURED_R499: anonymous GET to api.uspto.gov ODP search returns HTTP 403 -- the key gate is measured; free does not imply anonymous (LXXV)]",
-    "AUTOMATABLE": "YES (API/bulk) [OPERATOR_RESEARCH_2026-09-18 | ORUV]",
-    "LICENSE-COMPATIBLE": "UNREVIEWED_TERMS",
-    "RATE-LIMITED": "UNMEASURED_THIS_ROUND",
-    "AUTHENTICATED": "REQUIRES_ACCOUNT (USPTO.gov account; none held in any LXXIII store)"
-   },
-   "measured_state": "REQUIRES_ACCOUNT",
-   "evidence": [
-    "R499/R499_FREE_SOURCE_PROBES.json (uspto_odp_anonymous_boundary 403)"
-   ],
-   "notes": "the operator decision 'register a USPTO.gov account for bulk/API access' is an LXXIII-registry action, not yet taken"
-  },
-  "patentsview": {
-   "tier": "tier-1-adjacent structured US graph (operator research: 'extremely useful')",
-   "role": "structured US patent graph (inventors, assignees, CPC, citations, claim text; API + bulk)",
-   "properties": {
-    "FREE": "YES [OPERATOR_RESEARCH_2026-09-18 | ORUV]",
-    "ACCESSIBLE": "UNRESOLVABLE_FROM_THIS_SANDBOX [MEASURED_R499: search.patentsview.org DNS resolution fails from this environment -- a sandbox network property, NOT a source availability claim; the REQUIRES_KEY registration state stands from research typing]",
-    "AUTOMATABLE": "YES (PatentSearch API + bulk downloads; claim-text endpoints) [OPERATOR_RESEARCH_2026-09-18 | ORUV]",
-    "LICENSE-COMPATIBLE": "UNREVIEWED_TERMS (US government works / provider terms to review)",
-    "RATE-LIMITED": "UNMEASURED_THIS_ROUND",
-    "AUTHENTICATED": "REQUIRES_KEY (free API key registration; none held)"
-   },
-   "measured_state": "REQUIRES_KEY",
-   "evidence": [
-    "R499/R499_FREE_SOURCE_PROBES.json (patentsview_anonymous_boundary DNS failure)"
-   ],
-   "notes": "strongest candidate for the next integrated primary-side provider: free registration, claim text, citation graph -- fits the Observation Graph philosophy (operator research)"
-  },
-  "epo_espacenet": {
-   "tier": "tier-2 worldwide discovery (operator research)",
-   "role": "worldwide interactive search (>150M documents per EPO)",
-   "properties": {
-    "FREE": "YES [OPERATOR_RESEARCH_2026-09-18 | ORUV]",
-    "ACCESSIBLE": "UNMEASURED_THIS_ROUND",
-    "AUTOMATABLE": "NO-BY-PROVIDER-POLICY (EPO states Espacenet is not intended for bulk automated retrieval -- the operator's research's own caveat; automation belongs on EPO APIs) [OPERATOR_RESEARCH_2026-09-18 | ORUV]",
-    "LICENSE-COMPATIBLE": "UNREVIEWED_TERMS",
-    "RATE-LIMITED": "UNMEASURED_THIS_ROUND",
-    "AUTHENTICATED": "NO (anonymous web use) [OPERATOR_RESEARCH_2026-09-18 | ORUV]"
-   },
-   "measured_state": "UNMEASURED_THIS_ROUND",
-   "evidence": [],
-   "notes": "interactive-only by policy; never a fabric transport"
-  },
-  "epo_ops": {
-   "tier": "tier-1 automated worldwide retrieval (operator research)",
-   "role": "automated EPO/worldwide retrieval (bibliographic, legal status, full text, images)",
-   "properties": {
-    "FREE": "WITHIN-LIMITS (free up to 4 GB/week, fair-use, per EPO) [OPERATOR_RESEARCH_2026-09-18 | ORUV]",
-    "ACCESSIBLE": "REQUIRES_REGISTRATION [MEASURED_R499: anonymous GET to the OPS rest-services search endpoint returns HTTP 403 -- the registration gate is real and measured, not assumed]",
-    "AUTOMATABLE": "YES (standardized XML API) [OPERATOR_RESEARCH_2026-09-18 | ORUV]",
-    "LICENSE-COMPATIBLE": "UNREVIEWED_TERMS",
-    "RATE-LIMITED": "YES (4 GB/week fair-use envelope) [OPERATOR_RESEARCH_2026-09-18 | ORUV]",
-    "AUTHENTICATED": "REQUIRES_REGISTRATION (OAuth app credentials; none held)"
-   },
-   "measured_state": "REQUIRES_REGISTRATION",
-   "evidence": [
-    "R499/R499_FREE_SOURCE_PROBES.json (epo_ops_anonymous_boundary 403)"
-   ],
-   "notes": "the recommended automated EPO path (operator research); registration is an LXXIII-registry action, not yet taken"
-  },
-  "epo_publication_server": {
-   "tier": "tier-1 EP document retrieval (operator research)",
-   "role": "EP full-text document retrieval (EP-A 1978-, EP-B 1980-)",
-   "properties": {
-    "FREE": "YES [OPERATOR_RESEARCH_2026-09-18 | ORUV]",
-    "ACCESSIBLE": "UNMEASURED_THIS_ROUND",
-    "AUTOMATABLE": "YES (REST) [OPERATOR_RESEARCH_2026-09-18 | ORUV]",
-    "LICENSE-COMPATIBLE": "UNREVIEWED_TERMS",
-    "RATE-LIMITED": "UNMEASURED_THIS_ROUND",
-    "AUTHENTICATED": "UNMEASURED_THIS_ROUND (possibly anonymous; not probed)"
-   },
-   "measured_state": "UNMEASURED_THIS_ROUND",
-   "evidence": [],
-   "notes": "candidate for a cheap next probe (possibly no registration needed)"
-  },
-  "epo_linked_open_data": {
-   "tier": "tier-4-enabler primary graph (operator research)",
-   "role": "patent knowledge graph (RDF/SPARQL; CC BY 4.0)",
-   "properties": {
-    "FREE": "YES [MEASURED_R499: full SPARQL query path + primary document fetches served with no credential and no meter]. The provider notice reads 'Provided by the European Patent Office.' [MEASURED_R500]; the CC BY 4.0 license claim stays OPERATOR_RESEARCH (ORUV) pending terms review",
-    "ACCESSIBLE": "YES-LIVE [MEASURED_R500 + MEASURED_R499 (two independent lines, same endpoint)]: the SPARQL 1.1 protocol endpoint https://data.epo.org/linked-data/query measures LIVE (GET and POST, application/sparql-results+json). The R500 ld+json item path on the data URIs stays UNRESOLVED_THIS_ENVIRONMENT (soft-empty Elda wrapper, items=rdf:nil across five passes) \u2014 the R500 OPEN item is CLOSED ON THE SPARQL PATH by R499: the full identity model binds real data there (EP/0084638/A1 identity + simple-family/25798930 chain + Tier-1 primary documents XML/PDF 200, sha256-evidenced in R499/R499_FREE_LEGS_LIVE_PROOF.json). Historical: the R498 406 was the query-UI URL, not the protocol endpoint",
-    "AUTOMATABLE": "YES [MEASURED_R500 + MEASURED_R499]: SPARQL 1.1 protocol; subject-anchored identity/family/citation queries return in seconds with full bindings",
-    "LICENSE-COMPATIBLE": "LIKELY (attribution mechanics unreviewed) [MEASURED_R500 artifact: the Elda lda#notice literal 'Provided by the European Patent Office.'; the brief's CC BY 4.0 declaration remains OPERATOR_RESEARCH_2026-09-18 | ORUV, never a measurement]",
-    "RATE-LIMITED": "QUERY-COST-BOUND [MEASURED_R499]: full-graph scans (unbounded FILTER / GROUP BY COUNT) time out at the endpoint while subject-anchored queries return in seconds \u2014 the installed transport issues subject-anchored queries only, by construction; no quota/meter signal observed on keyless use [MEASURED_R500]",
-    "AUTHENTICATED": "NO KEY REQUIRED [MEASURED_R499 + MEASURED_R500: anonymous query + document fetch both served]"
-   },
-   "measured_state": "LIVE_MEASURED",
-   "evidence": [
-    "R498/R498_SOURCE_PROBES.json",
-    "R498/R498_SOURCE_PROBES.json (the historical 406, preserved)",
-    "R500/R500_FREE_SOURCE_PROBE.json (pass 1: protocol GET LIVE)",
-    "R500/R500_FREE_SOURCE_PROBE_PASS2.json (protocol POST LIVE; turtle 200 on the publication endpoint; HF warming verbatim)",
-    "R500/R500_FREE_SOURCE_PROBE_PASS3.json (Elda wrapper shape, .ttl self-URI, lda#notice)",
-    "R500/R500_FREE_SOURCE_PROBE_PASS4.json (items=rdf-nil; /resource candidates)",
-    "R500/R500_FREE_SOURCE_PROBE_PASS5.json (exact-IRI lookups zero bindings; key-shape matrix)",
-    "R499/R499_FREE_SOURCE_PROBES.json",
-    "R499/R499_FREE_LEGS_LIVE_PROOF.json (identity EP/0084638/A1 OK; family collapse 2 apps/3 pubs; US/8968233B2 NOT_IN_GRAPH typed as coverage state, never absence; primary XML doc sha256 e6539791...)"
-   ],
-   "notes": "TWO-LINE UNION: SPARQL protocol live (both lines); the R500 ld+json item path unresolved-this-env; the R499 SPARQL chain closes the R500 open item (full identity model reproduced: identity, family collapse, citation graph, Tier-1 primary documents). Coverage measured EP-centric: US/worldwide partial \u2014 US 3268123 A in-graph, US 8968233B2 NOT_IN_GRAPH via SPARQL (zero bindings) \u2014 a coverage state of THIS dataset, never evidence of absence. Installed transport: free_evidence_sources.py (Coder-1 line) \u2014 identity/family/document VERIFICATION path per LXXV clause 3; the sibling line's FreePatentSourceLayer (rbg_gate.py) is the instrument-side coverage layer. COMPLEMENTARY, not duplicate."
-  },
-  "wipo_patentscope": {
-   "tier": "tier-1 PCT/international (operator research)",
-   "role": "PCT/international search + family perspective (US/EP/WO/JP/CN/KR/IN/GB...)",
-   "properties": {
-    "FREE": "YES (web search) [OPERATOR_RESEARCH_2026-09-18 | ORUV]",
-    "ACCESSIBLE": "UNMEASURED_THIS_ROUND",
-    "AUTOMATABLE": "PARTIAL (web UI; a WS API exists behind registration) [OPERATOR_RESEARCH_2026-09-18 | ORUV]",
-    "LICENSE-COMPATIBLE": "UNREVIEWED_TERMS",
-    "RATE-LIMITED": "UNMEASURED_THIS_ROUND",
-    "AUTHENTICATED": "REQUIRES_REGISTRATION (for the API path; none held)"
-   },
-   "measured_state": "UNMEASURED_THIS_ROUND",
-   "evidence": [],
-   "notes": "needed for family-aware worldwide coverage (the operator's architecture)"
-  },
-  "huggingface_patent_datasets": {
-   "tier": "tier-3 ML/RAG corpora (operator research)",
-   "role": "offline retrieval / embedding / classification / benchmark substrate (common-pile/uspto ~16.2M rows ~1TB; filtered ~17M docs 661GB; dozens of specialized corpora)",
-   "properties": {
-    "FREE": "YES [MEASURED_R498: public API, no auth, dataset metadata served] + [OPERATOR_RESEARCH_2026-09-18 for corpus sizes | ORUV]",
-    "ACCESSIBLE": "YES-LIVE [MEASURED_R499 (Coder 1) + MEASURED_R500 (Coder 2), independent]: datasets API + datasets-server /splits + /rows all 200 on common-pile/uspto (served view 131,755 full-text documents, content-bearing text field, structured ids US-71623224-A shape); /search measured the provider's verbatim warming transient ('the dataset index is loading, this can take longer than usual', 500) by BOTH lines across the round \u2014 typed transient/unstable, never a coverage claim",
-    "AUTOMATABLE": "YES [MEASURED_R499 + MEASURED_R500]: datasets-server /splits + /rows deterministic; /search typed-pending",
-    "LICENSE-COMPATIBLE": "PER-DATASET, MEASURED FOR common-pile/uspto [MEASURED_R499: per-record license field reads 'Creative Commons - Attribution' (CC BY 4.0) \u2014 attribution mechanics to record on ingestion]; other corpora remain UNREVIEWED_PER-DATASET",
-    "RATE-LIMITED": "UNMETERED-ANONYMOUS [MEASURED_R499: no quota signal surfaced on any call; no account, no meter]",
-    "AUTHENTICATED": "NO for public metadata/datasets [MEASURED_R498]; gated datasets exist and would need an HF token"
-   },
-   "measured_state": "LIVE_MEASURED",
-   "evidence": [
-    "R498/R498_SOURCE_PROBES.json (hf_common_pile_uspto 200 + hf_patent_index 200: 50+ patent datasets on the first index page)",
-    "R500/R500_FREE_SOURCE_PROBE_PASS2.json (datasets-server /search on common-pile/uspto: 45s read-timeout, then HTTP 500 with the provider's verbatim 'the dataset index is loading, this may take longer than usual' \u2014 TRANSIENT state, never absence, Art. XXI)",
-    "R498/R498_SOURCE_PROBES.json (dataset API 200; index 50+ patent datasets)",
-    "R499/R499_FREE_SOURCE_PROBES.json",
-    "R499/R499_FREE_LEGS_LIVE_PROOF.json (corpus status OK; rows retrieval live)"
-   ],
-   "notes": "The served-view row count 131,755 is MEASURED by both lines; the operator brief's ~16.2M-row figure for the full upstream remains EXTERNAL_CLAIM_UNVERIFIED_AT_SERVED_VIEW (Coder-2 typing) \u2014 measured wins for the served surface. Coder-1 line installed the corpus transport (discovery ladder + deterministic rows); Coder-2 line installed the instrument coverage layer (FreePatentSourceLayer, battery v4 F12/F13)."
-  },
-  "github_patent_infra": {
-   "tier": "tier-3 engineering/research tooling (operator research)",
-   "role": "parsers, ETL, embeddings, benchmarks (google/patents-public-data as the canonical example: landscaping, claim extraction, claim-breadth analysis)",
-   "properties": {
-    "FREE": "YES [OPERATOR_RESEARCH_2026-09-18 | ORUV]",
-    "ACCESSIBLE": "YES-LIVE [MEASURED_R499 (Coder 1: repo metadata 200 from this sandbox) + MEASURED_R500 (Coder 2: google/patents-public-data substrate 200)]: the R498 per-IP rate-limit state recovered; per-IP budget states remain transient by nature, typed per call",
-    "AUTOMATABLE": "YES (git + API) [OPERATOR_RESEARCH_2026-09-18 | ORUV]",
-    "LICENSE-COMPATIBLE": "PER-REPO (VARIES; UNREVIEWED until recorded per-repo on ingestion)",
-    "RATE-LIMITED": "YES-ANONYMOUS (measured 403 at the anonymous budget boundary this run; authenticated budget higher)",
-    "AUTHENTICATED": "YES-HELD (a GitHub PAT is held in the LXXIII vault; NOT SPENT on this probe -- stewardship; the probe's purpose was the anonymous surface)"
-   },
-   "measured_state": "LIVE_ENDPOINT_RATE_LIMITED_THIS_RUN",
-   "evidence": [
-    "R498/R498_SOURCE_PROBES.json (github_patents_public_data 403 rate-limit)",
-    "R499/R499_FREE_SOURCE_PROBES.json (github_patents_public_data_retry 200)"
-   ],
-   "notes": "the 403 is a typed budget state of the probing client, never a property of the source's existence"
-  },
-  "zenodo_patent_datasets": {
-   "tier": "tier-3 research corpus (operator research)",
-   "role": "research corpora (varies per dataset)",
-   "properties": {
-    "FREE": "YES [OPERATOR_RESEARCH_2026-09-18 | ORUV]",
-    "ACCESSIBLE": "HTTP_403_THIS_RUN [MEASURED_R499: zenodo.org/api/records answered 403 to this sandbox -- a client-side block/budget state, never a source-availability claim; retryable in a later round]",
-    "AUTOMATABLE": "YES (downloads/API) [OPERATOR_RESEARCH_2026-09-18 | ORUV]",
-    "LICENSE-COMPATIBLE": "PER-DOI (VARIES; UNREVIEWED until recorded per-DOI on ingestion)",
-    "RATE-LIMITED": "UNMEASURED_THIS_ROUND",
-    "AUTHENTICATED": "NO (declared open) [OPERATOR_RESEARCH_2026-09-18 | ORUV]"
-   },
-   "measured_state": "UNMEASURED_THIS_ROUND",
-   "evidence": [
-    "R499/R499_FREE_SOURCE_PROBES.json (zenodo_patent_records 403)"
-   ],
-   "notes": ""
-  },
-  "academic_patent_datasets": {
-   "tier": "tier-3 specialized (operator research; a CLASS, not a single source)",
-   "role": "specialized models/benchmarks",
-   "properties": {
-    "FREE": "OFTEN [OPERATOR_RESEARCH_2026-09-18 | ORUV]",
-    "ACCESSIBLE": "UNMEASURED_THIS_ROUND",
-    "AUTOMATABLE": "VARIES",
-    "LICENSE-COMPATIBLE": "VARIES (per-dataset review on ingestion)",
-    "RATE-LIMITED": "VARIES",
-    "AUTHENTICATED": "VARIES"
-   },
-   "measured_state": "UNMEASURED_THIS_ROUND",
-   "evidence": [],
-   "notes": "each concrete dataset adopted must be registered individually with its own six properties"
-  }
- },
- "coverage_statement": {
-  "statement": "NO source in this registry has coverage measured sufficient for a novelty verdict; no novelty verdict exists in the machine's vocabulary (Art. XLVI/LXXV)",
-  "basis": "coverage sufficiency is a MEASURED property (LXXV clause 2); today only patentbear measures LIVE for search+record-fetch, with a 20-calls/month metered budget and unreviewed corpus coverage; every other patent source is typed out-of-scope, unopened, registration-gated, or unmeasured",
-  "consequence": "the collision stage's honest outputs remain: COLLISION_DETECTED (byte-bound), NO_COLLISION_FOUND (never novelty), typed transport states, and PATENT_COVERAGE_LIVE_THIS_RUN (coverage statement, not a verdict)"
- },
- "fabric_integration": {
-  "document": "PATENT_EVIDENCE_FABRIC.md",
-  "mapping_summary": "Tier 1 -> primary verification targets (LXXV clause 3); Tier 2 + integrated providers -> discovery; Tier 3 -> offline ML substrate; Tier 4 -> the machine's own normalized evidence graph (never an external source)",
-  "installed_legs_r499_union": {
-   "HF_USPTO_CORPUS (Coder 1)": "discovery-ladder provider + deterministic rows transport (free_evidence_sources.py)",
-   "EPO_LINKED_OPEN_DATA (Coder 1)": "identity/family/primary-document VERIFICATION transport (LXXV clause 3 path)",
-   "FreePatentSourceLayer (Coder 2)": "instrument-side coverage layer in rbg_gate.py; battery v4 F12/F13 (substrate honesty + corpus hallucination attack)"
-  }
- },
- "standing_owner_gated_actions": [
-  "register EPO OPS (OAuth) -- unblocks automated worldwide primary retrieval",
-  "register PatentsView (free API key) -- unblocks the structured US graph + claim text",
-  "register a USPTO.gov account -- unblocks US bulk data",
-  "review provider ToS for LICENSE-COMPATIBLE on every source before corpus-scale ingestion",
-  "the PatentBear account-upgrade decision (R378) remains open: key rotation (the operator's committed interim path, 'more keys will be supplied when you run out') serves the seal-scale measurements; the 105-search corpus-scale collision ladder needs either ~6 fresh keys or the upgraded account"
- ],
- "reviewer_provenance": "AI_REVIEW",
- "amended_round": "R499+R500 union",
- "amendment_note": "v1.2.0 UNION of the two parallel executions of the operator's free-source directive: Coder 2's R499/R500 (instrument-side coverage layer, battery v4, five-pass EPO LOD probe driver, SPARQL protocol live, ld+json item path unresolved) + Coder 1's R499 (corpus + identity/family/document transports installed, the full identity model reproduced on the SPARQL path \u2014 closing the R500 open item, query-cost bound measured, github/zenodo/EPO-OPS/USPTO-ODP/PatentsView boundary measurements). No absence claims; every state carries measurement provenance; both lines' evidence chains preserved. ART. XV CORRECTION (in-round): the first union script mis-read the rebase's stage-2 (the onto side) as this line's registry, silently dropping this line's epo_ops / uspto_open_data_bulk / zenodo / patentsview boundary measurements and evidence chains; caught by the round's own pinning test (test_registry_union_v1_2_0_carries_r499_measurements), re-applied from the pre-rebase commit 07b3a074. Both lines' evidence chains now preserved."
+  "standing_owner_gated_actions": [
+    "register EPO OPS (OAuth) -- unblocks automated worldwide primary retrieval",
+    "register PatentsView (free API key) -- unblocks the structured US graph + claim text",
+    "register a USPTO.gov account -- unblocks US bulk data",
+    "review provider ToS for LICENSE-COMPATIBLE on every source before corpus-scale ingestion",
+    "the PatentBear account-upgrade decision (R378) remains open: key rotation (the operator's committed interim path, 'more keys will be supplied when you run out') serves the seal-scale measurements; the 105-search corpus-scale collision ladder needs either ~6 fresh keys or the upgraded account"
+  ],
+  "reviewer_provenance": "AI_REVIEW",
+  "amended_round": "R499+R500 union",
+  "amendment_note": "v1.2.0 UNION of the two parallel executions of the operator's free-source directive: Coder 2's R499/R500 (instrument-side coverage layer, battery v4, five-pass EPO LOD probe driver, SPARQL protocol live, ld+json item path unresolved) + Coder 1's R499 (corpus + identity/family/document transports installed, the full identity model reproduced on the SPARQL path \u2014 closing the R500 open item, query-cost bound measured, github/zenodo/EPO-OPS/USPTO-ODP/PatentsView boundary measurements). No absence claims; every state carries measurement provenance; both lines' evidence chains preserved. ART. XV CORRECTION (in-round): the first union script mis-read the rebase's stage-2 (the onto side) as this line's registry, silently dropping this line's epo_ops / uspto_open_data_bulk / zenodo / patentsview boundary measurements and evidence chains; caught by the round's own pinning test (test_registry_union_v1_2_0_carries_r499_measurements), re-applied from the pre-rebase commit 07b3a074. Both lines' evidence chains now preserved.",
+  "updated_round": "R504"
 }
