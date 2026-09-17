@@ -1524,6 +1524,25 @@ class Handler(BaseHTTPRequestHandler):
             candidate = body.get("candidate")
             problem = body.get("problem")
             evidence = body.get("evidence") or []
+            # R491: the measurement ring pin (fail-closed). The sealed-
+            # corpus measurement declares WHICH provider ring the
+            # instrument is measured on; a pinned provider that is
+            # unavailable or fails yields a typed transport failure —
+            # NEVER a silent cascade to a different ring (the R488
+            # lesson: attacker calibration is (rules x ring)).
+            require_provider = str(body.get("require_provider") or "").strip()
+            if require_provider:
+                try:
+                    from discovery_fabric.engine import llm_registry as _reg
+                    known = [s.provider_id for s in _reg.PROVIDER_SPECS]
+                except Exception:  # noqa: BLE001 — typed, never 500
+                    known = []
+                if require_provider not in known:
+                    return self._json(400, {
+                        "error": "require_provider names no registered "
+                                 "provider id",
+                        "code": "UNKNOWN_RING_PIN",
+                        "detail": require_provider[:60]})
             if not isinstance(candidate, dict) \
                     or not isinstance(problem, dict):
                 return self._json(400, {
@@ -1553,7 +1572,9 @@ class Handler(BaseHTTPRequestHandler):
                     "code": "INSTRUMENT_IMPORT_FAILURE",
                     "detail": str(type(exc).__name__)})
             try:
-                record = _run_attack(candidate, problem, evidence, None)
+                record = _run_attack(candidate, problem, evidence, None,
+                                     require_provider=require_provider
+                                     or None)
             except Exception as exc:  # noqa: BLE001 — typed, never 500
                 return self._json(503, {
                     "error": "the attack instrument failed to execute",

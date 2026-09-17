@@ -86,16 +86,36 @@ def test_conductor_cemetery_will_not_fire_on_unknown():
 # ------------------------------------------------ the kill path, intact
 
 def test_genuine_scientific_kill_still_rejects():
-    """Art. V: fixing the defect must not weaken the real kill path. A
-    scientific KILLED verdict from a working evaluator still rejects."""
+    """Art. V: fixing the defect must not weaken the real kill path.
+
+    R491 contract change (the R490 owner ruling's destination, Art.
+    L): while the gauntlet holds NO shipped calibration meeting its
+    sealed bars, its KILL is escalated — objections preserved
+    verbatim, candidate NOT killed by the gauntlet alone (the R417
+    treatment). The REAL kill path is pinned by the calibrated-state
+    variant (below): a gauntlet whose measurement meets the bars
+    still rejects. Both shapes are asserted here so neither direction
+    can silently drift."""
+    from unittest import mock
+    from discovery_fabric.engine import attacker_calibration as _gate
     adv = _adversarial(
         "KILLED",
         attacks={"unsupported_mechanism": "KILLED",
                  "engineering_infeasibility": "KILLED"},
         reason="mechanism unsupported by any evidence")
+    # uncalibrated (the live state: no A2 measurement shipped)
     result = classify(BASE_CANDIDATE, VERIFIED, PRIOR_ART_OK, adv)
-    assert result["final_status"] == "REJECTED"
-    assert "adjudication_blocked" not in result
+    assert result["final_status"] == "AUTOMATED_INVENTION_CANDIDATE"
+    esc = result["adversarial_escalation"]
+    assert esc["gate"]["terminal_kill_admissible"] is False
+    assert "unsupported by any evidence" in \
+        esc["escalated_objection"]["gauntlet_reason"]
+    # calibrated (the measured future): the kill path is INTACT
+    with mock.patch.object(_gate, "resolve_state", return_value={
+            "state": "CALIBRATED", "terminal_kill_admissible": True}):
+        result2 = classify(BASE_CANDIDATE, VERIFIED, PRIOR_ART_OK, adv)
+    assert result2["final_status"] == "REJECTED"
+    assert "adjudication_blocked" not in result2
 
 
 def test_pass_still_promotes():
@@ -108,12 +128,19 @@ def test_pass_still_promotes():
 
 def test_state_vocabulary_is_closed():
     """Only the three named non-scientific states map to adjudication
-    blocked — an arbitrary string is NOT silently excused."""
+    blocked — an arbitrary string is NOT silently excused.
+
+    R491: an overall outside the recognized scientific vocabulary
+    (PASS/KILLED) AND outside the named non-scientific states is
+    UNKNOWN — fail closed on the unknown (never negative knowledge,
+    never a promotion; the pre-R491 shape rejected, the honest shape
+    is UNKNOWN with adjudication blocked)."""
     result = classify(BASE_CANDIDATE, VERIFIED, PRIOR_ART_OK,
                       _adversarial("SOMETHING_WEIRD"))
-    # unknown vocabulary falls into the generic non-PASS branch:
-    # rejected with the recorded reason (fail closed on the unknown)
-    assert result["final_status"] == "REJECTED"
+    # unknown vocabulary: adjudication blocked, no promotion, no
+    # negative knowledge
+    assert result["final_status"] == "UNKNOWN"
+    assert result["adjudication_blocked"] is True
 
 
 def test_evidence_gate_rejection_unchanged():

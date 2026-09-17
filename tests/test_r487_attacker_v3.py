@@ -290,8 +290,13 @@ class _Handler:
 class TestCalibrationTransportRoute(unittest.TestCase):
     def test_route_exists_with_caps_and_typed_failures(self):
         src = _Handler.route_source()
-        self.assertIn('_run_attack(candidate, problem, evidence, None)',
+        # R491: the call grew the require_provider ring pin (fail-closed,
+        # validated against the registry ids); the corpus-case shape and
+        # the caps are unchanged
+        self.assertIn('_run_attack(candidate, problem, evidence, None,',
                       src)
+        self.assertIn('require_provider=require_provider', src)
+        self.assertIn('UNKNOWN_RING_PIN', src)
         self.assertIn("12_000", src)   # candidate cap
         self.assertIn("413", src)      # payload cap typed
         self.assertIn("INSTRUMENT_IMPORT_FAILURE", src)

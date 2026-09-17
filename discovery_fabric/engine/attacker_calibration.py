@@ -222,6 +222,23 @@ INSTRUMENT_MEASUREMENTS = {
             "r487_attacker_v3_measurement.json"),
         "seal": _pinned_path("r487_attacker_v3_seal.json"),
     },
+    # R491: the A2 gauntlet (a2/adversarial.py::adversarial_challenge,
+    # the 8-dimension gauntlet whose KILL the conductor's classify()
+    # path executes) enters the SAME measurement registry — the R489
+    # composition finding closed by the R490 owner ruling (option a):
+    # Art. L binds every attacker influencing classification. The
+    # gauntlet has NO shipped measurement of its own (its DEV-corpus
+    # calibration is the owned work plan, Art. LIX), so this entry
+    # resolves fail-closed TODAY exactly like an unmeasured engine
+    # instrument version: UNKNOWN_NOT_CALIBRATED, terminal_kill_
+    # admissible false. When the gauntlet's own measurement + seal
+    # ship under these pinned names, the state derives from its
+    # numbers — never before (the annotation in a2/adversarial.py
+    # stays metadata; THIS registry is the authority).
+    "a2_adversarial_gauntlet/1.0.0": {
+        "measurement": _pinned_path("a2_gauntlet_measurement.json"),
+        "seal": _pinned_path("a2_gauntlet_seal.json"),
+    },
 }
 
 
@@ -339,6 +356,18 @@ def resolve_state(measurement_path: Optional[Path] = None,
         fpr <= thresholds["fpr_max"] and tpr >= thresholds["tpr_min"]
         and coverage >= thresholds["coverage_min"]
         and parse >= thresholds["parse_completeness_min"])
+    # R491: the measured RING travels with the state. The R488 lesson
+    # is that an LLM-served attacker's calibration is (rules x ring):
+    # the same v3 rules measured FPR 0.25 on the strong ring's frozen
+    # outputs and 1.0 live on the free-tier ring the cascade fell to
+    # under load. A CALIBRATED state therefore names the ring it was
+    # measured on; gate_attack_record enforces the match at
+    # consumption (a kill from a DIFFERENT ring never inherits the
+    # measured authority — it escalates with a typed reason). An
+    # absent ring block (legacy record shapes) is surfaced honestly
+    # and leaves the ring check unenforceable — recorded, never
+    # silently assumed.
+    ring = record.get("attacker_ring") or None
     def _rel(p: Path) -> Optional[str]:
         try:
             return str(p.relative_to(REPO))
@@ -355,7 +384,11 @@ def resolve_state(measurement_path: Optional[Path] = None,
             "tpr_scoped": tpr,
             "fpr_known_good": fpr,
             "n_cases_attacked": record.get("n_cases_attacked"),
+            "attacker_ring": ring,
         },
+        "ring_binding": (
+            "MEASURED_RING_REQUIRED_AT_CONSUMPTION" if ring
+            else "ABSENT_LEGACY_RECORD"),
         "sealed_thresholds": thresholds,
         "measurement_path": _rel(m_path),
         "measurement_sha256": _sha(m_path),
@@ -373,6 +406,50 @@ def resolve_state(measurement_path: Optional[Path] = None,
             "measured within the sealed bars; the instrument's KILL "
             "carries full terminal authority"),
     }
+
+
+def _ring_mismatch(attack_record: Dict[str, Any],
+                   state: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    """R491: does this attack record's ring match the MEASURED ring
+    of the calibration state? Returns None when the kill keeps its
+    measured terminal authority (match, or a legacy measurement with
+    no ring block — unenforceable, recorded as such), and a typed
+    mismatch description when it does not.
+
+    The R488 measured basis: the same v3 rules measured FPR 0.25 on
+    the strong ring's frozen outputs and 1.0 live on the free-tier
+    ring the cascade fell to — a CALIBRATED verdict is earned by
+    (instrument x ring) and a kill served by a DIFFERENT ring never
+    inherits it (Art. IV: never a silent semantic substitution).
+    """
+    ring = ((state.get("measured") or {}).get("attacker_ring") or {})
+    if not ring:
+        return None  # legacy record shape — no enforceable binding
+    got_provider = attack_record.get("attacker_provider")
+    got_model = attack_record.get("attacker_model")
+    want_provider = ring.get("provider")
+    want_model = ring.get("model")
+    if want_provider and got_provider != want_provider:
+        return {"kind": "RING_MISMATCH_PROVIDER",
+                "measured_ring": ring,
+                "attack_ring": {"provider": got_provider,
+                                "model": got_model},
+                "reason": (
+                    f"the instrument's calibration was measured on "
+                    f"provider '{want_provider}' — this attack ran on "
+                    f"'{got_provider}'; the (rules x ring) authority "
+                    f"does not transfer (R488 measured basis)")}
+    if want_model and got_model and got_model != want_model:
+        return {"kind": "RING_MISMATCH_MODEL",
+                "measured_ring": ring,
+                "attack_ring": {"provider": got_provider,
+                                "model": got_model},
+                "reason": (
+                    f"the instrument's calibration was measured on "
+                    f"model '{want_model}' — this attack ran on "
+                    f"'{got_model}' (same provider, different model); "
+                    f"the (rules x ring) authority does not transfer")}
+    return None
 
 
 def gate_attack_record(attack_record: Optional[Dict[str, Any]],
@@ -404,7 +481,42 @@ def gate_attack_record(attack_record: Optional[Dict[str, Any]],
         instrument_version=attack_record.get("attack_version")
         or GATED_INSTRUMENT_VERSION)
     if st.get("terminal_kill_admissible"):
-        return attack_record
+        # R491: the measured ring binds the authority. A CALIBRATED
+        # state names the ring it was measured on; a kill served by a
+        # different provider/model does NOT inherit the measured
+        # terminal authority — it escalates with the mismatch typed
+        # (never a silent ring-laundered kill).
+        mismatch = _ring_mismatch(attack_record, st)
+        if mismatch is None:
+            return attack_record
+        escalated = dict(attack_record)
+        escalated["raw_overall"] = attack_record.get("overall")
+        escalated["overall"] = ESCALATED
+        escalated["attack_outcome"] = ESCALATED
+        kills = list(attack_record.get("kill_basis") or [])
+        escalated["preserved_objections"] = kills
+        escalated["escalation"] = {
+            "gate_version": GATE_VERSION,
+            "instrument": (attack_record.get("attack_version")
+                           or GATED_INSTRUMENT_VERSION),
+            "calibration_state": st.get("state"),
+            "terminal_kill_admissible": False,
+            "ring_mismatch": mismatch,
+            "measured": st.get("measured"),
+            "sealed_thresholds": st.get("sealed_thresholds"),
+            "measurement_path": st.get("measurement_path"),
+            "measurement_sha256": st.get("measurement_sha256"),
+            "reason": mismatch["reason"],
+            "rule": (
+                "the instrument's calibration is measured per ring "
+                "(rules x ring); this KILL ran on a ring the "
+                "measurement does not cover — the objection is "
+                "preserved verbatim and ESCALATED for adjudication; "
+                "the candidate is NOT killed by this attack alone "
+                "(Art. L/IV)"),
+            "reviewer_provenance": "AI_REVIEW (Art. LXVII)",
+        }
+        return escalated
     escalated = dict(attack_record)
     escalated["raw_overall"] = attack_record.get("overall")
     escalated["overall"] = ESCALATED

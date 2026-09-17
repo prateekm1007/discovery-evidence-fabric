@@ -99,7 +99,8 @@ def utc_now() -> str:
 # ---------------------------------------------------------------------------
 def llm_generate(prompt: str, system: str = "", timeout: int = 240,
                  max_tokens: int = 700, purpose: str = "mechanism_space",
-                 exclude_providers: Optional[List[str]] = None
+                 exclude_providers: Optional[List[str]] = None,
+                 hard_pin_provider: Optional[str] = None
                  ) -> Dict[str, Any]:
     """Generate through the provider registry. exclude_providers removes
     providers from eligibility (used by the independent-attack separation
@@ -110,12 +111,89 @@ def llm_generate(prompt: str, system: str = "", timeout: int = 240,
     evidence-extraction purposes prefer fast/cheap providers, attack
     purposes keep provider separation, synthesis keeps quality-first —
     and the registry cascades across providers on failure with every hop
-    typed and recorded (the result meta carries provider_route)."""
+    typed and recorded (the result meta carries provider_route).
+
+    R491: hard_pin_provider pins the call to ONE provider id with NO
+    fallback (SelectionPolicy max_preference_fallback=0 — the same
+    operator-override semantics as the A2 gauntlet's ENGINE_ATTACK_
+    PROVIDER pin). Purpose: the SEALED-CORPUS CALIBRATION MEASUREMENT
+    must measure the instrument on the ring it declares, not on
+    wherever the availability cascade lands under load — the R488
+    measured lesson ("attacker calibration is (rules x ring), not
+    rules alone": the same v3 rules measured FPR 0.25 on the strong
+    ring's frozen outputs and FPR 1.0 live when the cascade fell to
+    the free-tier ring). Fail-closed: an unavailable or failing pinned
+    provider is PROVIDER_UNAVAILABLE / CALL_FAILED — NEVER a silent
+    ring change. The pin travels in the returned meta (never silent,
+    Art. IV). Production paths do not set it (their cascade keeps the
+    never-refuse-to-run discipline, Art. V)."""
     from .llm_registry import (SelectionPolicy, availability_matrix,
                                generate)
     from .provider_health import order_for_role, role_for_purpose
     matrix = availability_matrix()
     available = [m["provider_id"] for m in matrix if m["available"]]
+    hard_pin_status = "not_requested"
+    if hard_pin_provider:
+        # the measurement ring pin: ONE provider, ZERO fallback. A pin
+        # that is not a registered provider id, or is credentialed-out,
+        # fails closed RIGHT HERE — the LLM is never called on a ring
+        # the measurement did not declare (recorded, never silent).
+        registered = [m["provider_id"] for m in matrix]
+        if hard_pin_provider not in registered:
+            return {
+                "ok": False, "status": "PROVIDER_UNAVAILABLE",
+                "content": None, "provider": None, "model": None,
+                "prompt_hash": None, "output_hash": None,
+                "error": (f"hard pin '{hard_pin_provider}' names no "
+                          f"registered provider id"),
+                "hard_pin": {
+                    "requested": hard_pin_provider,
+                    "status": (f"unknown_provider_id "
+                               f"({hard_pin_provider})")},
+                "engine_llm_provider_pin": "not_set (hard_pin active)",
+                "call_provenance": {}, "task_degradation": {},
+                "cost_provenance": {},
+                "excluded_providers": list(exclude_providers or []),
+                "fallback_to_excluded": False,
+            }
+        if hard_pin_provider not in available:
+            return {
+                "ok": False, "status": "PROVIDER_UNAVAILABLE",
+                "content": None, "provider": None, "model": None,
+                "prompt_hash": None, "output_hash": None,
+                "error": (f"hard-pinned provider '{hard_pin_provider}' "
+                          f"holds no credential in this deployment"),
+                "hard_pin": {
+                    "requested": hard_pin_provider,
+                    "status": (f"pinned_provider_unavailable "
+                               f"({hard_pin_provider})")},
+                "engine_llm_provider_pin": "not_set (hard_pin active)",
+                "call_provenance": {}, "task_degradation": {},
+                "cost_provenance": {},
+                "excluded_providers": list(exclude_providers or []),
+                "fallback_to_excluded": False,
+            }
+        hard_pin_status = "HARD_PINNED_NO_FALLBACK"
+        policy = SelectionPolicy(
+            preferred_providers=[hard_pin_provider],
+            max_preference_fallback=0, purpose=purpose)
+        res = generate(prompt, system=system, timeout=timeout,
+                       max_retries=2, policy=policy, max_tokens=max_tokens,
+                       max_provider_fallbacks=0)
+        return {
+            "ok": res.ok, "status": res.status, "content": res.content,
+            "provider": res.provider_id, "model": res.model,
+            "prompt_hash": res.prompt_hash, "output_hash": res.output_hash,
+            "error": res.error,
+            "hard_pin": {"requested": hard_pin_provider,
+                         "status": hard_pin_status},
+            "engine_llm_provider_pin": "not_set (hard_pin active)",
+            "call_provenance": res.call_provenance,
+            "task_degradation": res.task_degradation,
+            "cost_provenance": res.cost_provenance,
+            "excluded_providers": list(exclude_providers or []),
+            "fallback_to_excluded": False,
+        }
     if exclude_providers:
         remaining = [p for p in available
                      if p not in set(exclude_providers)]

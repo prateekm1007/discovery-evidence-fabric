@@ -1,0 +1,63 @@
+{
+ "artifact_type": "ROUND_PLAN",
+ "round": "R491",
+ "directive_basis": "the operator's roadmap 'Toscanini to 9/10 in every benchmark' (starting point HEAD 8fc7bc47 / R490, overall 6/10) \u2014 minimum-path item 1, THE CRITICAL PATH: calibrate the attacker live ('If FPR won't move: change the ring/model, not the bars'), plus the fresh HF token enabling the deploy that was blocked since R488",
+ "reviewer_provenance": "AI_REVIEW",
+ "created_at_utc": "2026-09-17T13:05:00Z",
+ "starting_state": {
+  "local_and_origin_main": "a90b4e89 (R487/R489 reconciliation; verified ls-remote == HEAD, PAT fingerprint f1ebca5f9b62)",
+  "deployed_space": "7d38eb4e (the R487 v3 build; FIVE commits behind main \u2014 the R488 gate flip + R490 A2 annotation pending on the lost HF token)",
+  "hf_token": "operator re-supplied this round; verified live: user prateekm1, fine-grained, repo.write + inference.serverless.write; the INFERENCE ROUTER ITSELF still 402 CREDIT_EXHAUSTED (verified live against openai/gpt-oss-120b) \u2014 the token's operative value TODAY is the deploy path, not inference",
+  "the_r488_measured_fact": "v3 rules live measured FPR 1.0 / TPR 1.0 with the cascade serving xkiro/qwen3.8-max:free 20/22 (atria rate-limited under the measurement's own parallel load); the R487 dry-run on the SAME rules over the strong ring's frozen v2 outputs (zai/GLM-5.3-served, byte-verified this round in R447/ATTACKER_V2_RECALIBRATION/RAW) measured FPR 0.25 \u2014 attacker calibration is (rules x ring)"
+ },
+ "the_changes": [
+  {
+   "item": "the measurement ring pin (fail-closed)",
+   "files": [
+    "discovery_fabric/engine/mechanism_space.py (llm_generate hard_pin_provider)",
+    "discovery_fabric/engine/independent_attack.py (require_provider + ring_pin on every record)",
+    "toscanini/server.py (the transport's require_provider, validated against the registry ids \u2014 typed 400 UNKNOWN_RING_PIN)"
+   ],
+   "semantics": "the sealed-corpus measurement DECLARES its ring; a pinned provider that is unavailable or fails yields a typed transport failure \u2014 NEVER a silent cascade to a different ring; production attacks keep the availability cascade (the never-refuse-to-run discipline, Art. V)"
+  },
+  {
+   "item": "the ring-bound kill authority",
+   "files": [
+    "discovery_fabric/engine/attacker_calibration.py (attacker_ring surfaces on the state; _ring_mismatch; gate_attack_record enforces the match when CALIBRATED)"
+   ],
+   "semantics": "a CALIBRATED state names the ring it was measured on; a kill served by a different provider/model does NOT inherit the measured terminal authority \u2014 it escalates with a typed ring_mismatch (objections preserved verbatim). Legacy records without a ring block: unenforceable binding, recorded honestly (ring_binding ABSENT_LEGACY_RECORD), pre-R491 semantics hold"
+  },
+  {
+   "item": "the A2 consumption gate (the R490 owner ruling's destination, riding this deploy)",
+   "files": [
+    "discovery_fabric/a2/classify.py (the Article L gate at the gauntlet's kill branch)",
+    "discovery_fabric/a2/adversarial.py (the scope annotation's ruling text records the landing)",
+    "discovery_fabric/engine/attacker_calibration.py (the a2_adversarial_gauntlet/1.0.0 registry entry \u2014 the canonical measurement registry, NOT a new registry)"
+   ],
+   "semantics": "while the gauntlet holds no shipped calibration meeting sealed bars, its KILL is INADMISSIBLE as terminal REJECTED \u2014 objections preserved verbatim, ESCALATED_OBJECTION riding the promotion record (the R417 treatment; the R486-measured two-layer discipline: admission-despite-objection, selection-level demotion). The deterministic gates (prior-art kill states, the falsification contract) keep full authority. The state derives from the canonical registry \u2014 flips only when the gauntlet's own measurement ships",
+   "also_fixed": "the unknown-verdict vocabulary now fails closed (an overall outside PASS/KILLED and outside the named non-scientific states is UNKNOWN + adjudication blocked \u2014 never a promotion, never negative knowledge; the pre-R491 shape rejected, the honest shape is UNKNOWN)"
+  }
+ ],
+ "the_measurement_plan": {
+  "driver": "scripts/r491_ring_pinned_measurement.py",
+  "ring": "atria (Atria-Dawn-Preview \u2014 the strong ring class the v3 dry-run was validated on, GLM-5.3 family)",
+  "shape": "sequential, 30s pacing between cases (the R488 parallel waves starved the strong ring), case-by-case resume markers, identity-gated to the deployed build that carries the pin transport, per-case ring assertion (any RING_DEVIATION discards the marker \u2014 a case is scored only if the pinned ring served it)",
+  "corpus": "the frozen R446 corpus, sha-asserted before and after (unchanged); the R412 sealed bars reused verbatim (no new threshold, Art. XXVII)",
+  "discipline": "no threshold, corpus byte, scoring rule, or verdict path touched; the gate DERIVES the state from the shipped record whatever it says; the true number is reported whatever it is"
+ },
+ "test_campaign": {
+  "new_suite": "tests/test_r491_ring_pinned_calibration.py (23 tests: the hard pin, the ring_pin record, the transport validation, the ring-bound authority incl. mismatch + legacy branches, the A2 consumption gate incl. the calibrated-state restoration, the unknown-vocabulary fail-closed)",
+  "contract_updates": "tests/test_r402_discovery_integrity.py (the R402 completeness discipline carried to the escalation surface), tests/test_adversarial_infra_separation.py (both directions pinned: uncalibrated escalates, calibrated still rejects), tests/test_engine_integration.py D10 (the verdict flip still changes the outcome \u2014 ranking AND the escalation), tests/test_r487_attacker_v3.py (the transport route pin grew the parameter)",
+  "coverage": "223/223 test files run (three bulk groups + the touched suites), ulimit raised 1024->4096 after diagnosing fd-exhaustion mass-errors (an 8GB /tmp buildup from a killed full-suite run was also cleaned); RESULT: 0 new failures; 29 pre-existing failures baselined against the clean tree (e21_series 8, invention_v3_reconciliation 15, failure_universe_and_graph 1, patsnap_claims_regression 1, r392_readiness 2, r412_v1_reconciliation 1, r416_evolution 1 hang-class \u2014 all verified identical on the stashed clean tree)"
+ },
+ "deploy_plan": {
+  "driver": "scripts/r491_space_deploy.py (the r487 flow: push-before-deploy, prune, README, Dockerfile identity ARG, upload, variables, fp-gated secrets, restart)",
+  "carries": "this round's three changes + the pending R488 gate flip + the R490 A2 scope annotation",
+  "then": "verify /api/version == HEAD, /api/health, then the ring-pinned measurement (foreground batches), then ship the records whatever they say"
+ },
+ "known_risks": [
+  "atria may rate-limit even under sequential pacing \u2014 the pin is fail-closed, so this costs COVERAGE (the case re-runs), never a wrong-ring verdict; the coverage bar (0.875) is the honest constraint",
+  "if the strong ring still fails the FPR bar, the roadmap's named next step is a DIFFERENT strong ring (the hf rung needs the owner's inference credits \u2014 still 402), or the v4 rules on a DEV corpus (Art. LIX)",
+  "the ring-bound authority means production SEPARATE_PROVIDER attacks (generator=atria -> attacker avoids atria) will NOT carry terminal kill authority even after an atria-ring calibration \u2014 the honest state of the world, now visible in the records instead of hidden (the second strong ring is the fix; owner-gated)"
+ ]
+}

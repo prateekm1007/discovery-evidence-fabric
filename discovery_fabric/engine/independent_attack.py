@@ -727,13 +727,22 @@ def independent_attack(candidate: Dict[str, Any],
                        problem: Dict[str, Any],
                        evidence: List[Dict[str, Any]],
                        generator_provider: Optional[str],
+                       require_provider: Optional[str] = None,
                        ) -> Dict[str, Any]:
     """Run the independent adversarial attack on one candidate.
 
     Independence selection: providers OTHER than the generator's are
     preferred; if none is credentialed, the same provider is used in a
     separate reasoning context (disclosed). The independence mode and
-    both provider ids are recorded on the attack record."""
+    both provider ids are recorded on the attack record.
+
+    R491: require_provider HARD-PINS the attacker's ring for the
+    sealed-corpus calibration measurement (no fallback; the call FAILS
+    rather than silently changing rings — the R488 lesson: the same
+    rules measured FPR 0.25 on the strong ring's frozen outputs and
+    1.0 live on the free-tier ring the cascade fell to). The pin and
+    its outcome travel on the record as ring_pin (never silent).
+    """
     from .mechanism_space import llm_generate
     ev_lines = []
     for e in (evidence or [])[:5]:
@@ -772,7 +781,29 @@ def independent_attack(candidate: Dict[str, Any],
         # v2: the output contract grew (six lines each carrying the
         # basis AND the GROUNDED_IN binding tail) — the budget covers
         # the contract (disclosed instrument parameter, not a threshold)
-        max_tokens=1600)
+        max_tokens=1600,
+        hard_pin_provider=require_provider)
+    ring_pin_block = {
+        "requested": require_provider or None,
+        "mode": ("HARD_PIN_NO_FALLBACK" if require_provider
+                 else "PRODUCTION_CASCADE"),
+        "served_provider": meta.get("provider"),
+        "served_model": meta.get("model"),
+        "pin_status": (meta.get("hard_pin") or {}).get("status"),
+        "note": (
+            "the sealed-corpus measurement pins the attacker ring so "
+            "the instrument is measured on the ring it declares "
+            "(rules x ring); production attacks keep the availability "
+            "cascade"),
+    }
+    if require_provider and meta.get("ok") \
+            and meta.get("provider") != require_provider:
+        # belt-and-braces: the registry's max_preference_fallback=0
+        # already guarantees this cannot happen; if it ever did, the
+        # record says so loudly rather than laundering a ring change
+        ring_pin_block["pin_violation"] = (
+            "PINNED ring not served — treat this attack as "
+            "transport-invalid for measurement purposes")
     record: Dict[str, Any] = {
         "attack_version": ATTACK_VERSION,
         "candidate_id": candidate.get("candidate_id"),
@@ -797,6 +828,7 @@ def independent_attack(candidate: Dict[str, Any],
         "prompt_hash": meta.get("prompt_hash"),
         "output_hash": meta.get("output_hash"),
         "llm_status": meta.get("status"),
+        "ring_pin": ring_pin_block,
         "attacked_at": None,
     }
     from .mechanism_space import utc_now

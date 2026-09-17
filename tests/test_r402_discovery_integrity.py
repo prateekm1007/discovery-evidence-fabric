@@ -472,7 +472,14 @@ class TestDisabledStageHonesty:
 class TestRejectionReasonCompleteness:
     def test_empty_reason_falls_back_to_kill_dimensions(self):
         from discovery_fabric.a2.classify import classify
-        # v1 rendered "adversarial challenge failed: " (empty tail)
+        # v1 rendered "adversarial challenge failed: " (empty tail).
+        # R491 contract change (the R490 owner ruling's destination,
+        # Art. L): while the gauntlet is uncalibrated its KILL is
+        # INADMISSIBLE as terminal REJECTED — the candidate is NOT
+        # killed by the gauntlet alone; the objections ride the record
+        # VERBATIM as an escalation. The R402 completeness discipline
+        # (the killed dimensions must be enumerated — never an empty
+        # trailing colon) now pins the ESCALATION reason the same way.
         res = classify(
             {"falsification_test": "x" * 20},
             {"verified": True},
@@ -480,13 +487,22 @@ class TestRejectionReasonCompleteness:
             {"overall": "KILLED", "reason": "",
              "attacks": {"physics": "KILLED: violates conservation",
                          "safety": "KILLED: uncontrolled failure"}})
-        assert res["final_status"] == "REJECTED"
-        # the reason carries the kill dimensions — never an empty
-        # trailing colon (v1 rendered "adversarial challenge failed: ")
-        assert res["reason"].rstrip().endswith((")", "e", "s"))
-        assert not res["reason"].rstrip().endswith(":")
-        assert res["reason"].count(":") >= 2
-        assert "physics" in res["reason"] and "safety" in res["reason"]
+        assert res["final_status"] == "AUTOMATED_INVENTION_CANDIDATE"
+        esc = res["adversarial_escalation"]
+        # the objections are preserved verbatim, dimension by dimension
+        assert set(esc["escalated_objection"]["gauntlet_killed_dimensions"]) \
+            == {"physics", "safety"}
+        assert "violates conservation" in \
+            esc["escalated_objection"]["objections_verbatim"]["physics"]
+        # the escalation reason carries the kill dimensions — never an
+        # empty trailing colon (the R402 discipline, carried to the
+        # escalation surface)
+        reason = esc["escalation_reason"]
+        assert not reason.rstrip().endswith(":")
+        assert "physics" in reason and "safety" in reason
+        assert esc["gate"]["calibration_state"] == \
+            "UNKNOWN_NOT_CALIBRATED"
+        assert esc["gate"]["terminal_kill_admissible"] is False
 
     def test_prior_art_kill_cannot_kill_on_non_kill_state(self):
         from discovery_fabric.a2.classify import classify

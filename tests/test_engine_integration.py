@@ -370,7 +370,13 @@ def test_d10_attack_verdict_flip_changes_final_outcome():
         "would not be a real part of the engine (D10)"
     assert s_survivor > s_killed
     assert survivor.epistemic_state["final_status"] == "AUTOMATED_INVENTION_CANDIDATE"
-    assert killed.epistemic_state["final_status"] == "REJECTED"
+    # R491 contract (the R490 owner ruling's destination, Art. L): while
+    # the gauntlet is uncalibrated its KILL escalates instead of
+    # rejecting — the verdict flip still changes the outcome (ranking
+    # AND the escalated objections riding the promotion record)
+    assert killed.epistemic_state["final_status"] == \
+        "AUTOMATED_INVENTION_CANDIDATE"
+    assert "adversarial_escalation" in killed.epistemic_state
 
 
 def test_candidate_envelope_roundtrip_and_hashing():

@@ -109,8 +109,11 @@ A2_CALIBRATION_SCOPE = {
     "article_l_state": "UNCALIBRATED_NO_MEASUREMENT_SHIPPED",
     "ruling": "R490/A2_CALIBRATION_SCOPE.json option (a): own "
               "DEV-corpus calibration (Art. LIX) before the KILL "
-              "regains terminal authority; consumption-side escalation "
-              "(the R417 treatment) rides the next behavior deploy",
+              "regains terminal authority; the consumption-side "
+              "escalation (the R417 treatment) LANDED in R491 "
+              "(a2/classify.py consults the canonical measurement "
+              "registry entry a2_adversarial_gauntlet/1.0.0 — the "
+              "gauntlet's KILL escalates while uncalibrated)",
     "sealed_bar_coverage": "NONE — the R412/R447/R487 sealed-bar "
                            "calibration records cover independent_attack/* "
                            "only, never this gauntlet",
