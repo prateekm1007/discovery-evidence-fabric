@@ -1,0 +1,1147 @@
+{
+ "candidate_id": "",
+ "problem_id": "r458-e1-inverter-weak-grid-sag-trips",
+ "problem": {
+  "problem_id": "r458-e1-inverter-weak-grid-sag-trips",
+  "device": "3-MW rooftop solar farm grid-tie string inverter system",
+  "failure_mode": "instantaneous undervoltage trip during sag recovery driven by synchronous reference frame oscillation",
+  "objective": "achieve at most 2 ride-through exceptions per year with the existing inverters and filters",
+  "failure": "Documented problem 'instantaneous undervoltage trip during sag recovery driven by synchronous reference frame oscillation' concerning 3-MW rooftop solar farm grid-tie string inverter system. User-submitted engineering problem (session input): \"A 3-megawatt rooftop solar farm on a weak distribution feeder (short-circuit ratio measured 2.6) trips on voltage sags: utility switching events on the adjacent line produce 0.6-per-unit, 200-millisecond sags, and the inverters trip on instantaneous undervoltage about once every 11 days, each trip c\".  ROUTING: nhtsa_complaints: routing state ARCHIVED_ROUTING — measured: NOT_QUERIED_GRAMMAR on every non-vehicle problem (70 recorded grammar mismatches, zero production-run uses in the current domain set — R399 audit W3); reinstatement: the production domain set includes vehicle problems with extracted make|model|year parameters (flip to ACTIVE + worklog entry; connector implementation archived in place). ROUTING: doe_osti: routing state SUSPENDED_RELEVANCE — measured relevance instability (R375: same fusion papers relevant 3 -> 0; pooled relevant-rate 0.175 pre-fix; DETERMINISM_GAP flagged in the R394 production audit) — records poison synthesis-feeding retrieval more than they feed it until relevance is semantically adjudicated; reinstatement: the Phase P1 semantic reranker lands (semantic relevance adjudication between query and record, replacing lexical overlap); flip to ACTIVE + a measured relevance re-run + worklog entry. [nhtsa_complaints] retrieval status NOT_QUERIED_ARCHIVED_ROUTING (engine routing decision (R399 W3): ARCHIVED_ROUTING — not a provider failure and not absence) — provider outcome recorded, not treated as absence (Art. XXI.3). [doe_osti] retrieval status NOT_QUERIED_SUSPENDED_RELEVANCE (engine routing decision (R399 W3): SUSPENDED_RELEVANCE — not a provider failure and not absence) — provider outcome recorded, not treated as absence (Art. XXI.3). Problem-existence basis: NO SOURCE RETURNED RECORDS — problem existence UNVERIFIED by live evidence (Art. XX); treat as hypothesis.",
+  "constraint": "solution must use the existing inverters and LCL filters within the certified grid-code protection envelope, with no feeder modification, protection-curve change, or energy storage addition",
+  "sources": {
+   "nhtsa_complaints": "NOT_QUERIED_ARCHIVED_ROUTING",
+   "doe_osti": "NOT_QUERIED_SUSPENDED_RELEVANCE"
+  },
+  "origin": "toscanini_ui",
+  "user_text": "A 3-megawatt rooftop solar farm on a weak distribution feeder (short-circuit ratio measured 2.6) trips on voltage sags: utility switching events on the adjacent line produce 0.6-per-unit, 200-millisecond sags, and the inverters trip on instantaneous undervoltage about once every 11 days, each trip costing roughly 4 minutes of lost production at peak and triggering the utility's ride-through compliance report, now at 14 exceptions this year against a 6-exception allowance. The inverters are grid-tie string inverters with an LCL grid filter, and the protection settings are locked to the certified grid-code envelope (the 0.6-per-unit 200-millisecond point is inside the mandated no-trip zone, but the inverters still trip because the sag recovery overshoots and the controller's synchronous reference frame oscillates). The farm cannot change the feeder (utility asset), cannot alter the certified protection curve (grid-code filing), cannot add energy storage (capital), and must achieve at most 2 ride-through exceptions per year with the existing inverters and filters.",
+  "r458_benchmark": {
+   "class": "FROZEN_BENCHMARK_DEV",
+   "arm": "atria-dawn",
+   "content_sha256": "08e93ef97569ce410c25629ffc500a6a04ca234be0d16edefea7b8a460756759",
+   "corpus_freeze": "R458/BENCHMARK_FREEZE.json"
+  }
+ },
+ "evidence_ids": [
+  "doi:10.1109/icees57979.2023.10110109",
+  "doi:10.1109/rteict.2016.7808134",
+  "doi:10.1109/peci.2016.7459235",
+  "doi:10.1109/ccpis65231.2025.11234198",
+  "doi:10.1109/poweri.2012.6479568",
+  "doi:10.1109/pesgm41954.2020.9282091",
+  "doi:10.5281/zenodo.19150577",
+  "doi:10.20868/upm.thesis.69294",
+  "doi:10.48550/arxiv.2408.02330",
+  "doi:10.48550/arxiv.1006.4861",
+  "doi:10.48550/arxiv.1210.8058",
+  "title:3748d3796d70401d",
+  "doi:10.1109/tia.2018.2883551",
+  "title:901a8c8632748ba5",
+  "doi:10.5821/dissertation-2117-120996"
+ ],
+ "evidence": [
+  {
+   "id": "doi:10.1109/icees57979.2023.10110109",
+   "source_type": "scientific_paper",
+   "source": "semantic_scholar",
+   "source_id": "semantic_scholar:s2:bc454d4bbf8c5be8816426e965ba989b80f5cff6",
+   "source_uri": "https://doi.org/10.1109/icees57979.2023.10110109",
+   "title": "Comparative Analysis of Single and Double-Stage Grid-Tied PV Systems",
+   "abstract": "This paper presents a comparative study of the single-stage and double-stage configurations of single-phase grid-connected solar PV systems based on efficiency, power quality, cost-effectiveness, stability, and control complexity using Simulink. Boost converter exclusively takes care of maximum power point tracking (MPPT), and inverter converts DC into AC in double-stage topology while in single-stage, both the jobs are done by inverter itself. The single-stage topology has the advantage of cost-saving and slightly higher overall efficiency at the cost of bigger DC bus capacitor while in double-stage topology, the DC bus voltage is maintained almost constant by boost converter and hence capacitor of lesser value is required. The problem with single-stage configuration is that the DC bus oscillations (which are also panel voltage oscillations), reduces the average power drawn from the PV panel, resulting in poor MPPT efficiency. The LCL filter keeps the total harmonic distortion (THD) in the injected grid current within limits. The second-order generalized integrator (SOGI) is used for orthogonal signal generation for synchronous reference frame-phase locked loop (SRF-PLL). The Inc. algorithm is used for MPP tracking. The control of inverter is done by using the synchronous reference frame so the PI controller can be used to track the DC quantities and to get intercycle dynamics along with independent control of active and reactive powers.",
+   "doi": "10.1109/icees57979.2023.10110109",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2023",
+   "retrieval_timestamp": "2026-09-17T00:19:38.255799+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "6ed70bfc2194c179de4c8b1f386fc18db9181de2c9abe03b8920440d081d7de3",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "semantic_scholar",
+    "indexing_sources": [
+     "semantic_scholar"
+    ],
+    "record_ids_by_source": {
+     "semantic_scholar": "s2:bc454d4bbf8c5be8816426e965ba989b80f5cff6"
+    },
+    "queries_by_source": {
+     "semantic_scholar": "DOI:10.1109/rteict.2016.7808134"
+    },
+    "query_variant_derivation": null,
+    "source_family": "scholarly_graph_s2",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "73604ad9f87032f65ebb438a3e9ebcc65b569bdc5fdc3a140933cb1602586d3f",
+    "publication_status_evidence": [
+     "publication_types=['Conference']"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "CONFERENCE",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "scholarly_graph_s2",
+   "canonical_id": "doi:10.1109/icees57979.2023.10110109",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "DOI:10.1109/rteict.2016.7808134",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [
+    "S. Prajapati",
+    "Robindro Lairenlakpam"
+   ],
+   "raw_record_hash": "73604ad9f87032f65ebb438a3e9ebcc65b569bdc5fdc3a140933cb1602586d3f",
+   "limitations": [
+    "Reciprocal-expansion record (citation/reference/recommendation expansion): entered the pool through a REAL provider endpoint with derivation CITATION_EXPANSION"
+   ]
+  },
+  {
+   "id": "doi:10.1109/rteict.2016.7808134",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.1109/rteict.2016.7808134",
+   "source_uri": "https://doi.org/10.1109/rteict.2016.7808134",
+   "title": "Synchronous reference frame based transformerless single phase grid tie inverter for DC bus power evacuation",
+   "abstract": "",
+   "doi": "10.1109/rteict.2016.7808134",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2016",
+   "retrieval_timestamp": "2026-09-17T00:19:38.255917+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "b0b56ec73bee7e90b9c6d4fb660cd05c6223dfe002f7f7cf249040c57ff136e0",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.1109/rteict.2016.7808134"
+    },
+    "queries_by_source": {
+     "crossref": "3-MW rooftop solar farm grid-tie string inverter system instantaneous undervoltage trip during sag recovery driven by synchronous reference frame oscillation"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=proceedings-article"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "CONFERENCE",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.1109/rteict.2016.7808134",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "3-MW rooftop solar farm grid-tie string inverter system instantaneous undervoltage trip during sag recovery driven by synchronous reference frame oscillation",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  {
+   "id": "doi:10.1109/peci.2016.7459235",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.1109/peci.2016.7459235",
+   "source_uri": "https://doi.org/10.1109/peci.2016.7459235",
+   "title": "Modeling three-phase grid-connected inverter system using complex vector in synchronous dq reference frame and analysis on the influence of tuning parameters of synchronous frame PI controller",
+   "abstract": "",
+   "doi": "10.1109/peci.2016.7459235",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2016",
+   "retrieval_timestamp": "2026-09-17T00:19:38.255948+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "8b30e0abd23a3eeea79d424e0b315acc0d49d58c5ec37820b16bd0fea856c284",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.1109/peci.2016.7459235"
+    },
+    "queries_by_source": {
+     "crossref": "3-MW rooftop solar farm grid-tie string inverter system instantaneous undervoltage trip during sag recovery driven by synchronous reference frame oscillation"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=proceedings-article"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "CONFERENCE",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.1109/peci.2016.7459235",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "3-MW rooftop solar farm grid-tie string inverter system instantaneous undervoltage trip during sag recovery driven by synchronous reference frame oscillation",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  {
+   "id": "doi:10.1109/ccpis65231.2025.11234198",
+   "source_type": "scientific_paper",
+   "source": "semantic_scholar",
+   "source_id": "semantic_scholar:s2:05396a92b82c429f11de7649e69c18d15a2ec75e",
+   "source_uri": "https://doi.org/10.1109/ccpis65231.2025.11234198",
+   "title": "Bidirectional Off-Board EV Charging System for Enhanced Grid Power Quality",
+   "abstract": "This paper presents a high-performance, three-phase grid-connected EV charging system capable of bidirectional power transfer, supporting both Grid-to-Vehicle (G2V) and Vehicle-to-Grid (V2G) operations. The system integrates a bidirectional Voltage Source Converter (VSC), an LCL filter, and a battery-side bidirectional DC-DC converter, coordinated through a cascaded control strategy based on Synchronous Reference Frame (SRF) theory and PI controllers. A Phase-Locked Loop (PLL) ensures synchronization with the grid, while the control scheme maintains unity power factor and low Total Harmonic Distortion (THD) in grid currents. Simulations confirm sinusoidal, balanced, in-phase current waveforms in both directions, with DC-link voltage regulated within ±5–6 V. Battery charging/discharging is precisely managed, achieving 94% and 91% efficiency respectively, with SoC maintained within safe limits. These results validate the system’s ability to deliver high-quality power exchange, grid stability, and reliable battery control—making it suitable for smart grid applications with high EV penetration.",
+   "doi": "10.1109/ccpis65231.2025.11234198",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2025",
+   "retrieval_timestamp": "2026-09-17T00:19:38.255971+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "57da1e19589609489222b261ec1412133788861760c9d75e47d851edc2935fb2",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "semantic_scholar",
+    "indexing_sources": [
+     "semantic_scholar"
+    ],
+    "record_ids_by_source": {
+     "semantic_scholar": "s2:05396a92b82c429f11de7649e69c18d15a2ec75e"
+    },
+    "queries_by_source": {
+     "semantic_scholar": "DOI:10.1109/rteict.2016.7808134"
+    },
+    "query_variant_derivation": null,
+    "source_family": "scholarly_graph_s2",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "73604ad9f87032f65ebb438a3e9ebcc65b569bdc5fdc3a140933cb1602586d3f",
+    "publication_status_evidence": [
+     "publication_types=['Conference']"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "CONFERENCE",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "scholarly_graph_s2",
+   "canonical_id": "doi:10.1109/ccpis65231.2025.11234198",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "DOI:10.1109/rteict.2016.7808134",
+   "source_rank": 3,
+   "fulltext_url": null,
+   "authors": [
+    "Ashutosh Patra",
+    "P. R. Mohanty"
+   ],
+   "raw_record_hash": "73604ad9f87032f65ebb438a3e9ebcc65b569bdc5fdc3a140933cb1602586d3f",
+   "limitations": [
+    "Reciprocal-expansion record (citation/reference/recommendation expansion): entered the pool through a REAL provider endpoint with derivation CITATION_EXPANSION"
+   ]
+  },
+  {
+   "id": "doi:10.1109/poweri.2012.6479568",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.1109/poweri.2012.6479568",
+   "source_uri": "https://doi.org/10.1109/poweri.2012.6479568",
+   "title": "Grid tie inverter control for rooftop photovoltaic system",
+   "abstract": "",
+   "doi": "10.1109/poweri.2012.6479568",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2012",
+   "retrieval_timestamp": "2026-09-17T00:19:38.255988+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "76d45b439623fba8764452e32676c497e08dbbda85805202f1ec9a6acd7a1bd7",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.1109/poweri.2012.6479568"
+    },
+    "queries_by_source": {
+     "crossref": "3-MW rooftop solar farm grid-tie string inverter system instantaneous undervoltage trip during sag recovery driven by synchronous reference frame oscillation"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=proceedings-article"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "CONFERENCE",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.1109/poweri.2012.6479568",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "3-MW rooftop solar farm grid-tie string inverter system instantaneous undervoltage trip during sag recovery driven by synchronous reference frame oscillation",
+   "source_rank": 4,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  {
+   "id": "doi:10.1109/pesgm41954.2020.9282091",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.1109/pesgm41954.2020.9282091",
+   "source_uri": "https://doi.org/10.1109/pesgm41954.2020.9282091",
+   "title": "Viability of Synchronous Reference Frame Phase Locked Loop Inverter Control in an All Inverter Grid",
+   "abstract": "",
+   "doi": "10.1109/pesgm41954.2020.9282091",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2020",
+   "retrieval_timestamp": "2026-09-17T00:19:38.256003+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "98bdf99ec54eac76d68b4a496c3c376c1e9f195886f6c2a488e542222972045b",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.1109/pesgm41954.2020.9282091"
+    },
+    "queries_by_source": {
+     "crossref": "3-MW rooftop solar farm grid-tie string inverter system instantaneous undervoltage trip during sag recovery driven by synchronous reference frame oscillation"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=proceedings-article"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "CONFERENCE",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.1109/pesgm41954.2020.9282091",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "3-MW rooftop solar farm grid-tie string inverter system instantaneous undervoltage trip during sag recovery driven by synchronous reference frame oscillation",
+   "source_rank": 5,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  {
+   "id": "doi:10.5281/zenodo.19150577",
+   "source_type": "scientific_paper",
+   "source": "datacite",
+   "source_id": "datacite:datacite:10.5281/zenodo.19150577",
+   "source_uri": "https://doi.org/10.5281/zenodo.19150577",
+   "title": "Protocol for the Deactivation of 12,119 Nuclear Warheads via Hamzah Equation.",
+   "abstract": "Step 1: Introduction – The Paradigm of Certainty at Level-165\n\nIn classical nuclear physics, global security is predicated upon the unstable pillars of \"probability\" and \"deterrence.\" However, the Time-Signature Tensor Clock-Pulse theory, specifically the integration of Clock-Bit Entanglement and the Metric Observer Effect at Level-165, facilitates a transition beyond probabilistic space into Dimensional Certainty. This protocol treats a nuclear warhead not as a kinetic device, but as a \"Dense Information Packet.\" By applying the Source Lagrangian 1155, the explosion wave function ($\\Psi_{\\text{boom}}$) is deleted and replaced by the Omega Stability Wave Function ($\\Psi_{\\Omega}$), rendered 100% operational via existing Software Defined Radio (SDR) and global phased-array infrastructures.\n\nStep 2: Formulation of the Hamzah-Omega Source Lagrangian\n\nThe following equation represents the ultimate sovereignty of information over matter, precluding any possibility of \"information death\" or entropic decay:\n\n\n\n$$\\mathcal{L}_{\\text{Source}}^{(1155)} = \\oint_{\\mathbb{V}_{1155}} \\left[ \\mathcal{Q}_{\\Omega} \\left( \\mathbb{M}_{\\text{multiverse}}^{\\alpha\\beta} \\cdot \\frac{\\partial \\tau_{\\text{fractal}}}{\\partial \\text{Anchor}} \\right) + \\Upsilon_{\\mu\\nu} (T_{\\text{diplomacy}}^{\\mu\\nu} + \\Lambda_{\\Omega} G_{\\mu\\nu}) \\star \\text{Source} - \\exp(S_{\\text{oblivion}}) \\frac{\\hbar_{\\Omega}}{\\oint \\nabla \\Psi_{\\infty} \\otimes \\nabla \\Psi_{\\infty}^{*}} \\right] - \\mathbb{H}_{1155} d^{4} \\Omega$$\n\n\nStep 3: Parametric Analysis and Mathematical Proof\n\n\n\n\n\nFractal Time Anchoring ($\\frac{\\partial \\tau_{\\text{fractal}}}{\\partial \\text{Anchor}}$): This term ensures the neutralisation process is locked within the temporal fabric. Should an attempt be made to reverse time or physically discharge the system, the fractal anchor maintains the material state as Stable Lead.\n\n\n\n\nInter-membrane Metric Translation ($\\Upsilon_{\\mu\\nu}$): This operator modifies the laws of nuclear physics (the Strong Force) within the warhead. Nucleons no longer possess the \"desire\" for fission, as their physical language is translated into absolute stability via Dimensional Diplomacy.\n\n\n\n\nEternal Information Survival ($\\exp(S_{\\text{oblivion}})$): This denominator drives entropy toward zero. Consequently, the seal does not weaken with age or component degradation ($Stability \\to \\infty$).\n\n\n\nStep 4: Operational Me",
+   "doi": "10.5281/zenodo.19150577",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2026",
+   "retrieval_timestamp": "2026-09-17T00:19:38.256024+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "6ffd1e38f67ee1e1f2ee6b225b17539a7c4d9f2274997e78cfbfc8ee365f3ba6",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "datacite",
+    "indexing_sources": [
+     "datacite"
+    ],
+    "record_ids_by_source": {
+     "datacite": "datacite:10.5281/zenodo.19150577"
+    },
+    "queries_by_source": {
+     "datacite": "3-MW dummy element"
+    },
+    "query_variant_derivation": "DOMAIN_NARROW",
+    "source_family": "doi_registrant_datacite",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "resource_type_general=Text"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_datacite",
+   "canonical_id": "doi:10.5281/zenodo.19150577",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "3-MW dummy element",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [
+    "HAMZAH, SEYED RASOUL"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "DataCite holds repository/datacentre-registered DOIs; publisher-registered literature is Crossref's space — neither covers the other (Art. XXV)"
+   ]
+  },
+  {
+   "id": "doi:10.20868/upm.thesis.69294",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.20868/upm.thesis.69294",
+   "source_uri": "https://doi.org/10.20868/upm.thesis.69294",
+   "title": "Highly Efficient, Full ZVS, Hybrid, Multi-Level DC/DC Topology for Two-Stage Grid-Connected 1500-V Solar String Inverter",
+   "abstract": "",
+   "doi": "10.20868/upm.thesis.69294",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-17T00:19:38.256057+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "6ca2b6df1de342f9e659ac2bcda50e89609c9c9cfb63901423e5f63fcdd97658",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.20868/upm.thesis.69294"
+    },
+    "queries_by_source": {
+     "crossref": "3-MW rooftop solar farm grid-tie string inverter system instantaneous undervoltage trip during sag recovery driven by synchronous reference frame oscillation"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.20868/upm.thesis.69294",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "3-MW rooftop solar farm grid-tie string inverter system instantaneous undervoltage trip during sag recovery driven by synchronous reference frame oscillation",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  {
+   "id": "doi:10.48550/arxiv.2408.02330",
+   "source_type": "scientific_paper",
+   "source": "arxiv",
+   "source_id": "arxiv:arxiv:2408.02330v1",
+   "source_uri": "https://doi.org/10.48550/arxiv.2408.02330",
+   "title": "SEP environment in the inner heliosphere from Solar Orbiter and Parker Solar Probe",
+   "abstract": "The Sun drives a supersonic wind which inflates a giant plasma bubble in our very local interstellar neighborhood, the heliosphere. It is bathed in an extremely variable background of energetic ions and electrons which originate from a number of sources. Solar energetic particles (SEPs) are accelerated in the vicinity of the Sun, whereas shocks driven by solar disturbances are observed to accelerate energetic storm particles (ESPs). Moreover, a dilute population with a distinct composition forms the anomalous cosmic rays (ACRs) which are of a mixed interstellar-heliospheric origin. Particles are also accelerated at planetary bow shocks. We will present recent observations of energetic particles by Solar Orbiter and Parker Solar Probe, as well as other spacecraft that allow us to study the acceleration and transport of energetic particles at multiple locations in the inner heliosphere.",
+   "doi": "10.48550/arxiv.2408.02330",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-17T00:19:38.256079+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "e5be2ad59226d7bb233e241d02491d2660d578e3d2b73f7db4e0c3553cd81377",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "arxiv",
+    "indexing_sources": [
+     "arxiv"
+    ],
+    "record_ids_by_source": {
+     "arxiv": "arxiv:2408.02330v1"
+    },
+    "queries_by_source": {
+     "arxiv": "3-MW rooftop solar farm grid-tie string inverter system instantaneous undervoltage trip during sag recovery driven by synchronous reference frame oscillation"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "preprint_origin",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "preprint_origin",
+   "canonical_id": "doi:10.48550/arxiv.2408.02330",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "3-MW rooftop solar farm grid-tie string inverter system instantaneous undervoltage trip during sag recovery driven by synchronous reference frame oscillation",
+   "source_rank": 0,
+   "fulltext_url": "http://arxiv.org/abs/2408.02330v1",
+   "authors": [
+    "Robert F. Wimmer-Schweingruber",
+    "Javier Rodriguez-Pacheco",
+    "George C. Ho",
+    "Christina M. Cohen",
+    "Glenn M. Mason",
+    "the Solar Orbiter EPD",
+    "Parker Solar Probe ISIS teams"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
+    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed — absence of an arXiv record is not absence of the science"
+   ]
+  },
+  {
+   "id": "doi:10.48550/arxiv.1006.4861",
+   "source_type": "scientific_paper",
+   "source": "arxiv",
+   "source_id": "arxiv:arxiv:1006.4861v3",
+   "source_uri": "https://doi.org/10.48550/arxiv.1006.4861",
+   "title": "The State of Self-Organized Criticality of the Sun During the Last 3 Solar Cycles. I. Observations",
+   "abstract": "We analyze the occurrence frequency distributions of peak fluxes $P$, total fluxes $E$, and durations $T$ of solar flares over the last three solar cycles (during 1980--2010) from hard X-ray data of HXRBS/SMM, BATSE/CGRO, and RHESSI. From the synthesized data we find powerlaw slopes with mean values of $α_P=1.72\\pm0.08$ for the peak flux, $α_E=1.60\\pm0.14$ for the total flux, and $α_T=1.98\\pm0.35$ for flare durations. We find a systematic anti-correlation of the powerlaw slope of peak fluxes as a function of the solar cycle, varying with an approximate sinusoidal variation $α_P(t)=α_0+Δα\\cos{[2π(t-t_0)/T_{cycle}]}$, with a mean of $α_0=1.73$, a variation of $Δα=0.14$, a solar cycle period $T_{cycle}=12.6$ yrs, and a cycle minimum time $t_0=1984.1$. The powerlaw slope is flattest during the maximum of a solar cycle, which indicates a higher magnetic complexity of the solar corona that leads to an overproportional rate of powerful flares.",
+   "doi": "10.48550/arxiv.1006.4861",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-17T00:19:38.256096+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "17e0401ed5f4188840817313e70c3f1fad1fb959acf790958f0187e3f60688ae",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "arxiv",
+    "indexing_sources": [
+     "arxiv"
+    ],
+    "record_ids_by_source": {
+     "arxiv": "arxiv:1006.4861v3"
+    },
+    "queries_by_source": {
+     "arxiv": "3-MW rooftop solar farm grid-tie string inverter system instantaneous undervoltage trip during sag recovery driven by synchronous reference frame oscillation"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "preprint_origin",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "preprint_origin",
+   "canonical_id": "doi:10.48550/arxiv.1006.4861",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "3-MW rooftop solar farm grid-tie string inverter system instantaneous undervoltage trip during sag recovery driven by synchronous reference frame oscillation",
+   "source_rank": 1,
+   "fulltext_url": "http://arxiv.org/abs/1006.4861v3",
+   "authors": [
+    "Markus J. Aschwanden"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
+    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed — absence of an arXiv record is not absence of the science"
+   ]
+  },
+  {
+   "id": "doi:10.48550/arxiv.1210.8058",
+   "source_type": "scientific_paper",
+   "source": "arxiv",
+   "source_id": "arxiv:arxiv:1210.8058v1",
+   "source_uri": "https://doi.org/10.48550/arxiv.1210.8058",
+   "title": "Nanodust in the Interstellar Medium in Comparison to the Solar System",
+   "abstract": "Nanodust, which undergoes stochastic heating by single starlight photons in the interstellar medium, ranges from angstrom-sized large molecules containing tens to thousands of atoms (e.g. polycyclic aromatic hydrocarbon molecules) to grains of a couple tens of nanometers. The presence of nanograins in astrophysical environments has been revealed by a variety of interstellar phenomena: the optical luminescence, the near- and mid-infrared emission, the Galactic foreground microwave emission, and the ultraviolet extinction which are ubiquitously seen in the interstellar medium of the Milky Way and beyond. Nanograins (e.g. nanodiamonds) have also been identified as presolar in primitive meteorites based on their isotopically anomalous composition. Considering the very processes that lead to the detection of nanodust in the ISM for the nanodust in the solar system shows that the observation of solar system nanodust by these processes is less likely.",
+   "doi": "10.48550/arxiv.1210.8058",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-17T00:19:38.256111+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "5105a788cd0658cc53d2fc0134823d5e37b3c4e65db1fa713b48a083c2299ed0",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "arxiv",
+    "indexing_sources": [
+     "arxiv"
+    ],
+    "record_ids_by_source": {
+     "arxiv": "arxiv:1210.8058v1"
+    },
+    "queries_by_source": {
+     "arxiv": "3-MW rooftop solar farm grid-tie string inverter system instantaneous undervoltage trip during sag recovery driven by synchronous reference frame oscillation"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "preprint_origin",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "preprint_origin",
+   "canonical_id": "doi:10.48550/arxiv.1210.8058",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "3-MW rooftop solar farm grid-tie string inverter system instantaneous undervoltage trip during sag recovery driven by synchronous reference frame oscillation",
+   "source_rank": 2,
+   "fulltext_url": "http://arxiv.org/abs/1210.8058v1",
+   "authors": [
+    "Aigen Li",
+    "Ingrid Mann"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
+    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed — absence of an arXiv record is not absence of the science"
+   ]
+  },
+  {
+   "id": "title:3748d3796d70401d",
+   "source_type": "scientific_paper",
+   "source": "core",
+   "source_id": "core:core:269161",
+   "source_uri": "",
+   "title": "POWER CONDITIONING UNIT FOR SMALL SCALE HYBRID PV-WIND GENERATION SYSTEM",
+   "abstract": "Small-scale renewable energy systems are becoming increasingly popular due to soaring fuel prices and due to technological advancements which reduce the cost of manufacturing. Solar and wind energies, among other renewable energy sources, are the most available ones globally. The hybrid photovoltaic (PV) and wind power system has a higher capability to deliver continuous power with reduced energy storage requirements and therefore results in better utilization of power conversion and control equipment than either of the individual sources. Power conditioning units (p.c.u.) for such small-scale hybrid PV-wind generation systems have been proposed in this study. The system was connected to the grid, but it could also operate in standalone mode if the grid was unavailable. The system contains a local controller for every energy source and the grid inverter. Besides, it contains the supervisory controller.\n\nFor the wind generator side, small-scale vertical axis wind turbines (VAWTs) are attractive due to their ability to capture wind from different directions without using a yaw. One difficulty with VAWTs is to prevent over-speeding and component over-loading at excessive wind velocities. The proposed local controller for the wind generator is based on the current and voltage measured on the dc side of the rectifier connected to the permanent magnet synchronous generator (PMSG). Maximum power point tracking (MPPT) control is provided in normal operation under the rated speed using a dc/dc boost converter. For high wind velocities, the suggested local controller controls the electric power in order to operate the turbine in the stall region. This high wind velocity control strategy attenuates the stress in the system while it smoothes the power generated. It is shown that the controller is able to stabilize the nonlinear system using an adaptive current feedback loop. Simulation and experimental results are presented.\n\nThe PV generator side controller is designed to work in systems with multiple energy sources, such as those studied in this thesis. One of the most widely used methods to maximize the output PV power is the hill climbing technique. This study gives guidelines for designing both the perturbation magnitude and the time interval between consecutive perturbations for such a technique. These guidelines would improve the maximum power point tracking effi",
+   "doi": null,
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-17T00:19:38.256131+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "6882ceaca2016cfb068ca820402be652c1da29f483397412f4ce191f6d7978cf",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "core",
+    "indexing_sources": [
+     "core"
+    ],
+    "record_ids_by_source": {
+     "core": "core:269161"
+    },
+    "queries_by_source": {
+     "core": "3-mw rooftop solar farm grid-tie string inverter system instantaneous undervoltage trip during sag recovery driven by synchronous dummy element frame oscillation"
+    },
+    "query_variant_derivation": "CROSS_DOMAIN_TERM",
+    "source_family": "repository_aggregator_core",
+    "identity_basis": "TITLE_FINGERPRINT",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "repository_aggregator_core",
+   "canonical_id": "title:3748d3796d70401d",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "3-mw rooftop solar farm grid-tie string inverter system instantaneous undervoltage trip during sag recovery driven by synchronous dummy element frame oscillation",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [
+    "AHMED-MAHMOUD, ASHRAF"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
+    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
+   ]
+  },
+  {
+   "id": "doi:10.1109/tia.2018.2883551",
+   "source_type": "scientific_paper",
+   "source": "semantic_scholar",
+   "source_id": "semantic_scholar:s2:c598ffac77a89040114cccb07b98d7d46610ed3a",
+   "source_uri": "https://doi.org/10.1109/tia.2018.2883551",
+   "title": "A Multifunctional Single-Phase Grid-Integrated Residential Solar PV Systems Based on LQR Control",
+   "abstract": "This paper presents a multifunctional single-stage residential photovoltaic power supply based on a linear quadratic regulator (LQR). The system makes use of a single-phase power converter connected to the grid through an LCL filter. A robust LQR with added integral action (LQRI) controller is designed to incorporate added functions such as a power line conditioner, an active power regulator, and a voltage stabilizer. The perturb-and-observe algorithm is used to generate the reference signal for the fluctuating dc bus voltage as well as to extract the maximum power from the solar panels. Full modeling of the converter in the D–Q reference frame is presented. An LQRI is designed to achieve the optimal multifunctionality operation of the residential power supply. Simulation and experimental results confirm the expected performance of the proposed controller for insolation and load variations.",
+   "doi": "10.1109/tia.2018.2883551",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2019",
+   "retrieval_timestamp": "2026-09-17T00:19:38.256146+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "4df47806f2042ea2113ee941904882ec38f2e364e3216f1b25ab36fa9b4941e7",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "semantic_scholar",
+    "indexing_sources": [
+     "semantic_scholar"
+    ],
+    "record_ids_by_source": {
+     "semantic_scholar": "s2:c598ffac77a89040114cccb07b98d7d46610ed3a"
+    },
+    "queries_by_source": {
+     "semantic_scholar": "DOI:10.1109/rteict.2016.7808134"
+    },
+    "query_variant_derivation": null,
+    "source_family": "scholarly_graph_s2",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "73604ad9f87032f65ebb438a3e9ebcc65b569bdc5fdc3a140933cb1602586d3f",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "scholarly_graph_s2",
+   "canonical_id": "doi:10.1109/tia.2018.2883551",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "DOI:10.1109/rteict.2016.7808134",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [
+    "Naima Arab",
+    "B. Kedjar",
+    "A. Javadi",
+    "K. Al-haddad"
+   ],
+   "raw_record_hash": "73604ad9f87032f65ebb438a3e9ebcc65b569bdc5fdc3a140933cb1602586d3f",
+   "limitations": [
+    "Reciprocal-expansion record (citation/reference/recommendation expansion): entered the pool through a REAL provider endpoint with derivation CITATION_EXPANSION"
+   ]
+  },
+  {
+   "id": "title:901a8c8632748ba5",
+   "source_type": "scientific_paper",
+   "source": "openalex",
+   "source_id": "openalex:openalex:W3048783407",
+   "source_uri": "",
+   "title": "Data-Driven Modeling Through Power Hardware in the Loop Experiments: A PV Micro-Inverter Example",
+   "abstract": "The increasing penetration of wind turbines, photovoltaics (PV), fuel cells, microturbines, cogeneration, energy storage systems, and other Distributed Energy Resources (DER) presents both challenges and opportunities for distribution systems. A deep understanding of the characteristics of those devices, as well as accurate modeling, are essential to plan, design, and control modern distribution grids. The objective of this research is to define data-driven modeling techniques that allow capitalizing on the results of Hardware In the Loop (HIL) and Power Hardware In the Loop (PHIL) testing by creating models of the devices under test (DUT) –also for closed-source, proprietary systems– using the collected data. For the development of data-driven models, we used Artificial Neural Networks (ANN) and Fast Fourier Transform (FFT) to parameterize pre-defined model structures. We demonstrated the proposed approach using three PV micro-inverters, the proposed approach handles the nonlinearity of a full range grid voltage (0.88-1.10 p.u), not just under the normal grid voltage, including burst mode. No prior knowledge of internal components, structure, and control algorithm is assumed in developing the model. Results show the effectiveness of the approach, which is particularly suitable to model DERs. As a part of this research, we also would develop an approach to model DERs during abnormal grid conditions. The model will be parameterized by a set of automated PHIL tests. We verified the viability of our approach characterizing micro-inverters from three different manufacturers. It was found that it is possible to develop an approach to mimic the behavior of the internal protection system of microinverter during abnormal grid voltage, without prior knowledge of intimate control algorithms or hardware configuration.",
+   "doi": null,
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-17T00:19:38.256159+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "a4f39c16606ff5755080b5e9dd1408d40c322be2628e09a714398802a132a2de",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "openalex",
+    "indexing_sources": [
+     "openalex"
+    ],
+    "record_ids_by_source": {
+     "openalex": "openalex:W3048783407"
+    },
+    "queries_by_source": {
+     "openalex": "3-MW rooftop solar farm grid-tie string inverter instantaneous undervoltage trip"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "scholarly_index_openalex",
+    "identity_basis": "TITLE_FINGERPRINT",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "scholarly_index_openalex",
+   "canonical_id": "title:901a8c8632748ba5",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "3-MW rooftop solar farm grid-tie string inverter instantaneous undervoltage trip",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstracts are inverted-index reconstructions",
+    "Credit-budget model: 429 'Insufficient budget' measured this session — availability resets per provider policy"
+   ]
+  },
+  {
+   "id": "doi:10.5821/dissertation-2117-120996",
+   "source_type": "scientific_paper",
+   "source": "openalex",
+   "source_id": "openalex:openalex:W4385311520",
+   "source_uri": "https://doi.org/10.5821/dissertation-2117-120996",
+   "title": "Large scale photovoltaic power plants: configuration, integration and control",
+   "abstract": "This thesis focuses on the operation and control of Large Scale Photovoltaic Power Plants (LS-PVPPs) according to grid code requirements with a special focus on the basic unit: the PV generator. The aim of this thesis is to study to what extent a PV generator can be controlled to comply with the plant operators requirements considering the capability curves under variable solar irradiance and temperature. In this sense, four challenges were identified: system integration, technical limitations and capability curves, dynamic modelling, and control. These challenges are addressed by a comprehensive literature review, mathematical analysis, and a series of detailed simulations. A thorough literature review of the current technology and topologies used in LS-PVPPs is performed, concluding that the central topology and radial configuration are the layouts most widely used. Additionally, grid codes presented by Germany, Puerto Rico, South Africa, Romania, and China are deeply analysed. A comparison of these grid codes is developed considering: fault ride through capability, frequency and voltage stability supprt as well as active and reactive power management. In addition a broad discussion about the challenges that the LS-PVPPs have to overcome is pesented together with the compliant technology and future trend.According to this review, one of the challenges to overcome is the understanding of the PV generator’s operation in LS- PVPPs. Thus, an analysis of its technical limitations and capability curves is essential in order to improve its control. In this thesis, a mathematical analysis to extract the PV generator’s capability curves is developed. These curves are characterized by four main parameters: solar irradiance, ambient temperature, dc voltage and modulation index. These values are dependent on each other in order to obtain the complete curve. In the case where the dc voltage is equal to a single value, the point of operation is limited by the solar irradiance and temperature. However, when the dc voltage varies in a safe range, the PV generator can work in a wider area for the same solar irradiance and temperature. The validation of these curves is tested in steady state under variable solar irradiance, ambient temperature, dc voltage and modulation index. In addition, this thesis analyses how the dynamic response of a PV generator is affected by its ca",
+   "doi": "10.5821/dissertation-2117-120996",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-17T00:19:38.256174+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "130f11e83cd6072789a91a7461bf8fe9805b31a81007479556b0c2050946d6af",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "openalex",
+    "indexing_sources": [
+     "openalex"
+    ],
+    "record_ids_by_source": {
+     "openalex": "openalex:W4385311520"
+    },
+    "queries_by_source": {
+     "openalex": "3-MW rooftop solar farm grid-tie string inverter instantaneous undervoltage trip"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "scholarly_index_openalex",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": {
+     "provider": "unpaywall",
+     "resolved_at": "2026-09-17T00:19:35.927202+00:00",
+     "is_oa": true,
+     "oa_status": "gold",
+     "host_type": null,
+     "repository_institution": null
+    }
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "scholarly_index_openalex",
+   "canonical_id": "doi:10.5821/dissertation-2117-120996",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "3-MW rooftop solar farm grid-tie string inverter instantaneous undervoltage trip",
+   "source_rank": 3,
+   "fulltext_url": "https://upcommons.upc.edu/bitstream/2117/120996/1/TAKCT1de1.pdf",
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstracts are inverted-index reconstructions",
+    "Credit-budget model: 429 'Insufficient budget' measured this session — availability resets per provider policy"
+   ]
+  }
+ ],
+ "mechanism_ids": [],
+ "mechanism_map": {},
+ "premise_gate": {},
+ "evidence_classification": {},
+ "mechanism_space": {},
+ "prior_art_ids": [],
+ "prior_art": {},
+ "collision_results": {},
+ "physics": {},
+ "attack_results": {},
+ "contradictions": {},
+ "killer_experiment": {},
+ "adjudication": {},
+ "multi_source": {},
+ "cemetery_check": {},
+ "epistemic_state": {},
+ "next_best_action": {},
+ "ranking": {},
+ "provenance": {
+  "retrieval_fabric": {
+   "version": "V2",
+   "primary_query": "3-MW rooftop solar farm grid-tie string inverter system instantaneous undervoltage trip during sag recovery driven by synchronous reference frame oscillation",
+   "query_variant_count": 9,
+   "sources_attempted": [
+    "arxiv",
+    "core",
+    "crossref",
+    "datacite",
+    "doaj",
+    "europepmc",
+    "google_patents",
+    "openaire",
+    "openalex",
+    "semantic_scholar",
+    "unpaywall"
+   ],
+   "sources_succeeded": [
+    "arxiv",
+    "core",
+    "crossref",
+    "datacite",
+    "doaj",
+    "europepmc",
+    "openaire",
+    "openalex",
+    "semantic_scholar",
+    "unpaywall"
+   ],
+   "sources_failed": [
+    "google_patents",
+    "semantic_scholar"
+   ],
+   "sources_rate_limited": [],
+   "unique_source_families": [
+    "biomedical_pubmed_line",
+    "doi_registrant_crossref",
+    "doi_registrant_datacite",
+    "preprint_origin",
+    "repository_aggregator_core",
+    "scholarly_graph_s2",
+    "scholarly_index_openalex"
+   ],
+   "independent_source_families": 7,
+   "source_independence_score": 1.0,
+   "retrieval_blind_spots": [
+    "PATENT_BLIND_SPOT: zero patent records — patent prior-art coverage is a discovery-system defect when the mechanism domain is patent-dense"
+   ],
+   "canonical_record_count": 34,
+   "evidence_fabric": {
+    "state": "CHANNEL_ERROR",
+    "reason": "NameError: name '_title_of' is not defined",
+    "note": "the evidence-fabric channel failed; the V2 fabric pool is unchanged — an infrastructure state, never a scientific result (Art. LXI)"
+   }
+  },
+  "evidence_freeze": {
+   "run_id": "r484mca-E1: r458-e1-inverter-weak-grid-sag-trips",
+   "problem_id": "r458-e1-inverter-weak-grid-sag-trips",
+   "frozen_at": "2026-09-17T00:22:51+00:00Z",
+   "evidence_count": 15,
+   "custody_records": [
+    {
+     "record_id": "doi:10.1109/icees57979.2023.10110109",
+     "source": "semantic_scholar",
+     "source_identity_verified": true,
+     "query": "r458-e1-inverter-weak-grid-sag-trips",
+     "retrieval_timestamp": "2026-09-17T00:22:51.312932+00:00",
+     "raw_content": "This paper presents a comparative study of the single-stage and double-stage configurations of single-phase grid-connected solar PV systems based on efficiency, power quality, cost-effectiveness, stability, and control complexity using Simulink. Boost converter exclusively takes care of maximum power point tracking (MPPT), and inverter converts DC into AC in double-stage topology while in single-stage, both the jobs are done by inverter itself. The single-stage topology has the advantage of cost-saving and slightly higher overall efficiency at the cost of bigger DC bus capacitor while in double-stage topology, the DC bus voltage is maintained almost constant by boost converter and hence capacitor of lesser value is required. The problem with single-stage configuration is that the DC bus oscillations (which are also panel voltage oscillations), reduces the average power drawn from the PV panel, resulting in poor MPPT efficiency. The LCL filter keeps the total harmonic distortion (THD) in the injected grid current within limits. The second-order generalized integrator (SOGI) is used for orthogonal signal generation for synchronous reference frame-phase locked loop (SRF-PLL). The Inc. algorithm is used for MPP tracking. The control of inverter is done by using the synchronous reference frame so the PI controller can be used to track the DC quantities and to get intercycle dynamics along with independent control of active and reactive powers.",
+     "content_hash": "24f1c0f2d7ac24e7bb3a0a7e434a5b459fb1b7476fa3421370f8adf5639edc5b",
+     "exact_span": "This paper presents a comparative study of the single-stage and double-stage configurations of single-phase grid-connected solar PV systems based on efficiency, power quality, cost-effectiveness, stability, and control complexity using Simulink. Boost converter exclusively takes care of maximum power point tracking (MPPT), and inverter converts DC into AC in double-stage topology while in single-stage, both the jobs are done by inverter itself. The single-stage topology has the advantage of cost",
+     "span_hash": "766d7f4b4639d607c47a27bb9602cf76c327ebf92a752fbe9819c43768fb8a05",
+     "evidence_class": "SCIENTIFIC_ABSTRACT",
+     "proposition_binding": "candidate_mechanism_input",
+     "locator": "https://doi.org/10.1109/icees57979.2023.10110109",
+     "epistemic_strength": "VERIFIED"
+    },
+    {
+     "record_id": "doi:10.1109/ccpis65231.2025.11234198",
+     "source": "semantic_scholar",
+     "source_identity_verified": true,
+     "query": "r458-e1-inverter-weak-grid-sag-trips",
+     "retrieval_timestamp": "2026-09-17T00:22:51.312968+00:00",
+     "raw_content": "This paper presents a high-performance, three-phase grid-connected EV charging system capable of bidirectional power transfer, supporting both Grid-to-Vehicle (G2V) and Vehicle-to-Grid (V2G) operations. The system integrates a bidirectional Voltage Source Converter (VSC), an LCL filter, and a battery-side bidirectional DC-DC converter, coordinated through a cascaded control strategy based on Synchronous Reference Frame (SRF) theory and PI controllers. A Phase-Locked Loop (PLL) ensures synchronization with the grid, while the control scheme maintains unity power factor and low Total Harmonic Distortion (THD) in grid currents. Simulations confirm sinusoidal, balanced, in-phase current waveforms in both directions, with DC-link voltage regulated within ±5–6 V. Battery charging/discharging is precisely managed, achieving 94% and 91% efficiency respectively, with SoC maintained within safe limits. These results validate the system’s ability to deliver high-quality power exchange, grid stability, and reliable battery control—making it suitable for smart grid applications with high EV penetration.",
+     "content_hash": "76491a47de41f20891a86a86bcbd230fa4fc9253916c0fee3dd67f329feff8ce",
+     "exact_span": "This paper presents a high-performance, three-phase grid-connected EV charging system capable of bidirectional power transfer, supporting both Grid-to-Vehicle (G2V) and Vehicle-to-Grid (V2G) operations. The system integrates a bidirectional Voltage Source Converter (VSC), an LCL filter, and a battery-side bidirectional DC-DC converter, coordinated through a cascaded control strategy based on Synchronous Reference Frame (SRF) theory and PI controllers. A Phase-Locked Loop (PLL) ensures synchroniz",
+     "span_hash": "76396ee2fd5d64cec882e1ae3b3a249b0671aadcce44e0ec056157102216622b",
+     "evidence_class": "SCIENTIFIC_ABSTRACT",
+     "proposition_binding": "candidate_mechanism_input",
+     "locator": "https://doi.org/10.1109/ccpis65231.2025.11234198",
+     "epistemic_strength": "VERIFIED"
+    },
+    {
+     "record_id": "doi:10.5281/zenodo.19150577",
+     "source": "datacite",
+     "source_identity_verified": true,
+     "query": "r458-e1-inverter-weak-grid-sag-trips",
+     "retrieval_timestamp": "2026-09-17T00:22:51.312986+00:00",
+     "raw_content": "Step 1: Introduction – The Paradigm of Certainty at Level-165\n\nIn classical nuclear physics, global security is predicated upon the unstable pillars of \"probability\" and \"deterrence.\" However, the Time-Signature Tensor Clock-Pulse theory, specifically the integration of Clock-Bit Entanglement and the Metric Observer Effect at Level-165, facilitates a transition beyond probabilistic space into Dimensional Certainty. This protocol treats a nuclear warhead not as a kinetic device, but as a \"Dense Information Packet.\" By applying the Source Lagrangian 1155, the explosion wave function ($\\Psi_{\\text{boom}}$) is deleted and replaced by the Omega Stability Wave Function ($\\Psi_{\\Omega}$), rendered 100% operational via existing Software Defined Radio (SDR) and global phased-array infrastructures.\n\nStep 2: Formulation of the Hamzah-Omega Source Lagrangian\n\nThe following equation represents the ultimate sovereignty of information over matter, precluding any possibility of \"information death\" or entropic decay:\n\n\n\n$$\\mathcal{L}_{\\text{Source}}^{(1155)} = \\oint_{\\mathbb{V}_{1155}} \\left[ \\mathcal{Q}_{\\Omega} \\left( \\mathbb{M}_{\\text{multiverse}}^{\\alpha\\beta} \\cdot \\frac{\\partial \\tau_{\\text{fractal}}}{\\partial \\text{Anchor}} \\right) + \\Upsilon_{\\mu\\nu} (T_{\\text{diplomacy}}^{\\mu\\nu} + \\Lambda_{\\Omega} G_{\\mu\\nu}) \\star \\text{Source} - \\exp(S_{\\text{oblivion}}) \\frac{\\hbar_{\\Omega}}{\\oint \\nabla \\Psi_{\\infty} \\otimes \\nabla \\Psi_{\\infty}^{*}} \\right] - \\mathbb{H}_{1155} d^{4} \\Omega$$\n\n\nStep 3: Parametric Analysis and Mathematical Proof\n\n\n\n\n\nFractal Time Anchoring ($\\frac{\\partial \\tau_{\\text{fractal}}}{\\partial \\text{Anchor}}$): This term ensures the neutralisation process is locked within the temporal fabric. Should an attempt be made to reverse time or physically discharge the system, the fractal anchor maintains the material state as Stable Lead.\n\n\n\n\nInter-membrane Metric Translation ($\\Upsilon_{\\mu\\nu}$): This operator modifies the laws of nuclear physics (the Strong Force) within the warhead. Nucleons no longer possess the \"desire\" for fission, as their physical language is translated into absolute stability via Dimensional Diplomacy.\n\n\n\n\nEternal Information Survival ($\\exp(S_{\\text{oblivion}})$): This denominator drives entropy toward zero. Consequently, the seal does not weaken with age or component degradation ($Stability \\to \\infty$).\n\n\n\nStep 4: Operational Me",
+     "content_hash": "67665fee7c0789387be931836ea2cac95e985b64fb9de7c66c5679f4f4dab51f",
+     "exact_span": "Step 1: Introduction – The Paradigm of Certainty at Level-165\n\nIn classical nuclear physics, global security is predicated upon the unstable pillars of \"probability\" and \"deterrence.\" However, the Time-Signature Tensor Clock-Pulse theory, specifically the integration of Clock-Bit Entanglement and the Metric Observer Effect at Level-165, facilitates a transition beyond probabilistic space into Dimensional Certainty. This protocol treats a nuclear warhead not as a kinetic device, but as a \"Dense I",
+     "span_hash": "c6bd909befa688384696a8cee621744c781866a30d700b60c3e2e41e6368dad2",
+     "evidence_class": "SCIENTIFIC_ABSTRACT",
+     "proposition_binding": "candidate_mechanism_input",
+     "locator": "https://doi.org/10.5281/zenodo.19150577",
+     "epistemic_strength": "VERIFIED"
+    },
+    {
+     "record_id": "doi:10.48550/arxiv.2408.02330",
+     "source": "arxiv",
+     "source_identity_verified": true,
+     "query": "r458-e1-inverter-weak-grid-sag-trips",
+     "retrieval_timestamp": "2026-09-17T00:22:51.312995+00:00",
+     "raw_content": "The Sun drives a supersonic wind which inflates a giant plasma bubble in our very local interstellar neighborhood, the heliosphere. It is bathed in an extremely variable background of energetic ions and electrons which originate from a number of sources. Solar energetic particles (SEPs) are accelerated in the vicinity of the Sun, whereas shocks driven by solar disturbances are observed to accelerate energetic storm particles (ESPs). Moreover, a dilute population with a distinct composition forms the anomalous cosmic rays (ACRs) which are of a mixed interstellar-heliospheric origin. Particles are also accelerated at planetary bow shocks. We will present recent observations of energetic particles by Solar Orbiter and Parker Solar Probe, as well as other spacecraft that allow us to study the acceleration and transport of energetic particles at multiple locations in the inner heliosphere.",
+     "content_hash": "2f7c2f545f93189c11efabb45eb0e8e6d6038f62ccab150216c5fd74bc5da5ef",
+     "exact_span": "The Sun drives a supersonic wind which inflates a giant plasma bubble in our very local interstellar neighborhood, the heliosphere. It is bathed in an extremely variable background of energetic ions and electrons which originate from a number of sources. Solar energetic particles (SEPs) are accelerated in the vicinity of the Sun, whereas shocks driven by solar disturbances are observed to accelerate energetic storm particles (ESPs). Moreover, a dilute population with a distinct composition forms",
+     "span_hash": "530c43e9ae72fafb69840144b69acfe653e16feee631516674789821ba87c7d6",
+     "evidence_class": "SCIENTIFIC_ABSTRACT",
+     "proposition_binding": "candidate_mechanism_input",
+     "locator": "https://doi.org/10.48550/arxiv.2408.02330",
+     "epistemic_strength": "VERIFIED"
+    },
+    {
+     "record_id": "doi:10.48550/arxiv.1006.4861",
+     "source": "arxiv",
+     "source_identity_verified": true,
+     "query": "r458-e1-inverter-weak-grid-sag-trips",
+     "retrieval_timestamp": "2026-09-17T00:22:51.313008+00:00",
+     "raw_content": "We analyze the occurrence frequency distributions of peak fluxes $P$, total fluxes $E$, and durations $T$ of solar flares over the last three solar cycles (during 1980--2010) from hard X-ray data of HXRBS/SMM, BATSE/CGRO, and RHESSI. From the synthesized data we find powerlaw slopes with mean values of $α_P=1.72\\pm0.08$ for the peak flux, $α_E=1.60\\pm0.14$ for the total flux, and $α_T=1.98\\pm0.35$ for flare durations. We find a systematic anti-correlation of the powerlaw slope of peak fluxes as a function of the solar cycle, varying with an approximate sinusoidal variation $α_P(t)=α_0+Δα\\cos{[2π(t-t_0)/T_{cycle}]}$, with a mean of $α_0=1.73$, a variation of $Δα=0.14$, a solar cycle period $T_{cycle}=12.6$ yrs, and a cycle minimum time $t_0=1984.1$. The powerlaw slope is flattest during the maximum of a solar cycle, which indicates a higher magnetic complexity of the solar corona that leads to an overproportional rate of powerful flares.",
+     "content_hash": "13863c59a445db6b59d1d7d0e30afcb04022ac9506c657790253dd5d3588cf00",
+     "exact_span": "We analyze the occurrence frequency distributions of peak fluxes $P$, total fluxes $E$, and durations $T$ of solar flares over the last three solar cycles (during 1980--2010) from hard X-ray data of HXRBS/SMM, BATSE/CGRO, and RHESSI. From the synthesized data we find powerlaw slopes with mean values of $α_P=1.72\\pm0.08$ for the peak flux, $α_E=1.60\\pm0.14$ for the total flux, and $α_T=1.98\\pm0.35$ for flare durations. We find a systematic anti-correlation of the powerlaw slope of peak fluxes as ",
+     "span_hash": "6abad2ca26692ba59df4d15723c922553d9cb660fd3bd70ededb69385896f24e",
+     "evidence_class": "SCIENTIFIC_ABSTRACT",
+     "proposition_binding": "candidate_mechanism_input",
+     "locator": "https://doi.org/10.48550/arxiv.1006.4861",
+     "epistemic_strength": "VERIFIED"
+    },
+    {
+     "record_id": "doi:10.48550/arxiv.1210.8058",
+     "source": "arxiv",
+     "source_identity_verified": true,
+     "query": "r458-e1-inverter-weak-grid-sag-trips",
+     "retrieval_timestamp": "2026-09-17T00:22:51.313015+00:00",
+     "raw_content": "Nanodust, which undergoes stochastic heating by single starlight photons in the interstellar medium, ranges from angstrom-sized large molecules containing tens to thousands of atoms (e.g. polycyclic aromatic hydrocarbon molecules) to grains of a couple tens of nanometers. The presence of nanograins in astrophysical environments has been revealed by a variety of interstellar phenomena: the optical luminescence, the near- and mid-infrared emission, the Galactic foreground microwave emission, and the ultraviolet extinction which are ubiquitously seen in the interstellar medium of the Milky Way and beyond. Nanograins (e.g. nanodiamonds) have also been identified as presolar in primitive meteorites based on their isotopically anomalous composition. Considering the very processes that lead to the detection of nanodust in the ISM for the nanodust in the solar system shows that the observation of solar system nanodust by these processes is less likely.",
+     "content_hash": "9063bb9d0e45d0271bbf6fcf60a5de7018f2d4e93f8f4cd1263698ffd9470df9",
+     "exact_span": "Nanodust, which undergoes stochastic heating by single starlight photons in the interstellar medium, ranges from angstrom-sized large molecules containing tens to thousands of atoms (e.g. polycyclic aromatic hydrocarbon molecules) to grains of a couple tens of nanometers. The presence of nanograins in astrophysical environments has been revealed by a variety of interstellar phenomena: the optical luminescence, the near- and mid-infrared emission, the Galactic foreground microwave emission, and t",
+     "span_hash": "79ee3a7fe036a6a660d99c161d27a55bb87c070c43d5788b212e6d976f607eb9",
+     "evidence_class": "SCIENTIFIC_ABSTRACT",
+     "proposition_binding": "candidate_mechanism_input",
+     "locator": "https://doi.org/10.48550/arxiv.1210.8058",
+     "epistemic_strength": "VERIFIED"
+    },
+    {
+     "record_id": "title:3748d3796d70401d",
+     "source": "core",
+     "source_identity_verified": true,
+     "query": "r458-e1-inverter-weak-grid-sag-trips",
+     "retrieval_timestamp": "2026-09-17T00:22:51.313024+00:00",
+     "raw_content": "Small-scale renewable energy systems are becoming increasingly popular due to soaring fuel prices and due to technological advancements which reduce the cost of manufacturing. Solar and wind energies, among other renewable energy sources, are the most available ones globally. The hybrid photovoltaic (PV) and wind power system has a higher capability to deliver continuous power with reduced energy storage requirements and therefore results in better utilization of power conversion and control equipment than either of the individual sources. Power conditioning units (p.c.u.) for such small-scale hybrid PV-wind generation systems have been proposed in this study. The system was connected to the grid, but it could also operate in standalone mode if the grid was unavailable. The system contains a local controller for every energy source and the grid inverter. Besides, it contains the supervisory controller.\n\nFor the wind generator side, small-scale vertical axis wind turbines (VAWTs) are attractive due to their ability to capture wind from different directions without using a yaw. One difficulty with VAWTs is to prevent over-speeding and component over-loading at excessive wind velocities. The proposed local controller for the wind generator is based on the current and voltage measured on the dc side of the rectifier connected to the permanent magnet synchronous generator (PMSG). Maximum power point tracking (MPPT) control is provided in normal operation under the rated speed using a dc/dc boost converter. For high wind velocities, the suggested local controller controls the electric power in order to operate the turbine in the stall region. This high wind velocity control strategy attenuates the stress in the system while it smoothes the power generated. It is shown that the controller is able to stabilize the nonlinear system using an adaptive current feedback loop. Simulation and experimental results are presented.\n\nThe PV generator side controller is designed to work in systems with multiple energy sources, such as those studied in this thesis. One of the most widely used methods to maximize the output PV power is the hill climbing technique. This study gives guidelines for designing both the perturbation magnitude and the time interval between consecutive perturbations for such a technique. These guidelines would improve the maximum power point tracking effi",
+     "content_hash": "eecd812399af3da983559c5bc822e7933456b8a5bf75fa1dd1cbd5782ed3390c",
+     "exact_span": "Small-scale renewable energy systems are becoming increasingly popular due to soaring fuel prices and due to technological advancements which reduce the cost of manufacturing. Solar and wind energies, among other renewable energy sources, are the most available ones globally. The hybrid photovoltaic (PV) and wind power system has a higher capability to deliver continuous power with reduced energy storage requirements and therefore results in better utilization of power conversion and control equ",
+     "span_hash": "21760b66688b13c20f31353a0ac6cdbd1467ade94cb3fe322fe7dcc988eaa8de",
+     "evidence_class": "SCIENTIFIC_ABSTRACT",
+     "proposition_binding": "candidate_mechanism_input",
+     "locator": "",
+     "epistemic_strength": "VERIFIED"
+    },
+    {
+     "record_id": "doi:10.1109/tia.2018.2883551",
+     "source": "semantic_scholar",
+     "source_identity_verified": true,
+     "query": "r458-e1-inverter-weak-grid-sag-trips",
+     "retrieval_timestamp": "2026-09-17T00:22:51.313032+00:00",
+     "raw_content": "This paper presents a multifunctional single-stage residential photovoltaic power supply based on a linear quadratic regulator (LQR). The system makes use of a single-phase power converter connected to the grid through an LCL filter. A robust LQR with added integral action (LQRI) controller is designed to incorporate added functions such as a power line conditioner, an active power regulator, and a voltage stabilizer. The perturb-and-observe algorithm is used to generate the reference signal for the fluctuating dc bus voltage as well as to extract the maximum power from the solar panels. Full modeling of the converter in the D–Q reference frame is presented. An LQRI is designed to achieve the optimal multifunctionality operation of the residential power supply. Simulation and experimental results confirm the expected performance of the proposed controller for insolation and load variations.",
+     "content_hash": "2dd208804e7c40928eec748694f994ae8b93c16482c0331fc409ed39fce615ab",
+     "exact_span": "This paper presents a multifunctional single-stage residential photovoltaic power supply based on a linear quadratic regulator (LQR). The system makes use of a single-phase power converter connected to the grid through an LCL filter. A robust LQR with added integral action (LQRI) controller is designed to incorporate added functions such as a power line conditioner, an active power regulator, and a voltage stabilizer. The perturb-and-observe algorithm is used to generate the reference signal for",
+     "span_hash": "563bcfc70571813b6f5d52dca9d5f1718e04b44f73c776cb40315bd35983107f",
+     "evidence_class": "SCIENTIFIC_ABSTRACT",
+     "proposition_binding": "candidate_mechanism_input",
+     "locator": "https://doi.org/10.1109/tia.2018.2883551",
+     "epistemic_strength": "VERIFIED"
+    },
+    {
+     "record_id": "title:901a8c8632748ba5",
+     "source": "openalex",
+     "source_identity_verified": true,
+     "query": "r458-e1-inverter-weak-grid-sag-trips",
+     "retrieval_timestamp": "2026-09-17T00:22:51.313052+00:00",
+     "raw_content": "The increasing penetration of wind turbines, photovoltaics (PV), fuel cells, microturbines, cogeneration, energy storage systems, and other Distributed Energy Resources (DER) presents both challenges and opportunities for distribution systems. A deep understanding of the characteristics of those devices, as well as accurate modeling, are essential to plan, design, and control modern distribution grids. The objective of this research is to define data-driven modeling techniques that allow capitalizing on the results of Hardware In the Loop (HIL) and Power Hardware In the Loop (PHIL) testing by creating models of the devices under test (DUT) –also for closed-source, proprietary systems– using the collected data. For the development of data-driven models, we used Artificial Neural Networks (ANN) and Fast Fourier Transform (FFT) to parameterize pre-defined model structures. We demonstrated the proposed approach using three PV micro-inverters, the proposed approach handles the nonlinearity of a full range grid voltage (0.88-1.10 p.u), not just under the normal grid voltage, including burst mode. No prior knowledge of internal components, structure, and control algorithm is assumed in developing the model. Results show the effectiveness of the approach, which is particularly suitable to model DERs. As a part of this research, we also would develop an approach to model DERs during abnormal grid conditions. The model will be parameterized by a set of automated PHIL tests. We verified the viability of our approach characterizing micro-inverters from three different manufacturers. It was found that it is possible to develop an approach to mimic the behavior of the internal protection system of microinverter during abnormal grid voltage, without prior knowledge of intimate control algorithms or hardware configuration.",
+     "content_hash": "adbfef7099c2dbc8af7ea80a6d6a992a08563181f607a581e0c1bce546d1c778",
+     "exact_span": "The increasing penetration of wind turbines, photovoltaics (PV), fuel cells, microturbines, cogeneration, energy storage systems, and other Distributed Energy Resources (DER) presents both challenges and opportunities for distribution systems. A deep understanding of the characteristics of those devices, as well as accurate modeling, are essential to plan, design, and control modern distribution grids. The objective of this research is to define data-driven modeling techniques that allow capital",
+     "span_hash": "e502e25383c5e17c666c3aee21275cf97acc8cb54b4530aa1c361e0c10329576",
+     "evidence_class": "SCIENTIFIC_ABSTRACT",
+     "proposition_binding": "candidate_mechanism_input",
+     "locator": "",
+     "epistemic_strength": "VERIFIED"
+    },
+    {
+     "record_id": "doi:10.5821/dissertation-2117-120996",
+     "source": "openalex",
+     "source_identity_verified": true,
+     "query": "r458-e1-inverter-weak-grid-sag-trips",
+     "retrieval_timestamp": "2026-09-17T00:22:51.313065+00:00",
+     "raw_content": "This thesis focuses on the operation and control of Large Scale Photovoltaic Power Plants (LS-PVPPs) according to grid code requirements with a special focus on the basic unit: the PV generator. The aim of this thesis is to study to what extent a PV generator can be controlled to comply with the plant operators requirements considering the capability curves under variable solar irradiance and temperature. In this sense, four challenges were identified: system integration, technical limitations and capability curves, dynamic modelling, and control. These challenges are addressed by a comprehensive literature review, mathematical analysis, and a series of detailed simulations. A thorough literature review of the current technology and topologies used in LS-PVPPs is performed, concluding that the central topology and radial configuration are the layouts most widely used. Additionally, grid codes presented by Germany, Puerto Rico, South Africa, Romania, and China are deeply analysed. A comparison of these grid codes is developed considering: fault ride through capability, frequency and voltage stability supprt as well as active and reactive power management. In addition a broad discussion about the challenges that the LS-PVPPs have to overcome is pesented together with the compliant technology and future trend.According to this review, one of the challenges to overcome is the understanding of the PV generator’s operation in LS- PVPPs. Thus, an analysis of its technical limitations and capability curves is essential in order to improve its control. In this thesis, a mathematical analysis to extract the PV generator’s capability curves is developed. These curves are characterized by four main parameters: solar irradiance, ambient temperature, dc voltage and modulation index. These values are dependent on each other in order to obtain the complete curve. In the case where the dc voltage is equal to a single value, the point of operation is limited by the solar irradiance and temperature. However, when the dc voltage varies in a safe range, the PV generator can work in a wider area for the same solar irradiance and temperature. The validation of these curves is tested in steady state under variable solar irradiance, ambient temperature, dc voltage and modulation index. In addition, this thesis analyses how the dynamic response of a PV generator is affected by its ca",
+     "content_hash": "5d6ee09d917b6c3a2293a447dffb5c341bf725f9e4bfcfae3b10e28071a16d0b",
+     "exact_span": "This thesis focuses on the operation and control of Large Scale Photovoltaic Power Plants (LS-PVPPs) according to grid code requirements with a special focus on the basic unit: the PV generator. The aim of this thesis is to study to what extent a PV generator can be controlled to comply with the plant operators requirements considering the capability curves under variable solar irradiance and temperature. In this sense, four challenges were identified: system integration, technical limitations a",
+     "span_hash": "ba1ffae23bfe66f0f5778fbb2586a1c6a2217bb4b3785d023e76d5e1dca0b420",
+     "evidence_class": "SCIENTIFIC_ABSTRACT",
+     "proposition_binding": "candidate_mechanism_input",
+     "locator": "https://doi.org/10.5821/dissertation-2117-120996",
+     "epistemic_strength": "VERIFIED"
+    }
+   ],
+   "hash_verification_all_pass": true,
+   "snapshot_hash": "908c698f9b286f8f4d4a9e16681135edecfa9de732b74821768e9707ea7fba54"
+  }
+ },
+ "stage_log": [
+  {
+   "stage": "RETRIEVE",
+   "capability_id": "A2_RETRIEVAL",
+   "module_path": "discovery_fabric/retrieval_fabric/pipeline.py",
+   "function": "retrieve_fabric(problem) [V2] / retrieve(problem) [V1]",
+   "started_at": "2026-09-17T00:18:00+00:00Z",
+   "before_envelope_hash": "6f9b59837b2c71b3ee6e01177a9fafc6d74455a0680fc574354e6e43be78d0e7",
+   "status": "OK",
+   "finished_at": "2026-09-17T00:22:51+00:00Z",
+   "after_envelope_hash": "6fe16fd4fac8f98ed8bebcf4c8ea95b46826ee941c3db4c4d70d575f9acbd843",
+   "candidate_delta": [
+    "evidence",
+    "evidence_ids",
+    "provenance"
+   ],
+   "delta_real": true,
+   "result_meta": {
+    "retrieved_count": 15,
+    "retrieval_fabric_version": "V2"
+   },
+   "entry": {
+    "entry_helper_version": "stage_entry/1.1.0",
+    "stage": "RETRIEVE",
+    "entry_status": "ALLOWED",
+    "prerequisite": "UPSTREAM_COMPLETE",
+    "prerequisite_evidence": {
+     "failed_stages": [],
+     "skipped_stages": []
+    }
+   }
+  },
+  {
+   "stage": "FREEZE",
+   "capability_id": "EVIDENCE_FREEZE",
+   "module_path": "orchestrator/evidence_custody.py",
+   "function": "promote_to_evidence(record, source, query, class, binding)",
+   "started_at": "2026-09-17T00:22:51+00:00Z",
+   "before_envelope_hash": "6fe16fd4fac8f98ed8bebcf4c8ea95b46826ee941c3db4c4d70d575f9acbd843",
+   "status": "OK",
+   "finished_at": "2026-09-17T00:22:51+00:00Z",
+   "after_envelope_hash": "1e2ae61f864e8013d0f19d0dc7fa183d74b570c4b530b125262c41b3d0cb83ea",
+   "candidate_delta": [
+    "provenance"
+   ],
+   "delta_real": true,
+   "result_meta": {
+    "custody_records": 10,
+    "hash_ok": true
+   },
+   "entry": {
+    "entry_helper_version": "stage_entry/1.1.0",
+    "stage": "FREEZE",
+    "entry_status": "ALLOWED",
+    "prerequisite": "UPSTREAM_COMPLETE",
+    "prerequisite_evidence": {
+     "failed_stages": [],
+     "skipped_stages": []
+    }
+   }
+  }
+ ]
+}

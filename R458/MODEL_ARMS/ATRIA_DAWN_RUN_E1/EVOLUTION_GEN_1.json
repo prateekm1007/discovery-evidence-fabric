@@ -1,0 +1,33 @@
+{
+ "gen": 1,
+ "invention_id": "inv:4fe7e2a600:gen1",
+ "parent_id": null,
+ "lineage": [
+  "inv:4fe7e2a600:gen1"
+ ],
+ "origin": "BASELINE_SYNTHESIS",
+ "architecture": {
+  "mechanism": "Second-order generalized integrator (SOGI) orthogonal-signal generation for the SRF-PLL supplies a frequency-adaptive, resonant-filtered estimate of the grid voltage, so during a sag the PLL's d/q reference does not oscillate and the inverter can remain synchronized and ride through.",
+  "intervention": "Reflash the existing string inverters' firmware (no hardware, feeder, protection-curve, or storage change, keeping the certified LCL-filter grid-code envelope) to replace the park-transform PLL with a SOGI-QSG-based SRF-PLL (optionally SOGI-FLL for frequency adaptation) so the 0.6-pu, 200-ms utility-switching sags on the SCR 2.6 feeder no longer destabilize the reference frame and trigger the instantaneous undervoltage trip.",
+  "expected_effect": "The SRF oscillation driving the instantaneous undervoltage trip during sag recovery is suppressed; the inverters stay locked through 200-ms, 0.6-pu sags, eliminating the roughly once-per-11-days trip cadence, while the existing LCL filter keeps injected-current THD within limits.",
+  "falsification_test": "Flash one inverter string with the SOGI-QSG SRF-PLL and subject it to controlled 0.6-pu, 200-ms sags (or log naturally occurring events over a fixed window), comparing PLL q-axis error and undervoltage-trip counts against the baseline PLL on identical sags; the mechanism is falsified if trips are not eliminated or if current THD exceeds the certified limit."
+ },
+ "state": "INVENTION_SURVIVED",
+ "maturity": "GENERATED",
+ "challenge": {
+  "physics_lifecycle": "MECHANISM_NOT_SIMULATABLE",
+  "attack_overall": "EVALUATOR_CALL_FAILED",
+  "evidence_verified": true,
+  "killed": false,
+  "failure_class": null,
+  "kill_reason": "adversarial adjudication incomplete: EVALUATOR_CALL_FAILED — infrastructure/evaluator state, NOT a scientific verdict (Art. XXV); rerunnable, never negative knowledge",
+  "final_status": "UNKNOWN"
+ },
+ "causal_delta": null,
+ "change_delta": null,
+ "reason_for_change": null,
+ "fresh_evidence": null,
+ "model": null,
+ "artifacts": {},
+ "evidence_verified": true
+}
