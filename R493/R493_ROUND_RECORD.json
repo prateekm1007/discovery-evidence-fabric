@@ -1,0 +1,68 @@
+{
+  "artifact_type": "R493_ROUND_RECORD",
+  "round": "R493",
+  "reviewer_provenance": "AI_REVIEW",
+  "round_question": "Next: behavior deploy carrying the A2 /api/ops transport + consumption gate -> untuned baseline on the frozen corpus -> v4 tuning against DEV only.",
+  "headline": "ALL THREE DELIVERED, PLUS THE TUNING LOOP RAN TWICE. (1) The A2 measurement transport (/api/ops/a2-attack) is DEPLOYED and LIVE on the production Space (identity tuple GREEN at every step), with the R491 hard-pin discipline extended to the gauntlet (require_provider rides the registry's OWN hard_pin_provider mechanism — the preference-only pin was measured falling through to another ring on the smoke case and was fixed before the baseline ran). (2) The consumption gate rode the R491 parallel line (deployed at dc90b510 before this round's first push): the uncalibrated gauntlet's KILL escalates in classify() with objections preserved verbatim, the state derived from the canonical registry entry a2_adversarial_gauntlet/1.0.0 (fail-closed, UNKNOWN_NOT_CALIBRATED today); this round REBASED onto that line and took it as the single state-derivation source of truth, dropping a competing a2/calibration.py module in the rebase. (3) The UNTUNED BASELINE on the frozen DEV corpus is measured (21/21 cases through the deployed transport, ring-pinned, zero pin deviations): TPR 0.0909 / FPR 1.0 — the first A2 number that has ever existed, and it is the universal-killer class. (4) The v4 tuning against DEV ONLY ran two measured iterations (baseline -> v4 0.9091/0.75 -> v4.1 0.6364/0.00); the round ends honestly NOT_CALIBRATED: FPR and coverage now clear their bars, TPR does not, so NO seal ships, article_l_state stays UNCALIBRATED_NO_MEASUREMENT_SHIPPED, and the consumption gate keeps escalating A2 kills — the fail-closed discipline doing exactly its job.",
+  "part_1_transport_and_gate": {
+    "what": "POST /api/ops/a2-attack {candidate, prior_art_state?, evidence_items?, evidence_verified?, require_provider?} — the R490 owned-plan step 2, mirroring the R487/R491 calibration-attack discipline (one attack per request, candidate 12KB / evidence 10KB caps, typed failures never a 500, prior_art_state vocabulary gate, require_provider validated against the registered provider ids). Disclosed input mapping: the gauntlet's only input channel is the candidate packet, so the corpus case's pinned evidence_items merge into it and prior_art_state passes as the instrument's own parameter. Transport provenance stamped on every response record (Art. VI).",
+    "ring_pin_mechanism": "adversarial_challenge/llm_chat accept require_provider; the pin rides llm_registry.generate's hard_pin_provider (rungs filtered to EXACTLY the pinned provider, no admissible rung -> NO_ADMISSIBLE_RUNG fail-closed, a pinned failure is CALL_FAILED never a cascade). The first design (SelectionPolicy preference only) was MEASURED insufficient on the smoke case: pinned atria, served xkiro — the R490 rules-x-ring exposure reproduced on the measurement path itself; the transport's ring_pin block typed the violation and the driver refused to score it (RING_DEVIATION never scores), after which the pin was rewired to the hard-pin mechanism and re-deployed.",
+    "consumption_gate_provenance": "the R491 parallel line (1c9b3142 + dc90b510) landed and DEPLOYED the A2 consumption gate before this round's first push (race instance 11, resolved on the bytes): classify() escalates an uncalibrated KILL (fall-through with adversarial_escalation riding the record — objections verbatim, admission-despite-objection with selection-level demotion, the R486 two-layer discipline), the unknown-verdict vocabulary fails closed to UNKNOWN, the calibrated authority is RING-BOUND. This round's rebase took that gate as standing (ONE state derivation — the canonical engine registry; the round's own competing a2/calibration.py + a2/calibration_records/ were dropped) and contributes the missing half: the transport.",
+    "deploys": [
+      "76cefabd — transport + pin plumbing (identity flip verified, health GREEN)",
+      "dedca446 — the hard-pin rewiring (identity flip verified, health GREEN)",
+      "0d93d67f — v4 tuning (identity flip verified)",
+      "45c0058e — v4.1 memory-claim floor + parse contract (identity flip verified, health fully ready)"
+    ]
+  },
+  "part_2_untuned_baseline": {
+    "record": "R493/A2_BASELINE/ (MEASUREMENT_RESULTS.json + RAW/ per-case records + MEASUREMENT.json)",
+    "instrument": "a2_gauntlet/1.0.0 — the UNTUNED gauntlet as deployed (commit dedca446), production ring",
+    "ring": "xkiro (HARD_PIN, 21/21 served by the pinned ring, zero violations); the declared primary atria was probed first and MEASURED typed-broken for attack prompts through this transport (HARD_PIN held, served Atria-Dawn-Preview, EVALUATOR_CALL_FAILED empty content — the R491 line's measured atria defect reproduced on the A2 path; probe preserved as ATRIA_PIN_PROBE_TYPED_FAILURE.json)",
+    "n": "21/21 measured, coverage 1.0, parse 1.0",
+    "headline": {
+      "tpr_defect_cohorts": 0.0909,
+      "detected_in_defect_cohorts": "1/11 (marker-bound kills only)",
+      "fpr_known_good": 1.0,
+      "false_kills_on_controls": "4/4",
+      "threshold_verdict": "NOT_CALIBRATED (fails tpr_min AND fpr_max)",
+      "failure_signature": "the universal-killer: obvious_combination killed all 4 clean controls; contradiction killed 8/11 defect cases with no evidence conflict (ABSENCE_AS_CONTRADICTION on the malformed cohort); regulatory_incompatibility boilerplate on a marine corpus under a 'medical device' prompt; kills unbound to the seeded defect content"
+    },
+    "scoring_discipline": "the corpus's own contract (R492 scoring_contract): TPR over TRUE_POSITIVE+EVIDENCE_CONTRADICTED with marker binding; FPR/TNR over the 4 controls; near-miss/scope-conflict/malformed cohorts as category disciplines OUTSIDE the headline; incomplete/failed attacks count against coverage, never as survival; the pre-registered thresholds REUSED verbatim from the R412 sealed bars (Art. XXVII); the corpus freeze hash re-verified before and after the run"
+  },
+  "part_3_v4_tuning_trajectory": {
+    "discipline": "Art. LIX: every change WARRANTED by a measured DEV-corpus failure class and recorded as such; the sealed corpora untouched (test-enforced disjointness from R492); the tuning is in-sample by design and any future seal MUST carry that disclosure",
+    "iterations": [
+      {
+        "version": "a2_gauntlet/1.1.0 (v4, commit 0d93d67f, deployed and measured)",
+        "changes": "domain-neutral prompt (the 'medical device' framing measured as regulatory boilerplate on a marine corpus), the KILL STANDARD (a KILLED verdict must name its specific grounding), per-dimension grounding contracts, deterministic floors: contradiction_absence (Art. XXI.3) + ungrounded_kill (no digit, no named standard, no >=4-word echo of the candidate's claims)",
+        "measured": {"tpr": 0.9091, "fpr": 0.75, "coverage": 0.8095, "parse": 0.9683, "verdict": "NOT_CALIBRATED (fpr_max, coverage_min)"},
+        "typed_residuals": "three obviousness kills on controls + the baseline-equivalence defect case, ALL citing literature/commercial memory (IMO GloBallast, BIO-SEA/Trojan UV, D-2 textbook configurations) — the grounded-but-wrong class the R491 engine measurement named; four cases dropped 1-2 dimension lines (parse)"
+      },
+      {
+        "version": "a2_gauntlet/1.1.0 v4.1 (commit 45c0058e, deployed and measured)",
+        "changes": "FLOOR 3 memory-claim (an obviousness kill survives only when PACKET-ANCHORED — an ev: citation or a >=4-word echo of an evidence item; memory is unverifiable for a no-retrieval instrument, so it can never execute as a kill — the engine v4's burden-of-proof direction applied to the A2); the floors skip dimensions already typed ADVERSARIAL_INVALID; _kill_grounded accepts packet-evidence echo; the prompt mandates ALL NINE response lines",
+        "measured": {"tpr": 0.6364, "fpr": 0.0, "coverage_strict": 0.9048, "parse": 1.0, "verdict": "NOT_CALIBRATED (tpr_min only)"},
+        "typed_residuals": "TPR misses: a2dev-04 (the memory-cited baseline-equivalence kill honestly demoted — baseline equivalence needs a retrieval-backed gate, not LLM memory), a2dev-07 and a2dev-10 (evaluator judgment: the endpoint-ambiguity and hold-dependency defects were not objectified on the killing dimensions; a2dev-10's only kill was contradiction and the absence floor correctly demoted it), a2dev-11 (the pinned SPECIFIC_DISCLOSURE case passes the gauntlet and is killed deterministically at classify via KILL_STATES — the gauntlet-level miss is real and recorded); 2 cases EVALUATION_FAILED (the V4 invalid check), counted against coverage"
+      }
+    ],
+    "variance_disclosure": "run-to-run evaluator variance is measured: a2dev-13's contradiction kill appeared in v4 and vanished in v4.1 with no code change on that path (response variance on the same frozen corpus, same ring, same build path); a future seal attempt must therefore be variance-aware (repetition-based) — a single run cannot support the CALIBRATED flip",
+    "seal_decision": "NO SEAL: the bars are not met (TPR 0.6364 < 0.75); article_l_state stays UNCALIBRATED_NO_MEASUREMENT_SHIPPED; the registry entry a2_adversarial_gauntlet/1.0.0 stays empty and fail-closed; the consumption gate keeps escalating A2 kills. The registry schema contract the seal must ship in is pinned by test (metrics.false_kill_rate_on_known_good + scoped_tpr_diagnostic.tpr + threshold_verdict.calibrated + attacker_ring)."
+  },
+  "batteries": "178 green across the 11 affected families on the final tree (incl. the R491 ring-pinned suite 25, R402 36, r487 20); the R493 suite 21 (transport discipline, pin semantics incl. the typed pin_violation, union gate pins, the calibrated-future path through a temporarily-registered record pair, and the three floor contracts)",
+  "race_disclosures": [
+    "race instance 11: the parallel R491 line pushed 1c9b3142+dc90b510 (the consumption gate + ring pin + deploy) between this round's reads; rebased twice, took their gate as the standing implementation, dropped this round's competing a2/calibration.py module, kept the transport; their R491 records commit 0046b82c (the engine ring-pinned measurement: TPR 1.0 / FPR 0.75 NOT_CALIBRATED) rebased under this round's part 2",
+    "their measured atria defect (typed-broken for attack prompts) reproduced independently through this round's own transport before the baseline ran"
+  ],
+  "honest_boundaries": [
+    "the A2 gauntlet remains UNCALIBRATED; its kills still escalate at consumption; no A2 number supports terminal kill authority yet",
+    "the DEV-corpus tuning is in-sample; the trajectory records the honest risk that the instrument is being fitted to its own calibration corpus — the variance disclosure makes a single-run seal impossible and a repetition-based seal the only honest path",
+    "the baseline-equivalence defect class (a2dev-04) appears to need a RETRIEVAL-backed gate (the gauntlet has no retrieval) — recorded as the roadmap-relevant finding, not silently absorbed",
+    "google_patents 503 upstream and the Lens provider-invalid token remain as measured in R491/R492 (operator Art. LXXIII act pending)"
+  ],
+  "next_rounds": [
+    "v4.2 direction (if the operator holds the A2 on the critical path): the two evaluator-judgment misses (a2dev-07 endpoint-ambiguity, a2dev-10 hold-dependency) are prompt-addressable, but the variance disclosure says fix-and-measure ONCE more, then repetition-based measurement for any seal claim",
+    "the R490 owned plan step 4 (measurement + seal into calibration_records/ with DIGESTS pins, the state flip derived) awaits bars-met numbers",
+    "Phase 1 remainder per the dependency order: verbatim-span synthesis, baseline-win ruling, R458 re-run; OWNER items unchanged (visual billing, one REAL experiment P-07 WP-01, external review)"
+  ]
+}
