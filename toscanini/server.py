@@ -1503,6 +1503,64 @@ class Handler(BaseHTTPRequestHandler):
             payload["owner_key"] = self._owner_key_cached
             return self._json(200, payload)
 
+        # ---- R487: the calibration-measurement transport ----
+        # POST /api/ops/calibration-attack {candidate, problem, evidence}
+        # Runs the engine's OWN independent-attack instrument (the same
+        # code path every run's gauntlet uses) on ONE submitted corpus
+        # case and returns the attack record. This exists because the
+        # sealed-corpus calibration measurement must run on the
+        # deployed instrument with the production provider ring — the
+        # repository-side vault lost its provider keys in the container
+        # recycle (the Space's deployed ring persists, R480 proof).
+        # Surface class: identical to /api/run (an LLM-call endpoint);
+        # bounded to ONE attack per request, payload-capped, and every
+        # failure typed (never a 500). The measurement driver
+        # (scripts/r487_attacker_v3_measurement.py) is the only
+        # intended caller; the endpoint carries no verdict authority
+        # the instrument does not already have (the calibration gate
+        # stays in force).
+        if p.path == "/api/ops/calibration-attack":
+            body = self._body_json()
+            candidate = body.get("candidate")
+            problem = body.get("problem")
+            evidence = body.get("evidence") or []
+            if not isinstance(candidate, dict) \
+                    or not isinstance(problem, dict):
+                return self._json(400, {
+                    "error": "candidate (object) and problem (object) "
+                             "required"})
+            if not isinstance(evidence, list):
+                evidence = []
+            evidence = [e for e in evidence if isinstance(e, dict)][:5]
+            try:
+                c_len = len(json.dumps(candidate).encode())
+                p_len = len(json.dumps(problem).encode())
+                e_len = len(json.dumps(evidence).encode())
+            except (TypeError, ValueError):
+                return self._json(400, {"error": "unserializable payload"})
+            if c_len > 12_000 or p_len > 4_000 or e_len > 10_000:
+                return self._json(413, {
+                    "error": "payload too large for the calibration "
+                             "transport (candidate 12KB / problem 4KB "
+                             "/ evidence 10KB caps)"})
+            try:
+                from discovery_fabric.engine.independent_attack \
+                    import independent_attack as _run_attack
+            except Exception as exc:  # noqa: BLE001 — typed, never 500
+                return self._json(503, {
+                    "error": "the attack instrument is unavailable in "
+                             "this build",
+                    "code": "INSTRUMENT_IMPORT_FAILURE",
+                    "detail": str(type(exc).__name__)})
+            try:
+                record = _run_attack(candidate, problem, evidence, None)
+            except Exception as exc:  # noqa: BLE001 — typed, never 500
+                return self._json(503, {
+                    "error": "the attack instrument failed to execute",
+                    "code": "INSTRUMENT_EXECUTION_FAILURE",
+                    "detail": str(type(exc).__name__)})
+            return self._json(200, {"attack": record})
+
         # ---- R459 (audit P0-3): the attachment ingestion endpoints ----
         # POST /api/attachments (multipart) — upload BEFORE a run exists
         # (the composer's attach flow). POST /api/run/{id}/attachments —

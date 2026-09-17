@@ -87,7 +87,56 @@ relation, a boundary overlap) ALSO ground the kill — the tag is the
 attacker's declared ground, the mechanical discovery is the gate's own
 measurement, and either satisfying verification is grounding.
 
-Constitutional notes:
+R487 v3.0.0 — THE ANCHOR + ACCOMMODATION DISCIPLINE (the R417 ruling's
+decisive repair: attacker calibration to the sealed bars). The R447
+measurement proved the v2 grounding check verifies the FORM of a
+binding, not its ADEQUACY: on the frozen corpus every clean control
+was killed by objections the candidate's own record already
+ACCOMMODATES (a disclosed-and-disposed failure mode re-described as a
+discovery; a hedged quantity ("roughly 4x") disputed by an alternative
+derivation; an element the record never claimed presented as a fatal
+gap; a premise resting on an explicitly typical external value). The
+seeded defects, by contrast, are UNaccommodated — the record's own
+account cannot absorb the objection. v3 adds two deterministic layers
+between grounding and the verdict (no thresholds, no corpus-specific
+content — structural rules only):
+
+  ANCHOR (the binding-class floor): a KILL must carry at least one
+  ANCHOR binding — EVIDENCE, RECORD, or DECLARED_SCOPE. A numeric
+  relation alone (COMPUTATION-only) is the weakest binding class: it
+  is exactly what a false kill constructs (cross-field unit
+  confusion, external constants, reinterpretation). A
+  computation-only kill demotes to ABSTAIN — objection preserved,
+  authority withdrawn.
+
+  ACCOMMODATION (the record answers): a grounded, anchored KILL is
+  demoted when the candidate's own record already accommodates the
+  objection:
+    - CONCESSION_DISPOSAL: the kill's record binding cites a span
+      from the candidate's own declared known_failure_modes — a
+      disclosed limitation re-described is not a discovered defect
+      (adequacy of the disposal is the adjudication council's
+      question, not the instrument's).
+    - HEDGED_TARGET: the contradicted target is a quantity the record
+      itself hedges ("roughly 4x", "approximately", quoted or
+      attributed as the candidate's claim) — the record declares the
+      value non-exact; an alternative derivation disputing a hedged
+      value is an interpretive objection, not a demonstrable
+      falsehood.
+    - UNSTATED_ELEMENT: the kill's failure assertion rests on the
+      record NOT stating an element ("no bypass line stated
+      anywhere", "no element that addresses...") — record silence is
+      incompleteness, not failure (Art. XXI.3 extended from evidence
+      to specification).
+    - TYPICAL_VALUE_PREMISE: the kill premises an explicitly typical
+      external value ("typically 1-3 bar", "in practice...") — a
+      world-generalization presented as a ground is an asserted
+      problem, not a found one.
+  EVIDENCE-anchored kills are NEVER accommodation-demoted: an
+  objection about held evidence is an adjudicable fact — the
+  strongest ground the instrument can hold.
+
+Constitutional grounding:
   - Art. XXVII: no thresholds are invented here. The binding
     definitions are structural (an id that exists; a verbatim span
     that appears; numbers joined by a comparator; strong-token overlap
@@ -105,7 +154,7 @@ from __future__ import annotations
 import re
 from typing import Any, Dict, List, Optional, Tuple
 
-ATTACK_VERSION = "independent_attack/2.1.0"
+ATTACK_VERSION = "independent_attack/3.0.0"
 ATTACK_CLASSES = (
     "MECHANISM_FAILURE", "BOUNDARY_CONDITION_FAILURE",
     "EVIDENCE_CONTRADICTION", "BASELINE_EQUIVALENCE",
@@ -141,6 +190,7 @@ EVIDENCE HELD (the candidate's own evidence bundle):
 Attack each failure class independently. A KILL verdict MUST cite a specific, concrete failure basis AND bind it to something checkable, stated at the end of the line as:
 GROUNDED_IN: EVIDENCE <record id from the bundle> | RECORD "<exact quoted span from the candidate's own claims>" | COMPUTATION <the numbers and the comparison between them> | SCOPE <the boundary condition clause violated>
 A KILL grounded only in the ABSENCE of evidence (e.g. "no evidence provided", "fails to demonstrate") is invalid: absence of evidence is uncertainty, not failure. Speculative objections (may / might / could, without a bound ground) are RISK, not KILL.
+THE KILL STANDARD (burden of proof): a KILL is warranted only if the candidate's own record cannot be true as stated — the defect is demonstrable from the candidate's own claims or held evidence. An objection the record already accommodates is RISK, never KILL: a failure mode the candidate itself discloses and disposes of; a quantity the record itself hedges (roughly, approximately, a band); an element the record never claimed to carry; a demand beyond the declared boundary conditions; a premise resting on what is merely typical in practice rather than on the record or the evidence. State the strongest objection you can WITHIN that standard.
 
 Respond in EXACTLY this format (each field on ONE line):
 MECHANISM_FAILURE: <KILL, RISK, or SURVIVE> — <specific basis> GROUNDED_IN: <binding>
@@ -376,6 +426,170 @@ def grounding_check(basis: str,
     return out
 
 
+# ---------------------------------------------------------------------------
+# v3 (R487) — the ANCHOR + ACCOMMODATION discipline. Structural rules
+# only: no thresholds, no corpus-specific strings, no LLM. Every rule
+# demotes to ABSTAIN with the objection preserved verbatim (BS-011) —
+# nothing is dropped, nothing is re-labelled RISK.
+# ---------------------------------------------------------------------------
+#: the binding classes that can alone carry a terminal KILL
+ANCHOR_BINDINGS = ("evidence", "record", "declared_scope")
+
+#: UNSTATED_ELEMENT — the failure assertion rests on the record NOT
+#: stating an element (spec-silence as failure; Art. XXI.3 extended
+#: from evidence to specification). "no <gap> stated/specified/..." or
+#: "no element/component/provision that ...".
+_UNSTATED_ELEMENT_RE = re.compile(
+    r"\b(?:no|without|lacks?|lacking|nothing in|nowhere)\b"
+    r"[^.;:!?]{0,60}"
+    r"\b(?:stated|specified|mentioned|provided|declared|included|"
+    r"element|component|provision|bypass|feature|line item)\b",
+    re.IGNORECASE)
+
+#: TYPICAL_VALUE_PREMISE — the kill premises an explicitly typical
+#: external value (a world-generalization, not a record fact)
+_TYPICAL_PREMISE_RE = re.compile(
+    r"\b(?:typically|in practice|as a rule|industry standard|"
+    r"standard practice|commonly|in general practice)\b",
+    re.IGNORECASE)
+
+#: HEDGED_TARGET — a hedge word carried into a number, inside a quoted
+#: span or attributed as the candidate's own claim (the record's own
+#: declared uncertainty; the attacker's own arithmetic hedges do NOT
+#: demote — only the TARGET's hedge does)
+_HEDGE_NUM_RE = re.compile(
+    r"\b(?:roughly|approximately|approx\.|about|around|of the order|"
+    r"on the order|plus or minus)\s*[^,;.!?]{0,24}?\d|±\s*\d|~\s*\d",
+    re.IGNORECASE)
+_HEDGE_ATTRIBUTION_RE = re.compile(
+    r"\b(?:claimed|claims|declared|declares|stated|states|predicted|"
+    r"predicts|the claim|its own)\b", re.IGNORECASE)
+_QUOTE_SPAN_RE = re.compile(r'["\'][^"\']{3,240}["\']')
+
+
+def _quoted_spans(basis: str) -> List[Tuple[int, int]]:
+    return [(m.start(), m.end()) for m in _QUOTE_SPAN_RE.finditer(basis)]
+
+
+def _hedged_target(basis: str) -> Optional[Dict[str, Any]]:
+    """A hedged number presented as the contradicted TARGET: the hedge
+    match sits inside a quoted span, or an attribution word ("the
+    claimed ...") immediately precedes it. The attacker's own hedged
+    arithmetic (unquoted, unattributed) is not a target hedge."""
+    spans = _quoted_spans(basis)
+    for m in _HEDGE_NUM_RE.finditer(basis):
+        in_quote = any(s <= m.start() < e for s, e in spans)
+        attributed = bool(_HEDGE_ATTRIBUTION_RE.search(
+            basis[max(0, m.start() - 48):m.start()]))
+        if in_quote or attributed:
+            return {
+                "rule": "HEDGED_TARGET",
+                "match": basis[m.start():m.start() + 40],
+                "reason": (
+                    "the contradicted target is a quantity the record "
+                    "itself hedges; an alternative derivation disputing "
+                    "a hedged value is an interpretive objection, not a "
+                    "demonstrable falsehood — the objection is preserved "
+                    "and escalated, the kill authority withdrawn"),
+            }
+    return None
+
+
+def anchor_check(bindings: List[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
+    """The v3 binding-class floor: a terminal KILL needs at least one
+    ANCHOR binding (evidence / record / declared-scope). Returns the
+    demotion record when the kill is computation-only."""
+    kinds = {b.get("binding") for b in bindings}
+    if kinds & set(ANCHOR_BINDINGS):
+        return None
+    return {
+        "rule": "NO_ANCHOR_BINDING",
+        "reason": (
+            "the only binding is a numeric relation (computation) — "
+            "the weakest binding class, exactly what a false kill "
+            "constructs (cross-field unit confusion, external "
+            "constants, reinterpretation); the objection is preserved "
+            "and escalated, the kill authority withdrawn"),
+    }
+
+
+def accommodation_check(basis: str,
+                        candidate: Dict[str, Any],
+                        bindings: List[Dict[str, Any]]
+                        ) -> Optional[Dict[str, Any]]:
+    """The v3 record-answer check on one GROUNDED, ANCHORED kill basis.
+
+    Demotes (objection preserved) when the candidate's own record
+    already accommodates the objection. EVIDENCE-anchored kills are
+    never demoted here: an objection about held evidence is an
+    adjudicable fact. Returns None when the kill stands.
+    """
+    kinds = {b.get("binding") for b in bindings}
+    if "evidence" in kinds:
+        return None
+    # CONCESSION_DISPOSAL: the kill's record binding cites the
+    # candidate's own declared known_failure_modes — a disclosed
+    # limitation re-described is not a discovered defect
+    if "record" in kinds:
+        kfm = " ".join(str(x) for x in
+                       (candidate.get("known_failure_modes") or []))
+        if kfm:
+            kfm_grams = _ngrams(kfm)
+            for b in bindings:
+                if b.get("binding") != "record":
+                    continue
+                ground = str(b.get("ground") or "")
+                # the v2 record binding carries the verbatim span in
+                # its ground; a fresh 4-gram overlap with the conceded
+                # failure-mode text is the same measurement
+                quoted = re.findall(r"'([^']+)'", ground)
+                span_txt = quoted[0] if quoted else ground
+                if _ngrams(span_txt) & kfm_grams:
+                    return {
+                        "rule": "CONCESSION_DISPOSAL",
+                        "match": span_txt[:60],
+                        "reason": (
+                            "the kill's own record binding cites the "
+                            "candidate's declared known_failure_modes — "
+                            "a disclosed limitation re-described is not "
+                            "a discovered defect; the adequacy of the "
+                            "disposal is the adjudication council's "
+                            "question, not the instrument's — the "
+                            "objection is preserved and escalated"),
+                    }
+    # UNSTATED_ELEMENT: record silence as the failure ground
+    m = _UNSTATED_ELEMENT_RE.search(basis)
+    if m:
+        return {
+            "rule": "UNSTATED_ELEMENT",
+            "match": m.group(0)[:60],
+            "reason": (
+                "the failure assertion rests on the record NOT stating "
+                "an element — record silence is incompleteness, not "
+                "failure (Art. XXI.3 extended to specification); the "
+                "objection is preserved and escalated"),
+        }
+    # TYPICAL_VALUE_PREMISE: an explicitly typical external value as
+    # the load-bearing premise
+    m = _TYPICAL_PREMISE_RE.search(basis)
+    if m:
+        return {
+            "rule": "TYPICAL_VALUE_PREMISE",
+            "match": m.group(0)[:60],
+            "reason": (
+                "the kill premises an explicitly typical external "
+                "value — a world-generalization presented as a ground "
+                "is an asserted problem, not a found one; the objection "
+                "is preserved and escalated"),
+        }
+    # HEDGED_TARGET: the contradicted target carries the record's own
+    # hedge
+    hedged = _hedged_target(basis)
+    if hedged:
+        return hedged
+    return None
+
+
 def _parse_attack(content: str) -> Dict[str, Dict[str, str]]:
     parsed: Dict[str, Dict[str, str]] = {}
     for m in _ATTACK_LINE_RE.finditer(content or ""):
@@ -474,6 +688,28 @@ def _validate_parsed(parsed: Dict[str, Dict[str, str]],
                 # adjudication — never dropped, never re-labelled RISK
                 item["verdict"] = DEMOTED_CLASS_VERDICT
                 item["demoted_from"] = "KILL"
+                item["demotion_layer"] = "v2_grounding"
+            else:
+                # v3 (R487): the ANCHOR floor, then the ACCOMMODATION
+                # record-answer check — a grounded kill must still be
+                # anchored (not computation-only) and unaccommodated
+                # (the candidate's own record must not already absorb
+                # the objection). Objection preserved verbatim either
+                # way; only the verdict authority is withdrawn.
+                anchor = anchor_check(g.get("bindings") or [])
+                if anchor is not None:
+                    item["verdict"] = DEMOTED_CLASS_VERDICT
+                    item["demoted_from"] = "KILL"
+                    item["demotion_layer"] = "v3_anchor"
+                    item["anchor"] = anchor
+                else:
+                    acc = accommodation_check(
+                        basis, candidate, g.get("bindings") or [])
+                    if acc is not None:
+                        item["verdict"] = DEMOTED_CLASS_VERDICT
+                        item["demoted_from"] = "KILL"
+                        item["demotion_layer"] = "v3_accommodation"
+                        item["accommodation"] = acc
             items.append(item)
             continue
         items.append({"attack_class": cls, "verdict": verdict,

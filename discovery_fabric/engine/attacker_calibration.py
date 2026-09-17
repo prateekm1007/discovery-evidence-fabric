@@ -205,6 +205,23 @@ INSTRUMENT_MEASUREMENTS = {
             "only (intervention suggestions); the NOT_CALIBRATED state "
             "derives identically from the R447 measurement"),
     },
+    # R487: v3.0.0 — the ANCHOR + ACCOMMODATION discipline (the R417
+    # ruling's decisive repair: attacker calibration to the sealed
+    # bars). The verdict logic CHANGED (the anchor floor + the
+    # record-answer demotions between grounding and the verdict), so
+    # NO inheritance: v3 must EARN its calibration state from ITS OWN
+    # committed measurement on the frozen R446 corpus — the same
+    # sealed bars (R412/R447, pre-registered; no new threshold
+    # invented, Art. XXVII). Until that measurement exists in-tree,
+    # this entry resolves UNKNOWN_NOT_CALIBRATED — fail-closed (an
+    # unmeasured instrument version has no measured terminal
+    # authority, Art. L). The flip, when it comes, is DERIVED by
+    # resolve_state from the record's numbers — never asserted here.
+    "independent_attack/3.0.0": {
+        "measurement": _pinned_path(
+            "r487_attacker_v3_measurement.json"),
+        "seal": _pinned_path("r487_attacker_v3_seal.json"),
+    },
 }
 
 
