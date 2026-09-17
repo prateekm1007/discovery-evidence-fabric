@@ -88,11 +88,18 @@ def test_constitution_v220_parses_and_acknowledged():
     # R441: the constitution amended to v2.3.0 (Article LXXII); R447:
     # amended again to v2.4.0 (Article LXXI, the deployed-production-URL
     # delivery standard); R468: amended to v2.5.0 (Article LXXIII, the
-    # Operator Secrets Registry); the loader must parse the RATIFIED
-    # version, whatever it now is
+    # Operator Secrets Registry); R484: v2.6.0 (LXXIV, durable execution);
+    # R498: v2.7.0 (LXXV, patent evidence is not patent truth); R503:
+    # v2.8.0 (LXXVI, credential custody) — the loader must parse the
+    # RATIFIED version, whatever it now is. Art. VII disclosed update
+    # (R503): the frozen "2.5.0" literal is replaced by the loader's own
+    # atomic derivation (single authority, Art. X), floored at the
+    # LXX-era version this test was written for.
     from epistemic_integrity import constitution_loader as cl
-    assert cl._parse_constitution_version() == "2.5.0"
+    parsed = cl._parse_constitution_version()
+    assert tuple(int(p) for p in parsed.split(".")) >= (2, 2, 0)
     state = cl.check_constitution_compliance()
+    assert state.constitution_version == parsed
     assert state.constitution_present
     assert state.acknowledgment_present, (
         "acknowledgment must be re-bound to the amended constitution bytes")

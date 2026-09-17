@@ -88,9 +88,18 @@ def test_amendment_document_exists_with_operator_directive():
     assert _norm(directive) in _norm(AMD.read_text())
 
 
-def test_constitution_parses_v250_with_unique_article():
-    assert cl._parse_constitution_version() == "2.5.0"
-    body = (REPO / "EPISTEMIC_CONSTITUTION.md").read_text()
+def test_constitution_parses_ratified_version_with_unique_article():
+    # Art. VII disclosed update (R503, cited in R503/constitution/AMENDMENT_RECORD.json):
+    # the frozen "2.5.0" literal broke at every later RATIFIED amendment by design
+    # (R484 2.6.0 LXXIV, R498 2.7.0 LXXV, R503 2.8.0 LXXVI). The intent — the loader
+    # parses the ratified version and Article LXXIII is present exactly once — is
+    # now expressed without the frozen literal: the parsed version must match the
+    # loader's atomic derivation and be at least the LXXIII-era version.
+    parsed = cl._parse_constitution_version()
+    assert parsed == cl.CONSTITUTION_VERSION
+    ver = tuple(int(p) for p in parsed.split("."))
+    assert ver >= (2, 5, 0)
+    body = (REPO / "EPISTEMIC_CONSTITUTION.md").read_text(encoding="utf-8")
     assert body.count("## Article LXXIII —") == 1
     assert "The Operator Secrets Registry" in body
 
@@ -100,15 +109,44 @@ def test_amendment_record_hash_trail():
     rec = json.loads(RECORD.read_text())
     assert rec["old"] == {"version": "2.4.0", "sha256": OLD_V24_HASH}
     assert rec["new"]["version"] == "2.5.0"
-    assert rec["new"]["sha256"] == cl.compute_constitution_hash()
     assert rec["new"]["sha256"] != OLD_V24_HASH
+    # Art. VII disclosed update (R503): the direct equality to the CURRENT file
+    # hash was true only at the R468 era; each later ratified amendment
+    # supersedes that link by design. The pin now walks the ratified chain
+    # (contiguous from R468: R468 -> R484 -> R498 -> R503): every record's old hash binds its
+    # parent's new hash, and the latest ratified record binds the current file —
+    # strictly stronger than any single link.
+    records = sorted(REPO.glob("R*/constitution/AMENDMENT_RECORD.json"))
+    assert len(records) >= 2
+    chain = [json.loads(p.read_text(encoding="utf-8")) for p in records]
+    # The record convention starts at R468: earlier amendments (R419's 2.2.0,
+    # the unrecorded 2.3.0/2.4.0 eras) predate the hash-trail format, so the
+    # contiguous chain is the SUFFIX of records starting after the LAST break
+    # in the old-hash-binds-previous-new-hash sequence. Every pair within the
+    # suffix must bind, and the latest record must bind the live file.
+    s = 0
+    for i in range(1, len(chain)):
+        if chain[i]["old"]["sha256"] != chain[i - 1]["new"]["sha256"]:
+            s = i
+    suffix = chain[s:]
+    assert len(suffix) >= 2, "contiguous amendment chain must span at least two records"
+    for prev, nxt in zip(suffix, suffix[1:]):
+        assert nxt["old"]["sha256"] == prev["new"]["sha256"], (
+            f"amendment chain broken between {prev.get('round')} and {nxt.get('round')}"
+        )
+    assert suffix[-1]["new"]["sha256"] == cl.compute_constitution_hash()
+    assert suffix[0]["round"] == rec["round"]
 
 
 def test_acknowledgment_rebound_and_compliance_green():
     state = cl.check_constitution_compliance()
     assert state.constitution_present is True
     assert state.acknowledgment_present is True
-    assert state.constitution_version == "2.5.0"
+    # Art. VII disclosed update (R503): the ratified version is asserted against
+    # the loader's own atomic parse (single authority, Art. X), not a frozen
+    # literal; it must be at least the LXXIII-era version.
+    assert state.constitution_version == cl._parse_constitution_version()
+    assert tuple(int(p) for p in state.constitution_version.split(".")) >= (2, 5, 0)
     assert state.constitution_hash == cl.compute_constitution_hash()
 
 

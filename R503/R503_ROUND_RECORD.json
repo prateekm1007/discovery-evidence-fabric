@@ -1,0 +1,84 @@
+{
+  "round": "R503",
+  "agent": "Super Z (main session — Coder line)",
+  "measured_at_utc": "2026-09-18T00:00:00Z",
+  "operator_directive_verbatim": "huggingface API : <supplied in session, redacted here>; keep all keys safe in huggingface secrets. do not rotate them unless i the CEO says so. update that in the constitution. all keys, API's should be there.",
+  "task": "Credential custody: verify + re-store the operator-supplied HF token, consolidate all held credentials into the HF secrets vault (no rotation), ratify the custody ruling as Article LXXVI.",
+  "baseline_alignment": {
+    "local_head_before": "09b44c50 (STALE_LOCAL_CHECKOUT — r449-c2 branch, R451-era)",
+    "remote_main": "0e78a905 (ls-remote verified)",
+    "action": "fetched, checkout -B main origin/main, clean; expected infrastructure verified (constitution, GOVERNANCE/, ACTIVE_PATH)",
+    "constitution_read": "v2.7.0 IN FULL (2,282 lines) + GOVERNANCE/ five files + worklog tail + ACTIVE_PATH head/addenda"
+  },
+  "execution": [
+    {
+      "step": "token verification",
+      "result": "operator-supplied token whoami OK (prateekm1, fine-grained); BYTE-IDENTICAL to the registered credential already held in the session injection file (hf_MrZ...NkNM, len 37) and to the R468 HF_TOKEN vault set event (Space updatedAt 2026-09-15T16:45:28.599Z)",
+      "verdict": "RE-STORE_OF_REGISTERED_CREDENTIAL — not a rotation; no value changed anywhere"
+    },
+    {
+      "step": "vault audit (both surfaces)",
+      "result": "Space secret surface: 28 names measured live (HF_TOKEN, GITHUB_TOKEN, ZAI_API_KEY, XKIRO_API_KEY, UNOROUTER_API_KEY, HF_API_KEY, APINEX/BAI/BYNARA/TOKENHARBOR/AEROLINK, ATRIA_API_KEY_1..15, LENS_API_TOKEN, ELSEVIER_API_KEY, PORTFOLIO_COMMIT); legacy Render env: 8 names (DURABLE_STATE_ENABLED, ENGINE_COMMIT, ENGINE_OPERATOR_KEY, GITHUB_TOKEN, NVIDIA_API_KEY, OPENROUTER_API_KEY, OPENROUTER_MODEL, PORTFOLIO_COMMIT)",
+      "asymmetry_found": "NVIDIA_API_KEY, OPENROUTER_API_KEY, ENGINE_OPERATOR_KEY held on Render only"
+    },
+    {
+      "step": "vault consolidation",
+      "result": "Space surface 28 -> 32 names: NVIDIA_API_KEY, OPENROUTER_API_KEY, ENGINE_OPERATOR_KEY added from Render values (fetched in-process, never printed, BS-021 held)",
+      "standing_secrets_untouched": "all EXCEPT the disclosed GITHUB_TOKEN incident below"
+    },
+    {
+      "step": "DISCLOSED INCIDENT (Art. XV)",
+      "result": "first execution mis-parsed the secrets endpoint (dict-as-list -> measured empty surface) and re-set the standing GITHUB_TOKEN from the Render value; the written value MEASURED byte-identical to the registered PAT (sha256[:16] f1ebca5f9b622f3e == R497 lift-in record == local .gh_pat) — effective no-op, standing credential unchanged; write event disclosed in R503/R503_VAULT_CUSTODY_AUDIT.json; failure class codified against in Art. LXXVI Section 4 (measure-before-write, fail closed)",
+      "remediation": "script corrected to parse the dict response; re-run posts nothing (idempotent guard)"
+    },
+    {
+      "step": "local vault rebuilt",
+      "result": "/home/z/my-project/.secrets.env recreated (0600) from held values only: HF_TOKEN (operator directive) + GITHUB_TOKEN (session injection file); PATENTBEAR_API_KEY NOT fabricated (value not held here — typed custody gap)",
+      "note": "the Art. LXXIII local vault had been lost to an environment reset — the exact failure mode that made the operator re-supply a token the durable vault still held"
+    },
+    {
+      "step": "Article LXXVI ratification",
+      "result": "EPISTEMIC_CONSTITUTION.md v2.7.0 -> v2.8.0: Article LXXVI — Credential Custody (HF Space secret surface = vault of record, both-direction presence obligation, rotation CEO-gated only, typed custody states, values never custody-free, measure-before-write); full text R503/constitution/ARTICLE_LXXVI_CREDENTIAL_CUSTODY.md; amended line added; acknowledgment re-bound atomically to 2.8.0 / a9e2543d... (pre-empting the R447 stale-pin failure class)"
+    },
+    {
+      "step": "rotation ruling applied",
+      "result": "ZERO rotation events; the R451-family 'rotate the exposed credentials' escalations are CLOSED as owner-accepted risk (Art. LXXVI Section 2); future audit artifacts may recommend and route rotation to the operator, never execute it"
+    },
+    {
+      "step": "Art. X inventory regen",
+      "result": "MODULE_INVENTORY.json regenerated at tip: 128 files / 68,312 LOC; --check GREEN — closes the re-audit's union-drift finding (free_evidence_sources.py:562 unlisted at 0e78a905, verified STALE at round start)"
+    }
+  ],
+  "custody_gaps_typed": [
+    {
+      "name": "PATENTBEAR_API_KEY",
+      "state": "CUSTODY_GAP_VALUE_NOT_HELD_HERE",
+      "registered_fingerprint": "561b6e70f5b5ea7f (R497 rotation record)",
+      "what_unblocks": "a session holding the value sets it on the Space vault surface, or the operator re-supplies"
+    },
+    {
+      "name": "EPO_OPS_KEY / PATENTSVIEW_KEY (Tier-1, Art. LXXV clause 3)",
+      "state": "REGISTERED_ABSENT_VALUE_NOT_HELD",
+      "what_unblocks": "free operator registration (EPO OPS) / PatentsView account — standing item, unchanged"
+    }
+  ],
+  "quota": {
+    "patentbear_debits_spent_this_round": 0,
+    "bucket_state": "19/20, last debit preserved — untouched this round"
+  },
+  "score_deltas": "NONE — integrity/process round: no capability measurement claimed, no seal, no REAL event; sum stays 136/25 = 5.44 -> OVERALL 5/10, NO (the standing verdict)",
+  "production_deployment": {
+    "target_sha": "this round's commit (delivered to origin/main)",
+    "deployed_sha": "562c4ff0 (the canonical Space still serves the R482-era build)",
+    "health_check_result": "BLOCKED",
+    "drift": "DRIFT",
+    "blocked_by": "no deploy directive this round; the 12-commit gap (2.7.0/2.8.0 constitution + RBG v3.1/v4 + free legs) rides the next deploy — now UNBLOCKED on the credential leg: HF_TOKEN is verified held and vault-registered",
+    "what_unblocks": "operator deploy directive -> scripts/r487_space_deploy.py pattern"
+  },
+  "tests": {
+    "touched_suites": "39 passed, 1 skipped (test_r498_patent_source_registry.py + test_r468_secrets_registry.py + test_r419_english_only.py + test_r498_rbg_patent_leg_mode.py)",
+    "pin_updates_disclosed": "five constitution-chain pins updated per the Art. VII disclosed-update precedent (each had bound the CURRENT file bytes to its own round's ratified hash — a link every later ratified amendment supersedes by design): the R498 suite now verifies the full amendment chain (R503.old == R498.new byte-hash; latest record binds the live file) and derives the header version from the constitution_loader authority; the R468 suite walks the contiguous ratified chain (R468 -> R484 -> R498 -> R503) and asserts loader-derived versions; the R419 parse assertion is loader-derived, floored at its era; the LXXV operational-layer slice is bounded to the LXXV article (LXXVI legitimately discusses CREDENTIAL fingerprints — a different concept). No expectation weakened: chain verification is strictly stronger than any single frozen link; all amendments cited in-file",
+    "inventory_check": "GREEN (128 files / 68,312 LOC)"
+  },
+  "reviewer_provenance": "AI_REVIEW"
+}

@@ -1,0 +1,149 @@
+{
+  "record_id": "R503_VAULT_CUSTODY_AUDIT",
+  "measured_at_utc": "2026-09-17T21:58:57.324031+00:00",
+  "operator_directive_verbatim": "keep all keys safe in huggingface secrets. do not rotate them unless i the CEO says so. update that in the constitution. all keys, API's should be there.",
+  "vault_of_record": "https://huggingface.co/spaces/prateekm1/toscanini-prod-validation (secret surface, write-only)",
+  "operator_token_verification": {
+    "whoami": "prateekm1",
+    "type": "user",
+    "fingerprint": "hf_MrZ...NkNM (len 37)",
+    "matches_registered_R468_HF_TOKEN": true,
+    "verdict": "RE-STORE_OF_REGISTERED_CREDENTIAL (not a rotation)"
+  },
+  "space_secret_names_before_this_pass": [
+    "AEROLINK_API_KEY",
+    "APINEX_API_KEY",
+    "ATRIA_API_KEY",
+    "ATRIA_API_KEY_10",
+    "ATRIA_API_KEY_11",
+    "ATRIA_API_KEY_12",
+    "ATRIA_API_KEY_13",
+    "ATRIA_API_KEY_14",
+    "ATRIA_API_KEY_15",
+    "ATRIA_API_KEY_2",
+    "ATRIA_API_KEY_3",
+    "ATRIA_API_KEY_4",
+    "ATRIA_API_KEY_5",
+    "ATRIA_API_KEY_6",
+    "ATRIA_API_KEY_7",
+    "ATRIA_API_KEY_8",
+    "ATRIA_API_KEY_9",
+    "BAI_API_KEY",
+    "BYNARA_API_KEY",
+    "ELSEVIER_API_KEY",
+    "ENGINE_OPERATOR_KEY",
+    "GITHUB_TOKEN",
+    "HF_API_KEY",
+    "HF_TOKEN",
+    "LENS_API_TOKEN",
+    "NVIDIA_API_KEY",
+    "OPENROUTER_API_KEY",
+    "PORTFOLIO_COMMIT",
+    "TOKENHARBOR_API_KEY",
+    "UNOROUTER_API_KEY",
+    "XKIRO_API_KEY",
+    "ZAI_API_KEY"
+  ],
+  "space_secret_count_before_this_pass": 32,
+  "space_secret_count_before_round": 28,
+  "render_env_names": [
+    "DURABLE_STATE_ENABLED",
+    "ENGINE_COMMIT",
+    "ENGINE_OPERATOR_KEY",
+    "GITHUB_TOKEN",
+    "NVIDIA_API_KEY",
+    "OPENROUTER_API_KEY",
+    "OPENROUTER_MODEL",
+    "PORTFOLIO_COMMIT"
+  ],
+  "render_note": "legacy production surface (stale-surface escalation stands); values used in-process only as consolidation source",
+  "write_events_this_round": {
+    "ENGINE_OPERATOR_KEY": {
+      "intent": "INTENDED_ADD",
+      "source": "RENDER_ENV (in-process, never printed)",
+      "standing_secret_touched": false
+    },
+    "NVIDIA_API_KEY": {
+      "intent": "INTENDED_ADD",
+      "source": "RENDER_ENV (in-process, never printed)",
+      "standing_secret_touched": false
+    },
+    "OPENROUTER_API_KEY": {
+      "intent": "INTENDED_ADD",
+      "source": "RENDER_ENV (in-process, never printed)",
+      "standing_secret_touched": false
+    },
+    "GITHUB_TOKEN": {
+      "intent": "UNINTENDED_OVERWRITE",
+      "source": "RENDER_ENV (in-process, never printed)",
+      "standing_secret_touched": true,
+      "value_fingerprint": "sha256:f1ebca5f9b622f3e",
+      "registered_fingerprint": "sha256:f1ebca5f9b622f3e (R497 lift-in record)",
+      "effective_effect": "NO-OP (written value measured byte-identical to the standing value)",
+      "disclosure": "the first execution parsed the secrets endpoint as a list, measured an empty surface, and re-set an already-present name; the value was verified identical, so the standing credential is unchanged; disclosed per Art. XV"
+    }
+  },
+  "standing_secrets_touched": [
+    "GITHUB_TOKEN (value-identical overwrite, measured no-op; disclosed)"
+  ],
+  "rotation_events_this_round": [],
+  "rotation_policy": "NO ROTATION \u2014 CEO-gated only (the ruling this round ratifies as Art. LXXVI)",
+  "local_vault_recreated": "/home/z/my-project/.secrets.env",
+  "local_vault_names": [
+    "HF_TOKEN",
+    "GITHUB_TOKEN"
+  ],
+  "space_secret_names_after": [
+    "AEROLINK_API_KEY",
+    "APINEX_API_KEY",
+    "ATRIA_API_KEY",
+    "ATRIA_API_KEY_10",
+    "ATRIA_API_KEY_11",
+    "ATRIA_API_KEY_12",
+    "ATRIA_API_KEY_13",
+    "ATRIA_API_KEY_14",
+    "ATRIA_API_KEY_15",
+    "ATRIA_API_KEY_2",
+    "ATRIA_API_KEY_3",
+    "ATRIA_API_KEY_4",
+    "ATRIA_API_KEY_5",
+    "ATRIA_API_KEY_6",
+    "ATRIA_API_KEY_7",
+    "ATRIA_API_KEY_8",
+    "ATRIA_API_KEY_9",
+    "BAI_API_KEY",
+    "BYNARA_API_KEY",
+    "ELSEVIER_API_KEY",
+    "ENGINE_OPERATOR_KEY",
+    "GITHUB_TOKEN",
+    "HF_API_KEY",
+    "HF_TOKEN",
+    "LENS_API_TOKEN",
+    "NVIDIA_API_KEY",
+    "OPENROUTER_API_KEY",
+    "PORTFOLIO_COMMIT",
+    "TOKENHARBOR_API_KEY",
+    "UNOROUTER_API_KEY",
+    "XKIRO_API_KEY",
+    "ZAI_API_KEY"
+  ],
+  "space_secret_count_after": 32,
+  "custody_gaps": [
+    {
+      "name": "PATENTBEAR_API_KEY",
+      "state": "CUSTODY_GAP_VALUE_NOT_HELD_HERE",
+      "registered_fingerprint": "561b6e70f5b5ea7f (R497 rotation record)",
+      "detail": "the R497-era session vault (/home/z/my-project/.secrets.env) was lost to an environment reset; the Space vault surface has no PATENTBEAR_API_KEY name; the value cannot be fabricated or reconstructed (Art. VI/XXV)",
+      "what_unblocks": "a session holding the value sets it on the Space vault surface, or the operator re-supplies the key"
+    },
+    {
+      "name": "EPO_OPS_KEY / PATENTSVIEW_KEY (Tier-1 primary-verification credentials, Art. LXXV clause 3)",
+      "state": "REGISTERED_ABSENT_VALUE_NOT_HELD",
+      "detail": "never held; typed REQUIRES_REGISTRATION since R499",
+      "what_unblocks": "free operator registration (EPO OPS) / PatentsView account"
+    }
+  ],
+  "values_in_repository": false,
+  "bs021_note": "no secret value appears in this record, any log, or any committed artifact \u2014 fingerprints only",
+  "reviewer_provenance": "AI_REVIEW"
+}
